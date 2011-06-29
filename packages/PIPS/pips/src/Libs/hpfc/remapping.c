@@ -128,9 +128,9 @@ generate_work_sharing_system(
     int size_r, size_d;
     Psysteme sharing = sc_new();
 
-    sc_add_egalite(sharing, partial_linearization(src, FALSE, psi_r, &size_r, 
+    sc_add_egalite(sharing, partial_linearization(src, false, psi_r, &size_r, 
 						  get_ith_processor_dummy));
-    sc_add_egalite(sharing, partial_linearization(trg, TRUE, psi_d, &size_d,
+    sc_add_egalite(sharing, partial_linearization(trg, true, psi_d, &size_d,
 						  get_ith_processor_prime));
     
     /* psi_d = psi_r + |psi_r| delta
@@ -311,7 +311,7 @@ processor_loop(
     entity (*create_psi)(),    /* to create a local proc. dim. */
     entity (*create_oth)(),    /* to create a comm. proc. dim. */
     statement body,               /* loop body */
-    boolean sh)                   /* whether to shift the psi's */
+    bool sh)                   /* whether to shift the psi's */
 {
     entity divide = hpfc_name_to_entity(IDIVIDE);
     Psysteme condition, enumeration, known, simpler;
@@ -452,13 +452,13 @@ broadcast(
     body = make_block_statement
 	(CONS(STATEMENT, cmp_lid,
 	 CONS(STATEMENT, if_different_pe_and_not_twin
-	      (src, lid, hpfc_generate_message(lid, TRUE, FALSE),
+	      (src, lid, hpfc_generate_message(lid, true, false),
 	       make_empty_statement()),
 	      NIL)));
 
     nest = systeme_to_loop_nest(sr, ldiff, body, hpfc_name_to_entity(IDIVIDE));
 
-    return lazy ? hpfc_lazy_guard(TRUE, nest) : nest ;
+    return lazy ? hpfc_lazy_guard(true, nest) : nest ;
 }
 
 /* in the following functions tag t controls the code generation, 
@@ -531,10 +531,10 @@ gen(int what,
 	ret(hpfc_initsend(is_lazy));
 
     case RCV+PRE+LZY:
-	ret(set_logical(hpfc_name_to_entity(LAZY_RECV), TRUE));
+	ret(set_logical(hpfc_name_to_entity(LAZY_RECV), true));
 
     case RCV+PRE:
-	ret(hpfc_generate_message(lid, FALSE, FALSE));
+	ret(hpfc_generate_message(lid, false, false));
 
 	/* cpy inl 
 	 */
@@ -551,25 +551,25 @@ gen(int what,
     case BRD+INL:
     case SND+INL+LZY:
     case BRD+INL+LZY:
-	ret(hpfc_lazy_packing(src, lid, create_src, TRUE, is_lazy));
+	ret(hpfc_lazy_packing(src, lid, create_src, true, is_lazy));
 
     case SND+INL+BUF:
     case SND+INL+LZY+BUF:
     case BRD+INL+BUF:
     case BRD+INL+LZY+BUF:
 	ret(hpfc_lazy_buffer_packing(src, trg, lid, proc, create_src,
-				     TRUE /* send! */, is_lazy));
+				     true /* send! */, is_lazy));
     case RCV+INL+BUF:
     case RCV+INL+LZY+BUF:
 	ret(hpfc_lazy_buffer_packing(src, trg, lid, proc, create_trg,
-				     FALSE /* receive! */, is_lazy));
+				     false /* receive! */, is_lazy));
     case RCV+INL:
     case RCV+INL+LZY:
-	ret(hpfc_lazy_packing(trg, lid, create_trg, FALSE, is_lazy));
+	ret(hpfc_lazy_packing(trg, lid, create_trg, false, is_lazy));
 
     case SND+PST:
     case SND+PST+LZY:
-	ret(hpfc_generate_message(lid, TRUE, is_lazy));
+	ret(hpfc_generate_message(lid, true, is_lazy));
 
     case BRD+PST:
     case BRD+PST+LZY:
@@ -587,10 +587,10 @@ gen(int what,
     case SND+PRE+LZY+BUF:
     case BRD+PRE+BUF:
     case BRD+PRE+LZY+BUF:
-	ret(hpfc_buffer_initialization(TRUE /* send! */, is_lazy, TRUE));
+	ret(hpfc_buffer_initialization(true /* send! */, is_lazy, true));
     case RCV+PRE+BUF:
     case RCV+PRE+LZY+BUF:
-	ret(hpfc_buffer_initialization(FALSE /* receive! */, is_lazy, TRUE));
+	ret(hpfc_buffer_initialization(false /* receive! */, is_lazy, true));
 	
 	/* default is a forgotten case, I guess
 	 */
@@ -716,7 +716,7 @@ generate_remapping_code(
 	    (procs, l, lp, p_src, p_trg, lid, NULL,
 	     get_ith_processor_dummy, get_ith_processor_prime,
 	     if_different_pe_and_not_twin(src, lid, rp_send, 
-					  make_empty_statement()), FALSE);
+					  make_empty_statement()), false);
     }
     else
     {
@@ -739,7 +739,7 @@ generate_remapping_code(
 	send = processor_loop
 	    (sd, l, lpproc, p_src, p_trg, lid, is_buffer ? trg : NULL,
 	     get_ith_processor_dummy, get_ith_processor_prime,
-	     diff, FALSE);
+	     diff, false);
 
 	gen_free_list(lpproc); sc_rm(sd); sc_rm(sr);
     }
@@ -753,7 +753,7 @@ generate_remapping_code(
     receive = processor_loop
 	(procs, lp, l, p_trg, p_src, lid, NULL,
 	 get_ith_processor_prime, get_ith_processor_dummy,
-	 if_different_pe_and_not_twin(src, lid, recv, copy), TRUE);
+	 if_different_pe_and_not_twin(src, lid, recv, copy), true);
 
     if (dist_p) gen_remove(&l, lambda);
 
@@ -821,13 +821,13 @@ set_live_status(
     int trg_n = load_hpf_number(load_similar_mapping(trg));
 
     return make_assign_statement(live_mapping_expression(trg_n),
-				 bool_to_expression(TRUE));
+				 bool_to_expression(true));
 }
 
 static statement 
 update_runtime_for_remapping(entity trg)
 {
-    statement s = set_live_status(trg, TRUE);
+    statement s = set_live_status(trg, true);
 
     {
 	string comment =
@@ -891,7 +891,7 @@ generate_remapping_guard(
 
 	l = CONS(STATEMENT,
 		 make_assign_statement(live_mapping_expression(trg_n),
-				   bool_to_expression(TRUE)), l);
+				   bool_to_expression(true)), l);
     }
 
     result = test_to_statement(make_test(cond, 
@@ -962,7 +962,7 @@ generate_dynamic_liveness_for_primary(
 	    ls = CONS(STATEMENT, 
 	      make_assign_statement
                   (live_mapping_expression(load_hpf_number(array)),
-		   bool_to_expression(FALSE)), ls);
+		   bool_to_expression(false)), ls);
 	}	    
     },
 	entities_list(load_dynamic_hpf(primary)));
@@ -1279,7 +1279,7 @@ root_statement_remapping_inits(
      */
     MAP(ENTITY, array,
 	if (bound_dynamic_hpf_p(array) && primary_entity_p(array))
-	    ls = CONS(STATEMENT, generate_all_liveness(array, FALSE), ls),
+	    ls = CONS(STATEMENT, generate_all_liveness(array, false), ls),
 	le);
 
     gen_free_list(le), le = NIL;

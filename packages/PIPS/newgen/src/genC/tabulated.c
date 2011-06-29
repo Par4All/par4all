@@ -282,7 +282,7 @@ gen_enter_tabulated(int domain, string id, gen_chunk * cp, bool allow_ref)
 
   if (gp==gen_chunk_undefined)
   {
-    cp = gen_do_enter_tabulated(domain, id, cp, FALSE);
+    cp = gen_do_enter_tabulated(domain, id, cp, false);
   }
   else /* already in, redefine */
   {

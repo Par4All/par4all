@@ -301,7 +301,7 @@ static set interprocedural_mapping(string res, call c) {
   string func_name = entity_local_name(callee);
   memory_mapping mem_map = (memory_mapping)db_get_memory_resource(res,
                                                                   func_name,
-                                                                  TRUE);
+                                                                  true);
   set summary = MAKE_SET();
   set_assign(summary,memory_mapping_map(mem_map));
 
@@ -1142,26 +1142,26 @@ bool ikernel_load_store(__attribute__((unused)) char * module_name) {
 
   set_current_module_statement((statement)db_get_memory_resource(DBR_CODE,
                                                                  module_name,
-                                                                 TRUE));
+                                                                 true));
   module_stat = get_current_module_statement();
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   /* set_entity_to_size(); should be performed at the workspace level */
 
   debug_on("KERNEL_DATA_MAPPING_DEBUG_LEVEL");
 
-  string pe = db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE);
+  string pe = db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true);
   set_proper_rw_effects((statement_effects)pe);
 
   /* out regions */
-  string or = db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE);
+  string or = db_get_memory_resource(DBR_OUT_REGIONS, module_name, true);
   set_out_effects((statement_effects)or);
 
   /* in regions */
-  string ir = db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE);
+  string ir = db_get_memory_resource(DBR_IN_REGIONS, module_name, true);
   set_in_effects((statement_effects)ir);
 
   /* preconditions */
-  string precond = db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE);
+  string precond = db_get_memory_resource(DBR_PRECONDITIONS, module_name, true);
   set_precondition_map((statement_mapping)precond);
 
   transfert_statement(module_stat, MAKE_SET(), MAKE_SET(), NULL, NULL);
@@ -1185,7 +1185,7 @@ bool kernel_data_mapping(char * module_name) {
 
   set_current_module_statement((statement)db_get_memory_resource(DBR_CODE,
                                                                  module_name,
-                                                                 TRUE));
+                                                                 true));
   module_stat = get_current_module_statement();
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   /* set_entity_to_size(); should be performed at the workspace level */
@@ -1194,24 +1194,24 @@ bool kernel_data_mapping(char * module_name) {
 
 
   /* regions */
-  string region = db_get_memory_resource(DBR_REGIONS, module_name, TRUE);
+  string region = db_get_memory_resource(DBR_REGIONS, module_name, true);
   set_proper_rw_effects((statement_effects)region);
 
 
   /* out regions */
-  string or = db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE);
+  string or = db_get_memory_resource(DBR_OUT_REGIONS, module_name, true);
   set_out_effects((statement_effects)or);
 
   /* in regions */
-  string ir = db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE);
+  string ir = db_get_memory_resource(DBR_IN_REGIONS, module_name, true);
   set_in_effects((statement_effects)ir);
 
   /* preconditions */
-  string precond = db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE);
+  string precond = db_get_memory_resource(DBR_PRECONDITIONS, module_name, true);
   set_precondition_map((statement_mapping)precond);
 
   /* preconditions */
-  string cumu = db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE);
+  string cumu = db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true);
   set_cumulated_rw_effects((statement_effects)cumu);
 
   // Stuff for ... ?

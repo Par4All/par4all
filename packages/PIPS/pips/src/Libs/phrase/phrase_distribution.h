@@ -96,7 +96,7 @@ string get_externalized_function_name(statement stat);
 string get_externalized_and_analyzed_function_name(statement stat,
 						   int* stats_nb);
  
-boolean compute_distribution_context (list l_stats, 
+bool compute_distribution_context (list l_stats, 
 				      statement module_stat,
 				      entity module,
 				      hash_table* ht_stats,
@@ -105,7 +105,7 @@ boolean compute_distribution_context (list l_stats,
 				      hash_table* ht_out_regions,
 				      hash_table* ht_in_regions);
 
-boolean compute_distribution_controlization_context (list l_calls, 
+bool compute_distribution_controlization_context (list l_calls, 
 						     statement module_stat,
 						     entity module,
 						     hash_table* ht_calls,

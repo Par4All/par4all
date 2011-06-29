@@ -194,7 +194,7 @@ static list compute_regions_union(list l_in, list l_out)
 
   MAP(REGION, reg, {
                      entity e = region_entity(reg);
-                     bool is_already_present = FALSE;
+                     bool is_already_present = false;
                      region reg_already_present = NULL;
 
                      MAP (REGION, union_reg, {
@@ -202,7 +202,7 @@ static list compute_regions_union(list l_in, list l_out)
 
                                                if (same_entity_p(e, e2)) 
                                                {
-            	                                 is_already_present = TRUE;
+            	                                 is_already_present = true;
 	                                         reg_already_present = union_reg;
                                                }
                                              }, l_union);
@@ -256,9 +256,9 @@ static list compute_regions_union(list l_in, list l_out)
 /**
    Compute internal distribution context for statement externalized_code
  */
-static boolean internal_compute_distribution_context(statement externalized_code, hash_table* ht_params, hash_table* ht_private, hash_table* ht_in_regions, hash_table* ht_out_regions, void* key_value) 
+static bool internal_compute_distribution_context(statement externalized_code, hash_table* ht_params, hash_table* ht_private, hash_table* ht_in_regions, hash_table* ht_out_regions, void* key_value) 
 {
-  boolean returned_value = TRUE;
+  bool returned_value = true;
   list l_read, l_write, l_in, l_out;
   list l_params = NIL;
   list l_priv = NIL;
@@ -314,7 +314,7 @@ static boolean internal_compute_distribution_context(statement externalized_code
   else 
   {
     pips_user_warning("Multiply defined value in PARAMS hash_table!\n");    
-    returned_value = FALSE;
+    returned_value = false;
   }
   
   pips_debug(5, "Storing in ht_private: \n");
@@ -326,7 +326,7 @@ static boolean internal_compute_distribution_context(statement externalized_code
   else 
   {
     pips_user_warning("Multiply defined value in PRIVATE hash_table!\n");    
-    returned_value = FALSE;
+    returned_value = false;
   }
   
   pips_debug(5, "Storing in ht_in_regions: \n");
@@ -338,7 +338,7 @@ static boolean internal_compute_distribution_context(statement externalized_code
   else 
   {
     pips_user_warning("Multiply defined value in IN_REGIONS hash_table!\n");    
-    returned_value = FALSE;
+    returned_value = false;
   }
   
   pips_debug(5, "Storing in ht_out_regions: \n");
@@ -350,7 +350,7 @@ static boolean internal_compute_distribution_context(statement externalized_code
   else 
   {
     pips_user_warning("Multiply defined value in OUT_REGIONS hash_table!\n");    
-    returned_value = FALSE;
+    returned_value = false;
   }
 
   return returned_value;
@@ -360,9 +360,9 @@ static boolean internal_compute_distribution_context(statement externalized_code
 /**
    Compute distribution context for statement externalized_code
  */
-static boolean compute_distribution_context(list l_stats, statement module_stat, entity module, hash_table* ht_stats, hash_table* ht_params, hash_table* ht_private, hash_table* ht_in_regions, hash_table* ht_out_regions)
+static bool compute_distribution_context(list l_stats, statement module_stat, entity module, hash_table* ht_stats, hash_table* ht_params, hash_table* ht_private, hash_table* ht_in_regions, hash_table* ht_out_regions)
 {
-  boolean returned_value = TRUE;
+  bool returned_value = true;
 
   pips_debug(5, "[BEGIN] compute_distribution_context for %s: \n", entity_local_name(module));
 
@@ -404,14 +404,14 @@ static boolean compute_distribution_context(list l_stats, statement module_stat,
                       else 
                       {
                         pips_user_warning("Multiply defined value in STATS hash_table!\n");    
-                        returned_value = FALSE;
+                        returned_value = false;
                       }
 
                       pips_debug(3, "ANALYSING function named [%s]..................\n", function_name);
 
                       if (!internal_compute_distribution_context(externalized_code, ht_params, ht_private, ht_in_regions, ht_out_regions, function_name)) 
                       {
-                        returned_value = FALSE;
+                        returned_value = false;
                       }
                     }, l_stats);
 
@@ -774,18 +774,18 @@ bool safescale_distributor(string module_name)
   entity module;
 
   /* Set and get the current properties concerning regions */
-  set_bool_property("MUST_REGIONS", TRUE);
-  set_bool_property("EXACT_REGIONS", TRUE);
+  set_bool_property("MUST_REGIONS", true);
+  set_bool_property("EXACT_REGIONS", true);
   get_regions_properties();
   
   /* Get the resources */
-  module_stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  module_stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   module = module_name_to_entity(module_name);
 
   set_current_module_statement(module_stat);
   set_current_module_entity(module_name_to_entity(module_name));
 
-  set_cumulated_rw_effects((statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+  set_cumulated_rw_effects((statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
   module_to_value_mappings(module);
   
   /* Set dynamic_area */
@@ -797,9 +797,9 @@ bool safescale_distributor(string module_name)
   debug_on("SAFESCALE_DISTRIBUTOR_DEBUG_LEVEL");
 
   /* Get the READ, WRITE, IN and OUT regions of the module */
-  set_rw_effects((statement_effects) db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
-  set_in_effects((statement_effects) db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
-  set_out_effects((statement_effects) db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
+  set_rw_effects((statement_effects) db_get_memory_resource(DBR_REGIONS, module_name, true));
+  set_in_effects((statement_effects) db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
+  set_out_effects((statement_effects) db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
 
   /* Do the job */
   pips_debug(2, "BEGIN of SAFESCALE_DISTRIBUTOR\n");
@@ -831,5 +831,5 @@ bool safescale_distributor(string module_name)
   
   debug_off();
   
-  return TRUE;
+  return true;
 }

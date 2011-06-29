@@ -136,7 +136,7 @@ static void display_partial_redundancy_elimination_statistics()
    This function removes all the inequalities
    with big coefficient (> MAXCOEFFICIENT) in the system to avoid overflow */
 
-static boolean all_variables_in_precondition(Pvecteur v, Psysteme p)
+static bool all_variables_in_precondition(Pvecteur v, Psysteme p)
 {
   Pbase b = p->base;
   Pvecteur vec;
@@ -144,9 +144,9 @@ static boolean all_variables_in_precondition(Pvecteur v, Psysteme p)
     { 
       Variable var = vec->var;
       if ((var !=TCST) && (!base_contains_variable_p(b,var)))
-	return FALSE;
+	return false;
     }
-  return TRUE;
+  return true;
 }
 
 static Psysteme simplify_big_coeff(Psysteme sc)
@@ -170,9 +170,9 @@ static Psysteme simplify_big_coeff(Psysteme sc)
   return(sc);
 }
 
-boolean efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
+bool efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
 {
-  boolean retour = TRUE;
+  bool retour = true;
   ifdebug(3) 
     {	  
       fprintf(stderr, "\n Efficient check feasibility : ");    
@@ -183,9 +183,9 @@ boolean efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
   switch (sc_check_inequality_redundancy(contrainte_make(v), prec)) /* try fast check */
     {
     case 1: /* ok, feasible because ineq is redundant wrt prec*/
-      return TRUE;
+      return true;
     case 2: /* ok, system {prec + ineq} is infeasible */
-      return FALSE;
+      return false;
     case 0: /* no result, try slow version. default is feasible. */
       {
 
@@ -210,23 +210,23 @@ boolean efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
 	    sc_fprint(stderr,s, (char * (*)(Variable)) entity_local_name);
 	  }
 	/* add the inegality to the system*/
-	sc_constraint_add(s, contrainte_make(v), FALSE);
+	sc_constraint_add(s, contrainte_make(v), false);
 	ifdebug(3) 
 	  {	
 	    fprintf(stderr, " \n After add constraint : ");
 	    sc_fprint(stderr,s, (char * (*)(Variable)) entity_local_name);
 	  }
-	retour = sc_integer_feasibility_ofl_ctrl(s, OFL_CTRL,TRUE);
+	retour = sc_integer_feasibility_ofl_ctrl(s, OFL_CTRL,true);
 	ifdebug(2) 
 	  fprintf(stderr, " Retour: %d", retour); 	
 	sc_rm(s);
       
-      /* if retour = TRUE : the system is feasible or there are overflows
-	 (our goal is to verify if retour is FALSE or not)
+      /* if retour = true : the system is feasible or there are overflows
+	 (our goal is to verify if retour is false or not)
 	 if there are overflows (the value of nofoverflows will be changed), 
 	 we simplify the system and recalcul the feasibility*/
 	
-      if ((retour == TRUE) && 
+      if ((retour == true) && 
 	  (nofoverflows < linear_number_of_exception_thrown))
 	{
 	  /* there has been an overflow, let us try something else... */
@@ -238,13 +238,13 @@ boolean efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
 	      sc_fprint(stderr,new_s, (char * (*)(Variable)) entity_local_name);
 	    }
 	  new_s = simplify_big_coeff(new_s); 
-	  sc_constraint_add(new_s, contrainte_make(v), FALSE);
+	  sc_constraint_add(new_s, contrainte_make(v), false);
 	  ifdebug(3) 
 	    {	
 	      fprintf(stderr, " \n After add constraint : ");
 	      sc_fprint(stderr,new_s, (char * (*)(Variable)) entity_local_name);
 	    }
-	  retour = sc_integer_feasibility_ofl_ctrl(new_s, OFL_CTRL,TRUE);
+	  retour = sc_integer_feasibility_ofl_ctrl(new_s, OFL_CTRL,true);
 	  sc_rm(new_s);
 	}
       break;
@@ -280,9 +280,9 @@ partial_redundancy_elimination_expression(expression e, Psysteme prec)
 	}
       if (relational_expression_p(e))
 	{
-	  /* Fast check : check if e is trivial TRUE or FALSE
-	   * Slow check : see if e is TRUE or FALSE wrt the precondition prec
-	   * if (e + prec = infeasible) => e = FALSE 
+	  /* Fast check : check if e is trivial true or FALSE
+	   * Slow check : see if e is true or false wrt the precondition prec
+	   * if (e + prec = infeasible) => e = false 
 	   * if (NOT(e) + prec = infeasible) => e = TRUE
 	   * if not => no conclusion, return e itself
 	   *
@@ -293,7 +293,7 @@ partial_redundancy_elimination_expression(expression e, Psysteme prec)
 	   * ofl_ctrl = OFL_CTRL means that the overflows are treated in the 
 	   * called procedure (sc_rational_feasibility_ofl_ctrl())
 	   *
-	   * ofl_res = TRUE means that if the overflows occur, function 
+	   * ofl_res = true means that if the overflows occur, function 
 	   * sc_rational_feasibility_ofl_ctrl will return the value TRUE
 	   * we have no conclusion : retour = copy_expression (e)
 	   *
@@ -351,8 +351,8 @@ partial_redundancy_elimination_expression(expression e, Psysteme prec)
 		      else 
 			{
 			  Psysteme prec_dup = sc_dup(prec);
-			  sc_constraint_add(prec_dup,contrainte_make(v),TRUE);
-			  if (!sc_integer_feasibility_ofl_ctrl(prec_dup, OFL_CTRL,TRUE))
+			  sc_constraint_add(prec_dup,contrainte_make(v),true);
+			  if (!sc_integer_feasibility_ofl_ctrl(prec_dup, OFL_CTRL,true))
 			    {
 			      /* Not e + prec = infeasible => e = TRUE*/
 			      sc_rm(prec_dup);
@@ -385,10 +385,10 @@ partial_redundancy_elimination_expression(expression e, Psysteme prec)
 		      else
 			{
 			  Psysteme prec_dup = sc_dup(prec);
-			  sc_constraint_add(prec_dup,contrainte_make(v),TRUE);
+			  sc_constraint_add(prec_dup,contrainte_make(v),true);
 			  /* for union5.f, sc_rational_feasibility can not eliminate the second test 
 			   * it works with sc_integer_feasibility */
-			  if (!sc_integer_feasibility_ofl_ctrl(prec_dup, OFL_CTRL,TRUE))
+			  if (!sc_integer_feasibility_ofl_ctrl(prec_dup, OFL_CTRL,true))
 			    {
 			      /* e + prec = infeasible => e = FALSE*/
 			      sc_rm(prec_dup);
@@ -757,7 +757,7 @@ partial_redundancy_elimination_rwt(statement s,
 static bool store_mapping(control c, persistant_statement_to_control map)
 {
   extend_persistant_statement_to_control(map,control_statement(c),c);
-  return TRUE;
+  return true;
 }
 
 static void 
@@ -784,32 +784,32 @@ partial_redundancy_elimination_statement(statement module_statement)
    (A+B).GT.C.AND.(B+C).GT.A.AND.(C+A).GT.B where we have (C+A).LE.B will
    be FLAG = .FALSE.
 
-   If test conditions are simplified to TRUE or FALSE, the test statement
+   If test conditions are simplified to true or false, the test statement
    is replaced by the true or the false branch right away to avoid a
    re-computation of transformers and preconditions. FORMAT statements in
    the eliminated branch are preserved by moving them in the remaining
    statement. Some FORMAT statements may become useless but this is not
    tested.
 
-   If a WHILE condition is simplified to FALSE, the WHILE is eliminated.
+   If a WHILE condition is simplified to false, the WHILE is eliminated.
 
    @param[in] module_name is the name of the module we want to apply
    partial_redundancy_elimination on
 
-   @return TRUE since we are confident that everything goes fine
+   @return true since we are confident that everything goes fine
  */
 bool partial_redundancy_elimination(char *module_name)
 {
   statement module_statement;
   set_current_module_entity(module_name_to_entity(module_name));
-  module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   set_current_module_statement(module_statement);
 
   set_ordering_to_statement(module_statement);
   set_precondition_map((statement_mapping)
 		       db_get_memory_resource(DBR_PRECONDITIONS,
 					      module_name,
-					      TRUE));
+					      true));
   debug_on("PARTIAL_REDUNDANCY_ELIMINATION_DEBUG_LEVEL");
   ifdebug(1){
     debug(1, "Partial redundancy elimination for logical expressions","Begin for %s\n", module_name);
@@ -829,5 +829,5 @@ bool partial_redundancy_elimination(char *module_name)
   reset_precondition_map();
   reset_current_module_statement();
   reset_current_module_entity();
-  return TRUE;
+  return true;
 }

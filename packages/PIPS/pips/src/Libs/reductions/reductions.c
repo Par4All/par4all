@@ -56,7 +56,7 @@ reductions load_summary_reductions(entity f)
 {
     pips_assert("is a module", entity_module_p(f));
     return (reductions) db_get_memory_resource
-	(DBR_SUMMARY_REDUCTIONS, module_local_name(f), TRUE);
+	(DBR_SUMMARY_REDUCTIONS, module_local_name(f), true);
 }
 
 static reduction
@@ -113,9 +113,9 @@ bool summary_reductions(string module_name)
     set_generic_effects_as_needed();
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_current_module_statement((statement)
-        db_get_memory_resource(DBR_CODE, module_name, TRUE));
+        db_get_memory_resource(DBR_CODE, module_name, true));
     set_cumulated_reductions((pstatement_reductions)
-        db_get_memory_resource(DBR_CUMULATED_REDUCTIONS, module_name, TRUE));
+        db_get_memory_resource(DBR_CUMULATED_REDUCTIONS, module_name, true));
 
     red = compute_summary_reductions(get_current_module_entity());
 
@@ -127,7 +127,7 @@ bool summary_reductions(string module_name)
     generic_effects_reset_all_methods();
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /******************************************************* PROPER REDUCTIONS */
@@ -163,7 +163,7 @@ list_of_reduced_variables(
 	le = add_reduced_variables(le, load_cumulated_reductions(s));
       else {
 	pips_debug(5, "stat %s %p\n", note_for_statement(s), s);
-	pips_assert ("should not happen, all statements should have been visited for reduction", FALSE);
+	pips_assert ("should not happen, all statements should have been visited for reduction", false);
       }
     }
     return le;
@@ -248,12 +248,12 @@ static bool safe_effects_for_reductions(statement s, reductions rs)
                    effect_any_reference(e));
 
         gen_free_list(lr);
-        return FALSE;
+        return false;
       }
     }
 
     gen_free_list(lr);
-    return TRUE;
+    return true;
 }
 
 /* must check that the found reductions are
@@ -343,7 +343,7 @@ static bool pr_call_flt(call c)
 	    gen_nconc(translate_reductions(c), reductions_list(reds));
     }
 
-    return TRUE;
+    return true;
 }
 
 /* performs the computation of proper reductions for statement s.
@@ -381,9 +381,9 @@ bool proper_reductions(string module_name)
     module = local_name_to_top_level_entity(module_name);
     set_current_module_entity(module);
     set_current_module_statement
-	((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+	((statement) db_get_memory_resource(DBR_CODE, module_name, true));
     set_proper_references((statement_effects)
-        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, TRUE));
+        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, true));
 
     /* do the job
      */
@@ -401,7 +401,7 @@ bool proper_reductions(string module_name)
     generic_effects_reset_all_methods();
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /**************************************************** CUMULATED REDUCTIONS */
@@ -414,7 +414,7 @@ GENERIC_GLOBAL_FUNCTION(cumulated_reductions, pstatement_reductions)
 
 /* returns a r reduction of any compatible with { node } u ls
  * input: var, node and ls
- * output: TRUE and some *pr, or FALSE
+ * output: true and some *pr, or FALSE
  */
 static bool
 build_reduction_of_variable(
@@ -433,7 +433,7 @@ build_reduction_of_variable(
 	 load_proper_reductions(node)))
     {
 	free_reduction(*pr);
-	return FALSE;
+	return false;
     }
 
     FOREACH (STATEMENT, s, ls) {
@@ -442,16 +442,16 @@ build_reduction_of_variable(
 					  load_cumulated_reductions(s)))
 	  {
 	    free_reduction(*pr);
-	    return FALSE;
+	    return false;
 	  }
       }
       else {
 	pips_debug(5, "stat %s %p\n", note_for_statement(s), s);
-	pips_assert ("should not happen, all statements should have been visited for reduction", FALSE);
+	pips_assert ("should not happen, all statements should have been visited for reduction", false);
       }
     }
 
-    return TRUE;
+    return true;
 }
 
 /* builds cumulated reductions for node, depending on node and
@@ -548,13 +548,13 @@ bool cumulated_reductions(string module_name)
      */
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_current_module_statement((statement)
-        db_get_memory_resource(DBR_CODE, module_name, TRUE));
+        db_get_memory_resource(DBR_CODE, module_name, true));
     set_proper_references((statement_effects)
-        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, TRUE));
+        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, true));
     set_rw_effects((statement_effects)
-        db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+        db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     set_proper_reductions((pstatement_reductions)
-	db_get_memory_resource(DBR_PROPER_REDUCTIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_PROPER_REDUCTIONS, module_name, true));
 
     /* do the job here
      */
@@ -574,7 +574,7 @@ bool cumulated_reductions(string module_name)
     generic_effects_reset_all_methods();
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /** 

@@ -159,8 +159,8 @@ caller_list_of_bounds(
 		    if (ith_dim_overlapable_p(old, dim))
 		    {
 			lneeded = 
-			    CONS(EXPRESSION, hpfc_array_bound(var, FALSE, dim),
-			    CONS(EXPRESSION, hpfc_array_bound(var, TRUE, dim),
+			    CONS(EXPRESSION, hpfc_array_bound(var, false, dim),
+			    CONS(EXPRESSION, hpfc_array_bound(var, true, dim),
 				 lneeded));
 		    }
 		}
@@ -199,7 +199,7 @@ hpf_compile_call(
 	    entity primary = expression_to_entity(e);
 	    pips_debug(5, "dealing with array %s\n", entity_name(primary));
 	    if (array_distributed_p(primary))
-		ls = CONS(STATEMENT, generate_all_liveness(primary, TRUE), ls);
+		ls = CONS(STATEMENT, generate_all_liveness(primary, true), ls);
 	},
 	    call_arguments(c));
 	
@@ -607,14 +607,14 @@ static bool parallel_loop_found;
 static bool loop_flt(loop l)
 {
     if (execution_parallel_p(loop_execution(l))) {
-	parallel_loop_found = TRUE;
+	parallel_loop_found = true;
 	gen_recurse_stop(NULL);
     }
     return !parallel_loop_found;
 } 
 static bool parallel_loop_in_stat_p(statement s)
 {
-    parallel_loop_found = FALSE;
+    parallel_loop_found = false;
     gen_recurse(s, loop_domain, loop_flt, gen_null);
     return parallel_loop_found;
 }
@@ -763,12 +763,12 @@ hpf_compiler(
     if (lr)
     {
 	list /* of statement */ lh, ln;
-	lh = gen_nconc(compile_hpf_reduction(lr, TRUE, TRUE),
+	lh = gen_nconc(compile_hpf_reduction(lr, true, true),
          CONS(STATEMENT, *hoststatp,
-	               compile_hpf_reduction(lr, FALSE, TRUE)));
-	ln = gen_nconc(compile_hpf_reduction(lr, TRUE, FALSE),
+	               compile_hpf_reduction(lr, false, true)));
+	ln = gen_nconc(compile_hpf_reduction(lr, true, false),
 	 CONS(STATEMENT, *nodestatp,
-	               compile_hpf_reduction(lr, FALSE, FALSE)));
+	               compile_hpf_reduction(lr, false, false)));
 
 	*hoststatp = make_block_statement(lh);
 	*nodestatp = make_block_statement(ln);

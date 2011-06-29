@@ -25,8 +25,8 @@ bool step_init(string program_name)
   debug_on("STEP_DEBUG_LEVEL");
   pips_debug(1, "program_name = %s\n", program_name);
   
-  set_bool_property("PARSER_WARN_FOR_COLUMNS_73_80", FALSE);
-  //  set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE);
+  set_bool_property("PARSER_WARN_FOR_COLUMNS_73_80", false);
+  //  set_bool_property("PRETTYPRINT_IO_EFFECTS", false);
   
   DB_PUT_MEMORY_RESOURCE(DBR_STEP_STATUS, "", make_step_status(NIL,NIL));
   global_step_analyse_init();
@@ -41,7 +41,7 @@ bool step_init(string program_name)
   free(srcpath);
 
   debug_off();
-  return TRUE;
+  return true;
 }
 
 
@@ -78,7 +78,7 @@ bool step_install(string program_name)
   
   pips_debug(1, "fin step_install\n");
   debug_off();
-  return TRUE;
+  return true;
 }
 
 void step_print_code(FILE* file, entity module, statement statmt)

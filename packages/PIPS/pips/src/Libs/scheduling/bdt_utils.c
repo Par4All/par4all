@@ -182,19 +182,19 @@ void fprint_bdt_with_stat(fp, obj)
 }
 
 /*==========================================================================*/
-/* boolean my_contrainte_normalize(Pcontrainte c, boolean is_egalite):
+/* bool my_contrainte_normalize(Pcontrainte c, bool is_egalite):
  * this is the same function as contrainte_normalize, except that it divides
  * inequalities by the pgcd of all the terms, including the TCST one.
  *
  * AC 93/12/23
  */
 
-boolean my_contrainte_normalize(c, is_egalite)
+bool my_contrainte_normalize(c, is_egalite)
 
  Pcontrainte   c;
- boolean       is_egalite;
+ bool       is_egalite;
 {
- boolean       is_c_norm = TRUE;
+ bool       is_c_norm = true;
  Value        a, nb0 = VALUE_ZERO;
 
  if ((c != NULL) && (c->vecteur != NULL)
@@ -208,7 +208,7 @@ boolean my_contrainte_normalize(c, is_egalite)
              (void) vect_div(c->vecteur, value_abs(a));
              c->vecteur = vect_clean(c->vecteur);
             }
-         else is_c_norm= FALSE;
+         else is_c_norm= false;
         }
 
      else 
@@ -229,18 +229,18 @@ boolean my_contrainte_normalize(c, is_egalite)
 }
 
 /*===============================================================*/
-/* boolean my_inegalite_normalize(Pcontrainte ineg): same function
+/* bool my_inegalite_normalize(Pcontrainte ineg): same function
  * as inegalite_normalize except that it uses my_contrainte_nor-
  * malize insteadof contrainte_normalize.
  *
  * AC 93/12/23
  */
 
-boolean my_inegalite_normalize(ineg)
+bool my_inegalite_normalize(ineg)
 
  Pcontrainte ineg;
 {
- return(my_contrainte_normalize(ineg, FALSE));
+ return(my_contrainte_normalize(ineg, false));
 }
 
 /*===============================================================*/
@@ -278,8 +278,8 @@ Psysteme my_sc_normalize(ps)
             }
         }
      ps = sc_elim_db_constraints(ps);
-     sc_elim_empty_constraints(ps, TRUE);
-     sc_elim_empty_constraints(ps, FALSE);
+     sc_elim_empty_constraints(ps, true);
+     sc_elim_empty_constraints(ps, false);
 
      ps->base = (Pvecteur)NULL;
      sc_creer_base(ps);
@@ -373,13 +373,13 @@ bdt true_copy_bdt(b)
 }
 
 /*======================================================================*/
-/* boolean system_contains_var(ps, var): test if a system contains the
+/* bool system_contains_var(ps, var): test if a system contains the
  * variable"var".
  *
  * AC 94/01/04
  */
 
-boolean system_contains_var(ps, var)
+bool system_contains_var(ps, var)
 
  Psysteme   ps;
  Variable   var;
@@ -435,7 +435,7 @@ Psysteme suppress_sc_in_sc(in_ps1, in_ps2)
 
  for (eq1 = in_ps1->egalites; eq1 != NULL; eq1 = eq1->succ)
     {
-     bool ok = TRUE;
+     bool ok = true;
      for (eq2 = in_ps2->egalites; eq2 != NULL; eq2 = eq2->succ)
         {
          ok = ok && (!vect_equal(eq1->vecteur, eq2->vecteur));
@@ -449,7 +449,7 @@ Psysteme suppress_sc_in_sc(in_ps1, in_ps2)
     }
  for (ineq1 = in_ps1->inegalites; ineq1 != NULL; ineq1 = ineq1->succ)
     {
-     bool ok = TRUE;
+     bool ok = true;
      for (ineq2=in_ps2->inegalites; ineq2 != NULL; ineq2=ineq2->succ)
         {
          ok = ok && !(vect_equal(ineq1->vecteur, ineq2->vecteur));
@@ -810,14 +810,14 @@ void analyze_expression(e, d)
 }
 
 /*=======================================================================*/
-/* boolean exp_equals_p(e1,e2): tests if two expressions are equal. This
+/* bool exp_equals_p(e1,e2): tests if two expressions are equal. This
  * function is better than expression_equal_p() because it takes into
  * account the case where the expressions are not linear.
  *
  * AC 94/01/03
  */
 
-boolean exp_equals_p(e1, e2)
+bool exp_equals_p(e1, e2)
 
  expression  e1, e2;
 {
@@ -839,7 +839,7 @@ boolean exp_equals_p(e1, e2)
 	     return (vect_equal(normalized_linear(e1),\
 				normalized_linear(e2)));
             }
-         else return(FALSE);
+         else return(false);
 	}
      else
 	{
@@ -853,22 +853,22 @@ boolean exp_equals_p(e1, e2)
 			    normalized_linear(e22)));
 	}
     }
- else return(FALSE);
+ else return(false);
 }
 
 /*=======================================================================*/
-/* boolean list_of_exp_equals_p(l1,l2): tests if two lists of expressions
+/* bool list_of_exp_equals_p(l1,l2): tests if two lists of expressions
  * have all their terms equals. Beware, the equality of the length of the
  * two lists is not checked !
  *
  * AC 94/01/03
  */
 
-boolean list_of_exp_equals_p(l1, l2)
+bool list_of_exp_equals_p(l1, l2)
 
  list        l1, l2;
 {
- boolean     is_equal = TRUE;
+ bool     is_equal = true;
  expression  exp1, exp2;
 
  while ((is_equal) && (l1 != NIL))

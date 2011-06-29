@@ -53,7 +53,7 @@ bool            number_of_elements(ld, the_result)
 {
     list            pc;
     intptr_t             a_temp_int;
-    bool            ok = TRUE;
+    bool            ok = true;
 
     (*the_result) = 1;
 
@@ -77,16 +77,16 @@ bool            size_of_dimension(d, the_int)
     if (expression_integer_value(dimension_upper(d), &upper_dim) &&
 	expression_integer_value(dimension_lower(d), &lower_dim)) {
 	(*the_int) = upper_dim - lower_dim + 1;
-	return (TRUE);
+	return (true);
     }
     /* else */
-    return (FALSE);
+    return (false);
 }
 /*************************************************************************/
 
 /*
  * some tools to deal with basics and dimensions each function is looking for
- * a basic & a dimension if not found, it replies FALSE if found, that's
+ * a basic & a dimension if not found, it replies false if found, that's
  * TRUE. read find_bd_ as "find basic and dimensions" and not find comics!
  */
 
@@ -98,7 +98,7 @@ control_type_in_expression(enum basic_utype a_basic,
     basic           b;
     list            d;
     intptr_t             n;
-    bool            ok_dim = FALSE, ok = find_bd_expression(exp, &b, &d);
+    bool            ok_dim = false, ok = find_bd_expression(exp, &b, &d);
 
     if (ok)
 	ok_dim = number_of_elements(d, &n);
@@ -110,7 +110,7 @@ control_type_in_expression(enum basic_utype a_basic,
 
     flint_message("control type in expression",
 		  "warning : cannot verify the type\n");
-    return (TRUE);
+    return (true);
 }
 /*******************************************/
 bool            find_bd_parameter(param, base, dims)
@@ -130,12 +130,12 @@ bool            find_bd_type_variable(tp, base, dims)
     if (!type_variable_p(tp)) {
 	flint_message("find_bd_type_var",
 		 "very strange type encountered, waiting for a variable\n");
-	return (FALSE);
+	return (false);
     }
     *base = variable_basic(type_variable(tp));
     *dims = variable_dimensions(type_variable(tp));
 
-    return (TRUE);
+    return (true);
 }
 /*******************************************/
 bool            find_bd_expression(exp, base, dims)
@@ -153,7 +153,7 @@ bool            find_bd_expression(exp, base, dims)
 	return (find_bd_reference(re, base, dims));
     case is_syntax_range:
 	flint_message("find_bd_expression", "no basic in this expression\n");
-	return (FALSE);
+	return (false);
     case is_syntax_call:
 	c = syntax_call(s);
 	return (find_bd_call(c, base, dims));
@@ -161,7 +161,7 @@ bool            find_bd_expression(exp, base, dims)
 	FATAL("find_bd_expression : unexpected tag %u\n", syntax_tag(s));
     }
 
-    return (FALSE);
+    return (false);
 }
 /*******************************************/
 bool            find_bd_reference(ref, base, dims)
@@ -177,15 +177,15 @@ bool            find_bd_reference(ref, base, dims)
 
     ok = find_bd_type_variable(tp, base, dims);
     if (!ok)
-	return (FALSE);
+	return (false);
 
     len_dim = gen_length((*dims));
     if (len_dim < len_ind)
-	return (FALSE);
+	return (false);
 
     for (i = 1; i <= len_ind; i++)
 	(*dims) = CDR(*dims);
-    return (TRUE);
+    return (true);
 }
 /*******************************************/
 bool            find_bd_call(c, base, dims)
@@ -199,7 +199,7 @@ bool            find_bd_call(c, base, dims)
     if (!type_functional_p(tp)) {
 	flint_message("find_bd_call",
 		      "very strange function encountered\n");
-	return (FALSE);
+	return (false);
     }
     return (find_bd_type_variable(functional_result(type_functional(tp)), base, dims));
 }

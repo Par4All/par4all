@@ -146,7 +146,7 @@ static bool entity_sesam_buffer_p(entity e)
    @param sbp_context is the object describing how the targeted sesam application uses buffers
    @param k_task is the kernel task label, used here as an identifier
    @param buffer is the pointer to the buffer, used here as an identifier
-   @param in_p is a boolean true if the buffer is an input buffer of the task
+   @param in_p is a bool true if the buffer is an input buffer of the task
 
    This function:
       - adds the buffer to sbp_context set of buffers
@@ -428,7 +428,7 @@ bool sesam_buffers_processing(char *module_name)
 
   // use cumulated effects for the moment, regions can be used later if need be
   set_cumulated_rw_effects((statement_effects)
-			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
   set_methods_for_rw_effects_prettyprint(module_name);
   gen_context_recurse(module_statement, &sbp_context,

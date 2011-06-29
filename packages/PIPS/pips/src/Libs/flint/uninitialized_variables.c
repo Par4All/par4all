@@ -152,13 +152,13 @@ flint_variable_uninitialize_elsewhere(statement s,
     if (def_use_variables == (set) HASH_UNDEFINED_VALUE)
 	/* There is no variable for this statement with previously
            initialized value. Just return TRUE: */
-	return TRUE;
+	return true;
 
     if (set_belong_p(def_use_variables, (char *) a_variable))
 	/* OK, looks like the variable have been previously initialized: */
-	return FALSE;
+	return false;
 
-    return TRUE;
+    return true;
 }
 
 
@@ -168,7 +168,7 @@ flint_check_uninitialized_variables_in_statement(statement s)
 {
     list effects_list = load_proper_rw_effects_list(s);
 
-    bool something_said_about_this_statement = FALSE;
+    bool something_said_about_this_statement = false;
 
     /* It appears that effects are packed by statement number or
        ordering. I assume that to factorize the prettyprint: */
@@ -180,20 +180,20 @@ flint_check_uninitialized_variables_in_statement(statement s)
 		&& flint_variable_uninitialize_elsewhere(s, a_variable)) {
 		if (flint_no_uninitialized_variable_ouput_yet) {
 		    /* Nothing has been output yet: add a banner: */
-		    raw_flint_message(FALSE,
+		    raw_flint_message(false,
 				      "\n\nNon-initialized variables:"
 				      "\n--------------------------\n");
-		    flint_no_uninitialized_variable_ouput_yet = FALSE;
+		    flint_no_uninitialized_variable_ouput_yet = false;
 		}
 		if (!something_said_about_this_statement) {
-		    raw_flint_message(FALSE,
+		    raw_flint_message(false,
 				      "In statement number %d (%d.%d):\n",
 				      statement_number(s),
 				      ORDERING_NUMBER(statement_ordering(s)),
 				      ORDERING_STATEMENT(statement_ordering(s)));
-		    something_said_about_this_statement = TRUE;
+		    something_said_about_this_statement = true;
 		}
-		raw_flint_message(TRUE,
+		raw_flint_message(true,
 				  "\t\"%s\" used but not initialized.\n",
 				  entity_minimal_name(a_variable));
 	    }
@@ -201,7 +201,7 @@ flint_check_uninitialized_variables_in_statement(statement s)
 	effects_list);
 
     /* Go on recursion... */
-    return TRUE;
+    return true;
 }
 
 
@@ -211,7 +211,7 @@ flint_uninitialized_variables(graph dependence_graph,
 			      statement module_stat)
 {
     flint_initialize_statement_def_use_variables(dependence_graph);
-    flint_no_uninitialized_variable_ouput_yet = TRUE;
+    flint_no_uninitialized_variable_ouput_yet = true;
     
     gen_recurse(module_stat,
 		statement_domain,
@@ -219,7 +219,7 @@ flint_uninitialized_variables(graph dependence_graph,
 		gen_null);
     
     if (!flint_no_uninitialized_variable_ouput_yet)
-	raw_flint_message(FALSE,
+	raw_flint_message(false,
 			  "\n");
     
     flint_free_statement_def_use_variables();

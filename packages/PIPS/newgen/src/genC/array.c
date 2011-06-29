@@ -195,13 +195,13 @@ list_from_gen_array(gen_array_t a)
 */
 string string_array_join(gen_array_t array, string separator) {
   string join = "";
-  boolean first_iteration = TRUE;
+  bool first_iteration = true;
 
   GEN_ARRAY_MAP(s, {
       if (! first_iteration)
 	join = concatenate(join, separator, NULL);
       else
-	first_iteration = FALSE;
+	first_iteration = false;
       join = concatenate(join, (string) s, NULL);
     }, array);
 

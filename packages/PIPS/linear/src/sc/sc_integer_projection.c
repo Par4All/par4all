@@ -120,7 +120,7 @@ int *nb_pos,*nb_neg;
  * suffisante non satisfaite.
  */
 
-boolean
+bool
 sc_integer_fourier_motzkin_variable_elimination(
     Psysteme sci,
     Psysteme sc,
@@ -135,15 +135,15 @@ sc_integer_fourier_motzkin_variable_elimination(
     Pcontrainte inegs = NULL;
     Pcontrainte posit1 = NULL;
     Psysteme scd = SC_UNDEFINED;
-    boolean non_equivalent_projections = FALSE;
+    bool non_equivalent_projections = false;
     int nb_pos=0;
     int nb_neg = 0;
     int i1,dim = sc->nb_ineq;
-    boolean *ineg_stay; /* [dim+1] */
+    bool *ineg_stay; /* [dim+1] */
 
-    ineg_stay = (boolean*) malloc(sizeof(boolean)*(dim+1));
+    ineg_stay = (bool*) malloc(sizeof(bool)*(dim+1));
 
-    for (i1 =1; i1<=dim; ineg_stay[i1]=TRUE, i1++);
+    for (i1 =1; i1<=dim; ineg_stay[i1]=true, i1++);
     if (!SC_UNDEFINED_P(sc)) {
 	inegs=sc->inegalites;
 	scd = sc_dup(sc);
@@ -151,7 +151,7 @@ sc_integer_fourier_motzkin_variable_elimination(
     else {
 	inegs = NULL;
 	free(ineg_stay);
-	return TRUE;
+	return true;
     }
 
     constraint_sort(inegs,v,&rtri,&nb_pos,&nb_neg);
@@ -161,8 +161,8 @@ sc_integer_fourier_motzkin_variable_elimination(
        inegalite ou v a un coefficient negatif, faire une combinaison       */
 
     for( posit=rtri.pos; posit!=NULL; ) {
-	boolean integer_comb_p = TRUE; 
-	non_equivalent_projections = FALSE;
+	bool integer_comb_p = true; 
+	non_equivalent_projections = false;
 	for( negat=rtri.neg, i1=1; negat!=NULL; i1++) {
 	   
 	    ineg = sc_integer_inequalities_combination_ofl_ctrl
@@ -171,7 +171,7 @@ sc_integer_fourier_motzkin_variable_elimination(
  
 	  
 	    if (contrainte_constante_p(ineg)) {
-		if (contrainte_verifiee(ineg,FALSE)) {
+		if (contrainte_verifiee(ineg,false)) {
 		    vect_rm(ineg->vecteur);
 		    ineg->vecteur = NULL;
 		    /* combinaison => 1 termcst >= 0 */
@@ -186,7 +186,7 @@ sc_integer_fourier_motzkin_variable_elimination(
 		    rtri.cnul = NULL;
 		    posit = NULL;
 		    negat = NULL;
-		    return FALSE;
+		    return false;
 		    /* systeme non faisable */
 		}
 	    }
@@ -194,7 +194,7 @@ sc_integer_fourier_motzkin_variable_elimination(
 		if(!integer_comb_p) {
 		    vect_rm(ineg->vecteur);
 		    ineg->vecteur = vect_dup(negat->vecteur);
-		    non_equivalent_projections = TRUE;
+		    non_equivalent_projections = true;
 		}
 	    
 		ineg->succ = rtri.cnul;
@@ -229,7 +229,7 @@ sc_integer_fourier_motzkin_variable_elimination(
     (sc->inegalites) = rtri.cnul;
 
     free(ineg_stay);
-    return TRUE;
+    return true;
 }
 
 
@@ -253,7 +253,7 @@ Variable v;
 
 	/* trouver une egalite ou v a un coeff. minimal en valeur absolue */
 	
-	if ((eq = contrainte_var_min_coeff(sc->egalites,v,&coeff, FALSE)) 
+	if ((eq = contrainte_var_min_coeff(sc->egalites,v,&coeff, false)) 
 	    != NULL) 
 	{		
 	    if(!egalite_normalize(eq))

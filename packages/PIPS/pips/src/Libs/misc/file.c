@@ -243,7 +243,7 @@ FILE * stream;
 }
 
 /* returns a sorted arg list of files matching regular expression re
-  in directory 'dir' and with file_name_predicate() returning TRUE on
+  in directory 'dir' and with file_name_predicate() returning true on
   the file name (for example use directory_exists_p to select
   directories, of file_exists_p to select regular files).  re has the
   ed syntax.
@@ -415,7 +415,7 @@ file_readable_p(char * name)
 bool
 create_directory(char *name)
 {
-    bool success = TRUE;
+    bool success = true;
 
     if (directory_exists_p(name)) {
 	pips_internal_error("existing directory : %s", name);
@@ -424,7 +424,7 @@ create_directory(char *name)
     if (mkdir(name, 0777) == -1) {
 	pips_user_warning("cannot create directory : %s (%s)\n",
 			  name, strerror(errno));
-	success = FALSE;
+	success = false;
     }
 
     return success;
@@ -433,7 +433,7 @@ create_directory(char *name)
 bool
 purge_directory(char *name)
 {
-    bool success = TRUE;
+    bool success = true;
 
     if (directory_exists_p(name)) {
 	if(system(concatenate("/bin/rm -r ", name, (char*) NULL))) {
@@ -443,15 +443,15 @@ purge_directory(char *name)
 	    user_warning("purge_directory",
 			 "cannot purge directory %s. Check owner rights\n",
 			 name);
-	    success = FALSE;
+	    success = false;
 	}
 	else {
-	    success = TRUE;
+	    success = true;
 	}
     }
     else {
 	/* Well, it's purged if it does not exist... */
-	success = TRUE;
+	success = true;
     }
 
     return success;
@@ -537,7 +537,7 @@ safe_append(
     bool but_comments /* do not shift F77 comment lines */)
 {
     FILE * in = safe_fopen(file, "r");
-    bool first = TRUE;
+    bool first = true;
     int c, i;
     while ((c=getc(in))!=EOF)
     {
@@ -546,10 +546,10 @@ safe_append(
 	    for (i=0; i<margin; i++)
 		if (putc(' ', out)==EOF)
 		    pips_internal_error("append failed");
-	    first = FALSE;
+	    first = false;
 	}
 	if (c=='\n')
-	    first = TRUE;
+	    first = true;
 	if (putc(c, out)==EOF)
 	    pips_internal_error("append failed");
     }
@@ -669,7 +669,7 @@ char * pips_filename(char *fullpath, char *suffix, bool short_p)
 
 char * pips_basename(char *fullpath, char *suffix)
 {
-  return pips_filename(fullpath, suffix, TRUE);
+  return pips_filename(fullpath, suffix, true);
 }
 
 /* The source file name access path is shortened or not dependeing on

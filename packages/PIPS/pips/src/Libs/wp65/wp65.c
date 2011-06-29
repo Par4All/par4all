@@ -141,8 +141,8 @@ wp65(string input_module_name)
     graph dg;
     string ppp;
 
-    s = (statement) db_get_memory_resource(DBR_CODE, input_module_name,TRUE);
-    dg = (graph) db_get_memory_resource(DBR_DG, input_module_name, TRUE);
+    s = (statement) db_get_memory_resource(DBR_CODE, input_module_name,true);
+    dg = (graph) db_get_memory_resource(DBR_DG, input_module_name, true);
     set_ordering_to_statement(s);
     debug_on("WP65_DEBUG_LEVEL");
     debug(8, "wp65", "begin\n");
@@ -196,7 +196,7 @@ wp65(string input_module_name)
     set_string_property(PRETTYPRINT_PARALLEL, ppp); free(ppp);
     debug_off();
 
-return TRUE;
+return true;
 
 }
 
@@ -506,7 +506,7 @@ hash_table v_to_esv;
 }
 
 
-boolean wp65_conform_p(s)
+bool wp65_conform_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
@@ -522,13 +522,13 @@ statement s;
 	else {
 	    debug(1,"wp65_conform_p",
 		  "program body is an unstructured with at least two nodes\n");
-	    return FALSE;
+	    return false;
 	}
     }
 
     if(!instruction_block_p(i)) {
 	debug(1,"wp65_conform_p","program body is not a block\n");
-	return FALSE;
+	return false;
     }
     else {
 	list ls = instruction_block(i);
@@ -538,10 +538,10 @@ statement s;
 		if(!stop_statement_p(s1) && !return_statement_p(s1)) {
 		    debug(1,"wp65_conform_p",
 			  "program body contains a non-perfectly nested loop\n");
-		    return FALSE;
+		    return false;
 		}
 	    }
 	},ls);
     }
-    return TRUE;
+    return true;
 }

@@ -148,9 +148,9 @@ unsplit(const char* name)
 	FILE * out, * in;
 
 	module = gen_array_item(modules, i);
-	user_file = db_get_memory_resource(DBR_USER_FILE, module, TRUE);
+	user_file = db_get_memory_resource(DBR_USER_FILE, module, true);
 	new_user_file = get_new_user_file(src_dir, user_file);
-	printed_file = db_get_memory_resource(DBR_PRINTED_FILE, module, TRUE);
+	printed_file = db_get_memory_resource(DBR_PRINTED_FILE, module, true);
 	full = strdup(concatenate(dir_name, "/", printed_file, NULL));
   pips_debug(1, "Module: \"%s\", user_file: \"%s\", new_user_file: \"%s\","
              "full: \"%s\"\n",
@@ -182,5 +182,5 @@ unsplit(const char* name)
      */
     DB_PUT_FILE_RESOURCE(DBR_USER_FILE, PROGRAM_RESOURCE_OWNER, summary_name);
 
-    return TRUE;
+    return true;
 }

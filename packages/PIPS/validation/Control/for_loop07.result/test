@@ -17,10 +17,12 @@ Controlized code
 void foo()
 {
    int i;
-   for(i = 0; i <= 6; i += 1) {
+   i = 0;
+   while (i!=5) {
 more:      if (i==3)
          printf("%d", i);
       goto more;
+      i++;
    }
    printf("Exit with %d", i);
 }

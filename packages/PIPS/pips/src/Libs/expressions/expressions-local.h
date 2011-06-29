@@ -35,7 +35,7 @@ struct eformat {
     expression expr;
     int icoef;
     int ishift;
-    boolean simpler;
+    bool simpler;
 };
 
 typedef struct eformat eformat_t;

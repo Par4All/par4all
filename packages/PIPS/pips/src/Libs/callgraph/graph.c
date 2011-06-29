@@ -54,12 +54,12 @@
 static void
 node(FILE * out, string name)
 {
-    bool first=TRUE;
+    bool first=true;
     list lcallees = NIL;
 
     if (db_resource_p(DBR_CALLEES, name)) /* lazy callees. */
       lcallees = callees_callees((callees) 
-	db_get_memory_resource(DBR_CALLEES, name, TRUE));
+	db_get_memory_resource(DBR_CALLEES, name, true));
 
     /* daVinci node prolog. */
     fprintf(out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"%s\")],[", name, name);
@@ -68,7 +68,7 @@ node(FILE * out, string name)
     MAP(STRING, module_called, 
     {
 	if (!first) fprintf(out, ",\n");
-	else { fprintf(out, "\n"); first=FALSE; }
+	else { fprintf(out, "\n"); first=false; }
 	fprintf(out, " l(\"%s->%s\",e(\"\",[],r(\"%s\")))", 
 		name, module_called, module_called);
     },
@@ -82,8 +82,8 @@ node(FILE * out, string name)
  * recursive generation of the daVinci file.
  */
 static hash_table seen = hash_table_undefined;
-static bool first_seen = FALSE;
-static void init_seen(void) { first_seen = FALSE;
+static bool first_seen = false;
+static void init_seen(void) { first_seen = false;
     seen = hash_table_make(hash_string, 0); }
 static void close_seen(void) { 
     hash_table_free(seen); seen = hash_table_undefined; }
@@ -99,7 +99,7 @@ recursive_append(FILE* out, string name)
     if (seen_p(name)) return;
     /* else */
     if (first_seen) fprintf(out, ",\n");
-    else first_seen = TRUE;
+    else first_seen = true;
     node(out, name);
     set_as_seen(name);
 
@@ -108,7 +108,7 @@ recursive_append(FILE* out, string name)
      */
     if (db_resource_p(DBR_CALLEES, name))
     {
-      callees l = (callees) db_get_memory_resource(DBR_CALLEES, name, TRUE);
+      callees l = (callees) db_get_memory_resource(DBR_CALLEES, name, true);
       MAP(STRING, c, recursive_append(out, c), callees_callees(l));
     }
 }
@@ -138,7 +138,7 @@ graph_of_calls(string name)
     free(full_name), full_name = NULL;
     DB_PUT_FILE_RESOURCE(DBR_DVCG_FILE, name, file_name);
 
-    return TRUE;
+    return true;
 }
 
 /* To be called by pipsmake.
@@ -149,7 +149,7 @@ bool full_graph_of_calls(string name)
     gen_array_t modules = db_get_module_list();
     int n = gen_array_nitems(modules), i;
     FILE * out;
-    bool first = TRUE;
+    bool first = true;
     string dir_name, file_name, full_name;
 
     pips_debug(7, "global call graph requested for %s (PROGRAM)\n", name);
@@ -170,7 +170,7 @@ bool full_graph_of_calls(string name)
     for (i=0; i<n; i++)
     {
 	if (!first) fprintf(out, ",\n");
-	first=FALSE;
+	first=false;
 	node(out, gen_array_item(modules, i));
     }
 
@@ -185,5 +185,5 @@ bool full_graph_of_calls(string name)
     /* put resulting resource into pipsdbm. */
     DB_PUT_FILE_RESOURCE(DBR_DVCG_FILE, PROGRAM_RESOURCE_OWNER, file_name);
 
-    return TRUE;
+    return true;
 }

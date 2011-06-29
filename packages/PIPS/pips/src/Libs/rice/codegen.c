@@ -56,14 +56,14 @@ static bool AK_ignore_this_level(dg_arc_label dal, int level)
 	    return( action_write_p( s ) && action_read_p( k )) ;
 	  }
 	  else {
-	    return(FALSE);
+	    return(false);
 	  }
 	}
       }
     }
   }
 
-  return(TRUE);
+  return(true);
 }
 
 
@@ -102,7 +102,7 @@ static bool AK_ignore_this_successor(vertex __attribute__ ((unused)) v,
   if (!ignore_p
       && get_bool_property("PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES")) {
     list cl = dg_arc_label_conflicts(al);
-    bool thread_safe_p = TRUE;
+    bool thread_safe_p = true;
 
     FOREACH(CONFLICT, c, cl) {
       effect e = conflict_source(c);
@@ -110,7 +110,7 @@ static bool AK_ignore_this_successor(vertex __attribute__ ((unused)) v,
       entity v = reference_variable(r);
 
       if(!thread_safe_variable_p(v)) {
-	thread_safe_p = FALSE;
+	thread_safe_p = false;
 	break;
       }
     }
@@ -148,10 +148,10 @@ static bool variable_private_to_loop_p( list /* of loop statement */ loops,
     if (gen_find_eq(var, l) != entity_undefined
         || gen_find_eq(var, d) != entity_undefined
         ) {
-      return TRUE;
+      return true;
     }
   }
-  return FALSE;
+  return false;
 }
 
 
@@ -189,7 +189,7 @@ bool ignore_this_conflict(vertex v1, vertex v2, conflict c, int l)
 
   if (var1 != var2) {
     /* equivalences do not deserve more cpu cycles */
-    return(FALSE);
+    return(false);
   }
 
 
@@ -253,7 +253,7 @@ set scc_region(scc s)
 
 
 /* s is a strongly connected component for which a DO loop is being
-produced.  this function returns FALSE if s contains no dependences at
+produced.  this function returns false if s contains no dependences at
 level l. in this case, the loop will be a DOALL loop.
 */
 bool contains_level_l_dependence(scc s, set region, int level)
@@ -281,7 +281,7 @@ bool contains_level_l_dependence(scc s, set region, int level)
 		    print_effect(conflict_sink(c));
 		    fprintf(stderr, "\n");
 		  }
-		  return(TRUE);
+		  return(true);
 		}
 	      }
 	    }
@@ -291,12 +291,12 @@ bool contains_level_l_dependence(scc s, set region, int level)
     }
   }
 
-  return(FALSE);
+  return(false);
 }
 
 
 
-/* this function returns TRUE if scc s is stronly connected at level l,
+/* this function returns true if scc s is stronly connected at level l,
 i.e. dependence arcs at level l or greater form at least one cycle */
 
 bool strongly_connected_p(scc s, int l)
@@ -306,17 +306,17 @@ bool strongly_connected_p(scc s, int l)
 
   /* if s contains more than one vertex, it is strongly connected */
   if (CDR(pv) != NIL)
-    return(TRUE);
+    return(true);
 
   /* if there is a dependence from v to v, s is strongly connected */
   FOREACH(SUCCESSOR, s, vertex_successors(v)) {
     if (!AK_ignore_this_level((dg_arc_label) successor_arc_label(s), l) &&
 	successor_vertex(s) == v)
-      return(TRUE);
+      return(true);
   }
 
   /* s is not strongly connected */
-  return(FALSE);
+  return(false);
 }
 
 
@@ -353,7 +353,7 @@ statement MakeNestOfParallelLoops(int l,
     bool task_parallelize_inner =
       (seq_or_par == is_execution_parallel
        && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?
-      FALSE:task_parallelize_p;
+      false:task_parallelize_p;
 
     s = MakeLoopAs(slo, seq_or_par,
 		   MakeNestOfParallelLoops(0, CDR(loops), body,
@@ -400,8 +400,8 @@ statement MakeNestOfStatementList(int l,
 
 /* This function implements Allen & Kennedy's algorithm.
  *
- * BB (Bruno Baron): task_parallelize_p is TRUE when we want to
- * parallelize the loop, FALSE when we only want to vectorize
+ * BB (Bruno Baron): task_parallelize_p is true when we want to
+ * parallelize the loop, false when we only want to vectorize
  * it. Probably called by "rice_cray", but there is no explicit
  * information about the vectorization facility in PIPS.
  *
@@ -695,7 +695,7 @@ statement ConnectedStatements(graph g, scc s, int l, bool task_parallelize_p)
   task_parallelize_inner =
     (seq_or_par == is_execution_parallel
      && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?
-    FALSE : task_parallelize_p;
+    false : task_parallelize_p;
 
   /* CodeGenerate does not use the first parameter... */
   inner_stat = CodeGenerate(/* big hack */ statement_undefined,

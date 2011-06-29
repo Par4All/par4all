@@ -48,7 +48,7 @@
 extern Psysteme ps_yacc;
 
  /* detection des erreurs de syntaxe par sc_gram.y */
-extern boolean syst_syntax_error;
+extern bool syst_syntax_error;
 
  /* fichier lu par sc_lex.l */
 extern FILE * syst_in;
@@ -84,7 +84,7 @@ char * nomfic;
 	return(&ps_yacc);
 }
 
-/* boolean sc_fscan(FILE * f, Psysteme * ps): construit un systeme d'inegalites
+/* bool sc_fscan(FILE * f, Psysteme * ps): construit un systeme d'inegalites
  * et d'egalites lineaires a partir d'une representation externe standard;
  * 
  * Le systeme s est alloue et son ancienne valeur est perdue. Cette fonction
@@ -92,8 +92,8 @@ char * nomfic;
  * n'est pas retournee pour respecter la syntaxe habituelle de scanf et
  * pour pouvoir retourner un code.
  *
- * Si la syntaxe du fichier f est correct, la valeur TRUE est retournee;
- * FALSE sinon.
+ * Si la syntaxe du fichier f est correct, la valeur true est retournee;
+ * false sinon.
  *
  * les variables utilisees dans le systeme doivent etre declarees dans
  * la premiere ligne precedees du mot-cle VAR et separees par des
@@ -119,7 +119,7 @@ char * nomfic;
  *
  * Cette fonction peut relir un fichier cree par la fonction sc_fprint()
  */
-boolean sc_fscan(f,ps)
+bool sc_fscan(f,ps)
 FILE * f;
 Psysteme * ps;
 {

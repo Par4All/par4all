@@ -175,7 +175,7 @@ list effects_list;
 
 	    if ( get_debug_level() >= 5 ) {
 		fprintf(stderr, "control $%p:f=%f, compl.=", conti, f);
-		complexity_fprint(stderr, compi, TRUE, FALSE);
+		complexity_fprint(stderr, compi, true, false);
 	    }
 
 	    complexity_scalar_mult(&compi, f);
@@ -187,7 +187,7 @@ list effects_list;
 
     if (get_debug_level() >= 5) {
 	fprintf(stderr, "cumulated complexity=");
-	complexity_fprint(stderr, comp, TRUE, FALSE);
+	complexity_fprint(stderr, comp, true, false);
     }
 
     matrice_free(B);
@@ -228,7 +228,7 @@ list effects_list;
 
     if (get_debug_level() >= 5) {
 	fprintf(stderr, "this control($%p) has:", cont);
-	complexity_fprint(stderr, comp, TRUE, TRUE);
+	complexity_fprint(stderr, comp, true, true);
 	MAPL(pc, {
 	    fprintf(stderr, "successor: $%p\n", CONTROL(CAR(pc)));
 	    }, control_successors(cont));
@@ -273,7 +273,7 @@ int n_controls;
 control control_array[];
 {
     control cont = unstructured_control(unstr);
-    boolean already_examined[MAX_CONTROLS_IN_UNSTRUCTURED];
+    bool already_examined[MAX_CONTROLS_IN_UNSTRUCTURED];
     int i, j , n_succs, max_n_succs = 0;
     matrice P = matrice_new(n_controls, n_controls);
 
@@ -284,9 +284,9 @@ control control_array[];
 
     matrice_nulle(P, n_controls, n_controls);
 
-    /* initilize the already_examined to FALSE */
+    /* initilize the already_examined to false */
     for (i=1; i<=n_controls; i++) 
-	already_examined[i] = FALSE;
+	already_examined[i] = false;
 
     /* make in P the matrix "is_successor_of" */
     node_successors_to_matrix(cont, P, n_controls,
@@ -344,7 +344,7 @@ control control_array[];
  * It means that every succeccor has the same possibility to be reached.
  *
  * Modification:
- *  - put already_examined[i] = TRUE out of MAPL.
+ *  - put already_examined[i] = true out of MAPL.
  *    If control i has several successors, there is no need to set it several
  *    times in MAPL. LZ 13/04/92
  */
@@ -354,11 +354,11 @@ control cont;
 matrice P;
 int n_controls;
 control control_array[];
-boolean already_examined[];
+bool already_examined[];
 {
     int i = control_element_position_in_control_array(cont, control_array, n_controls);
 
-    already_examined[i] = TRUE;
+    already_examined[i] = true;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "CONTROL ($%p)  CONTROL_NUMBER %d\n", cont, i);

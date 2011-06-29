@@ -47,18 +47,18 @@
 
 typedef struct {
     /**
-     * This boolean is controlled by the "LINEARIZE_ARRAY_CAST_AT_CALL_SITE"
+     * This bool is controlled by the "LINEARIZE_ARRAY_CAST_AT_CALL_SITE"
      * property Turning it on break further effects analysis, but without
      * the cast it might
      * break compilation or at least generate warnings for type mismatch
      */
     bool cast_at_call_site_p;
     /**
-     * This boolean is controlled by the "LINEARIZE_ARRAY_USE_POINTERS" property
+     * This bool is controlled by the "LINEARIZE_ARRAY_USE_POINTERS" property
      */
     bool use_pointers_p;
     /**
-     * This boolean is controlled by the "LINEARIZE_ARRAY_MODIFY_CALL_SITE"
+     * This bool is controlled by the "LINEARIZE_ARRAY_MODIFY_CALL_SITE"
      * property
      */
     bool modify_call_site_p;

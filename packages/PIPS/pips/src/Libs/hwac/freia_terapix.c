@@ -294,7 +294,7 @@ static void terapix_gram_allocate
   {
     for (int i = 0; i<row_size-width+1; i++)
     {
-      boolean ok = true;
+      bool ok = true;
       for (int w = 0; ok && w<width; w++)
         for (int h = 0; ok && h<height; h++)
           ok &= !used[(i+w)+(j+h)*row_size];
@@ -319,7 +319,7 @@ static void terapix_gram_allocate
  * Moreover, as first numbers are IO imagelets, this help putting outputs
  * in the right imagelet so as to avoid additionnal copies, if possible.
  */
-static _int select_imagelet(set availables, int * nimgs, boolean first)
+static _int select_imagelet(set availables, int * nimgs, bool first)
 {
   _int choice = 0; // zero means no choice yet
   // allocate if no images are available

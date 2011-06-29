@@ -78,18 +78,18 @@ static text get_semantic_text(string,bool);
 
 bool print_code_transformers(string module_name)
 {
-  is_user_view = FALSE;
-  is_transformer = TRUE;
-  is_total_precondition = FALSE;
-  is_transformer_filtered = FALSE;
+  is_user_view = false;
+  is_transformer = true;
+  is_total_precondition = false;
+  is_transformer_filtered = false;
   return print_code_semantics(module_name);
 }
 
 bool print_code_preconditions(string module_name)
 {
-  is_user_view = FALSE;
-  is_transformer = FALSE;
-  is_total_precondition = FALSE;
+  is_user_view = false;
+  is_transformer = false;
+  is_total_precondition = false;
   is_transformer_filtered =
     get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   return print_code_semantics(module_name);
@@ -99,9 +99,9 @@ bool print_code_total_preconditions(string module_name)
 {
   bool success;
 
-  is_user_view = FALSE;
-  is_transformer = FALSE;
-  is_total_precondition = TRUE;
+  is_user_view = false;
+  is_transformer = false;
+  is_total_precondition = true;
   is_transformer_filtered =
     get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   success = print_code_semantics(module_name);
@@ -110,18 +110,18 @@ bool print_code_total_preconditions(string module_name)
 
 bool print_source_transformers(string module_name)
 {
-  is_user_view = TRUE;
-  is_transformer = TRUE;
-  is_total_precondition = FALSE;
-  is_transformer_filtered = FALSE;
+  is_user_view = true;
+  is_transformer = true;
+  is_total_precondition = false;
+  is_transformer_filtered = false;
   return print_code_semantics(module_name);
 }
 
 bool print_source_preconditions(string module_name)
 {
-  is_user_view = TRUE;
-  is_transformer = FALSE;
-  is_total_precondition = FALSE;
+  is_user_view = true;
+  is_transformer = false;
+  is_total_precondition = false;
   is_transformer_filtered =
     get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   return print_code_semantics(module_name);
@@ -129,9 +129,9 @@ bool print_source_preconditions(string module_name)
 
 bool print_source_total_preconditions(string module_name)
 {
-  is_user_view = TRUE;
-  is_transformer = FALSE;
-  is_total_precondition = TRUE;
+  is_user_view = true;
+  is_transformer = false;
+  is_total_precondition = true;
   is_transformer_filtered =
     get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   return print_code_semantics(module_name);
@@ -139,36 +139,36 @@ bool print_source_total_preconditions(string module_name)
 
 text get_text_transformers(string module_name)
 {
-  is_user_view = FALSE;
-  is_transformer = TRUE;
-  is_total_precondition = FALSE;
-  is_transformer_filtered = FALSE;
-  return get_semantic_text(module_name,FALSE);
+  is_user_view = false;
+  is_transformer = true;
+  is_total_precondition = false;
+  is_transformer_filtered = false;
+  return get_semantic_text(module_name,false);
 }
 
 text get_text_preconditions(string module_name)
 {
-  is_user_view = FALSE;
-  is_transformer = FALSE;
-  is_total_precondition = FALSE;
+  is_user_view = false;
+  is_transformer = false;
+  is_total_precondition = false;
   is_transformer_filtered =
     get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
-  return get_semantic_text(module_name,FALSE);
+  return get_semantic_text(module_name,false);
 }
 
 text get_text_total_preconditions(string module_name)
 {
-  is_user_view = FALSE;
-  is_transformer = FALSE;
-  is_total_precondition = TRUE;
+  is_user_view = false;
+  is_transformer = false;
+  is_total_precondition = true;
   is_transformer_filtered =
     get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
-  return get_semantic_text(module_name,FALSE);
+  return get_semantic_text(module_name,false);
 }
 
 static bool print_code_semantics(string module_name)
 {
-    bool success = TRUE;
+    bool success = true;
     text t = text_undefined;
 
     char * file_ext =
@@ -198,7 +198,7 @@ static bool print_code_semantics(string module_name)
 		 DBR_PRINTED_FILE);
 
     begin_attachment_prettyprint();
-    t = get_semantic_text(module_name,TRUE);
+    t = get_semantic_text(module_name,true);
     success = make_text_resource(module_name, resource_name, file_ext, t);
     end_attachment_prettyprint();
 
@@ -219,13 +219,13 @@ static text get_semantic_text(string module_name, bool give_code_p)
   mod = get_current_module_entity();
 
   set_current_module_statement
-    ((statement)db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    ((statement)db_get_memory_resource(DBR_CODE, module_name, true) );
   mod_stat = get_current_module_statement();
 
   /* To set up the hash table to translate value into value names */
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource
-			   (DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			   (DBR_CUMULATED_EFFECTS, module_name, true));
 
   debug_on("SEMANTICS_PRINT_DEBUG_LEVEL");
 
@@ -233,7 +233,7 @@ static text get_semantic_text(string module_name, bool give_code_p)
 
   if(is_user_view) {
     user_stat =  (statement)
-      db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+      db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
 
     nts = allocate_number_to_statement();
     nts = build_number_to_statement(nts, mod_stat);
@@ -245,13 +245,13 @@ static text get_semantic_text(string module_name, bool give_code_p)
       db_get_memory_resource(is_transformer? DBR_TRANSFORMERS:
 			     (is_total_precondition?
 			      DBR_TOTAL_PRECONDITIONS : DBR_PRECONDITIONS),
-			     module_name, TRUE));
+			     module_name, true));
 
   summary = (transformer)
       db_get_memory_resource(is_transformer? DBR_SUMMARY_TRANSFORMER:
 			     (is_total_precondition?
 		    DBR_SUMMARY_TOTAL_PRECONDITION: DBR_SUMMARY_PRECONDITION),
-			     module_name, TRUE);
+			     module_name, true);
   /* The summary precondition may be in another module's frame */
   translate_global_values(mod, summary);
 
@@ -279,7 +279,7 @@ static text get_semantic_text(string module_name, bool give_code_p)
     attach_preconditions_decoration_to_text(r);
   }
 
-  if (give_code_p == TRUE) {
+  if (give_code_p == true) {
     MERGE_TEXTS(r, text_module(mod, is_user_view? user_stat:mod_stat));
   }
 
@@ -390,12 +390,12 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 static bool __attribute__ ((unused))
 value_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
-  bool is_inferior = TRUE;
+  bool is_inferior = true;
 
   if (term_cst(*pvarval1))
-    is_inferior = FALSE;
+    is_inferior = false;
   else if(term_cst(*pvarval2))
-    is_inferior = TRUE;
+    is_inferior = true;
   else
     is_inferior = (strcmp(external_value_name((entity) vecteur_var(*pvarval1)),
 			  external_value_name((entity) vecteur_var(*pvarval2)))
@@ -419,7 +419,7 @@ value_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 text text_transformer(transformer tran)
 {
   text txt = make_text(NIL);
-  boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+  bool foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
   string str_prefix;
   char crt_line[MAX_LINE_LENGTH];
 
@@ -499,7 +499,7 @@ text text_for_a_transformer(transformer tran, bool is_a_transformer)
   text t = text_undefined;
 
   is_transformer = is_a_transformer;
-  is_total_precondition = FALSE;
+  is_total_precondition = false;
   t = text_transformer(tran);
   is_transformer = save_is_transformer;
   is_total_precondition = save_is_total_precondition;
@@ -531,8 +531,8 @@ string comment_prefix;
   string str_prefix = comment_prefix;
   char str_tmp[MAX_PRED_COMMENTARY_STRLEN];
   int len, new_str_pred_len, longueur_max;
-  boolean premiere_ligne = TRUE;
-  boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+  bool premiere_ligne = true;
+  bool foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
   longueur_max = MAX_PRED_COMMENTARY_STRLEN - strlen(str_prefix) - 2;
 
   /* if str_pred is too long, it must be splitted in several lines;
@@ -580,7 +580,7 @@ string comment_prefix;
     }
 
     if (premiere_ligne) {
-      premiere_ligne = FALSE;
+      premiere_ligne = false;
       longueur_max = longueur_max - 1;
       if (foresys){
 	int i;

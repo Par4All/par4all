@@ -46,10 +46,10 @@ mark_loop_to_outline(const statement s) {
     /* Since we only outline outermost loop-nest, stop digging further in
        this statement: */
     pips_debug(1, "Statement %td marked to be outlined\n", statement_number(s));
-    return FALSE;
+    return false;
   }
   // This statement is not a parallel loop, go on digging:
-  return TRUE;
+  return true;
 }
 
 
@@ -79,7 +79,7 @@ bool gpu_memory(const char * module_name) {
 						  "GPU_IFY_DEBUG_LEVEL");
 
   // Get the effects and use them:
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS,module_name,TRUE));
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS,module_name,true));
 
   // Apply the transformation on the kernel calls:
   gen_recurse(module_statement, call_domain, gpu_memory_apply, gen_identity);

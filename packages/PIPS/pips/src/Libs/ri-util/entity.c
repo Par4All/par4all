@@ -95,9 +95,9 @@ bool unbounded_expression_p(expression e)
     {
       string n = entity_local_name(call_function(syntax_call(s)));
       if (same_string_p(n, UNBOUNDED_DIMENSION_NAME))
-	return TRUE;
+	return true;
     }
-  return FALSE;
+  return false;
 }
 
 expression make_unbounded_expression()
@@ -266,7 +266,7 @@ entity make_loop_label(int __attribute__ ((unused)) desired_number,
   return e;
 }
 
-static bool label_defined_in_statement = FALSE;
+static bool label_defined_in_statement = false;
 static entity label_searched_in_statement = entity_undefined;
 
 static bool check_statement_for_label(statement s)
@@ -279,7 +279,7 @@ static bool check_statement_for_label(statement s)
 
 bool label_defined_in_statement_p(entity l, statement s)
 {
-  label_defined_in_statement = FALSE;
+  label_defined_in_statement = false;
   label_searched_in_statement = l;
 
   gen_recurse(s, statement_domain, check_statement_for_label, gen_null);
@@ -404,9 +404,9 @@ bool string_block_scope_p(string s)
 {
   // A block scope string is empty or made of numbers each terminated by BLOCK_SEP_STRING
   char valid[12] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', BLOCK_SEP_CHAR, '\0'};
-  bool is_block_scope = FALSE;
+  bool is_block_scope = false;
   string cs = s;
-  bool is_number = FALSE;
+  bool is_number = false;
 
   pips_debug(10, "Potential block scope string = \"%s\"\n", s);
 
@@ -415,11 +415,11 @@ bool string_block_scope_p(string s)
       if(is_number && isdigit(*cs))
 	;
       else if(is_number && *cs==BLOCK_SEP_CHAR)
-	is_number = FALSE;
+	is_number = false;
       else if(!is_number && isdigit(*cs))
-	is_number = TRUE;
+	is_number = true;
       else if(!is_number && *cs==BLOCK_SEP_CHAR) {
-	is_block_scope = FALSE;
+	is_block_scope = false;
 	break;
       }
     }
@@ -565,7 +565,7 @@ bool entity_module_p(entity e)
 {
   if(typedef_entity_p(e))
     /* Functional typedef also have value code ... */
-    return FALSE;
+    return false;
   else {
     value v = entity_initial(e);
     return v!=value_undefined && value_code_p(v);
@@ -634,9 +634,9 @@ bool entity_array_p(entity e)
   if (entity_variable_p(e))
     {
       variable var = type_variable(ultimate_type(entity_type(e)));
-      if (!ENDP(variable_dimensions(var)))  return TRUE;
+      if (!ENDP(variable_dimensions(var)))  return true;
     }
-  return FALSE;
+  return false;
 }
 bool array_entity_p(entity e)
 {
@@ -645,7 +645,7 @@ bool array_entity_p(entity e)
 
 bool assumed_size_array_p(entity e)
 {
-  /* return TRUE if e has an assumed-size array declarator
+  /* return true if e has an assumed-size array declarator
      (the upper bound of the last dimension is equal to * : REAL A(*) )*/
   if (entity_variable_p(e))
     {
@@ -656,15 +656,15 @@ bool assumed_size_array_p(entity e)
 	  int length = gen_length(l_dims);
 	  dimension last_dim =  find_ith_dimension(l_dims,length);
 	  if (unbounded_dimension_p(last_dim))
-	    return TRUE;
+	    return true;
 	}
     }
-  return FALSE;
+  return false;
 }
 
 bool pointer_type_array_p(entity e)
 {
-  /* return TRUE if e has a pointer-type array declarator
+  /* return true if e has a pointer-type array declarator
      (the upper bound of the last dimension is  equal to 1: REAL A(1) )*/
   if (entity_variable_p(e))
     {
@@ -676,18 +676,18 @@ bool pointer_type_array_p(entity e)
 	  dimension last_dim =  find_ith_dimension(l_dims,length);
 	  expression exp = dimension_upper(last_dim);
 	  if (expression_equal_integer_p(exp,1))
-	    return TRUE;
+	    return true;
 	}
     }
-  return FALSE;
+  return false;
 }
 
 bool unnormalized_array_p(entity e)
 {
-  /* return TRUE if e is an assumed-size array or a pointer-type array*/
+  /* return true if e is an assumed-size array or a pointer-type array*/
   if (assumed_size_array_p(e) || pointer_type_array_p(e))
-    return TRUE;
-  return FALSE;
+    return true;
+  return false;
 }
 
 
@@ -696,7 +696,7 @@ bool unnormalized_array_p(entity e)
 bool entity_field_p(entity e)
 {
   string eln = entity_local_name(e);
-  bool field_p = FALSE;
+  bool field_p = false;
 
   if(*eln!='\'' && *eln!='"') {
     string pos = strrchr(eln, MEMBER_SEP_CHAR);
@@ -933,12 +933,12 @@ entity entity_empty_label(void)
 bool top_level_entity_p(entity e)
 {
   /* This code is wrong because it only checks that entity_module_name(e)
-   * is a prefix of TOP_LEVEL_MODULE_NAME. So it returns TRUE for variables
+   * is a prefix of TOP_LEVEL_MODULE_NAME. So it returns true for variables
    * of a subroutine called TOP!
    *
    * The MODULE_SEP_STRING should be added to TOP_LEVEL_MODULE_NAME?
    *
-   * To return FALSE quickly, TOP_LEVEL_MODULE_NAME should begin with
+   * To return false quickly, TOP_LEVEL_MODULE_NAME should begin with
    * a special character never appearing in standard identifiers, for
    * instance * (star).
    */
@@ -951,7 +951,7 @@ bool top_level_entity_p(entity e)
   /* FI: It's late, I cannot think of anything better */
   /*
     int l = strlen(entity_module_name(e));
-    bool top = FALSE;
+    bool top = false;
 
     if(l==strlen(TOP_LEVEL_MODULE_NAME)) {
     top = (strncmp(TOP_LEVEL_MODULE_NAME,
@@ -1065,14 +1065,14 @@ void sort_list_of_entities(list l)
   gen_sort_list(l, (gen_cmp_func_t)compare_entities);
 }
 
-/*   TRUE if var1 <= var2
+/*   true if var1 <= var2
  */
 bool lexicographic_order_p(entity var1, entity var2)
 {
   /*   TCST is before anything else
    */
-  if ((Variable) var1==TCST) return(TRUE);
-  if ((Variable) var2==TCST) return(FALSE);
+  if ((Variable) var1==TCST) return(true);
+  if ((Variable) var2==TCST) return(false);
 
   /* else there are two entities
    */
@@ -1095,7 +1095,7 @@ basic entity_basic(entity e)
   return (basic_undefined);
 }
 
-/* return TRUE if the basic associated with entity e matchs the passed tag */
+/* return true if the basic associated with entity e matchs the passed tag */
 bool entity_basic_p(entity e,enum basic_utype basictag)
 {
   return basic_tag(entity_basic(e)) == basictag;
@@ -1104,7 +1104,7 @@ bool entity_basic_p(entity e,enum basic_utype basictag)
 /* Checks that el only contains entity*/
 bool entity_list_p(list el)
 {
-  bool pure = TRUE;
+  bool pure = true;
 
   FOREACH(ENTITY, e, el)
       {
@@ -1112,7 +1112,7 @@ bool entity_list_p(list el)
 	pips_debug(10, "Entity e in list is \"%s\"\n", safe_entity_name(e));
 	if(entity_domain_number(e)!=entity_domain) {
 	  pips_debug(8, "Last entity le in list is \"%s\"\n", safe_entity_name(le));
-	  pure = FALSE;
+	  pure = false;
 	  break;
 	}
 	le = e;
@@ -1328,16 +1328,16 @@ expression entity_ith_bounds(entity e, int i)
 /*bool statement_contains_io_intrinsic_call_p(statement s)
 {
  IoElementDescriptor *pid = IoElementDescriptorTable;
-      bool found = FALSE;
+      bool found = false;
 
       while ((pid->name != NULL) && (!found)) {
 	if (strcmp(pid->name, s) == 0) 
 	  {
-	    found = TRUE;
-	    return TRUE;
+	    found = true;
+	    return true;
 	  }
       }
-      return FALSE;
+      return false;
 }*/
 
 /* true if e is an io instrinsic
@@ -1378,9 +1378,9 @@ bool io_intrinsic_p(entity e)
 		     NULL);
   }
   if(set_belong_p(io_functions_set, e)) 
-    return TRUE;
+    return true;
   else 
-    return FALSE;
+    return false;
 }
 
 /* true if continue. See also macro ENTITY_CONTINUE_P
@@ -1443,12 +1443,12 @@ list /* of entity */ common_members_of_module(entity common,
   return gen_nreverse(result);
 }
 
-/* returns TRUE if l contains an entity with same type, local name and offset.
+/* returns true if l contains an entity with same type, local name and offset.
  */
 static bool comparable_entity_in_list_p(entity common, entity v, list l)
 {
   entity ref = entity_undefined;
-  bool ok, sn, so = FALSE, st = FALSE;
+  bool ok, sn, so = false, st = false;
 
   /* first find an entity with the same NAME.
    */
@@ -1498,17 +1498,17 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
  */
 bool check_common_inclusion(entity common)
 {
-  bool ok = TRUE;
+  bool ok = true;
   list /* of entity */ lv, lref;
   entity ref;
   pips_assert("entity is a common", entity_area_p(common));
   lv = area_layout(type_area(entity_type(common)));
 
-  if (!lv) return TRUE; /* empty common! */
+  if (!lv) return true; /* empty common! */
 
   /* take the first function as the reference for the check. */
   ref = ram_function(storage_ram(entity_storage(ENTITY(CAR(lv)))));
-  lref = common_members_of_module(common, ref, FALSE);
+  lref = common_members_of_module(common, ref, false);
 
   /* SAME name, type, offset */
   while (lv && ok)
@@ -1623,10 +1623,10 @@ entity find_ith_formal_parameter(entity the_fnct, int rank)
 bool some_main_entity_p(void)
 {
   gen_array_t modules = db_get_module_list();
-  bool some_main = FALSE;
+  bool some_main = false;
   GEN_ARRAY_MAP(name,
 		if (entity_main_module_p(local_name_to_top_level_entity(name)))
-		  some_main = TRUE,
+		  some_main = true,
 		modules);
   gen_array_full_free(modules);
   return some_main;
@@ -1658,7 +1658,7 @@ bool typedef_entity_p(entity e)
      MODULE_SEP_STRING and the scope information */
   string en = entity_name(e);
   string ms = strchr(en, BLOCK_SEP_CHAR);
-  bool is_typedef = FALSE;
+  bool is_typedef = false;
 
   /* If there is no scope information, use the module separator */
   if(ms==NULL)
@@ -1676,7 +1676,7 @@ bool member_entity_p(entity e)
   /* Its name must contain the MEMBER_PREFIX after the MODULE_SEP_STRING */
   string en = entity_name(e);
   string ms = strchr(en, MODULE_SEP);
-  bool is_member = FALSE;
+  bool is_member = false;
 
   if(ms!=NULL)
     is_member = (strchr(ms, MEMBER_SEP_CHAR)!=NULL);
@@ -1738,7 +1738,7 @@ bool extern_entity_p(entity module, entity e)
        global scope.
 */
   // Check if e belongs to module
-  /* bool isbelong = TRUE;
+  /* bool isbelong = true;
   list ld = entity_declarations(m);
   //ifdebug(1) {
     pips_assert("e is visible in module",gen_in_list_p(e,ld));
@@ -1843,7 +1843,7 @@ bool parameter_passing_mode_p(entity f, int tag)
 {
   type ft = ultimate_type(entity_type(f));
   functional ftf = type_functional(ft);
-  bool mode_p = TRUE;
+  bool mode_p = true;
 
   /* Calls thru pointers require syntax_application */
   pips_assert("call to a function", type_functional_p(ft));
@@ -2004,11 +2004,11 @@ list concat_new_entities(list l1, list l2)
  * @param e entity to check
  * @param ldecl list of entities whose declaration may use e
  *
- * @return @a TRUE if e appears in one of the declaration in ldecl
+ * @return @a true if e appears in one of the declaration in ldecl
  */
 bool entity_used_in_declarations_p(entity e, list ldecl)
 {
-  bool found_p = FALSE;
+  bool found_p = false;
 
   FOREACH(ENTITY, d, ldecl) {
     type dt = entity_type(d);
@@ -2017,7 +2017,7 @@ bool entity_used_in_declarations_p(entity e, list ldecl)
     if(gen_in_list_p(e, sel)) {
       pips_debug(8, "entity \"%s\" is used to declare entity \"%s\"\n",
 		 entity_name(e), entity_name(d));
-      found_p = TRUE;
+      found_p = true;
       gen_free_list(sel);
       break;
     }
@@ -2035,11 +2035,11 @@ bool entity_used_in_declarations_p(entity e, list ldecl)
  * @param e entity to check
  * @param ldecl list of entities whose declaration may use e
  *
- * @return @a TRUE if e appears in one of the declaration in ldecl
+ * @return @a true if e appears in one of the declaration in ldecl
  */
 bool type_used_in_type_declarations_p(entity e, list ldecl)
 {
-  bool found_p = FALSE;
+  bool found_p = false;
 
   FOREACH(ENTITY, d, ldecl) {
     /* The dummy declaration may be hidden in a struct or a union
@@ -2052,7 +2052,7 @@ bool type_used_in_type_declarations_p(entity e, list ldecl)
       if(gen_in_list_p(e, stl)) {
 	pips_debug(8, "entity \"%s\" is used to declare entity \"%s\"\n",
 		   entity_name(e), entity_name(d));
-	found_p = TRUE;
+	found_p = true;
 	gen_free_list(stl);
 	break;
       }
@@ -2123,7 +2123,7 @@ entity make_entity_copy(entity e)
 }
 
 /* Create a copy of an entity, with (almost) identical type, storage
-   and initial value if move_initialization_p is FALSE, but with a slightly
+   and initial value if move_initialization_p is false, but with a slightly
    different name as entities are uniquely known by their names, and a
    different offset if the storage is ram (still to be done).
 
@@ -2260,11 +2260,11 @@ bool abstract_state_variable_p(entity v)
 /* Make sure that an list is an homogeneous list of entities */
 bool entities_p(list el)
 {
-  bool success_p = TRUE;
+  bool success_p = true;
 
   FOREACH(ENTITY, e, el) {
     if(!check_entity(e)) {
-      success_p = FALSE;
+      success_p = false;
       break;
     }
   }
@@ -2457,7 +2457,7 @@ entity find_enum_of_member(entity m)
 /** Test if a module is in C */
 bool c_module_p(entity m)
 {
-  bool c_p = FALSE;
+  bool c_p = false;
   value v = entity_initial(m);
 
   if(!value_undefined_p(v)) {
@@ -2483,7 +2483,7 @@ bool c_module_p(entity m)
 bool fortran_module_p(entity m)
 {
   /* FI->FC: the code that follows breaks the validation of Hpfc?!? */
-  bool fortran_p = FALSE;
+  bool fortran_p = false;
   value v = entity_initial(m);
   if(!value_undefined_p(v)) {
     if(value_intrinsic_p(v))

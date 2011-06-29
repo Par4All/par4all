@@ -306,11 +306,11 @@ decorate_trail(entity module, list trail, hash_table labels)
 
 	    if(check_io_statement_p(control_statement(succ)) &&
 		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
-	      /* The real successor is the FALSE successor of the IO check */
+	      /* The real successor is the false successor of the IO check */
 	      succ = CONTROL(CAR(CDR(control_successors(succ))));
 	      if(check_io_statement_p(control_statement(succ)) &&
 		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
-		/* The real successor is the FALSE successor of the IO check */
+		/* The real successor is the false successor of the IO check */
 		succ = CONTROL(CAR(CDR(control_successors(succ))));
 	      }
 	      pips_assert("The successor is not a check io statement",
@@ -395,25 +395,25 @@ decorate_trail(entity module, list trail, hash_table labels)
     }
 }
 
-/* returns TRUE if c1 is encountered before c2 in trail, or if c1 == c2
- * is encountered in trail, FALSE is c2 is encountered first and c2 != c1,
+/* returns true if c1 is encountered before c2 in trail, or if c1 == c2
+ * is encountered in trail, false is c2 is encountered first and c2 != c1,
  * core dumps otherwise, if neither c1 nor c2 is in trail
  */
 static bool
 appears_first_in_trail(list trail, control c1, control c2)
 {
-    bool first = FALSE;
+    bool first = false;
     control c = control_undefined;
 
     MAPL(cc, {
 	c = CONTROL(CAR(cc));
 
 	if(c==c1) {
-	    first = TRUE;
+	    first = true;
 	    break;
 	}
 	else if(c==c2) {
-	    first = FALSE;
+	    first = false;
 	    break;
 	}
     }, trail);
@@ -548,18 +548,18 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
       case 0:
 	/* Build the statement text with enclosing braces if necessary in
 	   C and skip parasitic continues */
-        MERGE_TEXTS(r, text_statement_enclosed(module, margin, st, one_liner_p(st), TRUE, NIL));
+        MERGE_TEXTS(r, text_statement_enclosed(module, margin, st, one_liner_p(st), true, NIL));
         break;
       case 1: {
         control succ = CONTROL(CAR(control_successors(c)));
 
         if (check_io_statement_p(control_statement(succ))
             && !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
-          /* The real successor is the FALSE successor of the IO check */
+          /* The real successor is the false successor of the IO check */
           succ = CONTROL(CAR(CDR(control_successors(succ))));
           if (check_io_statement_p(control_statement(succ))
               && !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
-            /* The real successor is the FALSE successor of the IO check */
+            /* The real successor is the false successor of the IO check */
             succ = CONTROL(CAR(CDR(control_successors(succ))));
           }
           pips_assert("The successor is not a check io statement",
@@ -568,7 +568,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
 
 	/* Build the statement text with enclosing braces if necessary in
 	   C and skip parasitic continues */
-        MERGE_TEXTS(r, text_statement_enclosed(module, margin, st, one_liner_p(st), TRUE, NIL));
+        MERGE_TEXTS(r, text_statement_enclosed(module, margin, st, one_liner_p(st), true, NIL));
 
         /* If the statement "really" has a continuation (e.g. not a STOP
          * or a RETURN)
@@ -602,7 +602,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
         sentence s = sentence_undefined;
         string comments = statement_comments(st);
         text r1 = make_text(NIL);
-        bool no_endif = FALSE;
+        bool no_endif = false;
 
         pips_assert("must be a test", instruction_test_p(i));
 
@@ -661,7 +661,7 @@ static text text_trail(entity module, int margin, list trail, hash_table labels)
               /* succ1 must be reached by GOTO */
               l = control_to_label_name(succ1, labels);
               pips_assert("Must be labelled", l!= string_undefined);
-              no_endif = TRUE;
+              no_endif = true;
             } else {
               /* Both successors must be labelled */
               l = control_to_label_name(succ1, labels);

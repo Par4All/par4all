@@ -123,13 +123,13 @@ instruction make_instruction_block(list statements) {
  */
 bool native_call_p(call c,
         string op_name) {
-  bool call_s_p = FALSE;
+  bool call_s_p = false;
 
   // The called function
   entity f = call_function(c);
 
   if (strcmp(entity_user_name(f), op_name) == 0)
-    call_s_p = TRUE;
+    call_s_p = true;
 
   return call_s_p;
 }
@@ -144,7 +144,7 @@ bool native_call_p(call c,
 bool native_instruction_p(instruction i,
 			  string op_name)
 {
-  bool call_s_p = FALSE;
+  bool call_s_p = false;
 
   // Call can be directly inside the instruction,
   // or wrapped inside an expression
@@ -227,10 +227,10 @@ bool assignment_block_p(instruction i)
 
 	 if(!assignment_statement_p(s))
 	   if(!(continue_statement_p(s) && ENDP(CDR(cs)) ))
-	     return FALSE;
+	     return false;
        },
        instruction_block(i));
-  return TRUE;
+  return true;
 }
 
 

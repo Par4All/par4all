@@ -51,7 +51,7 @@
 #define call_constant_p(C) \
   (value_constant_p(entity_initial(call_function(C))))
 
-/* The following define may be replaced by #define ... (TRUE) */
+/* The following define may be replaced by #define ... (true) */
 #define effect_may_or_must_p(my_effect) \
   ((approximation_may_p(effect_approximation(my_effect))) || \
    (approximation_exact_p(effect_approximation(my_effect))) )
@@ -108,7 +108,7 @@ bool check_procedure(c)
 		flint_message("check procedure",
 			      "warning, function used as a procedure : %s\n",
 			      entity_name(the_fnct));
-		tmpbool = FALSE;
+		tmpbool = false;
 	    }
 	}
     }
@@ -146,22 +146,22 @@ bool check_the_call(c)
 
 
     if (!check_call_args_number(la, lt, c))
-	return (FALSE);
+	return (false);
 
     /* else */
     if (call_intrinsic_p(c))
 	return (check_call_intrinsic(la, lt, c));
 
     if ((int) gen_length(la) == 0)
-	return (TRUE);
+	return (true);
 
     /* else */
     if (!check_call_types_compatibility(la, lt, c))
-	return (FALSE);
+	return (false);
 
     /* else */
     if (call_constant_p(c))
-	return (TRUE);
+	return (true);
 
     /* else */
     /* Errors in parameter modes are found out by effect computation.
@@ -169,7 +169,7 @@ bool check_the_call(c)
      */
     /* return (check_call_mode_consistency(la, lt, the_fnct)); */
 
-    return TRUE;
+    return true;
 }
 
 
@@ -204,7 +204,7 @@ check_call_intrinsic(list la,
 	    return (BOOL_UNDEF);
 
 	if (!check_call_basic(ba2, ba1, c, 0))
-	    return (FALSE);
+	    return (false);
 
 	return (check_call_dim(da1, da2, c, 0) && check_call_dim(da2, da1, c, 0));
     }
@@ -231,7 +231,7 @@ bool check_call_args_number(
 
     if (na == nt ||
 	(nt<=na && type_varargs_p(parameter_type(PARAMETER(CAR(gen_last(lt)))))))
-	return (TRUE);
+	return (true);
 
     if (call_intrinsic_p(c) && (nt == 0)) {	/* sometimes out... */
 	return (BOOL_UNDEF);
@@ -242,7 +242,7 @@ bool check_call_args_number(
 		  na,
 		  entity_name(call_function(c)),
 		  nt);
-    return (FALSE);
+    return (false);
 }
 
 
@@ -259,7 +259,7 @@ check_call_types_compatibility(la, lt, c)
 {
     expression      exp;
     parameter       param;
-    bool            ok = TRUE;
+    bool            ok = true;
     int             i, len = gen_length(lt);
     list            ca = la, ct = lt;
 
@@ -310,7 +310,7 @@ bool check_call_basic(be, bp, c, i)
     int             i;
 {
     if (basic_tag(be) == basic_tag(bp))
-	return (TRUE);
+	return (true);
 
     if (basic_overloaded_p(be))
 	flint_message("check_call: WARNING",
@@ -321,7 +321,7 @@ bool check_call_basic(be, bp, c, i)
 		      "incompatible basic type, %dth arg in call to %s, %s>%s\n",
 		      i, entity_name(call_function(c)),
 		      basic_to_string(be), basic_to_string(bp));
-    return (FALSE);
+    return (false);
 }
 
 
@@ -347,14 +347,14 @@ bool check_call_dim(list de, list dp, call c, int i)
 
     /* else */
     if (n_de >= n_dp)
-	return (TRUE);
+	return (true);
 
     /* else */
     flint_message("check_call",
 		  "incompatible dim, %dth arg in call to %s, (%d<%d)\n",
 		  i, entity_name(call_function(c)),
 		  n_de, n_dp);
-    return (FALSE);
+    return (false);
 }
 
 
@@ -381,7 +381,7 @@ bool check_call_basic_and_dim(exp, param, c, i)
 
     /* else */
     if (!check_call_basic(bexp, bpar, c, i))
-	return (FALSE);
+	return (false);
 
     /* else */
     return (check_call_dim(dexp, dpar, c, i));
@@ -466,7 +466,7 @@ bool check_call_mode_consistency(la, lt, the_fnct)
     parameter
 	param;
     bool
-	ok = TRUE,
+	ok = true,
 	temp = -1;
     int
 	i, len = gen_length(lt);
@@ -477,7 +477,7 @@ bool check_call_mode_consistency(la, lt, the_fnct)
      * since summary effects should not be touched
      */
     sefs_list = effects_to_list( (effects)
-	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
+	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, true));
 
     pips_debug(7, "summary effects list for %s (%p)\n",
 	       module_name, sefs_list);
@@ -506,12 +506,12 @@ bool check_call_one_mode(expression exp,
 			 int i)
 {
   list            sefl = sefs_list;	/* locally */
-  bool            encountered = FALSE;
+  bool            encountered = false;
   effect          the_effect;
   entity          the_ent;
 
   if (!(param_ref_p(param) && arg_const_p(exp)))
-    return (TRUE);
+    return (true);
 
   /* else : control */
 
@@ -569,7 +569,7 @@ bool look_at_the_commons(entity module)
 	    }
 	}
     }
-    return (TRUE);
+    return (true);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -588,12 +588,12 @@ bool position_in_the_area(entity the_var, intptr_t *inf, intptr_t *sup)
     intptr_t             nb_of_elements = 0;
 
     if (!find_bd_type_variable(entity_type(the_var), &base, &dims))
-	return (FALSE);
+	return (false);
     if (!number_of_elements(dims, &nb_of_elements))
-	return (FALSE);
+	return (false);
     if (!(basic_int_p(base) || basic_float_p(base) ||
 	  basic_logical_p(base) || basic_complex_p(base)))
-	return (FALSE);
+	return (false);
 
     switch (basic_tag(base)) {
     case is_basic_int:{
@@ -619,7 +619,7 @@ bool position_in_the_area(entity the_var, intptr_t *inf, intptr_t *sup)
     *inf = ram_offset(storage_ram(entity_storage(the_var)));
     *sup = (*inf) + (nb_of_elements * len_unit) - 1;
 
-    return (TRUE);
+    return (true);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -629,7 +629,7 @@ bool position_in_the_area(entity the_var, intptr_t *inf, intptr_t *sup)
  *
  * this function checks the commons of the module, looking for all variables of
  * the module in commons, that could overlap with other variables and may be
- * incompatible. the boolean given back is set to TRUE whatever happens.
+ * incompatible. the bool given back is set to true whatever happens.
  * Special Commons used by PIPS, (dynamic and static) are not checked.
  */
 bool check_commons(entity module)
@@ -648,7 +648,7 @@ bool check_commons(entity module)
 	    check_one_common(local, module);
     }
 
-    return (TRUE);
+    return (true);
 }
 
 /*
@@ -748,28 +748,28 @@ bool check_overlap_in_common(the_common, e1, inf1, sup1, e2, inf2, sup2)
 
     /* testing overlap */
     if ((sup1 < inf2) || (sup2 < inf1))
-	return (TRUE);
+	return (true);
 
     /* else I must check basic compatibility */
     ok1 = find_bd_type_variable(entity_type(e1), &b1, &l1);
     ok2 = find_bd_type_variable(entity_type(e2), &b2, &l2);
 
     if (!(ok1 && ok2))
-	return (TRUE);		/* benefice du doute! */
+	return (true);		/* benefice du doute! */
 
     if (basic_tag(b1) == basic_tag(b2))
-	return (TRUE);
+	return (true);
 
     if ((basic_float_p(b1) && (basic_complex_p(b2))) ||
 	(basic_float_p(b2) && (basic_complex_p(b1))))
-	return (TRUE);
+	return (true);
 
     flint_message_2("check common",
 		"overlap of incompatible variables (%s, %s) in common %s\n",
 		    entity_name(e1),
 		    entity_name(e2),
 		    module_local_name(the_common));
-    return (FALSE);
+    return (false);
 }
 
 

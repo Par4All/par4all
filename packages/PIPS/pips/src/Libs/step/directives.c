@@ -25,7 +25,7 @@ string step_directives_USER_FILE_name()
   string file_name, full_name;
   string dir_name = db_get_current_workspace_directory();
   string module = module_local_name(get_current_module_entity());
-  string name = strdup(concatenate(dir_name, "/", db_get_file_resource(DBR_USER_FILE,module,TRUE), NULL));
+  string name = strdup(concatenate(dir_name, "/", db_get_file_resource(DBR_USER_FILE,module,true), NULL));
 
   if (dot_f_file_p(name)|| dot_F_file_p(name) )
     {
@@ -55,12 +55,12 @@ bool directives_init(string __attribute__ ((unused)) module_name)
   string dir_name = db_get_current_workspace_directory();
   safe_system(concatenate("touch ", dir_name , "/", WORKSPACE_TMP_SPACE, "/step_directives.f", NULL));
 
-  return TRUE;
+  return true;
 }
 
 void global_directives_load()
 {
-  set_global_directives((directives)db_get_memory_resource(DBR_DIRECTIVES, "", TRUE));
+  set_global_directives((directives)db_get_memory_resource(DBR_DIRECTIVES, "", true));
 }
 
 void global_directives_save()
@@ -93,7 +93,7 @@ bool directive_filter(string name)
     pips_debug(1, "considering module %s\n", name);
     
     dir_name = db_get_current_workspace_directory();
-    file_name = db_get_file_resource(DBR_SOURCE_FILE, name, TRUE);
+    file_name = db_get_file_resource(DBR_SOURCE_FILE, name, true);
     new_name = strdup(concatenate(name,"/",name, STEP_FILTERED_SUFFIX, NULL));
     src_name = strdup(concatenate(dir_name, "/", file_name, NULL));
 
@@ -107,7 +107,7 @@ bool directive_filter(string name)
 
     pips_debug(1, "fin\n");
     debug_off();
-    return TRUE;
+    return true;
 }
 
 bool directive_filter_c(string name)
@@ -118,7 +118,7 @@ bool directive_filter_c(string name)
     pips_debug(1, "considering module %s\n", name);
     
     dir_name = db_get_current_workspace_directory();
-    file_name = db_get_file_resource(DBR_C_SOURCE_FILE, name, TRUE);
+    file_name = db_get_file_resource(DBR_C_SOURCE_FILE, name, true);
     new_name = strdup(concatenate(name,"/",name, STEP_FILTERED_SUFFIX, NULL));
     src_name = strdup(concatenate(dir_name, "/", file_name, NULL));
 
@@ -131,7 +131,7 @@ bool directive_filter_c(string name)
 
     pips_debug(1, "fin\n");
     debug_off();
-    return TRUE;
+    return true;
 }
 
 
@@ -293,29 +293,29 @@ static bool optional_end_directive_p(directive current)
 
   pips_debug(1,"current = %p\n", current);
 
-  b = FALSE;
+  b = false;
 
   if(type_directive_omp_do_p(directive_type(current)) &&
      !ENDP(directive_body(current)))
     {
       /* if body not empty then omp_do is considered as ended */
-      b = TRUE;
+      b = true;
     }
 
   if(type_directive_omp_parallel_do_p(directive_type(current)) &&
      !ENDP(directive_body(current)))
     {
       /* if body not empty then omp_parallel_do is considered as ended */
-      b = TRUE;
+      b = true;
     }
 
   pips_debug(1,"b = %d\n", b);
   return b;
 }
 
-static bool hook_block_FALSE(directive __attribute__ ((unused)) current,directive __attribute__ ((unused)) next)
+static bool hook_block_false(directive __attribute__ ((unused)) current,directive __attribute__ ((unused)) next)
 {
-  return FALSE;
+  return false;
 }
 
 /*######################################################################################################*/
@@ -337,13 +337,13 @@ static directive_hooks directives_hooks[]= {
    PARALLEL_SECTIONS_TXT,
    make_directive_omp_parallel_sections,
    is_begin_directive_omp_parallel_sections,
-   hook_block_FALSE,
+   hook_block_false,
    handle_omp_sections
   },
   {is_type_directive_omp_end_parallel_sections,
    END_PARALLEL_SECTIONS_TXT,
    make_directive_omp_end_parallel_sections,
-   hook_block_FALSE,
+   hook_block_false,
    is_end_directive_omp_end_parallel_sections,
    NULL
   },
@@ -351,7 +351,7 @@ static directive_hooks directives_hooks[]= {
    SECTIONS_TXT,
    make_directive_omp_sections,
    is_begin_directive_omp_sections,
-   hook_block_FALSE,
+   hook_block_false,
    handle_omp_sections
   },
   {is_type_directive_omp_section,
@@ -364,7 +364,7 @@ static directive_hooks directives_hooks[]= {
   {is_type_directive_omp_end_sections,
    END_SECTIONS_TXT,
    make_directive_omp_end_sections,
-   hook_block_FALSE,
+   hook_block_false,
    is_end_directive_omp_end_sections,
    NULL
   },
@@ -372,13 +372,13 @@ static directive_hooks directives_hooks[]= {
    PARALLEL_DO_TXT,
    make_directive_omp_parallel_do,
    is_begin_directive_omp_parallel_do,
-   hook_block_FALSE,
+   hook_block_false,
    handle_omp_parallel_do
   },
   {is_type_directive_omp_end_parallel_do,
    END_PARALLEL_DO_TXT,
    make_directive_omp_end_parallel_do,
-   hook_block_FALSE,
+   hook_block_false,
    is_end_directive_omp_end_parallel_do,
    handle_omp_parallel_do
   },
@@ -386,13 +386,13 @@ static directive_hooks directives_hooks[]= {
    PARALLEL_TXT,
    make_directive_omp_parallel,
    is_begin_directive_omp_parallel,
-   hook_block_FALSE,
+   hook_block_false,
    handle_omp_parallel
   },
   {is_type_directive_omp_end_parallel,
    END_PARALLEL_TXT,
    make_directive_omp_end_parallel,
-   hook_block_FALSE,
+   hook_block_false,
    is_end_directive_omp_end_parallel,
    handle_omp_parallel
   },
@@ -400,13 +400,13 @@ static directive_hooks directives_hooks[]= {
    DO_TXT,
    make_directive_omp_do,
    is_begin_directive_omp_do,
-   hook_block_FALSE,
+   hook_block_false,
    handle_omp_do
   },
   {is_type_directive_omp_end_do,
    END_DO_TXT,
    make_directive_omp_end_do,
-   hook_block_FALSE,
+   hook_block_false,
    is_end_directive_omp_end_do,
    handle_omp_do
    },
@@ -414,13 +414,13 @@ static directive_hooks directives_hooks[]= {
    MASTER_TXT,
    make_directive_omp_master,
    begin_directive_omp_master,
-   hook_block_FALSE,
+   hook_block_false,
    handle_omp_master
   },
   {is_type_directive_omp_end_master,
    END_MASTER_TXT,
    make_directive_omp_end_master,
-   hook_block_FALSE,
+   hook_block_false,
    end_directive_omp_end_master,
    handle_omp_master
   },
@@ -428,13 +428,13 @@ static directive_hooks directives_hooks[]= {
    CRITICAL_TXT,
    make_directive_omp_critical,
    begin_directive_omp_critical,
-   hook_block_FALSE,
+   hook_block_false,
    handle_omp_critical
   },
   {is_type_directive_omp_end_critical,
    END_CRITICAL_TXT,
    make_directive_omp_end_critical,
-   hook_block_FALSE,
+   hook_block_false,
    end_directive_omp_end_critical,
    handle_omp_critical
   },
@@ -450,8 +450,8 @@ static directive_hooks directives_hooks[]= {
   {is_type_directive_none,/* fake directive for sequence instruction handling*/
    string_undefined,
    (make_directive_hook)make_directive_none,
-   (block_directive_hook)hook_block_FALSE,
-   (block_directive_hook)hook_block_FALSE,
+   (block_directive_hook)hook_block_false,
+   (block_directive_hook)hook_block_false,
    (handle_directive_hook)handle_directive_none
   }
 };
@@ -464,7 +464,7 @@ bool step_directive_p(string directive, string entity_name)
   pips_debug(3, "directive = %s (len=%zd), entity_name = %s\n", directive, strlen(directive), entity_name);
 
   if (string_undefined_p(directive))
-    return FALSE;
+    return false;
 
   debut=strcasestr(entity_name,directive);
   retcode=((debut-(char*)entity_name)==1);
@@ -507,7 +507,7 @@ static bool directive_statement_p(statement stmt)
   pips_debug(1, "stmt = %p\n", stmt);
 
   if (statement_undefined_p(stmt) || !statement_call_p(stmt))
-    return FALSE;
+    return false;
   
   f = call_function(statement_call(stmt));
   b = (top_level_entity_p(f) && strncmp(DIR_CALL, entity_local_name(f), strlen(DIR_CALL))==0);
@@ -648,7 +648,7 @@ statement step_keep_directive_txt(directive begin,statement stmt,directive end)
 					    new_comment,
 					    make_continue_instruction(),
 					    NIL, NULL,empty_extensions ()),
-		       TRUE); /* before */
+		       true); /* before */
     }
 
   if(!(directive_undefined_p(end) || directive_none_p(end)))
@@ -661,7 +661,7 @@ statement step_keep_directive_txt(directive begin,statement stmt,directive end)
 					    new_comment,
 					    make_continue_instruction(),
 					    NIL, NULL, empty_extensions()),
-		       FALSE); /* after */
+		       false); /* after */
     }
 
   pips_debug(1, "stmt = %p\n", stmt);
@@ -932,13 +932,13 @@ static bool dir_filter(statement stmt)
       pips_debug(2, "block statement\n");
 
       directive_block_filter(stmt); 
-      return FALSE;
+      return false;
     }
 
   STEP_DEBUG_STATEMENT(2, "end filter", stmt);
 
   pips_debug(1, "end\n");
-  return TRUE;
+  return true;
 }
 
 bool step_directives(string module_name)
@@ -948,7 +948,7 @@ bool step_directives(string module_name)
    
   debug_on("STEP_DIRECTIVES_DEBUG_LEVEL");
 
-  statement stmt = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  statement stmt = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   global_directives_load();
   outlining_load();
@@ -977,13 +977,13 @@ bool step_directives(string module_name)
   debug_off(); 
   debug_off();
   
-  return TRUE;
+  return true;
 }
 
 static string clauses_to_string(list clauses,bool close)
 {
   string s;
-  string_buffer sb = string_buffer_make(FALSE);
+  string_buffer sb = string_buffer_make(false);
 
   FOREACH(CLAUSE,c,clauses)
     {
@@ -1015,7 +1015,7 @@ static string clauses_to_string(list clauses,bool close)
 static string directive_formate(string unformated,string directive_guard,string directive_continue)
 {
   char tmp[MAX_LINE_LENGTH+1];
-  string_buffer formated_bs = string_buffer_make(FALSE);
+  string_buffer formated_bs = string_buffer_make(false);
   string formated;
   size_t size;
 
@@ -1173,7 +1173,7 @@ static bool step_pragma_to_call(string module_name)
    
   debug_on("STEP_PRAGMA_TO_CALL_DEBUG_LEVEL");
 
-  statement stmt = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+  statement stmt = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
   set_current_module_entity(local_name_to_top_level_entity(module_name));
 
   gen_recurse(stmt, statement_domain, dir_pragma_filter, gen_null); 
@@ -1190,7 +1190,7 @@ static bool step_pragma_to_call(string module_name)
   pips_debug(1, "Fin step_pragma_to_call\n");
   debug_off(); 
   debug_off();
-  return TRUE;
+  return true;
 }
 
 
@@ -1201,8 +1201,8 @@ static bool step_pragma_to_call(string module_name)
  */
 bool directive_parser(string module) {
   string dir = db_get_current_workspace_directory();
-  string filename = strdup(concatenate(dir, "/", db_get_file_resource(DBR_USER_FILE,module,TRUE), NULL));
-  bool return_value = FALSE;
+  string filename = strdup(concatenate(dir, "/", db_get_file_resource(DBR_USER_FILE,module,true), NULL));
+  bool return_value = false;
 
   // FIXME : we do not handle fortran95 files here...
   if (dot_f_file_p(filename) || dot_F_file_p(filename) ) {

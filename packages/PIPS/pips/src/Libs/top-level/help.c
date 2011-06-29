@@ -64,7 +64,7 @@ void
 get_help_topic(string topic, gen_array_t array)
 {
     FILE *fd;
-    int selected = FALSE, index=0;
+    int selected = false, index=0;
     int begin_length, end_length;
 
     char *line;
@@ -78,7 +78,7 @@ get_help_topic(string topic, gen_array_t array)
 	{
 	    if (strncmp(line, BEGIN_STR, begin_length) == 0 &&
 		strcmp(line + begin_length + 1, topic) == 0) {
-		selected = TRUE;
+		selected = true;
 	    } else if (strncmp(line, END_STR, end_length) == 0) {
 		if (selected) break;
 	    }

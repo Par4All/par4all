@@ -155,7 +155,7 @@ static vertex vertex_statement( statement st ) {
  * of one statement.
  *
  * @param st the statement to initialize
- * @return always TRUE (gen_recurse continuation)
+ * @return always true (gen_recurse continuation)
  */
 static bool init_one_statement( statement st ) {
 
@@ -211,7 +211,7 @@ static bool init_one_statement( statement st ) {
     set_clear( REF_IN( st ) );
   }
   /* Go on recursing down: */
-  return TRUE;
+  return true;
 }
 
 /* The GENKILL_xxx functions implement the computation of GEN, REF and
@@ -753,7 +753,7 @@ static void inout_loop( statement st, loop lo ) {
  */
 static void inout_whileloop( statement st, whileloop wl ) {
   statement body = whileloop_body( wl );
-  inout_any_loop( st, body, FALSE );
+  inout_any_loop( st, body, false );
 }
 
 /**
@@ -941,11 +941,11 @@ static void inout_control( control ct ) {
         }},
       ct, blocs );
 
-  for ( change = TRUE; change; ) {
+  for ( change = true; change; ) {
     ifdebug(3) {
       fprintf( stderr, "Iterating on %p ...\n", ct );
     }
-    change = FALSE;
+    change = false;
 
     CONTROL_MAP( b,
         { statement st = control_statement( b );
@@ -1104,18 +1104,18 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
       int din = gen_length(reference_indices(rin));
       reference rout = effect_any_reference(fout);
       int dout = gen_length(reference_indices(rout));
-      bool add_conflict_p = TRUE;
+      bool add_conflict_p = true;
 
       if(entity_abstract_location_p(ein)) {
         entity alout = variable_to_abstract_location(eout);
         if(abstract_locations_may_conflict_p(ein, alout))
-          add_conflict_p = TRUE;
+          add_conflict_p = true;
       } else if(pointer_type_p(tin) && pointer_type_p(tout)) {
         /* Second version due to accuracy improvements in effect
          computation */
         if(din == dout) {
           /* This is the standard case */
-          add_conflict_p = TRUE;
+          add_conflict_p = true;
         } else if(din < dout) {
           /* a write on the shorter memory access path conflicts
            with the longer one. If a[i] is written, then a[i][j]
@@ -1143,7 +1143,7 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
       }
 
       if(add_conflict_p) {
-        bool remove_this_conflict_p = FALSE;
+        bool remove_this_conflict_p = false;
         if(!entity_abstract_location_p(ein) && store_effect_p(fin)) {
           /* Here we filter effect on loop indices except for abstract
            locations */
@@ -1312,8 +1312,8 @@ graph statement_dependence_graph( statement s ) {
 }
 
 /* functions for effects maps */
-static bool rgch = FALSE;
-static bool iorgch = FALSE;
+static bool rgch = false;
+static bool iorgch = false;
 
 static list load_statement_effects( statement s ) {
   instruction inst = statement_instruction( s );
@@ -1360,10 +1360,10 @@ static void set_effects( char *module_name, enum chain_type use ) {
   switch ( use ) {
 
     case USE_PROPER_EFFECTS:
-      rgch = FALSE;
-      iorgch = FALSE;
+      rgch = false;
+      iorgch = false;
       string pe =
-          db_get_memory_resource( DBR_PROPER_EFFECTS, module_name, TRUE );
+          db_get_memory_resource( DBR_PROPER_EFFECTS, module_name, true );
       set_proper_rw_effects( (statement_effects) pe );
       break;
 
@@ -1377,29 +1377,29 @@ static void set_effects( char *module_name, enum chain_type use ) {
        * tests and loop range. BC.
        */
     case USE_REGIONS:
-      rgch = TRUE;
-      iorgch = FALSE;
+      rgch = true;
+      iorgch = false;
       string pr =
-          db_get_memory_resource( DBR_PROPER_REGIONS, module_name, TRUE );
+          db_get_memory_resource( DBR_PROPER_REGIONS, module_name, true );
       set_proper_rw_effects( (statement_effects) pr );
       break;
 
       /* For experimental purpose only */
     case USE_IN_OUT_REGIONS:
-      rgch = FALSE;
-      iorgch = TRUE;
+      rgch = false;
+      iorgch = true;
       /* Proper regions */
       string iopr = db_get_memory_resource( DBR_PROPER_REGIONS,
                                             module_name,
-                                            TRUE );
+                                            true );
       set_proper_rw_effects( (statement_effects) iopr );
 
       /* in regions */
-      string ir = db_get_memory_resource( DBR_IN_REGIONS, module_name, TRUE );
+      string ir = db_get_memory_resource( DBR_IN_REGIONS, module_name, true );
       set_in_effects( (statement_effects) ir );
 
       /* out regions */
-      string or = db_get_memory_resource( DBR_OUT_REGIONS, module_name, TRUE );
+      string or = db_get_memory_resource( DBR_OUT_REGIONS, module_name, true );
       set_out_effects( (statement_effects) or );
       break;
 
@@ -1425,7 +1425,7 @@ static void reset_effects() {
  * @param use the type of effects we want to use to compute the dependence
  * chains
  *
- * @return TRUE because we are very confident it works :-)
+ * @return true because we are very confident it works :-)
  */
 bool chains( char * module_name, enum chain_type use ) {
   statement module_stat;
@@ -1439,7 +1439,7 @@ bool chains( char * module_name, enum chain_type use ) {
 
   set_current_module_statement( (statement) db_get_memory_resource( DBR_CODE,
                                                                     module_name,
-                                                                    TRUE ) );
+                                                                    true ) );
   module_stat = get_current_module_statement( );
   set_current_module_entity( local_name_to_top_level_entity( module_name ) );
   /* set_entity_to_size(); should be performed at the workspace level */
@@ -1470,7 +1470,7 @@ bool chains( char * module_name, enum chain_type use ) {
   reset_current_module_statement( );
   reset_current_module_entity( );
 
-  return TRUE;
+  return true;
 }
 
 /**

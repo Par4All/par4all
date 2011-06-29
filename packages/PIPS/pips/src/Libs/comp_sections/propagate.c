@@ -95,14 +95,14 @@ bool comp_regions(char *module_name)
   
   /* Get the code of the module. */
   set_current_module_statement( (statement)
-  	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+  	db_get_memory_resource(DBR_CODE, module_name, true) );
   /* }}} */
   /* {{{  transformers and preconditions*/
   /* Get the transformers and preconditions of the module. */
   set_transformer_map( (statement_mapping)
-  	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );	
+  	db_get_memory_resource(DBR_TRANSFORMERS, module_name, true) );	
   set_precondition_map( (statement_mapping) 
-  	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
+  	db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
   /* }}} */
   /* {{{  predicates for purpose of debugging*/
   /* predicates defining summary regions from callees have to be 
@@ -111,7 +111,7 @@ bool comp_regions(char *module_name)
   
   
   set_cumulated_rw_effects((statement_effects)
-		db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+		db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
   module_to_value_mappings(get_current_module_entity());
   
   debug_on("COMP_REGIONS_DEBUG_LEVEL");
@@ -154,7 +154,7 @@ bool comp_regions(char *module_name)
   /* }}} */
   /* }}} */
 
-  return(TRUE);
+  return(true);
 }
 /* }}} */
 /* {{{  comp_regions_of_statement*/

@@ -338,7 +338,7 @@ claire_declarations_with_explicit_motif(entity module,
 {
   string result = strdup("");
   code c;
-  bool first = TRUE;
+  bool first = true;
 
   pips_assert("it is a code", value_code_p(entity_initial(module)));
 
@@ -354,7 +354,7 @@ claire_declarations_with_explicit_motif(entity module,
 				    svar, lastsep? separator: "", NULL));
 	free(old);
 	free(svar);
-	first = FALSE;
+	first = false;
       }
   },code_declarations(c));
   return result;
@@ -380,8 +380,8 @@ static string claire_call_from_assignation(call c, int task_number, bool * input
       reference ref = syntax_reference(syn);
       string varname = strdup(concatenate("A_", claire_entity_local_name(reference_variable(ref)), NULL));
       if(gen_array_index(array_names, varname) != ITEM_NOT_IN_ARRAY){
-	result = strdup(concatenate(result, claire_array_in_task(ref, FALSE, task_number), NULL));
-	*input_provided = TRUE;
+	result = strdup(concatenate(result, claire_array_in_task(ref, false, task_number), NULL));
+	*input_provided = true;
       }
 
      
@@ -520,7 +520,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   int j;
   int depth = 0;
 
-  bool null_fitting_p = TRUE;
+  bool null_fitting_p = true;
   string internal_index_declarations = strdup("");
   string fitting_declaration = strdup("");
   string fitting_declaration2 = strdup("");
@@ -585,12 +585,12 @@ static string claire_array_in_task(reference r, bool first, int task_number){
 
   /* CLAIRE column-major storage of fitting matrix */
   for(i=0;i<intern_nb; i++){
-    bool is_null_p = TRUE;
+    bool is_null_p = true;
     for(j = 0; j<index_of_array; j++){
       is_null_p = is_null_p && (same_string_p(fitting_array[j][i], "0"));
     }
     if(!is_null_p){
-      null_fitting_p = FALSE;
+      null_fitting_p = false;
       fitting_declaration = strdup(concatenate(fitting_declaration, "list(", NULL));
       for(j = 0; j<index_of_array-1; j++){
 	fitting_declaration = strdup(concatenate(fitting_declaration, "vartype!(", fitting_array[j][i], "), ", NULL));
@@ -615,7 +615,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
     result = strdup(concatenate(result, "list()),", NL, TAB, TAB, NULL));
     }
 
-  null_fitting_p = TRUE;
+  null_fitting_p = true;
   /* Generation of paving CLAIRE code*/
   result = strdup(concatenate(result, TAB, TAB, "paving = list<list[VARTYPE]>(", NULL));
 
@@ -639,7 +639,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   /* result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", i2a(MONMAX(gen_array_nitems(intern_indices_array), 1)), ",", NL, TAB, TAB, TAB, NULL)); */
 
   for (j = 0; j<intern_nb; j++){
-    bool is_null_p = TRUE;
+    bool is_null_p = true;
     for(i = 0; i < index_of_array; i++){
       is_null_p = is_null_p && (same_string_p(fitting_array[i][j], "0"));
     }
@@ -658,12 +658,12 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   */
 
   for (j = 0; j<intern_nb; j++){
-    bool is_null_p = TRUE;
+    bool is_null_p = true;
     for(i = 0; i < index_of_array; i++){
       is_null_p = is_null_p && (same_string_p(fitting_array[i][j], "0"));
     }
     if(!is_null_p){
-      null_fitting_p = FALSE;
+      null_fitting_p = false;
       result = strdup(concatenate(result, 
 				  "vartype!(", 
 				  *((string *)(gen_array_item(intern_upperbounds_array, j))), 
@@ -710,8 +710,8 @@ static string claire_call_from_loopnest(call c, int task_number){
   syntax s;
   string result = "";
   string first_result = "";
-  bool first = TRUE;
-  bool input_provided = FALSE, output_provided = FALSE;
+  bool first = true;
+  bool input_provided = false, output_provided = false;
   string name = strdup(claire_entity_local_name(called));
 
   if(!same_string_p(name, "="))
@@ -734,17 +734,17 @@ static string claire_call_from_loopnest(call c, int task_number){
       if(gen_array_index(array_names, varname) != ITEM_NOT_IN_ARRAY){
 	if(first){
 	  first_result = claire_array_in_task(r, first, task_number);
-	  output_provided = TRUE;
+	  output_provided = true;
 	}
 	else{
 	  result = strdup(concatenate(result, claire_array_in_task(r, first, task_number), NULL));
-	  input_provided = TRUE;
+	  input_provided = true;
 	}
       }
     }
     default:pips_internal_error("unhandled case");
     }
-    first = FALSE;
+    first = false;
   }
 
   if(!input_provided){
@@ -1071,7 +1071,7 @@ static string claire_code_string(entity module, statement stat)
       print_entities(statement_declarations(stat));
     }
 
-  decls       = claire_declarations_with_explicit_motif(module, variable_p, "", TRUE);
+  decls       = claire_declarations_with_explicit_motif(module, variable_p, "", true);
   tasks       = claire_tasks_with_motif(stat);
   
   result = strdup(concatenate(decls, NL, tasks, NL, NULL));
@@ -1103,7 +1103,7 @@ bool print_claire_code_with_explicit_motif(string module_name)
   module = module_name_to_entity(module_name);
   dir = db_get_current_workspace_directory();
   filename = strdup(concatenate(dir, "/", claire, NULL));
-  stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   if(statement_undefined_p(stat))
     {
@@ -1132,7 +1132,7 @@ bool print_claire_code_with_explicit_motif(string module_name)
   reset_current_module_statement();
   reset_current_module_entity();
 
-  return TRUE;
+  return true;
 }
 
 
@@ -1156,7 +1156,7 @@ nest_context_t,
 static void
 claire_declarations(entity module, string_buffer result)
 { 
-  bool comma = FALSE;
+  bool comma = false;
   list dim;
   int nb_dim =0;
   string up_string ;
@@ -1176,7 +1176,7 @@ claire_declarations(entity module, string_buffer result)
 					 i2a(nb_dim), ",", CLAIRE_RL,NULL));
 	
 	string_buffer_append(result, "origins = list<integer>(");
-	comma = FALSE; 
+	comma = false; 
 	for (dim = variable_dimensions(type_variable(entity_type(var))); !ENDP(dim); dim = CDR(dim)) {
 
 	  intptr_t low;
@@ -1190,14 +1190,14 @@ claire_declarations(entity module, string_buffer result)
 				 concatenate((comma)? ",":"", i2a(up-low+1),NULL));
 	  }
 	  else pips_user_error("Array dimensions must be integer\n");
-	  comma = TRUE;
+	  comma = true;
 	}
 
 	string_buffer_append(result, concatenate("),", CLAIRE_RL,NULL));
 
 	string_buffer_append(result, "dimSizes = list<integer>(");
 	up_string=string_buffer_to_string(result_up);
-	/*	string_buffer_free(&result_up,FALSE);*/ // MEMORY LEAK???
+	/*	string_buffer_free(&result_up,false);*/ // MEMORY LEAK???
 	string_buffer_append(result,up_string);
 	free(up_string);
 
@@ -1253,9 +1253,9 @@ static bool call_selection(call c, nest_context_p nest)
   entity f = call_function(c); 
   if  (ENTITY_ASSIGN_P(f) || entity_subroutine_p(f))
     {  
-      return TRUE;
+      return true;
     }
-  else return FALSE;
+  else return false;
 
   /*  statement s = (statement) stack_head(nest->current_stat);
       return ((!return_statement_p(s) && !continue_statement_p(s)));*/
@@ -1276,7 +1276,7 @@ static bool push_test(test t,  nest_context_p nest)
 {
   /* encapsulation de l'ensemble des instructions appartenant au test*/
   /* on ne fait rien pour le moment */
-  return FALSE;
+  return false;
 }
 
 
@@ -1327,7 +1327,7 @@ static expression expression_plusplus(expression e)
 
 static void claire_loop(stack st, string_buffer result)
 {
-  bool comma_needed = FALSE;
+  bool comma_needed = false;
   string_buffer buffer_lower = string_buffer_make(true);
   string_buffer buffer_upper = string_buffer_make(true);
   string_buffer buffer_names = string_buffer_make(true);
@@ -1359,7 +1359,7 @@ static void claire_loop(stack st, string_buffer result)
 		       concatenate(comma_needed? ",": "",
 				   QUOTE,entity_user_name(loop_index(l)),
 				   QUOTE,NULL));
-  comma_needed = TRUE;
+  comma_needed = true;
   },
 	      st, 0);
 
@@ -1564,7 +1564,7 @@ static void claire_tiling(int taskNumber, reference ref,  region reg, stack indi
   string string_offset = "";
   string string_paving = "";
   string string_fitting =  "";
-  bool comma = FALSE;
+  bool comma = false;
 
   Pvecteur iterat, pi= VECTEUR_NUL;
   Pcontrainte bound_inf = CONTRAINTE_UNDEFINED;
@@ -1635,7 +1635,7 @@ static void claire_tiling(int taskNumber, reference ref,  region reg, stack indi
 				   CLAIRE_MOTIF_PREFIX, i2a(taskNumber),"_",
 				   entity_user_name(var), "_",i2a(i),
 				   QUOTE,NULL));
-      comma = TRUE;
+      comma = true;
     } 
   for (j=1; j<=dim_indices ; j++){
     if (j>1)  string_buffer_append(buffer_paving,strdup("),list("));
@@ -1709,16 +1709,16 @@ static void claire_tiling(int taskNumber, reference ref,  region reg, stack indi
 static void claire_references(int taskNumber, list l_regions, stack indices, string_buffer result)
 { 
   list lr;
-  bool atleast_one_read_ref = FALSE;
-  bool atleast_one_written_ref = FALSE;
-  bool comma = FALSE;
+  bool atleast_one_read_ref = false;
+  bool atleast_one_written_ref = false;
+  bool comma = false;
 /*   Read array references first */
    for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
      {
        region re = REGION(CAR(lr));
        reference ref = effect_any_reference(re);
        if (array_reference_p(ref) && region_read_p(re)) {
-	 atleast_one_read_ref = TRUE;
+	 atleast_one_read_ref = true;
 	 if (comma) string_buffer_append(result,concatenate(",",CLAIRE_RL,NULL));
 	 string_buffer_append(result,concatenate(TAB,  "DATA(",NULL));
 	 claire_reference(taskNumber, ref,  region_write_p(re), result);
@@ -1727,7 +1727,7 @@ static void claire_references(int taskNumber, list l_regions, stack indices, str
 
 	 claire_tiling(taskNumber, ref,re, indices, result);
 	 string_buffer_append(result,concatenate(TAB, ")", NULL));
-	 comma = TRUE;
+	 comma = true;
        }
       }
    if (!atleast_one_read_ref)
@@ -1739,7 +1739,7 @@ static void claire_references(int taskNumber, list l_regions, stack indices, str
        region re = REGION(CAR(lr));
        reference ref = effect_any_reference(re);
        if (array_reference_p(ref) && region_write_p(re)) { 
-	 atleast_one_written_ref = TRUE;
+	 atleast_one_written_ref = true;
 	 if (comma) string_buffer_append(result, concatenate(",",CLAIRE_RL,NULL));
 	 string_buffer_append(result, concatenate(TAB, "DATA(",NULL));
 	 claire_reference(taskNumber, ref,  region_write_p(re), result);
@@ -1747,7 +1747,7 @@ static void claire_references(int taskNumber, list l_regions, stack indices, str
 	    print_regions(lr); */
 	 claire_tiling(taskNumber, ref,re, indices, result);
 	 string_buffer_append(result, ")");
-	 comma = TRUE;
+	 comma = true;
     }
      }
    if (!atleast_one_written_ref) 
@@ -1781,8 +1781,8 @@ static string task_complexity(statement s)
   complexity stat_comp = load_statement_complexity(s);
   string r;
     if(stat_comp != (complexity) HASH_UNDEFINED_VALUE && !complexity_zero_p(stat_comp)) {
-	cons *pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, FALSE,
-						TRUE));
+	cons *pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, false,
+						true));
 	 r = words_to_string(pc);
     }
     else r = i2a(1);
@@ -1865,7 +1865,7 @@ static string claire_code(entity module, statement stat)
   claire_tasks(stat,result);
 
   result2=string_buffer_to_string(result);
-  /*  string_buffer_free(&result,TRUE); */ // MEMORY LEAK ???
+  /*  string_buffer_free(&result,true); */ // MEMORY LEAK ???
   /* ifdebug(2)
     {
       printf("%s", result2);
@@ -1874,7 +1874,7 @@ static string claire_code(entity module, statement stat)
 }
 
 static bool valid_specification_p(entity module, statement stat)
-{ return TRUE;
+{ return true;
 }
 
 /******************************************************** PIPSMAKE INTERFACE */
@@ -1895,15 +1895,15 @@ bool print_claire_code(string module_name)
   string filename = strdup(concatenate(dir, "/", claire, NULL));
   
   statement stat=(statement) db_get_memory_resource(DBR_CODE, 
-						    module_name, TRUE);
+						    module_name, true);
 
   init_cost_table();
  /* Get the READ and WRITE regions of the module */
    set_rw_effects((statement_effects) 
-		 db_get_memory_resource(DBR_REGIONS, module_name, TRUE)); 
+		 db_get_memory_resource(DBR_REGIONS, module_name, true)); 
 
   set_complexity_map( (statement_mapping)
-	db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
+	db_get_memory_resource(DBR_COMPLEXITIES, module_name, true));
 
   if(statement_undefined_p(stat))
     {
@@ -1939,7 +1939,7 @@ bool print_claire_code(string module_name)
   reset_current_module_statement();
   reset_current_module_entity();
 
-  return TRUE;
+  return true;
 }
 
  

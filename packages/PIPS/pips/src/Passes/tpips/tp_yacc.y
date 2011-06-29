@@ -176,7 +176,7 @@ static bool display_a_resource(const char* rname, const char* mname)
 	{
 		pips_user_error("Cannot build view file %s\n", rname);
 		free(fname);
-		return FALSE;
+		return false;
 	}
 
 	if (jpips_is_running)
@@ -185,7 +185,7 @@ static bool display_a_resource(const char* rname, const char* mname)
 		 * What about special formats, such as graphs and all?
 		 */
 		jpips_tag2("show", fname);
-		ret = TRUE;
+		ret = true;
 	}
 	else
 	{
@@ -202,7 +202,7 @@ static bool remove_a_resource(const char* rname, const char* mname)
 		db_delete_resource(rname, mname);
 	else
 		pips_user_warning("no resource %s[%s] to delete.\n", rname, mname);
-	return TRUE;
+	return true;
 }
 
 /* tell pipsdbm that the resource is up to date.
@@ -225,27 +225,27 @@ static bool just_show(const char* rname, const char* mname)
 
 	if (!db_resource_p(rname, mname)) {
 		pips_user_warning("no resource %s[%s].\n", rname, mname);
-		return FALSE;
+		return false;
 	}
 
 	if (!displayable_file_p(rname)) {
 		pips_user_warning("resource %s cannot be displayed.\n", rname);
-		return FALSE;
+		return false;
 	}
 
 	/* now returns the name of the file.
 	 */
-	file = db_get_memory_resource(rname, mname, TRUE);
+	file = db_get_memory_resource(rname, mname, true);
 	fprintf(stdout, "resource %s[%s] is file %s\n", rname, mname, file);
 
-	return TRUE;
+	return true;
 }
 
 /* perform "what" to all resources in "res". res is freed. Several rules
 call it: display, apply. */
 static bool perform(bool (*what)(const char*, const char*), res_or_rule * res)
 {
-	bool result = TRUE;
+	bool result = true;
 
 	if (tpips_execution_mode)
 	{
@@ -269,8 +269,8 @@ static bool perform(bool (*what)(const char*, const char*), res_or_rule * res)
 									{
 										if (mod_name != NULL)
 										{
-											if (what(res->the_name, mod_name) == FALSE) {
-												result = FALSE;
+											if (!what(res->the_name, mod_name)) {
+												result = false;
 												break;
 											}
 										}
@@ -312,7 +312,7 @@ static void tp_system(const char* s)
 
 static bool tp_close_the_workspace(const char* s)
 {
-	bool result = TRUE;
+	bool result = true;
 
 	pips_debug(7, "reduce rule i_close\n");
 
@@ -324,20 +324,20 @@ static bool tp_close_the_workspace(const char* s)
 		{
 			if (same_string_p(s, current))
 			{
-				close_workspace(FALSE);
-				result = TRUE;
+				close_workspace(false);
+				result = true;
 			}
 			else
 			{
 				pips_user_error("must close the current workspace!\n");
-				result = FALSE;
+				result = false;
 			}
 		}
 		else {
 			pips_user_error("No workspace to close. Open or create one!\n");
-			result = FALSE;
+			result = false;
 		}
-		result = TRUE;
+		result = true;
 	}
 
 	return result;
@@ -488,7 +488,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_help
 	| i_touch
 	| i_unknown
-	| error {$$ = FALSE;}
+	| error {$$ = false;}
 	;
 
 i_quit: TK_QUIT TK_ENDOFLINE
@@ -672,7 +672,7 @@ i_open:	TK_OPEN workspace_name TK_ENDOFLINE
 				pips_user_warning("Closing workspace %s "
 													"before opening %s!\n",
 													db_get_current_workspace_name(), $2);
-				close_workspace(FALSE);
+				close_workspace(false);
 			}
 			if (!workspace_exists_p($2))
 				pips_user_error("No workspace %s to open!\n", $2);
@@ -722,7 +722,7 @@ i_create: TK_CREATE workspace_name /* workspace name */
 				{
 		if (!create_workspace($3))
 		{
-			db_close_workspace(FALSE);
+			db_close_workspace(false);
 			/* If you need to preserve the workspace
 				 for debugging purposes, use property
 				 ABORT_ON_USER_ERROR */
@@ -742,7 +742,7 @@ i_create: TK_CREATE workspace_name /* workspace name */
 			lazy_open_module(main_module_name);
 			free(main_module_name);
 		}
-		$$ = TRUE;
+		$$ = true;
 				}
 				else {
 					pips_user_error("Cannot create directory for workspace"
@@ -775,7 +775,7 @@ i_delete: TK_DELETE workspace_name /* workspace name */ TK_ENDOFLINE
 		if ((wname != NULL) && same_string_p(wname, $2)) {
 			pips_user_error("Close before delete: "
 											"Workspace %s is open\n", wname);
-			$$ = FALSE;
+			$$ = false;
 		} else {
 			if(workspace_exists_p($2))
 			{
@@ -783,7 +783,7 @@ i_delete: TK_DELETE workspace_name /* workspace name */ TK_ENDOFLINE
 					/* In case of problem, user_error() has been
 						 called, so it is OK now !!*/
 					user_log ("Workspace %s deleted.\n", $2);
-					$$ = TRUE;
+					$$ = true;
 			}
 			else {
 				pips_user_warning(
@@ -810,7 +810,7 @@ i_module: TK_MODULE TK_NAME /* module name */ TK_ENDOFLINE
 			} else {
 		        free($2);
 				pips_user_error("No workspace open. Open or create one!\n");
-				$$ = FALSE;
+				$$ = false;
 			}
 		}
         else free($2);
@@ -876,7 +876,7 @@ i_activate: TK_ACTIVATE rulename TK_ENDOFLINE
 
 		user_log("Selecting rule: %s\n", $2);
 		activate ($2);
-		$$ = TRUE;
+		$$ = true;
 		}
 		free($2);
 	}
@@ -909,7 +909,7 @@ i_get: TK_GET_PROPERTY propname TK_ENDOFLINE
 				fprint_property_direct(jpips_out_file(), $2);
 				jpips_end_tag();
 			}
-			$$ = TRUE;
+			$$ = true;
 		}
 		free($2);
 	}
@@ -919,7 +919,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 	{
 		int n = gen_array_nitems($2), i=0;
 		bool saved_tpips_is_interactive = tpips_is_interactive;
-		tpips_is_interactive = FALSE;
+		tpips_is_interactive = false;
 		CATCH(user_exception_error)
 		{
 			/* cleanup */
@@ -948,7 +948,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 				}
 				else
 				{
-					tpips_process_a_file(sourced, name, FALSE);
+					tpips_process_a_file(sourced, name, false);
 					fclose(sourced);
 				}
 			}
@@ -1059,7 +1059,7 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 
 			called_modules = (callees)
 				db_get_memory_resource(DBR_CALLEES,
-															 db_get_current_module_name(),TRUE);
+															 db_get_current_module_name(),true);
 
 			$$ = gen_array_from_list(callees_callees(called_modules));
 		}

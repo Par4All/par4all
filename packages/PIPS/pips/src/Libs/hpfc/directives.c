@@ -186,8 +186,8 @@ static void array_as_template(entity array)
 /* one simple ALIGN directive is handled.
  * retrieve the alignment from references array and template
  */
-/*  TRUE if the template dimension subscript is an alignment.
- *  FALSE if the dimension is replicated.
+/*  true if the template dimension subscript is an alignment.
+ *  false if the dimension is replicated.
  */
 static bool
 alignment_p(list /* of expressions */ align_src,
@@ -198,7 +198,7 @@ alignment_p(list /* of expressions */ align_src,
     Pvecteur v, v_src;
     int size, array_dim;
 
-    if (normalized_complex_p(n)) return FALSE;
+    if (normalized_complex_p(n)) return false;
 
     /*  else the subscript is affine
      */
@@ -215,7 +215,7 @@ alignment_p(list /* of expressions */ align_src,
     if (size==0 || (*pshift!=0 && size==1))
     {
 	*padim = 0, *prate = 0;
-	return TRUE;
+	return true;
     }
 
     /*   affine alignment case
@@ -235,7 +235,7 @@ alignment_p(list /* of expressions */ align_src,
 	    if (*prate!=0)
 	    {
 		*padim = array_dim;
-		return TRUE;   /* alignment ok */
+		return true;   /* alignment ok */
 	    }
 	}
     }
@@ -243,7 +243,7 @@ alignment_p(list /* of expressions */ align_src,
     /*   matching array dimension not found, replicated!
      */
     *padim = 0, *prate = 0;
-    return FALSE;
+    return false;
 }
 
 /*  builds an align from the alignee and template references.
@@ -335,7 +335,7 @@ static void initial_alignment(statement s)
     {
 	if (array_distributed_p(array))
         {
-	    propagate_synonym(s, array, array, TRUE);
+	    propagate_synonym(s, array, array, true);
 	    update_renamings(s, CONS(RENAMING, make_renaming(array, array),
 				     load_renamings(s)));
 
@@ -379,7 +379,7 @@ one_align_directive(
 	    array_distributed_p(array) && dynamic_entity_p(array));
 
 	new_array = array_synonym_aligned_as(array, a);
-	propagate_synonym(current, array, new_array, TRUE);
+	propagate_synonym(current, array, new_array, true);
 	update_renamings(current,
 			 CONS(RENAMING, make_renaming(array, new_array),
 			      load_renamings(current)));
@@ -576,7 +576,7 @@ one_distribute_directive(
 		  entity_template_p(template) && dynamic_entity_p(template));
 
 	new_t = template_synonym_distributed_as(template, d);
-	propagate_synonym(current, template, new_t, FALSE);
+	propagate_synonym(current, template, new_t, false);
 
 	/* the new template may be an array, thus auto-aligned 
 	 */
@@ -596,7 +596,7 @@ one_distribute_directive(
 	    a = new_align_with_template(load_hpf_alignment(array), new_t);
 	    new_array = array_synonym_aligned_as(array, a);
 	    
-	    propagate_synonym(current, array, new_array, TRUE);
+	    propagate_synonym(current, array, new_array, true);
 	    update_renamings(current, 
 			     CONS(RENAMING, make_renaming(array, new_array),
 				  load_renamings(current)));
@@ -669,12 +669,12 @@ HANDLER_PROTOTYPE(template)
 
 HANDLER_PROTOTYPE(align)
 {
-    handle_align_and_realign_directive(f, args, FALSE);
+    handle_align_and_realign_directive(f, args, false);
 }
 
 HANDLER_PROTOTYPE(distribute)
 {
-    handle_distribute_and_redistribute_directive(f, args, FALSE);
+    handle_distribute_and_redistribute_directive(f, args, false);
 }
 
 /* I chose not to modify the ri to add reductions as private variables.
@@ -812,12 +812,12 @@ HANDLER_PROTOTYPE(fake)
 
 HANDLER_PROTOTYPE(realign)
 {
-    handle_align_and_realign_directive(f, args, TRUE);
+    handle_align_and_realign_directive(f, args, true);
 }
 
 HANDLER_PROTOTYPE(redistribute)
 {
-    handle_distribute_and_redistribute_directive(f, args, TRUE);
+    handle_distribute_and_redistribute_directive(f, args, true);
 }
 
 /*********************************************** handlers for FCD directives */
@@ -893,7 +893,7 @@ HANDLER_PROTOTYPE(prescriptive)
     array = expression_to_entity(EXPRESSION(CAR(args)));
     new_array = expression_to_entity(EXPRESSION(CAR(CDR(args))));
 
-    propagate_synonym(current, array, new_array, TRUE);
+    propagate_synonym(current, array, new_array, true);
 
     /* only one renaming per rename directive!
      */
@@ -1026,7 +1026,7 @@ static bool prescription_filter(call c)
 	hpfc_translate_call_with_distributed_args(current_stmt_head(), c);
     }
 
-    return FALSE;
+    return false;
 }
 
 /* void handle_hpf_directives(s)

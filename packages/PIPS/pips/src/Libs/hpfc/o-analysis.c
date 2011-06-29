@@ -52,10 +52,10 @@ bool block_distributed_p(entity array)
 	    /* distributed && (nd==is_hpf_newdecl_none)) ?
 	     * ??? the case is not handled later on 
 	     */
-	    return(FALSE);
+	    return(false);
     }
 
-    return(TRUE);
+    return(true);
 }
 
 /* true if indices are constants or index
@@ -76,7 +76,7 @@ static bool simple_indices_p(reference r)
 	 normalized  n = expression_normalized(e); 
 	 int p;
 	 bool b1 = ith_dim_distributed_p(array, dim, &p);
-	 bool b2 = ((!b1) ? local_integer_constant_expression(e) : FALSE);
+	 bool b2 = ((!b1) ? local_integer_constant_expression(e) : false);
 
 	 pips_debug(7, "%s(DIM=%d), distributed %d, locally constant %d\n",
 		    entity_name(array), dim, b1, b2);
@@ -84,10 +84,10 @@ static bool simple_indices_p(reference r)
 	 if (!b2)
 	 {
 	 if (normalized_complex_p(n)) 
-	     /* cannot decide, so it is supposed to be FALSE */
+	     /* cannot decide, so it is supposed to be false */
 	 {
-	     pips_debug(7, "returning FALSE (complex)\n");
-	     return FALSE; 
+	     pips_debug(7, "returning false (complex)\n");
+	     return false; 
 	 }
 	 else
 	 {
@@ -97,18 +97,18 @@ static bool simple_indices_p(reference r)
 	     if (s>1) 
 	     {
 		 ifdebug(7) {
-		     pips_debug(7, "returning FALSE, vect size %d>1\n", s);
+		     pips_debug(7, "returning false, vect size %d>1\n", s);
 		     vect_debug(v);
 		 }
-		 return FALSE;
+		 return false;
 	     }
 	     
 	     if ((s==1) && 
 		 (!entity_loop_index_p((entity)v->var)) &&
 		 (value_zero_p(vect_coeff(TCST, v))))
 	     {
-		 pips_debug(7, "returning FALSE (not simple)\n");
-		 return FALSE;
+		 pips_debug(7, "returning false (not simple)\n");
+		 return false;
 	     }
 	     else
 	     if (entity_loop_index_p((entity)v->var))
@@ -122,8 +122,8 @@ static bool simple_indices_p(reference r)
 
 		 if (rate!=0 && rate!=1)
 		 {
-		     pips_debug(7, "returning FALSE (stride)\n");
-		     return(FALSE);
+		     pips_debug(7, "returning false (stride)\n");
+		     return(false);
 		 }
 	     }
 	 }
@@ -134,7 +134,7 @@ static bool simple_indices_p(reference r)
 	 reference_indices(r));
     
     pips_debug(7, "returning TRUE!\n");
-    return TRUE;
+    return true;
 }
 
 /* true if references are aligned or, for constants, on the same processor...
@@ -148,7 +148,7 @@ aligned_p(
 {
     entity e2 = reference_variable(r2),	template = array_to_template(e2);
     list lv = lvref, lk = lkref;
-    bool result = TRUE;
+    bool result = true;
     int i = 1 ;
 
     pips_debug(7, "arrays %s and %s\n",
@@ -172,7 +172,7 @@ aligned_p(
 	     (processor_number(template, tpldim, tpl, &p)!=
 	      processor_number(template, tpldim, tpl-dlt, &p))) ||
 	    ((t==aligned_shift) && (tsh!=0)))
-	    return FALSE;
+	    return false;
 
 	i++;
     }
@@ -232,13 +232,13 @@ message_manageable_p(
 		  "returning false for %s, dim %d, access %d\n",
 		  entity_name(array), i, ta);
 
-	    return(FALSE);
+	    return(false);
 	}
 
 	i++;
     }
 
-    if (!block_distributed_p(array)) return(FALSE);
+    if (!block_distributed_p(array)) return(false);
 
     /*
      * here the overlap is accepted, and stored
@@ -260,7 +260,7 @@ message_manageable_p(
 	i++;
     }
 
-    return(TRUE); /* accepted! */
+    return(true); /* accepted! */
 }
 
 /*
@@ -270,7 +270,7 @@ list l;
     range r = ((ENDP(l))?(NULL):(loop_range(LOOP(CAR(l)))));
 
     return((ENDP(l))?
-	   (TRUE):
+	   (true):
 	   (expression_integer_constant_p(range_lower(r)) &&
 	    expression_integer_constant_p(range_upper(r)) &&
 	    expression_integer_constant_p(range_increment(r)) &&
@@ -338,7 +338,7 @@ statement stat;
 	      "killing definition of %s (statement 0x%x)\n",
 	      entity_name(var), stat);
 
-	hpfc_killed_scalar = TRUE;
+	hpfc_killed_scalar = true;
 	statement_instruction(stat) =  /* ??? memory leak */
 	    make_continue_instruction();
     }
@@ -350,7 +350,7 @@ static bool hpfc_overlap_kill_unused_scalars(statement stat)
 {
     message_assert("defined", !entity_variable_used_undefined_p());
 
-    hpfc_killed_scalar = FALSE;
+    hpfc_killed_scalar = false;
 
     gen_recurse(stat, statement_domain,	gen_true,
 		hpfc_overlap_kill_unused_scalars_rewrite);
@@ -646,7 +646,7 @@ make_loop_nest_for_overlap(
     entity index, oldindexvalue;
     loop oldloop, newloop;
     list l, lnew_loop = NIL, lnew_body = NIL;
-    bool compute_index = FALSE;
+    bool compute_index = false;
 
     if (ENDP(lold)) 
 	return(innerbody);
@@ -705,7 +705,7 @@ make_loop_nest_for_overlap(
 	    lpre = NIL,
 	    lpost = NIL;
 	bool 
-	    pre = TRUE;
+	    pre = true;
 
 	for(; !ENDP(l); l=CDR(l))
 	{
@@ -715,7 +715,7 @@ make_loop_nest_for_overlap(
 	    /*  switch from pre to post.
 	     */
 	    if (instruction_loop_p(i) && instruction_loop(i)==oldloop)
-		pre = FALSE;
+		pre = false;
 	    else
 		if (pre)
 		    lpre = CONS(STATEMENT, copy_statement(s), lpre);
@@ -851,7 +851,7 @@ generate_optimized_code_for_loop_nest(
 					      CONS(STATEMENT, newnest,
 						   NIL)));
 
-    return(TRUE);
+    return(true);
 }
 
 /* must clear everything before returning in Overlap_Analysis...
@@ -875,7 +875,7 @@ statement stat, *pstat;
     syntax the_computer_syntax = syntax_undefined;
     reference the_computer_reference = reference_undefined;
     statement innerbody, messages_stat, newloopnest;
-    bool computer_is_written = TRUE;
+    bool computer_is_written = true;
 
     DEBUG_STAT(9, "considering statement", stat);
 
@@ -915,7 +915,7 @@ statement stat, *pstat;
     }
     else  /* must chose the computer among read references! */
     {
-	computer_is_written = FALSE;
+	computer_is_written = false;
 
 	MAP(SYNTAX, s,
 	{
@@ -935,7 +935,7 @@ statement stat, *pstat;
 	    Ra = CONS(SYNTAX, the_computer_syntax, NIL);
 	}
 	else
-	    RETURN(FALSE); 
+	    RETURN(false); 
     }
 
     if (!align_check(the_computer_reference,
@@ -984,7 +984,7 @@ statement stat, *pstat;
 	       gen_length(Wa), gen_length(lWa), gen_length(Wrt));
 
     if (gen_length(Wrt)!=0) 
-	RETURN(FALSE);
+	RETURN(false);
 
     /* Now, we have the following situation:
      * Wa: set of aligned written refs, the first of which is ``the'' ref.
@@ -1048,7 +1048,7 @@ statement stat, *pstat;
 	  gen_length(Ra), gen_length(Ro), gen_length(Rrt));
 
     if (gen_length(Rrt)!=0) 
-	RETURN(FALSE);
+	RETURN(false);
 
     /* here is the situation now:
      *
@@ -1076,7 +1076,7 @@ statement stat, *pstat;
     if (!generate_optimized_code_for_loop_nest
 	(innerbody, &newloopnest, the_computer_syntax, 
 	 Wa, Ra, Ro, lWa, lRa, lRo))
-	RETURN(FALSE);
+	RETURN(false);
 
     DEBUG_STAT(9, entity_name(node_module), newloopnest);
 
@@ -1092,7 +1092,7 @@ statement stat, *pstat;
 
     DEBUG_STAT(8, entity_name(node_module), *pstat);
 
-    RETURN(TRUE);
+    RETURN(true);
 }
 
 /* That is all

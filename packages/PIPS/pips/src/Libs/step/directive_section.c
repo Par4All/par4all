@@ -98,7 +98,7 @@ bool is_end_directive_omp_end_parallel_sections(directive  __attribute__ ((unuse
   
   pips_debug(1,"current = %p, next = %p\n", current, next);
 
-  b = TRUE;
+  b = true;
 
   pips_debug(1,"b = %d\n", b);
   return b;
@@ -146,7 +146,7 @@ bool is_begin_directive_omp_section(directive current, directive next)
 
      thus omp_section is considered as an end_directive
   */
-  b = FALSE;
+  b = false;
 
   pips_debug(1,"b = %d\n", b);
   return b;

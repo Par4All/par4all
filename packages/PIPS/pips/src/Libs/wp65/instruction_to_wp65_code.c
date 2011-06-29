@@ -131,7 +131,7 @@ reduce_loop_bound_for_st(statement stmp)
  gen_recurse(stmp,loop_domain,gen_true,reduce_loop_bound);
 
 }
-boolean 
+bool 
 list_of_calls_p(list lsb)
 {
     list pl;
@@ -195,7 +195,7 @@ instruction_to_wp65_code(entity module, list l, graph dg,int pn,int bn,int ls,in
     set_current_module_statement( (statement)
 				  db_get_memory_resource(DBR_CODE, 
 							 module_local_name(module),
-							 TRUE) ); 
+							 true) ); 
     mod_stat = get_current_module_statement();
     MAPL(pm,{
 	statement s1 = STATEMENT(CAR(pm));  
@@ -270,14 +270,14 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 		  statement_mapping store_map, hash_table v_to_esv)
 { 
     list lrefs;
-    boolean load_code = TRUE;
+    bool load_code = true;
     instruction i; 
     call c = instruction_call(statement_instruction(s));
     /* To deal with implied_do and I/Os */
 
 
     if (strcmp(entity_local_name(call_function(c)), "WRITE") == 0) {
-	generate_io_wp65_code(s,s,v_to_esv,FALSE);
+	generate_io_wp65_code(s,s,v_to_esv,false);
 	i = statement_instruction(emulator);
 	instruction_block(i) = gen_nconc(instruction_block(i), 
 					 CONS(STATEMENT, 
@@ -306,7 +306,7 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 	      stored in global memory  for assignments */
 	if ((lrefs = (list) GET_STATEMENT_MAPPING(store_map,s))
 	    != (list) HASH_UNDEFINED_VALUE) {
-	    load_code = FALSE;
+	    load_code = false;
 	    ifdebug(9) {
 		(void) fprintf(stderr,
 			       "Vars having to be stored for stat %"PRIdPTR":\n",
@@ -342,10 +342,10 @@ ref_in_implied_do(expression exp)
    its corresponding emulated shared memory reference */
 
 reference
-translate_IO_ref(call c, hash_table v_to_esv, boolean loop_or_call_print)
+translate_IO_ref(call c, hash_table v_to_esv, bool loop_or_call_print)
 {
     list pio,pc = NIL;
-    boolean iolist_reached = FALSE;
+    bool iolist_reached = false;
     expression exp; 
     syntax s;
     reference  result=reference_undefined;
@@ -368,7 +368,7 @@ translate_IO_ref(call c, hash_table v_to_esv, boolean loop_or_call_print)
 	    else
 		if (strcmp(entity_local_name(call_function(c1)),
 			   "IOLIST=")==0) {
-		    iolist_reached = TRUE;
+		    iolist_reached = true;
 		    pio = CDR(pio);
 		}
 	}
@@ -401,7 +401,7 @@ translate_IO_ref(call c, hash_table v_to_esv, boolean loop_or_call_print)
 
 
 statement
-generate_io_wp65_code(statement s1,statement body,hash_table v_to_esv,boolean loop_or_call_print)
+generate_io_wp65_code(statement s1,statement body,hash_table v_to_esv,bool loop_or_call_print)
 {
     
     list rvld,pl;
@@ -461,7 +461,7 @@ generate_io_wp65_code(statement s1,statement body,hash_table v_to_esv,boolean lo
 
 /* Test if the statement  resulting  from the 
    perfectly_loop_nest_to_body function contains at first call an io */
-boolean
+bool
 io_loop_nest_p(statement st)
 {
     instruction inst = statement_instruction(st);
@@ -497,7 +497,7 @@ loop_nest_movement_generation(
     statement_mapping fetch_map,
     statement_mapping store_map,
     statement mod_stat,
-    boolean fully_parallel,
+    bool fully_parallel,
     Psysteme sc_tile, 
     Pbase initial_basis,
     Pbase local_basis,
@@ -641,21 +641,21 @@ loop_nest_to_wp65_code(
     int i1,lpl, loop_nest_dimt;
     int first_parallel_level=1;
     int last_parallel_level, perfect_nested_loop_size; 
-    boolean loop_carried_dep[11];  
-    boolean fully_parallel;
-    boolean fully_sequential=TRUE;
+    bool loop_carried_dep[11];  
+    bool fully_parallel;
+    bool fully_sequential=true;
     int   nested_level2,nested_level=0;
     list list_statement_block=NIL;
     list list_statement_block2=NIL;
     list new_compute_lst = NIL;
     list new_bank_lst = NIL;
     instruction binst,binst2;
-    boolean io_statementp=FALSE;
+    bool io_statementp=false;
 
     debug_on("WP65_DEBUG_LEVEL");
     debug(5,"loop_nest_to_wp65_code", "begin\n");
 
-    for (i1=1;i1<=10;i1++)  loop_carried_dep[i1] = FALSE;
+    for (i1=1;i1<=10;i1++)  loop_carried_dep[i1] = false;
     compute_loop_nest_dim(loop_nest); 
     loop_nest_dimt = loop_nest_dim;
    
@@ -676,16 +676,16 @@ loop_nest_to_wp65_code(
        bornes sont identiques (meme restrictions que pour du loop fusion) */
   
     for (i1=perfect_nested_loop_size+1;i1<=10;i1++)  
-	loop_carried_dep[i1] = TRUE;
+	loop_carried_dep[i1] = true;
     assert(perfect_nested_loop_size <=10);
 
     last_parallel_level =perfect_nested_loop_size+1; 
     if (!fully_parallel) {  
-	for (i1=1; i1<=loop_nest_dimt && (loop_carried_dep[i1] == TRUE);
+	for (i1=1; i1<=loop_nest_dimt && (loop_carried_dep[i1] == true);
 	     i1++);
 	first_parallel_level = i1; 
 	for (i1=first_parallel_level; 
-	     i1<=loop_nest_dimt && (loop_carried_dep[i1] == FALSE);i1++);
+	     i1<=loop_nest_dimt && (loop_carried_dep[i1] == false);i1++);
 	last_parallel_level = i1-1; 
 	for (it=1, pv=initial_basis;
 	     it <perfect_nested_loop_size &&  it<last_parallel_level;
@@ -727,8 +727,8 @@ loop_nest_to_wp65_code(
 	body = perfectly_nested_loop_to_body(loop_nest);
  
      if (io_loop_nest_p(body)) {
-	 io_st = generate_io_wp65_code(loop_nest,body,v_to_esv,TRUE);
-     io_statementp = TRUE;}
+	 io_st = generate_io_wp65_code(loop_nest,body,v_to_esv,true);
+     io_statementp = true;}
      else {
 
 	/* a modifie pour tenir compte des dimensions reelles des domaines */
@@ -942,9 +942,9 @@ loop_nest_to_wp65_code(
 	reference rf = REFERENCE(CAR(r1));
 	if (reference_scalar_p(rf)) {
 	    include_constant_symbolic_communication(compute_module,CONS(REFERENCE,rf,NIL),
-						    FALSE,computational,proc_id);
+						    false,computational,proc_id);
 	    include_constant_symbolic_communication(memory_module,CONS(REFERENCE,rf,NIL),
-						    TRUE,emulator,(entity)bank_indices->var);
+						    true,emulator,(entity)bank_indices->var);
 	}
     },
 	 store_data_list); 
@@ -1003,7 +1003,7 @@ int first_parallel_level,last_parallel_level;
 	list llv = LIST(CAR(lllv));
 	entity lv = ENTITY(CAR(llv));
 	list lr = (list) hash_get(llv_to_lcr, (char *) llv);
-	boolean proper_tag = FALSE;
+	bool proper_tag = false;
 
 	for(; !ENDP(lr) && !proper_tag ; POP(lr)) {
 	    reference r = REFERENCE(CAR(lr));
@@ -1012,7 +1012,7 @@ int first_parallel_level,last_parallel_level;
 		statement mbs;	/* statement for one movement block */
 		statement bmbs;	 /* statement for one bank movement block */
 
-		proper_tag = TRUE;
+		proper_tag = true;
 		switch(use_def) {
 		case is_action_read:
 		    make_load_blocks(initial_module,compute_module,
@@ -1063,7 +1063,7 @@ search_parallel_loops( mod_stat,loop_statement,dg,loop_carried_dep)
 statement mod_stat;
 statement loop_statement;
 graph dg;
-boolean loop_carried_dep[11];
+bool loop_carried_dep[11];
 {
     cons *pv1, *ps, *pc;
     set region = region_of_loop(loop_statement);;
@@ -1099,7 +1099,7 @@ boolean loop_carried_dep[11];
 			}, lls); 
 			if (llsred != NIL)  
 			    MAPL(pl, 
-			     { loop_carried_dep[INT(CAR(pl))] = TRUE;
+			     { loop_carried_dep[INT(CAR(pl))] = true;
 			   }, llsred);
 		    }
 		}
@@ -1109,13 +1109,13 @@ boolean loop_carried_dep[11];
   reset_enclosing_loops_map(); 
 }
 
-boolean 
+bool 
 full_parallel_loop_nest_p(statement mod_stat,statement loop_stmt, 
-			  int nest_dim,graph dg, boolean *loop_carried_dep)
+			  int nest_dim,graph dg, bool *loop_carried_dep)
 {
     int i; 
     search_parallel_loops(mod_stat,loop_stmt, dg,loop_carried_dep);
-    for (i=1; i<= nest_dim && loop_carried_dep[i]== FALSE; i++);
-    return( (i>nest_dim) ? TRUE : FALSE);
+    for (i=1; i<= nest_dim && loop_carried_dep[i]== false; i++);
+    return( (i>nest_dim) ? true : false);
 }
 

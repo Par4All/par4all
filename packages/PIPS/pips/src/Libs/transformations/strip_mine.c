@@ -254,11 +254,11 @@ bool strip_mine(char *mod_name)
 
         set_current_module_entity(module);
 
-        /* DBR_CODE will be changed: argument "pure" should take FALSE but
+        /* DBR_CODE will be changed: argument "pure" should take false but
            this would be useless since there is only *one* version of code;
            a new version will be put back in the data base after
            strip_mineing */
-        mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
         set_current_module_statement(mod_stmt);
 
         look_for_nested_loop_statements(mod_stmt, loop_chunk_size_and_strip_mine, selected_loop_p);

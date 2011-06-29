@@ -40,9 +40,9 @@
 #include "vecteur.h"
 #include "contrainte.h"
 
-/* boolean contrainte_normalize(Pcontrainte c, boolean is_egalite): reduction
- * par le pgcd de ses coefficients d'une egalite (is_egalite==TRUE) ou
- * d'une inegalite (is_egalite==FALSE)
+/* bool contrainte_normalize(Pcontrainte c, bool is_egalite): reduction
+ * par le pgcd de ses coefficients d'une egalite (is_egalite==true) ou
+ * d'une inegalite (is_egalite==false)
  *
  * Dans le cas des egalites, la faisabilite est testee et retournee
  *
@@ -53,12 +53,12 @@
  *    inegalites 0 <= -k quand k est une constante numerique entiere
  *    strictement positive (Francois Irigoin, 15 novembre 1995)
  */
-boolean contrainte_normalize(
+bool contrainte_normalize(
     Pcontrainte c,
-    boolean is_egalite)
+    bool is_egalite)
 {
-    /* is_c_norm: si is_egalite=TRUE, equation faisable */
-    boolean is_c_norm = TRUE; 
+    /* is_c_norm: si is_egalite=true, equation faisable */
+    bool is_c_norm = true; 
     /* pgcd des termes non constant de c */
     Value a;
     /* modulo(abs(b0),a) */
@@ -85,7 +85,7 @@ boolean contrainte_normalize(
 		    c->vecteur = vect_clean(c->vecteur);
 		}
 		else 
-		    is_c_norm= FALSE;
+		    is_c_norm= false;
 	    }
 	    
 	    else {
@@ -109,7 +109,7 @@ boolean contrainte_normalize(
 	       && term_cst(v)) {
 		if(is_egalite) {
 		    assert(value_notzero_p(vecteur_val(v)));
-		    is_c_norm = FALSE;
+		    is_c_norm = false;
 		}
 		else { /* is_inegalite */
 		    is_c_norm = value_negz_p(vecteur_val(v)) ;
@@ -121,7 +121,7 @@ boolean contrainte_normalize(
     return is_c_norm;
 }
 
-/* boolean egalite_normalize(Pcontrainte eg): reduction d'une equation
+/* bool egalite_normalize(Pcontrainte eg): reduction d'une equation
  * diophantienne par le pgcd de ses coefficients; l'equation est infaisable si
  * le terme constant n'est pas divisible par ce pgcd
  *
@@ -133,15 +133,15 @@ boolean contrainte_normalize(
  *
  * return b % k == 0 || all ai == 0 && b != 0;
  */
-boolean egalite_normalize(eg)
+bool egalite_normalize(eg)
 Pcontrainte eg;
 {
-    return(contrainte_normalize(eg, TRUE));
+    return(contrainte_normalize(eg, true));
 }
 
-/* boolean inegalite_normalize(Pcontrainte ineg): normalisation
+/* bool inegalite_normalize(Pcontrainte ineg): normalisation
  * d'une inegalite a variables entieres; voir contrainte_normalize;
- * retourne presque toujours TRUE car une inegalite n'ayant qu'un terme
+ * retourne presque toujours true car une inegalite n'ayant qu'un terme
  * constant est toujours faisable a moins qu'il ne reste qu'un terme 
  * constant strictement positif.
  *
@@ -151,10 +151,10 @@ Pcontrainte eg;
  *            i
  * eg := eg/k
  *
- * return TRUE unless all ai are 0 and b < 0
+ * return true unless all ai are 0 and b < 0
  */
-boolean inegalite_normalize(ineg)
+bool inegalite_normalize(ineg)
 Pcontrainte ineg;
 {
-    return(contrainte_normalize(ineg ,FALSE));
+    return(contrainte_normalize(ineg ,false));
 }

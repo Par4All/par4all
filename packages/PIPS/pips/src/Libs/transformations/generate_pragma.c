@@ -60,7 +60,7 @@
 ///@param exprs, the pragma as a list of expression
 static list append_private_clause (loop l, list exprs) {
   // the private variables as a list of entites
-  list private = loop_private_variables_as_entites (l, TRUE, TRUE);
+  list private = loop_private_variables_as_entites (l, true, true);
   // add private clause if needed
   if (gen_length (private) != 0) {
     expression expr_private  = pragma_private_as_expr (private);
@@ -134,7 +134,7 @@ static bool pragma_str_for_reduction (loop l, statement stmt) {
   str = reductions_get_omp_pragma_str (l, stmt);
   // insert the pragma (if any) as a string to the current statement
   if ((str !=string_undefined) && (str != NULL) && (strcmp (str, "") != 0)) {
-    add_pragma_str_to_statement (stmt, str, FALSE);
+    add_pragma_str_to_statement (stmt, str, false);
     pips_debug (5, "new reduction pragma as an extension added: %s \n", str);
     return true;
   }
@@ -152,7 +152,7 @@ static bool pragma_str_for (loop l, statement stmt) {
   t = text_omp_directive (l, 0);
   str = text_to_string (t);
   // text appends one uselless \n at the end of the string so remove it
-  chop_newline (str, FALSE);
+  chop_newline (str, false);
   if ((str !=string_undefined) && (str != NULL) && (strcmp (str, "") != 0)) {
     string tmp = string_undefined;
     switch(get_prettyprint_language_tag()) {
@@ -173,7 +173,7 @@ static bool pragma_str_for (loop l, statement stmt) {
     }
     // insert the pragma as a string to the current statement
     if ((tmp !=string_undefined) && (tmp != NULL) && (strcmp (tmp, "") != 0)) {
-      add_pragma_str_to_statement (stmt, tmp, TRUE);
+      add_pragma_str_to_statement (stmt, tmp, true);
       pips_debug (5, "new for pragma as an extension added: %s \n", str);
       return true;
     }
@@ -237,7 +237,7 @@ bool ompify_code (const string module_name) {
   else  if (strcmp (type, "expr") == 0)
     gen_recurse(module_statement, loop_domain, gen_true,
 		generate_expr_omp_pragma_loop);
-  else pips_assert ("not expected property", FALSE);
+  else pips_assert ("not expected property", false);
 
   // Restore the previous PRETTYPRINT_PARALLEL property for the next
   set_string_property("PRETTYPRINT_PARALLEL", previous);
@@ -249,5 +249,5 @@ bool ompify_code (const string module_name) {
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);
 
-  return TRUE;
+  return true;
 }

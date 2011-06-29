@@ -143,7 +143,7 @@
  * to a current precondition. So t_init, t_skip etc... may have
  * different values at differente stages. This happens more when
  * transformers are computed in context (setproprety
- * SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE) and even more when
+ * SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT true) and even more when
  * they are recomputed (apply REFINE_TRANSFORMERS). For this reason, a
  * first crude precondition is computed with effects information to be
  * used to compute the body transformer. And since t_enter cannot be
@@ -275,7 +275,7 @@ transformer any_loop_to_k_transformer(transformer t_init,
 					     t_body,
 					     post_init,
 					     k, // unrollling degree
-					     FALSE); // assume a first
+					     false); // assume a first
 						     // execution of t_body
 
   /* Any transformer or other data structure to free? */
@@ -320,11 +320,11 @@ transformer forloop_to_transformer(forloop fl,
 
   /* Deal with condition expression */
   expression cond_e = forloop_condition(fl);
-  transformer t_enter = condition_to_transformer(cond_e, post_init, TRUE);
+  transformer t_enter = condition_to_transformer(cond_e, post_init, true);
   /* An effort could be made to compute the precondition for t_continue,
      especially if the precondition to t_inc is available. */
   transformer p_continue = transformer_identity();
-  transformer t_continue = condition_to_transformer(cond_e, p_continue, TRUE);
+  transformer t_continue = condition_to_transformer(cond_e, p_continue, true);
 
   /* Deal with increment expression */
   expression inc_e = forloop_increment(fl);
@@ -378,10 +378,10 @@ transformer new_whileloop_to_transformer(whileloop wl,
 
   /* Deal with condition expression */
   expression cond_e = whileloop_condition(wl);
-  transformer t_enter = condition_to_transformer(cond_e, pre, TRUE);
+  transformer t_enter = condition_to_transformer(cond_e, pre, true);
   /* An effort could be made to compute the precondition for t_continue. */
   transformer p_continue = transformer_identity();
-  transformer t_continue = condition_to_transformer(cond_e, p_continue, TRUE);
+  transformer t_continue = condition_to_transformer(cond_e, p_continue, true);
 
   t_body_star = any_loop_to_transformer(t_init, t_enter, t_continue, body_s, wlel, pre);
 
@@ -411,10 +411,10 @@ transformer new_whileloop_to_k_transformer(whileloop wl,
 
   /* Deal with condition expression */
   expression cond_e = whileloop_condition(wl);
-  transformer t_enter = condition_to_transformer(cond_e, pre, TRUE);
+  transformer t_enter = condition_to_transformer(cond_e, pre, true);
   /* An effort could be made to compute the precondition for t_continue. */
   transformer p_continue = transformer_identity();
-  transformer t_continue = condition_to_transformer(cond_e, p_continue, TRUE);
+  transformer t_continue = condition_to_transformer(cond_e, p_continue, true);
 
   t_body_star = any_loop_to_k_transformer(t_init, t_enter, t_continue, body_s, wlel, pre, k);
 
@@ -440,7 +440,7 @@ transformer repeatloop_to_transformer(whileloop wl,
   transformer t_enter = transformer_identity();
   /* An effort could be made to compute the precondition for t_continue,
      especially if the precondition to t_inc is available. */
-  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, true);
   //transformer t_inc = transformer_identity();
   transformer t_next = t_continue;
 
@@ -612,15 +612,15 @@ static transformer add_index_bound_conditions(transformer pre,
     type it = ultimate_type(entity_type(index));
     entity bv = make_local_temporary_value_entity(it);
     transformer pre_r = transformer_range(pre);
-    transformer bt = safe_any_expression_to_transformer(bv, bound, pre_r, TRUE);
+    transformer bt = safe_any_expression_to_transformer(bv, bound, pre_r, true);
     transformer br = transformer_range(bt);
     transformer npre = transformer_undefined;
 
     /* An inequation between index and bv should be added */
     if(lower_or_upper)
-      br = transformer_add_inequality(br, index, bv, FALSE);
+      br = transformer_add_inequality(br, index, bv, false);
     else
-      br = transformer_add_inequality(br, bv, index, FALSE);
+      br = transformer_add_inequality(br, bv, index, false);
 
     br = transformer_temporary_value_projection(br);
     reset_temporary_value_counter();
@@ -758,7 +758,7 @@ static transformer add_good_loop_conditions(transformer pre,
 
   pips_debug(8, "begin\n");
 
-  if(FALSE) { /* New version to deal with complex do loop bounds? */
+  if(false) { /* New version to deal with complex do loop bounds? */
     transformer lbt = loop_bound_evaluation_to_transformer(l, pre);
     transformer opre = pre;
     pre = transformer_apply(pre, lbt);
@@ -942,7 +942,7 @@ transformer add_loop_index_exit_value(
 	  }
 	  else {
 	    /* should never happen! */
-	    pips_assert("add_loop_index_exit_value", FALSE);
+	    pips_assert("add_loop_index_exit_value", false);
 	  }
 	  transformer_inequality_add(post, c1);
 	  transformer_inequality_add(post, c2);
@@ -979,7 +979,7 @@ transformer add_loop_index_exit_value(
 
 bool simple_dead_loop_p(expression lower, expression upper)
 {
-  bool dead_loop_p = FALSE;
+  bool dead_loop_p = false;
   normalized n_lower = NORMALIZE_EXPRESSION(lower);
   normalized n_upper = NORMALIZE_EXPRESSION(upper);
 
@@ -1023,7 +1023,7 @@ transformer precondition_filter_old_values(transformer pre)
       entity old_v = (entity) vecteur_var(b);
 
       if(old_value_entity_p(old_v)) {
-	pips_assert("No old values are left", FALSE);
+	pips_assert("No old values are left", false);
       }
     }
 
@@ -1164,17 +1164,17 @@ transformer loop_bound_evaluation_to_transformer(loop l, transformer pre)
     expression lbe = range_lower(loop_range(l));
     transformer iit = loop_initialization_to_transformer(l, pre);
     entity lbv = make_local_temporary_value_entity(entity_type(i));
-    transformer lbt = any_expression_to_transformer(lbv, lbe, pre, TRUE);
+    transformer lbt = any_expression_to_transformer(lbv, lbe, pre, true);
 
     transformer preub = transformer_safe_apply(iit, pre);
     expression ube = range_upper(loop_range(l));
     entity ubv = make_local_temporary_value_entity(entity_type(i));
-    transformer ubt = any_expression_to_transformer(ubv, ube, preub, TRUE);
+    transformer ubt = any_expression_to_transformer(ubv, ube, preub, true);
 
     transformer prei = transformer_safe_apply(ubt, preub);
     expression ie = range_increment(loop_range(l));
     entity iv = make_local_temporary_value_entity(entity_type(i));
-    transformer it = any_expression_to_transformer(iv, ie, prei, TRUE);
+    transformer it = any_expression_to_transformer(iv, ie, prei, true);
     transformer pre_inc = transformer_safe_intersection(prei, it);
     entity ni = entity_to_new_value(i);
     int inc_lb = 0;
@@ -1503,12 +1503,12 @@ transformer complete_forloop_transformer(transformer t_body_star,
   transformer post_init = transformer_apply(t_init, pre);
   expression cond_e = forloop_condition(fl);
   expression inc_e = forloop_increment(fl);
-  transformer t_skip = condition_to_transformer(cond_e, post_init, FALSE);
-  transformer t_enter = condition_to_transformer(cond_e, post_init, TRUE);
+  transformer t_skip = condition_to_transformer(cond_e, post_init, false);
+  transformer t_enter = condition_to_transformer(cond_e, post_init, true);
 /* An effort could be made to compute the precondition for t_exit,
      especially if the precondition to t_inc is available. */
-  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
-  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, true);
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, false);
   /* An effort could be made to compute the precondition for t_inc */
   transformer t_inc = safe_expression_to_transformer(inc_e, transformer_undefined);
 
@@ -1550,12 +1550,12 @@ list complete_forloop_transformer_list(transformer t_body_star,
   transformer post_init = transformer_apply(t_init, pre);
   expression cond_e = forloop_condition(fl);
   expression inc_e = forloop_increment(fl);
-  transformer t_skip = condition_to_transformer(cond_e, post_init, FALSE);
-  transformer t_enter = condition_to_transformer(cond_e, post_init, TRUE);
+  transformer t_skip = condition_to_transformer(cond_e, post_init, false);
+  transformer t_enter = condition_to_transformer(cond_e, post_init, true);
 /* An effort could be made to compute the precondition for t_exit,
      especially if the precondition to t_inc is available. */
-  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
-  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, true);
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, false);
   /* An effort could be made to compute the precondition for t_inc */
   transformer t_inc = safe_expression_to_transformer(inc_e, transformer_undefined);
 
@@ -1597,12 +1597,12 @@ list new_complete_whileloop_transformer_list(transformer t_body_star,
   transformer t_init = transformer_identity();
   expression cond_e = whileloop_condition(wl);
   //transformer t_skip = entered_p?
-  //  transformer_empty() : condition_to_transformer(cond_e, pre, FALSE);
-  transformer t_skip = condition_to_transformer(cond_e, pre, FALSE);
-  transformer t_enter = condition_to_transformer(cond_e, pre, TRUE);
+  //  transformer_empty() : condition_to_transformer(cond_e, pre, false);
+  transformer t_skip = condition_to_transformer(cond_e, pre, false);
+  transformer t_enter = condition_to_transformer(cond_e, pre, true);
   /* An effort could be made to compute the preconditions for t_continue and t_exit: see while04.c. */
-  //transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
-  //transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  //transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, true);
+  //transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, false);
   transformer t_continue = transformer_undefined;
   transformer t_exit = transformer_undefined;
   transformer t_inc = transformer_identity();
@@ -1614,8 +1614,8 @@ list new_complete_whileloop_transformer_list(transformer t_body_star,
   ct_body = complete_statement_transformer(t_body, pre_body, body_s);
 
   post_body = transformer_apply(ct_body, pre_body);
-  t_continue = condition_to_transformer(cond_e, post_body, TRUE);
-  t_exit = condition_to_transformer(cond_e, post_body, FALSE);
+  t_continue = condition_to_transformer(cond_e, post_body, true);
+  t_exit = condition_to_transformer(cond_e, post_body, false);
 
   tfl = complete_any_loop_transformer_list(t_init, t_skip, t_body_star,
 					   ct_body, t_inc, t_exit);
@@ -1657,10 +1657,10 @@ list complete_repeatloop_transformer_list(transformer t_body_star,
   transformer pre_body = transformer_undefined;
   transformer t_init = transformer_identity();
   expression cond_e = whileloop_condition(wl);
-  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, true);
   transformer t_enter = transformer_identity();
   transformer t_skip = transformer_empty();
-  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, false);
   /* An effort could be made to compute the precondition for t_exit */
   transformer t_inc = transformer_identity();
   transformer t_loop_1 = transformer_undefined;
@@ -1976,7 +1976,7 @@ transformer complete_whileloop_transformer(transformer ltf,
   evaluation lt = whileloop_evaluation(wl);
 
   if(evaluation_before_p(lt))
-    t = new_complete_whileloop_transformer(ltf, pre, wl, FALSE);
+    t = new_complete_whileloop_transformer(ltf, pre, wl, false);
   else
     t = complete_repeatloop_transformer(ltf, pre, wl);
 
@@ -1991,7 +1991,7 @@ list complete_whileloop_transformer_list(transformer ltf, // loop transformer
   evaluation lt = whileloop_evaluation(wl);
 
   if(evaluation_before_p(lt))
-    tfl = new_complete_whileloop_transformer_list(ltf, pre, wl, FALSE);
+    tfl = new_complete_whileloop_transformer_list(ltf, pre, wl, false);
   else
     tfl = complete_repeatloop_transformer_list(ltf, pre, wl);
 
@@ -2039,7 +2039,7 @@ transformer old_complete_whileloop_transformer(transformer ltf,
     btf = transformer_dup(load_statement_transformer(s));
   }
 
-  /* btf = transformer_add_condition_information(btf, cond, preb, TRUE); */
+  /* btf = transformer_add_condition_information(btf, cond, preb, true); */
   t_enter = transformer_combine(transformer_dup(ltf), btf);
 
   ifdebug(8) {
@@ -2048,7 +2048,7 @@ transformer old_complete_whileloop_transformer(transformer ltf,
   }
 
   /* add the exit condition */
-  t_enter =  transformer_add_condition_information(t_enter, cond, preb, FALSE);
+  t_enter =  transformer_add_condition_information(t_enter, cond, preb, false);
 
   ifdebug(8) {
     pips_debug(8, "entered and exited loop transformer t_enter=\n");
@@ -2060,7 +2060,7 @@ transformer old_complete_whileloop_transformer(transformer ltf,
   t_skip = transformer_undefined_p(pre)?
     transformer_identity() :
     transformer_dup(pre);
-  t_skip = transformer_add_condition_information(t_skip, cond, pre, FALSE);
+  t_skip = transformer_add_condition_information(t_skip, cond, pre, false);
 
   ifdebug(8) {
     pips_debug(8, "skipped loop transformer t_skip=\n");
@@ -2275,7 +2275,7 @@ transformer standard_whileloop_to_transformer(whileloop l,
        but I'm not sure it's safe (Francois Irigoin) */
     /* Side effects in cond are ignored! */
     pre_n = precondition_add_condition_information(pre_n, cond,
-						   transformer_undefined, TRUE);
+						   transformer_undefined, true);
 
     ifdebug(8) {
       pips_debug(8, "Precondition for loop body pre_n=\n");
@@ -2507,12 +2507,12 @@ transformer forloop_to_postcondition(transformer pre, forloop fl, transformer t_
   transformer post_init = transformer_apply(t_init, pre);
 
   expression cond_e = forloop_condition(fl);
-  transformer t_skip = condition_to_transformer(cond_e, post_init, FALSE);
-  transformer t_enter = condition_to_transformer(cond_e, post_init, TRUE);
+  transformer t_skip = condition_to_transformer(cond_e, post_init, false);
+  transformer t_enter = condition_to_transformer(cond_e, post_init, true);
 /* An effort could be made to compute the precondition for t_exit,
      especially if the precondition to t_inc is available. */
-  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
-  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, true);
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, false);
 
   expression inc_e = forloop_increment(fl);
   /* An effort could be made to compute the precondition for t_inc */
@@ -2554,8 +2554,8 @@ transformer repeatloop_to_postcondition(transformer pre, whileloop wl, transform
   transformer t_init = transformer_identity();
   transformer post_init = copy_transformer(pre);
   expression cond_e = whileloop_condition(wl);
-  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
-  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, true);
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, false);
   transformer t_skip = transformer_empty();
   //transformer t_skip = transformer_combine(copy_transformer(t_body), t_exit);
   transformer t_enter = transformer_identity();
@@ -2941,7 +2941,7 @@ transformer whileloop_to_postcondition(
   }
 
   if(false_condition_wrt_precondition_p(c, pre)) {
-    transformer c_t = condition_to_transformer(c, pre, FALSE);
+    transformer c_t = condition_to_transformer(c, pre, false);
     pips_debug(8, "The loop is never executed\n");
 
     /* propagate an impossible precondition in the loop body */
@@ -2957,7 +2957,7 @@ transformer whileloop_to_postcondition(
     transformer pre_next = transformer_dup(pre);
     transformer pre_init =
       precondition_add_condition_information(transformer_dup(pre),
-					     c, pre, TRUE);
+					     c, pre, true);
     // FI: this should work but is not compatible with the following
     //code; by definition, tf also include the side effect of pre
     //transformer pre_init = transformer_apply(c_t, pre);
@@ -3047,23 +3047,23 @@ transformer whileloop_to_postcondition(
 	// pre_init==P_0 in the statement just below
 	pre_next = transformer_combine(pre_next, tf);
 	pre_next = precondition_add_condition_information(pre_next, c,
-							  pre_next, TRUE);
+							  pre_next, true);
 	pre_next = transformer_combine(pre_next, tb);
 	pre_next = precondition_add_condition_information(pre_next, c,
-							  pre_next, TRUE);
+							  pre_next, true);
 	preb = transformer_convex_hull(pre_init, pre_next);
       }
       else { // transformer lists are used and at least two
 	     // transformers have been found
-	transformer c_t = condition_to_transformer(c, pre_fuzzy, TRUE);
+	transformer c_t = condition_to_transformer(c, pre_fuzzy, true);
 	//transformer preb1 = transformer_list_closure_to_precondition(btl, c_t, pre_init);
 	transformer preb1 = transformer_list_multiple_closure_to_precondition(btl, c_t, pre_init);
 	//pre_next = transformer_combine(pre_next, tf);
 	//pre_next = precondition_add_condition_information(pre_next, c,
-	//						  pre_next, TRUE);
+	//						  pre_next, true);
       //pre_next = transformer_combine(pre_next, tb);
       //pre_next = precondition_add_condition_information(pre_next, c,
-	//					  pre_next, TRUE);
+	//					  pre_next, true);
     //transformer preb2 = transformer_convex_hull(pre_init, pre_next);
     //pips_assert("The two preconditions have the same arguments",
     //		    arguments_equal_p(transformer_arguments(preb1),
@@ -3084,20 +3084,20 @@ transformer whileloop_to_postcondition(
       transformer pre_next2 = transformer_undefined;
       pre_next = transformer_combine(pre_next, tf2);
       pre_next = precondition_add_condition_information(pre_next, c,
-							pre_next, TRUE);
+							pre_next, true);
       pre_next = transformer_combine(pre_next, tb);
       pre_next = precondition_add_condition_information(pre_next, c,
-							pre_next, TRUE);
+							pre_next, true);
       preb = transformer_convex_hull(pre_init, pre_next);
 
       /* FI: since pre_next is no longer useful, pre_next2 could be
 	 avoided. It just makes debugging easier. */
       pre_next2 = copy_transformer(pre_next);
       pre_next2 = precondition_add_condition_information(pre_next2, c,
-							 pre_next2, TRUE);
+							 pre_next2, true);
       pre_next2 = transformer_combine(pre_next2, tb);
       pre_next2 = precondition_add_condition_information(pre_next2, c,
-							 pre_next2, TRUE);
+							 pre_next2, true);
       preb = transformer_convex_hull(preb, pre_next2);
       free_transformer(tf2);
       free_transformer(pre_next2);
@@ -3145,17 +3145,17 @@ transformer whileloop_to_postcondition(
 
       pips_debug(8, "The loop certainly is executed.\n");
 
-      if(FALSE) {
+      if(false) {
 	transformer ntl = transformer_undefined;
 	transformer cpost = transformer_undefined; // combined postcondition
 	ntl = transformer_apply(tf, pre);
 	/* Let's execute the last iteration since it certainly exists */
-	ntl = precondition_add_condition_information(ntl, c, ntl, TRUE);
+	ntl = precondition_add_condition_information(ntl, c, ntl, true);
 	post = transformer_apply(tb, ntl);
 	free_transformer(ntl);
-	post = precondition_add_condition_information(post, c, post, FALSE);
+	post = precondition_add_condition_information(post, c, post, false);
 
-	postb = precondition_add_condition_information(postb, c, postb, FALSE);
+	postb = precondition_add_condition_information(postb, c, postb, false);
 
 	cpost = transformer_intersection(post, postb);
 
@@ -3166,9 +3166,9 @@ transformer whileloop_to_postcondition(
       }
       else {
 	// FI: does not work with side effects
-	//post = precondition_add_condition_information(postb, c, postb, FALSE);
+	//post = precondition_add_condition_information(postb, c, postb, false);
 	transformer pre_c = transformer_range(postb);
-	transformer ctf = condition_to_transformer(c, pre_c, FALSE);
+	transformer ctf = condition_to_transformer(c, pre_c, false);
 	post = transformer_apply(ctf, postb);
 	free_transformer(pre_c);
 	free_transformer(ctf);
@@ -3188,20 +3188,20 @@ transformer whileloop_to_postcondition(
       //post_al = transformer_apply(tb, preb);
 
 	// FI: does not work with side effects
-	//post = precondition_add_condition_information(postb, c, postb, FALSE);
+	//post = precondition_add_condition_information(postb, c, postb, false);
 	transformer pre_c = transformer_range(postb);
-	transformer ctf = condition_to_transformer(c, pre_c, FALSE);
+	transformer ctf = condition_to_transformer(c, pre_c, false);
 	// Mmeory leak? Do we still need postb?
 	post_al = transformer_apply(ctf, postb);
 	free_transformer(pre_c);
 	free_transformer(ctf);
-	// post_al = precondition_add_condition_information(postb, c, postb, FALSE);
+	// post_al = precondition_add_condition_information(postb, c, postb, false);
 
       /* The loop is never executed */
 	// FI: does not work with side effects
-	// post_ne = precondition_add_condition_information(post_ne, c, post_ne, FALSE);
+	// post_ne = precondition_add_condition_information(post_ne, c, post_ne, false);
 	pre_c = transformer_range(post_ne);
-	ctf = condition_to_transformer(c, pre_c, FALSE);
+	ctf = condition_to_transformer(c, pre_c, false);
 	// Mmeory leak
 	post_ne = transformer_apply(ctf, post_ne);
 	free_transformer(pre_c);
@@ -3232,7 +3232,7 @@ transformer whileloop_to_total_precondition(
   statement s = whileloop_body(l);
   expression c = whileloop_condition(l);
 
-  pips_assert("not implemented yet", FALSE && t_post==t_post);
+  pips_assert("not implemented yet", false && t_post==t_post);
 
   pips_debug(8,"begin\n");
 
@@ -3267,15 +3267,15 @@ transformer whileloop_to_total_precondition(
       pips_debug(8, "The loop certainly is executed\n");
 
       /* propagate preconditions in the loop body */
-      preb = precondition_add_condition_information(preb, c, preb, TRUE);
+      preb = precondition_add_condition_information(preb, c, preb, true);
       (void) statement_to_postcondition(preb, s);
 
       /* ntl = transformer_apply(tf, pre); */
       /* Let's execute the last iteration since it certainly exists */
-      ntl = precondition_add_condition_information(ntl, c, ntl, TRUE);
+      ntl = precondition_add_condition_information(ntl, c, ntl, true);
       /* post = transformer_apply(tb, ntl); */
       free_transformer(ntl);
-      /* post = precondition_add_condition_information(post, c, post, FALSE); */
+      /* post = precondition_add_condition_information(post, c, post, false); */
     }
     else {
       /* Assume the loop is entered, post_al, or not, post_ne, and perform
@@ -3288,15 +3288,15 @@ transformer whileloop_to_total_precondition(
       pips_debug(8, "The loop may be executed or not\n");
 
       /* propagate preconditions in the loop body */
-      precondition_add_condition_information(preb, c, preb, TRUE);
+      precondition_add_condition_information(preb, c, preb, true);
       (void) statement_to_postcondition(preb, s);
 
       /* The loop is executed at least once: let's execute the last iteration */
       post_al = transformer_apply(tb, preb);
-      post_al = precondition_add_condition_information(post_al, c, post_al, FALSE);
+      post_al = precondition_add_condition_information(post_al, c, post_al, false);
 
       /* The loop is never executed */
-      post_ne = precondition_add_condition_information(post_ne, c, post_ne, FALSE);
+      post_ne = precondition_add_condition_information(post_ne, c, post_ne, false);
 
       /* post = transformer_convex_hull(post_ne, post_al); */
       transformer_free(post_ne);

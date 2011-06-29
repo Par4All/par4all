@@ -44,22 +44,22 @@
 
 /* pipsmake interruption 
  */
-static bool flag_interrupt_pipsmake_asap = FALSE;
+static bool flag_interrupt_pipsmake_asap = false;
 
 void interrupt_pipsmake_asap()
 {
-    flag_interrupt_pipsmake_asap = TRUE;
+    flag_interrupt_pipsmake_asap = true;
 }
 
 void dont_interrupt_pipsmake_asap()
 {
-    flag_interrupt_pipsmake_asap = FALSE;
+    flag_interrupt_pipsmake_asap = false;
 }
 
 bool interrupt_pipsmake_asap_p()
 {
     bool res = flag_interrupt_pipsmake_asap;
-    flag_interrupt_pipsmake_asap = FALSE;
+    flag_interrupt_pipsmake_asap = false;
     return res;
 }
 

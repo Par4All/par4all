@@ -57,7 +57,7 @@
  * for fast accesses.
  */
 static hash_table pl = (hash_table) NULL;
-static bool update_property = FALSE;
+static bool update_property = false;
 
 /* A flag used to avoid infinite recursion in the case of use error here */
 static size_t pending_errors = false;
@@ -97,11 +97,11 @@ static void parse_properties(void);
 void parse_properties_string(char *s)
 {
     yyrestart(NULL); // In case, lex has been interrupted by an error
-    update_property = TRUE;
+    update_property = true;
     string_to_parse = s;
     parse_properties();
     string_to_parse = (char *) 0;
-    update_property = FALSE;
+    update_property = false;
 }
 
 #else /* ATT/POSIX just seem to like parsing yyin... */
@@ -183,7 +183,7 @@ static void parse_properties(void)
 
 	n = strdup(yytext);
 
-	if (update_property && property_undefined_p(get_property(n, TRUE))) {
+	if (update_property && property_undefined_p(get_property(n, true))) {
 	  property_user_error("Unknown property %s to update\n", n);
 	  free(n);
 	  return;
@@ -192,10 +192,10 @@ static void parse_properties(void)
 	switch (tok = yylex())
 	{
 	case TTRUE:
-	    pr = make_property_bool(TRUE);
+	    pr = make_property_bool(true);
 	    break;
 	case TFALSE:
-	    pr = make_property_bool(FALSE);
+	    pr = make_property_bool(false);
 	    break;
 	case TNUMB:
 	    pr = make_property_int(atol(yytext));
@@ -248,7 +248,7 @@ static void parse_properties(void)
 static void parse_properties_file(FILE * fd)
 {
     string_to_parse = NULL;
-    update_property = FALSE; // FI: Tpips/property.tpips, to survive
+    update_property = false; // FI: Tpips/property.tpips, to survive
 			     // the open after the close
     yyrestart(fd);
     parse_properties();
@@ -262,7 +262,7 @@ static void read_properties(void)
     return;
     /* else */
     pl = hash_table_make(hash_string, 0);
-    update_property = FALSE;
+    update_property = false;
 
     /* Default properties:
      *
@@ -329,11 +329,11 @@ void reset_property_error() {
 
    @param[in] name is the name of the property to look-up
 
-   @param[in] cool is a boolean setting the behaviour if the property does
-   not exist. If the property does not exist and cool is TRUE, it return
-   property_undefined but if FALSE it aborts
+   @param[in] cool is a bool setting the behaviour if the property does
+   not exist. If the property does not exist and cool is true, it return
+   property_undefined but if false it aborts
 
-   @return the property or abort() if it does not exist and cool is FALSE
+   @return the property or abort() if it does not exist and cool is false
 */
 property get_property(const char* name, bool cool)
 {
@@ -356,22 +356,22 @@ property get_property(const char* name, bool cool)
 }
 
 
-/* Get the value of a boolean property
+/* Get the value of a bool property
 
    @param[in] name is the name of the property to look-up
 
-   @return the boolean value
+   @return the bool value
 */
 bool get_bool_property(const char* name)
 {
-    property p = get_property(name, FALSE);
+    property p = get_property(name, false);
     if (! property_bool_p(p))
 	property_user_error("property %s is not bool\n", name);
     return(property_bool(p));
 }
 
 
-/* Set the value of a boolean property
+/* Set the value of a bool property
 
    @param[in] name is the name of the property to set
 
@@ -379,7 +379,7 @@ bool get_bool_property(const char* name)
 */
 void set_bool_property(const char* name, bool b)
 {
-    property p = get_property(name, FALSE);
+    property p = get_property(name, false);
     if (! property_bool_p(p))
 	property_user_error("property %s is not bool\n", name);
     property_bool(p) = b;
@@ -394,7 +394,7 @@ void set_bool_property(const char* name, bool b)
 */
 string get_string_property(const char* name)
 {
-    property p = get_property(name, FALSE);
+    property p = get_property(name, false);
     if (! property_string_p(p))
 	property_user_error("property %s is not string\n", name);
     return property_string(p);
@@ -413,7 +413,7 @@ string get_string_property(const char* name)
 */
 string get_string_property_or_ask(const char* name,const char question[])
 {
-    property p = get_property(name, FALSE);
+    property p = get_property(name, false);
     if (! property_string_p(p))
         property_user_error("property %s is not string\n", name);
     string s = property_string(p);
@@ -433,7 +433,7 @@ string get_string_property_or_ask(const char* name,const char question[])
 */
 void set_string_property(const char* name, string s)
 {
-    property p = get_property(name, FALSE);
+    property p = get_property(name, false);
     if (! property_string_p(p))
 	property_user_error("property %s is not string\n", name);
     free(property_string(p));
@@ -450,7 +450,7 @@ void set_string_property(const char* name, string s)
 int
 get_int_property(const char* name)
 {
-    property p = get_property(name, FALSE);
+    property p = get_property(name, false);
     if (! property_int_p(p))
 	property_user_error("property %s is not int\n", name);
     return property_int(p);
@@ -465,7 +465,7 @@ get_int_property(const char* name)
 */
 void set_int_property(const char* name, int i)
 {
-    property p = get_property(name, FALSE);
+    property p = get_property(name, false);
     if (! property_int_p(p))
 	property_user_error("property %s is not int\n", name);
     property_int(p) = i;
@@ -473,7 +473,7 @@ void set_int_property(const char* name, int i)
 
 void fprint_property_direct(FILE * fd, const char* pname)
 {
-    property p = get_property(pname, TRUE);
+    property p = get_property(pname, true);
     if (property_undefined_p(p))
 	fprintf(fd, "# undefined property %s\n", pname);
     else
@@ -495,7 +495,7 @@ void fprint_property_direct(FILE * fd, const char* pname)
 
 void fprint_property(FILE * fd, const char* pname)
 {
-    property p = get_property(pname, TRUE);
+    property p = get_property(pname, true);
     if (property_undefined_p(p))
 	fprintf(fd, "# undefined property %s\n", pname);
     else
@@ -543,12 +543,12 @@ bool open_properties(void)
 {
     string file_name = get_property_file_name();
     FILE * file = check_fopen(file_name, "r");
-    if (!file) return FALSE;
+    if (!file) return false;
     if (pl) hash_table_free(pl), pl = (hash_table) NULL; /* lazy clean... */
     parse_properties_file(file);
     safe_fclose(file, file_name);
     free(file_name);
-    return TRUE;
+    return true;
 }
 
 /* on close, save the properties in the current workspace.

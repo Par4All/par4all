@@ -304,13 +304,13 @@ Psysteme s;
 		  entity_local_name((entity) v));
 	    if (SC_EMPTY_P(s  = sc_projection_pure(s, v))) {
 		debug(8, "ProjectOnDi", "infaisable\n");
-		return(FALSE);
+		return(false);
   	    }
 	    debug(8, "ProjectOnDi", "faisable\n");
 	}
     }
 
-     return(TRUE);
+     return(true);
 }
 
 
@@ -443,7 +443,7 @@ action ac1,ac2;
  *    *psc on return is sc_empty() if *psc on entry turns out to be 
  *    non-feasible.
  * a long jump buffer must have been initialized to handle overflows
- * The value returned is TRUE if the system is feasible, FALSE otherwise.
+ * The value returned is true if the system is feasible, false otherwise.
  */
 
 int 
@@ -472,15 +472,15 @@ Psysteme *psc;
 	fprintf(stderr,"The list of variables to be eliminated is :\n");
 	vect_debug(pv);
     }
-    is_test_Di = TRUE;
+    is_test_Di = true;
     
     *psc = sc_projection_optim_along_vecteur_ofl(*psc, pv);
     
     if (sc_empty_p(*psc)){
-	    res = FALSE;
+	    res = false;
 	}
     else {
-	res = TRUE;
+	res = true;
     }
 
     vect_rm(pv);
@@ -490,7 +490,7 @@ Psysteme *psc;
     return(res); 
 }
 
-/* boolean sc_faisabilite_optim (Psysteme sc) :
+/* bool sc_faisabilite_optim (Psysteme sc) :
  *
  * Test system sc feasibility by successive projections
  * along all variables in its basis.
@@ -502,15 +502,15 @@ Psysteme *psc;
  * 
  *  result  :
  *
- *  boolean	: TRUE if system is faisable
- *		  FALSE else
+ *  boolean	: true if system is faisable
+ *		  false else
  *
  * Modification:
  *  - call to sc_rm() added when sc_projection_optim_along_vecteur_ofl()
  *    returns sc_empty; necessary to have a consistent interface: when FALSE
  *    is returned, sc always has been freed.
  */
-boolean 
+bool 
 sc_faisabilite_optim(sc)
 Psysteme sc;
 {
@@ -520,13 +520,13 @@ Psysteme sc;
 	/* Automatic variables read in a CATCH block need to be declared volatile as
 	 * specified by the documentation*/
 	Psysteme volatile sc1 = sc_dup(sc);
-	is_test_Di = FALSE;
+	is_test_Di = false;
 	
 	CATCH(overflow_error) {
 	    pips_debug(7, "overflow error, returning TRUE. \n"); 
 	    sc_rm(sc1);
 	    debug(6, "sc_faisabilite_optim", "end\n");
-	    return(TRUE);
+	    return(true);
 	    
 	}
 	TRY {
@@ -537,30 +537,30 @@ Psysteme sc;
 		debug(6, "sc_faisabilite_optim", "end\n");
 		sc_rm(sc);
 		UNCATCH(overflow_error);
-		return(FALSE);
+		return(false);
 	    }	    
 	    else {
 		sc_rm (sc1);
 		debug(7, "sc_faisabilite_optim", "system feasible\n");
 		debug(6, "sc_faisabilite_optim", "end\n");
 		UNCATCH(overflow_error);
-		return(TRUE);
+		return(true);
 	    }
 	}
     }
     else {	
 	debug(7, "sc_faisabilite_optim", "normalized system not feasible\n");
 	debug(6, "sc_faisabilite_optim", "end\n");
-	return(FALSE);
+	return(false);
     }
 }
 
-/* boolean combiner_ofl_with_test(Psysteme sc, Variable v): 
+/* bool combiner_ofl_with_test(Psysteme sc, Variable v): 
  * the copy of combiner() adding the test of suffisants conditions of integer 
  * combination. 
- * It returns TRUE if exact
+ * It returns true if exact
  */
-static boolean 
+static bool 
 combiner_ofl_with_test(sc,v)
 Psysteme sc;
 Variable v;
@@ -575,7 +575,7 @@ Variable v;
 
     if ( pc == NULL ){
 	FMComp[0]++;
-	return(TRUE);
+	return(true);
     }
 
     sc1 = sc_dup(sc);
@@ -611,7 +611,7 @@ Variable v;
 
     for (pcp = pos; pcp != NULL; pcp = pcp->succ) {
 	for (pcn = neg; pcn != NULL; pcn = pcn->succ) {
-	    boolean int_comb_p = TRUE;
+	    bool int_comb_p = true;
 	    Pcontrainte pcnew = 
 		sc_integer_inequalities_combination_ofl_ctrl(sc1, pcp, pcn,
 							     v,
@@ -619,7 +619,7 @@ Variable v;
 							     FWD_OFL_CTRL);
 
 	    if (contrainte_constante_p(pcnew)) {
-		if (contrainte_verifiee(pcnew,FALSE)) {
+		if (contrainte_verifiee(pcnew,false)) {
 		    contrainte_free(pcnew);
 		}
 		else {
@@ -628,7 +628,7 @@ Variable v;
 		    contraintes_free(nul);		    
 		    contraintes_free(pcnew);
 		    sc_rm(sc1);
-		    return(FALSE);
+		    return(false);
 		}
 	    }
 	    else {
@@ -636,9 +636,9 @@ Variable v;
 		nul = pcnew;
 		nnul += 1;
 		if(!int_comb_p) {
-		    if (is_test_exact)  is_test_exact = FALSE;
-		    if (is_test_inexact_fm == FALSE) 
-			is_test_inexact_fm = TRUE;
+		    if (is_test_exact)  is_test_exact = false;
+		    if (is_test_inexact_fm == false) 
+			is_test_inexact_fm = true;
 		}
 	    }
 	}
@@ -652,7 +652,7 @@ Variable v;
     sc->inegalites = nul;
     sc->nb_ineq = nnul;
     sc_rm(sc1);
-    return(TRUE);
+    return(true);
 }
 
 
@@ -692,7 +692,7 @@ Pvecteur pv;
 	prv = NULL; pv1=pve;
 	while (!VECTEUR_NUL_P(pv1) && (sc->nb_eq!=0)) {
 	    v = pv1->var; 
-	    eq = contrainte_var_min_coeff(sc->egalites, v, &coeff, FALSE);
+	    eq = contrainte_var_min_coeff(sc->egalites, v, &coeff, false);
 	    if ((eq == NULL) || value_notone_p(coeff)){
 		prv = pv1;
 		pv1 = pv1->succ;
@@ -761,7 +761,7 @@ Pvecteur pv;
 	prv = NULL;
 	while ((sc->egalites!=0) && (pv1!=NULL)) {	
 	    v = pv1->var; 
-	    eq = contrainte_var_min_coeff(sc->egalites,v, &coeff, TRUE);
+	    eq = contrainte_var_min_coeff(sc->egalites,v, &coeff, true);
 	    if ( eq == NULL && pv1!=NULL) {
 		prv = pv1;
 		pv1 = pv1->succ;
@@ -774,10 +774,10 @@ Pvecteur pv;
 				entity_local_name((entity) v));
 			egalite_debug(eq);
 		    }
-		    if (is_test_inexact_eq == FALSE) 
-			is_test_inexact_eq = TRUE;
+		    if (is_test_inexact_eq == false) 
+			is_test_inexact_eq = true;
 		    if(is_test_exact) 
-			is_test_exact = FALSE;
+			is_test_exact = false;
 		    
 		    sc = sc_variable_substitution_with_eq_ofl_ctrl(sc,eq,v, 
 								   FWD_OFL_CTRL);
@@ -842,7 +842,7 @@ Pvecteur pv;
 		else fprintf(stderr, "%s\n", "not exact");
 	    }
 
-	    if (combiner_ofl_with_test(sc,v)==FALSE) {
+	    if (combiner_ofl_with_test(sc,v)==false) {
 		/* detection of non faisability of Psysteme */
 		if(is_test_Di) NbrTestProjFMDi++;
 		else NbrTestProjFM++;
@@ -874,7 +874,7 @@ Pvecteur pv;
 	    }
 
 /* 	    sc->inegalites = contrainte_sort(sc->inegalites, sc->base, BASE_NULLE, */
-/* 					     TRUE, FALSE); */
+/* 					     true, false); */
 	    
 /* 	    ifdebug(8) { */
 /* 		debug(8, "", "Sorted system :\n"); */
@@ -917,13 +917,13 @@ Pvecteur pv;
 /* void sc_minmax_of_variable_optim(Psysteme ps, Variable var, Value *pmin, *pmax):
  * examine un systeme pour trouver le minimum et le maximum d'une variable
  * apparaissant dans ce systeme par projection a la Fourier-Motzkin.
- * la procedure retourne la valeur FALSE si le systeme est infaisable et
- * TRUE sinon
+ * la procedure retourne la valeur false si le systeme est infaisable et
+ * true sinon
  *
  * le systeme ps est detruit.
  * 
  */
-boolean 
+bool 
 sc_minmax_of_variable_optim(ps, var, pmin, pmax)
 Psysteme volatile ps;
 Variable var;
@@ -937,10 +937,10 @@ Value *pmin, *pmax;
     *pmax =  VALUE_MAX;
     *pmin = VALUE_MIN;
 
-    if (sc_value_of_variable(ps, var, &val) == TRUE) {
+    if (sc_value_of_variable(ps, var, &val) == true) {
 	*pmin = val;
 	*pmax = val;
-	return TRUE;
+	return true;
     }
 
     /* projection sur toutes les variables sauf var */
@@ -962,18 +962,18 @@ Value *pmin, *pmax;
 	ps = sc_projection_optim_along_vecteur_ofl(ps, pv);
 	if (sc_empty_p(ps)) {	
 	    UNCATCH(overflow_error);
-	    return FALSE;
+	    return false;
 	}
 	if (SC_EMPTY_P(ps = sc_normalize(ps))) {
 	    UNCATCH(overflow_error);
-	    return FALSE;
+	    return false;
 	}
 	
-	if (sc_value_of_variable(ps, var, &val) == TRUE) {
+	if (sc_value_of_variable(ps, var, &val) == true) {
 	    *pmin = val;
 	    *pmax = val;
 	    UNCATCH(overflow_error);
-	    return TRUE;
+	    return true;
 	}
 
 	
@@ -1000,11 +1000,11 @@ Value *pmin, *pmax;
     }
 
     if(value_lt(*pmax,*pmin))
-	return FALSE;
+	return false;
 
     sc_rm(ps);
 
-    return TRUE;
+    return true;
 }
 
 

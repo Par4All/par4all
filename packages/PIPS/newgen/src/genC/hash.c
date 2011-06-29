@@ -178,7 +178,7 @@ static size_t get_next_hash_table_size(size_t size)
 static bool should_i_warn_on_redefinition = true;
 
 /* these function set the variable should_i_warn_on_redefinition
-   to the value TRUE or FALSE */
+   to the value true or false */
 
 void hash_warn_on_redefinition(void)
 {
@@ -469,7 +469,7 @@ list hash_get_default_empty_list(const hash_table h, const void * k) {
 }
 
 
-/* TRUE if key has e value in htp.
+/* true if key has e value in htp.
  */
 bool hash_defined_p(const hash_table htp, const void * key)
 {
@@ -639,11 +639,11 @@ static _uint hash_chunk_rank(const gen_chunk * key, size_t size)
 static int hash_string_equal(const char * key1, const char * key2)
 {
   if (key1==key2)
-    return TRUE;
+    return true;
   /* else check contents */
   for(; *key1 && *key2; key1++, key2++)
     if (*key1!=*key2)
-      return FALSE;
+      return false;
   return *key1==*key2;
 }
 

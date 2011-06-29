@@ -36,6 +36,7 @@
 #include <stdint.h>
 #include <limits.h>
 #include <assert.h>
+#include "boolean.h"
 
 /* expected headers: the internal structure does not need to be available!
 struct linear_hashtable_st;
@@ -50,8 +51,6 @@ typedef struct linear_hashtable_st * linear_hashtable_pt;
 #endif
 
 #define debug_assert_coherent(h) debug_assert(linear_hashtable_coherent_p(h))
-
-typedef enum { false, true } boolean;
 
 #define FREE_CHUNK	((void *) 0)
 #define EMPTIED_CHUNK	((void *) -1)
@@ -73,7 +72,7 @@ typedef struct linear_hashtable_st
 
 /* returns the location to put or get k in h.
  */
-static uintptr_t key_location(linear_hashtable_pt h, void * k, boolean toget)
+static uintptr_t key_location(linear_hashtable_pt h, void * k, bool toget)
 {
   uintptr_t index = ((((uintptr_t) k)
 		      & ~(((uintptr_t)1) << ((sizeof(uintptr_t)*CHAR_BIT) - 1)))
@@ -126,7 +125,7 @@ void linear_hashtable_dump(linear_hashtable_pt h)
 }
 
 /* check hashtable coherency */
-boolean linear_hashtable_coherent_p(linear_hashtable_pt h)
+bool linear_hashtable_coherent_p(linear_hashtable_pt h)
 {
   uintptr_t i, n;
 
@@ -235,7 +234,7 @@ static void linear_hashtable_extend(linear_hashtable_pt h)
 /*********************************************************************** USE */
 
 static void linear_hashtable_internal_put
-    (linear_hashtable_pt h, void * k, void * v, boolean once)
+    (linear_hashtable_pt h, void * k, void * v, bool once)
 {
   register int index;
 
@@ -271,12 +270,12 @@ void linear_hashtable_put_once(linear_hashtable_pt h, void * k, void * v)
   linear_hashtable_internal_put(h, k, v, true);
 }
 
-boolean linear_hashtable_isin(linear_hashtable_pt h, void * k)
+bool linear_hashtable_isin(linear_hashtable_pt h, void * k)
 {
   return h->contents[key_location(h, k, true)].key==k;
 }
 
-boolean linear_hashtable_remove(linear_hashtable_pt h, void * k)
+bool linear_hashtable_remove(linear_hashtable_pt h, void * k)
 {
   register int index = key_location(h, k, true);
 

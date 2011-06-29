@@ -228,7 +228,7 @@ static bool replace_reductions_in_statement( statement s, struct replace_ctx *ct
       if(gen_length(reductions_list(rs)) > 1) {
         pips_user_warning("Don't know how to handle multiple reductions on a "
             "statement ! Abort...\n");
-        return FALSE;
+        return false;
       }
 
       reduction r = REDUCTION_CAST(CAR(reductions_list(rs)));
@@ -272,7 +272,7 @@ static bool replace_reductions_in_statement( statement s, struct replace_ctx *ct
     }
   }
 
-  return TRUE;
+  return true;
 }
 
 
@@ -280,7 +280,7 @@ static bool process_reductions_in_loop(statement loop_stat,
                                        atomic_profile *profile,
                                        list *replaced_statements,
                                        bool replace) {
-  bool ret = TRUE;
+  bool ret = true;
   if(statement_loop_p(loop_stat) && !loop_parallel_p(statement_loop(loop_stat))) {
     pips_debug(1,"Loop is parallel only with reduction, fetching reductions...\n");
     loop l = statement_loop(loop_stat);
@@ -319,19 +319,19 @@ static bool process_reduced_loops(string mod_name, bool replace) {
   }
 
   set_current_module_entity(local_name_to_top_level_entity(mod_name));
-  statement module_stat = (statement)db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  statement module_stat = (statement)db_get_memory_resource(DBR_CODE, mod_name, true);
   set_current_module_statement(module_stat);
 
   // Load detected reductions
   set_statement_reductions(
       (pstatement_reductions)db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,
                                                     mod_name,
-                                                    TRUE));
+                                                    true));
 
   // Load targeted loops, those that need reductions to be parallel !
   reduced_loops loops = (reduced_loops)db_get_memory_resource(DBR_REDUCTION_PARALLEL_LOOPS,
                                                            mod_name,
-                                                           TRUE);
+                                                           true);
   list replaced_statements = NIL;
   set_ordering_to_statement(module_stat);
   FOREACH(int, ordering, reduced_loops_ordering(loops)) {
@@ -356,7 +356,7 @@ static bool process_reduced_loops(string mod_name, bool replace) {
   reset_statement_reductions();
   reset_current_module_entity();
   reset_current_module_statement();
-  return TRUE;
+  return true;
 }
 
 

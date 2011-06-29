@@ -25,10 +25,13 @@
 #ifndef BOOLEAN_INCLUDED
 #define BOOLEAN_INCLUDED
 
-typedef enum { false, true } boolean;
-#define	TRUE     true
-#define	FALSE    false
+#ifdef bool
+    #error newgen header not compatible with stdbool.h and linear header have to be compatible with newgen
+#endif
 
-#define boolean_string(b) ((b)? "TRUE" : "FALSE")
+typedef int bool; /* we cannot use an enum or stdbool because we need to be compatible with newgen */
+
+#define false 0
+#define true 1
 
 #endif /* BOOLEAN_INCLUDED */

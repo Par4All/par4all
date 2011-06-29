@@ -80,7 +80,7 @@ call_instruction_to_communications(
 	list lexpr =
 	    call_arguments(instruction_call(statement_instruction(s)));
 	/* first reference in statement s */
-	boolean first_reference = TRUE;
+	bool first_reference = true;
 
 	for(; !ENDP(lexpr); POP(lexpr)) {
 	    expression e = EXPRESSION(CAR(lexpr));
@@ -102,7 +102,7 @@ call_instruction_to_communications(
 			    reference_list_print(*lwr_local);}
 			reference_list_update(lwr_local,r);
 			update_map(*store_map,st_level2,r);
-			first_reference = FALSE;
+			first_reference = false;
 		    }
 		    else {
 			 if(!entity_is_argument_p(rv, *lpv)) {
@@ -283,10 +283,10 @@ compute_communications(list l, statement_mapping *fetch_map,statement_mapping *s
 static list 
 constant_symbolic_communication(
     entity compute_or_memory_module,list lrefs,
-    boolean load_code,entity var_id) 
+    bool load_code,entity var_id) 
 {
-    /* boolean load_code  is TRUE if the generated computational code 
-       must be a RECEIVE, FALSE if it  must be a SEND*/
+    /* bool load_code  is true if the generated computational code 
+       must be a RECEIVE, false if it  must be a SEND*/
 
     list lrs;
     list ccode = NIL; /* movements for the scalar variables 
@@ -304,7 +304,7 @@ constant_symbolic_communication(
 void 
 include_constant_symbolic_communication(
     entity compute_or_memory_module,list lrefs,
-    boolean load_code,statement computational_or_emulator,
+    bool load_code,statement computational_or_emulator,
     entity var_id) 
 { 
     instruction i;
@@ -322,7 +322,7 @@ array_indices_communication(
     int bn,
     int ls,
     list lrefs,
-    boolean load_code,
+    bool load_code,
     entity var_id,
     Pbase loop_indices,
     tiling tile, 
@@ -455,8 +455,8 @@ static list
 array_scalar_access_to_compute_communication(
     entity compute_module,Pbase bank_indices,
     int bn,int ls,list lt,
-    boolean load_code,entity proc_id, 
-    entity var_id,boolean fully_sequential,
+    bool load_code,entity proc_id, 
+    entity var_id,bool fully_sequential,
     Pbase loop_indices,tiling tile,Pvecteur tile_delay, 
     Pvecteur tile_indices,Pvecteur tile_local_indices)
 {
@@ -523,8 +523,8 @@ array_scalar_access_to_compute_communication(
 }
  
 list array_scalar_access_to_bank_communication(entity memory_module,Pbase  bank_indices, 
-					       int bn,int ls, list lt,boolean load_code,
-					       entity proc_id,entity var_id,boolean fully_sequential)
+					       int bn,int ls, list lt,bool load_code,
+					       entity proc_id,entity var_id,bool fully_sequential)
 {   
   
     reference ref1 = make_reference((entity) bank_indices->succ->var,NIL);
@@ -601,8 +601,8 @@ build_esv_list(list lt, hash_table v_to_esv, Pbase bank_indices)
 
 static void insert_array_scalar_access_movement(entity compute_module,entity memory_module,
 				    Pbase  bank_indices, int bn,int ls,entity proc_id,entity ent1,
-				   list lt, statement stat,boolean load,hash_table v_to_esv,
-				   list *new_slst,list *new_blist, boolean fully_sequential,
+				   list lt, statement stat,bool load,hash_table v_to_esv,
+				   list *new_slst,list *new_blist, bool fully_sequential,
 						Pbase loop_indices,tiling  tile,Pvecteur tile_delay, 
 				      Pvecteur tile_indices,  Pvecteur tile_local_indices)
 {
@@ -639,7 +639,7 @@ void insert_run_time_communications(entity compute_module,entity memory_module,
 				   list list_statement_block,
 				    statement_mapping fetch_map,statement_mapping store_map,
 				    list *new_slst,list *new_blist,hash_table v_to_esv,
-				    boolean fully_sequential,
+				    bool fully_sequential,
 				    Pbase loop_indices,tiling  tile,Pvecteur tile_delay, 
 				      Pvecteur tile_indices,  Pvecteur tile_local_indices)
 {
@@ -698,7 +698,7 @@ void insert_run_time_communications(entity compute_module,entity memory_module,
 	       AddEntityToDeclarations(ent1,compute_module);
 	       
 	       insert_array_scalar_access_movement(compute_module,memory_module,bank_indices,
-						   bn,ls,proc_id,ent1,lt,STATEMENT(CAR(st1)),TRUE,
+						   bn,ls,proc_id,ent1,lt,STATEMENT(CAR(st1)),true,
 						   v_to_esv,new_slst,new_blist,fully_sequential,
 						   loop_indices,tile, tile_delay,tile_indices,
 						   tile_local_indices
@@ -712,7 +712,7 @@ void insert_run_time_communications(entity compute_module,entity memory_module,
 	       AddEntityToDeclarations(ent1,compute_module);
 	   
 	       insert_array_scalar_access_movement(compute_module,memory_module,bank_indices,
-						   bn,ls,proc_id,ent1,lt,STATEMENT(CAR(st1)),FALSE,
+						   bn,ls,proc_id,ent1,lt,STATEMENT(CAR(st1)),false,
 						   v_to_esv,new_slst,new_blist,fully_sequential,
 						   loop_indices,tile, tile_delay,tile_indices,
 						   tile_local_indices);
@@ -727,17 +727,17 @@ void insert_run_time_communications(entity compute_module,entity memory_module,
    }, list_statement_block);
 }
 
-boolean 
+bool 
 test_run_time_communications(list list_statement_block,
 				    statement_mapping fetch_map,statement_mapping store_map)
 {
-    boolean ok ;
+    bool ok ;
     int nbcall =0;
     MAPL(st1, 
      { instruction inst = statement_instruction(STATEMENT(CAR(st1)));
        switch(instruction_tag(inst)) {
        case is_instruction_block: { 
-	   ok = FALSE;
+	   ok = false;
 	   MAPL(st2, {
 	       ok = (ok) ? ok : 
 		   test_run_time_communications(CONS(STATEMENT,
@@ -758,9 +758,9 @@ test_run_time_communications(list list_statement_block,
 	   list  lt = (list) GET_STATEMENT_MAPPING(fetch_map,STATEMENT(CAR(st1))); 
 	   if (lt != (list) HASH_UNDEFINED_VALUE) {
 	       nbcall ++;
-	   return (TRUE);  
+	   return (true);  
 	       } else
-		   return(FALSE);
+		   return(false);
 	   break;
        }
        default:
@@ -769,6 +769,6 @@ test_run_time_communications(list list_statement_block,
    }, 
        list_statement_block);
  /* just to avoid warning */
- return (TRUE);
+ return (true);
 }
 

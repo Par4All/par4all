@@ -58,7 +58,7 @@ extern FILE *genspec_in, *genspec_out;
 struct gen_binding *Tabulated_bp ;
 
 int Read_spec_mode ;
-static bool Read_spec_performed = FALSE ;
+static bool Read_spec_performed = false ;
 
 /* The debug flag can be changed by the user to check genClib code. */
 /* If you set gen_debug dynamically with gdb, do not forget to set
@@ -71,7 +71,7 @@ static int gen_debug_indent = 0 ;
 
 /* Default option in GEN_WRITE. */
 
-static int disallow_undefined_tabulated = TRUE ;
+static int disallow_undefined_tabulated = true ;
 
 /********************************************************************** MISC */
 
@@ -346,7 +346,7 @@ gen_chunk * gen_alloc(int size, int gen_check_p, int dom, ...)
   }
 
   if (IS_TABULATED(bp))
-    gen_enter_tabulated(dom, (cp+HASH_OFFSET)->s, cp, FALSE);
+    gen_enter_tabulated(dom, (cp+HASH_OFFSET)->s, cp, false);
 
   va_end( ap ) ;
 
@@ -358,7 +358,7 @@ gen_chunk * gen_alloc(int size, int gen_check_p, int dom, ...)
 /* The DRIVER structure is used to monitor the general function which
  * traverses objects. NULL is called whenver an undefined pointer is found.
  * <sort>_IN is called whenever an object of <sort> is entered. If the
- * returned value is TRUE, then recursive calls are made and, at the end,
+ * returned value is true, then recursive calls are made and, at the end,
  * the <sort>_OUT function is called.
  */
 
@@ -381,7 +381,7 @@ struct driver {
   if((obj)==gen_chunk_undefined) {(*(dr)->null)(bp) ; return ;}
 
 static void gen_trav_obj() ;
-static bool gen_trav_stop_recursion = FALSE; /* set to TRUE to stop... */
+static bool gen_trav_stop_recursion = false; /* set to true to stop... */
 
 /* GEN_TRAV_LEAF manages an OBJ value of type BP according to the current
    driver DR. A leaf is an object (inlined or not). */
@@ -853,12 +853,12 @@ free_already_seen_p(
 {
     message_assert("hash_table defined", free_already_seen);
 
-    if (hash_get(free_already_seen, (char *)obj)==(char*)TRUE)
-	return TRUE;
+    if (hash_get(free_already_seen, (char *)obj)==(char*)true)
+	return true;
     /* else seen for next time !
      */
-    hash_put(free_already_seen, (char *)obj, (char *) TRUE);
-    return FALSE;
+    hash_put(free_already_seen, (char *)obj, (char *) true);
+    return false;
 }
 
 /* A tabulated domain BP prohibits its OBJ to be recursively freed. */
@@ -1105,10 +1105,10 @@ copy_obj_in(gen_chunk * obj, __attribute__((unused)) struct driver * dr)
     /* hash table copy_table is updated
      */
     copy_hput(copy_table, (char *)obj, (char *)new_obj);
-    return TRUE;
+    return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 /* Just check for defined simple domains. */
@@ -1432,7 +1432,7 @@ gen_copy_tree(
     if (gen_chunk_undefined_p(obj))
 	return gen_chunk_undefined;
     else
-	return gen_local_copy_tree(obj, FALSE);
+	return gen_local_copy_tree(obj, false);
 }
 
 /* for re-entry only in gen_copy_tree...
@@ -1442,7 +1442,7 @@ gen_chunk *
 gen_copy_tree_with_sharing(
     gen_chunk *obj)
 {
-    return gen_local_copy_tree(obj, TRUE);
+    return gen_local_copy_tree(obj, true);
 }
 
 
@@ -1763,7 +1763,7 @@ gen_write(
 
     push_gen_trav_env();
 
-    shared_pointers(obj, FALSE);
+    shared_pointers(obj, false);
     fputi(shared_number, fd);
     gen_trav_obj( obj, &dr );
 
@@ -1886,7 +1886,7 @@ int gen_write_tabulated(FILE * fd, int domain)
   user_file = fd ;
 
   push_gen_trav_env();
-  shared_pointers(fake_obj, FALSE);
+  shared_pointers(fake_obj, false);
 
   /* headers: #shared, tag, domain number,
    */
@@ -1970,7 +1970,7 @@ static gtt_p gtt_make(void)
 static void gtt_table_init(gtt_p table)
 {
   int i;
-  table->identity = FALSE;
+  table->identity = false;
   for (i=0; i<MAX_DOMAIN; i++)
   {
     table->old_to_actual[i] = -1;
@@ -1981,7 +1981,7 @@ static void gtt_table_init(gtt_p table)
 static void gtt_table_identity(gtt_p table)
 {
   int i;
-  table->identity = TRUE;
+  table->identity = true;
   for (i=0; i<MAX_DOMAIN; i++)
   {
     table->old_to_actual[i] = i;
@@ -2057,7 +2057,7 @@ static gtt_p gtt_read(string filename)
   fclose(file);
 
   /* quick check for identity */
-  for (i=0, same=TRUE; i<MAX_DOMAIN && same; i++)
+  for (i=0, same=true; i<MAX_DOMAIN && same; i++)
   {
     if (items[i].number!=-1 && items[i].name)
       same = same_string_p(Domains[i].name, items[i].name) &&
@@ -2255,7 +2255,7 @@ void gen_read_spec(char * spec, ...)
   }
 
   Read_spec_mode = 0 ;
-  Read_spec_performed = TRUE ;
+  Read_spec_performed = true ;
 
   va_end(ap);
 
@@ -2338,9 +2338,9 @@ int gen_read_tabulated(FILE * file, int create_p)
 
   newgen_start_lexer(file);
 
-  newgen_allow_forward_ref = TRUE;
+  newgen_allow_forward_ref = true;
   genread_parse();
-  newgen_allow_forward_ref = FALSE;
+  newgen_allow_forward_ref = false;
 
   domain = Read_chunk->i;
   newgen_free((char *) Read_chunk);
@@ -2435,7 +2435,7 @@ int gen_defined_p(gen_chunk * obj)
     open_black_hole();
 
     if (gen_chunk_undefined_p(obj))
-      return FALSE;
+      return false;
 
     error_seen = 0  ;
     dr.null = defined_null ;
@@ -2450,7 +2450,7 @@ int gen_defined_p(gen_chunk * obj)
 
     push_gen_trav_env() ;
 
-    shared_pointers( obj, FALSE ) ;
+    shared_pointers( obj, false ) ;
     gen_trav_obj( obj, &dr ) ;
 
     pop_gen_trav_env() ;
@@ -2471,7 +2471,7 @@ static bool check_sharing(char * p, char * type)
     longjmp( env, 1 ) ;
     /* NOTREACHED*/
   }
-  return( FALSE ) ;
+  return( false ) ;
 }
 
 static int sharing_obj_in(gen_chunk * obj, struct driver * dr)
@@ -2527,13 +2527,13 @@ gen_chunk *obj1, *obj2 ;
   dr.leaf_in = tabulated_leaf_in ;
 
   push_gen_trav_env() ;
-  shared_pointers(obj2, FALSE );
+  shared_pointers(obj2, false );
 
   HASH_MAP( k, v, {
     hash_put( pointers, k, v ) ;
   }, obj_table ) ;
 
-  shared_pointers( obj1, FALSE ) ;
+  shared_pointers( obj1, false ) ;
 
   if( (found=setjmp( env )) == 0 )
     gen_trav_obj( obj1, &dr ) ;
@@ -2553,16 +2553,16 @@ gen_chunk *obj1, *obj2 ;
 static int current_size;
 static hash_table already_seen_objects = NULL;
 
-/*  true if obj was already seen in this recursion, and put it at TRUE
+/*  true if obj was already seen in this recursion, and put it at true
  */
 static bool
 allocated_memory_already_seen_p(obj)
 gen_chunk * obj;
 {
-    if (hash_get(already_seen_objects, (char *)obj)==(char*)TRUE)
-	return TRUE;
-    hash_put(already_seen_objects, (char *)obj, (char *) TRUE);
-    return FALSE;
+    if (hash_get(already_seen_objects, (char *)obj)==(char*)true)
+	return true;
+    hash_put(already_seen_objects, (char *)obj, (char *) true);
+    return false;
 }
 
 /* manages EXTERNALS and INLINABLES
@@ -2582,7 +2582,7 @@ struct gen_binding *bp ;
     }
 
     if (IS_TABULATED(bp) || allocated_memory_already_seen_p(obj))
-	return FALSE;
+	return false;
 
     if (IS_EXTERNAL(bp))
     {
@@ -2592,10 +2592,10 @@ struct gen_binding *bp ;
 	    user("[gen_allocated_memory] warning: "
 		 "external with no allocated memory function\n");
 
-	return FALSE;
+	return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /* manages newgen objects and strings...
@@ -2627,7 +2627,7 @@ allocated_memory_simple_in(
     gen_chunk *obj,
     union domain *dp)
 {
-    if (dp->ba.persistant) return FALSE;
+    if (dp->ba.persistant) return false;
 
     switch( dp->ba.type ) {
     case BASIS_DT:
@@ -2639,10 +2639,10 @@ allocated_memory_simple_in(
 	if (l && !list_undefined_p(l))
 	{
 	    current_size += list_own_allocated_memory(l);
-	    return TRUE;
+	    return true;
 	}
 	else
-	    return FALSE;
+	    return false;
     }
     case SET_DT:
     {
@@ -2651,10 +2651,10 @@ allocated_memory_simple_in(
 	if (!set_undefined_p(s))
 	{
 	    current_size += set_own_allocated_memory(s);
-	    return TRUE;
+	    return true;
 	}
 	else
-	    return FALSE;
+	    return false;
     }
     case ARRAY_DT:
     {
@@ -2663,10 +2663,10 @@ allocated_memory_simple_in(
 	if (!array_undefined_p(p))
 	{
 	    current_size += array_own_allocated_memory(dp);
-	    return TRUE;
+	    return true;
 	}
 	else
-	    return FALSE;
+	    return false;
     }
     default:
       break;
@@ -2746,7 +2746,7 @@ void gen_null(__attribute__((unused)) void * unused)
   return;
 }
 
-/** Return TRUE and ignore the argument.
+/** Return true and ignore the argument.
 
     Useful as a filter in a gen_recurse when we don't want to do anything
     in the filter part (top-down) but keeping visiting.
@@ -2756,7 +2756,7 @@ bool gen_true( __attribute__((unused)) gen_chunk * unused)
   return true;
 }
 
-/** Return FALSE and ignore the argument.
+/** Return false and ignore the argument.
 
     Useful for example as a filter in a gen_multi_recurse() to stop
     recursing in a type/domain of object but do not prevent other domains
@@ -2792,7 +2792,7 @@ void gen_core( __attribute__((unused)) void * p)
  *     the number of domains managed by newgen, max is MAX_DOMAIN.
  *
  *   DirectDomainsTable:
- *     DirectDomainsTable[domain_1, domain_2] is TRUE if domain_2
+ *     DirectDomainsTable[domain_1, domain_2] is true if domain_2
  *     may contains *directly* a domain_1 field.
  *
  *   DecisionTables:
@@ -2840,14 +2840,14 @@ static void initialize_domain_DecisionTables(int domain)
 		Domains[domain].name, domain);
 
     for (i=0; i<number_of_domains; i++)
-	not_used[i] = TRUE;
+	not_used[i] = true;
 
     /*   init with direct inclusions
      */
     for (i=0; i<number_of_domains; i++)
 	DecisionTables[domain][i] = DirectDomainsTable[domain][i];
 
-    not_used[domain]=FALSE;
+    not_used[domain]=false;
 
     /*   now the closure is computed
      */
@@ -2862,7 +2862,7 @@ static void initialize_domain_DecisionTables(int domain)
 
 	if (i>=number_of_domains) break; /* none */
 
-	not_used[i] = FALSE;
+	not_used[i] = false;
 
 	/*   cannot come from tabulated domains...
 	 *   this should be discussed, or put as a parameter...
@@ -2879,7 +2879,7 @@ static void initialize_domain_DecisionTables(int domain)
 
 	    for (j=0; j<number_of_domains; j++)
 		DecisionTables[domain][j] |= DecisionTables[i][j],
-		not_used[j] &= !DecisionTables[i][j] /*? FALSE : not_used[j] */;
+		not_used[j] &= !DecisionTables[i][j] /*? false : not_used[j] */;
 	}
 	else
 	{
@@ -2920,7 +2920,7 @@ union domain *dp;
 		    " - setting %s (%d) contains %s (%zd)\n",
 		    Domains[target].name, target,
 		    dp->se.element->name, dp->se.element-Domains);
-	DirectDomainsTable[dp->se.element-Domains][target] = TRUE;
+	DirectDomainsTable[dp->se.element-Domains][target] = true;
 	break;
     case CONSTRUCTED_DT:
     {
@@ -2930,7 +2930,7 @@ union domain *dp;
 	    initialize_domain_DirectDomainsTable(target, l->domain);
     }
     case IMPORT_DT:
-	break; /* abort() ? TRUE (safe) ? */
+	break; /* abort() ? true (safe) ? */
     case UNDEF_DT:
 	break; /* nothing is done */
     default:
@@ -2960,7 +2960,7 @@ initialize_DirectDomainsTable(void)
 	/*   first put falses
 	 */
 	for (j=0; j<number_of_domains; j++)
-	    DirectDomainsTable[j][i]=FALSE;
+	    DirectDomainsTable[j][i]=false;
 
 	initialize_domain_DirectDomainsTable(i, bp->domain);
     }
@@ -3381,8 +3381,8 @@ void gen_multi_recurse(void * o, ...)
 
     @param filter the filter method (function) to apply to an encountered
     object of the good type during the prefix (top-down) visit. If it
-    returns TRUE, the recursion is going on and the rewrite filter will be called
-    during the bottom-up visit. If it returns FALSE, the visit
+    returns true, the recursion is going on and the rewrite filter will be called
+    during the bottom-up visit. If it returns false, the visit
     does not go further inside this object and the rewrite method will not be
     called during the bottom-up visit.
 
@@ -3411,8 +3411,8 @@ void gen_recurse(
     @param filter the filter method (function) to apply to an encountered
     object of the good type during the prefix (top-down) visit. Its second
     argument is the context passed texto from the global context
-    parameter. If the method returns TRUE, the recursion is going on. If
-    it returns FALSE, the visit does not go further inside this object and
+    parameter. If the method returns true, the recursion is going on. If
+    it returns false, the visit does not go further inside this object and
     the rewrite method is not be called during the bottom-up visit.
 
     @param rewrite is the method (function) to apply to an encountered

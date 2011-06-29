@@ -252,8 +252,8 @@ static void update_locals(list prefix, list ls, entity e)
 */
 static bool expression_implied_do_index_p(expression exp, entity e)
 {
-  bool li=FALSE;
-  bool dep=FALSE;
+  bool li=false;
+  bool dep=false;
 
   if (expression_implied_do_p(exp)) {
     list args = call_arguments(syntax_call(expression_syntax(exp)));
@@ -273,7 +273,7 @@ static bool expression_implied_do_index_p(expression exp, entity e)
       if (reference_variable(effect_any_reference(eff)) == e &&
 	  action_read_p(effect_action(eff))) {
 	  pips_debug(7, "index read in range expressions\n");
-	  dep=TRUE;
+	  dep=true;
       }
     }
 
@@ -281,14 +281,14 @@ static bool expression_implied_do_index_p(expression exp, entity e)
   
     if (!dep) {
       if (same_entity_p(e,index))
-	li=TRUE;
+	li=true;
       else {
 	FOREACH(EXPRESSION,expr, CDR(CDR(args))) {
 	  syntax s = expression_syntax(expr);
 	  if(syntax_call_p(s)) {
 	    pips_debug(5,"Nested implied do\n");
 	    if (expression_implied_do_index_p(expr,e))
-	      li=TRUE;
+	      li=true;
 	  }
 	}
       }
@@ -304,13 +304,13 @@ static bool expression_implied_do_index_p(expression exp, entity e)
 */
 bool is_implied_do_index(entity e, instruction ins)
 {
-  bool li = FALSE;
+  bool li = false;
 
   debug(5,"is_implied_do_index","entity name: %s ", entity_name( e )) ;
 
   if (instruction_call_p(ins))
     MAP(EXPRESSION,exp,{
-      if (expression_implied_do_index_p(exp,e)) li=TRUE;
+      if (expression_implied_do_index_p(exp,e)) li=true;
     },call_arguments( instruction_call( ins ) ));
 
   ifdebug(5)
@@ -469,7 +469,7 @@ bool privatize_module(char *mod_name)
     module = get_current_module_entity();
 
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, mod_name, true) );
     mod_stat = get_current_module_statement();
 
     mod_inst = statement_instruction(mod_stat);
@@ -480,13 +480,13 @@ bool privatize_module(char *mod_name)
 	*/
 
     set_proper_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
+	db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
 
     set_cumulated_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE) );
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true) );
 
     mod_graph = (graph)
-	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
+	db_get_memory_resource(DBR_CHAINS, mod_name, true);
 
     debug_on("PRIVATIZE_DEBUG_LEVEL");
     set_ordering_to_statement(mod_stat);
@@ -542,7 +542,7 @@ bool privatize_module(char *mod_name)
 	reset_ordering_to_statement();
     clean_enclosing_loops();
 
-    return TRUE;
+    return true;
 }
 
 /**
@@ -639,7 +639,7 @@ localize_declaration(char *mod_name)
 	debug_on("LOCALIZE_DEBUG_LEVEL");
 	pips_debug(1,"begin localize_declaration ...\n");
 	set_current_module_entity(module_name_to_entity(mod_name) );
-	set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
+	set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, true) );
 
 	/* Propagate local informations to loop statements */
 

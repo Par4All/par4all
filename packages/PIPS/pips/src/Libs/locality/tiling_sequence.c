@@ -107,7 +107,7 @@ static int unique_integer_number = 0,
 /* first_turn permet de detecter le premier retour de la fonction loop_rwt()  */
 /* overflow permet de detecter un debordemebnt dans l'un des nids */
 
-static bool first_turn=FALSE, overflow=FALSE;
+static bool first_turn=false, overflow=false;
 
 
 /* pour marquer si la sequence repond a nos hypotheses */
@@ -125,7 +125,7 @@ static bool loop_flt(loop l )
   if( ! first_turn )        /* la premiere boucle d'un nid donne */
     {
       loop1=copy_loop(l);
-      first_turn = TRUE; 
+      first_turn = true; 
       /* allouer de la memoire pour les differentes boucles de ce nid */
       sequen[k1].nd= (struct INFO_LOOP  *)malloc(depth_max *sizeof(struct INFO_LOOP));
       /* allouer de la memoire pour les differents stencils  de ce nid */
@@ -146,7 +146,7 @@ static bool loop_flt(loop l )
   sequen[k1].nd[k2].lower=vect_coeff(TCST,pv1);  /* stocker sa borne inferieure */
   sequen[k1].nd[k2].upper=vect_coeff(TCST,pv2);   /* stocker sa borne superieure  */
   k2++;    /* incrementer le compteur des profondeur des nids */
-  return TRUE;
+  return true;
 } 
 
 static void loop_rwt(loop l, context_p context  ) 
@@ -161,7 +161,7 @@ static void loop_rwt(loop l, context_p context  )
   hash_put(context->contenu,stack_head(context->statement_stack), (void *) contenu  );
   if (first_turn)
     {
-      first_turn=FALSE;
+      first_turn=false;
       k2=0;
       k1++;
     }
@@ -170,7 +170,7 @@ static void loop_rwt(loop l, context_p context  )
 static bool stmt_flt(statement s,context_p context )
 {  
   stack_push(s, context->statement_stack); 
-  return TRUE;
+  return true;
 }
 
 
@@ -181,7 +181,7 @@ static void stmt_rwt( statement s, context_p context)
 
 static bool seq_flt(   )
 {
-  return TRUE;
+  return true;
 }
 
 static void seq_rwt(sequence sq, context_p context)
@@ -223,7 +223,7 @@ static void seq_rwt(sequence sq, context_p context)
 
 static bool uns_flt(   )
 {
-  return TRUE;
+  return true;
 }
 
 static void uns_rwt( context_p context)
@@ -236,7 +236,7 @@ static void uns_rwt( context_p context)
 
 static bool test_flt( )
 {
-  return TRUE;
+  return true;
 }
 
 static void test_rwt( context_p context)
@@ -248,7 +248,7 @@ static void test_rwt( context_p context)
 } 
 static bool call_flt( )
 {
-  return TRUE ;
+  return true ;
 }
 
 static void call_rwt(call  ca, context_p context)
@@ -372,18 +372,18 @@ static void wl_rwt( context_p context)
   hash_put(context->depth,stack_head(context->statement_stack), ( void *) 0); 
 } 
 
-/* Cette fonction retourne TRUE si  le vecteur 'a' est lexicographiquement superieur au vecteur 'b' */
+/* Cette fonction retourne true si  le vecteur 'a' est lexicographiquement superieur au vecteur 'b' */
 static bool lexi_sup(Pmatrix a, Pmatrix b)
 {
   int i;
   for (i=1;i<=depth;i++)
     {
       if (MATRIX_ELEM(a,i,1) >MATRIX_ELEM(b,i,1))
-	return TRUE;
+	return true;
       if (MATRIX_ELEM(a,i,1) < MATRIX_ELEM(b,i,1))
-	return FALSE;
+	return false;
     }
-  return FALSE;
+  return false;
 } 
 
 /* Cette fonction trie un tableau de stencil d'un  nid donne. st est le tableau 
@@ -962,19 +962,19 @@ statement permutation( s, P)
   statement scopy;
   int i,j;
   loop ls1,ls2;
-  bool found=FALSE;
+  bool found=false;
   scopy=copy_statement(s);
   ls1=instruction_loop(statement_instruction(scopy));
   for(i=1;i<=3*depth;i++)
     {
       j=1;
-      found=FALSE;
+      found=false;
       ls2=instruction_loop(statement_instruction(s));
       while ((j<=3*depth)&& !found)
 	{
 	  if (value_eq(MATRIX_ELEM(P,i,j),VALUE_ONE))
 	    {
-	      found =TRUE;
+	      found =true;
 	      loop_index(ls1)=loop_index(ls2);
 	      loop_range(ls1)=loop_range(ls2);
 	    };
@@ -994,19 +994,19 @@ statement permutation2( s, P)
   statement scopy;
   int i,j;
   loop ls1,ls2;
-  bool found=FALSE;
+  bool found=false;
   scopy=copy_statement(s);
   ls1=instruction_loop(statement_instruction(scopy));
   for(i=1;i<=2*depth;i++)
     {
       j=1;
-      found=FALSE;
+      found=false;
       ls2=instruction_loop(statement_instruction(s));
       while ((j<=2*depth)&& !found)
 	{
 	  if (value_eq(MATRIX_ELEM(P,i,j),VALUE_ONE))
 	    {
-	      found =TRUE;
+	      found =true;
 	      loop_index(ls1)=loop_index(ls2);
 	      loop_range(ls1)=loop_range(ls2);
 	    };
@@ -2204,7 +2204,7 @@ static bool array_overflow()
 		  if (value_plus(MATRIX_ELEM(sequen[i].st[j],depth-m,1), sequen[i].nd[depth-m-1].lower)
 		      < v1 )
 		    { 
-		      overflow=TRUE ;
+		      overflow=true ;
 		      printf(" Debordement dans le   tableau: %s\n",entity_name(first_array));
 
 
@@ -2213,7 +2213,7 @@ static bool array_overflow()
 		      v2 )
 		    {   
 
-		      overflow=TRUE ;
+		      overflow=true ;
 		      printf(" Debordement dans le  tableau: %s\n",entity_name(first_array));
 		    };
 		}
@@ -2228,13 +2228,13 @@ static bool array_overflow()
 		  if (value_plus(MATRIX_ELEM(sequen[i].st[j],k+1,1), sequen[i].nd[k].lower)
 		      <sequen[i-1].nd[k].lower )
 		    {
-		      overflow=TRUE ;
+		      overflow=true ;
 		      printf(" Debordement dans le domaine du tableau: %s\n",entity_name(sequen[i-1].tableau));
 		    };
 		  if (value_plus(MATRIX_ELEM(sequen[i].st[j],k+1,1), sequen[i].nd[k].upper)> 
 		      sequen[i-1].nd[k].upper )
 		    {
-		      overflow=TRUE ;
+		      overflow=true ;
 		      printf(" Debordement dans le domaine du tableau: %s\n",entity_name(sequen[i-1].tableau));
 		    };
 		  
@@ -2549,7 +2549,7 @@ bool tiling_sequence(string module)
   
  
   
-  stat = (statement) db_get_memory_resource(DBR_CODE, module, TRUE); 
+  stat = (statement) db_get_memory_resource(DBR_CODE, module, true); 
  
   
   context.contenu = hash_table_make(hash_pointer, 0);  
@@ -2622,7 +2622,7 @@ bool tiling_sequence(string module)
   pips_debug(1, "done.\n");
   debug_off();
    
-  return TRUE;
+  return true;
 }
  
 

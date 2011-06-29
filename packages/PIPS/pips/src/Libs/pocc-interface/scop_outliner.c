@@ -81,16 +81,16 @@ static bool outlining_scop(sequence s)
     FOREACH (EXTENSION, ext, l_exts) {
       pragma pr = extension_pragma (ext);
       if(strcmp(pragma_string(pr),pragma_begin)==0 )
-	begin = TRUE;
+	begin = true;
       if(strcmp(pragma_string(pr),pragma_end)==0)
 	{
-	  begin = FALSE;
+	  begin = false;
 	  lists_to_outline  = CONS(STATEMENT, stmt, lists_to_outline );
 	  lists_to_outline = gen_nreverse(lists_to_outline);
 	  /*Outline SCoPs
 	   */ 
 	  outliner(build_new_top_level_module_name(get_string_property("SCOP_PREFIX"), false), lists_to_outline);
-	  return TRUE;
+	  return true;
 	}
     }
     /*
@@ -110,16 +110,16 @@ static bool outlining_scop(sequence s)
 	    else 
 	      save_seq = CONS(statement, body, NIL );
 	  }
-	bool find_p = FALSE;
+	bool find_p = false;
 	FOREACH(statement, st, save_seq) {
 	  if(stmt != st)
-	    find_p = TRUE;
+	    find_p = true;
 	}
 	if( (!find_p ||statement_loop_p(stmt) ))
 	  lists_to_outline  = CONS(STATEMENT, stmt, lists_to_outline );      
       }
   }
-  return TRUE;
+  return true;
 }
 bool scop_outliner(char * module_name)
 { 
@@ -130,15 +130,15 @@ bool scop_outliner(char * module_name)
   set_current_module_entity(local_name_to_top_level_entity(module_name));
  
   set_current_module_statement((statement)
-			       db_get_memory_resource(DBR_CODE, module_name, TRUE));
+			       db_get_memory_resource(DBR_CODE, module_name, true));
   set_prettyprint_language_from_property(is_language_c);
   module_stat = get_current_module_statement();
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE)); 
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true)); 
 
   pragma_begin = get_string_property("PRAGMA_BEGIN");
   pragma_end = get_string_property("PRAGMA_END");
    
-  begin= FALSE;
+  begin= false;
   gen_recurse(module_stat, sequence_domain/*pragma_domain*/, outlining_scop , gen_null);
   lists_to_outline = gen_nreverse(lists_to_outline);
      
@@ -150,6 +150,6 @@ bool scop_outliner(char * module_name)
   reset_cumulated_rw_effects();
   reset_current_module_entity();
   reset_current_module_statement();
-  return TRUE;  
+  return true;  
 } 
  

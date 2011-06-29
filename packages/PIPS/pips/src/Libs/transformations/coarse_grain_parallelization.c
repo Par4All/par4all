@@ -98,7 +98,7 @@ typedef struct coarse_grain_ctx {
 
     @param l is the loop to parallelize
 
-    @return TRUE to ask the calling NewGen iterator to go on recursion on
+    @return true to ask the calling NewGen iterator to go on recursion on
     further loops in this loop.
  */
 static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
@@ -125,7 +125,7 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
   list l_conflicts = NIL;
 
   /* To keep track of a current conflict disabling the parallelization: */
-  bool may_conflicts_p = FALSE;
+  bool may_conflicts_p = false;
 
   /* Can we discard conflicts due to thread-safe variables? */
   bool thread_safe_p = get_bool_property("PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES");
@@ -198,7 +198,7 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
       pips_debug(1,"testing conflicts\n");
       /* We want to test for write/read and read/write dependences at the same
        * time. */
-      Finds2s1 = TRUE;
+      Finds2s1 = true;
       FOREACH(CONFLICT, conf, l_conflicts) {
         effect reg1 = conflict_source(conf);
         effect reg2 = conflict_sink(conf);
@@ -267,7 +267,7 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
         /* If the dependence cannot be disproved, add it to the list of
            assumed dependences. */
         if (!ENDP(levels) || !ENDP(levelsop))
-          may_conflicts_p = TRUE;
+          may_conflicts_p = true;
 
         gen_free_list(levels);
         gen_free_list(levelsop);
@@ -311,7 +311,7 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
 
   pips_debug(1,"end\n");
 
-  return(TRUE);
+  return(true);
 }
 
 
@@ -347,7 +347,7 @@ static list coarse_grain_loop_parallelization(statement module_stat)
     independance.
 
     @param module_name is the name of the module to parallelize
-    @return TRUE in case of success. Indeed, return alway true. :-)
+    @return true in case of success. Indeed, return alway true. :-)
  */
 static bool coarse_grain_parallelization_main(string module_name,
                                        bool use_reductions_p)
@@ -361,20 +361,20 @@ static bool coarse_grain_parallelization_main(string module_name,
       set_statement_reductions(
           (pstatement_reductions)db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,
                                                         module_name,
-                                                        TRUE));
+                                                        true));
     }
 
     /* Get the code of the module. */
     /* Build a copy of the CODE since we rewrite it on the fly to build a
        PARALLELIZED_CODE with it. Do not use
-       db_get_memory_resource(,,FALSE) since it is more efficient to use a
+       db_get_memory_resource(,,false) since it is more efficient to use a
        gen_copy_statement() and it has nasty effects on informations
        attached on the DBR_CODE with the statement addresses (see Trac
        ticket #159 in 2009).
 
        Well, indeed even this does not work. So this phase change the code
        resource... */
-    module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
 
     set_current_module_statement(module_stat);
     module = module_name_to_entity(module_name);
@@ -382,18 +382,18 @@ static bool coarse_grain_parallelization_main(string module_name,
 
     /* Get and use cumulated_effects: */
     set_cumulated_rw_effects((statement_effects)
-           db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+           db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
     /* Build mapping between variables and semantics informations: */
     module_to_value_mappings(module);
 
     /* use preconditions to check that loop bodies are not dead code */
     set_precondition_map((statement_mapping)
-            db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+            db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
 
     /* Get and use invariant read/write regions */
     set_invariant_rw_effects((statement_effects)
-        db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE));
+        db_get_memory_resource(DBR_INV_REGIONS, module_name, true));
 
     print_parallelization_statistics(module_name, "ante", module_stat);
 
@@ -426,18 +426,18 @@ static bool coarse_grain_parallelization_main(string module_name,
     reset_precondition_map();
     free_value_mappings();
 
-    return TRUE;
+    return true;
 }
 
 /** Parallelize code by using region informations to prove iteration
     independance.
 
     @param module_name is the name of the module to parallelize
-    @return TRUE in case of success. Indeed, return always true. :-)
+    @return true in case of success. Indeed, return always true. :-)
  */
 bool coarse_grain_parallelization(string module_name) {
   /* Do not use reductions: */
-  return coarse_grain_parallelization_main(module_name, FALSE);
+  return coarse_grain_parallelization_main(module_name, false);
 }
 
 /** Parallelize code by using region informations to prove iteration
@@ -448,9 +448,9 @@ bool coarse_grain_parallelization(string module_name) {
     more resources.
 
     @param module_name is the name of the module to parallelize
-    @return TRUE in case of success. Indeed, return always true. :-)
+    @return true in case of success. Indeed, return always true. :-)
  */
 bool coarse_grain_parallelization_with_reduction(string module_name) {
   /* Use reductions: */
-  return coarse_grain_parallelization_main(module_name, TRUE);
+  return coarse_grain_parallelization_main(module_name, true);
 }

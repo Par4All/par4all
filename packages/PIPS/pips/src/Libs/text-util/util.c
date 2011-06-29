@@ -144,7 +144,7 @@ add_to_current_line(
     int last_cut;
     int lappend;
     int lbuffer = strlen(buffer);
-    boolean comment = FALSE;
+    bool comment = false;
     char stmp;
     /* special case: appends a sole "," on end of line... */
     if (same_string_p(append, ", ") && lbuffer+3==MAX_LINE_LENGTH) 
@@ -237,7 +237,7 @@ close_current_line(
     int lbuffer=0;
     char stmp = continuation[0];
     char stmp1 = continuation[1];
-    boolean comment = stmp == 'c'|| stmp == 'C'
+    bool comment = stmp == 'c'|| stmp == 'C'
       || stmp == '!'|| stmp == '*'
       || (stmp == '/' && stmp1 == '*') || (stmp == '/' && stmp1 == '/');
 

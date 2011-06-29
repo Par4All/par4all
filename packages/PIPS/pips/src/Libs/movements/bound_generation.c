@@ -71,7 +71,7 @@ int number_of_lower_bounds,loop_rank;
     entity max = local_name_to_top_level_entity("MAX");
     int higher_rank,nlb = 0; 
     Value coeff;
-    boolean reductible = FALSE;
+    bool reductible = false;
  
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(8,"lower_bound_generation","begin\n");
@@ -82,7 +82,7 @@ int number_of_lower_bounds,loop_rank;
 	     ineq=ineq->succ) {
 	    Variable var2;
 	    Value coeff2,coeff3;
-	    reductible = FALSE;
+	    reductible = false;
 	    higher_rank=search_higher_rank(ineq->vecteur,index_base);
 	    if (higher_rank > loop_rank ) {
 		Pcontrainte pc2 = ineq->succ;
@@ -92,7 +92,7 @@ int number_of_lower_bounds,loop_rank;
 		
 		if (value_one_p(value_abs(coeff2)) || 
 		    value_one_p(value_abs(coeff3))) {
-		    reductible = TRUE;
+		    reductible = true;
 		    pv2 = vect_cl2(value_abs(coeff2),pc2->vecteur,
 				   value_abs(coeff3),ineq->vecteur);
 		    ineq= ineq->succ;
@@ -100,7 +100,7 @@ int number_of_lower_bounds,loop_rank;
 	    }
 	    else pv2 = vect_dup(ineq->vecteur);
 	    if (higher_rank <= loop_rank || reductible ) {  
-		/* this condition is TRUE if the constraint constrains 
+		/* this condition is true if the constraint constrains 
 		   directly the variable */
 		if (value_notmone_p(coeff= vect_coeff(var,pv2)))
 		    vect_add_elem(&pv2, TCST,
@@ -160,7 +160,7 @@ int number_of_upper_bounds, loop_rank;
     expression expr, ex2, ex1, upper = expression_undefined;
     cons * lex2,* lexpr = NIL;
     entity min=local_name_to_top_level_entity("MIN");
-    boolean reductible = FALSE;
+    bool reductible = false;
   
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(8,"upper_bound_generation","begin\n");
@@ -172,7 +172,7 @@ int number_of_upper_bounds, loop_rank;
 	     ineq=ineq->succ) {
 	    Variable var2;
 	    Value coeff2,coeff3;
-	    reductible = FALSE;
+	    reductible = false;
 	    higher_rank=search_higher_rank(ineq->vecteur,index_base);
 	    if (higher_rank > loop_rank ) {
 		var2 = variable_of_rank(index_base,higher_rank);
@@ -180,7 +180,7 @@ int number_of_upper_bounds, loop_rank;
 		coeff3 = vect_coeff(var2,(ineq->succ)->vecteur);
 		if (value_one_p(value_abs(coeff2)) || 
 		    value_one_p(value_abs(coeff3))) {
-		    reductible = TRUE;
+		    reductible = true;
 		    pv2 = vect_cl2(value_abs(coeff2),(ineq->succ)->vecteur,
 				   value_abs(coeff3),ineq->vecteur);
 
@@ -190,7 +190,7 @@ int number_of_upper_bounds, loop_rank;
 	    else pv2 = vect_dup(ineq->vecteur);
 
 	    if (higher_rank <=loop_rank || reductible) {
-		/* this condition is TRUE if the constraint constrains 
+		/* this condition is true if the constraint constrains 
 		   directly the variable */
 		coeff= vect_coeff(var,pv2);
 		vect_chg_sgn(pv2);
@@ -245,7 +245,7 @@ Pbase index_base;
     int rank;
     Value coeff;
     Variable var;
-    boolean debut;
+    bool debut;
     expression expr,ex1,ex2,ex3,ex4;
     expression exl= expression_undefined;
     expression exr= expression_undefined;
@@ -259,7 +259,7 @@ Pbase index_base;
     debug(8,"test_bound_generation","begin\n");
 
 
-    debut = TRUE;
+    debut = true;
     for (ineq = sc_test->inegalites; 
 	 !CONTRAINTE_UNDEFINED_P(ineq); 
 	 ineq=ineq->succ) {
@@ -316,7 +316,7 @@ Pbase index_base;
 	    lexpr=make_op_expression(an,CONS(EXPRESSION,lexpr,lex2));
 	}
 	ineq = ineq->succ;
-	debut = FALSE;
+	debut = false;
     }
     
     debug(8,"test_bound_generation","end\n");
@@ -332,8 +332,8 @@ Pbase index_base;
 statement 
 bound_generation(
     entity module,
-    boolean bank_code,
-    boolean receive_code,
+    bool bank_code,
+    bool receive_code,
     entity ent,
     Pbase loop_body_indices,
     Pbase var_id,
@@ -359,7 +359,7 @@ bound_generation(
     entity looplabel;
     loop newloop;
     int space = (n+1) * sizeof(Ssysteme);
-    boolean debut = TRUE;
+    bool debut = true;
     entity mod;
     int j;
     debug_on("MOVEMENT_DEBUG_LEVEL");
@@ -385,7 +385,7 @@ bound_generation(
 			 make_continue_statement(entity_empty_label()));
 	stat = test_to_statement(tst);
 	loopbody=make_block_statement(CONS(STATEMENT,stat,NIL));
-	debut=FALSE;
+	debut=false;
     }
   
     ifdebug(8) {
@@ -423,7 +423,7 @@ bound_generation(
 							 index_base,n0_loop,
 							 sc_info[n0_loop][3],
 							 sc_info[n0_loop][2]);
-		debut = FALSE;
+		debut = false;
 	    }
 	    else {
 		/* make new bound expression and new range loop */

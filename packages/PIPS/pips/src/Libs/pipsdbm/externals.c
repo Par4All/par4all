@@ -73,7 +73,7 @@ lire_int(FILE * fd)
 char *
 pipsdbm_read_entities(FILE * fd)
 {
-    int read = gen_read_tabulated(fd, FALSE);
+    int read = gen_read_tabulated(fd, false);
     pips_assert("entities were read", read==entity_domain);
     return (char *) entity_domain;
 }
@@ -163,7 +163,7 @@ pipsdbm_read_statement_mapping(FILE * fd)
     pips_assert("some current module name", dbll_current_module);
     pips_debug(3, "statement -> ??? for %s\n", dbll_current_module);
     stat = (statement)
-	db_get_memory_resource(DBR_CODE, dbll_current_module, TRUE);
+	db_get_memory_resource(DBR_CODE, dbll_current_module, true);
 
     set_ordering_to_statement(stat);
 
@@ -193,7 +193,7 @@ pipsdbm_check_statement_mapping(statement_mapping h)
 	pips_assert("consistent val", gen_consistent_p((void*) v));
     },
 	h);
-    return TRUE;
+    return true;
 }
 
 void
@@ -238,11 +238,11 @@ pipsdbm_consistent_statement_function(gen_chunkp map)
     hash_table h = (map+1)->h;
     STATEMENT_FUNCTION_MAP(s, x, 
     {
-	if (gen_type((void*)s)!=statement_domain) return FALSE;
-	if (!gen_consistent_p((void*)x)) return FALSE;
+	if (gen_type((void*)s)!=statement_domain) return false;
+	if (!gen_consistent_p((void*)x)) return false;
     },
 	h);
-    return TRUE;
+    return true;
 }
 
 /* the stored stuff need be based on the ordering...  because newgen won't
@@ -288,7 +288,7 @@ pipsdbm_read_statement_function(FILE * fd /**< file to read from */)
     pips_assert("some current module name", dbll_current_module);
     pips_debug(3, "statement -> ??? for %s\n", dbll_current_module);
     stat = (statement)
-	db_get_memory_resource(DBR_CODE, dbll_current_module, TRUE);
+	db_get_memory_resource(DBR_CODE, dbll_current_module, true);
 
     set_ordering_to_statement(stat);
 

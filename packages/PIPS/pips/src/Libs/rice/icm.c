@@ -59,7 +59,7 @@ static int reference_level=0;
 static string current_module_name; /* Bad hack to avoid an argument 
 				      in icm_codegen.... */
 
-static bool expression_invariant = FALSE; 
+static bool expression_invariant = false; 
 static set /* of entity */ invariant_entities = set_undefined;
 //static set /* of statement */ statements_partialy_invariant = set_undefined;
 
@@ -214,7 +214,7 @@ statement_mark(statement s)
      store_has_level(s, depth);
      store_statement_has_indices(s, gen_nreverse(gen_copy_seq(indices)));
      
-     return TRUE;
+     return true;
 }
 
 
@@ -229,7 +229,7 @@ loop_level_in (loop l)
     indices = CONS(ENTITY, index, indices);
     ++depth;
 
-    return TRUE;
+    return true;
 }
 
 
@@ -304,7 +304,7 @@ dependance_vertices_p(vertex v1, vertex v2, int dependance_type, int level)
 			    if (action_dependance_p(c, dependance_type))
 			    {
 				ifdebug(9) { fprintf(stderr, "yes\n"); }
-				return TRUE;
+				return true;
 			    }
 			}
 		    }, cone_levels(conflict_cone(c)));
@@ -314,7 +314,7 @@ dependance_vertices_p(vertex v1, vertex v2, int dependance_type, int level)
     }, vertex_successors(v1));
 
     ifdebug(9) { fprintf(stderr, "no\n"); }
-    return FALSE;
+    return false;
 }
 
 
@@ -331,11 +331,11 @@ exist_non_self_dependance_from_vertex_p(vertex v,
 	vertex y = successor_vertex(su);
 	if (v != y) {
 	    if (dependance_vertices_p(v, y, dependance_type, level))
-		return TRUE;
+		return true;
 	}
     }, vertex_successors(v));
 
-    return FALSE;
+    return false;
 }
 
 /*
@@ -549,15 +549,15 @@ icm_ignore_this_successor(vertex v,
 			  int level)
 {
     if (common_ignore_this_vertex(region, successor_vertex(su)))
-	return(TRUE);
+	return(true);
 
     if (!dependance_vertices_p(v, 
 			       successor_vertex(su), 
 			       ALL_DEPENDANCES, 
 			       level))
-	return (TRUE);
+	return (true);
 
-    return FALSE;
+    return false;
 }
 
 
@@ -572,15 +572,15 @@ invariant_ignore_this_successor(vertex v,
 				int level)
 {
     if (common_ignore_this_vertex(region, successor_vertex(su)))
-	return(TRUE);
+	return(true);
 
     if (!dependance_vertices_p(v, 
 				successor_vertex(su), 
 				FLOW_DEPENDANCE, 
 				level))
-	return (TRUE);
+	return (true);
 
-    return (FALSE);
+    return (false);
 }
 
 
@@ -618,7 +618,7 @@ statement_depend_of_indices_p(statement st,
 		    fprintf(stderr,": yes\n");
 		}
 
-		return TRUE;
+		return true;
 	    }
 	}, le);
     }, indices);
@@ -627,7 +627,7 @@ statement_depend_of_indices_p(statement st,
 	fprintf(stderr,": no\n");
     }
 
-    return FALSE;
+    return false;
 }
 
 
@@ -636,7 +636,7 @@ inv_entity_filter(entity e)
 {
     expression_invariant &= set_belong_p(invariant_entities, (char *) e);
     if (!expression_invariant) gen_recurse_stop(NULL);
-    return TRUE;
+    return true;
 }
 
 static bool ref_flt(reference r)
@@ -648,16 +648,16 @@ static bool
 expressions_invariant_p(list /* of expression */ le)
 {
     MAP(EXPRESSION, exp, {
-	expression_invariant = TRUE;
+	expression_invariant = true;
 
 	gen_recurse(exp, reference_domain, ref_flt, gen_null);
 
 	if (!expression_invariant) {
-	    return FALSE;
+	    return false;
 	}
     }, le);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -689,7 +689,7 @@ vertex_partially_invariant_p(vertex v,
 				"(known array access).\n", 
 				statement_number(st));
 		    }
-		    return TRUE;
+		    return true;
 		} 
 		else {
 		    ifdebug(6) {
@@ -699,7 +699,7 @@ vertex_partially_invariant_p(vertex v,
 				"(known array access).\n", 
 				statement_number(st));
 		    }
-		    return FALSE;
+		    return false;
 		}
 	    }
 	    else {
@@ -714,7 +714,7 @@ vertex_partially_invariant_p(vertex v,
 				statement_number(st));
 
 		    }
-		    return FALSE;
+		    return false;
 		}
 		else {
 		    /* A scalar variable */
@@ -726,7 +726,7 @@ vertex_partially_invariant_p(vertex v,
 				"(scalar access).\n", 
 				statement_number(st));
 		    }
-		    return TRUE;
+		    return true;
 		}
 	    }
 	}        
@@ -739,7 +739,7 @@ vertex_partially_invariant_p(vertex v,
 		statement_number(st));
     }
     
-    return FALSE;
+    return false;
 }
 
 
@@ -766,7 +766,7 @@ vertex_invariant_p(vertex v,
 		    statement_number(st));
 	}
 
-	return FALSE;
+	return false;
     }
 
     /* If there is a flow dependance from v to v, then v is not variant */
@@ -777,7 +777,7 @@ vertex_invariant_p(vertex v,
 		    "statement %02td is not invariant (self flow dep).\n",
 		    statement_number(st));
 	}
-	return FALSE;
+	return false;
     }
 
     /* If there is a flow dependance from y to v and if y is not invariant, 
@@ -798,7 +798,7 @@ vertex_invariant_p(vertex v,
 			    statement_number(y_st)); 
 		}
 	    
-		return FALSE;
+		return false;
 	    }
 	}
     }, graph_vertices(g));
@@ -810,7 +810,7 @@ vertex_invariant_p(vertex v,
 		statement_number(st));
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -951,7 +951,7 @@ vertex_redundant_p(vertex v,
   statement_number(st));
   }
 
-  return FALSE;
+  return false;
   }
 */
 
@@ -964,7 +964,7 @@ vertex_redundant_p(vertex v,
 		    "statement %02td is not redundant (variable address).\n", 
 		    statement_number(st));
 	}
-	return FALSE;
+	return false;
     }
 	
     /* If there is a flow dependance from v to y and if y is not redundant, 
@@ -985,7 +985,7 @@ vertex_redundant_p(vertex v,
 			    statement_number(st),
 			    statement_number(y_st)); 
 		}
-		return FALSE;
+		return false;
 	    }
 	}
     }
@@ -997,7 +997,7 @@ vertex_redundant_p(vertex v,
 		statement_number(st));
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -1177,14 +1177,14 @@ static bool does_it_depend(statement s)
 {
     it_depends |= statement_depend_of_indices_p(s, depending_indices, 0);
     if (it_depends) gen_recurse_stop(NULL);
-    return TRUE;
+    return true;
 }
 
 
 static bool push_depending_index(loop l)
 {
     depending_indices = CONS(ENTITY, loop_index(l), depending_indices);
-    return TRUE;
+    return true;
 }
 
 
@@ -1204,7 +1204,7 @@ static bool drop_it(loop l)
     if (execution_parallel_p(loop_execution(l)))
     {
 	depending_indices = NIL;
-	it_depends = FALSE;
+	it_depends = false;
 	gen_multi_recurse(l,
 			  statement_domain, 
 			      does_it_depend, gen_null,
@@ -1215,7 +1215,7 @@ static bool drop_it(loop l)
 	return !it_depends;
     }
   
-    return FALSE;
+    return false;
 }
 
 
@@ -1316,7 +1316,7 @@ static bool icm_loop_rwt(loop l)
 	}
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -1377,7 +1377,7 @@ statement icm_codegen(statement stat,
     set_proper_rw_effects((statement_effects) 
 			  db_get_memory_resource(DBR_PROPER_EFFECTS, 
 						 current_module_name, 
-						 TRUE));
+						 true));
 
     /* Compute has_level hash and has_indices tables */
 
@@ -1460,7 +1460,7 @@ statement icm_codegen(statement stat,
 
    @param[in] module_name
 
-   @return TRUE because everything should go fine
+   @return true because everything should go fine
 
    Prepare some stuffs and call icm_codegen...
 */
@@ -1471,13 +1471,13 @@ invariant_code_motion(string module_name)
     statement mod_stat = statement_undefined;
     set_current_module_entity(module);
 
-    set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", TRUE );
-    set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", FALSE );
+    set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", true );
+    set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", false );
 
     set_current_module_statement((statement)
 				 db_get_memory_resource(DBR_CODE,
 							module_name,
-							TRUE));
+							true));
 
     mod_stat = get_current_module_statement();
 
@@ -1502,7 +1502,7 @@ invariant_code_motion(string module_name)
     }
 
     if (graph_undefined_p(dg)) {
-	dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+	dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
     }
     else {
 	pips_internal_error("dg should be undefined");
@@ -1529,5 +1529,5 @@ invariant_code_motion(string module_name)
     reset_ordering_to_statement();
 
     debug_off();
-    return TRUE;
+    return true;
 }

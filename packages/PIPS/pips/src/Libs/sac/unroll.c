@@ -55,7 +55,7 @@ static bool should_unroll_p(instruction i)
     switch(instruction_tag(i))
     {
         case is_instruction_call:
-            return TRUE;
+            return true;
 
         case is_instruction_sequence:
             {
@@ -67,9 +67,9 @@ static bool should_unroll_p(instruction i)
                 {
                     statement s = STATEMENT(CAR(j));
                     if (!should_unroll_p(statement_instruction(s)))
-                        return FALSE;
+                        return false;
                 }
-                return TRUE;
+                return true;
             }
 
         case is_instruction_test:
@@ -78,7 +78,7 @@ static bool should_unroll_p(instruction i)
         case is_instruction_goto:
         case is_instruction_unstructured:
         default:
-            return FALSE;
+            return false;
     }
 }
 
@@ -179,19 +179,19 @@ static bool simple_simd_unroll_loop_filter(statement s)
     /* If this is not a loop, keep on recursing */
     i = statement_instruction(s);
     if (!instruction_loop_p(i))
-        return TRUE;
+        return true;
     l = instruction_loop(i);
 
     /* Can only simdize certain loops */
     iBody = statement_instruction(loop_body(l));
     if (!should_unroll_p(iBody))
-        return TRUE;  /* can't do anything */
+        return true;  /* can't do anything */
 
     /* Unroll as many times as needed by the variables width */
     simd_loop_unroll(s, simple_simd_unroll_rate(l) );
 
     /* Do not recursively analyse the loop */
-    return FALSE;
+    return false;
 }
 
 static void compute_parallelism_factor(statement s, MinMaxVar* factor)
@@ -225,13 +225,13 @@ static bool full_simd_unroll_loop_filter(statement s)
     /* If this is not a loop, keep on recursing */
     i = statement_instruction(s);
     if (!instruction_loop_p(i))
-        return TRUE;
+        return true;
     l = instruction_loop(i);
 
     /* Can only simdize certain loops */
     iBody = statement_instruction(loop_body(l));
     if (!should_unroll_p(iBody))
-        return TRUE;  /* can't do anything */
+        return true;  /* can't do anything */
 
     /* look at each of the statements in the body */
     factor.min = INT_MAX;
@@ -258,8 +258,8 @@ static void simd_unroll_as_needed(statement module_stmt)
     }
     else
     {
-        set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
-        set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
+        set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",true));
+        set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",true));
 
         gen_recurse(module_stmt, statement_domain, 
                 full_simd_unroll_loop_filter, gen_null);
@@ -270,7 +270,7 @@ static void simd_unroll_as_needed(statement module_stmt)
 bool loop_auto_unroll(const char* mod_name) {
     // get the resources
     statement mod_stmt = (statement)
-        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        db_get_memory_resource(DBR_CODE, mod_name, true);
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
@@ -311,7 +311,7 @@ bool simdizer_auto_unroll(char * mod_name)
 {
     // get the resources
     statement mod_stmt = (statement)
-        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        db_get_memory_resource(DBR_CODE, mod_name, true);
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
@@ -333,7 +333,7 @@ bool simdizer_auto_unroll(char * mod_name)
 
     debug_off();
 
-    return TRUE;
+    return true;
 }
 
 static void gather_local_indices(reference r, set s) {

@@ -255,7 +255,7 @@ typedef int Value;
 #define float_to_value(f) ((Value)(f))
 #define double_to_value(d) ((Value)(d))
 
-/* boolean operators on values
+/* bool operators on values
  */
 #define value_eq(v1,v2) ((v1)==(v2))
 #define value_ne(v1,v2) ((v1)!=(v2))

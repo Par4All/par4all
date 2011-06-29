@@ -211,13 +211,13 @@ static void generate_fifo_stats(list lRef, expression buffIndExp, entity ind,
 
     if(!strcmp(effAction, R_EFFECT))
       {
-	bool alreadyDone = FALSE;
+	bool alreadyDone = false;
 
 	MAP(REFERENCE, doneRef,
 	{
 	  if(reference_equal_p(curRef, doneRef))
 	    {
-	      alreadyDone = TRUE;
+	      alreadyDone = true;
 	      break;
 	    }
 	}, lReadDone);
@@ -229,7 +229,7 @@ static void generate_fifo_stats(list lRef, expression buffIndExp, entity ind,
 	    lReadDone = gen_nconc(lReadDone, CONS(REFERENCE, curRef, NIL));
 
 	    statement readStat = generate_fifo_stat(curRef, buffIndExp,
-						    ind, TRUE);
+						    ind, true);
 
 	    if(readStat == statement_undefined)
 	      {
@@ -242,13 +242,13 @@ static void generate_fifo_stats(list lRef, expression buffIndExp, entity ind,
       }
     else
       {
-	bool alreadyDone = FALSE;
+	bool alreadyDone = false;
 
 	MAP(REFERENCE, doneRef,
 	{
 	  if(reference_equal_p(curRef, doneRef))
 	    {
-	      alreadyDone = TRUE;
+	      alreadyDone = true;
 	      break;
 	    }
 	}, lWriteDone);
@@ -260,7 +260,7 @@ static void generate_fifo_stats(list lRef, expression buffIndExp, entity ind,
 	    lWriteDone = gen_nconc(lWriteDone, CONS(REFERENCE, curRef, NIL));
 
 	    statement writeStat = generate_fifo_stat(curRef, buffIndExp,
-						     ind, FALSE);
+						     ind, false);
 
 	    if(writeStat == statement_undefined)
 	      {
@@ -330,14 +330,14 @@ static void generate_scalar_variables()
 
   HASH_MAP(curRef, curBuff,
   {
-    bool alreadyDone = FALSE;
+    bool alreadyDone = false;
     reference refFound = reference_undefined;
 
     MAP(REFERENCE, ref1,
     {
       if(reference_equal_p(curRef, ref1))
 	{
-	  alreadyDone = TRUE;
+	  alreadyDone = true;
 	  refFound = ref1;
 	  break;
 	}
@@ -381,7 +381,7 @@ This function add the wait statements to the statement stat
  */
 statement generate_stat_from_ref_list_HRE(list lRef, statement stat)
 {
-  bool writeFound = FALSE;
+  bool writeFound = false;
 
   MAP(REFERENCE, curRef,
   {
@@ -392,7 +392,7 @@ statement generate_stat_from_ref_list_HRE(list lRef, statement stat)
 
     if(!strcmp(effAction, W_EFFECT))
       {
-	writeFound = TRUE;
+	writeFound = true;
 	break;
       }
 
@@ -424,7 +424,7 @@ This function add the wait statements to the statement stat
  */
 list generate_stat_from_ref_list_HRE_list(list lRef, list lInStats)
 {
-  bool writeFound = FALSE;
+  bool writeFound = false;
 
   MAP(REFERENCE, curRef,
   {
@@ -435,7 +435,7 @@ list generate_stat_from_ref_list_HRE_list(list lRef, list lInStats)
 
     if(!strcmp(effAction, W_EFFECT))
       {
-	writeFound = TRUE;
+	writeFound = true;
 	break;
       }
 
@@ -580,10 +580,10 @@ statement generate_code_test_HRE(statement stat)
     }
 
   // Get the new statements for the true statement
-  statement trueStat = generate_code_function(test_true(statement_test(stat)), FALSE);
+  statement trueStat = generate_code_function(test_true(statement_test(stat)), false);
 
   // Get the new statements for the false statement
-  statement falseStat = generate_code_function(test_false(statement_test(stat)), FALSE);
+  statement falseStat = generate_code_function(test_false(statement_test(stat)), false);
 
   free_statement(test_true(newTest));
   free_statement(test_false(newTest));
@@ -662,7 +662,7 @@ statement comEngine_generate_HRECode(statement externalized_code,
       generate_scalar_variables();
 
       // This means the HRE code is going to be generated
-      gGenHRE = TRUE;
+      gGenHRE = true;
 
       //This function generates the HRE code if we want to have only 
       //one process on the HRE

@@ -80,11 +80,11 @@
 #include "effects-generic.h"
 #include "effects-convex.h"
 
-#define IS_EG TRUE
-#define NOT_EG FALSE
+#define IS_EG true
+#define NOT_EG false
 
-#define PHI_FIRST TRUE
-#define NOT_PHI_FIRST FALSE
+#define PHI_FIRST true
+#define NOT_PHI_FIRST false
 
 /******************************************************** BETA ENTITIES */
 
@@ -453,7 +453,7 @@ void region_sc_append_and_normalize(region reg, Psysteme sc, int level)
   region_system_(reg) = cell_system_sc_append_and_normalize(sc_reg, sc, level);
 }
 
-/* void regions_sc_append(list l_reg, Psysteme sc, boolean arrays_only,
+/* void regions_sc_append(list l_reg, Psysteme sc, bool arrays_only,
  *                        scalars_only, bool nredund_p)
  * input    : a list of regions, a Psysteme and two booleans.
  * output   : a list of regions;
@@ -465,7 +465,7 @@ void region_sc_append_and_normalize(region reg, Psysteme sc, int level)
  * usage    : l_reg =  regions_sc_append(l_reg, ...).
  */
 list regions_sc_append_and_normalize(list l_reg, Psysteme sc,
-		       boolean arrays_only, boolean scalars_only,
+		       bool arrays_only, bool scalars_only,
 		       int level)
 {
     list l_res = NIL;
@@ -479,7 +479,7 @@ list regions_sc_append_and_normalize(list l_reg, Psysteme sc,
     {
       FOREACH(EFFECT, reg, l_reg)
 	    {
-		boolean scalar_p = region_scalar_p(reg);
+		bool scalar_p = region_scalar_p(reg);
 
 		if ((scalar_p && !arrays_only) || (!scalar_p && !scalars_only))
 		{
@@ -512,7 +512,7 @@ list regions_sc_append_and_normalize(list l_reg, Psysteme sc,
  */
 list array_regions_sc_append_and_normalize(list l_reg, Psysteme sc, int level)
 {
-    l_reg = regions_sc_append_and_normalize(l_reg, sc, TRUE, FALSE, level);
+    l_reg = regions_sc_append_and_normalize(l_reg, sc, true, false, level);
     return(l_reg);
 }
 
@@ -530,7 +530,7 @@ void region_sc_append(region reg, Psysteme sc, bool nredund_p)
     region_sc_append_and_normalize(reg, sc, level);
 }
 
-/* void regions_sc_append(list l_reg, Psysteme sc, boolean arrays_only,
+/* void regions_sc_append(list l_reg, Psysteme sc, bool arrays_only,
  *                        scalars_only, bool nredund_p)
  * input    : a list of regions, a Psysteme and two booleans.
  * output   : a list of regions;
@@ -542,7 +542,7 @@ void region_sc_append(region reg, Psysteme sc, bool nredund_p)
  * usage    : l_reg =  regions_sc_append(l_reg, ...).
  */
 list regions_sc_append(list l_reg, Psysteme sc,
-		       boolean arrays_only, boolean scalars_only,
+		       bool arrays_only, bool scalars_only,
 		       bool nredund_p)
 {
     int level = nredund_p? 1: -1;
@@ -560,7 +560,7 @@ list regions_sc_append(list l_reg, Psysteme sc,
  */
 list all_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
 {
-    l_reg = regions_sc_append(l_reg, sc, FALSE, FALSE, nredund_p);
+    l_reg = regions_sc_append(l_reg, sc, false, false, nredund_p);
     return(l_reg);
 }
 
@@ -572,7 +572,7 @@ list all_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
  */
 list scalar_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
 {
-    l_reg = regions_sc_append(l_reg, sc, FALSE, TRUE, nredund_p);
+    l_reg = regions_sc_append(l_reg, sc, false, true, nredund_p);
     return(l_reg);
 }
 
@@ -584,7 +584,7 @@ list scalar_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
  */
 list array_regions_sc_append(list l_reg, Psysteme sc, bool nredund_p)
 {
-    l_reg = regions_sc_append(l_reg, sc, TRUE, FALSE, nredund_p);
+    l_reg = regions_sc_append(l_reg, sc, true, false, nredund_p);
     return(l_reg);
 }
 
@@ -1065,7 +1065,7 @@ reference make_pointed_regions_reference(entity ent, bool indexed_p)
 reference make_regions_reference(entity ent)
 {
   /* The Fortran semantics */
-  return make_pointed_regions_reference(ent, FALSE);
+  return make_pointed_regions_reference(ent, false);
 }
 
 
@@ -1133,7 +1133,7 @@ effect make_reference_region(reference ref, action tac)
   entity e = reference_variable(ref);
   type t = entity_type(e);
   effect reg;
-  boolean linear_p = TRUE;
+  bool linear_p = true;
   Psysteme sc;
   type  bct = basic_concrete_type(t);
   int d = effect_type_depth(bct), dim;
@@ -1196,7 +1196,7 @@ effect make_reference_region(reference ref, action tac)
 	{
 	  /* For equalities. */
 	  expression exp_ind = EXPRESSION(CAR(ind));
-	  boolean dim_linear_p;
+	  bool dim_linear_p;
 	  bool unbounded_p =  unbounded_expression_p(exp_ind);
 
 	  ifdebug(3)
@@ -1312,7 +1312,7 @@ effect reference_whole_region(reference ref, action tac)
     entity e = reference_variable(ref);
     type t = entity_type(e);
     int d = type_depth(t), dim;
-    boolean linear_p = TRUE;
+    bool linear_p = true;
     Psysteme sc;
     bool pointer_p = pointer_type_p(ultimate_type(t));
 
@@ -1358,7 +1358,7 @@ effect reference_whole_region(reference ref, action tac)
 	  {
 	    /* For equalities. */
 	    expression exp_ind = EXPRESSION(CAR(ind));
-	    boolean dim_linear_p;
+	    bool dim_linear_p;
 	    bool unbounded_p =  unbounded_expression_p(exp_ind);
 
 	    ifdebug(3)
@@ -1432,7 +1432,7 @@ region entity_whole_region(entity e, action tac)
  *            allocated to the variable reference : the systeme of constraints
  *            is a sc_rn(phi_1, ..., phi_n) except if REGIONS_WITH_ARRAY_BOUNDS
  *            is true. The region is a MAY region.
- *            The boolean force_may_p is here for consistency with
+ *            The bool force_may_p is here for consistency with
  *            effect_to_store_independent_sdfi_list.
  *            We could refine this function in order to keep constraints
  *            which are independent from the store.
@@ -1652,7 +1652,7 @@ effect region_append(effect eff1, effect eff2)
 	}
     }
 
-  region_sc_append(eff1, sc2, TRUE);
+  region_sc_append(eff1, sc2, true);
 
   effect_approximation_tag(eff1) =
     approximation_and(effect_approximation_tag(eff1),
@@ -1760,7 +1760,7 @@ expression make_phi_expression(int n)
  *            equation to create is an equality or an inequality, and
  *            this last case, the direction of the inequality.
  *
- * output :   TRUE if expr is linear, FALSE otherwise, which means that
+ * output :   true if expr is linear, false otherwise, which means that
  *            sc does not contain all the information associated to expr
  *            (MAY region).
  *
@@ -1769,11 +1769,11 @@ expression make_phi_expression(int n)
  *
  * comment  : The equation can, in fact, be an equality or an inequality :
  *
- *            If it is an equality   (is_eg == TRUE)  :
+ *            If it is an equality   (is_eg == true)  :
  *                                     PHI  - expr  = 0
- *            If it is an inequality (is_eg == FALSE) :
- *                   (is_phi_first == FALSE)        expr - PHI  <= 0
- *                   (is_phi_first == TRUE )        PHI  - expr <= 0
+ *            If it is an inequality (is_eg == false) :
+ *                   (is_phi_first == false)        expr - PHI  <= 0
+ *                   (is_phi_first == true )        PHI  - expr <= 0
  *
  *            The indice of the region descriptor (PHI) is given by
  *            "dim".  The equation is added only if the expression
@@ -1795,7 +1795,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 {
   normalized nexpr = NORMALIZE_EXPRESSION(expr);
 
-  bool must_p = FALSE; /* Do we capture the semantics of the
+  bool must_p = false; /* Do we capture the semantics of the
 			  subscript expression exactly for sure? */
   Psysteme sc = *psc;
 
@@ -1844,7 +1844,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 	  sc->dimension = vect_size(sc->base);
 	}
 
-      must_p = TRUE;
+      must_p = true;
     }
     else {
       /* Some variables are not analyzed by semantics, for instance
@@ -1852,7 +1852,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
       /* No information about this subscript expression is added in
 	 the region. */
       vect_rm(v2);
-      must_p = FALSE;
+      must_p = false;
     }
   }
   else /* the expression is not linear */ {
@@ -1903,7 +1903,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 	 The approximation will become MAY (although in some cases, it is MUST) */
 	  
       entity phi = make_phi_entity(dim);
-      transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),TRUE);
+      transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),true);
 	  
       /* Careful: side-effects are lost */
       if (!transformer_undefined_p(trans)) {
@@ -1918,7 +1918,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 	   p_trans is returned. */
 	sc = sc_safe_append(sc, p_trans);
       }
-      must_p = FALSE;
+      must_p = false;
 	
     }
     else {
@@ -1929,7 +1929,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
        * declaration such as t[n*n];
        */
       pips_user_warning("Case not implemented as well as it could be\n");
-      must_p = FALSE;
+      must_p = false;
     }
   }
   pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
@@ -1949,7 +1949,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 void phi_first_sort_base(Pbase *ppbase)
 {
     Pvecteur v, v_pred = VECTEUR_NUL;
-    boolean first = TRUE, phi_only = TRUE;
+    bool first = true, phi_only = true;
 
     ifdebug(8) {
 	pips_debug(8, "initial base :\n");
@@ -1966,7 +1966,7 @@ void phi_first_sort_base(Pbase *ppbase)
 	    if (phi_only)
 	    {
 		v_pred = v;
-		if (first) first = FALSE;
+		if (first) first = false;
 	    }
 	    else
 	    {
@@ -1980,8 +1980,8 @@ void phi_first_sort_base(Pbase *ppbase)
 	{
 	    if (phi_only)
 	    {
-		first = FALSE;
-		phi_only = FALSE;
+		first = false;
+		phi_only = false;
 	    }
 	    v_pred = v;
 	}
@@ -2174,7 +2174,7 @@ list rho_entities_list(int rho_min, int rho_max)
     return(l_rho);
 }
 
-boolean rho_reference_p( reference ref )
+bool rho_reference_p( reference ref )
 {
   list l = reference_indices(ref);
 
@@ -2187,21 +2187,21 @@ boolean rho_reference_p( reference ref )
       if (!entity_field_p(e))
 	{
 	  if (variable_rho_p(e))
-	    return TRUE;
+	    return true;
 	  else
-	    return FALSE;
+	    return false;
 	}
     }
-  return TRUE; /* in case of a scalar */
+  return true; /* in case of a scalar */
 }
 
-/* boolean psi_region_p(effect reg)
+/* bool psi_region_p(effect reg)
  * input    : a region.
- * output   : TRUE if it is a PSI region
+ * output   : true if it is a PSI region
  * modifies : nothing
  * comment  : tests if the first indice of the reference is a PSI variable.
  */
-boolean rho_region_p(region reg)
+bool rho_region_p(region reg)
 {
     pips_assert("array region (not scalar)\n", !region_scalar_p(reg));
 
@@ -2336,7 +2336,7 @@ void phi_to_psi_region(region reg)
 }
 
 
-boolean psi_reference_p(reference ref)
+bool psi_reference_p(reference ref)
 {
 
   list l = reference_indices(ref);
@@ -2350,21 +2350,21 @@ boolean psi_reference_p(reference ref)
       if (!entity_field_p(e))
 	{
 	  if (variable_psi_p(e))
-	    return TRUE;
+	    return true;
 	  else
-	    return FALSE;
+	    return false;
 	}
     }
-  return TRUE; /* in case of a scalar */
+  return true; /* in case of a scalar */
 }
 
-/* boolean psi_region_p(effect reg)
+/* bool psi_region_p(effect reg)
  * input    : a region.
- * output   : TRUE if it is a PSI region
+ * output   : true if it is a PSI region
  * modifies : nothing
  * comment  : tests if the first indice of the reference is a PSI variable.
  */
-boolean psi_region_p(region reg)
+bool psi_region_p(region reg)
 {
     pips_assert("array region (not scalar)\n", !region_scalar_p(reg));
 
@@ -2373,11 +2373,11 @@ boolean psi_region_p(region reg)
 
 /************************************************************* PROPERTIES */
 
-static bool exact_regions_property = FALSE;
-static bool must_regions_property = FALSE;
-static bool array_bounds_property = FALSE;
-static bool disjunct_property = FALSE;
-static bool op_statistics_property = FALSE;
+static bool exact_regions_property = false;
+static bool must_regions_property = false;
+static bool array_bounds_property = false;
+static bool disjunct_property = false;
+static bool op_statistics_property = false;
 
 bool exact_regions_p()
 {
@@ -2422,8 +2422,8 @@ void get_regions_properties()
 
 void get_in_out_regions_properties()
 {
-    exact_regions_property = TRUE;
-    must_regions_property = TRUE;
+    exact_regions_property = true;
+    must_regions_property = true;
     array_bounds_property = get_bool_property("REGIONS_WITH_ARRAY_BOUNDS");
     disjunct_property = get_bool_property("DISJUNCT_IN_OUT_REGIONS");
     op_statistics_property = get_bool_property("REGIONS_OP_STATISTICS");
@@ -2459,12 +2459,12 @@ static int compare_region_entities(entity *pe1, entity *pe2);
 
 static int compare_region_equalities(Pcontrainte *pc1, Pcontrainte *pc2)
 {
-    return(compare_region_constraints(pc1, pc2, TRUE));
+    return(compare_region_constraints(pc1, pc2, true));
 }
 
 static int compare_region_inequalities(Pcontrainte *pc1, Pcontrainte *pc2)
 {
-    return(compare_region_constraints(pc1, pc2, FALSE));
+    return(compare_region_constraints(pc1, pc2, false));
 }
 
 
@@ -2490,13 +2490,13 @@ void region_sc_sort(Psysteme sc, Pbase sorted_base)
 	pips_debug(1, "\nafter sc_vect_sort:\n");
 	sc_syst_debug(sc);
     }
-    sc->inegalites = region_constraints_sort(sc->inegalites, sorted_base, FALSE);
+    sc->inegalites = region_constraints_sort(sc->inegalites, sorted_base, false);
     ifdebug(1)
     {
 	pips_debug(1, "\nafter inequality sort:\n");
 	sc_syst_debug(sc);
     }
-    sc->egalites = region_constraints_sort(sc->egalites, sorted_base, TRUE);
+    sc->egalites = region_constraints_sort(sc->egalites, sorted_base, true);
     ifdebug(1)
     {
 	pips_debug(1, "\nafter sort:\n");
@@ -2683,7 +2683,7 @@ static int compare_region_vectors(Pvecteur *pv1, Pvecteur *pv2)
  */
 static int compare_region_entities(entity *pe1, entity *pe2)
 {
-    int phi_1 = FALSE, phi_2 = FALSE,
+    int phi_1 = false, phi_2 = false,
 	null_1 = (*pe1==(entity)NULL),
 	null_2 = (*pe2==(entity)NULL);
 
@@ -2868,7 +2868,7 @@ char *func_entity_name(entity e)
 
 
 /* bool same_common_variables_p(entity e1, e2)
- * output   : returns TRUE if both entities, which are common variables,
+ * output   : returns true if both entities, which are common variables,
  *            occupy the same place in a COMMON, and, also, have
  *            the same shape.
  * modifies : nothing .
@@ -2884,7 +2884,7 @@ char *func_entity_name(entity e)
  */
 bool same_common_variables_p(entity e1, entity e2)
 {
-    bool equal = FALSE;
+    bool equal = false;
     storage st1, st2;
     int offs1, offs2;
 
@@ -2927,14 +2927,14 @@ bool same_common_variables_p(entity e1, entity e2)
 	    /* Same number of dimensions. */
 	    if (nb_dims1 == nb_dims2) {
 		int count_dim;
-		for (count_dim = 1, equal = TRUE;
+		for (count_dim = 1, equal = true;
 		     (count_dim <= nb_dims1) && (equal); count_dim++) {
 		    int size1 = SizeOfIthDimension(e1, count_dim);
 		    int size2 = SizeOfIthDimension(e2, count_dim);
 
 		    /* Same dimension size. */
 		    if (size1 != size2) {
-			equal = FALSE;
+			equal = false;
 		    }
 		}
 	    }
@@ -2997,7 +2997,7 @@ bool empty_convex_context_p(transformer context)
 	 * FC (RK).
 	 */
 	pips_debug(3, "undefined contexted found, returned as empty\n");
-	return TRUE;
+	return true;
     }
 
     /* else
@@ -3016,12 +3016,12 @@ static bool max_one_phi_var_per_constraint(c)
 Pcontrainte c;
 {
     for(; c; c=c->succ)
-	if (base_nb_phi(c->vecteur)>=2) return FALSE;
+	if (base_nb_phi(c->vecteur)>=2) return false;
 
-    return TRUE;
+    return true;
 }
 
-/* returns TRUE is syst defines a rectangle on phi variables
+/* returns true is syst defines a rectangle on phi variables
  */
 bool rectangular_region_p(region r)
 {
@@ -3047,12 +3047,12 @@ statement s;
             if (!approximation_exact_p(effect_approximation(e)) ||
                     !rectangular_region_p(e))
             {
-                pips_debug(6, "FALSE\n"); return FALSE;
+                pips_debug(6, "FALSE\n"); return false;
             }
         }
     }
     pips_debug(6, "TRUE\n");
-    return TRUE;
+    return true;
 }
 
 /********************************************************************

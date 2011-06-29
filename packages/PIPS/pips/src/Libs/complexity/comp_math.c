@@ -35,7 +35,7 @@
  * complexity complexity_dup(comp)
  * void complexity_rm(pcomp)
  * complexity make_single_var_complexity(float, var)
- * boolean complexity_constant_p(comp)
+ * bool complexity_constant_p(comp)
  * float complexity_TCST(comp)
  * void complexity_scalar_mult(pcomp, f)
  * void complexity_float_add(pcomp, f)
@@ -123,7 +123,7 @@ complexity clower, cupper;
 	pplower = complexity_polynome(clower);
 	ppupper = complexity_polynome(cupper);
 	
-	if (FALSE) {
+	if (false) {
 	    fprintf(stderr, "summing ");
 	    prp(complexity_polynome(comp));
 	    fprintf(stderr, " %s running between ", 
@@ -182,11 +182,11 @@ complexity compsubst;
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	    (void) complexity_consistent_p(cresult);
 	    fprintf(stderr,"complexity_var_subst, comp    is ");
-	    complexity_fprint(stderr, comp, FALSE, TRUE);
+	    complexity_fprint(stderr, comp, false, true);
 	    fprintf(stderr,"complexity_var_subst, compsubst is ");
-	    complexity_fprint(stderr, compsubst, FALSE, TRUE);
+	    complexity_fprint(stderr, compsubst, false, true);
 	    fprintf(stderr,"complexity_var_subst, cresult is ");
-	    complexity_fprint(stderr, cresult, FALSE, TRUE);
+	    complexity_fprint(stderr, cresult, false, true);
 	}
     }
 
@@ -241,32 +241,32 @@ complexity make_zero_complexity()
 }
 
 /* zero complexity check. Abort if undefined */
-boolean complexity_zero_p(comp)
+bool complexity_zero_p(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) ) 
 	pips_internal_error("undefined complexity");
 
     if ( POLYNOME_NUL_P((Ppolynome)complexity_eval(comp)) )
-	return (TRUE);
-    return (FALSE);
+	return (true);
+    return (false);
 }
 
-/* TRUE if comp is constant. Abort if undefined  */
-boolean complexity_constant_p(comp)
+/* true if comp is constant. Abort if undefined  */
+bool complexity_constant_p(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) ) 
 	pips_internal_error("undefined complexity");
 
     if ( complexity_zero_p(comp) ) 
-	return (TRUE);
+	return (true);
     else 
 	return (polynome_constant_p(complexity_eval(comp)));
 }
 
-/* TRUE if comp is unknown. Abort if undefined  */
-boolean complexity_unknown_p(comp)
+/* true if comp is unknown. Abort if undefined  */
+bool complexity_unknown_p(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) ) 
@@ -278,10 +278,10 @@ complexity comp;
     /*
     if ( polynome_contains_var((Ppolynome)complexity_eval(comp), 
 			       UNKNOWN_RANGE) ) 
-	return (TRUE);
+	return (true);
     else 
     */
-	return (FALSE);
+	return (false);
 }
 
 /* return the constant term of comp. Abort if undefined */

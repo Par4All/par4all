@@ -398,7 +398,7 @@ craft_layout_align(statement mod_stat)
 
 
 /*=======================================================================*/
-boolean print_parallelizedCMF_code(mod_name)
+bool print_parallelizedCMF_code(mod_name)
 char *mod_name;
 {
   plc the_plc;
@@ -423,9 +423,9 @@ char *mod_name;
   s = code_decls_text(c);
 
   /* Static controlize code */
-  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE); 
+  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, true); 
   STS = (statement_mapping) db_get_memory_resource(DBR_STATIC_CONTROL, 
-					    mod_name, TRUE); 
+					    mod_name, true); 
   set_current_stco_map(STS);
   stco = get_stco_from_current_map(mod_stat);
 
@@ -437,9 +437,9 @@ char *mod_name;
   
   /* The DFG, the BDT and the PLC */
   current_dfg = adg_pure_dfg((graph) db_get_memory_resource(DBR_ADFG,
-							mod_name, TRUE));
-  current_bdt = (bdt) db_get_memory_resource(DBR_BDT, mod_name, TRUE);
-  the_plc = (plc) db_get_memory_resource(DBR_PLC, mod_name, TRUE);
+							mod_name, true));
+  current_bdt = (bdt) db_get_memory_resource(DBR_BDT, mod_name, true);
+  the_plc = (plc) db_get_memory_resource(DBR_PLC, mod_name, true);
   if (get_debug_level() > 0) {
     fprint_dfg(stderr, current_dfg);
     fprint_bdt(stderr, current_bdt);
@@ -448,12 +448,12 @@ char *mod_name;
 
   pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
   set_string_property(PRETTYPRINT_PARALLEL, "cmf");
-  set_bool_property("PRETTYPRINT_ALL_DECLARATIONS", TRUE);
+  set_bool_property("PRETTYPRINT_ALL_DECLARATIONS", true);
 
   init_prettyprint(empty_text);
 
   mod_stat = (statement)
-    db_get_memory_resource(DBR_REINDEXED_CODE, mod_name, TRUE);
+    db_get_memory_resource(DBR_REINDEXED_CODE, mod_name, true);
     
   insure_declaration_coherency_of_module(module, mod_stat);
 
@@ -479,7 +479,7 @@ char *mod_name;
 
 
 /*=======================================================================*/
-boolean print_parallelizedCRAFT_code(mod_name)
+bool print_parallelizedCRAFT_code(mod_name)
 char *mod_name;
 {
   plc the_plc;
@@ -504,9 +504,9 @@ char *mod_name;
   s = code_decls_text(c);
 
   /* Static controlize code */
-  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE); 
+  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, true); 
   STS = (statement_mapping)db_get_memory_resource(DBR_STATIC_CONTROL, 
-					   mod_name, TRUE); 
+					   mod_name, true); 
   set_current_stco_map(STS);
   stco = get_stco_from_current_map(mod_stat);
 
@@ -519,9 +519,9 @@ char *mod_name;
   /* The DFG, the BDT and the PLC */
   current_dfg = adg_pure_dfg((graph) db_get_memory_resource(DBR_ADFG,
 							    mod_name,
-							    TRUE));
-  current_bdt = (bdt) db_get_memory_resource(DBR_BDT, mod_name, TRUE);
-  the_plc = (plc) db_get_memory_resource(DBR_PLC, mod_name, TRUE);
+							    true));
+  current_bdt = (bdt) db_get_memory_resource(DBR_BDT, mod_name, true);
+  the_plc = (plc) db_get_memory_resource(DBR_PLC, mod_name, true);
   if (get_debug_level() > 0) {
     fprint_dfg(stderr, current_dfg);
     fprint_bdt(stderr, current_bdt);
@@ -530,12 +530,12 @@ char *mod_name;
 
   pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
   set_string_property(PRETTYPRINT_PARALLEL, "craft");
-  set_bool_property("PRETTYPRINT_ALL_DECLARATIONS", TRUE);
+  set_bool_property("PRETTYPRINT_ALL_DECLARATIONS", true);
 
   init_prettyprint(empty_text);
 
   mod_stat = (statement) db_get_memory_resource(DBR_REINDEXED_CODE,
-						mod_name, TRUE);
+						mod_name, true);
     
   insure_declaration_coherency_of_module(module, mod_stat);
   craft_layout_align(mod_stat);

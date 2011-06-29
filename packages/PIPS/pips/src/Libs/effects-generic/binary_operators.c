@@ -62,10 +62,10 @@
           ( put as a parameter because testing abstract locations is costly and is
 	  better done outside loops when possible)
    @param[in] eff2_abstract_location_p is true if eff2 is an abstract location
-   @param[out] eff1_still_combinable_p is a pointer to a boolean which must be true
+   @param[out] eff1_still_combinable_p is a pointer to a bool which must be true
           when entering the function, and stays true if eff1 may still be
 	  combinable with other effects in the calling function
-   @param[out] eff2_still_combinable_p is a pointer to a boolean which must be true
+   @param[out] eff2_still_combinable_p is a pointer to a bool which must be true
           when entering the function, and stays true if eff2 may still be
 	  combinable with other effects in the calling function
    @param[in] concrete_effects_union_op computes the union of two effects on
@@ -152,10 +152,10 @@ static list effects_generic_union_op(effect eff1, effect eff2,
           ( put as a parameter because testing abstract locations is costly and is
 	  better done outside loops when possible)
    @param[in] eff2_abstract_location_p is true if eff2 is an abstract location
-   @param[out] eff1_still_combinable_p is a pointer to a boolean which must be true
+   @param[out] eff1_still_combinable_p is a pointer to a bool which must be true
           when entering the function, and stays true if eff1 may still be
 	  combinable with other effects in the calling function
-   @param[out] eff2_still_combinable_p is a pointer to a boolean which must be true
+   @param[out] eff2_still_combinable_p is a pointer to a bool which must be true
           when entering the function, and stays true if eff2 may still be
 	  combinable with other effects in the calling function
    @param[in] concrete_effects_intersection_op computes the union of two effects on
@@ -249,10 +249,10 @@ static list effects_generic_intersection_op(effect eff1, effect eff2,
           ( put as a parameter because testing abstract locations is costly and is
 	  better done outside loops when possible)
    @param[in] eff2_abstract_location_p is true if eff2 is an abstract location
-   @param[out] eff1_still_combinable_p is a pointer to a boolean which must be true
+   @param[out] eff1_still_combinable_p is a pointer to a bool which must be true
           when entering the function, and stays true if eff1 may still be
 	  combinable with other effects in the calling function
-   @param[out] eff2_still_combinable_p is a pointer to a boolean which must be true
+   @param[out] eff2_still_combinable_p is a pointer to a bool which must be true
           when entering the function, and stays true if eff2 may still be
 	  combinable with other effects in the calling function
    @param[in] concrete_effects_sup_difference_op computes the union of two effects on
@@ -332,10 +332,10 @@ static list effects_generic_sup_difference_op(effect eff1, effect eff2,
           ( put as a parameter because testing abstract locations is costly and is
 	  better done outside loops when possible)
    @param[in] eff2_abstract_location_p is true if eff2 is an abstract location
-   @param[out] eff1_still_combinable_p is a pointer to a boolean which must be true
+   @param[out] eff1_still_combinable_p is a pointer to a bool which must be true
           when entering the function, and stays true if eff1 may still be
 	  combinable with other effects in the calling function
-   @param[out] eff2_still_combinable_p is a pointer to a boolean which must be true
+   @param[out] eff2_still_combinable_p is a pointer to a bool which must be true
           when entering the function, and stays true if eff2 may still be
 	  combinable with other effects in the calling function
    @param[in] concrete_effects_sup_difference_op computes the union of two effects on
@@ -411,8 +411,8 @@ static list effects_generic_inf_difference_op(effect eff1, effect eff2,
    beware : modifies l1, l2 and their effects
 
   @param l1 and l2 are two lists of effects.
-  @param  r1_r2_combinable_p is a boolean function that takes two
-          individual effects as arguments and renders TRUE when they are
+  @param  r1_r2_combinable_p is a bool function that takes two
+          individual effects as arguments and renders true when they are
           considered as combinable ;
   @param  r1_r2_generic_binary_op is a binary operator that combines two
           individual effects whatever their path may be;
@@ -549,8 +549,8 @@ list_of_effects_generic_binary_op(
    beware : modifies/frees l1, l2 and their effects
 
   @param l1 and l2 are two lists of effects.
-  @param  r1_r2_combinable_p is a boolean function that takes two
-          individual effects as arguments and renders TRUE when they are
+  @param  r1_r2_combinable_p is a bool function that takes two
+          individual effects as arguments and renders true when they are
           considered as combinable ;
   @param  r1_r2_union_op is a union operator that combines two
           individual effects;
@@ -597,8 +597,8 @@ list_of_effects_generic_union_op(
    *beware*: modifies l1, l2 and their effects.
 
   @param  l1 and l2 are two lists of effects.
-  @param  r1_r2_combinable_p is a boolean function that takes two
-          individual effects as arguments and renders TRUE when they are
+  @param  r1_r2_combinable_p is a bool function that takes two
+          individual effects as arguments and renders true when they are
           considered as combinable;
   @param  r1_r2_intersection_op is a binary operator that combines two
           individual effects on concrete locations;
@@ -634,8 +634,8 @@ list list_of_effects_generic_intersection_op(
    *beware*: modifies l1, l2 and their effects.
 
   @param  l1 and l2 are two lists of effects.
-  @param  r1_r2_combinable_p is a boolean function that takes two
-          individual effects as arguments and renders TRUE when they are
+  @param  r1_r2_combinable_p is a bool function that takes two
+          individual effects as arguments and renders true when they are
           considered as combinable;
   @param  r1_r2_intersection_op is a binary operator that combines two
           individual effects on concrete locations;
@@ -672,8 +672,8 @@ list list_of_effects_generic_cells_intersection_op(
    of effects/regions. *beware*: modifies l1, l2 and their effects.
 
   @param  l1 and l2 are two lists of effects.
-  @param  r1_r2_combinable_p is a boolean function that takes two
-          individual effects as arguments and renders TRUE when they are
+  @param  r1_r2_combinable_p is a bool function that takes two
+          individual effects as arguments and renders true when they are
           considered as combinable;
   @param  r1_r2_difference_op is a binary operator that combines two
           individual effects on concrete locations;
@@ -710,8 +710,8 @@ list list_of_effects_generic_sup_difference_op(
    of effects/regions. *beware*: modifies l1, l2 and their effects.
 
   @param  l1 and l2 are two lists of effects.
-  @param  r1_r2_combinable_p is a boolean function that takes two
-          individual effects as arguments and renders TRUE when they are
+  @param  r1_r2_combinable_p is a bool function that takes two
+          individual effects as arguments and renders true when they are
           considered as combinable;
   @param  r1_r2_concrete_inf_difference_op is a binary operator that combines two
           individual effects on concrete locations;
@@ -748,8 +748,8 @@ list list_of_effects_generic_inf_difference_op(
    of effects/regions. *beware*: modifies l1, l2 and their effects.
 
   @param  l1 and l2 are two lists of effects.
-  @param  r1_r2_combinable_p is a boolean function that takes two
-          individual effects as arguments and renders TRUE when they are
+  @param  r1_r2_combinable_p is a bool function that takes two
+          individual effects as arguments and renders true when they are
           considered as combinable;
   @param  r1_r2_concrete_inf_difference_op is a binary operator that combines two
           individual effects on concrete locations;
@@ -783,7 +783,7 @@ list list_of_effects_generic_cells_inf_difference_op(
 
 list proper_to_summary_effects(list l_effects)
 {
-    return proper_effects_combine(l_effects, FALSE);
+    return proper_effects_combine(l_effects, false);
 }
 
 
@@ -797,7 +797,7 @@ list proper_to_summary_effects(list l_effects)
 
 list proper_effects_contract(list l_effects)
 {
-    return(proper_effects_combine(l_effects, TRUE));
+    return(proper_effects_combine(l_effects, true));
 }
 
 /**
@@ -840,7 +840,7 @@ list proper_effects_combine(list l_eff, bool scalars_only_p)
    solved by avoiding them. BC
 */
 /* list proper_effects_combine(list l_effects, bool scalars_only_p)
- * input    : a list of proper effects, and a boolean to know on which
+ * input    : a list of proper effects, and a bool to know on which
  *            elements to perform the combination.
  * output   : a list of effects, in which the selected elements have been
  *            merged.
@@ -927,7 +927,7 @@ static list __attribute__((unused)) old_proper_effects_combine(list l_effects, b
     string n;
     tag a;
     action_kind ak;
-    bool may_combine, do_combine = FALSE;
+    bool may_combine, do_combine = false;
     list do_combine_item = NIL;
     list next = CDR(cur); /* now, as 'cur' may be removed... */
 
@@ -969,14 +969,14 @@ static list __attribute__((unused)) old_proper_effects_combine(list l_effects, b
       case is_action_write:
 	if (hash_defined_p(all_write_effects, n))
 	{
-	  do_combine = TRUE;
+	  do_combine = true;
 	  do_combine_item = hash_get(all_write_effects, n);
 	}
 	break;
       case is_action_read:
 	if (hash_defined_p(all_read_effects, n))
 	{
-	  do_combine = TRUE;
+	  do_combine = true;
 	  do_combine_item = hash_get(all_read_effects, n);
 	}
 	break;
@@ -1008,7 +1008,7 @@ static list __attribute__((unused)) old_proper_effects_combine(list l_effects, b
 	free(cur);
       }
       else {
-	do_combine = FALSE;
+	do_combine = false;
       }
     }
     if(!do_combine)

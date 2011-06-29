@@ -308,7 +308,7 @@ rule find_rule_by_phase(const char* pname)
 void add_rule(rule r)
 {
     string pn = rule_phase(r);
-    bool   active_phase = FALSE;
+    bool   active_phase = false;
 
     /* Check resources produced by this rule */
     FOREACH(VIRTUAL_RESOURCE, vr, rule_produced(r)) {
@@ -320,7 +320,7 @@ void add_rule(rule r)
 	if ((phase = hash_get(activated, vrn)) == HASH_UNDEFINED_VALUE) {
 	    pips_debug(1, "Default function for %s is %s\n", vrn, pn);
 
-	    active_phase = TRUE;
+	    active_phase = true;
 	    hash_put(activated, vrn, pn);
 
 	    makefile_active_phases(pipsmakefile) = 
@@ -408,5 +408,5 @@ close_makefile(const char* name)
 {
     save_makefile(name);
     free_makefile(pipsmakefile), pipsmakefile = makefile_undefined;
-    return TRUE;
+    return true;
 }

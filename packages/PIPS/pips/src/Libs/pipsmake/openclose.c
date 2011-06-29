@@ -88,7 +88,7 @@ string  make_open_workspace(const char* name)
 	else
 	{
 	    pips_user_warning("Cannot read properties...\n");
-	    db_close_workspace(TRUE);
+	    db_close_workspace(true);
 	}
     } else
 	pips_user_warning("No workspace %s to open\n", name);
@@ -100,7 +100,7 @@ string  make_open_workspace(const char* name)
  */
 bool make_close_workspace(bool is_quit)
 {
-    bool res = TRUE;
+    bool res = true;
     string name;
 
     if (db_get_current_module_name()) /* lazy... */

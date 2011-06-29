@@ -349,7 +349,7 @@ bool simd_atomizer(char * mod_name)
 {
     /* get the resources */
     statement mod_stmt = (statement)
-        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        db_get_memory_resource(DBR_CODE, mod_name, true);
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
@@ -370,7 +370,7 @@ bool simd_atomizer(char * mod_name)
 
     debug_off();
 
-    return TRUE;
+    return true;
 }
 
 static bool do_expression_reduction(statement s, reduction r, expression e) {

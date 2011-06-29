@@ -121,7 +121,7 @@ summary_out_effects_stmt_filter(statement s)
 {
     pips_debug(1, "statement %03zd\n", statement_number(s));
     current_stmt = s;
-    return(TRUE);
+    return(true);
 }
 
 
@@ -138,7 +138,7 @@ out_effects_from_caller_to_callee(entity caller, entity callee)
     
     /* All we need to perform the translation */
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, caller_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, caller_name, true) );
     caller_statement = get_current_module_statement();
 
     (*effects_computation_init_func)(caller_name);
@@ -181,7 +181,7 @@ summary_out_effects_engine(char *module_name)
     /* Look for all call sites in the callers */
     callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
 						       module_name,
-						       TRUE);
+						       true);
     entity callee = module_name_to_entity(module_name);
 
 
@@ -217,7 +217,7 @@ summary_out_effects_engine(char *module_name)
     ifdebug(1) 
     {
       set_current_module_statement( (statement)
-				    db_get_memory_resource(DBR_CODE, module_local_name(callee), TRUE) );
+				    db_get_memory_resource(DBR_CODE, module_local_name(callee), true) );
 
 	pips_debug(1, "summary out_effects for module %s:\n", module_name);
 	(*effects_prettyprint_func)(l_eff);
@@ -229,7 +229,7 @@ summary_out_effects_engine(char *module_name)
     free_effects_private_current_context_stack();
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 
@@ -308,7 +308,7 @@ out_effects_from_unstructured_to_nodes(unstructured u)
     effects_free(l_out_unst);
 
     debug(1,"out_regions_from_unstructured_to_nodes","end\n");
-    return(TRUE);
+    return(true);
 }
 
 
@@ -516,13 +516,13 @@ out_effects_from_loop_to_body(loop l)
     }
 
     store_out_effects_list(body_stat, l_body_out);    
-    return(TRUE);
+    return(true);
 }
 
 
 /* static bool out_effects_from_test_to_branches(test t)
  * input    : a test.
- * output   : the TRUE boolean.
+ * output   : the true boolean.
  * modifies : .
  * comment  : computes the out regions of each branch of the test.	
  */
@@ -561,7 +561,7 @@ out_effects_from_test_to_branches(test t)
     }
     
     pips_debug(1,"end\n");
-    return(TRUE);
+    return(true);
 }
 
 /* Rout[s in for(c)s] = Rw[s] * MAY ?
@@ -578,7 +578,7 @@ static bool out_effects_from_for_to_body(forloop f)
       lout);
   store_out_effects_list(body, lout);
 
-  return TRUE;
+  return true;
 }
 
 /* Rout[s in while(c)s] = Rw[s] * MAY ?
@@ -595,7 +595,7 @@ static bool out_effects_from_while_to_body(whileloop w)
       lout);
   store_out_effects_list(body, lout);
 
-  return TRUE;
+  return true;
 }
 
 /* void out_regions_from_block_to_statements(list l_stat, list l_out, ctrans)
@@ -625,7 +625,7 @@ out_effects_from_block_to_statements(sequence seq)
 	/* empty block of statements. Nothing to do. */
 	if (get_bool_property("WARN_ABOUT_EMPTY_SEQUENCES"))
 	    pips_user_warning("empty sequence\n");	
-	return TRUE;
+	return true;
     }
 
     if (gen_length(l_stat) == 1) 
@@ -735,7 +735,7 @@ out_effects_from_block_to_statements(sequence seq)
 	
     }
     pips_debug(1,"end\n");
-    return(TRUE);
+    return(true);
 }
 
 
@@ -744,7 +744,7 @@ out_effects_statement_filter(statement s)
 {
     pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);   
-    return TRUE;
+    return true;
 }
 
 static void
@@ -807,7 +807,7 @@ out_effects_engine(char *module_name)
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, module_name, true) );
     module_stat = get_current_module_statement();
     
     (*effects_computation_init_func)(module_name);
@@ -855,5 +855,5 @@ out_effects_engine(char *module_name)
 
     free_effects_private_current_context_stack();
 
-    return TRUE;
+    return true;
 }

@@ -54,7 +54,7 @@ void generic_print_code_pv(char * module_name, pv_context * ctxt)
   bool success;
 
   set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, TRUE));  
+				db_get_memory_resource(DBR_CODE, module_name, true));  
   set_current_module_entity(module_name_to_entity(module_name));
 
   set_pv((*ctxt->db_get_pv_func)(module_name));
@@ -78,7 +78,7 @@ bool print_code_simple_pointer_values(char * module_name)
   pv_context ctxt = make_simple_pv_context();
   generic_print_code_pv(module_name, &ctxt);
   reset_pv_context(&ctxt);
-  return(TRUE);
+  return(true);
 }
 
 void generic_print_code_gen_kill_pv(char * module_name)
@@ -90,5 +90,5 @@ bool print_code_simple_gen_kill_pointer_values(char * module_name)
   pv_context ctxt = make_simple_pv_context();
   generic_print_code_gen_kill_pv(module_name);
   reset_pv_context(&ctxt);
-  return(TRUE);
+  return(true);
 }

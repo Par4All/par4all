@@ -48,7 +48,7 @@
 #include "vecteur.h"
 #include "contrainte.h"
 
-/* void contrainte_fprint(FILE * fp, Pcontrainte c, boolean is_inegalite,
+/* void contrainte_fprint(FILE * fp, Pcontrainte c, bool is_inegalite,
  *                        char * (*variable_name)()):
  *                                                                          
  * imprime dans le fichier fp la contrainte c, de type egalite ou inegalite
@@ -123,7 +123,7 @@ fprint_contrainte_vecteur(
 void contrainte_fprint(fp,c,is_inegalite,variable_name)
 FILE *fp;
 Pcontrainte c;
-boolean is_inegalite;
+bool is_inegalite;
 char * (*variable_name)(Variable);
 {
     Pvecteur v;
@@ -154,7 +154,7 @@ FILE *fp;
 Pcontrainte eg;
 char * (*variable_name)(Variable);
 {
-    contrainte_fprint(fp,eg,FALSE,variable_name);
+    contrainte_fprint(fp,eg,false,variable_name);
 }
 
 /* void egalite_dump(Pcontrainte c): impression "physique" d'une egalite;
@@ -176,7 +176,7 @@ FILE *fp;
 Pcontrainte ineg;
 char * (*variable_name)(Variable);
 {
-    contrainte_fprint(fp,ineg,TRUE,variable_name);
+    contrainte_fprint(fp,ineg,true,variable_name);
 }
 
 /* void inegalite_dump(Pcontrainte c): impression "physique" d'une inegalite;
@@ -198,7 +198,7 @@ Pcontrainte eg;
 char * (*variable_name)(Variable);
 {
     for( ; eg != NULL; eg = eg->succ)
-	contrainte_fprint(fp,eg,FALSE,variable_name);
+	contrainte_fprint(fp,eg,false,variable_name);
 }
 
 /* void inegalites_fprint(FILE * fp, Pcontrainte ineg,
@@ -214,11 +214,11 @@ Pcontrainte ineg;
 char * (*variable_name)(Variable);
 {
     for( ; ineg != NULL; ineg = ineg->succ)
-	contrainte_fprint(fp,ineg,TRUE,variable_name);
+	contrainte_fprint(fp,ineg,true,variable_name);
 }
 
 void
-sprint_operator(char *s, boolean is_inegalite, boolean a_la_fortran)
+sprint_operator(char *s, bool is_inegalite, bool a_la_fortran)
 {
     (void) sprintf(s, "%s",(is_inegalite? (a_la_fortran? ".LE.": "<="):
 			    (a_la_fortran? ".EQ.": "==")));
@@ -228,9 +228,9 @@ static char *
 heuristique_1(s, v, is_inegalite, variable_name, a_la_fortran)
 char * s;
 Pvecteur v;
-boolean is_inegalite;
+bool is_inegalite;
 char * (*variable_name)(Variable);
-boolean a_la_fortran;
+bool a_la_fortran;
 {
     short int debut = 1;
     Value constante = VALUE_ZERO;
@@ -272,16 +272,16 @@ static char *
 heuristique_3(s, v, is_inegalite, variable_name, a_la_fortran)
 char * s;
 Pvecteur v;
-boolean is_inegalite;
+bool is_inegalite;
 char * (*variable_name)(Variable);
-boolean a_la_fortran;
+bool a_la_fortran;
 {
     Pvecteur coord;
-    short int debut = TRUE;
+    short int debut = true;
     int positive_terms = 0;
     int negative_terms = 0;
     Value const_coeff = 0;
-    boolean const_coeff_p = FALSE;
+    bool const_coeff_p = false;
 
     if(!is_inegalite) {
 	for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
@@ -308,7 +308,7 @@ boolean a_la_fortran;
 	if (value_pos_p(coeff)) {
 	    positive_terms++;
 	    if (debut) {
-		debut = FALSE;
+		debut = false;
 		if (value_one_p(coeff) && var!=TCST)
 		    (void) sprintf(s+strlen(s),"%s", 
 				   variable_name(vecteur_var(coord)));
@@ -317,7 +317,7 @@ boolean a_la_fortran;
 		    (void) sprintf(s+strlen(s),"%s", variable_name(var));
 		}
 		else {
-		    debut = TRUE;
+		    debut = true;
 		    positive_terms--;
 		}
 	    }
@@ -339,22 +339,22 @@ boolean a_la_fortran;
 
     (void) sprint_operator(s+strlen(s), is_inegalite, a_la_fortran);
 
-    debut = TRUE;
+    debut = true;
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
 	Value coeff = vecteur_val(coord);
 	Variable var = var_of(coord);
 
 	if(term_cst(coord) && !is_inegalite) {
 	    /* Save the constant term for future use */
-	    const_coeff_p = TRUE;
+	    const_coeff_p = true;
 	    const_coeff = coeff;
 	    /* And now, a lie... In fact, rhs_terms++ */
 	    negative_terms++;
 	}
 	else if (value_neg_p(coeff)) {
 	    negative_terms++;
-	    if (debut == TRUE) {
-		debut = FALSE;
+	    if (debut == true) {
+		debut = false;
 		if (value_mone_p(coeff) && var!=TCST)
 		    (void) sprintf(s+strlen(s),"%s", variable_name(var));
 		else {
@@ -387,7 +387,7 @@ boolean a_la_fortran;
     return s;
 }
 
-/* char * contrainte_sprint(char * s, Pcontrainte c, boolean is_inegalite,
+/* char * contrainte_sprint(char * s, Pcontrainte c, bool is_inegalite,
  *                          char * (*variable_name)()):
  * Traduction d'une contrainte c en une chaine s de caracteres ASCII.
  * Les noms des variables sont recuperes via la fonction variable_name().
@@ -421,10 +421,10 @@ char *
 contrainte_sprint(s, c, is_inegalite, variable_name)
 char * s;
 Pcontrainte c;
-boolean is_inegalite;
+bool is_inegalite;
 char * (*variable_name)(Variable);
 {
-    s = contrainte_sprint_format(s, c, is_inegalite, variable_name, FALSE);
+    s = contrainte_sprint_format(s, c, is_inegalite, variable_name, false);
     return s;
 }
 
@@ -432,9 +432,9 @@ char *
 contrainte_sprint_format(
     char * s,
     Pcontrainte c,
-    boolean is_inegalite,
+    bool is_inegalite,
     char * (*variable_name)(Variable),
-    boolean a_la_fortran)
+    bool a_la_fortran)
 {
     Pvecteur v;
     int heuristique = 3;
@@ -467,7 +467,7 @@ char *s;
 Pcontrainte eg;
 char * (*variable_name)(Variable);
 {
-    return contrainte_sprint(s, eg, FALSE, variable_name);
+    return contrainte_sprint(s, eg, false, variable_name);
 }
 
 char * 
@@ -476,7 +476,7 @@ char * s;
 Pcontrainte ineg;
 char * (*variable_name)(Variable);
 {
-    return contrainte_sprint(s, ineg, TRUE, variable_name);
+    return contrainte_sprint(s, ineg, true, variable_name);
 }
 
 char * 
@@ -484,10 +484,10 @@ egalite_sprint_format(s, eg, variable_name, a_la_fortran)
 char *s;
 Pcontrainte eg;
 char * (*variable_name)(Variable);
-boolean a_la_fortran;
+bool a_la_fortran;
 {
     return contrainte_sprint_format
-	(s, eg, FALSE, variable_name, a_la_fortran);
+	(s, eg, false, variable_name, a_la_fortran);
 }
 
 char * 
@@ -495,8 +495,8 @@ inegalite_sprint_format(s, ineg, variable_name, a_la_fortran)
 char * s;
 Pcontrainte ineg;
 char * (*variable_name)(Variable);
-boolean a_la_fortran;
+bool a_la_fortran;
 {
     return contrainte_sprint_format
-	(s, ineg, TRUE, variable_name, a_la_fortran);
+	(s, ineg, true, variable_name, a_la_fortran);
 }

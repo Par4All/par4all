@@ -85,7 +85,7 @@ text text_region(effect reg)
 
     if(store_effect_p(reg)
        || !get_bool_property("PRETTYPRINT_MEMORY_EFFECTS_ONLY")) {
-      boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+      bool foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
       string str_prefix =
 	foresys ? FORESYS_CONTINUATION_PREFIX
 	: get_comment_continuation();
@@ -177,7 +177,7 @@ text text_region(effect reg)
  * input    : a list of regions
  * output   : a text representing this list of regions.
  * comment  : if the number of array regions is not nul, and if
- *            PRETTYPRINT_LOOSE is TRUE, then empty lines are
+ *            PRETTYPRINT_LOOSE is true, then empty lines are
  *            added before and after the text of the list of regions.
  */
 static text
@@ -185,8 +185,8 @@ text_array_regions(list l_reg, string ifread, string ifwrite)
 {
     text reg_text = make_text(NIL);
     /* in case of loose_prettyprint, at least one region to print? */
-    boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
-    boolean one_p = FALSE;
+    bool loose_p = get_bool_property("PRETTYPRINT_LOOSE");
+    bool one_p = false;
 
     set_action_interpretation(ifread, ifwrite);
 
@@ -209,7 +209,7 @@ text_array_regions(list l_reg, string ifread, string ifwrite)
 		    ADD_SENTENCE_TO_TEXT(reg_text,
 					 make_sentence(is_sentence_formatted,
 						       strdup("\n")));
-		    one_p = TRUE;
+		    one_p = true;
 		}
 		MERGE_TEXTS(reg_text, text_region(reg));
 	    }
@@ -254,7 +254,7 @@ get_text_regions_for_module(
     text t;
     entity mod;
     list /* of effect */ le = effects_effects((effects) 
-	db_get_memory_resource(resource_name, module_name, TRUE));
+	db_get_memory_resource(resource_name, module_name, true));
 
     /* the current entity may be used for minimal names... */
     mod = module_name_to_entity(module_name);

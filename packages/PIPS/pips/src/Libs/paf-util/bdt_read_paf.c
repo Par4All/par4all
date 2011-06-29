@@ -142,30 +142,30 @@ char *s;
 }
 
 /*============================================================================*/
-boolean same_predicate_p(p1, p2)
+bool same_predicate_p(p1, p2)
 predicate p1, p2;
 {
   Psysteme s1, s2;
 
   if( (p1 == predicate_undefined) && (p2 == predicate_undefined) )
-    return(TRUE);
+    return(true);
   else if(p1 == predicate_undefined)
-    return(FALSE);
+    return(false);
   else if(p2 == predicate_undefined)
-    return(FALSE);
+    return(false);
 
   s1 = (Psysteme) predicate_system(p1);
   s2 = (Psysteme) predicate_system(p2);
 
   if( (p1 == NULL) && (p2 == NULL) )
-    return(TRUE);
+    return(true);
   else if(p1 == NULL)
-    return(FALSE);
+    return(false);
   else if(p2 == NULL)
-    return(FALSE);
+    return(false);
 
   /* If the predicate are defined, we consider them as always different */
-  return(FALSE);
+  return(false);
 }
 
 
@@ -181,7 +181,7 @@ bdt base;
     schedule sch = SCHEDULE(CAR(sch_l));
     int stmt = schedule_statement(sch);
     predicate pred = schedule_predicate(sch);
-    boolean to_add = TRUE;
+    bool to_add = true;
 
     for(l = new_sch_l; (!ENDP(l)) && to_add; POP(l)) {
       schedule nsch =  SCHEDULE(CAR(l));
@@ -193,7 +193,7 @@ bdt base;
 	  expression nexp = EXPRESSION(CAR(schedule_dims(sch)));
 	  schedule_dims(nsch) = gen_nconc(schedule_dims(nsch),
 					  CONS(EXPRESSION, nexp, NIL));
-	  to_add = FALSE;
+	  to_add = false;
 	}
       }
     }

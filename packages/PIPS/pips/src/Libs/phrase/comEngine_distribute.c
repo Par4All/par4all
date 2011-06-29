@@ -137,7 +137,7 @@ static void update_HRE_mapping_from_list(list lRef, bool supRef, int inc)
     if(supRef)
       {
 	gCurBuff += inc;
-	hash_put(gRefToBuffSize, curRef, (void *)TRUE);
+	hash_put(gRefToBuffSize, curRef, (void *)true);
       }
     else
       {
@@ -160,15 +160,15 @@ static void do_HRE_memory_mapping_loop(statement stat)
 
   hash_put(gStatToHtOffset, stat, htOffset);
 
-  update_HRE_mapping_from_list(lSupportedRef, TRUE, 1);
-  update_HRE_mapping_from_list(lUnSupportedRef, FALSE, 1);
+  update_HRE_mapping_from_list(lSupportedRef, true, 1);
+  update_HRE_mapping_from_list(lUnSupportedRef, false, 1);
 
   update_max();
 
   do_HRE_memory_mapping(loop_body(statement_loop(stat)));
 
-  update_HRE_mapping_from_list(lSupportedRef, TRUE, -1);
-  update_HRE_mapping_from_list(lUnSupportedRef, FALSE, -1);
+  update_HRE_mapping_from_list(lSupportedRef, true, -1);
+  update_HRE_mapping_from_list(lUnSupportedRef, false, -1);
 }
 
 static void do_HRE_memory_mapping_stat(statement stat)
@@ -177,11 +177,11 @@ static void do_HRE_memory_mapping_stat(statement stat)
 
   if(lRef != HASH_UNDEFINED_VALUE)
     {
-      update_HRE_mapping_from_list(lRef, FALSE, 1);
+      update_HRE_mapping_from_list(lRef, false, 1);
 
       update_max();
 
-      update_HRE_mapping_from_list(lRef, FALSE, -1);
+      update_HRE_mapping_from_list(lRef, false, -1);
     }
 }
 
@@ -252,7 +252,7 @@ static bool compute_HRE_memory_mapping(statement stat, int hreMemSize)
 
   //printf("gBufferSize %d\n", gBufferSize);
 
-  return TRUE;
+  return true;
 }
 
 static void move_declarations(entity new_fun, statement stat)
@@ -305,8 +305,8 @@ void create_HRE_module(string new_module_name,
 
   saved_b1 = get_bool_property(ALL_DECLS);
   saved_b2 = get_bool_property(STAT_ORDER);
-  set_bool_property(ALL_DECLS, TRUE);
-  set_bool_property(STAT_ORDER, FALSE);
+  set_bool_property(ALL_DECLS, true);
+  set_bool_property(STAT_ORDER, false);
 
   //stat = comEngine_generate_HRECode(externalized_code, new_fun, l_in, l_out);
 
@@ -346,7 +346,7 @@ void create_HRE_module(string new_module_name,
   /* give the clonee a user file.
    */
   DB_PUT_MEMORY_RESOURCE(DBR_USER_FILE, new_name, 
-			 strdup(db_get_memory_resource(DBR_USER_FILE, name, TRUE)));
+			 strdup(db_get_memory_resource(DBR_USER_FILE, name, true)));
 
   free(new_name);
 }
@@ -368,7 +368,7 @@ static void comEngine_distribute_code (string module_name,
 			               list l_priv,
 				       graph dg) 
 {
-  bool success = FALSE;
+  bool success = false;
 
   gLoopToRef = hash_table_make(hash_pointer, 0);
   gStatToRef = hash_table_make(hash_pointer, 0);
@@ -476,7 +476,7 @@ void comEngine_distribute (string module_name,
   hash_table ht_in_regions;
   hash_table ht_out_regions;
 
-  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
 
   l_stats = identify_analyzed_statements_to_distribute (module_stat);
 
@@ -515,14 +515,14 @@ bool phrase_comEngine_distributor(string module_name)
   entity dynamic_area = entity_undefined;
 
   // set and get the current properties concerning regions 
-  set_bool_property("MUST_REGIONS", TRUE);
-  set_bool_property("EXACT_REGIONS", TRUE);
+  set_bool_property("MUST_REGIONS", true);
+  set_bool_property("EXACT_REGIONS", true);
   get_regions_properties();
   
   // get the resources 
   module_stat = (statement) db_get_memory_resource(DBR_CODE, 
 						   module_name, 
-						   TRUE);
+						   true);
   
   module = module_name_to_entity(module_name);
   
@@ -530,7 +530,7 @@ bool phrase_comEngine_distributor(string module_name)
   set_current_module_entity(module_name_to_entity(module_name)); // FI: a bit redundant since module is already available
   
   set_cumulated_rw_effects((statement_effects)
-			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
   module_to_value_mappings(module);
   
   // sets dynamic_area 
@@ -543,11 +543,11 @@ bool phrase_comEngine_distributor(string module_name)
 
     // Get the READ, WRITE, IN and OUT regions of the module
     set_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_REGIONS, module_name, true));
     set_in_effects((statement_effects) 
-	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
     set_out_effects((statement_effects) 
-	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
 
   // Now do the job
 
@@ -581,6 +581,6 @@ bool phrase_comEngine_distributor(string module_name)
   
   debug_off();
   
-  return TRUE;
+  return true;
 }
 

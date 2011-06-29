@@ -141,14 +141,14 @@ void sc_sort(
 {
   sc_vect_sort(sc, compare);
   sc->inegalites =
-    contrainte_sort(sc->inegalites, sc->base, sort_base, TRUE, TRUE);
+    contrainte_sort(sc->inegalites, sc->base, sort_base, true, true);
   sc->egalites =
-    contrainte_sort(sc->egalites, sc->base, sort_base, TRUE, TRUE);
+    contrainte_sort(sc->egalites, sc->base, sort_base, true, true);
 }
 
-static boolean vect_printout_order_decided_p(Pvecteur v)
+static bool vect_printout_order_decided_p(Pvecteur v)
 {
-  boolean decided_p = FALSE;
+  bool decided_p = false;
   int positive_terms = 0;
   int negative_terms = 0;
   Pvecteur coord = VECTEUR_UNDEFINED;
@@ -256,7 +256,7 @@ sc_lexicographic_sort(
 	   variables in mpeg2enc. We could take a default action here
 	   or force the user to improve his/her comparison function
 	   where more information is available. */
-        assert(FALSE);
+        assert(false);
       }
     }
   }
@@ -274,10 +274,10 @@ sc_lexicographic_sort(
  * @param inequalities whether to process inequalities
  * @return whether the system was changed
  */
-boolean sc_remove_large_coef(Psysteme sc, Value val,
-			     boolean equalities, boolean inequalities)
+bool sc_remove_large_coef(Psysteme sc, Value val,
+			     bool equalities, bool inequalities)
 {
-  boolean changed = false;
+  bool changed = false;
 
   // nothing to do in some simple cases
   if (sc==NULL || sc_empty_p(sc) || sc_rn_p(sc))

@@ -52,7 +52,7 @@
  * a  ligne  in the bank, ofs a variable corresponding to an offset 
  * in a ligne of the bank. 
  *
- * if COLUMN_MAJOR is TRUE the system is the following one
+ * if COLUMN_MAJOR is true the system is the following one
  *
  *      (VAR1-1) + (VAR2-1) *ms == bn*ls* ligne +ls*bank+ofs,
  *        1 <= bank <= bn ,
@@ -106,7 +106,7 @@ Psysteme build_sc_machine(
 	/* Si l'on veut utiliser le nombre d'octets il faut remplacer l'equation 
 	   par deux inequations du type 
 	   
-	   if COLUMN_MAJOR is TRUE the system is the following one
+	   if COLUMN_MAJOR is true the system is the following one
 	   
 	   (VAR1-1) + (VAR2-1) *ms <= bn*ls* (ligne-1) +ls*(bank-1)+ofs,
 	   bn*ls* (ligne-1) +ls*(bank-1)+ofs <=  (VAR1) + (VAR2-1) *ms
@@ -139,7 +139,7 @@ Psysteme build_sc_machine(
     /* bank_indices is assumed to belong the three variables
        bank_id, L and O (see documentation for more details) */
 
-    /* if COLUMN_MAJOR is TRUE then build the constraint   
+    /* if COLUMN_MAJOR is true then build the constraint   
        (VAR1-1) + (VAR2-1) *ms == bn*ls*L +ls*bank_id+O,
        else build the constraint
        (VAR1-1) * ms + (VAR2-1) == bn*ls*L +ls*bank_id+O,

@@ -107,22 +107,22 @@ statement */
 char FormatValue[FORMATLENGTH];
 
 
-static bool parser_recursive_call = FALSE;
+static bool parser_recursive_call = false;
 
 /* Safety for recursive calls of parser required to process entries */
 static void reset_parser_recursive_call()
 {
-    parser_recursive_call = FALSE;
+    parser_recursive_call = false;
 }
 
 static void set_parser_recursive_call()
 {
-    parser_recursive_call = FALSE;
+    parser_recursive_call = false;
 }
 
 /* Parser error handling */
 
-bool InParserError = FALSE;
+bool InParserError = false;
 
 bool ParserError(const char * f, char * m)
 {
@@ -132,11 +132,11 @@ bool ParserError(const char * f, char * m)
      * e.g. AbortOfProcedure() thru remove_ghost_variables()
      */
     if(InParserError)
-	return FALSE;
+	return false;
 
-    InParserError = TRUE;
+    InParserError = true;
 
-    uses_alternate_return(FALSE);
+    uses_alternate_return(false);
     ResetReturnCodeVariable();
     SubstituteAlternateReturns("NO");
 
@@ -188,7 +188,7 @@ bool ParserError(const char * f, char * m)
     AbortEntries();
     AbortOfProcedure();
 
-    InParserError = FALSE;
+    InParserError = false;
 
     /* FI: let catch_error() take care of this in pipsmake since debug_on()
        was not activated in ParserError */
@@ -197,7 +197,7 @@ bool ParserError(const char * f, char * m)
 	       line_b_I,line_e_I,m);
 
     /* Should never be executed */
-    return TRUE;
+    return true;
 }
 
 
@@ -218,14 +218,14 @@ bool ParserError(const char * f, char * m)
  */
 void BeginingOfParsing()
 {
-    static bool called = FALSE;
+    static bool called = false;
 
     if (called)
 	return;
 
     /* the current package is initialized */
     CurrentPackage = TOP_LEVEL_MODULE_NAME;
-    called = TRUE;
+    called = true;
 }
 
 /* parse "module.dbr_file"
@@ -251,7 +251,7 @@ static bool the_actual_parser(string module,
     dir = db_get_current_workspace_directory();
     CurrentFN =
 	strdup(concatenate(dir, "/",
-			   db_get_file_resource(dbr_file, module, TRUE), 0));
+			   db_get_file_resource(dbr_file, module, true), 0));
     free(dir);
 
     /* yacc parser is called */
@@ -287,7 +287,7 @@ static bool the_actual_parser(string module,
      * one subroutine/function/program at a time.  */
     debug_off();
 
-    return TRUE;
+    return true;
 }
 
 /* parser for HPFC.

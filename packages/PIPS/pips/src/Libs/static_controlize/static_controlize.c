@@ -144,7 +144,7 @@ static_control static_controlize_loop(loop l)
 	if (	   !constant_step_loop_p(l)
 		|| !splc_feautrier_expression_p(low, &Genclosing_loops)
 		|| !splc_feautrier_expression_p(up, &Genclosing_loops)  ) {
-		static_control_yes( sc ) = FALSE;
+		static_control_yes( sc ) = false;
 	}
 	SET_STATEMENT_MAPPING(Gstatic_control_map, loop_body(l), sc);
 	gen_remove( &Genclosing_loops, l );
@@ -168,7 +168,7 @@ static_control static_controlize_forloop(forloop fl)
   
   
   sc = static_controlize_statement( forloop_body( fl ) );
-  static_control_yes( sc ) = FALSE;
+  static_control_yes( sc ) = false;
   
   SET_STATEMENT_MAPPING(Gstatic_control_map, forloop_body(fl), sc);
   
@@ -188,7 +188,7 @@ static_control static_controlize_whileloop(whileloop wl)
   
   
   sc = static_controlize_statement( whileloop_body( wl ) );
-  static_control_yes( sc ) = FALSE;
+  static_control_yes( sc ) = false;
   
   SET_STATEMENT_MAPPING(Gstatic_control_map, whileloop_body(wl), sc);
   
@@ -204,7 +204,7 @@ static_control static_controlize_whileloop(whileloop wl)
 static_control static_controlize_statement(s)
 statement s;
 {
-  bool		is_static = TRUE, static_test = FALSE;
+  bool		is_static = true, static_test = false;
   instruction	inst = statement_instruction(s);
   static_control  sc, sc1, sc2;
   expression	exp, exp1, exp2;
@@ -236,7 +236,7 @@ statement s;
 	    expression_undefined) {
 	  //DK, don't change the structure of conditions
 	  //test_condition( t ) = exp ;
-	  static_test = TRUE;
+	  static_test = true;
 	}
 	ADD_ELEMENT_TO_LIST( Genclosing_tests, EXPRESSION, test_condition(t) );
 	sc1 = static_controlize_statement(test_true(t));
@@ -295,19 +295,19 @@ statement s;
 	if (get_bool_property("POCC_COMPATIBILITY"))
 	  {
 	    if (statement_contains_user_call_p(s) || io_intrinsic_p((call_function(instruction_call( inst)))))
-	      is_static = FALSE;
+	      is_static = false;
 	  }
 	break;
       }
       
     case is_instruction_goto :
       {
-	is_static = FALSE;
+	is_static = false;
 	break;
       }
     case is_instruction_expression :
       {
-	is_static = TRUE;
+	is_static = true;
 	break;
       }
     case is_instruction_unstructured :
@@ -348,7 +348,7 @@ statement s;
 static_control static_controlize_unstructured(u)
 unstructured u;
 {
-	bool		is_static = TRUE;
+	bool		is_static = true;
 	list		blocs = NIL;
 	static_control	sc, ret_sc = static_control_undefined;
 
@@ -422,7 +422,7 @@ statement st;
   bool res_b;
   instruction ins;
 
-  res_b = TRUE;
+  res_b = true;
   ins = statement_instruction(st);
 
   if(instruction_tag(ins) == is_instruction_call) {
@@ -431,12 +431,12 @@ statement st;
 
     /* There can be no statement inside a call, so gen_recurse() do not
        need to go further. */
-    res_b = FALSE;
+    res_b = false;
 
     if(value_tag(entity_initial(e)) == is_value_intrinsic) {
       string s = entity_local_name(e);
       IOIntrinsicDescriptor *pid = IOIntrinsicDescriptorTable;
-      bool found = FALSE;
+      bool found = false;
 
       while ((pid->name != NULL) && (!found)) {
 	if (strcmp(pid->name, s) == 0) {
@@ -449,7 +449,7 @@ statement st;
 	  /* FI: I'm not sure about the fourth argument of
 	     words_call() */
 	  sprintf(comment, "%s %s", comment,
-		  words_to_string(words_call(ca, 0, TRUE, TRUE, NIL)));
+		  words_to_string(words_call(ca, 0, true, true, NIL)));
 	  sprintf(comment, "%s\n", comment);
 
 	  pips_assert("no buffer overflow", strlen(comment)<64);
@@ -469,7 +469,7 @@ statement st;
 	     block: */
 	  fix_sequence_statement_attributes(st);
 
-	  found = TRUE;
+	  found = true;
 	}
 	pid += 1;
       }
@@ -484,7 +484,7 @@ statement st;
 /* void static_controlize((char*) mod_name)			AL 05/93
  * Computes the static_control attached to module-name : mod_name.
  */
-boolean static_controlize(string mod_name)
+bool static_controlize(string mod_name)
 {
 	statement	mod_stat;
 	instruction	mod_inst;
@@ -527,7 +527,7 @@ boolean static_controlize(string mod_name)
 	pips_debug(7, "\n formal integers : %s \n",
 		print_structurals( formal_integers ));
 
-	mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+	mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
 
 	mod_inst = statement_instruction( mod_stat );
 
@@ -585,7 +585,7 @@ boolean static_controlize(string mod_name)
 
 	debug_off();
 
-	return(TRUE);
+	return(true);
 }
 
 /*==================================================================*/

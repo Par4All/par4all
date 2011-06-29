@@ -38,7 +38,7 @@
 #include "contrainte.h"
 #include "sc.h"
 
-/* boolean sc_elim_simple_redund_with_eq(Psysteme ps, Pcontrainte eg):
+/* bool sc_elim_simple_redund_with_eq(Psysteme ps, Pcontrainte eg):
  * elimination en place des contraintes d'un systeme ps, qui sont redondantes
  * avec une egalite eg
  *                                                                       
@@ -57,23 +57,23 @@
  *
  *  resultat retourne par la fonction :
  *
- *  boolean: FALSE si l'equation a permis de montrer que le systeme
+ *  boolean: false si l'equation a permis de montrer que le systeme
  *                 etait non faisable
- *           TRUE sinon
+ *           true sinon
  *
  *  Les parametres de la fonction :
  *
  * !Psysteme ps	  : systeme
  *  Pcontrainte eg : equation du systeme 
  */
-boolean sc_elim_simple_redund_with_eq(ps,eg)
+bool sc_elim_simple_redund_with_eq(ps,eg)
 Psysteme ps;
 Pcontrainte eg;
 {
     Pcontrainte eq = NULL;
 
     if (SC_UNDEFINED_P(ps) || sc_rn_p(ps))
-	return(TRUE);
+	return(true);
 
     /* cas des egalites    */
     for (eq = ps->egalites; eq != NULL; eq = eq->succ) {
@@ -83,7 +83,7 @@ Pcontrainte eg;
 		   ==> elimination de eq */
 		eq_set_vect_nul(eq);
 	    else 
-		return(FALSE);
+		return(false);
 	}
     }
 
@@ -93,13 +93,13 @@ Pcontrainte eg;
 	    if (value_negz_p(eq_diff_const(eq, eg)))
 		eq_set_vect_nul(eq);
 	    else
-		return(FALSE);
+		return(false);
 	}
     }
-    return(TRUE);
+    return(true);
 }
 
-/* boolean sc_elim_simple_redund_with_ineq(Psysteme ps, Pcontrainte ineg):
+/* bool sc_elim_simple_redund_with_ineq(Psysteme ps, Pcontrainte ineg):
  * elimination des contraintes redondantes de ps avec une inegalite ineg
  * (FI: qui doit appartenir a ps; verifier qu'on ne fait pas de comparaisons
  * inutiles; apparemment pas parce qu'on modifie froidement ineg)
@@ -118,25 +118,25 @@ Pcontrainte eg;
  *                                                                       
  *  resultat retourne par la fonction :
  *
- *  boolean: FALSE si l'inequation a permis de montrer que le systeme
+ *  boolean: false si l'inequation a permis de montrer que le systeme
  *                 etait non faisable
- *           TRUE sinon
+ *           true sinon
  *
  *  Les parametres de la fonction :
  *
  *  Psysteme ps      : systeme
  *  Pcontrainte ineg : inequation du systeme
  */
-boolean sc_elim_simple_redund_with_ineq(ps,ineg)
+bool sc_elim_simple_redund_with_ineq(ps,ineg)
 Psysteme ps;
 Pcontrainte ineg;
 {
     Pcontrainte eq=NULL;
-    boolean result = TRUE;
+    bool result = true;
     Value b = VALUE_ZERO;
  
     if (SC_UNDEFINED_P(ps) || sc_rn_p(ps))
-	return(TRUE);
+	return(true);
 
     /* cas des egalites     */
     for (eq = ps->egalites; eq != NULL && ineg->vecteur != NULL; 
@@ -147,7 +147,7 @@ Pcontrainte ineg;
 		/* inegalite redondante avec l'egalite  
 		   ==> elimination de inegalite */
 		eq_set_vect_nul(ineg);
-	    else result = FALSE;
+	    else result = false;
 	}
 
     /* cas des inegalites          */
@@ -212,7 +212,7 @@ int sc_check_inequality_redundancy(Pcontrainte ineq, Psysteme ps)
 }
 
 
-/* void sc_elim_empty_constraints(Psysteme ps, boolean process_equalities):
+/* void sc_elim_empty_constraints(Psysteme ps, bool process_equalities):
  * elimination des "fausses" contraintes du systeme ps, i.e. les contraintes ne
  * comportant plus de couple (variable,valeur), i.e. les contraintes qui
  * ont ete eliminees par la fonction 'eq_set_vect_nul', i.e. 0 = 0 ou
@@ -222,8 +222,8 @@ int sc_check_inequality_redundancy(Pcontrainte ineq, Psysteme ps)
  * 
  * parametres de la fonction:
  *   !Psysteme ps: systeme lineaire 
- *   boolean egalite: TRUE s'il faut traiter la liste des egalites 
- *                    FALSE s'il faut traiter la liste des inegalites
+ *   bool egalite: true s'il faut traiter la liste des egalites 
+ *                    false s'il faut traiter la liste des inegalites
  *
  * Modifications:
  *  - the number of equalities was always decremented, regardless
@@ -231,7 +231,7 @@ int sc_check_inequality_redundancy(Pcontrainte ineq, Psysteme ps)
  */
 void sc_elim_empty_constraints(ps, process_equalities)
 Psysteme ps;
-boolean process_equalities;
+bool process_equalities;
 {
     Pcontrainte pc, ppc;
 
@@ -356,8 +356,8 @@ Psysteme ps;
 		eq_set_vect_nul(eq2);
     }
 
-    sc_elim_empty_constraints(ps, TRUE);
-    sc_elim_empty_constraints(ps, FALSE);
+    sc_elim_empty_constraints(ps, true);
+    sc_elim_empty_constraints(ps, false);
 
     return (ps);
 }
@@ -430,7 +430,7 @@ Psysteme ps;
   }
 
   for (ineq1 = ps->inegalites; ineq1 != NULL;ineq1 = ineq1->succ) {
-    (void) contrainte_normalize(ineq1, FALSE);
+    (void) contrainte_normalize(ineq1, false);
   }
 
   /* Detection of inconsistant equations: incompatible constant term */
@@ -557,8 +557,8 @@ Psysteme ps;
       vect_rm(diff1);
     }
   }
-  sc_elim_empty_constraints(ps, TRUE);
-  sc_elim_empty_constraints(ps, FALSE);
+  sc_elim_empty_constraints(ps, true);
+  sc_elim_empty_constraints(ps, false);
 
   return (ps);
 }

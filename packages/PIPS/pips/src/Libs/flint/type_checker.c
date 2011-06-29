@@ -287,7 +287,7 @@ check_this_whileloop(whileloop w, type_context_p context)
  * Range of loop (lower, upper, increment), all must be Integer, Real or Double
  * (According to ANSI X3.9-1978, FORTRAN 77; Page 11-5)
  *
- * Return TRUE if type of range is correct, otherwise FALSE
+ * Return true if type of range is correct, otherwise FALSE
  */
 bool
 check_loop_range(range r, hash_table types)
@@ -300,9 +300,9 @@ check_loop_range(range r, hash_table types)
       (basic_int_p(upper) || basic_float_p(upper)) &&
       (basic_int_p(incr) || basic_float_p(incr)))
   {
-    return TRUE;
+    return true;
   }
-  return FALSE;
+  return false;
 }
 /*****************************************************************************
  * Typing the loop if necessary
@@ -411,7 +411,7 @@ static bool
 stmt_flt(statement s, type_context_p context)
 {
   stack_push(s, context->stats);
-  return TRUE;
+  return true;
 }
 
 static void
@@ -554,7 +554,7 @@ bool type_checker(string name)
 
   /* Used to check the language */
   set_current_module_entity(module_name_to_entity(name));
-  stat = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
+  stat = (statement) db_get_memory_resource(DBR_CODE, name, true);
   set_current_module_statement(stat);
 
   typing_of_expressions(name, stat);
@@ -565,5 +565,5 @@ bool type_checker(string name)
 
   pips_debug(1, "done");
   debug_off();
-  return TRUE;
+  return true;
 }

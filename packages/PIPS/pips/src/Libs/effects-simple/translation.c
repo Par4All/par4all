@@ -66,7 +66,7 @@
     @param nb_common_indices is the number of indices of input_ref which must be skipped
     @param output_ref is a pointer on the resulting reference
     @param output_desc is here for compatibility with the corresponding convex cells function.
-    @param exact_p is a pointer on a boolean which is set to true if the translation is exact, false otherwise.
+    @param exact_p is a pointer on a bool which is set to true if the translation is exact, false otherwise.
   
  */
 void simple_cell_reference_with_address_of_cell_reference_translation
@@ -202,7 +202,7 @@ void simple_cell_reference_with_address_of_cell_reference_translation
     @param nb_common_indices is the number of indices of input_ref which must be skipped
     @param output_ref is a pointer on the resulting reference
     @param output_desc is here for compatibility with the corresponding convex cells function.
-    @param exact_p is a pointer on a boolean which is set to true if the translation is exact, false otherwise.
+    @param exact_p is a pointer on a bool which is set to true if the translation is exact, false otherwise.
   
  */
 void simple_cell_reference_with_value_of_cell_reference_translation

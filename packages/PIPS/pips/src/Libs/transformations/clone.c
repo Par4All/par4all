@@ -130,8 +130,8 @@ static entity build_a_clone_for(entity cloned,
 
   saved_b1 = get_bool_property(ALL_DECLS);
   saved_b2 = get_bool_property(STAT_ORDER);
-  set_bool_property(ALL_DECLS, TRUE);
-  set_bool_property(STAT_ORDER, FALSE);
+  set_bool_property(ALL_DECLS, true);
+  set_bool_property(STAT_ORDER, false);
 
   stat = build_statement_for_clone(cloned, argn, val);
   t = text_named_module(new_fun, cloned, stat);
@@ -258,7 +258,7 @@ static entity module_to_clone = entity_undefined;
 static int argument_to_clone = 0;
 static int statement_to_clone = STATEMENT_NUMBER_UNDEFINED;
 static entity clonee_to_substitute = entity_undefined;
-static bool some_cloning_performed = FALSE;
+static bool some_cloning_performed = false;
 
 void clone_error_handler()
 {
@@ -267,7 +267,7 @@ void clone_error_handler()
     argument_to_clone = 0;
     statement_to_clone = STATEMENT_NUMBER_UNDEFINED;
     clonee_to_substitute = entity_undefined;
-    some_cloning_performed = FALSE;
+    some_cloning_performed = false;
 }
 
 /* returns if the expression is a constant, maybe thanks to the preconditions.
@@ -277,12 +277,12 @@ this_expression_constant_p(
     expression e, /* expression to be tested */
     int * pval    /* returned integer value if one was found */)
 {  
-    bool ok = FALSE;
+    bool ok = false;
     if (expression_constant_p(e)) 
     {
 	pips_debug(7, "constant expression\n");
 	*pval = expression_to_int(e);
-	ok = TRUE;
+	ok = true;
     }
     else if (expression_reference_p(e))
     {   
@@ -322,7 +322,7 @@ this_expression_constant_p(
 	    constant_int_p(symbolic_constant(value_symbolic(v)))) 
 	{
 	    pips_debug(7, "is an int PARAMETER\n");
-	    ok = TRUE;
+	    ok = true;
 	    *pval = constant_int(symbolic_constant(value_symbolic(v)));
 	}
 	else pips_debug(7, "not a symbolic integer constant\n");
@@ -357,7 +357,7 @@ do_clone(
 	}
     }
 
-    some_cloning_performed = TRUE;
+    some_cloning_performed = true;
     call_function(c) = clonee;
 }
 
@@ -408,11 +408,11 @@ perform_clone(
 	       entity_local_name(module), caller_name, argn);
 
     caller = module_name_to_entity(caller_name);
-    stat = (statement) db_get_memory_resource(DBR_CODE, caller_name, TRUE);
+    stat = (statement) db_get_memory_resource(DBR_CODE, caller_name, true);
 
     if (argn!=0)
 	set_precondition_map((statement_mapping) 
-	    db_get_memory_resource(DBR_PRECONDITIONS, caller_name, TRUE));
+	    db_get_memory_resource(DBR_PRECONDITIONS, caller_name, true));
 
     /* init 
      */
@@ -421,7 +421,7 @@ perform_clone(
     argument_to_clone = argn;
     statement_to_clone = number;
     clonee_to_substitute = substitute;
-    some_cloning_performed = FALSE;
+    some_cloning_performed = false;
 
     /* perform cloning
      */
@@ -470,7 +470,7 @@ set_currents(string name)
     pips_assert("is a function", type_functional_p(entity_type(module)));
     set_current_module_entity(module);
     
-    stat = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
+    stat = (statement) db_get_memory_resource(DBR_CODE, name, true);
     set_current_module_statement(stat);
 }
 
@@ -492,7 +492,7 @@ is_a_caller_or_error(
     string name,
     string caller)
 {
-    callees callers = (callees)db_get_memory_resource(DBR_CALLERS, name, TRUE);
+    callees callers = (callees)db_get_memory_resource(DBR_CALLERS, name, true);
     MAP(STRING, s, 
 	if (same_string_p(s, caller)) return, /* ok */
 	callees_callees(callers));
@@ -563,7 +563,7 @@ clone_on_argument(string name)
     DEBUG_ON;
     set_currents(name);
     module = get_current_module_entity();
-    callers = (callees) db_get_memory_resource(DBR_CALLERS, name, TRUE);
+    callers = (callees) db_get_memory_resource(DBR_CALLERS, name, true);
     argn = get_int_property(ARG_TO_CLONE);
 
     if (argn<=0)
@@ -586,7 +586,7 @@ clone_on_argument(string name)
 	{
 	    reset_currents(name);
 	    pips_user_error("%s: no #%d formal\n", name, argn);
-	    return FALSE;
+	    return false;
 	}
 	
 	t = entity_type(arg);
@@ -598,7 +598,7 @@ clone_on_argument(string name)
 	{
 	    reset_currents(name);
 	    pips_user_error("%s: %d formal not a scalar int\n", name, argn);
-	    return FALSE;
+	    return false;
 	}
     }
 
@@ -609,7 +609,7 @@ clone_on_argument(string name)
 
     reset_currents(name);
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* clone a routine in a caller. the user is requested the caller and
@@ -660,7 +660,7 @@ clone_or_clone_substitute(
 	{
 	    reset_currents(name);
 	    pips_user_error("%s is not an existing function\n", substitute_s);
-	    return FALSE;
+	    return false;
 	}
 	free(substitute_s);
     }
@@ -689,7 +689,7 @@ clone_or_clone_substitute(
 bool
 clone(string name)
 {
-    return clone_or_clone_substitute(name, FALSE);
+    return clone_or_clone_substitute(name, false);
 }
 
 /* substitute name in one of its callers/statement number 
@@ -697,7 +697,7 @@ clone(string name)
 bool
 clone_substitute(string name)
 {
-    return clone_or_clone_substitute(name, TRUE);
+    return clone_or_clone_substitute(name, true);
 }
 
 /* use get_current_entity()
@@ -717,7 +717,7 @@ bool
 clone_only(string mod_name)
 {
     /* get the resources */
-    statement mod_stmt = (statement)db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+    statement mod_stmt = (statement)db_get_memory_resource(DBR_CODE, mod_name, true);
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
 

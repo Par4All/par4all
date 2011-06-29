@@ -139,14 +139,14 @@ void compute(int p, int n, float a[n][n])
 }
 
 //  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
-//    n==100}>
+//    n==100, 1<=p}>
 
 void compute(int p, int n, float a[n][n])
 {
 
 //  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
-//    n==100}>
+//    n==100, 1<=p}>
 
    // BEGIN BLOCK
    float t[100];
@@ -155,14 +155,14 @@ void compute(int p, int n, float a[n][n])
 
 //  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
-//    n==100}>
+//    n==100, 1<=p}>
 //  <t-INE-EXACT-{}>
 
    for(i = 0; i <= 99; i += 1) {
 
 //  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI1, PHI1<=99, 0<=PHI2,
-//    PHI2<=99, n==100}>
+//    PHI2<=99, n==100, 1<=p}>
 //  <t-INE-EXACT-{}>
 
       // BEGIN BLOCK
@@ -170,25 +170,26 @@ void compute(int p, int n, float a[n][n])
 
 //  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==i, i+k==99, n==100, 0<=i,
-//    i<=99}>
+//    i<=99, 1<=p}>
 //  <t-INE-EXACT-{}>
 
       t[-i+99] = a[i][i];
 
 //  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI2, PHI2<=99, i+k==99,
-//    n==100, 0<=i, i<=99}>
+//    n==100, 0<=i, i<=99, 1<=p}>
 //  <t-INE-EXACT-{}>
-//  <t[PHI1]-IN-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99}>
+//  <t[PHI1]-IN-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99,
+//    1<=p}>
 
       for(j = 0; j <= 99; j += 1)
 
 //  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, i+k==99, n==100, 0<=i,
-//    i<=99, 0<=j, j<=99}>
+//    i<=99, 0<=j, j<=99, 1<=p}>
 //  <t-INE-EXACT-{}>
 //  <t[PHI1]-IN-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99, 0<=j,
-//    j<=99}>
+//    j<=99, 1<=p}>
 
          a[i][j] /= t[-i+99];
       // END BLOCK
@@ -251,7 +252,8 @@ void compute(int p, int n, float a[n][n])
       // BEGIN BLOCK
       k = -i+99;
 
-//  <t[PHI1]-OUT-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99}>
+//  <t[PHI1]-OUT-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99,
+//    1<=p}>
 
       t[-i+99] = a[i][i];
 

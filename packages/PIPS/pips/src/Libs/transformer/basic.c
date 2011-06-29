@@ -32,7 +32,6 @@
 #include <stdio.h>
 #include <stdlib.h> 
 
-#include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
@@ -293,7 +292,7 @@ transformer_inequality_add(tf, i)
 transformer tf;
 Pvecteur i;
 {
-    return transformer_constraint_add(tf, i, FALSE);
+    return transformer_constraint_add(tf, i, false);
 }
 
 transformer 
@@ -301,7 +300,7 @@ transformer_equality_add(tf, i)
 transformer tf;
 Pvecteur i;
 {
-    return transformer_constraint_add(tf, i, TRUE);
+    return transformer_constraint_add(tf, i, true);
 }
 
 transformer 
@@ -317,7 +316,7 @@ Pcontrainte eqs;
     for(;eqs!=CONTRAINTE_UNDEFINED; eqs = eqs->succ)
 	(void) transformer_constraint_add(tf, 
 					  vect_dup(contrainte_vecteur(eqs)),
-					  TRUE);
+					  true);
     return tf;
 }
 
@@ -330,7 +329,7 @@ transformer_inequalities_add(transformer tf, Pcontrainte ineqs)
     for(ineq = ineqs; !CONTRAINTE_UNDEFINED_P(ineq); ineq = contrainte_succ(ineq))
 	(void) transformer_constraint_add(tf, 
 					  contrainte_vecteur(ineq),
-					  FALSE);
+					  false);
     return tf;
 }
 
@@ -438,18 +437,18 @@ transformer transformer_add_inequality_with_linear_term(transformer tf, entity v
 
 bool transformer_argument_consistency_p(transformer t)
 {
-  return transformer_argument_general_consistency_p(t, FALSE);
+  return transformer_argument_general_consistency_p(t, false);
 }
 
 bool transformer_argument_weak_consistency_p(transformer t)
 {
-  return transformer_argument_general_consistency_p(t, TRUE);
+  return transformer_argument_general_consistency_p(t, true);
 }
 
 bool transformer_argument_general_consistency_p(transformer t, bool is_weak)
 {
   list args = transformer_arguments(t);
-  bool consistent = TRUE;
+  bool consistent = true;
   Psysteme sc = (Psysteme) predicate_system(transformer_relation(t));
   Pbase b = sc_base(sc);
 
@@ -473,7 +472,7 @@ bool transformer_argument_general_consistency_p(transformer t, bool is_weak)
 	   entity_name(e)); */
 	pips_internal_error("No value for argument %s in relation basis",
 			    entity_name(e));
-	consistent = FALSE;
+	consistent = false;
       }
     }, args);
     pips_assert("Argument variables must have values in basis", consistent);
@@ -499,13 +498,13 @@ bool transformer_argument_general_consistency_p(transformer t, bool is_weak)
  * But, see final comment... In spite of it, I do not always return any longer.  */
 bool transformer_consistency_p(transformer t)
 {
-  return transformer_general_consistency_p(t, FALSE);
+  return transformer_general_consistency_p(t, false);
 }
 bool transformers_consistency_p(list tl)
 {
-  bool consistent_p = TRUE;
+  bool consistent_p = true;
   FOREACH(TRANSFORMER, t, tl) {
-    consistent_p = consistent_p && transformer_general_consistency_p(t, FALSE);
+    consistent_p = consistent_p && transformer_general_consistency_p(t, false);
   }
   return consistent_p;
 }
@@ -514,7 +513,7 @@ bool transformers_consistency_p(list tl)
 bool transformer_weak_consistency_p(t)
 transformer t;
 {
-  return transformer_general_consistency_p(t, TRUE);
+  return transformer_general_consistency_p(t, true);
 }
 
 bool transformer_general_consistency_p(transformer tf, bool is_weak)
@@ -534,13 +533,13 @@ bool transformer_general_consistency_p(transformer tf, bool is_weak)
      */
     Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
     list args = transformer_arguments(tf);
-    bool consistent = TRUE;
+    bool consistent = true;
 
     /* The NewGen data structure must be fully defined */
     ifdebug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL)
 	consistent = transformer_defined_p(tf);
     else
-	consistent = TRUE;
+	consistent = true;
     if(!consistent)
 	pips_debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
 		   "transformer t is not gen_defined\n");
@@ -567,7 +566,7 @@ bool transformer_general_consistency_p(transformer tf, bool is_weak)
        /* test aliasing between arguments and relations
           high cost testing */
 	    ifdebug(8) {
-		boolean aliasing = FALSE;
+		bool aliasing = false;
 		string emn =entity_module_name(val);
 		string eln =entity_local_name(val);
 		list lt =  args;
@@ -578,7 +577,7 @@ bool transformer_general_consistency_p(transformer tf, bool is_weak)
 		    consistent = consistent &&
 			(same_string_p(entity_local_name(e), eln) ?
 			 same_string_p(entity_module_name(e),emn)
-			 : TRUE);
+			 : true);
 		    aliasing = aliasing && entities_may_conflict_p(e,val);
 		}
 
@@ -592,7 +591,7 @@ bool transformer_general_consistency_p(transformer tf, bool is_weak)
 
 	    /* FI: the next test is not safe because val can be
 	     * a global value not recognized in the current
-	     * context. old_value_entity_p() returns TRUE or FALSE
+	     * context. old_value_entity_p() returns true or FALSE
 	     * or pips_error.
 	     *
 	     * A general version of this routine is needed...  The
@@ -658,7 +657,7 @@ bool transformer_general_consistency_p(transformer tf, bool is_weak)
 	    pips_user_warning("No value for argument %s in value mappings\n",
 			      entity_name(e));
 	    if(!is_weak)
-	      consistent = FALSE;
+	      consistent = false;
 	    }
 	}
     }
@@ -689,7 +688,7 @@ bool transformer_internal_consistency_p(transformer t)
       pips_user_warning("New value %s should be the same entity as variable %s"
 			" as long as equivalence equations are not added\n", 
 			entity_local_name(v), entity_local_name(e));
-      pips_assert("Argument must be a value", FALSE);
+      pips_assert("Argument must be a value", false);
     }
   }, args);
 
@@ -701,7 +700,7 @@ bool transformer_internal_consistency_p(transformer t)
       if(!entity_constant_p(val)) {
 	pips_user_warning("Variable %s in basis should be an internal value",
 			  entity_local_name(val));
-	pips_assert("Basis variables must be an internal value", FALSE);
+	pips_assert("Basis variables must be an internal value", false);
       }
     }
   }

@@ -37,37 +37,37 @@
 extern Variable variable_of_rank();
 extern Variable search_var_of_higher_rank();
 
-/* This  function returns TRUE:
+/* This  function returns true:
  *  if all positive OR all negative coefficients of the variable 
  *  var in the system are equal to 1.
  * That's mean that the FM projection can be used without problem on 
  * integer domain
 */
-boolean var_with_unity_coeff_p(sc, var)
+bool var_with_unity_coeff_p(sc, var)
 Psysteme sc;
 Variable var;
 {
     register Pcontrainte pc;
 
     if (!var_in_sc_p(sc,var))
-	return FALSE;
+	return false;
 
     for (pc = sc->inegalites; !CONTRAINTE_UNDEFINED_P(pc); pc = pc->succ) 
     {
 	Value coeff = vect_coeff(var,pc->vecteur);
 	if (value_gt(coeff, VALUE_ONE) ||
 	    value_lt(coeff, VALUE_MONE))
-	    return FALSE;
+	    return false;
     }
     for (pc = sc->egalites; !CONTRAINTE_UNDEFINED_P(pc); pc = pc->succ) 
     {
 	Value coeff = vect_coeff(var,pc->vecteur);
 	if (value_gt(coeff, VALUE_ONE) ||
 	    value_lt(coeff, VALUE_MONE))
-	    return FALSE;
+	    return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /* This function gives information about the variables and the constraints of
@@ -97,7 +97,7 @@ void sc_integer_projection_information(
     int rank_hr,right_rank,left_rank;
     int sign1,sign2;
     Value coeff1,coeff2,right_coeff,left_coeff;
-    boolean find_one = FALSE;
+    bool find_one = false;
     register int i;
     register int j;
 
@@ -118,7 +118,7 @@ void sc_integer_projection_information(
     for (ineq = sc->inegalites;
 	 !CONTRAINTE_UNDEFINED_P(ineq); ineq=ineq->succ) {
 
-	find_one=FALSE;
+	find_one=false;
 	if ((rank_hr= search_higher_rank(ineq->vecteur,index_base)) >dim_h) {
 
 	    /* if the variable rank is greater than n, the constraints may be 
@@ -143,7 +143,7 @@ void sc_integer_projection_information(
 		    if ((hvr1 ==hvr2) && 
 			(rank_of_variable(index_base,hvr1) >dim_h)) {
 			sc_info[rank_of_variable(index_base,hvr1)][1] ++;
-			find_one = TRUE;
+			find_one = true;
 		    }
 		}
 	    }

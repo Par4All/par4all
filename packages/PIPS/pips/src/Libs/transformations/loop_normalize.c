@@ -244,7 +244,7 @@ bool loop_normalize(char *mod_name)
     pips_debug(1, "\n\n *** LOOP_NORMALIZE for %s\n", mod_name);
 
     set_current_module_entity(module_name_to_entity(mod_name));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, mod_name, true));
 
 
     /* Compute the loops normalization of the module. */

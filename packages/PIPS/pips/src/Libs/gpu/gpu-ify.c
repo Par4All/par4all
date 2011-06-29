@@ -134,10 +134,10 @@ mark_loop_to_outline(const statement s) {
     /* Since we only outline outermost loop-nest, stop digging further in
        this statement: */
     pips_debug(1, "Statement %td marked to be outlined\n", statement_number(s));
-    return FALSE;
+    return false;
   }
   // This statement is not a parallel loop, go on digging:
-  return TRUE;
+  return true;
 }
 
 
@@ -316,7 +316,7 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
 
    @param module_name is the name of the module to work on.
 
-   @return TRUE since it should succeed...
+   @return true since it should succeed...
 */
 bool gpu_ify(const string mod_name) {
   // Use this module name and this environment variable to set
@@ -324,7 +324,7 @@ bool gpu_ify(const string mod_name) {
 						  "GPU_IFY_DEBUG_LEVEL");
 
   // Get the effects and use them:
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,mod_name,TRUE));
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,mod_name,true));
 
   // Initialize the loop nest set to outline to the empty set yet:
   loop_nests_to_outline = NIL;

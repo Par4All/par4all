@@ -118,9 +118,9 @@ update_an_effect_type(
  * each sentence corresponds to a line of prettyprint. If the
  * concatenation of a new effect in the buffer is impossible (overfull),
  * we save the buffer as a new sentence in the text and begin a new line.
- * Initially, the boolean is set to FALSE, and is turned to TRUE as soon
+ * Initially, the bool is set to false, and is turned to true as soon
  * as we found one effect of this kind in the list. Finally, we merge the
- * text into the global one only if the boolean is TRUE.
+ * text into the global one only if the bool is TRUE.
  *
  * Moreover, we sort the effects list in lexicographic order on the
  * references. We use gen_sort_list().
@@ -151,10 +151,10 @@ simple_effects_to_text(
   char r[MAX_LINE_LENGTH], w[MAX_LINE_LENGTH],
     R[MAX_LINE_LENGTH],  W[MAX_LINE_LENGTH],
     d[MAX_LINE_LENGTH], D[MAX_LINE_LENGTH], u[MAX_LINE_LENGTH], U[MAX_LINE_LENGTH];
-  bool rb = FALSE, Rb = FALSE,
-    wb = FALSE, Wb = FALSE,
-    db = FALSE, Db = FALSE,
-    ub = FALSE, Ub = FALSE;
+  bool rb = false, Rb = false,
+    wb = false, Wb = false,
+    db = false, Db = false,
+    ub = false, Ub = false;
   list ce = list_undefined;
 
   if (sefs_list == (list) HASH_UNDEFINED_VALUE ||
@@ -219,24 +219,24 @@ simple_effects_to_text(
            we save the current line, and begin a new one. */
 	if (action_read_p(ac) && approximation_may_p(ap))
 	  if(store_effect_p(eff))
-	    update_an_effect_type(rt, r, t), rb = TRUE;
+	    update_an_effect_type(rt, r, t), rb = true;
 	  else
-	    update_an_effect_type(ut, u, t), ub = TRUE;
+	    update_an_effect_type(ut, u, t), ub = true;
 	else if (!action_read_p(ac) && approximation_may_p(ap))
 	  if(store_effect_p(eff))
-	    update_an_effect_type(wt, w, t), wb = TRUE;
+	    update_an_effect_type(wt, w, t), wb = true;
 	  else
-	    update_an_effect_type(dt, d, t), db = TRUE;
+	    update_an_effect_type(dt, d, t), db = true;
 	else if (action_read_p(ac) && !approximation_may_p(ap))
 	  if(store_effect_p(eff))
-	    update_an_effect_type(Rt, R, t), Rb = TRUE;
+	    update_an_effect_type(Rt, R, t), Rb = true;
 	  else
-	    update_an_effect_type(Ut, U, t), Ub = TRUE;
+	    update_an_effect_type(Ut, U, t), Ub = true;
 	else if (!action_read_p(ac) && !approximation_may_p(ap))
 	  if(store_effect_p(eff))
-	    update_an_effect_type(Wt, W, t), Wb = TRUE;
+	    update_an_effect_type(Wt, W, t), Wb = true;
 	  else
-	    update_an_effect_type(Dt, D, t), Db = TRUE;
+	    update_an_effect_type(Dt, D, t), Db = true;
 	else
 	  pips_internal_error("unrecognized effect");
 
@@ -301,12 +301,12 @@ list words_effect_generic(effect obj, bool approximation_p)
 
 list words_effect(effect obj)
 {
-  return words_effect_generic(obj, TRUE);
+  return words_effect_generic(obj, true);
 }
 
 list words_effect_without_approximation(effect obj)
 {
-  return words_effect_generic(obj, FALSE);
+  return words_effect_generic(obj, false);
 }
 
 void print_effect(effect e)

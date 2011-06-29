@@ -142,7 +142,7 @@ void reset_csplit_current_beginning()
 
   csplit_current_beginning = 1000000;
   user_current_beginning = 1000000;
-  csplit_is_static_p = FALSE;
+  csplit_is_static_p = false;
 
   /* Snapshot the current file position as a potential function begin: */
   csplit_file_offset_beginning = current_csplit_file_offset;

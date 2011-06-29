@@ -16,7 +16,7 @@ clause step_check_private(entity module, string directive_txt)
   string private_,private_clause,remaining;
   string list_,item,comma;
   int nb_item, nb_comma;
-  boolean erreur=false;
+  bool erreur=false;
   list privates=NIL;
   string msg_err;
 
@@ -29,7 +29,7 @@ clause step_check_private(entity module, string directive_txt)
       if (!private_clause)
 	{
 	  msg_err="missing clause detail";
-	  erreur=TRUE;
+	  erreur=true;
 	  break;
 	}
       private_clause=strtok (private_clause,"()");
@@ -39,7 +39,7 @@ clause step_check_private(entity module, string directive_txt)
       if (!list_)
 	{
 	  msg_err="missing variable list";
-	  erreur=TRUE;
+	  erreur=true;
 	  break;
 	}
       
@@ -70,7 +70,7 @@ clause step_check_private(entity module, string directive_txt)
       if (item&&!erreur)
 	{
 	  msg_err="too many variable";
-	  erreur=TRUE;
+	  erreur=true;
 	  break;
 	}
     }
@@ -88,7 +88,7 @@ clause step_check_private(entity module, string directive_txt)
 string clause_private_to_string(list privates)
 {
   string s = string_undefined;
-  string_buffer sb = string_buffer_make(FALSE);
+  string_buffer sb = string_buffer_make(false);
 
   FOREACH(ENTITY,variable,privates)
     {

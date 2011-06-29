@@ -71,11 +71,11 @@ bool old_reductions(string mod_name)
     if( stat( LISP, &buf ) != 0 ) {
 	user_warning("reductions",
 		     "No lisp! Skipping reduction detection\n") ;
-	/* TRUE or FALSE? After all, it's just a user warning, not an error */
-	return FALSE;
+	/* true or FALSE? After all, it's just a user warning, not an error */
+	return false;
     }
     debug_on("REDUCTIONS_DEBUG_LEVEL");
-    db_close_workspace(FALSE) ;
+    db_close_workspace(false) ;
     options = (get_debug_level() <= 5) ? " -batch" : "" ;
     asprintf(&command, 
 	    "(echo \"(defparameter files-directory \\\"%s\\\")\
@@ -98,9 +98,9 @@ bool old_reductions(string mod_name)
     debug_off();
     db_open_workspace( program_name ) ;
     mod_stat = (statement) 
-	    db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+	    db_get_memory_resource(DBR_CODE, mod_name, true);
     module_reorder( mod_stat ) ;
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
 
-    return TRUE;
+    return true;
 }

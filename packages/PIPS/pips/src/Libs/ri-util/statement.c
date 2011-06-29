@@ -98,7 +98,7 @@ empty_code_p(statement s)
 
 bool empty_code_list_p(list l)
 {
-    MAP(STATEMENT, s, if (!empty_code_p(s)) return FALSE, l);
+    MAP(STATEMENT, s, if (!empty_code_p(s)) return false, l);
     return true;
 }
 
@@ -161,7 +161,7 @@ bool assignment_block_or_statement_p(statement s)
 	break;
     default: pips_internal_error("ill. instruction tag %d", instruction_tag(i));
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -200,14 +200,14 @@ bool forloop_statement_p(statement s) {
 }
 
 /* Had to be optimized according to Beatrice Creusillet. We assume
-   that FALSE is returned most of the time. String operations are
+   that false is returned most of the time. String operations are
    avoided (almost) as much as possible.
 
    For the time being a declaration statement is a call to continue
    with non-empty declarations.
 */
 bool declaration_statement_p(statement s) {
-  bool declaration_p = FALSE;
+  bool declaration_p = false;
 
   /* Initial implementation. It would have been better to check
      !ENDP() first. */
@@ -234,11 +234,11 @@ bool declaration_statement_p(statement s) {
    continue statements. */
 bool continue_statements_p(list sl)
 {
-  bool continue_p = TRUE;
+  bool continue_p = true;
 
   FOREACH(STATEMENT, s, sl) {
     if(!continue_statement_p(s)) {
-      continue_p = FALSE;
+      continue_p = false;
       break;
     }
   }
@@ -298,7 +298,7 @@ bool statement_possible_less_p(statement st1, statement st2)
   int o2 = statement_ordering( st2 ) ;
 
   if (ORDERING_NUMBER( o1 ) != ORDERING_NUMBER( o2 )) {
-    return(TRUE);
+    return(true);
   }
   else
     return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2));
@@ -406,7 +406,7 @@ bool nop_statement_p(statement s)
    * Note 1: blocks are now called "sequences"
    * Note 2: see also empty_statement_p()
    */
-  bool nop = FALSE;
+  bool nop = false;
   instruction i = statement_instruction(s);
 
   if(instruction_block_p(i) && ENDP(instruction_block(i))) {
@@ -414,7 +414,7 @@ bool nop_statement_p(statement s)
     pips_assert("No comments", empty_comments_p(statement_comments(s)));
     pips_assert("No statement number",
 		statement_number(s) == STATEMENT_NUMBER_UNDEFINED);
-    nop = TRUE;
+    nop = true;
   }
 
   return nop;
@@ -438,7 +438,7 @@ bool empty_statement_or_labelless_continue_p(statement st)
 
   if (!unlabelled_statement_p(st)
       || !empty_extensions_p(statement_extensions(st)))
-    return FALSE;
+    return false;
 
   if (continue_statement_p(st))
     return ENDP(statement_declarations(st));
@@ -449,12 +449,12 @@ bool empty_statement_or_labelless_continue_p(statement st)
 	{
 	  if (!empty_statement_or_labelless_continue_p(s))
 	    /* Well there is at least one possibly usefull thing... */
-	    return FALSE;
+	    return false;
 	},
 	instruction_block(i));
-    return TRUE;
+    return true;
   }
-  return FALSE;
+  return false;
 }
 
 
@@ -465,18 +465,18 @@ bool empty_statement_or_continue_p(statement st)
   instruction i;
 
   if (continue_statement_p(st))
-    return TRUE;
+    return true;
   i = statement_instruction(st);
   if (instruction_block_p(i)) {
     FOREACH(STATEMENT, s,instruction_block(i))
 	{
 	  if (!empty_statement_or_continue_p(s))
 	    /* Well there is at least one possibly usefull thing... */
-	    return FALSE;
+	    return false;
 	}
-    return TRUE;
+    return true;
   }
-  return FALSE;
+  return false;
 }
 
 
@@ -490,33 +490,33 @@ bool empty_statement_or_continue_without_comment_p(statement st)
 
   /* The very last condition should be sufficient */
   if (!empty_comments_p(the_comments))
-    return FALSE;
+    return false;
 
   if (!unlabelled_statement_p(st))
-    return FALSE;
+    return false;
   if (continue_statement_p(st) && ENDP(statement_declarations(st)))
-    return TRUE;
+    return true;
 
   i = statement_instruction(st);
   if (instruction_block_p(i)) {
     MAP(STATEMENT, s,
 	{
 	  if (!empty_statement_or_continue_without_comment_p(s))
-	    return FALSE;
+	    return false;
 	},
 	instruction_block(i));
     /* Everything in the block are commentless continue or empty
        statements: */
-    return TRUE;
+    return true;
   }
   /* Everything else useful: */
-  return FALSE;
+  return false;
 }
 
 
 bool check_io_statement_p(statement s)
 {
-  bool check_io = FALSE;
+  bool check_io = false;
   instruction i = statement_instruction(s);
 
   if(instruction_test_p(i)) {
@@ -1628,7 +1628,7 @@ string find_first_comment(statement s)
 
    The comment should have been malloc()'ed before.
 
-   Return TRUE on success, FALSE else. */
+   Return true on success, false else. */
 bool
 try_to_put_a_comment_on_a_statement(statement s,
 				    string the_comments)
@@ -1641,16 +1641,16 @@ try_to_put_a_comment_on_a_statement(statement s,
 	    {
 		if (try_to_put_a_comment_on_a_statement(st, the_comments))
 		    /* Ok, we succeed to put the comment: */
-		    return TRUE;
+		    return true;
 	    },
 	    sequence_statements(instruction_sequence(i)));
 	/* Hmm, no good statement found to attach a comment: */
-	return FALSE;
+	return false;
     }
     else {
 	/* Ok, it is a plain statement, we can put a comment on it: */
 	statement_comments(s) = the_comments;
-	return TRUE;
+	return true;
     }
 }
 
@@ -1987,12 +1987,12 @@ add_label_to_statement(entity label,
 }
 
 
-/* Returns FALSE is no syntactic control path exits s (i.e. even if TRUE is returned
+/* Returns false is no syntactic control path exits s (i.e. even if true is returned
  * there might be no control path). Subroutines and
  * functions are assumed to always return to keep the analysis intraprocedural.
  * See the continuation library for more advanced precondition-based analyses.
  *
- * TRUE is a safe default value.
+ * true is a safe default value.
  *
  * The function name is misleading: a RETURN statement does not return...
  * It should be called "statement_does_continue()"
@@ -2000,7 +2000,7 @@ add_label_to_statement(entity label,
 bool
 statement_does_return(statement s)
 {
-    bool returns = TRUE;
+    bool returns = true;
     instruction i = statement_instruction(s);
     test t = test_undefined;
 
@@ -2010,7 +2010,7 @@ statement_does_return(statement s)
 	     {
 		 statement st = STATEMENT(CAR(sts)) ;
 		 if (!statement_does_return(st)) {
-		     returns = FALSE;
+		     returns = false;
 		     break;
 		 }
 	     },
@@ -2035,11 +2035,11 @@ statement_does_return(statement s)
 	/* No precise answer, unless you can prove the loop executes at
 	 * least one iteration.
 	 */
-	returns = TRUE;
+	returns = true;
 	break;
     case is_instruction_goto:
 	/* returns = statement_does_return(instruction_goto(i)); */
-	returns = FALSE;
+	returns = false;
 	break;
     case is_instruction_forloop:
       break;
@@ -2059,7 +2059,7 @@ statement_does_return(statement s)
 bool
 unstructured_does_return(unstructured u)
 {
-  bool returns = FALSE;
+  bool returns = false;
   control entry = unstructured_control(u);
   control exit = unstructured_exit(u);
   list nodes = NIL;
@@ -2158,7 +2158,7 @@ figure_out_if_it_is_a_format(instruction i, bool *format_inside_statement_has_be
 }
 
 
-/* Return TRUE only if there is a FORMAT inside the statement:
+/* Return true only if there is a FORMAT inside the statement:
 
    @addtogroup statement_predicate
 */
@@ -2232,7 +2232,7 @@ down_counter(statement s)
 
     extend_persistant_statement_to_int(stmt_to_line, s, current_line);
 
-    return TRUE;
+    return true;
 }
 
 static void
@@ -2285,7 +2285,7 @@ statement_to_line_number(statement s)
  *
  * If not, create a new statement s2 with s's fields and update
  * s as a sequence with no comments and undefined number and ordering.
- * The sequence is either "s1;s2" if "before" is TRUE or "s2;s1" else.
+ * The sequence is either "s1;s2" if "before" is true or "s2;s1" else.
  *
  *
  * ATTENTION !!! : this version is not for unstructured case
@@ -2654,7 +2654,7 @@ void statement_replace_with_statement_list(statement as, statement rs, list sl)
 
 static bool find_implicit_goto(statement s, list * tl)
 {
-  bool found = FALSE;
+  bool found = false;
 
   if(statement_call_p(s)) {
     call c = instruction_call(statement_instruction(s));
@@ -2682,7 +2682,7 @@ static bool find_implicit_goto(statement s, list * tl)
       }
     }
     /* No need to go down in call statements */
-    found = TRUE;
+    found = true;
   }
   
   return !found;
@@ -2732,7 +2732,7 @@ static bool undefined_statement_found_p(statement s, bool * p_undefined_p)
 */
 bool all_statements_defined_p(statement s)
 {
-  bool undefined_p = FALSE;
+  bool undefined_p = false;
 
   gen_context_recurse(s, (void *) &undefined_p ,statement_domain,
 		      undefined_statement_found_p, gen_null);
@@ -2745,7 +2745,7 @@ bool all_statements_defined_p(statement s)
    This function is indeed to be used by statement_to_declarations() and
    instruction_to_declarations() but not by its own.
 
-   @return TRUE (to go on diving in a gen_recurse())
+   @return true (to go on diving in a gen_recurse())
 */
 bool add_statement_declarations(statement s, list *statement_to_all_included_declarations)
 {
@@ -2960,16 +2960,16 @@ static entity variable_searched = entity_undefined;
 
 static bool first_reference_to_v_p(reference r)
 {
-  bool result= TRUE;
+  bool result= true;
   if (reference_undefined_p(first_reference_to_v)) {
     entity rv = reference_variable(r);
     if (rv == variable_searched) {
       first_reference_to_v = r;
-      result = FALSE;
+      result = false;
     }
   }
   else
-    result = FALSE;
+    result = false;
 
   return result;
 }
@@ -2991,7 +2991,7 @@ static int reference_count = -1;
 /* Count static references */
 static bool count_static_references_to_v_p(reference r)
 {
-  bool result= TRUE;
+  bool result= true;
     entity rv = reference_variable(r);
     if (rv == variable_searched) {
       reference_count++;
@@ -3013,7 +3013,7 @@ static int    loop_depth;
 
 static bool count_references_to_v_p(reference r)
 {
-  bool result= TRUE;
+  bool result= true;
   entity rv = reference_variable(r);
   if (rv == variable_searched) {
     /* 10: arbitrary value for references nested in at least one loop */
@@ -3025,7 +3025,7 @@ static bool count_references_to_v_p(reference r)
 /* This function checks reference to proper elements, not slices */
 static bool count_element_references_to_v_p(reference r)
 {
-  bool result= TRUE;
+  bool result= true;
   entity rv = reference_variable(r);
   if (rv == variable_searched) {
     list inds = reference_indices(r);
@@ -3041,7 +3041,7 @@ static bool count_element_references_to_v_p(reference r)
 static bool count_loop_in(loop __attribute__ ((unused)) l)
 {
   loop_depth++;
-  return TRUE;
+  return true;
 }
 
 static void count_loop_out(loop __attribute__ ((unused)) l)
@@ -3341,11 +3341,11 @@ list find_statements_with_pragma(statement s, string begin)
 static bool look_for_user_call(call c, bool * user_call_p)
 {
   entity f = call_function(c);
-  bool go_on_p = TRUE;
+  bool go_on_p = true;
 
   if(value_code_p(entity_initial(f))) {
-    * user_call_p = TRUE;
-    go_on_p = FALSE;
+    * user_call_p = true;
+    go_on_p = false;
   }
   return go_on_p;
 }
@@ -3359,7 +3359,7 @@ static bool look_for_user_call(call c, bool * user_call_p)
 */
 bool statement_contains_user_call_p(statement s)
 {
-  bool user_call_p = FALSE;
+  bool user_call_p = false;
   gen_context_recurse(s, &user_call_p, call_domain, look_for_user_call, gen_null);
   return user_call_p;
 }
@@ -3367,12 +3367,12 @@ bool statement_contains_user_call_p(statement s)
 static bool look_for_control_effects(call c, bool * control_effect_p)
 {
   entity f = call_function(c);
-  bool go_on_p = TRUE;
+  bool go_on_p = true;
   value fv = entity_initial(f);
 
   if(value_code_p(fv)) {
-    * control_effect_p = TRUE;
-    go_on_p = FALSE;
+    * control_effect_p = true;
+    go_on_p = false;
   }
   else if(value_intrinsic_p(fv)) {
     if(ENTITY_EXIT_SYSTEM_P(f)
@@ -3381,8 +3381,8 @@ static bool look_for_control_effects(call c, bool * control_effect_p)
        || ENTITY_RETURN_P(f)
        || ENTITY_ASSERT_SYSTEM_P(f)
        || ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
-      * control_effect_p = TRUE;
-      go_on_p = FALSE;
+      * control_effect_p = true;
+      go_on_p = false;
     }
   }
   return go_on_p;
@@ -3398,7 +3398,7 @@ static bool look_for_control_effects(call c, bool * control_effect_p)
 */
 bool statement_may_have_control_effects_p(statement s)
 {
-  bool control_effect_p = FALSE;
+  bool control_effect_p = false;
 
   /* Preserve branch targets, without checking if they are useful or
      not because it can be done by another pass */
@@ -3459,7 +3459,7 @@ static bool statement_in_statement_walker(statement st, struct sb* sb)
 
    @param st is the outside statement
 
-   @return TRUE is @p s is inside @p st
+   @return true is @p s is inside @p st
 
    @addtogroup statement_predicate
 */
@@ -3478,7 +3478,7 @@ bool statement_in_statement_p(statement s, statement st)
 
    @param st is the outside statement
 
-   @return TRUE is at least one statement of @p l is inside @p st
+   @return true is at least one statement of @p l is inside @p st
 
    @addtogroup statement_predicate
 */

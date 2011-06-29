@@ -493,30 +493,30 @@ list make_list_of_n(n, c)
 }
 
 /*======================================================================*/
-/* boolean is_stat_in_pred_list(stat, pred_list): tests if the stat is
+/* bool is_stat_in_pred_list(stat, pred_list): tests if the stat is
  * in the list pred_list.
  *
  * AC 93/12/06
  */
 
-boolean is_stat_in_pred_list(stat, pred_list)
+bool is_stat_in_pred_list(stat, pred_list)
 
  int      stat;
  list     pred_list;
 {
     list     l;
-    boolean  bool = FALSE;
+    bool  bool = false;
     int      s;
 
     l = pred_list;
     
     if (l == NIL)
-	bool = FALSE;
+	bool = false;
     else {
 	for ( ; l != NIL; l = CDR(l)) {
 	    s = INT(CAR(l));
 	    if (s == stat)
-		bool = TRUE;
+		bool = true;
         }
     }
     return(bool);
@@ -758,7 +758,7 @@ bdt build_bdt_null(v)
 
 /*==================================================================*/
 /* if_no_pred(s, b): that function tests if the scc studied has
- * only 1 vertex and no predecessor. Returns TRUE in this case. At
+ * only 1 vertex and no predecessor. Returns true in this case. At
  * the same time, this function updates the field schedule of the
  * hash table with the proper schedule, that is time=0
  *
@@ -781,9 +781,9 @@ bool if_no_pred(s, b)
  if ((lver_b == NIL) && (lsucc == NIL)) 
    {
     *b = build_bdt_null(v);
-    return(TRUE);
+    return(true);
    }
-   else  return(FALSE) ;
+   else  return(false) ;
 }
 
 /*==================================================================*/
@@ -929,7 +929,7 @@ Psysteme transform_in_ineq(sc, l)
     }
 
  /* transform each equality in an inequality */
- sc_elim_empty_constraints(Psyst, TRUE);
+ sc_elim_empty_constraints(Psyst, true);
  sc->inegalites = Psyst->egalites;
  Psyst->egalites = sc->egalites;
  Psyst->nb_eq = sc->nb_eq;
@@ -1008,13 +1008,13 @@ int get_m_coef(e, de)
 }
 
 /*=======================================================================*/
-/* boolean coef_of_M_equal(exp1, exp2): tests if two expressions have the
+/* bool coef_of_M_equal(exp1, exp2): tests if two expressions have the
  * same coefficient of "M".
  *
  * AC 94/02/08
  */
 
-boolean coef_of_M_equal(exp1, exp2)
+bool coef_of_M_equal(exp1, exp2)
 
  expression  *exp1, *exp2;
 {
@@ -1028,18 +1028,18 @@ boolean coef_of_M_equal(exp1, exp2)
 }
 
 /*=======================================================================*/
-/* boolean list_of_exp_equals_1n_p(l1,l2,n): tests the equality of 2 lists 
+/* bool list_of_exp_equals_1n_p(l1,l2,n): tests the equality of 2 lists 
  * of expressions on the first n terms.
  *
  * AC 94/01/25
  */
 
-boolean list_of_exp_equals_1n_p(l1, l2, n)
+bool list_of_exp_equals_1n_p(l1, l2, n)
 
  list        l1, l2;
  int         n;
 {
- boolean     is_equal = TRUE;
+ bool     is_equal = true;
  expression  exp1, exp2;
  int         i;
 
@@ -1192,21 +1192,21 @@ list get_list_of_all_param(s, t)
 }
 
 /*==================================================================*/
-/* boolean is_uniform_rec(l, p): test if a causality condition is
+/* bool is_uniform_rec(l, p): test if a causality condition is
  * linear, that is independent of the structure parameters and all
  * the loop counters.
  *
  * AC 93/11/22
  */
 
-boolean is_uniform_rec(l, p)
+bool is_uniform_rec(l, p)
 
  list            l;
  Ppolynome       p;
 {
  list            lindice = l;
  Variable        var;
- boolean         bool = FALSE;
+ bool         bool = false;
 
  for ( ; lindice != NIL; lindice = CDR(lindice))
     {
@@ -1955,7 +1955,7 @@ Psysteme get_predicate_system_of_node(st, s)
  list      lver;
  vertex    ver;
  Psysteme  sys = SC_UNDEFINED;
- boolean   not_found = TRUE;
+ bool   not_found = true;
 
  lver = scc_vertices(s);
 
@@ -1967,7 +1967,7 @@ Psysteme get_predicate_system_of_node(st, s)
         {
          sys = predicate_to_system(dfg_vertex_label_exec_domain(\
                       (dfg_vertex_label)vertex_vertex_label(ver)));
-         not_found = FALSE;
+         not_found = false;
         }
      lver = CDR(lver);
     }
@@ -2065,7 +2065,7 @@ list simplify_dimension(ld, ps_eq, l)
  Pvecteur     vi, ve;
  expression   exp, ex;
  entity       ent;
- boolean      change = FALSE;
+ bool      change = false;
 
  /* loop on the dimension of the schedule to process */
  for (ldi = ld; ldi != NIL; ldi = CDR(ldi))
@@ -2106,7 +2106,7 @@ list simplify_dimension(ld, ps_eq, l)
 
          if (base_contains_variable_p(vi, (Variable) ent))
             {
-	     change = TRUE;
+	     change = true;
              coe = vect_coeff((Variable) ent, cte->vecteur);
              coi = vect_coeff((Variable) ent, vi);
              ve = vect_dup(cte->vecteur);
@@ -2402,13 +2402,13 @@ bdt include_results_in_bdt(b, baux, lexp)
 }
 
 /*==================================================================*/
-/* boolean is_mu_stat_in_sc(stat, sc): check if the system "sc" 
+/* bool is_mu_stat_in_sc(stat, sc): check if the system "sc" 
  * contains some variable of type "MU_stat".
  *
  * AC 94/01/27
  */
 
-boolean is_mu_stat_in_sc(stat, sc)
+bool is_mu_stat_in_sc(stat, sc)
 
  int       stat;
  Psysteme  sc;
@@ -2417,7 +2417,7 @@ boolean is_mu_stat_in_sc(stat, sc)
  char      *name;
  int       len;
  list      lbase;
- boolean   is_here = FALSE;
+ bool   is_here = false;
 
  asprintf(&name, "%s_%d", "MU", stat);
  len = strlen(name);
@@ -2428,7 +2428,7 @@ boolean is_mu_stat_in_sc(stat, sc)
     {
      ent = ENTITY(CAR(lbase));
      if (!strncmp(name, entity_local_name(ent), len))
-	is_here = TRUE;
+	is_here = true;
     }
  free(name);
  return(is_here);
@@ -2516,7 +2516,7 @@ static bdt analyze_quast(q, stat, lunk, lsys, b, lxe, me)
         /* we process the true edge */
         st_sys = sc_append(st_sys, sys);
 
-        if (sc_rational_feasibility_ofl_ctrl(st_sys, NO_OFL_CTRL, TRUE)) {
+        if (sc_rational_feasibility_ofl_ctrl(st_sys, NO_OFL_CTRL, true)) {
 	  st = make_schedule(stat, make_predicate(st_sys), NIL);
 	  bt = make_bdt(CONS(SCHEDULE, st, NIL));
 	  cond_aux = conditional_true_quast(cond);
@@ -2534,7 +2534,7 @@ static bdt analyze_quast(q, stat, lunk, lsys, b, lxe, me)
         sys = dj->psys;
         sf_sys = sc_append(sf_sys, sys);
 
-        if (sc_rational_feasibility_ofl_ctrl(sf_sys, NO_OFL_CTRL, TRUE))
+        if (sc_rational_feasibility_ofl_ctrl(sf_sys, NO_OFL_CTRL, true))
 	{
 	  sf = make_schedule(stat, make_predicate(sf_sys), NIL);
 	  bf = make_bdt(CONS(SCHEDULE, sf, NIL));
@@ -2726,7 +2726,7 @@ static bdt search_scc_bdt(s)
  Psyslist   lbdt_pred = NULL;
  Psys_list  lsys = NULL;
  entity     xe, me;
- boolean    all_external = FALSE;
+ bool    all_external = false;
  Pvecteur   vu;
 
  psys = sc_new();
@@ -2746,7 +2746,7 @@ static bdt search_scc_bdt(s)
     }
 
  lver = scc_vertices(s);
- if (lver->cdr == NIL) all_external = TRUE;
+ if (lver->cdr == NIL) all_external = true;
 
  /* for each node of the studied scc, get the characteristics of */
  /* the node we want the schedule                                */
@@ -2809,7 +2809,7 @@ static bdt search_scc_bdt(s)
 			         poly_dest, ldata, stat_pred, SC_RN,\
 			         poly_source, &count, xcount, &xe, den);
 	   
-                all_external = FALSE; 
+                all_external = false; 
 		ADD_ELEMENT_TO_LIST(lxe, ENTITY, xe);
                 lsys = add_elt_to_sys_list(lsys, xcount, psys_aux); 
                }
@@ -2876,7 +2876,7 @@ static bdt search_scc_bdt(s)
 
                         ADD_ELEMENT_TO_LIST(lxe, ENTITY, xe);
 			lsys = add_elt_to_sys_list(lsys, xcount, sys);
-			all_external = FALSE;
+			all_external = false;
 		       }
                     else
                         sys = make_causal_external(stat_dest, sys_dest,\

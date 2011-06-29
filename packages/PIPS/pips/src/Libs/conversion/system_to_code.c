@@ -128,7 +128,7 @@ Pcontrainte_to_expression_list(
 /* returns the lower and upper bounds of var if available
  * the concept could be transfered to SC ?
  */
-static boolean
+static bool
 vect_simple_definition_p(
     Pvecteur v,
     Variable *pvar,
@@ -137,17 +137,17 @@ vect_simple_definition_p(
 {
     Variable var;
     int size = vect_size(v);
-    if (size>2 || size<1) return FALSE;
+    if (size>2 || size<1) return false;
 
     var = var_of(v);
-    if (var==TCST && size<=1) return FALSE;
+    if (var==TCST && size<=1) return false;
 
     if (var==TCST) /* size == 2 */
     {
 	*pvar = var_of(v->succ);
 	*pcoe = val_of(v->succ);
 	*pcst = val_of(v);
-	return TRUE;
+	return true;
     }
     else
     {
@@ -156,12 +156,12 @@ vect_simple_definition_p(
 	if (!v->succ) 
 	{
 	    *pcst = 0;
-	    return TRUE;
+	    return true;
 	}
 
-	if (var_of(v->succ)!=TCST) return FALSE;
+	if (var_of(v->succ)!=TCST) return false;
 	*pcst = val_of(v->succ);
-	return TRUE;
+	return true;
     }
 }
 
@@ -259,22 +259,22 @@ reset_information_for_code_optimizations()
 
 /* this functions returns bounds for variable var if both are available.
  */
-static boolean    /* whether bounds were found */
+static bool    /* whether bounds were found */
 range_of_variable(
     Variable var, /* the VARiable */
     Value * lb,   /* Lower Bound */
     Value * ub)   /* Upper Bound */
 {
     if (lowers_undefined_p() || uppers_undefined_p()) 
-	return FALSE; /* no information available, that's for sure */
+	return false; /* no information available, that's for sure */
 
     if (!bound_lowers_p((entity) var) || !bound_uppers_p((entity) var))
-	return FALSE;
+	return false;
 
     *lb = int_to_value(load_lowers((entity) var));
     *ub = int_to_value(load_uppers((entity) var));
 
-    return TRUE;
+    return true;
 }
 
 /* returns v lower bound if found, or INT_MIN.
@@ -323,7 +323,7 @@ static Value vecteur_lower_bound(
     return bound;
 }
 
-static boolean
+static bool
 evaluate_divide_if_possible(
     Pvecteur v,
     Value denominator,
@@ -342,7 +342,7 @@ evaluate_divide_if_possible(
 	{
 	    Value cu,cl;
 	    if (!range_of_variable(var, &lb, &ub))
-		return FALSE;
+		return false;
 	    cu = value_mult(coef,ub);
 	    cl = value_mult(coef,lb);
 	    
@@ -514,7 +514,7 @@ bounds_equal_p(
     Value val_lower, val_upper, the_ppcm;
     bool result;
 
-    if (nb_elems_list(lower)!=1 || nb_elems_list(upper)!=1) return(FALSE);
+    if (nb_elems_list(lower)!=1 || nb_elems_list(upper)!=1) return(false);
 
     val_upper = vect_coeff(var, upper->vecteur); /*coeff for var in the constraint*/
     val_lower = vect_coeff(var, lower->vecteur);
@@ -589,7 +589,7 @@ systeme_to_loop_nest(
                 assign = 
                     make_assign_statement(entity_to_expression((entity) var),
                             constraints_to_loop_bound(lower, var, 
-                                TRUE, divide));
+                                true, divide));
                 current = 
                     make_block_statement(CONS(STATEMENT, assign,
                                 CONS(STATEMENT, current,
@@ -603,9 +603,9 @@ systeme_to_loop_nest(
                  *   ENDDO
                  */
                 rg = make_range(constraints_to_loop_bound(lower, var, 
-                            TRUE, divide),
+                            true, divide),
                         constraints_to_loop_bound(upper, var, 
-                            FALSE, divide),
+                            false, divide),
                         int_to_expression(1));
 
                 current = 

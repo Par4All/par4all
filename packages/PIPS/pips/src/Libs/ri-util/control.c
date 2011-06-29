@@ -294,7 +294,7 @@ cons **l ;
 
    @param cs is the list of control to search through
 
-   @return TRUE if the control node is in the list
+   @return true if the control node is in the list
 */
 bool
 is_control_in_list_p(control c,
@@ -302,9 +302,9 @@ is_control_in_list_p(control c,
 {
     MAP(CONTROL, cc, {
 	if (cc == c)
-	    return TRUE;
+	    return true;
     }, cs);
-    return FALSE;
+    return false;
 }
 
 /* Count the number of occurences of a control node in a list of control
@@ -509,7 +509,7 @@ check_control_coherency(control c)
 			       ctl, i1, cc, cc, i2, ctl);
 		}
 		ifdebug(8)
-		    pips_assert("Control is correct", FALSE);
+		    pips_assert("Control is correct", false);
 	    }
 	}, control_successors(ctl));
 
@@ -518,13 +518,13 @@ check_control_coherency(control c)
 	    /* if (!is_control_in_list_p(ctl, control_successors(cc))) { */
 	    if ((i1=occurences_in_control_list(ctl, control_successors(cc)))
 		!= (i2=occurences_in_control_list(cc, control_predecessors(ctl)))) {
-	      bool consistent_p = FALSE;
+	      bool consistent_p = false;
 		if(i1==0) {
 		    pips_debug(0, "Control node %p not in the successor list of %p\n", ctl, cc);
 		}
 		else {
 		  if(statement_test_p(control_statement(cc)) && i1>=2 && i2==1) {
-		    consistent_p = TRUE;
+		    consistent_p = true;
 		  }
 		  else {
 		    pips_debug(0, "Control %p occurs %d times in the successor list of %p"
@@ -548,7 +548,7 @@ check_control_coherency(control c)
 	   statement as this makes label resolution ambiguous */
 	if(set_belong_p(stmts, control_statement(ctl))) {
 	  fprintf(stderr, "Statement %p is pointed by two different control nodes\n", control_statement(ctl));
-	  pips_assert("each statement appears in at most one control node", FALSE);
+	  pips_assert("each statement appears in at most one control node", false);
 	}
 	else
 	  stmts = set_add_element(stmts, stmts, (void *) control_statement(ctl));
@@ -735,7 +735,7 @@ remove_some_unreachable_controls_of_an_unstructured(unstructured u)
     /* The entry point of the unstructured: */
     control entry_node = unstructured_control(u);
     control exit_node = unstructured_exit(u);
-    bool exit_node_has_been_seen = FALSE;
+    bool exit_node_has_been_seen = false;
     pips_debug(7, "From control %p, exit %p.\n", entry_node, exit_node);
     ifdebug(7) {
 	display_linked_control_nodes(entry_node);
@@ -757,7 +757,7 @@ remove_some_unreachable_controls_of_an_unstructured(unstructured u)
 		    if (c == exit_node)
 			/* Note that we could have entry_node ==
 			   exit_node... */
-			exit_node_has_been_seen = TRUE;
+			exit_node_has_been_seen = true;
 		},
 		entry_node,
 		blocs);
@@ -933,7 +933,7 @@ remove_a_control_from_a_list_and_relink(control c,
                the_dest_of_a_source_list = &control_predecessors(a_dest_of_a_source);
                break;
              default:
-               pips_assert("remove_a_control_from_a_list_and_relink with not a good \"which_way\".\n", FALSE);
+               pips_assert("remove_a_control_from_a_list_and_relink with not a good \"which_way\".\n", false);
            }
 
            /* Find the reference to c in the the_dest_of_a_source_list: */
@@ -1197,12 +1197,69 @@ link_2_control_nodes(control source,
   // defined and if it is defined and that it already has a successor
   // then it is a test? Might be better done here than later when
   // trying to print out the statements...
-    control_successors(source) = CONS(CONTROL,
-				      target,
-				      control_successors(source));
-    control_predecessors(target) = CONS(CONTROL,
-					source,
-					control_predecessors(target));
+  // FI: I think this explains why for loops are improperly desugared...
+
+  // FI: this assert is too strong because if statements are
+  // considered potentially structured and are linked like any other
+  // statement when processing a statement
+  //
+  // pips_assert("source is not a test\n",
+  //      statement_undefined_p(control_statement(source))
+  //      || !statement_test_p(control_statement(source)));
+
+  // FI: to avoid memory leaks and/or inconsistency
+  //pips_assert("source has no successor\n", ENDP(control_successors(source)));
+
+#if 0
+  if(!ENDP(control_successors(source)))
+    // FI: this should never happen if the graph is properly
+    // handled...
+    // I could re-instate the assert and/or just set a breakpoint on
+    // the gen_free_list()
+    gen_free_list(control_successors(source));
+  control_successors(source) = CONS(CONTROL, target, NIL);
+#endif
+
+  // FI: assume the callers knows what it is doing when dealing with tests...
+  control_successors(source) = CONS(CONTROL,
+				    target,
+				    control_successors(source));
+
+  // FI: guess to get for loop properly desugared... but it breaks
+  // something else...
+  //control_successors(source) =
+  //    gen_nconc(control_successors(source), CONS(CONTROL, target, NIL));
+  control_predecessors(target) = CONS(CONTROL,
+				      source,
+				      control_predecessors(target));
+}
+
+/* Add an edge between 2 control nodes.
+
+   Assume that this edge does not already exist or the source should be an
+   unstructured IF. FI: I am still puzzled how this can work when
+   tests are involved since the semantics of the first and second
+   successor is not paid attention at at all.
+
+   @param source is the control node the edge starts from
+
+   @param target is the control node the edge ends to
+ */
+void
+link_3_control_nodes(control c_test,
+		     control c_then, control c_else)
+{
+  if(!ENDP(control_successors(c_test)))
+    gen_free_list(control_successors(c_test));
+  control_successors(c_test) =
+    CONS(CONTROL, c_then, CONS(CONTROL, c_else, NIL));
+
+  control_predecessors(c_then) = CONS(CONTROL,
+				      c_test,
+				      control_predecessors(c_then));
+  control_predecessors(c_else) = CONS(CONTROL,
+				      c_test,
+				      control_predecessors(c_else));
 }
 
 

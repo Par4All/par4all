@@ -59,7 +59,7 @@ typedef struct cons {
 /** Test if a list is empty
 
     @param l the list to test
-    @return TRUE if the list is the empty list, FALSE else
+    @return true if the list is the empty list, false else
 */
 #define ENDP(l) ((l)==NIL)
 
@@ -237,7 +237,7 @@ typedef struct cons {
     }                                                     \
   }
 
-/** Another name to the funtion to insert a boolean element at the start
+/** Another name to the funtion to insert a bool element at the start
     of a list */
 #define gen_BOOL_cons gen_bool_cons
 

@@ -113,12 +113,12 @@ void
 CheckAndInitializeStmt(void)
 {
   int i;
-  int MustStop = FALSE;
+  int MustStop = false;
 
   for (i = 0; i < CurrentStmt; i++) {
     statement s = StmtHeap_buffer[i].s;
     if (statement_instruction(s) == instruction_undefined) {
-      MustStop = TRUE;
+      MustStop = true;
       user_warning("CheckAndInitializeStmt", "Undefined label \"%s\"\n", 
 		   label_local_name(statement_label(s)));
     }
@@ -556,7 +556,7 @@ bool number_it;
 
 	/* instruction_block(i) = CONS (STATEMENT, c, ls); */
       if(number_it) {
-	/* pips_assert("Why do you want to number a block?!?", FALSE); */
+	/* pips_assert("Why do you want to number a block?!?", false); */
 	/* OK, let's be cool and ignore this request to save the caller a test */
 	/* s = MakeStatement(entity_empty_label(), i); */
 	  /* s = instruction_to_statement(i); */
@@ -726,7 +726,7 @@ make_goto_instruction(entity l)
 
 instruction MakeComputedGotoInst(list ll, expression e)
 {
-    instruction inst = MakeAssignedOrComputedGotoInst(ll, e, FALSE);
+    instruction inst = MakeAssignedOrComputedGotoInst(ll, e, false);
 
     return inst;
 }
@@ -738,7 +738,7 @@ instruction MakeAssignedGotoInst(list ll, entity i)
 
     DeclareVariable(i, type_undefined, NIL, storage_undefined, value_undefined);
 
-    inst = MakeAssignedOrComputedGotoInst(ll, expr, TRUE);
+    inst = MakeAssignedOrComputedGotoInst(ll, expr, true);
 
     return inst;
 }
@@ -780,7 +780,7 @@ MakeAssignedOrComputedGotoInst(list ll, expression ce, bool assigned)
     }
   }
   else {
-    pips_internal_error("No range expected", FALSE);
+    pips_internal_error("No range expected", false);
   }
     
 
@@ -1017,7 +1017,7 @@ update_functional_type_with_actual_arguments(entity e, list l)
   else if(get_bool_property("PARSER_TYPE_CHECK_CALL_SITES"))  {
     /* The pre-existing typing of e should match the new one */
     int i = 0;
-    bool warning_p = FALSE;
+    bool warning_p = false;
 
     for (pc = l, pc2 = functional_parameters(ft), i = 1;
 	 !ENDP(pc) && !ENDP(pc2);
@@ -1061,7 +1061,7 @@ update_functional_type_with_actual_arguments(entity e, list l)
 		     i, nth_suffix(i),
 		     module_local_name(e), line_b_I, line_e_I);
 	free_type(at);
-	warning_p = TRUE;
+	warning_p = true;
 	break;
       }
       free_type(at);
@@ -1097,12 +1097,12 @@ MakeCallInst(
     list ar = get_alternate_returns();
     list ap = add_actual_return_code(l);
     storage s = entity_storage(e);
-    bool ffp_p = FALSE;
+    bool ffp_p = false;
     entity fe = e;
 
     if(!storage_undefined_p(s)) {
 	if(storage_formal_p(s)) {
-	  ffp_p = TRUE;
+	  ffp_p = true;
 	    pips_user_warning("entity %s is a formal functional parameter\n",
 			      entity_name(e));
 	    /* ParserError("MakeCallInst",
@@ -1247,7 +1247,7 @@ string l;
 				       NIL));
     }
 
-    LinkInstToCurrentBlock(ido, TRUE);
+    LinkInstToCurrentBlock(ido, true);
    
     PushBlock(instblock_do, l);
 }
@@ -1285,7 +1285,7 @@ MakeWhileDoInst(expression c, string l)
     iwdo = make_instruction(is_instruction_whileloop,
 			   make_whileloop(cond, stmt_do, dolab,make_evaluation_before()));
 
-    LinkInstToCurrentBlock(iwdo, TRUE);
+    LinkInstToCurrentBlock(iwdo, true);
    
     PushBlock(instblock_do, l);
 }
@@ -1510,7 +1510,7 @@ int elsif;
 				   MakeStatement(MakeLabel(""), bt),
 				   MakeStatement(MakeLabel(""), bf)));
 
-    LinkInstToCurrentBlock(i, TRUE);
+    LinkInstToCurrentBlock(i, true);
    
     PushBlock(bt, "ELSE");
     BlockStack[CurrentBlock-1].elsifs = elsif ;
@@ -1549,7 +1549,7 @@ MakeElseInst(bool is_else_p)
 	   The current label is temporarily hidden. */
 	string ln = strdup(get_current_label_string());
 	reset_current_label_string();
-	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+	LinkInstToCurrentBlock(make_continue_instruction(), false);
 	set_current_label_string(ln);
 	free(ln);
     }
@@ -1568,7 +1568,7 @@ MakeElseInst(bool is_else_p)
     if (is_else_p && !empty_current_label_string_p()) {
 	/* generate a CONTINUE to carry the label because the ELSE is not
            represented in the IR */
-	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+	LinkInstToCurrentBlock(make_continue_instruction(), false);
     }
 
     return( BlockStack[CurrentBlock-1].elsifs = elsifs ) ;
@@ -1585,13 +1585,13 @@ MakeEndifInst()
 
     if (iPrevComm != 0) {
 	/* generate a CONTINUE to carry the comments */
-	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+	LinkInstToCurrentBlock(make_continue_instruction(), false);
     }
 
     if (BlockStack[CurrentBlock-1].l != NULL &&
 	strcmp("ELSE", BlockStack[CurrentBlock-1].l) == 0) {
-	elsifs = MakeElseInst(TRUE);
-	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+	elsifs = MakeElseInst(true);
+	LinkInstToCurrentBlock(make_continue_instruction(), false);
     }
     if (BlockStack[CurrentBlock-1].l == NULL ||
 	strcmp("ENDIF", BlockStack[CurrentBlock-1].l)) {
@@ -1623,7 +1623,7 @@ MakeEnddoInst()
     /* Although it is not really an instruction, the ENDDO statement may 
      * carry comments and be labelled when closing a DO label structure.
      */
-    LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+    LinkInstToCurrentBlock(make_continue_instruction(), false);
 
     /* An unlabelled ENDDO can only close one loop. This cannot be
      * performed by LinkInstToCurrentBlock().
@@ -1941,8 +1941,8 @@ MakeSimpleIoInst2(int keyword, expression f, list io_list)
  * For more explanation, see check_first_statement() below.
  */
 
-static int seen = FALSE;
-static int format_seen = FALSE;
+static int seen = false;
+static int format_seen = false;
 static int declaration_lines = -1;
 
 /* Well, some constant defined in reader.c
@@ -1953,8 +1953,8 @@ static int declaration_lines = -1;
 void 
 reset_first_statement()
 {
-    seen = FALSE;
-    format_seen = FALSE;
+    seen = false;
+    format_seen = false;
     declaration_lines = -1;
 }
 
@@ -1962,7 +1962,7 @@ void
 set_first_format_statement()
 {
     if(!format_seen && !seen) {
-	format_seen = TRUE;
+	format_seen = true;
 	/* declaration_lines = line_b_I-1; */
 	    debug(8, "set_first_format_statement", "line_b_C=%d, line_b_I=%d\n",
 		  line_b_C, line_b_I);
@@ -2013,11 +2013,11 @@ check_in_declarations()
 void 
 check_first_statement()
 {
-    int line_start = TRUE;
-    int in_comment = FALSE;
-    int out_of_constant_string = TRUE;
-    int in_constant_string = FALSE;
-    int end_of_constant_string = FALSE;
+    int line_start = true;
+    int in_comment = false;
+    int out_of_constant_string = true;
+    int in_constant_string = false;
+    int end_of_constant_string = false;
     char string_sep = '\000';
 
     if (! seen) 
@@ -2031,7 +2031,7 @@ check_first_statement()
 	char * buffer = (char*) malloc(buffer_size);
 	pips_assert("malloc ok", buffer);
 
-	seen = TRUE;
+	seen = true;
 	
 	/* we must read the input file from the begining and up to the 
 	   line_b_I-1 th line, and the texte read must be stored in buffer */
@@ -2045,7 +2045,7 @@ check_first_statement()
 
 	fd = safe_fopen(CurrentFN, "r");
 	while ((c = getc(fd)) != EOF) {
-	    if(line_start == TRUE)
+	    if(line_start == true)
 		in_comment = strchr(START_COMMENT_LINE,c) != NULL;
 	    /* buffer[ibuffer++] = in_comment? c : toupper(c); */
 	    if(in_comment) {
@@ -2056,8 +2056,8 @@ check_first_statement()
 	      if(out_of_constant_string) {
 		if(c=='\'' || c == '"') {
 		  string_sep = c;
-		  out_of_constant_string = FALSE;
-		  in_constant_string = TRUE;
+		  out_of_constant_string = false;
+		  in_constant_string = true;
 		  buffer[ibuffer++] =  c;
 		} 
 		else {
@@ -2067,21 +2067,21 @@ check_first_statement()
 	      else
 		if(in_constant_string) {
 		  if(c==string_sep) {
-		    in_constant_string = FALSE;
-		    end_of_constant_string = TRUE;
+		    in_constant_string = false;
+		    end_of_constant_string = true;
 		  }
 		  buffer[ibuffer++] =  c;
 		}
 		else 
 		  if(end_of_constant_string) {
 		    if(c==string_sep) {
-		      in_constant_string = TRUE;
-		      end_of_constant_string = FALSE;
+		      in_constant_string = true;
+		      end_of_constant_string = false;
 		      buffer[ibuffer++] =  c;
 		    }
 		    else {
-		      out_of_constant_string = TRUE;
-		      end_of_constant_string = FALSE;
+		      out_of_constant_string = true;
+		      end_of_constant_string = false;
 		      buffer[ibuffer++] =  toupper(c);
 		    }
 		  }
@@ -2097,11 +2097,11 @@ check_first_statement()
 
 	    if (c == '\n') {
 		cpt++;
-		line_start = TRUE;
-		in_comment = FALSE;
+		line_start = true;
+		in_comment = false;
 	    }
 	    else {
-		line_start = FALSE;
+		line_start = false;
 	    }
 
 	    if (cpt == declaration_lines)

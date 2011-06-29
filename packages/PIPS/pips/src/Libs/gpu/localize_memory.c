@@ -45,10 +45,10 @@ mark_loop_to_outline(const statement s) {
     /* Since we only outline outermost loop-nest, stop digging further in
        this statement: */
     pips_debug(1, "Statement %td marked to be outlined\n", statement_number(s));
-    return FALSE;
+    return false;
   }
   // This statement is not a parallel loop, go on digging:
-  return TRUE;
+  return true;
 }
 
 
@@ -78,7 +78,7 @@ bool gpu_ify(const char * module_name) {
 						  "GPU_IFY_DEBUG_LEVEL");
 
   // Get the effects and use them:
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true));
 
   // Initialize the loop nest set to outline to the empty set yet:
   loop_nests_to_outline = NIL;

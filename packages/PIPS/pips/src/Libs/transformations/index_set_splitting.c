@@ -173,7 +173,7 @@ bool index_set_splitting(char* module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
     /* get the loop */
     string loop_label = get_string_property("LOOP_LABEL");
@@ -281,7 +281,7 @@ static void do_loop_fusion(entity lbl) {
 bool force_loop_fusion(char * module_name) {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
     /* get the loop */
     string loop_label = get_string_property("LOOP_LABEL");

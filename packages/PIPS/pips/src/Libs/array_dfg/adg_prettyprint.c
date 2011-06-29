@@ -110,7 +110,7 @@ graph obj;
 #define ADFG_EXT ".adfg_file"
 
 /*============================================================================*/
-boolean print_array_dfg( module_name )
+bool print_array_dfg( module_name )
 string module_name;
 {
   char *localfilename;
@@ -123,7 +123,7 @@ string module_name;
   if (get_debug_level() > 1)
     user_log("\n\n *** PRINTING ARRAY DFG for %s\n", module_name);
 
-  the_dfg = (graph) db_get_memory_resource(DBR_ADFG, module_name, TRUE);
+  the_dfg = (graph) db_get_memory_resource(DBR_ADFG, module_name, true);
 
   localfilename = strdup(concatenate(module_name, ADFG_EXT, NULL));
   filename = strdup(concatenate(db_get_current_workspace_directory(), 
@@ -139,7 +139,7 @@ string module_name;
   
   debug_off();
   
-  return(TRUE);
+  return(true);
 
 }
 

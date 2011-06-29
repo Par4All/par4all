@@ -1,0 +1,71 @@
+delete for_loop09
+
+create for_loop09 for_loop09.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# assume that return is a standard function, which may not return
+#setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+activate NEW_CONTROLIZER
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE(for_loop09)
+
+echo
+echo Controlizer output (return as a function)
+echo
+
+display PRINTED_FILE(for_loop09)
+
+echo
+echo Preconditions (return as a function)
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE(for_loop09)
+
+close
+
+delete for_loop09
+create for_loop09 for_loop09.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+activate NEW_CONTROLIZER
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE(for_loop09)
+
+echo
+echo Controlizer output (return as a goto)
+echo
+
+display PRINTED_FILE(for_loop09)
+
+echo
+echo Preconditions (return as a goto)
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE(for_loop09)
+
+apply UNSPLIT
+shell (cd for_loop09.database/Src; gcc for_loop09.c; ./a.out)
+
+close
+
+delete for_loop09
+quit

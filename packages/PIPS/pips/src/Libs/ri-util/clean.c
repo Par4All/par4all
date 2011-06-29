@@ -131,13 +131,13 @@ void GenericCleanLocalEntities(entity function, bool fortran_p)
 /* Fortran version */
 void CleanLocalEntities(entity function)
 {
-  GenericCleanLocalEntities(function, TRUE);
+  GenericCleanLocalEntities(function, true);
 }
 
 /* C language version */
 void CCleanLocalEntities(entity function)
 {
-  GenericCleanLocalEntities(function, FALSE);
+  GenericCleanLocalEntities(function, false);
 }
 
 /* Useful for ParserError()? */
@@ -157,5 +157,5 @@ entity function;
     /* gen_full_free_list(function_local_entities); */
     /* A gen_multi_recurse would be required but it's hard to be at the
        list level to remove the elements?!? */
-    pips_assert("implemented", FALSE);
+    pips_assert("implemented", false);
 }

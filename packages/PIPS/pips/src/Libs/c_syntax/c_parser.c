@@ -274,7 +274,7 @@ void CParserError(char *msg)
 
   error_reset_current_C_line_number();
   /* get rid of all collected comments */
-  reset_C_comment(TRUE);
+  reset_C_comment(true);
   reset_expression_comment();
   Reset_C_ReturnStatement();
 
@@ -295,7 +295,7 @@ static bool actual_c_parser(string module_name,
     string dir = db_get_current_workspace_directory();
     string file_name =
       strdup(concatenate(dir, "/",
-		     db_get_file_resource(dbr_file,module_name,TRUE), NULL));
+		     db_get_file_resource(dbr_file,module_name,true), NULL));
     entity built_in_va_list = entity_undefined;
     entity built_in_bool = entity_undefined;
     entity built_in_complex = entity_undefined;
@@ -315,7 +315,7 @@ static bool actual_c_parser(string module_name,
 	compilation_unit_name = compilation_unit_of_module(module_name);
 	keyword_typedef_table =
 	  (hash_table) db_get_memory_resource(DBR_DECLARATIONS,
-					      compilation_unit_name,TRUE);
+					      compilation_unit_name,true);
       }
 
     ContextStack = stack_make(c_parser_context_domain,0,0);
@@ -551,19 +551,19 @@ static bool actual_c_parser(string module_name,
     free(compilation_unit_name);
     ContextStack = FunctionStack = FormalStack = OffsetStack = StructNameStack = stack_undefined;
     debug_off();
-    return TRUE;
+    return true;
 }
 
 bool c_parser(string module_name)
 {
   /* When the compilation_unit is parsed, it is parsed a second time
      and multiple declarations are certain to happen. */
-   return actual_c_parser(module_name,DBR_C_SOURCE_FILE,FALSE);
+   return actual_c_parser(module_name,DBR_C_SOURCE_FILE,false);
 }
 
 bool compilation_unit_parser(string module_name)
 {
-  return actual_c_parser(module_name,DBR_C_SOURCE_FILE,TRUE);
+  return actual_c_parser(module_name,DBR_C_SOURCE_FILE,true);
 }
 
 
@@ -575,5 +575,5 @@ bool compilation_unit_parser(string module_name)
  */
 bool step_c_parser(string module)
 {
-  return actual_c_parser(module, DBR_DIRECTIVE_FILTERED_FILE, FALSE);
+  return actual_c_parser(module, DBR_DIRECTIVE_FILTERED_FILE, false);
 }

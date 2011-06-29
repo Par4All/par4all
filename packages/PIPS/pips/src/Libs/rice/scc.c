@@ -205,9 +205,9 @@ int IsInStack(vertex v)
 
   for (i = 0; i < StackPointer; i++)
     if (Stack[i] == v)
-      return(TRUE);
+      return(true);
 
-  return(FALSE);
+  return(false);
 }
 
 

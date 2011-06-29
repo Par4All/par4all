@@ -858,7 +858,7 @@ inline_calls(inlining_parameters p ,char * module)
     entity modified_module = module_name_to_entity(module);
     /* get target module's ressources */
     statement modified_module_statement =
-        (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
+        (statement) db_get_memory_resource(DBR_CODE, module, true);
     pips_assert("statements found", !statement_undefined_p(modified_module_statement) );
     pips_debug(2,"inlining %s in %s\n",entity_user_name(inlined_module(p)),module);
 
@@ -894,9 +894,9 @@ bool do_inlining(inlining_parameters p,char *module_name)
 {
     /* Get the module ressource */
     inlined_module (p)= module_name_to_entity( module_name );
-    inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
-    if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+    if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true));
 
     /* check them */
     pips_assert("is a functionnal",entity_function_p(inlined_module(p)) || entity_subroutine_p(inlined_module(p)) );
@@ -914,7 +914,7 @@ bool do_inlining(inlining_parameters p,char *module_name)
         callers_l = CONS(STRING, c_name, callers_l);
     }
     /*  or get module's callers */
-    callees callers = (callees)db_get_memory_resource(DBR_CALLERS, module_name, TRUE);
+    callees callers = (callees)db_get_memory_resource(DBR_CALLERS, module_name, true);
     if(ENDP(callers_l))
     {
         callers_l = callees_callees(callers);
@@ -942,7 +942,7 @@ bool do_inlining(inlining_parameters p,char *module_name)
     pips_debug(2, "inlining done for %s\n", module_name);
     debug_off();
     /* Should have worked: */
-    return TRUE;
+    return true;
 }
 
 /**
@@ -991,7 +991,7 @@ run_inlining(string caller_name, string module_name, inlining_parameters p)
 {
     /* Get the module ressource */
     inlined_module (p)= module_name_to_entity( module_name );
-    inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, true);
     
 
     if(statement_block_p(inlined_module_statement (p)) && ENDP(statement_block(inlined_module_statement (p))))
@@ -1001,7 +1001,7 @@ run_inlining(string caller_name, string module_name, inlining_parameters p)
     }
     else {
 
-        if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+        if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true));
 
         /* check them */
         pips_assert("is a functionnal",entity_function_p(inlined_module(p)) || entity_subroutine_p(inlined_module(p)) );
@@ -1056,7 +1056,7 @@ bool do_unfolding(inlining_parameters p, char* module_name)
     do {
         statement_has_callee = false;
         statement unfolded_module_statement =
-            (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+            (statement) db_get_memory_resource(DBR_CODE, module_name, true);
         /* gather all referenced calls */
         callees cc =compute_callees(unfolded_module_statement);
         set calls_name = set_make(set_string);

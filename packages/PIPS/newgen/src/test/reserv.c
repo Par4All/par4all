@@ -375,7 +375,7 @@ int main(void)
     gen_free_tabulated( date_domain ) ;
     fprintf( stderr, "Dates freed\n" ) ;
     fd = ouvrir( "sortie", "r" ) ;
-    gen_read_and_check_tabulated( fd, TRUE ) ;
+    gen_read_and_check_tabulated( fd, true ) ;
     fprintf( stderr, "Table read\n" ) ;
     gen_mapc_tabulated( print_date, date_domain ) ;
     i = (indisponibilite)gen_read( fd ) ;

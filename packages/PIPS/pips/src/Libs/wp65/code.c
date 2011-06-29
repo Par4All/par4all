@@ -67,7 +67,7 @@ Value offset_dim1 = VALUE_ZERO;
 Value offset_dim2 = VALUE_ZERO;
 
 static entity tile_indice_entity1;
-static boolean ref_in_statement1;
+static bool ref_in_statement1;
 static Value var_minmax = VALUE_ZERO;
 static Variable var_to_evaluate;
 
@@ -79,10 +79,10 @@ static void ref_found_p(reference ref)
  	
 }
 
-static boolean reference_in_statement_p(statement l, entity v)
+static bool reference_in_statement_p(statement l, entity v)
 {
     tile_indice_entity1= v;
-    ref_in_statement1 = FALSE;
+    ref_in_statement1 = false;
     gen_recurse(l,
 		reference_domain,
 		gen_true,
@@ -98,11 +98,11 @@ static void eval_var(reference ref)
     expression expr2 = expression_undefined;
     cons *expr=NIL;
     Value coeff = VALUE_ZERO;
-    boolean debut=TRUE;
+    bool debut=true;
     ind1 = reference_indices(ref);
 
     if (ind1) {
-	for (debut =TRUE; ind1 != NULL; ind1 = CDR(ind1))
+	for (debut =true; ind1 != NULL; ind1 = CDR(ind1))
 	{ normalized norm1;
 	  expr1 = EXPRESSION(CAR(ind1));
 	  norm1 = (normalized) NORMALIZE_EXPRESSION(expr1);
@@ -126,7 +126,7 @@ static void eval_var(reference ref)
 	  if (debut) {
 	      expr = CONS(EXPRESSION,expr2,NIL);
 	      print_words(stderr,words_expression(expr2, NIL));
-	      debut = FALSE;
+	      debut = false;
 	  }
 	  else expr = gen_nconc(expr,CONS(EXPRESSION,expr2,NIL));
 
@@ -318,7 +318,7 @@ make_scanning_over_tiles(
     ifdebug(9) wp65_debug_print_text(module, s);
 
     for(t = td; t >= 1; t--) { 
-	keep_indice[t]=TRUE;
+	keep_indice[t]=true;
 	sctmp = sc_dup(ordered_tile_domain);
 	sc_minmax_of_variable(sctmp,
 			      variable_of_rank(tile_basis_in_tile_basis, t),
@@ -328,11 +328,11 @@ make_scanning_over_tiles(
 	if ( value_eq(min,max) && !reference_in_statement_p(s,ind)) { 
 	    fprintf(stderr,"indice de tuile inutile %d, %s\n",t,
 		    entity_local_name(ind));
-	    keep_indice[t] = FALSE;
+	    keep_indice[t] = false;
 	}
     }
    
-    for (t=1;t<=td && keep_indice[t]== FALSE;t++);
+    for (t=1;t<=td && keep_indice[t]== false;t++);
     first_indice = (t==td+1) ? td:t;
     ifdebug(7) 
 	fprintf(stderr,"first tile index %d, %s\n",first_indice,
@@ -937,7 +937,7 @@ bool uniform_dependence_p(r1,r2)
 reference r1,r2;
 {
 
-    boolean uniform = TRUE;
+    bool uniform = true;
     cons * ind1, *ind2;
 
     debug(8,"uniform_dependence_p", "begin\n");
@@ -957,7 +957,7 @@ reference r1,r2;
 	    Pvecteur pv3 = vect_substract(pv1,pv2);
 	    if (vect_size(pv3) >1 || 
 		((vect_size (pv3)==1) && (vecteur_var(pv3) != TCST)))
-		uniform = FALSE;
+		uniform = false;
 	    vect_rm(pv3);
 	}
     }
@@ -975,7 +975,7 @@ reference r;
 {
     list plr,lr,bllr,lr2;
     list blr = NIL;
-    boolean trouve = FALSE;
+    bool trouve = false;
     reference r2;
 
     debug(8,"classify_reference", "begin\n");
@@ -984,7 +984,7 @@ reference r;
 	     lr = CDR(lr)) {
 	    r2 = REFERENCE(CAR(lr));
 	    if (uniform_dependence_p(r2,r)) 
-		trouve = TRUE;
+		trouve = true;
 	}
 	blr = (trouve) ? CONS(REFERENCE,r,LIST(CAR(plr))) :
 	    LIST(CAR(plr));
@@ -1078,7 +1078,7 @@ Pbase *new_index_base;
        */
     sc2 =sc_dup(sc_dup(sc_array_function));
     for (lr = CDR(lr); lr != NIL;lr = CDR(lr)) {
-	boolean new_variable = FALSE;
+	bool new_variable = false;
 	r= REFERENCE(CAR(lr));
 	ind = reference_indices(r);
 	for (expr = ind,pc = sc_array_function->inegalites,
@@ -1091,7 +1091,7 @@ Pbase *new_index_base;
 	    if (vect_size(pv3) == 1) {
 		if (value_notzero_p(cst=vecteur_val(pv3))) {
 		    if (!new_variable) {
-			new_variable = TRUE;
+			new_variable = true;
 			var = sc_add_new_variable_name(module,
 						    sc_array_function);
 		    
@@ -1193,11 +1193,11 @@ int last_parallel_level)
     Pbase new_index_base= BASE_NULLE;
     Pbase new_tile_indices = BASE_NULLE;
     reference r;
-    boolean bank_code;			/* is TRUE if it is the generation 
-					   of code for bank FALSE if it is 
+    bool bank_code;			/* is true if it is the generation 
+					   of code for bank false if it is 
 					   for engine */
-    boolean receive_code;		/* is TRUE if the generated code 
-					   must be a RECEIVE, FALSE if it 
+    bool receive_code;		/* is true if the generated code 
+					   must be a RECEIVE, false if it 
 					   must be a SEND*/
     statement stat1,stat2,sb,bsb;
     cons * bst_sb = NIL;
@@ -1230,11 +1230,11 @@ int last_parallel_level)
     for (lrs =lrefs ; !ENDP(lrs) ; POP(lrs)) {
 	r = REFERENCE(CAR(lrs));
 	if (reference_indices(r) ==NIL) {
-	    receive_code = FALSE;
+	    receive_code = false;
 	    *store_block=make_movement_scalar_wp65(compute_module,
 						   receive_code,
 						   r,Proc_id);
-	    receive_code = TRUE;
+	    receive_code = true;
 	    *bank_store_block=
 		make_movement_scalar_wp65(memory_module,receive_code,
 					  r,(entity) bank_indices->var);
@@ -1273,22 +1273,22 @@ int last_parallel_level)
 	pv =tile_indices;
 	nullify_offsets();
 	sc_image2 = sc_dup(sc_image);
-	bank_code = TRUE ;
-	receive_code = TRUE;
+	bank_code = true ;
+	receive_code = true;
 	var_id = (Pbase) vect_new(vecteur_var(ppid),
 				  vecteur_val(ppid));
-	stat1 = movement_computation(memory_module,FALSE,bank_code,
+	stat1 = movement_computation(memory_module,false,bank_code,
 				     receive_code,
 				     shared_variable,sc_image,
 				     const_base,bank_indices,
 				     new_tile_indices,
 				     var_id,loop_body_indices,n,dim_h);
 	initialize_offsets(ldr);
-	bank_code = FALSE ;
-	receive_code = FALSE;
+	bank_code = false ;
+	receive_code = false;
 	var_id = (Pbase) vect_new(vecteur_var(bank_indices),
 				  vecteur_val(bank_indices));
-	stat2 = movement_computation(compute_module,FALSE,bank_code,
+	stat2 = movement_computation(compute_module,false,bank_code,
 				     receive_code,
 				     local_variable,sc_image2,
 				     const_base,bank_indices,
@@ -1343,11 +1343,11 @@ int first_parallel_level,last_parallel_level;
     Pbase const_base;
     Pbase new_index_base = BASE_NULLE;
     Pbase new_tile_indices = BASE_NULLE;
-    boolean bank_code;			/* is TRUE if it is the generation 
-					   of code for bank FALSE if it is 
+    bool bank_code;			/* is true if it is the generation 
+					   of code for bank false if it is 
 					   for engine */
-    boolean receive_code;		/* is TRUE if the generated code 
-					   must be a RECEIVE, FALSE if it 
+    bool receive_code;		/* is true if the generated code 
+					   must be a RECEIVE, false if it 
 					   must be a SEND*/
     reference r;
     statement stat1,stat2,lb,blb;
@@ -1381,10 +1381,10 @@ int first_parallel_level,last_parallel_level;
 	r = REFERENCE(CAR(lrs));
 	if (reference_indices(r) ==NIL) {
 
-	    receive_code = TRUE;
+	    receive_code = true;
 	    *load_block =make_movement_scalar_wp65(compute_module,receive_code,
 						   r,Proc_id);
-	    receive_code = FALSE;
+	    receive_code = false;
 	    *bank_load_block=
 		make_movement_scalar_wp65(memory_module,receive_code,
 					  r,(entity) bank_indices->var);
@@ -1419,24 +1419,24 @@ int first_parallel_level,last_parallel_level;
 					 &n,&dim_h);
 	nullify_offsets();
 	sc_image2= sc_dup(sc_image);
-	bank_code = TRUE ;
-	receive_code = FALSE;
+	bank_code = true ;
+	receive_code = false;
 	var_id = (Pbase) vect_new(vecteur_var(ppid),
 				  vecteur_val(ppid));
 	stat1 = movement_computation(memory_module,
-				     TRUE,
+				     true,
 				     bank_code,
 				     receive_code,
 				     shared_variable,sc_image,
 				     const_base,bank_indices,new_tile_indices,
 				     var_id, loop_body_indices,n,dim_h);
 	initialize_offsets(lur);
-	bank_code = FALSE ;
-	receive_code = TRUE;
+	bank_code = false ;
+	receive_code = true;
 	var_id = (Pbase) vect_new(vecteur_var(bank_indices),
 				  vecteur_val(bank_indices));
 	stat2 = movement_computation(compute_module,
-				     TRUE,
+				     true,
 				     bank_code,
 				     receive_code,
 				     local_variable,sc_image2,

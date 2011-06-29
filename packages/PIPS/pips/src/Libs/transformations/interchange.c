@@ -104,7 +104,7 @@ gener_DOSEQ(
 			      loop_label(l_old),
 			      make_execution(is_execution_sequential,UU),
 			      loop_locals(l_old));
-	    bl = makeloopbody(l_hyp,s_loop, TRUE);
+	    bl = makeloopbody(l_hyp,s_loop, true);
 	    pb=pb->succ;
 	}
     }

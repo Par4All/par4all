@@ -89,7 +89,7 @@ bool SizeOfArray(entity e, int * s)
   type et = entity_type(e);
   type uet = ultimate_type(et);
   variable a, ua;
-  bool ok = TRUE;
+  bool ok = true;
   int se = -1;
   int ne = -1;
   int mne = -1;
@@ -114,7 +114,7 @@ bool SizeOfArray(entity e, int * s)
 	/* Is it an array of characters initialized with a string expression? */
 	if(char_type_p(et) && !basic_undefined_p(eveb) && basic_string_p(eveb)) {
 	  ne = string_type_size(eveb);
-	  ok = TRUE;
+	  ok = true;
 	}
 	else if(expression_call_p(eve)) {
 	  call evec = syntax_call(expression_syntax(eve));
@@ -148,21 +148,21 @@ bool SizeOfArray(entity e, int * s)
 	      // let's assume the source code is correct...
 	      ne = gen_length(args);
 	    }
-	    ok = TRUE;
+	    ok = true;
 	  }
 	  /* Check for other dimensions which must be all declared: the
 	     first dimension only can be implicit */
 	  /* Already taken care of by "ni" */
 	  /*
 	    if(ok && gen_length(variable_dimensions(a))>1) {
-	    bool sok = FALSE;
+	    bool sok = false;
 	    int sne = -1;
 	    sok = NumberOfElements(variable_basic(a), CDR(variable_dimensions(a)), &sne);
 	    if(sok) {
 	    ne *= sne;
 	    }
 	    else {
-	    ok = FALSE;
+	    ok = false;
 	    }
 	    }
 	  */
@@ -184,7 +184,7 @@ bool SizeOfArray(entity e, int * s)
       pips_user_warning("Array size incompatible with 32 bit signed integers\n"
 			"Maximum number of elements: %d, number of elements declared: %d\n",
 			mne, ne);
-      ok = FALSE;
+      ok = false;
     }
   }
   else {
@@ -408,7 +408,7 @@ NumberOfElements(basic b, list ld, int * n)
 {
   list pc;
   int ne = 1;
-  bool ok = TRUE;
+  bool ok = true;
   int sne = 1;
 
   /* do we have many elements at the lower typedef levels? */
@@ -677,7 +677,7 @@ storage_space_of_variable(entity v)
 #define INTERVAL_INTERSECTION(a,b,c,d) (!((b) <= (c) || (d) <= (a)))
 
 /*
-  this function returns TRUE if e1 and e2 MAY have some memory locations
+  this function returns true if e1 and e2 MAY have some memory locations
   in common
 
   This function used to be called entities_may_conflict_p() but abstract
@@ -685,19 +685,19 @@ storage_space_of_variable(entity v)
 */
 bool variable_entity_may_conflict_p(entity e1, entity e2)
 {
-    bool intersect_p = FALSE;
+    bool intersect_p = false;
     storage s1, s2;
     ram r1 = ram_undefined, r2 = ram_undefined;
     int o1, o2, l1, l2;
     entity f1, f2, a1, a2;
 
-    if(same_entity_p(e1, e2)) return TRUE;
+    if(same_entity_p(e1, e2)) return true;
 
     s1 = entity_storage(e1);
     s2 = entity_storage(e2);
 
     if (! (storage_ram_p(s1) && storage_ram_p(s2)))
-	return FALSE;
+	return false;
 
     r1 = storage_ram(s1);
     r2 = storage_ram(s2);
@@ -705,14 +705,14 @@ bool variable_entity_may_conflict_p(entity e1, entity e2)
     a1 = ram_section(r1);
     a2 = ram_section(r2);
 
-    if(a1!=a2) return FALSE;
+    if(a1!=a2) return false;
 
     /* Can we have and check static aliasing in a1? */
     if(stack_area_p(a1))
-      return FALSE;
+      return false;
 
     if(heap_area_p(a1))
-      return FALSE;
+      return false;
 
     /* Let's assume we are dealing with Fortran code, but another test
        should be added about the current module language. No test on
@@ -721,13 +721,13 @@ bool variable_entity_may_conflict_p(entity e1, entity e2)
     o1 = ram_offset(r1);
     o2 = ram_offset(r2);
 
-    if(o1==o2) return TRUE;
+    if(o1==o2) return true;
 
     f1 = ram_function(r1);
     f2 = ram_function(r2);
 
     if(f1==f2 && (ENDP(ram_shared(r1)) || ENDP(ram_shared(r2))))
-       return FALSE;
+       return false;
 
     l1 = storage_space_of_variable(e1);
     l1 = l1+o1-1;

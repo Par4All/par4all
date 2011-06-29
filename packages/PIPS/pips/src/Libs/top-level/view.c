@@ -74,7 +74,7 @@ static string get_view_file(const char* print_type, bool displayable)
       if (safe_make(print_type, module_name)) 
       {
          string file_name = 
-	     db_get_file_resource(print_type, module_name, TRUE);
+	     db_get_file_resource(print_type, module_name, true);
 
 	 if (file_name[0]!='.' && file_name[0]!='/')
 	 {
@@ -106,10 +106,10 @@ static string get_view_file(const char* print_type, bool displayable)
 
 string build_view_file(const char* print_type)
 {
-    return get_view_file(print_type, TRUE);
+    return get_view_file(print_type, true);
 }
 
 string get_dont_build_view_file(const char* print_type)
 {
-    return get_view_file(print_type, FALSE);
+    return get_view_file(print_type, false);
 }

@@ -512,7 +512,7 @@ reference r;
       dataflow df = DATAFLOW(CAR(ll));
       reference dfr = dataflow_reference(df);
 
-      /* TRUE equality, not on pointers */
+      /* true equality, not on pointers */
       if(reference_equal_p(dfr, r))
 	sls = gen_nconc(sls, CONS(SUCCESSOR, suc, NIL));
     }
@@ -904,22 +904,22 @@ instruction i;
 
 /* ========================================================================= */
 /*
- * boolean full_predicate_p(predicate p)
+ * bool full_predicate_p(predicate p)
  */
-boolean full_predicate_p(p)
+bool full_predicate_p(p)
 predicate p;
 {
   Psysteme ps;
 
-  if(p == predicate_undefined) return(TRUE);
+  if(p == predicate_undefined) return(true);
 
   ps = (Psysteme) predicate_system(p);
 
-  if(ps == NULL) return(TRUE);
+  if(ps == NULL) return(true);
 
-  if((ps->egalites == NULL) && (ps->inegalites == NULL)) return(TRUE);
+  if((ps->egalites == NULL) && (ps->inegalites == NULL)) return(true);
 
-  return(FALSE);
+  return(false);
 }
 
 
@@ -1175,9 +1175,9 @@ char*   mod_name;
     set_current_module_entity(ent);
   }
 
-  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
   STS = (statement_mapping) db_get_memory_resource(DBR_STATIC_CONTROL,
-					    mod_name, TRUE);
+					    mod_name, true);
   set_current_stco_map(STS);
   stco = get_stco_from_current_map(mod_stat);
 
@@ -1189,7 +1189,7 @@ char*   mod_name;
   }
 
   /* The DFG */
-  the_dfg = adg_pure_dfg((graph) db_get_memory_resource(DBR_ADFG, mod_name, TRUE));
+  the_dfg = adg_pure_dfg((graph) db_get_memory_resource(DBR_ADFG, mod_name, true));
 
   if(get_debug_level() > 0) {
     fprint_dfg(stdout, the_dfg);

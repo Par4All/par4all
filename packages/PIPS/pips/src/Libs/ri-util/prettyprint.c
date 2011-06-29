@@ -41,7 +41,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
   *     words_expression.  It has two arguments, expression and
   *     precedence. where precedence is newly added. In case of failure
   *     of words_subexpression , that is, when
-  *     syntax_call_p is FALSE, we use words_expression instead.
+  *     syntax_call_p is false, we use words_expression instead.
   * (3) When words_call is firstly called , we give it the lowest precedence,
   *        that is 0.
   *    Lei ZHOU           Nov. 4, 1991
@@ -168,7 +168,7 @@ enum language_utype get_prettyprint_language_tag () {
  * @return true if the language is f77
  **/
 bool prettyprint_language_is_fortran_p () {
-  return (get_prettyprint_language_tag () == is_language_fortran?TRUE:FALSE);
+  return (get_prettyprint_language_tag () == is_language_fortran);
 }
 
 
@@ -176,7 +176,7 @@ bool prettyprint_language_is_fortran_p () {
  * @return true if the language is f95
  **/
 bool prettyprint_language_is_fortran95_p () {
-  return (get_prettyprint_language_tag () == is_language_fortran95?TRUE:FALSE);
+  return (get_prettyprint_language_tag () == is_language_fortran95);
 }
 
 
@@ -184,7 +184,7 @@ bool prettyprint_language_is_fortran95_p () {
  * @return true if the language is C
  **/
 bool prettyprint_language_is_c_p () {
-  return (get_prettyprint_language_tag () == is_language_c?TRUE:FALSE);
+  return (get_prettyprint_language_tag () == is_language_c);
 }
 
 
@@ -286,7 +286,7 @@ static text text_forloop(entity module,string label,int margin,forloop obj,int n
 /* This variable is used to disable the precedence system and hence to
    prettyprint all parentheses, which let the prettyprint reflect the
    AST. */
-static bool precedence_p = TRUE;
+static bool precedence_p = true;
 
 /******************************************************************* STYLES */
 
@@ -375,7 +375,7 @@ bool one_liner_p(statement s)
 	/* OK, we could check deeper, but this is only useful for
 	   redundant internal representations. Let's forget about
 	   niceties such as skipping useless braces. */
-	yes = FALSE;
+	yes = false;
       }
       else
 	yes = ENDP(statement_declarations(s));
@@ -473,9 +473,9 @@ list words_loop_range(range obj, list pdl) {
     list pc;
     call c = syntax_call(expression_syntax(range_increment(obj)));
 
-    pc = words_subexpression(range_lower(obj), 0, TRUE, pdl);
+    pc = words_subexpression(range_lower(obj), 0, true, pdl);
     pc = CHAIN_SWORD(pc,", ");
-    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, TRUE, pdl));
+    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, true, pdl));
     if (/*  expression_constant_p(range_increment(obj)) && */
 	 strcmp( entity_local_name(call_function(c)), "1") == 0 )
 	return(pc);
@@ -498,7 +498,7 @@ list C_loop_range(range obj, entity i, list pdl)
     /* call c = syntax_call(expression_syntax(range_increment(obj))); */
 
     /* Complete the initialization assignment */
-    pc = words_subexpression(range_lower(obj), 0, TRUE, pdl);
+    pc = words_subexpression(range_lower(obj), 0, true, pdl);
     pc = CHAIN_SWORD(pc,"; ");
 
     /* Check the final bound */
@@ -515,7 +515,7 @@ list C_loop_range(range obj, entity i, list pdl)
       /* Else we assume to test against an upper bound: */
       pc = CHAIN_SWORD(pc," <= ");
 
-    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, TRUE, pdl));
+    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, true, pdl));
     pc = CHAIN_SWORD(pc,"; ");
 
     /* Increment the loop index */
@@ -732,7 +732,7 @@ list words_any_reference(reference obj, list pdl, const char* (*enf)(entity))
 			   words_subscript_range(syntax_range(ssubscript),
 						 pdl));
 	  } else {
-	    pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
+	    pc = gen_nconc(pc, words_subexpression(subscript, 0, true, pdl));
 	  }
 	}
 	pc = CHAIN_SWORD(pc,")");
@@ -747,7 +747,7 @@ list words_any_reference(reference obj, list pdl, const char* (*enf)(entity))
 			   words_subscript_range(syntax_range(ssubscript),
 						 pdl));
 	  } else {
-	    pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE, pdl));
+	    pc = gen_nconc(pc, words_subexpression(subscript, 0, true, pdl));
 	  }
 	  pc = CHAIN_SWORD(pc, "]");
 	}
@@ -1017,7 +1017,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
 	   context. Be careful with unary minus. */
 	pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(pa)),
 					       ASSIGN_OPERATOR_PRECEDENCE,
-					       TRUE/*FALSE*/,
+					       true/*false*/,
 					       pdl));
       }
       if (CDR(pa) != NIL)
@@ -1060,7 +1060,7 @@ words_call_intrinsic(call obj,
 		     bool __attribute__ ((unused)) leftmost,
 		     list pdl)
 {
-  return words_regular_call(obj, TRUE, pdl);
+  return words_regular_call(obj, true, pdl);
 }
 
 static list
@@ -1073,7 +1073,7 @@ words_assign_op(call obj,
   int prec = words_intrinsic_precedence(obj);
   string fun = entity_local_name(call_function(obj));
 
-  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE, pdl));
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, true, pdl));
 
   if (strcmp(fun, MODULO_UPDATE_OPERATOR_NAME) == 0)
     fun = "%=";
@@ -1096,13 +1096,13 @@ words_assign_op(call obj,
          even with the parenthesis option */
 	/*
          call c = syntax_call(expression_syntax(e));
-         pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE, pdl));
+         pc = gen_nconc(pc, words_call(c, 0, true, true, pdl));
          */
 	pc = gen_nconc(pc, words_syntax(expression_syntax(exp), pdl));
       } else
 	pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))),
 					       prec,
-					       TRUE,
+					       true,
 					       pdl));
       break;
     case is_language_c:
@@ -1115,10 +1115,10 @@ words_assign_op(call obj,
 	else {
 	  /* Be careful with expression lists, they may require
            surrounding parentheses. */
-	  pc = gen_nconc(pc, words_subexpression(exp, prec, TRUE, pdl));
+	  pc = gen_nconc(pc, words_subexpression(exp, prec, true, pdl));
 	}
       } else {
-	pc = gen_nconc(pc, words_subexpression(exp, prec, TRUE, pdl));
+	pc = gen_nconc(pc, words_subexpression(exp, prec, true, pdl));
       }
       break;
     default:
@@ -1151,9 +1151,9 @@ words_substring_op(call obj,
     l = EXPRESSION(CAR(CDR(call_arguments(obj))));
     u = EXPRESSION(CAR(CDR(CDR(call_arguments(obj)))));
 
-    pc = gen_nconc(pc, words_subexpression(r,  prec, TRUE, pdl));
+    pc = gen_nconc(pc, words_subexpression(r,  prec, true, pdl));
     pc = CHAIN_SWORD(pc, "(");
-    pc = gen_nconc(pc, words_subexpression(l, prec, TRUE, pdl));
+    pc = gen_nconc(pc, words_subexpression(l, prec, true, pdl));
     pc = CHAIN_SWORD(pc, ":");
 
     /* An unknown upper bound is encoded as a call to
@@ -1161,10 +1161,10 @@ words_substring_op(call obj,
     if(syntax_call_p(expression_syntax(u))) {
 	entity star = call_function(syntax_call(expression_syntax(u)));
 	if(star!=CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
-	  pc = gen_nconc(pc, words_subexpression(u, prec, TRUE, pdl));
+	  pc = gen_nconc(pc, words_subexpression(u, prec, true, pdl));
     }
     else {
-      pc = gen_nconc(pc, words_subexpression(u, prec, TRUE, pdl));
+      pc = gen_nconc(pc, words_subexpression(u, prec, true, pdl));
     }
     pc = CHAIN_SWORD(pc, ")");
 
@@ -1186,9 +1186,9 @@ words_assign_substring_op(call obj,
 
     e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj))))));
 
-    pc = gen_nconc(pc, words_substring_op(obj,  prec, TRUE, pdl));
+    pc = gen_nconc(pc, words_substring_op(obj,  prec, true, pdl));
     pc = CHAIN_SWORD(pc, " = ");
-    pc = gen_nconc(pc, words_subexpression(e, prec, TRUE, pdl));
+    pc = gen_nconc(pc, words_subexpression(e, prec, true, pdl));
 
     return(pc);
 }
@@ -1285,7 +1285,7 @@ words_nullary_op_c(call obj,
   entity func = call_function(obj);
   string fname = entity_local_name(func);
   int nargs = gen_length(args);
-  bool parentheses_p=TRUE;
+  bool parentheses_p=true;
 
   /* STOP and PAUSE and RETURN in Fortran may have 0 or 1 argument.
      STOP and PAUSE are prettyprinted in C using PIPS specific C functions. */
@@ -1323,7 +1323,7 @@ words_nullary_op_c(call obj,
     else if(same_string_p(fname,RETURN_FUNCTION_NAME)
 	    ||same_string_p(fname,C_RETURN_FUNCTION_NAME)){
       pc = CHAIN_SWORD(pc, "return");
-      parentheses_p = FALSE;
+      parentheses_p = false;
       //pips_user_error("alternate returns are not supported in C\n");
     }
     else if(same_string_p(fname, PAUSE_FUNCTION_NAME)){
@@ -1333,7 +1333,7 @@ words_nullary_op_c(call obj,
       pips_internal_error("unexpected one argument");
     }
     pc = CHAIN_SWORD(pc, parentheses_p?"(":" ");
-    pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE, pdl));
+    pc = gen_nconc(pc, words_subexpression(e, precedence, true, pdl));
     pc = CHAIN_SWORD(pc, parentheses_p?")":"");
   }
   else {
@@ -1369,7 +1369,7 @@ static list words_nullary_op_fortran(call obj,
        || same_string_p(fname, C_RETURN_FUNCTION_NAME)) {
       expression e = EXPRESSION(CAR(args));
       pc = CHAIN_SWORD(pc, " ");
-      pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE, pdl));
+      pc = gen_nconc(pc, words_subexpression(e, precedence, true, pdl));
     }
     else {
       pips_internal_error("unexpected arguments");
@@ -1517,10 +1517,10 @@ words_io_inst(call obj,
   list pc = NIL;
   list pcio = call_arguments(obj);
   list pio_write = pcio;
-  boolean good_fmt = FALSE;
-  bool good_unit = FALSE;
-  bool iolist_reached = FALSE;
-  bool complex_io_control_list = FALSE;
+  bool good_fmt = false;
+  bool good_unit = false;
+  bool iolist_reached = false;
+  bool complex_io_control_list = false;
   expression fmt_arg = expression_undefined;
   expression unit_arg = expression_undefined;
   string called = entity_local_name(call_function(obj));
@@ -1572,10 +1572,10 @@ words_io_inst(call obj,
       pio_write = CDR(CDR(pio_write));
     } else if(strcmp(entity_local_name(call_function(c)), IO_LIST_STRING_NAME)
 	      == 0) {
-      iolist_reached = TRUE;
+      iolist_reached = true;
       pio_write = CDR(pio_write);
     } else {
-      complex_io_control_list = TRUE;
+      complex_io_control_list = true;
       pio_write = CDR(CDR(pio_write));
     }
   }
@@ -1758,7 +1758,7 @@ words_prefix_unary_op(call obj,
       }
 
   pc = CHAIN_SWORD(pc,fun);
-  pc = gen_nconc(pc, words_subexpression(e, prec, FALSE, pdl));
+  pc = gen_nconc(pc, words_subexpression(e, prec, false, pdl));
 
   if(prec < precedence ||  (!precedence_p && precedence>0)) {
     pc = CONS(STRING, MAKE_SWORD("("), pc);
@@ -1779,7 +1779,7 @@ words_postfix_unary_op(call obj,
     int prec = words_intrinsic_precedence(obj);
     string fun = entity_local_name(call_function(obj));
 
-    pc = gen_nconc(pc, words_subexpression(e, prec, FALSE, pdl));
+    pc = gen_nconc(pc, words_subexpression(e, prec, false, pdl));
 
     if (strcmp(fun,POST_INCREMENT_OPERATOR_NAME) == 0)
       fun = "++";
@@ -1807,7 +1807,7 @@ words_unary_minus(call obj, int precedence, bool leftmost, list pdl)
     if ( prec < precedence || !leftmost ||  !precedence_p)
 	pc = CHAIN_SWORD(pc, "(");
     pc = CHAIN_SWORD(pc, "-");
-    pc = gen_nconc(pc, words_subexpression(e, prec, FALSE, pdl));
+    pc = gen_nconc(pc, words_subexpression(e, prec, false, pdl));
     if ( prec < precedence || !leftmost ||  !precedence_p)
 	pc = CHAIN_SWORD(pc, ")");
 
@@ -1836,7 +1836,7 @@ words_inverse_op(call obj,
     pc = CHAIN_SWORD(pc, "(");
   pc = CHAIN_SWORD(pc, "1./");
   pc = gen_nconc(pc, words_subexpression(e, MAXIMAL_PRECEDENCE ,
-					 FALSE, pdl));
+					 false, pdl));
 
   if ( prec < precedence)
     pc = CHAIN_SWORD(pc, ")");
@@ -1886,7 +1886,7 @@ words_goto_label(string tlabel)
 	pc = CHAIN_SWORD(pc, entity_user_name(rv));
 	pc = CHAIN_SWORD(pc, ";");
       }
-      if(FALSE) {
+      if(false) {
 	// the gotos are maintained, but the final return must be printed out
 	// FI: this would only work if the final return were printed
 	// out for sure and with its label
@@ -1947,14 +1947,14 @@ eole_fmx_specific_op(call obj,
   prec = intrinsic_precedence("*");
 
   /* first argument */
-  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)), prec, TRUE, pdl));
+  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)), prec, true, pdl));
 
   /* mult operator */
   pc = CHAIN_SWORD(pc,"*");
 
   /* second argument */
   args = CDR(args);
-  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)),prec,TRUE, pdl));
+  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)),prec,true, pdl));
 
   /* close parenthese two */
   pc = CHAIN_SWORD(pc, ")");
@@ -1967,7 +1967,7 @@ eole_fmx_specific_op(call obj,
 
   /* third argument */
   args = CDR(args);
-  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)),prec,FALSE, pdl));
+  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)),prec,false, pdl));
 
   /* close parenthese one  */
   pc = CHAIN_SWORD(pc,")");
@@ -1981,14 +1981,14 @@ eole_fmx_specific_op(call obj,
 list /* of string */
 eole_fma_specific_op(call obj, int precedence, bool leftmost, list pdl)
 {
-  return eole_fmx_specific_op(obj, precedence, leftmost, TRUE, pdl);
+  return eole_fmx_specific_op(obj, precedence, leftmost, true, pdl);
 }
 
 /* MULTIPLY-SUB operator */
 list /* of string */
 eole_fms_specific_op(call obj, int precedence, bool leftmost, list pdl)
 {
-  return eole_fmx_specific_op(obj, precedence, leftmost, FALSE, pdl);
+  return eole_fmx_specific_op(obj, precedence, leftmost, false, pdl);
 }
 
 /* Check if the given operator is associated with a special
@@ -2038,7 +2038,7 @@ words_infix_nary_op(call obj, int precedence, bool leftmost, list pdl)
   expression exp2;
 
   list we1 = words_subexpression(exp1, prec,
-				 prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE, pdl);
+				 prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: true, pdl);
   list we2;
 
   /* open parenthese if necessary */
@@ -2060,15 +2060,15 @@ words_infix_nary_op(call obj, int precedence, bool leftmost, list pdl)
      * Lei ZHOU       Nov. 4 , 1991
      */
     if ( strcmp(entity_local_name(call_function(obj)), "/") == 0 )  /* divide operator */
-      we2 = words_subexpression(exp2, MAXIMAL_PRECEDENCE, FALSE, pdl);
+      we2 = words_subexpression(exp2, MAXIMAL_PRECEDENCE, false, pdl);
     else if ( strcmp(entity_local_name(call_function(obj)), "-") == 0 ) { /* minus operator */
       if ( expression_call_p(exp2) &&
 	   words_intrinsic_precedence(syntax_call(expression_syntax(exp2))) >=
 	   intrinsic_precedence("*") )
 	/* precedence is greater than * or / */
-	we2 = words_subexpression(exp2, prec, FALSE, pdl);
+	we2 = words_subexpression(exp2, prec, false, pdl);
       else
-	we2 = words_subexpression(exp2, MAXIMAL_PRECEDENCE, FALSE, pdl);
+	we2 = words_subexpression(exp2, MAXIMAL_PRECEDENCE, false, pdl);
     }
     else {
       we2 = words_subexpression(exp2, prec,
@@ -2101,7 +2101,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
   list args = call_arguments(obj);
   int prec = words_intrinsic_precedence(obj);
   list we1 = words_subexpression(EXPRESSION(CAR(args)), prec,
-				 prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE, pdl);
+				 prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: true, pdl);
   list we2;
   string fun = entity_local_name(call_function(obj));
 
@@ -2111,7 +2111,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
   if(strcmp(fun, DIVIDE_OPERATOR_NAME) == 0) {
     /* Do we want to add a space in case we2 starts with a dereferencing operator "*"?
      Nga suggests to look at the quake benchmark of SPEC2000. */
-    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, FALSE, pdl);
+    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, false, pdl);
   }
   else if (strcmp(fun, MINUS_OPERATOR_NAME) == 0 ) {
     expression exp = EXPRESSION(CAR(CDR(args)));
@@ -2119,9 +2119,9 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
        words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >=
        intrinsic_precedence(MULTIPLY_OPERATOR_NAME) )
       /* precedence is greater than * or / */
-      we2 = words_subexpression(exp, prec, FALSE, pdl);
+      we2 = words_subexpression(exp, prec, false, pdl);
     else
-      we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE, pdl);
+      we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, false, pdl);
   }
   else if(strcmp(fun, MULTIPLY_OPERATOR_NAME) == 0) {
     expression exp = EXPRESSION(CAR(CDR(args)));
@@ -2130,14 +2130,14 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
       basic bexp = basic_of_expression(exp);
 
       if(basic_int_p(bexp)) {
-	we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE, pdl);
+	we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, false, pdl);
       }
       else
-	we2 = words_subexpression(exp, prec, FALSE, pdl);
+	we2 = words_subexpression(exp, prec, false, pdl);
       free_basic(bexp);
     }
     else
-      we2 = words_subexpression(exp, prec, FALSE, pdl);
+      we2 = words_subexpression(exp, prec, false, pdl);
   }
   else {
     we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec,
@@ -2209,11 +2209,11 @@ static list words_comma_op(call obj,
 
   if(prec < precedence || !precedence_p)
     pc = CHAIN_SWORD(pc,"(");
-  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE, pdl));
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, true, pdl));
   while (!ENDP(CDR(args)))
   {
     pc = CHAIN_SWORD(pc,space_p?", " : ",");
-    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE, pdl));
+    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, true, pdl));
     args = CDR(args);
   }
   if(prec < precedence || !precedence_p)
@@ -2231,11 +2231,11 @@ static list words_conditional_op(call obj,
 
   if(prec < precedence || !precedence_p)
     pc = CHAIN_SWORD(pc,"(");
-  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE, pdl));
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, true, pdl));
   pc = CHAIN_SWORD(pc,"?");
-  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE, pdl));
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, true, pdl));
   pc = CHAIN_SWORD(pc,":");
-  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(CDR(args)))), prec, TRUE, pdl));
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(CDR(args)))), prec, true, pdl));
   if(prec < precedence || !precedence_p)
     pc = CHAIN_SWORD(pc,")");
   return(pc);
@@ -2426,7 +2426,7 @@ words_intrinsic_call(call obj, int precedence, bool leftmost, list pdl)
 	p++;
     }
 
-    return words_regular_call(obj, FALSE, pdl);
+    return words_regular_call(obj, false, pdl);
 }
 
 static int
@@ -2504,15 +2504,15 @@ words_syntax(syntax obj, list pdl)
       pc = words_range(syntax_range(obj), pdl);
       break;
     case is_syntax_call:
-      pc = words_call(syntax_call(obj), 0, TRUE, FALSE, pdl);
+      pc = words_call(syntax_call(obj), 0, true, false, pdl);
       break;
     case is_syntax_cast:
       pc = words_cast(syntax_cast(obj), 0, pdl);
       break;
     case is_syntax_sizeofexpression: {
-      /* FI->SG: I do not know if in_type_declaration is TRUE, FALSE
+      /* FI->SG: I do not know if in_type_declaration is true, false
 	 or a formal parameter */
-      bool in_type_declaration = TRUE;
+      bool in_type_declaration = true;
       pc = words_sizeofexpression(syntax_sizeofexpression(obj),
 				  in_type_declaration, pdl);
       break;
@@ -2552,7 +2552,7 @@ list words_subexpression(
 
     if ( expression_call_p(obj) )
       pc = words_call(syntax_call(expression_syntax(obj)),
-		      precedence, leftmost, FALSE, pdl);
+		      precedence, leftmost, false, pdl);
     else if(expression_cast_p(obj)) {
       cast c = expression_cast(obj);
       pc = words_cast(c, precedence, pdl);
@@ -2736,7 +2736,7 @@ text_block(entity module,
   for (; objs != NIL; objs = CDR(objs)) {
     statement s = STATEMENT(CAR(objs));
 
-    text t = text_statement_enclosed(module, margin, s, FALSE, TRUE, pdl);
+    text t = text_statement_enclosed(module, margin, s, false, true, pdl);
     text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
     text_sentences(t) = NIL;
     free_text(t);
@@ -2767,13 +2767,13 @@ loop_private_variables(loop obj, list pdl)
 {
     bool all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
       hpf_private = pp_hpf_style_p(), omp_private = pp_omp_style_p(),
-      some_before = FALSE;
+      some_before = false;
   list l = NIL;
 
   // list of local entities
   // In case of openmp the variable declared in the loop body should
   // not be made private, so ask for removing them from the list of locals.
-  // If all_private is FALSE -> remove loop indice from the list of locals.
+  // If all_private is false -> remove loop indice from the list of locals.
   list locals = loop_private_variables_as_entites(obj,
 						  omp_private,
 						  !all_private);
@@ -2825,8 +2825,8 @@ loop_private_variables(loop obj, list pdl)
       if (some_before)
 	l = CHAIN_SWORD(l, ",");
       else
-	some_before = TRUE; /* from now on commas, triggered... */
-      l = gen_nconc(l, words_declaration(p, TRUE, pdl));
+	some_before = true; /* from now on commas, triggered... */
+      l = gen_nconc(l, words_declaration(p, true, pdl));
     }
 
     gen_free_list(locals);
@@ -2989,13 +2989,13 @@ text text_loop_default(entity module,
   entity the_label = loop_label(obj);
   string do_label = entity_local_name(the_label) + strlen(LABEL_PREFIX);
   bool structured_do = entity_empty_label_p(the_label);
-  bool doall_loop_p = FALSE;
+  bool doall_loop_p = false;
   bool hpf_prettyprint = pp_hpf_style_p();
   bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
   bool all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
 
   if (execution_sequential_p(loop_execution(obj))) {
-    doall_loop_p = FALSE;
+    doall_loop_p = false;
   } else {
     doall_loop_p = pp_doall_style_p();
   }
@@ -3162,10 +3162,10 @@ text text_loop(
     }
     else if (pp_f90_style_p()) {
       instruction bi = statement_instruction(body); // body instruction
-      bool success_p = FALSE;
+      bool success_p = false;
       if(instruction_assign_p(bi) ) {
 	MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
-	success_p = TRUE;
+	success_p = true;
       }
       else if(instruction_sequence_p(bi)) {
 	list sl = sequence_statements(instruction_sequence(bi));
@@ -3174,7 +3174,7 @@ text text_loop(
 	  instruction ibi = statement_instruction(ibs);
 	  if(instruction_assign_p(ibi) ) {
 	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
-	    success_p = TRUE;
+	    success_p = true;
 	  }
 	}
       }
@@ -3376,7 +3376,7 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
       pc = CHAIN_SWORD(pc, ") ");
       ti = statement_instruction(tb);
       c = instruction_call(ti);
-      pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE, pdl));
+      pc = gen_nconc(pc, words_call(c, 0, true, true, pdl));
       ADD_SENTENCE_TO_TEXT(r,
 			   make_sentence(is_sentence_unformatted,
 					 make_unformatted(strdup(label), n,
@@ -3418,7 +3418,7 @@ static text text_block_if(entity module,
   statement test_false_obj;
   bool one_liner_true_statement = one_liner_p(test_true(obj));
   bool one_liner_false_statement = one_liner_p(test_false(obj));
-  bool else_branch_p = FALSE; /* The else branch must be printed */
+  bool else_branch_p = false; /* The else branch must be printed */
 
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
@@ -3462,7 +3462,7 @@ static text text_block_if(entity module,
 	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
      || (continue_statement_p(test_false_obj)
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
-    else_branch_p = TRUE;
+    else_branch_p = true;
     switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
@@ -3630,8 +3630,8 @@ static text text_block_else(entity module,
 	MERGE_TEXTS(r, text_statement_enclosed(module,
 					       margin+INDENTATION,
 					       stmt,
-					       FALSE,
-					       FALSE,
+					       false,
+					       false,
 					       pdl));
       } else {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "else {"));
@@ -3841,8 +3841,8 @@ static text text_instruction(entity module,
 			       margin,
 			       words_call(instruction_call(obj),
 					  0,
-					  TRUE,
-					  TRUE,
+					  true,
+					  true,
 					  pdl));
 	  break;
 	case is_language_c:
@@ -3850,7 +3850,7 @@ static text text_instruction(entity module,
 			       n,
 			       margin,
 			       CHAIN_SWORD(words_call(instruction_call(obj),
-						      0, TRUE, TRUE, pdl),
+						      0, true, true, pdl),
 					   C_STATEMENT_END_STRING));
 	  break;
 	default:
@@ -3909,7 +3909,7 @@ static text text_instruction(entity module,
 /* In case the input code is not C code, non-standard comments have to
    be detected */
 bool  C_comment_p(string c){
-  bool is_C_comment=TRUE;
+  bool is_C_comment=true;
   char * ccp=c;
   char cc=' ';
 
@@ -3922,7 +3922,7 @@ bool  C_comment_p(string c){
  else if(cc=='\000')
    goto end;
  else {
-   is_C_comment=FALSE;
+   is_C_comment=false;
    goto end;
  }
 
@@ -3933,7 +3933,7 @@ bool  C_comment_p(string c){
  else if(cc=='/')
    goto slash_slash;
  else{
-   is_C_comment=FALSE;
+   is_C_comment=false;
    goto end;
  }
 
@@ -3942,7 +3942,7 @@ bool  C_comment_p(string c){
  if(cc=='*')
    goto slash_star_star;
   else if(cc=='\0'){
-    is_C_comment=FALSE;
+    is_C_comment=false;
     goto end;
   }
  else
@@ -3964,7 +3964,7 @@ bool  C_comment_p(string c){
   else if(cc=='*')
     goto slash_star_star;
   else if(cc=='\0'){
-    is_C_comment=FALSE;
+    is_C_comment=false;
     goto end;
   }
   else
@@ -3991,7 +3991,7 @@ text C_any_comment_to_text(int r_margin, string c)
   if(strlen(c)>0) {
     for(;*cp!='\0';cp++) {
       if(*cp=='\n') {
-	if(cp!=c || TRUE){ // Do not skip \n
+	if(cp!=c || true){ // Do not skip \n
 	  string cl = gen_strndup0(lb, le-lb);
 	  sentence s = sentence_undefined;
 	  if(is_C_comment)
@@ -4237,7 +4237,7 @@ text text_statement_enclosed(entity module,
   text temp;
   string i_comments = statement_comments(stmt);
   string comments = string_undefined;
-  bool braces_added = FALSE;
+  bool braces_added = false;
   int nmargin = imargin;
 
   // To ease breakpoint setting
@@ -4252,10 +4252,10 @@ text text_statement_enclosed(entity module,
      statement_block_p(stmt) &&
      !empty_extensions_p(statement_extensions(stmt)))
     {
-      string ext =  extensions_to_string(statement_extensions (stmt), TRUE);
+      string ext =  extensions_to_string(statement_extensions (stmt), true);
       if (ext != string_undefined) {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, ext));
-	braces_added = TRUE;
+	braces_added = true;
 	ADD_SENTENCE_TO_TEXT(r,
 			     MAKE_ONE_WORD_SENTENCE(imargin, "{"));
 	nmargin += INDENTATION;
@@ -4273,7 +4273,7 @@ text text_statement_enclosed(entity module,
   if (!ENDP(dl) && prettyprint_language_is_c_p()) {
     if(statement_block_p(stmt)) {
       if(!braces_p && !braces_added) {
-	braces_added = TRUE;
+	braces_added = true;
 	ADD_SENTENCE_TO_TEXT(r,
 			     MAKE_ONE_WORD_SENTENCE(imargin, "{"));
 	nmargin += INDENTATION;
@@ -4373,7 +4373,7 @@ text text_statement_enclosed(entity module,
 	get_current_module_entity()
 	: module;
 
-      if(TRUE || !compilation_unit_p(entity_name(m))) {
+      if(true || !compilation_unit_p(entity_name(m))) {
 	/* Do we need to print this CONTINUE statement in C? */
 	string cs = statement_comments(stmt);
 
@@ -4480,7 +4480,7 @@ text text_statement_enclosed(entity module,
 
   if(!(prettyprint_language_is_c_p() && statement_block_p(stmt))) {
     /* Append the extensions after comments: */
-    string ext =  extensions_to_string(statement_extensions (stmt), TRUE);
+    string ext =  extensions_to_string(statement_extensions (stmt), true);
     if (ext != string_undefined) {
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, ext));
     }
@@ -4504,7 +4504,7 @@ text text_statement_enclosed(entity module,
   attach_statement_information_to_text(r, stmt);
 
   // the last thing to do is to close the extension
-  string close =  close_extensions (statement_extensions (stmt), TRUE);
+  string close =  close_extensions (statement_extensions (stmt), true);
   if (close != string_undefined) {
     ADD_SENTENCE_TO_TEXT(r,make_sentence(is_sentence_formatted, close));
   }
@@ -4559,7 +4559,7 @@ text text_statement(
     statement stmt,
     list pdl)
 {
-  return text_statement_enclosed(module, margin, stmt, TRUE, TRUE, pdl);
+  return text_statement_enclosed(module, margin, stmt, true, true, pdl);
 }
 
 /* Keep track of the last statement to decide if a final return can be
@@ -4846,7 +4846,7 @@ bool output_a_graph_view_of_the_unstructured_from_a_control(text r,
 							    control begin_control,
 							    control exit_control)
 {
-  bool exit_node_has_been_displayed = FALSE;
+  bool exit_node_has_been_displayed = false;
   list blocs = NIL;
 
   CONTROL_MAP(c,
@@ -4858,7 +4858,7 @@ bool output_a_graph_view_of_the_unstructured_from_a_control(text r,
 								   margin,
 								   c);
 		if (c == exit_control)
-		  exit_node_has_been_displayed = TRUE;
+		  exit_node_has_been_displayed = true;
 	      },
 	      begin_control,
 	      blocs);
@@ -4874,7 +4874,7 @@ void output_a_graph_view_of_the_unstructured(text r,
 					     unstructured u,
 					     int __attribute__ ((unused)) num)
 {
-  bool exit_node_has_been_displayed = FALSE;
+  bool exit_node_has_been_displayed = false;
   control begin_control = unstructured_control(u);
   control end_control = unstructured_exit(u);
 
@@ -4944,7 +4944,7 @@ static list words_cast(cast obj, int precedence, list pdl)
   pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, c_words_entity(t, NIL, pdl));
   pc = CHAIN_SWORD(pc, space_p? ") " : ")");
-  pc = gen_nconc(pc, words_subexpression(exp, CAST_OPERATOR_PRECEDENCE, TRUE, pdl));
+  pc = gen_nconc(pc, words_subexpression(exp, CAST_OPERATOR_PRECEDENCE, true, pdl));
   if(get_bool_property("PRETTYPRINT_ALL_PARENTHESES")  || precedence >= 25) {
     pc = CONS(STRING, strdup("("),
 	      gen_nconc(pc,CONS(STRING, strdup(")"), NIL)));
@@ -4982,7 +4982,7 @@ static list words_sizeofexpression(sizeofexpression obj,
       }
       else {
 	/* The type must be fully declared: see struct15.c */
-	list pct = c_words_simplified_entity(t, NIL, TRUE, in_type_declaration, pdl);
+	list pct = c_words_simplified_entity(t, NIL, true, in_type_declaration, pdl);
 	pc = gen_nconc(pc, pct);
       }
     }
@@ -5002,7 +5002,7 @@ static list words_subscript(subscript s, list pdl)
   list pc = NIL;
   expression a = subscript_array(s);
   list lexp = subscript_indices(s);
-  bool first = TRUE;
+  bool first = true;
 
   /* Parentheses must be added for array expression
    * like __ctype+1 in (__ctype+1)[*np]
@@ -5054,7 +5054,7 @@ static list words_subscript(subscript s, list pdl)
       }
     }
     pc = gen_nconc(pc, words_expression(exp, pdl));
-    first = FALSE;
+    first = false;
   }
 
   /* Here we differentiate the indices syntax */
@@ -5084,7 +5084,7 @@ static list words_application(application a, list pdl)
   list pc = NIL;
   expression f = application_function(a);
   list lexp = application_arguments(a);
-  bool first = TRUE;
+  bool first = true;
   /* Parentheses must be added for function expression */
   pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, words_expression(f, pdl));
@@ -5094,7 +5094,7 @@ static list words_application(application a, list pdl)
     if (!first)
       pc = CHAIN_SWORD(pc,",");
     pc = gen_nconc(pc, words_expression(exp, pdl));
-    first = FALSE;
+    first = false;
   },lexp);
   pc = CHAIN_SWORD(pc,")");
   return pc;

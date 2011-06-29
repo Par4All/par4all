@@ -184,7 +184,7 @@ hpfc_lazy_guard(
 
 /* IF (LAZY_snd) THEN 
  *   PVMFsnd()
- *   LAZY_snd = FALSE // if receive
+ *   LAZY_snd = false // if receive
  * ENDIF
  */
 static statement 
@@ -198,7 +198,7 @@ hpfc_lazy_message(
 	comm = hpfc_message(tid, channel, snd),
 	then = snd ? comm : 
 	    make_block_statement(CONS(STATEMENT, comm,
-				 CONS(STATEMENT, set_logical(decision, FALSE),
+				 CONS(STATEMENT, set_logical(decision, false),
 				      NIL))) ;
     
     return hpfc_lazy_guard(snd, then);
@@ -241,7 +241,7 @@ hpfc_initsend(
 
     return lazy ? make_block_statement
 	(CONS(STATEMENT, init,
-         CONS(STATEMENT, set_logical(hpfc_name_to_entity(LAZY_SEND), FALSE),
+         CONS(STATEMENT, set_logical(hpfc_name_to_entity(LAZY_SEND), false),
 	      NIL))) :
 		  init ;
 }
@@ -354,7 +354,7 @@ hpfc_broadcast_buffers(
 	get_bool_property("HPFC_GUARDED_TWINS") && replicated_p(src);
 
     c = full_linearization(proc, (entity) NULL, &size, 
-			   get_ith_temporary_dummy, FALSE, 0);
+			   get_ith_temporary_dummy, false, 0);
 
     npdim = NumberOfDimension(proc);
     
@@ -411,9 +411,9 @@ hpfc_broadcast_if_necessary(
     expression not_empty;
     statement send, pack;
 
-    not_empty = buffer_full_condition(array, TRUE, FALSE);
+    not_empty = buffer_full_condition(array, true, false);
     send = hpfc_broadcast_buffers(array, trg, lid, proc);
-    pack = hpfc_packing_of_current__buffer(array, TRUE);
+    pack = hpfc_packing_of_current__buffer(array, true);
 
     if (is_lazy)
 	return test_to_statement
@@ -450,7 +450,7 @@ hpfc_lazy_buffer_packing(
 
     array = is_send ? src : trg;
     packing = hpfc_buffer_packing(array, array_dim, is_send);
-    condition = buffer_full_condition(array, is_send, TRUE);
+    condition = buffer_full_condition(array, is_send, true);
 
     /* CALL HPFC PACK/UNPACK
      */
@@ -463,7 +463,7 @@ hpfc_lazy_buffer_packing(
     indexeq0 = set_integer(hpfc_name_to_entity(BUFFER_INDEX), 0);
     optional = is_lazy ? 
 	is_send ? hpfc_broadcast_buffers(array, trg, lid, proc) :
-	          set_logical(hpfc_name_to_entity(RCV_NOT_PRF), TRUE) :
+	          set_logical(hpfc_name_to_entity(RCV_NOT_PRF), true) :
 	make_continue_statement(entity_undefined);
 			   
     if (is_send)
@@ -472,7 +472,7 @@ hpfc_lazy_buffer_packing(
 	    CONS(STATEMENT, indexeq0,
 		 is_lazy? 
 		 CONS(STATEMENT, set_logical(hpfc_name_to_entity(SND_NOT_INIT),
-					     TRUE), NIL): NIL)));
+					     true), NIL): NIL)));
     else
 	l = CONS(STATEMENT, optional,
 	    CONS(STATEMENT, realpack,
@@ -532,10 +532,10 @@ hpfc_lazy_packing(
 
     return lazy ? (pack ? make_block_statement
        (CONS(STATEMENT, pack_stmt,
-	CONS(STATEMENT, set_logical(hpfc_name_to_entity(LAZY_SEND), TRUE),
+	CONS(STATEMENT, set_logical(hpfc_name_to_entity(LAZY_SEND), true),
 	     NIL))) :
 		   make_block_statement
-       (CONS(STATEMENT, hpfc_generate_message(lid, FALSE, TRUE),
+       (CONS(STATEMENT, hpfc_generate_message(lid, false, true),
 	CONS(STATEMENT, pack_stmt,
 	     NIL)))) : pack_stmt ;
 }
@@ -576,7 +576,7 @@ hpfc_compute_lid(
 	Pvecteur v;
 	statement result;
 
-	c = full_linearization(proc, lid, &size, creation, FALSE, 1);
+	c = full_linearization(proc, lid, &size, creation, false, 1);
 	v = contrainte_vecteur(c);
 
 	if (array)

@@ -93,18 +93,18 @@ bool continuation_conditions(char *module_name)
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, module_name, true) );
     /* predicates defining summary regions from callees have to be 
        translated into variables local to module */
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     /* cumulated effects */
     set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     module_to_value_mappings(get_current_module_entity());
     
     /* Get the transformers of the module. */
     set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );	
+	db_get_memory_resource(DBR_TRANSFORMERS, module_name, true) );	
 
     /* initialisation of local maps */
     set_must_continuation_map( MAKE_STATEMENT_MAPPING() );
@@ -135,7 +135,7 @@ bool continuation_conditions(char *module_name)
     reset_may_continuation_map();
     free_value_mappings();
 
-    return(TRUE);
+    return(true);
 }
 
 /*********************************************************************************/

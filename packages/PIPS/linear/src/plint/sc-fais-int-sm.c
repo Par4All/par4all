@@ -163,9 +163,9 @@ Psysteme ps;
 				  au plus petit entier non nul appartenant a la 
 				  partie triangulaire superieure de la matrice   */
     int level = 0;
-    boolean trouve = FALSE;
-    boolean stop = FALSE;
-    boolean infaisab = FALSE;
+    bool trouve = false;
+    bool stop = false;
+    bool infaisab = false;
 
     if(ps)
 	sys = sc_normalize(sc_dup(sys));
@@ -283,15 +283,15 @@ Psysteme ps;
 #endif
 
 		}
-		trouve = TRUE;
+		trouve = true;
 	    }
 	    else {
 		if (!n_min || !m_min)
-		    stop = TRUE;
+		    stop = true;
 		else
 		{
 		    level++;
-		    trouve = FALSE;
+		    trouve = false;
 		}
 	    }
 	}
@@ -328,7 +328,7 @@ Psysteme ps;
 		    value_division(MATRIX_ELEM(B,i,1),
 				   MATRIX_ELEM(MAT,i,i));
 		else 
-		    infaisab = TRUE;
+		    infaisab = true;
 	    }
 	    else {
 		/* Si un terme diagonal est nul, on verifie que la variable
@@ -345,7 +345,7 @@ Psysteme ps;
 		else
 		    /* si la variable est non nulle ==> il y a une erreur
 		       ==> systeme infaisable */
-		    infaisab = TRUE;
+		    infaisab = true;
 	    }
 	}
 
@@ -401,7 +401,7 @@ Psysteme ps;
     return(sys);
 }
 
-/* boolean syst_smith(Psysteme ps):
+/* bool syst_smith(Psysteme ps):
  *  Test de faisabilite d'un systeme lineaire en nombres entiers positifs par
  *  resolution du systeme par la methode de Smith. 
  *
@@ -411,21 +411,21 @@ Psysteme ps;
  *
  *  resultat retourne par la fonction :
  *
- *  boolean	   : TRUE   si le systeme lineaire a une solution entiere
- *  		     FALSE  si le systeme lineaire n'a pas de solution 
+ *  boolean	   : true   si le systeme lineaire a une solution entiere
+ *  		     false  si le systeme lineaire n'a pas de solution 
  *		     entiere   
  *
  *  Les parametres de la fonction :
  *
  *  Psommet ps     : systeme lineaire 
 */
-boolean syst_smith(ps)
+bool syst_smith(ps)
 Psysteme ps;
 {
     Psysteme sys2 = NULL;
     Psysteme sys_cond_posit= NULL;
     Psommet som1 = NULL;
-    boolean is_faisab = TRUE;
+    bool is_faisab = true;
 #ifdef TRACE 
     printf (" ** syst_smith - test de faisabilite d'un systeme avec Smith \n");
 #endif
@@ -480,11 +480,11 @@ Psysteme ps;
 		 */
 		is_faisab = sc_faisabilite(sys2);
 	    else
-		is_faisab = FALSE; 
+		is_faisab = false; 
 	    sc_rm(sys_cond_posit);
 	}
 	else
-	    is_faisab = FALSE;
+	    is_faisab = false;
 
 #ifdef TRACE
 	if (is_faisab)

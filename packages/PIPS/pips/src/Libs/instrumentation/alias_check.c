@@ -194,12 +194,12 @@ static void initialize_dynamic_check_list()
   {
     MAP(ENTITY,e2,
     {
-      dynamic_check dc = make_dynamic_check(e1,e2,FALSE);
+      dynamic_check dc = make_dynamic_check(e1,e2,false);
       l_dynamic_check = gen_nconc(l_dynamic_check,CONS(DYNAMIC_CHECK,dc,NIL));
     },l_formals);
     MAP(ENTITY,e2,
     {
-      dynamic_check dc = make_dynamic_check(e1,e2,FALSE);
+      dynamic_check dc = make_dynamic_check(e1,e2,false);
       l_dynamic_check = gen_nconc(l_dynamic_check,CONS(DYNAMIC_CHECK,dc,NIL));
     },l_commons);
   },l_formals);
@@ -212,7 +212,7 @@ static bool dynamic_checked_p(entity e1, entity e2)
     if ((dynamic_check_first(dc)==e1)&&(dynamic_check_second(dc)==e2))
       return dynamic_check_checked(dc);
   }, l_dynamic_check);
-  return FALSE;
+  return false;
 }
 
 static void set_dynamic_checked(entity e1, entity e2)
@@ -220,7 +220,7 @@ static void set_dynamic_checked(entity e1, entity e2)
   MAP(DYNAMIC_CHECK,dc,
   { 
     if ((dynamic_check_first(dc)==e1)&&(dynamic_check_second(dc)==e2))
-      dynamic_check_checked(dc) = TRUE;
+      dynamic_check_checked(dc) = true;
   }, l_dynamic_check);
 }
 
@@ -246,11 +246,11 @@ bool included_call_chain_p(list l1, list l2)
     {
       call_site cs1 = CALL_SITE(CAR(l1));
       call_site cs2 = CALL_SITE(CAR(l2));
-      if (!same_call_site_p(cs1,cs2))  return FALSE;
+      if (!same_call_site_p(cs1,cs2))  return false;
       l1 = CDR(l1);
       l2 = CDR(l2);
     }
-  return TRUE;
+  return true;
 }
 
 /****************************************************************************
@@ -266,7 +266,7 @@ static bool tail_call_path_p(call_site cs, list l1, list l2)
       call_site cs1 = CALL_SITE(CAR(l1));
       return (same_call_site_p(cs,cs1) && included_call_chain_p(l2,CDR(l1)));
     }
-  return FALSE;
+  return false;
 }
 
 /* This function prints the call path , including names of caller functions 
@@ -393,7 +393,7 @@ static void insert_test_before_statement(expression flags, expression condition,
 				      entity_local_name(e2)," by call path ",
 				      print_call_path(path),"\'", NULL));
   string mod_name = module_local_name(current_mod);
-  string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
+  string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,true);
   string base_name = pips_basename(user_file, NULL);
   string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
   if (true_expression_p(condition))
@@ -432,7 +432,7 @@ static void insert_flag_before_call_site(list flags,list path)
       int order = call_site_ordering(cs);
       statement s_flag = make_assign_statement(e_flag,make_true_expression());
       string call_name = module_local_name(caller);
-      string user_file = db_get_memory_resource(DBR_USER_FILE,call_name,TRUE);
+      string user_file = db_get_memory_resource(DBR_USER_FILE,call_name,true);
       string base_name = pips_basename(user_file, NULL);
       string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
       fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(caller),
@@ -455,7 +455,7 @@ static void insert_flag_before_call_site(list flags,list path)
 static void insert_test_before_caller(expression condition, expression e_flag)
 {
   statement s_flag = make_assign_statement(e_flag,make_true_expression());
-  string user_file = db_get_memory_resource(DBR_USER_FILE,caller_name,TRUE);
+  string user_file = db_get_memory_resource(DBR_USER_FILE,caller_name,true);
   string base_name = pips_basename(user_file, NULL);
   string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
   if (true_expression_p(condition))
@@ -499,16 +499,16 @@ static list make_list_of_flags(list path)
   return retour;
 }
 
-/* This function returns TRUE if c is an user-defined function/subroutine*/
+/* This function returns true if c is an user-defined function/subroutine*/
 bool functional_call_p(call c)
 {
   entity fun = call_function(c);
   return entity_module_p(fun);
 }
 
-static bool written = FALSE;
+static bool written = false;
 static entity current_entity  = entity_undefined;
-/* This function returns TRUE if the variable is written directly in the current module, 
+/* This function returns true if the variable is written directly in the current module, 
    not by its callees (do not take into account the effects on X,Y of statement like 
    CALL FOO(X,Y))*/
 
@@ -533,23 +533,23 @@ static bool variable_is_written_by_statement_flt(statement s)
 			fprintf(stderr,"\n Write on entity %s :\n",entity_name(e));
 			fprintf(stderr,"\n Current entity %s :\n",entity_name(current_entity));
 		      }
-		    written = TRUE;
+		    written = true;
 		    //gen_recurse_stop(NULL);
-		    return FALSE;
+		    return false;
 		  }
 	      }
 	  },
 	      l_rw); 
-	  return FALSE;
+	  return false;
 	}  
-      return FALSE;
+      return false;
     }
-  return TRUE; 
+  return true; 
 }
 
 static bool variable_is_written_p(entity ent)
 {
-  written = FALSE;
+  written = false;
   current_entity = ent;
   gen_recurse(module_statement,statement_domain,
 	      variable_is_written_by_statement_flt,gen_null);
@@ -569,7 +569,7 @@ static void insert_check_alias_before_statement(entity e1, expression subval,
   statement smt;
   int order = statement_ordering(s);
   string mod_name = module_local_name(current_mod);
-  string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
+  string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,true);
   string base_name = pips_basename(user_file, NULL);
   string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
   l = CONS(EXPRESSION,entity_to_expression(e2),l);
@@ -631,14 +631,14 @@ static bool dynamic_alias_check_flt(statement s, alias_context_p context)
 		  /* Assumed-size or pointer-type array, the size of dummy array can not be 
 		     derived from the size of actual argument as we have no corresponding call chain*/
 		  pips_user_warning("\nAssumed-size or pointer-type array \n");
-		return FALSE;
+		return false;
 	      }
-	    return TRUE;
+	    return true;
 	  }
       }
   },
       l_rw); 
-  return FALSE; /* The variable is not in the list of write effects => OK*/
+  return false; /* The variable is not in the list of write effects => OK*/
 }
 
 /*****************************************************************************
@@ -671,15 +671,15 @@ static bool alias_check_scalar_variable_in_module_flt(statement s,
 		insert_test_before_statement(context->flags,context->condition,s,
 					     context->first_entity,context->second_entity,
 					     context->path);
-		context->insert = TRUE;
-		return FALSE;
+		context->insert = true;
+		return false;
 	      }
-	    return TRUE;
+	    return true;
 	  }
       }
   },
       l_rw); 
-  return FALSE; /* The variable is not in the list of write effects => OK*/
+  return false; /* The variable is not in the list of write effects => OK*/
 }
 
 /*****************************************************************************
@@ -732,7 +732,7 @@ static bool alias_check_array_and_scalar_variable_in_module_flt(statement s,
 		switch(k){
 		case -1: 
 		  /* off1 == ref2 is false =>  Okay, no write on aliased variable */
-		  return FALSE;
+		  return false;
 		default:
 		  {
 		    /* k = 0 or 1*/
@@ -745,17 +745,17 @@ static bool alias_check_array_and_scalar_variable_in_module_flt(statement s,
 						   context->first_entity,context->second_entity,
 						   context->path);
 		    
-		    context->insert = TRUE;
-		    return FALSE;	       
+		    context->insert = true;
+		    return false;	       
 		  }
 		}
 	      }
-	    return TRUE;
+	    return true;
 	  }
       }
   },
       l_rw); 
-  return FALSE; /* The variable is not in the list of write effects => OK*/
+  return false; /* The variable is not in the list of write effects => OK*/
 }
 
 /*****************************************************************************
@@ -807,7 +807,7 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
 		switch(k1){
 		case -1: 
 		  /* off2 <= ref1 is false =>  Okay, no write on aliased variable */
-		  return FALSE;
+		  return false;
 		default:
 		  {
 		    expression size2 = array_size_stride(context->second_entity);
@@ -831,7 +831,7 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
 		    switch(k2){
 		    case -1: 
 		      /* ref1 <= off2+size_stride2 is false =>  Okay, no write on aliased variable */
-		      return FALSE;
+		      return false;
 		    default:
 		      {
 			/* k1 = 0 or 1, k2 = 0 or 1*/
@@ -861,20 +861,20 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
 							       context->path);
 			      }
 			  }
-			context->insert = TRUE;
-			return FALSE;
+			context->insert = true;
+			return false;
 		      }
 		    }
-		    return FALSE;
+		    return false;
 		  }
 		}
 	      }
-	    return TRUE;
+	    return true;
 	  }
       }
   },
       l_rw); 
-  return FALSE; /* The variable is not in the list of write effects => OK*/
+  return false; /* The variable is not in the list of write effects => OK*/
 }
 
 /*****************************************************************************
@@ -907,7 +907,7 @@ static void alias_check_two_scalar_variables_in_module(entity e1,entity e2,expre
       /* insert flags before each call site in call path*/
       list l_flags = make_list_of_flags(path);
       alias_context_t context;
-      context.insert = FALSE;
+      context.insert = false;
       context.path = path;
       context.flags = expression_list_to_conjonction(l_flags);	  
       if (k==1)
@@ -992,7 +992,7 @@ static void alias_check_scalar_and_array_variables_in_module(entity e1,entity e2
 		 insert flags before each call site in call path*/
 	      list l_flags = make_list_of_flags(path);
 	      alias_context_t context;
-	      context.insert = FALSE;
+	      context.insert = false;
 	      context.path = path;
 	      context.flags = expression_list_to_conjonction(l_flags);
 	      if (k1+k2==0) // k1=k2=0
@@ -1108,7 +1108,7 @@ static void alias_check_two_array_variables_in_module(entity e1,entity e2,expres
 		  /* insert flags before each call site in call path*/
 		  list l_flags = make_list_of_flags(path);
 		  alias_context_t context;
-		  context.insert = FALSE;
+		  context.insert = false;
 		  context.path = path;
 		  context.flags = expression_list_to_conjonction(l_flags);
 		  context.first_entity = e1;
@@ -1206,15 +1206,15 @@ static bool alias_check_scalar_variable_in_caller_flt(statement s,alias_context_
 		insert_test_before_statement(context->flags,make_true_expression(),s,
 					     context->first_entity,context->second_entity,
 					     context->path);
-		context->insert = TRUE;
-		return FALSE;
+		context->insert = true;
+		return false;
 	      }
-	    return TRUE;
+	    return true;
 	  }
       }
   },
       l_rw); 
-  return FALSE; /* The variable is not in the list of write effects => OK*/
+  return false; /* The variable is not in the list of write effects => OK*/
 }
 
 /*****************************************************************************
@@ -1270,7 +1270,7 @@ static bool alias_check_array_and_scalar_variable_in_caller_flt(statement s,alia
 		    switch(k){
 		    case -1: 
 		      /* off1 == ref2 is false =>  Okay, no write on aliased variable */
-		      return FALSE;
+		      return false;
 		    default:
 		      {
 			/* k = 0 or 1*/
@@ -1294,8 +1294,8 @@ static bool alias_check_array_and_scalar_variable_in_caller_flt(statement s,alia
 			  insert_test_before_caller(simplify_relational_expression(diff),e_flag);
 			else 
 			  insert_test_before_caller(make_true_expression(),e_flag);
-			context->insert = TRUE;
-			return FALSE;
+			context->insert = true;
+			return false;
 		      }
 		    }
 		  }
@@ -1304,16 +1304,16 @@ static bool alias_check_array_and_scalar_variable_in_caller_flt(statement s,alia
 		    /* We can not translate subval to the frame of caller => use dynamic check*/
 		    insert_check_alias_before_statement(context->first_entity,subval2,
 							context->second_entity,int_to_expression(0),s);
-		    return FALSE;
+		    return false;
 		    //user_log("\n Warning : Can not translate writing reference to frame of caller \n");
 		  }
 	      }
-	    return TRUE;
+	    return true;
 	  }
       }
   },
       l_rw); 
-  return FALSE; /* The variable is not in the list of write effects => OK*/
+  return false; /* The variable is not in the list of write effects => OK*/
 }
 
 /*****************************************************************************
@@ -1435,7 +1435,7 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 					  insert_test_before_caller(simplify_relational_expression(diff2),e_flag);
 				      }
 				  }
-				context->insert = TRUE;
+				context->insert = true;
 				break;
 			      }
 			    }
@@ -1454,14 +1454,14 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 		    insert_check_alias_before_statement(context->first_entity,subval1,
 							context->second_entity,size2,s);
 		  }
-		return FALSE;
+		return false;
 	      }
-	    return TRUE;
+	    return true;
 	  }
       }
   },
       l_rw); 
-  return FALSE; /* The variable is not in the list of write effects => OK*/
+  return false; /* The variable is not in the list of write effects => OK*/
 }
 
 /*****************************************************************************
@@ -1495,7 +1495,7 @@ static void alias_check_two_scalar_variables_in_caller(entity e1,entity e2,expre
 	 current caller, we add the condition */
       list l_flags = make_list_of_flags(path);
       alias_context_t context;
-      context.insert = FALSE;
+      context.insert = false;
       context.path = path;
       context.flags = expression_list_to_conjonction(l_flags);
       context.first_entity = e1;
@@ -1588,7 +1588,7 @@ static void alias_check_scalar_and_array_variables_in_caller(entity e1, entity e
 		     we add the condition */
 		  list l_flags = make_list_of_flags(path);
 		  alias_context_t context;
-		  context.insert = FALSE;
+		  context.insert = false;
 		  context.path = path;
 		  context.flags = expression_list_to_conjonction(l_flags);
 		  context.first_entity = e1;
@@ -1724,7 +1724,7 @@ static void alias_check_two_array_variables_in_caller(entity e1, entity e2,
 			  /* insert flag before each call site in call path */
 			  list l_flags = NIL;
 			  alias_context_t context;
-			  context.insert = FALSE;
+			  context.insert = false;
 			  context.path = path;
 			  if (ENDP(CDR(path)))
 			    context.flags = make_true_expression();
@@ -1836,7 +1836,7 @@ static expression storage_formal_offset(call_site cs,entity actual_var,
 					expression subval,list path)
 {
   list l_caller_aliases = alias_associations_list((alias_associations)
-        db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,TRUE)); 
+        db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,true)); 
   expression exp = expression_undefined;
   MAP(ALIAS_ASSOCIATION, aa,
   {
@@ -1907,9 +1907,9 @@ static bool search_statement_by_ordering_flt(statement s)
   if (statement_ordering(s)==current_ordering)
     {
       current_statement = s;
-      return FALSE;
+      return false;
     }
-  return TRUE;
+  return true;
 }
 
 static void alias_check_two_variables(entity e1, entity e2, expression off1, 
@@ -1935,7 +1935,7 @@ static void alias_check_two_variables(entity e1, entity e2, expression off1,
 	  current_caller = call_site_function(cs);
 	  current_ordering = call_site_ordering(cs);
 	  caller_name = module_local_name(current_caller);
-	  caller_statement = (statement)db_get_memory_resource(DBR_CODE,caller_name,TRUE);
+	  caller_statement = (statement)db_get_memory_resource(DBR_CODE,caller_name,true);
 	  current_statement = statement_undefined;
 	  
 	  gen_recurse(caller_statement,statement_domain,
@@ -2008,7 +2008,7 @@ bool alias_check(char * module_name)
   ifdebug(1)
     fprintf(stderr, " \n Begin alias_check for %s \n", module_name); 
   l_module_aliases = alias_associations_list((alias_associations)
-		 db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,module_name,TRUE)); 
+		 db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,module_name,true)); 
   /* if the list of alias associations of module is NIL, do nothing*/
   if (l_module_aliases != NIL)
     {
@@ -2027,7 +2027,7 @@ bool alias_check(char * module_name)
       alias_function = gen_find_tabulated(alias_function_name,entity_domain);
       if (entity_undefined_p(alias_function))
 	alias_function = make_empty_subroutine(ALIAS_FUNCTION,copy_language(module_language(current_mod)));
-      module_statement = (statement) db_get_memory_resource(DBR_CODE,module_name,TRUE);
+      module_statement = (statement) db_get_memory_resource(DBR_CODE,module_name,true);
       ifdebug(2)
 	{
 	  fprintf(stderr, " \n The list of alias associations for module %s is:\n", module_name); 
@@ -2042,9 +2042,9 @@ bool alias_check(char * module_name)
          If a cumulated effect for elementary statements = proper effect => we need only 
          cumulated effect */
       set_cumulated_rw_effects((statement_effects) 
-			       db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE)); 
+			       db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true)); 
       set_proper_rw_effects((statement_effects) 
-			    db_get_memory_resource(DBR_PROPER_EFFECTS,module_name,TRUE));
+			    db_get_memory_resource(DBR_PROPER_EFFECTS,module_name,true));
       initialize_dynamic_check_list();
       while (!ENDP(l_module_aliases))
 	{
@@ -2157,7 +2157,7 @@ bool alias_check(char * module_name)
   debug_off();
   l_module_aliases = NIL;
   current_mod = entity_undefined;
-  return TRUE;
+  return true;
 }
 
 

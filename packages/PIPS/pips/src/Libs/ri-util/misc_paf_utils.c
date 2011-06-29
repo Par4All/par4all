@@ -299,7 +299,7 @@ list exp_l;
 }
 
 /* bool undefined_statement_list_p( (list) l )			AL 04/93
- * Returns TRUE if l is made of 2 undefined or continue statement.
+ * Returns true if l is made of 2 undefined or continue statement.
  */
 bool undefined_statement_list_p( l )
 list l;
@@ -309,7 +309,7 @@ list l;
 
 	debug(7, "undefined_statement_list_p","doing\n");
 	if ( (l == NIL) || (gen_length(l) != 2) )
-		return( FALSE );
+		return( false );
 
 	first = STATEMENT(CAR( l ));
 	second = STATEMENT(CAR(CDR( l )));

@@ -258,8 +258,8 @@ void do_loop_expansion(statement st, expression size,bool center,bool apply_guar
 bool loop_expansion(const string module_name)
 {
     set_current_module_entity(module_name_to_entity(module_name));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
-    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), TRUE));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), true));
 
     debug_on("LOOP_EXPANSION_DEBUG_LEVEL");
     /* first case: statement inserted by loop_expansion_init were illegal */
@@ -398,7 +398,7 @@ void do_loop_expansion_init(statement st, expression size)
 bool loop_expansion_init(const char* module_name)
 {
     set_current_module_entity(module_name_to_entity(module_name));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));
 
     debug_on("LOOP_EXPANSION_INIT_DEBUG_LEVEL");
 

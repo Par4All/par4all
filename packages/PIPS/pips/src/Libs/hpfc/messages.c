@@ -173,9 +173,9 @@ list li, lk, lv;
 	    /* assert(gen_consistent_p(rg)); */
 
 	    dom_lb = safe_static_domain_bound(array, i, 
-					      range_lower(rg), ishft, TRUE);
+					      range_lower(rg), ishft, true);
 	    dom_ub = safe_static_domain_bound(array, i, 
-					      range_upper(rg), ishft, FALSE);
+					      range_upper(rg), ishft, false);
 	    
 	    /* domain */
 	    ldom = 

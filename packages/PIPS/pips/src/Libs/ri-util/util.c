@@ -264,10 +264,10 @@ bool string_fortran_filename_p(string s)
 {
   int fnl = strlen(s);
   int sl = strlen(SEQUENTIAL_FORTRAN_EXT);
-  bool is_fortran = FALSE;
+  bool is_fortran = false;
 
   if(fnl<=sl)
-    is_fortran = FALSE;
+    is_fortran = false;
   else
     is_fortran = strcmp(SEQUENTIAL_FORTRAN_EXT, s+(fnl-sl))==0;
 
@@ -388,16 +388,14 @@ entity find_ith_parameter(entity e, int i)
   return(entity_undefined);
 }
 
-/* returns TRUE if v is the ith formal parameter of function f */
+/* returns true if v is the ith formal parameter of function f */
 bool ith_parameter_p(entity f, entity v, int i)
 {
   type tv = entity_type(v);
   storage sv = entity_storage(v);
 
   if (! entity_module_p(f)) {
-    fprintf(stderr, "[ith_parameter_p] %s is not a module\n",
-	    entity_name(f));
-    exit(1);
+    pips_internal_error("[ith_parameter_p] %s is not a module\n", entity_name(f));
   }
 
   if (type_variable_p(tv) && storage_formal_p(sv)) {
@@ -405,7 +403,7 @@ bool ith_parameter_p(entity f, entity v, int i)
     return(formal_function(fv) == f && formal_offset(fv) == i);
   }
 
-  return(FALSE);
+  return(false);
 }
 
 /* functions for references */

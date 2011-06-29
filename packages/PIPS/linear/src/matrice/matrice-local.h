@@ -92,17 +92,17 @@ typedef Value * matrice;
 /* #define DENOMINATOR(matrix) *(&((matrix)[0])) */
 #define DENOMINATOR(matrix) ((matrix)[0])
 
-/* boolean matrice_triangulaire_inferieure_p(matrice a, int n, int m):
+/* bool matrice_triangulaire_inferieure_p(matrice a, int n, int m):
  * test de triangularite de la matrice a
  */
 #define matrice_triangulaire_inferieure_p(a,n,m) \
-    matrice_triangulaire_p(a,n,m,TRUE)
+    matrice_triangulaire_p(a,n,m,true)
 
-/* boolean matrice_triangulaire_superieure_p(matrice a, int n, int m):
+/* bool matrice_triangulaire_superieure_p(matrice a, int n, int m):
  * test de triangularite de la matrice a
  */
 #define matrice_triangulaire_superieure_p(a,n,m) \
-    matrice_triangulaire_p(a,n,m,FALSE)
+    matrice_triangulaire_p(a,n,m,false)
 
 /* FI: Corinne, peux-tu expliquer la raison d'etre de cette macro? */
 /* d'apres ce que je comprends de la suite, ca permet de definir

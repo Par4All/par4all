@@ -153,7 +153,7 @@ Variable v_new;
 
 /* Psysteme sc_rename_variables(s, renamed_p, new_variable)
  * Psysteme s;
- * boolean (*renamed_p)(Variable);
+ * bool (*renamed_p)(Variable);
  * Variable (*new_variable)(Variable);
  *
  * what: driven renaming of variables in s.
@@ -167,7 +167,7 @@ Variable v_new;
  */
 Psysteme sc_rename_variables(s, renamed_p, new_variable)
 Psysteme s;
-boolean (*renamed_p)(/*Variable*/);
+bool (*renamed_p)(/*Variable*/);
 Variable (*new_variable)(/*Variable*/);
 {
     Pcontrainte c;
@@ -236,7 +236,7 @@ Variable var;
 	sc_dimension(sc)++; }
 }
 
-/* boolean sc_consistent_p(Psysteme sc): check that sc is well defined, that the
+/* bool sc_consistent_p(Psysteme sc): check that sc is well defined, that the
  * numbers of equalities and inequalities are consistent with the lists of
  * equalities and inequalities, and that every variable in the constraints is
  * in the base
@@ -249,10 +249,10 @@ Variable var;
  *  - there is no explicit check of TCST in the basis; TCST should *not* be in the
  * basis
  */
-boolean sc_consistent_p(sc)
+bool sc_consistent_p(sc)
 Psysteme sc;
 {
-    boolean consistent;
+    bool consistent;
 
     consistent = !SC_UNDEFINED_P(sc);
 
@@ -311,9 +311,9 @@ Psysteme sc;
  * TCST should *not* be in the basis for some use of Psystemes,
  * like transformers in PIPS.
  * */
-boolean sc_weak_consistent_p(Psysteme sc)
+bool sc_weak_consistent_p(Psysteme sc)
 {
-    boolean weak_consistent;
+    bool weak_consistent;
 
     weak_consistent = !SC_UNDEFINED_P(sc);
 

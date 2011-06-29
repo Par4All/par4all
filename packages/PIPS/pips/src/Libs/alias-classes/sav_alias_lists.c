@@ -74,7 +74,7 @@ no_alias_for(region reg)
     list alias_list;
     region alias_reg;
     Psysteme reg_sys, alias_reg_sys;
-    bool result = TRUE;
+    bool result = true;
 
     if (l_alias_lists != NIL)
 	do {
@@ -85,10 +85,10 @@ no_alias_for(region reg)
 		reg_sys = region_system(reg);
 		alias_reg_sys = region_system(alias_reg);
 		if ( sc_equal_p_ofl(reg_sys,alias_reg_sys) )
-		    result = FALSE;
+		    result = false;
 	    }
 	    rest_alias_lists = CDR(rest_alias_lists);
-	} while (rest_alias_lists != NIL && result == TRUE);
+	} while (rest_alias_lists != NIL && result == true);
     return result;
 }
 */
@@ -165,14 +165,14 @@ make_alias_lists_for_sub_regions(string module_name)
     /* we need the callees of the current module  */
 /*    module_callees = (callees) db_get_memory_resource(DBR_CALLEES,
 					       module_name,
-					       TRUE);
+					       true);
 					       */
     /* for each callee do */
 /*    MAP(STRING, callee_name,
 	{
 	callee_alias_lists = (list) db_get_memory_resource(DBR_ALIAS_LISTS,
 					  callee_name,
-					  TRUE);
+					  true);
 					  */
 	/* for each alias list do */
 /*	MAP(EFFECTS, alias_list_effects,
@@ -213,7 +213,7 @@ bool
 same_reg_ignore_action(region reg1, region reg2)
     {
     Psysteme reg1_sys, reg2_sys;
-    bool result = FALSE;
+    bool result = false;
 
     pips_debug(4,"begin\n");
 
@@ -238,7 +238,7 @@ same_reg_ignore_action(region reg1, region reg2)
 		reg2_sys = region_system(reg2);
 		if ( sc_equal_p_ofl(reg1_sys,reg2_sys) )
 		{
-		    result = TRUE;
+		    result = true;
 
 		    pips_debug(4,"same region\n");
 		}
@@ -258,7 +258,7 @@ member(region reg, list reg_list)
     {
 	region elem;
 	list rest_list;
-	bool result = FALSE;
+	bool result = false;
 
 	pips_debug(4,"begin\n");
 
@@ -280,13 +280,13 @@ member(region reg, list reg_list)
 			    elem = EFFECT(CAR(rest_list));
 			    if (same_reg_ignore_action(elem,reg))
 				{
-				    result = TRUE;
+				    result = true;
 
 				    pips_debug(4,"is member\n");
 				}
 
 			    rest_list = CDR(rest_list);
-			}while (rest_list != NIL && result == FALSE);
+			}while (rest_list != NIL && result == false);
 
 	pips_debug(4,"end\n");
 
@@ -333,7 +333,7 @@ add_pair_to_existing_list(list alias_pair)
 {
     list rest_alias_lists, alias_list;
     region formal_reg_pair, formal_reg_list, actual_reg_pair;
-    bool result = FALSE;
+    bool result = false;
 
     pips_debug(4,"begin\n");
 
@@ -360,7 +360,7 @@ add_pair_to_existing_list(list alias_pair)
 
 	    if ( same_reg_ignore_action(formal_reg_pair,formal_reg_list) )
 	    {
-		    result = TRUE;
+		    result = true;
 		    actual_reg_pair = EFFECT(CAR(CDR(alias_pair)));
 		    ifdebug(9)
 			{
@@ -373,7 +373,7 @@ add_pair_to_existing_list(list alias_pair)
 			append_reg_if_not_present(alias_list,actual_reg_pair);
 		}
 	    rest_alias_lists = CDR(rest_alias_lists);
-	} while (rest_alias_lists != NIL && result == FALSE);
+	} while (rest_alias_lists != NIL && result == false);
 
     ifdebug(9) 
 	{
@@ -408,12 +408,12 @@ alias_lists( string module_name )
 	    set_current_module_statement( (statement)
 					  db_get_memory_resource(DBR_CODE,
 								 module_name,
-								 TRUE) );
+								 true) );
 	    set_cumulated_rw_effects((statement_effects)
 				     db_get_memory_resource(
 					 DBR_CUMULATED_EFFECTS,
 					 module_name,
-					 TRUE));
+					 true));
 	    module_to_value_mappings(module);
 	    /* that's it, but we musn't forget to reset everything below */
 	}
@@ -432,7 +432,7 @@ alias_lists( string module_name )
 	effects_classes_classes((effects_classes)
 				db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
 						       module_name,
-						       TRUE));
+						       true));
 
 
 /* wrong but did work:
@@ -441,7 +441,7 @@ alias_lists( string module_name )
 	effects_to_list((effects)
 			db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
 					       module_name,
-					       TRUE));
+					       true));
 */
 
 /* seems right but didn't work (gets 2nd element of each pair only):
@@ -475,7 +475,7 @@ alias_lists( string module_name )
 	effects_classes_classes((effects_classes)
 				db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
 						       module_name,
-						       TRUE));
+						       true));
 
     MAP(LIST, alias_pair,
 	{
@@ -512,6 +512,6 @@ alias_lists( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(TRUE);
+    return(true);
 }
 

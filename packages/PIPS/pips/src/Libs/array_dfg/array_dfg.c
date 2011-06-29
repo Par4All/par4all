@@ -52,11 +52,11 @@ int my_fai_count;
 
 static hash_table		Gforward_substitute_table;
 
-boolean my_sc_faisabilite( in_ps )
+bool my_sc_faisabilite( in_ps )
 Psysteme in_ps;
 {
   my_fai_count++;
-  return(sc_rational_feasibility_ofl_ctrl(in_ps, NO_OFL_CTRL,TRUE));
+  return(sc_rational_feasibility_ofl_ctrl(in_ps, NO_OFL_CTRL,true));
 }
 
 /*=======================================================================*/
@@ -436,7 +436,7 @@ graph                   dup_dg;
 	  Pvecteur pv_unknowns;
 
 	  /* Order the psysteme according to ent_l */
-	  sort_psysteme( sou_ps, adg_list_to_vect(ent_l, TRUE) );
+	  sort_psysteme( sou_ps, adg_list_to_vect(ent_l, true) );
 	  pv_unknowns = list_to_base(renamed_l);
 	  sou_q = pip_integer_max(sou_ps, loc_context, pv_unknowns);
 	  my_pip_count++;
@@ -509,7 +509,7 @@ char* 	mod_name;
   statement 		mod_stat = NULL;
   static_control       	stco = NULL;
   string       		ss = NULL; /* summary or not ? */
-  boolean      		SUMMARY = FALSE;
+  bool      		SUMMARY = false;
   
   /* Initialize debugging functions */
   debug_on("ARRAY_DFG_DEBUG_LEVEL");
@@ -526,9 +526,9 @@ char* 	mod_name;
   ent       = local_name_to_top_level_entity( mod_name );
   set_current_module_entity(ent); /* set current_module_entity to ent ... */
   
-  mod_stat  = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  mod_stat  = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
   Gstco_map = (statement_mapping) db_get_memory_resource(DBR_STATIC_CONTROL,
-							 mod_name, TRUE);
+							 mod_name, true);
   
   /* If the input program is not a static_control one, return */
   stco	 = (static_control) GET_STATEMENT_MAPPING(Gstco_map, mod_stat);
@@ -538,10 +538,10 @@ char* 	mod_name;
   }
   Gstructural_parameters = static_control_params( stco );
   set_proper_rw_effects((statement_effects) 
-		       db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
+		       db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
 
   /* What will we compute ? */
-  SUMMARY = ((ss = getenv("SUMMARY")) != NULL)? atoi(ss) : FALSE;
+  SUMMARY = ((ss = getenv("SUMMARY")) != NULL)? atoi(ss) : false;
   
   
   /* We need the dependance graph for a first source approximation.
@@ -549,7 +549,7 @@ char* 	mod_name;
    * Then we take only the WR dependances.
    * At the end : duplicate nodes "a la Redon" for IF statement.
    */
-  dg	  = (graph) db_get_memory_resource( DBR_DG, mod_name, TRUE );
+  dg	  = (graph) db_get_memory_resource( DBR_DG, mod_name, true );
   rev_dg  = adg_reverse_graph( dg );
   wr_dg   = adg_only_call_WR_dependence( rev_dg );
   dup_dg  = adg_dup_disjunctive_nodes( wr_dg, Gstco_map );
@@ -583,7 +583,7 @@ char* 	mod_name;
   reset_current_module_entity();
   reset_current_module_statement();
 
-  return(TRUE);
+  return(true);
 }
 
 /*=======================================================================*/

@@ -175,7 +175,7 @@ static void print_blocks(list /* of fusion_block */ blocks) {
  * @brief Check that two loop statements have the same bounds
  */
 static bool loops_have_same_bounds_p(loop loop1, loop loop2) {
-  bool same_p = FALSE;
+  bool same_p = false;
 
   range r1 = loop_range(loop1);
   range r2 = loop_range(loop2);
@@ -752,7 +752,7 @@ static bool fusable_blocks_p( fusion_block b1, fusion_block b2) {
 static bool fuse_block( fusion_block b1,
                         fusion_block b2,
                         bool maximize_parallelism) {
-  bool return_val = FALSE; // Tell is a fusion has occured
+  bool return_val = false; // Tell is a fusion has occured
   if(!b1->is_a_loop) {
     pips_debug(5,"B1 (%d) is a not a loop, skip !\n",b1->num);
   } else if(!b2->is_a_loop) {
@@ -768,7 +768,7 @@ static bool fuse_block( fusion_block b1,
       pips_debug(2, "Loop have been fused\n");
       // Now fuse the corresponding blocks
       merge_blocks(b1, b2);
-      return_val=TRUE;
+      return_val=true;
     }
   }
   return return_val;
@@ -1082,24 +1082,24 @@ bool loop_fusion(char * module_name) {
   /* Get the true ressource, not a copy. */
   module_statement = (statement)db_get_memory_resource(DBR_CODE,
                                                        module_name,
-                                                       TRUE);
+                                                       true);
 
   /* Get the data dependence graph (chains) : */
   graph dependence_graph = (graph)db_get_memory_resource(DBR_DG,
                                                          module_name,
-                                                         TRUE);
+                                                         true);
 
   /* The proper effect to detect the I/O operations: */
   set_proper_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS,
                                                                   module_name,
-                                                                  TRUE));
+                                                                  true));
   set_precondition_map((statement_mapping)db_get_memory_resource(DBR_PRECONDITIONS,
                                                                  module_name,
-                                                                 TRUE));
+                                                                 true));
   /* Mandatory for DG construction */
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
                                                                      module_name,
-                                                                     TRUE));
+                                                                     true));
 
   set_current_module_statement(module_statement);
   set_current_module_entity(module_name_to_entity(module_name));
@@ -1139,5 +1139,5 @@ bool loop_fusion(char * module_name) {
    *
    * How do we let PyPS know the number of loops fused?
    */
-  return TRUE;
+  return true;
 }

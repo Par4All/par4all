@@ -133,8 +133,8 @@ static Psysteme sc_add_offset_variables(Psysteme g, Pbase b, Pbase db)
    to range r.
 
    Return value :
-   - TRUE if the graph is certainly functional,
-   - FALSE if it *might* be not functional.
+   - true if the graph is certainly functional,
+   - false if it *might* be not functional.
 
    NOTE: parameter dr could be derived from r within this function,
    but we do not know how to create generic variables in Linear. The
@@ -144,7 +144,7 @@ static Psysteme sc_add_offset_variables(Psysteme g, Pbase b, Pbase db)
 
 static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
 {
-  bool functional_p = TRUE;
+  bool functional_p = true;
 
   Psysteme g1, g2, g3, g4;
 
@@ -152,7 +152,7 @@ static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
   Pbase gb = sc_base(g);
   if (!(base_included_p(d, gb) && base_included_p(r, gb))) {
     // illegal arguments
-    functional_p = FALSE; //TODO
+    functional_p = false; //TODO
   }
   else {
 
@@ -187,7 +187,7 @@ static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
       }
     */
     if (SC_EMPTY_P(g4)) {
-      functional_p = FALSE;
+      functional_p = false;
     }
     else {
       // Check that all r_b_i variables are null, using sc_minmax_of_variables()
@@ -197,7 +197,7 @@ static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
         Value pmin, pmax;
         bool feasible_p = sc_minmax_of_variable(g4b,dv, &pmin, &pmax);
         if (!(feasible_p && value_eq(VALUE_ZERO, pmin) && value_eq(VALUE_ZERO, pmax))) {
-          functional_p = FALSE;
+          functional_p = false;
           break;
         }
       }
@@ -223,7 +223,7 @@ static bool sc_totally_functional_graph_p( Psysteme g, // function graph
                                     Pbase dr    // difference variable
                                     )
 {
-  bool totally_functional_p = FALSE;
+  bool totally_functional_p = false;
 
   if (sc_functional_graph_p(g, d, r, dr)) {
 
@@ -252,7 +252,7 @@ static entity scalarized_replacement_variable = entity_undefined;
 // gen_recurse callback function for
 // statement_substitute_scalarized_array_references
 static bool reference_substitute(reference r) {
-  bool result = FALSE;
+  bool result = false;
   entity v = reference_variable(r);
   if(reference_equal_p(r,scalarized_reference)) {
     // Scalarize only if r refers to an array element and not to a slice
@@ -261,7 +261,7 @@ static bool reference_substitute(reference r) {
     if (gen_length(inds) == d) {
       reference_variable(r) = scalarized_replacement_variable;
       reference_indices(r) = NIL; // TODO: add missing gen_full_free_list(reference_indices(r))
-      result = TRUE;
+      result = true;
     }
   }
   return result;
@@ -294,7 +294,7 @@ static Pbase make_phi_base(int phi_min, int phi_max)
 }
 
 
-static effect  effect_write_or_read_on_variable(list el, entity v, boolean write_p)
+static effect  effect_write_or_read_on_variable(list el, entity v, bool write_p)
 {
   effect result = effect_undefined;
   if(v) {
@@ -530,7 +530,7 @@ static bool loop_scalarization(loop l)
   gen_free_list(orl);
   gen_free_list(crwl);
 
-  return TRUE;
+  return true;
 }
 
 
@@ -540,7 +540,7 @@ static bool loop_scalarization(loop l)
  */
 static bool scalarization_statement_in(statement ls)
 {
-  bool result = TRUE;
+  bool result = true;
   if (statement_loop_p(ls)) {
     loop l = statement_loop(ls);
 
@@ -601,21 +601,21 @@ bool scalarization (char * module_name)
   module = get_current_module_entity();
 
   set_current_module_statement( (statement)
-                                db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+                                db_get_memory_resource(DBR_CODE, module_name, true) );
   module_stat = get_current_module_statement();
 
 
   set_cumulated_rw_effects((statement_effects)
-                           db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+                           db_get_memory_resource(DBR_REGIONS, module_name, true));
 
   module_to_value_mappings(module);
 
   set_precondition_map((statement_mapping)
-                       db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+                       db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
   set_in_effects((statement_effects)
-                 db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
+                 db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
   set_out_effects((statement_effects)
-                  db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
+                  db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
 
 
   debug_on("SCALARIZATION_DEBUG_LEVEL");
@@ -649,7 +649,7 @@ bool scalarization (char * module_name)
   free_value_mappings();
 
   /* Return value */
-  bool good_result_p = TRUE;
+  bool good_result_p = true;
 
   return (good_result_p);
 

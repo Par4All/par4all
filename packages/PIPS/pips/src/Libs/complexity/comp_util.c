@@ -28,7 +28,7 @@
  *
  * useful routines for evaluation of the complexity of a program
  *
- * boolean complexity_check(comp)
+ * bool complexity_check(comp)
  * void complexity_check_and_warn(function_name, comp)
  * void good_complexity_assert(function_name, comp)
  * void complexity_fprint(fd, comp, print_stats_p, print_local_names_p)
@@ -40,13 +40,13 @@
  * void fprint_cost_table(fd)
  * void init_cost_table();
  * int intrinsic_cost(name, argstype)
- * boolean is_inferior_basic(basic1, basic2)
+ * bool is_inferior_basic(basic1, basic2)
  * basic simple_basic_dup(b)
  * float constant_entity_to_float(e)
  * void trace_on(va_alist)
  * void trace_off()
  * list entity_list_reverse(l)
- * boolean is_linear_unstructured(unstr)
+ * bool is_linear_unstructured(unstr)
  * void add_formal_parameters_to_hash_table(mod, hash_complexity_params)
  * void remove_formal_parameters_from_hash_table(mod, hash_complexity_params)
  * hash_table fetch_callees_complexities(module_name)
@@ -91,8 +91,8 @@
 #define INDENT_BACK   "-"
 #define INDENT_INTERVAL 2
 
-/* return TRUE if allright */
-boolean complexity_check(comp)
+/* return true if allright */
+bool complexity_check(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) )
@@ -101,7 +101,7 @@ complexity comp;
     if ( !complexity_zero_p(comp) ) {
 	return (polynome_check(complexity_polynome(comp)));
     }
-    return (TRUE);
+    return (true);
 }
 
 void complexity_check_and_warn(s,comp)
@@ -173,7 +173,7 @@ complexity *pcomp;
 
 char *complexity_sprint(comp, print_stats_p, print_local_names_p)
 complexity comp;
-boolean print_stats_p, print_local_names_p;
+bool print_stats_p, print_local_names_p;
 {
 
     char *s=NULL;
@@ -216,7 +216,7 @@ boolean print_stats_p, print_local_names_p;
 void complexity_fprint(fd, comp, print_stats_p, print_local_names_p)
 FILE *fd;
 complexity comp;
-boolean print_stats_p, print_local_names_p;
+bool print_stats_p, print_local_names_p;
 {
     char *s = complexity_sprint(comp, print_stats_p, print_local_names_p);
 
@@ -226,13 +226,13 @@ boolean print_stats_p, print_local_names_p;
 
 void complexity_dump(complexity comp)
 {
-    complexity_fprint(stderr, comp, FALSE, TRUE);
+    complexity_fprint(stderr, comp, false, true);
 }
 
 void prc(comp)   /* for dbxtool: "print complexity" */
 complexity comp;
 {
-    complexity_fprint(stderr, comp, TRUE, TRUE);
+    complexity_fprint(stderr, comp, true, true);
 }
 
 void prp(pp)     /* for dbxtool: "print polynome" */
@@ -481,7 +481,7 @@ void fprint_cost_table(fd)
 FILE *fd;
 {
     struct intrinsic_cost_rec *p = intrinsic_cost_table;
-    boolean skip_one_line = FALSE;
+    bool skip_one_line = false;
     
     fprintf(fd, "\nIntrinsic cost table:\n\n");
     fprintf(fd, "        Intrinsic name        int    float   double   complex   dcomplex\n");
@@ -495,14 +495,14 @@ FILE *fd;
 	    (p->dcomplex_cost != 0)) {
 	    if (skip_one_line) {
 		fprintf(fd, "%25s|\n", "");
-		skip_one_line = FALSE;
+		skip_one_line = false;
 	    }
 	    fprintf(fd, "%22.21s   |%6td %6td %7td %8td %8td\n",
 		    p->name, p->int_cost, p->float_cost,
 		    p->double_cost, p->complex_cost, p->dcomplex_cost);
 	}
 	else
-	    skip_one_line = TRUE;
+	    skip_one_line = true;
     }
     fprintf(fd, "\n");
 }
@@ -562,7 +562,7 @@ float file_factor;
     int int_cost, float_cost, double_cost, complex_cost, dcomplex_cost;
     struct intrinsic_cost_rec *p;
     float scale_factor = 1.0;
-    boolean recognized;
+    bool recognized;
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	    fprintf(stderr, "\nReading cost file ");
@@ -577,7 +577,7 @@ float file_factor;
 		sscanf(line, "%s %d %d %d %d %d", intrinsic_name,
 		       &int_cost, &float_cost, &double_cost,
 		       &complex_cost, &dcomplex_cost);
-		recognized = FALSE;
+		recognized = false;
 		for (p = intrinsic_cost_table; p->name != NULL; p++) {
 		    if (same_string_p(p->name, intrinsic_name)) {
 			p->int_cost = (int)
@@ -590,7 +590,7 @@ float file_factor;
 			    (complex_cost * scale_factor * file_factor + 0.5);
 			p->dcomplex_cost = (int)
 			    (dcomplex_cost * scale_factor * file_factor + 0.5);
-			recognized = TRUE;
+			recognized = true;
 			break;
 		    }
 		}
@@ -685,7 +685,7 @@ void trace_on(char * fmt, ...)
     if (get_bool_property("COMPLEXITY_TRACE_CALLS")) {
 	va_list args;
 	char *indentstring = (char*) malloc(99);
-	boolean b = (call_level >= 0);
+	bool b = (call_level >= 0);
 	int i,k=1;
 
 	indentstring[0] = '\0';
@@ -714,7 +714,7 @@ void trace_off()
 {
     if (get_bool_property("COMPLEXITY_TRACE_CALLS")) {
 	char *indentstring = (char*) malloc(99);
-	boolean b = (call_level >= 0);
+	bool b = (call_level >= 0);
 	int i,k=1;
 
 	indentstring[0] = '\0';
@@ -731,10 +731,10 @@ void trace_off()
     }
 }
 
-/* return TRUE if unstr is simply a linear 
+/* return true if unstr is simply a linear 
  * string of controls
  */
-boolean is_linear_unstructured(unstr)
+bool is_linear_unstructured(unstr)
 unstructured unstr;
 {
     control current = unstructured_control(unstr);
@@ -746,11 +746,11 @@ unstructured unstr;
 	if (succs == NIL)
 	    pips_internal_error("control != exit one,it has no successor");
 	if (CDR(succs) != NIL) 
-	    return (FALSE);
+	    return (false);
 	current = CONTROL(CAR(succs));
     }
 
-    return(TRUE);
+    return(true);
 }
 
 list entity_list_reverse(l)
@@ -829,7 +829,7 @@ char *module_name;
 	fprintf(stderr, "Fetching callees complexities ...\n");
     }
 
-    cl = (callees)db_get_memory_resource(DBR_CALLEES, module_name, TRUE);
+    cl = (callees)db_get_memory_resource(DBR_CALLEES, module_name, true);
     callees_list = callees_callees(cl);
 
     if ( callees_list == NIL ) { 
@@ -855,7 +855,7 @@ char *module_name;
 	    callee_comp = (complexity)
 		db_get_memory_resource(DBR_SUMMARY_COMPLEXITY, 
 				       (char *) callee_name,
-				       TRUE);
+				       true);
 
 	    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 		fprintf(stderr, "fetched complexity for callee %s",
@@ -954,7 +954,7 @@ hash_table hash_complexity_params;
 		entity_module_p(module));
 
     sefs_list = effects_to_list( (effects)
-	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
+	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, true));
 
     ifdebug(5) {
 	debug(5, "add_common_variables_to_hash_table",
@@ -992,7 +992,7 @@ hash_table hash_complexity_params;
 		entity_module_p(module));
 
     sefs_list = effects_to_list( (effects)
-	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
+	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, true));
 
     MAPL(ce, { 
 	effect obj = EFFECT(CAR(ce));
@@ -1010,7 +1010,7 @@ hash_table hash_complexity_params;
     }, sefs_list);
 }
 
-boolean is_must_be_written_var(effects_list, var_name)
+bool is_must_be_written_var(effects_list, var_name)
 list effects_list;
 char *var_name;
 {
@@ -1029,7 +1029,7 @@ char *var_name;
 		    module_local_name(e) );
 */
 	    if ( strcmp(module_local_name(e), var_name) == 0 ) {
-		return (TRUE);
+		return (true);
 	    }
 	}
 /*
@@ -1040,7 +1040,7 @@ char *var_name;
 */
     },effects_list);
 
-    return (FALSE);
+    return (false);
 }
 
 /*
@@ -1061,7 +1061,7 @@ list effects_list;
     fprintf(stderr, "Final evaluation\n");
 
     for ( ; !VECTEUR_NUL_P(pb); pb = pb->succ) {
-	boolean mustbewritten;
+	bool mustbewritten;
 	char *var = variable_local_name(pb->var);
 
         fprintf(stderr, "Variable is %s\n", var);
@@ -1074,7 +1074,7 @@ list effects_list;
 	    compsubst = evaluate_var_to_complexity((entity)pb->var, 
 						   precond, 
 						   effects_list, 1);
-	    complexity_fprint( stderr, compsubst, FALSE, FALSE);
+	    complexity_fprint( stderr, compsubst, false, false);
 /*
 
 	    final_comp = complexity_var_subst(comp, pb->var, compsubst);
@@ -1083,7 +1083,7 @@ list effects_list;
 	comp = complexity_dup(final_comp);
     }
 
-    complexity_fprint( stderr, final_comp, FALSE, FALSE);
+    complexity_fprint( stderr, final_comp, false, false);
 
     return ( final_comp );
 }

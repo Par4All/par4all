@@ -568,7 +568,7 @@ static Value dn_multiply(Value v1, Value v2)
   if value_eq(v1,value_div(v,v2)) return(v);
   else {
     fprintf(stderr,"\nDNDNDN JANUS WARNING, multiplication overflow");
-    assert(FALSE);
+    assert(false);
     return VALUE_NAN;
   }
 }
@@ -582,7 +582,7 @@ static Value correctm(Pproblem XX,Value k1,Value k2)
   if (VISU>=ZVO)
     {       
       fprintf(FTRACE,"\nDNDNDN JANUS WARNING: correctm overflow");
-      assert(FALSE);
+      assert(false);
     }
   return(0);//should check parameter notzero before use, so return zero means overflow
 }
@@ -593,7 +593,7 @@ static int corrects(Pproblem XX,Value k1,Value k2)
   if value_eq(k1,value_minus(k,k2)) return(1);
   if (VISU>=ZVO)
     { 
-      assert(FALSE);
+      assert(false);
       fprintf(FTRACE,"\nDNDNDN JANUS WARNING: corrects overflow");
     }
   return(0);//means overflow

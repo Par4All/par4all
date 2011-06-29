@@ -165,7 +165,7 @@ static abc_checked initiliaze_marked_list()
 	    array_dimension_checked adc;
 	    for(i=1; i <= length; i++ )
 	      {
-		dc = make_dimension_checked(i,FALSE,FALSE);
+		dc = make_dimension_checked(i,false,false);
 		dc_list = gen_nconc(dc_list,
 				    CONS(DIMENSION_CHECKED,dc,NIL));
 	      }
@@ -192,9 +192,9 @@ static void set_array_dimension_checked(top_down_abc_context_p context,
 	    if (dimension_checked_dim(dc) == dim)
 	      {
 		if (bound)
-		  dimension_checked_lower(dc) = TRUE;
+		  dimension_checked_lower(dc) = true;
 		else
-		  dimension_checked_upper(dc) = TRUE;
+		  dimension_checked_upper(dc) = true;
 	      }
 	  },array_dimension_checked_dims(adc));
       }, abc_checked_list(context->read_marked_list));
@@ -210,9 +210,9 @@ static void set_array_dimension_checked(top_down_abc_context_p context,
 	    if (dimension_checked_dim(dc) == dim)
 	      {
 		if (bound)
-		  dimension_checked_lower(dc) = TRUE;
+		  dimension_checked_lower(dc) = true;
 		else
-		  dimension_checked_upper(dc) = TRUE;
+		  dimension_checked_upper(dc) = true;
 	      }
 	  },array_dimension_checked_dims(adc));
       }, abc_checked_list(context->write_marked_list));
@@ -226,7 +226,7 @@ Psysteme my_system_projection_along_variables(Psysteme ps, Pvecteur pv)
     return SC_UNDEFINED;
   TRY
     {
-      bool is_proj_exact = TRUE;
+      bool is_proj_exact = true;
       sc_projection_along_variables_with_test_ofl_ctrl(&ps, pv,
 				  &is_proj_exact, FWD_OFL_CTRL);
       UNCATCH(overflow_error);
@@ -320,11 +320,11 @@ static void top_down_abc_insert_before_statement(statement s,
 	}
       else
 	// there is no unstructured (?)
-	insert_statement(s,s1,TRUE);
+	insert_statement(s,s1,true);
     }
   else
     // structured case
-    insert_statement(s,s1,TRUE);
+    insert_statement(s,s1,true);
 }
 
 
@@ -416,7 +416,7 @@ static list top_down_abc_call(call c, entity array,
 	    /* Test if exp is trivial or not
 	       + If exp is always TRUE: there is certainly bound violation,
 	       return  make_true_expression
-	       + If exp is always FALSE, we don't have to add it to retour
+	       + If exp is always false, we don't have to add it to retour
 	       + Otherwise, we add it to retour.*/
 	    if (!expression_undefined_p(exp))
 	      {
@@ -466,7 +466,7 @@ static Bound_test top_down_abc_not_exact_case( statement s,
 {
   Bound_test retour;
   retour.test = expression_undefined;
-  retour.bound = TRUE;
+  retour.bound = true;
 
   /* Test if s is a call (elementary statement)*/
   if (statement_call_p(s))
@@ -484,7 +484,7 @@ static Bound_test top_down_abc_not_exact_case( statement s,
   else
     /* s is not a call, no conclusion for this bound,
        continue to go down */
-    retour.bound = FALSE;
+    retour.bound = false;
 
   return retour;
 }
@@ -496,7 +496,7 @@ static Bound_test top_down_abc_dimension(statement s,
   Bound_test retour;
   variable var = type_variable(entity_type(array));
   dimension dim_i = find_ith_dimension(variable_dimensions(var),i);
-  retour.bound = TRUE;
+  retour.bound = true;
   retour.test = expression_undefined;
   if (!bound && unbounded_dimension_p(dim_i))
     /* unbounded dimension, we don't have to check for this bound */
@@ -548,7 +548,7 @@ static Bound_test top_down_abc_dimension(statement s,
 	    {
 	      /* Add the equation  PHIi <= lower-1 (upper+1 <= PHIi)
 		 to the predicate of region re */
-	      if (sc_add_phi_equation(&P,exp,i,FALSE,bound))
+	      if (sc_add_phi_equation(&P,exp,i,false,bound))
 		{
 		  /* Every expression is linear.
 		   * Test the feasibility of P by using this function:
@@ -557,14 +557,14 @@ static Bound_test top_down_abc_dimension(statement s,
 		   * ofl_ctrl = OFL_CTRL means that the overflows are treated in the
 		   * called procedure (sc_rational_feasibility_ofl_ctrl())
 		   *
-		   * ofl_res = TRUE means that if the overflows occur, function
+		   * ofl_res = true means that if the overflows occur, function
 		   * sc_rational_feasibility_ofl_ctrl will return the value TRUE
 		   * we don't know if the system is feasible or not
 		   *
 		   * The function sc_rational_feasibility_ofl_ctrl() is less
 		   * expensive than the function sc_integer_feasibility_ofl_ctrl()*/
 
-		  if (!sc_rational_feasibility_ofl_ctrl(P, OFL_CTRL, TRUE))
+		  if (!sc_rational_feasibility_ofl_ctrl(P, OFL_CTRL, true))
 		    /* The system is not feasible (certainly) => no violation */
 		    set_array_dimension_checked(context,action,array,i,bound);
 		  else
@@ -613,7 +613,7 @@ static Bound_test top_down_abc_dimension(statement s,
 		}
 	      else
 		// the exp is not linear, we can't add to P
-		retour.bound = FALSE;
+		retour.bound = false;
 	    }
 	  }
 	  contrainte_free(con_exp);
@@ -657,7 +657,7 @@ static bool max_statement_write_flt(statement s)
       }
   },
       effects_list);
-  return TRUE;
+  return true;
 }
 
 /* search for the maximum ordering of statement (after s) that writes on a*/
@@ -697,12 +697,12 @@ static bool min_statement_write_flt(statement s)
 		fprintf(stderr, " This statement writes on %s with min ordering %d",
 			entity_name(current_entity),current_min);
 	      }
-	    return FALSE;
+	    return false;
 	  }
       }
   },
       effects_list);
-  return TRUE;
+  return true;
 }
 
 /* search for the minimum ordering of statement (after s) that writes on a*/
@@ -730,10 +730,10 @@ static bool is_first_written_array_p(entity a, list l, statement s)
 	int min = minimum_ordering(other,s);
 	ifdebug(4)
 	  fprintf(stderr, " min of other %s  = %d ", entity_name(other), min);
-	if (max >= min) return FALSE;
+	if (max >= min) return false;
       }
   },l);
-  return TRUE;
+  return true;
 }
 
 /*
@@ -756,7 +756,7 @@ static entity find_first_written_array(list l,statement s)
 }
 
 static statement test_sequence = statement_undefined;;
-static bool godown = FALSE;
+static bool godown = false;
 static list lexp = NIL;
 
 static void top_down_abc_array(entity array, region re,statement s, top_down_abc_context_p context)
@@ -784,8 +784,8 @@ static void top_down_abc_array(entity array, region re,statement s, top_down_abc
     Bound_test lower, upper;
     lower.test = expression_undefined;
     upper.test = expression_undefined;
-    lower.bound = TRUE;
-    upper.bound = TRUE;
+    lower.bound = true;
+    upper.bound = true;
 
     /* if we have a region like: <A(PHI)-EXACT-{}>
      * it means that all *declared* elements are touched, although
@@ -799,7 +799,7 @@ static void top_down_abc_array(entity array, region re,statement s, top_down_abc
     if (!dimension_checked_upper(dc))
       {
 	/* The upper bound of the dimension i is not marked TRUE*/
-	upper = top_down_abc_dimension(s,context,re,action,array,i,FALSE);
+	upper = top_down_abc_dimension(s,context,re,action,array,i,false);
 	if (!expression_undefined_p(upper.test))
 	  {
 	    statement sta;
@@ -808,7 +808,7 @@ static void top_down_abc_array(entity array, region re,statement s, top_down_abc
 	      strdup(concatenate("\'Bound violation:",
 				 read_or_write(action), " array ",
 				 entity_name(array),
-				 bool_to_bound(FALSE),
+				 bool_to_bound(false),
 				 int_to_dimension(i),"\'",NULL));
 
 	    if (true_expression_p(upper.test))
@@ -825,8 +825,8 @@ static void top_down_abc_array(entity array, region re,statement s, top_down_abc
 		if (statement_undefined_p(test_sequence))
 		  test_sequence = copy_statement(sta);
 		else
-		  insert_statement(test_sequence,copy_statement(sta),FALSE);
-		//return FALSE;  // follow the first strategy
+		  insert_statement(test_sequence,copy_statement(sta),false);
+		//return false;  // follow the first strategy
 	      }
 	    // test if expression upper.test exists already in test_sequence
 	    else
@@ -851,14 +851,14 @@ static void top_down_abc_array(entity array, region re,statement s, top_down_abc
 		  if (statement_undefined_p(test_sequence))
 		    test_sequence = copy_statement(sta);
 		  else
-		    insert_statement(test_sequence,copy_statement(sta),FALSE);
+		    insert_statement(test_sequence,copy_statement(sta),false);
 		}
 	  }
       }
     if (!dimension_checked_lower(dc))
       {
 	/* The lower bound of the dimension i is not marked TRUE*/
-	lower = top_down_abc_dimension(s,context,re,action,array,i,TRUE);
+	lower = top_down_abc_dimension(s,context,re,action,array,i,true);
 	if (!expression_undefined_p(lower.test))
 	  {
 	    statement sta;
@@ -867,7 +867,7 @@ static void top_down_abc_array(entity array, region re,statement s, top_down_abc
 	      strdup(concatenate("\'Bound violation:",
 				 read_or_write(action)," array ",
 				 entity_name(array),
-				 bool_to_bound(TRUE),
+				 bool_to_bound(true),
 				 int_to_dimension(i),"\'",NULL));
 
 	    if (true_expression_p(lower.test))
@@ -886,8 +886,8 @@ static void top_down_abc_array(entity array, region re,statement s, top_down_abc
 		else
 		  /* insert the test after the generated tests, the order of tests
 		     is important */
-		  insert_statement(test_sequence,copy_statement(sta),FALSE);
-		// return FALSE;  // follow the first strategy
+		  insert_statement(test_sequence,copy_statement(sta),false);
+		// return false;  // follow the first strategy
 	      }
 	    else
 	      // test if expression lower.test exists already in test_sequence
@@ -912,13 +912,13 @@ static void top_down_abc_array(entity array, region re,statement s, top_down_abc
 		  if (statement_undefined_p(test_sequence))
 		    test_sequence = copy_statement(sta);
 		  else
-		    insert_statement(test_sequence,copy_statement(sta),FALSE);
+		    insert_statement(test_sequence,copy_statement(sta),false);
 		}
 	  }
       }
-	/* If one bound of the dimension is marked FALSE,
+	/* If one bound of the dimension is marked false,
 	   we have to go down*/
-    if ((!lower.bound) || (!upper.bound)) godown = TRUE;
+    if ((!lower.bound) || (!upper.bound)) godown = true;
     dc_list = CDR(dc_list);
   }
 }
@@ -977,7 +977,7 @@ static bool top_down_abc_flt(statement s,top_down_abc_context_p context)
   list l_written_arrays = NIL;
   lexp = NIL;
   test_sequence = statement_undefined;
-  godown = FALSE;
+  godown = false;
   ifdebug(3)
     {
       fprintf(stderr, "\n list of regions ");
@@ -1035,7 +1035,7 @@ static bool top_down_abc_flt(statement s,top_down_abc_context_p context)
 	  /* if there is no array that is always written before the others,
 	     we have to go down to substatements of s*/
 	  if (entity_undefined_p(first_array))
-	    godown = TRUE;
+	    godown = true;
 	  else
 	    {
 	      ifdebug(3)
@@ -1067,7 +1067,7 @@ static bool top_down_abc_flt(statement s,top_down_abc_context_p context)
 	  print_statement(test_sequence);
 	}
       if (!godown)
-	// godown = FALSE, insert new tests for the statement s here
+	// godown = false, insert new tests for the statement s here
 	top_down_abc_insert_before_statement(s,test_sequence,context);
       else
 	// insert new tests in function rwt
@@ -1114,13 +1114,13 @@ static bool store_mapping(control c, top_down_abc_context_p context)
 {
   extend_persistant_statement_to_control(context->map,
 					 control_statement(c), c);
-  return TRUE;
+  return true;
 }
 
 static bool push_uns(unstructured u, top_down_abc_context_p context)
 {
   stack_push((char *) u, context->uns);
-  return TRUE;
+  return true;
 }
 
 static void pop_uns(unstructured __attribute__ ((unused)) u,
@@ -1166,21 +1166,21 @@ bool array_bound_check_top_down(char *module_name)
     pips_user_warning("\n MUST REGIONS not selected - "
 		      "\n Do not expect wonderful results\n");
   /* set and get the current properties concerning regions */
-  set_bool_property("MUST_REGIONS", TRUE);
-  set_bool_property("EXACT_REGIONS", TRUE);
+  set_bool_property("MUST_REGIONS", true);
+  set_bool_property("EXACT_REGIONS", true);
   get_regions_properties();
   /* Get the code of the module. */
   module_statement= (statement) db_get_memory_resource(DBR_CODE,
 						       module_name,
-						       TRUE);
+						       true);
   set_current_module_statement(module_statement);
   set_ordering_to_statement(module_statement);
   /* Get the READ and WRITE regions of the module */
   set_rw_effects((statement_effects)
-		 db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+		 db_get_memory_resource(DBR_REGIONS, module_name, true));
   set_proper_rw_effects((statement_effects)
 			db_get_memory_resource(DBR_PROPER_EFFECTS,
-					       module_name,TRUE));
+					       module_name,true));
   debug_on("ARRAY_BOUND_CHECK_TOP_DOWN_DEBUG_LEVEL");
   pips_debug(1, " Region based ABC, Begin for %s\n", module_name);
   pips_assert("Statement is consistent ...",
@@ -1198,7 +1198,7 @@ bool array_bound_check_top_down(char *module_name)
   reset_current_module_statement();
   reset_proper_rw_effects();
   reset_rw_effects();
-  return TRUE;
+  return true;
 }
 
 /* END OF FILE */

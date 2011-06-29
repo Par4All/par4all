@@ -104,14 +104,14 @@ static void generate_scalar_variables_from_list(list lRef)
 {
   MAP(REFERENCE, curRef,
   {
-    bool alreadyDone = FALSE;
+    bool alreadyDone = false;
     reference refFound = reference_undefined;
 
     HASH_MAP(ref1, var1,
     {
       if(reference_equal_p(curRef, ref1))
 	{
-	  alreadyDone = TRUE;
+	  alreadyDone = true;
 	  refFound = ref1;
 	  break;
 	}
@@ -205,7 +205,7 @@ static entity find_or_create_newInd(entity ind, bool bIsInd)
   // If the entity is an index, then memorize it with gIsIndex
   if(bIsInd)
     {
-      hash_put(gIsIndex, new_ent, (void *)TRUE);
+      hash_put(gIsIndex, new_ent, (void *)true);
     }
 
   return new_ent;
@@ -241,10 +241,10 @@ static expression get_indExp_from_ref(reference curRef, hash_table ht,
     {
       if(loop_index(statement_loop(STATEMENT(CAR(glCurLoop)))) == ind)
 	{
-	  *innerInd = TRUE;
+	  *innerInd = true;
 	}
 
-      entity new_ent = find_or_create_newInd(ind, TRUE);
+      entity new_ent = find_or_create_newInd(ind, true);
 
       indExp = entity_to_expression(new_ent);
     }
@@ -278,7 +278,7 @@ expression get_fifoExp_from_ref(reference curRef, expression buffExp,
     }
   else
     {
-      entity new_ent = find_or_create_newInd(ind, FALSE);
+      entity new_ent = find_or_create_newInd(ind, false);
 
       list addArg = gen_make_list(expression_domain,
 				  buffExp,
@@ -348,7 +348,7 @@ statement generate_fifo_stat2(reference curRef, bool bRead)
       return statement_undefined;
     }
 
-  bool innerInd = FALSE;
+  bool innerInd = false;
 
   expression indExp = get_indExp_from_ref(curRef, gRefToInd, &innerInd);
 
@@ -446,13 +446,13 @@ void generate_fifo_stats2(list lRef,
 
     if(!strcmp(effAction, R_EFFECT))
       {
-	bool alreadyDone = FALSE;
+	bool alreadyDone = false;
 
 	MAP(REFERENCE, doneRef,
 	{
 	  if(reference_equal_p(curRef, doneRef))
 	    {
-	      alreadyDone = TRUE;
+	      alreadyDone = true;
 	      break;
 	    }
 	}, lReadDone);
@@ -463,7 +463,7 @@ void generate_fifo_stats2(list lRef,
 
 	    lReadDone = gen_nconc(lReadDone, CONS(REFERENCE, curRef, NIL));
 
-	    statement readStat = generate_fifo_stat2(curRef, TRUE);
+	    statement readStat = generate_fifo_stat2(curRef, true);
 
 	    if(readStat == statement_undefined)
 	      {
@@ -476,13 +476,13 @@ void generate_fifo_stats2(list lRef,
       }
     else
       {
-	bool alreadyDone = FALSE;
+	bool alreadyDone = false;
 
 	MAP(REFERENCE, doneRef,
 	{
 	  if(reference_equal_p(curRef, doneRef))
 	    {
-	      alreadyDone = TRUE;
+	      alreadyDone = true;
 	      break;
 	    }
 	}, lWriteDone);
@@ -493,7 +493,7 @@ void generate_fifo_stats2(list lRef,
 
 	    lWriteDone = gen_nconc(lWriteDone, CONS(REFERENCE, curRef, NIL));
 
-	    statement writeStat = generate_fifo_stat2(curRef, FALSE);
+	    statement writeStat = generate_fifo_stat2(curRef, false);
 
 	    if(writeStat == statement_undefined)
 	      {
@@ -565,11 +565,11 @@ static statement add_index_statements(statement stat)
 	continue;
       }
 
-    statement readStat = generate_ind_fifo_stat2(oldInd, newInd, TRUE);
+    statement readStat = generate_ind_fifo_stat2(oldInd, newInd, true);
 
     lReadStats = CONS(STATEMENT, readStat, lReadStats);
 
-    //statement writeStat = generate_ind_fifo_stat2(oldInd, newInd, FALSE);
+    //statement writeStat = generate_ind_fifo_stat2(oldInd, newInd, false);
 
     //lWriteStats = CONS(STATEMENT, writeStat, lWriteStats);
 
@@ -730,7 +730,7 @@ static void create_loop_HRE_module()
 					   copy_basic(entity_basic(oldInd)));
       AddEntityToCurrentModule(newInd);
 
-    statement readStat = generate_ind_fifo_stat2(oldInd, newInd, TRUE);
+    statement readStat = generate_ind_fifo_stat2(oldInd, newInd, true);
 
     lReadStats = CONS(STATEMENT, readStat, lReadStats);
 
@@ -747,7 +747,7 @@ static void create_loop_HRE_module()
 
     lIncStats = CONS(STATEMENT, incStat, lIncStats);
 
-    statement writeStat = generate_ind_fifo_stat2(oldInd, newInd, FALSE);
+    statement writeStat = generate_ind_fifo_stat2(oldInd, newInd, false);
 
     lWriteStats = CONS(STATEMENT, writeStat, lWriteStats);
 
@@ -775,7 +775,7 @@ static statement HRE_distribute_loop(statement stat)
 
   glCurLoop = CONS(STATEMENT, stat, glCurLoop);
 
-  HRE_distribute_stat(loop_body(statement_loop(stat)), TRUE);
+  HRE_distribute_stat(loop_body(statement_loop(stat)), true);
 
   loop_enter();
 
@@ -833,7 +833,7 @@ static statement HRE_distribute_seq(statement stat)
   //printf("HRE_distribute_seq\n");
   MAP(STATEMENT, curStat,
   {
-    statement seqStat = HRE_distribute_stat(curStat, FALSE);
+    statement seqStat = HRE_distribute_stat(curStat, false);
 
     //printf("seqStat\n");
     if(seqStat == statement_undefined)
@@ -872,10 +872,10 @@ static statement HRE_distribute_test(statement stat)
   gIfCount++;
 
   // Generate the HRE code for the true statement
-  HRE_distribute_stat(test_true(statement_test(stat)), TRUE);
+  HRE_distribute_stat(test_true(statement_test(stat)), true);
 
   // Generate the HRE code for the false statement
-  HRE_distribute_stat(test_false(statement_test(stat)), TRUE);
+  HRE_distribute_stat(test_false(statement_test(stat)), true);
 
   gIfCount--;
 
@@ -939,7 +939,7 @@ static statement HRE_distribute_stat(statement stat, bool calledFromLoop)
       }
     default:
       {
-	pips_assert("FALSE", FALSE);
+	pips_assert("FALSE", false);
 	break;
       }
     }
@@ -969,7 +969,7 @@ statement HRE_distribute(statement stat, string new_module_name, string module_n
   glReadStats = NIL;
   glWriteStats = NIL;
 
-  HRE_distribute_stat(stat, TRUE);
+  HRE_distribute_stat(stat, true);
 
   loop_enter();
 
