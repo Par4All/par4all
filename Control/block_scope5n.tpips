@@ -5,12 +5,6 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create $WKS $WKS.c
 
-#setenv C_SYNTAX_DEBUG_LEVEL 9
-
-#activate C_PARSER
-#activate C_SYMBOL_TABLE
-
-#setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 #setproperty PRETTYPRINT_BLOCKS TRUE
 #setproperty PRETTYPRINT_ALL_C_BLOCKS TRUE
@@ -20,6 +14,8 @@ setproperty PRETTYPRINT_UNSTRUCTURED TRUE
 #setproperty PRETTYPRINT_INTERNAL_RETURN TRUE
 #setproperty PRETTYPRINT_FINAL_RETURN TRUE
 # setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+activate NEW_CONTROLIZER
 
 echo
 echo Parser output
@@ -40,12 +36,12 @@ setenv CONTROL_DEBUG_LEVEL=2
 activate NEW_CONTROLIZER
 display PRINTED_FILE[block_scope5n]
 
-echo
-echo After restructuring
-echo
+#echo
+#echo After restructuring
+#echo
 
-apply RESTRUCTURE_CONTROL[block_scope5n]
-display PRINTED_FILE[block_scope5n]
+#apply RESTRUCTURE_CONTROL[block_scope5n]
+#display PRINTED_FILE[block_scope5n]
 
 apply UNSPLIT
 shell (cd block_scope5n.database/Src; gcc -c block_scope5n.c)

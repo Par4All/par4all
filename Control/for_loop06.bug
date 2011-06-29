@@ -1,0 +1,1 @@
+bug in for to do loop conversion; documented in the C code; more dependences should be checked and nothing should be lost.
