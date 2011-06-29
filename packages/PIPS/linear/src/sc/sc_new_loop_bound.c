@@ -58,7 +58,7 @@ Psysteme new_loop_bound
 	enumeration = NULL;
 
     algorithm_row_echelon_generic(scn, base_index, 
-				  &condition, &enumeration, FALSE);
+				  &condition, &enumeration, false);
 
     sc_rm(scn);
     scn = NULL;
@@ -136,7 +136,7 @@ algorithm_row_echelon_generic(
     Pbase base_index,       /* enumeration variables, from outer to inner. */
     Psysteme *pcondition,   /* returned condition (what remains from scn). */
     Psysteme *penumeration, /* returned enumeration system. */
-    boolean redundancy      /* whether to allow outwards redundancy. */)
+    bool redundancy      /* whether to allow outwards redundancy. */)
 {
     int i, dimension = vect_size(base_index);
     Psysteme ps_interm, ps_project, ps_tmp;
@@ -243,10 +243,10 @@ algorithm_row_echelon(
     Psysteme *penumeration)
 {
   algorithm_row_echelon_generic
-    (scn, base_index, pcondition, penumeration, FALSE);  
+    (scn, base_index, pcondition, penumeration, false);  
 }
 
-void sc_set_row_echelon_redundancy(boolean b __attribute__ ((unused)))
+void sc_set_row_echelon_redundancy(bool b __attribute__ ((unused)))
 {
   return;
 }
@@ -293,7 +293,7 @@ void algorithm_tiling
 
     /* tiles iterations enumeration row echelon
      */
-    algorithm_row_echelon_generic(syst, inner, &transfer, piter_enum, TRUE);
+    algorithm_row_echelon_generic(syst, inner, &transfer, piter_enum, true);
 
     if (sc_empty_p(transfer))
     {
@@ -315,7 +315,7 @@ void algorithm_tiling
 
     /* tiles enumeration row echelon
      */
-    algorithm_row_echelon_generic(sc, outer, pcondition, ptile_enum, TRUE);
+    algorithm_row_echelon_generic(sc, outer, pcondition, ptile_enum, true);
 
     if (sc_empty_p(*pcondition))
     {

@@ -22,7 +22,7 @@ extern int slx_lex();
 extern int slx_error();
 extern char yytext[]; /* dialogue avec l'analyseur lexical */
 extern Psysteme ps_yacc;
-boolean syntax_error;
+bool syntax_error;
 Value valcst;
 extern Value fac;        /* facteur multiplicatif suivant qu'on analyse un terme*/
                       /* introduit par un moins (-1) ou par un plus (1) */
@@ -85,7 +85,7 @@ s_list   : inisl defvar l_sys endsl
 inisl : 
    { /* Initialisation de la liste des systemes */
      sl_yacc      = NULL; 
-     syntax_error = FALSE;
+     syntax_error = false;
    }
    ;
 
@@ -317,7 +317,7 @@ char *s;
   int c;
   (void) fprintf(stderr,"%s near %s\n",s,yytext);
   while ((c = getchar()) != EOF) putchar(c);
-  syntax_error = TRUE;
+  syntax_error = true;
   return 0;
 }
 

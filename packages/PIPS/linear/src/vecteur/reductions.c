@@ -268,14 +268,14 @@ Value vect_sum(Pvecteur v)
     return sum;
 }
 
-/* boolean vect_equal(Pvecteur v1, Pvecteur v2): test a egalite de
+/* bool vect_equal(Pvecteur v1, Pvecteur v2): test a egalite de
  * deux vecteurs
  * 
  *        ->    ->
  * return v1 == v2 ;
  *
  */
-boolean vect_equal(v1,v2)
+bool vect_equal(v1,v2)
 Pvecteur v1,v2;
 {
     /* Note: le test n'est pas optimal puisque v2 est parcouru et compare
@@ -285,8 +285,8 @@ Pvecteur v1,v2;
      * shorter version, FC 28/09/94
      */
     Pvecteur v;
-    register boolean 
-	result = TRUE;
+    register bool 
+	result = true;
 
     if (!v1 || !v2)
 	return(!v1 && !v2);
@@ -308,7 +308,7 @@ Pvecteur v1,v2;
     return result;
 }
 
-/* boolean vect_equal_except(Pvecteur v1, Pvecteur v2, Variable var):
+/* bool vect_equal_except(Pvecteur v1, Pvecteur v2, Variable var):
  * test a egalite des projections selon la coordonnees var de deux vecteurs
  *      ->
  * Soit e un vecteur de base quelconque:
@@ -316,7 +316,7 @@ Pvecteur v1,v2;
  * return <v1 . e> == <v2 . e>;
  *                e!=var
  */
-boolean vect_equal_except(v1,v2,var)
+bool vect_equal_except(v1,v2,var)
 Pvecteur v1,v2;
 Variable var;
 {
@@ -326,22 +326,22 @@ Variable var;
      * a v1 meme si ces coefficients ont ete deja ete compare lors du
      * parcours de v1; mais cela evite le "marquage" des coefficients vus;
      */
-    boolean result;
+    bool result;
 
     if(v1==NULL && v2==NULL)
-	result = TRUE;
+	result = true;
     else if(v1==NULL)
 	result = v2->succ==NULL && var_of(v2)==var;
     else if(v2 == NULL)
 	result = v1->succ==NULL && var_of(v1)==var;
     else {
-	result = TRUE;
+	result = true;
 
-	for (pv = v1; pv != NULL && result == TRUE; pv = pv->succ)
+	for (pv = v1; pv != NULL && result == true; pv = pv->succ)
 	    if (var_of(pv) != var)
 		result = value_eq(val_of(pv),vect_coeff(var_of(pv), v2));
 
-	for (pv = v2; pv != NULL && result == TRUE; pv = pv->succ)
+	for (pv = v2; pv != NULL && result == true; pv = pv->succ)
 	    if (var_of(pv) != var)
 		result = value_eq(val_of(pv),vect_coeff(var_of(pv), v1));
 
@@ -350,14 +350,14 @@ Variable var;
     return result;
 }
 
-/* boolean vect_oppos(Pvecteur v1, Pvecteur v2): test de l'opposition de
+/* bool vect_oppos(Pvecteur v1, Pvecteur v2): test de l'opposition de
  * deux vecteurs
  * 
  *        ->   ->    ->
  * return v1 + v2 == 0 ;
  *
  */
-boolean vect_oppos(v1,v2)
+bool vect_oppos(v1,v2)
 Pvecteur v1,v2;
 {
     /*
@@ -365,21 +365,21 @@ Pvecteur v1,v2;
      * a v1 meme si ces coefficients ont ete deja ete compare lors du
      * parcours de v1; mais cela evite le "marquage" des coefficients vus;
      */
-    boolean result;
+    bool result;
     Pvecteur pv;
 
     if(v1==NULL && v2==NULL)
-	result = TRUE;
+	result = true;
     else if(v1==NULL || v2 == NULL)
-	result = FALSE;
+	result = false;
     else {
-	result = TRUE;
+	result = true;
 
-	for (pv = v1; pv != NULL && result == TRUE; pv = pv->succ)
+	for (pv = v1; pv != NULL && result == true; pv = pv->succ)
 	    result = value_eq(val_of(pv),
 			      value_uminus(vect_coeff(var_of(pv), v2)));
 
-	for (pv = v2; pv != NULL && result == TRUE; pv = pv->succ)
+	for (pv = v2; pv != NULL && result == true; pv = pv->succ)
 	    result = value_eq(val_of(pv),
 			      value_uminus(vect_coeff(var_of(pv), v1)));
 
@@ -388,7 +388,7 @@ Pvecteur v1,v2;
     return result;
 }
 
-/* boolean vect_opposite_except(Pvecteur v1, Pvecteur v2, Variable var):
+/* bool vect_opposite_except(Pvecteur v1, Pvecteur v2, Variable var):
  * test a egalite des projections selon la coordonnees var de deux vecteurs
  *      ->
  * Soit e un vecteur de base quelconque:
@@ -396,7 +396,7 @@ Pvecteur v1,v2;
  * return <v1 . e> == - <v2 . e>;
  *                e!=var
  */
-boolean vect_opposite_except(v1,v2,var)
+bool vect_opposite_except(v1,v2,var)
 Pvecteur v1,v2;
 Variable var;
 {
@@ -406,23 +406,23 @@ Variable var;
      * a v1 meme si ces coefficients ont ete deja ete compare lors du
      * parcours de v1; mais cela evite le "marquage" des coefficients vus;
      */
-    boolean result;
+    bool result;
 
     if(v1==NULL && v2==NULL)
-	result = TRUE;
+	result = true;
     else if(v1==NULL)
 	result = v2->succ==NULL && var_of(v2)==var;
     else if(v2 == NULL)
 	result = v1->succ==NULL && var_of(v1)==var;
     else {
-	result = TRUE;
+	result = true;
 
-	for (pv = v1; pv != NULL && result == TRUE; pv = pv->succ)
+	for (pv = v1; pv != NULL && result == true; pv = pv->succ)
 	    if (var_of(pv) != var)
 		result = value_eq(val_of(pv),
 				  value_uminus(vect_coeff(var_of(pv), v2)));
 
-	for (pv = v2; pv != NULL && result == TRUE; pv = pv->succ)
+	for (pv = v2; pv != NULL && result == true; pv = pv->succ)
 	    if (var_of(pv) != var)
 		result = value_eq(val_of(pv),
 				  value_uminus(vect_coeff(var_of(pv), v1)));
@@ -498,22 +498,22 @@ Pvecteur v1,v2;
     return prop;
 }
 
-/* boolean vect_colin_base(Pvecteur vec, Variable var): renvoie TRUE si
+/* bool vect_colin_base(Pvecteur vec, Variable var): renvoie true si
  * -->     -->
  * vec = k var
  *
- * FALSE sinon
+ * false sinon
  *
  * Attention: le vecteur nul est colineaire a tous les vecteurs de base
  */
-boolean vect_colin_base(vec,var)
+bool vect_colin_base(vec,var)
 Pvecteur vec;
 Variable var;
 {
     return(vec==NULL || (vec->succ==NULL && var_of(vec)==var));
 }
 
-/* boolean vect_check(Pvecteur v): renvoie TRUE si le vecteur v est
+/* bool vect_check(Pvecteur v): renvoie true si le vecteur v est
  * coherent avec les specifications du package; aucun des coefficients
  * effectivement conserves en memoire ne doit etre nul (la cellule aurait
  * du etre liberee) et aucune dimension (i.e. variable) ne peut apparaitre
@@ -525,11 +525,11 @@ Variable var;
  * new version to test linear_hashtable. better for large vectors,
  * but much worse for small ones I guess. FC.
  */
-boolean vect_check(Pvecteur v)
+bool vect_check(Pvecteur v)
 {
-  register boolean 
-    consistent = TRUE, 
-    tcst_seen = FALSE;
+  register bool 
+    consistent = true, 
+    tcst_seen = false;
   linear_hashtable_pt seen = linear_hashtable_make();
 
   for(; v!=NULL && consistent; v=v->succ) 
@@ -538,12 +538,12 @@ boolean vect_check(Pvecteur v)
     if (var_of(v)) 
     {
       if (linear_hashtable_isin(seen, var_of(v)))
-	consistent = FALSE;
+	consistent = false;
       linear_hashtable_put(seen, var_of(v), (void*) 1);
     }
     else {
-      if (tcst_seen) consistent = FALSE;
-      tcst_seen = TRUE;
+      if (tcst_seen) consistent = false;
+      tcst_seen = true;
     }
   }
 
@@ -555,7 +555,7 @@ boolean vect_check(Pvecteur v)
  * @param v vecteur being scanned
  * @param val maximum absolute value allowed, or 0 to ignore
  */
-boolean vect_larger_coef_p(Pvecteur v, Value val)
+bool vect_larger_coef_p(Pvecteur v, Value val)
 {
   linear_assert("positive value", value_posz_p(val));
   if (value_zero_p(val)) return false;

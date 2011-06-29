@@ -106,8 +106,8 @@ Pvecteur in_v1, in_v2;
 {
   Pvecteur            v1, v2;
   enum hspara_elem    ret_sle = unpara;
-  boolean             first     = TRUE;
-  boolean             same_sign = FALSE;
+  bool             first     = true;
+  bool             same_sign = false;
   Value                 gcd1, gcd2;   /* gcd of each vector                 */
   int                 l1, l2;   /* length of each vector without TCST */
   Value               b1, b2, diff; /* value of TCST and their diff       */
@@ -147,7 +147,7 @@ Pvecteur in_v1, in_v2;
   for (v2 = in_v2; v2 != NULL; v2 = v2->succ) {
     Variable  var2  = var_of(v2);
     Value     val2  = val_of(v2);
-    boolean   found = FALSE;
+    bool   found = false;
 
     if (var2 == TCST) continue;
 
@@ -155,13 +155,13 @@ Pvecteur in_v1, in_v2;
       if (var_of(v1) == var2) {
    Value      i1 = value_mult(gcd2,val_of(v1));
    Value     i2 = value_mult(gcd1,val2);
-   boolean  ss = value_eq(i1,i2);
-   boolean  op = value_eq(i1,value_uminus(i2));
+   bool  ss = value_eq(i1,i2);
+   bool  op = value_eq(i1,value_uminus(i2));
    
    if (!ss && !op) return unpara;
-   if (first) {first = FALSE; same_sign = (ss)?ss:op ;}
+   if (first) {first = false; same_sign = (ss)?ss:op ;}
    if ((same_sign && op)||(!same_sign && ss)) return unpara; 
-   found = TRUE;
+   found = true;
       }
     }
 
@@ -257,7 +257,7 @@ Psysteme in_ps1, in_ps2;
 {
   Psysteme        ps1, ps2,  ret_ps = NULL;
   Pcontrainte     ineq1, ineqs2;
-  boolean         stop = FALSE, dup1 = FALSE, dup2 = FALSE;
+  bool         stop = false, dup1 = false, dup2 = false;
   
   if ( in_ps1 == SC_RN ) return sc_dup(in_ps2);
   
@@ -271,11 +271,11 @@ Psysteme in_ps1, in_ps2;
 
   /* Transforms equalities in inequalities if necessary */
   if (in_ps1->nb_eq != 0) 
-    { ps1 = sc_dup( in_ps1 ); sc_transform_eg_in_ineg( ps1 ); dup1 = TRUE; }
+    { ps1 = sc_dup( in_ps1 ); sc_transform_eg_in_ineg( ps1 ); dup1 = true; }
   else ps1 = in_ps1;
  
   if (in_ps2->nb_eq != 0) 
-    { ps2 = sc_dup( in_ps2 ); sc_transform_eg_in_ineg( ps2 ); dup2 = TRUE; }
+    { ps2 = sc_dup( in_ps2 ); sc_transform_eg_in_ineg( ps2 ); dup2 = true; }
   else ps2 = in_ps2;
 
 
@@ -293,7 +293,7 @@ Psysteme in_ps1, in_ps2;
       case empty:
    ret_ps = sc_free(ret_ps);
    ret_ps = sc_empty(NULL);
-   stop = TRUE; 
+   stop = true; 
    break;
       case full: continue; break;
       default:  
@@ -344,7 +344,7 @@ Psysteme in_ps1, in_ps2;
   for (eq = in_ps2->egalites; eq != NULL; eq = eq->succ) {
     Pcontrainte  co, eq2;
     Pvecteur     pv;
-    boolean      eq_in_ineq, co_in_ineq;
+    bool      eq_in_ineq, co_in_ineq;
 
     if (contrainte_in_liste(eq, in_ps1->egalites)) continue;
     
@@ -467,7 +467,7 @@ int      ofl_ctrl;
       vect_normalize(eq->vecteur);
   }
   /* returns if there is no intersection */
-  if (!sc_rational_feasibility_ofl_ctrl(ps1, ofl_ctrl, TRUE)) { 
+  if (!sc_rational_feasibility_ofl_ctrl(ps1, ofl_ctrl, true)) { 
     tail->succ = NULL;  ps1 = sc_free(ps1); 
     in_ps2 = sc_free(in_ps2); in_ps2 = sc_empty(NULL);
     C3_RETURN( IS_SC, in_ps2 ); 
@@ -489,7 +489,7 @@ int      ofl_ctrl;
      sc_fprint( stderr, ps1, union_variable_name );
       });
 
-      if (sc_rational_feasibility_ofl_ctrl(ps1, ofl_ctrl, TRUE))
+      if (sc_rational_feasibility_ofl_ctrl(ps1, ofl_ctrl, true))
       {
      contrainte_reverse(eq);
      prev_eq = prev_eq->succ;
@@ -665,8 +665,8 @@ int     ofl_ctrl;
   Pcontrainte common_cons_oppose;
   Psysteme    common_ps, common_ps_oppose;
   Ppath    pa1, pa2; 
-  boolean     pa1_empty  = FALSE, pa2_empty  = FALSE;
-  boolean     pa1_filled = FALSE, pa2_filled = FALSE;
+  bool     pa1_empty  = false, pa2_empty  = false;
+  bool     pa1_filled = false, pa2_filled = false;
   
 #line 1144 "reduc.w"
      Pdisjunct  dj1 = dj_empty(), dj2 = dj_empty(); 
@@ -731,13 +731,13 @@ int     ofl_ctrl;
   
   for(cons = (lcomp->psys)->inegalites;
      (cons != NULL)&&(lcomp->succ != NULL);cons = cons->succ){
-    boolean is_common = TRUE;
+    bool is_common = true;
     cons_pv           = vect_dup( cons->vecteur ); vect_chg_sgn( cons_pv );
     cons_oppose       = contrainte_make(vect_add( cons_pv, vect_1 )); 
   
     for(comp = lcomp->succ;(comp != NULL) && is_common; comp = comp->succ){
       Pcontrainte ineg = (comp->psys)->inegalites;
-      boolean     is_common1, is_common2;
+      bool     is_common1, is_common2;
   
       is_common1 = contrainte_in_liste( cons,        ineg );
       is_common2 = contrainte_in_liste( cons_oppose, ineg );
@@ -781,13 +781,13 @@ int     ofl_ctrl;
       
       if (!pa1_empty && contrainte_in_liste(common_cons, co)) {
         local_ps = sc_supress_same_constraints( common_ps, comp->psys );
-        if (local_ps == SC_EMPTY) { pa1 = pa_empty(); pa1_empty = TRUE; continue;}
-        pa1->pcomp = sl_append_system( pa1->pcomp, local_ps ); pa1_filled = TRUE;
+        if (local_ps == SC_EMPTY) { pa1 = pa_empty(); pa1_empty = true; continue;}
+        pa1->pcomp = sl_append_system( pa1->pcomp, local_ps ); pa1_filled = true;
       }
       else if(!pa2_empty &&  contrainte_in_liste(common_cons_oppose, co)) {
         local_ps = sc_supress_same_constraints( common_ps_oppose, comp->psys );
-        if (local_ps == SC_EMPTY) {pa2 = pa_empty(); pa2_empty = TRUE; continue;}
-        pa2->pcomp = sl_append_system( pa2->pcomp, local_ps ); pa2_filled = TRUE;
+        if (local_ps == SC_EMPTY) {pa2 = pa_empty(); pa2_empty = true; continue;}
+        pa2->pcomp = sl_append_system( pa2->pcomp, local_ps ); pa2_filled = true;
       }
     }
     
@@ -861,19 +861,19 @@ int     ofl_ctrl;
 
 #line 1249 "reduc.w"
 
-/* boolean pa_inclusion_p(Psysteme ps1, Psysteme ps2) BA, AL 31/05/94
- * returns TRUE if ps1 represents a subset of ps2, false otherwise
+/* bool pa_inclusion_p(Psysteme ps1, Psysteme ps2) BA, AL 31/05/94
+ * returns true if ps1 represents a subset of ps2, false otherwise
  * Inspector (no sharing on memory).
  */
-boolean pa_inclusion_p_ofl_ctrl(ps1, ps2, ofl_ctrl)
+bool pa_inclusion_p_ofl_ctrl(ps1, ps2, ofl_ctrl)
 Psysteme ps1, ps2;
 int ofl_ctrl;
 {
-  boolean   result;
+  bool   result;
   Ppath     chemin = pa_make(ps1, sl_append_system(NULL, ps2));
   
   CATCH(overflow_error) {
-    result = FALSE; 
+    result = false; 
   }
   TRY {
     result = ! (pa_feasibility_ofl_ctrl(chemin, ofl_ctrl));
@@ -885,9 +885,9 @@ int ofl_ctrl;
 
 #line 1275 "reduc.w"
 
-/* boolean pa_system_equal_p(Psysteme ps1, Psysteme ps2) BA
+/* bool pa_system_equal_p(Psysteme ps1, Psysteme ps2) BA
  */
-boolean pa_system_equal_p_ofl_ctrl(ps1,ps2, ofl_ctrl)
+bool pa_system_equal_p_ofl_ctrl(ps1,ps2, ofl_ctrl)
 Psysteme ps1, ps2;
 int ofl_ctrl;
 {
@@ -926,22 +926,22 @@ int      ofl_ctrl;
 
 #line 1323 "reduc.w"
 
-/* boolean pa_convex_hull_equals_union_p(conv_hull, ps1, ps2)
+/* bool pa_convex_hull_equals_union_p(conv_hull, ps1, ps2)
  * input    : two Psystems and their convex hull   AL,BC 23/03/95
- * output   : TRUE if ps1 U ps2 = convex_hull, FALSE otherwise
+ * output   : true if ps1 U ps2 = convex_hull, false otherwise
  * modifies : nothing
  * comment  : complexity = nb_constraints(ps1) * nb_constraints(ps2) 
  *            if ofl_ctrl = OFL_CTRL, conservatively returns ofl_ctrl 
  *            when an overflow error occurs
  */
-boolean pa_convex_hull_equals_union_p_ofl_ctrl
+bool pa_convex_hull_equals_union_p_ofl_ctrl
             (conv_hull, ps1, ps2, ofl_ctrl, ofl_res)
 Psysteme  conv_hull, ps1, ps2;
 int       ofl_ctrl;
-boolean   ofl_res;
+bool   ofl_res;
 {
   Ppath    chemin;
-  boolean  result;
+  bool  result;
   int      local_ofl_ctrl = (ofl_ctrl == OFL_CTRL)?FWD_OFL_CTRL:ofl_ctrl;
   
   chemin = pa_make(conv_hull,sl_append_system(sl_append_system(NULL,ps1),ps2));

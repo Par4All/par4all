@@ -120,7 +120,7 @@ void sc_init_lex(void)
     BEGIN TEXT;
 }
 
-extern boolean yysyntax_error;
+extern bool yysyntax_error;
 
 int yyerror(char *s)
 {
@@ -131,8 +131,8 @@ int yyerror(char *s)
 /*	while ((c = getchar()) != EOF)
 		putchar(c);
 */
-	yysyntax_error = TRUE;
-	return TRUE;
+	yysyntax_error = true;
+	return true;
 }
 
 

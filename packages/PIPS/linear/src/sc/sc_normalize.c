@@ -79,7 +79,7 @@ Psysteme sc_normalize(ps)
 Psysteme ps;
 {
     Pcontrainte eq;
-    boolean is_sc_fais = TRUE;
+    bool is_sc_fais = true;
 
     ps = sc_kill_db_eg(ps);
     if (ps) {
@@ -89,7 +89,7 @@ Psysteme ps;
 	    /* normalisation de chaque equation */
 	    if (eq->vecteur)    {
 		vect_normalize(eq->vecteur);
-		if ((is_sc_fais = egalite_normalize(eq))== TRUE)
+		if ((is_sc_fais = egalite_normalize(eq))== true)
 		    is_sc_fais = sc_elim_simple_redund_with_eq(ps,eq);
 	    }
 	}
@@ -98,14 +98,14 @@ Psysteme ps;
 	     eq=eq->succ) {
 	    if (eq->vecteur)    {
 		vect_normalize(eq->vecteur);
-		if ((is_sc_fais = inegalite_normalize(eq))== TRUE)
+		if ((is_sc_fais = inegalite_normalize(eq))== true)
 		    is_sc_fais = sc_elim_simple_redund_with_ineq(ps,eq);
 	    }
 	}
 
 	ps = sc_kill_db_eg(ps);
-	sc_elim_empty_constraints(ps, TRUE);
-	sc_elim_empty_constraints(ps, FALSE);
+	sc_elim_empty_constraints(ps, true);
+	sc_elim_empty_constraints(ps, false);
     }
 
     if (!is_sc_fais) 
@@ -182,8 +182,8 @@ Psysteme ps;
   Pcontrainte eq;
 
   ps = sc_elim_double_constraints(ps);
-  sc_elim_empty_constraints(ps, TRUE);
-  sc_elim_empty_constraints(ps, FALSE);
+  sc_elim_empty_constraints(ps, true);
+  sc_elim_empty_constraints(ps, false);
 
   if (!SC_UNDEFINED_P(ps)) {
     Pbase b = sc_base(ps);
@@ -250,8 +250,8 @@ Psysteme ps;
     }
 
     ps = sc_elim_double_constraints(ps);
-    sc_elim_empty_constraints(ps, TRUE);
-    sc_elim_empty_constraints(ps, FALSE);
+    sc_elim_empty_constraints(ps, true);
+    sc_elim_empty_constraints(ps, false);
   }
     
   return(ps);
@@ -286,7 +286,7 @@ Pcontrainte eq;
 	    return(NULL);
 	}
 
-	sc_rm_empty_constraints(ps, TRUE);
+	sc_rm_empty_constraints(ps, true);
     }
 
     return(ps);
@@ -314,7 +314,7 @@ Pcontrainte ineq;
 	    return(NULL);
 	}
 
-	sc_rm_empty_constraints(ps, FALSE);
+	sc_rm_empty_constraints(ps, false);
     }
 
     return(ps);
@@ -344,7 +344,7 @@ Psysteme ps;
 static Psysteme sc_rational_feasibility(Psysteme sc)
 {
 
-    if(!sc_rational_feasibility_ofl_ctrl((sc), OFL_CTRL,TRUE)) {
+    if(!sc_rational_feasibility_ofl_ctrl((sc), OFL_CTRL,true)) {
 	sc_rm(sc);
 	sc = SC_EMPTY;
     }
@@ -407,7 +407,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 
     Psysteme volatile new_ps = SC_UNDEFINED;
     Psysteme proj_ps = SC_UNDEFINED;
-    boolean feasible_p = TRUE;
+    bool feasible_p = true;
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
     Psysteme volatile ps_backup = sc_copy(ps);
@@ -502,7 +502,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 				  if(sc_empty_p(proj_ps =
 				  sc_variable_substitution_with_eq_ofl_ctrl
 				  (proj_ps, proj_eq, v, NO_OFL_CTRL))) {
-				  feasible_p = FALSE;
+				  feasible_p = false;
 				  break;
 				  }
 				  else {
@@ -525,7 +525,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 			}
 			else {
 			    /* The system is not feasible. Stop */
-			    feasible_p = FALSE;
+			    feasible_p = false;
 			    break;
 			}
 			
@@ -557,7 +557,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 			
 			if(inegalite_normalize(proj_ineq)) {
 			    if(contrainte_constante_p(proj_ineq)
-			       && contrainte_verifiee(proj_ineq, FALSE)) {
+			       && contrainte_verifiee(proj_ineq, false)) {
 				/* ineq is redundant */
 				;
 			    }
@@ -577,17 +577,17 @@ Psysteme sc_strong_normalize_and_check_feasibility
 				    eq_set_vect_nul(proj_ineq);
 				}
 				else if(i==2) {
-				    feasible_p = FALSE;
+				    feasible_p = false;
 				    break;
 				}
 				else {
-				    assert(FALSE);
+				    assert(false);
 				}
 			    }
 			}
 			else {
 			    /* The system is not feasible. Stop */
-			    feasible_p = FALSE;
+			    feasible_p = false;
 			    break;
 			}
 		    }
@@ -622,7 +622,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 		      "[sc_strong_normalize]:"
 		      " Non-feasibility detected by sc_normalize\n");
 		    */
-		    feasible_p = FALSE;
+		    feasible_p = false;
 		}
 	    }
 	    else {
@@ -630,7 +630,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 		  fprintf(stderr,
 		  "[sc_strong_normalize]: Empty system as input\n");
 		*/
-		feasible_p = FALSE;
+		feasible_p = false;
 	    }
 	    
 	    if(feasible_p && check_feasibility != (Psysteme (*)(Psysteme)) NULL) {
@@ -687,10 +687,10 @@ Psysteme sc_strong_normalize_and_check_feasibility
 Psysteme sc_strong_normalize2(Psysteme ps)
 {
 
-#define if_debug_sc_strong_normalize_2 if(FALSE)
+#define if_debug_sc_strong_normalize_2 if(false)
 
     Psysteme new_ps = sc_make(NULL, NULL);
-    boolean feasible_p = TRUE;
+    bool feasible_p = true;
 
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
@@ -768,7 +768,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 				  if(sc_empty_p(ps =
 				  sc_variable_substitution_with_eq_ofl_ctrl
 				  (ps, eq, v, OFL_CTRL))) {
-				  feasible_p = FALSE;
+				  feasible_p = false;
 				  break;
 				  }
 				  else {
@@ -791,7 +791,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 			}
 			else {
 			    /* The system is not feasible. Stop */
-			    feasible_p = FALSE;
+			    feasible_p = false;
 			    break;
 			}
 			
@@ -830,7 +830,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 				"[sc_strong_normalize2]:"
 				" Non-feasibility detected by first call to sc_normalize\n");
 		    }
-		    feasible_p = FALSE;
+		    feasible_p = false;
 		}
 	    }
 	    else {
@@ -838,7 +838,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 		    fprintf(stderr,
 			    "[sc_strong_normalize2]: Empty system as input\n");
 		}
-		feasible_p = FALSE;
+		feasible_p = false;
 	    }
 	    
 	    if(!feasible_p) {
@@ -929,10 +929,10 @@ Psysteme sc_strong_normalize_and_check_feasibility2
  int level)
 {
 
-#define if_debug_sc_strong_normalize_and_check_feasibility2 if(FALSE)
+#define if_debug_sc_strong_normalize_and_check_feasibility2 if(false)
 
   Psysteme new_ps = sc_make(NULL, NULL);
-  boolean feasible_p = TRUE;
+  bool feasible_p = true;
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   Psysteme volatile ps_backup = sc_copy(ps);
@@ -958,7 +958,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 		  "[sc_strong_normalize_and_check_feasibility2]"
 		  " Empty system as input\n");
 	}
-	feasible_p = FALSE;
+	feasible_p = false;
       }
       else if(SC_EMPTY_P(ps = sc_normalize(ps))) {
 	if_debug_sc_strong_normalize_and_check_feasibility2 {
@@ -966,7 +966,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 		  "[sc_strong_normalize_and_check_feasibility2]:"
 		  " Non-feasibility detected by first call to sc_normalize\n");
 	}
-	feasible_p = FALSE;
+	feasible_p = false;
       }
       else {
 	Pcontrainte eq = CONTRAINTE_UNDEFINED;
@@ -1088,7 +1088,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 	    }
 	    else {
 	      /* The system is not feasible. Stop */
-	      feasible_p = FALSE;
+	      feasible_p = false;
 	      break;
 	    }
 			
@@ -1126,8 +1126,8 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 	    sc_default_dump(new_ps);
 	  }
 	}
-	sc_elim_empty_constraints(new_ps,TRUE);
-	sc_elim_empty_constraints(ps,TRUE);
+	sc_elim_empty_constraints(new_ps,true);
+	sc_elim_empty_constraints(ps,true);
 	assert(!feasible_p ||
 	       (CONTRAINTE_UNDEFINED_P(eq) && CONTRAINTE_UNDEFINED_P(ineq)));
 		
@@ -1170,7 +1170,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 		  "New system %p\n", new_ps);
 	  sc_default_dump(new_ps);
 	  /* assert(sc_weak_consistent_p(new_ps)); */
-	  assert(FALSE);
+	  assert(false);
 	}
       }
 	    

@@ -47,7 +47,7 @@
 #include "arithmetique.h"
 #include "vecteur.h"
 
-/* boolean variable_equal(Variable v1, Variable v2): returns TRUE if
+/* bool variable_equal(Variable v1, Variable v2): returns true if
  * variables v1 and v2 have the same VALUE
  *
  * Type Variable is assumed here to be char *
@@ -57,15 +57,15 @@
  *    any type; all computations in vecteur.dir are based on pointer
  *    comparisons (FI, 28/12/89)
  */
-boolean variable_equal(v1, v2)
+bool variable_equal(v1, v2)
 Variable v1;
 Variable v2;
 {
     /*
      * if(v1==NULL&&v2==NULL)
-     *     return(TRUE);
+     *     return(true);
      * else if (v1==NULL||v2==NULL)
-     *	   return(FALSE);
+     *	   return(false);
      *
      * return(!strcmp(v1,v2));
      */

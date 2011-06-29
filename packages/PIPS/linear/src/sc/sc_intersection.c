@@ -169,12 +169,12 @@ Psysteme s2;
 	/* ne rien faire et renvoyer s1 */
 	/* on ne devrait jamais passer la dans le futur proche car
 	   SC_EMPTY==SC_RN */
-	assert(FALSE);
+	assert(false);
 	;
     }
     else if(SC_EMPTY_P(s2)) {
 	/* desallouer s1 et renvoyer SC_EMPTY */
-	assert(FALSE);
+	assert(false);
 	sc_rm(s1);
 	s1 = SC_EMPTY;
     }
@@ -305,18 +305,18 @@ Psysteme s2;
 }
 
 
-/* boolean sc_intersection_empty_p_ofl(ps1, ps2) 
+/* bool sc_intersection_empty_p_ofl(ps1, ps2) 
  * input    : two polyhedra
- * output   : TRUE if their intersection is empty, FALSE otherwise.
+ * output   : true if their intersection is empty, false otherwise.
  * modifies : nothing
  * comment  : calls sc_faisabilite_ofl in order to trap overflow errors
  *            BC, 1994.	
  */
-boolean sc_intersection_empty_p_ofl(ps1, ps2)
+bool sc_intersection_empty_p_ofl(ps1, ps2)
 Psysteme ps1, ps2;
 {
     Psysteme ps = SC_UNDEFINED;
-    boolean result;
+    bool result;
     ps1 = sc_copy(ps1);
     ps2 = sc_copy(ps2);
     ps = sc_safe_intersection(ps,ps1,ps2);
@@ -334,8 +334,8 @@ Psysteme ps1, ps2;
 Psysteme extract_common_syst(Psysteme s1, Psysteme s2)
 {
   Pcontrainte 
-    e = extract_common_constraints(&s1->egalites, &s2->egalites, TRUE),
-    i = extract_common_constraints(&s1->inegalites, &s2->inegalites, FALSE);
+    e = extract_common_constraints(&s1->egalites, &s2->egalites, true),
+    i = extract_common_constraints(&s1->inegalites, &s2->inegalites, false);
 
   sc_fix(s1);
   sc_fix(s2);

@@ -69,14 +69,14 @@ int level;
 {
     int i,j;
     int I = 0;
-    boolean trouve = FALSE;
+    bool trouve = false;
 
     /* recherche du premier element non nul de la sous-matrice */
     for (i = level+1; i<=n && !trouve ; i++) {
 	for (j = level+1; j<= m && value_zero_p(ACCESS(MAT,n,i,j)); j++);
 	if(j <= m) {
 	    /* on dumpe la colonne J... */
-	    trouve = TRUE;
+	    trouve = true;
 	    I = i;
 	}
     }
@@ -200,7 +200,7 @@ int level;
     int vali= 0;
     int valj=0;
     register Value min=VALUE_ZERO, val;
-    boolean trouve = FALSE;
+    bool trouve = false;
 
 
     /*  initialisation du minimum  car recherche d'un minimum non nul*/
@@ -209,7 +209,7 @@ int level;
 	    min = ACCESS(MAT,n,i,j);
 	    value_absolute(min);
 	    if(min != 0) {
-		trouve = TRUE;
+		trouve = true;
 		vali = i;
 		valj = j;
 	    }
@@ -335,7 +335,7 @@ int level;
     DENOMINATOR(ID) = VALUE_ONE;
 }
 
-/* boolean matrice_identite_p(matrice ID, int n, int level)
+/* bool matrice_identite_p(matrice ID, int n, int level)
  * test d'une sous-matrice dans ID(level+1..n, level+1..n) pour savoir si
  * c'est une matrice identite. Le test n'est correct que si la matrice
  * ID passee en argument est normalisee (cf. matrice_normalize())
@@ -350,7 +350,7 @@ int level;
  *		     et de la premiere colonne a partir duquel on commence 
  *		     a prendre en compte les elements de la matrice
  */
-boolean matrice_identite_p(ID,n,level)
+bool matrice_identite_p(ID,n,level)
 matrice ID;
 int n;
 int level;
@@ -361,14 +361,14 @@ int level;
 	for(j = level+1; j <= n; j++) {
 	    if(i==j) {
 		if(value_notone_p(ACCESS(ID,n,i,i)))
-		    return(FALSE);
+		    return(false);
 	    }
 	    else /* i!=j */
 		if(value_notzero_p(ACCESS(ID,n,i,j)))
-		    return(FALSE);
+		    return(false);
 	}
     }
-    return(TRUE);
+    return(true);
 }
 
 /* int mat_lig_el(matrice MAT, int n, int m, int level)
@@ -429,7 +429,7 @@ int n,m;
 int *lg_nnul,*cl_nnul;
 int level;
 {
-    boolean trouve = FALSE;
+    bool trouve = false;
     int j;
     register Value min=VALUE_ZERO,val;
 
@@ -448,7 +448,7 @@ int level;
 	    min = ACCESS(MAT,n,*lg_nnul,j);
 	    value_absolute(min);
 	    if (value_notzero_p(min)) {
-		trouve = TRUE;
+		trouve = true;
 		*cl_nnul=j;
 	    }
 	}

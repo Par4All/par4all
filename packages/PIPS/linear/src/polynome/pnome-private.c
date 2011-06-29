@@ -68,13 +68,13 @@ Variable var;
 }
 
 
-/* boolean monome_colin(Pmonome pm1, Pmonome pm2)
+/* bool monome_colin(Pmonome pm1, Pmonome pm2)
  *  PRIVATE
- *  returns TRUE if the two monomials are "colinear":
+ *  returns true if the two monomials are "colinear":
  *  same variables, same exponents.
  *  We consider that MONOME_UNDEFINED is only colinear to MONOME_UNDEFINED. [???]
  */
-boolean monome_colin(pm1, pm2)
+bool monome_colin(pm1, pm2)
 Pmonome pm1, pm2;
 {
     if (MONOME_UNDEFINED_P(pm1) || MONOME_UNDEFINED_P(pm2)
@@ -85,12 +85,12 @@ Pmonome pm1, pm2;
 }
 
 
-/* boolean monome_equal(Pmonome pm1, Pmonome pm2)
+/* bool monome_equal(Pmonome pm1, Pmonome pm2)
  *  PRIVATE
- *  returns TRUE if the two monomials are equal
+ *  returns true if the two monomials are equal
  *  same coeff., same variables, same exponents.
  */
-boolean monome_equal(pm1, pm2)
+bool monome_equal(pm1, pm2)
 Pmonome pm1, pm2;
 {
     if (MONOME_UNDEFINED_P(pm1) || MONOME_UNDEFINED_P(pm2)
@@ -165,24 +165,24 @@ int n;
 }
 
 
-/* boolean is_inferior_monome(Pmonome pm1, pm2, int (*is_inferior_var)())
+/* bool is_inferior_monome(Pmonome pm1, pm2, int (*is_inferior_var)())
  *  returns the qsort comparison (pm1<pm2)
  *  we follow the "lexicographic" order: decreasing powers of the main variable,
  *  (according to the variable order relation passed in is_inferior_var)
  *  the decreasing powers of the next main variable, ...
- *  When pm1=pm2 we return FALSE.
- *  When pm1 or pm2 is MONOME_NUL or MONOME_UNDEFINED we return FALSE.
+ *  When pm1=pm2 we return false.
+ *  When pm1 or pm2 is MONOME_NUL or MONOME_UNDEFINED we return false.
  *
  * is_inferior_var is indeed to be understood as the qsort comparator
  * method and so is ill-defined here. RK
  */
-boolean is_inferior_monome(pm1, pm2, is_inferior_var)
+bool is_inferior_monome(pm1, pm2, is_inferior_var)
 Pmonome pm1, pm2;
 int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
     if (MONOME_UNDEFINED_P(pm1) || MONOME_UNDEFINED_P(pm2)
 	||    MONOME_NUL_P(pm1) || MONOME_NUL_P(pm2))
-	return (FALSE);
+	return (false);
     else {
 	/* Initial version:
 	   Pvecteur pv1 = vect_tri(monome_term(pm1), is_inferior_var);
@@ -198,18 +198,18 @@ int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 	/* Pbase pbsorted = (Pbase) vect_tri(pb, is_inferior_var); */
 	/* Pbase pbsorted = (Pbase) vect_sort(pb, vect_compare); */
 	Pbase pbsorted = (Pbase) vect_sort(pb, is_inferior_var);
-	boolean result = FALSE;
+	bool result = false;
 
 	/* The following test is added by L.Zhou .    
 	   We want the constant term at the end . Jul.15, 91 */
 	if ( term_cst(pv1) )
-	    return(TRUE);
+	    return(true);
 	else if ( term_cst(pv2) )
-	    return(FALSE);
+	    return(false);
 
 	/* The following test is added by L.Zhou .    Mar.26, 91 */
 	if ( vect_coeff_sum(pv1) < vect_coeff_sum(pv2) )
-	    result = TRUE;
+	    result = true;
 	else if ( vect_coeff_sum(pv1) > vect_coeff_sum(pv2) )
 	    ;
 	else {
@@ -219,7 +219,7 @@ int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 		Value power2 = vect_coeff(var, pv2);
 
 		if ( power1 < power2 ) {
-		    result = TRUE;
+		    result = true;
 		    break;
 		}
 		else if ( power2 < power1 ) 

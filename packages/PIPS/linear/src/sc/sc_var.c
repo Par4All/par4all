@@ -117,11 +117,11 @@ Psysteme ps;
 }
 
 
-boolean var_in_lcontrainte_p(pc,var)
+bool var_in_lcontrainte_p(pc,var)
 Pcontrainte pc;
 Variable var;
 {
-    boolean find = FALSE;
+    bool find = false;
     Pcontrainte pc1;
 
     for (pc1 = pc; !CONTRAINTE_UNDEFINED_P(pc1) && !find; pc1=pc1->succ)
@@ -130,16 +130,16 @@ Variable var;
     return (find);
 }
 
-/* boolean var_in_sc_p(Psysteme sc, Variable var)
+/* bool var_in_sc_p(Psysteme sc, Variable var)
  * Cette fonction teste si la variable est contrainte par les egalites
  * ou les inegalites
 */
-boolean var_in_sc_p(sc,var)
+bool var_in_sc_p(sc,var)
 Psysteme sc;
 Variable var;
 {
 
-    boolean find = FALSE;
+    bool find = false;
 
     find = find ||  var_in_lcontrainte_p(sc->egalites,var) 
 	||  var_in_lcontrainte_p(sc->inegalites,var); 

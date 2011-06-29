@@ -249,7 +249,7 @@ char * vect_sprint_as_monome(Pvecteur v,
     else {
 	/* si la base n'est pas vide, affiche selon l'ordre 
 	 * qu'elle definit */
-	boolean first_var = TRUE;
+	bool first_var = true;
 	Value exp;
 	for ( ; !VECTEUR_NUL_P(b); b = b->succ) {
 	    exp = vect_coeff(b->var, v);
@@ -260,7 +260,7 @@ char * vect_sprint_as_monome(Pvecteur v,
 		    r = strchr(r, '\0');
 		}
 		else 
-		    first_var = FALSE;
+		    first_var = false;
 	    
 		if (value_pos_p(exp)) {
 		    if (value_one_p(exp)) {
@@ -276,7 +276,7 @@ char * vect_sprint_as_monome(Pvecteur v,
 		}
 		else /* exp < 0 */ {
 		    /* inutile pour les polynomes */ 
-		    first_var = FALSE;
+		    first_var = false;
 
 		    (void) sprintf(r, "%s^(", variable_name(b->var));
 		    r = strchr(r, '\0');

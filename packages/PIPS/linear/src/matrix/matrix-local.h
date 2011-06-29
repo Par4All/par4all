@@ -88,17 +88,17 @@ typedef struct Smatrix {
 #define MATRIX_NB_LINES(matrix)  ((matrix)->number_of_lines)
 #define MATRIX_NB_COLUMNS(matrix)  ((matrix)->number_of_columns)
 
-/* boolean matrix_triangular_inferieure_p(matrice a):
+/* bool matrix_triangular_inferieure_p(matrice a):
  * test de triangularite de la matrice a
  */
 #define matrix_triangular_inferieure_p(a) \
-    matrix_triangular_p(a,TRUE)
+    matrix_triangular_p(a,true)
 
-/* boolean matrix_triangular_superieure_p(matrice a, int n, int m):
+/* bool matrix_triangular_superieure_p(matrice a, int n, int m):
  * test de triangularite de la matrice a
  */
 #define matrix_triangular_superieure_p(a) \
-    matrix_triangular_p(a,FALSE)
+    matrix_triangular_p(a,false)
 
 /* MATRIX_RIGHT_INF_ELEM Permet d'acceder des sous-matrices dont le 
  * coin infe'rieur droit (i.e. le premier element) se trouve sur la 

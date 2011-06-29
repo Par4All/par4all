@@ -163,7 +163,7 @@ Variable *var;
     Value a;
     Value max = VALUE_ZERO;
     Variable v1 = NULL;
-    boolean borne = TRUE;
+    bool borne = true;
 
 #ifdef TRACE
     printf(" **  Gomory - recherche d'une variable non_entiere \n");

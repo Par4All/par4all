@@ -38,10 +38,10 @@
  *               -> overflow errors must be handled by the calling function
  * - ofl_res is the result of the feasibility test when ofl_ctrl == OFL_CTRL
  *   and there is an overflow error.
- * - integer_p (low_level function only) is a boolean :
- *     integer_p == TRUE to test if there exists at least one integer point 
+ * - integer_p (low_level function only) is a bool :
+ *     integer_p == true to test if there exists at least one integer point 
  *               in the convex polyhedron defined by the system of constraints.
- *     integer_p == FALSE to test if there exists at least one rational point 
+ *     integer_p == false to test if there exists at least one rational point 
  *               in the convex polyhedron defined by the system of constraints.
  *     (This has an impact only upon Fourier-Motzkin feasibility test).
  *
@@ -69,9 +69,9 @@
 
 #include <signal.h>
 
-#define EXCEPTION_PRINT_LINEAR_SIMPLEX TRUE
-#define EXCEPTION_PRINT_FM TRUE
-#define EXCEPTION_PRINT_JANUS TRUE
+#define EXCEPTION_PRINT_LINEAR_SIMPLEX true
+#define EXCEPTION_PRINT_FM true
+#define EXCEPTION_PRINT_JANUS true
 
 #define FILTERING_TIMEOUT_FM filtering_timeout_FM
 #define FILTERING_TIMEOUT_LINEAR_SIMPLEX filtering_timeout_S
@@ -88,30 +88,30 @@
 
 static int feasibility_sc_counter = 0;
 
-boolean FM_timeout = FALSE;
-boolean J_timeout = FALSE;
-boolean S_timeout = FALSE;
+bool FM_timeout = false;
+bool J_timeout = false;
+bool S_timeout = false;
 
 /* 
  * INTERFACES
  */
 
-boolean 
+bool 
 sc_rational_feasibility_ofl_ctrl(sc, ofl_ctrl, ofl_res)
 Psysteme sc;
 int ofl_ctrl;
-boolean ofl_res;
+bool ofl_res;
 {
-    return sc_feasibility_ofl_ctrl(sc, FALSE, ofl_ctrl, ofl_res);
+    return sc_feasibility_ofl_ctrl(sc, false, ofl_ctrl, ofl_res);
 }
 
-boolean 
+bool 
 sc_integer_feasibility_ofl_ctrl(sc,ofl_ctrl, ofl_res)
 Psysteme sc;
 int ofl_ctrl;
-boolean ofl_res;
+bool ofl_res;
 {
-    return sc_feasibility_ofl_ctrl(sc, TRUE, ofl_ctrl, ofl_res);
+    return sc_feasibility_ofl_ctrl(sc, true, ofl_ctrl, ofl_res);
 }
 
 /*
@@ -124,19 +124,19 @@ static void
 filtering_catch_alarm_FM (int sig)
 {  
   alarm(0);
-  FM_timeout = TRUE;
+  FM_timeout = true;
 }
 static void 
 filtering_catch_alarm_J (int sig)
 {  
   alarm(0);
-  J_timeout = TRUE;
+  J_timeout = true;
 }
 static void
 filtering_catch_alarm_S (int sig)
 {
   alarm(0);
-  S_timeout = TRUE;
+  S_timeout = true;
 }
 #endif
 
@@ -176,12 +176,12 @@ int weight;
  * - if there are equalities, chose the var with the min |coeff| (not null)
  * - if there are only inequalities, chose the var that will generate the
  *   minimum number of constraints with pairwise combinations.
- * - if ineq is TRUE, consider variables even if no equalities.
+ * - if ineq is true, consider variables even if no equalities.
  *
  * (c) FC 21 July 1995
  */
 static Variable
-chose_variable_to_project_for_feasability(Psysteme s, Pbase b, boolean ineq)
+chose_variable_to_project_for_feasability(Psysteme s, Pbase b, bool ineq)
 {
   Pcontrainte c = sc_egalites(s);
   Pvecteur v;
@@ -289,12 +289,12 @@ chose_variable_to_project_for_feasability(Psysteme s, Pbase b, boolean ineq)
 /* project in s1 (which is modified) 
  * using equalities or both equalities and inequalities.
 */
-static boolean sc_fm_project_variables
-(Psysteme volatile * ps1, boolean integer_p, boolean use_eq_only, int ofl_ctrl)
+static bool sc_fm_project_variables
+(Psysteme volatile * ps1, bool integer_p, bool use_eq_only, int ofl_ctrl)
 {
   Pbase b = base_copy(sc_base(*ps1));
   Variable var;
-  boolean faisable = TRUE;
+  bool faisable = true;
   
    while (b && faisable)
   {
@@ -324,7 +324,7 @@ static boolean sc_fm_project_variables
 	    
     if (sc_empty_p(*ps1))
     {
-      faisable = FALSE;
+      faisable = false;
       break;
     }
 
@@ -332,7 +332,7 @@ static boolean sc_fm_project_variables
       *ps1 = sc_normalize(*ps1);
       if (SC_EMPTY_P(*ps1)) 
       { 
-	faisable = FALSE; 
+	faisable = false; 
 	break;
       }
     }    
@@ -359,10 +359,10 @@ static boolean sc_fm_project_variables
 
 static int method_used = 0; /* means LINEAR_SIMPLEX :-) */
 
-static boolean internal_sc_feasibility
-(Psysteme sc, int heuristic, boolean int_p, int ofl_ctrl)
+static bool internal_sc_feasibility
+(Psysteme sc, int heuristic, bool int_p, int ofl_ctrl)
 {   
-  boolean ok = TRUE;
+  bool ok = true;
   int method, n_var,  n_ref_eq = 0, n_ref_in = 0;
  /* Automatic variables read in a CATCH block need to be declared volatile as
   * specified by the documentation*/
@@ -378,7 +378,7 @@ static boolean internal_sc_feasibility
 #ifdef FILTERING
  /*Begin size filters*/
   
-  if (TRUE) {
+  if (true) {
     int dimens; int nb_cont_eq = 0; int nb_ref_eq = 0; int nb_cont_in = 0; int nb_ref_in = 0;
 
     dimens = sc->dimension; value_assign(magnitude,VALUE_ZERO);
@@ -464,9 +464,9 @@ static boolean internal_sc_feasibility
 	    method_used = 0;/*LINEAR_SIMPLEX*/
 	    ifscdebug(5) {fprintf(stderr,"J failes so change to LS ...");}
 	    if (n_cont_eq>=6) {	      
-	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,TRUE,int_p,ofl_ctrl);
+	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,true,int_p,ofl_ctrl);
 	    }else{
-	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,FALSE,int_p,ofl_ctrl);
+	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,false,int_p,ofl_ctrl);
 	    }
 	    ifscdebug(5) {fprintf(stderr," ...Passed\n");}
 	    linear_number_of_exception_thrown --;
@@ -485,9 +485,9 @@ static boolean internal_sc_feasibility
 	    /*Janus*/
 	  }else {	    
 	    if (n_cont_eq>=6) {	      
-	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,TRUE,int_p,ofl_ctrl);
+	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,true,int_p,ofl_ctrl);
 	    }else{
-	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,FALSE,int_p,ofl_ctrl);
+	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,false,int_p,ofl_ctrl);
 	    }
 	  }
 	  ifscdebug(5) {fprintf(stderr," ...Passed\n");}
@@ -500,9 +500,9 @@ static boolean internal_sc_feasibility
 	    ok = sc_janus_feasibility_ofl_ctrl_timeout_ctrl(sc,ofl_ctrl);
 	  }else {	    
 	    if (n_cont_eq>=6) {	      
-	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,TRUE,int_p,ofl_ctrl);
+	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,true,int_p,ofl_ctrl);
 	    }else{
-	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,FALSE,int_p,ofl_ctrl);
+	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,false,int_p,ofl_ctrl);
 	    }
 	  }
 	}else{
@@ -539,12 +539,12 @@ static boolean internal_sc_feasibility
   
   case (LINEAR_SIMPLEX_PROJECT_EQ_METHOD): 
     {
-      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,TRUE,int_p,ofl_ctrl);
+      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,true,int_p,ofl_ctrl);
       break;
     }
   case (LINEAR_SIMPLEX_NO_PROJECT_EQ_METHOD): 
     {
-      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,FALSE,int_p,ofl_ctrl);
+      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,false,int_p,ofl_ctrl);
       break;
     }
   case (FM_METHOD): 
@@ -560,7 +560,7 @@ static boolean internal_sc_feasibility
   case (ALL_METHOD):
     {
 
-      boolean okS = TRUE,okJ = TRUE,okFM = TRUE;
+      bool okS = true,okJ = true,okFM = true;
       CATCH(overflow_error) {
 	ifscdebug(5) {
 	  fprintf(stderr,"Janus or Simplex failed. Let's go with FM\n");
@@ -570,9 +570,9 @@ static boolean internal_sc_feasibility
       }
       TRY {
 	if (n_cont_eq >= 10) {
-	  okS = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,TRUE,int_p,ofl_ctrl);
+	  okS = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,true,int_p,ofl_ctrl);
 	} else { 
-	  okS = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,FALSE,int_p,ofl_ctrl);
+	  okS = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,false,int_p,ofl_ctrl);
 	}
 	okJ = sc_janus_feasibility_ofl_ctrl_timeout_ctrl(sc,ofl_ctrl);
     
@@ -607,16 +607,16 @@ static boolean internal_sc_feasibility
 }
 
 
-boolean 
+bool 
 sc_feasibility_ofl_ctrl(sc, integer_p, ofl_ctrl, ofl_res)
 Psysteme sc;
-boolean integer_p;
+bool integer_p;
 int ofl_ctrl;
-boolean ofl_res;
+bool ofl_res;
 { 
-  boolean 
-    ok = FALSE,
-    catch_performed = FALSE;
+  bool 
+    ok = false,
+    catch_performed = false;
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   int volatile heuristic = 0;
@@ -625,31 +625,31 @@ boolean ofl_res;
     if (sc->dimension < 0) {
       sc_default_dump(sc);
       sc_fix(sc);
-      assert(FALSE);
+      assert(false);
     }
   }
 
   if (sc_rn_p(sc)) {
     ifscdebug(5) {
-      fprintf(stderr,"\n sc_rn is given to sc_feasibility_ofl_ctrl : return TRUE");
+      fprintf(stderr,"\n sc_rn is given to sc_feasibility_ofl_ctrl : return true");
     }/* this should be treated somewhere else -> faster */
-    return TRUE;
+    return true;
   }
   if (sc_empty_p(sc)) {
     ifscdebug(5) {
-      fprintf(stderr,"\n sc_empty is given to sc_feasibility_ofl_ctrl : return FALSE");
+      fprintf(stderr,"\n sc_empty is given to sc_feasibility_ofl_ctrl : return false");
     }/*this should be treated somewhere else -> faster*/
-    return FALSE;
+    return false;
   }
 
   switch (ofl_ctrl) {
 
   case OFL_CTRL :
     ofl_ctrl = FWD_OFL_CTRL;
-    catch_performed = TRUE;    
+    catch_performed = true;    
     CATCH(overflow_error) {
 	ok = ofl_res;
-	catch_performed = FALSE;
+	catch_performed = false;
 	/* 
 	 *   PLEASE do not remove this warning.
 	 *
@@ -658,7 +658,7 @@ boolean ofl_res;
 	linear_number_of_exception_thrown--;
 	fprintf(stderr, "\n[sc_feasibility_ofl_ctrl] "
 		"arithmetic error (%d) -> %s\n",
-		heuristic, ofl_res ? "TRUE" : "FALSE");
+		heuristic, ofl_res ? "true" : "false");
  
       break;
       }		
@@ -677,14 +677,14 @@ boolean ofl_res;
   return ok;
 }
 
-/* boolean sc_fourier_motzkin_faisabilite_ofl(Psysteme s):
+/* bool sc_fourier_motzkin_faisabilite_ofl(Psysteme s):
  * test de faisabilite d'un systeme de contraintes lineaires, par projections
  * successives du systeme selon les differentes variables du systeme
  *
  *  resultat retourne par la fonction :
  *
- *  boolean	: TRUE si le systeme est faisable
- *		  FALSE sinon
+ *  bool	: true si le systeme est faisable
+ *		  false sinon
  *
  *  Les parametres de la fonction :
  *
@@ -696,25 +696,25 @@ boolean ofl_res;
  * Back to the version modifying the sc. Calls of this function should store the sc first
  * or pls call sc_fourier_motzkin_ofl_ctrl_timeout_ctrl DN210203 
  */
-boolean 
+bool 
 sc_fourier_motzkin_feasibility_ofl_ctrl(s, integer_p, ofl_ctrl)
 Psysteme s;
-boolean integer_p;
+bool integer_p;
 int ofl_ctrl;
 {
-  boolean faisable = TRUE;
+  bool faisable = true;
 
   CATCH(any_exception_error) {
     /* maybe timeout_error or overflow_error*/
     if (ofl_ctrl == FWD_OFL_CTRL) {
       RETHROW(); /*rethrow whatever the exception is*/
     } else {
-      fprintf(stderr,"\n[sc_fourier_motzkin_feasibility_ofl_ctrl] without OFL_CTRL => RETURN TRUE\n");
-      return TRUE;/* default is feasible*/
+      fprintf(stderr,"\n[sc_fourier_motzkin_feasibility_ofl_ctrl] without OFL_CTRL => RETURN true\n");
+      return true;/* default is feasible*/
     }
   }
  
-  if (s == NULL) return TRUE;
+  if (s == NULL) return true;
   
   ifscdebug(8)
     {
@@ -731,7 +731,7 @@ int ofl_ctrl;
     base_rm(sc_base(s));
     sc_creer_base(s);
 
-    faisable = sc_fm_project_variables(&s, integer_p, FALSE, ofl_ctrl);
+    faisable = sc_fm_project_variables(&s, integer_p, false, ofl_ctrl);
 
     sc_rm(s); /*should remove the copy of the sc.*/
     s = NULL;
@@ -740,25 +740,25 @@ int ofl_ctrl;
   else 
     /* sc_kill_db_eg a de'sallouer s a` la detection de 
        sa non-faisabilite */
-    faisable = FALSE;
+    faisable = false;
 
   UNCATCH(any_exception_error);
 
   return faisable;
 }
 
-boolean
+bool
 sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl(sc,int_p,ofl_ctrl)
 Psysteme sc;
-boolean int_p;
+bool int_p;
 int ofl_ctrl;
 {
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   Psysteme volatile w = NULL;
-  boolean ok = TRUE;
+  bool ok = true;
 
-  if (sc->dimension == 0) return TRUE;
+  if (sc->dimension == 0) return true;
 
   CATCH(any_exception_error) {
 
@@ -780,8 +780,8 @@ int ofl_ctrl;
       linear_number_of_exception_thrown -=2;/* there r 2 exceptions here! */
       THROW(overflow_error);
     } else {
-      fprintf(stderr,"\n[sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
-      return TRUE;
+      fprintf(stderr,"\n[sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN true\n");
+      return true;
     }    
   }
   TRY {
@@ -792,14 +792,14 @@ int ofl_ctrl;
     if (FILTERING_TIMEOUT_FM) {
       signal(SIGALRM, filtering_catch_alarm_FM);
       alarm(FILTERING_TIMEOUT_FM);
-      FM_timeout = FALSE;
+      FM_timeout = false;
     }
 #endif
 
     if (w) {
       ok= sc_fourier_motzkin_feasibility_ofl_ctrl(w,int_p,ofl_ctrl);   
     }
-    else ok = TRUE;
+    else ok = true;
     
 #ifdef FILTERING
     if (FILTERING_TIMEOUT_FM) {
@@ -820,19 +820,19 @@ int ofl_ctrl;
   return ok;
 }
 
-boolean 
+bool 
 sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc, project_eq_p, int_p, ofl_ctrl)
 Psysteme sc;
-boolean project_eq_p;
-boolean int_p;
+bool project_eq_p;
+bool int_p;
 int ofl_ctrl;
 { 
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   Psysteme volatile w = NULL;
-  boolean ok = TRUE;
+  bool ok = true;
 
-  if (sc->dimension == 0) return TRUE;
+  if (sc->dimension == 0) return true;
   
   CATCH(any_exception_error) {
 
@@ -854,8 +854,8 @@ int ofl_ctrl;
       linear_number_of_exception_thrown -=2;/*there r 2 exceptions here!*/
       THROW(overflow_error);
     } else {
-      fprintf(stderr,"\n[sc_simplex_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
-      return TRUE;/* default is feasible*/
+      fprintf(stderr,"\n[sc_simplex_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN true\n");
+      return true;/* default is feasible*/
     }
   }
   TRY {      
@@ -864,13 +864,13 @@ int ofl_ctrl;
     if (FILTERING_TIMEOUT_LINEAR_SIMPLEX) {
       signal(SIGALRM, filtering_catch_alarm_S);
       alarm(FILTERING_TIMEOUT_LINEAR_SIMPLEX); 
-      S_timeout = FALSE;
+      S_timeout = false;
     }
 #endif
 
     if (project_eq_p) {
       w = sc_copy(sc);
-      ok = sc_fm_project_variables(&w, int_p, TRUE, ofl_ctrl);
+      ok = sc_fm_project_variables(&w, int_p, true, ofl_ctrl);
       ok = sc_simplexe_feasibility_ofl_ctrl(w,ofl_ctrl);
     }else {    
       ok = sc_simplexe_feasibility_ofl_ctrl(sc,ofl_ctrl);
@@ -894,10 +894,10 @@ int ofl_ctrl;
   return ok;
 }
 
-boolean
+bool
 sc_janus_feasibility_ofl_ctrl_timeout_ctrl(sc,ofl_ctrl)
 Psysteme sc;
-boolean ofl_ctrl;
+bool ofl_ctrl;
 {
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
@@ -906,9 +906,9 @@ boolean ofl_ctrl;
 
   /*DN: We should be sure that the sc is not null in the sc_feasibility_ofl_ctrl, but for direct calls of Janus ...*/
   if (sc) {
-    if (sc->dimension == 0) return TRUE;
+    if (sc->dimension == 0) return true;
   }
-  else return TRUE;
+  else return true;
 
   /* sc_empty_p is filtered, (sc_fix is called), so there's no other reason for janus to fail ...
    * maybe a sc_not_easy_to_see_empty */
@@ -936,7 +936,7 @@ boolean ofl_ctrl;
   }
   TRY { 
     if (sc) {w = sc_copy(sc);}
-    else return TRUE;
+    else return true;
     if (w) {sc_fix(w);}
 
     if (w) {
@@ -945,7 +945,7 @@ boolean ofl_ctrl;
       if (FILTERING_TIMEOUT_JANUS) {
 	signal(SIGALRM, filtering_catch_alarm_J);
 	alarm(FILTERING_TIMEOUT_JANUS);
-	J_timeout = FALSE;
+	J_timeout = false;
       }
 #endif
  
@@ -961,7 +961,7 @@ boolean ofl_ctrl;
       }
 #endif
 
-    } else return TRUE;
+    } else return true;
     
   }
 
@@ -970,8 +970,8 @@ boolean ofl_ctrl;
   if (ok<3) {    
     /* result found*/
     if (w) sc_rm(w);
-    if (ok > 0) return TRUE;
-    else return FALSE;
+    if (ok > 0) return true;
+    else return false;
   } else {
     /* result not found*/
     ifscdebug(5) {
@@ -987,8 +987,8 @@ boolean ofl_ctrl;
     if (ofl_ctrl == FWD_OFL_CTRL) {
       THROW(overflow_error);
     } else {
-      fprintf(stderr,"\n[sc_janus_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
-      return TRUE;/* default is feasible*/
+      fprintf(stderr,"\n[sc_janus_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN true\n");
+      return true;/* default is feasible*/
     }
   }
   return(ok);

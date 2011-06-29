@@ -129,7 +129,7 @@ Psommet eq,fonct;
     double min=0, min2;
     Variable no_lpivot = NULL;
     Value cf2 = VALUE_ZERO;
-    boolean trouve = FALSE;
+    bool trouve = false;
 
 #ifdef TRACE
     printf(" **** alg. dual - recherche de la variable pivot \n");
@@ -156,7 +156,7 @@ Psommet eq,fonct;
 		d2 = VALUE_TO_DOUBLE(cf2) * 
 		    VALUE_TO_DOUBLE(eq->denominateur) ;
 		min = - d2/d1;
-		trouve = TRUE;
+		trouve = true;
 		no_lpivot = var_of(pv);
 	    }
 	}
@@ -184,7 +184,7 @@ Psommet eq,fonct;
     return (no_lpivot);
 }
 
-/* boolean dual_pivot_pas(Psommet * sys, Pvecteur * lvbase, int nb_som,
+/* bool dual_pivot_pas(Psommet * sys, Pvecteur * lvbase, int nb_som,
  *                        Psommet fonct, int * nbvars, Pbase * b):
  * execution d'un pas de l'algorithme dual du simplexe i.e.
  * - ajout des variables d'ecart
@@ -193,9 +193,9 @@ Psommet eq,fonct;
  *
  *  resultat retourne par la fonction :
  *
- *  boolean           :  == FALSE si l'on n'a pas pu effectuer un pas de 
+ *  bool           :  == false si l'on n'a pas pu effectuer un pas de 
  * 			       l'algorithme dual 
- * 		      == TRUE  si l'on a pu effectuer un pas de l'algorithme
+ * 		      == true  si l'on a pu effectuer un pas de l'algorithme
  *
  *  le systeme est modifie. 
  *  Si le systeme retourne est NULL, c'est que le systeme est non borne. 
@@ -210,7 +210,7 @@ Psommet eq,fonct;
  *  int     nbvars : nombre de variables du systeme.
  *  Pbase     * b : liste des variables du systeme
  */
-boolean dual_pivot_pas(sys,lvbase,nb_som,fonct,nbvars,b)
+bool dual_pivot_pas(sys,lvbase,nb_som,fonct,nbvars,b)
 Psommet *sys;
 Pvecteur *lvbase;
 int nb_som;
@@ -222,7 +222,7 @@ Pbase *b;
     Psommet ligne_entrant =NULL;
     Psommet *ps=NULL;
     int no_som = 0;
-    boolean result = TRUE;
+    bool result = true;
 
 #ifdef TRACE
     printf(" *** alg. dual -  un pas de l'algorithme \n");
@@ -251,7 +251,7 @@ Pbase *b;
 	    {
 		sommets_rm(*sys);
 		*sys = NULL;
-		result = FALSE;
+		result = false;
 #ifdef TRACE
 		printf (" --- alg. dual - le probleme n'est pas borne \n");
 #endif
@@ -260,7 +260,7 @@ Pbase *b;
     }
     else 
     {
-	result = FALSE;
+	result = false;
 #ifdef TRACE
 	printf (" --- alg. dual - plus de ligne pivot possible \n");
 #endif
@@ -270,7 +270,7 @@ Pbase *b;
 
 }
 
-/* boolean dual_pivot(Psysteme sys, Psysteme * syst_result,
+/* bool dual_pivot(Psysteme sys, Psysteme * syst_result,
  *                    Psommet * fonct, int * nb_som, Pvecteur * lvbase):
  * Algorithme dual du simplexe 
  *  (c.f. Programmation mathematique - tome 1 . M.MINOUX (83) )  
@@ -278,8 +278,8 @@ Pbase *b;
  *
  *  resultat retourne par la fonction :
  *
- *  boolean           : == TRUE  si le systeme a une solution
- *                   == FALSE sinon
+ *  bool           : == true  si le systeme a une solution
+ *                   == false sinon
  *
  *  Le parametre SYST_RESULT est le systeme final  (dont on peut
  *  deduire la valeur des differentes variables du systeme)     .
@@ -294,7 +294,7 @@ Pbase *b;
  *! int     nb_som 	: nombre de contraintes du systeme
  *
  */
-boolean dual_pivot(sys,syst_result,fonct,nb_som,lvbase)
+bool dual_pivot(sys,syst_result,fonct,nb_som,lvbase)
 Psysteme sys;
 Psysteme *syst_result;
 Psommet *fonct;
@@ -317,7 +317,7 @@ Pvecteur *lvbase;
 
 	while( (som != (Psommet) NULL) && 
 	       (dual_pivot_pas(&som,lvbase,*nb_som,*fonct,&(sys->dimension),
-			       &(sys->base))	== TRUE) );
+			       &(sys->base))	== true) );
 
 	*syst_result = som_sys_conv(som);
 	if (*syst_result) {

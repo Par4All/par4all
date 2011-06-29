@@ -42,48 +42,48 @@
 #include "vecteur.h"
 #include "contrainte.h"
 
-/* boolean eq_smg(Pcontrainte c1, Pcontrainte c2):
+/* bool eq_smg(Pcontrainte c1, Pcontrainte c2):
  * comparaison des coefficients de deux contraintes pour savoir si elles ont le
  * meme membre gauche.
  *
  * Note: this works for inequalities. Similar equations may differ
  *       by a factor of -1.
  */
-boolean eq_smg(c1,c2)
+bool eq_smg(c1,c2)
 Pcontrainte c1,c2;
 {
-    boolean result;
+    bool result;
 
     if(c1==NULL && c2==NULL)
-	result = TRUE;
+	result = true;
     else if(c1==NULL || c2==NULL)
-	result = FALSE;
+	result = false;
     else
 	result = vect_equal_except(c1->vecteur,c2->vecteur,TCST);
 
     return result;
 }
 
-/* boolean inequalities_opposite_p(Pcontrainte c1, Pcontrainte c2):
+/* bool inequalities_opposite_p(Pcontrainte c1, Pcontrainte c2):
  * True if the non-constant part of c1 is the opposite of
  * the non-constant part of c2.
  */
-boolean inequalities_opposite_p(c1,c2)
+bool inequalities_opposite_p(c1,c2)
 Pcontrainte c1,c2;
 {
-    boolean result;
+    bool result;
 
     if(c1==NULL && c2==NULL)
-	result = TRUE;
+	result = true;
     else if(c1==NULL || c2==NULL)
-	result = FALSE;
+	result = false;
     else
 	result = vect_opposite_except(c1->vecteur,c2->vecteur,TCST);
 
     return result;
 }
 
-/* boolean egalite_equal(Pcontrainte eg1, Pcontrainte eg2): teste
+/* bool egalite_equal(Pcontrainte eg1, Pcontrainte eg2): teste
  * l'equivalence de deux egalites; leurs coefficients peuvent etre
  * tous egaux ou tous opposes; pour obtenir une meilleure equivalence
  * il faut commencer par reduire leurs coefficients par les PGCD
@@ -95,16 +95,16 @@ Pcontrainte c1,c2;
  *
  * Note: 2x=2 est different de x=1
  */
-boolean egalite_equal(eg1,eg2)
+bool egalite_equal(eg1,eg2)
 Pcontrainte eg1;
 Pcontrainte eg2;
 {
-    boolean result;
+    bool result;
 
     if(CONTRAINTE_UNDEFINED_P(eg1) && CONTRAINTE_UNDEFINED_P(eg2))
-	result = TRUE;
+	result = true;
     else if(CONTRAINTE_UNDEFINED_P(eg1) || CONTRAINTE_UNDEFINED_P(eg2))
-	result = FALSE;
+	result = false;
     else
 	result = vect_equal(eg1->vecteur,eg2->vecteur) ||
 	    vect_oppos(eg1->vecteur,eg2->vecteur);
@@ -112,7 +112,7 @@ Pcontrainte eg2;
     return(result);
 }
 
-/* boolean contrainte_equal(Pcontrainte c1, Pcontrainte c2): test
+/* bool contrainte_equal(Pcontrainte c1, Pcontrainte c2): test
  * d'egalite des contraintes c1 et c2; elles sont egales si tous
  * leurs coefficients et leur termes constants sont egaux; il faut les
  * avoir normalisees auparavant pour etre sur de leur egalite;
@@ -125,10 +125,10 @@ Pcontrainte eg2;
  *  - utilisation de CONTRAINTE_UNDEFINED_P() et contrainte_vecteur()
  *    (FI, 08/12/89)
  */
-boolean contrainte_equal(c1,c2)
+bool contrainte_equal(c1,c2)
 Pcontrainte c1,c2;
 {
-    register boolean 
+    register bool 
 	undef1 = CONTRAINTE_UNDEFINED_P(c1),
 	undef2 = CONTRAINTE_UNDEFINED_P(c2);
 
@@ -139,7 +139,7 @@ Pcontrainte c1,c2;
 		      contrainte_vecteur(c2)));
 }
 
-/* boolean contrainte_constante_p(Pcontrainte c): test de contrainte
+/* bool contrainte_constante_p(Pcontrainte c): test de contrainte
  * triviale sans variables (ie du type 0<= K ou 0<=0 ou 0 == 0 ou 0 == K)
  * 
  * Les equations non-faisables ne sont pas detectees.
@@ -149,18 +149,18 @@ Pcontrainte c1,c2;
  * Bugs:
  *  - should assert !CONTRAINTE_UNDEFINED_P(c)
  */
-boolean contrainte_constante_p(c)
+bool contrainte_constante_p(c)
 Pcontrainte c;
 {
 
     if (CONTRAINTE_NULLE_P(c))
-	return(TRUE);
+	return(true);
     else {
 	return vect_constant_p(contrainte_vecteur(c));
     }
 }
 
-/* boolean vect_constant_p(Pvecteur v): v contains only a constant term,
+/* bool vect_constant_p(Pvecteur v): v contains only a constant term,
  * may be zero
  *
  * Bugs:
@@ -168,14 +168,14 @@ Pcontrainte c;
  *    vecteur.dir with TCST...
  *  - should assert !VECTEUR_UNDEFINED_P(v)
  */
-boolean vect_constant_p(v)
+bool vect_constant_p(v)
 Pvecteur v;
 {
     return(VECTEUR_NUL_P(v) || (v->var == TCST && v->succ == NULL));
 }
 
-/* boolean contrainte_verifiee(Pcontrainte ineg, boolean eq_p): 
- * test de faisabilite d'inegalite (eq_p == FALSE) ou d'egalite triviale
+/* bool contrainte_verifiee(Pcontrainte ineg, bool eq_p): 
+ * test de faisabilite d'inegalite (eq_p == false) ou d'egalite triviale
  *
  * Le test est different pour les egalites.
  *
@@ -191,16 +191,16 @@ Pvecteur v;
  *    la valeur bottom pour les inegalites non constantes;
  *  - le nom devrait etre inegalite_verifiee()
  */
-boolean contrainte_verifiee(ineg,eq_p)
+bool contrainte_verifiee(ineg,eq_p)
 Pcontrainte ineg;
-boolean eq_p;
+bool eq_p;
 {
     Value v;
     assert(contrainte_constante_p(ineg));
 
     /* l'inegalite 0 <= 0 est representee par un vecteur nul */
     if (CONTRAINTE_NULLE_P(ineg))
-	return(TRUE);
+	return(true);
 
     /* l'inegalite 0 <= K est representee par un vecteur a un element */
     v = val_of(ineg->vecteur);
@@ -209,20 +209,20 @@ boolean eq_p;
 	|| ( eq_p && value_zero_p(v) && ineg->vecteur->succ==NULL);
 }
 
-/* boolean contrainte_oppos(Pcontrainte ineg1, Pcontrainte ineg2):
+/* bool contrainte_oppos(Pcontrainte ineg1, Pcontrainte ineg2):
  * indique si 2 inegalites forment une egalite ou si deux egalites sont
  * equivalentes.
  *
  * return(ineg1 == -ineg2);
  */
-boolean contrainte_oppos(ineg1,ineg2)
+bool contrainte_oppos(ineg1,ineg2)
 Pcontrainte ineg1,ineg2;
 {
     return(vect_oppos(ineg1->vecteur,ineg2->vecteur));
 }
 
 
-/* boolean constraint_without_vars(c, vars)
+/* bool constraint_without_vars(c, vars)
  * Pcontrainte c;
  * Pbase vars;
  *
@@ -233,7 +233,7 @@ Pcontrainte ineg1,ineg2;
  *
  * (c) FC 16/05/94
  */
-boolean constraint_without_vars(c, vars)
+bool constraint_without_vars(c, vars)
 Pcontrainte c;
 Pbase vars;
 {
@@ -243,21 +243,21 @@ Pbase vars;
     for(b=vars;
 	b!=BASE_NULLE;
 	b=b->succ)
-	if (vect_coeff(var_of(b), c->vecteur)!=(Value) 0) return(FALSE);
+	if (vect_coeff(var_of(b), c->vecteur)!=(Value) 0) return(false);
 
-    return(TRUE);	    
+    return(true);	    
 }
 
-/* boolean constraints_without_vars(pc, vars)
+/* bool constraints_without_vars(pc, vars)
  * Pcontrainte pc;
  * Pbase vars;
  *
  *     IN: c, vars
  *    OUT: returned boolean
  * 
- * returns TRUE if none of the constraints use the variables in vars.
+ * returns true if none of the constraints use the variables in vars.
  */
-boolean constraints_without_vars(pc, vars)
+bool constraints_without_vars(pc, vars)
 Pcontrainte pc;
 Pbase vars;
 {
@@ -266,9 +266,9 @@ Pbase vars;
     for (c=pc;
 	 c!=NULL;
 	 c=c->succ)
-	if (!constraint_without_vars(c, vars)) return(FALSE);
+	if (!constraint_without_vars(c, vars)) return(false);
 
-    return(TRUE);
+    return(true);
 }	
 
 /*

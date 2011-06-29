@@ -100,19 +100,19 @@ Pcontrainte ineq;
 Psysteme
 sc_equation_add(Psysteme sc, Pcontrainte c)
 {
-    sc = sc_constraint_add(sc, c, TRUE);
+    sc = sc_constraint_add(sc, c, true);
     return sc;
 }
 
 Psysteme
 sc_inequality_add(Psysteme sc, Pcontrainte c)
 {
-    sc = sc_constraint_add(sc, c, FALSE);
+    sc = sc_constraint_add(sc, c, false);
     return sc;
 }
 
 Psysteme
-sc_constraint_add(Psysteme sc, Pcontrainte c, boolean equality)
+sc_constraint_add(Psysteme sc, Pcontrainte c, bool equality)
 {
     Pbase old_basis;
     Pbase new_basis;

@@ -44,24 +44,24 @@
 
 #define MALLOC(s,t,f) malloc(s)
 
-/* boolean sys_int_fais(Psysteme sys1):
+/* bool sys_int_fais(Psysteme sys1):
  * Test de faisabilite d'un systeme lineaire syst1 en nombres entiers par 
  * l'algorithme des congruences decroissantes (cf. livre ???, pp. ??? ).
- * Renvoie TRUE si le systeme est satisfiable (i.e. il definit un polyedre
- * convexe non vide), FALSE sinon.
+ * Renvoie true si le systeme est satisfiable (i.e. il definit un polyedre
+ * convexe non vide), false sinon.
  *
  * Ce test est exact, mais il est tres couteux en temps CPU.
  *
  * Le systeme de contrainte syst1 n'est pas modifie
  */
-boolean sys_int_fais(sys1)
+bool sys_int_fais(sys1)
 Psysteme sys1;
 {
     Psysteme sys2 = NULL;
     Psommet fonct = fonct_min(sys1->dimension,sys1->base);
     Psolution sol1 = NULL;
 
-    boolean is_faisable = FALSE;
+    bool is_faisable = false;
 
     sys2=sc_dup(sys1);
     /*
@@ -73,11 +73,11 @@ Psysteme sys1;
 	( (sys2->egalites != NULL) || (sys2->inegalites != NULL))) 
 	sys2 = plint(sys2,fonct,&sol1);
     else
-	is_faisable = TRUE;
+	is_faisable = true;
 
     if ((sys2 != NULL) && ((sys2->egalites != NULL)
 			   || (sys2->inegalites != NULL)))
-	is_faisable = TRUE;
+	is_faisable = true;
 
     if (is_faisable)
 	/* cas ou le systeme est faisable          */

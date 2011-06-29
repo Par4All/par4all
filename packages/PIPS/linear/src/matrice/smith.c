@@ -78,8 +78,8 @@ matrice Q;
     register Value x;          /* le rest de la division par ALL */
     int i;
     
-    boolean stop = FALSE;
-    boolean next = TRUE;
+    bool stop = false;
+    bool next = true;
 
     /* precondition sur les parametres */
     assert(m > 0 && n >0);
@@ -93,7 +93,7 @@ matrice Q;
 	mat_min(D,n,m,&n_min,&m_min,level);
 		
 	if ((n_min == 0) && (m_min == 0))
-	    stop = TRUE;
+	    stop = true;
 	else {
 	    /* le transformation n'est pas fini. */
 	    if (n_min > level +1) {
@@ -121,7 +121,7 @@ matrice Q;
 		    value_division(x,ALL);
 		    matrice_soustraction_colonne(D,n,m,i,level+1,x);
 		    matrice_soustraction_colonne(Q,m,m,i,level+1,x);
-		    next = FALSE;
+		    next = false;
 		}
 	    if (mat_col_el(D,n,m,level) != 0) 
 		for(i=level+2;i<=n;i++) {
@@ -129,14 +129,14 @@ matrice Q;
 		    value_division(x,ALL);
 		    matrice_soustraction_ligne(D,n,m,i,level+1,x);
 		    matrice_soustraction_ligne(P,n,n,i,level+1,x);
-		    next = FALSE;
+		    next = false;
 		}
 #ifdef TRACE
 		(void) printf("apres division par A(%d,%d) des termes de la %d-ieme ligne et de la %d-em colonne \n",level+1,level+1,level+1,level+1);
 		matrice_print(D,n,m);
 #endif
 	    if (next) level++;
-	    next = TRUE;
+	    next = true;
 	}
     }
 
