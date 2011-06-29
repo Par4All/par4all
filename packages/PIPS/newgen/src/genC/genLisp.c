@@ -35,7 +35,7 @@
   . An AND type is a DEFSTRUCT,
   . An OR type is an OR structure with a tag (a keyword) and a value.
 
-  Note that boolean (which doesn't exist in Lisp) uses TRUE and FALSE, and
+  Note that bool (which doesn't exist in Lisp) uses true and false, and
   so (if (foo-bar x) ...) as to be written (if (true? (foo-bar x))
   ...)
 

@@ -62,7 +62,7 @@ AM_CPPFLAGS=-Igenread -I$(srcdir)/genread -Igenspec -I$(srcdir)/genspec
 
 newgen_auto_string.h:string.c
 	$(CPROTO) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" \
-		`(test -f string.c && echo string.c ) || echo $(srcdir)/string.c` > $@
+		`(test -f string.c && echo string.c ) || echo $(srcdir)/string.c` > newgen_auto_string.h
 
 CLEANFILES=$(nodist_include_HEADERS)
 

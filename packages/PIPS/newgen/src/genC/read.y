@@ -51,7 +51,7 @@ extern FILE * yyin;
 
 /* User selectable options. */
 
-int warn_on_ref_without_def_in_read_tabulated = FALSE;
+int warn_on_ref_without_def_in_read_tabulated = false;
 
 /* Where the root will be. */
 
@@ -72,7 +72,7 @@ static gen_chunk ** shared_table ;
 
 /* Management of forward references in read */
 
-int newgen_allow_forward_ref = FALSE;
+int newgen_allow_forward_ref = false;
 
 static void * read_external(int);
 static gen_chunk * make_def(gen_chunk *);
@@ -433,7 +433,7 @@ static gen_chunk * make_ref(int domain, gen_chunk * st)
       cp->i = domain;
       (cp+1)->i = 0; /* no number yet */
       (cp+2)->s = st->s; /* TAKEN! */
-      cp = gen_do_enter_tabulated(domain, st->s, cp, TRUE);
+      cp = gen_do_enter_tabulated(domain, st->s, cp, true);
     }
     else 
     {
