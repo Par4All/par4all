@@ -1,14 +1,39 @@
 delete guerin01
+
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 setproperty FSMIZE_WITH_GLOBAL_VARIABLE FALSE
 setproperty UNSPAGHETTIFY_IN_CONTROLIZER TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+
 create guerin01 guerin01.f
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE
+
+echo
+echo Code after full_spaghettify
+echo
+
 apply FULL_SPAGHETTIFY
 display PRINTED_FILE
+
+echo
+echo Code after FSM generation
+echo
+
 apply FSM_GENERATION
 display PRINTED_FILE
+
+echo
+echo Code after partial evaluation
+echo
+
 apply PARTIAL_EVAL
+display PRINTED_FILE
+
 close
 delete guerin01
 quit
