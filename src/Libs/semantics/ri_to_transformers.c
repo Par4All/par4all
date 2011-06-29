@@ -1670,7 +1670,6 @@ transformer assigned_expression_to_transformer(entity v,
 
   if(entity_has_values_p(v)) {
     entity v_new = entity_to_new_value(v);
-    entity v_old = entity_to_old_value(v);
     entity tmp = make_local_temporary_value_entity(entity_type(v));
     //list tf_args = CONS(ENTITY, v, NIL);
 
@@ -1690,6 +1689,7 @@ transformer assigned_expression_to_transformer(entity v,
 
       }
       else { /* subcase of previous aternative */
+	entity v_old = entity_to_old_value(v);
 	tf = transformer_value_substitute(tf, v_new, v_old);
 	tf = transformer_value_substitute(tf, tmp, v_new);
 	// v cannot be a temporary variable
@@ -1734,7 +1734,12 @@ transformer safe_assigned_expression_to_transformer(entity v,
     else
       tf = transformer_identity();
 
-    if(entity_has_values_p(v)) {
+    // FI: need to investigate interplay between typedef and
+    // qualifier?
+    // FI: Issue: a static variable qualified with const and accessed thru
+    // a function. See hs_list_smoothing() in hyantes
+    // Or you see the issue as using assignment analysis for static definition...
+    if(entity_has_values_p(v) && !type_with_const_qualifier_p(entity_type(v))) {
       tf = transformer_add_modified_variable_entity(tf, v);
     }
   }
