@@ -2173,10 +2173,11 @@ section.
 %%
 Otherwise, it still works but all tests are run one after the other.
 %%
-Then, to run an intra-directory parallel validation:
+Then, to run an intra-directory parallel validation, with a parallelism
+of 8 bounded by a load of 10 on the host:
 \begin{verbatim}
   sh> cd validation/HardwareAccelerator
-  sh> make -j 8 validate-test
+  sh> make -j 8 -l 10 validate-test
 \end{verbatim}
 Then local file \texttt{RESULTS} contains a summary of all results,
 typically whether a test \emph{passed}, \emph{failed}, \emph{changed}
@@ -2219,8 +2220,8 @@ For the inter-directory parallel validation, on defaults or only some
 directories by defining the \texttt{TARGET} make macro:
 \begin{verbatim}
   sh> cd validation
-  sh> make -j 8 new-validate
-  sh> make -j 8 TARGET='HardwareAccelerator Hpfc' new-validate
+  sh> make -j 8 -l 10 new-validate
+  sh> make -j 8 -l 10 TARGET='HardwareAccelerator Hpfc' new-validate
 \end{verbatim}
 
 The detailed results are stored in file \texttt{validation.out}.
