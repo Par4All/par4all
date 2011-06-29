@@ -156,13 +156,13 @@ reference    r;
     fprintf(stderr,"\nNew ref : ");
     print_reference(r);}
 
-  return(FALSE);
+  return(false);
 }
 
 /*=======================================================================*/
 /* bool assignation_filter(c): tests if the call is an assignation. This
  * is the filter of the function gen_recurse(). In case of a call we do not
- * want to go down so the boolean is always set to false. We test too if
+ * want to go down so the bool is always set to false. We test too if
  * the assignation is an instruction and in that case, we treat each 
  * reference by calling the function gen_recurse again.
  * 
@@ -186,7 +186,7 @@ call        c;
 		  rewrite_nothing_ref); }
   }
   
-  return(FALSE);
+  return(false);
 }
 
 /*=======================================================================*/

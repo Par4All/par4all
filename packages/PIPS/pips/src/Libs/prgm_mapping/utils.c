@@ -95,29 +95,29 @@ typedef dfg_arc_label arc_label;
 
 
 /* ======================================================================== */
-/* list insert_sort(list l, boolean (*compare_obj)()): returns the result of
+/* list insert_sort(list l, bool (*compare_obj)()): returns the result of
  * sorting the list "l" using the comparison function "compare_obj". This
- * boolean function should retuns TRUE if its first argument has to be placed
+ * bool function should retuns true if its first argument has to be placed
  * before its second argument in the sorted list, else FALSE.
  *
  * This is a generic function that accepts any homogene list of newgen
  * objects. The comparison function must be coded by the user, its prototype
- * should be: boolean my_compare_obj(chunk * obj1, chunk * obj2);
+ * should be: bool my_compare_obj(chunk * obj1, chunk * obj2);
  *
  * This function uses the insert sort algorithm which has a mean and worst case
  * complexity of n^2.
  */
 list insert_sort(l, compare_obj)
 list l;
-boolean (*compare_obj)();
+bool (*compare_obj)();
 {
   list al, aal, nl = NIL, nnl, nnl_q;
   chunk * ngo, * aux_ngo;
-  boolean not_inserted;
+  bool not_inserted;
 
   for(al = l; al != NIL; al = CDR(al)) {
     ngo = CHUNK(CAR(al));
-    not_inserted = TRUE;
+    not_inserted = true;
     nnl = NIL;
     nnl_q = nnl;
 
@@ -125,7 +125,7 @@ boolean (*compare_obj)();
        aux_ngo = CHUNK(CAR(aal));
        if(compare_obj(ngo, aux_ngo)) {
           nnl = gen_nconc(gen_nconc(nnl, CONS(CHUNK, ngo, NIL)), aal);
-          not_inserted = FALSE;
+          not_inserted = false;
        }
        else
           nnl = gen_nconc(nnl, CONS(CHUNK, aux_ngo, NIL));
@@ -141,24 +141,24 @@ boolean (*compare_obj)();
 
 
 /* ======================================================================== */
-boolean is_index_coeff_p(e)
+bool is_index_coeff_p(e)
 entity e;
 {
   if( (strncmp(entity_local_name(e), INDEX_COEFF, 1) == 0) ||
       (strncmp(entity_local_name(e), MU_COEFF, 1) == 0) )
-    return(TRUE);
+    return(true);
   else
-    return(FALSE);
+    return(false);
 }
 
 
 /* ======================================================================== */
-/* boolean compare_coeff(c1, c2):
+/* bool compare_coeff(c1, c2):
  *
- * returns a boolean saying TRUE if "c1" is before "c2" in the lexicographic
+ * returns a bool saying true if "c1" is before "c2" in the lexicographic
  * order, else FALSE. "c1" and "c2" are entities, we compare their
  * name. */
-boolean compare_coeff(c1, c2)
+bool compare_coeff(c1, c2)
 chunk * c1, * c2;
 {
   return strcmp(entity_local_name((entity) c1),
@@ -167,7 +167,7 @@ chunk * c1, * c2;
 
 
 /* ======================================================================== */
-boolean compare_nodes_dim(n1, n2)
+bool compare_nodes_dim(n1, n2)
 chunk * n1, * n2;
 {
   extern hash_table StmtToDim;
@@ -178,7 +178,7 @@ chunk * n1, * n2;
 
 
 /* ======================================================================== */
-boolean compare_dfs_weight(d1, d2)
+bool compare_dfs_weight(d1, d2)
 chunk * d1, * d2;
 {
   extern hash_table DtfToWgh;
@@ -189,7 +189,7 @@ chunk * d1, * d2;
 
 
 /* ======================================================================== */
-boolean compare_unks_frenq(e1, e2)
+bool compare_unks_frenq(e1, e2)
 chunk * e1, * e2;
 {
   extern hash_table UnkToFrenq;
@@ -304,11 +304,11 @@ list l1, l2;
 
     for(; !ENDP(l2); POP(l2)) {
       chunk * c2 = CHUNK(CAR(l2));
-      boolean found = FALSE;
+      bool found = false;
       for(; (!ENDP(l1)) && (!found); POP(l1)) {
         chunk *c1 = CHUNK(CAR(l1));
         if(c1 == c2)
-	  found = TRUE;
+	  found = true;
       }
       if(! found)
         gen_nconc(l, CONS(CHUNK, c2, NIL));
@@ -353,7 +353,7 @@ list *init_l, *elim_l;
     Variable v = (Variable) ENTITY(CAR(l));
     Value coeff;
 
-    if ((eq = contrainte_var_min_coeff(ps->egalites,v, &coeff, TRUE))
+    if ((eq = contrainte_var_min_coeff(ps->egalites,v, &coeff, true))
 	!= NULL) {
 
  if(get_debug_level() > 7) {
@@ -373,14 +373,14 @@ fprintf(stderr, "\n");
          ete enleve dans la fonction contrainte_var_min_coeff(). */
 
       for(eg = ps->egalites; eg != NULL; eg = eg->succ)
-        (void) contrainte_subst_ofl_ctrl(v, eq, eg, TRUE, NO_OFL_CTRL);
+        (void) contrainte_subst_ofl_ctrl(v, eq, eg, true, NO_OFL_CTRL);
       for(eg = ps->inegalites; eg != NULL; eg = eg->succ)
-        (void) contrainte_subst_ofl_ctrl(v, eq, eg, FALSE, NO_OFL_CTRL);
+        (void) contrainte_subst_ofl_ctrl(v, eq, eg, false, NO_OFL_CTRL);
 
       for(eg = sc_elim->egalites; eg != NULL; eg = eg->succ)
-        (void) contrainte_subst_ofl_ctrl(v, eq, eg, TRUE, NO_OFL_CTRL);
+        (void) contrainte_subst_ofl_ctrl(v, eq, eg, true, NO_OFL_CTRL);
       for(eg = sc_elim->inegalites; eg != NULL; eg = eg->succ)
-        (void) contrainte_subst_ofl_ctrl(v, eq, eg, FALSE, NO_OFL_CTRL);
+        (void) contrainte_subst_ofl_ctrl(v, eq, eg, false, NO_OFL_CTRL);
 
       sc_add_egalite(sc_elim, eq);
       gen_remove(init_l, (chunk *) v);
@@ -427,7 +427,7 @@ Psysteme plc_elim_var_with_eg(ps, init_l, elim_l)
 Psysteme ps;
 list *init_l, *elim_l;
 {
- boolean var_not_found;
+ bool var_not_found;
  Psysteme sc_elim = sc_new();
  Pcontrainte eqs;
  Pvecteur ve, pv_elim;
@@ -456,12 +456,12 @@ fprintf(stderr, "\n");
     /* We look, in vl (i.e. init_l), for a variable that we can eliminate in
      * ve, i.e. with a coefficient equal to 1 or -1.
      */
-    var_not_found = TRUE;
+    var_not_found = true;
     for(l = vl ; (l != NIL) && var_not_found; l = CDR(l)) {
       crt_var = ENTITY(CAR(l));
       crt_val = (int) vect_coeff((Variable) crt_var, ve);
       if((crt_val == 1) || (crt_val == -1))
-	var_not_found = FALSE;
+	var_not_found = false;
     }
 
     /* If we get such a variable, we eliminate it. */
@@ -664,7 +664,7 @@ list le;
  * we'll be able to simplified the final calculus (F(x) - P(x)) by an addition.
  */
 
-typedef boolean (*argh)(Pvecteur*, Pvecteur*);
+typedef bool (*argh)(Pvecteur*, Pvecteur*);
 
 Ppolynome apply_farkas(F, D, L, count_lambdas)
 Ppolynome F;
@@ -726,11 +726,11 @@ int *count_lambdas;
   /* pu_is_inferior_var is not implemented and does not match prototype... */
   params_in_D = base_to_list(polynome_used_var(P, (argh) pu_is_inferior_var));
   for(l = gen_append(prgm_parameter_l, NIL); !ENDP(l); POP(l)) {
-    boolean not_found = TRUE;
+    bool not_found = true;
     entity p = ENTITY(CAR(l));
     for(ll = params_in_D; !ENDP(ll) && (not_found); POP(ll)) {
       if( same_entity_p(p, ENTITY(CAR(ll))) )
-	not_found = FALSE;
+	not_found = false;
     }
     if(not_found) {
       nl = find_or_create_coeff(LAMBD_COEFF, cl++);
@@ -875,11 +875,11 @@ list l1, l2;
 
   for( ; !ENDP(l1); POP(l1)) {
     chunk *c1 = CHUNK(CAR(l1));
-    boolean found = FALSE;
+    bool found = false;
     for(; (!ENDP(l2)) && (!found); POP(l2)) {
       chunk *c2 = CHUNK(CAR(l2));
       if(c1 == c2)
-        found = TRUE;
+        found = true;
     }
     if(!found)
       l = gen_nconc(l, CONS(CHUNK, c1, NIL));
@@ -890,7 +890,7 @@ list l1, l2;
 
 /* ======================================================================== */
 /*
- * boolean vecteurs_libres_p(Psysteme sys, Pbase v_base, Pbase c_base):
+ * bool vecteurs_libres_p(Psysteme sys, Pbase v_base, Pbase c_base):
  * returns true if "sys" contains a list of equalities that can represent a
  * family of free vectors.
  * "v_base" is the list unit vectors, and "c_base" is the list of symbolic
@@ -900,7 +900,7 @@ list l1, l2;
  *		{i + n == 0, i - n == 0} is not a free family
  *              {i + j == 0, i - j == 0} is a free family
  */
-boolean vecteurs_libres_p(sys, v_base, c_base)
+bool vecteurs_libres_p(sys, v_base, c_base)
 Psysteme sys;
 Pbase v_base, c_base;
 {
@@ -912,7 +912,7 @@ Pbase v_base, c_base;
   m1 = base_dimension(v_base);
 
   if(m1 < n)
-    return(FALSE);
+    return(false);
 
   m2 = base_dimension(c_base) + 1; /* add 1, because of the TCST */
   A = matrice_new(n,m1);
@@ -1009,7 +1009,7 @@ entity var;
 
 /* ======================================================================== */
 /*
- * Psysteme nullify_factors(Ppolynome *pp, list var_l, boolean with_remnants):
+ * Psysteme nullify_factors(Ppolynome *pp, list var_l, bool with_remnants):
  * returns a system of equalities ("new_ps") computed from a polynome "pp"
  * and a list of variables "var_l".
  *
@@ -1017,7 +1017,7 @@ entity var;
  * the factor. Thus, the resulting system contains the equations that nullify
  * these factors (the degree of the polynome must be less or equal to two).
  *
- * If "with_remnants" is TRUE, then the remaining polynome, from which we
+ * If "with_remnants" is true, then the remaining polynome, from which we
  * have removed all the occurences of these variables, is also nullify and the
  * equation added to the system (then, these remnants must be of degree 1).
  *
@@ -1026,7 +1026,7 @@ entity var;
 Psysteme nullify_factors(pp, var_l, with_remnants)
 Ppolynome *pp;
 list var_l;
-boolean with_remnants;
+bool with_remnants;
 {
   Ppolynome aux_pp = *pp;
   Psysteme new_ps = sc_new();
@@ -1082,10 +1082,10 @@ boolean with_remnants;
 
 
 /* ======================================================================== */
-/* boolean is_broadcast_p(dataflow df): returns TRUE if the dataflow "df"
+/* bool is_broadcast_p(dataflow df): returns true if the dataflow "df"
  * has a defined broadcast communication. Otherwise it returns FALSE.
  */
-boolean is_broadcast_p(df)
+bool is_broadcast_p(df)
 dataflow df;
 {
   communication com;
@@ -1094,17 +1094,17 @@ dataflow df;
 
   com = dataflow_communication(df);
   if(com == communication_undefined)
-    return(FALSE);
+    return(false);
 
   bp = communication_broadcast(com);
   if(bp == predicate_undefined)
-    return(FALSE);
+    return(false);
 
   ps = (Psysteme) predicate_system(bp);
   if(ps == NULL)
-    return(FALSE);
+    return(false);
   else
-    return(TRUE);
+    return(true);
 }
 
 
@@ -1144,10 +1144,10 @@ dataflow df;
 
 
 /* ======================================================================== */
-/* boolean is_reduction_p(dataflow df): returns TRUE if the dataflow "df"
+/* bool is_reduction_p(dataflow df): returns true if the dataflow "df"
  * has a defined reduction communication. Otherwise it returns FALSE.
  */
-boolean is_reduction_p(df)
+bool is_reduction_p(df)
 dataflow df;
 {
  communication com = dataflow_communication(df);
@@ -1155,25 +1155,25 @@ dataflow df;
  Psysteme ps;
 
  if(com == communication_undefined)
-    return(FALSE);
+    return(false);
 
  bp = communication_reduction(com);
  if(bp == predicate_undefined)
-   return(FALSE);
+   return(false);
 
  ps = (Psysteme) predicate_system(bp);
  if(ps == NULL)
-   return(FALSE);
+   return(false);
  else
-   return(TRUE);
+   return(true);
 }
 
 
 /* ======================================================================== */
-/* boolean is_shift_p(dataflow df): returns TRUE if the dataflow "df" has a
+/* bool is_shift_p(dataflow df): returns true if the dataflow "df" has a
  * defined shift communication. Otherwise it returns FALSE.
  */
-boolean is_shift_p(df)
+bool is_shift_p(df)
 dataflow df;
 {
  communication com = dataflow_communication(df);
@@ -1181,17 +1181,17 @@ dataflow df;
  Psysteme ps;
 
  if(com == communication_undefined)
-    return(FALSE);
+    return(false);
 
  bp = communication_shift(com);
  if(bp == predicate_undefined)
-   return(FALSE);
+   return(false);
 
  ps = (Psysteme) predicate_system(bp);
  if(ps == NULL)
-   return(FALSE);
+   return(false);
  else
-   return(TRUE);
+   return(true);
 }
 
 
@@ -1315,7 +1315,7 @@ Variable var;
       int newval;
       Pvecteur vec, newpv;
       entity first = entity_undefined, second = entity_undefined;
-      boolean factor_found = TRUE;
+      bool factor_found = true;
 
       vec = (ppp->monome)->term;
       for(; (vec != NULL) && (second == entity_undefined); vec = vec->succ) {
@@ -1332,7 +1332,7 @@ Variable var;
       else if(same_entity_p(second, (entity) var))
 	newvar = (Variable) first;
       else
-	factor_found = FALSE;
+	factor_found = false;
 
       if(factor_found) {
         newval = (int) (ppp->monome)->coeff;

@@ -135,10 +135,10 @@ void print_proj_op_statistics(char *mod_name, char *prefix)
 
 /* entity
  * loop_regions_normalize(list l_reg, entity index, range l_range,
- *		          boolean *normalized_regions_p, boolean sc_loop_p,
+ *		          bool *normalized_regions_p, bool sc_loop_p,
  *                        Psysteme *psc_loop)
  * input    : a list of regions, a loop index, its range, and a pointer on a
- *            boolean to know if the loop is normalized, a boolean to know
+ *            bool to know if the loop is normalized, a bool to know
  *            if the loop precondition system sc_loop must be normalized.
  *
  * output   : an entity representing the new loop index to use; it may be index
@@ -157,7 +157,7 @@ void print_proj_op_statistics(char *mod_name, char *prefix)
  */
 entity
 loop_regions_normalize(list l_reg, entity index, range l_range,
-		       boolean *normalized_regions_p, boolean sc_loop_p,
+		       bool *normalized_regions_p, bool sc_loop_p,
 		       Psysteme *psc_loop )
 {
     Value incr = VALUE_ZERO;
@@ -261,7 +261,7 @@ loop_regions_normalize(list l_reg, entity index, range l_range,
  */
 void project_regions_along_loop_index(list l_reg, entity index, range l_range)
 {
-    boolean projection_of_index_safe = FALSE;
+    bool projection_of_index_safe = false;
     Psysteme sc_tmp = SC_UNDEFINED;
 
     debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
@@ -269,7 +269,7 @@ void project_regions_along_loop_index(list l_reg, entity index, range l_range)
 
 
     index = loop_regions_normalize(l_reg, index, l_range,
-				   &projection_of_index_safe,FALSE,&sc_tmp);
+				   &projection_of_index_safe,false,&sc_tmp);
 
     if (must_regions_p() && projection_of_index_safe)
     {
@@ -361,13 +361,13 @@ void
 project_regions_with_transformer(list l_reg, transformer trans,
 				 list l_var_not_proj)
 {
-    regions_transformer_apply(l_reg, trans, l_var_not_proj, FALSE);
+    regions_transformer_apply(l_reg, trans, l_var_not_proj, false);
 }
 
 void project_regions_with_transformer_inverse(list l_reg, transformer trans,
 					      list l_var_not_proj)
 {
-    regions_transformer_apply(l_reg, trans, l_var_not_proj, TRUE);
+    regions_transformer_apply(l_reg, trans, l_var_not_proj, true);
 }
 
 /* void regions_transformer_apply(l_reg, trans, l_var_not_proj)
@@ -539,7 +539,7 @@ list regions_dynamic_elim(list l_reg)
 	if(store_effect_p(reg)) {
         entity reg_ent = region_entity(reg);
         storage reg_s = entity_storage(reg_ent);
-        boolean ignore_this_region = FALSE;
+        bool ignore_this_region = false;
 
 	ifdebug(4)
 	  {
@@ -554,7 +554,7 @@ list regions_dynamic_elim(list l_reg)
 	    {
 	    case is_storage_return:
 	      pips_debug(5, "return var ignored (%s)\n", entity_name(reg_ent));
-	      ignore_this_region = TRUE;
+	      ignore_this_region = true;
 	      break;
 	    case is_storage_ram:
 	      {
@@ -563,7 +563,7 @@ list regions_dynamic_elim(list l_reg)
 		    || stack_area_p(ram_section(r)))
 		  {
 		    pips_debug(5, "dynamic or pointed var ignored (%s)\n", entity_name(reg_ent));
-		    ignore_this_region = TRUE;
+		    ignore_this_region = true;
 		  }
 		break;
 	      }
@@ -571,7 +571,7 @@ list regions_dynamic_elim(list l_reg)
 	      break;
 	    case is_storage_rom:
 	      if(!entity_special_area_p(reg_ent) && !anywhere_effect_p(reg))
-		ignore_this_region = TRUE;
+		ignore_this_region = true;
 	      break;
 	      /* pips_internal_error("bad tag for %s (rom)", entity_name(reg_ent)); */
 	    default:
@@ -609,9 +609,9 @@ list regions_dynamic_elim(list l_reg)
 
 static Psysteme region_sc_projection_ofl_along_parameters(Psysteme sc,
 							  Pvecteur pv_param,
-							  boolean *p_exact);
+							  bool *p_exact);
 static Psysteme region_sc_projection_ofl_along_parameter(Psysteme sc, Variable param,
-							 boolean *p_exact);
+							 bool *p_exact);
 
 
 /* void region_remove_phi_variables(effect reg, int phi_max)
@@ -924,7 +924,7 @@ void region_exact_projection_along_parameters(region reg, list l_param)
 		 * are linked to PHI variables (l_phi_param). */
 		if(!ENDP(l_phi_param))
 		{
-		    boolean exact = TRUE;
+		    bool exact = true;
 		    Pvecteur pv_phi_param = NULL;
 
 		    if (op_statistics_p()) nb_proj_param_pot_must++;
@@ -1196,7 +1196,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 		else
 		{
 		    Pvecteur pv_var = NULL;
-		    boolean is_proj_exact = TRUE;
+		    bool is_proj_exact = true;
 
 		    vect_add_elem(&pv_var, (Variable) var, VALUE_ONE);
 		    sc = sc_projection_ofl_along_variables_with_test
@@ -1236,15 +1236,15 @@ void region_exact_projection_along_variable(region reg, entity var)
 
 static Pcontrainte eq_var_nophi_min_coeff(Pcontrainte contraintes, Variable var);
 static Pcontrainte eq_var_phi(Pcontrainte contraintes, Variable var);
-static Psysteme region_sc_minimal(Psysteme sc, boolean *p_sc_changed_p);
+static Psysteme region_sc_minimal(Psysteme sc, bool *p_sc_changed_p);
 
 
 /* Psysteme region_sc_projection_ofl_along_parameters(Psysteme sc,
  *                                                 Pvecteur pv_param,
- *                                                 boolean *p_exact)
+ *                                                 bool *p_exact)
  * input    : a convex polyhedron sc to project along the parameters contained
  *            in the vector pv_param, which are linked to the PHI variables;
- *            p_exact is a pointer to a boolean indicating whether the
+ *            p_exact is a pointer to a bool indicating whether the
  *            projection is exact or not.
  * output   : the polyhedron resulting of the projection.
  * modifies : sc, *p_exact.
@@ -1252,11 +1252,11 @@ static Psysteme region_sc_minimal(Psysteme sc, boolean *p_sc_changed_p);
  */
 static Psysteme region_sc_projection_ofl_along_parameters(Psysteme sc,
 							  Pvecteur pv_param,
-							  boolean *p_exact)
+							  bool *p_exact)
 {
-    *p_exact = TRUE;
+    *p_exact = true;
 
-    for(; (*p_exact == TRUE) && !VECTEUR_NUL_P(pv_param); pv_param = pv_param->succ)
+    for(; (*p_exact == true) && !VECTEUR_NUL_P(pv_param); pv_param = pv_param->succ)
     {
 	Variable param = vecteur_var(pv_param);
 	sc = region_sc_projection_ofl_along_parameter(sc, param, p_exact);
@@ -1276,10 +1276,10 @@ static Psysteme region_sc_projection_ofl_along_parameters(Psysteme sc,
 
 /* Psysteme region_sc_projection_ofl_along_parameter(Psysteme sc,
  *                                                 Variable param,
- *                                                 boolean *p_exact)
+ *                                                 bool *p_exact)
  * input    : a convex polyhedron sc to project along the variable param
  *            which is linked to the PHI variables;
- *            p_exact is a pointer to a boolean indicating whether the
+ *            p_exact is a pointer to a bool indicating whether the
  *            projection is exact or not.
  * output   : the polyhedron resulting of the projection.
  * modifies : sc, *p_exact.
@@ -1295,12 +1295,12 @@ static Psysteme region_sc_projection_ofl_along_parameters(Psysteme sc,
  * WARNING : the base and dimension of sc are not updated.
  */
 static Psysteme region_sc_projection_ofl_along_parameter(Psysteme sc, Variable param,
-							 boolean *p_exact)
+							 bool *p_exact)
 {
     Pcontrainte eq;
     Pbase base_sc;
     Psysteme sc_tmp;
-    boolean hermite_sc_p;
+    bool hermite_sc_p;
 
     pips_debug(8, "begin\n");
 
@@ -1313,7 +1313,7 @@ static Psysteme region_sc_projection_ofl_along_parameter(Psysteme sc, Variable p
     if (!CONTRAINTE_UNDEFINED_P(eq))
     {
 	sc = sc_projection_ofl_with_eq(sc, eq, param);
-	*p_exact = TRUE;
+	*p_exact = true;
 	debug(8, "region_sc_projection_ofl_along_parameter",
 	      "explicit equation found.\n");
 	return(sc);
@@ -1332,7 +1332,7 @@ static Psysteme region_sc_projection_ofl_along_parameter(Psysteme sc, Variable p
 	if (!CONTRAINTE_UNDEFINED_P(eq))
 	{
 	    sc = sc_projection_ofl_with_eq(sc, eq, param);
-	    *p_exact = TRUE;
+	    *p_exact = true;
 	    pips_debug(8, "implicit equation found.\n");
 	    if (op_statistics_p()) nb_proj_param_hermite_success++;
 
@@ -1348,7 +1348,7 @@ static Psysteme region_sc_projection_ofl_along_parameter(Psysteme sc, Variable p
     if (!CONTRAINTE_UNDEFINED_P(eq))
     {
 	sc = sc_projection_ofl_with_eq(sc, eq, param);
-	*p_exact = FALSE;
+	*p_exact = false;
 	pips_debug(8, "equation with PHI and param found -> projection not exact.\n");
 
 	return(sc);
@@ -1360,9 +1360,9 @@ static Psysteme region_sc_projection_ofl_along_parameter(Psysteme sc, Variable p
      */
     eq = eq_var_phi(sc->inegalites, param);
     if(CONTRAINTE_UNDEFINED_P(eq))
-	*p_exact = TRUE;
+	*p_exact = true;
     else
-	*p_exact = FALSE;
+	*p_exact = false;
 
     base_sc = base_dup(sc->base);
     if (!combiner_ofl(sc, param))
@@ -1446,15 +1446,15 @@ static Pcontrainte eq_var_phi(Pcontrainte contraintes, Variable var)
 
 static int constraints_nb_phi_eq(Pcontrainte eqs);
 
-/* Psysteme region_sc_minimal(Psysteme sc, boolean p_sc_changed_p)
+/* Psysteme region_sc_minimal(Psysteme sc, bool p_sc_changed_p)
  * input    : a polyhedron
  * output   : an equivalent polyhedron, in which the number of equations
  *            containing phi variables is minimal (see report E/185).
- * modifies : sc and p_sc_changed_p. The pointed boolean is set to TRUE, if
+ * modifies : sc and p_sc_changed_p. The pointed bool is set to true, if
  *            a new sc is calculated (with the hermite stuff).
  * comment  :
  */
-static Psysteme region_sc_minimal(Psysteme sc, boolean *p_sc_changed_p)
+static Psysteme region_sc_minimal(Psysteme sc, bool *p_sc_changed_p)
 {
     Pcontrainte eq = sc->egalites;
     int m = nb_elems_list(eq),
@@ -1464,7 +1464,7 @@ static Psysteme region_sc_minimal(Psysteme sc, boolean *p_sc_changed_p)
     Value det_P, det_Q;
     Pbase sorted_base = base_dup(sc->base);
 
-    *p_sc_changed_p = FALSE;
+    *p_sc_changed_p = false;
 
     /* the number of equations containing phi variables must be greater than one,
      * otherwise, the system is already minimal. Moreover, the number of phi
@@ -1473,7 +1473,7 @@ static Psysteme region_sc_minimal(Psysteme sc, boolean *p_sc_changed_p)
     if (!(n_phi > 0 && (constraints_nb_phi_eq(eq) > 1)))
 	return(sc);
 
-    *p_sc_changed_p = TRUE;
+    *p_sc_changed_p = true;
 
     ifdebug(8)
     {
@@ -1552,17 +1552,17 @@ static int constraints_nb_phi_eq(Pcontrainte eqs)
 
 
 
-/* boolean region_projection_along_index_safe_p(entity index, range l_range)
+/* bool region_projection_along_index_safe_p(entity index, range l_range)
  * input    : an loop index and its range
- * output   : TRUE if its projection of regions along index is safe (see
+ * output   : true if its projection of regions along index is safe (see
  *            conditions in report E/185).
  * modifies : nothing
  * comment  :
  */
-boolean region_projection_along_index_safe_p(entity __attribute__ ((unused)) index,
+bool region_projection_along_index_safe_p(entity __attribute__ ((unused)) index,
 					     range l_range)
 {
-    boolean projection_of_index_safe = FALSE;
+    bool projection_of_index_safe = false;
     normalized n, nub, nlb;
     expression e_incr = range_increment(l_range);
     Value incr = VALUE_ZERO;

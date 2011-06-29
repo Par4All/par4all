@@ -437,14 +437,14 @@ FILE* file;
 	 MAP(DISTRIBUTION, d,
 	 {
 	      int param;
-	      bool block_case = FALSE;
+	      bool block_case = false;
 
 	      switch(style_tag(distribution_style(d)))
 	      {
 	      case is_style_none:
 		  break;
 	      case is_style_block:
-		  block_case = TRUE;
+		  block_case = true;
 	      case is_style_cyclic:
 		  param = HpfcExpressionToInt(distribution_parameter(d));
 		  if (!block_case) param = -param;

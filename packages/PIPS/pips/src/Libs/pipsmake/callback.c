@@ -38,27 +38,27 @@
 
 static pipsmake_callback_handler_type callback =
     (pipsmake_callback_handler_type) NULL ;
-static bool callback_set_p = FALSE;
+static bool callback_set_p = false;
 
 void set_pipsmake_callback(pipsmake_callback_handler_type p)
 {
-    message_assert("callback is already set", callback_set_p == FALSE);
+    message_assert("callback is already set", callback_set_p == false);
     
-    callback_set_p = TRUE;
+    callback_set_p = true;
     callback = p;
 }
 
 void reset_pipsmake_callback()
 {
-    message_assert("callback not set", callback_set_p == TRUE);
+    message_assert("callback not set", callback_set_p == true);
     
-    callback_set_p = FALSE;
+    callback_set_p = false;
     callback = (pipsmake_callback_handler_type) NULL;
 }
 
 bool run_pipsmake_callback()
 {
-    bool result = TRUE;
+    bool result = true;
 
     if (callback_set_p)
 	result = (*callback)();

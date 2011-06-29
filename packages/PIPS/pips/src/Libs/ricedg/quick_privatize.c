@@ -73,10 +73,10 @@ static bool quick_privatize_loop(statement stat, list successors)
 
     if (! quick_privatize_statement_pair(stat, st,
 					 dg_arc_label_conflicts(dal)))
-      return(FALSE);
+      return(false);
   }
 
-  return(TRUE);
+  return(true);
  }
 
 
@@ -120,11 +120,11 @@ list conflicts;
 
 	if(is_implied_do_index(e1,statement_instruction(s2))) {
 	  pips_debug(3, "s2 is an implied loop\n");
-	  return(TRUE);
+	  return(true);
 	}
 	if (! statement_loop_p(s2)) {
 	  pips_debug(3, "s2 not a loop\n");
-	  return(FALSE);
+	  return(false);
 	}
 
 	/* s2 is a loop. if there are no read effet in the range
@@ -140,7 +140,7 @@ list conflicts;
 	    pips_debug(3, "index read in range expressions\n");
 
 	    free_effects(make_effects(range_effects));
-	    return(FALSE);
+	    return(false);
 	  }
 	}
 	free_effects(make_effects(range_effects));
@@ -148,6 +148,6 @@ list conflicts;
     }
   }
 
-  return(TRUE);
+  return(true);
 }
 

@@ -538,8 +538,8 @@ array_bounds_list(entity array, bool upper)
 list /* of expressions */
 array_lower_upper_bounds_list(entity array)
 {
-    list /* of expression */ lb = array_bounds_list(array, FALSE),
-    			     lu = array_bounds_list(array, TRUE),
+    list /* of expression */ lb = array_bounds_list(array, false),
+    			     lu = array_bounds_list(array, true),
     			     l = lb, lnb, lnu;
 
     if (!l) return NIL;
@@ -587,7 +587,7 @@ typedef struct
     entity  object;
 } RunTimeSupportDescriptor;
 
-static bool RTSTable_initialized_p = FALSE;
+static bool RTSTable_initialized_p = false;
 
 static RunTimeSupportDescriptor RTSTable[] =
 {
@@ -755,7 +755,7 @@ void hpfc_init_run_time_entities()
     list l=NIL;
 
     if (RTSTable_initialized_p) return;
-    RTSTable_initialized_p = TRUE;
+    RTSTable_initialized_p = true;
 
     for(current=RTSTable;
 	current->what!=is_end;
@@ -831,7 +831,7 @@ entity e;
 {
     RunTimeSupportDescriptor *entry = find_entry_by_name(entity_local_name(e));
 
-    return entry ? entry->what==is_ifn : FALSE;
+    return entry ? entry->what==is_ifn : false;
 }
 
 bool hpfc_io_like_function(e)
@@ -839,7 +839,7 @@ entity e;
 {
     RunTimeSupportDescriptor *entry = find_entry_by_name(entity_local_name(e));
 
-    return entry ? entry->what==is_iof : FALSE;
+    return entry ? entry->what==is_iof : false;
 }
 
 /* that is all

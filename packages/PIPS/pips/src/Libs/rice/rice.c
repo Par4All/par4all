@@ -198,7 +198,7 @@ statement rice_loop(statement stat,
   }
 
   set_enclosing_loops_map( loops_mapping_of_statement(stat) );
-  nstat = codegen_fun(stat, dg, region, l, TRUE);
+  nstat = codegen_fun(stat, dg, region, l, true);
 
   ifdebug(7){
     pips_debug(7, "consistency checking for CodeGenerate output: ");
@@ -276,7 +276,7 @@ do_it(
     set_current_module_statement( (statement)
 				  db_get_memory_resource(DBR_CODE,
 							 mod_name,
-							 TRUE) );
+							 true) );
     mod_stat = get_current_module_statement();
 
     debug_on("RICE_DEBUG_LEVEL");
@@ -313,7 +313,7 @@ do_it(
     }
 
     if (graph_undefined_p(dg)) {
-	dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+	dg = (graph) db_get_memory_resource(DBR_DG, mod_name, true);
     }
     else {
 	pips_internal_error("dg should be undefined");
@@ -350,7 +350,7 @@ do_it(
 
     dg = graph_undefined;
     reset_current_module_statement();
-    return TRUE;
+    return true;
 }
 
 
@@ -365,7 +365,7 @@ bool distributer(string mod_name)
 
     debug_on("RICE_DEBUG_LEVEL");
 
-    success = do_it( mod_name, TRUE, DBR_CODE, &CodeGenerate ) ;
+    success = do_it( mod_name, true, DBR_CODE, &CodeGenerate ) ;
 
     debug_off();
     reset_current_module_entity();
@@ -375,24 +375,24 @@ bool distributer(string mod_name)
 
 static bool rice(string mod_name)
 {
-    bool success = TRUE;
+    bool success = true;
     entity module = local_name_to_top_level_entity(mod_name);
 
     /*
      * For C code, this pass requires that effects are calculated with property
-     * MEMORY_EFFECTS_ONLY set to FALSE because we need that the Chains includes
+     * MEMORY_EFFECTS_ONLY set to false because we need that the Chains includes
      * arcs for declarations as these latter are separate statements now.
      */
     bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
     if(c_module_p(module) && memory_effects_only_p) {
       pips_user_warning("Rice parallelization should be run with property "
                         "MEMORY_EFFECTS_ONLY set to FALSE.\n");
-      return FALSE; // return to pass manager with a failure code
+      return false; // return to pass manager with a failure code
     }
 
     set_current_module_entity(module);
 
-    success = do_it( mod_name, FALSE, DBR_PARALLELIZED_CODE, &CodeGenerate);
+    success = do_it( mod_name, false, DBR_PARALLELIZED_CODE, &CodeGenerate);
 
     reset_current_module_entity();
     return success;
@@ -400,22 +400,22 @@ static bool rice(string mod_name)
 
 bool rice_all_dependence(string mod_name)
 {
-    set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", TRUE ) ;
-    set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", FALSE ) ;
+    set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", true ) ;
+    set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", false ) ;
     return rice( mod_name ) ;
 }
 
 bool rice_data_dependence(string mod_name)
 {
-    set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", TRUE ) ;
-    set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", TRUE ) ;
+    set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", true ) ;
+    set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", true ) ;
     pips_user_warning("This phase is designed for experimental purposes only. The generated code is most likely to be illegal, especially if a privatization phase was performed before.\n");
     return rice( mod_name ) ;
 }
 
 bool rice_cray(string mod_name)
 {
-    set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", FALSE ) ;
-    set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", FALSE ) ;
+    set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", false ) ;
+    set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", false ) ;
     return rice( mod_name ) ;
 }

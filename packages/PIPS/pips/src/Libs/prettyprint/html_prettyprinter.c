@@ -802,7 +802,7 @@ bool html_prettyprint(const char *module_name) {
   /* Put back the new statement module */
   PIPS_PHASE_POSTLUDE(module_statement);
 
-  return TRUE;
+  return true;
 }
 
 bool html_prettyprint_symbol_table(const char *module) {
@@ -816,5 +816,5 @@ bool html_prettyprint_symbol_table(const char *module) {
   printf("<li class=\"endSymbolTable\">&nbsp;</li>" NL "</ul></li>" NL);
   end_block("Symbol table", true);
 
-  return TRUE;
+  return true;
 }

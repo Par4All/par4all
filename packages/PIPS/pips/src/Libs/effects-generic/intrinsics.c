@@ -1386,7 +1386,7 @@ address_expression_effects(entity op, list args)
     call nc = syntax_call(expression_syntax(ne));
 
     pips_debug(5, "begin\n");
-    le = generic_proper_effects_of_address_expression(ne, FALSE);
+    le = generic_proper_effects_of_address_expression(ne, false);
     call_function(nc) = entity_undefined; // useless because of persistance
     call_arguments(nc) = NIL;
     free_expression(ne);
@@ -1492,19 +1492,19 @@ static list any_affect_effects(entity e __attribute__ ((__unused__)),
 
 static list affect_effects(entity e __attribute__ ((__unused__)),list args)
 {
-  return any_affect_effects(e, args, FALSE, FALSE);
+  return any_affect_effects(e, args, false, false);
 }
 
 static list
 update_effects(entity e __attribute__ ((__unused__)),list args)
 {
-  return any_affect_effects(e, args, TRUE, FALSE);
+  return any_affect_effects(e, args, true, false);
 }
 
 static list
 unique_update_effects(entity e __attribute__ ((__unused__)),list args)
 {
-  return any_affect_effects(e, args, TRUE, TRUE);
+  return any_affect_effects(e, args, true, true);
 }
 
 static list
@@ -1756,7 +1756,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
   int lenght=0;
   int i=0;
   /* it really is an IO, not a string operation */
-  //bool file_p = TRUE;
+  //bool file_p = true;
 
   expression unit = expression_undefined;
 
@@ -1807,8 +1807,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	{
 	  // The output is written to stdout
 	  entity std_ent =  local_name_to_top_level_entity("stdout");
-	  pips_assert("stdout must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
-	  std_ref = make_reference(std_ent, NIL);
+	  if (entity_undefined_p(std_ent))
+	    pips_user_error("stdout is not defined (check if <stdio.h> is included)\n");
+	  else
+	    std_ref = make_reference(std_ent, NIL);
 
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
 	    unit = int_to_expression(STDOUT_FILENO);
@@ -1823,8 +1825,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	{
 	  //The input is obtained from stdin
 	  entity std_ent =  local_name_to_top_level_entity("stdin");
-	  pips_assert("stdin must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
-	  std_ref = make_reference(std_ent, NIL);
+	  if (entity_undefined_p(std_ent))
+	    pips_user_error("stdin is not defined (check if <stdio.h> is included)\n");
+	  else
+	    std_ref = make_reference(std_ent, NIL);
 
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
 	    unit = int_to_expression(STDIN_FILENO);
@@ -1835,8 +1839,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
       else if (ENTITY_PERROR_P(e))
 	{
 	  entity std_ent =  local_name_to_top_level_entity("stderr");
-	  pips_assert("stderr must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
-	  std_ref = make_reference(std_ent, NIL);
+	  if (entity_undefined_p(std_ent))
+	    pips_user_error("stderr is not defined (check if <stdio.h> is included)\n");
+	  else
+	    std_ref = make_reference(std_ent, NIL);
 
 	  /* we cannot use STDERR_FILENO because the stderr variable may have been modified by the user */
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
@@ -1918,13 +1924,13 @@ static list generic_io_effects(entity e, list args, bool system_p)
 /* unix_io_effects to manage the IO system's functions */
 static list unix_io_effects(entity e, list args)
 {
-  return generic_io_effects(e, args, TRUE);
+  return generic_io_effects(e, args, true);
 }
 
 /* c_io_effects to handle the effects of functions of the "stdio.h" library. Amira Mensi*/
 static list c_io_effects(entity e, list args)
 {
-  return generic_io_effects(e, args, FALSE);
+  return generic_io_effects(e, args, false);
 }
 
 
@@ -2104,7 +2110,7 @@ static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bo
   ifdebug(8) print_reference(ref);
 
   /* Read first. */
-  if(init_p != TRUE){
+  if(init_p != true){
     le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
   }
 
@@ -2119,13 +2125,13 @@ static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bo
 /* The seed is written for initialization */
 static list rgsi_effects(entity e, list args)
 {
-  return any_rgs_effects( e, args, TRUE);
+  return any_rgs_effects( e, args, true);
 }
 
 /* The seed is read and then written */
 static list rgs_effects(entity e, list args)
 {
-  return any_rgs_effects( e, args, FALSE);
+  return any_rgs_effects( e, args, false);
 }
 
 /* To handle the effects of heap related functions.
@@ -2273,7 +2279,7 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	 return a bit too much. */
 
 
-      if(FALSE) {
+      if(false) {
 	/* FI: short term simplification... We need pointers for side effects... */
 	syntax s = expression_syntax(exp);
 
@@ -2347,7 +2353,7 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 
 static list effects_of_ioelem(expression exp, tag act)
 {
-  return effects_of_any_ioelem(exp, act, TRUE);
+  return effects_of_any_ioelem(exp, act, true);
 }
 
 /**

@@ -116,10 +116,10 @@ static void pips_parse_arguments(int argc, char * argv[])
 	 * FC, 27/03/95
 	 */
 	case '1':
-	    set_bool_property(optarg, TRUE);
+	    set_bool_property(optarg, true);
 	    break;
 	case '0':
-	    set_bool_property(optarg, FALSE);
+	    set_bool_property(optarg, false);
 	    break;
 	case '?':
 	    fprintf(stderr, usage, argv[0]);
@@ -173,7 +173,7 @@ static void pips_user_log(const char * fmt, va_list args)
 	va_end(args_copy);
     }
 
-    if(get_bool_property("USER_LOG_P")==FALSE)
+    if(!get_bool_property("USER_LOG_P"))
 	return;
 
     /* It goes to stderr to have only displayed files on stdout */
@@ -184,7 +184,7 @@ static void pips_user_log(const char * fmt, va_list args)
 int 
 pips_main(int argc, char ** argv)
 {
-    bool success = TRUE;
+    bool success = true;
     pips_checks();
 
     initialize_newgen();
@@ -201,8 +201,8 @@ pips_main(int argc, char ** argv)
     {
 	/* no need to pop_pips_context() at top-level */
 	/* FI: are you sure make_close_program() cannot call user_error() ? */
-	close_workspace(TRUE);
-	success = FALSE;
+	close_workspace(true);
+	success = false;
     }
     TRY
     {
@@ -271,7 +271,7 @@ pips_main(int argc, char ** argv)
 	}
 	
 	/* whether success or not... */
-	close_workspace(TRUE);
+	close_workspace(true);
 	/* pop_performance_spy(stderr, "pips"); */
 	/* check debug level if no exception occured */
 

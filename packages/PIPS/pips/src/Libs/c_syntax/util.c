@@ -279,7 +279,7 @@ expression MakeFunctionExpression(expression e, list le)
       {
 	entity ent = reference_variable(syntax_reference(s));
     free_expression(e);
-	bool ok = TRUE;
+	bool ok = true;
 	entity cf = get_current_module_entity();
 
 	ifdebug(8) {
@@ -459,10 +459,10 @@ expression MemberIdentifierToExpression(expression e, string m)
 	  }
 	/* More types of call must be taken into account: typedef and
 	   pointer to functions */
-	if (TRUE || type_functional_p(entity_type(f)))
+	if (true || type_functional_p(entity_type(f)))
 	  {
 	    /* User defined call */
-	    type ft = call_to_functional_type(c, TRUE);
+	    type ft = call_to_functional_type(c, true);
 	    type t = functional_result(type_functional(ft));
 	    return MemberDerivedIdentifierToExpression(t,m);
 	  }
@@ -703,7 +703,7 @@ entity FindOrCreateEntityFromLocalNameAndPrefixAndScope(string name,
   string ls = strdup(scope);
   string ls_head = ls;
 
-  pips_assert("Should not be used", FALSE);
+  pips_assert("Should not be used", false);
 
   pips_assert("scope is a block scope", string_block_scope_p(scope));
 
@@ -896,7 +896,7 @@ bool CheckExternList()
 	}
       }
     }
-    return TRUE;
+    return true;
 }
 
 /* This function finds or creates the current entity. Only entity full
@@ -933,9 +933,9 @@ entity FindOrCreateCurrentEntity(string name,
   }
 
   if (stack_undefined_p(FormalStack) || stack_empty_p(FormalStack))
-    is_formal = FALSE;
+    is_formal = false;
   else {
-    is_formal= TRUE;
+    is_formal= true;
     function = stack_head(FunctionStack);
   }
 
@@ -1219,7 +1219,7 @@ dimension MakeDimension(list le)
       expression e = EXPRESSION(CAR(le));
       intptr_t up;
 
-      if (FALSE && expression_integer_value(e,&up))
+      if (false && expression_integer_value(e,&up))
 	/* use the integer value */ /* If we do this, we cannot restitute the source code */
 	  d = make_dimension(int_to_expression(0),int_to_expression(up-1));
       else
@@ -1592,7 +1592,7 @@ type UpdateType(type t1, type t2)
 
 /* This function allocates the memory to the Current Compilation Unit */
 
-void CCompilationUnitMemoryAllocations(entity module, boolean first_p)
+void CCompilationUnitMemoryAllocations(entity module, bool first_p)
 {
   list ld = entity_declarations(module);
   entity var = entity_undefined;
@@ -1669,12 +1669,12 @@ void CCompilationUnitMemoryAllocations(entity module, boolean first_p)
 
 void CCompilationUnitMemoryAllocation(entity module)
 {
-  CCompilationUnitMemoryAllocations(module, TRUE);
+  CCompilationUnitMemoryAllocations(module, true);
 }
 
 void CCompilationUnitMemoryReallocation(entity module)
 {
-  CCompilationUnitMemoryAllocations(module, FALSE);
+  CCompilationUnitMemoryAllocations(module, false);
 }
 
 /* This function is for MemoryAllocation for Module of C programs*/
@@ -2019,7 +2019,7 @@ void RemoveDummyArguments(entity f, list refs)
       ;
     }
 
-    if(TRUE) {
+    if(true) {
 
       /* FI: just in case? */
       remove_entity_type_stacks(formals);
@@ -2186,7 +2186,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   /* If e is an intrinsics, nothing should be done, unless you are in
      the compilation unit: but the intrinsic type has laready been
      put aside in the type stack linked to the entity and destroyed */
-  if(FALSE && intrinsic_entity_p(e) && !compilation_unit_p(get_current_module_name()))
+  if(false && intrinsic_entity_p(e) && !compilation_unit_p(get_current_module_name()))
     return;
 
   if (lq != NIL)
@@ -2350,7 +2350,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     entity_storage(e) = make_storage_rom();
   }
   else
-    pips_assert("not implemented yet", FALSE);
+    pips_assert("not implemented yet", false);
 
 
   /************************* INITIAL VALUE PART ****************************************/
@@ -2365,7 +2365,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   }
 
   /* Be careful if standard arguments are needed: replace the dummy parameters */
-  if(TRUE || !is_declaration) {
+  if(true || !is_declaration) {
     type t = entity_type(e);
     /* FI: intrinsic may need to be processed here if they use dynamic
        typing, a.k.a. dependent types but they do not have a code
@@ -2468,7 +2468,7 @@ entity CleanUpEntity(entity e)
 void CleanUpEntities(list le)
 {
   list ce = list_undefined;
-  bool found = FALSE;
+  bool found = false;
 
   for(ce=le; !ENDP(ce); POP(ce)) {
     entity e = ENTITY(CAR(ce));
@@ -2480,19 +2480,19 @@ void CleanUpEntities(list le)
       storage s = entity_storage(e);
 
       /* update entity in module declarations */
-      found = FALSE;
+      found = false;
       for(de=d; !ENDP(de); POP(de)) {
 	entity ed = ENTITY(CAR(de));
 	if(ed==e) {
 	  CAR(de).p = (gen_chunk *) ne;
-	  found = TRUE;
+	  found = true;
 	}
       }
       if(!found)
 	pips_internal_error("Entity to be replaced not declared");
 
       /* Update storage area */
-      found = FALSE;
+      found = false;
       if(storage_ram_p(s)) {
 	ram r = storage_ram(s);
 	entity a = ram_section(r);
@@ -2502,7 +2502,7 @@ void CleanUpEntities(list le)
 	for(lde=ld; !ENDP(lde); POP(lde)) {
 	  entity ed = ENTITY(CAR(lde));
 	  if(ed==e) {
-	    found = TRUE;
+	    found = true;
 	    CAR(lde).p = (gen_chunk *) ne;
 	  }
 	}
@@ -3007,7 +3007,7 @@ int ComputeAreaOffset(entity a, entity v)
   area aa = type_area(ta);
   int offset = area_size(aa);
 
-  pips_assert("Not used", FALSE);
+  pips_assert("Not used", false);
 
   /* Update the size and layout of the area aa.
      This function is called too earlier, we may not have the size of v.
@@ -3094,14 +3094,14 @@ void AddToCalledModules(entity e)
 {
   if (!intrinsic_entity_p(e))
     {
-      bool already_here = FALSE;
+      bool already_here = false;
       //string n = top_level_entity_p(e)?entity_local_name(e):entity_name(e);
       string n = entity_local_name(e);
       MAP(STRING,s,
       {
 	if (strcmp(n, s) == 0)
 	  {
-	    already_here = TRUE;
+	    already_here = true;
 	    break;
 	  }
       }, CalledModules);
@@ -3128,7 +3128,7 @@ static bool referencenodeclfilter(reference r)
     if(!(gen_in_list_p(e, entity_declarations(m))
 	 || gen_in_list_p(e, entity_declarations(cu))))
       {
-	declarationerror_p = TRUE;
+	declarationerror_p = true;
 	user_log("\n\nNo declaration of variable \"%s\" (\"%s\") in module \"%s\'\n",
 		 entity_local_name(e),entity_name(e),get_current_module_name());
       }
@@ -3140,13 +3140,13 @@ static bool referencenodeclfilter(reference r)
      systematically for functions and to restore this test. */
   /*
   //  if(storage_return_p(entity_storage(e))){
-  //  declarationerror_p = TRUE;
+  //  declarationerror_p = true;
   //  user_log("\n\nNo declaration of variable \"%s\" (\"%s\") in module \"%s\"\n",
   //	     entity_user_name(e),entity_name(e),get_current_module_name());
   }
   */
 
-  return TRUE;
+  return true;
 }
 
 
@@ -3192,14 +3192,14 @@ static bool callnodeclfilter(call c)
       }
   }
 
-  return TRUE;
+  return true;
 }
 
 
 void
 nodecl_p(entity __attribute__ ((unused)) module, statement stat)
 {
-  declarationerror_p = FALSE;
+  declarationerror_p = false;
   gen_multi_recurse(stat, reference_domain,referencenodeclfilter,gen_null,
 		    call_domain,callnodeclfilter,gen_null, NULL);
 
@@ -3296,7 +3296,7 @@ void set_entity_initial(entity v, expression nie)
 bool check_declaration_uniqueness_p(statement s)
 {
   list dl = statement_declarations(s);
-  bool failure_p = FALSE;
+  bool failure_p = false;
 
   FOREACH(ENTITY, e, dl) {
     int n = gen_occurences(e, dl);
@@ -3306,7 +3306,7 @@ bool check_declaration_uniqueness_p(statement s)
 
       if(!type_functional_p(t)) {
 	pips_debug(0, "Entity \"%s\" declared %d times.\n", entity_name(e), n);
-	failure_p = TRUE;
+	failure_p = true;
       }
     }
   }

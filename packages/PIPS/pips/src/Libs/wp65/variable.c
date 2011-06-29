@@ -123,7 +123,7 @@ tiling tile;
 	if(assignment_statement_p(s)) {
 	    list lexpr =call_arguments(instruction_call(statement_instruction(s)));
 	    /* first reference in statement s */
-	    boolean first_reference = TRUE;
+	    bool first_reference = true;
 	    /* there are only two expressions to loop over: the lhs and the 
 	       rhs */
 	    for(; !ENDP(lexpr); POP(lexpr)) {
@@ -147,13 +147,13 @@ tiling tile;
 			      "Variable %s is private\n", 
 			      entity_local_name(rv));
 			
-			first_reference = FALSE;
+			first_reference = false;
 		    }
 		    else {
 			hash_put(r_to_ud,  r,
 				 (void*)(intptr_t)(first_reference? 
 					   is_action_write : is_action_read));
-			first_reference = FALSE;
+			first_reference = false;
 			if(!reference_conflicting_test_and_update(r, dg, 
 								  v_to_lllv, 
 								  llv_to_lcr,
@@ -394,7 +394,7 @@ hash_table v_to_lllv;
  * had to be fused. This is not likely to happen with real code. In that
  * case, the function would stop with pips_error().
  */
-boolean reference_conflicting_test_and_update(r, dg, 
+bool reference_conflicting_test_and_update(r, dg, 
 					      v_to_lllv, llv_to_lcr,
 					      r_to_llv, r_to_ud)
 reference r;
@@ -408,7 +408,7 @@ hash_table r_to_ud;
     entity rv;				/* referenced variable */
     list lllv;
     list cllv;
-    boolean conflicting = FALSE;
+    bool conflicting = false;
 
     debug(8,"reference_conflicting_test_and_update", "begin\n");
 
@@ -428,7 +428,7 @@ hash_table r_to_ud;
 	      r, entity_local_name(rv));
 
 	debug(8,"reference_conflicting_test_and_update", "return FALSE\n");
-	return FALSE;
+	return false;
     }
 
     for(cllv = lllv; !ENDP(cllv); POP(cllv)) {
@@ -471,7 +471,7 @@ hash_table r_to_ud;
 			  "reference equality and same use, return TRUE\n");
 		}
 		hash_put(r_to_llv, (char *) r, (char *) llv);
-		return TRUE;
+		return true;
 	    }
 	    else if(reference_conflicting_p(r, r2, dg)) {
 		if(conflicting) {
@@ -485,7 +485,7 @@ hash_table r_to_ud;
 		    pips_internal_error("local variable merge not implemented");
 		}
 		else {
-		    conflicting = TRUE;
+		    conflicting = true;
 		    /* update llv_to_lcr by side-effect */
 		    lcr = gen_nconc(lcr, CONS(REFERENCE, r, NIL));
 		    hash_put(r_to_llv, (char *) r, (char *) llv);
@@ -506,7 +506,7 @@ hash_table r_to_ud;
     return conflicting;
 }
 
-boolean reference_conflicting_p(r1,r2,dg)
+bool reference_conflicting_p(r1,r2,dg)
 reference r1,r2;
 graph dg;
 {
@@ -561,14 +561,14 @@ graph dg;
 		if( (reference_equal_p(r11,r1) &&  reference_equal_p(r21,r2))
 		   || (reference_equal_p(r11,r2) && reference_equal_p(r21,r1)) ) {
 		    debug(8,"reference_conflicting_p","return TRUE\n");
-		    return TRUE;
+		    return true;
 		}
 	    },conf_list);
 	},ver2);
     },ver1);
 
     debug(8,"reference_conflicting_p","return FALSE\n");
-    return FALSE;
+    return false;
 }
 
 /* Psysteme make_tile_constraints(P, b):
@@ -697,7 +697,7 @@ int dimn;
     list rvld;			/* referenced variable dimension list */
     int d = -1;			/* dimension number */
     list lvd = NIL;		/* dimensions for the local variables */
-    boolean first_ref;
+    bool first_ref;
     matrice P = (matrice) tiling_tile(tile);
     debug(8,"set_dimensions_of_local_variable_family","begin\n");
 
@@ -730,7 +730,7 @@ int dimn;
 	    value_decrement(gmax);
 	    imax = gmax;
 	}
-	first_ref = TRUE;
+	first_ref = true;
 	for(cr = lr; !ENDP(cr); POP(cr)) {
 	    entity phi = make_phi_entity(d);
 	    expression e;
@@ -788,7 +788,7 @@ int dimn;
 		gmax = first_ref? value_min(gmax, max): value_max(gmax, max);
 		
 		if (value_gt(gmin,gmax)) gmax = gmin;
-		first_ref=FALSE;		
+		first_ref=false;		
 	    }
 	}
 	dimd = make_dimension(int_to_expression(VALUE_TO_INT(gmin)),

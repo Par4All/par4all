@@ -232,12 +232,12 @@ static void add_declaration_information(transformer pre, entity m, bool precondi
 
 static void transformer_add_declaration_information(transformer pre, entity m)
 {
-  add_declaration_information(pre, m, FALSE);
+  add_declaration_information(pre, m, false);
 }
 
 static void precondition_add_declaration_information(transformer pre, entity m)
 {
-  add_declaration_information(pre, m, TRUE);
+  add_declaration_information(pre, m, true);
 }
 
 /* Functions to make transformers */
@@ -247,25 +247,25 @@ bool transformers_intra_fast(char * module_name)
   bool si = get_bool_property(SEMANTICS_INTERPROCEDURAL);
   bool sfs = get_bool_property(SEMANTICS_FLOW_SENSITIVE);
   bool sfp = get_bool_property(SEMANTICS_FIX_POINT);
-  bool result = TRUE;
+  bool result = true;
 
   /* Set properties as required for a very fast semantics analysis */
   if(si) {
     pips_user_warning("Property SEMANTICS_INTERPROCEDURAL is ignored\n");
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, false);
   }
   if(!sfs) {
     pips_user_warning("Property SEMANTICS_FLOW_SENSITIVE is ignored\n");
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
   }
   if(sfp) {
     pips_user_warning("Property SEMANTICS_FIX_POINT is ignored\n");
-    set_bool_property(SEMANTICS_FIX_POINT, FALSE);
+    set_bool_property(SEMANTICS_FIX_POINT, false);
   }
   /* No need to select a fix point operator given the above property, but just in case... */
   select_fix_point_operator();
 
-  set_bool_property(SEMANTICS_STDOUT, FALSE);
+  set_bool_property(SEMANTICS_STDOUT, false);
   /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
 
   if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
@@ -278,44 +278,44 @@ bool transformers_intra_fast(char * module_name)
 
   /* Restaure initial values of modified properties */
   if(si)
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
   if(!sfs)
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, FALSE);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, false);
   if(sfp)
-    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+    set_bool_property(SEMANTICS_FIX_POINT, true);
 
   return result;
 }
 
 bool transformers_intra_full(char * module_name)
 {
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, false);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+    set_bool_property(SEMANTICS_FIX_POINT, true);
     select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    set_bool_property(SEMANTICS_STDOUT, false);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_transformers(module_name);
 }
 
 bool transformers_inter_fast(char * module_name)
 {
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-    set_bool_property(SEMANTICS_FIX_POINT, FALSE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+    set_bool_property(SEMANTICS_FIX_POINT, false);
     select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    set_bool_property(SEMANTICS_STDOUT, false);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_transformers(module_name);
 }
 
 bool transformers_inter_full(char * module_name)
 {
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+    set_bool_property(SEMANTICS_FIX_POINT, true);
     select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    set_bool_property(SEMANTICS_STDOUT, false);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_transformers(module_name);
 }
@@ -324,20 +324,20 @@ bool transformers_inter_full(char * module_name)
    interprocedural analysis is performed. For intraprocedural analyses,
    using property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT is
    sufficient. */
-bool refine_transformers_p = FALSE;
+bool refine_transformers_p = false;
 
 bool refine_transformers(char * module_name)
 {
   bool res;
-  set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
-  set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-  set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+  set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
+  set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+  set_bool_property(SEMANTICS_FIX_POINT, true);
   select_fix_point_operator();
-  set_bool_property(SEMANTICS_STDOUT, FALSE);
+  set_bool_property(SEMANTICS_STDOUT, false);
   /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-  refine_transformers_p = TRUE;
+  refine_transformers_p = true;
   res = module_name_to_transformers_in_context(module_name);
-  refine_transformers_p = FALSE;
+  refine_transformers_p = false;
   return res;
 }
 
@@ -350,7 +350,7 @@ bool summary_transformer(char * module_name)
      module_name_to_transformers(). The choice does not have to be
      consistent with the similar choice made for summary_precondition. */
   pips_debug(1, "considering module %s\n", module_name);
-  return TRUE;
+  return true;
 }
 
 bool preconditions_intra(char * module_name)
@@ -358,15 +358,15 @@ bool preconditions_intra(char * module_name)
     /* nothing to do: transformers are preconditions for this
        intraprocedural option */
 
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, false);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
     /* Maybe we should have an intra fast and an intra full as with other
        semantics entries */
-    /* set_bool_property(SEMANTICS_FIX_POINT, FALSE); */
-    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    /* set_bool_property(SEMANTICS_FIX_POINT, false); */
+    set_bool_property(SEMANTICS_FIX_POINT, true);
+    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, false);
     select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    set_bool_property(SEMANTICS_STDOUT, false);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_preconditions(module_name);
 }
@@ -376,63 +376,63 @@ bool preconditions_intra_fast(char * module_name)
     /* nothing to do: transformers are preconditions for this
        intraprocedural option */
 
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, false);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
     /* Maybe we should have an intra fast and an intra full as with other
        semantics entries */
-    /* set_bool_property(SEMANTICS_FIX_POINT, FALSE); */
-    set_bool_property(SEMANTICS_FIX_POINT, FALSE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    /* set_bool_property(SEMANTICS_FIX_POINT, false); */
+    set_bool_property(SEMANTICS_FIX_POINT, false);
+    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, false);
     select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    set_bool_property(SEMANTICS_STDOUT, false);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_preconditions(module_name);
 }
 
 bool preconditions_inter_fast(char * module_name)
 {
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-    set_bool_property(SEMANTICS_FIX_POINT, FALSE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+    set_bool_property(SEMANTICS_FIX_POINT, false);
+    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, false);
     select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    set_bool_property(SEMANTICS_STDOUT, false);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_preconditions(module_name);
 }
 
 bool preconditions_inter_full(char * module_name)
 {
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+    set_bool_property(SEMANTICS_FIX_POINT, true);
+    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, false);
     select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    set_bool_property(SEMANTICS_STDOUT, false);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_preconditions(module_name);
 }
 
 bool total_preconditions_intra(char * module_name)
 {
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, false);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+    set_bool_property(SEMANTICS_FIX_POINT, true);
+    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, false);
     select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    set_bool_property(SEMANTICS_STDOUT, false);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_total_preconditions(module_name);
 }
 
 bool total_preconditions_inter(char * module_name)
 {
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
+    set_bool_property(SEMANTICS_FIX_POINT, true);
+    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, false);
     select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    set_bool_property(SEMANTICS_STDOUT, false);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_total_preconditions(module_name);
 }
@@ -455,7 +455,7 @@ bool old_summary_precondition(char * module_name)
     /* touch it */
     t = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
 					     module_name,
-					     TRUE);
+					     true);
   }
   else {
     t = transformer_identity();
@@ -473,13 +473,13 @@ bool old_summary_precondition(char * module_name)
 
   debug_off();
 
-  return TRUE;
+  return true;
 }
 
 bool intraprocedural_summary_precondition(char * module_name)
 {
   /* The current module is sufficient to derive it. */
-  set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
+  set_bool_property(SEMANTICS_INTERPROCEDURAL, false);
   return summary_precondition(module_name);
 }
 
@@ -487,7 +487,7 @@ bool interprocedural_summary_precondition(char * module_name)
 {
   /* The DATA statement from all modules, called or not called, are used,
      as well as the preconditions at all call sites. */
-  set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
+  set_bool_property(SEMANTICS_INTERPROCEDURAL, true);
   return summary_precondition(module_name);
 }
 
@@ -505,7 +505,7 @@ static transformer main_summary_precondition(entity callee)
 
   if (get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
     t = copy_transformer((transformer)
-      db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE));
+      db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", false));
     if(transformer_empty_p(t)) {
       pips_user_warning(
 			"Initial preconditions are not consistent.\n"
@@ -522,7 +522,7 @@ static transformer main_summary_precondition(entity callee)
     t = copy_transformer
       ((transformer) db_get_memory_resource(DBR_INITIAL_PRECONDITION,
 					    module_local_name(callee),
-					    FALSE));
+					    false));
   }
 
   return t;
@@ -552,7 +552,7 @@ static transformer ordinary_summary_precondition(string module_name,
      */
     callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
 						       module_name,
-						       TRUE);
+						       true);
     list lc = callees_callees(callers);
 
     ifdebug(1) {
@@ -620,7 +620,7 @@ bool summary_precondition(char * module_name)
   debug_on(SEMANTICS_DEBUG_LEVEL);
 
   set_current_module_entity(callee);
-  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));
 
   if(entity_main_module_p(callee)) {
     t = main_summary_precondition(callee);
@@ -637,9 +637,9 @@ bool summary_precondition(char * module_name)
    * summary transformer as an input validity condition.
    *
    */
-  if(FALSE && get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
+  if(false && get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
     set_cumulated_rw_effects((statement_effects)
-			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     module_to_value_mappings( get_current_module_entity() );
     transformer_add_declaration_information(t,
 					    get_current_module_entity());
@@ -673,7 +673,7 @@ bool summary_precondition(char * module_name)
   reset_current_module_entity();
   debug_off();
 
-  return TRUE;
+  return true;
 }
 
 bool summary_total_postcondition(char * module_name)
@@ -682,14 +682,14 @@ bool summary_total_postcondition(char * module_name)
    */
   callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
 						     module_name,
-						     TRUE);
+						     true);
   entity callee = module_name_to_entity(module_name);
   /* transformer t = transformer_identity(); */
   transformer t = transformer_undefined;
 
   debug_on(SEMANTICS_DEBUG_LEVEL);
 
-  pips_assert("Not implemented yet", FALSE);
+  pips_assert("Not implemented yet", false);
 
   set_current_module_entity(callee);
 
@@ -739,11 +739,11 @@ bool summary_total_postcondition(char * module_name)
    * summary transformer as an input validity condition.
    *
    */
-  if(FALSE && get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
+  if(false && get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
     set_current_module_statement(
-				 (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+				 (statement) db_get_memory_resource(DBR_CODE, module_name, true));
     set_cumulated_rw_effects((statement_effects)
-			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     module_to_value_mappings( get_current_module_entity() );
     transformer_add_declaration_information(t,
 					    get_current_module_entity());
@@ -766,7 +766,7 @@ bool summary_total_postcondition(char * module_name)
   reset_current_module_entity();
   debug_off();
 
-  return TRUE;
+  return true;
 }
 
 bool summary_total_precondition(char * module_name)
@@ -774,7 +774,7 @@ bool summary_total_precondition(char * module_name)
     /* there is a choice: do nothing and leave the effective computation
        in module_name_to_total_preconditions or move it here */
   pips_debug(1, "considering module %s\n", module_name);
-  return TRUE;
+  return true;
 }
 
 
@@ -797,22 +797,22 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     set_current_module_entity(module_name_to_entity(module_name));
     /* could be a gen_find_tabulated as well... */
     set_current_module_statement(
-	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+	(statement) db_get_memory_resource(DBR_CODE, module_name, true));
     if( get_current_module_statement() == (statement) database_undefined )
 	pips_internal_error("no statement for module %s", module_name);
 
     set_proper_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
 
     set_cumulated_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
     set_methods_for_simple_effects();
 
     /* cumulated_effects_map_print();*/
 
     e_inter = effects_to_list( (effects)
-	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
+	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, true));
 
     set_transformer_map( MAKE_STATEMENT_MAPPING() );
 
@@ -827,7 +827,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
       if (get_bool_property(SEMANTICS_INTERPROCEDURAL))
       {
 	mod_pre = (transformer)
-	  db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
+	  db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", false);
 	if(transformer_empty_p(mod_pre)) {
 	  pips_user_warning(
 	     "Initial preconditions are not consistent.\n"
@@ -858,7 +858,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
        transformers cannot propagate enough information. */
     if(in_context) {
      set_precondition_map( (statement_mapping)
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
    }
 
     /* compute intraprocedural transformer */
@@ -900,22 +900,22 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     sc_variable_name_pop();
     debug_off();
 
-    return TRUE;
+    return true;
 }
 
 bool module_name_to_transformers_in_context(char *module_name)
 {
-  bool rc = FALSE;
+  bool rc = false;
   bool save_prop = get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT");
 
   if(!save_prop) {
     pips_user_warning("Although property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT"
 		      " is not set, it is used because it is necessary for this "
 		      "recomputation to be useful\n");
-    set_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT", TRUE);
+    set_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT", true);
   }
 
-  rc = generic_module_name_to_transformers(module_name, TRUE);
+  rc = generic_module_name_to_transformers(module_name, true);
 
   set_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT", save_prop);
   return rc;
@@ -923,8 +923,8 @@ bool module_name_to_transformers_in_context(char *module_name)
 
 bool module_name_to_transformers(char *module_name)
 {
-  bool rc = FALSE;
-  rc = generic_module_name_to_transformers(module_name, FALSE);
+  bool rc = false;
+  rc = generic_module_name_to_transformers(module_name, false);
   return rc;
 }
 
@@ -945,23 +945,23 @@ bool module_name_to_preconditions(char *module_name)
     set_current_module_entity(module_name_to_entity(module_name) );
     /* could be a gen_find_tabulated as well... */
     set_current_module_statement(
-	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+	(statement) db_get_memory_resource(DBR_CODE, module_name, true));
     if(get_current_module_statement() == (statement) database_undefined)
 	pips_internal_error("no statement for module %s", module_name);
 
     /* Used to add reference information when it is trusted... which
        should always be, at least for automatic parallelization. */
     set_proper_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
 
     /* cumulated effects are used to compute the value mappings */
     set_cumulated_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
     set_methods_for_simple_effects();
 
     set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE));
+	db_get_memory_resource(DBR_TRANSFORMERS, module_name, true));
 
 
     /* p_inter is not used!!! FI, 9 February 1994 */
@@ -969,12 +969,12 @@ bool module_name_to_preconditions(char *module_name)
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
 	p_inter = (transformer)
 	    db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
-				   module_name, TRUE);
+				   module_name, true);
     }
     */
 
     t_inter = (transformer)
-	db_get_memory_resource(DBR_SUMMARY_TRANSFORMER, module_name, TRUE);
+	db_get_memory_resource(DBR_SUMMARY_TRANSFORMER, module_name, true);
 
     /* debug_on(SEMANTICS_DEBUG_LEVEL); */
 
@@ -1039,7 +1039,7 @@ bool module_name_to_preconditions(char *module_name)
     sc_variable_name_pop();
     debug_off();
 
-    return TRUE;
+    return true;
 }
 
 bool module_name_to_total_preconditions(char *module_name)
@@ -1055,28 +1055,28 @@ bool module_name_to_total_preconditions(char *module_name)
 
   set_current_module_entity(module_name_to_entity(module_name) );
   set_current_module_statement(
-			       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+			       (statement) db_get_memory_resource(DBR_CODE, module_name, true));
   if(get_current_module_statement() == (statement) database_undefined)
     pips_internal_error("no statement for module %s", module_name);
 
   set_proper_rw_effects((statement_effects)
-			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
 
   set_cumulated_rw_effects((statement_effects)
-			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
   e_inter = effects_to_list((effects)
-			    db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
+			    db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, true));
 
   set_transformer_map( (statement_mapping)
-		       db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE));
+		       db_get_memory_resource(DBR_TRANSFORMERS, module_name, true));
 
   set_precondition_map( (statement_mapping)
-		       db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+		       db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
 
 
   t_inter = (transformer)
-    db_get_memory_resource(DBR_SUMMARY_TRANSFORMER, module_name, TRUE);
+    db_get_memory_resource(DBR_SUMMARY_TRANSFORMER, module_name, true);
 
   set_total_precondition_map( MAKE_STATEMENT_MAPPING() );
 
@@ -1162,7 +1162,7 @@ bool module_name_to_total_preconditions(char *module_name)
   sc_variable_name_pop();
   debug_off();
 
-  return TRUE;
+  return true;
 }
 
 
@@ -1192,7 +1192,7 @@ transformer load_summary_transformer(entity e)
 	t = (transformer)
 	    db_get_memory_resource(DBR_SUMMARY_TRANSFORMER,
 				   entity_local_name(e),
-				   TRUE);
+				   true);
 
 	/* db_get_memory_resource never returns database_undefined or
 	   resource_undefined */
@@ -1210,7 +1210,7 @@ transformer load_summary_transformer(entity e)
 	list el = effects_effects((effects)
 				  db_get_memory_resource(DBR_SUMMARY_EFFECTS,
 							 entity_local_name(e),
-							 TRUE));
+							 true));
 	t = effects_to_transformer(el);
       }
     }
@@ -1240,7 +1240,7 @@ void update_summary_precondition(entity e, transformer t)
 
     t_old = (transformer)
 	db_get_memory_resource(DBR_SUMMARY_PRECONDITION, module_local_name(e),
-			       TRUE);
+			       true);
 
     ifdebug(8) {
 	debug(8, "update_summary_precondition", " old precondition for %s:\n",
@@ -1282,7 +1282,7 @@ transformer load_summary_precondition(entity e)
 
   t = (transformer)
     db_get_memory_resource(DBR_SUMMARY_PRECONDITION, module_local_name(e),
-			   TRUE);
+			   true);
   /* Not done earlier, because the value mappings were not available. On
      the other hand, htis assumes that the value mappings have been
      initialized before a call to load_summary_precondition(0 is
@@ -1315,7 +1315,7 @@ transformer load_summary_total_postcondition(entity e)
 
     t_post = (transformer)
 	db_get_memory_resource(DBR_SUMMARY_TOTAL_POSTCONDITION, module_local_name(e),
-			       TRUE);
+			       true);
 
     pips_assert("t is defined", t_post != transformer_undefined);
 
@@ -1339,7 +1339,7 @@ list load_summary_effects(entity e)
 
     t = effects_to_list( (effects)
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_local_name(e),
-			       TRUE));
+			       true));
 
     pips_assert("load_summary_effects", t != list_undefined);
 

@@ -69,8 +69,8 @@ static graph dependence_graph;
    the given statement s.
 
    @return :
-   - FALSE if rv is not considered as such;
-   - TRUE if yes, change index_relation to the Pvector of the transformer
+   - false if rv is not considered as such;
+   - true if yes, change index_relation to the Pvector of the transformer
      that represents the index evolution and initial_rv points to the initial
      variable of rv in the transformer.
 */
@@ -82,7 +82,7 @@ find_simple_for_like_variable(statement s,
   pips_debug(5, "Look for variable %s (%p)\n", entity_global_name(rv), rv);
   transformer t = load_statement_semantic(s);
   ifdebug(5) {
-    dump_text(text_for_a_transformer(t, TRUE));
+    dump_text(text_for_a_transformer(t, true));
     print_statement(s);
   }
   /* Look for the referenced variable in the transformer argument: */
@@ -99,7 +99,7 @@ find_simple_for_like_variable(statement s,
 	char crt_line[MAX_LINE_LENGTH];
 
 	system_text_format(crt_line, ">", txt, ps,
-			   (char * (*)(Variable)) pips_user_value_name, FALSE);
+			   (char * (*)(Variable)) pips_user_value_name, false);
 	fputs(text_to_string(txt), stderr);
       }
 
@@ -108,9 +108,9 @@ find_simple_for_like_variable(statement s,
 	   equality != NULL;
 	   equality = equality->succ) {
 	/* For the pattern matching: */
-	bool found_value_for_current_variable = FALSE;
-	bool found_old_value_for_current_variable = FALSE;
-	bool found_value_for_another_variable_in_transformer = FALSE;
+	bool found_value_for_current_variable = false;
+	bool found_old_value_for_current_variable = false;
+	bool found_value_for_another_variable_in_transformer = false;
 
 	pips_debug(5, "Equality : %p\n", equality);
 	for (Pvecteur v = contrainte_vecteur(equality);
@@ -129,7 +129,7 @@ find_simple_for_like_variable(statement s,
 	    if (var == e) {
 	      pips_debug(5, "We have found a reference to the variable"
 			 " in the transformer\n");
-	      found_value_for_current_variable = TRUE;
+	      found_value_for_current_variable = true;
 	    }
 	    else if (local_old_value_entity_p(var)
 		     && value_to_variable(var) == e
@@ -137,7 +137,7 @@ find_simple_for_like_variable(statement s,
 	      pips_debug(5, "We have found a reference to the initial value"
 			 " of the variable in the transformer"
 			 " with a factor +/- 1\n");
-	      found_old_value_for_current_variable = TRUE;
+	      found_old_value_for_current_variable = true;
 	      *initial_rv = var;
 	    }
 	    else if (gen_in_list_p(var, transformer_arguments(t))) {
@@ -146,7 +146,7 @@ find_simple_for_like_variable(statement s,
 	      /* That means that the variable e evolved according to
 		 another variable var, so it is not a simple for
 		 loop. Just skipping... */
-	      found_value_for_another_variable_in_transformer = TRUE;
+	      found_value_for_another_variable_in_transformer = true;
 	      break;
 	    }
 	    /* Else it should be a reference to a variable that is loop
@@ -162,12 +162,12 @@ find_simple_for_like_variable(statement s,
 		     );
 	  /* Return the found relation that modelizes the index behaviour: */
 	  *index_relation = contrainte_vecteur(equality);
-	  return TRUE;
+	  return true;
 	}
       }
     }
   }
-  return FALSE;
+  return false;
 }
 
 
@@ -296,7 +296,7 @@ try_to_recover_for_loop_in_a_while(whileloop wl) {
 	  make_assign_statement(entity_to_expression(rv),
 				entity_to_expression(new_index));
 	statement for_loop_body = whileloop_body(wl);
-	insert_statement(for_loop_body, copy_new_index_to_old, TRUE);
+	insert_statement(for_loop_body, copy_new_index_to_old, true);
 
 	forloop f = make_forloop(init, cond, inc, for_loop_body);
 	/* Modify the enclosing instruction to be a for-loop instead. It
@@ -340,7 +340,7 @@ recover_for_loop(char * module_name) {
 
   /* Get the true ressource, not a copy, since we modify it in place. */
   module_statement =
-    (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   set_current_module_statement(module_statement);
   entity mod = module_name_to_entity(module_name);
@@ -354,21 +354,21 @@ recover_for_loop(char * module_name) {
   set_proper_rw_effects((statement_effects)
 			db_get_memory_resource(DBR_PROPER_EFFECTS,
 					       module_name,
-					       TRUE));
+					       true));
 
   /* To set up the hash table to translate value into value names */
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource(DBR_CUMULATED_EFFECTS,
-						  module_name, TRUE));
+						  module_name, true));
 
   /* Get the transformers of the module: */
   set_semantic_map((statement_mapping)
 		   db_get_memory_resource(DBR_TRANSFORMERS,
 					  module_name,
-					  TRUE));
+					  true));
 
   transformer summary = (transformer)
-    db_get_memory_resource(DBR_SUMMARY_TRANSFORMER, module_name, TRUE);
+    db_get_memory_resource(DBR_SUMMARY_TRANSFORMER, module_name, true);
 
   /* Build all the mapping needed by the transformer usage: */
   module_to_value_mappings(mod);
@@ -385,14 +385,14 @@ recover_for_loop(char * module_name) {
    */
   /*
     dependence_graph =
-    (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+    (graph) db_get_memory_resource(DBR_DG, module_name, true);
   */
 
   /* Get the use-def chains */
   /*
     Not used yet
     dependence_graph =
-    (graph) db_get_memory_resource(DBR_CHAINS, module_name, TRUE);
+    (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
   */
 
   debug_on("RECOVER_FOR_LOOP_DEBUG_LEVEL");
@@ -420,5 +420,5 @@ recover_for_loop(char * module_name) {
   free_value_mappings();
 
   /* Should have worked: */
-  return TRUE;
+  return true;
 }

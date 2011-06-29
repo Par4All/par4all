@@ -703,7 +703,7 @@ void my_matrices_to_constraints_with_sym_cst(pc, new_base, index_base,
  Pcontrainte  cp, newpc = NULL;
  int          i, j;
  Value cst, coeff, dena, denb, ppc;
- boolean      found;
+ bool      found;
  list         lnew = gen_nreverse(base_to_list(new_base));
  entity       ent;
 
@@ -717,7 +717,7 @@ void my_matrices_to_constraints_with_sym_cst(pc, new_base, index_base,
 
  for (i = n; i >= 1; i--)
     {
-     found = FALSE;
+     found = false;
      cp = contrainte_new();
 
      /* build the constant terme if it exists */
@@ -726,7 +726,7 @@ void my_matrices_to_constraints_with_sym_cst(pc, new_base, index_base,
 	 Value x = value_mult(ppc,cst);
 	 value_division(x, denb);
          pv = vect_new(TCST, x);
-         found = TRUE;
+         found = true;
      }
 
      vect = index_base;
@@ -742,7 +742,7 @@ void my_matrices_to_constraints_with_sym_cst(pc, new_base, index_base,
 	      {
                /* build a new vecteur if there is not constant term */
                pv = vect_new(vecteur_var(vect), x);
-               found = TRUE;
+               found = true;
               }
 	   }
         }
@@ -760,7 +760,7 @@ void my_matrices_to_constraints_with_sym_cst(pc, new_base, index_base,
 	      {
                /* build a new vecteur if there is not constant term */
                pv = vect_new(vecteur_var(vect), x);
-               found = TRUE;
+               found = true;
               }
 	   }
         }
@@ -816,7 +816,7 @@ void my_matrices_to_constraints_with_sym_cst_2(pc, new_base, index_base,
  Pcontrainte  cp, newpc = NULL;
  int          i, j;
  Value cst, coeff, dena, denb, ppc;
- boolean      found;
+ bool      found;
 
  int n= MATRIX_NB_LINES(A);
  int m1 = MATRIX_NB_COLUMNS(A);
@@ -828,7 +828,7 @@ void my_matrices_to_constraints_with_sym_cst_2(pc, new_base, index_base,
 
  for (i = n; i >= 1; i--)
     {
-     found = FALSE;
+     found = false;
      cp = contrainte_new();
 
      /* build the constant terme if it exists */
@@ -837,7 +837,7 @@ void my_matrices_to_constraints_with_sym_cst_2(pc, new_base, index_base,
 	 Value x = value_div(ppc,denb);
 	 value_product(x, cst);
 	 pv = vect_new(TCST,  x);
-	 found = TRUE;
+	 found = true;
      }
 
      vect = index_base;
@@ -853,7 +853,7 @@ void my_matrices_to_constraints_with_sym_cst_2(pc, new_base, index_base,
 	      {
                /* build a new vecteur if there is not constant term */
                pv = vect_new(vecteur_var(vect), x);
-               found = TRUE;
+               found = true;
               }
 	   }
         }
@@ -871,7 +871,7 @@ void my_matrices_to_constraints_with_sym_cst_2(pc, new_base, index_base,
 	      {
                /* build a new vecteur if there is not constant term */
                pv = vect_new(vecteur_var(vect), x);
-               found = TRUE;
+               found = true;
               }
 	   }
         }
@@ -965,15 +965,15 @@ Psysteme sc_reverse_constraints(ps)
 
 
 /*=======================================================================*/
-/* boolean vars_in_vect_p(Pvecteur pv, list vars):
+/* bool vars_in_vect_p(Pvecteur pv, list vars):
  *
- * returns TRUE if the vector "vec" contains at least one of the variables
+ * returns true if the vector "vec" contains at least one of the variables
  * of "vars". Else, returns FALSE.  */
-boolean vars_in_vect_p(pv, vars)
+bool vars_in_vect_p(pv, vars)
      Pvecteur pv;
      list vars;
 {
-  boolean no_var = TRUE;
+  bool no_var = true;
   list lv;
 
   if(!VECTEUR_NUL_P(pv)) {
@@ -981,7 +981,7 @@ boolean vars_in_vect_p(pv, vars)
       entity cv = ENTITY(CAR(lv));
 
       if(value_notzero_p(vect_coeff((Variable) cv, pv)))
-	no_var = FALSE;
+	no_var = false;
     }
   }
   return(! no_var);
@@ -1029,12 +1029,12 @@ int max_or_min;
 
 /*====================================================================*/
 /*
- * boolean min_or_max_expression_p(expression exp)
+ * bool min_or_max_expression_p(expression exp)
  *
- * Returns TRUE if this expression ("exp") is a call to the MAX or MIN
+ * Returns true if this expression ("exp") is a call to the MAX or MIN
  * function. Else, returns FALSE.
  */
-boolean min_or_max_expression_p(exp)
+bool min_or_max_expression_p(exp)
 expression exp;
 {
   syntax sy;
@@ -1043,7 +1043,7 @@ expression exp;
 
   sy = expression_syntax(exp);
   if(syntax_tag(sy) != is_syntax_call)
-    return(FALSE);
+    return(false);
 
   ca = syntax_call(sy);
   func = call_function(ca);
@@ -1269,37 +1269,37 @@ Psysteme     ps;
 
 
 /*=========================================================================*/
-/* boolean is_vect_constant_p(v): test if a vecteur is constant.
+/* bool is_vect_constant_p(v): test if a vecteur is constant.
  *
  * AC 94/07/01
  */
 
-boolean is_vect_constant_p(v)
+bool is_vect_constant_p(v)
 Pvecteur v;
 {
   if (VECTEUR_NUL_P(v))
-    return(TRUE);
+    return(true);
   else {
     if ((v->var == TCST)&&(v->succ == NULL))
-      return(TRUE);
+      return(true);
     else
-      return(FALSE);
+      return(false);
   }
 }
 
 /*=========================================================================*/
-/* boolean cst_vector_p(Pvecteur v, Pbase b)
+/* bool cst_vector_p(Pvecteur v, Pbase b)
  *
  * Tests if a vector is constant, i.e. does not depend on one of the
  * variables given in b.
  *
  * AC 94/07/01 */
 
-boolean cst_vector_p(v, b)
+bool cst_vector_p(v, b)
 Pvecteur v;
 Pbase b;
 {
-  boolean not_found = TRUE;
+  bool not_found = true;
   Pvecteur av;
 
   if (!VECTEUR_NUL_P(v)) {
@@ -1362,17 +1362,17 @@ list le;
 
 
 /*=======================================================================*/
-/* boolean array_ref_exp_p(e)
+/* bool array_ref_exp_p(e)
  *
  * Tests if an expression is an array, that is we test the field
  * "reference" of the expression which should not be empty.
  * 
  * AC 94/07/28 */
 
-boolean array_ref_exp_p(e)
+bool array_ref_exp_p(e)
 expression   e;
 {
-  boolean      b = FALSE;
+  bool      b = false;
 
   if(syntax_reference_p(expression_syntax(e)))  {
     reference r = syntax_reference(expression_syntax(e));

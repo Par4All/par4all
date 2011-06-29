@@ -113,7 +113,7 @@ transformer generic_reference_to_transformer(entity v,
      || entity_has_values_p(rv)) {
     entity rv_new = is_internal?
     entity_to_new_value(rv) : external_entity_to_new_value(rv);
-    tf =  simple_equality_to_transformer(v, rv_new, FALSE);
+    tf =  simple_equality_to_transformer(v, rv_new, false);
   }
   else { /* If you are dealing with a C array reference, find
 	    transformers for each subscript expression in case of
@@ -251,7 +251,7 @@ transformer any_basic_update_operation_to_transformer(entity tmp, entity v, enti
   tf = any_assign_operation_to_transformer(v,
 					   args,
 					   transformer_undefined,
-					   FALSE); 
+					   false); 
   if(ENTITY_POST_INCREMENT_P(op) || ENTITY_POST_DECREMENT_P(op))
     tf = transformer_add_equality(tf, entity_to_old_value(v), tmp);
   else
@@ -386,7 +386,7 @@ transformer any_assign_operation_to_transformer(entity tmp,
 	entity v_old = entity_to_old_value(v);
 	entity tmp2 = make_local_temporary_value_entity(entity_type(v));
 
-	tf = any_expression_to_transformer(tmp2, rhs, pre, TRUE);
+	tf = any_expression_to_transformer(tmp2, rhs, pre, true);
 
 	if(!transformer_undefined_p(tf)) {
 
@@ -396,7 +396,7 @@ transformer any_assign_operation_to_transformer(entity tmp,
 	  if(entity_is_argument_p(v, transformer_arguments(tf))) {
 	    /* Is it standard compliant? The assigned variable is
 	       modified by the rhs. */
-	    transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
+	    transformer teq = simple_equality_to_transformer(v, tmp, true);
 	    string s =
 	      words_to_string(words_syntax(expression_syntax(rhs),NIL));
 
@@ -425,7 +425,7 @@ transformer any_assign_operation_to_transformer(entity tmp,
 
 	    transformer_add_modified_variable(tf, v_repr);
 	  }
-	  //tf = generic_equality_to_transformer(tmp, tmp2, FALSE, FALSE);
+	  //tf = generic_equality_to_transformer(tmp, tmp2, false, false);
 	  //tf = transformer_combine(tf, tfe);
 	}
       }
@@ -520,7 +520,7 @@ static transformer constant_to_transformer(entity v,
 
 	  if(llhs==-1 || llhs >= lrhs) {
 	    /* Implicitly sufficient length or implicit padding with SPACEs */
-	    tf = simple_equality_to_transformer(v, f, FALSE);
+	    tf = simple_equality_to_transformer(v, f, false);
 	  }
 	  else {
 	    /* Take the prefix of the constant. Expect problems with PIPS quotes... */
@@ -532,7 +532,7 @@ static transformer constant_to_transformer(entity v,
 	    pips_assert("A simple or a double quote is used", *n=='"' || *n=='\'');
 	    *(n+llhs+2) = 0;
 	    f1 = make_constant_entity(n, is_basic_string, llhs);
-	    tf = simple_equality_to_transformer(v, f1, FALSE);
+	    tf = simple_equality_to_transformer(v, f1, false);
 	  }
 	}
 	else {
@@ -542,7 +542,7 @@ static transformer constant_to_transformer(entity v,
       }
       else {
 	/* This is not a constant string */
-	tf = simple_equality_to_transformer(v, f, FALSE);
+	tf = simple_equality_to_transformer(v, f, false);
       }
     }
   }
@@ -558,7 +558,7 @@ static transformer constant_to_transformer(entity v,
 #   define DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN 7
 
 /* call transformer_add_condition_information_updown() recursively
- * on both sub-expressions if veracity == TRUE; else
+ * on both sub-expressions if veracity == true; else
  * try your best...
  *
  */
@@ -618,9 +618,9 @@ transformer_add_anded_conditions_updown(
     transformer pre2 = pre;
 
     pre1 = transformer_add_condition_information_updown
-      (pre1, c1, context, FALSE, upwards);
+      (pre1, c1, context, false, upwards);
     pre2 = transformer_add_condition_information_updown
-      (pre2, c2, context, FALSE, upwards);
+      (pre2, c2, context, false, upwards);
     newpre = transformer_convex_hull(pre1, pre2);
 
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
@@ -653,7 +653,7 @@ transformer_add_anded_conditions_updown(
 }
 
 /* call transformer_add_condition_information_updown() recursively on both
- * sub-expressions if veracity == FALSE; else try to do your best...
+ * sub-expressions if veracity == false; else try to do your best...
  *
  * Should be fused with the .AND. case?!? Careful with veracity...
  *
@@ -676,9 +676,9 @@ static transformer transformer_add_ored_conditions_updown(
   if(!veracity) {
     /* compute !(c1||c2) as !c1 && !c2 */
     newpre = transformer_add_condition_information_updown
-      (pre, c1, context, FALSE, upwards);
+      (pre, c1, context, false, upwards);
     newpre = transformer_add_condition_information_updown
-      (newpre, c2, context, FALSE, upwards);
+      (newpre, c2, context, false, upwards);
   }
   else if(!upwards) {
     /* compute (c1||c2) as such */
@@ -686,9 +686,9 @@ static transformer transformer_add_ored_conditions_updown(
     transformer pre2 = pre;
 
     pre1 = transformer_add_condition_information_updown
-      (pre1, c1, context, TRUE, upwards);
+      (pre1, c1, context, true, upwards);
     pre2 = transformer_add_condition_information_updown
-      (pre2, c2, context, TRUE, upwards);
+      (pre2, c2, context, true, upwards);
     newpre = transformer_convex_hull(pre1, pre2);
 
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
@@ -849,7 +849,7 @@ static transformer transformer_add_condition_information_updown(
 	else {
 	  entity tmp_v = make_local_temporary_integer_value_entity();
 	  transformer ct =
-	    safe_integer_expression_to_transformer(tmp_v, c, context, TRUE);
+	    safe_integer_expression_to_transformer(tmp_v, c, context, true);
 	  if(!veracity)
 	    ct = transformer_add_equality_with_integer_constant(ct, tmp_v, 0);
 	  newpre = transformer_apply(ct, pre);
@@ -929,7 +929,7 @@ transformer transformer_add_condition_information(
 {
     transformer post =
 	transformer_add_condition_information_updown(pre, c, context,
-						     veracity, TRUE);
+						     veracity, true);
 
     post = transformer_temporary_value_projection(post);
     reset_temporary_value_counter();
@@ -951,13 +951,13 @@ precondition_add_condition_information(
   if(transformer_undefined_p(context)
      || ENDP(transformer_arguments(context))) {
     post = transformer_add_condition_information_updown
-      (pre, c, context, veracity, FALSE);
+      (pre, c, context, veracity, false);
   }
   else {
     transformer new_context = transformer_range(context);
 
     post = transformer_add_condition_information_updown
-      (pre, c, new_context, veracity, FALSE);
+      (pre, c, new_context, veracity, false);
     free_transformer(new_context);
   }
 
@@ -1099,7 +1099,7 @@ transformer affine_increment_to_transformer(entity e, Pvecteur a)
 {
     transformer tf = transformer_undefined;
 
-    tf = affine_to_transformer(e, a, FALSE);
+    tf = affine_to_transformer(e, a, false);
 
     return tf;
 }
@@ -1383,32 +1383,32 @@ static transformer integer_multiply_to_transformer(entity v,
 	// v <= v1 * lb2, v <= lb1 * v2 (if lb1 and lb2 exist)
 	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
 	tf = transformer_normalize(tf, 2);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,FALSE);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,FALSE);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,false);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,false);
 	if(lb2>INT_MIN)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,TRUE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,true);
 	if(lb1>INT_MIN)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,TRUE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,true);
       }
       else if(lb2>=0) { // e2 is positive
 	// v <= v1 * lb2, v <= ub1 * v2
 	// v >= v1 * ub2, v >= lb1 * v2 (if lb1 and ub2 exist)
 	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
 	tf = transformer_normalize(tf, 2);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,TRUE);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,TRUE);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,true);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,true);
 	if(ub2<INT_MAX)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,FALSE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,false);
 	if(lb1>INT_MIN)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,FALSE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,false);
       }
       else { // if lb2 and ub2 are known and their signs are different
 	if(lb2>INT_MIN && ub2<INT_MAX) {
 	  // v1 * ub2 <= v <= v1 * lb2
 	  tf = transformer_intersection(t1,t2); // FI: not good if side effects!
 	  tf = transformer_normalize(tf, 2);
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,FALSE);
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,TRUE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,false);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,true);
 	  ;
 	}
 	else {
@@ -1423,24 +1423,24 @@ static transformer integer_multiply_to_transformer(entity v,
 	// v <= ub1 * v2, v <= v1 * ub2 (if ub1 and ub2 exist)
 	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
 	tf = transformer_normalize(tf, 2);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,FALSE);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,FALSE);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,false);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,false);
 	if(ub1<INT_MAX)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,TRUE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,true);
 	if(ub2<INT_MAX)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,TRUE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,true);
       }
       else if(ub2<=0) {
 	// v <= v1 * ub2, v <= lb1 * v2
 	// v >= v1 * lb2, v >= ub1 * v2 (if ub1 and lb2 exist)
 	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
 	tf = transformer_normalize(tf, 2);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,TRUE);
-	tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,TRUE);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,true);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,true);
 	if(lb2>INT_MIN)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,FALSE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,false);
 	if(ub1>INT_MAX)
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,FALSE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,false);
 	;
       }
       else {
@@ -1448,8 +1448,8 @@ static transformer integer_multiply_to_transformer(entity v,
 	  // v1 * lb2 <= v <= v1 * ub2
 	  tf = transformer_intersection(t1,t2); // FI: not good if side effects!
 	  tf = transformer_normalize(tf, 2);
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,FALSE);
-	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,TRUE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,false);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,true);
 	}
 	else {
 	  tf = transformer_identity();
@@ -1616,20 +1616,20 @@ static transformer integer_left_shift_to_transformer(entity v,
       if(lb2>=0 && lb1>=1) {
 	// The value of v is greater than the value of v1 multiplied
 	// by 2
-	tf = transformer_add_inequality_with_affine_term(t1, v, v1, 2, 0, FALSE);
+	tf = transformer_add_inequality_with_affine_term(t1, v, v1, 2, 0, false);
       }
       else if(lb2>=0 && lb1==0) {
 	// The value of v is 0
-	tf = transformer_add_inequality(t1, v1, v, FALSE);
+	tf = transformer_add_inequality(t1, v1, v, false);
 	//tf = transformer_add_equality_with_integer_constant(tf, v, 0);
       }
       else if(lb2>0 && ub1<0) {
 	// The value of v is lesser than the value of v1
-	tf = transformer_add_inequality(t1, v, v1, TRUE);
+	tf = transformer_add_inequality(t1, v, v1, true);
       }
       else if(lb2>0 && ub1==0) {
 	// The value of v is lesser than the value of v1
-	tf = transformer_add_inequality(t1, v, v1, FALSE);
+	tf = transformer_add_inequality(t1, v, v1, false);
       }
       else if(ub2<0) {
 	// The value of v is zero
@@ -1640,9 +1640,9 @@ static transformer integer_left_shift_to_transformer(entity v,
       else // nothing is know about v2: the sign of v1 is preserved
 	// To be checked in C standard...
 	if(0<=lb1)
-	  tf = transformer_add_inequality_with_integer_constraint(t1, v, 0, FALSE);
+	  tf = transformer_add_inequality_with_integer_constraint(t1, v, 0, false);
 	else if(ub1<=0)
-	  tf = transformer_add_inequality_with_integer_constraint(t1, v, 0, TRUE);
+	  tf = transformer_add_inequality_with_integer_constraint(t1, v, 0, true);
     }
   }
   else if(!transformer_undefined_p(t1)) {
@@ -1857,7 +1857,7 @@ static transformer min0_to_transformer(entity e,
 				       transformer pre,
 				       bool is_internal)
 {
-  return integer_minmax_to_transformer(e, args, pre, TRUE, is_internal);
+  return integer_minmax_to_transformer(e, args, pre, true, is_internal);
 }
 
 static transformer max0_to_transformer(entity e,
@@ -1865,7 +1865,7 @@ static transformer max0_to_transformer(entity e,
 				       transformer pre,
 				       bool is_internal)
 {
-  return integer_minmax_to_transformer(e, args, pre, FALSE, is_internal);
+  return integer_minmax_to_transformer(e, args, pre, false, is_internal);
 }
 
 /* Returns an undefined transformer in case of failure */
@@ -1883,7 +1883,7 @@ transformer assign_operation_to_transformer(entity val, // assumed to be a value
 
     if(entity_has_values_p(e) /* && integer_scalar_entity_p(e) */) {
       entity ev = entity_to_new_value(e);
-      //transformer teq = simple_equality_to_transformer(val, ev, TRUE);
+      //transformer teq = simple_equality_to_transformer(val, ev, true);
       tf = assigned_expression_to_transformer(ev, rhs, pre);
       if(!transformer_undefined_p(tf))
 	tf = transformer_add_equality(tf, val, ev);
@@ -2035,9 +2035,9 @@ static transformer integer_call_expression_to_transformer(
   }
   else if(ENTITY_NOT_P(f)) {
     /* FI: should only happen for C code because int are often used
-       as boolean since there was no other way before C99. Quite time
+       as bool since there was no other way before C99. Quite time
        consuming here because it is applied to an int and not a
-       boolean argument. */
+       bool argument. */
     tf = logical_not_to_transformer(e, args, pre);
   }
   else if(ENTITY_BITWISE_XOR_P(f)) {
@@ -2047,7 +2047,7 @@ static transformer integer_call_expression_to_transformer(
   }
   else if(ENTITY_RAND_P(f)) {
     tf = transformer_identity();
-    tf = transformer_add_inequality_with_integer_constraint(tf, e, VALUE_ZERO, FALSE);
+    tf = transformer_add_inequality_with_integer_constraint(tf, e, VALUE_ZERO, false);
   }
   else if(value_code_p(entity_initial(f))) {
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
@@ -2380,13 +2380,13 @@ static transformer logical_binary_function_to_transformer(entity v,
 								 expr1,
 								 expr2,
 								 pre,
-								 TRUE,
-								 TRUE);
+								 true,
+								 true);
 
       // The normalization of tfe and tfne below is key because
       // transformer_empty_p() is quite weak (but fast)
       tfe = transformer_normalize(tfe, 2);
-      /* if the transformer is not feasible, return FALSE */
+      /* if the transformer is not feasible, return false */
       if(transformer_empty_p(tfe)) {
 	Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
 	Pcontrainte c;
@@ -2401,11 +2401,11 @@ static transformer logical_binary_function_to_transformer(entity v,
 								   expr1,
 								   expr2,
 								   pre,
-								   FALSE,
-								   TRUE);
+								   false,
+								   true);
 
 	tfne = transformer_normalize(tfne, 2);
-	/* if the transformer is not feasible, return TRUE */
+	/* if the transformer is not feasible, return true */
 	if(transformer_empty_p(tfne)) {
 	  Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
 	  Pcontrainte c;
@@ -2458,8 +2458,8 @@ static transformer logical_binary_function_to_transformer(entity v,
     if(transformer_undefined_p(tf)) {
       // Must return 0<=v<=1
       tf = transformer_identity();
-      tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, TRUE);
-      tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, FALSE);
+      tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, true);
+      tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, false);
     }
   }
 
@@ -2477,7 +2477,7 @@ static transformer logical_reference_to_transformer(entity v,
     entity r_new = is_internal? entity_to_new_value(r) : external_entity_to_new_value(r);
 
 
-    tf = simple_equality_to_transformer(v, r_new, FALSE);
+    tf = simple_equality_to_transformer(v, r_new, false);
     tf = transformer_logical_inequalities_add(tf, r_new);
   }
 
@@ -2542,7 +2542,7 @@ transformer logical_expression_to_transformer(entity v,
 	pips_internal_error("Unexpected case.\n");
     }
     else {
-      // call to a C or Fortran boolean function
+      // call to a C or Fortran bool function
       //list ef = expression_to_proper_effects(rhs);
       tf = user_function_call_to_transformer(v, rhs, pre);
     }
@@ -2600,7 +2600,7 @@ transformer string_expression_to_transformer(entity v,
 
 	  if(llhs == -1 || llhs >= lrhs) {
 	    entity r_new = entity_to_new_value(r);
-	    tf =  simple_equality_to_transformer(v, r_new, FALSE);
+	    tf =  simple_equality_to_transformer(v, r_new, false);
 	  }
 	}
 	else {
@@ -2668,15 +2668,15 @@ float_call_expression_to_transformer(
   int arity = gen_length(args);
 
   if(ENTITY_AMIN1_P(op)||ENTITY_DMIN1_P(op)||ENTITY_MIN_P(op)) {
-    tf = generic_minmax_to_transformer(v, args, pre, TRUE, is_internal);
+    tf = generic_minmax_to_transformer(v, args, pre, true, is_internal);
   }
   if(ENTITY_C_MIN_P(op)) {
     args=CDR(args);
     --arity;
-    tf = generic_minmax_to_transformer(v, args, pre, TRUE, is_internal);
+    tf = generic_minmax_to_transformer(v, args, pre, true, is_internal);
   }
   else if(ENTITY_AMAX1_P(op)||ENTITY_DMAX1_P(op)||ENTITY_MAX_P(op)) {
-    tf = generic_minmax_to_transformer(v, args, pre, FALSE, is_internal);
+    tf = generic_minmax_to_transformer(v, args, pre, false, is_internal);
   }
   else if(value_code_p(entity_initial(op))
 	  && get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
@@ -2813,12 +2813,12 @@ transformer transformer_add_any_relation_information(
            rel in pre! */
 	entity tmp1 = make_local_temporary_value_entity_with_basic(b1);
 	entity tmp2 = make_local_temporary_value_entity_with_basic(b2);
-	transformer tf1 = safe_any_expression_to_transformer(tmp1, e1, context, TRUE);
+	transformer tf1 = safe_any_expression_to_transformer(tmp1, e1, context, true);
 	/* tf1 may modify the initial context. See w10.f */
 	transformer pcontext = transformer_undefined_p(context)? transformer_identity()
 	  : transformer_apply(tf1, context);
 	transformer ncontext = transformer_range(pcontext);
-	transformer tf2 = safe_any_expression_to_transformer(tmp2, e2, ncontext, TRUE);
+	transformer tf2 = safe_any_expression_to_transformer(tmp2, e2, ncontext, true);
 	transformer rel = relation_to_transformer(op, tmp1, tmp2, veracity);
 	transformer cond = transformer_undefined;
 	transformer newpre = transformer_undefined;
@@ -2835,8 +2835,8 @@ transformer transformer_add_any_relation_information(
 	     || (ENTITY_EQUAL_P(op) && !veracity)) {
 	    entity lt = local_name_to_top_level_entity(LESS_THAN_OPERATOR_NAME);
 	    entity gt = local_name_to_top_level_entity(GREATER_THAN_OPERATOR_NAME);
-	    transformer rel1 = relation_to_transformer(lt, tmp1, tmp2, TRUE);
-	    transformer rel2 = relation_to_transformer(gt, tmp1, tmp2, TRUE);
+	    transformer rel1 = relation_to_transformer(lt, tmp1, tmp2, true);
+	    transformer rel2 = relation_to_transformer(gt, tmp1, tmp2, true);
 	    transformer full_cond1 = transformer_safe_image_intersection(cond, rel1);
 	    transformer full_cond2 = transformer_safe_image_intersection(cond, rel2);
 	    /* pre disappears into newpre2 */
@@ -2933,7 +2933,7 @@ transformer transformer_add_any_relation_information(
    Suggested keyword: "light"
 
    4. Conditional expressions require specific treatment because the
-   boolean analysis is not well linked to the integer analysis and
+   bool analysis is not well linked to the integer analysis and
    because C uses implicit conditions: if(n) means if(n!=0).
 
    5. Expression lists are a special case of expression.
@@ -3126,7 +3126,7 @@ transformer expression_to_transformer(
 	entity tmpv = make_local_temporary_value_entity(cet);
 
 	/* FI: I do not remember the meaning of the last parameter */
-	tf = any_expression_to_transformer(tmpv, sub_exp, pre, FALSE);
+	tf = any_expression_to_transformer(tmpv, sub_exp, pre, false);
       }
       free_type(cet);
     }
@@ -3144,14 +3144,14 @@ transformer expression_to_transformer(
   else if(analyzable_type_p(et)) {
     entity tmpv = make_local_temporary_value_entity(et);
     /* FI: I do not remember the meaning of the last parameter */
-    tf = any_expression_to_transformer(tmpv, exp, pre, FALSE);
+    tf = any_expression_to_transformer(tmpv, exp, pre, false);
   }
   else {
     // FI: we should go down recursively anyway because of casts and
     // side effects in C...
     if(expression_reference_p(exp)) {
       reference r = expression_reference(exp);
-      tf = generic_reference_to_transformer(entity_undefined, r, pre, FALSE);
+      tf = generic_reference_to_transformer(entity_undefined, r, pre, false);
     }
     else if(expression_call_p(exp)) {
       call c = expression_call(exp);
@@ -3240,13 +3240,13 @@ transformer condition_to_transformer(expression cond,
     transformer_range(pre);
   basic eb = basic_of_expression(cond);
   transformer tf = transformer_undefined;
-  bool relation_p = FALSE;
-  /* upwards should be set to FALSE when computing preconditions (but
+  bool relation_p = false;
+  /* upwards should be set to false when computing preconditions (but
      we have no way to know) or when computing tramsformers in
-     context. And set to TRUE in other cases. upwards is a way to gain
+     context. And set to true in other cases. upwards is a way to gain
      execution time at the expense of precision. This speed/accuracy
      tradeoff has evolved with CPU technology. */
-  bool upwards = FALSE;
+  bool upwards = false;
   expression tcond = cond; // By default; not true for the comma operations
 
   /* If a comma operator is used, the test is the last expression */
@@ -3276,7 +3276,7 @@ transformer condition_to_transformer(expression cond,
 
   if(basic_logical_p(eb)) {
     // entity tmpv = make_local_temporary_value_entity_with_basic(eb);
-    //tf = logical_expression_to_transformer(tmpv, cond, safe_pre, TRUE);
+    //tf = logical_expression_to_transformer(tmpv, cond, safe_pre, true);
     //tf = transformer_add_condition_information_updown
     //  (transformer_identity(), cond, safe_pre, veracity, upwards);
     /* FI: not good when side effects in cond */
@@ -3316,7 +3316,7 @@ transformer condition_to_transformer(expression cond,
     */
     if(analyzable_basic_p(eb)) {
       entity tmpv = make_local_temporary_value_entity_with_basic(eb);
-      transformer ctf = safe_any_expression_to_transformer(tmpv, tcond, safe_pre, TRUE);
+      transformer ctf = safe_any_expression_to_transformer(tmpv, tcond, safe_pre, true);
       tf = transformer_combine(tf, ctf);
       if(veracity) {
 	/* tmpv != 0 */
@@ -3369,11 +3369,11 @@ transformer conditional_to_transformer(expression cond,
 				       list ef)
 {
   transformer tf = transformer_undefined;
-  transformer ttf = condition_to_transformer(cond, pre, TRUE);
+  transformer ttf = condition_to_transformer(cond, pre, true);
   transformer t_pre = transformer_apply(ttf, pre);
   transformer t_pre_r = transformer_range(t_pre);
   transformer tet = safe_expression_to_transformer(te, t_pre_r);
-  transformer ftf = condition_to_transformer(cond, pre, FALSE);
+  transformer ftf = condition_to_transformer(cond, pre, false);
   transformer f_pre = transformer_apply(ftf, pre);
   transformer f_pre_r = transformer_range(f_pre);
   transformer fet = safe_expression_to_transformer(fe, f_pre_r);
@@ -3406,14 +3406,14 @@ transformer any_conditional_to_transformer(entity v,
   expression te = EXPRESSION(CAR(CDR(args)));
   expression fe = EXPRESSION(CAR(CDR(CDR(args))));
   transformer tf = transformer_undefined;
-  transformer ttf = condition_to_transformer(cond, pre, TRUE);
+  transformer ttf = condition_to_transformer(cond, pre, true);
   transformer t_pre = transformer_apply(ttf, pre);
   transformer t_pre_r = transformer_range(t_pre);
-  transformer tet = safe_any_expression_to_transformer(v, te, t_pre_r, TRUE);
-  transformer ftf = condition_to_transformer(cond, pre, FALSE);
+  transformer tet = safe_any_expression_to_transformer(v, te, t_pre_r, true);
+  transformer ftf = condition_to_transformer(cond, pre, false);
   transformer f_pre = transformer_apply(ftf, pre);
   transformer f_pre_r = transformer_range(f_pre);
-  transformer fet = safe_any_expression_to_transformer(v, fe, f_pre_r, TRUE);
+  transformer fet = safe_any_expression_to_transformer(v, fe, f_pre_r, true);
 
   ttf = transformer_combine(ttf, tet);
   ftf = transformer_combine(ftf, fet);
@@ -3455,7 +3455,7 @@ transformer logical_not_to_transformer(entity v,
 
   //if(basic_int_p(be)) {
     entity tmp_v = make_local_temporary_integer_value_entity();
-    tf = safe_any_expression_to_transformer(tmp_v, le, pre, TRUE);
+    tf = safe_any_expression_to_transformer(tmp_v, le, pre, true);
     transformer tfr = transformer_range(tf);
     intptr_t lb, ub;
 
@@ -3465,13 +3465,13 @@ transformer logical_not_to_transformer(entity v,
       else if(lb>0 || ub<0)
 	tf = transformer_add_equality_with_integer_constant(tf, v, 0);
       else {
-	tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, TRUE);
-	tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, FALSE);
+	tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, true);
+	tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, false);
       }
     }
     else {
-      tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, TRUE);
-      tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, FALSE);
+      tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, true);
+      tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, false);
     }
     free_transformer(tfr);
     //  }
@@ -3514,12 +3514,12 @@ transformer bitwise_xor_to_transformer(entity v,
     entity tmp_v1 = make_local_temporary_integer_value_entity();
     // FI: Even with the "in context" property, the precondition is
     // not integrated into the transformer...
-    transformer tf1 = safe_any_expression_to_transformer(tmp_v1, le1, pre, TRUE);
+    transformer tf1 = safe_any_expression_to_transformer(tmp_v1, le1, pre, true);
     //transformer tfr1 = transformer_range(tf1);
     transformer tfr1 = transformer_apply(tf1, pre);
     intptr_t lb1, ub1;
     entity tmp_v2 = make_local_temporary_integer_value_entity();
-    transformer tf2 = safe_any_expression_to_transformer(tmp_v2, le2, pre, TRUE);
+    transformer tf2 = safe_any_expression_to_transformer(tmp_v2, le2, pre, true);
     // transformer tfr2 = transformer_range(tf2);
     transformer tfr2 = transformer_apply(tf2, pre);
     intptr_t lb2, ub2;
@@ -3641,7 +3641,7 @@ transformer any_expressions_to_transformer(entity v,
        safe_expression_to_transformer() taking care of computing the
        precise effects of exp instead of using the effects of expl. */
     transformer ctf = (exp==l_exp)?
-      safe_any_expression_to_transformer(v, exp, cpre, FALSE) :
+      safe_any_expression_to_transformer(v, exp, cpre, false) :
       safe_expression_to_transformer(exp, cpre);
     transformer npre = transformer_undefined;
     transformer npre_r = transformer_undefined;
@@ -3760,32 +3760,32 @@ void simplify_minmax_expression(expression e,transformer tr)
 
 bool false_condition_wrt_precondition_p(expression c, transformer pre)
 {
-  bool result = FALSE;
+  bool result = false;
 
-  result = eval_condition_wrt_precondition_p(c, pre, FALSE);
+  result = eval_condition_wrt_precondition_p(c, pre, false);
 
   return result;
 }
 
 bool true_condition_wrt_precondition_p(expression c, transformer pre)
 {
-  bool result = FALSE;
+  bool result = false;
 
-  result = eval_condition_wrt_precondition_p(c, pre, TRUE);
+  result = eval_condition_wrt_precondition_p(c, pre, true);
 
   return result;
 }
 
 bool eval_condition_wrt_precondition_p(expression c, transformer pre, bool veracity)
 {
-  bool result = FALSE;
+  bool result = false;
   transformer f = transformer_dup(pre);
 
   if(veracity) {
-    f = precondition_add_condition_information(f, c, pre, FALSE);
+    f = precondition_add_condition_information(f, c, pre, false);
   }
   else {
-    f = precondition_add_condition_information(f, c, pre, TRUE);
+    f = precondition_add_condition_information(f, c, pre, true);
   }
 
   result = transformer_empty_p(f);
@@ -3929,7 +3929,7 @@ transformer transformer_add_integer_relation_information(
   return newpre;
 }
 
-/* Simplification of boolean expressions with precondition
+/* Simplification of bool expressions with precondition
  *
  * Expression e is modified, if necessary, by side effect.
  *
@@ -3944,7 +3944,7 @@ transformer transformer_add_integer_relation_information(
  * arise. Think of the conditional and comma operators, think of all
  * kinds of side effects, think of integer expressions,...
  *
- * FI: In the short term, I only need to deal with boolean operators
+ * FI: In the short term, I only need to deal with bool operators
  * and, or and not.
  */
 int simplify_boolean_expression_with_precondition(expression e,
@@ -4021,8 +4021,8 @@ int simplify_boolean_expression_with_precondition(expression e,
     }
   }
   else {
-    transformer tt = condition_to_transformer(e,p, TRUE);
-    transformer ft = condition_to_transformer(e,p, FALSE);
+    transformer tt = condition_to_transformer(e,p, true);
+    transformer ft = condition_to_transformer(e,p, false);
 
     if(transformer_empty_p(tt)) {
       // Then the condition is always false

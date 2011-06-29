@@ -62,7 +62,7 @@ pointer_info_val get_pointer_info_kind()
   return pointer_info_kind;
 }
 
-static bool constant_paths_p = FALSE;
+static bool constant_paths_p = false;
 
 void set_constant_paths_p(bool b)
 {
@@ -301,15 +301,15 @@ generic_effects_reset_all_methods()
     db_get_out_effects_func = (statement_effects_function) UNDEF;
     db_put_out_effects_func = (void_function) UNDEF;
 
-    set_contracted_proper_effects(TRUE);
-    set_contracted_rw_effects(TRUE);
+    set_contracted_proper_effects(true);
+    set_contracted_rw_effects(true);
 
-    set_descriptor_range_p(FALSE);
+    set_descriptor_range_p(false);
 
     /* PRETTYPRINT related functions and settings
      */
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(FALSE);
+    set_is_user_view_p(false);
+    set_prettyprint_with_attachments(false);
 
     effects_prettyprint_func = (void_function) UNDEF;
     effect_prettyprint_func = (void_function) UNDEF;

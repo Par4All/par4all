@@ -61,14 +61,14 @@ static bool propagate(statement);
       }									\
       else {								\
         pips_debug(5, "Statement %p marked as reached but the execution does not continue on afterwards.\n\tSo return FALSE.\n", s); \
-        return FALSE; /* avoids an infinite recursion... */		\
+        return false; /* avoids an infinite recursion... */		\
       }									\
     }									\
     else {								\
       pips_debug(5, "New statement %p marked as reached.\n", s);	\
-      store_reached(s, TRUE);						\
+      store_reached(s, true);						\
     }									\
-  } while (FALSE) /* Pattern to be able to use this macro like an instruction. */
+  } while (false) /* Pattern to be able to use this macro like an instruction. */
 
 static bool
 control_propagate(control c)
@@ -106,7 +106,7 @@ control_propagate(control c)
 	 we have a cycle with more than 1 goto... It does not work for
 	 irreductible graphs either but it is detected anyway now in
 	 proagate(). RK */
-      else continued = FALSE; /* 1 GO TO 1 */
+      else continued = false; /* 1 GO TO 1 */
     }
   }
   pips_debug(1, "Ending control_propagate for control %p and statement %p returning continued %d\n",
@@ -122,7 +122,7 @@ control_propagate(control c)
  */
 static bool
 propagate(statement s) {
-    bool continued = TRUE;
+    bool continued = true;
     instruction i;
 
     pips_assert("defined statement", !statement_undefined_p(s));
@@ -183,7 +183,7 @@ propagate(statement s) {
 	  /* Since the exit node is not reached, that means that there is
 	     an infinite loop is the unstructured, so globally it is not
 	     continued: */
-	  continued = FALSE;
+	  continued = false;
       }
       break;
     }
@@ -196,7 +196,7 @@ propagate(statement s) {
     }
     case is_instruction_expression:
     {
-      continued = TRUE; /* FI: interprocedural exit possible:-( */
+      continued = true; /* FI: interprocedural exit possible:-( */
       break;
     }
     case is_instruction_multitest:
@@ -244,7 +244,7 @@ statement_continued_p(statement s)
     if (bound_continued_p(s))
 	return continued_p(s);
     else
-	return FALSE;
+	return false;
 }
 
 /* Remove reachability information about previously checked statements */

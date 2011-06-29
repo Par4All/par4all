@@ -54,8 +54,8 @@ typedef struct {
 static bool loop_flt(loop l, context_p context )
 { 
   cpt++;  
-  if( ! first_turn ) first_turn = TRUE; 
-  return TRUE;
+  if( ! first_turn ) first_turn = true; 
+  return true;
 } 
 static void loop_rwt(loop l, context_p context  ) 
 {  
@@ -68,7 +68,7 @@ static void loop_rwt(loop l, context_p context  )
     contenu =is_a_perf_nes_loop;
     hash_put(context->contenu,stack_head(context->statement_stack), 
 	   (void *) contenu );
-    first_turn= FALSE;
+    first_turn= false;
   }
   else {  
     statement s = loop_body(l);
@@ -97,7 +97,7 @@ static bool stmt_flt(statement s,context_p context )
 {  
  
    stack_push(s, context->statement_stack); 
-   return TRUE;
+   return true;
 }
 
 
@@ -113,7 +113,7 @@ static void stmt_rwt( statement s, context_p context)
 } 
 static bool seq_flt( sequence sq, context_p context  )
 {
-  return TRUE;
+  return true;
 }
 static void seq_rwt(sequence sq, context_p context)
 {
@@ -122,7 +122,7 @@ static void seq_rwt(sequence sq, context_p context)
   intptr_t depth=0;
   intptr_t max=0;
   intptr_t nbr=0;
-  bool found=FALSE;
+  bool found=false;
   list l= sequence_statements(sq);
    MAP(STATEMENT, s,
   {
@@ -130,12 +130,12 @@ static void seq_rwt(sequence sq, context_p context)
      if ( (nbr !=0)&&((contenu==  is_a_perf_nes_loop)||
                      ( contenu==  is_a_no_perf_nes_loop)|| 
                      ( contenu==   is_a_no_perf_nes_loop_t) ) )
-         found=TRUE;
+         found=true;
      if ((contenu != is_a_perf_nes_loop)&& 
          ( contenu !=  is_a_no_perf_nes_loop)&& 
          ( contenu!=  is_a_no_perf_nes_loop_t) && 
          ( contenu != is_a_continue) )
-         found=TRUE; 
+         found=true; 
      switch ( contenu ){
         case is_a_perf_nes_loop : {nbr++; contenu_loop=contenu;
           depth = (intptr_t ) hash_get(context->depth, s);
@@ -211,7 +211,7 @@ static void seq_rwt(sequence sq, context_p context)
 } 
 static bool uns_flt(unstructured u, context_p context   )
 {
-    return TRUE;
+    return true;
 }
 static void uns_rwt(unstructured u, context_p context)
 { 
@@ -271,7 +271,7 @@ static void uns_rwt(unstructured u, context_p context)
 } 
 static bool test_flt(test t, context_p context)
 {
-  return TRUE;
+  return true;
 }
 static void test_rwt(test t, context_p context)
 {
@@ -372,7 +372,7 @@ static void test_rwt(test t, context_p context)
 static bool call_flt( call  ca, context_p context)
 {
  
-return TRUE ;
+return true ;
 }
 static void call_rwt(call  ca, context_p context)
 {
@@ -410,8 +410,8 @@ static void initialize ()
     nbr_perfectly_nested_loop=0; nbr_no_perfectly_nested_loop=0;
     nbr_interested_loop=0;
     nbr_nested_loop=0 ;  max_depth_perfect=0  ;
-    nbr_loop=0;max_depth_no_perfect=0;first_turn=TRUE;
-    first_turn = TRUE;
+    nbr_loop=0;max_depth_no_perfect=0;first_turn=true;
+    first_turn = true;
 } 
 static void put_result(string filename)
 {
@@ -452,7 +452,7 @@ int loop_statistics(string name)
  
   initialize() ;
   
-  stat = (statement) db_get_memory_resource(DBR_CODE, name, TRUE); 
+  stat = (statement) db_get_memory_resource(DBR_CODE, name, true); 
 
   context.contenu = hash_table_make(hash_pointer, 0);  
   context.depth   = hash_table_make(hash_pointer, 0);
@@ -494,7 +494,7 @@ int loop_statistics(string name)
 pips_debug(1, "done.\n");
   debug_off();
    
-  return TRUE;
+  return true;
 }
 
 

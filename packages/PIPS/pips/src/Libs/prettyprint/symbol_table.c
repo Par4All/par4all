@@ -132,7 +132,7 @@ static string check_derived_and_typedef (basic b, int indent,
 void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfortran)
 {
   entity mod = get_current_module_entity();
-  list members = get_common_members(c, mod, FALSE);
+  list members = get_common_members(c, mod, false);
   list equiv_members = NIL;
 
   string_buffer_append(result,
@@ -609,7 +609,7 @@ string get_symbol_table(entity m, bool isfortran)
 
   FOREACH (ENTITY, e, decls) {
 	if(type_area_p(entity_type(e))) {
-	  dump_common_layout(result, e, FALSE, isfortran);
+	  dump_common_layout(result, e, false, isfortran);
 	}
   }
 
@@ -635,14 +635,14 @@ void actual_symbol_table_dump(string module_name, bool isfortran)
 						   module_name, NULL);
   string dir = db_get_current_workspace_directory();
   string filename = strdup(concatenate(dir, "/", symboltable, NULL));
-  bool reset_p = FALSE;
+  bool reset_p = false;
 
   debug_on("SYMBOL_TABLE_DEBUG_LEVEL");
 
   /* This function is called in two different context: as a
      standalone phase or as part of debugging the parser?!? */
   if(entity_undefined_p(get_current_module_entity())) {
-    reset_p = TRUE;
+    reset_p = true;
     set_current_module_entity(module);
   }
 
@@ -667,12 +667,12 @@ bool c_symbol_table(string module_name)
 {
   set_prettyprint_language_tag(is_language_c);
   //all the way down to words_basic()
-  actual_symbol_table_dump(module_name, FALSE);
-  return TRUE;
+  actual_symbol_table_dump(module_name, false);
+  return true;
 }
 
 bool fortran_symbol_table(string module_name)
 {
-  actual_symbol_table_dump(module_name, TRUE);
-  return TRUE;
+  actual_symbol_table_dump(module_name, true);
+  return true;
 }

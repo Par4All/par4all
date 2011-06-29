@@ -138,12 +138,12 @@ instruction *inst;
 
     case is_instruction_block: {
         int nbl = 0;
-        boolean simple_block = FALSE;
+        bool simple_block = false;
 	b= instruction_block(i);
         nbl = gen_length((list) b);
         simple_block = (nbl==1 
                         || (nbl ==2 && continue_statement_p(STATEMENT(CAR(CDR(b)))))) 
-            ? TRUE : FALSE;
+            ? true : false;
         
 	if (simple_block && instruction_loop_p(statement_instruction(STATEMENT(CAR(b)))))
                 iteration_domain_from_statement(list_loop_statement,

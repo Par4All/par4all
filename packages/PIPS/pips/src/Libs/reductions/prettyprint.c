@@ -192,7 +192,7 @@ static text text_code_reductions(statement s)
 /* handles the required prettyprint
  * ??? what about summary reductions?
  * should be pprinted with cumulated regions.
- * @ return TRUE if succeed
+ * @ return true if succeed
  * @param module_name the module name to process
  * @param resource_name the resource to use
  * @param decoration_name
@@ -215,9 +215,9 @@ print_any_reductions(
 
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_printed_reductions((pstatement_reductions)
-	 db_get_memory_resource(resource_name, module_name, TRUE));
+	 db_get_memory_resource(resource_name, module_name, true));
     set_current_module_statement((statement)
-	 db_get_memory_resource(DBR_CODE, module_name, TRUE));
+	 db_get_memory_resource(DBR_CODE, module_name, true));
     reduction_decoration = decoration_name;
 
     t = text_code_reductions(get_current_module_statement());
@@ -225,7 +225,7 @@ print_any_reductions(
     if (summary_name)
     {
 	reductions rs = (reductions)
-	    db_get_memory_resource(summary_name, module_name, TRUE);
+	    db_get_memory_resource(summary_name, module_name, true);
 	text p =
 	    words_predicate_to_commentary(words_reductions("summary ", rs),
 	                                  get_comment_sentinel());
@@ -241,7 +241,7 @@ print_any_reductions(
     reduction_decoration = NULL;
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* Handlers for PIPSMAKE

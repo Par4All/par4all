@@ -58,16 +58,16 @@ static statement bound_to_statement(entity mpi_module, list expr_bound, entity a
 /*
   si equality=TRUE :
   recherche la premiere contrainte d'egalite portant sur la variable PHI du systeme de contraintes sys et transforme cette contrainte en 2 expressions, l'une traduisant le contrainte d'inferiorite (ajouter a expr_l), l'autre traduisant la contrainte de superiorite (ajoutée a expr_u)
-  retourne TRUE si une contrainte d'egalite a ete trouve, FALSE sinon.
+  retourne true si une contrainte d'egalite a ete trouve, false sinon.
 
   si equality=FALSE :
   traduit l'ensemble des contraintes d'inegalite portant sur la variable PHI.
   Les expressions traduisant une contrainte d'inferiorie (de superiorite) sont ajoutes à la liste expr_l (expr_u)
 */
-static boolean contraintes_to_expression(bool equality, entity phi, Psysteme sys, list *expr_l, list *expr_u)
+static bool contraintes_to_expression(bool equality, entity phi, Psysteme sys, list *expr_l, list *expr_u)
 {
   Pcontrainte c;
-  boolean found_equality=FALSE;
+  bool found_equality=false;
 
   for(c = equality?sc_egalites(sys):sc_inegalites(sys); !found_equality && !CONTRAINTE_UNDEFINED_P(c); c = c->succ)
     {
@@ -76,8 +76,8 @@ static boolean contraintes_to_expression(bool equality, entity phi, Psysteme sys
 	{
 	  expression expr;
 	  Pvecteur coord,v = vect_del_var(c->vecteur, (Variable)phi);
-	  boolean low_bound=FALSE;
-	  boolean up_bound=FALSE;
+	  bool low_bound=false;
+	  bool up_bound=false;
 
 	  //construction des expressions d'affectation
 	  if(VECTEUR_NUL_P(v))
@@ -86,7 +86,7 @@ static boolean contraintes_to_expression(bool equality, entity phi, Psysteme sys
 	    {
 	      if (coef_phi > 0) //contrainte de type : coef_phi*phi  <= "vecteur"
 		{
-		  up_bound = TRUE;
+		  up_bound = true;
 		  for (coord = v; coord!=NULL; coord=coord->succ) 
 		    val_of(coord) = -val_of(coord);
 		  coef_phi = -coef_phi;
@@ -119,7 +119,7 @@ static void systeme_to_expression(entity phi, Psysteme sys, list *expr_l, list *
   pips_assert("empty list", ENDP(*expr_l) && ENDP(*expr_u));
   
   // recherche et transformation des contraintes d'equalites portant sur phi
-  boolean equality=contraintes_to_expression(true, phi, sys, expr_l, expr_u);
+  bool equality=contraintes_to_expression(true, phi, sys, expr_l, expr_u);
   
   // recherche et transformation des contraintes d'inequalites portant sur phi
   if (!equality) contraintes_to_expression(false, phi, sys, expr_l, expr_u);

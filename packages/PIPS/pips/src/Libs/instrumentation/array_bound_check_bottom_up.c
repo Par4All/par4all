@@ -154,8 +154,8 @@ static void display_bottom_up_abc_statistics()
 static bool array_dimension_bound_test_undefined_p(array_dimension_bound_test x)
 {
   if ((x.arr == NIL) && (x.dim == NIL) && (x.bou == NIL) && (x.exp == NIL))
-    return TRUE;
-  return FALSE;
+    return true;
+  return false;
 }
 
 string int_to_dimension(int i)
@@ -183,8 +183,8 @@ string int_to_dimension(int i)
     }
 }
 
-/* This function returns TRUE, if the array needs bound checks
- *                       FALSE, otherwise.
+/* This function returns true, if the array needs bound checks
+ *                       false, otherwise.
  *
  * If the arrays are not created by user, for example the arrays
  * of Logical Units : LUNS, END_LUNS, ERR_LUNS, ... in the
@@ -196,8 +196,8 @@ bool array_need_bound_check_p(entity e)
 {
   string s = entity_module_name(e);
   if (strcmp(s,IO_EFFECTS_PACKAGE_NAME)==0)
-    return FALSE;
-  return TRUE;
+    return false;
+  return true;
 }
 
 
@@ -355,14 +355,14 @@ static array_dimension_bound_test abc_with_allocation_size(reference r)
   case 1:
     {
       user_log("\n Bound violation on lower bound of array %s\n",entity_local_name(e));
-      return make_true_array_dimension_bound_test(e,0,TRUE);
+      return make_true_array_dimension_bound_test(e,0,true);
     }
   case -1:
     break;
   case 0:
     {
       number_of_added_checks++;
-      temp = make_array_dimension_bound_test(e,0,TRUE,check);
+      temp = make_array_dimension_bound_test(e,0,true,check);
       retour = add_array_dimension_bound_test(retour,temp);
       break;
     }
@@ -379,14 +379,14 @@ static array_dimension_bound_test abc_with_allocation_size(reference r)
   case 1:
     {
       user_log("\n Bound violation on upper bound of array %s\n",entity_local_name(e));
-      return make_true_array_dimension_bound_test(e,0,FALSE);
+      return make_true_array_dimension_bound_test(e,0,false);
     }
   case -1:
     break;
   case 0:
     {
       number_of_added_checks++;
-      temp = make_array_dimension_bound_test(e,0,FALSE,check);
+      temp = make_array_dimension_bound_test(e,0,false,check);
       retour = add_array_dimension_bound_test(retour,temp);
       break;
     }
@@ -439,7 +439,7 @@ static array_dimension_bound_test bottom_up_abc_reference(reference r)
 		   * + If the check expression is always TRUE:
 		   *        there is certainly bound violation, we return retour
 		   *        immediately: retour = ({e},{i},{bound},{.TRUE.})
-		   * + If the check expression is always FALSE, we don't have to add check to retour.
+		   * + If the check expression is always false, we don't have to add check to retour.
 		   * + Otherwise, we have to add check to retour.*/
 		  ifdebug(3)
 		    {
@@ -452,14 +452,14 @@ static array_dimension_bound_test bottom_up_abc_reference(reference r)
 		  case 1:
 		    {
 		      user_log("\n Bound violation on lower bound of array %s\n",entity_local_name(e));
-		      return make_true_array_dimension_bound_test(e,i,TRUE);
+		      return make_true_array_dimension_bound_test(e,i,true);
 		    }
 		  case -1:
 		    break;
 		  case 0:
 		    {
 		      number_of_added_checks++;
-		      temp = make_array_dimension_bound_test(e,i,TRUE,check);
+		      temp = make_array_dimension_bound_test(e,i,true,check);
 		      retour = add_array_dimension_bound_test(retour,temp);
 		      break;
 		    }
@@ -479,14 +479,14 @@ static array_dimension_bound_test bottom_up_abc_reference(reference r)
 		      case 1:
 			{
 			  user_log("\n Bound violation on upper bound of array %s\n",entity_local_name(e));
-			  return make_true_array_dimension_bound_test(e,i,FALSE);
+			  return make_true_array_dimension_bound_test(e,i,false);
 			}
 		      case -1:
 			break;
 		      case 0:
 			{
 			  number_of_added_checks++;
-			  temp = make_array_dimension_bound_test(e,i,FALSE,check);
+			  temp = make_array_dimension_bound_test(e,i,false,check);
 			  retour = add_array_dimension_bound_test(retour,temp);
 			  break;
 			}
@@ -538,14 +538,14 @@ bottom_up_abc_base_reference_implied_do(reference re,
 	  case 1:
 	    {
 	      user_log("\n Bound violation on lower bound of array %s\n",entity_local_name(ent));
-	      return make_true_array_dimension_bound_test(ent,i,TRUE);
+	      return make_true_array_dimension_bound_test(ent,i,true);
 	    }
 	  case -1:
 	    break;
 	  case 0:
 	    {		  
 	      number_of_added_checks++;
-	      temp = make_array_dimension_bound_test(ent,i,TRUE,check);
+	      temp = make_array_dimension_bound_test(ent,i,true,check);
 	      retour = add_array_dimension_bound_test(retour,temp);
 	      break;
 	    }
@@ -564,14 +564,14 @@ bottom_up_abc_base_reference_implied_do(reference re,
 	      case 1:
 		{
 		  user_log("\n Bound violation on upper bound of array %s\n",entity_local_name(ent));
-		  return make_true_array_dimension_bound_test(ent,i,FALSE);
+		  return make_true_array_dimension_bound_test(ent,i,false);
 		}
 	      case -1:
 		break;
 	      case 0:
 		{
 		  number_of_added_checks++;
-		  temp = make_array_dimension_bound_test(ent,i,FALSE,check);
+		  temp = make_array_dimension_bound_test(ent,i,false,check);
 		  retour = add_array_dimension_bound_test(retour,temp);
 		  break;
 		}
@@ -736,7 +736,7 @@ static bool expression_in_array_subscript(expression e, list args)
 		print_expression(exp);
 	      }
 	    if (same_expression_p(e,e1)||same_expression_p(e,e2)||same_expression_p(e,e3))
-	      return TRUE;
+	      return true;
 	  }
 	break;
       }
@@ -747,7 +747,7 @@ static bool expression_in_array_subscript(expression e, list args)
 	  {
 	    list arrayinds = reference_indices(ref);
 	    if (same_expression_in_list_p(e,arrayinds))
-	      return TRUE;
+	      return true;
 	  }
 	break;
       }
@@ -755,7 +755,7 @@ static bool expression_in_array_subscript(expression e, list args)
       break;
     }
   },args);
-  return FALSE;
+  return false;
 }
 
 static bool read_statement_with_write_effect_on_array_subscript(call c)
@@ -769,10 +769,10 @@ static bool read_statement_with_write_effect_on_array_subscript(call c)
 	  expression exp = EXPRESSION(CAR(args));
 	  args = CDR(args);
 	  if (expression_in_array_subscript(exp,args))
-	    return TRUE;
+	    return true;
 	}
     }
-  return FALSE;
+  return false;
 }
 
 static array_dimension_bound_test bottom_up_abc_call(call cal)
@@ -900,7 +900,7 @@ static statement make_bottom_up_abc_tests(array_dimension_bound_test adt)
 	retour = copy_statement(smt);
       else
 	// always structured case
-	insert_statement(retour,copy_statement(smt),FALSE);
+	insert_statement(retour,copy_statement(smt),false);
       la = CDR(la);
       ld = CDR(ld);
       lb = CDR(lb);
@@ -970,11 +970,11 @@ static void bottom_up_abc_insert_before_statement(statement s, statement s1,
 	}
       else
 	// there is no unstructured (?)
-	insert_statement(s,s1,TRUE);
+	insert_statement(s,s1,true);
     }
   else
     // structured case
-    insert_statement(s,s1,TRUE);
+    insert_statement(s,s1,true);
 }
 
 /* forward declaration */
@@ -1058,13 +1058,13 @@ static bool store_mapping(control c, bottom_up_abc_context_p context)
 {
   extend_persistant_statement_to_control(context->map,
 					 control_statement(c), c);
-  return TRUE;
+  return true;
 }
 
 static bool push_uns(unstructured u, bottom_up_abc_context_p context)
 {
   stack_push((char *) u, context->uns);
-  return TRUE;
+  return true;
 }
 
 static void pop_uns(unstructured u, bottom_up_abc_context_p context)
@@ -1094,7 +1094,7 @@ bool array_bound_check_bottom_up(char *module_name)
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   /* Begin the dynamic array bound checking phase.
    * Get the code from dbm (true resource) */
-  module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   set_current_module_statement(module_statement);
   set_ordering_to_statement(module_statement);
   debug_on("ARRAY_BOUND_CHECK_BOTTOM_UP_DEBUG_LEVEL");
@@ -1118,7 +1118,7 @@ bool array_bound_check_bottom_up(char *module_name)
   reset_ordering_to_statement();
   reset_current_module_statement();
   reset_current_module_entity();
-  return TRUE;
+  return true;
 }
 
 /*

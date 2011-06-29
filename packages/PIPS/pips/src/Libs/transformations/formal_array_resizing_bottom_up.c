@@ -70,14 +70,14 @@ bool formal_array_resizing_bottom_up(char* mod_name)
 {
   entity mod_ent = module_name_to_entity(mod_name);
   list l_decl = code_declarations(entity_code(mod_ent)), l_regions = NIL; 
-  statement mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  statement mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
   transformer mod_pre;
   Psysteme pre;
   current_mod = mod_name;  
   set_precondition_map((statement_mapping)
-		       db_get_memory_resource(DBR_PRECONDITIONS,mod_name,TRUE));
+		       db_get_memory_resource(DBR_PRECONDITIONS,mod_name,true));
   set_rw_effects((statement_effects) 
-		 db_get_memory_resource(DBR_SUMMARY_REGIONS, mod_name, TRUE));
+		 db_get_memory_resource(DBR_SUMMARY_REGIONS, mod_name, true));
   regions_init(); 
   debug_on("FORMAL_ARRAY_RESIZING_BOTTOM_UP_DEBUG_LEVEL");
   debug(1," Begin bottom up formal array resizing for %s\n", mod_name);
@@ -112,6 +112,6 @@ bool formal_array_resizing_bottom_up(char* mod_name)
   reset_rw_effects();
   current_mod = "";
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
-  return TRUE;
+  return true;
 }
 

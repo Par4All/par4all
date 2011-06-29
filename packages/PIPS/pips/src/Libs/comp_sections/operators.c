@@ -92,6 +92,6 @@ bool
 CompIntersection(comp_sec __attribute__ ((unused)) cs1,
 		 comp_sec __attribute__ ((unused)) cs2)
 {
-  return FALSE;
+  return false;
 }
 

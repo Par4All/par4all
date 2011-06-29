@@ -93,7 +93,7 @@ call c;
     list l;
     syntax s;
 
-    if (!call_assign_p(c)) return(TRUE);
+    if (!call_assign_p(c)) return(true);
 
     /*   else ASSIGN case
      */
@@ -108,14 +108,14 @@ call c;
 	gen_nconc(FindRefToDistArray(EXPRESSION(CAR(CDR(l)))),
 		  found_read);
     
-    return(FALSE);
+    return(false);
 }
 
 static bool FindRefToDistArrayInStatement_expression_filter(e)
 expression e;
 {
     found_read = gen_nconc(FindRefToDistArray(e), found_read);
-    return(FALSE);
+    return(false);
 }
 
 void FindRefToDistArrayInStatement(obj, lwp, lrp)
@@ -202,10 +202,10 @@ entity e;
 list l;
 {
     MAP(SYNTAX, s,
-	if (e==reference_variable(syntax_reference(s))) return(TRUE),
+	if (e==reference_variable(syntax_reference(s))) return(true),
 	l);
 
-    return(FALSE);
+    return(false);
 }
 
 /* ??? False!
@@ -271,7 +271,7 @@ statement stat;
     ifdebug(1)
 	hpfc_warning("not  implemented, returning TRUE\n");
 
-    return TRUE;
+    return true;
 }
 
 /* indirections_inside_statement_p
@@ -284,7 +284,7 @@ statement stat;
 {
     ifdebug(1)
 	hpfc_warning("not implemented yet, returning FALSE\n");
-    return FALSE;
+    return false;
 }
 
 /* ------------------------------------------------------------------
@@ -386,8 +386,8 @@ void reset_current_loops()
 bool entity_loop_index_p(e)
 entity e;
 {
-    MAP(LOOP, l, if (e == loop_index(l)) return TRUE, current_loop_list);
-    return FALSE;
+    MAP(LOOP, l, if (e == loop_index(l)) return true, current_loop_list);
+    return false;
 }
 
 range loop_index_to_range(index)

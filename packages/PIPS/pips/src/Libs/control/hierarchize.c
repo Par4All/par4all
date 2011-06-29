@@ -98,19 +98,19 @@ remove_interval_predecessors(vertex interval)
 
 /* Remove all the instances of a predecessor pred of an interval.
 
-   Return TRUE if pred was really in the predecessor list: */
+   Return true if pred was really in the predecessor list: */
 static bool
 remove_interval_predecessor(vertex interval,
 			    vertex pred)
 {
-    bool pred_has_been_found_p = FALSE;
+    bool pred_has_been_found_p = false;
     list predecessors_to_remove = NIL;
     /* Detach the predecessor vertex: */
     MAP(PREDECESSOR, p, {
 	if (predecessor_vertex(p) == pred) {
 	    predecessor_vertex(p) = vertex_undefined;
 	    predecessors_to_remove = CONS(PREDECESSOR, p, predecessors_to_remove);
-	    pred_has_been_found_p = TRUE;
+	    pred_has_been_found_p = true;
 	}
     }, vertex_predecessors(interval));
     /* And now remove the predecessors than own pred: */
@@ -136,14 +136,14 @@ add_node_to_interval(graph intervals,
        is it cannot have more than one edge from a vertex to another one: */
     MAP(VERTEX, v, {
       list predecessors_to_change = NIL;
-      bool interval_already_in_predecessors = FALSE;
+      bool interval_already_in_predecessors = false;
 	MAPL(ip, {
 	  if (predecessor_vertex(PREDECESSOR(CAR(ip))) == node)
 	    predecessors_to_change = CONS(PREDECESSOR,
 					  PREDECESSOR(CAR(ip)),
 					  predecessors_to_change);
 	  if (predecessor_vertex(PREDECESSOR(CAR(ip))) == interval)
-	    interval_already_in_predecessors = TRUE;
+	    interval_already_in_predecessors = true;
 	}, vertex_predecessors(v));
 	if (predecessors_to_change != NIL) {
 	  /* There is at least an interval that must appear ONLY ONCE in
@@ -193,16 +193,16 @@ add_to_interval_or_create_new_interval(vertex node,
     set_add_element(selected_nodes, selected_nodes, (char *) node);
 
     do {
-	a_node_has_been_added = FALSE;
+	a_node_has_been_added = false;
 	/* Find a candidate through all the intervals: */
 	MAP(VERTEX, candidate, {
 	    if (!set_belong_p(selected_nodes, (char *) candidate)) {
-		bool all_predecessors_are_in_current_interval = TRUE;
+		bool all_predecessors_are_in_current_interval = true;
 		/* Test that the candidate has all its predecessors in
 		   the interval we are building: */
 		MAP(PREDECESSOR, predecessor, {
 		    if (predecessor_vertex(predecessor) != node) {
-			all_predecessors_are_in_current_interval = FALSE;
+			all_predecessors_are_in_current_interval = false;
 			break;
 		    }
 		}, vertex_predecessors(candidate));
@@ -214,7 +214,7 @@ add_to_interval_or_create_new_interval(vertex node,
 					 selected_nodes,
 					 &intervals_to_be_removed);*/
 		    /* Look for the next appliant: */
-		    a_node_has_been_added = TRUE;
+		    a_node_has_been_added = true;
 		    break;
 		}
 	    }
@@ -261,14 +261,14 @@ static bool
 interval_graph(graph intervals)
 {
     bool a_node_has_been_fused;
-    bool the_interval_graph_has_been_modified = FALSE;
+    bool the_interval_graph_has_been_modified = false;
     vertex entry_interval = VERTEX(CAR(graph_vertices(intervals)));
 
     /* Apply the T2 transformation, that is equivalent to my
        fuse_sequences_in_unstructured elsewhere. Just use a less
        optimized algorithm here: */
     do {
-	a_node_has_been_fused = FALSE;
+	a_node_has_been_fused = false;
 	MAP(VERTEX, node, {
 	    pips_debug(8, "vertex %p.\n", node);
 	    if (node != entry_interval
@@ -279,7 +279,7 @@ interval_graph(graph intervals)
 		pips_debug(8, "\tonly one vertex predecessor %p.\n", p_v);
 		add_node_to_interval(intervals, p_v, node);
 		/* Let's go to find a new interval to fuse: */
-		a_node_has_been_fused = TRUE;
+		a_node_has_been_fused = true;
 		break;
 	    }
 	}, graph_vertices(intervals));
@@ -346,7 +346,7 @@ control_graph_to_interval_graph_format(control entry_node)
 					   control_to_interval_node);
 	pips_debug(6, "\tControl %p -> interval %p\n", c,  interval);
 	MAP(CONTROL, p, {
-	  bool interval_already_in_predecessors = FALSE;
+	  bool interval_already_in_predecessors = false;
 	    vertex vertex_predecessor =
 		create_or_get_an_interval_node(p,
 					       intervals,
@@ -355,7 +355,7 @@ control_graph_to_interval_graph_format(control entry_node)
                predecessor list: */
 	    MAPL(ip, {
 	      if (predecessor_vertex(PREDECESSOR(CAR(ip))) == vertex_predecessor) {
-		interval_already_in_predecessors = TRUE;
+		interval_already_in_predecessors = true;
 		break;
 	      }
 	    }, vertex_predecessors(interval));

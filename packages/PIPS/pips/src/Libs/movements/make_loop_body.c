@@ -68,7 +68,7 @@ void wp65_debug_print_module(entity m, statement s)
 extern Value offset_dim1;
 extern Value offset_dim2;
 
-boolean
+bool
 variable_in_declaration_module_p(m, v)
 entity m;
 entity v;
@@ -78,13 +78,13 @@ entity v;
     cons *d, *cp1;
     d = code_declarations(c);
 
-    if (d == NIL) return(FALSE) ;
+    if (d == NIL) return(false) ;
     for (cp1 = d ; !ENDP(cp1) ; cp1 = CDR( cp1 ))  {
 	if (strcmp(entity_local_name(ENTITY(CAR(cp1))),
 		   entity_local_name(v)) == 0)
-	    return(TRUE);
+	    return(true);
     }
-    return (FALSE);
+    return (false);
 }
 
 entity
@@ -178,7 +178,7 @@ make_statement_operator(entity oper,cons * args)
 statement
 make_movements_loop_body_wp65(module,receive_code,ent,local_indices,var_id,sc_neg,sc_pos,index_base,rank,number_of_lower_bounds,number_of_upper_bounds)
 entity module;
-boolean receive_code;      /* is TRUE if the code is generated for receive */
+bool receive_code;      /* is true if the code is generated for receive */
 entity ent;                /* corresponds to  the shared entiy if bank_code
                               and to the local entity otherwise */
 Pbase local_indices;       /* correspond to O,L if bank_code and to LI,LJ
@@ -206,7 +206,7 @@ int number_of_lower_bounds,number_of_upper_bounds;
      cons * args, * args2, * lex2, * lex3;
     char *str1;
     Psysteme sctmp=NULL;
-    boolean b2 ;
+    bool b2 ;
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(8,"make_movements_loop_body_wp65","begin\n");
 
@@ -398,7 +398,7 @@ int number_of_lower_bounds,number_of_upper_bounds;
  */
 statement make_datum_movement(module,receive_code,ent,local_indices,var_id)
 entity module;
-boolean receive_code;      /* is TRUE if the code is generated for receive */
+bool receive_code;      /* is true if the code is generated for receive */
 entity ent;                /* corresponds to  the shared entiy if bank_code
                               and to the local entity otherwise */
 Pbase local_indices;       /* correspond to O,L if bank_code and to LJ,LI
@@ -482,7 +482,7 @@ Pbase var_id;              /* corresponds to the Pvecteur belonging Prod_id
  */
 statement make_movement_scalar_wp65(module,receive_code,r, var_id)
 entity module;
-boolean receive_code;      /* is TRUE if the code is generated for receive */
+bool receive_code;      /* is true if the code is generated for receive */
 reference r;                /* corresponds to scalaire entity */
 entity var_id;
 {

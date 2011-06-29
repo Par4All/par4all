@@ -223,10 +223,10 @@ static bool common_variable_in_module_scope_p(entity ent,entity mod)
 	ram r2 = storage_ram(entity_storage(ent));
 	entity a1 = ram_section(r1);
 	entity a2 = ram_section(r2);
-	if (a1 == a2) return TRUE;
+	if (a1 == a2) return true;
       }
   },d);
-  return FALSE;
+  return false;
 }
 
 static bool initialized_by_equivalent_variable_p(entity ent)
@@ -241,9 +241,9 @@ static bool initialized_by_equivalent_variable_p(entity ent)
 	  pips_debug(3,"List of shared variables of %s \n",entity_name(ent));
 	  print_entities(local_shared);
 	}
-      return TRUE;
+      return true;
     }
-  return FALSE;
+  return false;
 }
 
 static Psysteme remove_temporal_variables_from_system(Psysteme ps)
@@ -284,7 +284,7 @@ static expression make_special_value(entity ent)
       user_log("\nInitialize floating number with more than 8 bytes ?");
       return make_call_expression(MakeConstant("which_value",is_basic_float),NIL);
     }
-  case 2: /*logical : FALSE = 0, TRUE = 1*/
+  case 2: /*logical : false = 0, true = 1*/
     return int_to_expression(2);
   case 3: /*overloaded*/
     user_log("\nInitialize overloaded ?");
@@ -414,7 +414,7 @@ static void verify_scalar_variable(entity ent)
 	{
 	  statement s = make_assign_statement(entity_to_expression(ent),int_to_expression(0));  
 	  /*insert the assignment after the PRINT statement*/
-	  insert_statement(smt,s,FALSE); 
+	  insert_statement(smt,s,false); 
 	}
     }
   else
@@ -450,7 +450,7 @@ static void verify_array_element(entity ent, expression exp)
 	{
 	  statement s = make_assign_statement(exp,int_to_expression(0));  
 	  /*insert the assignment after the PRINT statement*/
-	  insert_statement(smt,s,FALSE); 
+	  insert_statement(smt,s,false); 
 	}
     }
   else
@@ -513,7 +513,7 @@ static void verify_array_variable(entity ent, region reg)
 	{
 	  statement s = make_assign_statement(exp,int_to_expression(0));  
 	  /*insert the assignment after the PRINT statement*/
-	  insert_statement(smt,s,FALSE); 
+	  insert_statement(smt,s,false); 
 	}
     }
   else
@@ -700,7 +700,7 @@ static bool verify_used_before_set_statement_flt(statement s)
 		else
 		  verify_array_variable(ent,reg);
 		fprintf(out,"%s\n",PREFIX2);
-		return FALSE;
+		return false;
 	      }
 	    else 
 	      {
@@ -717,7 +717,7 @@ static bool verify_used_before_set_statement_flt(statement s)
 		    {	
 		      call c = statement_call(s);
 		      verify_used_before_set_call(c,s);
-		      return FALSE;
+		      return false;
 		    } 
 		  case is_instruction_whileloop:
 		    {
@@ -735,13 +735,13 @@ static bool verify_used_before_set_statement_flt(statement s)
 		  case is_instruction_loop:
 		    // suppose that there are only MUST IN region in loop's range
 		  case is_instruction_unstructured:
-		    return TRUE;
+		    return true;
 		  }  
 	      }
 	  }
       }
   },l_in_regions);
-  return FALSE;
+  return false;
 }
 
 static void verify_used_before_set_statement()
@@ -754,10 +754,10 @@ static void verify_used_before_set_statement()
 
 static void verify_formal_and_common_variables(entity ent,list l_callers)
 {  
-  bool check = FALSE;	    
+  bool check = false;	    
   MAP(STRING,caller_name,
   { 
-    list l_caller_ubs = ubs_list((ubs)db_get_memory_resource(DBR_UBS,caller_name,TRUE));
+    list l_caller_ubs = ubs_list((ubs)db_get_memory_resource(DBR_UBS,caller_name,true));
     MAP(UBS_CHECK,fp,
     {
       entity mod = ubs_check_module(fp);	 
@@ -773,7 +773,7 @@ static void verify_formal_and_common_variables(entity ent,list l_callers)
 		  if (off == offset)
 		    {
 		      pips_debug(1,"Formal parameter %s must be verified\n",entity_name(ent));
-		      check = TRUE;
+		      check = true;
 		      break;
 		    }
 		}
@@ -783,7 +783,7 @@ static void verify_formal_and_common_variables(entity ent,list l_callers)
 	      if (entities_may_conflict_p(e,ent))
 		{
 		  pips_debug(1,"Common variable %s must be verified\n",entity_name(ent));
-		  check = TRUE;
+		  check = true;
 		  break;
 		}
 	    }
@@ -858,7 +858,7 @@ static void insert_common_declaration(entity ent,entity sec)
 {
   string mod_name = entity_module_name(ent);
   entity mod = local_name_to_top_level_entity(mod_name);
-  list entities = common_members_of_module(sec,mod,TRUE);
+  list entities = common_members_of_module(sec,mod,true);
   ifdebug(3)
     {
       fprintf(stderr,"\nList of entities in the common declaration");
@@ -867,14 +867,14 @@ static void insert_common_declaration(entity ent,entity sec)
   if (!ENDP(entities))
     {
       string area_name = module_local_name(sec);
-      bool comma = FALSE;
+      bool comma = false;
       fprintf(out2,"      COMMON ");
       if (strcmp(area_name, BLANK_COMMON_LOCAL_NAME) != 0) 
 	fprintf(out2,"/%s/ ", area_name);
       MAP(ENTITY, ee, 
       {
 	if (comma) fprintf(out2,",");
-	else comma = TRUE;
+	else comma = true;
 	fprintf(out2,"%s",words_to_string(words_common_variable(ee)));
       }, entities);
       fprintf(out2,"\n");
@@ -1044,7 +1044,7 @@ bool used_before_set(char *module_name)
 { 
   list l_in_regions = NIL;
   ubs module_ubs; 
-  string user_file = db_get_memory_resource(DBR_USER_FILE,module_name,TRUE);
+  string user_file = db_get_memory_resource(DBR_USER_FILE,module_name,true);
   string base_name = pips_basename(user_file, NULL);
   /* File instrument.out is used to store ubs checks*/
   string dir_name = db_get_current_workspace_directory();
@@ -1056,16 +1056,16 @@ bool used_before_set(char *module_name)
   if (!same_string_p(rule_phase(find_rule_by_resource("REGIONS")),"MUST_REGIONS"))
     pips_user_warning("\nMUST REGIONS not selected - " "Do not expect wonderful results\n");
   /* Set and get the current properties concerning regions */
-  set_bool_property("MUST_REGIONS", TRUE);
-  set_bool_property("EXACT_REGIONS", TRUE);
+  set_bool_property("MUST_REGIONS", true);
+  set_bool_property("EXACT_REGIONS", true);
   get_regions_properties();
   current_mod = local_name_to_top_level_entity(module_name);
   set_current_module_entity(current_mod);
   /* Get the code of the module */
-  module_statement = (statement) db_get_memory_resource(DBR_CODE,module_name,TRUE);
+  module_statement = (statement) db_get_memory_resource(DBR_CODE,module_name,true);
   set_current_module_statement(module_statement);
   /* Get IN regions of the module */
-  set_in_effects((statement_effects) db_get_memory_resource(DBR_IN_REGIONS,module_name,TRUE));
+  set_in_effects((statement_effects) db_get_memory_resource(DBR_IN_REGIONS,module_name,true));
   regions_init(); 
   set_ordering_to_statement(module_statement);  
   debug_on("USED_BEFORE_SET_DEBUG_LEVEL");
@@ -1107,7 +1107,7 @@ bool used_before_set(char *module_name)
     }
   else
     {    
-      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,TRUE);
+      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,true);
       list l_callers = callees_callees(callers); 
       MAP(REGION,reg,
       {
@@ -1141,7 +1141,7 @@ bool used_before_set(char *module_name)
   reset_in_effects();
   reset_current_module_statement(); 
   reset_current_module_entity();
-  return TRUE;
+  return true;
 }
 
 

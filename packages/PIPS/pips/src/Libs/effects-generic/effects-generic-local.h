@@ -60,12 +60,12 @@ typedef void (*generic_attachment_function)(text);
 #define DB_GET_SE(name, NAME)				\
 static statement_effects db_get_##name(char * modname)	\
 { return (statement_effects)				\
-  db_get_memory_resource(DBR_##NAME, modname, TRUE);}
+  db_get_memory_resource(DBR_##NAME, modname, true);}
 
 #define DB_GET_LS(name, NAME)				\
 static list db_get_##name(char * modname)		\
 { return effects_to_list((effects)			\
-  db_get_memory_resource(DBR_##NAME, modname, TRUE));}
+  db_get_memory_resource(DBR_##NAME, modname, true));}
 
 #define DB_PUT_SE(name, NAME)						\
 static void db_put_##name(char * modname, statement_effects se)		\

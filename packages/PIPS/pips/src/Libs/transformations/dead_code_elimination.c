@@ -410,13 +410,13 @@ static bool match_call_to_user_function(call c, bool *user_function_found) {
 
   FOREACH(STRING, func, keeped_functions) {
     if(strcmp(match_name,func)==0) {
-      *user_function_found = TRUE;
+      *user_function_found = true;
     }
   }
 
   FOREACH(STRING, func_prefix, keeped_functions_prefix) {
     if(strncmp(match_name,func_prefix,strlen(func_prefix))==0) {
-      *user_function_found = TRUE;
+      *user_function_found = true;
     }
   }
 
@@ -425,7 +425,7 @@ static bool match_call_to_user_function(call c, bool *user_function_found) {
 }
 
 static bool statement_call_a_keep_function_p( statement s ) {
-  bool user_function_found = FALSE;
+  bool user_function_found = false;
   if(statement_call_p(s) || statement_expression_p(s)) {
     gen_context_recurse(s,&user_function_found,call_domain, match_call_to_user_function,gen_true);
   }
@@ -440,9 +440,9 @@ static void use_def_deal_if_useful(statement s) {
    bool this_statement_has_an_io_effect;
    bool this_statement_writes_a_procedure_argument;
    bool this_statement_is_a_format;
-   bool this_statement_is_an_unstructured_test = FALSE;
+   bool this_statement_is_an_unstructured_test = false;
    bool this_statement_is_a_c_return;
-   bool outside_effect_p = FALSE;
+   bool outside_effect_p = false;
    bool this_statement_call_a_user_function;
 
    ifdebug(5) {
@@ -482,7 +482,7 @@ static void use_def_deal_if_useful(statement s) {
        control control_father = load_control_father(s);
        if (gen_length(control_successors(control_father)) == 2)
 	   /* It is an unstructured test: keep it: */
-	   this_statement_is_an_unstructured_test = TRUE;
+	   this_statement_is_an_unstructured_test = true;
    }
 
    this_statement_is_a_c_return = return_statement_p(s);
@@ -494,7 +494,7 @@ static void use_def_deal_if_useful(statement s) {
     reference a_reference = effect_any_reference(eff);
     entity touched = reference_variable(a_reference);
     if(effect_write_p(eff) && !entity_local_variable_p(touched,current_func)) {
-      outside_effect_p = TRUE;
+      outside_effect_p = true;
       pips_debug(7, "Statement %p, outside effect on %s (module %s)\n",
           s,
           entity_name(touched),
@@ -666,19 +666,19 @@ bool dead_code_elimination_on_module(char * module_name)
 
    /*
     * For C code, this pass requires that effects are calculated with property
-    * MEMORY_EFFECTS_ONLY set to FALSE because we need that the Chains includes
+    * MEMORY_EFFECTS_ONLY set to false because we need that the Chains includes
     * arcs for declarations as these latter are separate statements now.
     */
    bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
    if(c_module_p(module) && memory_effects_only_p) {
      pips_user_warning("Rice parallelization should be run with property "
                        "MEMORY_EFFECTS_ONLY set to FALSE.\n");
-     return FALSE; // return to pass manager with a failure code
+     return false; // return to pass manager with a failure code
    }
 
    /* Get the true ressource, not a copy. */
    module_statement =
-      (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+      (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
    /* Get the data dependence graph: */
    /* The dg is more precise than the chains, so I (RK) guess I should
@@ -689,17 +689,17 @@ bool dead_code_elimination_on_module(char * module_name)
     */
    /*
    dependence_graph =
-      (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+      (graph) db_get_memory_resource(DBR_DG, module_name, true);
       */
 
    dependence_graph =
-      (graph) db_get_memory_resource(DBR_CHAINS, module_name, TRUE);
+      (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
 
    /* The proper effect to detect the I/O operations: */
    set_proper_rw_effects((statement_effects)
 			 db_get_memory_resource(DBR_PROPER_EFFECTS,
 						module_name,
-						TRUE)); 
+						true)); 
 
 
    set_current_module_statement(module_statement);
@@ -739,7 +739,7 @@ bool dead_code_elimination_on_module(char * module_name)
    set_cumulated_rw_effects(
        (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
                                                  module_name,
-                                                 TRUE));
+                                                 true));
    module_clean_declarations(get_current_module_entity(),
                              get_current_module_statement());
 
@@ -761,7 +761,7 @@ bool dead_code_elimination_on_module(char * module_name)
    reset_ordering_to_statement();
 
    /* Should have worked: */
-   return TRUE;
+   return true;
 }
 
 bool dead_code_elimination(char * module_name)

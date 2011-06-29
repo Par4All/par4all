@@ -60,7 +60,7 @@ GENERIC_GLOBAL_FUNCTION(kill_pv, statement_effects)
 
 statement_cell_relations db_get_simple_pv(char * module_name)
 {
-  return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_POINTER_VALUES, module_name, TRUE);
+  return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_POINTER_VALUES, module_name, true);
 }
 
 void db_put_simple_pv(char * module_name, statement_cell_relations scr)
@@ -70,7 +70,7 @@ void db_put_simple_pv(char * module_name, statement_cell_relations scr)
 
 /* static statement_cell_relations db_get_simple_gen_pv(char * module_name) */
 /* { */
-/*   return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, TRUE); */
+/*   return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, true); */
 /* } */
 
 /* static void db_put_simple_gen_pv(char * module_name, statement_cell_relations scr) */
@@ -80,7 +80,7 @@ void db_put_simple_pv(char * module_name, statement_cell_relations scr)
 
 /* static statement_effects db_get_simple_kill_pv(char * module_name) */
 /* { */
-/*   return (statement_effects) db_get_memory_resource(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, TRUE); */
+/*   return (statement_effects) db_get_memory_resource(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, true); */
 /* } */
 
 /* static void db_put_simple_kill_pv(char * module_name, statement_effects se) */
@@ -1412,7 +1412,7 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
      of visited modules */
   /* Get the code of the module. */
   set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, TRUE));
+				db_get_memory_resource(DBR_CODE, module_name, true));
   set_current_module_entity(module_name_to_entity(module_name));
   init_pv();
   //  init_gen_pv();
@@ -1451,6 +1451,6 @@ bool simple_pointer_values(char * module_name)
   generic_module_pointer_values(module_name, &ctxt);
   reset_pv_context(&ctxt);
   generic_effects_reset_all_methods();
-  return(TRUE);
+  return(true);
 }
 

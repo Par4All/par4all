@@ -113,8 +113,8 @@ static void reset_csplit_current_function_name()
 /* static int enum_counter = 0; */
 
 /* Shared with the lexical analyzer */
-bool csplit_is_static_p = FALSE;
-static bool current_function_is_static_p = FALSE;
+bool csplit_is_static_p = false;
+static bool current_function_is_static_p = false;
 
  void csplit_parser_warning(string s)
    {
@@ -140,14 +140,14 @@ static bool current_function_is_static_p = FALSE;
 
 /* All the following global variables must be replaced by functions, once we have the preprocessor for C */
 
-static int csplit_is_typedef = FALSE; /* to know if this is a typedef name or not */
+static int csplit_is_typedef = false; /* to know if this is a typedef name or not */
 static stack TypedefStack = stack_undefined;
 
  static void PushTypedef()
  {
    pips_debug(8, "csplit_is_typedef = %s\n", bool_to_string(csplit_is_typedef));
    stack_push((void *) (_int)csplit_is_typedef, TypedefStack);
-   csplit_is_typedef = FALSE;
+   csplit_is_typedef = false;
    pips_debug(8, "csplit_is_typedef = %s\n", bool_to_string(csplit_is_typedef));
  }
 
@@ -204,7 +204,7 @@ static string general_build_signature(bool arguments_are_defined_p,
     string sa[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
     string r = string_undefined;
     int i;
-    bool some_argument_undefined_p = FALSE;
+    bool some_argument_undefined_p = false;
 
     /* va_start(*some_arguments, s1); */
     s = s1;
@@ -214,7 +214,7 @@ static string general_build_signature(bool arguments_are_defined_p,
 	if(arguments_are_defined_p)
 	  pips_internal_error("Unexpected undefined argument %d", count+1);
 	else
-	  some_argument_undefined_p = TRUE;
+	  some_argument_undefined_p = true;
       }
       else if(s==NULL) {
 	/* We are in trouble too */
@@ -274,7 +274,7 @@ static string build_signature(string s1, ...)
     va_list some_arguments;
 
     va_start(some_arguments, s1);
-    return general_build_signature(TRUE, s1, &some_arguments);
+    return general_build_signature(true, s1, &some_arguments);
   }
 
 /* Arguments may be defined or not, but as soon as one is undefined, an
@@ -284,7 +284,7 @@ static string safe_build_signature(string s1, ...)
     va_list some_arguments;
 
     va_start(some_arguments, s1);
-    return general_build_signature(FALSE, s1, &some_arguments);
+    return general_build_signature(false, s1, &some_arguments);
   }
 
 /* Get rid of useless spaces: multiple contiguous spaces, spaces next to a
@@ -1348,7 +1348,7 @@ declaration:                                /* ISO 6.7.*/
 				     $1, string_undefined_p($2) ? "UNDEFINED" : $2);
 			  csplit_is_function = 0; /* not function's declaration */
 			  //pips_assert("TypedefStack is empty", stack_empty_p(TypedefStack));
-			  csplit_is_typedef = FALSE;
+			  csplit_is_typedef = false;
 			  free_partial_signature($1);
 			  free_partial_signature($2);
 			  $$ = string_undefined;
@@ -1360,7 +1360,7 @@ declaration:                                /* ISO 6.7.*/
 			  pips_debug(5, "decl_spec_list=\"%s\"\n", $1);
 			  csplit_is_function = 0; /* not function's declaration */
 			  //pips_assert("TypedefStack is empty", stack_empty_p(TypedefStack));
-			  csplit_is_typedef = FALSE;
+			  csplit_is_typedef = false;
 			  free_partial_signature($1);
 			  $$ = string_undefined;
 			  PopTypedef();
@@ -1400,7 +1400,7 @@ decl_spec_list:                         /* ISO 6.7 */
     TK_TYPEDEF decl_spec_list_opt
                         {
 			  pips_debug(5, "TK_TYPEDEF decl_spec_list_opt->decl_spec_list\n");
-			  csplit_is_typedef = TRUE;
+			  csplit_is_typedef = true;
 			  pips_debug(8, "csplit_is_typedef=%s\n", bool_to_string(csplit_is_typedef));
 			  /* I would have liked not to build them when unnecessary. */
 			  /*
@@ -1422,7 +1422,7 @@ decl_spec_list:                         /* ISO 6.7 */
                         {
 			  /* There are 3 cases: static function, external and internal static variable*/
 			  pips_debug(5, "TK_STATIC decl_spec_list_opt->decl_spec_list\n");
-			  csplit_is_static_p = TRUE;
+			  csplit_is_static_p = true;
 			  if (!csplit_is_function) {
 			    pips_debug(5, "We are not within a function, so this STATIC may be related to a function: %s.\n", $2);
 			  }
@@ -1785,7 +1785,7 @@ declarator:  /* (* ISO 6.7.5. Plus Microsoft declarators.*) */
 			    csplit_parser_warning("attributes_with_asm not supported\n");
 			    free_partial_signature($3);
 			  }
-			  if(TRUE) /* Keep parameter names in signatures. */
+			  if(true) /* Keep parameter names in signatures. */
 			    $$ = build_signature($1, $2, NULL);
 			  else {
 			    /* This does not work! Do not try it anymore... */
@@ -1812,10 +1812,10 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			   /* Too early to reset: one typedef can be used
                               to declare several named types... but I do
                               not know how to use it. */
-			   //csplit_is_typedef = FALSE;
+			   //csplit_is_typedef = false;
 			   $$ = $1;
 			 }
-			 else if(TRUE) { /* Keep identifiers in signatures */
+			 else if(true) { /* Keep identifiers in signatures */
 			   $$ = $1;
 			 }
 			 else { /* You are going to loose the function
@@ -2098,7 +2098,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  csplit_is_function = 1; /* function's declaration */
 
 			  current_function_is_static_p = csplit_is_static_p;
-			  csplit_is_static_p = FALSE;
+			  csplit_is_static_p = false;
 			  csplit_definite_function_signature
 			    = simplify_signature(build_signature($1, $2, NULL));
 			  pips_debug(1, "Signature for function \"%s\": \"%s\"\n\n",
@@ -2124,7 +2124,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  pips_debug(5, "Rule 2: Function declaration is located between line %d and line %d\n", get_csplit_current_beginning(), csplit_line_number);
 			  csplit_is_function = 1; /* function's declaration */
 			  current_function_is_static_p = csplit_is_static_p;
-			  csplit_is_static_p = FALSE;
+			  csplit_is_static_p = false;
 			  csplit_definite_function_signature
 			    = simplify_signature(build_signature($1, $2, NULL));
 			  pips_debug(1, "Signature for function \"%s\": \"%s\"\n\n",
@@ -2142,7 +2142,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  csplit_definite_function_name = strdup($1);
 			  csplit_is_function = 1; /* function's declaration */
 			  current_function_is_static_p = csplit_is_static_p;
-			  csplit_is_static_p = FALSE;
+			  csplit_is_static_p = false;
 
 			  csplit_definite_function_signature
 			    = simplify_signature
@@ -2162,7 +2162,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  csplit_definite_function_name = strdup($1);
 			  csplit_is_function = 1; /* function's declaration */
 			  current_function_is_static_p = csplit_is_static_p;
-			  csplit_is_static_p = FALSE;
+			  csplit_is_static_p = false;
 
 			  free_partial_signature($3);
 			  free_partial_signature($5);

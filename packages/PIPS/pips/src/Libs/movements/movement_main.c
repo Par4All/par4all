@@ -50,7 +50,7 @@ char *argv[];
     char *ppf_filename;
     FILE *fd;
     int i;
-    bool prettyprint_it = FALSE;
+    bool prettyprint_it = false;
     statement s,stat;
     cons *copy_in = NIL;
     cons  *copy_out=NIL;
@@ -82,7 +82,7 @@ text t;
 
 	make(DBR_CODE, module_name);
 
-	s = (statement) db_get_memory_resource(DBR_CODE, module_name, FALSE);
+	s = (statement) db_get_memory_resource(DBR_CODE, module_name, false);
 
 	mod = local_name_to_top_level_entity(module_name); 
 	search_array_from_statement2(module_name,s,&copy_in,&copy_out);

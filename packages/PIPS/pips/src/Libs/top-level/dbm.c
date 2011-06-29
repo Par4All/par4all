@@ -58,7 +58,7 @@ void (* pips_update_props_handler)() = default_update_props;
  * also works if the path was not set.
  */
 static string saved_pips_src_path = NULL;
-static bool some_saved_path = FALSE;
+static bool some_saved_path = false;
 
 static void push_path(void)
 {
@@ -66,7 +66,7 @@ static void push_path(void)
     pips_assert("not set", !some_saved_path);
     dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
     //saved_pips_src_path = strdup(pips_srcpath_append(dir));
-    some_saved_path = TRUE;
+    some_saved_path = true;
     free(dir);
 }
 
@@ -76,7 +76,7 @@ static void pop_path(void)
     pips_srcpath_set(saved_pips_src_path);
     free(saved_pips_src_path);
     saved_pips_src_path = NULL;
-    some_saved_path = FALSE;
+    some_saved_path = false;
 }
 
 /* tpips used to convert lower cases into upper cases for all module
@@ -85,7 +85,7 @@ static void pop_path(void)
    name is open if name cannot be open. */
 bool open_module(const char* name)
 {
-    bool success = FALSE;
+    bool success = false;
     string upper_case_name = strupper(strdup(name), name);
     string module_name = string_undefined;
 
@@ -136,7 +136,7 @@ bool open_module(const char* name)
 bool open_module_if_unique()
 {
     /* Be optimistic: */
-    bool success = TRUE;
+    bool success = true;
     gen_array_t a;
 
     pips_assert("some current workspace", db_get_current_workspace_name());
@@ -186,13 +186,13 @@ bool create_workspace(gen_array_t files)
     push_path();
 
     // Flag that check if there is F90 file
-    bool fortran_90_p = FALSE;
+    bool fortran_90_p = false;
 
     // Precompile F95/F90 files, necessary because of module
     for ( i = 0; i < argc; i++ ) {
       string filename = gen_array_item( files, i );
       if ( dot_f90_file_p( filename ) || dot_f95_file_p( filename ) ) {
-        fortran_90_p = TRUE;
+        fortran_90_p = true;
         compile_f90_module( filename );
       }
     }
@@ -252,7 +252,7 @@ bool create_workspace(gen_array_t files)
 /* Do not open a module already opened : */
 bool lazy_open_module(const char* name)
 {
-    bool success = TRUE;
+    bool success = true;
 
     pips_assert("lazy_open_module", db_get_current_workspace_name());
     pips_assert("cannot lazy_open no module", name != NULL);
@@ -287,7 +287,7 @@ bool open_workspace(const char* name)
 	/* should be show_message */
 	/* FI: what happens since log_file is not open? */
 	user_log("Cannot open workspace %s.\n", name);
-	success = FALSE;
+	success = false;
     }
     else {
 	string dir = db_get_current_workspace_directory();
@@ -327,7 +327,7 @@ bool close_workspace(bool is_quit)
 
 bool delete_workspace(const char * wname)
 {
-    int success = check_delete_workspace(wname,TRUE);
+    int success = check_delete_workspace(wname,true);
 
     return success;
 }
@@ -418,7 +418,7 @@ gen_array_t get_callers (string module)
             pips_internal_error("Cannot make callers for %s", module);
 
     caller_modules = (callees)
-            db_get_memory_resource(DBR_CALLERS, module,TRUE);
+            db_get_memory_resource(DBR_CALLERS, module,true);
 
     return gen_array_from_list(callees_callees(caller_modules));
 }
@@ -433,7 +433,7 @@ gen_array_t get_callees (string module)
             pips_internal_error("Cannot make callees for %s", module);
 
     callee_modules = (callees)
-            db_get_memory_resource(DBR_CALLEES, module,TRUE);
+            db_get_memory_resource(DBR_CALLEES, module,true);
 
     return gen_array_from_list(callees_callees(callee_modules));
 }

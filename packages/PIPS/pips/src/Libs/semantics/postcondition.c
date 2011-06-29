@@ -97,7 +97,7 @@ static bool postcondition_filter(statement stat)
     }
 
     /* ??? may happen in obscure unstructured... */
-    if (transformer_undefined_p(post)) return TRUE; 
+    if (transformer_undefined_p(post)) return true; 
 
     switch(instruction_tag(inst))
     {
@@ -167,7 +167,7 @@ static bool postcondition_filter(statement stat)
         break;
     }
 
-    return TRUE; /* must go downward */
+    return true; /* must go downward */
 }
 
 /* statement_mapping compute_postcondition(stat, post_map, pre_map)

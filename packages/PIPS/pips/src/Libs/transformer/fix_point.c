@@ -488,7 +488,7 @@ void build_transfer_equations(Pcontrainte leq,
 	Pcontrainte next_eq = CONTRAINTE_UNDEFINED;
 
 	for(eq = lteq; !CONTRAINTE_UNDEFINED_P(eq); eq = next_eq) {
-	    bool preserve = TRUE;
+	    bool preserve = true;
 	    Pvecteur t = VECTEUR_UNDEFINED;
 	    for(t = contrainte_vecteur(eq);
 		!VECTEUR_UNDEFINED_P(t) && preserve;
@@ -647,7 +647,7 @@ static void build_transfer_matrix(matrice * pa,
 /* sub_basis_p(Pbase b1, Pbase b2): check if b1 is included in b2 */
 bool sub_basis_p(Pbase b1, Pbase b2)
 {
-    bool is_a_sub_basis = TRUE;
+    bool is_a_sub_basis = true;
     Pbase t;
 
     for(t=b1; !VECTEUR_UNDEFINED_P(t) && is_a_sub_basis; t = t->succ) {
@@ -817,7 +817,7 @@ Pvecteur look_for_the_best_counter(Pcontrainte egs)
 	    entity p_old_index = entity_undefined;
 	    entity p_new_index = entity_undefined;
 	    Pvecteur lv = VECTEUR_UNDEFINED;
-	    bool failed = FALSE;
+	    bool failed = false;
 	    for(lv = v; !VECTEUR_UNDEFINED_P(lv) && !failed; lv = vecteur_succ(lv)) {
 		if(vecteur_var(lv) == TCST) {
 		    c_inc = (int) vecteur_val(lv);
@@ -826,13 +826,13 @@ Pvecteur look_for_the_best_counter(Pcontrainte egs)
 		    if(entity_undefined_p(p_old_index))
 			p_old_index = (entity) vecteur_var(lv);
 		    else
-			failed = TRUE;
+			failed = true;
 		}
 		else if(new_value_entity_p((entity) vecteur_var(lv))) {
 		    if(entity_undefined_p(p_new_index))
 			p_new_index = (entity) vecteur_var(lv);
 		    else
-			failed = TRUE;
+			failed = true;
 		}
 		else {
 		    pips_internal_error("Unexpected value entity %s",
@@ -941,7 +941,7 @@ Pcontrainte constraints_keep_invariants_only(Pcontrainte lc)
 
 bool invariant_vector_p(Pvecteur v)
 {
-    bool invariant = TRUE;
+    bool invariant = true;
     Pvecteur cv = VECTEUR_UNDEFINED;
     Pvecteur v_old = VECTEUR_NUL;
     Pvecteur v_new = VECTEUR_NUL;
@@ -954,7 +954,7 @@ bool invariant_vector_p(Pvecteur v)
 
     for(cv=v; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
 	if(vecteur_var(cv)==TCST) {
-	    /* OK, you could argue for invariant = FALSE,
+	    /* OK, you could argue for invariant = false,
 	     * but this would not help my debugging!
 	     */
 	    pips_internal_error("Constant term in a potential invariant vector!");
@@ -989,13 +989,13 @@ bool invariant_vector_p(Pvecteur v)
     }
 
     if(VECTEUR_NUL_P(v_sum)) {
-	invariant = TRUE;
+	invariant = true;
     }
     else {
 	/* if v_sum is non zero, you might try to bound it
 	 * wrt the loop precondition?
 	 */
-	invariant = FALSE;
+	invariant = false;
 	vect_rm(v_sum);
     }
 
@@ -1143,7 +1143,7 @@ transformer transformer_derivative_fix_point(transformer tf)
     entity ik = make_local_temporary_integer_value_entity();
     //Psysteme sc_t_prime_k = sc_dup(sc);
     //sc_t_prime_k = sc_multiply_constant_terms(sc_t_prime_k, (Variable) ik);
-    sc = sc_multiply_constant_terms(sc, (Variable) ik, TRUE);
+    sc = sc_multiply_constant_terms(sc, (Variable) ik, true);
     //Psysteme sc_t_prime_star = sc_projection_ofl(sc_t_prime_k, (Variable) ik);
     sc = sc_projection_ofl(sc, (Variable) ik);
     sc->base = base_remove_variable(sc->base, (Variable) ik);

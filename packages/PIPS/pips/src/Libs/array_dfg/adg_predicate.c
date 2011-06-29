@@ -220,7 +220,7 @@ expression ndf_exp;
 /* list adg_get_disjunctions( (list) exp_l )			AL 13/07/93
  * exp_l is a list of normal disjunctive form expressions.
  * It returns a list of Predicates. These Predicates, put together
- * in a disjunctive form have the same boolean value as a system
+ * in a disjunctive form have the same bool value as a system
  * of incoming expressions.
  */
 list adg_get_disjunctions( exp_l )

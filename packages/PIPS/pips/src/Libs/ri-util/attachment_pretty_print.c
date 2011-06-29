@@ -77,7 +77,7 @@ name_something(chunk * something)
 		       (char *) something))
 	/* Well, we have already named this object. Return the fact
            for gen_recurse: */
-	return FALSE;
+	return false;
     
     hash_put(names_of_almost_everything_in_a_module,
 	     (char *) something,
@@ -93,7 +93,7 @@ name_something(chunk * something)
 		current_name_of_something != 0);
     
     /* Go on in the RI: */
-    return TRUE;
+    return true;
 }
 
 
@@ -135,7 +135,7 @@ void
 begin_attachment_prettyprint()
 {
     if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {
-	is_emacs_pretty_print_asked = TRUE;
+	is_emacs_pretty_print_asked = true;
 	/*word_text_attachment_mapping = hash_table_make(hash_pointer, 0);*/
 	/* Initialize the local mapings: */
 	init_word_to_attachments_begin();
@@ -150,7 +150,7 @@ void
 end_attachment_prettyprint()
 {
     if (is_emacs_pretty_print_asked) {
-	is_emacs_pretty_print_asked = FALSE;
+	is_emacs_pretty_print_asked = false;
 
 	/* Strings in attachments should already have been freed by
 	   print_sentence and attachement it-self (witout "s") by
@@ -443,7 +443,7 @@ void
 attach_total_preconditions_decoration_to_text(text __attribute__ ((unused)) t)
 {
   if (is_emacs_pretty_print_asked)
-    pips_assert("not implemented yet", FALSE);
+    pips_internal_error("not implemented yet");
 }
 
 
@@ -767,7 +767,7 @@ output_an_attachment(FILE * output_file,
 	}
 
     default:
-	pips_assert("attachee_tag inconsistent", FALSE);
+	pips_internal_error("attachee_tag inconsistent");
     }
 
     /* End an Emacs Lisp properties: */
@@ -837,7 +837,7 @@ put_an_attachment_in_the_list(attachment a)
 				      attachments_before_sorting);
 
     /* We do not want to go on the recursion: */
-    return FALSE;
+    return false;
 }
 
 

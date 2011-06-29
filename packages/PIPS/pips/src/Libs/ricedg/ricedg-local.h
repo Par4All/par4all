@@ -54,12 +54,12 @@ extern int NbrTestDiVar;
 extern int NbrProjFMTotal;
 extern int NbrFMSystNonAug;
 extern int FMComp[18]; 
-extern boolean is_test_exact;
-extern boolean is_test_inexact_eq;
-extern boolean is_test_inexact_fm;
-extern boolean is_dep_cnst;
-extern boolean is_test_Di;
-extern boolean Finds2s1;
+extern bool is_test_exact;
+extern bool is_test_inexact_eq;
+extern bool is_test_inexact_fm;
+extern bool is_dep_cnst;
+extern bool is_test_Di;
+extern bool Finds2s1;
 
 extern int Nbrdo;
 

@@ -50,7 +50,7 @@
 bool region_consistent_p(region reg)
 {
 #define MY_MAX_CHECK VALUE_CONST(100000000)
-  bool consistent = TRUE;
+  bool consistent = true;
   Psysteme sc;
   Pbase b, t;
   Pcontrainte c;
@@ -115,7 +115,7 @@ bool region_consistent_p(region reg)
 
 bool regions_consistent_p(list l_reg)
 {
-    bool consistent = TRUE;
+    bool consistent = true;
     MAP(EFFECT, reg,
 	consistent = consistent && region_consistent_p(reg),l_reg);
     return consistent;

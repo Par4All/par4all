@@ -200,14 +200,14 @@ void fprint_lrange(
     FILE* file,
     list l)
 {
-    bool firstrange = TRUE;
+    bool firstrange = true;
 
     MAP(RANGE, r,
      {
 	 if (!firstrange)
 	     (void) fprintf(file, ", ");
 
-	 firstrange = FALSE;
+	 firstrange = false;
 	 fprint_range(file, r);
      },
 	l);

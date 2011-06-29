@@ -372,17 +372,17 @@ bool update_label_do_directive_module_name(directive begin, directive end)
       suffix = SUFFIX_OMP_DO;
       break;
     default:
-      return FALSE;
+      return false;
     }
 
   stmt = STATEMENT(CAR(directive_body(end)));
   if (!statement_loop_p(stmt))
-    return FALSE;
+    return false;
 
   /* Case of a loop statement only */
   label = loop_label(instruction_loop(statement_instruction(stmt)));
   if (entity_empty_label_p(label))
-    return FALSE;
+    return false;
   
   drt = current_directives_pop();
   STEP_DEBUG_DIRECTIVE(2, "pop current_directives", drt);
@@ -396,7 +396,7 @@ bool update_label_do_directive_module_name(directive begin, directive end)
   current_directives_push(drt);
 
   pips_debug(1,"TRUE\n");
-  return TRUE;
+  return true;
 }
 
 

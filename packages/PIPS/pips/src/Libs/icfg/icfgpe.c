@@ -75,7 +75,7 @@ text get_text_proper_effects_flt(string module_name)
   entity module;
   statement module_stat;
   statement s;
-  gen_chunk * m = (gen_chunk *) db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE);
+  gen_chunk * m = (gen_chunk *) db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true);
   
   /* current entity
    */
@@ -85,7 +85,7 @@ text get_text_proper_effects_flt(string module_name)
   /* current statement
    */
   set_current_module_statement((statement) db_get_memory_resource
-			       (DBR_CODE, module_name, TRUE));
+			       (DBR_CODE, module_name, true));
   module_stat = get_current_module_statement();
   
   {

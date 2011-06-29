@@ -139,8 +139,8 @@ list merge_transformer_lists(list tl1, list tl2)
  */
 bool check_transformer_list(list tl)
 {
-  bool identity_p = FALSE;
-  bool one_p = FALSE; // useless for the time being
+  bool identity_p = false;
+  bool one_p = false; // useless for the time being
 
   if(ENDP(tl)) {
     /* The empty transformer list is used to represent the empty
@@ -151,12 +151,12 @@ bool check_transformer_list(list tl)
     FOREACH(TRANSFORMER, tf, tl) {
       if(transformer_identity_p(tf)) {
 	if(identity_p) {
-	  one_p = FALSE;
+	  one_p = false;
 	  pips_internal_error("Two identity transformers in one list.");
 	}
 	else {
-	  identity_p = TRUE;
-	  one_p = TRUE;
+	  identity_p = true;
+	  one_p = true;
 	}
       }
     }
@@ -172,7 +172,7 @@ bool check_transformer_list(list tl)
     }
   }
 
-  return TRUE;
+  return true;
 }
 
 /* each transformer of tl1 must be combined with a transformer of
@@ -219,7 +219,7 @@ list combine_transformer_lists(list tl1, list tl2)
    list. Empty preconditions are not preserved in the returned
    list. An empty list is unfeasible.
 
-   if exclude_p==FALSE, return U_i1 U_i2 apply(t_i1, p_i2);
+   if exclude_p==false, return U_i1 U_i2 apply(t_i1, p_i2);
    else return U_i1 U_i2!=i1 apply(t_i1, p_i2);
  */
 list apply_transformer_lists_generic(list tl1, list tl2, bool exclude_p)
@@ -270,12 +270,12 @@ list apply_transformer_lists_generic(list tl1, list tl2, bool exclude_p)
 
 list apply_transformer_lists(list tl1, list tl2)
 {
-  return apply_transformer_lists_generic(tl1, tl2, FALSE);
+  return apply_transformer_lists_generic(tl1, tl2, false);
 }
 
 list apply_transformer_lists_with_exclusion(list tl1, list tl2)
 {
-  return apply_transformer_lists_generic(tl1, tl2, TRUE);
+  return apply_transformer_lists_generic(tl1, tl2, true);
 }
 
 /* Eliminate empty transformers and keep at most one identity
@@ -292,7 +292,7 @@ list apply_transformer_lists_with_exclusion(list tl1, list tl2)
 list clean_up_transformer_list(list tfl)
 {
   list ntfl = NIL;
-  bool identity_p = FALSE;
+  bool identity_p = false;
 
   FOREACH(TRANSFORMER, tf, tfl) {
     bool tf_identity_p = transformer_identity_p(tf);
@@ -435,7 +435,7 @@ transformer generic_transformer_list_to_transformer(list ltl, bool active_p)
  */
 transformer transformer_list_to_transformer(list ltl)
 {
-  return generic_transformer_list_to_transformer(ltl, FALSE);
+  return generic_transformer_list_to_transformer(ltl, false);
 }
 
 /* Reduce the sublist of active transformers in the transformer list
@@ -448,7 +448,7 @@ transformer transformer_list_to_transformer(list ltl)
  */
 transformer active_transformer_list_to_transformer(list ltl)
 {
-  return generic_transformer_list_to_transformer(ltl, TRUE);
+  return generic_transformer_list_to_transformer(ltl, true);
 }
 
 // Remove all inactive transformers from ltl and generate a new list
@@ -787,11 +787,11 @@ list transformer_list_preserved_variables(list vl, list tl, list tl_v)
   list pvl = NIL;
 
   FOREACH(ENTITY, v, vl) {
-    bool found_p = FALSE;
+    bool found_p = false;
     FOREACH(TRANSFORMER, t, tl) {
       if(!gen_in_list_p(t, tl_v)) {
 	if(entity_is_argument_p(v, transformer_arguments(t))) {
-	  found_p = TRUE;
+	  found_p = true;
 	  break;
 	}
       }
@@ -1120,13 +1120,13 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
 /* Compute (U tfl)* */
 transformer transformer_list_transitive_closure(list tfl)
 {
-  return transformer_list_generic_transitive_closure(tfl, TRUE);
+  return transformer_list_generic_transitive_closure(tfl, true);
 }
 
 /* Compute (U tfl)+ */
 transformer transformer_list_transitive_closure_plus(list tfl)
 {
-  return transformer_list_generic_transitive_closure(tfl, FALSE);
+  return transformer_list_generic_transitive_closure(tfl, false);
 }
 
 /* Internal recursive function. Should be used as
@@ -1163,7 +1163,7 @@ static list transformer_list_add_combination(int tn,
   if(n>0) {
     int k = 1; // to select a non-zero bit in past
     int ti; // transformation index
-    bool found_p = FALSE;
+    bool found_p = false;
     for(ti=0; ti<n;ti++) {
       if(k&past) {
 	// this transformation is selectable, because it has not been
@@ -1178,7 +1178,7 @@ static list transformer_list_add_combination(int tn,
 	  list nl = transformer_list_add_combination(tn, ta, n-1, nct, npast);
 	  cl = gen_nconc(cl, nl);
 	}
-	found_p = TRUE;
+	found_p = true;
 	free_transformer(nct);
       }
       k <<= 1;

@@ -101,7 +101,7 @@ clean_up_sequences_filter(statement s)
   /* gen_true() would be as good... and gcc would not complain. */
   /* And the maintenance would be easier. */
   pips_assert("", s==s);
-  return TRUE;
+  return true;
 }
 
 
@@ -129,9 +129,9 @@ compute_statement_to_goto_table_filter(instruction i)
 						      (char *) s)));
 	}
 	/* There is nothing to recurse into: */
-	return FALSE;
+	return false;
     }
-    return TRUE;
+    return true;
 }
 
 

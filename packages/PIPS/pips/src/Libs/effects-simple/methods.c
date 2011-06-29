@@ -150,8 +150,8 @@ set_methods_for_proper_references()
     db_get_proper_rw_effects_func = db_get_proper_references;
     db_put_proper_rw_effects_func = db_put_proper_references;
 
-    set_contracted_proper_effects(FALSE);
-    set_descriptor_range_p(FALSE);
+    set_contracted_proper_effects(false);
+    set_descriptor_range_p(false);
     set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
@@ -234,8 +234,8 @@ set_methods_for_cumulated_references()
     db_put_rw_effects_func = db_put_cumulated_references;
 
     /* FC: rm set_contracted_proper_effects(!PROPER_EFFECTS_CONTRACT); */
-    set_contracted_rw_effects(FALSE);
-    set_descriptor_range_p(FALSE);
+    set_contracted_rw_effects(false);
+    set_descriptor_range_p(false);
     set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
@@ -307,8 +307,8 @@ set_default_methods_for_proper_simple_effects()
   db_put_proper_rw_effects_func = db_put_simple_proper_rw_pointer_effects;
   db_get_summary_rw_effects_func = db_get_simple_summary_rw_pointer_effects;
 
-  set_contracted_proper_effects(TRUE);
-  set_descriptor_range_p(FALSE);
+  set_contracted_proper_effects(true);
+  set_descriptor_range_p(false);
   set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
@@ -460,8 +460,8 @@ set_methods_for_simple_effects()
   db_get_summary_out_effects_func = db_get_simple_summary_out_effects;
   db_put_summary_out_effects_func = db_put_simple_summary_out_effects;
 
-  set_contracted_rw_effects(TRUE);
-  set_descriptor_range_p(FALSE);
+  set_contracted_rw_effects(true);
+  set_descriptor_range_p(false);
   set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
@@ -558,8 +558,8 @@ set_methods_for_simple_pointer_effects()
   db_get_summary_out_effects_func = db_get_simple_summary_out_effects;
   db_put_summary_out_effects_func = db_put_simple_summary_out_effects;
 
-  set_contracted_rw_effects(TRUE);
-  set_descriptor_range_p(FALSE);
+  set_contracted_rw_effects(true);
+  set_descriptor_range_p(false);
   set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
@@ -574,10 +574,10 @@ void set_methods_for_inout_effects(string module_name __attribute__ ((unused)))
   /*
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement((statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, module_name, true) );
 
   set_cumulated_rw_effects((statement_effects)
-     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
   module_to_value_mappings(module_name_to_entity(module_name));
 

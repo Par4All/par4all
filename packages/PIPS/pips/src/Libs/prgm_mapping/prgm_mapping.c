@@ -134,7 +134,7 @@ string module_name;
   if (get_debug_level() > 1)
       user_log("\n\n *** PRINTING PLC for %s\n", module_name);
 
-  the_plc = (plc) db_get_memory_resource(DBR_PLC, module_name, TRUE);
+  the_plc = (plc) db_get_memory_resource(DBR_PLC, module_name, true);
 
   localfilename = strdup(concatenate(module_name, PLC_EXT, NULL));
   filename = strdup(concatenate(db_get_current_workspace_directory(), 
@@ -153,7 +153,7 @@ string module_name;
 
   debug_off();
 
-  return(TRUE);
+  return(true);
 }
 
 
@@ -399,17 +399,17 @@ int plc_make_dim()
 	    expression e = EXPRESSION(CAR(dl));
 	    if(! expression_constant_p(e)) {
 	      list l;
-	      boolean ind_not_null;
+	      bool ind_not_null;
               Pvecteur pv;
   
               NORMALIZE_EXPRESSION(e);
               pv = (Pvecteur) normalized_linear(expression_normalized(e));
 
-	      ind_not_null = FALSE;
+	      ind_not_null = false;
 	      for(l = ind_l; (!ENDP(l)) && (!ind_not_null); POP(l)) {
 	        entity var = ENTITY(CAR(l));
                 if(vect_coeff((Variable) var, pv) != 0)
-		  ind_not_null = TRUE;
+		  ind_not_null = true;
 	      }
 	      if(ind_not_null)
 	        sdim++;
@@ -714,8 +714,8 @@ list df_l;
     /* We transforme this polynome ("pp_dist") into two systems of
      * equations, Mi and Mp (cf. above).
      */
-    Mi_local = nullify_factors(&pp_dist, sink_ind_l, FALSE);
-    Mp_local = nullify_factors(&pp_dist, sink_par_l, TRUE);
+    Mi_local = nullify_factors(&pp_dist, sink_ind_l, false);
+    Mp_local = nullify_factors(&pp_dist, sink_par_l, true);
 
     polynome_rm(&pp_dist);
 
@@ -910,20 +910,20 @@ void edge_weight()
 
 /* ======================================================================== */
 /*
- * boolean in_list_p(chunk *c, list l)
+ * bool in_list_p(chunk *c, list l)
  *
- * returns TRUE if "c" appears in "l".
+ * returns true if "c" appears in "l".
  */
-boolean in_list_p(c, l)
+bool in_list_p(c, l)
 chunk *c;
 list l;
 {
   list ll = l;
-  boolean not_found = TRUE;
+  bool not_found = true;
 
   for( ; !ENDP(ll) && (not_found); POP(ll) ) {
     if(c == CHUNK(CAR(ll)))
-      not_found = FALSE;
+      not_found = false;
   }
   return(!not_found);
 }
@@ -1085,15 +1085,15 @@ fprintf(stderr, "\n");
 
 /* ======================================================================== */
 /*
- * boolean is_not_trivial_p(list vvs):
+ * bool is_not_trivial_p(list vvs):
  *
- * returns TRUE if all the prototypes are not trivial after applying "vvs".
+ * returns true if all the prototypes are not trivial after applying "vvs".
  * Otherwise, returns FALSE.
  *
  * A prototype is not trivial if it depends on enough parameters that one may
  * construct the required number of linearly independent solutions.
  */
-boolean is_not_trivial_p(vvs)
+bool is_not_trivial_p(vvs)
 list vvs;
 {
   extern hash_table StmtToProto, /* Mapping from a statement to its prototype */
@@ -1104,7 +1104,7 @@ list vvs;
  list l, ind_l;
  int stmt, dim_plc, dim_bdt;
  Ppolynome pp;
- boolean proto_not_triv = TRUE;
+ bool proto_not_triv = true;
 
   if(get_debug_level() > 5) {
     fprintf(stderr, "[is_not_trivial_p] \t\t\tSub is:\n");
@@ -1142,7 +1142,7 @@ list vvs;
 
     /* we carry on if the prototype is not trivial */
     if(prototype_dimension(pp, ind_l) < dim_plc)
-      proto_not_triv = FALSE;
+      proto_not_triv = false;
     else
       hash_put(stp, (char *) stmt, (char *) pp);
   }
@@ -1289,7 +1289,7 @@ fprint_entity_list(stderr, var_l);
 fprintf(stderr, "\n");
 }
 
-    farkas_ps = nullify_factors(&farkas_pp, var_l, TRUE);
+    farkas_ps = nullify_factors(&farkas_pp, var_l, true);
 
 /*    (void) polynome_free(sub_pp);*/
     (void) polynome_free(farkas_pp);
@@ -1569,19 +1569,19 @@ fprintf(stderr, "\n");
 
       for(lax = xunks; !ENDP(lax) && !ENDP(rem_xl) && !ENDP(aux_xl); POP(lax)) {
         list crt_ax = CONSP(CAR(lax));
-	boolean not_found = TRUE;
+	bool not_found = true;
 	entity e = entity_undefined;
 
 	for(cl = aux_xl; !ENDP(cl) && not_found; cl = CDR(cl)) {
 	  e = ENTITY(CAR(cl));
 	  if(in_list_p((chunk *) e, crt_ax))
-	    not_found = FALSE;
+	    not_found = false;
 	}
 	if(not_found) {
 	  for(cl = aux_xl; !ENDP(cl) && not_found; cl = CDR(cl)) {
 	    e = ENTITY(CAR(cl));
 	    if(in_list_p((chunk *) e, rem_xl))
-	      not_found = FALSE;
+	      not_found = false;
 	  }
 	  if(!not_found) {
 	    CONSP(CAR(lax)) = gen_nconc(crt_ax, CONS(ENTITY, e, NIL));
@@ -1651,7 +1651,7 @@ fprintf(stderr, "\n");
 /* ======================================================================== */
 /*
  * Psysteme system_inversion_restrict(Psysteme sys, list unks_l var_l par_l,
- *				      int nb_restrict, boolean is_first):
+ *				      int nb_restrict, bool is_first):
  *
  * sys -> B.e, unks_l -> l, ps_res -> l.B^(-1), var_l -> e :
  *
@@ -1664,7 +1664,7 @@ Psysteme system_inversion_restrict(sys, unks_l, var_l, par_l, nb_restrict, is_fi
 Psysteme sys;
 list unks_l, var_l, par_l;
 int nb_restrict;
-boolean is_first;
+bool is_first;
 {
   Psysteme full_ps;
   Pcontrainte new_pc;
@@ -1719,11 +1719,11 @@ boolean is_first;
 
 
 /* ======================================================================== */
-boolean solve_system_by_succ_elim(sys, sigma)
+bool solve_system_by_succ_elim(sys, sigma)
 Psysteme sys;
 list *sigma;
 {
-  boolean result = TRUE;
+  bool result = true;
   list sig = *sigma, sigma_p;
   Pcontrainte leg;
   Pvecteur new_v;
@@ -1755,7 +1755,7 @@ list *sigma;
     }
  
     if(sigma_p == NIL) {
-      /*result = TRUE;*/
+      /*result = true;*/
     }
     /* We apply it on all prototypes, if none becomes trivial ... */
     else if(is_not_trivial_p(sigma_p)) {
@@ -1767,10 +1767,10 @@ list *sigma;
       }
 
       sig = compose_vvs(sigma_p, sig);
-      /*result = TRUE;*/
+      /*result = true;*/
     }
     else
-      result = FALSE;
+      result = false;
   }
   *sigma = sig;
 
@@ -1780,13 +1780,13 @@ list *sigma;
 
 /* ========================================================================= */
 /*
- * boolean constant_vecteur_p(Pvecteur pv)
+ * bool constant_vecteur_p(Pvecteur pv)
  */
-boolean constant_vecteur_p(pv)
+bool constant_vecteur_p(pv)
 Pvecteur pv;
 {
   if(pv == NULL)
-    return(TRUE);
+    return(true);
   else
     return( (pv->succ == NULL) && (pv->var == TCST) );
 }
@@ -2141,7 +2141,7 @@ fprintf(stderr, "\n");
 
 
 /* ======================================================================== */
-boolean is_mu_coeff_p(e)
+bool is_mu_coeff_p(e)
 entity e;
 {
   return(strncmp(entity_local_name(e), MU_COEFF, 4) == 0);
@@ -2257,9 +2257,9 @@ char*   module_name;
 
   set_current_module_entity(ent);
 
-  mod_stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  mod_stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   STS = (statement_mapping) db_get_memory_resource(DBR_STATIC_CONTROL,
-						       module_name, TRUE);
+						       module_name, true);
   stco     = (static_control) GET_STATEMENT_MAPPING(STS, mod_stat);
   if ( stco == static_control_undefined) {
     pips_internal_error("This is an undefined static control !");
@@ -2279,11 +2279,11 @@ char*   module_name;
   }
 
   /* The DFG */
-  the_dfg = adg_pure_dfg((graph) db_get_memory_resource(DBR_ADFG, module_name, TRUE));
+  the_dfg = adg_pure_dfg((graph) db_get_memory_resource(DBR_ADFG, module_name, true));
 
   /* the BDT */
   the_bdt = bdt_undefined;
-  the_bdt = (bdt) db_get_memory_resource(DBR_BDT, module_name, TRUE);
+  the_bdt = (bdt) db_get_memory_resource(DBR_BDT, module_name, true);
 
   if(get_debug_level() > 2) {
     fprint_dfg(stderr, the_dfg);
@@ -2398,7 +2398,7 @@ char*   module_name;
     reset_current_stco_map();
     reset_current_module_entity();
     debug_off();
-    return(TRUE);
+    return(true);
   }
 
   /* Computation of the weight of each dataflow of the DFG. */
@@ -2664,5 +2664,5 @@ fprint_plc_pp_dims(stderr, pfunc);
 
   debug_off();
 
-  return(TRUE);
+  return(true);
 }

@@ -40,7 +40,7 @@
 
 #include "misc.h"
 
-static bool module_coherent_p=TRUE;
+static bool module_coherent_p=true;
 static entity checked_module = entity_undefined;
 
 
@@ -109,8 +109,8 @@ bool compilation_unit_p(const char* module_name) {
   /* A module name is a compilation unit if and only if its last character is
      FILE_SEP */
   if (module_name[strlen(module_name)-1]==FILE_SEP)
-    return TRUE;
-  return FALSE;
+    return true;
+  return false;
 }
 
 
@@ -149,7 +149,7 @@ variable_declaration_verify(reference ref)
 {
 
     if (!variable_in_module_p2(reference_variable(ref),checked_module))
-    { 	module_coherent_p = FALSE;
+    { 	module_coherent_p = false;
 	fprintf(stderr,
 			   "variable non declaree %s\n",
 			   entity_name(reference_variable(ref)));
@@ -162,7 +162,7 @@ symbolic_constant_declaration_verify(call c)
     
     if (value_symbolic_p(entity_initial(call_function(c)))) {
 	if (!variable_in_module_p2(call_function(c),checked_module))
-	{    module_coherent_p = FALSE;
+	{    module_coherent_p = false;
 	     ifdebug(4) fprintf(stderr,
 				"variable non declaree %s\n",
 				entity_name(call_function(c)));
@@ -234,13 +234,13 @@ add_symbolic_constant_to_declaration(call c)
 bool 
 variable_declaration_coherency_p(entity module, statement st)
 {
-    module_coherent_p = TRUE;
+    module_coherent_p = true;
     checked_module = module;
     gen_multi_recurse(st,
 		reference_domain,
 		gen_true,
 		add_non_declared_reference_to_declaration, NULL);
-    module_coherent_p = TRUE;
+    module_coherent_p = true;
     gen_multi_recurse(st,
 		call_domain,
 		gen_true,
@@ -274,7 +274,7 @@ get_end_of_header_comments(string the_comments)
                comment... Should never happend in a real program
                without any useful header! */
 	    pips_assert("get_end_of_header_comments found only comments!",
-			FALSE);
+			false);
     }
     return end_of_comment;
 }
@@ -468,7 +468,7 @@ list module_to_all_declarations(entity m)
   if(c_module_p(m)) {
     //string module_name = entity_user_name(m);
     string module_name = entity_local_name(m);
-    statement s = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+    statement s = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
     list sdl = statement_to_declarations(s);
 
     FOREACH(ENTITY, e, sdl) {
@@ -488,7 +488,7 @@ list module_to_all_declarations(entity m)
 */
 static bool x_language_module_p(entity m, unsigned int x)
 {
-  bool is_x = TRUE;
+  bool is_x = true;
   value mv = entity_initial(m);
 
   if(value_code_p(mv)) {
@@ -496,7 +496,7 @@ static bool x_language_module_p(entity m, unsigned int x)
     is_x = language_tag(code_language(c))==x;
   }
   else
-    is_x = FALSE;
+    is_x = false;
 
   return is_x;
 }
@@ -548,17 +548,17 @@ entity function_to_return_value(entity m)
 }
 
 /* Check if m is a C void function or a Fortran subroutine. No
-   information about m is available when FALSE is returned. */
+   information about m is available when false is returned. */
 bool void_function_p(entity m)
 {
   type ft = ultimate_type(entity_type(m));
-  bool void_p = FALSE;
+  bool void_p = false;
 
   if(type_functional_p(ft)) {
     functional f = type_functional(ft);
     type r = functional_result(f);
     if(type_void_p(r)) {
-      void_p = TRUE;
+      void_p = true;
     }
   }
 

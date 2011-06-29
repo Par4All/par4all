@@ -246,7 +246,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| error
 	{
 	  printf("\n");
-	  $$ = FALSE;
+	  $$ = false;
 	}
 	;
 
@@ -441,20 +441,20 @@ i_create: TK_CREATE workspace_name /* workspace name */
       printf("#Add some default property\n%s" JUMPL,default_props);
     }
 
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
 i_close: TK_CLOSE /* assume current workspace */ TK_ENDOFLINE
 	{
     printf("#Closing workspace\nw.close()" JUMPL);
-    $$ = TRUE;
+    $$ = true;
 	}
 	| TK_CLOSE TK_NAME /* workspace name */ TK_ENDOFLINE
 	{
 		printf("#Closing workspace %s\nw.close()" JUMPL,$2);
 		workspace_exist_p = false;
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -462,7 +462,7 @@ i_delete: TK_DELETE workspace_name /* workspace name */ TK_ENDOFLINE
 	{
 		pips_debug(7,"reduce rule i_delete\n");
     printf("#Deleting workspace\nworkspace.delete(\"%s\")" JUMPL,$2);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -470,7 +470,7 @@ i_module: TK_MODULE TK_NAME /* module name */ TK_ENDOFLINE
 	{
 		pips_debug(7,"reduce rule i_module\n");
     printf("# tpips : module %s\nw.set_current_active_module(\"%s\")" JUMPL, $2, $2);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -478,7 +478,7 @@ i_make:	TK_MAKE resource_id TK_ENDOFLINE
 	{
 		pips_debug(7, "reduce rule i_make\n");
     printf("# tpips : make \n# UNSUPPORTED" JUMPL);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -487,7 +487,7 @@ i_apply: TK_APPLY rule_id TK_ENDOFLINE
 		pips_debug(7,"reduce rule i_apply\n");
 		res_or_rule * res = &$2;
 		perform("apply" , true, res);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -505,7 +505,7 @@ i_capply: TK_CAPPLY rule_id TK_ENDOFLINE
                       pips_user_warning("Select a module first!\n");
                     }
                   }, res->the_owners);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -514,7 +514,7 @@ i_display: TK_DISPLAY resource_id TK_ENDOFLINE
 		pips_debug(7,"reduce rule i_display\n");
     res_or_rule * res = &$2;
     perform("display", false, res);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -522,7 +522,7 @@ i_touch: TK_TOUCH resource_id TK_ENDOFLINE
 	{
 		pips_debug(7, "reduce rule i_touch\n");
     printf("# tpips : touch \n# UNSUPPORTED" JUMPL);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -530,7 +530,7 @@ i_show: TK_SHOW resource_id TK_ENDOFLINE
 	{
 		pips_debug(7, "reduce rule i_show\n");
     printf("# tpips : show\n# UNSUPPORTED" JUMPL);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -538,7 +538,7 @@ i_rm: TK_REMOVE resource_id TK_ENDOFLINE
 	{
 		pips_debug(7,"reduce rule i_rm\n");
     printf("# tpips : rm\n# UNSUPPORTED" JUMPL);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -546,7 +546,7 @@ i_activate: TK_ACTIVATE rulename TK_ENDOFLINE
 	{
 		pips_debug(7,"reduce rule i_activate\n");
     printf("# tpips : activate %s\nw.activate(\"%s\")" JUMPL, $2,$2);
-		$$ = TRUE;
+		$$ = true;
 	}
 	;
 
@@ -562,7 +562,7 @@ i_get: TK_GET_PROPERTY propname TK_ENDOFLINE
     string s = $2;
     skip_blanks(s);
     printf("# tpips : get %s\nprint w.props.%s" JUMPL, s,s);
-    $$ = TRUE;
+    $$ = true;
 	}
 	;
 
@@ -570,7 +570,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 	{
 		int n = gen_array_nitems($2), i=0;
 		bool saved_tpips_is_interactive = tpips_is_interactive;
-		tpips_is_interactive = FALSE;
+		tpips_is_interactive = false;
 		CATCH(user_exception_error)
 		{
 			/* cleanup */
@@ -599,7 +599,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 				}
 				else
 				{
-					tpips_process_a_file(sourced, name, FALSE);
+					tpips_process_a_file(sourced, name, false);
 					fclose(sourced);
 				}
 			}

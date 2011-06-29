@@ -118,7 +118,7 @@
   * Modifications:
   *
   *  - only integer variables used to be analyzed; the analysis is
-  *  extended to strings, boolean and floating point scalar variables
+  *  extended to strings, bool and floating point scalar variables
   *  (Francois Irigoin, 14 June 2001).
   *
   *  - temporary values are added to deal with subexpressions and to
@@ -254,11 +254,11 @@ int number_of_temporary_values()
 
 /* TYPING */
 
-static bool analyze_integer_scalar_entities = TRUE;
-static bool analyze_boolean_scalar_entities = FALSE;
-static bool analyze_string_scalar_entities = FALSE;
-static bool analyze_float_scalar_entities = FALSE;
-static bool analyze_complex_scalar_entities = FALSE;
+static bool analyze_integer_scalar_entities = true;
+static bool analyze_boolean_scalar_entities = false;
+static bool analyze_string_scalar_entities = false;
+static bool analyze_float_scalar_entities = false;
+static bool analyze_complex_scalar_entities = false;
 
 void set_analyzed_types()
 {
@@ -276,11 +276,11 @@ void set_analyzed_types()
 
 void reset_analyzed_types()
 {
-  analyze_integer_scalar_entities = TRUE;
-  analyze_boolean_scalar_entities = FALSE;
-  analyze_string_scalar_entities = FALSE;
-  analyze_float_scalar_entities = FALSE;
-  analyze_complex_scalar_entities = FALSE;
+  analyze_integer_scalar_entities = true;
+  analyze_boolean_scalar_entities = false;
+  analyze_string_scalar_entities = false;
+  analyze_float_scalar_entities = false;
+  analyze_complex_scalar_entities = false;
 }
 
 bool integer_analyzed_p()
@@ -311,25 +311,25 @@ bool complex_analyzed_p()
 /* The entity is type of one of the analyzed types */
 bool analyzable_basic_p(basic b)
 {
-  bool analyzable_p = FALSE;
+  bool analyzable_p = false;
 
   if(basic_int_p(b) && analyze_integer_scalar_entities)
-    analyzable_p = TRUE;
+    analyzable_p = true;
   else if(basic_string_p(b) && analyze_string_scalar_entities)
-    analyzable_p = TRUE;
+    analyzable_p = true;
   else if(basic_logical_p(b) && analyze_boolean_scalar_entities)
-    analyzable_p = TRUE;
+    analyzable_p = true;
   else if(basic_float_p(b) && analyze_float_scalar_entities)
-    analyzable_p = TRUE;
+    analyzable_p = true;
   else if(basic_complex_p(b) && analyze_complex_scalar_entities)
-    analyzable_p = TRUE;
+    analyzable_p = true;
   else if(basic_derived_p(b) && analyze_integer_scalar_entities) {
     entity de = basic_derived(b);
     type dt = ultimate_type(entity_type(de));
     analyzable_p = type_enum_p(dt);
   }
   else
-    analyzable_p = FALSE;
+    analyzable_p = false;
 
   return analyzable_p;
 }
@@ -337,7 +337,7 @@ bool analyzable_basic_p(basic b)
 /* The entity is type of one of the analyzed types */
 bool analyzable_type_p(type t)
 {
-  bool result = FALSE;
+  bool result = false;
   type ut = ultimate_type(t);
 
   /* The type dimension or type_depth could be checked also... */
@@ -352,7 +352,7 @@ bool analyzable_type_p(type t)
 /* The entity is type of one of the analyzed types */
 bool analyzable_scalar_entity_p(entity e)
 {
-  bool result = FALSE;
+  bool result = false;
 
   if(!abstract_state_variable_p(e)) {
     type ut = ultimate_type(entity_type(e));
@@ -381,16 +381,16 @@ bool analyzed_constant_p(entity f)
     /* integer and logical constants are handled explicitly */
 
     if(basic_string_p(b) && analyze_string_scalar_entities)
-      return TRUE;
+      return true;
     if(basic_float_p(b) && analyze_float_scalar_entities)
-      return TRUE;
+      return true;
     if(basic_complex_p(b) && analyze_complex_scalar_entities)
-      return TRUE;
+      return true;
     else
-      return FALSE;
+      return false;
   }
   else {
-    return FALSE;
+    return false;
   }
 }
 
@@ -433,12 +433,12 @@ static entity make_local_value_entity(int n, int nature, type t)
        allocate one... */
     /* Well, type_equal_p() replaces typedefs types by the underlying
        type which leads to disasters; see suppress_dead_code04.c */
-    if(TRUE || type_equal_p(entity_type(v), t)) {
+    if(true || type_equal_p(entity_type(v), t)) {
       free_type(entity_type(v));
       entity_type(v) = copy_type(t);
     }
     else if(basic_string_p(variable_basic(type_variable(entity_type(v))))) {
-      /* The previous test always returns TRUE for strings */
+      /* The previous test always returns true for strings */
       free_type(entity_type(v));
       entity_type(v) = copy_type(t);
     }
@@ -516,10 +516,10 @@ bool local_temporary_value_entity_p(entity e)
 
 bool global_new_value_p(entity e)
 {
-  bool new = FALSE;
+  bool new = false;
   /* this is not a general test; it will only work for GLOBAL values */
 
-  /* this function should always return FALSE because new value = variable (FI) */
+  /* this function should always return false because new value = variable (FI) */
 
   /* => suf == NULL
      string suf = strchr(entity_local_name(e), SEMANTICS_SEPARATOR);
@@ -530,7 +530,7 @@ bool global_new_value_p(entity e)
      strcmp(suf, NEW_VALUE_SUFFIX) == 0;
   */
 
-  pips_assert("global_new_value", new == FALSE && e==e);
+  pips_assert("global_new_value", new == false && e==e);
 
   return new;
 }
@@ -541,7 +541,7 @@ bool global_old_value_p(entity e)
 {
   /* this is not a general test; it will only work for GLOBAL values */
   string suf = strchr(entity_local_name(e), SEMANTICS_SEPARATOR);
-  bool old = FALSE;
+  bool old = false;
 
   if(suf!=NULL)
     old = strcmp(entity_module_name(e), SEMANTICS_MODULE_NAME) != 0 &&
@@ -554,7 +554,7 @@ bool global_intermediate_value_p(entity e)
 {
   /* this is not a general test; it will only work for GLOBAL values */
   string suf = strchr(entity_local_name(e), SEMANTICS_SEPARATOR);
-  bool intermediate = FALSE;
+  bool intermediate = false;
 
   if(suf!=NULL)
     intermediate = strcmp(entity_module_name(e), SEMANTICS_MODULE_NAME) != 0 &&
@@ -714,7 +714,7 @@ bool old_value_entity_p(entity e)
     return s1!=NULL || s2!=NULL;
   }
   else
-    return FALSE;
+    return false;
 }
 
 bool intermediate_value_entity_p(entity e)
@@ -730,10 +730,10 @@ bool value_entity_p(entity e)
   string s = hash_get(hash_value_to_name, (char *) e);
 
   if(s == (char*) HASH_UNDEFINED_VALUE) {
-    return FALSE;
+    return false;
   }
   else {
-    return TRUE;
+    return true;
   }
 }
 

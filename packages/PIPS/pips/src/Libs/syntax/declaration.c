@@ -272,12 +272,12 @@ void MakeVariableStatic(entity v, bool force_it)
 
 void ProcessSave(entity v)
 {
-  MakeVariableStatic(v, TRUE);
+  MakeVariableStatic(v, true);
 }
 
 void save_initialized_variable(entity v)
 {
-  MakeVariableStatic(v, FALSE);
+  MakeVariableStatic(v, false);
 }
 
 /* this function transforms a dynamic common into a static one.  */
@@ -605,11 +605,11 @@ static bool
 same_basic_and_scalar_p(type t1, type t2)
 {
     variable v1, v2;
-    if (!type_variable_p(t1) || !type_variable_p(t2)) return FALSE;
+    if (!type_variable_p(t1) || !type_variable_p(t2)) return false;
     v1 = type_variable(t1);
     v2 = type_variable(t2);
-    if (variable_undefined_p(v1) || variable_undefined_p(v2)) return FALSE;
-    if (!basic_equal_p(variable_basic(v1), variable_basic(v2))) return FALSE;
+    if (variable_undefined_p(v1) || variable_undefined_p(v2)) return false;
+    if (!basic_equal_p(variable_basic(v1), variable_basic(v2))) return false;
     return variable_dimensions(v1)==NIL && variable_dimensions(v2)==NIL;
 }
 
@@ -666,7 +666,7 @@ DeclareVariable(
 {
   type et = entity_type(e);
   list etd = list_undefined;
-  bool variable_had_implicit_type_p = FALSE;
+  bool variable_had_implicit_type_p = false;
 
   debug(8, "DeclareVariable", "%s\n", entity_name(e));
   pips_assert("DeclareVariable", t == type_undefined || type_variable_p(t));
@@ -743,7 +743,7 @@ DeclareVariable(
 	if(implicit_type_p(e)){
 	  type nt;
 
-	  variable_had_implicit_type_p = TRUE;
+	  variable_had_implicit_type_p = true;
 
 	  /* set dimension etd if NIL */
 	  if(etd==NIL)
@@ -765,7 +765,7 @@ DeclareVariable(
 	  if(!same_basic_and_scalar_p(entity_type(e), nt))
 	    {
 			
-	      if(/*FI: to check update_common_layout*/ FALSE && 
+	      if(/*FI: to check update_common_layout*/ false && 
 		 entity_storage(e)!=storage_undefined &&
 		 storage_ram_p(entity_storage(e)) &&
 		 basic_type_size(variable_basic(type_variable(t)))
@@ -972,7 +972,7 @@ reset_common_size_map_on_error()
 bool
 common_to_defined_size_p(entity a)
 {
-    bool defined = FALSE;
+    bool defined = false;
 
     defined = ( (hash_get(common_size_map,(char *) a))
 	!= HASH_UNDEFINED_VALUE );
@@ -1359,7 +1359,7 @@ implicit_type_p(entity e)
     basic b;
 
     if(t == type_undefined)
-	return TRUE;
+	return true;
 
     if(type_functional_p(t))
 	t = functional_result(type_functional(t));
@@ -1380,7 +1380,7 @@ implicit_type_p(entity e)
     b = variable_basic(type_variable(t));
 
     if((tag)basic_tag(b) != tag_implicit[i])
-	return FALSE;
+	return false;
 
     switch(basic_tag(b)) {
 	case is_basic_int: return (size_t)basic_int(b)==int_implicit[i];
@@ -1395,7 +1395,7 @@ implicit_type_p(entity e)
 	default:
 	    pips_internal_error("illegal basic tag");
 	}
-    return FALSE; /* to please gcc */
+    return false; /* to please gcc */
 }
 
 /* If an IMPLICIT statement is encountered, it must be applied to
@@ -1514,7 +1514,7 @@ value v;
     b = make_basic(t, v);
   }
   else {
-    bool ok = FALSE;
+    bool ok = false;
     l = (v == value_undefined) ? DefaultLengthOfBasic(t) : 
       constant_int(value_constant(v));
 
@@ -1635,7 +1635,7 @@ range r;
 
 
 /* FI: should be moved in ri-util;
- * this function returns TRUE if e is a zero dimension variable of basic
+ * this function returns true if e is a zero dimension variable of basic
  * type integer
  */
 
@@ -1647,10 +1647,10 @@ entity e;
 	variable a = type_variable(entity_type(e));
 
 	if (variable_dimensions(a) == NIL && basic_int_p(variable_basic(a)))
-		return(TRUE);
+		return(true);
     }
 
-    return(FALSE);
+    return(false);
 }
 
 void
@@ -1658,9 +1658,9 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
 {
     entity mod = get_current_module_entity();
     /* list members = area_layout(type_area(entity_type(c))); */
-    /* list members = common_members_of_module(c, mod , TRUE); */
+    /* list members = common_members_of_module(c, mod , true); */
     /* for debugging only */
-    list members = common_members_of_module(c, mod , FALSE);
+    list members = common_members_of_module(c, mod , false);
     list equiv_members = NIL;
 
     (void) fprintf(fd,"\nLayout for common /%s/ of size %td:\n",
@@ -1808,7 +1808,7 @@ entity m;
     MAP(ENTITY, e, {
 	if(type_area_p(entity_type(e))) {
 	    ifdebug(1) {
-		print_common_layout(stderr, e, TRUE);
+		print_common_layout(stderr, e, true);
 	    }
 	    if(!entity_special_area_p(e)) {
 		/* User declarations of commons imply the offset and
@@ -1821,7 +1821,7 @@ entity m;
 		   processed. */
 		if(update_common_layout(m, e)) {
 		    ifdebug(1) {
-			print_common_layout(stderr, e, TRUE);
+			print_common_layout(stderr, e, true);
 		    }
 		}
 	    }
@@ -1866,7 +1866,7 @@ entity c;
 
     list members = area_layout(type_area(entity_type(c)));
     entity previous = entity_undefined;
-    bool updated = FALSE;
+    bool updated = false;
     list cm = list_undefined;
 
     ifdebug(8) {
@@ -1922,7 +1922,7 @@ entity c;
 			(void) update_common_to_size(c, new_s);
 		    }
 		}
-		updated = TRUE;
+		updated = true;
 	    }
 	    else {
 		/* Variables declared in the static and dynamic areas were
@@ -1952,7 +1952,7 @@ entity c;
 	      +SafeSizeOfArray(previous);
 	    if(s < new_s) {
 	      (void) update_common_to_size(c, new_s);
-	      updated = TRUE;
+	      updated = true;
 	    }
 	  }
 	}
@@ -2034,7 +2034,7 @@ SafeFindOrCreateEntity(
 	  /* There is such a global variable and it is in the proper scope */
 	  e = fe;
 	}
-	else if(FALSE && intrinsic_entity_p(fe)) {
+	else if(false && intrinsic_entity_p(fe)) {
 	  /* Here comes the mistake if the current_module_entity is not
              yet defined as is the case when formal parameters are
              parsed. Intrinsics may wrongly picked out. See capture01.f, variable DIM. */

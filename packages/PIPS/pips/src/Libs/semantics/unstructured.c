@@ -296,7 +296,7 @@ void print_control_postcondition_map
   }
   else {
     pips_assert("The CFG contains at least one node with one statement",
-		FALSE);
+		false);
   }
 }
 
@@ -422,11 +422,11 @@ static bool ready_to_be_processed_p(control c,
 				    list already_processed,
 				    control_mapping control_postcondition_map)
 {
-  bool ready = TRUE;
+  bool ready = true;
   MAP(CONTROL, pred, {
     if(gen_in_list_p(pred, already_processed)) {
       /* useless, except for debugging */
-      ready &= TRUE;
+      ready &= true;
     }
     else if(!gen_in_list_p(pred, to_be_processed)) {
       /* postcondition must be empty because pred is not reachable */
@@ -444,7 +444,7 @@ static bool ready_to_be_processed_p(control c,
       }
     }
     else if(gen_in_list_p(pred, still_to_be_processed)) {
-      ready &= FALSE;
+      ready &= false;
     }
     else {
       pips_internal_error("node pred does not belong to any category: %s",
@@ -473,7 +473,7 @@ static transformer load_arc_precondition(control pred, control c,
     pips_debug(2, "Failed for predecessor node pred=%p and node c=%p with map %p:\n",
 	       pred, c, control_postcondition_map);
     pips_assert("postconditions of predecessors are assumed initialized"
-		" (see process_ready_node().", FALSE);
+		" (see process_ready_node().", false);
     pre = transformer_empty();
   }
   else {
@@ -503,12 +503,12 @@ static transformer load_arc_precondition(control pred, control c,
 
 	if(i%2==1) { /* One of the true successors */
 	  pre = precondition_add_condition_information(pre, e,
-						       transformer_undefined, TRUE);
+						       transformer_undefined, true);
 
 	}
 	else{ /* One of the false successors */
 	  pre = precondition_add_condition_information(pre, e,
-						       transformer_undefined, FALSE);
+						       transformer_undefined, false);
 	}
       }
     }
@@ -539,7 +539,7 @@ transformer load_cycle_fix_point(control c, hash_table fix_point_map)
 
   if((fptf = (transformer) hash_get(fix_point_map, (void *) c))
      == (transformer) (HASH_UNDEFINED_VALUE)) 
-    pips_assert("c is not a cycle head", FALSE);
+    pips_assert("c is not a cycle head", false);
 
   return fptf;
 }
@@ -729,7 +729,7 @@ static void process_ready_node(control c,
 	 pre, /* precondition on entry */
 	 n_pre_u, /* precondition true for any node of scc_u. */
 	 control_postcondition_map, /* */
-	 FALSE); /* Compute transformers */
+	 false); /* Compute transformers */
 
       ifdebug(2) {
 	pips_debug(2, "Fixpoint transformer %p for control %p:\n", fptf, c);
@@ -752,11 +752,11 @@ static void process_ready_node(control c,
       /* FI: I do not know why an empty context is passed down. */
       if(true_successors_only_p(c)) {
 	pre_no_cycle = precondition_add_condition_information(pre_no_cycle, e,
-							      transformer_undefined, TRUE);
+							      transformer_undefined, true);
       }
       else if(false_successors_only_p(c)) {
 	pre_no_cycle = precondition_add_condition_information(pre_no_cycle, e,
-							      transformer_undefined, FALSE);
+							      transformer_undefined, false);
       }
     }
     free_transformer(pre);
@@ -809,7 +809,7 @@ static void process_ready_node(control c,
   else {
     /* The statement transformer may have been computed earlier thru a fix
        point calculation, but the transformer may not be correct if it
-       were computed in context (property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE). */
+       were computed in context (property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT true). */
     transformer tfp = load_statement_transformer(stmt);
     transformer tf = transformer_undefined;
 
@@ -914,7 +914,7 @@ static bool process_unreachable_node(control c,
 			statement_identification(s));
     }
   }
-  return TRUE;
+  return true;
 }
 
 /*
@@ -1006,7 +1006,7 @@ void print_statement_temporary_precondition
     }, statement_temporary_precondition_map);
   }
   else {
-    pips_assert("The DAG contains at least one control node with one statement", FALSE);
+    pips_assert("The DAG contains at least one control node with one statement", false);
   }
 }
 
@@ -1216,7 +1216,7 @@ static void cycle_to_flow_sensitive_preconditions
     } while(count!=0);
     if(!ENDP(still_to_be_processed)) {
       pips_assert("still_to_be_processed is empty because of the Bourdoncle's restructuring",
-		  FALSE);
+		  false);
     }
   }
   /* The precondition for the entry node may be improved by now using the
@@ -1284,11 +1284,11 @@ static void dag_to_flow_sensitive_preconditions
 	  /* FI: I do not know why an empty context is passed down. */
 	  if(true_successors_only_p(c)) {
 	    pre_no_cycle = precondition_add_condition_information(pre_no_cycle, e,
-								  transformer_undefined, TRUE);
+								  transformer_undefined, true);
 	  }
 	  else if(false_successors_only_p(c)) {
 	    pre_no_cycle = precondition_add_condition_information(pre_no_cycle, e,
-								  transformer_undefined, FALSE);
+								  transformer_undefined, false);
 	  }
 	}
 	/* free_transformer(pre); */
@@ -1616,7 +1616,7 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
     } while(count!=0);
     if(!ENDP(still_to_be_processed)) {
       pips_assert("still_to_be_processed is empty because of the Bourdoncle's restructuring",
-		  FALSE);
+		  false);
     }
   }
 
@@ -1728,7 +1728,7 @@ transformer dag_to_flow_sensitive_postconditions_or_transformers
 
   tf = dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
     (partition, ndu, ancestor_map, scc_map, fix_point_map, e_pre, n_pre,
-     control_postcondition_map, postcondition_p, TRUE);
+     control_postcondition_map, postcondition_p, true);
 
   return tf;
 }
@@ -1748,7 +1748,7 @@ transformer cycle_to_flow_sensitive_postconditions_or_transformers
 
   tf = dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
     (partition, ndu, ancestor_map, scc_map, fix_point_map, e_pre, n_pre,
-     control_postcondition_map, postcondition_p, FALSE);
+     control_postcondition_map, postcondition_p, false);
 
   return tf;
 }
@@ -1991,7 +1991,7 @@ unstructured_to_postconditions(
 	statement prev_st = control_statement(prev_c);
 
 	if(statement_test_p(prev_st)) {
-	  /* the condition is TRUE if c is the first successor of prev_c */
+	  /* the condition is true if c is the first successor of prev_c */
 	  bool true_false = (c==(CONTROL(CAR(control_successors(prev_c)))));
 	  expression e = test_condition(statement_test(prev_st));
 	  transformer context = transformer_range(pre);
@@ -2054,7 +2054,7 @@ transformer unstructured_to_flow_sensitive_postconditions
   }
   else {
     post = unstructured_to_flow_sensitive_postconditions_or_transformers
-      (pre_u, pre, u, TRUE);
+      (pre_u, pre, u, true);
   }
   gen_free_list(succs);
 
@@ -2358,7 +2358,7 @@ transformer unstructured_to_transformer(unstructured u,
 
   /* Transformers should be computed precisely whether the unstructured is
      left by the exit node or by an explicit or implicit call to STOP. */
-  if(TRUE || gen_in_list_p(tail, succs)) {
+  if(true || gen_in_list_p(tail, succs)) {
     /* computing the transformer for u is like computing the postcondition
        with no information on entry: no, the input context may be used to
        refine the transformer. */
@@ -2422,7 +2422,7 @@ transformer unstructured_to_transformer(unstructured u,
     }
     else {
       tf = unstructured_to_flow_sensitive_postconditions_or_transformers
-	(pre_u, pre, u, FALSE);
+	(pre_u, pre, u, false);
     }
     free_transformer(pre_u);
   }
@@ -2469,7 +2469,7 @@ transformer unstructured_to_flow_sensitive_total_preconditions
   transformer post = transformer_undefined;
   /* control tail = unstructured_exit(u); */
 
-  pips_assert("Not implemented yet", FALSE);
+  pips_assert("Not implemented yet", false);
   pips_assert("Shut up the compiler", t_post_u==t_post_u && pre==pre && u==u);
 
   pips_assert("Total precondition for unstructured is consistent",

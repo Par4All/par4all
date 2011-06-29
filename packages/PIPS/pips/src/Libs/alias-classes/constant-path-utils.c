@@ -1038,7 +1038,7 @@ bool opgen_may_vreference(list vr1, list vr2)
   else{
     FOREACH(expression, e, vr1){
       if(extended_integer_constant_expression_p(e)) {
-	gen_may_p = FALSE;
+	gen_may_p = false;
 	break;
       }
     }

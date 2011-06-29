@@ -333,15 +333,15 @@ statements in the imbricated if-statements
 - the number of calls in the imbricated if-statements
 is smaller than IF_CONV_THRESH
 */
-boolean if_conversion_init(char * mod_name)
+bool if_conversion_init(char * mod_name)
 {
     // get the resources
     set_current_module_entity(module_name_to_entity(mod_name));
-    statement root = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+    statement root = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
     statement fake = make_empty_block_statement();
 
     set_current_module_statement(fake);// to prevent a complex bug with gen_recurse and AddEntityToCurrentModule
-    set_complexity_map( (statement_mapping) db_get_memory_resource(DBR_COMPLEXITIES, mod_name, TRUE));
+    set_complexity_map( (statement_mapping) db_get_memory_resource(DBR_COMPLEXITIES, mod_name, true));
 
     debug_on("IF_CONVERSION_INIT_DEBUG_LEVEL");
 
@@ -379,5 +379,5 @@ boolean if_conversion_init(char * mod_name)
 
     debug_off();
 
-    return TRUE;
+    return true;
 }

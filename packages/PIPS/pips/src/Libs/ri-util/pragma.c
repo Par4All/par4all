@@ -118,7 +118,7 @@ static expression merge_conditions(list l_cond, if_clause_policy policy) {
           op = CreateIntrinsic(C_AND_OPERATOR_NAME);
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error ("This case should have been handled before");
           break;
       }
       break;
@@ -132,12 +132,12 @@ static expression merge_conditions(list l_cond, if_clause_policy policy) {
           op = CreateIntrinsic(C_OR_OPERATOR_NAME);
           break;
         default:
-          pips_assert ("This case should have been handled before", FALSE);
+          pips_internal_error ("This case should have been handled before");
           break;
       }
       break;
     default:
-      pips_assert ("update switch case", FALSE);
+      pips_internal_error ("update switch case");
       break;
   }
   // now we have a list of condition and an operator -> merge them
@@ -166,7 +166,7 @@ expression pragma_build_if_condition(expression cond) {
       op = CreateIntrinsic(C_GREATER_OR_EQUAL_OPERATOR_NAME);
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_internal_error ("This case should have been handled before" );
       break;
   }
   int threshold = get_int_property("OMP_LOOP_PARALLEL_THRESHOLD_VALUE");
@@ -331,7 +331,7 @@ list pragma_omp_merge_expr (list l_pragma) {
   // Get the if clause policy
   if_clause_policy policy = get_if_clause_policy ();
   // the outer flag
-  bool flag = TRUE;
+  bool flag = true;
 
   // look into each pragma for private, reduction and if clauses
   FOREACH (PRAGMA, p, l_pragma) {
@@ -347,7 +347,7 @@ list pragma_omp_merge_expr (list l_pragma) {
         // each private var has to be uniquely declared
         list add = NIL;
         FOREACH (EXPRESSION, exp, args) {
-          if(expression_equal_in_list_p(exp, priv_var) == FALSE)
+          if(!expression_equal_in_list_p(exp, priv_var) )
             add = gen_expression_cons(exp, add);
         }
         priv_var = gen_nconc(priv_var, add);
@@ -362,12 +362,12 @@ list pragma_omp_merge_expr (list l_pragma) {
             if_cond = gen_nconc(if_cond, args);
             break;
           default:
-            pips_assert ("Should not happend",FALSE);
+            pips_internal_error ("Should not happen");
             break;
         }
       } else if(is_expression_omp_reduction_p(e)) {
         // Only the reductions clause on the outer loop need to be saved
-        if(flag == TRUE) {
+        if(flag ) {
           red = gen_expression_cons(e, red);
         }
       } else if(is_expression_omp_omp_p(e) || is_expression_omp_for_p(e)
@@ -378,7 +378,7 @@ list pragma_omp_merge_expr (list l_pragma) {
         pips_internal_error("pips cannot merge this pragma clause");
       }
     }
-    flag = FALSE;
+    flag = false;
   }
   // build the private clause if needed
   if(priv_var != NIL) {
@@ -425,12 +425,12 @@ string close_pragma(pragma p) {
  */
 string
 pragma_to_string (pragma p) {
-  bool flg   = FALSE;
+  bool flg   = false;
   list l_str = NULL; //list of string
   list l_expr = NULL; // list of expression
   size_t line_sz = 0; // the pragma line size
   string s = string_undefined;
-  string_buffer sb = string_buffer_make(FALSE);
+  string_buffer sb = string_buffer_make(false);
 
   switch(pragma_tag (p)) {
     case is_pragma_string:
@@ -440,11 +440,11 @@ pragma_to_string (pragma p) {
       l_expr = gen_nreverse(pragma_expression (p));
       FOREACH (EXPRESSION, e, l_expr)
       {
-        if(flg == TRUE) {
+        if(flg ) {
           string_buffer_append(sb, strdup(" "));
           line_sz += 1;
         }
-        flg = TRUE;
+        flg = true;
         l_str = words_expression(e, NIL);
         //      l_str = gen_nreverse (l_str);
         if(prettyprint_language_is_fortran_p()) {
@@ -510,7 +510,7 @@ pragma_to_string (pragma p) {
 void add_pragma_str_to_statement(statement st, string s, bool copy_flag) {
 
   /* Duplicate string if requested */
-  if (copy_flag == TRUE) s=strdup(s);
+  if (copy_flag ) s=strdup(s);
 
   /* Make a new pragma */
   pragma p = make_pragma_string(s);
@@ -567,7 +567,7 @@ add_pragma_expr_to_statement(statement st, list l) {
  */
 void
 add_expr_to_pragma_expr_list (pragma pr, expression ex) {
-  pips_assert ("the pragma need to be an expression", pragma_expression_p (pr) == TRUE);
+  pips_assert ("the pragma need to be an expression", pragma_expression_p (pr) );
   /* Add the new pragma to the extension list: */
   list exprs = pragma_expression (pr);
   exprs = gen_expression_cons (ex, exprs);

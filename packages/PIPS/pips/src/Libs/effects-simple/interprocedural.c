@@ -140,8 +140,8 @@ list effects_dynamic_elim(list l_eff)
 {
   list l_res = NIL;
   list c_eff = list_undefined;
-  bool add_anywhere_write_effect_p = FALSE;
-  bool add_anywhere_read_effect_p = FALSE;
+  bool add_anywhere_write_effect_p = false;
+  bool add_anywhere_read_effect_p = false;
   bool value_passing_p = c_module_p(get_current_module_entity());
 
   for(c_eff = l_eff; !ENDP(c_eff); POP(c_eff)) {
@@ -149,7 +149,7 @@ list effects_dynamic_elim(list l_eff)
 
     entity eff_ent = effect_entity(eff);
     storage eff_s = entity_storage(eff_ent);
-    boolean ignore_this_effect = FALSE;
+    bool ignore_this_effect = false;
 
     ifdebug(4) {
       pips_debug(4, "current effect for entity \"\%s\":\n",
@@ -164,7 +164,7 @@ list effects_dynamic_elim(list l_eff)
       switch (storage_tag(eff_s)) {
       case is_storage_return:
 	pips_debug(5, "return var ignored (%s)\n", entity_name(eff_ent));
-	ignore_this_effect = TRUE;
+	ignore_this_effect = true;
 	break;
       case is_storage_ram:
 	{
@@ -196,7 +196,7 @@ list effects_dynamic_elim(list l_eff)
 		  fel = effects_dynamic_elim(nel);
 
 		  if(ENDP(fel)) {
-		    ignore_this_effect = TRUE;
+		    ignore_this_effect = true;
 		  }
 		  else
 		    {
@@ -217,21 +217,21 @@ list effects_dynamic_elim(list l_eff)
 		  pips_debug(5, "Local pointer \"%s\" is not initialized!\n",
 			     entity_name(eff_ent));
 		  if(action_write_p(ac))
-		    add_anywhere_write_effect_p = TRUE;
+		    add_anywhere_write_effect_p = true;
 		  else
-		    add_anywhere_read_effect_p = TRUE;
-		  ignore_this_effect = TRUE;
+		    add_anywhere_read_effect_p = true;
+		  ignore_this_effect = true;
 		}
 	      }
 	      else {
 		pips_debug(5, "Local pointer \"%s\" can be ignored\n",
 			   entity_name(eff_ent));
-		ignore_this_effect = TRUE;
+		ignore_this_effect = true;
 	      }
 	    else {
 	      pips_debug(5, "dynamic or pointed var ignored (%s)\n",
 			 entity_name(eff_ent));
-	      ignore_this_effect = TRUE;
+	      ignore_this_effect = true;
 	    }
 	  }
 	  break;
@@ -242,12 +242,12 @@ list effects_dynamic_elim(list l_eff)
 	  list inds = reference_indices(r);
 	  action ac = effect_action(eff);
 	  if(action_write_p(ac) && ENDP(inds))
-	    ignore_this_effect = TRUE;
+	    ignore_this_effect = true;
 	}
 	break;
       case is_storage_rom:
 	if(!entity_special_area_p(eff_ent) && !anywhere_effect_p(eff))
-	  ignore_this_effect = TRUE;
+	  ignore_this_effect = true;
 	break;
 	/*  pips_internal_error("bad tag for %s (rom)",
 	    entity_name(eff_ent));*/
@@ -353,7 +353,7 @@ offset_of_reference(reference ref, int n)
         return(voffset);
 
     for (idim = 1; idim <= n; idim++) {
-        bool non_computable = FALSE;
+        bool non_computable = false;
         expression index = reference_ith_index(ref, idim);
         expression bound = dimension_lower(entity_ith_dimension(a, idim));
         normalized ni, nb;
@@ -374,7 +374,7 @@ offset_of_reference(reference ref, int n)
                     Pvecteur s = size_of_array(a, idim-1);
                     if ((v = vect_product(&v, &s)) == NULL)
 		    {
-                        non_computable = TRUE;
+                        non_computable = true;
                     }
                 }
                 if (! non_computable)
@@ -386,7 +386,7 @@ offset_of_reference(reference ref, int n)
         }
         else
 	{
-            non_computable = TRUE;
+            non_computable = true;
         }
 
         if (non_computable)
@@ -433,7 +433,7 @@ global_effect_translation(
     entity ccommon; /* current common */
     int eff_ent_size, total_size, eff_ent_begin_offset, eff_ent_end_offset;
     effect new_eff;
-    boolean found = FALSE;
+    bool found = false;
 
     pips_debug(5, "target function: %s (local name: %s)\n",
 	       entity_name(target_func), module_local_name(target_func));
@@ -472,7 +472,7 @@ global_effect_translation(
 	if (strcmp(entity_module_name(com_ent),
 		   module_local_name(target_func)) == 0)
 	{
-	    found = TRUE;
+	    found = true;
 	}
     }
 
@@ -651,7 +651,7 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
     /* Check that inequality real_size <= formal_size + offset - 1
      * is not compatible with the binding equations
      */
-    bad_reshaping = TRUE;
+    bad_reshaping = true;
     if (size_formal != NULL && size_real != NULL && offset != (Pvecteur) -1)
     {
 	Pcontrainte ct = CONTRAINTE_UNDEFINED;
@@ -673,7 +673,7 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
 	    sc_fprint(stderr, equations, (get_variable_name_t) vect_debug_entity_name);
 	}
 
-	bad_reshaping = FALSE;
+	bad_reshaping = false;
 	sc_creer_base(equations);
 	if ((equations = sc_normalize(equations)) != NULL) {
 	    debug(5, "translate_array_effect",

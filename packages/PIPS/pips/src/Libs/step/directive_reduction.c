@@ -11,21 +11,21 @@ License.
 #endif
 #include "defines-local.h"
 
-static boolean reduction_op_p(string op)
+static bool reduction_op_p(string op)
 {
-  if (!strcasecmp(op,"+")) return TRUE;
-  if (!strcasecmp(op,"*")) return TRUE;
-  if (!strcasecmp(op,"-")) return TRUE;
-  if (!strcasecmp(op,".and.")) return TRUE;
-  if (!strcasecmp(op,".or.")) return TRUE;
-  if (!strcasecmp(op,".eqv.")) return TRUE;
-  if (!strcasecmp(op,".neqv.")) return TRUE;
-  if (!strcasecmp(op,"max")) return TRUE;
-  if (!strcasecmp(op,"min")) return TRUE;
-  if (!strcasecmp(op,"iand")) return TRUE;
-  if (!strcasecmp(op,"ior")) return TRUE;
-  if (!strcasecmp(op,"ieor")) return TRUE;
-  return FALSE;
+  if (!strcasecmp(op,"+")) return true;
+  if (!strcasecmp(op,"*")) return true;
+  if (!strcasecmp(op,"-")) return true;
+  if (!strcasecmp(op,".and.")) return true;
+  if (!strcasecmp(op,".or.")) return true;
+  if (!strcasecmp(op,".eqv.")) return true;
+  if (!strcasecmp(op,".neqv.")) return true;
+  if (!strcasecmp(op,"max")) return true;
+  if (!strcasecmp(op,"min")) return true;
+  if (!strcasecmp(op,"iand")) return true;
+  if (!strcasecmp(op,"ior")) return true;
+  if (!strcasecmp(op,"ieor")) return true;
+  return false;
 }
 
 clause step_check_reduction(entity module, string directive_txt)
@@ -34,7 +34,7 @@ clause step_check_reduction(entity module, string directive_txt)
   string operator_,operator;
   string list_,item,comma;
   int nb_item, nb_comma;
-  boolean erreur=false;
+  bool erreur=false;
   map_entity_string reductions=make_map_entity_string();
   string msg_err;
 
@@ -47,7 +47,7 @@ clause step_check_reduction(entity module, string directive_txt)
       if (!reduction_clause)
 	{
 	  msg_err="missing clause detail";
-	  erreur=TRUE;
+	  erreur=true;
 	  break;
 	}
       reduction_clause=strtok (reduction_clause,"()");
@@ -59,7 +59,7 @@ clause step_check_reduction(entity module, string directive_txt)
       if (!list_)
 	{
 	  msg_err="missing variable list";
-	  erreur=TRUE;
+	  erreur=true;
 	  break;
 	}
       
@@ -68,7 +68,7 @@ clause step_check_reduction(entity module, string directive_txt)
       if (!reduction_op_p(operator)||strtok(NULL," "))
 	{
 	  msg_err="unknow operator";
-	  erreur=TRUE;
+	  erreur=true;
 	  break;
 	}
 
@@ -88,14 +88,14 @@ clause step_check_reduction(entity module, string directive_txt)
 	  if (entity_undefined_p (e)) 
 	    {
 	      msg_err="unknow variable";
-	      erreur=TRUE;
+	      erreur=true;
 	      break;
 	    }
 	  /* verifier la non existance d'une r�duction pr�c�dente pour la variable*/
 	  if (bound_map_entity_string_p(reductions,e))
 	    {
 	      msg_err="several reduction for the same variable.";
-	      erreur=TRUE;
+	      erreur=true;
 	      break;
 	    }
 	  extend_map_entity_string(reductions,e,strdup(operator));
@@ -106,7 +106,7 @@ clause step_check_reduction(entity module, string directive_txt)
       if (item&&!erreur)
 	{
 	  msg_err="too many variable";
-	  erreur=TRUE;
+	  erreur=true;
 	}
 
       free(reduction_clause_dup);
@@ -126,7 +126,7 @@ clause step_check_reduction(entity module, string directive_txt)
 string clause_reduction_to_string(map_entity_string reductions)
 {
   string s = string_undefined;
-  string_buffer sb = string_buffer_make(FALSE);
+  string_buffer sb = string_buffer_make(false);
   list entity_reduction=NIL;
 
   MAP_ENTITY_STRING_MAP(e, __attribute__ ((unused))op,{

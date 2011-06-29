@@ -76,7 +76,7 @@ reference cell_any_reference(cell c)
 */
 bool memory_dereferencing_p(reference r)
 {
-  bool dereferencing_p = FALSE;
+  bool dereferencing_p = false;
   entity v = reference_variable(r);
   type vt = entity_type(v);
   type uvt = ultimate_type(vt);
@@ -85,7 +85,7 @@ bool memory_dereferencing_p(reference r)
   /* Get rid of simple Fortran-like array accesses */
   if(gen_length(sl)==gen_length(variable_dimensions(type_variable(vt)))) {
     /* This is a simple array access */
-    dereferencing_p = FALSE;
+    dereferencing_p = false;
   }
   else if(!ENDP(sl)) {
     /* cycle with alias-classes library: import explictly */
@@ -93,7 +93,7 @@ bool memory_dereferencing_p(reference r)
     if(entity_abstract_location_p(v)) {
       pips_internal_error("Do we want to subscript abstract locations?");
     }
-    else if(FALSE /* entity_heap_variable_p(v)*/) {
+    else if(false /* entity_heap_variable_p(v)*/) {
       /* Heap modelization is behind*/
     }
     else if(entity_variable_p(v)) {
@@ -102,7 +102,7 @@ bool memory_dereferencing_p(reference r)
        subscript is a zero. */
       if(pointer_type_p(uvt))
 	/* Since it is subscripted, there is dereferencing */
-	dereferencing_p = TRUE;
+	dereferencing_p = true;
       else {
 	list csl = sl; // current subscript list
 	type ct = uvt; // current type
@@ -110,7 +110,7 @@ bool memory_dereferencing_p(reference r)
 	  expression se = EXPRESSION(CAR(csl));
 	  ct = ultimate_type(subscripted_type_to_type(ct, se));
 	  if(pointer_type_p(ct) && !ENDP(csl)) {
-	    dereferencing_p = TRUE;
+	    dereferencing_p = true;
 	  }
 	  else {
 	    POP(csl);
@@ -177,7 +177,7 @@ statement_mapping efs_map;
 
 
 
-/* Return TRUE if the statement has a write effect on at least one of
+/* Return true if the statement has a write effect on at least one of
    the argument (formal parameter) of the module. Note that the return
    variable of a function is also considered here as a formal
    parameter. */
@@ -186,7 +186,7 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
                                                       entity module,
                                                       statement_mapping effects_list_map)
 {
-   bool write_effect_on_a_module_argument_found = FALSE;
+   bool write_effect_on_a_module_argument_found = false;
    list effects_list = (list) GET_STATEMENT_MAPPING(effects_list_map, s);
 
    MAP(EFFECT, an_effect,
@@ -197,7 +197,7 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
               && (variable_return_p(a_variable)
 		  || variable_is_a_module_formal_parameter_p(a_variable,
 							     module))) {
-	      write_effect_on_a_module_argument_found = TRUE;
+	      write_effect_on_a_module_argument_found = true;
              break;
           }
        },
@@ -373,7 +373,7 @@ bool std_file_effects_p(list effects)
    they only differ by their approximations and their descriptors? */
 bool effect_comparable_p(effect e1, effect e2)
 {
-  bool comparable_p = FALSE;
+  bool comparable_p = false;
   reference r1 = effect_any_reference(e1);
   reference r2 = effect_any_reference(e2);
   entity v1 = reference_variable(r1);
@@ -393,7 +393,7 @@ bool effect_comparable_p(effect e1, effect e2)
 	  {
 	    list csl1 = list_undefined;
 	    list csl2 = list_undefined;
-	    bool equal_p = TRUE;
+	    bool equal_p = true;
 
 	    for(csl1=sl1, csl2=sl2; !ENDP(csl1) && equal_p; POP(csl1), POP(csl2))
 	      {
@@ -416,7 +416,7 @@ bool effect_comparable_p(effect e1, effect e2)
  */
 bool store_independent_effect_p(effect eff)
 {
-  bool independent_p = FALSE;
+  bool independent_p = false;
 
   ifdebug(1) {
     reference r = effect_any_reference(eff);
@@ -425,7 +425,7 @@ bool store_independent_effect_p(effect eff)
   }
 
   if(anywhere_effect_p(eff))
-    independent_p = TRUE;
+    independent_p = true;
   else {
     reference r = effect_any_reference(eff);
     entity v = reference_variable(r);
@@ -449,7 +449,7 @@ bool store_independent_effect_p(effect eff)
 /* FI: I use this predicate to guard the use-def chains computation */
 bool fortran_compatible_effect_p(effect e)
 {
-  bool compatible_p = FALSE;
+  bool compatible_p = false;
   reference r = effect_any_reference(e);
   entity v = reference_variable(r);
   type ut = ultimate_type(entity_type(v));
@@ -457,7 +457,7 @@ bool fortran_compatible_effect_p(effect e)
 
   /* Basically, this is about a Fortran effect... */
   if((!pointer_type_p(ut) || ENDP(ind))) {
-    compatible_p = TRUE;
+    compatible_p = true;
   }
 
   return compatible_p;
@@ -514,7 +514,7 @@ bool effects_interfere_p(effect eff1, effect eff2)
 {
   action ac1 = effect_action(eff1);
   action ac2 = effect_action(eff2);
-  bool interfere_p = FALSE;
+  bool interfere_p = false;
 
   if(action_write_p(ac1)||action_write_p(ac2)) {
     if(anywhere_effect_p(eff1) && action_write_p(ac1)) {
@@ -558,7 +558,7 @@ bool effects_interfere_p(effect eff1, effect eff2)
 	  MAP(REFERENCE, r, {
 	      entity v = reference_variable(r);
 	      if(wv==v) {
-		interfere_p = TRUE;
+		interfere_p = true;
 		break;
 	      }
 	    }, rl);
@@ -566,7 +566,7 @@ bool effects_interfere_p(effect eff1, effect eff2)
 	    break;
 	}, rind);
 
-      //interfere_p = TRUE;
+      //interfere_p = true;
     }
   }
   return interfere_p;
@@ -707,14 +707,14 @@ effect effect_interference(effect eff1, effect eff2)
 	  expression s = EXPRESSION(CAR(cind1));
 	  list rl = NIL;
 	  list crl = list_undefined;
-	  bool interfere_p = FALSE;
+	  bool interfere_p = false;
 
 	  rl = expression_to_reference_list(s, rl);
 	  for(crl=rl; !ENDP(rl); POP(rl)) {
 	    reference r = REFERENCE(CAR(crl));
 	    entity v = reference_variable(r);
 	    if(v2==v) {
-	      interfere_p = TRUE;
+	      interfere_p = true;
 	      break;
 	    }
 	  }
@@ -825,7 +825,7 @@ action make_action_read_memory(void)
 
 bool action_equal_p(action a1, action a2)
 {
-  bool equal_p = FALSE;
+  bool equal_p = false;
 
   if(action_tag(a1)==action_tag(a2)) {
     if(action_read_p(a1)) {
@@ -896,14 +896,14 @@ bool type_declaration_effect_p(effect e)
 
 bool effects_write_variable_p(list el, entity v)
 {
-  bool result = FALSE;
+  bool result = false;
   if(v) {
     FOREACH(EFFECT, e, el) {
       action a  = effect_action(e);
       entity ev = effect_entity(e);
       if (action_write_p(a) && store_effect_p(e)
           && entities_may_conflict_p(ev,v) ) {
-        result = TRUE;
+        result = true;
         break;
       }
     }
@@ -913,14 +913,14 @@ bool effects_write_variable_p(list el, entity v)
 
 bool effects_read_variable_p(list el, entity v)
 {
-  bool result = FALSE;
+  bool result = false;
   if(v) {
     FOREACH(EFFECT, e, el) {
       action a  = effect_action(e);
       entity ev = effect_entity(e);
       if (action_read_p(a) && store_effect_p(e)
           && entities_may_conflict_p(ev,v) ) {
-        result = TRUE;
+        result = true;
         break;
       }
     }
@@ -931,12 +931,12 @@ bool effects_read_variable_p(list el, entity v)
 /* Check that all effects in el are read effects */
 bool effects_all_read_p(list el)
 {
-  bool result = TRUE;
+  bool result = true;
   FOREACH(EFFECT, e, el) {
     action a  = effect_action(e);
     //entity ev = effect_entity(e);
     if (action_write_p(a)) {
-      result = FALSE;
+      result = false;
       break;
     }
   }
@@ -949,7 +949,7 @@ bool effects_all_read_p(list el)
    conservative. */
 bool effect_list_can_be_safely_full_freed_p(list el)
 {
-  bool safe_p = TRUE;
+  bool safe_p = true;
   FOREACH(EFFECT, e, el) {
     cell c = effect_cell(e);
     if(cell_reference_p(c)) {
@@ -959,7 +959,7 @@ bool effect_list_can_be_safely_full_freed_p(list el)
       if(ENDP(inds)) {
 	/* The free is very likely to be unsafe */
 	//entity v = reference_variable(r);
-	safe_p = FALSE;
+	safe_p = false;
 	//fprintf(stderr, "cell_reference for %s", entity_name(v));
       }
       else {
@@ -1042,7 +1042,7 @@ reference cell_to_reference(cell c) {
 /* Debugging */
 bool effect_list_consistent_p(list el)
 {
-  bool ok_p = TRUE;
+  bool ok_p = true;
 
   FOREACH(EFFECT, e, el)
     ok_p = ok_p && effect_consistent_p(e);
@@ -1068,7 +1068,7 @@ bool union_compatible_effects_p(effect ef1, effect ef2)
   tag akt2 = action_kind_tag(ak2);
   entity e2 = effect_variable(ef2);
   descriptor d2 = effect_descriptor(ef2);
-  bool compatible_p = TRUE;
+  bool compatible_p = true;
 
   pips_assert("effect e1 is consistent", effect_consistent_p(ef1));
   pips_assert("effect e2 is consistent", effect_consistent_p(ef2));
@@ -1078,12 +1078,12 @@ bool union_compatible_effects_p(effect ef1, effect ef2)
        you might want to do so to generate the set of referenced
        elements, for instance to generate communications or to
        allocate memory */
-    compatible_p = FALSE;
+    compatible_p = false;
   }
   else if(akt1!=akt2) {
     /* You do not want to union an effect on store with an effect on
        environment or type declaration */
-    compatible_p = FALSE;
+    compatible_p = false;
   }
   else {
     /* Here we know: at1==at2 and akt1==akt2 */
@@ -1091,13 +1091,13 @@ bool union_compatible_effects_p(effect ef1, effect ef2)
        it easier to understand */
     if(akt1==is_action_kind_store) {
       if(e1!=e2) /* Beware: that's not true anymore because of abstract locations */
-	compatible_p = FALSE;
+	compatible_p = false;
       else {
 	tag dt1 = descriptor_tag(d1);
 	tag dt2 = descriptor_tag(d2);
 
 	if(dt1!=dt2)
-	  compatible_p = FALSE;
+	  compatible_p = false;
       }
     }
     else {
@@ -1122,16 +1122,16 @@ entity effect_to_entity(effect ef)
   return e;
 }
 
-/* boolean vect_contains_phi_p(Pvecteur v)
+/* bool vect_contains_phi_p(Pvecteur v)
  * input    : a vector
- * output   : TRUE if v contains a PHI variable, FALSE otherwise
+ * output   : true if v contains a PHI variable, false otherwise
  * modifies : nothing
  */
-boolean vect_contains_phi_p(Pvecteur v)
+bool vect_contains_phi_p(Pvecteur v)
 {
     for(; !VECTEUR_NUL_P(v); v = v->succ)
 	if (variable_phi_p((entity) var_of(v)))
-	    return(TRUE);
+	    return(true);
 
-    return(FALSE);
+    return(false);
 }

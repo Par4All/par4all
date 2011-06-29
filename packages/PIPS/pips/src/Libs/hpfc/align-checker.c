@@ -50,10 +50,10 @@ write_on_entity_p(
     entity e)
 {
     MAP(REGION, r,
-	if (region_entity(r)==e && region_write_p(r)) return TRUE,
+	if (region_entity(r)==e && region_write_p(r)) return true,
 	load_statement_local_regions(get_hpfc_current_statement()));
 
-    return FALSE;
+    return false;
 }
 
 /* true is the expression is locally constant, that is in the whole loop nest,
@@ -69,10 +69,10 @@ local_integer_constant_expression(
 	(normalized_linear_p(expression_normalized(e))))
     {
 	entity ent = reference_variable(syntax_reference(s));
-	if (write_on_entity_p(ent)) return FALSE;
+	if (write_on_entity_p(ent)) return false;
     }
     
-    return TRUE;
+    return true;
 }
 
 /* true if the expression is shift function
@@ -90,7 +90,7 @@ int *pi;
     switch (normalized_tag(n))
     {
     case is_normalized_complex:
-	return(FALSE);
+	return(false);
 	break;
     case is_normalized_linear:
     {
@@ -98,7 +98,7 @@ int *pi;
 	int s = vect_size(vp);
 	bool result;
 
-	if (s!=1) return FALSE;
+	if (s!=1) return false;
 
 	result = entity_loop_index_p((entity)var_of(vp)) && 
 	    value_one_p(val_of(vp));
@@ -120,7 +120,7 @@ int *pi;
 	break;
     }
     
-    return FALSE; /* just to avoid a gcc warning */
+    return false; /* just to avoid a gcc warning */
 }
 
 /* true if the expression is an affine function
@@ -144,7 +144,7 @@ int *pi1, *pi2;
     switch (normalized_tag(n))
     {
     case is_normalized_complex:
-	return(FALSE);
+	return(false);
 	break;
     case is_normalized_linear:
     {
@@ -153,7 +153,7 @@ int *pi1, *pi2;
 	int s = vect_size(vp);
 	bool result;
 
-	if (s!=1) return(FALSE);
+	if (s!=1) return(false);
 
 	result = (entity_loop_index_p((entity)var_of(vp)) && 
 		  value_notone_p(val_of(vp)));
@@ -176,11 +176,11 @@ int *pi1, *pi2;
 	break;
     }
     
-    return(FALSE); /* just to avoid a gcc warning */
+    return(false); /* just to avoid a gcc warning */
 }
 
 /* computes the shift vector that links the two references,
- * TRUE if every thing is ok, i.e. the vector is ok for the
+ * true if every thing is ok, i.e. the vector is ok for the
  * distributed dimensions...
  * The vector considered here is just a list of integers.
  * conditions: same template
@@ -195,7 +195,7 @@ align_check(
     int procdim, i, ne2dim;
     entity e1, e2;
     align a1, a2;
-    bool ok = TRUE;
+    bool ok = true;
     list li1, li2;
 
     e1 = reference_variable(r1),
@@ -524,7 +524,7 @@ int *pi;
     switch (normalized_tag(n))
     {
     case is_normalized_complex:
-	return(FALSE);
+	return(false);
 	break;
     case is_normalized_linear:
     {
@@ -549,5 +549,5 @@ int *pi;
 	break;
     }
     
-    return(FALSE); /* just to avoid a gcc warning */
+    return(false); /* just to avoid a gcc warning */
 }

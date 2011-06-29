@@ -229,7 +229,7 @@ void FixCReturnStatements(statement ms)
   if(get_bool_property("C_PARSER_RETURN_SUBSTITUTION")) {
     /* How many return statements have been encountered? */
     int nrs = GetReturnNumber();
-    int replace_p = FALSE;
+    int replace_p = false;
     if(nrs==-1 || nrs==0)
       ; /* nothing to be done */
     else if(nrs==1) {
@@ -257,19 +257,19 @@ void FixCReturnStatements(statement ms)
 		make_continue_instruction();
 	    free_instruction(li);
 	    //free_instruction(lrvai); contains the expression resued above!
-	    replace_p = FALSE;
+	    replace_p = false;
 	  }
 	  else
-	    replace_p = TRUE;
+	    replace_p = true;
 	}
 	else
-	  replace_p = TRUE;
+	  replace_p = true;
       }
       else
-	replace_p = TRUE;
+	replace_p = true;
     }
     else if(nrs>1)
-      replace_p = TRUE;
+      replace_p = true;
     else
       pips_internal_error("The number of return statements has"
 			  " not been initialized");
@@ -284,7 +284,7 @@ void FixCReturnStatements(statement ms)
 				     ms);
 	reset_current_module_entity();
       }
-      insert_statement(ms, C_return_statement, FALSE);
+      insert_statement(ms, C_return_statement, false);
     }
   }
   Reset_C_ReturnStatement();

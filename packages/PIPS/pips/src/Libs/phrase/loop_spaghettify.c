@@ -375,7 +375,7 @@ static unstructured make_unstructured_from_loop (loop the_loop,
 
   link_2_control_nodes (initialization, condition); /* after init, we test */
 
-  /* The first connexion is the FALSE one */
+  /* The first connexion is the false one */
   link_2_control_nodes (condition, exit); /* false condition, we exit from loop */
   link_2_control_nodes (condition, body); /* true condition, we go to body */
 

@@ -214,11 +214,11 @@ static void abc_instrumentation_insert_before_statement(statement s, statement s
 	}
       else
 	// there is no unstructured (?)
-	insert_statement(s,s1,TRUE);
+	insert_statement(s,s1,true);
     }
   else
     // structured case 
-    insert_statement(s,s1,TRUE);     
+    insert_statement(s,s1,true);     
 }
 
 static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_context_p context )
@@ -314,12 +314,12 @@ static bool abc_bound_violation_stop_statement_p(statement s)
 	  expression e = EXPRESSION(CAR(l));
 	  string name = entity_name(call_function(syntax_call(expression_syntax(e))));	  
 	  //  fprintf(stderr, "name = %s\n",name);
-	  if (strstr(name,"Bound violation") != NULL) return TRUE;
-	  return FALSE;
+	  if (strstr(name,"Bound violation") != NULL) return true;
+	  return false;
 	}
-      return FALSE;
+      return false;
     }
-  return FALSE; 
+  return false; 
 }
 
 static bool number_of_operators_flt(expression e, abc_number_of_operators_context_p context)
@@ -329,11 +329,11 @@ static bool number_of_operators_flt(expression e, abc_number_of_operators_contex
       if (logical_operator_expression_p(e))
 	{
 	  context->number ++;;
-	  return TRUE;
+	  return true;
 	}
-      return FALSE;
+      return false;
     }
-  return FALSE;
+  return false;
 }
 
 static int  number_of_logical_operators(expression e)
@@ -413,13 +413,13 @@ static bool store_mapping(control c, abc_instrumentation_context_p context)
 {
   extend_persistant_statement_to_control(context->map,
 					 control_statement(c), c);
-  return TRUE;
+  return true;
 }
 
 static bool push_uns(unstructured u, abc_instrumentation_context_p context)
 {
   stack_push((char *) u, context->uns);
-  return TRUE;
+  return true;
 }
 
 static void pop_uns(unstructured u, abc_instrumentation_context_p context)
@@ -491,7 +491,7 @@ bool old_array_bound_check_instrumentation(char *module_name)
   /* Begin the array bound check instrumentation phase. 
    * Get the code from dbm (true resource) */  
   module_statement= (statement) 
-    db_get_memory_resource(DBR_CODE, module_name, TRUE);  
+    db_get_memory_resource(DBR_CODE, module_name, true);  
   set_current_module_statement(module_statement); 
   set_ordering_to_statement(module_statement);      
   debug_on("ARRAY_BOUND_CHECK_INSTRUMENTATION_DEBUG_LEVEL");  
@@ -546,7 +546,7 @@ bool old_array_bound_check_instrumentation(char *module_name)
   reset_ordering_to_statement();
   reset_current_module_statement();
   reset_current_module_entity();
-  return TRUE;
+  return true;
 }
 
 static list l_commons = NIL;
@@ -615,7 +615,7 @@ bool array_bound_check_instrumentation(char *module_name)
   /* Eliminate 4 special variables : MAIN000:*DYNAMIC*, MAIN000:*STATIC*,MAIN000:*HEAP*, MAIN000:*STACK* **/
   user_log("*\nNumber of scalar variables :%d *\n", number_of_scalar_variables);
   user_log("*\nNumber of array variables :%d *\n", number_of_array_variables);
-  return TRUE;
+  return true;
 } 
 
 

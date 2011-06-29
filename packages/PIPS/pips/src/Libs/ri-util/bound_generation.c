@@ -74,7 +74,7 @@ expression *upper;
 	if (ABS(i)==rank_index){	/* found */
 	    ifdebug(7) {
 		(void) fprintf(stderr, "\n constraint before :");
-		contrainte_fprint(stderr, pc, TRUE,
+		contrainte_fprint(stderr, pc, true,
 				  (get_variable_name_t) entity_name_or_TCST);
 	    }
 	    ex = make_constraint_expression(pc->vecteur, (Variable) index);

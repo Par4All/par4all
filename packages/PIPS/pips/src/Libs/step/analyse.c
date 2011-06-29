@@ -58,7 +58,7 @@ GENERIC_GLOBAL_FUNCTION(global_step_analyses,map_entity_step_analyses);
 
 void global_step_analyses_load()
 {
-  set_global_step_analyses((map_entity_step_analyses)db_get_memory_resource(DBR_STEP_ANALYSES, "", TRUE));
+  set_global_step_analyses((map_entity_step_analyses)db_get_memory_resource(DBR_STEP_ANALYSES, "", true));
 }
 
 void global_step_analyses_save()
@@ -281,7 +281,7 @@ static list step_send_regions(list write_l, list out_l)
    
    Region entrelacee: determination a l'execution de la modification
 */
-static boolean step_interlaced_iteration_regions_p(region reg, list loop_data_l)
+static bool step_interlaced_iteration_regions_p(region reg, list loop_data_l)
 {
   Psysteme s = sc_dup(region_system(reg));
   Psysteme  s_prime = sc_dup(s);
@@ -319,7 +319,7 @@ static boolean step_interlaced_iteration_regions_p(region reg, list loop_data_l)
 //sc_default_dump(s);
   pips_debug(1, "Fin\n");
 
-  return sc_integer_feasibility_ofl_ctrl(s, NO_OFL_CTRL, TRUE);
+  return sc_integer_feasibility_ofl_ctrl(s, NO_OFL_CTRL, true);
 }
 
 static list step_interlaced_iteration_regions(list loop_data_l, list send_l)
@@ -470,9 +470,9 @@ bool step_analyse(string module_name)
   debug_on("STEP_ANALYSE_DEBUG_LEVEL");
 
   // recuperation des effects R W IN et OUT
-  region_l = effects_to_list((effects)db_get_memory_resource(DBR_SUMMARY_REGIONS, entity_user_name(module), TRUE));
-  in_l = effects_to_list((effects)db_get_memory_resource(DBR_IN_SUMMARY_REGIONS, entity_user_name(module), TRUE));
-  out_l = effects_to_list((effects)db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS, entity_user_name(module), TRUE));
+  region_l = effects_to_list((effects)db_get_memory_resource(DBR_SUMMARY_REGIONS, entity_user_name(module), true));
+  in_l = effects_to_list((effects)db_get_memory_resource(DBR_IN_SUMMARY_REGIONS, entity_user_name(module), true));
+  out_l = effects_to_list((effects)db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS, entity_user_name(module), true));
 
   set_methods_for_convex_effects();
   init_convex_rw_prettyprint(module_name);
@@ -495,8 +495,8 @@ bool step_analyse(string module_name)
     step_print_region("Region out ", out_l);
   }
 
-  set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, entity_user_name(module), TRUE));
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, entity_user_name(module), TRUE));
+  set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, entity_user_name(module), true));
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, entity_user_name(module), true));
   module_to_value_mappings(module);
 
   // STEP analysis
@@ -546,7 +546,7 @@ bool step_analyse(string module_name)
   debug_off();
 
   pips_debug(1, "FIN\n");
-  return TRUE;
+  return true;
 }
 
 
@@ -613,8 +613,8 @@ bool step_analyse_com(string module_name)
 
   debug_on("STEP_ANALYSE_COM_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module_name);
-  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
-  statement body = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
+  statement body = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   set_current_module_statement(body);
@@ -755,7 +755,7 @@ bool step_analyse_com(string module_name)
   reset_current_module_entity();
 
   debug_off(); 
-  return TRUE;
+  return true;
 }
 
 static list step_effect_backward_translation(statement current_stat, list comm_entities)
@@ -823,7 +823,7 @@ static void statement_to_send_recv(statement s, list *send, list *recv)
     {
       entity func = call_function(statement_call(s));
       string func_name = entity_local_name(func);
-      step_analyses_com analyses_com=(step_analyses_com)db_get_memory_resource(DBR_STEP_ANALYSES_COM, func_name, TRUE);
+      step_analyses_com analyses_com=(step_analyses_com)db_get_memory_resource(DBR_STEP_ANALYSES_COM, func_name, true);
       pips_debug(3, "\tCalled module %s\n",func_name);
       
       if(!step_analyses_com_undefined_p(analyses_com))
@@ -861,8 +861,8 @@ bool step_analyse_com2(string module_name)
   debug_on("STEP_ANALYSE_COM2_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module_name);
   entity module = local_name_to_top_level_entity(module_name);
-  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
-  statement body = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
+  statement body = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   set_current_module_entity(module);
   set_current_module_statement(body);
@@ -1013,5 +1013,5 @@ bool step_analyse_com2(string module_name)
   reset_current_module_entity();
 
   debug_off(); 
-  return TRUE;
+  return true;
 }

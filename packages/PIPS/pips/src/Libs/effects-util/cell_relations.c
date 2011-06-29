@@ -43,8 +43,8 @@
    beware : modifies l1, l2 and their effects
 
   @param l1 and l2 are two lists of cell_relations.
-  @param  cr1_cr2_combinable_p is a boolean function that takes two
-          individual cell_relations as arguments and renders TRUE when they are
+  @param  cr1_cr2_combinable_p is a bool function that takes two
+          individual cell_relations as arguments and renders true when they are
           considered as combinable ;
   @param  cr1_cr2_binary_op is a binary operator that combines two
           individual cell_relations;
@@ -80,7 +80,7 @@ list cell_relations_generic_binary_op(
     {
       cell_relation cr1 = CELL_RELATION(CAR(l_cr1));
       list prec_l_cr2 = NIL;
-      bool combinable = FALSE;
+      bool combinable = false;
 
       pips_debug_pv(2, "dealing with cr1:\n", cr1);
 
@@ -94,7 +94,7 @@ list cell_relations_generic_binary_op(
 	  if ( (*cr1_cr2_combinable_p)(cr1,cr2) )
 	    {
 	      pips_debug(2, "combinable\n");
-	      combinable = TRUE;
+	      combinable = true;
 	      list l_res_tmp = (*cr1_cr2_binary_op)(cr1,cr2);
 	      l_res = (*union_op)(l_res, l_res_tmp);
 

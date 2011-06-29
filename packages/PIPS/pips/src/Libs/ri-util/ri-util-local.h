@@ -1649,7 +1649,7 @@
 
 /***************************************************** BOOLEAN EXPRESSIONS */
 
-/* Building quickly boolean expressions, FC. */
+/* Building quickly bool expressions, FC. */
 
 #define unary_intrinsic_expression(name, e)\
  call_to_expression(make_call(entity_intrinsic(name),CONS(EXPRESSION,e,NIL)))
@@ -2084,7 +2084,7 @@ the variable is unsigned, signed or not */
   set_current_module_statement((statement)				\
 			       db_get_memory_resource(DBR_CODE,		\
 						      module_name,	\
-						      TRUE));		\
+						      true));		\
 									\
   /* Set the current module entity required to have many things		\
      working in PIPS: */						\
@@ -2122,8 +2122,8 @@ the variable is unsigned, signed or not */
   reset_current_module_statement();					\
   reset_current_module_entity();					\
   									\
-  /* Assume it should have worked by returning TRUE... */		\
-  return TRUE
+  /* Assume it should have worked by returning true... */		\
+  return true
 
 
 /** @} */

@@ -72,7 +72,7 @@ host_section_p(
 		 HPF_PREFIX HOSTSECTION_SUFFIX);
     }
 
-    return FALSE;
+    return false;
 }
 
 /* ??? neglect expression side effects...
@@ -195,7 +195,7 @@ static statement hpfc_hmessage(
     lp = CONS(STATEMENT, cmp_lid, NIL);
 
     if (!send)
-	lp = CONS(STATEMENT, hpfc_buffer_initialization(FALSE, FALSE, FALSE), 
+	lp = CONS(STATEMENT, hpfc_buffer_initialization(false, false, false), 
 		  lp);
 
     comm = hpfc_make_call_statement(hpfc_name_to_entity(
@@ -220,10 +220,10 @@ static statement hpfc_nrecv(
     bool cast) /* from host */
 {
     return make_block_statement(
-	CONS(STATEMENT, hpfc_buffer_initialization(FALSE, FALSE, FALSE),
+	CONS(STATEMENT, hpfc_buffer_initialization(false, false, false),
 	CONS(STATEMENT, hpfc_make_call_statement
 	     (hpfc_name_to_entity(cast? HPFC_NCAST: HPFC_rH2N), NIL),
-	CONS(STATEMENT, hpfc_packing_of_current__buffer(array, FALSE),
+	CONS(STATEMENT, hpfc_packing_of_current__buffer(array, false),
 	     NIL))));
 }
 
@@ -233,7 +233,7 @@ static statement hpfc_nrecv(
 static statement hpfc_nsend(entity array)
 {
     return make_block_statement(
-	CONS(STATEMENT, hpfc_packing_of_current__buffer(array, TRUE),
+	CONS(STATEMENT, hpfc_packing_of_current__buffer(array, true),
 	CONS(STATEMENT, hpfc_make_call_statement
 	     (hpfc_name_to_entity(HPFC_sN2H), NIL),
 	     NIL)));
@@ -247,7 +247,7 @@ static statement hpfc_nsend(entity array)
 static statement hpfc_hcast(entity array)
 {
     return make_block_statement(
-	CONS(STATEMENT, hpfc_packing_of_current__buffer(array, TRUE),
+	CONS(STATEMENT, hpfc_packing_of_current__buffer(array, true),
 	CONS(STATEMENT, 
 	     hpfc_make_call_statement(hpfc_name_to_entity(HPFC_HCAST), NIL),
 	     NIL)));
@@ -260,23 +260,23 @@ static statement NAME(array, move) entity array; tag move;\
  return((move==is_movement_collect) ? (COLLECT) : (UPDATE));}
 
 GENERATION(node_pre_io,
-	   hpfc_buffer_initialization(TRUE, FALSE, TRUE),
-	   hpfc_nrecv(array, FALSE))
+	   hpfc_buffer_initialization(true, false, true),
+	   hpfc_nrecv(array, false))
 GENERATION(node_in_io,
-	   hpfc_buffer_packing(array, (entity (*)())get_ith_local_dummy, TRUE),
-	   hpfc_buffer_packing(array, (entity (*)())get_ith_local_dummy, FALSE))
+	   hpfc_buffer_packing(array, (entity (*)())get_ith_local_dummy, true),
+	   hpfc_buffer_packing(array, (entity (*)())get_ith_local_dummy, false))
 GENERATION(node_post_io,
 	   hpfc_nsend(array),
 	   make_empty_statement())
 GENERATION(host_pre_io,
-	   hpfc_hmessage(array, array_to_processors(array), FALSE),
-	   hpfc_buffer_initialization(TRUE, FALSE, TRUE))
+	   hpfc_hmessage(array, array_to_processors(array), false),
+	   hpfc_buffer_initialization(true, false, true))
 GENERATION(host_in_io,
-	   hpfc_buffer_packing(array, (entity (*)())get_ith_array_dummy, FALSE),
-	   hpfc_buffer_packing(array, (entity (*)())get_ith_array_dummy, TRUE))
+	   hpfc_buffer_packing(array, (entity (*)())get_ith_array_dummy, false),
+	   hpfc_buffer_packing(array, (entity (*)())get_ith_array_dummy, true))
 GENERATION(host_post_io,
 	   make_empty_statement(),
-	   hpfc_hmessage(array, array_to_processors(array), TRUE))
+	   hpfc_hmessage(array, array_to_processors(array), true))
 
 /* generate_io_statements_for_distributed_arrays
  *
@@ -456,13 +456,13 @@ void generate_io_statements_for_shared_arrays(
     statement
 	h_cont = make_empty_statement(),
 	n_cont = make_empty_statement(),
-	h_pre = hpfc_buffer_initialization(TRUE, FALSE, TRUE),
+	h_pre = hpfc_buffer_initialization(true, false, true),
 	h_rebuild = generate_deducables(rebuild),
-	h_pack = hpfc_buffer_packing(array, (entity (*)())get_ith_array_dummy, TRUE),
+	h_pack = hpfc_buffer_packing(array, (entity (*)())get_ith_array_dummy, true),
 	h_cast = hpfc_hcast(array),
-	n_rcv = hpfc_nrecv(array, TRUE),
+	n_rcv = hpfc_nrecv(array, true),
 	n_rebuild = generate_deducables(rebuild),
-	n_unpack = hpfc_buffer_packing(array, (entity (*)())get_ith_local_dummy, FALSE),
+	n_unpack = hpfc_buffer_packing(array, (entity (*)())get_ith_local_dummy, false),
 	h_scan = systeme_to_loop_nest
 	             (echelon, 
 		      scanners,

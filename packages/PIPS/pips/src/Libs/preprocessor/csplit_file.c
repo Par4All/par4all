@@ -257,7 +257,7 @@ void csplit_append_to_compilation_unit(int last_line,
     copy_between_2_fd_up_to_offset(splitc_in_append,
 				   compilation_unit_file,
 				   last_offset,
-				   TRUE /* Copy up to function begin */);
+				   true /* Copy up to function begin */);
   }
   else {
     /* We are in the line-oreiented mode: */
@@ -416,7 +416,7 @@ void csplit_copy(string module_name,
     copy_between_2_fd_up_to_offset(splitc_in_append,
 				   mfd,
 				   last_offset,
-				   FALSE /* Do not include trailing spaces */);
+				   false /* Do not include trailing spaces */);
   }
 
   /* Step 4: Copy the function definition */

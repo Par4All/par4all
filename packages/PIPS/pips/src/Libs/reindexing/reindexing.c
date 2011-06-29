@@ -442,7 +442,7 @@ predicate pred;
 
       if (reference_equal_p(crhs, dataflow_reference(d))) {
 	if (SC_RN_P(sys_pred) ||
-	    sc_rational_feasibility_ofl_ctrl(sys_pred, NO_OFL_CTRL, TRUE)) {
+	    sc_rational_feasibility_ofl_ctrl(sys_pred, NO_OFL_CTRL, true)) {
 	  if (get_debug_level() > 6) {
 	    fprintf(stderr, "\nDomain inter donc faisabilite:");
 	    fprint_psysteme(stderr, sys_pred);
@@ -534,7 +534,7 @@ expression  exp;
 
 instruction build_flag_assign(f, val)
 entity   f;
-boolean val;
+bool val;
 {
   call     ca;
   list     lexp;
@@ -665,7 +665,7 @@ entity    e;
  * 
  */
 
-boolean reindexing(mod_name)
+bool reindexing(mod_name)
 char*           mod_name;
 {
   extern int tc;
@@ -696,10 +696,10 @@ char*           mod_name;
   }
 
   /* mod_stat = copy_statement((statement) db_get_memory_resource(DBR_CODE, mod_name,
-     TRUE));*/
-  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, FALSE);
+     true));*/
+  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, false);
   STS = (statement_mapping)db_get_memory_resource(DBR_STATIC_CONTROL,
-					   mod_name, FALSE);
+					   mod_name, false);
   set_current_stco_map(STS);
   stco = get_stco_from_current_map(mod_stat);
 
@@ -713,9 +713,9 @@ char*           mod_name;
   
 
   /* The DFG, the BDT and the PLC */
-  the_dfg = (graph)db_get_memory_resource(DBR_ADFG, mod_name, TRUE);
-  the_bdt = (bdt)db_get_memory_resource(DBR_BDT, mod_name, TRUE);
-  the_plc = (plc)db_get_memory_resource(DBR_PLC, mod_name, TRUE);
+  the_dfg = (graph)db_get_memory_resource(DBR_ADFG, mod_name, true);
+  the_bdt = (bdt)db_get_memory_resource(DBR_BDT, mod_name, true);
+  the_plc = (plc)db_get_memory_resource(DBR_PLC, mod_name, true);
 
   if (get_debug_level() > 0)  
   {
@@ -748,7 +748,7 @@ char*           mod_name;
   reset_current_module_statement(); 
   set_current_module_statement((statement) 
 			       db_get_memory_resource(DBR_CODE, 
-						      mod_name, TRUE) ); 
+						      mod_name, true) ); 
   mod_stat = get_current_module_statement(); 
 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), (char*) mod_stat); 
@@ -769,5 +769,5 @@ char*           mod_name;
 
   debug_off();
 
-  return(TRUE);
+  return(true);
 }

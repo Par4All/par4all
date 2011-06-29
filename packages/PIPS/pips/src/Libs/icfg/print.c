@@ -52,8 +52,8 @@
  */
 static bool print_any_icfg(string module_name, int decor_type)
 {
-  set_bool_property(ICFG_IFs, FALSE);
-  set_bool_property(ICFG_DOs, FALSE);
+  set_bool_property(ICFG_IFs, false);
+  set_bool_property(ICFG_DOs, false);
   set_int_property(ICFG_DECOR, decor_type);
   return generic_print_icfg(module_name);
 }
@@ -63,8 +63,8 @@ static bool print_any_icfg(string module_name, int decor_type)
  */
 static bool print_any_icfg_with_loops(string module_name, int decor_type)
 {
-  set_bool_property(ICFG_DOs, TRUE);
-  set_bool_property(ICFG_IFs, FALSE);
+  set_bool_property(ICFG_DOs, true);
+  set_bool_property(ICFG_IFs, false);
   set_int_property(ICFG_DECOR, decor_type);
   return generic_print_icfg(module_name);
 }
@@ -74,15 +74,15 @@ static bool print_any_icfg_with_loops(string module_name, int decor_type)
  */
 static bool print_any_icfg_with_control(string module_name, int decor_type)
 {
-  set_bool_property(ICFG_IFs, TRUE);
-  set_bool_property(ICFG_DOs, TRUE);
+  set_bool_property(ICFG_IFs, true);
+  set_bool_property(ICFG_DOs, true);
   set_int_property(ICFG_DECOR, decor_type);
   return generic_print_icfg(module_name);
 }
 
 /* Shared throughout the icfg library*/
-bool prettyprint_fortran_icfg_p = TRUE;
-bool prettyprint_C_icfg_p = FALSE;
+bool prettyprint_fortran_icfg_p = true;
+bool prettyprint_C_icfg_p = false;
 
 bool generic_print_icfg(string module_name)
 {
@@ -121,7 +121,7 @@ bool parametrized_print_icfg(
   set_bool_property(ICFG_DOs, print_dos);
   print_module_icfg_with_decoration(module, deco);
 
-  return TRUE;
+  return true;
 }
 
 bool print_icfg(string module_name)
@@ -161,7 +161,7 @@ bool print_icfg_with_filtered_proper_effects(string module_name)
 
 bool print_dvicfg_with_filtered_proper_effects(string module_name)
 {
-  set_bool_property(ICFG_DV, TRUE);
+  set_bool_property(ICFG_DV, true);
   return print_any_icfg(module_name, ICFG_DECOR_FILTERED_PROPER_EFFECTS);
 }
 

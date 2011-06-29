@@ -57,7 +57,7 @@ extern int genread_input();
     stored. Methods defined in methods.h will know how to deal with.
 */
 #define DB_PUT_MEMORY_RESOURCE(res_name, own_name, res_val) \
-  db_put_or_update_memory_resource(res_name, own_name, (void*) res_val, TRUE)
+  db_put_or_update_memory_resource(res_name, own_name, (void*) res_val, true)
 
 /** Put a file resource into the current workspace database
 
@@ -94,10 +94,10 @@ extern int genread_input();
     stored. Methods defined in methods.h will know how to deal with.
 */
 #define DB_PUT_NEW_FILE_RESOURCE(res_name, own_name, res_val) \
-  db_put_or_update_memory_resource(res_name, own_name, (void*) res_val, FALSE)
+  db_put_or_update_memory_resource(res_name, own_name, (void*) res_val, false)
 
 #define db_get_file_resource db_get_memory_resource
-#define db_unput_a_resource(r,o) (db_delete_resource(r,o), TRUE)
+#define db_unput_a_resource(r,o) (db_delete_resource(r,o), true)
 #define build_pgmwd db_get_workspace_directory_name
 
 #define db_make_subdirectory(n) free(db_get_directory_name_for_module(n))

@@ -96,7 +96,7 @@ bool
 may_pointer_regions(char *module_name)
 {
   bool res1, res2;
-  set_bool_property("MUST_REGIONS", FALSE);
+  set_bool_property("MUST_REGIONS", false);
 
   set_constant_paths_p(false);
   set_pointer_info_kind(with_no_pointer_info);
@@ -121,7 +121,7 @@ may_regions(char *module_name)
 {
     bool res1, res2;
 
-    set_bool_property("MUST_REGIONS", FALSE);
+    set_bool_property("MUST_REGIONS", false);
 
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
       set_constant_paths_p(false);
@@ -146,7 +146,7 @@ bool
 must_pointer_regions(char *module_name)
 {
   bool res1, res2;
-  set_bool_property("MUST_REGIONS", TRUE);
+  set_bool_property("MUST_REGIONS", true);
 
   set_constant_paths_p(false);
   set_pointer_info_kind(with_no_pointer_info);
@@ -165,7 +165,7 @@ bool
 must_pointer_regions_with_points_to(char *module_name)
 {
   bool res1, res2;
-  set_bool_property("MUST_REGIONS", TRUE);
+  set_bool_property("MUST_REGIONS", true);
 
   set_constant_paths_p(false);
   set_pointer_info_kind(with_points_to);
@@ -194,7 +194,7 @@ must_regions(char *module_name)
 {
     bool res1, res2;
 
-    set_bool_property("MUST_REGIONS", TRUE);
+    set_bool_property("MUST_REGIONS", true);
 
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
       set_constant_paths_p(false);
@@ -228,7 +228,7 @@ must_regions_with_points_to(char *module_name)
 {
     bool res1, res2;
 
-    set_bool_property("MUST_REGIONS", TRUE);
+    set_bool_property("MUST_REGIONS", true);
 
     set_constant_paths_p(true);
     set_pointer_info_kind(with_points_to);
@@ -372,91 +372,91 @@ print_code_any_regions(
 bool
 print_code_proper_pointer_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
+    return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_PROPER_POINTER_REGIONS, string_undefined, ".preg");
 }
 
 bool
 print_code_pointer_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
+    return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_POINTER_REGIONS, DBR_SUMMARY_POINTER_REGIONS, ".reg");
 }
 
 bool
 print_code_inv_pointer_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
+    return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_INV_POINTER_REGIONS, DBR_SUMMARY_POINTER_REGIONS, ".reg");
 }
 
 bool
 print_code_proper_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
+    return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_PROPER_REGIONS, string_undefined, ".preg");
 }
 
 bool
 print_source_proper_regions(char* module_name)
 {
-    return print_code_any_regions(module_name, is_rw, TRUE, FALSE,
+    return print_code_any_regions(module_name, is_rw, true, false,
 			  DBR_PROPER_REGIONS, string_undefined, ".upreg");
 }
 
 bool
 print_code_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
+    return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_REGIONS, DBR_SUMMARY_REGIONS, ".reg");
 }
 
 bool
 print_source_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, TRUE, FALSE,
+    return print_code_any_regions(module_name, is_rw, true, false,
 			  DBR_REGIONS, DBR_SUMMARY_REGIONS, ".ureg");
 }
 
 bool
 print_code_inv_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
+    return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_INV_REGIONS, DBR_SUMMARY_REGIONS, ".reg");
 }
 
 bool
 print_source_inv_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, TRUE, FALSE,
+    return print_code_any_regions(module_name, is_rw, true, false,
 			  DBR_INV_REGIONS, DBR_SUMMARY_REGIONS, ".ureg");
 }
 
 bool
 print_code_in_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_inout, FALSE, FALSE,
+    return print_code_any_regions(module_name, is_inout, false, false,
 			  DBR_IN_REGIONS, DBR_IN_SUMMARY_REGIONS, ".inreg");
 }
 
 bool
 print_source_in_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_inout, TRUE, FALSE,
+    return print_code_any_regions(module_name, is_inout, true, false,
 			  DBR_IN_REGIONS, DBR_IN_SUMMARY_REGIONS, ".uinreg");
 }
 
 bool
 print_code_out_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_inout, FALSE, FALSE,
+    return print_code_any_regions(module_name, is_inout, false, false,
 			  DBR_OUT_REGIONS, DBR_OUT_SUMMARY_REGIONS, ".outreg");
 }
 
 bool
 print_source_out_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_inout, TRUE, FALSE,
+    return print_code_any_regions(module_name, is_inout, true, false,
 		  DBR_OUT_REGIONS, DBR_OUT_SUMMARY_REGIONS, ".uoutreg");
 }
 

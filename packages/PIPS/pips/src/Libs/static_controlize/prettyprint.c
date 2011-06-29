@@ -84,7 +84,7 @@ static statement_mapping	Gsc_map;
 /* void print_code_static_control((char*) module_name)		AL 05/93
  * Prettyprints a static_control mapping attached to a module_name.
  */
-boolean print_code_static_control(module_name)
+bool print_code_static_control(module_name)
 string module_name;
 {
     entity	module;
@@ -100,9 +100,9 @@ string module_name;
 
     module = local_name_to_top_level_entity(module_name);
     module_stat = (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE);
+	db_get_memory_resource(DBR_CODE, module_name, true);
     Gsc_map = (statement_mapping)
-	db_get_memory_resource( DBR_STATIC_CONTROL, module_name, TRUE);
+	db_get_memory_resource( DBR_STATIC_CONTROL, module_name, true);
     init_prettyprint(text_static_control);
 
 /*

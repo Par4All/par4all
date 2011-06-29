@@ -59,9 +59,9 @@ typedef dg_vertex_label vertex_label;
 
 #include "wp65.h"
 
-boolean ref_in_list_p(list lt,reference r)
+bool ref_in_list_p(list lt,reference r)
 {
-    return (FALSE);
+    return (false);
 }
 
 void update_map(statement_mapping m, statement st, reference r) 
@@ -126,21 +126,21 @@ list lr;
  * Reference r  belongs to  List lwr or not
  */
 
-boolean reference_in_list_p(reference r,list lwr)
+bool reference_in_list_p(reference r,list lwr)
 { 
     list lref2;
-    boolean result = FALSE;
+    bool result = false;
     for (lref2 = lwr; 
 	 lref2 != NULL && !result; 
 	 result = result || reference_equal_p(r,REFERENCE(CAR(lref2))),
 	 lref2 = CDR(lref2)) ;
     return(result);
 }
-boolean array_indice_in_list_p(reference r,list lwr)
+bool array_indice_in_list_p(reference r,list lwr)
 { 
  
     list lr = NIL;
-    boolean result = FALSE;
+    bool result = false;
     list lref1;
     MAPL(ce,{	 expression e = EXPRESSION(CAR(ce));
 		 lr = expression_to_reference_list(e, lr);
@@ -232,7 +232,7 @@ void variable_list_add(list *l1,list *l2)
 
 
 
-void  concat_data_list(list * l,list * lr, statement st,statement_mapping map, boolean perfect_nested_loop)
+void  concat_data_list(list * l,list * lr, statement st,statement_mapping map, bool perfect_nested_loop)
 {
     instruction inst; 
     list  lt = (list) GET_STATEMENT_MAPPING(map,st);

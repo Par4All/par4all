@@ -28,16 +28,16 @@
 static bool call_load_store_p(call c){
   if(strstr(entity_name(call_function(c)),get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION"))!=NULL
      || strstr(entity_name(call_function(c)),get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION"))!=NULL){
-    return TRUE;
+    return true;
   }
 
-  return FALSE;
+  return false;
 
 }
 
 static bool find_call_to_wrap(call c,list *call_to_wrap){
   *call_to_wrap = CONS(CALL,c,*call_to_wrap);
-  return FALSE;
+  return false;
 }
 
 
@@ -62,7 +62,7 @@ static bool find_entities_to_wrap(call c,set* entities_to_wrap){
         set_add_element(*entities_to_wrap,*entities_to_wrap,e);
     }
   }
-  return TRUE;
+  return true;
 }
 
 
@@ -103,7 +103,7 @@ bool scalopify (char* module_name) {
 
   entity get_call_entity = local_name_to_top_level_entity("P4A_scmp_flow");
 
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
   gen_context_recurse(module_statement,&entities_to_wrap, call_domain,
 		      find_entities_to_wrap,gen_identity);
@@ -159,5 +159,5 @@ bool scalopify (char* module_name) {
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);
 
-  return TRUE;
+  return true;
 }

@@ -144,8 +144,8 @@ static char buf[BSZ];
 static FILE *ifp;
 static char *x, *mainp, *blkp;
 
-#define TRUE 1
-#define FALSE 0
+#define true 1
+#define false 0
 static struct stat sbuf;
 
 static char *look(), *skiplab(), *functs();
@@ -228,14 +228,14 @@ static char * skip_comment_if_any(char * lines)
 static int lend()
 {
   register char *p, * lbuf;
-  int tab = FALSE;
+  int tab = false;
   
   lbuf = skip_comment_if_any(buf);
   
   for (p=lbuf; p<&lbuf[6] && !tab; p++)
   {
     if (*p=='\0') return 0;
-    if (*p=='\t') tab=TRUE;
+    if (*p=='\t') tab=true;
   }
   
   if (!tab && (lbuf[5]!=' ' && lbuf[5]!='\t')) 

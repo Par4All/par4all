@@ -68,7 +68,7 @@ void tpips_set_line_to_parse(char * line)
 	skip_blanks(line);
 	/* store line pointer */
 	line_parsed = line_to_parse = line;
-	cr_not_returned = TRUE;
+	cr_not_returned = true;
 }
 
 char * tpips_get_line_to_parse(void)
@@ -92,7 +92,7 @@ static int tpips_lex_input (void)
 	pips_debug(9,"input char '%c'(0x%2x) from input\n", c, c);
 	if (c) line_to_parse++;
 	/* a fake \n is provided, to check for nargs in the syntax... */
-	else if (cr_not_returned) { cr_not_returned=FALSE; return (int) '\n'; }
+	else if (cr_not_returned) { cr_not_returned=false; return (int) '\n'; }
 	return (int) c;
 }
 

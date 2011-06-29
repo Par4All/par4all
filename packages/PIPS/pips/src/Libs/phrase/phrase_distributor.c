@@ -176,7 +176,7 @@ static statement isolate_code_portion (statement begin_tag_statement,
 	       function_name != NULL);
 
   /* First, count the number of statements to isolate in a single statement */
-  statement_to_isolate = FALSE;
+  statement_to_isolate = false;
   nb_of_statements_to_isolate = 0;
   MAP (STATEMENT, s, {
 
@@ -186,10 +186,10 @@ static statement isolate_code_portion (statement begin_tag_statement,
       isolated_seq_stats = CONS(STATEMENT, s, isolated_seq_stats);
     }
     if (statement_to_isolate && (s == end_tag_statement)) {
-      statement_to_isolate = FALSE;
+      statement_to_isolate = false;
     }
     if ((!statement_to_isolate) && (s == begin_tag_statement)) {
-      statement_to_isolate = TRUE;
+      statement_to_isolate = true;
     }
     
   }, seq_stats);
@@ -229,7 +229,7 @@ static statement isolate_code_portion (statement begin_tag_statement,
 		       sequence_instruction,NIL,NULL,
 		       statement_extensions(sequence_statement));
 
-    bool isolated_seq_stats_is_inserted = FALSE;
+    bool isolated_seq_stats_is_inserted = false;
     
     /* Build new sequence containing isolated sequence statement */
 
@@ -238,17 +238,17 @@ static statement isolate_code_portion (statement begin_tag_statement,
 	  || ((!statement_to_isolate) && (s == begin_tag_statement))) {
 	if (!isolated_seq_stats_is_inserted) {
 	  new_seq_stats = CONS(STATEMENT, returned_statement, new_seq_stats);
-	  isolated_seq_stats_is_inserted = TRUE;
+	  isolated_seq_stats_is_inserted = true;
 	}
       }
       else {
 	new_seq_stats = CONS(STATEMENT, s, new_seq_stats);
       }
       if (statement_to_isolate && (s == end_tag_statement)) {
-	statement_to_isolate = FALSE;
+	statement_to_isolate = false;
       }
       if ((!statement_to_isolate) && (s == begin_tag_statement)) {
-	statement_to_isolate = TRUE;
+	statement_to_isolate = true;
       }
     }, seq_stats); 
 
@@ -770,7 +770,7 @@ bool phrase_distributor_init(string module_name)
   /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 
 						      module_name, 
-						      TRUE);
+						      true);
   
   module = module_name_to_entity(module_name);
   
@@ -804,7 +804,7 @@ bool phrase_distributor_init(string module_name)
   
   debug_off();
   
-  return TRUE;
+  return true;
 }
 
 /*********************************************************
@@ -819,14 +819,14 @@ bool phrase_distributor(string module_name)
   entity module;
   
   /* set and get the current properties concerning regions */
-  set_bool_property("MUST_REGIONS", TRUE);
-  set_bool_property("EXACT_REGIONS", TRUE);
+  set_bool_property("MUST_REGIONS", true);
+  set_bool_property("EXACT_REGIONS", true);
   get_regions_properties();
   
   /* get the resources */
   module_stat = (statement) db_get_memory_resource(DBR_CODE, 
 						   module_name, 
-						   TRUE);
+						   true);
   
   module = module_name_to_entity(module_name);
   
@@ -834,7 +834,7 @@ bool phrase_distributor(string module_name)
   set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant
   
   set_cumulated_rw_effects((statement_effects)
-			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
   module_to_value_mappings(module);
   
   /* sets dynamic_area */
@@ -848,11 +848,11 @@ bool phrase_distributor(string module_name)
      /* Get the READ, WRITE, IN and OUT regions of the module
       */
     set_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_REGIONS, module_name, true));
     set_in_effects((statement_effects) 
-	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
     set_out_effects((statement_effects) 
-	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
 
   /* Now do the job */
 
@@ -886,5 +886,5 @@ bool phrase_distributor(string module_name)
   
   debug_off();
   
-  return TRUE;
+  return true;
 }

@@ -75,8 +75,8 @@ string_to_callees(string module_name)
 {
   callees cl = callees_undefined;
 
-  if(FALSE && static_module_name_p(module_name))
-    cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
+  if(false && static_module_name_p(module_name))
+    cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,true);
   else {
     // Should be dealt with in ri-util
     // string ln = global_name_to_user_name(module_name);
@@ -84,7 +84,7 @@ string_to_callees(string module_name)
     ln += strspn(ln, MAIN_PREFIX)
       + strspn(ln, BLOCKDATA_PREFIX)
       + strspn(ln, COMMON_PREFIX);
-    cl = (callees)db_get_memory_resource(DBR_CALLEES,ln,TRUE);
+    cl = (callees)db_get_memory_resource(DBR_CALLEES,ln,true);
   }
   return callees_callees(cl);
 }
@@ -258,10 +258,10 @@ callgraph_module_name(
     FOREACH(ENTITY, e,entity_to_callees(module))
     {
 	string n = module_resource_name(e);
-	string f = db_get_memory_resource(DBR_CALLGRAPH_FILE, n, TRUE);
+	string f = db_get_memory_resource(DBR_CALLGRAPH_FILE, n, true);
 	string full = strdup(concatenate(dir, "/", f, NULL));
 
-	safe_append(fp, full, CALLGRAPH_INDENT, TRUE);
+	safe_append(fp, full, CALLGRAPH_INDENT, true);
 
 	free(full);
     }
@@ -289,7 +289,7 @@ module_to_callgraph(
     free(full);
 
     DB_PUT_FILE_RESOURCE(DBR_CALLGRAPH_FILE, name, local);
-    return TRUE;
+    return true;
 }
 
 
@@ -473,7 +473,7 @@ bool callgraph(string name)
     list ccm = list_undefined;
 
     called_modules = (callees)
-      db_get_memory_resource(DBR_CALLEES, module_name, TRUE);
+      db_get_memory_resource(DBR_CALLEES, module_name, true);
     hash_put(module_callees, (void *) module_name, (void *) called_modules);
 
     for( ccm = callees_callees(called_modules);
@@ -505,7 +505,7 @@ bool callgraph(string name)
 	  c = make_callees(NIL);
 	  hash_put(module_callers, (void *) module_called, (void *) c);
 	  c =  (callees)
-	    db_get_memory_resource(DBR_CALLEES, module_called, TRUE);
+	    db_get_memory_resource(DBR_CALLEES, module_called, true);
 	  hash_put(module_callees, (void *) module_called, (void *) c);
       rmake(DBR_CALLERS, module_called);
 	}
@@ -516,7 +516,7 @@ bool callgraph(string name)
 	    pips_user_error("Provide or let PIPS synthesize source code for module %s\n",
 	    module_called);*/
 	  set_pips_current_computation(BUILDER_CALLGRAPH, name);
-	  return FALSE;
+	  return false;
 	}
 	/* pop_pips_current_computation(DBR_CALLEES, module_called); */
 	/* reset_pips_current_computation(); */
@@ -550,7 +550,7 @@ bool callgraph(string name)
 
   /* Since Fabien is not available to help with pipsdbm... Let's move on with Cathare-2! */
   /*
-  if(TRUE) {
+  if(true) {
     FILE * h_file = safe_fopen("height", "w");
     FILE * d_file = safe_fopen("depth", "w");
     HASH_MAP(module_name, callers,
@@ -590,5 +590,5 @@ bool callgraph(string name)
   hash_table_free(module_depth);
   set_free(modules);
   gen_array_full_free(module_array);
-  return TRUE;
+  return true;
 }

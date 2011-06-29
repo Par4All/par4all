@@ -105,9 +105,9 @@ static hash_table hash_entity_def_to_task = hash_table_undefined;
 static string global_module_name;
 static int global_margin =0;
 
-boolean fortran_appli = TRUE;
-static boolean box_in_statement_p=FALSE;
-static boolean motif_in_statement_p=FALSE;
+bool fortran_appli = true;
+static bool box_in_statement_p=false;
+static bool motif_in_statement_p=false;
 static list cumulated_list=NIL;
 
 #define MEM_PREFIX "-MEM:"
@@ -350,7 +350,7 @@ xml_declarations_with_explicit_motif(entity module,
 {
   string result = strdup("");
   code c;
-  bool first = TRUE;
+  bool first = true;
 
   pips_assert("it is a code", value_code_p(entity_initial(module)));
 
@@ -366,7 +366,7 @@ xml_declarations_with_explicit_motif(entity module,
 					svar, lastsep? separator: "", NULL));
 	    free(old);
 	    free(svar);
-	    first = FALSE;
+	    first = false;
 	  }
       },code_declarations(c));
   return result;
@@ -392,8 +392,8 @@ static string xml_call_from_assignation(call c, int task_number, bool * input_pr
 	reference ref = syntax_reference(syn);
 	string varname = strdup(concatenate("A_", xml_entity_local_name(reference_variable(ref)), NULL));
 	if(gen_array_index(array_names, varname) != ITEM_NOT_IN_ARRAY){
-	  result = strdup(concatenate(result, xml_array_in_task(ref, FALSE, task_number), NULL));
-	  *input_provided = TRUE;
+	  result = strdup(concatenate(result, xml_array_in_task(ref, false, task_number), NULL));
+	  *input_provided = true;
 	}
 	break;
       }
@@ -528,7 +528,7 @@ static string xml_array_in_task(reference r, bool first, int task_number){
   int j;
   int depth = 0;
 
-  bool null_fitting_p = TRUE;
+  bool null_fitting_p = true;
   string internal_index_declarations = strdup("");
   string fitting_declaration = strdup("");
   string fitting_declaration2 = strdup("");
@@ -593,12 +593,12 @@ static string xml_array_in_task(reference r, bool first, int task_number){
 
   /* XML column-major storage of fitting matrix */
   for(i=0;i<intern_nb; i++){
-    bool is_null_p = TRUE;
+    bool is_null_p = true;
     for(j = 0; j<index_of_array; j++){
       is_null_p = is_null_p && (same_string_p(fitting_array[j][i], "0"));
     }
     if(!is_null_p){
-      null_fitting_p = FALSE;
+      null_fitting_p = false;
       fitting_declaration = strdup(concatenate(fitting_declaration, "list(", NULL));
       for(j = 0; j<index_of_array-1; j++){
 	fitting_declaration = strdup(concatenate(fitting_declaration, "vartype!(", fitting_array[j][i], "), ", NULL));
@@ -623,7 +623,7 @@ static string xml_array_in_task(reference r, bool first, int task_number){
     result = strdup(concatenate(result, "list()),", NL, TAB, TAB, NULL));
   }
 
-  null_fitting_p = TRUE;
+  null_fitting_p = true;
   /* Generation of paving XML code*/
   result = strdup(concatenate(result, TAB, TAB, "paving = list<list[VARTYPE]>(", NULL));
 
@@ -647,7 +647,7 @@ static string xml_array_in_task(reference r, bool first, int task_number){
   /* result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", i2a(MONMAX(gen_array_nitems(intern_indices_array), 1)), ",", NL, TAB, TAB, TAB, NULL)); */
 
   for (j = 0; j<intern_nb; j++){
-    bool is_null_p = TRUE;
+    bool is_null_p = true;
     for(i = 0; i < index_of_array; i++){
       is_null_p = is_null_p && (same_string_p(fitting_array[i][j], "0"));
     }
@@ -666,12 +666,12 @@ static string xml_array_in_task(reference r, bool first, int task_number){
   */
 
   for (j = 0; j<intern_nb; j++){
-    bool is_null_p = TRUE;
+    bool is_null_p = true;
     for(i = 0; i < index_of_array; i++){
       is_null_p = is_null_p && (same_string_p(fitting_array[i][j], "0"));
     }
     if(!is_null_p){
-      null_fitting_p = FALSE;
+      null_fitting_p = false;
       result = strdup(concatenate(result,
 				  "vartype!(",
 				  *((string *)(gen_array_item(intern_upperbounds_array, j))),
@@ -716,8 +716,8 @@ static string xml_call_from_loopnest(call c, int task_number){
   syntax s;
   string result = "";
   string first_result = "";
-  bool first = TRUE;
-  bool input_provided = FALSE, output_provided = FALSE;
+  bool first = true;
+  bool input_provided = false, output_provided = false;
   string name = strdup(xml_entity_local_name(called));
 
   if(!same_string_p(name, "="))
@@ -740,17 +740,17 @@ static string xml_call_from_loopnest(call c, int task_number){
       if(gen_array_index(array_names, varname) != ITEM_NOT_IN_ARRAY){
 	if(first){
 	  first_result = xml_array_in_task(r, first, task_number);
-	  output_provided = TRUE;
+	  output_provided = true;
 	}
 	else{
 	  result = strdup(concatenate(result, xml_array_in_task(r, first, task_number), NULL));
-	  input_provided = TRUE;
+	  input_provided = true;
 	}
       }
     }
     default: pips_internal_error("unhandled case");
     }
-    first = FALSE;
+    first = false;
   }
 
   if(!input_provided){
@@ -1074,7 +1074,7 @@ static string xml_code_string(entity module, statement stat)
       print_entities(statement_declarations(stat));
     }
 
-  decls       = xml_declarations_with_explicit_motif(module, variable_p, "", TRUE);
+  decls       = xml_declarations_with_explicit_motif(module, variable_p, "", true);
   tasks       = xml_tasks_with_motif(stat);
   result = strdup(concatenate(decls, NL, tasks, NL, NULL));
   ifdebug(2)
@@ -1105,7 +1105,7 @@ bool print_xml_code_with_explicit_motif(string module_name)
   module = module_name_to_entity(module_name);
   dir = db_get_current_workspace_directory();
   filename = strdup(concatenate(dir, "/", xml, NULL));
-  stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   if(statement_undefined_p(stat))
     {
@@ -1134,7 +1134,7 @@ bool print_xml_code_with_explicit_motif(string module_name)
   reset_current_module_statement();
   reset_current_module_entity();
 
-  return TRUE;
+  return true;
 }
 
 
@@ -1247,9 +1247,9 @@ static bool call_selection(call c, nest_context_p nest __attribute__ ((unused)))
   entity f = call_function(c);
   if  (ENTITY_ASSIGN_P(f) || entity_subroutine_p(f))
     {
-      return TRUE;
+      return true;
     }
-  else return FALSE;
+  else return false;
 
   /*  statement s = (statement) stack_head(nest->current_stat);
       return ((!return_statement_p(s) && !continue_statement_p(s)));*/
@@ -1272,7 +1272,7 @@ static bool push_test(test t  __attribute__ ((unused)),
 {
   /* encapsulation de l'ensemble des instructions appartenant au test*/
   /* on ne fait rien pour le moment */
-  return FALSE;
+  return false;
 }
 
 
@@ -1629,15 +1629,15 @@ static void xml_tiling(int taskNumber, reference ref,  region reg, stack indices
 static void xml_references(int taskNumber, list l_regions, stack indices, string_buffer result)
 {
   list lr;
-  bool atleast_one_read_ref = FALSE;
-  bool atleast_one_written_ref = FALSE;
+  bool atleast_one_read_ref = false;
+  bool atleast_one_written_ref = false;
   /*   Read array references first */
   for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
     {
       region re = REGION(CAR(lr));
       reference ref = effect_any_reference(re);
       if (array_entity_p(reference_variable(ref)) && region_read_p(re)) {
-	atleast_one_read_ref = TRUE;
+	atleast_one_read_ref = true;
 	string_buffer_append(result,concatenate(TAB, SPACE, SPACE, OPENANGLE,  "data darray=",NULL));
 	xml_reference(taskNumber, ref,  region_write_p(re), result);
 	xml_tiling(taskNumber, ref,re, indices, result);
@@ -1651,7 +1651,7 @@ static void xml_references(int taskNumber, list l_regions, stack indices, string
       region re = REGION(CAR(lr));
       reference ref = effect_any_reference(re);
       if (array_entity_p(reference_variable(ref)) && region_write_p(re)) {
-	atleast_one_written_ref = TRUE;
+	atleast_one_written_ref = true;
 	string_buffer_append(result,concatenate(TAB, SPACE, SPACE, OPENANGLE, "data darray=",NULL));
 	xml_reference(taskNumber, ref,  region_write_p(re), result);
 	xml_tiling(taskNumber, ref,re, indices, result);
@@ -1689,8 +1689,8 @@ static string task_complexity(statement s)
   complexity stat_comp = load_statement_complexity(s);
   string r;
   if(stat_comp != (complexity) HASH_UNDEFINED_VALUE && !complexity_zero_p(stat_comp)) {
-    cons *pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, FALSE,
-						  TRUE));
+    cons *pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, false,
+						  true));
     r = words_to_string(pc);
   }
   else r = i2a(1);
@@ -1779,7 +1779,7 @@ static string xml_code(entity module, statement stat)
 
   string_buffer_append(result,concatenate(OPENANGLE, SLASH, "module", CLOSEANGLE, NL, NULL ));
   result2=string_buffer_to_string(result);
-  /*  string_buffer_free(&result,TRUE); */
+  /*  string_buffer_free(&result,true); */
   /* ifdebug(2)
      {
      printf("%s", result2);
@@ -1789,7 +1789,7 @@ static string xml_code(entity module, statement stat)
 
 static bool valid_specification_p(entity module __attribute__ ((unused)),
 				  statement stat __attribute__ ((unused)))
-{ return TRUE;
+{ return true;
 }
 
 /******************************************************** PIPSMAKE INTERFACE */
@@ -1809,15 +1809,15 @@ bool print_xml_code(string module_name)
   string  dir = db_get_current_workspace_directory();
   string filename = strdup(concatenate(dir, "/", xml, NULL));
   statement stat=(statement) db_get_memory_resource(DBR_CODE,
-						    module_name, TRUE);
+						    module_name, true);
 
   init_cost_table();
   /* Get the READ and WRITE regions of the module */
   set_rw_effects((statement_effects)
-		 db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+		 db_get_memory_resource(DBR_REGIONS, module_name, true));
 
   set_complexity_map( (statement_mapping)
-		      db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
+		      db_get_memory_resource(DBR_COMPLEXITIES, module_name, true));
 
   if(statement_undefined_p(stat))
     {
@@ -1850,7 +1850,7 @@ bool print_xml_code(string module_name)
   reset_current_module_statement();
   reset_current_module_entity();
 
-  return TRUE;
+  return true;
 }
 
 
@@ -1862,11 +1862,11 @@ static string vect_to_string(Pvecteur pv) {
   return  words_to_string(words_syntax(expression_syntax(make_vecteur_expression(pv)),NIL));
 }
 
-boolean vect_one_p(Pvecteur v) {
+bool vect_one_p(Pvecteur v) {
   return  (!VECTEUR_NUL_P(v) && vect_size(v) == 1 && vect_coeff(TCST, v) ==1);
 }
 
-boolean vect_zero_p(Pvecteur v) {
+bool vect_zero_p(Pvecteur v) {
   return  (VECTEUR_NUL_P(v) ||
 	   (!VECTEUR_NUL_P(v) && vect_size(v) == 1 && value_zero_p(vect_coeff(TCST, v))));
 }
@@ -2011,14 +2011,14 @@ void insert_xml_callees(string module_name) {
   string sm = db_build_file_resource_name(DBR_XML_PRINTED_FILE,
 					  module_name, XMLPRETTY);
   string xml_module_name = strdup(concatenate(dir, "/", sm, NULL));
-  callees callers = (callees)db_get_memory_resource(DBR_CALLEES,module_name, TRUE);
+  callees callers = (callees)db_get_memory_resource(DBR_CALLEES,module_name, true);
   out = safe_fopen(xml_module_name, "a");
 
   MAP(STRING, callee_name, {
       string sc=(string) db_get_memory_resource(DBR_XML_PRINTED_FILE,
-						callee_name, TRUE);
+						callee_name, true);
       string xml_callee_name = strdup(concatenate(dir, "/", sc, NULL));
-      safe_append(out, xml_callee_name,0, TRUE);
+      safe_append(out, xml_callee_name,0, true);
       free(xml_callee_name);
     },
     callees_callees(callers));
@@ -2041,11 +2041,11 @@ void insert_xml_string(string module_name, string s) {
 
 // A changer par une fonction qui detectera si la variable a ete definie
 // dans un fichier de parametres ...
-static boolean entity_xml_parameter_p(entity e)
+static bool entity_xml_parameter_p(entity e)
 {
   string s = entity_local_name(e);
-  boolean b=FALSE;
-  if (strstr(s,"PARAM")!=NULL || strstr(s,"param")!=NULL) b = TRUE;
+  bool b=false;
+  if (strstr(s,"PARAM")!=NULL || strstr(s,"param")!=NULL) b = true;
   return (b);
 }
 
@@ -2219,7 +2219,7 @@ static void  find_pattern(Psysteme ps, Pvecteur paving_indices, Pvecteur formal_
   }
 }
 
-static void xml_Pattern_Paving( region reg,entity var, boolean effet_read, Pvecteur formal_parameters, Pvecteur paving_indices, string_buffer sb_result)
+static void xml_Pattern_Paving( region reg,entity var, bool effet_read, Pvecteur formal_parameters, Pvecteur paving_indices, string_buffer sb_result)
 {
   string_buffer buffer_pattern = string_buffer_make(true);
   string_buffer buffer_paving = string_buffer_make(true);
@@ -2445,8 +2445,8 @@ static void  xml_Region_Range(region reg, string_buffer sb_result)
   }
 }
 
-static boolean string_in_list_p(string ts,list lr){
-  boolean trouve=FALSE;
+static bool string_in_list_p(string ts,list lr){
+  bool trouve=false;
   MAPL(tt,
        {trouve= trouve || strcmp(STRING(CAR(tt)),ts) == 0;},
        lr);
@@ -2457,7 +2457,7 @@ static void xml_Region_Parameter(list pattern_region, string_buffer sb_result)
 {
   list lr;
   list lrr = NIL;
-  boolean effet_read = TRUE;
+  bool effet_read = true;
   reference ref;
   region reg;
   entity v;
@@ -2516,8 +2516,8 @@ int find_effect_actions_for_entity(list leff, effect *effr, effect *effw, entity
   // return effet_rwb = 1 for Read, 2 for Write, 3 for Read/Write
   int effet_rwb=0;
   list lr = NIL;
-  bool er = FALSE;
-  bool ew = FALSE;
+  bool er = false;
+  bool ew = false;
 
   for ( lr = leff; !ENDP(lr); lr = CDR(lr)) {
     effect eff=  EFFECT(CAR(lr));
@@ -2525,8 +2525,8 @@ int find_effect_actions_for_entity(list leff, effect *effr, effect *effw, entity
     entity v = reference_variable(ref);
     if (same_entity_p(v,e)) {
       if (action_read_p(effect_action(eff)))
-	er = TRUE, *effr =eff;
-      else ew = TRUE, *effw=eff;
+	er = true, *effr =eff;
+      else ew = true, *effw=eff;
     }
   }
   effet_rwb = (er?1:0) +(ew?2:0);
@@ -2535,15 +2535,15 @@ int find_effect_actions_for_entity(list leff, effect *effr, effect *effw, entity
 
 
 
-static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Variable var, Pvecteur formal_parameters, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
+static void xml_TaskParameter(bool assign_function,bool is_not_main_p, Variable var, Pvecteur formal_parameters, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
 {
-  boolean effet_read = TRUE;
+  bool effet_read = true;
   region rwr = region_undefined;
   region rre = region_undefined;
   reference ref;
   region reg;
   entity v;
-  boolean  pavp=TRUE;
+  bool  pavp=true;
 
   // rappel : les regions contiennent les effects sur les scalaires
   // pour les fonctions, on ecrit les parametres formels dans l'ordre
@@ -2566,7 +2566,7 @@ static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Var
     }
     else  // cas ou il n'y a pas d'effet sur le parametre formel,
       //  mais il fait partie de la liste des parametres de la fonction
-      v = var, effet_read = TRUE;
+      v = var, effet_read = true;
   }
   if (pavp) {
     add_margin(global_margin,sb_result);
@@ -2594,7 +2594,7 @@ static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Var
 
 
 
-static void xml_TaskParameters(boolean assign_function, int code_tag, entity module, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
+static void xml_TaskParameters(bool assign_function, int code_tag, entity module, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
 {
 
   int ith;
@@ -2619,13 +2619,13 @@ static void xml_TaskParameters(boolean assign_function, int code_tag, entity mod
     // les parametres formels doivent etre introduits dans l'ordre.
     for (ith=1;ith<=FormalParameterNumber;ith++) {
       FormalArrayName = find_ith_formal_parameter(module,ith);
-      xml_TaskParameter(assign_function,TRUE,FormalArrayName,
+      xml_TaskParameter(assign_function,true,FormalArrayName,
 			formal_parameters,pattern_region,paving_indices,sb_result);
     }
   }
   else   {
     for (lr = pattern_region; !ENDP(lr); lr = CDR(lr)) {
-      xml_TaskParameter(assign_function,FALSE,FormalArrayName,
+      xml_TaskParameter(assign_function,false,FormalArrayName,
 			formal_parameters,lr,paving_indices,sb_result);
     }
   }
@@ -2637,11 +2637,11 @@ static void xml_TaskParameters(boolean assign_function, int code_tag, entity mod
 }
 
 
-boolean  eval_linear_expression(expression exp, Psysteme ps, int *val)
+bool  eval_linear_expression(expression exp, Psysteme ps, int *val)
 {
   normalized norm= normalized_undefined;
   Pvecteur   vexp,pv;
-  boolean result = TRUE;
+  bool result = true;
   *val = 0;
 
   // fprintf(stdout,"Expression a evaluer : %s",words_to_string(words_expression(exp,NIL)));
@@ -2664,15 +2664,15 @@ boolean  eval_linear_expression(expression exp, Psysteme ps, int *val)
 	    *val += vect_coeff(v,vexp) *min;
 	  }
 	  else  // fprintf(stdout,"le systeme est non faisable\n");
-	    result = FALSE;
+	    result = false;
 	} //  sc_free(ps1); le systeme est desalloue par sc_minmax_of_variable
 	else
-	  result = FALSE;
+	  result = false;
       }
     }
   }
   else  // fprintf(stdout,"Ce n'est pas une expression lineaire\n");
-    result = FALSE;
+    result = false;
 
   //fprintf(stdout,"Valeur trouvee : %d \n",*val);
   return result;
@@ -2994,13 +2994,13 @@ static void motif_in_statement(statement s)
 {
   string comm = statement_comments(s);
   if (!string_undefined_p(comm) && strstr(comm,"MOTIF")!=NULL)
-    motif_in_statement_p= TRUE;
+    motif_in_statement_p= true;
 }
 static void box_in_statement(statement s)
 {
   string comm = statement_comments(s);
   if (!string_undefined_p(comm) && strstr(comm,"BOX")!=NULL)
-    box_in_statement_p= TRUE;
+    box_in_statement_p= true;
 }
 
 
@@ -3028,10 +3028,10 @@ static void xml_Loop(statement s, string_buffer sb_result)
   sc_free(prec);
 }
 
-static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_region, Pvecteur *paving_indices, Pvecteur *pattern_indices, boolean motif_in_te_p, string_buffer sb_result)
+static void xml_Loops(stack st,bool call_external_loop_p, list *pattern_region, Pvecteur *paving_indices, Pvecteur *pattern_indices, bool motif_in_te_p, string_buffer sb_result)
 {
-  boolean in_motif_p=!call_external_loop_p && !motif_in_te_p;
-  boolean motif_on_loop_p=FALSE;
+  bool in_motif_p=!call_external_loop_p && !motif_in_te_p;
+  bool motif_on_loop_p=false;
   // Boucles externes a la TE
   if (call_external_loop_p)
     string_buffer_append_word("ExternalLoops",sb_result);
@@ -3053,7 +3053,7 @@ static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_regio
 
 		  if (!in_motif_p) {
 		    // Test : Motif is in the loop body  or not
-		    motif_in_statement_p=FALSE;
+		    motif_in_statement_p=false;
 		    gen_recurse(loop_body(l), statement_domain, gen_true,motif_in_statement);
 		    motif_on_loop_p = !string_undefined_p(comm) && strstr(comm,"MOTIF")!=NULL;
 
@@ -3119,16 +3119,16 @@ static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
   list pattern_region =NIL;
   Pvecteur paving_indices = VECTEUR_NUL;
   Pvecteur pattern_indices = VECTEUR_NUL;
-  boolean motif_in_te_p = FALSE;
+  bool motif_in_te_p = false;
   entity module = module_name_to_entity(module_name);
   Psysteme prec;
   string string_sb_result;
   statement stat_module=(statement) db_get_memory_resource(DBR_CODE,
-							   module_name, TRUE);
+							   module_name, true);
   reset_rw_effects();
   set_rw_effects
     ((statement_effects)
-     db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+     db_get_memory_resource(DBR_REGIONS, module_name, true));
 
   push_current_module_statement(stat_module);
   prec = first_precondition_of_module(module_name);
@@ -3156,8 +3156,8 @@ static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
   xml_Region_Parameter(pattern_region, sb_result);
   gen_recurse(stat_module, statement_domain, gen_true,motif_in_statement);
   motif_in_te_p = motif_in_statement_p;
-  xml_Loops(nested_loops,FALSE,&pattern_region,&paving_indices, &pattern_indices, motif_in_te_p, sb_result);
-  xml_TaskParameters(FALSE,code_tag, module,pattern_region,paving_indices,sb_result);
+  xml_Loops(nested_loops,false,&pattern_region,&paving_indices, &pattern_indices, motif_in_te_p, sb_result);
+  xml_TaskParameters(false,code_tag, module,pattern_region,paving_indices,sb_result);
   xml_Regions(sb_result);
   xml_CodeSize(sb_result);
   global_margin--;
@@ -3397,7 +3397,7 @@ static void   xml_Dependances()
   // Not implemented Yet
 }
 
-boolean array_in_effect_list_p(list effects_list)
+bool array_in_effect_list_p(list effects_list)
 {
   list pc;
   for (pc= effects_list;pc != NIL; pc = CDR(pc)){
@@ -3405,9 +3405,9 @@ boolean array_in_effect_list_p(list effects_list)
     reference r = effect_any_reference(e);
     entity v =  reference_variable(r);
     if (array_entity_p(v))
-      return(TRUE);
+      return(true);
   }
-  return(FALSE);
+  return(false);
 }
 
 static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p nest, string_buffer sb_result)
@@ -3419,7 +3419,7 @@ static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p
   list pattern_region=NIL;
   Pvecteur paving_indices = VECTEUR_NUL;
   Pvecteur pattern_indices = VECTEUR_NUL;
-  boolean motif_in_te_p=FALSE;
+  bool motif_in_te_p=false;
   transformer t = load_statement_precondition(s);
   Psysteme prec = sc_dup((Psysteme) predicate_system(transformer_relation(t)));
 
@@ -3437,10 +3437,10 @@ static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p
 				     CLOSEANGLE,NL, NULL));
     global_margin++;
     xml_Region_Parameter(pattern_region, sb_result);
-    xml_Loops(st,TRUE,&pattern_region,&paving_indices, &pattern_indices,motif_in_te_p, sb_result);
+    xml_Loops(st,true,&pattern_region,&paving_indices, &pattern_indices,motif_in_te_p, sb_result);
 
     if (ENTITY_ASSIGN_P(func))
-      xml_TaskParameters(TRUE,code_tag, module,pattern_region,paving_indices,sb_result);
+      xml_TaskParameters(true,code_tag, module,pattern_region,paving_indices,sb_result);
     else
       xml_Arguments(s,func,paving_indices, prec,sb_result);
     xml_Dependances();
@@ -3516,7 +3516,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
     statement s = gen_array_item(nest->nested_call,callnumber);
     call c = instruction_call(statement_instruction(s));
     entity func= call_function(c);
-    boolean assign_func = ENTITY_ASSIGN_P(func);
+    bool assign_func = ENTITY_ASSIGN_P(func);
     const char* n= assign_func ? "LocalAssignment" : entity_user_name(func);
     list effects_list = regions_dup(load_statement_local_regions(s));
     if (!assign_func || array_in_effect_list_p(effects_list)) {
@@ -3675,11 +3675,11 @@ static void xml_Application(string module_name, int code_tag,string_buffer sb_re
 int find_code_status(string module_name)
 {
   statement stat=(statement) db_get_memory_resource(DBR_CODE,
-						    module_name, TRUE);
-  boolean wmotif = FALSE;
-  boolean wbox = FALSE;
+						    module_name, true);
+  bool wmotif = false;
+  bool wbox = false;
 
-  motif_in_statement_p=FALSE;
+  motif_in_statement_p=false;
   gen_recurse(stat, statement_domain, gen_true,motif_in_statement);
   wmotif = motif_in_statement_p;
   gen_recurse(stat, statement_domain, gen_true,box_in_statement);
@@ -3710,7 +3710,7 @@ bool print_xml_application(string module_name)
   dir = db_get_current_workspace_directory();
   filename = strdup(concatenate(dir, "/", xml, NULL));
   stat=(statement) db_get_memory_resource(DBR_CODE,
-					  module_name, TRUE);
+					  module_name, true);
 
   set_current_module_entity(module);
   set_current_module_statement(stat);
@@ -3719,19 +3719,19 @@ bool print_xml_application(string module_name)
     }
   set_proper_rw_effects((statement_effects)
 			db_get_memory_resource(DBR_PROPER_EFFECTS,
-					       module_name,TRUE));
+					       module_name,true));
   init_cost_table();
   // set_complexity_map( (statement_mapping)
-  //		      db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
+  //		      db_get_memory_resource(DBR_COMPLEXITIES, module_name, true));
 
   /* Get the READ and WRITE regions of the module */
   set_rw_effects((statement_effects)
-		 db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+		 db_get_memory_resource(DBR_REGIONS, module_name, true));
 
   set_precondition_map((statement_mapping)
 		       db_get_memory_resource(DBR_PRECONDITIONS,
 					      module_name,
-					      TRUE));
+					      true));
   debug_on("XMLPRETTYPRINTER_DEBUG_LEVEL");
   out = safe_fopen(filename, "w");
   fprintf(out,"<!-- XML prettyprint for module %s. --> \n",module_name);
@@ -3772,5 +3772,5 @@ bool print_xml_application(string module_name)
   reset_precondition_map();
   reset_rw_effects();
   reset_proper_rw_effects();
-  return TRUE;
+  return true;
 }

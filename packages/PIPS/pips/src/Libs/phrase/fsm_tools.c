@@ -306,7 +306,7 @@ statement make_transition_statement(control current_node,
    
     current_test = instruction_test (statement_instruction(stat));
 
-    // Begin computing for the TRUE statement
+    // Begin computing for the true statement
 
     old_statement_if_true = test_true(current_test);
    
@@ -333,7 +333,7 @@ statement make_transition_statement(control current_node,
    
     test_true(current_test) = transition_statement_if_true;
 
-    // Begin computing for the FALSE statement
+    // Begin computing for the false statement
 
     old_statement_if_false = test_false(current_test);
    

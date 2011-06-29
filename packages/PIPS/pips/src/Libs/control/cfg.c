@@ -53,7 +53,7 @@ unstructured_consistency_p(unstructured u, bool assert_p)
 {
     control entry_node = unstructured_control(u);
     control exit_node = unstructured_exit(u);
-    bool consistency_p = TRUE;
+    bool consistency_p = true;
     list nodes = NIL;
 
     forward_control_map_get_blocs(entry_node, &nodes);
@@ -62,8 +62,8 @@ unstructured_consistency_p(unstructured u, bool assert_p)
      * unstructured would have been reduced to one structured statement
      */
     if(exit_node==entry_node) {
-	consistency_p = FALSE;
-	if(assert_p) pips_assert("Entry and exit nodes are different", FALSE);
+	consistency_p = false;
+	if(assert_p) pips_assert("Entry and exit nodes are different", false);
     }
 
     /* The entry node must have at least one predecessor:
@@ -72,16 +72,16 @@ unstructured_consistency_p(unstructured u, bool assert_p)
      * unstructured entry point.
      */
     if(consistency_p && ENDP(control_predecessors(entry_node))) {
-	consistency_p = FALSE;
-	if(assert_p) pips_assert("Entry node has at least one predecessor", FALSE);
+	consistency_p = false;
+	if(assert_p) pips_assert("Entry node has at least one predecessor", false);
     }
 
     /* The exit node should have no successors: its real successor
      * is the statement following the unstructured
      */
     if(consistency_p && !ENDP(control_successors(exit_node))) {
-	consistency_p = FALSE;
-	if(assert_p) pips_assert("Exit node has no successor", FALSE);
+	consistency_p = false;
+	if(assert_p) pips_assert("Exit node has no successor", false);
     }
 
     /* The exit node should not be a test:
@@ -92,8 +92,8 @@ unstructured_consistency_p(unstructured u, bool assert_p)
     if(consistency_p) {
 	statement exit_s = control_statement(exit_node);
 	if(statement_test_p(exit_s)) {
-	    consistency_p = FALSE;
-	    if(assert_p) pips_assert("Exit node is not a test", FALSE);
+	    consistency_p = false;
+	    if(assert_p) pips_assert("Exit node is not a test", false);
 	}
     }
 
@@ -102,8 +102,8 @@ unstructured_consistency_p(unstructured u, bool assert_p)
      */
     if(consistency_p && !ENDP(control_predecessors(exit_node))) {
 	if(gen_find_eq(exit_node, nodes)!=exit_node) {
-	    consistency_p = FALSE;
-	    if(assert_p) pips_assert("Exit node has predecessors but is unreachable", FALSE);
+	    consistency_p = false;
+	    if(assert_p) pips_assert("Exit node has predecessors but is unreachable", false);
 	}
     }
 
@@ -116,8 +116,8 @@ unstructured_consistency_p(unstructured u, bool assert_p)
 	statement exit_s = control_statement(exit_node);
 
 	if(!continue_statement_p(exit_s)) {
-	    consistency_p = FALSE;
-	    if(assert_p) pips_assert("Unreachable exit node is a CONTINUE statement", FALSE);
+	    consistency_p = false;
+	    if(assert_p) pips_assert("Unreachable exit node is a CONTINUE statement", false);
 	}
     }
 
@@ -130,8 +130,8 @@ unstructured_consistency_p(unstructured u, bool assert_p)
 	statement s = control_statement(c);
 
 	if(!statement_test_p(s)) {
-	    consistency_p = FALSE;
-	    if(assert_p) pips_assert("Unique predecessor of exit node is a test", FALSE);
+	    consistency_p = false;
+	    if(assert_p) pips_assert("Unique predecessor of exit node is a test", false);
 	}
     }
 
@@ -152,7 +152,7 @@ unstructured_consistency_p(unstructured u, bool assert_p)
 	    if(gen_length(control_predecessors(c2))==1) {
 		control c3 = CONTROL(CAR(control_predecessors(c2)));
 		if(c1!=c3) {
-		    consistency_p = FALSE;
+		    consistency_p = false;
 		    if(assert_p) {
 			(void) fprintf(stderr,
 				       "\nEntry node: %p\nExit node: %p\n"
@@ -160,11 +160,11 @@ unstructured_consistency_p(unstructured u, bool assert_p)
 				       entry_node, exit_node, c1, c2, c3);
 			display_linked_control_nodes(entry_node);
 			pips_assert("c3, the unique predecessor of the unique successor of c1, is c1",
-				    FALSE);
+				    false);
 		    }
 		}
 		else if(c2!=entry_node && !statement_test_p(s2)) {
-		    consistency_p = FALSE;
+		    consistency_p = false;
 		    if(assert_p) {
 			(void) fprintf(stderr,
 				       "\nEntry node: %p\nExit node: %p\nc1 node: %p\nc2 node: %p\n\n",
@@ -172,7 +172,7 @@ unstructured_consistency_p(unstructured u, bool assert_p)
 			display_linked_control_nodes(entry_node);
 			pips_assert("c2 is the unique successor of c1. "
 				    "c2 has c1 as unique predecessor. c2 must be the entry node",
-				    FALSE);
+				    false);
 		    }
 		}
 	    }
@@ -192,7 +192,7 @@ unstructured_while_p(unstructured u)
 {
     control entry_node = unstructured_control(u);
     control exit_node = unstructured_exit(u);
-    bool while_p = FALSE;
+    bool while_p = false;
 
     ifdebug(5) {
 	debug(5, "unstructured_while_p", "Begin with graph\n");
@@ -203,8 +203,8 @@ unstructured_while_p(unstructured u)
     }
 
     /* Make sure that the unstructured has been "normalized" */
-    /* while_p = unstructured_consistency_p(u, TRUE); */
-    while_p = unstructured_consistency_p(u, FALSE);
+    /* while_p = unstructured_consistency_p(u, true); */
+    while_p = unstructured_consistency_p(u, false);
 
     /* An unstructured is a while loop if and only if the exit node
      * has only one predecessor and if the entry node is a successor
@@ -223,12 +223,12 @@ unstructured_while_p(unstructured u)
 	forward_control_map_get_blocs(pred, &succs);
 
 	if(gen_find_eq(entry_node, succs)==entry_node) {
-	    while_p = TRUE;
+	    while_p = true;
 	}
 	gen_free_list(succs);
     }
     else {
-	while_p = FALSE;
+	while_p = false;
     }
 
     debug(5, "unstructured_while_p", "End with while_p=%s\n", bool_to_string(while_p));

@@ -45,7 +45,7 @@
 
 Psysteme sc_newbase;
 Ptsg sg;
-bool if1=FALSE,if2=FALSE; 
+bool if1=false,if2=false; 
 
 typedef struct 
 {
@@ -115,7 +115,7 @@ static Value intersection (pv1, pv2,var,floor)
 static bool stmt_flt(statement s,context_p context)
 {
   stack_push(s, context->statement_stack); 
-  return TRUE; 
+  return true; 
 }
 static void  stmt_rwt(statement s,context_p context)
 {  
@@ -127,7 +127,7 @@ static bool loop_flt(loop l, context_p context)
                    /*DECLARATION */
   statement s1=NULL,s2=NULL,s_in_loop_in_side=NULL,st=NULL;
   int i=0,cas=0;
-  bool first1=TRUE,first2=TRUE;
+  bool first1=true,first2=true;
   Value val1=0,val2=0,f1_val1,f1_val2,f2_val1,f2_val2,e=0;
   loop copyloop,loop_in_side=NULL;
   Variable var1= (Variable)loop_index(l);
@@ -226,7 +226,7 @@ static bool loop_flt(loop l, context_p context)
 	    }
 	  }
 	}
-	first1 =FALSE; 
+	first1 =false; 
 	i=0;
       }
       if ( (! first1 )&&(i !=0)) {
@@ -282,7 +282,7 @@ static bool loop_flt(loop l, context_p context)
 	  t1= make_test(eq_expression (copyindex,copylower),s1, 
 			make_block_statement(NIL));
 	  s1=test_to_statement(t1);
-	  if1=TRUE;
+	  if1=true;
 	  };
 	if (gen_length(lis2)!=0)  
 	  { expression copyindex, copyupper;
@@ -291,7 +291,7 @@ static bool loop_flt(loop l, context_p context)
 	    t2= make_test(eq_expression (copyindex,copyupper) ,s2, 
 			  make_block_statement(NIL));
 	    s2=test_to_statement(t2);
-	    if2=TRUE;
+	    if2=true;
 	  };
 	if (gen_length(lis2)!=0)
 	  lis=CONS(STATEMENT , s2,NIL);
@@ -369,7 +369,7 @@ static bool loop_flt(loop l, context_p context)
 	MAP(STATEMENT,s,{ instruction ins1=statement_instruction(s);
 	if( (instruction_loop_p(ins1))&&first2 ) {
 	  CHUNK(CAR(lis))= (gen_chunk *) make_block_statement(NIL);
-	  first2=FALSE;
+	  first2=false;
 	};
 	lis=CDR(lis);
 	;},lis);
@@ -407,7 +407,7 @@ static bool loop_flt(loop l, context_p context)
 	    t1= make_test(eq_expression (copyindex,copylower),s1,
 			  make_block_statement(NIL));
 	    s1=test_to_statement(t1);
-	    if1=TRUE;
+	    if1=true;
 	  };
 	if (gen_length(lis2)!=0)  
 	  {
@@ -417,7 +417,7 @@ static bool loop_flt(loop l, context_p context)
 	    t2= make_test(eq_expression (copyindex,copyupper) ,s2, 
 			  make_block_statement(NIL));
 	    s2=test_to_statement(t2);
-	    if2=TRUE;
+	    if2=true;
 	  };
 	if (gen_length(lis2)!=0)
 	  lis=CONS(STATEMENT , s2,NIL);
@@ -443,7 +443,7 @@ static bool loop_flt(loop l, context_p context)
 	MAP(STATEMENT,s,{ instruction ins1=statement_instruction(s);
 	if( (instruction_loop_p(ins1))&&first2 ) {
 	  CHUNK(CAR(lis))= (gen_chunk *) make_block_statement(NIL);
-	  first2=FALSE;};
+	  first2=false;};
 	lis=CDR(lis);
 	;},lis);
 	range_upper(loop_range(copyloop))= int_to_expression(e-1);
@@ -457,7 +457,7 @@ static bool loop_flt(loop l, context_p context)
       default :{break;}
       };
     }; 
-  return FALSE;
+  return false;
 }
    
 statement unimodular(s)
@@ -534,8 +534,8 @@ statement unimodular(s)
   l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
   lower = range_upper(loop_range(l));
   upper= expression_to_expression_newbase(lower, pvg, base_oldindex);
-  /* FI: I do not know if the last parameter should be TRUE or FALSE */
-  s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase, TRUE);
+  /* FI: I do not know if the last parameter should be true or false */
+  s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase, true);
   printf(" finn  \n");
   return(s_lhyp);
 }
@@ -690,7 +690,7 @@ statement  free_guards( s)
     list lisi,lisj;
     range range; 
     statement loop2=NULL;
-    bool condition1=FALSE,condition2=FALSE;
+    bool condition1=false,condition2=false;
     tab_loop[i]=copy_loop(loop1);
     tab_instruction[i] = make_instruction_loop(tab_loop[i]);
     tab_statement[i]=instruction_to_statement (  tab_instruction[i]);
@@ -781,10 +781,10 @@ statement  free_guards( s)
 	       value_direct_multiply(vect_coeff(indice2,pvif2),j2)+
 	       vect_coeff(TCST,pvif2)==0)){
 	    if( vect_coeff(indice2,pvif2) < 0 )
-	      condition1=TRUE;
+	      condition1=true;
 	    else{
 	      if( vect_coeff(indice2,pvif1) > 0 ){
-		condition2=TRUE;
+		condition2=true;
 		
 	      };
 	    }
@@ -962,7 +962,7 @@ statement  free_guards( s)
       };
     };
     
-    if ((condition1==FALSE) && (condition2==FALSE)){
+    if ((condition1==false) && (condition2==false)){
       
       /*  debut  cas1  */
       
@@ -1215,7 +1215,7 @@ bool guard_elimination(string module)
   debug_on("GUARD_ELIMINATION_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module);
   set_current_module_entity(local_name_to_top_level_entity(module));
-  stat = (statement) db_get_memory_resource(DBR_CODE, module, TRUE); 
+  stat = (statement) db_get_memory_resource(DBR_CODE, module, true); 
   set_current_module_statement(stat);
   context.statement_stack = stack_make(statement_domain, 0, 0);
   
@@ -1260,7 +1260,7 @@ bool guard_elimination(string module)
     reset_current_module_entity();
     reset_current_module_statement();
     debug_off();
-    return TRUE;  
+    return true;  
 }
 
 

@@ -250,7 +250,7 @@ static bool discard_statement_and_save_label_and_comment(statement s)
    * Maybe also, we might want to preserve some comments. See
    * Transformations/no_effect_statement_00
    */
-  else if(FALSE && !ENDP(statement_declarations(s))) {
+  else if(false && !ENDP(statement_declarations(s))) {
     if(statement_block_p(s)) {
       FOREACH(STATEMENT,st,statement_block(s))
 	if(!declaration_statement_p(s))

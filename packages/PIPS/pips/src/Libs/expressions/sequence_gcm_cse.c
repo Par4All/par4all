@@ -84,12 +84,12 @@ static bool Is_Associative_Commutative(entity e)
     {
       if (same_string_p(local_name,table_of_AC_operators[i])){
 	pips_debug(3," %s is Associative Commutative \n", local_name);
-	return TRUE;
+	return true;
       }
       i++;
     }
   pips_debug(3," %s is NOT Associative Commutative \n", local_name);
-  return FALSE;
+  return false;
 }
 
 
@@ -154,10 +154,10 @@ static bool side_effects_p(expression e)
     FOREACH(EFFECT, ef,le)
         if (effect_write_p(ef)) {
             pips_debug(1,"has side effects\n");
-            return TRUE;
+            return true;
         }
     pips_debug(1,"does not have side effects\n");
-    return FALSE;
+    return false;
 }
 
 /* Compute if an effect list Some effect in les interfere with var.
@@ -175,14 +175,14 @@ static bool interference_on(entity var, list /* of effect */ les)
     if (effect_write_p(ef)) {
       if (entity_all_locations_p(effect_entity(ef)))
 	/* If an effect can write anywhere, it may be also on var: */
-	return TRUE;
+	return true;
 
       if (entities_may_conflict_p(var, reference_variable(effect_any_reference(ef))))
 	/* If we may have a write effect on var, mark a conflict: */
-	return TRUE;
+	return true;
     }
   }
-  return FALSE;
+  return false;
 }
 
 
@@ -193,8 +193,8 @@ static bool moveable_to(list /* of effects */ le, statement s)
   list les = load_cumulated_rw_effects_list(s);
   FOREACH(EFFECT, ef,le)
       if (interference_on(reference_variable(effect_any_reference(ef)), les))
-        return FALSE;
-  return TRUE;
+        return false;
+  return true;
 }
 
 /* Return the level of this expression, using the current nesting list.
@@ -302,11 +302,11 @@ static bool entity_as_arguments(entity ent, statement stat)
       if (syntax_reference_p(s) &&
               ent == reference_variable(syntax_reference(s)))
       {
-          return TRUE;
+          return true;
       }
   }
 
-  return FALSE;
+  return false;
 }
 
 /* Return the expression in the left side of an assign statement
@@ -407,7 +407,7 @@ static bool atomizable_sub_expression_p(expression e)
   {
   case is_syntax_range:
   case is_syntax_reference:
-    return FALSE;
+    return false;
   case is_syntax_call:
     {
       entity called = call_function(syntax_call(s));
@@ -416,7 +416,7 @@ static bool atomizable_sub_expression_p(expression e)
     }
   default:
     pips_internal_error("unexpected syntax tag: %d", syntax_tag(s));
-    return FALSE;
+    return false;
   }
 }
 
@@ -463,7 +463,7 @@ group_expr_by_level(int nlevels, list le)
 
   /* Fix expressions by useful levels, with some operations.
    */
-  first_alone = TRUE;
+  first_alone = true;
   for (i=0; i<nlevels && first_alone; i++)
   {
     list lei = (list) gen_array_item(result, i);
@@ -481,7 +481,7 @@ group_expr_by_level(int nlevels, list le)
 	gen_array_addto(result, i, list_undefined);
       }
       else
-	first_alone = FALSE;
+	first_alone = false;
     }
   }
 
@@ -528,7 +528,7 @@ static void do_atomize_if_different_level(expression e, int level)
         pips_debug(1,"atomize \n");
         statement atom = atomize_this_expression(make_new_scalar_variable, e);
         if (atom)
-            insert_before_statement(atom, statement_of_level(elevel), TRUE);
+            insert_before_statement(atom, statement_of_level(elevel), true);
     }
     else
         pips_debug(1,"not atomize\n");
@@ -602,7 +602,7 @@ static void atomize_or_associate_for_level(expression e, int level)
 	if (lei!=list_undefined)
 	{
 	  int j;
-	  bool satom_inserted = FALSE;
+	  bool satom_inserted = false;
 	  syntax satom = make_syntax_call(make_call(func, lei));
 	  expression eatom = expression_undefined;
 	  statement atom;
@@ -617,7 +617,7 @@ static void atomize_or_associate_for_level(expression e, int level)
 	      eatom = make_expression(satom, normalized_undefined);
 	      lej = CONS(EXPRESSION, eatom, lej);
 	      gen_array_addto(groups, j, lej);
-	      satom_inserted = TRUE;
+	      satom_inserted = true;
 	    }
 	  }
 	  if (!satom_inserted)
@@ -627,7 +627,7 @@ static void atomize_or_associate_for_level(expression e, int level)
 	  }
 
 	  atom = atomize_this_expression(make_new_scalar_variable, eatom);
-	  insert_before_statement(atom, statement_of_level(i), TRUE);
+	  insert_before_statement(atom, statement_of_level(i), true);
 	}
       }
 
@@ -694,7 +694,7 @@ static bool loop_flt(loop l)
 	      instruction_loop(statement_instruction(sofl))==l);
   /* RK: Why ? */
   push_nesting(sofl);
-  return TRUE;
+  return true;
 }
 
 static void loop_rwt(loop l)
@@ -729,7 +729,7 @@ static bool number_of_use_greater_1(statement s)
 
   if(empty_comments_p(comment))
   {
-    return FALSE;
+    return false;
   }
 
   sscanf((const char*)comment,"%d", &number);
@@ -860,7 +860,7 @@ static bool cse_expression_flt(expression e, list* inserted)
   if(!syntax_reference_p(expression_syntax(e)))
   {
     /* Go down  */
-    return TRUE;
+    return true;
   }
 
   scala = reference_variable(syntax_reference(expression_syntax(e)));
@@ -880,12 +880,12 @@ static bool cse_expression_flt(expression e, list* inserted)
               set_comment_of_statement(s, string_undefined);
 
               /* Go up */
-              return FALSE;
+              return false;
           }
           else if (string_undefined_p(statement_comments(s)))
           {
               /* This statement is already visited! Not do again! Go up */
-              return FALSE;
+              return false;
           }
           else
           {
@@ -905,13 +905,13 @@ static bool cse_expression_flt(expression e, list* inserted)
               free_statement(s);
 
               /* Continue go down the new expression */
-              return TRUE;
+              return true;
           }
       }
   }
 
   /* Nothing is done! Go up */
-  return FALSE;
+  return false;
 }
 #if 1
 
@@ -926,7 +926,7 @@ static bool cse_call_flt(call c, __attribute__((unused))list* inserted)
           gen_recurse_stop(lhs);
   }
   /* Go down! */
-  return TRUE;
+  return true;
 }
 #endif
 
@@ -993,7 +993,7 @@ void perform_icm_association(string name, /* of the module */
   /* GET CUMULATED EFFECTS
    */
   set_cumulated_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, TRUE));
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, true));
 
   /* Initialize the "inserted" mapping: */
   init_inserted();
@@ -1171,7 +1171,7 @@ static bool expr_cse_flt(expression e,__attribute__((unused))list *skip_list)
 static entity entity_of_expression(expression e, bool * inverted, entity inv)
 {
   syntax s = expression_syntax(e);
-  *inverted = FALSE;
+  *inverted = false;
   switch (syntax_tag(s))
   {
   case is_syntax_call:
@@ -1179,7 +1179,7 @@ static entity entity_of_expression(expression e, bool * inverted, entity inv)
       call c = syntax_call(s);
       if (call_function(c)==inv)
       {
-	*inverted = TRUE;
+	*inverted = true;
 	return entity_of_expression(EXPRESSION(CAR(call_arguments(c))),
 				    inverted, NULL);
       }
@@ -1204,8 +1204,8 @@ static entity entity_of_expression(expression e, bool * inverted, entity inv)
 
 static bool expression_in_list_p(expression e, list seen)
 {
-  MAP(EXPRESSION, f, if (e==f) return TRUE, seen);
-  return FALSE;
+  MAP(EXPRESSION, f, if (e==f) return true, seen);
+  return false;
 }
 
 static expression find_equal_expression_not_in_list(expression e, list avails, list seen)
@@ -1408,11 +1408,11 @@ static bool expression_eq_in_list_p(expression e, list l, expression *f)
     if (expression_equal_p(e, et))
     {
       *f = et;
-      return TRUE;
+      return true;
     }
   }
 
-  return FALSE;
+  return false;
 }
 
 /* returns an allocated l1-l2 with expression_equal_p
@@ -1449,7 +1449,7 @@ static bool call_unary_minus_p(expression e)
     call c = syntax_call(s);
     return ENTITY_UNARY_MINUS_P(call_function(c));
   }
-  return FALSE;
+  return false;
 }
 
 /* Remove some inpropriate ones...
@@ -1579,7 +1579,7 @@ static void atom_cse_expression(expression e,list * skip_list)
                                 gen_free_list(old);
 
                                 set_comment_of_statement(scse, strdup("1"));
-                                insert_before_statement(scse, aspt->container, FALSE);
+                                insert_before_statement(scse, aspt->container, false);
                                 increase_number_of_use_by_1(scalar, aspt->container);
 
                                 /* don't visit it later. */
@@ -1641,7 +1641,7 @@ static void atom_cse_expression(expression e,list * skip_list)
             if(atom) {
                 /* At fisrt, this statement is set "virtual" */
                 set_comment_of_statement(atom,strdup("1"));
-                insert_before_statement(atom, current_statement, TRUE);
+                insert_before_statement(atom, current_statement, true);
 
                 /* don't visit it later, just in case... */
                 gen_recurse_stop(atom);
@@ -1694,7 +1694,7 @@ static void atom_cse_expression(expression e,list * skip_list)
                 expression_syntax(e) = ref;
 
                 set_comment_of_statement(assign,strdup("1"));
-                insert_before_statement(assign, current_statement, TRUE);
+                insert_before_statement(assign, current_statement, true);
 
                 aspt = make_available_scalar(scalar, current_statement, rhs);
                 current_availables = CONS(STRING, (char*)aspt, current_availables);
@@ -1706,20 +1706,20 @@ static void atom_cse_expression(expression e,list * skip_list)
 static bool loop_stop(loop l,__attribute__((unused))list *skip_list)
 {
   gen_recurse_stop(loop_body(l));
-  return TRUE;
+  return true;
 }
 
 static bool test_stop(test t,__attribute__((unused))list *skip_list)
 {
   gen_recurse_stop(test_true(t));
   gen_recurse_stop(test_false(t));
-  return TRUE;
+  return true;
 }
 
 static bool while_stop(whileloop wl,__attribute__((unused))list *skip_list)
 {
   gen_recurse_stop(whileloop_body(wl));
-  return TRUE;
+  return true;
 }
 
 
@@ -1884,7 +1884,7 @@ void perform_ac_cse(__attribute__((unused)) string name, statement s)
    @param[in] module_name is the name of the module we want to apply the
    Common Subexpression Elimination on
 
-   @return TRUE if everything goes fine.
+   @return true if everything goes fine.
 */
 bool common_subexpression_elimination(string module_name)
 {
@@ -1907,7 +1907,7 @@ bool common_subexpression_elimination(string module_name)
    @param[in] module_name is the name of the module we want to apply the
    Invariant Code Motion on
 
-   @return TRUE if everything goes file.
+   @return true if everything goes file.
 
    Beware, invariant_code_motion phase already exists too but deal with
    loop invariant code motion...

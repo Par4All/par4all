@@ -258,7 +258,7 @@ void build_full_ctrl_graph(statement s)
  */
 void full_control_graph(string name)
 {
-    statement s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
+    statement s = (statement) db_get_memory_resource(DBR_CODE, name, true);
     build_full_ctrl_graph(s);
 
     /*  should put something in the db if made as a pass
@@ -291,10 +291,10 @@ static bool (*travel_decision)(statement);
 
 static void push_if_necessary(statement s)
 {
-  if (load_statement_stacked(s)!=TRUE)
+  if (load_statement_stacked(s)!=true)
   {
     to_see_push(s);
-    store_statement_stacked(s, TRUE);
+    store_statement_stacked(s, true);
   }
 }
 
@@ -318,7 +318,7 @@ void init_ctrl_graph_travel(statement s, bool (*decision)(statement))
     make_stacked_map();
     travel_decision = decision;
 
-    store_statement_stacked(s, TRUE); /* no loop back */
+    store_statement_stacked(s, true); /* no loop back */
     push_successors(s);
 }
 
@@ -330,11 +330,11 @@ bool next_ctrl_graph_travel(statement *ps)
 	if ((*travel_decision)(*ps))
 	{
 	    push_successors(*ps);
-	    return TRUE;
+	    return true;
 	}
     }
 
-    return FALSE;
+    return false;
 }
 
 void close_ctrl_graph_travel(void)

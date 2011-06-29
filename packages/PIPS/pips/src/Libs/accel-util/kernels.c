@@ -231,7 +231,7 @@ bool do_kernelize(statement s, entity loop_label)
       cumulated_effects(module_local_name(cme));
       set_current_module_entity(cme);
       set_current_module_statement(cms);
-      set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), TRUE));
+      set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), true));
       /* outline the work and kernel parts*/
       outliner(kernel_name,make_statement_list(loop_body(l)));
       (void)outliner(host_call_name,make_statement_list(s));
@@ -259,7 +259,7 @@ bool kernelize(char * module_name)
 {
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
-  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
   /* retreive loop label */
   string loop_label_name = get_string_property_or_ask("LOOP_LABEL","label of the loop to turn into a kernel ?\n");

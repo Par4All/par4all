@@ -139,9 +139,9 @@ int dfg_is_in_stack(v)
  int     i;
 
  for (i = 0; i < StackPointer; i++)
-     if (Stack[i] == v)  return(TRUE);
+     if (Stack[i] == v)  return(true);
 
- return(FALSE);
+ return(false);
 }
 
 /*==================================================================*/

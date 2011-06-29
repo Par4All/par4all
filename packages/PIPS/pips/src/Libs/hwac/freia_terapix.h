@@ -70,7 +70,7 @@ typedef struct {
   // this information is available in the terapix simulator
   int cost;
   // whether it can be done in place
-  boolean inplace;
+  bool inplace;
   // microcode segment name
   string ucode;
 } terapix_hw_t;

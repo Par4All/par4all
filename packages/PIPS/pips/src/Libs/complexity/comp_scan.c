@@ -79,7 +79,7 @@ DEFINE_CURRENT_MAPPING(complexity, complexity)
 bool uniform_complexities(module_name)
 char *module_name;
 {
-    bool success = TRUE;
+    bool success = true;
 
     set_string_property("COMPLEXITY_COST_TABLE", "all_1");
     success = any_complexities(module_name);
@@ -90,7 +90,7 @@ char *module_name;
 bool fp_complexities(module_name)
 char *module_name;
 {
-    bool success = TRUE;
+    bool success = true;
 
     set_string_property("COMPLEXITY_COST_TABLE", "fp_1");
     success = any_complexities(module_name);
@@ -112,12 +112,12 @@ char *module_name;
 
     /* we may need to print preconditions for debugging purposes */
     set_precondition_map( (statement_mapping)
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
     set_cumulated_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE ) );
+	db_get_memory_resource(DBR_CODE, module_name, true ) );
 
     module_entity = get_current_module_entity();
     module_stat = get_current_module_statement();
@@ -175,7 +175,7 @@ char *module_name;
     reset_current_module_statement();
     free_value_mappings();
 
-    return TRUE;
+    return true;
 }
 
 bool summary_complexity(module_name)
@@ -185,10 +185,10 @@ char *module_name;
     complexity summary_comp_dup = complexity_undefined;
 
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE ) );
+	db_get_memory_resource(DBR_CODE, module_name, true ) );
 
     set_complexity_map( (statement_mapping)
-		       db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
+		       db_get_memory_resource(DBR_COMPLEXITIES, module_name, true));
     summary_comp = load_statement_complexity( get_current_module_statement() );
 
     trace_on("summary complexity %s", module_name);
@@ -226,7 +226,7 @@ char *module_name;
     reset_complexity_map();
     reset_current_module_statement();
 
-    return TRUE;
+    return true;
 }
 
 /* starting point of Abstract Syntax Tree */
@@ -260,7 +260,7 @@ complexity statement_to_complexity(statement stat,
 	fprintf(stderr,"complexity for statement (%td,%td) at %p\n",
 		(statement_ordering(stat) >> 16),
 		(statement_ordering(stat) & 0xffff), comp);
-	complexity_fprint(stderr, comp, TRUE, TRUE);
+	complexity_fprint(stderr, comp, true, true);
     }
 
     /* Check and store the complexity in the statement_mapping */
@@ -383,7 +383,7 @@ complexity block_to_complexity(list block, // list of statements
 				      default_is_inferior_pvarval));
 
       for ( ; !VECTEUR_NUL_P(pb); pb = pb->succ) {
-	boolean mustbewritten;
+	bool mustbewritten;
 	entity v = (entity) (pb->var);
 	//char *var = variable_local_name(pb->var);
 
@@ -405,7 +405,7 @@ complexity block_to_complexity(list block, // list of statements
   if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
     (void) complexity_consistent_p(comp);
     fprintf(stderr, "block comp is at %p and comp value is ", comp);
-    complexity_fprint(stderr, comp, FALSE, TRUE);
+    complexity_fprint(stderr, comp, false, true);
   }
   complexity_check_and_warn("block_to_complexity", comp);
 
@@ -432,11 +432,11 @@ list effects_list;
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "YYY  test true  complexity: ");
-	complexity_fprint(stderr, ctrue, FALSE, TRUE);
+	complexity_fprint(stderr, ctrue, false, true);
 	fprintf(stderr, "YYY  test false complexity: ");
-	complexity_fprint(stderr, cfalse, FALSE, TRUE);
+	complexity_fprint(stderr, cfalse, false, true);
 	fprintf(stderr, "YYY  test cond. complexity: ");
-	complexity_fprint(stderr, comp, FALSE, TRUE);
+	complexity_fprint(stderr, comp, false, true);
     }
 
     ctemp = complexity_dup(ctrue);
@@ -450,7 +450,7 @@ list effects_list;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "YYY  test total complexity: ");
-	complexity_fprint(stderr, comp, TRUE, TRUE);
+	complexity_fprint(stderr, comp, true, true);
 	fprintf(stderr, "\n");
     }
     complexity_check_and_warn("test_to_complexity", comp);    
@@ -617,17 +617,17 @@ list effects_list;
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "@@@  body  complexity: ");
-	complexity_fprint(stderr, cbody, FALSE, TRUE);
+	complexity_fprint(stderr, cbody, false, true);
 	fprintf(stderr, "@@@  range complexity: ");
-	complexity_fprint(stderr, crange, FALSE, TRUE);
+	complexity_fprint(stderr, crange, false, true);
 	fprintf(stderr, "@@@  lower     value : ");
-	complexity_fprint(stderr, clower, FALSE, TRUE);
+	complexity_fprint(stderr, clower, false, true);
 	fprintf(stderr, "@@@  upper     value : ");
-	complexity_fprint(stderr, cupper, FALSE, TRUE);
+	complexity_fprint(stderr, cupper, false, true);
 	fprintf(stderr, "@@@  increment value : ");
-	complexity_fprint(stderr, cincr, FALSE, TRUE);
+	complexity_fprint(stderr, cincr, false, true);
 	fprintf(stderr, "@@@  sigma complexity: ");
-	complexity_fprint(stderr, comp, FALSE, TRUE);
+	complexity_fprint(stderr, comp, false, true);
     }
 /*
     if ( !complexity_constant_p(cincr) ) {
@@ -670,7 +670,7 @@ list effects_list;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "@@@  loop total compl: ");
-	complexity_fprint(stderr, comp, TRUE, TRUE);
+	complexity_fprint(stderr, comp, true, true);
 	fprintf(stderr, "\n");
     }
 
@@ -702,9 +702,9 @@ complexity whileloop_to_complexity(whileloop while_instr, transformer precond, l
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
         fprintf(stderr, "\n");
         fprintf(stderr, "YYY  body  complexity: ");
-        complexity_fprint(stderr, cbody, FALSE, TRUE);
+        complexity_fprint(stderr, cbody, false, true);
         fprintf(stderr, "YYY  test complexity: ");
-        complexity_fprint(stderr, ctest, FALSE, TRUE);
+        complexity_fprint(stderr, ctest, false, true);
     }
 
      complexity range = make_complexity_unknown(UNKNOWN_RANGE_NAME);
@@ -713,7 +713,7 @@ complexity whileloop_to_complexity(whileloop while_instr, transformer precond, l
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
         fprintf(stderr, "YYY  while total complexity: ");
-        complexity_fprint(stderr, cbody, TRUE, TRUE);
+        complexity_fprint(stderr, cbody, true, true);
         fprintf(stderr, "\n");
     }
     complexity_check_and_warn(__FUNCTION__, cbody);    
@@ -775,7 +775,7 @@ list effects_list;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "call '%s': ", name);
-	complexity_fprint(stderr, comp, FALSE, TRUE);
+	complexity_fprint(stderr, comp, false, true);
 	fprintf(stderr, "call comp is at %p\n", comp);
     }
     complexity_check_and_warn("call_to_complexity", comp);
@@ -814,7 +814,7 @@ list effects_list;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "argument comp is at %p and value is ", comp);
-	complexity_fprint(stderr, comp, FALSE, TRUE);
+	complexity_fprint(stderr, comp, false, true);
     }
     complexity_check_and_warn("arguments_to_complexity", comp);
 
@@ -1008,11 +1008,11 @@ list effects_list;
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "\n");
 	fprintf(stderr, ">>>  ref. %s argus   complexity: ", name);
-	complexity_fprint(stderr, comp, FALSE, TRUE);
+	complexity_fprint(stderr, comp, false, true);
 	fprintf(stderr, ">>>  ref. %s access  complexity: ", name);
-	complexity_fprint(stderr, ca, FALSE, TRUE);
+	complexity_fprint(stderr, ca, false, true);
 	fprintf(stderr, ">>>  ref. %s indices complexity: ", name);
-	complexity_fprint(stderr, ci, FALSE, TRUE);
+	complexity_fprint(stderr, ci, false, true);
     }
 
     complexity_add(&comp, ca);
@@ -1022,7 +1022,7 @@ list effects_list;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, ">>>  ref. %s total   complexity: ", name);
-	complexity_fprint(stderr, comp, TRUE, TRUE);
+	complexity_fprint(stderr, comp, true, true);
 	fprintf(stderr,"\n");
     }
 
@@ -1103,11 +1103,11 @@ list effects_list;
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "---  range lower complexity: ");
-	complexity_fprint(stderr, compl, FALSE, TRUE);
+	complexity_fprint(stderr, compl, false, true);
 	fprintf(stderr, "---  range upper complexity: ");
-	complexity_fprint(stderr, compu, FALSE, TRUE);
+	complexity_fprint(stderr, compu, false, true);
 	fprintf(stderr, "---  range incr  complexity: ");
-	complexity_fprint(stderr, compi, FALSE, TRUE);
+	complexity_fprint(stderr, compi, false, true);
     }
 
     complexity_add(&compl, compu);
@@ -1117,7 +1117,7 @@ list effects_list;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "---  range total complexity: ");
-	complexity_fprint(stderr, compl, TRUE, TRUE);
+	complexity_fprint(stderr, compl, true, true);
 	fprintf(stderr, "\n");
     }
     complexity_check_and_warn("range_to_complexity", compl);

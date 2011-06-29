@@ -81,7 +81,7 @@ static text
 text_region_no_action(effect reg)
 {
     text t_reg;
-    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+    bool foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
     string str_prefix = foresys? 
 	FORESYS_CONTINUATION_PREFIX: get_comment_continuation();
     char line_buffer[MAX_LINE_LENGTH];
@@ -170,7 +170,7 @@ aliases_text(string module_name, string resource_name)
 
     alias_lists = effects_classes_classes(
 	(effects_classes)
-	db_get_memory_resource(resource_name, module_name, TRUE));
+	db_get_memory_resource(resource_name, module_name, true));
 
     pips_debug(9,"got aliases\n");
 
@@ -181,9 +181,9 @@ aliases_text(string module_name, string resource_name)
     set_current_module_entity( local_name_to_top_level_entity(module_name));
     module = get_current_module_entity();
     set_current_module_statement((statement) db_get_memory_resource
-				 (DBR_CODE, module_name, TRUE));
+				 (DBR_CODE, module_name, true));
     set_cumulated_rw_effects((statement_effects)
-	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     /* that's it, but we musn't forget to rest everything after the call
      */
 
@@ -249,7 +249,7 @@ static bool
 print_aliases( string module_name, string resource_name, string file_extn)
 {
     char *file_resource_name;
-    bool success = TRUE;
+    bool success = true;
 
     pips_debug(4,"module %s resource %s file extn %s\n",
 	       module_name,resource_name,file_extn);
@@ -271,7 +271,7 @@ print_aliases( string module_name, string resource_name, string file_extn)
 bool
 print_in_alias_pairs( string module_name )
 {
-    bool success = TRUE;
+    bool success = true;
 
     debug_on("ALIAS_PAIRS_DEBUG_LEVEL");
     pips_debug(4,"module %s\n",module_name);
@@ -281,14 +281,14 @@ print_in_alias_pairs( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(TRUE);
+    return(true);
 }
 
 
 bool
 print_out_alias_pairs( string module_name )
 {
-    bool success = TRUE;
+    bool success = true;
 
     debug_on("ALIAS_PAIRS_DEBUG_LEVEL");
     pips_debug(4,"module %s\n",module_name);
@@ -298,13 +298,13 @@ print_out_alias_pairs( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(TRUE);
+    return(true);
 }
 
 bool
 print_alias_lists( string module_name )
 {
-    bool success = TRUE;
+    bool success = true;
 
     debug_on("ALIAS_LISTS_DEBUG_LEVEL");
     pips_debug(4,"module %s\n",module_name);
@@ -314,13 +314,13 @@ print_alias_lists( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(TRUE);
+    return(true);
 }
 
 bool
 print_alias_classes( string module_name )
 {
-    bool success = TRUE;
+    bool success = true;
 
     debug_on("ALIAS_CLASSES_DEBUG_LEVEL");
     pips_debug(4,"module %s\n",module_name);
@@ -331,5 +331,5 @@ print_alias_classes( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(TRUE);
+    return(true);
 }
