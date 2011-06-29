@@ -87,7 +87,7 @@ Psommet fonct;
 
 	    /* calcul de la solution reelle positive  */
 	    while ((sys1 != NULL) && 
-		   (dual_pivot_pas(&sys1,&lvbase,nb_som,fonct,&nbvars,&b) == TRUE));
+		   (dual_pivot_pas(&sys1,&lvbase,nb_som,fonct,&nbvars,&b) == true));
 
 	    /* si le systeme est non faisable,
 	       liberation de l'espace memoire ocupe par la fonction 

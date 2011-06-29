@@ -41,25 +41,25 @@
 #include "contrainte.h"
 #include "sc.h"
 
-/* boolean sc_value_for_variable(Psysteme ps, Variable var, Value *pval):
+/* bool sc_value_for_variable(Psysteme ps, Variable var, Value *pval):
  * examine les egalites du systeme ps pour recherche une egalite de la forme:
  * 
  *    coeff*var - cste == 0
  * 
  * Si une telle equation est trouvee et si elle est faisable,
  * sc_value_for_variable calcule la valeur de var pour ce systeme et
- * la retourne par pval. Sinon, la procedure renvoie la valeur FALSE.
+ * la retourne par pval. Sinon, la procedure renvoie la valeur false.
  * 
  * Notes:
  *  - le vecteur representant l'equation est suppose correct: une variable 
  *    dont le coefficient est nul ne doit pas etre materialisee
  *  - ce n'est pas une fonction sur les systemes mais sur les listes d'egalites
- *  - la valeur FALSE peut signifer que le systeme d'egalites de ps n'est pas
+ *  - la valeur false peut signifer que le systeme d'egalites de ps n'est pas
  *    faisable ou qu'il n'y a pas d'equation satisfaisante; l'arret par 
  *    sc_error() en cas de non-faisabilite n'etait pas satisfaisant pour les 
  *    procedures appelantes
  */
-boolean sc_value_of_variable(ps, var, pval)
+bool sc_value_of_variable(ps, var, pval)
 Psysteme ps;
 Variable var;
 Value *pval;
@@ -67,7 +67,7 @@ Value *pval;
     Pcontrainte pc;
 
     if (SC_UNDEFINED_P(ps))
-	return(FALSE);
+	return(false);
 
     for (pc = ps->egalites; pc != NULL; pc = pc->succ) 
     {
@@ -81,7 +81,7 @@ Value *pval;
 		{
 		    /* equation de la forme: k*var == 0 */
 		    *pval = 0;
-		    return(TRUE);
+		    return(true);
 		}
 	    }
 	    else if (pv->succ->succ == NULL)
@@ -93,11 +93,11 @@ Value *pval;
 		    if(value_zero_p(value_mod(vs,v)))
 		    {
 			*pval = value_uminus(value_div(vs,v));
-			return(TRUE);
+			return(true);
 		    }
 		    else
 		    {
-			return(FALSE);
+			return(false);
 		    }
 		}
 		else
@@ -108,11 +108,11 @@ Value *pval;
 			/* equation de la forme: c - k*var == 0 */
 			if(value_zero_p(value_mod(v,vs))) {
 			    *pval = value_uminus(value_div(v,vs));
-			    return(TRUE);
+			    return(true);
 			}
 			else
 			{
-			    return(FALSE);
+			    return(false);
 			}
 		    }
 		}
@@ -120,19 +120,19 @@ Value *pval;
 	}
     }
     
-    return(FALSE);
+    return(false);
 }
 
 /* void sc_minmax_of_variable(Psysteme ps, Variable var, Value *pmin, *pmax):
  * examine un systeme pour trouver le minimum et le maximum d'une variable
  * apparaissant dans ce systeme par projection a la Fourier-Motzkin.
- * la procedure retourne la valeur FALSE si le systeme est infaisable et
- * TRUE sinon
+ * la procedure retourne la valeur false si le systeme est infaisable et
+ * true sinon
  *
  * le systeme ps est detruit.
  * 
  */
-boolean sc_minmax_of_variable(ps, var, pmin, pmax)
+bool sc_minmax_of_variable(ps, var, pmin, pmax)
 Psysteme ps;
 Variable var;
 Value *pmin, *pmax;
@@ -146,10 +146,10 @@ Value *pmin, *pmax;
     *pmax = VALUE_MAX;
     *pmin = VALUE_MIN;
 
-    if (sc_value_of_variable(ps, var, &val) == TRUE) {
+    if (sc_value_of_variable(ps, var, &val) == true) {
 	*pmin = val;
 	*pmax = val;
-	return TRUE;
+	return true;
     }
 
     /* projection sur toutes les variables sauf var */
@@ -157,18 +157,18 @@ Value *pmin, *pmax;
 	Variable v = vecteur_var(b);
 	if (v != var) {
 	    if (SC_EMPTY_P(ps = sc_projection(ps, v))) {
-		return FALSE;
+		return false;
 	    }
 	    if (SC_EMPTY_P(ps = sc_normalize(ps))) {
-		return FALSE;
+		return false;
 	    }
 	}
     }
 
-    if (sc_value_of_variable(ps, var, &val) == TRUE) {
+    if (sc_value_of_variable(ps, var, &val) == true) {
 	*pmin = val;
 	*pmax = val;
-	return TRUE;
+	return true;
     }
 
     for (pc = ps->inegalites; pc != NULL; pc = pc->succ) {
@@ -189,11 +189,11 @@ Value *pmin, *pmax;
 	}
     }
     if (value_lt(*pmax,*pmin)) 
-	return FALSE;
+	return false;
 
     sc_rm(ps);
 
-    return TRUE;
+    return true;
 }
 
 /* This function uses sc_minmax_of_variable to compute the min and max 
@@ -212,7 +212,7 @@ Pbase b;
 	Variable var1 = vecteur_var(pv);
 	Psysteme sc = sc_dup(ps1);
 	Value min, max;
-	boolean faisable = sc_minmax_of_variable(sc, var1, &min, &max);
+	bool faisable = sc_minmax_of_variable(sc, var1, &min, &max);
 	Pcontrainte pc;
 
 	if (faisable) {
@@ -293,8 +293,8 @@ Variable var;
 /* void sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, *pmax):
  * examine un systeme pour trouver le minimum et le maximum d'une variable
  * apparaissant dans ce systeme par projection a la Fourier-Motzkin.
- * la procedure retourne la valeur FALSE si le systeme est infaisable et
- * TRUE sinon
+ * la procedure retourne la valeur false si le systeme est infaisable et
+ * true sinon
  *
  * Le systeme ps est detruit et desalloue..
  *
@@ -307,7 +307,7 @@ Variable var;
  *
  * Note:
  *  - comme on ne teste pas la faisabilite en entiers, il se peut que
- *    cette fonction renvoie TRUE et que les deux valeurs min et max
+ *    cette fonction renvoie true et que les deux valeurs min et max
  *    n'existent pas vraiment; il faut donc etre sur de la maniere dont
  *    on utilise cette fonction; dans le cas de l'evaluation de la valeur
  *    d'une variable en un point d'un programme, cela n'a pas d'importance
@@ -318,15 +318,15 @@ Variable var;
  *    trivial mais pas forcement justifie, ce test est laisse a la charge
  *    de l'appelant.
  */
-boolean 
+bool 
 sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 {
 /* Maximum number of variables in an equation used for the projection */
 #define level (2)
 
-#define if_debug_sc_minmax_of_variable2 if(FALSE)
+#define if_debug_sc_minmax_of_variable2 if(false)
 
-    boolean feasible_p = TRUE;
+    bool feasible_p = true;
 
     if_debug_sc_minmax_of_variable2 {
 	fprintf(stderr, "[sc_minmax_of_variable2]: Begin\n");
@@ -337,7 +337,7 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 	    fprintf(stderr,
 		    "[sc_minmax_of_variable2]: Empty system as input\n");
 	}
-	feasible_p = FALSE;
+	feasible_p = false;
     }
     else if(SC_EMPTY_P(ps = sc_normalize(ps))) {
 	if_debug_sc_minmax_of_variable2 {
@@ -345,7 +345,7 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 		    "[sc_minmax_of_variable2]:"
 		    " Non-feasibility detected by first call to sc_normalize\n");
 	}
-	feasible_p = FALSE;
+	feasible_p = false;
     }
     else { /* no obvious non-feasibility */
 	Pcontrainte eq = CONTRAINTE_UNDEFINED;
@@ -405,7 +405,7 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 			    Variable v2 = TCST;
 			    Variable nv = TCST;
 			    Pvecteur pv = contrainte_vecteur(eq);
-			    boolean value_found_p = FALSE;
+			    bool value_found_p = false;
 
 			    /* Does eq define var's value (and min==max)?
 			     * Let's keep track of this but go on to check
@@ -420,7 +420,7 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 					   (value_div(val_of(vecteur_succ(pv)),
 						      val_of(pv)));
 					*pmax = *pmin;
-					value_found_p = TRUE;
+					value_found_p = true;
 				    }
 				    else if ((pv->succ->var == var) &&
 					     (pv->var == TCST)) {
@@ -428,20 +428,20 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 					    (value_div(val_of(pv),
 					        val_of(vecteur_succ(pv))));
 					*pmax = *pmin;
-					value_found_p = TRUE;
+					value_found_p = true;
 				    }
 				    else {
-					value_found_p = FALSE;
+					value_found_p = false;
 				    }
 				}
 				else {
 				    if (pv->var == var) {
 					*pmin = VALUE_ZERO;
 					*pmax = *pmin;
-					value_found_p = TRUE;
+					value_found_p = true;
 				    }
 				    else {
-					value_found_p = FALSE;
+					value_found_p = false;
 				    }
 				}
 			    }
@@ -453,7 +453,7 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 			    if(value_found_p) {
 				/* do not touch ps any more */
 				/* sc_rm(new_ps); */
-				return TRUE;
+				return true;
 			    }
 
 			    /* keep eq */
@@ -477,7 +477,7 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 				pv = vecteur_succ(pv)) {
 				nv = vecteur_var(pv);
 				/* This test is not fully used in the curent
-				 * version since value_found_p==FALSE here.
+				 * version since value_found_p==false here.
 				 * That would change if feasibility had to
 				 * be checked better.
 				 */
@@ -546,7 +546,7 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 		}
 		else {
 		    /* The system is not feasible. Stop */
-		    feasible_p = FALSE;
+		    feasible_p = false;
 		    break;
 		}
 

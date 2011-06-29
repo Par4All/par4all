@@ -74,14 +74,14 @@
 #include <signal.h>
 #define SC_CONVEX_HULL_TIMEOUT 180 //3 minutes
 
-boolean SC_CONVEX_HULL_timeout = FALSE;
+bool SC_CONVEX_HULL_timeout = false;
 
 void 
 catch_alarm_SC_CONVEX_HULL (int sig  __attribute__ ((unused)))
 {  
   fprintf(stderr,"CATCH ALARM sc_convex_hull !!!\n");
   //put inside CATCH(any_exception_error) alarm(0); //clear the alarm
-  SC_CONVEX_HULL_timeout = TRUE;
+  SC_CONVEX_HULL_timeout = true;
 
   THROW(timeout_error);
 }
@@ -126,14 +126,14 @@ int dim;
 {
     int j;
     Pvecteur pv,pvnew = NULL;
-    boolean NEWPV = TRUE;
+    bool NEWPV = true;
 
     for (j=1,pv=base ;j<dim;j++,pv=pv->succ) {
       if (mat->p[i][j]) {
 	if (NEWPV) { 
 	  pvnew= vect_new(vecteur_var(pv),
 			  IRINT_TO_VALUE(mat->p[i][j]));
-	  NEWPV =FALSE; 
+	  NEWPV =false; 
 	}		
 	else 
 	  vect_add_elem(&pvnew,vecteur_var(pv),
@@ -173,13 +173,13 @@ int dim;
 {
     int j;
     Pvecteur pv,pvnew = NULL;
-    boolean NEWPV = TRUE;
+    bool NEWPV = true;
 
     for (j=1,pv=base ;j<dim;j++,pv=pv->succ) {
       if (pol->Ray[i][j]) {
 	    if (NEWPV) { pvnew= vect_new(vecteur_var(pv),
 					 IRINT_TO_VALUE(pol->Ray[i][j]));
-			 NEWPV =FALSE;  }		
+			 NEWPV =false;  }		
 	    else vect_add_elem(&pvnew,vecteur_var(pv),
 			       IRINT_TO_VALUE(pol->Ray[i][j]));
       }
@@ -320,8 +320,8 @@ static void matrix_to_sc(Matrix *mat, Psysteme sc)
     Pcontrainte pce=NULL;
     Pcontrainte pci=NULL;
     Pcontrainte pc_tmp=NULL;
-    boolean neweq = TRUE;
-    boolean newineq = TRUE;
+    bool neweq = true;
+    bool newineq = true;
     int i,nbrows;
     int nbeq=0;
     int nbineq=0;
@@ -335,7 +335,7 @@ static void matrix_to_sc(Matrix *mat, Psysteme sc)
 		if (neweq) { 
 		    pce= pc_tmp  = 
 			matrix_ligne_to_contrainte(mat, i, sc->base);
-		    neweq = FALSE;} 
+		    neweq = false;} 
 		else {
 		    pc_tmp->succ = 
 			matrix_ligne_to_contrainte(mat, i, sc->base);
@@ -346,7 +346,7 @@ static void matrix_to_sc(Matrix *mat, Psysteme sc)
 		if (newineq) {pci = pc_tmp =
 				  matrix_ligne_to_contrainte(mat,
 							     i,sc->base); 
-				  newineq = FALSE; } 
+				  newineq = false; } 
 		else {
 		    pc_tmp->succ = matrix_ligne_to_contrainte(mat,
 							      i,sc->base);
@@ -382,9 +382,9 @@ static void polyhedron_to_sg(Polyhedron  *pol, Ptsg sg)
     int nbsommets =0;
     int  nbrays=0;
     int dim = vect_size(sg->base) +1;
-    boolean newsommet = TRUE;
-    boolean newray = TRUE;
-    boolean newdte = TRUE;
+    bool newsommet = true;
+    bool newray = true;
+    bool newdte = true;
 
     for (i=0; i< pol->NbRays; i++) {
 	switch (pol->Ray[i][0]) {
@@ -393,7 +393,7 @@ static void polyhedron_to_sg(Polyhedron  *pol, Ptsg sg)
 	    pvnew = polyhedron_ligne_to_vecteur(pol,i,sg->base,dim);
 	    if (newdte) {
 		ldtes_tmp= ldtes = ray_dte_make(pvnew);
-		newdte = FALSE; 
+		newdte = false; 
 	    } else {
 		/* Pour chaque droite suivante */
 		ldtes_tmp->succ = ray_dte_make(pvnew);
@@ -408,7 +408,7 @@ static void polyhedron_to_sg(Polyhedron  *pol, Ptsg sg)
 		pvnew = polyhedron_ligne_to_vecteur(pol,i,sg->base,dim);
 		if (newray) {
 		    lray_tmp = lray = ray_dte_make(pvnew);
-		    newray = FALSE;
+		    newray = false;
 		} else {
 		    lray_tmp->succ= ray_dte_make(pvnew);
 		    lray_tmp =lray_tmp->succ;    }
@@ -420,7 +420,7 @@ static void polyhedron_to_sg(Polyhedron  *pol, Ptsg sg)
 		    lsommet_tmp=lsommet=
 			sommet_make(IRINT_TO_VALUE(pol->Ray[i][dim]),
 				    pvnew);
-		    newsommet = FALSE;
+		    newsommet = false;
 		} else {
 		    lsommet_tmp->succ=
 			sommet_make(IRINT_TO_VALUE(pol->Ray[i][dim]),
@@ -599,7 +599,7 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
       
       if (SC_CONVEX_HULL_timeout) {
 
-	SC_CONVEX_HULL_timeout = FALSE;
+	SC_CONVEX_HULL_timeout = false;
 
 	//fprintf(stderr,"\n *** * *** Timeout from polyedre/chernikova : sc_convex_hull !!! \n");
 	

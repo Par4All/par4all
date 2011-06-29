@@ -73,7 +73,7 @@
 
 #include <signal.h>
 
-#define EXCEPTION_PRINT_PROJECTION TRUE
+#define EXCEPTION_PRINT_PROJECTION true
 
 #ifdef FILTERING
 
@@ -84,13 +84,13 @@
 
 #define FILTERING_TIMEOUT_PROJECTION filtering_timeout_projection
 
-static boolean PROJECTION_timeout = FALSE;
+static bool PROJECTION_timeout = false;
 
 static void 
 catch_alarm_projection (int sig)
 { 
   alarm(0); /*clear the alarm*/
-  PROJECTION_timeout = TRUE;
+  PROJECTION_timeout = true;
 }
 #endif
 
@@ -133,7 +133,7 @@ int ofl_ctrl;
     Pbase base_init = base_copy((*psc)->base);
 
     /* trouver une egalite ou v a un coeff. minimal en valeur absolu */
-    eq = contrainte_var_min_coeff((*psc)->egalites, v, &coeff, FALSE);
+    eq = contrainte_var_min_coeff((*psc)->egalites, v, &coeff, false);
     
     if (eq != NULL) {		
 	if(!egalite_normalize(eq)) {
@@ -149,14 +149,14 @@ int ofl_ctrl;
 	}
     }
     else {
-	boolean fm_int_exact_p;
+	bool fm_int_exact_p;
 	/* v n'apparait dans aucune egalite, il faut l'eliminer des inegalites
 	   par des combinaisons (fonction combiner) */
 	
 	fm_int_exact_p = 
-	    sc_fourier_motzkin_variable_elimination_ofl_ctrl(*psc, v, FALSE, 
-							     FALSE, ofl_ctrl);
-	if (fm_int_exact_p == FALSE) {
+	    sc_fourier_motzkin_variable_elimination_ofl_ctrl(*psc, v, false, 
+							     false, ofl_ctrl);
+	if (fm_int_exact_p == false) {
 	    /* detection de la non faisabilite du Psysteme */
 	    sc_rm(*psc);
 	    *psc = sc_empty(base_init);	    
@@ -239,11 +239,11 @@ int ofl_ctrl;
 
 /* void sc_projection_with_test_along_variables_ofl_ctrl(Psysteme *psc, 
  *                                                      Pvecteur pv, 
- *                                                      boolean *is_proj_exact)
+ *                                                      bool *is_proj_exact)
  * input    : the systeme to project along the variables of the vector pv.
  *            *is_proj_exact is supposed to be initialized.
  * output   : nothing. 
- * modifies : *is_proj_exact is set to FALSE if the projection is not exact.
+ * modifies : *is_proj_exact is set to false if the projection is not exact.
  * comment  : The initial systeme is successively projected along 
  *            all the variables of pv, even if the projection is not exact.
  *            The projection is done first by eliminating variables in the 
@@ -261,7 +261,7 @@ void sc_projection_along_variables_with_test_ofl_ctrl(psc, pv, is_proj_exact,
 							  ofl_ctrl)
 Psysteme *psc;
 Pvecteur pv;
-boolean *is_proj_exact; /* this boolean is supposed to be initialized */
+bool *is_proj_exact; /* this bool is supposed to be initialized */
 int ofl_ctrl;
 {
     Pcontrainte eq;
@@ -339,7 +339,7 @@ int ofl_ctrl;
 	    else {
 		/* elimination for v with the constraints of sc other than eq*/
 
-		if (*is_proj_exact) *is_proj_exact = FALSE;
+		if (*is_proj_exact) *is_proj_exact = false;
 
 		sc = sc_variable_substitution_with_eq_ofl_ctrl
 		    (sc, eq, v, ofl_ctrl);
@@ -368,7 +368,7 @@ int ofl_ctrl;
 
 	    v = current_pv->var;
 
-	    if (! sc_fourier_motzkin_variable_elimination_ofl_ctrl(sc, v, TRUE,
+	    if (! sc_fourier_motzkin_variable_elimination_ofl_ctrl(sc, v, true,
 								   is_proj_exact, 
 								   ofl_ctrl)) 
 	    {
@@ -447,7 +447,7 @@ int ofl_ctrl;
       }
       else 
       {
-	switch (contrainte_subst_ofl_ctrl(v, eq, current_eq, TRUE, ofl_ctrl)) 
+	switch (contrainte_subst_ofl_ctrl(v, eq, current_eq, true, ofl_ctrl)) 
 	{
 	case 0 : 
 		/* the substitution found that the system is not feasible */
@@ -482,7 +482,7 @@ int ofl_ctrl;
     current_eq = sc->inegalites;
     while(current_eq != NULL) {
 	
-	switch (contrainte_subst_ofl_ctrl(v, eq, current_eq, FALSE,ofl_ctrl)) {
+	switch (contrainte_subst_ofl_ctrl(v, eq, current_eq, false,ofl_ctrl)) {
 
 	case 0 : 
 	    /* the substitution found that the system is not feasible */
@@ -546,45 +546,45 @@ int ofl_ctrl;
     for(eq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(eq);
 	eq = contrainte_succ(eq)){
       if (eq!=def) /* skip if aliased! */
-	(void) contrainte_subst_ofl_ctrl(v, def, eq, TRUE, ofl_ctrl);
+	(void) contrainte_subst_ofl_ctrl(v, def, eq, true, ofl_ctrl);
     }
 
     for(ineq = sc_inegalites(sc); !CONTRAINTE_UNDEFINED_P(ineq);
 	ineq = contrainte_succ(ineq)){
-	(void) contrainte_subst_ofl_ctrl(v, def, ineq, FALSE, ofl_ctrl);
+	(void) contrainte_subst_ofl_ctrl(v, def, ineq, false, ofl_ctrl);
     }
     return sc;
 }
 
-/* boolean sc_fourier_motzkin_variable_elimination_ofl_ctrl(Psysteme sc, 
+/* bool sc_fourier_motzkin_variable_elimination_ofl_ctrl(Psysteme sc, 
  *                     Variable v, 
- *                     boolean integer_test_p, boolean *integer_test_res_p, 
+ *                     bool integer_test_p, bool *integer_test_res_p, 
  *                     int ofl_ctrl)
  * input    : a systeme of constraints sc, a variable to eliminate using
- *            Fourier-Motzking elimination, a boolean (integer_test_p)  
- *            TRUE when the test of sufficient conditions for an exact
+ *            Fourier-Motzking elimination, a bool (integer_test_p)  
+ *            true when the test of sufficient conditions for an exact
  *            projection must be performed, a pointer towards an already
- *            initialized boolean (integer_test_res_p) to store the
+ *            initialized bool (integer_test_res_p) to store the
  *            logical and of its initial value and of the result of the
  *            previous test, and an integer to indicate how the overflow
  *            error must be handled (see sc-types.h). The case OFL_CTRL
  *            is of no interest here.
- * output   : TRUE if sc is feasible (w.r.t the inequalities), 
- *            FALSE otherwise;
- * modifies : sc, *integer_test_res_p if integer_test_p == TRUE.
+ * output   : true if sc is feasible (w.r.t the inequalities), 
+ *            false otherwise;
+ * modifies : sc, *integer_test_res_p if integer_test_p == true.
  * comment  : eliminates v from sc by combining the inequalities of sc 
  *            (Fourier-Motzkin). If this elimination is not exact, 
- *            *integer_test_res_p is set to FALSE.
+ *            *integer_test_res_p is set to false.
  *            *integer_test_res_p must be initialized.
  *            
  */
 
-boolean sc_fourier_motzkin_variable_elimination_ofl_ctrl(sc,v, integer_test_p,
+bool sc_fourier_motzkin_variable_elimination_ofl_ctrl(sc,v, integer_test_p,
 						integer_test_res_p, ofl_ctrl)
 Psysteme sc;
 Variable v;
-boolean integer_test_p;
-boolean *integer_test_res_p;
+bool integer_test_p;
+bool *integer_test_res_p;
 int ofl_ctrl;
 {
     Psysteme sc1 = SC_UNDEFINED;
@@ -594,7 +594,7 @@ int ofl_ctrl;
     int nnul;
 
     if ((sc->inegalites) == NULL) {
-      return(TRUE);
+      return(true);
     }
 
     CATCH(timeout_error|overflow_error){
@@ -611,7 +611,7 @@ int ofl_ctrl;
       else {
 	ifscdebug(5) {
 	  fprintf(stderr,"\n[fourier_motzkin_variable_elimination_ofl_ctrl]: ofl_ctrl <> FWD_OFL_CTRL \n");}
-	/*return FALSE means system non feasible. return TRUE, mean ok => both wrong		*/
+	/*return false means system non feasible. return true, mean ok => both wrong		*/
       }
     }
     TRY
@@ -653,7 +653,7 @@ int ofl_ctrl;
 	    Pcontrainte pcnew;	    
 
 	    if (integer_test_p) {
-		boolean int_comb_p;
+		bool int_comb_p;
 		pcnew = 
 		    sc_integer_inequalities_combination_ofl_ctrl
 			(sc1, pcp, pcn, v, &int_comb_p, ofl_ctrl);
@@ -663,7 +663,7 @@ int ofl_ctrl;
 		pcnew = inegalite_comb_ofl_ctrl(pcp, pcn, v, ofl_ctrl);
 	    
 	    if (contrainte_constante_p(pcnew)) {
-		if (contrainte_verifiee(pcnew,FALSE)) {
+		if (contrainte_verifiee(pcnew,false)) {
 		    contrainte_free(pcnew);
 		}
 		else {
@@ -676,7 +676,7 @@ int ofl_ctrl;
 alarm(0);
 #endif
 		    UNCATCH(timeout_error|overflow_error);
-		    return(FALSE);
+		    return(false);
 		}
 	    }
 	    else {
@@ -703,7 +703,7 @@ alarm(0);
 #endif
     UNCATCH(timeout_error|overflow_error);
 
-    return TRUE;
+    return true;
 }
 
 /* Psysteme sc_projection_on_variables
@@ -775,16 +775,16 @@ Pvecteur pv;
 /* Pcontrainte sc_integer_inequalities_combination_ofl_ctrl(Psysteme sc,
  *                                            Pcontrainte posit, negat,
  *                                                          Variable v,
- *                                      boolean *integer_combination_p,
+ *                                      bool *integer_combination_p,
  *                                                        int ofl_ctrl)
  * input    : many things !
  * output   : a constraint which is the combination of the constraints
  *            posit and negat by the variable v.
  * modifies : *integer_combination_p.
  * comment  :
- *      *integer_combination_p is set to TRUE, if the Fourier Motzkin
+ *      *integer_combination_p is set to true, if the Fourier Motzkin
  *      projection is equivalent to the "integer projection". 
- *      else, it is set to FALSE.
+ *      else, it is set to false.
  *
  * Redundancy is checked using contrainte_reverse() and feasability
  * checking. Non-redundant constraints in rational may be discarded.
@@ -794,7 +794,7 @@ Pcontrainte sc_integer_inequalities_combination_ofl_ctrl
 Psysteme sc;
 Pcontrainte posit, negat;
 Variable v;
-boolean *integer_combination_p;
+bool *integer_combination_p;
 int ofl_ctrl;
 {
     Value cp, cn;
@@ -820,7 +820,7 @@ int ofl_ctrl;
 
 	    if (contrainte_constante_p(ineg) &&
 		value_le(vect_coeff(TCST, ineg->vecteur), value_uminus(tmp)))
-		*integer_combination_p = TRUE;
+		*integer_combination_p = true;
 	    else {
 		Pcontrainte ineg_test = contrainte_copy(ineg);
 		Psysteme sc_test = sc_copy(sc);
@@ -831,15 +831,15 @@ int ofl_ctrl;
 		 
 		sc_add_inegalite(sc_test,ineg_test);
 		
-		if (!sc_rational_feasibility_ofl_ctrl(sc_test, OFL_CTRL, TRUE))
-		    *integer_combination_p = TRUE;
+		if (!sc_rational_feasibility_ofl_ctrl(sc_test, OFL_CTRL, true))
+		    *integer_combination_p = true;
 		else 
-		   *integer_combination_p = FALSE; 
+		   *integer_combination_p = false; 
 		sc_rm(sc_test);		
 	    }								      
 	}
 	else {
-	    *integer_combination_p = TRUE; 
+	    *integer_combination_p = true; 
 	}
 	
     }
@@ -913,7 +913,7 @@ Pvecteur pv;
 Psysteme sc_projection_ofl_along_variables_with_test(sc, pv, is_proj_exact)
 Psysteme sc;
 Pvecteur pv;
-boolean *is_proj_exact; /* this boolean is supposed to be initialized */
+bool *is_proj_exact; /* this bool is supposed to be initialized */
 {
     sc_projection_along_variables_with_test_ofl_ctrl(&sc, pv, is_proj_exact, 
 							  FWD_OFL_CTRL);
@@ -937,14 +937,14 @@ Variable v;
     return(res);
 }
 
-boolean cond_suff_comb_integer_ofl_ctrl(sc,posit,negat, v, ofl_ctrl)
+bool cond_suff_comb_integer_ofl_ctrl(sc,posit,negat, v, ofl_ctrl)
 Psysteme sc;
 Pcontrainte posit,negat;
 Variable v;
 int ofl_ctrl;
 {
     Pcontrainte ineg = CONTRAINTE_UNDEFINED;
-    boolean result;
+    bool result;
 
     ineg = sc_integer_inequalities_combination_ofl_ctrl(sc, posit, negat, v, 
 							&result, ofl_ctrl);
@@ -964,7 +964,7 @@ Psysteme sc_projection_optim_along_vecteur(Psysteme sc,
     }
     TRY {
         Psysteme sc1 = sc_copy(sc);
-	boolean exact = TRUE;
+	bool exact = true;
 	sc1 = sc_projection_ofl_along_variables_with_test(sc1,pv,&exact);
 	sc_rm(sc);
 	UNCATCH(overflow_error);
@@ -979,14 +979,14 @@ Pcontrainte contraintes;
 Variable v;
 {
     Value coeff;
-    return contrainte_var_min_coeff(contraintes, v, &coeff, TRUE);
+    return contrainte_var_min_coeff(contraintes, v, &coeff, true);
 }
 
-boolean sc_expensive_projection_p(sc,v)
+bool sc_expensive_projection_p(sc,v)
 Psysteme sc;
 Variable v;
 {
-    boolean expensive = FALSE;
+    bool expensive = false;
     /* if Variable v is constrained by  equalities, the system size 
        is kept (-1) after projection */
     if (!var_in_lcontrainte_p(sc->egalites,v) 
@@ -1000,7 +1000,7 @@ Variable v;
 	    else if (coeff<0) nb_nvar ++;
 	}
        if (nb_pvar*nb_nvar>200) 
-	   expensive=TRUE; 
+	   expensive=true; 
     }
     return (expensive);
 
@@ -1084,7 +1084,7 @@ Psysteme volatile *psc;
 Variable v;
 int ofl_ctrl;
 {
-  /* static boolean DN = FALSE; */
+  /* static bool DN = false; */
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   Psysteme volatile sc; 
@@ -1109,10 +1109,10 @@ int ofl_ctrl;
 
 #ifdef FILTERING
 
-  PROJECTION_timeout = FALSE;
+  PROJECTION_timeout = false;
   /*Begin size filters */
   
-  if (TRUE) { /* all these stuff in a block*/
+  if (true) { /* all these stuff in a block*/
     Value magnitude;
     int dimens, nb_cont_eq = 0, nb_ref_eq = 0, nb_cont_in = 0, nb_ref_in = 0;
 

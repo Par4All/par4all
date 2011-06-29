@@ -70,7 +70,7 @@ Variable var;
 
     Value c1 = VALUE_ZERO;
     Value den;
-    boolean cst = FALSE;
+    bool cst = false;
 #ifdef TRACE
     printf(" --- pas - pivoter \n");
 #endif
@@ -78,14 +78,14 @@ Variable var;
 	Pvecteur pv3 = vect_dup(eq->vecteur);
 
 	den = ligne->denominateur;
-	cst = FALSE;
+	cst = false;
 	if ((eq != ligne) && value_notzero_p(c1 = vect_coeff(var,pv3))) {
 
 	    ligne2 = vect_dup(ligne->vecteur);
 	    value_product(eq->denominateur,den);
 	    for (pvec =pv3;pvec!= NULL; pvec=pvec->succ) {
 		Value tmp;
-		if (pvec->var == NULL) cst = TRUE;
+		if (pvec->var == NULL) cst = true;
 
 		value_product(pvec->val,den);
 		tmp = vect_coeff(pvec->var,ligne->vecteur);

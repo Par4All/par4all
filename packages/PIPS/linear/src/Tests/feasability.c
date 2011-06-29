@@ -42,7 +42,7 @@ test_system(Psysteme sc)
     CATCH(overflow_error) 
 	fprintf(stdout, "*** Arithmetic error occured in simplex\n");
     TRY
-	if (sc_feasibility_ofl_ctrl(sc, FALSE, OFL_CTRL, TRUE))
+	if (sc_feasibility_ofl_ctrl(sc, false, OFL_CTRL, true))
 	    printf("Systeme faisable (soluble) en rationnels\n") ;
 	else
 	    printf("Systeme insoluble\n");

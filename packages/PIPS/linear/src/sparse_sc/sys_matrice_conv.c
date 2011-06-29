@@ -193,7 +193,7 @@ int n,m;
     Pbase b;
     int i,j;
     Value cst,coeff,dena,denb;
-    boolean trouve ;
+    bool trouve ;
 
     /* create the  variables */
 
@@ -219,14 +219,14 @@ int n,m;
     denb = DENOMINATOR(B);
 
     for (i=1;i<=n; i++)
-    {	trouve = FALSE;
+    {	trouve = false;
 	cp = contrainte_new();
 
 	/* build the constant terme if it exists */
 	cst = ACCESS(B,n,i,1);
 	if (value_notzero_p(cst)) {
 	    pv = vect_new(TCST, value_mult(dena,cst));
-	    trouve = TRUE;
+	    trouve = true;
 	}
 
 	for (vect = ps->base,j=1;j<=m;vect=vect->succ,j++) {
@@ -238,7 +238,7 @@ int n,m;
 		else {	/* build a new vecteur if there is not constant term */
 		    pv = vect_new(vecteur_var(vect), 
 				  value_mult(denb,coeff));
-		    trouve = TRUE;
+		    trouve = true;
 		}
 	    }
 	}
@@ -346,7 +346,7 @@ int n,m1,m2;
     Pbase b;
     int i,j;
     Value cst,coeff,dena,denb;
-    boolean trouve ;
+    bool trouve ;
 
     /* create the  variables */
 
@@ -386,7 +386,7 @@ int n,m1,m2;
     denb = DENOMINATOR(B);
 
     for (i=1;i<=n; i++)
-    {	trouve = FALSE;
+    {	trouve = false;
 	cp = contrainte_new();
 
 	/* build the constant terme if it exists */
@@ -394,7 +394,7 @@ int n,m1,m2;
 
 	if (value_notzero_p(cst)) {
 	    pv = vect_new(TCST,  value_mult(dena,cst));
-	    trouve = TRUE;
+	    trouve = true;
 	}
 
 
@@ -407,7 +407,7 @@ int n,m1,m2;
 		else {			
 		    /* build a new vecteur if there is not constant term */
 		    pv = vect_new(vecteur_var(vect), value_mult(denb,coeff));
-		    trouve = TRUE;
+		    trouve = true;
 		}
 	    }
 	}
@@ -421,7 +421,7 @@ int n,m1,m2;
 		else {			
 		    /* build a new vecteur if there is not constant term */
 		    pv = vect_new(vecteur_var(vect), value_mult(denb,coeff));
-		    trouve = TRUE;
+		    trouve = true;
 		}
 	    }
 	}
@@ -515,7 +515,7 @@ Pmatrix A, B;
     for (i=n;i>=1; i--) {
 	Pvecteur vect, pv;
 	Pcontrainte cp;
-	boolean found = FALSE;
+	bool found = false;
 
 	cp = contrainte_new();
 
@@ -523,7 +523,7 @@ Pmatrix A, B;
 	cst = MATRIX_ELEM(B,i,1);
 	if (value_notzero_p(cst)) {
 	    pv = vect_new(TCST,  value_mult(dena,cst));
-	    found = TRUE;
+	    found = true;
 	}
 
 	for (vect = b,j=1;j<=m;vect=vect->succ,j++) {
@@ -536,7 +536,7 @@ Pmatrix A, B;
 		    /* build a new vecteur if there is a null constant term */
 		    pv = vect_new(vecteur_var(vect), 
 				   value_mult(denb,coeff));
-		    found = TRUE;
+		    found = true;
 		}
 	    }
 	}
@@ -627,7 +627,7 @@ Pmatrix A, B;
     Pcontrainte cp,newpc= NULL;
     int i,j;
     Value cst,coeff,dena,denb;
-    boolean found ;
+    bool found ;
     int n = MATRIX_NB_LINES(A);
     int m1 = MATRIX_NB_COLUMNS(A);
     int m2 = MATRIX_NB_COLUMNS(B);
@@ -635,14 +635,14 @@ Pmatrix A, B;
     denb = MATRIX_DENOMINATOR(B);
 
     for (i=n;i>=1; i--) {
-	found = FALSE;
+	found = false;
 	cp = contrainte_new();
 
 	/* build the constant terme if it exists */
 	cst = MATRIX_ELEM(B,i,m2);
 	if (value_notzero_p(cst)) {
 	    pv = vect_new(TCST,  value_mult(dena,cst));
-	    found = TRUE;
+	    found = true;
 	}
 
 	vect = base_union(index_base, const_base);
@@ -656,7 +656,7 @@ Pmatrix A, B;
 		    /* build a new vecteur if there is not constant term */
 		    pv = vect_new(vecteur_var(vect), 
 				  value_mult(denb,coeff));
-		    found = TRUE;
+		    found = true;
 		}
 	    }
 	}
@@ -671,7 +671,7 @@ Pmatrix A, B;
 		    /* build a new vecteur if there is not constant term */
 		    pv = vect_new(vecteur_var(vect),
 				  value_mult(denb,coeff));
-		    found = TRUE;
+		    found = true;
 		}
 	    }
 	}

@@ -71,7 +71,7 @@ Psysteme sc_inequations_elim_redund(Psysteme ps)
   for (eq = ps->inegalites;eq != NULL; eq = eq1) {
     eq1 = eq->succ;
     contrainte_reverse(eq);
-    if (sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL,TRUE))
+    if (sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL,true))
 	    contrainte_reverse(eq);
     else  {
 	    eq_set_vect_nul(eq);
@@ -109,7 +109,7 @@ Psysteme sc_elim_redund(Psysteme ps)
   if (SC_UNDEFINED_P(ps))
     return ps;
 
-  if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,TRUE))
+  if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,true))
   {
     sc_rm(ps);
     return NULL;

@@ -77,8 +77,8 @@ Pmatrix Q;
     Value x=VALUE_ZERO;          /* le rest de la division par ALL */
     int i;
     
-    boolean stop = FALSE;
-    boolean next = TRUE;
+    bool stop = false;
+    bool next = true;
 
     /* precondition sur les parametres */
     int n = MATRIX_NB_LINES(MAT);
@@ -94,7 +94,7 @@ Pmatrix Q;
 	matrix_min(D,&n_min,&m_min,level);
 		
 	if ((n_min == 0) && (m_min == 0))
-	    stop = TRUE;
+	    stop = true;
 	else {
 	    /* le transformation n'est pas fini. */
 	    if (n_min > level +1) {
@@ -120,21 +120,21 @@ Pmatrix Q;
 		    x = value_div(MATRIX_ELEM(D,level+1,i),ALL);
 		    matrix_subtraction_column(D,i,level+1,x);
 		    matrix_subtraction_column(Q,i,level+1,x);
-		    next = FALSE;
+		    next = false;
 		}
 	    if (matrix_col_el(D,level) != 0) 
 		for(i=level+2;i<=n;i++) {
 		    x = value_div(MATRIX_ELEM(D,i,level+1),ALL);
 		    matrix_subtraction_line(D,i,level+1,x);
 		    matrix_subtraction_line(P,i,level+1,x);
-		    next = FALSE;
+		    next = false;
 		}
 #ifdef TRACE
 		(void) printf("apres division par A(%d,%d) des termes de la %d-ieme ligne et de la %d-em colonne \n",level+1,level+1,level+1,level+1);
 		matrix_print(D);
 #endif
 	    if (next) level++;
-	    next = TRUE;
+	    next = true;
 	}
     }
 

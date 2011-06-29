@@ -343,14 +343,14 @@ Pbase b;
 
     return sc;
 }
-/* boolean sc_empty_p(Psysteme sc): check if the set associated to sc
+/* bool sc_empty_p(Psysteme sc): check if the set associated to sc
  * is the constant sc_empty or not. More expensive tests like
  * sc_faisabilite() are necessary to handle the general case.
  */
-boolean sc_empty_p(sc)
+bool sc_empty_p(sc)
 Psysteme sc;
 {
-    boolean empty = FALSE;
+    bool empty = false;
 
     assert(!SC_UNDEFINED_P(sc));
     if(sc_nbre_inegalites(sc)==0 && sc_nbre_egalites(sc)==1) {
@@ -363,10 +363,10 @@ Psysteme sc;
     return empty;
 }
 
-/* boolean sc_rn_p(Psysteme sc): check if the set associated to sc is
+/* bool sc_rn_p(Psysteme sc): check if the set associated to sc is
    the whole space, rn
  */
-boolean sc_rn_p(sc)
+bool sc_rn_p(sc)
 Psysteme sc;
 {
     assert(!SC_UNDEFINED_P(sc));

@@ -84,9 +84,9 @@ enum hspara_elem
 #define sc_equal_p_ofl(ps1,ps2)      pa_system_equal_p_ofl_ctrl((ps1), (ps2), FWD_OFL_CTRL)
 #define sc_equal_p_ofl_ctrl(ps1, ps2, ofl) pa_system_equal_p_ofl_ctrl((ps1), (ps2), (ofl))
 #define sc_convex_hull_equals_union_p(conv_hull, ps1, ps2) \
-  pa_convex_hull_equals_union_p_ofl_ctrl((conv_hull), (ps1), (ps2),NO_OFL_CTRL, FALSE)
+  pa_convex_hull_equals_union_p_ofl_ctrl((conv_hull), (ps1), (ps2),NO_OFL_CTRL, false)
 #define sc_convex_hull_equals_union_p_ofl(conv_hull, ps1, ps2) \
-  pa_convex_hull_equals_union_p_ofl_ctrl((conv_hull), (ps1), (ps2), OFL_CTRL, FALSE)
+  pa_convex_hull_equals_union_p_ofl_ctrl((conv_hull), (ps1), (ps2), OFL_CTRL, false)
 #define sc_convex_hull_equals_union_p_ofl_ctrl(conv_hull, ps1, ps2, ofl, bo) \
   pa_convex_hull_equals_union_p_ofl_ctrl((conv_hull), (ps1), (ps2), (ofl), (bo))
 
@@ -122,7 +122,7 @@ enum hspara_elem
 #define pa_path_to_few_disjunct(pa)   pa_path_to_few_disjunct_ofl_ctrl((pa), NO_OFL_CTRL)
 #define pa_system_difference(ps1,ps2) pa_system_difference_ofl_ctrl((ps1),(ps2),NO_OFL_CTRL)
 #define pa_convex_hull_equals_union_p(conv_hull, ps1, ps2) \
-  pa_convex_hull_equals_union_p_ofl_ctrl((conv_hull), (ps1), (ps2), NO_OFL_CTRL, FALSE)
+  pa_convex_hull_equals_union_p_ofl_ctrl((conv_hull), (ps1), (ps2), NO_OFL_CTRL, false)
 
 #define un_fprint(fi,un,fu,ty)        un_fprint_tab((fi), (un), (fu), (ty), 0)
 

@@ -72,13 +72,13 @@ void sc_transform_ineg_in_eg(sc)
 Psysteme sc;
 {
     Pcontrainte pc1, pc2, pc1_succ, c_tmp;
-    boolean found;
+    bool found;
 
     for (pc1 = sc->inegalites, pc1_succ = (pc1==NULL ? NULL : pc1->succ); 
 	 !CONTRAINTE_UNDEFINED_P(pc1);
 	 pc1 = pc1_succ, pc1_succ = (pc1==NULL ? NULL : pc1->succ))
     {
-	for (pc2 = pc1->succ, found=FALSE; 
+	for (pc2 = pc1->succ, found=false; 
 	     !CONTRAINTE_UNDEFINED_P(pc2) && !found; 
 	     pc2 = pc2->succ)
 	{
@@ -91,7 +91,7 @@ Psysteme sc;
 		sc_add_eg(sc, c_tmp);
 		eq_set_vect_nul(pc2);
 		eq_set_vect_nul(pc1);
-		found = TRUE;
+		found = true;
 	    }
 	    
 	    vect_rm(pv);

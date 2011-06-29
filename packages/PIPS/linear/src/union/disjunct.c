@@ -95,7 +95,7 @@ Pdisjunct dj_full(){ return( dj_new() ); }
 /* dj_full_p( (Pdisjunct) in_dj )   AL 30/05/94
  * Returns True if in_dj = (NIL) ^ (NIL)
  */
-boolean dj_full_p( in_dj )
+bool dj_full_p( in_dj )
 Pdisjunct in_dj;
 {
   return( (in_dj != DJ_UNDEFINED) &&
@@ -115,7 +115,7 @@ Pdisjunct dj_empty()
 /* dj_empty_p( (Ppath) in_pa )   AL 30/05/94
  * Returns True if in_dj = (1*TCST = 0) ^ (NIL)
  */
-boolean dj_empty_p( in_dj )
+bool dj_empty_p( in_dj )
 Pdisjunct in_dj;
 {
   return( ( in_dj != DJ_UNDEFINED     )    &&
@@ -147,7 +147,7 @@ int ofl_ctrl;
   for(dj1 = in_dj1; dj1 != NULL; dj1 = dj1->succ) {
     for(dj2 = in_dj2; dj2 != NULL; dj2 = dj2->succ) {
       Psysteme ps = sc_append( sc_dup(dj1->psys), dj2->psys );
-      if (!sc_rational_feasibility_ofl_ctrl( ps, ofl_ctrl, TRUE )) 
+      if (!sc_rational_feasibility_ofl_ctrl( ps, ofl_ctrl, true )) 
    { ps = sc_free( ps ); continue; }
       ret_dj = (Pdisjunct) sl_append_system( ret_dj, ps );
     }
@@ -226,21 +226,21 @@ Pdisjunct in_dj1, in_dj2;
 
 #line 287 "disjunct.w"
 
-/* boolean dj_feasibility_ofl_ctrl( (Pdisjunct) in_dj, (int) ofl_ctrl ) 
+/* bool dj_feasibility_ofl_ctrl( (Pdisjunct) in_dj, (int) ofl_ctrl ) 
  * Returns true if in_dj is a feasible disjunction. AL,BC 23/02/95
  */
-boolean dj_feasibility_ofl_ctrl( in_dj, ofl_ctrl )
+bool dj_feasibility_ofl_ctrl( in_dj, ofl_ctrl )
 Pdisjunct in_dj;
 int ofl_ctrl;
 {
-  boolean   ret_bool = FALSE;
+  bool   ret_bool = false;
   Pdisjunct dj;
 
-  if ( in_dj == DJ_UNDEFINED ) return FALSE;
+  if ( in_dj == DJ_UNDEFINED ) return false;
   for( dj = in_dj; dj != NULL && !ret_bool; dj = dj->succ ) {
-    if (dj->psys == SC_UNDEFINED) return FALSE;
+    if (dj->psys == SC_UNDEFINED) return false;
     ret_bool = ret_bool || 
-      sc_rational_feasibility_ofl_ctrl( dj->psys, ofl_ctrl, TRUE );
+      sc_rational_feasibility_ofl_ctrl( dj->psys, ofl_ctrl, true );
   }
   return ret_bool;
 }
@@ -387,10 +387,10 @@ Pdisjunct in_dj;
 
 #line 477 "disjunct.w"
 
-/* boolean dj_is_system_p( (Pdisjunct) in_dj )  AL 16/11/93
+/* bool dj_is_system_p( (Pdisjunct) in_dj )  AL 16/11/93
  * Returns True if disjunction in_dj has only one Psysteme in it.
  */
-boolean dj_is_system_p( in_dj )
+bool dj_is_system_p( in_dj )
 Pdisjunct in_dj;
 { return( sl_is_system_p( (Psyslist) in_dj ) ); }
 
@@ -451,7 +451,7 @@ int          ofl_ctrl ;
 
   C3_DEBUG( "dj_variable_substitution_with_eqs_ofl_ctrl", {
     dj_fprint        ( stderr, in_dj,        union_variable_name );
-    contrainte_fprint( stderr, in_pc, FALSE, union_variable_name );
+    contrainte_fprint( stderr, in_pc, false, union_variable_name );
     vect_fprint      ( stderr, in_pv,        union_variable_name );
   });
 

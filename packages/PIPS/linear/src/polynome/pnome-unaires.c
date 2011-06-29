@@ -221,7 +221,7 @@ Ppolynome ppinf, ppsup;
 }
 
 
-/* Ppolynome polynome_sort((Ppolynome *) ppp, boolean (*is_inferior_var)())
+/* Ppolynome polynome_sort((Ppolynome *) ppp, bool (*is_inferior_var)())
  *  Sorts the polynomial *ppp: monomials are sorted by the private routine
  *  "is_inferior_monome" based on the user one "is_inferior_var".
  *  !usage: polynome_sort(&pp, is_inferior_var);

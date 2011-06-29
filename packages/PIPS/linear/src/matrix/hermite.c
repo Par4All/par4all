@@ -96,7 +96,7 @@ Value *det_q;
     
     Value ALL;/* le plus petit element sur la diagonale */
     Value x=VALUE_ZERO;  /* la quotient de la division par ALL */
-    boolean stop = FALSE;
+    bool stop = false;
     int i;
     
     *det_p = *det_q = VALUE_ONE;
@@ -127,7 +127,7 @@ Value *det_q;
 
 	if (ind_n == 0 && ind_m == 0)
 	    /* la sous-matrice restante est nulle, on a terminee */
-	    stop = TRUE; 
+	    stop = true; 
 	else { 
 	    /* s'il existe un plus petit element non nul dans la partie
 	       triangulaire superieure de la sous-matrice,
@@ -195,14 +195,14 @@ int matrix_dim_hermite (H)
 Pmatrix H;
 {
     int i,j;
-    boolean trouve_j = FALSE;
+    bool trouve_j = false;
     int res=0;
     int n = MATRIX_NB_LINES(H);
     int m = MATRIX_NB_COLUMNS(H);
     for (j = 1; j<=m && !trouve_j;j++) {
 	for (i=1; i<= n && MATRIX_ELEM(H,i,j) == 0; i++);
 	if (i>n) {
-	    trouve_j = TRUE;
+	    trouve_j = true;
 	    res= j-1;
 	}
     }

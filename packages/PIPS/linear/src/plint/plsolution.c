@@ -45,13 +45,13 @@
 #define MALLOC(s,t,f) malloc((unsigned)(s))
 #define FREE(s,t,f) free((char *)(s))
 
-/* boolean sol_entiere(Psommet sys, Pvecteur lvbase, int nb_som):
+/* bool sol_entiere(Psommet sys, Pvecteur lvbase, int nb_som):
  * Cette fonction teste si la solution est entiere
  *
  *  resultat retourne par la fonction :
  *
- *  boolean	   : TRUE si la solution est entiere
- * 		     FALSE sinon
+ *  boolean	   : true si la solution est entiere
+ * 		     false sinon
  *
  *  Les parametres de la fonction :
  *
@@ -59,14 +59,14 @@
  *  Pvecteur lvbase: liste des variables de base du systeme
  *  int     nb_som : nombre de contraintes du systeme
  */
-boolean sol_entiere(sys,lvbase,nb_som)
+bool sol_entiere(sys,lvbase,nb_som)
 Psommet sys;
 Pvecteur lvbase;
 int nb_som;
 {
     Psommet ps1=NULL;
     Variable var =NULL;
-    boolean result = TRUE;
+    bool result = true;
     Value cv;
 #ifdef TRACE
     printf(" ** la solution est elle entiere ? \n");
@@ -77,15 +77,15 @@ int nb_som;
 	if (var != NULL 
 	    &&  value_notzero_p(cv = vect_coeff(var,ps1->vecteur))
 	    && value_notzero_p(value_mod(vect_coeff(TCST,ps1->vecteur),cv)))
-	    result = FALSE;
+	    result = false;
 	nb_som --;
     }
     if (sys == NULL)
-	result = FALSE;
+	result = false;
     return (result);
 }
 
-/* boolean sol_positive(Psommet sys, Pvecteur lvbase, int nb_som):
+/* bool sol_positive(Psommet sys, Pvecteur lvbase, int nb_som):
  * Cette fonction teste si la solution est positive
  *
  * On deduit la solution du systeme lineaire a l'aide de la liste des variables de base 
@@ -95,8 +95,8 @@ int nb_som;
  *
  *  resultat retourne par la fonction :
  *
- *  boolean	   : TRUE si la solution est positive
- * 		     FALSE sinon
+ *  boolean	   : true si la solution est positive
+ * 		     false sinon
  *
  *  Les parametres de la fonction :
  *
@@ -104,7 +104,7 @@ int nb_som;
  *  Pvecteur lvbase: liste des variables de base du systeme
  *  int     nb_som : nombre de contraintes du systeme
  */
-boolean sol_positive(sys,lvbase,nb_som)
+bool sol_positive(sys,lvbase,nb_som)
 Psommet sys;
 Pvecteur lvbase;
 int nb_som;
@@ -113,7 +113,7 @@ int nb_som;
     Value in1 = VALUE_ZERO;
     Variable var = NULL;
     Value b;
-    boolean result = TRUE;
+    bool result = true;
 
 #ifdef TRACE
     printf(" ** la solution est elle positive ? \n");
@@ -127,19 +127,19 @@ int nb_som;
 	    if ( value_notzero_p(v1 = vect_coeff(var,ps1->vecteur)))
 		in1 = value_div(b,v1);
 	    if (value_neg_p(in1)) {
-		result = FALSE; 
+		result = false; 
 		printf ("sol. negative \n");
 	    }
 	}
 	nb_som --;
     }
     if (sys == NULL)
-	result = FALSE;
+	result = false;
     return (result);
 }
 
 
-boolean sol_positive_simpl(sys,lvbase,lvsup,nb_som)
+bool sol_positive_simpl(sys,lvbase,lvsup,nb_som)
 Psommet sys;
 Pvecteur lvbase;
 Pvecteur lvsup;
@@ -149,7 +149,7 @@ int nb_som;
     Value in1 = VALUE_ZERO;
     Variable var = NULL;
     Value b;
-    boolean result = TRUE;
+    bool result = true;
 
 #ifdef TRACE
     printf(" ** la solution est elle positive ? \n");
@@ -166,14 +166,14 @@ int nb_som;
 	    if ((value_neg_p(in1) && value_zero_p(tmp))
 		 || (value_pos_p(in1) && value_notzero_p(tmp)))
 	    {
-		result = FALSE; 
+		result = false; 
 		printf ("sol. negative \n");
 	    }
 	}
 	nb_som --;
     }
     if (sys == NULL)
-	result = FALSE;
+	result = false;
     return (result);
 }
 /* Psolution sol_finale(Psommet sys, Pvecteur lvbase, int nb_som):

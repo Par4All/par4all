@@ -40,7 +40,7 @@
 int contrainte_subst_ofl(v,def,c,eq_p)
 Variable v;
 Pcontrainte def,c;
-boolean eq_p;
+bool eq_p;
 {
     return( contrainte_subst_ofl_ctrl(v,def,c,eq_p, FWD_OFL_CTRL)); 
 }
@@ -48,7 +48,7 @@ boolean eq_p;
 int contrainte_subst(v,def,c,eq_p)
 Variable v;
 Pcontrainte def,c;
-boolean eq_p;
+bool eq_p;
 {
     return( contrainte_subst_ofl_ctrl(v,def,c,eq_p, NO_OFL_CTRL)); 
 
@@ -101,7 +101,7 @@ Variable v;
 int contrainte_subst_ofl_ctrl(v,def,c,eq_p, ofl_ctrl)
 Variable v;
 Pcontrainte def,c;
-boolean eq_p;
+bool eq_p;
 int ofl_ctrl;
 {
     Pvecteur save_c;
@@ -147,9 +147,9 @@ int ofl_ctrl;
 	    return(-1);	
 	else 
 	    /* => systeme non faisable      */
-	    return(FALSE);
+	    return(false);
     }
-    return(TRUE);
+    return(true);
 }
 
 /* Pcontrainte inegalite_comb_ofl_ctrl(Pcontrainte posit, Pcontrainte negat, 
@@ -276,7 +276,7 @@ Pcontrainte c1, c2;
  * WARNING: *pc1 and *pc2 are modified.
  */
 Pcontrainte 
-extract_common_constraints(Pcontrainte * pc1, Pcontrainte * pc2, boolean eq)
+extract_common_constraints(Pcontrainte * pc1, Pcontrainte * pc2, bool eq)
 {
   Pcontrainte c = CONTRAINTE_UNDEFINED, c1, c2, c1p, c2p, nc1, nc2;
   

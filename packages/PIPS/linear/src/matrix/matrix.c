@@ -266,7 +266,7 @@ Pmatrix  A,B;
 	B->coefficients[i] = A->coefficients[i];
 }
 
-/* boolean matrix_equality(Pmatrix A, Pmatrix B)
+/* bool matrix_equality(Pmatrix A, Pmatrix B)
  * test de l'egalite de deux matrices A et B; elles doivent avoir
  * ete normalisees au prealable pour que le test soit mathematiquement
  * exact
@@ -278,7 +278,7 @@ Pmatrix  A,B;
  * int  n	: nombre de lignes de la matrice
  * int  m 	: nombre de colonnes de la matrice
  */
-boolean matrix_equality(A,B)
+bool matrix_equality(A,B)
 Pmatrix  A,B;
 {
     int i;  
@@ -286,8 +286,8 @@ Pmatrix  A,B;
     int m = MATRIX_NB_COLUMNS(A);
     for (i = 0 ;i<= n*m;i++)
 	if(B->coefficients[i] != A->coefficients[i])
-	    return(FALSE);
-    return(TRUE);
+	    return(false);
+    return(true);
 }
 
 /* void matrix_nulle(Pmatrix Z):
@@ -317,7 +317,7 @@ Pmatrix Z;
     MATRIX_DENOMINATOR(Z) = VALUE_ONE;
 }
 
-/* boolean matrix_nulle_p(Pmatrix Z):
+/* bool matrix_nulle_p(Pmatrix Z):
  * test de nullite de la matrice Z
  *
  * QQ i dans [1..n]
@@ -330,7 +330,7 @@ Pmatrix Z;
  * int  n	: nombre de lignes de la matrice
  * int  m 	: nombre de colonnes de la matrice
  */
-boolean matrix_nulle_p(Z)
+bool matrix_nulle_p(Z)
 Pmatrix Z;
 {
     int i,j;
@@ -339,11 +339,11 @@ Pmatrix Z;
     for (i=1;i<=n;i++)
 	for (j=1;j<=m;j++)
 	    if(MATRIX_ELEM(Z,i,j)!=0)
-		return(FALSE);
-    return(TRUE);
+		return(false);
+    return(true);
 }
 
-/* boolean matrix_diagonal_p(Pmatrix Z):
+/* bool matrix_diagonal_p(Pmatrix Z):
  * test de nullite de la matrice Z
  *
  * QQ i dans [1..n]
@@ -356,7 +356,7 @@ Pmatrix Z;
  * int  n	: nombre de lignes de la matrice
  * int  m 	: nombre de colonnes de la matrice
  */
-boolean matrix_diagonal_p(Z)
+bool matrix_diagonal_p(Z)
 Pmatrix Z;
 {
     int i,j;
@@ -365,19 +365,19 @@ Pmatrix Z;
     for (i=1;i<=n;i++)
 	for (j=1;j<=m;j++)
 	    if(i!=j && MATRIX_ELEM(Z,i,j)!=0)
-		return(FALSE);
-    return(TRUE);
+		return(false);
+    return(true);
 }
 
-/* boolean matrix_triangular_p(Pmatrix Z, boolean inferieure):
+/* bool matrix_triangular_p(Pmatrix Z, bool inferieure):
  * test de triangularite de la matrice Z
  *
- * si inferieure == TRUE
+ * si inferieure == true
  * QQ i dans [1..n]
  * QQ j dans [i+1..m]
  *    Z(i,j) == 0
  *
- * si inferieure == FALSE (triangulaire superieure)
+ * si inferieure == false (triangulaire superieure)
  * QQ i dans [1..n]
  * QQ j dans [1..i-1]
  *    Z(i,j) == 0
@@ -388,9 +388,9 @@ Pmatrix Z;
  * int  n	: nombre de lignes de la matrice
  * int  m 	: nombre de colonnes de la matrice
  */
-boolean matrix_triangular_p(Z,inferieure)
+bool matrix_triangular_p(Z,inferieure)
 Pmatrix Z;
-boolean inferieure;
+bool inferieure;
 {
     int i,j;
     int n = MATRIX_NB_LINES(Z);
@@ -399,25 +399,25 @@ boolean inferieure;
 	if(inferieure) {
 	    for (j=i+1; j <= m; j++)
 		if(MATRIX_ELEM(Z,i,j)!=0)
-		    return(FALSE);
+		    return(false);
 	}
 	else
 	    for (j=1; j <= i-1; j++)
 		if(MATRIX_ELEM(Z,i,j)!=0)
-		    return(FALSE);
-    return(TRUE);
+		    return(false);
+    return(true);
 }
 
-/* boolean matrix_triangular_unimodular_p(Pmatrix Z, boolean inferieure)
+/* bool matrix_triangular_unimodular_p(Pmatrix Z, bool inferieure)
  * test de la triangulaire et unimodulaire de la matrice Z.
- * si inferieure == TRUE
+ * si inferieure == true
  * QQ i dans [1..n]
  * QQ j dans [i+1..n]
  *    Z(i,j) == 0
  * i dans [1..n]
  *   Z(i,i) == 1
  *
- * si inferieure == FALSE (triangulaire superieure)
+ * si inferieure == false (triangulaire superieure)
  * QQ i dans [1..n]
  * QQ j dans [1..i-1]
  *    Z(i,j) == 0
@@ -428,21 +428,21 @@ boolean inferieure;
  * matrice Z : la matrice entre
  * int n     : la dimension de la martice caree
  */
-boolean matrix_triangular_unimodular_p(Z,inferieure)
+bool matrix_triangular_unimodular_p(Z,inferieure)
 Pmatrix Z;
-boolean inferieure;
+bool inferieure;
 {
-    boolean triangulaire;
+    bool triangulaire;
     int i;  
     int n = MATRIX_NB_LINES(Z);
     triangulaire = matrix_triangular_p(Z,inferieure);
-    if (triangulaire == FALSE)
-	return(FALSE);
+    if (triangulaire == false)
+	return(false);
     else{
 	for(i=1; i<=n; i++)
 	    if (value_notone_p(MATRIX_ELEM(Z,i,i)))
-		return(FALSE);
-	return(TRUE);
+		return(false);
+	return(true);
     }
 }	    
 

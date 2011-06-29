@@ -207,9 +207,9 @@ un temps raisonnable */
 /* ensemble de macros permettant de compiler les programmes utilisant
 les anciens noms des fonctions */
 
-#define sc_faisabilite(sc) sc_rational_feasibility_ofl_ctrl((sc), NO_OFL_CTRL,TRUE) 
+#define sc_faisabilite(sc) sc_rational_feasibility_ofl_ctrl((sc), NO_OFL_CTRL,true) 
 #define sc_faisabilite_ofl(sc) \
- sc_rational_feasibility_ofl_ctrl((sc), FWD_OFL_CTRL, TRUE)
+ sc_rational_feasibility_ofl_ctrl((sc), FWD_OFL_CTRL, true)
 #define sc_feasible_ofl(sc, b) sc_rational_feasibility_ofl_ctrl((sc), OFL_CTRL, (b))
 #define sc_elim_redond(ps) sc_elim_redund((ps))
 #define sc_triang_elim_redond(x,y) sc_triang_elim_redund(x,y)
@@ -222,12 +222,12 @@ les anciens noms des fonctions */
 #define sc_projection_on_list_of_variables(sc,ib,pv) \
  sc_projection_on_variables((sc),(ib),(pv))
 #define combiner(sc, v) \
- sc_fourier_motzkin_variable_elimination_ofl_ctrl((sc),(v),FALSE,FALSE,NO_OFL_CTRL)
+ sc_fourier_motzkin_variable_elimination_ofl_ctrl((sc),(v),false,false,NO_OFL_CTRL)
 #define combiner_ofl(sc, v) \
- sc_fourier_motzkin_variable_elimination_ofl_ctrl((sc),(v),FALSE,FALSE,FWD_OFL_CTRL)
+ sc_fourier_motzkin_variable_elimination_ofl_ctrl((sc),(v),false,false,FWD_OFL_CTRL)
 #define exact_combiner_ofl(sc, v, b) \
- sc_fourier_motzkin_variable_elimination_ofl_ctrl((sc),(v),TRUE, (b), FWD_OFL_CTRL)
-#define eq_v_min_coeff(c, v, cf) contrainte_var_min_coeff((c), (v), (cf), FALSE)
+ sc_fourier_motzkin_variable_elimination_ofl_ctrl((sc),(v),true, (b), FWD_OFL_CTRL)
+#define eq_v_min_coeff(c, v, cf) contrainte_var_min_coeff((c), (v), (cf), false)
 #define sc_projection_ofl_with_eq(sc, eq, v) \
  sc_variable_substitution_with_eq_ofl_ctrl((sc), (eq), (v), FWD_OFL_CTRL)
 #define cond_suff_comb_integer(sc,pos,neg, v) \

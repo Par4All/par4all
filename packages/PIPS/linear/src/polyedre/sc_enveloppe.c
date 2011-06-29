@@ -71,7 +71,7 @@ Psysteme s2;
 int ofl_ctrl;
 {
     Psysteme s = SC_UNDEFINED;
-    boolean catch_performed = FALSE;
+    bool catch_performed = false;
     /* mem_spy_begin(); */
 
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
@@ -80,7 +80,7 @@ int ofl_ctrl;
     {
     case OFL_CTRL :
 	ofl_ctrl = FWD_OFL_CTRL;
-	catch_performed = TRUE;
+	catch_performed = true;
 	CATCH(overflow_error|timeout_error) {
 	  //CATCH(overflow_error) {
 	    /* 
@@ -172,7 +172,7 @@ static Psysteme actual_convex_union(Psysteme s1, Psysteme s2)
  */
 Psysteme elementary_convex_union(Psysteme s1, Psysteme s2)
 {
-  boolean
+  bool
     b1 = sc_empty_p(s1),
     b2 = sc_empty_p(s2);
     
@@ -216,39 +216,39 @@ Psysteme elementary_convex_union(Psysteme s1, Psysteme s2)
 /* put base variables in set.
    returns whether something was put.
  */
-static boolean base_to_set(linear_hashtable_pt s, Pvecteur b)
+static bool base_to_set(linear_hashtable_pt s, Pvecteur b)
 {
-  boolean modified = FALSE;
+  bool modified = false;
 
   for (; b; b=b->succ)
     if (b->var && !linear_hashtable_isin(s, b->var)) 
     {
       linear_hashtable_put(s, b->var, b->var);
-      modified = TRUE;
+      modified = true;
     }
 
   return modified;
 }
 
 /* returns whether c contains variables of vars. */
-static boolean contains_variables(Pvecteur v, linear_hashtable_pt vars)
+static bool contains_variables(Pvecteur v, linear_hashtable_pt vars)
 {
   for (; v; v = v->succ)
     if (v->var && linear_hashtable_isin(vars, v->var))
-      return TRUE;
-  return FALSE;
+      return true;
+  return false;
 }
 
 /* one pass only of transitive closure.
  * returns whether vars was modified.
  * appends extracted constraints to ex.
  */
-static boolean 
+static bool 
 transitive_closure_pass(Pcontrainte * pc, Pcontrainte * ex, 
 			linear_hashtable_pt vars)
 {
   Pcontrainte c, cp, cn;
-  boolean modified = FALSE;
+  bool modified = false;
 
   for (c=*pc, 
 	 cp = CONTRAINTE_UNDEFINED, 
@@ -275,7 +275,7 @@ transitive_closure_pass(Pcontrainte * pc, Pcontrainte * ex,
 static Psysteme transitive_closure_system(Psysteme s, linear_hashtable_pt vars)
 {
   Pcontrainte e = CONTRAINTE_UNDEFINED, i = CONTRAINTE_UNDEFINED;
-  boolean modified;
+  bool modified;
 
   do {
     modified = transitive_closure_pass(&s->egalites, &e, vars);
