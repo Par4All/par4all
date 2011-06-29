@@ -1,0 +1,30 @@
+delete for_loop10
+
+create for_loop10 for_loop10.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# assume that return is a standard function, which may not return
+#setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+activate NEW_CONTROLIZER
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE(for_loop10)
+
+echo
+echo Controlizer output (return as a function)
+echo
+
+display PRINTED_FILE(for_loop10)
+
+apply UNSPLIT
+shell (cd for_loop10.database/Src; gcc for_loop10.c; ./a.out)
+
+close
+quit
