@@ -16,7 +16,7 @@ echo
 
 activate NEW_CONTROLIZER
 
-#setenv CONTROL_DEBUG_LEVEL 9
+#setenv CONTROL_DEBUG_LEVEL 8
 
 display PRINTED_FILE
 

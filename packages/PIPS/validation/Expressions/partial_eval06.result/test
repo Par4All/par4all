@@ -207,60 +207,50 @@ int main()
 Initial code with preconditions for "duck"
 
 
-//  P() {duck_counter==0, internal_duck_counter==0}
+//  P() {duck_counter==0, internal_duck_counter==0, size==2}
 
 int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
 
-//  P() {duck_counter==0, internal_duck_counter==0}
+//  P() {duck_counter==0, internal_duck_counter==0, size==2}
 
    static int internal_duck_counter = 0;
 
-//  P() {duck_counter==0, internal_duck_counter==0}
+//  P() {duck_counter==0, internal_duck_counter==0, size==2}
 
    int *zaza = (int *) fifi+(3-1-0+1)*1;
 
-//  P() {duck_counter==0, internal_duck_counter==0}
+//  P() {duck_counter==0, internal_duck_counter==0, size==2}
 
    internal_duck_counter++;
 
 //  P(internal_duck_counter) {duck_counter==0,
-//    internal_duck_counter==1, internal_duck_counter#init==0}
+//    internal_duck_counter==1, internal_duck_counter#init==0,
+//    size==2}
 
    printf("internal duck counter=%d\n", internal_duck_counter+1);
 
 //  P(internal_duck_counter) {duck_counter==0,
-//    internal_duck_counter==1, internal_duck_counter#init==0}
+//    internal_duck_counter==1, internal_duck_counter#init==0,
+//    size==2}
 
    duck_counter++;
 
 //  P(duck_counter,internal_duck_counter) {duck_counter==1,
 //    duck_counter#init==0, internal_duck_counter==1,
-//    internal_duck_counter#init==0}
+//    internal_duck_counter#init==0, size==2}
 
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
-}
-
-Code after array conversion
-
-int duck(int *riri, int *fifi, int size, int *loulou)
-{
-   static int internal_duck_counter = 0;
-   int *zaza = (int *) fifi+(3-1-0+1)*1;
-   internal_duck_counter++;
-   printf("internal duck counter=%d\n", internal_duck_counter+1);
-   duck_counter++;
    return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
 
 Code after partial eval for "duck"
 
-int duck(int *riri, int *fifi, int size, int *loulou)
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
    static int internal_duck_counter = 0;
    int *zaza = (int *) fifi+3;
    internal_duck_counter++;
-   printf("internal duck counter=%d\n", internal_duck_counter+1);
+   printf("internal duck counter=%d\n", 2);
    duck_counter++;
    return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3);
 }
@@ -281,7 +271,7 @@ int main()
       for(j = 0; j <= 5; j += 1)
          loulou[0][i][j] = k++;
    t = duck(riri, fifi, 2, loulou);
-   printf("global duck counter=%d\n", duck_counter+1);
+   printf("global duck counter=%d\n", 2);
    printf("%d\n", t);
    return 0;
 }

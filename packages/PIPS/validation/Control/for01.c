@@ -1,5 +1,7 @@
 // Debug the destrucuration of a for loop by the new controlizer
 
+#include <stdio.h>
+
 void for01()
 {
   int c;
@@ -9,5 +11,12 @@ void for01()
   }
   c++;
  end:
+  printf("c=%d, k=%d\n", c, k);
   return;
+}
+
+main()
+{
+  for01();
+  return 0;
 }

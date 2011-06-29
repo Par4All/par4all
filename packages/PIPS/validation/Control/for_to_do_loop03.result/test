@@ -4,8 +4,14 @@ Initial code with converted loop
 void foo()
 {
    int i;
-   for(i = 0; i <= 6; i += 1)
+   i = 0;
+   while (i!=5) {
       printf("%d", i);
-   for(i = 5; i >= 1; i += -1)
+      i++;
+   }
+   i = 5;
+   while (i!=0) {
       printf("%d", i);
+      i--;
+   }
 }

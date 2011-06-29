@@ -1,0 +1,195 @@
+
+Parser output
+
+int for_loop09()
+{
+   int i, j = 0;
+   for (i = 0;i!=5;i++) {
+      if (i==3) {
+         printf("i=%d\n", i);
+         return i;
+      }
+      j++;
+   }
+   printf("Exit with j=%d\n", j);
+   return i;
+}
+
+Controlizer output (return as a function)
+
+int for_loop09()
+{
+   int i, j = 0;
+   i = 0;
+   while (i!=5) {
+      if (i==3) {
+         printf("i=%d\n", i);
+         return i;
+      }
+      j++;
+      i++;
+   }
+   printf("Exit with j=%d\n", j);
+   return i;
+}
+
+Preconditions (return as a function)
+
+
+//  P() {}
+
+int for_loop09()
+{
+
+//  P() {}
+
+   int i, j = 0;
+
+//  P(i,j) {j==0}
+
+   i = 0;
+
+//  P(i,j) {i==0, j==0}
+
+   while (i!=5) {
+
+//  P(for_loop09,i,j) {}
+
+      if (i==3) {
+
+//  P(for_loop09,i,j) {i==3}
+
+         printf("i=%d\n", i);
+
+//  P(for_loop09,i,j) {i==3}
+
+         return i;
+      }
+
+//  P(for_loop09,i,j) {}
+
+      j++;
+
+//  P(for_loop09,i,j) {}
+
+      i++;
+   }
+
+//  P(for_loop09,i,j) {i==5}
+
+   printf("Exit with j=%d\n", j);
+
+//  P(for_loop09,i,j) {i==5}
+
+   return i;
+}
+
+Parser output
+
+int for_loop09()
+{
+   int i, j = 0;
+   //PIPS generated variable
+   int for_loop09;
+   for (i = 0;i!=5;i++) {
+      if (i==3) {
+         printf("i=%d\n", i);
+         for_loop09 = i;
+         return for_loop09;
+      }
+      j++;
+   }
+   printf("Exit with j=%d\n", j);
+   for_loop09 = i;
+   return for_loop09;
+   return for_loop09;
+}
+
+Controlizer output (return as a goto)
+
+int for_loop09()
+{
+   int i, j = 0;
+   //PIPS generated variable
+   int for_loop09;
+   i = 0;
+l99997:   ;
+   if (i!=5) goto l99999;
+   printf("Exit with j=%d\n", j);
+   for_loop09 = i;
+   return for_loop09;
+l99999:   ;
+   if (i==3) goto l99998;
+   j++;
+   i++;
+   goto l99997;
+l99998:   ;
+   printf("i=%d\n", i);
+   for_loop09 = i;
+   return for_loop09;
+}
+
+Preconditions (return as a goto)
+
+
+//  P() {}
+
+int for_loop09()
+{
+
+//  P() {}
+
+   int i, j = 0;
+   //PIPS generated variable
+
+//  P(i,j) {j==0}
+
+   int for_loop09;
+
+//  P(for_loop09,i,j) {j==0}
+
+   i = 0;
+l99997:   ;
+
+//  P(for_loop09,i,j) {i==j}
+
+   if (i!=5) goto l99999;
+
+//  P(for_loop09,i,j) {i==5, j==5}
+
+   printf("Exit with j=%d\n", j);
+
+//  P(for_loop09,i,j) {i==5, j==5}
+
+   for_loop09 = i;
+   return for_loop09;
+l99999:   ;
+
+//  P(for_loop09,i,j) {i==j}
+
+   if (i==3) goto l99998;
+
+//  P(for_loop09,i,j) {i==j}
+
+   j++;
+
+//  P(for_loop09,i,j) {i==j-1}
+
+   i++;
+   goto l99997;
+l99998:   ;
+
+//  P(for_loop09,i,j) {i==3, j==3}
+
+   printf("i=%d\n", i);
+
+//  P(for_loop09,i,j) {i==3, j==3}
+
+   for_loop09 = i;
+
+//  P(for_loop09,i,j) {for_loop09==i, for_loop09==j, 3<=for_loop09,
+//    for_loop09<=5}
+
+   return for_loop09;
+}
+i=3
