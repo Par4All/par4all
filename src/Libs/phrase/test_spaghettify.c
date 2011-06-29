@@ -126,8 +126,9 @@ static unstructured make_unstructured_from_test (test the_test,
   control if_false = make_if_false_from_test (the_test,module_name);
 
   /* The first connexion is the false one */
-  link_2_control_nodes (condition, if_false);
-  link_2_control_nodes (condition, if_true);
+  //link_2_control_nodes (condition, if_false);
+  //link_2_control_nodes (condition, if_true);
+  link_3_control_nodes (condition, if_true, if_false);
   link_2_control_nodes (if_true, exit);
   link_2_control_nodes (if_false, exit);
 

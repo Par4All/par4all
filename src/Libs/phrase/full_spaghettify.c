@@ -139,7 +139,7 @@ static statement full_spaghettify_module (statement module_statement,
 		  statement_consistent_p(control_statement(current_control)));
       debug_control("FSM STATE: Module control =======================================",current_control, 2);
     }, entry, blocs);
-  } 
+  }
   return returned_statement;
 }
 
@@ -180,7 +180,7 @@ static void reduce_sequence (control current_control,
   }
 
   /* Deconnect all the predecessors */
-  for (i=0; i<gen_length(predecessors); i++) {
+  for (i=0; i<(int)gen_length(predecessors); i++) {
     pips_debug(5,"Unlink predecessor [%p-%p]\n",
 	       CONTROL(gen_nth(i,predecessors)),
 	       current_control);
@@ -188,7 +188,7 @@ static void reduce_sequence (control current_control,
   }
 
   /* Deconnect all the successors */
-  for (i=0; i<gen_length(successors); i++) {
+  for (i=0; i<(int)gen_length(successors); i++) {
     pips_debug(5,"Unlink successor [%p-%p]\n",
 	       current_control,
 	       CONTROL(gen_nth(i,successors)));
@@ -198,7 +198,7 @@ static void reduce_sequence (control current_control,
   is_first_control = true;
 
   /* We iterate on each statement in the sequence */
-  MAP(STATEMENT, current_stat,
+  FOREACH(STATEMENT, current_stat, sequence_statements(seq))
   {
     /* We build a new control node from current statement */
     new_control = make_control (current_stat, NIL, NIL);
@@ -209,7 +209,7 @@ static void reduce_sequence (control current_control,
       /* For the first statement... */
       first_control = new_control;
       is_first_control = false;
-      pips_debug(5,"First control %p\n", first_control);   
+      pips_debug(5,"First control %p\n", first_control);
       *new_entry = first_control;
       /* Reconnect all the predecessors */
       /* ATTENTION link_2_control_nodes add to the list at the first position,
@@ -218,7 +218,8 @@ static void reduce_sequence (control current_control,
 	pips_debug(5,"Relink predecessor [%p-%p]\n",
 		   CONTROL(gen_nth(i,predecessors)),
 		   first_control);
-	link_2_control_nodes (CONTROL(gen_nth(i,predecessors)), first_control);
+	control c = CONTROL(gen_nth(i,predecessors));
+	link_2_control_nodes (c, first_control);
       }
       /* Reconnect all the successors */
       /* ATTENTION link_2_control_nodes add to the list at the first position,
@@ -235,9 +236,9 @@ static void reduce_sequence (control current_control,
 	 it with the previous one */
       link_2_control_nodes (last_control, new_control);
       pips_debug(5,"Other control %p [%p-%p]\n",
-		 new_control, last_control, new_control);   
+		 new_control, last_control, new_control);
       /* Deconnect all the OLD successors */
-      for (i=0; i<gen_length(successors); i++) {
+      for (i=0; i<(int)gen_length(successors); i++) {
 	pips_debug(5,"Unlink successor [%p-%p]\n",
 		   last_control,
 		   CONTROL(gen_nth(i,successors)));
@@ -252,10 +253,10 @@ static void reduce_sequence (control current_control,
 		   CONTROL(gen_nth(i,successors)));
 	link_2_control_nodes (new_control, CONTROL(gen_nth(i,successors)));
       }
-    } 
+    }
     last_control = new_control;
     *new_exit = new_control;
-  }, sequence_statements(seq));
+  }
 }
 			    
 
@@ -445,12 +446,12 @@ static control replace_control_with_unstructured (unstructured the_unstructured,
   list successors = gen_copy_seq (control_successors(current_control));
 
   /* Deconnect all the predecessors */
-  for (i=0; i<gen_length(predecessors); i++) {
+  for (i=0; i<(int)gen_length(predecessors); i++) {
     unlink_2_control_nodes (CONTROL(gen_nth(i,predecessors)), current_control);
   }
 
   /* Deconnect all the successors */
-  for (i=0; i<gen_length(successors); i++) {
+  for (i=0; i<(int)gen_length(successors); i++) {
     unlink_2_control_nodes (current_control, CONTROL(gen_nth(i,successors)));
   }
 

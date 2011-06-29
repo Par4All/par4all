@@ -126,12 +126,12 @@ static unstructured make_unstructured_from_whileloop (whileloop the_whileloop,
   control condition = make_condition_from_whileloop (the_whileloop,stat);
   control exit = make_exit_from_whileloop();
   control body = make_body_from_whileloop(the_whileloop,module_name);
- 
+
   /* The first connexion is the false one */
-  link_2_control_nodes (condition, exit); /* false condition, we exit from whileloop */
-  link_2_control_nodes (condition, body); /* true condition, we go to body */
-  link_2_control_nodes (body, condition); /* after body, we go back to condition */
- 
+  //link_2_control_nodes (condition, exit); /* false condition, we exit from whileloop */
+  //link_2_control_nodes (condition, body); /* true condition, we go to body */
+  link_3_control_nodes (body, condition, exit);
+
   return make_unstructured (condition, exit);
 }
 
