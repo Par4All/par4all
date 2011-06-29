@@ -1209,6 +1209,8 @@ link_2_control_nodes(control source,
 
   // FI: to avoid memory leaks and/or inconsistency
   //pips_assert("source has no successor\n", ENDP(control_successors(source)));
+
+#if 0
   if(!ENDP(control_successors(source)))
     // FI: this should never happen if the graph is properly
     // handled...
@@ -1216,10 +1218,12 @@ link_2_control_nodes(control source,
     // the gen_free_list()
     gen_free_list(control_successors(source));
   control_successors(source) = CONS(CONTROL, target, NIL);
+#endif
 
-  //control_successors(source) = CONS(CONTROL,
-  //			    target,
-  //			    control_successors(source));
+  // FI: assume the callers knows what it is doing when dealing with tests...
+  control_successors(source) = CONS(CONTROL,
+				    target,
+				    control_successors(source));
 
   // FI: guess to get for loop properly desugared... but it breaks
   // something else...
