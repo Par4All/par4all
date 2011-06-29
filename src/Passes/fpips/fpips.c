@@ -28,7 +28,7 @@
  * FPIPS stands for Full PIPS, or Fabien PIPS;-)
  *
  * it provides a single executable for {,t,w}pips, enabling faster
- * link when developping and testing. Also a single executable can
+ * link when developing and testing. Also a single executable can
  * be exported, reducing the size of binary distributions.
  * The execution depends on the name of the executable, or the first option.
  *
@@ -118,11 +118,11 @@ int fpips_error(char * what,
 static int name_end_p(char * name, char * ref)
 {
     int nlen = strlen(name), rlen = strlen(ref);
-    if (nlen<rlen) return FALSE;
+    if (nlen<rlen) return false;
     while (rlen>0)
 	if (ref[--rlen]!=name[--nlen])
-	    return FALSE;
-    return TRUE;
+	    return false;
+    return true;
 }
 
 /********************************************************************* MAIN */
