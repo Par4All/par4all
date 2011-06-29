@@ -59,7 +59,7 @@
   PREFIX bool __attribute__ ((unused)) name##_filter(type i)		\
   {									\
     stack_push((void *)i, name##_stack);				\
-    return TRUE;							\
+    return true;							\
   }									\
   PREFIX void __attribute__ ((unused)) name##_rewrite(type i)		\
   {									\

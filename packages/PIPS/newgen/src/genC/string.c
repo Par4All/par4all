@@ -242,7 +242,7 @@ string strlower(string s1, const char* s2)
 
 string bool_to_string(bool b)
 {
-  return b? "TRUE": "FALSE";
+  return b? "true": "false";
 }
 
 /* @return the english suffix for i.
@@ -294,7 +294,7 @@ string chop_newline (string s, bool flg)
 {
   if ((s == string_undefined) || (s == NULL)) return s;
   string r = s;
-  if (flg == TRUE) r = strdup(s);
+  if (flg == true) r = strdup(s);
   int l = strlen(s);
   if (l > 0) {
     if (*(r + l - 1) == '\n') *(r + l - 1) = '\0';
@@ -307,7 +307,7 @@ string chop_newline (string s, bool flg)
 ///@param s, the string to process
 string remove_newline_of_string (string s)
 {
-  return chop_newline (s, TRUE) ;
+  return chop_newline (s, true) ;
 }
 
 /* @return array of string

@@ -30,20 +30,6 @@
 
 */
 
-/* same as linear boolean.h */
-#ifndef BOOLEAN_INCLUDED
-#define BOOLEAN_INCLUDED
-typedef enum { false, true } boolean;
-#ifndef TRUE /* defined by glib2.0 AS (!FALSE) */
-#define	TRUE     true
-#endif /* TRUE */
-#ifndef FALSE /* idem AS (0) */
-#define	FALSE    false
-#endif /* FALSE */
-#endif /* BOOLEAN_INCLUDED */
-
-/* newgen compatibility */
-typedef boolean bool;
 
 /* STRING
  */
@@ -51,8 +37,13 @@ typedef boolean bool;
 #undef string
 #endif
 typedef char *string ;
+#define string_undefined ((string)-15)
+#define string_undefined_p(s) ((s)==string_undefined)
+#define copy_string(s) strdup(s)
 
-#ifndef _INT_TYPE_DEFINED
+/* _INT
+ */
+#ifndef _int_undefined
 /* RK wants an "int" which is the size of a "pointer".
  * However, the use of the relevant "intptr_t" type in the code
  * amounts to source file defacing, hence this definition. FC.
@@ -65,20 +56,48 @@ typedef uintptr_t _uint;
 #include <inttypes.h>
 #define _intFMT PRIuPTR
 #define _uintFMT "u" PRIuPTR
-#define _INT_TYPE_DEFINED
-#endif /* _INT_TYPE_DEFINED */
+#define _int_undefined ((_int)-15) /* SG: this is dangerous: a valid value is used to state an invalid value */
+#define _int_undefined_p(i) ((i)==_int_undefined)
 
-#define string_undefined ((string)-15)
-#define string_undefined_p(s) ((s)==string_undefined)
-#define copy_string(s) strdup(s)
+#endif /* _int_undefined */
 
+/* BOOL
+ */
+
+/* SG: _Bool is not compatible with newgen because it does not permit the definition of an `undefined' state
+   we use the int type for compatible behavior */
+#ifndef BOOLEAN_INCLUDED /* similar to linear ... */
+#define BOOLEAN_INCLUDED
+
+#ifdef bool
+    #error newgen header not compatible with stdbool.h
+#endif
+
+typedef int bool; /* we cannot use an enum or stdbool because we need to be compatible with newgen */
+
+#define false 0
+#define true 1
+#endif
+
+#define bool_undefined ((bool)-15) /* SG: this is a dangerous semantic: bool_undefined evaluates to true ... */
+#define bool_undefined_p(b) ((b)==bool_undefined)
+
+
+
+
+/* TAG
+ */
 typedef int tag;
 #define tag_undefined (-3)
 
+/* UNIT
+ */
 typedef int unit ;
 #define UU ((void*)0)
 #define UUINT(i) ((void*)(i))
 
+/* ARRAY
+ */
 #define array_undefined NULL
 #define array_undefined_p(a) ((a)==NULL)
 

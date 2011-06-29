@@ -90,7 +90,7 @@ set set_generic_make(set_type typ,
 /* Create an empty set of any type but hash_private */
 set set_make(set_type typ)
 {
-  message_assert("typ is not hash_private", typ!=hash_private);
+  message_assert("typ is not set_private", typ!=set_private);
   /* Use default functions for equality check and rank computation. */
   return set_generic_make(typ, NULL, NULL);
 }
@@ -387,7 +387,7 @@ void gen_set_closure_iterate(void (*iterate)(void *, set),
  */
 void gen_set_closure(void (*iterate)(void *, set), set initial)
 {
-  gen_set_closure_iterate(iterate, initial, TRUE);
+  gen_set_closure_iterate(iterate, initial, true);
 }
 
 int set_own_allocated_memory(const set s)
