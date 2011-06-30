@@ -37,7 +37,6 @@ model gopan_sas07_1 {
 strategy s {
 
 	Region init := {state = k1};
-	Region bad := {s = 2};
 
 }
 

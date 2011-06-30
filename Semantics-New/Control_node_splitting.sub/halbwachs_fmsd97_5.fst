@@ -51,7 +51,6 @@ model halbwachs_fmsd97_5 {
 strategy s {
 
 	Region init := {state = k1};
-	Region bad := {s >= 3};
 
 }
 

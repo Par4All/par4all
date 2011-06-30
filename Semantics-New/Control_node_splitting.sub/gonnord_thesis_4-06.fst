@@ -51,7 +51,6 @@ model gonnord_thesis_4_06 {
 strategy s {
 
 	Region init := {state = k1};
-	Region bad := {s >= 3};
 
 }
 

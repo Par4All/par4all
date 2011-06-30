@@ -30,7 +30,6 @@ model gulwani_pldi10_6 {
 strategy s {
 
 	Region init := {state = k1};
-	Region bad := {state = k2 && i1 > n0 - x0};
 
 }
 

@@ -37,7 +37,6 @@ model gulwani_cav09_3 {
 strategy s {
 
 	Region init := {state = k1};
-	Region bad := {state = k2 && i1 > n};
 
 }
 
