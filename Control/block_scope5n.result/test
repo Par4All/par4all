@@ -62,8 +62,4 @@ l99999:   ;
 //:   END UNSTRUCTURED
    // END BLOCK
 }
-internal x = -1
-external x = 7
-internal x = 6
-external x = 3
 

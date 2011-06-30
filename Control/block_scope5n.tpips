@@ -44,10 +44,10 @@ display PRINTED_FILE[block_scope5n]
 #display PRINTED_FILE[block_scope5n]
 
 apply UNSPLIT
-shell (cd block_scope5n.database/Src; gcc block_scope5n.c; ./a.out)
+
+# (1) we should never execute code in the validation itself
+# (2) this code is NOT deterministic, an unitialized value is used
+#shell (cd block_scope5n.database/Src; gcc block_scope5n.c; ./a.out)
 
 close
-
 #delete $WKS
-
-
