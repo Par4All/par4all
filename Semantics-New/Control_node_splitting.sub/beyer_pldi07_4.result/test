@@ -23,6 +23,14 @@ void ts_singlestate(void)
 
    y = 50;
 
+//  T() {s==1, x==0, y==50}
+
+   if (s==2&&y!=100)
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(s,x,y) {1<=s, s<=2, s#init<=s, x#init+y<=x+y#init, y<=x+50,
 //    50<=y, y#init<=y}
 
@@ -123,6 +131,14 @@ void ts_restructured(void)
 //  T(y) {s==1, x==0, y==50}
 
    y = 50;
+
+//  T() {s==1, x==0, y==50}
+
+   if (s==2&&y!=100)
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T(x) {s==1, y==50, 0<=x, x<=49, x#init<=x}
 
@@ -269,6 +285,14 @@ void ts_singlestate(void)
 
 //  P(s,x,y) {s==1, x==0, y==50}
 
+   if (s==2&&y!=100)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(s,x,y) {s==1, x==0, y==50}
+
    while (rand_b())
 
 //  P(s,x,y) {1<=s, s<=2, y<=x+50, 50<=y}
@@ -365,6 +389,14 @@ void ts_restructured(void)
 //  P(s,x,y) {s==1, x==0}
 
    y = 50;
+
+//  P(s,x,y) {s==1, x==0, y==50}
+
+   if (s==2&&y!=100)
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(s,x,y) {s==1, x==0, y==50}
 

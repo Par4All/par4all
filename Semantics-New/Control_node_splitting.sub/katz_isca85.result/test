@@ -27,6 +27,14 @@ void ts_singlestate(void)
 
       deadlock();
 
+//  T() {e==0, ne==0, uo==0, 1<=i}
+
+   if (e>=2||uo+ne>=1&&e>=1)
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(e,i,ne,uo) {e+i+ne+uo==e#init+i#init+ne#init+uo#init, e<=1,
 //    1<=e+i+ne+uo}
 
@@ -163,6 +171,14 @@ void ts_restructured(void)
 //  T() {0==-1}
 
       deadlock();
+
+//  T() {e==0, ne==0, uo==0, 1<=i}
+
+   if (e>=2||uo+ne>=1&&e>=1)
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T(e,i,ne,uo) {e#init+i#init+ne#init+uo#init==e+i, ne==0, uo==0,
 //    e<=1, 1<=e+i}
@@ -804,6 +820,14 @@ void ts_singlestate(void)
 
 //  P(e,i,ne,uo) {e==0, ne==0, uo==0, 1<=i}
 
+   if (e>=2||uo+ne>=1&&e>=1)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(e,i,ne,uo) {e==0, ne==0, uo==0, 1<=i}
+
    while (rand_b())
 
 //  P(e,i,ne,uo) {0<=e, e<=1, 1<=e+i+ne+uo, 1<=e+i+uo, e+ne<=1, 0<=i,
@@ -954,6 +978,14 @@ void ts_restructured(void)
 //  P(e,i,ne,uo) {e==0, i==0, ne==0, uo==0}
 
       deadlock();
+
+//  P(e,i,ne,uo) {e==0, ne==0, uo==0, 1<=i}
+
+   if (e>=2||uo+ne>=1&&e>=1)
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(e,i,ne,uo) {e==0, ne==0, uo==0, 1<=i}
 

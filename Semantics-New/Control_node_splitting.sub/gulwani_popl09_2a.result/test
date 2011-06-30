@@ -48,9 +48,18 @@ void ts_singlestate(void)
 
    c1 = c2 = 0;
 
+//  T() {c1==0, c2==0, x==x0, y==y0, 0<=m, y<=m, 0<=n, x<=n, 0<=x,
+//    0<=y}
+
+   if (!(c1<=m-y0&&c2<=n-x0))
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(c1,c2,x,y) {c1+y#init==c1#init+y, c1+y0==y,
-//    c2+x#init==c2#init+x, c2+x0==x, c1#init<=c1, y<=m, x<=n,
-//    x#init<=x, x0<=x, 0<=x0, y0<=y, 0<=y0}
+//    c2+x#init==c2#init+x, c2+x0==x, 0<=c1, c1#init<=c1, c1<=y,
+//    0<=c2, c2<=x, y<=m, x<=n, x#init<=x}
 
    while (rand_b())
 
@@ -157,6 +166,15 @@ void ts_restructured(void)
 //    0<=x, 0<=y}
 
    c1 = c2 = 0;
+
+//  T() {c1==0, c2==0, x==x0, y==y0, 0<=m, y<=m, 0<=n, x<=n, 0<=x,
+//    0<=y}
+
+   if (!(c1<=m-y0&&c2<=n-x0))
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T() {c1==0, c2==0, x==x0, y==y0, 0<=m, y<=m, x<=n, 0<=x, 0<=y}
 
@@ -362,6 +380,15 @@ void ts_singlestate(void)
 //  P(c1,c2,m,n,x,x0,y,y0) {c1==0, c2==0, x==x0, y==y0, 0<=m, y<=m,
 //    0<=n, x<=n, 0<=x, 0<=y}
 
+   if (!(c1<=m-y0&&c2<=n-x0))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(c1,c2,m,n,x,x0,y,y0) {c1==0, c2==0, x==x0, y==y0, 0<=m, y<=m,
+//    0<=n, x<=n, 0<=x, 0<=y}
+
    while (rand_b())
 
 //  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2+x0==x, y<=m, x<=n, x0<=x,
@@ -481,6 +508,15 @@ void ts_restructured(void)
 //  P(c1,c2,m,n,x,x0,y,y0) {c1==0, c2==0, x==x0, y==y0, 0<=m, y<=m,
 //    0<=n, x<=n, 0<=x, 0<=y}
 
+   if (!(c1<=m-y0&&c2<=n-x0))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(c1,c2,m,n,x,x0,y,y0) {c1==0, c2==0, x==x0, y==y0, 0<=m, y<=m,
+//    0<=n, x<=n, 0<=x, 0<=y}
+
    if (x<n) {
    }
    else {
@@ -493,7 +529,7 @@ void ts_restructured(void)
    if (y<m) goto L1;
 
 //  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m, c2==0, m==y, x==x0, 0<=c1,
-//    c1<=m, 0<=n, x+1<=n, 0<=x}
+//    c1<=m, x+1<=n, 0<=x}
 
 L2:   ;
 
@@ -632,8 +668,8 @@ L1:   ;
       checking_error();
    goto L2;
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2+x0==n, n==x, 0<=c2, c2<=n,
-//    y<=m, y0<=y, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2+x0==n, n==x, 0<=c1, c1<=y,
+//    0<=c2, c2<=n, y<=m}
 
 L3:   ;
 }

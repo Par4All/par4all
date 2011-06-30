@@ -19,6 +19,14 @@ void ts_singlestate(void)
 
    d = 1;
 
+//  T() {d==1, x==0}
+
+   if (!(-1<=d&&d<=1&&d>=2*x-1999))
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(d,x) {0<=d+1, d<=1, 2x<=d+1999, 0<=x}
 
    while (rand_b())
@@ -118,6 +126,14 @@ void ts_restructured(void)
 //  T(d) {d==1, x==0}
 
    d = 1;
+
+//  T() {d==1, x==0}
+
+   if (!(-1<=d&&d<=1&&d>=2*x-1999))
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T() {d==1, x==0}
 
@@ -309,6 +325,14 @@ void ts_singlestate(void)
 
 //  P(d,x) {d==1, x==0}
 
+   if (!(-1<=d&&d<=1&&d>=2*x-1999))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(d,x) {d==1, x==0}
+
    while (rand_b())
 
 //  P(d,x) {0<=d+1, d<=1, 2x<=d+1999, 0<=x}
@@ -405,6 +429,14 @@ void ts_restructured(void)
 //  P(d,x) {x==0}
 
    d = 1;
+
+//  P(d,x) {d==1, x==0}
+
+   if (!(-1<=d&&d<=1&&d>=2*x-1999))
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(d,x) {d==1, x==0}
 

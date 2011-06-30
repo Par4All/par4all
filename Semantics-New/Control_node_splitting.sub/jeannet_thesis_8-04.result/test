@@ -27,6 +27,14 @@ void ts_singlestate(void)
 
    f = rand_b();
 
+//  T() {s==1, x==0, y==0, 0<=e, e<=1, 0<=f, f<=1}
+
+   if (!(y<=2*x))
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(s,x,y) {0<=e, e<=1, 0<=f, f<=1, s#init+x#init<=s+x,
 //    6s#init+5y#init<=6s+5y, 3s#init+2y#init<=3s+2y,
 //    2s#init+3y#init<=2s+3y, 2x#init+y<=2x+y#init, y#init<=y}
@@ -187,6 +195,14 @@ void ts_restructured(void)
 //  T(f) {s==1, x==0, y==0, 0<=e, e<=1, 0<=f, f<=1}
 
    f = rand_b();
+
+//  T() {s==1, x==0, y==0, 0<=e, e<=1, 0<=f, f<=1}
+
+   if (!(y<=2*x))
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T(s,x,y) {e+s==3, s#init==1, x#init==0, y#init==0, 0<=e, e<=1,
 //    0<=f, f<=1, y<=2x, 0<=y}
@@ -351,6 +367,14 @@ void ts_singlestate(void)
 
 //  P(e,f,s,x,y) {s==1, x==0, y==0, 0<=e, e<=1, 0<=f, f<=1}
 
+   if (!(y<=2*x))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(e,f,s,x,y) {s==1, x==0, y==0, 0<=e, e<=1, 0<=f, f<=1}
+
    while (rand_b())
 
 //  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, y<=2x, 0<=y}
@@ -507,6 +531,14 @@ void ts_restructured(void)
 //  P(e,f,s,x,y) {s==1, x==0, y==0, 0<=e, e<=1}
 
    f = rand_b();
+
+//  P(e,f,s,x,y) {s==1, x==0, y==0, 0<=e, e<=1, 0<=f, f<=1}
+
+   if (!(y<=2*x))
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(e,f,s,x,y) {s==1, x==0, y==0, 0<=e, e<=1, 0<=f, f<=1}
 
