@@ -5,28 +5,21 @@
 
 model aspic_bug_03 {
 
-	var i, m, n, j1, j2;
+	var i, m, j;
 	states k;
 
-	transition t1 := {
-		from := k;
-		to := k;
-		guard := i > 0 && i < m;
-		action := i' = i - 1, j1' = j1 + 1;
-	};
-
-	transition t2 := {
+	transition t := {
 		from := k;
 		to := k;
 		guard := i > 0 && i >= m;
-		action := i' = i - m, j2' = j2 + 1;
+		action := i' = i - m, j' = j + 1;
 	};
 
 }
 
 strategy s {
 
-	Region init := {state = k && m > 0 && n >= 0 && m < n && i = n && j1 = 0 && j2 = 0};
+	Region init := {state = k && m > 0 && j = 0};
 
 }
 
