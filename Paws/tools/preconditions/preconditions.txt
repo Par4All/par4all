@@ -1,1 +1,6 @@
-Preconditions in PIPS are affine to predict over scalar integer variables. They are used for dependence testing, interprocedural convex array analysis, control simplification and possibly property dependence providing.
+Preconditions are affine predicate over scalar variables. They are
+used for dependence testing, interprocedural convex array analysis,
+inteprocedural constant propagation, control simplification and
+possibly property dependence proving. By default, only integer
+variables are analyzed, but boolean, string and float scalar variables
+can also be analyzed.
