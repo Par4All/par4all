@@ -28,7 +28,7 @@ echo -e "#\n# compile run compare $case\n#"
 [ "$PIPS_VALIDATION_EXE" ] || exit 0
 
 # we are doing the stuff...
-#echo -e "### compiling, running & comparing $case..." >&2
+echo -e "### compiling, running & comparing $case..." >&2
 
 # get suffix & set compiler
 if [ -e $case.c ]
