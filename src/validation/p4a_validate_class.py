@@ -124,10 +124,9 @@ class ValidationClass:
 			# cpp or other stuff run by pips, even if relative path names are used.
 			output = output.replace(directory_test_path,'.')
 
-			if (os.path.isfile(err_file_path) == True):
+			if (os.path.isfile(err_file_path) == True and os.path.isdir(self.p4a_root+"/RESULT")):
 				# copy error file on RESULT directories of par4all validation
-				shutil.move(err_file_path,self.p4a_root+'/RESULT')
-				os.rename(self.p4a_root+"/RESULT/"+os.path.basename(err_file_path),self.p4a_root+"/RESULT/"+os.path.basename(directory_test_path)+"_"+os.path.basename(err_file_path))
+				shutil.move(err_file_path,self.p4a_root+"/RESULT/"+os.path.basename(directory_test_path)+"_"+os.path.basename(err_file_path))
 		
 			if(int_status != 0):
 				status = "failed"
