@@ -1,0 +1,8 @@
+delete crc01
+create crc01 crc01.c
+apply PARTIAL_EVAL
+display PRINTED_FILE
+apply UNSPLIT
+shell pips_validation_exe.sh crc01
+close
+delete crc01
