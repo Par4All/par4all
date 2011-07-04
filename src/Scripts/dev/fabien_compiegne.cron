@@ -5,6 +5,7 @@
 # check on commit runs on every minute
 * * * * * /home/fabien/CHECK/pips_check_compile --source /home/fabien/CHECK/pipsrc.sh --keepfail --validation-option DO_SLOW= pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # force check once a day
+# could add --validation-option PIPS_VALIDATION_EXE=1? (does it work?)
 7 0 * * * /home/fabien/CHECK/pips_check_compile --wait --force --report --source /home/fabien/CHECK/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # test autoconf version
 @hourly /home/fabien/AUTOC/pips_check_compile --autoconf --keepfail --source=/home/fabien/AUTOC/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/AUTOC/prod /home/fabien/AUTOC/validation
