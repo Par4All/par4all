@@ -4,6 +4,13 @@
 
 // Case flip-flop 2
 
+/**************************************************************************
+*
+* Use advanced mode!
+* It requires SEMANTICS_K_FIX_POINT property to be set on 2.
+*
+**************************************************************************/
+
 #include <stdio.h>
 
 
