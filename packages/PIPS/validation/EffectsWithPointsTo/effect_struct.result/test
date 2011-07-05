@@ -22,22 +22,22 @@ float main(int argc, char *argv[])
 
 POINTS-TO
 
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
 float main(int argc, char *argv[])
 {
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
    int i, j, k;
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
 
    for(i = 0; i <= 8; i += 1)
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
       for(j = 0; j <= 8; j += 1) {
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
          imagein[i][j].re = 0.0;
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
          imagein[i][j].im = 0.0;
       }
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
    return imagein[2][1].re;
 }
 

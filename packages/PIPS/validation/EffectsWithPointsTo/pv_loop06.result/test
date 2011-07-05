@@ -66,8 +66,8 @@ int main()
    q = &b[0];
 //             <    is written>: i
    for(i = 0; i <= 9; i += 1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: b[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: a[0] *ANY_MODULE*:*ANYWHERE*
       *p++ = 2**q++;
    return 0;
 }
@@ -75,8 +75,14 @@ int main()
  *********************** Use-Def Chains *********************
 
 	13 --> 13 with conflicts
+		from <a[0]-W-MAY> to <a[0]-W-MAY>
+		from <a[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <a[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <b[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <b[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <a[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 13 with conflicts
 		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>

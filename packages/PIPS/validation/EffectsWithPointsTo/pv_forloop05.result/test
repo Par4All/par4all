@@ -30,23 +30,24 @@ int main()
 {
 //  {}
    float *p[10];
-//  {}
+//  {(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    float a[10], t;
-//  {}
+//  {(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i;
-//  {}
+//  {(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    t = 1.0;
-//  {}
+//  {(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    while (t<2.0) {
-//  {(p[i],a[i],-MAY-)}
+//  {(p[*],a[*],-MAY-);(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       for(i = 0; i <= 9; i += 1)
-//  {(p[i],a[i],-MAY-)}
+//  {(p[*],a[*],-MAY-);(p[*],a[*],-MAY-);(p[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
          p[i] = &a[i];
-//  {(p[i],a[i],-MAY-)}
+//  {(p[*],a[*],-MAY-);(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       t += 0, 01;
    }
-//  {(p[i],a[i],-MAY-)}
+//  {(p[*],a[*],-MAY-);(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }
 

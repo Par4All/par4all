@@ -1,6 +1,14 @@
 
 PROPER  EFFECTS 
 
+void foo(int *col)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: col
+   *col++;
+
+   return;
+}
 int main()
 {
    int x, tab1[10], tab2[10], *p;
@@ -18,6 +26,15 @@ int main()
 
 POINTS-TO
 
+//  {(col,_col_1[0],-Exact-)}
+void foo(int *col)
+{
+//  {(col,_col_1[0],-Exact-)}
+   *col++;
+//  {(col,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+   return;
+}
 //  {}
 int main()
 {
@@ -35,6 +52,14 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void foo(int *col)
+{
+//             <    is read   >: _col_1[0] col
+//             <    is written>: col
+   *col++;
+
+   return;
+}
 int main()
 {
    int x, tab1[10], tab2[10], *p;

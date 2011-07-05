@@ -23,24 +23,29 @@ int main(int argc, char *argv[])
 
 POINTS-TO
 
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
 int main(int argc, char *argv[])
 {
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
    int i, j;
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
    int *a[64];
-//  {}
+//  {(a[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(argv[*],_argv_1[0],
+//   -Exact-)}
 
    for(i = 0; i <= 63; i += 1) {
-//  {(a[i],*HEAP*_l_13[0],-MAY-)}
+//  {(a[*],*HEAP*_l_13[0],-MAY-);(a[*],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(argv[*],_argv_1[0],-Exact-)}
       a[i] = (float) malloc(64*sizeof(float));
-//  {(a[i],*HEAP*_l_13[0],-MAY-)}
+//  {(a[*],*HEAP*_l_13[0],-MAY-);(a[*],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(argv[*],_argv_1[0],-Exact-)}
       for(j = 0; j <= 63; j += 1)
-//  {(a[i],*HEAP*_l_13[0],-Exact-)}
+//  {(a[*],*HEAP*_l_13[0],-Exact-);(a[*],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(argv[*],_argv_1[0],-Exact-)}
          a[i][j] = 0.;
    }
-//  {(a[i],*HEAP*_l_13[0],-MAY-)}
+//  {(a[*],*HEAP*_l_13[0],-MAY-);(a[*],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(argv[*],_argv_1[0],-Exact-)}
 
    return 0;
 }
@@ -59,8 +64,9 @@ int main(int argc, char *argv[])
       a[i] = (float) malloc(64*sizeof(float));
 //             <    is written>: j
       for(j = 0; j <= 63; j += 1)
+//             <may be written>: *HEAP*_l_13[j] 
+//                               *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: a[i] i j
-//             <    is written>: *HEAP*_l_13[0+j]
          a[i][j] = 0.;
    }
 
@@ -70,15 +76,30 @@ int main(int argc, char *argv[])
  *********************** Use-Def Chains *********************
 
 	15 --> 15 with conflicts
-		from <*HEAP*_l_13[0+j]-W-EXACT> to <*HEAP*_l_13[0+j]-W-EXACT>
+		from <*HEAP*_l_13[j]-W-MAY> to <*HEAP*_l_13[j]-W-MAY>
+		from <*HEAP*_l_13[j]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*HEAP*_l_13[j]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <a[i]-R-EXACT>
+		from <a[i]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	15 --> 14 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
 		from <j-R-EXACT> to <j-W-EXACT>
 	15 --> 13 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <a[i]-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <a[i]-R-EXACT> to <a[i]-W-EXACT>
 	14 --> 14 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 	13 --> 15 with conflicts
+		from <a[i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <a[i]-W-EXACT> to <a[i]-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	13 --> 13 with conflicts
 		from <a[i]-W-EXACT> to <a[i]-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>

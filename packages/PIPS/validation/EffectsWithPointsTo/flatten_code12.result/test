@@ -1,6 +1,27 @@
 
 PROPER  EFFECTS 
 
+void flatten_code12(void)
+{
+//             <    is read   >: foo_0
+//             <    is written>: i
+   int i = foo_0;
+//             <    is written>: i
+
+   for(i = 0; i <= 3; i += 1) {
+      static int foo = 0;
+//             <    is read   >: foo
+//             <    is written>: foo
+
+      foo++;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: foo stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+      fprintf(stdout, "foo=%d\n", foo);
+   }
+}
 int main()
 {
 //             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
@@ -14,6 +35,24 @@ int main()
 POINTS-TO
 
 //  {}
+void flatten_code12(void)
+{
+//  {}
+   int i = foo_0;
+//  {}
+
+   for(i = 0; i <= 3; i += 1) {
+//  {}
+      static int foo = 0;
+//  {}
+
+      foo++;
+//  {}
+
+      fprintf(stdout, "foo=%d\n", foo);
+   }
+}
+//  {}
 int main()
 {
 //  {}
@@ -25,6 +64,27 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void flatten_code12(void)
+{
+//             <    is read   >: foo_0
+//             <    is written>: i
+   int i = foo_0;
+//             <    is written>: i
+
+   for(i = 0; i <= 3; i += 1) {
+      static int foo = 0;
+//             <    is read   >: foo
+//             <    is written>: foo
+
+      foo++;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: foo stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+      fprintf(stdout, "foo=%d\n", foo);
+   }
+}
 int main()
 {
 //             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
