@@ -45,6 +45,20 @@ int main(void)
    **pp = 0;
    return 0;
 }
+static int alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: r _RANDOM_EFFECTS:GEN_SEED
+   int r = rand();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: r stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", r);
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2==1;
+}
 
 POINTS-TO
 
@@ -87,6 +101,16 @@ int main(void)
 //   -MAY-)}
    return 0;
 }
+//  {}
+static int alea(void)
+{
+//  {}
+   int r = rand();
+//  {}
+   printf("%d\n", r);
+//  {}
+   return rand()%2==1;
+}
 
 PROPER  EFFECTS WITH POINTS TO
 
@@ -126,13 +150,27 @@ int main(void)
    
    // pp may points to a dead value in the stack
    printf("%p\n", pp);
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: pi *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: i *ANY_MODULE*:*ANYWHERE*
    
    // possible segfault.
    // should generate an error while analyzing?
    **pp = 0;
    return 0;
+}
+static int alea(void)
+{
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: r _RANDOM_EFFECTS:GEN_SEED
+   int r = rand();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: r stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", r);
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   return rand()%2==1;
 }
 
  *********************** Use-Def Chains *********************
@@ -181,8 +219,10 @@ int main(void)
 		from <pp-W-EXACT> to <pp-W-EXACT>
 	15 --> 33 with conflicts
 		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-W-EXACT> to <pi-R-MAY>
 		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	14 --> 33 with conflicts
+		from <i-W-EXACT> to <i-W-MAY>
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 

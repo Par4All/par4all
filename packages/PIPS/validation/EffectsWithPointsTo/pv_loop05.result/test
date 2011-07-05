@@ -48,18 +48,18 @@ int main()
 
    for(i = 0; i <= 4; i += 1) {
 //  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
       *q = i;
 //  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
       q++;
    }
 //  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
 
    free(p);
 //  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
    return 0;
 }
 
@@ -79,7 +79,7 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= 4; i += 1) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *HEAP*_l_8[0] *HEAP*_l_8[*]
 //             <    is read   >: i q
       *q = i;
 //             <    is read   >: q
@@ -100,38 +100,24 @@ int main()
 		from <q-W-EXACT> to <q-R-EXACT>
 		from <q-R-EXACT> to <q-W-EXACT>
 	14 --> 13 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <q-W-EXACT> to <q-R-EXACT>
-		from <q-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	13 --> 17 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 	13 --> 14 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
 		from <q-R-EXACT> to <q-W-EXACT>
 	13 --> 13 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-		from <q-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
+		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
 	09 --> 14 with conflicts
 		from <q-W-EXACT> to <q-W-EXACT>
 		from <q-W-EXACT> to <q-R-EXACT>
 	09 --> 13 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <q-W-EXACT> to <q-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	08 --> 17 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	08 --> 13 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	08 --> 09 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
 

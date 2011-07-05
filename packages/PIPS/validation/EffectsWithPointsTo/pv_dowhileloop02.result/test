@@ -61,7 +61,7 @@ int main()
 //             <    is read   >: i
    do {
 //             <    is read   >: i p
-//             <    is written>: *HEAP*_l_7[0+i]
+//             <    is written>: *HEAP*_l_7[i]
       p[i] = i;
 //             <    is read   >: i
 //             <    is written>: i
@@ -82,7 +82,7 @@ int main()
 	11 --> 12 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	11 --> 11 with conflicts
-		from <*HEAP*_l_7[0+i]-W-EXACT> to <*HEAP*_l_7[0+i]-W-EXACT>
+		from <*HEAP*_l_7[i]-W-EXACT> to <*HEAP*_l_7[i]-W-EXACT>
 	13 --> 12 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	07 --> 11 with conflicts

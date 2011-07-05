@@ -1,6 +1,12 @@
 
 PROPER  EFFECTS 
 
+void call09(int i, int j)
+{
+//             <    is read   >: i j
+//             <    is written>: i
+   i = i+j;
+}
 int main()
 {
    tf_t s;
@@ -13,6 +19,12 @@ int main()
 
 POINTS-TO
 
+//  {}
+void call09(int i, int j)
+{
+//  {}
+   i = i+j;
+}
 //  {}
 int main()
 {
@@ -27,6 +39,12 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call09(int i, int j)
+{
+//             <    is read   >: i j
+//             <    is written>: i
+   i = i+j;
+}
 int main()
 {
    tf_t s;

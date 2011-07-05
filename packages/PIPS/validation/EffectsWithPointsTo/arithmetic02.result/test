@@ -59,21 +59,21 @@ int main()
    p = pdeb;
 //  {(p,t[0],-Exact-);(pdeb,t[0],-Exact-);(pfin,t[10-1],-Exact-)}
    while (p<=pfin) {
-//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
-//   -Exact-);(pfin,t[10-1],-Exact-)}
+//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
+//   -Exact-)}
       if (*p==0)
-//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
-//   -Exact-);(pfin,t[10-1],-Exact-)}
+//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
+//   -Exact-)}
          printf("%d ", p-pdeb);
-//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
-//   -Exact-);(pfin,t[10-1],-Exact-)}
+//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
+//   -Exact-)}
       p++;
    }
-//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
-//   -Exact-);(pfin,t[10-1],-Exact-)}
+//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
+//   -Exact-)}
    printf("\n");
-//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
-//   -Exact-);(pfin,t[10-1],-Exact-)}
+//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
+//   -Exact-)}
    return 0;
 }
 
@@ -95,7 +95,8 @@ int main()
    p = pdeb;
 //             <    is read   >: p pfin
    while (p<=pfin) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: t[0] t[*]
+//             <    is read   >: p
       if (*p==0)
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -123,7 +124,7 @@ int main()
 	-1 --> 14 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
 	-1 --> 14 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <p-W-EXACT> to <p-R-EXACT>
 	14 --> 15 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
@@ -140,14 +141,8 @@ int main()
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	14 --> 15 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 	14 --> -1 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <p-W-EXACT>
-	14 --> 14 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <p-R-EXACT> to <p-W-EXACT>
 	-1 --> -1 with conflicts
 		from <p-R-EXACT> to <p-W-EXACT>
 	-1 --> -1 with conflicts
@@ -156,17 +151,13 @@ int main()
 	-1 --> 14 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
 	-1 --> 14 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <p-W-EXACT> to <p-R-EXACT>
 	-1 --> -1 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
-	11 --> 14 with conflicts
-		from <pfin-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	11 --> -1 with conflicts
 		from <pfin-W-EXACT> to <pfin-R-EXACT>
 	10 --> 14 with conflicts
 		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
-	10 --> 14 with conflicts
-		from <pdeb-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	10 --> -1 with conflicts
 		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
 

@@ -1,6 +1,27 @@
 
 PROPER  EFFECTS 
 
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+//             <    is read   >: j
+//             <    is written>: i
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+//             <    is read   >: i
+//             <    is written>: y[i]
+   y[i] = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   p->one = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: j p
+   (p->two)[j] = 2.;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i q[i]
+   *q[i] = 3;
+}
 int main()
 {
    int a;
@@ -19,6 +40,23 @@ int main()
 
 POINTS-TO
 
+//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+   y[i] = 0;
+//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+   p->one = 1;
+//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+   (p->two)[j] = 2.;
+//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+   *q[i] = 3;
+}
 //  {}
 int main()
 {
@@ -30,17 +68,38 @@ int main()
    int x[10];
 //  {}
    int *ap[10];
-//  {}
+//  {(ap[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    tf_t s;
-//  {}
+//  {(ap[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    tf_t *sp = &s;
-//  {(sp,s,-Exact-)}
+//  {(ap[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(sp,s,-Exact-)}
 
    call02(a, b, x, ap, sp);
 }
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
+{
+//             <    is read   >: j
+//             <    is written>: i
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
+   i = j+1;
+//             <    is read   >: i
+//             <    is written>: y[i]
+   y[i] = 0;
+//             <    is read   >: p
+//             <    is written>: _p_2[0].one
+   p->one = 1;
+//             <    is read   >: j p
+//             <    is written>: _p_2[0].two[j]
+   (p->two)[j] = 2.;
+//             <may be written>: _q_1[0]
+//             <    is read   >: i q[i]
+   *q[i] = 3;
+}
 int main()
 {
    int a;
@@ -51,7 +110,7 @@ int main()
 //             <    is written>: sp
    tf_t *sp = &s;
 //             <may be read   >: ap[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: x[*]
 //             <    is read   >: a b sp
 
    call02(a, b, x, ap, sp);
@@ -60,7 +119,6 @@ int main()
  *********************** Use-Def Chains *********************
 
 	26 --> 28 with conflicts
-		from <sp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <sp-W-EXACT> to <sp-R-EXACT>
 
 ****************** End of Dependence Graph ******************

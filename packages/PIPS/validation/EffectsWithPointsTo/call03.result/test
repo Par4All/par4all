@@ -1,6 +1,21 @@
 
 PROPER  EFFECTS 
 
+void call03()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pi
+   *pi = 1;
+//             <    is read   >: pi
+//             <    is written>: pi
+   pi++;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   q->one = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   (q->two)[4] = 2;
+}
 int main()
 {
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -11,6 +26,18 @@ int main()
 POINTS-TO
 
 //  {}
+void call03()
+{
+//  {}
+   *pi = 1;
+//  {}
+   pi++;
+//  {}
+   q->one = 1;
+//  {}
+   (q->two)[4] = 2;
+}
+//  {}
 int main()
 {
 //  {}
@@ -19,6 +46,21 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call03()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pi
+   *pi = 1;
+//             <    is read   >: pi
+//             <    is written>: pi
+   pi++;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   q->one = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   (q->two)[4] = 2;
+}
 int main()
 {
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*

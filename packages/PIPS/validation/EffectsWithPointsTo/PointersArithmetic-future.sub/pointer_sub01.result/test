@@ -10,19 +10,19 @@ int main()
    int a[n][m];
 //  {}
    int (*p)[m] = a;
-//  {(p,a[0],-Exact-)}
+//  {(p,a[0][0],-Exact-)}
    // p == &a[0]
    p += 1;
-//  {(p,a[1],-Exact-)}
+//  {(p,a[*][*],-Exact-)}
    // p == &a[1]
    (*p)[2] = 99;
-//  {(p,a[1],-Exact-)}
+//  {(p,a[*][*],-Exact-)}
    // a[1][2] = 99
    n = p-a;
-//  {(p,a[1],-Exact-)}
+//  {(p,a[*][*],-Exact-)}
    // n == 1
    printf("n = %d", n);
-//  {(p,a[1],-Exact-)}
+//  {(p,a[*][*],-Exact-)}
    return 0;
 }
 
@@ -45,8 +45,8 @@ int main()
 //             <    is referenced>: p
    // p == &a[0]
    p += 1;
+//             <may be written>: a[*][*][2]
 //             <    is read   >: p
-//             <    is written>: a[1][2]
    // p == &a[1]
    (*p)[2] = 99;
 //             <    is read   >: p

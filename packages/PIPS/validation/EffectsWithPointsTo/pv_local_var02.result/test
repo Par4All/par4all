@@ -34,17 +34,17 @@ int main()
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    for(i = 0; i <= 9; i += 1) {
-//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(q,a[i],
+//  {(p,a[*],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(q,a[*],
 //   -MAY-)}
       int *q;
-//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(q,a[i],
+//  {(p,a[*],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(q,a[*],
 //   -MAY-)}
       q = &a[i];
-//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(q,a[i],
+//  {(p,a[*],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(q,a[*],
 //   -MAY-)}
       p = q;
    }
-//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
+//  {(p,a[*],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
    return 0;
 }
 

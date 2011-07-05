@@ -1,6 +1,20 @@
 
 PROPER  EFFECTS 
 
+void call12(int n, int m, int x[n][m])
+{
+   int i, j;
+//             <    is read   >: n
+//             <    is written>: i
+
+   for(i = 0; i <= n-1; i += 1)
+//             <    is read   >: m n
+//             <    is written>: j
+      for(j = 0; j <= m-1; j += 1)
+//             <    is read   >: i j m n
+//             <    is written>: x[i][j]
+         x[i][j] = 0;
+}
 int main()
 {
 //             <    is written>: d1
@@ -28,6 +42,19 @@ int main()
 POINTS-TO
 
 //  {}
+void call12(int n, int m, int x[n][m])
+{
+//  {}
+   int i, j;
+//  {}
+
+   for(i = 0; i <= n-1; i += 1)
+//  {}
+      for(j = 0; j <= m-1; j += 1)
+//  {}
+         x[i][j] = 0;
+}
+//  {}
 int main()
 {
 //  {}
@@ -53,6 +80,20 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call12(int n, int m, int x[n][m])
+{
+   int i, j;
+//             <    is read   >: n
+//             <    is written>: i
+
+   for(i = 0; i <= n-1; i += 1)
+//             <    is read   >: m n
+//             <    is written>: j
+      for(j = 0; j <= m-1; j += 1)
+//             <    is read   >: i j m n
+//             <    is written>: x[i][j]
+         x[i][j] = 0;
+}
 int main()
 {
 //             <    is written>: d1

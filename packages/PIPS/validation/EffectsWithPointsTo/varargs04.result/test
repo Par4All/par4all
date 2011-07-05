@@ -1,6 +1,82 @@
 
 PROPER  EFFECTS 
 
+void f2(int n_ptrs, char *array[31])
+{
+   int ptr_no;
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "%s\n", array[ptr_no]);
+}
+void f3(int n_ptrs, int f4_after, ...)
+{
+   va_list ap, ap_save;
+   char *array[31];
+//             <    is written>: ptr_no
+   int ptr_no = 0;
+//             <    is read   >: n_ptrs
+   if (n_ptrs>31)
+//             <    is written>: n_ptrs
+      n_ptrs = 31;
+//             <    is read   >: ap
+//             <    is written>: ap
+   va_start(ap, f4_after);
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
+//             <    is read   >: ap n_ptrs ptr_no
+//             <    is written>: ap array[ptr_no]
+      array[ptr_no] = va_arg(ap, char *);
+//             <    is read   >: f4_after n_ptrs ptr_no
+      if (ptr_no==f4_after)
+//             <    is read   >: ap ap_save n_ptrs
+//             <    is written>: ap_save
+         va_copy(ap_save, ap);
+   }
+//             <may be written>: ap
+//             <    is read   >: ap
+   va_end(ap);
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: stderr[0] __IO_EFFECTS:LUNS[2]
+   f2(n_ptrs, array);
+//             <    is read   >: f4_after n_ptrs
+//             <    is written>: n_ptrs
+   // Now process the saved copy.
+   n_ptrs -= f4_after;
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//             <    is read   >: ap_save n_ptrs ptr_no
+//             <    is written>: ap_save array[ptr_no]
+      array[ptr_no] = va_arg(ap_save, char *);
+//             <may be written>: ap_save
+//             <    is read   >: ap_save
+   va_end(ap_save);
+//             <may be read   >: stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+   f4(n_ptrs, array);
+}
+void f4(int n_ptrs, char *array[31])
+{
+   int ptr_no;
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      fprintf(stdout, "%s\n", array[ptr_no]);
+}
 int main()
 {
 //             <may be read   >: stderr stderr[0] stdout stdout[0] 
@@ -17,6 +93,77 @@ int main()
 
 POINTS-TO
 
+//  {(array[*],_array_1[0],-Exact-)}
+void f2(int n_ptrs, char *array[31])
+{
+//  {(array[*],_array_1[0],-Exact-)}
+   int ptr_no;
+//  {(array[*],_array_1[0],-Exact-)}
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//  {(array[*],_array_1[0],-Exact-)}
+      fprintf(stderr, "%s\n", array[ptr_no]);
+}
+//  {}
+void f3(int n_ptrs, int f4_after, ...)
+{
+//  {}
+   va_list ap, ap_save;
+//  {}
+   char *array[31];
+//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int ptr_no = 0;
+//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   if (n_ptrs>31)
+//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+      n_ptrs = 31;
+//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   va_start(ap, f4_after);
+//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
+//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(array[*],
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+      array[ptr_no] = va_arg(ap, char *);
+//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(array[*],
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+      if (ptr_no==f4_after)
+//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(array[ptr_no],
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+         va_copy(ap_save, ap);
+   }
+//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   va_end(ap);
+//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   f2(n_ptrs, array);
+//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   // Now process the saved copy.
+   n_ptrs -= f4_after;
+//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(array[*],
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+      array[ptr_no] = va_arg(ap_save, char *);
+//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   va_end(ap_save);
+//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   f4(n_ptrs, array);
+}
+//  {(array[*],_array_2[0],-Exact-)}
+void f4(int n_ptrs, char *array[31])
+{
+//  {(array[*],_array_2[0],-Exact-)}
+   int ptr_no;
+//  {(array[*],_array_2[0],-Exact-)}
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//  {(array[*],_array_2[0],-Exact-)}
+      fprintf(stdout, "%s\n", array[ptr_no]);
+}
 //  {}
 int main()
 {
@@ -28,6 +175,84 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void f2(int n_ptrs, char *array[31])
+{
+   int ptr_no;
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//             <may be read   >: _array_1[*] stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: array[ptr_no] n_ptrs ptr_no stderr 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "%s\n", array[ptr_no]);
+}
+void f3(int n_ptrs, int f4_after, ...)
+{
+   va_list ap, ap_save;
+   char *array[31];
+//             <    is written>: ptr_no
+   int ptr_no = 0;
+//             <    is read   >: n_ptrs
+   if (n_ptrs>31)
+//             <    is written>: n_ptrs
+      n_ptrs = 31;
+//             <    is read   >: ap
+//             <    is written>: ap
+   va_start(ap, f4_after);
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
+//             <    is read   >: ap n_ptrs ptr_no
+//             <    is written>: ap array[ptr_no]
+      array[ptr_no] = va_arg(ap, char *);
+//             <    is read   >: f4_after n_ptrs ptr_no
+      if (ptr_no==f4_after)
+//             <    is read   >: ap ap_save n_ptrs
+//             <    is written>: ap_save
+         va_copy(ap_save, ap);
+   }
+//             <may be written>: ap
+//             <    is read   >: ap
+   va_end(ap);
+//             <may be read   >: array[*] stderr stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: stderr[0] __IO_EFFECTS:LUNS[2]
+//             <    is read   >: n_ptrs
+   f2(n_ptrs, array);
+//             <    is read   >: f4_after n_ptrs
+//             <    is written>: n_ptrs
+   // Now process the saved copy.
+   n_ptrs -= f4_after;
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//             <    is read   >: ap_save n_ptrs ptr_no
+//             <    is written>: ap_save array[ptr_no]
+      array[ptr_no] = va_arg(ap_save, char *);
+//             <may be written>: ap_save
+//             <    is read   >: ap_save
+   va_end(ap_save);
+//             <may be read   >: array[*] stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: n_ptrs
+   f4(n_ptrs, array);
+}
+void f4(int n_ptrs, char *array[31])
+{
+   int ptr_no;
+//             <    is read   >: n_ptrs
+//             <    is written>: ptr_no
+   for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
+//             <may be read   >: _array_2[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: array[ptr_no] n_ptrs ptr_no stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      fprintf(stdout, "%s\n", array[ptr_no]);
+}
 int main()
 {
 //             <may be read   >: stderr stderr[0] stdout stdout[0] 

@@ -1,6 +1,12 @@
 
 PROPER  EFFECTS 
 
+int foo(int **dest, int *source)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: dest source
+   *dest = source;
+}
 int main()
 {
    int *p, *q;
@@ -20,6 +26,12 @@ int main()
 
 POINTS-TO
 
+//  {(dest,_dest_1[0],-Exact-);(source,_source_2[0],-Exact-)}
+int foo(int **dest, int *source)
+{
+//  {(dest,_dest_1[0],-Exact-);(source,_source_2[0],-Exact-)}
+   *dest = source;
+}
 //  {}
 int main()
 {
@@ -43,6 +55,12 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+int foo(int **dest, int *source)
+{
+//             <    is read   >: dest source
+//             <    is written>: _dest_1[0]
+   *dest = source;
+}
 int main()
 {
    int *p, *q;

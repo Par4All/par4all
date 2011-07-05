@@ -33,13 +33,13 @@ int main()
    int a[10];
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    do {
-//  {(p,a[i],-Exact-)}
+//  {(p,a[*],-Exact-)}
       p = &a[i];
-//  {(p,a[i],-Exact-)}
+//  {(p,a[*],-Exact-)}
       i++;
    }
    while (i<10);
-//  {(p,a[i],-Exact-)}
+//  {(p,a[*],-Exact-)}
    return 0;
 }
 

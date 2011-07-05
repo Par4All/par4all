@@ -18,15 +18,6 @@ void call01(int *pi, tf_t *q)
 //             <    is read   >: q
    (q->two)[4] = 2;
 }
-/* #include<stdio.h> */
-typedef struct two_fields {
-   int one;
-   int two[10];
-} tf_t;
-
-void call01(int *pi, tf_t *q);
-
-int main();
 int main()
 {
    int i;
@@ -47,24 +38,11 @@ void call01(int *pi, tf_t *q)
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
-//  {(pi,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,_q_2[0],-Exact-)}
+//  {(pi,_pi_1[*],-Exact-);(q,_q_2[0],-Exact-)}
    q->one = 1;
-//  {(pi,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,_q_2[0],-Exact-)}
+//  {(pi,_pi_1[*],-Exact-);(q,_q_2[0],-Exact-)}
    (q->two)[4] = 2;
 }
-//  {}
-/* #include<stdio.h> */
-//  {}
-typedef struct two_fields {
-   int one;
-   int two[10];
-} tf_t;
-
-//  {}
-void call01(int *pi, tf_t *q);
-
-//  {}
-int main();
 //  {}
 int main()
 {
@@ -96,15 +74,6 @@ void call01(int *pi, tf_t *q)
 //             <    is written>: _q_2[0].two[4]
    (q->two)[4] = 2;
 }
-/* #include<stdio.h> */
-typedef struct two_fields {
-   int one;
-   int two[10];
-} tf_t;
-
-void call01(int *pi, tf_t *q);
-
-int main();
 int main()
 {
    int i;

@@ -1,6 +1,13 @@
 
 PROPER  EFFECTS 
 
+void foo(int *p)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p = 4;
+   return;
+}
 int main()
 {
    int *x;
@@ -70,6 +77,14 @@ int main()
 
 POINTS-TO
 
+//  {(p,_p_1[0],-Exact-)}
+void foo(int *p)
+{
+//  {(p,_p_1[0],-Exact-)}
+   *p = 4;
+//  {(p,_p_1[0],-Exact-)}
+   return;
+}
 //  {}
 int main()
 {
@@ -79,65 +94,90 @@ int main()
    int tab[10];
 //  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int *tab2[10];
-//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int tab3[10][10];
-//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int **tab4;
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int y;
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    
    
    foo(x);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    foo(tab);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    foo(tab2[4]);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    foo(tab3[5]);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    foo(tab4[6]);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    foo(&y);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    foo(&tab[1]);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
 
    printf("%d\n", *x);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    printf("%d\n", tab[0]);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    printf("%d\n", tab2[4][0]);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    printf("%d\n", tab3[5][0]);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    printf("%d\n", tab4[6][0]);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    printf("%d\n", y);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    printf("%d\n", tab[1]);
-//  {(tab4,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(tab2[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab4,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    return 1;
 }
 
 PROPER  EFFECTS WITH POINTS TO
 
+void foo(int *p)
+{
+//             <    is read   >: p
+//             <    is written>: _p_1[0]
+   *p = 4;
+   return;
+}
 int main()
 {
    int *x;

@@ -64,7 +64,7 @@ void assign03()
 //             <    is written>: j
    int j = 2;
 //             <    is read   >: j p
-//             <    is written>: *HEAP*_l_4[0+j]
+//             <    is written>: *HEAP*_l_4[j]
 
    p[j] = 1.;
 }

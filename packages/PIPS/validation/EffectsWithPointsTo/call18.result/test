@@ -1,6 +1,25 @@
 
 PROPER  EFFECTS 
 
+void call18(int i, ...)
+{
+//             <    is read   >: i
+//             <    is written>: i
+   i++;
+//             <    is read   >: i
+   if (i) {
+      va_list pa;
+      int r;
+//             <    is read   >: pa
+//             <    is written>: pa
+
+      va_start(pa, fmt);
+//             <may be written>: pa
+//             <    is read   >: pa
+
+      va_end(pa);
+   }
+}
 int main()
 {
 //             <    is written>: i
@@ -17,6 +36,25 @@ int main()
 POINTS-TO
 
 //  {}
+void call18(int i, ...)
+{
+//  {}
+   i++;
+//  {}
+   if (i) {
+//  {}
+      va_list pa;
+//  {}
+      int r;
+//  {}
+
+      va_start(pa, fmt);
+//  {}
+
+      va_end(pa);
+   }
+}
+//  {}
 int main()
 {
 //  {}
@@ -32,6 +70,25 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call18(int i, ...)
+{
+//             <    is read   >: i
+//             <    is written>: i
+   i++;
+//             <    is read   >: i
+   if (i) {
+      va_list pa;
+      int r;
+//             <    is read   >: pa
+//             <    is written>: pa
+
+      va_start(pa, fmt);
+//             <may be written>: pa
+//             <    is read   >: pa
+
+      va_end(pa);
+   }
+}
 int main()
 {
 //             <    is written>: i
