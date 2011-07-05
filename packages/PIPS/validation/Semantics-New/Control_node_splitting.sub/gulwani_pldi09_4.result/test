@@ -35,6 +35,14 @@ void ts_singlestate(void)
 
    j1 = j2 = 0;
 
+//  T() {i==n, j1==0, j2==0, 0<=i, m+1<=i, 1<=m}
+
+   if (!(j1<=n&&j2<=n))
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(i,j1,j2) {0<=i, i+j1+j2<=i#init+j1#init+j2#init, 2<=i+2j1+2j2,
 //    i+j1+j2<=n, 4<=i+2j2+2m, 0<=j1, j1#init<=j1, 0<=j2, j2#init<=j2,
 //    1<=m, m+1<=n}
@@ -131,6 +139,14 @@ void ts_restructured(void)
 //  T(j1,j2) {i==n, j1==0, j2==0, 0<=i, m+1<=i, 1<=m}
 
    j1 = j2 = 0;
+
+//  T() {i==n, j1==0, j2==0, 0<=i, m+1<=i, 1<=m}
+
+   if (!(j1<=n&&j2<=n))
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T(i,j2) {j1==0, i+j2<=i#init+j2#init, m+1<=i+j2, i+j2<=n, m<=i,
 //    0<=j2, j2#init<=j2, 1<=m}
@@ -289,6 +305,14 @@ void ts_singlestate(void)
 
 //  P(i,j1,j2,m,n) {i==n, j1==0, j2==0, 0<=i, m+1<=i, 1<=m}
 
+   if (!(j1<=n&&j2<=n))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(i,j1,j2,m,n) {i==n, j1==0, j2==0, 0<=i, m+1<=i, 1<=m}
+
    while (rand_b())
 
 //  P(i,j1,j2,m,n) {0<=i, 2<=i+2j1+2j2, 8<=3i+4j1+4j2+2m,
@@ -401,6 +425,14 @@ void ts_restructured(void)
 //  P(i,j1,j2,m,n) {i==n, 0<=i, m+1<=i, 1<=m}
 
    j1 = j2 = 0;
+
+//  P(i,j1,j2,m,n) {i==n, j1==0, j2==0, 0<=i, m+1<=i, 1<=m}
+
+   if (!(j1<=n&&j2<=n))
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(i,j1,j2,m,n) {i==n, j1==0, j2==0, 0<=i, m+1<=i, 1<=m}
 

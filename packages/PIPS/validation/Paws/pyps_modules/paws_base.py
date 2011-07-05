@@ -5,13 +5,14 @@ from pyrops import pworkspace
 def import_module(operation):
 	return __import__('paws_' + operation, None, None, ['__all__'])
 
-def perform(source_path, operation, advanced=False, properties=None, analysis=None):
+def perform(source_path, operation, advanced=False, properties=None, analysis=None, phases=None):
 	mod = import_module(operation)
         try:
                 ws = pworkspace(source_path, deleteOnClose=True)
                 if advanced:
-                        set_properties(ws, str(properties).split(';')[: -1])
-                        activate(ws, analysis)
+                        if (properties != ""): set_properties(ws, str(properties).split(';')[: -1])
+                        if (analysis != ""): activate(ws, analysis)
+			if (phases != ""): apply_phases(ws, phases)
                 functions = ''
                 for fu in ws.fun:
                         functions += mod.invoke_function(fu, ws)
@@ -21,10 +22,14 @@ def perform(source_path, operation, advanced=False, properties=None, analysis=No
                 ws.close()
                 raise
 
-def perform_multiple(sources, operation, function_name):
+def perform_multiple(sources, operation, function_name, advanced=False, properties=None, analysis=None, phases=None):
 	mod = import_module(operation)
         try:
                 ws = pworkspace(*sources, deleteOnClose=True)
+		if advanced:
+                        if (properties != ""): set_properties(ws, str(properties).split(';')[: -1])
+                        if (analysis != ""): activate(ws, analysis)
+			if (phases != ""): apply_phases(ws, phases)		
                 result = mod.invoke_function(ws.fun.__getattr__(function_name), ws)
                 ws.close()
                 return result
@@ -32,11 +37,16 @@ def perform_multiple(sources, operation, function_name):
                 ws.close()
                 raise
 
-def activate(ws, operation_type):
-        ws.activate(str(operation_type))
+def activate(ws, analyses):
+	for analysis in analyses[ : -1].split(';'):
+		ws.activate(str(analysis))
+
+def apply_phases(ws, phases):
+	for phase in phases[ : -1].split(';'):
+		if phase.split()[1] == 'true':
+			getattr(ws.all, phase.split()[0])()
 
 def set_properties(ws, properties):
-
         for prop in properties:
                 pair = prop.split()
                 default = getattr(ws.props, pair[0])

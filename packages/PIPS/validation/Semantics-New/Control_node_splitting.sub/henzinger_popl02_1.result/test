@@ -35,6 +35,14 @@ void ts_singlestate(void)
 
    s = 1;
 
+//  T() {lock==0, s==1, 0<=x, 1<=x+y, 0<=y}
+
+   if (s==2&&lock==0)
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(lock,s,x,y) {1<=s, s<=2, s#init<=s, 0<=x, 0<=y, y#init<=y}
 
    while (rand_b())
@@ -153,6 +161,14 @@ void ts_restructured(void)
 //  T(s) {lock==0, s==1, 0<=x, 1<=x+y, 0<=y}
 
    s = 1;
+
+//  T() {lock==0, s==1, 0<=x, 1<=x+y, 0<=y}
+
+   if (s==2&&lock==0)
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T() {lock==0, s==1, 0<=x, 1<=x+y, 0<=y}
 
@@ -350,6 +366,14 @@ void ts_singlestate(void)
 
 //  P(lock,s,x,y) {lock==0, s==1, 0<=x, 1<=x+y, 0<=y}
 
+   if (s==2&&lock==0)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(lock,s,x,y) {lock==0, s==1, 0<=x, 1<=x+y, 0<=y}
+
    while (rand_b())
 
 //  P(lock,s,x,y) {1<=s, s<=2, 0<=x, 0<=y}
@@ -466,6 +490,14 @@ void ts_restructured(void)
 //  P(lock,s,x,y) {lock==0, 0<=x, 1<=x+y, 0<=y}
 
    s = 1;
+
+//  P(lock,s,x,y) {lock==0, s==1, 0<=x, 1<=x+y, 0<=y}
+
+   if (s==2&&lock==0)
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(lock,s,x,y) {lock==0, s==1, 0<=x, 1<=x+y, 0<=y}
 

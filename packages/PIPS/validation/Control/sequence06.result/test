@@ -27,7 +27,7 @@ void sequence06()
    int l = -1;
    {
       //PIPS generated variable
-      int i_ = 0;
+      int i_;
       int i = 4;
       if (i%2==0) goto l100;
 

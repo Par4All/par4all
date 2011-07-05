@@ -43,25 +43,23 @@ void control_error(void) {
 #endif
 
 #if DO_CHECKING == 0
-#define CHECK(c)
-#define CHECK_NOT(c)
+#define CHECK
 #else
 void checking_error(void) {
 	fprintf(stderr, "checking error");
 	exit(2);
 }
-#define CHECK(c) {if (!(c)) checking_error();}
-#define CHECK_NOT(c) {if (c) checking_error();}
+#ifdef GOOD
+#define CHECK {if (!(GOOD)) checking_error();}
+#else
+#ifdef BAD
+#define CHECK {if (BAD) checking_error();}
+#endif
+#endif
 #endif
 
 #define COMMAND_NOCHECK(g, a) {ASSUME(g); a;}
-#ifdef GOOD
-#define COMMAND(g, a) {COMMAND_NOCHECK(g, a); CHECK(GOOD);}
-#else
-#ifdef BAD
-#define COMMAND(g, a) {COMMAND_NOCHECK(g, a); CHECK_NOT(BAD);}
-#endif
-#endif
+#define COMMAND(g, a) {COMMAND_NOCHECK(g, a); CHECK;}
 
 // control and commands
 
@@ -90,13 +88,13 @@ void checking_error(void) {
 
 void ts_singlestate(void) {
 	int x, y;
-	INI;
+	INI; CHECK;
 	LOOP(OR(C1, C2));
 }
 
 void ts_restructured(void) {
 	int x, y;
-	INI;
+	INI; CHECK;
 	S1;
 	LOOP(OR(C1a; S1, C2a; S1));
 	OR(C1b; S2, C2b; S2);

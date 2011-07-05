@@ -19,6 +19,14 @@ void ts_singlestate(void)
 
    t = 1;
 
+//  T() {b==0, d==0, s==0, t==1}
+
+   if (!(b-s>=-10&&b-s<=19))
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(b,d,s,t) {s<=b+10, b<=s+19, 1<=t, t<=4}
 
    while (rand_b())
@@ -357,6 +365,14 @@ void ts_restructured(void)
 //  T(t) {b==0, d==0, s==0, t==1}
 
    t = 1;
+
+//  T() {b==0, d==0, s==0, t==1}
+
+   if (!(b-s>=-10&&b-s<=19))
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T(b,s) {d==0, t==1, 21b#init+s<=21b+s#init,
 //    19b#init+121s#init<=19b+121s, 11b#init+s<=11b+s#init,
@@ -6174,6 +6190,14 @@ void ts_singlestate(void)
 
 //  P(b,d,s,t) {b==0, d==0, s==0, t==1}
 
+   if (!(b-s>=-10&&b-s<=19))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(b,d,s,t) {b==0, d==0, s==0, t==1}
+
    while (rand_b())
 
 //  P(b,d,s,t) {0<=b, b<=s+19, 20t<=27b+2s+20, 4t<=3b+3s+4,
@@ -6568,6 +6592,14 @@ void ts_restructured(void)
 //  P(b,d,s,t) {b==0, d==0, s==0}
 
    t = 1;
+
+//  P(b,d,s,t) {b==0, d==0, s==0, t==1}
+
+   if (!(b-s>=-10&&b-s<=19))
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(b,d,s,t) {b==0, d==0, s==0, t==1}
 

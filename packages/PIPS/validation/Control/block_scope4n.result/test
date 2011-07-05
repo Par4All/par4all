@@ -16,10 +16,11 @@ Controlizer output
 
 void block_scope4n()
 {
+   //PIPS generated variable
 // (0,2)
-   int x = 6;                                                           /*0005*/
+   int x_;
 // (0,3)
-   int x_;                                                              /*0007*/
+   int x = 6;                                                           /*0005*/
 // (0,4)
 // (1,2)
 lab1:   x_--;                                                                /*0009*/
@@ -32,10 +33,11 @@ After restructuring
 
 void block_scope4n()
 {
+   //PIPS generated variable
 // (0,2)
-   int x = 6;                                                           /*0005*/
+   int x_;
 // (0,3)
-   int x_;                                                              /*0007*/
+   int x = 6;                                                           /*0005*/
 // (0,4)
 // (1,2)
 lab1:   x_--;                                                                /*0009*/

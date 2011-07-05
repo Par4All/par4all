@@ -3,38 +3,46 @@ Parser output
 
 int block_scope2()
 {
-   int x = 6;                                                           /*0004*/
-lab1:   x--;                                                                 /*0007*/
+   int x = 6;                                                           /*0019*/
+lab1:   x--;                                                                 /*0022*/
    {
-      int x;                                                            /*0009*/
-      x++;                                                              /*0010*/
+      int x;                                                            /*0024*/
+      x++;                                                              /*0025*/
    }
    {
-      int x = -1;                                                       /*0014*/
-      goto lab1;                                                        /*0015*/
+      int x = -1;                                                       /*0029*/
+      if (x>0)                                                          /*0030*/
+         goto lab1;                                                     /*0030*/
+      else
    }
-   return x;                                                            /*0017*/
+   return x;                                                            /*0032*/
 }
 
 Controlizer output
 
 int block_scope2()
 {
+   //PIPS generated variable
 // (0,2)
-   int x = 6;                                                           /*0004*/
+   int x_;
 // (0,3)
+   int x = 6;                                                           /*0019*/
+// (0,4)
 //:   BEGIN UNSTRUCTURED
 // (1,2)
-lab1:   x--;                                                                 /*0007*/
+lab1:   x--;                                                                 /*0022*/
    {
 // (1,4)
-      int x;                                                            /*0009*/
+      int x;                                                            /*0024*/
 // (1,5)
-      x++;                                                              /*0010*/
+      x++;                                                              /*0025*/
    }
 // (1,6)
-   int x_ = -1;                                                         /*0014*/
-   goto lab1;
+   x_ = -1;
+// (2,1)
+   if (x_>0) goto lab1;                                                 /*0030*/
+// (3,1)
+   return x;                                                            /*0032*/
 //:   END UNSTRUCTURED
 }
 
@@ -42,21 +50,28 @@ Output after control restructuring
 
 int block_scope2()
 {
+   //PIPS generated variable
 // (0,2)
-   int x = 6;                                                           /*0004*/
+   int x_;
 // (0,3)
+   int x = 6;                                                           /*0019*/
+// (0,4)
 //:   BEGIN UNSTRUCTURED
 // (1,2)
-lab1:   x--;                                                                 /*0007*/
+lab1:   x--;                                                                 /*0022*/
    {
 // (1,4)
-      int x;                                                            /*0009*/
+      int x;                                                            /*0024*/
 // (1,5)
-      x++;                                                              /*0010*/
+      x++;                                                              /*0025*/
    }
 // (1,6)
-   int x_ = -1;                                                         /*0014*/
-   goto lab1;
+   x_ = -1;
+// (2,1)
+   if (x_>0) goto lab1;                                                 /*0030*/
+// (3,1)
+   return x;                                                            /*0032*/
 //:   END UNSTRUCTURED
 }
+j=5
 

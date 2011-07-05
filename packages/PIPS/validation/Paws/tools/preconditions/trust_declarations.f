@@ -1,5 +1,8 @@
       subroutine trusted_decl01
 
+C     Use advanced mode!
+C     It requires SEMANTICS_TRUST_ARRAY_DECLARATIONS property to be set.
+
       real a(100)
 
       read *, n
