@@ -1,6 +1,23 @@
 
 PROPER  EFFECTS 
 
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k, l;
+//             <    is read   >: i
+//             <    is written>: k
+
+   for(k = 0; k <= i-1; k += 1)
+//             <    is read   >: i
+//             <    is written>: x[i]
+      x[i] = 0;
+//             <    is read   >: j
+//             <    is written>: l
+   for(l = 0; l <= j-1; l += 1)
+//             <    is read   >: i j
+//             <    is written>: y[i]
+      y[i] = 0;
+}
 int main()
 {
    tf_t s;
@@ -15,6 +32,21 @@ int main()
 POINTS-TO
 
 //  {}
+void call10(int i, int x[10], int j, int y[10])
+{
+//  {}
+   int k, l;
+//  {}
+
+   for(k = 0; k <= i-1; k += 1)
+//  {}
+      x[i] = 0;
+//  {}
+   for(l = 0; l <= j-1; l += 1)
+//  {}
+      y[i] = 0;
+}
+//  {}
 int main()
 {
 //  {}
@@ -28,6 +60,23 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k, l;
+//             <    is read   >: i
+//             <    is written>: k
+
+   for(k = 0; k <= i-1; k += 1)
+//             <    is read   >: i
+//             <    is written>: x[i]
+      x[i] = 0;
+//             <    is read   >: j
+//             <    is written>: l
+   for(l = 0; l <= j-1; l += 1)
+//             <    is read   >: i j
+//             <    is written>: y[i]
+      y[i] = 0;
+}
 int main()
 {
    tf_t s;

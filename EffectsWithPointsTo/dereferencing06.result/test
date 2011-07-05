@@ -1,6 +1,21 @@
 
 PROPER  EFFECTS 
 
+void dereferencing06()
+{
+//             <    is written>: x
+   double x = 1.;
+//             <    is written>: p
+   double *p = &x;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p++ = 1;
+}
 int main()
 {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
@@ -11,6 +26,20 @@ int main()
 POINTS-TO
 
 //  {}
+void dereferencing06()
+{
+//  {}
+   double x = 1.;
+//  {}
+   double *p = &x;
+//  {(p,x,-Exact-)}
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   *p++ = 1;
+}
+//  {}
 int main()
 {
 //  {}
@@ -19,6 +48,21 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void dereferencing06()
+{
+//             <    is written>: x
+   double x = 1.;
+//             <    is written>: p
+   double *p = &x;
+//             <    is read   >: p x
+//             <    is written>: p
+   
+   /* This read has no effect unless p == 0 and the compiler does not optimize? */
+   *p++;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p++ = 1;
+}
 int main()
 {
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*

@@ -1,6 +1,14 @@
 
 PROPER  EFFECTS 
 
+void call07(int r, int m, int *x)
+{
+   int j;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: r x
+
+   x[4] = 10*r+4;
+}
 int main()
 {
 //             <    is written>: d1
@@ -20,6 +28,15 @@ int main()
 
 POINTS-TO
 
+//  {(x,_x_1[0],-Exact-)}
+void call07(int r, int m, int *x)
+{
+//  {(x,_x_1[0],-Exact-)}
+   int j;
+//  {(x,_x_1[0],-Exact-)}
+
+   x[4] = 10*r+4;
+}
 //  {}
 int main()
 {
@@ -40,6 +57,14 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call07(int r, int m, int *x)
+{
+   int j;
+//             <    is read   >: r x
+//             <    is written>: _x_1[4]
+
+   x[4] = 10*r+4;
+}
 int main()
 {
 //             <    is written>: d1

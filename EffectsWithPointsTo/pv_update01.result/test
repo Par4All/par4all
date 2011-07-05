@@ -35,13 +35,13 @@ int main()
    p = &a[0];
 //  {(p,a[0],-Exact-)}
    p++;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,a[*],-Exact-)}
    ++p;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,a[0],-Exact-)}
    p--;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,a[*],-Exact-)}
    --p;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,a[0],-Exact-)}
    return 0;
 }
 

@@ -50,18 +50,23 @@ int main()
    q = p;
 //  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[0],-Exact-)}
    do {
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
+//   *HEAP*_l_7[0],-MAY-)}
       *q = i;
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
+//   *HEAP*_l_7[0],-MAY-)}
       q++;
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
+//   *HEAP*_l_7[0],-MAY-)}
       i++;
    }
    while (i<5);
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
+//   *HEAP*_l_7[0],-MAY-)}
 
    free(p);
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
+//   *HEAP*_l_7[0],-MAY-)}
    return 0;
 }
 
@@ -81,7 +86,7 @@ int main()
    q = p;
 //             <    is read   >: i
    do {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *HEAP*_l_7[0] *HEAP*_l_7[*]
 //             <    is read   >: i q
       *q = i;
 //             <    is read   >: q
@@ -106,62 +111,40 @@ int main()
 		from <i-W-EXACT> to <i-R-EXACT>
 		from <i-R-EXACT> to <i-W-EXACT>
 	14 --> 12 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i-W-EXACT> to <i-R-EXACT>
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	13 --> 13 with conflicts
 		from <q-W-EXACT> to <q-W-EXACT>
 		from <q-W-EXACT> to <q-R-EXACT>
 		from <q-R-EXACT> to <q-W-EXACT>
 	13 --> 12 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <q-W-EXACT> to <q-R-EXACT>
-		from <q-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	12 --> 17 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 	12 --> 14 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
 		from <i-R-EXACT> to <i-W-EXACT>
 	12 --> 13 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
 		from <q-R-EXACT> to <q-W-EXACT>
 	12 --> 12 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-		from <q-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
+		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
+		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
+		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
 	15 --> 14 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
-	15 --> 12 with conflicts
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	08 --> 13 with conflicts
 		from <q-W-EXACT> to <q-W-EXACT>
 		from <q-W-EXACT> to <q-R-EXACT>
 	08 --> 12 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <q-W-EXACT> to <q-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	07 --> 17 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	07 --> 12 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	07 --> 08 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
 	04 --> 14 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
 	04 --> 12 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i-W-EXACT> to <i-R-EXACT>
 	04 --> 15 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>

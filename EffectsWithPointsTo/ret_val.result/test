@@ -1,6 +1,21 @@
 
 PROPER  EFFECTS 
 
+long long int get_result(int argc, char **argv)
+{
+//             <    is written>: result
+   long long int result = 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: result
+   result = atoll(argv[1]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: result stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("return value will be %lld\n", result);
+//             <    is read   >: result
+   return result;
+}
 int main(int argc, char **argv)
 {
 //             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
@@ -15,22 +30,48 @@ int main(int argc, char **argv)
 POINTS-TO
 
 //  {(argv,_argv_1[0],-Exact-)}
-int main(int argc, char **argv)
+long long int get_result(int argc, char **argv)
 {
 //  {(argv,_argv_1[0],-Exact-)}
-   long long int size = get_result(argc, argv);
+   long long int result = 0;
 //  {(argv,_argv_1[0],-Exact-)}
+   result = atoll(argv[1]);
+//  {(argv,_argv_1[0],-Exact-)}
+   printf("return value will be %lld\n", result);
+//  {(argv,_argv_1[0],-Exact-)}
+   return result;
+}
+//  {(argv,_argv_2[0],-Exact-)}
+int main(int argc, char **argv)
+{
+//  {(argv,_argv_2[0],-Exact-)}
+   long long int size = get_result(argc, argv);
+//  {(argv,_argv_2[0],-Exact-)}
    return size;
 }
 
 PROPER  EFFECTS WITH POINTS TO
 
+long long int get_result(int argc, char **argv)
+{
+//             <    is written>: result
+   long long int result = 0;
+//             <    is read   >: _argv_1[1] argv
+//             <    is written>: result
+   result = atoll(argv[1]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: result stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("return value will be %lld\n", result);
+//             <    is read   >: result
+   return result;
+}
 int main(int argc, char **argv)
 {
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: _argv_1[1] argc argv stdout 
-//                               __IO_EFFECTS:LUNS[1]
+//             <    is read   >: argc argv stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: size __IO_EFFECTS:LUNS[1]
    long long int size = get_result(argc, argv);
 //             <    is read   >: size

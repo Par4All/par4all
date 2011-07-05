@@ -39,8 +39,6 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[b][*],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    tab_s[0] = s1;
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*NOWHERE*_b0,
@@ -49,8 +47,6 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[b][*],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    tab_s[1] = s1;
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*NOWHERE*_b0,
@@ -59,8 +55,6 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[b][*],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    tab_s[1] = s2;
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*NOWHERE*_b0,
@@ -69,8 +63,6 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[b][*],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }
