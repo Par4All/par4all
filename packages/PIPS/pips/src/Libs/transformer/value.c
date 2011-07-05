@@ -680,7 +680,7 @@ bool entity_has_values_p(entity e)
 {
   /* is e a variable whose value(s) (already) are analyzed?
    */
-  pips_assert("value hash table is defined", 
+  pips_assert("value hash table is defined",
 	      !hash_table_undefined_p(hash_entity_to_new_value));
 
   return hash_defined_p(hash_entity_to_new_value, (char *) e);
