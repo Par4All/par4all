@@ -1,6 +1,18 @@
 
 PROPER  EFFECTS 
 
+void call06(int r, int m, int *x)
+{
+   int j;
+//             <    is read   >: m
+//             <    is written>: j
+
+   for(j = 0; j <= m-1; j += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: j m r x
+      x[j] = 10*r+j;
+   return;
+}
 int main()
 {
 //             <    is written>: d1
@@ -21,6 +33,19 @@ int main()
 
 POINTS-TO
 
+//  {(x,_x_1[0],-Exact-)}
+void call06(int r, int m, int *x)
+{
+//  {(x,_x_1[0],-Exact-)}
+   int j;
+//  {(x,_x_1[0],-Exact-)}
+
+   for(j = 0; j <= m-1; j += 1)
+//  {(x,_x_1[0],-Exact-)}
+      x[j] = 10*r+j;
+//  {(x,_x_1[0],-Exact-)}
+   return;
+}
 //  {}
 int main()
 {
@@ -43,6 +68,18 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call06(int r, int m, int *x)
+{
+   int j;
+//             <    is read   >: m
+//             <    is written>: j
+
+   for(j = 0; j <= m-1; j += 1)
+//             <    is read   >: j m r x
+//             <    is written>: _x_1[j]
+      x[j] = 10*r+j;
+   return;
+}
 int main()
 {
 //             <    is written>: d1

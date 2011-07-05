@@ -158,3 +158,45 @@ void whilewhile(void)
             a = 0;
          }
 }
+
+Preconditions for "whilewhile" after refinement
+
+
+//  P() {}
+
+void whilewhile(void)
+{
+
+//  P() {}
+
+   int a = 0, b = 1;
+
+//  P(a,b) {a==0, b==1}
+
+   while (1)
+
+//  P(a,b) {a==0, b==1}
+
+      while (1)
+
+//  P(a,b) {a==0, b==1}
+
+         if (1) {
+
+//  P(a,b) {a==0, b==1}
+
+            if (b<1)
+
+//  P() {0==-1}
+
+               error();
+
+//  P(a,b) {a==0, b==1}
+
+            b = a+1;
+
+//  P(a,b) {a==0, b==1}
+
+            a = 0;
+         }
+}

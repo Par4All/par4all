@@ -1,6 +1,15 @@
 
 PROPER  EFFECTS 
 
+void call15(int *pi, tf_t *q)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pi
+   *pi = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   q->one = 1;
+}
 int main()
 {
    int i;
@@ -12,6 +21,14 @@ int main()
 
 POINTS-TO
 
+//  {(pi,_pi_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+void call15(int *pi, tf_t *q)
+{
+//  {(pi,_pi_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+   *pi = 1;
+//  {(pi,_pi_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+   q->one = 1;
+}
 //  {}
 int main()
 {
@@ -26,6 +43,15 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call15(int *pi, tf_t *q)
+{
+//             <    is read   >: pi
+//             <    is written>: _pi_1[0]
+   *pi = 1;
+//             <    is read   >: q
+//             <    is written>: _q_2[0].one
+   q->one = 1;
+}
 int main()
 {
    int i;

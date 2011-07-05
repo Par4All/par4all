@@ -1,6 +1,12 @@
 
 PROPER  EFFECTS 
 
+int * foo()
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   return (int *) malloc(sizeof(int));
+}
 int main()
 {
    int *a;
@@ -12,6 +18,12 @@ int main()
 
 POINTS-TO
 
+//  {}
+int * foo()
+{
+//  {}
+   return (int *) malloc(sizeof(int));
+}
 //  {}
 int main()
 {
@@ -25,6 +37,12 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+int * foo()
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   return (int *) malloc(sizeof(int));
+}
 int main()
 {
    int *a;

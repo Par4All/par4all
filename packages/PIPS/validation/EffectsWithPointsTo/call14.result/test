@@ -1,6 +1,17 @@
 
 PROPER  EFFECTS 
 
+void call14(int n, int m, int *x)
+{
+   int i, j;
+//             <    is read   >: m n
+//             <    is written>: i
+
+   for(i = 0; i <= n*m-1; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i m n x
+      x[i] = i;
+}
 int main()
 {
 //             <    is written>: d1
@@ -36,6 +47,17 @@ int main()
 
 POINTS-TO
 
+//  {(x,_x_1[0],-Exact-)}
+void call14(int n, int m, int *x)
+{
+//  {(x,_x_1[0],-Exact-)}
+   int i, j;
+//  {(x,_x_1[0],-Exact-)}
+
+   for(i = 0; i <= n*m-1; i += 1)
+//  {(x,_x_1[0],-Exact-)}
+      x[i] = i;
+}
 //  {}
 int main()
 {
@@ -64,6 +86,17 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void call14(int n, int m, int *x)
+{
+   int i, j;
+//             <    is read   >: m n
+//             <    is written>: i
+
+   for(i = 0; i <= n*m-1; i += 1)
+//             <    is read   >: i m n x
+//             <    is written>: _x_1[i]
+      x[i] = i;
+}
 int main()
 {
 //             <    is written>: d1

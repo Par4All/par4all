@@ -147,20 +147,20 @@ int main()
    /* Initialisation du tableau b */
    for(i = 0; i <= 19; i += 1)
 //             <    is read   >: b i
-//             <    is written>: *HEAP*_l_10[0+i]
+//             <    is written>: *HEAP*_l_10[i]
       b[i] = i;
 //             <    is written>: i
    
    /* Initialisation du tableau c */
    for(i = 0; i <= 19; i += 1)
 //             <    is read   >: c i
-//             <    is written>: *HEAP*_l_11[0+i]
+//             <    is written>: *HEAP*_l_11[i]
       c[i] = 1;
 //             <    is written>: i
    /* Initialisation du tableau a */
    for(i = 0; i <= 19; i += 1)
-//             <    is read   >: *HEAP*_l_10[0+i] a b i
-//             <    is written>: *HEAP*_l_11[0+i]
+//             <    is read   >: *HEAP*_l_10[i] a b i
+//             <    is written>: *HEAP*_l_11[i]
       a[i] = b[i];
    return 0;
 }
@@ -168,23 +168,23 @@ int main()
  *********************** Use-Def Chains *********************
 
 	28 --> 28 with conflicts
-		from <*HEAP*_l_11[0+i]-W-EXACT> to <*HEAP*_l_11[0+i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
 	25 --> 28 with conflicts
-		from <*HEAP*_l_11[0+i]-W-EXACT> to <*HEAP*_l_11[0+i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
 	25 --> 27 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	25 --> 25 with conflicts
-		from <*HEAP*_l_11[0+i]-W-EXACT> to <*HEAP*_l_11[0+i]-W-EXACT>
+		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
 	24 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 	21 --> 28 with conflicts
-		from <*HEAP*_l_10[0+i]-W-EXACT> to <*HEAP*_l_10[0+i]-R-EXACT>
+		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-R-EXACT>
 	21 --> 27 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	21 --> 24 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	21 --> 21 with conflicts
-		from <*HEAP*_l_10[0+i]-W-EXACT> to <*HEAP*_l_10[0+i]-W-EXACT>
+		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-W-EXACT>
 	20 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 	20 --> 24 with conflicts

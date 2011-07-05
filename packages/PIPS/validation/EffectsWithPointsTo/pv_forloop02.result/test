@@ -73,8 +73,8 @@ int main()
    while (t<2.0) {
 //             <    is written>: i
       for(i = 0; i <= 9; i += 1)
-//             <    is read   >: *HEAP*_l_9[0+i] a i t
-//             <    is written>: *HEAP*_l_9[0+i]
+//             <    is read   >: *HEAP*_l_9[i] a i t
+//             <    is written>: *HEAP*_l_9[i]
          a[i] = a[i]+t*0, 5;
       t+0, 01;
    }
@@ -84,9 +84,9 @@ int main()
  *********************** Use-Def Chains *********************
 
 	-1 --> -1 with conflicts
-		from <*HEAP*_l_9[0+i]-W-EXACT> to <*HEAP*_l_9[0+i]-W-EXACT>
-		from <*HEAP*_l_9[0+i]-W-EXACT> to <*HEAP*_l_9[0+i]-R-EXACT>
-		from <*HEAP*_l_9[0+i]-R-EXACT> to <*HEAP*_l_9[0+i]-W-EXACT>
+		from <*HEAP*_l_9[i]-W-EXACT> to <*HEAP*_l_9[i]-W-EXACT>
+		from <*HEAP*_l_9[i]-W-EXACT> to <*HEAP*_l_9[i]-R-EXACT>
+		from <*HEAP*_l_9[i]-R-EXACT> to <*HEAP*_l_9[i]-W-EXACT>
 	-1 --> 12 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	12 --> 12 with conflicts

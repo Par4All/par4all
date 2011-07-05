@@ -80,8 +80,8 @@ int main()
    i = 0;
 //             <    is read   >: i
    while (i<10) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: b[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: a[0] *ANY_MODULE*:*ANYWHERE*
       *p++ = 2**q++;
 //             <    is read   >: i
 //             <    is written>: i
@@ -105,8 +105,14 @@ int main()
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <i-W-EXACT>
 	16 --> 16 with conflicts
+		from <a[0]-W-MAY> to <a[0]-W-MAY>
+		from <a[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <a[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <b[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <b[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <a[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	14 --> 17 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>

@@ -1,6 +1,16 @@
 
 PROPER  EFFECTS 
 
+void decl04(mystruct s)
+{
+//             <    is read   >: s.champ1 s.champ2
+//             <    is written>: s_loc.champ1 s_loc.champ2
+   mystruct s_loc = s;
+//             <    is read   >: s_loc.champ1
+//             <    is written>: s_loc.champ1
+
+   s_loc.champ1 = s_loc.champ1-1;
+}
 int main()
 {
    mystruct s;
@@ -16,6 +26,15 @@ int main()
 
 POINTS-TO
 
+//  {}
+void decl04(mystruct s)
+{
+//  {}
+   mystruct s_loc = s;
+//  {}
+
+   s_loc.champ1 = s_loc.champ1-1;
+}
 //  {}
 int main()
 {
@@ -34,6 +53,16 @@ int main()
 
 PROPER  EFFECTS WITH POINTS TO
 
+void decl04(mystruct s)
+{
+//             <    is read   >: s.champ1 s.champ2
+//             <    is written>: s_loc.champ1 s_loc.champ2
+   mystruct s_loc = s;
+//             <    is read   >: s_loc.champ1
+//             <    is written>: s_loc.champ1
+
+   s_loc.champ1 = s_loc.champ1-1;
+}
 int main()
 {
    mystruct s;
