@@ -1488,7 +1488,8 @@ hash_table used_labels;
 #endif
 
 /* Move all the declarations found in a list of control to a given
-   statement
+   statement. Maintain the initializations where they belong. See
+   Control/block_scope5n.
 
    @ctls is a list of control nodes
 
@@ -1579,7 +1580,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
   new_declarations = gen_nreverse(new_declarations);
   statement_declarations(s_above) = gen_nconc(declarations_above,
 					      new_declarations);
-  FOREACH(ENTITY, dv, new_variables)
+  FOREACH(ENTITY, dv, new_variables) {
     // This does not seem to work because the above statement is being
     // controlized. Hence, the new declaration statements are simply
     // ignored... It might be better to rely on the block declaration
@@ -1587,8 +1588,14 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
     // of controlize_statement(). The other option is to generate C99
     // code with declarations anywhere in the execution flow
     //add_declaration_statement(s_above, dv);
+    ;
+  }
 
-  if(get_bool_property("C89_CODE_GENERATION")) {
+  // Even with C99 code, the initializations should not be moved,
+  // even when the initial value is numerically known. See
+  // Control/block_scope5n. Unless the variable is static. See
+  // Control/block_scope13.c
+  if(true || get_bool_property("C89_CODE_GENERATION")) {
     /* Replace initializations in declarations by assignment
        statements, when possible; see split_initializations(); do not
        worry about variable renaming yet */
@@ -1609,14 +1616,20 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 	list dvl = statement_declarations(s);
 	//list il = NIL; // initialization list
 	FOREACH(ENTITY, dv, dvl) {
-	  value iv = entity_initial(dv);
-	  if(!value_unknown_p(iv)) {
-	    expression ie = variable_initial_expression(dv);
-	    expression lhs= entity_to_expression(dv);
-	    statement s = make_assign_statement(lhs, ie);
-	    control ic = make_control(s, NIL, NIL);
-	    nctls = gen_nconc(nctls, CONS(CONTROL, ic, NIL));
-	    icl = gen_nconc(icl, CONS(CONTROL, ic, NIL));
+	  if(!entity_static_variable_p(dv)) {
+	    value iv = entity_initial(dv);
+	    if(!value_unknown_p(iv)) {
+	      expression ie = variable_initial_expression(dv);
+	      expression lhs= entity_to_expression(dv);
+	      statement s = make_assign_statement(lhs, ie);
+	      control ic = make_control(s, NIL, NIL);
+	      nctls = gen_nconc(nctls, CONS(CONTROL, ic, NIL));
+	      icl = gen_nconc(icl, CONS(CONTROL, ic, NIL));
+	      entity n = (entity) hash_get(old_to_new_variables, (void *) dv);
+	      n = HASH_UNDEFINED_VALUE==n? dv : n;
+	      free_value(entity_initial(n));
+	      entity_initial(n) = make_value_unknown();
+	    }
 	  }
 	}
 	/* chain icl to c, assume ctls is a list over a control sequence... */
@@ -1631,15 +1644,15 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 	  link_2_control_nodes(lic, succ);
 	  /* They should be added into ctls too... because the
 	     initialization expressions may require some renaming... */
-	  statement_declarations(s) = NIL;
 	}
+	statement_declarations(s) = NIL;
       }
     }
   }
   else
     nctls = gen_copy_seq(ctls);
 
-  /* Replace all the references on old variables to references to the new
+  /* Replace all references to old variables to references to the new
      ones in all the corresponding control nodes by in the code */
   void * ccp = NULL; // current couple pointer
   entity old, new;
@@ -1647,7 +1660,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
   //HASH_MAP(old, new, {
       FOREACH(CONTROL, c, nctls) {
 	statement s = control_statement(c);
-	if(!get_bool_property("C89_CODE_GENERATION")) { // C99 assumed
+	if(true || !get_bool_property("C89_CODE_GENERATION")) { // C99 assumed
 	  if(declaration_statement_p(s)) {
 	    list dl = statement_declarations(s);
 	    list cl;
@@ -1930,7 +1943,7 @@ static bool controlize_sequence(control c_res,
     control c = make_conditional_control(s);
     //bool control_preexisting_p = false;
 
-    // FI: I'm not sure this is enough to dectet that
+    // FI: I'm not sure this is enough to detect that
     // make_conditional_control() has not made a new control but
     // retrieved a control by its label...
     //if(!ENDP(control_successors(c)) || !ENDP(control_predecessors(c)) ) {

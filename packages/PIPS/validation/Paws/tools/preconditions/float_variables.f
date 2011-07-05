@@ -1,6 +1,7 @@
       SUBROUTINE VRFVAL ()
  
-C     Bug found by Corinne on 4 October 2002 (not reproduced)
+C     Use advanced mode!
+C     It requires SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES property to be set.
 
       REAL*8 X,Y,I      
 

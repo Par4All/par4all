@@ -1,0 +1,18 @@
+# initial
+int main(void)
+{
+   int i = 42;
+   fprintf(stdout, "%d\n", i);
+   return 0;
+}
+# partial eval
+int main(void)
+{
+   int i = 42;
+   fprintf(stdout, "%d\n", 42);
+   return 0;
+}
+#
+# compile run compare crc01
+#
+

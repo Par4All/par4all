@@ -15,6 +15,14 @@ void ts_singlestate(void)
 
    z = x = 0;
 
+//  T() {x==0, z==0}
+
+   if (!(x>=0&&z>=0&&z<=10&&z<=x))
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(x,z) {x#init<=x, x#init+z<=x+z#init, z<=x, 0<=z, z<=10}
 
    while (rand_b())
@@ -84,6 +92,14 @@ void ts_restructured(void)
 //  T(x,z) {x==0, z==0}
 
    z = x = 0;
+
+//  T() {x==0, z==0}
+
+   if (!(x>=0&&z>=0&&z<=10&&z<=x))
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T(x,z) {9x#init+z#init<=9x+z, x#init+z<=x+z#init, z<=x, 0<=z,
 //    z<=9}
@@ -185,6 +201,14 @@ void ts_singlestate(void)
 
 //  P(x,z) {x==0, z==0}
 
+   if (!(x>=0&&z>=0&&z<=10&&z<=x))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(x,z) {x==0, z==0}
+
    while (rand_b())
 
 //  P(x,z) {z<=x, 0<=z, z<=10}
@@ -251,6 +275,14 @@ void ts_restructured(void)
 //  P(x,z) {}
 
    z = x = 0;
+
+//  P(x,z) {x==0, z==0}
+
+   if (!(x>=0&&z>=0&&z<=10&&z<=x))
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(x,z) {x==0, z==0}
 

@@ -2,6 +2,13 @@
 
 //typedef enum { false, true } bool;
 
+/**************************************************************************
+*
+* Use advanced mode!
+* It requires SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES property to be set.
+*
+**************************************************************************/
+
 #include <stdbool.h>
 
 int main(void)

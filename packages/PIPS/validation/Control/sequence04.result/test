@@ -21,11 +21,13 @@ Printed file
 
 void sequence04()
 {
+   //PIPS generated variable
+   int i_;
    int i = 4;
    if (i%2==0) goto l100;
 
    i = i+10;
-   int i_ = 0;
+   i_ = 0;
 
 l100:   ;
    i_ = i_+20;

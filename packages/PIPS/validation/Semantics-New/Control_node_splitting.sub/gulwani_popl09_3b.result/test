@@ -23,6 +23,14 @@ void ts_singlestate(void)
 
    s = 1;
 
+//  T() {c==0, s==1, x==0, 0<=n}
+
+   if (!(c<=n))
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(c,s,x) {c==x, c#init==x#init, 0<=c, c#init<=c, c<=n, 1<=s, s<=2,
 //    s#init<=s}
 
@@ -127,6 +135,14 @@ void ts_restructured(void)
 //  T(s) {c==0, s==1, x==0, 0<=n}
 
    s = 1;
+
+//  T() {c==0, s==1, x==0, 0<=n}
+
+   if (!(c<=n))
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T(c,s,x) {c==n, c==x, c#init==0, s==2, s#init==1, x#init==0, 0<=c}
 
@@ -336,6 +352,14 @@ void ts_singlestate(void)
 
 //  P(c,n,s,x) {c==0, s==1, x==0, 0<=n}
 
+   if (!(c<=n))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(c,n,s,x) {c==0, s==1, x==0, 0<=n}
+
    while (rand_b())
 
 //  P(c,n,s,x) {c==x, 0<=c, c<=n, 1<=s, s<=2}
@@ -436,6 +460,14 @@ void ts_restructured(void)
 //  P(c,n,s,x) {c==0, x==0, 0<=n}
 
    s = 1;
+
+//  P(c,n,s,x) {c==0, s==1, x==0, 0<=n}
+
+   if (!(c<=n))
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(c,n,s,x) {c==0, s==1, x==0, 0<=n}
 

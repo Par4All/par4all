@@ -31,6 +31,14 @@ void ts_singlestate(void)
 
    ok = 1;
 
+//  T() {b0==0, b1==0, ok==1, x==0, y==0}
+
+   if (!ok)
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(b0,b1,ok,x,y) {ok==1, ok#init==1, 0<=b0, b0<=1,
 //    b0#init+x#init<=b0+x, b0+x#init<=b0#init+x, 2b1<=b0+x,
 //    3b1+y<=4b0+2x, 2b1+y<=2b0+x+1, 2b0+y<=3b1+2x, 2b0+y<=2b1+x+1,
@@ -232,6 +240,14 @@ void ts_restructured(void)
 //  T(ok) {b0==0, b1==0, ok==1, x==0, y==0}
 
    ok = 1;
+
+//  T() {b0==0, b1==0, ok==1, x==0, y==0}
+
+   if (!ok)
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T(b0,b1,ok,x,y) {b0==0, b0#init==0, b1==0, b1#init==0, ok==1,
 //    ok#init==1, x==y, x#init==y#init, 0<=x, y#init<=x}
@@ -651,6 +667,14 @@ void ts_singlestate(void)
 
 //  P(b0,b1,ok,x,y) {b0==0, b1==0, ok==1, x==0, y==0}
 
+   if (!ok)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(b0,b1,ok,x,y) {b0==0, b1==0, ok==1, x==0, y==0}
+
    while (rand_b())
 
 //  P(b0,b1,ok,x,y) {ok==1, 0<=b0, b0<=1, 2b1<=b0+x, 4b1+2y<=7b0+3x,
@@ -907,6 +931,14 @@ void ts_restructured(void)
 //  P(b0,b1,ok,x,y) {b0==0, b1==0, x==0, y==0}
 
    ok = 1;
+
+//  P(b0,b1,ok,x,y) {b0==0, b1==0, ok==1, x==0, y==0}
+
+   if (!ok)
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(b0,b1,ok,x,y) {b0==0, b1==0, ok==1, x==0, y==0}
 

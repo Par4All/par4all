@@ -23,7 +23,6 @@
       ENDIF
       R = A*R                                                           0037
       A = A+9                                                           0038
-      GOTO 99996
 99998 CONTINUE
       B = 5                                                             0029
       A = 17                                                            0030
@@ -118,7 +117,7 @@
          ELSEIF (FSM9_STATE.EQ.9) THEN
             R = A*R                                                     0037
             A = A+9                                                     0038
-            FSM9_STATE = 8
+            FSM9_STATE = 0
          ELSEIF (FSM9_STATE.EQ.10) THEN
 
             FSM9_STATE = 0                                              0041
