@@ -28,7 +28,8 @@ SCRIPTS = \
 	ubs_checking_instrument.pl \
 	pips_validation_summary.pl \
 	pips_validation_dig.pl \
-	pips_validation_diff_out.sh
+	pips_validation_diff_out.sh \
+	pips_validation_exe.sh
 
 INSTALL_UTL =	$(SCRIPTS)
 

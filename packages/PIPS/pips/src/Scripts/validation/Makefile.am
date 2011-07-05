@@ -28,5 +28,6 @@ dist_bin_SCRIPTS = \
 	pips_validation_diff_out.sh \
 	pips_validation_dig.pl \
 	array_resizing_instrument.pl \
-	ubs_checking_instrument.pl
+	ubs_checking_instrument.pl \
+	pips_validation_exe.sh
 

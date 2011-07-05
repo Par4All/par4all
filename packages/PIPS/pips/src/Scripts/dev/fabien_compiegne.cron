@@ -5,11 +5,11 @@
 # check on commit runs on every minute
 * * * * * /home/fabien/CHECK/pips_check_compile --source /home/fabien/CHECK/pipsrc.sh --keepfail --validation-option DO_SLOW= pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # force check once a day
-7 0 * * * /home/fabien/CHECK/pips_check_compile --wait --force --report --source /home/fabien/CHECK/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
+7 0 * * * /home/fabien/CHECK/pips_check_compile --wait --force --report --source /home/fabien/CHECK/pipsrc.sh --validation-option PIPS_VALIDATION_EXE=1 pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # test autoconf version
 @hourly /home/fabien/AUTOC/pips_check_compile --autoconf --keepfail --source=/home/fabien/AUTOC/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/AUTOC/prod /home/fabien/AUTOC/validation
 # force autoconf once a day
-7 1 * * * /home/fabien/AUTOC/pips_check_compile --wait --force --report --autoconf --keepfail --source=/home/fabien/AUTOC/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/AUTOC/prod /home/fabien/AUTOC/validation
+7 1 * * * /home/fabien/AUTOC/pips_check_compile --wait --force --report --autoconf --keepfail --source=/home/fabien/AUTOC/pipsrc.sh --validation-option PIPS_VALIDATION_EXE=1 pips-validation@cri.ensmp.fr /home/fabien/AUTOC/prod /home/fabien/AUTOC/validation
 # 32 bit cross compilation
 7 2 * * * /home/fabien/CROSS/pips_check_compile --force --report --source=/home/fabien/CROSS/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/CROSS/prod
 # private validation
