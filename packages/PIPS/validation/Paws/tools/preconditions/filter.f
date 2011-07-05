@@ -1,6 +1,7 @@
       program filter
 
-C     Goal: check the property SEMANTICS_FILTERED_PRECONDITIONS
+C     Use advanced mode!
+C     It requires SEMANTICS_FILTERED_PRECONDITIONS property to be set.
 
       i = 1
 

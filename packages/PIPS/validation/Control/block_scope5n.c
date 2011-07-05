@@ -7,22 +7,42 @@
  * issue. It looks like a prettyprinter issue because the "x--;" is
  * moved up because of the "goto lab1;". However, the controlizer is
  * supposed to move the declaration upwards...
+ *
+ * Output:
+ *
+ * internal x = -1 (or 4195391...)
+ * external x = 7
+ * internal x = 6
+ * external x = 3
+ *
+ * This shows that the internal x is not initialized when the
+ * initialization is skipped.
  */
+
+#include <stdio.h>
+
+//#define x1 x
+//#define x2 x
 
 void block_scope5n()
 {
-  int i;
-  {
-  int x = 6;
+  int x1 = 6;
   goto lab1;
  lab2:
-  x = 2;
+  x1 = 2;
   {
-    int x = 7;
+    int x2 = 7;
   lab1:
-    x--;
+    x2--;
+    printf("internal x = %d\n", x2);
   }
-  x++;
-  goto lab2;
-  }
+  x1++;
+  printf("external x = %d\n", x1);
+  if(x1>3) goto lab2;
+}
+
+main()
+{
+  block_scope5n();
+  return 0;
 }

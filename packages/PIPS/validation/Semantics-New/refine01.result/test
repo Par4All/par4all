@@ -1,0 +1,185 @@
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+
+   if (n<0)
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+
+   while (i<=n)
+
+//  P(i,j,n) {0<=i, i<=n}
+
+      i++, j += i;
+
+//  P(i,j,n) {i==n+1, 1<=i}
+
+
+   return 0;
+}
+
+Source code with preconditions after one transformer refinement
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+
+   if (n<0)
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+
+   while (i<=n)
+
+//  P(i,j,n) {0<=i, i<=j, 2i<=j+1, 3i<=j+3, i<=n}
+
+      i++, j += i;
+
+//  P(i,j,n) {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6}
+
+
+   return 0;
+}
+
+Source code with preconditions after two transformer refinements
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+
+   if (n<0)
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+
+   while (i<=n)
+
+//  P(i,j,n) {0<=i, i<=j, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10, i<=n}
+
+      i++, j += i;
+
+//  P(i,j,n) {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15}
+
+
+   return 0;
+}
+
+Source code with preconditions after three transformer refinements
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+
+   if (n<0)
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+
+   while (i<=n)
+
+//  P(i,j,n) {0<=i, i<=j, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, i<=n}
+
+      i++, j += i;
+
+//  P(i,j,n) {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, 8i<=j+28}
+
+
+   return 0;
+}
+
+Source code with preconditions after four transformer refinements
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 0, j = 0, n;
+
+//  P(i,j,n) {i==0, j==0}
+
+
+   if (n<0)
+
+//  P(i,j,n) {i==0, j==0, n+1<=0}
+
+      exit(1);
+
+//  P(i,j,n) {i==0, j==0, 0<=n}
+
+
+   while (i<=n)
+
+//  P(i,j,n) {0<=i, i<=j, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, 8i<=j+28, 9i<=j+36, i<=n}
+
+      i++, j += i;
+
+//  P(i,j,n) {i==n+1, 1<=i, 2i<=j+1, 3i<=j+3, 4i<=j+6, 5i<=j+10,
+//    6i<=j+15, 7i<=j+21, 8i<=j+28, 9i<=j+36, 10i<=j+45}
+
+
+   return 0;
+}

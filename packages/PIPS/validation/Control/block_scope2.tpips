@@ -49,7 +49,7 @@ display PRINTED_FILE[block_scope2]
 
 apply UNSPLIT
 
-shell (cd block_scope2.database/Src; gcc -c block_scope2.c)
+shell (cd block_scope2.database/Src; gcc block_scope2.c; ./a.out)
 
 close
 

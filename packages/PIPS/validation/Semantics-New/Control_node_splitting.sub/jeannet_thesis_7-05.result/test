@@ -27,6 +27,14 @@ void ts_singlestate(void)
 
       deadlock();
 
+//  T() {0<=b, b<=1, x+1<=0}
+
+   if (b==0&&x>=0)
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(x) {0<=b, b<=1}
 
    while (rand_b())
@@ -103,6 +111,14 @@ void ts_restructured(void)
 //  T() {0==-1}
 
       deadlock();
+
+//  T() {0<=b, b<=1, x+1<=0}
+
+   if (b==0&&x>=0)
+
+//  T() {0==-1}
+
+      checking_error();
 
 //  T() {0<=b, b<=1, x+1<=0}
 
@@ -189,6 +205,14 @@ void ts_singlestate(void)
 
 //  P(b,x) {0<=b, b<=1, x+1<=0}
 
+   if (b==0&&x>=0)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(b,x) {0<=b, b<=1, x+1<=0}
+
    while (rand_b())
 
 //  P(b,x) {0<=b, b<=1}
@@ -263,6 +287,14 @@ void ts_restructured(void)
 //  P(b,x) {0<=b, b<=1, 0<=x}
 
       deadlock();
+
+//  P(b,x) {0<=b, b<=1, x+1<=0}
+
+   if (b==0&&x>=0)
+
+//  P() {0==-1}
+
+      checking_error();
 
 //  P(b,x) {0<=b, b<=1, x+1<=0}
 

@@ -44,9 +44,18 @@ void ts_singlestate(void)
 
    c1 = c2 = 0;
 
+//  T() {c1==0, c2==0, x==x0, z==z0, 0<=n, x<=n, x+z<=2n, z<=n, 0<=x,
+//    0<=z}
+
+   if (!(c1+c2<=n-x0+n-z0))
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T(c1,c2,x,z) {c1+x#init==c1#init+x, c1+x0==x,
-//    c2+z#init==c2#init+z, c2+z0==z, c1#init<=c1, x<=n, x+z<=2n,
-//    z0<=n, x0<=x, 0<=x0, z#init<=z, z0<=z, 0<=z0}
+//    c2+z#init==c2#init+z, c2+z0==z, 0<=c1, c1#init<=c1, c1<=x,
+//    0<=c2, z<=c2+n, c2<=z, x<=n, x+z<=2n, z#init<=z}
 
    while (rand_b())
 
@@ -150,6 +159,15 @@ void ts_restructured(void)
 
    c1 = c2 = 0;
 
+//  T() {c1==0, c2==0, x==x0, z==z0, 0<=n, x<=n, x+z<=2n, z<=n, 0<=x,
+//    0<=z}
+
+   if (!(c1+c2<=n-x0+n-z0))
+
+//  T() {0==-1}
+
+      checking_error();
+
 //  T() {c1==0, c2==0, x==x0, z==z0, x<=n, z<=n, 0<=x, 0<=z}
 
    if (x<n) {
@@ -162,8 +180,8 @@ void ts_restructured(void)
 
    if (z>x) goto L1;
 
-//  T() {c1==0, c2==0, x==x0, z==z0, 0<=n, x+1<=n, z<=n, 0<=x, z<=x,
-//    0<=z}
+//  T() {c1==0, c2==0, x==x0, z==z0, 0<=n, x+1<=n, x+z<=2n, z<=n,
+//    0<=x, z<=x, 0<=z}
 
 L2:   ;
 
@@ -197,8 +215,8 @@ L2:   ;
          checking_error();
    }
 
-//  T() {c1==0, c2+z0==x, x==x0, x==z, 0<=n, x+1<=n, z0<=n, 0<=x,
-//    z0<=x, 0<=z0}
+//  T() {c1==0, c2+z0==x, x==x0, x==z, 0<=n, x+1<=n, x+z0<=2n, z0<=n,
+//    0<=x, z0<=x, 0<=z0}
 
    if (!(x<n&&z==x))
 
@@ -207,17 +225,17 @@ L2:   ;
       deadlock();
 
 //  T(z) {c1==0, c2+z0==x, x==x0, x==z-1, x==z#init, 0<=n, x+1<=n,
-//    z0<=n, 0<=x, z0<=x, 0<=z0}
+//    x+z0<=2n, z0<=n, 0<=x, z0<=x, 0<=z0}
 
    z++;
 
 //  T(c2) {c1==0, c2==c2#init+1, c2+z0==x+1, x==x0, x==z-1, 0<=n,
-//    x+1<=n, z0<=n, 0<=x, z0<=x, 0<=z0}
+//    x+1<=n, x+z0<=2n, z0<=n, 0<=x, z0<=x, 0<=z0}
 
    c2++;
 
-//  T() {c1==0, c2+z0==x+1, x==x0, x==z-1, 0<=n, x+1<=n, z0<=n, 0<=x,
-//    z0<=x, 0<=z0}
+//  T() {c1==0, c2+z0==x+1, x==x0, x==z-1, 0<=n, x+1<=n, x+z0<=2n,
+//    z0<=n, 0<=x, z0<=x, 0<=z0}
 
    if (!(c1+c2<=n-x0+n-z0))
 
@@ -432,6 +450,15 @@ void ts_singlestate(void)
 //  P(c1,c2,n,x,x0,z,z0) {c1==0, c2==0, x==x0, z==z0, 0<=n, x<=n,
 //    z<=n, 0<=x, 0<=z}
 
+   if (!(c1+c2<=n-x0+n-z0))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(c1,c2,n,x,x0,z,z0) {c1==0, c2==0, x==x0, z==z0, 0<=n, x<=n,
+//    x+z<=2n, z<=n, 0<=x, 0<=z}
+
    while (rand_b())
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 0<=c1, c1+x0<=n, c1<=x,
@@ -551,6 +578,15 @@ void ts_restructured(void)
 //  P(c1,c2,n,x,x0,z,z0) {c1==0, c2==0, x==x0, z==z0, 0<=n, x<=n,
 //    z<=n, 0<=x, 0<=z}
 
+   if (!(c1+c2<=n-x0+n-z0))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(c1,c2,n,x,x0,z,z0) {c1==0, c2==0, x==x0, z==z0, 0<=n, x<=n,
+//    x+z<=2n, z<=n, 0<=x, 0<=z}
+
    if (x<n) {
    }
    else {
@@ -558,17 +594,17 @@ void ts_restructured(void)
    }
 
 //  P(c1,c2,n,x,x0,z,z0) {c1==0, c2==0, x==x0, z==z0, 0<=n, x+1<=n,
-//    z<=n, 0<=x, 0<=z}
+//    x+z<=2n, z<=n, 0<=x, 0<=z}
 
    if (z>x) goto L1;
 
 //  P(c1,c2,n,x,x0,z,z0) {c1==0, c2==0, x==x0, z==z0, 0<=n, x+1<=n,
-//    z<=n, 0<=x, z<=x, 0<=z}
+//    x+z<=2n, z<=n, 0<=x, z<=x, 0<=z}
 
 L2:   ;
 
 //  P(c1,c2,n,x,x0,z,z0) {c1==0, c2==0, x==x0, z==z0, 0<=n, x+1<=n,
-//    z<=n, 0<=x, z<=x, 0<=z}
+//    x+z<=2n, z<=n, 0<=x, z<=x, 0<=z}
 
    while (rand_b()) {
 
@@ -618,12 +654,12 @@ L2:   ;
    z++;
 
 //  P(c1,c2,n,x,x0,z,z0) {c1==0, c2+z0==x, x==x0, x==z-1, 0<=n,
-//    x+1<=n, z0<=n, 0<=x, z0<=x, 0<=z0}
+//    x+1<=n, x+z0<=2n, z0<=n, 0<=x, z0<=x, 0<=z0}
 
    c2++;
 
 //  P(c1,c2,n,x,x0,z,z0) {c1==0, c2+z0==x+1, x==x0, x==z-1, 0<=n,
-//    x+1<=n, z0<=n, 0<=x, z0<=x, 0<=z0}
+//    x+1<=n, x+z0<=2n, z0<=n, 0<=x, z0<=x, 0<=z0}
 
    if (!(c1+c2<=n-x0+n-z0))
 
