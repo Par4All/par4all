@@ -14,7 +14,7 @@ void pointer08()
    struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
 //  {(t,*HEAP*_l_8,-Exact-)}
    for(i = 0; i <= 9; i += 1)
-//  {(t[0][tree_list][*],*HEAP*_l_10,-MAY-);(t,*HEAP*_l_8,-MAY-)}
+//  {(t[0][tree_list][i],*HEAP*_l_10,-MAY-);(t,*HEAP*_l_8,-MAY-)}
       (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
 }
 
