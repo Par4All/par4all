@@ -50,23 +50,18 @@ int main()
    q = p;
 //  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[0],-Exact-)}
    do {
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
-//   *HEAP*_l_7[0],-MAY-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
       *q = i;
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
-//   *HEAP*_l_7[0],-MAY-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
       q++;
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
-//   *HEAP*_l_7[0],-MAY-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
       i++;
    }
    while (i<5);
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
-//   *HEAP*_l_7[0],-MAY-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
 
    free(p);
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-MAY-);(q,
-//   *HEAP*_l_7[0],-MAY-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
    return 0;
 }
 
@@ -86,7 +81,7 @@ int main()
    q = p;
 //             <    is read   >: i
    do {
-//             <may be written>: *HEAP*_l_7[0] *HEAP*_l_7[*]
+//             <may be written>: *HEAP*_l_7[*]
 //             <    is read   >: i q
       *q = i;
 //             <    is read   >: q
@@ -123,9 +118,6 @@ int main()
 	12 --> 13 with conflicts
 		from <q-R-EXACT> to <q-W-EXACT>
 	12 --> 12 with conflicts
-		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
-		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
-		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
 		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
 	15 --> 14 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
