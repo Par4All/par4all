@@ -48,17 +48,17 @@ int main()
 
    for(i = 0; i <= 4; i += 1) {
 //  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
       *q = i;
 //  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
       q++;
    }
 //  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
 
    free(p);
 //  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
    return 0;
 }

@@ -29,16 +29,16 @@ int main()
    int i = 0;
 //  {}
    int *p[10];
-//  {}
+//  {(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int a[10];
-//  {}
+//  {(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    do {
-//  {(p[i],a[i],-Exact-)}
+//  {(p[*],a[*],-Exact-);(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       p[i] = &a[i];
-//  {(p[i],a[i],-Exact-)}
+//  {(p[*],a[*],-Exact-);(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       i++;
    }
    while (i<10);
-//  {(p[i],a[i],-Exact-)}
+//  {(p[*],a[*],-Exact-);(p[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }

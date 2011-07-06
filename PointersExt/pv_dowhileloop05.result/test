@@ -50,17 +50,17 @@ int main()
    q = p;
 //  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[0],-Exact-)}
    do {
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
       *q = i;
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
       q++;
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
       i++;
    }
    while (i<5);
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
 
    free(p);
-//  {(p,*HEAP*_l_7[0],-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-);(q,*HEAP*_l_7[*],-Exact-)}
    return 0;
 }
