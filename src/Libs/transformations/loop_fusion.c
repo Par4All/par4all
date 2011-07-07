@@ -790,6 +790,7 @@ static bool try_to_fuse_with_successors(fusion_block b,
     pips_debug(5,"Block %d is a loop, try to fuse with successors !\n",b->num);
     SET_FOREACH(fusion_block, succ, b->successors)
     {
+      pips_debug(6,"Handling successor : %d\n",succ->num);
       if(fuse_block(b, succ, maximize_parallelism)) {
         /* predecessors and successors set have been modified for the current
          * block... we can no longer continue in this loop, so we stop and let
@@ -802,7 +803,8 @@ static bool try_to_fuse_with_successors(fusion_block b,
   }
   // Second step is recursion on successors (if any)
   SET_FOREACH(fusion_block, succ, b->successors) {
-    return try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism);
+    if(try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism))
+      return true;
   }
 
   return false;
