@@ -104,7 +104,7 @@ normalized NormalizeSyntax(syntax s)
 	n = NormalizeCall((syntax_call(s)));
 	break;
     case is_syntax_cast:
-	n = make_normalized_complex();
+      n = NormalizeCast(syntax_cast(s));
       break;
     case is_syntax_sizeofexpression:
 	n = make_normalized_complex();
@@ -123,6 +123,21 @@ normalized NormalizeSyntax(syntax s)
     }
 
     return(n);
+}
+
+normalized NormalizeCast(cast c)
+{
+  normalized n=normalized_undefined;
+   type ct = cast_type(c);
+   expression cexp = cast_expression(c);
+   type cexpt = expression_to_type(cexp);
+
+   if (type_equal_p(ct, cexpt))
+     n = NormalizeExpression(cexp);
+   else
+     n = make_normalized_complex();
+   free_type(cexpt);
+   return(n);
 }
 
 normalized NormalizeCall(call c)
