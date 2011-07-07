@@ -2046,7 +2046,7 @@ set points_to_init(statement s, set pt_in)
 
 list points_to_init_variable(entity e){
   list l = NIL;
-  effect ef = effect_undefined;
+  //  effect ef = effect_undefined;
   expression ex = entity_to_expression(e);
 
   if(entity_variable_p(e)){
