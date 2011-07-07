@@ -1684,10 +1684,17 @@ void get_data(char filename[])
    p4a_kernel_launcher_get_data(space);
    
    /* Read the pixel grey value: */
-#pragma omp for private(i,j)
+#pragma omp for private(c,i,j)
    for(j = 0; j <= ny-1; j += 1)
+
+//  <c-PRIVATE-EXACT-{}>
+//  <i-PRIVATE-EXACT-{}>
+
 #pragma omp for private(c,i)
       for(i = 0; i <= nx-1; i += 1) {
+
+//  <c-PRIVATE-EXACT-{}>
+
          // BEGIN BLOCK
          c = fgetc(fp);
          /* Truncate the image if too big: */

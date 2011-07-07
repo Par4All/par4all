@@ -51,7 +51,7 @@ void getimage(void)
    
    /* This loops should not be distributed.  On 2009/05/26, if the main()
         is removed, this bug too... */
-#pragma omp parallel for private(c,j)
+#pragma omp parallel for private(j)
    for(i = 0; i <= 63; i += 1)
 #pragma omp parallel for private(c)
       for(j = 0; j <= 63; j += 1) {

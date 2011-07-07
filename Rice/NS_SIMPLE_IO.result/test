@@ -19,7 +19,7 @@ Ask for the parallelization of all the modules of the program with OpenMP output
 !$OMP    PARALLEL DO PRIVATE(I)
          DO J = 1, NY                                                   0010
 
-!$OMP       PARALLEL DO PRIVATE(Y,X,UNO,IV,DIVU)
+!$OMP       PARALLEL DO PRIVATE(DIVU,IV,UNO,X,Y)
             DO I = 1, NX                                                0011
                READ (1, *) X, Y, (PHI(IV,I,J), IV = 1, NVAR), DIVU,     0012
      &         UNO                                                      0012

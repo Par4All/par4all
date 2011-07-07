@@ -1,0 +1,40 @@
+int main()
+{
+   int i, j;
+   int tmp;
+   int a[10][10];
+   
+   // tmp must be declared as private for the parallel loop
+   // even if it initially belongs to the loop locals of the
+   // inner loop which is not parallel
+#pragma omp for private(i,j,tmp)
+   for(i = 0; i <= 9; i += 1) {
+      a[i][0] = i;
+#pragma omp for private(j,tmp)
+      for(j = 1; j <= 9; j += 1) {
+         tmp = a[i][j-1];
+         a[i][j] = tmp+j;
+      }
+   }
+   return 0;
+}
+int main()
+{
+   int i, j;
+   int tmp;
+   int a[10][10];
+   
+   // tmp must be declared as private for the parallel loop
+   // even if it initially belongs to the loop locals of the
+   // inner loop which is not parallel
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      a[i][0] = i;
+#pragma omp parallel for private(j,tmp)
+   for(i = 0; i <= 9; i += 1)
+      for(j = 1; j <= 9; j += 1) {
+         tmp = a[i][j-1];
+         a[i][j] = tmp+j;
+      }
+   return 0;
+}

@@ -1,0 +1,16 @@
+int main()
+{
+   int i, j;
+   int tmp;
+   int a[10][10];
+   
+   // tmp must be declared as private only in the second loop
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 9; i += 1)
+#pragma omp parallel for private(tmp)
+      for(j = 0; j <= 9; j += 1) {
+         tmp = a[i][j];
+         a[i][j] = tmp+j;
+      }
+   return 0;
+}

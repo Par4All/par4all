@@ -5,7 +5,7 @@ C
       REAL A(N,N)
 c
       DOALL I = 1, N                                                    0007
-         PRIVATE M,J
+         PRIVATE J,M
          M = I                                                          0008
          DOALL J = 1, M                                                 0009
             A(I,J) = 0.                                                 0010
