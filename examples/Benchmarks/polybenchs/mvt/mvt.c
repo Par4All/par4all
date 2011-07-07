@@ -21,8 +21,7 @@ DATA_TYPE y_1[N];
 DATA_TYPE x2[N];
 DATA_TYPE y_2[N];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
   for (i = 0; i < N;) {
@@ -40,8 +39,7 @@ void init_array() {
 
 /* Define the live-out variables. Code is not executed unless
  POLYBENCH_DUMP_ARRAYS is defined. */
-static inline
-void print_array(int argc, char** argv) {
+static void print_array(int argc, char** argv) {
   int i, j;
 #ifndef POLYBENCH_DUMP_ARRAYS
   if(argc > 42 && !strcmp(argv[0], ""))
@@ -67,12 +65,22 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
       x1[i] = x1[i] + A[i][j] * y_1[j];
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
       x2[i] = x2[i] + A[j][i] * y_2[j];
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
+  }
 
   /* Stop and print timer. */
   timer_stop_display(); ;

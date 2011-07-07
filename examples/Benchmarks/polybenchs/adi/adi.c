@@ -26,17 +26,19 @@ DATA_TYPE X[N][N];
 DATA_TYPE A[N][N];
 DATA_TYPE B[N][N];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
-  for (i = 0; i < N; i++)
-    for (j = 0; j < N; j++) {
+  for (i = 0; i < N; ) {
+    for (j = 0; j < N; ) {
       int r = rand();
       X[i][j] = ((DATA_TYPE)i * (j + 1) + 1) / N;
       A[i][j] = ((DATA_TYPE)(i - 1) * (j + 4) + 2) / N;
       B[i][j] = ((DATA_TYPE)(i + 3) * (j + 7) + 3) / N;
+      j++;
     }
+    i++;
+  }
 }
 
 /* Define the live-out variables. Code is not executed unless
@@ -69,6 +71,11 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   for (t = 0; t < tsteps; t++) {
     for (i1 = 0; i1 < n; i1++)
       for (i2 = 1; i2 < n; i2++) {
@@ -97,6 +104,11 @@ int main(int argc, char** argv) {
       for (i2 = 0; i2 < n; i2++)
         X[n - 2 - i1][i2] = (X[n - 2 - i1][i2] - X[n - i1 - 3][i2] * A[n - 3
             - i1][i2]) / B[n - 2 - i1][i2];
+  }
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
   }
 
   /* Stop and print timer. */

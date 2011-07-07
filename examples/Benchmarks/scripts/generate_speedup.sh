@@ -30,6 +30,7 @@ for test in $tests; do
     time=`echo "select ROUND(AVG(measure),2) from timing where testcase=\"$test\" and version=\"$ver\";" | sqlite3 $dbfile`
     speedup=0
     if [[ ! -z $time && ! -z $ref ]]; then
+      #echo "speedup $test $ver $time : $ref/$time"
       speedup=`echo "scale=2; $ref/$time" | bc `
     fi
     echo -n " $speedup" >> $out_dat
@@ -47,7 +48,7 @@ ratio=`echo "scale=2; 1/$nvers" | bc `
 for ver in $versions; do
   echo "\\" >> $out_gp
   echo "$sep '$out_dat' u $nver:xtic(1) \\" >> $out_gp
-  echo -n ",'' u (\$0+($(($nver-2)))*1./(${nvers}+g)):$nver:$nver w labels font 'Arial,9' rotate by 90 offset -0.55,1 t ''" >> $out_gp
+  echo -n ",'' u (\$0+($(($nver-2)))*1./(${nvers}+g)):$nver:$nver w labels font 'Arial,9' rotate by 90 offset -1.1,1 t ''" >> $out_gp
   nver=$(($nver+1))
   sep=","
 done

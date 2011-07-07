@@ -26,8 +26,7 @@ DATA_TYPE A[M][N];
 DATA_TYPE R[M][N];
 DATA_TYPE Q[M][N];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
   for (i = 0; i < M; ) {
@@ -69,6 +68,11 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   for (k = 0; k < n; k++) {
     for(j=0;j<1;j++) {
       nrm = 0;
@@ -85,6 +89,11 @@ int main(int argc, char** argv) {
       for (i = 0; i < m; i++)
         A[i][j] = A[i][j] - Q[i][k] * R[k][j];
     }
+  }
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
   }
 
   /* Stop and print timer. */

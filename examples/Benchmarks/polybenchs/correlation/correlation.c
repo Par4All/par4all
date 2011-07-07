@@ -29,8 +29,7 @@ DATA_TYPE symmat[M + 1][M + 1];
 DATA_TYPE stddev[M + 1];
 DATA_TYPE mean[M + 1];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
   for (i = 0; i <= M;) {
@@ -72,6 +71,11 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
 #define sqrt_of_array_cell(x,j) sqrt(x[j])
 
   /* Determine mean of column vectors of input data matrix */
@@ -112,6 +116,11 @@ int main(int argc, char** argv) {
     }
   }
   symmat[m][m] = 1.0;
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
+  }
 
   /* Stop and print timer. */
   timer_stop_display();;
