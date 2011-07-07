@@ -84,9 +84,12 @@ class Validation:
     def accept(s):
         "Accept the output of this validation case as a reference"
 
-        shutil.move(Validation.output_file_name(s),
-                    Validation.reference_file_name(s))
-
+        try:
+            shutil.move(Validation.output_file_name(s),
+                        Validation.reference_file_name(s))
+        except:
+            print ("cannot move", Validation.output_file_name(s), "into",
+                Validation.reference_file_name(s))
 
     @staticmethod
     def git_add(s):
