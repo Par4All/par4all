@@ -169,6 +169,15 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
       ;
       /* ultimate_type() returns a wrong type for arrays. For
        * example for type int*[10] it returns int*[10] instead of int[10]. */
+      basic fpb = variable_basic(type_variable(upt));
+      if(basic_pointer_p(fpb)){
+	expression ind = make_unbounded_expression();
+	reference r = make_reference(e, CONS(EXPRESSION, ind, NULL));
+	cell c = make_cell_reference(r);
+	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+    }
     }
     else {
       basic fpb = variable_basic(type_variable(upt));
