@@ -1,4 +1,4 @@
-2011-06-29  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+2011-07-07  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.2
 
@@ -40,6 +40,9 @@
 		* GPU kernel can be outlined in separated source files on demand,
 		  for OpenCL or use a separate non C99 compiler (CUDA nvcc), at
 		  kernel, launcher, wrapper grain...
+
+		* Fixed compilation flags in PIPS/linear to avoid recompilation to
+		  fail when an API changes too much
 
 
 2011-04-20  Ronan Keryell <Ronan.Keryell@hpc-project.com>
