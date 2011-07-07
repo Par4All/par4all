@@ -358,6 +358,8 @@ list loop_private_variables_as_entites (loop obj, bool local, bool index) {
     gen_remove (&result, loop_index(obj));
   }
 
+  sort_list_of_entities(result);
+
   return result;
 }
 

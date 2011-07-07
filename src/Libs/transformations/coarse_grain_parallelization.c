@@ -62,6 +62,7 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "reduction.h"
+#include "transformations.h"
 
 /* includes pour system generateur */
 #include "ray_dte.h"
@@ -119,7 +120,7 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
   transformer body_prec = load_statement_precondition(inner_stat);
 
   /* Get the loop invariant regions for the loop body: */
-  list l_reg = load_statement_inv_regions(inner_stat);
+  list l_reg = load_invariant_rw_effects_list(inner_stat);
 
   /* To store potential conflicts to study: */
   list l_conflicts = NIL;
@@ -160,7 +161,7 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
         reference r = effect_any_reference(reg);
         int d = gen_length(reference_indices(r));
 
-        if (region_write_p(reg) && store_effect_p(reg) &&  !(thread_safe_p && thread_safe_variable_p(e))
+        if (gen_chunk_undefined_p(gen_find_eq(effect_entity(reg),loop_locals(l))) && region_write_p(reg) && store_effect_p(reg) &&  !(thread_safe_p && thread_safe_variable_p(e))
             && !(local_use_reductions_p && set_belong_p(lreductions,e))
             ) {
           conflict conf = conflict_undefined;
@@ -335,8 +336,9 @@ static list coarse_grain_loop_parallelization(statement module_stat)
   gen_context_recurse(module_stat,
                       &ctx,
                       loop_domain,
-                      whole_loop_parallelize,
-                      gen_true);
+		      whole_loop_parallelize,
+                      gen_true
+                      );
 
   pips_debug(1,"end\n");
   return ctx.reduced_loops;
@@ -372,7 +374,7 @@ static bool coarse_grain_parallelization_main(string module_name,
        attached on the DBR_CODE with the statement addresses (see Trac
        ticket #159 in 2009).
 
-       Well, indeed even this does not work. So this phase change the code
+       Well, indeed even this does not work. So this phase changes the code
        resource... */
     module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
 
@@ -408,6 +410,12 @@ static bool coarse_grain_parallelization_main(string module_name,
 
     print_parallelization_statistics
         (module_name, "post", module_stat);
+    reset_cumulated_rw_effects();
+    reset_invariant_rw_effects();
+    reset_precondition_map();
+    reset_current_module_entity();
+    reset_current_module_statement();
+    free_value_mappings();
 
     if(local_use_reductions_p) {
       reset_statement_reductions();
@@ -415,16 +423,18 @@ static bool coarse_grain_parallelization_main(string module_name,
            module_name,
            (char*) make_reduced_loops(loops));
     } else {
+      /* update loop_locals according to exhibited parallel loops */
+      /* this require recomputing effects */
+      /* This is only one strategy among others, and has been discussed in ticket #538 */
+      /* The advantage of this one is to be compatible with Fortran 77 and C */
+      /* To declare private variables at innermost levels even when loops are not
+       * parallel, use another phase prior to this one. BC - 07/2011
+       */
+      (void) update_loops_locals(module_name, module_stat);
       DB_PUT_MEMORY_RESOURCE(DBR_CODE,
            module_name,
            (char*) module_stat);
     }
-    reset_current_module_entity();
-    reset_current_module_statement();
-    reset_cumulated_rw_effects();
-    reset_invariant_rw_effects();
-    reset_precondition_map();
-    free_value_mappings();
 
     return true;
 }

@@ -2335,16 +2335,6 @@ cumulated_effects_with_pointer_values   > MODULE.cumulated_effects
         < MODULE.proper_effects
 \end{PipsMake}
 
-Cumulated memory effects do not take into account local effects on
-private variables, such as variables declared in C blocks or in
-Fortran parallel DO loops. \PipsPropRef{MASK_EFFECTS_ON_PRIVATE_VARIABLES}
-can be set to FALSE to prevent this behavior.
-\begin{PipsProp}{MASK_EFFECTS_ON_PRIVATE_VARIABLES}
-MASK_EFFECTS_ON_PRIVATE_VARIABLES TRUE
-\end{PipsProp}
-
-
-
 \subsection{Summary Data Flow Information (SDFI)}
 \label{subsubection-summary-data-flow-information}
 \index{SDFI}

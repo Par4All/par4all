@@ -679,5 +679,83 @@ localize_declaration(char *mod_name)
 	return true;
 }
 
+/**
+    @brief update the input loop loop_locals by removing entities
+           with no corresponding effects in loop body (e.g. entities
+	   already private in inner loops and not used in other
+	   statements of the current loop body).
+ */
+static void update_loop_locals(loop l)
+{
+  statement body = loop_body(l);
+  list body_effects = load_rw_effects_list(body);
+  ifdebug(1) {
+    fprintf(stderr, "new body effects:\n");
+    print_effects(body_effects);
+  }
+  list new_loop_locals = NIL;
+  FOREACH(ENTITY, private_variable, loop_locals(l))
+    {
+      pips_debug(1, "considering entity %s\n",
+		 entity_local_name(private_variable));
+      if (effects_read_or_write_entity_p(body_effects, private_variable))
+	{
+	  pips_debug(1, "keeping entity\n");
+	  new_loop_locals = CONS(ENTITY, private_variable, new_loop_locals);
+	}
+    }
+  gen_free_list(loop_locals(l));
+  loop_locals(l) = new_loop_locals;
+  ifdebug(1) {
+    print_entities(loop_locals(l));
+    fprintf(stderr, "\n");
+  }
+}
+
+
+/**
+   @brief update loop_locals found by privatize_module by taking parallel loops
+   into account
+ */
+bool update_loops_locals(string module_name, statement module_stat)
+{
+  init_proper_rw_effects();
+  init_rw_effects();
+  init_invariant_rw_effects();
+  set_current_module_entity(module_name_to_entity(module_name));
+
+  debug_on("EFFECTS_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
+
+  if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+    set_constant_paths_p(false);
+  else
+    set_constant_paths_p(true);
+  set_pointer_info_kind(with_no_pointer_info); /* should use current pointer information
+						  according to current effects active phase
+					        */
+
+  set_methods_for_proper_simple_effects();
+  proper_effects_of_module_statement(module_stat);
+  set_methods_for_simple_effects();
+  rw_effects_of_module_statement(module_stat);
+
+  gen_recurse(module_stat,
+	      loop_domain, gen_true, update_loop_locals);
+
+  pips_debug(1, "end\n");
+  debug_off();
+
+  /* Hope that these close actually free the effects in the mappings */
+  close_proper_rw_effects();
+  close_rw_effects();
+  close_invariant_rw_effects();
+  generic_effects_reset_all_methods();
+  reset_current_module_entity();
+
+  return true;
+}
+
+
 
 /**  @} */
