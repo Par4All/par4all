@@ -3419,12 +3419,33 @@ bool statement_may_have_control_effects_p(statement s)
   return control_effect_p;
 }
 
+
+static bool look_for_exiting_intrinsic_calls(call c, bool * control_effect_p)
+{
+  entity f = call_function(c);
+  bool go_on_p = true;
+  value fv = entity_initial(f);
+
+  if(value_intrinsic_p(fv)) {
+    if(ENTITY_EXIT_SYSTEM_P(f)
+       || ENTITY_ABORT_SYSTEM_P(f)
+       || ENTITY_C_RETURN_P(f)
+       || ENTITY_RETURN_P(f)
+       || ENTITY_ASSERT_SYSTEM_P(f)
+       || ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
+      * control_effect_p = true;
+      go_on_p = false;
+    }
+  }
+  return go_on_p;
+}
+
 bool statement_may_contain_exiting_intrinsic_call_p(statement s)
 {
   bool control_effect_p = false;
 
   if(!control_effect_p)
-      gen_context_recurse(s, &control_effect_p, call_domain, look_for_control_effects, gen_null);
+      gen_context_recurse(s, &control_effect_p, call_domain, look_for_exiting_intrinsic_calls, gen_null);
 
   return control_effect_p;
 }
