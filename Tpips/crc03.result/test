@@ -13,6 +13,21 @@ int main(void)
    return 0;
 }
 #
-# compile run compare both crc01
+# compile run compare both crc03
+#
+#
+# compile run compare both crc03
+#
+#
+# compile run both crc03
+#
+#
+# compile both crc03
+#
+#
+# compile initial crc03
+#
+#
+# compile generated crc03
 #
 
