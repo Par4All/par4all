@@ -4,15 +4,32 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create return01 return01.c
 
+#setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+
 apply PRIVATIZE_MODULE(find_neg)
 
-apply  COARSE_GRAIN_PARALLELIZATION
-display PRINTED_FILE [%ALL]
+apply  COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+display PRINTED_FILE [%ALLFUNC]
 
 apply UNSPLIT
 shell gcc -fopenmp -c return01.database/Src/return01.c -o return01.database/Src/return01.o
 
 close
 delete return01
+create return01 return01.c
+
+setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+
+apply PRIVATIZE_MODULE(find_neg)
+
+apply  COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+display PRINTED_FILE [%ALLFUNC]
+
+apply UNSPLIT
+shell gcc -fopenmp -c return01.database/Src/return01.c -o return01.database/Src/return01.o
+
+close
+delete return01
+
 quit
 # EOF

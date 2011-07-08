@@ -2,6 +2,8 @@
 int find_neg (int size, int a[size]) {
   int i = 0;
   int result = -1;
+
+  // this loop must not be parallelized
   for (i = 0; i < size; i++) {
     if (a[i] < 0) return i;
   }
