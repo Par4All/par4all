@@ -1,227 +1,233 @@
 2011-07-07  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.2
+ * Par4All 1.2
 
-		* This version targets mainly the Wild Cruncher, a parallelizing
-		  environment from HPC Project for Scilab programs. Par4All is used
-		  to parallelize the output of the Scilab-to-C compiler from HPC
-		  Project
+  * This version targets mainly the Wild Cruncher, a parallelizing
+    environment from HPC Project for Scilab programs. Par4All is used
+    to parallelize the output of the Scilab-to-C compiler from HPC
+    Project
 
-		* Improved support for CUDA atomic update for reductions
+  * Improved support for CUDA atomic update for reductions
 
-		* Better deal with scalars in GPU parallelization
+  * Better deal with scalars in GPU parallelization
 
-		* Improved memory effect analysis
+  * Improved memory effect analysis
 
-		* Fixed outlining for kernel generation with scalar parameters
+  * Fixed outlining for kernel generation with scalar parameters
 
-		* Improved loop fusion, deal with local variable declarations
+  * Improved loop fusion, deal with local variable declarations
 
-		* Improved array scalarization
+  * Improved array scalarization
 
-		* Make package publication more resilient to network failures
+  * Make package publication more resilient to network failures
 
-		* Fixed GPU code generation for non rectangular iteration spaces
+  * Fixed GPU code generation for non rectangular iteration spaces
 
-		* Fixed communication optimization between GPU and CPU
+  * Fixed communication optimization between GPU and CPU
 
-		* Added support for CEA SCMP embedded system
+  * Added support for CEA SCMP embedded system
 
-		* Installation directory can now be changed also after a first
-		  installation
+  * Installation directory can now be changed also after a first
+    installation
 
-		* Use the broker concept to deal with stubs to manage with non or
-		  already parallelized libraries
+  * Use the broker concept to deal with stubs to manage with non or
+    already parallelized libraries
 
-		* Now install LICENSE.txt
+  * Now install LICENSE.txt
 
-		* Updated to new PyPS interface
+  * Updated to new PyPS interface
 
-		* GPU kernel can be outlined in separated source files on demand,
-		  for OpenCL or use a separate non C99 compiler (CUDA nvcc), at
-		  kernel, launcher, wrapper grain...
+  * GPU kernel can be outlined in separated source files on demand,
+    for OpenCL or use a separate non C99 compiler (CUDA nvcc), at
+    kernel, launcher, wrapper grain...
 
-		* Fixed compilation flags in PIPS/linear to avoid recompilation to
-		  fail when an API changes too much
+  * Fixed compilation flags in PIPS/linear to avoid recompilation to
+    fail when an API changes too much
 
 
 2011-04-20  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.1.2
+ * Par4All 1.1.2
 
-		* Improved support for Scilab compiler output
+  * Improved support for Scilab compiler output
 
-		* Some work on effects in PIPS
+  * Some work on effects in PIPS
 
-		* p4a -g now put device code in debug too.
+  * p4a -g now put device code in debug too.
 
-		* Improved Stars-PM example
+  * Improved Stars-PM example
 
-		  Added nVidia SM11 GPU, FFT timing...
+    Added nVidia SM11 GPU, FFT timing...
 
-		  Added a PGI Accelerator version for comparison
+    Added a PGI Accelerator version for comparison
 
-		* Fixed wrong Makefile targets for Jacobi demo
+  * Fixed wrong Makefile targets for Jacobi demo
 
-		  Bug reported by Richard Membarth from Universität Erlangen.
+    Bug reported by Richard Membarth from Universität Erlangen.
 
 
 2011-04-12  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.1.1
+ * Par4All 1.1.1
 
-		* Added support for CEA SCMP task dataflow machine (European
-		  project ARTEMIS SCALOPES)
+  * Added support for CEA SCMP task dataflow machine (European
+    project ARTEMIS SCALOPES)
 
-		* Improved GPU kernel generation for loop nests with complex
-		  declarations.
+  * Improved GPU kernel generation for loop nests with complex
+    declarations.
 
-		  Bug reported by Richard Membarth from Universität Erlangen.
+    Bug reported by Richard Membarth from Universität Erlangen.
 
-		* Added new options to apply PIPS transformations in the Par4All
-		  compilation transit (--apply-before-parallelization...)
+  * Added new options to apply PIPS transformations in the Par4All
+    compilation transit (--apply-before-parallelization...)
 
-		* Added a programming guide describing best practices to get
-		  better performance with Par4All
+  * Added a programming guide describing best practices to get
+    better performance with Par4All
 
 
 2011-03-01  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.1
+ * Par4All 1.1
 
-        * C99 declarations anywhere in a block and in C99 for-loops are now
-          supported.
+  * C99 declarations anywhere in a block and in C99 for-loops are now
+    supported.
 
-        * Fixed code generation for C99 declarations.
+  * Fixed code generation for C99 declarations.
 
-        * New --apply-before-parallelization option to apply phases before
-          parallelization.
+  * New --apply-before-parallelization option to apply phases before
+    parallelization.
 
-        * Improved compilation speed.
+  * Improved compilation speed.
 
-        * No longer rely on Python 3.x since there where some issues on
-          some systems to cope with both 2.y and 3.x versions.
+  * No longer rely on Python 3.x since there where some issues on
+    some systems to cope with both 2.y and 3.x versions.
 
-        * Fixed encoding issues.
+  * Fixed encoding issues.
 
 
 2011-02-03  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.0.5 fixes a bug when a code to be kernelized uses some
-          global variables.
+ * Par4All 1.0.5
 
-          Thanks to Sarnath Kannan for this bug report. It should work now
-          on common cases.
+  * Par4All 1.0.5 fixes a bug when a code to be kernelized uses some
+    global variables.
 
-        * Prototype on lazy CUDA communication optimizations to remove
-          redundant host-accelerator communications.
+    Thanks to Sarnath Kannan for this bug report. It should work now
+    on common cases.
 
-        * Fixed a space iteration transposition bug in accelerator mode
-          that was killing performances. But right now, better results are
-          obtained with 2D kernels.
+  * Prototype on lazy CUDA communication optimizations to remove
+    redundant host-accelerator communications.
 
-        * C99 for(int i;...;...) are now accepted.
+  * Fixed a space iteration transposition bug in accelerator mode
+    that was killing performances. But right now, better results are
+    obtained with 2D kernels.
 
-        * Can generate kernels with less perfectly nested loops.
+  * C99 for(int i;...;...) are now accepted.
 
-        * Updated examples directory to new options and communication
-          optimizations
+  * Can generate kernels with less perfectly nested loops.
 
-        * Better error and warning messages.
+  * Updated examples directory to new options and communication
+    optimizations
 
-        * Script cleaning by using Python module names everywhere.
+  * Better error and warning messages.
+
+  * Script cleaning by using Python module names everywhere.
 
 
 2010-11-22  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.0.4 introduces a new P4A Accel runtime for OpenMP and CUDA.
+ * Par4All 1.0.4
 
-        * In previous months, PIPS and PyPS has evolved a lot, specially
-          in the code generation for various accelerators. This version
-          try to cope with these evolutions.
+  * Par4All 1.0.4 introduces a new P4A Accel runtime for OpenMP and CUDA.
 
-        * Added the Stars-pm cosmological N-body simulation program as an
-          example.
+  * In previous months, PIPS and PyPS has evolved a lot, specially
+    in the code generation for various accelerators. This version
+    try to cope with these evolutions.
 
-        * Now the runtime can deal with subarray transfers between the
-          host and the accelerator, up to 4D arrays. Well right now the
-          phases chosen in PIPS do not use them yet.
+  * Added the Stars-pm cosmological N-body simulation program as an
+    example.
 
-        * The code generation for non-C99 CUDA is more robust.
+  * Now the runtime can deal with subarray transfers between the
+    host and the accelerator, up to 4D arrays. Well right now the
+    phases chosen in PIPS do not use them yet.
+
+  * The code generation for non-C99 CUDA is more robust.
 
 
 2010-11-05  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.0.3 is a base version to be used from Windows in a
-          Wild Cruncher..
+ * Par4All 1.0.3
 
-        * NVIDIA_GPU_Computing_SDK is no longer needed to produce CUDA
-          code for nVidia GPU.
+  * Par4All 1.0.3 is a base version to be used from Windows in a
+    Wild Cruncher..
 
-        * Can now compile on Fedora.
+  * NVIDIA_GPU_Computing_SDK is no longer needed to produce CUDA
+    code for nVidia GPU.
 
-        * New option to use simpler #include recovery.
+  * Can now compile on Fedora.
 
-        * Can move produced files to a given directory.
+  * New option to use simpler #include recovery.
 
-        * Improved documentation.
+  * Can move produced files to a given directory.
 
-        * New options for Python code injection.
+  * Improved documentation.
 
-        * Better error messages.
+  * New options for Python code injection.
+
+  * Better error messages.
 
 
 2010-09-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.0.2
+ * Par4All 1.0.2
 
-        * Clean up examples and their README files.
+  * Clean up examples and their README files.
 
-            Added an option to run Hyantes example in single precision
-            (for demos on laptops with small GPU).
+      Added an option to run Hyantes example in single precision
+      (for demos on laptops with small GPU).
 
-        * Updated to current PIPS and PyPS version.
+  * Updated to current PIPS and PyPS version.
 
-        * --accel without --cuda works again for GPU emulation in OpenMP.
+  * --accel without --cuda works again for GPU emulation in OpenMP.
 
-        * Do not use new PyPS #include recovery.
+  * Do not use new PyPS #include recovery.
 
-        * Recover any #include, not only standard ones (useful for Par4All
-          Scilab).
+  * Recover any #include, not only standard ones (useful for Par4All
+    Scilab).
 
-        * Do not use PIPS capply by default when running phases.
+  * Do not use PIPS capply by default when running phases.
 
-        * Added path normalization in p4a_setup so that configure can
-          take relative path.
+  * Added path normalization in p4a_setup so that configure can
+    take relative path.
 
-        * p4a_validate post-processing utility updated to cope with new
-          PIPS validation output.
+  * p4a_validate post-processing utility updated to cope with new
+    PIPS validation output.
 
 
 2010-07-23  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.0.1
+ * Par4All 1.0.1
 
-        * Corrected library name issue for libcutil on 32 bit x86.
+  * Corrected library name issue for libcutil on 32 bit x86.
 
-        * Fixed bugs into array_to_pointer.
+  * Fixed bugs into array_to_pointer.
 
-        * Corrected behaviour of NULL for nvcc.
+  * Corrected behaviour of NULL for nvcc.
 
-        * Fixed usage of limit_nested_parallelism in p4a_process.py.
+  * Fixed usage of limit_nested_parallelism in p4a_process.py.
 
-        * Better error message display.
+  * Better error message display.
 
-        * Fixed OpenMP prettyprint of C parallel loops with label.
+  * Fixed OpenMP prettyprint of C parallel loops with label.
 
-        * Deals with clock() intrinsic function.
+  * Deals with clock() intrinsic function.
 
 
 2010-07-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-        * Par4All 1.0 released
+ * Par4All 1.0
 
-            Initial version.
+  * Initial version of Par4All released.
 
 
 %%% Local Variables:
