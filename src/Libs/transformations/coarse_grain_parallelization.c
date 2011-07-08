@@ -106,13 +106,16 @@ static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
 {
   /* Get the statement owning this loop: */
   statement loop_stat = (statement) gen_get_ancestor(statement_domain, l);
+  statement inner_stat = loop_body(l);
 
   if (!get_bool_property("PARALLELIZE_AGAIN_PARALLEL_CODE")
       && loop_parallel_p(l)) {
     return false;
   }
 
-  statement inner_stat = loop_body(l);
+  if (statement_may_contain_exiting_intrinsic_call_p(inner_stat))
+    return false;
+
   /* ...needed by TestCoupleOfReferences(): */
   list l_enclosing_loops = CONS(STATEMENT, loop_stat, NIL);
 

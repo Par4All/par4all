@@ -3419,6 +3419,15 @@ bool statement_may_have_control_effects_p(statement s)
   return control_effect_p;
 }
 
+bool statement_may_contain_exiting_intrinsic_call_p(statement s)
+{
+  bool control_effect_p = false;
+
+  if(!control_effect_p)
+      gen_context_recurse(s, &control_effect_p, call_domain, look_for_control_effects, gen_null);
+
+  return control_effect_p;
+}
 
 /* Make (a bit more) sure that s is gen_defined_p in spite of poor
    decision for empty fields and that strdup can be used on the string

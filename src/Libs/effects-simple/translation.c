@@ -52,11 +52,11 @@
 
 
 /** @brief translates a simple memory access path reference from given indices
-           using an address_of memory access path reference 
+           using an address_of memory access path reference
 
-    This function is used when we want to translate a cell or an effect on a[i][j][k] as input_ref, 
+    This function is used when we want to translate a cell or an effect on a[i][j][k] as input_ref,
     knowing that a[i] = &address_of_ref. In this case nb_common_indices is 1 (which corresponds to [i])
-    
+
     @param input_ref is the input simple cell reference
     @param input_desc is here for compatibility with the corresponding convex cells function.
 
@@ -67,7 +67,7 @@
     @param output_ref is a pointer on the resulting reference
     @param output_desc is here for compatibility with the corresponding convex cells function.
     @param exact_p is a pointer on a bool which is set to true if the translation is exact, false otherwise.
-  
+
  */
 void simple_cell_reference_with_address_of_cell_reference_translation
 (reference input_ref, descriptor __attribute__ ((unused)) input_desc,
@@ -77,27 +77,31 @@ void simple_cell_reference_with_address_of_cell_reference_translation
  bool *exact_p)
 {
 
+  pips_debug(1, "input_ref: %s\n",words_to_string(words_reference(input_ref, NIL)));
+  pips_debug(1, "address_of_ref: %s\n",words_to_string(words_reference(address_of_ref, NIL)));
+  pips_debug(1, "nb_common_indices: %d \n", nb_common_indices);
+
   /* assume exactness */
   *exact_p = true;
-  
+
   /* */
   *output_ref = copy_reference(address_of_ref);
   list output_indices = gen_last(reference_indices(*output_ref));
   list input_remaining_indices = reference_indices(input_ref);
-  for(int i = 0; i<nb_common_indices; i++, POP(input_remaining_indices)); 
-		  
+  for(int i = 0; i<nb_common_indices; i++, POP(input_remaining_indices));
+
   /* special case for the first remaning index: we must add it to the last index of build_ref */
   if (!ENDP(output_indices))
     {
-      expression last_output_indices_exp = EXPRESSION(CAR(output_indices)); 
+      expression last_output_indices_exp = EXPRESSION(CAR(output_indices));
       expression first_input_remaining_exp = EXPRESSION(CAR(input_remaining_indices));
       expression new_exp = expression_undefined;
-      /* adapted from the address_of case of c_simple_effects_on_formal_parameter_backward_translation 
+      /* adapted from the address_of case of c_simple_effects_on_formal_parameter_backward_translation
 	 this should maybe be put in another function
       */
       if(!unbounded_expression_p(last_output_indices_exp))
 	{
-	  if (expression_reference_p(last_output_indices_exp) && 
+	  if (expression_reference_p(last_output_indices_exp) &&
 	      entity_field_p(expression_variable(last_output_indices_exp)))
 	    {
 	      if (!expression_equal_integer_p(first_input_remaining_exp, 0))
@@ -106,13 +110,13 @@ void simple_cell_reference_with_address_of_cell_reference_translation
 		  free_reference(*output_ref);
 		  *output_ref = make_reference(entity_all_locations(), NIL);
 		  *exact_p = false;
-		}	
+		}
 	      else
 		new_exp = last_output_indices_exp;
 	    }
-			    
+
 	  else if(!unbounded_expression_p(first_input_remaining_exp))
-	    {				
+	    {
 	      value v;
 	      intptr_t i_last_output_indices_exp;
 	      intptr_t i_first_input_remaining_exp;
@@ -131,12 +135,12 @@ void simple_cell_reference_with_address_of_cell_reference_translation
 		     copy_expression(last_output_indices_exp), copy_expression(first_input_remaining_exp));
 		  /* Then we must try to evaluate the expression */
 		  v = EvalExpression(new_exp);
-		  if (! value_undefined_p(v) && 
+		  if (! value_undefined_p(v) &&
 		      value_constant_p(v))
 		    {
 		      constant vc = value_constant(v);
 		      if (constant_int_p(vc))
-			{				    
+			{
 			  free_expression(new_exp);
 			  new_exp = int_to_expression(constant_int(vc));
 			}
@@ -150,7 +154,7 @@ void simple_cell_reference_with_address_of_cell_reference_translation
 	    }
 	  if (! entity_all_locations_p(reference_variable(*output_ref)))
 	    {
-	      CAR(gen_last(reference_indices(*output_ref))).p 
+	      CAR(gen_last(reference_indices(*output_ref))).p
 		= (void *) new_exp;
 	    }
 	}
@@ -171,14 +175,14 @@ void simple_cell_reference_with_address_of_cell_reference_translation
 	  *exact_p = false;
 	}
     }
-	      
+
   if (! entity_all_locations_p(reference_variable(*output_ref)))
     {
       FOREACH(EXPRESSION, input_ind, CDR(input_remaining_indices))
 	{
 	  reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
-						     CONS(EXPRESSION, 
-							  copy_expression(input_ind), 
+						     CONS(EXPRESSION,
+							  copy_expression(input_ind),
 							  NIL));
 	}
     }
@@ -186,13 +190,13 @@ void simple_cell_reference_with_address_of_cell_reference_translation
 	     words_to_string(words_reference(*output_ref, NIL)));
   return;
 }
-								      
-/** @brief translates a simple memory access path reference from given indices
-           using an value_of memory access path reference 
 
-    This function is used when we want to translate a cell or an effect on a[i][j][k] as input_ref, 
+/** @brief translates a simple memory access path reference from given indices
+           using an value_of memory access path reference
+
+    This function is used when we want to translate a cell or an effect on a[i][j][k] as input_ref,
     knowing that a[i] = value_of_ref. In this case nb_common_indices is 1 (which corresponds to [i])
-    
+
     @param input_ref is the input simple cell reference
     @param input_desc is here for compatibility with the corresponding convex cells function.
 
@@ -203,7 +207,7 @@ void simple_cell_reference_with_address_of_cell_reference_translation
     @param output_ref is a pointer on the resulting reference
     @param output_desc is here for compatibility with the corresponding convex cells function.
     @param exact_p is a pointer on a bool which is set to true if the translation is exact, false otherwise.
-  
+
  */
 void simple_cell_reference_with_value_of_cell_reference_translation
 (reference input_ref, descriptor __attribute__ ((unused)) input_desc,
@@ -213,7 +217,7 @@ void simple_cell_reference_with_value_of_cell_reference_translation
  bool *exact_p)
 {
   /* assume exactness */
-  *exact_p = true; 
+  *exact_p = true;
 
   /* we do not handle yet the cases where the type of value_of_ref does not match
      the type of a[i]. I need a special function to test if types are compatible,
@@ -223,17 +227,17 @@ void simple_cell_reference_with_value_of_cell_reference_translation
   */
   list input_inds = reference_indices(input_ref);
   *output_ref = copy_reference(value_of_ref);
-  
+
   /* we add the indices of the input reference past the nb_common_indices
      (they have already be poped out) to the copy of the value_of reference */
-  
+
   for(int i = 0; i<nb_common_indices; i++, POP(input_inds));
   FOREACH(EXPRESSION, input_ind, input_inds)
     {
       reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
-						 CONS(EXPRESSION, 
-						      copy_expression(input_ind), 
+						 CONS(EXPRESSION,
+						      copy_expression(input_ind),
 						      NIL));
     }
- 
+
 }
