@@ -16,7 +16,7 @@ echo
 echo PROPER  EFFECTS 
 echo
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[ReadPGMrow]
+display PRINTED_FILE[%ALLFUNC]
 
 
 #module main
@@ -24,14 +24,14 @@ echo
 echo POINTS-TO
 echo
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[ReadPGMrow]
+display PRINTED_FILE[%ALLFUNC]
 
 echo 
 echo PROPER  EFFECTS WITH POINTS TO
 echo
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[ReadPGMrow]
+display PRINTED_FILE[%ALLFUNC]
 
 
 activate PRINT_CHAINS_GRAPH

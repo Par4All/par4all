@@ -1,11 +1,16 @@
-delete fulguro01
-create fulguro01 fulguro01.c 
+delete fread04
+create fread04 fread04.c 
+activate C_PARSER
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 1
-setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+#setenv POINTER_VALUES_DEBUG_LEVEL 2
 
 echo 
 echo PROPER  EFFECTS 
@@ -34,5 +39,5 @@ display DG_FILE
 
 
 close
-delete fulguro01
+delete fread04
 quit
