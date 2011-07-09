@@ -182,7 +182,7 @@ class module(object): # deriving from object is needed for overloaded setter
 
     def _set_code(self,newcode):
         """set module content from a string"""
-        if not self.compilation_unit_p()
+        if not self.compilation_unit_p():
             (code_rc,_) = self.__prepare_modification()
             pypsutils.string2file(newcode, code_rc)
 
