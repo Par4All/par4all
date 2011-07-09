@@ -163,6 +163,16 @@ static void print_block(fusion_block block) {
 }
 
 /**
+ * Add statement 's' to the set 'stmts'. To be called with gen_context_recurse
+ * to record all statement in a branch of the IR tree.
+ */
+static bool record_statements(statement s, set stmts) {
+  set_add_element(stmts, stmts, s);
+  return true;
+}
+
+
+/**
  * Debug function that print a list of blocks
  */
 static void print_blocks(list /* of fusion_block */ blocks) {
@@ -430,6 +440,33 @@ static bool fusion_loops(statement sloop1,
     }
   }
 
+  if(get_bool_property("LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS")) {
+    // Check if we have perfect loop nests, and thus prevents losing parallelism
+    statement inner_loop1 = get_first_inner_perfectly_nested_loop(body_loop1);
+    statement inner_loop2 = get_first_inner_perfectly_nested_loop(body_loop2);
+    if(!statement_undefined_p(inner_loop1) && !statement_undefined_p(inner_loop2)) {
+      if(loop_parallel_p(statement_loop(inner_loop1)) &&
+          loop_parallel_p(statement_loop(inner_loop2))) {
+        // Record statements
+        set stmts1 = set_make(set_pointer);
+        gen_context_recurse(inner_loop1,stmts1,statement_domain,record_statements,gen_true);
+
+        set stmts2 = set_make(set_pointer);
+        gen_context_recurse(inner_loop2,stmts2,statement_domain,record_statements,gen_true);
+
+        success = fusion_loops(inner_loop1,stmts1,inner_loop2,stmts2,maximize_parallelism);
+
+        set_free(stmts1);
+        set_free(stmts2);
+      } else if(loop_parallel_p(statement_loop(inner_loop1)) ||
+                loop_parallel_p(statement_loop(inner_loop2))) {
+        success = false;
+      }
+
+    }
+  }
+
+
   if(success) {
     // Cleaning FIXME
     // Fix real DG
@@ -477,15 +514,6 @@ static fusion_block make_empty_block(int num) {
   block->is_a_loop = false;
 
   return block;
-}
-
-/**
- * Add statement 's' to the set 'stmts'. To be called with gen_context_recurse
- * to record all statement in a branch of the IR tree.
- */
-static bool record_statements(statement s, set stmts) {
-  set_add_element(stmts, stmts, s);
-  return true;
 }
 
 /**

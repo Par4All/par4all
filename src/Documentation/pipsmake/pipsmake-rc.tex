@@ -7912,6 +7912,10 @@ array_expansion > PROGRAM.entities
   loop fusion has to preserve parallelism while fusing. If this property
   is true, a parallel loop is never fused with a sequential loop.
 
+  Property \PipsPropRef{LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS} prevents
+  to lose parallelism when fusing outer loops from a loop nests without being
+  able to fuse inner loops.
+
   The fusion legality is checked in the standard way by comparing the
   dependence graphs obtained before and after fusion.
 
@@ -7938,6 +7942,9 @@ LOOP_FUSION_MAXIMIZE_PARALLELISM TRUE
 LOOP_FUSION_GREEDY FALSE
 \end{PipsProp}
 
+\begin{PipsProp}{LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS}
+LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS TRUE
+\end{PipsProp}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Index Set Splitting
