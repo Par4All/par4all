@@ -1,10 +1,6 @@
-void pas_vous()
-{
-   int i, j, k;
-   for(i = 0; i <= k-1; i += 1)
-      for(j = 12; j <= i-1; j += 1)
-         printf("%d", j);
-}
+//
+// Code after privatize_module for module pas_vous
+//
 void pas_vous()
 {
    int i, j, k;

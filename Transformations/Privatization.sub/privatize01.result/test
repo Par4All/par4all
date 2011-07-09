@@ -1,9 +1,6 @@
-void papy_boom()
-{
-   int i = 0;
-   for(i = 0; i <= 9; i += 1)
-      printf("%i", i);
-}
+//
+// Code after privatize_module for module papy_boom
+//
 void papy_boom()
 {
    int i = 0;

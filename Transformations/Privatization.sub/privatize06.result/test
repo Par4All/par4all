@@ -1,16 +1,6 @@
-int erminable(char isme)
-{
-   int the, follow, ce, luke;
-   follow = the;
-   ce;
-   while (luke)
-      ;
-
-   for(the = 2; the <= 1; the += 1) {
-      ce = luke;
-      luke = ce;
-   }
-}
+//
+// Code after privatize_module for module erminable
+//
 int erminable(char isme)
 {
    int the, follow, ce, luke;

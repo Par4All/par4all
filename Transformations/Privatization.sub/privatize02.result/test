@@ -1,9 +1,6 @@
-void j_aime_les_moulinettes_a_fromage()
-{
-   int i, j = 0;
-   for(i = 0; i <= 11; i += 1)
-      j++;
-}
+//
+// Code after privatize_module for module j_aime_les_moulinettes_a_fromage
+//
 void j_aime_les_moulinettes_a_fromage()
 {
    int i, j = 0;
