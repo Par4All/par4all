@@ -3,7 +3,7 @@ import pypsutils
 import shutil, os, re
 import webbrowser
 
-def ir_navigator(m,openBrowser=False,output_dir="ir_navigator"):
+def ir_navigator(m,openBrowser=False,output_dir="ir_navigator",keep_existing=False):
     """Produce IR (internal representation) output for a module"""
     m.html_prettyprint()
     filename = os.path.join(m.workspace.dirname,m.show("HTML_IR_FILE"))
@@ -33,7 +33,16 @@ def ir_navigator(m,openBrowser=False,output_dir="ir_navigator"):
     
     
     #writing the output file
-    output_file = os.path.join(output_dir,m.name+'.html')
+    output_file = ""
+    current_suffix = ""
+    while output_file=="":
+        try_output_file = os.path.join(output_dir,m.name+str(current_suffix)+'.html')
+        if not keep_existing or not os.path.exists(try_output_file):
+            output_file=try_output_file
+        else:
+            if current_suffix == '': current_suffix=1
+            else: current_suffix += 1 
+        
     with open(output_file, 'w') as f:
         f.write(read_data)
 
