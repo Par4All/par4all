@@ -116,6 +116,10 @@ class module(object): # deriving from object is needed for overloaded setter
         """module name"""
         return self.__name
 
+    @property
+    def language(self):
+        return self.__ws.cpypips.get_module_language(self.name);
+
     def edit(self,editor=os.getenv("EDITOR","vi")):
         """edits module using given editor
            does nothing on compilation units ...
