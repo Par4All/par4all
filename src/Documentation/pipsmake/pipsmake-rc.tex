@@ -11983,7 +11983,7 @@ Produce a html version of the internal represenation of a PIPS Module
 \end{PipsPass}
 
 \begin{PipsMake}
-html_prettyprint > MODULE.parsed_printed_file
+html_prettyprint > MODULE.html_ir_file
          < PROGRAM.entities
          < MODULE.code
 \end{PipsMake}
@@ -11993,7 +11993,7 @@ Produce a html version of the symbol table
 \end{PipsPass}
 
 \begin{PipsMake}
-html_prettyprint_symbol_table > MODULE.parsed_printed_file
+html_prettyprint_symbol_table > PROGRAM.html_ir_file
          < PROGRAM.entities
          < MODULE.code
 \end{PipsMake}

@@ -158,7 +158,10 @@ class module(object): # deriving from object is needed for overloaded setter
 
     def show(self,rc):
         """get name of `rc' resource"""
-        return self.__ws.cpypips.show(rc.upper(),self.name).split()[-1]
+        try:
+            return self.__ws.cpypips.show(rc.upper(),self.name).split()[-1]
+        except:
+            raise RuntimeError("Cannot show resource " + rc)
 
     def display(self,activate="print_code", rc="printed_file", **props):
         """display a given resource rc of the module, with the
