@@ -5,8 +5,8 @@ from os import system
 with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as w:
 	# print out all functions
 	w.all_functions.display()
-	a_out=w.compile()
-	system("./"+a_out+" include/input.pgm include/mapfile.amp /dev/null")
+	#a_out=w.compile()
+	#system("./"+a_out+" include/input.pgm include/mapfile.amp /dev/null")
 
 	# print all function with both callers and callees
 	for fun in w.all:
@@ -14,7 +14,7 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 			fun.display()
 	
 	# get some help
-	help(module.unfolding)
+	#help(module.unfolding)
 	# apply what we have just learnt
 	w.fun.transfo.unfolding()
 	# select a transformation
@@ -39,15 +39,15 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 		t.suppress_dead_code()
 		t.display()
 		# greate, saturated arithmeteic !
-		help(module.expression_substitution)
+		#help(module.expression_substitution)
 		t.expression_substitution(pattern=w.fun.adds.name)
 		t.display()
 		t.privatize_module()
 		t.coarse_grain_parallelization()
 		# great ! OMP pragmas
 		t.display()
-		o=w.compile()
-		w.run(o, args=["include/input.pgm","include/mapfile.amp", "/dev/null"])
+		#o=w.compile()
+		#w.run(o, args=["include/input.pgm","include/mapfile.amp", "/dev/null"])
 
 		w.props.constant_path_effects=False
 		lbl=t.loops(0).loops(0).label
@@ -59,5 +59,5 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 
 		t.run(["sed","s/current/voltage/g"])
 		t.display()
-		a_out=w.compile()
+		#a_out=w.compile()
 		#a_out
