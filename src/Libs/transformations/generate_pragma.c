@@ -112,10 +112,10 @@ static void generate_expr_omp_pragma_loop (loop l) {
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
 
   if (pragma_expr_for_reduction (l, stmt) == false)
-    // A reduction pragma has alredy been found no need to look for a simple
-    // parallel for loop. Note that founding such a simple paralle for loop
+    // A reduction pragma has already been found no need to look for a simple
+    // parallel for loop. Note that founding such a simple parallel for loop
     // might show some problems in the code. For example dead code or the usage
-    // of unitialized variables. In such a case PIPS follows the principle :
+    // of initialized variables. In such a case PIPS follows the principle :
     // If the code is false or dead then, do it in parallel, it will still be
     // false or dead.
     pragma_expr_for (l, stmt);
