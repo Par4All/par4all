@@ -15,3 +15,49 @@ int erminable(char isme)
       luke = ce;
    }
 }
+//
+// Code after localize_declaration for module erminable
+//
+int erminable(char isme)
+{
+   int the, follow, ce, luke;
+   follow = the;
+   ce;
+   while (luke)
+      ;
+   {
+      //PIPS generated variable
+      int the;
+
+#pragma omp for private(the)
+      for(the = 2; the <= 1; the += 1) {
+         //PIPS generated variable
+         int ce, luke;
+         ce = luke;
+         luke = ce;
+      }
+   }
+}
+//
+// Code after clean_declarations for module erminable
+//
+int erminable(char isme)
+{
+   int the, ce, luke;
+   the;
+   ce;
+   while (luke)
+      ;
+   {
+      //PIPS generated variable
+      int the;
+
+#pragma omp for private(the)
+      for(the = 2; the <= 1; the += 1) {
+         //PIPS generated variable
+         int ce, luke;
+         ce = luke;
+         luke = ce;
+      }
+   }
+}

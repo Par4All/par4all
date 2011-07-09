@@ -16,3 +16,57 @@ void c_est_dommage()
    }
    j = l;
 }
+//
+// Code after localize_declaration for module c_est_dommage
+//
+void c_est_dommage()
+{
+   int i, j, k, l;
+   {
+      //PIPS generated variable
+      int i;
+#pragma omp for private(i)
+      for(i = 0; i <= 1; i += 1) {
+         //PIPS generated variable
+         int j1, k1;
+         j1 = 12;
+         k1 = 22;
+         {
+            //PIPS generated variable
+            int j;
+#pragma omp for private(j1,k1)
+            for(j1 = 4; j1 >= 1; j1 += -5) {
+               //PIPS generated variable
+               int k;
+               k1 = 23;
+               l = k1*2+j1;
+            }
+         }
+      }
+   }
+   j = l;
+}
+//
+// Code after clean_declarations for module c_est_dommage
+//
+void c_est_dommage()
+{
+   int l;
+   {
+      //PIPS generated variable
+      int i;
+#pragma omp for private(i)
+      for(i = 0; i <= 1; i += 1) {
+         //PIPS generated variable
+         int j1, k1;
+         j1 = 12;
+         k1 = 22;
+#pragma omp for private(j1,k1)
+         for(j1 = 4; j1 >= 1; j1 += -5) {
+            k1 = 23;
+            l = k1*2+j1;
+         }
+      }
+   }
+   l;
+}
