@@ -3105,7 +3105,8 @@ bool statement_substatement_p(statement s, statement root)
 
 /**
  * @brief computes the block-depth of a statement
- * usefull to generate entity declared at particular block level
+ * NOT INTENDED to generate entity name declared at particular block level :
+ * The block scope depends on the number of different blocks at the same depth !
  *
  * @param s statement we compute the depth of
  * @param root outer statement containing s
