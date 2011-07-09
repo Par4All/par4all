@@ -4835,6 +4835,7 @@ summary_regions                 > MODULE.summary_regions
 \index{IN Regions}
 \index{Regions (IN)}
 
+\begin{PipsPass}{in_regions}
 \verb+IN+ convex array regions are flow sensitive regions. They are read regions not
 covered (i.e. not previously written) by assignments in the local
 hierarchical control-flow graph. There is no way with the current
@@ -4842,6 +4843,7 @@ pipsmake-rc and \Pipsmake{} to express the fact that \verb+IN+ (and \verb+OUT+)
 regions must be calculated using \PipsPassRef{must_regions} (a new kind of
 resources, \PipsPassRef{must_regions}, should be added). The user must be
 knowledgeable enough to select \PipsPassRef{must_regions} first.
+\end{PipsPass}
 
 \begin{PipsMake}
 in_regions                      > MODULE.in_regions
