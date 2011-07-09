@@ -753,15 +753,11 @@ static void html_print_statement(statement s) {
 
   list l = statement_declarations(s);
   if(!ENDP(l)) {
-    bool cr;
-    if(CDR(l)) {
-      cr = true;
-    }
-    begin_block("declarations", cr);
+    begin_block("declarations", true);
     FOREACH( entity, e, l ) {
       html_print_entity_name(e);
     }
-    end_block("declarations", cr);
+    end_block("declarations", true);
   }
 
   begin_block("instruction", true);
