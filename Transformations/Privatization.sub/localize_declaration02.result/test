@@ -1,126 +1,91 @@
-Try to restructure the code for more precision:
+//
+// Code after privatize_module for module main
+//
 int main(int argc, char *argv[])
 {
-   float b[N], c[N], a;                                                 /*0006*/
-   int i;                                                               /*0007*/
+   float b[N], c[N], a;
+   int i;
 
-   a = 0;                                                               /*0009*/
+   a = 0;
 
-init:   do {                                                                 /*0017*/
-      for(i = 0; i <= 999999; i += 1) {                                 /*0013*/
-         b[i] = i;                                                      /*0014*/
-         c[i] = i+1;                                                    /*0015*/
-      }
-   }
-   while (1);                                                           /*0017*/
-compute:   do {                                                                 /*0022*/
-      for(i = 0; i <= 999999; i += 1)                                   /*0020*/
-         a = a+b[i]*c[i];                                               /*0021*/
-   }
-   while (1);                                                           /*0022*/
-
-   printf("Result = %f\n", a);                                          /*0024*/
-   return 0;                                                            /*0025*/
-}
-int main(int argc, char *argv[])
-{
-   float b[N], c[N], a;                                                 /*0006*/
-   int i;                                                               /*0007*/
-
-   a = 0;                                                               /*0009*/
-
-init:   do {                                                                 /*0017*/
-      for(i = 0; i <= 999999; i += 1) {                                 /*0013*/
-         b[i] = i;                                                      /*0014*/
-         c[i] = i+1;                                                    /*0015*/
-      }
-   }
-   while (1);                                                           /*0017*/
-compute:   do {                                                                 /*0022*/
-      for(i = 0; i <= 999999; i += 1)                                   /*0020*/
-         a = a+b[i]*c[i];                                               /*0021*/
-   }
-   while (1);                                                           /*0022*/
-
-   printf("Result = %f\n", a);                                          /*0024*/
-   return 0;                                                            /*0025*/
-}
-int main(int argc, char *argv[])
-{
-   float b[N], c[N], a;                                                 /*0006*/
-   int i;                                                               /*0007*/
-
-   a = 0;                                                               /*0009*/
-
-init:   do {                                                                 /*0017*/
-      //PIPS generated variable
-      int i;
+init:   do {
+#pragma omp for private(i)
       for(i = 0; i <= 999999; i += 1) {
-         b[i] = i;                                                      /*0014*/
-         c[i] = i+1;                                                    /*0015*/
+         b[i] = i;
+         c[i] = i+1;
       }
    }
-   while (1);                                                           /*0017*/
-compute:   do {                                                                 /*0022*/
-      //PIPS generated variable
-      int i;
+   while (1);
+compute:   do {
+#pragma omp for private(i)
       for(i = 0; i <= 999999; i += 1)
-         a = a+b[i]*c[i];                                               /*0021*/
+         a = a+b[i]*c[i];
    }
-   while (1);                                                           /*0022*/
+   while (1);
 
-   printf("Result = %f\n", a);                                          /*0024*/
-   return 0;                                                            /*0025*/
+   printf("Result = %f\n", a);
+   return 0;
 }
+//
+// Code after localize_declaration for module main
+//
 int main(int argc, char *argv[])
 {
-   float b[N], c[N], a;                                                 /*0006*/
+   float b[N], c[N], a;
+   int i;
 
-   a = 0;                                                               /*0009*/
+   a = 0;
 
-init:   do {                                                                 /*0017*/
+init:   do {
       //PIPS generated variable
       int i;
+#pragma omp for private(i)
       for(i = 0; i <= 999999; i += 1) {
-         b[i] = i;                                                      /*0014*/
-         c[i] = i+1;                                                    /*0015*/
+         b[i] = i;
+         c[i] = i+1;
       }
    }
-   while (1);                                                           /*0017*/
-compute:   do {                                                                 /*0022*/
+   while (1);
+compute:   do {
       //PIPS generated variable
       int i;
+#pragma omp for private(i)
       for(i = 0; i <= 999999; i += 1)
-         a = a+b[i]*c[i];                                               /*0021*/
+         a = a+b[i]*c[i];
    }
-   while (1);                                                           /*0022*/
+   while (1);
 
-   printf("Result = %f\n", a);                                          /*0024*/
-   return 0;                                                            /*0025*/
+   printf("Result = %f\n", a);
+   return 0;
 }
+//
+// Code after clean_declarations for module main
+//
 int main(int argc, char *argv[])
 {
-   float b[N], c[N], a;                                                 /*0006*/
+   float b[N], c[N], a;
 
-   a = 0;                                                               /*0009*/
+   a = 0;
 
-init:   do {                                                                 /*0017*/
+init:   do {
       //PIPS generated variable
       int i;
+#pragma omp for private(i)
       for(i = 0; i <= 999999; i += 1) {
-         b[i] = i;                                                      /*0014*/
-         c[i] = i+1;                                                    /*0015*/
+         b[i] = i;
+         c[i] = i+1;
       }
    }
-   while (1);                                                           /*0017*/
-compute:   do {                                                                 /*0022*/
+   while (1);
+compute:   do {
       //PIPS generated variable
       int i;
+#pragma omp for private(i)
       for(i = 0; i <= 999999; i += 1)
-         a = a+b[i]*c[i];                                               /*0021*/
+         a = a+b[i]*c[i];
    }
-   while (1);                                                           /*0022*/
+   while (1);
 
-   printf("Result = %f\n", a);                                          /*0024*/
-   return 0;                                                            /*0025*/
+   printf("Result = %f\n", a);
+   return 0;
 }
