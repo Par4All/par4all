@@ -1,3 +1,6 @@
+//
+// Code after privatize_module for module PRIVATIZATION08
+//
 C     Check that J is not privatized in the first loop, but privatized
 C     in the second one. This is the same vase as privatization01.f, but
 C     with a proper initialization of J
