@@ -7,6 +7,7 @@ import sys
 import tempfile
 import shutil
 import shlex
+import re
 from subprocess import Popen, PIPE
 
 # initialize pipslibs when module is loaded
@@ -101,7 +102,8 @@ class module(object): # deriving from object is needed for overloaded setter
         self.__name=name
         self.__source=source
         self.__ws=ws
-
+        self.re_compilation_units = re.compile("^.*!$")
+        
     @property
     def cu(self):
         """compilation unit"""
@@ -119,6 +121,9 @@ class module(object): # deriving from object is needed for overloaded setter
     @property
     def language(self):
         return self.__ws.cpypips.get_module_language(self.name);
+
+    def compilation_unit_p(self):
+        return self.re_compilation_units.match(self.name)
 
     def edit(self,editor=os.getenv("EDITOR","vi")):
         """edits module using given editor
@@ -568,21 +573,26 @@ class workspace(object):
         the_modules=[m for m in self.__modules.values() if matching(m)]
         return modules(the_modules)
 
+    @property
+    def compilation_units(self):
+     """Transform in the same way the filtered compilation units as a
+     pseudo-variable"""
+     return self.filter(lambda m:m.compilation_unit_p())
+
+    @property
+    def all_functions(self):
+     """Build also a pseudo-variable for the set of all the functions of the
+     workspace.  We should ask PIPS top-level for it instead of
+     recomputing it here, but it is so simple this way..."""
+     return self.filter(lambda m: not m.compilation_unit_p())
+
+
     def pre_phase(self, phase, module): pass
     def post_phase(self, phase, module): pass
 
     # Create an "all" pseudo-variable that is in fact the execution of
     # filter with the default filtering rule: True
     all = property(filter)
-
-    # Transform in the same way the filtered compilation units as a
-    # pseudo-variable:
-    compilation_units = property(pypsutils.filter_compilation_units)
-
-    # Build also a pseudo-variable for the set of all the functions of the
-    # workspace.  We should ask PIPS top-level for it instead of
-    # recomputing it here, but it is so simple this way...
-    all_functions = property(pypsutils.filter_all_functions)
 
     @staticmethod
     def delete(name):

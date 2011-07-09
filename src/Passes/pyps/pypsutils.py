@@ -109,16 +109,6 @@ def update_props(passe,props):
     return props
 
 
-# A regex matching compilation unit names ending with a "!":
-re_compilation_units = re.compile("^.*!$")
-def filter_compilation_units(ws):
-    """ retrieve compilation unit """
-    return ws.filter(lambda m: re_compilation_units.match(m.name))
-
-def filter_all_functions(ws):
-    """ retrieve function, all non compilation unit """
-    return ws.filter(lambda m: not re_compilation_units.match(m.name))
-
 def get_property(ws, name):
     name = name.upper()
     """return property value"""
