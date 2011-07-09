@@ -129,7 +129,7 @@ class module(object): # deriving from object is needed for overloaded setter
         """edits module using given editor
            does nothing on compilation units ...
         """
-        if not pypsutils.re_compilation_units.match(self.name):
+        if not self.compilation_unit_p():
             self.print_code()
             printcode_rc=os.path.join(self.__ws.dirname,self.__ws.cpypips.show("PRINTED_FILE",self.name))
             code_rc=os.path.join(self.__ws.dirname,self.__ws.cpypips.show("C_SOURCE_FILE",self.name))
@@ -159,7 +159,7 @@ class module(object): # deriving from object is needed for overloaded setter
         """run command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd < 'path/to/module/src' > 'path/to/module/src''
            does nothing on compilation unit ...
         """
-        if not pypsutils.re_compilation_units.match(self.name):
+        if not self.compilation_unit_p():
             (code_rc,printcode_rc) = self.__prepare_modification()
             pid=Popen(cmd,stdout=file(code_rc,"w"),stdin=file(printcode_rc,"r"),stderr=PIPE)
             if pid.wait() != 0:
@@ -182,7 +182,7 @@ class module(object): # deriving from object is needed for overloaded setter
 
     def _set_code(self,newcode):
         """set module content from a string"""
-        if not pypsutils.re_compilation_units.match(self.name):
+        if not self.compilation_unit_p()
             (code_rc,_) = self.__prepare_modification()
             pypsutils.string2file(newcode, code_rc)
 
