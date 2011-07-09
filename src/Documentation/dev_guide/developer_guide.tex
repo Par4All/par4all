@@ -2550,11 +2550,15 @@ to access it is provided in PyPS. For instance the following python sample opens
 specific transformation :
 
 \begin{lstlisting}[showspaces=false]
-   m = w.fun.main
-   m.localize_declaration()
-   w.fun.main.ir_navigator(openBrowser=True)
-   m.clean_declarations()
-   w.fun.main.ir_navigator(openBrowser=True,keep_existing=True)
+import ir_navigator
+...
+m = w.fun.main
+
+m.localize_declaration()
+w.fun.main.ir_navigator(openBrowser=True)
+
+m.clean_declarations()
+w.fun.main.ir_navigator(openBrowser=True,keep_existing=True)
 \end{lstlisting}
 
 
