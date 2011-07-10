@@ -1,4 +1,3 @@
-w=1024, h=1024, max=255
 int adds(char i0, char i1)
 {
    return (int) i0+i1>255?255:i0+i1;
