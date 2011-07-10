@@ -440,11 +440,12 @@ static bool fusion_loops(statement sloop1,
     }
   }
 
-  if(get_bool_property("LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS")) {
+  if(success && get_bool_property("LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS")) {
     // Check if we have perfect loop nests, and thus prevents losing parallelism
     statement inner_loop1 = get_first_inner_perfectly_nested_loop(body_loop1);
     statement inner_loop2 = get_first_inner_perfectly_nested_loop(body_loop2);
     if(!statement_undefined_p(inner_loop1) && !statement_undefined_p(inner_loop2)) {
+      pips_debug(4,"Ensure that we don't break parallel loop nests !\n");
       if(loop_parallel_p(statement_loop(inner_loop1)) &&
           loop_parallel_p(statement_loop(inner_loop2))) {
         // Record statements
@@ -454,7 +455,14 @@ static bool fusion_loops(statement sloop1,
         set stmts2 = set_make(set_pointer);
         gen_context_recurse(inner_loop2,stmts2,statement_domain,record_statements,gen_true);
 
+        pips_debug(4,"Try to fuse inner loops !\n");
         success = fusion_loops(inner_loop1,stmts1,inner_loop2,stmts2,maximize_parallelism);
+        if(success) {
+          pips_debug(4,"Inner loops fused :-)\n");
+          loop_body(loop1) = body_loop1;
+        } else {
+          pips_debug(4,"Inner loops not fusable :-(\n");
+        }
 
         set_free(stmts1);
         set_free(stmts2);
