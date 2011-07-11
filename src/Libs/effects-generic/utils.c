@@ -1461,38 +1461,6 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 /************ CONVERSION TO CONSTANT PATH EFFECTS ***********/
 
 
-#if 0
-static bool FILE_star_effect_reference(reference ref)
-{
-  bool res = false;
-  type t = basic_concrete_type(entity_type(reference_variable(ref)));
-  pips_debug(8, "begin with type %s\n",
-	     words_to_string(words_type(t,NIL)));
-  if (type_variable_p(t))
-    {
-      basic b = variable_basic(type_variable(t));
-      if (basic_pointer_p(b))
-	{
-	  t = basic_pointer(b);
-	   if (type_variable_p(t))
-	     {
-		basic b = variable_basic(type_variable(t));
-		if (basic_derived_p(b))
-		  {
-		    entity te = basic_derived(b);
-		    if (same_string_p(entity_user_name(te), "_IO_FILE"))
-		      {
-			res = true;
-		      }
-		  }
-	     }
-	}
-    }
-  pips_debug(8, "end with : %s\n", res? "true":"false");
-
-  return res;
-}
-#endif
 
 
 /**
