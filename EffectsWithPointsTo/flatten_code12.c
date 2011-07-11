@@ -1,6 +1,7 @@
 /* Make sure that initialization effects are taken into account. Here
-   "foo_0" is read, but this does not show in proper or cumulated
-   effects. */
+   global variable "foo_0" is read, and this must appear in the summary
+   effects at flatten_code12 call site.
+*/
 
 #include <stdio.h>
 

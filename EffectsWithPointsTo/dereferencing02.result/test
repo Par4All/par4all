@@ -106,7 +106,7 @@ void dereferencing02()
    
    **q = 2.;
 //             <    is read   >: p q
-//             <    is written>: x
+//             <    is written>: i x
    **(q+(i = 0)) = 3.;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
