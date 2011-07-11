@@ -1,12 +1,12 @@
 # $Id$
 #
-# Debian Lenny x86_64
+# Debian Squeeze x86_64
 #
 # check on commit runs on every minute
 * * * * * /home/fabien/CHECK/pips_check_compile --source /home/fabien/CHECK/pipsrc.sh --keepfail --validation-option DO_SLOW= pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # force check once a day
-7 0 * * * /home/fabien/CHECK/pips_check_compile --wait --force --report --source /home/fabien/CHECK/pipsrc.sh --validation-option PIPS_VALIDATION_EXE=1 pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
-# test autoconf version
+7 0 * * * /home/fabien/CHECK/pips_check_compile --wait --force --report --source /home/fabien/CHECK/pipsrc.sh --validation-option DO_SLOW= pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
+# test autoconf version on every hour
 @hourly /home/fabien/AUTOC/pips_check_compile --autoconf --keepfail --source=/home/fabien/AUTOC/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/AUTOC/prod /home/fabien/AUTOC/validation
 # force autoconf once a day
 7 1 * * * /home/fabien/AUTOC/pips_check_compile --wait --force --report --autoconf --keepfail --source=/home/fabien/AUTOC/pipsrc.sh --validation-option PIPS_VALIDATION_EXE=1 pips-validation@cri.ensmp.fr /home/fabien/AUTOC/prod /home/fabien/AUTOC/validation
@@ -14,3 +14,5 @@
 7 2 * * * /home/fabien/CROSS/pips_check_compile --force --report --source=/home/fabien/CROSS/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/CROSS/prod
 # private validation
 7 3 * * * /home/fabien/PRIVE/pips_check_compile --force --report --source /home/fabien/PRIVE/pipsrc.sh pips-private@cri.ensmp.fr /home/fabien/PRIVE/prod /home/fabien/PRIVE/private
+# debian squeeze with execution
+7 6 * * * /home/fabien/DEB60/pips_check_compile --force --report --source /home/fabien/DEB60/pipsrc.sh coelho@cri.ensmp.fr /home/fabien/DEB60/prod /home/fabien/DEB60/validation
