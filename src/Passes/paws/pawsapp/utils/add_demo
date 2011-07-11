@@ -27,9 +27,11 @@ echo $name
 source ../../bin/activate
 
 # new controller and new mako template
-paster controller --tutorial tutorial_$name
-paster tutorial-template $name $file
-mv "../pawsapp/templates/tutorial_${name}.mako.py" "../pawsapp/templates/tutorial_${name}.mako"
+#paster controller --tutorial tutorial_$name
+#paster tutorial-template $name $file
+#mv "../pawsapp/templates/tutorial_${name}.mako.py" "../pawsapp/templates/tutorial_${name}.mako"
+python create_controller.py tutorial ${name}
+python create_tutorial_template.py ${name} ${file}
 
 # new tutorial directory with files and description
 mkdir "${validation}$name"
