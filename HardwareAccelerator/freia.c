@@ -210,6 +210,7 @@ FunP(freia_aipo_or_const);
 FunP(freia_aipo_xor_const);
 
 Fun(freia_aipo_not);
+Fun(freia_aipo_log2);
 
 // Linear
 FunK2P(freia_aipo_convolution);
