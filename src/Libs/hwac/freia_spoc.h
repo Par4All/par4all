@@ -116,6 +116,9 @@ typedef enum {
   alu_xor_1cst,
   alu_not_0,
   alu_not_1,
+  // ???
+  // alu_log2_0,
+  // alu_log2_1,
   // array generation
   alu_copy_cst
   // and so on

@@ -144,6 +144,12 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_not_0, NO_MES },
     TRPX_OP(4, "NOT") // ??? why not less
   },
+  { AIPO "log2", "l2", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
+    // { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_log2_0, NO_MES },
+    // bug, an empty code is generated...
+    NO_SPOC,
+    TRPX_OP(3, "LOG2")
+  },
   { AIPO "add_const", "+.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_add_0cst, NO_MES },
     TRPX_OP(3, "ADD_CONST")
