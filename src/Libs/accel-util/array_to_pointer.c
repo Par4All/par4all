@@ -111,34 +111,34 @@ static void do_linearize_array_reference(reference r) {
                 /* merge all */
                 new_index=int_to_expression(0);/* better start with this than nothing */
                 while(!ENDP(vdims) && !ENDP(indices) ) {
-				  expression curr_exp = copy_expression(EXPRESSION(CAR(indices)));
-				  if (fortran_p) {
-					// in fortran we have to take care of the lower bound that can
-					// be set to any value
-					// First compute the lower bound
-					expression lower = copy_expression(dimension_lower(DIMENSION(CAR(vdims))));
-					if (ENDP(CDR(indices))) {
-					  // for the last dimension (the most contiguous in the memory)
-					  // substract the lower bound minus 1 since the first index is
-					  // one
-					  lower = add_integer_to_expression (lower, -1);
-					  curr_exp = make_op_exp (MINUS_OPERATOR_NAME, curr_exp, lower);
-					}
-					else {
-					  // substract the lower bound to the index to compute the
-					  // dimension stride in the linearized array
-					  curr_exp = make_op_exp (MINUS_OPERATOR_NAME, curr_exp, lower);
-					}
-				  }
-				  new_index=make_op_exp(PLUS_OPERATOR_NAME,
-										make_op_exp(MULTIPLY_OPERATOR_NAME,
-													curr_exp,
-													SizeOfDimensions(CDR(vdims))
-													),
-										new_index
-										);
-				  POP(vdims);
-				  POP(indices);
+                                  expression curr_exp = copy_expression(EXPRESSION(CAR(indices)));
+                                  if (fortran_p) {
+                                        // in fortran we have to take care of the lower bound that can
+                                        // be set to any value
+                                        // First compute the lower bound
+                                        expression lower = copy_expression(dimension_lower(DIMENSION(CAR(vdims))));
+                                        if (ENDP(CDR(indices))) {
+                                          // for the last dimension (the most contiguous in the memory)
+                                          // substract the lower bound minus 1 since the first index is
+                                          // one
+                                          lower = add_integer_to_expression (lower, -1);
+                                          curr_exp = make_op_exp (MINUS_OPERATOR_NAME, curr_exp, lower);
+                                        }
+                                        else {
+                                          // substract the lower bound to the index to compute the
+                                          // dimension stride in the linearized array
+                                          curr_exp = make_op_exp (MINUS_OPERATOR_NAME, curr_exp, lower);
+                                        }
+                                  }
+                                  new_index=make_op_exp(PLUS_OPERATOR_NAME,
+                                                                                make_op_exp(MULTIPLY_OPERATOR_NAME,
+                                                                                                        curr_exp,
+                                                                                                        SizeOfDimensions(CDR(vdims))
+                                                                                                        ),
+                                                                                new_index
+                                                                                );
+                                  POP(vdims);
+                                  POP(indices);
                 }
             }
             /* it's a pointer: pop type */
@@ -151,8 +151,8 @@ static void do_linearize_array_reference(reference r) {
             }
             new_indices=CONS(EXPRESSION,new_index,new_indices);
         }
-	reference_indices(r)=gen_nreverse(new_indices);
-	gen_full_free_list (to_be_free);
+        reference_indices(r)=gen_nreverse(new_indices);
+        gen_full_free_list (to_be_free);
     }
 }
 
@@ -247,18 +247,18 @@ static void do_array_to_pointer_type_aux(type *t) {
 static bool do_array_to_pointer_type(type *t) {
     bool remove = false;
     if(!type_void_or_void_pointer_p(*t)) {
-	    if(pointer_type_p(*t)){
-		    variable vt = type_variable(*t);
-		    basic bt = variable_basic(vt);
-		    type t2 = basic_pointer(bt);
-		    if(array_type_p(t2)) {
-			    basic_pointer(bt) = type_undefined;
-			    free_type(*t);
-			    *t=t2;
-			    remove=true;
-		    }
-	    }
-	    do_array_to_pointer_type_aux(t);
+            if(pointer_type_p(*t)){
+                    variable vt = type_variable(*t);
+                    basic bt = variable_basic(vt);
+                    type t2 = basic_pointer(bt);
+                    if(array_type_p(t2)) {
+                            basic_pointer(bt) = type_undefined;
+                            free_type(*t);
+                            *t=t2;
+                            remove=true;
+                    }
+            }
+            do_array_to_pointer_type_aux(t);
     }
     return remove;
 }
@@ -555,23 +555,23 @@ static void do_linearize_array(entity m, statement s, param_t *param) {
     /* step2: the declarations */
     FOREACH(ENTITY,e,entity_declarations(m))
       if(entity_variable_p(e)) {
-	bool rr;
-	pips_debug (5, "linearizing entity %s\n", entity_name (e));
-	do_linearize_type(&entity_type(e),&rr);
-	if(rr) do_linearize_remove_dereferencment(s,e);
-	do_linearize_array_init(entity_initial(e));
+        bool rr;
+        pips_debug (5, "linearizing entity %s\n", entity_name (e));
+        do_linearize_type(&entity_type(e),&rr);
+        if(rr) do_linearize_remove_dereferencment(s,e);
+        do_linearize_array_init(entity_initial(e));
       }
 
     /* pips bonus step: the consistency */
     set linearized_param = set_make(set_pointer);
     FOREACH(PARAMETER,p,module_functional_parameters(m)) {
         dummy d = parameter_dummy(p);
-	pips_debug (5, "linearizing parameters\n");
+        pips_debug (5, "linearizing parameters\n");
         if(dummy_identifier_p(d))
         {
             entity di = dummy_identifier(d);
             do_linearize_type(&entity_type(di),NULL);
-	    pips_debug (5, "linearizing dummy parameter %s\n", entity_name (di));
+            pips_debug (5, "linearizing dummy parameter %s\n", entity_name (di));
         }
 
         if(do_linearize_type(&parameter_type(p),NULL))
@@ -585,7 +585,7 @@ static void do_linearize_array(entity m, statement s, param_t *param) {
           }
           do_array_to_pointer_type(&parameter_type(p));
         }
-	pips_assert("everything went well",parameter_consistent_p(p));
+        pips_assert("everything went well",parameter_consistent_p(p));
     }
 
     /* step3: change the caller to reflect the new types accordinlgy */
@@ -644,9 +644,9 @@ static void do_array_to_pointer_patch_call_expression(expression exp) {
                     expression_syntax( EXPRESSION(CAR(call_arguments(c2))) )=syntax_undefined;
                     update_expression_syntax(exp,syn);
                 }
-		else if( ENTITY_ADDRESS_OF_P(call_function(c2))) {
-			update_expression_syntax(arg,copy_syntax(expression_syntax(EXPRESSION(CAR(call_arguments(c2))))));
-		}
+                else if( ENTITY_ADDRESS_OF_P(call_function(c2))) {
+                        update_expression_syntax(arg,copy_syntax(expression_syntax(EXPRESSION(CAR(call_arguments(c2))))));
+                }
             }
         }
     }
@@ -654,28 +654,28 @@ static void do_array_to_pointer_patch_call_expression(expression exp) {
 
 /* special ad-hoc handler for pointer to arrays */
 static void do_array_to_pointer_walk_call_and_patch(call c) {
-	entity op = call_function(c);
-	if(ENTITY_DEREFERENCING_P(op)) {
-		expression exp = EXPRESSION(CAR(call_arguments(c)));
-		if(expression_reference_p(exp)) {
-			reference r = expression_reference(exp);
-			entity e = reference_variable(r);
-			/* pointer to an array ... */
-			if(entity_pointer_p(e)) {
-				type pointed_type = basic_pointer(variable_basic(type_variable(ultimate_type(entity_type(e)))));
-				if(array_type_p(pointed_type)) {
-					update_expression_syntax(exp,
-							make_syntax_call(
-								make_call(
-									entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
-									CONS(EXPRESSION,copy_expression(exp),NIL)
-									)
-								)
-							);
-				}
-			}
-		}
-	}
+        entity op = call_function(c);
+        if(ENTITY_DEREFERENCING_P(op)) {
+                expression exp = EXPRESSION(CAR(call_arguments(c)));
+                if(expression_reference_p(exp)) {
+                        reference r = expression_reference(exp);
+                        entity e = reference_variable(r);
+                        /* pointer to an array ... */
+                        if(entity_pointer_p(e)) {
+                                type pointed_type = basic_pointer(variable_basic(type_variable(ultimate_type(entity_type(e)))));
+                                if(array_type_p(pointed_type)) {
+                                        update_expression_syntax(exp,
+                                                        make_syntax_call(
+                                                                make_call(
+                                                                        entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                                                                        CONS(EXPRESSION,copy_expression(exp),NIL)
+                                                                        )
+                                                                )
+                                                        );
+                                }
+                        }
+                }
+        }
 }
 
 static void do_array_to_pointer_walk_cast(cast ct){
@@ -736,35 +736,35 @@ list initialization_list_to_statements(entity e) {
         if(!formal_parameter_p(e)) {
             /* use alloca when converting array to pointers, to make sure everything is initialized correctly */
             free_value(entity_initial(e));
-	    type ct = copy_type(ultimate_type(entity_type(e)));
-	    if(array_type_p(ct)) {
-		    POP(variable_dimensions(type_variable(ct))); //leak spotted !
-		    ct = make_type_variable(
-				    make_variable(
-					    make_basic_pointer(ct),NIL,NIL
-					    )
-				    );
-	    }
-		
-	    entity_initial(e) = make_value_expression(
-			    syntax_to_expression(
-				    make_syntax_cast(
-					    make_cast(ct,
-						    MakeUnaryCall(
-							    entity_intrinsic(ALLOCA_FUNCTION_NAME),
-							    make_expression(
-								    make_syntax_sizeofexpression(
-									    make_sizeofexpression_type(
-										    copy_type(entity_type(e))
-										    )
-									    ),
-								    normalized_undefined
-								    )
-							    )
-						    )
-					    )
-				    )
-			    );
+            type ct = copy_type(ultimate_type(entity_type(e)));
+            if(array_type_p(ct)) {
+                    POP(variable_dimensions(type_variable(ct))); //leak spotted !
+                    ct = make_type_variable(
+                                    make_variable(
+                                            make_basic_pointer(ct),NIL,NIL
+                                            )
+                                    );
+            }
+
+            entity_initial(e) = make_value_expression(
+                            syntax_to_expression(
+                                    make_syntax_cast(
+                                            make_cast(ct,
+                                                    MakeUnaryCall(
+                                                            entity_intrinsic(ALLOCA_FUNCTION_NAME),
+                                                            make_expression(
+                                                                    make_syntax_sizeofexpression(
+                                                                            make_sizeofexpression_type(
+                                                                                    copy_type(entity_type(e))
+                                                                                    )
+                                                                            ),
+                                                                    normalized_undefined
+                                                                    )
+                                                            )
+                                                    )
+                                            )
+                                    )
+                            );
             AddEntityToModuleCompilationUnit(entity_intrinsic(ALLOCA_FUNCTION_NAME),
                     get_current_module_entity());
         }
@@ -864,14 +864,13 @@ bool linearize_array_generic (char *module_name)
         pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
         module_reorder(get_current_module_statement());
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
-	if (fortran_module_p(get_current_module_entity()) ) {
-	  // remove decls_text or the prettyprinter will use that field
-	  discard_module_declaration_text (get_current_module_entity ());
-	}
-	else {
-	  //compilation unti doesn't exit in fortran
-	  db_touch_resource(DBR_CODE,compilation_unit_of_module(module_name));
-	}
+        if (fortran_module_p(get_current_module_entity()) ) {
+          // remove decls_text or the prettyprinter will use that field
+          discard_module_declaration_text (get_current_module_entity ());
+        } else {
+          //compilation unti doesn't exit in fortran
+          db_touch_resource(DBR_CODE,compilation_unit_of_module(module_name));
+        }
         /*postlude*/
         reset_current_module_statement();
     }
