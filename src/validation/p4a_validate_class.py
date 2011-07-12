@@ -333,6 +333,7 @@ def valid_par4all():
 
 	test_list = list()
 	log_file = "p4a_log.txt"
+
 	# Open the file where par4all tests are:
 	for line in f:
 		# Check line is not empty
@@ -349,20 +350,18 @@ def valid_par4all():
 			for j in range(0,len(directory)-1):
 				directory_test = directory_test+'/'+directory[j]
 
-			# print (('# Considering %s')%(line.strip('\n')))
-
 			ext = ext.strip('\n').strip(' ')
 
+			# File to test
 			file_tested = (par4ll_validation_dir+line).strip('\n')
 
+			# Check that test can be add to the test_list
 			if(ext in extension):
 				if (os.path.isdir(directory_test) != True ):
 					print('%s is not a directory into packages/PIPS/validation'%(directory_test.replace(par4ll_validation_dir+'/','')))
 				elif (os.path.isfile(par4ll_validation_dir+line.strip('\n').strip(' ')) != True):
 					print('%s is not a file into packages/PIPS/validation/'%(line.strip('\n')))
 				else:
-					# Run test
-					# test_par4all(directory_test,par4ll_validation_dir+line,'p4a_log.txt')
 					test_list.append(file_tested)
 			elif (ext == '.result'):
 					test_name_list = search_file(file_tested.replace('.result',''))
@@ -608,6 +607,7 @@ def valid_pips():
 		shutil.rmtree("RESULT", ignore_errors=True)
 	os.mkdir("RESULT")
 
+	# Default file (where directories to test is listed
 	default_file_path = par4ll_validation_dir+"defaults"
 
 	default_file = open(default_file_path)
@@ -720,15 +720,10 @@ def valid_test(arg_test):
 			# Check that extension of the file is OK
 			if(ext in extension):
 				test_list.append(file_tested)
-				# Test
-				# status = test_par4all(directory_test, file_tested,log_file)
-				# print('%s : %s'%(arg_test[i],status))
 			elif (ext == '.result'):
 				test_name_list = search_file(file_tested.replace('.result',''))
 				for test_name_path in test_name_list:
 					test_list.append(file_tested)
-					# status = test_par4all(directory_test,test_name_path,log_file)
-					# print('%s : %s'%(test_name_path.replace(par4ll_validation_dir+'/',''),status))
 			else:
 				print('%s : Not done (extension must be %s or a valid .result folder)'%(arg_test[i],extension))
 
@@ -740,6 +735,34 @@ def valid_test(arg_test):
 		print line.strip('\n')
 	f.close()
 
+###### Launch make validate of pips validation ################
+def make_validate(options):
+	os.chdir(par4ll_validation_dir)
+
+	# Make 
+	command = ["make"]
+
+	# Add options for make
+	for opt in options:
+		command.append("-"+opt)
+
+	# Target of makefile
+	command.append("validate-out")
+
+	# Launch validation
+	process_valid = subprocess.Popen(command, stdout=subprocess.PIPE)
+	output = process_valid.communicate()[0]
+
+	makeval_file = open(p4a_root+'/make_validate.txt','w')
+	makeval_file.write(output)
+	makeval_file.close()
+
+	# String to print
+	string_command = str(command)
+	string_command = string_command.replace("[","").replace("]","").replace("'","").replace(",","")
+
+	print ('Output of the "'+string_command+'" is in '+p4a_root+'/make_validate.txt')
+
 ###################### Main -- Options #################################
 def main():
 	usage = "usage: python %prog [options]"
@@ -749,6 +772,7 @@ def main():
 	parser.add_option("--diff", action="store_true", dest="diff", help = "List tests that are done with pips option but not with p4a option")
 	parser.add_option("--dir", action="store_true", dest="dir", help = "Validate tests which are located in packages/PIPS/validation/directory_name")
 	parser.add_option("--test", action="store_true", dest="test", help = "Validate tests given in argument")
+	parser.add_option("--makeval", action="store_true", dest="makeval", help = "Launch 'make [options] validate-out' of pips validation. Options are make options without '-'. Example of usage: ./p4a-validate_class.py --makeval j4 l")
 	(options, args) = parser.parse_args()
 
 	#set all locale categories to C (English), to make the test results consistent to match
@@ -783,6 +807,10 @@ def main():
 			exit()
 
 		vc = valid_test(args)
+
+	elif options.makeval:
+		vc = make_validate(args)
+		print ('Summary of the validation is in par4all/packages/PIPS/validation/SUMMARY')
 
 	else:
 		# Help
