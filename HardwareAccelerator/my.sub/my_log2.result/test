@@ -20,7 +20,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 l2" [shape=circle];
+  "5 l2" [shape=trapezium,orientation=270];
   "5 l2" -> "o";
   "i0" -> "5 l2";
 }
@@ -33,7 +33,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 l2" [shape=circle];
+  "5 l2" [shape=trapezium,orientation=270];
   "5 l2" -> "o";
   "i0" -> "5 l2";
 }
@@ -66,7 +66,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 l2" [shape=circle];
+  "5 l2" [shape=trapezium,orientation=270];
   "5 l2" -> "o";
   "i0" -> "5 l2";
 }
@@ -79,7 +79,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 l2" [shape=circle];
+  "5 l2" [shape=trapezium,orientation=270];
   "5 l2" -> "o";
   "i0" -> "5 l2";
 }
@@ -92,7 +92,7 @@ digraph "my_log2_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 l2" [shape=circle];
+  "5 l2" [shape=trapezium,orientation=270];
   "5 l2" -> "o";
   "i0" -> "5 l2";
 }
@@ -122,12 +122,16 @@ freia_status my_log2_helper_0_0_0(freia_data2d * o0, freia_data2d * i0)
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 poc 0] 5 log2
+  // i0 [0 input 0] -> [0 alu] 5 log2
   // nope
+  // alu 5 log2 stage 0
+  si.alu[0][0].op = SPOC_ALU_LOG2_IN0;
+
 
   // output image o on 0
-  // o [0 poc 0] -> [0 output 0] 0 null
-  si.mux[0][0].op = SPOC_MUX_IN0;
+  // o [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
   // o [0 output 0] -> [7 output 0] 0 null
@@ -199,7 +203,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 l2" [shape=circle];
+  "5 l2" [shape=trapezium,orientation=270];
   "5 l2" -> "o";
   "i0" -> "5 l2";
 }
@@ -212,7 +216,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 l2" [shape=circle];
+  "5 l2" [shape=trapezium,orientation=270];
   "5 l2" -> "o";
   "i0" -> "5 l2";
 }
@@ -225,7 +229,7 @@ digraph "my_log2_helper_0_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 l2" [shape=circle];
+  "5 l2" [shape=trapezium,orientation=270];
   "5 l2" -> "o";
   "i0" -> "5 l2";
 }
