@@ -97,6 +97,9 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_div_10, alu_div_01, "SPOC_ALU_DIV_IN1_IN0", F, T, T },
   { alu_div_0cst, alu_div_1cst, "SPOC_ALU_DIV_IN0_CONST", T, T, F },
   { alu_div_1cst, alu_div_0cst, "SPOC_ALU_DIV_IN1_CONST", T, F, T },
+  // LOG2
+  { alu_log2_0, alu_log2_1, "SPOC_ALU_LOG2_IN0", F, T, F },
+  { alu_log2_1, alu_log2_0, "SPOC_ALU_LOG2_IN1", F, F, T },
   // INF
   { alu_inf_01, alu_inf_01, "SPOC_ALU_INF_IN0_IN1", F, T, T },
   { alu_inf_0cst, alu_inf_1cst, "SPOC_ALU_INF_IN0_CONST", T, T, F },
@@ -119,7 +122,7 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_xor_1cst, alu_xor_0cst, "SPOC_ALU_XOR_IN1_CONST", T, F, T },
   // NOT
   { alu_not_0, alu_not_1, "SPOC_ALU_NOT_IN0", F, T, F },
-  { alu_not_1, alu_not_0, "SPOC_ALU_NOT_IN1", T, F, T },
+  { alu_not_1, alu_not_0, "SPOC_ALU_NOT_IN1", F, F, T },
   // MISC
   { alu_copy_cst, alu_copy_cst, "SPOC_ALU_COPY_CONST", T, F, F }
   // and so on?

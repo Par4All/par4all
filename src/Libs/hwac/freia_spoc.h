@@ -97,6 +97,8 @@ typedef enum {
   alu_div_10,
   alu_div_0cst,
   alu_div_1cst,
+  alu_log2_0,
+  alu_log2_1,
   // comparisons
   alu_inf_01,
   alu_inf_0cst,
@@ -116,9 +118,6 @@ typedef enum {
   alu_xor_1cst,
   alu_not_0,
   alu_not_1,
-  // ???
-  // alu_log2_0,
-  // alu_log2_1,
   // array generation
   alu_copy_cst
   // and so on
@@ -175,40 +174,40 @@ typedef enum {
 #define spoc_depth_prop "HWAC_SPOC_DEPTH"
 
 // what about something simpler like "freia-spoc.h"?
-#define FREIA_SPOC_INCLUDES			\
-  "#include <freiaCommon.h>\n"			\
-  "#include <freiaMediumGrain.h>\n"		\
-  "#include <freiaCoarseGrain.h>\n"		\
+#define FREIA_SPOC_INCLUDES           \
+  "#include <freiaCommon.h>\n"        \
+  "#include <freiaMediumGrain.h>\n"   \
+  "#include <freiaCoarseGrain.h>\n"   \
   "#include <spoc.h>\n"
 
-#define FREIA_SPOC_DECL						\
-  "  spoc_instr si;\n"						\
-  "  spoc_param sp;\n"						\
-  "  spoc_reduction reduc;\n"					\
-  "  freia_microcode mcode;\n"					\
-  "  freia_dynamic_param dynparam;\n"				\
-  "  freia_reduction_results redres;\n"				\
-  "  freia_op_param param;\n"					\
-  "  freia_status ret;\n"					\
-  "  int i;\n"							\
-  "\n"								\
-  "  // init pipe to nop\n"					\
-  "  spoc_init_pipe(&si, &sp, " FREIA_DEFAULT_BPP ");\n"	\
+#define FREIA_SPOC_DECL                                   \
+  "  spoc_instr si;\n"                                    \
+  "  spoc_param sp;\n"                                    \
+  "  spoc_reduction reduc;\n"                             \
+  "  freia_microcode mcode;\n"                            \
+  "  freia_dynamic_param dynparam;\n"                     \
+  "  freia_reduction_results redres;\n"                   \
+  "  freia_op_param param;\n"                             \
+  "  freia_status ret;\n"                                 \
+  "  int i;\n"                                            \
+  "\n"                                                    \
+  "  // init pipe to nop\n"                               \
+  "  spoc_init_pipe(&si, &sp, " FREIA_DEFAULT_BPP ");\n"  \
   "\n"
 
-#define FREIA_SPOC_CALL						\
-  "\n"								\
-  "  mcode.raw = (freia_ptr) &si;\n"				\
-  "  mcode.size = sizeof(spoc_instr);\n"			\
-  "\n"								\
-  "  dynparam.raw = (freia_ptr) &sp;\n"				\
-  "  dynparam.size = sizeof(spoc_param);\n"			\
-  "\n"								\
-  "  redres.raw = (freia_ptr) &reduc;\n"			\
-  "  redres.size = sizeof(spoc_reduction);\n"			\
-  "\n"								\
-  "  ret = freia_cg_write_microcode(&mcode);\n"			\
-  "  ret |= freia_cg_write_dynamic_param(&dynparam);\n"		\
+#define FREIA_SPOC_CALL                                 \
+  "\n"                                                  \
+  "  mcode.raw = (freia_ptr) &si;\n"                    \
+  "  mcode.size = sizeof(spoc_instr);\n"                \
+  "\n"                                                  \
+  "  dynparam.raw = (freia_ptr) &sp;\n"                 \
+  "  dynparam.size = sizeof(spoc_param);\n"             \
+  "\n"                                                  \
+  "  redres.raw = (freia_ptr) &reduc;\n"                \
+  "  redres.size = sizeof(spoc_reduction);\n"           \
+  "\n"                                                  \
+  "  ret = freia_cg_write_microcode(&mcode);\n"         \
+  "  ret |= freia_cg_write_dynamic_param(&dynparam);\n" \
   "\n"
 
 #endif /* !HWAC_FREIA_SPOC_H_ */
