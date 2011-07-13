@@ -1433,7 +1433,8 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
         reference r = syntax_reference(s);
         list i = reference_indices(r);
         lr = generic_proper_effects_of_expressions(i);
-	lr = CONS(EFFECT, make_declaration_effect(reference_variable(r), false), lr);
+	if (!get_bool_property("MEMORY_EFFECTS_ONLY"))
+	  lr = CONS(EFFECT, make_declaration_effect(reference_variable(r), false), lr);
     }
     else
       {
