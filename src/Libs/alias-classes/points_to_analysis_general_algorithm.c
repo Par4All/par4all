@@ -366,10 +366,18 @@ set basic_ref_array(set pts_to_set, expression lhs, expression rhs) {
   effect e1 = effect_undefined, e2 = effect_undefined;
   /*init the effect's engine.*/
   set_methods_for_proper_simple_effects();
-  list l1 = generic_proper_effects_of_complex_address_expression(lhs, 
-								 &e1, true);
+  list l_ef = NIL;
+  list l1 = generic_proper_effects_of_complex_address_expression(lhs,
+								 &l_ef, true);
+  e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef); /* free the spine */
+
+  l_ef = NIL;
   list l2 = generic_proper_effects_of_complex_address_expression(rhs,
-								 &e2, false);
+								 &l_ef, false);
+  e2 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef); /* free the spine */
+
   effects_free(l1);
   effects_free(l2);
   /* transform tab[i] into tab[*]. */
@@ -428,12 +436,20 @@ set basic_ref_addr_emami(set pts_to_set, expression lhs, expression rhs) {
 
   // creation of the source
   effect e1 = effect_undefined, e2 = effect_undefined;
+  list l_ef = NIL;
   /*init the effect's engine.*/
   set_methods_for_proper_simple_effects();
-  list l1 = generic_proper_effects_of_complex_address_expression(lhs, &e1,
+  list l1 = generic_proper_effects_of_complex_address_expression(lhs, &l_ef,
 								 true);
-  list l2 = generic_proper_effects_of_complex_address_expression(rhs, &e2,
+  e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef); /* free the spine */
+  l_ef = NIL;
+
+  list l2 = generic_proper_effects_of_complex_address_expression(rhs, &l_ef,
 								 false);
+  e2 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef); /* free the spine */
+
   effects_free(l1);
   effects_free(l2);
   generic_effects_reset_all_methods();
@@ -478,12 +494,19 @@ set struct_double_pointer(set pts_to_set, expression lhs, expression rhs) {
   reference r1 = reference_undefined;
   reference r2 = reference_undefined;
   if (expression_reference_p(lhs) && expression_reference_p(rhs)) {
+    list l_ef = NIL;
     /* init the effect's engine. */
     set_methods_for_proper_simple_effects();
     list l1 = generic_proper_effects_of_complex_address_expression(lhs,
-								   &e1, true);
+								   &l_ef, true);
+    e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+    gen_free_list(l_ef); /* free the spine */
+    l_ef = NIL;
     list l2 = generic_proper_effects_of_complex_address_expression(rhs,
-								   &e2, false);
+								   &l_ef, false);
+    e2 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+    gen_free_list(l_ef); /* free the spine */
+
     effects_free(l1);
     effects_free(l2);
     generic_effects_reset_all_methods();
@@ -537,12 +560,19 @@ set struct_pointer(set pts_to_set, expression lhs, expression rhs) {
   effect e1 = effect_undefined, e2 = effect_undefined;
   reference r1 = reference_undefined;
   reference r2 = reference_undefined;
+  list l_ef = NIL;
   /* init the effect's engine.*/
   set_methods_for_proper_simple_effects();
-  list l1 = generic_proper_effects_of_complex_address_expression(lhs, &e1,
+  list l1 = generic_proper_effects_of_complex_address_expression(lhs, &l_ef,
 								 true);
-  list l2 = generic_proper_effects_of_complex_address_expression(rhs, &e2,
+  e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef); /* free the spine */
+  l_ef = NIL;
+  list l2 = generic_proper_effects_of_complex_address_expression(rhs, &l_ef,
 								 false);
+  e2 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef); /* free the spine */
+
   effects_free(l1);
   effects_free(l2);
   generic_effects_reset_all_methods();
@@ -1029,10 +1059,15 @@ cell get_array_path(expression e)
   cell c = cell_undefined;
 
   /*init the effect's engine*/
+  list l_ef = NIL;
   set_methods_for_proper_simple_effects();
-  list l1 = generic_proper_effects_of_complex_address_expression(e, &ef,
+  list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
 								 true);
+  ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef); /* free the spine */
+
   list l2 = effect_to_store_independent_sdfi_list(ef, false);
+
   effects_free(l1);
   effects_free(l2);
   generic_effects_reset_all_methods();
@@ -1055,8 +1090,12 @@ cell array_to_store_independent(cell c)
   effect e1 = effect_undefined;
   /*init the effect's engine.*/
   set_methods_for_proper_simple_effects();
+  list l_ef = NIL;
   list l1 = generic_proper_effects_of_complex_address_expression(e,
-								 &e1, false);
+								 &l_ef, false);
+  e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef); /* free the spine */
+
   effects_free(l1);
   list l2 = effect_to_store_independent_sdfi_list(e1, false);
   e1 = EFFECT(CAR(l2));
@@ -1080,8 +1119,13 @@ cell add_array_dimension(cell c)
   effect e1 = effect_undefined;
   /*init the effect's engine.*/
   set_methods_for_proper_simple_effects();
+  list l_ef = NIL;
   list l1 = generic_proper_effects_of_complex_address_expression(e,
-								 &e1, true);
+								 &l_ef, true);
+
+  e1 = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef); /* free the spine */
+
   effect_add_dereferencing_dimension(e1);
   effects_free(l1);
   generic_effects_reset_all_methods();
@@ -2260,8 +2304,11 @@ list  points_to_init_struct(entity e, entity ee){
 					    ex,
 					    ef);
 	    set_methods_for_proper_simple_effects();
-	    list l1 = generic_proper_effects_of_complex_address_expression(ex1, &eff,
+	    list l_ef = NIL;
+	    list l1 = generic_proper_effects_of_complex_address_expression(ex1, &l_ef,
 								       true);
+	    eff = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+	    gen_free_list(l_ef);
 	    reference r2 = effect_any_reference(eff);
 	    effects_free(l1);
 	    generic_effects_reset_all_methods();
@@ -2294,8 +2341,12 @@ list points_to_init_array_of_struct(entity e, entity field){
 	  reference  r = reference_undefined;
 	  /*init the effect's engine*/
 	  set_methods_for_proper_simple_effects();
-	  list l1 = generic_proper_effects_of_complex_address_expression(ex, &ef,
+	  list l_ef = NIL;
+	  list l1 = generic_proper_effects_of_complex_address_expression(ex, &l_ef,
 									 true);
+	  ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+	  gen_free_list(l_ef); /* free the spine */
+
 	  effect_add_dereferencing_dimension(ef);
 	  r = effect_any_reference(ef);
 	  list l_inds = reference_indices(r);

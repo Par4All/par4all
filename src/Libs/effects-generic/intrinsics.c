@@ -1435,11 +1435,10 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
     }
     else
       {
-	effect eff = effect_undefined;
-	lr = generic_proper_effects_of_complex_address_expression(e, &eff, false);
+	list l_eff = NIL;
+	lr = generic_proper_effects_of_complex_address_expression(e, &l_eff, false);
 	/* there is no effect on the argument of & */
-	if (!effect_undefined_p(eff))
-	  free_effect(eff);
+	effects_free(l_eff);
       }
 
     pips_debug_effects(5, "end\n", lr);
@@ -1969,34 +1968,42 @@ generic_string_effects(entity e, list args)
     }
   else
     {
-      effect eff1; /* main effect on first arg */
-      list l_tmp = generic_proper_effects_of_complex_address_expression(arg1, &eff1, true);
+      list l_eff1 = NIL; /* main effects on first arg */
+      list l_tmp = generic_proper_effects_of_complex_address_expression(arg1, &l_eff1, true);
       gen_full_free_list(l_tmp);
-      
-      if (!anywhere_effect_p(eff1))
+
+      FOREACH(EFFECT, eff1, l_eff1)
 	{
-	  if (gen_length(args) == 3) // we may know the number of elements
+	  if (!anywhere_effect_p(eff1))
 	    {
-	      /* first check whether the argument main effect is on a char *. */
-	      type t = simple_effect_reference_type(effect_any_reference(eff1));
-	      variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
-	      if (!variable_undefined_p(v)
-		  && ((basic_pointer_p(variable_basic(v))
-		       && ENDP(variable_dimensions(v))
-		       && char_type_p(basic_pointer(variable_basic(v))))
-		      ||
-		      (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+	      if (gen_length(args) == 3) // we may know the number of elements
 		{
-		  /* Effect is on eff11_ref[0..arg3-1]*/
-		  expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
-		  expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-						    copy_expression(arg3),
-						    int_to_expression(1));
-		  range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
-		  expression ie = make_expression(make_syntax_range(r),
-						  make_normalized_complex());
-		  (*effect_add_expression_dimension_func)(eff1, ie);
-		  le = gen_nconc(le, CONS(EFFECT, eff1, NIL));
+		  /* first check whether the argument main effect is on a char *. */
+		  type t = simple_effect_reference_type(effect_any_reference(eff1));
+		  variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
+		  if (!variable_undefined_p(v)
+		      && ((basic_pointer_p(variable_basic(v))
+			   && ENDP(variable_dimensions(v))
+			   && char_type_p(basic_pointer(variable_basic(v))))
+			  ||
+			  (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+		    {
+		      /* Effect is on eff11_ref[0..arg3-1]*/
+		      expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
+		      expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+							copy_expression(arg3),
+							int_to_expression(1));
+		      range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+		      expression ie = make_expression(make_syntax_range(r),
+						      make_normalized_complex());
+		      (*effect_add_expression_dimension_func)(eff1, ie);
+		      le = gen_nconc(le, CONS(EFFECT, eff1, NIL));
+		    }
+		  else
+		    {
+		      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
+		      free_effect(eff1);
+		    }
 		}
 	      else
 		{
@@ -2005,13 +2012,9 @@ generic_string_effects(entity e, list args)
 		}
 	    }
 	  else
-	    {
-	      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
-	      free_effect(eff1);
-	    }
+	    le = gen_nconc(le, CONS(EFFECT, eff1, NIL)); /* write is after reads */
 	}
-      else
-	le = gen_nconc(le, CONS(EFFECT, eff1, NIL)); /* write is after reads */
+      gen_free_list(l_eff1);
     }
 
   // and on the same number of elements of the second one for all handled intrinsics
@@ -2029,34 +2032,42 @@ generic_string_effects(entity e, list args)
 	}
       else
 	{
-	  effect eff2; /* main effect on second arg */
-	  list l_tmp = generic_proper_effects_of_complex_address_expression(arg2, &eff2, false);
+	  list l_eff2; /* main effects on second arg */
+	  list l_tmp = generic_proper_effects_of_complex_address_expression(arg2, &l_eff2, false);
 	  gen_full_free_list(l_tmp);
 
-	  if (!anywhere_effect_p(eff2))
+	  FOREACH(EFFECT, eff2, l_eff2)
 	    {
-	      if (gen_length(args) == 3) // we may know the number of elements
+	      if (!anywhere_effect_p(eff2))
 		{
-		  /* first check whether the argument main effect is on a char *. */
-		  type t = simple_effect_reference_type(effect_any_reference(eff2));
-		  variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
-		  if (!variable_undefined_p(v)
-		      && ((basic_pointer_p(variable_basic(v))
-			   && ENDP(variable_dimensions(v))
-			   && char_type_p(basic_pointer(variable_basic(v))))
-			  ||
-			  (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+		  if (gen_length(args) == 3) // we may know the number of elements
 		    {
-		      /* Effect is on eff12_ref[0..arg3-1]*/
-		      expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
-		      expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-							copy_expression(arg3),
-							int_to_expression(1));
-		      range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
-		      expression ie = make_expression(make_syntax_range(r),
-						      make_normalized_complex());
-		      (*effect_add_expression_dimension_func)(eff2, ie);
-		      le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
+		      /* first check whether the argument main effect is on a char *. */
+		      type t = simple_effect_reference_type(effect_any_reference(eff2));
+		      variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
+		      if (!variable_undefined_p(v)
+			  && ((basic_pointer_p(variable_basic(v))
+			       && ENDP(variable_dimensions(v))
+			       && char_type_p(basic_pointer(variable_basic(v))))
+			      ||
+			      (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+			{
+			  /* Effect is on eff12_ref[0..arg3-1]*/
+			  expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
+			  expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+							    copy_expression(arg3),
+							    int_to_expression(1));
+			  range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+			  expression ie = make_expression(make_syntax_range(r),
+							  make_normalized_complex());
+			  (*effect_add_expression_dimension_func)(eff2, ie);
+			  le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
+			}
+		      else
+			{
+			  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
+			  free_effect(eff2);
+			}
 		    }
 		  else
 		    {
@@ -2065,13 +2076,9 @@ generic_string_effects(entity e, list args)
 		    }
 		}
 	      else
-		{
-		  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
-		  free_effect(eff2);
-		}
+		le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
 	    }
-	  else
-	    le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
+	  gen_free_list(l_eff2);
 	}
     }
 
@@ -2412,77 +2419,80 @@ static list effects_of_C_ioelem(expression arg, tag act)
 
        /* first the effects on the file pointer */
        /* We should maybe check here that the argument has the right type (FILE *) */
-       effect fp_eff_w = effect_undefined;
-       effect fp_eff_r = effect_undefined;
-       list l_fp_eff = generic_proper_effects_of_complex_address_expression(arg, &fp_eff_r, false);
-       if (effect_undefined_p(fp_eff_r))
+       list l_fp_eff_r = NIL;
+       list l_fp_eff = generic_proper_effects_of_complex_address_expression(arg, &l_fp_eff_r, false);
+
+       FOREACH(EFFECT, fp_eff_r, l_fp_eff_r)
 	 {
-	   fp_eff_w = make_anywhere_effect(make_action_write_memory());
-	   fp_eff_r = make_anywhere_effect(make_action_read_memory());
-	 }
-       else
-	 {
-	   if( anywhere_effect_p(fp_eff_r))
-	     fp_eff_w = make_anywhere_effect(make_action_write_memory());
+	   effect fp_eff_w = effect_undefined;
+	   if (effect_undefined_p(fp_eff_r))
+	     {
+	       fp_eff_w = make_anywhere_effect(make_action_write_memory());
+	       fp_eff_r = make_anywhere_effect(make_action_read_memory());
+	     }
 	   else
 	     {
-	       /* the read effect on the file pointer will be added later */
-	       /* l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, copy_effect(fp_eff_r), NIL)); */
-	       effect_add_dereferencing_dimension(fp_eff_r);
-	       effect_to_may_effect(fp_eff_r);
-	       fp_eff_w = copy_effect(fp_eff_r);
-	       effect_action(fp_eff_w) = make_action_write_memory();
+	       if( anywhere_effect_p(fp_eff_r))
+		 fp_eff_w = make_anywhere_effect(make_action_write_memory());
+	       else
+		 {
+		   /* the read effect on the file pointer will be added later */
+		   /* l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, copy_effect(fp_eff_r), NIL)); */
+		   effect_add_dereferencing_dimension(fp_eff_r);
+		   effect_to_may_effect(fp_eff_r);
+		   fp_eff_w = copy_effect(fp_eff_r);
+		   effect_action(fp_eff_w) = make_action_write_memory();
+		 }
 	     }
+	   l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_w, CONS(EFFECT, fp_eff_r, NIL)));
+
+	   /* Then we simulate actions on files by read/write actions
+	      to a special static integer array.
+	      GO: It is necessary to do a read and write action to
+	      the array, because it updates the file-pointer so
+	      it reads it and then writes it ...
+	      We try to identify if the stream points to a std file
+	   */
+
+	   if ((!get_bool_property("USER_EFFECTS_ON_STD_FILES")) && std_file_effect_p(fp_eff_r))
+	     {
+	       const char* s = entity_user_name(effect_entity(fp_eff_r));
+	       if (same_string_p(s, "stdout"))
+		 unit = int_to_expression(STDOUT_FILENO);
+	       else if (same_string_p(s, "stdin"))
+		 unit = int_to_expression(STDIN_FILENO);
+	       else /* (same_string_p(s, "stderr")) */
+		 unit = int_to_expression(STDERR_FILENO);
+	       must_p = true;
+
+	     }
+	   else
+	     {
+	       unit = make_unbounded_expression();
+	       must_p = false;
+	     }
+	   indices = CONS(EXPRESSION,
+			  unit,
+			  NIL);
+	   private_io_entity = global_name_to_entity
+	     (IO_EFFECTS_PACKAGE_NAME,
+	      IO_EFFECTS_ARRAY_NAME);
+
+	   pips_assert("private_io_entity is defined\n",
+		       private_io_entity != entity_undefined);
+
+	   ref1 = make_reference(private_io_entity, indices);
+	   ref2 = copy_reference(ref1);
+	   eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
+	   eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
+
+	   if(!must_p)
+	     {
+	       effect_approximation_tag(eff1) = is_approximation_may;
+	       effect_approximation_tag(eff2) = is_approximation_may;
+	     }
+	   le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
 	 }
-       l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_w, CONS(EFFECT, fp_eff_r, NIL)));
-
-       /* Then we simulate actions on files by read/write actions
-	  to a special static integer array.
-	  GO: It is necessary to do a read and write action to
-	  the array, because it updates the file-pointer so
-	  it reads it and then writes it ...
-	  We try to identify if the stream points to a std file
-       */
-
-       if ((!get_bool_property("USER_EFFECTS_ON_STD_FILES")) && std_file_effect_p(fp_eff_r))
-	 {
-	   const char* s = entity_user_name(effect_entity(fp_eff_r));
-	   if (same_string_p(s, "stdout"))
-	     unit = int_to_expression(STDOUT_FILENO);
-	   else if (same_string_p(s, "stdin"))
-	     unit = int_to_expression(STDIN_FILENO);
-	   else /* (same_string_p(s, "stderr")) */
-	     unit = int_to_expression(STDERR_FILENO);
-	   must_p = true;
-
-	 }
-       else
-	 {
-	   unit = make_unbounded_expression();
-	   must_p = false;
-	 }
-       indices = CONS(EXPRESSION,
-		      unit,
-		      NIL);
-       private_io_entity = global_name_to_entity
-	 (IO_EFFECTS_PACKAGE_NAME,
-	  IO_EFFECTS_ARRAY_NAME);
-
-       pips_assert("private_io_entity is defined\n",
-		   private_io_entity != entity_undefined);
-
-       ref1 = make_reference(private_io_entity, indices);
-       ref2 = copy_reference(ref1);
-       eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
-       eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
-
-       if(!must_p)
-	 {
-	   effect_approximation_tag(eff1) = is_approximation_may;
-	   effect_approximation_tag(eff2) = is_approximation_may;
-	 }
-       le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
-
        le = gen_nconc(le, l_fp_eff);
 
        break;

@@ -90,7 +90,7 @@ void simple_cell_reference_with_address_of_cell_reference_translation
   list input_remaining_indices = reference_indices(input_ref);
   for(int i = 0; i<nb_common_indices; i++, POP(input_remaining_indices));
 
-  /* special case for the first remaning index: we must add it to the last index of build_ref */
+  /* special case for the first remaining index: we must add it to the last index of build_ref */
   if (!ENDP(output_indices))
     {
       expression last_output_indices_exp = EXPRESSION(CAR(output_indices));

@@ -220,8 +220,11 @@ list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
   }
   else {
     int dim = variable_entity_dimension(reference_variable(er));
+    list l_ef = NIL;
   list l1 = generic_proper_effects_of_complex_address_expression(e,
-								 &ef, false);
+								 &l_ef, false);
+  ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+  gen_free_list(l_ef);/* free the spine */
   effects_free(l1);
     for(i = 0; i< dim; i++)
   effect_add_dereferencing_dimension(ef);
@@ -307,11 +310,14 @@ cell get_memory_path(expression e, bool * eval_p)
       if(ENTITY_FIELD_P(op) ||
 	 ENTITY_POINT_TO_P(op) ||
 	 ENTITY_DEREFERENCING_P(op)){
-	
+
 	/*init the effect's engine*/
 	set_methods_for_proper_simple_effects();
-	list l1 = generic_proper_effects_of_complex_address_expression(e, &ef,
+	list l_ef = NIL;
+	list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
 								       true);
+	ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+	gen_free_list(l_ef); /* free the spine */
 	r = effect_any_reference(ef);
 	c = make_cell_reference(r);
 	(*eval_p) = effect_reference_dereferencing_p(r, &exact_p);
@@ -324,10 +330,13 @@ cell get_memory_path(expression e, bool * eval_p)
   else if(syntax_subscript_p(expression_syntax(e))){
     set_methods_for_proper_simple_effects();
     list l = NIL;
+    list l_ef = NIL;
     list l2 = generic_proper_effects_of_complex_memory_access_expression(e,
-									&ef,
+									&l_ef,
 									&l,
 									true);
+    ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+    gen_free_list(l_ef); /* free the spine */
     r = effect_any_reference(ef);
     c = make_cell_reference(r);
     effects_free(l2);
@@ -336,8 +345,12 @@ cell get_memory_path(expression e, bool * eval_p)
   }else if(array_argument_p(e)){
     (*eval_p) = false;
     set_methods_for_proper_simple_effects();
-    list l1 = generic_proper_effects_of_complex_address_expression(e, &ef,
+    list l_ef = NIL;
+    list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
 								   true);
+
+    ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+    gen_free_list(l_ef); /* free the spine */
     r = effect_any_reference(ef);
     c = make_cell_reference(r);
     effects_free(l1);
@@ -345,10 +358,13 @@ cell get_memory_path(expression e, bool * eval_p)
   }else if(expression_reference_p(e)){
     r = expression_reference(e);
     if(!ENDP(reference_indices(r)) && !array_argument_p(e) ){
+      list l_ef = NIL;
       (*eval_p) = true;
       set_methods_for_proper_simple_effects();
-      list l1 = generic_proper_effects_of_complex_address_expression(e, &ef,
+      list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
 								   true);
+      ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+      gen_free_list(l_ef); /* free the spine */
       r = effect_any_reference(ef);
       c = make_cell_reference(r);
       effects_free(l1);

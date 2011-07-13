@@ -301,8 +301,11 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
 						  ef);
 		  set_methods_for_proper_simple_effects();
 		  effect ef = effect_undefined;
-		  list l1 = generic_proper_effects_of_complex_address_expression(ex1, &ef,
+		  list l_ef = NIL;
+		  list l1 = generic_proper_effects_of_complex_address_expression(ex1, &l_ef,
 										 true);
+		  ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+		  gen_free_list(l_ef); /* free the spine */
 
 		  reference source_ref =  effect_any_reference(ef);
 		  effects_free(l1);
@@ -374,8 +377,11 @@ set  typedef_formal_parameter_to_stub_points_to(type pt, cell c)
 						  ef);
 			set_methods_for_proper_simple_effects();
 			effect ef = effect_undefined;
-			list l1 = generic_proper_effects_of_complex_address_expression(ex1, &ef,
+			list l_ef = NIL;
+			list l1 = generic_proper_effects_of_complex_address_expression(ex1, &l_ef,
 										       true);
+			ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+			gen_free_list(l_ef); /* free the spine */
 
 			reference source_ref =  effect_any_reference(ef);
 			effects_free(l1);
