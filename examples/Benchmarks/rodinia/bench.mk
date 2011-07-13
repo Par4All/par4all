@@ -1,6 +1,5 @@
 
-
-P4A_FLAGS+= --c99
+C99_MODE = 1
 
 include ../../bench.mk
 
