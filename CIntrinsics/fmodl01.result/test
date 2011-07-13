@@ -31,6 +31,7 @@ void main()
 //             <may be written>: d1 d2 stdin[0]
 //             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
 //             <    is written>: __IO_EFFECTS:LUNS[0]
+//             <    is referenced>: d1 d2
    scanf("%lf %lf", &d1, &d2);
 //             <    is read   >: d1 d2
 //             <    is written>: r
