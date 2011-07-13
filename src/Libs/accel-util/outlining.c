@@ -576,7 +576,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
     intptr_t i=0;
 
-	/* all variables are promoted parameters */
+    /* all variables are promoted parameters */
     list effective_parameters = NIL;
     list formal_parameters = NIL;
     FOREACH(ENTITY,e,referenced_entities)
@@ -729,20 +729,18 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
     /* prepare parameters and body*/
     module_functional_parameters(new_fun)=formal_parameters;
-	FOREACH(PARAMETER,p,formal_parameters) {
-		code_declarations(value_code(entity_initial(new_fun))) =
-			gen_nconc(
-					code_declarations(value_code(entity_initial(new_fun))),
-					CONS(ENTITY,dummy_identifier(parameter_dummy(p)),NIL));
-	}
+    FOREACH(PARAMETER,p,formal_parameters) {
+      code_declarations(value_code(entity_initial(new_fun))) =
+          gen_nconc(code_declarations(value_code(entity_initial(new_fun))),
+                    CONS(ENTITY,dummy_identifier(parameter_dummy(p)),NIL));
+    }
     /* either use origin's compilation unit or a new one */
     char * cu_name = string_undefined;
     // In fortran we always want to generate the outline function
     // in its own new file
     if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT") ||
        (fortran_module_p(get_current_module_entity()))) {
-    }
-    else {
+    } else {
       cu_name = compilation_unit_of_module(get_current_module_name());
     }
 
@@ -758,11 +756,12 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
     add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), cu_name );
     set_bool_property(STAT_ORDER,saved);
-	/* horrible hack to prevent declaration duplication
-	 * signed : Serge Guelton
-	 */
-	gen_free_list(code_declarations(EntityCode(new_fun)));
-	code_declarations(EntityCode(new_fun))=NIL;
+
+    /* horrible hack to prevent declaration duplication
+     * signed : Serge Guelton
+     */
+    gen_free_list(code_declarations(EntityCode(new_fun)));
+    code_declarations(EntityCode(new_fun))=NIL;
 
     /* we need to free them now, otherwise recompilation fails */
     FOREACH(PARAMETER,p,formal_parameters) {
@@ -857,11 +856,11 @@ outline(char* module_name)
     /* validate */
     module_reorder(get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,
-			   get_current_module_statement());
+                           get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));
 
     /*postlude*/
-	reset_cumulated_rw_effects();
+    reset_cumulated_rw_effects();
     reset_rw_effects();
     reset_current_module_entity();
     reset_current_module_statement();
