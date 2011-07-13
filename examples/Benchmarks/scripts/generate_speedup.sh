@@ -1,6 +1,9 @@
 #!/bin/bash
 
+if [[ -z $dbfile ]]; then
 dbfile="timing.sqlite"
+fi
+
 out_dat="timing.dat"
 out_gp="histogram.gp"
 rm -f $out_dat;
