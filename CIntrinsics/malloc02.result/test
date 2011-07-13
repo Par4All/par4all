@@ -41,7 +41,6 @@ int main()
 //             <may be written>: i stdin[0]
 //             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
 //             <    is written>: __IO_EFFECTS:LUNS[0]
-//             <    is referenced>: i
    scanf("%d", &i);
 //             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
