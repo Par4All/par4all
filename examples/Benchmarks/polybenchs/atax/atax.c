@@ -76,10 +76,9 @@ int main(int argc, char** argv) {
     tmp[i] = 0;
     for (j = 0; j < ny; j++)
       tmp[i] = tmp[i] + A[i][j] * x[j];
+    for (j = 0; j < ny; j++)
+      y[j] = y[j] + A[i][j] * tmp[i];
   }
-  for (j = 0; j < ny; j++)
-     for (i = 0; i < ny; i++)
-       y[j] = y[j] + A[i][j] * tmp[i];
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {
