@@ -1,3 +1,59 @@
+double allpass(int D, double w[], double *p[], double a, double x)
+{
+   double y, s0, sD;
+//             <may be read   >: w[*]
+//             <    is read   >: D p[0]
+//             <    is written>: sD
+
+   sD = tap(D, w, *p, D);
+//             <    is read   >: a sD x
+//             <    is written>: s0
+   /* \(D\)th tap delay output */
+   s0 = x+a*sD;
+//             <    is read   >: a s0 sD
+//             <    is written>: y
+   y = -a*s0+sD;
+//             <    is read   >: p[0] s0
+//             <    is written>: p[0][0]
+   /* filter output */
+   **p = s0;
+//             <    is read   >: D p[0]
+//             <    is written>: p[0]
+   /* delay input */
+   cdelay(D, w, p);
+//             <    is read   >: y
+   /* update delay line */
+   
+   return y;
+}
+double allpass(int D, double w[], double *p[], double a, double x)
+{
+   double y, s0, sD;
+
+//  <p[PHI1]-R-EXACT-{PHI1==0}>
+//  <w[PHI1]-R-MAY-{}>
+
+
+   sD = tap(D, w, *p, D);
+   /* \(D\)th tap delay output */
+   s0 = x+a*sD;
+   y = -a*s0+sD;
+
+//  <p[PHI1]-R-EXACT-{PHI1==0}>
+//  <p[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==0}>
+
+   /* filter output */
+   **p = s0;
+
+//  <p[PHI1]-R-EXACT-{PHI1==0}>
+//  <p[PHI1]-W-EXACT-{PHI1==0}>
+
+   /* delay input */
+   cdelay(D, w, p);
+   /* update delay line */
+   
+   return y;
+}
 
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
@@ -69,6 +125,9 @@ int main(int argc, char **argv)
 //  <in-R-EXACT-{}>
 //  <in[PHI1][PHI2]-R-MAY-{PHI1==0}>
 //  <in2-R-EXACT-{}>
+//  <in2[PHI1]-R-EXACT-{PHI1==0}>
+//  <in2[PHI1]-W-EXACT-{PHI1==0}>
+//  <in2[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==0}>
 
    r = allpass(4, *in, in2, 0.4f, 0.9f);
 
