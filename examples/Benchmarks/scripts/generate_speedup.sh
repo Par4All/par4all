@@ -9,14 +9,18 @@ if [[ ! -e $dbfile ]]; then
   echo "There's no sqlite db to process (${dbfile})"
 fi
 
-
+if [[ -z $versions ]]; then
 versions=`echo "select version from timing group by version;" | sqlite3 $dbfile`
-nvers=`echo "select count(DISTINCT version) from timing;" | sqlite3 $dbfile`
+fi
+
+
+nvers=0
 tests=`echo "select testcase from timing group by testcase;" | sqlite3 $dbfile`
 
 # 1st line is header
 echo -n " run_seq" >> $out_dat
 for ver in $versions; do
+  nvers=$(($nvers + 1))
   ver=`echo $ver|sed 's/run_//g'|sed 's/_/ /g'`
   echo -n " \"$ver\"" >> $out_dat
 done
