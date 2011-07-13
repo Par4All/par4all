@@ -11,6 +11,8 @@
 
 
 int main(int argc, char **argv);
+//PIPS generated variable
+void p4a_launcher_main(int n, char **argv, int a[n]);
 int main(int argc, char **argv)
 {
    int n = atoi(argv[1]);
