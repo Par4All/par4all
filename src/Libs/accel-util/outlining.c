@@ -738,8 +738,11 @@ statement outliner(string outline_module_name, list statements_to_outline)
     char * cu_name = string_undefined;
     // In fortran we always want to generate the outline function
     // in its own new file
-    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT") ||
-       (fortran_module_p(get_current_module_entity()))) {
+    if(fortran_module_p(get_current_module_entity())) {
+      ;
+    } else if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
+      // Declare in current module so that it's not undefined at call site
+      AddEntityToModuleCompilationUnit(new_fun,get_current_module_entity());
     } else {
       cu_name = compilation_unit_of_module(get_current_module_name());
     }
