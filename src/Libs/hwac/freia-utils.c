@@ -1016,6 +1016,13 @@ bool freia_aipo_terapix_implemented(const freia_api_t * api)
   return api->terapix.ucode!=NULL;
 }
 
+/* @brief is it the convolution special case?
+ */
+bool freia_convolution_p(dagvtx v)
+{
+  return same_string_p(dagvtx_operation(v), "convolution");
+}
+
 /* @brief get width & height of convolution
  */
 void freia_convolution_width_height(dagvtx v, _int * pw, _int * ph)
