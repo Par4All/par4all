@@ -296,9 +296,10 @@ static const freia_api_t FREIA_AIPO_API[] = {
   // cost rather approximated for Terapix
   { AIPO "convolution", "conv", NULL, 1, 1, 0, 3,
     NO_PARAM, { TY_PIN, TY_UIN, TY_UIN }, // kernel, width, height
+    // ??? the -1 is a hack used here and there, should be removed...
     NO_SPOC, { -1, -1, -1, -1, 0, 20, false, "TERAPIX_UCODE_CONV" }
   },
-  // not implemented by SPOC!
+  // not implemented by SPOC! nor by TERAPIX!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
     NO_PARAM, { TY_UIN, NULL, NULL },
     NO_SPOC, NO_TERAPIX
@@ -353,6 +354,7 @@ string what_operation(const _int type)
 {
   switch (type)
   {
+  case spoc_type_sni: return "sni";
   case spoc_type_oth: return "other";
   case spoc_type_nop: return "none";
   case spoc_type_inp: return "input";
