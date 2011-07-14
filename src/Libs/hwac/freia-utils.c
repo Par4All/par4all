@@ -62,7 +62,7 @@
 #define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, "TERAPIX_UCODE_" op }
 #define TRPX_NG(c, op) { 1, 1, 1, 1, 0, c, false, "TERAPIX_UCODE_" op }
 
-// preliminary stuff for volume/min/max/..., although it is not defined yet
+// preliminary stuff for volume/min/max/...
 #define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, "TERAPIX_UCODE_" op }
 
 // types used by AIPO parameters
@@ -293,9 +293,10 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   // LINEAR
   // not implemented by SPOC!
+  // cost rather approximated for Terapix
   { AIPO "convolution", "conv", NULL, 1, 1, 0, 3,
     NO_PARAM, { TY_PIN, TY_UIN, TY_UIN }, // kernel, width, height
-    NO_SPOC, NO_TERAPIX
+    NO_SPOC, { -1, -1, -1, -1, 0, 20, false, "TERAPIX_UCODE_CONV" }
   },
   // not implemented by SPOC!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
@@ -398,7 +399,9 @@ void set_operation(const freia_api_t * api, _int * type, _int * id)
   pips_assert("no type set", *type == spoc_type_nop);
 
   // set type which is enough for staging?
-  if (api->spoc.used & spoc_alu)
+  if (api->spoc.used==spoc_not_implemented)
+    *type = spoc_type_sni;
+  else if (api->spoc.used & spoc_alu)
     *type = spoc_type_alu;
   else if (api->spoc.used & (spoc_poc_0|spoc_poc_1))
     *type = spoc_type_poc;
@@ -407,7 +410,7 @@ void set_operation(const freia_api_t * api, _int * type, _int * id)
   else if (api->spoc.used & (spoc_measure_0|spoc_measure_1))
     *type = spoc_type_mes;
   else
-    *type = spoc_type_nop; // e.g. for copy? (cast? convol? ...)
+    *type = spoc_type_nop; // e.g. for copy? (...)
 
   // set details
   *id = hwac_freia_api_index(api->function_name);
@@ -631,16 +634,6 @@ bool entity_freia_api_p(const entity f)
   return strncmp(entity_local_name(f), AIPO, strlen(AIPO))==0;
 }
 
-/* @return whether to optimize AIPO call to function for SPoC.
-*/
-static bool freia_spoc_optimise(const entity called)
-{
-  string fname = entity_local_name(called);
-  return !same_string_p(fname, "freia_aipo_convolution") &&
-    !same_string_p(fname, "freia_aipo_cast") &&
-    !same_string_p(fname, "freia_aipo_fast_correlation");
-}
-
 /* returns whether the statement is a FREIA call.
  */
 bool freia_statement_aipo_call_p(const statement s)
@@ -650,9 +643,7 @@ bool freia_statement_aipo_call_p(const statement s)
   if (instruction_call_p(i)) {
     call c = instruction_call(i);
     entity called = call_function(c);
-    if (entity_freia_api_p(called) &&
-        // ??? should be take care later?
-        freia_spoc_optimise(called))
+    if (entity_freia_api_p(called))
       return true;
     else if (freia_assignment_p(called))
     {
@@ -660,9 +651,7 @@ bool freia_statement_aipo_call_p(const statement s)
       pips_assert("2 arguments to assign", gen_length(la));
       syntax op2 = expression_syntax(EXPRESSION(CAR(CDR(la))));
       if (syntax_call_p(op2))
-        return entity_freia_api_p(call_function(syntax_call(op2)))
-          // ??? later?
-          && freia_spoc_optimise(call_function(syntax_call(op2)));
+        return entity_freia_api_p(call_function(syntax_call(op2)));
     }
     else if (ENTITY_C_RETURN_P(called))
     {
@@ -670,9 +659,7 @@ bool freia_statement_aipo_call_p(const statement s)
       if (gen_length(la)==1) {
         syntax op = expression_syntax(EXPRESSION(CAR(la)));
         if (syntax_call_p(op))
-          return entity_freia_api_p(call_function(syntax_call(op)))
-            // ??? later?
-            && freia_spoc_optimise(call_function(syntax_call(op)));
+          return entity_freia_api_p(call_function(syntax_call(op)));
       }
     }
   }
@@ -1025,4 +1012,19 @@ bool freia_aipo_terapix_implemented(const freia_api_t * api)
 {
   pips_assert("some api", api!=NULL);
   return api->terapix.ucode!=NULL;
+}
+
+/* @brief get width & height of convolution
+ */
+void freia_convolution_width_height(dagvtx v, _int * pw, _int * ph)
+{
+  // pips_assert("vertex is convolution", ...)
+  list largs = freia_get_vertex_params(v);
+  pips_assert("3 args to convolution", gen_length(largs)==3);
+  bool bw = expression_integer_value(EXPRESSION(CAR(CDR(largs))), pw);
+  pips_assert("constant convolution width", bw);
+  pips_assert("odd convolution width", ((*pw)%2)==1);
+  bool bh = expression_integer_value(EXPRESSION(CAR(CDR(CDR(largs)))), ph);
+  pips_assert("constant convolution height", bh);
+  pips_assert("odd convolution height", ((*ph)%2)==1);
 }

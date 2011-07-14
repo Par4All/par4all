@@ -157,14 +157,24 @@ static void update_erosions
   // "const" with initial values { 000 XXX XXX } => north=0 and so on.
   // this is interesting on licensePlate, even if the zero
   // computations are still performed...
-  bool north = true, south = true, west = true, east = true;
-  if (api->terapix.north)
+  if (api->terapix.north==-1) // convolution special handling...
+  {
+    _int width, height;
+    freia_convolution_width_height(v, &width, &height);
+    w+=width/2;
+    e+=width/2;
+    n+=height/2;
+    s+=height/2;
+  }
+  else if (api->terapix.north) // erode & dilate
+  {
+    bool north = true, south = true, west = true, east = true;
     erosion_optimization(v, &north, &south, &west, &east);
-
-  if (north) n += api->terapix.north;
-  if (south) s += api->terapix.south;
-  if (west) w += api->terapix.west;
-  if (east) e += api->terapix.east;
+    if (north) n += api->terapix.north;
+    if (south) s += api->terapix.south;
+    if (west) w += api->terapix.west;
+    if (east) e += api->terapix.east;
+  }
 
   // store results
   hash_put(erosion, NORTH(v), (void*) n);
@@ -405,7 +415,7 @@ static void terapix_mcu_pval(string_buffer code, int op, string ref,
 static void gram_param
   (string_buffer code, string_buffer decl,
    string name, dagvtx v, hash_table hparams,
-   int width, int height, bool * used)
+   int width, int height, bool is_kernel, bool * used)
 {
   int size = width*height;
   pips_assert("something to copy...", size>0);
@@ -423,25 +433,29 @@ static void gram_param
   pips_assert("some args...", gen_length(largs)>0);
   string p1 = hash_get(hparams, EXPRESSION(CAR(largs)));
   // copy code...
-  switch (size)
+  if (is_kernel)
   {
-  case 1: // constant
-    sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
-    break;
-  case 3: // threshold min/max/bin
-    sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
-    sb_cat(code, "  p_", name, "[1] = ",
-           hash_get(hparams, EXPRESSION(CAR(CDR(largs)))), ";\n");
-    sb_cat(code, "  p_", name, "[2] = ",
-           hash_get(hparams, EXPRESSION(CAR(CDR(CDR(largs))))), ";\n");
-    break;
-  case 9: // kernel
     sb_cat(code,
-           "  for(i=0; i<9; i++)\n"
+           "  for(i=0; i<", itoa(size), "; i++)\n"
            "    p_", name, "[i] = ", p1, "[i];\n");
-    break;
-  default:
-    pips_internal_error("unexpected gram size");
+  }
+  else
+  {
+    switch (size)
+    {
+    case 1: // constant
+      sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
+      break;
+    case 3: // threshold min/max/bin
+      sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
+      sb_cat(code, "  p_", name, "[1] = ",
+             hash_get(hparams, EXPRESSION(CAR(CDR(largs)))), ";\n");
+      sb_cat(code, "  p_", name, "[2] = ",
+             hash_get(hparams, EXPRESSION(CAR(CDR(CDR(largs))))), ";\n");
+      break;
+    default:
+      pips_internal_error("unexpected gram size");
+    }
   }
 
   sb_cat(code, "  gram.xoffset = x_", name, ";\n");
@@ -478,15 +492,21 @@ static void terapix_gram_management
   {
     switch (api->arg_misc_in)
     {
-    case 3: // threshold
-      gram_param(code, decl, name, v, hparams, 3, 1, used);
+    case 3: // convolution or threshold
+      if (api->terapix.north==-1) // convolution special case
+      {
+        _int w, h;
+        freia_convolution_width_height(v, &w, &h);
+        gram_param(code, decl, name, v, hparams, w, h, true, used);
+      }
+      else
+        gram_param(code, decl, name, v, hparams, 3, 1, false, used);
       break;
     case 1: // kernel or operation with a constant
-      if (api->terapix.north)
-        // let us say it is a kernel...
-        gram_param(code, decl, name, v, hparams, 3, 3, used);
+      if (api->terapix.north) // let us say it is a kernel...
+        gram_param(code, decl, name, v, hparams, 3, 3, true, used);
       else
-        gram_param(code, decl, name, v, hparams, 1, 1, used);
+        gram_param(code, decl, name, v, hparams, 1, 1, false, used);
       break;
     default:
       pips_internal_error("unexpected number of input image arguments");
@@ -554,8 +574,21 @@ static void terapix_macro_code
   }
   terapix_mcu_val(code, op, "iter1", "TERAPIX_PE_NUMBER");
   terapix_mcu_val(code, op, "iter2", "imagelet_size");
-  terapix_mcu_val(code, op, "iter3", "0");
-  terapix_mcu_val(code, op, "iter4", "0");
+  if (api->terapix.north==-1) // convolution special case hack
+  {
+    _int w, h;
+    freia_convolution_width_height(v, &w, &h);
+    // ??? should I use the parameters?
+    // ??? or check their values?
+    // ??? or remove them from the list as they are inlined?
+    terapix_mcu_int(code, op, "iter3", (int) w);
+    terapix_mcu_int(code, op, "iter4", (int) h);
+  }
+  else
+  {
+    terapix_mcu_val(code, op, "iter3", "0");
+    terapix_mcu_val(code, op, "iter4", "0");
+  }
   terapix_mcu_val(code, op, "addrStart", api->terapix.ucode);
 }
 
