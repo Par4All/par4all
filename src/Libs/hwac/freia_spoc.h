@@ -55,8 +55,9 @@ typedef enum {
   spoc_alu_in0 = 0x01000000, // redundant with spoc_alu_op_t.use_in0
   spoc_alu_in1 = 0x02000000, // redundant with spoc_alu_op_t.use_in1
   spoc_alu_out0 = 0x04000000,
-  spoc_alu_out1 = 0x08000000
+  spoc_alu_out1 = 0x08000000,
   // others?
+  spoc_not_implemented = 0xffffffff
 } spoc_hw_parts_t;
 
 typedef enum {
@@ -127,7 +128,7 @@ typedef enum {
 typedef struct {
   spoc_alu_t op;  // operation
   spoc_alu_t flipped; // flipped call
-  string setting; // macro the operation
+  string setting; // macro for the operation
   bool use_cst;   // whether a constant is needed
   bool use_in0;   // whether first input is used
   bool use_in1;   // whether second input is used

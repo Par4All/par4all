@@ -52,7 +52,11 @@
 #define NO_POC { { spoc_poc_unused, 0 }, { spoc_poc_unused, 0 } }
 #define NO_MES { measure_none, measure_none }
 
-#define NO_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
+// no operation
+#define NOPE_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
+
+// not implemented
+#define NO_SPOC { spoc_not_implemented, NO_POC, alu_unused, NO_MES }
 #define NO_TERAPIX { 0, 0, 0, 0, 0, 0, false, NULL }
 
 #define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, "TERAPIX_UCODE_" op }
@@ -77,7 +81,7 @@
  */
 static const freia_api_t FREIA_AIPO_API[] = {
   { "undefined", "?", NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    { 0, NO_POC, alu_unused, NO_MES }, NO_TERAPIX
+    NO_SPOC, NO_TERAPIX
   },
   {
     // ARITHMETIC
@@ -93,7 +97,8 @@ static const freia_api_t FREIA_AIPO_API[] = {
       alu_add,
       // global measures
       NO_MES
-    }, TRPX_OP(4, "ADD3")
+    },
+    TRPX_OP(4, "ADD3")
   },
   { AIPO "sub", "-", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
@@ -208,12 +213,12 @@ static const freia_api_t FREIA_AIPO_API[] = {
   // semantics of "scalar_copy(a, b);" is "*a = *b;"
   { AIPO "scalar_copy", "?=", NULL, 0, 0, 1, 1, NO_PARAM,
       { TY_INT, TY_INT, NULL},
-    { 0, NO_POC, alu_unused, NO_MES },
-    NO_TERAPIX
+    NO_SPOC, NO_TERAPIX
   },
   // MISC
   // this one may be ignored?!
   { AIPO "copy", "=", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
+    // hmmm... would NO_SPOC do?
     { spoc_input_0|spoc_output_0, NO_POC, alu_unused, NO_MES },
     TRPX_OP(3, "COPY")
   },
@@ -289,7 +294,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   // LINEAR
   // not implemented by SPOC!
   { AIPO "convolution", "conv", NULL, 1, 1, 0, 3,
-    NO_PARAM, { TY_PIN, TY_UIN, TY_UIN },
+    NO_PARAM, { TY_PIN, TY_UIN, TY_UIN }, // kernel, width, height
     NO_SPOC, NO_TERAPIX
   },
   // not implemented by SPOC!
@@ -1004,4 +1009,20 @@ void freia_clean_image_occurrences(hash_table occs)
   HASH_FOREACH(entity, v, set, s, occs)
     set_free(s);
   hash_table_free(occs);
+}
+
+/* @brief whether api available with SPoC
+ */
+bool freia_aipo_spoc_implemented(const freia_api_t * api)
+{
+  pips_assert("some api", api!=NULL);
+  return api->spoc.used!=spoc_not_implemented;
+}
+
+/* @brief whether api available with Ter@pix
+ */
+bool freia_aipo_terapix_implemented(const freia_api_t * api)
+{
+  pips_assert("some api", api!=NULL);
+  return api->terapix.ucode!=NULL;
 }
