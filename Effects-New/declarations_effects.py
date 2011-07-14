@@ -1,8 +1,7 @@
-import pyps
+from validation import vworkspace
 
-w = pyps.workspace("declarations_effects.c");
+with vworkspace() as w:
+  w.props.constant_path_effects = False
+  w.props.memory_effects_only = False
+  w.fun.main.display("print_code_proper_effects")
 
-w.props.memory_effects_only = False;
-w.fun.main.print_code_proper_effects();
-
-w.fun.main.display();
