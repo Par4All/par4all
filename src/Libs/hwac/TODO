@@ -31,7 +31,7 @@
 - other simple or complex algebraic optimization ideas?
   maybe at least A xor A => A = 0 would be useful?
 - redundancy: max coord includes max
-- check optimality of tests cases
++ check optimality of tests cases (for spoc)
 
 * code
 + cleanup data structures?
