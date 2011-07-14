@@ -234,6 +234,7 @@ void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */);
     Since it is a macro, beware of side effects...
 */
 #define P4A_min(a, b) ((a) > (b) ? (b) : (a))
+#define P4A_max(a, b) ((a) > (b) ? (a) : (b))
 
 #ifdef P4A_ACCEL_CUDA
 #include <p4a_accel-CUDA.h>
