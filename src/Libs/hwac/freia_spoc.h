@@ -69,7 +69,7 @@ typedef enum {
   measure_vol
 } spoc_measure_t;
 
-/* all ALU operations */
+/* all SPoC ALU operations */
 typedef enum {
   alu_unused,
   // arithmetic operations

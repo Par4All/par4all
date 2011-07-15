@@ -306,8 +306,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   // last entry
   { NULL, NULL, NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    { 0, NO_POC, alu_unused, NO_MES },
-    NO_TERAPIX
+    NO_SPOC, NO_TERAPIX
   }
 };
 
@@ -1013,6 +1012,11 @@ bool freia_aipo_spoc_implemented(const freia_api_t * api)
 bool freia_aipo_terapix_implemented(const freia_api_t * api)
 {
   pips_assert("some api", api!=NULL);
+  // some special cases are handled manually
+  if (same_string_p(api->function_name, "undefined") ||
+      // this one is inserted to deal with replicated measures
+      same_string_p(api->function_name, AIPO "scalar_copy"))
+    return true;
   return api->terapix.ucode!=NULL;
 }
 
@@ -1024,16 +1028,18 @@ bool freia_convolution_p(dagvtx v)
 }
 
 /* @brief get width & height of convolution
+ * @return whether they could be extracted
  */
-void freia_convolution_width_height(dagvtx v, _int * pw, _int * ph)
+bool freia_convolution_width_height(dagvtx v, _int * pw, _int * ph, bool check)
 {
   // pips_assert("vertex is convolution", ...)
   list largs = freia_get_vertex_params(v);
-  pips_assert("3 args to convolution", gen_length(largs)==3);
+  if (check) pips_assert("3 args to convolution", gen_length(largs)==3);
   bool bw = expression_integer_value(EXPRESSION(CAR(CDR(largs))), pw);
-  pips_assert("constant convolution width", bw);
-  pips_assert("odd convolution width", ((*pw)%2)==1);
+  if (check) pips_assert("constant convolution width", bw);
+  if (check) pips_assert("odd convolution width", ((*pw)%2)==1);
   bool bh = expression_integer_value(EXPRESSION(CAR(CDR(CDR(largs)))), ph);
-  pips_assert("constant convolution height", bh);
-  pips_assert("odd convolution height", ((*ph)%2)==1);
+  if (check) pips_assert("constant convolution height", bh);
+  if (check) pips_assert("odd convolution height", ((*ph)%2)==1);
+  return bw && bh;
 }

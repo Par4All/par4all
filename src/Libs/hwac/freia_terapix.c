@@ -157,14 +157,17 @@ static void update_erosions
   // "const" with initial values { 000 XXX XXX } => north=0 and so on.
   // this is interesting on licensePlate, even if the zero
   // computations are still performed...
-  if (api->terapix.north==-1) // convolution special handling...
+  if (freia_convolution_p(v)) // convolution special handling...
   {
     _int width, height;
-    freia_convolution_width_height(v, &width, &height);
-    w+=width/2;
-    e+=width/2;
-    n+=height/2;
-    s+=height/2;
+    if (freia_convolution_width_height(v, &width, &height, false))
+    {
+      w+=width/2;
+      e+=width/2;
+      n+=height/2;
+      s+=height/2;
+    }
+    // else simply ignore, should not be used anyway...
   }
   else if (api->terapix.north) // erode & dilate
   {
@@ -493,10 +496,10 @@ static void terapix_gram_management
     switch (api->arg_misc_in)
     {
     case 3: // convolution or threshold
-      if (api->terapix.north==-1) // convolution special case
+      if (freia_convolution_p(v)) // convolution special case
       {
         _int w, h;
-        freia_convolution_width_height(v, &w, &h);
+        freia_convolution_width_height(v, &w, &h, true);
         gram_param(code, decl, name, v, hparams, w, h, true, used);
       }
       else
@@ -574,10 +577,10 @@ static void terapix_macro_code
   }
   terapix_mcu_val(code, op, "iter1", "TERAPIX_PE_NUMBER");
   terapix_mcu_val(code, op, "iter2", "imagelet_size");
-  if (api->terapix.north==-1) // convolution special case hack
+  if (freia_convolution_p(v)) // convolution special case hack
   {
     _int w, h;
-    freia_convolution_width_height(v, &w, &h);
+    freia_convolution_width_height(v, &w, &h, true);
     // ??? should I use the parameters?
     // ??? or check their values?
     // ??? or remove them from the list as they are inlined?
@@ -1397,8 +1400,13 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
   // if there is only one of them
   if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
   {
+    // non implemented stuff
+    if (!freia_aipo_terapix_implemented(a1))
+      result = 1, why = "impl";
+    else if (!freia_aipo_terapix_implemented(a2))
+      result = -1, why = "impl";
     // scalars operations first to remove (scalar) dependences
-    if (vtxcontent_optype(c1)==spoc_type_oth)
+    else if (vtxcontent_optype(c1)==spoc_type_oth)
       result = -1, why = "scal";
     else if (vtxcontent_optype(c2)==spoc_type_oth)
       result = 1, why = "scal";
@@ -1514,14 +1522,39 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
   return result;
 }
 
+/* @brief whether vertex is not implemented in terapix
+ */
+static bool not_implemented(dagvtx v)
+{
+  if (freia_convolution_p(v)) // special case
+  {
+    // skip if parametric
+    _int w, h;
+    return !freia_convolution_width_height(v, &w, &h, false);
+  }
+  return !freia_aipo_terapix_implemented(dagvtx_freia_api(v));
+}
+
+/* @brief whether dag is not implemented in terapix
+ */
+static bool terapix_not_implemented(dag d)
+{
+  FOREACH(dagvtx, v, dag_vertices(d))
+    if (not_implemented(v))
+      return true;
+  return false;
+}
+
 /* @brief split a dag on scalar dependencies only, with a greedy heuristics.
  * @param initial dag to split
+ * @param alone_only whether to keep it alone (for non implemented cases)
  * @return a list of sub-dags
  * this pass also decides the schedule of image operations, with the aim
  * or reducing the number of necessary imagelets, so as to maximise
  * imagelet size.
  */
-static list /* of dags */ split_dag_on_scalars(const dag initial)
+static list /* of dags */
+split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx))
 {
   if (!single_image_assignement_p(initial))
     // well, it should work most of the time, so only a warning
@@ -1572,9 +1605,17 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
       ifdebug(7)
         dagvtx_dump(stderr, "choice", first);
 
+      // do not add if not alone
+      if (alone_only && alone_only(first) && lcurrent)
+        break;
+
       set_add_element(current, current, first);
       set_add_element(computed, computed, first);
       lcurrent = gen_nconc(lcurrent, CONS(dagvtx, first, NIL));
+
+      // getout if was alone
+      if (alone_only && alone_only(first))
+        break;
     }
 
     // is there something?
@@ -1810,7 +1851,7 @@ void freia_trpx_compile_calls
   //           \-> E -> F />
   // then ABEF / CD is chosen
   // although ABE / FCD and AB / EFCD would be also possible...
-  list ld = split_dag_on_scalars(fulld);
+  list ld = split_dag_on_scalars(fulld, not_implemented);
 
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
@@ -1824,6 +1865,10 @@ void freia_trpx_compile_calls
   int n_split = 0;
   FOREACH(dag, d, ld)
   {
+    // skip if something is not implemented
+    if (terapix_not_implemented(d))
+      continue;
+
     if (trpx_dag_cut_none_p(dag_cut))
     {
       // direct handling of the dag

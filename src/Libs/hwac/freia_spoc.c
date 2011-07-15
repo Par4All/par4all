@@ -1871,7 +1871,7 @@ static int number_of_output_arcs(dag d, set vs)
 
 /* does this dag contains a spoc non implemented operation?
  */
-static bool not_implemented(dag d)
+static bool dag_spoc_not_implemented(dag d)
 {
   FOREACH(dagvtx, v, dag_vertices(d))
     if (dagvtx_optype(v)==spoc_type_sni)
@@ -2122,7 +2122,7 @@ void freia_spoc_compile_calls
   FOREACH(dag, d, ld)
   {
     // skip non implemented stuff
-    if (not_implemented(d))
+    if (dag_spoc_not_implemented(d))
       continue;
 
     set remainings = set_make(set_pointer);
