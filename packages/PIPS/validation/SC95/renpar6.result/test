@@ -230,7 +230,7 @@ C  <A(PHI1)-OUT-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=J, J+1<=N}>
       DIMENSION WORK(100,100)
       K0 = M*M                                                          0006
       DOALL I = 1, N                                                    0007
-         PRIVATE WORK(1:100, 1:100),K,J
+         PRIVATE J,K,WORK(1:100, 1:100)
          K = K0+I-1                                                     0008
          DOALL J = 1, N                                                 0009
             WORK(J,K) = J+K                                             0010

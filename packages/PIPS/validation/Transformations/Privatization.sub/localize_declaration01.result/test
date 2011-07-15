@@ -1,0 +1,87 @@
+//
+// Code after privatize_module for module main
+//
+int main(int argc, char *argv[])
+{
+   float b[N], c[N], a;
+   int i;
+
+   a = 0;
+
+#pragma omp for private(i)
+init:
+   for(i = 0; i <= 999999; i += 1) {
+      b[i] = i;
+      c[i] = i+1;
+   }
+#pragma omp for private(i)
+compute:
+   for(i = 0; i <= 999999; i += 1)
+      a = a+b[i]*c[i];
+
+   printf("Result = %f\n", a);
+   return 0;
+}
+//
+// Code after localize_declaration for module main
+//
+int main(int argc, char *argv[])
+{
+   float b[N], c[N], a;
+   int i;
+
+   a = 0;
+   {
+      //PIPS generated variable
+      int i;
+
+init:      ;
+#pragma omp for private(i)
+      for(i = 0; i <= 999999; i += 1) {
+         b[i] = i;
+         c[i] = i+1;
+      }
+   }
+   {
+      //PIPS generated variable
+      int i;
+compute:      ;
+#pragma omp for private(i)
+      for(i = 0; i <= 999999; i += 1)
+         a = a+b[i]*c[i];
+   }
+
+   printf("Result = %f\n", a);
+   return 0;
+}
+//
+// Code after clean_declarations for module main
+//
+int main(int argc, char *argv[])
+{
+   float b[N], c[N], a;
+
+   a = 0;
+   {
+      //PIPS generated variable
+      int i;
+
+init:      ;
+#pragma omp for private(i)
+      for(i = 0; i <= 999999; i += 1) {
+         b[i] = i;
+         c[i] = i+1;
+      }
+   }
+   {
+      //PIPS generated variable
+      int i;
+compute:      ;
+#pragma omp for private(i)
+      for(i = 0; i <= 999999; i += 1)
+         a = a+b[i]*c[i];
+   }
+
+   printf("Result = %f\n", a);
+   return 0;
+}

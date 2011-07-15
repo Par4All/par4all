@@ -10,7 +10,7 @@
                DOALL J = 1, 2                                           0006
                   PRIVATE I
                   DOALL I = 1, 10                                       0007
-                     PRIVATE Z,Y,X,W
+                     PRIVATE W,X,Y,Z
                      X = 2.3                                            0008
                      Y = 5.3+X                                          0009
                      Z = 2.32+Y                                         0010
@@ -38,7 +38,7 @@
 !HPF$          INDEPENDENT, NEW(I)
                DO J = 1, 2                                              0006
 
-!HPF$             INDEPENDENT, NEW(Z,Y,X,W)
+!HPF$             INDEPENDENT, NEW(W,X,Y,Z)
                   DO I = 1, 10                                          0007
                      X = 2.3                                            0008
                      Y = 5.3+X                                          0009
@@ -67,7 +67,7 @@
 !$OMP          PARALLEL DO PRIVATE(I)
                DO J = 1, 2                                              0006
 
-!$OMP             PARALLEL DO PRIVATE(Z,Y,X,W)
+!$OMP             PARALLEL DO PRIVATE(W,X,Y,Z)
                   DO I = 1, 10                                          0007
                      X = 2.3                                            0008
                      Y = 5.3+X                                          0009

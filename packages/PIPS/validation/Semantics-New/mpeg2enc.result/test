@@ -5305,10 +5305,12 @@ void putbits(int val, int n)
 
 Cumulated effects for "putnonintrablk"
 
-//             <may be read   >: stderr stderr[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: alternate_scan[*] altscan blk blk[*] 
+//                               errortext[*] mpeg1 outfile outfile[0]
+//                               stderr stderr[0] zig_zag_scan[*] 
 //                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*]
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
 //             <may be written>: errortext[*] outfile[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
@@ -5321,10 +5323,13 @@ void putnonintrablk(short *blk)
    run = 0;
 //             <    is written>: first
    first = 1;
-//             <may be read   >: stderr stderr[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: alternate_scan[*] altscan blk blk[*] 
+//                               errortext[*] first mpeg1 n outfile 
+//                               outfile[0] run signed_level stderr 
+//                               stderr[0] zig_zag_scan[*] 
 //                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*]
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
 //             <may be written>: errortext[*] first outfile[0] run 
 //                               signed_level stderr[0] 
 //                               __IO_EFFECTS:LUNS[2] 
@@ -5333,7 +5338,9 @@ void putnonintrablk(short *blk)
 //             <    is written>: n
 
    for(n = 0; n <= 63; n += 1) {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: alternate_scan[*] blk[*] 
+//                               zig_zag_scan[*]
+//             <    is read   >: altscan blk n
 //             <    is written>: signed_level
       /* use appropriate entropy scanning pattern */
       signed_level = blk[(altscan?alternate_scan:zig_zag_scan)[n]];
@@ -5608,10 +5615,59 @@ void putpict(unsigned char *frame)
    /* initialize quantization parameter */
    
    k = 0;
-//             <may be read   >: stderr stderr[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*]
+//             <may be read   >: MBAinc PMV[0][0][0] PMV[0][0][1] 
+//                               PMV[0][1][0] PMV[0][1][1] 
+//                               PMV[0][*][0] PMV[0][*][1] 
+//                               PMV[1][*][0] PMV[1][*][1] 
+//                               alternate_scan[*] altscan avg_act 
+//                               back_hor_f_code back_vert_f_code 
+//                               block_count blocks cbp cc 
+//                               chroma_format comp dc_dct_pred[*] 
+//                               dc_prec errortext[*] forw_hor_f_code 
+//                               forw_vert_f_code frame_pred_dct i 
+//                               inter_q[*] intra_q[*] intravlc j k 
+//                               map_non_linear_mquant[*] mb_type 
+//                               mb_width mbinfo mbinfo[*].MV[0][0][0]
+//                               mbinfo[*].MV[0][0][1] 
+//                               mbinfo[*].MV[0][1][0] 
+//                               mbinfo[*].MV[0][1][1] 
+//                               mbinfo[*].MV[0][*][0] 
+//                               mbinfo[*].MV[0][*][1] 
+//                               mbinfo[*].MV[1][*][0] 
+//                               mbinfo[*].MV[1][*][1] 
+//                               mbinfo[*].dct_type 
+//                               mbinfo[*].dmvector[0] 
+//                               mbinfo[*].dmvector[1] 
+//                               mbinfo[*].mb_type 
+//                               mbinfo[*].motion_type 
+//                               mbinfo[*].mquant 
+//                               mbinfo[*].mv_field_sel[0][0] 
+//                               mbinfo[*].mv_field_sel[0][1] 
+//                               mbinfo[*].mv_field_sel[0][*] 
+//                               mbinfo[*].mv_field_sel[1][*] 
+//                               mbinfo[*].act mpeg1 
+//                               non_linear_mquant_table[*] outfile 
+//                               outfile[0] pict_struct pict_type 
+//                               prev_mquant q_scale_type quiet r 
+//                               stderr stderr[0] vertical_size 
+//                               zig_zag_scan[*] __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt 
+//                               putvlc!:DCchromtab[*].code 
+//                               putvlc!:DCchromtab[*].len 
+//                               putvlc!:DClumtab[*].code 
+//                               putvlc!:DClumtab[*].len 
+//                               putvlc!:addrinctab[*].code 
+//                               putvlc!:addrinctab[*].len 
+//                               putvlc!:cbptable[*].code 
+//                               putvlc!:cbptable[*].len 
+//                               putvlc!:mbtypetab[*][*].code 
+//                               putvlc!:mbtypetab[*][*].len 
+//                               putvlc!:motionvectab[*].code 
+//                               putvlc!:motionvectab[*].len 
+//                               ratectl!:Q ratectl!:S ratectl!:T 
+//                               ratectl!:actsum ratectl!:d 
+//                               ratectl!:prev_mquant
 //             <may be written>: MBAinc PMV[0][0][0] PMV[0][0][1] 
 //                               PMV[0][1][0] PMV[0][1][1] 
 //                               PMV[0][*][0] PMV[0][*][1] 
@@ -5628,13 +5684,63 @@ void putpict(unsigned char *frame)
 //                               putbits!:outbfr putbits!:outcnt 
 //                               ratectl!:Q ratectl!:actsum 
 //                               ratectl!:prev_mquant
+//             <    is read   >: mb_height2
 //             <    is written>: j
 
    for(j = 0; j <= mb_height2-1; j += 1)
-//             <may be read   >: stderr stderr[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*]
+//             <may be read   >: MBAinc PMV[0][0][0] PMV[0][0][1] 
+//                               PMV[0][1][0] PMV[0][1][1] 
+//                               PMV[0][*][0] PMV[0][*][1] 
+//                               PMV[1][*][0] PMV[1][*][1] 
+//                               alternate_scan[*] altscan avg_act 
+//                               back_hor_f_code back_vert_f_code 
+//                               block_count blocks cbp cc 
+//                               chroma_format comp dc_dct_pred[*] 
+//                               dc_prec errortext[*] forw_hor_f_code 
+//                               forw_vert_f_code frame_pred_dct i 
+//                               inter_q[*] intra_q[*] intravlc j k 
+//                               map_non_linear_mquant[*] mb_type 
+//                               mbinfo mbinfo[*].MV[0][0][0] 
+//                               mbinfo[*].MV[0][0][1] 
+//                               mbinfo[*].MV[0][1][0] 
+//                               mbinfo[*].MV[0][1][1] 
+//                               mbinfo[*].MV[0][*][0] 
+//                               mbinfo[*].MV[0][*][1] 
+//                               mbinfo[*].MV[1][*][0] 
+//                               mbinfo[*].MV[1][*][1] 
+//                               mbinfo[*].dct_type 
+//                               mbinfo[*].dmvector[0] 
+//                               mbinfo[*].dmvector[1] 
+//                               mbinfo[*].mb_type 
+//                               mbinfo[*].motion_type 
+//                               mbinfo[*].mquant 
+//                               mbinfo[*].mv_field_sel[0][0] 
+//                               mbinfo[*].mv_field_sel[0][1] 
+//                               mbinfo[*].mv_field_sel[0][*] 
+//                               mbinfo[*].mv_field_sel[1][*] 
+//                               mbinfo[*].act mpeg1 
+//                               non_linear_mquant_table[*] outfile 
+//                               outfile[0] pict_struct pict_type 
+//                               prev_mquant q_scale_type quiet r 
+//                               stderr stderr[0] vertical_size 
+//                               zig_zag_scan[*] __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt 
+//                               putvlc!:DCchromtab[*].code 
+//                               putvlc!:DCchromtab[*].len 
+//                               putvlc!:DClumtab[*].code 
+//                               putvlc!:DClumtab[*].len 
+//                               putvlc!:addrinctab[*].code 
+//                               putvlc!:addrinctab[*].len 
+//                               putvlc!:cbptable[*].code 
+//                               putvlc!:cbptable[*].len 
+//                               putvlc!:mbtypetab[*][*].code 
+//                               putvlc!:mbtypetab[*][*].len 
+//                               putvlc!:motionvectab[*].code 
+//                               putvlc!:motionvectab[*].len 
+//                               ratectl!:Q ratectl!:S ratectl!:T 
+//                               ratectl!:actsum ratectl!:d 
+//                               ratectl!:prev_mquant
 //             <may be written>: MBAinc PMV[0][0][0] PMV[0][0][1] 
 //                               PMV[0][1][0] PMV[0][1][1] 
 //                               PMV[0][*][0] PMV[0][*][1] 
@@ -5650,6 +5756,7 @@ void putpict(unsigned char *frame)
 //                               putbits!:outbfr putbits!:outcnt 
 //                               ratectl!:Q ratectl!:actsum 
 //                               ratectl!:prev_mquant
+//             <    is read   >: mb_height2 mb_width
 //             <    is written>: i
       /* macroblock row loop */
       
@@ -6106,61 +6213,99 @@ l99996:         ;
 //             <    is read   >: block_count cbp mb_height2 mb_width
                putbits(cbp, block_count-6);
          }
-//             <may be read   >: stderr stderr[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*]
+//             <may be read   >: alternate_scan[*] altscan blocks cbp 
+//                               cc comp dc_dct_pred[*] errortext[*] 
+//                               intravlc k mb_type mpeg1 outfile 
+//                               outfile[0] stderr stderr[0] 
+//                               zig_zag_scan[*] __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt 
+//                               putvlc!:DCchromtab[*].code 
+//                               putvlc!:DCchromtab[*].len 
+//                               putvlc!:DClumtab[*].code 
+//                               putvlc!:DClumtab[*].len
 //             <may be written>: cc dc_dct_pred[*] errortext[*] 
 //                               outfile[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: block_count mb_height2 mb_width
 //             <    is written>: comp
 
          for(comp = 0; comp <= block_count-1; comp += 1)
-//             <may be read   >: stderr stderr[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: alternate_scan[*] altscan blocks cc 
+//                               dc_dct_pred[*] errortext[*] intravlc 
+//                               k mb_type mpeg1 outfile outfile[0] 
+//                               stderr stderr[0] zig_zag_scan[*] 
 //                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*]
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt 
+//                               putvlc!:DCchromtab[*].code 
+//                               putvlc!:DCchromtab[*].len 
+//                               putvlc!:DClumtab[*].code 
+//                               putvlc!:DClumtab[*].len
 //             <may be written>: cc dc_dct_pred[*] errortext[*] 
 //                               outfile[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: block_count cbp comp mb_height2 
+//                               mb_width
             if (cbp&1<<block_count-1-comp)
-//             <may be read   >: stderr stderr[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: alternate_scan[*] altscan cc 
+//                               dc_dct_pred[*] errortext[*] intravlc 
+//                               mpeg1 outfile outfile[0] stderr 
+//                               stderr[0] zig_zag_scan[*] 
 //                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*]
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt 
+//                               putvlc!:DCchromtab[*].code 
+//                               putvlc!:DCchromtab[*].len 
+//                               putvlc!:DClumtab[*].code 
+//                               putvlc!:DClumtab[*].len
 //             <may be written>: cc dc_dct_pred[*] errortext[*] 
 //                               outfile[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: block_count blocks comp k mb_height2 
+//                               mb_type mb_width
                if (mb_type&1) {
 //             <    is read   >: block_count comp mb_height2 mb_width
 //             <    is written>: cc
                   cc = comp<4?0:(comp&1)+1;
-//             <may be read   >: stderr stderr[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
-//                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*]
+//             <may be read   >: alternate_scan[*] altscan 
+//                               dc_dct_pred[*] errortext[*] outfile 
+//                               outfile[0] stderr stderr[0] 
+//                               zig_zag_scan[*] __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt 
+//                               putvlc!:DCchromtab[*].code 
+//                               putvlc!:DCchromtab[*].len 
+//                               putvlc!:DClumtab[*].code 
+//                               putvlc!:DClumtab[*].len
 //             <may be written>: dc_dct_pred[*] errortext[*] 
 //                               outfile[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: block_count blocks cc comp intravlc k
+//                               mb_height2 mb_width mpeg1
                   putintrablk(blocks[k*block_count+comp], cc);
                }
                else
-//             <may be read   >: stderr stderr[0] 
-//                               *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: alternate_scan[*] altscan 
+//                               errortext[*] mpeg1 outfile outfile[0]
+//                               stderr stderr[0] zig_zag_scan[*] 
 //                               __IO_EFFECTS:LUNS[2] 
-//                               __IO_EFFECTS:LUNS[*]
+//                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
+//                               putbits!:outbfr putbits!:outcnt
 //             <may be written>: errortext[*] outfile[0] stderr[0] 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
+//             <    is read   >: block_count blocks comp k mb_height2 
+//                               mb_width
                   putnonintrablk(blocks[k*block_count+comp]);
 //             <may be read   >: cc
 //             <may be written>: cc dc_dct_pred[*]
@@ -34876,8 +35021,8 @@ void putintrablk(short *blk, int cc)
    else
 
 //  P(dct_diff,n,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt,run,
-//    signed_level) {n==64, 0<=dct_diff+2047, dct_diff<=2047,
-//    putbits!:bytecnt#init<=putbits!:bytecnt,
+//    signed_level) {intravlc==0, n==64, 0<=dct_diff+2047,
+//    dct_diff<=2047, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
 //    putbits!:outcnt#init,
 //    512putbits!:bytecnt#init+64putbits!:outcnt+63<=512

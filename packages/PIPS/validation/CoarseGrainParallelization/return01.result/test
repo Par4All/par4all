@@ -2,6 +2,8 @@ int find_neg(int size, int a[size])
 {
    int i = 0;
    int result = -1;
+   
+   // this loop must not be parallelized
    for(i = 0; i <= size-1; i += 1)
       if (a[i]<0)
          return i;
@@ -16,7 +18,33 @@ int main()
       a[i] = 0;
    return find_neg(size, a);
 }
-// return the index of the first negative element, -1 if all positive
-int find_neg(int size, int a[size]);
+int find_neg(int size, int a[size])
+{
+   int i = 0;
+   int result = -1;
+   //PIPS generated variable
+   int find_neg;
+   i = 0;
+l99997:   ;
 
-int main();
+// this loop must not be parallelized
+   if (!(i<size)) goto l99999;
+   if (a[i]<0) goto l99998;
+   i++;
+   goto l99997;
+l99998:   ;
+   find_neg = i;
+   return find_neg;
+l99999:   ;
+   find_neg = result;
+   return find_neg;
+}
+int main()
+{
+   int size = 10, i = 0;
+   int a[size];
+#pragma omp parallel for 
+   for(i = 0; i <= size-1; i += 1)
+      a[i] = 0;
+   return find_neg(size, a);
+}

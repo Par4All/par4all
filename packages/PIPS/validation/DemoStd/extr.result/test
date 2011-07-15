@@ -136,7 +136,7 @@ C
          L = NI                                                         0022
          K = K1                                                         0023
          DOALL J = J1, JA                                               0024
-            PRIVATE S3,S2,S1
+            PRIVATE S1,S2,S3
             S1 = D(J, K, J, K+1)                                        0025
             S2 = D(J, K+1, J, K+2)+S1                                   0026
             S3 = D(J, K+2, J, K+3)+S2                                   0027

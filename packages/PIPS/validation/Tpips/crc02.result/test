@@ -1,0 +1,16 @@
+# initial
+      PROGRAM CRC02
+      INTEGER N
+      N = 17                                                            0003
+      PRINT *, N+25                                                     0004
+      END
+# partial eval
+      PROGRAM CRC02
+      INTEGER N
+      N = 17                                                            0003
+      PRINT *, 42                                                       0004
+      END
+#
+# compile run compare both crc02
+#
+

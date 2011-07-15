@@ -37,11 +37,11 @@ int main()
    p++;
 //  {(p,a[*],-Exact-)}
    ++p;
-//  {(p,a[0],-Exact-)}
+//  {(p,a[*],-Exact-)}
    p--;
 //  {(p,a[*],-Exact-)}
    --p;
-//  {(p,a[0],-Exact-)}
+//  {(p,a[*],-Exact-)}
    return 0;
 }
 

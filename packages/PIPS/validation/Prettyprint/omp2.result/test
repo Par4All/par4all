@@ -16,10 +16,10 @@ int main()
 
 #pragma omp parallel for private(j)
    for(i = 0; i <= 9; i += 1)                                           /*0015*/
-#pragma omp parallel for private(z,k)
+#pragma omp parallel for private(k,z)
       for(j = 0; j <= 9; j += 1) {                                      /*0016*/
          z = 0.0;                                                       /*0017*/
-#pragma omp parallel for private(z,l)
+#pragma omp parallel for private(l,z)
          for(k = 0; k <= 9; k += 1) {                                   /*0018*/
             z = k*2.0;                                                  /*0019*/
 #pragma omp parallel for private(m)

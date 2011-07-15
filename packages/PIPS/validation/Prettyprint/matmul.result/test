@@ -46,7 +46,7 @@ c square matrix multiplication
 !HPF$ INDEPENDENT, NEW(I)
       DO J = 1, N                                                       0021
 
-!HPF$    INDEPENDENT, NEW(X,K)
+!HPF$    INDEPENDENT, NEW(K,X)
          DO I = 1, N                                                    0022
             X = 0.                                                      0023
             DO K = 1, N                                                 0024

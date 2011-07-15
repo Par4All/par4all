@@ -75,7 +75,7 @@ C
          ENDDO
          P(I) = 1.0/SQRT(X)                                             0015
          DOALL J = I+1, N                                               0016
-            PRIVATE X,KK
+            PRIVATE KK,X
             X = A(I,J)                                                  0017
             DO KK = 1, I-1                                              0018
                X = X-A(I,J)*A(I,KK)                                     0019
@@ -126,7 +126,7 @@ C
          ENDDO
          P(I) = 1.0/SQRT(X)                                             0015
          DOALL J = I+1, N                                               0016
-            PRIVATE X,KK
+            PRIVATE KK,X
             X = A(I,J)                                                  0017
             DO KK = 1, I-1                                              0018
                X = X-A(I,J)*A(I,KK)                                     0019

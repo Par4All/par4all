@@ -33,14 +33,14 @@ int main()
    int *p = &j;
 //  {(p,j,-Exact-)}
    int *q = tab[1];
-//  {(p,j,-Exact-);(q,tab[1][0],-Exact-)}
+//  {(p,j,-Exact-);(q,tab[1],-Exact-)}
 
    k = 1;
-//  {(p,j,-Exact-);(q,tab[1][0],-Exact-)}
+//  {(p,j,-Exact-);(q,tab[1],-Exact-)}
    j = k;
-//  {(p,j,-Exact-);(q,tab[1][0],-Exact-)}
+//  {(p,j,-Exact-);(q,tab[1],-Exact-)}
    p = &k;
-//  {(p,k,-Exact-);(q,tab[1][0],-Exact-)}
+//  {(p,k,-Exact-);(q,tab[1],-Exact-)}
 
    return 0;
 }

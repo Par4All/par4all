@@ -1,3 +1,6 @@
+//
+// Code after privatize_module for module PRIVATIZATION07
+//
 C     Check that J is not privatized in the outermost loop very similar
 C     to privatization02.f)
 
