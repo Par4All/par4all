@@ -1170,7 +1170,7 @@ bool simplify_control(string mod_name)
   set_cumulated_rw_effects((statement_effects)
       db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true));
 
-  debug_on("DEAD_CODE_DEBUG_LEVEL");
+  debug_on("SIMPLIFY_CONTROL_DEBUG_LEVEL");
 
   ifdebug(1) {
     pips_debug(1, "Begin for %s\n", mod_name);

@@ -80,7 +80,7 @@ int main()
    // do par <- annotate whole loop nest
    //   do par
    //     do par
-#pragma omp parallel for private(j,k)
+#pragma omp parallel for private(j)
    for(i = 0; i <= 123; i += 1)
 #pragma omp parallel for private(k)
       for(j = 0; j <= 234; j += 1)
@@ -134,7 +134,7 @@ int main()
          if (i<=123&&j<=498)
             b[i][j] = (float) i*j;
    // Loop nest P4A begin,3D(499, 235, 124)
-#pragma omp parallel for private(j,k)
+#pragma omp parallel for private(j)
    for(i = 0; i <= 123; i += 1)
 #pragma omp parallel for private(k)
       for(j = 0; j <= 234; j += 1)

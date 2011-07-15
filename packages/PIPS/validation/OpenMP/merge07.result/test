@@ -6,7 +6,7 @@ int main(void)
    int a[size][size][size];
    int b[size][size][size];
 
-#pragma omp parallel for private(i, k)
+#pragma omp parallel for private(k)
    for(l = 0; l <= size-1; l += 1) {
 #pragma omp parallel for private(i)
       for(k = 0; k <= size-1; k += 1) {

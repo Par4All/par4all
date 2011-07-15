@@ -2541,6 +2541,27 @@ behaviour is controlled at execution with the \verb|MUDFLAP_OPTIONS|
 environment variable.
 
 
+\subsection{Debugging the internal representation in a browser (IR Navigator)}
+\label{sec:debugg-ir_nav}
+
+A web interface to the internal representation in built-in. A convenient way
+to access it is provided in PyPS. For instance the following python sample opens
+2 tabs in your default web browser, each with a dump of the IR after a 
+specific transformation :
+
+\begin{lstlisting}[showspaces=false]
+import ir_navigator
+...
+m = w.fun.main
+
+m.localize_declaration()
+w.fun.main.ir_navigator(openBrowser=True)
+
+m.clean_declarations()
+w.fun.main.ir_navigator(openBrowser=True,keep_existing=True)
+\end{lstlisting}
+
+
 \section{Documentation}
 \label{sec:documentation}
 
@@ -3277,6 +3298,7 @@ $(TARGET): ../Lib/misc/misc.a
 
 \section{Bug policy}
 \label{sec:bugs}
+\textbf{Warning: all the following is obsolete !}
 
 \subsection{Bug detection}
 

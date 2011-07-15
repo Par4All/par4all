@@ -1,0 +1,25 @@
+int main()
+{
+//             <    is written>: i
+//             <    is referenced>: i
+//             <    is declared>: i
+   int i = 0;
+//             <    is written>: e
+//             <    is referenced>: e
+//             <    is declared>: e
+   int e = 0;
+//             <    is declared>: a
+   int a[10];
+//             <    is declared>: b
+   int b[10];
+//             <    is declared>: c
+   int c[10];
+//             <may be read   >: b[i] c[i]
+//             <may be referenced>: b c
+//             <    is read   >: e i
+//             <    is written>: a[(e?b:c)[i]]
+//             <    is referenced>: a e i
+
+   a[(e?b:c)[i]] = 0;
+   return 0;
+}

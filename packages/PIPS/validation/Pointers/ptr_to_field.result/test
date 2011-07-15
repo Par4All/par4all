@@ -44,47 +44,31 @@ int ptr_to_field()
       int *p;
    } my_str;
 
-//  {(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {}
    my_str *m, *n;
-//  {(m,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(my_str[p],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b1,
-//   -Exact-)}
+//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i = 0, j = 1;
-//  {(m,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(my_str[p],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b1,
-//   -Exact-)}
+//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    m = (my_str *) malloc(sizeof(my_str));
-//  {(m,*HEAP*_l_12,-Exact-);(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(my_str[q],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+//  {(m,*HEAP*_l_12,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    n = (my_str *) malloc(sizeof(my_str));
-//  {(m,*HEAP*_l_12,-Exact-);(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(my_str[q],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
-//   *HEAP*_l_13,-Exact-)}
+//  {(m,*HEAP*_l_12,-Exact-);(n,*HEAP*_l_13,-Exact-)}
    m->q = &i;
-//  {(*HEAP*_l_12[q],i,-Exact-);(m,*HEAP*_l_12,-Exact-);(my_str[p],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,*HEAP*_l_13,-Exact-)}
+//  {(*HEAP*_l_12[q],i,-Exact-);(m,*HEAP*_l_12,-Exact-);(n,
+//   *HEAP*_l_13,-Exact-)}
    m->p = &j;
 //  {(*HEAP*_l_12[p],j,-Exact-);(*HEAP*_l_12[q],i,-Exact-);(m,
-//   *HEAP*_l_12,-Exact-);(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(my_str[q],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
-//   *HEAP*_l_13,-Exact-)}
+//   *HEAP*_l_12,-Exact-);(n,*HEAP*_l_13,-Exact-)}
    n->q = m->p;
 //  {(*HEAP*_l_12[p],j,-Exact-);(*HEAP*_l_12[q],i,
-//   -Exact-);(*HEAP*_l_13[q],j,-Exact-);(m,*HEAP*_l_12,
-//   -Exact-);(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(my_str[q],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
+//   -Exact-);(*HEAP*_l_13[q],j,-Exact-);(m,*HEAP*_l_12,-Exact-);(n,
 //   *HEAP*_l_13,-Exact-)}
    n->p = m->q;
 //  {(*HEAP*_l_12[p],j,-Exact-);(*HEAP*_l_12[q],i,
 //   -Exact-);(*HEAP*_l_13[p],i,-Exact-);(*HEAP*_l_13[q],j,
-//   -Exact-);(m,*HEAP*_l_12,-Exact-);(my_str[p],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,*HEAP*_l_13,-Exact-)}
+//   -Exact-);(m,*HEAP*_l_12,-Exact-);(n,*HEAP*_l_13,-Exact-)}
 
    return 0;
 }

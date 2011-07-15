@@ -14,6 +14,6 @@ int main()
 {
 //  {}
    int *a[10];
-//  {}
+//  {(a[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }

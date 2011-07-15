@@ -119,7 +119,7 @@ c     compute x := y * z
       DOALL I = 1, L                                                    0006
          PRIVATE J
          DOALL J = 1, N                                                 0007
-            PRIVATE S,K
+            PRIVATE K,S
             S = 0.                                                      0008
             DO K = 1, M                                                 0009
                S = S+Y(I,K)*Z(K,J)                                      0010

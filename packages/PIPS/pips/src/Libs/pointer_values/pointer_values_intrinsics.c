@@ -1735,7 +1735,8 @@ static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
 			       make_approximation_exact(),
 			       make_descriptor_none());
 
-      if (!entity_heap_location_p(e))
+      if (!entity_all_heap_locations_p(e) &&
+	  !entity_all_module_heap_locations_p(e))
 	  effect_add_dereferencing_dimension(eff);
       else
 	effect_to_may_effect(eff);

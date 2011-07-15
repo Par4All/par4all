@@ -86,8 +86,8 @@ bool entity_all_locations_p(entity e)
   return anywhere_p;
 }
 
-/* return the bottom of the anywhere lattice = nowhere, i.e. the
-   unitialized pointer. */
+/* return *ANY_MODULE*:*NOWHERE* */
+   
 entity entity_nowhere_locations()
 {
   entity nowhere = entity_undefined;
@@ -117,7 +117,7 @@ bool entity_nowhere_locations_p(entity e)
   return nowhere_p;
 }
 
-/* return the NULL/UNDEFINED POINTER...
+/* return TOP-LEVEL:*NULL_POINTER*  
  * The NULL pointer should be a global variable, unique for all modules
  * FI: why isn't it called entity_null_location()?
  */
@@ -152,7 +152,8 @@ bool entity_null_locations_p(entity e)
   return null_pointer_p;
 }
 
-/* Set of all memory locations related to one module.
+/* return m:*ANYWHERE* 
+   Set of all memory locations related to one module.
 
    FI: This may prove useless unless the compilation unit is taken into
    account.
@@ -188,7 +189,9 @@ bool entity_all_module_locations_p(entity e)
   return null_pointer_p;
 }
 
-/* Generic set of functions for all kinds of areas */
+/* return m:xxx*ANYWHERE*
+ * Generic set of functions for all kinds of areas
+*/
 
 entity entity_all_module_xxx_locations(entity m, string xxx)
 {
@@ -269,6 +272,7 @@ bool entity_all_module_xxx_locations_p(entity e, string xxx)
   return dynamic_p;
 }
 
+/* return *ANY_MODULE*:xxx */
 entity entity_all_xxx_locations(string xxx)
 {
   entity dynamic = entity_undefined;
@@ -348,6 +352,7 @@ bool entity_all_xxx_locations_p(entity e, string xxx)
 }
 
 
+/* return m:*HEAP**ANYWHERE */
 entity entity_all_module_heap_locations(entity m)
 {
   return entity_all_module_xxx_locations(m, HEAP_AREA_LOCAL_NAME);
@@ -365,6 +370,7 @@ bool entity_all_module_heap_locations_p(entity e)
   return entity_all_module_xxx_locations_p(e, HEAP_AREA_LOCAL_NAME);
 }
 
+/* return ANY_MODULE:*HEAP* */
 entity entity_all_heap_locations()
 {
   return entity_all_xxx_locations(HEAP_AREA_LOCAL_NAME);
@@ -382,6 +388,7 @@ bool entity_all_heap_locations_p(entity e)
 }
 
 
+/* return m:*STACK**ANYWHERE */
 entity entity_all_module_stack_locations(entity m)
 {
   return entity_all_module_xxx_locations(m, STACK_AREA_LOCAL_NAME);
@@ -393,6 +400,7 @@ bool entity_all_module_stack_locations_p(entity e)
   return entity_all_module_xxx_locations_p(e, STACK_AREA_LOCAL_NAME);
 }
 
+/* return ANY_MODULE:*STACK* */
 entity entity_all_stack_locations()
 {
   return entity_all_xxx_locations(STACK_AREA_LOCAL_NAME);
@@ -405,6 +413,7 @@ bool entity_all_stack_locations_p(entity e)
 }
 
 
+/* return m:*DYNAMIC**ANYWHERE */
 entity entity_all_module_static_locations(entity m)
 {
   return entity_all_module_xxx_locations(m, STATIC_AREA_LOCAL_NAME);
@@ -416,6 +425,7 @@ bool entity_all_module_static_locations_p(entity e)
   return entity_all_module_xxx_locations_p(e, STATIC_AREA_LOCAL_NAME);
 }
 
+/* return  ANY_MODULE:*STATIC* */
 entity entity_all_static_locations()
 {
   return entity_all_xxx_locations(STATIC_AREA_LOCAL_NAME);
@@ -428,6 +438,7 @@ bool entity_all_static_locations_p(entity e)
 }
 
 
+/* return m:*DYNAMIC**ANYWHERE */
 entity entity_all_module_dynamic_locations(entity m)
 {
   return entity_all_module_xxx_locations(m, DYNAMIC_AREA_LOCAL_NAME);
@@ -439,6 +450,7 @@ bool entity_all_module_dynamic_locations_p(entity e)
   return entity_all_module_xxx_locations_p(e, DYNAMIC_AREA_LOCAL_NAME);
 }
 
+/* return ANY_MODULE:*DYNAMIC* */
 entity entity_all_dynamic_locations()
 {
   return entity_all_xxx_locations(DYNAMIC_AREA_LOCAL_NAME);

@@ -29,26 +29,26 @@ int main(int argc, char *argv[])
 
 POINTS-TO
 
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
 int main(int argc, char *argv[])
 {
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
    int t, i;
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
 
    for(i = 1; i <= 62; i += 1)
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
       tab3[i] = malloc(64*sizeof(float));
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
    for(t = 0; t <= 63; t += 1)
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
       compute();
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
 
    for(i = 1; i <= 62; i += 1)
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
       free(tab3[i]);
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
 
    return 0;
 }

@@ -7,6 +7,7 @@ import sys
 import tempfile
 import shutil
 import shlex
+import re
 from subprocess import Popen, PIPE
 
 # initialize pipslibs when module is loaded
@@ -101,7 +102,8 @@ class module(object): # deriving from object is needed for overloaded setter
         self.__name=name
         self.__source=source
         self.__ws=ws
-
+        self.re_compilation_units = re.compile("^.*!$")
+        
     @property
     def cu(self):
         """compilation unit"""
@@ -116,11 +118,18 @@ class module(object): # deriving from object is needed for overloaded setter
         """module name"""
         return self.__name
 
+    @property
+    def language(self):
+        return self.__ws.cpypips.get_module_language(self.name);
+
+    def compilation_unit_p(self):
+        return self.re_compilation_units.match(self.name)
+
     def edit(self,editor=os.getenv("EDITOR","vi")):
         """edits module using given editor
            does nothing on compilation units ...
         """
-        if not pypsutils.re_compilation_units.match(self.name):
+        if not self.compilation_unit_p():
             self.print_code()
             printcode_rc=os.path.join(self.__ws.dirname,self.__ws.cpypips.show("PRINTED_FILE",self.name))
             code_rc=os.path.join(self.__ws.dirname,self.__ws.cpypips.show("C_SOURCE_FILE",self.name))
@@ -150,7 +159,7 @@ class module(object): # deriving from object is needed for overloaded setter
         """run command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd < 'path/to/module/src' > 'path/to/module/src''
            does nothing on compilation unit ...
         """
-        if not pypsutils.re_compilation_units.match(self.name):
+        if not self.compilation_unit_p():
             (code_rc,printcode_rc) = self.__prepare_modification()
             pid=Popen(cmd,stdout=file(code_rc,"w"),stdin=file(printcode_rc,"r"),stderr=PIPE)
             if pid.wait() != 0:
@@ -158,7 +167,10 @@ class module(object): # deriving from object is needed for overloaded setter
 
     def show(self,rc):
         """get name of `rc' resource"""
-        return self.__ws.cpypips.show(rc.upper(),self.name).split()[-1]
+        try:
+            return self.__ws.cpypips.show(rc.upper(),self.name).split()[-1]
+        except:
+            raise RuntimeError("Cannot show resource " + rc)
 
     def display(self,activate="print_code", rc="printed_file", **props):
         """display a given resource rc of the module, with the
@@ -170,7 +182,7 @@ class module(object): # deriving from object is needed for overloaded setter
 
     def _set_code(self,newcode):
         """set module content from a string"""
-        if not pypsutils.re_compilation_units.match(self.name):
+        if not self.compilation_unit_p():
             (code_rc,_) = self.__prepare_modification()
             pypsutils.string2file(newcode, code_rc)
 
@@ -561,21 +573,26 @@ class workspace(object):
         the_modules=[m for m in self.__modules.values() if matching(m)]
         return modules(the_modules)
 
+    @property
+    def compilation_units(self):
+     """Transform in the same way the filtered compilation units as a
+     pseudo-variable"""
+     return self.filter(lambda m:m.compilation_unit_p())
+
+    @property
+    def all_functions(self):
+     """Build also a pseudo-variable for the set of all the functions of the
+     workspace.  We should ask PIPS top-level for it instead of
+     recomputing it here, but it is so simple this way..."""
+     return self.filter(lambda m: not m.compilation_unit_p())
+
+
     def pre_phase(self, phase, module): pass
     def post_phase(self, phase, module): pass
 
     # Create an "all" pseudo-variable that is in fact the execution of
     # filter with the default filtering rule: True
     all = property(filter)
-
-    # Transform in the same way the filtered compilation units as a
-    # pseudo-variable:
-    compilation_units = property(pypsutils.filter_compilation_units)
-
-    # Build also a pseudo-variable for the set of all the functions of the
-    # workspace.  We should ask PIPS top-level for it instead of
-    # recomputing it here, but it is so simple this way...
-    all_functions = property(pypsutils.filter_all_functions)
 
     @staticmethod
     def delete(name):

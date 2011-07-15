@@ -163,6 +163,16 @@ static void print_block(fusion_block block) {
 }
 
 /**
+ * Add statement 's' to the set 'stmts'. To be called with gen_context_recurse
+ * to record all statement in a branch of the IR tree.
+ */
+static bool record_statements(statement s, set stmts) {
+  set_add_element(stmts, stmts, s);
+  return true;
+}
+
+
+/**
  * Debug function that print a list of blocks
  */
 static void print_blocks(list /* of fusion_block */ blocks) {
@@ -430,6 +440,41 @@ static bool fusion_loops(statement sloop1,
     }
   }
 
+  if(success && get_bool_property("LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS")) {
+    // Check if we have perfect loop nests, and thus prevents losing parallelism
+    statement inner_loop1 = get_first_inner_perfectly_nested_loop(body_loop1);
+    statement inner_loop2 = get_first_inner_perfectly_nested_loop(body_loop2);
+    if(!statement_undefined_p(inner_loop1) && !statement_undefined_p(inner_loop2)) {
+      pips_debug(4,"Ensure that we don't break parallel loop nests !\n");
+      if(loop_parallel_p(statement_loop(inner_loop1)) &&
+          loop_parallel_p(statement_loop(inner_loop2))) {
+        // Record statements
+        set stmts1 = set_make(set_pointer);
+        gen_context_recurse(inner_loop1,stmts1,statement_domain,record_statements,gen_true);
+
+        set stmts2 = set_make(set_pointer);
+        gen_context_recurse(inner_loop2,stmts2,statement_domain,record_statements,gen_true);
+
+        pips_debug(4,"Try to fuse inner loops !\n");
+        success = fusion_loops(inner_loop1,stmts1,inner_loop2,stmts2,maximize_parallelism);
+        if(success) {
+          pips_debug(4,"Inner loops fused :-)\n");
+          loop_body(loop1) = body_loop1;
+        } else {
+          pips_debug(4,"Inner loops not fusable :-(\n");
+        }
+
+        set_free(stmts1);
+        set_free(stmts2);
+      } else if(loop_parallel_p(statement_loop(inner_loop1)) ||
+                loop_parallel_p(statement_loop(inner_loop2))) {
+        success = false;
+      }
+
+    }
+  }
+
+
   if(success) {
     // Cleaning FIXME
     // Fix real DG
@@ -477,15 +522,6 @@ static fusion_block make_empty_block(int num) {
   block->is_a_loop = false;
 
   return block;
-}
-
-/**
- * Add statement 's' to the set 'stmts'. To be called with gen_context_recurse
- * to record all statement in a branch of the IR tree.
- */
-static bool record_statements(statement s, set stmts) {
-  set_add_element(stmts, stmts, s);
-  return true;
 }
 
 /**
@@ -790,6 +826,7 @@ static bool try_to_fuse_with_successors(fusion_block b,
     pips_debug(5,"Block %d is a loop, try to fuse with successors !\n",b->num);
     SET_FOREACH(fusion_block, succ, b->successors)
     {
+      pips_debug(6,"Handling successor : %d\n",succ->num);
       if(fuse_block(b, succ, maximize_parallelism)) {
         /* predecessors and successors set have been modified for the current
          * block... we can no longer continue in this loop, so we stop and let
@@ -802,7 +839,8 @@ static bool try_to_fuse_with_successors(fusion_block b,
   }
   // Second step is recursion on successors (if any)
   SET_FOREACH(fusion_block, succ, b->successors) {
-    return try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism);
+    if(try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism))
+      return true;
   }
 
   return false;

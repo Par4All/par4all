@@ -100,6 +100,7 @@ static list rgs_effects(entity e,list args);
 static list rgsi_effects(entity e,list args);
 static list any_heap_effects(entity e,list args);
 static list va_list_effects(entity e, list args);
+static list search_or_sort_effects(entity e, list args);
 /* MB */
 static list generic_string_effects(entity e,list args);
 static list memmove_effects(entity e, list args);
@@ -981,8 +982,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {_EXIT_FUNCTION_NAME,                    no_write_effects},
   {GETENV_FUNCTION_NAME,                   no_write_effects},
   {SYSTEM_FUNCTION_NAME,                   no_write_effects},
-  {BSEARCH_FUNCTION_NAME,                  no_write_effects},
-  {QSORT_FUNCTION_NAME,                    no_write_effects},
+  {BSEARCH_FUNCTION_NAME,                  search_or_sort_effects},
+  {QSORT_FUNCTION_NAME,                    search_or_sort_effects},
   {C_ABS_FUNCTION_NAME,                    no_write_effects},
   {LABS_FUNCTION_NAME,                     no_write_effects},
   {LLABS_FUNCTION_NAME,                    no_write_effects},
@@ -1432,14 +1433,15 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
         reference r = syntax_reference(s);
         list i = reference_indices(r);
         lr = generic_proper_effects_of_expressions(i);
+	if (!get_bool_property("MEMORY_EFFECTS_ONLY"))
+	  lr = CONS(EFFECT, make_declaration_effect(reference_variable(r), false), lr);
     }
     else
       {
-	effect eff = effect_undefined;
-	lr = generic_proper_effects_of_complex_address_expression(e, &eff, false);
+	list l_eff = NIL;
+	lr = generic_proper_effects_of_complex_address_expression(e, &l_eff, false);
 	/* there is no effect on the argument of & */
-	if (!effect_undefined_p(eff))
-	  free_effect(eff);
+	effects_free(l_eff);
       }
 
     pips_debug_effects(5, "end\n", lr);
@@ -1969,34 +1971,42 @@ generic_string_effects(entity e, list args)
     }
   else
     {
-      effect eff1; /* main effect on first arg */
-      list l_tmp = generic_proper_effects_of_complex_address_expression(arg1, &eff1, true);
+      list l_eff1 = NIL; /* main effects on first arg */
+      list l_tmp = generic_proper_effects_of_complex_address_expression(arg1, &l_eff1, true);
       gen_full_free_list(l_tmp);
-      
-      if (!anywhere_effect_p(eff1))
+
+      FOREACH(EFFECT, eff1, l_eff1)
 	{
-	  if (gen_length(args) == 3) // we may know the number of elements
+	  if (!anywhere_effect_p(eff1))
 	    {
-	      /* first check whether the argument main effect is on a char *. */
-	      type t = simple_effect_reference_type(effect_any_reference(eff1));
-	      variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
-	      if (!variable_undefined_p(v)
-		  && ((basic_pointer_p(variable_basic(v))
-		       && ENDP(variable_dimensions(v))
-		       && char_type_p(basic_pointer(variable_basic(v))))
-		      ||
-		      (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+	      if (gen_length(args) == 3) // we may know the number of elements
 		{
-		  /* Effect is on eff11_ref[0..arg3-1]*/
-		  expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
-		  expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-						    copy_expression(arg3),
-						    int_to_expression(1));
-		  range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
-		  expression ie = make_expression(make_syntax_range(r),
-						  make_normalized_complex());
-		  (*effect_add_expression_dimension_func)(eff1, ie);
-		  le = gen_nconc(le, CONS(EFFECT, eff1, NIL));
+		  /* first check whether the argument main effect is on a char *. */
+		  type t = simple_effect_reference_type(effect_any_reference(eff1));
+		  variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
+		  if (!variable_undefined_p(v)
+		      && ((basic_pointer_p(variable_basic(v))
+			   && ENDP(variable_dimensions(v))
+			   && char_type_p(basic_pointer(variable_basic(v))))
+			  ||
+			  (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+		    {
+		      /* Effect is on eff11_ref[0..arg3-1]*/
+		      expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
+		      expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+							copy_expression(arg3),
+							int_to_expression(1));
+		      range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+		      expression ie = make_expression(make_syntax_range(r),
+						      make_normalized_complex());
+		      (*effect_add_expression_dimension_func)(eff1, ie);
+		      le = gen_nconc(le, CONS(EFFECT, eff1, NIL));
+		    }
+		  else
+		    {
+		      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
+		      free_effect(eff1);
+		    }
 		}
 	      else
 		{
@@ -2005,13 +2015,9 @@ generic_string_effects(entity e, list args)
 		}
 	    }
 	  else
-	    {
-	      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg1, 'w'));
-	      free_effect(eff1);
-	    }
+	    le = gen_nconc(le, CONS(EFFECT, eff1, NIL)); /* write is after reads */
 	}
-      else
-	le = gen_nconc(le, CONS(EFFECT, eff1, NIL)); /* write is after reads */
+      gen_free_list(l_eff1);
     }
 
   // and on the same number of elements of the second one for all handled intrinsics
@@ -2029,34 +2035,42 @@ generic_string_effects(entity e, list args)
 	}
       else
 	{
-	  effect eff2; /* main effect on second arg */
-	  list l_tmp = generic_proper_effects_of_complex_address_expression(arg2, &eff2, false);
+	  list l_eff2; /* main effects on second arg */
+	  list l_tmp = generic_proper_effects_of_complex_address_expression(arg2, &l_eff2, false);
 	  gen_full_free_list(l_tmp);
 
-	  if (!anywhere_effect_p(eff2))
+	  FOREACH(EFFECT, eff2, l_eff2)
 	    {
-	      if (gen_length(args) == 3) // we may know the number of elements
+	      if (!anywhere_effect_p(eff2))
 		{
-		  /* first check whether the argument main effect is on a char *. */
-		  type t = simple_effect_reference_type(effect_any_reference(eff2));
-		  variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
-		  if (!variable_undefined_p(v)
-		      && ((basic_pointer_p(variable_basic(v))
-			   && ENDP(variable_dimensions(v))
-			   && char_type_p(basic_pointer(variable_basic(v))))
-			  ||
-			  (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+		  if (gen_length(args) == 3) // we may know the number of elements
 		    {
-		      /* Effect is on eff12_ref[0..arg3-1]*/
-		      expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
-		      expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-							copy_expression(arg3),
-							int_to_expression(1));
-		      range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
-		      expression ie = make_expression(make_syntax_range(r),
-						      make_normalized_complex());
-		      (*effect_add_expression_dimension_func)(eff2, ie);
-		      le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
+		      /* first check whether the argument main effect is on a char *. */
+		      type t = simple_effect_reference_type(effect_any_reference(eff2));
+		      variable v = type_variable_p(t) ? type_variable(t) : variable_undefined;
+		      if (!variable_undefined_p(v)
+			  && ((basic_pointer_p(variable_basic(v))
+			       && ENDP(variable_dimensions(v))
+			       && char_type_p(basic_pointer(variable_basic(v))))
+			      ||
+			      (char_type_p(t) && (gen_length(variable_dimensions(v)) == 1))))
+			{
+			  /* Effect is on eff12_ref[0..arg3-1]*/
+			  expression arg3 = EXPRESSION(CAR(CDR(CDR(args))));
+			  expression argm1 = MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+							    copy_expression(arg3),
+							    int_to_expression(1));
+			  range r = make_range(int_to_expression(0), argm1, int_to_expression(1));
+			  expression ie = make_expression(make_syntax_range(r),
+							  make_normalized_complex());
+			  (*effect_add_expression_dimension_func)(eff2, ie);
+			  le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
+			}
+		      else
+			{
+			  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
+			  free_effect(eff2);
+			}
 		    }
 		  else
 		    {
@@ -2065,13 +2079,9 @@ generic_string_effects(entity e, list args)
 		    }
 		}
 	      else
-		{
-		  le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg2, 'r'));
-		  free_effect(eff2);
-		}
+		le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
 	    }
-	  else
-	    le = gen_nconc(le, CONS(EFFECT, eff2, NIL));
+	  gen_free_list(l_eff2);
 	}
     }
 
@@ -2412,77 +2422,80 @@ static list effects_of_C_ioelem(expression arg, tag act)
 
        /* first the effects on the file pointer */
        /* We should maybe check here that the argument has the right type (FILE *) */
-       effect fp_eff_w = effect_undefined;
-       effect fp_eff_r = effect_undefined;
-       list l_fp_eff = generic_proper_effects_of_complex_address_expression(arg, &fp_eff_r, false);
-       if (effect_undefined_p(fp_eff_r))
+       list l_fp_eff_r = NIL;
+       list l_fp_eff = generic_proper_effects_of_complex_address_expression(arg, &l_fp_eff_r, false);
+
+       FOREACH(EFFECT, fp_eff_r, l_fp_eff_r)
 	 {
-	   fp_eff_w = make_anywhere_effect(make_action_write_memory());
-	   fp_eff_r = make_anywhere_effect(make_action_read_memory());
-	 }
-       else
-	 {
-	   if( anywhere_effect_p(fp_eff_r))
-	     fp_eff_w = make_anywhere_effect(make_action_write_memory());
+	   effect fp_eff_w = effect_undefined;
+	   if (effect_undefined_p(fp_eff_r))
+	     {
+	       fp_eff_w = make_anywhere_effect(make_action_write_memory());
+	       fp_eff_r = make_anywhere_effect(make_action_read_memory());
+	     }
 	   else
 	     {
-	       /* the read effect on the file pointer will be added later */
-	       /* l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, copy_effect(fp_eff_r), NIL)); */
-	       effect_add_dereferencing_dimension(fp_eff_r);
-	       effect_to_may_effect(fp_eff_r);
-	       fp_eff_w = copy_effect(fp_eff_r);
-	       effect_action(fp_eff_w) = make_action_write_memory();
+	       if( anywhere_effect_p(fp_eff_r))
+		 fp_eff_w = make_anywhere_effect(make_action_write_memory());
+	       else
+		 {
+		   /* the read effect on the file pointer will be added later */
+		   /* l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, copy_effect(fp_eff_r), NIL)); */
+		   effect_add_dereferencing_dimension(fp_eff_r);
+		   effect_to_may_effect(fp_eff_r);
+		   fp_eff_w = copy_effect(fp_eff_r);
+		   effect_action(fp_eff_w) = make_action_write_memory();
+		 }
 	     }
+	   l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_w, CONS(EFFECT, fp_eff_r, NIL)));
+
+	   /* Then we simulate actions on files by read/write actions
+	      to a special static integer array.
+	      GO: It is necessary to do a read and write action to
+	      the array, because it updates the file-pointer so
+	      it reads it and then writes it ...
+	      We try to identify if the stream points to a std file
+	   */
+
+	   if ((!get_bool_property("USER_EFFECTS_ON_STD_FILES")) && std_file_effect_p(fp_eff_r))
+	     {
+	       const char* s = entity_user_name(effect_entity(fp_eff_r));
+	       if (same_string_p(s, "stdout"))
+		 unit = int_to_expression(STDOUT_FILENO);
+	       else if (same_string_p(s, "stdin"))
+		 unit = int_to_expression(STDIN_FILENO);
+	       else /* (same_string_p(s, "stderr")) */
+		 unit = int_to_expression(STDERR_FILENO);
+	       must_p = true;
+
+	     }
+	   else
+	     {
+	       unit = make_unbounded_expression();
+	       must_p = false;
+	     }
+	   indices = CONS(EXPRESSION,
+			  unit,
+			  NIL);
+	   private_io_entity = global_name_to_entity
+	     (IO_EFFECTS_PACKAGE_NAME,
+	      IO_EFFECTS_ARRAY_NAME);
+
+	   pips_assert("private_io_entity is defined\n",
+		       private_io_entity != entity_undefined);
+
+	   ref1 = make_reference(private_io_entity, indices);
+	   ref2 = copy_reference(ref1);
+	   eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
+	   eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
+
+	   if(!must_p)
+	     {
+	       effect_approximation_tag(eff1) = is_approximation_may;
+	       effect_approximation_tag(eff2) = is_approximation_may;
+	     }
+	   le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
 	 }
-       l_fp_eff = gen_nconc(l_fp_eff, CONS(EFFECT, fp_eff_w, CONS(EFFECT, fp_eff_r, NIL)));
-
-       /* Then we simulate actions on files by read/write actions
-	  to a special static integer array.
-	  GO: It is necessary to do a read and write action to
-	  the array, because it updates the file-pointer so
-	  it reads it and then writes it ...
-	  We try to identify if the stream points to a std file
-       */
-
-       if ((!get_bool_property("USER_EFFECTS_ON_STD_FILES")) && std_file_effect_p(fp_eff_r))
-	 {
-	   const char* s = entity_user_name(effect_entity(fp_eff_r));
-	   if (same_string_p(s, "stdout"))
-	     unit = int_to_expression(STDOUT_FILENO);
-	   else if (same_string_p(s, "stdin"))
-	     unit = int_to_expression(STDIN_FILENO);
-	   else /* (same_string_p(s, "stderr")) */
-	     unit = int_to_expression(STDERR_FILENO);
-	   must_p = true;
-
-	 }
-       else
-	 {
-	   unit = make_unbounded_expression();
-	   must_p = false;
-	 }
-       indices = CONS(EXPRESSION,
-		      unit,
-		      NIL);
-       private_io_entity = global_name_to_entity
-	 (IO_EFFECTS_PACKAGE_NAME,
-	  IO_EFFECTS_ARRAY_NAME);
-
-       pips_assert("private_io_entity is defined\n",
-		   private_io_entity != entity_undefined);
-
-       ref1 = make_reference(private_io_entity, indices);
-       ref2 = copy_reference(ref1);
-       eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);
-       eff2 = (*reference_to_effect_func)(ref2, make_action_write_memory(), false);
-
-       if(!must_p)
-	 {
-	   effect_approximation_tag(eff1) = is_approximation_may;
-	   effect_approximation_tag(eff2) = is_approximation_may;
-	 }
-       le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
-
        le = gen_nconc(le, l_fp_eff);
 
        break;
@@ -2787,5 +2800,92 @@ static list va_list_effects(entity e, list args)
       fprintf(stderr, "\n");
     }
   pips_debug(5, "end\n");
+  return le;
+}
+
+/**
+   compute the effects of a call to a searching or sorting function
+
+   The summary effects of the comparison function should be translated
+   using the actual argument target array to infer the actual effects
+   of the search or sort, especially in case of an array of structs for
+   instance. Currently, conservative effects are generated, which means
+   effects on all the paths reachable from the array elements.
+ */
+static list search_or_sort_effects(entity e, list args)
+{
+  list le = NIL;
+  list l_tmp = NIL;
+  expression base_exp = expression_undefined;
+  expression nmemb_exp = expression_undefined;
+  expression size_exp = expression_undefined;
+  expression compar_func_exp = expression_undefined;
+
+  if(ENTITY_BSEARCH_SYSTEM_P(e))
+    {
+      pips_debug(8, "bsearch function\n");
+      expression key_exp = EXPRESSION(CAR(args));
+      // the key is passed to the comparison function as an argument.
+      // so all paths reachable from key may be read.
+      le = c_actual_argument_to_may_summary_effects(key_exp, 'r');
+      pips_debug_effects(8, "effects for the key:", le);
+      POP(args);
+    }
+  else if(ENTITY_QSORT_SYSTEM_P(e))
+    {
+      pips_debug(8, "qsort function\n");
+    }
+  else
+    pips_internal_error("unexpected searching or sorting function\n");
+
+  base_exp = EXPRESSION(CAR(args));
+  POP(args);
+  nmemb_exp = EXPRESSION(CAR(args));
+  POP(args);
+  size_exp = EXPRESSION(CAR(args));
+  POP(args);
+  compar_func_exp = EXPRESSION(CAR(args));
+
+  // each element of the array is passed to the comparison function
+  // so all paths reachable from base may be read;
+  // more precise effects could be generated by taking into account
+  // the summary effects of the comparison function
+  l_tmp = c_actual_argument_to_may_summary_effects(base_exp, 'r');
+  pips_debug_effects(8, "read effects for the base array:", l_tmp);
+  le = gen_nconc(l_tmp, le);
+
+  // then each element of the array may be written,
+  // but not beyond struct internal pointers
+  list l_base_eff = NIL;
+  list l_base_inter_eff =
+    generic_proper_effects_of_complex_address_expression(base_exp, &l_base_eff, true);
+
+  l_tmp = NIL;
+  FOREACH(EFFECT, base_eff, l_base_eff)
+    {
+      type base_eff_type = cell_to_type(effect_cell(base_eff));
+      l_tmp = gen_nconc
+	(l_tmp,
+	 generic_effect_generate_all_accessible_paths_effects_with_level(base_eff,
+									 base_eff_type,
+									 'w',
+									 true,
+									 0,
+									 false));
+      free_type(base_eff_type);
+    }
+  pips_debug_effects(8, "write effects for the base array:", l_tmp);
+  le = gen_nconc(l_tmp, le);
+  le = gen_nconc(l_base_inter_eff, le);
+
+  //nmemb_exp and size_exp are read
+  le = gen_nconc(generic_proper_effects_of_expression(nmemb_exp), le);
+  le = gen_nconc(generic_proper_effects_of_expression(size_exp), le);
+
+  // and the comparison function expression is evaluated
+  le = gen_nconc(generic_proper_effects_of_expression(compar_func_exp), le);
+
+  pips_debug_effects(8, "final effects:", le);
+
   return le;
 }

@@ -25,12 +25,17 @@ int main()
    int *a;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int *b[10];
-//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i = 5;
-//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    a = b[i];
-//  {(a,b[*][0],-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    b[++i] = a;
-//  {(a,b[*][0],-Exact-);(b[++i],b[*][0],-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[*],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[++i],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }

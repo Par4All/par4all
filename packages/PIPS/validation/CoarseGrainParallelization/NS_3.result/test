@@ -17,7 +17,7 @@ Ask for the parallelization of all the modules of the program with OpenMP output
 ! This loop nest should be parallelized on j
 ! xco, px and py should be privatized
 
-!$OMP PARALLEL DO PRIVATE(I,PX,PY,XCO)
+!$OMP PARALLEL DO PRIVATE(I)
       DO J = 2, NY-1                                                    0011
 
 !$OMP    PARALLEL DO PRIVATE(PX,PY,XCO)

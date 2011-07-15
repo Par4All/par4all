@@ -1,0 +1,33 @@
+# initial
+int main(void)
+{
+   int i = 17;
+   fprintf(stdout, "%d\n", i+25);
+   return 0;
+}
+# partial eval
+int main(void)
+{
+   int i = 17;
+   fprintf(stdout, "%d\n", 42);
+   return 0;
+}
+#
+# compile run compare both crc03
+#
+#
+# compile run compare both crc03
+#
+#
+# compile run both crc03
+#
+#
+# compile both crc03
+#
+#
+# compile initial crc03
+#
+#
+# compile generated crc03
+#
+

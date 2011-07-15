@@ -55,8 +55,9 @@ typedef enum {
   spoc_alu_in0 = 0x01000000, // redundant with spoc_alu_op_t.use_in0
   spoc_alu_in1 = 0x02000000, // redundant with spoc_alu_op_t.use_in1
   spoc_alu_out0 = 0x04000000,
-  spoc_alu_out1 = 0x08000000
+  spoc_alu_out1 = 0x08000000,
   // others?
+  spoc_not_implemented = 0xffffffff
 } spoc_hw_parts_t;
 
 typedef enum {
@@ -68,7 +69,7 @@ typedef enum {
   measure_vol
 } spoc_measure_t;
 
-/* all ALU operations */
+/* all SPoC ALU operations */
 typedef enum {
   alu_unused,
   // arithmetic operations
@@ -97,6 +98,8 @@ typedef enum {
   alu_div_10,
   alu_div_0cst,
   alu_div_1cst,
+  alu_log2_0,
+  alu_log2_1,
   // comparisons
   alu_inf_01,
   alu_inf_0cst,
@@ -125,7 +128,7 @@ typedef enum {
 typedef struct {
   spoc_alu_t op;  // operation
   spoc_alu_t flipped; // flipped call
-  string setting; // macro the operation
+  string setting; // macro for the operation
   bool use_cst;   // whether a constant is needed
   bool use_in0;   // whether first input is used
   bool use_in1;   // whether second input is used
@@ -157,8 +160,9 @@ typedef struct {
 
 typedef enum {
   // important, in hardware order
+  spoc_type_sni = -3, // spoc not implemented
   spoc_type_oth = -2, // for anything else...
-  spoc_type_nop = -1, // used by copy?
+  spoc_type_nop = -1, // no-operation, used by copy?
   spoc_type_inp = 0, // used for input
   spoc_type_poc = 1,
   spoc_type_alu = 2,
@@ -172,40 +176,40 @@ typedef enum {
 #define spoc_depth_prop "HWAC_SPOC_DEPTH"
 
 // what about something simpler like "freia-spoc.h"?
-#define FREIA_SPOC_INCLUDES			\
-  "#include <freiaCommon.h>\n"			\
-  "#include <freiaMediumGrain.h>\n"		\
-  "#include <freiaCoarseGrain.h>\n"		\
+#define FREIA_SPOC_INCLUDES           \
+  "#include <freiaCommon.h>\n"        \
+  "#include <freiaMediumGrain.h>\n"   \
+  "#include <freiaCoarseGrain.h>\n"   \
   "#include <spoc.h>\n"
 
-#define FREIA_SPOC_DECL						\
-  "  spoc_instr si;\n"						\
-  "  spoc_param sp;\n"						\
-  "  spoc_reduction reduc;\n"					\
-  "  freia_microcode mcode;\n"					\
-  "  freia_dynamic_param dynparam;\n"				\
-  "  freia_reduction_results redres;\n"				\
-  "  freia_op_param param;\n"					\
-  "  freia_status ret;\n"					\
-  "  int i;\n"							\
-  "\n"								\
-  "  // init pipe to nop\n"					\
-  "  spoc_init_pipe(&si, &sp, " FREIA_DEFAULT_BPP ");\n"	\
+#define FREIA_SPOC_DECL                                   \
+  "  spoc_instr si;\n"                                    \
+  "  spoc_param sp;\n"                                    \
+  "  spoc_reduction reduc;\n"                             \
+  "  freia_microcode mcode;\n"                            \
+  "  freia_dynamic_param dynparam;\n"                     \
+  "  freia_reduction_results redres;\n"                   \
+  "  freia_op_param param;\n"                             \
+  "  freia_status ret;\n"                                 \
+  "  int i;\n"                                            \
+  "\n"                                                    \
+  "  // init pipe to nop\n"                               \
+  "  spoc_init_pipe(&si, &sp, " FREIA_DEFAULT_BPP ");\n"  \
   "\n"
 
-#define FREIA_SPOC_CALL						\
-  "\n"								\
-  "  mcode.raw = (freia_ptr) &si;\n"				\
-  "  mcode.size = sizeof(spoc_instr);\n"			\
-  "\n"								\
-  "  dynparam.raw = (freia_ptr) &sp;\n"				\
-  "  dynparam.size = sizeof(spoc_param);\n"			\
-  "\n"								\
-  "  redres.raw = (freia_ptr) &reduc;\n"			\
-  "  redres.size = sizeof(spoc_reduction);\n"			\
-  "\n"								\
-  "  ret = freia_cg_write_microcode(&mcode);\n"			\
-  "  ret |= freia_cg_write_dynamic_param(&dynparam);\n"		\
+#define FREIA_SPOC_CALL                                 \
+  "\n"                                                  \
+  "  mcode.raw = (freia_ptr) &si;\n"                    \
+  "  mcode.size = sizeof(spoc_instr);\n"                \
+  "\n"                                                  \
+  "  dynparam.raw = (freia_ptr) &sp;\n"                 \
+  "  dynparam.size = sizeof(spoc_param);\n"             \
+  "\n"                                                  \
+  "  redres.raw = (freia_ptr) &reduc;\n"                \
+  "  redres.size = sizeof(spoc_reduction);\n"           \
+  "\n"                                                  \
+  "  ret = freia_cg_write_microcode(&mcode);\n"         \
+  "  ret |= freia_cg_write_dynamic_param(&dynparam);\n" \
   "\n"
 
 #endif /* !HWAC_FREIA_SPOC_H_ */

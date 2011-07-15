@@ -358,6 +358,8 @@ list loop_private_variables_as_entites (loop obj, bool local, bool index) {
     gen_remove (&result, loop_index(obj));
   }
 
+  sort_list_of_entities(result);
+
   return result;
 }
 
@@ -479,6 +481,40 @@ int depth_of_perfect_loop_nest(statement s) {
     /* No loop found here */
     return 0;
   }
+}
+
+
+/** Return the inner loop in a perfect loop-nest
+
+    @param stat is the statement to test
+
+    @return the loop statement if we have a perfect loop nest, else statement_undefined
+*/
+statement get_first_inner_perfectly_nested_loop(statement stat) {
+  instruction ins = statement_instruction(stat);
+  tag t = instruction_tag(ins);
+
+  switch(t) {
+    case is_instruction_block: {
+      list lb = instruction_block(ins);
+
+      if(lb != NIL && (lb->cdr) != NIL && (lb->cdr)->cdr == NIL
+          && (continue_statement_p(STATEMENT(CAR(lb))))) {
+        return get_first_inner_perfectly_nested_loop(STATEMENT(CAR(lb->cdr)));
+      } else if(lb != NIL && (lb->cdr) == NIL) {
+        return get_first_inner_perfectly_nested_loop(STATEMENT(CAR(lb)));
+      }
+      break;
+    }
+    case is_instruction_loop: {
+      return stat;
+    }
+    default:
+      break;
+  }
+
+  return statement_undefined;
+
 }
 
 

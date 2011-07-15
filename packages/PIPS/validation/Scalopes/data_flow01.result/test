@@ -4,12 +4,12 @@ int main()
 {
 //             <    is written>: s
    int t, i, a[100], s = 0;
-//             <may be read   >: a[*] stdout stdout[0] 
+//             <may be read   >: a[*] i stdout stdout[0] t 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: a[*] stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: a[*] i stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is written>: t
    for(t = 0; t <= 9; t += 1) {
-//             <may be read   >: t
+//             <may be read   >: i t
 //             <may be written>: a[*]
 //             <    is written>: i
 scmp_task_0:
@@ -17,7 +17,7 @@ scmp_task_0:
 //             <may be written>: a[*]
 //             <    is read   >: i t
          a[i] = i*t;
-//             <may be read   >: a[*] stdout stdout[0] 
+//             <may be read   >: a[*] i stdout stdout[0] 
 //                               __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is written>: i
@@ -91,7 +91,7 @@ int main()
 {
 //             <    is written>: s
    int t, i, a[100], s = 0;
-//             <may be read   >: a[*] stdout stdout[0] 
+//             <may be read   >: a[*] i stdout stdout[0] t 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
@@ -107,7 +107,7 @@ int main()
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__0, sizeof(int)*100);
 
-//             <may be read   >: P4A__a__0 t
+//             <may be read   >: P4A__a__0 i t
 //             <may be written>: P4A__a__0[0][*]
 //             <    is written>: i
 scmp_task_0:
@@ -135,7 +135,7 @@ scmp_task_0:
 //             <    is read   >: P4A__a__1
          P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *P4A__a__1);
 
-//             <may be read   >: P4A__a__1 P4A__a__1[0][*] stdout 
+//             <may be read   >: P4A__a__1 P4A__a__1[0][*] i stdout 
 //                               stdout[0] __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is written>: i

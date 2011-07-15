@@ -1,3 +1,6 @@
+//
+// Code after privatize_module for module PRIVATIZATION01
+//
 C     Check that j is not privatized in the first loop, but privatized
 C     in the second one... However, j is not initialized before its use
 C     in the first loop, the value of j does not matter and hence j can

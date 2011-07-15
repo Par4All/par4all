@@ -4,13 +4,13 @@ int main()
 {
 //             <    is written>: s
    int t, i, a[100], b[100/2], c[100/2], s = 0;
-//             <may be read   >: a[*] b[*] c[*] stdout stdout[0] 
+//             <may be read   >: a[*] b[*] c[*] i stdout stdout[0] t 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: a[*] b[*] c[*] stdout[0] 
+//             <may be written>: a[*] b[*] c[*] i stdout[0] 
 //                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: t
    for(t = 0; t <= 9; t += 1) {
-//             <may be read   >: t
+//             <may be read   >: i t
 //             <may be written>: a[*]
 //             <    is written>: i
 scmp_task_0:
@@ -18,7 +18,7 @@ scmp_task_0:
 //             <may be written>: a[*]
 //             <    is read   >: i t
          a[i] = i*t;
-//             <may be read   >: a[*]
+//             <may be read   >: a[*] i
 //             <may be written>: b[*]
 //             <    is written>: i
 scmp_task_1:
@@ -27,7 +27,7 @@ scmp_task_1:
 //             <may be written>: b[*]
 //             <    is read   >: i
          b[i] = a[i];
-//             <may be read   >: a[*]
+//             <may be read   >: a[*] i
 //             <may be written>: c[*]
 //             <    is written>: i
 scmp_task_2:
@@ -36,7 +36,7 @@ scmp_task_2:
 //             <may be written>: c[*]
 //             <    is read   >: i
          c[i] = a[i+100/2];
-//             <may be read   >: b[*] stdout stdout[0] 
+//             <may be read   >: b[*] i stdout stdout[0] 
 //                               __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is written>: i
@@ -47,7 +47,7 @@ scmp_task_3:
 //             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
          printf("%d\n", b[i]);
-//             <may be read   >: c[*] stdout stdout[0] 
+//             <may be read   >: c[*] i stdout stdout[0] 
 //                               __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is written>: i
@@ -141,7 +141,7 @@ int main()
 {
 //             <    is written>: s
    int t, i, a[100], b[100/2], c[100/2], s = 0;
-//             <may be read   >: a[*] b[*] c[*] stdout stdout[0] 
+//             <may be read   >: a[*] b[*] c[*] i stdout stdout[0] t 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
@@ -157,7 +157,7 @@ int main()
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__0, sizeof(int)*100);
 
-//             <may be read   >: P4A__a__0 t
+//             <may be read   >: P4A__a__0 i t
 //             <may be written>: P4A__a__0[0][*]
 //             <    is written>: i
 scmp_task_0:
@@ -189,7 +189,7 @@ scmp_task_0:
 //             <    is read   >: P4A__a__1
          P4A_copy_to_accel_1d(sizeof(int), 100, 50, 0, &a[0], *P4A__a__1);
 
-//             <may be read   >: P4A__a__1 P4A__a__1[0][*] P4A__b__0
+//             <may be read   >: P4A__a__1 P4A__a__1[0][*] P4A__b__0 i
 //             <may be written>: P4A__b__0[0][*]
 //             <    is written>: i
 scmp_task_1:
@@ -224,7 +224,7 @@ scmp_task_1:
 //             <    is read   >: P4A__a__2
          P4A_copy_to_accel_1d(sizeof(int), 100, 50, 50, &a[0], *P4A__a__2);
 
-//             <may be read   >: P4A__a__2 P4A__a__2[0][*] P4A__c__0
+//             <may be read   >: P4A__a__2 P4A__a__2[0][*] P4A__c__0 i
 //             <may be written>: P4A__c__0[0][*]
 //             <    is written>: i
 scmp_task_2:
@@ -255,7 +255,7 @@ scmp_task_2:
 //             <    is read   >: P4A__b__1
          P4A_copy_to_accel_1d(sizeof(int), 50, 50, 0, &b[0], *P4A__b__1);
 
-//             <may be read   >: P4A__b__1 P4A__b__1[0][*] stdout 
+//             <may be read   >: P4A__b__1 P4A__b__1[0][*] i stdout 
 //                               stdout[0] __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is written>: i
@@ -283,7 +283,7 @@ scmp_task_3:
 //             <    is read   >: P4A__c__1
          P4A_copy_to_accel_1d(sizeof(int), 50, 50, 0, &c[0], *P4A__c__1);
 
-//             <may be read   >: P4A__c__1 P4A__c__1[0][*] stdout 
+//             <may be read   >: P4A__c__1 P4A__c__1[0][*] i stdout 
 //                               stdout[0] __IO_EFFECTS:LUNS[1]
 //             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is written>: i

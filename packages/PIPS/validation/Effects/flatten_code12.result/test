@@ -34,13 +34,15 @@ void flatten_code12(void)
 
 Code with cumulated effects
 
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: foo stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: foo stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is read   >: foo_0
 void flatten_code12(void)
 {
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: foo stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: foo stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is read   >: foo_0
 // (0,1)
    // BEGIN BLOCK
@@ -48,8 +50,9 @@ void flatten_code12(void)
 //             <    is written>: i
 // (0,2)
    int i = foo_0;                                                       /*0011*/
-//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be read   >: foo stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: foo stdout[0] __IO_EFFECTS:LUNS[1]
 //             <    is written>: i
 // (0,3)
 
@@ -82,7 +85,7 @@ void flatten_code12(void)
 Code with transformers
 
 
-//  T() {}
+//  T(foo) {}
 
 void flatten_code12(void)
 {

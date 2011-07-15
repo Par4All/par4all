@@ -97,6 +97,9 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_div_10, alu_div_01, "SPOC_ALU_DIV_IN1_IN0", F, T, T },
   { alu_div_0cst, alu_div_1cst, "SPOC_ALU_DIV_IN0_CONST", T, T, F },
   { alu_div_1cst, alu_div_0cst, "SPOC_ALU_DIV_IN1_CONST", T, F, T },
+  // LOG2
+  { alu_log2_0, alu_log2_1, "SPOC_ALU_LOG2_IN0", F, T, F },
+  { alu_log2_1, alu_log2_0, "SPOC_ALU_LOG2_IN1", F, F, T },
   // INF
   { alu_inf_01, alu_inf_01, "SPOC_ALU_INF_IN0_IN1", F, T, T },
   { alu_inf_0cst, alu_inf_1cst, "SPOC_ALU_INF_IN0_CONST", T, T, F },
@@ -119,7 +122,7 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_xor_1cst, alu_xor_0cst, "SPOC_ALU_XOR_IN1_CONST", T, F, T },
   // NOT
   { alu_not_0, alu_not_1, "SPOC_ALU_NOT_IN0", F, T, F },
-  { alu_not_1, alu_not_0, "SPOC_ALU_NOT_IN1", T, F, T },
+  { alu_not_1, alu_not_0, "SPOC_ALU_NOT_IN1", F, F, T },
   // MISC
   { alu_copy_cst, alu_copy_cst, "SPOC_ALU_COPY_CONST", T, F, F }
   // and so on?
@@ -1652,6 +1655,7 @@ static int poc_count_same_inputs(const dagvtx ref)
  * this is deep voodoo, because the priority has an impact on
  * correctness? that should not be the case as only computations
  * allowed by dependencies are schedule.
+ * non implemented functions are pushed late.
  * tells v1 < v2  =>  -1  =>  v1 BEFORE v2
  */
 int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
@@ -1666,8 +1670,13 @@ int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
   // if there is only one of them
   if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
   {
-    // scalars operations first to remove (scalar) dependences
-    if (vtxcontent_optype(c1)==spoc_type_oth)
+    // non implemented operations
+    if (vtxcontent_optype(c1)==spoc_type_sni)
+      result = 1, why = "not";
+    else if (vtxcontent_optype(c2)==spoc_type_sni)
+      result = -1, why = "not";
+    // then scalars operations first to remove (scalar) dependences
+    else if (vtxcontent_optype(c1)==spoc_type_oth)
       result = -1, why = "scal";
     else if (vtxcontent_optype(c2)==spoc_type_oth)
       result = 1, why = "scal";
@@ -1850,7 +1859,7 @@ static set output_arcs(dag d, set vs)
   return out_nodes;
 }
 
-/* how many output arcs from this set of vertices ?
+/* how many output arcs from this set of vertices?
  */
 static int number_of_output_arcs(dag d, set vs)
 {
@@ -1858,6 +1867,16 @@ static int number_of_output_arcs(dag d, set vs)
   int n_arcs = set_size(out_nodes);
   set_free(out_nodes);
   return n_arcs;
+}
+
+/* does this dag contains a spoc non implemented operation?
+ */
+static bool dag_spoc_not_implemented(dag d)
+{
+  FOREACH(dagvtx, v, dag_vertices(d))
+    if (dagvtx_optype(v)==spoc_type_sni)
+      return true;
+  return false;
 }
 
 /* return first vertex in the list which is compatible, or NULL if none.
@@ -1993,6 +2012,10 @@ static list /* of dags */ split_dag(dag initial)
     dagvtx vok =
       first_which_may_be_added(dall, current, computables, sure, maybe);
 
+    if (vok && dagvtx_optype(vok)==spoc_type_sni && lcurrent)
+      // extract non implemented nodes alone only!
+      vok = NULL;
+
     if (vok)
     {
       pips_debug(5, "extracting %" _intFMT "...\n", dagvtx_number(vok));
@@ -2003,8 +2026,10 @@ static list /* of dags */ split_dag(dag initial)
       // set_union(avails, sure, maybe);
     }
 
-    // no stuff vertex can be added, or it was the last one
-    if (!vok || set_size(computed)==nvertices)
+    // no stuff vertex can be added, or it was the last one,
+    // or it is not implemented and thus to be extracted "alone"
+    if (!vok || set_size(computed)==nvertices ||
+        (vok && dagvtx_optype(vok)==spoc_type_sni))
     {
       // ifdebug(5)
       // set_fprint(stderr, "closing current", current, )
@@ -2096,6 +2121,10 @@ void freia_spoc_compile_calls
   int n_pipes = 0;
   FOREACH(dag, d, ld)
   {
+    // skip non implemented stuff
+    if (dag_spoc_not_implemented(d))
+      continue;
+
     set remainings = set_make(set_pointer);
     set_append_vertex_statements(remainings, dag_vertices(d));
     // remove special inputs nodes

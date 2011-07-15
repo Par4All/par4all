@@ -874,14 +874,18 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
 	case is_syntax_subscript:
 	  {
 	    pips_debug(5, "subscript case\n");
-	    effect eff;
 	    /* aborts if there are calls in subscript expressions */
-	    list l_tmp = generic_proper_effects_of_complex_address_expression(exp, &eff, true);
+	    list l_eff = NIL;
+	    list l_tmp = generic_proper_effects_of_complex_address_expression(exp, &l_eff, true);
 	    gen_full_free_list(l_tmp);
-	    pv_res->result_paths = CONS(EFFECT, eff, NIL);
-	    pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
-							make_cell_interpretation_value_of(),
-							NIL);
+	    FOREACH(EFFECT, eff, l_eff)
+	      {
+		pv_res->result_paths = CONS(EFFECT, eff, NIL);
+		pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
+							    make_cell_interpretation_value_of(),
+							    NIL);
+	      }
+	    gen_free_list(l_eff); /* free the spine */
 	    /* we assume no effects on aliases due to subscripts evaluations for the moment */
 	    pv_res->l_out = l_in;
 	    break;

@@ -94,6 +94,9 @@ typedef dfg_vertex_label vertex_label;
 #include "paf-util.h"
 #include "static_controlize.h"
 
+// Forward declaration to survive races in the compilation process
+statement_mapping get_current_stco_map(void);
+
 /* Macro functions	*/
 #define STRING_FOUR_OPERATION_P(s) ( \
 				    (strcmp(s,PLUS_OPERATOR_NAME) == 0) || \

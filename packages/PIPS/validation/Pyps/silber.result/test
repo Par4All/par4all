@@ -1,4 +1,3 @@
-w=1024, h=1024, max=255
 int adds(char i0, char i1)
 {
    return (int) i0+i1>255?255:i0+i1;
@@ -148,17 +147,6 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    curve(w, h, dest, lut);
    light(w, h, dest, val);
 }
-Help on method unfolding in module pyps:
-
-unfolding(self, inlining_use_initialization_list=None, **props) unbound pypsbase.module method
-    Unfolding is a complementary transformation of
-    inlining .  While inlining inlines all call
-    sites to a given module in other modules, unfolding inlines
-    recursively all call sites in a given module, thus unfolding the
-    content of the module. An unfolded source code does not contain
-    any call anymore.
-    If you run it recursievly, you should set  to false.
-
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    {
@@ -325,20 +313,6 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    
    ;
 }
-Help on method expression_substitution in module pyps:
-
-expression_substitution(self, pattern=None, relax_float_associativity=None, **props) unbound pypsbase.module method
-    This transformation is quickly developed to fulfill the need of a
-    simple pattern matcher in pips.  The user provide a module name
-    through  property and all
-    expression similar to those contained in
-     will be substituted to a call
-    to this module. It is a kind of simple outlining transformations, it
-    proves to be useful during simdization to recognize some idioms. Note
-    that the pattern must contain only a single return instruction!
-    
-    This phase was developed by Serge  during his PhD.
-
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
@@ -425,7 +399,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    int I_10;
 
-#pragma omp parallel for private(j_0)
+#pragma omp parallel for private(I_3,current_0,current_1,j_0)
 l99989:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
 l99990:      inner(h, w, &i_0, bytes, dest, lut, val);

@@ -31,7 +31,7 @@
 - other simple or complex algebraic optimization ideas?
   maybe at least A xor A => A = 0 would be useful?
 - redundancy: max coord includes max
-- check optimality of tests cases
++ check optimality of tests cases (for spoc)
 
 * code
 + cleanup data structures?
@@ -83,6 +83,10 @@
 + license_plate_copies takes too much time to compile? 1mn -> 4.5s
 - reuse of images in some cases when nodes are reordered... SSA?
 - wrong copy extraction order in vs_core_2, and copies not really removed
+- should turn = in image copies?
+
+* spoc target
++ check for not implemented functions, and skip them! convolution, other?
 
 * terapix target
 + must manage memory allocation in tiles
@@ -105,6 +109,10 @@
 - implement "enumerate" dag cutting strategy
 - it would be great if the simulator timings are ok for a paper...
 - cleanup declarations in the generated code, when not used?
++ skip non implemented ops? fast_correlation?
+
+* Mixed target
+- could do something simple greedy first, spoc first, implemented first...
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler

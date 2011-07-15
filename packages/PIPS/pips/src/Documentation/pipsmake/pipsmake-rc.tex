@@ -2335,16 +2335,6 @@ cumulated_effects_with_pointer_values   > MODULE.cumulated_effects
         < MODULE.proper_effects
 \end{PipsMake}
 
-Cumulated memory effects do not take into account local effects on
-private variables, such as variables declared in C blocks or in
-Fortran parallel DO loops. \PipsPropRef{MASK_EFFECTS_ON_PRIVATE_VARIABLES}
-can be set to FALSE to prevent this behavior.
-\begin{PipsProp}{MASK_EFFECTS_ON_PRIVATE_VARIABLES}
-MASK_EFFECTS_ON_PRIVATE_VARIABLES TRUE
-\end{PipsProp}
-
-
-
 \subsection{Summary Data Flow Information (SDFI)}
 \label{subsubection-summary-data-flow-information}
 \index{SDFI}
@@ -4845,6 +4835,7 @@ summary_regions                 > MODULE.summary_regions
 \index{IN Regions}
 \index{Regions (IN)}
 
+\begin{PipsPass}{in_regions}
 \verb+IN+ convex array regions are flow sensitive regions. They are read regions not
 covered (i.e. not previously written) by assignments in the local
 hierarchical control-flow graph. There is no way with the current
@@ -4852,6 +4843,7 @@ pipsmake-rc and \Pipsmake{} to express the fact that \verb+IN+ (and \verb+OUT+)
 regions must be calculated using \PipsPassRef{must_regions} (a new kind of
 resources, \PipsPassRef{must_regions}, should be added). The user must be
 knowledgeable enough to select \PipsPassRef{must_regions} first.
+\end{PipsPass}
 
 \begin{PipsMake}
 in_regions                      > MODULE.in_regions
@@ -7920,6 +7912,10 @@ array_expansion > PROGRAM.entities
   loop fusion has to preserve parallelism while fusing. If this property
   is true, a parallel loop is never fused with a sequential loop.
 
+  Property \PipsPropRef{LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS} prevents
+  to lose parallelism when fusing outer loops from a loop nests without being
+  able to fuse inner loops.
+
   The fusion legality is checked in the standard way by comparing the
   dependence graphs obtained before and after fusion.
 
@@ -7946,6 +7942,9 @@ LOOP_FUSION_MAXIMIZE_PARALLELISM TRUE
 LOOP_FUSION_GREEDY FALSE
 \end{PipsProp}
 
+\begin{PipsProp}{LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS}
+LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS TRUE
+\end{PipsProp}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Index Set Splitting
@@ -11991,7 +11990,7 @@ Produce a html version of the internal represenation of a PIPS Module
 \end{PipsPass}
 
 \begin{PipsMake}
-html_prettyprint > MODULE.parsed_printed_file
+html_prettyprint > MODULE.html_ir_file
          < PROGRAM.entities
          < MODULE.code
 \end{PipsMake}
@@ -12001,7 +12000,7 @@ Produce a html version of the symbol table
 \end{PipsPass}
 
 \begin{PipsMake}
-html_prettyprint_symbol_table > MODULE.parsed_printed_file
+html_prettyprint_symbol_table > PROGRAM.html_ir_file
          < PROGRAM.entities
          < MODULE.code
 \end{PipsMake}

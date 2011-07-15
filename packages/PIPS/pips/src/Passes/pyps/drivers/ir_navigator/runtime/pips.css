@@ -1,0 +1,71 @@
+
+.header img{
+  float:left;
+}
+
+.clear {
+  height:0px; clear:both;
+}
+div {
+ margin-left: 10px;
+}
+
+img {
+  border:none;
+}
+
+
+#sourcecode {
+/* float:right; */
+}
+
+.module, .symbolTable {
+ padding : 0;
+ margin : 0;
+ margin-left : -1em;
+}
+
+#navigator li {
+ margin : 0;
+ list-style: none;
+}
+
+li.inlined span,li.blocked span {
+/* margin-left : 1em;*/
+ padding-left : 8px;
+ float:left; 
+ background:transparent url(bg_bullet_arrow.png) no-repeat 0 50%;
+}
+
+li.inlined {
+ margin : 0;
+ float:left;
+}
+ul.inlined {
+ margin : 0;
+ padding-left : 1em;
+ float:left;
+}
+
+li.blocked {
+ display : block;
+ clear: left;
+}
+
+.Symbol-table {
+ clear:left;
+}
+
+ul.module {
+ float: none;
+ border: 2px dashed black;
+ border-left: none;
+ border-right: none;
+ border-top: none;
+}
+
+
+li.endmodule {
+ clear: left;
+ height: 0px;
+}

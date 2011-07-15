@@ -1,0 +1,18 @@
+delete crc03
+set ABORT_ON_USER_ERROR TRUE
+create crc03 crc03.c
+echo # initial
+display PRINTED_FILE
+apply PARTIAL_EVAL
+echo # partial eval
+display PRINTED_FILE
+apply UNSPLIT
+# test with options
+shell pips_validation_exe.sh crc03
+shell pips_validation_exe.sh --crc crc03
+shell pips_validation_exe.sh -cr crc03
+shell pips_validation_exe.sh -c crc03
+shell pips_validation_exe.sh -c -i crc03
+shell pips_validation_exe.sh -c -g crc03
+close
+delete crc03

@@ -5,7 +5,7 @@
       REAL ARRAY (SIZE,SIZE,SIZE)
 
 
-!$OMP PARALLEL DO PRIVATE(J,K)
+!$OMP PARALLEL DO PRIVATE(J)
       DO I = 1, SIZE                                                    0006
 
 !$OMP    PARALLEL DO PRIVATE(K)
@@ -26,7 +26,7 @@
       PARAMETER (SIZE = 100)
       REAL ARRAY (SIZE,SIZE,SIZE)
 
-!$omp parallel do private(K, J)
+!$omp parallel do private(J, K)
       DO I = 1, SIZE                                                    0006
          DO J = 1, SIZE                                                 0007
             DO K = 1, SIZE                                              0008

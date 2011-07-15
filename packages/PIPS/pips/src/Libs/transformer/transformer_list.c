@@ -622,6 +622,7 @@ transformer_list_closure_to_precondition_max_depth(list tl,
 						   transformer p_0)
 {
   list ntl = transformers_combine(gen_full_copy_list(tl), c_t);
+  //pips_assert("ntl is OK", check_transformer_list(ntl));
 
   list p_1_l = transformers_apply(ntl, p_0);
   transformer p_1 = transformer_list_to_transformer(p_1_l);

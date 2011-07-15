@@ -34,7 +34,7 @@ Ask for the parallelization of all the modules of the program with OpenMP output
        REAL XCOEF(NXM,NYM),XPT(NXM),YPT(NXM)
 
 
-!$OMP PARALLEL DO PRIVATE(I,PX,PY,XCO)
+!$OMP PARALLEL DO PRIVATE(I)
       DO J = 2, NY-1                                                    0008
 
 !$OMP    PARALLEL DO PRIVATE(PX,PY,XCO)
@@ -77,7 +77,7 @@ Ask for the parallelization of all the modules of the program with OpenMP output
        REAL XCOEF(NXM,NYM),XPT(NXM),YPT(NXM)
 
 
-!$OMP PARALLEL DO PRIVATE(I,PX,PY,XCO)
+!$OMP PARALLEL DO PRIVATE(I)
       DO J = 2, NY-1                                                    0008
 
 !$OMP    PARALLEL DO PRIVATE(PX,PY,XCO)

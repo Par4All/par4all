@@ -369,6 +369,39 @@ bool std_file_effects_p(list effects)
     return false;
 }
 
+bool FILE_star_effect_reference_p(reference ref)
+{
+  bool res = false;
+  type t = basic_concrete_type(entity_type(reference_variable(ref)));
+  pips_debug(8, "begin with type %s\n",
+	     words_to_string(words_type(t,NIL)));
+  if (type_variable_p(t))
+    {
+      basic b = variable_basic(type_variable(t));
+      if (basic_pointer_p(b))
+	{
+	  t = basic_pointer(b);
+	   if (type_variable_p(t))
+	     {
+		basic b = variable_basic(type_variable(t));
+		if (basic_derived_p(b))
+		  {
+		    entity te = basic_derived(b);
+		    if (same_string_p(entity_user_name(te), "_IO_FILE"))
+		      {
+			res = true;
+		      }
+		  }
+	     }
+	}
+    }
+  pips_debug(8, "end with : %s\n", res? "true":"false");
+
+  return res;
+}
+
+
+
 /* Can we merge these two effects because they are equal or because
    they only differ by their approximations and their descriptors? */
 bool effect_comparable_p(effect e1, effect e2)

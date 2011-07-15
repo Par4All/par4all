@@ -50,9 +50,7 @@ class FileUtils:
 	
     def create_result_file(self, code):
 
-	if os.path.exists(paws.results + session['directory']):
-		print 'Istnieje'
-	else:
+	if os.path.exists(paws.results + session['directory']) == False:
 		os.mkdir(paws.results + session['directory'])
 	f = open(paws.results + session['directory'] + '/' + session['directory'], 'w')
 	f.write(code)
