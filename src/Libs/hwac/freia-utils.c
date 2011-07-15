@@ -296,7 +296,6 @@ static const freia_api_t FREIA_AIPO_API[] = {
   // cost rather approximated for Terapix
   { AIPO "convolution", "conv", NULL, 1, 1, 0, 3,
     NO_PARAM, { TY_PIN, TY_UIN, TY_UIN }, // kernel, width, height
-    // ??? the -1 is a hack used here and there, should be removed...
     NO_SPOC, { -1, -1, -1, -1, 0, 20, false, "TERAPIX_UCODE_CONV" }
   },
   // not implemented by SPOC! nor by TERAPIX!
