@@ -1541,7 +1541,8 @@ static void dag_append_freia_call(dag d, statement s)
 
     vtxcontent cont =
       make_vtxcontent(-1, 0, make_pstatement_statement(s), ins, out);
-    set_operation(api, &vtxcontent_optype(cont), &vtxcontent_opid(cont));
+    freia_spoc_set_operation
+      (api, &vtxcontent_optype(cont), &vtxcontent_opid(cont));
 
     dagvtx nv = make_dagvtx(cont, NIL);
     dag_append_vertex(d, nv);

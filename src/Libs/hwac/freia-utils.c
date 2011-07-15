@@ -394,7 +394,7 @@ string what_operation_shape(const _int type)
 
 /* ??? beurk: I keep the operation as two ints for code regeneration.
  */
-void set_operation(const freia_api_t * api, _int * type, _int * id)
+void freia_spoc_set_operation(const freia_api_t * api, _int * type, _int * id)
 {
   pips_assert("no type set", *type == spoc_type_nop);
 
@@ -416,6 +416,8 @@ void set_operation(const freia_api_t * api, _int * type, _int * id)
   *id = hwac_freia_api_index(api->function_name);
 }
 
+/* @brief get freia further parameters, skipping image ones
+ */
 list freia_get_params(const freia_api_t * api, list args)
 {
   int skip = api->arg_img_in + api->arg_img_out;
@@ -516,7 +518,7 @@ list /* of expression */ freia_extract_params
   return gen_nreverse(res);
 }
 
-/* all is well
+/* @brief build all is well freia constant
  */
 static call freia_ok(void)
 {
@@ -524,7 +526,7 @@ static call freia_ok(void)
   return make_call(local_name_to_top_level_entity("0"), NIL);
 }
 
-/* is it an assignment to ignore
+/* @brief tell whether it is an assignment to ignore?
  */
 bool freia_assignment_p(const entity e)
 {
