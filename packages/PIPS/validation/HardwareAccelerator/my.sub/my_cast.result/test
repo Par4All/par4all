@@ -11,6 +11,32 @@ freia_status my_cast(freia_data2d *o, freia_data2d *i0)
 
 ! graphs
 
+// graph for dag "dag_0" of module "my_cast" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =()" [shape=circle];
+  "4 =()" -> "o";
+  "i0" -> "4 =()";
+}
+// graph for dag "dag_cleaned_0" of module "my_cast" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =()" [shape=circle];
+  "4 =()" -> "o";
+  "i0" -> "4 =()";
+}
 
 ! updated function for
 
@@ -31,6 +57,32 @@ freia_status my_cast(freia_data2d *o, freia_data2d *i0)
 
 ! graphs
 
+// graph for dag "dag_0" of module "my_cast" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =()" [shape=circle];
+  "4 =()" -> "o";
+  "i0" -> "4 =()";
+}
+// graph for dag "dag_cleaned_0" of module "my_cast" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =()" [shape=circle];
+  "4 =()" -> "o";
+  "i0" -> "4 =()";
+}
 
 ! acceleration function
 
@@ -65,6 +117,32 @@ freia_status my_cast(freia_data2d *o, freia_data2d *i0)
 
 ! graphs
 
+// graph for dag "dag_0" of module "my_cast" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =()" [shape=circle];
+  "4 =()" -> "o";
+  "i0" -> "4 =()";
+}
+// graph for dag "dag_cleaned_0" of module "my_cast" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =()" [shape=circle];
+  "4 =()" -> "o";
+  "i0" -> "4 =()";
+}
 
 ! acceleration function
 

@@ -45,13 +45,13 @@ int main()
 //  {(a,*HEAP*_l_8[0],-Exact-);(p,*HEAP*_l_8[0],-Exact-)}
    while (i<10) {
 //  {(a,*HEAP*_l_8[0],-Exact-);(p,*HEAP*_l_8[0],-MAY-);(p,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
       *p = 1.0;
 //  {(a,*HEAP*_l_8[0],-Exact-);(p,*HEAP*_l_8[0],-MAY-);(p,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
       p++;
    }
 //  {(a,*HEAP*_l_8[0],-Exact-);(p,*HEAP*_l_8[0],-MAY-);(p,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   *HEAP*_l_8[*],-MAY-)}
    return 0;
 }

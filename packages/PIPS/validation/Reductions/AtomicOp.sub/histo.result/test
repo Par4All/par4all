@@ -55,7 +55,7 @@ void histogram(int data[128][128][128], int histo[128][128][128])
             s += data[i][j][k];
    
    // This is parallel without a reduction
-#pragma omp parallel for private(j,k)
+#pragma omp parallel for private(j)
    for(i = 0; i <= 127; i += 1)
 #pragma omp parallel for private(k)
       for(j = 0; j <= 127; j += 1)
@@ -89,7 +89,7 @@ void histogram(int data[128][128][128], int histo[128][128][128])
             s += data[i][j][k];
    
    // This is parallel without a reduction
-#pragma omp parallel for private(j,k)
+#pragma omp parallel for private(j)
    for(i = 0; i <= 127; i += 1)
 #pragma omp parallel for private(k)
       for(j = 0; j <= 127; j += 1)
@@ -129,7 +129,7 @@ void histogram(int data[128][128][128], int histo[128][128][128])
             atomicAddInt(&s, 1);
    
    // This is parallel without a reduction
-#pragma omp parallel for private(j,k)
+#pragma omp parallel for private(j)
    for(i = 0; i <= 127; i += 1)
 #pragma omp parallel for private(k)
       for(j = 0; j <= 127; j += 1)

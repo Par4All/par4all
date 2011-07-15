@@ -23,24 +23,29 @@ int main(int argc, char *argv[])
 
 POINTS-TO
 
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
 int main(int argc, char *argv[])
 {
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
    int i, j;
-//  {}
+//  {(argv[*],_argv_1[0],-Exact-)}
    int *a[64];
-//  {}
+//  {(a[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(argv[*],_argv_1[0],
+//   -Exact-)}
 
    for(i = 0; i <= 63; i += 1) {
-//  {(a[i],*HEAP*_l_13[0],-MAY-)}
+//  {(a[*],*HEAP*_l_13[0],-MAY-);(a[*],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(argv[*],_argv_1[0],-Exact-)}
       a[i] = (float) malloc(64*sizeof(float));
-//  {(a[i],*HEAP*_l_13[0],-MAY-)}
+//  {(a[*],*HEAP*_l_13[0],-MAY-);(a[*],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(argv[*],_argv_1[0],-Exact-)}
       for(j = 0; j <= 63; j += 1)
-//  {(a[i],*HEAP*_l_13[0],-Exact-)}
+//  {(a[*],*HEAP*_l_13[0],-Exact-);(a[*],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(argv[*],_argv_1[0],-Exact-)}
          a[i][j] = 0.;
    }
-//  {(a[i],*HEAP*_l_13[0],-MAY-)}
+//  {(a[*],*HEAP*_l_13[0],-MAY-);(a[*],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(argv[*],_argv_1[0],-Exact-)}
 
    return 0;
 }

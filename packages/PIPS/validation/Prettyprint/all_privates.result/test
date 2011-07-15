@@ -7,16 +7,16 @@ int main()
    float z = 0.0;                                                       /*0007*/
    float y = 2.0;                                                       /*0008*/
 
-#pragma omp parallel for private(j,i)
+#pragma omp parallel for private(i,j)
    for(i = 0; i <= 9; i += 1)                                           /*0010*/
-#pragma omp parallel for private(k,j)
+#pragma omp parallel for private(j,k)
       for(j = 0; j <= 9; j += 1)                                        /*0011*/
-#pragma omp parallel for private(z,l,k)
+#pragma omp parallel for private(k,l,z)
          for(k = 0; k <= 9; k += 1) {                                   /*0012*/
             z = k*2.0;                                                  /*0013*/
-#pragma omp parallel for private(m,l)
+#pragma omp parallel for private(l,m)
             for(l = 0; l <= 9; l += 1)                                  /*0014*/
-#pragma omp parallel for private(y,m)
+#pragma omp parallel for private(m,y)
                for(m = 0; m <= 9; m += 1) {                             /*0015*/
                   y = 3.5+x+z;                                          /*0016*/
                   a[i][j][k][l][m] = x*y;                               /*0017*/
@@ -25,14 +25,14 @@ int main()
    
    // use the value of the array to prevent pips doing optimization on unused
    // values
-#pragma omp for private(j,i)
+#pragma omp for private(i,j,k,l,m,z)
    for(i = 0; i <= 9; i += 1)                                           /*0026*/
-#pragma omp for private(k,j)
+#pragma omp for private(j,k,l,m,z)
       for(j = 0; j <= 9; j += 1)                                        /*0027*/
-#pragma omp for private(z,l,k)
+#pragma omp for private(k,l,m,z)
          for(k = 0; k <= 9; k += 1) {                                   /*0028*/
             z = k*2.0;                                                  /*0029*/
-#pragma omp for private(m,l)
+#pragma omp for private(l,m)
             for(l = 0; l <= 9; l += 1)                                  /*0030*/
 #pragma omp for private(m)
                for(m = 0; m <= 9; m += 1)                               /*0031*/

@@ -74,6 +74,7 @@ extern freia_status freia_aipo_or_const(freia_data2d *, const freia_data2d *, in
 extern freia_status freia_aipo_xor(freia_data2d *, const freia_data2d *, const freia_data2d *);
 extern freia_status freia_aipo_xor_const(freia_data2d *, const freia_data2d *, int32_t);
 extern freia_status freia_aipo_not(freia_data2d *, const freia_data2d *);
+extern freia_status freia_aipo_log2(freia_data2d *, const freia_data2d *);
 // Linear
 extern freia_status freia_aipo_convolution(freia_data2d *, const freia_data2d *, const int32_t *, uint32_t, uint32_t);
 extern freia_status freia_aipo_fast_correlation(freia_data2d *, const freia_data2d *, const freia_data2d *, uint32_t);

@@ -5,7 +5,7 @@ c	dans les I/O
         INTEGER I,J,K
 
       DO J = 1, 32                                                      0007
-         PRIVATE K,I
+         PRIVATE I,K
          DO I = 1, 10                                                   0008
             A(I,J) = 0.                                                 0009
          ENDDO

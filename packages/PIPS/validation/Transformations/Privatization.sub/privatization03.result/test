@@ -1,3 +1,6 @@
+//
+// Code after privatize_module for module PRIVATIZATION03
+//
 C     Check that j is privatized
 
       SUBROUTINE PRIVATIZATION03

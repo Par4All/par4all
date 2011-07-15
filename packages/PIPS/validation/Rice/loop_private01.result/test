@@ -1,0 +1,46 @@
+//
+// Initial code for module loop_private
+//
+void loop_private()
+{
+   int n = 10;
+   int tsteps = 10;
+   {
+      int t;
+      for(t = 0; t <= tsteps-1; t += 1) {
+         {
+            int i1;
+            for(i1 = 0; i1 <= n-1; i1 += 1)
+               printf("toto");
+         }
+         {
+            int i1;
+            for(i1 = 0; i1 <= n-1; i1 += 1)
+               printf("tata");
+         }
+      }
+   }
+}
+//
+// Code after internalize_parallel_code for module loop_private
+//
+void loop_private()
+{
+   int n = 10;
+   int tsteps = 10;
+   {
+      int t;
+      for(t = 0; t <= tsteps-1; t += 1) {
+         {
+           int i1;
+           for(i1 = 0; i1 <= n-1; i1 += 1)
+              printf("toto");
+         }
+         {
+           int i1;
+         for(i1 = 0; i1 <= n-1; i1 += 1)
+            printf("tata");
+         }
+      }
+   }
+}

@@ -18,21 +18,21 @@
                A(P,P) = CSQ*APP+2.0*CS*APQ+SSQ*AQQ                      0017
                A(Q,Q) = SSQ*APP-2.0*CS*APQ+CSQ*AQQ                      0018
                DOALL I = 1, P-1                                         0021
-                  PRIVATE AIQ,AIP
+                  PRIVATE AIP,AIQ
                   AIP = A(I,P)                                          0022
                   AIQ = A(I,Q)                                          0023
                   A(I,P) = C*AIP+S*AIQ                                  0024
                   A(I,Q) = -S*AIP+C*AIQ                                 0026
                ENDDO
                DOALL I = P+1, Q-1                                       0029
-                  PRIVATE AIQ,AIP
+                  PRIVATE AIP,AIQ
                   AIP = A(I,P)                                          0030
                   AIQ = A(I,Q)                                          0031
                   A(I,P) = C*AIP+S*AIQ                                  0032
                   A(I,Q) = -S*AIP+C*AIQ                                 0034
                ENDDO
                DOALL I = Q+1, N                                         0037
-                  PRIVATE AIQ,AIP
+                  PRIVATE AIP,AIQ
                   AIP = A(I,P)                                          0038
                   AIQ = A(I,Q)                                          0039
                   A(I,P) = C*AIP+S*AIQ                                  0040
