@@ -1,0 +1,172 @@
+#
+# AIPO
+#
+
+! initial function
+
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0005*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_convolution" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 conv" [shape=circle];
+  "5 conv" -> "o";
+  "i0" -> "5 conv";
+}
+// graph for dag "dag_cleaned_0" of module "my_convolution" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 conv" [shape=circle];
+  "5 conv" -> "o";
+  "i0" -> "5 conv";
+}
+
+! updated function for
+
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0005*/
+}
+#
+# SPOC
+#
+
+! initial function
+
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0005*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_convolution" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 conv" [shape=circle];
+  "5 conv" -> "o";
+  "i0" -> "5 conv";
+}
+// graph for dag "dag_cleaned_0" of module "my_convolution" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 conv" [shape=circle];
+  "5 conv" -> "o";
+  "i0" -> "5 conv";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+! updated function
+
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0005*/
+}
+
+! cleaned up function
+
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0005*/
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0005*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_convolution" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 conv" [shape=circle];
+  "5 conv" -> "o";
+  "i0" -> "5 conv";
+}
+// graph for dag "dag_cleaned_0" of module "my_convolution" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 conv" [shape=circle];
+  "5 conv" -> "o";
+  "i0" -> "5 conv";
+}
+
+! acceleration function
+
+// freia terapix includes
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+! updated function
+
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0005*/
+}
+
+! cleaned up function
+
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0005*/
+}
+#
+# FREIA COMPILATION DONE
+#
+
