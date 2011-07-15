@@ -170,11 +170,13 @@ Simple command line interface}
   \item Automatic parallelization with advanced semantics analysis
   \item C and Fortran input language
   \item OpenMP code generation (C \& Fortran)
+  \item Scilab parallelization with Wild Cruncher
   \item Code generation for heterogeneous accelerators
     \begin{itemize}
     \item CUDA for GPU
+    \item OpenCL for GPU \& ST Platform 2012 (on-going)
+    \item SCMP task programs for SCMP machine from CEA
     \end{itemize}
-  \item Code generation for the SCMP architecture
   \item Source-to-source: capitalize on real value \& surf on best
     back-ends
   \item Manage back-end invocation for simplicity
@@ -237,6 +239,9 @@ p4a [\emph{options}] \emph{files}
   \item \texttt{-{}-cuda} generates CUDA output
   \item \texttt{-{}-accel} \texttt{-{}-openmp} generates OpenMP output that
     simulates the CUDA behaviour
+  \item \texttt{-{}-com-optimization} use static interprocedural data-flow
+    analysis to keep track of data movement and allocation to remove
+    redundant communications and allocation
   \item \texttt{-{}-scmp} generates an application for the SCMP architecture
   \end{itemize}
 \end{frame}
