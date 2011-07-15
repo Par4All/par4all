@@ -2,9 +2,6 @@ import logging, sys, os, traceback
 
 import pawsapp.config.paws as paws
 
-from pyps import workspace, module
-from pyrops import pworkspace
-
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 
@@ -15,75 +12,58 @@ log = logging.getLogger(__name__)
 
 class OperationsController(BaseController, FileUtils):
 
-    def import_mod(self, operation):
+    def import_base_module(self):
 	sys.path.append(paws.modules)
-	return __import__('paws_' + operation, None, None, ['__all__'])
+	return __import__('paws_base', None, None, ['__all__'])
 
     def get_source_file(self, operation, code, language):
 	self.imports = self.get_includes(code) if language == "C" else ''
 	return self.create_file(operation, code, language)
 
-    def invoke(self, mod, function, workspace):
-	try:
-		return mod.invoke_function(function, workspace)
-	except:
-		workspace.close()
-		raise
-
     def perform(self):
-	return self.perform_operation(request.params['operation'], request.params['code'], request.params['language'])
+	return self.invoke_module(request.params['operation'], request.params['code'], request.params['language'])
 
     def perform_advanced(self):
-	return self.perform_operation(request.params['operation'], request.params['code'], request.params['language'], request.params['type'], request.params['properties'], True)
+	return self.invoke_module(request.params['operation'], request.params['code'], request.params['language'], request.params['analyses'], request.params['properties'], request.params['phases'], True)
 
-    def perform_operation(self, operation, code, language, analysis=None, properties=None, advanced=False):
+    def invoke_module(self, operation, code, language, analysis=None, properties=None, phases=None, advanced=False):
 	source_file = self.get_source_file(operation, code, language)
-	mod = self.import_mod(operation)
+	mod = self.import_base_module()
 	try:
-		ws = pworkspace(str(source_file), deleteOnClose=True)
-		if advanced:
-			mod.set_properties(ws, str(properties).split(';')[: -1])
-			mod.activate(ws, analysis)
-		functions = ''
-		for fu in ws.fun:
-			functions += self.invoke(mod, fu, ws)
-		ws.close()
+		functions = mod.perform(os.getcwd() + '/' + str(source_file), operation, advanced, properties, analysis, phases)
 		self.delete_dir(source_file)
 		return self.highlight_code(self.imports + '\n' + functions, language)
         except RuntimeError, msg:
-                traceback.print_exc(file=sys.stdout)
-                traceback_msg = traceback.format_exc()
-                return 'EXCEPTION<br/>' + str(msg) + '<br/><br/>TRACEBACK:<br/>' + traceback_msg.replace('\n', '<br/>')
+		return self.catch_error(msg)
         except:
-                traceback.print_exc(file=sys.stdout)
-                traceback_msg = traceback.format_exc()
-                return 'EXCEPTION<br/><br/>TRACEBACK:<br/>' + traceback_msg.replace('\n', '<br/>')
+		return self.catch_error('')
+
+    def invoke_module_multiple(self, sources, operation, function, language, analysis=None, properties=None, phases=None, advanced=False):
+	mod = self.import_base_module()
+	try:
+		result = mod.perform_multiple(sources, operation, function, advanced, properties, analysis, phases)
+		return self.highlight_code(result, language)
+        except RuntimeError, msg:
+		return self.catch_error(msg)
+        except:
+		return self.catch_error('')
 
     def perform_multiple(self):
+	return self.invoke_module_multiple(session['sources'], request.params['operation'], request.params['functions'], request.params['language'])
 
-	function = request.params['function']
-	operation = request.params['operation']
-	mod = self.import_mod(operation)
-	try:
-		ws = pworkspace(*session['sources'], deleteOnClose=True)
-		result = self.invoke(mod, ws.fun.__getattr__(function), ws)
-		ws.close()
-		return self.highlight_code(result, 'C')
-	except RuntimeError, msg:
-		traceback.print_exc(file=sys.stdout)
-		traceback_msg = traceback.format_exc()
-		return 'EXCEPTION<br/>' + str(msg) + '<br/><br/>TRACEBACK:<br/>' + traceback_msg.replace('\n', '<br/>')
-	except:
-		traceback.print_exc(file=sys.stdout)
-		traceback_msg = traceback.format_exc()
-		return 'EXCEPTION<br/><br/>TRACEBACK:<br/>' + traceback_msg.replace('\n', '<br/>')
+    def perform_multiple_advanced(self):
+	return self.invoke_module_multiple(session['sources'], request.params['operation'], request.params['functions'], request.params['language'], request.params['analyses'], request.params['properties'], request.params['phases'], True)
+
+    def catch_error(self, msg):
+	traceback.print_exc(file=sys.stdout)
+        traceback_msg = traceback.format_exc()
+        return 'EXCEPTION<br/>' + str(msg) + '<br/><br/>TRACEBACK:<br/>' + traceback_msg.replace('\n', '<br/>')
 
     def get_directory(self):
         return self.create_directory()
 
     def get_functions(self):
         sources = []
-	print request.params['number']
         for i in range(int(request.params['number'])):
                 sources.append(self.create_file('functions' + str(i), request.params['code' + str(i)], request.params['lang' + str(i)]))
 	session['sources'] = sources
@@ -93,13 +73,8 @@ class OperationsController(BaseController, FileUtils):
 
     def analyze_functions(self, source_files):
 
-        ws = pworkspace(*source_files, deleteOnClose=True)
-        functions = []
-        for fu in ws.fun:
-                functions.append(fu.name)
-        ws.close()
-	session['methods'] = functions
+	mod = self.import_base_module()
+	session['methods'] = mod.get_functions(source_files)
 	session.save()
-	print session['methods'][0][0]
-        return functions
+        return session['methods']
 

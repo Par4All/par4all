@@ -58,6 +58,5 @@ class GraphController(BaseController, FileUtils, Images):
 		p.wait()
 		self.create_result_graphs(filename)
 		images += '<div style="clear: both;width:100%"><b>' + fu + ':</b><br/>' + self.create_zoom_image(session['directory'] + '/' + fu + '.png') + '</div>'
-	#self.delete_dir(source_file)
 	ws.close()
 	return images

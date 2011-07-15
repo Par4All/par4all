@@ -6,38 +6,41 @@
 # 4 - directory with examples (existing one, to copy)
 # 5 - pyps print code module
 
-# TO DO: sample pyps code file!
-
 # TO DO advanced!
 
-EXPECTED_ARGS=5
+EXPECTED_ARGS=4
+OPTIONAL_ARGS=5
 
 if [ $# -ne $EXPECTED_ARGS ]
 then
-	echo "Usage: add_tool <tool_name> <header_of_page> <description> <directory_with_examples> <pyps_print_code_module>"
-	return 1
+	if [ $# -ne $OPTIONAL_ARGS ]
+	then
+		echo "Usage: add_tool <tool_name> <header_of_page> <description> <pyps_print_code_module> <directory_with_examples>"
+		return 1
+	fi
 fi
-
-echo $2
 
 validation="../../../../validation/Paws/tools/"
 
 source ../../bin/activate
 # new controller and new mako template
-paster controller --tool tools_$1
-paster tool-template $1 "$2" 
-mv "../pawsapp/templates/tools_${1}.mako.py" "../pawsapp/templates/tools_${1}.mako" 
+python create_controller.py tool $1
+python create_tool_template.py $1 "$2"
 
 # new tool validation directory with examples and description
-cp -r $4 ${validation}
-mv "${validation}$4" "${validation}$1"
+mkdir "${validation}$1"
+if [ $# -ne $OPTIONAL_ARGS ]
+then
+	cp -r $5 ${validation}
+	mv "${validation}$5" "${validation}$1"
+fi
 
 # new description file
 echo $3 > "${validation}${1}/${1}.txt"
 
 # new pyps module
 cp "templates/template.c" "${validation}/../pyps_modules/paws_${1}.c"
-python create_pyps_module.py $5 $1
+python create_pyps_module.py $4 $1
 mv "templates/paws_${1}.py" "${validation}/../pyps_modules/"
 
 deactivate

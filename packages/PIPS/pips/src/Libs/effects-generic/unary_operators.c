@@ -463,16 +463,44 @@ db_get_empty_list(string name)
  * modifies : the effect eff.
  * comment  : adds a last dimension  to represent an effect on the memory
  *            location pointed by the reference of the initial effect.
- *            also modifies the descriptor if there is one	
+ *            also modifies the descriptor if there is one
  */
 void effect_add_dereferencing_dimension(effect eff)
 {
 
-  expression deref_exp = int_to_expression(0);
+  if (!entity_heap_location_p(effect_entity(eff))
+      && !entity_flow_or_context_sentitive_heap_location_p(effect_entity(eff))
+      && effect_abstract_location_p(eff))
+    {
 
-  (*effect_add_expression_dimension_func)(eff, deref_exp);
-  free_expression(deref_exp);
+      pips_debug(8, "abstract location \n");
+      cell eff_c = effect_cell(eff);
+      if (!anywhere_effect_p(eff))
+	{
+	  /* change for an anywhere effect. More work could be done here
+	     in case of a typed abstract location
+	  */
+	  entity anywhere_ent = entity_all_locations();
+	  if (cell_preference_p(eff_c))
+	    {
+	      /* it's a preference : we change for a reference cell */
+	      free_cell(eff_c);
+	      effect_cell(eff) = make_cell_reference(make_reference(anywhere_ent, NIL));
+	    }
+	  else
+	    {
+	      reference_variable(cell_reference(eff_c)) = anywhere_ent;
+	    }
+	}
+    }
+  else
+    {
+      expression deref_exp = int_to_expression(0);
+      pips_debug(8, "heap or concrete location \n");
 
+      (*effect_add_expression_dimension_func)(eff, deref_exp);
+      free_expression(deref_exp);
+    }
   return;
 }
 
@@ -481,7 +509,7 @@ void effect_add_dereferencing_dimension(effect eff)
  * output   : nothing
  * modifies : the effect eff.
  * comment  : adds a last dimension to represent an effect on the field
- *            of rank "rank" of the actual reference represented by the 
+ *            of rank "rank" of the actual reference represented by the
  *            effect reference.	The dimension is added at the end of the
  *            effect reference dimensions.Also modifies the descriptor
  *            if the representation includes one.
@@ -496,31 +524,54 @@ void effect_add_dereferencing_dimension(effect eff)
 void effect_add_field_dimension(effect eff, entity field)
 {
   cell eff_c = effect_cell(eff);
-  reference ref;
-  
+
   pips_debug_effect(8, "begin with effect :\n", eff);
-  
-  if (cell_preference_p(eff_c))
+
+  if (!entity_flow_or_context_sentitive_heap_location_p(effect_entity(eff))
+			      && effect_abstract_location_p(eff))
     {
-      /* it's a preference : we change for a reference cell */
-      pips_debug(8, "It's a preference\n");
-      ref = copy_reference(preference_reference(cell_preference(eff_c)));
-      free_cell(eff_c);
-      effect_cell(eff) = make_cell_reference(ref);
+      if (!anywhere_effect_p(eff))
+	{
+	  /* change for an anywhere effect. More work could be done here
+	     in case of a typed abstract location
+	  */
+	  entity anywhere_ent = entity_all_locations();
+	  if (cell_preference_p(eff_c))
+	    {
+	      /* it's a preference : we change for a reference cell */
+	      free_cell(eff_c);
+	      effect_cell(eff) = make_cell_reference(make_reference(anywhere_ent, NIL));
+	    }
+	  else
+	    {
+	      reference_variable(cell_reference(eff_c)) = anywhere_ent;
+	    }
+	}
     }
   else
     {
-      /* it's a reference : let'us modify it */
-      ref = cell_reference(eff_c);
-    }
+      reference ref;
+      if (cell_preference_p(eff_c))
+	{
+	  /* it's a preference : we change for a reference cell */
+	  pips_debug(8, "It's a preference\n");
+	  ref = copy_reference(preference_reference(cell_preference(eff_c)));
+	  free_cell(eff_c);
+	  effect_cell(eff) = make_cell_reference(ref);
+	}
+      else
+	{
+	  /* it's a reference : let'us modify it */
+	  ref = cell_reference(eff_c);
+	}
 
-  reference_indices(ref) = gen_nconc(reference_indices(ref),
-				     CONS(EXPRESSION, 
-					  entity_to_expression(field), 
-					  NIL));
-  
+      reference_indices(ref) = gen_nconc(reference_indices(ref),
+					 CONS(EXPRESSION,
+					      entity_to_expression(field),
+					      NIL));
+    }
   pips_debug_effect(8, "end with effect :\n",eff);
-  
+
   return;
 }
 

@@ -80,7 +80,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
   pips_assert("there should be no store effect on variable names\n", gen_length(current_l_ind) >= current_nb_dim);
   
 
-  switch (basic_tag(current_basic)) 
+  switch (basic_tag(current_basic))
     {
     case is_basic_pointer:
       {
@@ -93,49 +93,56 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
       {
 	int i;
 	current_type = entity_type(basic_derived(current_basic));
-	
+
 	if (type_enum_p(current_type))
 	  result = -1;
 	else
 	  {
-	    
 	    /*first skip array dimensions if any*/
 	    for(i=0; i< (int) current_nb_dim; i++, POP(current_l_ind));
-	    pips_assert("there must be at least one index left for the field\n", gen_length(current_l_ind) > 0);
-	    
-	    list l_fields = derived_type_fields(current_type);
-	    
-	    entity current_field_entity = effect_field_dimension_entity(EXPRESSION(CAR(current_l_ind)), l_fields);
-	    
-	    if (variable_phi_p(current_field_entity) || same_string_p(entity_local_name(current_field_entity), UNBOUNDED_DIMENSION_NAME))
+
+	    if (same_string_p(entity_user_name(basic_derived(current_basic)), "_IO_FILE") && gen_length(current_l_ind) == 0)
 	      {
-		while (!ENDP(l_fields))
-		  {
-		    int tmp_result = -1;
-		    entity current_field_entity = ENTITY(CAR(l_fields));
-		    type current_type =  basic_concrete_type(entity_type(current_field_entity));
-		    size_t current_nb_dim = gen_length(variable_dimensions(type_variable(current_type)));
-		    
-		    if (gen_length(CDR(current_l_ind)) >= current_nb_dim)
-		      // consider this field only if it can be an effect on this field
-		      tmp_result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
-		    
-		    POP(l_fields);
-		    if (tmp_result >= 0)
-		      result = result < 0 ? tmp_result : (tmp_result <= result ? tmp_result : result);
-		    free_type(current_type);
-		  }
-		
-		*exact_p = (result < 0);
-		if (result >= 0) result ++; // do not forget the field index !
+		pips_debug(8, "_IO_FILE_ array: no pointer dimension\n");
+		result = -1;
 	      }
 	    else
 	      {
-		
-		current_type = basic_concrete_type(entity_type(current_field_entity));
-		result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
-		if (result >=0) result++; // do not forget the field index ! 
-		free_type(current_type);
+		pips_assert("there must be at least one index left for the field\n", gen_length(current_l_ind) > 0);
+
+		list l_fields = derived_type_fields(current_type);
+
+		entity current_field_entity = effect_field_dimension_entity(EXPRESSION(CAR(current_l_ind)), l_fields);
+
+		if (variable_phi_p(current_field_entity) || same_string_p(entity_local_name(current_field_entity), UNBOUNDED_DIMENSION_NAME))
+		  {
+		    while (!ENDP(l_fields))
+		      {
+			int tmp_result = -1;
+			entity current_field_entity = ENTITY(CAR(l_fields));
+			type current_type =  basic_concrete_type(entity_type(current_field_entity));
+			size_t current_nb_dim = gen_length(variable_dimensions(type_variable(current_type)));
+
+			if (gen_length(CDR(current_l_ind)) >= current_nb_dim)
+			  // consider this field only if it can be an effect on this field
+			  tmp_result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
+
+			POP(l_fields);
+			if (tmp_result >= 0)
+			  result = result < 0 ? tmp_result : (tmp_result <= result ? tmp_result : result);
+			free_type(current_type);
+		      }
+
+		    *exact_p = (result < 0);
+		    if (result >= 0) result ++; // do not forget the field index !
+		  }
+		else
+		  {
+		    current_type = basic_concrete_type(entity_type(current_field_entity));
+		    result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
+		    if (result >=0) result++; // do not forget the field index ! 
+		    free_type(current_type);
+		  }
 	      }
 	  }
 	break;
@@ -162,25 +169,34 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
       a pointer dimension in current_l_ind otherwise. If this information is exact, *exact_p is set to true.
  */
 static int effect_reference_first_pointer_dimension_rank(reference ref, bool *exact_p)
-{ 
+{
   entity ent = reference_variable(ref);
   list current_l_ind = reference_indices(ref);
   type ent_type = entity_type(ent);
   int result;
 
   pips_debug(8, "input reference : %s\n", words_to_string(effect_words_reference(ref)));
-  
+ 
   if (!type_variable_p(ent_type))
     {
       result = -1;
     }
   else
     {
-      type current_type = basic_concrete_type(ent_type);
-      result = effect_indices_first_pointer_dimension_rank(current_l_ind, current_type, exact_p);
-      free_type(current_type);
+      if (FILE_star_effect_reference_p(ref))
+	{
+	  result = 0;
+	  *exact_p = true;
+	}
+      else
+	{
+	  type current_type = basic_concrete_type(ent_type);
+	  result = effect_indices_first_pointer_dimension_rank(current_l_ind, current_type, exact_p);
+	  free_type(current_type);
+	}
     }
 
+  pips_debug(8, "returning %d\n", result);
   return result;
 
 }

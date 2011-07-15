@@ -157,14 +157,27 @@ static void update_erosions
   // "const" with initial values { 000 XXX XXX } => north=0 and so on.
   // this is interesting on licensePlate, even if the zero
   // computations are still performed...
-  bool north = true, south = true, west = true, east = true;
-  if (api->terapix.north)
+  if (freia_convolution_p(v)) // convolution special handling...
+  {
+    _int width, height;
+    if (freia_convolution_width_height(v, &width, &height, false))
+    {
+      w+=width/2;
+      e+=width/2;
+      n+=height/2;
+      s+=height/2;
+    }
+    // else simply ignore, should not be used anyway...
+  }
+  else if (api->terapix.north) // erode & dilate
+  {
+    bool north = true, south = true, west = true, east = true;
     erosion_optimization(v, &north, &south, &west, &east);
-
-  if (north) n += api->terapix.north;
-  if (south) s += api->terapix.south;
-  if (west) w += api->terapix.west;
-  if (east) e += api->terapix.east;
+    if (north) n += api->terapix.north;
+    if (south) s += api->terapix.south;
+    if (west) w += api->terapix.west;
+    if (east) e += api->terapix.east;
+  }
 
   // store results
   hash_put(erosion, NORTH(v), (void*) n);
@@ -405,7 +418,7 @@ static void terapix_mcu_pval(string_buffer code, int op, string ref,
 static void gram_param
   (string_buffer code, string_buffer decl,
    string name, dagvtx v, hash_table hparams,
-   int width, int height, bool * used)
+   int width, int height, bool is_kernel, bool * used)
 {
   int size = width*height;
   pips_assert("something to copy...", size>0);
@@ -423,25 +436,29 @@ static void gram_param
   pips_assert("some args...", gen_length(largs)>0);
   string p1 = hash_get(hparams, EXPRESSION(CAR(largs)));
   // copy code...
-  switch (size)
+  if (is_kernel)
   {
-  case 1: // constant
-    sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
-    break;
-  case 3: // threshold min/max/bin
-    sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
-    sb_cat(code, "  p_", name, "[1] = ",
-           hash_get(hparams, EXPRESSION(CAR(CDR(largs)))), ";\n");
-    sb_cat(code, "  p_", name, "[2] = ",
-           hash_get(hparams, EXPRESSION(CAR(CDR(CDR(largs))))), ";\n");
-    break;
-  case 9: // kernel
     sb_cat(code,
-           "  for(i=0; i<9; i++)\n"
+           "  for(i=0; i<", itoa(size), "; i++)\n"
            "    p_", name, "[i] = ", p1, "[i];\n");
-    break;
-  default:
-    pips_internal_error("unexpected gram size");
+  }
+  else
+  {
+    switch (size)
+    {
+    case 1: // constant
+      sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
+      break;
+    case 3: // threshold min/max/bin
+      sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
+      sb_cat(code, "  p_", name, "[1] = ",
+             hash_get(hparams, EXPRESSION(CAR(CDR(largs)))), ";\n");
+      sb_cat(code, "  p_", name, "[2] = ",
+             hash_get(hparams, EXPRESSION(CAR(CDR(CDR(largs))))), ";\n");
+      break;
+    default:
+      pips_internal_error("unexpected gram size");
+    }
   }
 
   sb_cat(code, "  gram.xoffset = x_", name, ";\n");
@@ -478,15 +495,21 @@ static void terapix_gram_management
   {
     switch (api->arg_misc_in)
     {
-    case 3: // threshold
-      gram_param(code, decl, name, v, hparams, 3, 1, used);
+    case 3: // convolution or threshold
+      if (freia_convolution_p(v)) // convolution special case
+      {
+        _int w, h;
+        freia_convolution_width_height(v, &w, &h, true);
+        gram_param(code, decl, name, v, hparams, w, h, true, used);
+      }
+      else
+        gram_param(code, decl, name, v, hparams, 3, 1, false, used);
       break;
     case 1: // kernel or operation with a constant
-      if (api->terapix.north)
-        // let us say it is a kernel...
-        gram_param(code, decl, name, v, hparams, 3, 3, used);
+      if (api->terapix.north) // let us say it is a kernel...
+        gram_param(code, decl, name, v, hparams, 3, 3, true, used);
       else
-        gram_param(code, decl, name, v, hparams, 1, 1, used);
+        gram_param(code, decl, name, v, hparams, 1, 1, false, used);
       break;
     default:
       pips_internal_error("unexpected number of input image arguments");
@@ -554,8 +577,21 @@ static void terapix_macro_code
   }
   terapix_mcu_val(code, op, "iter1", "TERAPIX_PE_NUMBER");
   terapix_mcu_val(code, op, "iter2", "imagelet_size");
-  terapix_mcu_val(code, op, "iter3", "0");
-  terapix_mcu_val(code, op, "iter4", "0");
+  if (freia_convolution_p(v)) // convolution special case hack
+  {
+    _int w, h;
+    freia_convolution_width_height(v, &w, &h, true);
+    // ??? should I use the parameters?
+    // ??? or check their values?
+    // ??? or remove them from the list as they are inlined?
+    terapix_mcu_int(code, op, "iter3", (int) w);
+    terapix_mcu_int(code, op, "iter4", (int) h);
+  }
+  else
+  {
+    terapix_mcu_val(code, op, "iter3", "0");
+    terapix_mcu_val(code, op, "iter4", "0");
+  }
   terapix_mcu_val(code, op, "addrStart", api->terapix.ucode);
 }
 
@@ -1364,8 +1400,13 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
   // if there is only one of them
   if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
   {
+    // non implemented stuff
+    if (!freia_aipo_terapix_implemented(a1))
+      result = 1, why = "impl";
+    else if (!freia_aipo_terapix_implemented(a2))
+      result = -1, why = "impl";
     // scalars operations first to remove (scalar) dependences
-    if (vtxcontent_optype(c1)==spoc_type_oth)
+    else if (vtxcontent_optype(c1)==spoc_type_oth)
       result = -1, why = "scal";
     else if (vtxcontent_optype(c2)==spoc_type_oth)
       result = 1, why = "scal";
@@ -1481,14 +1522,39 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
   return result;
 }
 
+/* @brief whether vertex is not implemented in terapix
+ */
+static bool not_implemented(dagvtx v)
+{
+  if (freia_convolution_p(v)) // special case
+  {
+    // skip if parametric
+    _int w, h;
+    return !freia_convolution_width_height(v, &w, &h, false);
+  }
+  return !freia_aipo_terapix_implemented(dagvtx_freia_api(v));
+}
+
+/* @brief whether dag is not implemented in terapix
+ */
+static bool terapix_not_implemented(dag d)
+{
+  FOREACH(dagvtx, v, dag_vertices(d))
+    if (not_implemented(v))
+      return true;
+  return false;
+}
+
 /* @brief split a dag on scalar dependencies only, with a greedy heuristics.
  * @param initial dag to split
+ * @param alone_only whether to keep it alone (for non implemented cases)
  * @return a list of sub-dags
  * this pass also decides the schedule of image operations, with the aim
  * or reducing the number of necessary imagelets, so as to maximise
  * imagelet size.
  */
-static list /* of dags */ split_dag_on_scalars(const dag initial)
+static list /* of dags */
+split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx))
 {
   if (!single_image_assignement_p(initial))
     // well, it should work most of the time, so only a warning
@@ -1539,9 +1605,17 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
       ifdebug(7)
         dagvtx_dump(stderr, "choice", first);
 
+      // do not add if not alone
+      if (alone_only && alone_only(first) && lcurrent)
+        break;
+
       set_add_element(current, current, first);
       set_add_element(computed, computed, first);
       lcurrent = gen_nconc(lcurrent, CONS(dagvtx, first, NIL));
+
+      // getout if was alone
+      if (alone_only && alone_only(first))
+        break;
     }
 
     // is there something?
@@ -1777,7 +1851,7 @@ void freia_trpx_compile_calls
   //           \-> E -> F />
   // then ABEF / CD is chosen
   // although ABE / FCD and AB / EFCD would be also possible...
-  list ld = split_dag_on_scalars(fulld);
+  list ld = split_dag_on_scalars(fulld, not_implemented);
 
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
@@ -1791,6 +1865,10 @@ void freia_trpx_compile_calls
   int n_split = 0;
   FOREACH(dag, d, ld)
   {
+    // skip if something is not implemented
+    if (terapix_not_implemented(d))
+      continue;
+
     if (trpx_dag_cut_none_p(dag_cut))
     {
       // direct handling of the dag

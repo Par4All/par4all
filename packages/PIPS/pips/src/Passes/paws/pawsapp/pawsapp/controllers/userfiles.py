@@ -11,7 +11,6 @@ log = logging.getLogger(__name__)
 
 class UserfilesController(BaseController):
 
-
     def upload(self):
         source = request.POST['file']
 	filename = request.POST['file'].filename

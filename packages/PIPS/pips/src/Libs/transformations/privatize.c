@@ -560,14 +560,87 @@ static set gather_loop_indices(void *v) {
 }
 
 /**
-   @brief Create a statement block around the statement if it is a do-loop with local/private variable
+ * gen_recurse context for localize declaration, keep track of the scope !
+ */
+#define MAX_DEPTH 100
+typedef struct {
+  int depth;
+  int scope_numbers[MAX_DEPTH];
+  hash_table old_entity_to_new;
+} localize_ctx;
 
-   It creates statement_blocks where needed to hold further declarations later
-   And then performs localization based on the locals field
+/**
+ * Create a context
+ */
+static localize_ctx make_localize_ctx() {
+  localize_ctx ctx;
+  ctx.depth= -1;
+  memset(ctx.scope_numbers, -1, MAX_DEPTH*sizeof(ctx.scope_numbers[0]));
+  ctx.old_entity_to_new = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
 
-   @param s concerned statement */
-static
-void localize_declaration_walker(statement s, hash_table old_entity_to_new) {
+  return ctx;
+}
+
+/**
+ * Keep track of the scope during recursion
+ */
+static bool localize_track_scope_in(statement s, localize_ctx *ctx) {
+  if(statement_block_p(s)) {
+    pips_assert("depth is in acceptable range\n", ctx->depth<MAX_DEPTH);
+    ctx->depth++;
+    ctx->scope_numbers[ctx->depth]++;
+  }
+  return true;
+}
+
+/**
+ * Keep track of the scope during recursion
+ */
+static void localize_track_scope_out(statement s, localize_ctx *ctx) {
+  if(statement_block_p(s)) {
+    ctx->depth--;
+  }
+}
+
+
+/**
+ * Create an (unique) entity taking into account the current scope
+ */
+static entity make_localized_entity(entity e, localize_ctx *ctx) {
+  string build_localized_name = strdup("");
+  for(int i=1;i<=ctx->depth;i++) {
+    string new_name;
+    asprintf(&new_name,"%s%d" BLOCK_SEP_STRING,build_localized_name,ctx->scope_numbers[i]);
+    free(build_localized_name);
+    build_localized_name = new_name;
+  }
+  string localized_name;
+  asprintf(&localized_name,"%s%s",build_localized_name, entity_user_name(e));
+  free(build_localized_name);
+
+  string unique_name = strdup(localized_name);
+  int count = 0;
+  while(!entity_undefined_p(FindEntity(get_current_module_name(),unique_name))) {
+    free(unique_name);
+    asprintf(&unique_name,"%s%d",localized_name, ++count);
+    pips_assert("infinite loop ?",count<10000);
+  }
+  free(localized_name);
+
+  return FindOrCreateEntity(get_current_module_name(),unique_name);
+}
+
+
+/**
+ * @brief Create a statement block around the statement if it is a do-loop with
+ * local/private variable
+ *
+ * It creates statement_blocks where needed to hold further declarations later
+ * And then performs localization based on the locals field
+ *
+ * @param s concerned statement
+ */
+static void localize_declaration_walker(statement s, localize_ctx *ctx) {
   if(statement_loop_p(s)) {
     instruction i = statement_instruction(s);
     loop l = instruction_loop(i);
@@ -587,56 +660,63 @@ void localize_declaration_walker(statement s, hash_table old_entity_to_new) {
 
         /* now add declarations to the created block */
         list locals = gen_copy_seq(loop_locals(l));
-	list sd = statement_to_declarations(s);
-    	set li = gather_loop_indices(s);
+        list sd = statement_to_declarations(s);
+        set li = gather_loop_indices(s);
+        bool skip_loop_indices = get_bool_property("LOCALIZE_DECLARATION_SKIP_LOOP_INDICES");
+
+        // take into account that we are in a new block
+        localize_track_scope_in(s,ctx);
+        pips_debug(1,"Handling a loop with scope (%d,%d)",ctx->depth,ctx->scope_numbers[ctx->depth]);
+
         FOREACH(ENTITY,e,locals)
         {
-            if(!entity_in_list_p(e,sd) && 
-		(!get_bool_property("LOCALIZE_DECLARATION_SKIP_LOOP_INDICES") || !set_belong_p(li,e))) {
+          if(!entity_in_list_p(e,sd) && !(skip_loop_indices && set_belong_p(li,e))) {
             /* create a new name for the local entity */
-            int n = get_statement_depth(s,get_current_module_statement());
-            string new_entity_local_name = NULL;
-            asprintf(&new_entity_local_name,"%d" BLOCK_SEP_STRING "%s%d",n,entity_user_name(e),n);
+            entity new_entity = make_localized_entity(e,ctx);
+            pips_debug(1,"Creating localized entity : %s (from %s)\n",entity_name(new_entity), entity_name(e));
             /* get the new entity and initialize it and register it*/
-            entity new_entity = FindOrCreateEntity(get_current_module_name(),new_entity_local_name);
-            free(new_entity_local_name);
             entity_type(new_entity)=copy_type(entity_type(e));
             entity_initial(new_entity) = make_value_unknown();
             /* add the variable to the loop body if it's not an index */
             AddLocalEntityToDeclarations(new_entity,get_current_module_entity(),
-                    same_entity_p(e,loop_index(l))?
-                        s:
-                        loop_body(l));
+                                         same_entity_p(e,loop_index(l))?
+                                                                        s:
+                                                                        loop_body(l));
 
-            list previous_replacements = hash_get(old_entity_to_new,e);
+            list previous_replacements = hash_get(ctx->old_entity_to_new,e);
             if( previous_replacements == HASH_UNDEFINED_VALUE )
                 previous_replacements = CONS(ENTITY,new_entity,NIL);
             previous_replacements=gen_nconc(previous_replacements,CONS(ENTITY,e,NIL));
-            hash_put(old_entity_to_new,e,previous_replacements);
-            FOREACH(ENTITY,prev,previous_replacements)
+            hash_put(ctx->old_entity_to_new,e,previous_replacements);
+            FOREACH(ENTITY,prev,previous_replacements)  {
                 replace_entity(s,prev,new_entity);
             }
+          }
         }
-set_free(li);
+
+        // take into account that we exit a block
+        localize_track_scope_out(s,ctx);
+
+        set_free(li);
         gen_free_list(locals);
         gen_free_list(sd);
     }
+  } else {
+    localize_track_scope_out(s, ctx);
   }
+
 }
 
-
 /**
-   @brief make loop local variables declared in the innermost statement
-
-   @param mod_name name of the module being processed
-
-   @return
+ * @brief make loop local variables declared in the innermost statement
+ *
+ * @param mod_name name of the module being processed
+ *
+ * @return
  */
-bool
-localize_declaration(char *mod_name)
-{
+bool localize_declaration(char *mod_name) {
 	/* prelude */
-	debug_on("LOCALIZE_DEBUG_LEVEL");
+	debug_on("LOCALIZE_DECLARATION_DEBUG_LEVEL");
 	pips_debug(1,"begin localize_declaration ...\n");
 	set_current_module_entity(module_name_to_entity(mod_name) );
 	set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, true) );
@@ -644,7 +724,6 @@ localize_declaration(char *mod_name)
 	/* Propagate local informations to loop statements */
 
 	// To keep track of what has been done:
-	hash_table old_entity_to_new=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
 	ifdebug(1) {
 	  pips_debug(1,"The statement before we create block statement:\n");
 	  print_statement(get_current_module_statement());
@@ -652,15 +731,19 @@ localize_declaration(char *mod_name)
 
 	// Create the statement_block where needed and perform localization
 	clean_up_sequences(get_current_module_statement());
-	gen_context_recurse(get_current_module_statement(),old_entity_to_new,
-			    statement_domain,gen_true,localize_declaration_walker);
+
+	// Context for recursion
+	localize_ctx ctx = make_localize_ctx();
+
+	gen_context_recurse(get_current_module_statement(),&ctx,
+	                    statement_domain,localize_track_scope_in,localize_declaration_walker);
 	ifdebug(1) {
 	  pips_debug(1,"The statement before we convert loop_locals to local declarations:\n");
 	  print_statement(get_current_module_statement());
 	}
 	// Use loop_locals data to fill local declarations:
 	clean_up_sequences(get_current_module_statement());
-	hash_table_free(old_entity_to_new);
+	hash_table_free(ctx.old_entity_to_new);
 
 	ifdebug(1) {
 	  pips_debug(1,"The statement after conversion:\n");
@@ -678,6 +761,84 @@ localize_declaration(char *mod_name)
 	pips_debug(1,"end localize_declaration\n");
 	return true;
 }
+
+/**
+    @brief update the input loop loop_locals by removing entities
+           with no corresponding effects in loop body (e.g. entities
+	   already private in inner loops and not used in other
+	   statements of the current loop body).
+ */
+static void update_loop_locals(loop l)
+{
+  statement body = loop_body(l);
+  list body_effects = load_rw_effects_list(body);
+  ifdebug(1) {
+    fprintf(stderr, "new body effects:\n");
+    print_effects(body_effects);
+  }
+  list new_loop_locals = NIL;
+  FOREACH(ENTITY, private_variable, loop_locals(l))
+    {
+      pips_debug(1, "considering entity %s\n",
+		 entity_local_name(private_variable));
+      if (effects_read_or_write_entity_p(body_effects, private_variable))
+	{
+	  pips_debug(1, "keeping entity\n");
+	  new_loop_locals = CONS(ENTITY, private_variable, new_loop_locals);
+	}
+    }
+  gen_free_list(loop_locals(l));
+  loop_locals(l) = new_loop_locals;
+  ifdebug(1) {
+    print_entities(loop_locals(l));
+    fprintf(stderr, "\n");
+  }
+}
+
+
+/**
+   @brief update loop_locals found by privatize_module by taking parallel loops
+   into account
+ */
+bool update_loops_locals(string module_name, statement module_stat)
+{
+  init_proper_rw_effects();
+  init_rw_effects();
+  init_invariant_rw_effects();
+  set_current_module_entity(module_name_to_entity(module_name));
+
+  debug_on("EFFECTS_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
+
+  if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+    set_constant_paths_p(false);
+  else
+    set_constant_paths_p(true);
+  set_pointer_info_kind(with_no_pointer_info); /* should use current pointer information
+						  according to current effects active phase
+					        */
+
+  set_methods_for_proper_simple_effects();
+  proper_effects_of_module_statement(module_stat);
+  set_methods_for_simple_effects();
+  rw_effects_of_module_statement(module_stat);
+
+  gen_recurse(module_stat,
+	      loop_domain, gen_true, update_loop_locals);
+
+  pips_debug(1, "end\n");
+  debug_off();
+
+  /* Hope that these close actually free the effects in the mappings */
+  close_proper_rw_effects();
+  close_rw_effects();
+  close_invariant_rw_effects();
+  generic_effects_reset_all_methods();
+  reset_current_module_entity();
+
+  return true;
+}
+
 
 
 /**  @} */

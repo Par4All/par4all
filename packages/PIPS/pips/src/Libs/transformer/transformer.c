@@ -394,13 +394,24 @@ transformer transformer_combine(transformer t1, transformer t2)
 }
 
 /* Combine each transformer of transformer list tl1 with
-   t2. Side-effect on tl1. See comments for transformer_combine() */
+ *   t2. Side-effect on tl1 or new list etl. See comments for
+ *   transformer_combine()
+ *
+ * FI: I'm not too sure about the best way to remove the resulting
+ * empty transformers. gen_remove() on tl1 or creation of new list...
+ */
 list transformers_combine(list tl1, transformer t2)
 {
+  list ntl = NIL;
+
   FOREACH(TRANSFORMER, t1, tl1) {
     t1 = transformer_combine(t1, t2);
+    if(!transformer_empty_p(t1))
+      ntl = gen_nconc(ntl, CONS(TRANSFORMER, t1, NIL));
   }
-  return tl1;
+
+  gen_free_list(tl1);
+  return ntl;
 }
 
 /* Combine each transformer of transformer list tl1 with the

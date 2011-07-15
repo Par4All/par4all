@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>PIPS IR-Navigator</title>
+  <link rel="stylesheet" type="text/css" href="pips.css" media="screen, presentation" />
+<!-- <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript" src="jquery.treeview.js"></script> -->
+</head>
+<body>
+  <div class="header">
+    <a href="http://www.pip4u.org/"><img src="logo-pips.small.gif" alt="logo pips" /></a>
+    <h1>PIPS IR-Navigator</h1>
+  </div>
+  <div class="clear">&nbsp;</div>
+  <div class="content">
+  <div id="navigator_control">
+    <a title="Collapse the entire tree below" href="#">Collapse All</a><br />
+    <a title="Expand the entire tree below" href="#">Expand All</a><br />
+    <a title="Toggle the tree below, opening closed branches, closing open branches" href="#">Toggle All</a>
+  </div>
+  <div>click-on a name to expand a branch :
+    <ul id="navigator">
+       INCLUDE_RI_HERE
+    </ul>
+  </div>
+  <script>
+    $(document).ready(function(){
+      // Tree view Jquery plugin
+      $(".module").treeview({
+        control: "#navigator_control",
+        animated: "fast",
+        collapsed: true
+      });
+    } );
+  </script>
+</div>
+</body>
+</html>

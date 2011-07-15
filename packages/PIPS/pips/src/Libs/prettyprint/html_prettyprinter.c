@@ -70,13 +70,32 @@ static void html_print_statement(statement r);
 static void html_print_type(type t);
 static void html_print_value(value v);
 
+
+// Output
+static FILE *out_fp = 0;
+
+// Define output
+static void html_set_output(FILE *new_fp) {
+  out_fp = new_fp;
+}
+
+/*
+ * Print to the defined output the format string and an optional string argument
+ */
+#define html_print(format, args...) \
+{ \
+  pips_assert("Output is set",out_fp); \
+  fprintf(out_fp,format,##args); \
+}
+
+
 static void begin_block(const char *block, bool cr) {
   if(cr) {
-    printf("<li class=\"%s blocked\"><span>%s</span><ul class=\"inlined\">" NL,
+    html_print("<li class=\"%s blocked\"><span>%s</span><ul class=\"inlined\">" NL,
            block,
            block);
   } else {
-    printf("<li class=\"%s inlined\"><span>%s</span><ul class=\"inlined\">" NL,
+    html_print("<li class=\"%s inlined\"><span>%s</span><ul class=\"inlined\">" NL,
            block,
            block);
   }
@@ -84,16 +103,16 @@ static void begin_block(const char *block, bool cr) {
 
 static void end_block(const char *block, bool cr) {
   if(cr) {
-    printf("</ul></li><!-- %s -->" NL, block);
+    html_print("</ul></li><!-- %s -->" NL, block);
   } else
-    printf("</ul></li><!-- %s -->" NL, block);
+    html_print("</ul></li><!-- %s -->" NL, block);
 }
 
 void html_output(const char *out, bool cr) {
   if(cr) {
-    printf("<li><span>%s</span></li>" NL, out);
+    html_print("<li><span>%s</span></li>" NL, out);
   } else {
-    printf("<li class=\"inlined\"><span>%s</span></li>" NL, out);
+    html_print("<li class=\"inlined\"><span>%s</span></li>" NL, out);
   }
 }
 
@@ -734,15 +753,11 @@ static void html_print_statement(statement s) {
 
   list l = statement_declarations(s);
   if(!ENDP(l)) {
-    bool cr;
-    if(CDR(l)) {
-      cr = true;
-    }
-    begin_block("declarations", cr);
+    begin_block("declarations", true);
     FOREACH( entity, e, l ) {
       html_print_entity_name(e);
     }
-    end_block("declarations", cr);
+    end_block("declarations", true);
   }
 
   begin_block("instruction", true);
@@ -788,33 +803,80 @@ static void html_print_statement(statement s) {
   end_block("statement", true);
 }
 
-bool html_prettyprint(const char *module_name) {
-  statement module_statement =
-      PIPS_PHASE_PRELUDE(module_name,"PREPEND_COMMENT_DEBUG_LEVEL");
+bool html_prettyprint(const char *mod_name) {
+
+  statement module_statement = (statement)db_get_memory_resource(DBR_CODE,
+                                                                 mod_name,
+                                                                 true);
+
+  set_current_module_statement(module_statement);
+
+  /* Set the current module entity required to have many things
+     working in PIPS: */
+  set_current_module_entity(module_name_to_entity(mod_name));
+
+
+  /* The debug is now controled by this environment variable name: */
+  debug_on("HTML_PRETTYPRINT_DEBUG_LEVEL");
+  pips_assert("Statement should be OK at entry...",
+              statement_consistent_p(module_statement));
+
+  // Prepare the output file
+  string html_file_name = db_build_file_resource_name( "RI", mod_name, ".ri.html" );
+  string output_file = strdup( concatenate( db_get_current_workspace_directory( ),
+                                        "/",
+                                        html_file_name,
+                                        NULL ) );
+  pips_debug(2,"Output in %s",output_file);
+  FILE *fp = safe_fopen( output_file, "w" );
+  html_set_output(fp);
 
   /* Print current module */
-  printf(NL "<li><ul class=\"module\">" NL);
-  begin_block(module_name, true);
+  html_print(NL "<li><ul class=\"module\">" NL);
+  begin_block(mod_name, true);
   html_print_statement(module_statement);
-  end_block(module_name, true);
-  printf("<li class=\"endmodule\">&nbsp;</li>" NL "</ul></li>" NL);
+  end_block(mod_name, true);
+  html_print("<li class=\"endmodule\">&nbsp;</li>" NL "</ul></li>" NL);
 
-  /* Put back the new statement module */
-  PIPS_PHASE_POSTLUDE(module_statement);
+  // Reset output file
+  html_set_output(0);
+  safe_fclose( fp, output_file );
+
+
+  DB_PUT_FILE_RESOURCE( DBR_HTML_IR_FILE, strdup( mod_name ), html_file_name );
+
+  reset_current_module_statement();
+  reset_current_module_entity();
 
   return true;
 }
 
 bool html_prettyprint_symbol_table(const char *module) {
+  // Prepare the output file
+  string html_file_name = db_build_file_resource_name( "Symbols", "", ".symbols.html" );
+  string output_file = strdup( concatenate( db_get_current_workspace_directory( ),
+                                        "/",
+                                        html_file_name,
+                                        NULL ) );
+  FILE *fp = safe_fopen( output_file, "w" );
+  html_set_output(fp);
+
+
   /* Print symbol table */
-  printf(NL "<li><ul class=\"symbolTable\">" NL);
+  html_print(NL "<li><ul class=\"symbolTable\">" NL);
   begin_block("Symbol table", true);
   list entities = gen_filter_tabulated(gen_true, entity_domain);
   FOREACH(entity, e, entities ) {
     html_print_entity_full(e);
   }
-  printf("<li class=\"endSymbolTable\">&nbsp;</li>" NL "</ul></li>" NL);
+  html_print("<li class=\"endSymbolTable\">&nbsp;</li>" NL "</ul></li>" NL);
   end_block("Symbol table", true);
+
+  // Reset output file
+  html_set_output(0);
+  safe_fclose( fp, output_file );
+
+  DB_PUT_FILE_RESOURCE( DBR_HTML_IR_FILE, "", html_file_name );
 
   return true;
 }

@@ -642,7 +642,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	  {
 	    expression arg1 = EXPRESSION(CAR(args));
 	    list l_real_arg = NIL;
-	    effect eff_real;
+	    list l_eff_real;
 
 	    /* first we compute an effect on the argument of the
 	       address_of operator (to treat cases like &(n->m))*/
@@ -650,69 +650,72 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 
 	    l_real_arg =
 	      generic_proper_effects_of_complex_address_expression
-	      (arg1, &eff_real, true);
+	      (arg1, &l_eff_real, true);
 
-	    pips_debug_effect(6, "base effect :\n",eff_real);
+	    pips_debug_effects(6, "base effects :\n", l_eff_real);
 
-	    FOREACH(EFFECT, eff, l_sum_eff)
+	    FOREACH(EFFECT, eff_real, l_eff_real)
 	      {
-		reference eff_ref = effect_any_reference(eff);
-		list eff_ind = reference_indices(eff_ref);
-
-		pips_debug_effect(6, "current formal effect :\n", eff);
-
-		if (effect_undefined_p(eff_real) || anywhere_effect_p(eff_real))
+		FOREACH(EFFECT, eff, l_sum_eff)
 		  {
-		    n_eff =  make_anywhere_effect(copy_action(effect_action(eff)));
-		  }
-		else
-		  {
-		    if(!ENDP(eff_ind))
+		    reference eff_ref = effect_any_reference(eff);
+		    list eff_ind = reference_indices(eff_ref);
+
+		    pips_debug_effect(6, "current formal effect :\n", eff);
+
+		    if (effect_undefined_p(eff_real) || anywhere_effect_p(eff_real))
 		      {
-			effect eff_init = (*effect_dup_func)(eff);
-			Psysteme sc_init ;
-
-			/* we translate the initial region descriptor
-			   into the caller's name space
-			*/
-			convex_region_descriptor_translation(eff_init);
-			sc_init = region_system(eff_init);
-
-			reference output_ref;
-			descriptor output_desc;
-			bool exact;
-
-			convex_cell_reference_with_address_of_cell_reference_translation
-			  (effect_any_reference(eff), effect_descriptor(eff_init),
-			   effect_any_reference(eff_real), effect_descriptor(eff_real),
-			   0,
-			   &output_ref, &output_desc,
-			   &exact);
-
-			if (entity_all_locations_p(reference_variable(output_ref)))
+			n_eff =  make_anywhere_effect(copy_action(effect_action(eff)));
+		      }
+		    else
+		      {
+			if(!ENDP(eff_ind))
 			  {
-			    free_reference(output_ref);
-			    n_eff = make_anywhere_effect(copy_action(effect_action(eff)));
-			  }
-			else
-			  {
-			    n_eff = make_effect(make_cell_reference(output_ref),
-						copy_action(effect_action(eff)),
-						exact? copy_approximation(effect_approximation(eff)): make_approximation_may(),
-						output_desc);
-			    pips_debug_effect(6, "resulting effect: \n", n_eff);
-			  }
+			    effect eff_init = (*effect_dup_func)(eff);
+			    Psysteme sc_init ;
+
+			    /* we translate the initial region descriptor
+			       into the caller's name space
+			    */
+			    convex_region_descriptor_translation(eff_init);
+			    sc_init = region_system(eff_init);
+
+			    reference output_ref;
+			    descriptor output_desc;
+			    bool exact;
+
+			    convex_cell_reference_with_address_of_cell_reference_translation
+			      (effect_any_reference(eff), effect_descriptor(eff_init),
+			       effect_any_reference(eff_real), effect_descriptor(eff_real),
+			       0,
+			       &output_ref, &output_desc,
+			       &exact);
+
+			    if (entity_all_locations_p(reference_variable(output_ref)))
+			      {
+				free_reference(output_ref);
+				n_eff = make_anywhere_effect(copy_action(effect_action(eff)));
+			      }
+			    else
+			      {
+				n_eff = make_effect(make_cell_reference(output_ref),
+						    copy_action(effect_action(eff)),
+						    exact? copy_approximation(effect_approximation(eff)): make_approximation_may(),
+						    output_desc);
+				pips_debug_effect(6, "resulting effect: \n", n_eff);
+			      }
 
 
-		      } /* if(!ENDP(eff_ind))*/
+			  } /* if(!ENDP(eff_ind))*/
 
-		  } /* else du if (effect_undefined_p(eff_real) || ...) */
+		      } /* else du if (effect_undefined_p(eff_real) || ...) */
 
-		l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
-	      } /*  FOREACH(EFFECT, eff, l_sum_eff) */
+		    l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
+		  } /*  FOREACH(EFFECT, eff, l_sum_eff) */
+	      } /* FOREACH (EFFECT, eff_real, l_eff_real) */
 
 	    gen_free_list(l_real_arg);
-	    free_effect(eff_real);
+	    gen_full_free_list(l_eff_real);
 
 	  }
 	else if(ENTITY_DEREFERENCING_P(real_op))
@@ -733,50 +736,53 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	      /* first compute the region corresponding to the
 		 real argument
 	      */
-	      effect real_eff = effect_undefined;
+	      list l_real_eff = NIL;
 	      list l_real_arg =
 		generic_proper_effects_of_complex_address_expression
-		(real_arg, &real_eff, true);
+		(real_arg, &l_real_eff, true);
 
-	      pips_debug_effect(6, "base effect :\n", real_eff);
+	      pips_debug_effects(6, "base effects :\n", l_real_eff);
 
-	      FOREACH(EFFECT, eff, l_sum_eff)
+	      FOREACH(EFFECT, real_eff, l_real_eff)
 		{
-		  /* this could easily be made generic BC. */
-		  /* FI: I add the restriction on store regions, but
-		     they should have been eliminated before translation
-		     is attempted */
-		  if(!anywhere_effect_p(real_eff) && store_effect_p(real_eff))
+		  FOREACH(EFFECT, eff, l_sum_eff)
 		    {
-		      reference n_eff_ref;
-		      descriptor n_eff_d;
-		      effect n_eff;
-		      bool exact_translation_p;
-		      effect init_eff = (*effect_dup_func)(eff);
+		      /* this could easily be made generic BC. */
+		      /* FI: I add the restriction on store regions, but
+			 they should have been eliminated before translation
+			 is attempted */
+		      if(!anywhere_effect_p(real_eff) && store_effect_p(real_eff))
+			{
+			  reference n_eff_ref;
+			  descriptor n_eff_d;
+			  effect n_eff;
+			  bool exact_translation_p;
+			  effect init_eff = (*effect_dup_func)(eff);
 
-		      /* we translate the initial region descriptor
-			 into the caller's name space
-		      */
-		      convex_region_descriptor_translation(init_eff);
-		      /* and then perform the translation */
-		      convex_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(init_eff),
-										     effect_descriptor(init_eff),
-										     effect_any_reference(real_eff),
-										     effect_descriptor(real_eff),
-										     0,
-										     &n_eff_ref, &n_eff_d,
-										     &exact_translation_p);
-		      n_eff = make_effect(make_cell_reference(n_eff_ref), copy_action(effect_action(eff)),
-					  exact_translation_p? copy_approximation(effect_approximation(eff)) : make_approximation_may(),
-					  n_eff_d);
-		      /* shouldn't it be a union ? BC */
-		      l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
-		      free_effect(init_eff);
+			  /* we translate the initial region descriptor
+			     into the caller's name space
+			  */
+			  convex_region_descriptor_translation(init_eff);
+			  /* and then perform the translation */
+			  convex_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(init_eff),
+											 effect_descriptor(init_eff),
+											 effect_any_reference(real_eff),
+											 effect_descriptor(real_eff),
+											 0,
+											 &n_eff_ref, &n_eff_d,
+											 &exact_translation_p);
+			  n_eff = make_effect(make_cell_reference(n_eff_ref), copy_action(effect_action(eff)),
+					      exact_translation_p? copy_approximation(effect_approximation(eff)) : make_approximation_may(),
+					      n_eff_d);
+			  /* shouldn't it be a union ? BC */
+			  l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
+			  free_effect(init_eff);
+			}
+
 		    }
-
 		}
 	      gen_free_list(l_real_arg);
-	      free_effect(real_eff);
+	      gen_full_free_list(l_real_eff);
 
 
 	    } /*  if (pointer_type_p(real_arg_t)) */
@@ -790,44 +796,47 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	else if(ENTITY_POINT_TO_P(real_op)|| ENTITY_FIELD_P(real_op))
 	  {
 	    list l_real_arg = NIL;
-	    effect eff_real;
+	    list l_eff_real = NIL;
 	    /* first we compute an effect on the real_arg */
 
 	    l_real_arg = generic_proper_effects_of_complex_address_expression
-	      (real_arg, &eff_real, true);
+	      (real_arg, &l_eff_real, true);
 
-	     FOREACH(EFFECT, eff, l_sum_eff)
-	      {
-		effect eff_formal = (*effect_dup_func)(eff);
-		effect new_eff;
+	     FOREACH(EFFECT, eff_real, l_eff_real)
+	       {
+		 FOREACH(EFFECT, eff, l_sum_eff)
+		   {
+		     effect eff_formal = (*effect_dup_func)(eff);
+		     effect new_eff;
 
-		if (effect_undefined_p(eff_real))
-		  new_eff =  make_anywhere_effect(copy_action(effect_action(eff)));
-		else
-		  {
-		    new_eff = (*effect_dup_func)(eff_real);
-		    effect_approximation_tag(new_eff) =
-		      effect_approximation_tag(eff);
-		    effect_action_tag(new_eff) =
-		      effect_action_tag(eff);
+		     if (effect_undefined_p(eff_real))
+		       new_eff =  make_anywhere_effect(copy_action(effect_action(eff)));
+		     else
+		       {
+			 new_eff = (*effect_dup_func)(eff_real);
+			 effect_approximation_tag(new_eff) =
+			   effect_approximation_tag(eff);
+			 effect_action_tag(new_eff) =
+			   effect_action_tag(eff);
 
 
-		    /* first we translate the formal region predicate */
-		    convex_region_descriptor_translation(eff_formal);
+			 /* first we translate the formal region predicate */
+			 convex_region_descriptor_translation(eff_formal);
 
-		    /* Then we append the formal region to the real region */
-		    /* Well this is valid only in the general case :
-		     * we should verify that types are compatible. */
-		    new_eff = region_append(new_eff, eff_formal);
-		    /* shouldn't it be a union ? BC */
-		    l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
-		    free_effect(eff_formal);
+			 /* Then we append the formal region to the real region */
+			 /* Well this is valid only in the general case :
+			  * we should verify that types are compatible. */
+			 new_eff = region_append(new_eff, eff_formal);
+			 /* shouldn't it be a union ? BC */
+			 l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
+			 free_effect(eff_formal);
 
-		  } /* else du if (effect_undefined_p(eff_real)) */
-		l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
-	      } /* FOREACH(EFFECT, eff, l_sum_eff) */
+		       } /* else du if (effect_undefined_p(eff_real)) */
+		     l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
+		   } /* FOREACH(EFFECT, eff, l_sum_eff) */
+	      }
 	     gen_free_list(l_real_arg);
-	     free_effect(eff_real);
+	     gen_full_free_list(l_eff_real);
 
 	  }
 	else if(ENTITY_MALLOC_SYSTEM_P(real_op))
@@ -1191,8 +1200,13 @@ list c_convex_effects_on_actual_parameter_forward_translation
 		       Simple effect indices are easier to retrieve.
 		    */
 		    set_methods_for_proper_simple_effects();
+		    list l_eff_real = NIL;
 		    l_real_arg = generic_proper_effects_of_complex_address_expression
-		      (arg1, &eff_real, true);
+		      (arg1, &l_eff_real, true);
+
+		    eff_real = EFFECT(CAR(l_eff_real)); /* there should be a FOREACH here to scan the whole list */
+		    gen_free_list(l_eff_real);
+
 		    nb_phi_real = (int) gen_length(reference_indices(effect_any_reference(eff_real)));
 		    gen_full_free_list(l_real_arg);
 
@@ -1247,8 +1261,12 @@ list c_convex_effects_on_actual_parameter_forward_translation
 		       according to the fact that there is an addressing operator
 		    */
 
+		    l_eff_real = NIL;
 		    l_real_arg = generic_proper_effects_of_complex_address_expression
-		      (arg1, &eff_real, true);
+		      (arg1, &l_eff_real, true);
+		    eff_real = EFFECT(CAR(l_eff_real)); /*There should be a FOREACH to handle all elements */
+		    gen_free_list(l_eff_real);
+
 		    gen_full_free_list(l_real_arg);
 
 		    if (!general_case)
@@ -1427,9 +1445,12 @@ list c_convex_effects_on_actual_parameter_forward_translation
 	  eff_real = make_reference_region(syntax_reference(real_s), make_action_write_memory());
 	else
 	  {
+	    list l_eff_real = NIL;
 	    list l_real_arg = generic_proper_effects_of_complex_address_expression
-	      (real_exp, &eff_real, true);
+	      (real_exp, &l_eff_real, true);
 	    gen_full_free_list(l_real_arg);
+	    eff_real = EFFECT(CAR(l_eff_real)); /*there should be a foreach to scan all the elements */
+	    gen_free_list(l_eff_real);
 	  }
 
 	FOREACH(EFFECT, eff_orig, l_reg)

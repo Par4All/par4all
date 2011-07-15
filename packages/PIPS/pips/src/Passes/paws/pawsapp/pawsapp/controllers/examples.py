@@ -24,25 +24,9 @@ class ExamplesController(BaseController, FileUtils):
     def demo(self):
 	filename = request.params['name']
 	return self.get_file_content(request.params['operation'], filename[ : filename.index('.')] + '.tpips')
-
-    def get_analysis(self):
-	analysis = []
-	text = self.get_file_content(request.params['operation'], request.params['name'] + '.tpips')
-	for line in text.split('\n'):
-		if line.startswith('activate'):
-			analysis.append(line.split()[1])
-	return '\n'.join([ '<input value="%s" type="submit"/><br/>' % f for f in analysis])
-	
-    def get_properties(self):
-	properties = []
-	text = self.get_file_content(request.params['operation'], request.params['name'] + '.tpips')
-	for line in text.split('\n'):
-		if line.startswith('setproperty'):
-			properties.append(line.split()[1])
-	return '<ul>' + ''.join([ '<li>%s</li>' %f for f in properties])+ '</ul>'
-
+    
     def get_file_content(self, operation, name):
-        return file(paws.examples + operation + '/'+ name).read()
+	return file(paws.examples + operation + '/'+ name).read()
 
     def perform(self):
 	name = request.params['name']

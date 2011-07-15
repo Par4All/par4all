@@ -169,6 +169,15 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
       ;
       /* ultimate_type() returns a wrong type for arrays. For
        * example for type int*[10] it returns int*[10] instead of int[10]. */
+      basic fpb = variable_basic(type_variable(upt));
+      if(basic_pointer_p(fpb)){
+	expression ind = make_unbounded_expression();
+	reference r = make_reference(e, CONS(EXPRESSION, ind, NULL));
+	cell c = make_cell_reference(r);
+	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
+    }
     }
     else {
       basic fpb = variable_basic(type_variable(upt));
@@ -292,8 +301,11 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
 						  ef);
 		  set_methods_for_proper_simple_effects();
 		  effect ef = effect_undefined;
-		  list l1 = generic_proper_effects_of_complex_address_expression(ex1, &ef,
+		  list l_ef = NIL;
+		  list l1 = generic_proper_effects_of_complex_address_expression(ex1, &l_ef,
 										 true);
+		  ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+		  gen_free_list(l_ef); /* free the spine */
 
 		  reference source_ref =  effect_any_reference(ef);
 		  effects_free(l1);
@@ -365,8 +377,11 @@ set  typedef_formal_parameter_to_stub_points_to(type pt, cell c)
 						  ef);
 			set_methods_for_proper_simple_effects();
 			effect ef = effect_undefined;
-			list l1 = generic_proper_effects_of_complex_address_expression(ex1, &ef,
+			list l_ef = NIL;
+			list l1 = generic_proper_effects_of_complex_address_expression(ex1, &l_ef,
 										       true);
+			ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+			gen_free_list(l_ef); /* free the spine */
 
 			reference source_ref =  effect_any_reference(ef);
 			effects_free(l1);

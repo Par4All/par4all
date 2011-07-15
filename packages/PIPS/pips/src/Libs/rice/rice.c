@@ -53,6 +53,7 @@
 #include "misc.h"
 
 #include "local.h"
+#include"transformations.h"
 
 /* the dependence graph of the current loop nest */
 graph dg = graph_undefined;
@@ -267,6 +268,9 @@ do_it(
     statement (*codegen_fun)(statement, graph, set, int, bool)
     )
 {
+    entity module = local_name_to_top_level_entity(mod_name);
+    set_current_module_entity(module);
+
     statement mod_stat = statement_undefined;
     /* In spite of its name, the new statement "mod_parallel_stat"
      * may be sequential if distribute_p is true
@@ -329,8 +333,11 @@ do_it(
     mod_parallel_stat = rice_statement(mod_parallel_stat,1,codegen_fun);
 
     /* Regenerate statement_ordering for the parallel code */
-	reset_ordering_to_statement();
+    reset_ordering_to_statement();
     module_body_reorder(mod_parallel_stat);
+    reset_current_module_entity();
+
+    (void) update_loops_locals(mod_name, mod_parallel_stat);
 
     ifdebug(7)
     {
@@ -359,16 +366,12 @@ do_it(
 bool distributer(string mod_name)
 {
     bool success;
-    entity module = local_name_to_top_level_entity(mod_name);
-
-    set_current_module_entity(module);
 
     debug_on("RICE_DEBUG_LEVEL");
 
     success = do_it( mod_name, true, DBR_CODE, &CodeGenerate ) ;
 
     debug_off();
-    reset_current_module_entity();
 
     return success;
 }
@@ -377,7 +380,7 @@ static bool rice(string mod_name)
 {
     bool success = true;
     entity module = local_name_to_top_level_entity(mod_name);
-
+ 
     /*
      * For C code, this pass requires that effects are calculated with property
      * MEMORY_EFFECTS_ONLY set to false because we need that the Chains includes
@@ -390,11 +393,8 @@ static bool rice(string mod_name)
       return false; // return to pass manager with a failure code
     }
 
-    set_current_module_entity(module);
-
     success = do_it( mod_name, false, DBR_PARALLELIZED_CODE, &CodeGenerate);
 
-    reset_current_module_entity();
     return success;
 }
 
