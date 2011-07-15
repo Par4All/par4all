@@ -25,8 +25,7 @@ DATA_TYPE A[NR][NQ][NP];
 DATA_TYPE sum[NR][NQ][NP];
 DATA_TYPE C4[NP][NP];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j, k;
 
   for (i = 0; i < NR;) {
@@ -80,6 +79,11 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   for (r = 0; r < nr; r++)
     for (q = 0; q < nq; q++) {
       for (p = 0; p < np; p++) {
@@ -90,6 +94,11 @@ int main(int argc, char** argv) {
       for (p = 0; p < np; p++)
         A[r][q][p] = sum[r][q][p];
     }
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
+  }
 
   /* Stop and print timer. */
   timer_stop_display();;

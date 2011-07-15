@@ -30,9 +30,13 @@ static inline
 void init_array() {
   int i, j;
 
-  for (i = 0; i < LENGTH; i++)
-    for (j = 0; j < LENGTH; j++)
+  for (i = 0; i < LENGTH; ) {
+    for (j = 0; j < LENGTH; ) {
       W[i][j] = ((DATA_TYPE)i * j + 1) / LENGTH;
+      j++;
+    }
+    i++;
+  }
 }
 
 /* Define the live-out variables. Code is not executed unless
@@ -60,6 +64,11 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   out = 0;
   for (iter = 0; iter < tsteps; iter++) {
     for (i = 0; i <= length - 1; i++)
@@ -75,6 +84,11 @@ int main(int argc, char** argv) {
       }
     }
     out += c[0][length - 1];
+  }
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
   }
 
   /* Stop and print timer. */

@@ -25,7 +25,7 @@ CC := gcc
 COMMON_FLAGS:= -I../../common/ -DPOLYBENCH_TIME
 CFLAGS:= -O3 -fno-strict-aliasing -fPIC -std=c99  
 LDFLAGS:= -lm
-P4A_FLAGS+= --c99 -p $(TARGET)_p4a -r
+P4A_FLAGS+= -p $(TARGET)_p4a -r #--c99 
 
 ifdef debug
 CFLAGS+=-W -Wall -DP4A_DEBUG

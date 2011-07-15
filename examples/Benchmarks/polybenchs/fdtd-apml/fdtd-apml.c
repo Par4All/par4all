@@ -41,8 +41,7 @@ DATA_TYPE cxph[CXM + 1];
 DATA_TYPE czm[CZ + 1];
 DATA_TYPE czp[CZ + 1];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j, k;
 
   mui = 2341;
@@ -81,8 +80,7 @@ void init_array() {
 
 /* Define the live-out variables. Code is not executed unless
  POLYBENCH_DUMP_ARRAYS is defined. */
-static inline
-void print_array(int argc, char** argv) {
+static void print_array(int argc, char** argv) {
   int i, j, k;
 #ifndef POLYBENCH_DUMP_ARRAYS
   if(argc > 42 && !strcmp(argv[0], ""))
@@ -113,6 +111,11 @@ int main(int argc, char** argv) {
 
   /* Start timer. */
   timer_start();
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
 
   for (iz = 0; iz < Cz; iz++) {
     for (iy = 0; iy < Cym; iy++) {
@@ -155,6 +158,11 @@ int main(int argc, char** argv) {
     }
   }
 
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
+  }
 
   /* Stop and print timer. */
   timer_stop_display(); ;

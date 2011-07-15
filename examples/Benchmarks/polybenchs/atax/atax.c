@@ -23,8 +23,7 @@ DATA_TYPE x[NY];
 DATA_TYPE y[NY];
 DATA_TYPE tmp[NX];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
   for (i = 0; i < NX;) {
@@ -66,16 +65,25 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   for (i = 0; i < nx; i++)
     y[i] = 0;
   for (i = 0; i < ny; i++) {
     tmp[i] = 0;
     for (j = 0; j < ny; j++)
       tmp[i] = tmp[i] + A[i][j] * x[j];
+    for (j = 0; j < ny; j++)
+      y[j] = y[j] + A[i][j] * tmp[i];
   }
-  for (j = 0; j < ny; j++)
-     for (i = 0; i < ny; i++)
-       y[j] = y[j] + A[i][j] * tmp[i];
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
+  }
 
   /* Stop and print timer. */
   timer_stop_display();;

@@ -27,8 +27,7 @@ DATA_TYPE C[NI][NJ];
 DATA_TYPE A[NI][NK];
 DATA_TYPE B[NK][NJ];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
   alpha = 32412;
@@ -58,8 +57,7 @@ void init_array() {
 
 /* Define the live-out variables. Code is not executed unless
  POLYBENCH_DUMP_ARRAYS is defined. */
-static inline
-void print_array(int argc, char** argv) {
+static void print_array(int argc, char** argv) {
   int i, j;
 #ifndef POLYBENCH_DUMP_ARRAYS
   if(argc > 42 && !strcmp(argv[0], ""))
@@ -90,6 +88,11 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   /* C := alpha*A*B + beta*C */
   for (i = 0; i < ni; i++)
     for (j = 0; j < nj; j++) {
@@ -97,6 +100,11 @@ int main(int argc, char** argv) {
       for (k = 0; k < nk; ++k)
         C[i][j] += alpha * A[i][k] * B[k][j];
     }
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
+  }
 
   /* Stop and print timer. */
   timer_stop_display();;

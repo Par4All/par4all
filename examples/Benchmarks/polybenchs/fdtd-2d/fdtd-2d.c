@@ -30,8 +30,7 @@ DATA_TYPE ex[NX][NY];
 DATA_TYPE ey[NX][NY];
 DATA_TYPE hz[NX][NY];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
   for (i = 0; i < TMAX;) {
@@ -52,8 +51,7 @@ void init_array() {
 
 /* Define the live-out variables. Code is not executed unless
  POLYBENCH_DUMP_ARRAYS is defined. */
-static inline
-void print_array(int argc, char** argv) {
+static void print_array(int argc, char** argv) {
   int i, j;
 #ifndef POLYBENCH_DUMP_ARRAYS
   if(argc > 42 && !strcmp(argv[0], ""))
@@ -83,6 +81,11 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   for (t = 0; t < tmax; t++) {
     for (j = 0; j < ny; j++)
       ey[0][j] = _fict_[t];
@@ -96,6 +99,11 @@ int main(int argc, char** argv) {
       for (j = 0; j < ny - 1; j++)
         hz[i][j] = hz[i][j] - 0.7 * (ex[i][j + 1] - ex[i][j] + ey[i + 1][j]
             - ey[i][j]);
+  }
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
   }
 
   /* Stop and print timer. */
