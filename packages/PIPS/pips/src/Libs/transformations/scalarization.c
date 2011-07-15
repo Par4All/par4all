@@ -356,7 +356,10 @@ static bool loop_scalarization(loop l)
     descriptor d = effect_descriptor(pr);
     if (descriptor_convex_p(d) &&
         !entity_is_argument_p(pv, scalarized_variables) && !vect_coeff(pv,var_already_seen)) {
-
+      ifdebug(2) {
+        pips_debug(0,"Considering regions : ");
+        print_region(pr);
+      }
       Psysteme sc = descriptor_convex(d);
       int nd = type_depth(entity_type(pv));
       Psysteme sc_union = SC_UNDEFINED;
@@ -368,7 +371,7 @@ static bool loop_scalarization(loop l)
       if ((pr2 = effect_write_or_read_on_variable(crwl,pv,!(action_write_p(effect_action(pr)))))
           != effect_undefined) {
         descriptor d2= effect_descriptor(pr2);
-         if (descriptor_convex_p(d2))
+        if (descriptor_convex_p(d2))
           sc2 = descriptor_convex(d2);
       }
       /*  Merge Read and Write Effects constraints on pv */
@@ -393,7 +396,11 @@ static bool loop_scalarization(loop l)
            So, we go on only if the two are equal.
         */
 
-        if (nvo == neo) {
+        if (nvo != neo) {
+          ifdebug(2) {
+            pips_debug(0,"Legality criterion not met : %d!=%d (nvo!=neo)\n",nvo,neo);
+          }
+        } else {
 
           bool read_pv    = effects_read_variable_p(crwl, pv);
           bool written_pv = effects_write_variable_p(crwl, pv);
@@ -419,13 +426,29 @@ static bool loop_scalarization(loop l)
              check if the region is a constant function.
           */
 
-          if (nd > 0
-              && (neo > 2
-                  || (neo > 1 && !read_and_written_pv)
-                  || (entity_undefined_p(iv) && entity_undefined_p(ov))
+          if (nd <= 0 // Scalar
+              || (neo <= 2 && // Two or less references
+                  (neo < 2 || read_and_written_pv) && // ...
+                  (!entity_undefined_p(iv) || !entity_undefined_p(ov)) // At least copy in or copy out !
                   )
               ) {
-
+            ifdebug(2) {
+              pips_debug(0,"Profitability criterion not met: (nd) %d>0 (scalar) "
+                         "or not one of the following : (%d&&%d&&%d) "
+                         "(neo) %d <= 2 and "
+                         "((neo) %d <= 1 || %d read_and_written_pv) and "
+                         "(%d (!entity_undefined_p(iv)) || %d (!entity_undefined_p(ov)))\n",
+                         nd,
+                         neo <= 2,
+                         (neo <= 1 || read_and_written_pv),
+                         (!entity_undefined_p(iv) || !entity_undefined_p(ov)),
+                         neo,
+                         neo,
+                         !read_and_written_pv,
+                         entity_undefined_p(iv),
+                         entity_undefined_p(ov));
+            }
+          } else {
             /* Check that a unique element of pv is used. In other
                words, the relationship between the iterations i and the
                array element phi is a function, by definition of a

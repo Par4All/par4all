@@ -1858,13 +1858,13 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
   else /* the expression is not linear */ {
     if(is_eg) {
       /* try to see if expression is i++, i--, ++i, --i */
-      
-      if(expression_call_p(expr)) 
+
+      if(expression_call_p(expr))
 	{
 	  call c = syntax_call(expression_syntax(expr));
 	  entity op = call_function(c);
 	  list args = call_arguments(c);
-	  
+
 	  if(ENTITY_POST_INCREMENT_P(op) ||
 	     ENTITY_POST_DECREMENT_P(op))
 	    {
@@ -1886,30 +1886,30 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 	      free_expression(new_exp);
 	      return must_p;
 	    }
-	  
+
 	}
-      
-	  
+
+
       /* Nga Nguyen: 29 August 2001
 	 If the expression expr is not a linear expression, we try to retrieve more
 	 information by using function any_expression_to_transformer, for cases like:
-	     
+
 	 ITAB(I/2) => {2*PHI1 <= I <= 2*PHI1+1}
 	 ITAB(MOD(I,3)) => {0 <= PHI1 <= 2}, ...
-	     
+
 	 The function any_expression_to_transformer() returns a transformer that may
 	 contain temporary variables so we have to project these variables.
-	     
+
 	 The approximation will become MAY (although in some cases, it is MUST) */
-	  
+
       entity phi = make_phi_entity(dim);
       transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),true);
-	  
+
       /* Careful: side-effects are lost */
       if (!transformer_undefined_p(trans)) {
 	transformer new_trans = transformer_temporary_value_projection(trans);
 	Psysteme p_trans = sc_copy(predicate_system(transformer_relation(new_trans)));
-	    
+
 	/* trans has been transformed into new_trans by the
 	   projection */
 	//free_transformer(trans);
@@ -1919,7 +1919,7 @@ bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 	sc = sc_safe_append(sc, p_trans);
       }
       must_p = false;
-	
+
     }
     else {
       /* An inequation should be generated.
@@ -3060,7 +3060,7 @@ statement s;
  */
 
 
-/* computes the rectangular hull of a region 
+/* computes the rectangular hull of a region
  * if the region indices contain fields and @p nofield is set to true
  * they are removed to ensure a non strided access
  * that is if the field is at the head, it is kept (struct of array)
@@ -3107,7 +3107,7 @@ region region_rectangular_hull(region reg, bool nofield)
     /* fist gather all phis */
     list phis = NIL;
     FOREACH(EXPRESSION,exp,reference_indices(region_any_reference(hyper)))
-        if(expression_reference_p(exp) && 
+        if(expression_reference_p(exp) &&
                 variable_phi_p(reference_variable(expression_reference(exp))))
             phis = CONS(ENTITY,reference_variable(expression_reference(exp)),phis);
     phis=gen_nreverse(phis);
@@ -3141,7 +3141,7 @@ region region_rectangular_hull(region reg, bool nofield)
 
 /* translates a reference form a region into a valid expression
  * it handles fields accesses conversion, but does not changes phi variables
- * it is up to the user to use replace_entity on the generated expression according to its needs 
+ * it is up to the user to use replace_entity on the generated expression according to its needs
  * no sharing introduced between returned expression and @p r
  */
 expression region_reference_to_expression(reference r) {

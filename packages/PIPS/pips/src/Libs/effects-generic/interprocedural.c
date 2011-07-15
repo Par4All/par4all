@@ -99,7 +99,6 @@ list generic_fortran_effects_backward_translation(
 list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 {
   list l_res = NIL, l_tmp;
-  effect real_arg_eff = effect_undefined;
 
   type real_arg_t = expression_to_type(real_arg);
   int real_arg_t_d = effect_type_depth(real_arg_t);
@@ -152,65 +151,70 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 		expression arg1 = EXPRESSION(CAR(args));
 
 		pips_debug(5, "address_of case \n");
+		list l_real_arg_eff = NIL;
 		l_tmp = generic_proper_effects_of_complex_address_expression
-		  (arg1, &real_arg_eff, true);
+		  (arg1, &l_real_arg_eff, true);
 		effects_free(l_tmp);
 
-		if (anywhere_effect_p(real_arg_eff))
+		FOREACH(EFFECT, real_arg_eff, l_real_arg_eff)
 		  {
-		    pips_debug(6, "anywhere effects \n");
-		    l_res = gen_nconc
-		      (l_res,
-		       effect_to_effects_with_given_tag(real_arg_eff, act));
-		  }
-		else
-		  {
-		    type eff_type =  expression_to_type(arg1);
-
-		    if(!ENDP(reference_indices(effect_any_reference(real_arg_eff))))
+		    if (anywhere_effect_p(real_arg_eff))
 		      {
-			/* The operand of & is subcripted */
-			/* the effect last index must be changed to '*' if it's
-                           not already the case
-			*/
-			reference eff_ref;
-			expression last_eff_ind;
-			expression n_exp;
-
-			eff_ref = effect_any_reference(real_arg_eff);
-			last_eff_ind =
-			  EXPRESSION(CAR(gen_last(reference_indices(eff_ref))));
-
-			if(!unbounded_expression_p(last_eff_ind))
-			  {
-			    n_exp = make_unbounded_expression();
-			    (*effect_change_ith_dimension_expression_func)
-			      (real_arg_eff, n_exp,
-			       gen_length(reference_indices(eff_ref)));
-			    free_expression(n_exp);
-
-			  }
+			pips_debug(6, "anywhere effects \n");
+			l_res = gen_nconc
+			  (l_res,
+			   effect_to_effects_with_given_tag(real_arg_eff, act));
 		      }
+		    else
+		      {
+			type eff_type =  expression_to_type(arg1);
 
-		    /* l_res = gen_nconc
-		      (l_res,
-		       effect_to_effects_with_given_tag(real_arg_eff,
-		       act)); */
+			if(!ENDP(reference_indices(effect_any_reference(real_arg_eff))))
+			  {
+			    /* The operand of & is subcripted */
+			    /* the effect last index must be changed to '*' if it's
+			       not already the case
+			    */
+			    reference eff_ref;
+			    expression last_eff_ind;
+			    expression n_exp;
 
-		    /* add effects on accessible paths */
+			    eff_ref = effect_any_reference(real_arg_eff);
+			    last_eff_ind =
+			      EXPRESSION(CAR(gen_last(reference_indices(eff_ref))));
 
-		    /*l_res = gen_nconc
-		      (l_res,
-		       generic_effect_generate_all_accessible_paths_effects
-		       (real_arg_eff, eff_type, act));*/
+			    if(!unbounded_expression_p(last_eff_ind))
+			      {
+				n_exp = make_unbounded_expression();
+				(*effect_change_ith_dimension_expression_func)
+				  (real_arg_eff, n_exp,
+				   gen_length(reference_indices(eff_ref)));
+				free_expression(n_exp);
 
-		    l_res = gen_nconc
-		      (l_res,generic_effect_generate_all_accessible_paths_effects_with_level(real_arg_eff,
-									 eff_type,
-									 act,
-									 true,
-									 10, /* to avoid too long paths until GAPS are handled */
-											     false));
+			      }
+			  }
+
+			/* l_res = gen_nconc
+			   (l_res,
+			   effect_to_effects_with_given_tag(real_arg_eff,
+			   act)); */
+
+			/* add effects on accessible paths */
+
+			/*l_res = gen_nconc
+			  (l_res,
+			  generic_effect_generate_all_accessible_paths_effects
+			  (real_arg_eff, eff_type, act));*/
+
+			l_res = gen_nconc
+			  (l_res,generic_effect_generate_all_accessible_paths_effects_with_level(real_arg_eff,
+												 eff_type,
+												 act,
+												 true,
+												 10, /* to avoid too long paths until GAPS are handled */
+												 false));
+		      }
+		    gen_free_list(l_real_arg_eff);
 		  }
 		break;
 	      }
@@ -218,33 +222,38 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 	case is_syntax_reference:
 	case is_syntax_subscript:
 	  {
+	    list l_real_arg_eff = NIL;
 	    pips_debug(5, "general call, reference or subscript case \n");
 	    l_tmp = generic_proper_effects_of_complex_address_expression
-		  (real_arg, &real_arg_eff, true);
+		  (real_arg, &l_real_arg_eff, true);
 	    effects_free(l_tmp);
 
-	    if (anywhere_effect_p(real_arg_eff))
+	    FOREACH(EFFECT, real_arg_eff, l_real_arg_eff)
 	      {
-		pips_debug(6, "anywhere effects \n");
-		l_res = gen_nconc
-		  (l_res,
-		   effect_to_effects_with_given_tag(real_arg_eff,
-							  act));
-	      }
-	    else
-	      {
-		/* l_res = gen_nconc
-		  (l_res,
-		   generic_effect_generate_all_accessible_paths_effects
-		   (real_arg_eff, real_arg_t, act)); */
-		l_res = gen_nconc
+		if (anywhere_effect_p(real_arg_eff))
+		  {
+		    pips_debug(6, "anywhere effects \n");
+		    l_res = gen_nconc
+		      (l_res,
+		       effect_to_effects_with_given_tag(real_arg_eff,
+							act));
+		  }
+		else
+		  {
+		    /* l_res = gen_nconc
+		       (l_res,
+		       generic_effect_generate_all_accessible_paths_effects
+		       (real_arg_eff, real_arg_t, act)); */
+		    l_res = gen_nconc
 		      (l_res,generic_effect_generate_all_accessible_paths_effects_with_level(real_arg_eff,
-									 real_arg_t,
-									 act,
-									 false,
-									 10, /* to avoid too long paths until GAPS are handled */
+											     real_arg_t,
+											     act,
+											     false,
+											     10, /* to avoid too long paths until GAPS are handled */
 											     false));
+		  }
 	      }
+	    gen_free_list(l_real_arg_eff);
 
 	  }
 	  break;

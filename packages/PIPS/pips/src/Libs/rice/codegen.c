@@ -531,7 +531,7 @@ statement MakeLoopAs(statement old_loop_statement,
   loop new_loop;
   statement new_loop_s;
   statement old_body = loop_body (old_loop);
-  list new_locals = NewLoopLocals(body, loop_locals(old_loop));
+  list new_locals = gen_copy_seq(loop_locals(old_loop));
 
   if (rice_distribute_only)
     seq_or_par = is_execution_sequential;
@@ -551,7 +551,7 @@ statement MakeLoopAs(statement old_loop_statement,
   }
 
   new_loop = make_loop(loop_index(old_loop),
-		       loop_range(old_loop),
+		       copy_range(loop_range(old_loop)), /* avoid sharing */
 		       body,
 		       entity_empty_label(),
 		       make_execution(seq_or_par, UU),
@@ -576,52 +576,7 @@ statement MakeLoopAs(statement old_loop_statement,
   return(new_loop_s);
 }
 
-/*
- * list NewLoopLocals(body, locals)
- *
- * the private variable of the new loop are the old one one's
- * on which there are effects.
- * ??? the effects shouldn't be computed once more...
- *
- * FC 22/09/93
- *
- * FI: I've added the body local variables to the loop local variables
- * for C. I'm glad they are removed here.
- */
-list NewLoopLocals(statement body, list locals)
-{
-  list body_effects = statement_to_effects(body);
-  list result = NIL;
 
-  ifdebug(8) {
-    pips_debug(8, "body is:\n");
-    print_statement(body);
-    pips_debug(8, "effects considered are:\n");
-    print_effects(body_effects);
-  }
-
-  FOREACH(ENTITY, private_variable, locals) {
-    pips_debug(8, "considering entity %s with given effects\n",
-	       entity_local_name(private_variable));
-
-    if (effects_read_or_write_entity_p(body_effects, private_variable))
-      result = CONS(ENTITY, private_variable, result);
-  }
-
-  gen_free_list(body_effects);
-
-  pips_debug(8,
-	     "%td private variables kept out of %td\n",
-	     gen_length(result),
-	     gen_length(locals));
-  ifdebug(9) {
-    pips_debug(9, "the kept variables are : \n");
-    FOREACH(ENTITY, private, result) {
-      pips_debug(9, "%s\n", entity_local_name(private));
-    }
-  }
-  return(result);
-}
 
 /* If the isolated statement is a CALL and is not a CONTINUE,
    regenerate the nested loops around it. Otherwise, returns an

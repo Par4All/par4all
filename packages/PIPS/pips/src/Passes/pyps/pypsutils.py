@@ -109,16 +109,6 @@ def update_props(passe,props):
     return props
 
 
-# A regex matching compilation unit names ending with a "!":
-re_compilation_units = re.compile("^.*!$")
-def filter_compilation_units(ws):
-    """ retrieve compilation unit """
-    return ws.filter(lambda m: re_compilation_units.match(m.name))
-
-def filter_all_functions(ws):
-    """ retrieve function, all non compilation unit """
-    return ws.filter(lambda m: not re_compilation_units.match(m.name))
-
 def get_property(ws, name):
     name = name.upper()
     """return property value"""
@@ -159,14 +149,18 @@ def patchIncludes(s):
         s+=" -I."
     return s
 
-def get_runtimefile(fname,subdir=None):
+def get_runtimefile(fname,subdir=None,isFile=True):
     """Returns runtime file path"""
     searchdirs=[pypsconfig.pypsruntime] # removed "." from the search dir because it leads to complicated situations
     if subdir: searchdirs.insert(1,os.path.join(pypsconfig.pypsruntime,subdir))
     for d in searchdirs:
         f=os.path.join(d,fname)
-        if os.path.isfile(f):return f
+        if isFile and os.path.isfile(f): return f
+        if not isFile and os.path.isdir(f):return f
     raise RuntimeError, "Cannot find runtime file : " + fname + "\nsearch path: "+":".join(searchdirs)
+
+def get_runtimedir(fname,subdir=None):
+    return get_runtimefile(fname,subdir=subdir,isFile=False)
 
 
 def gen_compile_command(rep,makefile,outfile,rule,**opts):

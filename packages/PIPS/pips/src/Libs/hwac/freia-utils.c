@@ -52,13 +52,17 @@
 #define NO_POC { { spoc_poc_unused, 0 }, { spoc_poc_unused, 0 } }
 #define NO_MES { measure_none, measure_none }
 
-#define NO_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
+// no operation
+#define NOPE_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
+
+// not implemented
+#define NO_SPOC { spoc_not_implemented, NO_POC, alu_unused, NO_MES }
 #define NO_TERAPIX { 0, 0, 0, 0, 0, 0, false, NULL }
 
 #define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, "TERAPIX_UCODE_" op }
 #define TRPX_NG(c, op) { 1, 1, 1, 1, 0, c, false, "TERAPIX_UCODE_" op }
 
-// preliminary stuff for volume/min/max/..., although it is not defined yet
+// preliminary stuff for volume/min/max/...
 #define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, "TERAPIX_UCODE_" op }
 
 // types used by AIPO parameters
@@ -77,7 +81,7 @@
  */
 static const freia_api_t FREIA_AIPO_API[] = {
   { "undefined", "?", NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    { 0, NO_POC, alu_unused, NO_MES }, NO_TERAPIX
+    NO_SPOC, NO_TERAPIX
   },
   {
     // ARITHMETIC
@@ -93,7 +97,8 @@ static const freia_api_t FREIA_AIPO_API[] = {
       alu_add,
       // global measures
       NO_MES
-    }, TRPX_OP(4, "ADD3")
+    },
+    TRPX_OP(4, "ADD3")
   },
   { AIPO "sub", "-", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
@@ -143,6 +148,10 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_not_0, NO_MES },
     TRPX_OP(4, "NOT") // ??? why not less
+  },
+  { AIPO "log2", "l2", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_log2_0, NO_MES },
+    TRPX_OP(3, "LOG2")
   },
   { AIPO "add_const", "+.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_add_0cst, NO_MES },
@@ -204,12 +213,12 @@ static const freia_api_t FREIA_AIPO_API[] = {
   // semantics of "scalar_copy(a, b);" is "*a = *b;"
   { AIPO "scalar_copy", "?=", NULL, 0, 0, 1, 1, NO_PARAM,
       { TY_INT, TY_INT, NULL},
-    { 0, NO_POC, alu_unused, NO_MES },
-    NO_TERAPIX
+    NO_SPOC, NO_TERAPIX
   },
   // MISC
   // this one may be ignored?!
   { AIPO "copy", "=", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
+    // hmmm... would NO_SPOC do?
     { spoc_input_0|spoc_output_0, NO_POC, alu_unused, NO_MES },
     TRPX_OP(3, "COPY")
   },
@@ -284,19 +293,19 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   // LINEAR
   // not implemented by SPOC!
+  // cost rather approximated for Terapix
   { AIPO "convolution", "conv", NULL, 1, 1, 0, 3,
-    NO_PARAM, { TY_PIN, TY_UIN, TY_UIN },
-    NO_SPOC, NO_TERAPIX
+    NO_PARAM, { TY_PIN, TY_UIN, TY_UIN }, // kernel, width, height
+    NO_SPOC, { -1, -1, -1, -1, 0, 20, false, "TERAPIX_UCODE_CONV" }
   },
-  // not implemented by SPOC!
+  // not implemented by SPOC! nor by TERAPIX!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
     NO_PARAM, { TY_UIN, NULL, NULL },
     NO_SPOC, NO_TERAPIX
   },
   // last entry
   { NULL, NULL, NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    { 0, NO_POC, alu_unused, NO_MES },
-    NO_TERAPIX
+    NO_SPOC, NO_TERAPIX
   }
 };
 
@@ -343,6 +352,7 @@ string what_operation(const _int type)
 {
   switch (type)
   {
+  case spoc_type_sni: return "sni";
   case spoc_type_oth: return "other";
   case spoc_type_nop: return "none";
   case spoc_type_inp: return "input";
@@ -384,12 +394,14 @@ string what_operation_shape(const _int type)
 
 /* ??? beurk: I keep the operation as two ints for code regeneration.
  */
-void set_operation(const freia_api_t * api, _int * type, _int * id)
+void freia_spoc_set_operation(const freia_api_t * api, _int * type, _int * id)
 {
   pips_assert("no type set", *type == spoc_type_nop);
 
   // set type which is enough for staging?
-  if (api->spoc.used & spoc_alu)
+  if (api->spoc.used==spoc_not_implemented)
+    *type = spoc_type_sni;
+  else if (api->spoc.used & spoc_alu)
     *type = spoc_type_alu;
   else if (api->spoc.used & (spoc_poc_0|spoc_poc_1))
     *type = spoc_type_poc;
@@ -398,12 +410,14 @@ void set_operation(const freia_api_t * api, _int * type, _int * id)
   else if (api->spoc.used & (spoc_measure_0|spoc_measure_1))
     *type = spoc_type_mes;
   else
-    *type = spoc_type_nop; // e.g. for copy? (cast? convol? ...)
+    *type = spoc_type_nop; // e.g. for copy? (...)
 
   // set details
   *id = hwac_freia_api_index(api->function_name);
 }
 
+/* @brief get freia further parameters, skipping image ones
+ */
 list freia_get_params(const freia_api_t * api, list args)
 {
   int skip = api->arg_img_in + api->arg_img_out;
@@ -504,7 +518,7 @@ list /* of expression */ freia_extract_params
   return gen_nreverse(res);
 }
 
-/* all is well
+/* @brief build all is well freia constant
  */
 static call freia_ok(void)
 {
@@ -512,7 +526,7 @@ static call freia_ok(void)
   return make_call(local_name_to_top_level_entity("0"), NIL);
 }
 
-/* is it an assignment to ignore
+/* @brief tell whether it is an assignment to ignore?
  */
 bool freia_assignment_p(const entity e)
 {
@@ -622,16 +636,6 @@ bool entity_freia_api_p(const entity f)
   return strncmp(entity_local_name(f), AIPO, strlen(AIPO))==0;
 }
 
-/* @return whether to optimize AIPO call to function for SPoC.
-*/
-static bool freia_spoc_optimise(const entity called)
-{
-  string fname = entity_local_name(called);
-  return !same_string_p(fname, "freia_aipo_convolution") &&
-    !same_string_p(fname, "freia_aipo_cast") &&
-    !same_string_p(fname, "freia_aipo_fast_correlation");
-}
-
 /* returns whether the statement is a FREIA call.
  */
 bool freia_statement_aipo_call_p(const statement s)
@@ -641,9 +645,7 @@ bool freia_statement_aipo_call_p(const statement s)
   if (instruction_call_p(i)) {
     call c = instruction_call(i);
     entity called = call_function(c);
-    if (entity_freia_api_p(called) &&
-        // ??? should be take care later?
-        freia_spoc_optimise(called))
+    if (entity_freia_api_p(called))
       return true;
     else if (freia_assignment_p(called))
     {
@@ -651,9 +653,7 @@ bool freia_statement_aipo_call_p(const statement s)
       pips_assert("2 arguments to assign", gen_length(la));
       syntax op2 = expression_syntax(EXPRESSION(CAR(CDR(la))));
       if (syntax_call_p(op2))
-        return entity_freia_api_p(call_function(syntax_call(op2)))
-          // ??? later?
-          && freia_spoc_optimise(call_function(syntax_call(op2)));
+        return entity_freia_api_p(call_function(syntax_call(op2)));
     }
     else if (ENTITY_C_RETURN_P(called))
     {
@@ -661,9 +661,7 @@ bool freia_statement_aipo_call_p(const statement s)
       if (gen_length(la)==1) {
         syntax op = expression_syntax(EXPRESSION(CAR(la)));
         if (syntax_call_p(op))
-          return entity_freia_api_p(call_function(syntax_call(op)))
-            // ??? later?
-            && freia_spoc_optimise(call_function(syntax_call(op)));
+          return entity_freia_api_p(call_function(syntax_call(op)));
       }
     }
   }
@@ -1000,4 +998,49 @@ void freia_clean_image_occurrences(hash_table occs)
   HASH_FOREACH(entity, v, set, s, occs)
     set_free(s);
   hash_table_free(occs);
+}
+
+/* @brief whether api available with SPoC
+ */
+bool freia_aipo_spoc_implemented(const freia_api_t * api)
+{
+  pips_assert("some api", api!=NULL);
+  return api->spoc.used!=spoc_not_implemented;
+}
+
+/* @brief whether api available with Ter@pix
+ */
+bool freia_aipo_terapix_implemented(const freia_api_t * api)
+{
+  pips_assert("some api", api!=NULL);
+  // some special cases are handled manually
+  if (same_string_p(api->function_name, "undefined") ||
+      // this one is inserted to deal with replicated measures
+      same_string_p(api->function_name, AIPO "scalar_copy"))
+    return true;
+  return api->terapix.ucode!=NULL;
+}
+
+/* @brief is it the convolution special case?
+ */
+bool freia_convolution_p(dagvtx v)
+{
+  return same_string_p(dagvtx_operation(v), "convolution");
+}
+
+/* @brief get width & height of convolution
+ * @return whether they could be extracted
+ */
+bool freia_convolution_width_height(dagvtx v, _int * pw, _int * ph, bool check)
+{
+  // pips_assert("vertex is convolution", ...)
+  list largs = freia_get_vertex_params(v);
+  if (check) pips_assert("3 args to convolution", gen_length(largs)==3);
+  bool bw = expression_integer_value(EXPRESSION(CAR(CDR(largs))), pw);
+  if (check) pips_assert("constant convolution width", bw);
+  if (check) pips_assert("odd convolution width", ((*pw)%2)==1);
+  bool bh = expression_integer_value(EXPRESSION(CAR(CDR(CDR(largs)))), ph);
+  if (check) pips_assert("constant convolution height", bh);
+  if (check) pips_assert("odd convolution height", ((*ph)%2)==1);
+  return bw && bh;
 }

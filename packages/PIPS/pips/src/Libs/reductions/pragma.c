@@ -242,10 +242,10 @@ void reductions_pragma_omp_end (void) {
   reset_printed_reductions();
 }
 
-///@return a list of expressions with omp pragma for reductions, NULL if nothing
-///to return
-///@param l, the loop associated with the statement
-///@param stmt, the statement to analyzed for reductions, must be a loop
+//@return a list of expressions with omp pragma for reductions, NULL if nothing
+//to return
+//@param l, the loop associated with the statement
+//@param stmt, the statement to analyzed for reductions, must be a loop
 list reductions_get_omp_pragma_expr (loop l, statement stmt) {
   list exprs = NULL;
   // check that reduction as been detected at loop level

@@ -66,6 +66,9 @@ bool entity_heap_location_p(entity b)
     entity_all_module_heap_locations_p(b);
 
   if(!bucket_p) {
+      string ln = entity_local_name(b);
+      string found = strstr(ln, HEAP_AREA_LOCAL_NAME);
+      bucket_p = found != NULL;
   }
 
   return bucket_p;

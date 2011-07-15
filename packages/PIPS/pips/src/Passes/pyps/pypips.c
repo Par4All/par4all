@@ -413,6 +413,20 @@ bool add_a_file( string file ) {
 }
 
 
+/*
+ * Retrieve the language (string form) for a module
+ */
+char *get_module_language( string mod_name ) {
+  language l = module_language(module_name_to_entity(mod_name));
+
+  switch(language_tag(l)) {
+    case is_language_fortran: return "fortran";
+    case is_language_fortran95: return "fortran95";
+    case is_language_c: return "c";
+    default: return "unknown";
+  }
+}
+
 
 // Broker registering python callback to C
 

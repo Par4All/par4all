@@ -220,6 +220,8 @@ list simple_effect_to_constant_path_effects_with_points_to(effect eff)
   bool exact_p;
   reference ref = effect_any_reference(eff);
 
+  pips_debug_effect(5, "input effect", eff);
+
   if (effect_reference_dereferencing_p(ref, &exact_p))
     {
       pips_debug(8, "dereferencing case \n");
@@ -246,6 +248,8 @@ list simple_effect_to_constant_path_effects_with_points_to(effect eff)
 	  /* change the resulting effects action to the current effect action */
 	  if (effect_read_p(eff))
 	    effects_to_read_effects(l_eval);
+	  if (effect_may_p(eff))
+	    effects_to_may_effects(l_eval);
 	  le = gen_nconc(l_eval,le);
 	}
     }
