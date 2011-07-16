@@ -54,10 +54,11 @@
 
 // no operation
 #define NOPE_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
+#define NOPE_TRPX { 0, 0, 0, 0, 0, 0, false, NULL }
 
 // not implemented
 #define NO_SPOC { spoc_not_implemented, NO_POC, alu_unused, NO_MES }
-#define NO_TERAPIX { 0, 0, 0, 0, 0, 0, false, NULL }
+#define NO_TRPX { 0, 0, 0, 0, 0, -1, false, NULL }
 
 #define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, "TERAPIX_UCODE_" op }
 #define TRPX_NG(c, op) { 1, 1, 1, 1, 0, c, false, "TERAPIX_UCODE_" op }
@@ -81,7 +82,7 @@
  */
 static const freia_api_t FREIA_AIPO_API[] = {
   { "undefined", "?", NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    NO_SPOC, NO_TERAPIX
+    NOPE_SPOC, NOPE_TRPX
   },
   {
     // ARITHMETIC
@@ -213,7 +214,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   // semantics of "scalar_copy(a, b);" is "*a = *b;"
   { AIPO "scalar_copy", "?=", NULL, 0, 0, 1, 1, NO_PARAM,
       { TY_INT, TY_INT, NULL},
-    NO_SPOC, NO_TERAPIX
+    NOPE_SPOC, NOPE_TRPX
   },
   // MISC
   // this one may be ignored?!
@@ -224,7 +225,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { // not implemented by SPOC! nor TERAPIX!
     AIPO "cast", "=()", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
-    NO_SPOC, NO_TERAPIX
+    NO_SPOC, NO_TRPX
   },
   { AIPO "threshold", "thr", NULL, 1, 1, 0, 3, NO_PARAM,
     { TY_INT, TY_INT, TY_INT },
@@ -296,16 +297,21 @@ static const freia_api_t FREIA_AIPO_API[] = {
   // cost rather approximated for Terapix
   { AIPO "convolution", "conv", NULL, 1, 1, 0, 3,
     NO_PARAM, { TY_PIN, TY_UIN, TY_UIN }, // kernel, width, height
-    NO_SPOC, { -1, -1, -1, -1, 0, 20, false, "TERAPIX_UCODE_CONV" }
+    // for spoc, only 3x3 convolutions
+    { spoc_input_0|spoc_output_0|spoc_poc_0,
+      { { spoc_poc_conv, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
+    },
+    // for terapix, this is a special case
+    { -1, -1, -1, -1, 0, 2, false, "TERAPIX_UCODE_CONV" }
   },
   // not implemented by SPOC! nor by TERAPIX!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
     NO_PARAM, { TY_UIN, NULL, NULL },
-    NO_SPOC, NO_TERAPIX
+    NO_SPOC, NO_TRPX
   },
   // last entry
   { NULL, NULL, NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    NO_SPOC, NO_TERAPIX
+    NO_SPOC, NO_TRPX
   }
 };
 
@@ -1018,7 +1024,7 @@ bool freia_aipo_terapix_implemented(const freia_api_t * api)
       // this one is inserted to deal with replicated measures
       same_string_p(api->function_name, AIPO "scalar_copy"))
     return true;
-  return api->terapix.ucode!=NULL;
+  return api->terapix.cost!=-1;
 }
 
 /* @brief is it the convolution special case?

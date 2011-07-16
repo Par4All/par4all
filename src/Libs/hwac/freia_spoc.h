@@ -137,7 +137,8 @@ typedef struct {
 typedef enum {
   spoc_poc_unused,
   spoc_poc_erode,
-  spoc_poc_dilate
+  spoc_poc_dilate,
+  spoc_poc_conv
 } spoc_poc_op_t;
 
 typedef struct {

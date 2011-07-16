@@ -215,9 +215,18 @@ static int dag_terapix_measures
     FOREACH(dagvtx, v, lv)
     {
       const freia_api_t * api = dagvtx_freia_api(v);
-      dcost += api->terapix.cost;
+      if (freia_convolution_p(v)) // special handling...
+      {
+        _int w, h;
+        if (freia_convolution_width_height(v, &w, &h, false))
+          dcost += 2+(api->terapix.cost*w*h);
+        else
+          dcost += 20; // au pif 3x3
+      }
+      else
+        dcost += api->terapix.cost;
       // only count non null operations
-      if (api->terapix.cost) dnops ++;
+      if (api->terapix.cost && api->terapix.cost!=-1) dnops ++;
       if (api->arg_img_out) level_width++;
       update_erosions(d, v, erosion);
     }

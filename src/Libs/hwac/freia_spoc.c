@@ -202,6 +202,8 @@ static void spoc_poc_conf
       sb_cat(body, "SPOC_POC_ERODE;\n");
     else if (poc.op==spoc_poc_dilate)
       sb_cat(body, "SPOC_POC_DILATE;\n");
+    else if (poc.op==spoc_poc_conv)
+      sb_cat(body, "SPOC_POC_CONV;\n");
     else
       pips_internal_error("unexpected poc operation %d", poc.op);
 
@@ -1869,12 +1871,26 @@ static int number_of_output_arcs(dag d, set vs)
   return n_arcs;
 }
 
+/* @return whether it is a 3x3 convolution
+ */
+static bool convolution_33(dagvtx v)
+{
+  if (freia_convolution_p(v)) {
+    _int w, h;
+    if (freia_convolution_width_height(v, &w, &h, false) && w==3 && h==3)
+      return true;
+  }
+  return false;
+}
+
 /* does this dag contains a spoc non implemented operation?
  */
 static bool dag_spoc_not_implemented(dag d)
 {
   FOREACH(dagvtx, v, dag_vertices(d))
-    if (dagvtx_optype(v)==spoc_type_sni)
+    if (dagvtx_optype(v)==spoc_type_sni ||
+        // special handling of convolution
+        (freia_convolution_p(v) && !convolution_33(v)))
       return true;
   return false;
 }
@@ -2012,7 +2028,9 @@ static list /* of dags */ split_dag(dag initial)
     dagvtx vok =
       first_which_may_be_added(dall, current, computables, sure, maybe);
 
-    if (vok && dagvtx_optype(vok)==spoc_type_sni && lcurrent)
+    if (vok && (dagvtx_optype(vok)==spoc_type_sni ||
+                (freia_convolution_p(vok) && !convolution_33(vok)))
+        && lcurrent)
       // extract non implemented nodes alone only!
       vok = NULL;
 
@@ -2029,7 +2047,8 @@ static list /* of dags */ split_dag(dag initial)
     // no stuff vertex can be added, or it was the last one,
     // or it is not implemented and thus to be extracted "alone"
     if (!vok || set_size(computed)==nvertices ||
-        (vok && dagvtx_optype(vok)==spoc_type_sni))
+        (vok && (dagvtx_optype(vok)==spoc_type_sni ||
+                 (freia_convolution_p(vok) && !convolution_33(vok)))))
     {
       // ifdebug(5)
       // set_fprint(stderr, "closing current", current, )
