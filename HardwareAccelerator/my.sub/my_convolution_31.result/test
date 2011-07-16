@@ -20,7 +20,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 conv" [shape=circle];
+  "4 conv" [shape=box];
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
@@ -33,7 +33,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 conv" [shape=circle];
+  "4 conv" [shape=box];
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
@@ -66,7 +66,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 conv" [shape=circle];
+  "4 conv" [shape=box];
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
@@ -79,7 +79,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 conv" [shape=circle];
+  "4 conv" [shape=box];
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
@@ -126,7 +126,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 conv" [shape=circle];
+  "4 conv" [shape=box];
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
@@ -139,7 +139,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 conv" [shape=circle];
+  "4 conv" [shape=box];
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
@@ -152,7 +152,7 @@ digraph "my_convolution_31_helper_0_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 conv" [shape=circle];
+  "4 conv" [shape=box];
   "4 conv" -> "o";
   "i" -> "4 conv";
 }
@@ -182,7 +182,7 @@ digraph "my_convolution_31_helper_0_0_0" {
  * 1 image operations in dag
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
- * - computation: 20
+ * - computation: 8
  * - communication: 64
  */
 freia_status my_convolution_31_helper_0_0_0(
