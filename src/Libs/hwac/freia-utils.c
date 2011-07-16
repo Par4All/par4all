@@ -145,6 +145,11 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_xor, NO_MES }, TRPX_OP(4, "XOR3")
   },
+  { AIPO "replace_const", ":", AIPO "replace_const",
+    1, 2, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
+    { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
+      NO_POC, alu_repcst_0, NO_MES }, TRPX_OP(3, "CONV_REPLACE_EQ_CONST")
+  },
   // unary
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_not_0, NO_MES },
@@ -302,7 +307,8 @@ static const freia_api_t FREIA_AIPO_API[] = {
       { { spoc_poc_conv, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
     // for terapix, this is a special case
-    { -1, -1, -1, -1, 0, 2, false, "TERAPIX_UCODE_CONV" }
+    // I'm not sure about the cost model (h*35) for 3x3?
+    { -1, -1, -1, -1, 0, 3, false, "TERAPIX_UCODE_CONV" }
   },
   // not implemented by SPOC! nor by TERAPIX!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,

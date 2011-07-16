@@ -120,7 +120,10 @@ typedef enum {
   alu_not_0,
   alu_not_1,
   // array generation
-  alu_copy_cst
+  alu_copy_cst,
+  // replace constant
+  alu_repcst_0,
+  alu_repcst_1
   // and so on
 } spoc_alu_t;
 

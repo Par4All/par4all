@@ -219,9 +219,9 @@ static int dag_terapix_measures
       {
         _int w, h;
         if (freia_convolution_width_height(v, &w, &h, false))
-          dcost += 2+(api->terapix.cost*w*h);
+          dcost += 8+(api->terapix.cost*w*h); // hmmm? 3x3 is 35?
         else
-          dcost += 20; // au pif 3x3
+          dcost += 35; // au pif 3x3
       }
       else
         dcost += api->terapix.cost;
@@ -511,7 +511,7 @@ static void terapix_gram_management
         freia_convolution_width_height(v, &w, &h, true);
         gram_param(code, decl, name, v, hparams, w, h, true, used);
       }
-      else
+      else // threshold
         gram_param(code, decl, name, v, hparams, 3, 1, false, used);
       break;
     case 1: // kernel or operation with a constant
@@ -560,6 +560,8 @@ static void terapix_macro_code
     terapix_mcu_int(code, op, "ymin2", 0);
     terapix_mcu_img(code, op, "xmin3", out);
     terapix_mcu_int(code, op, "ymin3", 0);
+    // ??? needed for replace const... although arg 3 is used already
+    terapix_gram_management(code, decl, op, api, v, hparams, used);
     break;
   case 1:
     // alu: image op cst 1

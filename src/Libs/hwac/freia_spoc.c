@@ -124,7 +124,9 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_not_0, alu_not_1, "SPOC_ALU_NOT_IN0", F, T, F },
   { alu_not_1, alu_not_0, "SPOC_ALU_NOT_IN1", F, F, T },
   // MISC
-  { alu_copy_cst, alu_copy_cst, "SPOC_ALU_COPY_CONST", T, F, F }
+  { alu_copy_cst, alu_copy_cst, "SPOC_ALU_COPY_CONST", T, F, F },
+  { alu_repcst_0, alu_repcst_1, "SPOC_ALU_REPLACE_IN0_IN1_CONST", T, T, T },
+  { alu_repcst_1, alu_repcst_0, "SPOC_ALU_REPLACE_IN1_IN0_CONST", T, T, T }
   // and so on?
 };
 
