@@ -182,7 +182,7 @@ digraph "my_convolution_13_helper_0_0_0" {
  * 1 image operations in dag
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
- * - computation: 8
+ * - computation: 17
  * - communication: 64
  */
 freia_status my_convolution_13_helper_0_0_0(
