@@ -92,11 +92,11 @@ freia_status freia_common_draw_rect(freia_data2d *image,
     return FREIA_OK;                                      \
   }
 
-#define FbinP(name)                                       \
+#define FbinP(name,ctype)                                 \
   freia_status                                            \
   name(freia_data2d * o,                                  \
        const freia_data2d * i0, const freia_data2d * i1,  \
-       uint32_t c)                                        \
+       ctype c)                                        \
   {                                                       \
     o->stuff = i0->stuff | i1->stuff | (int32_t) c;       \
     return FREIA_OK;                                      \
@@ -214,7 +214,8 @@ Fun(freia_aipo_log2);
 
 // Linear
 FunK2P(freia_aipo_convolution);
-FbinP(freia_aipo_fast_correlation);
+FbinP(freia_aipo_fast_correlation, uint32_t);
+FbinP(freia_aipo_replace_const, int32_t);
 
 // Measure
 Fred1(freia_aipo_global_min);

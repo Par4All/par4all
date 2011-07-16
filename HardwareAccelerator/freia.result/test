@@ -157,6 +157,11 @@ freia_status freia_aipo_or_const(freia_data2d *o, const freia_data2d *i, int32_t
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
+freia_status freia_aipo_replace_const(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1, int32_t c)
+{
+   o->stuff = i0->stuff|i1->stuff|(int32_t) c;
+   return FREIA_OK;
+}
 freia_status freia_aipo_set_constant(freia_data2d *o, int32_t c)
 {
    o->stuff = c;
@@ -567,6 +572,15 @@ freia_status freia_aipo_or_const(freia_data2d *o, const freia_data2d *i, int32_t
 //             <    is read   >: c i i[0].stuff o
 //             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
+   return FREIA_OK;
+}
+//             <    is read   >: c i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
+freia_status freia_aipo_replace_const(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1, int32_t c)
+{
+//             <    is read   >: c i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
+   o->stuff = i0->stuff|i1->stuff|(int32_t) c;
    return FREIA_OK;
 }
 //             <    is read   >: c o
