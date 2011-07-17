@@ -503,8 +503,8 @@ freia_status vs_core_2_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_
   // nope
   // in [0 input 1] -> [0 alu] 15 absdiff
   // nope
-  // alu 15 absdiff stage 0 flipped
-  si.alu[0][0].op = SPOC_ALU_ABSSUB_IN1_IN0;
+  // alu 15 absdiff stage 0
+  si.alu[0][0].op = SPOC_ALU_ABSSUB_IN0_IN1;
 
   // mv [0 alu] -> [0 measure 0] 15 absdiff
   si.mux[0][0].op = SPOC_MUX_IN1;
