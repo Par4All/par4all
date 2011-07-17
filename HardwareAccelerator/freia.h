@@ -1,6 +1,8 @@
 // $Id$
 // Minimal self contained types for these headers
 
+#include <stdlib.h>
+
 #ifndef _freia_h_included_
 #define _freia_h_included_
 #ifndef NULL
