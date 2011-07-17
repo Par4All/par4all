@@ -84,8 +84,7 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_subsat_0cst, alu_subsat_1cst, "SPOC_ALU_SUBSAT_IN0_CONST", T, T, F },
   { alu_subsat_1cst, alu_subsat_0cst, "SPOC_ALU_SUBSAT_IN1_CONST", T, F, T },
   // ABSSUB
-  { alu_abssub_01, alu_abssub_10, "SPOC_ALU_ABSSUB_IN0_IN1", F, T, T },
-  { alu_abssub_10, alu_abssub_01, "SPOC_ALU_ABSSUB_IN1_IN0", F, T, T },
+  { alu_abssub, alu_abssub, "SPOC_ALU_ABSSUB_IN0_IN1", F, T, T },
   { alu_abssub_0cst, alu_abssub_1cst, "SPOC_ALU_ABSSUB_IN0_CONST", T, T, F },
   { alu_abssub_1cst, alu_abssub_0cst, "SPOC_ALU_ABSSUB_IN1_CONST", T, F, T },
   // MUL

@@ -123,7 +123,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "absdiff", "-|", AIPO "absdiff", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_abssub_01, NO_MES }, TRPX_OP(4, "ABS_DIFF3")
+      NO_POC, alu_abssub, NO_MES }, TRPX_OP(4, "ABS_DIFF3")
   },
   { AIPO "inf", "<", AIPO "inf", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
