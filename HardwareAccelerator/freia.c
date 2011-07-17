@@ -21,6 +21,21 @@ freia_status freia_common_destruct_data(freia_data2d * img)
   return FREIA_OK;
 }
 
+int32_t freia_common_get(freia_data2d * img, int32_t i, int32_t j)
+{
+  return img->stuff + i + j;
+}
+
+freia_ptr freia_common_alloc(size_t s)
+{
+  return (freia_ptr) malloc(s);
+}
+
+void freia_common_free(freia_ptr p)
+{
+  free(p);
+}
+
 freia_status freia_common_open_input(freia_dataio * in, uint32_t n)
 {
   in->framebpp = 16;
@@ -74,12 +89,14 @@ freia_status freia_common_draw_line(freia_data2d *image,
    int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
 {
   image->stuff += color+x1+y1+x2+y2;
+  return FREIA_OK;
 }
 
 freia_status freia_common_draw_rect(freia_data2d *image,
    int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
 {
   image->stuff += color+x1+y1+x2+y2;
+  return FREIA_OK;
 }
 
 
