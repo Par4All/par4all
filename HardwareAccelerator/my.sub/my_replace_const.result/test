@@ -138,7 +138,7 @@ freia_status my_replace_const_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   // i1 [0 input 1] -> [0 alu] 5 replace_const
   // nope
   // alu 5 replace_const stage 0
-  si.alu[0][0].op = SPOC_ALU_REPLACE_IN0_IN1_CONST;
+  si.alu[0][0].op = SPOC_ALU_REPLACE_IN1_IN0_CONST;
   sp.alu[0][0].constant = pi0;
 
 
