@@ -249,6 +249,11 @@ freia_status freia_common_destruct_data(freia_data2d *img)
    free(img);
    return FREIA_OK;
 }
+freia_status freia_common_draw_disc(freia_data2d *image, int32_t x1, int32_t y1, int32_t rad, int32_t color)
+{
+   image->stuff += color+x1+y1+rad;
+   return FREIA_OK;
+}
 freia_status freia_common_draw_line(freia_data2d *image, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
 {
    image->stuff += color+x1+y1+x2+y2;
@@ -285,10 +290,20 @@ freia_status freia_common_open_output(freia_dataio *out, uint32_t n, uint32_t w,
    global_io_effect++;
    return FREIA_OK;
 }
+freia_status freia_common_reset_wa(freia_data2d *image)
+{
+   image->stuff += 1;
+   return FREIA_OK;
+}
 freia_status freia_common_rx_image(freia_data2d *img, freia_dataio *in)
 {
    img->stuff = in->stuff;
    global_io_effect++;
+   return FREIA_OK;
+}
+freia_status freia_common_set_wa(freia_data2d *image, int32_t x1, int32_t y1, int32_t w, int32_t h)
+{
+   image->stuff += x1+y1+w+h;
    return FREIA_OK;
 }
 freia_status freia_common_tx_image(const freia_data2d *img, freia_dataio *out)
@@ -761,6 +776,15 @@ freia_status freia_common_destruct_data(freia_data2d *img)
    free(img);
    return FREIA_OK;
 }
+//             <    is read   >: color image image[0].stuff rad x1 y1
+//             <    is written>: image[0].stuff
+freia_status freia_common_draw_disc(freia_data2d *image, int32_t x1, int32_t y1, int32_t rad, int32_t color)
+{
+//             <    is read   >: color image image[0].stuff rad x1 y1
+//             <    is written>: image[0].stuff
+   image->stuff += color+x1+y1+rad;
+   return FREIA_OK;
+}
 //             <    is read   >: color image image[0].stuff x1 x2 y1 
 //                               y2
 //             <    is written>: image[0].stuff
@@ -843,6 +867,15 @@ freia_status freia_common_open_output(freia_dataio *out, uint32_t n, uint32_t w,
    global_io_effect++;
    return FREIA_OK;
 }
+//             <    is read   >: image image[0].stuff
+//             <    is written>: image[0].stuff
+freia_status freia_common_reset_wa(freia_data2d *image)
+{
+//             <    is read   >: image image[0].stuff
+//             <    is written>: image[0].stuff
+   image->stuff += 1;
+   return FREIA_OK;
+}
 //             <    is read   >: img in in[0].stuff global_io_effect
 //             <    is written>: img[0].stuff global_io_effect
 freia_status freia_common_rx_image(freia_data2d *img, freia_dataio *in)
@@ -853,6 +886,15 @@ freia_status freia_common_rx_image(freia_data2d *img, freia_dataio *in)
 //             <    is read   >: global_io_effect
 //             <    is written>: global_io_effect
    global_io_effect++;
+   return FREIA_OK;
+}
+//             <    is read   >: h image image[0].stuff w x1 y1
+//             <    is written>: image[0].stuff
+freia_status freia_common_set_wa(freia_data2d *image, int32_t x1, int32_t y1, int32_t w, int32_t h)
+{
+//             <    is read   >: h image image[0].stuff w x1 y1
+//             <    is written>: image[0].stuff
+   image->stuff += x1+y1+w+h;
    return FREIA_OK;
 }
 //             <    is read   >: img img[0].stuff out out[0].stuff 

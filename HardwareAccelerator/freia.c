@@ -99,6 +99,25 @@ freia_status freia_common_draw_rect(freia_data2d *image,
   return FREIA_OK;
 }
 
+freia_status freia_common_draw_disc(freia_data2d *image,
+   int32_t x1, int32_t y1, int32_t rad, int32_t color)
+{
+  image->stuff += color+x1+y1+rad;
+  return FREIA_OK;
+}
+
+freia_status freia_common_set_wa(freia_data2d *image,
+   int32_t x1, int32_t y1, int32_t w, int32_t h)
+{
+  image->stuff += x1+y1+w+h;
+  return FREIA_OK;
+}
+
+freia_status freia_common_reset_wa(freia_data2d *image)
+{
+  image->stuff += 1;
+  return FREIA_OK;
+}
 
 #define Fbin(name)                                        \
   freia_status                                            \
