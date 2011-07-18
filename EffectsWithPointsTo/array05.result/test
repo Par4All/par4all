@@ -270,7 +270,7 @@ int main()
 // pu -> &t[1][2][0] , EXACT
 // q -> &t[1] , EXACT
 // qu -> &t[1][0] , EXACT
-// r -> &t[0][0][0] , EXACT
+// r -> &t , EXACT
 // ru -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    (((*r)[0])[0])[0] = 0;
@@ -280,7 +280,7 @@ int main()
 // pu -> &t[1][2][0] , EXACT
 // q -> &t[1] , EXACT
 // qu -> &t[1][0] , EXACT
-// r -> &t[0][0][0] , EXACT
+// r -> &t , EXACT
 // ru -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    (((*r)[1])[2])[3] = 0;
@@ -290,7 +290,7 @@ int main()
 // pu -> &t[1][2][0] , EXACT
 // q -> &t[1] , EXACT
 // qu -> &t[1][0] , EXACT
-// r -> &t[0][0][0] , EXACT
+// r -> &t , EXACT
 // ru -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
@@ -301,7 +301,7 @@ int main()
 // pu -> &t[1][2][0] , EXACT
 // q -> &t[1] , EXACT
 // qu -> &t[1][0] , EXACT
-// r -> &t[0][0][0] , EXACT
+// r -> &t , EXACT
 // ru -> &t[0] , EXACT
 
    ((*ru)[0])[0] = 0;
@@ -311,7 +311,7 @@ int main()
 // pu -> &t[1][2][0] , EXACT
 // q -> &t[1] , EXACT
 // qu -> &t[1][0] , EXACT
-// r -> &t[0][0][0] , EXACT
+// r -> &t , EXACT
 // ru -> &t[0] , EXACT
 
    ru[0][0][0] = 0;
@@ -321,7 +321,7 @@ int main()
 // pu -> &t[1][2][0] , EXACT
 // q -> &t[1] , EXACT
 // qu -> &t[1][0] , EXACT
-// r -> &t[0][0][0] , EXACT
+// r -> &t , EXACT
 // ru -> &t[0] , EXACT
 
    ru[1][2][1] = 0;
@@ -331,7 +331,7 @@ int main()
 // pu -> &t[1][2][0] , EXACT
 // q -> &t[1] , EXACT
 // qu -> &t[1][0] , EXACT
-// r -> &t[0][0][0] , EXACT
+// r -> &t , EXACT
 // ru -> &t[0] , EXACT
 
 
@@ -393,10 +393,10 @@ int main()
 
    r = &t;
 //             <    is read   >: r
-//             <    is written>: t[0][0][0][0][0][0]
+//             <    is written>: t[0][0][0]
    (((*r)[0])[0])[0] = 0;
 //             <    is read   >: r
-//             <    is written>: t[0][0][0][1][2][3]
+//             <    is written>: t[1][2][3]
    (((*r)[1])[2])[3] = 0;
 //             <    is written>: ru
 
@@ -413,3 +413,44 @@ int main()
 
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	38 --> 39 with conflicts
+		from <t[0][0][0]-W-EXACT> to <t[0][0][0]-W-EXACT>
+	37 --> 40 with conflicts
+		from <ru-W-EXACT> to <ru-R-EXACT>
+	37 --> 39 with conflicts
+		from <ru-W-EXACT> to <ru-R-EXACT>
+	37 --> 38 with conflicts
+		from <ru-W-EXACT> to <ru-R-EXACT>
+	34 --> 39 with conflicts
+		from <t[0][0][0]-W-EXACT> to <t[0][0][0]-W-EXACT>
+	34 --> 38 with conflicts
+		from <t[0][0][0]-W-EXACT> to <t[0][0][0]-W-EXACT>
+	33 --> 35 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+	33 --> 34 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+	29 --> 31 with conflicts
+		from <qu-W-EXACT> to <qu-R-EXACT>
+	29 --> 30 with conflicts
+		from <qu-W-EXACT> to <qu-R-EXACT>
+	26 --> 35 with conflicts
+		from <t[1][2][3]-W-EXACT> to <t[1][2][3]-W-EXACT>
+	25 --> 27 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	25 --> 26 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	21 --> 23 with conflicts
+		from <pu-W-EXACT> to <pu-R-EXACT>
+	21 --> 22 with conflicts
+		from <pu-W-EXACT> to <pu-R-EXACT>
+	18 --> 40 with conflicts
+		from <t[1][2][1]-W-EXACT> to <t[1][2][1]-W-EXACT>
+	17 --> 19 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	17 --> 18 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

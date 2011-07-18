@@ -20,31 +20,31 @@ int main()
    int (*p)[m] = a;
 
 // Points To:
-// p -> &a[0][0] , EXACT
+// p -> &a , EXACT
 
    // p == &a[0]
    p += 1;
 
 // Points To:
-// p -> &a[*][*] , EXACT
+// p -> &a[*] , EXACT
 
    // p == &a[1]
    (*p)[2] = 99;
 
 // Points To:
-// p -> &a[*][*] , EXACT
+// p -> &a[*] , EXACT
 
    // a[1][2] = 99
    n = p-a;
 
 // Points To:
-// p -> &a[*][*] , EXACT
+// p -> &a[*] , EXACT
 
    // n == 1
    printf("n = %d", n);
 
 // Points To:
-// p -> &a[*][*] , EXACT
+// p -> &a[*] , EXACT
 
    return 0;
 }
@@ -68,7 +68,7 @@ int main()
 //             <    is referenced>: p
    // p == &a[0]
    p += 1;
-//             <may be written>: a[*][*][2]
+//             <may be written>: a[*][2]
 //             <    is read   >: p
 //             <    is referenced>: p
    // p == &a[1]
