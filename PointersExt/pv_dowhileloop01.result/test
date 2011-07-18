@@ -21,21 +21,35 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i = 0;
-//  {}
+
+// Points To: none
+
    int a[10];
-//  {}
+
+// Points To: none
+
    do {
-//  {}
+
+// Points To: none
+
       a[i] = i;
-//  {}
+
+// Points To: none
+
       i++;
    }
    while (i<10);
-//  {}
+
+// Points To: none
+
    return 0;
 }

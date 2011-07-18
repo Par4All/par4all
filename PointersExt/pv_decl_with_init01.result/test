@@ -11,13 +11,22 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int a;
-//  {}
+
+// Points To: none
+
    int *b = &a;
-//  {(b,a,-Exact-)}
+
+// Points To:
+// b -> &a , EXACT
+
    return 0;
 }
