@@ -471,7 +471,8 @@ static bool fusion_loops(statement sloop1,
         success = false;
       }
 
-    } else if(!statement_undefined_p(inner_loop1) || !statement_undefined_p(inner_loop2)) {
+    } else if((!statement_undefined_p(inner_loop1) && loop_parallel_p(statement_loop(inner_loop1))) ||
+        (!statement_undefined_p(inner_loop2) && loop_parallel_p(statement_loop(inner_loop2)))) {
       // We have one perfect loop nest deeper than the other, prevent fusion !
       success = false;
     }
