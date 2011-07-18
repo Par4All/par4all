@@ -23,23 +23,41 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i = 5;
-//  {}
+
+// Points To: none
+
    int j = 6;
-//  {}
+
+// Points To: none
+
    float x;
-//  {}
+
+// Points To: none
+
    double y[10];
-//  {}
+
+// Points To: none
+
    char *fmt = "i=%d, %d, %f\n";
-//  {(fmt,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
 
    y[0] = 0.;
-//  {(fmt,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    printf(fmt, i, i+j, x);
 }
 

@@ -47,39 +47,71 @@ int main()
 
 POINTS-TO
 
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
 void call14(int n, int m, int *x)
 {
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
    int i, j;
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
 
    for(i = 0; i <= n*m-1; i += 1)
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
       x[i] = i;
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int d1 = 4;
-//  {}
+
+// Points To: none
+
    int d2 = 4;
-//  {}
+
+// Points To: none
+
    int y[d1][d2];
-//  {}
+
+// Points To: none
+
    int i, j;
-//  {}
+
+// Points To: none
+
 
    call14(d1, d2, (int *) y);
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= d1-1; i += 1) {
-//  {}
+
+// Points To: none
+
       for(j = 0; j <= d2-1; j += 1)
-//  {}
+
+// Points To: none
+
          printf("y[%d][%d] = %d\t", i, j, y[i][j]);
-//  {}
+
+// Points To: none
+
       printf("\n");
    }
 }

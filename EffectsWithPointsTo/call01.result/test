@@ -29,28 +29,56 @@ int main()
 
 POINTS-TO
 
-//  {(pi,_pi_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+
+// Points To:
+// pi -> &_pi_1[0] , EXACT
+// q -> &_q_2[0] , EXACT
+
 void call01(int *pi, tf_t *q)
 {
-//  {(pi,_pi_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+
+// Points To:
+// pi -> &_pi_1[0] , EXACT
+// q -> &_q_2[0] , EXACT
+
    *pi = 1;
-//  {(pi,_pi_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+
+// Points To:
+// pi -> &_pi_1[0] , EXACT
+// q -> &_q_2[0] , EXACT
+
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
-//  {(pi,_pi_1[*],-Exact-);(q,_q_2[0],-Exact-)}
+
+// Points To:
+// pi -> &_pi_1[*] , EXACT
+// q -> &_q_2[0] , EXACT
+
    q->one = 1;
-//  {(pi,_pi_1[*],-Exact-);(q,_q_2[0],-Exact-)}
+
+// Points To:
+// pi -> &_pi_1[*] , EXACT
+// q -> &_q_2[0] , EXACT
+
    (q->two)[4] = 2;
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i;
-//  {}
+
+// Points To: none
+
    tf_t s;
-//  {}
+
+// Points To: none
+
 
    call01(&i, &s);
 }

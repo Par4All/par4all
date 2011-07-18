@@ -23,27 +23,52 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int **x, *y, k, h;
-//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    k = 1;
-//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    h = 2;
-//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    y = &h;
-//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,h,-Exact-)}
+
+// Points To:
+// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> &h , EXACT
+
    *x = y;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,h,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,h,-Exact-)}
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> &h , EXACT
+// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> &h , EXACT
+
    printf("x = %p \n", x);
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,h,-Exact-);(x,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,h,-Exact-)}
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> &h , EXACT
+// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> &h , EXACT
+
    return 0;
 }
 

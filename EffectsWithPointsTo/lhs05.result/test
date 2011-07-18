@@ -11,12 +11,18 @@ void lhs05()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void lhs05()
 {
-//  {}
+
+// Points To: none
+
    int x;
-//  {}
+
+// Points To: none
+
 
    *&x = 1;
 }

@@ -59,45 +59,83 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int b = 1;
-//  {}
+
+// Points To: none
+
    int i = 10;
-//  {}
+
+// Points To: none
+
 
    b = b+i;
-//  {}
+
+// Points To: none
+
    b = b*i;
-//  {}
+
+// Points To: none
+
    b = b/i;
-//  {}
+
+// Points To: none
+
    b = b&i;
-//  {}
+
+// Points To: none
+
    b = b^i;
-//  {}
+
+// Points To: none
+
    b = b|i;
-//  {}
+
+// Points To: none
+
    b += i;
-//  {}
+
+// Points To: none
+
    b *= i;
-//  {}
+
+// Points To: none
+
    b /= i;
-//  {}
+
+// Points To: none
+
    b -= i;
-//  {}
+
+// Points To: none
+
    b &= i;
-//  {}
+
+// Points To: none
+
    b |= i;
-//  {}
+
+// Points To: none
+
    b ^= i;
-//  {}
+
+// Points To: none
+
    b++;
-//  {}
+
+// Points To: none
+
    b--;
-//  {}
+
+// Points To: none
+
 
    return 0;
 }

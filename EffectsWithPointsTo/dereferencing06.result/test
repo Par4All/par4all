@@ -25,24 +25,40 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void dereferencing06()
 {
-//  {}
+
+// Points To: none
+
    double x = 1.;
-//  {}
+
+// Points To: none
+
    double *p = &x;
-//  {(p,x,-Exact-)}
+
+// Points To:
+// p -> &x , EXACT
+
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    *p++ = 1;
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    dereferencing06();
 }
 

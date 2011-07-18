@@ -1,28 +1,51 @@
 
 POINTS TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int n = 4, m = 3;
-//  {}
+
+// Points To: none
+
    int a[n][m];
-//  {}
+
+// Points To: none
+
    int (*p)[m] = a;
-//  {(p,a[0][0],-Exact-)}
+
+// Points To:
+// p -> &a[0][0] , EXACT
+
    // p == &a[0]
    p += 1;
-//  {(p,a[*][*],-Exact-)}
+
+// Points To:
+// p -> &a[*][*] , EXACT
+
    // p == &a[1]
    (*p)[2] = 99;
-//  {(p,a[*][*],-Exact-)}
+
+// Points To:
+// p -> &a[*][*] , EXACT
+
    // a[1][2] = 99
    n = p-a;
-//  {(p,a[*][*],-Exact-)}
+
+// Points To:
+// p -> &a[*][*] , EXACT
+
    // n == 1
    printf("n = %d", n);
-//  {(p,a[*][*],-Exact-)}
+
+// Points To:
+// p -> &a[*][*] , EXACT
+
    return 0;
 }
 

@@ -29,34 +29,58 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void inter01()
 {
-//  {}
+
+// Points To: none
+
    static int l;
-//  {}
+
+// Points To: none
+
    int m;
-//  {}
+
+// Points To: none
+
    int n;
-//  {}
+
+// Points To: none
+
 
    for(n = 0; n <= 9; n += 1) {
-//  {}
+
+// Points To: none
+
       i = 1;
-//  {}
+
+// Points To: none
+
       j = 2;
-//  {}
+
+// Points To: none
+
       k = 3;
-//  {}
+
+// Points To: none
+
       l = 4;
-//  {}
+
+// Points To: none
+
       m = 5;
    }
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    inter01();
 }
 

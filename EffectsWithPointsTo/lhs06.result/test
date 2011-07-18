@@ -26,30 +26,74 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
 
 POINTS-TO
 
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
 int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
 {
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
    int nbout;
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
    int col = 0;
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
    int indent = 0;
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
    int ui32;
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
    int i32;
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
    static char buffer[2000];
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
 
    if (!my_fputc)
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
       return 0;
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
 
    nbout = 0;
-//  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
+
+// Points To:
+// _stream -> &__stream_2[0] , EXACT
+// fmt -> &_fmt_1[0] , EXACT
+
 
    *va_arg(pa, int *) = col;
 }

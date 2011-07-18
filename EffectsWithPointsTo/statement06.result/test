@@ -72,140 +72,299 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int a, b, c, d;
-//  {}
+
+// Points To: none
+
    int *pa, *pb, *pc, *pd;
-//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pa -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int **ppa, **ppb, **ppc, **ppd;
-//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppb -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    a = 1;
-//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppb -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    b = 2;
-//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppb -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    c = 3;
-//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppb -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    d = 4;
-//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppb -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
 
    pa = &a;
-//  {(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(ppa,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &a , EXACT
+// pb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppb -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    ppa = &pa;
-//  {(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*_b1,
-//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &a , EXACT
+// pb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    *ppa = &b;
-//  {(pa,b,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*_b1,
-//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
 
    pb = &b;
-//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,
-//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &b , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    ppb = &pb;
-//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,
-//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,
-//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &b , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    *ppb = &a;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,
-//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,
-//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
 
    pc = &c;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
-//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &c , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    ppc = &pc;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
-//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,
-//   -Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &c , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    *ppc = &a;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
-//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,
-//   -Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &a , EXACT
+// pd -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
 
    pd = &d;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,d,-Exact-);(ppa,
-//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &a , EXACT
+// pd -> &d , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    ppd = &pd;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,d,-Exact-);(ppa,
-//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &a , EXACT
+// pd -> &d , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &pd , EXACT
+
    *ppd = &c;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,c,-Exact-);(ppa,
-//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &a , EXACT
+// pd -> &c , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &pd , EXACT
+
 
    pc = pd;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,c,-Exact-);(ppa,
-//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &c , EXACT
+// pd -> &c , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &pd , EXACT
+
 
    *ppc = &b;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
-//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &b , EXACT
+// pd -> &c , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &pd , EXACT
+
 
    *ppa = pc;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
-//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+// Points To:
+// pa -> &b , EXACT
+// pb -> &a , EXACT
+// pc -> &b , EXACT
+// pd -> &c , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &pd , EXACT
+
 
    pa = *ppd;
-//  {(pa,c,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
-//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+// Points To:
+// pa -> &c , EXACT
+// pb -> &a , EXACT
+// pc -> &b , EXACT
+// pd -> &c , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &pd , EXACT
+
 
    *ppa = *ppd;
-//  {(pa,c,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
-//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+// Points To:
+// pa -> &c , EXACT
+// pb -> &a , EXACT
+// pc -> &b , EXACT
+// pd -> &c , EXACT
+// ppa -> &pa , EXACT
+// ppb -> &pb , EXACT
+// ppc -> &pc , EXACT
+// ppd -> &pd , EXACT
+
 
    return 0;
 }

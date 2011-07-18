@@ -28,30 +28,53 @@ int main()
 
 POINTS-TO
 
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
 void call08(int r, int m, int *x)
 {
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
    int j;
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
 
    x[4] = 10*r+4;
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int d1 = 4;
-//  {}
+
+// Points To: none
+
    int d2 = 4;
-//  {}
+
+// Points To: none
+
    int y[d1][d2];
-//  {}
+
+// Points To: none
+
    int i, j;
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= d1-1; i += 1)
-//  {}
+
+// Points To: none
+
       call08(i, d2, &y[i][1]);
 }
 

@@ -25,30 +25,69 @@ void dotprod(int *a, int *b, int *c)
 
 POINTS-TO
 
-//  {(_a,__a_1[0],-Exact-);(_b,__b_2[0],-Exact-);(_c,__c_3[0],
-//   -Exact-)}
+
+// Points To:
+// _a -> &__a_1[0] , EXACT
+// _b -> &__b_2[0] , EXACT
+// _c -> &__c_3[0] , EXACT
+
 void call16(int _i, int *_a, int *_b, int *_c)
 {
-//  {(_a,__a_1[0],-Exact-);(_b,__b_2[0],-Exact-);(_c,__c_3[0],
-//   -Exact-)}
+
+// Points To:
+// _a -> &__a_1[0] , EXACT
+// _b -> &__b_2[0] , EXACT
+// _c -> &__c_3[0] , EXACT
+
    _a[_i] = _b[_i]+_c[_i];
 }
-//  {}
-//  {}
+
+// Points To: none
+
+
+// Points To: none
+
 void call16(int _i, int *_a, int *_b, int *_c);
 
-//  {}
+
+// Points To: none
+
 void dotprod(int *a, int *b, int *c);
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+
+// Points To:
+// a -> &_a_4[0] , EXACT
+// b -> &_b_5[0] , EXACT
+// c -> &_c_6[0] , EXACT
+
 void dotprod(int *a, int *b, int *c)
 {
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+
+// Points To:
+// a -> &_a_4[0] , EXACT
+// b -> &_b_5[0] , EXACT
+// c -> &_c_6[0] , EXACT
+
    int i;
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+
+// Points To:
+// a -> &_a_4[0] , EXACT
+// b -> &_b_5[0] , EXACT
+// c -> &_c_6[0] , EXACT
+
    for(i = 0; i <= 999999; i += 1)
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+
+// Points To:
+// a -> &_a_4[0] , EXACT
+// b -> &_b_5[0] , EXACT
+// c -> &_c_6[0] , EXACT
+
       call16(i, a, b, c);
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+
+// Points To:
+// a -> &_a_4[0] , EXACT
+// b -> &_b_5[0] , EXACT
+// c -> &_c_6[0] , EXACT
+
    
    
    return;

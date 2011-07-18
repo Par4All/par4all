@@ -25,22 +25,36 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void call03()
 {
-//  {}
+
+// Points To: none
+
    *pi = 1;
-//  {}
+
+// Points To: none
+
    pi++;
-//  {}
+
+// Points To: none
+
    q->one = 1;
-//  {}
+
+// Points To: none
+
    (q->two)[4] = 2;
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    call03();
 }
 

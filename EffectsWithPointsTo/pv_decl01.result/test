@@ -9,12 +9,18 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int a;
-//  {}
+
+// Points To: none
+
    return 0;
 }
 
