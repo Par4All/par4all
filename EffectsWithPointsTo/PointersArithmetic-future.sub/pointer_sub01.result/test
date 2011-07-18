@@ -70,6 +70,7 @@ int main()
    p += 1;
 //             <may be written>: a[*][*][2]
 //             <    is read   >: p
+//             <    is referenced>: p
    // p == &a[1]
    (*p)[2] = 99;
 //             <    is read   >: p
