@@ -29,34 +29,65 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    typedef struct my_struct {
       int i;
       int *p;
    } my_str;
-//  {}
+
+// Points To: none
+
    my_str *m, *n;
-//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int j;
-//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    j = 2;
-//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    m = (my_str *) malloc(sizeof(my_str));
-//  {(m,*HEAP*_l_10,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// m -> &*HEAP*_l_10 , EXACT
+// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    m->i = 1;
-//  {(m,*HEAP*_l_10,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// m -> &*HEAP*_l_10 , EXACT
+// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    m->p = &j;
-//  {(*HEAP*_l_10[p],j,-Exact-);(m,*HEAP*_l_10,-Exact-);(n,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// *HEAP*_l_10.p -> &j , EXACT
+// m -> &*HEAP*_l_10 , EXACT
+// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    n = m;
-//  {(*HEAP*_l_10[p],j,-Exact-);(m,*HEAP*_l_10,-Exact-);(n,
-//   *HEAP*_l_10,-Exact-)}
+
+// Points To:
+// *HEAP*_l_10.p -> &j , EXACT
+// m -> &*HEAP*_l_10 , EXACT
+// n -> &*HEAP*_l_10 , EXACT
+
 
    return 0;
 }

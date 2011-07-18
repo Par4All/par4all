@@ -23,22 +23,35 @@ void point_to04()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void point_to04()
 {
-//  {}
+
+// Points To: none
+
    struct s {
       int a;
       int b;
       int c;
       int d;
    } c, *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    p = &c;
-//  {(p,c,-Exact-)}
+
+// Points To:
+// p -> &c , EXACT
+
 
    p->d = p->a;
-//  {(p,c,-Exact-)}
+
+// Points To:
+// p -> &c , EXACT
+
    p->d = p->a = 4;
 }

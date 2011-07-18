@@ -33,22 +33,38 @@ void foo()
 
 POINTS TO
 
-//  {}
+
+// Points To: none
+
 void assign03()
 {
-//  {}
+
+// Points To: none
+
    char *malloc(int);
-//  {}
+
+// Points To: none
+
    double *p = (double *) malloc(10*sizeof(double));
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*HEAP* , EXACT
+
    int j = 2;
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*HEAP* , EXACT
+
 
    p[j] = 1.;
 }
-//  {}
+
+// Points To: none
+
 void foo()
 {
-//  {}
+
+// Points To: none
+
    assign03();
 }

@@ -52,64 +52,121 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int *a, *b, *c;
-//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
+
+// Points To:
+// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int i;
-//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
+
+// Points To:
+// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    i = 0;
-//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
+
+// Points To:
+// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    /* Allocation dynamiques des tableaux */
    a = (int *) malloc(20*sizeof(int));
-//  {(a,*HEAP*_l_9[0],-Exact-);(b,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_9[0] , EXACT
+// b -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// c -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    b = (int *) malloc(20*sizeof(int));
-//  {(a,*HEAP*_l_9[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_9[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    c = (int *) malloc(20*sizeof(int));
-//  {(a,*HEAP*_l_9[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *HEAP*_l_11[0],-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_9[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*HEAP*_l_11[0] , EXACT
+
    /* Creation d'alias entre a et b */
    a = b;
-//  {(a,*HEAP*_l_10[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *HEAP*_l_11[0],-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_10[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*HEAP*_l_11[0] , EXACT
+
    
    /* Suppression de l'ancien alias entre a et b, creation d'un nouveau
     * entre a et c */
    a = c;
-//  {(a,*HEAP*_l_11[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *HEAP*_l_11[0],-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_11[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*HEAP*_l_11[0] , EXACT
+
    
    /* Initialisation du tableau b */
    for(i = 0; i <= 19; i += 1)
-//  {(a,*HEAP*_l_11[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *HEAP*_l_11[0],-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_11[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*HEAP*_l_11[0] , EXACT
+
       b[i] = i;
-//  {(a,*HEAP*_l_11[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *HEAP*_l_11[0],-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_11[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*HEAP*_l_11[0] , EXACT
+
    
    /* Initialisation du tableau c */
    for(i = 0; i <= 19; i += 1)
-//  {(a,*HEAP*_l_11[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *HEAP*_l_11[0],-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_11[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*HEAP*_l_11[0] , EXACT
+
       c[i] = 1;
-//  {(a,*HEAP*_l_11[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *HEAP*_l_11[0],-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_11[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*HEAP*_l_11[0] , EXACT
+
    /* Initialisation du tableau a */
    for(i = 0; i <= 19; i += 1)
-//  {(a,*HEAP*_l_11[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *HEAP*_l_11[0],-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_11[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*HEAP*_l_11[0] , EXACT
+
       a[i] = b[i];
-//  {(a,*HEAP*_l_11[0],-Exact-);(b,*HEAP*_l_10[0],-Exact-);(c,
-//   *HEAP*_l_11[0],-Exact-)}
+
+// Points To:
+// a -> &*HEAP*_l_11[0] , EXACT
+// b -> &*HEAP*_l_10[0] , EXACT
+// c -> &*HEAP*_l_11[0] , EXACT
+
    return 0;
 }

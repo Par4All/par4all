@@ -13,14 +13,23 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    tf_t s;
-//  {}
+
+// Points To: none
+
    tf_t *sp = &s;
-//  {(sp,s,-Exact-)}
+
+// Points To:
+// sp -> &s , EXACT
+
 
    call09(s.one, sp->one);
 }

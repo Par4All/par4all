@@ -19,18 +19,30 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int ny = 10, nx = 10;
-//  {}
+
+// Points To: none
+
    Cplfloat pt_in[ny][nx];
-//  {}
+
+// Points To: none
+
    float Sigma2;
-//  {}
+
+// Points To: none
+
    Cplfloat pt_out[ny][nx];
-//  {}
+
+// Points To: none
+
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);
 }
