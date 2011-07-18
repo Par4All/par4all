@@ -85,9 +85,9 @@ static bool privatizable(entity e)
     */
 
     return( entity_scalar_p( e ) &&
-	    storage_ram_p( s ) &&
-	    //value_unknown_p(entity_initial(e)) &&
-	    dynamic_area_p( ram_section( storage_ram( s )))) ;
+            storage_ram_p( s ) &&
+            //value_unknown_p(entity_initial(e)) &&
+            dynamic_area_p( ram_section( storage_ram( s )))) ;
 }
 
 /* SCAN_STATEMENT gathers the list of enclosing LOOPS of statement S.
@@ -101,78 +101,78 @@ static void scan_statement(statement s, list loops)
     instruction i = statement_instruction(s);
 
     if (get_enclosing_loops_map() == hash_table_undefined) {
-	set_enclosing_loops_map( MAKE_STATEMENT_MAPPING() );
+        set_enclosing_loops_map( MAKE_STATEMENT_MAPPING() );
     }
     store_statement_enclosing_loops(s, loops);
 
     switch(instruction_tag(i)) {
     case is_instruction_block:
-	MAPL(ps, {scan_statement(STATEMENT(CAR(ps)), loops);},
-	     instruction_block(i));
-	break ;
+        MAPL(ps, {scan_statement(STATEMENT(CAR(ps)), loops);},
+             instruction_block(i));
+        break ;
     case is_instruction_loop: {
-	loop l = instruction_loop(i);
-	statement b = loop_body(l);
-	list new_loops =
-		gen_nconc(gen_copy_seq(loops), CONS(STATEMENT, s, NIL)) ;
-	list locals = NIL ;
+        loop l = instruction_loop(i);
+        statement b = loop_body(l);
+        list new_loops =
+                gen_nconc(gen_copy_seq(loops), CONS(STATEMENT, s, NIL)) ;
+        list locals = NIL ;
 
-	FOREACH(EFFECT, f, load_cumulated_rw_effects_list(b)) {
-	    entity e = effect_entity( f ) ;
+        FOREACH(EFFECT, f, load_cumulated_rw_effects_list(b)) {
+            entity e = effect_entity( f ) ;
 
-	    if(!anywhere_effect_p(f)
-	       && action_write_p( effect_action( f ))
-	       &&  privatizable( e )
-	       &&  gen_find_eq( e, locals ) == entity_undefined ) {
-		locals = CONS( ENTITY, e, locals ) ;
-	    }
-	}
+            if(!anywhere_effect_p(f)
+               && action_write_p( effect_action( f ))
+               &&  privatizable( e )
+               &&  gen_find_eq( e, locals ) == entity_undefined ) {
+                locals = CONS( ENTITY, e, locals ) ;
+            }
+        }
 
-	/* Add the loop index because it does not have to be taken
-	   into account for parallelization. */
-	loop_locals( l ) = CONS( ENTITY, loop_index( l ), locals ) ;
+        /* Add the loop index because it does not have to be taken
+           into account for parallelization. */
+        loop_locals( l ) = CONS( ENTITY, loop_index( l ), locals ) ;
 
-	/* FI: add the local variables of the loop body at least, but
-	   they might have to be added recursively for all enclosed
-	   loops. Note: their dependency pattern should lead to
-	   privatization, but they are eliminated from the body
-	   effect and not taken into consideration. */
-	loop_locals(l) = gen_nconc(loop_locals(l),
-				   gen_copy_seq(statement_declarations(b)));
+        /* FI: add the local variables of the loop body at least, but
+           they might have to be added recursively for all enclosed
+           loops. Note: their dependency pattern should lead to
+           privatization, but they are eliminated from the body
+           effect and not taken into consideration. */
+        loop_locals(l) = gen_nconc(loop_locals(l),
+                                   gen_copy_seq(statement_declarations(b)));
 
-	scan_statement( b, new_loops ) ;
-	hash_del(get_enclosing_loops_map(), (char *) s) ;
-	store_statement_enclosing_loops(s, new_loops);
-	break;
+        scan_statement( b, new_loops ) ;
+        hash_del(get_enclosing_loops_map(), (char *) s) ;
+        store_statement_enclosing_loops(s, new_loops);
+        break;
     }
     case is_instruction_test: {
-	test t = instruction_test( i ) ;
+        test t = instruction_test( i ) ;
 
-	scan_statement( test_true( t ), loops ) ;
-	scan_statement( test_false( t ), loops ) ;
-	break ;
+        scan_statement( test_true( t ), loops ) ;
+        scan_statement( test_false( t ), loops ) ;
+        break ;
     }
     case is_instruction_whileloop: {
-	whileloop l = instruction_whileloop(i);
-	statement b = whileloop_body(l);
-	scan_statement(b, loops ) ;
-	break;
+        whileloop l = instruction_whileloop(i);
+        statement b = whileloop_body(l);
+        scan_statement(b, loops ) ;
+        break;
     }
     case is_instruction_forloop: {
-	forloop l = instruction_forloop(i);
-	statement b = forloop_body(l);
-	scan_statement(b, loops ) ;
-	break;
+        forloop l = instruction_forloop(i);
+        statement b = forloop_body(l);
+        scan_statement(b, loops ) ;
+        break;
     }
    case is_instruction_unstructured:
-	scan_unstructured( instruction_unstructured( i ), loops ) ;
-	break ;
+        scan_unstructured( instruction_unstructured( i ), loops ) ;
+        break ;
     case is_instruction_call:
     case is_instruction_expression:
     case is_instruction_goto:
-	break ;
+        break ;
     default:
-	pips_internal_error("unexpected tag %d", instruction_tag(i));
+        pips_internal_error("unexpected tag %d", instruction_tag(i));
     }
 }
 
@@ -181,7 +181,7 @@ static void scan_unstructured(unstructured u, list loops)
     list blocs = NIL ;
 
     CONTROL_MAP( c, {scan_statement( control_statement( c ), loops );},
-		 unstructured_control( u ), blocs ) ;
+                 unstructured_control( u ), blocs ) ;
     gen_free_list( blocs ) ;
 }
 
@@ -192,16 +192,16 @@ static list loop_prefix(list l1, list l2)
     statement st ;
 
     if( ENDP( l1 )) {
-	return( NIL ) ;
+        return( NIL ) ;
     }
     else if( ENDP( l2 )) {
-	return( NIL ) ;
+        return( NIL ) ;
     }
     else if( (st=STATEMENT( CAR( l1 ))) == STATEMENT( CAR( l2 ))) {
-	return( CONS( STATEMENT, st, loop_prefix( CDR( l1 ), CDR( l2 )))) ;
+        return( CONS( STATEMENT, st, loop_prefix( CDR( l1 ), CDR( l2 )))) ;
     }
     else {
-	return( NIL ) ;
+        return( NIL ) ;
     }
 }
 
@@ -215,19 +215,19 @@ static void update_locals(list prefix, list ls, entity e)
   if( ENDP( prefix )) {
     if(!ENDP(ls)) {
       ifdebug(1) {
-	pips_debug(1, "Removing %s from locals of ", entity_name( e )) ;
-	FOREACH(STATEMENT, st, ls) {
-	  pips_debug(1, "%td ", statement_number( st )) ;
-	}
-	pips_debug(1, "\n" ) ;
+        pips_debug(1, "Removing %s from locals of ", entity_name( e )) ;
+        FOREACH(STATEMENT, st, ls) {
+          pips_debug(1, "%td ", statement_number( st )) ;
+        }
+        pips_debug(1, "\n" ) ;
       }
       FOREACH(STATEMENT, st, ls) {
-	instruction i = statement_instruction( st ) ;
+        instruction i = statement_instruction( st ) ;
 
-	pips_assert( "instruction i is a loop", instruction_loop_p( i )) ;
-	gen_remove( &loop_locals( instruction_loop( i )), e );
-	pips_debug(1, "Variable %s is removed from locals of statement %td\n",
-		   entity_name(e), statement_number(st));
+        pips_assert( "instruction i is a loop", instruction_loop_p( i )) ;
+        gen_remove( &loop_locals( instruction_loop( i )), e );
+        pips_debug(1, "Variable %s is removed from locals of statement %td\n",
+                   entity_name(e), statement_number(st));
       }
     }
     else {
@@ -236,7 +236,7 @@ static void update_locals(list prefix, list ls, entity e)
   }
   else {
     pips_assert( "The first statements in prefix and in ls are the same statement", 
-		 STATEMENT( CAR( prefix )) == STATEMENT( CAR( ls ))) ;
+                 STATEMENT( CAR( prefix )) == STATEMENT( CAR( ls ))) ;
 
     pips_debug(1, "Recurse on common prefix\n");
 
@@ -265,15 +265,15 @@ static bool expression_implied_do_index_p(expression exp, entity e)
 
     pips_debug(5, "begin\n");
     pips_debug(7, "%s implied do index ? index: %s\n",
-	       entity_name(e),entity_name(index));
+               entity_name(e),entity_name(index));
 
     range_effects = proper_effects_of_range(r);
 
     FOREACH(EFFECT, eff, range_effects) {
       if (reference_variable(effect_any_reference(eff)) == e &&
-	  action_read_p(effect_action(eff))) {
-	  pips_debug(7, "index read in range expressions\n");
-	  dep=true;
+          action_read_p(effect_action(eff))) {
+          pips_debug(7, "index read in range expressions\n");
+          dep=true;
       }
     }
 
@@ -281,16 +281,16 @@ static bool expression_implied_do_index_p(expression exp, entity e)
   
     if (!dep) {
       if (same_entity_p(e,index))
-	li=true;
+        li=true;
       else {
-	FOREACH(EXPRESSION,expr, CDR(CDR(args))) {
-	  syntax s = expression_syntax(expr);
-	  if(syntax_call_p(s)) {
-	    pips_debug(5,"Nested implied do\n");
-	    if (expression_implied_do_index_p(expr,e))
-	      li=true;
-	  }
-	}
+        FOREACH(EXPRESSION,expr, CDR(CDR(args))) {
+          syntax s = expression_syntax(expr);
+          if(syntax_call_p(s)) {
+            pips_debug(5,"Nested implied do\n");
+            if (expression_implied_do_index_p(expr,e))
+              li=true;
+          }
+        }
       }
     }
     pips_debug(5,"end\n");
@@ -348,12 +348,12 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
   ifdebug(1) {
     if(statement_loop_p(st)) {
       pips_debug(1, "Trying to privatize %s in loop statement %td (ordering %03zd) with local(s) ",
-		 entity_local_name( e ), statement_number( st ), statement_ordering(st)) ;
+                 entity_local_name( e ), statement_number( st ), statement_ordering(st)) ;
       print_arguments(loop_locals(statement_loop(st)));
     }
     else {
       pips_debug(1, "Trying to privatize %s in statement %td\n",
-		 entity_local_name( e ), statement_number( st )) ;
+                 entity_local_name( e ), statement_number( st )) ;
     }
   }
 
@@ -407,47 +407,47 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
       effect sk = conflict_sink( c ) ;
 
       if(store_effect_p(sc)) {
-	/* Only store effects are considered for privatization */
-	list prefix = list_undefined;
+        /* Only store effects are considered for privatization */
+        list prefix = list_undefined;
 
-	pips_assert("Both effects sc and sk are of the same kind",
-		    store_effect_p(sk));
+        pips_assert("Both effects sc and sk are of the same kind",
+                    store_effect_p(sk));
 
-	/* Take into account def-def and use-def arcs only */
-	if(!entities_may_conflict_p( e, effect_entity( sc )) ||
-	   !entities_may_conflict_p( e, effect_entity( sk )) ||
-	   action_write_p( effect_action( sk))) {
-	  continue ;
-	}
-	/* PC dependance and the sink is a loop index */
-	if(action_read_p( effect_action( sk )) &&
-	   (instruction_loop_p( succ_i) ||
-	    is_implied_do_index( e, succ_i))) {
-	  continue ;
-	}
-	pips_debug(5,"Conflict for %s between statements %td and %td\n",
-		   entity_local_name(e),
-		   statement_number(st),
-		   statement_number(succ_st));
+        /* Take into account def-def and use-def arcs only */
+        if(!entities_may_conflict_p( e, effect_entity( sc )) ||
+           !entities_may_conflict_p( e, effect_entity( sk )) ||
+           action_write_p( effect_action( sk))) {
+          continue ;
+        }
+        /* PC dependance and the sink is a loop index */
+        if(action_read_p( effect_action( sk )) &&
+           (instruction_loop_p( succ_i) ||
+            is_implied_do_index( e, succ_i))) {
+          continue ;
+        }
+        pips_debug(5,"Conflict for %s between statements %td and %td\n",
+                   entity_local_name(e),
+                   statement_number(st),
+                   statement_number(succ_st));
 
-	if (v==succ_v) {
-	  /* No decision can be made from this couple of effects alone */
-	  ;
-	  //pips_debug(5,"remove %s from locals in all enclosing loops\n",
-	  //	   entity_local_name(e));
-	  //update_locals( NIL, ls, e ); /* remove e from all enclosing loops */
-	}
-	else {
-	  pips_debug(5,"remove %s from locals in non common enclosing loops\n",
-		     entity_local_name(e));
-	  prefix = loop_prefix( ls, succ_ls ) ;
-	  /* e cannot be a local variable at a lower level than
-	     the common prefix because of this dependence
-	     arc. */
-	  update_locals( prefix, ls, e ) ;
-	  update_locals( prefix, succ_ls, e ) ;
-	  gen_free_list( prefix ) ;
-	}
+        if (v==succ_v) {
+          /* No decision can be made from this couple of effects alone */
+          ;
+          //pips_debug(5,"remove %s from locals in all enclosing loops\n",
+          //           entity_local_name(e));
+          //update_locals( NIL, ls, e ); /* remove e from all enclosing loops */
+        }
+        else {
+          pips_debug(5,"remove %s from locals in non common enclosing loops\n",
+                     entity_local_name(e));
+          prefix = loop_prefix( ls, succ_ls ) ;
+          /* e cannot be a local variable at a lower level than
+             the common prefix because of this dependence
+             arc. */
+          update_locals( prefix, ls, e ) ;
+          update_locals( prefix, succ_ls, e ) ;
+          gen_free_list( prefix ) ;
+        }
       }
     }
   }
@@ -469,24 +469,24 @@ bool privatize_module(char *mod_name)
     module = get_current_module_entity();
 
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, mod_name, true) );
+        db_get_memory_resource(DBR_CODE, mod_name, true) );
     mod_stat = get_current_module_statement();
 
     mod_inst = statement_instruction(mod_stat);
 
     /*
     if (! instruction_unstructured_p(mod_inst))
-	pips_internal_error("unstructured expected");
-	*/
+        pips_internal_error("unstructured expected");
+        */
 
     set_proper_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
+        db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
 
     set_cumulated_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true) );
+        db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true) );
 
     mod_graph = (graph)
-	db_get_memory_resource(DBR_CHAINS, mod_name, true);
+        db_get_memory_resource(DBR_CHAINS, mod_name, true);
 
     debug_on("PRIVATIZE_DEBUG_LEVEL");
     set_ordering_to_statement(mod_stat);
@@ -507,25 +507,25 @@ bool privatize_module(char *mod_name)
 
     /* remove non private variables from locals */
     FOREACH(VERTEX, v, graph_vertices( mod_graph )) {
-	dg_vertex_label vl = (dg_vertex_label) vertex_vertex_label( v ) ;
-	statement st =
-	    ordering_to_statement(dg_vertex_label_statement(vl));
+        dg_vertex_label vl = (dg_vertex_label) vertex_vertex_label( v ) ;
+        statement st =
+            ordering_to_statement(dg_vertex_label_statement(vl));
 
-	pips_debug(1, "Entering statement %03zd :\n", statement_ordering(st));
-	ifdebug(4) {
-	  print_statement(st);
-	}
+        pips_debug(1, "Entering statement %03zd :\n", statement_ordering(st));
+        ifdebug(4) {
+          print_statement(st);
+        }
 
-	FOREACH(EFFECT, f, load_proper_rw_effects_list( st )) {
-	    entity e = effect_entity( f ) ;
-	    ifdebug(4) {
-	      pips_debug(1, "effect :");
-	      print_effect(f);
-	    }
-	    if( action_write_p( effect_action( f ))) {
-		try_privatize( v, st, f, e ) ;
-	    }
-	}
+        FOREACH(EFFECT, f, load_proper_rw_effects_list( st )) {
+            entity e = effect_entity( f ) ;
+            ifdebug(4) {
+              pips_debug(1, "effect :");
+              print_effect(f);
+            }
+            if( action_write_p( effect_action( f ))) {
+                try_privatize( v, st, f, e ) ;
+            }
+        }
     }
 
     /* sort locals
@@ -539,7 +539,7 @@ bool privatize_module(char *mod_name)
     reset_current_module_statement();
     reset_proper_rw_effects();
     reset_cumulated_rw_effects();
-	reset_ordering_to_statement();
+        reset_ordering_to_statement();
     clean_enclosing_loops();
 
     return true;
@@ -550,13 +550,13 @@ bool privatize_module(char *mod_name)
  * @{ */
 
 static void do_gather_loop_indices(loop l, set s) {
-	set_add_element(s,s,loop_index(l));
+        set_add_element(s,s,loop_index(l));
 }
 
 static set gather_loop_indices(void *v) {
-	set s = set_make(set_pointer);
-	gen_context_recurse(v,s,loop_domain,gen_true,do_gather_loop_indices);
-	return s;
+        set s = set_make(set_pointer);
+        gen_context_recurse(v,s,loop_domain,gen_true,do_gather_loop_indices);
+        return s;
 }
 
 /**
@@ -715,58 +715,58 @@ static void localize_declaration_walker(statement s, localize_ctx *ctx) {
  * @return
  */
 bool localize_declaration(char *mod_name) {
-	/* prelude */
-	debug_on("LOCALIZE_DECLARATION_DEBUG_LEVEL");
-	pips_debug(1,"begin localize_declaration ...\n");
-	set_current_module_entity(module_name_to_entity(mod_name) );
-	set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, true) );
+        /* prelude */
+        debug_on("LOCALIZE_DECLARATION_DEBUG_LEVEL");
+        pips_debug(1,"begin localize_declaration ...\n");
+        set_current_module_entity(module_name_to_entity(mod_name) );
+        set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, true) );
 
-	/* Propagate local informations to loop statements */
+        /* Propagate local informations to loop statements */
 
-	// To keep track of what has been done:
-	ifdebug(1) {
-	  pips_debug(1,"The statement before we create block statement:\n");
-	  print_statement(get_current_module_statement());
-	}
+        // To keep track of what has been done:
+        ifdebug(1) {
+          pips_debug(1,"The statement before we create block statement:\n");
+          print_statement(get_current_module_statement());
+        }
 
-	// Create the statement_block where needed and perform localization
-	clean_up_sequences(get_current_module_statement());
+        // Create the statement_block where needed and perform localization
+        clean_up_sequences(get_current_module_statement());
 
-	// Context for recursion
-	localize_ctx ctx = make_localize_ctx();
+        // Context for recursion
+        localize_ctx ctx = make_localize_ctx();
 
-	gen_context_recurse(get_current_module_statement(),&ctx,
-	                    statement_domain,localize_track_scope_in,localize_declaration_walker);
-	ifdebug(1) {
-	  pips_debug(1,"The statement before we convert loop_locals to local declarations:\n");
-	  print_statement(get_current_module_statement());
-	}
-	// Use loop_locals data to fill local declarations:
-	clean_up_sequences(get_current_module_statement());
-	hash_table_free(ctx.old_entity_to_new);
+        gen_context_recurse(get_current_module_statement(),&ctx,
+                            statement_domain,localize_track_scope_in,localize_declaration_walker);
+        ifdebug(1) {
+          pips_debug(1,"The statement before we convert loop_locals to local declarations:\n");
+          print_statement(get_current_module_statement());
+        }
+        // Use loop_locals data to fill local declarations:
+        clean_up_sequences(get_current_module_statement());
+        hash_table_free(ctx.old_entity_to_new);
 
-	ifdebug(1) {
-	  pips_debug(1,"The statement after conversion:\n");
-	  print_statement(get_current_module_statement());
-	}
+        ifdebug(1) {
+          pips_debug(1,"The statement after conversion:\n");
+          print_statement(get_current_module_statement());
+        }
 
-	/* Renumber the statement with a new ordering */
-	module_reorder(get_current_module_statement());
-	DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
+        /* Renumber the statement with a new ordering */
+        module_reorder(get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
 
-	/* postlude */
-	debug_off();
-	reset_current_module_entity();
-	reset_current_module_statement();
-	pips_debug(1,"end localize_declaration\n");
-	return true;
+        /* postlude */
+        debug_off();
+        reset_current_module_entity();
+        reset_current_module_statement();
+        pips_debug(1,"end localize_declaration\n");
+        return true;
 }
 
 /**
     @brief update the input loop loop_locals by removing entities
            with no corresponding effects in loop body (e.g. entities
-	   already private in inner loops and not used in other
-	   statements of the current loop body).
+           already private in inner loops and not used in other
+           statements of the current loop body).
  */
 static void update_loop_locals(loop l)
 {
@@ -780,12 +780,12 @@ static void update_loop_locals(loop l)
   FOREACH(ENTITY, private_variable, loop_locals(l))
     {
       pips_debug(1, "considering entity %s\n",
-		 entity_local_name(private_variable));
+                 entity_local_name(private_variable));
       if (effects_read_or_write_entity_p(body_effects, private_variable))
-	{
-	  pips_debug(1, "keeping entity\n");
-	  new_loop_locals = CONS(ENTITY, private_variable, new_loop_locals);
-	}
+        {
+          pips_debug(1, "keeping entity\n");
+          new_loop_locals = CONS(ENTITY, private_variable, new_loop_locals);
+        }
     }
   gen_free_list(loop_locals(l));
   loop_locals(l) = new_loop_locals;
@@ -815,8 +815,8 @@ bool update_loops_locals(string module_name, statement module_stat)
   else
     set_constant_paths_p(true);
   set_pointer_info_kind(with_no_pointer_info); /* should use current pointer information
-						  according to current effects active phase
-					        */
+                                                  according to current effects active phase
+                                                */
 
   set_methods_for_proper_simple_effects();
   proper_effects_of_module_statement(module_stat);
@@ -824,7 +824,7 @@ bool update_loops_locals(string module_name, statement module_stat)
   rw_effects_of_module_statement(module_stat);
 
   gen_recurse(module_stat,
-	      loop_domain, gen_true, update_loop_locals);
+              loop_domain, gen_true, update_loop_locals);
 
   pips_debug(1, "end\n");
   debug_off();
