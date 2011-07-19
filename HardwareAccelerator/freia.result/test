@@ -222,7 +222,7 @@ freia_status freia_cipo_inner_gradient(freia_data2d *o, const freia_data2d *i, i
    o->stuff = i->stuff|c1+c2;
    return FREIA_OK;
 }
-freia_ptr freia_common_alloc(size_t s)
+freia_ptr freia_common_alloc(uint32_t s)
 {
    return (freia_ptr) malloc(s);
 }
@@ -724,7 +724,7 @@ freia_status freia_cipo_inner_gradient(freia_data2d *o, const freia_data2d *i, i
 }
 //             <    is read   >: s _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
-freia_ptr freia_common_alloc(size_t s)
+freia_ptr freia_common_alloc(uint32_t s)
 {
 //             <    is read   >: s _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_

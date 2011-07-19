@@ -26,7 +26,7 @@ int32_t freia_common_get(freia_data2d * img, int32_t i, int32_t j)
   return img->stuff + i + j;
 }
 
-freia_ptr freia_common_alloc(size_t s)
+freia_ptr freia_common_alloc(uint32_t s)
 {
   return (freia_ptr) malloc(s);
 }

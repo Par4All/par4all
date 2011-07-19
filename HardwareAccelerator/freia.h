@@ -57,7 +57,7 @@ extern freia_status freia_common_reset_wa(freia_data2d *);
 
 // Misc
 extern int32_t freia_common_get(freia_data2d *, int32_t, int32_t);
-extern freia_ptr freia_common_alloc(size_t);
+extern freia_ptr freia_common_alloc(uint32_t);
 extern void freia_common_free(freia_ptr);
 
 // 2 CIPO functions
