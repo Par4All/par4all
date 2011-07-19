@@ -104,6 +104,7 @@ static list search_or_sort_effects(entity e, list args);
 /* MB */
 static list generic_string_effects(entity e,list args);
 static list memmove_effects(entity e, list args);
+static list strtoxxx_effects(entity e, list args);
 
 
 
@@ -962,12 +963,12 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ATOI_FUNCTION_NAME,                     no_write_effects},
   {ATOL_FUNCTION_NAME,                     no_write_effects},
   {ATOLL_FUNCTION_NAME,                    no_write_effects},
-  {STRTOD_FUNCTION_NAME,                   no_write_effects},
-  {STRTOF_FUNCTION_NAME,                   no_write_effects},
-  {STRTOL_FUNCTION_NAME,                   safe_c_effects},
-  {STRTOLL_FUNCTION_NAME,                  safe_c_effects},
-  {STRTOUL_FUNCTION_NAME,                  safe_c_effects},
-  {STRTOULL_FUNCTION_NAME,                 safe_c_effects},
+  {STRTOD_FUNCTION_NAME,                   strtoxxx_effects},
+  {STRTOF_FUNCTION_NAME,                   strtoxxx_effects},
+  {STRTOL_FUNCTION_NAME,                   strtoxxx_effects},
+  {STRTOLL_FUNCTION_NAME,                  strtoxxx_effects},
+  {STRTOUL_FUNCTION_NAME,                  strtoxxx_effects},
+  {STRTOULL_FUNCTION_NAME,                 strtoxxx_effects},
   {RAND_FUNCTION_NAME,                     rgs_effects},
   {SRAND_FUNCTION_NAME,                    rgsi_effects},
   {CALLOC_FUNCTION_NAME,                   no_write_effects},
@@ -2887,5 +2888,58 @@ static list search_or_sort_effects(entity e, list args)
 
   pips_debug_effects(8, "final effects:", le);
 
+  return le;
+}
+
+/**
+    generate effects for strtoxxx functions
+ */
+static list strtoxxx_effects(entity e, list args)
+{
+  list le = NIL;
+  expression nptr_exp = EXPRESSION(CAR(args));
+  POP(args);
+  expression endptr_exp = EXPRESSION(CAR(args));
+  POP(args);
+  expression base_exp = EXPRESSION(CAR(args));
+
+  /* the first expression must be char * or char[], and all its components may be read */
+  le = c_actual_argument_to_may_summary_effects(nptr_exp, 'r');
+  pips_debug_effects(8, "effects on first argument\n", le);
+
+  /* the second expression target is initialized */
+  if (expression_address_of_p(endptr_exp))
+    {
+      call c = expression_call(endptr_exp);
+      endptr_exp = EXPRESSION(CAR(call_arguments(c)));
+      list lme_endptr = NIL;
+      list le_endptr = generic_proper_effects_of_complex_address_expression(endptr_exp, &lme_endptr, true);
+      pips_debug_effects(8, "main effects for address of expression\n", lme_endptr);
+      le = gen_nconc(le, lme_endptr);
+      le = gen_nconc(le, le_endptr);
+    }
+  else
+    {
+      list lme_endptr = NIL;
+      list le_endptr = generic_proper_effects_of_complex_address_expression(endptr_exp, &lme_endptr, true);
+      pips_debug_effects(8, "main effects on second argument\n", lme_endptr);
+
+      FOREACH(EFFECT, me, lme_endptr)
+	{
+	  /* there is a read effect on the main pointer */
+	  effect me_dup = (*effect_dup_func)(me);
+	  effect_to_read_effect(me_dup);
+	  le = gen_nconc(le, effect_to_list(me_dup));
+	  effect_add_dereferencing_dimension(me);
+	  effect_to_may_effect(me); /* well, if its a NULL pointer, it is not assigned, but we don't know it */
+	}
+      pips_debug_effects(8, "main effects after adding dereferencing dimension\n", lme_endptr);
+      le = gen_nconc(le, lme_endptr);
+      le = gen_nconc(le, le_endptr);
+    }
+  /* the third expression is solely read */
+  le = gen_nconc(le, generic_proper_effects_of_expression(base_exp));
+
+  pips_debug_effects(8,"final_effects:", le);
   return le;
 }
