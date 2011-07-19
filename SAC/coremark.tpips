@@ -25,8 +25,12 @@ echo
 echo simdized code
 echo
 
-display PRINTED_FILE
+setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[matrix_mul_matrix]
 
+close
+quit
 apply UNSPLIT
 
 #shell cc $WS.c include/SIMD.c -o $WS.database/Tmp/ref
