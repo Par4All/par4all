@@ -560,12 +560,12 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   /* ISO 6.5.17 comma operator */
   {COMMA_OPERATOR_NAME,                    no_write_effects},
-  
+
   {BREAK_FUNCTION_NAME,                    no_write_effects},
   {CASE_FUNCTION_NAME,                     no_write_effects},
   {DEFAULT_FUNCTION_NAME,                  no_write_effects},
   {C_RETURN_FUNCTION_NAME,                 no_write_effects},
- 
+
   /* intrinsic to handle C initialization */
 
   {BRACE_INTRINSIC,                        no_write_effects},
@@ -577,7 +577,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   {ASSERT_FUNCTION_NAME,                   no_write_effects},
   {ASSERT_FAIL_FUNCTION_NAME,              no_write_effects}, /* in fact, IO effect, does not return */
-  
+
   /* #include <complex.h> */
   {CACOS_OPERATOR_NAME,                    no_write_effects},
   {CACOSF_OPERATOR_NAME,                   no_write_effects},
@@ -585,7 +585,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {CASIN_OPERATOR_NAME,                    no_write_effects},
   {CASINF_OPERATOR_NAME,                   no_write_effects},
   {CASINL_OPERATOR_NAME,                   no_write_effects},
-  {CATAN_OPERATOR_NAME,                    no_write_effects}, 
+  {CATAN_OPERATOR_NAME,                    no_write_effects},
   {CATANF_OPERATOR_NAME,                   no_write_effects},
   {CATANL_OPERATOR_NAME,                   no_write_effects},
   {C_CCOS_OPERATOR_NAME,                   no_write_effects},
@@ -664,9 +664,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ISXDIGIT_OPERATOR_NAME,                 no_write_effects},
   {TOLOWER_OPERATOR_NAME,                  no_write_effects},
   {TOUPPER_OPERATOR_NAME,                  no_write_effects},
- 
+
   /* errno.h */
-  // MB: errno is usually an extern int variable, but *errno() is allowed (ISO section 7.5 in C99)  
+  // MB: errno is usually an extern int variable, but *errno() is allowed (ISO section 7.5 in C99)
   {"errno",                                no_write_effects},
 
   /* fenv.h */
@@ -681,7 +681,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   // {FESETENV_FUNCTION_NAME,                 no_write_effects},
   //{FEUPDATEENV_FUNCTION_NAME,              no_write_effects},
 
-  
+
   /* inttypes.h */
   {IMAXABS_FUNCTION_NAME,                  no_write_effects},
   {IMAXDIV_FUNCTION_NAME,                  no_write_effects},
@@ -706,7 +706,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ASINL_OPERATOR_NAME,                    no_write_effects},
   {C_ATAN_OPERATOR_NAME,                   no_write_effects},
   {ATANF_OPERATOR_NAME,                    no_write_effects},
-  {ATANL_OPERATOR_NAME,                    no_write_effects},  
+  {ATANL_OPERATOR_NAME,                    no_write_effects},
   {C_ATAN2_OPERATOR_NAME,                  no_write_effects},
   {ATAN2F_OPERATOR_NAME,                   no_write_effects},
   {ATAN2L_OPERATOR_NAME,                   no_write_effects},
@@ -776,9 +776,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {SCALBNF_OPERATOR_NAME,                  no_write_effects},
   {SCALBNL_OPERATOR_NAME,                  no_write_effects},
   {SCALB_OPERATOR_NAME,                    no_write_effects}, /* POSIX.1-2001, The scalb function is the BSD name for ldexp */
-  {SCALBLN_OPERATOR_NAME,                  no_write_effects},  
-  {SCALBLNF_OPERATOR_NAME,                 no_write_effects}, 
-  {SCALBLNL_OPERATOR_NAME,                 no_write_effects}, 
+  {SCALBLN_OPERATOR_NAME,                  no_write_effects},
+  {SCALBLNF_OPERATOR_NAME,                 no_write_effects},
+  {SCALBLNL_OPERATOR_NAME,                 no_write_effects},
   {CBRT_OPERATOR_NAME,                     no_write_effects},
   {CBRTF_OPERATOR_NAME,                    no_write_effects},
   {CBRTL_OPERATOR_NAME,                    no_write_effects},
@@ -876,13 +876,13 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
 
   /*#include <setjmp.h>*/
-  
+
   {"setjmp",                               no_write_effects},
   {"__setjmp",                             no_write_effects},
   {"longjmp",                              no_write_effects}, // control effect 7.13 in C99
   {"__longjmp",                            no_write_effects},
-  {"sigsetjmp",                            no_write_effects}, //POSIX.1-2001 
-  {"siglongjmp",                           no_write_effects}, //POSIX.1-2001 
+  {"sigsetjmp",                            no_write_effects}, //POSIX.1-2001
+  {"siglongjmp",                           no_write_effects}, //POSIX.1-2001
 
 
   /* signal.h 7.14 */
@@ -930,7 +930,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {VSNPRINTF_FUNCTION_NAME,                c_io_effects},
   {VSPRINTF_FUNCTION_NAME,                 c_io_effects},
   {VSSCANF_FUNCTION_NAME,                  c_io_effects},
-  {ISOC99_VSSCANF_FUNCTION_NAME,           c_io_effects}, 
+  {ISOC99_VSSCANF_FUNCTION_NAME,           c_io_effects},
   {FGETC_FUNCTION_NAME,                    c_io_effects},
   {FGETS_FUNCTION_NAME,                    c_io_effects},
   {FPUTC_FUNCTION_NAME,                    c_io_effects},
@@ -1019,7 +1019,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {STRTOK_FUNCTION_NAME,                   no_write_effects},
   {MEMSET_FUNCTION_NAME,                   generic_string_effects},
   {STRERROR_FUNCTION_NAME,                 no_write_effects},
-  {STRERROR_R_FUNCTION_NAME,               no_write_effects}, 
+  {STRERROR_R_FUNCTION_NAME,               no_write_effects},
   {STRLEN_FUNCTION_NAME,                   no_write_effects},
 
   /*#include <time.h>*/
@@ -1039,29 +1039,29 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ISWALPHA_OPERATOR_NAME,                 no_write_effects},
   {ISWBLANK_OPERATOR_NAME,                 no_write_effects},
   {ISWCNTRL_OPERATOR_NAME,                 no_write_effects},
-  {ISWDIGIT_OPERATOR_NAME,                 no_write_effects}, 
-  {ISWGRAPH_OPERATOR_NAME,                 no_write_effects}, 
-  {ISWLOWER_OPERATOR_NAME,                 no_write_effects}, 
-  {ISWPRINT_OPERATOR_NAME,                 no_write_effects}, 
-  {ISWPUNCT_OPERATOR_NAME,                 no_write_effects}, 
-  {ISWSPACE_OPERATOR_NAME,                 no_write_effects}, 
-  {ISWUPPER_OPERATOR_NAME,                 no_write_effects}, 
+  {ISWDIGIT_OPERATOR_NAME,                 no_write_effects},
+  {ISWGRAPH_OPERATOR_NAME,                 no_write_effects},
+  {ISWLOWER_OPERATOR_NAME,                 no_write_effects},
+  {ISWPRINT_OPERATOR_NAME,                 no_write_effects},
+  {ISWPUNCT_OPERATOR_NAME,                 no_write_effects},
+  {ISWSPACE_OPERATOR_NAME,                 no_write_effects},
+  {ISWUPPER_OPERATOR_NAME,                 no_write_effects},
   {ISWXDIGIT_OPERATOR_NAME,                no_write_effects},
-  {ISWCTYPE_OPERATOR_NAME,                 no_write_effects}, 
-  {WCTYPE_OPERATOR_NAME,                   no_write_effects}, 
-  {TOWLOWER_OPERATOR_NAME,                 no_write_effects}, 
-  {TOWUPPER_OPERATOR_NAME,                 no_write_effects},  
+  {ISWCTYPE_OPERATOR_NAME,                 no_write_effects},
+  {WCTYPE_OPERATOR_NAME,                   no_write_effects},
+  {TOWLOWER_OPERATOR_NAME,                 no_write_effects},
+  {TOWUPPER_OPERATOR_NAME,                 no_write_effects},
   {TOWCTRANS_OPERATOR_NAME,                no_write_effects},
   {WCTRANS_OPERATOR_NAME,                  no_write_effects},
 
 
 
   //not found in standard C99 (in GNU C Library)
-  {ISASCII_OPERATOR_NAME,                  no_write_effects}, //This function is a BSD extension and is also an SVID extension. 
-  {TOASCII_OPERATOR_NAME,                  no_write_effects}, //This function is a BSD extension and is also an SVID extension. 
+  {ISASCII_OPERATOR_NAME,                  no_write_effects}, //This function is a BSD extension and is also an SVID extension.
+  {TOASCII_OPERATOR_NAME,                  no_write_effects}, //This function is a BSD extension and is also an SVID extension.
   {_TOLOWER_OPERATOR_NAME,                 no_write_effects}, //This function is provided for compatibility with the SVID
   {_TOUPPER_OPERATOR_NAME,                 no_write_effects}, //This function is provided for compatibility with the SVID
-  
+
   /* Part of the binary standard */
   {CTYPE_B_LOC_OPERATOR_NAME,              no_write_effects},
 
@@ -1069,14 +1069,14 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   {"__flt_rounds",                         no_write_effects},
 
-  {"_sysconf",                             no_write_effects}, 
+  {"_sysconf",                             no_write_effects},
   {"wdinit",                               no_write_effects},
   {"wdchkind",                             no_write_effects},
   {"wdbindf",                              no_write_effects},
   {"wddelim",                              no_write_effects},
   {"mcfiller",                             no_write_effects},
   {"mcwrap",                               no_write_effects},
- 
+
   //GNU C Library
   {"dcgettext",                            no_write_effects},
   {"dgettext",                             no_write_effects},
@@ -1114,7 +1114,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
 
   /* Random number generators in stdlib.h Conforming to SVr4, POSIX.1-2001 but not in C99 */
-  
+
   {RANDOM_FUNCTION_NAME,                   rgs_effects},
   {SRANDOM_FUNCTION_NAME,                  rgsi_effects},
   {DRAND48_FUNCTION_NAME,                  rgs_effects},
@@ -1940,30 +1940,30 @@ static list c_io_effects(entity e, list args)
 /*
   @brief handles several C intrinsics from string.h.
  */
-static list 
+static list
 generic_string_effects(entity e, list args)
 {
   list le = NIL;
- 
+
   pips_debug(5, "begin\n");
 
-  // first read effects for the evaluation of arguments 
+  // first read effects for the evaluation of arguments
   le = generic_proper_effects_of_expressions(args);
 
   // then effects on special entities for memmove intrinsic
   if (strcmp(entity_user_name(e),"memmove")==0)
-    { 
+    {
       le = gen_nconc(le,memmove_effects(e, args));
     }
 
   // finally write effects on some elements of first argument depending on third argument
   // if the main effect is not on a char *, or if we don't know the number of copied elements,
-  // we generate may effects on all reachable paths 
+  // we generate may effects on all reachable paths
   // from the main effect, without going through pointers.
 
   expression arg1 = EXPRESSION(CAR(args));
 
-  if (expression_call_p(arg1) 
+  if (expression_call_p(arg1)
       && call_constant_p(expression_call(arg1)))
     {
       pips_user_error("constant expression as first argument not allowed "
