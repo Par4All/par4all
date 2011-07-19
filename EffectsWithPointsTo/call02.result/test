@@ -154,8 +154,9 @@ int main()
 //             <    is written>: sp
    tf_t *sp = &s;
 //             <may be read   >: ap[*]
-//             <may be written>: x[*]
+//             <may be written>: ap[0] s.two[*] x[*]
 //             <    is read   >: a b sp
+//             <    is written>: s.one
 
    call02(a, b, x, ap, sp);
 }

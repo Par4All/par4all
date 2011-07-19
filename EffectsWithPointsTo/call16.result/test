@@ -109,7 +109,8 @@ void dotprod(int *a, int *b, int *c)
    int i;
 //             <    is written>: i
    for(i = 0; i <= 999999; i += 1)
-//             <may be read   >: _a_4[*] _b_5[*]
+//             <may be read   >: _b_5[*] _c_6[*]
+//             <may be written>: _a_4[*]
 //             <    is read   >: a b c i
       call16(i, a, b, c);
    
@@ -119,5 +120,7 @@ void dotprod(int *a, int *b, int *c)
 
  *********************** Use-Def Chains *********************
 
+	11 --> 11 with conflicts
+		from <_a_4[*]-W-MAY> to <_a_4[*]-W-MAY>
 
 ****************** End of Dependence Graph ******************

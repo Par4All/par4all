@@ -374,3 +374,89 @@ int nrerror(char *f1)
 
 PROPER  EFFECTS WITH POINTS TO
 
+byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
+{
+   int height, width, gris;
+   byte **m;
+   FILE *file;
+   char *buffer;
+   int i;
+//             <    is written>: buffer
+
+   buffer = (char *) calloc(80, sizeof(char));
+//             <may be read   >: _filename_1[*] __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is read   >: filename
+//             <    is written>: file
+   file = fopen(filename, "rb");
+//             <    is read   >: file
+   if (file==(void *) 0)
+      nrerror("ouverture du fichier impossible\n");
+//             <    is read   >: buffer
+   
+   // The code synthesis fails because of type_supporting_entities() which explodes the stack
+   //readitem(file, buffer);
+   if (strcmp(buffer, "P5")!=0)
+      nrerror("entete du fichier %s invalide\n");
+//             <    is read   >: nrl
+//             <    is written>: _nrl_2[0]
+   
+   //width  = atoi(readitem(file, buffer));
+   //height = atoi(readitem(file, buffer));
+   //gris   = atoi(readitem(file, buffer));
+   
+   *nrl = 0;
+//             <    is read   >: height nrh
+//             <    is written>: _nrh_3[0]
+   *nrh = height-1;
+//             <    is read   >: ncl
+//             <    is written>: _ncl_4[0]
+   *ncl = 0;
+//             <    is read   >: nch width
+//             <    is written>: _nch_5[0]
+   *nch = width-1;
+//             <    is read   >: _nch_5[0] _ncl_4[0] _nrh_3[0] 
+//                               _nrl_2[0] nch ncl nrh nrl
+//             <    is written>: m
+   m = bmatrix(*nrl, *nrh, *ncl, *nch);
+//             <    is read   >: height
+//             <    is written>: i
+
+   for(i = 0; i <= height-1; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+      ReadPGMrow(file, width, m[i]);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+
+   fclose(file);
+//             <    is read   >: buffer _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(buffer);
+//             <    is read   >: m
+
+   return m;
+}
+void ReadPGMrow(FILE *file, int width, byte *line)
+{
+//             <may be read   >: _file_6[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: _file_6[0] _line_7[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: file width
+   fread(&line[0], sizeof(byte), width, file);
+}
+int bmatrix(int f1, int f2, int f3, int f4)
+{
+}
+int nrerror(char *f1)
+{
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

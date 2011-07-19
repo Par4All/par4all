@@ -95,7 +95,8 @@ int main(int argc, char **argv)
 {
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: argc argv stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: _argv_2[1] argc argv stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: size __IO_EFFECTS:LUNS[1]
    long long int size = get_result(argc, argv);
 //             <    is read   >: size
