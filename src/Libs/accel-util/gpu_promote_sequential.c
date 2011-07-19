@@ -61,7 +61,7 @@ static statement promote_statement(list promoted_stmts, loop l) {
                                              make_basic(is_basic_int, (void *) 4));
   statement promoted = make_new_loop_statement(loop_idx,
                                                int_to_expression(0),
-                                               int_to_expression(1),
+                                               int_to_expression(0),
                                                int_to_expression(1),
                                                make_block_statement(promoted_stmts),
                                                make_execution_parallel());
