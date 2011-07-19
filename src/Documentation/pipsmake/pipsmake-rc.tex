@@ -11986,8 +11986,11 @@ to build the module value basis.
 This is intended to be used with PIPS IR Navigator (tm).
 
 \begin{PipsPass}{html_prettyprint}
-Produce a html version of the internal represenation of a PIPS Module
+Produce a html version of the internal representation of a PIPS Module. 
+The property \PipsPropRef{HTML_PRETTYPRINT_SYMBOL_TABLE} control whether the 
+symbol table should be included in the output.
 \end{PipsPass}
+
 
 \begin{PipsMake}
 html_prettyprint > MODULE.html_ir_file
@@ -11996,7 +11999,8 @@ html_prettyprint > MODULE.html_ir_file
 \end{PipsMake}
 
 \begin{PipsPass}{html_prettyprint_symbol_table}
-Produce a html version of the symbol table
+Produce a html version of the symbol table, it's module-independent, it'll 
+produce the same output for each module (the symbol table is global/unique).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -12005,8 +12009,11 @@ html_prettyprint_symbol_table > PROGRAM.html_ir_file
          < MODULE.code
 \end{PipsMake}
 
-The latter is module-independant, it'll produce the same output for each module
-(the symbol table is global/unique).
+
+
+\begin{PipsProp}{HTML_PRETTYPRINT_SYMBOL_TABLE}
+HTML_PRETTYPRINT_SYMBOL_TABLE FALSE
+\end{PipsProp}
 
 
 \subsection{Menu for Sequential Views}
