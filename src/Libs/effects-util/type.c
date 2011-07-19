@@ -394,8 +394,8 @@ bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(t
 {
 
   pips_debug(8,"real_ct : %s \t formal_ct: %s\n",
-	     type_to_string(real_ct),
-	     type_to_string(formal_ct));
+	     words_to_string(words_type(real_ct, NIL)),
+	     words_to_string(words_type(formal_ct,NIL)));
 
   bool result = false; /* safe default result */
   /* easiest case */
@@ -464,16 +464,38 @@ bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(t
 		    if (basic_pointer_p(real_b) && gen_length(real_dims) == 0)
 		      {
 			real_ct = basic_pointer(real_b);
-			real_b = variable_basic(type_variable(real_ct));
-			real_dims = variable_dimensions(type_variable(real_ct));
-			formal_dims = CDR(formal_dims); /* we are sure here that gen_length(formal_dims) != 0*/
+			if (type_void_p(real_ct))
+			  {
+			    /* we have a void * as actual argument */
+			    /* translation cannot be accurate */
+			    finished = true;
+			  }
+			else if (type_variable_p(real_ct))
+			  {
+			    real_b = variable_basic(type_variable(real_ct));
+			    real_dims = variable_dimensions(type_variable(real_ct));
+			    formal_dims = CDR(formal_dims); /* we are sure here that gen_length(formal_dims) != 0*/
+			  }
+			else
+			  finished = true;
 		      }
 		    else if (basic_pointer_p(formal_b) && gen_length(formal_dims) == 0)
 		      {
 			formal_ct = basic_pointer(formal_b);
-			formal_b = variable_basic(type_variable(formal_ct));
-			formal_dims = variable_dimensions(type_variable(formal_ct));
-			real_dims = CDR(real_dims); /* we are sure here that gen_length(real_dims) != 0*/
+			if (type_void_p(formal_ct))
+			  {
+			    /* we have a void * as actual argument */
+			    /* translation cannot be accurate */
+			    finished = true;
+			  }
+			else if (type_variable_p(formal_ct))
+			  {
+			    formal_b = variable_basic(type_variable(formal_ct));
+			    formal_dims = variable_dimensions(type_variable(formal_ct));
+			    real_dims = CDR(real_dims); /* we are sure here that gen_length(real_dims) != 0*/
+			  }
+			else
+			  finished = true;
 		      }
 		    else
 		      finished = true;
