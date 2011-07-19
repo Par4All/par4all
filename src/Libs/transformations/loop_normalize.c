@@ -141,6 +141,13 @@ void loop_normalize_statement(statement s) {
     if (normal_loop_p(l) && !get_bool_property("LOOP_NORMALIZE_ONE_INCREMENT"))
       return;
 
+    /* Do not normalize sequential loops if we ask for: */
+    if (loop_sequential_p(l) && get_bool_property("LOOP_NORMALIZE_PARALLEL_LOOPS_ONLY")) {
+      pips_debug(2,"Do not normalize this loop because it's sequential and "
+                 "we asked to normalize only parallel loops\n");
+      return;
+    }
+
     // Get the new lower bound of the loop:
     int new_lb = get_int_property("LOOP_NORMALIZE_LOWER_BOUND");
 

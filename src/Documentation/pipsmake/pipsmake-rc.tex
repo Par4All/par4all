@@ -8264,6 +8264,10 @@ SYMBOLIC_TILING_FORCE FALSE
 The loop normalization consists in transforming all the loops of a given
 module into a normal form. In this normal form, the lower bound and the
 increment are equal to one (1).
+
+Property \PipsPropRef{LOOP_NORMALIZE_PARALLEL_LOOPS_ONLY} control whether we 
+want to normalize only parallel loops or all loops.
+
 \end{PipsPass}
 
 If we note the initial DO loop as:
@@ -8320,6 +8324,12 @@ following property.
 \begin{PipsProp}{LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT}
 LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT FALSE
 \end{PipsProp}
+
+
+\begin{PipsProp}{LOOP_NORMALIZE_PARALLEL_LOOPS_ONLY}
+ LOOP_NORMALIZE_PARALLEL_LOOPS_ONLY FALSE
+\end{PipsProp}
+
 
 
 \subsection{Guard Elimination and Loop Transformations}
