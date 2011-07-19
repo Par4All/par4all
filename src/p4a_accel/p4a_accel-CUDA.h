@@ -88,6 +88,11 @@ static inline void checkErrorMessageInline(const char *errorMessage, const char 
 #define P4A_CUDA_THREAD_MAX 512
 #endif
 
+#ifndef P4A_CUDA_MIN_BLOCKS
+/** The minimum number of blocks */
+#define P4A_CUDA_MIN_BLOCKS 32
+#endif
+
 #ifndef P4A_CUDA_THREAD_PER_BLOCK_IN_1D
 /** There is a maximum of P4A_CUDA_THREAD_MAX threads per block. Use
     them. May cause some trouble if too many resources per thread are
@@ -441,10 +446,13 @@ void P4A_copy_to_accel_3d(size_t element_size,
 					 block_descriptor_name,		\
 					 size)				\
   /* Define the number of thread per block: */				\
+  int tpb = P4A_min(P4A_CUDA_THREAD_PER_BLOCK_IN_1D,size/P4A_CUDA_MIN_BLOCKS); \
+  tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
+  tpb = P4A_max(tpb,32); \
   dim3 block_descriptor_name(P4A_min((int) size,			\
-				     (int) P4A_CUDA_THREAD_PER_BLOCK_IN_1D)); \
+				     (int)tpb )); \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  dim3 grid_descriptor_name((((int)size) + P4A_CUDA_THREAD_PER_BLOCK_IN_1D - 1)/P4A_CUDA_THREAD_PER_BLOCK_IN_1D); \
+  dim3 grid_descriptor_name((((int)size) + tpb - 1)/tpb); \
   P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
   P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
@@ -467,10 +475,12 @@ void P4A_copy_to_accel_3d(size_t element_size,
   else {								\
     /* Allocate a maximum of threads alog X axis (the warp dimension) for \
        better average efficiency: */					\
+    int tpb = P4A_min(P4A_CUDA_THREAD_MAX,(n_x_iter)*(n_y_iter)/P4A_CUDA_MIN_BLOCKS); \
+    tpb = P4A_max(tpb,32); \
     p4a_block_x = P4A_min((int) n_x_iter,				\
-                          (int) P4A_CUDA_THREAD_MAX);			\
+                          (int) tpb);			\
     p4a_block_y = P4A_min((int) n_y_iter,				\
-                          P4A_CUDA_THREAD_MAX/p4a_block_x);		\
+                          tpb/p4a_block_x);		\
   }									\
   dim3 block_descriptor_name(p4a_block_x, p4a_block_y);			\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
