@@ -85,9 +85,8 @@ static bool privatizable(entity e)
     */
 
     return( entity_scalar_p( e ) &&
-            storage_ram_p( s ) &&
-            //value_unknown_p(entity_initial(e)) &&
-            dynamic_area_p( ram_section( storage_ram( s )))) ;
+            ((storage_formal_p( s ) && parameter_passing_by_value_p(get_current_module_entity()) )||
+                (storage_ram_p( s ) && dynamic_area_p( ram_section( storage_ram( s )))))) ;
 }
 
 /* SCAN_STATEMENT gathers the list of enclosing LOOPS of statement S.
