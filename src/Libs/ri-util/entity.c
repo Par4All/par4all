@@ -1842,11 +1842,13 @@ void update_dummy_parameter(parameter p, entity ep)
 bool parameter_passing_mode_p(entity f, int tag)
 {
   type ft = ultimate_type(entity_type(f));
-  functional ftf = type_functional(ft);
-  bool mode_p = true;
 
   /* Calls thru pointers require syntax_application */
   pips_assert("call to a function", type_functional_p(ft));
+
+  functional ftf = type_functional(ft);
+  bool mode_p = true;
+
 
   if(!ENDP(functional_parameters(ftf))) {
     /* It is assumed that all parameters are passed the same way,
