@@ -5,8 +5,7 @@ int main()
 {
    char *end;
    long int li;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: end li
 
    li = strtol("32445667 is a number", &end, 0);
    return 0;
@@ -47,8 +46,7 @@ int main()
 {
    char *end;
    long int li;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: end li
 
    li = strtol("32445667 is a number", &end, 0);
    return 0;
