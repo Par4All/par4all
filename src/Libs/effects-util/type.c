@@ -4,7 +4,7 @@
 
   Copyright 1989-2010 MINES ParisTech
   Copyright 2009-2010 HPC Project
-  
+
 
   This file is part of PIPS.
 
@@ -39,7 +39,7 @@
 #include "effects-util.h"
 #include "misc.h"
 #include "text-util.h"
- 
+
 /***************************************/
 
 /**
@@ -63,7 +63,7 @@ entity effect_field_dimension_entity(expression exp, list l_fields)
 /**
    @brief recursively walks thru current_l_ind and current_type in parallel until a pointer dimension is found.
    @param current_l_ind is a list of effect reference indices.
-   @param current_type is the corresponding type in the original entity type arborescence 
+   @param current_type is the corresponding type in the original entity type arborescence
    @param exact_p is a pointer to a bool, which is set to true if the result is not an approximation.
    @return -1 if no index corresponds to a pointer dimension in current_l_ind, the rank of the least index that may correspond to
       a pointer dimension in current_l_ind otherwise. If this information is exact, *exact_p is set to true.
@@ -78,7 +78,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
   pips_debug(8, "current_basic : %s, and number of dimensions %d\n", basic_to_string(current_basic), (int) current_nb_dim);
 
   pips_assert("there should be no store effect on variable names\n", gen_length(current_l_ind) >= current_nb_dim);
-  
+
 
   switch (basic_tag(current_basic))
     {
@@ -140,7 +140,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 		  {
 		    current_type = basic_concrete_type(entity_type(current_field_entity));
 		    result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
-		    if (result >=0) result++; // do not forget the field index ! 
+		    if (result >=0) result++; // do not forget the field index !
 		    free_type(current_type);
 		  }
 	      }
@@ -154,10 +154,10 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 	break;
       }
     }
-  
+
   pips_debug(8, "returning %d\n", result);
   return result;
-  
+
 }
 
 
@@ -176,7 +176,7 @@ static int effect_reference_first_pointer_dimension_rank(reference ref, bool *ex
   int result;
 
   pips_debug(8, "input reference : %s\n", words_to_string(effect_words_reference(ref)));
- 
+
   if (!type_variable_p(ent_type))
     {
       result = -1;
@@ -259,7 +259,7 @@ static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
   basic current_basic = variable_basic(type_variable(current_type)); /* current basic */
   list l_current_dim = variable_dimensions(type_variable(current_type)); /* current type array dimensions */
   size_t current_nb_dim = gen_length(l_current_dim);
-     
+
   pips_debug(8, "input type : %s\n", type_to_string(current_type));
   pips_debug(8, "current_basic : %s, and number of dimensions %d\n", basic_to_string(current_basic), (int) current_nb_dim);
 
@@ -268,7 +268,7 @@ static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
 
  /*first skip array dimensions if any*/
   for(int i=0; i< (int) current_nb_dim; i++, POP(ref_l_ind));
-  
+
   if (ENDP(ref_l_ind)) /* We have reached the current basic */
     {
       /* Warning : qualifiers are set to NIL, because I do not see
@@ -279,7 +279,7 @@ static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
   else
     {
       /* The cell reference contains indices that go beyond the current type array dimensions.
-         This can happen if and only if the current basic is a pointer or a derived 
+         This can happen if and only if the current basic is a pointer or a derived
          (typedef have been eliminated by the use of basic_concrete_type).
       */
       switch (basic_tag(current_basic))
@@ -383,4 +383,162 @@ type cell_to_type(cell c)
   reference ref = cell_reference_p(c)? cell_reference(c) : preference_reference(cell_preference(c));
 
   return cell_reference_to_type(ref);
+}
+
+/**
+    tests if the actual argument type and the formal argument type are compatible
+    with the current state of the interprocedural translation algorithms. Input types
+    are @see basic_concrete_type .
+ */
+bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(type real_ct, type formal_ct)
+{
+
+  pips_debug(8,"real_ct : %s \t formal_ct: %s\n",
+	     type_to_string(real_ct),
+	     type_to_string(formal_ct));
+
+  bool result = false; /* safe default result */
+  /* easiest case */
+  if (real_ct == formal_ct)
+    {
+      pips_debug(8, "types are equal\n");
+      result = true;
+    }
+
+  else if (type_tag(real_ct) != type_tag(formal_ct))
+    {
+      pips_debug(8, "not same type tags\n");
+      result = false;
+    }
+
+  else
+    {
+      switch(type_tag(real_ct))
+	{
+	case is_type_void:
+	  result = true;
+	  break;
+	case is_type_variable:
+	  {
+	    pips_debug(8, "variable case\n");
+	    basic real_b = variable_basic(type_variable(real_ct));
+	    list real_dims = variable_dimensions(type_variable(real_ct));
+	    basic formal_b = variable_basic(type_variable(formal_ct));
+	    list formal_dims = variable_dimensions(type_variable(formal_ct));
+
+	    bool finished = false;
+	    /* we do not take care of array dimension sizes */
+	    while (! finished)
+	      {
+		if (gen_length(real_dims) == gen_length(formal_dims))
+		  {
+		    /* well, basic_equal_strict_p is at the same time too restrictive
+		       for derived and too optimistic for pointers and arrays because
+		       dimensions are skipped
+		    */
+		    if (basic_pointer_p(real_b) && basic_pointer_p(formal_b))
+		      {
+			pips_debug(8, "pointer case\n");
+			result =
+			  basic_concrete_types_compatible_for_effects_interprocedural_translation_p
+			  (basic_pointer(real_b), basic_pointer(formal_b));
+		      }
+		    else if (basic_derived_p(real_b) && basic_derived_p(formal_b))
+		      {
+			pips_debug(8, "derived case, real: %s, formal: %s\n",
+				   entity_name(basic_derived(real_b)),
+				   entity_name(basic_derived(formal_b)));
+			/* use entity user name (see #548 for more details) */
+			result = same_string_p(entity_user_name(basic_derived(real_b)),
+					       entity_user_name(basic_derived(formal_b)));
+		      }
+		    else
+		      result = basic_equal_strict_p(real_b, formal_b);
+		    finished = true;
+		  }
+		else
+		  {
+		    /* skip same number of array and pointer dimensions until we reach the
+		       ultimate basic or there are no more corresponding dimensions
+		    */
+		    if (basic_pointer_p(real_b) && gen_length(real_dims) == 0)
+		      {
+			real_ct = basic_pointer(real_b);
+			real_b = variable_basic(type_variable(real_ct));
+			real_dims = variable_dimensions(type_variable(real_ct));
+			formal_dims = CDR(formal_dims); /* we are sure here that gen_length(formal_dims) != 0*/
+		      }
+		    else if (basic_pointer_p(formal_b) && gen_length(formal_dims) == 0)
+		      {
+			formal_ct = basic_pointer(formal_b);
+			formal_b = variable_basic(type_variable(formal_ct));
+			formal_dims = variable_dimensions(type_variable(formal_ct));
+			real_dims = CDR(real_dims); /* we are sure here that gen_length(real_dims) != 0*/
+		      }
+		    else
+		      finished = true;
+		  }
+	      }
+	  }
+	  break;
+	case is_type_struct:
+	case is_type_union:
+	case is_type_enum:
+	  pips_debug(8, "struct, union or enum case\n");
+	  list real_fields = type_fields(real_ct);
+	  list formal_fields = type_fields(formal_ct);
+	  bool finished = false;
+	  result = true;
+	  while(!finished && !ENDP(real_fields) && !ENDP(formal_fields))
+	    {
+	      pips_debug(8, "fields, real: %s, formal: %s\n",
+			 entity_name(ENTITY(CAR(real_fields))),
+			 entity_name(ENTITY(CAR(formal_fields))));
+	      if (!same_entity_p(ENTITY(CAR(real_fields)),
+				 ENTITY(CAR(formal_fields))))
+		{
+		  result = false;
+		  finished = true;
+		}
+	      POP(real_fields);
+	      POP(formal_fields);
+	    }
+	  result = result && ENDP(real_fields) && ENDP(formal_fields);
+	  break;
+	case is_type_functional:
+	  pips_debug(8, "functional case\n");
+	  result = false;
+	  break;
+	default:
+	  pips_internal_error("unexpected function argument type: %s\n", type_to_string(real_ct) );
+	}
+    }
+  pips_debug(8, "returning %s\n", result? "true":"false");
+  return result;
+}
+
+/**
+    tests if the actual argument type and the formal argument type are compatible
+    with the current state of the interprocedural translation algorithms.
+ */
+bool types_compatible_for_effects_interprocedural_translation_p(type real_arg_t, type formal_arg_t)
+{
+  bool result = false; /* safe default result */
+
+  if (real_arg_t == formal_arg_t)
+    result = true;
+  else
+    {
+      type real_arg_ct = basic_concrete_type(real_arg_t);
+      type formal_arg_ct = basic_concrete_type(formal_arg_t);
+
+      result =
+	basic_concrete_types_compatible_for_effects_interprocedural_translation_p
+	(real_arg_ct, formal_arg_ct);
+
+      free_type(real_arg_ct);
+      free_type(formal_arg_ct);
+    }
+
+  return result;
 }
