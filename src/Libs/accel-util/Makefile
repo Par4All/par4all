@@ -33,6 +33,7 @@ LIB_CFILES =group_constants.c \
 			terapixify.c \
 			constraints.c \
 			delay.c \
+			gpu_promote_sequential.c \
 			computation_intensity.c
 
 INC_TARGET =    $(TARGET).h

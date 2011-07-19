@@ -7650,6 +7650,18 @@ GPU_LOOP_NEST_ANNOTATE_PARALLEL TRUE
 \end{PipsProp}
 
 
+\begin{PipsPass}{gpu_promote_sequential}
+This phase promote sequential code in GPU kernels to avoid memory transfers.
+\end{PipsPass}
+
+\begin{PipsMake}
+gpu_promote_sequential	> MODULE.code
+		> PROGRAM.entities
+		< PROGRAM.entities
+		< MODULE.code
+\end{PipsMake}
+
+
 \subsection{Task generation for SCALOPES project}
 \label{subsubsection-scalopes-project}
 
