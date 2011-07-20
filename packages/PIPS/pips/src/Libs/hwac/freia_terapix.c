@@ -215,9 +215,18 @@ static int dag_terapix_measures
     FOREACH(dagvtx, v, lv)
     {
       const freia_api_t * api = dagvtx_freia_api(v);
-      dcost += api->terapix.cost;
+      if (freia_convolution_p(v)) // special handling...
+      {
+        _int w, h;
+        if (freia_convolution_width_height(v, &w, &h, false))
+          dcost += 8+(api->terapix.cost*w*h); // hmmm? 3x3 is 35?
+        else
+          dcost += 35; // au pif 3x3
+      }
+      else
+        dcost += api->terapix.cost;
       // only count non null operations
-      if (api->terapix.cost) dnops ++;
+      if (api->terapix.cost && api->terapix.cost!=-1) dnops ++;
       if (api->arg_img_out) level_width++;
       update_erosions(d, v, erosion);
     }
@@ -502,7 +511,7 @@ static void terapix_gram_management
         freia_convolution_width_height(v, &w, &h, true);
         gram_param(code, decl, name, v, hparams, w, h, true, used);
       }
-      else
+      else // threshold
         gram_param(code, decl, name, v, hparams, 3, 1, false, used);
       break;
     case 1: // kernel or operation with a constant
@@ -551,6 +560,8 @@ static void terapix_macro_code
     terapix_mcu_int(code, op, "ymin2", 0);
     terapix_mcu_img(code, op, "xmin3", out);
     terapix_mcu_int(code, op, "ymin3", 0);
+    // ??? needed for replace const... although arg 3 is used already
+    terapix_gram_management(code, decl, op, api, v, hparams, used);
     break;
   case 1:
     // alu: image op cst 1

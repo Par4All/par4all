@@ -1366,20 +1366,23 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	  } /* case is_syntax_call */
 	case is_syntax_cast :
 	  {
-	    /* Ignore the cast */
-	    //cast c = syntax_cast(real_s);
-	    bool read_p = false, write_p = false;
-	    pips_user_warning("Cast in actual parameter -> anywhere effect\n");
-	    FOREACH(EFFECT, eff, l_sum_eff)
+	    /* let us at least generate effects on all memory locations reachable from
+	       the cast expression
+	    */
+	    if (!ENDP(l_sum_eff))
 	      {
-		if(effect_write_p(eff)) write_p = true;
-		else read_p = false;
+		cast c = syntax_cast(real_s);
+		bool read_p = false, write_p = false;
+		FOREACH(EFFECT, eff, l_sum_eff)
+		  {
+		    if(effect_write_p(eff)) write_p = true;
+		    else read_p = false;
+		  }
+		tag t = write_p ? (read_p ? 'x' : 'w') : 'r';
+		l_eff = gen_nconc
+		  (l_eff,
+		   c_actual_argument_to_may_summary_effects(cast_expression(c), t));
 	      }
-
-	    if (write_p)
-	      l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL));
-	    if (read_p)
-	      l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_read_memory()), NIL));
 	    break;
 	  }
 	case is_syntax_sizeofexpression :

@@ -84,8 +84,7 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_subsat_0cst, alu_subsat_1cst, "SPOC_ALU_SUBSAT_IN0_CONST", T, T, F },
   { alu_subsat_1cst, alu_subsat_0cst, "SPOC_ALU_SUBSAT_IN1_CONST", T, F, T },
   // ABSSUB
-  { alu_abssub_01, alu_abssub_10, "SPOC_ALU_ABSSUB_IN0_IN1", F, T, T },
-  { alu_abssub_10, alu_abssub_01, "SPOC_ALU_ABSSUB_IN1_IN0", F, T, T },
+  { alu_abssub, alu_abssub, "SPOC_ALU_ABSSUB_IN0_IN1", F, T, T },
   { alu_abssub_0cst, alu_abssub_1cst, "SPOC_ALU_ABSSUB_IN0_CONST", T, T, F },
   { alu_abssub_1cst, alu_abssub_0cst, "SPOC_ALU_ABSSUB_IN1_CONST", T, F, T },
   // MUL
@@ -124,7 +123,10 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_not_0, alu_not_1, "SPOC_ALU_NOT_IN0", F, T, F },
   { alu_not_1, alu_not_0, "SPOC_ALU_NOT_IN1", F, F, T },
   // MISC
-  { alu_copy_cst, alu_copy_cst, "SPOC_ALU_COPY_CONST", T, F, F }
+  { alu_copy_cst, alu_copy_cst, "SPOC_ALU_COPY_CONST", T, F, F },
+  // hmmm, the input images are exchanged from AIPO to SPOC?
+  { alu_repcst_0, alu_repcst_1, "SPOC_ALU_REPLACE_IN1_IN0_CONST", T, T, T },
+  { alu_repcst_1, alu_repcst_0, "SPOC_ALU_REPLACE_IN0_IN1_CONST", T, T, T }
   // and so on?
 };
 
@@ -202,6 +204,8 @@ static void spoc_poc_conf
       sb_cat(body, "SPOC_POC_ERODE;\n");
     else if (poc.op==spoc_poc_dilate)
       sb_cat(body, "SPOC_POC_DILATE;\n");
+    else if (poc.op==spoc_poc_conv)
+      sb_cat(body, "SPOC_POC_CONV;\n");
     else
       pips_internal_error("unexpected poc operation %d", poc.op);
 
@@ -381,15 +385,20 @@ static void basic_spoc_conf
     sb_cat(body, "\n");
 }
 
+/* a data structure to describe a schedule for an operation
+ */
 typedef struct {
-  entity image;     // output
+  entity image;     // output of this operation
   dagvtx producer;  // possibly NULL on input and output
-  int stage;
+  int stage;        // stage of production
   spoc_hardware_type level;  // nope | input < poc < alu < threshold < measure
   int side;  // 0 or 1
   bool flip; // whether alu op is flipped
   bool used; // whether the image has been used by an output
   bool just_used; // idem but at this stage
+  // where this was used, to detect some particular cases?
+  int used_stage;
+  spoc_hardware_type used_level;
 }  op_schedule;
 
 static void init_op_schedule(op_schedule * op, dagvtx v, int side)
@@ -402,6 +411,8 @@ static void init_op_schedule(op_schedule * op, dagvtx v, int side)
   op->flip = false;
   op->used = false;
   op->just_used = false;
+  op->used_stage = -1; // never used
+  op->used_level = spoc_type_inp;
 }
 
 static int max_stage(const op_schedule * in0, const op_schedule * in1)
@@ -452,14 +463,15 @@ static bool image_is_needed(dagvtx prod, dag d, set todo)
 static void
 print_op_schedule(FILE * out, const string name, const op_schedule * op)
 {
-  fprintf(out, "sched '%s' = %s (%" _intFMT " %s) %d %s %d %s %sused\n",
+  fprintf(out, "sched '%s' = %s (%" _intFMT " %s) %d:%s:%d %s %sused (%d:%s)\n",
           name,
           op->image? entity_local_name(op->image): "NULL",
           dagvtx_number(op->producer),
           dagvtx_operation(op->producer),
           op->stage, what_operation(op->level), op->side,
           (op->level==spoc_type_alu)? (op->flip? "/": "."): "",
-          op->used? "": "not ");
+          op->used? "": "not ",
+          op->used_stage, what_operation(op->used_level));
 }
 
 static bool check_mux_availibity(hash_table wiring, int stage, int mux)
@@ -518,12 +530,16 @@ static int find_first_crossing(hash_table wiring, int stage, int level)
   return stage;
 }
 
-static void find_first_available_component
-  (hash_table wiring,
-   int start_stage, int level, int side, // starting point
-   int target_level,
-   bool crossing, // whether to include a crossing on the path...
-   int * pstage, int * pside)
+/* return the stage & side of the first component available
+ * after (start_stage, level, side) which is the source of the used image,
+ * for an operation of type target_level
+ */
+static void find_first_available_component(
+  hash_table wiring,
+  int start_stage, int level, int side, // image comes from
+  int target_level,
+  bool crossing, // whether to include a crossing on the path...
+  int * pstage, int * pside)
 {
   int stage = start_stage;
   int preferred, other;
@@ -619,6 +635,8 @@ where_to_perform_operation
   vtxcontent c = dagvtx_content(op);
   out->side = -100;
   out->used = false;
+  out->used_stage = -1;
+  out->used_level = spoc_type_inp;
   in0->just_used = false;
   in1->just_used = false;
 
@@ -701,7 +719,7 @@ where_to_perform_operation
     {
       entity dep = ENTITY(CAR(vtxcontent_inputs(c)));
       pips_assert("dependence is available",
-		  dep==in0->image || dep==in1->image);
+                  dep==in0->image || dep==in1->image);
       op_schedule * used, * notused;
 
       // where is the needed image? put it in used
@@ -803,14 +821,24 @@ where_to_perform_operation
 
       pips_assert("not a copy", level!=spoc_type_nop);
 
+      // ??? hmmm... an ALU used the operation???
       find_first_available_component
-        (wiring, used->stage, used->level, used->side,
+        (wiring,
+         // source (level may be shifted for ALU/morph issue, see freia_50
+         used->stage,
+         used->used_stage!=-1 &&
+         used->used_level==spoc_type_alu &&
+         level==spoc_type_poc? spoc_type_poc: used->level, used->side,
          level, used_image_still_needed && used->image!=notused->image,
          &out->stage, &out->side);
 
       // tell which image was used
       used->used = true;
       notused->used = false;
+
+      // record last use
+      used->used_stage = out->stage;
+      used->used_level = level;
       break;
     }
     case 2: // ALU
@@ -819,12 +847,18 @@ where_to_perform_operation
       if (!in0->image) *in0 = *in1;
       pips_assert("alu binary operation", level==spoc_type_alu);
       out->stage = max_stage(in0, in1);
+      // update input image status
       in0->used = true, in0->just_used = true;
       in1->used = true, in1->just_used = true;
       if (out->stage==in0->stage && in0->level >= spoc_type_alu)
         out->stage++;
       if (out->stage==in1->stage && in1->level >= spoc_type_alu)
         out->stage++;
+      // including where last used
+      in0->used_stage = out->stage;
+      in0->used_level = level;
+      in1->used_stage = out->stage;
+      in1->used_level = level;
       break;
     default:
       pips_internal_error("shoud not get there");
@@ -866,7 +900,7 @@ static void generate_wiring_stage
  hash_table wiring)
 {
   pips_assert("check sides",
-	      in_side>=-1 && in_side<=1 && out_side>=0 && out_side<=1);
+              in_side>=-1 && in_side<=1 && out_side>=0 && out_side<=1);
   pips_debug(7, "stage %d in %d -> out %d\n", stage, in_side, out_side);
   switch (in_side)
   {
@@ -910,14 +944,14 @@ static void generate_wiring
  hash_table wiring)
 {
   pips_debug(6, "%s [%d %s %d] -> [%d %s %d] %" _intFMT "\n",
-	     entity_local_name(in->image),
-	     in->stage, what_operation(in->level), in->side,
-	     out->stage, what_operation(out->level), out->side,
-	     dagvtx_number(out->producer));
+             entity_local_name(in->image),
+             in->stage, what_operation(in->level), in->side,
+             out->stage, what_operation(out->level), out->side,
+             dagvtx_number(out->producer));
 
   pips_assert("ordered schedule",
-	      (in->stage < out->stage) ||
-	      ((in->stage == out->stage) && (in->level <= out->level)));
+              (in->stage < out->stage) ||
+              ((in->stage == out->stage) && (in->level <= out->level)));
 
   // code comment...
   string
@@ -965,7 +999,7 @@ static void generate_wiring
       // out->level is after thr, so there is a side
       if (out->side!=-1)
         generate_wiring_stage(code, in->stage, -1, out->side, wiring);
-      // else: X alu -> W alu, possybly because it operation is a copy
+      // else: X alu -> W alu, possibly because it operation is a copy
       break;
     case spoc_type_thr:
     case spoc_type_mes:
@@ -1651,6 +1685,17 @@ static int poc_count_same_inputs(const dagvtx ref)
 }
 #endif
 
+/* ? = Morpho(I); ? = ALU(I, ?);
+ */
+static bool erode_alu_shared_p(vtxcontent c1, vtxcontent c2)
+{
+  return
+    vtxcontent_optype(c1)==spoc_type_poc &&
+    vtxcontent_optype(c2)==spoc_type_alu &&
+    gen_length(vtxcontent_inputs(c2))==2 &&
+    gen_in_list_p(ENTITY(CAR(vtxcontent_inputs(c1))), vtxcontent_inputs(c2));
+}
+
 /* comparison function for sorting dagvtx in qsort,
  * this is deep voodoo, because the priority has an impact on
  * correctness? that should not be the case as only computations
@@ -1690,6 +1735,11 @@ int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
       result = 1, why = "copy";
     else if (vtxcontent_optype(c2)==spoc_type_nop)
       result = -1, why = "copy";
+    // special morpho/alu case with a shared input image
+    else if (erode_alu_shared_p(c1, c2))
+      result = 1, why = "shared";
+    else if (erode_alu_shared_p(c2, c1))
+      result = -1, why = "shared";
   }
 
   if (result==0)
@@ -1869,12 +1919,26 @@ static int number_of_output_arcs(dag d, set vs)
   return n_arcs;
 }
 
+/* @return whether it is a 3x3 convolution
+ */
+static bool convolution_33(dagvtx v)
+{
+  if (freia_convolution_p(v)) {
+    _int w, h;
+    if (freia_convolution_width_height(v, &w, &h, false) && w==3 && h==3)
+      return true;
+  }
+  return false;
+}
+
 /* does this dag contains a spoc non implemented operation?
  */
 static bool dag_spoc_not_implemented(dag d)
 {
   FOREACH(dagvtx, v, dag_vertices(d))
-    if (dagvtx_optype(v)==spoc_type_sni)
+    if (dagvtx_optype(v)==spoc_type_sni ||
+        // special handling of convolution
+        (freia_convolution_p(v) && !convolution_33(v)))
       return true;
   return false;
 }
@@ -2012,7 +2076,9 @@ static list /* of dags */ split_dag(dag initial)
     dagvtx vok =
       first_which_may_be_added(dall, current, computables, sure, maybe);
 
-    if (vok && dagvtx_optype(vok)==spoc_type_sni && lcurrent)
+    if (vok && (dagvtx_optype(vok)==spoc_type_sni ||
+                (freia_convolution_p(vok) && !convolution_33(vok)))
+        && lcurrent)
       // extract non implemented nodes alone only!
       vok = NULL;
 
@@ -2029,7 +2095,8 @@ static list /* of dags */ split_dag(dag initial)
     // no stuff vertex can be added, or it was the last one,
     // or it is not implemented and thus to be extracted "alone"
     if (!vok || set_size(computed)==nvertices ||
-        (vok && dagvtx_optype(vok)==spoc_type_sni))
+        (vok && (dagvtx_optype(vok)==spoc_type_sni ||
+                 (freia_convolution_p(vok) && !convolution_33(vok)))))
     {
       // ifdebug(5)
       // set_fprint(stderr, "closing current", current, )

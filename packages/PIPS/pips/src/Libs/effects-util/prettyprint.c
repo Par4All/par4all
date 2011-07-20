@@ -149,6 +149,11 @@ list /* of string */ effect_words_reference(reference obj)
   return(pc);
 }
 
+string effect_reference_to_string(reference ref)
+{
+  return words_to_string(effect_words_reference(ref));
+}
+
 /************* CELL DESCRIPTORS */
 
 /* char * pips_region_user_name(entity ent)

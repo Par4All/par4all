@@ -15,6 +15,7 @@ libaccel_util_la_SOURCES=group_constants.c \
 			terapixify.c\
 			constraints.c\
 			delay.c\
+			gpu_promote_sequential.c \
 			computation_intensity.c
 
 include $(srcdir)/../pipslibs_includes.mk
