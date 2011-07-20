@@ -4,6 +4,8 @@
 #include <time.h>
 #include <sys/time.h>
 
+#include "timing.h"
+
 /* Timer code (gettimeofday). */
 static double t_start, t_end;
 
