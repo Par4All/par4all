@@ -3,10 +3,29 @@ Parsed printed file for "acosl01"
 
 int main()
 {
-   long double res = acosl(90.0l);
+   long double x = 90.0l;
+   long double res = acosl(x);
    printf("acosl(1.0l)=%Lf", res);
    return 0;
 }
 
 Cumulated effetcs for "acosl01"
 
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//             <    is written>: x
+   long double x = 90.0l;
+//             <    is read   >: x
+//             <    is written>: res
+   long double res = acosl(x);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: res stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("acosl(1.0l)=%Lf", res);
+   return 0;
+}
