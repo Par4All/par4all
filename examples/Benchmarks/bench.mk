@@ -37,6 +37,10 @@ LDFLAGS:= -lm
 P4A_FLAGS+= -p $(TARGET)_p4a -r
 NVCC_FLAGS+= --compiler-options "-O3"
 
+ifdef threads
+NVCC_FLAGS+= -DP4A_CUDA_THREAD_MAX=$(threads)
+endif
+
 ifdef debug
 CFLAGS+=-W -Wall -DP4A_DEBUG
 endif
