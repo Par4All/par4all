@@ -978,6 +978,15 @@ bool rand_effects_entity_p(entity e)
 		 strlen(entity_module_name(e))) == 0);
 }
 
+bool malloc_entity_p(entity e)
+{
+  return same_string_p(entity_local_name(e), MALLOC_EFFECTS_NAME);
+}
+
+bool effects_package_entity_p(entity e)
+{
+  return (strstr(entity_module_name(e), "_EFFECTS") != 0);
+}
 
 bool intrinsic_entity_p(entity e)
 {
