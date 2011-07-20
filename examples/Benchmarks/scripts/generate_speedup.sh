@@ -16,7 +16,9 @@ fi
 if [[ -z $versions ]]; then
 versions=`echo "select version from timing group by version;" | sqlite3 $dbfile`
 fi
-
+if [[ -z $ref_ver ]]; then
+ref_ver=run_seq
+fi
 
 nvers=0
 if [[ -z $tests ]]; then
@@ -44,7 +46,7 @@ nmean=0
 for test in $tests; do
   echo -n $test >> $out_dat
   # reference 
-  ref=`echo "select ROUND(AVG(measure),2) from timing where testcase=\"$test\" and version=\"run_seq\";" | sqlite3 $dbfile`
+  ref=`echo "select ROUND(AVG(measure),2) from timing where testcase=\"$test\" and version=\"$ref_ver\";" | sqlite3 $dbfile`
   mean_idx=0
   for ver in $versions; do
     time=`echo "select ROUND(AVG(measure),2) from timing where testcase=\"$test\" and version=\"$ver\";" | sqlite3 $dbfile`
