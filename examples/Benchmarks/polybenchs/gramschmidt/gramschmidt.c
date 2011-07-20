@@ -74,12 +74,10 @@ int main(int argc, char** argv) {
   }
 
   for (k = 0; k < n; k++) {
-    for(j=0;j<1;j++) {
-      nrm = 0;
-      for (i = 0; i < m; i++)
-        nrm += A[i][k] * A[i][k];
-      R[k][k] = sqrt(nrm);
-    }
+    nrm = 0;
+    for (i = 0; i < m; i++)
+      nrm += A[i][k] * A[i][k];
+    R[k][k] = sqrt(nrm);
     for (i = 0; i < m; i++)
       Q[i][k] = A[i][k] / R[k][k];
     for (j = k + 1; j < n; j++) {
