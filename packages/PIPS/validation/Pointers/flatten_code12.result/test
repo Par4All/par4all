@@ -4,7 +4,9 @@ PROPER  EFFECTS
 int main()
 {
 //             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//                               flatten_code12:0`1`foo
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1] 
+//                               flatten_code12:0`1`foo
 //             <    is read   >: foo_0
    flatten_code12();
 
@@ -13,12 +15,18 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    flatten_code12();
-//  {}
+
+// Points To: none
+
 
    return 0;
 }

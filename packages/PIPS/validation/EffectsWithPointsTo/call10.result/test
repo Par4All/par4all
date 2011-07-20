@@ -31,29 +31,50 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void call10(int i, int x[10], int j, int y[10])
 {
-//  {}
+
+// Points To: none
+
    int k, l;
-//  {}
+
+// Points To: none
+
 
    for(k = 0; k <= i-1; k += 1)
-//  {}
+
+// Points To: none
+
       x[i] = 0;
-//  {}
+
+// Points To: none
+
    for(l = 0; l <= j-1; l += 1)
-//  {}
+
+// Points To: none
+
       y[i] = 0;
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    tf_t s;
-//  {}
+
+// Points To: none
+
    tf_t *sp = &s;
-//  {(sp,s,-Exact-)}
+
+// Points To:
+// sp -> &s , EXACT
+
 
    call10(s.one, s.two, sp->one, sp->two);
 }

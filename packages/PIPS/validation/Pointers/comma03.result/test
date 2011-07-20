@@ -27,30 +27,55 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i = 0, j = 1, k = 2, l = 3;
-//  {}
+
+// Points To: none
+
    int *p, *q, *r, *s, *t;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(t,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// s -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    r = &i;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,i,-Exact-);(s,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(t,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> &i , EXACT
+// s -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    q = &j;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,j,-Exact-);(r,i,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(t,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &j , EXACT
+// r -> &i , EXACT
+// s -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// t -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    s = &k;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,j,-Exact-);(r,i,
-//   -Exact-);(s,k,-Exact-);(t,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &j , EXACT
+// r -> &i , EXACT
+// s -> &k , EXACT
+// t -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    /* we trat this instruction like :
         s = r;
         q;
@@ -58,7 +83,13 @@ int main()
         p = s;
      */
    p = (s = r, q, s);
-//  {(p,i,-Exact-);(q,j,-Exact-);(r,i,-Exact-);(s,i,-Exact-);(t,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &i , EXACT
+// q -> &j , EXACT
+// r -> &i , EXACT
+// s -> &i , EXACT
+// t -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    return 0;
 }

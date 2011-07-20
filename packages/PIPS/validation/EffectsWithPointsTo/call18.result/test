@@ -35,35 +35,59 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void call18(int i, ...)
 {
-//  {}
+
+// Points To: none
+
    i++;
-//  {}
+
+// Points To: none
+
    if (i) {
-//  {}
+
+// Points To: none
+
       va_list pa;
-//  {}
+
+// Points To: none
+
       int r;
-//  {}
+
+// Points To: none
+
 
       va_start(pa, fmt);
-//  {}
+
+// Points To: none
+
 
       va_end(pa);
    }
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i = 1;
-//  {}
+
+// Points To: none
+
    int j = 2;
-//  {}
+
+// Points To: none
+
    int k = 3;
-//  {}
+
+// Points To: none
+
 
    call18(i, i, j, k, 0);
 }

@@ -2,6 +2,7 @@ raw file with loop flagged and privated variables scanned
 int elligent(long int le, short ie)
 {
    short eil;
+#pragma omp for private(le)
 l99999:
    for(eil = 0; eil <= ie-1; eil += 1)
       le += eil;
@@ -14,9 +15,9 @@ int elligent(long int le, short ie)
    //PIPS generated variable
    int I_0;
    I_0 = (ie+127)/128;
+#pragma omp for private(le)
 l99999:
    for(eil = 0; eil <= 128*I_0-1; eil += 1)
-      if (eil>=0&&eil<=ie-1)
-         le += eil;
+      le += eil;
    return eil;
 }

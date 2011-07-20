@@ -28,26 +28,58 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int *q;
-//  {(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int i = 0, j = 1;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    q = &i;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,i,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &i , EXACT
+
    p = i>0?&j:q;
-//  {(p,i,-MAY-);(p,j,-MAY-);(q,i,-Exact-)}
+
+// Points To:
+// p -> &i , MAY
+// p -> &j , MAY
+// q -> &i , EXACT
+
    printf("address of p =%p\n", p);
-//  {(p,i,-MAY-);(p,j,-MAY-);(q,i,-Exact-)}
+
+// Points To:
+// p -> &i , MAY
+// p -> &j , MAY
+// q -> &i , EXACT
+
    printf("address of q =%p\n", q);
-//  {(p,i,-MAY-);(p,j,-MAY-);(q,i,-Exact-)}
+
+// Points To:
+// p -> &i , MAY
+// p -> &j , MAY
+// q -> &i , EXACT
+
    return 0;
 }
 

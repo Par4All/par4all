@@ -13,17 +13,30 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int **a;
-//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int b;
-//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    a[0] = &b;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,b,-Exact-);(a,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> &b , EXACT
+// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    return 0;
 }
 

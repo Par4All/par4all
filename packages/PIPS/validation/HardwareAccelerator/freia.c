@@ -21,6 +21,21 @@ freia_status freia_common_destruct_data(freia_data2d * img)
   return FREIA_OK;
 }
 
+int32_t freia_common_get(freia_data2d * img, int32_t i, int32_t j)
+{
+  return img->stuff + i + j;
+}
+
+freia_ptr freia_common_alloc(uint32_t s)
+{
+  return (freia_ptr) malloc(s);
+}
+
+void freia_common_free(freia_ptr p)
+{
+  free(p);
+}
+
 freia_status freia_common_open_input(freia_dataio * in, uint32_t n)
 {
   in->framebpp = 16;
@@ -74,14 +89,35 @@ freia_status freia_common_draw_line(freia_data2d *image,
    int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
 {
   image->stuff += color+x1+y1+x2+y2;
+  return FREIA_OK;
 }
 
 freia_status freia_common_draw_rect(freia_data2d *image,
    int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
 {
   image->stuff += color+x1+y1+x2+y2;
+  return FREIA_OK;
 }
 
+freia_status freia_common_draw_disc(freia_data2d *image,
+   int32_t x1, int32_t y1, int32_t rad, int32_t color)
+{
+  image->stuff += color+x1+y1+rad;
+  return FREIA_OK;
+}
+
+freia_status freia_common_set_wa(freia_data2d *image,
+   int32_t x1, int32_t y1, int32_t w, int32_t h)
+{
+  image->stuff += x1+y1+w+h;
+  return FREIA_OK;
+}
+
+freia_status freia_common_reset_wa(freia_data2d *image)
+{
+  image->stuff += 1;
+  return FREIA_OK;
+}
 
 #define Fbin(name)                                        \
   freia_status                                            \
@@ -92,11 +128,11 @@ freia_status freia_common_draw_rect(freia_data2d *image,
     return FREIA_OK;                                      \
   }
 
-#define FbinP(name)                                       \
+#define FbinP(name,ctype)                                 \
   freia_status                                            \
   name(freia_data2d * o,                                  \
        const freia_data2d * i0, const freia_data2d * i1,  \
-       uint32_t c)                                        \
+       ctype c)                                        \
   {                                                       \
     o->stuff = i0->stuff | i1->stuff | (int32_t) c;       \
     return FREIA_OK;                                      \
@@ -214,7 +250,8 @@ Fun(freia_aipo_log2);
 
 // Linear
 FunK2P(freia_aipo_convolution);
-FbinP(freia_aipo_fast_correlation);
+FbinP(freia_aipo_fast_correlation, uint32_t);
+FbinP(freia_aipo_replace_const, int32_t);
 
 // Measure
 Fred1(freia_aipo_global_min);

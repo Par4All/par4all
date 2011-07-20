@@ -88,154 +88,296 @@ void ReadPGMrow(FILE *file, int width, byte *line)
 
 POINTS TO
 
-//  {(filename,_filename_1[0],-Exact-);(nch,_nch_5[0],-Exact-);(ncl,
-//   _ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,_nrl_2[0],
-//   -Exact-)}
+
+// Points To:
+// filename -> &_filename_1[0] , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-//  {(filename,_filename_1[0],-Exact-);(nch,_nch_5[0],-Exact-);(ncl,
-//   _ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,_nrl_2[0],
-//   -Exact-)}
+
+// Points To:
+// filename -> &_filename_1[0] , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    int height, width, gris;
-//  {(filename,_filename_1[0],-Exact-);(nch,_nch_5[0],-Exact-);(ncl,
-//   _ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,_nrl_2[0],
-//   -Exact-)}
+
+// Points To:
+// filename -> &_filename_1[0] , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    byte **m;
-//  {(filename,_filename_1[0],-Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(nch,_nch_5[0],-Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,
-//   _nrh_3[0],-Exact-);(nrl,_nrl_2[0],-Exact-)}
+
+// Points To:
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    FILE *file;
-//  {(file,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(filename,
-//   _filename_1[0],-Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(nch,_nch_5[0],-Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,
-//   _nrh_3[0],-Exact-);(nrl,_nrl_2[0],-Exact-)}
+
+// Points To:
+// file -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    char *buffer;
-//  {(buffer,*ANY_MODULE*:*NOWHERE*_b2,-Exact-);(file,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// file -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    int i;
-//  {(buffer,*ANY_MODULE*:*NOWHERE*_b2,-Exact-);(file,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// file -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
 
    buffer = (char *) calloc(80, sizeof(char));
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    file = fopen(filename, "rb");
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    if (file==(void *) 0)
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
       nrerror("ouverture du fichier impossible\n");
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    
    // The code synthesis fails because of type_supporting_entities() which explodes the stack
    //readitem(file, buffer);
    if (strcmp(buffer, "P5")!=0)
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
       nrerror("entete du fichier %s invalide\n");
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    
    //width  = atoi(readitem(file, buffer));
    //height = atoi(readitem(file, buffer));
    //gris   = atoi(readitem(file, buffer));
    
    *nrl = 0;
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    *nrh = height-1;
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    *ncl = 0;
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    *nch = width-1;
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    m = bmatrix(*nrl, *nrh, *ncl, *nch);
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
 
    for(i = 0; i <= height-1; i += 1)
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
       ReadPGMrow(file, width, m[i]);
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
 
    fclose(file);
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
    free(buffer);
-//  {(buffer,*ANY_MODULE*:*HEAP*,-Exact-);(file,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(filename,_filename_1[0],
-//   -Exact-);(m,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(nch,_nch_5[0],
-//   -Exact-);(ncl,_ncl_4[0],-Exact-);(nrh,_nrh_3[0],-Exact-);(nrl,
-//   _nrl_2[0],-Exact-)}
+
+// Points To:
+// buffer -> &*ANY_MODULE*:*HEAP* , EXACT
+// file -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// filename -> &_filename_1[0] , EXACT
+// m -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// nch -> &_nch_5[0] , EXACT
+// ncl -> &_ncl_4[0] , EXACT
+// nrh -> &_nrh_3[0] , EXACT
+// nrl -> &_nrl_2[0] , EXACT
+
 
    return m;
 }
-//  {(file,_file_6[0],-Exact-);(line,_line_7[0],-Exact-)}
+
+// Points To:
+// file -> &_file_6[0] , EXACT
+// line -> &_line_7[0] , EXACT
+
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
-//  {(file,_file_6[0],-Exact-);(line,_line_7[0],-Exact-)}
+
+// Points To:
+// file -> &_file_6[0] , EXACT
+// line -> &_line_7[0] , EXACT
+
    fread(&line[0], sizeof(byte), width, file);
 }
-//  {}
+
+// Points To: none
+
 int bmatrix(int f1, int f2, int f3, int f4)
 {
 }
-//  {(f1,_f1_8[0],-Exact-)}
+
+// Points To:
+// f1 -> &_f1_8[0] , EXACT
+
 int nrerror(char *f1)
 {
 }

@@ -64,19 +64,31 @@ s_t make_s(int i, float x)
 
 POINTS TO
 
-//  {}
+
+// Points To: none
+
 void assign02()
 {
-//  {}
+
+// Points To: none
+
    s_t s;
-//  {}
+
+// Points To: none
+
    int j;
-//  {}
+
+// Points To: none
+
 
    s = make_s(1, 2.);
-//  {}
+
+// Points To: none
+
    s.entier = 4;
-//  {}
+
+// Points To: none
+
    
    /* invalid lvalue in assignment */
    /* make_s(1, 2.).entier = 4; */
@@ -84,20 +96,39 @@ void assign02()
    /* But this is OK in rhs */
    j = make_s(1, 2.).entier;
 }
-//  {}
+
+// Points To: none
+
 s_t make_s(int i, float x)
 {
-//  {}
+
+// Points To: none
+
    s_t *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    char *malloc(int);
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    p = (s_t *) malloc(sizeof(s_t));
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*HEAP* , EXACT
+
    p->entier = i;
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*HEAP* , EXACT
+
    p->reel = x;
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*HEAP* , EXACT
+
    return *p;
 }

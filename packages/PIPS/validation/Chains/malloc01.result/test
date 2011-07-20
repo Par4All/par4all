@@ -1,0 +1,35 @@
+int main(int argc, char *argv[])
+{
+   int i, j;                                                            /*0009*/
+   float *a[64];                                                        /*0010*/
+//             <    is written>: i
+
+   for(i = 0; i <= 63; i += 1) {                                        /*0012*/
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a[i] _MALLOC_EFFECTS:_MALLOC_
+      /*sizeof(float)*/
+      a[i] = malloc(64*4);                                              /*0013*/
+//             <    is written>: j
+      for(j = 0; j <= 63; j += 1)                                       /*0014*/
+//             <    is read   >: a[i] i j
+//             <    is written>: a[i][j]
+         a[i][j] = 0.;                                                  /*0015*/
+   }
+
+   return 0;                                                            /*0019*/
+}
+// chains for main
+7 7 W W <a[i][j]> - <a[i][j]> levels()
+7 6 W W <a[i][j]> - <j> levels()
+7 6 R W <j> - <j> levels()
+7 5 W W <a[i][j]> - <a[i]> levels()
+7 5 R W <a[i]> - <a[i]> levels()
+6 6 W W <j> - <j> levels()
+5 7 W W <a[i]> - <a[i][j]> levels()
+5 7 W R <a[i]> - <a[i]> levels()
+5 5 W W <a[i]> - <a[i]> levels()
+5 5 W W <_MALLOC_EFFECTS:_MALLOC_> - <_MALLOC_EFFECTS:_MALLOC_> levels()
+5 5 W R <_MALLOC_EFFECTS:_MALLOC_> - <_MALLOC_EFFECTS:_MALLOC_> levels()
+5 5 R W <_MALLOC_EFFECTS:_MALLOC_> - <_MALLOC_EFFECTS:_MALLOC_> levels()
+
+None

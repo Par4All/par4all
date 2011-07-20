@@ -22,27 +22,50 @@ int main(int argc, char *argv[])
 
 POINTS-TO
 
-//  {(argv[*],_argv_1[0],-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+
 int main(int argc, char *argv[])
 {
-//  {(argv[*],_argv_1[0],-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+
    int *p, i, j;
-//  {(argv[*],_argv_1[0],-Exact-);(p,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    i = 0;
-//  {(argv[*],_argv_1[0],-Exact-);(p,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    j = 1;
-//  {(argv[*],_argv_1[0],-Exact-);(p,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    for(i = 1; i <= 4; i += 1)
-//  {(argv[*],_argv_1[0],-Exact-);(p,*HEAP*_l_11,-MAY-);(p,
-//   *ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+// p -> &*HEAP*_l_11 , MAY
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+
 
       p = (int *) malloc(sizeof(int));
-//  {(argv[*],_argv_1[0],-Exact-);(p,*HEAP*_l_11,-MAY-);(p,
-//   *ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+// p -> &*HEAP*_l_11 , MAY
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+
    
    
    return 0;

@@ -21,22 +21,43 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i;
-//  {}
+
+// Points To: none
+
    int *p = 0;
-//  {(p,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// p -> &*NULL_POINTER* , EXACT
+
    int **q = 0;
-//  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// p -> &*NULL_POINTER* , EXACT
+// q -> &*NULL_POINTER* , EXACT
+
 
    *p = 1;
-//  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// p -> &*NULL_POINTER* , EXACT
+// q -> &*NULL_POINTER* , EXACT
+
    *q = &i;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,*NULL_POINTER*,
-//   -Exact-);(q,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> &i , EXACT
+// p -> &*NULL_POINTER* , EXACT
+// q -> &*NULL_POINTER* , EXACT
+
 
    return 0;
 }

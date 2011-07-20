@@ -2,8 +2,6 @@ delete private
 create private private.f
 
 set PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
-create private private.f
-activate PRECONDITIONS_INTRA_FULL
 activate TRANSFORMERS_INTRA_FULL
 activate MUST_REGIONS
 apply PRIVATIZE_MODULE

@@ -30,33 +30,62 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int *p, *q, i, j;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    i = 1;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    j = 0;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    /* Initialisation des pointeurs*/
    p = &i;
-//  {(p,i,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &i , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    q = &j;
-//  {(p,i,-Exact-);(q,j,-Exact-)}
+
+// Points To:
+// p -> &i , EXACT
+// q -> &j , EXACT
+
    
    /* Les deux pointeurs pointent vers la meme case memoire j */
    p = q;
-//  {(p,j,-Exact-);(q,j,-Exact-)}
+
+// Points To:
+// p -> &j , EXACT
+// q -> &j , EXACT
+
    
    /* Dereferencement du pointeur p -> acces à la variable j */
    *p = 1;
-//  {(p,j,-Exact-);(q,j,-Exact-)}
+
+// Points To:
+// p -> &j , EXACT
+// q -> &j , EXACT
+
 
    return 0;
 }

@@ -840,8 +840,8 @@ freia_status freia_43_helper_0_4_0(freia_data2d * o0, freia_data2d * i0, freia_d
   // nope
   // 0`ic [0 input 1] -> [0 alu] 56 absdiff
   // nope
-  // alu 56 absdiff stage 0 flipped
-  si.alu[0][0].op = SPOC_ALU_ABSSUB_IN1_IN0;
+  // alu 56 absdiff stage 0
+  si.alu[0][0].op = SPOC_ALU_ABSSUB_IN0_IN1;
 
 
   // output image 0`ib on 0

@@ -11,14 +11,24 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    char *s;
-//  {(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// s -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    s = "hello\n";
-//  {(s,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    return 0;
 }
 

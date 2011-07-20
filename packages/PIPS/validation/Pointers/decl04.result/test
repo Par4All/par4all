@@ -16,18 +16,30 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    mystruct s;
-//  {}
+
+// Points To: none
+
 
    s.champ1 = 3;
-//  {}
+
+// Points To: none
+
    s.champ2 = 4;
-//  {}
+
+// Points To: none
+
    decl04(s);
-//  {}
+
+// Points To: none
+
    return 0;
 }

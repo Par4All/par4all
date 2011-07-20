@@ -13,14 +13,25 @@ int global01()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int global01()
 {
-//  {}
+
+// Points To: none
+
    i = &k;
-//  {(i,k,-Exact-)}
+
+// Points To:
+// i -> &k , EXACT
+
    j = i;
-//  {(i,k,-Exact-);(j,k,-Exact-)}
+
+// Points To:
+// i -> &k , EXACT
+// j -> &k , EXACT
+
    return 0;
 }
 

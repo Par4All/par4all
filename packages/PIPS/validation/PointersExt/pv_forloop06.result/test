@@ -28,37 +28,79 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    float f;
-//  {}
+
+// Points To: none
+
    int *p, *q;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int a[10];
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int b[10];
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    p = &a[0];
-//  {(p,a[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &a[0] , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    q = &b[0];
-//  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
+
+// Points To:
+// p -> &a[0] , EXACT
+// q -> &b[0] , EXACT
+
    f = 0.0;
-//  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
+
+// Points To:
+// p -> &a[0] , EXACT
+// q -> &b[0] , EXACT
+
    while (f<10.5) {
-//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
-//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+
+// Points To:
+// p -> &a[0] , MAY
+// p -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> &b[0] , MAY
+// q -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
       *p++ = 2**q++;
-//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
-//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+
+// Points To:
+// p -> &a[0] , MAY
+// p -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> &b[0] , MAY
+// q -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
       f += 1.0;
    }
-//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
-//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+
+// Points To:
+// p -> &a[0] , MAY
+// p -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// q -> &b[0] , MAY
+// q -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
    return 0;
 }

@@ -36,30 +36,48 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void flatten_code12(void)
 {
-//  {}
+
+// Points To: none
+
    int i = foo_0;
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= 3; i += 1) {
-//  {}
+
+// Points To: none
+
       static int foo = 0;
-//  {}
+
+// Points To: none
+
 
       foo++;
-//  {}
+
+// Points To: none
+
 
       fprintf(stdout, "foo=%d\n", foo);
    }
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    flatten_code12();
-//  {}
+
+// Points To: none
+
 
    return 0;
 }

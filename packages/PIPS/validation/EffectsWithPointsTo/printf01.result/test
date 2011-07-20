@@ -14,12 +14,18 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i = 5;
-//  {}
+
+// Points To: none
+
    printf("i=%d", i);
 }
 

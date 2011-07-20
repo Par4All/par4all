@@ -12,12 +12,18 @@ void lhs04()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void lhs04()
 {
-//  {}
+
+// Points To: none
+
    float x;
-//  {}
+
+// Points To: none
+
 
    *((int *) &x) &= 0x7fffffff;
 }

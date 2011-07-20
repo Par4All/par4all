@@ -21,17 +21,25 @@ int struct04()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int struct04()
 {
-//  {}
+
+// Points To: none
+
    struct one {
       int first;
       int second;
    } x;
-//  {}
+
+// Points To: none
+
    int y[10];
-//  {}
+
+// Points To: none
+
    
    //  x.first = 1;
    //x.second = 2;

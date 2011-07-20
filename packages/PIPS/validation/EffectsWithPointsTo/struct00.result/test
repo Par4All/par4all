@@ -17,19 +17,32 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    struct one {
       int *first;
    } x;
-//  {(x[first],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// x.first -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int y[10];
-//  {(x[first],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// x.first -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    x.first = &y[5];
-//  {(x[first],y[5],-Exact-)}
+
+// Points To:
+// x.first -> &y[5] , EXACT
+
    
    
    return 0;
