@@ -55,15 +55,17 @@ $(TARGET):
 $(OMP_SOURCE): $(SOURCE) $(COMMON)
 	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS)
 	mv $(<:%.c=%.p4a.c) $@
+openmp_src:$(OMP_SOURCE)
 
 $(CUDA_SOURCE): $(SOURCE) $(COMMON)
 	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) --cuda
 	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
+cuda_src:$(CUDA_SOURCE)
 
 $(CUDA_OPT_SOURCE): $(SOURCE) $(COMMON)
 	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) --cuda --com-optimization
 	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
-
+cuda_opt_src:$(CUDA_OPT_SOURCE)
 
 # build binary for the 3 different versions
 $(SEQ_TARGET): $(SOURCE) $(COMMON)
