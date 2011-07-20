@@ -335,9 +335,9 @@ l99997:
 }
 outlining to launcher
 
+//  <result[PHI1][PHI2]-W-MAY-{PHI1==0}>
 //  <src0[PHI1][PHI2]-R-MAY-{PHI1==0}>
 //  <src1[PHI1][PHI2]-R-MAY-{PHI1==0}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
@@ -347,18 +347,18 @@ void alphablending(short src0[512][512], short src1[512][512], short result[512]
    //PIPS generated variable
    unsigned int i_t, j_t;
 
+//  <result[PHI1][PHI2]-W-MAY-{PHI1==0}>
 //  <src0[PHI1][PHI2]-R-MAY-{PHI1==0}>
 //  <src1[PHI1][PHI2]-R-MAY-{PHI1==0}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
 l99998:
    for(i_t = 1; i_t <= 4; i_t += 1)
 
+//  <result[PHI1][PHI2]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4}>
 //  <src0[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4}>
 //  <src1[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
@@ -401,25 +401,34 @@ l99995:
 
             short (*result0)[128][8] = (short (*)[128][8]) 0;
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <result0-W-MAY-{}>
+//  <result0[PHI1]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <result0[PHI1][PHI2][PHI3]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t,
+//    j_t<=64}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
 
             P4A_accel_malloc((void **) &result0, 1024*sizeof(short));
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <caillou0-W-MAY-{}>
+//  <caillou0[PHI1]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <caillou0[PHI1][PHI2]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
 
             P4A_accel_malloc((void **) &caillou0, 4*sizeof(int));
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <src10-W-MAY-{}>
+//  <src10[PHI1]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src10[PHI1][PHI2][PHI3]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
 
             P4A_accel_malloc((void **) &src10, 1024*sizeof(short));
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <src00-W-MAY-{}>
+//  <src00[PHI1]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src00[PHI1][PHI2][PHI3]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
 
@@ -436,16 +445,16 @@ l99995:
 //  <src1[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 //  <src10-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src10[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
+//    j_t<=64}>
 
             P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src1[0][0], *src10);
 
 //  <src0[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 //  <src00-R-EXACT-{}>
-//  <src00[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
+//  <src00[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
+//    j_t<=64}>
 
             P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src0[0][0], *src00);
 
@@ -500,9 +509,8 @@ l99997:
 //  <result[PHI1][PHI2]-W-MAY-{PHI1==0, i==129, j==9, 1<=i_t, i_t<=4,
 //    1<=j_t, j_t<=64}>
 //  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, i==129, j==9, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
+//  <result0[PHI1][PHI2][PHI3]-R-MAY-{PHI1==0, i==129, j==9, 1<=i_t,
+//    i_t<=4, 1<=j_t, j_t<=64}>
 
             P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
 

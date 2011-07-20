@@ -25,28 +25,48 @@ void struct07()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void struct07()
 {
-//  {}
+
+// Points To: none
+
    extern complex imagein[256][256], imageout[256][256];
-//  {}
+
+// Points To: none
+
    int i, j, k, l;
-//  {}
+
+// Points To: none
+
    float z1, z2;
-//  {}
+
+// Points To: none
+
    float x[256][256];
-//  {}
+
+// Points To: none
+
 
    for(k = 0; k <= 255; k += 1)
-//  {}
+
+// Points To: none
+
       imageout[k][1].re = z1;
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= 255; i += 1)
-//  {}
+
+// Points To: none
+
       for(j = 0; j <= 255; j += 1)
-//  {}
+
+// Points To: none
+
          x[i][j] = 0.;
 }
 

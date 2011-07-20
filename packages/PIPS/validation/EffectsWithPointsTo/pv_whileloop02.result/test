@@ -25,25 +25,46 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i = 0;
-//  {}
+
+// Points To: none
+
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    p = (int *) malloc(10*sizeof(int));
-//  {(p,*HEAP*_l_7[0],-Exact-)}
+
+// Points To:
+// p -> &*HEAP*_l_7[0] , EXACT
+
 
    while (i<10) {
-//  {(p,*HEAP*_l_7[0],-Exact-)}
+
+// Points To:
+// p -> &*HEAP*_l_7[0] , EXACT
+
       p[i] = i;
-//  {(p,*HEAP*_l_7[0],-Exact-)}
+
+// Points To:
+// p -> &*HEAP*_l_7[0] , EXACT
+
       i++;
    }
-//  {(p,*HEAP*_l_7[0],-Exact-)}
+
+// Points To:
+// p -> &*HEAP*_l_7[0] , EXACT
+
    return 0;
 }
 

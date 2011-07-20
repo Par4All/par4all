@@ -18,23 +18,44 @@ int main(int argc, char *argv[])
 
 POINTS-TO
 
-//  {(argv[*],_argv_1[0],-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+
 int main(int argc, char *argv[])
 {
-//  {(argv[*],_argv_1[0],-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+
    int *pi;
-//  {(argv[*],_argv_1[0],-Exact-);(pi,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+// pi -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    float *px;
-//  {(argv[*],_argv_1[0],-Exact-);(pi,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(px,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+// pi -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// px -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
 
    pi = (int *) malloc(sizeof(int));
-//  {(argv[*],_argv_1[0],-Exact-);(pi,*HEAP*_l_10,-Exact-);(px,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+// pi -> &*HEAP*_l_10 , EXACT
+// px -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    px = (float *) malloc(sizeof(int));
-//  {(argv[*],_argv_1[0],-Exact-);(pi,*HEAP*_l_10,-Exact-);(px,
-//   *HEAP*_l_11,-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+// pi -> &*HEAP*_l_10 , EXACT
+// px -> &*HEAP*_l_11 , EXACT
+
 
    return 0;
 }

@@ -20,7 +20,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 conv" [shape=circle];
+  "5 conv" [shape=box];
   "5 conv" -> "o";
   "i0" -> "5 conv";
 }
@@ -33,7 +33,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 conv" [shape=circle];
+  "5 conv" [shape=box];
   "5 conv" -> "o";
   "i0" -> "5 conv";
 }
@@ -66,7 +66,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 conv" [shape=circle];
+  "5 conv" [shape=box];
   "5 conv" -> "o";
   "i0" -> "5 conv";
 }
@@ -79,7 +79,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 conv" [shape=circle];
+  "5 conv" [shape=box];
   "5 conv" -> "o";
   "i0" -> "5 conv";
 }
@@ -126,7 +126,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 conv" [shape=circle];
+  "5 conv" [shape=box];
   "5 conv" -> "o";
   "i0" -> "5 conv";
 }
@@ -139,7 +139,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 conv" [shape=circle];
+  "5 conv" [shape=box];
   "5 conv" -> "o";
   "i0" -> "5 conv";
 }

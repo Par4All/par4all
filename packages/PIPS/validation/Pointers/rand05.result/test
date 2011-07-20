@@ -32,31 +32,66 @@ int main(void)
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main(void)
 {
-//  {}
+
+// Points To: none
+
    int i1;
-//  {}
+
+// Points To: none
+
    int *pi1 = &i1;
-//  {(pi1,i1,-Exact-)}
+
+// Points To:
+// pi1 -> &i1 , EXACT
+
    int **pp;
-//  {(pi1,i1,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pi1 -> &i1 , EXACT
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    srand(time((void *) 0));
-//  {(pi1,i1,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pi1 -> &i1 , EXACT
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    if (alea())
-//  {(pi1,i1,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pi1 -> &i1 , EXACT
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       pp = &pi1;
-//  {(pi1,i1,-Exact-);(pp,pi1,-MAY-);(pp,*ANY_MODULE*:*NOWHERE*_b0,
-//   -MAY-)}
+
+// Points To:
+// pi1 -> &i1 , EXACT
+// pp -> &pi1 , MAY
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+
 
    *pp = (void *) 0;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,*NULL_POINTER*,-MAY-);(pi1,
-//   *NULL_POINTER*,-MAY-);(pi1,i1,-MAY-);(pp,pi1,-MAY-);(pp,
-//   *ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> &*NULL_POINTER* , MAY
+// pi1 -> &*NULL_POINTER* , MAY
+// pi1 -> &i1 , MAY
+// pp -> &pi1 , MAY
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+
    printf("%p %p \n", pp, pi1);
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,*NULL_POINTER*,-MAY-);(pi1,
-//   *NULL_POINTER*,-MAY-);(pi1,i1,-MAY-);(pp,pi1,-MAY-);(pp,
-//   *ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> &*NULL_POINTER* , MAY
+// pi1 -> &*NULL_POINTER* , MAY
+// pi1 -> &i1 , MAY
+// pp -> &pi1 , MAY
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+
    return 0;
 }

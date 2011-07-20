@@ -12,11 +12,17 @@ char * conditional01(int i)
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 char * conditional01(int i)
 {
-//  {}
+
+// Points To: none
+
    char *p[3] = {"a", "b", "c"};
-//  {}
+
+// Points To: none
+
    return i<0||i>2?p[0]:p[i];
 }

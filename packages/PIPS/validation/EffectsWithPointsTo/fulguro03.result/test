@@ -41,58 +41,114 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 
 POINTS-TO
 
-//  {(dat,_dat_1[0],-Exact-);(vct,_vct_2[0],-Exact-)}
+
+// Points To:
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
-//  {(dat,_dat_1[0],-Exact-);(vct,_vct_2[0],-Exact-)}
+
+// Points To:
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
    fgUINT16 *array_s = (fgUINT16 *) vct->array;
-//  {(array_s,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],
-//   -Exact-);(vct,_vct_2[0],-Exact-)}
+
+// Points To:
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
    int I_0 = vct->spp;
    {
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
       register fgUINT16 val;
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
       register int i;
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
       register int k;
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
       unsigned short _return0;
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
       i = col*I_0;
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
       for(k = 0; k <= I_0-1; k += 1) {
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
          _return0 = array_s[k];
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
          val = _return0;
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
          array_d[i] = val;
-//  {(array_d,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(array_s,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(dat,_dat_1[0],-Exact-);(vct,
-//   _vct_2[0],-Exact-)}
+
+// Points To:
+// array_d -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// array_s -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// dat -> &_dat_1[0] , EXACT
+// vct -> &_vct_2[0] , EXACT
+
          i++;
       }
    }

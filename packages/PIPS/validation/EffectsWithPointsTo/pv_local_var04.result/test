@@ -28,32 +28,68 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
 
    if (a>1) {
-//  {}
+
+// Points To: none
+
       static int *p = &a;
-//  {(p,a,-Exact-)}
+
+// Points To:
+// p -> &a , EXACT
+
       static int *q;
-//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &a , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       q = &b;
-//  {(p,a,-Exact-);(q,b,-Exact-)}
+
+// Points To:
+// p -> &a , EXACT
+// q -> &b , EXACT
+
       a = a-1;
    }
    else {
-//  {}
+
+// Points To: none
+
       static int *r = &a;
-//  {(r,a,-Exact-)}
+
+// Points To:
+// r -> &a , EXACT
+
       static int *s;
-//  {(r,a,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// r -> &a , EXACT
+// s -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       s = &b;
-//  {(r,a,-Exact-);(s,b,-Exact-)}
+
+// Points To:
+// r -> &a , EXACT
+// s -> &b , EXACT
+
       a = a+2;
    }
-//  {(p,a,-MAY-);(q,b,-MAY-);(r,a,-MAY-);(s,b,-MAY-)}
+
+// Points To:
+// p -> &a , MAY
+// q -> &b , MAY
+// r -> &a , MAY
+// s -> &b , MAY
+
    return 0;
 }
 

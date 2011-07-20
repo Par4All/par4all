@@ -14,15 +14,23 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int tab[3] = {0, 1, 2};
-//  {}
+
+// Points To: none
+
 
    tab[0] = tab[0]+2;
-//  {}
+
+// Points To: none
+
    return 0;
 }
 

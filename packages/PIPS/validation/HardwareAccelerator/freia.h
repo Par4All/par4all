@@ -19,17 +19,26 @@ typedef enum { FREIA_OK, FREIA_ERROR } freia_status;
 typedef struct {
   int framebpp, framewidth, frameheight, stuff;
 } freia_dataio;
+typedef void * freia_ptr;
 
+// for CIPO
 static const int32_t freia_morpho_kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 static const int32_t freia_morpho_kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
 static const int32_t freia_morpho_kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
 
+// hack for ECIPO
+static const int32_t freia_morpho_k8_0[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};
+static const int32_t freia_morpho_k8_1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};
+static const int32_t freia_morpho_k8_2[9] = {0, 0, 1, 0, 1, 0, 1, 0, 0};
+static const int32_t freia_morpho_k6_0[9] = {0, 0, 1, 1, 1, 0, 0, 0, 0};
+static const int32_t freia_morpho_k6_1[9] = {0, 1, 0, 1, 0, 1, 0, 0, 0};
+static const int32_t freia_morpho_k6_2[9] = {1, 0, 0, 1, 0, 0, 1, 0, 0};
+static const int32_t freia_morpho_k4_0[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};
+static const int32_t freia_morpho_k4_1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};
+
 // FREIA image allocation & deallocation
 extern freia_data2d * freia_common_create_data(uint32_t, uint32_t, uint32_t);
 extern freia_status freia_common_destruct_data(freia_data2d *);
-
-#define freia_common_alloc malloc
-#define freia_common_free free
 
 // IO
 extern freia_status freia_common_open_input(freia_dataio *, uint32_t);
@@ -42,6 +51,14 @@ extern freia_status freia_common_close_output(freia_dataio *);
 // common functions, should be in AIPO
 extern freia_status freia_common_draw_line(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
 extern freia_status freia_common_draw_rect(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
+extern freia_status freia_common_draw_disc(freia_data2d *, int32_t, int32_t, int32_t, int32_t);
+extern freia_status freia_common_set_wa(freia_data2d *, int32_t, int32_t, int32_t, int32_t);
+extern freia_status freia_common_reset_wa(freia_data2d *);
+
+// Misc
+extern int32_t freia_common_get(freia_data2d *, int32_t, int32_t);
+extern freia_ptr freia_common_alloc(uint32_t);
+extern void freia_common_free(freia_ptr);
 
 // 2 CIPO functions
 extern freia_status freia_cipo_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
@@ -89,6 +106,7 @@ extern freia_status freia_aipo_copy(freia_data2d *, const freia_data2d *);
 extern freia_status freia_aipo_cast(freia_data2d *, const freia_data2d *);
 extern freia_status freia_aipo_set_constant(freia_data2d *, int32_t);
 extern freia_status freia_aipo_threshold(freia_data2d *, const freia_data2d *, int32_t, int32_t, bool);
+extern freia_status freia_aipo_replace_const(freia_data2d *, const freia_data2d *, const freia_data2d *, int32_t);
 // Morpho
 extern freia_status freia_aipo_erode_8c(freia_data2d *, const freia_data2d *, const int32_t *);
 extern freia_status freia_aipo_dilate_8c(freia_data2d *, const freia_data2d *, const int32_t *);

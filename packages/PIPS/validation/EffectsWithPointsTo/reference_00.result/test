@@ -13,17 +13,27 @@ void reference_00(void)
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void reference_00(void)
 {
-//  {}
+
+// Points To: none
+
    int i = 0;
-//  {}
+
+// Points To: none
+
    int a[10];
-//  {}
+
+// Points To: none
+
    // effects on empty references...
    i;
-//  {}
+
+// Points To: none
+
    a[i];
 }
 

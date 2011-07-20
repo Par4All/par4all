@@ -25,23 +25,42 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int *a, b, c, d;
-//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    c = 3;
-//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    /* S1 */
    a = &c;
-//  {(a,c,-Exact-)}
+
+// Points To:
+// a -> &c , EXACT
+
    /* S2 */
    read(d);
-//  {(a,c,-Exact-)}
+
+// Points To:
+// a -> &c , EXACT
+
    /* S3 */
    b = *a;
-//  {(a,c,-Exact-)}
+
+// Points To:
+// a -> &c , EXACT
+
    /* S4 */
    
    

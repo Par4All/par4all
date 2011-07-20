@@ -16,16 +16,26 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int d1 = 10;
-//  {}
+
+// Points To: none
+
    int d2 = 10;
-//  {}
+
+// Points To: none
+
    int y[d1][d2];
-//  {}
+
+// Points To: none
+
 
    call04(d1, d2, y);
 }

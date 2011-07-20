@@ -1,0 +1,95 @@
+
+Transformers for "main"
+
+
+//  T(main) {}
+
+int main(void)
+{
+
+//  T(stabilize) {stabilize==1}
+
+   _Bool stabilize = 1;
+
+//  T(i) {i==1}
+
+   int i = 1;
+
+//  T(i) {}
+
+
+   if (stabilize==1)
+
+//  T(i) {i==2}
+
+      i = 2;
+
+//  T(i) {0<=stabilize, stabilize<=1}
+
+
+   if (stabilize)
+
+//  T(i) {i==3}
+
+      i = 3;
+
+//  T(main) {i==main}
+
+
+   return i;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   _Bool stabilize = 1;
+
+//  P(stabilize) {stabilize==1}
+
+   int i = 1;
+
+//  P(i,stabilize) {i==1, stabilize==1}
+
+
+   if (stabilize==1)
+
+//  P(i,stabilize) {i==1, stabilize==1}
+
+      i = 2;
+
+//  P(i,stabilize) {stabilize==1, 1<=i, i<=2}
+
+
+   if (stabilize)
+
+//  P(i,stabilize) {stabilize==1, 1<=i, i<=2}
+
+      i = 3;
+
+//  P(i,stabilize) {i==3, stabilize==1}
+
+
+   return i;
+}
+
+Code after control simplification
+
+int main(void)
+{
+   _Bool stabilize = 1;
+   int i = 1;
+
+   if (stabilize==1)
+      i = 2;
+
+   i = 3;
+
+   return i;
+}

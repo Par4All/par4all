@@ -1,0 +1,2 @@
+dead code elimination is too optimistic,
+does not see dep on common_get

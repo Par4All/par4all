@@ -134,8 +134,7 @@ scmp_task_4:
 //             <may be read   >: stdout stdout[0] 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
-//                               _MALLOC_EFFECTS:_MALLOC_ 
+//             <may be written>: stdout[0] _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
 int main()
 {
@@ -144,16 +143,18 @@ int main()
 //             <may be read   >: a[*] b[*] c[*] i stdout stdout[0] t 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: a[*] b[*] c[*] i stdout[0] 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: t
    for(t = 0; t <= 9; t += 1) {
       {
          //PIPS generated variable
 //             <    is written>: P4A__a__0
          int (*P4A__a__0)[100] = (int (*)[100]) 0;
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: P4A__a__0 P4A__a__0[*] 
+//                               P4A__a__0[*][*] 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__0, sizeof(int)*100);
 
@@ -177,11 +178,13 @@ scmp_task_0:
 //             <    is written>: P4A__a__1 P4A__b__0
          int (*P4A__a__1)[50] = (int (*)[50]) 0, (*P4A__b__0)[50] = (int (*)[50]) 0;
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: P4A__b__0 P4A__b__0[*] 
+//                               P4A__b__0[*][*] 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__b__0, sizeof(int)*50);
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: P4A__a__1 P4A__a__1[*] 
+//                               P4A__a__1[*][*] 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__1, sizeof(int)*50);
 //             <may be read   >: a[*]
@@ -212,11 +215,13 @@ scmp_task_1:
 //             <    is written>: P4A__a__2 P4A__c__0
          int (*P4A__a__2)[50] = (int (*)[50]) 0, (*P4A__c__0)[50] = (int (*)[50]) 0;
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: P4A__c__0 P4A__c__0[*] 
+//                               P4A__c__0[*][*] 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__c__0, sizeof(int)*50);
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: P4A__a__2 P4A__a__2[*] 
+//                               P4A__a__2[*][*] 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__2, sizeof(int)*50);
 //             <may be read   >: a[*]
@@ -247,7 +252,8 @@ scmp_task_2:
 //             <    is written>: P4A__b__1
          int (*P4A__b__1)[50] = (int (*)[50]) 0;
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: P4A__b__1 P4A__b__1[*] 
+//                               P4A__b__1[*][*] 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__b__1, sizeof(int)*50);
 //             <may be read   >: b[*]
@@ -275,7 +281,8 @@ scmp_task_3:
 //             <    is written>: P4A__c__1
          int (*P4A__c__1)[50] = (int (*)[50]) 0;
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: P4A__c__1 P4A__c__1[*] 
+//                               P4A__c__1[*][*] 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__c__1, sizeof(int)*50);
 //             <may be read   >: c[*]

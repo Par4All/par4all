@@ -93,83 +93,164 @@ int main()
 
 POINTS-TO
 
-//  {(array[*],_array_1[0],-Exact-)}
+
+// Points To:
+// array[*] -> &_array_1[0] , EXACT
+
 void f2(int n_ptrs, char *array[31])
 {
-//  {(array[*],_array_1[0],-Exact-)}
+
+// Points To:
+// array[*] -> &_array_1[0] , EXACT
+
    int ptr_no;
-//  {(array[*],_array_1[0],-Exact-)}
+
+// Points To:
+// array[*] -> &_array_1[0] , EXACT
+
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
-//  {(array[*],_array_1[0],-Exact-)}
+
+// Points To:
+// array[*] -> &_array_1[0] , EXACT
+
       fprintf(stderr, "%s\n", array[ptr_no]);
 }
-//  {}
+
+// Points To: none
+
 void f3(int n_ptrs, int f4_after, ...)
 {
-//  {}
+
+// Points To: none
+
    va_list ap, ap_save;
-//  {}
+
+// Points To: none
+
    char *array[31];
-//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int ptr_no = 0;
-//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    if (n_ptrs>31)
-//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       n_ptrs = 31;
-//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    va_start(ap, f4_after);
-//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
-//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(array[*],
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
       array[ptr_no] = va_arg(ap, char *);
-//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(array[*],
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
       if (ptr_no==f4_after)
-//  {(array[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(array[ptr_no],
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[ptr_no] -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
          va_copy(ap_save, ap);
    }
-//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    va_end(ap);
-//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    f2(n_ptrs, array);
-//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    // Now process the saved copy.
    n_ptrs -= f4_after;
-//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
-//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(array[*],
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+
       array[ptr_no] = va_arg(ap_save, char *);
-//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    va_end(ap_save);
-//  {(array[*],*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(array[*],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// array[*] -> &*ANY_MODULE*:*ANYWHERE*_b0 , MAY
+// array[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    f4(n_ptrs, array);
 }
-//  {(array[*],_array_2[0],-Exact-)}
+
+// Points To:
+// array[*] -> &_array_2[0] , EXACT
+
 void f4(int n_ptrs, char *array[31])
 {
-//  {(array[*],_array_2[0],-Exact-)}
+
+// Points To:
+// array[*] -> &_array_2[0] , EXACT
+
    int ptr_no;
-//  {(array[*],_array_2[0],-Exact-)}
+
+// Points To:
+// array[*] -> &_array_2[0] , EXACT
+
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
-//  {(array[*],_array_2[0],-Exact-)}
+
+// Points To:
+// array[*] -> &_array_2[0] , EXACT
+
       fprintf(stdout, "%s\n", array[ptr_no]);
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    f3(6, 4, "ch1", "ch2", "ch3", "ch4", "ch5", "ch6");
-//  {}
+
+// Points To: none
+
    return 0;
 }
 

@@ -32,30 +32,48 @@ int struct02()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int struct02()
 {
-//  {}
+
+// Points To: none
+
    struct two {
       int first;
       int second;
    } x[10];
-//  {}
+
+// Points To: none
+
    int i = 0;
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= 9; i += 1)
-//  {}
+
+// Points To: none
+
       if (1) {
-//  {}
+
+// Points To: none
+
          x[i].first = 1;
-//  {}
+
+// Points To: none
+
          x[i].second = 0;
       }
       else {
-//  {}
+
+// Points To: none
+
          x[i].first = 0;
-//  {}
+
+// Points To: none
+
          x[i].second = 1;
       }
 }

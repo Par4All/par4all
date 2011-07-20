@@ -40,39 +40,83 @@ int main()
 
 POINTS-TO
 
-//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_2[0] , EXACT
+// q[*] -> &_q_1[0] , EXACT
+
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
-//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_2[0] , EXACT
+// q[*] -> &_q_1[0] , EXACT
+
    /* i can be modified locally, but it won't show in the summary
         effects... which creates a problem for transformer and
         precondition computation. */
    i = j+1;
-//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_2[0] , EXACT
+// q[*] -> &_q_1[0] , EXACT
+
    y[i] = 0;
-//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_2[0] , EXACT
+// q[*] -> &_q_1[0] , EXACT
+
    p->one = 1;
-//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_2[0] , EXACT
+// q[*] -> &_q_1[0] , EXACT
+
    (p->two)[j] = 2.;
-//  {(p,_p_2[0],-Exact-);(q[*],_q_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_2[0] , EXACT
+// q[*] -> &_q_1[0] , EXACT
+
    *q[i] = 3;
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int a;
-//  {}
+
+// Points To: none
+
    int b;
-//  {}
+
+// Points To: none
+
    int x[10];
-//  {}
+
+// Points To: none
+
    int *ap[10];
-//  {(ap[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// ap[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    tf_t s;
-//  {(ap[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// ap[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    tf_t *sp = &s;
-//  {(ap[*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(sp,s,-Exact-)}
+
+// Points To:
+// ap[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// sp -> &s , EXACT
+
 
    call02(a, b, x, ap, sp);
 }
@@ -110,8 +154,9 @@ int main()
 //             <    is written>: sp
    tf_t *sp = &s;
 //             <may be read   >: ap[*]
-//             <may be written>: x[*]
+//             <may be written>: ap[0] s.two[*] x[*]
 //             <    is read   >: a b sp
+//             <    is written>: s.one
 
    call02(a, b, x, ap, sp);
 }

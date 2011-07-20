@@ -29,24 +29,48 @@ int main(int argc, char **argv)
 
 POINTS-TO
 
-//  {(argv,_argv_1[0],-Exact-)}
+
+// Points To:
+// argv -> &_argv_1[0] , EXACT
+
 long long int get_result(int argc, char **argv)
 {
-//  {(argv,_argv_1[0],-Exact-)}
+
+// Points To:
+// argv -> &_argv_1[0] , EXACT
+
    long long int result = 0;
-//  {(argv,_argv_1[0],-Exact-)}
+
+// Points To:
+// argv -> &_argv_1[0] , EXACT
+
    result = atoll(argv[1]);
-//  {(argv,_argv_1[0],-Exact-)}
+
+// Points To:
+// argv -> &_argv_1[0] , EXACT
+
    printf("return value will be %lld\n", result);
-//  {(argv,_argv_1[0],-Exact-)}
+
+// Points To:
+// argv -> &_argv_1[0] , EXACT
+
    return result;
 }
-//  {(argv,_argv_2[0],-Exact-)}
+
+// Points To:
+// argv -> &_argv_2[0] , EXACT
+
 int main(int argc, char **argv)
 {
-//  {(argv,_argv_2[0],-Exact-)}
+
+// Points To:
+// argv -> &_argv_2[0] , EXACT
+
    long long int size = get_result(argc, argv);
-//  {(argv,_argv_2[0],-Exact-)}
+
+// Points To:
+// argv -> &_argv_2[0] , EXACT
+
    return size;
 }
 
@@ -71,7 +95,8 @@ int main(int argc, char **argv)
 {
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: argc argv stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: _argv_2[1] argc argv stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: size __IO_EFFECTS:LUNS[1]
    long long int size = get_result(argc, argv);
 //             <    is read   >: size

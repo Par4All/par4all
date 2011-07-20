@@ -17,15 +17,25 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i = 5;
-//  {}
+
+// Points To: none
+
    int j = 6;
-//  {}
+
+// Points To: none
+
    float x;
-//  {}
+
+// Points To: none
+
    printf("i=%d, %d, %f\n", i, i+j, x);
 }

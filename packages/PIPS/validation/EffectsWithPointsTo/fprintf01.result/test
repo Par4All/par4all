@@ -38,28 +38,56 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    FILE *pFile;
-//  {(pFile,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pFile -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int n;
-//  {(pFile,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pFile -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    char name[100];
-//  {(pFile,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pFile -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    pFile = fopen("myfile.txt", "w");
-//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// pFile -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    for(n = 0; n <= 2; n += 1) {
-//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// pFile -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
       puts("please, enter a name: ");
-//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// pFile -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
       gets(name);
-//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// pFile -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
       fprintf(pFile, "Name %d %s\n", n, name);
    }
-//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// pFile -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    fclose(pFile);
 }
 
