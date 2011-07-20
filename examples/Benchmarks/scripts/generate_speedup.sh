@@ -20,13 +20,17 @@ if [[ -z $ref_ver ]]; then
 ref_ver=run_seq
 fi
 
-nvers=0
+if [[ ! -z $exclude_tests ]]; then
+exclude_tests="where testcase not in ($exclude_tests)"
+fi
+
 if [[ -z $tests ]]; then
-tests=`echo "select testcase from timing group by testcase;" | sqlite3 $dbfile`
+tests=`echo "select testcase from timing $exclude_tests group by testcase;" | sqlite3 $dbfile`
 fi
 
 # 1st line is header
 echo -n " run_seq" >> $out_dat
+nvers=0 #compute number of versions
 for ver in $versions; do
   nvers=$(($nvers + 1))
   ver=`echo $ver|sed 's/run_//g'|sed 's/_/ /g'`
