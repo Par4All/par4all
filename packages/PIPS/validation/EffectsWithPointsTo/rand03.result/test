@@ -71,59 +71,105 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
 {
-//  {}
+
+// Points To: none
+
    int ix, iy;
-//  {}
+
+// Points To: none
+
    double u, A, v, B;
-//  {}
+
+// Points To: none
+
    
    // MOTIF 
    u = 0;
-//  {}
+
+// Points To: none
+
    for(iy = 0; iy <= ny-1; iy += 1)
-//  {}
+
+// Points To: none
+
       for(ix = 0; ix <= nx-1; ix += 1) {
-//  {}
+
+// Points To: none
+
 
          while (u==0||u>1)
-//  {}
+
+// Points To: none
+
             u = rand()/32768.;
-//  {}
+
+// Points To: none
+
          A = sqrt(-2.*log(u));
-//  {}
+
+// Points To: none
+
          v = rand()/32768.;
-//  {}
+
+// Points To: none
+
          B = 2.*3.141592653589793238*v;
-//  {}
+
+// Points To: none
+
          A = 1.0;
-//  {}
+
+// Points To: none
+
          v = 1.0;
-//  {}
+
+// Points To: none
+
          B = 1.0;
-//  {}
+
+// Points To: none
+
 
          pt_out[iy][ix].re = pt_in[iy][ix].re+Sigma2*A*cos(B);
-//  {}
+
+// Points To: none
+
          pt_out[iy][ix].im = pt_in[iy][ix].im+Sigma2*A*sin(B);
-//  {}
+
+// Points To: none
+
          u = 0;
       }
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int ny = 10, nx = 10;
-//  {}
+
+// Points To: none
+
    Cplfloat pt_in[ny][nx];
-//  {}
+
+// Points To: none
+
    float Sigma2;
-//  {}
+
+// Points To: none
+
    Cplfloat pt_out[ny][nx];
-//  {}
+
+// Points To: none
+
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);
 }

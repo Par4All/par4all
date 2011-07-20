@@ -1,0 +1,26 @@
+int main(int argc, char **argv)
+{
+   int i, j;
+   
+   /* Initialize array. */
+   init_array();
+   {
+      //PIPS generated variable
+      double (*P4A_var_y0)[80] = (double (*)[80]) 0;
+      P4A_accel_malloc((void **) &P4A_var_y0, sizeof(double)*80);
+
+
+      p4a_launcher_main(*P4A_var_y0);
+      P4A_copy_from_accel_1d(sizeof(double), 80, 80, 0, &y[0], *P4A_var_y0);
+      P4A_accel_free(P4A_var_y0);
+   }
+   p4a_launcher_main_1(tmp);
+   p4a_launcher_main_2(A, tmp, x);
+   for(i = 0; i <= 79; i += 1)
+      p4a_launcher_main_3(A, tmp, y, i);
+   
+   
+   print_array(argc, argv);
+
+   return 0;
+}

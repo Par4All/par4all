@@ -34,48 +34,87 @@ void foo()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void assign04()
 {
-//  {}
+
+// Points To: none
+
    int ***p;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int **q;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+
    int *r;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b2,
-//   -Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
    int i;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b2,
-//   -Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
+
 
    r = &i;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,i,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> &i , EXACT
+
    //q = &r;
    p = &q;
-//  {(p,q,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,i,
-//   -Exact-)}
+
+// Points To:
+// p -> &q , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> &i , EXACT
+
    **p = r;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,q,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,i,-Exact-)}
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> &i , EXACT
+// p -> &q , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// r -> &i , EXACT
+
    ***p = 0;
 }
-//  {}
+
+// Points To: none
+
 /* To be out of Emami's patterns */
 
-//  {}
+
+// Points To: none
+
 void assign04();
 
-//  {}
+
+// Points To: none
+
 void foo();
-//  {}
+
+// Points To: none
+
 void foo()
 {
-//  {}
+
+// Points To: none
+
    assign04();
 }
 

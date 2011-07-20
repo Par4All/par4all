@@ -16,18 +16,30 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i;
-//  {}
+
+// Points To: none
+
    int a[10];
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= 9; i += 1)
-//  {}
+
+// Points To: none
+
       a[i] = i;
-//  {}
+
+// Points To: none
+
    return 0;
 }

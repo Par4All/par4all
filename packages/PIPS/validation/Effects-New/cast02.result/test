@@ -1,0 +1,25 @@
+//             <may be read   >: a
+//             <may be written>: a[*]
+//             <    is read   >: size
+void init(int *a, int size)
+{
+   int i;
+//             <may be read   >: a i
+//             <may be written>: a[*]
+//             <    is read   >: size
+//             <    is written>: i
+   for(i = 0; i <= size-1; i += 1)
+//             <may be written>: a[*]
+//             <    is read   >: a i size
+      a[i] = i;
+}
+void cast_implicit()
+{
+//             <    is written>: n
+   int n = 10;
+   int a[n][n];
+//             <may be written>: a[*][*]
+//             <    is read   >: n
+
+   init(a, n*n);
+}

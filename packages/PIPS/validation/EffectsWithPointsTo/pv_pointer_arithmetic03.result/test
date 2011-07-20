@@ -29,30 +29,63 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int a[10];
-//  {}
+
+// Points To: none
+
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int i, j;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    i = 3;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    j = 2;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    p = &a[0];
-//  {(p,a[0],-Exact-)}
+
+// Points To:
+// p -> &a[0] , EXACT
+
    p = p+i;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    p = p+j;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    p = p-i;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    p = p-j;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    return 0;
 }
 

@@ -38,42 +38,87 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int *pdeb, *pfin, *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pdeb,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pfin,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pdeb -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pfin -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    pdeb = &t[0];
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pdeb,t[0],-Exact-);(pfin,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pdeb -> &t[0] , EXACT
+// pfin -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    /*   repère le premier élément de t   */
    pfin = &t[10-1];
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pdeb,t[0],-Exact-);(pfin,
-//   t[10-1],-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// pdeb -> &t[0] , EXACT
+// pfin -> &t[10-1] , EXACT
+
    /*   repère le dernier élément de t   */
    
    p = pdeb;
-//  {(p,t[0],-Exact-);(pdeb,t[0],-Exact-);(pfin,t[10-1],-Exact-)}
+
+// Points To:
+// p -> &t[0] , EXACT
+// pdeb -> &t[0] , EXACT
+// pfin -> &t[10-1] , EXACT
+
    while (p<=pfin) {
-//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
-//   -Exact-)}
+
+// Points To:
+// p -> &t[0] , MAY
+// p -> &t[*] , MAY
+// pdeb -> &t[0] , EXACT
+// pfin -> &t[10-1] , EXACT
+
       if (*p==0)
-//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
-//   -Exact-)}
+
+// Points To:
+// p -> &t[0] , MAY
+// p -> &t[*] , MAY
+// pdeb -> &t[0] , EXACT
+// pfin -> &t[10-1] , EXACT
+
          printf("%d ", p-pdeb);
-//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
-//   -Exact-)}
+
+// Points To:
+// p -> &t[0] , MAY
+// p -> &t[*] , MAY
+// pdeb -> &t[0] , EXACT
+// pfin -> &t[10-1] , EXACT
+
       p++;
    }
-//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
-//   -Exact-)}
+
+// Points To:
+// p -> &t[0] , MAY
+// p -> &t[*] , MAY
+// pdeb -> &t[0] , EXACT
+// pfin -> &t[10-1] , EXACT
+
    printf("\n");
-//  {(p,t[0],-MAY-);(p,t[*],-MAY-);(pdeb,t[0],-Exact-);(pfin,t[10-1],
-//   -Exact-)}
+
+// Points To:
+// p -> &t[0] , MAY
+// p -> &t[*] , MAY
+// pdeb -> &t[0] , EXACT
+// pfin -> &t[10-1] , EXACT
+
    return 0;
 }
 

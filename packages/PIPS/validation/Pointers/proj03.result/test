@@ -48,42 +48,89 @@ int main(void)
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main(void)
 {
-//  {}
+
+// Points To: none
+
    int i = 1;
-//  {}
+
+// Points To: none
+
    int *pi = &i;
-//  {(pi,i,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+
    int **pp = &pi;
-//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &pi , EXACT
+
    int j = 2;
-//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &pi , EXACT
+
 
    srand(time((void *) 0));
-//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &pi , EXACT
+
 
    if (alea()) {
-//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &pi , EXACT
+
       int *pj = &j;
-//  {(pi,i,-Exact-);(pj,j,-Exact-);(pp,pi,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pj -> &j , EXACT
+// pp -> &pi , EXACT
+
       pp = &pj;
-//  {(pi,i,-Exact-);(pj,j,-Exact-);(pp,pj,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pj -> &j , EXACT
+// pp -> &pj , EXACT
+
       **pp = 0;
    }
-//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,pi,
-//   -MAY-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> &pi , MAY
+
    
    // pp may points to a dead value in the stack
    printf("%p\n", pp);
-//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,pi,
-//   -MAY-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> &pi , MAY
+
    
    // possible segfault.
    // should generate an error while analyzing?
    **pp = 0;
-//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,pi,
-//   -MAY-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> &pi , MAY
+
    return 0;
 }

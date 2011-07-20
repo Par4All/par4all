@@ -22,22 +22,38 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int entier;
-//  {}
+
+// Points To: none
+
    int graine;
-//  {}
+
+// Points To: none
+
    double virgule;
-//  {}
+
+// Points To: none
+
    graine = 50;
-//  {}
+
+// Points To: none
+
    srandom(graine);
-//  {}
+
+// Points To: none
+
    /* generator initialization */
    virgule = (double) rand()/(2147483647+1);
-//  {}
+
+// Points To: none
+
    entier = 1+rand();
 }

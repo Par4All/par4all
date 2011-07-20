@@ -22,23 +22,39 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    float t;
-//  {}
+
+// Points To: none
+
    float a;
-//  {}
+
+// Points To: none
+
 
    t = 1.0;
-//  {}
+
+// Points To: none
+
    while (t<2.0) {
-//  {}
+
+// Points To: none
+
       a = a+t*0, 5;
-//  {}
+
+// Points To: none
+
       t += 0, 01;
    }
-//  {}
+
+// Points To: none
+
    return 0;
 }

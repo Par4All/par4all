@@ -45,37 +45,75 @@ int main(void)
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main(void)
 {
-//  {}
+
+// Points To: none
+
    int i = 0, j = 0;
-//  {}
+
+// Points To: none
+
    int **pp = (void *) 0;
-//  {(pp,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// pp -> &*NULL_POINTER* , EXACT
+
 
    srand(time((void *) 0));
-//  {(pp,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// pp -> &*NULL_POINTER* , EXACT
+
    if (alea()) {
-//  {(pp,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// pp -> &*NULL_POINTER* , EXACT
+
       int *pi = &i;
-//  {(pi,i,-Exact-);(pp,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &*NULL_POINTER* , EXACT
+
       pp = &pi;
    }
    else {
-//  {(pp,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// pp -> &*NULL_POINTER* , EXACT
+
       int *pj = &j;
-//  {(pj,j,-Exact-);(pp,*NULL_POINTER*,-Exact-)}
+
+// Points To:
+// pj -> &j , EXACT
+// pp -> &*NULL_POINTER* , EXACT
+
       pp = &pj;
    }
-//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+
+// Points To:
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> &*NULL_POINTER* , MAY
+
 
    printf("pp=%p\n", pp);
-//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+
+// Points To:
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> &*NULL_POINTER* , MAY
+
    
    // possible segfault.
    // should generate an error while analyzing?
    **pp = 0;
-//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+
+// Points To:
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> &*NULL_POINTER* , MAY
+
    return 0;
 }

@@ -12,14 +12,22 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int i;
-//  {}
+
+// Points To: none
+
    tf_t s;
-//  {}
+
+// Points To: none
+
 
    call15(&i, &s);
 }

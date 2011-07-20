@@ -12,12 +12,18 @@ int main(void)
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main(void)
 {
-//  {}
+
+// Points To: none
+
    int k = reference_01();
-//  {}
+
+// Points To: none
+
 
    return k;
 }

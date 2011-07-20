@@ -24,25 +24,39 @@ int struct05()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int struct05()
 {
-//  {}
+
+// Points To: none
+
    struct two {
       int first;
       int second;
    } x[10];
-//  {}
+
+// Points To: none
+
    int i = 0;
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= 9; i += 1)
-//  {}
+
+// Points To: none
+
       if (1)
-//  {}
+
+// Points To: none
+
          x[i].first = x[i].second;
       else
-//  {}
+
+// Points To: none
+
          x[i].second = x[i].first;
 }
 

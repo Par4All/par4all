@@ -109,7 +109,9 @@ static boolean compress_data(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 //                               compptr[0].MCU_height 
 //                               compptr[0].MCU_width last_MCU_col
                   if (blockcnt<compptr->MCU_width) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: coef[0].MCU_buffer[blkn+blockcnt][*] 
+//                               coef[0].MCU_buffer[blkn+blockcnt][*][
+//                               *]
 //             <    is read   >: blkn blockcnt cinfo 
 //                               cinfo[0].comps_in_scan coef 
 //                               coef[0].MCU_buffer[blkn+blockcnt] 
@@ -142,7 +144,8 @@ static boolean compress_data(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
                   }
                }
                else {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: coef[0].MCU_buffer[blkn][*] 
+//                               coef[0].MCU_buffer[blkn][*][*]
 //             <    is read   >: blkn cinfo cinfo[0].comps_in_scan 
 //                               coef coef[0].MCU_buffer[blkn] 
 //                               coef[0].MCU_rows_per_iMCU_row 
@@ -330,7 +333,7 @@ static boolean compress_first_pass(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 //             <    is written>: thisblockrow
             /* Create dummy blocks at the right edge of the image. */
             thisblockrow += blocks_across;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: thisblockrow[*] thisblockrow[*][*]
 //             <    is read   >: block_rows cinfo 
 //                               cinfo[0].num_components ndummy 
 //                               thisblockrow
@@ -386,7 +389,7 @@ static boolean compress_first_pass(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 //                               compptr[0].v_samp_factor
 //             <    is written>: lastblockrow
             lastblockrow = buffer[block_row-1];
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: thisblockrow[*] thisblockrow[*][*]
 //             <    is read   >: block_rows blocks_across cinfo 
 //                               cinfo[0].num_components compptr 
 //                               compptr[0].v_samp_factor thisblockrow
@@ -6766,7 +6769,7 @@ static void transencode_coef_controller(j_compress_ptr cinfo, jvirt_barray_ptr *
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    buffer = (JBLOCKROW) (*cinfo->mem->alloc_large)((j_common_ptr) cinfo,1,10*(size_t) sizeof(JBLOCK));
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: buffer[*] buffer[*][*]
 //             <    is read   >: buffer
    jzero_far((void *) buffer, 10*(size_t) sizeof(JBLOCK));
 //             <    is written>: i
@@ -7613,7 +7616,8 @@ static int decompress_onepass(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
 //                               coef[0].MCU_vert_offset last_MCU_col
 //             <    is written>: MCU_col_num
       for(MCU_col_num = coef->MCU_ctr; MCU_col_num <= last_MCU_col; MCU_col_num += 1) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: coef[0].MCU_buffer[0][*] 
+//                               coef[0].MCU_buffer[0][*][*]
 //             <    is read   >: cinfo cinfo[0].blocks_in_MCU coef 
 //                               coef[0].MCU_buffer[0] coef[0].MCU_ctr
 //                               coef[0].MCU_rows_per_iMCU_row 
@@ -8077,7 +8081,7 @@ break_1:   ;
 //             <    is written>: block_num
             for(block_num = 0; block_num <= last_block_column; block_num += 1) {
 //             <may be read   >: buffer_ptr[*] buffer_ptr[*][*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: workspace[*]
 //             <    is read   >: block_rows buffer_ptr cinfo 
 //                               cinfo[0].num_components 
 //                               last_block_column
@@ -18510,7 +18514,8 @@ static JBLOCKARRAY access_virt_barray(j_common_ptr cinfo, jvirt_barray_ptr ptr, 
          end_row -= ptr->cur_start_row;
 //             <    is read   >: end_row undef_row
          while (undef_row<end_row) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: ptr[0].mem_buffer[undef_row][*] 
+//                               ptr[0].mem_buffer[undef_row][*][*]
 //             <    is read   >: bytesperrow ptr ptr[0].mem_buffer 
 //                               ptr[0].mem_buffer[undef_row] 
 //                               undef_row
@@ -18646,7 +18651,7 @@ static JSAMPARRAY access_virt_sarray(j_common_ptr cinfo, jvirt_sarray_ptr ptr, J
          end_row -= ptr->cur_start_row;
 //             <    is read   >: end_row undef_row
          while (undef_row<end_row) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: ptr[0].mem_buffer[undef_row][*]
 //             <    is read   >: bytesperrow ptr ptr[0].mem_buffer 
 //                               ptr[0].mem_buffer[undef_row] 
 //                               undef_row
@@ -25800,7 +25805,7 @@ static void quantize_fs_dither(j_decompress_ptr cinfo, JSAMPARRAY input_buf, JSA
    
    
    for(row = 0; row <= num_rows-1; row += 1) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: output_buf[row][*]
 //             <    is read   >: num_rows output_buf output_buf[row] 
 //                               row width
       jzero_far((void *) output_buf[row], (size_t) (width*(size_t) sizeof(JSAMPLE)));
@@ -25984,7 +25989,7 @@ static void quantize_ord_dither(j_decompress_ptr cinfo, JSAMPARRAY input_buf, JS
 //             <    is written>: row
 
    for(row = 0; row <= num_rows-1; row += 1) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: output_buf[row][*]
 //             <    is read   >: num_rows output_buf output_buf[row] 
 //                               row width
       jzero_far((void *) output_buf[row], (size_t) (width*(size_t) sizeof(JSAMPLE)));
@@ -26236,7 +26241,7 @@ switch_1_case_JDITHER_FS:      ;
 //             <    is read   >: cinfo cinfo[0].out_color_components
 //             <    is written>: i
       for(i = 0; i <= cinfo->out_color_components-1; i += 1)
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: cquantize[0].fserrors[i][*]
 //             <    is read   >: arraysize cinfo 
 //                               cinfo[0].out_color_components 
 //                               cquantize cquantize[0].fserrors[i] i
@@ -27705,7 +27710,7 @@ static void start_pass_2_quant(j_decompress_ptr cinfo, boolean is_pre_scan)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
             cquantize->fserrors = (FSERRPTR) (*cinfo->mem->alloc_large)((j_common_ptr) cinfo,1,arraysize);
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: cquantize[0].fserrors[*]
 //             <    is read   >: arraysize cquantize 
 //                               cquantize[0].fserrors
          /* Initialize the propagated errors to zero. */
@@ -27726,7 +27731,7 @@ static void start_pass_2_quant(j_decompress_ptr cinfo, boolean is_pre_scan)
    if (cquantize->needs_zeroed) {
 //             <    is written>: i
       for(i = 0; i <= 31; i += 1)
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: histogram[i][*] histogram[i][*][*]
 //             <    is read   >: histogram histogram[i] i
          jzero_far((void *) histogram[i], (1<<6)*(1<<5)*(size_t) sizeof(histcell));
 //             <    is read   >: cquantize

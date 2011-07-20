@@ -34,30 +34,54 @@ void foo()
 
 POINTS TO
 
-//  {}
+
+// Points To: none
+
 void assign05()
 {
-//  {}
+
+// Points To: none
+
    int *r;
-//  {(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// r -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int i;
-//  {(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// r -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    r = bar(i);
-//  {(r,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// r -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    i = 1;
-//  {(r,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// r -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    *r = 0;
 }
-//  {}
+
+// Points To: none
+
 int * bar(int j)
 {
-//  {}
+
+// Points To: none
+
    return &j;
 }
-//  {}
+
+// Points To: none
+
 void foo()
 {
-//  {}
+
+// Points To: none
+
    assign05();
 }

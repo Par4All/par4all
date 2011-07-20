@@ -5,8 +5,7 @@ int main()
 {
    char *end;
    long int li;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: end li
 
    li = strtol("32445667 is a number", &end, 0);
    return 0;
@@ -14,17 +13,30 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    char *end;
-//  {(end,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// end -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    long int li;
-//  {(end,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// end -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    li = strtol("32445667 is a number", &end, 0);
-//  {(end,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+
+// Points To:
+// end -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
    return 0;
 }
 
@@ -34,8 +46,7 @@ int main()
 {
    char *end;
    long int li;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: end li
 
    li = strtol("32445667 is a number", &end, 0);
    return 0;

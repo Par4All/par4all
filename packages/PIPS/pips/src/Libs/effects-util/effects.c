@@ -325,6 +325,18 @@ bool malloc_cell_p(cell c)
   return heap_p;
 }
 
+bool malloc_reference_p(reference r)
+{
+  bool heap_p;
+  entity v = reference_variable(r);
+
+  heap_p = same_string_p(entity_local_name(v), MALLOC_EFFECTS_NAME);
+
+  return heap_p;
+}
+
+
+
 /*************** I/O EFFECTS *****************/
 bool io_effect_entity_p(entity e)
 {

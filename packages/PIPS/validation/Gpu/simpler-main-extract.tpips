@@ -70,23 +70,23 @@ display PRINTED_FILE[%ALLFUNC]
 #setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_COPY_TO_ACCEL"
 #setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_COPY_FROM_ACCEL"
 # Should be automatic with pyps:
-apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4,p4a_kernel_launcher_5]
-#apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0]
+apply KERNEL_LOAD_STORE[p4a_launcher_main,p4a_launcher_main_1,p4a_launcher_main_2,p4a_launcher_main_3,p4a_launcher_main_4]
+#apply KERNEL_LOAD_STORE[p4a_launcher_0]
 display PRINTED_FILE[%ALLFUNC]
 
 # Need pyps for automate this
-apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4,p4a_kernel_launcher_5]
-#apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
+apply GPU_LOOP_NEST_ANNOTATE[p4a_launcher_main,p4a_launcher_main_1,p4a_launcher_main_2,p4a_launcher_main_3,p4a_launcher_main_4]
+#apply GPU_LOOP_NEST_ANNOTATE[p4a_launcher_0]
 
 # Inline back the kernel since CUDA can only deal with local functions if
 # they are in the same file as the caller (by inlining them, by the
 # way... :-) )
-#apply INLINING[p4a_kernel_0,p4a_kernel_1,p4a_kernel_2,p4a_kernel_3,p4a_kernel_4]
-apply INLINING[p4a_kernel_0]
+#apply INLINING[p4a_kernel_main,p4a_kernel_main_1,p4a_kernel_main_2,p4a_kernel_main_3,p4a_kernel_main_4]
+apply INLINING[p4a_kernel_main]
 # Instead, do a global loop normalization above:
-#apply LOOP_NORMALIZE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2]
-#apply USE_DEF_ELIMINATION[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2]
-#display PRINTED_FILE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2]
+#apply LOOP_NORMALIZE[p4a_launcher_main,p4a_launcher_main_1]
+#apply USE_DEF_ELIMINATION[p4a_launcher_main,p4a_launcher_main_1]
+#display PRINTED_FILE[p4a_launcher_main,p4a_launcher_main_1]
 
 #apply SUPPRESS_DEAD_CODE
 #display PRINTED_FILE

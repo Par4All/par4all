@@ -368,8 +368,12 @@ statement effects_to_dma(statement stat,
   if(empty_string_p(get_dma_name(s,dma1D)))
     return statement_undefined;
 
-  /* work on a copy because we compute the rectangular hull in place */
-  list rw_effects= gen_full_copy_list(load_cumulated_rw_effects_list(stat));
+  /* work on a copy because we compute the rectangular hull in place
+     and keep only store effects: we do not care for environment effects here (BC)
+  */
+  list l_eff_tmp = effects_store_effects(load_cumulated_rw_effects_list(stat));
+  list rw_effects = gen_full_copy_list(l_eff_tmp);
+  gen_free_list(l_eff_tmp); /* free the spine, as effects are shared with the database */
   transformer tr = transformer_range(load_statement_precondition(stat));
 
   /* SG: to do: merge convex hulls when they refer to *all* fields of a region

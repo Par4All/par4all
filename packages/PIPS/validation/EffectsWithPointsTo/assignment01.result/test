@@ -16,24 +16,44 @@ void assignment01()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 void assignment01()
 {
-//  {}
+
+// Points To: none
+
    int i;
-//  {}
+
+// Points To: none
+
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int *q;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int *r;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
 
    p = q = r = &i;
-//  {(p,i,-Exact-);(q,i,-Exact-);(r,i,-Exact-)}
+
+// Points To:
+// p -> &i , EXACT
+// q -> &i , EXACT
+// r -> &i , EXACT
+
    i = 2;
 }
 

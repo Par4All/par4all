@@ -18,21 +18,35 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    char buf[20];
-//  {}
+
+// Points To: none
+
    size_t nbytes;
-//  {}
+
+// Points To: none
+
    ssize_t bytes_read;
-//  {}
+
+// Points To: none
+
    int fd;
-//  {}
+
+// Points To: none
+
 
    nbytes = sizeof(buf);
-//  {}
+
+// Points To: none
+
    bytes_read = read(fd, buf, nbytes);
 }
 

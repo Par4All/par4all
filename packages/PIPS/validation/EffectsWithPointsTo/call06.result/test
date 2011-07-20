@@ -33,36 +33,67 @@ int main()
 
 POINTS-TO
 
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
 void call06(int r, int m, int *x)
 {
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
    int j;
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
 
    for(j = 0; j <= m-1; j += 1)
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
       x[j] = 10*r+j;
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
    return;
 }
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int d1 = 4;
-//  {}
+
+// Points To: none
+
    int d2 = 4;
-//  {}
+
+// Points To: none
+
    int y[d1][d2];
-//  {}
+
+// Points To: none
+
    int i, j;
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= d1-1; i += 1)
-//  {}
+
+// Points To: none
+
       call06(i, d2, &y[i][0]);
-//  {}
+
+// Points To: none
+
    exit(0);
 }
 
@@ -92,6 +123,7 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
+//             <may be written>: y[i][*]
 //             <    is read   >: d1 d2 i
       call06(i, d2, &y[i][0]);
    exit(0);
@@ -99,6 +131,8 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	20 --> 20 with conflicts
+		from <y[i][*]-W-MAY> to <y[i][*]-W-MAY>
 	15 --> 20 with conflicts
 		from <d2-W-EXACT> to <d2-R-EXACT>
 	14 --> 20 with conflicts

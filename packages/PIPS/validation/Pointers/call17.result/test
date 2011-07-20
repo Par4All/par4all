@@ -14,12 +14,22 @@ void call17(int *x)
 
 POINTS-TO
 
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
 void call17(int *x)
 {
    /* check aliases */
-//  {(x,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+
    int *y = x;
-//  {(x,_x_1[0],-Exact-);(y,_x_1[0],-Exact-)}
+
+// Points To:
+// x -> &_x_1[0] , EXACT
+// y -> &_x_1[0] , EXACT
+
    y[0] = 1;
 }

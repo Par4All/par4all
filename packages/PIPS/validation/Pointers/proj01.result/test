@@ -29,30 +29,56 @@ int main(void)
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main(void)
 {
-//  {}
+
+// Points To: none
+
    int i, j;
-//  {}
+
+// Points To: none
+
    int **pp;
    {
-//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       int *pi = &i;
-//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       pp = &pi;
-//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+
+// Points To:
+// pi -> &i , EXACT
+// pp -> &pi , EXACT
+
       **pp = 1;
    }
-//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    
    // pp points to a dead value in the stack
    // should generate an error
    **pp = 0;
-//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    // segfault?
    *pp = &j;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,j,-Exact-);(pp,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// *ANY_MODULE*:*ANYWHERE*_b0 -> &j , EXACT
+// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    return 0;
 }

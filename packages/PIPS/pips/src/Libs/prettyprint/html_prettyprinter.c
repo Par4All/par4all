@@ -57,6 +57,7 @@
 #include "control.h"
 #include "pipsdbm.h"
 #include "text-util.h"
+#include "properties.h"
 
 #define NL "\n"
 /**************************************************************** MISC UTILS */
@@ -803,6 +804,19 @@ static void html_print_statement(statement s) {
   end_block("statement", true);
 }
 
+
+void html_print_symbol_table() {
+  /* Print symbol table */
+  html_print(NL "<li><ul class=\"symbolTable\">" NL);
+  begin_block("Symbol table", true);
+  list entities = gen_filter_tabulated(gen_true, entity_domain);
+  FOREACH(entity, e, entities ) {
+    html_print_entity_full(e);
+  }
+  html_print("<li class=\"endSymbolTable\">&nbsp;</li>" NL "</ul></li>" NL);
+  end_block("Symbol table", true);
+}
+
 bool html_prettyprint(const char *mod_name) {
 
   statement module_statement = (statement)db_get_memory_resource(DBR_CODE,
@@ -838,6 +852,11 @@ bool html_prettyprint(const char *mod_name) {
   end_block(mod_name, true);
   html_print("<li class=\"endmodule\">&nbsp;</li>" NL "</ul></li>" NL);
 
+
+  if(get_bool_property("HTML_PRETTYPRINT_SYMBOL_TABLE")) {
+    html_print_symbol_table();
+  }
+
   // Reset output file
   html_set_output(0);
   safe_fclose( fp, output_file );
@@ -861,16 +880,6 @@ bool html_prettyprint_symbol_table(const char *module) {
   FILE *fp = safe_fopen( output_file, "w" );
   html_set_output(fp);
 
-
-  /* Print symbol table */
-  html_print(NL "<li><ul class=\"symbolTable\">" NL);
-  begin_block("Symbol table", true);
-  list entities = gen_filter_tabulated(gen_true, entity_domain);
-  FOREACH(entity, e, entities ) {
-    html_print_entity_full(e);
-  }
-  html_print("<li class=\"endSymbolTable\">&nbsp;</li>" NL "</ul></li>" NL);
-  end_block("Symbol table", true);
 
   // Reset output file
   html_set_output(0);

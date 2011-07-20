@@ -28,26 +28,58 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    int a;
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
    if (a==1)
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       p = (int *) malloc(2*sizeof(int));
    else
-//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+// Points To:
+// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       p = (int *) malloc(3*sizeof(int));
-//  {(p,*HEAP*_l_8[0],-MAY-);(p,*HEAP*_l_10[0],-MAY-)}
+
+// Points To:
+// p -> &*HEAP*_l_8[0] , MAY
+// p -> &*HEAP*_l_10[0] , MAY
+
    p[0] = 0;
-//  {(p,*HEAP*_l_8[0],-MAY-);(p,*HEAP*_l_10[0],-MAY-)}
+
+// Points To:
+// p -> &*HEAP*_l_8[0] , MAY
+// p -> &*HEAP*_l_10[0] , MAY
+
    p[1] = 1;
-//  {(p,*HEAP*_l_8[0],-MAY-);(p,*HEAP*_l_10[0],-MAY-)}
+
+// Points To:
+// p -> &*HEAP*_l_8[0] , MAY
+// p -> &*HEAP*_l_10[0] , MAY
+
    free(p);
-//  {(p,*HEAP*_l_8[0],-MAY-);(p,*HEAP*_l_10[0],-MAY-)}
+
+// Points To:
+// p -> &*HEAP*_l_8[0] , MAY
+// p -> &*HEAP*_l_10[0] , MAY
+
    return 0;
 }

@@ -24,23 +24,48 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int j = 0, k, tab[5];
-//  {}
+
+// Points To: none
+
    int *p = &j;
-//  {(p,j,-Exact-)}
+
+// Points To:
+// p -> &j , EXACT
+
    int *q = tab[1];
-//  {(p,j,-Exact-);(q,tab[1],-Exact-)}
+
+// Points To:
+// p -> &j , EXACT
+// q -> &tab[1] , EXACT
+
 
    k = 1;
-//  {(p,j,-Exact-);(q,tab[1],-Exact-)}
+
+// Points To:
+// p -> &j , EXACT
+// q -> &tab[1] , EXACT
+
    j = k;
-//  {(p,j,-Exact-);(q,tab[1],-Exact-)}
+
+// Points To:
+// p -> &j , EXACT
+// q -> &tab[1] , EXACT
+
    p = &k;
-//  {(p,k,-Exact-);(q,tab[1],-Exact-)}
+
+// Points To:
+// p -> &k , EXACT
+// q -> &tab[1] , EXACT
+
 
    return 0;
 }

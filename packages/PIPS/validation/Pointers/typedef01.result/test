@@ -17,18 +17,33 @@ int main(int argc, char *argv[])
 
 POINTS-TO
 
-//  {(argv[*],_argv_1[0],-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+
 int main(int argc, char *argv[])
 {
-//  {(argv[*],_argv_1[0],-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+
    int t;
-//  {(argv[*],_argv_1[0],-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+
    
    
    for(t = 0; t <= 63; t += 1)
-//  {(argv[*],_argv_1[0],-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+
       compute();
-//  {(argv[*],_argv_1[0],-Exact-)}
+
+// Points To:
+// argv[*] -> &_argv_1[0] , EXACT
+
    
    
    return 0;

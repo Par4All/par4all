@@ -27,26 +27,46 @@ int main()
 
 POINTS-TO
 
-//  {}
+
+// Points To: none
+
 int main()
 {
-//  {}
+
+// Points To: none
+
    int d1 = 10;
-//  {}
+
+// Points To: none
+
    int d2 = 10;
-//  {}
+
+// Points To: none
+
    int d3 = 10;
-//  {}
+
+// Points To: none
+
    int d4 = 10;
-//  {}
+
+// Points To: none
+
    int y[d1][d2][d3][d4];
-//  {}
+
+// Points To: none
+
    int i, j;
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= d1-1; i += 1)
-//  {}
+
+// Points To: none
+
       for(j = 0; j <= d2-1; j += 1)
-//  {}
+
+// Points To: none
+
          call11(d3, d4, &y[i][j][0]);
 }

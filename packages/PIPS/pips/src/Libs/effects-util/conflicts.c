@@ -390,7 +390,10 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
   entity v1 = reference_variable(r1);
   entity v2 = reference_variable(r2);
 
+  pips_debug(5, " %s vs %s\n", effect_reference_to_string(r1), effect_reference_to_string(r2));
+
   if ( entities_may_conflict_p( v1, v2 ) ) {
+    pips_debug(5, "entities may conflict\n");
     list ind1 = reference_indices(r1);
     list ind2 = reference_indices(r2);
 
@@ -405,84 +408,98 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
       conflict_p = variable_references_may_conflict_p( v1, ind1, ind2 );
     }
   } else {
-    /* Can we have some dynamic aliasing? */
-    /* Do we have aliasing between types? */
-    /* Do we have aliasing within a data structure? This should have
-       been checked above with
-       variable_references_may_conflict_p(v1,ind1,ind2) */
 
-    /* Can we use types to conclude there is not indirect conflict? */
-    bool get_bool_property( string );
-    if ( !get_bool_property( "ALIASING_ACROSS_TYPES" ) ) {
-      /* No type check for abstract location
-       * FIXME : really ?
-       */
-      if ( !entity_abstract_location_p( reference_variable(r1) )
-	   && !entity_abstract_location_p( reference_variable(r2) ) ) {
+    /* Since we are dealing with constantpath effects here, I don't understand
+       the reason for this else branch ...
+       Everything should have been treated in the previous branch. BC */
+
+	/* Can we have some dynamic aliasing? */
+	/* Do we have aliasing between types? */
+	/* Do we have aliasing within a data structure? This should have
+	   been checked above with
+	   variable_references_may_conflict_p(v1,ind1,ind2) */
+
+
+    /* A patch for effects_package references, which have already been treated befofre */
+    if (effects_package_entity_p(v1) || effects_package_entity_p(v2))
+      conflict_p = (v1 == v2);
+    else
+      {
+
+	/* Can we use types to conclude there is not indirect conflict? */
+	bool get_bool_property( string );
+	if ( !get_bool_property( "ALIASING_ACROSS_TYPES" ) ) {
+	  /* No type check for abstract location
+	   * FIXME : really ?
+	   */
+	  if ( !entity_abstract_location_p( reference_variable(r1) )
+	       && !entity_abstract_location_p( reference_variable(r2) ) ) {
+
+	    /* Are we dealing with NULL POINTER ? */
+	    if ( entity_null_locations_p(v1) && entity_null_locations_p(v2) )
+	      conflict_p = true;
+	    else if(entity_null_locations_p(v1) || entity_null_locations_p(v2) )
+	      conflict_p = false;
+	    else{
+	      type t1 = cell_reference_to_type( r1 );
+	      type t2 = cell_reference_to_type( r2 );
+
+	      conflict_p = type_equal_p( t1, t2 );
+	    }
+	  }
+	}
+
+	/* Do we use formal parameters? */
+	if ( !get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" ) ) {
+	  /* No type check for abstract location
+	   * FIXME : really ?
+	   */
+	  if ( entity_formal_p( reference_variable(r1) )
+	       && entity_formal_p( reference_variable(r2) ) ) {
+	    conflict_p = false;
+	  }
+	}
 
 	/* Are we dealing with NULL POINTER ? */
 	if ( entity_null_locations_p(v1) && entity_null_locations_p(v2) )
 	  conflict_p = true;
 	else if(entity_null_locations_p(v1) || entity_null_locations_p(v2) )
 	  conflict_p = false;
-	else{
-	  type t1 = cell_reference_to_type( r1 );
-	  type t2 = cell_reference_to_type( r2 );
 
-	  conflict_p = type_equal_p( t1, t2 );
+	/* There still could be a conflict in C because the two references
+	   might point to the same memory location. It might be more
+	   effective to drop this when Fortran 77 code is analyzed because
+	   the lack of pointers guarantees there is no conflict. */
+	if ( conflict_p ) {
+	  /* Do we have some dereferencing in ind1 or ind2? Do we assume
+	     that p[0] conflicts with any reference? We might as well use
+	     reference_to_abstract_location()... */
+	  /* Could be improved with ALIASING_ACROSS_DATA_STRUCTURES? */
+	  bool exact;
+	  // Check dereferencing in r1
+	  conflict_p = effect_reference_dereferencing_p( r1, &exact );
+	  if(!conflict_p) {
+	    /* We need to evaluate dereferencing in r2 only when a dereferencing
+	     * have not been find in r1 */
+	    conflict_p = effect_reference_dereferencing_p( r2, &exact );
+	  }
+	  /* In other words, we assume not conflict as soon as not pointer is
+	   * dereferenced... even when aliasing across types is not ignored !
+	   *
+	   * If aliasing across types is ignored, we know here that the
+	   * two memory locations referenced are of the same type. If the
+	   * pointer in one reference (let's assume only one pointer to
+	   * start with) is not of type pointer to the common type, then
+	   * there is no conflict.
+	   *
+	   * Else, we have to assume a conflict no matter what, because
+	   * simple cases should have been simplified via the points-to
+	   * analysis.
+	   */
 	}
       }
-    }
-
-    /* Do we use formal parameters? */
-    if ( !get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" ) ) {
-      /* No type check for abstract location
-       * FIXME : really ?
-       */
-      if ( entity_formal_p( reference_variable(r1) )
-	   && entity_formal_p( reference_variable(r2) ) ) {
-	conflict_p = false;
-      }
-    }
-
-    /* Are we dealing with NULL POINTER ? */
-    if ( entity_null_locations_p(v1) && entity_null_locations_p(v2) )
-      conflict_p = true;
-    else if(entity_null_locations_p(v1) || entity_null_locations_p(v2) )
-      conflict_p = false;
-
-    /* There still could be a conflict in C because the two references
-       might point to the same memory location. It might be more
-       effective to drop this when Fortran 77 code is analyzed because
-       the lack of pointers guarantees there is no conflict. */
-    if ( conflict_p ) {
-      /* Do we have some dereferencing in ind1 or ind2? Do we assume
-       that p[0] conflicts with any reference? We might as well use
-       reference_to_abstract_location()... */
-      /* Could be improved with ALIASING_ACROSS_DATA_STRUCTURES? */
-      bool exact;
-      // Check dereferencing in r1
-      conflict_p = effect_reference_dereferencing_p( r1, &exact );
-      if(!conflict_p) {
-        /* We need to evaluate dereferencing in r2 only when a dereferencing
-         * have not been find in r1 */
-        conflict_p = effect_reference_dereferencing_p( r2, &exact );
-      }
-      /* In other words, we assume not conflict as soon as not pointer is
-       * dereferenced... even when aliasing across types is not ignored !
-       *
-       * If aliasing across types is ignored, we know here that the
-       * two memory locations referenced are of the same type. If the
-       * pointer in one reference (let's assume only one pointer to
-       * start with) is not of type pointer to the common type, then
-       * there is no conflict.
-       *
-       * Else, we have to assume a conflict no matter what, because
-       * simple cases should have been simplified via the points-to
-       * analysis.
-       */
-    }
   }
+  pips_debug(5, "there is %s may conflict\n", conflict_p? "a": "no");
   return conflict_p;
 }
 
@@ -497,6 +514,8 @@ bool references_must_conflict_p( reference r1, reference r2 ) {
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
 
+  pips_debug(5, " %s vs %s\n", effect_reference_to_string(r1), effect_reference_to_string(r2));
+
   // Do a simple check for scalar conflicts
   if ( reference_scalar_p( r1 ) && reference_scalar_p( r2 )
       && entities_must_conflict_p( e1, e2 ) ) {
@@ -505,6 +524,7 @@ bool references_must_conflict_p( reference r1, reference r2 ) {
     /* pips_user_warning("Not completely implemented yet. "
        "Conservative under approximation is made\n");*/
   }
+  pips_debug(5, "there is %s must conflict\n", conflict_p? "a": "no");
   return conflict_p;
 }
 
