@@ -57,4 +57,19 @@ cuda_opt:
 		make -C $$target $@ ; \
 	done
 
+openmp_src:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
+
+cuda_src:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
+
+cuda_opt_src:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
+
 
