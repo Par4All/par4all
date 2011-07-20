@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-double get_time();
+double timer_get_time();
 void timer_start();
 void timer_stop();
 void timer_display();
