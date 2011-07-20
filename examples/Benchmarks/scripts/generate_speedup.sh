@@ -19,7 +19,9 @@ fi
 
 
 nvers=0
+if [[ -z $tests ]]; then
 tests=`echo "select testcase from timing group by testcase;" | sqlite3 $dbfile`
+fi
 
 # 1st line is header
 echo -n " run_seq" >> $out_dat
