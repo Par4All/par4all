@@ -3,6 +3,7 @@
 if [[ -z $dbfile ]]; then
 dbfile="timing.sqlite"
 fi
+echo $dbfile
 
 out_dat="timing.dat"
 out_gp="histogram.gp"
@@ -29,10 +30,20 @@ for ver in $versions; do
 done
 echo >> $out_dat
 
+
+mean_idx=0
+for ver in $versions; do
+  mean_expr[$mean_idx]="0" # compute geomean !
+  ((mean_idx++))
+done
+
+nmean=0
+
 for test in $tests; do
   echo -n $test >> $out_dat
   # reference 
   ref=`echo "select ROUND(AVG(measure),2) from timing where testcase=\"$test\" and version=\"run_seq\";" | sqlite3 $dbfile`
+  mean_idx=0
   for ver in $versions; do
     time=`echo "select ROUND(AVG(measure),2) from timing where testcase=\"$test\" and version=\"$ver\";" | sqlite3 $dbfile`
     speedup=0
@@ -40,10 +51,32 @@ for test in $tests; do
       #echo "speedup $test $ver $time : $ref/$time"
       speedup=`echo "scale=2; $ref/$time" | bc `
     fi
+
+    if [[ "$speedup" ==  "0" ]]; then
+      mean_expr[$mean_idx]+="+ 0"
+    else 
+      mean_expr[$mean_idx]+="+ l($speedup)"
+    fi
+    ((mean_idx++))
     echo -n " $speedup" >> $out_dat
   done
   echo >> $out_dat
+  nmean=$((nmean+1))
 done
+
+element_count=${#mean_expr[@]}
+mean_idx=0
+echo -n "Geo.Mean" >> $out_dat
+while [ "$mean_idx" -lt "$element_count" ]
+do    # List all the elements in the array.
+  echo "e((${mean_expr[$mean_idx]})/$nmean)"
+  geomean=`echo "scale=2; e((${mean_expr[$mean_idx]})/$nmean)" | bc -l`
+  echo "$geomean"
+  echo -n " $geomean" >> $out_dat
+  ((mean_idx++))
+done
+echo >> $out_dat
+
 
 
 cp speedup.gp $out_gp
@@ -55,7 +88,7 @@ ratio=`echo "scale=2; 1/$nvers" | bc `
 for ver in $versions; do
   echo "\\" >> $out_gp
   echo "$sep '$out_dat' u $nver:xtic(1) \\" >> $out_gp
-  echo -n ",'' u (\$0+($(($nver-2)))*1./(${nvers}+g)):$nver:$nver w labels font 'Arial,9' rotate by 90 offset -1.1,1 t ''" >> $out_gp
+  echo -n ",'' u (\$0-(${nvers}-2)/2.*1./(${nvers}+2)+($(($nver-2)))*1./(${nvers}+g)):$nver:$nver w labels font 'Arial,7' left rotate by 90 offset 0,0.1 t ''" >> $out_gp
   nver=$(($nver+1))
   sep=","
 done
