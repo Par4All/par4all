@@ -497,17 +497,38 @@ list generic_c_effects_backward_translation(entity callee,
 	      pips_debug(5, "effects on current formal argument:\n");
 	      (*effects_prettyprint_func)(l_eff_on_current_formal);
 	    }
-	  /* then translate them */
-	  l_eff = gen_nconc
-	    (l_eff,
-	     (*c_effects_on_formal_parameter_backward_translation_func)
-	     (l_eff_on_current_formal, real_arg, context));
+	  /* then translate them if possible */
+	  if (!ENDP( l_eff_on_current_formal))
+	    {
+	      type real_arg_t = expression_to_type(real_arg);
+	      if (types_compatible_for_effects_interprocedural_translation_p(real_arg_t, te))
+		l_eff = gen_nconc
+		  (l_eff,
+		   (*c_effects_on_formal_parameter_backward_translation_func)
+		   (l_eff_on_current_formal, real_arg, context));
+	      else
+		{
+		  bool read_p = false;
+		  bool write_p = false;
+		  FOREACH(EFFECT, eff, l_eff_on_current_formal)
+		    {
+		      write_p = write_p || effect_write_p(eff);
+		      read_p = read_p || effect_read_p(eff);
+		    }
+
+		  tag t = write_p ? (read_p ? 'x' : 'w') : 'r';
+		  l_eff = gen_nconc(l_eff,
+				     c_actual_argument_to_may_summary_effects(real_arg, t));
+		}
+	      free_type(real_arg_t);
+	    }
 
 	  POP(formal_args);
 	} /* else if (!spurious_real_arg_p) */
 
       /* add the proper effects on the real arg evaluation on any case */
       l_eff = gen_nconc(l_eff, generic_proper_effects_of_c_function_call_argument(real_arg));
+
     } /* for */
 
   /* removed because the parser adds arguments to the function (see ticket 452) */

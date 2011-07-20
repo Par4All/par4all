@@ -978,6 +978,15 @@ bool rand_effects_entity_p(entity e)
 		 strlen(entity_module_name(e))) == 0);
 }
 
+bool malloc_entity_p(entity e)
+{
+  return same_string_p(entity_local_name(e), MALLOC_EFFECTS_NAME);
+}
+
+bool effects_package_entity_p(entity e)
+{
+  return (strstr(entity_module_name(e), "_EFFECTS") != 0);
+}
 
 bool intrinsic_entity_p(entity e)
 {
@@ -1842,11 +1851,13 @@ void update_dummy_parameter(parameter p, entity ep)
 bool parameter_passing_mode_p(entity f, int tag)
 {
   type ft = ultimate_type(entity_type(f));
-  functional ftf = type_functional(ft);
-  bool mode_p = true;
 
   /* Calls thru pointers require syntax_application */
   pips_assert("call to a function", type_functional_p(ft));
+
+  functional ftf = type_functional(ft);
+  bool mode_p = true;
+
 
   if(!ENDP(functional_parameters(ftf))) {
     /* It is assumed that all parameters are passed the same way,

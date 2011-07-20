@@ -307,6 +307,16 @@ bool expression_call_p(expression e)
 {
   return(syntax_call_p(expression_syntax(e)));
 }
+bool expression_address_of_p(expression e)
+{
+  if (expression_call_p(e))
+    {
+      call c = expression_call(e);
+      return(ENTITY_ADDRESS_OF_P(call_function(c)));
+    }
+  else
+    return false;
+}
 
 call expression_call(expression e)
 {

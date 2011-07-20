@@ -1827,7 +1827,7 @@ choke some parts of \PIPS{}...) like:
 This representation is not yet implemented.
 
 
-\section{Controlized Code (hierarchical control flow graph)}
+\section{Controlized Code (Hierarchical Control Flow Graph)}
 \label{subsection-controlized-code}
 \index{Controlizer}
 \index{CFG}
@@ -3349,7 +3349,7 @@ Unstructured control flow graphs can lead to very long transformer computations,
 \PipsPropRef{SEMANTICS_MAX_CFG_SIZE2}
 \PipsPropRef{SEMANTICS_MAX_CFG_SIZE1}
 
-discussed in the property documentation.
+discussed below.
 
 Default value were set in the early nineties to obtain results fast
 enough for live demonstrations. They have not been changed to preserve the
@@ -7650,6 +7650,18 @@ GPU_LOOP_NEST_ANNOTATE_PARALLEL TRUE
 \end{PipsProp}
 
 
+\begin{PipsPass}{gpu_promote_sequential}
+This phase promote sequential code in GPU kernels to avoid memory transfers.
+\end{PipsPass}
+
+\begin{PipsMake}
+gpu_promote_sequential	> MODULE.code
+		> PROGRAM.entities
+		< PROGRAM.entities
+		< MODULE.code
+\end{PipsMake}
+
+
 \subsection{Task generation for SCALOPES project}
 \label{subsubsection-scalopes-project}
 
@@ -8252,6 +8264,10 @@ SYMBOLIC_TILING_FORCE FALSE
 The loop normalization consists in transforming all the loops of a given
 module into a normal form. In this normal form, the lower bound and the
 increment are equal to one (1).
+
+Property \PipsPropRef{LOOP_NORMALIZE_PARALLEL_LOOPS_ONLY} control whether we 
+want to normalize only parallel loops or all loops.
+
 \end{PipsPass}
 
 If we note the initial DO loop as:
@@ -8308,6 +8324,12 @@ following property.
 \begin{PipsProp}{LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT}
 LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT FALSE
 \end{PipsProp}
+
+
+\begin{PipsProp}{LOOP_NORMALIZE_PARALLEL_LOOPS_ONLY}
+ LOOP_NORMALIZE_PARALLEL_LOOPS_ONLY FALSE
+\end{PipsProp}
+
 
 
 \subsection{Guard Elimination and Loop Transformations}
@@ -11986,8 +12008,11 @@ to build the module value basis.
 This is intended to be used with PIPS IR Navigator (tm).
 
 \begin{PipsPass}{html_prettyprint}
-Produce a html version of the internal represenation of a PIPS Module
+Produce a html version of the internal representation of a PIPS Module. 
+The property \PipsPropRef{HTML_PRETTYPRINT_SYMBOL_TABLE} control whether the 
+symbol table should be included in the output.
 \end{PipsPass}
+
 
 \begin{PipsMake}
 html_prettyprint > MODULE.html_ir_file
@@ -11996,7 +12021,8 @@ html_prettyprint > MODULE.html_ir_file
 \end{PipsMake}
 
 \begin{PipsPass}{html_prettyprint_symbol_table}
-Produce a html version of the symbol table
+Produce a html version of the symbol table, it's module-independent, it'll 
+produce the same output for each module (the symbol table is global/unique).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -12005,8 +12031,11 @@ html_prettyprint_symbol_table > PROGRAM.html_ir_file
          < MODULE.code
 \end{PipsMake}
 
-The latter is module-independant, it'll produce the same output for each module
-(the symbol table is global/unique).
+
+
+\begin{PipsProp}{HTML_PRETTYPRINT_SYMBOL_TABLE}
+HTML_PRETTYPRINT_SYMBOL_TABLE FALSE
+\end{PipsProp}
 
 
 \subsection{Menu for Sequential Views}

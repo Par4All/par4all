@@ -510,7 +510,7 @@ bool statement_flatten_declarations(entity module, statement s)
             hash_table_free(renamings), renamings = NULL;
         }
         else {
-            pips_user_warning("Code flattening fails because the statement does"
+            pips_debug(2,"Code flattening fails because the statement does"
                     " not contain any local declaration\n");
         }
     }
