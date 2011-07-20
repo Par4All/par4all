@@ -89,6 +89,11 @@ echo >> $out_dat
 
 cp speedup.gp $out_gp
 
+if [[ ! -z $title ]]; then
+echo set title '"'$title'"' >> $out_gp
+fi
+
+
 echo -n "plot " >> $out_gp
 nver=2
 ratio=`echo "scale=2; 1/$nvers" | bc `
