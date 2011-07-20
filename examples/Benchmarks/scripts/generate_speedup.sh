@@ -92,11 +92,11 @@ cp speedup.gp $out_gp
 echo -n "plot " >> $out_gp
 nver=2
 ratio=`echo "scale=2; 1/$nvers" | bc `
-
+labelfontsize=$((11-${nmean}/4))
 for ver in $versions; do
   echo "\\" >> $out_gp
   echo "$sep '$out_dat' u $nver:xtic(1) \\" >> $out_gp
-  echo -n ",'' u (\$0-(${nvers}-2)/2.*1./(${nvers}+2)+($(($nver-2)))*1./(${nvers}+g)):$nver:$nver w labels font 'Arial,7' left rotate by 90 offset 0,0.1 t ''" >> $out_gp
+  echo -n ",'' u (\$0-(${nvers}-2)/2.*1./(${nvers}+2)+($(($nver-2)))*1./(${nvers}+g)):$nver:$nver w labels font 'Arial,$labelfontsize' left rotate by 90 offset 0,0.1 t ''" >> $out_gp
   nver=$(($nver+1))
   sep=","
 done
