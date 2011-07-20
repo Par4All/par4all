@@ -25,9 +25,10 @@ for root, subfolders, files in os.walk(os.environ.get("PWD")):
 par4ll_validation_dir = p4a_root+'/../../packages/PIPS/validation/'
 
 extension = ['.c','.F','.f','.f90','.f95']
+script = ['.tpips','.tpips2','.test','.py']
 
 # warning and failed status
-warning = ['skipped','timeout']
+warning = ['skipped','timeout','orphan']
 failed = ['changed','failed']
 
 # get default architecture and tpips/pips
@@ -39,6 +40,9 @@ for root, subfolders, files in os.walk(par4ll_validation_dir+'/..'):
 # Timeout
 timeout = 600 # Time in second
 timeout_value = 203 # Value of timeout status
+
+# Orphan status
+orphan_status = 202
 
 # Multiprocessing
 nb_cpu = multiprocessing.cpu_count()
@@ -162,18 +166,11 @@ def command_test(directory_test_path,test_name_path,err_file_path,test_file_path
 		command = "FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" python "+directory_test_path+"/default_pyps.py 2>"+err_file_path
 		(int_status,output,err) = run_process(command,True,err_pipe)
 
-	# Pips in command line
+	# Orphan status (there is source file, .result directory and test reference file but there is no script to execute (.tpips, .tpips2, etc...))
 	else:
-		subprocess.Popen(["Delete",os.path.basename(test_name_path)])
-
-		command = ["Init","-f",test_file_path,"-d",os.path.basename(test_name_path)]
-		(int_status,output,err)=run_process(command,False,err_pipe)
-	
-		if int_status == 0:
-			command = "while read module ; do Display -m  $module -w "+os.path.basename(test_name_path)+" ; done < "+os.path.basename(test_name_path)+".database/modules"
-			(int_status, output_display,err_display)=run_process(command,True,err_pipe)
-
-		subprocess.Popen(["Delete",os.path.basename(test_name_path)])
+		int_status = orphan_status
+		output = ''
+		err = None
 
 	if err != None:
 		err_file_path_h = open(err_file_path, 'w')
@@ -181,6 +178,29 @@ def command_test(directory_test_path,test_name_path,err_file_path,test_file_path
 		err_file_path_h.close()
 
 	return (int_status,output)
+
+### Check to see if there is a multi-script or multi-source status ###
+def multi_source_script(directory_test,test_root):
+	multi_status = ''
+	nb_source = 0
+	nb_script = 0
+
+	# check if there is several sources for one script
+	for ext in extension:
+		if os.path.isfile(directory_test+'/'+test_root+ext):
+			nb_source = nb_source + 1
+
+	# check if there is sevral script for one source
+	for exe in script:
+		if os.path.isfile(directory_test+'/'+test_root+exe):
+			nb_script = nb_script + 1
+
+	if nb_script > 1:
+		multi_status = 'multi-script'
+	elif nb_source > 1:
+		multi_status = 'multi-source'
+
+	return multi_status
 
 #### Function which run tests and save result on result_log ######
 def test_par4all(directory_test_path,test_file_path,log_file):
@@ -197,6 +217,7 @@ def test_par4all(directory_test_path,test_file_path,log_file):
 	#check that .result and reference of the test are present. If not, status is "skipped" 
 	if (os.path.isdir(test_result_path) != True or (os.path.isfile(test_ref_path) != True and os.path.isfile(test_ref_path+'.'+arch) != True)):
 		status ='skipped'
+	# Test is in development or it is known like a bug
 	elif (os.path.isfile(test_name_path+".bug") or os.path.isfile(test_name_path+".later")):
 		status ='bug-later'
 	else:
@@ -224,10 +245,12 @@ def test_par4all(directory_test_path,test_file_path,log_file):
 		if (os.path.isfile(err_file_path) == True):
 			# copy error file on RESULT directories of par4all validation
 			new_err = err_file_path.replace(par4ll_validation_dir,'')
-			shutil.move(err_file_path,p4a_root+'/RESULT/'+new_err.replace('/','_'))#+'.err')
+			shutil.move(err_file_path,p4a_root+'/RESULT/'+new_err.replace('/','_'))
 
 		if (int_status == timeout_value):
 			status = 'timeout'
+		if (int_status == orphan_status):
+			status = 'orphan'
 		elif(int_status != 0):
 			status = "failed"
 		else:
@@ -306,6 +329,12 @@ def test_par4all(directory_test_path,test_file_path,log_file):
 			else:
 				#status of the test
 				status = 'succeeded'
+
+			# Check to see if there is multi-script or multi-source
+			multi_status = multi_source_script(directory_test_path,os.path.basename(test_name_path))
+
+			if multi_status != '':
+				status = status.replace(':','')+'_'+multi_status
 
 	# Write status
 	write_log(status,log_file,test_file_path)
@@ -408,13 +437,17 @@ def recursive_dir_test(dirlist,log_file,new_dir_list):
 
 			print (('# Considering %s')%(directory_test.replace(par4ll_validation_dir,'').strip('\n')))
 
-			# List file/directories to test, subdirectories and skipped status (no correspondig .result folder)
-			listing = os.listdir(directory_test)
-			for dirfile in listing:
-				dir_sublist,resultdir_list = subdir_list_test(directory_test,log_file,resultdir_list,dirfile,dir_sublist)
+			if os.path.isdir(directory_test):
+				# List file/directories to test, subdirectories and skipped status (no correspondig .result folder)
+				listing = os.listdir(directory_test)
+				for dirfile in listing:
+					dir_sublist,resultdir_list = subdir_list_test(directory_test,log_file,resultdir_list,dirfile,dir_sublist)
 
-			# Test
-			result_test(directory_test,resultdir_list,log_file)
+				# Test
+				result_test(directory_test,resultdir_list,log_file)
+			else:
+				print ('None valid directory to test: %s does not exist'%(directory_test.replace(par4ll_validation_dir,'').strip('\n')))
+				
 			print (('# %s Finished')%(directory_test.replace(par4ll_validation_dir,'').strip('\n')))
 
 		# Lock to have only one process who add dir to test
@@ -443,11 +476,15 @@ def count_failed_warn(log_file):
 		i = 0
 		for i in range(0,len(warning)):
 			nb_warning = nb_warning + int(log_file_str.count(warning[i]+':'))
+			nb_warning = nb_warning + int(log_file_str.count(warning[i]+'_multi-script:'))
+			nb_warning = nb_warning + int(log_file_str.count(warning[i]+'_multi-source:'))
 
 		# Number of failed
 		i = 0
 		for i in range(0,len(failed)):
 			nb_failed = nb_failed + int(log_file_str.count(failed[i]+':'))
+			nb_failed = nb_failed + int(log_file_str.count(failed[i]+'_multi-script:'))
+			nb_failed = nb_failed + int(log_file_str.count(failed[i]+'_multi-source:'))
 
 		log_file_h.close()
 
@@ -763,6 +800,93 @@ def make_validate(options):
 
 	print ('Output of the "'+string_command+'" is in '+p4a_root+'/make_validate.txt')
 
+### return test and directory for filter options ###
+def test_dir(line):
+	# Remove last element corresponding to run-time
+	line = line.split(" ")
+	if (len(line) > 2):
+		line.pop()
+
+	# Find test name and directory of the test
+	line[len(line)-1] = line[len(line)-1].replace('\\','/')
+	test_index =  line[len(line)-1].rfind('/')
+	test = line[len(line)-1][test_index+1:].strip(' ').strip('\n')
+	dir = line[len(line)-1][:test_index].strip(' ').strip('\n')
+	status = line[0]
+
+	return (status,dir,test)
+
+#### Rewrite validation.out to have a good format for pips/par4all validation team ################
+def filter_makeval():
+	file = par4ll_validation_dir+"/validation.out"
+	if (os.path.isfile(par4ll_validation_dir+"/validation.out")):
+		# Open the file to browse
+		validout_file = open(par4ll_validation_dir+"/validation.out")
+
+		# The new file with desired content
+		valid_file = open(p4a_root+'/pips_valid.txt',"w")
+
+		multi_source_list = set() # multi-source list
+		multi_script_list = set() # multi-script list
+
+		# Browse file to find multi-script and multi-source
+		for line in validout_file:
+			if (len(line.strip(' ').strip('\n')) != 0):
+				(status,dir,test) = test_dir(line)
+				# Remove multi-script and multi-source because there are tested
+				if 'multi-source' in line:
+					multi_source_list.add(dir+'/'+test)
+				elif 'multi-script' in line:
+					multi_script_list.add(dir+'/'+test)
+
+		validout_file.close
+		validout_file = open(par4ll_validation_dir+"/validation.out")
+
+		# Browse file
+		for line in validout_file:
+			if (not 'multi-source' in line) and (not 'multi-script' in line):
+				if (len(line.strip(' ').strip('\n')) != 0):
+					(status,dir,test) = test_dir(line)
+					# Check that it's not a default_pyps/test/tpips test
+					if (not "default_pyps" in line) and (not "default_test" in line) and (not "default_tpips" in line):
+						# Replace bug or later in bug-later
+						if re.match('bug:',status) :
+							status = status.replace(status,"bug-later:")
+						elif re.match('later:',status):
+							status = status.replace(status,"bug-later:")
+
+						# orphan status but know like a bug or in development
+						elif re.match('orphan:',status) and (os.path.isfile(par4ll_validation_dir+'/'+dir+'/'+test+".bug") or os.path.isfile(par4ll_validation_dir+'/'+dir+'/'+test+".later")):
+							status = status.replace(status,"bug-later:")
+						elif re.match('passed:',status) :
+							status = status.replace(status,"succeeded:")
+
+						# If test has another status (multi-source or multi-script), add multi-X at this status
+						if (dir+'/'+test) in multi_script_list:
+							status = status.replace(':','')+'_multi-script:'
+						elif (dir+'/'+test) in multi_source_list:
+							status = status.replace(':','')+'_multi-source:'
+
+						# Find the extension of the test name
+						ext_found = 0
+						for ext in extension:
+							file_test = par4ll_validation_dir+'/'+dir+'/'+test+ext
+							if os.path.isfile(file_test):
+								test = test+ext
+								ext_found  = 1
+								# Write in new file
+								valid_file.write(status + ' ' +dir+'/'+test+'\n')
+
+						if ext_found == 0 and os.path.isdir(par4ll_validation_dir+'/'+dir+'/'+test+'.result'):
+							test = test+'.result'
+							# Write in new file
+							valid_file.write(status + ' ' +dir+'/'+test+'\n')
+
+		validout_file.close
+		valid_file.close
+	else:
+		print ("No validation.out file in par4all/packages/PIPS/validation folder. Launch --makeval option to have it.")
+
 ###################### Main -- Options #################################
 def main():
 	usage = "usage: python %prog [options]"
@@ -773,6 +897,7 @@ def main():
 	parser.add_option("--dir", action="store_true", dest="dir", help = "Validate tests which are located in packages/PIPS/validation/directory_name")
 	parser.add_option("--test", action="store_true", dest="test", help = "Validate tests given in argument")
 	parser.add_option("--makeval", action="store_true", dest="makeval", help = "Launch 'make [options] validate-out' of pips validation. Options are make options without '-'. Example of usage: ./p4a-validate_class.py --makeval j4 l")
+	parser.add_option("--filter", action="store_true", dest="filter", help = "Rewrite validation.out to have the desired file of pips/par4all validation team. Can be used with --makeval option")
 	(options, args) = parser.parse_args()
 
 	#set all locale categories to C (English), to make the test results consistent to match
@@ -813,8 +938,13 @@ def main():
 		print ('Summary of the validation is in par4all/packages/PIPS/validation/SUMMARY')
 
 	else:
-		# Help
-		print(subprocess.check_output(["python p4a_validate_class.py","-h"]))
+		if (not options.filter):
+			# Help
+			print(subprocess.check_output(["python p4a_validate_class.py","-h"]))
+
+	if options.filter:
+		vc = filter_makeval()
+		print('Result of the filter are in pips_valid.txt')
 
 	os.chdir(os.getcwd())
 

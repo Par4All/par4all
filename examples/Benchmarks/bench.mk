@@ -1,5 +1,14 @@
 TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 
+# C99 mode ?
+ifdef C99_MODE
+P4A_FLAGS+= --c99
+P4A_CUDA_SUFFIX=.c
+else
+P4A_CUDA_SUFFIX=.cu
+endif 
+
+
 # Common source file (for timing...)
 COMMON := ../../common/timing.c
 ACCEL_FLAGS := -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -arch=sm_13
@@ -10,8 +19,8 @@ NRUNS := `seq 1 3`
 # source file for the different version of the code
 SOURCE := $(TARGET).c
 OMP_SOURCE := $(TARGET).openmp.c
-CUDA_SOURCE := $(TARGET).naive.c
-CUDA_OPT_SOURCE := $(TARGET).opt.c
+CUDA_SOURCE := $(TARGET).naive$(P4A_CUDA_SUFFIX)
+CUDA_OPT_SOURCE := $(TARGET).opt$(P4A_CUDA_SUFFIX)
 GENERATED_KERNELS = $(wildcard p4a_new_files/*.cu)
 
 SEQ_TARGET := $(TARGET)_seq
@@ -25,7 +34,7 @@ CC := gcc
 COMMON_FLAGS:= -I../../common/ -DPOLYBENCH_TIME
 CFLAGS:= -O3 -fno-strict-aliasing -fPIC -std=c99  
 LDFLAGS:= -lm
-P4A_FLAGS+= -p $(TARGET)_p4a -r #--c99 
+P4A_FLAGS+= -p $(TARGET)_p4a -r
 
 ifdef debug
 CFLAGS+=-W -Wall -DP4A_DEBUG
@@ -47,12 +56,12 @@ $(OMP_SOURCE): $(SOURCE) $(COMMON)
 	mv $(<:%.c=%.p4a.c) $@
 
 $(CUDA_SOURCE): $(SOURCE) $(COMMON)
-	p4a $^ $(COMMON_FLAGS)  $(P4A_FLAGS) --cuda
-	mv $(<:%.c=%.p4a.c) $@
+	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) --cuda
+	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
 
 $(CUDA_OPT_SOURCE): $(SOURCE) $(COMMON)
 	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) --cuda --com-optimization
-	mv $(<:%.c=%.p4a.c) $@
+	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
 
 
 # build binary for the 3 different versions
