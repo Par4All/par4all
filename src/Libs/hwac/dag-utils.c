@@ -642,8 +642,7 @@ switch_vertex_to_assign(dagvtx target, dagvtx source)
  * @param source does perform the same computation
  * @param tpreds target predecessors to be added to source
  */
-static void
-switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
+static void switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
 {
   pips_debug(5, "replacing %"_intFMT" by %"_intFMT"\n",
        dagvtx_number(target), dagvtx_number(source));
@@ -681,6 +680,8 @@ switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
   }
 }
 
+/* @return whether two vertices are the same operation
+ */
 static bool same_operation_p(const dagvtx v1, const dagvtx v2)
 {
   return
@@ -688,6 +689,8 @@ static bool same_operation_p(const dagvtx v1, const dagvtx v2)
     dagvtx_opid(v1) == dagvtx_opid(v2);
 }
 
+/* @return whether two vertices are commutors
+ */
 static bool commutative_operation_p(const dagvtx v1, const dagvtx v2)
 {
   if (dagvtx_optype(v1) == dagvtx_optype(v2))
@@ -699,6 +702,8 @@ static bool commutative_operation_p(const dagvtx v1, const dagvtx v2)
   else return false;
 }
 
+/* @return whether two lists are commuted
+ */
 static bool list_commuted_p(const list l1, const list l2)
 {
   pips_assert("length 2", gen_length(l1)==2 && gen_length(l2)==2);
@@ -810,6 +815,21 @@ static int number_of_copies(list /* of dagvtx */ l)
   return n;
 }
 
+/* @brief apply basic algebraic simplification to dag
+ */
+static void dag_simplify(dag d)
+{
+  // to be implemented
+  FOREACH(dagvtx, v, dag_vertices(d))
+  {
+    // a=xor(b,b) => a=0 (should change effects...)
+    // a=&.(b,0) => a=0
+    // a=|.(b,0xffff) => a=0xffff
+    // a=+.(b,0) => a=b (copy)
+    // a=+(b,b) => a=b*.2
+  }
+}
+
 /* remove dead image operations.
  * remove AIPO copies detected as useless.
  * remove identical operations.
@@ -826,19 +846,8 @@ list /* of statements */ dag_optimize(dag d)
     dag_dump(stderr, "input", d);
   }
 
-  /*
   if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
-  {
-    FOREACH(dagvtx, v, dag_vertices(d))
-    {
-      // a=xor(b,b) => a=0 (should change effects...)
-      // a=&.(b,0) => a=0
-      // a=|.(b,0xffff) => a=0xffff
-      // a=+.(b,0) => a=b (copy)
-      // a=+(b,b) => a=b*.2
-    }
-  }
-  */
+    dag_simplify(d);
 
   // remove dead image operations
   // ??? hmmm... measures are kept because of the implicit scalar dependency?
