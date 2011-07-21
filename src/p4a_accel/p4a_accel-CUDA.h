@@ -474,7 +474,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
   else {								\
     /* Allocate a maximum of threads alog X axis (the warp dimension) for \
        better average efficiency: */					\
-    int tpb = P4A_min(p4a_max_threads_per_block,(n_x_iter)*(n_y_iter)/P4A_CUDA_MIN_BLOCKS); \
+    int tpb = P4A_min(p4a_max_threads_per_block,(int)ceil((n_x_iter)*(n_y_iter)/(float)P4A_CUDA_MIN_BLOCKS)); \
     tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
     tpb = P4A_max(tpb,32); \
     p4a_block_x = P4A_min((int) n_x_iter,				\
