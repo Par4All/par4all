@@ -78,11 +78,15 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_sub_10, alu_sub_01, "SPOC_ALU_SUB_IN1_IN0", F, T, T },
   { alu_sub_0cst, alu_sub_1cst, "SPOC_ALU_SUB_IN0_CONST", T, T, F },
   { alu_sub_1cst, alu_sub_0cst, "SPOC_ALU_SUB_IN1_CONST", T, F, T },
+  { alu_sub_cst0, alu_sub_cst1, "SPOC_ALU_SUB_CONST_IN0", T, T, F },
+  { alu_sub_cst1, alu_sub_cst0, "SPOC_ALU_SUB_CONST_IN1", T, F, T },
   // SUBSAT
   { alu_subsat_01, alu_subsat_10, "SPOC_ALU_SUBSAT_IN0_IN1", F, T, T },
   { alu_subsat_10, alu_subsat_01, "SPOC_ALU_SUBSAT_IN1_IN0", F, T, T },
   { alu_subsat_0cst, alu_subsat_1cst, "SPOC_ALU_SUBSAT_IN0_CONST", T, T, F },
   { alu_subsat_1cst, alu_subsat_0cst, "SPOC_ALU_SUBSAT_IN1_CONST", T, F, T },
+  { alu_subsat_cst0, alu_subsat_cst1, "SPOC_ALU_SUBSAT_CONST_IN0", T, T, F },
+  { alu_subsat_cst1, alu_subsat_cst0, "SPOC_ALU_SUBSAT_CONST_IN1", T, F, T },
   // ABSSUB
   { alu_abssub, alu_abssub, "SPOC_ALU_ABSSUB_IN0_IN1", F, T, T },
   { alu_abssub_0cst, alu_abssub_1cst, "SPOC_ALU_ABSSUB_IN0_CONST", T, T, F },
@@ -96,6 +100,8 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_div_10, alu_div_01, "SPOC_ALU_DIV_IN1_IN0", F, T, T },
   { alu_div_0cst, alu_div_1cst, "SPOC_ALU_DIV_IN0_CONST", T, T, F },
   { alu_div_1cst, alu_div_0cst, "SPOC_ALU_DIV_IN1_CONST", T, F, T },
+  { alu_div_cst0, alu_div_cst1, "SPOC_ALU_DIV_CONST_IN0", T, T, F },
+  { alu_div_cst1, alu_div_cst0, "SPOC_ALU_DIV_CONST_IN1", T, F, T },
   // LOG2
   { alu_log2_0, alu_log2_1, "SPOC_ALU_LOG2_IN0", F, T, F },
   { alu_log2_1, alu_log2_0, "SPOC_ALU_LOG2_IN1", F, F, T },
