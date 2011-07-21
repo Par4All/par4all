@@ -940,7 +940,7 @@ def main():
 	else:
 		if (not options.filter):
 			# Help
-			print(subprocess.check_output(["python p4a_validate_class.py","-h"]))
+			print subprocess.Popen(["python","p4a_validate_class.py","-h"], stdout=subprocess.PIPE).communicate()[0]
 
 	if options.filter:
 		vc = filter_makeval()
