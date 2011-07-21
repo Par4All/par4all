@@ -1703,7 +1703,7 @@ static bool erode_alu_shared_p(vtxcontent c1, vtxcontent c2)
  * non implemented functions are pushed late.
  * tells v1 < v2  =>  -1  =>  v1 BEFORE v2
  */
-int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
+static int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
 {
   string why = "none";
   int result = 0;
