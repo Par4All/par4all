@@ -144,7 +144,25 @@ void P4A_copy_to_accel(size_t element_size,
 
 #ifdef P4A_ACCEL_CUDA
 
-//#include <cutil_inline.h>
+
+int p4a_max_threads_per_block = P4A_CUDA_THREAD_MAX;
+
+void p4a_init_cuda_accel() {
+  toolTestExec(cudaEventCreate(&p4a_start_event));
+  toolTestExec(cudaEventCreate(&p4a_stop_event));
+  checkStackSize();
+  char *env_p4a_max_tpb = getenv ("P4A_MAX_TPB");
+  if(env_p4a_max_tpb) {
+    errno = 0;
+    int tpb = strtol(env_p4a_max_tpb, NULL,10);
+    if(errno==0) {
+      p4a_max_threads_per_block = tpb;
+    }
+
+  }
+}
+
+
 
 /** To do basic time measure. Do not nest... */
 
@@ -154,7 +172,6 @@ cudaEvent_t p4a_start_event, p4a_stop_event;
 
  @addtogroup P4A_cuda_time_measure
  */
-
 double P4A_accel_timer_stop_and_float_measure() {
   float execution_time;
   toolTestExec(cudaEventRecord(p4a_stop_event, 0));
