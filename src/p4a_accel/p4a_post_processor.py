@@ -104,7 +104,7 @@ def p4a_launcher_clean_up(match_object):
         print 'vb', variables_before, 'end'
 
     # Inside loop nest, just remove the for loops:
-    variables_in_loop_nest = re.sub("(?s)\n\\s*for\\([^\n]*", "", loop_nest)
+    variables_in_loop_nest = re.sub("(?s)\\s*for\\([^\n]*", "", loop_nest)
     # Remove also the '// To be assigned to a call to P4A_vp_...' that
     # should no be stay here:
     variables_in_loop_nest = re.sub("(?s)\\s*// To be assigned to a call to P4A_vp_[^\n]*", "", variables_in_loop_nest)
@@ -167,16 +167,6 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
 
-	# This patch is a temporary solution. It may not cover all possible cases
-    # I guess all this should be done by applying partial_eval in PIPS ?
-	# It replaces some array declarations that nvcc do not compile.
-	# For ex.
-	# int n = 100; double a [n];
-	# is replaced by :
-	# double a[100]
-    fObj = re.findall("\s*(?:int|\,)\s*(\w+)\s*=\s*(\d+)", content)
-    for obj in fObj:
-		content = re.sub("\["+obj[0]+"\]","["+obj[1]+"]", content)
 
     # Now the outliner output all the declarations in one line, so put
     # only one function per line for further replacement:
@@ -221,7 +211,7 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     # with a regular expression without it
     )\n{)(.*?)(?#
     # First capture any declaration at the begining up to the loop label:
-    )// Loop nest P4A begin,(\\d+?)D\\(([^)]+?)\\)(?#
+    )// Loop nest P4A begin,(\\d+?)D\\((.+?)\\)\\n(?#
     # So now we have captured kernel iteration space.
     # Next capture up to following 'Loop nest P4A end', not the last one...
     )(.*?)// Loop nest P4A end.+?(?#

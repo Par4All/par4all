@@ -20,7 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <cutil_inline.h>
+#include <errno.h>
+
 #include <cuda_runtime_api.h>
 #include <cuda.h>
 #include <p4a_stacksize_test.h>
@@ -77,23 +78,30 @@ static inline void checkErrorMessageInline(const char *errorMessage, const char 
     If you get arrors such as "P4A CUDA kernel execution failed : too many 
     resources requested for launch.", there is not enough registers to run
     all the requested threads of your block. So try to reduce them with 
-    -DP4A_CUDA_THREAD_MAX=384 or less. That may need some trimming.
+    -DP4A_CUDA_THREAD_MAX=384 or less at compile time, or with the environment
+    variable P4A_MAX_TPB at runtime. That may need some trimming.
 
     There are unfortunately some hardware limits on the thread block size
     that appear at the programming level, so we should add another level
     of tiling.
 */
+extern int p4a_max_threads_per_block;
 #ifndef P4A_CUDA_THREAD_MAX
 /** The maximum number of threads in a block of thread */
 #define P4A_CUDA_THREAD_MAX 512
 #endif
 
+#ifndef P4A_CUDA_MIN_BLOCKS
+/** The minimum number of blocks */
+#define P4A_CUDA_MIN_BLOCKS 14
+#endif
+
 #ifndef P4A_CUDA_THREAD_PER_BLOCK_IN_1D
-/** There is a maximum of P4A_CUDA_THREAD_MAX threads per block. Use
+/** There is a maximum of p4a_max_threads_per_block threads per block. Use
     them. May cause some trouble if too many resources per thread are
     used. Change it with an option at compile time if that causes
     trouble: */
-#define P4A_CUDA_THREAD_PER_BLOCK_IN_1D P4A_CUDA_THREAD_MAX
+#define P4A_CUDA_THREAD_PER_BLOCK_IN_1D p4a_max_threads_per_block
 //P4A_CUDA_THREAD_PER_BLOCK_IN_1D = 5,
 #endif
 
@@ -103,10 +111,10 @@ static inline void checkErrorMessageInline(const char *errorMessage, const char 
     that big in Y, P4A_create_2d_thread_descriptors() allocates all
     threads in X that seems to often leads to better performance if the
     memory accesses are rather according to the X axis: */
-#define P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D (P4A_CUDA_THREAD_MAX/16)
+#define P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D (p4a_max_threads_per_block/16)
 #endif
 #ifndef P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D
-#define P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D (P4A_CUDA_THREAD_MAX/P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D)
+#define P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D (p4a_max_threads_per_block/P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D)
 #endif
 
 #ifndef P4A_CUDA_THREAD_X_PER_BLOCK_IN_3D
@@ -141,12 +149,8 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     Just initialize events for time measure right now.
 */
-#define P4A_init_accel					\
-  do {							\
-    toolTestExec(cudaEventCreate(&p4a_start_event));	\
-    toolTestExec(cudaEventCreate(&p4a_stop_event));	\
-    checkStackSize(); \
-  } while (0)
+void p4a_init_cuda_accel();
+#define P4A_init_accel p4a_init_cuda_accel();
 
 
 /** Release the hardware accelerator in CUDA
@@ -441,10 +445,13 @@ void P4A_copy_to_accel_3d(size_t element_size,
 					 block_descriptor_name,		\
 					 size)				\
   /* Define the number of thread per block: */				\
+  int tpb = P4A_min(P4A_CUDA_THREAD_PER_BLOCK_IN_1D,(size)/P4A_CUDA_MIN_BLOCKS); \
+  tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
+  tpb = P4A_max(tpb,32); \
   dim3 block_descriptor_name(P4A_min((int) size,			\
-				     (int) P4A_CUDA_THREAD_PER_BLOCK_IN_1D)); \
+				     (int)tpb )); \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  dim3 grid_descriptor_name((((int)size) + P4A_CUDA_THREAD_PER_BLOCK_IN_1D - 1)/P4A_CUDA_THREAD_PER_BLOCK_IN_1D); \
+  dim3 grid_descriptor_name((((int)size) + tpb - 1)/tpb); \
   P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
   P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
@@ -467,10 +474,13 @@ void P4A_copy_to_accel_3d(size_t element_size,
   else {								\
     /* Allocate a maximum of threads alog X axis (the warp dimension) for \
        better average efficiency: */					\
+    int tpb = P4A_min(p4a_max_threads_per_block,(n_x_iter)*(n_y_iter)/P4A_CUDA_MIN_BLOCKS); \
+    tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
+    tpb = P4A_max(tpb,32); \
     p4a_block_x = P4A_min((int) n_x_iter,				\
-                          (int) P4A_CUDA_THREAD_MAX);			\
+                          (int) tpb);			\
     p4a_block_y = P4A_min((int) n_y_iter,				\
-                          P4A_CUDA_THREAD_MAX/p4a_block_x);		\
+                          tpb/p4a_block_x);		\
   }									\
   dim3 block_descriptor_name(p4a_block_x, p4a_block_y);			\
   /* Define the ceil-rounded number of needed blocks of threads: */	\

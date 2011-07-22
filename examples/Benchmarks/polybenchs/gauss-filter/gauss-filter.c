@@ -32,8 +32,7 @@ DATA_TYPE g_acc2[N][M][4];
 DATA_TYPE in_image[N][M]; //input
 DATA_TYPE gauss_image[N][M]; //output
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
   for (i = 0; i < N;) {
@@ -51,8 +50,7 @@ void init_array() {
 
 /* Define the live-out variables. Code is not executed unless
  POLYBENCH_DUMP_ARRAYS is defined. */
-static inline
-void print_array(int argc, char** argv) {
+static void print_array(int argc, char** argv) {
   int i, j;
 #ifndef POLYBENCH_DUMP_ARRAYS
   if(argc > 42 && !strcmp(argv[0], ""))
@@ -80,6 +78,11 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   tot[0] = 0;
   for (k = t - 1; k <= 1 + t; k++)
     tot[k + 2 - t] = tot[k + 1 - t] + Gauss[k - t + 1];
@@ -102,6 +105,11 @@ int main(int argc, char** argv) {
             + k - t] * Gauss[k - t + 1];
       gauss_image[x][y] = g_acc2[x][y][3] / tot[3];
     }
+  }
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
   }
 
   /* Stop and print timer. */

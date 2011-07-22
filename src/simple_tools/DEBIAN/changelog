@@ -1,3 +1,7 @@
+2011-07-15  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+ * Par4All 1.2.1
+
 2011-07-07  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
  * Par4All 1.2
@@ -6,6 +10,10 @@
     environment from HPC Project for Scilab programs. Par4All is used
     to parallelize the output of the Scilab-to-C compiler from HPC
     Project
+
+  * Added in examples/Benchmarks some benchmark examples we use in
+	our publications so that anybody can verify Par4All performance on
+	them with own hardware
 
   * Improved support for CUDA atomic update for reductions
 

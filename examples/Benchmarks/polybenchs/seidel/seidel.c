@@ -23,8 +23,7 @@
 
 DATA_TYPE A[N][N];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
   for (i = 0; i < N;) {
@@ -38,8 +37,7 @@ void init_array() {
 
 /* Define the live-out variables. Code is not executed unless
  POLYBENCH_DUMP_ARRAYS is defined. */
-static inline
-void print_array(int argc, char** argv) {
+static void print_array(int argc, char** argv) {
   int i, j;
 #ifndef POLYBENCH_DUMP_ARRAYS
   if(argc > 42 && !strcmp(argv[0], ""))
@@ -66,12 +64,22 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   for (t = 0; t <= tsteps - 1; t++)
     for (i = 1; i <= n - 2; i++)
       for (j = 1; j <= n - 2; j++)
         A[i][j] = (A[i - 1][j - 1] + A[i - 1][j] + A[i - 1][j + 1]
             + A[i][j - 1] + A[i][j] + A[i][j + 1] + A[i + 1][j - 1]
             + A[i + 1][j] + A[i + 1][j + 1]) / 9.0;
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
+  }
 
   /* Stop and print timer. */
   timer_stop_display(); ;

@@ -26,8 +26,7 @@ DATA_TYPE data[M + 1][N + 1];
 DATA_TYPE symmat[M + 1][M + 1];
 DATA_TYPE mean[M + 1];
 
-static inline
-void init_array() {
+static void init_array() {
   int i, j;
 
   for (i = 0; i <= M;) {
@@ -69,6 +68,11 @@ int main(int argc, char** argv) {
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    init_array();
+  }
+
   /* Determine mean of column vectors of input data matrix */
   for (j = 1; j <= m; j++) {
     mean[j] = 0.0;
@@ -90,6 +94,11 @@ int main(int argc, char** argv) {
         symmat[j1][j2] += data[i][j1] * data[i][j2];
       symmat[j2][j1] = symmat[j1][j2];
     }
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0]==0) {
+    print_array(argc, argv);
+  }
 
   /* Stop and print timer. */
   timer_stop_display();;

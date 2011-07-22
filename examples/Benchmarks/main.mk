@@ -3,6 +3,8 @@ TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 default:
 	more $(TOP)/USAGE
 
+all: seq openmp cuda cuda_opt
+
 clean: 
 	for target in $(TARGETS) ; do \
 		make -C $$target clean ; \
@@ -51,6 +53,21 @@ run_cuda_opt:
 	done
 
 cuda_opt:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
+
+openmp_src:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
+
+cuda_src:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
+
+cuda_opt_src:
 	for target in $(TARGETS) ; do \
 		make -C $$target $@ ; \
 	done

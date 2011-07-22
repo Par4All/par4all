@@ -5,7 +5,6 @@
 
 #include "timing.h"
 
-
 /* Default problem size. */
 #ifndef NI
 # define NI 512
@@ -23,7 +22,6 @@
 # define NM 512
 #endif
 
-
 /* Default data type is double (dgemm). */
 #ifndef DATA_TYPE
 # define DATA_TYPE double
@@ -37,72 +35,88 @@ DATA_TYPE E[NI][NJ];
 DATA_TYPE F[NJ][NL];
 DATA_TYPE G[NI][NL];
 
-
-static inline
-void init_array()
-{
+static void init_array() {
   int i, j;
 
-  for (i = 0; i < NI; i++)
-    for (j = 0; j < NK; j++) {
+  for (i = 0; i < NI;) {
+    for (j = 0; j < NK;) {
       int r = rand();
-      A[i][j] = ((DATA_TYPE) i*j)/NI;
+      A[i][j] = ((DATA_TYPE)i * j) / NI;
+      j++;
     }
-  for (i = 0; i < NK; i++)
-    for (j = 0; j < NJ; j++){
+    i++;
+  }
+  for (i = 0; i < NK;) {
+    for (j = 0; j < NJ;) {
       int r = rand();
-      B[i][j] = ((DATA_TYPE) i*j + 1)/NJ;
+      B[i][j] = ((DATA_TYPE)i * j + 1) / NJ;
+      j++;
     }
-  for (i = 0; i < NJ; i++)
-    for (j = 0; j < NM; j++){
+    i++;
+  }
+  for (i = 0; i < NJ;) {
+    for (j = 0; j < NM;) {
       int r = rand();
-      C[i][j] = ((DATA_TYPE) i*j + 2)/NJ;
+      C[i][j] = ((DATA_TYPE)i * j + 2) / NJ;
+      j++;
     }
-  for (i = 0; i < NM; i++)
-    for (j = 0; j < NL; j++){
+    i++;
+  }
+  for (i = 0; i < NM;) {
+    for (j = 0; j < NL;) {
       int r = rand();
-      D[i][j] = ((DATA_TYPE) i*j + 2)/NJ;
+      D[i][j] = ((DATA_TYPE)i * j + 2) / NJ;
+      j++;
     }
-  for (i = 0; i < NI; i++)
-    for (j = 0; j < NJ; j++){
+    i++;
+  }
+  for (i = 0; i < NI;) {
+    for (j = 0; j < NJ;) {
       int r = rand();
-      E[i][j] = ((DATA_TYPE) i*j + 2)/NJ;
+      E[i][j] = ((DATA_TYPE)i * j + 2) / NJ;
+      j++;
     }
-  for (i = 0; i < NJ; i++)
-    for (j = 0; j < NL; j++){
+    i++;
+  }
+  for (i = 0; i < NJ;) {
+    for (j = 0; j < NL;) {
       int r = rand();
-      F[i][j] = ((DATA_TYPE) i*j + 2)/NJ;
+      F[i][j] = ((DATA_TYPE)i * j + 2) / NJ;
+      j++;
     }
-  for (i = 0; i < NI; i++)
-    for (j = 0; j < NL; j++){
+    i++;
+  }
+  for (i = 0; i < NI;) {
+    for (j = 0; j < NL;) {
       int r = rand();
-      G[i][j] = ((DATA_TYPE) i*j + 2)/NJ;
+      G[i][j] = ((DATA_TYPE)i * j + 2) / NJ;
+      j++;
     }
+    i++;
+  }
 }
 
 /* Define the live-out variables. Code is not executed unless
-   POLYBENCH_DUMP_ARRAYS is defined. */
+ POLYBENCH_DUMP_ARRAYS is defined. */
 static inline
-void print_array(int argc, char** argv)
-{
+void print_array(int argc, char** argv) {
   int i, j;
 #ifndef POLYBENCH_DUMP_ARRAYS
-  if (argc > 42 && ! strcmp(argv[0], ""))
+  if(argc > 42 && !strcmp(argv[0], ""))
 #endif
-    {
-      for (i = 0; i < NI; i++) {
-	for (j = 0; j < NL; j++) {
-	  fprintf(stderr, "%0.2lf ", G[i][j]);
-	  if ((i * NI + j) % 80 == 20) fprintf(stderr, "\n");
-	}
-	fprintf(stderr, "\n");
+  {
+    for (i = 0; i < NI; i++) {
+      for (j = 0; j < NL; j++) {
+        fprintf(stderr, "%0.2lf ", G[i][j]);
+        if((i * NI + j) % 80 == 20)
+          fprintf(stderr, "\n");
       }
+      fprintf(stderr, "\n");
     }
+  }
 }
 
-
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   int i, j, k;
   int ni = NI;
   int nj = NJ;
@@ -116,31 +130,38 @@ int main(int argc, char** argv)
   /* Start timer. */
   timer_start();
 
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0] == 0) {
+    init_array();
+  }
+
   /* E := A*B */
   for (i = 0; i < ni; i++)
-    for (j = 0; j < nj; j++)
-      {
-	E[i][j] = 0;
-	for (k = 0; k < nk; ++k)
-	  E[i][j] += A[i][k] * B[k][j];
-      }
+    for (j = 0; j < nj; j++) {
+      E[i][j] = 0;
+      for (k = 0; k < nk; ++k)
+        E[i][j] += A[i][k] * B[k][j];
+    }
 
   /* F := C*D */
   for (i = 0; i < nj; i++)
-    for (j = 0; j < nl; j++)
-      {
-	F[i][j] = 0;
-	for (k = 0; k < nm; ++k)
-	  F[i][j] += C[i][k] * D[k][j];
-      }
+    for (j = 0; j < nl; j++) {
+      F[i][j] = 0;
+      for (k = 0; k < nm; ++k)
+        F[i][j] += C[i][k] * D[k][j];
+    }
   /* G := E*F */
   for (i = 0; i < ni; i++)
-    for (j = 0; j < nl; j++)
-      {
-	G[i][j] = 0;
-	for (k = 0; k < nj; ++k)
-	  G[i][j] += E[i][k] * F[k][j];
-      }
+    for (j = 0; j < nl; j++) {
+      G[i][j] = 0;
+      for (k = 0; k < nj; ++k)
+        G[i][j] += E[i][k] * F[k][j];
+    }
+
+  /* Cheat the compiler to limit the scope of optimisation */
+  if(argv[0] == 0) {
+    print_array(argc, argv);
+  }
 
   /* Stop and print timer. */
   timer_stop_display();
