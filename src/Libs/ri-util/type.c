@@ -2551,6 +2551,23 @@ bool standard_long_integer_type_p(type t)
   return long_p;
 }
 
+bool default_complex_type_p(type t)
+{
+  bool default_complex_p = false;
+  if(!type_undefined_p(t) && type_variable_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    if(basic_complex_p(b)) {
+      int s = basic_int(b);
+
+      default_complex_p = ENDP(variable_dimensions(v))
+	&& ENDP(variable_qualifiers(v))
+	&& s == DEFAULT_COMPLEX_TYPE_SIZE;
+    }
+  }
+  return default_complex_p;
+}
+
 bool scalar_integer_type_p(type t)
 {
   bool long_p = false;
