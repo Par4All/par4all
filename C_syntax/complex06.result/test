@@ -3,7 +3,7 @@ parsed printed file
 
 int main(void)
 {
-   double z = 42.0+42.0iF;
+   double _Complex z = 42.0+42.0iF;
 
    return 0;
 }
