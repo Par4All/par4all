@@ -58,6 +58,7 @@ def process(input):
                 filter_exclude = input.exclude_modules,
                 accel = input.accel,
                 cuda = input.cuda,
+                opencl = input.opencl,
                 openmp=input.openmp,
                 com_optimization = input.com_optimization,
                 fftw3 = input.fftw3,

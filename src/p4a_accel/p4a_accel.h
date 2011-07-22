@@ -43,6 +43,14 @@ extern double P4A_accel_timer_stop_and_float_measure();
 #error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
 #endif
 
+#if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENCL) 
+#error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENCL defined, yet"
+#endif
+
+#if defined(P4A_ACCEL_OPENCL) && defined(P4A_ACCEL_OPENMP) 
+#error "You cannot have both P4A_ACCEL_OPENCL and P4A_ACCEL_OPENMP defined, yet"
+#endif
+
 /* Some common function prototypes. */
 
 /** Prototype for allocating memory on the hardware accelerator.
@@ -242,6 +250,11 @@ void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */);
 #include <p4a_accel-OpenMP.h>
 #else
 #error "You have to define either P4A_ACCEL_CUDA or P4A_ACCEL_OPENMP"
+#ifdef P4A_ACCEL_OPENCL
+#include <p4a_accel-OpenCL.h>
+#else
+#error "You have to define either P4A_ACCEL_CUDA, P4A_ACCEL_OPENMP or P4A_ACCEL_OPENCL"
+#endif
 #endif
 #endif
 

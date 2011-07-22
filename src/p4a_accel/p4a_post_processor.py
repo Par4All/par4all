@@ -8,7 +8,7 @@ Ronan.Keryell@hpc-project.com
 
 #import string, re, sys, os, types, optparse
 
-import sys, re, os, optparse, subprocess
+import sys, re, os, optparse, subprocess, p4a_util
 
 verbose = False
 
@@ -46,6 +46,36 @@ def insert_kernel_launcher_declaration(m):
     if verbose:
         print "Inserting", decl
     return decl
+
+def replace_by_opencl_own_declarations(content):
+    # Replace sinf by the opencl intrinsic sin function
+    content = re.sub("sinf","sin",content)
+    # size_t is not a standard in OpenCL ...
+    # size_t can be a 32-bit or a 64-bit unsigned integer, and the OpenCL
+    # compiler does not accept variable types that are
+    # implementation-dependent.
+
+    # Don't know where has been generated, but the opposite of what we want
+    # Comment this line in the opencl kernel file
+    content = re.sub("typedef unsigned int size_t;","//typedef unsigned int size_t;",content)
+    content = re.sub("size_t","unsigned long int",content)
+
+    # Opencl pointers and array variable must be explicitely declared
+    # in the global memory space
+    # any (... * ..., substituted by (P4A_accel_global_address ... * ...,
+    content = re.sub("\s*\(\s*(\w*)\s*\*\s*(\w*)\,","(P4A_accel_global_address \\1 *\\2,", content)
+    # any ,... * ..., substituted by ,P4A_accel_global_address ... * ...,
+    content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\,",",P4A_accel_global_address \\1 *\\2,", content)
+    # any ,... * ...) substituted by ,P4A_accel_global_address ... * ...,
+    content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\)",",P4A_accel_global_address \\1 *\\2)", content)
+    # ,...  ...[...], substituted by ,P4A_accel_global_address ... * ...[...],
+    content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,",",P4A_accel_global_address \\1 \\2[\\3],", content)
+    # (...  ...[...], substituted by (P4A_accel_global_address ... * ...[...],
+    content = re.sub("\(\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,","(P4A_accel_global_address \\1 \\2[\\3],", content)
+    # ,...  ...[...]) substituted by ,P4A_accel_global_address ... * ...[...])
+    content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\)",",P4A_accel_global_address \\1 \\2[\\3])", content)
+
+    return content
 
 
 def p4a_launcher_clean_up(match_object):
@@ -116,8 +146,13 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = f.read()
     f.close()
 
-    # Inject P4A accel header definitions:
-    header = """/* Use the Par4All accelerator run time: */
+    if (p4a_util.opencl_file_p(file_base_name)):
+        content = replace_by_opencl_own_declarations(content)
+
+    header = ""
+    # Inject P4A accel header definitions except in opencl files:
+    if (not p4a_util.opencl_file_p(file_base_name)):
+        header += """/* Use the Par4All accelerator run time: */
 #include <p4a_accel.h>
 """
     for include in includes:

@@ -249,6 +249,23 @@ def flush_log():
     if log_file_handler:
         log_file_handler.flush()
 
+def skip_file_up_to_word(o_file,word,fold):
+    """ Skip all the file lines until the <fold> occurence of <word>
+    For instance, in the wrapper file, the signature is omitted thus
+    it the file will be skipped until the second occurence of 
+    word="P4A_accel_kernel_wrapper"
+    """
+    n = 0
+    src = open (o_file, 'r')
+    content = ""
+    for line in src:
+        if re.search(word,line):
+            n = n + 1
+        if n == fold:
+            content = content + str(line)
+    src.close ()
+    write_file(o_file,content)
+
 def merge_files (dst_name, src_name_l):
     """ merge the sources file (given as a list) into the dst file. The content
     of the sources is appended to the destination
@@ -630,6 +647,11 @@ def cuda_file_p(file):
     '''Tests if a file has a CUDA name.'''
     ext = get_file_extension(file)
     return ext == '.cu'
+
+def opencl_file_p(file):
+    '''Tests if a file has a OPENCL name.'''
+    ext = get_file_extension(file)
+    return ext == '.cl'
 
 def sharedlib_file_p(file):
     '''Tests if a file has a shared library name.'''
