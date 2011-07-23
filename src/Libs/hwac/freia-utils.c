@@ -461,6 +461,11 @@ list freia_get_vertex_params(const dagvtx v)
   return freia_get_params(api, call_arguments(c));
 }
 
+expression freia_get_nth_scalar_param(const dagvtx v, int n)
+{
+  return EXPRESSION(CAR(gen_nthcdr(n, freia_get_vertex_params(v))));
+}
+
 /* returns an allocated expression list of the parameters only
  * (i.e. do not include the input & output images).
  * params maps variables (if so) to already present parameters names.
