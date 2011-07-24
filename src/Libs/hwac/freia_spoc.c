@@ -1144,6 +1144,11 @@ static void freia_spoc_code_buildup
   // end of headers (some arguments may have been added by stages),
   // and begin the function body
   sb_cat(code, ")\n{\n" FREIA_SPOC_DECL);
+  sb_cat(code,
+         "  // init pipe to nop\n"
+         "  spoc_init_pipe(&si, &sp, ", itoa(FREIA_DEFAULT_BPP), ");\n"
+         "\n");
+
   string_buffer_append_sb(code, body);
 
   // generate actual call to the accelerator

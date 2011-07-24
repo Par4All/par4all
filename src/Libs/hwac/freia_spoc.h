@@ -191,19 +191,16 @@ typedef enum {
   "#include <freiaCoarseGrain.h>\n"   \
   "#include <spoc.h>\n"
 
-#define FREIA_SPOC_DECL                                   \
-  "  spoc_instr si;\n"                                    \
-  "  spoc_param sp;\n"                                    \
-  "  spoc_reduction reduc;\n"                             \
-  "  freia_microcode mcode;\n"                            \
-  "  freia_dynamic_param dynparam;\n"                     \
-  "  freia_reduction_results redres;\n"                   \
-  "  freia_op_param param;\n"                             \
-  "  freia_status ret;\n"                                 \
-  "  int i;\n"                                            \
-  "\n"                                                    \
-  "  // init pipe to nop\n"                               \
-  "  spoc_init_pipe(&si, &sp, " FREIA_DEFAULT_BPP ");\n"  \
+#define FREIA_SPOC_DECL                 \
+  "  spoc_instr si;\n"                  \
+  "  spoc_param sp;\n"                  \
+  "  spoc_reduction reduc;\n"           \
+  "  freia_microcode mcode;\n"          \
+  "  freia_dynamic_param dynparam;\n"   \
+  "  freia_reduction_results redres;\n" \
+  "  freia_op_param param;\n"           \
+  "  freia_status ret;\n"               \
+  "  int i;\n"                          \
   "\n"
 
 #define FREIA_SPOC_CALL                                 \
