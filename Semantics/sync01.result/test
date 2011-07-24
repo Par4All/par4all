@@ -167,7 +167,7 @@ int main(void)
 
    while (1) {
 
-//  P(b,ok,x,y) {b+y==x, 0<=ok, ok<=1, 1<=ok+x, y<=x, x<=y+1, 0<=y}
+//  P(b,ok,x,y) {b+y==x, 0<=b, b<=1, b<=x, 0<=ok, ok<=1, 1<=ok+x}
 
       if (b)
 
@@ -229,8 +229,8 @@ int main(void)
 
       exit(1);
 
-//  T(b,ok,x,y) {b+y==b#init+x, b+y==x, ok==1, ok#init==1, x#init==0,
-//    y#init==0, b<=b#init+x, 0<=x, y<=x, x<=y+1}
+//  T(b,ok,x,y) {b+y==x, b+y==x+y#init, b#init==0, ok==1, ok#init==1,
+//    x#init==0, 0<=b, b<=1, b<=x, 0<=x}
 
    while (1) {
 
@@ -303,7 +303,7 @@ int main(void)
 
    while (1) {
 
-//  P(b,ok,x,y) {b+y==x, ok==1, y<=x, x<=y+1, 0<=y}
+//  P(b,ok,x,y) {b+y==x, ok==1, 0<=b, b<=1, b<=x}
 
       if (b)
 

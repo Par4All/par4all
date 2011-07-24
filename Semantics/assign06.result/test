@@ -1,0 +1,46 @@
+
+Source code with transformers
+
+
+//  T(assign06) {assign06==2}
+
+int assign06()
+{
+
+//  T(j,k) {}
+
+   _Bool j, k;
+
+//  T(j,k) {j==1, k==1}
+
+
+   j = k = 1;
+
+//  T(assign06) {j+k==assign06}
+
+
+   return j+k;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int assign06()
+{
+
+//  P() {}
+
+   _Bool j, k;
+
+//  P(j,k) {}
+
+
+   j = k = 1;
+
+//  P(j,k) {j==1, k==1}
+
+
+   return j+k;
+}
