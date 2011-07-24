@@ -1,1 +1,0 @@
-reduction01.c
