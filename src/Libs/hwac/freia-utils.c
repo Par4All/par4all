@@ -447,6 +447,8 @@ list freia_get_params(const freia_api_t * api, list args)
 {
   int skip = api->arg_img_in + api->arg_img_out;
   while (skip--) args = CDR(args);
+  pips_assert("number of scalar args is ok",
+              gen_length(args)==api->arg_misc_in+api->arg_misc_out);
   return args;
 }
 
@@ -463,7 +465,20 @@ list freia_get_vertex_params(const dagvtx v)
 
 expression freia_get_nth_scalar_param(const dagvtx v, int n)
 {
-  return EXPRESSION(CAR(gen_nthcdr(n, freia_get_vertex_params(v))));
+  return EXPRESSION(CAR(gen_nthcdr(n-1, freia_get_vertex_params(v))));
+}
+
+int freia_max_pixel_value(void)
+{
+  int bpp = FREIA_DEFAULT_BPP;
+  switch (bpp)
+  {
+  case 8: return 0xff;
+  case 16: return 0xffff;
+  default:
+    pips_user_error("expecting 8 or 16 for pixel size, got %d", bpp);
+    return 0;
+  }
 }
 
 /* returns an allocated expression list of the parameters only
