@@ -113,7 +113,12 @@ transformer generic_reference_to_transformer(entity v,
      || entity_has_values_p(rv)) {
     entity rv_new = is_internal?
     entity_to_new_value(rv) : external_entity_to_new_value(rv);
-    tf =  simple_equality_to_transformer(v, rv_new, false);
+    transformer tfr =  simple_equality_to_transformer(v, rv_new, false);
+    if(!transformer_undefined_p(pre)) {
+      // FI: assume pre is a range
+      tf = transformer_intersection(tfr, pre);
+    }
+    free_transformer(tfr);
   }
   else { /* If you are dealing with a C array reference, find
 	    transformers for each subscript expression in case of
@@ -126,7 +131,7 @@ transformer generic_reference_to_transformer(entity v,
   return tf;
 }
 
-static transformer 
+static transformer
 generic_minmax_to_transformer(entity e,
 			      list args,
 			      transformer pre,
@@ -2363,6 +2368,14 @@ static transformer logical_binary_function_to_transformer(entity v,
      ||ENTITY_BITWISE_AND_P(op)||ENTITY_BITWISE_OR_P(op)) {
     tf = logical_binary_operation_to_transformer(v, c, pre, is_internal);
   }
+  else if(ENTITY_ASSIGN_P(op)) {
+    /* FI: slight signature mismatch: no need to propagate the call
+       once you know it is a binary operator... */
+    list args = call_arguments(c);
+    expression lhs = EXPRESSION(CAR(args));
+    expression rhs = EXPRESSION(CAR(CDR(args)));
+    tf = assign_operation_to_transformer(v, lhs, rhs, pre);
+  }
   else if(ENTITY_RELATIONAL_OPERATOR_P(op)) {
     expression expr1 = EXPRESSION(CAR(call_arguments(c)));
     expression expr2 = EXPRESSION(CAR(CDR(call_arguments(c))));
@@ -2548,10 +2561,16 @@ transformer logical_expression_to_transformer(entity v,
     }
     break;
   }
-  case is_syntax_reference:
-    tf = logical_reference_to_transformer(v, reference_variable(syntax_reference(srhs)),
+  case is_syntax_reference: {
+    // FI: information in precondition pre is lost here
+    transformer rtf = logical_reference_to_transformer(v, reference_variable(syntax_reference(srhs)),
 					  is_internal);
+    if(!transformer_undefined_p(rtf) && !transformer_undefined_p(pre)) {
+      // FI: let us assume that pre is a range, not a transformer
+      tf = transformer_intersection(rtf, pre);
+    }
     break;
+  }
   case is_syntax_range:
     pips_internal_error("Unexpected tag %d", syntax_tag(srhs));
     break;
@@ -2648,6 +2667,9 @@ float_binary_operation_to_transformer(
 
   if(ENTITY_PLUS_P(op) || ENTITY_MINUS_P(op)) {
     tf = addition_operation_to_transformer(e, e1, e2, pre, ENTITY_PLUS_P(op), is_internal);
+  }
+  else if(ENTITY_ASSIGN_P(op)) {
+    tf = assign_operation_to_transformer(e, e1, e2, pre);
   }
 
   return tf;
@@ -2748,7 +2770,7 @@ transformer float_expression_to_transformer(entity v,
   return tf;
 }
 
-/* Assimilate enum to int (used when they appear in logical
+/* Assimilate enum and logical to int (used when they appear in logical
  * operations)
  *
  * FI: Might be useful quite often in semantics... but forces the
@@ -2764,6 +2786,8 @@ static int semantics_basic_tag(basic b)
     if(type_enum_p(dt))
       t = is_basic_int;
   }
+  else if(t==is_basic_logical)
+    t = is_basic_int;
 
   return t;
 }
@@ -2819,6 +2843,10 @@ transformer transformer_add_any_relation_information(
 	  : transformer_apply(tf1, context);
 	transformer ncontext = transformer_range(pcontext);
 	transformer tf2 = safe_any_expression_to_transformer(tmp2, e2, ncontext, true);
+	// FI: not precise because the context is not taken into
+	// account when non-convex information is available,
+	// non-convex information that could be convex within the
+	// context. But see below.
 	transformer rel = relation_to_transformer(op, tmp1, tmp2, veracity);
 	transformer cond = transformer_undefined;
 	transformer newpre = transformer_undefined;
@@ -2903,6 +2931,8 @@ transformer transformer_add_any_relation_information(
   free_basic(b1);
   free_basic(b2);
 
+  pre = transformer_normalize(pre, 2);
+
   /* pre may be unchanged when no information is derived */
   pips_debug(8, "end with pre=%p\n", pre);
 
@@ -2976,7 +3006,8 @@ transformer any_expression_to_transformer(
       || (basic_float_p(bv) && basic_int_p(be))
       || (basic_derived_p(bv) && basic_int_p(be))
       || (basic_derived_p(be) && basic_int_p(bv))
-      || (basic_logical_p(bv) && basic_int_p(be))) {
+      || (basic_logical_p(bv) && basic_int_p(be))
+      || (basic_logical_p(be) && basic_int_p(bv))) {
     switch(basic_tag(be)) {
     case is_basic_int:
       if(integer_analyzed_p()) {
@@ -3000,8 +3031,11 @@ transformer any_expression_to_transformer(
       }
       break;
     case is_basic_logical:
-      if(boolean_analyzed_p())
+      if(basic_logical_p(bv) && boolean_analyzed_p())
 	tf = logical_expression_to_transformer(v, expr, pre, is_internal);
+      else if(basic_int_p(bv)) { // We should check that integers are analyzed...
+	tf = integer_expression_to_transformer(v, expr, pre, is_internal);
+      }
       break;
     case is_basic_float:
       /* PIPS does not represent negative constants: call to unary_minus */
@@ -3532,6 +3566,7 @@ transformer bitwise_xor_to_transformer(entity v,
 	tf = transformer_add_equality_with_integer_constant(tf, v, lb1 ^ lb2);
       }
       else if(0<=lb1 && ub1 <= 1 && 0<=lb2 && ub2 <= 1) {
+	tf = transformer_identity();
 	/* The two values can be interpreted as booleans */
 	/* Code about cut-and-pasted from
 	   logical_binary_operation_to_transformer() */

@@ -173,7 +173,8 @@ transformer relation_to_transformer(entity op, entity e1, entity e2,
 	  ||(ENTITY_GREATER_OR_EQUAL_P(op) && !veracity)) {
     ineq = vect_new((Variable) e1, VALUE_ONE);
     vect_add_elem(&ineq, (Variable) e2, VALUE_MONE);
-    if(basic_int_p(b1) && basic_int_p(b2)) {
+    if((basic_int_p(b1) || basic_logical_p(b1))
+       && (basic_int_p(b2) || basic_logical_p(b2))) {
       vect_add_elem(&ineq, TCST, VALUE_ONE);
     }
   }
@@ -186,7 +187,8 @@ transformer relation_to_transformer(entity op, entity e1, entity e2,
 	  || (ENTITY_LESS_OR_EQUAL_P(op) && !veracity)) {
     ineq = vect_new((Variable) e1, VALUE_MONE);
     vect_add_elem(&ineq, (Variable) e2, VALUE_ONE);
-    if(basic_int_p(b1) && basic_int_p(b2)) {
+    if((basic_int_p(b1) || basic_logical_p(b1))
+       && (basic_int_p(b2) || basic_logical_p(b2))) {
       vect_add_elem(&ineq, TCST, VALUE_ONE);
     }
   }
@@ -851,6 +853,7 @@ transformer transformer_normalize(transformer t, int level)
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
     Psysteme r2 = sc_dup(r);
+
     /* Select one tradeoff between speed and accuracy:
      * enumerated by increasing speeds according to Beatrice
      */
@@ -1858,6 +1861,9 @@ transformer transformer_safe_value_substitute(transformer t,
   return t;
 }
 
+/* Check if a transformer is empty. Take into account, if necessary,
+   constraints with floating point and string constraints.
+ */
 static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
 {
   string s1 = string_undefined;

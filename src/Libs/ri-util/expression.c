@@ -1140,6 +1140,11 @@ list syntax_to_reference_list(syntax s, list lr)
     }
     return lr;
 }
+
+void fprint_expression(FILE * f, expression e)
+{
+  print_words(f, words_syntax(expression_syntax(e), NIL));
+}
 
 /* no file descriptor is passed to make is easier to use in a debugging
    stage.

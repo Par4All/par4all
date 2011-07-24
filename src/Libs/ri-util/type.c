@@ -1247,7 +1247,7 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
                         if(type_variable_p(rt))
                             rb = copy_basic(variable_basic(type_variable(rt)));
                         else {
-                            /* Too bad for "void"... 
+                            /* Too bad for "void"...
                              * SG: should not happen because dereferencing a void* is a mistake */
                             pips_internal_error("input code seems to derference a void* pointer ?");
                         }
@@ -1345,6 +1345,12 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
               free_basic(b);
               rb = new_rb;
             }
+	    /* logical variables can be used as integer arguments */
+	    if(basic_logical_p(rb))
+	      if(arithmetic_intrinsic_p(f)) {
+		free_basic(rb);
+		rb = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
+	      }
         }
 
     }
@@ -1485,6 +1491,9 @@ basic basic_maximum(basic fb1, basic fb2)
 
 	b = make_basic(is_basic_logical,UUINT(s1>s2?s1:s2));
       }
+      else if(basic_int_p(b2)) {
+	b = copy_basic(b2);
+      }
       else
 	b = make_basic(is_basic_overloaded, UU);
       break;
@@ -1529,6 +1538,9 @@ basic basic_maximum(basic fb1, basic fb2)
 	_int s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
+      }
+      else if(basic_logical_p(b2)) {
+	b = copy_basic(b1);
       }
       else if(basic_pointer_p(b2)) {
           return copy_basic(b2);
