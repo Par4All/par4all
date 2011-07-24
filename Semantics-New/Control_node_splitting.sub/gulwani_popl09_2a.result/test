@@ -58,8 +58,8 @@ void ts_singlestate(void)
       checking_error();
 
 //  T(c1,c2,x,y) {c1+y#init==c1#init+y, c1+y0==y,
-//    c2+x#init==c2#init+x, c2+x0==x, 0<=c1, c1#init<=c1, c1<=y,
-//    0<=c2, c2<=x, y<=m, x<=n, x#init<=x}
+//    c2+x#init==c2#init+x, c2+x0==x, c1#init<=c1, y<=m, x<=n,
+//    x#init<=x, x0<=x, 0<=x0, y0<=y, 0<=y0}
 
    while (rand_b())
 
@@ -260,8 +260,8 @@ L2:   ;
 
 L1:   ;
 
-//  T(c1,y) {c1+y#init==c1#init+y, c1+y0==y, c2==0, x==x0, y+1<=m,
-//    0<=n, x+1<=n, 0<=x, y#init<=y, y0<=y, 0<=y0}
+//  T(c1,y) {c1+y#init==c1#init+y, c1+y0==y, c2==0, x==x0, 0<=c1,
+//    c1+y0+1<=m, 0<=n, x+1<=n, 0<=x, y#init<=y, 0<=y0}
 
    while (rand_b()) {
 
@@ -528,13 +528,13 @@ void ts_restructured(void)
 
    if (y<m) goto L1;
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m, c2==0, m==y, x==x0, 0<=c1,
-//    c1<=m, x+1<=n, 0<=x}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m, c2==0, m==y, x==x0, y0<=m,
+//    x+1<=n, 0<=x, 0<=y0}
 
 L2:   ;
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m, c2==0, m==y, x==x0, 0<=c1,
-//    c1<=m, 0<=n, x+1<=n, 0<=x}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m, c2==0, m==y, x==x0, y0<=m, 0<=n,
+//    x+1<=n, 0<=x, 0<=y0}
 
    while (rand_b()) {
 
@@ -608,28 +608,28 @@ L1:   ;
 
    while (rand_b()) {
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, 0<=c1, c1+y0+1<=m,
-//    0<=n, x+1<=n, 0<=x, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, y+1<=m, 0<=n,
+//    x+1<=n, 0<=x, y0<=y, 0<=y0}
 
       if (!(x<n&&y<m-1))
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, 0<=c1, c1+y0+1<=m,
-//    m<=y+1, 0<=n, x+1<=n, 0<=x, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m-1, c2==0, m==y+1, x==x0, y0+1<=m,
+//    0<=n, x+1<=n, 0<=x, 0<=y0}
 
          deadlock();
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, 0<=c1, y+2<=m,
-//    0<=n, x+1<=n, 0<=x, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, y+2<=m, 0<=n,
+//    x+1<=n, 0<=x, y0<=y, 0<=y0}
 
       y++;
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y-1, c2==0, x==x0, 0<=c1, y+1<=m,
-//    y0+1<=m, 0<=n, x+1<=n, 0<=x, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y-1, c2==0, x==x0, y+1<=m, y0+1<=m,
+//    0<=n, x+1<=n, 0<=x, y0+1<=y, 0<=y0}
 
       c1++;
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, 1<=c1, y+1<=m,
-//    y0+1<=m, 0<=n, x+1<=n, 0<=x, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, y+1<=m, y0+1<=m,
+//    0<=n, x+1<=n, 0<=x, y0+1<=y, 0<=y0}
 
       if (!(c1<=m-y0&&c2<=n-x0))
 
@@ -638,28 +638,28 @@ L1:   ;
          checking_error();
    }
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, 0<=c1, c1+y0+1<=m,
-//    x+1<=n, 0<=x, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, y+1<=m, x+1<=n,
+//    0<=x, y0<=y, 0<=y0}
 
    if (!(x<n&&y==m-1))
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, 0<=c1, y+2<=m,
-//    x+1<=n, 0<=x, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2==0, x==x0, y+2<=m, x+1<=n,
+//    0<=x, y0<=y, 0<=y0}
 
       deadlock();
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m-1, c2==0, m==y+1, x==x0, 0<=c1,
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m-1, c2==0, m==y+1, x==x0, y0+1<=m,
 //    x+1<=n, 0<=x, 0<=y0}
 
    y++;
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m-1, c2==0, m==y, x==x0, 0<=c1,
-//    0<=m, 0<=n, x+1<=n, 0<=x, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m-1, c2==0, m==y, x==x0, 0<=m,
+//    y0+1<=m, 0<=n, x+1<=n, 0<=x, 0<=y0}
 
    c1++;
 
-//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m, c2==0, m==y, x==x0, 1<=c1, 0<=m,
-//    0<=n, x+1<=n, 0<=x, 0<=y0}
+//  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==m, c2==0, m==y, x==x0, 0<=m,
+//    y0+1<=m, 0<=n, x+1<=n, 0<=x, 0<=y0}
 
    if (!(c1<=m-y0&&c2<=n-x0))
 
@@ -669,7 +669,7 @@ L1:   ;
    goto L2;
 
 //  P(c1,c2,m,n,x,x0,y,y0) {c1+y0==y, c2+x0==n, n==x, 0<=c1, c1<=y,
-//    0<=c2, c2<=n, y<=m}
+//    y<=m, x0<=n, 0<=x0}
 
 L3:   ;
 }
