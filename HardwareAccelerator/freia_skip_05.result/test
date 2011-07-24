@@ -4,14 +4,14 @@
 
 ! initial function
 
-void freia_skip_05(freia_data2d *o, freia_data2d *i)
+void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    int32_t seuil;                                                       /*0005*/
    freia_data2d *t;                                                     /*0006*/
    // allocation in the middle of the stream
-   freia_aipo_sub(i, i, i);                                             /*0008*/
+   freia_aipo_sub(i1, i0, i1);                                          /*0008*/
    t = freia_common_create_data(16, 128, 128);                          /*0009*/
-   freia_aipo_xor_const(t, i, 111);                                     /*0010*/
+   freia_aipo_xor_const(t, i1, 111);                                    /*0010*/
    freia_aipo_threshold(o, t, 8, 100, true);                            /*0011*/
    freia_common_destruct_data(t);                                       /*0012*/
 }
@@ -21,10 +21,11 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
 // graph for dag "dag_0" of module "freia_skip_05" in dot format
 digraph "dag_0" {
   // inputs
-  "i" [shape=circle];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i" [shape=circle];
+  "i1" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -33,18 +34,19 @@ digraph "dag_0" {
   "10 ^." [shape=trapezium,orientation=270];
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i"];
-  "8 -" -> "i";
-  "i" -> "8 -";
-  "i" -> "8 -";
+  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "i1";
+  "i1" -> "8 -";
+  "i0" -> "8 -";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_05" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=circle];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i" [shape=circle];
+  "i1" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -53,21 +55,21 @@ digraph "dag_cleaned_0" {
   "10 ^." [shape=trapezium,orientation=270];
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i"];
-  "8 -" -> "i";
-  "i" -> "8 -";
-  "i" -> "8 -";
+  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "i1";
+  "i1" -> "8 -";
+  "i0" -> "8 -";
 }
 
 ! updated function for
 
-void freia_skip_05(freia_data2d *o, freia_data2d *i)
+void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_data2d *t;                                                     /*0006*/
    t = freia_common_create_data(16, 128, 128);                          /*0009*/
    // allocation in the middle of the stream
-   freia_aipo_sub(i, i, i);                                             /*0008*/
-   freia_aipo_xor_const(t, i, 111);                                     /*0010*/
+   freia_aipo_sub(i1, i0, i1);                                          /*0008*/
+   freia_aipo_xor_const(t, i1, 111);                                    /*0010*/
    freia_aipo_threshold(o, t, 8, 100, true);                            /*0011*/
    freia_common_destruct_data(t);                                       /*0012*/
 }
@@ -77,14 +79,14 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
 
 ! initial function
 
-void freia_skip_05(freia_data2d *o, freia_data2d *i)
+void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    int32_t seuil;                                                       /*0005*/
    freia_data2d *t;                                                     /*0006*/
    // allocation in the middle of the stream
-   freia_aipo_sub(i, i, i);                                             /*0008*/
+   freia_aipo_sub(i1, i0, i1);                                          /*0008*/
    t = freia_common_create_data(16, 128, 128);                          /*0009*/
-   freia_aipo_xor_const(t, i, 111);                                     /*0010*/
+   freia_aipo_xor_const(t, i1, 111);                                    /*0010*/
    freia_aipo_threshold(o, t, 8, 100, true);                            /*0011*/
    freia_common_destruct_data(t);                                       /*0012*/
 }
@@ -94,10 +96,11 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
 // graph for dag "dag_0" of module "freia_skip_05" in dot format
 digraph "dag_0" {
   // inputs
-  "i" [shape=circle];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i" [shape=circle];
+  "i1" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -106,18 +109,19 @@ digraph "dag_0" {
   "10 ^." [shape=trapezium,orientation=270];
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i"];
-  "8 -" -> "i";
-  "i" -> "8 -";
-  "i" -> "8 -";
+  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "i1";
+  "i1" -> "8 -";
+  "i0" -> "8 -";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_05" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=circle];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i" [shape=circle];
+  "i1" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -126,18 +130,19 @@ digraph "dag_cleaned_0" {
   "10 ^." [shape=trapezium,orientation=270];
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i"];
-  "8 -" -> "i";
-  "i" -> "8 -";
-  "i" -> "8 -";
+  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "i1";
+  "i1" -> "8 -";
+  "i0" -> "8 -";
 }
 // graph for dag "freia_skip_05_helper_0_0" of module "freia_skip_05" in dot format
 digraph "freia_skip_05_helper_0_0" {
   // inputs
-  "i" [shape=circle];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i" [shape=circle];
+  "i1" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -146,10 +151,10 @@ digraph "freia_skip_05_helper_0_0" {
   "10 ^." [shape=trapezium,orientation=270];
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i"];
-  "8 -" -> "i";
-  "i" -> "8 -";
-  "i" -> "8 -";
+  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "i1";
+  "i1" -> "8 -";
+  "i0" -> "8 -";
 }
 
 ! acceleration function
@@ -160,7 +165,7 @@ digraph "freia_skip_05_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_skip_05
-freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
   int32_t pi0,
   int32_t pi1,
   int32_t pi2,
@@ -181,19 +186,19 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 alu] 8 sub
+  // i0 [0 input 0] -> [0 alu] 8 sub
   // nope
-  // i [0 input 1] -> [0 alu] 8 sub
+  // i1 [0 input 1] -> [0 alu] 8 sub
   // nope
-  // alu 8 sub stage 0 flipped
-  si.alu[0][0].op = SPOC_ALU_SUB_IN1_IN0;
+  // alu 8 sub stage 0
+  si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
 
 
   // STAGE 1
-  // i [0 alu] -> [1 alu] 10 xor_const
+  // i1 [0 alu] -> [1 alu] 10 xor_const
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // i [1 input 0] -> [1 alu] 10 xor_const
+  // i1 [1 input 0] -> [1 alu] 10 xor_const
   // nope
   // alu 10 xor_const stage 1
   si.alu[1][0].op = SPOC_ALU_XOR_IN0_CONST;
@@ -208,24 +213,24 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   sp.th[1][0].boundmax = pi2;
 
 
-  // output image i on 1 and image o on 0
-  // i [1 poc 0] -> [1 output 1] 0 null
+  // output image i1 on 1 and image o on 0
+  // i1 [1 poc 0] -> [1 output 1] 0 null
   si.mux[1][1].op = SPOC_MUX_IN0;
   si.mux[1][3].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // i [1 output 1] -> [7 output 1] 0 null
-  // i [2 input 1] -> [7 output 1] 0 null
+  // i1 [1 output 1] -> [7 output 1] 0 null
+  // i1 [2 input 1] -> [7 output 1] 0 null
   si.mux[2][3].op = SPOC_MUX_IN1;
-  // i [3 input 1] -> [7 output 1] 0 null
+  // i1 [3 input 1] -> [7 output 1] 0 null
   si.mux[3][3].op = SPOC_MUX_IN1;
-  // i [4 input 1] -> [7 output 1] 0 null
+  // i1 [4 input 1] -> [7 output 1] 0 null
   si.mux[4][3].op = SPOC_MUX_IN1;
-  // i [5 input 1] -> [7 output 1] 0 null
+  // i1 [5 input 1] -> [7 output 1] 0 null
   si.mux[5][3].op = SPOC_MUX_IN1;
-  // i [6 input 1] -> [7 output 1] 0 null
+  // i1 [6 input 1] -> [7 output 1] 0 null
   si.mux[6][3].op = SPOC_MUX_IN1;
-  // i [7 input 1] -> [7 output 1] 0 null
+  // i1 [7 input 1] -> [7 output 1] 0 null
   si.mux[7][3].op = SPOC_MUX_IN1;
 
   // o [1 threshold 0] -> [1 output 0] 0 null
@@ -259,25 +264,25 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, o1, o0, i0, i0);
+  freia_cg_template_process_2i_2o(&param, o1, o0, i0, i1);
 
   return ret;
 }
 
 ! updated function
 
-void freia_skip_05(freia_data2d *o, freia_data2d *i)
+void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // allocation in the middle of the stream
-   freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, true);              /*0008*/
+   freia_skip_05_helper_0_0_0(i1, o, i0, i1, 111, 8, 100, true);        /*0008*/
 }
 
 ! cleaned up function
 
-void freia_skip_05(freia_data2d *o, freia_data2d *i)
+void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // allocation in the middle of the stream
-   freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, 1);                 /*0008*/
+   freia_skip_05_helper_0_0_0(i1, o, i0, i1, 111, 8, 100, 1);           /*0008*/
 }
 #
 # TERAPIX
@@ -285,14 +290,14 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
 
 ! initial function
 
-void freia_skip_05(freia_data2d *o, freia_data2d *i)
+void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    int32_t seuil;                                                       /*0005*/
    freia_data2d *t;                                                     /*0006*/
    // allocation in the middle of the stream
-   freia_aipo_sub(i, i, i);                                             /*0008*/
+   freia_aipo_sub(i1, i0, i1);                                          /*0008*/
    t = freia_common_create_data(16, 128, 128);                          /*0009*/
-   freia_aipo_xor_const(t, i, 111);                                     /*0010*/
+   freia_aipo_xor_const(t, i1, 111);                                    /*0010*/
    freia_aipo_threshold(o, t, 8, 100, true);                            /*0011*/
    freia_common_destruct_data(t);                                       /*0012*/
 }
@@ -302,10 +307,11 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
 // graph for dag "dag_0" of module "freia_skip_05" in dot format
 digraph "dag_0" {
   // inputs
-  "i" [shape=circle];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i" [shape=circle];
+  "i1" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -314,18 +320,19 @@ digraph "dag_0" {
   "10 ^." [shape=trapezium,orientation=270];
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i"];
-  "8 -" -> "i";
-  "i" -> "8 -";
-  "i" -> "8 -";
+  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "i1";
+  "i1" -> "8 -";
+  "i0" -> "8 -";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_05" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=circle];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i" [shape=circle];
+  "i1" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -334,18 +341,19 @@ digraph "dag_cleaned_0" {
   "10 ^." [shape=trapezium,orientation=270];
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i"];
-  "8 -" -> "i";
-  "i" -> "8 -";
-  "i" -> "8 -";
+  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "i1";
+  "i1" -> "8 -";
+  "i0" -> "8 -";
 }
 // graph for dag "freia_skip_05_helper_0_0_0" of module "freia_skip_05" in dot format
 digraph "freia_skip_05_helper_0_0_0" {
   // inputs
-  "i" [shape=circle];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i" [shape=circle];
+  "i1" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -354,10 +362,10 @@ digraph "freia_skip_05_helper_0_0_0" {
   "10 ^." [shape=trapezium,orientation=270];
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i"];
-  "8 -" -> "i";
-  "i" -> "8 -";
-  "i" -> "8 -";
+  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "i1";
+  "i1" -> "8 -";
+  "i0" -> "8 -";
 }
 
 ! acceleration function
@@ -381,21 +389,22 @@ digraph "freia_skip_05_helper_0_0_0" {
  * IMAGE H  = 0
  * MAX SIZE = 0
  *
- * 1 input image, 2 output images
+ * 2 input images, 2 output images
  * 3 image operations in dag
  * dag length is 4, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 12
- * - communication: 96
+ * - communication: 128
  */
 freia_status freia_skip_05_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * i0,
-  int32_t pi3,
+  freia_data2d * i1,
   int32_t pi4,
   int32_t pi5,
-  int32_t pi6)
+  int32_t pi6,
+  int32_t pi7)
 {
   // declarations:
   freia_microcode mcode;
@@ -420,7 +429,7 @@ freia_status freia_skip_05_helper_0_0_0(
   const int32_t y_2 = 0;
   // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
-  terapix_tile_info tile_in[2][1];
+  terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
   // imagelets definitions:
   // - 2 computation imagelets
@@ -451,13 +460,13 @@ freia_status freia_skip_05_helper_0_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: -(1,1) -> 1
+  // 0: -(1,2) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
   mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].xmin2 = imagelet_io_1_0;
-  mcu_macro[1][0].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][0].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][0].xmin2 = imagelet_io_2_1;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
   mcu_macro[0][0].xmin3 = imagelet_io_1_0;
@@ -484,7 +493,7 @@ freia_status freia_skip_05_helper_0_0_0(
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   // copy of operation 1 parameters
-  p_1[0] = pi3;
+  p_1[0] = pi4;
   gram.xoffset = x_1;
   gram.yoffset = y_1;
   gram.width = 1;
@@ -515,9 +524,9 @@ freia_status freia_skip_05_helper_0_0_0(
   mcu_macro[0][2].ymin2 = 0;
   mcu_macro[1][2].ymin2 = 0;
   // copy of operation 2 parameters
-  p_2[0] = pi4;
-  p_2[1] = pi5;
-  p_2[2] = pi6;
+  p_2[0] = pi5;
+  p_2[1] = pi6;
+  p_2[2] = pi7;
   gram.xoffset = x_2;
   gram.yoffset = y_2;
   gram.width = 3;
@@ -541,14 +550,19 @@ freia_status freia_skip_05_helper_0_0_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for i
+  // - imagelet 1 is i0 for i0
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
+  // - imagelet 2 is i1 for i1
+  tile_in[0][1].x = imagelet_io_2_0;
+  tile_in[0][1].y = 0;
+  tile_in[1][1].x = imagelet_io_2_1;
+  tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 1 is o0 for i
+  // - imagelet 1 is o0 for i1
   tile_out[0][0].x = imagelet_io_1_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
@@ -573,7 +587,7 @@ freia_status freia_skip_05_helper_0_0_0(
   mcu_instr.out1 = tile_out[1];
 
   // inputs
-  mcu_instr.nbin = 1;
+  mcu_instr.nbin = 2;
   mcu_instr.in0 = tile_in[0];
   mcu_instr.in1 = tile_in[1];
 
@@ -585,7 +599,7 @@ freia_status freia_skip_05_helper_0_0_0(
   // call terapix runtime
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
-  ret |= freia_cg_template_process(&param, o0, o1, i0);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -595,18 +609,18 @@ freia_status freia_skip_05_helper_0_0_0(
 
 ! updated function
 
-void freia_skip_05(freia_data2d *o, freia_data2d *i)
+void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // allocation in the middle of the stream
-   freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, true);              /*0008*/
+   freia_skip_05_helper_0_0_0(i1, o, i0, i1, 111, 8, 100, true);        /*0008*/
 }
 
 ! cleaned up function
 
-void freia_skip_05(freia_data2d *o, freia_data2d *i)
+void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // allocation in the middle of the stream
-   freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, 1);                 /*0008*/
+   freia_skip_05_helper_0_0_0(i1, o, i0, i1, 111, 8, 100, 1);           /*0008*/
 }
 #
 # FREIA COMPILATION DONE
