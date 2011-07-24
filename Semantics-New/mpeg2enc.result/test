@@ -41380,51 +41380,57 @@ switch_1_case_1:   ;
    d0i = d;
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
 break_1:   ;
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
 
    fprintf(statfile, "\nrate control: end of picture\n");
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " actual number of bits: S=%d\n", S);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
 
    fprintf(statfile, " average quantization parameter Q=%.1f\n", (double) Q/(mb_width*mb_height2));
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " remaining number of bits in GOP: R=%d\n", R);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    
@@ -41432,9 +41438,10 @@ break_1:   ;
    fprintf(statfile, " global complexity measures (I,P,B): Xi=%d, Xp=%d, Xb=%d\n", Xi, Xp, Xb);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    
@@ -41442,25 +41449,28 @@ break_1:   ;
    fprintf(statfile, " virtual buffer fullness (I,P,B): d0i=%d, d0p=%d, d0b=%d\n", d0i, d0p, d0b);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " remaining number of P pictures in GOP: Np=%d\n", Np);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " remaining number of B pictures in GOP: Nb=%d\n", Nb);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " average activity: avg_act=%.1f\n", avg_act);
