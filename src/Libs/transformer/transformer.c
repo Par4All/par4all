@@ -1916,15 +1916,15 @@ Pvecteur simplify_float_constraint(Pvecteur v, bool is_equation_p)
     /* FI: do we want to represent 0. by 0? */
     if(x!=0.) {
       // FI: awfull precision loss...
-      entity vx = float_to_entity((float) x);
+      entity vx = float_to_entity((float) x>0?x:-x);
       // FI: let's try to move the constants on the right side,
       // i.e. the constant side, of the constraints
       // Might be independent of the constant sign
       // Avoid -(-6.) if a term is moved from one side to the other
-      if(vx>0)
+      if(x>0)
 	vect_add_elem(&nv, (Variable) vx, VALUE_ONE);
       else
-	vect_add_elem(&nv, (Variable) -vx, VALUE_MONE);
+	vect_add_elem(&nv, (Variable) vx, VALUE_MONE);
     }
     Pvecteur sv = vect_add(v, nv);
     vect_rm(v);
