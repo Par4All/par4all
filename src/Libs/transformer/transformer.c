@@ -1896,6 +1896,8 @@ Pvecteur simplify_float_constraint(Pvecteur v, bool is_equation_p)
 	double d = float_constant_to_double(e);
 	x += (long double)(val) * (long double) (d);
 	occ++;
+	if(val!=1)
+	  occ++;
 	vect_add_elem(&nv, (Variable) e, -val);
       }
       else
@@ -1930,10 +1932,14 @@ Pvecteur simplify_float_constraint(Pvecteur v, bool is_equation_p)
     vect_rm(v);
     vect_rm(nv);
     v = sv;
-    /* Check that v is a feasible constraint */
-    if(vect_size(v)==1) {
-      /* The new term must be the only one since vx is a new entity
-	 whose term cannot be cancelled by vect_add() */
+  }
+
+  /* Check that v is a feasible constraint */
+  if(vect_size(v)==1) {
+    entity e = (entity) vecteur_var(v);
+    /* The new term must be the only one since vx is a new entity
+       whose term cannot be cancelled by vect_add() */
+    if(e != (entity) TCST && entity_constant_p(e)) {
       if((!is_equation_p && x >0)
 	 || (is_equation_p && x!=0.)) {
 	/* Unfeasible constraint */
