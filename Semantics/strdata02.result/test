@@ -15,13 +15,13 @@
       PRINT *, C, I, R, L                                               0015
       END
 
-C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+C  P() {C=='hello world', R==1.0, I==12, L==1}
 
 
-C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+C  P() {C=='hello world', R==1.0, I==12, L==1}
 
 
-C  T(C,I,L,R) {'bye world'==C, 2.0==R, I==3, L==0}
+C  T(C,I,L,R) {C=='bye world', R==2.0, I==3, L==0}
 
       PROGRAM STRDATA02
       CHARACTER*12 C
@@ -37,7 +37,7 @@ C  T() {}
 
       PRINT *, C, I, R, L                                               0010
 
-C  T(C) {'bye world'==C}
+C  T(C) {C=='bye world'}
 
       C = 'bye world'                                                   0011
 
@@ -45,7 +45,7 @@ C  T(I) {I==3}
 
       I = 3                                                             0012
 
-C  T(R) {2.0==R}
+C  T(R) {R==2.0}
 
       R = 2.0                                                           0013
 
@@ -58,7 +58,7 @@ C  T() {}
       PRINT *, C, I, R, L                                               0015
       END
 
-C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+C  P() {C=='hello world', R==1.0, I==12, L==1}
 
       PROGRAM STRDATA02
       CHARACTER*12 C
@@ -70,30 +70,30 @@ C  P() {'hello world'==C, 1.0==R, I==12, L==1}
       LOGICAL L
       DATA L /.TRUE./
 
-C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+C  P() {C=='hello world', R==1.0, I==12, L==1}
 
       PRINT *, C, I, R, L                                               0010
 
-C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+C  P() {C=='hello world', R==1.0, I==12, L==1}
 
       C = 'bye world'                                                   0011
 
-C  P(C) {'bye world'==C, 'hello world'==C#init, 1.0==R, I==12, L==1}
+C  P(C) {C=='bye world', C#init=='hello world', R==1.0, I==12, L==1}
 
       I = 3                                                             0012
 
-C  P(C,I) {'bye world'==C, 'hello world'==C#init, 1.0==R, I==3,
+C  P(C,I) {C=='bye world', C#init=='hello world', R==1.0, I==3,
 C    I#init==12, L==1}
 
       R = 2.0                                                           0013
 
-C  P(C,I,R) {'bye world'==C, 'hello world'==C#init, 1.0==R#init,
-C    2.0==R, I==3, I#init==12, L==1}
+C  P(C,I,R) {C=='bye world', C#init=='hello world', R#init==1.0,
+C    R==2.0, I==3, I#init==12, L==1}
 
       L = .FALSE.                                                       0014
 
-C  P(C,I,L,R) {'bye world'==C, 'hello world'==C#init, 1.0==R#init,
-C    2.0==R, I==3, I#init==12, L==0, L#init==1}
+C  P(C,I,L,R) {C=='bye world', C#init=='hello world', R#init==1.0,
+C    R==2.0, I==3, I#init==12, L==0, L#init==1}
 
       PRINT *, C, I, R, L                                               0015
       END

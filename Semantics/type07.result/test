@@ -8,7 +8,7 @@ C     scalar variables in tests
 
       REAL X
 
-C  T(X) {0.57==X}
+C  T(X) {X==0.57}
 
 
       X = 0.57                                                          0008
@@ -52,7 +52,7 @@ C  P() {}
 
       X = 0.57                                                          0008
 
-C  P(X) {0.57==X}
+C  P(X) {X==0.57}
 
 
       IF (X.GE.0.58) THEN                                               0010
@@ -66,11 +66,11 @@ C  P() {0==-1}
          PRINT *, X                                                     0012
       ELSE
 
-C  P(X) {0.57==X, 0.57<=0.58}
+C  P(X) {X==0.57, -0.01<=0}
 
          READ *, X                                                      0014
 
-C  P(X) {0.57<=0.58}
+C  P(X) {-0.01<=0}
 
          PRINT *, X                                                     0015
       ENDIF

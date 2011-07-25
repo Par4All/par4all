@@ -8,7 +8,7 @@ C     scalar variables in tests
 
       CHARACTER*4 C1
 
-C  T(C1) {"TITI"==C1}
+C  T(C1) {C1=="TITI"}
 
 
       C1 = "TITI"                                                       0008
@@ -43,7 +43,7 @@ C  P() {}
 
       C1 = "TITI"                                                       0008
 
-C  P(C1) {"TITI"==C1}
+C  P(C1) {C1=="TITI"}
 
 
       IF (C1.EQ."TOTO") THEN                                            0010

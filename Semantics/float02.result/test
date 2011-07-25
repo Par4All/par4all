@@ -1,0 +1,75 @@
+
+C  T() {}
+
+!
+! Check simplification of float constants
+!
+! Like float01.f, but check behavior for "0."
+! Do we want to handle "0." as a value different from 0?
+!
+
+      PROGRAM FLOAT02
+      REAL X, Y, Z
+
+C  T(X) {X==1.}
+
+
+      X = 1.                                                            0011
+
+C  T(Y) {Y==0}
+
+      Y = 0.                                                            0012
+
+C  T(Z) {X+Y==Z}
+
+      Z = X+Y                                                           0013
+
+C  T(X,Y) {}
+
+
+      READ *, X, Y                                                      0015
+
+C  T() {}
+
+
+      PRINT *, Z                                                        0017
+
+      END
+
+C  P() {}
+
+!
+! Check simplification of float constants
+!
+! Like float01.f, but check behavior for "0."
+! Do we want to handle "0." as a value different from 0?
+!
+
+      PROGRAM FLOAT02
+      REAL X, Y, Z
+
+C  P() {}
+
+
+      X = 1.                                                            0011
+
+C  P(X) {X==1.}
+
+      Y = 0.                                                            0012
+
+C  P(X,Y) {X==1., Y==0}
+
+      Z = X+Y                                                           0013
+
+C  P(X,Y,Z) {X==1., Z==1., Y==0}
+
+
+      READ *, X, Y                                                      0015
+
+C  P(X,Y,Z) {Z==1.}
+
+
+      PRINT *, Z                                                        0017
+
+      END
+

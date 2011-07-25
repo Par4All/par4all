@@ -1,16 +1,16 @@
 
-C  T(X,XINCR,Y,Z) {1.+Y#init==Y, 3.==X, 4.==XINCR, Y==Z}
+C  T(X,XINCR,Y,Z) {Y==1.+Y#init, X==3., XINCR==4., Y==Z}
 
 
       REAL FUNCTION XINCR(Y)
       COMMON X, Z
 
-C  T(Y) {1.+Y#init==Y}
+C  T(Y) {Y==1.+Y#init}
 
 
       Y = Y+1.                                                          0005
 
-C  T(X) {3.==X}
+C  T(X) {X==3.}
 
       X = 3.                                                            0006
 
@@ -18,7 +18,7 @@ C  T(Z) {Y==Z}
 
       Z = Y                                                             0007
 
-C  T(XINCR) {4.==XINCR}
+C  T(XINCR) {XINCR==4.}
 
 
       XINCR = 4.                                                        0009
@@ -38,7 +38,7 @@ C  T(I) {I==0}
 
       I = 0                                                             0007
 
-C  T(I,Y,Z) {1.+Y#init==Z, 2.+4.==Y}
+C  T(I,Y,Z) {-6.+Y==0, Z==1.+Y#init}
 
 
       Y = 2.+XINCR(Y)                                                   0009
@@ -68,7 +68,7 @@ C  P(I) {I==0}
 
       Y = 2.+XINCR(Y)                                                   0009
 
-C  P(I,Y,Z) {2.+4.==Y}
+C  P(I,Y,Z) {-6.+Y==0}
 
 
       PRINT *, I                                                        0011
@@ -86,15 +86,15 @@ C  P() {}
 
       Y = Y+1.                                                          0005
 
-C  P(Y) {1.+Y#init==Y}
+C  P(Y) {Y==1.+Y#init}
 
       X = 3.                                                            0006
 
-C  P(X,Y) {1.+Y#init==Y, 3.==X}
+C  P(X,Y) {Y==1.+Y#init, X==3.}
 
       Z = Y                                                             0007
 
-C  P(X,Y,Z) {1.+Y#init==Y, 3.==X, Y==Z}
+C  P(X,Y,Z) {Y==1.+Y#init, X==3., Y==Z}
 
 
       XINCR = 4.                                                        0009
