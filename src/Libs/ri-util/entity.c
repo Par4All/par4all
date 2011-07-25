@@ -1415,7 +1415,7 @@ bool arithmetic_intrinsic_p(entity e)
 		     entity_intrinsic(DIVIDE_OPERATOR_NAME),
 		     NULL);
   }
-  if(set_belong_p(io_functions_set, e))
+  if(set_belong_p(arithmetic_functions_set, e))
     return true;
   else
     return false;
