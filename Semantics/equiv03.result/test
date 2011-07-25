@@ -38,7 +38,7 @@ C  T(I) {I==0}
 
       I = 0                                                             0007
 
-C  T(I,Y,Z) {-6.+Y==0, Z==1.+Y#init}
+C  T(I,Y,Z) {Z==1.+Y#init, Y==6.}
 
 
       Y = 2.+XINCR(Y)                                                   0009
@@ -68,7 +68,7 @@ C  P(I) {I==0}
 
       Y = 2.+XINCR(Y)                                                   0009
 
-C  P(I,Y,Z) {-6.+Y==0}
+C  P(I,Y,Z) {Y==6.}
 
 
       PRINT *, I                                                        0011

@@ -15,7 +15,7 @@ C  T(S) {S=="Hello World!"}
 
       S = "Hello World!"                                                0007
 
-C  T(X) {X==2.0}
+C  T(X) {X==2.}
 
       X = 2.0                                                           0008
 
@@ -50,18 +50,18 @@ C  P(S) {S=="Hello World!"}
 
       X = 2.0                                                           0008
 
-C  P(S,X) {S=="Hello World!", X==2.0}
+C  P(S,X) {S=="Hello World!", X==2.}
 
       I = 1                                                             0009
 
-C  P(I,S,X) {S=="Hello World!", X==2.0, I==1}
+C  P(I,S,X) {S=="Hello World!", X==2., I==1}
 
 
       CALL INIPRINT(S, X, I)                                            0011
 
       END
 
-C  P() {FS=="Hello World!", FX==2.0, FI==1}
+C  P() {FS=="Hello World!", FX==2., FI==1}
 
 
       SUBROUTINE INIPRINT(FS, FX, FI)
@@ -69,7 +69,7 @@ C  P() {FS=="Hello World!", FX==2.0, FI==1}
       CHARACTER*(*) FS
       INTEGER FI
 
-C  P() {FS=="Hello World!", FX==2.0, FI==1}
+C  P() {FS=="Hello World!", FX==2., FI==1}
 
 
       PRINT *, FS, FX, FI                                               0007

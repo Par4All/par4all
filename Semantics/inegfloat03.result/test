@@ -86,11 +86,11 @@ C  P(R) {}
 
       IF (R.GE.0.0.AND.R.LE.1.0) THEN                                   0015
 
-C  P(R) {R<=1.0, 0<=R}
+C  P(R) {R<=1., 0<=R}
 
          PRINT *, 'float ge le float'                                   0016
 
-C  P(R) {R<=1.0, 0<=R}
+C  P(R) {R<=1., 0<=R}
 
          PRINT *, R                                                     0017
       ENDIF
@@ -109,16 +109,16 @@ C  P(R) {R==0.5}
 
       IF (R.GE.0.0.AND.R.LE.1.0) THEN                                   0026
 
-C  P(R) {R==0.5, -0.5<=0, 0<=0.5}
+C  P(R) {R==0.5}
 
          PRINT *, 'float ge le float'                                   0027
 
-C  P(R) {R==0.5, -0.5<=0, 0<=0.5}
+C  P(R) {R==0.5}
 
          PRINT *, R                                                     0028
       ENDIF
 
-C  P(R) {R==0.5, -0.5<=0, 0<=0.5}
+C  P(R) {R==0.5}
 
 
       PRINT *, I, R, D                                                  0031

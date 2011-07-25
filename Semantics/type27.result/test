@@ -7,7 +7,7 @@ C     Check multi-type initialization routine
 
       CHARACTER*20 S
 
-C  T(I,S,X) {S=="Hello World!", X==2.0, I==1}
+C  T(I,S,X) {S=="Hello World!", X==2., I==1}
 
 
       CALL INIT(S, X, I)                                                0007
@@ -32,14 +32,14 @@ C  P() {}
 
       CALL INIT(S, X, I)                                                0007
 
-C  P(I,S,X) {S=="Hello World!", X==2.0, I==1}
+C  P(I,S,X) {S=="Hello World!", X==2., I==1}
 
 
       CALL INIPRINT(S, X, I)                                            0009
 
       END
 
-C  P() {FS=="Hello World!", FX==2.0, FI==1}
+C  P() {FS=="Hello World!", FX==2., FI==1}
 
 
       SUBROUTINE INIPRINT(FS, FX, FI)
@@ -47,7 +47,7 @@ C  P() {FS=="Hello World!", FX==2.0, FI==1}
       CHARACTER*(*) FS
       INTEGER FI
 
-C  P() {FS=="Hello World!", FX==2.0, FI==1}
+C  P() {FS=="Hello World!", FX==2., FI==1}
 
 
       PRINT *, FS, FX, FI                                               0007
