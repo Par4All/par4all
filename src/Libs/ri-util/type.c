@@ -1880,9 +1880,12 @@ type call_to_type(call c)
 type reference_to_type(reference ref)
 {
   type t = type_undefined;
+  pips_debug(6, "input entity type %s\n", words_to_string(words_type(entity_type(reference_variable(ref)), NIL)));
+
   type exp_type = basic_concrete_type(entity_type(reference_variable(ref)));
 
   pips_debug(6, "reference case \n");
+  pips_debug(6, "exp_type %s\n", words_to_string(words_type(exp_type, NIL)));
 
   if(type_variable_p(exp_type))
     {
@@ -1925,13 +1928,15 @@ type reference_to_type(reference ref)
       /* Warning : qualifiers are set to NIL, because I do not see
 	 the need for something else for the moment. BC.
       */
-      t = make_type(is_type_variable,
+      t = make_type_variable(
 		    make_variable(copy_basic(cb),
 				  gen_full_copy_list(cd),
 				  NIL));
+      pips_debug(6, "t at the end of reference case %s\n", words_to_string(words_type(t, NIL)));
     }
   else if(type_functional_p(exp_type))
     {
+      pips_debug(6, "functional case \n");
       /* A reference to a function returns a pointer to a function
 	 of the very same time */
       t = make_type(is_type_variable,
@@ -1947,7 +1952,7 @@ type reference_to_type(reference ref)
 			  entity_name(reference_variable(ref)));
     }
   free_type(exp_type);
-
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL)));
   return t;
 }
 
@@ -2769,7 +2774,7 @@ type basic_concrete_type(type t)
 {
   type nt;
 
-  pips_debug(9, "Begin with type \"%s\"\n", type_to_string(t));
+  pips_debug(8, "Begin with type \"%s\"\n", words_to_string(words_type(t, NIL)));
 
   switch (type_tag(t))
     {
@@ -2819,7 +2824,7 @@ type basic_concrete_type(type t)
       nt = copy_type(t);
     }
 
-  pips_debug(9, "Ends with type \"%s\"\n", type_to_string(nt));
+  pips_debug(8, "Ends with type \"%s\"\n", words_to_string(words_type(nt, NIL)));
   ifdebug(9)
     {
     if(type_variable_p(nt))

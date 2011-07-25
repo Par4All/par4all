@@ -795,10 +795,12 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 {
   list l_res = NIL;
   pips_assert("the effect must be defined\n", !effect_undefined_p(eff));
-
-
+  pips_debug_effect(6, "input effect:", eff);
+  pips_debug(6, "input type: %s (%s)\n", words_to_string(words_type(eff_type, NIL)), type_to_string(eff_type));
+  pips_debug(6, "add_eff is %s\n", add_eff? "true": "false");
   if (type_with_const_qualifier_p(eff_type))
     {
+      pips_debug(6, "const qualifier\n");
       if (act == 'w')
 	return NIL;
       else if (act == 'x')
@@ -841,12 +843,26 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 		  (eff_write, make_unbounded_expression());
 		add_array_dims = true;
 	      }
-	    
+
+	    /* if the basic if an end basic, add the path if add_eff is true
+	       or if there has been array dimensions added to the original input path */
+	    if(basic_int_p(b) ||
+	       basic_float_p(b) ||
+	       basic_logical_p(b) ||
+	       basic_overloaded_p(b) ||
+	       basic_complex_p(b) || basic_bit_p(b) || basic_string_p(b)) /* should I had basic_string_p here or make a special case?*/
+	      {
+		pips_debug(6, "end basic case\n");
+		if ((add_array_dims || add_eff) && !pointers_only)
+		  l_res = gen_nconc
+		    (l_res,
+		     effect_to_effects_with_given_tag(eff_write,act));
+	      }
 	    /* If the basic is a pointer type, we must add an effect
 	       with a supplementary dimension, and then recurse
                on the pointed type.
 	    */
-	    if(basic_pointer_p(b))
+	    else if(basic_pointer_p(b))
 	      {
 		if (add_array_dims || add_eff)
 		  l_res = gen_nconc
@@ -855,23 +871,23 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 		if (level > 0)
 		  {
 		    pips_debug(8, "pointer case, \n");
-		    
+
 		    eff_write = (*effect_dup_func)(eff_write);
 		    (*effect_add_expression_dimension_func)
 		      (eff_write, make_unbounded_expression());
-		    
-		    l_res = gen_nconc
+
+		    /*l_res = gen_nconc
 		      (l_res,
-		       effect_to_effects_with_given_tag(eff_write,act));
-		    
+		      effect_to_effects_with_given_tag(eff_write,act));*/
+
 		    l_res = gen_nconc
 		      (l_res,
 		       generic_effect_generate_all_accessible_paths_effects_with_level
-		       (eff_write,  basic_pointer(b), act, false, level - 1, pointers_only));
+		       (eff_write,  basic_pointer(b), act, /*false*/ true, level - 1, pointers_only));
 		  }
 		else
 		  {
-		    pips_debug(8, "pointer case with level == 0 -> no additional dimension\n");		    
+		    pips_debug(8, "pointer case with level == 0 -> no additional dimension\n");
 		  }
 	      }
 	    else if (basic_derived_p(b))

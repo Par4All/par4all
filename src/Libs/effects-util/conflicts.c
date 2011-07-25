@@ -387,143 +387,162 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 )
  */
 bool references_may_conflict_p( reference r1, reference r2 ) {
   bool conflict_p = true; // In doubt, conflict is assumed
-  entity v1 = reference_variable(r1);
-  entity v2 = reference_variable(r2);
+  entity e1 = reference_variable(r1);
+  entity e2 = reference_variable(r2);
   list ind1 = reference_indices(r1);
   list ind2 = reference_indices(r2);
   bool get_bool_property( string );
 
   pips_debug(5, " %s vs %s\n", effect_reference_to_string(r1), effect_reference_to_string(r2));
 
-  /* I'm not sure that calling entities_may_conflict_p is adapted here
-     because we may have for instance r1="a[i].e[k]" with "a" declared as "mystruct *a";
-     and v2 an abstract location with type mystruct *. Obviously, there is no conflict
-     between v1 and v2, whereas there is a conflict between r1 and r2.
-  */
-  if ( entities_may_conflict_p( v1, v2 ) ) {
-    pips_debug(5, "entities may conflict\n");
-
-    if ( v1 != v2 ) {
-      /* We do not bother with the offset and the array types in case
-	 of static aliasing */
-      /* We do not bother with the abstract locations */
-      conflict_p = true;
-    } else {
-      /* v1 == v2 */
-      /* Is ALIASING_ACROSS_DATA_STRUCTURES taken into account? */
-      conflict_p = variable_references_may_conflict_p( v1, ind1, ind2 );
+  if (!c_module_p(get_current_module_entity()))
+    {
+      pips_debug(5, "fortran case\n");
+      if (same_entity_p(e1, e2))
+	conflict_p = variable_references_may_conflict_p( e1, ind1, ind2 );
+      else
+	conflict_p =  variable_entity_may_conflict_p( e1, e2 );
     }
-  }  else if (ENDP(ind1) && ENDP(ind2)) {
-    /* for scalar entities, all the job has been performed in entities_may_conflict_p( v1, v2 ) */
-    conflict_p = false;
-  } else {
+  else if (ENDP(ind1) && ENDP(ind2))   /* calling entities_may_conflict_p is only valid for scalar entities */
+    {
+      pips_debug(5, "scalar case\n");
+      conflict_p = entities_may_conflict_p( e1, e2 );
+    }
+  else
+    {
+      /* here, we have either two concrete locations, one of which at least has indices,
+	 or one abstract location and one concrete location with indices. BC
+      */
+      /* I'm not completely sure of that. Are numbered heap locations considered as abstract locations?
+         And they may have indices. Heap locations testing is a mess. BC.
+      */
 
-    /* here, we have either two concrete locations, one of which at least has indices,
-       or one abstract location and one concrete location with indices. BC
-    */
-    /* Abstract locations are not expected to have indices, maybe except
-       abstract heap locations. To be adapted in the future. BC
-    */
+      // these are costly function calls; call them only once.
+      bool e1_abstract_location_p = entity_abstract_location_p( e1 );
+      bool e2_abstract_location_p = entity_abstract_location_p( e2 );
 
-	/* Can we have some dynamic aliasing? */
+      bool e1_heap_location_p = e1_abstract_location_p
+	&& entity_flow_or_context_sentitive_heap_location_p(e1);
+      bool e2_heap_location_p = e2_abstract_location_p
+	&& entity_flow_or_context_sentitive_heap_location_p(e2);
+
+      pips_assert("there shouldn't be two abstract locations here.",
+		  !( (e1_abstract_location_p && !e1_heap_location_p)
+		     &&  (e2_abstract_location_p && !e2_heap_location_p)));
+
+
+	/* FI: Can we have some dynamic aliasing? */
 	/* Do we have aliasing between types? */
 	/* Do we have aliasing within a data structure? This should have
 	   been checked above with
 	   variable_references_may_conflict_p(v1,ind1,ind2) */
 
-    /* A patch for effects_package references, which cannot conflict with user variables */
-    /* well, strictly speaking, couldn't they conflict with an anywhere:anywhere effect?
-       but then there should be other conflicts... */
-    if (effects_package_entity_p(v1) || effects_package_entity_p(v2))
-      conflict_p = (v1 == v2);
-    else
-      {
-	/* Even if CONSTANT_PATH_EFFECTS is set to TRUE, there can be a conflict
-	   between a concrete location and an abstract locations - BC */
-
-	/* Can we use types to conclude there is not indirect conflict? */
-	if ( !get_bool_property( "ALIASING_ACROSS_TYPES" ) ) {
-	  /* No type check for abstract location
-	   * FIXME : really ?
-	   */
-	  if ( !entity_abstract_location_p( reference_variable(r1) )
-	       && !entity_abstract_location_p( reference_variable(r2) ) ) {
-
-	    /* Are we dealing with NULL POINTER ? */
-	    if ( entity_null_locations_p(v1) && entity_null_locations_p(v2) )
-	      conflict_p = true;
-	    else if(entity_null_locations_p(v1) || entity_null_locations_p(v2) )
-	      conflict_p = false;
-	    else{
-	      type t1 = cell_reference_to_type( r1 );
-	      type t2 = cell_reference_to_type( r2 );
-
-	      conflict_p = type_equal_p( t1, t2 ); /* well type_equal_p does not perform a good job :-( BC*/
-	    }
-	  }
-	}
-
-	/* Do we use formal parameters? */
-	if ( !get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" ) ) {
-	  /* No type check for abstract location
-	   * FIXME : really ?
-	   */
-	  if ( entity_formal_p( reference_variable(r1) )
-	       && entity_formal_p( reference_variable(r2) ) ) {
+      /* A patch for effects_package references, which cannot conflict with user variables */
+      /* well, strictly speaking, couldn't they conflict with an anywhere:anywhere effect?
+	 but then there should be other conflicts... */
+      if (effects_package_entity_p(e1) || effects_package_entity_p(e2))
+	{
+	  if (!same_entity_p(e1, e2) || (ENDP(ind1) && ENDP(ind2)) )
 	    conflict_p = false;
-	  }
+	  else // same entity, with indices
+	    conflict_p = variable_references_may_conflict_p( e1, ind1, ind2 );
 	}
+      else
+	{
 
-	/* Are we dealing with NULL POINTER ? */
-	if ( entity_null_locations_p(v1) && entity_null_locations_p(v2) )
-	  conflict_p = true;
-	else if(entity_null_locations_p(v1) || entity_null_locations_p(v2) )
-	  conflict_p = false;
+	  /* string operations are costly - perform them only once */
+	  bool e1_null_p = entity_null_locations_p(e1);
+	  bool e2_null_p = entity_null_locations_p(e2);
 
-	/* There still could be a conflict in C because the two references
-	   might point to the same memory location. It might be more
-	   effective to drop this when Fortran 77 code is analyzed because
-	   the lack of pointers guarantees there is no conflict. */
-	/* there should be no dereferencing when dealing with constant path effects
-	   and testing for dereferencing is costly
-	*/
-	if ( conflict_p )
-	  {
-	    if (get_bool_property("CONSTANT_PATH_EFFECTS"))
-	      {
-		conflict_p = false;
-	      }
-	    else
-	      {
-		/* Do we have some dereferencing in ind1 or ind2? Do we assume
-		   that p[0] conflicts with any reference? We might as well use
-		   reference_to_abstract_location()... */
-		/* Could be improved with ALIASING_ACROSS_DATA_STRUCTURES? */
-		bool exact;
-		// Check dereferencing in r1
-		conflict_p = effect_reference_dereferencing_p( r1, &exact );
-		if(!conflict_p) {
-		  /* We need to evaluate dereferencing in r2 only when a dereferencing
-		   * have not been find in r1 */
-		  conflict_p = effect_reference_dereferencing_p( r2, &exact );
+	  if (e1_null_p || e2_null_p)
+	    conflict_p = e1_null_p && e2_null_p;
+	  else if ((e1_abstract_location_p && !e1_heap_location_p )
+		   || (e2_abstract_location_p && !e2_heap_location_p ))
+	    {
+	      entity abstract_location_e = e1_abstract_location_p? e1: e2;
+	      //entity concrete_location_e = e1_abstract_location_p? e2: e1;
+
+	      pips_debug(5, "abstract location vs. concrete location case\n");
+
+	      if (entity_all_locations_p(abstract_location_e))
+		conflict_p = true;
+	      else
+		// there should be a reference_to_abstract_location function
+		// as there is a variable_to_abstract_location function
+		// assume conflict, but much more work should be done here. BC.
+		conflict_p = true;
+	    }
+	  else // two concrete locations
+	    {
+	      pips_debug(5, "two concrete locations case \n");
+	      if (same_entity_p(e1, e2))
+		conflict_p = variable_references_may_conflict_p( e1, ind1, ind2 );
+	      else
+		{
+		  // there should be no conflict here with constant path effects
+		  // however, this is still work in progress :-( and when
+		  // CONSTANT_PATH_EFFECTS is set to FALSE, effects may be erroneous.
+		  // so we need this to avoid over-optimistic program transformations
+
+		  if (get_bool_property("CONSTANT_PATH_EFFECTS"))
+		    {
+		      conflict_p = false;
+		    }
+		  else
+		    {
+		      type t1 = cell_reference_to_type( r1 );
+		      type t2 = cell_reference_to_type( r2 );
+
+		      if ( conflict_p && !get_bool_property( "ALIASING_ACROSS_TYPES" )
+			   && !type_equal_p(t1, t2) )
+			{
+			  pips_debug(5, "no conflict because types are not equal\n");
+			  conflict_p = false; /* well type_equal_p does not perform a good job :-( BC*/
+			}
+
+		      if ( conflict_p && !get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" )
+				&& entity_formal_p(e1) && entity_formal_p(e2) )
+			{
+			  pips_debug(5, "no conflict because entities are formals\n");
+			  conflict_p = false;
+			}
+		      /* should ALIASING_ACROSS_DATA_STRUCTURES be also tested here? */
+		      if ( conflict_p )
+			{
+			  /* Do we have some dereferencing in ind1 or ind2? Do we assume
+			     that p[0] conflicts with any reference? We might as well use
+			     reference_to_abstract_location()... */
+			  /* Could be improved with ALIASING_ACROSS_DATA_STRUCTURES? */
+			  bool exact;
+			  // Check dereferencing in r1
+			  conflict_p = effect_reference_dereferencing_p( r1, &exact );
+			  if(!conflict_p) {
+			    /* We need to evaluate dereferencing in r2 only when a dereferencing
+			     * have not been find in r1 */
+			    conflict_p = effect_reference_dereferencing_p( r2, &exact );
+			  }
+			  /* In other words, we assume no conflict as soon as no pointer is
+			   * dereferenced... even when aliasing across types is not ignored !
+			   *
+			   * If aliasing across types is ignored, we know here that the
+			   * two memory locations referenced are of the same type. If the
+			   * pointer in one reference (let's assume only one pointer to
+			   * start with) is not of type pointer to the common type, then
+			   * there is no conflict.
+			   *
+			   * Else, we have to assume a conflict no matter what, because
+			   * simple cases should have been simplified via the points-to
+			   * analysis.
+			   */
+			}
+
+		    }
 		}
-		/* In other words, we assume not conflict as soon as not pointer is
-		 * dereferenced... even when aliasing across types is not ignored !
-		 *
-		 * If aliasing across types is ignored, we know here that the
-		 * two memory locations referenced are of the same type. If the
-		 * pointer in one reference (let's assume only one pointer to
-		 * start with) is not of type pointer to the common type, then
-		 * there is no conflict.
-		 *
-		 * Else, we have to assume a conflict no matter what, because
-		 * simple cases should have been simplified via the points-to
-		 * analysis.
-		 */
-	      }
-	  }
-      }
-  }
+	    } // end: two concrete locations
+
+	}
+    }
+
   pips_debug(5, "there is %s may conflict\n", conflict_p? "a": "no");
   return conflict_p;
 }
@@ -633,119 +652,120 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
   // effects package entities are not usual variables
   if (effects_package_entity_p(e1) || effects_package_entity_p(e2))
     conflict_p = (e1 == e2);
-
-  // these are costly function calls; call them only once.
-  bool e1_abstract_location_p = entity_abstract_location_p( e1 );
-  bool e2_abstract_location_p = entity_abstract_location_p( e2 );
-
-  bool (*abstract_locations_conflict_p)(entity,entity);
-  abstract_locations_conflict_p =
-    must_p ? abstract_locations_must_conflict_p :
-    abstract_locations_may_conflict_p;
-
-  if (e1_abstract_location_p && e2_abstract_location_p)
-    {
-      // two abstract locations
-      conflict_p = abstract_locations_conflict_p( e1, e2 );
-    }
-  else if (e1_abstract_location_p || e2_abstract_location_p)
-    {
-      // one abstract location and a concrete one
-      entity abstract_location = e1_abstract_location_p? e1 : e2;
-      entity concrete_location = e1_abstract_location_p? e2 : e1;
-
-      if (entity_null_locations_p(concrete_location))
-	conflict_p = entity_all_locations_p(abstract_location);
-
-      else if ( entity_variable_p(concrete_location) )
-	{
-	  if ( variable_return_p( concrete_location ) )
-	    {
-	      conflict_p = false;
-	    }
-	  else if ( entity_formal_p( concrete_location ) )
-	    {
-	      /* FI: Either we need an new abstract location for the formal
-		 parameters or we need to deal explictly with this case
-		 here and declare conflict with *anywhere*. */
-	      conflict_p = entity_all_locations_p(abstract_location);
-	    }
-	  else
-	    {
-	      entity concrete_location_al = variable_to_abstract_location( concrete_location );
-	      conflict_p = abstract_locations_conflict_p( abstract_location, concrete_location_al );
-	    }
-	}
-      else
-	{
-	  pips_internal_error("Unexpected case.");
-	}
-    }
   else
     {
-      // two concrete locations
-      if ( variable_return_p( e1 ) && variable_return_p( e2 ) )
+      // these are costly function calls; call them only once.
+      bool e1_abstract_location_p = entity_abstract_location_p( e1 );
+      bool e2_abstract_location_p = entity_abstract_location_p( e2 );
+
+      bool (*abstract_locations_conflict_p)(entity,entity);
+      abstract_locations_conflict_p =
+	must_p ? abstract_locations_must_conflict_p :
+	abstract_locations_may_conflict_p;
+
+      if (e1_abstract_location_p && e2_abstract_location_p)
 	{
-	  conflict_p =  same_entity_p(e1,e2);
+	  // two abstract locations
+	  conflict_p = abstract_locations_conflict_p( e1, e2 );
 	}
-      else if ( entity_formal_p( e1 ) && entity_formal_p( e2 ) )
+      else if (e1_abstract_location_p || e2_abstract_location_p)
 	{
-	  conflict_p = same_entity_p(e1,e2);
-	}
-      else if( entity_null_locations_p(e1) || entity_null_locations_p(e2) )
-	{
-	  conflict_p = same_entity_p(e1,e2);
-	}
-      else if ( entity_variable_p(e1) && entity_variable_p(e2) )
-	{
-	  /* FIXME : variable_entity_must_conflict_p does not exist yet */
-	  if( !must_p)
+	  // one abstract location and a concrete one
+	  entity abstract_location = e1_abstract_location_p? e1 : e2;
+	  entity concrete_location = e1_abstract_location_p? e2 : e1;
+
+	  if (entity_null_locations_p(concrete_location))
+	    conflict_p = entity_all_locations_p(abstract_location);
+
+	  else if ( entity_variable_p(concrete_location) )
 	    {
-	      conflict_p = variable_entity_may_conflict_p( e1, e2 );
+	      if ( variable_return_p( concrete_location ) )
+		{
+		  conflict_p = false;
+		}
+	      else if ( entity_formal_p( concrete_location ) )
+		{
+		  /* FI: Either we need an new abstract location for the formal
+		     parameters or we need to deal explictly with this case
+		     here and declare conflict with *anywhere*. */
+		  conflict_p = entity_all_locations_p(abstract_location);
+		}
+	      else
+		{
+		  entity concrete_location_al = variable_to_abstract_location( concrete_location );
+		  conflict_p = abstract_locations_conflict_p( abstract_location, concrete_location_al );
+		}
 	    }
 	  else
 	    {
-	      /* A must conflict is useful to guarantee a kill, but this
-		 shows that it is not related to the definition of the
-		 may case: two variables may share exactly the same set
-		 of memory locations but a reference to one of them does
-		 not necessarily imply that all locations are read or
-		 written. More comments (thinking) are needed to
-		 distinguish between entity and reference conflicts. */
-	      /* We assume that e1 and e2 are program variables. Because
-		 we do not have enough comments, we do not know if this
-		 only hold for variables and arrays of one element. It is
-		 easy to argue that an array cannot must conflict with
-		 itself. The test below does not solve the case of
-		 struct, and maybe union. */
-	      if(entity_scalar_p(e1)) // should always be the case here
-		conflict_p = same_entity_p(e1,e2);
-	      else
-		conflict_p = false;
+	      pips_internal_error("Unexpected case.");
 	    }
 	}
       else
 	{
-	  /* FI: we end up here if references linked to environment or
-	     type declarations are tested for conflicts. Should we
-	     perform such tests, basically e1==e2, or assume that they
-	     should have been handled at a higher level? */
-	  if(!variable_entity_p(e1) || variable_entity_p(e2))
+	  // two concrete locations
+	  if ( variable_return_p( e1 ) && variable_return_p( e2 ) )
 	    {
-	      /* There are no conflicts between entities of different
-		 kinds */
-	      /* Since this implies e1!=e2, this case could be merged
-		 with the next one, but the spec would be less clear */
-	      conflict_p = false;
+	      conflict_p =  same_entity_p(e1,e2);
 	    }
-	  else {
-	    /* Environment and type declaration conflicts imply that
-	       the very same entity is involved. */
-	    conflict_p = same_entity_p(e1,e2);
-	  }
-	}
-    } // end: two concrete locations
-
+	  else if ( entity_formal_p( e1 ) && entity_formal_p( e2 ) )
+	    {
+	      conflict_p = same_entity_p(e1,e2);
+	    }
+	  else if( entity_null_locations_p(e1) || entity_null_locations_p(e2) )
+	    {
+	      conflict_p = same_entity_p(e1,e2);
+	    }
+	  else if ( entity_variable_p(e1) && entity_variable_p(e2) )
+	    {
+	      /* FIXME : variable_entity_must_conflict_p does not exist yet */
+	      if( !must_p)
+		{
+		  conflict_p = variable_entity_may_conflict_p( e1, e2 );
+		}
+	      else
+		{
+		  /* A must conflict is useful to guarantee a kill, but this
+		     shows that it is not related to the definition of the
+		     may case: two variables may share exactly the same set
+		     of memory locations but a reference to one of them does
+		     not necessarily imply that all locations are read or
+		     written. More comments (thinking) are needed to
+		     distinguish between entity and reference conflicts. */
+		  /* We assume that e1 and e2 are program variables. Because
+		     we do not have enough comments, we do not know if this
+		     only hold for variables and arrays of one element. It is
+		     easy to argue that an array cannot must conflict with
+		     itself. The test below does not solve the case of
+		     struct, and maybe union. */
+		  if(entity_scalar_p(e1)) // should always be the case here
+		    conflict_p = same_entity_p(e1,e2);
+		  else
+		    conflict_p = false;
+		}
+	    }
+	  else
+	    {
+	      /* FI: we end up here if references linked to environment or
+		 type declarations are tested for conflicts. Should we
+		 perform such tests, basically e1==e2, or assume that they
+		 should have been handled at a higher level? */
+	      if(!variable_entity_p(e1) || variable_entity_p(e2))
+		{
+		  /* There are no conflicts between entities of different
+		     kinds */
+		  /* Since this implies e1!=e2, this case could be merged
+		     with the next one, but the spec would be less clear */
+		  conflict_p = false;
+		}
+	      else {
+		/* Environment and type declaration conflicts imply that
+		   the very same entity is involved. */
+		conflict_p = same_entity_p(e1,e2);
+	      }
+	    }
+	} // end: two concrete locations
+    }
   return conflict_p;
 }
 

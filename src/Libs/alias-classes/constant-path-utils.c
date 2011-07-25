@@ -213,11 +213,11 @@ list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
 {
   list l = NIL;
   bool changed = false;
-  effect ef = effect_undefined;
-  reference r = reference_undefined;
+  //effect ef = effect_undefined;
+  //reference r = reference_undefined;
   cell c = cell_undefined;
   cell c_new = cell_undefined;
-  int i;
+  //int i;
   reference er = expression_reference(e);
   set_methods_for_proper_simple_effects();
   if(array_reference_p(er)) {

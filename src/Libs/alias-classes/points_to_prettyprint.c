@@ -144,7 +144,7 @@ bool print_code_points_to(string module_name,
 			  string resource_name __attribute__ ((__unused__)),
 			  string file_suffix)
 {
-  list wl = list_undefined;
+  //list wl = list_undefined;
   bool res;
   debug_on("POINTS_TO_DEBUG_LEVEL");
   set_current_module_entity(local_name_to_top_level_entity(module_name));
