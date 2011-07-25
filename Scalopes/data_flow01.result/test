@@ -103,8 +103,7 @@ int main()
 //             <    is written>: P4A__a__0
          int (*P4A__a__0)[100] = (int (*)[100]) 0;
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: P4A__a__0 P4A__a__0[*] 
-//                               P4A__a__0[*][*] 
+//             <may be written>: P4A__a__0 P4A__a__0[*][*] 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__0, sizeof(int)*100);
 
@@ -128,8 +127,7 @@ scmp_task_0:
 //             <    is written>: P4A__a__1
          int (*P4A__a__1)[100] = (int (*)[100]) 0;
 //             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <may be written>: P4A__a__1 P4A__a__1[*] 
-//                               P4A__a__1[*][*] 
+//             <may be written>: P4A__a__1 P4A__a__1[*][*] 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__1, sizeof(int)*100);
 //             <may be read   >: a[*]

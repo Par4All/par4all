@@ -109,7 +109,7 @@ static boolean compress_data(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 //                               compptr[0].MCU_height 
 //                               compptr[0].MCU_width last_MCU_col
                   if (blockcnt<compptr->MCU_width) {
-//             <may be written>: coef[0].MCU_buffer[blkn+blockcnt][*] 
+//             <may be written>: 
 //                               coef[0].MCU_buffer[blkn+blockcnt][*][
 //                               *]
 //             <    is read   >: blkn blockcnt cinfo 
@@ -144,8 +144,7 @@ static boolean compress_data(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
                   }
                }
                else {
-//             <may be written>: coef[0].MCU_buffer[blkn][*] 
-//                               coef[0].MCU_buffer[blkn][*][*]
+//             <may be written>: coef[0].MCU_buffer[blkn][*][*]
 //             <    is read   >: blkn cinfo cinfo[0].comps_in_scan 
 //                               coef coef[0].MCU_buffer[blkn] 
 //                               coef[0].MCU_rows_per_iMCU_row 
@@ -333,7 +332,7 @@ static boolean compress_first_pass(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 //             <    is written>: thisblockrow
             /* Create dummy blocks at the right edge of the image. */
             thisblockrow += blocks_across;
-//             <may be written>: thisblockrow[*] thisblockrow[*][*]
+//             <may be written>: thisblockrow[*][*]
 //             <    is read   >: block_rows cinfo 
 //                               cinfo[0].num_components ndummy 
 //                               thisblockrow
@@ -389,7 +388,7 @@ static boolean compress_first_pass(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 //                               compptr[0].v_samp_factor
 //             <    is written>: lastblockrow
             lastblockrow = buffer[block_row-1];
-//             <may be written>: thisblockrow[*] thisblockrow[*][*]
+//             <may be written>: thisblockrow[*][*]
 //             <    is read   >: block_rows blocks_across cinfo 
 //                               cinfo[0].num_components compptr 
 //                               compptr[0].v_samp_factor thisblockrow
@@ -3978,8 +3977,8 @@ static void validate_script(j_compress_ptr cinfo)
 }
 void jcopy_block_row(JBLOCKROW input_row, JBLOCKROW output_row, JDIMENSION num_blocks)
 {
-//             <may be read   >: input_row[*] input_row[*][*]
-//             <may be written>: output_row[*] output_row[*][*]
+//             <may be read   >: input_row[*][*]
+//             <may be written>: output_row[*][*]
 //             <    is read   >: input_row num_blocks output_row
    memcpy((void *) output_row, (void *) input_row, (size_t) (num_blocks*64*(size_t) sizeof(JCOEF)));
 }
@@ -6769,7 +6768,7 @@ static void transencode_coef_controller(j_compress_ptr cinfo, jvirt_barray_ptr *
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    buffer = (JBLOCKROW) (*cinfo->mem->alloc_large)((j_common_ptr) cinfo,1,10*(size_t) sizeof(JBLOCK));
-//             <may be written>: buffer[*] buffer[*][*]
+//             <may be written>: buffer[*][*]
 //             <    is read   >: buffer
    jzero_far((void *) buffer, 10*(size_t) sizeof(JBLOCK));
 //             <    is written>: i
@@ -7197,8 +7196,8 @@ static boolean fill_input_buffer(j_decompress_ptr cinfo)
    my_src_ptr src = (my_src_ptr) cinfo->src;
    size_t nbytes;
 //             <may be read   >: src[0].infile[0] __IO_EFFECTS:LUNS[*]
-//             <may be written>: src[0].buffer[*] src[0].infile[0] 
-//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: src[0].buffer[*] src[0].infile[0]
+                                 __IO_EFFECTS:LUNS[*]
 //             <    is read   >: src src[0].buffer src[0].infile
 //             <    is written>: nbytes
    nbytes = (size_t) fread((void *) src->buffer, (size_t) 1, (size_t) 4096, src->infile);
@@ -7616,8 +7615,7 @@ static int decompress_onepass(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
 //                               coef[0].MCU_vert_offset last_MCU_col
 //             <    is written>: MCU_col_num
       for(MCU_col_num = coef->MCU_ctr; MCU_col_num <= last_MCU_col; MCU_col_num += 1) {
-//             <may be written>: coef[0].MCU_buffer[0][*] 
-//                               coef[0].MCU_buffer[0][*][*]
+//             <may be written>: coef[0].MCU_buffer[0][*][*]
 //             <    is read   >: cinfo cinfo[0].blocks_in_MCU coef 
 //                               coef[0].MCU_buffer[0] coef[0].MCU_ctr
 //                               coef[0].MCU_rows_per_iMCU_row 
@@ -8080,7 +8078,7 @@ break_1:   ;
 //                               last_block_column
 //             <    is written>: block_num
             for(block_num = 0; block_num <= last_block_column; block_num += 1) {
-//             <may be read   >: buffer_ptr[*] buffer_ptr[*][*]
+//             <may be read   >: buffer_ptr[*][*]
 //             <may be written>: workspace[*]
 //             <    is read   >: block_rows buffer_ptr cinfo 
 //                               cinfo[0].num_components 
@@ -10124,12 +10122,12 @@ static void latch_quant_tables(j_decompress_ptr cinfo)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
          qtbl = (JQUANT_TBL *) (*cinfo->mem->alloc_small)((j_common_ptr) cinfo,1,(size_t) sizeof(JQUANT_TBL));
-//             <may be read   >: cinfo[0].quant_tbl_ptrs[qtblno][*] 
+//             <may be read   >: 
 //                               cinfo[0].quant_tbl_ptrs[qtblno][*].qu
 //                               antval[*] 
 //                               cinfo[0].quant_tbl_ptrs[qtblno][*].se
 //                               nt_table
-//             <may be written>: qtbl[*] qtbl[*].quantval[*] 
+//             <may be written>: qtbl[*].quantval[*] 
 //                               qtbl[*].sent_table
 //             <    is read   >: cinfo cinfo[0].comps_in_scan 
 //                               cinfo[0].quant_tbl_ptrs[qtblno] qtbl 
@@ -18514,8 +18512,7 @@ static JBLOCKARRAY access_virt_barray(j_common_ptr cinfo, jvirt_barray_ptr ptr, 
          end_row -= ptr->cur_start_row;
 //             <    is read   >: end_row undef_row
          while (undef_row<end_row) {
-//             <may be written>: ptr[0].mem_buffer[undef_row][*] 
-//                               ptr[0].mem_buffer[undef_row][*][*]
+//             <may be written>: ptr[0].mem_buffer[undef_row][*][*]
 //             <    is read   >: bytesperrow ptr ptr[0].mem_buffer 
 //                               ptr[0].mem_buffer[undef_row] 
 //                               undef_row
@@ -27731,7 +27728,7 @@ static void start_pass_2_quant(j_decompress_ptr cinfo, boolean is_pre_scan)
    if (cquantize->needs_zeroed) {
 //             <    is written>: i
       for(i = 0; i <= 31; i += 1)
-//             <may be written>: histogram[i][*] histogram[i][*][*]
+//             <may be written>: histogram[i][*][*]
 //             <    is read   >: histogram histogram[i] i
          jzero_far((void *) histogram[i], (1<<6)*(1<<5)*(size_t) sizeof(histcell));
 //             <    is read   >: cquantize
