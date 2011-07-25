@@ -547,7 +547,17 @@ static transformer constant_to_transformer(entity v,
       }
       else {
 	/* This is not a constant string */
-	tf = simple_equality_to_transformer(v, f, false);
+	int i;
+	if(integer_constant_p(f, &i) && i==0) {
+	  tf = transformer_identity();
+	  tf = transformer_add_equality_with_integer_constant(tf, v, 0);
+	}
+	else if(float_constant_p(f) && float_constant_to_double(f)==0.) {
+	  tf = transformer_identity();
+	  tf = transformer_add_equality_with_integer_constant(tf, v, 0);
+	}
+	else
+	  tf = simple_equality_to_transformer(v, f, false);
       }
     }
   }

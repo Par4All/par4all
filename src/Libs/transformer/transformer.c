@@ -835,18 +835,27 @@ static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarv
    constraints.
 
    Does not take into account value types. So s=="hello" and
-   s=="world" do not result into an empty transformer.
+   s=="world" do not result into an empty transformer. But floating
+   point values are taken into account.
  */
 transformer transformer_normalize(transformer t, int level)
 {
-  /* Automatic variables read in a CATCH block need to be declared volatile as
-   * specified by the documentation*/
-  Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
-
   ifdebug(1) {
     pips_assert("Transformer t is consistent on entrance",
 		transformer_consistency_p(t));
   }
+
+  if(float_analyzed_p()) {
+    predicate_system(transformer_relation(t)) =
+      simplify_float_constraint_system(predicate_system(transformer_relation(t)));
+    ifdebug(1)
+      pips_assert("t is consistent after floating point simplification\n",
+		  transformer_consistent_p(t));
+  }
+
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
+  Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
 
   if (!sc_empty_p(r)) {
     Pbase b = base_dup(sc_base(r));
@@ -1861,9 +1870,125 @@ transformer transformer_safe_value_substitute(transformer t,
   return t;
 }
 
+/* If v is a not a float constraint, retun v. If v is a float
+   constraint, merge all float constants. If the constraint is
+   trivially satisfied, return a NULL vector. */
+Pvecteur simplify_float_constraint(Pvecteur v, bool is_equation_p)
+{
+  long double x = 0.;
+  int occ = 0;
+  bool is_float = true; // maybe a float constraint
+  Pvecteur cv = VECTEUR_UNDEFINED;
+  Pvecteur nv = VECTEUR_NUL;
+
+  for(cv=v; !VECTEUR_UNDEFINED_P(cv) && is_float; cv = vecteur_succ(cv)) {
+    entity e = (entity) vecteur_var(cv);
+    Value val = vecteur_val(cv);
+
+    if((Variable) e == TCST) {
+      /* An integer constant cannot be mixed with floating point
+	 values */
+      // pips_assert("x is zero", x==0.);
+      is_float = false;
+    }
+    else if(entity_constant_p(e)) {
+      if(float_constant_p(e)) {
+	double d = float_constant_to_double(e);
+	x += (long double)(val) * (long double) (d);
+	occ++;
+	vect_add_elem(&nv, (Variable) e, -val);
+      }
+      else
+	is_float = false;
+    }
+    else {
+      type t = entity_type(e);
+      if(float_type_p(t)) {
+	;
+      }
+      else {
+	is_float = false;
+      }
+    }
+  }
+
+  if(is_float && vect_size(nv) > 0 && occ > 1 /* x!=0. */) {
+    /* FI: do we want to represent 0. by 0? */
+    if(x!=0.) {
+      // FI: awfull precision loss...
+      entity vx = float_to_entity((float) x);
+      // FI: let's try to move the constants on the right side,
+      // i.e. the constant side, of the constraints
+      // Might be independent of the constant sign
+      // Avoid -(-6.) if a term is moved from one side to the other
+      if(vx>0)
+	vect_add_elem(&nv, (Variable) vx, VALUE_ONE);
+      else
+	vect_add_elem(&nv, (Variable) -vx, VALUE_MONE);
+    }
+    Pvecteur sv = vect_add(v, nv);
+    vect_rm(v);
+    vect_rm(nv);
+    v = sv;
+    /* Check that v is a feasible constraint */
+    if(vect_size(v)==1) {
+      /* The new term must be the only one since vx is a new entity
+	 whose term cannot be cancelled by vect_add() */
+      if((!is_equation_p && x >0)
+	 || (is_equation_p && x!=0.)) {
+	/* Unfeasible constraint */
+	Pvecteur nv = vect_new(TCST, VALUE_ONE);
+	vect_rm(v);
+	v = nv;
+      }
+      else {
+	vect_rm(v);
+	v = VECTEUR_NUL;
+      }
+    }
+  }
+
+  return v;
+}
+
+/* Simplify float constraints and possibly detect*/
+Psysteme simplify_float_constraint_system(Psysteme ps)
+{
+  Pcontrainte eq;
+
+  for (eq = ps->egalites; eq != NULL; eq=eq->succ) {
+    if (eq->vecteur) {
+      eq->vecteur = simplify_float_constraint(eq->vecteur, true);
+    }
+  }
+  for (eq = ps->inegalites; eq != NULL; eq=eq->succ) {
+    if (eq->vecteur) {
+      eq->vecteur = simplify_float_constraint(eq->vecteur, false);
+    }
+  }
+
+  /* Recompute the base, most of the time useless, but you cannot
+     guess what happened in simplify_float_constraint() */
+  Pbase ob = sc_base(ps);
+  Pbase nb = sc_to_minimal_basis(ps);
+  /* Do not discard old values due to arguments... Just in case, keep
+     too many floating point constants in the base. But add the new
+     ones. */
+  sc_base(ps) = base_union(ob, nb);
+  sc_dimension(ps) = base_dimension(sc_base(ps));
+  vect_rm(ob);
+  vect_rm(nb);
+
+  ifdebug(1) pips_assert("sc is consistent", sc_consistent_p(ps));
+
+  return ps;
+}
+
 /* Check if a transformer is empty. Take into account, if necessary,
    constraints with floating point and string constraints.
  */
+
+/* Simplify constraints build with float and string constants only */
 static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
 {
   string s1 = string_undefined;

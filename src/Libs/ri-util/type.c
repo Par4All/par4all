@@ -2585,6 +2585,19 @@ bool default_complex_type_p(type t)
   return default_complex_p;
 }
 
+bool float_type_p(type t)
+{
+  bool float_p = false;
+  if(!type_undefined_p(t) && type_variable_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    if(basic_float_p(b)) {
+      float_p = true;
+    }
+  }
+  return float_p;
+}
+
 bool scalar_integer_type_p(type t)
 {
   bool long_p = false;
