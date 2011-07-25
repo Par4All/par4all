@@ -50,7 +50,8 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
-
+#include "properties.h"
+#include "preprocessor.h"
 #include "misc.h"
 
 #include "prettyprint.h"
@@ -86,6 +87,8 @@ text text_points_to(entity module __attribute__ ((__unused__)),int margin __attr
     :words_predicate_to_commentary
     (CONS(STRING,PT_TO_DECO, CONS(STRING, strdup("{}"), NIL)),
         get_comment_sentinel());
+
+
   return t;
 }
 
@@ -101,18 +104,54 @@ text text_points_to(entity module __attribute__ ((__unused__)),int margin __attr
   return t;
 }
 
+/* bool print_code_points_to(string module_name, */
+/* 			  string resource_name __attribute__ ((__unused__)), */
+/* 			  string file_suffix) */
+/* { */
+/*   list wl = list_undefined; */
+/*   text t, st = text_undefined; */
+/*   bool res; */
+/*   debug_on("POINTS_TO_DEBUG_LEVEL"); */
+/*   set_current_module_entity(local_name_to_top_level_entity(module_name)); */
+/*   points_to_list summary_pts_to = (points_to_list) */
+/*     db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, true); */
+/*   wl = words_points_to_list(PT_TO_DECO, summary_pts_to); */
+/*   pips_debug(1, "considering module %s \n", */
+/* 	     module_name); */
+
+/*   /\*  FI: just for debugging *\/ */
+/*   // check_abstract_locations(); */
+/*   set_printed_points_to_list((statement_points_to) */
+/* 			     db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, true)); */
+/*   statement_points_to_consistent_p(get_printed_points_to_list()); */
+/*   set_current_module_statement((statement) */
+/* 			       db_get_memory_resource(DBR_CODE, */
+/* 						      module_name, */
+/* 						      true)); */
+/*   // FI: should be language neutral... */
+
+/*   st = words_predicate_to_commentary(wl, get_comment_sentinel()); */
+/*   t = text_code_points_to(get_current_module_statement()); */
+/*   MERGE_TEXTS(st, t); */
+/*   res= make_text_resource_and_free(module_name,DBR_PRINTED_FILE,file_suffix, st); */
+/*   reset_current_module_entity(); */
+/*   reset_current_module_statement(); */
+/*   reset_printed_points_to_list(); */
+/*   debug_off(); */
+/*   return true; */
+/* } */
 bool print_code_points_to(string module_name,
 			  string resource_name __attribute__ ((__unused__)),
 			  string file_suffix)
 {
   list wl = list_undefined;
-  text t, st = text_undefined;
   bool res;
   debug_on("POINTS_TO_DEBUG_LEVEL");
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   points_to_list summary_pts_to = (points_to_list)
     db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, true);
-  wl = words_points_to_list(PT_TO_DECO, summary_pts_to);
+  list l_sum_pt_to = points_to_list_list(summary_pts_to);
+  
   pips_debug(1, "considering module %s \n",
 	     module_name);
 
@@ -125,12 +164,15 @@ bool print_code_points_to(string module_name,
 			       db_get_memory_resource(DBR_CODE,
 						      module_name,
 						      true));
-  // FI: should be language neutral...
 
-  st = words_predicate_to_commentary(wl, get_comment_sentinel());
-  t = text_code_points_to(get_current_module_statement());
-  MERGE_TEXTS(st, t);
-  res= make_text_resource_and_free(module_name,DBR_PRINTED_FILE,file_suffix, st);
+  init_prettyprint(text_pt_to);
+  text sum_tex = text_points_to_relations(l_sum_pt_to, "Points To:");
+  text t = make_text(NIL);
+  MERGE_TEXTS( t, sum_tex );
+  MERGE_TEXTS(t, text_module(get_current_module_entity(),
+			     get_current_module_statement()));
+  res= make_text_resource_and_free(module_name,DBR_PRINTED_FILE,file_suffix, t);
+  close_prettyprint();
   reset_current_module_entity();
   reset_current_module_statement();
   reset_printed_points_to_list();
@@ -138,10 +180,207 @@ bool print_code_points_to(string module_name,
   return true;
 }
 
+
 //Handlers for PIPSMAKE
 bool print_code_points_to_list(string module_name)
 {
 	return print_code_points_to(module_name,
 				    DBR_POINTS_TO_LIST,
 				    PT_TO_SUFFIX);
+}
+
+
+list words_points_to(points_to pt)
+{
+  cell source = points_to_source(pt);
+  cell sink = points_to_sink(pt);
+
+  pips_assert("there should not be preference cells in points to (source) \n",
+	      !cell_preference_p(source));
+  pips_assert("there should not be preference cells in points to (sink) \n",
+	      !cell_preference_p(sink));
+
+  pips_assert("gaps not handled yet (source)", !cell_gap_p(source));
+  pips_assert("gaps not handled yet (sink)", !cell_gap_p(sink));
+
+
+  list w = NIL;
+
+  reference source_ref = cell_reference(source);
+  reference sink_ref = cell_reference(sink);
+  approximation ap = points_to_approximation(pt);
+  pips_assert("approximation is not must\n", !approximation_exact_p(ap));
+
+  w= gen_nconc(w, effect_words_reference(source_ref));
+  w = CHAIN_SWORD(w," -> &");
+  w= gen_nconc(w, effect_words_reference(sink_ref));
+  w = CHAIN_SWORD(w, approximation_may_p(ap) ? " (may)" : " (exact)" );
+  return (w);
+}
+
+#define append(s) add_to_current_line(line_buffer, s, str_prefix, tpt_to)
+
+/* text text_region(effect reg)
+ * input    : a region
+ * output   : a text consisting of several lines of commentaries,
+ *            representing the region
+ * modifies : nothing
+ */
+text text_points_to_relation(points_to pt_to)
+{
+  text tpt_to = text_undefined;
+
+  bool foresys = false;
+  string str_prefix = get_comment_continuation();
+  char line_buffer[MAX_LINE_LENGTH];
+  Psysteme sc;
+  list /* of string */ ls;
+
+  if (points_to_undefined_p(pt_to))
+    {
+      ifdebug(1)
+	{
+	  return make_text(CONS(SENTENCE,
+				make_sentence(is_sentence_formatted,
+					      strdup(concatenate(str_prefix,
+								 "undefined points to relation\n",
+								 NULL))),
+				NIL));
+	}
+      else
+	pips_user_warning("unexpected points to relation undefined\n");
+    }
+  else
+    tpt_to = make_text(NIL);
+
+  cell source = points_to_source(pt_to);
+  cell sink = points_to_sink(pt_to);
+
+  pips_assert("there should not be preference cells in points to relation (source) \n",
+	      !cell_preference_p(source));
+  pips_assert("there should not be preference cells in points to relation (sink) \n",
+	      !cell_preference_p(sink));
+
+  pips_assert("gaps not handled yet (source)", !cell_gap_p(source));
+  pips_assert("gaps not handled yet (sink)", !cell_gap_p(sink));
+
+
+  reference source_r = cell_reference(source);
+  reference sink_r = cell_reference(sink);
+  approximation ap = points_to_approximation(pt_to);
+  descriptor d = points_to_descriptor(pt_to);
+
+  /* PREFIX
+   */
+  strcpy(line_buffer, get_comment_sentinel());
+  append(" ");
+
+  /* REFERENCES */
+  ls = effect_words_reference(source_r);
+
+  FOREACH(STRING, s, ls) {append(s);}
+  gen_free_string_list(ls); ls = NIL;
+
+  append(" -> &");
+
+  ls = effect_words_reference(sink_r);
+  /* if (points_to_second_address_of_p(pt_to)) */
+  /*   append("&"); */
+
+  FOREACH(STRING, s, ls) {append(s);}
+  gen_free_string_list(ls); ls = NIL;
+
+  /* DESCRIPTOR */
+  /* sorts in such a way that constraints with phi variables come first.
+   */
+  if(!descriptor_none_p(d))
+    {
+      sc = sc_copy(descriptor_convex(d));
+      sc_lexicographic_sort(sc, is_inferior_cell_descriptor_pvarval);
+      system_sorted_text_format(line_buffer, str_prefix, tpt_to, sc,
+				(get_variable_name_t) pips_region_user_name,
+				vect_contains_phi_p, foresys);
+      sc_rm(sc);
+    }
+
+  /* APPROXIMATION */
+  append(approximation_may_p(ap) ? " , MAY" : " , EXACT");
+
+  /* CLOSE */
+  close_current_line(line_buffer, tpt_to, str_prefix);
+
+  return tpt_to;
+}
+
+text
+text_points_to_relations(list l_pt_to, string header)
+{
+    text tpt_to = make_text(NIL);
+    /* in case of loose_prettyprint, at least one region to print? */
+    bool loose_p = get_bool_property("PRETTYPRINT_LOOSE");
+
+    /* GO: No redundant test anymore, see  text_statement_array_regions */
+    if (l_pt_to != (list) HASH_UNDEFINED_VALUE && l_pt_to != list_undefined)
+    {
+      /* header first */
+      char line_buffer[MAX_LINE_LENGTH];
+      string str_prefix = get_comment_continuation();
+      if (loose_p)
+	{
+	  strcpy(line_buffer,"\n");
+	  append(get_comment_sentinel());
+	}
+      else
+	{
+	  strcpy(line_buffer,get_comment_sentinel());
+	}
+      append(" ");
+      append(header);
+      if(ENDP(l_pt_to))
+	append(" none\n");
+      else
+	append("\n");
+      ADD_SENTENCE_TO_TEXT(tpt_to,
+			   make_sentence(is_sentence_formatted,
+					 strdup(line_buffer)));
+      l_pt_to = points_to_list_sort(l_pt_to);
+      FOREACH(points_to, pt_to, l_pt_to)
+	{
+	  MERGE_TEXTS(tpt_to, text_points_to_relation(pt_to));
+	}
+
+      if (loose_p)
+	ADD_SENTENCE_TO_TEXT(tpt_to,
+			     make_sentence(is_sentence_formatted,
+					   strdup("\n")));
+    }
+    return tpt_to;
+}
+
+void print_points_to_relation(points_to pt_to)
+{
+  text t = text_points_to_relation(pt_to);
+  print_text(stderr, t);
+  free_text(t);
+}
+void print_points_to_relations(list l_pt_to)
+{
+  fprintf(stderr,"\n");
+  if (ENDP(l_pt_to))
+    fprintf(stderr,"<none>");
+  else
+    {
+      FOREACH(POINTS_TO, pt, l_pt_to)
+	{
+	  print_points_to_relation(pt);
+	}
+    }
+  fprintf(stderr,"\n");
+}
+
+text text_pt_to(entity __attribute__ ((unused)) module_name, int __attribute__ ((unused)) margin, statement s)
+{
+  list l_pt_to = points_to_list_list(load_printed_points_to_list(s));
+  return(text_points_to_relations(l_pt_to, "Points To:"));
+
 }

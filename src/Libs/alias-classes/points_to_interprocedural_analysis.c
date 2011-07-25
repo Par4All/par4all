@@ -103,6 +103,8 @@ points_to create_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basi
   expression ex = make_unbounded_expression();
   reference r = cell_to_reference(copy_cell(c));
   entity e = reference_variable(r);
+  formal f = storage_formal( entity_storage(e) );
+  int off = formal_offset(f);
   string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(pointer_index), NULL));
   string formal_name = strdup(concatenate(get_current_module_name() /* POINTS_TO_MODULE_NAME */ ,MODULE_SEP_STRING, s, NULL));
   entity formal_parameter = gen_find_entity(formal_name);
@@ -121,7 +123,7 @@ points_to create_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basi
 						       make_formal(
 								    get_current_module_entity() 
 								   /* module_name_to_entity(POINTS_TO_MODULE_NAME) */,
-								   pointer_index)),
+								  off /* pointer_index */)),
 				   make_value_unknown());
   }
   /* expression ex_sink =  entity_to_expression(formal_parameter); */
