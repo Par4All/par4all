@@ -1,17 +1,27 @@
 
 POINTS TO
 
-//  {}
+
+// Points To: none
+
 void pointer05(int n, float p[n], float q[n])
 {
-//  {}
+
+// Points To: none
+
    int i;
-//  {}
+
+// Points To: none
+
 
    for(i = 0; i <= n-1; i += 1) {
-//  {}
+
+// Points To: none
+
       float x = q[i];
-//  {}
+
+// Points To: none
+
       p[i] = x;
    }
 }

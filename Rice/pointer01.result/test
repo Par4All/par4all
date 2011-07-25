@@ -1,15 +1,31 @@
 
 POINTS TO
 
-//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+// q -> &_q_2[0] , EXACT
+
 void pointer01(int n, float *p, float *q)
 {
-//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+// q -> &_q_2[0] , EXACT
+
    int i;
-//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+// q -> &_q_2[0] , EXACT
+
 
    for(i = 0; i <= n-1; i += 1)
-//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+// q -> &_q_2[0] , EXACT
+
       p[i] = q[i];
 }
 
