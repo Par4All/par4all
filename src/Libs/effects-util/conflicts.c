@@ -652,6 +652,14 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
   // effects package entities are not usual variables
   if (effects_package_entity_p(e1) || effects_package_entity_p(e2))
     conflict_p = (e1 == e2);
+  else if (!c_module_p(get_current_module_entity()))
+    {
+      pips_debug(5, "fortran case\n");
+      if (same_entity_p(e1, e2))
+	conflict_p = true;
+      else
+	conflict_p = must_p ? false : variable_entity_may_conflict_p( e1, e2 );
+    }
   else
     {
       // these are costly function calls; call them only once.

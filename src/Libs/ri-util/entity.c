@@ -1401,7 +1401,7 @@ bool io_intrinsic_p(entity e)
  */
 bool arithmetic_intrinsic_p(entity e)
 {
-  if (set_undefined_p(io_functions_set)) {
+  if (set_undefined_p(arithmetic_functions_set)) {
     arithmetic_functions_set = set_make(set_pointer);
     set_add_elements(arithmetic_functions_set, arithmetic_functions_set,
 		     entity_intrinsic(SCANF_FUNCTION_NAME),
