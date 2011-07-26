@@ -70,7 +70,7 @@ void p4a_kernel_1(size_t size, size_t i, size_t j, t_precision *ptr, t_precision
 {
    // Loop nest P4A end
    if (i<=-1+size&&j<=-1+size)
-      *(ptr+j+i*size) = val;
+      *(ptr+(j+i*size)) = val;
 }
 void p4a_kernel_launcher_1(size_t size, t_precision *ptr, t_precision val)
 {
