@@ -527,15 +527,15 @@ Variable var;
  */
 bool vect_check(Pvecteur v)
 {
-  register bool 
-    consistent = true, 
+  register bool
+    consistent = true,
     tcst_seen = false;
   linear_hashtable_pt seen = linear_hashtable_make();
 
-  for(; v!=NULL && consistent; v=v->succ) 
+  for(; v!=NULL && consistent; v=v->succ)
   {
     consistent = value_notzero_p(val_of(v));
-    if (var_of(v)) 
+    if (var_of(v))
     {
       if (linear_hashtable_isin(seen, var_of(v)))
 	consistent = false;
