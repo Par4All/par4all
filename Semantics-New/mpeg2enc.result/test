@@ -8458,7 +8458,7 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
       }
 }
 
-//  T(main) {main==0}
+//  T(main) {argc==3, main==0}
 
 int main(int argc, char *argv[])
 {
