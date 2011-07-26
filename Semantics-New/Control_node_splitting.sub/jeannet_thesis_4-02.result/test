@@ -293,7 +293,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         if (!(x==y&&b0==1&&b1==0&&ok==1&&x>=y))
+         if (!(x==y&&(b0==1&&b1==0&&ok==1&&x>=y)))
 
 //  T() {0==-1}
 
@@ -383,7 +383,7 @@ void ts_restructured(void)
 
 //  T() {b0==1, b1==0, ok==1, y+1<=x}
 
-         if (!(x>=y+1&&b0==1&&b1==0&&ok==1&&x>=y))
+         if (!(x>=y+1&&(b0==1&&b1==0&&ok==1&&x>=y)))
 
 //  T() {0==-1}
 
@@ -447,7 +447,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         if (!(x==y&&b0==0&&b1==1&&ok==1&&x>=y))
+         if (!(x==y&&(b0==0&&b1==1&&ok==1&&x>=y)))
 
 //  T() {0==-1}
 
@@ -537,7 +537,7 @@ void ts_restructured(void)
 
 //  T() {b0==1, b1==0, ok==1, y+1<=x}
 
-         if (!(x>=y+1&&b0==1&&b1==0&&ok==1&&x>=y))
+         if (!(x>=y+1&&(b0==1&&b1==0&&ok==1&&x>=y)))
 
 //  T() {0==-1}
 
@@ -601,7 +601,7 @@ void ts_restructured(void)
 
 //  T() {b0==0, b1==1, ok==1, y+1<=x}
 
-         if (!(x>=y+1&&b0==0&&b1==1&&ok==1&&x>=y))
+         if (!(x>=y+1&&(b0==0&&b1==1&&ok==1&&x>=y)))
 
 //  T() {0==-1}
 
@@ -982,7 +982,7 @@ void ts_restructured(void)
 
 //  P(b0,b1,ok,x,y) {b0==1, b1==0, ok==1, x==y+1, 1<=x}
 
-         if (!(x==y&&b0==1&&b1==0&&ok==1&&x>=y))
+         if (!(x==y&&(b0==1&&b1==0&&ok==1&&x>=y)))
 
 //  P(b0,b1,ok,x,y) {b0==1, b1==0, ok==1, x==y+1, 1<=x}
 
@@ -1072,7 +1072,7 @@ void ts_restructured(void)
 
 //  P(b0,b1,ok,x,y) {b0==1, b1==0, ok==1, x==y+1, 1<=x}
 
-         if (!(x>=y+1&&b0==1&&b1==0&&ok==1&&x>=y))
+         if (!(x>=y+1&&(b0==1&&b1==0&&ok==1&&x>=y)))
 
 //  P() {0==-1}
 
@@ -1136,7 +1136,7 @@ void ts_restructured(void)
 
 //  P(b0,b1,ok,x,y) {b0==0, b1==1, ok==1, x==y+1, 2<=x}
 
-         if (!(x==y&&b0==0&&b1==1&&ok==1&&x>=y))
+         if (!(x==y&&(b0==0&&b1==1&&ok==1&&x>=y)))
 
 //  P(b0,b1,ok,x,y) {b0==0, b1==1, ok==1, x==y+1, 2<=x}
 
@@ -1226,7 +1226,7 @@ void ts_restructured(void)
 
 //  P(b0,b1,ok,x,y) {b0==1, b1==0, ok==1, x==y+1, 1<=x}
 
-         if (!(x>=y+1&&b0==1&&b1==0&&ok==1&&x>=y))
+         if (!(x>=y+1&&(b0==1&&b1==0&&ok==1&&x>=y)))
 
 //  P() {0==-1}
 
@@ -1290,7 +1290,7 @@ void ts_restructured(void)
 
 //  P(b0,b1,ok,x,y) {b0==0, b1==1, ok==1, x==y+1, 2<=x}
 
-         if (!(x>=y+1&&b0==0&&b1==1&&ok==1&&x>=y))
+         if (!(x>=y+1&&(b0==0&&b1==1&&ok==1&&x>=y)))
 
 //  P() {0==-1}
 
