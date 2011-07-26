@@ -54,7 +54,12 @@ default_properties = dict(
     # Prevents automatic addition of OpenMP directives when
     # unsplitting.  We will add them manually using ompify if
     # requested.
-    PRETTYPRINT_SEQUENTIAL_STYLE = "do"
+    PRETTYPRINT_SEQUENTIAL_STYLE = "do",
+    # Required property since floating point arithmetic operations are not
+    # associatives. PIPS does not take that into account now and is based
+    # on theoretical math. Unfortunately floating points number implies
+    # rounding that breaks associativity. cf TRAC 551
+    PRETTYPRINT_ALL_PARENTHESES = True
 )
 
 # The default values of some PIPS properties are OK for C but has to be
