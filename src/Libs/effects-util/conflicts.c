@@ -39,6 +39,25 @@
 #include "ri-util.h"
 #include "effects-util.h"
 
+/** \addtogroup Effects
+    @{
+ */
+
+
+/*
+  This file contains functions for testing "conflicts" between
+  effects, cells, references and entities which represent memory
+  locations.
+
+  The effects, cells and references may correspond to different
+  stores, so it cannot be assumed that a[i] and a[i] represent the
+  same memory location.
+
+
+ */
+
+
+/* Intersection tests */
 
 /**
  * @brief Check if two effects always conflict.
@@ -793,3 +812,93 @@ bool entities_must_conflict_p( entity e1, entity e2 ) {
   return entities_maymust_conflict_p( e1, e2, true);
 }
 
+
+/* Inclusion tests */
+
+/* I'm not sure that testing must conflicts makes much sense with sets of memory locations.
+   We cannot well define a symmetrical semantics.
+   However, testing the inclusion makes sense! BC.
+*/
+
+/* tests whether first reference certainely includes second one
+
+   @see first_effect_certainely_includes_second_effect_p
+ */
+bool first_reference_certainely_includes_second_reference_p(reference r1, reference r2)
+{
+  bool r1_certainely_includes_r2_p = false; /* safe result */
+
+  if (reference_scalar_p(r1) && reference_scalar_p(r2)
+      && same_entity_p(reference_variable(r1), reference_variable(r2)))
+    r1_certainely_includes_r2_p = true;
+
+  return r1_certainely_includes_r2_p;
+}
+
+/* tests whether first cell certainely includes second one
+
+   @see first_effect_certainely_includes_second_effect_p
+ */
+bool first_cell_certainely_includes_second_cell_p(cell c1, cell c2)
+{
+  bool cell1_certainely_includes_cell2_p = false; /* safe result */
+
+  reference r1 = reference_undefined;
+  reference r2 = reference_undefined;
+
+  if ( cell_reference_p(c1) )
+    r1 = cell_reference(c1);
+  else if ( cell_preference_p(c1) )
+    r1 = preference_reference(cell_preference(c1));
+
+  if ( cell_reference_p(c2) )
+    r2 = cell_reference(c2);
+  else if ( cell_preference_p(c2) )
+    r2 = preference_reference(cell_preference(c2));
+
+  if ( reference_undefined_p(r1) || reference_undefined_p(r2) ) {
+    pips_internal_error("either undefined references or gap "
+        "not implemented yet\n");
+  }
+  cell1_certainely_includes_cell2_p = first_reference_certainely_includes_second_reference_p(r1, r2);
+  return cell1_certainely_includes_cell2_p;
+}
+
+
+/* tests whether first effect certainely includes second one. The effects
+   are not necessarily functions of the same store.
+
+   This means that a[i]-exact does not necessarily contains a[i]-exact
+   because i may not have the same value in the store to which the effects refer.
+   This is the case  for instance in the following code:
+
+   i = 1;
+   a[i] = ...; // S1
+   i = 2;
+   a[i] = ...; // S2
+
+   The assignment in S2 does not kill the assignment in S2;
+
+   This function could be improved for convex effects by eliminating
+   from Psystems program variables which are not common inclosing loop variants.
+   this would require much more information than what we currently have.
+
+   So in all cases, the function safely returns false for effects
+   described with access paths which are not single entities.
+ */
+bool first_effect_certainely_includes_second_effect_p(effect eff1, effect eff2)
+{
+  bool eff1_certainely_includes_eff2_p = false; /* safe result */
+
+  if (effect_exact_p(eff1)
+      && effect_scalar_p(eff1) && effect_scalar_p(eff2)
+      && first_cell_certainely_includes_second_cell_p(effect_cell(eff1), effect_cell(eff2)))
+    {
+      eff1_certainely_includes_eff2_p = true;
+    }
+
+  return eff1_certainely_includes_eff2_p;
+}
+
+
+/** @} */
