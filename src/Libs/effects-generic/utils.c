@@ -319,11 +319,11 @@ bool effects_must_read_or_write_entity_p(cons * fx, entity e)
 {
   bool read_or_write = false;
 
-  if(entity_variable_p(e)) {
+  if(entity_variable_p(e) && entity_scalar_p(e)) {
     FOREACH(EFFECT, ef, fx) {
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
-      if(store_effect_p(ef) && entities_must_conflict_p(e, e_used)) {
+      if(store_effect_p(ef) && entity_scalar_p(e_used) && entities_must_conflict_p(e, e_used)) {
         read_or_write = true;
         break;
       }

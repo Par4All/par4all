@@ -900,5 +900,29 @@ bool first_effect_certainely_includes_second_effect_p(effect eff1, effect eff2)
   return eff1_certainely_includes_eff2_p;
 }
 
+/* misc functions */
+
+/** check whether scalar entity e must be read or written by any effect "effects" or
+  if it simply might be accessed or not even access at all
+
+  In semantics, e can be a functional entity such as constant string
+  or constant float.
+*/
+bool effects_must_read_or_write_entity_p(list fx, entity e)
+{
+  bool read_or_write = false;
+
+  if(entity_variable_p(e) && entity_scalar_p(e)) {
+    FOREACH(EFFECT, ef, fx) {
+      entity e_used = reference_variable(effect_any_reference(ef));
+      /* Used to be a simple pointer equality test */
+      if(store_effect_p(ef) && entity_scalar_p(e_used) && entities_must_conflict_p(e, e_used)) {
+        read_or_write = true;
+        break;
+      }
+    }
+  }
+  return read_or_write;
+}
 
 /** @} */
