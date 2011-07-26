@@ -286,28 +286,6 @@ bool effects_write_entity_p(cons * fx, entity e) {
   return write;
 }
 
-/* bool effects_read_or_write_entity_p(cons * effects, entity e): check whether e
- * may be read or written by effects "effects" or cannot accessed at all
- *
- * In semantics, e can be a functional entity such as constant string
- * or constant float.
- */
-bool effects_read_or_write_entity_p(cons * fx, entity e)
-{
-  bool read_or_write = false;
-
-  if(entity_variable_p(e)) {
-    FOREACH(EFFECT, ef, fx) {
-      entity e_used = reference_variable(effect_any_reference(ef));
-      /* Used to be a simple pointer equality test */
-      if(store_effect_p(ef) && entities_may_conflict_p(e, e_used)) {
-        read_or_write = true;
-        break;
-      }
-    }
-  }
-  return read_or_write;
-}
 
 
 /**

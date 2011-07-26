@@ -902,13 +902,69 @@ bool first_effect_certainely_includes_second_effect_p(effect eff1, effect eff2)
 
 /* misc functions */
 
-/** check whether scalar entity e must be read or written by any effect "effects" or
-  if it simply might be accessed or not even access at all
+/**
+   tests whether the input effects list may contain effects
+   with a memory path from the input entity e; this is currently a mere syntactic test.
+
+   other strategies could be implemented, such as building all the
+   memory locations reachable from "e" using
+   generic_effect_generate_all_accessible_paths_effects_with_level,
+   and then testing whether in the resulting effects there is an
+   effect which may conflict with en effect from the input
+   list. However, this would be very costly.
+ */
+bool effects_may_read_or_write_memory_paths_from_entity_p(list l_eff, entity e)
+{
+  bool read_or_write = false;
+  if(entity_variable_p(e))
+    {
+      FOREACH(EFFECT, ef, l_eff)
+	{
+	  entity e_used = reference_variable(effect_any_reference(ef));
+	  if(store_effect_p(ef) && same_entity_p(e, e_used))
+	    {
+	      read_or_write = true;
+	      break;
+	    }
+	}
+    }
+  return read_or_write;
+}
+
+/**
+   check whether scalar entity e may be read or written by effects
+   fx or cannot be accessed at all
+
+   In semantics, e can be a functional entity such as constant string
+   or constant float.
+*/
+bool effects_may_read_or_write_scalar_entity_p(list fx, entity e)
+{
+  bool read_or_write = false;
+
+  if(entity_variable_p(e) && entity_scalar_p(e)) {
+    FOREACH(EFFECT, ef, fx) {
+      entity e_used = reference_variable(effect_any_reference(ef));
+      /* Used to be a simple pointer equality test */
+      if(store_effect_p(ef) && entity_scalar_p(e_used) && entities_may_conflict_p(e, e_used)) {
+        read_or_write = true;
+        break;
+      }
+    }
+  }
+  return read_or_write;
+}
+
+
+
+/**
+  check whether scalar entity e must be read or written by any effect of fx or
+  if it simply might be accessed.
 
   In semantics, e can be a functional entity such as constant string
   or constant float.
 */
-bool effects_must_read_or_write_entity_p(list fx, entity e)
+bool effects_must_read_or_write_scalar_entity_p(list fx, entity e)
 {
   bool read_or_write = false;
 

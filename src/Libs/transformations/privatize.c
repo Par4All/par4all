@@ -780,7 +780,7 @@ static void update_loop_locals(loop l)
     {
       pips_debug(1, "considering entity %s\n",
                  entity_local_name(private_variable));
-      if (effects_read_or_write_entity_p(body_effects, private_variable))
+      if (effects_may_read_or_write_memory_paths_from_entity_p(body_effects, private_variable))
         {
           pips_debug(1, "keeping entity\n");
           new_loop_locals = CONS(ENTITY, private_variable, new_loop_locals);
