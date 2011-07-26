@@ -1,5 +1,3 @@
-a + c - b = 0.000000e+00
-a + (c - b)= 1.000000e+00
 "prettyprint with PRETTYPRINT_ALL_PARENTHESES = FALSE"
 ""
 int main()
@@ -9,12 +7,10 @@ int main()
    b = 100.0E+25;
    c = b;
    e = a+c-b;
-   d = a+c-b;
+   d = a+(c-b);
    printf("a + c - b = %e\na + (c - b)= %e\n", e, d);
    return (int) d;
 }
-a + c - b = 0.000000e+00
-a + (c - b)= 0.000000e+00
 ""
 "prettyprint with PRETTYPRINT_ALL_PARENTHESES = TRUE"
 ""
@@ -29,5 +25,3 @@ int main()
    printf("a + c - b = %e\na + (c - b)= %e\n", e, d);
    return ((int) d);
 }
-a + c - b = 0.000000e+00
-a + (c - b)= 1.000000e+00

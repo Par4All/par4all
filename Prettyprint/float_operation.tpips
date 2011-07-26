@@ -2,15 +2,15 @@ delete float_operation
 
 create float_operation float_operation.c
 
-shell (cd float_operation.database/Src; gcc ../../float_operation.c -o float_operation; ./float_operation)
+#shell (cd float_operation.database/Src; gcc ../../float_operation.c -o float_operation; ./float_operation)
 
 echo "prettyprint with PRETTYPRINT_ALL_PARENTHESES = FALSE"
 echo ""
 display PRINTED_FILE(main)
 apply UNSPLIT
 
-shell gcc float_operation.database/Src/float_operation.c -o float_operation.database/Src/float_operation
-shell ./float_operation.database/Src/float_operation
+#shell gcc float_operation.database/Src/float_operation.c -o float_operation.database/Src/float_operation
+#shell ./float_operation.database/Src/float_operation
 
 close
 
@@ -25,8 +25,8 @@ setproperty PRETTYPRINT_ALL_PARENTHESES TRUE
 display PRINTED_FILE(main)
 apply UNSPLIT
 
-shell gcc float_operation.database/Src/float_operation.c -o float_operation.database/Src/float_operation
-shell ./float_operation.database/Src/float_operation
+#shell gcc float_operation.database/Src/float_operation.c -o float_operation.database/Src/float_operation
+#shell ./float_operation.database/Src/float_operation
 
 close
 delete float_operation
