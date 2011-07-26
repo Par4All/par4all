@@ -9,5 +9,5 @@ int main(void)
    c = 2;
    /* a simple parallel loop */
    for(i = 0; i <= 99; i += 1)
-      a[i] = c*a[i]+a[i]-1;
+      a[i] = c*a[i]+(a[i]-1);
 }
