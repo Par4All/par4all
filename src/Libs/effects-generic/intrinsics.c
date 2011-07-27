@@ -2891,6 +2891,7 @@ static list search_or_sort_effects(entity e, list args)
   return le;
 }
 
+
 /**
     generate effects for strtoxxx functions
  */
@@ -2907,7 +2908,7 @@ static list strtoxxx_effects(entity e, list args)
   le = c_actual_argument_to_may_summary_effects(nptr_exp, 'r');
   pips_debug_effects(8, "effects on first argument\n", le);
 
-  /* the second expression target is initialized */
+  /* the second expression target is initialized if it is a non-null pointer */
   if (expression_address_of_p(endptr_exp))
     {
       call c = expression_call(endptr_exp);
@@ -2918,7 +2919,7 @@ static list strtoxxx_effects(entity e, list args)
       le = gen_nconc(le, lme_endptr);
       le = gen_nconc(le, le_endptr);
     }
-  else
+  else if (!expression_null_p(endptr_exp)) /* if its a NULL pointer, it is not assigned */
     {
       list lme_endptr = NIL;
       list le_endptr = generic_proper_effects_of_complex_address_expression(endptr_exp, &lme_endptr, true);
@@ -2931,7 +2932,7 @@ static list strtoxxx_effects(entity e, list args)
 	  effect_to_read_effect(me_dup);
 	  le = gen_nconc(le, effect_to_list(me_dup));
 	  effect_add_dereferencing_dimension(me);
-	  effect_to_may_effect(me); /* well, if its a NULL pointer, it is not assigned, but we don't know it */
+	  effect_to_may_effect(me); /* well, if its a NULL pointer, it is not assigned, but we may not know it */
 	}
       pips_debug_effects(8, "main effects after adding dereferencing dimension\n", lme_endptr);
       le = gen_nconc(le, lme_endptr);
