@@ -76,7 +76,7 @@ short accumulate(unsigned int n, short a[n], short seed)
       RED0[6] = RED0[6]+a[6+i];
       RED0[7] = RED0[7]+a[7+i];
    }
-   seed = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+RED0[0]+seed;
+   seed = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(RED0[0]+seed)))))));
    for(i = 8*(n/8); i <= n-1; i += 1)
       seed = seed+a[i];
    return seed;
@@ -105,7 +105,7 @@ short accumulate(unsigned int n, short a[n], short seed)
       RED0[6] = RED0[6]+a[6+i0];
       RED0[7] = RED0[7]+a[7+i0];
    }
-   seed = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+RED0[0]+seed;
+   seed = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(RED0[0]+seed)))))));
    for(i1 = 8*(n/8); i1 <= n-1; i1 += 1)
       seed = seed+a[i1];
    return seed;
@@ -132,7 +132,7 @@ short accumulate(unsigned int n, short a[n], short seed)
       SIMD_ADDW(vec00, vec00, vec10);
       SIMD_STORE_V8HI(vec00, &RED0[0]);
    }
-   seed = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+seed+RED0[0];
+   seed = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(seed+RED0[0])))))));
    for(i1 = 8*(n/8); i1 <= n-1; i1 += 1)
       seed = seed+a[i1];
    return seed;
@@ -161,7 +161,7 @@ short accumulate(unsigned int n, short a[n], short seed)
       SIMD_ADDW(vec00_0, vec00_0, vec10_0);
    }
    SIMD_STORE_V8HI(vec00_0, &RED0[0]);
-   seed = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+seed+RED0[0];
+   seed = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(seed+RED0[0])))))));
    for(i1 = 8*(n/8); i1 <= n-1; i1 += 1)
       seed = seed+a[i1];
    return seed;
@@ -189,7 +189,7 @@ short accumulate(unsigned int n, short a[n], short seed)
       SIMD_ADDW(vec00_0, vec00_0, vec10_0);
    }
    SIMD_STORE_V8HI(vec00_0, &RED0[0]);
-   seed = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+seed+RED0[0];
+   seed = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(seed+RED0[0])))))));
    for(i1 = 8*(n/8); i1 <= n-1; i1 += 1)
       seed = seed+a[i1];
    return seed;
@@ -220,7 +220,7 @@ short accumulate(unsigned int n, short a[n], short seed)
       SIMD_ADDW(vec00_0, vec00_0, vec10_0);
    }
    SIMD_STORE_V8HI(vec00_0, &RED0[0]);
-   seed = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+seed+RED0[0];
+   seed = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(seed+RED0[0])))))));
    for(i1 = 8*(n/8); i1 <= n-1; i1 += 1)
       seed = seed+a[i1];
    return seed;

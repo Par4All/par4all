@@ -9,7 +9,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       for(rg = 0; rg <= Nrg-1; rg += 1)
          for(v = 0; v <= Nv-1; v += 1)
 
-            PP = PP+ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
+            PP = PP+(ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im);
       Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
    }
@@ -25,7 +25,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       for(rg = 0; rg <= Nrg-1; rg += 1)
          for(v = 0; v <= Nv-1; v += 1)
 
-            PP = PP+ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
+            PP = PP+(ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im);
       Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
    }
@@ -41,7 +41,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       for(rg = 0; rg <= Nrg-1; rg += 1)
          for(v = 0; v <= Nv-1; v += 1)
 
-            PP = PP+ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
+            PP = PP+(ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im);
       Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
    }
@@ -161,14 +161,14 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    for(th = 0; th <= Nth-1; th += 1) {
       PP = 0.;
       for(rg = 0; rg <= Nrg-1; rg += 1) {
-         RED0[0] = 0.000000;
-         RED0[1] = 0.000000;
-         RED0[2] = 0.000000;
-         RED0[3] = 0.000000;
-         RED0[4] = 0.000000;
-         RED0[5] = 0.000000;
-         RED0[6] = 0.000000;
-         RED0[7] = 0.000000;
+         RED0[0] = 0.;
+         RED0[1] = 0.;
+         RED0[2] = 0.;
+         RED0[3] = 0.;
+         RED0[4] = 0.;
+         RED0[5] = 0.;
+         RED0[6] = 0.;
+         RED0[7] = 0.;
          for(v = 0; v <= 4*(Nv/4)-1; v += 4) {
             F_0 = ptrin[th][rg][v].re*ptrin[th][rg][v].re;
             F_1 = ptrin[th][rg][v].im*ptrin[th][rg][v].im;
@@ -187,7 +187,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             RED0[6] = RED0[6]+F_1;
             RED0[7] = RED0[7]+F_0;
          }
-         PP = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+RED0[0]+PP;
+         PP = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(RED0[0]+PP)))))));
          for(v = 4*(Nv/4); v <= Nv-1; v += 1) {
             F_0 = ptrin[th][rg][v].re*ptrin[th][rg][v].re;
             F_1 = ptrin[th][rg][v].im*ptrin[th][rg][v].im;
@@ -214,14 +214,14 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    for(th0 = 0; th0 <= Nth-1; th0 += 1) {
       PP = 0.;
       for(rg = 0; rg <= Nrg-1; rg += 1) {
-         RED0[0] = 0.000000;
-         RED0[1] = 0.000000;
-         RED0[2] = 0.000000;
-         RED0[3] = 0.000000;
-         RED0[4] = 0.000000;
-         RED0[5] = 0.000000;
-         RED0[6] = 0.000000;
-         RED0[7] = 0.000000;
+         RED0[0] = 0.;
+         RED0[1] = 0.;
+         RED0[2] = 0.;
+         RED0[3] = 0.;
+         RED0[4] = 0.;
+         RED0[5] = 0.;
+         RED0[6] = 0.;
+         RED0[7] = 0.;
          for(v0 = 0; v0 <= 4*(Nv/4)-1; v0 += 4) {
             F_00 = ptrin[th0][rg][v0].re*ptrin[th0][rg][v0].re;
             F_10 = ptrin[th0][rg][v0].im*ptrin[th0][rg][v0].im;
@@ -240,7 +240,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             RED0[6] = RED0[6]+F_13;
             RED0[7] = RED0[7]+F_03;
          }
-         PP = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+RED0[0]+PP;
+         PP = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(RED0[0]+PP)))))));
          for(v = 4*(Nv/4); v <= Nv-1; v += 1) {
             F_0 = ptrin[th0][rg][v].re*ptrin[th0][rg][v].re;
             F_1 = ptrin[th0][rg][v].im*ptrin[th0][rg][v].im;
@@ -271,14 +271,14 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    for(th0 = 0; th0 <= Nth-1; th0 += 1) {
       PP = 0.;
       for(rg = 0; rg <= Nrg-1; rg += 1) {
-         RED0[0] = 0.000000;
-         RED0[1] = 0.000000;
-         RED0[2] = 0.000000;
-         RED0[3] = 0.000000;
-         RED0[4] = 0.000000;
-         RED0[5] = 0.000000;
-         RED0[6] = 0.000000;
-         RED0[7] = 0.000000;
+         RED0[0] = 0.;
+         RED0[1] = 0.;
+         RED0[2] = 0.;
+         RED0[3] = 0.;
+         RED0[4] = 0.;
+         RED0[5] = 0.;
+         RED0[6] = 0.;
+         RED0[7] = 0.;
          for(v0 = 0; v0 <= 4*(Nv/4)-1; v0 += 4) {
             //PIPS:SAC generated v4sf vector(s)
             v4sf vec00, vec10, vec20, vec30, vec40, vec50, vec60, vec70;
@@ -297,7 +297,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             SIMD_ADDPS(vec60, vec20_0, vec60);
             SIMD_STORE_V4SF(vec60, &RED0[4]);
          }
-         PP = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+PP+RED0[0];
+         PP = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(PP+RED0[0])))))));
          for(v = 4*(Nv/4); v <= Nv-1; v += 1) {
             F_0 = ptrin[th0][rg][v].re*ptrin[th0][rg][v].re;
             F_1 = ptrin[th0][rg][v].im*ptrin[th0][rg][v].im;
@@ -330,14 +330,14 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    for(th0 = 0; th0 <= Nth-1; th0 += 1) {
       PP = 0.;
       for(rg = 0; rg <= Nrg-1; rg += 1) {
-         RED0[0] = 0.000000;
-         RED0[1] = 0.000000;
-         RED0[2] = 0.000000;
-         RED0[3] = 0.000000;
-         RED0[4] = 0.000000;
-         RED0[5] = 0.000000;
-         RED0[6] = 0.000000;
-         RED0[7] = 0.000000;
+         RED0[0] = 0.;
+         RED0[1] = 0.;
+         RED0[2] = 0.;
+         RED0[3] = 0.;
+         RED0[4] = 0.;
+         RED0[5] = 0.;
+         RED0[6] = 0.;
+         RED0[7] = 0.;
          for(v0 = 0; v0 <= 4*(Nv/4)-1; v0 += 4) {
             //PIPS:SAC generated v4sf vector(s)
             SIMD_LOAD_V4SF(vec10_0, &ptrin[th0][rg][v0].re);
@@ -354,7 +354,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             SIMD_STORE_V4SF(vec60_0, &RED0[4]);
             SIMD_STORE_V4SF(vec40_0, &RED0[0]);
          }
-         PP = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+PP+RED0[0];
+         PP = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(PP+RED0[0])))))));
          for(v = 4*(Nv/4); v <= Nv-1; v += 1) {
             F_0 = ptrin[th0][rg][v].re*ptrin[th0][rg][v].re;
             F_1 = ptrin[th0][rg][v].im*ptrin[th0][rg][v].im;
@@ -386,14 +386,14 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    for(th0 = 0; th0 <= Nth-1; th0 += 1) {
       PP = 0.;
       for(rg = 0; rg <= Nrg-1; rg += 1) {
-         RED0[0] = 0.000000;
-         RED0[1] = 0.000000;
-         RED0[2] = 0.000000;
-         RED0[3] = 0.000000;
-         RED0[4] = 0.000000;
-         RED0[5] = 0.000000;
-         RED0[6] = 0.000000;
-         RED0[7] = 0.000000;
+         RED0[0] = 0.;
+         RED0[1] = 0.;
+         RED0[2] = 0.;
+         RED0[3] = 0.;
+         RED0[4] = 0.;
+         RED0[5] = 0.;
+         RED0[6] = 0.;
+         RED0[7] = 0.;
          for(v0 = 0; v0 <= 4*(Nv/4)-1; v0 += 4) {
             //PIPS:SAC generated v4sf vector(s)
             SIMD_LOAD_V4SF(vec10_0, &ptrin[th0][rg][v0].re);
@@ -409,7 +409,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             SIMD_STORE_V4SF(vec60_0, &RED0[4]);
             SIMD_STORE_V4SF(vec40_0, &RED0[0]);
          }
-         PP = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+PP+RED0[0];
+         PP = RED0[7]+(RED0[6]+(RED0[5]+(RED0[4]+(RED0[3]+(RED0[2]+(RED0[1]+(PP+RED0[0])))))));
          for(v = 4*(Nv/4); v <= Nv-1; v += 1) {
             F_0 = ptrin[th0][rg][v].re*ptrin[th0][rg][v].re;
             F_1 = ptrin[th0][rg][v].im*ptrin[th0][rg][v].im;
