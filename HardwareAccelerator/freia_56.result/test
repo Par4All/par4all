@@ -377,10 +377,10 @@ digraph "freia_56_helper_0_0_0" {
   "11 <." [shape=trapezium,orientation=270];
   "11 <." -> "13 <" [label="tb"];
   "12 E8" [shape=box];
-  "12 E8" -> "13 <" [label="out"];
+  "12 E8" -> "13 <" [label="out_1"];
   "10 D8" [shape=box];
-  "10 D8" -> "11 <." [label="out"];
-  "10 D8" -> "12 E8" [label="out"];
+  "10 D8" -> "11 <." [label="out_2"];
+  "10 D8" -> "12 E8" [label="out_2"];
   "in" -> "10 D8";
 }
 

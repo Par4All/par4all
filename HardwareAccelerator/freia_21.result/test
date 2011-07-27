@@ -387,7 +387,7 @@ digraph "freia_21_helper_0_0_0" {
   "14 -" [shape=trapezium,orientation=270];
   "14 -" -> "15 &" [label="t"];
   "13 *" [shape=trapezium,orientation=270];
-  "13 *" -> "14 -" [label="t"];
+  "13 *" -> "14 -" [label="t_1"];
   "i1" -> "13 *";
   "i0" -> "15 &";
   "i0" -> "14 -";

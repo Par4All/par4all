@@ -1122,7 +1122,7 @@ digraph "dag_cleaned_0" {
 // graph for dag "vs_core_2_helper_0_0_0" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_0_0" {
   // inputs
-  "mv" [shape=circle];
+  "mv_6" [shape=circle];
   "stab" [shape=circle];
 
   // outputs
@@ -1133,51 +1133,51 @@ digraph "vs_core_2_helper_0_0_0" {
   "45 *" -> "mv";
   "stab" -> "45 *";
   "44 &." [shape=trapezium,orientation=270];
-  "44 &." -> "45 *" [label="mv"];
+  "44 &." -> "45 *" [label="mv_1"];
   "43 -." [shape=trapezium,orientation=270];
-  "43 -." -> "44 &." [label="mv"];
+  "43 -." -> "44 &." [label="mv_2"];
   "41 -" [shape=trapezium,orientation=270];
-  "41 -" -> "43 -." [label="mv"];
+  "41 -" -> "43 -." [label="mv_3"];
   "40 E8" [shape=box];
-  "40 E8" -> "41 -" [label="mv"];
+  "40 E8" -> "41 -" [label="mv_4"];
   "39 D8" [shape=box];
   "39 D8" -> "41 -" [label="t2"];
   "36 D8" [shape=box];
   "36 D8" -> "40 E8" [label="t1"];
   "36 D8" -> "39 D8" [label="t1"];
   "35 E8" [shape=box];
-  "35 E8" -> "36 D8" [label="t1"];
+  "35 E8" -> "36 D8" [label="t1_1"];
   "32 thr" [shape=parallelogram];
-  "32 thr" -> "35 E8" [label="mv"];
-  "mv" -> "32 thr";
+  "32 thr" -> "35 E8" [label="mv_5"];
+  "mv_6" -> "32 thr";
 }
 // graph for dag "vs_core_2_helper_0_1_0" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_1_0" {
   // inputs
-  "bg" [shape=circle];
+  "bg_3" [shape=circle];
   "in" [shape=circle];
 
   // outputs
-  "mv" [shape=circle];
+  "mv_6" [shape=circle];
   "bg" [shape=circle];
 
   // computation vertices
   "22 /." [shape=trapezium,orientation=270];
   "22 /." -> "bg";
   "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "22 /." [label="bg"];
+  "21 +" -> "22 /." [label="bg_1"];
   "20 *." [shape=trapezium,orientation=270];
-  "20 *." -> "21 +" [label="bg"];
+  "20 *." -> "21 +" [label="bg_2"];
   "19 *." [shape=trapezium,orientation=270];
   "19 *." -> "21 +" [label="t0"];
   "27 min" [shape=diamond];
   "26 max" [shape=diamond];
   "15 -|" [shape=trapezium,orientation=270];
-  "15 -|" -> "27 min" [label="mv"];
-  "15 -|" -> "26 max" [label="mv"];
-  "15 -|" -> "mv";
-  "bg" -> "20 *.";
-  "bg" -> "15 -|";
+  "15 -|" -> "27 min" [label="mv_6"];
+  "15 -|" -> "26 max" [label="mv_6"];
+  "15 -|" -> "mv_6";
+  "bg_3" -> "20 *.";
+  "bg_3" -> "15 -|";
   "in" -> "19 *.";
   "in" -> "15 -|";
 }
@@ -1530,7 +1530,7 @@ freia_status vs_core_2_helper_0_0_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for mv
+  // - imagelet 1 is i0 for mv_6
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
@@ -1944,7 +1944,7 @@ freia_status vs_core_2_helper_0_1_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for bg
+  // - imagelet 1 is i0 for bg_3
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
@@ -1956,7 +1956,7 @@ freia_status vs_core_2_helper_0_1_0(
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for mv
+  // - imagelet 2 is o0 for mv_6
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;

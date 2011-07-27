@@ -359,9 +359,9 @@ digraph "freia_22_helper_0_0_0" {
   "12 +s" [shape=trapezium,orientation=270];
   "12 +s" -> "o";
   "11 |" [shape=trapezium,orientation=270];
-  "11 |" -> "12 +s" [label="o"];
+  "11 |" -> "12 +s" [label="o_1"];
   "10 /" [shape=trapezium,orientation=270];
-  "10 /" -> "11 |" [label="o"];
+  "10 /" -> "11 |" [label="o_2"];
   "i1" -> "10 /";
   "i0" -> "12 +s";
   "i0" -> "11 |";

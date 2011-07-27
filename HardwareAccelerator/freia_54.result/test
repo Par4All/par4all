@@ -366,8 +366,8 @@ digraph "freia_54_helper_0_0_0" {
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
   "8 D8" [shape=box];
-  "8 D8" -> "9 <." [label="tb"];
-  "8 D8" -> "10 E8" [label="tb"];
+  "8 D8" -> "9 <." [label="tb_1"];
+  "8 D8" -> "10 E8" [label="tb_1"];
   "in" -> "8 D8";
 }
 

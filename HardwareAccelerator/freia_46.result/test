@@ -270,7 +270,7 @@ digraph "dag_cleaned_0" {
 digraph "freia_46_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
-  "out" [shape=circle];
+  "out_1" [shape=circle];
 
   // outputs
   "out" [shape=circle];
@@ -278,7 +278,7 @@ digraph "freia_46_helper_0_0_0" {
   // computation vertices
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "out";
-  "out" -> "9 +";
+  "out_1" -> "9 +";
   "in" -> "9 +";
 }
 
@@ -392,7 +392,7 @@ freia_status freia_46_helper_0_0_0(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for out
+  // - imagelet 2 is i1 for out_1
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;

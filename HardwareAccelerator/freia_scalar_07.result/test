@@ -1011,7 +1011,7 @@ digraph "freia_scalar_07_helper_0_0_0" {
 // graph for dag "freia_scalar_07_helper_0_1_0" of module "freia_scalar_07" in dot format
 digraph "freia_scalar_07_helper_0_1_0" {
   // inputs
-  "X" [shape=circle];
+  "X_1" [shape=circle];
   "i" [shape=circle];
 
   // outputs
@@ -1028,7 +1028,7 @@ digraph "freia_scalar_07_helper_0_1_0" {
   "25 thr" [shape=parallelogram];
   "25 thr" -> "26 +" [label="tC"];
   "25 thr" -> "26 +" [label="tC"];
-  "X" -> "25 thr";
+  "X_1" -> "25 thr";
   "28 D8" [shape=box];
   "28 D8" -> "29 *" [label="tB2"];
   "19 thr" [shape=parallelogram];
@@ -1042,13 +1042,13 @@ digraph "freia_scalar_07_helper_0_2_0" {
   "i" [shape=circle];
 
   // outputs
-  "X" [shape=circle];
+  "X_1" [shape=circle];
 
   // computation vertices
   "23 min" [shape=diamond];
   "21 E8" [shape=box];
-  "21 E8" -> "23 min" [label="X"];
-  "21 E8" -> "X";
+  "21 E8" -> "23 min" [label="X_1"];
+  "21 E8" -> "X_1";
   "17 max" [shape=diamond];
   "i" -> "21 E8";
   "i" -> "17 max";
@@ -1547,7 +1547,7 @@ freia_status freia_scalar_07_helper_0_1_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for X
+  // - imagelet 1 is i0 for X_1
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
@@ -1866,7 +1866,7 @@ freia_status freia_scalar_07_helper_0_2_0(
   tile_in[1][0].y = 0;
 
   // outputs:
-  // - imagelet 1 is o0 for X
+  // - imagelet 1 is o0 for X_1
   tile_out[0][0].x = imagelet_io_1_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;

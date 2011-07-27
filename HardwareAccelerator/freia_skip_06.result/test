@@ -459,7 +459,7 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_skip_06_helper_0_0_0" of module "freia_skip_06" in dot format
 digraph "freia_skip_06_helper_0_0_0" {
   // inputs
-  "i" [shape=circle];
+  "i_1" [shape=circle];
 
   // outputs
   "i" [shape=circle];
@@ -476,8 +476,8 @@ digraph "freia_skip_06_helper_0_0_0" {
   "7 +" -> "11 ^." [label="i"];
   "7 +" -> "10 &." [label="i"];
   "7 +" -> "i";
-  "i" -> "7 +";
-  "i" -> "7 +";
+  "i_1" -> "7 +";
+  "i_1" -> "7 +";
 }
 
 ! acceleration function
@@ -681,7 +681,7 @@ freia_status freia_skip_06_helper_0_0_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for i
+  // - imagelet 1 is i0 for i_1
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;

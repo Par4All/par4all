@@ -836,66 +836,66 @@ digraph "median_1_helper_0_0_0" {
   "i" [shape=circle];
 
   // outputs
-  "t" [shape=circle];
+  "t_8" [shape=circle];
 
   // computation vertices
   "15 D8" [shape=box];
-  "15 D8" -> "t";
+  "15 D8" -> "t_8";
   "14 E8" [shape=box];
-  "14 E8" -> "15 D8" [label="t"];
+  "14 E8" -> "15 D8" [label="t_9"];
   "11 E8" [shape=box];
-  "11 E8" -> "14 E8" [label="t"];
+  "11 E8" -> "14 E8" [label="t_10"];
   "10 D8" [shape=box];
-  "10 D8" -> "11 E8" [label="t"];
+  "10 D8" -> "11 E8" [label="t_11"];
   "i" -> "10 D8";
 }
 // graph for dag "median_1_helper_0_0_1" of module "median_1" in dot format
 digraph "median_1_helper_0_0_1" {
   // inputs
-  "t" [shape=circle];
+  "t_8" [shape=circle];
   "i" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
-  "t" [shape=circle];
+  "o_1" [shape=circle];
+  "t_4" [shape=circle];
 
   // computation vertices
   "25 D8" [shape=box];
-  "25 D8" -> "t";
+  "25 D8" -> "t_4";
   "21 <" [shape=trapezium,orientation=270];
-  "21 <" -> "o";
+  "21 <" -> "o_1";
   "i" -> "21 <";
   "24 E8" [shape=box];
-  "24 E8" -> "25 D8" [label="t"];
+  "24 E8" -> "25 D8" [label="t_5"];
   "19 E8" [shape=box];
-  "19 E8" -> "21 <" [label="t"];
-  "19 E8" -> "24 E8" [label="t"];
+  "19 E8" -> "21 <" [label="t_6"];
+  "19 E8" -> "24 E8" [label="t_6"];
   "18 D8" [shape=box];
-  "18 D8" -> "19 E8" [label="t"];
-  "t" -> "18 D8";
+  "18 D8" -> "19 E8" [label="t_7"];
+  "t_8" -> "18 D8";
 }
 // graph for dag "median_1_helper_0_0_2" of module "median_1" in dot format
 digraph "median_1_helper_0_0_2" {
   // inputs
-  "t" [shape=circle];
-  "o" [shape=circle];
+  "t_4" [shape=circle];
+  "o_1" [shape=circle];
 
   // outputs
   "o" [shape=circle];
 
   // computation vertices
-  "t" -> "28 D8";
-  "o" -> "35 >";
+  "t_4" -> "28 D8";
+  "o_1" -> "35 >";
   "35 >" [shape=trapezium,orientation=270];
   "35 >" -> "o";
   "33 D8" [shape=box];
   "33 D8" -> "35 >" [label="t"];
   "32 E8" [shape=box];
-  "32 E8" -> "33 D8" [label="t"];
+  "32 E8" -> "33 D8" [label="t_1"];
   "29 E8" [shape=box];
-  "29 E8" -> "32 E8" [label="t"];
+  "29 E8" -> "32 E8" [label="t_2"];
   "28 D8" [shape=box];
-  "28 D8" -> "29 E8" [label="t"];
+  "28 D8" -> "29 E8" [label="t_3"];
 }
 
 ! acceleration function
@@ -1089,7 +1089,7 @@ freia_status median_1_helper_0_0_0(
   tile_in[1][0].y = 0;
 
   // outputs:
-  // - imagelet 1 is o0 for t
+  // - imagelet 1 is o0 for t_8
   tile_out[0][0].x = imagelet_io_1_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
@@ -1333,7 +1333,7 @@ freia_status median_1_helper_0_0_1(
 
 
   // inputs:
-  // - imagelet 1 is i0 for t
+  // - imagelet 1 is i0 for t_8
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
@@ -1345,12 +1345,12 @@ freia_status median_1_helper_0_0_1(
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 1 is o0 for o
+  // - imagelet 1 is o0 for o_1
   tile_out[0][0].x = imagelet_io_1_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-  // - imagelet 2 is o1 for t
+  // - imagelet 2 is o1 for t_4
   tile_out[0][1].x = imagelet_io_2_0;
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_2_1;
@@ -1593,12 +1593,12 @@ freia_status median_1_helper_0_0_2(
 
 
   // inputs:
-  // - imagelet 1 is i0 for t
+  // - imagelet 1 is i0 for t_4
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for o
+  // - imagelet 2 is i1 for o_1
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;

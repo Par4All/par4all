@@ -3205,151 +3205,151 @@ digraph "license_plate_helper_0_0_0" {
   "in" [shape=circle];
 
   // outputs
-  "imopen" [shape=circle];
-  "imclose" [shape=circle];
+  "imopen_25" [shape=circle];
+  "imclose_11" [shape=circle];
 
   // computation vertices
   "93 D8" [shape=box];
-  "93 D8" -> "imclose";
+  "93 D8" -> "imclose_11";
   "57 E8" [shape=box];
-  "57 E8" -> "imopen";
+  "57 E8" -> "imopen_25";
   "92 D8" [shape=box];
-  "92 D8" -> "93 D8" [label="imclose"];
+  "92 D8" -> "93 D8" [label="imclose_12"];
   "56 E8" [shape=box];
-  "56 E8" -> "57 E8" [label="imopen"];
+  "56 E8" -> "57 E8" [label="imopen_26"];
   "91 D8" [shape=box];
-  "91 D8" -> "92 D8" [label="imclose"];
+  "91 D8" -> "92 D8" [label="imclose_13"];
   "55 E8" [shape=box];
-  "55 E8" -> "56 E8" [label="imopen"];
+  "55 E8" -> "56 E8" [label="imopen_27"];
   "90 D8" [shape=box];
-  "90 D8" -> "91 D8" [label="imclose"];
+  "90 D8" -> "91 D8" [label="imclose_14"];
   "54 E8" [shape=box];
-  "54 E8" -> "55 E8" [label="imopen"];
+  "54 E8" -> "55 E8" [label="imopen_28"];
   "89 D8" [shape=box];
-  "89 D8" -> "90 D8" [label="imclose"];
+  "89 D8" -> "90 D8" [label="imclose_15"];
   "53 E8" [shape=box];
-  "53 E8" -> "54 E8" [label="imopen"];
+  "53 E8" -> "54 E8" [label="imopen_29"];
   "in" -> "89 D8";
   "in" -> "53 E8";
 }
 // graph for dag "license_plate_helper_0_0_1" of module "license_plate" in dot format
 digraph "license_plate_helper_0_0_1" {
   // inputs
-  "imclose" [shape=circle];
-  "imopen" [shape=circle];
+  "imclose_11" [shape=circle];
+  "imopen_25" [shape=circle];
 
   // outputs
-  "imopen" [shape=circle];
-  "imclose" [shape=circle];
+  "imopen_16" [shape=circle];
+  "imclose_2" [shape=circle];
 
   // computation vertices
   "104 E8" [shape=box];
-  "104 E8" -> "imclose";
+  "104 E8" -> "imclose_2";
   "66 E8" [shape=box];
-  "66 E8" -> "imopen";
+  "66 E8" -> "imopen_16";
   "103 E8" [shape=box];
-  "103 E8" -> "104 E8" [label="imclose"];
+  "103 E8" -> "104 E8" [label="imclose_3"];
   "65 E8" [shape=box];
-  "65 E8" -> "66 E8" [label="imopen"];
+  "65 E8" -> "66 E8" [label="imopen_17"];
   "102 E8" [shape=box];
-  "102 E8" -> "103 E8" [label="imclose"];
+  "102 E8" -> "103 E8" [label="imclose_4"];
   "64 E8" [shape=box];
-  "64 E8" -> "65 E8" [label="imopen"];
+  "64 E8" -> "65 E8" [label="imopen_18"];
   "101 E8" [shape=box];
-  "101 E8" -> "102 E8" [label="imclose"];
+  "101 E8" -> "102 E8" [label="imclose_5"];
   "63 E8" [shape=box];
-  "63 E8" -> "64 E8" [label="imopen"];
+  "63 E8" -> "64 E8" [label="imopen_19"];
   "100 E8" [shape=box];
-  "100 E8" -> "101 E8" [label="imclose"];
+  "100 E8" -> "101 E8" [label="imclose_6"];
   "62 E8" [shape=box];
-  "62 E8" -> "63 E8" [label="imopen"];
+  "62 E8" -> "63 E8" [label="imopen_20"];
   "99 E8" [shape=box];
-  "99 E8" -> "100 E8" [label="imclose"];
+  "99 E8" -> "100 E8" [label="imclose_7"];
   "61 E8" [shape=box];
-  "61 E8" -> "62 E8" [label="imopen"];
+  "61 E8" -> "62 E8" [label="imopen_21"];
   "96 D8" [shape=box];
-  "96 D8" -> "99 E8" [label="imclose"];
+  "96 D8" -> "99 E8" [label="imclose_8"];
   "60 E8" [shape=box];
-  "60 E8" -> "61 E8" [label="imopen"];
+  "60 E8" -> "61 E8" [label="imopen_22"];
   "95 D8" [shape=box];
-  "95 D8" -> "96 D8" [label="imclose"];
+  "95 D8" -> "96 D8" [label="imclose_9"];
   "59 E8" [shape=box];
-  "59 E8" -> "60 E8" [label="imopen"];
+  "59 E8" -> "60 E8" [label="imopen_23"];
   "94 D8" [shape=box];
-  "94 D8" -> "95 D8" [label="imclose"];
-  "imclose" -> "94 D8";
+  "94 D8" -> "95 D8" [label="imclose_10"];
+  "imclose_11" -> "94 D8";
   "58 E8" [shape=box];
-  "58 E8" -> "59 E8" [label="imopen"];
-  "imopen" -> "58 E8";
+  "58 E8" -> "59 E8" [label="imopen_24"];
+  "imopen_25" -> "58 E8";
 }
 // graph for dag "license_plate_helper_0_0_2" of module "license_plate" in dot format
 digraph "license_plate_helper_0_0_2" {
   // inputs
-  "imclose" [shape=circle];
-  "imopen" [shape=circle];
+  "imclose_2" [shape=circle];
+  "imopen_16" [shape=circle];
 
   // outputs
-  "imopen" [shape=circle];
+  "imopen_7" [shape=circle];
   "imcloseth" [shape=circle];
 
   // computation vertices
   "77 D8" [shape=box];
-  "77 D8" -> "imopen";
+  "77 D8" -> "imopen_7";
   "76 D8" [shape=box];
-  "76 D8" -> "77 D8" [label="imopen"];
+  "76 D8" -> "77 D8" [label="imopen_8"];
   "75 D8" [shape=box];
-  "75 D8" -> "76 D8" [label="imopen"];
+  "75 D8" -> "76 D8" [label="imopen_9"];
   "74 D8" [shape=box];
-  "74 D8" -> "75 D8" [label="imopen"];
+  "74 D8" -> "75 D8" [label="imopen_10"];
   "73 D8" [shape=box];
-  "73 D8" -> "74 D8" [label="imopen"];
+  "73 D8" -> "74 D8" [label="imopen_11"];
   "72 D8" [shape=box];
-  "72 D8" -> "73 D8" [label="imopen"];
+  "72 D8" -> "73 D8" [label="imopen_12"];
   "113 thr" [shape=parallelogram];
   "113 thr" -> "imcloseth";
   "71 D8" [shape=box];
-  "71 D8" -> "72 D8" [label="imopen"];
+  "71 D8" -> "72 D8" [label="imopen_13"];
   "106 E8" [shape=box];
   "106 E8" -> "113 thr" [label="imclose"];
   "70 D8" [shape=box];
-  "70 D8" -> "71 D8" [label="imopen"];
+  "70 D8" -> "71 D8" [label="imopen_14"];
   "105 E8" [shape=box];
-  "105 E8" -> "106 E8" [label="imclose"];
-  "imclose" -> "105 E8";
+  "105 E8" -> "106 E8" [label="imclose_1"];
+  "imclose_2" -> "105 E8";
   "67 E8" [shape=box];
-  "67 E8" -> "70 D8" [label="imopen"];
-  "imopen" -> "67 E8";
+  "67 E8" -> "70 D8" [label="imopen_15"];
+  "imopen_16" -> "67 E8";
 }
 // graph for dag "license_plate_helper_0_0_3" of module "license_plate" in dot format
 digraph "license_plate_helper_0_0_3" {
   // inputs
   "imcloseth" [shape=circle];
-  "imopen" [shape=circle];
+  "imopen_7" [shape=circle];
 
   // outputs
-  "imout" [shape=circle];
+  "imout_6" [shape=circle];
 
   // computation vertices
   "132 E8" [shape=box];
-  "132 E8" -> "imout";
+  "132 E8" -> "imout_6";
   "131 E8" [shape=box];
-  "131 E8" -> "132 E8" [label="imout"];
+  "131 E8" -> "132 E8" [label="imout_7"];
   "126 D8" [shape=box];
   "126 D8" -> "131 E8" [label="imfilt"];
   "125 D8" [shape=box];
-  "125 D8" -> "126 D8" [label="imfilt"];
+  "125 D8" -> "126 D8" [label="imfilt_1"];
   "124 D8" [shape=box];
-  "124 D8" -> "125 D8" [label="imfilt"];
+  "124 D8" -> "125 D8" [label="imfilt_2"];
   "123 D8" [shape=box];
-  "123 D8" -> "124 D8" [label="imfilt"];
+  "123 D8" -> "124 D8" [label="imfilt_3"];
   "120 E8" [shape=box];
-  "120 E8" -> "123 D8" [label="imfilt"];
+  "120 E8" -> "123 D8" [label="imfilt_4"];
   "119 E8" [shape=box];
-  "119 E8" -> "120 E8" [label="imfilt"];
+  "119 E8" -> "120 E8" [label="imfilt_5"];
   "118 E8" [shape=box];
-  "118 E8" -> "119 E8" [label="imfilt"];
+  "118 E8" -> "119 E8" [label="imfilt_6"];
   "117 E8" [shape=box];
-  "117 E8" -> "118 E8" [label="imfilt"];
+  "117 E8" -> "118 E8" [label="imfilt_7"];
   "115 &" [shape=trapezium,orientation=270];
   "115 &" -> "117 E8" [label="imand"];
   "imcloseth" -> "115 &";
@@ -3358,50 +3358,50 @@ digraph "license_plate_helper_0_0_3" {
   "84 D8" [shape=box];
   "84 D8" -> "112 thr" [label="imopen"];
   "83 D8" [shape=box];
-  "83 D8" -> "84 D8" [label="imopen"];
+  "83 D8" -> "84 D8" [label="imopen_1"];
   "82 D8" [shape=box];
-  "82 D8" -> "83 D8" [label="imopen"];
+  "82 D8" -> "83 D8" [label="imopen_2"];
   "81 D8" [shape=box];
-  "81 D8" -> "82 D8" [label="imopen"];
+  "81 D8" -> "82 D8" [label="imopen_3"];
   "80 D8" [shape=box];
-  "80 D8" -> "81 D8" [label="imopen"];
+  "80 D8" -> "81 D8" [label="imopen_4"];
   "79 D8" [shape=box];
-  "79 D8" -> "80 D8" [label="imopen"];
+  "79 D8" -> "80 D8" [label="imopen_5"];
   "78 D8" [shape=box];
-  "78 D8" -> "79 D8" [label="imopen"];
-  "imopen" -> "78 D8";
+  "78 D8" -> "79 D8" [label="imopen_6"];
+  "imopen_7" -> "78 D8";
 }
 // graph for dag "license_plate_helper_0_0_4" of module "license_plate" in dot format
 digraph "license_plate_helper_0_0_4" {
   // inputs
-  "imout" [shape=circle];
+  "imout_6" [shape=circle];
   "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
 
   // computation vertices
-  "imout" -> "133 E8";
+  "imout_6" -> "133 E8";
   "152 &" [shape=trapezium,orientation=270];
   "152 &" -> "out";
   "147 D8" [shape=box];
-  "147 D8" -> "152 &" [label="out"];
+  "147 D8" -> "152 &" [label="out_1"];
   "146 D8" [shape=box];
-  "146 D8" -> "147 D8" [label="out"];
+  "146 D8" -> "147 D8" [label="out_2"];
   "145 D8" [shape=box];
-  "145 D8" -> "146 D8" [label="out"];
+  "145 D8" -> "146 D8" [label="out_3"];
   "140 D8" [shape=box];
   "140 D8" -> "145 D8" [label="imout"];
   "139 D8" [shape=box];
-  "139 D8" -> "140 D8" [label="imout"];
+  "139 D8" -> "140 D8" [label="imout_1"];
   "138 D8" [shape=box];
-  "138 D8" -> "139 D8" [label="imout"];
+  "138 D8" -> "139 D8" [label="imout_2"];
   "137 D8" [shape=box];
-  "137 D8" -> "138 D8" [label="imout"];
+  "137 D8" -> "138 D8" [label="imout_3"];
   "134 E8" [shape=box];
-  "134 E8" -> "137 D8" [label="imout"];
+  "134 E8" -> "137 D8" [label="imout_4"];
   "133 E8" [shape=box];
-  "133 E8" -> "134 E8" [label="imout"];
+  "133 E8" -> "134 E8" [label="imout_5"];
   "in" -> "152 &";
 }
 
@@ -3739,12 +3739,12 @@ freia_status license_plate_helper_0_0_0(
   tile_in[1][0].y = 0;
 
   // outputs:
-  // - imagelet 1 is o0 for imopen
+  // - imagelet 1 is o0 for imopen_25
   tile_out[0][0].x = imagelet_io_1_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-  // - imagelet 2 is o1 for imclose
+  // - imagelet 2 is o1 for imclose_11
   tile_out[0][1].x = imagelet_io_2_0;
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_2_1;
@@ -4287,24 +4287,24 @@ freia_status license_plate_helper_0_0_1(
 
 
   // inputs:
-  // - imagelet 1 is i0 for imclose
+  // - imagelet 1 is i0 for imclose_11
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for imopen
+  // - imagelet 2 is i1 for imopen_25
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for imopen
+  // - imagelet 2 is o0 for imopen_16
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
   tile_out[1][0].y = 0;
-  // - imagelet 1 is o1 for imclose
+  // - imagelet 1 is o1 for imclose_2
   tile_out[0][1].x = imagelet_io_1_0;
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
@@ -4726,19 +4726,19 @@ freia_status license_plate_helper_0_0_2(
 
 
   // inputs:
-  // - imagelet 1 is i0 for imclose
+  // - imagelet 1 is i0 for imclose_2
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for imopen
+  // - imagelet 2 is i1 for imopen_16
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for imopen
+  // - imagelet 2 is o0 for imopen_7
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
@@ -5344,14 +5344,14 @@ freia_status license_plate_helper_0_0_3(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for imopen
+  // - imagelet 2 is i1 for imopen_7
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 1 is o0 for imout
+  // - imagelet 1 is o0 for imout_6
   tile_out[0][0].x = imagelet_io_1_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
@@ -5723,7 +5723,7 @@ freia_status license_plate_helper_0_0_4(
 
 
   // inputs:
-  // - imagelet 1 is i0 for imout
+  // - imagelet 1 is i0 for imout_6
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;

@@ -315,7 +315,7 @@ digraph "dag_cleaned_0" {
 digraph "freia_57_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
-  "io" [shape=circle];
+  "io_1" [shape=circle];
 
   // outputs
   "o" [shape=circle];
@@ -328,8 +328,8 @@ digraph "freia_57_helper_0_0_0" {
   "6 +" -> "7 <" [label="o"];
   "6 +" -> "o";
   "i" -> "6 +";
-  "io" -> "7 <";
-  "io" -> "6 +";
+  "io_1" -> "7 <";
+  "io_1" -> "6 +";
 }
 
 ! acceleration function
@@ -466,7 +466,7 @@ freia_status freia_57_helper_0_0_0(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for io
+  // - imagelet 2 is i1 for io_1
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;

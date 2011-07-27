@@ -510,11 +510,11 @@ digraph "freia_reuse_01_helper_0_0_0" {
   "14 -" [shape=trapezium,orientation=270];
   "14 -" -> "o1";
   "13 D6" [shape=box];
-  "13 D6" -> "14 -" [label="o1"];
+  "13 D6" -> "14 -" [label="o1_1"];
   "11 E6" [shape=box];
   "11 E6" -> "14 -" [label="t"];
   "12 D6" [shape=box];
-  "12 D6" -> "13 D6" [label="o1"];
+  "12 D6" -> "13 D6" [label="o1_2"];
   "9 E6" [shape=box];
   "9 E6" -> "11 E6" [label="o0"];
   "9 E6" -> "o0";
