@@ -2163,6 +2163,7 @@ static list /* of dags */ split_dag(dag initial)
  * @param ls list of statements for the dag (in reverse order)
  * @param helper output file
  * @param number current helper dag count
+ * @return list of intermediate images to allocate
  */
 list freia_spoc_compile_calls
   (string module,
