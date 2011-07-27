@@ -595,7 +595,7 @@ freia_status freia_26(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // parallel reuses
    // o0 = i0 - i0
    // o1 = i1 / i1
-   freia_26_helper_0_0_0(o0, o1, i0, i1);                               /*0009*/
+   freia_26_helper_0_0_0(o0, o1, i0, i1);                               /*0010*/
 
    return FREIA_OK;                                                     /*0012*/
 }
@@ -607,7 +607,7 @@ freia_status freia_26(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // parallel reuses
    // o0 = i0 - i0
    // o1 = i1 / i1
-   freia_26_helper_0_0_0(o0, o1, i0, i1);                               /*0009*/
+   freia_26_helper_0_0_0(o0, o1, i0, i1);                               /*0010*/
 
    return 0;                                                            /*0012*/
 }

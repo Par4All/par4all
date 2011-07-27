@@ -633,7 +633,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
-   ret = median_1_helper_0_0_0(t, o, i, freia_morpho_kernel_8c);        /*0010*/
+   ret = 0;                                                             /*0010*/
    ret |= 0;                                                            /*0011*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
@@ -648,17 +648,17 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // ret |= freia_cipo_open(t, i, c, 1);
    ret |= 0;                                                            /*0024*/
-   ret |= 0;                                                            /*0025*/
+   ret |= median_1_helper_0_0_0(t, o, i, freia_morpho_kernel_8c);       /*0025*/
    
    // ret |= freia_cipo_close(t, t, c, 1);
-   ret |= median_1_helper_0_0_1(o, t, o, freia_morpho_kernel_8c);       /*0028*/
+   ret |= 0;                                                            /*0028*/
    ret |= 0;                                                            /*0029*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
    ret |= 0;                                                            /*0032*/
    ret |= 0;                                                            /*0033*/
 
-   ret |= 0;                                                            /*0035*/
+   ret |= median_1_helper_0_0_1(o, t, o, freia_morpho_kernel_8c);       /*0035*/
    
    // cleanup
    ret |= freia_common_destruct_data(t);                                /*0038*/
@@ -674,7 +674,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
-   ret = median_1_helper_0_0_0(t, o, i, freia_morpho_kernel_8c);        /*0010*/
+   ret = 0;                                                             /*0010*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
    
@@ -682,12 +682,13 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    
    // ret |= freia_cipo_open(t, i, c, 1);
+   ret |= median_1_helper_0_0_0(t, o, i, freia_morpho_kernel_8c);       /*0025*/
    
    // ret |= freia_cipo_close(t, t, c, 1);
-   ret |= median_1_helper_0_0_1(o, t, o, freia_morpho_kernel_8c);       /*0028*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
    
+   ret |= median_1_helper_0_0_1(o, t, o, freia_morpho_kernel_8c);       /*0035*/
    
    // cleanup
    ret |= freia_common_destruct_data(t);                                /*0038*/
@@ -1335,7 +1336,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
-   ret = median_1_helper_0_0_0(o, i, freia_morpho_kernel_8c);           /*0010*/
+   ret = 0;                                                             /*0010*/
    ret |= 0;                                                            /*0011*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
@@ -1360,7 +1361,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    ret |= 0;                                                            /*0032*/
    ret |= 0;                                                            /*0033*/
 
-   ret |= 0;                                                            /*0035*/
+   ret |= median_1_helper_0_0_0(o, i, freia_morpho_kernel_8c);          /*0035*/
    
    // cleanup
    ret |= 0;                                                            /*0038*/
@@ -1375,7 +1376,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
-   ret = median_1_helper_0_0_0(o, i, freia_morpho_kernel_8c);           /*0010*/
+   ret = 0;                                                             /*0010*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
    
@@ -1388,6 +1389,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // ret |= freia_cipo_open(t, t, c, 1);
    
+   ret |= median_1_helper_0_0_0(o, i, freia_morpho_kernel_8c);          /*0035*/
    
    // cleanup
    return ret;                                                          /*0039*/

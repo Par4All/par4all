@@ -248,14 +248,14 @@ freia_status sub_00_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, ,
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);                   /*0007*/
+   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);                   /*0010*/
 }
 
 ! cleaned up function
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0007*/
+   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0010*/
 }
 #
 # TERAPIX
@@ -564,14 +564,14 @@ freia_status sub_00_helper_0_0_0(
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);                   /*0007*/
+   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);                   /*0010*/
 }
 
 ! cleaned up function
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0007*/
+   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0010*/
 }
 #
 # FREIA COMPILATION DONE

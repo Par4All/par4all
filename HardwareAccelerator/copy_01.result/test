@@ -371,12 +371,12 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
+   ret_0 |= 0;                                                          /*0028*/
    ret_0 |= 0;                                                          /*0029*/
    ret_0 |= 0;                                                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
 
-   ret_0 |= 0;                                                          /*0033*/
+   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/
@@ -415,8 +415,8 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
-   
+
+   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/
@@ -795,12 +795,12 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
+   ret_0 |= 0;                                                          /*0028*/
    ret_0 |= 0;                                                          /*0029*/
    ret_0 |= 0;                                                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
 
-   ret_0 |= 0;                                                          /*0033*/
+   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/
@@ -839,8 +839,8 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
-   
+
+   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/

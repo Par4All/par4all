@@ -293,7 +293,7 @@ freia_status freia_23(freia_data2d *o, freia_data2d *io, freia_data2d *i1)
    // o = io ^ i1
    // io' = o - io
    // o = o + io'
-   freia_23_helper_0_0_0(io, o, i1, io);                                /*0010*/
+   freia_23_helper_0_0_0(io, o, i1, io);                                /*0012*/
 
    return FREIA_OK;                                                     /*0014*/
 }
@@ -306,7 +306,7 @@ freia_status freia_23(freia_data2d *o, freia_data2d *io, freia_data2d *i1)
    // o = io ^ i1
    // io' = o - io
    // o = o + io'
-   freia_23_helper_0_0_0(io, o, i1, io);                                /*0010*/
+   freia_23_helper_0_0_0(io, o, i1, io);                                /*0012*/
 
    return 0;                                                            /*0014*/
 }
@@ -618,7 +618,7 @@ freia_status freia_23(freia_data2d *o, freia_data2d *io, freia_data2d *i1)
    // o = io ^ i1
    // io' = o - io
    // o = o + io'
-   freia_23_helper_0_0_0(io, o, i1, io);                                /*0010*/
+   freia_23_helper_0_0_0(io, o, i1, io);                                /*0012*/
 
    return FREIA_OK;                                                     /*0014*/
 }
@@ -631,7 +631,7 @@ freia_status freia_23(freia_data2d *o, freia_data2d *io, freia_data2d *i1)
    // o = io ^ i1
    // io' = o - io
    // o = o + io'
-   freia_23_helper_0_0_0(io, o, i1, io);                                /*0010*/
+   freia_23_helper_0_0_0(io, o, i1, io);                                /*0012*/
 
    return 0;                                                            /*0014*/
 }

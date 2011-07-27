@@ -278,7 +278,7 @@ freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    
    // o = inf(i0 + i1, i0) - i0
-   freia_01_helper_0_0_0(o, i0, i1);                                    /*0011*/
+   freia_01_helper_0_0_0(o, i0, i1);                                    /*0013*/
    
    
    return FREIA_OK;                                                     /*0018*/
@@ -292,7 +292,7 @@ freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    
    // o = inf(i0 + i1, i0) - i0
-   freia_01_helper_0_0_0(o, i0, i1);                                    /*0011*/
+   freia_01_helper_0_0_0(o, i0, i1);                                    /*0013*/
    
    
    return 0;                                                            /*0018*/
@@ -597,7 +597,7 @@ freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    
    // o = inf(i0 + i1, i0) - i0
-   freia_01_helper_0_0_0(o, i0, i1);                                    /*0011*/
+   freia_01_helper_0_0_0(o, i0, i1);                                    /*0013*/
    
    
    return FREIA_OK;                                                     /*0018*/
@@ -611,7 +611,7 @@ freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    
    // o = inf(i0 + i1, i0) - i0
-   freia_01_helper_0_0_0(o, i0, i1);                                    /*0011*/
+   freia_01_helper_0_0_0(o, i0, i1);                                    /*0013*/
    
    
    return 0;                                                            /*0018*/

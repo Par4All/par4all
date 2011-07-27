@@ -410,11 +410,11 @@ freia_status freia_37(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_37_helper_0_0_0(o, i, kern);                                   /*0010*/
    
    
    
    
+   freia_37_helper_0_0_0(o, i, kern);                                   /*0022*/
    
    
    return FREIA_OK;                                                     /*0027*/
@@ -429,11 +429,11 @@ freia_status freia_37(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_37_helper_0_0_0(o, i, kern);                                   /*0010*/
    
    
    
    
+   freia_37_helper_0_0_0(o, i, kern);                                   /*0022*/
    
    
    return 0;                                                            /*0027*/
@@ -921,11 +921,11 @@ freia_status freia_37(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_37_helper_0_0_0(o, i, kern);                                   /*0010*/
    
    
    
    
+   freia_37_helper_0_0_0(o, i, kern);                                   /*0022*/
    
    
    return FREIA_OK;                                                     /*0027*/
@@ -940,11 +940,11 @@ freia_status freia_37(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_37_helper_0_0_0(o, i, kern);                                   /*0010*/
    
    
    
    
+   freia_37_helper_0_0_0(o, i, kern);                                   /*0022*/
    
    
    return 0;                                                            /*0027*/

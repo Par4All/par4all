@@ -766,25 +766,24 @@ int anr999_01(void)
    freia_common_rx_image(in, &fdin);                                    /*0036*/
 
    t = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);    /*0048*/
-
-   anr999_01_helper_0_0_0(od, t, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);             /*0038*/
-
+   
+   
    i_0 = 10;                                                            /*0043*/
 
    I_6 = 0;                                                             /*0045*/
    I_6;                                                                 /*0046*/
 
+   anr999_01_helper_0_0_0(od, t, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);             /*0053*/
    i_1 = 10;                                                            /*0054*/
 
    I_3_0 = 0;                                                           /*0056*/
    ret_0 = I_3_0;                                                       /*0057*/
 
-   anr999_01_helper_0_1_0(og, in, t, freia_morpho_kernel_8c);           /*0059*/
    i_2 = 10;                                                            /*0063*/
 
    I_10_0 = 0;                                                          /*0065*/
    ret_0 |= I_10_0;                                                     /*0066*/
-   ret_0 |= 0;                                                          /*0067*/
+   ret_0 |= anr999_01_helper_0_1_0(og, in, t, freia_morpho_kernel_8c);  /*0067*/
 
    freia_common_destruct_data(t);                                       /*0069*/
    I_13 = 0;                                                            /*0070*/
@@ -838,22 +837,22 @@ int anr999_01(void)
    freia_common_rx_image(in, &fdin);                                    /*0036*/
 
    t = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);    /*0048*/
-
-   anr999_01_helper_0_0_0(od, t, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);             /*0038*/
-
+   
+   
    i_0 = 10;                                                            /*0043*/
 
    I_6 = 0;                                                             /*0045*/
 
+   anr999_01_helper_0_0_0(od, t, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);             /*0053*/
    i_1 = 10;                                                            /*0054*/
 
    I_3_0 = 0;                                                           /*0056*/
    ret_0 = 0;                                                           /*0057*/
 
-   anr999_01_helper_0_1_0(og, in, t, freia_morpho_kernel_8c);           /*0059*/
    i_2 = 10;                                                            /*0063*/
 
    I_10_0 = 0;                                                          /*0065*/
+   ret_0 |= anr999_01_helper_0_1_0(og, in, t, freia_morpho_kernel_8c);  /*0067*/
 
    freia_common_destruct_data(t);                                       /*0069*/
    I_13 = 0;                                                            /*0070*/
@@ -1623,8 +1622,7 @@ int anr999_01(void)
    freia_common_rx_image(in, &fdin);                                    /*0036*/
    
    
-   anr999_01_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
-
+   
    i_0 = 10;                                                            /*0043*/
 
    I_6 = 0;                                                             /*0045*/
@@ -1639,7 +1637,7 @@ int anr999_01(void)
 
    I_10_0 = 0;                                                          /*0065*/
    ret_0 |= I_10_0;                                                     /*0066*/
-   ret_0 |= 0;                                                          /*0067*/
+   ret_0 |= anr999_01_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);   /*0067*/
 
    I_13 = 0;                                                            /*0070*/
    I_13;                                                                /*0071*/
@@ -1691,8 +1689,7 @@ int anr999_01(void)
    freia_common_rx_image(in, &fdin);                                    /*0036*/
    
    
-   anr999_01_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
-
+   
    i_0 = 10;                                                            /*0043*/
 
    I_6 = 0;                                                             /*0045*/
@@ -1705,6 +1702,7 @@ int anr999_01(void)
    i_2 = 10;                                                            /*0063*/
 
    I_10_0 = 0;                                                          /*0065*/
+   ret_0 |= anr999_01_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);   /*0067*/
 
    I_13 = 0;                                                            /*0070*/
 

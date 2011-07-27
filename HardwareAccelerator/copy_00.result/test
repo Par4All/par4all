@@ -513,15 +513,15 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 {
    
    // 1
-   copy_00_helper_0_0_0(o0, in, freia_morpho_kernel_8c);                /*0012*/
-   copy_00_helper_0_1_0(o1, in, freia_morpho_kernel_8c);                /*0013*/
    
    // 2
    
    // 3
+   copy_00_helper_0_0_0(o0, in, freia_morpho_kernel_8c);                /*0022*/
    
    // 4
-   
+   copy_00_helper_0_1_0(o1, in, freia_morpho_kernel_8c);                /*0027*/
+
    return 0;                                                            /*0029*/
 }
 
@@ -531,15 +531,15 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 {
    
    // 1
-   copy_00_helper_0_0_0(o0, in, freia_morpho_kernel_8c);                /*0012*/
-   copy_00_helper_0_1_0(o1, in, freia_morpho_kernel_8c);                /*0013*/
    
    // 2
    
    // 3
+   copy_00_helper_0_0_0(o0, in, freia_morpho_kernel_8c);                /*0022*/
    
    // 4
-   
+   copy_00_helper_0_1_0(o1, in, freia_morpho_kernel_8c);                /*0027*/
+
    return 0;                                                            /*0029*/
 }
 #
@@ -1091,14 +1091,14 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 {
    
    // 1
-   copy_00_helper_0_0_0(o0, o1, in, freia_morpho_kernel_8c);            /*0012*/
    
    // 2
    
    // 3
    
    // 4
-   
+   copy_00_helper_0_0_0(o0, o1, in, freia_morpho_kernel_8c);            /*0027*/
+
    return 0;                                                            /*0029*/
 }
 
@@ -1108,14 +1108,14 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 {
    
    // 1
-   copy_00_helper_0_0_0(o0, o1, in, freia_morpho_kernel_8c);            /*0012*/
    
    // 2
    
    // 3
    
    // 4
-   
+   copy_00_helper_0_0_0(o0, o1, in, freia_morpho_kernel_8c);            /*0027*/
+
    return 0;                                                            /*0029*/
 }
 #

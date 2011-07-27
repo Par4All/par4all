@@ -674,12 +674,12 @@ int freia_51(int32_t *k)
    int32_t volcurrent, volprevious;                                     /*0008*/
 
    freia_common_rx_image(in, &fdin);                                    /*0010*/
-
-   freia_51_helper_1_0_0(out, t4, in, k, 255);                          /*0012*/
-
+   
+   
    t4 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);               /*0017*/
 
-   freia_51_helper_1_1_0(out, t4, 255);                                 /*0026*/
+   freia_51_helper_1_0_0(out, t4, in, k, 255);                          /*0025*/
+   freia_51_helper_1_1_0(out, t4, 255);                                 /*0028*/
    do {                                                                 /*0033*/
       freia_aipo_global_vol(out, &volcurrent);                          /*0031*/
    }
@@ -704,12 +704,12 @@ int freia_51(int32_t *k)
    int32_t volcurrent, volprevious;                                     /*0008*/
 
    freia_common_rx_image(in, &fdin);                                    /*0010*/
-
-   freia_51_helper_1_0_0(out, t4, in, k, 255);                          /*0012*/
-
+   
+   
    t4 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);               /*0017*/
 
-   freia_51_helper_1_1_0(out, t4, 255);                                 /*0026*/
+   freia_51_helper_1_0_0(out, t4, in, k, 255);                          /*0025*/
+   freia_51_helper_1_1_0(out, t4, 255);                                 /*0028*/
    do {                                                                 /*0033*/
       freia_aipo_global_vol(out, &volcurrent);                          /*0031*/
    }
@@ -1409,10 +1409,10 @@ int freia_51(int32_t *k)
    int32_t volcurrent, volprevious;                                     /*0008*/
 
    freia_common_rx_image(in, &fdin);                                    /*0010*/
-
-   freia_51_helper_1_0_0(out, out, in, k, 255, 255);                    /*0012*/
    
    
+   
+   freia_51_helper_1_0_0(out, out, in, k, 255, 255);                    /*0028*/
    do {                                                                 /*0033*/
       freia_aipo_global_vol(out, &volcurrent);                          /*0031*/
    }
@@ -1437,10 +1437,10 @@ int freia_51(int32_t *k)
    int32_t volcurrent, volprevious;                                     /*0008*/
 
    freia_common_rx_image(in, &fdin);                                    /*0010*/
-
-   freia_51_helper_1_0_0(out, out, in, k, 255, 255);                    /*0012*/
    
    
+   
+   freia_51_helper_1_0_0(out, out, in, k, 255, 255);                    /*0028*/
    do {                                                                 /*0033*/
       freia_aipo_global_vol(out, &volcurrent);                          /*0031*/
    }

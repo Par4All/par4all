@@ -391,10 +391,10 @@ int anr999_03(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0024*/
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
+   
+   
+   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0034*/
 
-   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0029*/
-   
-   
    freia_common_tx_image(in, &fdout);                                   /*0036*/
    freia_common_tx_image(od, &fdout);                                   /*0037*/
    freia_common_tx_image(og, &fdout);                                   /*0038*/
@@ -427,10 +427,10 @@ int anr999_03(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0024*/
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
+   
+   
+   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0034*/
 
-   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0029*/
-   
-   
    freia_common_tx_image(in, &fdout);                                   /*0036*/
    freia_common_tx_image(od, &fdout);                                   /*0037*/
    freia_common_tx_image(og, &fdout);                                   /*0038*/
@@ -821,10 +821,10 @@ int anr999_03(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0024*/
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
+   
+   
+   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0034*/
 
-   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0029*/
-   
-   
    freia_common_tx_image(in, &fdout);                                   /*0036*/
    freia_common_tx_image(od, &fdout);                                   /*0037*/
    freia_common_tx_image(og, &fdout);                                   /*0038*/
@@ -857,10 +857,10 @@ int anr999_03(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0024*/
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
+   
+   
+   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0034*/
 
-   anr999_03_helper_0_0_0(od, og, in, freia_morpho_kernel_8c);          /*0029*/
-   
-   
    freia_common_tx_image(in, &fdout);                                   /*0036*/
    freia_common_tx_image(od, &fdout);                                   /*0037*/
    freia_common_tx_image(og, &fdout);                                   /*0038*/
