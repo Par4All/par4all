@@ -906,42 +906,43 @@ void freia_substitute_by_helper_call
   set_difference(global_remainings, global_remainings, dones);
 
   // replace first statement of dones in ls (so last in sequence)
-  bool substitution_done = false;
+  statement last = NULL;
   FOREACH(statement, sc, ls)
   {
     pips_debug(5, "in statement %" _intFMT "\n", statement_number(sc));
-
     if (set_belong_p(dones, sc))
     {
       pips_assert("statement is a call", statement_call_p(sc));
-      pips_debug(5, "sustituting %" _intFMT"...\n", statement_number(sc));
-
-      // build helper entity
-      entity example = local_name_to_top_level_entity("freia_aipo_add");
-      pips_assert("example is a function", entity_function_p(example));
-      entity helper = make_empty_function(function_name,
-        copy_type(functional_result(type_functional(entity_type(example)))),
-                                          make_language_c());
-      // update type of parameters
-      list larg_params = NIL;
-      FOREACH(expression, e, lparams)
-        larg_params = CONS(parameter,
-                           make_parameter(expression_to_user_type(e),
-                                          make_mode_value(),
-                                          make_dummy_unknown()),
-                           larg_params);
-      larg_params = gen_nreverse(larg_params);
-      module_functional_parameters(helper) = larg_params;
-
-      // substitute by call to helper
-      call c = make_call(helper, lparams);
-
-      hwac_replace_statement(sc, c, false);
-      substitution_done = true;
-      break;
+      if (last)
+        last = statement_number(sc)>statement_number(last)? sc: last;
+      else
+        last = sc;
     }
   }
-  pips_assert("substitution done", substitution_done);
+
+  pips_assert("some last statement found", last);
+
+  // build helper entity
+  entity example = local_name_to_top_level_entity("freia_aipo_add");
+  pips_assert("example is a function", entity_function_p(example));
+  entity helper = make_empty_function(function_name,
+        copy_type(functional_result(type_functional(entity_type(example)))),
+                                      make_language_c());
+  // update type of parameters
+  list larg_params = NIL;
+  FOREACH(expression, e, lparams)
+    larg_params = CONS(parameter,
+                       make_parameter(expression_to_user_type(e),
+                                      make_mode_value(),
+                                      make_dummy_unknown()),
+                       larg_params);
+  larg_params = gen_nreverse(larg_params);
+  module_functional_parameters(helper) = larg_params;
+
+  // substitute by call to helper
+  call c = make_call(helper, lparams);
+
+  hwac_replace_statement(last, c, false);
 
   set_free(not_dones);
   set_free(dones);
