@@ -1,5 +1,0 @@
-pips error in freia_spoc_pipeline: (/home/fabien/DEV/PROJECTS/prod/pips/src/Libs/hwac/freia_spoc.c:1504) assertion failed
-
- '0, 1, 2 output images' not verified
-
-Aborted
