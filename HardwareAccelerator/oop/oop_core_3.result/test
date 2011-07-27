@@ -634,7 +634,7 @@ digraph "oop_core_helper_0_0" {
   "69 -" [shape=trapezium,orientation=270];
   "69 -" -> "imgtmp";
   "68 E8" [shape=box];
-  "68 E8" -> "69 -" [label="imgtmp"];
+  "68 E8" -> "69 -" [label="imgtmp_1"];
   "67 D8" [shape=box];
   "67 D8" -> "69 -" [label="imtmp_4"];
   "img0" -> "68 E8";
@@ -646,13 +646,13 @@ digraph "oop_core_helper_0_1" {
   "imgtt2" [shape=circle];
 
   // outputs
-  "img1" [shape=circle];
+  "img1_3" [shape=circle];
 
   // computation vertices
   "78 -" [shape=trapezium,orientation=270];
-  "78 -" -> "img1";
+  "78 -" -> "img1_3";
   "77 E8" [shape=box];
-  "77 E8" -> "78 -" [label="img1"];
+  "77 E8" -> "78 -" [label="img1_4"];
   "76 D8" [shape=box];
   "76 D8" -> "78 -" [label="imtmp_5"];
   "imgtt2" -> "77 E8";
@@ -661,7 +661,7 @@ digraph "oop_core_helper_0_1" {
 // graph for dag "oop_core_helper_0_2" of module "oop_core" in dot format
 digraph "oop_core_helper_0_2" {
   // inputs
-  "img1" [shape=circle];
+  "img1_3" [shape=circle];
   "imgtmp" [shape=circle];
 
   // outputs
@@ -671,10 +671,10 @@ digraph "oop_core_helper_0_2" {
   "83 D6" [shape=box];
   "83 D6" -> "img1";
   "82 E6" [shape=box];
-  "82 E6" -> "83 D6" [label="img1"];
+  "82 E6" -> "83 D6" [label="img1_1"];
   "81 -|" [shape=trapezium,orientation=270];
-  "81 -|" -> "82 E6" [label="img1"];
-  "img1" -> "81 -|";
+  "81 -|" -> "82 E6" [label="img1_2"];
+  "img1_3" -> "81 -|";
   "imgtmp" -> "81 -|";
 }
 // graph for dag "oop_core_helper_0_3" of module "oop_core" in dot format
@@ -683,13 +683,13 @@ digraph "oop_core_helper_0_3" {
   "imgtt4" [shape=circle];
 
   // outputs
-  "img2" [shape=circle];
+  "img2_3" [shape=circle];
 
   // computation vertices
   "97 -" [shape=trapezium,orientation=270];
-  "97 -" -> "img2";
+  "97 -" -> "img2_3";
   "96 E8" [shape=box];
-  "96 E8" -> "97 -" [label="img2"];
+  "96 E8" -> "97 -" [label="img2_4"];
   "95 D8" [shape=box];
   "95 D8" -> "97 -" [label="imtmp_7"];
   "imgtt4" -> "96 E8";
@@ -698,8 +698,8 @@ digraph "oop_core_helper_0_3" {
 // graph for dag "oop_core_helper_0_4" of module "oop_core" in dot format
 digraph "oop_core_helper_0_4" {
   // inputs
-  "img1" [shape=circle];
-  "img2" [shape=circle];
+  "img1_3" [shape=circle];
+  "img2_3" [shape=circle];
 
   // outputs
   "img2" [shape=circle];
@@ -708,11 +708,11 @@ digraph "oop_core_helper_0_4" {
   "103 D6" [shape=box];
   "103 D6" -> "img2";
   "102 E6" [shape=box];
-  "102 E6" -> "103 D6" [label="img2"];
+  "102 E6" -> "103 D6" [label="img2_1"];
   "100 -|" [shape=trapezium,orientation=270];
-  "100 -|" -> "102 E6" [label="img2"];
-  "img2" -> "100 -|";
-  "img1" -> "100 -|";
+  "100 -|" -> "102 E6" [label="img2_2"];
+  "img2_3" -> "100 -|";
+  "img1_3" -> "100 -|";
 }
 // graph for dag "oop_core_helper_0_5" of module "oop_core" in dot format
 digraph "oop_core_helper_0_5" {
@@ -727,7 +727,7 @@ digraph "oop_core_helper_0_5" {
   "105 thr" [shape=parallelogram];
   "105 thr" -> "img3";
   "104 <" [shape=trapezium,orientation=270];
-  "104 <" -> "105 thr" [label="img3"];
+  "104 <" -> "105 thr" [label="img3_1"];
   "img1" -> "104 <";
   "img2" -> "104 <";
 }
@@ -776,7 +776,7 @@ freia_status oop_core_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 
   // 0`imtmp_4 [0 poc 0] -> [0 alu] 69 sub
   // nope
-  // 0`imgtmp [0 poc 1] -> [0 alu] 69 sub
+  // 0`imgtmp_1 [0 poc 1] -> [0 alu] 69 sub
   // nope
   // alu 69 sub stage 0
   si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
@@ -849,22 +849,22 @@ freia_status oop_core_helper_0_1_0(freia_data2d * o0, freia_data2d * i0,
 
   // 0`imtmp_5 [0 poc 0] -> [0 alu] 78 sub
   // nope
-  // 0`img1 [0 poc 1] -> [0 alu] 78 sub
+  // 0`img1_4 [0 poc 1] -> [0 alu] 78 sub
   // nope
   // alu 78 sub stage 0
   si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
 
 
-  // output image 0`img1 on 0
-  // 0`img1 [0 alu] -> [0 output 0] 0 null
+  // output image 0`img1_3 on 0
+  // 0`img1_3 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`img1 [0 output 0] -> [2 output 0] 0 null
-  // 0`img1 [1 input 0] -> [2 output 0] 0 null
+  // 0`img1_3 [0 output 0] -> [2 output 0] 0 null
+  // 0`img1_3 [1 input 0] -> [2 output 0] 0 null
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`img1 [2 input 0] -> [2 output 0] 0 null
+  // 0`img1_3 [2 input 0] -> [2 output 0] 0 null
   si.mux[2][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
@@ -904,7 +904,7 @@ freia_status oop_core_helper_0_2_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`img1 [0 input 0] -> [0 alu] 81 absdiff
+  // 0`img1_3 [0 input 0] -> [0 alu] 81 absdiff
   // nope
   // 0`imgtmp [0 input 1] -> [0 alu] 81 absdiff
   // nope
@@ -913,10 +913,10 @@ freia_status oop_core_helper_0_2_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 1
-  // 0`img1 [0 alu] -> [1 poc 0] 82 erode_6c
+  // 0`img1_2 [0 alu] -> [1 poc 0] 82 erode_6c
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // 0`img1 [1 input 0] -> [1 poc 0] 82 erode_6c
+  // 0`img1_2 [1 input 0] -> [1 poc 0] 82 erode_6c
   // nope
   // poc 82 erode_6c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
@@ -926,9 +926,9 @@ freia_status oop_core_helper_0_2_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 2
-  // 0`img1 [1 poc 0] -> [2 poc 0] 83 dilate_6c
+  // 0`img1_1 [1 poc 0] -> [2 poc 0] 83 dilate_6c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`img1 [2 input 0] -> [2 poc 0] 83 dilate_6c
+  // 0`img1_1 [2 input 0] -> [2 poc 0] 83 dilate_6c
   // nope
   // poc 83 dilate_6c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_DILATE;
@@ -1000,22 +1000,22 @@ freia_status oop_core_helper_0_3_0(freia_data2d * o0, freia_data2d * i0,
 
   // 0`imtmp_7 [0 poc 0] -> [0 alu] 97 sub
   // nope
-  // 0`img2 [0 poc 1] -> [0 alu] 97 sub
+  // 0`img2_4 [0 poc 1] -> [0 alu] 97 sub
   // nope
   // alu 97 sub stage 0
   si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
 
 
-  // output image 0`img2 on 0
-  // 0`img2 [0 alu] -> [0 output 0] 0 null
+  // output image 0`img2_3 on 0
+  // 0`img2_3 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`img2 [0 output 0] -> [2 output 0] 0 null
-  // 0`img2 [1 input 0] -> [2 output 0] 0 null
+  // 0`img2_3 [0 output 0] -> [2 output 0] 0 null
+  // 0`img2_3 [1 input 0] -> [2 output 0] 0 null
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`img2 [2 input 0] -> [2 output 0] 0 null
+  // 0`img2_3 [2 input 0] -> [2 output 0] 0 null
   si.mux[2][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
@@ -1055,19 +1055,19 @@ freia_status oop_core_helper_0_4_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`img1 [0 input 0] -> [0 alu] 100 absdiff
+  // 0`img1_3 [0 input 0] -> [0 alu] 100 absdiff
   // nope
-  // 0`img2 [0 input 1] -> [0 alu] 100 absdiff
+  // 0`img2_3 [0 input 1] -> [0 alu] 100 absdiff
   // nope
   // alu 100 absdiff stage 0
   si.alu[0][0].op = SPOC_ALU_ABSSUB_IN0_IN1;
 
 
   // STAGE 1
-  // 0`img2 [0 alu] -> [1 poc 0] 102 erode_6c
+  // 0`img2_2 [0 alu] -> [1 poc 0] 102 erode_6c
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // 0`img2 [1 input 0] -> [1 poc 0] 102 erode_6c
+  // 0`img2_2 [1 input 0] -> [1 poc 0] 102 erode_6c
   // nope
   // poc 102 erode_6c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
@@ -1077,9 +1077,9 @@ freia_status oop_core_helper_0_4_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 2
-  // 0`img2 [1 poc 0] -> [2 poc 0] 103 dilate_6c
+  // 0`img2_1 [1 poc 0] -> [2 poc 0] 103 dilate_6c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`img2 [2 input 0] -> [2 poc 0] 103 dilate_6c
+  // 0`img2_1 [2 input 0] -> [2 poc 0] 103 dilate_6c
   // nope
   // poc 103 dilate_6c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_DILATE;
@@ -1142,7 +1142,7 @@ freia_status oop_core_helper_0_5_0(freia_data2d * o0, freia_data2d * i0, freia_d
   // alu 104 inf stage 0
   si.alu[0][0].op = SPOC_ALU_INF_IN0_IN1;
 
-  // 0`img3 [0 alu] -> [0 threshold 0] 105 threshold
+  // 0`img3_1 [0 alu] -> [0 threshold 0] 105 threshold
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
   // threshold 105 threshold stage 0 side 0
@@ -1201,6 +1201,8 @@ int oop_core(void)
    freia_data2d *imgtmp;                                                /*0020*/
 
    freia_status end;                                                    /*0029*/
+   // hardware accelerator generated variable
+   freia_data2d *img1_3 = freia_common_create_data(img1->bpp, img1->width, img1->height);
    
    // Input/output stream and image creations
    freia_common_open_input(&fdin, 0);                                   /*0032*/
@@ -1241,15 +1243,16 @@ int oop_core(void)
    
    oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0067*/
 
-   oop_core_helper_0_1_0(img1, imgtt2, freia_morpho_kernel_8c);         /*0076*/
+   oop_core_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);       /*0076*/
 
-   oop_core_helper_0_2_0(img1, img1, imgtmp, freia_morpho_kernel_6c);   /*0081*/
+   oop_core_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);                /*0081*/
 
    oop_core_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);         /*0095*/
 
-   oop_core_helper_0_4_0(img2, img1, img2, freia_morpho_kernel_6c);     /*0100*/
+   oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0100*/
 
    oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0104*/
+   freia_common_destruct_data(img1_3);
    
    
    // skipped stuff... drawing on img0...
@@ -1297,6 +1300,8 @@ int oop_core(void)
    freia_data2d *imgtmp;                                                /*0020*/
 
    freia_status end;                                                    /*0029*/
+   // hardware accelerator generated variable
+   freia_data2d *img1_3 = freia_common_create_data(img1->bpp, img1->width, img1->height);
    
    // Input/output stream and image creations
    freia_common_open_input(&fdin, 0);                                   /*0032*/
@@ -1337,15 +1342,16 @@ int oop_core(void)
    
    oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0067*/
 
-   oop_core_helper_0_1_0(img1, imgtt2, freia_morpho_kernel_8c);         /*0076*/
+   oop_core_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);       /*0076*/
 
-   oop_core_helper_0_2_0(img1, img1, imgtmp, freia_morpho_kernel_6c);   /*0081*/
+   oop_core_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);                /*0081*/
 
    oop_core_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);         /*0095*/
 
-   oop_core_helper_0_4_0(img2, img1, img2, freia_morpho_kernel_6c);     /*0100*/
+   oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0100*/
 
    oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0104*/
+   freia_common_destruct_data(img1_3);
    
    
    // skipped stuff... drawing on img0...

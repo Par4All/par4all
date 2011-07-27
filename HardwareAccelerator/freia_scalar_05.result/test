@@ -256,13 +256,13 @@ digraph "freia_scalar_05_helper_0_0" {
   "i" [shape=circle];
 
   // outputs
-  "X" [shape=circle];
+  "X_1" [shape=circle];
 
   // computation vertices
   "18 min" [shape=diamond];
   "17 E8" [shape=box];
-  "17 E8" -> "18 min" [label="X"];
-  "17 E8" -> "X";
+  "17 E8" -> "18 min" [label="X_1"];
+  "17 E8" -> "X_1";
   "15 max" [shape=diamond];
   "i" -> "17 E8";
   "i" -> "15 max";
@@ -270,7 +270,7 @@ digraph "freia_scalar_05_helper_0_0" {
 // graph for dag "freia_scalar_05_helper_0_1" of module "freia_scalar_05" in dot format
 digraph "freia_scalar_05_helper_0_1" {
   // inputs
-  "X" [shape=circle];
+  "X_1" [shape=circle];
   "i" [shape=circle];
 
   // outputs
@@ -280,7 +280,7 @@ digraph "freia_scalar_05_helper_0_1" {
   // computation vertices
   "19 thr" [shape=parallelogram];
   "19 thr" -> "tC";
-  "X" -> "19 thr";
+  "X_1" -> "19 thr";
   "22 vol" [shape=diamond];
   "21 D8" [shape=box];
   "21 D8" -> "22 vol" [label="X"];
@@ -363,27 +363,27 @@ freia_status freia_scalar_05_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = pi1[i];
 
-  // 0`X [1 poc 0] -> [1 measure 0] 17 erode_8c
+  // 0`X_1 [1 poc 0] -> [1 measure 0] 17 erode_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
 
 
-  // output image 0`X on 0
-  // 0`X [1 measure 0] -> [1 output 0] 0 null
+  // output image 0`X_1 on 0
+  // 0`X_1 [1 measure 0] -> [1 output 0] 0 null
   // nope
 
   // fill in to the end...
-  // 0`X [1 output 0] -> [7 output 0] 0 null
-  // 0`X [2 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [1 output 0] -> [7 output 0] 0 null
+  // 0`X_1 [2 input 0] -> [7 output 0] 0 null
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // 0`X [3 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [3 input 0] -> [7 output 0] 0 null
   si.mux[3][0].op = SPOC_MUX_IN0;
-  // 0`X [4 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [4 input 0] -> [7 output 0] 0 null
   si.mux[4][0].op = SPOC_MUX_IN0;
-  // 0`X [5 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [5 input 0] -> [7 output 0] 0 null
   si.mux[5][0].op = SPOC_MUX_IN0;
-  // 0`X [6 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [6 input 0] -> [7 output 0] 0 null
   si.mux[6][0].op = SPOC_MUX_IN0;
-  // 0`X [7 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [7 input 0] -> [7 output 0] 0 null
   si.mux[7][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
@@ -460,18 +460,20 @@ freia_status freia_scalar_05_helper_0_1_0(freia_data2d * o0, freia_data2d * o1, 
   // 0`X [1 poc 1] -> [1 measure 1] 21 dilate_8c
   si.mux[1][3].op = SPOC_MUX_IN1;
 
-  // 0`X [1 poc 1] -> [1 threshold 0] 19 threshold
-  si.mux[1][0].op = SPOC_MUX_IN1;
-  si.mux[1][2].op = SPOC_MUX_IN1;
-  // threshold 19 threshold stage 1 side 0
-  si.th[1][0].op = pi7? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[1][0].boundmin = pi5;
-  sp.th[1][0].boundmax = pi6;
+
+  // STAGE 0
+  // 0`X_1 [0 input 0] -> [0 threshold 0] 19 threshold
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // threshold 19 threshold stage 0 side 0
+  si.th[0][0].op = pi7? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][0].boundmin = pi5;
+  sp.th[0][0].boundmax = pi6;
 
 
   // output image 0`tC on 0 and image 0`X on 1
-  // 0`tC [1 threshold 0] -> [1 output 0] 0 null
-  // nope
+  // 0`tC [0 threshold 0] -> [1 output 0] 0 null
+  // 0`tC [1 input 0] -> [1 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
   // 0`tC [1 output 0] -> [7 output 0] 0 null

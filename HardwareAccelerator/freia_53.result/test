@@ -178,8 +178,8 @@ digraph "freia_53_helper_0_0" {
   "11 E8" [shape=box];
   "11 E8" -> "12 <" [label="tb"];
   "9 D8" [shape=box];
-  "9 D8" -> "10 <." [label="tb"];
-  "9 D8" -> "11 E8" [label="tb"];
+  "9 D8" -> "10 <." [label="tb_1"];
+  "9 D8" -> "11 E8" [label="tb_1"];
   "in" -> "9 D8";
 }
 // graph for dag "freia_53_helper_0_1" of module "freia_53" in dot format
@@ -235,11 +235,11 @@ freia_status freia_53_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 2
-  // 0`tb [0 poc 0] -> [2 poc 0] 11 erode_8c
+  // 0`tb_1 [0 poc 0] -> [2 poc 0] 11 erode_8c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`tb [1 input 0] -> [2 poc 0] 11 erode_8c
+  // 0`tb_1 [1 input 0] -> [2 poc 0] 11 erode_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`tb [2 input 0] -> [2 poc 0] 11 erode_8c
+  // 0`tb_1 [2 input 0] -> [2 poc 0] 11 erode_8c
   // nope
   // poc 11 erode_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_ERODE;
@@ -247,35 +247,36 @@ freia_status freia_53_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   for(i=0 ; i<9 ; i++)
     sp.poc[2][0].kernel[i] = pi0[i];
 
-  // 0`tb [2 poc 0] -> [2 alu] 10 inf_const
+
+  // STAGE 1
+  // 0`tb_1 [1 poc 0] -> [1 alu] 10 inf_const
   // nope
-  // alu 10 inf_const stage 2
-  si.alu[2][0].op = SPOC_ALU_INF_IN0_CONST;
-  sp.alu[2][0].constant = pi1;
+  // alu 10 inf_const stage 1
+  si.alu[1][0].op = SPOC_ALU_INF_IN0_CONST;
+  sp.alu[1][0].constant = pi1;
 
 
-  // STAGE 3
-  // 0`tc [2 alu] -> [3 alu] 12 inf
-  si.mux[2][0].op = SPOC_MUX_IN1;
-  si.mux[2][2].op = SPOC_MUX_IN0;
-  // 0`tc [3 input 0] -> [3 alu] 12 inf
+  // STAGE 2
+  // 0`tc [1 alu] -> [2 alu] 12 inf
+  si.mux[1][1].op = SPOC_MUX_IN1;
+  si.mux[1][3].op = SPOC_MUX_IN0;
+  // 0`tc [2 input 1] -> [2 alu] 12 inf
   // nope
-  // 0`tb [2 poc 0] -> [3 alu] 12 inf
-  si.mux[2][1].op = SPOC_MUX_IN0;
-  si.mux[2][3].op = SPOC_MUX_IN0;
-  // 0`tb [3 input 1] -> [3 alu] 12 inf
+  // 0`tb [2 poc 0] -> [2 alu] 12 inf
   // nope
-  // alu 12 inf stage 3
-  si.alu[3][0].op = SPOC_ALU_INF_IN0_IN1;
+  // alu 12 inf stage 2
+  si.alu[2][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
   // output image 0`td on 0
-  // 0`td [3 alu] -> [3 output 0] 0 null
-  si.mux[3][0].op = SPOC_MUX_IN1;
-  si.mux[3][2].op = SPOC_MUX_IN0;
+  // 0`td [2 alu] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN1;
+  si.mux[2][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`td [3 output 0] -> [7 output 0] 0 null
+  // 0`td [2 output 0] -> [7 output 0] 0 null
+  // 0`td [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
   // 0`td [4 input 0] -> [7 output 0] 0 null
   si.mux[4][0].op = SPOC_MUX_IN0;
   // 0`td [5 input 0] -> [7 output 0] 0 null

@@ -311,30 +311,30 @@ digraph "median_1_helper_0_0" {
   "33 D8" [shape=box];
   "33 D8" -> "35 >" [label="t"];
   "32 E8" [shape=box];
-  "32 E8" -> "33 D8" [label="t"];
+  "32 E8" -> "33 D8" [label="t_1"];
   "29 E8" [shape=box];
-  "29 E8" -> "32 E8" [label="t"];
+  "29 E8" -> "32 E8" [label="t_2"];
   "28 D8" [shape=box];
-  "28 D8" -> "29 E8" [label="t"];
+  "28 D8" -> "29 E8" [label="t_3"];
   "25 D8" [shape=box];
-  "25 D8" -> "28 D8" [label="t"];
+  "25 D8" -> "28 D8" [label="t_4"];
   "24 E8" [shape=box];
-  "24 E8" -> "25 D8" [label="t"];
+  "24 E8" -> "25 D8" [label="t_5"];
   "21 <" [shape=trapezium,orientation=270];
-  "21 <" -> "35 >" [label="o"];
+  "21 <" -> "35 >" [label="o_1"];
   "19 E8" [shape=box];
-  "19 E8" -> "24 E8" [label="t"];
-  "19 E8" -> "21 <" [label="t"];
+  "19 E8" -> "24 E8" [label="t_6"];
+  "19 E8" -> "21 <" [label="t_6"];
   "18 D8" [shape=box];
-  "18 D8" -> "19 E8" [label="t"];
+  "18 D8" -> "19 E8" [label="t_7"];
   "15 D8" [shape=box];
-  "15 D8" -> "18 D8" [label="t"];
+  "15 D8" -> "18 D8" [label="t_8"];
   "14 E8" [shape=box];
-  "14 E8" -> "15 D8" [label="t"];
+  "14 E8" -> "15 D8" [label="t_9"];
   "11 E8" [shape=box];
-  "11 E8" -> "14 E8" [label="t"];
+  "11 E8" -> "14 E8" [label="t_10"];
   "10 D8" [shape=box];
-  "10 D8" -> "11 E8" [label="t"];
+  "10 D8" -> "11 E8" [label="t_11"];
   "i" -> "21 <";
   "i" -> "10 D8";
 }
@@ -374,12 +374,12 @@ freia_status median_1_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_11 on 0
+  // 0`t_11 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_11 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -419,7 +419,7 @@ freia_status median_1_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 11 erode_8c
+  // 0`t_11 [0 input 0] -> [0 poc 0] 11 erode_8c
   // nope
   // poc 11 erode_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_ERODE;
@@ -428,12 +428,12 @@ freia_status median_1_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, freia_d
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_10 on 0
+  // 0`t_10 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_10 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -473,7 +473,7 @@ freia_status median_1_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 14 erode_8c
+  // 0`t_10 [0 input 0] -> [0 poc 0] 14 erode_8c
   // nope
   // poc 14 erode_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_ERODE;
@@ -482,12 +482,12 @@ freia_status median_1_helper_0_0_2(freia_data2d * o0, freia_data2d * i0, freia_d
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_9 on 0
+  // 0`t_9 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_9 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -527,7 +527,7 @@ freia_status median_1_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 15 dilate_8c
+  // 0`t_9 [0 input 0] -> [0 poc 0] 15 dilate_8c
   // nope
   // poc 15 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -536,12 +536,12 @@ freia_status median_1_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, freia_d
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_8 on 0
+  // 0`t_8 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_8 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -581,7 +581,7 @@ freia_status median_1_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 18 dilate_8c
+  // 0`t_8 [0 input 0] -> [0 poc 0] 18 dilate_8c
   // nope
   // poc 18 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -590,12 +590,12 @@ freia_status median_1_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, freia_d
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_7 on 0
+  // 0`t_7 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_7 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -635,7 +635,7 @@ freia_status median_1_helper_0_0_5(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 19 erode_8c
+  // 0`t_7 [0 input 0] -> [0 poc 0] 19 erode_8c
   // nope
   // poc 19 erode_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_ERODE;
@@ -643,7 +643,7 @@ freia_status median_1_helper_0_0_5(freia_data2d * o0, freia_data2d * o1, freia_d
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = pi0[i];
 
-  // 0`t [0 poc 0] -> [0 alu] 21 inf
+  // 0`t_6 [0 poc 0] -> [0 alu] 21 inf
   // nope
   // i [0 input 1] -> [0 alu] 21 inf
   // nope
@@ -651,20 +651,20 @@ freia_status median_1_helper_0_0_5(freia_data2d * o0, freia_data2d * o1, freia_d
   si.alu[0][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
-  // output image 0`t on 0 and image o on 1
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_6 on 0 and image o_1 on 1
+  // 0`t_6 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_6 [0 output 0] -> [0 output 0] 0 null
   // nope
 
-  // o [0 alu] -> [0 output 1] 0 null
+  // o_1 [0 alu] -> [0 output 1] 0 null
   si.mux[0][1].op = SPOC_MUX_IN1;
   si.mux[0][3].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // o [0 output 1] -> [0 output 1] 0 null
+  // o_1 [0 output 1] -> [0 output 1] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -704,7 +704,7 @@ freia_status median_1_helper_0_0_6(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 24 erode_8c
+  // 0`t_6 [0 input 0] -> [0 poc 0] 24 erode_8c
   // nope
   // poc 24 erode_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_ERODE;
@@ -713,12 +713,12 @@ freia_status median_1_helper_0_0_6(freia_data2d * o0, freia_data2d * i0, freia_d
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_5 on 0
+  // 0`t_5 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_5 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -758,7 +758,7 @@ freia_status median_1_helper_0_0_7(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 25 dilate_8c
+  // 0`t_5 [0 input 0] -> [0 poc 0] 25 dilate_8c
   // nope
   // poc 25 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -767,12 +767,12 @@ freia_status median_1_helper_0_0_7(freia_data2d * o0, freia_data2d * i0, freia_d
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_4 on 0
+  // 0`t_4 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_4 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -812,7 +812,7 @@ freia_status median_1_helper_0_0_8(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 28 dilate_8c
+  // 0`t_4 [0 input 0] -> [0 poc 0] 28 dilate_8c
   // nope
   // poc 28 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -821,12 +821,12 @@ freia_status median_1_helper_0_0_8(freia_data2d * o0, freia_data2d * i0, freia_d
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_3 on 0
+  // 0`t_3 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_3 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -866,7 +866,7 @@ freia_status median_1_helper_0_0_9(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 29 erode_8c
+  // 0`t_3 [0 input 0] -> [0 poc 0] 29 erode_8c
   // nope
   // poc 29 erode_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_ERODE;
@@ -875,12 +875,12 @@ freia_status median_1_helper_0_0_9(freia_data2d * o0, freia_data2d * i0, freia_d
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_2 on 0
+  // 0`t_2 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_2 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -920,7 +920,7 @@ freia_status median_1_helper_0_0_10(freia_data2d * o0, freia_data2d * i0, freia_
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 32 erode_8c
+  // 0`t_2 [0 input 0] -> [0 poc 0] 32 erode_8c
   // nope
   // poc 32 erode_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_ERODE;
@@ -929,12 +929,12 @@ freia_status median_1_helper_0_0_10(freia_data2d * o0, freia_data2d * i0, freia_
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t on 0
-  // 0`t [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t_1 on 0
+  // 0`t_1 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [0 output 0] -> [0 output 0] 0 null
+  // 0`t_1 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -974,7 +974,7 @@ freia_status median_1_helper_0_0_11(freia_data2d * o0, freia_data2d * i0, freia_
 
 
   // STAGE 0
-  // 0`t [0 input 0] -> [0 poc 0] 33 dilate_8c
+  // 0`t_1 [0 input 0] -> [0 poc 0] 33 dilate_8c
   // nope
   // poc 33 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -984,7 +984,7 @@ freia_status median_1_helper_0_0_11(freia_data2d * o0, freia_data2d * i0, freia_
 
   // 0`t [0 poc 0] -> [0 alu] 35 sup
   // nope
-  // o [0 input 1] -> [0 alu] 35 sup
+  // o_1 [0 input 1] -> [0 alu] 35 sup
   // nope
   // alu 35 sup stage 0
   si.alu[0][0].op = SPOC_ALU_SUP_IN0_IN1;
@@ -1023,6 +1023,8 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
 {
    freia_status ret;                                                    /*0005*/
    freia_data2d *t = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);        /*0006*/
+   // hardware accelerator generated variable
+   freia_data2d *o_1 = freia_common_create_data(o->bpp, o->width, o->height);
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
@@ -1035,23 +1037,24 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // ret |= freia_cipo_close(t, t, c, 1);
    ret |= median_1_helper_0_0_4(t, t, i, freia_morpho_kernel_8c);       /*0018*/
-   ret |= median_1_helper_0_0_5(t, o, t, i, freia_morpho_kernel_8c);    /*0019*/
+   ret |= median_1_helper_0_0_5(t, o_1, t, i, freia_morpho_kernel_8c);  /*0019*/
 
    ret |= 0;                                                            /*0021*/
    
    // ret |= freia_cipo_open(t, i, c, 1);
-   ret |= median_1_helper_0_0_6(t, t, o, freia_morpho_kernel_8c);       /*0024*/
-   ret |= median_1_helper_0_0_7(t, t, o, freia_morpho_kernel_8c);       /*0025*/
+   ret |= median_1_helper_0_0_6(t, t, o_1, freia_morpho_kernel_8c);     /*0024*/
+   ret |= median_1_helper_0_0_7(t, t, o_1, freia_morpho_kernel_8c);     /*0025*/
    
    // ret |= freia_cipo_close(t, t, c, 1);
-   ret |= median_1_helper_0_0_8(t, t, o, freia_morpho_kernel_8c);       /*0028*/
-   ret |= median_1_helper_0_0_9(t, t, o, freia_morpho_kernel_8c);       /*0029*/
+   ret |= median_1_helper_0_0_8(t, t, o_1, freia_morpho_kernel_8c);     /*0028*/
+   ret |= median_1_helper_0_0_9(t, t, o_1, freia_morpho_kernel_8c);     /*0029*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
-   ret |= median_1_helper_0_0_10(t, t, o, freia_morpho_kernel_8c);      /*0032*/
-   ret |= median_1_helper_0_0_11(o, t, o, freia_morpho_kernel_8c);      /*0033*/
+   ret |= median_1_helper_0_0_10(t, t, o_1, freia_morpho_kernel_8c);    /*0032*/
+   ret |= median_1_helper_0_0_11(o, t, o_1, freia_morpho_kernel_8c);    /*0033*/
 
    ret |= 0;                                                            /*0035*/
+   freia_common_destruct_data(o_1);
    
    // cleanup
    ret |= freia_common_destruct_data(t);                                /*0038*/
@@ -1064,6 +1067,8 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
 {
    freia_status ret;                                                    /*0005*/
    freia_data2d *t = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);        /*0006*/
+   // hardware accelerator generated variable
+   freia_data2d *o_1 = freia_common_create_data(o->bpp, o->width, o->height);
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
@@ -1076,21 +1081,22 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // ret |= freia_cipo_close(t, t, c, 1);
    ret |= median_1_helper_0_0_4(t, t, i, freia_morpho_kernel_8c);       /*0018*/
-   ret |= median_1_helper_0_0_5(t, o, t, i, freia_morpho_kernel_8c);    /*0019*/
+   ret |= median_1_helper_0_0_5(t, o_1, t, i, freia_morpho_kernel_8c);  /*0019*/
    
    
    // ret |= freia_cipo_open(t, i, c, 1);
-   ret |= median_1_helper_0_0_6(t, t, o, freia_morpho_kernel_8c);       /*0024*/
-   ret |= median_1_helper_0_0_7(t, t, o, freia_morpho_kernel_8c);       /*0025*/
+   ret |= median_1_helper_0_0_6(t, t, o_1, freia_morpho_kernel_8c);     /*0024*/
+   ret |= median_1_helper_0_0_7(t, t, o_1, freia_morpho_kernel_8c);     /*0025*/
    
    // ret |= freia_cipo_close(t, t, c, 1);
-   ret |= median_1_helper_0_0_8(t, t, o, freia_morpho_kernel_8c);       /*0028*/
-   ret |= median_1_helper_0_0_9(t, t, o, freia_morpho_kernel_8c);       /*0029*/
+   ret |= median_1_helper_0_0_8(t, t, o_1, freia_morpho_kernel_8c);     /*0028*/
+   ret |= median_1_helper_0_0_9(t, t, o_1, freia_morpho_kernel_8c);     /*0029*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
-   ret |= median_1_helper_0_0_10(t, t, o, freia_morpho_kernel_8c);      /*0032*/
-   ret |= median_1_helper_0_0_11(o, t, o, freia_morpho_kernel_8c);      /*0033*/
-   
+   ret |= median_1_helper_0_0_10(t, t, o_1, freia_morpho_kernel_8c);    /*0032*/
+   ret |= median_1_helper_0_0_11(o, t, o_1, freia_morpho_kernel_8c);    /*0033*/
+
+   freia_common_destruct_data(o_1);
    
    // cleanup
    ret |= freia_common_destruct_data(t);                                /*0038*/

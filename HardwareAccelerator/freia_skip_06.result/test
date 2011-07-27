@@ -153,7 +153,7 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_skip_06_helper_0_0" of module "freia_skip_06" in dot format
 digraph "freia_skip_06_helper_0_0" {
   // inputs
-  "i" [shape=circle];
+  "i_1" [shape=circle];
 
   // outputs
   "i" [shape=circle];
@@ -165,8 +165,8 @@ digraph "freia_skip_06_helper_0_0" {
   "7 +" [shape=trapezium,orientation=270];
   "7 +" -> "10 &." [label="i"];
   "7 +" -> "i";
-  "i" -> "7 +";
-  "i" -> "7 +";
+  "i_1" -> "7 +";
+  "i_1" -> "7 +";
 }
 // graph for dag "freia_skip_06_helper_0_1" of module "freia_skip_06" in dot format
 digraph "freia_skip_06_helper_0_1" {
@@ -212,9 +212,9 @@ freia_status freia_skip_06_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 alu] 7 add
+  // i_1 [0 input 0] -> [0 alu] 7 add
   // nope
-  // i [0 input 1] -> [0 alu] 7 add
+  // i_1 [0 input 1] -> [0 alu] 7 add
   // nope
   // alu 7 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;

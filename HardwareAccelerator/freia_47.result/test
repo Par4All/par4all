@@ -136,7 +136,7 @@ digraph "dag_cleaned_0" {
 digraph "freia_47_helper_0_0" {
   // inputs
   "in" [shape=circle];
-  "o1" [shape=circle];
+  "o1_1" [shape=circle];
 
   // outputs
   "o1" [shape=circle];
@@ -148,7 +148,7 @@ digraph "freia_47_helper_0_0" {
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "10 *" [label="o1"];
   "9 +" -> "o1";
-  "o1" -> "9 +";
+  "o1_1" -> "9 +";
   "in" -> "10 *";
   "in" -> "9 +";
 }
@@ -180,7 +180,7 @@ freia_status freia_47_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // STAGE 0
   // in [0 input 0] -> [0 alu] 9 add
   // nope
-  // o1 [0 input 1] -> [0 alu] 9 add
+  // o1_1 [0 input 1] -> [0 alu] 9 add
   // nope
   // alu 9 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;

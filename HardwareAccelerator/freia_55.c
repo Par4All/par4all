@@ -15,6 +15,5 @@ freia_status freia_55(freia_data2d * out, freia_data2d * in)
   freia_common_destruct_data(ta);
   freia_common_destruct_data(tb);
   freia_common_destruct_data(tc);
-  freia_common_destruct_data(td);
   return FREIA_OK;
 }

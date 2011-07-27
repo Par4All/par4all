@@ -199,10 +199,10 @@ digraph "anr999_03_helper_0_0" {
   "34 -" [shape=trapezium,orientation=270];
   "34 -" -> "og";
   "29 D8" [shape=box];
-  "29 D8" -> "30 D8" [label="od"];
-  "29 D8" -> "34 -" [label="od"];
+  "29 D8" -> "30 D8" [label="od_1"];
+  "29 D8" -> "34 -" [label="od_1"];
   "33 E8" [shape=box];
-  "33 E8" -> "34 -" [label="og"];
+  "33 E8" -> "34 -" [label="og_1"];
   "in" -> "29 D8";
   "in" -> "33 E8";
 }
@@ -295,18 +295,18 @@ freia_status anr999_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
   for(i=0 ; i<9 ; i++)
     sp.poc[0][1].kernel[i] = pi0[i];
 
-  // 0`og [0 poc 0] -> [0 alu] 34 sub
+  // 0`og_1 [0 poc 0] -> [0 alu] 34 sub
   // nope
-  // 0`od [0 poc 1] -> [0 alu] 34 sub
+  // 0`od_1 [0 poc 1] -> [0 alu] 34 sub
   // nope
   // alu 34 sub stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_SUB_IN1_IN0;
 
 
   // STAGE 1
-  // 0`od [0 poc 1] -> [1 poc 1] 30 dilate_8c
+  // 0`od_1 [0 poc 1] -> [1 poc 1] 30 dilate_8c
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // 0`od [1 input 1] -> [1 poc 1] 30 dilate_8c
+  // 0`od_1 [1 input 1] -> [1 poc 1] 30 dilate_8c
   // nope
   // poc 30 dilate_8c stage 1 side 1
   si.poc[1][1].op = SPOC_POC_DILATE;

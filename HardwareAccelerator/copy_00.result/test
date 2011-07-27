@@ -189,8 +189,8 @@ digraph "copy_00_helper_0_0" {
   "18 D8" [shape=box];
   "18 D8" -> "22 -" [label="b"];
   "12 D8" [shape=box];
-  "12 D8" -> "19 E8" [label="a"];
-  "12 D8" -> "18 D8" [label="a"];
+  "12 D8" -> "19 E8" [label="a_1"];
+  "12 D8" -> "18 D8" [label="a_1"];
   "in" -> "12 D8";
 }
 // graph for dag "copy_00_helper_0_1" of module "copy_00" in dot format
@@ -209,12 +209,12 @@ digraph "copy_00_helper_0_1" {
   "23 D8" [shape=box];
   "23 D8" -> "27 -" [label="d"];
   "17 E8" [shape=box];
-  "17 E8" -> "24 E8" [label="c"];
+  "17 E8" -> "24 E8" [label="c_1"];
   "16 D8" [shape=box];
-  "16 D8" -> "23 D8" [label="d"];
+  "16 D8" -> "23 D8" [label="d_1"];
   "13 E8" [shape=box];
-  "13 E8" -> "17 E8" [label="c"];
-  "13 E8" -> "16 D8" [label="c"];
+  "13 E8" -> "17 E8" [label="c_2"];
+  "13 E8" -> "16 D8" [label="c_2"];
   "in" -> "13 E8";
 }
 // graph for dag "dag_0" of module "copy_00" in dot format
@@ -324,11 +324,11 @@ freia_status copy_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 2
-  // 0`a [0 poc 0] -> [2 poc 0] 18 dilate_8c
+  // 0`a_1 [0 poc 0] -> [2 poc 0] 18 dilate_8c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`a [1 input 0] -> [2 poc 0] 18 dilate_8c
+  // 0`a_1 [1 input 0] -> [2 poc 0] 18 dilate_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`a [2 input 0] -> [2 poc 0] 18 dilate_8c
+  // 0`a_1 [2 input 0] -> [2 poc 0] 18 dilate_8c
   // nope
   // poc 18 dilate_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_DILATE;
@@ -336,10 +336,10 @@ freia_status copy_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   for(i=0 ; i<9 ; i++)
     sp.poc[2][0].kernel[i] = pi0[i];
 
-  // 0`a [1 poc 0] -> [2 poc 1] 19 erode_8c
+  // 0`a_1 [1 poc 0] -> [2 poc 1] 19 erode_8c
   si.mux[1][1].op = SPOC_MUX_IN0;
   si.mux[1][3].op = SPOC_MUX_IN0;
-  // 0`a [2 input 1] -> [2 poc 1] 19 erode_8c
+  // 0`a_1 [2 input 1] -> [2 poc 1] 19 erode_8c
   // nope
   // poc 19 erode_8c stage 2 side 1
   si.poc[2][1].op = SPOC_POC_ERODE;
@@ -420,11 +420,11 @@ freia_status copy_00_helper_0_1_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 2
-  // 0`c [0 poc 0] -> [2 poc 0] 16 dilate_8c
+  // 0`c_2 [0 poc 0] -> [2 poc 0] 16 dilate_8c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`c [1 input 0] -> [2 poc 0] 16 dilate_8c
+  // 0`c_2 [1 input 0] -> [2 poc 0] 16 dilate_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`c [2 input 0] -> [2 poc 0] 16 dilate_8c
+  // 0`c_2 [2 input 0] -> [2 poc 0] 16 dilate_8c
   // nope
   // poc 16 dilate_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_DILATE;
@@ -432,10 +432,10 @@ freia_status copy_00_helper_0_1_0(freia_data2d * o0, freia_data2d * i0,
   for(i=0 ; i<9 ; i++)
     sp.poc[2][0].kernel[i] = pi0[i];
 
-  // 0`c [1 poc 0] -> [2 poc 1] 17 erode_8c
+  // 0`c_2 [1 poc 0] -> [2 poc 1] 17 erode_8c
   si.mux[1][1].op = SPOC_MUX_IN0;
   si.mux[1][3].op = SPOC_MUX_IN0;
-  // 0`c [2 input 1] -> [2 poc 1] 17 erode_8c
+  // 0`c_2 [2 input 1] -> [2 poc 1] 17 erode_8c
   // nope
   // poc 17 erode_8c stage 2 side 1
   si.poc[2][1].op = SPOC_POC_ERODE;
@@ -445,9 +445,9 @@ freia_status copy_00_helper_0_1_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 3
-  // 0`d [2 poc 0] -> [3 poc 0] 23 dilate_8c
+  // 0`d_1 [2 poc 0] -> [3 poc 0] 23 dilate_8c
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // 0`d [3 input 0] -> [3 poc 0] 23 dilate_8c
+  // 0`d_1 [3 input 0] -> [3 poc 0] 23 dilate_8c
   // nope
   // poc 23 dilate_8c stage 3 side 0
   si.poc[3][0].op = SPOC_POC_DILATE;
@@ -455,9 +455,9 @@ freia_status copy_00_helper_0_1_0(freia_data2d * o0, freia_data2d * i0,
   for(i=0 ; i<9 ; i++)
     sp.poc[3][0].kernel[i] = pi0[i];
 
-  // 0`c [2 poc 1] -> [3 poc 1] 24 erode_8c
+  // 0`c_1 [2 poc 1] -> [3 poc 1] 24 erode_8c
   si.mux[2][3].op = SPOC_MUX_IN1;
-  // 0`c [3 input 1] -> [3 poc 1] 24 erode_8c
+  // 0`c_1 [3 input 1] -> [3 poc 1] 24 erode_8c
   // nope
   // poc 24 erode_8c stage 3 side 1
   si.poc[3][1].op = SPOC_POC_ERODE;

@@ -341,7 +341,7 @@ digraph "dag_cleaned_1" {
 digraph "freia_51_helper_0_0" {
   // inputs
   "in" [shape=circle];
-  "out" [shape=circle];
+  "out_1" [shape=circle];
 
   // outputs
   "out" [shape=circle];
@@ -349,7 +349,7 @@ digraph "freia_51_helper_0_0" {
   // computation vertices
   "35 -" [shape=trapezium,orientation=270];
   "35 -" -> "out";
-  "out" -> "35 -";
+  "out_1" -> "35 -";
   "in" -> "35 -";
 }
 // graph for dag "freia_51_helper_1_0" of module "freia_51" in dot format
@@ -358,7 +358,7 @@ digraph "freia_51_helper_1_0" {
   "in" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out_3" [shape=circle];
   "t4" [shape=circle];
 
   // computation vertices
@@ -369,9 +369,9 @@ digraph "freia_51_helper_1_0" {
   "20 D8" [shape=box];
   "20 D8" -> "21 <." [label="t2"];
   "15 !" [shape=trapezium,orientation=270];
-  "15 !" -> "20 D8" [label="out"];
+  "15 !" -> "20 D8" [label="out_2"];
   "12 E8" [shape=box];
-  "12 E8" -> "out";
+  "12 E8" -> "out_3";
   "in" -> "15 !";
   "in" -> "12 E8";
 }
@@ -419,7 +419,7 @@ freia_status freia_51_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   // STAGE 0
   // 0`in [0 input 0] -> [0 alu] 35 sub
   // nope
-  // 0`out [0 input 1] -> [0 alu] 35 sub
+  // 0`out_1 [0 input 1] -> [0 alu] 35 sub
   // nope
   // alu 35 sub stage 0
   si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
@@ -500,9 +500,10 @@ freia_status freia_51_helper_1_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 1
-  // 0`out [0 poc 0] -> [1 poc 0] 20 dilate_8c
-  si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`out [1 input 0] -> [1 poc 0] 20 dilate_8c
+  // 0`out_2 [0 alu] -> [1 poc 0] 20 dilate_8c
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`out_2 [1 input 0] -> [1 poc 0] 20 dilate_8c
   // nope
   // poc 20 dilate_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_DILATE;
@@ -530,26 +531,26 @@ freia_status freia_51_helper_1_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
     sp.poc[2][0].kernel[i] = pi0[i];
 
 
-  // output image 0`out on 1 and image 0`t4 on 0
-  // 0`out [0 poc 0] -> [2 output 1] 0 null
+  // output image 0`out_3 on 1 and image 0`t4 on 0
+  // 0`out_3 [0 poc 0] -> [2 output 1] 0 null
   si.mux[0][1].op = SPOC_MUX_IN0;
   si.mux[0][3].op = SPOC_MUX_IN0;
-  // 0`out [1 input 1] -> [2 output 1] 0 null
+  // 0`out_3 [1 input 1] -> [2 output 1] 0 null
   si.mux[1][3].op = SPOC_MUX_IN1;
-  // 0`out [2 input 1] -> [2 output 1] 0 null
+  // 0`out_3 [2 input 1] -> [2 output 1] 0 null
   si.mux[2][3].op = SPOC_MUX_IN1;
 
   // fill in to the end...
-  // 0`out [2 output 1] -> [7 output 1] 0 null
-  // 0`out [3 input 1] -> [7 output 1] 0 null
+  // 0`out_3 [2 output 1] -> [7 output 1] 0 null
+  // 0`out_3 [3 input 1] -> [7 output 1] 0 null
   si.mux[3][3].op = SPOC_MUX_IN1;
-  // 0`out [4 input 1] -> [7 output 1] 0 null
+  // 0`out_3 [4 input 1] -> [7 output 1] 0 null
   si.mux[4][3].op = SPOC_MUX_IN1;
-  // 0`out [5 input 1] -> [7 output 1] 0 null
+  // 0`out_3 [5 input 1] -> [7 output 1] 0 null
   si.mux[5][3].op = SPOC_MUX_IN1;
-  // 0`out [6 input 1] -> [7 output 1] 0 null
+  // 0`out_3 [6 input 1] -> [7 output 1] 0 null
   si.mux[6][3].op = SPOC_MUX_IN1;
-  // 0`out [7 input 1] -> [7 output 1] 0 null
+  // 0`out_3 [7 input 1] -> [7 output 1] 0 null
   si.mux[7][3].op = SPOC_MUX_IN1;
 
   // 0`t4 [2 poc 0] -> [2 output 0] 0 null

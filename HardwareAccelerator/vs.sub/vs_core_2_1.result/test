@@ -389,11 +389,11 @@ digraph "dag_cleaned_0" {
 // graph for dag "vs_core_2_helper_0_0" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_0" {
   // inputs
-  "bg" [shape=circle];
+  "bg_3" [shape=circle];
   "in" [shape=circle];
 
   // outputs
-  "mv" [shape=circle];
+  "mv_6" [shape=circle];
   "t0" [shape=circle];
 
   // computation vertices
@@ -402,10 +402,10 @@ digraph "vs_core_2_helper_0_0" {
   "27 min" [shape=diamond];
   "26 max" [shape=diamond];
   "15 -|" [shape=trapezium,orientation=270];
-  "15 -|" -> "27 min" [label="mv"];
-  "15 -|" -> "26 max" [label="mv"];
-  "15 -|" -> "mv";
-  "bg" -> "15 -|";
+  "15 -|" -> "27 min" [label="mv_6"];
+  "15 -|" -> "26 max" [label="mv_6"];
+  "15 -|" -> "mv_6";
+  "bg_3" -> "15 -|";
   "in" -> "19 *.";
   "in" -> "15 -|";
 }
@@ -413,7 +413,7 @@ digraph "vs_core_2_helper_0_0" {
 digraph "vs_core_2_helper_0_1" {
   // inputs
   "t0" [shape=circle];
-  "bg" [shape=circle];
+  "bg_3" [shape=circle];
 
   // outputs
   "bg" [shape=circle];
@@ -422,44 +422,44 @@ digraph "vs_core_2_helper_0_1" {
   "22 /." [shape=trapezium,orientation=270];
   "22 /." -> "bg";
   "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "22 /." [label="bg"];
+  "21 +" -> "22 /." [label="bg_1"];
   "t0" -> "21 +";
   "20 *." [shape=trapezium,orientation=270];
-  "20 *." -> "21 +" [label="bg"];
-  "bg" -> "20 *.";
+  "20 *." -> "21 +" [label="bg_2"];
+  "bg_3" -> "20 *.";
 }
 // graph for dag "vs_core_2_helper_0_2" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_2" {
   // inputs
-  "mv" [shape=circle];
+  "mv_6" [shape=circle];
 
   // outputs
-  "mv" [shape=circle];
+  "mv_1" [shape=circle];
 
   // computation vertices
   "44 &." [shape=trapezium,orientation=270];
-  "44 &." -> "mv";
+  "44 &." -> "mv_1";
   "43 -." [shape=trapezium,orientation=270];
-  "43 -." -> "44 &." [label="mv"];
+  "43 -." -> "44 &." [label="mv_2"];
   "41 -" [shape=trapezium,orientation=270];
-  "41 -" -> "43 -." [label="mv"];
+  "41 -" -> "43 -." [label="mv_3"];
   "40 E8" [shape=box];
-  "40 E8" -> "41 -" [label="mv"];
+  "40 E8" -> "41 -" [label="mv_4"];
   "39 D8" [shape=box];
   "39 D8" -> "41 -" [label="t2"];
   "36 D8" [shape=box];
   "36 D8" -> "40 E8" [label="t1"];
   "36 D8" -> "39 D8" [label="t1"];
   "35 E8" [shape=box];
-  "35 E8" -> "36 D8" [label="t1"];
+  "35 E8" -> "36 D8" [label="t1_1"];
   "32 thr" [shape=parallelogram];
-  "32 thr" -> "35 E8" [label="mv"];
-  "mv" -> "32 thr";
+  "32 thr" -> "35 E8" [label="mv_5"];
+  "mv_6" -> "32 thr";
 }
 // graph for dag "vs_core_2_helper_0_3" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_3" {
   // inputs
-  "mv" [shape=circle];
+  "mv_1" [shape=circle];
   "stab" [shape=circle];
 
   // outputs
@@ -468,7 +468,7 @@ digraph "vs_core_2_helper_0_3" {
   // computation vertices
   "45 *" [shape=trapezium,orientation=270];
   "45 *" -> "mv";
-  "mv" -> "45 *";
+  "mv_1" -> "45 *";
   "stab" -> "45 *";
 }
 
@@ -499,27 +499,27 @@ freia_status vs_core_2_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_
 
 
   // STAGE 0
-  // bg [0 input 0] -> [0 alu] 15 absdiff
+  // bg_3 [0 input 0] -> [0 alu] 15 absdiff
   // nope
   // in [0 input 1] -> [0 alu] 15 absdiff
   // nope
   // alu 15 absdiff stage 0
   si.alu[0][0].op = SPOC_ALU_ABSSUB_IN0_IN1;
 
-  // mv [0 alu] -> [0 measure 0] 15 absdiff
+  // mv_6 [0 alu] -> [0 measure 0] 15 absdiff
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
-  // mv [0 measure 0] -> [0 measure 0] 15 absdiff
+  // mv_6 [0 measure 0] -> [0 measure 0] 15 absdiff
   // nope
 
 
-  // output image mv on 0
-  // mv [0 measure 0] -> [0 output 0] 0 null
+  // output image mv_6 on 0
+  // mv_6 [0 measure 0] -> [0 output 0] 0 null
   // nope
 
   // fill in to the end...
-  // mv [0 output 0] -> [0 output 0] 0 null
+  // mv_6 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -621,20 +621,20 @@ freia_status vs_core_2_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_
 
 
   // STAGE 0
-  // bg [0 input 1] -> [0 alu] 20 mul_const
+  // bg_3 [0 input 1] -> [0 alu] 20 mul_const
   // nope
   // alu 20 mul_const stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_MUL_IN1_CONST;
   sp.alu[0][0].constant = pi0;
 
 
-  // output image bg on 0
-  // bg [0 alu] -> [0 output 0] 0 null
+  // output image bg_2 on 0
+  // bg_2 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // bg [0 output 0] -> [0 output 0] 0 null
+  // bg_2 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -675,19 +675,19 @@ freia_status vs_core_2_helper_0_1_1(freia_data2d * o0, freia_data2d * i0, freia_
   // STAGE 0
   // 0`t0 [0 input 0] -> [0 alu] 21 add
   // nope
-  // bg [0 input 1] -> [0 alu] 21 add
+  // bg_2 [0 input 1] -> [0 alu] 21 add
   // nope
   // alu 21 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
 
 
-  // output image bg on 0
-  // bg [0 alu] -> [0 output 0] 0 null
+  // output image bg_1 on 0
+  // bg_1 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // bg [0 output 0] -> [0 output 0] 0 null
+  // bg_1 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -727,7 +727,7 @@ freia_status vs_core_2_helper_0_1_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // bg [0 input 0] -> [0 alu] 22 div_const
+  // bg_1 [0 input 0] -> [0 alu] 22 div_const
   // nope
   // alu 22 div_const stage 0
   si.alu[0][0].op = SPOC_ALU_DIV_IN0_CONST;
@@ -782,7 +782,7 @@ freia_status vs_core_2_helper_0_2_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // mv [0 input 0] -> [0 threshold 0] 32 threshold
+  // mv_6 [0 input 0] -> [0 threshold 0] 32 threshold
   si.mux[0][0].op = SPOC_MUX_IN0;
   // threshold 32 threshold stage 0 side 0
   si.th[0][0].op = pi2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
@@ -790,12 +790,12 @@ freia_status vs_core_2_helper_0_2_0(freia_data2d * o0, freia_data2d * i0,
   sp.th[0][0].boundmax = pi1;
 
 
-  // output image mv on 0
-  // mv [0 threshold 0] -> [0 output 0] 0 null
+  // output image mv_5 on 0
+  // mv_5 [0 threshold 0] -> [0 output 0] 0 null
   // nope
 
   // fill in to the end...
-  // mv [0 output 0] -> [0 output 0] 0 null
+  // mv_5 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -835,7 +835,7 @@ freia_status vs_core_2_helper_0_2_1(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // mv [0 input 0] -> [0 poc 0] 35 erode_8c
+  // mv_5 [0 input 0] -> [0 poc 0] 35 erode_8c
   // nope
   // poc 35 erode_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_ERODE;
@@ -844,12 +844,12 @@ freia_status vs_core_2_helper_0_2_1(freia_data2d * o0, freia_data2d * i0,
     sp.poc[0][0].kernel[i] = pi0[i];
 
 
-  // output image 0`t1 on 0
-  // 0`t1 [0 poc 0] -> [0 output 0] 0 null
+  // output image 0`t1_1 on 0
+  // 0`t1_1 [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t1 [0 output 0] -> [0 output 0] 0 null
+  // 0`t1_1 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -889,7 +889,7 @@ freia_status vs_core_2_helper_0_2_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // 0`t1 [0 input 0] -> [0 poc 0] 36 dilate_8c
+  // 0`t1_1 [0 input 0] -> [0 poc 0] 36 dilate_8c
   // nope
   // poc 36 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -961,19 +961,19 @@ freia_status vs_core_2_helper_0_2_3(freia_data2d * o0, freia_data2d * i0,
 
   // 0`t2 [0 poc 0] -> [0 alu] 41 sub
   // nope
-  // mv [0 poc 1] -> [0 alu] 41 sub
+  // mv_4 [0 poc 1] -> [0 alu] 41 sub
   // nope
   // alu 41 sub stage 0
   si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
 
 
-  // output image mv on 0
-  // mv [0 alu] -> [0 output 0] 0 null
+  // output image mv_3 on 0
+  // mv_3 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // mv [0 output 0] -> [0 output 0] 0 null
+  // mv_3 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -1013,20 +1013,20 @@ freia_status vs_core_2_helper_0_2_4(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // mv [0 input 0] -> [0 alu] 43 sub_const
+  // mv_3 [0 input 0] -> [0 alu] 43 sub_const
   // nope
   // alu 43 sub_const stage 0
   si.alu[0][0].op = SPOC_ALU_SUB_IN0_CONST;
   sp.alu[0][0].constant = pi0;
 
 
-  // output image mv on 0
-  // mv [0 alu] -> [0 output 0] 0 null
+  // output image mv_2 on 0
+  // mv_2 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // mv [0 output 0] -> [0 output 0] 0 null
+  // mv_2 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -1066,20 +1066,20 @@ freia_status vs_core_2_helper_0_2_5(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // mv [0 input 0] -> [0 alu] 44 and_const
+  // mv_2 [0 input 0] -> [0 alu] 44 and_const
   // nope
   // alu 44 and_const stage 0
   si.alu[0][0].op = SPOC_ALU_AND_IN0_CONST;
   sp.alu[0][0].constant = pi0;
 
 
-  // output image mv on 0
-  // mv [0 alu] -> [0 output 0] 0 null
+  // output image mv_1 on 0
+  // mv_1 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // mv [0 output 0] -> [0 output 0] 0 null
+  // mv_1 [0 output 0] -> [0 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -1118,7 +1118,7 @@ freia_status vs_core_2_helper_0_3_0(freia_data2d * o0, freia_data2d * i0, freia_
 
 
   // STAGE 0
-  // mv [0 input 0] -> [0 alu] 45 mul
+  // mv_1 [0 input 0] -> [0 alu] 45 mul
   // nope
   // stab [0 input 1] -> [0 alu] 45 mul
   // nope

@@ -298,13 +298,13 @@ digraph "freia_scalar_07_helper_0_0" {
   "i" [shape=circle];
 
   // outputs
-  "X" [shape=circle];
+  "X_1" [shape=circle];
 
   // computation vertices
   "23 min" [shape=diamond];
   "21 E8" [shape=box];
-  "21 E8" -> "23 min" [label="X"];
-  "21 E8" -> "X";
+  "21 E8" -> "23 min" [label="X_1"];
+  "21 E8" -> "X_1";
   "17 max" [shape=diamond];
   "i" -> "21 E8";
   "i" -> "17 max";
@@ -333,6 +333,7 @@ digraph "freia_scalar_07_helper_0_1" {
 digraph "freia_scalar_07_helper_0_2" {
   // inputs
   "X" [shape=circle];
+  "X_1" [shape=circle];
 
   // outputs
   "tC" [shape=circle];
@@ -341,9 +342,9 @@ digraph "freia_scalar_07_helper_0_2" {
   // computation vertices
   "25 thr" [shape=parallelogram];
   "25 thr" -> "tC";
+  "X_1" -> "25 thr";
   "32 thr" [shape=parallelogram];
   "32 thr" -> "tD";
-  "X" -> "25 thr";
   "X" -> "32 thr";
 }
 // graph for dag "freia_scalar_07_helper_0_3" of module "freia_scalar_07" in dot format
@@ -418,27 +419,27 @@ freia_status freia_scalar_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = pi1[i];
 
-  // 0`X [1 poc 0] -> [1 measure 0] 21 erode_8c
+  // 0`X_1 [1 poc 0] -> [1 measure 0] 21 erode_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
 
 
-  // output image 0`X on 0
-  // 0`X [1 measure 0] -> [1 output 0] 0 null
+  // output image 0`X_1 on 0
+  // 0`X_1 [1 measure 0] -> [1 output 0] 0 null
   // nope
 
   // fill in to the end...
-  // 0`X [1 output 0] -> [7 output 0] 0 null
-  // 0`X [2 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [1 output 0] -> [7 output 0] 0 null
+  // 0`X_1 [2 input 0] -> [7 output 0] 0 null
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // 0`X [3 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [3 input 0] -> [7 output 0] 0 null
   si.mux[3][0].op = SPOC_MUX_IN0;
-  // 0`X [4 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [4 input 0] -> [7 output 0] 0 null
   si.mux[4][0].op = SPOC_MUX_IN0;
-  // 0`X [5 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [5 input 0] -> [7 output 0] 0 null
   si.mux[5][0].op = SPOC_MUX_IN0;
-  // 0`X [6 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [6 input 0] -> [7 output 0] 0 null
   si.mux[6][0].op = SPOC_MUX_IN0;
-  // 0`X [7 input 0] -> [7 output 0] 0 null
+  // 0`X_1 [7 input 0] -> [7 output 0] 0 null
   si.mux[7][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
@@ -568,7 +569,7 @@ freia_status freia_scalar_07_helper_0_1_0(freia_data2d * o0, freia_data2d * i0,
 }
 
 // FREIA-SPoC helper function for module freia_scalar_07
-freia_status freia_scalar_07_helper_0_2_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+freia_status freia_scalar_07_helper_0_2_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
   int32_t pi0,
   int32_t pi1,
   int32_t pi2,
@@ -598,7 +599,7 @@ freia_status freia_scalar_07_helper_0_2_0(freia_data2d * o0, freia_data2d * o1, 
   sp.th[0][0].boundmin = pi0;
   sp.th[0][0].boundmax = pi1;
 
-  // 0`X [0 input 1] -> [0 threshold 1] 25 threshold
+  // 0`X_1 [0 input 1] -> [0 threshold 1] 25 threshold
   si.mux[0][3].op = SPOC_MUX_IN1;
   // threshold 25 threshold stage 0 side 1
   si.th[0][1].op = pi5? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
@@ -660,7 +661,7 @@ freia_status freia_scalar_07_helper_0_2_0(freia_data2d * o0, freia_data2d * o1, 
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, o1, o0, i0, i0);
+  freia_cg_template_process_2i_2o(&param, o1, o0, i0, i1);
 
   return ret;
 }
@@ -818,7 +819,7 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    // A
    // A
    // C with X from A
-   freia_scalar_07_helper_0_2_0(tC, tD, X, sC-10, sC-1, false, sB-10, sB-1, false);    /*0025*/
+   freia_scalar_07_helper_0_2_0(tC, tD, X, X, sC-10, sC-1, false, sB-10, sB-1, false);                /*0025*/
    freia_scalar_07_helper_0_3_0(tC2, tC);                               /*0026*/
    // B
    // D with X from B
@@ -852,7 +853,7 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    // A
    // A
    // C with X from A
-   freia_scalar_07_helper_0_2_0(tC, tD, X, sC-10, sC-1, 0, sB-10, sB-1, 0);            /*0025*/
+   freia_scalar_07_helper_0_2_0(tC, tD, X, X, sC-10, sC-1, 0, sB-10, sB-1, 0);         /*0025*/
    freia_scalar_07_helper_0_3_0(tC2, tC);                               /*0026*/
    // B
    // D with X from B
