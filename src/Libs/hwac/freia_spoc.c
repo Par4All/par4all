@@ -1135,7 +1135,7 @@ static void freia_spoc_code_buildup
   // first, image arguments
   if (n_im_out>0) sb_cat(code, FREIA_IMAGE "o0");
   if (n_im_out>1) sb_cat(code, ", " FREIA_IMAGE "o1");
-  if (n_im_out!=0) sb_cat(code, ", ");
+  if (n_im_out!=0 && n_im_in>0) sb_cat(code, ", ");
   if (n_im_in>0) sb_cat(code, FREIA_IMAGE "i0");
   if (n_im_in>1) sb_cat(code, ", " FREIA_IMAGE "i1");
 
