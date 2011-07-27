@@ -448,9 +448,9 @@ bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(t
 			pips_debug(8, "derived case, real: %s, formal: %s\n",
 				   entity_name(basic_derived(real_b)),
 				   entity_name(basic_derived(formal_b)));
-			/* use entity user name (see #548 for more details) */
-			result = same_string_p(entity_user_name(basic_derived(real_b)),
-					       entity_user_name(basic_derived(formal_b)));
+			type formal_dt = entity_type(basic_derived(formal_b));
+			type real_dt =  entity_type(basic_derived(real_b));
+			result = basic_concrete_types_compatible_for_effects_interprocedural_translation_p(real_dt, formal_dt);
 		      }
 		    else
 		      result = basic_equal_strict_p(real_b, formal_b);
@@ -509,27 +509,31 @@ bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(t
 	  pips_debug(8, "struct, union or enum case\n");
 	  list real_fields = type_fields(real_ct);
 	  list formal_fields = type_fields(formal_ct);
-	  bool finished = false;
-	  result = true;
-	  while(!finished && !ENDP(real_fields) && !ENDP(formal_fields))
+	  if (gen_length(real_fields) == gen_length(formal_fields))
 	    {
-	      pips_debug(8, "fields, real: %s, formal: %s\n",
-			 entity_name(ENTITY(CAR(real_fields))),
-			 entity_name(ENTITY(CAR(formal_fields))));
-	      if (!same_entity_p(ENTITY(CAR(real_fields)),
-				 ENTITY(CAR(formal_fields))))
+	      result = true;
+	      while(result && !ENDP(real_fields))
 		{
-		  result = false;
-		  finished = true;
+		  pips_debug(8, "fields, real: %s, formal: %s\n",
+			     entity_name(ENTITY(CAR(real_fields))),
+			     entity_name(ENTITY(CAR(formal_fields))));
+		  type real_ft = basic_concrete_type(entity_type(ENTITY(CAR(real_fields))));
+		  type formal_ft = basic_concrete_type(entity_type(ENTITY(CAR(formal_fields))));
+		  /* It should be a type equality here, but type_equal_p is*/
+		  result =
+		    basic_concrete_types_compatible_for_effects_interprocedural_translation_p
+		    (real_ft, formal_ft);
+
+		  free_type(real_ft);
+		  free_type(formal_ft);
+		  POP(real_fields);
+		  POP(formal_fields);
 		}
-	      POP(real_fields);
-	      POP(formal_fields);
 	    }
-	  result = result && ENDP(real_fields) && ENDP(formal_fields);
 	  break;
 	case is_type_functional:
 	  pips_debug(8, "functional case\n");
-	  result = false;
+	  result = true;
 	  break;
 	default:
 	  pips_internal_error("unexpected function argument type: %s\n", type_to_string(real_ct) );
