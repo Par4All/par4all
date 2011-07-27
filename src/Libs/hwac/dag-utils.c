@@ -194,7 +194,8 @@ void dagvtx_dump(FILE * out, const string name, const dagvtx v)
  */
 void dag_dump(FILE * out, const string what, const dag d)
 {
-  fprintf(out, "dag '%s' (%p):\n", what, d);
+  fprintf(out, "dag '%s' (%p) %"_intFMT" vertices:\n",
+          what, d, gen_length(dag_vertices(d)));
 
   dagvtx_nb_dump(out, "inputs", dag_inputs(d));
   dagvtx_nb_dump(out, "outputs", dag_outputs(d));
@@ -1142,6 +1143,7 @@ static void dag_simplify(dag d)
       set_aipo_copy(v, img);
     }
   }
+
   // fix input node successors...
   if (!set_empty_p(setconst))
   {
@@ -1151,14 +1153,14 @@ static void dag_simplify(dag d)
       FOREACH(dagvtx, s, dagvtx_succs(v))
       {
         if (!set_belong_p(setconst, s))
-          ni = CONS(dagvtx, s, NIL);
+          ni = CONS(dagvtx, s, ni);
       }
       gen_free_list(dagvtx_succs(v));
       dagvtx_succs(v) = gen_nreverse(ni);
     }
   }
   // cleanup
-  set_free(setconst);
+  set_free(setconst), setconst = NULL;
 }
 
 /* remove dead image operations.
@@ -1653,18 +1655,6 @@ void freia_hack_fix_global_ins_outs(dag dfull, dag d)
   {
     dagvtx twin = find_twin_vertex(dfull, v);
 
-    ifdebug(9)
-    {
-      pips_debug(8,
-                 "vtx %"_intFMT" in outputs: %s\n"
-                 "#succs = %d vs #succs = %d (%"_intFMT")\n",
-                 dagvtx_number(v),
-                 gen_in_list_p(twin, dag_outputs(dfull))? "yes": "no",
-                 (int) gen_length(dagvtx_succs(v)),
-                 (int) gen_length(dagvtx_succs(twin)),
-                 dagvtx_number(twin));
-    }
-
     if (dagvtx_number(v)!=0 &&
         // the vertex was an output node in the full dag
         (gen_in_list_p(twin, dag_outputs(dfull)) ||
@@ -1806,7 +1796,7 @@ list /* of dagvtx */ get_computable_vertices
     {
       list preds = dag_vertex_preds(d, v);
       pips_debug(9, "%d predecessors to %" _intFMT "\n",
-     (int) gen_length(preds), dagvtx_number(v));
+                 (int) gen_length(preds), dagvtx_number(v));
 
       if(// no scalar dependencies in the current pipeline
         !any_scalar_dep(v, local_currents) &&
