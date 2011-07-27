@@ -133,16 +133,21 @@ int dagvtx_ordering(const dagvtx * v1, const dagvtx * v2)
   return dagvtx_number(*v1) - dagvtx_number(*v2);
 }
 
-/* return (last) producer vertex or NULL if none found.
+/* return (last) producer of image e for vertex sink, or NULL if none found.
  * this is one of the two predecessors of sink.
  */
-dagvtx
-dagvtx_get_producer(const dag d, const dagvtx sink, const entity e)
+dagvtx dagvtx_get_producer(const dag d, const dagvtx sink,
+                           const entity e, _int before_number)
 {
   pips_assert("some image", e!=entity_undefined);
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     vtxcontent c = dagvtx_content(v);
+    pips_debug(8, "%"_intFMT" pred of %"_intFMT"?\n",
+               dagvtx_number(v), dagvtx_number(sink));
+    // they may have been reversed ordered when used to append a vertex
+    if (before_number>0 && dagvtx_number(v)>0 && dagvtx_number(v)>before_number)
+      continue;
     // the image may be kept within a pipe
     if (vtxcontent_out(c)==e &&
         (sink==NULL || gen_in_list_p(sink, dagvtx_succs(v))))
@@ -517,7 +522,7 @@ void dag_append_vertex(dag d, dagvtx nv)
   FOREACH(entity, e, vtxcontent_inputs(dagvtx_content(nv)))
   {
     pips_assert("e is defined", e!=entity_undefined);
-    dagvtx pv = dagvtx_get_producer(d, NULL, e);
+    dagvtx pv = dagvtx_get_producer(d, NULL, e, dagvtx_number(nv));
     if (!pv)
     {
       // side effect, create an input node of type 0 (not a computation)
@@ -769,7 +774,7 @@ static void unlink_copy_vertex(dag d, const entity source, dagvtx copy)
 {
   entity target = vtxcontent_out(dagvtx_content(copy));
   // may be NULL if source is an input
-  dagvtx prod = dagvtx_get_producer(d, copy, source);
+  dagvtx prod = dagvtx_get_producer(d, copy, source, 0);
 
   // add copy successors as successors of prod
   // it is kept as a successor in case it is not removed
@@ -1408,7 +1413,7 @@ list /* of statements */ dag_optimize(dag d)
               target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
         entity source = ENTITY(CAR(vtxcontent_inputs(c)));
-        dagvtx prod = dagvtx_get_producer(d, w, source);
+        dagvtx prod = dagvtx_get_producer(d, w, source, 0);
 
         if (source==target)
         {
@@ -1646,12 +1651,25 @@ void freia_hack_fix_global_ins_outs(dag dfull, dag d)
   // cleanup outputs
   FOREACH(dagvtx, v, dag_vertices(d))
   {
+    dagvtx twin = find_twin_vertex(dfull, v);
+
+    ifdebug(9)
+    {
+      pips_debug(8,
+                 "vtx %"_intFMT" in outputs: %s\n"
+                 "#succs = %d vs #succs = %d (%"_intFMT")\n",
+                 dagvtx_number(v),
+                 gen_in_list_p(twin, dag_outputs(dfull))? "yes": "no",
+                 (int) gen_length(dagvtx_succs(v)),
+                 (int) gen_length(dagvtx_succs(twin)),
+                 dagvtx_number(twin));
+    }
+
     if (dagvtx_number(v)!=0 &&
         // the vertex was an output node in the full dag
-        (gen_in_list_p(find_twin_vertex(dfull, v), dag_outputs(dfull)) ||
+        (gen_in_list_p(twin, dag_outputs(dfull)) ||
          // OR there were more successors in the full dag
-         gen_length(dagvtx_succs(v))!=
-         gen_length(dagvtx_succs(find_twin_vertex(dfull, v)))))
+         gen_length(dagvtx_succs(v))!=gen_length(dagvtx_succs(twin))))
     {
       pips_debug(4, "adding %" _intFMT " as output\n", dagvtx_number(v));
       dag_outputs(d) = gen_once(v, dag_outputs(d));

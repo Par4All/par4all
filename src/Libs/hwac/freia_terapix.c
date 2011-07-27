@@ -280,7 +280,7 @@ static list /* of ints */ dag_vertex_pred_imagelets
   list limagelets = NIL;
   FOREACH(entity, img, vtxcontent_inputs(dagvtx_content(v)))
   {
-    dagvtx prod = dagvtx_get_producer(d, v, img);
+    dagvtx prod = dagvtx_get_producer(d, v, img, 0);
     pips_assert("some producer found!", prod!=NULL);
     limagelets =
       gen_nconc(limagelets,
