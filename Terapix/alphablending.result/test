@@ -664,7 +664,7 @@ void launcher_0_microcode(int *caillou0, short *result00, short *src000, short *
    unsigned int j;
 l99997:
    for(j = 0; j <= 7; j += 1)
-      *(result00+j+1-1) = (*(caillou0+2)**(src000+j+1-1)+*(caillou0+3)**(src100+j+1-1))*(*(caillou0+0)<<*(caillou0+1))>>*(caillou0+1);
+      *(result00+(j+1-1)) = (*(caillou0+2)**(src000+(j+1-1))+*(caillou0+3)**(src100+(j+1-1)))*(*(caillou0+0)<<*(caillou0+1))>>*(caillou0+1);
 }
 caillou0 seems a mask
 result00 seems an image
@@ -694,7 +694,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    ma0 = FIFO0;
 l99997:
    for(re2 = 0; re2 <= N0; re2 += 1)
-      *(im1+re2+1-1) = (*(ma0+2)**(im2+re2+1-1)+*(ma0+3)**(im3+re2+1-1))*(*(ma0+0)<<*(ma0+1))>>*(ma0+1);
+      *(im1+(re2+1-1)) = (*(ma0+2)**(im2+(re2+1-1))+*(ma0+3)**(im3+(re2+1-1)))*(*(ma0+0)<<*(ma0+1))>>*(ma0+1);
 }
 void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
 {
