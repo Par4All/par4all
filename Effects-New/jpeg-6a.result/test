@@ -5886,7 +5886,7 @@ static void fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info
 //                               compptr[0].v_samp_factor membersum 
 //                               nextcolsum
 //             <    is written>: neighsum
-      neighsum = colsum+colsum-membersum+nextcolsum;
+      neighsum = colsum+(colsum-membersum)+nextcolsum;
 //             <    is read   >: compptr compptr[0].v_samp_factor 
 //                               memberscale membersum neighscale 
 //                               neighsum
@@ -5931,7 +5931,7 @@ static void fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info
 //                               compptr[0].v_samp_factor lastcolsum 
 //                               membersum nextcolsum output_cols
 //             <    is written>: neighsum
-         neighsum = lastcolsum+colsum-membersum+nextcolsum;
+         neighsum = lastcolsum+(colsum-membersum)+nextcolsum;
 //             <    is read   >: compptr compptr[0].v_samp_factor 
 //                               memberscale membersum neighscale 
 //                               neighsum output_cols
@@ -5958,7 +5958,7 @@ static void fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info
 //                               compptr[0].v_samp_factor lastcolsum 
 //                               membersum
 //             <    is written>: neighsum
-      neighsum = lastcolsum+colsum-membersum+colsum;
+      neighsum = lastcolsum+(colsum-membersum)+colsum;
 //             <    is read   >: compptr compptr[0].v_samp_factor 
 //                               memberscale membersum neighscale 
 //                               neighsum
@@ -13813,7 +13813,7 @@ static void prepare_range_limit_table(j_decompress_ptr cinfo)
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: cinfo cinfo[0].sample_range_limit 
 //                               table
-   memcpy((void *) (table+4*(255+1)-128), (void *) cinfo->sample_range_limit, (size_t) (128*(size_t) sizeof(JSAMPLE)));
+   memcpy((void *) (table+(4*(255+1)-128)), (void *) cinfo->sample_range_limit, (size_t) (128*(size_t) sizeof(JSAMPLE)));
 }
 static boolean use_merged_upsample(j_decompress_ptr cinfo)
 {
@@ -18535,7 +18535,7 @@ static JBLOCKARRAY access_virt_barray(j_common_ptr cinfo, jvirt_barray_ptr ptr, 
       ptr->dirty = 1;
 //             <    is read   >: ptr ptr[0].cur_start_row 
 //                               ptr[0].mem_buffer start_row
-   return ptr->mem_buffer+start_row-ptr->cur_start_row;
+   return ptr->mem_buffer+(start_row-ptr->cur_start_row);
 }
 static JSAMPARRAY access_virt_sarray(j_common_ptr cinfo, jvirt_sarray_ptr ptr, JDIMENSION start_row, JDIMENSION num_rows, boolean writable)
 {
@@ -18671,7 +18671,7 @@ static JSAMPARRAY access_virt_sarray(j_common_ptr cinfo, jvirt_sarray_ptr ptr, J
       ptr->dirty = 1;
 //             <    is read   >: ptr ptr[0].cur_start_row 
 //                               ptr[0].mem_buffer start_row
-   return ptr->mem_buffer+start_row-ptr->cur_start_row;
+   return ptr->mem_buffer+(start_row-ptr->cur_start_row);
 }
 static JBLOCKARRAY alloc_barray(j_common_ptr cinfo, int pool_id, JDIMENSION blocksperrow, JDIMENSION numrows)
 {
@@ -25838,7 +25838,7 @@ static void quantize_fs_dither(j_decompress_ptr cinfo, JSAMPARRAY input_buf, JSA
 //                               cquantize[0].fserrors[ci] nc num_rows
 //                               width
 //             <    is written>: errorptr
-            errorptr = (cquantize->fserrors)[ci]+width+1;
+            errorptr = (cquantize->fserrors)[ci]+(width+1);
          }
          else {
 //             <    is read   >: nc num_rows
@@ -26371,13 +26371,13 @@ static void fill_inverse_cmap(j_decompress_ptr cinfo, int c0, int c1, int c2)
    c2 >>= 5-3;
 //             <    is read   >: c0
 //             <    is written>: minc0
-   minc0 = (c0<<8-5+5-3)+(1<<8-5>>1);
+   minc0 = (c0<<8-5+(5-3))+(1<<8-5>>1);
 //             <    is read   >: c1
 //             <    is written>: minc1
-   minc1 = (c1<<8-6+6-3)+(1<<8-6>>1);
+   minc1 = (c1<<8-6+(6-3))+(1<<8-6>>1);
 //             <    is read   >: c2
 //             <    is written>: minc2
-   minc2 = (c2<<8-5+5-3)+(1<<8-5>>1);
+   minc2 = (c2<<8-5+(5-3))+(1<<8-5>>1);
 //             <may be read   >: cinfo[0].colormap 
 //                               cinfo[0].colormap[0] 
 //                               cinfo[0].colormap[0][*] 
@@ -26659,19 +26659,19 @@ static int find_nearby_colors(j_decompress_ptr cinfo, int minc0, int minc1, int 
    INT32 mindist[255+1];
 //             <    is read   >: minc0
 //             <    is written>: maxc0
-   maxc0 = minc0+(1<<8-5+5-3)-(1<<8-5);
+   maxc0 = minc0+((1<<8-5+(5-3))-(1<<8-5));
 //             <    is read   >: maxc0 minc0
 //             <    is written>: centerc0
    centerc0 = minc0+maxc0>>1;
 //             <    is read   >: minc1
 //             <    is written>: maxc1
-   maxc1 = minc1+(1<<8-6+6-3)-(1<<8-6);
+   maxc1 = minc1+((1<<8-6+(6-3))-(1<<8-6));
 //             <    is read   >: maxc1 minc1
 //             <    is written>: centerc1
    centerc1 = minc1+maxc1>>1;
 //             <    is read   >: minc2
 //             <    is written>: maxc2
-   maxc2 = minc2+(1<<8-5+5-3)-(1<<8-5);
+   maxc2 = minc2+((1<<8-5+(5-3))-(1<<8-5));
 //             <    is read   >: maxc2 minc2
 //             <    is written>: centerc2
    centerc2 = minc2+maxc2>>1;
