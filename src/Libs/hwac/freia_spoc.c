@@ -2028,9 +2028,7 @@ static dagvtx first_which_may_be_added
  */
 static list /* of dags */ split_dag(dag initial)
 {
-  if (!single_image_assignement_p(initial))
-    // well, it should work most of the time, so only a warning
-    pips_user_warning("image reuse may result in subtly wrong code...\n");
+  pips_assert("no image reuse", single_image_assignement_p(initial));
 
   // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
   // if everything was removed by optimizations, there is nothing to do.
@@ -2162,11 +2160,11 @@ static list /* of dags */ split_dag(dag initial)
 /* generate helpers for statements in ls of module
  * output resulting functions in helper, which may be empty in some cases.
  * @param module
- * @param ls list of statements for the dag
+ * @param ls list of statements for the dag (in reverse order)
  * @param helper output file
  * @param number current helper dag count
  */
-void freia_spoc_compile_calls
+list freia_spoc_compile_calls
   (string module,
    list /* of statements */ ls,
    hash_table occs,
@@ -2179,6 +2177,9 @@ void freia_spoc_compile_calls
 
   list added_stats = NIL;
   dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
+
+  hash_table init = hash_table_make(hash_pointer, 0);
+  list new_images = dag_fix_image_reuse(fulld, init);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
@@ -2259,4 +2260,11 @@ void freia_spoc_compile_calls
   FOREACH(dag, dc, ld)
     free_dag(dc);
   gen_free_list(ld);
+
+  // deal with new images
+  list real_new_images =
+    freia_allocate_new_images_if_needed(ls, new_images, init);
+  gen_free_list(new_images);
+  hash_table_free(init);
+  return real_new_images;
 }

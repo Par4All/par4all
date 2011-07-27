@@ -948,6 +948,7 @@ void freia_substitute_by_helper_call
 }
 
 /* insert added statements to actual code sequence in "ls"
+ * beware that ls is assumed to be in reverse order
  */
 void freia_insert_added_stats(list ls, list added_stats)
 {
@@ -1088,4 +1089,83 @@ bool freia_convolution_width_height(dagvtx v, _int * pw, _int * ph, bool check)
   if (check) pips_assert("constant convolution height", bh);
   if (check) pips_assert("odd convolution height", ((*ph)%2)==1);
   return bw && bh;
+}
+
+/****************************************************** NEW IMAGE ALLOCATION */
+
+static statement image_alloc(entity v)
+{
+  return make_assign_statement
+    (entity_to_expression(v),
+     call_to_expression(make_call(local_name_to_top_level_entity(FREIA_ALLOC),
+                                  NIL)));
+}
+
+static statement image_free(entity v)
+{
+  return call_to_statement(
+    make_call(local_name_to_top_level_entity(FREIA_FREE),
+              CONS(expression, entity_to_expression(v), NIL)));
+}
+
+static void entref(reference r, hash_table count)
+{
+  entity var = reference_variable(r);
+  // pips_debug(7, "ref to %s\n", entity_local_name(var));
+  if (hash_defined_p(count, var))
+    hash_put(count, var, (void*) ((_int) hash_get(count, var)+1));
+  else
+    hash_put(count, var, (void*) (_int) (1));
+}
+
+/* insert image allocation if needed, for intermediate image inserted before
+ * if an image is used only twice, then it is switched back to the initial one
+ * @param ls list of statements to consider
+ * @param images list of entities to check and maybe allocate
+ * @param init new image -> initial image
+ * @return actually allocated images
+ */
+list freia_allocate_new_images_if_needed(list ls, list images, hash_table init)
+{
+  // check for used images
+  hash_table count = hash_table_make(hash_pointer, 0);
+
+  FOREACH(statement, s, ls)
+    gen_context_recurse(s, (void*) count, reference_domain, gen_true, entref);
+
+  list allocated = NIL;
+  FOREACH(entity, v, images)
+  {
+    _int n = (_int) hash_get(count, v);
+    if (n>=3)
+      allocated = CONS(entity, v, allocated);
+    else if (n>=1)
+    {
+      // used twice, substitude back to initial variable???
+      // ??? not sure, guard with a property?
+      FOREACH(statement, s, ls)
+        freia_switch_image_in_statement(s, v, (entity) hash_get(init, v));
+    }
+    // not used
+  }
+  hash_table_free(count), count = NULL;
+
+  // allocate those used
+  if (allocated)
+  {
+    pips_assert("some statements", ls!=NIL);
+    statement first = STATEMENT(CAR(ls));
+    statement last = STATEMENT(CAR(gen_last(ls)));
+    pips_assert("at least two statements", first!=last);
+
+    FOREACH(entity, v, images)
+    {
+      pips_debug(7, "allocating image %s\n", entity_name(v));
+      // add_declaration_statement(first, v); // NO, returned
+      // insert_statement(first, image_alloc(v), true); // NO, init
+      insert_statement(last, image_free(v), false);
+    }
+  }
+
+  return allocated;
 }

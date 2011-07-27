@@ -1538,8 +1538,8 @@ static bool any_use_statement(set stats)
       pips_debug(9, "call to %s\n", name);
       // some freia utils are considered harmless,
       // others imply an actual "use"
-      if (!same_string_p(name, "freia_common_destruct_data") &&
-          !same_string_p(name, "freia_common_create_data") &&
+      if (!same_string_p(name, FREIA_FREE) &&
+          !same_string_p(name, FREIA_ALLOC) &&
           !same_string_p(name, "freia_common_rx_image"))
         used = true;
     }
@@ -1933,4 +1933,147 @@ dag build_freia_dag(string module, list ls, int number,
   dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
 
   return fulld;
+}
+
+/**************************************************** NEW INTERMEDIATE IMAGE */
+
+// in phrase
+extern entity clone_variable_with_new_name(entity, string, string);
+// in pipsmake
+extern string compilation_unit_of_module(const char *);
+
+// ??? could not find this anywhere
+static entity freia_data2d_field(string field)
+{
+  string cu =
+    compilation_unit_of_module(entity_local_name(get_current_module_entity()));
+  entity fi = FindOrCreateEntity(cu, TYPEDEF_PREFIX FREIA_IMAGE_TYPE);
+  pips_assert("freia_data2d type found", fi!=entity_undefined);
+  type ut = ultimate_type(entity_type(fi));
+
+  list fields =
+    type_struct(entity_type(basic_derived(variable_basic(type_variable(ut)))));
+  pips_assert("some fields", fields);
+  FOREACH(entity, f, fields)
+    if (same_string_p(field,
+                      entity_local_name(f)+strlen(DUMMY_STRUCT_PREFIX)+2))
+      return f;
+  // should not get there
+  pips_internal_error("cannot find freia_data2d field %s\n", field);
+  return NULL;
+}
+
+static expression do_point_to(entity var, string field_name)
+{
+  // entity f2d = local_name_to_top_level_entity(FREIA_IMAGE_TYPE);
+  expression evar = entity_to_expression(var);
+  return call_to_expression(make_call(
+    local_name_to_top_level_entity(POINT_TO_OPERATOR_NAME),
+    gen_make_list(expression_domain, evar,
+                  entity_to_expression(freia_data2d_field(field_name)),
+                  NULL)));
+}
+
+/* @return a new image from the model
+ */
+static entity new_local_image_variable(entity model)
+{
+  entity img = NULL;
+  int index = 1;
+  do
+  {
+    string varname;
+    int n = asprintf(&varname, "%s_%d", entity_local_name(model), index);
+    pips_assert("asprintf succeeded", n!=-1);
+    img = clone_variable_with_new_name
+      (model, varname, module_local_name(get_current_module_entity()));
+    free(varname);
+    index++;
+    if (img)
+    {
+      // handle allocation as the declaration initial value
+      free_value(entity_initial(img));
+      entity_initial(img) =
+        make_value_expression(
+          call_to_expression(
+            make_call(local_name_to_top_level_entity(FREIA_ALLOC),
+                      gen_make_list(expression_domain,
+                                    do_point_to(model, "bpp"),
+                                    do_point_to(model, "width"),
+                                    do_point_to(model, "height"),
+                                    NULL))));
+      // should not be a parameter! overwrite storage if so...
+      if (formal_parameter_p(img))
+      {
+        free_storage(entity_storage(img));
+        entity_storage(img) = make_storage_rom();
+        // make_storage_ram(make_ram(get_current_module_entity(),
+        // entity_undefined, UNKNOWN_RAM_OFFSET, NIL));
+      }
+    }
+  }
+  while (img==NULL);
+  return img;
+}
+
+typedef struct { entity old; entity new; } two_vars;
+
+static void ref_rwt(reference r, two_vars * ctx)
+{
+  if (reference_variable(r)==ctx->old)
+    reference_variable(r) = ctx->new;
+}
+
+// ??? must be available somewhere?
+// see substitute_entity_in_expression
+void freia_switch_image_in_statement(statement s, entity old, entity img)
+{
+  two_vars ctx = { old, img };
+  gen_context_recurse(s, &ctx, reference_domain, gen_true, ref_rwt);
+}
+
+/* switch to new image variable in v & its direct successors
+ */
+static void switch_image_variable(dagvtx v, entity old, entity img)
+{
+  vtxcontent c = dagvtx_content(v);
+  pips_assert("switch image output", vtxcontent_out(c)==old);
+  vtxcontent_out(c) = img;
+  FOREACH(dagvtx, s, dagvtx_succs(v))
+  {
+    vtxcontent cs = dagvtx_content(s);
+    gen_replace_in_list(vtxcontent_inputs(cs), old, img);
+    freia_switch_image_in_statement(dagvtx_statement(s), old, img);
+  }
+}
+
+/* fix intermediate image reuse in dag
+ * @return new image entities to be added to declarations
+ */
+list dag_fix_image_reuse(dag d, hash_table init)
+{
+  list images = NIL;
+  set seen = set_make(hash_pointer);
+
+  // dag vertices are assumed to be in reverse statement order,
+  // so that last write is seen first and is kept by default
+  FOREACH(dagvtx, v, dag_vertices(d))
+  {
+    entity img = dagvtx_image(v);
+    if (!img || img==entity_undefined)
+      continue;
+
+    if (set_belong_p(seen, img))
+    {
+      entity new_img = new_local_image_variable(img);
+      switch_image_variable(v, img, new_img);
+      images = CONS(entity, new_img, images);
+      // keep track of new->old image mapping, to reverse it latter eventually
+      hash_put(init, new_img, img);
+    }
+    set_add_element(seen, seen, img);
+  }
+
+  set_free(seen);
+  return images;
 }

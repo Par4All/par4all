@@ -63,22 +63,22 @@ static bool freia_skip_op_p(const statement s)
   call c = freia_statement_to_call(s);
   const char* called = c? entity_user_name(call_function(c)): "";
   // ??? what about freia_common_check* ?
-  return same_string_p(called, "freia_common_create_data")
-    ||   same_string_p(called, "freia_common_destruct_data");
+  return same_string_p(called, FREIA_ALLOC)
+    ||   same_string_p(called, FREIA_FREE);
 }
 
 static bool is_alloc(const statement s)
 {
   call c = freia_statement_to_call(s);
   const char* called = c? entity_user_name(call_function(c)): "";
-  return same_string_p(called, "freia_common_create_data");
+  return same_string_p(called, FREIA_ALLOC);
 }
 
 static bool is_dealloc(const statement s)
 {
   call c = freia_statement_to_call(s);
   const char* called = c? entity_user_name(call_function(c)): "";
-  return same_string_p(called, "freia_common_destruct_data");
+  return same_string_p(called, FREIA_FREE);
 }
 
 /* I reorder a little bit statements, so that allocs & deallocs are up
@@ -206,6 +206,7 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
     set_assign_list(cmp_subset, ls);
     gen_sort_list(sequence_statements(sq),
                   (gen_cmp_func_t) freia_cmp_statement);
+    // the list is put in *REVERSE* order
     ls = gen_nreverse(ls);
     fsip->seqs = CONS(list, ls, fsip->seqs);
     ls = NIL;
@@ -269,13 +270,22 @@ string freia_compile(string module, statement mod_stat, string target)
   int n_dags = 0;
   FOREACH(list, ls, fsi.seqs)
   {
+    list allocated = NIL;
+
     if (freia_spoc_p(target))
-      freia_spoc_compile_calls(module, ls, occs, helper, n_dags);
+      allocated = freia_spoc_compile_calls(module, ls, occs, helper, n_dags);
     else if (freia_terapix_p(target))
       freia_trpx_compile_calls(module, ls, occs, helper, n_dags);
     else if (freia_aipo_p(target))
       freia_aipo_compile_calls(module, ls, occs, n_dags);
     gen_free_list(ls);
+
+    if (allocated)
+    {
+      FOREACH(entity, img, allocated)
+        add_declaration_statement(mod_stat, img);
+      gen_free_list(allocated);
+    }
     n_dags++;
   }
 
