@@ -1111,6 +1111,8 @@ static statement image_free(entity v)
 
 static void entref(reference r, hash_table count)
 {
+  // ??? I should rather count in how many distinct statements
+  // the variable is used, instead of counting occurences
   entity var = reference_variable(r);
   // pips_debug(7, "ref to %s\n", entity_local_name(var));
   if (hash_defined_p(count, var))
