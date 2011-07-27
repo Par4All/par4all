@@ -275,7 +275,7 @@ string freia_compile(string module, statement mod_stat, string target)
     if (freia_spoc_p(target))
       allocated = freia_spoc_compile_calls(module, ls, occs, helper, n_dags);
     else if (freia_terapix_p(target))
-      freia_trpx_compile_calls(module, ls, occs, helper, n_dags);
+      allocated = freia_trpx_compile_calls(module, ls, occs, helper, n_dags);
     else if (freia_aipo_p(target))
       freia_aipo_compile_calls(module, ls, occs, n_dags);
     gen_free_list(ls);
