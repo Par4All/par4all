@@ -880,7 +880,7 @@ digraph "dag_cleaned_1" {
 digraph "freia_51_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
-  "out" [shape=circle];
+  "out_1" [shape=circle];
 
   // outputs
   "out" [shape=circle];
@@ -888,7 +888,7 @@ digraph "freia_51_helper_0_0_0" {
   // computation vertices
   "35 -" [shape=trapezium,orientation=270];
   "35 -" -> "out";
-  "out" -> "35 -";
+  "out_1" -> "35 -";
   "in" -> "35 -";
 }
 // graph for dag "freia_51_helper_1_0_0" of module "freia_51" in dot format
@@ -897,7 +897,7 @@ digraph "freia_51_helper_1_0_0" {
   "in" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out_3" [shape=circle];
   "out" [shape=circle];
 
   // computation vertices
@@ -913,9 +913,9 @@ digraph "freia_51_helper_1_0_0" {
   "20 D8" [shape=box];
   "20 D8" -> "21 <." [label="t2"];
   "15 !" [shape=trapezium,orientation=270];
-  "15 !" -> "20 D8" [label="out"];
+  "15 !" -> "20 D8" [label="out_2"];
   "12 E8" [shape=box];
-  "12 E8" -> "out";
+  "12 E8" -> "out_3";
   "in" -> "15 !";
   "in" -> "12 E8";
 }
@@ -1030,7 +1030,7 @@ freia_status freia_51_helper_0_0_0(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for out
+  // - imagelet 2 is i1 for out_1
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
@@ -1355,7 +1355,7 @@ freia_status freia_51_helper_1_0_0(
   tile_in[1][0].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for out
+  // - imagelet 2 is o0 for out_3
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
