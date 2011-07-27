@@ -139,7 +139,7 @@ digraph "dag_cleaned_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module cst_01
-freia_status cst_01_helper_0_0_0(freia_data2d * o0, ,
+freia_status cst_01_helper_0_0_0(freia_data2d * o0,
   int32_t pi0)
 {
   spoc_instr si;

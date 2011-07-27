@@ -155,7 +155,7 @@ digraph "freia_13_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_13
-freia_status freia_13_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, ,
+freia_status freia_13_helper_0_0_0(freia_data2d * o0, freia_data2d * o1,
   int32_t pi0,
   const int32_t * pi1)
 {
