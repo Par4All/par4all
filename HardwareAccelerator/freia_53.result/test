@@ -1,0 +1,115 @@
+#
+# AIPO
+#
+
+! initial function
+
+freia_status freia_53(freia_data2d *out, freia_data2d *in)
+{
+   freia_data2d *tb = freia_common_create_data(16, 128, 128);           /*0005*/
+   freia_data2d *tc = freia_common_create_data(16, 128, 128);           /*0006*/
+   freia_data2d *td = freia_common_create_data(16, 128, 128);           /*0007*/
+
+   freia_aipo_dilate_8c(tb, in, freia_morpho_kernel_8c);                /*0009*/
+   freia_aipo_inf_const(tc, tb, 255);                                   /*0010*/
+   freia_aipo_erode_8c(tb, tb, freia_morpho_kernel_8c);                 /*0011*/
+   freia_aipo_inf(td, tc, tb);                                          /*0012*/
+   freia_aipo_sub(out, in, td);                                         /*0013*/
+
+   freia_common_destruct_data(tb);                                      /*0015*/
+   freia_common_destruct_data(tc);                                      /*0016*/
+   freia_common_destruct_data(td);                                      /*0017*/
+   return FREIA_OK;                                                     /*0018*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_53" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "out";
+  "12 <" [shape=trapezium,orientation=270];
+  "12 <" -> "13 -" [label="td"];
+  "11 E8" [shape=box];
+  "11 E8" -> "12 <" [label="tb"];
+  "10 <." [shape=trapezium,orientation=270];
+  "10 <." -> "12 <" [label="tc"];
+  "9 D8" [shape=box];
+  "9 D8" -> "11 E8" [label="tb"];
+  "9 D8" -> "10 <." [label="tb"];
+  "in" -> "13 -";
+  "in" -> "9 D8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_53" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "out";
+  "12 <" [shape=trapezium,orientation=270];
+  "12 <" -> "13 -" [label="td"];
+  "11 E8" [shape=box];
+  "11 E8" -> "12 <" [label="tb"];
+  "10 <." [shape=trapezium,orientation=270];
+  "10 <." -> "12 <" [label="tc"];
+  "9 D8" [shape=box];
+  "9 D8" -> "11 E8" [label="tb"];
+  "9 D8" -> "10 <." [label="tb"];
+  "in" -> "13 -";
+  "in" -> "9 D8";
+}
+
+! updated function for
+
+freia_status freia_53(freia_data2d *out, freia_data2d *in)
+{
+   freia_data2d *tb = freia_common_create_data(16, 128, 128);           /*0005*/
+   freia_data2d *tc = freia_common_create_data(16, 128, 128);           /*0006*/
+   freia_data2d *td = freia_common_create_data(16, 128, 128);           /*0007*/
+
+   freia_aipo_dilate_8c(tb, in, freia_morpho_kernel_8c);                /*0009*/
+   freia_aipo_inf_const(tc, tb, 255);                                   /*0010*/
+   freia_aipo_erode_8c(tb, tb, freia_morpho_kernel_8c);                 /*0011*/
+   freia_aipo_inf(td, tc, tb);                                          /*0012*/
+   freia_aipo_sub(out, in, td);                                         /*0013*/
+
+   freia_common_destruct_data(tb);                                      /*0015*/
+   freia_common_destruct_data(tc);                                      /*0016*/
+   freia_common_destruct_data(td);                                      /*0017*/
+   return FREIA_OK;                                                     /*0018*/
+}
+#
+# SPOC
+#
+
+! initial function
+
+freia_status freia_53(freia_data2d *out, freia_data2d *in)
+{
+   freia_data2d *tb = freia_common_create_data(16, 128, 128);           /*0005*/
+   freia_data2d *tc = freia_common_create_data(16, 128, 128);           /*0006*/
+   freia_data2d *td = freia_common_create_data(16, 128, 128);           /*0007*/
+
+   freia_aipo_dilate_8c(tb, in, freia_morpho_kernel_8c);                /*0009*/
+   freia_aipo_inf_const(tc, tb, 255);                                   /*0010*/
+   freia_aipo_erode_8c(tb, tb, freia_morpho_kernel_8c);                 /*0011*/
+   freia_aipo_inf(td, tc, tb);                                          /*0012*/
+   freia_aipo_sub(out, in, td);                                         /*0013*/
+
+   freia_common_destruct_data(tb);                                      /*0015*/
+   freia_common_destruct_data(tc);                                      /*0016*/
+   freia_common_destruct_data(td);                                      /*0017*/
+   return FREIA_OK;                                                     /*0018*/
+}
