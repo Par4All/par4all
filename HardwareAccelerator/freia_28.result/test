@@ -334,6 +334,13 @@ digraph "freia_28_helper_0_3" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
+// dag 0: 10 ops (0 copies), optimized to 10 (0 copies)
+// split 0: 1 cut
+// split 1: 1 cut
+// split 2: 1 cut
+// split 3: 1 cut
+// # SPOC calls: 4
+
 // FREIA-SPoC helper function for module freia_28
 freia_status freia_28_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   int32_t * po0,

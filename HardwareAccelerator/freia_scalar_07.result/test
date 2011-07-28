@@ -387,6 +387,14 @@ digraph "freia_scalar_07_helper_0_4" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
+// dag 0: 11 ops (0 copies), optimized to 11 (0 copies)
+// split 0: 1 cut
+// split 1: 1 cut
+// split 2: 1 cut
+// split 3: 1 cut
+// split 4: 1 cut
+// # SPOC calls: 5
+
 // FREIA-SPoC helper function for module freia_scalar_07
 freia_status freia_scalar_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   int32_t * po0,

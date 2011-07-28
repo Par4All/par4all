@@ -298,6 +298,11 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
+// dag 0: 10 ops (0 copies), optimized to 10 (0 copies)
+// split 0: 1 cut
+// split 1: 1 cut
+// # SPOC calls: 2
+
 // FREIA-SPoC helper function for module copy_00
 freia_status copy_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   const int32_t * pi0)

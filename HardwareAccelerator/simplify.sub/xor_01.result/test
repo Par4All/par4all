@@ -118,6 +118,10 @@ digraph "xor_01_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
+// dag 0: 2 ops (0 copies), optimized to 1 (0 copies)
+// split 0: 1 cut
+// # SPOC calls: 1
+
 // FREIA-SPoC helper function for module xor_01
 freia_status xor_01_helper_0_0_0(freia_data2d * o0,
   int32_t pi0)

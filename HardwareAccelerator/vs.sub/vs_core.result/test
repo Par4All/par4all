@@ -467,6 +467,13 @@ digraph "vs_core_helper_0_3" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
+// dag 0: 17 ops (1 copies), optimized to 16 (0 copies)
+// split 0: 1 cut
+// split 1: 1 cut
+// split 2: 1 cut
+// split 3: 1 cut
+// # SPOC calls: 4
+
 // FREIA-SPoC helper function for module vs_core
 freia_status vs_core_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
   int32_t * po0,

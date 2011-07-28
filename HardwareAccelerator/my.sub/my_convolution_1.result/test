@@ -94,6 +94,9 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
+// dag 0: 1 ops (0 copies), optimized to 1 (0 copies)
+// # SPOC calls: 0
+
 ! updated function
 
 freia_status my_convolution_1(freia_data2d *o, freia_data2d *i, int32_t *k)
