@@ -40,11 +40,11 @@ C  P(A,B) {}
 
       IF (A+B.EQ.0.0) THEN                                              0006
 
-C  P(A,B) {A+B==0.0}
+C  P(A,B) {A+B==0}
 
          PRINT *, 'a+b = 0'                                             0007
 
-C  P(A,B) {A+B==0.0}
+C  P(A,B) {A+B==0}
 
          PRINT *, A+B                                                   0008
       ENDIF

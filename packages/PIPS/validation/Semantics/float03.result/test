@@ -1,0 +1,73 @@
+
+C  T() {}
+
+!
+! Check simplification of float constants
+!
+! Like float01.f, but check behavior for negative values
+!
+
+      PROGRAM FLOAT03
+      REAL X, Y, Z
+
+C  T(X) {1.+X==0}
+
+
+      X = -1.                                                           0010
+
+C  T(Y) {2.+Y==0}
+
+      Y = -2.                                                           0011
+
+C  T(Z) {X+Y==Z}
+
+      Z = X+Y                                                           0012
+
+C  T(X,Y) {}
+
+
+      READ *, X, Y                                                      0014
+
+C  T() {}
+
+
+      PRINT *, Z                                                        0016
+
+      END
+
+C  P() {}
+
+!
+! Check simplification of float constants
+!
+! Like float01.f, but check behavior for negative values
+!
+
+      PROGRAM FLOAT03
+      REAL X, Y, Z
+
+C  P() {}
+
+
+      X = -1.                                                           0010
+
+C  P(X) {1.+X==0}
+
+      Y = -2.                                                           0011
+
+C  P(X,Y) {1.+X==0, 2.+Y==0}
+
+      Z = X+Y                                                           0012
+
+C  P(X,Y,Z) {1.+2.+Z==0, 1.+X==0, 2.+Y==0}
+
+
+      READ *, X, Y                                                      0014
+
+C  P(X,Y,Z) {3.+Z==0}
+
+
+      PRINT *, Z                                                        0016
+
+      END
+

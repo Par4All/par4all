@@ -402,7 +402,6 @@ l99995:
             short (*result0)[128][8] = (short (*)[128][8]) 0;
 
 //  <result0-W-MAY-{}>
-//  <result0[PHI1]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <result0[PHI1][PHI2][PHI3]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
@@ -411,7 +410,6 @@ l99995:
             P4A_accel_malloc((void **) &result0, 1024*sizeof(short));
 
 //  <caillou0-W-MAY-{}>
-//  <caillou0[PHI1]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <caillou0[PHI1][PHI2]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
@@ -419,7 +417,6 @@ l99995:
             P4A_accel_malloc((void **) &caillou0, 4*sizeof(int));
 
 //  <src10-W-MAY-{}>
-//  <src10[PHI1]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <src10[PHI1][PHI2][PHI3]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
@@ -427,7 +424,6 @@ l99995:
             P4A_accel_malloc((void **) &src10, 1024*sizeof(short));
 
 //  <src00-W-MAY-{}>
-//  <src00[PHI1]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <src00[PHI1][PHI2][PHI3]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
@@ -668,7 +664,7 @@ void launcher_0_microcode(int *caillou0, short *result00, short *src000, short *
    unsigned int j;
 l99997:
    for(j = 0; j <= 7; j += 1)
-      *(result00+j+1-1) = (*(caillou0+2)**(src000+j+1-1)+*(caillou0+3)**(src100+j+1-1))*(*(caillou0+0)<<*(caillou0+1))>>*(caillou0+1);
+      *(result00+(j+1-1)) = (*(caillou0+2)**(src000+(j+1-1))+*(caillou0+3)**(src100+(j+1-1)))*(*(caillou0+0)<<*(caillou0+1))>>*(caillou0+1);
 }
 caillou0 seems a mask
 result00 seems an image
@@ -698,7 +694,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    ma0 = FIFO0;
 l99997:
    for(re2 = 0; re2 <= N0; re2 += 1)
-      *(im1+re2+1-1) = (*(ma0+2)**(im2+re2+1-1)+*(ma0+3)**(im3+re2+1-1))*(*(ma0+0)<<*(ma0+1))>>*(ma0+1);
+      *(im1+(re2+1-1)) = (*(ma0+2)**(im2+(re2+1-1))+*(ma0+3)**(im3+(re2+1-1)))*(*(ma0+0)<<*(ma0+1))>>*(ma0+1);
 }
 void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
 {

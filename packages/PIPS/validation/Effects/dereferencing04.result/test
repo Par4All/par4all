@@ -6,7 +6,7 @@ void dereferencing04()
    double *p;
    double *q;
    double *r;
-   *(p+q-r) = 0.;
+   *(p+(q-r)) = 0.;
 }
 
 Proper pointer effects for "dereferencing04"
@@ -18,7 +18,7 @@ void dereferencing04()
    double *r;
 //             <    is read   >: p q r
 //             <    is written>: p[q-r]
-   *(p+q-r) = 0.;
+   *(p+(q-r)) = 0.;
 }
 
 Cumulated pointer effects for "dereferencing04"
@@ -30,7 +30,7 @@ void dereferencing04()
    double *r;
 //             <may be written>: p[*]
 //             <    is read   >: p q r
-   *(p+q-r) = 0.;
+   *(p+(q-r)) = 0.;
 }
 
 Proper effects for "dereferencing04"
@@ -42,7 +42,7 @@ void dereferencing04()
    double *r;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p q r
-   *(p+q-r) = 0.;
+   *(p+(q-r)) = 0.;
 }
 
 Cumulated effects for "dereferencing04"
@@ -55,5 +55,5 @@ void dereferencing04()
    double *r;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p q r
-   *(p+q-r) = 0.;
+   *(p+(q-r)) = 0.;
 }

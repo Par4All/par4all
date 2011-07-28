@@ -46,34 +46,33 @@ int main()
 Transformers for "main"
 
 
-//  T() {1.+2.==delta2, 1.==delta}
+//  T() {delta==1., delta2==3.}
 
 int main()
 {
 
-//  T() {1.+2.==delta2, 1.==delta}
+//  T() {delta==1., delta2==3.}
 
    // BEGIN BLOCK
 
-//  T(i) {0.==i}
+//  T(i) {i==0}
 
    float i = 0.;
 
-//  T(k) {0.==i, 1.+2.==delta2, 1.==delta, k==1}
+//  T(k) {delta2==1.+2., delta==1., i==0, k==1}
 
    int k = 1;
 
-//  T(i) {0.+1.==i, 0.==i#init, 1.+2.==delta2, 1.==delta, k==1}
+//  T(i) {3.==1.+2., delta==1., i==1., delta2==3., i#init==0, k==1}
 
 
    i = i+delta;
 
-//  T(i) {0.+1.==i#init, 1.+2.==delta2, 1.==delta, 1.+i#init==i, k==1}
+//  T(i) {delta==1., i==21., i#init==1., delta2==3., k==1}
 
    i = i+delta;
 
-//  T(i) {0.+21.==i#init, 1.+2.==delta2, 1.==delta, delta2+i#init==i,
-//    k==1}
+//  T(i) {delta==1., i==2.+3., i#init==2., delta2==3., k==1}
 
    i = i+delta2;
    // END BLOCK
@@ -82,33 +81,33 @@ int main()
 Preconditions for "main"
 
 
-//  P() {1.+2.==delta2, 1.==delta}
+//  P() {delta2==1.+2., delta==1.}
 
 int main()
 {
 
-//  P() {1.+2.==delta2, 1.==delta}
+//  P() {delta==1., delta2==3.}
 
    // BEGIN BLOCK
 
-//  P() {1.+2.==delta2, 1.==delta}
+//  P() {delta==1., delta2==3.}
 
    float i = 0.;
 
-//  P(i) {0.==i, 1.+2.==delta2, 1.==delta}
+//  P(i) {delta==1., delta2==3., i==0}
 
    int k = 1;
 
-//  P(i,k) {0.==i, 1.+2.==delta2, 1.==delta, k==1}
+//  P(i,k) {delta==1., delta2==3., i==0, k==1}
 
 
    i = i+delta;
 
-//  P(i,k) {0.+1.==i, 1.+2.==delta2, 1.==delta, k==1}
+//  P(i,k) {delta==1., i==1., delta2==3., k==1}
 
    i = i+delta;
 
-//  P(i,k) {0.+21.==i, 1.+2.==delta2, 1.==delta, k==1}
+//  P(i,k) {delta==1., i==2., delta2==3., k==1}
 
    i = i+delta2;
    // END BLOCK

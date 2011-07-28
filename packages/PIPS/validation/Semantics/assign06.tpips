@@ -1,0 +1,32 @@
+delete assign06
+create assign06 assign06.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+
+# We do want to use the winning combination for the loop postcondition
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+
+echo
+echo Source code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[assign06]
+
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[assign06]
+
+close
+
+quit

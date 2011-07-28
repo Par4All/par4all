@@ -17,9 +17,9 @@ here:
 #pragma omp parallel for private(j)
       for(I_1 = 0; I_1 <= (m-1)/N; I_1 += 1)
 #pragma omp parallel for 
-         for(i = I_0*N; i <= MIN(n-1, I_0*N+N-1); i += 1)
+         for(i = I_0*N; i <= MIN(n-1, I_0*N+(N-1)); i += 1)
 #pragma omp parallel for 
-            for(j = I_1*N; j <= MIN(m-1, I_1*N+N-1); j += 1)
+            for(j = I_1*N; j <= MIN(m-1, I_1*N+(N-1)); j += 1)
                a[i][j] = b[i][j]*alpha+c[i][j]*(100-alpha);
 }
 
@@ -53,14 +53,14 @@ here:
 //  <c[PHI1][PHI2]-R-MAY-{PHI1+1<=n, PHI2+1<=m, 0<=I_0, 0<=I_1}>
 
 #pragma omp parallel for 
-         for(i = I_0*N; i <= MIN(n-1, I_0*N+N-1); i += 1)
+         for(i = I_0*N; i <= MIN(n-1, I_0*N+(N-1)); i += 1)
 
 //  <a[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2+1<=m, 0<=I_0, 0<=I_1, i+1<=n}>
 //  <b[PHI1][PHI2]-R-MAY-{PHI1==i, PHI2+1<=m, 0<=I_0, 0<=I_1, i+1<=n}>
 //  <c[PHI1][PHI2]-R-MAY-{PHI1==i, PHI2+1<=m, 0<=I_0, 0<=I_1, i+1<=n}>
 
 #pragma omp parallel for 
-            for(j = I_1*N; j <= MIN(m-1, I_1*N+N-1); j += 1)
+            for(j = I_1*N; j <= MIN(m-1, I_1*N+(N-1)); j += 1)
 
 //  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=I_0, 0<=I_1, i+1<=n,
 //    j+1<=m}>

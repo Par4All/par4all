@@ -472,46 +472,46 @@ digraph "anr999_helper_0_0" {
   "87 -" [shape=trapezium,orientation=270];
   "87 -" -> "og";
   "82 E8" [shape=box];
-  "82 E8" -> "87 -" [label="og"];
+  "82 E8" -> "87 -" [label="og_1"];
   "81 E8" [shape=box];
-  "81 E8" -> "82 E8" [label="og"];
+  "81 E8" -> "82 E8" [label="og_2"];
   "80 E8" [shape=box];
-  "80 E8" -> "81 E8" [label="og"];
+  "80 E8" -> "81 E8" [label="og_3"];
   "79 E8" [shape=box];
-  "79 E8" -> "80 E8" [label="og"];
+  "79 E8" -> "80 E8" [label="og_4"];
   "78 E8" [shape=box];
-  "78 E8" -> "79 E8" [label="og"];
+  "78 E8" -> "79 E8" [label="og_5"];
   "77 E8" [shape=box];
-  "77 E8" -> "78 E8" [label="og"];
+  "77 E8" -> "78 E8" [label="og_6"];
   "76 E8" [shape=box];
-  "76 E8" -> "77 E8" [label="og"];
+  "76 E8" -> "77 E8" [label="og_7"];
   "75 E8" [shape=box];
-  "75 E8" -> "76 E8" [label="og"];
+  "75 E8" -> "76 E8" [label="og_8"];
   "74 E8" [shape=box];
-  "74 E8" -> "75 E8" [label="og"];
+  "74 E8" -> "75 E8" [label="og_9"];
   "73 E8" [shape=box];
-  "73 E8" -> "74 E8" [label="og"];
+  "73 E8" -> "74 E8" [label="og_10"];
   "50 D8" [shape=box];
   "50 D8" -> "87 -" [label="od"];
   "50 D8" -> "od";
   "49 D8" [shape=box];
-  "49 D8" -> "50 D8" [label="od"];
+  "49 D8" -> "50 D8" [label="od_1"];
   "48 D8" [shape=box];
-  "48 D8" -> "49 D8" [label="od"];
+  "48 D8" -> "49 D8" [label="od_2"];
   "47 D8" [shape=box];
-  "47 D8" -> "48 D8" [label="od"];
+  "47 D8" -> "48 D8" [label="od_3"];
   "46 D8" [shape=box];
-  "46 D8" -> "47 D8" [label="od"];
+  "46 D8" -> "47 D8" [label="od_4"];
   "45 D8" [shape=box];
-  "45 D8" -> "46 D8" [label="od"];
+  "45 D8" -> "46 D8" [label="od_5"];
   "44 D8" [shape=box];
-  "44 D8" -> "45 D8" [label="od"];
+  "44 D8" -> "45 D8" [label="od_6"];
   "43 D8" [shape=box];
-  "43 D8" -> "44 D8" [label="od"];
+  "43 D8" -> "44 D8" [label="od_7"];
   "42 D8" [shape=box];
-  "42 D8" -> "43 D8" [label="od"];
+  "42 D8" -> "43 D8" [label="od_8"];
   "41 D8" [shape=box];
-  "41 D8" -> "42 D8" [label="od"];
+  "41 D8" -> "42 D8" [label="od_9"];
   "39 vol" [shape=diamond];
   "38 min" [shape=diamond];
   "in" -> "73 E8";
@@ -723,9 +723,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 2
-  // 0`od [1 poc 0] -> [2 poc 0] 42 dilate_8c
+  // 0`od_9 [1 poc 0] -> [2 poc 0] 42 dilate_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`od [2 input 0] -> [2 poc 0] 42 dilate_8c
+  // 0`od_9 [2 input 0] -> [2 poc 0] 42 dilate_8c
   // nope
   // poc 42 dilate_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_DILATE;
@@ -735,9 +735,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 3
-  // 0`od [2 poc 0] -> [3 poc 0] 43 dilate_8c
+  // 0`od_8 [2 poc 0] -> [3 poc 0] 43 dilate_8c
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // 0`od [3 input 0] -> [3 poc 0] 43 dilate_8c
+  // 0`od_8 [3 input 0] -> [3 poc 0] 43 dilate_8c
   // nope
   // poc 43 dilate_8c stage 3 side 0
   si.poc[3][0].op = SPOC_POC_DILATE;
@@ -747,9 +747,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 4
-  // 0`od [3 poc 0] -> [4 poc 0] 44 dilate_8c
+  // 0`od_7 [3 poc 0] -> [4 poc 0] 44 dilate_8c
   si.mux[3][0].op = SPOC_MUX_IN0;
-  // 0`od [4 input 0] -> [4 poc 0] 44 dilate_8c
+  // 0`od_7 [4 input 0] -> [4 poc 0] 44 dilate_8c
   // nope
   // poc 44 dilate_8c stage 4 side 0
   si.poc[4][0].op = SPOC_POC_DILATE;
@@ -759,9 +759,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 5
-  // 0`od [4 poc 0] -> [5 poc 0] 45 dilate_8c
+  // 0`od_6 [4 poc 0] -> [5 poc 0] 45 dilate_8c
   si.mux[4][0].op = SPOC_MUX_IN0;
-  // 0`od [5 input 0] -> [5 poc 0] 45 dilate_8c
+  // 0`od_6 [5 input 0] -> [5 poc 0] 45 dilate_8c
   // nope
   // poc 45 dilate_8c stage 5 side 0
   si.poc[5][0].op = SPOC_POC_DILATE;
@@ -771,9 +771,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 6
-  // 0`od [5 poc 0] -> [6 poc 0] 46 dilate_8c
+  // 0`od_5 [5 poc 0] -> [6 poc 0] 46 dilate_8c
   si.mux[5][0].op = SPOC_MUX_IN0;
-  // 0`od [6 input 0] -> [6 poc 0] 46 dilate_8c
+  // 0`od_5 [6 input 0] -> [6 poc 0] 46 dilate_8c
   // nope
   // poc 46 dilate_8c stage 6 side 0
   si.poc[6][0].op = SPOC_POC_DILATE;
@@ -783,9 +783,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 7
-  // 0`od [6 poc 0] -> [7 poc 0] 47 dilate_8c
+  // 0`od_4 [6 poc 0] -> [7 poc 0] 47 dilate_8c
   si.mux[6][0].op = SPOC_MUX_IN0;
-  // 0`od [7 input 0] -> [7 poc 0] 47 dilate_8c
+  // 0`od_4 [7 input 0] -> [7 poc 0] 47 dilate_8c
   // nope
   // poc 47 dilate_8c stage 7 side 0
   si.poc[7][0].op = SPOC_POC_DILATE;
@@ -795,9 +795,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 8
-  // 0`od [7 poc 0] -> [8 poc 0] 48 dilate_8c
+  // 0`od_3 [7 poc 0] -> [8 poc 0] 48 dilate_8c
   si.mux[7][0].op = SPOC_MUX_IN0;
-  // 0`od [8 input 0] -> [8 poc 0] 48 dilate_8c
+  // 0`od_3 [8 input 0] -> [8 poc 0] 48 dilate_8c
   // nope
   // poc 48 dilate_8c stage 8 side 0
   si.poc[8][0].op = SPOC_POC_DILATE;
@@ -817,9 +817,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 1
-  // 0`og [0 poc 1] -> [1 poc 1] 74 erode_8c
+  // 0`og_10 [0 poc 1] -> [1 poc 1] 74 erode_8c
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // 0`og [1 input 1] -> [1 poc 1] 74 erode_8c
+  // 0`og_10 [1 input 1] -> [1 poc 1] 74 erode_8c
   // nope
   // poc 74 erode_8c stage 1 side 1
   si.poc[1][1].op = SPOC_POC_ERODE;
@@ -829,9 +829,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 2
-  // 0`og [1 poc 1] -> [2 poc 1] 75 erode_8c
+  // 0`og_9 [1 poc 1] -> [2 poc 1] 75 erode_8c
   si.mux[1][3].op = SPOC_MUX_IN1;
-  // 0`og [2 input 1] -> [2 poc 1] 75 erode_8c
+  // 0`og_9 [2 input 1] -> [2 poc 1] 75 erode_8c
   // nope
   // poc 75 erode_8c stage 2 side 1
   si.poc[2][1].op = SPOC_POC_ERODE;
@@ -841,9 +841,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 3
-  // 0`og [2 poc 1] -> [3 poc 1] 76 erode_8c
+  // 0`og_8 [2 poc 1] -> [3 poc 1] 76 erode_8c
   si.mux[2][3].op = SPOC_MUX_IN1;
-  // 0`og [3 input 1] -> [3 poc 1] 76 erode_8c
+  // 0`og_8 [3 input 1] -> [3 poc 1] 76 erode_8c
   // nope
   // poc 76 erode_8c stage 3 side 1
   si.poc[3][1].op = SPOC_POC_ERODE;
@@ -853,9 +853,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 4
-  // 0`og [3 poc 1] -> [4 poc 1] 77 erode_8c
+  // 0`og_7 [3 poc 1] -> [4 poc 1] 77 erode_8c
   si.mux[3][3].op = SPOC_MUX_IN1;
-  // 0`og [4 input 1] -> [4 poc 1] 77 erode_8c
+  // 0`og_7 [4 input 1] -> [4 poc 1] 77 erode_8c
   // nope
   // poc 77 erode_8c stage 4 side 1
   si.poc[4][1].op = SPOC_POC_ERODE;
@@ -865,9 +865,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 5
-  // 0`og [4 poc 1] -> [5 poc 1] 78 erode_8c
+  // 0`og_6 [4 poc 1] -> [5 poc 1] 78 erode_8c
   si.mux[4][3].op = SPOC_MUX_IN1;
-  // 0`og [5 input 1] -> [5 poc 1] 78 erode_8c
+  // 0`og_6 [5 input 1] -> [5 poc 1] 78 erode_8c
   // nope
   // poc 78 erode_8c stage 5 side 1
   si.poc[5][1].op = SPOC_POC_ERODE;
@@ -877,9 +877,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 6
-  // 0`og [5 poc 1] -> [6 poc 1] 79 erode_8c
+  // 0`og_5 [5 poc 1] -> [6 poc 1] 79 erode_8c
   si.mux[5][3].op = SPOC_MUX_IN1;
-  // 0`og [6 input 1] -> [6 poc 1] 79 erode_8c
+  // 0`og_5 [6 input 1] -> [6 poc 1] 79 erode_8c
   // nope
   // poc 79 erode_8c stage 6 side 1
   si.poc[6][1].op = SPOC_POC_ERODE;
@@ -889,9 +889,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 7
-  // 0`og [6 poc 1] -> [7 poc 1] 80 erode_8c
+  // 0`og_4 [6 poc 1] -> [7 poc 1] 80 erode_8c
   si.mux[6][3].op = SPOC_MUX_IN1;
-  // 0`og [7 input 1] -> [7 poc 1] 80 erode_8c
+  // 0`og_4 [7 input 1] -> [7 poc 1] 80 erode_8c
   // nope
   // poc 80 erode_8c stage 7 side 1
   si.poc[7][1].op = SPOC_POC_ERODE;
@@ -901,9 +901,9 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 8
-  // 0`og [7 poc 1] -> [8 poc 1] 81 erode_8c
+  // 0`og_3 [7 poc 1] -> [8 poc 1] 81 erode_8c
   si.mux[7][3].op = SPOC_MUX_IN1;
-  // 0`og [8 input 1] -> [8 poc 1] 81 erode_8c
+  // 0`og_3 [8 input 1] -> [8 poc 1] 81 erode_8c
   // nope
   // poc 81 erode_8c stage 8 side 1
   si.poc[8][1].op = SPOC_POC_ERODE;
@@ -912,19 +912,19 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
     sp.poc[8][1].kernel[i] = pi2[i];
 
 
-  // output image 0`od on 0 and image 0`og on 1
-  // 0`od [8 poc 0] -> [8 output 0] 0 null
+  // output image 0`od_2 on 0 and image 0`og_2 on 1
+  // 0`od_2 [8 poc 0] -> [8 output 0] 0 null
   si.mux[8][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`od [8 output 0] -> [8 output 0] 0 null
+  // 0`od_2 [8 output 0] -> [8 output 0] 0 null
   // nope
 
-  // 0`og [8 poc 1] -> [8 output 1] 0 null
+  // 0`og_2 [8 poc 1] -> [8 output 1] 0 null
   si.mux[8][3].op = SPOC_MUX_IN1;
 
   // fill in to the end...
-  // 0`og [8 output 1] -> [8 output 1] 0 null
+  // 0`og_2 [8 output 1] -> [8 output 1] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -973,7 +973,7 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 0
-  // 0`od [0 input 0] -> [0 poc 0] 49 dilate_8c
+  // 0`od_2 [0 input 0] -> [0 poc 0] 49 dilate_8c
   // nope
   // poc 49 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -983,9 +983,9 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 1
-  // 0`od [0 poc 0] -> [1 poc 0] 50 dilate_8c
+  // 0`od_1 [0 poc 0] -> [1 poc 0] 50 dilate_8c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`od [1 input 0] -> [1 poc 0] 50 dilate_8c
+  // 0`od_1 [1 input 0] -> [1 poc 0] 50 dilate_8c
   // nope
   // poc 50 dilate_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_DILATE;
@@ -995,7 +995,7 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 
   // STAGE 0
-  // 0`og [0 input 1] -> [0 poc 1] 82 erode_8c
+  // 0`og_2 [0 input 1] -> [0 poc 1] 82 erode_8c
   // nope
   // poc 82 erode_8c stage 0 side 1
   si.poc[0][1].op = SPOC_POC_ERODE;
@@ -1007,9 +1007,9 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_dat
   // STAGE 1
   // 0`od [1 poc 0] -> [1 alu] 87 sub
   // nope
-  // 0`og [0 poc 1] -> [1 alu] 87 sub
+  // 0`og_1 [0 poc 1] -> [1 alu] 87 sub
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // 0`og [1 input 1] -> [1 alu] 87 sub
+  // 0`og_1 [1 input 1] -> [1 alu] 87 sub
   // nope
   // alu 87 sub stage 1
   si.alu[1][0].op = SPOC_ALU_SUB_IN0_IN1;
@@ -1105,9 +1105,7 @@ int anr999(void)
    freia_common_rx_image(in, &fdin);                                    /*0036*/
    
    
-   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
-
-   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0049*/
+   
    i_0 = 10;                                                            /*0051*/
 
    I_6 = 0;                                                             /*0053*/
@@ -1118,11 +1116,12 @@ int anr999(void)
    I_3_0 = 0;                                                           /*0070*/
    ret_0 = I_3_0;                                                       /*0071*/
 
+   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0081*/
    i_2 = 10;                                                            /*0083*/
 
    I_10_0 = 0;                                                          /*0085*/
    ret_0 |= I_10_0;                                                     /*0086*/
-   ret_0 |= 0;                                                          /*0087*/
+   ret_0 |= anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);               /*0087*/
 
    I_13 = 0;                                                            /*0090*/
    I_13;                                                                /*0091*/
@@ -1173,9 +1172,7 @@ int anr999(void)
    freia_common_rx_image(in, &fdin);                                    /*0036*/
    
    
-   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
-
-   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0049*/
+   
    i_0 = 10;                                                            /*0051*/
 
    I_6 = 0;                                                             /*0053*/
@@ -1185,9 +1182,11 @@ int anr999(void)
    I_3_0 = 0;                                                           /*0070*/
    ret_0 = 0;                                                           /*0071*/
 
+   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0081*/
    i_2 = 10;                                                            /*0083*/
 
    I_10_0 = 0;                                                          /*0085*/
+   ret_0 |= anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);               /*0087*/
 
    I_13 = 0;                                                            /*0090*/
 
@@ -1319,14 +1318,14 @@ digraph "anr999_helper_0_0_0" {
   "in" [shape=circle];
 
   // outputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_9" [shape=circle];
+  "og_10" [shape=circle];
 
   // computation vertices
   "73 E8" [shape=box];
-  "73 E8" -> "og";
+  "73 E8" -> "og_10";
   "41 D8" [shape=box];
-  "41 D8" -> "od";
+  "41 D8" -> "od_9";
   "39 vol" [shape=diamond];
   "38 min" [shape=diamond];
   "in" -> "73 E8";
@@ -1337,125 +1336,125 @@ digraph "anr999_helper_0_0_0" {
 // graph for dag "anr999_helper_0_0_1" of module "anr999" in dot format
 digraph "anr999_helper_0_0_1" {
   // inputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_9" [shape=circle];
+  "og_10" [shape=circle];
 
   // outputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_8" [shape=circle];
+  "og_9" [shape=circle];
 
   // computation vertices
   "74 E8" [shape=box];
-  "74 E8" -> "og";
-  "og" -> "74 E8";
+  "74 E8" -> "og_9";
+  "og_10" -> "74 E8";
   "42 D8" [shape=box];
-  "42 D8" -> "od";
-  "od" -> "42 D8";
+  "42 D8" -> "od_8";
+  "od_9" -> "42 D8";
 }
 // graph for dag "anr999_helper_0_0_2" of module "anr999" in dot format
 digraph "anr999_helper_0_0_2" {
   // inputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_8" [shape=circle];
+  "og_9" [shape=circle];
 
   // outputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_7" [shape=circle];
+  "og_8" [shape=circle];
 
   // computation vertices
   "75 E8" [shape=box];
-  "75 E8" -> "og";
-  "og" -> "75 E8";
+  "75 E8" -> "og_8";
+  "og_9" -> "75 E8";
   "43 D8" [shape=box];
-  "43 D8" -> "od";
-  "od" -> "43 D8";
+  "43 D8" -> "od_7";
+  "od_8" -> "43 D8";
 }
 // graph for dag "anr999_helper_0_0_3" of module "anr999" in dot format
 digraph "anr999_helper_0_0_3" {
   // inputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_7" [shape=circle];
+  "og_8" [shape=circle];
 
   // outputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_6" [shape=circle];
+  "og_7" [shape=circle];
 
   // computation vertices
   "76 E8" [shape=box];
-  "76 E8" -> "og";
-  "og" -> "76 E8";
+  "76 E8" -> "og_7";
+  "og_8" -> "76 E8";
   "44 D8" [shape=box];
-  "44 D8" -> "od";
-  "od" -> "44 D8";
+  "44 D8" -> "od_6";
+  "od_7" -> "44 D8";
 }
 // graph for dag "anr999_helper_0_0_4" of module "anr999" in dot format
 digraph "anr999_helper_0_0_4" {
   // inputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_6" [shape=circle];
+  "og_7" [shape=circle];
 
   // outputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_4" [shape=circle];
+  "og_5" [shape=circle];
 
   // computation vertices
   "78 E8" [shape=box];
-  "78 E8" -> "og";
+  "78 E8" -> "og_5";
   "46 D8" [shape=box];
-  "46 D8" -> "od";
+  "46 D8" -> "od_4";
   "77 E8" [shape=box];
-  "77 E8" -> "78 E8" [label="og"];
-  "og" -> "77 E8";
+  "77 E8" -> "78 E8" [label="og_6"];
+  "og_7" -> "77 E8";
   "45 D8" [shape=box];
-  "45 D8" -> "46 D8" [label="od"];
-  "od" -> "45 D8";
+  "45 D8" -> "46 D8" [label="od_5"];
+  "od_6" -> "45 D8";
 }
 // graph for dag "anr999_helper_0_0_5" of module "anr999" in dot format
 digraph "anr999_helper_0_0_5" {
   // inputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_4" [shape=circle];
+  "og_5" [shape=circle];
 
   // outputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_2" [shape=circle];
+  "og_3" [shape=circle];
 
   // computation vertices
   "80 E8" [shape=box];
-  "80 E8" -> "og";
+  "80 E8" -> "og_3";
   "48 D8" [shape=box];
-  "48 D8" -> "od";
+  "48 D8" -> "od_2";
   "79 E8" [shape=box];
-  "79 E8" -> "80 E8" [label="og"];
-  "og" -> "79 E8";
+  "79 E8" -> "80 E8" [label="og_4"];
+  "og_5" -> "79 E8";
   "47 D8" [shape=box];
-  "47 D8" -> "48 D8" [label="od"];
-  "od" -> "47 D8";
+  "47 D8" -> "48 D8" [label="od_3"];
+  "od_4" -> "47 D8";
 }
 // graph for dag "anr999_helper_0_0_6" of module "anr999" in dot format
 digraph "anr999_helper_0_0_6" {
   // inputs
-  "od" [shape=circle];
-  "og" [shape=circle];
+  "od_2" [shape=circle];
+  "og_3" [shape=circle];
 
   // outputs
   "od" [shape=circle];
   "og" [shape=circle];
 
   // computation vertices
-  "og" -> "81 E8";
-  "od" -> "49 D8";
+  "og_3" -> "81 E8";
+  "od_2" -> "49 D8";
   "87 -" [shape=trapezium,orientation=270];
   "87 -" -> "og";
   "82 E8" [shape=box];
-  "82 E8" -> "87 -" [label="og"];
+  "82 E8" -> "87 -" [label="og_1"];
   "50 D8" [shape=box];
   "50 D8" -> "87 -" [label="od"];
   "50 D8" -> "od";
   "81 E8" [shape=box];
-  "81 E8" -> "82 E8" [label="og"];
+  "81 E8" -> "82 E8" [label="og_2"];
   "49 D8" [shape=box];
-  "49 D8" -> "50 D8" [label="od"];
+  "49 D8" -> "50 D8" [label="od_1"];
 }
 // graph for dag "dag_0" of module "anr999" in dot format
 digraph "dag_0" {
@@ -1897,12 +1896,12 @@ freia_status anr999_helper_0_0_0(
   tile_in[1][0].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for od
+  // - imagelet 2 is o0 for od_9
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
   tile_out[1][0].y = 0;
-  // - imagelet 1 is o1 for og
+  // - imagelet 1 is o1 for og_10
   tile_out[0][1].x = imagelet_io_1_0;
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
@@ -2128,24 +2127,24 @@ freia_status anr999_helper_0_0_1(
 
 
   // inputs:
-  // - imagelet 1 is i0 for od
+  // - imagelet 1 is i0 for od_9
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for og
+  // - imagelet 2 is i1 for og_10
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for od
+  // - imagelet 2 is o0 for od_8
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
   tile_out[1][0].y = 0;
-  // - imagelet 1 is o1 for og
+  // - imagelet 1 is o1 for og_9
   tile_out[0][1].x = imagelet_io_1_0;
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
@@ -2339,24 +2338,24 @@ freia_status anr999_helper_0_0_2(
 
 
   // inputs:
-  // - imagelet 1 is i0 for od
+  // - imagelet 1 is i0 for od_8
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for og
+  // - imagelet 2 is i1 for og_9
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for od
+  // - imagelet 2 is o0 for od_7
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
   tile_out[1][0].y = 0;
-  // - imagelet 1 is o1 for og
+  // - imagelet 1 is o1 for og_8
   tile_out[0][1].x = imagelet_io_1_0;
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
@@ -2550,24 +2549,24 @@ freia_status anr999_helper_0_0_3(
 
 
   // inputs:
-  // - imagelet 1 is i0 for od
+  // - imagelet 1 is i0 for od_7
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for og
+  // - imagelet 2 is i1 for og_8
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for od
+  // - imagelet 2 is o0 for od_6
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
   tile_out[1][0].y = 0;
-  // - imagelet 1 is o1 for og
+  // - imagelet 1 is o1 for og_7
   tile_out[0][1].x = imagelet_io_1_0;
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
@@ -2807,24 +2806,24 @@ freia_status anr999_helper_0_0_4(
 
 
   // inputs:
-  // - imagelet 1 is i0 for od
+  // - imagelet 1 is i0 for od_6
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for og
+  // - imagelet 2 is i1 for og_7
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for od
+  // - imagelet 2 is o0 for od_4
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
   tile_out[1][0].y = 0;
-  // - imagelet 1 is o1 for og
+  // - imagelet 1 is o1 for og_5
   tile_out[0][1].x = imagelet_io_1_0;
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
@@ -3064,24 +3063,24 @@ freia_status anr999_helper_0_0_5(
 
 
   // inputs:
-  // - imagelet 1 is i0 for od
+  // - imagelet 1 is i0 for od_4
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for og
+  // - imagelet 2 is i1 for og_5
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for od
+  // - imagelet 2 is o0 for od_2
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
   tile_out[1][0].y = 0;
-  // - imagelet 1 is o1 for og
+  // - imagelet 1 is o1 for og_3
   tile_out[0][1].x = imagelet_io_1_0;
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
@@ -3325,12 +3324,12 @@ freia_status anr999_helper_0_0_6(
 
 
   // inputs:
-  // - imagelet 1 is i0 for od
+  // - imagelet 1 is i0 for od_2
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for og
+  // - imagelet 2 is i1 for og_3
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
@@ -3412,14 +3411,7 @@ int anr999(void)
    freia_common_rx_image(in, &fdin);                                    /*0036*/
    
    
-   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
-
-   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0042*/
-   anr999_helper_0_0_2(od, og, od, og, freia_morpho_kernel_8c);         /*0043*/
-   anr999_helper_0_0_3(od, og, od, og, freia_morpho_kernel_8c);         /*0044*/
-   anr999_helper_0_0_4(od, og, od, og, freia_morpho_kernel_8c);         /*0045*/
-   anr999_helper_0_0_5(od, og, od, og, freia_morpho_kernel_8c);         /*0047*/
-   anr999_helper_0_0_6(od, og, od, og, freia_morpho_kernel_8c);         /*0049*/
+   
    i_0 = 10;                                                            /*0051*/
 
    I_6 = 0;                                                             /*0053*/
@@ -3430,11 +3422,17 @@ int anr999(void)
    I_3_0 = 0;                                                           /*0070*/
    ret_0 = I_3_0;                                                       /*0071*/
 
+   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0073*/
+   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0074*/
+   anr999_helper_0_0_2(od, og, od, og, freia_morpho_kernel_8c);         /*0075*/
+   anr999_helper_0_0_3(od, og, od, og, freia_morpho_kernel_8c);         /*0076*/
+   anr999_helper_0_0_4(od, og, od, og, freia_morpho_kernel_8c);         /*0078*/
+   anr999_helper_0_0_5(od, og, od, og, freia_morpho_kernel_8c);         /*0080*/
    i_2 = 10;                                                            /*0083*/
 
    I_10_0 = 0;                                                          /*0085*/
    ret_0 |= I_10_0;                                                     /*0086*/
-   ret_0 |= 0;                                                          /*0087*/
+   ret_0 |= anr999_helper_0_0_6(od, og, od, og, freia_morpho_kernel_8c);               /*0087*/
 
    I_13 = 0;                                                            /*0090*/
    I_13;                                                                /*0091*/
@@ -3485,14 +3483,7 @@ int anr999(void)
    freia_common_rx_image(in, &fdin);                                    /*0036*/
    
    
-   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
-
-   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0042*/
-   anr999_helper_0_0_2(od, og, od, og, freia_morpho_kernel_8c);         /*0043*/
-   anr999_helper_0_0_3(od, og, od, og, freia_morpho_kernel_8c);         /*0044*/
-   anr999_helper_0_0_4(od, og, od, og, freia_morpho_kernel_8c);         /*0045*/
-   anr999_helper_0_0_5(od, og, od, og, freia_morpho_kernel_8c);         /*0047*/
-   anr999_helper_0_0_6(od, og, od, og, freia_morpho_kernel_8c);         /*0049*/
+   
    i_0 = 10;                                                            /*0051*/
 
    I_6 = 0;                                                             /*0053*/
@@ -3502,9 +3493,16 @@ int anr999(void)
    I_3_0 = 0;                                                           /*0070*/
    ret_0 = 0;                                                           /*0071*/
 
+   anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0073*/
+   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0074*/
+   anr999_helper_0_0_2(od, og, od, og, freia_morpho_kernel_8c);         /*0075*/
+   anr999_helper_0_0_3(od, og, od, og, freia_morpho_kernel_8c);         /*0076*/
+   anr999_helper_0_0_4(od, og, od, og, freia_morpho_kernel_8c);         /*0078*/
+   anr999_helper_0_0_5(od, og, od, og, freia_morpho_kernel_8c);         /*0080*/
    i_2 = 10;                                                            /*0083*/
 
    I_10_0 = 0;                                                          /*0085*/
+   ret_0 |= anr999_helper_0_0_6(od, og, od, og, freia_morpho_kernel_8c);               /*0087*/
 
    I_13 = 0;                                                            /*0090*/
 

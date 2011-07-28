@@ -24,7 +24,7 @@ void atp(float *cdens)
    int i;
    for(i = 0; i <= 1023; i += 1) {
       *(cdens+2*i) = 1;
-      *(cdens+2*i+1) = 0;
+      *(cdens+(2*i+1)) = 0;
    }
 }
 int main(int argc, char **argv)

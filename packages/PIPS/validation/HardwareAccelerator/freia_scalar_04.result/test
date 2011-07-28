@@ -359,7 +359,7 @@ freia_status freia_scalar_04(freia_data2d *o, freia_data2d *i0, freia_data2d *i1
    int max, min = 10;                                                   /*0011*/
    bool bin = false;                                                    /*0012*/
    // break pipeline on scalar dependency
-   freia_scalar_04_helper_0_0_0(t2, i0, i1, &max, k);                   /*0014*/
+   freia_scalar_04_helper_0_0_0(t2, i0, i1, &max, k);                   /*0016*/
    freia_scalar_04_helper_0_1_0(o, t2, min, max, bin);                  /*0017*/
    freia_common_destruct_data(t2);                                      /*0019*/
    return FREIA_OK;                                                     /*0020*/
@@ -375,7 +375,7 @@ freia_status freia_scalar_04(freia_data2d *o, freia_data2d *i0, freia_data2d *i1
    int max, min = 10;                                                   /*0011*/
    bool bin = 0;                                                        /*0012*/
    // break pipeline on scalar dependency
-   freia_scalar_04_helper_0_0_0(t2, i0, i1, &max, k);                   /*0014*/
+   freia_scalar_04_helper_0_0_0(t2, i0, i1, &max, k);                   /*0016*/
    freia_scalar_04_helper_0_1_0(o, t2, 10, max, bin);                   /*0017*/
    freia_common_destruct_data(t2);                                      /*0019*/
    return 0;                                                            /*0020*/
@@ -915,7 +915,7 @@ freia_status freia_scalar_04(freia_data2d *o, freia_data2d *i0, freia_data2d *i1
    int max, min = 10;                                                   /*0011*/
    bool bin = false;                                                    /*0012*/
    // break pipeline on scalar dependency
-   freia_scalar_04_helper_0_1_0(t2, i0, i1, &max, k);                   /*0014*/
+   freia_scalar_04_helper_0_1_0(t2, i0, i1, &max, k);                   /*0016*/
    freia_scalar_04_helper_0_0_0(o, t2, min, max, bin);                  /*0017*/
    freia_common_destruct_data(t2);                                      /*0019*/
    return FREIA_OK;                                                     /*0020*/
@@ -931,7 +931,7 @@ freia_status freia_scalar_04(freia_data2d *o, freia_data2d *i0, freia_data2d *i1
    int max, min = 10;                                                   /*0011*/
    bool bin = 0;                                                        /*0012*/
    // break pipeline on scalar dependency
-   freia_scalar_04_helper_0_1_0(t2, i0, i1, &max, k);                   /*0014*/
+   freia_scalar_04_helper_0_1_0(t2, i0, i1, &max, k);                   /*0016*/
    freia_scalar_04_helper_0_0_0(o, t2, 10, max, bin);                   /*0017*/
    freia_common_destruct_data(t2);                                      /*0019*/
    return 0;                                                            /*0020*/

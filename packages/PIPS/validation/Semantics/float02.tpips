@@ -1,0 +1,20 @@
+delete float02
+create float02 float02.f
+
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+# activate PRINT_CODE
+# apply PARTIAL_EVAL[%ALL]
+
+# display PRINTED_FILE[%ALL]
+
+close
+# delete float02
+delete float02

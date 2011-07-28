@@ -1,5 +1,5 @@
 
-C  T(S) {"Hello World!"==S}
+C  T(S) {S=="Hello World!"}
 
       SUBROUTINE TYPE23(S)
 
@@ -9,7 +9,7 @@ C     it's right
 
       CHARACTER*(*) S
 
-C  T(S) {"Hello World!"==S}
+C  T(S) {S=="Hello World!"}
 
 
 C     Should not be truncated since the actual lenght of s is unknown

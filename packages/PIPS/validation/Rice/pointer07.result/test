@@ -1,23 +1,53 @@
 
 POINTS TO
 
-//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-)}
+
+// Points To:
+// a -> &_a_1[0] , EXACT
+// b -> &_b_2[0] , EXACT
+// c -> &_c_3[0] , EXACT
+
 void pointer07(double *a, double *b, double *c, int cnt)
 {
-//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-)}
+
+// Points To:
+// a -> &_a_1[0] , EXACT
+// b -> &_b_2[0] , EXACT
+// c -> &_c_3[0] , EXACT
+
    double *w = (void *) 0;
-//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
-//   *NULL_POINTER*,-Exact-)}
+
+// Points To:
+// a -> &_a_1[0] , EXACT
+// b -> &_b_2[0] , EXACT
+// c -> &_c_3[0] , EXACT
+// w -> &*NULL_POINTER* , EXACT
+
    int i;
-//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
-//   *NULL_POINTER*,-Exact-)}
+
+// Points To:
+// a -> &_a_1[0] , EXACT
+// b -> &_b_2[0] , EXACT
+// c -> &_c_3[0] , EXACT
+// w -> &*NULL_POINTER* , EXACT
+
 
    w = (double *) malloc(cnt*sizeof(double));
-//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
-//   *HEAP*_l_8[0],-Exact-)}
+
+// Points To:
+// a -> &_a_1[0] , EXACT
+// b -> &_b_2[0] , EXACT
+// c -> &_c_3[0] , EXACT
+// w -> &*HEAP*_l_8[0] , EXACT
+
    for(i = 0; i <= cnt-1; i += 1)
-//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
-//   *HEAP*_l_8[0],-Exact-)}
+
+// Points To:
+// a -> &_a_1[0] , EXACT
+// b -> &_b_2[0] , EXACT
+// c -> &_c_3[0] , EXACT
+// w -> &*HEAP*_l_8[0] , EXACT
+
       w[i] = c[i]+a[i]*b[i];
 }
 

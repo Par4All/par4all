@@ -18,7 +18,7 @@ char isme(int elligent)
 donne:
    for(I_0 = 1; I_0 <= (elligent+1)/2/N; I_0 += 1)
 #pragma omp parallel for 
-      for(roverti = I_0*N; roverti <= MIN((elligent+1)/2, I_0*N+N-1); roverti += 1)
+      for(roverti = I_0*N; roverti <= MIN((elligent+1)/2, I_0*N+(N-1)); roverti += 1)
          repide[2*roverti-2] = repide[2*roverti-2+1]*2;
 }
 char isme(int elligent)
@@ -40,7 +40,7 @@ donne:
 //  <repide[PHI1]-W-MAY-{PHI1+1<=elligent, 1<=I_0}>
 
 #pragma omp parallel for 
-      for(roverti = I_0*N; roverti <= MIN((elligent+1)/2, I_0*N+N-1); roverti += 1)
+      for(roverti = I_0*N; roverti <= MIN((elligent+1)/2, I_0*N+(N-1)); roverti += 1)
 
 //  <repide[PHI1]-R-EXACT-{PHI1==2roverti-1, 1<=I_0,
 //    2roverti<=elligent+1}>

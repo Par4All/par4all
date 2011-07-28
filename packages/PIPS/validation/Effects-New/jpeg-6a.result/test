@@ -109,7 +109,7 @@ static boolean compress_data(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 //                               compptr[0].MCU_height 
 //                               compptr[0].MCU_width last_MCU_col
                   if (blockcnt<compptr->MCU_width) {
-//             <may be written>: coef[0].MCU_buffer[blkn+blockcnt][*] 
+//             <may be written>: 
 //                               coef[0].MCU_buffer[blkn+blockcnt][*][
 //                               *]
 //             <    is read   >: blkn blockcnt cinfo 
@@ -144,8 +144,7 @@ static boolean compress_data(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
                   }
                }
                else {
-//             <may be written>: coef[0].MCU_buffer[blkn][*] 
-//                               coef[0].MCU_buffer[blkn][*][*]
+//             <may be written>: coef[0].MCU_buffer[blkn][*][*]
 //             <    is read   >: blkn cinfo cinfo[0].comps_in_scan 
 //                               coef coef[0].MCU_buffer[blkn] 
 //                               coef[0].MCU_rows_per_iMCU_row 
@@ -333,7 +332,7 @@ static boolean compress_first_pass(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 //             <    is written>: thisblockrow
             /* Create dummy blocks at the right edge of the image. */
             thisblockrow += blocks_across;
-//             <may be written>: thisblockrow[*] thisblockrow[*][*]
+//             <may be written>: thisblockrow[*][*]
 //             <    is read   >: block_rows cinfo 
 //                               cinfo[0].num_components ndummy 
 //                               thisblockrow
@@ -389,7 +388,7 @@ static boolean compress_first_pass(j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 //                               compptr[0].v_samp_factor
 //             <    is written>: lastblockrow
             lastblockrow = buffer[block_row-1];
-//             <may be written>: thisblockrow[*] thisblockrow[*][*]
+//             <may be written>: thisblockrow[*][*]
 //             <    is read   >: block_rows blocks_across cinfo 
 //                               cinfo[0].num_components compptr 
 //                               compptr[0].v_samp_factor thisblockrow
@@ -3978,8 +3977,8 @@ static void validate_script(j_compress_ptr cinfo)
 }
 void jcopy_block_row(JBLOCKROW input_row, JBLOCKROW output_row, JDIMENSION num_blocks)
 {
-//             <may be read   >: input_row[*] input_row[*][*]
-//             <may be written>: output_row[*] output_row[*][*]
+//             <may be read   >: input_row[*][*]
+//             <may be written>: output_row[*][*]
 //             <    is read   >: input_row num_blocks output_row
    memcpy((void *) output_row, (void *) input_row, (size_t) (num_blocks*64*(size_t) sizeof(JCOEF)));
 }
@@ -5887,7 +5886,7 @@ static void fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info
 //                               compptr[0].v_samp_factor membersum 
 //                               nextcolsum
 //             <    is written>: neighsum
-      neighsum = colsum+colsum-membersum+nextcolsum;
+      neighsum = colsum+(colsum-membersum)+nextcolsum;
 //             <    is read   >: compptr compptr[0].v_samp_factor 
 //                               memberscale membersum neighscale 
 //                               neighsum
@@ -5932,7 +5931,7 @@ static void fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info
 //                               compptr[0].v_samp_factor lastcolsum 
 //                               membersum nextcolsum output_cols
 //             <    is written>: neighsum
-         neighsum = lastcolsum+colsum-membersum+nextcolsum;
+         neighsum = lastcolsum+(colsum-membersum)+nextcolsum;
 //             <    is read   >: compptr compptr[0].v_samp_factor 
 //                               memberscale membersum neighscale 
 //                               neighsum output_cols
@@ -5959,7 +5958,7 @@ static void fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info
 //                               compptr[0].v_samp_factor lastcolsum 
 //                               membersum
 //             <    is written>: neighsum
-      neighsum = lastcolsum+colsum-membersum+colsum;
+      neighsum = lastcolsum+(colsum-membersum)+colsum;
 //             <    is read   >: compptr compptr[0].v_samp_factor 
 //                               memberscale membersum neighscale 
 //                               neighsum
@@ -6769,7 +6768,7 @@ static void transencode_coef_controller(j_compress_ptr cinfo, jvirt_barray_ptr *
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    buffer = (JBLOCKROW) (*cinfo->mem->alloc_large)((j_common_ptr) cinfo,1,10*(size_t) sizeof(JBLOCK));
-//             <may be written>: buffer[*] buffer[*][*]
+//             <may be written>: buffer[*][*]
 //             <    is read   >: buffer
    jzero_far((void *) buffer, 10*(size_t) sizeof(JBLOCK));
 //             <    is written>: i
@@ -7197,8 +7196,8 @@ static boolean fill_input_buffer(j_decompress_ptr cinfo)
    my_src_ptr src = (my_src_ptr) cinfo->src;
    size_t nbytes;
 //             <may be read   >: src[0].infile[0] __IO_EFFECTS:LUNS[*]
-//             <may be written>: src[0].buffer[*] src[0].infile[0] 
-//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: src[0].buffer[*] src[0].infile[0]
+                                 __IO_EFFECTS:LUNS[*]
 //             <    is read   >: src src[0].buffer src[0].infile
 //             <    is written>: nbytes
    nbytes = (size_t) fread((void *) src->buffer, (size_t) 1, (size_t) 4096, src->infile);
@@ -7616,8 +7615,7 @@ static int decompress_onepass(j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
 //                               coef[0].MCU_vert_offset last_MCU_col
 //             <    is written>: MCU_col_num
       for(MCU_col_num = coef->MCU_ctr; MCU_col_num <= last_MCU_col; MCU_col_num += 1) {
-//             <may be written>: coef[0].MCU_buffer[0][*] 
-//                               coef[0].MCU_buffer[0][*][*]
+//             <may be written>: coef[0].MCU_buffer[0][*][*]
 //             <    is read   >: cinfo cinfo[0].blocks_in_MCU coef 
 //                               coef[0].MCU_buffer[0] coef[0].MCU_ctr
 //                               coef[0].MCU_rows_per_iMCU_row 
@@ -8080,7 +8078,7 @@ break_1:   ;
 //                               last_block_column
 //             <    is written>: block_num
             for(block_num = 0; block_num <= last_block_column; block_num += 1) {
-//             <may be read   >: buffer_ptr[*] buffer_ptr[*][*]
+//             <may be read   >: buffer_ptr[*][*]
 //             <may be written>: workspace[*]
 //             <    is read   >: block_rows buffer_ptr cinfo 
 //                               cinfo[0].num_components 
@@ -10124,12 +10122,12 @@ static void latch_quant_tables(j_decompress_ptr cinfo)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
          qtbl = (JQUANT_TBL *) (*cinfo->mem->alloc_small)((j_common_ptr) cinfo,1,(size_t) sizeof(JQUANT_TBL));
-//             <may be read   >: cinfo[0].quant_tbl_ptrs[qtblno][*] 
+//             <may be read   >: 
 //                               cinfo[0].quant_tbl_ptrs[qtblno][*].qu
 //                               antval[*] 
 //                               cinfo[0].quant_tbl_ptrs[qtblno][*].se
 //                               nt_table
-//             <may be written>: qtbl[*] qtbl[*].quantval[*] 
+//             <may be written>: qtbl[*].quantval[*] 
 //                               qtbl[*].sent_table
 //             <    is read   >: cinfo cinfo[0].comps_in_scan 
 //                               cinfo[0].quant_tbl_ptrs[qtblno] qtbl 
@@ -13815,7 +13813,7 @@ static void prepare_range_limit_table(j_decompress_ptr cinfo)
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: cinfo cinfo[0].sample_range_limit 
 //                               table
-   memcpy((void *) (table+4*(255+1)-128), (void *) cinfo->sample_range_limit, (size_t) (128*(size_t) sizeof(JSAMPLE)));
+   memcpy((void *) (table+(4*(255+1)-128)), (void *) cinfo->sample_range_limit, (size_t) (128*(size_t) sizeof(JSAMPLE)));
 }
 static boolean use_merged_upsample(j_decompress_ptr cinfo)
 {
@@ -18514,8 +18512,7 @@ static JBLOCKARRAY access_virt_barray(j_common_ptr cinfo, jvirt_barray_ptr ptr, 
          end_row -= ptr->cur_start_row;
 //             <    is read   >: end_row undef_row
          while (undef_row<end_row) {
-//             <may be written>: ptr[0].mem_buffer[undef_row][*] 
-//                               ptr[0].mem_buffer[undef_row][*][*]
+//             <may be written>: ptr[0].mem_buffer[undef_row][*][*]
 //             <    is read   >: bytesperrow ptr ptr[0].mem_buffer 
 //                               ptr[0].mem_buffer[undef_row] 
 //                               undef_row
@@ -18538,7 +18535,7 @@ static JBLOCKARRAY access_virt_barray(j_common_ptr cinfo, jvirt_barray_ptr ptr, 
       ptr->dirty = 1;
 //             <    is read   >: ptr ptr[0].cur_start_row 
 //                               ptr[0].mem_buffer start_row
-   return ptr->mem_buffer+start_row-ptr->cur_start_row;
+   return ptr->mem_buffer+(start_row-ptr->cur_start_row);
 }
 static JSAMPARRAY access_virt_sarray(j_common_ptr cinfo, jvirt_sarray_ptr ptr, JDIMENSION start_row, JDIMENSION num_rows, boolean writable)
 {
@@ -18674,7 +18671,7 @@ static JSAMPARRAY access_virt_sarray(j_common_ptr cinfo, jvirt_sarray_ptr ptr, J
       ptr->dirty = 1;
 //             <    is read   >: ptr ptr[0].cur_start_row 
 //                               ptr[0].mem_buffer start_row
-   return ptr->mem_buffer+start_row-ptr->cur_start_row;
+   return ptr->mem_buffer+(start_row-ptr->cur_start_row);
 }
 static JBLOCKARRAY alloc_barray(j_common_ptr cinfo, int pool_id, JDIMENSION blocksperrow, JDIMENSION numrows)
 {
@@ -25841,7 +25838,7 @@ static void quantize_fs_dither(j_decompress_ptr cinfo, JSAMPARRAY input_buf, JSA
 //                               cquantize[0].fserrors[ci] nc num_rows
 //                               width
 //             <    is written>: errorptr
-            errorptr = (cquantize->fserrors)[ci]+width+1;
+            errorptr = (cquantize->fserrors)[ci]+(width+1);
          }
          else {
 //             <    is read   >: nc num_rows
@@ -26374,13 +26371,13 @@ static void fill_inverse_cmap(j_decompress_ptr cinfo, int c0, int c1, int c2)
    c2 >>= 5-3;
 //             <    is read   >: c0
 //             <    is written>: minc0
-   minc0 = (c0<<8-5+5-3)+(1<<8-5>>1);
+   minc0 = (c0<<8-5+(5-3))+(1<<8-5>>1);
 //             <    is read   >: c1
 //             <    is written>: minc1
-   minc1 = (c1<<8-6+6-3)+(1<<8-6>>1);
+   minc1 = (c1<<8-6+(6-3))+(1<<8-6>>1);
 //             <    is read   >: c2
 //             <    is written>: minc2
-   minc2 = (c2<<8-5+5-3)+(1<<8-5>>1);
+   minc2 = (c2<<8-5+(5-3))+(1<<8-5>>1);
 //             <may be read   >: cinfo[0].colormap 
 //                               cinfo[0].colormap[0] 
 //                               cinfo[0].colormap[0][*] 
@@ -26662,19 +26659,19 @@ static int find_nearby_colors(j_decompress_ptr cinfo, int minc0, int minc1, int 
    INT32 mindist[255+1];
 //             <    is read   >: minc0
 //             <    is written>: maxc0
-   maxc0 = minc0+(1<<8-5+5-3)-(1<<8-5);
+   maxc0 = minc0+((1<<8-5+(5-3))-(1<<8-5));
 //             <    is read   >: maxc0 minc0
 //             <    is written>: centerc0
    centerc0 = minc0+maxc0>>1;
 //             <    is read   >: minc1
 //             <    is written>: maxc1
-   maxc1 = minc1+(1<<8-6+6-3)-(1<<8-6);
+   maxc1 = minc1+((1<<8-6+(6-3))-(1<<8-6));
 //             <    is read   >: maxc1 minc1
 //             <    is written>: centerc1
    centerc1 = minc1+maxc1>>1;
 //             <    is read   >: minc2
 //             <    is written>: maxc2
-   maxc2 = minc2+(1<<8-5+5-3)-(1<<8-5);
+   maxc2 = minc2+((1<<8-5+(5-3))-(1<<8-5));
 //             <    is read   >: maxc2 minc2
 //             <    is written>: centerc2
    centerc2 = minc2+maxc2>>1;
@@ -27731,7 +27728,7 @@ static void start_pass_2_quant(j_decompress_ptr cinfo, boolean is_pre_scan)
    if (cquantize->needs_zeroed) {
 //             <    is written>: i
       for(i = 0; i <= 31; i += 1)
-//             <may be written>: histogram[i][*] histogram[i][*][*]
+//             <may be written>: histogram[i][*][*]
 //             <    is read   >: histogram histogram[i] i
          jzero_far((void *) histogram[i], (1<<6)*(1<<5)*(size_t) sizeof(histcell));
 //             <    is read   >: cquantize

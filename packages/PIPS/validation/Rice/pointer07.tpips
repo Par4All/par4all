@@ -4,6 +4,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create pointer07 pointer07.c
 
+setenv CHAINS_DEBUG_LEVEL 5
 setproperty MEMORY_EFFECTS_ONLY FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
 

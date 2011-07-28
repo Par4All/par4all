@@ -8,12 +8,12 @@ C     Check proper subtring operation in string assignment
       CHARACTER*4 S1
       CHARACTER*2 S2
 
-C  T(S1) {"Hell"==S1}
+C  T(S1) {S1=="Hell"}
 
 
       S1 = "Hello!"                                                     0008
 
-C  T(S2) {'He'==S2}
+C  T(S2) {S2=='He'}
 
       S2 = 'Hello!'                                                     0009
 
@@ -38,11 +38,11 @@ C  P() {}
 
       S1 = "Hello!"                                                     0008
 
-C  P(S1) {"Hell"==S1}
+C  P(S1) {S1=="Hell"}
 
       S2 = 'Hello!'                                                     0009
 
-C  P(S1,S2) {"Hell"==S1, 'He'==S2}
+C  P(S1,S2) {S1=="Hell", S2=='He'}
 
 
       PRINT *, S1, S2                                                   0011

@@ -635,15 +635,18 @@ void ts_restructured(void)
 
             while (rand_b()) {
 
-//  P(c1,c2,m,n,x,y) {c1==x, c2==y, 1<=c1, c1+1<=n, 0<=c2, c2+1<=m}
+//  P(c1,c2,m,n,x,y) {c1==x, c2==y, 1<=c1, c1+1<=n, 0<=c2, c2+1<=m,
+//    1<=n}
 
                if (!(x<n&&y<m-1))
 
-//  P(c1,c2,m,n,x,y) {c1==x, c2==m-1, c2==y, 1<=c1, c1+1<=n, 0<=c2}
+//  P(c1,c2,m,n,x,y) {c1==x, c2==m-1, c2==y, 1<=c1, c1+1<=n, 0<=c2,
+//    1<=n}
 
                   deadlock();
 
-//  P(c1,c2,m,n,x,y) {c1==x, c2==y, 1<=c1, c1+1<=n, 0<=c2, c2+2<=m}
+//  P(c1,c2,m,n,x,y) {c1==x, c2==y, 1<=c1, c1+1<=n, 0<=c2, c2+2<=m,
+//    1<=n}
 
                y++;
 

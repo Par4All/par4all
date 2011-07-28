@@ -153,7 +153,7 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_skip_06_helper_0_0" of module "freia_skip_06" in dot format
 digraph "freia_skip_06_helper_0_0" {
   // inputs
-  "i" [shape=circle];
+  "i_1" [shape=circle];
 
   // outputs
   "i" [shape=circle];
@@ -165,8 +165,8 @@ digraph "freia_skip_06_helper_0_0" {
   "7 +" [shape=trapezium,orientation=270];
   "7 +" -> "10 &." [label="i"];
   "7 +" -> "i";
-  "i" -> "7 +";
-  "i" -> "7 +";
+  "i_1" -> "7 +";
+  "i_1" -> "7 +";
 }
 // graph for dag "freia_skip_06_helper_0_1" of module "freia_skip_06" in dot format
 digraph "freia_skip_06_helper_0_1" {
@@ -212,9 +212,9 @@ freia_status freia_skip_06_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 alu] 7 add
+  // i_1 [0 input 0] -> [0 alu] 7 add
   // nope
-  // i [0 input 1] -> [0 alu] 7 add
+  // i_1 [0 input 1] -> [0 alu] 7 add
   // nope
   // alu 7 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
@@ -372,8 +372,8 @@ void freia_skip_06(freia_data2d *o, freia_data2d *i)
    freia_data2d *t0;                                                    /*0005*/
    t0 = freia_common_create_data(16, 128, 128);                         /*0008*/
    // live allocation in an intermediate statement
-   freia_skip_06_helper_0_0_0(i, t0, i, 111);                           /*0007*/
-   freia_skip_06_helper_0_1_0(o, t0, i, 111);                           /*0011*/
+   freia_skip_06_helper_0_0_0(i, t0, i, 111);                           /*0010*/
+   freia_skip_06_helper_0_1_0(o, t0, i, 111);                           /*0012*/
    freia_common_destruct_data(t0);                                      /*0013*/
 }
 
@@ -384,8 +384,8 @@ void freia_skip_06(freia_data2d *o, freia_data2d *i)
    freia_data2d *t0;                                                    /*0005*/
    t0 = freia_common_create_data(16, 128, 128);                         /*0008*/
    // live allocation in an intermediate statement
-   freia_skip_06_helper_0_0_0(i, t0, i, 111);                           /*0007*/
-   freia_skip_06_helper_0_1_0(o, t0, i, 111);                           /*0011*/
+   freia_skip_06_helper_0_0_0(i, t0, i, 111);                           /*0010*/
+   freia_skip_06_helper_0_1_0(o, t0, i, 111);                           /*0012*/
    freia_common_destruct_data(t0);                                      /*0013*/
 }
 #
@@ -459,7 +459,7 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_skip_06_helper_0_0_0" of module "freia_skip_06" in dot format
 digraph "freia_skip_06_helper_0_0_0" {
   // inputs
-  "i" [shape=circle];
+  "i_1" [shape=circle];
 
   // outputs
   "i" [shape=circle];
@@ -476,8 +476,8 @@ digraph "freia_skip_06_helper_0_0_0" {
   "7 +" -> "11 ^." [label="i"];
   "7 +" -> "10 &." [label="i"];
   "7 +" -> "i";
-  "i" -> "7 +";
-  "i" -> "7 +";
+  "i_1" -> "7 +";
+  "i_1" -> "7 +";
 }
 
 ! acceleration function
@@ -681,7 +681,7 @@ freia_status freia_skip_06_helper_0_0_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for i
+  // - imagelet 1 is i0 for i_1
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
@@ -738,7 +738,7 @@ freia_status freia_skip_06_helper_0_0_0(
 void freia_skip_06(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_06_helper_0_0_0(i, o, i, 111, 111);                       /*0007*/
+   freia_skip_06_helper_0_0_0(i, o, i, 111, 111);                       /*0012*/
 }
 
 ! cleaned up function
@@ -746,7 +746,7 @@ void freia_skip_06(freia_data2d *o, freia_data2d *i)
 void freia_skip_06(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_06_helper_0_0_0(i, o, i, 111, 111);                       /*0007*/
+   freia_skip_06_helper_0_0_0(i, o, i, 111, 111);                       /*0012*/
 }
 #
 # FREIA COMPILATION DONE
