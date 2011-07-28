@@ -39,7 +39,7 @@ void ts_singlestate(void)
 
       checking_error();
 
-//  T(b,c,x,y) {x+y#init==x#init+y, x+y0==x0+y, y<=x+y0, 0<=y0, 0<=z}
+//  T(b,c,x,y) {x+y#init==x#init+y, x+y0==x0+y, x<=x0+y, 0<=x0, 0<=z}
 
    while (rand_b())
 
@@ -404,7 +404,7 @@ L1:   ;
 
 //  T() {x+y+3<=0, 0<=x0, 0<=y0, 0<=z}
 
-      if (!(x+y<=-3&&x+y<=-1&&z>=0))
+      if (!(x+y<=-3&&(x+y<=-1&&z>=0)))
 
 //  T() {0==-1}
 
@@ -437,7 +437,7 @@ L1:   ;
 
 //  T() {0<=x+y+2, x+y+1<=0, 0<=x0, 0<=y0, 0<=z}
 
-   if (!(x+y>-3&&x+y<=-1&&z>=0))
+   if (!(x+y>-3&&(x+y<=-1&&z>=0)))
 
 //  T() {0==-1}
 
@@ -515,19 +515,19 @@ void ts_singlestate(void)
 
    while (rand_b())
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x<=x0+y, 0<=x0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, y<=x+y0, 0<=y0, 0<=z}
 
       if (rand_b()) {
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x<=x0+y, 0<=x0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, y<=x+y0, 0<=y0, 0<=z}
 
          if (!(x+y<=-1&&z>=0))
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x<=x0+y, 0<=x+y, 0<=x0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, 0<=x+y, y<=x+y0, 0<=y0, 0<=z}
 
             deadlock();
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x<=x0+y, x+y+1<=0, 0<=x0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x+y+1<=0, y<=x+y0, 0<=y0, 0<=z}
 
          b = 1;
 
@@ -557,11 +557,11 @@ void ts_singlestate(void)
       }
       else if (rand_b()) {
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x<=x0+y, 0<=x0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, y<=x+y0, 0<=y0, 0<=z}
 
          if (!(x+y<=-1&&z<0))
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x<=x0+y, 0<=x0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, y<=x+y0, 0<=y0, 0<=z}
 
             deadlock();
 
@@ -591,15 +591,15 @@ void ts_singlestate(void)
       }
       else {
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x<=x0+y, 0<=x0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, y<=x+y0, 0<=y0, 0<=z}
 
          if (!(x+y>-1))
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x<=x0+y, x+y+1<=0, 0<=x0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x+y+1<=0, y<=x+y0, 0<=y0, 0<=z}
 
             deadlock();
 
-//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, x<=x0+y, 0<=x+y, 0<=x0, 0<=z}
+//  P(b,c,x,x0,y,y0,z) {x+y0==x0+y, 0<=x+y, y<=x+y0, 0<=y0, 0<=z}
 
          b = 0;
 
@@ -893,7 +893,7 @@ L1:   ;
 //  P(b,c,x,x0,y,y0,z) {b==0, c==0, x+y0==x0+y, x0<=2x+y0+2,
 //    2x+y0+1<=x0, 0<=x0, 0<=y0, 0<=z}
 
-      if (!(x+y<=-3&&x+y<=-1&&z>=0))
+      if (!(x+y<=-3&&(x+y<=-1&&z>=0)))
 
 //  P(b,c,x,x0,y,y0,z) {b==0, c==0, x+y0==x0+y, 2x+y0+1<=x0, 0<=x+y+2,
 //    0<=x0, 0<=y0, 0<=z}
@@ -928,7 +928,7 @@ L1:   ;
 //  P(b,c,x,x0,y,y0,z) {b==0, c==0, x+y0==x0+y, x0<=2x+y0+2,
 //    2x+y0+1<=x0, 0<=x0, 0<=y0, 0<=z}
 
-   if (!(x+y>-3&&x+y<=-1&&z>=0))
+   if (!(x+y>-3&&(x+y<=-1&&z>=0)))
 
 //  P() {0==-1}
 

@@ -1,11 +1,11 @@
 
-C  T(I,X) {2.==X, I==I#init+1}
+C  T(I,X) {X==2., I==I#init+1}
 
 
       SUBROUTINE INCR(I)
       COMMON /FOO/ X
 
-C  T(X) {2.==X}
+C  T(X) {X==2.}
 
       X = 2.                                                            0004
 
@@ -44,7 +44,7 @@ C  P() {}
 
       X = 2.                                                            0004
 
-C  P(X) {2.==X}
+C  P(X) {X==2.}
 
       I = I+1                                                           0005
       END

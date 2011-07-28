@@ -210,7 +210,7 @@ digraph "copy_01_helper_0_0" {
   "30 E8" [shape=box];
   "30 E8" -> "33 E8" [label="open"];
   "28 E8" [shape=box];
-  "28 E8" -> "30 E8" [label="open"];
+  "28 E8" -> "30 E8" [label="open_1"];
   "in" -> "28 E8";
 }
 // graph for dag "dag_0" of module "copy_01" in dot format
@@ -290,9 +290,9 @@ freia_status copy_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 1
-  // 0`open [0 poc 0] -> [1 poc 0] 30 erode_8c
+  // 0`open_1 [0 poc 0] -> [1 poc 0] 30 erode_8c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`open [1 input 0] -> [1 poc 0] 30 erode_8c
+  // 0`open_1 [1 input 0] -> [1 poc 0] 30 erode_8c
   // nope
   // poc 30 erode_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
@@ -371,12 +371,12 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
+   ret_0 |= 0;                                                          /*0028*/
    ret_0 |= 0;                                                          /*0029*/
    ret_0 |= 0;                                                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
 
-   ret_0 |= 0;                                                          /*0033*/
+   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/
@@ -415,8 +415,8 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
-   
+
+   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/
@@ -501,7 +501,7 @@ digraph "copy_01_helper_0_0_0" {
   "30 E8" [shape=box];
   "30 E8" -> "33 E8" [label="open"];
   "28 E8" [shape=box];
-  "28 E8" -> "30 E8" [label="open"];
+  "28 E8" -> "30 E8" [label="open_1"];
   "in" -> "28 E8";
 }
 // graph for dag "dag_0" of module "copy_01" in dot format
@@ -795,12 +795,12 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
+   ret_0 |= 0;                                                          /*0028*/
    ret_0 |= 0;                                                          /*0029*/
    ret_0 |= 0;                                                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
 
-   ret_0 |= 0;                                                          /*0033*/
+   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/
@@ -839,8 +839,8 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
-   
+
+   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/

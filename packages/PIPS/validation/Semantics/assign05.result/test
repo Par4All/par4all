@@ -1,0 +1,46 @@
+
+Source code with transformers
+
+
+//  T(assign05) {assign05==4}
+
+int assign05()
+{
+
+//  T(j,k) {}
+
+   int j, k;
+
+//  T(j,k) {j==2, k==2}
+
+
+   j = k = 2;
+
+//  T(assign05) {j+k==assign05}
+
+
+   return j+k;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int assign05()
+{
+
+//  P() {}
+
+   int j, k;
+
+//  P(j,k) {}
+
+
+   j = k = 2;
+
+//  P(j,k) {j==2, k==2}
+
+
+   return j+k;
+}

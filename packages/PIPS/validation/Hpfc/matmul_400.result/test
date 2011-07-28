@@ -694,8 +694,8 @@ c
 ! collecting distributed variable C
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (200*PSI2.LE.U+199.AND.L.LE.200*PSI2.AND.200*PSI1.LE.U+199
-     &.AND.L.LE.200*PSI1) THEN
+      IF (200*PSI2.LE.U+199.AND.(L.LE.200*PSI2.AND.(200*PSI1.LE.U+199
+     &.AND.L.LE.200*PSI1))) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          DO ALPHA2 = MAX(L, 200*PSI2-199), MIN(200*PSI2, U)

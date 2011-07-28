@@ -820,16 +820,16 @@ freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // complex dag for split
    // A
-   freia_33_helper_0_0_0(X0, i, &sA, k, &sB);                           /*0018*/
    // B
-   freia_33_helper_0_1_0(X1, i, sA-10, sA-1, false, k, &sC);            /*0020*/
    // A
    // A
+   freia_33_helper_0_0_0(X0, i, &sA, k, &sB);                           /*0024*/
    // C
-   freia_33_helper_0_2_0(tC, tD, X0, X1, sC-10, sC-1, false, sB-10, sB-1, false);      /*0026*/
    freia_33_helper_0_3_0(tC2, tC);                                      /*0027*/
    // B
+   freia_33_helper_0_1_0(X1, i, sA-10, sA-1, false, k, &sC);            /*0031*/
    // D
+   freia_33_helper_0_2_0(tC, tD, X0, X1, sC-10, sC-1, false, sB-10, sB-1, false);      /*0033*/
    freia_33_helper_0_4_0(o, tC2, tD);                                   /*0034*/
 
    freia_common_destruct_data(X0);                                      /*0036*/
@@ -856,16 +856,16 @@ freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // complex dag for split
    // A
-   freia_33_helper_0_0_0(X0, i, &sA, k, &sB);                           /*0018*/
    // B
-   freia_33_helper_0_1_0(X1, i, sA-10, sA-1, 0, k, &sC);                /*0020*/
    // A
    // A
+   freia_33_helper_0_0_0(X0, i, &sA, k, &sB);                           /*0024*/
    // C
-   freia_33_helper_0_2_0(tC, tD, X0, X1, sC-10, sC-1, 0, sB-10, sB-1, 0);              /*0026*/
    freia_33_helper_0_3_0(tC2, tC);                                      /*0027*/
    // B
+   freia_33_helper_0_1_0(X1, i, sA-10, sA-1, 0, k, &sC);                /*0031*/
    // D
+   freia_33_helper_0_2_0(tC, tD, X0, X1, sC-10, sC-1, 0, sB-10, sB-1, 0);              /*0033*/
    freia_33_helper_0_4_0(o, tC2, tD);                                   /*0034*/
 
    freia_common_destruct_data(X0);                                      /*0036*/
@@ -1966,15 +1966,15 @@ freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // complex dag for split
    // A
-   freia_33_helper_0_2_0(X0, i, &sA, k, &sB);                           /*0018*/
    // B
-   freia_33_helper_0_1_0(tC2, X1, X0, i, sA-10, sA-1, false, k, sB-10, sB-1, false, &sC);             /*0020*/
    // A
    // A
+   freia_33_helper_0_2_0(X0, i, &sA, k, &sB);                           /*0024*/
    // C
    // B
+   freia_33_helper_0_1_0(tC2, X1, X0, i, sA-10, sA-1, false, k, sB-10, sB-1, false, &sC);             /*0031*/
    // D
-   freia_33_helper_0_0_0(o, X1, tC2, sC-10, sC-1, false);               /*0033*/
+   freia_33_helper_0_0_0(o, X1, tC2, sC-10, sC-1, false);               /*0034*/
 
    freia_common_destruct_data(X0);                                      /*0036*/
    freia_common_destruct_data(X1);                                      /*0037*/
@@ -1998,15 +1998,15 @@ freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // complex dag for split
    // A
-   freia_33_helper_0_2_0(X0, i, &sA, k, &sB);                           /*0018*/
    // B
-   freia_33_helper_0_1_0(tC2, X1, X0, i, sA-10, sA-1, 0, k, sB-10, sB-1, 0, &sC);      /*0020*/
    // A
    // A
+   freia_33_helper_0_2_0(X0, i, &sA, k, &sB);                           /*0024*/
    // C
    // B
+   freia_33_helper_0_1_0(tC2, X1, X0, i, sA-10, sA-1, 0, k, sB-10, sB-1, 0, &sC);      /*0031*/
    // D
-   freia_33_helper_0_0_0(o, X1, tC2, sC-10, sC-1, 0);                   /*0033*/
+   freia_33_helper_0_0_0(o, X1, tC2, sC-10, sC-1, 0);                   /*0034*/
 
    freia_common_destruct_data(X0);                                      /*0036*/
    freia_common_destruct_data(X1);                                      /*0037*/

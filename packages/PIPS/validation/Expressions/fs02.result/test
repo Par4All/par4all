@@ -38,8 +38,9 @@
          X1 = B(I)                                                      0013
          X2 = B(I)*B(I)+B(I)                                            0014
          DO J = 1, N                                                    0015
-            X3 = B(I)+B(I)*B(I)+B(I)                                    0016
-            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0017
+            X3 = B(I)+(B(I)*B(I)+B(I))                                  0016
+            A(I,J) = A(I,J)*(B(I)+(B(I)*B(I)+B(I)))+(B(I)*B(I)+B(I))-   0017
+     &      1                                                           0017
          ENDDO
       ENDDO
 
@@ -60,7 +61,8 @@
 
       DO I = 1, N                                                       0012
          DO J = 1, N                                                    0015
-            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0017
+            A(I,J) = A(I,J)*(B(I)+(B(I)*B(I)+B(I)))+(B(I)*B(I)+B(I))-   0017
+     &      1                                                           0017
          ENDDO
       ENDDO
 
@@ -76,7 +78,8 @@
 
       DO I = 1, N                                                       0012
          DO J = 1, N                                                    0015
-            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0017
+            A(I,J) = A(I,J)*(B(I)+(B(I)*B(I)+B(I)))+(B(I)*B(I)+B(I))-   0017
+     &      1                                                           0017
          ENDDO
       ENDDO
 

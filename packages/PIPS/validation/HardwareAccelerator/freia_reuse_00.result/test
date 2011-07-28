@@ -160,9 +160,9 @@ digraph "freia_reuse_00_helper_0_0" {
   "14 E8" [shape=box];
   "14 E8" -> "15 D8" [label="t"];
   "13 D6" [shape=box];
-  "13 D6" -> "14 E8" [label="t"];
+  "13 D6" -> "14 E8" [label="t_1"];
   "12 E6" [shape=box];
-  "12 E6" -> "13 D6" [label="t"];
+  "12 E6" -> "13 D6" [label="t_2"];
   "i" -> "12 E6";
 }
 
@@ -202,9 +202,9 @@ freia_status freia_reuse_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 1
-  // 0`t [0 poc 0] -> [1 poc 0] 13 dilate_6c
+  // 0`t_2 [0 poc 0] -> [1 poc 0] 13 dilate_6c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`t [1 input 0] -> [1 poc 0] 13 dilate_6c
+  // 0`t_2 [1 input 0] -> [1 poc 0] 13 dilate_6c
   // nope
   // poc 13 dilate_6c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_DILATE;
@@ -214,9 +214,9 @@ freia_status freia_reuse_00_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 2
-  // 0`t [1 poc 0] -> [2 poc 0] 14 erode_8c
+  // 0`t_1 [1 poc 0] -> [2 poc 0] 14 erode_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`t [2 input 0] -> [2 poc 0] 14 erode_8c
+  // 0`t_1 [2 input 0] -> [2 poc 0] 14 erode_8c
   // nope
   // poc 14 erode_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_ERODE;
@@ -279,7 +279,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
+   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0015*/
    
    
    return FREIA_OK;                                                     /*0019*/
@@ -294,7 +294,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
+   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0015*/
    
    
    return 0;                                                            /*0019*/
@@ -377,9 +377,9 @@ digraph "freia_reuse_00_helper_0_0_0" {
   "14 E8" [shape=box];
   "14 E8" -> "15 D8" [label="t"];
   "13 D6" [shape=box];
-  "13 D6" -> "14 E8" [label="t"];
+  "13 D6" -> "14 E8" [label="t_1"];
   "12 E6" [shape=box];
-  "12 E6" -> "13 D6" [label="t"];
+  "12 E6" -> "13 D6" [label="t_2"];
   "i" -> "12 E6";
 }
 
@@ -623,7 +623,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
+   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0015*/
    
    
    return FREIA_OK;                                                     /*0019*/
@@ -638,7 +638,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
+   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0015*/
    
    
    return 0;                                                            /*0019*/

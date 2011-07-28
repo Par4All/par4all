@@ -72,6 +72,7 @@ extern freia_status freia_aipo_sup(freia_data2d *, const freia_data2d *, const f
 extern freia_status freia_aipo_sup_const(freia_data2d *, const freia_data2d *, int32_t);
 extern freia_status freia_aipo_sub(freia_data2d *, const freia_data2d *, const freia_data2d *);
 extern freia_status freia_aipo_sub_const(freia_data2d *, const freia_data2d *, int32_t);
+extern freia_status freia_aipo_const_sub(freia_data2d *, const freia_data2d *, int32_t);
 extern freia_status freia_aipo_subsat(freia_data2d *, const freia_data2d *, const freia_data2d *);
 extern freia_status freia_aipo_subsat_const(freia_data2d *, const freia_data2d *, int32_t);
 extern freia_status freia_aipo_add(freia_data2d *, const freia_data2d *, const freia_data2d *);
@@ -83,6 +84,7 @@ extern freia_status freia_aipo_absdiff_const(freia_data2d *, const freia_data2d 
 extern freia_status freia_aipo_mul(freia_data2d *, const freia_data2d *, const freia_data2d *);
 extern freia_status freia_aipo_mul_const(freia_data2d *, const freia_data2d *, int32_t);
 extern freia_status freia_aipo_div(freia_data2d *, const freia_data2d *, const freia_data2d *);
+extern freia_status freia_aipo_const_div(freia_data2d *, const freia_data2d *, int32_t);
 extern freia_status freia_aipo_div_const(freia_data2d *, const freia_data2d *, int32_t);
 extern freia_status freia_aipo_and(freia_data2d *, const freia_data2d *, const freia_data2d *);
 extern freia_status freia_aipo_and_const(freia_data2d *, const freia_data2d *, int32_t);

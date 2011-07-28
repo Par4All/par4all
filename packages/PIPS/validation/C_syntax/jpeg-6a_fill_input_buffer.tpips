@@ -1,0 +1,30 @@
+
+setenv WS=jpeg-6a_fill_input_buffer
+delete $WS
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Symbole table for "activate"
+echo
+
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#display SYMBOL_TABLE_FILE[%ALLFUNC]
+
+display PARSED_PRINTED_FILE[%ALL]
+
+close
+delete $WS
+quit

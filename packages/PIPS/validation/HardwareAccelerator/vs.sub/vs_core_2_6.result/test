@@ -389,11 +389,11 @@ digraph "dag_cleaned_0" {
 // graph for dag "vs_core_2_helper_0_0" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_0" {
   // inputs
-  "bg" [shape=circle];
+  "bg_3" [shape=circle];
   "in" [shape=circle];
 
   // outputs
-  "mv" [shape=circle];
+  "mv_6" [shape=circle];
   "t0" [shape=circle];
 
   // computation vertices
@@ -402,10 +402,10 @@ digraph "vs_core_2_helper_0_0" {
   "27 min" [shape=diamond];
   "26 max" [shape=diamond];
   "15 -|" [shape=trapezium,orientation=270];
-  "15 -|" -> "27 min" [label="mv"];
-  "15 -|" -> "26 max" [label="mv"];
-  "15 -|" -> "mv";
-  "bg" -> "15 -|";
+  "15 -|" -> "27 min" [label="mv_6"];
+  "15 -|" -> "26 max" [label="mv_6"];
+  "15 -|" -> "mv_6";
+  "bg_3" -> "15 -|";
   "in" -> "19 *.";
   "in" -> "15 -|";
 }
@@ -413,7 +413,7 @@ digraph "vs_core_2_helper_0_0" {
 digraph "vs_core_2_helper_0_1" {
   // inputs
   "t0" [shape=circle];
-  "bg" [shape=circle];
+  "bg_3" [shape=circle];
 
   // outputs
   "bg" [shape=circle];
@@ -422,44 +422,44 @@ digraph "vs_core_2_helper_0_1" {
   "22 /." [shape=trapezium,orientation=270];
   "22 /." -> "bg";
   "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "22 /." [label="bg"];
+  "21 +" -> "22 /." [label="bg_1"];
   "t0" -> "21 +";
   "20 *." [shape=trapezium,orientation=270];
-  "20 *." -> "21 +" [label="bg"];
-  "bg" -> "20 *.";
+  "20 *." -> "21 +" [label="bg_2"];
+  "bg_3" -> "20 *.";
 }
 // graph for dag "vs_core_2_helper_0_2" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_2" {
   // inputs
-  "mv" [shape=circle];
+  "mv_6" [shape=circle];
 
   // outputs
-  "mv" [shape=circle];
+  "mv_1" [shape=circle];
 
   // computation vertices
   "44 &." [shape=trapezium,orientation=270];
-  "44 &." -> "mv";
+  "44 &." -> "mv_1";
   "43 -." [shape=trapezium,orientation=270];
-  "43 -." -> "44 &." [label="mv"];
+  "43 -." -> "44 &." [label="mv_2"];
   "41 -" [shape=trapezium,orientation=270];
-  "41 -" -> "43 -." [label="mv"];
+  "41 -" -> "43 -." [label="mv_3"];
   "40 E8" [shape=box];
-  "40 E8" -> "41 -" [label="mv"];
+  "40 E8" -> "41 -" [label="mv_4"];
   "39 D8" [shape=box];
   "39 D8" -> "41 -" [label="t2"];
   "36 D8" [shape=box];
   "36 D8" -> "40 E8" [label="t1"];
   "36 D8" -> "39 D8" [label="t1"];
   "35 E8" [shape=box];
-  "35 E8" -> "36 D8" [label="t1"];
+  "35 E8" -> "36 D8" [label="t1_1"];
   "32 thr" [shape=parallelogram];
-  "32 thr" -> "35 E8" [label="mv"];
-  "mv" -> "32 thr";
+  "32 thr" -> "35 E8" [label="mv_5"];
+  "mv_6" -> "32 thr";
 }
 // graph for dag "vs_core_2_helper_0_3" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_3" {
   // inputs
-  "mv" [shape=circle];
+  "mv_1" [shape=circle];
   "stab" [shape=circle];
 
   // outputs
@@ -468,7 +468,7 @@ digraph "vs_core_2_helper_0_3" {
   // computation vertices
   "45 *" [shape=trapezium,orientation=270];
   "45 *" -> "mv";
-  "mv" -> "45 *";
+  "mv_1" -> "45 *";
   "stab" -> "45 *";
 }
 
@@ -500,18 +500,18 @@ freia_status vs_core_2_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
 
 
   // STAGE 0
-  // bg [0 input 0] -> [0 alu] 15 absdiff
+  // bg_3 [0 input 0] -> [0 alu] 15 absdiff
   // nope
   // in [0 input 1] -> [0 alu] 15 absdiff
   // nope
   // alu 15 absdiff stage 0
   si.alu[0][0].op = SPOC_ALU_ABSSUB_IN0_IN1;
 
-  // mv [0 alu] -> [0 measure 0] 15 absdiff
+  // mv_6 [0 alu] -> [0 measure 0] 15 absdiff
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
-  // mv [0 measure 0] -> [0 measure 0] 15 absdiff
+  // mv_6 [0 measure 0] -> [0 measure 0] 15 absdiff
   // nope
 
 
@@ -525,20 +525,20 @@ freia_status vs_core_2_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
   sp.alu[1][0].constant = pi2;
 
 
-  // output image mv on 0 and image 0`t0 on 1
-  // mv [0 measure 0] -> [1 output 0] 0 null
-  // mv [1 input 0] -> [1 output 0] 0 null
+  // output image mv_6 on 0 and image 0`t0 on 1
+  // mv_6 [0 measure 0] -> [1 output 0] 0 null
+  // mv_6 [1 input 0] -> [1 output 0] 0 null
   si.mux[1][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // mv [1 output 0] -> [5 output 0] 0 null
-  // mv [2 input 0] -> [5 output 0] 0 null
+  // mv_6 [1 output 0] -> [5 output 0] 0 null
+  // mv_6 [2 input 0] -> [5 output 0] 0 null
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // mv [3 input 0] -> [5 output 0] 0 null
+  // mv_6 [3 input 0] -> [5 output 0] 0 null
   si.mux[3][0].op = SPOC_MUX_IN0;
-  // mv [4 input 0] -> [5 output 0] 0 null
+  // mv_6 [4 input 0] -> [5 output 0] 0 null
   si.mux[4][0].op = SPOC_MUX_IN0;
-  // mv [5 input 0] -> [5 output 0] 0 null
+  // mv_6 [5 input 0] -> [5 output 0] 0 null
   si.mux[5][0].op = SPOC_MUX_IN0;
 
   // 0`t0 [1 alu] -> [1 output 1] 0 null
@@ -603,7 +603,7 @@ freia_status vs_core_2_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_
 
 
   // STAGE 0
-  // bg [0 input 1] -> [0 alu] 20 mul_const
+  // bg_3 [0 input 1] -> [0 alu] 20 mul_const
   // nope
   // alu 20 mul_const stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_MUL_IN1_CONST;
@@ -615,20 +615,20 @@ freia_status vs_core_2_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_
   si.mux[0][0].op = SPOC_MUX_IN0;
   // 0`t0 [1 input 0] -> [1 alu] 21 add
   // nope
-  // bg [0 alu] -> [1 alu] 21 add
+  // bg_2 [0 alu] -> [1 alu] 21 add
   si.mux[0][1].op = SPOC_MUX_IN1;
   si.mux[0][3].op = SPOC_MUX_IN0;
-  // bg [1 input 1] -> [1 alu] 21 add
+  // bg_2 [1 input 1] -> [1 alu] 21 add
   // nope
   // alu 21 add stage 1
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_IN1;
 
 
   // STAGE 2
-  // bg [1 alu] -> [2 alu] 22 div_const
+  // bg_1 [1 alu] -> [2 alu] 22 div_const
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
-  // bg [2 input 0] -> [2 alu] 22 div_const
+  // bg_1 [2 input 0] -> [2 alu] 22 div_const
   // nope
   // alu 22 div_const stage 2
   si.alu[2][0].op = SPOC_ALU_DIV_IN0_CONST;
@@ -690,7 +690,7 @@ freia_status vs_core_2_helper_0_2_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // mv [0 input 0] -> [0 threshold 0] 32 threshold
+  // mv_6 [0 input 0] -> [0 threshold 0] 32 threshold
   si.mux[0][0].op = SPOC_MUX_IN0;
   // threshold 32 threshold stage 0 side 0
   si.th[0][0].op = pi2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
@@ -699,8 +699,8 @@ freia_status vs_core_2_helper_0_2_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 1
-  // mv [0 threshold 0] -> [1 poc 0] 35 erode_8c
-  // mv [1 input 0] -> [1 poc 0] 35 erode_8c
+  // mv_5 [0 threshold 0] -> [1 poc 0] 35 erode_8c
+  // mv_5 [1 input 0] -> [1 poc 0] 35 erode_8c
   // nope
   // poc 35 erode_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
@@ -710,9 +710,9 @@ freia_status vs_core_2_helper_0_2_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 2
-  // 0`t1 [1 poc 0] -> [2 poc 0] 36 dilate_8c
+  // 0`t1_1 [1 poc 0] -> [2 poc 0] 36 dilate_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`t1 [2 input 0] -> [2 poc 0] 36 dilate_8c
+  // 0`t1_1 [2 input 0] -> [2 poc 0] 36 dilate_8c
   // nope
   // poc 36 dilate_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_DILATE;
@@ -745,7 +745,7 @@ freia_status vs_core_2_helper_0_2_0(freia_data2d * o0, freia_data2d * i0,
   for(i=0 ; i<9 ; i++)
     sp.poc[4][1].kernel[i] = pi3[i];
 
-  // mv [4 poc 1] -> [4 alu] 41 sub
+  // mv_4 [4 poc 1] -> [4 alu] 41 sub
   // nope
   // 0`t2 [4 poc 0] -> [4 alu] 41 sub
   // nope
@@ -754,23 +754,23 @@ freia_status vs_core_2_helper_0_2_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 5
-  // mv [4 alu] -> [5 alu] 43 sub_const
+  // mv_3 [4 alu] -> [5 alu] 43 sub_const
   si.mux[4][0].op = SPOC_MUX_IN1;
   si.mux[4][2].op = SPOC_MUX_IN0;
-  // mv [5 input 0] -> [5 alu] 43 sub_const
+  // mv_3 [5 input 0] -> [5 alu] 43 sub_const
   // nope
   // alu 43 sub_const stage 5
   si.alu[5][0].op = SPOC_ALU_SUB_IN0_CONST;
   sp.alu[5][0].constant = pi4;
 
 
-  // output image mv on 0
-  // mv [5 alu] -> [5 output 0] 0 null
+  // output image mv_2 on 0
+  // mv_2 [5 alu] -> [5 output 0] 0 null
   si.mux[5][0].op = SPOC_MUX_IN1;
   si.mux[5][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // mv [5 output 0] -> [5 output 0] 0 null
+  // mv_2 [5 output 0] -> [5 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -810,29 +810,29 @@ freia_status vs_core_2_helper_0_2_1(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // mv [0 input 0] -> [0 alu] 44 and_const
+  // mv_2 [0 input 0] -> [0 alu] 44 and_const
   // nope
   // alu 44 and_const stage 0
   si.alu[0][0].op = SPOC_ALU_AND_IN0_CONST;
   sp.alu[0][0].constant = pi0;
 
 
-  // output image mv on 0
-  // mv [0 alu] -> [0 output 0] 0 null
+  // output image mv_1 on 0
+  // mv_1 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // mv [0 output 0] -> [5 output 0] 0 null
-  // mv [1 input 0] -> [5 output 0] 0 null
+  // mv_1 [0 output 0] -> [5 output 0] 0 null
+  // mv_1 [1 input 0] -> [5 output 0] 0 null
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // mv [2 input 0] -> [5 output 0] 0 null
+  // mv_1 [2 input 0] -> [5 output 0] 0 null
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // mv [3 input 0] -> [5 output 0] 0 null
+  // mv_1 [3 input 0] -> [5 output 0] 0 null
   si.mux[3][0].op = SPOC_MUX_IN0;
-  // mv [4 input 0] -> [5 output 0] 0 null
+  // mv_1 [4 input 0] -> [5 output 0] 0 null
   si.mux[4][0].op = SPOC_MUX_IN0;
-  // mv [5 input 0] -> [5 output 0] 0 null
+  // mv_1 [5 input 0] -> [5 output 0] 0 null
   si.mux[5][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
@@ -871,7 +871,7 @@ freia_status vs_core_2_helper_0_3_0(freia_data2d * o0, freia_data2d * i0, freia_
 
 
   // STAGE 0
-  // mv [0 input 0] -> [0 alu] 45 mul
+  // mv_1 [0 input 0] -> [0 alu] 45 mul
   // nope
   // stab [0 input 1] -> [0 alu] 45 mul
   // nope
@@ -925,24 +925,24 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    freia_data2d *t0 = freia_common_create_data(16, 128, 128);           /*0012*/
    int binvalue, maxmotion, minmotion;                                  /*0013*/
-
-   vs_core_2_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);           /*0015*/
+   
    
    // bg update
    // was cast
-   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
+   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0022*/
    // was cast
    
    // measure
+   vs_core_2_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);           /*0027*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
-
-   vs_core_2_helper_0_2_0(mv, mv, binvalue, 255, true, freia_morpho_kernel_8c, 1);     /*0032*/
+   
    
    // open
    
    // gradient
    
+   vs_core_2_helper_0_2_0(mv, mv, binvalue, 255, true, freia_morpho_kernel_8c, 1);     /*0043*/
    vs_core_2_helper_0_2_1(mv, mv, 1);                                   /*0044*/
    vs_core_2_helper_0_3_0(mv, mv, stab);                                /*0045*/
 
@@ -960,24 +960,24 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    freia_data2d *t0 = freia_common_create_data(16, 128, 128);           /*0012*/
    int binvalue, maxmotion, minmotion;                                  /*0013*/
-
-   vs_core_2_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);           /*0015*/
+   
    
    // bg update
    // was cast
-   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
+   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0022*/
    // was cast
    
    // measure
+   vs_core_2_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);           /*0027*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
-
-   vs_core_2_helper_0_2_0(mv, mv, binvalue, 255, 1, freia_morpho_kernel_8c, 1);        /*0032*/
+   
    
    // open
    
    // gradient
    
+   vs_core_2_helper_0_2_0(mv, mv, binvalue, 255, 1, freia_morpho_kernel_8c, 1);        /*0043*/
    vs_core_2_helper_0_2_1(mv, mv, 1);                                   /*0044*/
    vs_core_2_helper_0_3_0(mv, mv, stab);                                /*0045*/
 
@@ -1157,24 +1157,22 @@ digraph "dag_cleaned_0" {
 // graph for dag "vs_core_2_helper_0_0_0" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_0_0" {
   // inputs
-  "mv" [shape=circle];
+  "mv_6" [shape=circle];
 
   // outputs
-  "mv" [shape=circle];
-  "t1" [shape=circle];
+  "t1_1" [shape=circle];
 
   // computation vertices
   "35 E8" [shape=box];
-  "35 E8" -> "t1";
+  "35 E8" -> "t1_1";
   "32 thr" [shape=parallelogram];
-  "32 thr" -> "35 E8" [label="mv"];
-  "32 thr" -> "mv";
-  "mv" -> "32 thr";
+  "32 thr" -> "35 E8" [label="mv_5"];
+  "mv_6" -> "32 thr";
 }
 // graph for dag "vs_core_2_helper_0_0_1" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_0_1" {
   // inputs
-  "t1" [shape=circle];
+  "t1_1" [shape=circle];
 
   // outputs
   "t1" [shape=circle];
@@ -1182,7 +1180,7 @@ digraph "vs_core_2_helper_0_0_1" {
   // computation vertices
   "36 D8" [shape=box];
   "36 D8" -> "t1";
-  "t1" -> "36 D8";
+  "t1_1" -> "36 D8";
 }
 // graph for dag "vs_core_2_helper_0_0_2" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_0_2" {
@@ -1200,43 +1198,43 @@ digraph "vs_core_2_helper_0_0_2" {
   "45 *" -> "mv";
   "stab" -> "45 *";
   "44 &." [shape=trapezium,orientation=270];
-  "44 &." -> "45 *" [label="mv"];
+  "44 &." -> "45 *" [label="mv_1"];
   "43 -." [shape=trapezium,orientation=270];
-  "43 -." -> "44 &." [label="mv"];
+  "43 -." -> "44 &." [label="mv_2"];
   "41 -" [shape=trapezium,orientation=270];
-  "41 -" -> "43 -." [label="mv"];
+  "41 -" -> "43 -." [label="mv_3"];
   "40 E8" [shape=box];
-  "40 E8" -> "41 -" [label="mv"];
+  "40 E8" -> "41 -" [label="mv_4"];
   "39 D8" [shape=box];
   "39 D8" -> "41 -" [label="t2"];
 }
 // graph for dag "vs_core_2_helper_0_1_0" of module "vs_core_2" in dot format
 digraph "vs_core_2_helper_0_1_0" {
   // inputs
-  "bg" [shape=circle];
+  "bg_3" [shape=circle];
   "in" [shape=circle];
 
   // outputs
-  "mv" [shape=circle];
+  "mv_6" [shape=circle];
   "bg" [shape=circle];
 
   // computation vertices
   "22 /." [shape=trapezium,orientation=270];
   "22 /." -> "bg";
   "21 +" [shape=trapezium,orientation=270];
-  "21 +" -> "22 /." [label="bg"];
+  "21 +" -> "22 /." [label="bg_1"];
   "20 *." [shape=trapezium,orientation=270];
-  "20 *." -> "21 +" [label="bg"];
+  "20 *." -> "21 +" [label="bg_2"];
   "19 *." [shape=trapezium,orientation=270];
   "19 *." -> "21 +" [label="t0"];
   "27 min" [shape=diamond];
   "26 max" [shape=diamond];
   "15 -|" [shape=trapezium,orientation=270];
-  "15 -|" -> "27 min" [label="mv"];
-  "15 -|" -> "26 max" [label="mv"];
-  "15 -|" -> "mv";
-  "bg" -> "20 *.";
-  "bg" -> "15 -|";
+  "15 -|" -> "27 min" [label="mv_6"];
+  "15 -|" -> "26 max" [label="mv_6"];
+  "15 -|" -> "mv_6";
+  "bg_3" -> "20 *.";
+  "bg_3" -> "15 -|";
   "in" -> "19 *.";
   "in" -> "15 -|";
 }
@@ -1262,21 +1260,20 @@ digraph "vs_core_2_helper_0_1_0" {
  * IMAGE H  = 0
  * MAX SIZE = 0
  *
- * 1 input image, 2 output images
+ * 1 input image, 1 output image
  * 2 image operations in dag
- * dag length is 3, dag width is 2
+ * dag length is 3, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 20
- * - communication: 18
+ * - communication: 12
  */
 freia_status vs_core_2_helper_0_0_0(
   freia_data2d * o0,
-  freia_data2d * o1,
   freia_data2d * i0,
+  int32_t pi2,
   int32_t pi3,
   int32_t pi4,
-  int32_t pi5,
-  const int32_t * pi6)
+  const int32_t * pi5)
 {
   // declarations:
   freia_microcode mcode;
@@ -1300,23 +1297,20 @@ freia_status vs_core_2_helper_0_0_0(
   const int32_t x_1 = 3;
   const int32_t y_1 = 0;
   // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][2];
+  terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][1];
-  terapix_tile_info tile_out[2][2];
+  terapix_tile_info tile_out[2][1];
   // imagelets definitions:
   // - 2 computation imagelets
-  // - 2 double buffer imagelets
-  int imagelet_size = 256;
+  // - 1 double buffer imagelets
+  int imagelet_size = 341;
   int imagelet_1 = 0;
-  int imagelet_2 = 256;
-  int imagelet_3 = 512;
-  int imagelet_4 = 768;
+  int imagelet_2 = 341;
+  int imagelet_3 = 682;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
   int imagelet_io_1_1 = imagelet_3;
-  int imagelet_io_2_0 = imagelet_2;
-  int imagelet_io_2_1 = imagelet_4;
 
   // body:
   // mcode param
@@ -1342,9 +1336,9 @@ freia_status vs_core_2_helper_0_0_0(
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
   // copy of operation 0 parameters
-  p_0[0] = pi3;
-  p_0[1] = pi4;
-  p_0[2] = pi5;
+  p_0[0] = pi2;
+  p_0[1] = pi3;
+  p_0[2] = pi4;
   gram.xoffset = x_0;
   gram.yoffset = y_0;
   gram.width = 3;
@@ -1370,13 +1364,13 @@ freia_status vs_core_2_helper_0_0_0(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][1].xmin2 = imagelet_2;
+  mcu_macro[1][1].xmin2 = imagelet_2;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   // copy of operation 1 parameters
   for(i=0; i<9; i++)
-    p_1[i] = pi6[i];
+    p_1[i] = pi5[i];
   gram.xoffset = x_1;
   gram.yoffset = y_1;
   gram.width = 3;
@@ -1397,26 +1391,40 @@ freia_status vs_core_2_helper_0_0_0(
   mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // output copy 2 -> 1
+  mcu_macro[0][2].xmin1 = imagelet_2;
+  mcu_macro[1][2].xmin1 = imagelet_2;
+  mcu_macro[0][2].ymin1 = 0;
+  mcu_macro[1][2].ymin1 = 0;
+  mcu_macro[0][2].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][2].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][2].ymin2 = 0;
+  mcu_macro[1][2].ymin2 = 0;
+  mcu_macro[0][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][2].iter2 = imagelet_size;
+  mcu_macro[1][2].iter2 = imagelet_size;
+  mcu_macro[0][2].iter3 = 0;
+  mcu_macro[1][2].iter3 = 0;
+  mcu_macro[0][2].iter4 = 0;
+  mcu_macro[1][2].iter4 = 0;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_COPY;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_COPY;
 
 
   // inputs:
-  // - imagelet 1 is i0 for mv
+  // - imagelet 1 is i0 for mv_6
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
 
   // outputs:
-  // - imagelet 1 is o0 for mv
+  // - imagelet 1 is o0 for t1_1
   tile_out[0][0].x = imagelet_io_1_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-  // - imagelet 2 is o1 for t1
-  tile_out[0][1].x = imagelet_io_2_0;
-  tile_out[0][1].y = 0;
-  tile_out[1][1].x = imagelet_io_2_1;
-  tile_out[1][1].y = 0;
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -1427,7 +1435,7 @@ freia_status vs_core_2_helper_0_0_0(
   mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
-  mcu_instr.nbout = 2;
+  mcu_instr.nbout = 1;
   mcu_instr.out0 = tile_out[0];
   mcu_instr.out1 = tile_out[1];
 
@@ -1437,14 +1445,14 @@ freia_status vs_core_2_helper_0_0_0(
   mcu_instr.in1 = tile_in[1];
 
   // actual instructions
-  mcu_instr.nbinstr = 2;
+  mcu_instr.nbinstr = 3;
   mcu_instr.instr0   = mcu_macro[0];
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
-  ret |= freia_cg_template_process(&param, o0, o1, i0);
+  ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
 
@@ -1577,7 +1585,7 @@ freia_status vs_core_2_helper_0_0_1(
 
 
   // inputs:
-  // - imagelet 1 is i0 for t1
+  // - imagelet 1 is i0 for t1_1
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
@@ -2291,7 +2299,7 @@ freia_status vs_core_2_helper_0_1_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for bg
+  // - imagelet 1 is i0 for bg_3
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
@@ -2303,7 +2311,7 @@ freia_status vs_core_2_helper_0_1_0(
   tile_in[1][1].y = 0;
 
   // outputs:
-  // - imagelet 2 is o0 for mv
+  // - imagelet 2 is o0 for mv_6
   tile_out[0][0].x = imagelet_io_2_0;
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
@@ -2390,26 +2398,26 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0012*/
    int binvalue, maxmotion, minmotion;                                  /*0013*/
-
-   vs_core_2_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0015*/
+   
    
    // bg update
    // was cast
    // was cast
    
    // measure
+   vs_core_2_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0027*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
-
-   vs_core_2_helper_0_0_0(mv, t1, mv, binvalue, 255, true, freia_morpho_kernel_8c);    /*0032*/
+   
    
    // open
+   vs_core_2_helper_0_0_0(t1, mv, binvalue, 255, true, freia_morpho_kernel_8c);        /*0035*/
    vs_core_2_helper_0_0_1(t1, t1, freia_morpho_kernel_8c);              /*0036*/
    
    // gradient
-   vs_core_2_helper_0_0_2(mv, t1, stab, freia_morpho_kernel_8c, 1, 1);  /*0039*/
    
-   
+   vs_core_2_helper_0_0_2(mv, t1, stab, freia_morpho_kernel_8c, 1, 1);  /*0045*/
+
    freia_common_destruct_data(t1);                                      /*0048*/
    return FREIA_OK;                                                     /*0050*/
 }
@@ -2424,26 +2432,26 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0012*/
    int binvalue, maxmotion, minmotion;                                  /*0013*/
-
-   vs_core_2_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0015*/
+   
    
    // bg update
    // was cast
    // was cast
    
    // measure
+   vs_core_2_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0027*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
-
-   vs_core_2_helper_0_0_0(mv, t1, mv, binvalue, 255, 1, freia_morpho_kernel_8c);       /*0032*/
+   
    
    // open
+   vs_core_2_helper_0_0_0(t1, mv, binvalue, 255, 1, freia_morpho_kernel_8c);           /*0035*/
    vs_core_2_helper_0_0_1(t1, t1, freia_morpho_kernel_8c);              /*0036*/
    
    // gradient
-   vs_core_2_helper_0_0_2(mv, t1, stab, freia_morpho_kernel_8c, 1, 1);  /*0039*/
    
-   
+   vs_core_2_helper_0_0_2(mv, t1, stab, freia_morpho_kernel_8c, 1, 1);  /*0045*/
+
    freia_common_destruct_data(t1);                                      /*0048*/
    return 0;                                                            /*0050*/
 }

@@ -7,9 +7,9 @@ int main()
    int j;
    int k = 3;
    i++ +j-j;
-   i++ +j-j;
+   i++ +(j-j);
    i++ +k-k;
-   i++ +k-k;
+   i++ +(k-k);
    return i;
 }
 
@@ -39,7 +39,7 @@ int main()
 
 //  P(i,j,k) {k==3}
 
-   i++ +j-j;
+   i++ +(j-j);
 
 //  P(i,j,k) {k==3}
 
@@ -47,7 +47,7 @@ int main()
 
 //  P(i,j,k) {k==3}
 
-   i++ +k-k;
+   i++ +(k-k);
 
 //  P(i,j,k) {k==3}
 

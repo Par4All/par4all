@@ -9,12 +9,12 @@ C     s2 should receive different values
       CHARACTER*20 S1
       CHARACTER*2 S2
 
-C  T(S1) {"Hello World!"==S1}
+C  T(S1) {S1=="Hello World!"}
 
 
       CALL FOO(S1)                                                      0009
 
-C  T(S2) {"Hello World!"==S2}
+C  T(S2) {S2=="Hello World!"}
 
       CALL FOO(S2)                                                      0010
 
@@ -25,7 +25,7 @@ C  T() {}
 
       END
 
-C  T(S) {"Hello World!"==S}
+C  T(S) {S=="Hello World!"}
 
 
       SUBROUTINE FOO(S)
@@ -36,7 +36,7 @@ C     that the assignment is legal
 
       CHARACTER*(*) S
 
-C  T(S) {"Hello World!"==S}
+C  T(S) {S=="Hello World!"}
 
 
 C     Should not be truncated since the actual lenght of s is unknown

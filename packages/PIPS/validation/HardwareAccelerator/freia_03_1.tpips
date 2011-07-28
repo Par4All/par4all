@@ -1,5 +1,6 @@
 setproperty HWAC_SPOC_DEPTH 1
-setenv WSPACE freia_03_1
-setenv FILE $WSPACE.c
+setproperty FREIA_SIMPLIFY_OPERATIONS FALSE
 setenv NAME freia_03
+setenv WSPACE ${NAME}_1
+setenv FILE $NAME.c
 source default_tpips

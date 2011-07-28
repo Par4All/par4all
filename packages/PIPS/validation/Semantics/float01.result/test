@@ -1,0 +1,69 @@
+
+C  T() {}
+
+!
+! Check simplification of float constants
+!
+
+      PROGRAM FLOAT01
+      REAL X, Y, Z
+
+C  T(X) {X==1.}
+
+
+      X = 1.                                                            0008
+
+C  T(Y) {Y==2.}
+
+      Y = 2.                                                            0009
+
+C  T(Z) {X+Y==Z}
+
+      Z = X+Y                                                           0010
+
+C  T(X,Y) {}
+
+
+      READ *, X, Y                                                      0012
+
+C  T() {}
+
+
+      PRINT *, Z                                                        0014
+
+      END
+
+C  P() {}
+
+!
+! Check simplification of float constants
+!
+
+      PROGRAM FLOAT01
+      REAL X, Y, Z
+
+C  P() {}
+
+
+      X = 1.                                                            0008
+
+C  P(X) {X==1.}
+
+      Y = 2.                                                            0009
+
+C  P(X,Y) {X==1., Y==2.}
+
+      Z = X+Y                                                           0010
+
+C  P(X,Y,Z) {Z==1.+2., X==1., Y==2.}
+
+
+      READ *, X, Y                                                      0012
+
+C  P(X,Y,Z) {Z==3.}
+
+
+      PRINT *, Z                                                        0014
+
+      END
+

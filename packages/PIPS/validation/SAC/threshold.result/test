@@ -177,9 +177,9 @@ void threshold(float data[128], float val)
          //PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)
          SIMD_LOAD_V4SF(vec10_0, &data[i]);
          SIMD_GTPS(vec00_0, vec10_0, vec20_0);
-         SIMD_STORE_V4SI(vec00_0, &I_0_0[i]);
          SIMD_PHIPS(vec30_0, vec00_0, vec20_0, vec10_0);
          SIMD_STORE_V4SF(vec30_0, &data[i]);
+         SIMD_STORE_V4SI(vec00_0, &I_0_0[i]);
       }
       i = 128;
    }
@@ -199,9 +199,9 @@ void threshold(float data[128], float val)
       //PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)
       SIMD_LOAD_V4SF(vec10_0, &data[i]);
       SIMD_GTPS(vec00_0, vec10_0, vec20_0);
-      SIMD_STORE_V4SI(vec00_0, &I_0_0[i]);
       SIMD_PHIPS(vec30_0, vec00_0, vec20_0, vec10_0);
       SIMD_STORE_V4SF(vec30_0, &data[i]);
+      SIMD_STORE_V4SI(vec00_0, &I_0_0[i]);
    }
    i = 128;
 }
@@ -223,9 +223,9 @@ void threshold(float data[128], float val)
       //PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)
       SIMD_LOAD_V4SF(vec10_0, &data[i]);
       SIMD_GTPS(vec00_0, vec10_0, vec20_0);
-      SIMD_STORE_V4SI(vec00_0, &I_0_0[i]);
       SIMD_PHIPS(vec30_0, vec00_0, vec20_0, vec10_0);
       SIMD_STORE_V4SF(vec30_0, &data[i]);
+      SIMD_STORE_V4SI(vec00_0, &I_0_0[i]);
    }
    i = 128;
 }

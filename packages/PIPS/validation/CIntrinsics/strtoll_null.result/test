@@ -1,0 +1,26 @@
+int main()
+{
+   long long int res;
+   char *input_chain1, *input_chain2;
+//             <    is written>: input_chain1
+   input_chain1 = "  1 ; and this is the remainder.\n";
+//             <may be read   >: input_chain1[*]
+//             <    is written>: res
+   res = strtoll(input_chain1, (void *) 0, 0);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: res stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("my first integer is :%lld\n", res);
+//             <may be read   >: input_chain2[*]
+//             <    is written>: res
+   res = strtoll(input_chain2, (void *) 0, 0);
+//             <    is written>: input_chain2
+   input_chain2 = "  2 ; and this is the remainder.\n";
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: res stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("my second integer is :%lld\n", res);
+   return 0;
+}

@@ -182,7 +182,7 @@ int freia_dup_08(freia_data2d *i)
 {
    int max1, max2, x, y;                                                /*0005*/
    // same measure performed twice
-   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0007*/
+   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0008*/
    return max1+max2+x+y;                                                /*0009*/
 }
 
@@ -192,7 +192,7 @@ int freia_dup_08(freia_data2d *i)
 {
    int max1, max2, x, y;                                                /*0005*/
    // same measure performed twice
-   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0007*/
+   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0008*/
    return max1+max2+x+y;                                                /*0009*/
 }
 #
@@ -552,7 +552,7 @@ int freia_dup_08(freia_data2d *i)
 {
    int max1, max2, x, y;                                                /*0005*/
    // same measure performed twice
-   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0007*/
+   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0008*/
    return max1+max2+x+y;                                                /*0009*/
 }
 
@@ -562,7 +562,7 @@ int freia_dup_08(freia_data2d *i)
 {
    int max1, max2, x, y;                                                /*0005*/
    // same measure performed twice
-   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0007*/
+   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0008*/
    return max1+max2+x+y;                                                /*0009*/
 }
 #

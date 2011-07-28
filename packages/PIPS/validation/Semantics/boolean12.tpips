@@ -12,6 +12,7 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 # This property is set to analyze C99 boolean variables
 setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 echo
 echo Transformers for "main"

@@ -1,0 +1,83 @@
+int main()
+{
+   struct mystruct s1;                                                  /*0015*/
+   s1.f1 = 0;                                                           /*0016*/
+   s1.f1 = 1;                                                           /*0017*/
+   return s1.f1;                                                        /*0018*/
+}
+int main()
+{
+//             <    is declared>: s1
+   struct mystruct s1;                                                  /*0015*/
+//             <    is written>: s1.f1
+//             <    is referenced>: s1
+   s1.f1 = 0;                                                           /*0016*/
+//             <    is written>: s1.f1
+//             <    is referenced>: s1
+   s1.f1 = 1;                                                           /*0017*/
+//             <    is read   >: s1.f1
+//             <    is referenced>: s1
+   return s1.f1;                                                        /*0018*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	17 --> 18 with conflicts
+		from <s1.f1-W-EXACT> to <s1.f1-R-EXACT>
+	16 --> 18 with conflicts
+		from <s1.f1-W-EXACT> to <s1.f1-R-EXACT>
+	16 --> 17 with conflicts
+		from <s1.f1-W-EXACT> to <s1.f1-W-EXACT>
+	15 --> 18 with conflicts
+		from <s1-WE-EXACT> to <s1-RE-EXACT>
+	15 --> 17 with conflicts
+		from <s1-WE-EXACT> to <s1-RE-EXACT>
+	15 --> 16 with conflicts
+		from <s1-WE-EXACT> to <s1-RE-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+int main()
+{
+
+//  <s1-WE-EXACT-{}>
+
+   struct mystruct s1;                                                  /*0015*/
+
+//  <s1-RE-EXACT-{}>
+//  <s1.f1-W-EXACT-{}>
+
+   s1.f1 = 0;                                                           /*0016*/
+
+//  <s1-RE-EXACT-{}>
+//  <s1.f1-W-EXACT-{}>
+
+   s1.f1 = 1;                                                           /*0017*/
+
+//  <s1-RE-EXACT-{}>
+//  <s1.f1-R-EXACT-{}>
+
+   return s1.f1;                                                        /*0018*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	17 --> 18 with conflicts
+		from <s1.f1-W-EXACT> to <s1.f1-R-EXACT>
+	16 --> 18 with conflicts
+		from <s1.f1-W-EXACT> to <s1.f1-R-EXACT>
+	16 --> 17 with conflicts
+		from <s1.f1-W-EXACT> to <s1.f1-W-EXACT>
+	15 --> 18 with conflicts
+		from <s1-WE-EXACT> to <s1-RE-EXACT>
+	15 --> 17 with conflicts
+		from <s1-WE-EXACT> to <s1-RE-EXACT>
+	15 --> 16 with conflicts
+		from <s1-WE-EXACT> to <s1-RE-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None

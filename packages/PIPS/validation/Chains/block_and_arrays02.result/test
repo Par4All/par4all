@@ -1,0 +1,84 @@
+int main()
+{
+   int a[10];                                                           /*0009*/
+   a[1] = 1;                                                            /*0010*/
+   a[2] = 2;                                                            /*0011*/
+   return a[1]+a[2];                                                    /*0012*/
+}
+int main()
+{
+//             <    is declared>: a
+   int a[10];                                                           /*0009*/
+//             <    is written>: a[1]
+//             <    is referenced>: a
+   a[1] = 1;                                                            /*0010*/
+//             <    is written>: a[2]
+//             <    is referenced>: a
+   a[2] = 2;                                                            /*0011*/
+//             <    is read   >: a[1] a[2]
+//             <    is referenced>: a a
+   return a[1]+a[2];                                                    /*0012*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 12 with conflicts
+		from <a[2]-W-EXACT> to <a[2]-R-EXACT>
+	10 --> 12 with conflicts
+		from <a[1]-W-EXACT> to <a[1]-R-EXACT>
+	09 --> 12 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	09 --> 11 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	09 --> 10 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+int main()
+{
+
+//  <a-WE-EXACT-{}>
+
+   int a[10];                                                           /*0009*/
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{PHI1==1}>
+
+   a[1] = 1;                                                            /*0010*/
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{PHI1==2}>
+
+   a[2] = 2;                                                            /*0011*/
+
+//  <a-RE-EXACT-{}>
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-R-MAY-{1<=PHI1, PHI1<=2}>
+
+   return a[1]+a[2];                                                    /*0012*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 12 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-MAY>
+	10 --> 12 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-MAY>
+	10 --> 11 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-W-EXACT>
+	09 --> 12 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	09 --> 11 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	09 --> 10 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
