@@ -26,7 +26,7 @@ static const int32_t freia_morpho_kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 static const int32_t freia_morpho_kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
 static const int32_t freia_morpho_kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
 
-// hack for ECIPO
+// hack for ECIPO?
 static const int32_t freia_morpho_k8_0[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};
 static const int32_t freia_morpho_k8_1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};
 static const int32_t freia_morpho_k8_2[9] = {0, 0, 1, 0, 1, 0, 1, 0, 0};
