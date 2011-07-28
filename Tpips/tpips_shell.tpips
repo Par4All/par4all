@@ -19,7 +19,7 @@ delete tps
 create tps tpips_shell.src/*.f
 
 # $ALL does not trigger the shell substitution... {} must be used.
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALL]
 
 # some shell commands
 echo ## ls...
@@ -42,7 +42,7 @@ create tps `echo tpips_shell.src/*.f | \
 		sed 's,tpips_shell.src/foo.f,,'`
 
 # there should be only BLA there.
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALL]
 
 close
 delete tps
