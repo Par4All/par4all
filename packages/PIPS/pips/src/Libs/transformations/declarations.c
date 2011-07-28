@@ -267,6 +267,7 @@ static void cleanup_call(call c, struct helper * ctx)
           unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
         replace = true;
     }
+    // else what?
   }
   else if (call_assign_p(c))
   {
@@ -287,8 +288,14 @@ static void cleanup_call(call c, struct helper * ctx)
   if (replace)
   {
     pips_debug(6, "replacing...\n");
-    // ??? is continue always appropriate?
-    call_function(c) = entity_intrinsic(CONTINUE_FUNCTION_NAME);
+    instruction ins =
+      (instruction) gen_get_ancestor(instruction_domain, c);
+    if (instruction_call_p(ins) && instruction_call(ins)==c)
+      // continue is appropriate only if call is an instruction!
+      call_function(c) = entity_intrinsic(CONTINUE_FUNCTION_NAME);
+    else
+      // ??? otherwise, let us try 0
+      call_function(c) = int_to_entity(0);
     gen_full_free_list(call_arguments(c));
     call_arguments(c) = NIL;
   }

@@ -15,37 +15,37 @@ C  P() {}
 
       S = "hello"                                                       0010
 
-C  P(S) {"hello"==S}
+C  P(S) {S=="hello"}
 
       T = "hello "                                                      0011
 
-C  P(S,T) {"hello "==T, "hello"==S}
+C  P(S,T) {T=="hello ", S=="hello"}
 
 
       IF (S.EQ.T) THEN                                                  0013
 
-C  P(S,T) {"hello "=="hello", "hello "==S, "hello "==T}
+C  P(S,T) {"hello "=="hello", S=="hello ", T=="hello "}
 
 !        FALSE
          PRINT *, "Trailing blanks are ignored"                         0015
       ELSE
 
-C  P(S,T) {"hello "==T, "hello"==S}
+C  P(S,T) {T=="hello ", S=="hello"}
 
 !        TRUE 
          PRINT *, "Trailing blanks are not ignored"                     0018
       ENDIF
 
-C  P(S,T) {"hello "==T, "hello"==S}
+C  P(S,T) {T=="hello ", S=="hello"}
 
 
       S = "hello"                                                       0021
 
-C  P(S,T) {"hello "==T, "hello"==S}
+C  P(S,T) {T=="hello ", S=="hello"}
 
       T = " hello"                                                      0022
 
-C  P(S,T) {" hello"==T, "hello"==S}
+C  P(S,T) {T==" hello", S=="hello"}
 
 
       IF (S.EQ.T) THEN                                                  0024
@@ -56,7 +56,7 @@ C  P() {0==-1}
          PRINT *, "Leading blanks are ignored"                          0026
       ELSE
 
-C  P(S,T) {" hello"==T, "hello"==S}
+C  P(S,T) {T==" hello", S=="hello"}
 
 !        TRUE 
          PRINT *, "Leading blanks are not ignored"                      0029

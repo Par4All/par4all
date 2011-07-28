@@ -1,0 +1,5 @@
+setproperty FREIA_SIMPLIFY_OPERATIONS FALSE
+setenv NAME freia_31
+setenv WSPACE $NAME
+setenv FILE $WSPACE.c
+source default_tpips

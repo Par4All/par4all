@@ -43,6 +43,16 @@ freia_status freia_aipo_cast(freia_data2d *o, const freia_data2d *i)
    o->stuff = i->stuff;
    return FREIA_OK;
 }
+freia_status freia_aipo_const_div(freia_data2d *o, const freia_data2d *i, int32_t c)
+{
+   o->stuff = i->stuff|c;
+   return FREIA_OK;
+}
+freia_status freia_aipo_const_sub(freia_data2d *o, const freia_data2d *i, int32_t c)
+{
+   o->stuff = i->stuff|c;
+   return FREIA_OK;
+}
 freia_status freia_aipo_convolution(freia_data2d *o, const freia_data2d *i, const int32_t *k, uint32_t c0, uint32_t c1)
 {
    o->stuff = i->stuff|*k|c0&c1;
@@ -391,6 +401,24 @@ freia_status freia_aipo_cast(freia_data2d *o, const freia_data2d *i)
 //             <    is read   >: i i[0].stuff o
 //             <    is written>: o[0].stuff
    o->stuff = i->stuff;
+   return FREIA_OK;
+}
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
+freia_status freia_aipo_const_div(freia_data2d *o, const freia_data2d *i, int32_t c)
+{
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
+   o->stuff = i->stuff|c;
+   return FREIA_OK;
+}
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
+freia_status freia_aipo_const_sub(freia_data2d *o, const freia_data2d *i, int32_t c)
+{
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
+   o->stuff = i->stuff|c;
    return FREIA_OK;
 }
 //             <    is read   >: c0 c1 i i[0].stuff k k[0] o

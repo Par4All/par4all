@@ -5,7 +5,7 @@ void alignbits()
 }
 int bitcount()
 {
-   return 8*bytecnt+8-outcnt;
+   return 8*bytecnt+(8-outcnt);
 }
 void calcSNR(unsigned char *org[3], unsigned char *rec[3])
 {
@@ -63,7 +63,7 @@ void calc_vbv_delay()
    else {
       /* I or P picture */
       if (fieldpic)
-         if (topfirst==pict_struct==1)
+         if (topfirst==(pict_struct==1))
             /* first field */
             picture_delay = 90000.0/(2.0*frame_rate);
          else
@@ -74,7 +74,7 @@ void calc_vbv_delay()
          /* frame picture */
          /* take frame reordering delay into account*/
          picture_delay = next_ip_delay;
-      if (!fieldpic||topfirst!=pict_struct==1)
+      if (!fieldpic||topfirst!=(pict_struct==1))
          /* frame picture or second field */
          if (prog_seq)
             if (!repeatfirst)
@@ -2267,7 +2267,7 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
    /* half pel flag */
    yint = dy>>1;
    yh = dy&1;
-   s = src+lx*(y+yint)+x+xint;
+   s = src+lx*(y+yint)+(x+xint);
    /* motion vector */
    d = dst+lx*y+x;
 
@@ -3084,7 +3084,7 @@ l99996:         ;
 l99999:         ;
          if (pict_type==2&&!(mb_type&8)) goto l99998;
          if (pict_type==3&&pict_struct==3&&mbinfo[k].motion_type==2&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1])&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1])) goto l99997;
-         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==pict_struct==2)&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==pict_struct==2)) {
+         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==(pict_struct==2))&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==(pict_struct==2))) {
          }
          else {
             goto l99996;
@@ -3243,7 +3243,7 @@ void putseq()
          fprintf(stderr, "Encoding frame %d ", i);
          fflush(stderr);
       }
-      f0 = N*((i+M-1)/N)-(M-1);
+      f0 = N*((i+(M-1))/N)-(M-1);
 
       if (f0<0)
          f0 = 0;
@@ -3279,7 +3279,7 @@ void putseq()
             if (i==0)
                np = (n+2*(M-1))/M-1;
             else
-               np = (n+M-1)/M-1;
+               np = (n+(M-1))/M-1;
             
             /* number of B frames */
             nb = n-np-1;
@@ -3858,7 +3858,7 @@ int rc_calc_mquant(int j)
 {
    int mquant;
    double dj, Qj, actj, N_actj;
-   dj = d+bitcount()-S-j*(T/(mb_width*mb_height2));
+   dj = d+(bitcount()-S)-j*(T/(mb_width*mb_height2));
    
    /* scale against dynamic range of mquant and the bits/picture count */
    Qj = dj*31.0/r;
@@ -6370,7 +6370,7 @@ l99999:         ;
 //                               PMV[0][1][0] PMV[0][1][1] k 
 //                               mb_height2 mb_type mb_width mbinfo 
 //                               pict_struct pict_type
-         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==pict_struct==2)&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==pict_struct==2)) {
+         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==(pict_struct==2))&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==(pict_struct==2))) {
          }
          else {
             goto l99996;
@@ -6881,7 +6881,7 @@ l99999:         ;
 
 //  T() {}
 
-         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==pict_struct==2)&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==pict_struct==2)) {
+         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==(pict_struct==2))&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==(pict_struct==2))) {
          }
          else {
             goto l99996;
@@ -7257,7 +7257,7 @@ int bitcount(void)
 
 //  T(bitcount) {bitcount+outcnt==8bytecnt+8}
 
-   return 8*bytecnt+8-outcnt;
+   return 8*bytecnt+(8-outcnt);
 }
 
 //  T() {}
@@ -7414,7 +7414,7 @@ void calc_vbv_delay(void)
 
 //  T() {}
 
-         if (topfirst==pict_struct==1)
+         if (topfirst==(pict_struct==1))
 
 //  T() {}
 
@@ -7437,7 +7437,7 @@ void calc_vbv_delay(void)
 
 //  T() {}
 
-      if (!fieldpic||topfirst!=pict_struct==1)
+      if (!fieldpic||topfirst!=(pict_struct==1))
 
 //  T() {}
 
@@ -8458,7 +8458,7 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
       }
 }
 
-//  T(main) {main==0}
+//  T(main) {argc==3, main==0}
 
 int main(int argc, char *argv[])
 {
@@ -13671,7 +13671,7 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
 
 //  T() {}
 
-   s = src+lx*(y+yint)+x+xint;
+   s = src+lx*(y+yint)+(x+xint);
 
 //  T() {}
 
@@ -16212,7 +16212,7 @@ l99999:         ;
 
 //  T() {}
 
-         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==pict_struct==2)&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==pict_struct==2)) {
+         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==(pict_struct==2))&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==(pict_struct==2))) {
          }
          else {
             goto l99996;
@@ -16854,7 +16854,7 @@ void putseq(void)
 
 //  T(f0) {}
 
-      f0 = N*((i+M-1)/N)-(M-1);
+      f0 = N*((i+(M-1))/N)-(M-1);
 
 //  T(f0) {0<=f0, f0#init<=f0}
 
@@ -16959,7 +16959,7 @@ void putseq(void)
 
 //  T(np) {}
 
-               np = (n+M-1)/M-1;
+               np = (n+(M-1))/M-1;
 
 //  T(nb) {nb+np==n-1}
 
@@ -18933,7 +18933,7 @@ int rc_calc_mquant(int j)
 
 //  T() {}
 
-   dj = d+bitcount()-S-j*(T/(mb_width*mb_height2));
+   dj = d+(bitcount()-S)-j*(T/(mb_width*mb_height2));
 
 //  T() {}
 
@@ -21769,7 +21769,7 @@ int bitcount(void)
 
 //  P() {}
 
-   return 8*bytecnt+8-outcnt;
+   return 8*bytecnt+(8-outcnt);
 }
 
 //  P() {}
@@ -21926,7 +21926,7 @@ void calc_vbv_delay(void)
 
 //  P() {}
 
-         if (topfirst==pict_struct==1)
+         if (topfirst==(pict_struct==1))
 
 //  P() {}
 
@@ -21949,7 +21949,7 @@ void calc_vbv_delay(void)
 
 //  P() {}
 
-      if (!fieldpic||topfirst!=pict_struct==1)
+      if (!fieldpic||topfirst!=(pict_struct==1))
 
 //  P() {}
 
@@ -32921,7 +32921,7 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
 //  P(i,j,xh,xint,yh,yint) {0<=addflag, addflag<=1, 2xint<=dx,
 //    dx<=2xint+1, 2yint<=dy, dy<=2yint+1}
 
-   s = src+lx*(y+yint)+x+xint;
+   s = src+lx*(y+yint)+(x+xint);
 
 //  P(i,j,xh,xint,yh,yint) {0<=addflag, addflag<=1, 2xint<=dx,
 //    dx<=2xint+1, 2yint<=dy, dy<=2yint+1}
@@ -36205,7 +36205,7 @@ l99999:         ;
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {cbp<=0, 0<=comp,
 //    1<=i, i<=k, 0<=j}
 
-         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==pict_struct==2)&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==pict_struct==2)) {
+         if (pict_type==3&&pict_struct!=3&&mbinfo[k].motion_type==1&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1]&&((mbinfo[k].mv_field_sel)[0])[0]==(pict_struct==2))&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1]&&((mbinfo[k].mv_field_sel)[0])[1]==(pict_struct==2))) {
          }
          else {
             goto l99996;
@@ -37376,7 +37376,7 @@ void putseq(void)
 
 //  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=i}
 
-      f0 = N*((i+M-1)/N)-(M-1);
+      f0 = N*((i+(M-1))/N)-(M-1);
 
 //  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=i}
 
@@ -37487,7 +37487,7 @@ void putseq(void)
 
 //  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {f0==i, j==3, 1<=f0}
 
-               np = (n+M-1)/M-1;
+               np = (n+(M-1))/M-1;
 
 //  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {f0==i, j==3, 0<=f0}
 
@@ -40794,7 +40794,7 @@ int rc_calc_mquant(int j)
 
 //  P(mquant) {0<=j}
 
-   dj = d+bitcount()-S-j*(T/(mb_width*mb_height2));
+   dj = d+(bitcount()-S)-j*(T/(mb_width*mb_height2));
 
 //  P(mquant) {0<=j}
 
@@ -41380,51 +41380,57 @@ switch_1_case_1:   ;
    d0i = d;
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
 break_1:   ;
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
 
    fprintf(statfile, "\nrate control: end of picture\n");
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " actual number of bits: S=%d\n", S);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
 
    fprintf(statfile, " average quantization parameter Q=%.1f\n", (double) Q/(mb_width*mb_height2));
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " remaining number of bits in GOP: R=%d\n", R);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    
@@ -41432,9 +41438,10 @@ break_1:   ;
    fprintf(statfile, " global complexity measures (I,P,B): Xi=%d, Xp=%d, Xb=%d\n", Xi, Xp, Xb);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    
@@ -41442,25 +41449,28 @@ break_1:   ;
    fprintf(statfile, " virtual buffer fullness (I,P,B): d0i=%d, d0p=%d, d0b=%d\n", d0i, d0p, d0b);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " remaining number of P pictures in GOP: Np=%d\n", Np);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " remaining number of B pictures in GOP: Nb=%d\n", Nb);
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
-//    R+T+d==ratectl!:R#init+ratectl!:d#init,
-//    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
-//    ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
+//    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
+//    putbits!:bytecnt+8,
+//    T+d+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+
+//    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
    fprintf(statfile, " average activity: avg_act=%.1f\n", avg_act);

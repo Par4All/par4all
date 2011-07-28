@@ -47,10 +47,9 @@ void ts_singlestate(void)
 
       checking_error();
 
-//  T(i1,i2,v1,v2) {i1+v1==i1#init+v1#init, i1+v1==n, 0<=i1,
-//    i2+v2+1<=i1+m+v1, i2+1<=i1+2v1, i2<=i1+v1, i2+v2+1<=2i1+v1,
-//    1<=i1+v1, v2<=i1, 1<=m, v2<=m, 0<=v1, v1<=v1#init,
-//    v1+v2<=v1#init+v2#init}
+//  T(i1,i2,v1,v2) {i1+v1==i1#init+v1#init, i1+v1==n, i2+v2+1<=m+n,
+//    i2<=n, i2+1<=n+v1, i2+v1+v2+1<=2n, 1<=m, v2<=m, 1<=n, v1<=n,
+//    v1+v2<=n, 0<=v1, v1<=v1#init, v1+v2<=v1#init+v2#init}
 
    while (rand_b())
 
@@ -165,10 +164,9 @@ void ts_restructured(void)
 
       checking_error();
 
-//  T(i1,i2,v1,v2) {i1+v1==i1#init+v1#init, i1+v1==n, 0<=i1,
-//    i2+1<=i1+m, i2+1<=2i1+v1, i2<=i1+v1, i2+v2<=i1, 0<=i2, i2<=m,
-//    i2+v2<=m, 1<=m, v2+1<=m, 1<=v1, v1<=v1#init,
-//    v1+v2<=v1#init+v2#init}
+//  T(i1,i2,v1,v2) {i1+v1==i1#init+v1#init, i1+v1==n, 0<=i2, i2<=m,
+//    i2+v1+1<=m+n, i2+v2<=m, i2<=n, i2+v1+1<=2n, i2+v1+v2<=n, 1<=m,
+//    v2+1<=m, v1<=n, 1<=v1, v1<=v1#init, v1+v2<=v1#init+v2#init}
 
    while (rand_b())
 

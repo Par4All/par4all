@@ -228,6 +228,7 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 		  (real_arg, &l_real_arg_eff, true);
 	    effects_free(l_tmp);
 
+
 	    FOREACH(EFFECT, real_arg_eff, l_real_arg_eff)
 	      {
 		if (anywhere_effect_p(real_arg_eff))

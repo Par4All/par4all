@@ -1,10 +1,10 @@
 
-C  T(X) {1.+X#init==X}
+C  T(X) {X==1.+X#init}
 
 
       SUBROUTINE INCR(X)
 
-C  T(X) {1.+X#init==X}
+C  T(X) {X==1.+X#init}
 
       X = X+1.                                                          0003
       END

@@ -24,11 +24,11 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/* 
+/*
  * This section has been revised and cleaned.
- * The main change is to sort the arguments for 
+ * The main change is to sort the arguments for
  * the preconditions print.
- * 
+ *
  * Modification : Arnauld LESERVOT
  * Date         : 92 08 27
  * Old version  : prettyprint.old.c

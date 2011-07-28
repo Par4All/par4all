@@ -41,8 +41,8 @@ void foo_l(int a[4], int b[4], int c[4])
    int i, j;
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec00_1, vec10_1, vec20_1;
-   SIMD_LOAD_V4SI_TO_V4SF(vec10_0, &b[0]);
    SIMD_LOAD_V4SI_TO_V4SF(vec20_0, &c[0]);
+   SIMD_LOAD_V4SI_TO_V4SF(vec10_0, &b[0]);
    for(j = 0; j <= 9; j += 1)
       for(i = 0; i <= 9; i += 1) {
          //PIPS:SAC generated v4sf vector(s)

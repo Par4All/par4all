@@ -83,10 +83,14 @@ typedef enum {
   alu_sub_10,
   alu_sub_0cst,
   alu_sub_1cst,
+  alu_sub_cst0,
+  alu_sub_cst1,
   alu_subsat_01,
   alu_subsat_10,
   alu_subsat_0cst,
   alu_subsat_1cst,
+  alu_subsat_cst0,
+  alu_subsat_cst1,
   alu_abssub,
   alu_abssub_0cst,
   alu_abssub_1cst,
@@ -97,6 +101,8 @@ typedef enum {
   alu_div_10,
   alu_div_0cst,
   alu_div_1cst,
+  alu_div_cst0,
+  alu_div_cst1,
   alu_log2_0,
   alu_log2_1,
   // comparisons
@@ -185,19 +191,16 @@ typedef enum {
   "#include <freiaCoarseGrain.h>\n"   \
   "#include <spoc.h>\n"
 
-#define FREIA_SPOC_DECL                                   \
-  "  spoc_instr si;\n"                                    \
-  "  spoc_param sp;\n"                                    \
-  "  spoc_reduction reduc;\n"                             \
-  "  freia_microcode mcode;\n"                            \
-  "  freia_dynamic_param dynparam;\n"                     \
-  "  freia_reduction_results redres;\n"                   \
-  "  freia_op_param param;\n"                             \
-  "  freia_status ret;\n"                                 \
-  "  int i;\n"                                            \
-  "\n"                                                    \
-  "  // init pipe to nop\n"                               \
-  "  spoc_init_pipe(&si, &sp, " FREIA_DEFAULT_BPP ");\n"  \
+#define FREIA_SPOC_DECL                 \
+  "  spoc_instr si;\n"                  \
+  "  spoc_param sp;\n"                  \
+  "  spoc_reduction reduc;\n"           \
+  "  freia_microcode mcode;\n"          \
+  "  freia_dynamic_param dynparam;\n"   \
+  "  freia_reduction_results redres;\n" \
+  "  freia_op_param param;\n"           \
+  "  freia_status ret;\n"               \
+  "  int i;\n"                          \
   "\n"
 
 #define FREIA_SPOC_CALL                                 \

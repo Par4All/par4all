@@ -53,11 +53,11 @@ C  P(R) {}
 
       IF (R.GT.0.0.AND.R.LT.1.0) THEN                                   0007
 
-C  P(R) {0.0<=R, R<=1.0}
+C  P(R) {R<=1., 0<=R}
 
          PRINT *, R                                                     0008
 
-C  P(R) {0.0<=R, R<=1.0}
+C  P(R) {R<=1., 0<=R}
 
          PRINT *, R                                                     0009
 c      else

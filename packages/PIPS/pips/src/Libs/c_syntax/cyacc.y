@@ -2246,11 +2246,18 @@ type_spec:   /* ISO 6.7.2 */
 			  if(type_undefined_p(t))
 			    v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
 			  else {
+			    if(default_complex_type_p(t)) {
+			      pips_user_warning("complex double declaration is not in the C99 standard\n");
+			      v = make_variable(make_basic_complex(DEFAULT_DOUBLECOMPLEX_TYPE_SIZE), NIL, NIL);
+			    }
 			    /* This secondary test is probably
 			       useless. See the case of TK_COMPLEX. */
-			    if(standard_long_integer_type_p(t))
+			    else if(standard_long_integer_type_p(t))
 			      v = make_variable(make_basic_float(DEFAULT_QUADPRECISION_TYPE_SIZE),NIL,NIL);
 			    else
+			      /* FI: we should probably have a user
+				 or internal error here since we
+				 ignore the beginning of the type declaration*/
 			      v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
 			    free_type(t);
 			  }

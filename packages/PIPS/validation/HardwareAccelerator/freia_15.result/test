@@ -245,7 +245,7 @@ freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
 {
    // test re ordering of mes
-   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0008*/
+   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -254,7 +254,7 @@ freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1
 freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
 {
    // test re ordering of mes
-   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0008*/
+   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0011*/
    return 0;                                                            /*0012*/
 }
 #
@@ -716,7 +716,7 @@ freia_status freia_15_helper_0_0_0(
 freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
 {
    // test re ordering of mes
-   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0008*/
+   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0011*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -725,7 +725,7 @@ freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1
 freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
 {
    // test re ordering of mes
-   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0008*/
+   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0011*/
    return 0;                                                            /*0012*/
 }
 #

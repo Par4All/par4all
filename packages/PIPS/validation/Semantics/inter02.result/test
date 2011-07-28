@@ -59,7 +59,7 @@ C  T() {}
 
       PROGRAM INTER02
 
-C  T(X) {0.==X}
+C  T(X) {X==0}
 
 
 C     Check that type mismatches are detected and do not cause core dumps
@@ -119,7 +119,7 @@ C     Check that type mismatches are detected and do not cause core dumps
 
       X = 0.                                                            0005
 
-C  P(X) {0.==X}
+C  P(X) {X==0}
 
 
       CALL INCR(X)                                                      0007

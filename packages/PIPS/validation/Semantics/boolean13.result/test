@@ -1,0 +1,87 @@
+
+Transformers for "main"
+
+
+//  T(main) {main==5}
+
+int main(void)
+{
+
+//  T(stabilize) {stabilize==1}
+
+   _Bool stabilize = 1;
+
+//  T(j,k) {stabilize==1}
+
+   int j, k;
+
+//  T(j) {j==2, stabilize==1}
+
+
+   j = stabilize+stabilize;
+
+//  T(k) {j==2, k==3, stabilize==1}
+
+   k = 3*stabilize;
+
+//  T() {j==2, k==3, stabilize==1}
+
+
+   printf("j=%d, k=%d\n", j, k);
+
+//  T(main) {j==2, k==3, main==5, stabilize==1}
+
+
+   return j+k;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   _Bool stabilize = 1;
+
+//  P(stabilize) {stabilize==1}
+
+   int j, k;
+
+//  P(j,k,stabilize) {stabilize==1}
+
+
+   j = stabilize+stabilize;
+
+//  P(j,k,stabilize) {j==2, stabilize==1}
+
+   k = 3*stabilize;
+
+//  P(j,k,stabilize) {j==2, k==3, stabilize==1}
+
+
+   printf("j=%d, k=%d\n", j, k);
+
+//  P(j,k,stabilize) {j==2, k==3, stabilize==1}
+
+
+   return j+k;
+}
+
+Code after control simplification
+
+int main(void)
+{
+   _Bool stabilize = 1;
+   int j, k;
+
+   j = stabilize+stabilize;
+   k = 3*stabilize;
+
+   printf("j=%d, k=%d\n", j, k);
+
+   return j+k;
+}

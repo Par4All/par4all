@@ -1,0 +1,100 @@
+int main()
+{
+   int a, b;                                                            /*0007*/
+   a = 0;                                                               /*0008*/
+   a = 1;                                                               /*0009*/
+   b = a;                                                               /*0010*/
+   b = a+1;                                                             /*0011*/
+   return b;                                                            /*0012*/
+}
+int main()
+{
+//             <    is declared>: a b
+   int a, b;                                                            /*0007*/
+//             <    is written>: a
+//             <    is referenced>: a
+   a = 0;                                                               /*0008*/
+//             <    is written>: a
+//             <    is referenced>: a
+   a = 1;                                                               /*0009*/
+//             <    is read   >: a
+//             <    is written>: b
+//             <    is referenced>: a b
+   b = a;                                                               /*0010*/
+//             <    is read   >: a
+//             <    is written>: b
+//             <    is referenced>: a b
+   b = a+1;                                                             /*0011*/
+//             <    is read   >: b
+//             <    is referenced>: b
+   return b;                                                            /*0012*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 12 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	10 --> 11 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+	09 --> 11 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	09 --> 10 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	08 --> 09 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+	07 --> 12 with conflicts
+		from <b-WE-EXACT> to <b-RE-EXACT>
+	07 --> 11 with conflicts
+		from <b-WE-EXACT> to <b-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	07 --> 10 with conflicts
+		from <b-WE-EXACT> to <b-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	07 --> 09 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	07 --> 08 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+int main()
+{
+   int a, b;                                                            /*0007*/
+   a = 0;                                                               /*0008*/
+   a = 1;                                                               /*0009*/
+   b = a;                                                               /*0010*/
+   b = a+1;                                                             /*0011*/
+   return b;                                                            /*0012*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 12 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	10 --> 11 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+	09 --> 11 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	09 --> 10 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	08 --> 09 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+	07 --> 12 with conflicts
+		from <b-WE-EXACT> to <b-RE-EXACT>
+	07 --> 11 with conflicts
+		from <b-WE-EXACT> to <b-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	07 --> 10 with conflicts
+		from <b-WE-EXACT> to <b-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	07 --> 09 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	07 --> 08 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None

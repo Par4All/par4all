@@ -215,7 +215,7 @@ int main(char *fmt1, ...)
 //             <    is written>: nr
    nr = fwrite(buf2, sizeof(char), n, fp);
 //             <may be read   >: fp[0] __IO_EFFECTS:LUNS[*]
-//             <may be written>: fp[0] fp_pos[*] fp_pos[*].__pos 
+//             <may be written>: fp[0] fp_pos[*].__pos 
 //                               fp_pos[*].__state.__count 
 //                               fp_pos[*].__state.__value.__wch 
 //                               fp_pos[*].__state.__value.__wchb[*] 
@@ -236,7 +236,7 @@ int main(char *fmt1, ...)
 //             <    is read   >: fp
 
    (void) fseek(fp, 0L, 0);
-//             <may be read   >: fp[0] fp_pos[*] fp_pos[*].__pos 
+//             <may be read   >: fp[0] fp_pos[*].__pos 
 //                               fp_pos[*].__state.__count 
 //                               fp_pos[*].__state.__value.__wch 
 //                               fp_pos[*].__state.__value.__wchb[*] 

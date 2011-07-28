@@ -145,7 +145,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-      if (!(i+j>17&&i+j<=20&&i<10))
+      if (!(i+j>17&&(i+j<=20&&i<10)))
 
 //  T() {0==-1}
 
@@ -384,7 +384,7 @@ void ts_restructured(void)
 
 //  P(i,j) {i==2j+2, 0<=j, j<=3}
 
-      if (!(i+j>17&&i+j<=20&&i<10))
+      if (!(i+j>17&&(i+j<=20&&i<10)))
 
 //  P(i,j) {i==2j+2, 0<=j, j<=3}
 

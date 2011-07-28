@@ -189,7 +189,7 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0};
    //PIPS generated variable
-   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0;
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec00_1, vec10_1, vec20_1, vec30_1, vec40_1, vec50_1, vec60_1, vec70_1, vec80_1, vec90_1, vec100_1, vec110_1, vec120_1, vec130_1;
    SIMD_LOAD_BROADCAST_V4SF(vec10_0, alpha);
    //SAC generated temporary array
    a4si pdata2 = {1, 1, 1, 1};
@@ -203,13 +203,9 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       SIMD_LOAD_V4SF(vec100_0, &src2[i0]);
       SIMD_LOAD_V4SF(vec20_0, &src1[i0]);
       SIMD_MULPS(vec00_0, vec10_0, vec20_0);
-      SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
       SIMD_UMINPS(vec30_0, vec10_0);
-      SIMD_STORE_V4SF(vec30_0, &pdata1[0]);
       SIMD_ADDPS(vec50_0, vec30_0, vec70_0);
-      SIMD_STORE_V4SF(vec50_0, &pdata3[0]);
       SIMD_MULPS(vec80_0, vec50_0, vec100_0);
-      SIMD_STORE_V4SF(vec80_0, &pdata4[0]);
       SIMD_ADDPS(vec110_0, vec00_0, vec80_0);
       SIMD_STORE_V4SF(vec110_0, &result[i0]);
    }
@@ -220,6 +216,10 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
       F_3 = F_2*src2[i1];
       result[i1] = F_0+F_3;
    }
+   SIMD_STORE_V4SF(vec80_0, &pdata4[0]);
+   SIMD_STORE_V4SF(vec50_0, &pdata3[0]);
+   SIMD_STORE_V4SF(vec30_0, &pdata1[0]);
+   SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {

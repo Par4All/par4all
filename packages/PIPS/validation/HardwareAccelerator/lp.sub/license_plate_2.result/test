@@ -1197,47 +1197,47 @@ digraph "license_plate_helper_0_0" {
   "in" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out_1" [shape=circle];
 
   // computation vertices
   "147 D8" [shape=box];
-  "147 D8" -> "out";
+  "147 D8" -> "out_1";
   "146 D8" [shape=box];
-  "146 D8" -> "147 D8" [label="out"];
+  "146 D8" -> "147 D8" [label="out_2"];
   "145 D8" [shape=box];
-  "145 D8" -> "146 D8" [label="out"];
+  "145 D8" -> "146 D8" [label="out_3"];
   "140 D8" [shape=box];
   "140 D8" -> "145 D8" [label="imout"];
   "139 D8" [shape=box];
-  "139 D8" -> "140 D8" [label="imout"];
+  "139 D8" -> "140 D8" [label="imout_1"];
   "138 D8" [shape=box];
-  "138 D8" -> "139 D8" [label="imout"];
+  "138 D8" -> "139 D8" [label="imout_2"];
   "137 D8" [shape=box];
-  "137 D8" -> "138 D8" [label="imout"];
+  "137 D8" -> "138 D8" [label="imout_3"];
   "134 E8" [shape=box];
-  "134 E8" -> "137 D8" [label="imout"];
+  "134 E8" -> "137 D8" [label="imout_4"];
   "133 E8" [shape=box];
-  "133 E8" -> "134 E8" [label="imout"];
+  "133 E8" -> "134 E8" [label="imout_5"];
   "132 E8" [shape=box];
-  "132 E8" -> "133 E8" [label="imout"];
+  "132 E8" -> "133 E8" [label="imout_6"];
   "131 E8" [shape=box];
-  "131 E8" -> "132 E8" [label="imout"];
+  "131 E8" -> "132 E8" [label="imout_7"];
   "126 D8" [shape=box];
   "126 D8" -> "131 E8" [label="imfilt"];
   "125 D8" [shape=box];
-  "125 D8" -> "126 D8" [label="imfilt"];
+  "125 D8" -> "126 D8" [label="imfilt_1"];
   "124 D8" [shape=box];
-  "124 D8" -> "125 D8" [label="imfilt"];
+  "124 D8" -> "125 D8" [label="imfilt_2"];
   "123 D8" [shape=box];
-  "123 D8" -> "124 D8" [label="imfilt"];
+  "123 D8" -> "124 D8" [label="imfilt_3"];
   "120 E8" [shape=box];
-  "120 E8" -> "123 D8" [label="imfilt"];
+  "120 E8" -> "123 D8" [label="imfilt_4"];
   "119 E8" [shape=box];
-  "119 E8" -> "120 E8" [label="imfilt"];
+  "119 E8" -> "120 E8" [label="imfilt_5"];
   "118 E8" [shape=box];
-  "118 E8" -> "119 E8" [label="imfilt"];
+  "118 E8" -> "119 E8" [label="imfilt_6"];
   "117 E8" [shape=box];
-  "117 E8" -> "118 E8" [label="imfilt"];
+  "117 E8" -> "118 E8" [label="imfilt_7"];
   "115 &" [shape=trapezium,orientation=270];
   "115 &" -> "117 E8" [label="imand"];
   "113 thr" [shape=parallelogram];
@@ -1247,95 +1247,95 @@ digraph "license_plate_helper_0_0" {
   "106 E8" [shape=box];
   "106 E8" -> "113 thr" [label="imclose"];
   "105 E8" [shape=box];
-  "105 E8" -> "106 E8" [label="imclose"];
+  "105 E8" -> "106 E8" [label="imclose_1"];
   "104 E8" [shape=box];
-  "104 E8" -> "105 E8" [label="imclose"];
+  "104 E8" -> "105 E8" [label="imclose_2"];
   "103 E8" [shape=box];
-  "103 E8" -> "104 E8" [label="imclose"];
+  "103 E8" -> "104 E8" [label="imclose_3"];
   "102 E8" [shape=box];
-  "102 E8" -> "103 E8" [label="imclose"];
+  "102 E8" -> "103 E8" [label="imclose_4"];
   "101 E8" [shape=box];
-  "101 E8" -> "102 E8" [label="imclose"];
+  "101 E8" -> "102 E8" [label="imclose_5"];
   "100 E8" [shape=box];
-  "100 E8" -> "101 E8" [label="imclose"];
+  "100 E8" -> "101 E8" [label="imclose_6"];
   "99 E8" [shape=box];
-  "99 E8" -> "100 E8" [label="imclose"];
+  "99 E8" -> "100 E8" [label="imclose_7"];
   "96 D8" [shape=box];
-  "96 D8" -> "99 E8" [label="imclose"];
+  "96 D8" -> "99 E8" [label="imclose_8"];
   "95 D8" [shape=box];
-  "95 D8" -> "96 D8" [label="imclose"];
+  "95 D8" -> "96 D8" [label="imclose_9"];
   "94 D8" [shape=box];
-  "94 D8" -> "95 D8" [label="imclose"];
+  "94 D8" -> "95 D8" [label="imclose_10"];
   "93 D8" [shape=box];
-  "93 D8" -> "94 D8" [label="imclose"];
+  "93 D8" -> "94 D8" [label="imclose_11"];
   "92 D8" [shape=box];
-  "92 D8" -> "93 D8" [label="imclose"];
+  "92 D8" -> "93 D8" [label="imclose_12"];
   "91 D8" [shape=box];
-  "91 D8" -> "92 D8" [label="imclose"];
+  "91 D8" -> "92 D8" [label="imclose_13"];
   "90 D8" [shape=box];
-  "90 D8" -> "91 D8" [label="imclose"];
+  "90 D8" -> "91 D8" [label="imclose_14"];
   "89 D8" [shape=box];
-  "89 D8" -> "90 D8" [label="imclose"];
+  "89 D8" -> "90 D8" [label="imclose_15"];
   "84 D8" [shape=box];
   "84 D8" -> "112 thr" [label="imopen"];
   "83 D8" [shape=box];
-  "83 D8" -> "84 D8" [label="imopen"];
+  "83 D8" -> "84 D8" [label="imopen_1"];
   "82 D8" [shape=box];
-  "82 D8" -> "83 D8" [label="imopen"];
+  "82 D8" -> "83 D8" [label="imopen_2"];
   "81 D8" [shape=box];
-  "81 D8" -> "82 D8" [label="imopen"];
+  "81 D8" -> "82 D8" [label="imopen_3"];
   "80 D8" [shape=box];
-  "80 D8" -> "81 D8" [label="imopen"];
+  "80 D8" -> "81 D8" [label="imopen_4"];
   "79 D8" [shape=box];
-  "79 D8" -> "80 D8" [label="imopen"];
+  "79 D8" -> "80 D8" [label="imopen_5"];
   "78 D8" [shape=box];
-  "78 D8" -> "79 D8" [label="imopen"];
+  "78 D8" -> "79 D8" [label="imopen_6"];
   "77 D8" [shape=box];
-  "77 D8" -> "78 D8" [label="imopen"];
+  "77 D8" -> "78 D8" [label="imopen_7"];
   "76 D8" [shape=box];
-  "76 D8" -> "77 D8" [label="imopen"];
+  "76 D8" -> "77 D8" [label="imopen_8"];
   "75 D8" [shape=box];
-  "75 D8" -> "76 D8" [label="imopen"];
+  "75 D8" -> "76 D8" [label="imopen_9"];
   "74 D8" [shape=box];
-  "74 D8" -> "75 D8" [label="imopen"];
+  "74 D8" -> "75 D8" [label="imopen_10"];
   "73 D8" [shape=box];
-  "73 D8" -> "74 D8" [label="imopen"];
+  "73 D8" -> "74 D8" [label="imopen_11"];
   "72 D8" [shape=box];
-  "72 D8" -> "73 D8" [label="imopen"];
+  "72 D8" -> "73 D8" [label="imopen_12"];
   "71 D8" [shape=box];
-  "71 D8" -> "72 D8" [label="imopen"];
+  "71 D8" -> "72 D8" [label="imopen_13"];
   "70 D8" [shape=box];
-  "70 D8" -> "71 D8" [label="imopen"];
+  "70 D8" -> "71 D8" [label="imopen_14"];
   "67 E8" [shape=box];
-  "67 E8" -> "70 D8" [label="imopen"];
+  "67 E8" -> "70 D8" [label="imopen_15"];
   "66 E8" [shape=box];
-  "66 E8" -> "67 E8" [label="imopen"];
+  "66 E8" -> "67 E8" [label="imopen_16"];
   "65 E8" [shape=box];
-  "65 E8" -> "66 E8" [label="imopen"];
+  "65 E8" -> "66 E8" [label="imopen_17"];
   "64 E8" [shape=box];
-  "64 E8" -> "65 E8" [label="imopen"];
+  "64 E8" -> "65 E8" [label="imopen_18"];
   "63 E8" [shape=box];
-  "63 E8" -> "64 E8" [label="imopen"];
+  "63 E8" -> "64 E8" [label="imopen_19"];
   "62 E8" [shape=box];
-  "62 E8" -> "63 E8" [label="imopen"];
+  "62 E8" -> "63 E8" [label="imopen_20"];
   "61 E8" [shape=box];
-  "61 E8" -> "62 E8" [label="imopen"];
+  "61 E8" -> "62 E8" [label="imopen_21"];
   "60 E8" [shape=box];
-  "60 E8" -> "61 E8" [label="imopen"];
+  "60 E8" -> "61 E8" [label="imopen_22"];
   "59 E8" [shape=box];
-  "59 E8" -> "60 E8" [label="imopen"];
+  "59 E8" -> "60 E8" [label="imopen_23"];
   "58 E8" [shape=box];
-  "58 E8" -> "59 E8" [label="imopen"];
+  "58 E8" -> "59 E8" [label="imopen_24"];
   "57 E8" [shape=box];
-  "57 E8" -> "58 E8" [label="imopen"];
+  "57 E8" -> "58 E8" [label="imopen_25"];
   "56 E8" [shape=box];
-  "56 E8" -> "57 E8" [label="imopen"];
+  "56 E8" -> "57 E8" [label="imopen_26"];
   "55 E8" [shape=box];
-  "55 E8" -> "56 E8" [label="imopen"];
+  "55 E8" -> "56 E8" [label="imopen_27"];
   "54 E8" [shape=box];
-  "54 E8" -> "55 E8" [label="imopen"];
+  "54 E8" -> "55 E8" [label="imopen_28"];
   "53 E8" [shape=box];
-  "53 E8" -> "54 E8" [label="imopen"];
+  "53 E8" -> "54 E8" [label="imopen_29"];
   "in" -> "89 D8";
   "in" -> "53 E8";
 }
@@ -1343,7 +1343,7 @@ digraph "license_plate_helper_0_0" {
 digraph "license_plate_helper_0_1" {
   // inputs
   "in" [shape=circle];
-  "out" [shape=circle];
+  "out_1" [shape=circle];
 
   // outputs
   "out" [shape=circle];
@@ -1352,7 +1352,7 @@ digraph "license_plate_helper_0_1" {
   "152 &" [shape=trapezium,orientation=270];
   "152 &" -> "out";
   "in" -> "152 &";
-  "out" -> "152 &";
+  "out_1" -> "152 &";
 }
 
 ! acceleration function
@@ -1394,9 +1394,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 1
-  // 0`imopen [0 poc 0] -> [1 poc 0] 54 erode_8c
+  // 0`imopen_29 [0 poc 0] -> [1 poc 0] 54 erode_8c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`imopen [1 input 0] -> [1 poc 0] 54 erode_8c
+  // 0`imopen_29 [1 input 0] -> [1 poc 0] 54 erode_8c
   // nope
   // poc 54 erode_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
@@ -1406,9 +1406,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 2
-  // 0`imopen [1 poc 0] -> [2 poc 0] 55 erode_8c
+  // 0`imopen_28 [1 poc 0] -> [2 poc 0] 55 erode_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`imopen [2 input 0] -> [2 poc 0] 55 erode_8c
+  // 0`imopen_28 [2 input 0] -> [2 poc 0] 55 erode_8c
   // nope
   // poc 55 erode_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_ERODE;
@@ -1418,9 +1418,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 3
-  // 0`imopen [2 poc 0] -> [3 poc 0] 56 erode_8c
+  // 0`imopen_27 [2 poc 0] -> [3 poc 0] 56 erode_8c
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // 0`imopen [3 input 0] -> [3 poc 0] 56 erode_8c
+  // 0`imopen_27 [3 input 0] -> [3 poc 0] 56 erode_8c
   // nope
   // poc 56 erode_8c stage 3 side 0
   si.poc[3][0].op = SPOC_POC_ERODE;
@@ -1430,9 +1430,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 4
-  // 0`imopen [3 poc 0] -> [4 poc 0] 57 erode_8c
+  // 0`imopen_26 [3 poc 0] -> [4 poc 0] 57 erode_8c
   si.mux[3][0].op = SPOC_MUX_IN0;
-  // 0`imopen [4 input 0] -> [4 poc 0] 57 erode_8c
+  // 0`imopen_26 [4 input 0] -> [4 poc 0] 57 erode_8c
   // nope
   // poc 57 erode_8c stage 4 side 0
   si.poc[4][0].op = SPOC_POC_ERODE;
@@ -1442,9 +1442,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 5
-  // 0`imopen [4 poc 0] -> [5 poc 0] 58 erode_8c
+  // 0`imopen_25 [4 poc 0] -> [5 poc 0] 58 erode_8c
   si.mux[4][0].op = SPOC_MUX_IN0;
-  // 0`imopen [5 input 0] -> [5 poc 0] 58 erode_8c
+  // 0`imopen_25 [5 input 0] -> [5 poc 0] 58 erode_8c
   // nope
   // poc 58 erode_8c stage 5 side 0
   si.poc[5][0].op = SPOC_POC_ERODE;
@@ -1454,9 +1454,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 6
-  // 0`imopen [5 poc 0] -> [6 poc 0] 59 erode_8c
+  // 0`imopen_24 [5 poc 0] -> [6 poc 0] 59 erode_8c
   si.mux[5][0].op = SPOC_MUX_IN0;
-  // 0`imopen [6 input 0] -> [6 poc 0] 59 erode_8c
+  // 0`imopen_24 [6 input 0] -> [6 poc 0] 59 erode_8c
   // nope
   // poc 59 erode_8c stage 6 side 0
   si.poc[6][0].op = SPOC_POC_ERODE;
@@ -1466,9 +1466,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 7
-  // 0`imopen [6 poc 0] -> [7 poc 0] 60 erode_8c
+  // 0`imopen_23 [6 poc 0] -> [7 poc 0] 60 erode_8c
   si.mux[6][0].op = SPOC_MUX_IN0;
-  // 0`imopen [7 input 0] -> [7 poc 0] 60 erode_8c
+  // 0`imopen_23 [7 input 0] -> [7 poc 0] 60 erode_8c
   // nope
   // poc 60 erode_8c stage 7 side 0
   si.poc[7][0].op = SPOC_POC_ERODE;
@@ -1478,9 +1478,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 8
-  // 0`imopen [7 poc 0] -> [8 poc 0] 61 erode_8c
+  // 0`imopen_22 [7 poc 0] -> [8 poc 0] 61 erode_8c
   si.mux[7][0].op = SPOC_MUX_IN0;
-  // 0`imopen [8 input 0] -> [8 poc 0] 61 erode_8c
+  // 0`imopen_22 [8 input 0] -> [8 poc 0] 61 erode_8c
   // nope
   // poc 61 erode_8c stage 8 side 0
   si.poc[8][0].op = SPOC_POC_ERODE;
@@ -1490,9 +1490,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 9
-  // 0`imopen [8 poc 0] -> [9 poc 0] 62 erode_8c
+  // 0`imopen_21 [8 poc 0] -> [9 poc 0] 62 erode_8c
   si.mux[8][0].op = SPOC_MUX_IN0;
-  // 0`imopen [9 input 0] -> [9 poc 0] 62 erode_8c
+  // 0`imopen_21 [9 input 0] -> [9 poc 0] 62 erode_8c
   // nope
   // poc 62 erode_8c stage 9 side 0
   si.poc[9][0].op = SPOC_POC_ERODE;
@@ -1502,9 +1502,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 10
-  // 0`imopen [9 poc 0] -> [10 poc 0] 63 erode_8c
+  // 0`imopen_20 [9 poc 0] -> [10 poc 0] 63 erode_8c
   si.mux[9][0].op = SPOC_MUX_IN0;
-  // 0`imopen [10 input 0] -> [10 poc 0] 63 erode_8c
+  // 0`imopen_20 [10 input 0] -> [10 poc 0] 63 erode_8c
   // nope
   // poc 63 erode_8c stage 10 side 0
   si.poc[10][0].op = SPOC_POC_ERODE;
@@ -1514,9 +1514,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 11
-  // 0`imopen [10 poc 0] -> [11 poc 0] 64 erode_8c
+  // 0`imopen_19 [10 poc 0] -> [11 poc 0] 64 erode_8c
   si.mux[10][0].op = SPOC_MUX_IN0;
-  // 0`imopen [11 input 0] -> [11 poc 0] 64 erode_8c
+  // 0`imopen_19 [11 input 0] -> [11 poc 0] 64 erode_8c
   // nope
   // poc 64 erode_8c stage 11 side 0
   si.poc[11][0].op = SPOC_POC_ERODE;
@@ -1526,9 +1526,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 12
-  // 0`imopen [11 poc 0] -> [12 poc 0] 65 erode_8c
+  // 0`imopen_18 [11 poc 0] -> [12 poc 0] 65 erode_8c
   si.mux[11][0].op = SPOC_MUX_IN0;
-  // 0`imopen [12 input 0] -> [12 poc 0] 65 erode_8c
+  // 0`imopen_18 [12 input 0] -> [12 poc 0] 65 erode_8c
   // nope
   // poc 65 erode_8c stage 12 side 0
   si.poc[12][0].op = SPOC_POC_ERODE;
@@ -1538,9 +1538,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 13
-  // 0`imopen [12 poc 0] -> [13 poc 0] 66 erode_8c
+  // 0`imopen_17 [12 poc 0] -> [13 poc 0] 66 erode_8c
   si.mux[12][0].op = SPOC_MUX_IN0;
-  // 0`imopen [13 input 0] -> [13 poc 0] 66 erode_8c
+  // 0`imopen_17 [13 input 0] -> [13 poc 0] 66 erode_8c
   // nope
   // poc 66 erode_8c stage 13 side 0
   si.poc[13][0].op = SPOC_POC_ERODE;
@@ -1550,9 +1550,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 14
-  // 0`imopen [13 poc 0] -> [14 poc 0] 67 erode_8c
+  // 0`imopen_16 [13 poc 0] -> [14 poc 0] 67 erode_8c
   si.mux[13][0].op = SPOC_MUX_IN0;
-  // 0`imopen [14 input 0] -> [14 poc 0] 67 erode_8c
+  // 0`imopen_16 [14 input 0] -> [14 poc 0] 67 erode_8c
   // nope
   // poc 67 erode_8c stage 14 side 0
   si.poc[14][0].op = SPOC_POC_ERODE;
@@ -1562,9 +1562,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 15
-  // 0`imopen [14 poc 0] -> [15 poc 0] 70 dilate_8c
+  // 0`imopen_15 [14 poc 0] -> [15 poc 0] 70 dilate_8c
   si.mux[14][0].op = SPOC_MUX_IN0;
-  // 0`imopen [15 input 0] -> [15 poc 0] 70 dilate_8c
+  // 0`imopen_15 [15 input 0] -> [15 poc 0] 70 dilate_8c
   // nope
   // poc 70 dilate_8c stage 15 side 0
   si.poc[15][0].op = SPOC_POC_DILATE;
@@ -1584,9 +1584,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 1
-  // 0`imclose [0 poc 1] -> [1 poc 1] 90 dilate_8c
+  // 0`imclose_15 [0 poc 1] -> [1 poc 1] 90 dilate_8c
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // 0`imclose [1 input 1] -> [1 poc 1] 90 dilate_8c
+  // 0`imclose_15 [1 input 1] -> [1 poc 1] 90 dilate_8c
   // nope
   // poc 90 dilate_8c stage 1 side 1
   si.poc[1][1].op = SPOC_POC_DILATE;
@@ -1596,9 +1596,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 2
-  // 0`imclose [1 poc 1] -> [2 poc 1] 91 dilate_8c
+  // 0`imclose_14 [1 poc 1] -> [2 poc 1] 91 dilate_8c
   si.mux[1][3].op = SPOC_MUX_IN1;
-  // 0`imclose [2 input 1] -> [2 poc 1] 91 dilate_8c
+  // 0`imclose_14 [2 input 1] -> [2 poc 1] 91 dilate_8c
   // nope
   // poc 91 dilate_8c stage 2 side 1
   si.poc[2][1].op = SPOC_POC_DILATE;
@@ -1608,9 +1608,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 3
-  // 0`imclose [2 poc 1] -> [3 poc 1] 92 dilate_8c
+  // 0`imclose_13 [2 poc 1] -> [3 poc 1] 92 dilate_8c
   si.mux[2][3].op = SPOC_MUX_IN1;
-  // 0`imclose [3 input 1] -> [3 poc 1] 92 dilate_8c
+  // 0`imclose_13 [3 input 1] -> [3 poc 1] 92 dilate_8c
   // nope
   // poc 92 dilate_8c stage 3 side 1
   si.poc[3][1].op = SPOC_POC_DILATE;
@@ -1620,9 +1620,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 4
-  // 0`imclose [3 poc 1] -> [4 poc 1] 93 dilate_8c
+  // 0`imclose_12 [3 poc 1] -> [4 poc 1] 93 dilate_8c
   si.mux[3][3].op = SPOC_MUX_IN1;
-  // 0`imclose [4 input 1] -> [4 poc 1] 93 dilate_8c
+  // 0`imclose_12 [4 input 1] -> [4 poc 1] 93 dilate_8c
   // nope
   // poc 93 dilate_8c stage 4 side 1
   si.poc[4][1].op = SPOC_POC_DILATE;
@@ -1632,9 +1632,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 5
-  // 0`imclose [4 poc 1] -> [5 poc 1] 94 dilate_8c
+  // 0`imclose_11 [4 poc 1] -> [5 poc 1] 94 dilate_8c
   si.mux[4][3].op = SPOC_MUX_IN1;
-  // 0`imclose [5 input 1] -> [5 poc 1] 94 dilate_8c
+  // 0`imclose_11 [5 input 1] -> [5 poc 1] 94 dilate_8c
   // nope
   // poc 94 dilate_8c stage 5 side 1
   si.poc[5][1].op = SPOC_POC_DILATE;
@@ -1644,9 +1644,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 6
-  // 0`imclose [5 poc 1] -> [6 poc 1] 95 dilate_8c
+  // 0`imclose_10 [5 poc 1] -> [6 poc 1] 95 dilate_8c
   si.mux[5][3].op = SPOC_MUX_IN1;
-  // 0`imclose [6 input 1] -> [6 poc 1] 95 dilate_8c
+  // 0`imclose_10 [6 input 1] -> [6 poc 1] 95 dilate_8c
   // nope
   // poc 95 dilate_8c stage 6 side 1
   si.poc[6][1].op = SPOC_POC_DILATE;
@@ -1656,9 +1656,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 7
-  // 0`imclose [6 poc 1] -> [7 poc 1] 96 dilate_8c
+  // 0`imclose_9 [6 poc 1] -> [7 poc 1] 96 dilate_8c
   si.mux[6][3].op = SPOC_MUX_IN1;
-  // 0`imclose [7 input 1] -> [7 poc 1] 96 dilate_8c
+  // 0`imclose_9 [7 input 1] -> [7 poc 1] 96 dilate_8c
   // nope
   // poc 96 dilate_8c stage 7 side 1
   si.poc[7][1].op = SPOC_POC_DILATE;
@@ -1668,9 +1668,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 8
-  // 0`imclose [7 poc 1] -> [8 poc 1] 99 erode_8c
+  // 0`imclose_8 [7 poc 1] -> [8 poc 1] 99 erode_8c
   si.mux[7][3].op = SPOC_MUX_IN1;
-  // 0`imclose [8 input 1] -> [8 poc 1] 99 erode_8c
+  // 0`imclose_8 [8 input 1] -> [8 poc 1] 99 erode_8c
   // nope
   // poc 99 erode_8c stage 8 side 1
   si.poc[8][1].op = SPOC_POC_ERODE;
@@ -1680,9 +1680,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 9
-  // 0`imclose [8 poc 1] -> [9 poc 1] 100 erode_8c
+  // 0`imclose_7 [8 poc 1] -> [9 poc 1] 100 erode_8c
   si.mux[8][3].op = SPOC_MUX_IN1;
-  // 0`imclose [9 input 1] -> [9 poc 1] 100 erode_8c
+  // 0`imclose_7 [9 input 1] -> [9 poc 1] 100 erode_8c
   // nope
   // poc 100 erode_8c stage 9 side 1
   si.poc[9][1].op = SPOC_POC_ERODE;
@@ -1692,9 +1692,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 10
-  // 0`imclose [9 poc 1] -> [10 poc 1] 101 erode_8c
+  // 0`imclose_6 [9 poc 1] -> [10 poc 1] 101 erode_8c
   si.mux[9][3].op = SPOC_MUX_IN1;
-  // 0`imclose [10 input 1] -> [10 poc 1] 101 erode_8c
+  // 0`imclose_6 [10 input 1] -> [10 poc 1] 101 erode_8c
   // nope
   // poc 101 erode_8c stage 10 side 1
   si.poc[10][1].op = SPOC_POC_ERODE;
@@ -1704,9 +1704,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 11
-  // 0`imclose [10 poc 1] -> [11 poc 1] 102 erode_8c
+  // 0`imclose_5 [10 poc 1] -> [11 poc 1] 102 erode_8c
   si.mux[10][3].op = SPOC_MUX_IN1;
-  // 0`imclose [11 input 1] -> [11 poc 1] 102 erode_8c
+  // 0`imclose_5 [11 input 1] -> [11 poc 1] 102 erode_8c
   // nope
   // poc 102 erode_8c stage 11 side 1
   si.poc[11][1].op = SPOC_POC_ERODE;
@@ -1716,9 +1716,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 12
-  // 0`imclose [11 poc 1] -> [12 poc 1] 103 erode_8c
+  // 0`imclose_4 [11 poc 1] -> [12 poc 1] 103 erode_8c
   si.mux[11][3].op = SPOC_MUX_IN1;
-  // 0`imclose [12 input 1] -> [12 poc 1] 103 erode_8c
+  // 0`imclose_4 [12 input 1] -> [12 poc 1] 103 erode_8c
   // nope
   // poc 103 erode_8c stage 12 side 1
   si.poc[12][1].op = SPOC_POC_ERODE;
@@ -1728,9 +1728,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 13
-  // 0`imclose [12 poc 1] -> [13 poc 1] 104 erode_8c
+  // 0`imclose_3 [12 poc 1] -> [13 poc 1] 104 erode_8c
   si.mux[12][3].op = SPOC_MUX_IN1;
-  // 0`imclose [13 input 1] -> [13 poc 1] 104 erode_8c
+  // 0`imclose_3 [13 input 1] -> [13 poc 1] 104 erode_8c
   // nope
   // poc 104 erode_8c stage 13 side 1
   si.poc[13][1].op = SPOC_POC_ERODE;
@@ -1740,9 +1740,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 14
-  // 0`imclose [13 poc 1] -> [14 poc 1] 105 erode_8c
+  // 0`imclose_2 [13 poc 1] -> [14 poc 1] 105 erode_8c
   si.mux[13][3].op = SPOC_MUX_IN1;
-  // 0`imclose [14 input 1] -> [14 poc 1] 105 erode_8c
+  // 0`imclose_2 [14 input 1] -> [14 poc 1] 105 erode_8c
   // nope
   // poc 105 erode_8c stage 14 side 1
   si.poc[14][1].op = SPOC_POC_ERODE;
@@ -1752,9 +1752,9 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
 
 
   // STAGE 15
-  // 0`imclose [14 poc 1] -> [15 poc 1] 106 erode_8c
+  // 0`imclose_1 [14 poc 1] -> [15 poc 1] 106 erode_8c
   si.mux[14][3].op = SPOC_MUX_IN1;
-  // 0`imclose [15 input 1] -> [15 poc 1] 106 erode_8c
+  // 0`imclose_1 [15 input 1] -> [15 poc 1] 106 erode_8c
   // nope
   // poc 106 erode_8c stage 15 side 1
   si.poc[15][1].op = SPOC_POC_ERODE;
@@ -1770,12 +1770,12 @@ freia_status license_plate_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   sp.th[15][1].boundmax = pi2;
 
 
-  // output image 0`imopen on 0 and image 0`imcloseth on 1
-  // 0`imopen [15 poc 0] -> [15 output 0] 0 null
+  // output image 0`imopen_14 on 0 and image 0`imcloseth on 1
+  // 0`imopen_14 [15 poc 0] -> [15 output 0] 0 null
   si.mux[15][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`imopen [15 output 0] -> [15 output 0] 0 null
+  // 0`imopen_14 [15 output 0] -> [15 output 0] 0 null
   // nope
 
   // 0`imcloseth [15 threshold 1] -> [15 output 1] 0 null
@@ -1826,7 +1826,7 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 0
-  // 0`imopen [0 input 1] -> [0 poc 1] 71 dilate_8c
+  // 0`imopen_14 [0 input 1] -> [0 poc 1] 71 dilate_8c
   // nope
   // poc 71 dilate_8c stage 0 side 1
   si.poc[0][1].op = SPOC_POC_DILATE;
@@ -1836,9 +1836,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 1
-  // 0`imopen [0 poc 1] -> [1 poc 1] 72 dilate_8c
+  // 0`imopen_13 [0 poc 1] -> [1 poc 1] 72 dilate_8c
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // 0`imopen [1 input 1] -> [1 poc 1] 72 dilate_8c
+  // 0`imopen_13 [1 input 1] -> [1 poc 1] 72 dilate_8c
   // nope
   // poc 72 dilate_8c stage 1 side 1
   si.poc[1][1].op = SPOC_POC_DILATE;
@@ -1848,9 +1848,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 2
-  // 0`imopen [1 poc 1] -> [2 poc 1] 73 dilate_8c
+  // 0`imopen_12 [1 poc 1] -> [2 poc 1] 73 dilate_8c
   si.mux[1][3].op = SPOC_MUX_IN1;
-  // 0`imopen [2 input 1] -> [2 poc 1] 73 dilate_8c
+  // 0`imopen_12 [2 input 1] -> [2 poc 1] 73 dilate_8c
   // nope
   // poc 73 dilate_8c stage 2 side 1
   si.poc[2][1].op = SPOC_POC_DILATE;
@@ -1860,9 +1860,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 3
-  // 0`imopen [2 poc 1] -> [3 poc 1] 74 dilate_8c
+  // 0`imopen_11 [2 poc 1] -> [3 poc 1] 74 dilate_8c
   si.mux[2][3].op = SPOC_MUX_IN1;
-  // 0`imopen [3 input 1] -> [3 poc 1] 74 dilate_8c
+  // 0`imopen_11 [3 input 1] -> [3 poc 1] 74 dilate_8c
   // nope
   // poc 74 dilate_8c stage 3 side 1
   si.poc[3][1].op = SPOC_POC_DILATE;
@@ -1872,9 +1872,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 4
-  // 0`imopen [3 poc 1] -> [4 poc 1] 75 dilate_8c
+  // 0`imopen_10 [3 poc 1] -> [4 poc 1] 75 dilate_8c
   si.mux[3][3].op = SPOC_MUX_IN1;
-  // 0`imopen [4 input 1] -> [4 poc 1] 75 dilate_8c
+  // 0`imopen_10 [4 input 1] -> [4 poc 1] 75 dilate_8c
   // nope
   // poc 75 dilate_8c stage 4 side 1
   si.poc[4][1].op = SPOC_POC_DILATE;
@@ -1884,9 +1884,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 5
-  // 0`imopen [4 poc 1] -> [5 poc 1] 76 dilate_8c
+  // 0`imopen_9 [4 poc 1] -> [5 poc 1] 76 dilate_8c
   si.mux[4][3].op = SPOC_MUX_IN1;
-  // 0`imopen [5 input 1] -> [5 poc 1] 76 dilate_8c
+  // 0`imopen_9 [5 input 1] -> [5 poc 1] 76 dilate_8c
   // nope
   // poc 76 dilate_8c stage 5 side 1
   si.poc[5][1].op = SPOC_POC_DILATE;
@@ -1896,9 +1896,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 6
-  // 0`imopen [5 poc 1] -> [6 poc 1] 77 dilate_8c
+  // 0`imopen_8 [5 poc 1] -> [6 poc 1] 77 dilate_8c
   si.mux[5][3].op = SPOC_MUX_IN1;
-  // 0`imopen [6 input 1] -> [6 poc 1] 77 dilate_8c
+  // 0`imopen_8 [6 input 1] -> [6 poc 1] 77 dilate_8c
   // nope
   // poc 77 dilate_8c stage 6 side 1
   si.poc[6][1].op = SPOC_POC_DILATE;
@@ -1908,9 +1908,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 7
-  // 0`imopen [6 poc 1] -> [7 poc 1] 78 dilate_8c
+  // 0`imopen_7 [6 poc 1] -> [7 poc 1] 78 dilate_8c
   si.mux[6][3].op = SPOC_MUX_IN1;
-  // 0`imopen [7 input 1] -> [7 poc 1] 78 dilate_8c
+  // 0`imopen_7 [7 input 1] -> [7 poc 1] 78 dilate_8c
   // nope
   // poc 78 dilate_8c stage 7 side 1
   si.poc[7][1].op = SPOC_POC_DILATE;
@@ -1920,9 +1920,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 8
-  // 0`imopen [7 poc 1] -> [8 poc 1] 79 dilate_8c
+  // 0`imopen_6 [7 poc 1] -> [8 poc 1] 79 dilate_8c
   si.mux[7][3].op = SPOC_MUX_IN1;
-  // 0`imopen [8 input 1] -> [8 poc 1] 79 dilate_8c
+  // 0`imopen_6 [8 input 1] -> [8 poc 1] 79 dilate_8c
   // nope
   // poc 79 dilate_8c stage 8 side 1
   si.poc[8][1].op = SPOC_POC_DILATE;
@@ -1932,9 +1932,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 9
-  // 0`imopen [8 poc 1] -> [9 poc 1] 80 dilate_8c
+  // 0`imopen_5 [8 poc 1] -> [9 poc 1] 80 dilate_8c
   si.mux[8][3].op = SPOC_MUX_IN1;
-  // 0`imopen [9 input 1] -> [9 poc 1] 80 dilate_8c
+  // 0`imopen_5 [9 input 1] -> [9 poc 1] 80 dilate_8c
   // nope
   // poc 80 dilate_8c stage 9 side 1
   si.poc[9][1].op = SPOC_POC_DILATE;
@@ -1944,9 +1944,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 10
-  // 0`imopen [9 poc 1] -> [10 poc 1] 81 dilate_8c
+  // 0`imopen_4 [9 poc 1] -> [10 poc 1] 81 dilate_8c
   si.mux[9][3].op = SPOC_MUX_IN1;
-  // 0`imopen [10 input 1] -> [10 poc 1] 81 dilate_8c
+  // 0`imopen_4 [10 input 1] -> [10 poc 1] 81 dilate_8c
   // nope
   // poc 81 dilate_8c stage 10 side 1
   si.poc[10][1].op = SPOC_POC_DILATE;
@@ -1956,9 +1956,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 11
-  // 0`imopen [10 poc 1] -> [11 poc 1] 82 dilate_8c
+  // 0`imopen_3 [10 poc 1] -> [11 poc 1] 82 dilate_8c
   si.mux[10][3].op = SPOC_MUX_IN1;
-  // 0`imopen [11 input 1] -> [11 poc 1] 82 dilate_8c
+  // 0`imopen_3 [11 input 1] -> [11 poc 1] 82 dilate_8c
   // nope
   // poc 82 dilate_8c stage 11 side 1
   si.poc[11][1].op = SPOC_POC_DILATE;
@@ -1968,9 +1968,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 12
-  // 0`imopen [11 poc 1] -> [12 poc 1] 83 dilate_8c
+  // 0`imopen_2 [11 poc 1] -> [12 poc 1] 83 dilate_8c
   si.mux[11][3].op = SPOC_MUX_IN1;
-  // 0`imopen [12 input 1] -> [12 poc 1] 83 dilate_8c
+  // 0`imopen_2 [12 input 1] -> [12 poc 1] 83 dilate_8c
   // nope
   // poc 83 dilate_8c stage 12 side 1
   si.poc[12][1].op = SPOC_POC_DILATE;
@@ -1980,9 +1980,9 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
 
 
   // STAGE 13
-  // 0`imopen [12 poc 1] -> [13 poc 1] 84 dilate_8c
+  // 0`imopen_1 [12 poc 1] -> [13 poc 1] 84 dilate_8c
   si.mux[12][3].op = SPOC_MUX_IN1;
-  // 0`imopen [13 input 1] -> [13 poc 1] 84 dilate_8c
+  // 0`imopen_1 [13 input 1] -> [13 poc 1] 84 dilate_8c
   // nope
   // poc 84 dilate_8c stage 13 side 1
   si.poc[13][1].op = SPOC_POC_DILATE;
@@ -2049,12 +2049,12 @@ freia_status license_plate_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, fr
     sp.poc[15][0].kernel[i] = pi4[i];
 
 
-  // output image 0`imfilt on 0
-  // 0`imfilt [15 poc 0] -> [15 output 0] 0 null
+  // output image 0`imfilt_7 on 0
+  // 0`imfilt_7 [15 poc 0] -> [15 output 0] 0 null
   si.mux[15][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`imfilt [15 output 0] -> [15 output 0] 0 null
+  // 0`imfilt_7 [15 output 0] -> [15 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -2096,7 +2096,7 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // 0`imfilt [0 input 0] -> [0 poc 0] 118 erode_8c
+  // 0`imfilt_7 [0 input 0] -> [0 poc 0] 118 erode_8c
   // nope
   // poc 118 erode_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_ERODE;
@@ -2106,9 +2106,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 1
-  // 0`imfilt [0 poc 0] -> [1 poc 0] 119 erode_8c
+  // 0`imfilt_6 [0 poc 0] -> [1 poc 0] 119 erode_8c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`imfilt [1 input 0] -> [1 poc 0] 119 erode_8c
+  // 0`imfilt_6 [1 input 0] -> [1 poc 0] 119 erode_8c
   // nope
   // poc 119 erode_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
@@ -2118,9 +2118,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 2
-  // 0`imfilt [1 poc 0] -> [2 poc 0] 120 erode_8c
+  // 0`imfilt_5 [1 poc 0] -> [2 poc 0] 120 erode_8c
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // 0`imfilt [2 input 0] -> [2 poc 0] 120 erode_8c
+  // 0`imfilt_5 [2 input 0] -> [2 poc 0] 120 erode_8c
   // nope
   // poc 120 erode_8c stage 2 side 0
   si.poc[2][0].op = SPOC_POC_ERODE;
@@ -2130,9 +2130,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 3
-  // 0`imfilt [2 poc 0] -> [3 poc 0] 123 dilate_8c
+  // 0`imfilt_4 [2 poc 0] -> [3 poc 0] 123 dilate_8c
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // 0`imfilt [3 input 0] -> [3 poc 0] 123 dilate_8c
+  // 0`imfilt_4 [3 input 0] -> [3 poc 0] 123 dilate_8c
   // nope
   // poc 123 dilate_8c stage 3 side 0
   si.poc[3][0].op = SPOC_POC_DILATE;
@@ -2142,9 +2142,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 4
-  // 0`imfilt [3 poc 0] -> [4 poc 0] 124 dilate_8c
+  // 0`imfilt_3 [3 poc 0] -> [4 poc 0] 124 dilate_8c
   si.mux[3][0].op = SPOC_MUX_IN0;
-  // 0`imfilt [4 input 0] -> [4 poc 0] 124 dilate_8c
+  // 0`imfilt_3 [4 input 0] -> [4 poc 0] 124 dilate_8c
   // nope
   // poc 124 dilate_8c stage 4 side 0
   si.poc[4][0].op = SPOC_POC_DILATE;
@@ -2154,9 +2154,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 5
-  // 0`imfilt [4 poc 0] -> [5 poc 0] 125 dilate_8c
+  // 0`imfilt_2 [4 poc 0] -> [5 poc 0] 125 dilate_8c
   si.mux[4][0].op = SPOC_MUX_IN0;
-  // 0`imfilt [5 input 0] -> [5 poc 0] 125 dilate_8c
+  // 0`imfilt_2 [5 input 0] -> [5 poc 0] 125 dilate_8c
   // nope
   // poc 125 dilate_8c stage 5 side 0
   si.poc[5][0].op = SPOC_POC_DILATE;
@@ -2166,9 +2166,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 6
-  // 0`imfilt [5 poc 0] -> [6 poc 0] 126 dilate_8c
+  // 0`imfilt_1 [5 poc 0] -> [6 poc 0] 126 dilate_8c
   si.mux[5][0].op = SPOC_MUX_IN0;
-  // 0`imfilt [6 input 0] -> [6 poc 0] 126 dilate_8c
+  // 0`imfilt_1 [6 input 0] -> [6 poc 0] 126 dilate_8c
   // nope
   // poc 126 dilate_8c stage 6 side 0
   si.poc[6][0].op = SPOC_POC_DILATE;
@@ -2190,9 +2190,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 8
-  // 0`imout [7 poc 0] -> [8 poc 0] 132 erode_8c
+  // 0`imout_7 [7 poc 0] -> [8 poc 0] 132 erode_8c
   si.mux[7][0].op = SPOC_MUX_IN0;
-  // 0`imout [8 input 0] -> [8 poc 0] 132 erode_8c
+  // 0`imout_7 [8 input 0] -> [8 poc 0] 132 erode_8c
   // nope
   // poc 132 erode_8c stage 8 side 0
   si.poc[8][0].op = SPOC_POC_ERODE;
@@ -2202,9 +2202,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 9
-  // 0`imout [8 poc 0] -> [9 poc 0] 133 erode_8c
+  // 0`imout_6 [8 poc 0] -> [9 poc 0] 133 erode_8c
   si.mux[8][0].op = SPOC_MUX_IN0;
-  // 0`imout [9 input 0] -> [9 poc 0] 133 erode_8c
+  // 0`imout_6 [9 input 0] -> [9 poc 0] 133 erode_8c
   // nope
   // poc 133 erode_8c stage 9 side 0
   si.poc[9][0].op = SPOC_POC_ERODE;
@@ -2214,9 +2214,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 10
-  // 0`imout [9 poc 0] -> [10 poc 0] 134 erode_8c
+  // 0`imout_5 [9 poc 0] -> [10 poc 0] 134 erode_8c
   si.mux[9][0].op = SPOC_MUX_IN0;
-  // 0`imout [10 input 0] -> [10 poc 0] 134 erode_8c
+  // 0`imout_5 [10 input 0] -> [10 poc 0] 134 erode_8c
   // nope
   // poc 134 erode_8c stage 10 side 0
   si.poc[10][0].op = SPOC_POC_ERODE;
@@ -2226,9 +2226,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 11
-  // 0`imout [10 poc 0] -> [11 poc 0] 137 dilate_8c
+  // 0`imout_4 [10 poc 0] -> [11 poc 0] 137 dilate_8c
   si.mux[10][0].op = SPOC_MUX_IN0;
-  // 0`imout [11 input 0] -> [11 poc 0] 137 dilate_8c
+  // 0`imout_4 [11 input 0] -> [11 poc 0] 137 dilate_8c
   // nope
   // poc 137 dilate_8c stage 11 side 0
   si.poc[11][0].op = SPOC_POC_DILATE;
@@ -2238,9 +2238,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 12
-  // 0`imout [11 poc 0] -> [12 poc 0] 138 dilate_8c
+  // 0`imout_3 [11 poc 0] -> [12 poc 0] 138 dilate_8c
   si.mux[11][0].op = SPOC_MUX_IN0;
-  // 0`imout [12 input 0] -> [12 poc 0] 138 dilate_8c
+  // 0`imout_3 [12 input 0] -> [12 poc 0] 138 dilate_8c
   // nope
   // poc 138 dilate_8c stage 12 side 0
   si.poc[12][0].op = SPOC_POC_DILATE;
@@ -2250,9 +2250,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 13
-  // 0`imout [12 poc 0] -> [13 poc 0] 139 dilate_8c
+  // 0`imout_2 [12 poc 0] -> [13 poc 0] 139 dilate_8c
   si.mux[12][0].op = SPOC_MUX_IN0;
-  // 0`imout [13 input 0] -> [13 poc 0] 139 dilate_8c
+  // 0`imout_2 [13 input 0] -> [13 poc 0] 139 dilate_8c
   // nope
   // poc 139 dilate_8c stage 13 side 0
   si.poc[13][0].op = SPOC_POC_DILATE;
@@ -2262,9 +2262,9 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 14
-  // 0`imout [13 poc 0] -> [14 poc 0] 140 dilate_8c
+  // 0`imout_1 [13 poc 0] -> [14 poc 0] 140 dilate_8c
   si.mux[13][0].op = SPOC_MUX_IN0;
-  // 0`imout [14 input 0] -> [14 poc 0] 140 dilate_8c
+  // 0`imout_1 [14 input 0] -> [14 poc 0] 140 dilate_8c
   // nope
   // poc 140 dilate_8c stage 14 side 0
   si.poc[14][0].op = SPOC_POC_DILATE;
@@ -2285,12 +2285,12 @@ freia_status license_plate_helper_0_0_2(freia_data2d * o0, freia_data2d * i0,
     sp.poc[15][0].kernel[i] = pi2[i];
 
 
-  // output image 0`out on 0
-  // 0`out [15 poc 0] -> [15 output 0] 0 null
+  // output image 0`out_3 on 0
+  // 0`out_3 [15 poc 0] -> [15 output 0] 0 null
   si.mux[15][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`out [15 output 0] -> [15 output 0] 0 null
+  // 0`out_3 [15 output 0] -> [15 output 0] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -2330,7 +2330,7 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 0
-  // 0`out [0 input 0] -> [0 poc 0] 146 dilate_8c
+  // 0`out_3 [0 input 0] -> [0 poc 0] 146 dilate_8c
   // nope
   // poc 146 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -2340,9 +2340,9 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 1
-  // 0`out [0 poc 0] -> [1 poc 0] 147 dilate_8c
+  // 0`out_2 [0 poc 0] -> [1 poc 0] 147 dilate_8c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`out [1 input 0] -> [1 poc 0] 147 dilate_8c
+  // 0`out_2 [1 input 0] -> [1 poc 0] 147 dilate_8c
   // nope
   // poc 147 dilate_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_DILATE;
@@ -2351,39 +2351,39 @@ freia_status license_plate_helper_0_0_3(freia_data2d * o0, freia_data2d * i0,
     sp.poc[1][0].kernel[i] = pi0[i];
 
 
-  // output image 0`out on 0
-  // 0`out [1 poc 0] -> [1 output 0] 0 null
+  // output image 0`out_1 on 0
+  // 0`out_1 [1 poc 0] -> [1 output 0] 0 null
   si.mux[1][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`out [1 output 0] -> [15 output 0] 0 null
-  // 0`out [2 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [1 output 0] -> [15 output 0] 0 null
+  // 0`out_1 [2 input 0] -> [15 output 0] 0 null
   si.mux[2][0].op = SPOC_MUX_IN0;
-  // 0`out [3 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [3 input 0] -> [15 output 0] 0 null
   si.mux[3][0].op = SPOC_MUX_IN0;
-  // 0`out [4 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [4 input 0] -> [15 output 0] 0 null
   si.mux[4][0].op = SPOC_MUX_IN0;
-  // 0`out [5 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [5 input 0] -> [15 output 0] 0 null
   si.mux[5][0].op = SPOC_MUX_IN0;
-  // 0`out [6 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [6 input 0] -> [15 output 0] 0 null
   si.mux[6][0].op = SPOC_MUX_IN0;
-  // 0`out [7 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [7 input 0] -> [15 output 0] 0 null
   si.mux[7][0].op = SPOC_MUX_IN0;
-  // 0`out [8 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [8 input 0] -> [15 output 0] 0 null
   si.mux[8][0].op = SPOC_MUX_IN0;
-  // 0`out [9 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [9 input 0] -> [15 output 0] 0 null
   si.mux[9][0].op = SPOC_MUX_IN0;
-  // 0`out [10 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [10 input 0] -> [15 output 0] 0 null
   si.mux[10][0].op = SPOC_MUX_IN0;
-  // 0`out [11 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [11 input 0] -> [15 output 0] 0 null
   si.mux[11][0].op = SPOC_MUX_IN0;
-  // 0`out [12 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [12 input 0] -> [15 output 0] 0 null
   si.mux[12][0].op = SPOC_MUX_IN0;
-  // 0`out [13 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [13 input 0] -> [15 output 0] 0 null
   si.mux[13][0].op = SPOC_MUX_IN0;
-  // 0`out [14 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [14 input 0] -> [15 output 0] 0 null
   si.mux[14][0].op = SPOC_MUX_IN0;
-  // 0`out [15 input 0] -> [15 output 0] 0 null
+  // 0`out_1 [15 input 0] -> [15 output 0] 0 null
   si.mux[15][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
@@ -2424,7 +2424,7 @@ freia_status license_plate_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, fr
   // STAGE 0
   // 0`in [0 input 0] -> [0 alu] 152 and
   // nope
-  // 0`out [0 input 1] -> [0 alu] 152 and
+  // 0`out_1 [0 input 1] -> [0 alu] 152 and
   // nope
   // alu 152 and stage 0
   si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
@@ -2527,7 +2527,7 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = license_plate_helper_0_0_0(imopen, imcloseth, in, kernel1x3, 150, 255, 1);  /*0053*/
+   ret_0 = 0;                                                           /*0053*/
    ret_0 |= 0;                                                          /*0054*/
    ret_0 |= 0;                                                          /*0055*/
    ret_0 |= 0;                                                          /*0056*/
@@ -2545,7 +2545,7 @@ int license_plate(void)
    i_0 = 15;                                                            /*0068*/
 
    ret_0 |= 0;                                                          /*0070*/
-   ret_0 |= license_plate_helper_0_0_1(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);    /*0071*/
+   ret_0 |= 0;                                                          /*0071*/
    ret_0 |= 0;                                                          /*0072*/
    ret_0 |= 0;                                                          /*0073*/
    ret_0 |= 0;                                                          /*0074*/
@@ -2585,11 +2585,12 @@ int license_plate(void)
    
    
    _return0 = ret_1;                                                    /*0110*/
+
+   license_plate_helper_0_0_0(imopen, imcloseth, in, kernel1x3, 150, 255, 1);          /*0113*/
    
    
-   
-   ret_2 = 0;                                                           /*0117*/
-   ret_2 |= license_plate_helper_0_0_2(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);    /*0118*/
+   ret_2 = license_plate_helper_0_0_1(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);     /*0117*/
+   ret_2 |= 0;                                                          /*0118*/
    ret_2 |= 0;                                                          /*0119*/
    ret_2 |= 0;                                                          /*0120*/
    i_2 = 4;                                                             /*0121*/
@@ -2616,7 +2617,8 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   license_plate_helper_0_0_3(out, out, freia_morpho_kernel_8c);        /*0146*/
+   license_plate_helper_0_0_2(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);             /*0145*/
+   license_plate_helper_0_0_3(out, out, freia_morpho_kernel_8c);        /*0147*/
    i_4 = 3;                                                             /*0148*/
 
    _return4 = 0;                                                        /*0150*/
@@ -2679,10 +2681,9 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = license_plate_helper_0_0_0(imopen, imcloseth, in, kernel1x3, 150, 255, 1);  /*0053*/
+   ret_0 = 0;                                                           /*0053*/
    i_0 = 15;                                                            /*0068*/
 
-   ret_0 |= license_plate_helper_0_0_1(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);    /*0071*/
    i_0 = 15;                                                            /*0085*/
 
    _return1 = ret_0;                                                    /*0087*/
@@ -2694,11 +2695,11 @@ int license_plate(void)
    
    
    _return0 = ret_1;                                                    /*0110*/
+
+   license_plate_helper_0_0_0(imopen, imcloseth, in, kernel1x3, 150, 255, 1);          /*0113*/
    
    
-   
-   ret_2 = 0;                                                           /*0117*/
-   ret_2 |= license_plate_helper_0_0_2(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);    /*0118*/
+   ret_2 = license_plate_helper_0_0_1(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);     /*0117*/
    i_2 = 4;                                                             /*0121*/
 
    i_2 = 4;                                                             /*0127*/
@@ -2712,7 +2713,8 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   license_plate_helper_0_0_3(out, out, freia_morpho_kernel_8c);        /*0146*/
+   license_plate_helper_0_0_2(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);             /*0145*/
+   license_plate_helper_0_0_3(out, out, freia_morpho_kernel_8c);        /*0147*/
    i_4 = 3;                                                             /*0148*/
 
    _return4 = 0;                                                        /*0150*/
@@ -3257,43 +3259,43 @@ digraph "license_plate_helper_0_0_0" {
   "152 &" [shape=trapezium,orientation=270];
   "152 &" -> "out";
   "147 D8" [shape=box];
-  "147 D8" -> "152 &" [label="out"];
+  "147 D8" -> "152 &" [label="out_1"];
   "146 D8" [shape=box];
-  "146 D8" -> "147 D8" [label="out"];
+  "146 D8" -> "147 D8" [label="out_2"];
   "145 D8" [shape=box];
-  "145 D8" -> "146 D8" [label="out"];
+  "145 D8" -> "146 D8" [label="out_3"];
   "140 D8" [shape=box];
   "140 D8" -> "145 D8" [label="imout"];
   "139 D8" [shape=box];
-  "139 D8" -> "140 D8" [label="imout"];
+  "139 D8" -> "140 D8" [label="imout_1"];
   "138 D8" [shape=box];
-  "138 D8" -> "139 D8" [label="imout"];
+  "138 D8" -> "139 D8" [label="imout_2"];
   "137 D8" [shape=box];
-  "137 D8" -> "138 D8" [label="imout"];
+  "137 D8" -> "138 D8" [label="imout_3"];
   "134 E8" [shape=box];
-  "134 E8" -> "137 D8" [label="imout"];
+  "134 E8" -> "137 D8" [label="imout_4"];
   "133 E8" [shape=box];
-  "133 E8" -> "134 E8" [label="imout"];
+  "133 E8" -> "134 E8" [label="imout_5"];
   "132 E8" [shape=box];
-  "132 E8" -> "133 E8" [label="imout"];
+  "132 E8" -> "133 E8" [label="imout_6"];
   "131 E8" [shape=box];
-  "131 E8" -> "132 E8" [label="imout"];
+  "131 E8" -> "132 E8" [label="imout_7"];
   "126 D8" [shape=box];
   "126 D8" -> "131 E8" [label="imfilt"];
   "125 D8" [shape=box];
-  "125 D8" -> "126 D8" [label="imfilt"];
+  "125 D8" -> "126 D8" [label="imfilt_1"];
   "124 D8" [shape=box];
-  "124 D8" -> "125 D8" [label="imfilt"];
+  "124 D8" -> "125 D8" [label="imfilt_2"];
   "123 D8" [shape=box];
-  "123 D8" -> "124 D8" [label="imfilt"];
+  "123 D8" -> "124 D8" [label="imfilt_3"];
   "120 E8" [shape=box];
-  "120 E8" -> "123 D8" [label="imfilt"];
+  "120 E8" -> "123 D8" [label="imfilt_4"];
   "119 E8" [shape=box];
-  "119 E8" -> "120 E8" [label="imfilt"];
+  "119 E8" -> "120 E8" [label="imfilt_5"];
   "118 E8" [shape=box];
-  "118 E8" -> "119 E8" [label="imfilt"];
+  "118 E8" -> "119 E8" [label="imfilt_6"];
   "117 E8" [shape=box];
-  "117 E8" -> "118 E8" [label="imfilt"];
+  "117 E8" -> "118 E8" [label="imfilt_7"];
   "115 &" [shape=trapezium,orientation=270];
   "115 &" -> "117 E8" [label="imand"];
   "112 thr" [shape=parallelogram];
@@ -3303,95 +3305,95 @@ digraph "license_plate_helper_0_0_0" {
   "84 D8" [shape=box];
   "84 D8" -> "112 thr" [label="imopen"];
   "83 D8" [shape=box];
-  "83 D8" -> "84 D8" [label="imopen"];
+  "83 D8" -> "84 D8" [label="imopen_1"];
   "82 D8" [shape=box];
-  "82 D8" -> "83 D8" [label="imopen"];
+  "82 D8" -> "83 D8" [label="imopen_2"];
   "81 D8" [shape=box];
-  "81 D8" -> "82 D8" [label="imopen"];
+  "81 D8" -> "82 D8" [label="imopen_3"];
   "80 D8" [shape=box];
-  "80 D8" -> "81 D8" [label="imopen"];
+  "80 D8" -> "81 D8" [label="imopen_4"];
   "79 D8" [shape=box];
-  "79 D8" -> "80 D8" [label="imopen"];
+  "79 D8" -> "80 D8" [label="imopen_5"];
   "78 D8" [shape=box];
-  "78 D8" -> "79 D8" [label="imopen"];
+  "78 D8" -> "79 D8" [label="imopen_6"];
   "77 D8" [shape=box];
-  "77 D8" -> "78 D8" [label="imopen"];
+  "77 D8" -> "78 D8" [label="imopen_7"];
   "76 D8" [shape=box];
-  "76 D8" -> "77 D8" [label="imopen"];
+  "76 D8" -> "77 D8" [label="imopen_8"];
   "75 D8" [shape=box];
-  "75 D8" -> "76 D8" [label="imopen"];
+  "75 D8" -> "76 D8" [label="imopen_9"];
   "74 D8" [shape=box];
-  "74 D8" -> "75 D8" [label="imopen"];
+  "74 D8" -> "75 D8" [label="imopen_10"];
   "73 D8" [shape=box];
-  "73 D8" -> "74 D8" [label="imopen"];
+  "73 D8" -> "74 D8" [label="imopen_11"];
   "72 D8" [shape=box];
-  "72 D8" -> "73 D8" [label="imopen"];
+  "72 D8" -> "73 D8" [label="imopen_12"];
   "71 D8" [shape=box];
-  "71 D8" -> "72 D8" [label="imopen"];
+  "71 D8" -> "72 D8" [label="imopen_13"];
   "106 E8" [shape=box];
   "106 E8" -> "113 thr" [label="imclose"];
   "70 D8" [shape=box];
-  "70 D8" -> "71 D8" [label="imopen"];
+  "70 D8" -> "71 D8" [label="imopen_14"];
   "105 E8" [shape=box];
-  "105 E8" -> "106 E8" [label="imclose"];
+  "105 E8" -> "106 E8" [label="imclose_1"];
   "67 E8" [shape=box];
-  "67 E8" -> "70 D8" [label="imopen"];
+  "67 E8" -> "70 D8" [label="imopen_15"];
   "104 E8" [shape=box];
-  "104 E8" -> "105 E8" [label="imclose"];
+  "104 E8" -> "105 E8" [label="imclose_2"];
   "66 E8" [shape=box];
-  "66 E8" -> "67 E8" [label="imopen"];
+  "66 E8" -> "67 E8" [label="imopen_16"];
   "103 E8" [shape=box];
-  "103 E8" -> "104 E8" [label="imclose"];
+  "103 E8" -> "104 E8" [label="imclose_3"];
   "65 E8" [shape=box];
-  "65 E8" -> "66 E8" [label="imopen"];
+  "65 E8" -> "66 E8" [label="imopen_17"];
   "102 E8" [shape=box];
-  "102 E8" -> "103 E8" [label="imclose"];
+  "102 E8" -> "103 E8" [label="imclose_4"];
   "64 E8" [shape=box];
-  "64 E8" -> "65 E8" [label="imopen"];
+  "64 E8" -> "65 E8" [label="imopen_18"];
   "101 E8" [shape=box];
-  "101 E8" -> "102 E8" [label="imclose"];
+  "101 E8" -> "102 E8" [label="imclose_5"];
   "63 E8" [shape=box];
-  "63 E8" -> "64 E8" [label="imopen"];
+  "63 E8" -> "64 E8" [label="imopen_19"];
   "100 E8" [shape=box];
-  "100 E8" -> "101 E8" [label="imclose"];
+  "100 E8" -> "101 E8" [label="imclose_6"];
   "62 E8" [shape=box];
-  "62 E8" -> "63 E8" [label="imopen"];
+  "62 E8" -> "63 E8" [label="imopen_20"];
   "99 E8" [shape=box];
-  "99 E8" -> "100 E8" [label="imclose"];
+  "99 E8" -> "100 E8" [label="imclose_7"];
   "61 E8" [shape=box];
-  "61 E8" -> "62 E8" [label="imopen"];
+  "61 E8" -> "62 E8" [label="imopen_21"];
   "96 D8" [shape=box];
-  "96 D8" -> "99 E8" [label="imclose"];
+  "96 D8" -> "99 E8" [label="imclose_8"];
   "60 E8" [shape=box];
-  "60 E8" -> "61 E8" [label="imopen"];
+  "60 E8" -> "61 E8" [label="imopen_22"];
   "95 D8" [shape=box];
-  "95 D8" -> "96 D8" [label="imclose"];
+  "95 D8" -> "96 D8" [label="imclose_9"];
   "59 E8" [shape=box];
-  "59 E8" -> "60 E8" [label="imopen"];
+  "59 E8" -> "60 E8" [label="imopen_23"];
   "94 D8" [shape=box];
-  "94 D8" -> "95 D8" [label="imclose"];
+  "94 D8" -> "95 D8" [label="imclose_10"];
   "58 E8" [shape=box];
-  "58 E8" -> "59 E8" [label="imopen"];
+  "58 E8" -> "59 E8" [label="imopen_24"];
   "93 D8" [shape=box];
-  "93 D8" -> "94 D8" [label="imclose"];
+  "93 D8" -> "94 D8" [label="imclose_11"];
   "57 E8" [shape=box];
-  "57 E8" -> "58 E8" [label="imopen"];
+  "57 E8" -> "58 E8" [label="imopen_25"];
   "92 D8" [shape=box];
-  "92 D8" -> "93 D8" [label="imclose"];
+  "92 D8" -> "93 D8" [label="imclose_12"];
   "56 E8" [shape=box];
-  "56 E8" -> "57 E8" [label="imopen"];
+  "56 E8" -> "57 E8" [label="imopen_26"];
   "91 D8" [shape=box];
-  "91 D8" -> "92 D8" [label="imclose"];
+  "91 D8" -> "92 D8" [label="imclose_13"];
   "55 E8" [shape=box];
-  "55 E8" -> "56 E8" [label="imopen"];
+  "55 E8" -> "56 E8" [label="imopen_27"];
   "90 D8" [shape=box];
-  "90 D8" -> "91 D8" [label="imclose"];
+  "90 D8" -> "91 D8" [label="imclose_14"];
   "54 E8" [shape=box];
-  "54 E8" -> "55 E8" [label="imopen"];
+  "54 E8" -> "55 E8" [label="imopen_28"];
   "89 D8" [shape=box];
-  "89 D8" -> "90 D8" [label="imclose"];
+  "89 D8" -> "90 D8" [label="imclose_15"];
   "53 E8" [shape=box];
-  "53 E8" -> "54 E8" [label="imopen"];
+  "53 E8" -> "54 E8" [label="imopen_29"];
   "in" -> "152 &";
   "in" -> "89 D8";
   "in" -> "53 E8";
@@ -5222,7 +5224,7 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = license_plate_helper_0_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);                /*0053*/
+   ret_0 = 0;                                                           /*0053*/
    ret_0 |= 0;                                                          /*0054*/
    ret_0 |= 0;                                                          /*0055*/
    ret_0 |= 0;                                                          /*0056*/
@@ -5315,6 +5317,7 @@ int license_plate(void)
 
    _return4 = 0;                                                        /*0150*/
 
+   license_plate_helper_0_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);         /*0152*/
    freia_common_tx_image(out, &fdout);                                  /*0153*/
    
    /* images destruction */
@@ -5363,7 +5366,7 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = license_plate_helper_0_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);                /*0053*/
+   ret_0 = 0;                                                           /*0053*/
    i_0 = 15;                                                            /*0068*/
 
    i_0 = 15;                                                            /*0085*/
@@ -5398,6 +5401,7 @@ int license_plate(void)
 
    _return4 = 0;                                                        /*0150*/
 
+   license_plate_helper_0_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);         /*0152*/
    freia_common_tx_image(out, &fdout);                                  /*0153*/
    
    /* images destruction */

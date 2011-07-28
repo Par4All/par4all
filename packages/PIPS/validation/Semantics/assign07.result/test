@@ -1,0 +1,56 @@
+
+Source code with transformers
+
+
+//  T(assign07) {}
+
+int assign07()
+{
+
+//  T(j,k,l) {0.==j, 0.==k}
+
+   float j = 0., k = 0., l;
+
+//  T(j,k) {1.0==j, 1.0==k}
+
+
+   j = k = 1.0;
+
+//  T(l) {j+k==l}
+
+
+   l = j+k;
+
+//  T(assign07) {}
+
+
+   return (int) l;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int assign07()
+{
+
+//  P() {}
+
+   float j = 0., k = 0., l;
+
+//  P(j,k,l) {0.==j, 0.==k}
+
+
+   j = k = 1.0;
+
+//  P(j,k,l) {1.0==j, 1.0==k}
+
+
+   l = j+k;
+
+//  P(j,k,l) {1.0==j, 1.0==k, 21.0==l}
+
+
+   return (int) l;
+}

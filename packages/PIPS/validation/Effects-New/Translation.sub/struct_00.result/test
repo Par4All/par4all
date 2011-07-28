@@ -1,0 +1,53 @@
+void bla(struct thing *b)
+{
+   foo(b);
+}
+void foo(struct thing *f)
+{
+   f->stuff++;
+}
+int main(void)
+{
+   struct thing t;
+   t.stuff = 1;
+   bla(&t);
+
+   struct thing *s;
+   s = &t;
+   bla(s);
+   return 0;
+}
+//             <    is read   >: b b[0].stuff
+//             <    is written>: b[0].stuff
+void bla(struct thing *b)
+{
+//             <    is read   >: b b[0].stuff
+//             <    is written>: b[0].stuff
+   foo(b);
+}
+//             <    is read   >: f f[0].stuff
+//             <    is written>: f[0].stuff
+void foo(struct thing *f)
+{
+//             <    is read   >: f f[0].stuff
+//             <    is written>: f[0].stuff
+   f->stuff++;
+}
+int main(void)
+{
+   struct thing t;
+//             <    is written>: t.stuff
+   t.stuff = 1;
+//             <    is read   >: t.stuff
+//             <    is written>: t.stuff
+   bla(&t);
+
+   struct thing *s;
+//             <    is written>: s
+   s = &t;
+//             <    is read   >: s s[0].stuff
+//             <    is written>: s[0].stuff
+   bla(s);
+   return 0;
+}
+

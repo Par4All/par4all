@@ -1,17 +1,34 @@
 
 POINTS TO
 
-//  {(p,_p_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+
 void pointer03(int n, float *p)
 {
-//  {(p,_p_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+
    int i;
-//  {(p,_p_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+
    float *r = p;
-//  {(p,_p_1[0],-Exact-);(r,_p_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+// r -> &_p_1[0] , EXACT
+
 
    for(i = 0; i <= n-1; i += 1)
-//  {(p,_p_1[0],-Exact-);(r,_p_1[0],-Exact-)}
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+// r -> &_p_1[0] , EXACT
+
       p[i] = r[i];
 }
 

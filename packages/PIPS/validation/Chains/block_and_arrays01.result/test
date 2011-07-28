@@ -1,0 +1,150 @@
+int main()
+{
+   int a[10], i;                                                        /*0008*/
+   i = 0;                                                               /*0009*/
+   a[i] = 1;                                                            /*0010*/
+   i = 1;                                                               /*0011*/
+   a[i] = 2;                                                            /*0012*/
+   i = 3;                                                               /*0013*/
+   return a[i];                                                         /*0014*/
+}
+int main()
+{
+//             <    is declared>: a i
+   int a[10], i;                                                        /*0008*/
+//             <    is written>: i
+//             <    is referenced>: i
+   i = 0;                                                               /*0009*/
+//             <    is read   >: i
+//             <    is written>: a[i]
+//             <    is referenced>: a i
+   a[i] = 1;                                                            /*0010*/
+//             <    is written>: i
+//             <    is referenced>: i
+   i = 1;                                                               /*0011*/
+//             <    is read   >: i
+//             <    is written>: a[i]
+//             <    is referenced>: a i
+   a[i] = 2;                                                            /*0012*/
+//             <    is written>: i
+//             <    is referenced>: i
+   i = 3;                                                               /*0013*/
+//             <    is read   >: a[i] i
+//             <    is referenced>: a i
+   return a[i];                                                         /*0014*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	13 --> 14 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	12 --> 14 with conflicts
+		from <a[i]-W-EXACT> to <a[i]-R-EXACT>
+	12 --> 13 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	11 --> 13 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	11 --> 12 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	10 --> 14 with conflicts
+		from <a[i]-W-EXACT> to <a[i]-R-EXACT>
+	10 --> 13 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	10 --> 12 with conflicts
+		from <a[i]-W-EXACT> to <a[i]-W-EXACT>
+	10 --> 11 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	09 --> 11 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	09 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	08 --> 14 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	08 --> 13 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	08 --> 12 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	08 --> 11 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	08 --> 10 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	08 --> 09 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+int main()
+{
+
+//  <a-WE-EXACT-{}>
+
+   int a[10], i;                                                        /*0008*/
+   i = 0;                                                               /*0009*/
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, i==0}>
+
+   a[i] = 1;                                                            /*0010*/
+   i = 1;                                                               /*0011*/
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, i==1}>
+
+   a[i] = 2;                                                            /*0012*/
+   i = 3;                                                               /*0013*/
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-R-EXACT-{PHI1==i, i==3}>
+
+   return a[i];                                                         /*0014*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	13 --> 14 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	12 --> 14 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
+	12 --> 13 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	11 --> 13 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	11 --> 12 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	10 --> 14 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
+	10 --> 13 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	10 --> 12 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-W-EXACT>
+	10 --> 11 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	09 --> 11 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	09 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	08 --> 14 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	08 --> 13 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	08 --> 12 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	08 --> 11 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	08 --> 10 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	08 --> 09 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None

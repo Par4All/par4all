@@ -605,37 +605,37 @@
          IF (.NOT.L_6.AND..NOT.L_5) L_4 = N.LT.0
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND.L_4) INFO = 4
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.L_4)) INFO = 4
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4) L_3 = K.LT.0
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND..NOT.L_4)) L_3 = K.LT.0
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND.L_3) INFO = 5
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.L_3))) INFO = 5
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3) L_2 = 
-     &   LDA.LT.MAX(1, NROWA)
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND..NOT.L_3))) L_2
+     &    = LDA.LT.MAX(1, NROWA)
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.L_2
-     &   ) INFO = 8
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.
+     &   L_2)))) INFO = 8
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2) L_1 = LDB.LT.MAX(1, NROWB)
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.
+     &   .NOT.L_2)))) L_1 = LDB.LT.MAX(1, NROWB)
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND.L_1) INFO = 10
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
+     &   .NOT.L_2.AND.L_1))))) INFO = 10
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND..NOT.L_1) L_0 = LDC.LT.MAX(1, M)
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
+     &   .NOT.L_2.AND..NOT.L_1))))) L_0 = LDC.LT.MAX(1, M)
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND..NOT.L_1.AND.L_0) INFO = 13
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
+     &   .NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))) INFO = 13
 !$omp end parallel do
       ENDIF
       IF (INFO.NE.0) THEN                                               0081
@@ -830,37 +830,37 @@
          IF (.NOT.L_6.AND..NOT.L_5) L_4 = N.LT.0
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND.L_4) INFO = 4
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.L_4)) INFO = 4
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4) L_3 = K.LT.0
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND..NOT.L_4)) L_3 = K.LT.0
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND.L_3) INFO = 5
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.L_3))) INFO = 5
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3) L_2 = 
-     &   LDA.LT.MAX(1, NROWA)
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND..NOT.L_3))) L_2
+     &    = LDA.LT.MAX(1, NROWA)
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.L_2
-     &   ) INFO = 8
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.
+     &   L_2)))) INFO = 8
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2) L_1 = LDB.LT.MAX(1, NROWB)
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.
+     &   .NOT.L_2)))) L_1 = LDB.LT.MAX(1, NROWB)
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND.L_1) INFO = 10
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
+     &   .NOT.L_2.AND.L_1))))) INFO = 10
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND..NOT.L_1) L_0 = LDC.LT.MAX(1, M)
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
+     &   .NOT.L_2.AND..NOT.L_1))))) L_0 = LDC.LT.MAX(1, M)
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
-         IF (.NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND..NOT.L_1.AND.L_0) INFO = 13
+         IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
+     &   .NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))) INFO = 13
 !$omp end parallel do
       ENDIF
       IF (INFO.NE.0) THEN                                               0081
@@ -1037,25 +1037,25 @@
          INFO = .NOT.L_6.AND.L_5?3:INFO
          L_40 = N.LT.0
          L_4 = .NOT.L_6.AND..NOT.L_5?L_40:L_4
-         INFO = .NOT.L_6.AND..NOT.L_5.AND.L_4?4:INFO
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.L_4)?4:INFO
          L_30 = K.LT.0
-         L_3 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4?L_30:L_3
-         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND.L_3?5:INFO
+         L_3 = .NOT.L_6.AND.(.NOT.L_5.AND..NOT.L_4)?L_30:L_3
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.L_3))?5:INFO
          L_20 = LDA.LT.MAX(1, NROWA)
-         L_2 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3?L_20:
-     &   L_2
-         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   L_2?8:INFO
+         L_2 = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND..NOT.L_3))?
+     &   L_20:L_2
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND.L_2)))?8:INFO
          L_10 = LDB.LT.MAX(1, NROWB)
-         L_1 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2?L_10:L_1
-         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND.L_1?10:INFO
+         L_1 = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND..NOT.L_2)))?L_10:L_1
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND.(.NOT.L_2.AND.L_1))))?10:INFO
          L_00 = LDC.LT.MAX(1, M)
-         L_0 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND..NOT.L_1?L_00:L_0
-         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND..NOT.L_1.AND.L_0?13:INFO
+         L_0 = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND.(.NOT.L_2.AND..NOT.L_1))))?L_00:L_0
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND.(.NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))?13:INFO
       ENDIF
       IF (INFO.NE.0) THEN                                               0081
 *         CALL XERBLA( 'SGEMM ', INFO )
@@ -1219,25 +1219,25 @@
          INFO = .NOT.L_6.AND.L_5?3:INFO
          L_40 = N.LT.0
          L_4 = .NOT.L_6.AND..NOT.L_5?L_40:L_4
-         INFO = .NOT.L_6.AND..NOT.L_5.AND.L_4?4:INFO
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.L_4)?4:INFO
          L_30 = K.LT.0
-         L_3 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4?L_30:L_3
-         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND.L_3?5:INFO
+         L_3 = .NOT.L_6.AND.(.NOT.L_5.AND..NOT.L_4)?L_30:L_3
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.L_3))?5:INFO
          L_20 = LDA.LT.MAX(1, NROWA)
-         L_2 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3?L_20:
-     &   L_2
-         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   L_2?8:INFO
+         L_2 = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND..NOT.L_3))?
+     &   L_20:L_2
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND.L_2)))?8:INFO
          L_10 = LDB.LT.MAX(1, NROWB)
-         L_1 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2?L_10:L_1
-         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND.L_1?10:INFO
+         L_1 = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND..NOT.L_2)))?L_10:L_1
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND.(.NOT.L_2.AND.L_1))))?10:INFO
          L_00 = LDC.LT.MAX(1, M)
-         L_0 = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND..NOT.L_1?L_00:L_0
-         INFO = .NOT.L_6.AND..NOT.L_5.AND..NOT.L_4.AND..NOT.L_3.AND.
-     &   .NOT.L_2.AND..NOT.L_1.AND.L_0?13:INFO
+         L_0 = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND.(.NOT.L_2.AND..NOT.L_1))))?L_00:L_0
+         INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
+     &   .AND.(.NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))?13:INFO
       ENDIF
       IF (INFO.NE.0) THEN                                               0081
 *         CALL XERBLA( 'SGEMM ', INFO )

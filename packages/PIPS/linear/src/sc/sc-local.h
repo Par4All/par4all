@@ -90,28 +90,28 @@ typedef struct Ssysteme {
  * il faut rajouter un parame`tre permettant de savoir quoi retourner en
  * cas d'overflow, et ce n'e'tait pas toujours possible. Voir les
  * commentaires au dessus des fonctions pour cela.
- * 
+ *
  * Toutes les fonctions qui acceptent ces valeurs en (dernier) parame`tre
  * ont leur nom qui finit par _ofl_ctrl.
- * 
+ *
  * Ceci concerne quasiment toutes les fonctions de projection, les
  * fonctions de test de faisabilite', la fonction du simplexe, les
  * fonctions d'e'limination de redondances, la fonction de valeur absolue
  * (abs_ofl_ctrl), les fonctions de combinaisons line'aires de vecteurs.
  * Ceci n'est pas force'ment exhaustif...
- * 
- * 
+ *
+ *
  * - SC_EMPTY, SC_RN, sc_empty, sc_rn
  *   ~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~
   * Le systeme vide "sc_empty" est represente par l'egalite "0==-1".
- * le systeme representant l'espace Rn "sc_rn" est un  systeme 
- * ne contenant aucune contrainte. 
+ * le systeme representant l'espace Rn "sc_rn" est un  systeme
+ * ne contenant aucune contrainte.
  * Avant ces deux systemes etaient representes par Le pointeur (Psysteme) NULL.
  * Progressivement, les (Psysteme) NULL sont replaces par des appels aux
- *  fonctions sc_empty et sc_rn. 
- * SC_EMPTY et SC_RN representent des valeurs obsoletes qu'ils faudraient 
+ *  fonctions sc_empty et sc_rn.
+ * SC_EMPTY et SC_RN representent des valeurs obsoletes qu'ils faudraient
  * remplacer par les sc_empty et sc_rn.
- * 
+ *
  * - entier ou rationnel ?
  *   ~~~~~~~~~~~~~~~~~~~~~
  * Les tests de faisabilite' e'taient fait en entier. Les deux tests
@@ -180,7 +180,7 @@ extern void syst_restart(FILE * input_file );
 #define SC_EMPTY_P(sc) ((sc)==SC_EMPTY)
 
 /* ex-definition d'un systeme de contraintes vide, representant tout l'espace,
- * dont la base se trouve eventuellement dans "base" (quand ce champ est 
+ * dont la base se trouve eventuellement dans "base" (quand ce champ est
  * alloue); quand la base et la dimension ne sont pas definies, cela
  * represente un espace de dimension quelconque.
  *

@@ -52,24 +52,24 @@
  *
  * Pour les egalites, on elimine une equation si on a un systeme d'egalites
  * de la forme :
- * 
- *   a1/    Ax - b == 0,            ou  b1/        Ax - b == 0,              
- *          Ax - b == 0,                           b - Ax == 0,              
- * 
- * ou c1/ 0 == 0	 
- * 
+ *
+ *   a1/    Ax - b == 0,            ou  b1/        Ax - b == 0,
+ *          Ax - b == 0,                           b - Ax == 0,
+ *
+ * ou c1/ 0 == 0
+ *
  * Pour les inegalites, on elimine une inequation si on a un systeme de
  * contraintes de la forme :
- * 
+ *
  *   a2/    Ax - b <= c,             ou   b2/     0 <= const  (avec const >=0)
- *          Ax - b <= c             
- * 
- *   ou  c2/   Ax == b,	
+ *          Ax - b <= c
+ *
+ *   ou  c2/   Ax == b,
  *             Ax <= c        avec b <= c,
- * 
+ *
  *   ou  d2/    Ax <= b,
  *              Ax <= c    avec c >= b ou b >= c
- * 
+ *
  * sc_normalize retourne NULL quand la normalisation a montre que le systeme
  * etait non faisable
  *
@@ -108,9 +108,9 @@ Psysteme ps;
 	sc_elim_empty_constraints(ps, false);
     }
 
-    if (!is_sc_fais) 
+    if (!is_sc_fais)
 	sc_rm(ps), ps=NULL;
-    
+
     return(ps);
 }
 
@@ -605,11 +605,11 @@ Psysteme sc_strong_normalize_and_check_feasibility
 		      (unsigned int) new_ps);
 		      sc_default_dump(new_ps);
 		    */
-		    
+
 		    /* Check redundancy between residual inequalities */
-		    
+
 		    /* sc_elim_simple_redund_with_ineq(ps,ineg) */
-		    
+
 		    /* Well, sc_normalize should not be able to do much here! */
 		    /*
 		      new_ps = sc_normalize(new_ps);
@@ -632,12 +632,12 @@ Psysteme sc_strong_normalize_and_check_feasibility
 		*/
 		feasible_p = false;
 	    }
-	    
+
 	    if(feasible_p && check_feasibility != (Psysteme (*)(Psysteme)) NULL) {
 		proj_ps = check_feasibility(proj_ps);
 		feasible_p = !SC_EMPTY_P(proj_ps);
 	    }
-	    
+
 	    if(!feasible_p) {
 		sc_rm(new_ps);
 		new_ps = SC_EMPTY;
@@ -646,9 +646,11 @@ Psysteme sc_strong_normalize_and_check_feasibility
 		sc_base(new_ps) = sc_base(ps);
 		sc_base(ps) = BASE_UNDEFINED;
 		sc_dimension(new_ps) = sc_dimension(ps);
-		assert(sc_weak_consistent_p(new_ps));
+		/* FI: test added for breakpoint placement*/
+		if(!sc_weak_consistent_p(new_ps))
+		  assert(sc_weak_consistent_p(new_ps));
 	    }
-	    
+
 	    sc_rm(proj_ps);
 	    sc_rm(ps);
 	    sc_rm(ps_backup);
@@ -658,7 +660,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 	      sc_default_dump(new_ps);
 	      fprintf(stderr, "[sc_strong_normalize]: End\n");
 	    */
-	
+
 	    UNCATCH(overflow_error);
 	}
     return new_ps;

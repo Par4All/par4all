@@ -95,7 +95,7 @@ digraph "my_set_constant_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_set_constant
-freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, ,
+freia_status my_set_constant_helper_0_0_0(freia_data2d * o0,
   int32_t pi0)
 {
   spoc_instr si;

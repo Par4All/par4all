@@ -120,9 +120,9 @@ static entity omp_operator_entity (reduction_operator o) {
 
 ///@return a list of expression for reduction r
 ///@param r the reduction to process
-static list reduction_as_expr (reduction r)
+static expression reduction_as_expr (reduction r)
 {
-  // secondly prepare the expressions list that specifies the variable
+  // prepare the expressions list that specifies the variable
   // and the operator
   reference ref = copy_reference (reduction_reference(r));
   syntax s = make_syntax_reference (ref);
@@ -140,11 +140,7 @@ static list reduction_as_expr (reduction r)
   entity e = CreateIntrinsic(OMP_REDUCTION_FUNCTION_NAME);
   call c = make_call (e, args);
   s = make_syntax_call (c);
-  expression expr_for = make_expression (s, normalized_undefined);
-
-  //secondly get "omp parallel for" as an expr and concatenate
-  list result = pragma_omp_parallel_for_as_exprs ();
-  result = gen_expression_cons (expr_for, result);
+  expression result = make_expression (s, normalized_undefined);
 
   pips_debug(5, "finish\n");
   return result;
@@ -213,13 +209,10 @@ static string omp_operator_str (reduction_operator o) {
 static string reduction_as_str (reduction r)
 {
   string str;
-  string header = (prettyprint_language_is_fortran_p ()
-		   ? OMP_PRAGMA_FOR_HEADER_F :
-		   OMP_PRAGMA_FOR_HEADER_C);
-  str = concatenate (header, " ", REDUCTION_KEYWORD,
-		     "(", omp_operator_str (reduction_op(r)), ":",
-		     words_to_string(words_reference(reduction_reference(r),NIL)),
-		     ")", NULL);
+  str = concatenate (REDUCTION_KEYWORD,
+					 "(", omp_operator_str (reduction_op(r)), ":",
+					 words_to_string(words_reference(reduction_reference(r),NIL)),
+					 ")", NULL);
   pips_debug(5, "finish with string: %s\n", str);
   return strdup (str);
 }
@@ -247,7 +240,7 @@ void reductions_pragma_omp_end (void) {
 //@param l, the loop associated with the statement
 //@param stmt, the statement to analyzed for reductions, must be a loop
 list reductions_get_omp_pragma_expr (loop l, statement stmt) {
-  list exprs = NULL;
+  list exprs = NIL;
   // check that reduction as been detected at loop level
   if  (statement_is_reduction (stmt) == true) {
     reductions rs = load_printed_reductions(stmt);
@@ -260,10 +253,13 @@ list reductions_get_omp_pragma_expr (loop l, statement stmt) {
       // the test is too restrictive so need to be improved
       gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
       if (all_reduction == true) {
-	reductions rs = load_printed_reductions(stmt);
-	FOREACH (REDUCTION, red, reductions_list(rs)) {
-	  exprs = reduction_as_expr (red);
-	}
+				reductions rs = load_printed_reductions(stmt);
+				FOREACH (REDUCTION, red, reductions_list(rs)) {
+				  exprs = gen_expression_cons (reduction_as_expr (red), exprs);
+				}
+				//secondly get "omp parallel for" as an expr and concatenate
+				list parallel_for = pragma_omp_parallel_for_as_exprs ();
+				exprs = gen_nconc (exprs, parallel_for);
       }
     }
   }
@@ -275,7 +271,7 @@ list reductions_get_omp_pragma_expr (loop l, statement stmt) {
 ///@param l, the loop associated with the statement
 ///@param stmt, the statement to analyzed for reductions, must be a loop
 string reductions_get_omp_pragma_str (loop l, statement stmt) {
-  string str  = string_undefined;
+  string_buffer buf  = string_buffer_make (false);
   // check that reduction as been detected at loop level
   if  (statement_is_reduction (stmt) == true) {
     reductions rs = load_printed_reductions(stmt);
@@ -288,12 +284,19 @@ string reductions_get_omp_pragma_str (loop l, statement stmt) {
       // the test is too restrictive so need to be improved
       gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
       if (all_reduction == true) {
+	string header = (prettyprint_language_is_fortran_p ()
+			 ? OMP_PRAGMA_FOR_HEADER_F :
+			 OMP_PRAGMA_FOR_HEADER_C);
+	string_buffer_append (buf, strdup (header));
+	string_buffer_append (buf, strdup (" "));
 	FOREACH (REDUCTION, red, reductions_list(rs)) {
-	  str = reduction_as_str (red);
+	  string_buffer_append (buf, reduction_as_str (red));
 	}
       }
     }
   }
-  pips_debug(5, "finish with pragma: %s\n", str == string_undefined? "" : str);
-  return str;
+  string result = string_buffer_to_string (buf);
+  pips_debug(5, "finish with pragma: %s\n", result);
+  string_buffer_free_all (&buf);
+  return result;
 }

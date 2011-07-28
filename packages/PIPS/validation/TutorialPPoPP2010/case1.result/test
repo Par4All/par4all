@@ -167,15 +167,15 @@ int main()
       for(j = 1; j <= 10; j += 1)
 //  T() {1<=i, i<=10, 1<=j, j<=10}
          b[i][j] = 1.0;
-//  T(h) {2.0==h, i==11, j==11}
+//  T(h) {h==2., i==11, j==11}
    h = 2.0;
-//  T() {2.0==h, i==11, j==11}
+//  T() {h==2., i==11, j==11}
    func1(10, 10, a, b, h);
-//  T(i,j) {2.0==h, i#init==11, j#init==11, 1<=i, i<=10}
+//  T(i,j) {h==2., i#init==11, j#init==11, 1<=i, i<=10}
    for(i = 1; i <= 10; i += 1)
-//  T(j) {2.0==h, 1<=i, i<=10, 1<=j, j<=10}
+//  T(j) {h==2., 1<=i, i<=10, 1<=j, j<=10}
       for(j = 1; j <= 10; j += 1)
-//  T() {2.0==h, 1<=i, i<=10, 1<=j, j<=10}
+//  T() {h==2., 1<=i, i<=10, 1<=j, j<=10}
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
 
@@ -196,29 +196,29 @@ int main()
          b[i][j] = 1.0;
 //  P(h,i,j) {i==11, j==11}
    h = 2.0;
-//  P(h,i,j) {2.0==h, i==11, j==11}
+//  P(h,i,j) {h==2., i==11, j==11}
    func1(10, 10, a, b, h);
-//  P(h,i,j) {2.0==h, i==11, j==11}
+//  P(h,i,j) {h==2., i==11, j==11}
    for(i = 1; i <= 10; i += 1)
-//  P(h,i,j) {2.0==h, 1<=i, i<=10}
+//  P(h,i,j) {h==2., 1<=i, i<=10}
       for(j = 1; j <= 10; j += 1)
-//  P(h,i,j) {2.0==h, 1<=i, i<=10, 1<=j, j<=10}
+//  P(h,i,j) {h==2., 1<=i, i<=10, 1<=j, j<=10}
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
-//  P() {2.0==h, m==10, n==10}
+//  P() {h==2., m==10, n==10}
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
-//  P() {2.0==h, m==10, n==10}
+//  P() {h==2., m==10, n==10}
    float x;
-//  P(x) {2.0==h, m==10, n==10}
+//  P(x) {h==2., m==10, n==10}
    int i, j;
-//  P(i,j,x) {2.0==h, m==10, n==10}
+//  P(i,j,x) {h==2., m==10, n==10}
    for(i = 1; i <= n; i += 1)
-//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10}
+//  P(i,j,x) {h==2., m==10, n==10, 1<=i, i<=10}
       for(j = 1; j <= m; j += 1) {
-//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
+//  P(i,j,x) {h==2., m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
          x = i*h+j;
-//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
+//  P(i,j,x) {h==2., m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
          a[i][j] = b[i][j]*x;
       }
 }
@@ -226,34 +226,34 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 Printed files with regions
 
 
-//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    2.0==h, m==10, n==10}>
-//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    2.0==h, m==10, n==10}>
+//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m, h==2.,
+//    m==10, n==10}>
+//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m, h==2.,
+//    m==10, n==10}>
 
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
    float x;
    int i, j;
 
-//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    2.0==h, m==10, n==10}>
-//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    2.0==h, m==10, n==10}>
+//  <a[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m, h==2.,
+//    m==10, n==10}>
+//  <b[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m, h==2.,
+//    m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
-//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, 2.0==h, m==10,
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, h==2., m==10,
 //    n==10, 1<=i, i<=n}>
-//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, 2.0==h, m==10,
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, h==2., m==10,
 //    n==10, 1<=i, i<=n}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
 
-//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 2.0==h, m==10, n==10,
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, h==2., m==10, n==10,
 //    1<=i, i<=10, 1<=j, j<=10}>
-//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 2.0==h, m==10, n==10,
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, h==2., m==10, n==10,
 //    1<=i, i<=10, 1<=j, j<=10}>
 
          a[i][j] = b[i][j]*x;
@@ -261,7 +261,7 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 }
 
 //  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    2.0==h, m==10, n==10}>
+//    h==2., m==10, n==10}>
 
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
@@ -269,17 +269,17 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
    int i, j;
 
 //  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    2.0==h, m==10, n==10}>
+//    h==2., m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
-//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, 2.0==h, m==10,
+//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, h==2., m==10,
 //    n==10, 1<=i, i<=n}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
 
-//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, 2.0==h, m==10, n==10,
+//  <b[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, h==2., m==10, n==10,
 //    1<=i, i<=10, 1<=j, j<=10}>
 
          a[i][j] = b[i][j]*x;
@@ -300,19 +300,19 @@ int main()
    h = 2.0;
 
 //  <b[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    2.0==h, i==11, j==11}>
+//    h==2., i==11, j==11}>
 
    func1(10, 10, a, b, h);
 
 //  <a[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    2.0==h, j==11}>
+//    h==2., j==11}>
 //  <stderr-IN-EXACT-{}>
-//  <stderr[PHI1]-IN-MAY-{PHI1==0, 2.0==h, j==11}>
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2, 2.0==h, j==11}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0, h==2., j==11}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2, h==2., j==11}>
 
    for(i = 1; i <= 10; i += 1)
 
-//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, 2.0==h, 1<=i,
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, h==2., 1<=i,
 //    i<=10}>
 //  <stderr-IN-EXACT-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
@@ -320,7 +320,7 @@ int main()
 
       for(j = 1; j <= 10; j += 1)
 
-//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, 2.0==h, 1<=i, i<=10,
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, h==2., 1<=i, i<=10,
 //    1<=j, j<=10}>
 //  <stderr-IN-EXACT-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
@@ -330,7 +330,7 @@ int main()
 }
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    2.0==h, m==10, n==10}>
+//    h==2., m==10, n==10}>
 
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
@@ -338,17 +338,17 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
    int i, j;
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=n, 1<=PHI2, PHI2<=m,
-//    2.0==h, m==10, n==10}>
+//    h==2., m==10, n==10}>
 
    for(i = 1; i <= n; i += 1)
 
-//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, 2.0==h,
-//    m==10, n==10, 1<=i, i<=n}>
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, 1<=PHI2, PHI2<=m, h==2., m==10,
+//    n==10, 1<=i, i<=n}>
 
       for(j = 1; j <= m; j += 1) {
          x = i*h+j;
 
-//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI2==j, 2.0==h, m==10, n==10,
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI2==j, h==2., m==10, n==10,
 //    1<=i, i<=10, 1<=j, j<=10}>
 
          a[i][j] = b[i][j]*x;
@@ -375,7 +375,7 @@ int main()
    h = 2.0;
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
-//    2.0==h, i==11, j==11}>
+//    h==2., i==11, j==11}>
 
    func1(10, 10, a, b, h);
    for(i = 1; i <= 10; i += 1)
@@ -446,29 +446,29 @@ int main()
          b[i][j] = 1.0;
 //  P(h,i,j) {i==11, j==11}
    h = 2.0;
-//  P(h,i,j) {2.0==h, i==11, j==11}
+//  P(h,i,j) {h==2., i==11, j==11}
    func1(10, 10, a, b, h);
-//  P(h,i,j) {2.0==h, i==11, j==11}
+//  P(h,i,j) {h==2., i==11, j==11}
    for(i = 1; i <= 10; i += 1)
-//  P(h,i,j) {2.0==h, 1<=i, i<=10}
+//  P(h,i,j) {h==2., 1<=i, i<=10}
       for(j = 1; j <= 10; j += 1)
-//  P(h,i,j) {2.0==h, 1<=i, i<=10, 1<=j, j<=10}
+//  P(h,i,j) {h==2., 1<=i, i<=10, 1<=j, j<=10}
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
-//  P() {2.0==h, m==10, n==10}
+//  P() {h==2., m==10, n==10}
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
-//  P() {2.0==h, m==10, n==10}
+//  P() {h==2., m==10, n==10}
    float x;
-//  P(x) {2.0==h, m==10, n==10}
+//  P(x) {h==2., m==10, n==10}
    int i, j;
-//  P(i,j,x) {2.0==h, m==10, n==10}
+//  P(i,j,x) {h==2., m==10, n==10}
    for(i = 1; i <= 10; i += 1)
-//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10}
+//  P(i,j,x) {h==2., m==10, n==10, 1<=i, i<=10}
       for(j = 1; j <= 10; j += 1) {
-//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
+//  P(i,j,x) {h==2., m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
          x = i*h+j;
-//  P(i,j,x) {2.0==h, m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
+//  P(i,j,x) {h==2., m==10, n==10, 1<=i, i<=10, 1<=j, j<=10}
          a[i][j] = b[i][j]*x;
       }
 }

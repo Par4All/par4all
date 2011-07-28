@@ -1,8 +1,0 @@
-  FREIA_SPOC_COMPILER            updating   CODE(freia_49)
-                                 building   CALLEES(freia_49)
-                                 building   SPOC_FILE(freia_49)
-user warning in split_dag: image reuse may result in subtly wrong code...
-pips error in freia_spoc_pipeline: (.../pips/src/Libs/hwac/freia_spoc.c:1523) assertion failed
-
- 'output two results in two variables' not verified
-

@@ -45,8 +45,8 @@ void induction05(int SIZE, double A[SIZE], double B[SIZE][SIZE])
    int k = SIZE;
    for(i = 0; i <= SIZE-1; i += 1) {
       if (k = -((-SIZE)+2*i)-1, k-1)
-         A[-(1+2*i+(-SIZE))] = B[j-(-(1+2*i+(-SIZE)))][-(1+2*i+(-SIZE))]+A[-(1+2*i+(-SIZE))];
-      if (k = -((-SIZE)+2*i+1)-1)
-         A[-(2+2*i+(-SIZE))] = B[j-(-(2+2*i+(-SIZE)))][-(2+2*i+(-SIZE))]+A[-(2+2*i+(-SIZE))];
+         A[-(1+(2*i+(-SIZE)))] = B[j-(-(1+(2*i+(-SIZE))))][-(1+(2*i+(-SIZE)))]+A[-(1+(2*i+(-SIZE)))];
+      if (k = -((-SIZE)+(2*i+1))-1)
+         A[-(2+(2*i+(-SIZE)))] = B[j-(-(2+(2*i+(-SIZE))))][-(2+(2*i+(-SIZE)))]+A[-(2+(2*i+(-SIZE)))];
    }
 }

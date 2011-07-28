@@ -1480,24 +1480,26 @@ statement makeloopbody(loop l, statement s_old, bool inner_p)
 
 string external_statement_identification(statement s)
 {
-    string buffer;
-    instruction i = statement_instruction(s);
-    string instrstring = instruction_identification(i);
-    int so = statement_ordering(s);
-    entity called = entity_undefined;
+  string buffer;
+  instruction i = statement_instruction(s);
+  string instrstring = instruction_identification(i);
+  int so = statement_ordering(s);
+  entity called = entity_undefined;
 
-    if(same_string_p(instrstring, "CALL")) {
-	called = call_function(instruction_call(i));
-    }
+  if(same_string_p(instrstring, "CALL")) {
+    called = call_function(instruction_call(i));
+  }
 
-    asprintf(&buffer, "%td (%d, %d): %s %s\n",
-	     statement_number(s),
-	     ORDERING_NUMBER(so),
-	     ORDERING_STATEMENT(so),
-	     instrstring,
-	     entity_undefined_p(called)? "" : module_local_name(called));
+  int n = asprintf(&buffer, "%td (%d, %d): %s %s\n",
+                   statement_number(s),
+                   ORDERING_NUMBER(so),
+                   ORDERING_STATEMENT(so),
+                   instrstring,
+                   entity_undefined_p(called)? "" : module_local_name(called));
 
-    return buffer;
+  pips_assert("asprintf ok", n!=-1);
+
+  return buffer;
 }
 
 /* Like external_statement_identification(), but with internal
@@ -1517,13 +1519,15 @@ string statement_identification(statement s)
     called = call_function(instruction_call(i));
   }
 
-  asprintf(&buffer, "%td (%d, %d) at %p: %s %s\n",
-	   statement_number(s),
-	   ORDERING_NUMBER(so),
-	   ORDERING_STATEMENT(so),
-	   s,
-	   instrstring,
-	   entity_undefined_p(called)? "" : module_local_name(called));
+  int n = asprintf(&buffer, "%td (%d, %d) at %p: %s %s\n",
+                   statement_number(s),
+                   ORDERING_NUMBER(so),
+                   ORDERING_STATEMENT(so),
+                   s,
+                   instrstring,
+                   entity_undefined_p(called)? "" : module_local_name(called));
+
+  pips_assert("asprintf ok", n!=-1);
 
   return buffer;
 }
@@ -2347,13 +2351,15 @@ void insert_statement(statement s,
     }
 }
 
+// there should be a space at the beginning of the string
 #define PIPS_DECLARATION_COMMENT "PIPS generated variable\n"
 static string
 default_generated_variable_commenter(__attribute__((unused))entity e)
 {
-    return strdup(PIPS_DECLARATION_COMMENT);
+  return strdup(PIPS_DECLARATION_COMMENT);
 }
 
+// hmmm... why not use the "stack" type, instead of betting?
 #define MAX_COMMENTERS 8
 
 /* commenters are function used to add comments to pips-created variables
@@ -2361,15 +2367,17 @@ default_generated_variable_commenter(__attribute__((unused))entity e)
  * all commenters are supposed to return allocated data
  */
 typedef string (*generated_variable_commenter)(entity);
-static generated_variable_commenter generated_variable_commenters[MAX_COMMENTERS] = {
-    [0]=default_generated_variable_commenter /* c99 inside :) */
+static generated_variable_commenter
+generated_variable_commenters[MAX_COMMENTERS] = {
+  [0]=default_generated_variable_commenter /* c99 inside :) */
 };
 static size_t nb_commenters=1;
 
 void push_generated_variable_commenter(string (*commenter)(entity))
 {
-    pips_assert("not exceeding stack commenters stack limited size\n",nb_commenters<MAX_COMMENTERS);
-    generated_variable_commenters[nb_commenters++]=commenter;
+  pips_assert("not exceeding stack commenters stack limited size\n",
+              nb_commenters<MAX_COMMENTERS);
+  generated_variable_commenters[nb_commenters++]=commenter;
 }
 
 void pop_generated_variable_commenter()

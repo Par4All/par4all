@@ -498,7 +498,7 @@ switch_10_case_B:         ;
          goto break_10;
 switch_10_case_A:         ;
          if (i<=2)
-            if (key_rank!=test_rank_array[i]+iteration-1)
+            if (key_rank!=test_rank_array[i]+(iteration-1))
                failed = 1;
             else
                passed_verification++;
@@ -509,7 +509,7 @@ switch_10_case_A:         ;
          goto break_10;
 switch_10_case_W:         ;
          if (i<2)
-            if (key_rank!=test_rank_array[i]+iteration-2)
+            if (key_rank!=test_rank_array[i]+(iteration-2))
                failed = 1;
             else
                passed_verification++;

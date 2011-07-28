@@ -1,0 +1,1 @@
+The Fortran XOR of GNU Fortran is not interpreted because XOR is not an intrinsics for PIPS internal representation.
