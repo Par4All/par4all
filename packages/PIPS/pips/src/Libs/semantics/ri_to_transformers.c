@@ -1115,7 +1115,7 @@ transformer transformer_intra_to_inter(transformer tf,
       /* Variables with no impact on the caller world are eliminated.
        * However, the return value associated to a function is preserved.
        */
-      if( !effects_must_read_or_write_entity_p(le, v) &&
+      if( !effects_must_read_or_write_scalar_entity_p(le, v) &&
 	  !storage_return_p(entity_storage(v)) &&
 	  !entity_constant_p(v)) {
 	lost_args = arguments_add_entity(lost_args, e);

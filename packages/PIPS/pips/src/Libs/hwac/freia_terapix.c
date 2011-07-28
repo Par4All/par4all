@@ -280,7 +280,7 @@ static list /* of ints */ dag_vertex_pred_imagelets
   list limagelets = NIL;
   FOREACH(entity, img, vtxcontent_inputs(dagvtx_content(v)))
   {
-    dagvtx prod = dagvtx_get_producer(d, v, img);
+    dagvtx prod = dagvtx_get_producer(d, v, img, 0);
     pips_assert("some producer found!", prod!=NULL);
     limagelets =
       gen_nconc(limagelets,
@@ -1839,8 +1839,9 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld)
  * @param occs, occurences of images (image -> set of statements)
  * @param helper_file, file to which code is to be generated
  * @param number, number of this statement sequence in module
+ * @return list of intermediate image to allocate
  */
-void freia_trpx_compile_calls
+list freia_trpx_compile_calls
 (string module,
  list /* of statements */ ls,
  hash_table occs,
@@ -1853,6 +1854,9 @@ void freia_trpx_compile_calls
 
   list added_stats = NIL;
   dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
+
+  hash_table init = hash_table_make(hash_pointer, 0);
+  list new_images = dag_fix_image_reuse(fulld, init);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
@@ -1930,4 +1934,11 @@ void freia_trpx_compile_calls
   FOREACH(dag, dc, ld)
     free_dag(dc);
   gen_free_list(ld);
+
+  // deal with new images
+  list real_new_images =
+    freia_allocate_new_images_if_needed(ls, new_images, init);
+  gen_free_list(new_images);
+  hash_table_free(init);
+  return real_new_images;
 }

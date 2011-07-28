@@ -235,21 +235,6 @@ entity e;
     return((e == (entity) TCST) ? "TCST" : entity_name(e));
 }
 
-/* bool integer_scalar_read_effects_p(cons * effects): checks that *all* read
- * effects in effects are on integer scalar variable
- *
- * Francois Irigoin: I do not see where the "read" type is checked FI
- */
-bool integer_scalar_read_effects_p(fx)
-cons * fx;
-{
-    MAPL(ceffect,
-     {entity e =
-	  reference_variable(effect_any_reference(EFFECT(CAR(ceffect))));
-     if(!integer_scalar_entity_p(e)) return false;},
-	 fx);
-    return true;
-}
 
 /* check that *some* read or write effects are on integer variables
  *
@@ -267,70 +252,7 @@ bool some_integer_scalar_read_or_write_effects_p(cons * fx) {
   return r_or_w_p;
 }
 
-/* bool effects_write_entity_p(cons * effects, entity e): check whether e
- * is certainly (MUST/EXACT) written by effects "effects" or not
- */
-bool effects_write_entity_p(cons * fx, entity e) {
-  bool write = false;
-  FOREACH(EFFECT, ef,fx) {
-    entity e_used = reference_variable(effect_any_reference(ef));
 
-    /* Note: to test aliasing == should be replaced below by
-     * entities_may_conflict_p()
-     */
-    if(e == e_used  && store_effect_p(ef) && effect_write_p(ef)) {
-      write = true;
-      break;
-    }
-  }
-  return write;
-}
-
-/* bool effects_read_or_write_entity_p(cons * effects, entity e): check whether e
- * may be read or written by effects "effects" or cannot accessed at all
- *
- * In semantics, e can be a functional entity such as constant string
- * or constant float.
- */
-bool effects_read_or_write_entity_p(cons * fx, entity e)
-{
-  bool read_or_write = false;
-
-  if(entity_variable_p(e)) {
-    FOREACH(EFFECT, ef, fx) {
-      entity e_used = reference_variable(effect_any_reference(ef));
-      /* Used to be a simple pointer equality test */
-      if(store_effect_p(ef) && entities_may_conflict_p(e, e_used)) {
-        read_or_write = true;
-        break;
-      }
-    }
-  }
-  return read_or_write;
-}
-
-/* check whether e must be read or written by any effect "effects" or
- * if it simply might be accessed or not even access at all
- *
- * In semantics, e can be a functional entity such as constant string
- * or constant float.
- */
-bool effects_must_read_or_write_entity_p(cons * fx, entity e)
-{
-  bool read_or_write = false;
-
-  if(entity_variable_p(e)) {
-    FOREACH(EFFECT, ef, fx) {
-      entity e_used = reference_variable(effect_any_reference(ef));
-      /* Used to be a simple pointer equality test */
-      if(store_effect_p(ef) && entities_must_conflict_p(e, e_used)) {
-        read_or_write = true;
-        break;
-      }
-    }
-  }
-  return read_or_write;
-}
 
 /**
  * @brief Check if an effect may conflict with an entity : i.e. if the entity
@@ -795,10 +717,12 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 {
   list l_res = NIL;
   pips_assert("the effect must be defined\n", !effect_undefined_p(eff));
-
-
+  pips_debug_effect(6, "input effect:", eff);
+  pips_debug(6, "input type: %s (%s)\n", words_to_string(words_type(eff_type, NIL)), type_to_string(eff_type));
+  pips_debug(6, "add_eff is %s\n", add_eff? "true": "false");
   if (type_with_const_qualifier_p(eff_type))
     {
+      pips_debug(6, "const qualifier\n");
       if (act == 'w')
 	return NIL;
       else if (act == 'x')
@@ -841,12 +765,26 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 		  (eff_write, make_unbounded_expression());
 		add_array_dims = true;
 	      }
-	    
+
+	    /* if the basic if an end basic, add the path if add_eff is true
+	       or if there has been array dimensions added to the original input path */
+	    if(basic_int_p(b) ||
+	       basic_float_p(b) ||
+	       basic_logical_p(b) ||
+	       basic_overloaded_p(b) ||
+	       basic_complex_p(b) || basic_bit_p(b) || basic_string_p(b)) /* should I had basic_string_p here or make a special case?*/
+	      {
+		pips_debug(6, "end basic case\n");
+		if ((add_array_dims || add_eff) && !pointers_only)
+		  l_res = gen_nconc
+		    (l_res,
+		     effect_to_effects_with_given_tag(eff_write,act));
+	      }
 	    /* If the basic is a pointer type, we must add an effect
 	       with a supplementary dimension, and then recurse
                on the pointed type.
 	    */
-	    if(basic_pointer_p(b))
+	    else if(basic_pointer_p(b))
 	      {
 		if (add_array_dims || add_eff)
 		  l_res = gen_nconc
@@ -855,23 +793,23 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 		if (level > 0)
 		  {
 		    pips_debug(8, "pointer case, \n");
-		    
+
 		    eff_write = (*effect_dup_func)(eff_write);
 		    (*effect_add_expression_dimension_func)
 		      (eff_write, make_unbounded_expression());
-		    
-		    l_res = gen_nconc
+
+		    /*l_res = gen_nconc
 		      (l_res,
-		       effect_to_effects_with_given_tag(eff_write,act));
-		    
+		      effect_to_effects_with_given_tag(eff_write,act));*/
+
 		    l_res = gen_nconc
 		      (l_res,
 		       generic_effect_generate_all_accessible_paths_effects_with_level
-		       (eff_write,  basic_pointer(b), act, false, level - 1, pointers_only));
+		       (eff_write,  basic_pointer(b), act, /*false*/ true, level - 1, pointers_only));
 		  }
 		else
 		  {
-		    pips_debug(8, "pointer case with level == 0 -> no additional dimension\n");		    
+		    pips_debug(8, "pointer case with level == 0 -> no additional dimension\n");
 		  }
 	      }
 	    else if (basic_derived_p(b))

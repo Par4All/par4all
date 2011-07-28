@@ -38,9 +38,12 @@
 
 // macros for freia stuff
 #define FREIA_IMAGE_TYPE "freia_data2d"
+#define FREIA_ALLOC "freia_common_create_data"
+#define FREIA_FREE  "freia_common_destruct_data"
+
 #define AIPO "freia_aipo_"
 #define FREIA_IMAGE FREIA_IMAGE_TYPE " * "
-#define FREIA_DEFAULT_BPP "16"
+#define FREIA_DEFAULT_BPP get_int_property("FREIA_PIXEL_SIZE")
 
 // check the hardware target
 #define freia_spoc_p(s) same_string_p((s), "spoc")

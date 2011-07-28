@@ -84,7 +84,8 @@ set points_to_nowhere_typed(list lhs_list, set input)
       /* create a new points to with as source the current
 	 element of lhs_set and sink the null value .*/
       entity e = entity_all_xxx_locations_typed(NOWHERE_LOCATION,
-					       cell_reference_to_type(cell_reference(c)));
+					      cell_reference_to_type
+					      (cell_reference(c)));
       reference r = make_reference(e, NIL);
       cell sink = make_cell_reference(r);
       points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
@@ -96,6 +97,13 @@ set points_to_nowhere_typed(list lhs_list, set input)
   return res;
 }
 
+/* arg1:  list of cells
+   arg2:  set of points-to
+   Create a points-to set with elements of lhs_list as
+   source and NOWHERE as sink.
+   Iterate over input and kill all points-to relations
+   where sinks are elements of lhs_list.
+*/
 set points_to_nowhere(list lhs_list, set input)
 {
   /* lhs_path matches the kill set.*/
@@ -121,7 +129,7 @@ set points_to_nowhere(list lhs_list, set input)
   if((int)gen_length(lhs_list) > 1)// || set_size(rhs_set)>1)
     a = make_approximation_may();
 
-  /* Computing the gen set*/
+  /* Computing the gen set */
   FOREACH(cell, c, lhs_list) {
     entity e =entity_all_xxx_locations(NOWHERE_LOCATION);
     reference r = make_reference(e, NIL);
@@ -179,7 +187,6 @@ set points_to_anywhere_typed(list lhs_list, set input)
     entity er = reference_variable(cr);
     type t = entity_type(er);
     entity e = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
-					     /* cell_reference_to_type(cell_reference(c) )); */
     reference r = make_reference(e, NIL);
     cell sink = make_cell_reference(r);
     points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
@@ -187,7 +194,7 @@ set points_to_anywhere_typed(list lhs_list, set input)
     }
   /* gen + input_kill_diff*/
   set_union(res, gen, input_kill_diff);
-  
+
   return res;
 }
 
@@ -202,16 +209,15 @@ set points_to_anywhere_typed(list lhs_list, set input)
    Finaly construct a set of constant paths according to the list
    returned by eval_cell_with_points_to().
 */
-
 list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
 {
   list l = NIL;
   bool changed = false;
-  effect ef = effect_undefined;
-  reference r = reference_undefined;
+  //effect ef = effect_undefined;
+  //reference r = reference_undefined;
   cell c = cell_undefined;
   cell c_new = cell_undefined;
-  int i;
+  //int i;
   reference er = expression_reference(e);
   set_methods_for_proper_simple_effects();
   if(array_reference_p(er)) {
@@ -219,28 +225,20 @@ list array_to_constant_paths(expression e, set in __attribute__ ((__unused__)))
     c_new = simple_cell_to_store_independent_cell(c, &changed);
   }
   else {
-    int dim = variable_entity_dimension(reference_variable(er));
-    list l_ef = NIL;
-  list l1 = generic_proper_effects_of_complex_address_expression(e,
-								 &l_ef, false);
-  ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
-  gen_free_list(l_ef);/* free the spine */
-  effects_free(l1);
-    for(i = 0; i< dim; i++)
-  effect_add_dereferencing_dimension(ef);
-  r = effect_any_reference(ef);
-    c_new = make_cell_reference(r);
-    
+    c_new = make_cell_reference(er);
   }
   generic_effects_reset_all_methods();
   l = CONS(CELL, c_new, NIL);
+
   return l;
 }
 
 
 
-
-
+/*
+  Change dereferenced pointers and filed access into a constant paths
+  When no constant path is found the expression is uninitialized pointer
+*/
 list expression_to_constant_paths(expression e, set in)
 {
   cell c = cell_undefined;
@@ -250,21 +248,25 @@ list expression_to_constant_paths(expression e, set in)
   c = get_memory_path(e, &eval_p);
   reference cr = cell_reference(c);
   /* if c is an anywhere or a reference we don't evaluate it*/
-  if(!eval_p)
+  if (!eval_p)
     l = CONS(CELL, c, NIL);
-  else if(set_empty_p(in)|| entity_null_locations_p(reference_variable(cr))
+  else if (set_empty_p(in)|| entity_null_locations_p(reference_variable(cr))
 			      || entity_nowhere_locations_p(reference_variable(cr))){
-    if(get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")){
+    if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING")){
       pips_user_error("Uninitialized pointer\n");
-    }else{
+    }
+    else {
       pips_user_warning("Uninitialized pointer");
-      entity nowhere = entity_all_xxx_locations_typed(NOWHERE_LOCATION,
-					 cell_reference_to_type(cell_reference(c)));
+      entity nowhere = entity_all_xxx_locations_typed(
+						      NOWHERE_LOCATION,
+						      cell_reference_to_type
+						      (cell_reference(c)));
       reference r = make_reference(nowhere,NIL);
       c = make_cell_reference(r);
       l = CONS(CELL, c, NIL);
     }
-  }else{
+  }
+  else {
     set_methods_for_proper_simple_effects();
     l_in = set_to_sorted_list(in,
 			      (int(*)(const void*, const void*))
@@ -296,8 +298,8 @@ cell get_memory_path(expression e, bool * eval_p)
      are only intereseted in user function call, reference or pointer
      dereferening*/
 
-  if(expression_call_p(e)){
-    if(user_function_call_p(e)){
+  if (expression_call_p(e)) {
+    if (user_function_call_p(e)) {
       (*eval_p) = false;
       /* entity anywhere =  entity_all_xxx_locations(ANYWHERE_LOCATION); */
       call cl = expression_call(e);
@@ -305,18 +307,22 @@ cell get_memory_path(expression e, bool * eval_p)
 						      call_to_type(cl));
       reference r = make_reference(anywhere,NIL);
       c = make_cell_reference(r);
-    }else{
+    }
+    else {
       entity op = call_function(expression_call(e));
       if(ENTITY_FIELD_P(op) ||
 	 ENTITY_POINT_TO_P(op) ||
-	 ENTITY_DEREFERENCING_P(op)){
+	 ENTITY_DEREFERENCING_P(op)) {
 
 	/*init the effect's engine*/
 	set_methods_for_proper_simple_effects();
 	list l_ef = NIL;
-	list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
+	list l1 = generic_proper_effects_of_complex_address_expression(
+								       e,
+								       &l_ef,
 								       true);
-	ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+	ef = EFFECT(CAR(l_ef));
+	/* In fact, there should be a FOREACH to scan all elements of l_ef */
 	gen_free_list(l_ef); /* free the spine */
 	r = effect_any_reference(ef);
 	c = make_cell_reference(r);
@@ -327,7 +333,7 @@ cell get_memory_path(expression e, bool * eval_p)
       }
     }
   }
-  else if(syntax_subscript_p(expression_syntax(e))){
+  else if (syntax_subscript_p(expression_syntax(e))) {
     set_methods_for_proper_simple_effects();
     list l = NIL;
     list l_ef = NIL;
@@ -335,41 +341,47 @@ cell get_memory_path(expression e, bool * eval_p)
 									&l_ef,
 									&l,
 									true);
-    ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+    ef = EFFECT(CAR(l_ef));
+    /* In fact, there should be a FOREACH to scan all elements of l_ef */
     gen_free_list(l_ef); /* free the spine */
     r = effect_any_reference(ef);
     c = make_cell_reference(r);
     effects_free(l2);
     generic_effects_reset_all_methods();
     (*eval_p) = false;
-  }else if(array_argument_p(e)){
+  }
+  else if (array_argument_p(e)) {
     (*eval_p) = false;
     set_methods_for_proper_simple_effects();
     list l_ef = NIL;
     list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
 								   true);
 
-    ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+    ef = EFFECT(CAR(l_ef));
+    /* In fact, there should be a FOREACH to scan all elements of l_ef */
     gen_free_list(l_ef); /* free the spine */
     r = effect_any_reference(ef);
     c = make_cell_reference(r);
     effects_free(l1);
     generic_effects_reset_all_methods();
-  }else if(expression_reference_p(e)){
+  }
+  else if (expression_reference_p(e)) {
     r = expression_reference(e);
-    if(!ENDP(reference_indices(r)) && !array_argument_p(e) ){
+    if (!ENDP(reference_indices(r)) && !array_argument_p(e)) {
       list l_ef = NIL;
       (*eval_p) = true;
       set_methods_for_proper_simple_effects();
       list l1 = generic_proper_effects_of_complex_address_expression(e, &l_ef,
 								   true);
-      ef = EFFECT(CAR(l_ef)); /* In fact, there should be a FOREACH to scan all elements of l_ef */
+      ef = EFFECT(CAR(l_ef)); 
+      /* In fact, there should be a FOREACH to scan all elements of l_ef */
       gen_free_list(l_ef); /* free the spine */
       r = effect_any_reference(ef);
       c = make_cell_reference(r);
       effects_free(l1);
       generic_effects_reset_all_methods();
-    }else{
+    }
+    else {
       (*eval_p) = false;
       c = make_cell_reference(r);
     }
@@ -386,29 +398,40 @@ cell get_memory_path(expression e, bool * eval_p)
    - a set containing anywhere paths of the list is empty or contains
    a nowhere path.
 */
-list possible_constant_paths(list l, cell lhs, bool *nowhere_p __attribute__ ((__unused__)) )
+list possible_constant_paths(
+			     list l,
+			     cell lhs,
+			     bool *nowhere_p __attribute__ ((__unused__))
+			     )
 {
   list paths = NIL;
-  if(ENDP(l)){
-    if(get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING"))
+  if (ENDP(l)) {
+    if (get_bool_property("POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING"))
       pips_user_error("Uninitialized pointer \n");
-    else{
+    else {
       pips_user_warning("Uninitialized pointer \n");
-      entity nowhere =entity_all_xxx_locations_typed(NOWHERE_LOCATION,
-					 cell_reference_to_type(cell_reference(lhs)));
+      entity nowhere =entity_all_xxx_locations_typed(
+						     NOWHERE_LOCATION,
+						     cell_reference_to_type
+						     (cell_reference(lhs))
+						     );
       reference r = make_reference(nowhere,NIL);
       cell c = make_cell_reference(r);
       paths = CONS(CELL, c, NIL);
     }
-  }else{
+  }
+  else {
     FOREACH(cell, c, l){
       reference r = cell_to_reference(c);
       entity e = reference_variable(r);
       if(entity_nowhere_locations_p(e))
 	pips_user_warning("Uninitialized pointer \n");
       if(entity_all_locations_p(e)){
-	entity anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-					 cell_reference_to_type(cell_reference(lhs)));
+	entity anywhere =entity_all_xxx_locations_typed(
+							ANYWHERE_LOCATION,
+							cell_reference_to_type
+							(cell_reference(lhs))
+							);
 	r = make_reference(anywhere,NIL);
 	c = make_cell_reference(r);
       }
@@ -432,9 +455,9 @@ cell max_module(cell m1, cell m2)
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
 
-  if(same_string_p(entity_name(e1),entity_name(e2)))
+  if (same_string_p(entity_name(e1),entity_name(e2)))
     return m1;
-  else{
+  else {
     e1 = entity_all_locations();
     r1 = make_reference(e1,NIL);
     m1 = make_cell_reference(r1);
@@ -469,8 +492,7 @@ bool opkill_may_module(cell m1, cell m2)
   bool kill_may_p;
   /* if the lhs or the rhs is a nowhere location or a null/0 value we
      generate a pips_user_warning */
- 
-  if(entity_any_module_p(e1) && entity_any_module_p(e2))
+  if (entity_any_module_p(e1) && entity_any_module_p(e2))
     kill_may_p = true;
   else
     kill_may_p = same_string_p(entity_name(e1),entity_name(e2));
@@ -484,7 +506,7 @@ bool opkill_must_module(cell m1, cell m2)
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
   bool kill_must_p;
-  if(entity_any_module_p(e1) && entity_any_module_p(e2))
+  if (entity_any_module_p(e1) && entity_any_module_p(e2))
     kill_must_p = false;
   else
     kill_must_p = same_string_p(entity_name(e1),entity_name(e2));
@@ -532,18 +554,21 @@ bool opkill_may_name(cell n1, cell n2)
  entity e1 = reference_variable(r1);
  entity e2 = reference_variable(r2);
  bool kill_may_p;
-  if(entity_nowhere_locations_p(e1)||entity_nowhere_locations_p(e2)||
+
+  if (entity_nowhere_locations_p(e1)||entity_nowhere_locations_p(e2)||
      entity_null_locations_p(e1) || entity_null_locations_p(e2))
     pips_user_error("NULL or ANYWHERE locations can't appear as an lvalue\n");
- if(entity_abstract_location_p(e2)){
-   if(entity_all_locations_p(e2))
+
+ if (entity_abstract_location_p(e2)) {
+   if (entity_all_locations_p(e2))
      kill_may_p = true;
-   if(entity_abstract_location_p(e1)){
-     if(entity_all_locations_p(e1))
+   if (entity_abstract_location_p(e1)) {
+     if (entity_all_locations_p(e1))
        kill_may_p = true;
      else
        kill_may_p = same_string_p(entity_name(e1), entity_name(e2));
-   }else{
+   }
+   else {
        /* if(entity_malloc_p(e2)) kill_may_p = false// function
 	  entity_malloc_p() have to be defined and different from
 	  entity_heap_location_p() */
@@ -553,11 +578,11 @@ bool opkill_may_name(cell n1, cell n2)
        kill_may_p = opkill_may_name(n1, n2);
    }
  }
- else{
-   if(entity_abstract_location_p(e1)){
-     if(entity_all_locations_p(e1))
+ else {
+   if (entity_abstract_location_p(e1)) {
+     if (entity_all_locations_p(e1))
        kill_may_p = true;
-     else{
+     else {
        /* if(entity_malloc_p(e1)) kill_may_p = true// function
 	  entity_malloc_p() have to be defined and different from
 	  entity_heap_location_p() */
@@ -566,7 +591,8 @@ bool opkill_may_name(cell n1, cell n2)
        n2 = make_cell_reference(r2);
        kill_may_p = opkill_may_name(n1, n2);
      }
-   }else
+   }
+   else
      kill_may_p = same_string_p(entity_name(e1), entity_name(e2));
  }
 
@@ -581,18 +607,20 @@ bool opkill_must_name(cell n1, cell n2)
  entity e2 = reference_variable(r2);
  bool kill_must_p;
  
- if(entity_nowhere_locations_p(e1)||entity_nowhere_locations_p(e2)||
+ if (entity_nowhere_locations_p(e1)||entity_nowhere_locations_p(e2)||
      entity_null_locations_p(e1) || entity_null_locations_p(e2))
     pips_user_error("NULL or ANYWHERE locations can't appear as an lvalue\n");
- if(entity_abstract_location_p(e2)){
-   if(entity_all_locations_p(e2))
+
+ if (entity_abstract_location_p(e2)) {
+   if (entity_all_locations_p(e2))
      kill_must_p = false;
-   if(entity_abstract_location_p(e1)){
+   if (entity_abstract_location_p(e1)) {
      if(entity_all_locations_p(e1))
        kill_must_p = false;
      else
 	 kill_must_p = same_string_p(entity_name(e1), entity_name(e2));
-   }else{
+   }
+   else {
      /* if(entity_malloc_p(e2)) kill_may_p = false// function
 	entity_malloc_p() have to be defined and different from
 	entity_heap_location_p() */
@@ -602,11 +630,11 @@ bool opkill_must_name(cell n1, cell n2)
      kill_must_p = opkill_may_name(n1, n2);
    }
  }
- else{
-   if(entity_abstract_location_p(e1)){
-     if(entity_all_locations_p(e1))
+ else {
+   if (entity_abstract_location_p(e1)) {
+     if (entity_all_locations_p(e1))
        kill_must_p = false;
-     else{
+     else {
        /* if(entity_malloc_p(e1)) kill_may_p = true// function
 	  entity_malloc_p() have to be defined and different from
 	  entity_heap_location_p() */
@@ -625,7 +653,7 @@ bool opkill_must_name(cell n1, cell n2)
 
 type max_type(type t1, type t2)
 {
-  if(!type_unknown_p(t1) && ! type_unknown_p(t2) && type_equal_p(t1,t2))
+  if (!type_unknown_p(t1) && ! type_unknown_p(t2) && type_equal_p(t1,t2))
     return t1;
   else {
     type t = MakeTypeUnknown();
@@ -636,7 +664,7 @@ type max_type(type t1, type t2)
 
 bool opkill_may_type(type t1, type t2)
 {
-  if(!type_unknown_p(t1) && ! type_unknown_p(t2))
+  if (!type_unknown_p(t1) && ! type_unknown_p(t2))
     return type_equal_p(t1,t2);
   else
     return false;
@@ -651,9 +679,9 @@ bool opkill_must_type(type t1, type t2)
 
 type opgen_may_type(type t1, type t2)
 {
-  if(!type_unknown_p(t1)&& ! type_unknown_p(t2))
+  if (!type_unknown_p(t1)&& ! type_unknown_p(t2))
     return t1;
-  else{
+  else {
     type t = MakeTypeUnknown();
     return t;
   }
@@ -671,18 +699,18 @@ bool opkill_may_reference(cell c1, cell c2)
   reference r1 = reference_undefined;
   reference r2 = reference_undefined;
   bool kill_may_p = true;
-  if(cell_reference_p(c1))
+  if (cell_reference_p(c1))
     r1 = cell_reference(c1);
   else
     r1 = preference_reference(cell_preference(c1));
-  if(cell_reference_p(c2))
+  if (cell_reference_p(c2))
     r2 = cell_reference(c2);
   else
     r2 = preference_reference(cell_preference(c2));
 
-  if(store_independent_reference_p(r1) || store_independent_reference_p(r2))
+  if (store_independent_reference_p(r1) || store_independent_reference_p(r2))
     return kill_may_p;
-  else{
+  else {
     kill_may_p = reference_equal_p(r1,r2);
     return kill_may_p;
       }
@@ -695,9 +723,9 @@ bool opkill_must_reference(cell c1, cell c2)
   reference r2 = cell_to_reference(c2);
   bool kill_must_p = false;
 
-  if(store_independent_reference_p(r1) || store_independent_reference_p(r2))
+  if (store_independent_reference_p(r1) || store_independent_reference_p(r2))
     return kill_must_p;
-  else{
+  else {
     kill_must_p = reference_equal_p(r1,r2);
     return kill_must_p;
       }
@@ -716,23 +744,23 @@ bool opkill_may_vreference(cell c1, cell c2)
   extern const char* entity_minimal_user_name(entity);
 
   i = strcmp(entity_minimal_user_name(v1), entity_minimal_user_name(v2));
-  if(i==0)
+  if (i==0)
     {
     sl1 = reference_indices(r1);
     sl2 = reference_indices(r2);
-    for(;i==0 && !ENDP(sl1) && ! ENDP(sl2) ; POP(sl1), POP(sl2))
+    for (;i==0 && !ENDP(sl1) && ! ENDP(sl2) ; POP(sl1), POP(sl2))
       {
 	expression se1 = EXPRESSION(CAR(sl1));
 	expression se2 = EXPRESSION(CAR(sl2));
-	if(unbounded_expression_p(se2) && expression_constant_p(se1))
+	if (unbounded_expression_p(se2) && expression_constant_p(se1))
 	  i = 0;
-	else if(expression_constant_p(se1) && expression_constant_p(se2))
+	else if (expression_constant_p(se1) && expression_constant_p(se2))
 	  {
 	  int i1 = expression_to_int(se1);
 	  int i2 = expression_to_int(se2);
 	  i = i2>i1? 1 : (i2<i1? -1 : 0);
 
-	  if(i==0)
+	  if (i==0)
 	    {
 	    string s1 = words_to_string(words_expression(se1, NIL));
 	    string s2 = words_to_string(words_expression(se2, NIL));
@@ -758,26 +786,26 @@ bool opkill_must_vreference(cell c1, cell c2)
   extern const char* entity_minimal_user_name(entity);
 
   i = strcmp(entity_minimal_user_name(v1), entity_minimal_user_name(v2));
-  if(i==0) {
+  if (i==0) {
     sl1 = reference_indices(r1);
     sl2 = reference_indices(r2);
-    for(;i==0 && !ENDP(sl1) && ! ENDP(sl2) ; POP(sl1), POP(sl2)){
+    for (;i==0 && !ENDP(sl1) && ! ENDP(sl2) ; POP(sl1), POP(sl2)){
 	expression se1 = EXPRESSION(CAR(sl1));
 	expression se2 = EXPRESSION(CAR(sl2));
 	if(expression_constant_p(se2) && unbounded_expression_p(se1)){
 	  i = 0;
 	}
-	else if(expression_constant_p(se1) && expression_constant_p(se2)){
+	else if (expression_constant_p(se1) && expression_constant_p(se2)){
 	  int i1 = expression_to_int(se1);
 	  int i2 = expression_to_int(se2);
 	  i = i2>i1? 1 : (i2<i1? -1 : 0);
-	  if(i==0){
+	  if (i==0){
 	    string s1 = words_to_string(words_expression(se1, NIL));
 	    string s2 = words_to_string(words_expression(se2, NIL));
 	    i = strcmp(s1, s2);
 	}
       }
-	else{
+	else {
 	  string s1 = words_to_string(words_expression(se1, NIL));
 	  string s2 = words_to_string(words_expression(se2, NIL));
 	  i = strcmp(s1, s2);
@@ -800,7 +828,7 @@ bool opkill_may_constant_path(cell c1, cell c2)
   entity v2 = reference_variable(r2);
   bool type_equal_p = true;
 
-  if(! type_area_p(entity_type(v1)) && !type_area_p(entity_type(v2))){
+  if (! type_area_p(entity_type(v1)) && !type_area_p(entity_type(v2))){
     t1 = simple_effect_reference_type(r1);
     t2 = simple_effect_reference_type(r2);
     type_equal_p = opkill_may_type(t1,t2);
@@ -822,12 +850,12 @@ bool opkill_must_constant_path(cell c1, cell c2)
   entity v2 = reference_variable(r2);
   bool type_equal_p = true;
 
-  if(! type_area_p(entity_type(v1)) && !type_area_p(entity_type(v2))){
-    if(entity_abstract_location_p(v1))
+  if (! type_area_p(entity_type(v1)) && !type_area_p(entity_type(v2))){
+    if (entity_abstract_location_p(v1))
       t1 = entity_type(v1);
     else
       t1 = simple_effect_reference_type(r1);
-    if(entity_abstract_location_p(v2))
+    if (entity_abstract_location_p(v2))
       t2 = entity_type(v2);
     else
       t2 = simple_effect_reference_type(r2);
@@ -846,7 +874,7 @@ set kill_may_set(list L, set in_may)
 			     points_to_rank);
   FOREACH(cell, l, L){
      SET_FOREACH(points_to, pt, in_may){
-       if(opkill_may_constant_path(points_to_source(pt),l)){
+       if (opkill_may_constant_path(points_to_source(pt),l)) {
 	 points_to npt = make_points_to(points_to_source(pt), points_to_sink(pt), 
 					make_approximation_may(), make_descriptor_none());
 	 set_add_element(kill_may, kill_may,(void*)npt);
@@ -878,7 +906,7 @@ set points_to_may_filter(set in)
 			     points_to_rank);
 
   SET_FOREACH(points_to, pt, in){
-    if(approximation_may_p(points_to_approximation(pt)))
+    if (approximation_may_p(points_to_approximation(pt)))
       set_add_element(in_may, in_may, (void*)pt);
   }
   return in_may;
@@ -890,7 +918,7 @@ set points_to_must_filter(set in)
   set in_must = set_generic_make(set_private, points_to_equal_p,
 			     points_to_rank);
   SET_FOREACH(points_to, pt, in){
-    if(approximation_exact_p(points_to_approximation(pt)))
+    if (approximation_exact_p(points_to_approximation(pt)))
       set_add_element(in_must, in_must, (void*)pt);
   }
   return in_must;
@@ -901,8 +929,8 @@ bool address_of_expression_p(expression e)
 {
   bool address_of_p = false;
   syntax s = expression_syntax(e);
-  if(syntax_call_p(s)){
-    if(entity_an_operator_p(call_function(syntax_call(s)), ADDRESS_OF))
+  if (syntax_call_p(s)) {
+    if (entity_an_operator_p(call_function(syntax_call(s)), ADDRESS_OF))
        address_of_p = true;
   }
     return address_of_p;
@@ -917,14 +945,18 @@ bool subscript_expression_p(expression e)
 
 bool expression_null_locations_p(expression e)
 {
-  if(expression_reference_p(e)){
+  if (expression_reference_p(e)) {
     entity v = expression_variable(e);
     return entity_null_locations_p(v);
-  }else
+  }
+  else
     return false;
 }
 
-
+/*
+create a set of points-to relations of the form:
+element_L -> & element_R, MAY
+*/
 set gen_may_set(list L, list R, set in_may, bool *address_of_p)
 {
  set gen_may1 = set_generic_make(set_private, points_to_equal_p,
@@ -949,6 +981,11 @@ set gen_may_set(list L, list R, set in_may, bool *address_of_p)
  return gen_may2;
 }
 
+
+/*
+create a set of points-to relations of the form:
+element_L -> & element_R, EXACT
+*/
 set gen_must_set(list L, list R, set in_must, bool *address_of_p)
 {
  set gen_must1 = set_generic_make(set_private, points_to_equal_p,

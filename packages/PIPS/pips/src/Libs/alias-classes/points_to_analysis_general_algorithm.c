@@ -1447,11 +1447,29 @@ set points_to_filter_with_effects(set pts, list el) {
   return pts;
 }
 
+/*
+See C standard, section 6:
+if the expression lhs points to the i-th element of an array object,
+the expression (lhs)+N (equivalently, N+(lhs)) and (lhs)-N (where N has the value n)
+point to, respectively, the i+n-th and i-n-th elements of the array object.
+
+Since we can't always keep the element's indice we only keep the information about
+the array object as tab[*]
+See the example below :
+{
+int n = 4, m = 3;
+int a[n][m];
+int (*p)[m] = a; // {(p,a[0],-EXACT)}
+p += 1; // {(p,a[*],-EXACT)}
+}
+*/
+
 set points_to_plus_update(statement s, expression lhs, expression rhs, set pts, list eff_list)
 {
   set res = set_generic_make(set_private, points_to_equal_p,
 			     points_to_rank);
   list new_inds = NIL;
+  int i;
   if( expression_integer_constant_p(rhs)) {
     if(expression_reference_p(lhs)) {
       reference r = expression_reference(lhs);
@@ -1461,8 +1479,18 @@ set points_to_plus_update(statement s, expression lhs, expression rhs, set pts, 
 	if(points_to_compare_cell(c, pt_source)) {
 	  cell pt_sink = points_to_sink(pt);
 	  reference ref_sink = cell_to_reference(pt_sink);
-	  if(array_reference_p(ref_sink)) {
+	  entity ent_sink = reference_variable(ref_sink);
+	  /* if(array_reference_p(ref_sink)) { */
+	  if(array_entity_p(ent_sink)) {
 	    list l_ind = reference_indices(ref_sink);
+	    if(ENDP(l_ind)) {
+	      int dim = variable_entity_dimension(reference_variable(ref_sink));
+	      for(i = 0; i< dim; i++) {
+		expression new_ind = make_unbounded_expression();
+		l_ind = gen_nconc(CONS(EXPRESSION, new_ind, NIL),new_inds);
+	      }
+	    }
+
 	    FOREACH(EXPRESSION, exp, l_ind){
 	      if(expression_integer_constant_p(exp)) {
 		expression new_ind = make_unbounded_expression();
@@ -1497,6 +1525,7 @@ set points_to_post_increment(statement s, expression lhs, set pts, list eff_list
 			     points_to_rank);
   res = set_assign(res, pts);
   list new_inds = NIL;
+  int i;
   if(expression_reference_p(lhs)) 
     {
     reference r = expression_reference(lhs);
@@ -1508,9 +1537,19 @@ set points_to_post_increment(statement s, expression lhs, set pts, list eff_list
 	{
 	cell pt_sink = points_to_sink(pt);
 	reference ref_sink = cell_to_reference(pt_sink);
-	if(array_reference_p(ref_sink)) 
+	entity ent_sink = reference_variable(ref_sink);
+	/* if(array_reference_p(ref_sink))  */
+	if(array_entity_p(ent_sink))
 	  {
 	  list l_ind = reference_indices(ref_sink);
+	  if(ENDP(l_ind)) {
+	    int dim = variable_entity_dimension(reference_variable(ref_sink));
+	    for(i = 0; i< dim; i++) {
+	      expression new_ind = make_unbounded_expression();
+	      l_ind = gen_nconc(CONS(EXPRESSION, new_ind, NIL),new_inds);
+	    }
+	  }
+
 	  FOREACH(EXPRESSION, exp, l_ind)
 	    {
 	    if(expression_integer_constant_p(exp)) 

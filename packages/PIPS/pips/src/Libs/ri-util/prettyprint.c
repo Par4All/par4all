@@ -2140,7 +2140,13 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
       we2 = words_subexpression(exp, prec, false, pdl);
   }
   else {
-    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec,
+    /* If the operator in the second subexpression has the same
+       priority as the current operator, it has to be parenthesized
+       to respect the structure imposed by the programmer. For
+       instance, a+(b+c) does require parentheses whereas (a+b)+c is
+       the same as a+b+c. So we1 and we2 cannot be processed exactly
+       in the same way. */
+    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec+1,
 			      prec<MINIMAL_ARITHMETIC_PRECEDENCE, pdl);
   }
 

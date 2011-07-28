@@ -25,13 +25,13 @@
 + take advantage of commutative operators to remove operations
 + copy to remove in freia_46 and freia_47
 + remove redundant measures, esp for terapix
++ other simple or complex algebraic optimization ideas?
+  maybe at least A xor A => A = 0 would be useful?
++ check optimality of tests cases (for spoc)
+- redundancy: max coord includes max
+- min commutes with dilate & max with erode, or vice-versa ?
 - should keep AIPO/software calls if accelerator calls are slower?
   I would I know that?
-- min commutes with dilate & max with erode, or vice-versa ?
-- other simple or complex algebraic optimization ideas?
-  maybe at least A xor A => A = 0 would be useful?
-- redundancy: max coord includes max
-+ check optimality of tests cases (for spoc)
 
 * code
 + cleanup data structures?

@@ -49,6 +49,12 @@
 #include "freia.h"
 #include "hwac.h"
 
+static string commenter(__attribute__((unused)) entity e)
+{
+  return strdup(" hardware accelerator generated variable");
+  //return string_undefined; // no comment?
+}
+
 /************************************************************ FREIA COMPILERS */
 
 /* compile FREIA calls for some target.
@@ -69,6 +75,7 @@ static int freia_compiler(string module, string hardware)
   // useless... but...
   set_proper_rw_effects((statement_effects)
       db_get_memory_resource(DBR_PROPER_EFFECTS, module, false));
+  push_generated_variable_commenter(commenter);
 
   pips_debug(1, "considering module %s\n", module);
 
@@ -95,6 +102,7 @@ static int freia_compiler(string module, string hardware)
   // ??? free statement_effects? MEMORY LEAK...
   // but some statements contents where freed
   // there may be some sharing between * effects & statements?
+  pop_generated_variable_commenter();
   reset_cumulated_rw_effects();
   reset_proper_rw_effects();
   reset_current_module_statement();

@@ -855,13 +855,13 @@ entity v;
       }
 
       pips_debug(7, "%s has already been translated into %s\n",
-                 entity_name(v), entity_name(e));
+		 entity_name(v), entity_name(e));
       if(!language_c_p(module_language(m))) {
-        user_warning("translate_global_value",
-                     "Variable %s is probably aliased with a formal parameter"
-                     " by the current call to %s from %s.\n"
-                     "This is forbidden by the Fortran 77 standard.\n",
-                     entity_name(v), entity_module_name(v), module_local_name(m));
+	user_warning("translate_global_value",
+		     "Variable %s is probably aliased with a formal parameter"
+		     " by the current call to %s from %s.\n"
+		     "This is forbidden by the Fortran 77 standard.\n",
+		     entity_name(v), entity_module_name(v), module_local_name(m));
       }
       ifdebug(7) {
 	pips_debug(7,

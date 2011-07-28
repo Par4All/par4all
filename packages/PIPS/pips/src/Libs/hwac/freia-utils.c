@@ -175,6 +175,10 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES },
     TRPX_OP(3, "SUB_CONST")
   },
+  { AIPO "const_sub", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_cst0, NO_MES },
+    TRPX_OP(3, "CONST_SUB?")
+  },
   { AIPO "and_const", "&.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_and_0cst, NO_MES },
     TRPX_OP(3, "AND_CONST")
@@ -197,6 +201,11 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES },
     TRPX_OP(3, "SUBSAT_CONST?")
   },
+  { AIPO "const_subsat", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
+    { TY_INT, NULL, NULL },
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_cst0, NO_MES },
+    TRPX_OP(3, "CONST_SUBSAT?")
+  },
   { AIPO "absdiff_const", "-|.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_abssub_0cst, NO_MES },
@@ -209,6 +218,10 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "div_const", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES },
     TRPX_OP(3, "DIV_CONST")
+  },
+  { AIPO "const_div", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+    { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_cst0, NO_MES },
+    TRPX_OP(3, "CONST_DIV?")
   },
   // nullary
   { AIPO "set_constant", "C", NULL, 1, 0, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
@@ -434,6 +447,8 @@ list freia_get_params(const freia_api_t * api, list args)
 {
   int skip = api->arg_img_in + api->arg_img_out;
   while (skip--) args = CDR(args);
+  pips_assert("number of scalar args is ok",
+              gen_length(args)==api->arg_misc_in+api->arg_misc_out);
   return args;
 }
 
@@ -446,6 +461,24 @@ list freia_get_vertex_params(const dagvtx v)
   const call c = freia_statement_to_call(s);
   const freia_api_t * api = dagvtx_freia_api(v);
   return freia_get_params(api, call_arguments(c));
+}
+
+expression freia_get_nth_scalar_param(const dagvtx v, int n)
+{
+  return EXPRESSION(CAR(gen_nthcdr(n-1, freia_get_vertex_params(v))));
+}
+
+int freia_max_pixel_value(void)
+{
+  int bpp = FREIA_DEFAULT_BPP;
+  switch (bpp)
+  {
+  case 8: return 0xff;
+  case 16: return 0xffff;
+  default:
+    pips_user_error("expecting 8 or 16 for pixel size, got %d", bpp);
+    return 0;
+  }
 }
 
 /* returns an allocated expression list of the parameters only
@@ -873,48 +906,50 @@ void freia_substitute_by_helper_call
   set_difference(global_remainings, global_remainings, dones);
 
   // replace first statement of dones in ls (so last in sequence)
-  bool substitution_done = false;
+  statement last = NULL;
   FOREACH(statement, sc, ls)
   {
     pips_debug(5, "in statement %" _intFMT "\n", statement_number(sc));
-
     if (set_belong_p(dones, sc))
     {
       pips_assert("statement is a call", statement_call_p(sc));
-      pips_debug(5, "sustituting %" _intFMT"...\n", statement_number(sc));
-
-      // build helper entity
-      entity example = local_name_to_top_level_entity("freia_aipo_add");
-      pips_assert("example is a function", entity_function_p(example));
-      entity helper = make_empty_function(function_name,
-        copy_type(functional_result(type_functional(entity_type(example)))),
-                                          make_language_c());
-      // update type of parameters
-      list larg_params = NIL;
-      FOREACH(expression, e, lparams)
-        larg_params = CONS(parameter,
-                           make_parameter(expression_to_user_type(e),
-                                          make_mode_value(),
-                                          make_dummy_unknown()),
-                           larg_params);
-      larg_params = gen_nreverse(larg_params);
-      module_functional_parameters(helper) = larg_params;
-
-      // substitute by call to helper
-      call c = make_call(helper, lparams);
-
-      hwac_replace_statement(sc, c, false);
-      substitution_done = true;
-      break;
+      if (last)
+        last = statement_number(sc)>statement_number(last)? sc: last;
+      else
+        last = sc;
     }
   }
-  pips_assert("substitution done", substitution_done);
+
+  pips_assert("some last statement found", last);
+
+  // build helper entity
+  entity example = local_name_to_top_level_entity("freia_aipo_add");
+  pips_assert("example is a function", entity_function_p(example));
+  entity helper = make_empty_function(function_name,
+        copy_type(functional_result(type_functional(entity_type(example)))),
+                                      make_language_c());
+  // update type of parameters
+  list larg_params = NIL;
+  FOREACH(expression, e, lparams)
+    larg_params = CONS(parameter,
+                       make_parameter(expression_to_user_type(e),
+                                      make_mode_value(),
+                                      make_dummy_unknown()),
+                       larg_params);
+  larg_params = gen_nreverse(larg_params);
+  module_functional_parameters(helper) = larg_params;
+
+  // substitute by call to helper
+  call c = make_call(helper, lparams);
+
+  hwac_replace_statement(last, c, false);
 
   set_free(not_dones);
   set_free(dones);
 }
 
 /* insert added statements to actual code sequence in "ls"
+ * beware that ls is assumed to be in reverse order
  */
 void freia_insert_added_stats(list ls, list added_stats)
 {
@@ -969,6 +1004,13 @@ void freia_add_image_arguments
 
 /********************************************************* IMAGE OCCURRENCES */
 
+typedef struct {
+  // built image occurences
+  hash_table occs;
+  // enclosing statement for inner recursion
+  statement enclosing;
+} occs_ctx;
+
 /* hack to help replace use-def chains which did not work initially with C.
  * occurrences is: <image entity> -> { set of statements }
  * this is really a ugly hack, sorry!
@@ -976,31 +1018,49 @@ void freia_add_image_arguments
  * contain image allocations so there should be no problem.
  */
 
-static void check_ref(reference r, hash_table occs)
+static void check_ref(reference r, occs_ctx * ctx)
 {
   entity v = reference_variable(r);
   if (freia_image_variable_p(v))
   {
     // ensure that target set exists
-    if (!hash_defined_p(occs, v))
-      hash_put(occs, v, set_make(set_pointer));
-    set stats = (set) hash_get(occs, v);
-    // get first containing statement
-    statement up = (statement) gen_get_ancestor(statement_domain, r);
+    if (!hash_defined_p(ctx->occs, v))
+      hash_put(ctx->occs, v, set_make(set_pointer));
+    set stats = (set) hash_get(ctx->occs, v);
+    // get containing statement
+    statement up = ctx->enclosing? ctx->enclosing:
+      (statement) gen_get_ancestor(statement_domain, r);
     // which MUST exist?
     pips_assert("some containing statement", up);
     // store result
     set_add_element(stats, stats, (void*) up);
+
+    pips_debug(9, "entity %s in statement %"_intFMT"\n",
+               entity_name(v), statement_number(up));
   }
 }
 
-/* @return build occurrence hash table
+static void check_stmt(statement s, occs_ctx * ctx)
+{
+  ctx->enclosing = s;
+  FOREACH(entity, var, statement_declarations(s))
+    gen_context_recurse(entity_initial(var), ctx,
+                        reference_domain, gen_true, check_ref);
+  ctx->enclosing = NULL;
+}
+
+/* @return build occurrence hash table: { entity -> set of statements }
  */
 hash_table freia_build_image_occurrences(statement s)
 {
-  hash_table occs = hash_table_make(hash_pointer, 0);
-  gen_context_recurse(s, (void*) occs, reference_domain, gen_true, check_ref);
-  return occs;
+  occs_ctx ctx;
+  ctx.occs = hash_table_make(hash_pointer, 0);
+  ctx.enclosing = NULL;
+  gen_context_multi_recurse(s, &ctx,
+                            statement_domain, gen_true, check_stmt,
+                            reference_domain, gen_true, check_ref,
+                            NULL);
+  return ctx.occs;
 }
 
 /* cleanup occurrence data structure
@@ -1055,4 +1115,85 @@ bool freia_convolution_width_height(dagvtx v, _int * pw, _int * ph, bool check)
   if (check) pips_assert("constant convolution height", bh);
   if (check) pips_assert("odd convolution height", ((*ph)%2)==1);
   return bw && bh;
+}
+
+/****************************************************** NEW IMAGE ALLOCATION */
+
+static statement image_alloc(entity v)
+{
+  return make_assign_statement
+    (entity_to_expression(v),
+     call_to_expression(make_call(local_name_to_top_level_entity(FREIA_ALLOC),
+                                  NIL)));
+}
+
+static statement image_free(entity v)
+{
+  return call_to_statement(
+    make_call(local_name_to_top_level_entity(FREIA_FREE),
+              CONS(expression, entity_to_expression(v), NIL)));
+}
+
+static void entref(reference r, hash_table count)
+{
+  // ??? I should rather count in how many distinct statements
+  // the variable is used, instead of counting occurences
+  entity var = reference_variable(r);
+  // pips_debug(7, "ref to %s\n", entity_local_name(var));
+  if (hash_defined_p(count, var))
+    hash_put(count, var, (void*) ((_int) hash_get(count, var)+1));
+  else
+    hash_put(count, var, (void*) (_int) (1));
+}
+
+/* insert image allocation if needed, for intermediate image inserted before
+ * if an image is used only twice, then it is switched back to the initial one
+ * @param ls list of statements to consider
+ * @param images list of entities to check and maybe allocate
+ * @param init new image -> initial image
+ * @return actually allocated images
+ */
+list freia_allocate_new_images_if_needed(list ls, list images, hash_table init)
+{
+  // check for used images
+  hash_table count = hash_table_make(hash_pointer, 0);
+
+  FOREACH(statement, s, ls)
+    gen_context_recurse(s, (void*) count, reference_domain, gen_true, entref);
+
+  list allocated = NIL;
+  FOREACH(entity, v, images)
+  {
+    _int n = (_int) hash_get(count, v);
+    if (n>=3)
+      allocated = CONS(entity, v, allocated);
+    else if (n>=1)
+    {
+      // used twice, substitude back to initial variable???
+      // ??? not sure, guard with a property?
+      FOREACH(statement, s, ls)
+        freia_switch_image_in_statement(s, v, (entity) hash_get(init, v));
+    }
+    // not used
+  }
+  hash_table_free(count), count = NULL;
+
+  // allocate those used
+  if (allocated)
+  {
+    pips_assert("some statements", ls!=NIL);
+    statement first = STATEMENT(CAR(ls));
+    statement last = STATEMENT(CAR(gen_last(ls)));
+    pips_assert("at least two statements", first!=last);
+
+    FOREACH(entity, v, images)
+    {
+      pips_debug(7, "allocating image %s\n", entity_name(v));
+      // add_declaration_statement(first, v); // NO, returned
+      // insert_statement(first, image_alloc(v), true); // NO, init
+      insert_statement(last, image_free(v), false);
+    }
+  }
+
+  return allocated;
 }

@@ -1247,7 +1247,7 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
                         if(type_variable_p(rt))
                             rb = copy_basic(variable_basic(type_variable(rt)));
                         else {
-                            /* Too bad for "void"... 
+                            /* Too bad for "void"...
                              * SG: should not happen because dereferencing a void* is a mistake */
                             pips_internal_error("input code seems to derference a void* pointer ?");
                         }
@@ -1345,6 +1345,12 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
               free_basic(b);
               rb = new_rb;
             }
+	    /* logical variables can be used as integer arguments */
+	    if(basic_logical_p(rb))
+	      if(arithmetic_intrinsic_p(f)) {
+		free_basic(rb);
+		rb = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
+	      }
         }
 
     }
@@ -1485,6 +1491,9 @@ basic basic_maximum(basic fb1, basic fb2)
 
 	b = make_basic(is_basic_logical,UUINT(s1>s2?s1:s2));
       }
+      else if(basic_int_p(b2)) {
+	b = copy_basic(b2);
+      }
       else
 	b = make_basic(is_basic_overloaded, UU);
       break;
@@ -1529,6 +1538,9 @@ basic basic_maximum(basic fb1, basic fb2)
 	_int s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
+      }
+      else if(basic_logical_p(b2)) {
+	b = copy_basic(b1);
       }
       else if(basic_pointer_p(b2)) {
           return copy_basic(b2);
@@ -1868,9 +1880,12 @@ type call_to_type(call c)
 type reference_to_type(reference ref)
 {
   type t = type_undefined;
+  pips_debug(6, "input entity type %s\n", words_to_string(words_type(entity_type(reference_variable(ref)), NIL)));
+
   type exp_type = basic_concrete_type(entity_type(reference_variable(ref)));
 
   pips_debug(6, "reference case \n");
+  pips_debug(6, "exp_type %s\n", words_to_string(words_type(exp_type, NIL)));
 
   if(type_variable_p(exp_type))
     {
@@ -1913,13 +1928,15 @@ type reference_to_type(reference ref)
       /* Warning : qualifiers are set to NIL, because I do not see
 	 the need for something else for the moment. BC.
       */
-      t = make_type(is_type_variable,
+      t = make_type_variable(
 		    make_variable(copy_basic(cb),
 				  gen_full_copy_list(cd),
 				  NIL));
+      pips_debug(6, "t at the end of reference case %s\n", words_to_string(words_type(t, NIL)));
     }
   else if(type_functional_p(exp_type))
     {
+      pips_debug(6, "functional case \n");
       /* A reference to a function returns a pointer to a function
 	 of the very same time */
       t = make_type(is_type_variable,
@@ -1935,7 +1952,7 @@ type reference_to_type(reference ref)
 			  entity_name(reference_variable(ref)));
     }
   free_type(exp_type);
-
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL)));
   return t;
 }
 
@@ -2551,6 +2568,36 @@ bool standard_long_integer_type_p(type t)
   return long_p;
 }
 
+bool default_complex_type_p(type t)
+{
+  bool default_complex_p = false;
+  if(!type_undefined_p(t) && type_variable_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    if(basic_complex_p(b)) {
+      int s = basic_int(b);
+
+      default_complex_p = ENDP(variable_dimensions(v))
+	&& ENDP(variable_qualifiers(v))
+	&& s == DEFAULT_COMPLEX_TYPE_SIZE;
+    }
+  }
+  return default_complex_p;
+}
+
+bool float_type_p(type t)
+{
+  bool float_p = false;
+  if(!type_undefined_p(t) && type_variable_p(t)) {
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    if(basic_float_p(b)) {
+      float_p = true;
+    }
+  }
+  return float_p;
+}
+
 bool scalar_integer_type_p(type t)
 {
   bool long_p = false;
@@ -2740,7 +2787,7 @@ type basic_concrete_type(type t)
 {
   type nt;
 
-  pips_debug(9, "Begin with type \"%s\"\n", type_to_string(t));
+  pips_debug(8, "Begin with type \"%s\"\n", words_to_string(words_type(t, NIL)));
 
   switch (type_tag(t))
     {
@@ -2790,7 +2837,7 @@ type basic_concrete_type(type t)
       nt = copy_type(t);
     }
 
-  pips_debug(9, "Ends with type \"%s\"\n", type_to_string(nt));
+  pips_debug(8, "Ends with type \"%s\"\n", words_to_string(words_type(nt, NIL)));
   ifdebug(9)
     {
     if(type_variable_p(nt))

@@ -133,16 +133,21 @@ int dagvtx_ordering(const dagvtx * v1, const dagvtx * v2)
   return dagvtx_number(*v1) - dagvtx_number(*v2);
 }
 
-/* return (last) producer vertex or NULL if none found.
+/* return (last) producer of image e for vertex sink, or NULL if none found.
  * this is one of the two predecessors of sink.
  */
-dagvtx
-dagvtx_get_producer(const dag d, const dagvtx sink, const entity e)
+dagvtx dagvtx_get_producer(const dag d, const dagvtx sink,
+                           const entity e, _int before_number)
 {
   pips_assert("some image", e!=entity_undefined);
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     vtxcontent c = dagvtx_content(v);
+    pips_debug(8, "%"_intFMT" pred of %"_intFMT"?\n",
+               dagvtx_number(v), dagvtx_number(sink));
+    // they may have been reversed ordered when used to append a vertex
+    if (before_number>0 && dagvtx_number(v)>0 && dagvtx_number(v)>before_number)
+      continue;
     // the image may be kept within a pipe
     if (vtxcontent_out(c)==e &&
         (sink==NULL || gen_in_list_p(sink, dagvtx_succs(v))))
@@ -189,7 +194,8 @@ void dagvtx_dump(FILE * out, const string name, const dagvtx v)
  */
 void dag_dump(FILE * out, const string what, const dag d)
 {
-  fprintf(out, "dag '%s' (%p):\n", what, d);
+  fprintf(out, "dag '%s' (%p) %"_intFMT" vertices:\n",
+          what, d, gen_length(dag_vertices(d)));
 
   dagvtx_nb_dump(out, "inputs", dag_inputs(d));
   dagvtx_nb_dump(out, "outputs", dag_outputs(d));
@@ -517,7 +523,7 @@ void dag_append_vertex(dag d, dagvtx nv)
   FOREACH(entity, e, vtxcontent_inputs(dagvtx_content(nv)))
   {
     pips_assert("e is defined", e!=entity_undefined);
-    dagvtx pv = dagvtx_get_producer(d, NULL, e);
+    dagvtx pv = dagvtx_get_producer(d, NULL, e, dagvtx_number(nv));
     if (!pv)
     {
       // side effect, create an input node of type 0 (not a computation)
@@ -642,8 +648,7 @@ switch_vertex_to_assign(dagvtx target, dagvtx source)
  * @param source does perform the same computation
  * @param tpreds target predecessors to be added to source
  */
-static void
-switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
+static void switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
 {
   pips_debug(5, "replacing %"_intFMT" by %"_intFMT"\n",
        dagvtx_number(target), dagvtx_number(source));
@@ -657,7 +662,7 @@ switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
   // fix contents
   vtxcontent cot = dagvtx_content(target);
   vtxcontent_optype(cot) = spoc_type_nop;
-  vtxcontent_opid(cot) = hwac_freia_api_index("freia_aipo_copy");
+  vtxcontent_opid(cot) = hwac_freia_api_index(AIPO "copy");
   gen_free_list(vtxcontent_inputs(cot));
   vtxcontent_inputs(cot) = CONS(entity, src_img, NIL);
 
@@ -681,6 +686,8 @@ switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
   }
 }
 
+/* @return whether two vertices are the same operation
+ */
 static bool same_operation_p(const dagvtx v1, const dagvtx v2)
 {
   return
@@ -688,6 +695,8 @@ static bool same_operation_p(const dagvtx v1, const dagvtx v2)
     dagvtx_opid(v1) == dagvtx_opid(v2);
 }
 
+/* @return whether two vertices are commutors
+ */
 static bool commutative_operation_p(const dagvtx v1, const dagvtx v2)
 {
   if (dagvtx_optype(v1) == dagvtx_optype(v2))
@@ -699,6 +708,8 @@ static bool commutative_operation_p(const dagvtx v1, const dagvtx v2)
   else return false;
 }
 
+/* @return whether two lists are commuted
+ */
 static bool list_commuted_p(const list l1, const list l2)
 {
   pips_assert("length 2", gen_length(l1)==2 && gen_length(l2)==2);
@@ -764,7 +775,7 @@ static void unlink_copy_vertex(dag d, const entity source, dagvtx copy)
 {
   entity target = vtxcontent_out(dagvtx_content(copy));
   // may be NULL if source is an input
-  dagvtx prod = dagvtx_get_producer(d, copy, source);
+  dagvtx prod = dagvtx_get_producer(d, copy, source, 0);
 
   // add copy successors as successors of prod
   // it is kept as a successor in case it is not removed
@@ -810,6 +821,348 @@ static int number_of_copies(list /* of dagvtx */ l)
   return n;
 }
 
+// tell whether this is this (short name) aipo function?
+#define aipo_op_p(a, name)                      \
+  same_string_p(AIPO name, a->function_name)
+
+/* @brief compute a constant expression for FREIA
+ * ??? TODO partial eval if values are constant
+ */
+static expression compute_constant(string op, expression val1, expression val2)
+{
+  // rough! could/should do some partial evaluation here
+  entity eop = local_name_to_top_level_entity(op);
+  pips_assert("operator function found", eop!=entity_undefined);
+  call c = make_call(eop,
+                     CONS(expression, copy_expression(val1),
+                          CONS(expression, copy_expression(val2), NIL)));
+  return call_to_expression(c);
+}
+
+/* switch vertex statement to an aipo call
+ * @param v vertex to modify
+ * @param name function short name to switch to, must be an AIPO function
+ * @param img possible image argument, may be entity_undefined or NULL
+ * @param val possible scalar argument, may be expression undefined or NULL
+ */
+static void set_aipo_call(dagvtx v, string name, entity img, expression val)
+{
+  vtxcontent c = dagvtx_content(v);
+  pstatement ps = vtxcontent_source(c);
+  pips_assert("some statement!", pstatement_statement_p(ps));
+
+  string fname = strdup(cat(AIPO, name));
+
+  // remove inputs
+  gen_free_list(vtxcontent_inputs(c));
+  vtxcontent_inputs(c) =
+    (img && img!=entity_undefined)? CONS(entity, img, NIL): NIL;
+  vtxcontent_opid(c) = hwac_freia_api_index(fname);
+  pips_assert("function index found", vtxcontent_opid(c)!=-1);
+  vtxcontent_optype(c) =
+    same_string_p(name, "copy")? spoc_type_nop: spoc_type_alu;
+
+  // set call
+  call cf = freia_statement_to_call(pstatement_statement(ps));
+  entity func = local_name_to_top_level_entity(fname);
+  pips_assert("AIPO function found", func!=entity_undefined);
+  call_function(cf) = func;
+  list args = NIL;
+  if (val && val!=expression_undefined)
+    args = CONS(expression, copy_expression(val), args);
+  if (img && img!=entity_undefined)
+    args = CONS(expression, entity_to_expression(img), args);
+  args = CONS(expression, entity_to_expression(vtxcontent_out(c)), args);
+  // with a bold memory leak (effects may use refs?)
+  call_arguments(cf) = args;
+
+  // cleanup
+  free(fname);
+}
+
+/* @brief switch vertex to a copy of an image
+ */
+static void set_aipo_copy(dagvtx v, entity e)
+{
+  set_aipo_call(v, "copy", e, NULL);
+}
+
+// forward declarations
+static bool propagate_constant_image(dagvtx, entity, expression);
+static void set_aipo_constant(dagvtx, expression);
+static expression constant_image_p(dagvtx);
+static entity copy_image_p(dagvtx);
+
+/* @brief propagate constant image to vertex successors
+ */
+static void propagate_constant_image_to_succs(dagvtx v, expression val)
+{
+  vtxcontent c = dagvtx_content(v);
+  list nsuccs = NIL;
+  // i=? -> i+i => to identical successors, but forward once
+  set seen = set_make(hash_pointer);
+  FOREACH(dagvtx, s, dagvtx_succs(v))
+  {
+    if (!set_belong_p(seen, s) &&
+        !propagate_constant_image(s, vtxcontent_out(c), val))
+      nsuccs = CONS(dagvtx, s, nsuccs);
+    set_add_element(seen, seen, s);
+  }
+  set_free(seen);
+  dagvtx_succs(v) = gen_nreverse(nsuccs);
+}
+
+/* @brief recursively propagate a constant image on a vertex
+ * @param v starting vertex
+ * @param image which is constant
+ * @param val actual value of all image pixels
+ * @return whether v can be unlinked
+ * ??? small memory leaks
+ */
+static bool propagate_constant_image(dagvtx v, entity image, expression val)
+{
+  vtxcontent c = dagvtx_content(v);
+  _int op = vtxcontent_opid(c);
+  expression newval = expression_undefined;
+  if (op<=0) return false;
+  // op>0
+  const freia_api_t * api = get_freia_api(op);
+  int noccs = gen_occurences(image, vtxcontent_inputs(c));
+  pips_assert("image is used at least once", noccs>0);
+  int nargs = gen_length(vtxcontent_inputs(c));
+  bool image_is_first = ENTITY(CAR(vtxcontent_inputs(c)))==image;
+
+  if (copy_image_p(v)!=NULL)
+  {
+    propagate_constant_image_to_succs(v, val);
+    set_aipo_copy(v, image);
+    return false;
+  }
+
+  if (noccs==1 && nargs==1) // Cst(n)<op>.m => Cst(n<op>m)
+  {
+    string op = NULL;
+    if (aipo_op_p(api, "add_const"))      op = "+";
+    else if (aipo_op_p(api, "sub_const")) op = "-";
+    else if (aipo_op_p(api, "mul_const")) op = "*";
+    else if (aipo_op_p(api, "div_const")) op = "/";
+    else if (aipo_op_p(api, "and_const")) op = BITWISE_AND_OPERATOR_NAME;
+    else if (aipo_op_p(api, "or_const"))  op = "|";
+    else if (aipo_op_p(api, "xor_const")) op = BITWISE_XOR_OPERATOR_NAME;
+    // ??? TODO addsat, subsat, inf, sup, not, log2...
+    // but I need the corresponding scalar functions
+    // some of which depends on the actual pixel type
+    else if (aipo_op_p(api, "erode_6c") || aipo_op_p(api, "dilate_6c") ||
+             aipo_op_p(api, "erode_8c") || aipo_op_p(api, "dilate_8c"))
+      newval = val;
+    // ??? TODO threshold
+    // ??? TODO global_min/global_max can be switch to a simple assign
+    // ??? TODO global_vol can be switched to n_pixels*val
+
+    if (op)
+      newval = compute_constant(op, val, freia_get_nth_scalar_param(v, 1));
+    if (newval!=expression_undefined)
+    {
+      set_aipo_constant(v, newval);
+      return true;
+    }
+  }
+  else if (noccs==1 && nargs==2)
+  {
+    string op = NULL;
+    entity other = image_is_first?
+      ENTITY(CAR(CDR(vtxcontent_inputs(c)))): ENTITY(CAR(vtxcontent_inputs(c)));
+
+    if (aipo_op_p(api, "add"))      op = "add_const";
+    else if (aipo_op_p(api, "mul")) op = "mul_const";
+    else if (aipo_op_p(api, "and")) op = "add_const";
+    else if (aipo_op_p(api, "or"))  op = "or_const";
+    else if (aipo_op_p(api, "xor")) op = "xor_const";
+    else if (aipo_op_p(api, "inf")) op = "inf_const";
+    else if (aipo_op_p(api, "sup")) op = "sup_const";
+    else if (aipo_op_p(api, "addsat")) op = "addsat_const";
+    else if (aipo_op_p(api, "subsat")) op = "subsat_const";
+    else if (aipo_op_p(api, "absdiff")) op = "absdiff_const";
+    else if (aipo_op_p(api, "sub"))
+      op = image_is_first? "const_sub": "sub_const";
+    else if (aipo_op_p(api, "div"))
+      op = image_is_first? "const_div": "div_const";
+
+    if (op)
+    {
+      set_aipo_call(v, op, other, val);
+      return true;
+    }
+  }
+  else if (noccs==2)
+  {
+    // special case for (image <op> image)
+    if (aipo_op_p(api, "add"))
+    {
+      set_aipo_constant(v, compute_constant("*", val, int_to_expression(2)));
+      return true;
+    }
+    else if (aipo_op_p(api, "sub"))
+    {
+      set_aipo_constant(v, int_to_expression(0));
+      return true;
+    }
+  }
+  return false;
+}
+
+/* @brief set vertex as a constant image and propagate to successors
+ */
+static void set_aipo_constant(dagvtx v, expression val)
+{
+  set_aipo_call(v, "set_constant", entity_undefined, val);
+  propagate_constant_image_to_succs(v, val);
+}
+
+/* @brief whether vertex generates a constant image
+ * @param v vertex to consider
+ * @return constant allocated expression or NULL
+ */
+static expression constant_image_p(dagvtx v)
+{
+  vtxcontent c = dagvtx_content(v);
+  _int op = vtxcontent_opid(c);
+  const freia_api_t * api = get_freia_api(op);
+  if (api->arg_img_in==2)
+  {
+    pips_assert("2 input images", gen_length(vtxcontent_inputs(c))==2);
+    entity e1 = ENTITY(CAR(vtxcontent_inputs(c))),
+      e2 = ENTITY(CAR(CDR(vtxcontent_inputs(c))));
+    if (e1==e2 && (aipo_op_p(api, "sub") || aipo_op_p(api, "xor")))
+      return int_to_expression(0);
+    if (e1==e2 && aipo_op_p(api, "div"))
+      return int_to_expression(1);
+  }
+  else if (api->arg_img_in==1)
+  {
+    if (api->arg_misc_in==1)
+    {
+      expression e1 = freia_get_nth_scalar_param(v, 1);
+      _int val;
+      if (expression_integer_value(e1, &val))
+      {
+        if ((aipo_op_p(api, "mul_const") && val==0) ||
+            (aipo_op_p(api, "and_const") && val==0) ||
+            (aipo_op_p(api, "inf_const") && val==0) ||
+            (aipo_op_p(api, "const_div") && val==0))
+          return int_to_expression(val);
+
+        int maxval = freia_max_pixel_value();
+        if ((aipo_op_p(api, "sup_const") && val==maxval) ||
+            (aipo_op_p(api, "or_const") && val==maxval) ||
+            (aipo_op_p(api, "addsat_const") && val==maxval))
+          return int_to_expression(val);
+
+        if ((aipo_op_p(api, "subsat_const") && val==maxval))
+          return int_to_expression(0);
+      }
+    }
+  }
+  else if (api->arg_img_in==0)
+  {
+    if (aipo_op_p(api, "set_constant"))
+      return copy_expression(freia_get_nth_scalar_param(v, 1));
+  }
+  return NULL;
+}
+
+/* @brief tell whether vertex can be assimilated to a copy
+ * e.g.  i+.0  i*.1  i/.1  i|.0  i-.0 i&i i|i i>i i<i
+ * @return image to copy, or NULL
+ */
+static entity copy_image_p(dagvtx v)
+{
+  vtxcontent c = dagvtx_content(v);
+  _int op = vtxcontent_opid(c);
+  const freia_api_t * api = get_freia_api(op);
+  if (api->arg_img_in==2)
+  {
+    pips_assert("2 input images", gen_length(vtxcontent_inputs(c))==2);
+    entity e1 = ENTITY(CAR(vtxcontent_inputs(c))),
+      e2 = ENTITY(CAR(CDR(vtxcontent_inputs(c))));
+    if (e1==e2 && (aipo_op_p(api, "and") ||
+                   aipo_op_p(api, "or") ||
+                   aipo_op_p(api, "sup") ||
+                   aipo_op_p(api, "inf")))
+      return e1;
+  }
+  else if (api->arg_img_in==1)
+  {
+    if (api->arg_misc_in==1)
+    {
+      expression e1 = freia_get_nth_scalar_param(v, 1);
+      _int val;
+      if (expression_integer_value(e1, &val))
+      {
+        if ((aipo_op_p(api, "mul_const") && val==1) ||
+            (aipo_op_p(api, "div_const") && val==1) ||
+            (aipo_op_p(api, "or_const") && val==0) ||
+            (aipo_op_p(api, "add_const") && val==0) ||
+            (aipo_op_p(api, "sub_const") && val==0) ||
+            (aipo_op_p(api, "sup_const") && val==0))
+          return ENTITY(CAR(vtxcontent_inputs(c)));
+
+        int maxval = freia_max_pixel_value();
+        if ((aipo_op_p(api, "inf_const") && val==maxval) ||
+            (aipo_op_p(api, "addsat") && val==maxval))
+          return ENTITY(CAR(vtxcontent_inputs(c)));
+      }
+    }
+    else if (api->arg_misc_in==0)
+    {
+      if (aipo_op_p(api, "copy"))
+        return ENTITY(CAR(vtxcontent_inputs(c)));
+    }
+  }
+  return NULL;
+}
+
+/* @brief apply basic algebraic simplification to dag
+ */
+static void dag_simplify(dag d)
+{
+  set setconst = set_make(hash_pointer);
+  // propagate constants and detect copies
+  FOREACH(dagvtx, v, dag_vertices(d))
+  {
+    expression val;
+    entity img;
+    if ((val=constant_image_p(v))!=NULL)
+    {
+      set_aipo_constant(v, val);
+      free_expression(val);
+      set_add_element(setconst, setconst, v);
+    }
+    else if ((img=copy_image_p(v))!=NULL)
+    {
+      set_aipo_copy(v, img);
+    }
+  }
+
+  // fix input node successors...
+  if (!set_empty_p(setconst))
+  {
+    FOREACH(dagvtx, v, dag_inputs(d))
+    {
+      list ni = NIL;
+      FOREACH(dagvtx, s, dagvtx_succs(v))
+      {
+        if (!set_belong_p(setconst, s))
+          ni = CONS(dagvtx, s, ni);
+      }
+      gen_free_list(dagvtx_succs(v));
+      dagvtx_succs(v) = gen_nreverse(ni);
+    }
+  }
+  // cleanup
+  set_free(setconst), setconst = NULL;
+}
+
 /* remove dead image operations.
  * remove AIPO copies detected as useless.
  * remove identical operations.
@@ -822,23 +1175,17 @@ list /* of statements */ dag_optimize(dag d)
   set remove = set_make(set_pointer);
 
   ifdebug(6) {
-    pips_debug(4, "considering dag:\n");
+    pips_debug(6, "considering dag:\n");
     dag_dump(stderr, "input", d);
   }
 
-  /*
   if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
-  {
-    FOREACH(dagvtx, v, dag_vertices(d))
-    {
-      // a=xor(b,b) => a=0 (should change effects...)
-      // a=&.(b,0) => a=0
-      // a=|.(b,0xffff) => a=0xffff
-      // a=+.(b,0) => a=b (copy)
-      // a=+(b,b) => a=b*.2
-    }
+    dag_simplify(d);
+
+  ifdebug(8) {
+    pips_debug(8, "considering dag:\n");
+    dag_dump(stderr, "simplified", d);
   }
-  */
 
   // remove dead image operations
   // ??? hmmm... measures are kept because of the implicit scalar dependency?
@@ -884,10 +1231,10 @@ list /* of statements */ dag_optimize(dag d)
 
     FOREACH(dagvtx, vr, vertices)
     {
-      pips_debug(7, "at vertex %"_intFMT"\n", dagvtx_number(vr));
+      int op = (int) vtxcontent_optype(dagvtx_content(vr));
+      pips_debug(7, "at vertex %"_intFMT" (op=%d)\n", dagvtx_number(vr), op);
 
       // skip no-operations
-      int op = (int) vtxcontent_optype(dagvtx_content(vr));
       if (op<spoc_type_poc || op>spoc_type_mes) continue;
 
       // skip already removed ops
@@ -919,8 +1266,8 @@ list /* of statements */ dag_optimize(dag d)
           }
         }
         else if (same_operation_p(vr, p) &&
-            gen_list_equals_p(preds, (list) lp) &&
-            same_constant_parameters(vr, p))
+                 gen_list_equals_p(preds, (list) lp) &&
+                 same_constant_parameters(vr, p))
         {
           switch_vertex_to_a_copy(vr, p, preds);
           switched = true;
@@ -1068,7 +1415,7 @@ list /* of statements */ dag_optimize(dag d)
               target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
         entity source = ENTITY(CAR(vtxcontent_inputs(c)));
-        dagvtx prod = dagvtx_get_producer(d, w, source);
+        dagvtx prod = dagvtx_get_producer(d, w, source, 0);
 
         if (source==target)
         {
@@ -1191,8 +1538,8 @@ static bool any_use_statement(set stats)
       pips_debug(9, "call to %s\n", name);
       // some freia utils are considered harmless,
       // others imply an actual "use"
-      if (!same_string_p(name, "freia_common_destruct_data") &&
-          !same_string_p(name, "freia_common_create_data") &&
+      if (!same_string_p(name, FREIA_FREE) &&
+          !same_string_p(name, FREIA_ALLOC) &&
           !same_string_p(name, "freia_common_rx_image"))
         used = true;
     }
@@ -1306,12 +1653,13 @@ void freia_hack_fix_global_ins_outs(dag dfull, dag d)
   // cleanup outputs
   FOREACH(dagvtx, v, dag_vertices(d))
   {
+    dagvtx twin = find_twin_vertex(dfull, v);
+
     if (dagvtx_number(v)!=0 &&
         // the vertex was an output node in the full dag
-        (gen_in_list_p(find_twin_vertex(dfull, v), dag_outputs(dfull)) ||
+        (gen_in_list_p(twin, dag_outputs(dfull)) ||
          // OR there were more successors in the full dag
-         gen_length(dagvtx_succs(v))!=
-         gen_length(dagvtx_succs(find_twin_vertex(dfull, v)))))
+         gen_length(dagvtx_succs(v))!=gen_length(dagvtx_succs(twin))))
     {
       pips_debug(4, "adding %" _intFMT " as output\n", dagvtx_number(v));
       dag_outputs(d) = gen_once(v, dag_outputs(d));
@@ -1448,7 +1796,7 @@ list /* of dagvtx */ get_computable_vertices
     {
       list preds = dag_vertex_preds(d, v);
       pips_debug(9, "%d predecessors to %" _intFMT "\n",
-     (int) gen_length(preds), dagvtx_number(v));
+                 (int) gen_length(preds), dagvtx_number(v));
 
       if(// no scalar dependencies in the current pipeline
         !any_scalar_dep(v, local_currents) &&
@@ -1585,4 +1933,147 @@ dag build_freia_dag(string module, list ls, int number,
   dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
 
   return fulld;
+}
+
+/**************************************************** NEW INTERMEDIATE IMAGE */
+
+// in phrase
+extern entity clone_variable_with_new_name(entity, string, string);
+// in pipsmake
+extern string compilation_unit_of_module(const char *);
+
+// ??? could not find this anywhere
+static entity freia_data2d_field(string field)
+{
+  string cu =
+    compilation_unit_of_module(entity_local_name(get_current_module_entity()));
+  entity fi = FindOrCreateEntity(cu, TYPEDEF_PREFIX FREIA_IMAGE_TYPE);
+  pips_assert("freia_data2d type found", fi!=entity_undefined);
+  type ut = ultimate_type(entity_type(fi));
+
+  list fields =
+    type_struct(entity_type(basic_derived(variable_basic(type_variable(ut)))));
+  pips_assert("some fields", fields);
+  FOREACH(entity, f, fields)
+    if (same_string_p(field,
+                      entity_local_name(f)+strlen(DUMMY_STRUCT_PREFIX)+2))
+      return f;
+  // should not get there
+  pips_internal_error("cannot find freia_data2d field %s\n", field);
+  return NULL;
+}
+
+static expression do_point_to(entity var, string field_name)
+{
+  // entity f2d = local_name_to_top_level_entity(FREIA_IMAGE_TYPE);
+  expression evar = entity_to_expression(var);
+  return call_to_expression(make_call(
+    local_name_to_top_level_entity(POINT_TO_OPERATOR_NAME),
+    gen_make_list(expression_domain, evar,
+                  entity_to_expression(freia_data2d_field(field_name)),
+                  NULL)));
+}
+
+/* @return a new image from the model
+ */
+static entity new_local_image_variable(entity model)
+{
+  entity img = NULL;
+  int index = 1;
+  do
+  {
+    string varname;
+    int n = asprintf(&varname, "%s_%d", entity_local_name(model), index);
+    pips_assert("asprintf succeeded", n!=-1);
+    img = clone_variable_with_new_name
+      (model, varname, module_local_name(get_current_module_entity()));
+    free(varname);
+    index++;
+    if (img)
+    {
+      // handle allocation as the declaration initial value
+      free_value(entity_initial(img));
+      entity_initial(img) =
+        make_value_expression(
+          call_to_expression(
+            make_call(local_name_to_top_level_entity(FREIA_ALLOC),
+                      gen_make_list(expression_domain,
+                                    do_point_to(model, "bpp"),
+                                    do_point_to(model, "width"),
+                                    do_point_to(model, "height"),
+                                    NULL))));
+      // should not be a parameter! overwrite storage if so...
+      if (formal_parameter_p(img))
+      {
+        free_storage(entity_storage(img));
+        entity_storage(img) = make_storage_rom();
+        // make_storage_ram(make_ram(get_current_module_entity(),
+        // entity_undefined, UNKNOWN_RAM_OFFSET, NIL));
+      }
+    }
+  }
+  while (img==NULL);
+  return img;
+}
+
+typedef struct { entity old; entity new; } two_vars;
+
+static void ref_rwt(reference r, two_vars * ctx)
+{
+  if (reference_variable(r)==ctx->old)
+    reference_variable(r) = ctx->new;
+}
+
+// ??? must be available somewhere?
+// see substitute_entity_in_expression
+void freia_switch_image_in_statement(statement s, entity old, entity img)
+{
+  two_vars ctx = { old, img };
+  gen_context_recurse(s, &ctx, reference_domain, gen_true, ref_rwt);
+}
+
+/* switch to new image variable in v & its direct successors
+ */
+static void switch_image_variable(dagvtx v, entity old, entity img)
+{
+  vtxcontent c = dagvtx_content(v);
+  pips_assert("switch image output", vtxcontent_out(c)==old);
+  vtxcontent_out(c) = img;
+  FOREACH(dagvtx, s, dagvtx_succs(v))
+  {
+    vtxcontent cs = dagvtx_content(s);
+    gen_replace_in_list(vtxcontent_inputs(cs), old, img);
+    freia_switch_image_in_statement(dagvtx_statement(s), old, img);
+  }
+}
+
+/* fix intermediate image reuse in dag
+ * @return new image entities to be added to declarations
+ */
+list dag_fix_image_reuse(dag d, hash_table init)
+{
+  list images = NIL;
+  set seen = set_make(hash_pointer);
+
+  // dag vertices are assumed to be in reverse statement order,
+  // so that last write is seen first and is kept by default
+  FOREACH(dagvtx, v, dag_vertices(d))
+  {
+    entity img = dagvtx_image(v);
+    if (!img || img==entity_undefined)
+      continue;
+
+    if (set_belong_p(seen, img))
+    {
+      entity new_img = new_local_image_variable(img);
+      switch_image_variable(v, img, new_img);
+      images = CONS(entity, new_img, images);
+      // keep track of new->old image mapping, to reverse it latter eventually
+      hash_put(init, new_img, img);
+    }
+    set_add_element(seen, seen, img);
+  }
+
+  set_free(seen);
+  return images;
 }
