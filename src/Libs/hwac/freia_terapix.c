@@ -1852,8 +1852,11 @@ list freia_trpx_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  list added_stats = NIL;
-  dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
+  dag fulld = build_freia_dag(module, ls, number, occs);
+  list added_stats = freia_dag_optimize(fulld);
+
+  // dump final dag
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
 
   hash_table init = hash_table_make(hash_pointer, 0);
   list new_images = dag_fix_image_reuse(fulld, init);

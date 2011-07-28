@@ -2176,8 +2176,23 @@ list freia_spoc_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  list added_stats = NIL;
-  dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
+  dag fulld = build_freia_dag(module, ls, number, occs);
+  int n_op_init = freia_aipo_count(fulld, true);
+  int n_op_init_copies = n_op_init - freia_aipo_count(fulld, false);
+
+  // remove copies and duplicates if possible...
+  // ??? maybe there should be an underlying transitive closure? not sure.
+  list added_stats = freia_dag_optimize(fulld);
+  int n_op_opt = freia_aipo_count(fulld, true);
+  int n_op_opt_copies = n_op_opt - freia_aipo_count(fulld, false);
+
+  fprintf(helper_file,
+          "\n"
+          "// dag %d: %d ops (%d copies), optimized to %d (%d copies)\n",
+          number, n_op_init, n_op_init_copies, n_op_opt, n_op_opt_copies);
+
+  // dump final dag
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
 
   hash_table init = hash_table_make(hash_pointer, 0);
   list new_images = dag_fix_image_reuse(fulld, init);
@@ -2198,6 +2213,9 @@ list freia_spoc_compile_calls
   set global_remainings = set_make(set_pointer);
   set_assign_list(global_remainings, ls);
 
+  string_buffer code = string_buffer_make(true);
+
+  int n_spoc_calls = 0;
   int n_pipes = 0;
   FOREACH(dag, d, ld)
   {
@@ -2233,26 +2251,31 @@ list freia_spoc_compile_calls
       string fname_split = strdup(cat(fname_dag, "_", itoa(split++)));
       list /* of expression */ lparams = NIL;
 
-      string_buffer code = string_buffer_make(true);
       freia_spoc_pipeline(module, fname_split, code, d, &lparams);
-      string_buffer_to_file(code, helper_file);
-      string_buffer_free(&code);
-
       freia_substitute_by_helper_call(d, global_remainings, remainings,
                                       ls, fname_split, lparams);
 
       free(fname_split), fname_split = NULL;
     }
 
+    n_spoc_calls += split;
+    fprintf(helper_file, "// split %d: %d cut%s\n",
+            n_pipes-1, split, split>1? "s": "");
+
     set_free(remainings), remainings = NULL;
     free(fname_dag), fname_dag = NULL;
   }
+
+  fprintf(helper_file, "// # SPOC calls: %d\n", n_spoc_calls);
 
   // no, copy statements are not done...
   // pips_assert("all statements done", set_empty_p(global_remainings));
 
   freia_insert_added_stats(ls, added_stats);
   added_stats = NIL;
+
+  string_buffer_to_file(code, helper_file);
+  string_buffer_free(&code);
 
   // cleanup
   set_free(global_remainings), global_remainings = NULL;

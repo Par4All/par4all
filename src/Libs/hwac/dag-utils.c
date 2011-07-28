@@ -111,13 +111,18 @@ _int dagvtx_opid(const dagvtx v)
   return vtxcontent_opid(dagvtx_content(v));
 }
 
-string dagvtx_operation(const dagvtx v)
+string dagvtx_function_name(const dagvtx v)
 {
   if (v==NULL) return "null";
   int index = vtxcontent_opid(dagvtx_content(v));
   const freia_api_t * api = get_freia_api(index);
-  return strncmp(api->function_name, AIPO, strlen(AIPO))==0?
-    api->function_name + strlen(AIPO): api->function_name;
+  return api->function_name;
+}
+
+string dagvtx_operation(const dagvtx v)
+{
+  string op = dagvtx_function_name(v);
+  return strncmp(op, AIPO, strlen(AIPO))==0? op + strlen(AIPO): op;
 }
 
 string dagvtx_compact_operation(const dagvtx v)
@@ -1169,7 +1174,7 @@ static void dag_simplify(dag d)
  * @return statements to be managed outside (external copies)...
  * ??? maybe there should be a transitive closure...
  */
-list /* of statements */ dag_optimize(dag d)
+list /* of statements */ freia_dag_optimize(dag d)
 {
   list lstats = NIL;
   set remove = set_make(set_pointer);
@@ -1909,10 +1914,8 @@ static void dag_append_freia_call(dag d, statement s)
  * @param list of statements in sequence
  * @param number dag identifier in function
  * @param occurrences entity -> set of statements where they appear
- * @param added_stat list of statements killed by dag optimization
  */
-dag build_freia_dag(string module, list ls, int number,
-                    hash_table occurrences, list * added_stats)
+dag build_freia_dag(string module, list ls, int number, hash_table occurrences)
 {
   // build full dag
   dag fulld = make_dag(NIL, NIL, NIL);
@@ -1924,13 +1927,6 @@ dag build_freia_dag(string module, list ls, int number,
 
   // dump resulting dag
   dag_dot_dump_prefix(module, "dag_", number, fulld);
-
-  // remove copies and duplicates if possible...
-  // ??? maybe there should be an underlying transitive closure? not sure.
-  *added_stats = dag_optimize(fulld);
-
-  // dump final dag
-  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
 
   return fulld;
 }
