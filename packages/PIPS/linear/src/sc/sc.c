@@ -333,7 +333,8 @@ bool sc_weak_consistent_p(Psysteme sc)
     }
 
     if(weak_consistent && sc_dimension(sc) != 0) {
-	base_normalized_p(sc_base(sc));
+      Pbase b = sc_base(sc);
+	weak_consistent = base_normalized_p(b);
     }
 
     if(weak_consistent) {
