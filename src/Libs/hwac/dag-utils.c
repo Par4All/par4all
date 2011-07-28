@@ -1935,6 +1935,15 @@ dag build_freia_dag(string module, list ls, int number,
   return fulld;
 }
 
+/* tell whether we have something to do with images
+ */
+bool dag_no_image_operation(dag d)
+{
+  if (!dag_inputs(d) && !dag_outputs(d))
+    return true;
+  return false;
+}
+
 /**************************************************** NEW INTERMEDIATE IMAGE */
 
 // in phrase

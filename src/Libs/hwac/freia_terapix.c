@@ -1559,7 +1559,7 @@ static bool terapix_not_implemented(dag d)
 /* @brief split a dag on scalar dependencies only, with a greedy heuristics.
  * @param initial dag to split
  * @param alone_only whether to keep it alone (for non implemented cases)
- * @return a list of sub-dags
+ * @return a list of sub-dags, some of which may contain no image operations
  * this pass also decides the schedule of image operations, with the aim
  * or reducing the number of necessary imagelets, so as to maximise
  * imagelet size.
@@ -1882,6 +1882,9 @@ list freia_trpx_compile_calls
   {
     // skip if something is not implemented
     if (terapix_not_implemented(d))
+      continue;
+
+    if (dag_no_image_operation(d))
       continue;
 
     if (trpx_dag_cut_none_p(dag_cut))
