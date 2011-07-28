@@ -899,10 +899,12 @@ static string tp_substitutions(string line)
 		{
 			tpips_init();
 			pips_user_warning("error in shell substitutions...\n");
+      if (get_bool_property("ABORT_ON_USER_ERROR")) abort();
 			substituted = strdup(line);
 		}
 		if (line_with_substitutions(substituted))
 		{
+      // not sure whether there is really an error, so we cannot abort
 			pips_user_warning("maybe error in substituted lines:\n\t%s\n"
 												"For instance, check location of your source files.\n",
 												substituted);
