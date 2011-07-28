@@ -30,6 +30,8 @@ run=1
 compare=1
 message="compile run compare"
 what="both"
+copt=
+file=
 
 # option management
 # some more stuff could be added here if needed
@@ -55,7 +57,7 @@ do
       ;;
     # operations to perform
     -c|--c|--compile)
-      compile=1 run= compare= initial=
+      compile=1 run= compare= initial= copt=-c
       message="compile"
       ;;
     -cr|--cr|--compile-run)
@@ -66,10 +68,20 @@ do
       compile=1 run=1 compare=1 initial=
       message="compile run compare"
       ;;
+    # file name, if not case.suffix
+    -f|--file) file=$(basename $1) ; shift
+      ;;
+    --file=*) file=$(basename ${opt//*=/})
+      ;;
     # option error
     *) err 14 "unexpected option $opt" ;;
   esac
 done
+
+if [ "$file" ]
+then
+  [ -e $file ] || err 15 "expected file $file not found"
+fi
 
 # argument management
 if [ $# -ne 1 ]
@@ -84,15 +96,15 @@ fi
 echo -e "#\n# $message $what $case\n#"
 
 # get suffix & set compiler accordingly
-if [ -e $case.c ]
+if [[ -e $case.c || "$file" == *.c ]]
 then
   suffix=c
   comp=${PIPS_CC:-cc}
-elif [ -e $case.f ]
+elif [[ -e $case.f || "$file" == *.f ]]
 then
   suffix=f
   comp=${PIPS_F77:-gfortran}
-elif [ -e $case.f90 ]
+elif [[ -e $case.f90 || "$file" == *.f90 ]]
 then
   suffix=f90
   comp=${PIPS_F90:-gfortran}
@@ -101,7 +113,7 @@ else
 fi
 
 # overall settings
-source=$case.$suffix
+source=${file:-$case.$suffix}
 database=$case.database
 tmp=$database/Tmp
 unsplit=$database/Src/$source
@@ -130,11 +142,11 @@ type $comp >&2 || err 8 "compiler $comp not found"
 if [ "$compile" ]
 then
   if [ "$initial" ] ; then
-    $comp -o $exe.1 $source ||
+    $comp $copt -o $exe.1 $source ||
       err 3 "cannot compile initial source $source"
   fi
   if [ "$generated" ] ; then
-    $comp -o $exe.2 $unsplit ||
+    $comp $copt -o $exe.2 $unsplit ||
       err 4 "cannot compile unsplit source $unsplit"
   fi
 fi
