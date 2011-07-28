@@ -1,0 +1,9 @@
+delete struct_00
+setproperty ABORT_ON_USER_ERROR TRUE
+create struct_00 struct_00.c
+display PRINTED_FILE[%ALLFUNC]
+setproperty CONSTANT_PATH_EFFECTS FALSE
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+close
+delete struct_00
