@@ -1004,6 +1004,13 @@ void freia_add_image_arguments
 
 /********************************************************* IMAGE OCCURRENCES */
 
+typedef struct {
+  // built image occurences
+  hash_table occs;
+  // enclosing statement for inner recursion
+  statement enclosing;
+} occs_ctx;
+
 /* hack to help replace use-def chains which did not work initially with C.
  * occurrences is: <image entity> -> { set of statements }
  * this is really a ugly hack, sorry!
@@ -1011,31 +1018,49 @@ void freia_add_image_arguments
  * contain image allocations so there should be no problem.
  */
 
-static void check_ref(reference r, hash_table occs)
+static void check_ref(reference r, occs_ctx * ctx)
 {
   entity v = reference_variable(r);
   if (freia_image_variable_p(v))
   {
     // ensure that target set exists
-    if (!hash_defined_p(occs, v))
-      hash_put(occs, v, set_make(set_pointer));
-    set stats = (set) hash_get(occs, v);
-    // get first containing statement
-    statement up = (statement) gen_get_ancestor(statement_domain, r);
+    if (!hash_defined_p(ctx->occs, v))
+      hash_put(ctx->occs, v, set_make(set_pointer));
+    set stats = (set) hash_get(ctx->occs, v);
+    // get containing statement
+    statement up = ctx->enclosing? ctx->enclosing:
+      (statement) gen_get_ancestor(statement_domain, r);
     // which MUST exist?
     pips_assert("some containing statement", up);
     // store result
     set_add_element(stats, stats, (void*) up);
+
+    pips_debug(9, "entity %s in statement %"_intFMT"\n",
+               entity_name(v), statement_number(up));
   }
 }
 
-/* @return build occurrence hash table
+static void check_stmt(statement s, occs_ctx * ctx)
+{
+  ctx->enclosing = s;
+  FOREACH(entity, var, statement_declarations(s))
+    gen_context_recurse(entity_initial(var), ctx,
+                        reference_domain, gen_true, check_ref);
+  ctx->enclosing = NULL;
+}
+
+/* @return build occurrence hash table: { entity -> set of statements }
  */
 hash_table freia_build_image_occurrences(statement s)
 {
-  hash_table occs = hash_table_make(hash_pointer, 0);
-  gen_context_recurse(s, (void*) occs, reference_domain, gen_true, check_ref);
-  return occs;
+  occs_ctx ctx;
+  ctx.occs = hash_table_make(hash_pointer, 0);
+  ctx.enclosing = NULL;
+  gen_context_multi_recurse(s, &ctx,
+                            statement_domain, gen_true, check_stmt,
+                            reference_domain, gen_true, check_ref,
+                            NULL);
+  return ctx.occs;
 }
 
 /* cleanup occurrence data structure
