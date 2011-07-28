@@ -53,12 +53,12 @@ Pvecteur v_in;
 {
   Pvecteur v_out;
   Pvecteur v;
-  
+
   v_out = NULL;
   for(v=v_in; v!=NULL; v=v->succ) {
     v_out = vect_chain(v_out,var_of(v),val_of(v));
   }
-  
+
   return v_out;
 }
 

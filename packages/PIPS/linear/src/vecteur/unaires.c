@@ -64,9 +64,9 @@ Pvecteur v;
 	(void) vect_div(v, gcd);
 }
 
-/* void vect_add_elem(Pvecteur * pvect, Variable var, Value val): 
+/* void vect_add_elem(Pvecteur * pvect, Variable var, Value val):
  * addition d'un vecteur colineaire au vecteur de base var au vecteur vect
- * 
+ *
  * ----->    ----->       --->
  * *pvect := *pvect + val evar
  */

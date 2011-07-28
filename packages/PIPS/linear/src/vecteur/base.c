@@ -448,7 +448,7 @@ Pbase base_union(Pbase b1, Pbase b2)
 	b = vect_chain(b, var, VALUE_ONE);
       }
     }
-    
+
     for (v = b2; v; v=v->succ)
     {
       var = var_of(v);
@@ -462,7 +462,7 @@ Pbase base_union(Pbase b1, Pbase b2)
 
     linear_hashtable_free(seen);
   }
-  
+
   return b;
 }
 
@@ -565,7 +565,7 @@ int i;
 
     for (b1=b, j=1; j<i; b1=b1->succ,j++);
     return(b1);
-} 
+}
 
 Pbase base_normalize(b)
 Pbase b;
@@ -582,11 +582,11 @@ Pbase b;
 {
     Pbase eb;
 
-    for (eb = b ; 
-	 !BASE_NULLE_P(eb) && value_one_p(vecteur_val(eb)); 
+    for (eb = b ;
+	 !BASE_NULLE_P(eb) && value_one_p(vecteur_val(eb));
 	 eb=eb->succ)
 	;
-    return !BASE_NULLE_P(eb) && vect_check((Pvecteur) b);
+    return BASE_NULLE_P(eb) && vect_check((Pvecteur) b);
 }
 
 /* Pbase base_difference(Pbase b1, Pbase b2):
