@@ -186,6 +186,10 @@ contrainte_to_text_1(
   return buffer;
 }
 
+/* FI: does not take into account constant floating point terms
+ *
+ * No easy modification. I give up for the time being. 25 July 2011.
+ */
 static string
 contrainte_to_text_2(
     string buffer,
@@ -207,7 +211,8 @@ contrainte_to_text_2(
 
   if(!is_inegalite) {
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
-      if(vecteur_var(coord)!= TCST)
+      if(vecteur_var(coord)!= TCST
+	 && !entity_constant_p((entity)vecteur_var(coord)))
 	(value_pos_p(vecteur_val(coord))) ?
 	  positive_terms++ :  negative_terms++;
     }

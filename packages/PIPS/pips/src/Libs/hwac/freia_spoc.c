@@ -78,11 +78,15 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_sub_10, alu_sub_01, "SPOC_ALU_SUB_IN1_IN0", F, T, T },
   { alu_sub_0cst, alu_sub_1cst, "SPOC_ALU_SUB_IN0_CONST", T, T, F },
   { alu_sub_1cst, alu_sub_0cst, "SPOC_ALU_SUB_IN1_CONST", T, F, T },
+  { alu_sub_cst0, alu_sub_cst1, "SPOC_ALU_SUB_CONST_IN0", T, T, F },
+  { alu_sub_cst1, alu_sub_cst0, "SPOC_ALU_SUB_CONST_IN1", T, F, T },
   // SUBSAT
   { alu_subsat_01, alu_subsat_10, "SPOC_ALU_SUBSAT_IN0_IN1", F, T, T },
   { alu_subsat_10, alu_subsat_01, "SPOC_ALU_SUBSAT_IN1_IN0", F, T, T },
   { alu_subsat_0cst, alu_subsat_1cst, "SPOC_ALU_SUBSAT_IN0_CONST", T, T, F },
   { alu_subsat_1cst, alu_subsat_0cst, "SPOC_ALU_SUBSAT_IN1_CONST", T, F, T },
+  { alu_subsat_cst0, alu_subsat_cst1, "SPOC_ALU_SUBSAT_CONST_IN0", T, T, F },
+  { alu_subsat_cst1, alu_subsat_cst0, "SPOC_ALU_SUBSAT_CONST_IN1", T, F, T },
   // ABSSUB
   { alu_abssub, alu_abssub, "SPOC_ALU_ABSSUB_IN0_IN1", F, T, T },
   { alu_abssub_0cst, alu_abssub_1cst, "SPOC_ALU_ABSSUB_IN0_CONST", T, T, F },
@@ -96,6 +100,8 @@ static const spoc_alu_op_t ALU_OP[] = {
   { alu_div_10, alu_div_01, "SPOC_ALU_DIV_IN1_IN0", F, T, T },
   { alu_div_0cst, alu_div_1cst, "SPOC_ALU_DIV_IN0_CONST", T, T, F },
   { alu_div_1cst, alu_div_0cst, "SPOC_ALU_DIV_IN1_CONST", T, F, T },
+  { alu_div_cst0, alu_div_cst1, "SPOC_ALU_DIV_CONST_IN0", T, T, F },
+  { alu_div_cst1, alu_div_cst0, "SPOC_ALU_DIV_CONST_IN1", T, F, T },
   // LOG2
   { alu_log2_0, alu_log2_1, "SPOC_ALU_LOG2_IN0", F, T, F },
   { alu_log2_1, alu_log2_0, "SPOC_ALU_LOG2_IN1", F, F, T },
@@ -1129,7 +1135,7 @@ static void freia_spoc_code_buildup
   // first, image arguments
   if (n_im_out>0) sb_cat(code, FREIA_IMAGE "o0");
   if (n_im_out>1) sb_cat(code, ", " FREIA_IMAGE "o1");
-  if (n_im_out!=0) sb_cat(code, ", ");
+  if (n_im_out!=0 && n_im_in>0) sb_cat(code, ", ");
   if (n_im_in>0) sb_cat(code, FREIA_IMAGE "i0");
   if (n_im_in>1) sb_cat(code, ", " FREIA_IMAGE "i1");
 
@@ -1138,6 +1144,11 @@ static void freia_spoc_code_buildup
   // end of headers (some arguments may have been added by stages),
   // and begin the function body
   sb_cat(code, ")\n{\n" FREIA_SPOC_DECL);
+  sb_cat(code,
+         "  // init pipe to nop\n"
+         "  spoc_init_pipe(&si, &sp, ", itoa(FREIA_DEFAULT_BPP), ");\n"
+         "\n");
+
   string_buffer_append_sb(code, body);
 
   // generate actual call to the accelerator
@@ -1703,7 +1714,7 @@ static bool erode_alu_shared_p(vtxcontent c1, vtxcontent c2)
  * non implemented functions are pushed late.
  * tells v1 < v2  =>  -1  =>  v1 BEFORE v2
  */
-int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
+static int dagvtx_spoc_priority(const dagvtx * v1, const dagvtx * v2)
 {
   string why = "none";
   int result = 0;
@@ -2017,9 +2028,7 @@ static dagvtx first_which_may_be_added
  */
 static list /* of dags */ split_dag(dag initial)
 {
-  if (!single_image_assignement_p(initial))
-    // well, it should work most of the time, so only a warning
-    pips_user_warning("image reuse may result in subtly wrong code...\n");
+  pips_assert("no image reuse", single_image_assignement_p(initial));
 
   // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
   // if everything was removed by optimizations, there is nothing to do.
@@ -2151,11 +2160,12 @@ static list /* of dags */ split_dag(dag initial)
 /* generate helpers for statements in ls of module
  * output resulting functions in helper, which may be empty in some cases.
  * @param module
- * @param ls list of statements for the dag
+ * @param ls list of statements for the dag (in reverse order)
  * @param helper output file
  * @param number current helper dag count
+ * @return list of intermediate images to allocate
  */
-void freia_spoc_compile_calls
+list freia_spoc_compile_calls
   (string module,
    list /* of statements */ ls,
    hash_table occs,
@@ -2168,6 +2178,9 @@ void freia_spoc_compile_calls
 
   list added_stats = NIL;
   dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
+
+  hash_table init = hash_table_make(hash_pointer, 0);
+  list new_images = dag_fix_image_reuse(fulld, init);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
@@ -2248,4 +2261,11 @@ void freia_spoc_compile_calls
   FOREACH(dag, dc, ld)
     free_dag(dc);
   gen_free_list(ld);
+
+  // deal with new images
+  list real_new_images =
+    freia_allocate_new_images_if_needed(ls, new_images, init);
+  gen_free_list(new_images);
+  hash_table_free(init);
+  return real_new_images;
 }

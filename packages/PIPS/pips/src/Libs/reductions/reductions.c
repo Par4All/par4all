@@ -66,7 +66,7 @@ compute_one_summary_reduction(reduction model, list /* of effect */ le)
 
   /* keep the entities that are exported... */
   FOREACH(ENTITY, e,reduction_dependences(model)) {
-    if (!effects_read_or_write_entity_p(le,e))
+    if (!effects_may_read_or_write_memory_paths_from_entity_p(le,e))
 	    remove_variable_from_reduction(r, e);
   }
 
@@ -91,7 +91,7 @@ compute_summary_reductions(entity f)
 
     FOREACH(REDUCTION, r,lc) {
       DEBUG_REDUCTION(4, "considering\n", r);
-      if (effects_read_or_write_entity_p(le, reduction_variable(r)))
+      if (effects_may_read_or_write_memory_paths_from_entity_p(le, reduction_variable(r)))
         lr = CONS(REDUCTION, compute_one_summary_reduction(r, le), lr);
     }
 

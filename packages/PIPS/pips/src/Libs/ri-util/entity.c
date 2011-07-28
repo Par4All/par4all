@@ -45,6 +45,7 @@
 
 
 static set io_functions_set = set_undefined;
+static set arithmetic_functions_set = set_undefined;
 
 void print_entities(list l)
 {
@@ -1340,7 +1341,7 @@ expression entity_ith_bounds(entity e, int i)
       bool found = false;
 
       while ((pid->name != NULL) && (!found)) {
-	if (strcmp(pid->name, s) == 0) 
+	if (strcmp(pid->name, s) == 0)
 	  {
 	    found = true;
 	    return true;
@@ -1355,7 +1356,7 @@ bool io_intrinsic_p(entity e)
 {
   if (set_undefined_p(io_functions_set)) {
     io_functions_set = set_make(set_pointer);
-    set_add_elements(io_functions_set, io_functions_set, entity_intrinsic(SCANF_FUNCTION_NAME), 
+    set_add_elements(io_functions_set, io_functions_set, entity_intrinsic(SCANF_FUNCTION_NAME),
 		     entity_intrinsic(PRINTF_FUNCTION_NAME),
 		     entity_intrinsic(SCANF_FUNCTION_NAME),
 		     entity_intrinsic(ISOC99_SCANF_FUNCTION_NAME),
@@ -1386,9 +1387,37 @@ bool io_intrinsic_p(entity e)
 		     entity_intrinsic(FORMAT_FUNCTION_NAME),
 		     NULL);
   }
-  if(set_belong_p(io_functions_set, e)) 
+  if(set_belong_p(io_functions_set, e))
     return true;
-  else 
+  else
+    return false;
+}
+
+/* true if e is an arithmetic instrinsic
+ *
+ * Used to determine if a logical argument must be promoted to integer
+ *
+ * FI: the arithmetic operator set is not fully defined. To be completed.
+ */
+bool arithmetic_intrinsic_p(entity e)
+{
+  if (set_undefined_p(arithmetic_functions_set)) {
+    arithmetic_functions_set = set_make(set_pointer);
+    set_add_elements(arithmetic_functions_set, arithmetic_functions_set,
+		     entity_intrinsic(SCANF_FUNCTION_NAME),
+		     entity_intrinsic(PLUS_OPERATOR_NAME),
+		     entity_intrinsic(PLUS_C_OPERATOR_NAME),
+		     entity_intrinsic(MINUS_OPERATOR_NAME),
+		     entity_intrinsic(MINUS_C_OPERATOR_NAME),
+		     entity_intrinsic(UNARY_PLUS_OPERATOR_NAME),
+		     entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),
+		     entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+		     entity_intrinsic(DIVIDE_OPERATOR_NAME),
+		     NULL);
+  }
+  if(set_belong_p(arithmetic_functions_set, e))
+    return true;
+  else
     return false;
 }
 

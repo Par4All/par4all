@@ -79,6 +79,7 @@ static bool pragma_expr_for_reduction (loop l, statement stmt) {
   exprs = reductions_get_omp_pragma_expr (l, stmt);
   // insert the pragma (if any) as an expression to the current statement
   if (exprs != NULL) {
+    // check if a private clause is needed on top of the reduction clause
     exprs = append_private_clause (l, exprs);
     add_pragma_expr_to_statement (stmt, exprs);
     pips_debug (5, "new reduction pragma as an extension added\n");

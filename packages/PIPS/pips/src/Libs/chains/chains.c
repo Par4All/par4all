@@ -231,6 +231,10 @@ static bool init_one_statement( statement st ) {
  * @param e the "killer" effect
  */
 static void kill_effect( set kill, effect e ) {
+  /* The test on the approximation is an optimization:
+     it is part of the first_effect_certainely_includes_second_effect_p
+     test.
+   */
   if ( action_write_p(effect_action(e))
       && approximation_exact_p(effect_approximation(e)) ) {
     HASH_MAP(theEffect,theStatement, {
@@ -239,14 +243,7 @@ static void kill_effect( set kill, effect e ) {
 
           /* We avoid a self killing */
           if( e != theEffect ) {
-            /* Check if there is a must conflict
-             * Avoid using effects_must_conflict_p() because we want to be
-             * able to kill "may" effects.
-             */
-            cell cell1 = effect_cell(e);
-            cell cell2 = effect_cell((effect)theEffect);
-            /* Check that the cells conflicts */
-            if ( cells_must_conflict_p( cell1, cell2 ) ) {
+            if ( first_effect_certainely_includes_second_effect_p(e, theEffect) ) {
               set_add_element( kill, kill, theEffect );
             }
           }

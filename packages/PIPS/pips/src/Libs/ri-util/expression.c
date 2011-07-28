@@ -1140,6 +1140,11 @@ list syntax_to_reference_list(syntax s, list lr)
     }
     return lr;
 }
+
+void fprint_expression(FILE * f, expression e)
+{
+  print_words(f, words_syntax(expression_syntax(e), NIL));
+}
 
 /* no file descriptor is passed to make is easier to use in a debugging
    stage.
@@ -2240,6 +2245,27 @@ bool expression_one_p(expression exp)
     }
   }
   return one_p;
+}
+
+/**
+   returns true if the expression is equal to zero or NULL (even if
+   there is a cast before such as in (void *) 0).
+*/
+bool expression_null_p(expression exp)
+{
+  bool null_p = false;
+  if (expression_cast_p(exp))
+    null_p = expression_null_p(cast_expression(expression_cast(exp)));
+  else if (expression_reference_p(exp))
+    {
+      null_p = same_string_p(entity_local_name(expression_variable(exp)), "NULL");
+    }
+  else
+    {
+      if (expression_constant_p(exp))
+	null_p = (expression_to_int(exp) == 0);
+    }
+  return null_p;
 }
 
 

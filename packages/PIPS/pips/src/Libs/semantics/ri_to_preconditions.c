@@ -463,7 +463,8 @@ static transformer c_data_to_prec_for_variables(entity m, list /* of entity */le
 	 refer other variables which have values, however they are not
 	 likely to be static initializations. */
       expression ie = variable_initial_expression(e);
-      transformer npre = safe_assigned_expression_to_transformer(e, ie, pre);
+      transformer pre_r = transformer_range(pre);
+      transformer npre = safe_assigned_expression_to_transformer(e, ie, pre_r);
 
       pips_debug(8, "begin for variable %s\n", entity_name(e));
 
@@ -471,6 +472,7 @@ static transformer c_data_to_prec_for_variables(entity m, list /* of entity */le
       pre = transformer_combine(pre, npre);
       pre = transformer_safe_normalize(pre, 2);
       free_transformer(npre);
+      free_transformer(pre_r);
     }
   }
 
