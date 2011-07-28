@@ -11,7 +11,7 @@ set logscale y 2
 
 
 unset xtics
-set xtics out rotate by -30 nomirror offset -1,0
+set xtics out rotate by -30 nomirror offset 0,0
 #set xtics scale 0
 
 bw = 1

@@ -4,10 +4,12 @@
 #include <time.h>
 #include <sys/time.h>
 
+#include "timing.h"
+
 /* Timer code (gettimeofday). */
 static double t_start, t_end;
 
-double get_time()
+double timer_get_time()
 {
     struct timeval t;
     if (gettimeofday (&t, NULL) != 0) {
@@ -19,11 +21,11 @@ double get_time()
 
 
 void timer_start() {
-  t_start = get_time();
+  t_start = timer_get_time();
 }
 
 void timer_stop() {
-  t_end = get_time();
+  t_end = timer_get_time();
 }
 
 void timer_display() {

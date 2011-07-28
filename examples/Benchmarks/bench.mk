@@ -14,7 +14,7 @@ COMMON := ../../common/timing.c
 ACCEL_FLAGS := -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -arch=sm_13
 ACCEL_SRC := $(P4A_ACCEL_DIR)/p4a_accel.cu $(P4A_ACCEL_DIR)/p4a_communication_optimization_runtime.cpp
 # Params for benchmarks
-NRUNS := `seq 1 3`
+NRUNS := `seq 1 5`
 
 # source file for the different version of the code
 SOURCE := $(TARGET).c
@@ -35,6 +35,11 @@ COMMON_FLAGS:= -I../../common/ -DPOLYBENCH_TIME
 CFLAGS:= -O3 -fno-strict-aliasing -fPIC -std=c99  
 LDFLAGS:= -lm
 P4A_FLAGS+= -p $(TARGET)_p4a -r
+NVCC_FLAGS+= --compiler-options "-O3"
+
+ifdef threads
+NVCC_FLAGS+= -DP4A_CUDA_THREAD_MAX=$(threads)
+endif
 
 ifdef debug
 CFLAGS+=-W -Wall -DP4A_DEBUG
@@ -54,15 +59,17 @@ $(TARGET):
 $(OMP_SOURCE): $(SOURCE) $(COMMON)
 	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS)
 	mv $(<:%.c=%.p4a.c) $@
+openmp_src:$(OMP_SOURCE)
 
 $(CUDA_SOURCE): $(SOURCE) $(COMMON)
 	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) --cuda
 	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
+cuda_src:$(CUDA_SOURCE)
 
 $(CUDA_OPT_SOURCE): $(SOURCE) $(COMMON)
 	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) --cuda --com-optimization
 	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
-
+cuda_opt_src:$(CUDA_OPT_SOURCE)
 
 # build binary for the 3 different versions
 $(SEQ_TARGET): $(SOURCE) $(COMMON)
@@ -74,10 +81,10 @@ $(OMP_TARGET): $(OMP_SOURCE) $(COMMON)
 openmp: $(OMP_TARGET)
 
 $(CUDA_TARGET): $(CUDA_SOURCE) $(COMMON)
-	nvcc $^ -o $@ $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(GENERATED_KERNELS)
+	nvcc $^ -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(GENERATED_KERNELS)
 cuda: $(CUDA_TARGET)
 $(CUDA_OPT_TARGET): $(CUDA_OPT_SOURCE) $(COMMON)
-	nvcc $^ -o $@ $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(GENERATED_KERNELS)
+	nvcc $^ -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(GENERATED_KERNELS)
 cuda_opt: $(CUDA_OPT_TARGET)
 
 # Run target
