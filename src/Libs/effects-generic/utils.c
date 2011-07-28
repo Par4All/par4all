@@ -235,21 +235,6 @@ entity e;
     return((e == (entity) TCST) ? "TCST" : entity_name(e));
 }
 
-/* bool integer_scalar_read_effects_p(cons * effects): checks that *all* read
- * effects in effects are on integer scalar variable
- *
- * Francois Irigoin: I do not see where the "read" type is checked FI
- */
-bool integer_scalar_read_effects_p(fx)
-cons * fx;
-{
-    MAPL(ceffect,
-     {entity e =
-	  reference_variable(effect_any_reference(EFFECT(CAR(ceffect))));
-     if(!integer_scalar_entity_p(e)) return false;},
-	 fx);
-    return true;
-}
 
 /* check that *some* read or write effects are on integer variables
  *
@@ -265,25 +250,6 @@ bool some_integer_scalar_read_or_write_effects_p(cons * fx) {
 	  }
   }
   return r_or_w_p;
-}
-
-/* bool effects_write_entity_p(cons * effects, entity e): check whether e
- * is certainly (MUST/EXACT) written by effects "effects" or not
- */
-bool effects_write_entity_p(cons * fx, entity e) {
-  bool write = false;
-  FOREACH(EFFECT, ef,fx) {
-    entity e_used = reference_variable(effect_any_reference(ef));
-
-    /* Note: to test aliasing == should be replaced below by
-     * entities_may_conflict_p()
-     */
-    if(e == e_used  && store_effect_p(ef) && effect_write_p(ef)) {
-      write = true;
-      break;
-    }
-  }
-  return write;
 }
 
 
