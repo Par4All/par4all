@@ -240,6 +240,11 @@ entity e;
  *
  * FI: this is almost always true because of array subscript expressions
  */
+/*
+  This function might be dangerous in case of abstract locations and
+  with complex memory paths involving dereferencements, struct fields,
+  and array indices. BC.
+ */
 bool some_integer_scalar_read_or_write_effects_p(cons * fx) {
   bool r_or_w_p = false;
   FOREACH(EFFECT, ef,fx) {
