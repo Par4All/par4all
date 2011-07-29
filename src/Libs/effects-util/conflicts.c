@@ -1043,31 +1043,36 @@ entity effects_conflict_with_entity(cons * fx,entity e) {
 
    if concrete_p==true, ignore abstract location entities.
  */
-list generic_effects_conflict_with_entities(list fx,
-					    entity e,
-					    bool concrete_p) {
+static list generic_effects_entities_which_may_conflict_with_scalar_entity(list fx,
+								    entity e,
+								    bool concrete_p)
+{
   list lconflict_e = NIL;
 
-  FOREACH(EFFECT, ef, fx) {
-    entity e_used = reference_variable(effect_any_reference(ef));
-    if(!(entity_abstract_location_p(e_used) && concrete_p)) {
-      if(entities_may_conflict_p(e, e_used)) {
-        lconflict_e = gen_nconc(lconflict_e,
-                                CONS(ENTITY, e_used, NIL));
-      }
+  FOREACH(EFFECT, ef, fx)
+    {
+      entity e_used = reference_variable(effect_any_reference(ef));
+      if(!(entity_abstract_location_p(e_used) && concrete_p))
+	{
+	  if(entities_may_conflict_p(e, e_used))
+	    {
+	      lconflict_e = gen_nconc(lconflict_e,
+				      CONS(ENTITY, e_used, NIL));
+	    }
+	}
     }
-  }
 
   return lconflict_e;
 }
 
-list effects_conflict_with_entities(list fx, entity e) {
-  return generic_effects_conflict_with_entities(fx, e, false);
+list effects_entities_which_may_conflict_with_scalar_entity(list fx, entity e)
+{
+  return generic_effects_entities_which_may_conflict_with_scalar_entity(fx, e, false);
 }
 
-list concrete_effects_conflict_with_entities(list fx, entity e)
+list concrete_effects_entities_which_may_conflict_with_scalar_entity(list fx, entity e)
 {
-  return generic_effects_conflict_with_entities(fx, e, true);
+  return generic_effects_entities_which_may_conflict_with_scalar_entity(fx, e, true);
 }
 
 
