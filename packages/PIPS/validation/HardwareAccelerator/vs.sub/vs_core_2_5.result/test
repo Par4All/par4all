@@ -1,6 +1,9 @@
 #
 # AIPO
 #
+#
+# compile generated vs_core_2_5
+#
 
 ! initial function
 
@@ -478,6 +481,13 @@ digraph "vs_core_2_helper_0_3" {
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
+
+// dag 0: 18 ops (2 copies), optimized to 16 (0 copies)
+// split 0: 1 cut
+// split 1: 1 cut
+// split 2: 2 cuts
+// split 3: 1 cut
+// # SPOC calls: 5
 
 // FREIA-SPoC helper function for module vs_core_2
 freia_status vs_core_2_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,

@@ -1,8 +1,9 @@
 // fake implementations, should be right for effects
 
-// what about freia_common_draw_line?
+// #include <stdlib.h>
+extern void * malloc(unsigned int);
+extern void free(void *);
 
-#include <stdlib.h>
 #include "freia.h"
 
 static int global_io_effect = 0;

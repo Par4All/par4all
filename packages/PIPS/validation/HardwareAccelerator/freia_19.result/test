@@ -1,6 +1,9 @@
 #
 # AIPO
 #
+#
+# compile generated freia_19
+#
 
 ! initial function
 
@@ -114,6 +117,9 @@ digraph "dag_cleaned_0" {
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
+
+// dag 0: 2 ops (2 copies), optimized to 0 (0 copies)
+// # SPOC calls: 0
 
 ! updated function
 

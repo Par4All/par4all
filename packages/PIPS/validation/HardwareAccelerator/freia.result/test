@@ -938,4 +938,7 @@ freia_status freia_common_tx_image(const freia_data2d *img, freia_dataio *out)
    global_io_effect++;
    return FREIA_OK;
 }
+#
+# compile generated freia
+#
 
