@@ -741,6 +741,8 @@ static void set_add_scalars(set s, const statement stat, const bool written)
   }
 }
 
+/************************************************ SCALAR DEPENDENCIES (HACK) */
+
 /* is there a simple scalar (no image) rw dependency from s to t?
  * WW deps are ignored... should be okay of computed in order?
  * @param s source statement
@@ -1072,6 +1074,8 @@ void freia_clean_image_occurrences(hash_table occs)
   hash_table_free(occs);
 }
 
+/************************************************************* VARIOUS TESTS */
+
 /* @brief whether api available with SPoC
  */
 bool freia_aipo_spoc_implemented(const freia_api_t * api)
@@ -1092,6 +1096,8 @@ bool freia_aipo_terapix_implemented(const freia_api_t * api)
     return true;
   return api->terapix.cost!=-1;
 }
+
+/******************************************************* CONVOLUTION HELPERS */
 
 /* @brief is it the convolution special case?
  */
@@ -1119,6 +1125,7 @@ bool freia_convolution_width_height(dagvtx v, _int * pw, _int * ph, bool check)
 
 /****************************************************** NEW IMAGE ALLOCATION */
 
+/*
 static statement image_alloc(entity v)
 {
   return make_assign_statement
@@ -1126,6 +1133,7 @@ static statement image_alloc(entity v)
      call_to_expression(make_call(local_name_to_top_level_entity(FREIA_ALLOC),
                                   NIL)));
 }
+*/
 
 static statement image_free(entity v)
 {
@@ -1196,4 +1204,22 @@ list freia_allocate_new_images_if_needed(list ls, list images, hash_table init)
   }
 
   return allocated;
+}
+
+/************************************************************* AIPO COUNTERS */
+
+/* @return the number for FREIA AIPO ops in dag
+ */
+int freia_aipo_count(dag d, bool with_copies)
+{
+  int count = 0;
+  FOREACH(dagvtx, v, dag_vertices(d))
+  {
+    string op = dagvtx_function_name(v);
+    if (strncmp(op, AIPO, strlen(AIPO))==0) count++;
+    // handle exceptions afterwards
+    if (!with_copies && same_string_p(op, AIPO "copy")) count--;
+    if (same_string_p(op, AIPO "scalar_copy")) count--;
+  }
+  return count;
 }

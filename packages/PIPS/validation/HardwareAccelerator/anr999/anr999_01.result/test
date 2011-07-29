@@ -1,6 +1,9 @@
 #
 # AIPO
 #
+#
+# compile generated anr999_01
+#
 
 ! initial function
 
@@ -493,6 +496,11 @@ digraph "dag_cleaned_0" {
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
+
+// dag 0: 13 ops (0 copies), optimized to 11 (0 copies)
+// split 0: 1 cut
+// split 1: 1 cut
+// # SPOC calls: 2
 
 // FREIA-SPoC helper function for module anr999_01
 freia_status anr999_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,

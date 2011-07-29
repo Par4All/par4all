@@ -8,11 +8,14 @@ setproperty FREIA_DAG_LABEL_ARCS=TRUE
 setproperty MEMORY_EFFECTS_ONLY=FALSE
 # use "old" effects...
 setproperty CONSTANT_PATH_EFFECTS=FALSE
-#setenv PIPS_HWAC_DEBUG_LEVEL=7
 create ${WSPACE} ${FILE} freia.c
-shell ${PIPS_CC:-cc} -c ${FILE} -o ${WSPACE}.database/Tmp/${WSPACE}.o
-#activate NEW_CONTROLIZER
 setproperty PRETTYPRINT_STATEMENT_NUMBER=TRUE
+#activate NEW_CONTROLIZER
+#
+# check compilation
+#
+apply UNSPLIT[${NAME}]
+shell pips_validation_exe.sh -c -g -f ${FILE} ${WSPACE}
 echo
 echo ! initial function
 echo

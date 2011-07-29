@@ -1,7 +1,0 @@
-  FREIA_TERAPIX_COMPILER         updating   CODE(freia_dead_03)
-                                 building   CALLEES(freia_dead_03)
-                                 building   TERAPIX_FILE(freia_dead_03)
-pips error in freia_terapix_call: (/home/fabien/DEV/PROJECTS/prod/pips/src/Libs/hwac/freia_terapix.c:770) assertion failed
-
- 'some I/O images' not verified
-

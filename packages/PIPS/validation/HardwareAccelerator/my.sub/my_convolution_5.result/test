@@ -1,6 +1,9 @@
 #
 # AIPO
 #
+#
+# compile generated my_convolution_5
+#
 
 ! initial function
 
@@ -90,6 +93,9 @@ digraph "dag_cleaned_0" {
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
+
+// dag 0: 1 ops (0 copies), optimized to 1 (0 copies)
+// # SPOC calls: 0
 
 ! updated function
 
