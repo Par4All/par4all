@@ -1859,7 +1859,7 @@ list freia_trpx_compile_calls
   dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
 
   hash_table init = hash_table_make(hash_pointer, 0);
-  list new_images = dag_fix_image_reuse(fulld, init);
+  list new_images = dag_fix_image_reuse(fulld, init, occs);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 

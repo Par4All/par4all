@@ -864,6 +864,20 @@ call freia_statement_to_call(const statement s)
   return c;
 }
 
+bool is_freia_alloc(const statement s)
+{
+  call c = freia_statement_to_call(s);
+  const char* called = c? entity_user_name(call_function(c)): "";
+  return same_string_p(called, FREIA_ALLOC);
+}
+
+bool is_freia_dealloc(const statement s)
+{
+  call c = freia_statement_to_call(s);
+  const char* called = c? entity_user_name(call_function(c)): "";
+  return same_string_p(called, FREIA_FREE);
+}
+
 /* tell whether v1 and v2 point to statements with the same parameters.
  */
 bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
@@ -907,22 +921,22 @@ void freia_substitute_by_helper_call
   set_difference(remainings, remainings, dones);
   set_difference(global_remainings, global_remainings, dones);
 
-  // replace first statement of dones in ls (so last in sequence)
-  statement last = NULL;
+  // replace first statement of dones in ls ???
+  statement found = NULL;
   FOREACH(statement, sc, ls)
   {
     pips_debug(5, "in statement %" _intFMT "\n", statement_number(sc));
     if (set_belong_p(dones, sc))
     {
       pips_assert("statement is a call", statement_call_p(sc));
-      if (last)
-        last = statement_number(sc)>statement_number(last)? sc: last;
+      if (found)
+        found = statement_number(sc)<statement_number(found)? sc: found;
       else
-        last = sc;
+        found = sc;
     }
   }
 
-  pips_assert("some last statement found", last);
+  pips_assert("some statement found", found);
 
   // build helper entity
   entity example = local_name_to_top_level_entity("freia_aipo_add");
@@ -944,7 +958,7 @@ void freia_substitute_by_helper_call
   // substitute by call to helper
   call c = make_call(helper, lparams);
 
-  hwac_replace_statement(last, c, false);
+  hwac_replace_statement(found, c, false);
 
   set_free(not_dones);
   set_free(dones);

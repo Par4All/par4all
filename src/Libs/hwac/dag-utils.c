@@ -1979,9 +1979,77 @@ static expression do_point_to(entity var, string field_name)
                   NULL)));
 }
 
+/************************************* FIND FIRST REFERENCED IMAGE SOMEWHERE */
+// hmmm... only works if initialized at the declaration level
+
+static bool image_ref_flt(reference r, entity * image)
+{
+  entity var = reference_variable(r);
+  if (freia_image_variable_p(var))
+  {
+    *image = var;
+    gen_recurse_stop(NULL);
+  }
+  // do not go in array indexes
+  return false;
+}
+
+// ??? l'arrache (tm)
+static entity get_upper_model(entity model, hash_table occs)
+{
+  entity image = NULL;
+  // first look in declarations
+  gen_context_recurse(entity_initial(model), &image,
+                      reference_domain, image_ref_flt, gen_null);
+  // then look for statements...
+  if (!image && hash_defined_p(occs, model))
+  {
+    SET_FOREACH(statement, s, (set) hash_get(occs, model))
+    {
+      if (is_freia_alloc(s))
+        gen_context_recurse(freia_statement_to_call(s), &image,
+                            reference_domain, image_ref_flt, gen_null);
+      if (image && image!=model) break;
+      image = NULL;
+    }
+  }
+  // go upwards!
+  if (image && image!=model) image = get_upper_model(image, occs);
+  return image? image: model;
+}
+
+// maybe I should build another hash_table for this purpose...
+static statement allocation_statement(entity image, hash_table occs)
+{
+  pips_debug(8, "look for allocation statement for %s\n", entity_name(image));
+
+  if (hash_defined_p(occs, image))
+  {
+    SET_FOREACH(statement, s, (set) hash_get(occs, image))
+    {
+      // it may already have been switched to a sequence by a prior insert...
+      // ??? it is unclear why I encounter nested sequences
+      while (statement_sequence_p(s))
+        s = STATEMENT(CAR(sequence_statements(statement_sequence(s))));
+
+      // fprintf(stderr, "statement %"_intFMT"?\n", statement_number(s));
+      if (is_freia_alloc(s))
+      {
+        call c = statement_call(s);
+        pips_assert("must be an assignment", ENTITY_ASSIGN_P(call_function(c)));
+        entity var;
+        gen_context_recurse(EXPRESSION(CAR(call_arguments(c))), &var,
+                            reference_domain, image_ref_flt, gen_null);
+        if (var==image) return s;
+      }
+    }
+  }
+  return NULL;
+}
+
 /* @return a new image from the model
  */
-static entity new_local_image_variable(entity model)
+static entity new_local_image_variable(entity model, hash_table occs)
 {
   entity img = NULL;
   int index = 1;
@@ -1996,17 +2064,48 @@ static entity new_local_image_variable(entity model)
     index++;
     if (img)
     {
-      // handle allocation as the declaration initial value
-      free_value(entity_initial(img));
-      entity_initial(img) =
-        make_value_expression(
-          call_to_expression(
-            make_call(local_name_to_top_level_entity(FREIA_ALLOC),
-                      gen_make_list(expression_domain,
-                                    do_point_to(model, "bpp"),
-                                    do_point_to(model, "width"),
-                                    do_point_to(model, "height"),
-                                    NULL))));
+      // use the reference of the model instead of the model itself, if found.
+      entity ref = get_upper_model(model, occs);
+
+      call alloc = make_call(local_name_to_top_level_entity(FREIA_ALLOC),
+                             gen_make_list(expression_domain,
+                                           do_point_to(ref, "bpp"),
+                                           do_point_to(ref, "widthWa"),
+                                           do_point_to(ref, "heightWa"),
+                                           NULL));
+
+      // handle allocation as the declaration initial value, if possible
+      if (formal_parameter_p(ref))
+      {
+        free_value(entity_initial(img));
+        entity_initial(img) = make_value_expression(call_to_expression(alloc));
+      }
+      else
+      {
+        statement sa = allocation_statement(ref, occs);
+
+        if (sa)
+        {
+          // insert statement just after the reference declaration
+          free_value(entity_initial(img));
+          entity_initial(img) = make_value_expression(int_to_expression(0));
+
+          statement na = make_assign_statement(entity_to_expression(img),
+                                               call_to_expression(alloc));
+          insert_statement(sa, na, false);
+        }
+        else
+        {
+          // this may happen if the "ref" is allocated at its declaration point,
+          // as this statement is not currently found by our search
+
+          // ??? try with a direct declaration
+          free_value(entity_initial(img));
+          entity_initial(img) =
+            make_value_expression(call_to_expression(alloc));
+        }
+      }
+
       // should not be a parameter! overwrite storage if so...
       if (formal_parameter_p(img))
       {
@@ -2055,7 +2154,7 @@ static void switch_image_variable(dagvtx v, entity old, entity img)
 /* fix intermediate image reuse in dag
  * @return new image entities to be added to declarations
  */
-list dag_fix_image_reuse(dag d, hash_table init)
+list dag_fix_image_reuse(dag d, hash_table init, hash_table occs)
 {
   list images = NIL;
   set seen = set_make(hash_pointer);
@@ -2070,7 +2169,7 @@ list dag_fix_image_reuse(dag d, hash_table init)
 
     if (set_belong_p(seen, img))
     {
-      entity new_img = new_local_image_variable(img);
+      entity new_img = new_local_image_variable(img, occs);
       switch_image_variable(v, img, new_img);
       images = CONS(entity, new_img, images);
       // keep track of new->old image mapping, to reverse it latter eventually
