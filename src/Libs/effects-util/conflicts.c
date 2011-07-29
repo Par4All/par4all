@@ -971,7 +971,8 @@ bool effects_may_read_or_write_scalar_entity_p(list fx, entity e)
     FOREACH(EFFECT, ef, fx) {
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
-      if(store_effect_p(ef) && entity_scalar_p(e_used) && entities_may_conflict_p(e, e_used)) {
+      if(store_effect_p(ef) && entity_scalar_p(e_used)
+	 && entities_may_conflict_p(e, e_used)) {
         read_or_write = true;
         break;
       }
@@ -997,7 +998,8 @@ bool effects_must_read_or_write_scalar_entity_p(list fx, entity e)
     FOREACH(EFFECT, ef, fx) {
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
-      if(store_effect_p(ef) && entity_scalar_p(e_used) && entities_must_conflict_p(e, e_used)) {
+      if(store_effect_p(ef) && entity_scalar_p(e_used)
+	 && entities_must_conflict_p(e, e_used)) {
         read_or_write = true;
         break;
       }
@@ -1005,5 +1007,68 @@ bool effects_must_read_or_write_scalar_entity_p(list fx, entity e)
   }
   return read_or_write;
 }
+
+
+/**
+ * @brief Check if an effect may conflict with an entity : i.e. if the entity
+ * may be affected (read or write) by the effect.
+ */
+bool effect_may_conflict_with_entity_p( effect eff, entity e) {
+  bool conflict_p = true;
+  entity e_used = reference_variable(effect_any_reference(eff));
+  if(!entities_may_conflict_p(e, e_used)) {
+    conflict_p = false;
+  }
+  return conflict_p;
+}
+
+
+entity effects_conflict_with_entity(cons * fx,entity e) {
+  entity conflict_e = entity_undefined;
+  FOREACH(effect,ef,fx){
+    if(effect_may_conflict_with_entity_p(ef, e)) {
+      entity e_used = reference_variable(effect_any_reference(ef));
+      conflict_e = e_used;
+      break;
+    }
+  }
+  return conflict_e;
+}
+
+/* Returns the list of entities used in effect list fx and
+   potentially conflicting with e.
+
+   Of course, abstract location entities do conflict with many
+   entities, possibly of different types.
+
+   if concrete_p==true, ignore abstract location entities.
+ */
+list generic_effects_conflict_with_entities(list fx,
+					    entity e,
+					    bool concrete_p) {
+  list lconflict_e = NIL;
+
+  FOREACH(EFFECT, ef, fx) {
+    entity e_used = reference_variable(effect_any_reference(ef));
+    if(!(entity_abstract_location_p(e_used) && concrete_p)) {
+      if(entities_may_conflict_p(e, e_used)) {
+        lconflict_e = gen_nconc(lconflict_e,
+                                CONS(ENTITY, e_used, NIL));
+      }
+    }
+  }
+
+  return lconflict_e;
+}
+
+list effects_conflict_with_entities(list fx, entity e) {
+  return generic_effects_conflict_with_entities(fx, e, false);
+}
+
+list concrete_effects_conflict_with_entities(list fx, entity e)
+{
+  return generic_effects_conflict_with_entities(fx, e, true);
+}
+
 
 /** @} */
