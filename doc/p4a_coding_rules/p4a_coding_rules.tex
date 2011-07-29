@@ -328,7 +328,7 @@ to the version of figure~\ref{fig:disjoint_array_accesses}.
 
 Even if \Apips is interprocedural and can deal with parameter passing
 through global variables, such global declarations should be avoided if
-possible and replace by explicit argument passing in functions.
+possible and replaced by explicit argument passing in functions.
 
 For example, the actual generation of \Agpu code may choke on some case of
 global arrays that are not well outlined and forgotten.
@@ -340,16 +340,57 @@ global arrays that are not well outlined and forgotten.
 A huge effort has been made to integrate all standard libraries
 functions. However, depending on your operating system and/or your
 compiler version, some of your favorite ones may be missing. Don't
-hesitate to contact us on \texttt{pipdev at cri dot ensmp dot fr} so
+hesitate to contact us on \texttt{pipsdev at cri dot ensmp dot fr} so
 that we can integrate them.
 
 The effects of the cast operators on the analyses is currently under
 study: please use it sparingly.
 
+\section{Values of scalar variables}
+\label{sec:values_of_scalar_variables}
+
+\Apips contains powerful semantics analysis of scalar variables values
+whose results are used by many other program analyses and
+transformations, such as dead code elimination, parallelization,
+array region analyses \ldots
+
+To help these analyses, you should avoid embedding key scalar values
+involved in loop bounds, test conditions and array sizes and index
+expressions inside structured data types.
+
+Also if you need flip-flop values inside a for loop, prefer the code
+of Listing~\ref{fig:good_flip_flop} to the code of
+Lising~\ref{fig:bad_flip_flop}.
+
+  \begin{figure}
+    \begin{lstlisting}
+  val1 = 0;
+  val2 = 1;
+  for(i=0; i<n; i++)
+  {
+     ...
+     val1 = val2;
+     val2 = 1-val1;
+  }
+    \end{lstlisting}
+    \caption{Don't use this flip-flop coding style}
+    \label{fig:bad_flip_flop}
+  \end{figure}
+  \begin{figure}
+    \begin{lstlisting}
+  for(i=0; i<n; i++)
+  {
+     val1 = i%2;
+     val2 = 1-val1;
+     ...
+  }
+    \end{lstlisting}
+    \caption{Prefer this flip-flop coding style}
+    \label{fig:good_flip_flop}
+  \end{figure}
 
 \section{Fortran language}
 \label{sec:fortran-language}
-
 
 \section{Conclusion}
 \label{sec:conclusion}
