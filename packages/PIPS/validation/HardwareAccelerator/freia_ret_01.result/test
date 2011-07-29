@@ -1,6 +1,9 @@
 #
 # AIPO
 #
+#
+# compile generated freia_ret_01
+#
 
 ! initial function
 
@@ -143,6 +146,10 @@ digraph "freia_ret_01_helper_0_0" {
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
+
+// dag 0: 2 ops (0 copies), optimized to 2 (0 copies)
+// split 0: 1 cut
+// # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_ret_01
 freia_status freia_ret_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)

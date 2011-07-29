@@ -1,6 +1,9 @@
 #
 # AIPO
 #
+#
+# compile generated xor_00
+#
 
 ! initial function
 
@@ -108,6 +111,10 @@ digraph "xor_00_helper_0_0" {
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
+
+// dag 0: 1 ops (0 copies), optimized to 1 (0 copies)
+// split 0: 1 cut
+// # SPOC calls: 1
 
 // FREIA-SPoC helper function for module xor_00
 freia_status xor_00_helper_0_0_0(freia_data2d * o0,

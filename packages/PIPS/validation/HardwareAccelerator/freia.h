@@ -21,20 +21,14 @@ typedef struct {
 } freia_dataio;
 typedef void * freia_ptr;
 
+// no checks, code is assume correct
+#define freia_common_check_image_bpp_compat(a,b,c) true
+#define freia_common_check_image_window_compat(a,b,c) true
+
 // for CIPO
 static const int32_t freia_morpho_kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 static const int32_t freia_morpho_kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
 static const int32_t freia_morpho_kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
-
-// hack for ECIPO
-static const int32_t freia_morpho_k8_0[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};
-static const int32_t freia_morpho_k8_1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};
-static const int32_t freia_morpho_k8_2[9] = {0, 0, 1, 0, 1, 0, 1, 0, 0};
-static const int32_t freia_morpho_k6_0[9] = {0, 0, 1, 1, 1, 0, 0, 0, 0};
-static const int32_t freia_morpho_k6_1[9] = {0, 1, 0, 1, 0, 1, 0, 0, 0};
-static const int32_t freia_morpho_k6_2[9] = {1, 0, 0, 1, 0, 0, 1, 0, 0};
-static const int32_t freia_morpho_k4_0[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};
-static const int32_t freia_morpho_k4_1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};
 
 // FREIA image allocation & deallocation
 extern freia_data2d * freia_common_create_data(uint32_t, uint32_t, uint32_t);

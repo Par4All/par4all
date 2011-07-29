@@ -1,6 +1,9 @@
 #
 # AIPO
 #
+#
+# compile generated border_dead
+#
 
 ! initial function
 
@@ -115,6 +118,10 @@ digraph "dag_cleaned_0" {
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
+
+// dag 0: 1 ops (0 copies), optimized to 1 (0 copies)
+// split 0: 1 cut
+// # SPOC calls: 1
 
 // FREIA-SPoC helper function for module border_dead
 freia_status border_dead_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
