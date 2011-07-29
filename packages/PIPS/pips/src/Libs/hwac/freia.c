@@ -175,7 +175,7 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
       // or it has no image effects
       (ls && (freia_skip_op_p(s) || !some_effects_on_images(s)));
 
-    pips_debug(7, "statement %"_intFMT": %skeeped\n",
+    pips_debug(7, "statement %"_intFMT": %skept\n",
                statement_number(s), keep_stat? "": "not ");
 
     if (keep_stat)
