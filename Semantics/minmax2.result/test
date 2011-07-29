@@ -1,4 +1,7 @@
 
+Transformers for "MINMAX2"
+
+
 C  T(I,J,K,L) {I<=J, I<=K, I<=L, I<=M, I<=N, J<=M, J<=N, M<=K, N<=K,
 C    M<=L, N<=L}
 
@@ -38,6 +41,9 @@ C  T() {}
       PRINT *, I                                                        0013
 
       END
+
+Preconditions for "MINMAX2"
+
 
 C  P() {}
 

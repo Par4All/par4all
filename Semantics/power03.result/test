@@ -1,0 +1,108 @@
+
+C  T() {}
+
+      PROGRAM POWER03
+
+C  T(M) {}
+
+
+C     Excerpt from turb3d
+
+      READ *, M                                                         0005
+
+C  T() {5<=M, M<=6}
+
+
+      IF (M.LT.5.OR.M.GT.6) STOP                                        0007
+
+C  T(N) {5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64}
+
+
+      N = 2**M                                                          0009
+
+C  T(M1) {M1==2, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64}
+
+      M1 = MIN(M/2, 2)                                                  0010
+
+C  T(M2) {M==M2+2, M1==2, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64}
+
+      M2 = M-M1                                                         0011
+
+C  T(N2) {M==M2+2, M1==2, N2==4, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N,
+C    N<=64}
+
+      N2 = 2**M1                                                        0012
+
+C  T(N1) {M==M2+2, M1==2, N2==4, 5<=M, M<=6, M+1<=N, 2M<=N, M<=N1+1,
+C    2M<=N1+4, 32<=N, N<=64, 8<=N1, N1<=16}
+
+      N1 = 2**M2                                                        0013
+
+C  T(M1,M2) {M==M2#init+2, M1#init==2, N2==4, 5<=M, M<=6, M+1<=N,
+C    2M<=N, M<=N1+1, 2M<=N1+4, 32<=N, N<=64, 8<=N1, N1<=16}
+
+
+c     Get rid of auxiliary variables
+      READ *, M1, M2                                                    0016
+
+C  T() {N2==4, 5<=M, M<=6, M+1<=N, 2M<=N, M<=N1+1, 2M<=N1+4, 32<=N,
+C    N<=64, 8<=N1, N1<=16}
+
+
+      PRINT *, I, N, N1, N2                                             0018
+
+      END
+
+C  P() {}
+
+      PROGRAM POWER03
+
+C  P() {}
+
+
+C     Excerpt from turb3d
+
+      READ *, M                                                         0005
+
+C  P(M) {}
+
+
+      IF (M.LT.5.OR.M.GT.6) STOP                                        0007
+
+C  P(M) {5<=M, M<=6}
+
+
+      N = 2**M                                                          0009
+
+C  P(M,N) {5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64}
+
+      M1 = MIN(M/2, 2)                                                  0010
+
+C  P(M,M1,N) {M1==2, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N, N<=64}
+
+      M2 = M-M1                                                         0011
+
+C  P(M,M1,M2,N) {M==M2+2, M1==2, 5<=M, M<=6, M+1<=N, 2M<=N, 32<=N,
+C    N<=64}
+
+      N2 = 2**M1                                                        0012
+
+C  P(M,M1,M2,N,N2) {M==M2+2, M1==2, N2==4, 5<=M, M<=6, M+1<=N, 2M<=N,
+C    32<=N, N<=64}
+
+      N1 = 2**M2                                                        0013
+
+C  P(M,M1,M2,N,N1,N2) {M==M2+2, M1==2, N2==4, 5<=M, M<=6, M+1<=N,
+C    2M<=N, M<=N1+1, 2M<=N1+4, 32<=N, N<=64, 8<=N1, N1<=16}
+
+
+c     Get rid of auxiliary variables
+      READ *, M1, M2                                                    0016
+
+C  P(M,M1,M2,N,N1,N2) {N2==4, 5<=M, M<=6, M+1<=N, 2M<=N, M<=N1+1,
+C    2M<=N1+4, 32<=N, N<=64, 8<=N1, N1<=16}
+
+
+      PRINT *, I, N, N1, N2                                             0018
+
+      END
