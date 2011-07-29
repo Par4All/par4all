@@ -34,6 +34,7 @@ extern "C" {
 /* For size_t: */
 #include <stddef.h>
 
+
 /** Note that in CUDA and OpenCL there is 3 dimensions max: */
 enum { P4A_vp_dim_max = 3 };
 
@@ -174,6 +175,11 @@ void P4A_copy_from_accel_4d(size_t element_size,
           void *host_address,
           const void *accel_address);
 
+/** Formats the standard MACROS  __FILE__ and __LINE__ for message print.
+ */
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define AT __FILE__ ":" TOSTRING(__LINE__)
 
 
 /**
@@ -250,7 +256,6 @@ void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */);
 #ifdef P4A_ACCEL_OPENMP
 #include <p4a_accel-OpenMP.h>
 #else
-#error "You have to define either P4A_ACCEL_CUDA or P4A_ACCEL_OPENMP"
 #ifdef P4A_ACCEL_OPENCL
 #include <p4a_accel-OpenCL.h>
 #else

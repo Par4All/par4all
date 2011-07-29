@@ -19,13 +19,13 @@
  *  execution (in ms)
  */
 float p4a_timing_elapsedTime = -1;
+struct timeval p4a_time_begin, p4a_time_end;
 
 #ifdef P4A_ACCEL_OPENMP
 
 /**
  * global structure used for timing purpose
  */
-struct timeval p4a_time_begin, p4a_time_end;
 
 
 
@@ -308,7 +308,7 @@ void P4A_copy_to_accel(size_t element_size,
 
  @return the host_address, by compatibility with memcpy().
  */
-void P4A_copy_from_accel_1d(size_t element_size,
+/*void P4A_copy_from_accel_1d(size_t element_size,
     size_t d1_size,
     size_t d1_block_size,
     size_t d1_offset,
@@ -316,7 +316,7 @@ void P4A_copy_from_accel_1d(size_t element_size,
     const void *accel_address) {
   const char * cdest = d1_offset*element_size + (char *)host_address;
   P4A_copy_from_accel(d1_block_size * element_size, (void *)cdest, accel_address);
-}
+}*/
 
 /** Function for copying a 1D memory zone from the host to a compact memory
  zone in the hardware accelerator.
@@ -340,7 +340,7 @@ void P4A_copy_from_accel_1d(size_t element_size,
  data. In the general case, accel_address may be seen as a unique idea
  (FIFO) and not some address in some memory space.
  */
-void P4A_copy_to_accel_1d(size_t element_size,
+/*void P4A_copy_to_accel_1d(size_t element_size,
     size_t d1_size,
     size_t d1_block_size,
     size_t d1_offset,
@@ -348,7 +348,7 @@ void P4A_copy_to_accel_1d(size_t element_size,
     void *accel_address) {
   const char * csrc = d1_offset*element_size + (char *)host_address;
   P4A_copy_to_accel(d1_block_size * element_size, csrc, accel_address);
-}
+}*/
 
 /** Function for copying memory from the hardware accelerator to a 2D array in
  the host.
