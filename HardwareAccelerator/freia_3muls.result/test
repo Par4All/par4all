@@ -263,14 +263,14 @@ freia_status freia_3muls_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, frei
 
 void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_data2d *in1)
 {
-   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0007*/
+   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0005*/
 }
 
 ! cleaned up function
 
 void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_data2d *in1)
 {
-   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0007*/
+   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0005*/
 }
 #
 # TERAPIX
@@ -543,14 +543,14 @@ freia_status freia_3muls_helper_0_0_0(
 
 void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_data2d *in1)
 {
-   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0007*/
+   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0005*/
 }
 
 ! cleaned up function
 
 void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_data2d *in1)
 {
-   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0007*/
+   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0005*/
 }
 #
 # FREIA COMPILATION DONE

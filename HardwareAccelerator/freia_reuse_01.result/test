@@ -408,8 +408,8 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    
    // variable reuse & duplicate operations?
-   freia_reuse_01_helper_0_0_0(o0, t, i, k);                            /*0011*/
-   freia_reuse_01_helper_0_1_0(o1, t, i, k);                            /*0014*/
+   freia_reuse_01_helper_0_0_0(o0, t, i, k);                            /*0009*/
+   freia_reuse_01_helper_0_1_0(o1, t, i, k);                            /*0012*/
    
    //freia_common_destruct_data(t);
    
@@ -423,8 +423,8 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    
    // variable reuse & duplicate operations?
-   freia_reuse_01_helper_0_0_0(o0, t, i, k);                            /*0011*/
-   freia_reuse_01_helper_0_1_0(o1, t, i, k);                            /*0014*/
+   freia_reuse_01_helper_0_0_0(o0, t, i, k);                            /*0009*/
+   freia_reuse_01_helper_0_1_0(o1, t, i, k);                            /*0012*/
    
    //freia_common_destruct_data(t);
    
@@ -800,7 +800,7 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
 {
    
    // variable reuse & duplicate operations?
-   freia_reuse_01_helper_0_0_0(o0, o1, i, k);                           /*0014*/
+   freia_reuse_01_helper_0_0_0(o0, o1, i, k);                           /*0009*/
    
    //freia_common_destruct_data(t);
    
@@ -813,7 +813,7 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
 {
    
    // variable reuse & duplicate operations?
-   freia_reuse_01_helper_0_0_0(o0, o1, i, k);                           /*0014*/
+   freia_reuse_01_helper_0_0_0(o0, o1, i, k);                           /*0009*/
    
    //freia_common_destruct_data(t);
    

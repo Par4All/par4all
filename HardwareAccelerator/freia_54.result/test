@@ -280,7 +280,7 @@ freia_status freia_54_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 freia_status freia_54(freia_data2d *out, freia_data2d *in)
 {
 
-   freia_54_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0011*/
+   freia_54_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0008*/
 
    return FREIA_OK;                                                     /*0015*/
 }
@@ -290,7 +290,7 @@ freia_status freia_54(freia_data2d *out, freia_data2d *in)
 freia_status freia_54(freia_data2d *out, freia_data2d *in)
 {
 
-   freia_54_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0011*/
+   freia_54_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0008*/
 
    return 0;                                                            /*0015*/
 }
@@ -627,7 +627,7 @@ freia_status freia_54_helper_0_0_0(
 freia_status freia_54(freia_data2d *out, freia_data2d *in)
 {
 
-   freia_54_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0011*/
+   freia_54_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0008*/
 
    return FREIA_OK;                                                     /*0015*/
 }
@@ -637,7 +637,7 @@ freia_status freia_54(freia_data2d *out, freia_data2d *in)
 freia_status freia_54(freia_data2d *out, freia_data2d *in)
 {
 
-   freia_54_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0011*/
+   freia_54_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0008*/
 
    return 0;                                                            /*0015*/
 }

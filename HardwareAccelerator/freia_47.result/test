@@ -269,7 +269,7 @@ freia_status freia_47_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 freia_status freia_47(freia_data2d *in, freia_data2d *o1, freia_data2d *o2)
 {
    // useless copy that requires backwards and back-forwards propagation
-   freia_47_helper_0_0_0(o1, o2, in, o1);                               /*0010*/
+   freia_47_helper_0_0_0(o1, o2, in, o1);                               /*0009*/
    return FREIA_OK;                                                     /*0013*/
 }
 
@@ -278,7 +278,7 @@ freia_status freia_47(freia_data2d *in, freia_data2d *o1, freia_data2d *o2)
 freia_status freia_47(freia_data2d *in, freia_data2d *o1, freia_data2d *o2)
 {
    // useless copy that requires backwards and back-forwards propagation
-   freia_47_helper_0_0_0(o1, o2, in, o1);                               /*0010*/
+   freia_47_helper_0_0_0(o1, o2, in, o1);                               /*0009*/
    return 0;                                                            /*0013*/
 }
 #
@@ -555,7 +555,7 @@ freia_status freia_47_helper_0_0_0(
 freia_status freia_47(freia_data2d *in, freia_data2d *o1, freia_data2d *o2)
 {
    // useless copy that requires backwards and back-forwards propagation
-   freia_47_helper_0_0_0(o1, o2, in, o1);                               /*0010*/
+   freia_47_helper_0_0_0(o1, o2, in, o1);                               /*0009*/
    return FREIA_OK;                                                     /*0013*/
 }
 
@@ -564,7 +564,7 @@ freia_status freia_47(freia_data2d *in, freia_data2d *o1, freia_data2d *o2)
 freia_status freia_47(freia_data2d *in, freia_data2d *o1, freia_data2d *o2)
 {
    // useless copy that requires backwards and back-forwards propagation
-   freia_47_helper_0_0_0(o1, o2, in, o1);                               /*0010*/
+   freia_47_helper_0_0_0(o1, o2, in, o1);                               /*0009*/
    return 0;                                                            /*0013*/
 }
 #

@@ -5,6 +5,14 @@ int freia_51(int32_t * k)
 {
   freia_dataio fdin, fdout;
   freia_data2d *in, *out, *t0, *t1, *t2, *t3, *t4, *t5;
+  in = freia_common_create_data(16, 1024, 1024);
+  t0 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+  t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+  t2 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+  t3 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+  // t4 is later
+  t5 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+  out = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
   int32_t volcurrent, volprevious;
 
   freia_common_rx_image(in, &fdin);
@@ -33,12 +41,16 @@ int freia_51(int32_t * k)
   while (volcurrent!=volprevious);
 
   freia_aipo_sub(out, in, out);
+  freia_aipo_mul_const(out, out, 2);
 
   freia_common_tx_image(out, &fdout);
 
   freia_common_destruct_data(in);
-  freia_common_destruct_data(t1);
   freia_common_destruct_data(t0);
+  freia_common_destruct_data(t1);
+  freia_common_destruct_data(t2);
+  freia_common_destruct_data(t3);
+  freia_common_destruct_data(t4);
   freia_common_destruct_data(out);
 
   return 0;

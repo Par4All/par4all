@@ -619,7 +619,7 @@ freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // two pipeline calls are necessary
    // o0 = i0 * i1
    // o1 = i0 & i1
-   freia_05_helper_0_0_0(o0, o1, i0, i1);                               /*0012*/
+   freia_05_helper_0_0_0(o0, o1, i0, i1);                               /*0011*/
    return FREIA_OK;                                                     /*0013*/
 }
 
@@ -630,7 +630,7 @@ freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // two pipeline calls are necessary
    // o0 = i0 * i1
    // o1 = i0 & i1
-   freia_05_helper_0_0_0(o0, o1, i0, i1);                               /*0012*/
+   freia_05_helper_0_0_0(o0, o1, i0, i1);                               /*0011*/
    return 0;                                                            /*0013*/
 }
 #

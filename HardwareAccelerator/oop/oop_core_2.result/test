@@ -1292,7 +1292,7 @@ int oop_core(void)
 
    freia_status end;                                                    /*0029*/
    // hardware accelerator generated variable
-   freia_data2d *img1_3 = freia_common_create_data(img1->bpp, img1->width, img1->height);
+   freia_data2d *img1_3 = 0;
    
    // Input/output stream and image creations
    freia_common_open_input(&fdin, 0);                                   /*0032*/
@@ -1302,6 +1302,7 @@ int oop_core(void)
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0036*/
 
    img1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0038*/
+   img1_3 = freia_common_create_data(img1->bpp, img1->widthWa, img1->heightWa);
    img2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0039*/
    img3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0040*/
 
@@ -1331,21 +1332,21 @@ int oop_core(void)
    
    
    
-   oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0069*/
+   oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0067*/
 
-   oop_core_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);       /*0078*/
+   oop_core_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);       /*0076*/
 
-   oop_core_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);                /*0082*/
+   oop_core_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);                /*0081*/
    oop_core_helper_0_2_1(img1, img1, freia_morpho_kernel_6c);           /*0083*/
 
-   oop_core_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);         /*0097*/
-   
-   
-   oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0102*/
+   oop_core_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);         /*0095*/
+
+   oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0100*/
+
    oop_core_helper_0_4_1(img2, img2, freia_morpho_kernel_6c);           /*0103*/
-   oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0105*/
+   oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0104*/
+
    freia_common_destruct_data(img1_3);
-   
    
    // skipped stuff... drawing on img0...
    
@@ -1393,7 +1394,7 @@ int oop_core(void)
 
    freia_status end;                                                    /*0029*/
    // hardware accelerator generated variable
-   freia_data2d *img1_3 = freia_common_create_data(img1->bpp, img1->width, img1->height);
+   freia_data2d *img1_3 = 0;
    
    // Input/output stream and image creations
    freia_common_open_input(&fdin, 0);                                   /*0032*/
@@ -1403,6 +1404,7 @@ int oop_core(void)
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0036*/
 
    img1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0038*/
+   img1_3 = freia_common_create_data(img1->bpp, img1->widthWa, img1->heightWa);
    img2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0039*/
    img3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0040*/
 
@@ -1432,21 +1434,21 @@ int oop_core(void)
    
    
    
-   oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0069*/
+   oop_core_helper_0_0_0(imgtmp, img0, freia_morpho_kernel_8c);         /*0067*/
 
-   oop_core_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);       /*0078*/
+   oop_core_helper_0_1_0(img1_3, imgtt2, freia_morpho_kernel_8c);       /*0076*/
 
-   oop_core_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);                /*0082*/
+   oop_core_helper_0_2_0(img1, img1_3, imgtmp, freia_morpho_kernel_6c);                /*0081*/
    oop_core_helper_0_2_1(img1, img1, freia_morpho_kernel_6c);           /*0083*/
 
-   oop_core_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);         /*0097*/
-   
-   
-   oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0102*/
+   oop_core_helper_0_3_0(img2, imgtt4, freia_morpho_kernel_8c);         /*0095*/
+
+   oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0100*/
+
    oop_core_helper_0_4_1(img2, img2, freia_morpho_kernel_6c);           /*0103*/
-   oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0105*/
+   oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0104*/
+
    freia_common_destruct_data(img1_3);
-   
    
    // skipped stuff... drawing on img0...
    
@@ -2416,12 +2418,12 @@ int oop_core(void)
    
    
    
+   oop_core_helper_0_0_0(img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);    /*0067*/
    
    
    
    
    
-   oop_core_helper_0_0_0(img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);    /*0105*/
    
    
    // skipped stuff... drawing on img0...
@@ -2498,12 +2500,12 @@ int oop_core(void)
    
    
    
+   oop_core_helper_0_0_0(img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);    /*0067*/
    
    
    
    
    
-   oop_core_helper_0_0_0(img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);    /*0105*/
    
    
    // skipped stuff... drawing on img0...
