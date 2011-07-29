@@ -50,8 +50,11 @@ void freia_aipo_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  list added_stats = NIL;
-  dag fulld = build_freia_dag(module, ls, number, occs, &added_stats);
+  dag fulld = build_freia_dag(module, ls, number, occs);
+  list added_stats = freia_dag_optimize(fulld);
+
+  // dump final dag
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
 
   // ??? append possibly extracted copies?
   // should it be NIL because it is not useful in AIPO->AIPO?

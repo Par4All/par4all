@@ -2247,7 +2247,8 @@ type_spec:   /* ISO 6.7.2 */
 			    v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
 			  else {
 			    if(default_complex_type_p(t)) {
-			      pips_user_warning("complex double declaration is not in the C99 standard\n");
+			      pips_user_warning("'complex double' declaration is not in the C99 standard but we accept it. You should use 'double complex' instead.\n"
+);
 			      v = make_variable(make_basic_complex(DEFAULT_DOUBLECOMPLEX_TYPE_SIZE), NIL, NIL);
 			    }
 			    /* This secondary test is probably

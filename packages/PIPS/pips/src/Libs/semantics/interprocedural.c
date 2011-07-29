@@ -476,10 +476,11 @@ transformer precondition_intra_to_inter(entity callee,
   for(ca = values; !ENDP(ca);  POP(ca))    {
     entity e = ENTITY(CAR(ca));
     // FI: concrete effects are now killed by abstract effects
-    list l_callee = (list) concrete_effects_conflict_with_entities(le, e);
+    list l_callee =
+      (list) concrete_effects_entities_which_may_conflict_with_scalar_entity(le, e);
     // FI: the association with an abstract effect kills the
     // translation process below
-    // list l_callee = (list) effects_conflict_with_entities(le, e);
+    // list l_callee = (list) effects_entities_which_may_conflict_with_scalar_entity(le, e);
     /* For clarity, all cases are presented */
     if(c_language_module_p(callee) && local_entity_of_module_p(e, callee)) {
       /* No need to substitute or eliminate this value */

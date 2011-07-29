@@ -820,7 +820,8 @@ bool entities_must_conflict_p( entity e1, entity e2 ) {
    However, testing the inclusion makes sense! BC.
 */
 
-/* tests whether first reference certainely includes second one
+/**
+   tests whether first reference certainely includes second one
 
    @see first_effect_certainely_includes_second_effect_p
  */
@@ -865,7 +866,8 @@ bool first_cell_certainely_includes_second_cell_p(cell c1, cell c2)
 }
 
 
-/* tests whether first effect certainely includes second one. The effects
+/**
+   tests whether first effect certainely includes second one. The effects
    are not necessarily functions of the same store.
 
    This means that a[i]-exact does not necessarily contains a[i]-exact
@@ -903,6 +905,33 @@ bool first_effect_certainely_includes_second_effect_p(effect eff1, effect eff2)
 /* misc functions */
 
 /**
+   tests whether the input effect has a memory path from the input
+   entity e; this is currently a mere syntactic test.
+
+   other strategies could be implemented, such as building all the
+   memory locations reachable from "e" using
+   generic_effect_generate_all_accessible_paths_effects_with_level,
+   and then testing whether in the resulting effects there is an
+   effect which may conflict with en effect from the input
+   list. However, this would be very costly.
+ */
+bool effect_may_read_or_write_memory_paths_from_entity_p(effect ef, entity e)
+{
+  bool read_or_write = false;
+  if(entity_variable_p(e))
+    {
+      entity e_used = reference_variable(effect_any_reference(ef));
+      if(store_effect_p(ef) && same_entity_p(e, e_used))
+	{
+	  read_or_write = true;
+	}
+    }
+
+  return read_or_write;
+}
+
+
+/**
    tests whether the input effects list may contain effects
    with a memory path from the input entity e; this is currently a mere syntactic test.
 
@@ -920,12 +949,8 @@ bool effects_may_read_or_write_memory_paths_from_entity_p(list l_eff, entity e)
     {
       FOREACH(EFFECT, ef, l_eff)
 	{
-	  entity e_used = reference_variable(effect_any_reference(ef));
-	  if(store_effect_p(ef) && same_entity_p(e, e_used))
-	    {
-	      read_or_write = true;
-	      break;
-	    }
+	  read_or_write = effect_may_read_or_write_memory_paths_from_entity_p(ef, e);
+	  if (read_or_write) break;
 	}
     }
   return read_or_write;
@@ -946,7 +971,8 @@ bool effects_may_read_or_write_scalar_entity_p(list fx, entity e)
     FOREACH(EFFECT, ef, fx) {
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
-      if(store_effect_p(ef) && entity_scalar_p(e_used) && entities_may_conflict_p(e, e_used)) {
+      if(store_effect_p(ef) && entity_scalar_p(e_used)
+	 && entities_may_conflict_p(e, e_used)) {
         read_or_write = true;
         break;
       }
@@ -972,7 +998,8 @@ bool effects_must_read_or_write_scalar_entity_p(list fx, entity e)
     FOREACH(EFFECT, ef, fx) {
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
-      if(store_effect_p(ef) && entity_scalar_p(e_used) && entities_must_conflict_p(e, e_used)) {
+      if(store_effect_p(ef) && entity_scalar_p(e_used)
+	 && entities_must_conflict_p(e, e_used)) {
         read_or_write = true;
         break;
       }
@@ -980,5 +1007,48 @@ bool effects_must_read_or_write_scalar_entity_p(list fx, entity e)
   }
   return read_or_write;
 }
+
+
+
+/* Returns the list of entities used in effect list fx and
+   potentially conflicting with e.
+
+   Of course, abstract location entities do conflict with many
+   entities, possibly of different types.
+
+   if concrete_p==true, ignore abstract location entities.
+ */
+static list generic_effects_entities_which_may_conflict_with_scalar_entity(list fx,
+								    entity e,
+								    bool concrete_p)
+{
+  list lconflict_e = NIL;
+
+  FOREACH(EFFECT, ef, fx)
+    {
+      entity e_used = reference_variable(effect_any_reference(ef));
+      if(!(entity_abstract_location_p(e_used) && concrete_p))
+	{
+	  if(entities_may_conflict_p(e, e_used))
+	    {
+	      lconflict_e = gen_nconc(lconflict_e,
+				      CONS(ENTITY, e_used, NIL));
+	    }
+	}
+    }
+
+  return lconflict_e;
+}
+
+list effects_entities_which_may_conflict_with_scalar_entity(list fx, entity e)
+{
+  return generic_effects_entities_which_may_conflict_with_scalar_entity(fx, e, false);
+}
+
+list concrete_effects_entities_which_may_conflict_with_scalar_entity(list fx, entity e)
+{
+  return generic_effects_entities_which_may_conflict_with_scalar_entity(fx, e, true);
+}
+
 
 /** @} */

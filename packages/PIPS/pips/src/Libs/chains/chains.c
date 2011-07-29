@@ -327,7 +327,7 @@ static void mask_effects( set s, list l ) {
     if ( action_read_p( a ) ) {
       FOREACH( entity, e, l )
       {
-        if ( effect_may_conflict_with_entity_p( f, e ) ) {
+        if ( effect_may_read_or_write_memory_paths_from_entity_p( f, e ) ) {
           /* Register which one we have to mask */
           to_mask = CONS( effect, f, to_mask );
         }
