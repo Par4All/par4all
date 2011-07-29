@@ -1009,31 +1009,6 @@ bool effects_must_read_or_write_scalar_entity_p(list fx, entity e)
 }
 
 
-/**
- * @brief Check if an effect may conflict with an entity : i.e. if the entity
- * may be affected (read or write) by the effect.
- */
-bool effect_may_conflict_with_entity_p( effect eff, entity e) {
-  bool conflict_p = true;
-  entity e_used = reference_variable(effect_any_reference(eff));
-  if(!entities_may_conflict_p(e, e_used)) {
-    conflict_p = false;
-  }
-  return conflict_p;
-}
-
-
-entity effects_conflict_with_entity(cons * fx,entity e) {
-  entity conflict_e = entity_undefined;
-  FOREACH(effect,ef,fx){
-    if(effect_may_conflict_with_entity_p(ef, e)) {
-      entity e_used = reference_variable(effect_any_reference(ef));
-      conflict_e = e_used;
-      break;
-    }
-  }
-  return conflict_e;
-}
 
 /* Returns the list of entities used in effect list fx and
    potentially conflicting with e.
