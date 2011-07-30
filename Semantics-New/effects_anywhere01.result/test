@@ -1,0 +1,176 @@
+
+Proper effects
+
+void effects_anywhere01(int i, int *p)
+{
+//             <    is read   >: i
+   if (i!=1)
+      exit(1);
+   else {
+      int k;
+//             <    is read   >: i
+//             <    is written>: k
+
+      k = i;
+      
+      // If this statement is commented out, the information i==1 is
+      // found after the call in the main programm
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: l
+      int l = *p;
+//             <    is read   >: k
+
+      if (k!=1)
+         print("error\n");
+   }
+   return;
+}
+
+Cumulated effects 
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+void effects_anywhere01(int i, int *p)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+   if (i!=1)
+      exit(1);
+   else {
+      int k;
+//             <    is read   >: i
+//             <    is written>: k
+
+      k = i;
+      
+      // If this statement is commented out, the information i==1 is
+      // found after the call in the main programm
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: l
+      int l = *p;
+//             <    is read   >: k
+
+      if (k!=1)
+         print("error\n");
+   }
+   return;
+}
+
+Transformers
+
+
+//  T() {}
+
+void effects_anywhere01(int i, int *p)
+{
+
+//  T() {i==1}
+
+   if (i!=1)
+
+//  T() {0==-1}
+
+      exit(1);
+   else {
+
+//  T(k) {}
+
+      int k;
+
+//  T(k) {i==k}
+
+
+      k = i;
+      
+      // If this statement is commented out, the information i==1 is
+      // found after the call in the main programm
+
+//  T(l) {}
+
+      int l = *p;
+
+//  T() {}
+
+
+      if (k!=1)
+
+//  T() {}
+
+         print("error\n");
+   }
+
+//  T() {}
+
+   return;
+}
+
+Preconditions in "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int *p = foo();
+
+//  P() {}
+
+   int i;
+
+//  P(i) {}
+
+   effects_anywhere01(i, p);
+
+//  P(i) {}
+
+   return 0;
+}
+
+Preconditions
+
+
+//  P() {}
+
+void effects_anywhere01(int i, int *p)
+{
+
+//  P() {}
+
+   if (i!=1)
+
+//  P() {}
+
+      exit(1);
+   else {
+
+//  P() {i==1}
+
+      int k;
+
+//  P(k) {i==1}
+
+
+      k = i;
+      
+      // If this statement is commented out, the information i==1 is
+      // found after the call in the main programm
+
+//  P(k) {i==1, k==1}
+
+      int l = *p;
+
+//  P(k,l) {i==1, k==1}
+
+
+      if (k!=1)
+
+//  P() {0==-1}
+
+         print("error\n");
+   }
+
+//  P() {i==1}
+
+   return;
+}

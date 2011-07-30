@@ -136,6 +136,20 @@ activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[calcSNR]
 
 echo
+echo Cumulated effects for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
 echo Transformers for %ALLFUNC
 echo
 
