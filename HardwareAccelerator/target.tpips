@@ -19,6 +19,11 @@ echo ! initial function
 echo
 display PRINTED_FILE[${NAME}]
 #
+# possibly to some unrolling, for SPoC only
+#
+${DO_UNROLL:-#} FREIA_UNROLL_WHILE[${NAME}]
+#display PRINTED_FILE
+#
 # apply compiler and clean unused images
 #
 apply FREIA_${FREIA_TARGET}_COMPILER[${NAME}]

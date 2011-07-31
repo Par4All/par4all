@@ -35,7 +35,11 @@ int freia_51(int32_t * k)
   freia_aipo_dilate_8c(t4, out, k);
   freia_aipo_inf(out, t5, t4);
 
+  freia_aipo_global_vol(out, &volcurrent);
   do {
+    volprevious = volcurrent;
+    freia_aipo_dilate_8c(out, out, k);
+    freia_aipo_inf(out, out, in);
     freia_aipo_global_vol(out, &volcurrent);
   }
   while (volcurrent!=volprevious);
