@@ -951,12 +951,12 @@ int freia_42(void)
    freia_42_helper_0_3_0(i6, i3, i6);                                   /*0043*/
    freia_42_helper_0_4_0(i6, i1_1, i6);                                 /*0044*/
    freia_42_helper_0_5_0(i7, i1, i6);                                   /*0045*/
-   freia_common_destruct_data(i1_1);
 
    freia_common_tx_image(i7, &fdout);                                   /*0047*/
 
    freia_common_destruct_data(i0);                                      /*0049*/
    freia_common_destruct_data(i1);                                      /*0050*/
+   freia_common_destruct_data(i1_1);
    freia_common_destruct_data(i2);                                      /*0051*/
    freia_common_destruct_data(i3);                                      /*0052*/
    freia_common_destruct_data(i4);                                      /*0053*/
@@ -1008,12 +1008,12 @@ int freia_42(void)
    freia_42_helper_0_3_0(i6, i3, i6);                                   /*0043*/
    freia_42_helper_0_4_0(i6, i1_1, i6);                                 /*0044*/
    freia_42_helper_0_5_0(i7, i1, i6);                                   /*0045*/
-   freia_common_destruct_data(i1_1);
 
    freia_common_tx_image(i7, &fdout);                                   /*0047*/
 
    freia_common_destruct_data(i0);                                      /*0049*/
    freia_common_destruct_data(i1);                                      /*0050*/
+   freia_common_destruct_data(i1_1);
    freia_common_destruct_data(i2);                                      /*0051*/
    freia_common_destruct_data(i3);                                      /*0052*/
    freia_common_destruct_data(i4);                                      /*0053*/

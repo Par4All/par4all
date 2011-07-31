@@ -1275,8 +1275,7 @@ int oop_core(void)
    oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0100*/
 
    oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0104*/
-
-   freia_common_destruct_data(img1_3);
+   
    
    // skipped stuff... drawing on img0...
    
@@ -1285,6 +1284,7 @@ int oop_core(void)
    /* images destruction */
    freia_common_destruct_data(img0);                                    /*0112*/
    freia_common_destruct_data(img1);                                    /*0113*/
+   freia_common_destruct_data(img1_3);
    freia_common_destruct_data(img2);                                    /*0114*/
    freia_common_destruct_data(img3);                                    /*0115*/
    freia_common_destruct_data(imgtt0);                                  /*0116*/
@@ -1375,8 +1375,7 @@ int oop_core(void)
    oop_core_helper_0_4_0(img2, img1_3, img2, freia_morpho_kernel_6c);   /*0100*/
 
    oop_core_helper_0_5_0(img3, img1, img2, 15, 255, 1);                 /*0104*/
-
-   freia_common_destruct_data(img1_3);
+   
    
    // skipped stuff... drawing on img0...
    
@@ -1385,6 +1384,7 @@ int oop_core(void)
    /* images destruction */
    freia_common_destruct_data(img0);                                    /*0112*/
    freia_common_destruct_data(img1);                                    /*0113*/
+   freia_common_destruct_data(img1_3);
    freia_common_destruct_data(img2);                                    /*0114*/
    freia_common_destruct_data(img3);                                    /*0115*/
    freia_common_destruct_data(imgtt0);                                  /*0116*/
