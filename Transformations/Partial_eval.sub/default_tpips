@@ -1,0 +1,24 @@
+# WSPACE=foo FILE=foo.c tpips default_tpips
+# WSPACE=foo FILE=foo.c gdb path/to/tpips
+# gdb> run default_tpips
+delete $WSPACE
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WSPACE $FILE
+echo #
+echo # initial files
+echo #
+display PRINTED_FILE[%ALLFUNC]
+echo #
+echo # with preconditions
+echo #
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+echo #
+echo # after partial eval
+echo #
+apply PARTIAL_EVAL
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+close
+delete $WSPACE
+quit
