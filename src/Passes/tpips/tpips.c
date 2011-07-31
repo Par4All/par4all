@@ -267,6 +267,7 @@ static struct t_completion_scheme completion_scheme[] =
 { "activate",   COMP_RULE,       COMP_NONE },
 { SET_ENV,	COMP_NONE,	 COMP_NONE },
 { GET_ENV,	COMP_NONE,	 COMP_NONE },
+{ "unsetenv",   COMP_NONE, COMP_NONE },
 { SET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { GET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { "info",       COMP_NONE,	 COMP_NONE },
@@ -707,6 +708,8 @@ void tpips_help(string line)
 	TP_HELP("pwd", "pwd\n", "\tprint current working directory\n");
 	TP_HELP("setenv", "setenv    <name>=<value>\n",
 					"\tchange environment\n");
+	TP_HELP("unsetenv", "unsetenv    <name>\n",
+					"\tremove variable from environment\n");
 	TP_HELP("getenv", "getenv   <name>\n",
 					"\tprint from environment (echo ${<name>} also ok)\n");
 	TP_HELP("setproperty", "setproperty <name>=<value>\n",
