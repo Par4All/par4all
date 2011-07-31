@@ -278,3 +278,5 @@ FunK(freia_aipo_dilate_6c);
 // cipo
 Fun2P(freia_cipo_gradient);
 Fun2P(freia_cipo_inner_gradient);
+Fun2P(freia_cipo_open);
+Fun2P(freia_cipo_close);

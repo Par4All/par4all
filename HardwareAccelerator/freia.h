@@ -54,9 +54,11 @@ extern int32_t freia_common_get(freia_data2d *, int32_t, int32_t);
 extern freia_ptr freia_common_alloc(uint32_t);
 extern void freia_common_free(freia_ptr);
 
-// 2 CIPO functions
+// some CIPO functions
 extern freia_status freia_cipo_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
 extern freia_status freia_cipo_inner_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
+extern freia_status freia_cipo_close(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
+extern freia_status freia_cipo_open(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
 
 // AIPO function definitions
 // Arithmetic
