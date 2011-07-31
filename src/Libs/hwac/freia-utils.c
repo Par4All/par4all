@@ -641,7 +641,8 @@ void hwac_kill_statement(statement s)
 bool freia_image_variable_p(const entity var)
 {
   bool is_image = false;
-  if (entity_variable_p(var) && entity_scalar_p(var))
+  if (var && var!=entity_undefined &&
+      entity_variable_p(var) && entity_scalar_p(var))
   {
     type t = ultimate_type(entity_type(var));
     basic b = variable_basic(type_variable(t));
@@ -864,18 +865,21 @@ call freia_statement_to_call(const statement s)
   return c;
 }
 
-bool is_freia_alloc(const statement s)
+static bool is_freia_this_call(const statement s, const string fname)
 {
   call c = freia_statement_to_call(s);
   const char* called = c? entity_user_name(call_function(c)): "";
-  return same_string_p(called, FREIA_ALLOC);
+  return same_string_p(called, fname);
+}
+
+bool is_freia_alloc(const statement s)
+{
+  return is_freia_this_call(s, FREIA_ALLOC);
 }
 
 bool is_freia_dealloc(const statement s)
 {
-  call c = freia_statement_to_call(s);
-  const char* called = c? entity_user_name(call_function(c)): "";
-  return same_string_p(called, FREIA_FREE);
+  return is_freia_this_call(s, FREIA_FREE);
 }
 
 /* tell whether v1 and v2 point to statements with the same parameters.
@@ -1236,4 +1240,56 @@ int freia_aipo_count(dag d, bool with_copies)
     if (same_string_p(op, AIPO "scalar_copy")) count--;
   }
   return count;
+}
+
+/******************************************************* BUILD OUTPUT IMAGES */
+
+static void oi_call_rwt(call c, set images)
+{
+  entity called = call_function(c);
+  list args = call_arguments(c);
+  if (!args) return;
+  if (ENTITY_RETURN_P(called) ||
+      same_string_p(entity_local_name(called), FREIA_OUTPUT))
+  {
+    entity var = expression_to_entity(EXPRESSION(CAR(args)));
+    if (freia_image_variable_p(var))
+      set_add_element(images, images, var);
+  }
+}
+
+static void oi_stmt_rwt(statement s, set images)
+{
+  FOREACH(entity, var, statement_declarations(s))
+    gen_context_recurse(entity_initial(var), images,
+                        call_domain, gen_true, oi_call_rwt);
+}
+
+/* @return the set of images which are output somehow
+ * this is a little bit simplistic...
+ * read output effects of statement?
+ */
+set freia_compute_output_images(entity module, statement s)
+{
+  set images = set_make(hash_pointer);
+
+  // image formal parameters
+  FOREACH(entity, var, module_functional_parameters(module))
+  {
+    if (freia_image_variable_p(var))
+      set_add_element(images, images, var);
+  }
+
+  // some image uses in the code
+  gen_context_multi_recurse(s, images,
+                            statement_domain, gen_true, oi_stmt_rwt,
+                            call_domain, gen_true, oi_call_rwt,
+                            NULL);
+  return images;
+}
+
+set freia_compute_current_output_images(void)
+{
+  return freia_compute_output_images(get_current_module_entity(),
+                                     get_current_module_statement());
 }

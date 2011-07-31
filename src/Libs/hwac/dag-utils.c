@@ -1554,7 +1554,8 @@ static bool any_use_statement(set stats)
 
 /* @return whether there is a significant use of e outside of stats
  */
-static bool other_significant_uses(entity e, hash_table occs, set stats)
+static bool other_significant_uses
+(entity e, const hash_table occs, const set stats)
 {
   if (!occs) return true; // safe
   set all_stats = (set) hash_get(occs, e);
@@ -1572,9 +1573,12 @@ static bool other_significant_uses(entity e, hash_table occs, set stats)
  * ??? BUG the output is rather an approximation
  * should rely on used defs or out effects for the underlying
  * sequence. however, the status of chains and effects on C does not
- * allow it.
+ * allow it at the time.
+ * @param d dag to consider
+ * @param occs statement image occurences, may be NULL
+ * @param output_images images that are output, may be NULL
  */
-void dag_compute_outputs(dag d, hash_table occs)
+void dag_compute_outputs(dag d, const hash_table occs, const set output_images)
 {
   set outvars = set_make(set_pointer);
   set outs = set_make(set_pointer);
@@ -1594,8 +1598,10 @@ void dag_compute_outputs(dag d, hash_table occs)
       pips_debug(8, "entity is %s\n", safe_entity_name(out));
 
       if (out!=entity_undefined &&
-          // no successors to this vertex BUT it is used somewhere
-          ((!dagvtx_succs(v) && other_significant_uses(out, occs, stats)) ||
+          ((output_images && !set_belong_p(outvars, out) &&
+            set_belong_p(output_images, out)) ||
+           // no successors to this vertex BUT it is used somewhere
+           (!dagvtx_succs(v) && other_significant_uses(out, occs, stats)) ||
            // all non-empty successors are measures?!
            (dagvtx_succs(v) && all_mesures_p(dagvtx_succs(v))) ||
            // new function parameter not yet an output
@@ -1914,15 +1920,19 @@ static void dag_append_freia_call(dag d, statement s)
  * @param list of statements in sequence
  * @param number dag identifier in function
  * @param occurrences entity -> set of statements where they appear
+ * @param output_images set of images that are output
  */
-dag build_freia_dag(string module, list ls, int number, hash_table occurrences)
+dag build_freia_dag(string module, list ls, int number,
+                    const hash_table occurrences, const set output_images)
 {
   // build full dag
   dag fulld = make_dag(NIL, NIL, NIL);
 
   FOREACH(statement, s, ls)
     dag_append_freia_call(fulld, s);
-  dag_compute_outputs(fulld, occurrences);
+
+  dag_compute_outputs(fulld, occurrences, output_images);
+
   ifdebug(3) dag_dump(stderr, "fulld", fulld);
 
   // dump resulting dag
@@ -1995,7 +2005,7 @@ static bool image_ref_flt(reference r, entity * image)
 }
 
 // ??? l'arrache (tm)
-static entity get_upper_model(entity model, hash_table occs)
+static entity get_upper_model(entity model, const hash_table occs)
 {
   entity image = NULL;
   // first look in declarations
@@ -2019,7 +2029,7 @@ static entity get_upper_model(entity model, hash_table occs)
 }
 
 // maybe I should build another hash_table for this purpose...
-static statement allocation_statement(entity image, hash_table occs)
+static statement allocation_statement(entity image, const hash_table occs)
 {
   pips_debug(8, "look for allocation statement for %s\n", entity_name(image));
 
@@ -2049,7 +2059,7 @@ static statement allocation_statement(entity image, hash_table occs)
 
 /* @return a new image from the model
  */
-static entity new_local_image_variable(entity model, hash_table occs)
+static entity new_local_image_variable(entity model, const hash_table occs)
 {
   entity img = NULL;
   int index = 1;
@@ -2154,7 +2164,7 @@ static void switch_image_variable(dagvtx v, entity old, entity img)
 /* fix intermediate image reuse in dag
  * @return new image entities to be added to declarations
  */
-list dag_fix_image_reuse(dag d, hash_table init, hash_table occs)
+list dag_fix_image_reuse(dag d, hash_table init, const hash_table occs)
 {
   list images = NIL;
   set seen = set_make(hash_pointer);

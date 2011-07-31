@@ -120,35 +120,10 @@ static int freia_cmp_statement(const statement * s1, const statement * s2)
   return order;
 }
 
-
-// tmp debug
-/*
-static void stmt_list_nb(string msg, list l)
-{
-  fprintf(stderr, "! %s: ", msg);
-  FOREACH(statement, s, l)
-    fprintf(stderr, " %"_intFMT, statement_number(s));
-  fprintf(stderr, "\n");
-}
-
-static void stmt_seq_nb_flt(sequence sq, string msg)
-{
-  stmt_list_nb(msg, sequence_statements(sq));
-}
-
-static void stmt_seq_nb(string msg)
-{
-  gen_context_recurse(get_current_module_statement(), msg,
-                      sequence_domain, stmt_seq_nb_flt, gen_null);
-}
-*/
-
 static void sort_subsequence(list ls, sequence sq)
 {
   set cmp = set_make(set_pointer);
   set_assign_list(cmp, ls);
-  // stmt_list_nb("ls", ls);
-  // stmt_seq_nb("before");
 
   // sort ls
   gen_sort_list(ls, (gen_cmp_func_t) freia_cmp_statement);
@@ -174,7 +149,6 @@ static void sort_subsequence(list ls, sequence sq)
   sequence_statements(sq) =
     gen_nconc(gen_nreverse(head), gen_nconc(lcmp, gen_nreverse(tail)));
 
-  // stmt_seq_nb("after");
   set_free(cmp);
 }
 
@@ -315,6 +289,7 @@ string freia_compile(string module, statement mod_stat, string target)
 
   // hmmm...
   hash_table occs = freia_build_image_occurrences(mod_stat);
+  set output_images = freia_compute_current_output_images();
 
   int n_dags = 0;
   FOREACH(list, ls, fsi.seqs)
@@ -322,11 +297,13 @@ string freia_compile(string module, statement mod_stat, string target)
     list allocated = NIL;
 
     if (freia_spoc_p(target))
-      allocated = freia_spoc_compile_calls(module, ls, occs, helper, n_dags);
+      allocated = freia_spoc_compile_calls(module, ls, occs, output_images,
+                                           helper, n_dags);
     else if (freia_terapix_p(target))
-      allocated = freia_trpx_compile_calls(module, ls, occs, helper, n_dags);
+      allocated = freia_trpx_compile_calls(module, ls, occs, output_images,
+                                           helper, n_dags);
     else if (freia_aipo_p(target))
-      freia_aipo_compile_calls(module, ls, occs, n_dags);
+      freia_aipo_compile_calls(module, ls, occs, output_images, n_dags);
     gen_free_list(ls);
 
     if (allocated)
@@ -339,10 +316,10 @@ string freia_compile(string module, statement mod_stat, string target)
     n_dags++;
   }
 
+  // cleanup
   freia_clean_image_occurrences(occs);
   freia_close_dep_cache();
-
-  // cleanup
+  set_free(output_images), output_images = NULL;
   gen_free_list(fsi.seqs);
   if (helper) safe_fclose(helper, file);
 

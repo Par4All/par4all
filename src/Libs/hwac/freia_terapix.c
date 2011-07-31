@@ -1313,7 +1313,6 @@ static void freia_terapix_call
       free_dagvtx(vr);
     }
   }
-  // dag_compute_outputs(thedag);
   // cleanup
   gen_free_list(vertices), vertices = NIL;
   string_buffer_free(&head);
@@ -1565,7 +1564,8 @@ static bool terapix_not_implemented(dag d)
  * imagelet size.
  */
 static list /* of dags */
-split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx))
+split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx),
+                     const set output_images)
 {
   if (!single_image_assignement_p(initial))
     // well, it should work most of the time, so only a warning
@@ -1639,7 +1639,7 @@ split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx))
         pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
         dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd, NULL);
+      dag_compute_outputs(nd, NULL, output_images);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
@@ -1739,7 +1739,8 @@ static int cut_decision(dag d, hash_table erosion)
 
 /* cut dag "d", possibly a subdag of "fulld", at "erosion" "cut"
  */
-static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld)
+static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
+                       const set output_images)
 {
   pips_debug(2, "cutting with cut=%d\n", cut);
   pips_assert("something cut width", cut>0);
@@ -1807,7 +1808,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld)
     // pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
     dag_append_vertex(nd, copy_dagvtx_norec(v));
   }
-  dag_compute_outputs(nd, NULL);
+  dag_compute_outputs(nd, NULL, output_images);
   dag_cleanup_other_statements(nd);
 
   // cleanup full dag
@@ -1844,7 +1845,8 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld)
 list freia_trpx_compile_calls
 (string module,
  list /* of statements */ ls,
- hash_table occs,
+ const hash_table occs,
+ const set output_images,
  FILE * helper_file,
  int number)
 {
@@ -1852,7 +1854,7 @@ list freia_trpx_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  dag fulld = build_freia_dag(module, ls, number, occs);
+  dag fulld = build_freia_dag(module, ls, number, occs, output_images);
   list added_stats = freia_dag_optimize(fulld);
 
   // dump final dag
@@ -1869,7 +1871,7 @@ list freia_trpx_compile_calls
   //           \-> E -> F />
   // then ABEF / CD is chosen
   // although ABE / FCD and AB / EFCD would be also possible...
-  list ld = split_dag_on_scalars(fulld, not_implemented);
+  list ld = split_dag_on_scalars(fulld, not_implemented, output_images);
 
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
@@ -1910,7 +1912,7 @@ list freia_trpx_compile_calls
 
       while ((cut = cut_decision(d, erosion)))
       {
-        dag dc = cut_perform(d, cut, erosion, fulld);
+        dag dc = cut_perform(d, cut, erosion, fulld, output_images);
         // generate code for cut
         freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag, n_split,
                                    n_cut++, global_remainings, helper_file);

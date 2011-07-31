@@ -1212,7 +1212,8 @@ static bool is_consummed_by_vertex(dagvtx prod, dagvtx v, dag d, set todo)
  * - accelerated statements are cleaned
  */
 static void freia_spoc_pipeline
-(string module, string helper, string_buffer code, dag dpipe, list * lparams)
+(string module, string helper, string_buffer code, dag dpipe, list * lparams,
+ const set output_images)
 {
   hash_table wiring = hash_table_make(hash_int, 128);
   list outs = NIL;
@@ -1494,7 +1495,7 @@ static void freia_spoc_pipeline
       free_dagvtx(vr);
     }
   }
-  dag_compute_outputs(dpipe, NULL);
+  dag_compute_outputs(dpipe, NULL, output_images);
 
   gen_free_list(vertices), vertices = NIL;
   set_free(computed), computed = NULL;
@@ -2026,7 +2027,7 @@ static dagvtx first_which_may_be_added
  * which must be processed in that order (?)
  * side effect: dall is more or less consummed...
  */
-static list /* of dags */ split_dag(dag initial)
+static list /* of dags */ split_dag(dag initial, const set output_images)
 {
   pips_assert("no image reuse", single_image_assignement_p(initial));
 
@@ -2121,7 +2122,7 @@ static list /* of dags */ split_dag(dag initial)
         pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
         dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd, NULL);
+      dag_compute_outputs(nd, NULL, output_images);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
@@ -2168,7 +2169,8 @@ static list /* of dags */ split_dag(dag initial)
 list freia_spoc_compile_calls
   (string module,
    list /* of statements */ ls,
-   hash_table occs,
+   const hash_table occs,
+   const set output_images,
    FILE * helper_file,
    int number)
 {
@@ -2176,7 +2178,7 @@ list freia_spoc_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  dag fulld = build_freia_dag(module, ls, number, occs);
+  dag fulld = build_freia_dag(module, ls, number, occs, output_images);
   int n_op_init = freia_aipo_count(fulld, true);
   int n_op_init_copies = n_op_init - freia_aipo_count(fulld, false);
 
@@ -2200,7 +2202,7 @@ list freia_spoc_compile_calls
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
   // split dag in one-pipe dags.
-  list ld = split_dag(fulld);
+  list ld = split_dag(fulld, output_images);
 
   // nothing to do!
   // it would have been interesting not to create thehelper file in this case.
@@ -2251,7 +2253,8 @@ list freia_spoc_compile_calls
       string fname_split = strdup(cat(fname_dag, "_", itoa(split++)));
       list /* of expression */ lparams = NIL;
 
-      freia_spoc_pipeline(module, fname_split, code, d, &lparams);
+      freia_spoc_pipeline(module, fname_split, code, d, &lparams,
+                          output_images);
       freia_substitute_by_helper_call(d, global_remainings, remainings,
                                       ls, fname_split, lparams);
 
