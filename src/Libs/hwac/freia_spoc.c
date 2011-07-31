@@ -2290,7 +2290,7 @@ list freia_spoc_compile_calls
 
   // deal with new images
   list real_new_images =
-    freia_allocate_new_images_if_needed(ls, new_images, init);
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init);
   gen_free_list(new_images);
   hash_table_free(init);
   return real_new_images;

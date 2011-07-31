@@ -2027,10 +2027,14 @@ static entity get_upper_model(entity model, const hash_table occs)
   return image? image: model;
 }
 
-// maybe I should build another hash_table for this purpose...
-static statement allocation_statement(entity image, const hash_table occs)
+/* @return statement where image is allocated/deallocated
+ * maybe I should build another hash_table for this purpose?
+ */
+statement freia_memory_management_statement
+(entity image, const hash_table occs, bool alloc)
 {
-  pips_debug(8, "look for allocation statement for %s\n", entity_name(image));
+  pips_debug(8, "look for %s statement for %s\n",
+             alloc? "allocation": "deallocation", entity_name(image));
 
   if (hash_defined_p(occs, image))
   {
@@ -2042,10 +2046,18 @@ static statement allocation_statement(entity image, const hash_table occs)
         s = STATEMENT(CAR(sequence_statements(statement_sequence(s))));
 
       // fprintf(stderr, "statement %"_intFMT"?\n", statement_number(s));
-      if (is_freia_alloc(s))
+      if (alloc && is_freia_alloc(s))
       {
         call c = statement_call(s);
         pips_assert("must be an assignment", ENTITY_ASSIGN_P(call_function(c)));
+        entity var;
+        gen_context_recurse(EXPRESSION(CAR(call_arguments(c))), &var,
+                            reference_domain, image_ref_flt, gen_null);
+        if (var==image) return s;
+      }
+      else if (!alloc && is_freia_dealloc(s))
+      {
+        call c = statement_call(s);
         entity var;
         gen_context_recurse(EXPRESSION(CAR(call_arguments(c))), &var,
                             reference_domain, image_ref_flt, gen_null);
@@ -2091,7 +2103,7 @@ static entity new_local_image_variable(entity model, const hash_table occs)
       }
       else
       {
-        statement sa = allocation_statement(ref, occs);
+        statement sa = freia_memory_management_statement(ref, occs, true);
 
         if (sa)
         {

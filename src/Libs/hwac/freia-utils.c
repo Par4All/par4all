@@ -1179,7 +1179,8 @@ static void entref(reference r, hash_table count)
  * @param init new image -> initial image
  * @return actually allocated images
  */
-list freia_allocate_new_images_if_needed(list ls, list images, hash_table init)
+list freia_allocate_new_images_if_needed
+(list ls, list images, const hash_table occs, const hash_table init)
 {
   // check for used images
   hash_table count = hash_table_make(hash_pointer, 0);
@@ -1204,7 +1205,7 @@ list freia_allocate_new_images_if_needed(list ls, list images, hash_table init)
   }
   hash_table_free(count), count = NULL;
 
-  // allocate those used
+  // allocate those which are finally used
   if (allocated)
   {
     pips_assert("some statements", ls!=NIL);
@@ -1217,7 +1218,10 @@ list freia_allocate_new_images_if_needed(list ls, list images, hash_table init)
       pips_debug(7, "allocating image %s\n", entity_name(v));
       // add_declaration_statement(first, v); // NO, returned
       // insert_statement(first, image_alloc(v), true); // NO, init
-      insert_statement(last, image_free(v), false);
+      // ??? deallocation should be at end of allocation block...
+      entity model = (entity) hash_get(init, v);
+      statement s = freia_memory_management_statement(model, occs, false);
+      insert_statement(s? s: last, image_free(v), false);
     }
   }
 
