@@ -1597,9 +1597,8 @@ void dag_compute_outputs(dag d, const hash_table occs, const set output_images)
 
       pips_debug(8, "entity is %s\n", safe_entity_name(out));
 
-      if (out!=entity_undefined &&
-          ((output_images && !set_belong_p(outvars, out) &&
-            set_belong_p(output_images, out)) ||
+      if (out!=entity_undefined && !set_belong_p(outvars, out) &&
+          ((output_images && set_belong_p(output_images, out)) ||
            // no successors to this vertex BUT it is used somewhere
            (!dagvtx_succs(v) && other_significant_uses(out, occs, stats)) ||
            // all non-empty successors are measures?!
