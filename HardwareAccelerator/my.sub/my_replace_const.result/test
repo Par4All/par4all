@@ -378,12 +378,12 @@ freia_status my_replace_const_helper_0_0_0(
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_SET_CONST_RAMREG;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_SET_CONST_RAMREG;
   // now take care of actual operation
-  mcu_macro[0][1].xmin1 = imagelet_io_1_0;
-  mcu_macro[1][1].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][1].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin1 = imagelet_io_2_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = imagelet_io_1_0;
