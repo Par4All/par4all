@@ -554,9 +554,10 @@ static void terapix_macro_code
   {
   case 2:
     pips_assert("2 ins, alu operation...", out);
-    terapix_mcu_img(code, op, "xmin1", INT(CAR(ins)));
+    int img1 = INT(CAR(ins)), img2 = INT(CAR(CDR(ins)));
+    terapix_mcu_img(code, op, "xmin1", api->terapix.reverse? img2: img1);
     terapix_mcu_int(code, op, "ymin1", 0);
-    terapix_mcu_img(code, op, "xmin2", INT(CAR(CDR(ins))));
+    terapix_mcu_img(code, op, "xmin2", api->terapix.reverse? img1: img2);
     terapix_mcu_int(code, op, "ymin2", 0);
     terapix_mcu_img(code, op, "xmin3", out);
     terapix_mcu_int(code, op, "ymin3", 0);

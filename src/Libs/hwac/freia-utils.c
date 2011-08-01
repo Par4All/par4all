@@ -54,17 +54,18 @@
 
 // no operation
 #define NOPE_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
-#define NOPE_TRPX { 0, 0, 0, 0, 0, 0, false, NULL }
+#define NOPE_TRPX { 0, 0, 0, 0, 0, 0, false, false, NULL }
 
 // not implemented
 #define NO_SPOC { spoc_not_implemented, NO_POC, alu_unused, NO_MES }
-#define NO_TRPX { 0, 0, 0, 0, 0, -1, false, NULL }
+#define NO_TRPX { 0, 0, 0, 0, 0, -1, false, false, NULL }
 
-#define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, "TERAPIX_UCODE_" op }
-#define TRPX_NG(c, op) { 1, 1, 1, 1, 0, c, false, "TERAPIX_UCODE_" op }
+#define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, false, "TERAPIX_UCODE_" op }
+#define TRPX_IO(c, op) { 0, 0, 0, 0, 0, c, true, true, "TERAPIX_UCODE_" op }
+#define TRPX_NG(c, op) { 1, 1, 1, 1, 0, c, false, false, "TERAPIX_UCODE_" op }
 
 // preliminary stuff for volume/min/max/...
-#define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, "TERAPIX_UCODE_" op }
+#define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, false, "TERAPIX_UCODE_" op }
 
 // types used by AIPO parameters
 #define TY_INT "int32_t"
@@ -148,7 +149,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "replace_const", ":", AIPO "replace_const",
     1, 2, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_repcst_0, NO_MES }, TRPX_OP(3, "CONV_REPLACE_EQ_CONST")
+      NO_POC, alu_repcst_0, NO_MES }, TRPX_IO(3, "CONV_REPLACE_EQ_CONST")
   },
   // unary
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
@@ -321,7 +322,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     },
     // for terapix, this is a special case
     // I'm not sure about the cost model (h*35) for 3x3?
-    { -1, -1, -1, -1, 0, 3, false, "TERAPIX_UCODE_CONV" }
+    { -1, -1, -1, -1, 0, 3, false, false, "TERAPIX_UCODE_CONV" }
   },
   // not implemented by SPOC! nor by TERAPIX!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
