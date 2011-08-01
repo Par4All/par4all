@@ -561,7 +561,8 @@ static void terapix_macro_code
     terapix_mcu_img(code, op, "xmin3", out);
     terapix_mcu_int(code, op, "ymin3", 0);
     // ??? needed for replace const... although arg 3 is used already
-    terapix_gram_management(code, decl, op, api, v, hparams, used);
+    // replace_const special argument management is handled directly elsewhere
+    // terapix_gram_management(code, decl, op, api, v, hparams, used);
     break;
   case 1:
     // alu: image op cst 1
@@ -850,7 +851,7 @@ static void freia_terapix_call
          "  freia_op_param param;\n"
          "  freia_dynamic_param dyn_param;\n"
          "  terapix_gram gram;\n"
-         "  int i;\n"
+         "  int i;\n" // not always used...
          "  freia_status ret = FREIA_OK;\n"
          "  // data structures for reductions\n"
          "  terapix_mcu_macrocode mem_init;\n"
@@ -1014,6 +1015,26 @@ static void freia_terapix_call
     *params = gen_nconc(*params,
                         freia_extract_params(opid, call_arguments(c),
                                              head, hparams, &nargs));
+
+    // special case for replace_const, which needs a 4th argument
+    if (same_string_p(api->compact_name, ":"))
+    {
+      sb_cat(body, "  // *special* set parameter for replace_const\n");
+      terapix_mcu_int(body, n_ops, "xmin1", 0);
+      terapix_mcu_int(body, n_ops, "ymin1", 0);
+      terapix_mcu_int(body, n_ops, "xmin2", 0);
+      terapix_mcu_int(body, n_ops, "ymin2", 0);
+      terapix_gram_management(body, decl, n_ops, api, current, hparams, used);
+      terapix_mcu_val(body, n_ops, "iter1", "TERAPIX_PE_NUMBER");
+      terapix_mcu_int(body, n_ops, "iter2", 0);
+      terapix_mcu_int(body, n_ops, "iter3", 0);
+      terapix_mcu_int(body, n_ops, "iter4", 0);
+      terapix_mcu_val(body, n_ops, "addrStart",
+                      "TERAPIX_UCODE_SET_CONST_RAMREG");
+
+      sb_cat(body, "  // now take care of actual operation\n");
+      n_ops++;
+    }
 
     if (api->terapix.memory)
     {
