@@ -343,6 +343,11 @@ static void terapix_gram_allocate
  */
 static _int select_imagelet(set availables, int * nimgs, bool first)
 {
+  ifdebug(8) {
+    pips_debug(8, "selecting first=%s\n", first? "true": "false");
+    set_fprint(stderr, "availables", availables, (gen_string_func_t) itoa);
+  }
+
   _int choice = 0; // zero means no choice yet
   // allocate if no images are available
   if (set_empty_p(availables))
@@ -362,6 +367,7 @@ static _int select_imagelet(set availables, int * nimgs, bool first)
     set_del_element(availables, availables, (void*) choice);
   }
   pips_assert("some choice was made", choice>0);
+  pips_debug(8, "choice is %"_intFMT"\n", choice);
   return choice;
 }
 
@@ -1101,9 +1107,13 @@ static void freia_terapix_call
     {
       SET_FOREACH(dagvtx, v, deads)
       {
-        _int img = (_int) hash_get(allocation, v);
-        if (img<0) img=-img;
-        set_add_element(avail_img, avail_img, (void*) img);
+        // but keep intermediate output images!
+        if (!gen_in_list_p(v, dag_outputs(thedag)))
+        {
+          _int img = (_int) hash_get(allocation, v);
+          if (img<0) img=-img;
+          set_add_element(avail_img, avail_img, (void*) img);
+        }
       }
     }
 
