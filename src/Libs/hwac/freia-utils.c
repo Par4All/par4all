@@ -176,7 +176,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES },
     TRPX_OP(3, "SUB_CONST")
   },
-  { AIPO "const_sub", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "const_sub", ".-", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_cst0, NO_MES },
     TRPX_OP(3, "CONST_SUB")
   },
@@ -202,7 +202,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES },
     TRPX_OP(3, "SUBSAT_CONST?")
   },
-  { AIPO "const_subsat", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
+  { AIPO "const_subsat", ".-s", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_cst0, NO_MES },
     TRPX_OP(3, "CONST_SUBSAT?")
@@ -220,7 +220,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES },
     TRPX_OP(3, "DIV_CONST")
   },
-  { AIPO "const_div", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "const_div", "./", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_cst0, NO_MES },
     TRPX_OP(3, "CONST_DIV?")
   },
