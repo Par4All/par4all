@@ -969,6 +969,21 @@ void freia_substitute_by_helper_call
   set_free(dones);
 }
 
+static statement find_last_aipo_statement(list ls)
+{
+  statement found = NULL;
+  FOREACH(statement, s, ls)
+  {
+    if (freia_statement_aipo_call_p(s))
+      if (!found || statement_number(found)<statement_number(s))
+        found = s;
+  }
+  // ??? au pif
+  if (!found && ls)
+    found = STATEMENT(CAR(gen_last(ls)));
+  return found;
+}
+
 /* insert added statements to actual code sequence in "ls"
  * beware that ls is assumed to be in reverse order
  */
@@ -976,8 +991,7 @@ void freia_insert_added_stats(list ls, list added_stats)
 {
   if (added_stats)
   {
-    statement slast = STATEMENT(CAR(ls));
-    // fprintf(stderr, "adding stats to %p\n", slast);
+    statement slast = find_last_aipo_statement(ls);
     instruction ilast = statement_instruction(slast);
     statement newstat = instruction_to_statement(ilast);
     // transfer comments and some cleanup...
