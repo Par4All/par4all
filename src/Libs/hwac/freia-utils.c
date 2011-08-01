@@ -166,7 +166,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "inf_const", "<.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_inf_0cst, NO_MES },
-    TRPX_OP(3, "INF_CONST?")
+    TRPX_OP(3, "INF_CONST")
   },
   { AIPO "sup_const", ">.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES },
