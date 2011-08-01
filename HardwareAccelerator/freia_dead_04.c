@@ -6,7 +6,7 @@ int freia_dead_04(int32_t * kernel)
    freia_dataio fdin, fdout;
 
    freia_common_open_input(&fdin, 0);
-   freia_common_open_output(&fdout, 1);
+   freia_common_open_output(&fdout, 1, 1024, 720, 16);
 
    freia_data2d *in, *t, *out;
 
@@ -25,7 +25,7 @@ int freia_dead_04(int32_t * kernel)
 
    // cleanup
    freia_common_destruct_data(in);
-   freia_common_destruct_data(t1);
+   freia_common_destruct_data(t);
    freia_common_destruct_data(out);
 
    freia_common_close_input(&fdin);
