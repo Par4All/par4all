@@ -38,7 +38,10 @@ setproperty ABORT_ON_USER_ERROR FALSE
 echo
 echo ! graphs
 echo
+# this fails in some case where there is no graph
 shell cat ./${WSPACE}.database/${NAME}/*.dot
+# back to normal
+setproperty ABORT_ON_USER_ERROR TRUE
 echo
 echo ! acceleration function
 echo

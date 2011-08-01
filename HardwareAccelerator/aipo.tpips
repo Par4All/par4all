@@ -38,6 +38,7 @@ shell cat ./${WSPACE}.database/${NAME}/*.dot
 #
 # new function code
 #
+setproperty ABORT_ON_USER_ERROR TRUE
 echo
 echo ! updated function for ${FREIA_TARGET}
 echo
