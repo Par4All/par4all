@@ -66,9 +66,9 @@ int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in
    freia_data2d *tmp;                                                   /*0007*/
    tmp = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);  /*0008*/
 
-   freia_aipo_dilate_8c(tmp, in, freia_morpho_kernel_8c);
+   freia_aipo_dilate_8c(tmp, in, freia_morpho_kernel_8c);               /*0010*/
+   freia_aipo_add(out1, tmp, in);
    freia_aipo_copy(out0, out1);
-   freia_aipo_add(out1, tmp, in);                                       /*0011*/
 
    freia_common_destruct_data(tmp);                                     /*0014*/
    return 0;                                                            /*0015*/
@@ -238,7 +238,7 @@ freia_status freia_dead_08_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in)
 {
 
-   freia_dead_08_helper_0_0_0(out1, in, freia_morpho_kernel_8c);
+   freia_dead_08_helper_0_0_0(out1, in, freia_morpho_kernel_8c);        /*0010*/
    freia_aipo_copy(out0, out1);
 
    return 0;                                                            /*0015*/
@@ -249,7 +249,7 @@ int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in
 int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in)
 {
 
-   freia_dead_08_helper_0_0_0(out1, in, freia_morpho_kernel_8c);
+   freia_dead_08_helper_0_0_0(out1, in, freia_morpho_kernel_8c);        /*0010*/
    freia_aipo_copy(out0, out1);
 
    return 0;                                                            /*0015*/
@@ -518,7 +518,7 @@ freia_status freia_dead_08_helper_0_0_0(
 int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in)
 {
 
-   freia_dead_08_helper_0_0_0(out1, in, freia_morpho_kernel_8c);
+   freia_dead_08_helper_0_0_0(out1, in, freia_morpho_kernel_8c);        /*0010*/
    freia_aipo_copy(out0, out1);
 
    return 0;                                                            /*0015*/
@@ -529,7 +529,7 @@ int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in
 int freia_dead_08(freia_data2d *out0, freia_data2d *out1, const freia_data2d *in)
 {
 
-   freia_dead_08_helper_0_0_0(out1, in, freia_morpho_kernel_8c);
+   freia_dead_08_helper_0_0_0(out1, in, freia_morpho_kernel_8c);        /*0010*/
    freia_aipo_copy(out0, out1);
 
    return 0;                                                            /*0015*/
