@@ -648,6 +648,59 @@ switch_vertex_to_assign(dagvtx target, dagvtx source)
   return false;
 }
 
+/* subtitute produced or used image in the statement of vertex v.
+ * @param v vertex
+ * @param source image variable to replace
+ * @param target new image variable to use
+ * @param used whether to replace used image (input, forward propagation)
+ *             or procuded image (output, backward propagation)
+ */
+static void substitute_image_in_statement
+(dagvtx v, entity source, entity target, bool used)
+{
+  pips_debug(8, "image %s -> %s in %"_intFMT"\n",
+             entity_name(source), entity_name(target), dagvtx_number(v));
+
+  int nsubs=0;
+  vtxcontent vc = dagvtx_content(v);
+  pstatement ps = vtxcontent_source(vc);
+  pips_assert("is a statement", pstatement_statement_p(ps));
+
+  // get call
+  call c = freia_statement_to_call(pstatement_statement(ps));
+  list args = call_arguments(c);
+
+  const freia_api_t * api = dagvtx_freia_api(v);
+
+  // how many argument to skip, how many to replace
+  unsigned int skip, subs;
+
+  if (used)
+    skip = api->arg_img_out, subs = api->arg_img_in;
+  else
+    skip = 0, subs = api->arg_img_out;
+
+  pips_assert("call length is okay", gen_length(args)>=skip+subs);
+
+  while (skip--)
+    args = CDR(args);
+
+  while (subs--)
+  {
+    expression e = EXPRESSION(CAR(args));
+    // I'm not sure what to do if an image is not a simple reference...
+    pips_assert("image argument is a reference", expression_reference_p(e));
+    reference r = expression_reference(e);
+
+    if (reference_variable(r)==source)
+      nsubs++, reference_variable(r) = target;
+    args = CDR(args);
+  }
+
+  // ??? Hmmm... this happens in freia_3muls, not sure why.
+  // pips_assert("some image substitutions", nsubs>0);
+}
+
 /* replace target vertex by a copy of source results...
  * @param target to be removed
  * @param source does perform the same computation
@@ -656,7 +709,7 @@ switch_vertex_to_assign(dagvtx target, dagvtx source)
 static void switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
 {
   pips_debug(5, "replacing %"_intFMT" by %"_intFMT"\n",
-       dagvtx_number(target), dagvtx_number(source));
+             dagvtx_number(target), dagvtx_number(source));
 
   ifdebug(9) {
     dagvtx_dump(stderr, "in source", source);
@@ -672,13 +725,16 @@ static void switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
   vtxcontent_inputs(cot) = CONS(entity, src_img, NIL);
 
   // fix vertices
-
   FOREACH(dagvtx, v, tpreds)
     gen_remove(&dagvtx_succs(v), target);
 
+  entity trg_img = dagvtx_image(target);
   FOREACH(dagvtx, s, dagvtx_succs(target))
-    gen_list_patch(vtxcontent_inputs(dagvtx_content(s)),
-       dagvtx_image(target), src_img);
+  {
+    gen_list_patch(vtxcontent_inputs(dagvtx_content(s)), trg_img, src_img);
+    // also fix subsequent statements, for AIPO output
+    substitute_image_in_statement(s, trg_img, src_img, true);
+  }
   dagvtx_succs(source) = gen_once(target, dagvtx_succs(source));
   dagvtx_succs(source) = gen_nconc(dagvtx_succs(target), dagvtx_succs(source));
   dagvtx_succs(target) = NIL;
@@ -722,62 +778,13 @@ static bool list_commuted_p(const list l1, const list l2)
     CHUNKP(CAR(l1))==CHUNKP(CAR(CDR(l2)));
 }
 
-/* subtitute produced or used image in the statement of vertex v.
- * @param v vertex
- * @param source image variable to replace
- * @param target new image variable to use
- * @param used whether to replace used image (input, forward propagation)
- *             or procuded image (output, backward propagation)
- */
-static void substitute_image_in_statement
-(dagvtx v, entity source, entity target, bool used)
-{
-  int nsubs=0;
-  vtxcontent vc = dagvtx_content(v);
-  pstatement ps = vtxcontent_source(vc);
-  pips_assert("is a statement", pstatement_statement_p(ps));
-
-  // get call
-  call c = freia_statement_to_call(pstatement_statement(ps));
-  list args = call_arguments(c);
-
-  const freia_api_t * api = dagvtx_freia_api(v);
-
-  // how many argument to skip, how many to replace
-  unsigned int skip, subs;
-
-  if (used)
-    skip = api->arg_img_out, subs = api->arg_img_in;
-  else
-    skip = 0, subs = api->arg_img_out;
-
-  pips_assert("call length is okay", gen_length(args)>=skip+subs);
-
-  while (skip--)
-    args = CDR(args);
-
-  while (subs--)
-  {
-    expression e = EXPRESSION(CAR(args));
-    // I'm not sure what to do if an image is not a simple reference...
-    pips_assert("image argument is a reference", expression_reference_p(e));
-    reference r = expression_reference(e);
-
-    if (reference_variable(r)==source)
-      nsubs++, reference_variable(r) = target;
-    args = CDR(args);
-  }
-
-  // ??? Hmmm... this happens in freia_3muls, not sure why.
-  // pips_assert("some image substitutions", nsubs>0);
-}
-
-
 /* "copy" copies "source" image in dag "d".
  * remove it properly (forward copy propagation)
  */
 static void unlink_copy_vertex(dag d, const entity source, dagvtx copy)
 {
+  pips_debug(8, "unlinking %"_intFMT"\n", dagvtx_number(copy));
+
   entity target = vtxcontent_out(dagvtx_content(copy));
   // may be NULL if source is an input
   dagvtx prod = dagvtx_get_producer(d, copy, source, 0);
