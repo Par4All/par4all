@@ -85,7 +85,7 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
    
    // variable reuse & duplicate operations?
    freia_aipo_erode_6c(o0, i, k);                                       /*0009*/
-   freia_aipo_erode_6c(t, t, k);                                        /*0011*/
+   freia_aipo_erode_6c(t, o0, k);                                       /*0011*/
    freia_aipo_dilate_6c(o1, i, k);                                      /*0012*/
    freia_aipo_dilate_6c(o1, o1, k);                                     /*0013*/
    freia_aipo_sub(o1, o1, t);                                           /*0014*/

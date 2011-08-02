@@ -224,7 +224,7 @@ int anr999_01(void)
    I_6 = 0;                                                             /*0045*/
    I_6;                                                                 /*0046*/
 
-   freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);                  /*0052*/
+   freia_aipo_dilate_8c(t, od, freia_morpho_kernel_8c);                 /*0052*/
    freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);                  /*0053*/
    i_1 = 10;                                                            /*0054*/
 

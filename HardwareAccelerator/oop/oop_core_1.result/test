@@ -337,7 +337,7 @@ int oop_core(void)
    freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
    freia_aipo_sub(img2, imtmp_7, img2);                                 /*0097*/
 
-   freia_aipo_absdiff(img2, imgtmp, img2);                              /*0100*/
+   freia_aipo_absdiff(img2, img1, img2);                                /*0100*/
 
    freia_aipo_erode_6c(img2, img2, freia_morpho_kernel_6c);             /*0102*/
    freia_aipo_dilate_6c(img2, img2, freia_morpho_kernel_6c);            /*0103*/

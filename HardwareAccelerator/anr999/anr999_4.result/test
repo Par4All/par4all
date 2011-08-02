@@ -282,7 +282,6 @@ int anr999(void)
    int I_10_0;                                                          /*0022*/
    int I_3_0;                                                           /*0023*/
    freia_status ret_0;                                                  /*0024*/
-   freia_data2d *t;                                                     /*0025*/
    int i_1;                                                             /*0026*/
    int i_2;                                                             /*0027*/
 
@@ -294,9 +293,8 @@ int anr999(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
-
-   t = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);    /*0056*/
-
+   
+   
    freia_aipo_global_min(in, &measure_min);                             /*0038*/
    freia_aipo_global_vol(in, &measure_vol);                             /*0039*/
 
@@ -334,9 +332,8 @@ int anr999(void)
 
    I_10_0 = 0;                                                          /*0085*/
    ret_0 |= I_10_0;                                                     /*0086*/
-   ret_0 |= freia_aipo_sub(og, t, og);                                  /*0087*/
+   ret_0 |= freia_aipo_sub(og, od, og);                                 /*0087*/
 
-   freia_common_destruct_data(t);                                       /*0089*/
    I_13 = 0;                                                            /*0090*/
    I_13;                                                                /*0091*/
 
