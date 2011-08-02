@@ -1,0 +1,4 @@
+setenv WS=400
+setenv FILES=$WS.perlbench/src/*.c
+quit
+

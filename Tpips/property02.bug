@@ -1,0 +1,6 @@
+setenv WS "400"
+[gen_alloc] (/home/francois/MYPIPS/prod/newgen/src/genC/genClib.c:309) assertion failed
+
+ gen_read_spec not performed prior to use not verified
+
+Aborted
