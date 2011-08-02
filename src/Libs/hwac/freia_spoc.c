@@ -2178,7 +2178,7 @@ list freia_spoc_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  dag fulld = build_freia_dag(module, ls, number, occs, output_images);
+  dag fulld = freia_build_dag(module, ls, number, occs, output_images);
   int n_op_init = freia_aipo_count(fulld, true);
   int n_op_init_copies = n_op_init - freia_aipo_count(fulld, false);
 

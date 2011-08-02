@@ -51,7 +51,7 @@ void freia_aipo_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  dag fulld = build_freia_dag(module, ls, number, occs, output_images);
+  dag fulld = freia_build_dag(module, ls, number, occs, output_images);
   list added_stats = freia_dag_optimize(fulld);
 
   // dump final dag

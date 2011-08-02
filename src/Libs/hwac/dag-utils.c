@@ -1921,7 +1921,7 @@ static void dag_append_freia_call(dag d, statement s)
  * @param occurrences entity -> set of statements where they appear
  * @param output_images set of images that are output
  */
-dag build_freia_dag(string module, list ls, int number,
+dag freia_build_dag(string module, list ls, int number,
                     const hash_table occurrences, const set output_images)
 {
   // build full dag
