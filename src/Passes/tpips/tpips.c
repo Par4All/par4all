@@ -908,6 +908,7 @@ static string tp_substitutions(string line)
 		if (line_with_substitutions(substituted))
 		{
       // not sure whether there is really an error, so we cannot abort
+			tpips_init();
 			pips_user_warning("maybe error in substituted lines:\n\t%s\n"
 												"For instance, check location of your source files.\n",
 												substituted);
@@ -981,7 +982,15 @@ static void tpips_exec(char * line)
 		/* leading setenv/getenv in a tpips script are performed
 		 * PRIOR to pips initialization, hence the environment variable
 		 * NEWGEN_MAX_TABULATED_ELEMENTS can be taken into account
-		 * for a run. little of a hack.
+		 * for a run. little of a hack. That results in a core
+		 * dump when the tpips script starts with setenv
+		 * commands generating user warnings because those
+		 * imply a check of the property NO_USER_WARNING. Also
+		 * errors are likely to lead to a check of
+		 * ABORT_ON_USER_ERROR. And properties cannot be used
+		 * before tpips_init() has been executed. So
+		 * pips_user_warning() have to be protected in tpips.c
+		 * by a preliminary call to tpips_init()
 		 */
 		if (!tpips_init_done &&
 				strncmp(line, SET_ENV, strlen(SET_ENV))!=0 &&
