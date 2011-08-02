@@ -684,8 +684,8 @@ freia_status freia_49_helper_0_0_0(
   mcu_macro[1][2].iter3 = 0;
   mcu_macro[0][2].iter4 = 0;
   mcu_macro[1][2].iter4 = 0;
-  mcu_macro[0][2].addrStart = TERAPIX_UCODE_INF_CONST?;
-  mcu_macro[1][2].addrStart = TERAPIX_UCODE_INF_CONST?;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_INF_CONST;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_INF_CONST;
   // 3: <(2,3) -> 3
   mcu_macro[0][3].xmin1 = imagelet_2;
   mcu_macro[1][3].xmin1 = imagelet_2;
