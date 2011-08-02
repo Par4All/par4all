@@ -22,8 +22,12 @@ typedef struct {
 typedef void * freia_ptr;
 
 // no checks, code is assume correct
-#define freia_common_check_image_bpp_compat(a,b,c) true
-#define freia_common_check_image_window_compat(a,b,c) true
+// see freiaCommonData.c for details
+#define freia_common_check_image_window_compat(args...) (true)
+#define freia_common_check_image_size_compat(args...) (true)
+#define freia_common_check_image_bpp_compat(args...) (true)
+#define freia_common_check_image_not_null(args...) (true)
+#define freia_common_check_value_compat(args...) (true)
 
 // for CIPO
 static const int32_t freia_morpho_kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
