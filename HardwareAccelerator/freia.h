@@ -42,7 +42,7 @@ extern freia_status freia_common_tx_image(const freia_data2d *, freia_dataio *);
 extern freia_status freia_common_close_input(freia_dataio *);
 extern freia_status freia_common_close_output(freia_dataio *);
 
-// common functions, should be in AIPO
+// common functions, some should be in AIPO
 extern freia_status freia_common_draw_line(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
 extern freia_status freia_common_draw_rect(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
 extern freia_status freia_common_draw_disc(freia_data2d *, int32_t, int32_t, int32_t, int32_t);
@@ -50,6 +50,8 @@ extern freia_status freia_common_set_wa(freia_data2d *, int32_t, int32_t, int32_
 extern freia_status freia_common_reset_wa(freia_data2d *);
 
 // Misc
+extern void freia_initialize(int, char **);
+extern void freia_shutdown(void);
 extern int32_t freia_common_get(freia_data2d *, int32_t, int32_t);
 extern freia_ptr freia_common_alloc(uint32_t);
 extern void freia_common_free(freia_ptr);

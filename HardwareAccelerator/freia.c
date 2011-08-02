@@ -120,6 +120,16 @@ freia_status freia_common_reset_wa(freia_data2d *image)
   return FREIA_OK;
 }
 
+void freia_initialize(int argc, char * argv[])
+{
+  global_io_effect++;
+}
+
+void freia_shutdown(void)
+{
+  global_io_effect++;
+}
+
 #define Fbin(name)                                        \
   freia_status                                            \
   name(freia_data2d * o,                                  \

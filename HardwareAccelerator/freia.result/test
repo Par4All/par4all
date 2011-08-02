@@ -332,6 +332,14 @@ freia_status freia_common_tx_image(const freia_data2d *img, freia_dataio *out)
    global_io_effect++;
    return FREIA_OK;
 }
+void freia_initialize(int argc, char *argv[])
+{
+   global_io_effect++;
+}
+void freia_shutdown(void)
+{
+   global_io_effect++;
+}
 //             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
 //             <    is written>: o[0].stuff
 freia_status freia_aipo_absdiff(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
@@ -965,6 +973,22 @@ freia_status freia_common_tx_image(const freia_data2d *img, freia_dataio *out)
 //             <    is written>: global_io_effect
    global_io_effect++;
    return FREIA_OK;
+}
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
+void freia_initialize(int argc, char *argv[])
+{
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
+   global_io_effect++;
+}
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
+void freia_shutdown(void)
+{
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
+   global_io_effect++;
 }
 #
 # compile generated freia
