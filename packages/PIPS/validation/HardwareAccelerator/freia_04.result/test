@@ -430,7 +430,7 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    // v  = vol(t3)
    // m  = min(t4)
    // o  = t4 + t3
-   freia_04_helper_0_0_0(o, i, k, inf, sup, bin, v, m);                 /*0033*/
+   freia_04_helper_0_0_0(o, i, k, inf, sup, bin, v, m);                 /*0026*/
    
    
    return FREIA_OK;                                                     /*0041*/
@@ -455,7 +455,7 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    // v  = vol(t3)
    // m  = min(t4)
    // o  = t4 + t3
-   freia_04_helper_0_0_0(o, i, k, inf, sup, bin, v, m);                 /*0033*/
+   freia_04_helper_0_0_0(o, i, k, inf, sup, bin, v, m);                 /*0026*/
    
    
    return 0;                                                            /*0041*/
@@ -1052,7 +1052,7 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    // v  = vol(t3)
    // m  = min(t4)
    // o  = t4 + t3
-   freia_04_helper_0_0_0(o, i, k, inf, sup, bin, v, m);                 /*0033*/
+   freia_04_helper_0_0_0(o, i, k, inf, sup, bin, v, m);                 /*0026*/
    
    
    return FREIA_OK;                                                     /*0041*/
@@ -1077,7 +1077,7 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    // v  = vol(t3)
    // m  = min(t4)
    // o  = t4 + t3
-   freia_04_helper_0_0_0(o, i, k, inf, sup, bin, v, m);                 /*0033*/
+   freia_04_helper_0_0_0(o, i, k, inf, sup, bin, v, m);                 /*0026*/
    
    
    return 0;                                                            /*0041*/

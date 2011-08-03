@@ -288,7 +288,7 @@ freia_status freia_56(freia_data2d *out, freia_data2d *in)
 {
    // same as freia_55, but out is used as a temporary
    
-   freia_56_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0013*/
+   freia_56_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0010*/
 
    return FREIA_OK;                                                     /*0017*/
 }
@@ -299,7 +299,7 @@ freia_status freia_56(freia_data2d *out, freia_data2d *in)
 {
    // same as freia_55, but out is used as a temporary
    
-   freia_56_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0013*/
+   freia_56_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0010*/
 
    return 0;                                                            /*0017*/
 }
@@ -560,8 +560,8 @@ freia_status freia_56_helper_0_0_0(
   mcu_macro[1][2].iter3 = 0;
   mcu_macro[0][2].iter4 = 0;
   mcu_macro[1][2].iter4 = 0;
-  mcu_macro[0][2].addrStart = TERAPIX_UCODE_INF_CONST?;
-  mcu_macro[1][2].addrStart = TERAPIX_UCODE_INF_CONST?;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_INF_CONST;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_INF_CONST;
   // 3: <(2,1) -> 1
   mcu_macro[0][3].xmin1 = imagelet_2;
   mcu_macro[1][3].xmin1 = imagelet_2;
@@ -641,7 +641,7 @@ freia_status freia_56(freia_data2d *out, freia_data2d *in)
 {
    // same as freia_55, but out is used as a temporary
    
-   freia_56_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0013*/
+   freia_56_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0010*/
 
    return FREIA_OK;                                                     /*0017*/
 }
@@ -652,7 +652,7 @@ freia_status freia_56(freia_data2d *out, freia_data2d *in)
 {
    // same as freia_55, but out is used as a temporary
    
-   freia_56_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0013*/
+   freia_56_helper_0_0_0(out, in, freia_morpho_kernel_8c, 255);         /*0010*/
 
    return 0;                                                            /*0017*/
 }

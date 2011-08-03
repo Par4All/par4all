@@ -174,10 +174,8 @@ int freia_43(void)
    freia_data2d *i2;                                                    /*0011*/
    freia_data2d *i3;                                                    /*0012*/
    freia_data2d *i4;                                                    /*0013*/
-   freia_data2d *i5;                                                    /*0014*/
    freia_data2d *i6;                                                    /*0015*/
    freia_data2d *i7;                                                    /*0016*/
-   freia_data2d *i9;                                                    /*0018*/
    freia_data2d *ia;                                                    /*0019*/
    freia_data2d *ib;                                                    /*0020*/
    freia_data2d *ic;                                                    /*0021*/
@@ -190,10 +188,8 @@ int freia_43(void)
    i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0028*/
    i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0029*/
    i4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0030*/
-   i5 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0031*/
    i6 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0032*/
    i7 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0033*/
-   i9 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0035*/
    ia = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0036*/
    ib = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0037*/
    ic = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0038*/
@@ -210,8 +206,8 @@ int freia_43(void)
    freia_aipo_sub(ic, i3, i1);                                          /*0049*/
    freia_aipo_absdiff(id, i2, ic);                                      /*0050*/
    freia_aipo_erode_8c(i6, i4, freia_morpho_kernel_8c);                 /*0054*/
-   freia_aipo_sub(ia, i5, i6);                                          /*0055*/
-   freia_aipo_absdiff(ib, i9, ia);                                      /*0056*/
+   freia_aipo_sub(ia, i3, i6);                                          /*0055*/
+   freia_aipo_absdiff(ib, ic, ia);                                      /*0056*/
    freia_aipo_inf(i7, ib, id);                                          /*0057*/
 
    freia_common_tx_image(i7, &fdout);                                   /*0059*/
@@ -221,10 +217,8 @@ int freia_43(void)
    freia_common_destruct_data(i2);                                      /*0063*/
    freia_common_destruct_data(i3);                                      /*0064*/
    freia_common_destruct_data(i4);                                      /*0065*/
-   freia_common_destruct_data(i5);                                      /*0066*/
    freia_common_destruct_data(i6);                                      /*0067*/
    freia_common_destruct_data(i7);                                      /*0068*/
-   freia_common_destruct_data(i9);                                      /*0070*/
    freia_common_destruct_data(ia);                                      /*0071*/
    freia_common_destruct_data(ib);                                      /*0072*/
    freia_common_destruct_data(ic);                                      /*0073*/
@@ -1001,9 +995,9 @@ int freia_43(void)
    freia_common_rx_image(i2, &fdin);                                    /*0044*/
    freia_common_rx_image(i4, &fdin);                                    /*0045*/
 
-   freia_43_helper_0_1_0(i3, ic, i0, i1, freia_morpho_kernel_8c);       /*0049*/
+   freia_43_helper_0_1_0(i3, ic, i0, i1, freia_morpho_kernel_8c);       /*0047*/
+   freia_43_helper_0_0_0(i1, i6, i0, i4, freia_morpho_kernel_8c);       /*0048*/
    freia_43_helper_0_2_0(id, i2, ic);                                   /*0050*/
-   freia_43_helper_0_0_0(i1, i6, i0, i4, freia_morpho_kernel_8c);       /*0054*/
    freia_43_helper_0_3_0(ia, i3, i6);                                   /*0055*/
    freia_43_helper_0_4_0(ib, ia, ic);                                   /*0056*/
    freia_43_helper_0_5_0(i7, ib, id);                                   /*0057*/
@@ -1066,9 +1060,9 @@ int freia_43(void)
    freia_common_rx_image(i2, &fdin);                                    /*0044*/
    freia_common_rx_image(i4, &fdin);                                    /*0045*/
 
-   freia_43_helper_0_1_0(i3, ic, i0, i1, freia_morpho_kernel_8c);       /*0049*/
+   freia_43_helper_0_1_0(i3, ic, i0, i1, freia_morpho_kernel_8c);       /*0047*/
+   freia_43_helper_0_0_0(i1, i6, i0, i4, freia_morpho_kernel_8c);       /*0048*/
    freia_43_helper_0_2_0(id, i2, ic);                                   /*0050*/
-   freia_43_helper_0_0_0(i1, i6, i0, i4, freia_morpho_kernel_8c);       /*0054*/
    freia_43_helper_0_3_0(ia, i3, i6);                                   /*0055*/
    freia_43_helper_0_4_0(ib, ia, ic);                                   /*0056*/
    freia_43_helper_0_5_0(i7, ib, id);                                   /*0057*/
@@ -1655,7 +1649,7 @@ int freia_43(void)
    freia_common_rx_image(i2, &fdin);                                    /*0044*/
    freia_common_rx_image(i4, &fdin);                                    /*0045*/
 
-   freia_43_helper_0_0_0(i7, i0, i2, i4, freia_morpho_kernel_8c);       /*0057*/
+   freia_43_helper_0_0_0(i7, i0, i2, i4, freia_morpho_kernel_8c);       /*0047*/
 
    freia_common_tx_image(i7, &fdout);                                   /*0059*/
 
@@ -1694,7 +1688,7 @@ int freia_43(void)
    freia_common_rx_image(i2, &fdin);                                    /*0044*/
    freia_common_rx_image(i4, &fdin);                                    /*0045*/
 
-   freia_43_helper_0_0_0(i7, i0, i2, i4, freia_morpho_kernel_8c);       /*0057*/
+   freia_43_helper_0_0_0(i7, i0, i2, i4, freia_morpho_kernel_8c);       /*0047*/
 
    freia_common_tx_image(i7, &fdout);                                   /*0059*/
 

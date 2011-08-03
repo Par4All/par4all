@@ -22,8 +22,12 @@ typedef struct {
 typedef void * freia_ptr;
 
 // no checks, code is assume correct
-#define freia_common_check_image_bpp_compat(a,b,c) true
-#define freia_common_check_image_window_compat(a,b,c) true
+// see freiaCommonData.c for details
+#define freia_common_check_image_window_compat(args...) (true)
+#define freia_common_check_image_size_compat(args...) (true)
+#define freia_common_check_image_bpp_compat(args...) (true)
+#define freia_common_check_image_not_null(args...) (true)
+#define freia_common_check_value_compat(args...) (true)
 
 // for CIPO
 static const int32_t freia_morpho_kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -42,7 +46,7 @@ extern freia_status freia_common_tx_image(const freia_data2d *, freia_dataio *);
 extern freia_status freia_common_close_input(freia_dataio *);
 extern freia_status freia_common_close_output(freia_dataio *);
 
-// common functions, should be in AIPO
+// common functions, some should be in AIPO
 extern freia_status freia_common_draw_line(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
 extern freia_status freia_common_draw_rect(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
 extern freia_status freia_common_draw_disc(freia_data2d *, int32_t, int32_t, int32_t, int32_t);
@@ -50,13 +54,17 @@ extern freia_status freia_common_set_wa(freia_data2d *, int32_t, int32_t, int32_
 extern freia_status freia_common_reset_wa(freia_data2d *);
 
 // Misc
+extern void freia_initialize(int, char **);
+extern void freia_shutdown(void);
 extern int32_t freia_common_get(freia_data2d *, int32_t, int32_t);
 extern freia_ptr freia_common_alloc(uint32_t);
 extern void freia_common_free(freia_ptr);
 
-// 2 CIPO functions
+// some CIPO functions
 extern freia_status freia_cipo_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
 extern freia_status freia_cipo_inner_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
+extern freia_status freia_cipo_close(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
+extern freia_status freia_cipo_open(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
 
 // AIPO function definitions
 // Arithmetic

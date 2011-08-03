@@ -275,7 +275,7 @@ freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t1 = f(i)
    // t2 = g(i)
    // o  = t1 - t2
-   freia_34_helper_0_0_0(o, i, k);                                      /*0015*/
+   freia_34_helper_0_0_0(o, i, k);                                      /*0013*/
    
    
    return FREIA_OK;                                                     /*0020*/
@@ -292,7 +292,7 @@ freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t1 = f(i)
    // t2 = g(i)
    // o  = t1 - t2
-   freia_34_helper_0_0_0(o, i, k);                                      /*0015*/
+   freia_34_helper_0_0_0(o, i, k);                                      /*0013*/
    
    
    return 0;                                                            /*0020*/
@@ -600,7 +600,7 @@ freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t1 = f(i)
    // t2 = g(i)
    // o  = t1 - t2
-   freia_34_helper_0_0_0(o, i, k);                                      /*0015*/
+   freia_34_helper_0_0_0(o, i, k);                                      /*0013*/
    
    
    return FREIA_OK;                                                     /*0020*/
@@ -617,7 +617,7 @@ freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t1 = f(i)
    // t2 = g(i)
    // o  = t1 - t2
-   freia_34_helper_0_0_0(o, i, k);                                      /*0015*/
+   freia_34_helper_0_0_0(o, i, k);                                      /*0013*/
    
    
    return 0;                                                            /*0020*/

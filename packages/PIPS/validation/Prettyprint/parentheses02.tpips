@@ -1,0 +1,14 @@
+delete parentheses02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create parentheses02 parentheses02.f
+
+setproperty PRETTYPRINT_ALL_PARENTHESES TRUE
+
+module PARENTHESES02
+display PRINTED_FILE[PARENTHESES02]
+close
+delete parentheses02
+quit
+

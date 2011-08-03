@@ -257,7 +257,7 @@ freia_status freia_31(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
    // parallel reuses (similar to freia_27)
    // o0 = i ^ i
    // o1 = f(i)
-   freia_31_helper_0_0_0(o0, o1, i, 10, 20, true);                      /*0010*/
+   freia_31_helper_0_0_0(o0, o1, i, 10, 20, true);                      /*0009*/
 
    return FREIA_OK;                                                     /*0012*/
 }
@@ -269,7 +269,7 @@ freia_status freia_31(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
    // parallel reuses (similar to freia_27)
    // o0 = i ^ i
    // o1 = f(i)
-   freia_31_helper_0_0_0(o0, o1, i, 10, 20, 1);                         /*0010*/
+   freia_31_helper_0_0_0(o0, o1, i, 10, 20, 1);                         /*0009*/
 
    return 0;                                                            /*0012*/
 }
@@ -551,7 +551,7 @@ freia_status freia_31(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
    // parallel reuses (similar to freia_27)
    // o0 = i ^ i
    // o1 = f(i)
-   freia_31_helper_0_0_0(o0, o1, i, 10, 20, true);                      /*0010*/
+   freia_31_helper_0_0_0(o0, o1, i, 10, 20, true);                      /*0009*/
 
    return FREIA_OK;                                                     /*0012*/
 }
@@ -563,7 +563,7 @@ freia_status freia_31(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
    // parallel reuses (similar to freia_27)
    // o0 = i ^ i
    // o1 = f(i)
-   freia_31_helper_0_0_0(o0, o1, i, 10, 20, 1);                         /*0010*/
+   freia_31_helper_0_0_0(o0, o1, i, 10, 20, 1);                         /*0009*/
 
    return 0;                                                            /*0012*/
 }

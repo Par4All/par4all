@@ -902,24 +902,24 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    freia_data2d *t0 = freia_common_create_data(16, 128, 128);           /*0012*/
    int binvalue, maxmotion, minmotion;                                  /*0013*/
-   
+
+   vs_core_2_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);           /*0015*/
    
    // bg update
    // was cast
-   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0022*/
+   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
    // was cast
    
    // measure
-   vs_core_2_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);           /*0027*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
-   
+
+   vs_core_2_helper_0_2_0(mv, mv, binvalue, 255, true, freia_morpho_kernel_8c, 1, 1);  /*0032*/
    
    // open
    
    // gradient
    
-   vs_core_2_helper_0_2_0(mv, mv, binvalue, 255, true, freia_morpho_kernel_8c, 1, 1);  /*0044*/
    vs_core_2_helper_0_3_0(mv, mv, stab);                                /*0045*/
 
    freia_common_destruct_data(t0);                                      /*0047*/
@@ -936,24 +936,24 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    freia_data2d *t0 = freia_common_create_data(16, 128, 128);           /*0012*/
    int binvalue, maxmotion, minmotion;                                  /*0013*/
-   
+
+   vs_core_2_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);           /*0015*/
    
    // bg update
    // was cast
-   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0022*/
+   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
    // was cast
    
    // measure
-   vs_core_2_helper_0_0_0(mv, t0, bg, in, &maxmotion, &minmotion, motion_a);           /*0027*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
-   
+
+   vs_core_2_helper_0_2_0(mv, mv, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);     /*0032*/
    
    // open
    
    // gradient
    
-   vs_core_2_helper_0_2_0(mv, mv, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);     /*0044*/
    vs_core_2_helper_0_3_0(mv, mv, stab);                                /*0045*/
 
    freia_common_destruct_data(t0);                                      /*0047*/
@@ -2052,24 +2052,24 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    
    int binvalue, maxmotion, minmotion;                                  /*0013*/
-   
+
+   vs_core_2_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0015*/
    
    // bg update
    // was cast
    // was cast
    
    // measure
-   vs_core_2_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0027*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
-   
+
+   vs_core_2_helper_0_0_0(mv, mv, stab, binvalue, 255, true, freia_morpho_kernel_8c, 1, 1);           /*0032*/
    
    // open
    
    // gradient
    
-   vs_core_2_helper_0_0_0(mv, mv, stab, binvalue, 255, true, freia_morpho_kernel_8c, 1, 1);           /*0045*/
-
+   
    return FREIA_OK;                                                     /*0050*/
 }
 
@@ -2082,24 +2082,24 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    
    
    int binvalue, maxmotion, minmotion;                                  /*0013*/
-   
+
+   vs_core_2_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0015*/
    
    // bg update
    // was cast
    // was cast
    
    // measure
-   vs_core_2_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0027*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
-   
+
+   vs_core_2_helper_0_0_0(mv, mv, stab, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);              /*0032*/
    
    // open
    
    // gradient
    
-   vs_core_2_helper_0_0_0(mv, mv, stab, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);              /*0045*/
-
+   
    return 0;                                                            /*0050*/
 }
 #

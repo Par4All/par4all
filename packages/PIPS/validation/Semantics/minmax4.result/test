@@ -1,0 +1,72 @@
+
+Transformers for "MINMAX4"
+
+
+C  T() {}
+
+! Check the computation of a lower bound for a min and of an upper bound
+! for a max when all the arguments are themselves bounded
+
+      SUBROUTINE MINMAX4
+
+C  T() {4<=M, M<=10}
+
+
+      IF (4.GT.M.OR.M.GT.10) STOP                                       0006
+
+C  T() {4<=M, M<=10, 5<=N, N<=11}
+
+      IF (5.GT.N.OR.N.GT.11) STOP                                       0007
+
+C  T(I) {4<=I, I<=M, I<=N, 4<=M, M<=10, 5<=N, N<=11}
+
+
+      I = MIN(M, N)                                                     0009
+
+C  T(J) {4<=I, I<=M, I<=N, J<=11, M<=J, N<=J, 4<=M, M<=10, 5<=N,
+C    N<=11}
+
+      J = MAX(M, N)                                                     0010
+
+C  T() {4<=I, I<=M, I<=N, J<=11, M<=J, N<=J, 4<=M, M<=10, 5<=N, N<=11}
+
+
+      PRINT *, I, J                                                     0012
+
+      END
+
+Preconditions for "MINMAX4"
+
+
+C  P() {}
+
+! Check the computation of a lower bound for a min and of an upper bound
+! for a max when all the arguments are themselves bounded
+
+      SUBROUTINE MINMAX4
+
+C  P() {}
+
+
+      IF (4.GT.M.OR.M.GT.10) STOP                                       0006
+
+C  P() {4<=M, M<=10}
+
+      IF (5.GT.N.OR.N.GT.11) STOP                                       0007
+
+C  P() {4<=M, M<=10, 5<=N, N<=11}
+
+
+      I = MIN(M, N)                                                     0009
+
+C  P(I) {4<=I, I<=M, I<=N, 4<=M, M<=10, 5<=N, N<=11}
+
+      J = MAX(M, N)                                                     0010
+
+C  P(I,J) {4<=I, I<=M, I<=N, J<=11, M<=J, N<=J, 4<=M, M<=10, 5<=N,
+C    N<=11}
+
+
+      PRINT *, I, J                                                     0012
+
+      END

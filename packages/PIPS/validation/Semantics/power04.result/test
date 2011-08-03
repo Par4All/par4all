@@ -1,0 +1,76 @@
+
+C  T() {}
+
+      PROGRAM POWER04
+
+C  T(I) {I==9}
+
+
+C     Check constant power
+
+      I = 3**2                                                          0005
+
+C  T(N) {I==9, N==2}
+
+      N = 2                                                             0006
+
+C  T(I) {I==16, I#init==9, N==2}
+
+      I = 4**N                                                          0007
+
+C  T(M) {I==16, M==3, N==2}
+
+      M = 3                                                             0008
+
+C  T(I) {I==27, I#init==16, M==3, N==2}
+
+      I = M**3                                                          0009
+
+C  T(I) {I==8, I#init==27, M==3, N==2}
+
+      I = N**M                                                          0010
+
+C  T() {I==8, M==3, N==2}
+
+
+      PRINT *, I                                                        0012
+
+      END
+
+C  P() {}
+
+      PROGRAM POWER04
+
+C  P() {}
+
+
+C     Check constant power
+
+      I = 3**2                                                          0005
+
+C  P(I) {I==9}
+
+      N = 2                                                             0006
+
+C  P(I,N) {I==9, N==2}
+
+      I = 4**N                                                          0007
+
+C  P(I,N) {I==16, N==2}
+
+      M = 3                                                             0008
+
+C  P(I,M,N) {I==16, M==3, N==2}
+
+      I = M**3                                                          0009
+
+C  P(I,M,N) {I==27, M==3, N==2}
+
+      I = N**M                                                          0010
+
+C  P(I,M,N) {I==8, M==3, N==2}
+
+
+      PRINT *, I                                                        0012
+
+      END

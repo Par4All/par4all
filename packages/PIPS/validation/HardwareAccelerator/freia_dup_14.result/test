@@ -418,12 +418,11 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   ret_0 |= 0;                                                          /*0038*/
+   ret_0 |= freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);          /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
    ret_1 |= 0;                                                          /*0045*/
-
-   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0049*/
+   
    
    
    
@@ -468,10 +467,10 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
+   ret_0 |= freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);          /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
-
-   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0049*/
+   
    
    
    
@@ -853,12 +852,11 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   ret_0 |= 0;                                                          /*0038*/
+   ret_0 |= freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);          /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
    ret_1 |= 0;                                                          /*0045*/
-
-   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0049*/
+   
    
    
    
@@ -903,10 +901,10 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
+   ret_0 |= freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);          /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
-
-   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0049*/
+   
    
    
    
