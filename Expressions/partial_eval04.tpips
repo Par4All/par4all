@@ -71,12 +71,12 @@ echo
 
 apply UNSPLIT
 
+# NO, DO NOT SHOW UNSPLIT FILE
 # This is not wise because of the include expansion
-shell cat $WS.database/Src/$WS.c
+# the contents of which depends on the system version
+# shell cat $WS.database/Src/$WS.c
 
-shell cc $WS.c -o $WS.database/Tmp/ref
-shell (cd $WS.database; cc Src/$WS.c  -o Tmp/out)
-shell (cd $WS.database; if test `./Tmp/ref` = `./Tmp/out`; then echo "ok"; else echo "ko" ; fi)
+shell pips_validation_exe.sh $WS
 
 close
 #delete $WS
