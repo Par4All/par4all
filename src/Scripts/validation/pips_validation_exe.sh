@@ -138,9 +138,13 @@ unsplit=$database/Src/$source
 exe=$tmp/exe
 
 # some sanity checks. the first one cannot fail.
-[ "$initial" -a -e $source ] || err 9 "expected source $source not found"
-[ "$generated" -a -d $database ] || err 10 "expected $database not found"
-[ "$generated" -a -e $unsplit ] || err 11 "expected unsplit $unsplit not found"
+[ "$initial" ] && {
+  [ -e $source ] || err 9 "expected source $source not found"
+}
+[ "$generated" ] && {
+  [ -d $database ] || err 10 "expected database $database not found"
+  [ -e $unsplit ] || err 11 "expected unsplit $unsplit not found"
+}
 
 # check trigger
 [ "$PIPS_VALIDATION_EXE" ] || exit 0
