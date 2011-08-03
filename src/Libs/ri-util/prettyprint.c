@@ -1804,11 +1804,11 @@ words_unary_minus(call obj, int precedence, bool leftmost, list pdl)
     expression e = EXPRESSION(CAR(call_arguments(obj)));
     int prec = words_intrinsic_precedence(obj);
 
-    if ( prec < precedence || !leftmost ||  !precedence_p)
+    if ( prec < precedence || !leftmost || (!precedence_p && precedence>0))
 	pc = CHAIN_SWORD(pc, "(");
     pc = CHAIN_SWORD(pc, "-");
     pc = gen_nconc(pc, words_subexpression(e, prec, false, pdl));
-    if ( prec < precedence || !leftmost ||  !precedence_p)
+    if ( prec < precedence || !leftmost || (!precedence_p && precedence>0))
 	pc = CHAIN_SWORD(pc, ")");
 
     return(pc);
