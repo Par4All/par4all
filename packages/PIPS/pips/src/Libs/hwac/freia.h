@@ -38,8 +38,9 @@
 
 // macros for freia stuff
 #define FREIA_IMAGE_TYPE "freia_data2d"
-#define FREIA_ALLOC "freia_common_create_data"
-#define FREIA_FREE  "freia_common_destruct_data"
+#define FREIA_OUTPUT     "freia_common_tx_image"
+#define FREIA_ALLOC      "freia_common_create_data"
+#define FREIA_FREE       "freia_common_destruct_data"
 
 #define AIPO "freia_aipo_"
 #define FREIA_IMAGE FREIA_IMAGE_TYPE " * "

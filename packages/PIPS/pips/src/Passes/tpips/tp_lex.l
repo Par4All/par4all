@@ -116,6 +116,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 
 <KEY>setenv		{ KEYWORD(TK_SET_ENVIRONMENT); }
 <KEY>getenv		{ KEYWORD(TK_GET_ENVIRONMENT); }
+<KEY>unsetenv { KEYWORD(TK_UNSET_ENVIRONMENT); }
 <KEY>open		{ KEYWORD(TK_OPEN); }
 <KEY>create		{ KEYWORD(TK_CREATE); }
 <KEY>close		{ KEYWORD(TK_CLOSE); }

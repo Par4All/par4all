@@ -31,7 +31,7 @@
 %token TK_MAKE TK_APPLY TK_CAPPLY TK_DISPLAY
 %token TK_REMOVE TK_ACTIVATE
 %token TK_SET_PROPERTY TK_GET_PROPERTY
-%token TK_SET_ENVIRONMENT TK_GET_ENVIRONMENT
+%token TK_SET_ENVIRONMENT TK_GET_ENVIRONMENT TK_UNSET_ENVIRONMENT
 %token TK_CDIR TK_INFO TK_PWD TK_HELP TK_SHOW TK_SOURCE
 %token TK_SHELL TK_ECHO TK_UNKNOWN
 %token TK_QUIT TK_EXIT
@@ -60,7 +60,7 @@
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
 %type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help i_capply
-%type <status> i_checkpoint i_show i_unknown i_checkactive i_touch
+%type <status> i_checkpoint i_show i_unknown i_checkactive i_touch i_unsetenv
 %type <name> rulename filename propname phasename resourcename workspace_name
 %type <array> filename_list
 %type <rn> resource_id rule_id
@@ -475,6 +475,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_get
 	| i_getenv
 	| i_setenv
+	| i_unsetenv
 	| i_cd
 	| i_pwd
 	| i_source
@@ -648,6 +649,10 @@ i_setenv: TK_SET_ENVIRONMENT TK_NAME TK_NAME TK_ENDOFLINE
 	| TK_SET_ENVIRONMENT TK_NAME TK_EQUAL filename_list TK_ENDOFLINE
 	{ set_env_log_and_free($2, strdup(string_array_join($4, " ")));	}
 	;
+
+i_unsetenv: TK_UNSET_ENVIRONMENT TK_NAME TK_ENDOFLINE
+  { unsetenv($2); }
+  ;
 
 i_checkpoint: TK_CHECKPOINT TK_ENDOFLINE
 	{

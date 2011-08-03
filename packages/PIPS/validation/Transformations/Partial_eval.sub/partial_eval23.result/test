@@ -1,0 +1,72 @@
+#
+# initial files
+#
+int main(void)
+{
+   int i = 0;
+   int j = rand();
+   // identity
+   j |= i;
+   int k = rand();
+   int l = k|i;
+   int m = rand();
+   m &= i;
+   return j+l&m;
+}
+#
+# with preconditions
+#
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int j = rand();
+
+//  P(i,j) {i==0, 0<=j}
+
+   // identity
+   j |= i;
+
+//  P(i,j) {i==0}
+
+   int k = rand();
+
+//  P(i,j,k) {i==0, 0<=k}
+
+   int l = k|i;
+
+//  P(i,j,k,l) {i==0, 0<=k}
+
+   int m = rand();
+
+//  P(i,j,k,l,m) {i==0, 0<=k, 0<=m}
+
+   m &= i;
+
+//  P(i,j,k,l,m) {i==0, 0<=k}
+
+   return j+l&m;
+}
+#
+# after partial eval
+#
+int main(void)
+{
+   int i = 0;
+   int j = rand();
+   // identity
+   ;
+   int k = rand();
+   int l = k;
+   int m = rand();
+   m &= 0;
+   return j+l&m;
+}

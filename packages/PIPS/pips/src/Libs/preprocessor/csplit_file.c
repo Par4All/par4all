@@ -194,10 +194,10 @@ void csplit_close_compilation_unit()
 void copy_between_2_fd_up_to_offset(FILE * source,
 				    FILE * destination,
 				    unsigned long long up_to_offset,
-				    bool greedy_spaces) {
+				    bool greedy_spaces __attribute__ ((__unused__))) {
   int c = EOF;
   int next_c = EOF;
-  while(ftell(source) < up_to_offset) {
+  while(((unsigned) ftell(source)) < up_to_offset) {
     /* There is something to copy: */
       c = fgetc(source);
       if (c == EOF)
@@ -530,6 +530,7 @@ string  csplit(
     UNCATCH(any_exception_error);
   }
 
+  if(error_message==NULL) {
   /* Do not forget to catch what could remain after the last function up
      to the end of file: */
   csplit_append_to_compilation_unit(INT_MAX, ULLONG_MAX);
@@ -549,7 +550,7 @@ string  csplit(
   module_list_file = NULL;
 
   csplit_reset();
-
+  }
   debug_off();
 
   return error_message;

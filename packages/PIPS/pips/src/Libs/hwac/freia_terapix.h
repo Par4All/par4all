@@ -71,6 +71,8 @@ typedef struct {
   int cost;
   // whether it can be done in place
   bool inplace;
+  // whether the input images order must be reversed when calling the hardware
+  bool reverse;
   // microcode segment name
   string ucode;
 } terapix_hw_t;

@@ -257,7 +257,7 @@ freia_status freia_35_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 freia_status freia_35(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    int32_t min;                                                         /*0007*/
-   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0010*/
+   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0008*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -266,7 +266,7 @@ freia_status freia_35(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 freia_status freia_35(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    int32_t min;                                                         /*0007*/
-   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0010*/
+   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0008*/
    return 0;                                                            /*0012*/
 }
 #
@@ -608,7 +608,7 @@ freia_status freia_35_helper_0_0_0(
 freia_status freia_35(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    int32_t min;                                                         /*0007*/
-   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0010*/
+   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0008*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -617,7 +617,7 @@ freia_status freia_35(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 freia_status freia_35(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    int32_t min;                                                         /*0007*/
-   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0010*/
+   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0008*/
    return 0;                                                            /*0012*/
 }
 #

@@ -137,7 +137,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
 #define PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER "\202Unstructured Item"
 #define PRETTYPRINT_UNSTRUCTURED_SUCC_MARKER "\203Unstructured Successor ->"
 #define PRETTYPRINT_UNREACHABLE_EXIT_MARKER "\204Unstructured Unreachable"
-
+
 /*===================== Language management ===========*/
 
 /* The prettyprint language */
@@ -276,7 +276,7 @@ unsigned int get_prettyprint_indentation() {
     return INDENTATION;
   }
 }
-
+
 static list words_cast(cast obj, int precedence, list pdl);
 static list words_sizeofexpression(sizeofexpression obj, bool in_type_declaration, list pdl);
 static list words_subscript(subscript s, list pdl);
@@ -2152,7 +2152,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
 
   /* Use precedence to generate or not parentheses,
    * unless parentheses are always required */
-  if(prec < precedence ||  !precedence_p) {
+  if(prec < precedence || (!precedence_p && precedence>0)) {
     pc = CHAIN_SWORD(pc, "(");
   }
 
@@ -2194,7 +2194,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
     pc = gen_nconc(pc, we2);
   }
 
-  if(prec < precedence || !precedence_p) {
+  if(prec < precedence || (!precedence_p && precedence>0)) {
     pc = CHAIN_SWORD(pc, ")");
   }
 
@@ -2362,19 +2362,19 @@ multiply-add operators ( JZ - sept 98) */
     {BITWISE_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
     {C_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
 
-    /* What is the priority for CAST? 22? */
+    /* What is the priority for CAST? 23? */
 
-#define CAST_OPERATOR_PRECEDENCE (22)
+#define CAST_OPERATOR_PRECEDENCE (23)
 
-    {C_MODULO_OPERATOR_NAME,  words_infix_binary_op, 21},
-    {MULTIPLY_OPERATOR_NAME, words_infix_binary_op, 21},
-    {DIVIDE_OPERATOR_NAME, words_infix_binary_op, 21},
+    {C_MODULO_OPERATOR_NAME,  words_infix_binary_op, 22},
+    {MULTIPLY_OPERATOR_NAME, words_infix_binary_op, 22},
+    {DIVIDE_OPERATOR_NAME, words_infix_binary_op, 22},
 
     {PLUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
     {MINUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
 
-    {LEFT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 19},
-    {RIGHT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 19},
+    {LEFT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 18},
+    {RIGHT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 18},
 
     {C_LESS_THAN_OPERATOR_NAME, words_infix_binary_op, 15 },
     {C_GREATER_THAN_OPERATOR_NAME, words_infix_binary_op, 15},

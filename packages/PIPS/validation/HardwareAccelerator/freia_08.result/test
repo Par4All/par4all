@@ -819,7 +819,7 @@ freia_status freia_08(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia
    freia_cipo_gradient(g0, i0, connexity, size);                        /*0026*/
    freia_cipo_gradient(g1, i1, connexity, size);                        /*0027*/
    freia_cipo_gradient(g2, i2, connexity, size);                        /*0028*/
-   freia_08_helper_0_0_0(o, g0, g1, g2);                                /*0031*/
+   freia_08_helper_0_0_0(o, g0, g1, g2);                                /*0029*/
 
    freia_common_destruct_data(g0);                                      /*0033*/
    freia_common_destruct_data(g1);                                      /*0034*/
@@ -842,7 +842,7 @@ freia_status freia_08(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia
    freia_cipo_gradient(g0, i0, 8, 1);                                   /*0026*/
    freia_cipo_gradient(g1, i1, 8, 1);                                   /*0027*/
    freia_cipo_gradient(g2, i2, 8, 1);                                   /*0028*/
-   freia_08_helper_0_0_0(o, g0, g1, g2);                                /*0031*/
+   freia_08_helper_0_0_0(o, g0, g1, g2);                                /*0029*/
 
    freia_common_destruct_data(g0);                                      /*0033*/
    freia_common_destruct_data(g1);                                      /*0034*/

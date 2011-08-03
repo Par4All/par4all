@@ -343,6 +343,11 @@ static void terapix_gram_allocate
  */
 static _int select_imagelet(set availables, int * nimgs, bool first)
 {
+  ifdebug(8) {
+    pips_debug(8, "selecting first=%s\n", first? "true": "false");
+    set_fprint(stderr, "availables", availables, (gen_string_func_t) itoa);
+  }
+
   _int choice = 0; // zero means no choice yet
   // allocate if no images are available
   if (set_empty_p(availables))
@@ -362,6 +367,7 @@ static _int select_imagelet(set availables, int * nimgs, bool first)
     set_del_element(availables, availables, (void*) choice);
   }
   pips_assert("some choice was made", choice>0);
+  pips_debug(8, "choice is %"_intFMT"\n", choice);
   return choice;
 }
 
@@ -554,14 +560,16 @@ static void terapix_macro_code
   {
   case 2:
     pips_assert("2 ins, alu operation...", out);
-    terapix_mcu_img(code, op, "xmin1", INT(CAR(ins)));
+    int img1 = INT(CAR(ins)), img2 = INT(CAR(CDR(ins)));
+    terapix_mcu_img(code, op, "xmin1", api->terapix.reverse? img2: img1);
     terapix_mcu_int(code, op, "ymin1", 0);
-    terapix_mcu_img(code, op, "xmin2", INT(CAR(CDR(ins))));
+    terapix_mcu_img(code, op, "xmin2", api->terapix.reverse? img1: img2);
     terapix_mcu_int(code, op, "ymin2", 0);
     terapix_mcu_img(code, op, "xmin3", out);
     terapix_mcu_int(code, op, "ymin3", 0);
     // ??? needed for replace const... although arg 3 is used already
-    terapix_gram_management(code, decl, op, api, v, hparams, used);
+    // replace_const special argument management is handled directly elsewhere
+    // terapix_gram_management(code, decl, op, api, v, hparams, used);
     break;
   case 1:
     // alu: image op cst 1
@@ -850,7 +858,7 @@ static void freia_terapix_call
          "  freia_op_param param;\n"
          "  freia_dynamic_param dyn_param;\n"
          "  terapix_gram gram;\n"
-         "  int i;\n"
+         "  int i;\n" // not always used...
          "  freia_status ret = FREIA_OK;\n"
          "  // data structures for reductions\n"
          "  terapix_mcu_macrocode mem_init;\n"
@@ -1015,6 +1023,26 @@ static void freia_terapix_call
                         freia_extract_params(opid, call_arguments(c),
                                              head, hparams, &nargs));
 
+    // special case for replace_const, which needs a 4th argument
+    if (same_string_p(api->compact_name, ":"))
+    {
+      sb_cat(body, "  // *special* set parameter for replace_const\n");
+      terapix_mcu_int(body, n_ops, "xmin1", 0);
+      terapix_mcu_int(body, n_ops, "ymin1", 0);
+      terapix_mcu_int(body, n_ops, "xmin2", 0);
+      terapix_mcu_int(body, n_ops, "ymin2", 0);
+      terapix_gram_management(body, decl, n_ops, api, current, hparams, used);
+      terapix_mcu_val(body, n_ops, "iter1", "TERAPIX_PE_NUMBER");
+      terapix_mcu_int(body, n_ops, "iter2", 0);
+      terapix_mcu_int(body, n_ops, "iter3", 0);
+      terapix_mcu_int(body, n_ops, "iter4", 0);
+      terapix_mcu_val(body, n_ops, "addrStart",
+                      "TERAPIX_UCODE_SET_CONST_RAMREG");
+
+      sb_cat(body, "  // now take care of actual operation\n");
+      n_ops++;
+    }
+
     if (api->terapix.memory)
     {
       string sop = strdup(itoa(n_ops));
@@ -1079,9 +1107,13 @@ static void freia_terapix_call
     {
       SET_FOREACH(dagvtx, v, deads)
       {
-        _int img = (_int) hash_get(allocation, v);
-        if (img<0) img=-img;
-        set_add_element(avail_img, avail_img, (void*) img);
+        // but keep intermediate output images!
+        if (!gen_in_list_p(v, dag_outputs(thedag)))
+        {
+          _int img = (_int) hash_get(allocation, v);
+          if (img<0) img=-img;
+          set_add_element(avail_img, avail_img, (void*) img);
+        }
       }
     }
 
@@ -1313,7 +1345,6 @@ static void freia_terapix_call
       free_dagvtx(vr);
     }
   }
-  // dag_compute_outputs(thedag);
   // cleanup
   gen_free_list(vertices), vertices = NIL;
   string_buffer_free(&head);
@@ -1565,7 +1596,8 @@ static bool terapix_not_implemented(dag d)
  * imagelet size.
  */
 static list /* of dags */
-split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx))
+split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx),
+                     const set output_images)
 {
   if (!single_image_assignement_p(initial))
     // well, it should work most of the time, so only a warning
@@ -1639,7 +1671,7 @@ split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx))
         pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
         dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd, NULL);
+      dag_compute_outputs(nd, NULL, output_images);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
@@ -1739,7 +1771,8 @@ static int cut_decision(dag d, hash_table erosion)
 
 /* cut dag "d", possibly a subdag of "fulld", at "erosion" "cut"
  */
-static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld)
+static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
+                       const set output_images)
 {
   pips_debug(2, "cutting with cut=%d\n", cut);
   pips_assert("something cut width", cut>0);
@@ -1807,7 +1840,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld)
     // pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
     dag_append_vertex(nd, copy_dagvtx_norec(v));
   }
-  dag_compute_outputs(nd, NULL);
+  dag_compute_outputs(nd, NULL, output_images);
   dag_cleanup_other_statements(nd);
 
   // cleanup full dag
@@ -1844,7 +1877,8 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld)
 list freia_trpx_compile_calls
 (string module,
  list /* of statements */ ls,
- hash_table occs,
+ const hash_table occs,
+ const set output_images,
  FILE * helper_file,
  int number)
 {
@@ -1852,14 +1886,14 @@ list freia_trpx_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  dag fulld = build_freia_dag(module, ls, number, occs);
+  dag fulld = freia_build_dag(module, ls, number, occs, output_images);
   list added_stats = freia_dag_optimize(fulld);
 
   // dump final dag
   dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
 
   hash_table init = hash_table_make(hash_pointer, 0);
-  list new_images = dag_fix_image_reuse(fulld, init);
+  list new_images = dag_fix_image_reuse(fulld, init, occs);
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
@@ -1869,7 +1903,7 @@ list freia_trpx_compile_calls
   //           \-> E -> F />
   // then ABEF / CD is chosen
   // although ABE / FCD and AB / EFCD would be also possible...
-  list ld = split_dag_on_scalars(fulld, not_implemented);
+  list ld = split_dag_on_scalars(fulld, not_implemented, output_images);
 
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
@@ -1910,7 +1944,7 @@ list freia_trpx_compile_calls
 
       while ((cut = cut_decision(d, erosion)))
       {
-        dag dc = cut_perform(d, cut, erosion, fulld);
+        dag dc = cut_perform(d, cut, erosion, fulld, output_images);
         // generate code for cut
         freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag, n_split,
                                    n_cut++, global_remainings, helper_file);
@@ -1943,7 +1977,7 @@ list freia_trpx_compile_calls
 
   // deal with new images
   list real_new_images =
-    freia_allocate_new_images_if_needed(ls, new_images, init);
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init);
   gen_free_list(new_images);
   hash_table_free(init);
   return real_new_images;

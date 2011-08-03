@@ -1,0 +1,25 @@
+delete minmax5
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create minmax5 minmax5.f
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+echo
+echo Transformers for "MINMAX5"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+echo
+echo Preconditions for "MINMAX5"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete minmax5
+quit

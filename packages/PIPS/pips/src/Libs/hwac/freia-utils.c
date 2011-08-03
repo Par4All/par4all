@@ -54,17 +54,18 @@
 
 // no operation
 #define NOPE_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
-#define NOPE_TRPX { 0, 0, 0, 0, 0, 0, false, NULL }
+#define NOPE_TRPX { 0, 0, 0, 0, 0, 0, false, false, NULL }
 
 // not implemented
 #define NO_SPOC { spoc_not_implemented, NO_POC, alu_unused, NO_MES }
-#define NO_TRPX { 0, 0, 0, 0, 0, -1, false, NULL }
+#define NO_TRPX { 0, 0, 0, 0, 0, -1, false, false, NULL }
 
-#define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, "TERAPIX_UCODE_" op }
-#define TRPX_NG(c, op) { 1, 1, 1, 1, 0, c, false, "TERAPIX_UCODE_" op }
+#define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, false, "TERAPIX_UCODE_" op }
+#define TRPX_IO(c, op) { 0, 0, 0, 0, 0, c, true, true, "TERAPIX_UCODE_" op }
+#define TRPX_NG(c, op) { 1, 1, 1, 1, 0, c, false, false, "TERAPIX_UCODE_" op }
 
 // preliminary stuff for volume/min/max/...
-#define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, "TERAPIX_UCODE_" op }
+#define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, false, "TERAPIX_UCODE_" op }
 
 // types used by AIPO parameters
 #define TY_INT "int32_t"
@@ -148,7 +149,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "replace_const", ":", AIPO "replace_const",
     1, 2, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_repcst_0, NO_MES }, TRPX_OP(3, "CONV_REPLACE_EQ_CONST")
+      NO_POC, alu_repcst_0, NO_MES }, TRPX_IO(3, "CONV_REPLACE_EQ_CONST")
   },
   // unary
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
@@ -165,7 +166,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "inf_const", "<.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_inf_0cst, NO_MES },
-    TRPX_OP(3, "INF_CONST?")
+    TRPX_OP(3, "INF_CONST")
   },
   { AIPO "sup_const", ">.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES },
@@ -175,9 +176,9 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES },
     TRPX_OP(3, "SUB_CONST")
   },
-  { AIPO "const_sub", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "const_sub", ".-", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_cst0, NO_MES },
-    TRPX_OP(3, "CONST_SUB?")
+    TRPX_OP(3, "CONST_SUB")
   },
   { AIPO "and_const", "&.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_and_0cst, NO_MES },
@@ -201,7 +202,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES },
     TRPX_OP(3, "SUBSAT_CONST?")
   },
-  { AIPO "const_subsat", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
+  { AIPO "const_subsat", ".-s", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_cst0, NO_MES },
     TRPX_OP(3, "CONST_SUBSAT?")
@@ -219,7 +220,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES },
     TRPX_OP(3, "DIV_CONST")
   },
-  { AIPO "const_div", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "const_div", "./", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_cst0, NO_MES },
     TRPX_OP(3, "CONST_DIV?")
   },
@@ -321,7 +322,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     },
     // for terapix, this is a special case
     // I'm not sure about the cost model (h*35) for 3x3?
-    { -1, -1, -1, -1, 0, 3, false, "TERAPIX_UCODE_CONV" }
+    { -1, -1, -1, -1, 0, 3, false, false, "TERAPIX_UCODE_CONV" }
   },
   // not implemented by SPOC! nor by TERAPIX!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
@@ -641,7 +642,8 @@ void hwac_kill_statement(statement s)
 bool freia_image_variable_p(const entity var)
 {
   bool is_image = false;
-  if (entity_variable_p(var) && entity_scalar_p(var))
+  if (var && var!=entity_undefined &&
+      entity_variable_p(var) && entity_scalar_p(var))
   {
     type t = ultimate_type(entity_type(var));
     basic b = variable_basic(type_variable(t));
@@ -864,6 +866,23 @@ call freia_statement_to_call(const statement s)
   return c;
 }
 
+static bool is_freia_this_call(const statement s, const string fname)
+{
+  call c = freia_statement_to_call(s);
+  const char* called = c? entity_user_name(call_function(c)): "";
+  return same_string_p(called, fname);
+}
+
+bool is_freia_alloc(const statement s)
+{
+  return is_freia_this_call(s, FREIA_ALLOC);
+}
+
+bool is_freia_dealloc(const statement s)
+{
+  return is_freia_this_call(s, FREIA_FREE);
+}
+
 /* tell whether v1 and v2 point to statements with the same parameters.
  */
 bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
@@ -907,22 +926,22 @@ void freia_substitute_by_helper_call
   set_difference(remainings, remainings, dones);
   set_difference(global_remainings, global_remainings, dones);
 
-  // replace first statement of dones in ls (so last in sequence)
-  statement last = NULL;
+  // replace first statement of dones in ls ???
+  statement found = NULL;
   FOREACH(statement, sc, ls)
   {
     pips_debug(5, "in statement %" _intFMT "\n", statement_number(sc));
     if (set_belong_p(dones, sc))
     {
       pips_assert("statement is a call", statement_call_p(sc));
-      if (last)
-        last = statement_number(sc)>statement_number(last)? sc: last;
+      if (found)
+        found = statement_number(sc)<statement_number(found)? sc: found;
       else
-        last = sc;
+        found = sc;
     }
   }
 
-  pips_assert("some last statement found", last);
+  pips_assert("some statement found", found);
 
   // build helper entity
   entity example = local_name_to_top_level_entity("freia_aipo_add");
@@ -944,10 +963,25 @@ void freia_substitute_by_helper_call
   // substitute by call to helper
   call c = make_call(helper, lparams);
 
-  hwac_replace_statement(last, c, false);
+  hwac_replace_statement(found, c, false);
 
   set_free(not_dones);
   set_free(dones);
+}
+
+static statement find_last_aipo_statement(list ls)
+{
+  statement found = NULL;
+  FOREACH(statement, s, ls)
+  {
+    if (freia_statement_aipo_call_p(s))
+      if (!found || statement_number(found)<statement_number(s))
+        found = s;
+  }
+  // ??? au pif
+  if (!found && ls)
+    found = STATEMENT(CAR(gen_last(ls)));
+  return found;
 }
 
 /* insert added statements to actual code sequence in "ls"
@@ -957,8 +991,7 @@ void freia_insert_added_stats(list ls, list added_stats)
 {
   if (added_stats)
   {
-    statement slast = STATEMENT(CAR(ls));
-    // fprintf(stderr, "adding stats to %p\n", slast);
+    statement slast = find_last_aipo_statement(ls);
     instruction ilast = statement_instruction(slast);
     statement newstat = instruction_to_statement(ilast);
     // transfer comments and some cleanup...
@@ -1161,7 +1194,8 @@ static void entref(reference r, hash_table count)
  * @param init new image -> initial image
  * @return actually allocated images
  */
-list freia_allocate_new_images_if_needed(list ls, list images, hash_table init)
+list freia_allocate_new_images_if_needed
+(list ls, list images, const hash_table occs, const hash_table init)
 {
   // check for used images
   hash_table count = hash_table_make(hash_pointer, 0);
@@ -1186,7 +1220,7 @@ list freia_allocate_new_images_if_needed(list ls, list images, hash_table init)
   }
   hash_table_free(count), count = NULL;
 
-  // allocate those used
+  // allocate those which are finally used
   if (allocated)
   {
     pips_assert("some statements", ls!=NIL);
@@ -1199,7 +1233,10 @@ list freia_allocate_new_images_if_needed(list ls, list images, hash_table init)
       pips_debug(7, "allocating image %s\n", entity_name(v));
       // add_declaration_statement(first, v); // NO, returned
       // insert_statement(first, image_alloc(v), true); // NO, init
-      insert_statement(last, image_free(v), false);
+      // ??? deallocation should be at end of allocation block...
+      entity model = (entity) hash_get(init, v);
+      statement s = freia_memory_management_statement(model, occs, false);
+      insert_statement(s? s: last, image_free(v), false);
     }
   }
 
@@ -1222,4 +1259,56 @@ int freia_aipo_count(dag d, bool with_copies)
     if (same_string_p(op, AIPO "scalar_copy")) count--;
   }
   return count;
+}
+
+/******************************************************* BUILD OUTPUT IMAGES */
+
+static void oi_call_rwt(call c, set images)
+{
+  entity called = call_function(c);
+  list args = call_arguments(c);
+  if (!args) return;
+  if (ENTITY_RETURN_P(called) ||
+      same_string_p(entity_local_name(called), FREIA_OUTPUT))
+  {
+    entity var = expression_to_entity(EXPRESSION(CAR(args)));
+    if (freia_image_variable_p(var))
+      set_add_element(images, images, var);
+  }
+}
+
+static void oi_stmt_rwt(statement s, set images)
+{
+  FOREACH(entity, var, statement_declarations(s))
+    gen_context_recurse(entity_initial(var), images,
+                        call_domain, gen_true, oi_call_rwt);
+}
+
+/* @return the set of images which are output somehow
+ * this is a little bit simplistic...
+ * read output effects of statement?
+ */
+set freia_compute_output_images(entity module, statement s)
+{
+  set images = set_make(hash_pointer);
+
+  // image formal parameters
+  FOREACH(entity, var, module_functional_parameters(module))
+  {
+    if (freia_image_variable_p(var))
+      set_add_element(images, images, var);
+  }
+
+  // some image uses in the code
+  gen_context_multi_recurse(s, images,
+                            statement_domain, gen_true, oi_stmt_rwt,
+                            call_domain, gen_true, oi_call_rwt,
+                            NULL);
+  return images;
+}
+
+set freia_compute_current_output_images(void)
+{
+  return freia_compute_output_images(get_current_module_entity(),
+                                     get_current_module_statement());
 }

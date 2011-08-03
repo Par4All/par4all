@@ -2622,7 +2622,7 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = 0;                                                           /*0053*/
+   ret_0 = license_plate_helper_0_0_0(imopen, imclose, in, kernel1x3);  /*0053*/
    ret_0 |= 0;                                                          /*0054*/
    ret_0 |= 0;                                                          /*0055*/
    ret_0 |= 0;                                                          /*0056*/
@@ -2630,7 +2630,7 @@ int license_plate(void)
    ret_0 |= 0;                                                          /*0058*/
    ret_0 |= 0;                                                          /*0059*/
    ret_0 |= 0;                                                          /*0060*/
-   ret_0 |= 0;                                                          /*0061*/
+   ret_0 |= license_plate_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);   /*0061*/
    ret_0 |= 0;                                                          /*0062*/
    ret_0 |= 0;                                                          /*0063*/
    ret_0 |= 0;                                                          /*0064*/
@@ -2640,15 +2640,15 @@ int license_plate(void)
    i_0 = 15;                                                            /*0068*/
 
    ret_0 |= 0;                                                          /*0070*/
-   ret_0 |= 0;                                                          /*0071*/
+   ret_0 |= license_plate_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);          /*0071*/
    ret_0 |= 0;                                                          /*0072*/
    ret_0 |= 0;                                                          /*0073*/
    ret_0 |= 0;                                                          /*0074*/
    ret_0 |= 0;                                                          /*0075*/
    ret_0 |= 0;                                                          /*0076*/
    ret_0 |= 0;                                                          /*0077*/
-   ret_0 |= license_plate_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);          /*0078*/
-   ret_0 |= 0;                                                          /*0079*/
+   ret_0 |= 0;                                                          /*0078*/
+   ret_0 |= license_plate_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);    /*0079*/
    ret_0 |= 0;                                                          /*0080*/
    ret_0 |= 0;                                                          /*0081*/
    ret_0 |= 0;                                                          /*0082*/
@@ -2665,7 +2665,7 @@ int license_plate(void)
    ret_1 |= 0;                                                          /*0093*/
    ret_1 |= 0;                                                          /*0094*/
    ret_1 |= 0;                                                          /*0095*/
-   ret_1 |= license_plate_helper_0_0_0(imopen, imclose, in, kernel1x3);                /*0096*/
+   ret_1 |= 0;                                                          /*0096*/
    i_1 = 8;                                                             /*0097*/
 
    ret_1 |= 0;                                                          /*0099*/
@@ -2680,12 +2680,11 @@ int license_plate(void)
    
    
    _return0 = ret_1;                                                    /*0110*/
-
-   license_plate_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);            /*0113*/
    
    
-   ret_2 = license_plate_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);     /*0117*/
-   ret_2 |= 0;                                                          /*0118*/
+   
+   ret_2 = 0;                                                           /*0117*/
+   ret_2 |= license_plate_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);           /*0118*/
    ret_2 |= 0;                                                          /*0119*/
    ret_2 |= 0;                                                          /*0120*/
    i_2 = 4;                                                             /*0121*/
@@ -2698,8 +2697,8 @@ int license_plate(void)
 
    _return2 = ret_2;                                                    /*0129*/
 
-   ret_3 = license_plate_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);            /*0131*/
-   ret_3 |= 0;                                                          /*0132*/
+   ret_3 = 0;                                                           /*0131*/
+   ret_3 |= license_plate_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);                /*0132*/
    ret_3 |= 0;                                                          /*0133*/
    ret_3 |= 0;                                                          /*0134*/
    i_3 = 4;                                                             /*0135*/
@@ -2712,8 +2711,7 @@ int license_plate(void)
 
    _return3 = ret_3;                                                    /*0143*/
 
-   license_plate_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);          /*0145*/
-   license_plate_helper_0_0_6(out, out, freia_morpho_kernel_8c);        /*0147*/
+   license_plate_helper_0_0_6(out, out, freia_morpho_kernel_8c);        /*0146*/
    i_4 = 3;                                                             /*0148*/
 
    _return4 = 0;                                                        /*0150*/
@@ -2782,42 +2780,43 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = 0;                                                           /*0053*/
+   ret_0 = license_plate_helper_0_0_0(imopen, imclose, in, kernel1x3);  /*0053*/
+   ret_0 |= license_plate_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);   /*0061*/
    i_0 = 15;                                                            /*0068*/
 
-   ret_0 |= license_plate_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);          /*0078*/
+   ret_0 |= license_plate_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);          /*0071*/
+   ret_0 |= license_plate_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);    /*0079*/
    i_0 = 15;                                                            /*0085*/
 
    _return1 = ret_0;                                                    /*0087*/
 
    ret_1 = 0;                                                           /*0089*/
-   ret_1 |= license_plate_helper_0_0_0(imopen, imclose, in, kernel1x3);                /*0096*/
    i_1 = 8;                                                             /*0097*/
 
    i_1 = 8;                                                             /*0107*/
    
    
    _return0 = ret_1;                                                    /*0110*/
-
-   license_plate_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);            /*0113*/
    
    
-   ret_2 = license_plate_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);     /*0117*/
+   
+   ret_2 = 0;                                                           /*0117*/
+   ret_2 |= license_plate_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);           /*0118*/
    i_2 = 4;                                                             /*0121*/
 
    i_2 = 4;                                                             /*0127*/
 
    _return2 = ret_2;                                                    /*0129*/
 
-   ret_3 = license_plate_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);            /*0131*/
+   ret_3 = 0;                                                           /*0131*/
+   ret_3 |= license_plate_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);                /*0132*/
    i_3 = 4;                                                             /*0135*/
 
    i_3 = 4;                                                             /*0141*/
 
    _return3 = ret_3;                                                    /*0143*/
 
-   license_plate_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);          /*0145*/
-   license_plate_helper_0_0_6(out, out, freia_morpho_kernel_8c);        /*0147*/
+   license_plate_helper_0_0_6(out, out, freia_morpho_kernel_8c);        /*0146*/
    i_4 = 3;                                                             /*0148*/
 
    _return4 = 0;                                                        /*0150*/
@@ -5329,7 +5328,7 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = 0;                                                           /*0053*/
+   ret_0 = license_plate_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0053*/
    ret_0 |= 0;                                                          /*0054*/
    ret_0 |= 0;                                                          /*0055*/
    ret_0 |= 0;                                                          /*0056*/
@@ -5422,7 +5421,6 @@ int license_plate(void)
 
    _return4 = 0;                                                        /*0150*/
 
-   license_plate_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);           /*0152*/
    freia_common_tx_image(out, &fdout);                                  /*0153*/
    
    /* images destruction */
@@ -5471,7 +5469,7 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = 0;                                                           /*0053*/
+   ret_0 = license_plate_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0053*/
    i_0 = 15;                                                            /*0068*/
 
    i_0 = 15;                                                            /*0085*/
@@ -5506,7 +5504,6 @@ int license_plate(void)
 
    _return4 = 0;                                                        /*0150*/
 
-   license_plate_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);           /*0152*/
    freia_common_tx_image(out, &fdout);                                  /*0153*/
    
    /* images destruction */

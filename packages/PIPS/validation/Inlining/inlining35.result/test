@@ -1,0 +1,21 @@
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int *x0, *y0;
+   //PIPS generated variable
+   int i;
+   int xshift, yshift;
+   //PIPS generated variable
+   int _return0;
+   if (1) {
+   }
+   else {
+      goto l99999;
+   }
+   if (0) goto l99999;
+   //PIPS generated variable
+   x0 = &xshift;
+l99999:   ;
+
+   return 0;
+}

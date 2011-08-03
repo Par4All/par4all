@@ -3,8 +3,7 @@
 freia_status
 freia_21(freia_data2d * o, freia_data2d * i0, freia_data2d * i1)
 {
-  freia_data2d
-    * t = freia_common_create_data(16, 128, 128);
+  freia_data2d * t = freia_common_create_data(i0->bpp, i0->widthWa, i0->heightWa);
 
   // internal variable reuses
   // t = i0 * i1

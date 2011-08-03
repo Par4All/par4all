@@ -63,6 +63,7 @@
   * but such a case is forbidden by the C99 standard. The result of
   * the evaluation of such an expression is undefined.
   */
+
 #include <stdio.h>
 #include <string.h>
 /* #include <stdlib.h> */
@@ -1529,7 +1530,7 @@ static transformer integer_multiply_to_transformer(entity v,
 
   return tf;
 }
-
+
 /* Assumes that e1 and e2 are integer expressions, i.e. explicit casting
  * is supposed to be used.
  *
@@ -1674,7 +1675,7 @@ static transformer integer_left_shift_to_transformer(entity v,
 
   return tf;
 }
-
+
 static transformer integer_power_to_transformer(entity e,
 						expression arg1,
 						expression arg2,
@@ -1690,11 +1691,36 @@ static transformer integer_power_to_transformer(entity e,
   /* Should be rewritten using expression_to_transformer and expression
      evaluation as in integer_multiply_to_transformer */
   /* pips_assert("Precondition is unused", transformer_undefined_p(pre)); */
-  pips_assert("Shut up the compiler", pre==pre);
+  //pips_assert("Shut up the compiler", pre==pre);
   pips_assert("Shut up the compiler", is_internal==is_internal);
 
-  if(signed_integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
-    int d = signed_integer_constant_expression_value(arg2);
+  /* Is arg1 bounded? constant? */
+  bool arg1_is_constant_p = false;
+  //bool arg1_is_bounded_p = false;
+  intptr_t lb1, ub1;
+  if(precondition_minmax_of_expression(arg1, pre, &lb1, &ub1)) {
+    if(lb1==ub1) {
+      arg1_is_constant_p = true;
+    }
+  }
+  /* Is arg2 bounded? constant? */
+  bool arg2_is_constant_p = false;
+  //bool arg2_is_bounded_p = false;
+  intptr_t lb2, ub2;
+  if(precondition_minmax_of_expression(arg2, pre, &lb2, &ub2)) {
+    if(lb2==ub2) {
+      arg2_is_constant_p = true;
+    }
+  }
+
+  if(arg1_is_constant_p && arg2_is_constant_p) {
+    int v = (int) exponentiate((Value) lb1, (Value) lb2);
+    tf = transformer_identity();
+    tf = transformer_add_equality_with_integer_constant(tf, e, v);
+  }
+  else if(arg2_is_constant_p && normalized_linear_p(n1)) {
+    //int d = signed_integer_constant_expression_value(arg2);
+    int d = (int) lb2;
 
     if(d%2==0) {
 
@@ -1766,8 +1792,9 @@ static transformer integer_power_to_transformer(entity e,
 						   CONTRAINTE_UNDEFINED)));
     }
   }
-  else if(signed_integer_constant_expression_p(arg1)) {
-    int d = signed_integer_constant_expression_value(arg1);
+  else if(arg1_is_constant_p) {
+    //int d = signed_integer_constant_expression_value(arg1);
+    int d = (int) lb1;
 
     if(d==0||d==1) {
       /* 0 or 1 is assigned unless arg2 equals 0... which is neglected */
@@ -1778,28 +1805,57 @@ static transformer integer_power_to_transformer(entity e,
 			    make_predicate(sc_make(contrainte_make(v),
 						   CONTRAINTE_UNDEFINED)));
     }
-    else if(d > 1) {
+    else if(d > 1) { // e>=0, always
+
+      tf = transformer_identity();
+
+      /* e >= d^lb2 */
+      if(lb2>=1) {
+	Value elb2 = exponentiate((Value) d, (Value) lb2);
+	tf =
+	  transformer_add_inequality_with_integer_constraint(tf,
+							     (Variable) e,
+							     (int) elb2,
+							     false);
+      }
+
+      /* e <= d^lb2 */
+      if(ub2<INT_MAX) {
+	// FI: let's hope no overflow is generated...
+	Value eub2 = exponentiate((Value) d, (Value) ub2);
+	tf =
+	  transformer_add_inequality_with_integer_constraint(tf,
+							     (Variable) e,
+							     (int) eub2,
+							     true);
+      }
+
+
       /* the assigned value is positive */
       Pvecteur v1 = vect_new((Variable) e, VALUE_MONE);
-      Pcontrainte c1 = contrainte_make(v1);
+      //Pcontrainte c1 = contrainte_make(v1);
+      tf = transformer_inequality_add(tf, v1);
 
       if(normalized_linear_p(n2)) {
 	Pvecteur v2 = vect_dup(normalized_linear(n2));
-	Pcontrainte c2 = CONTRAINTE_UNDEFINED;
+	//Pcontrainte c2 = CONTRAINTE_UNDEFINED;
 	Pvecteur v3 = vect_multiply(vect_dup(normalized_linear(n2)), (Value) d);
-	Pcontrainte c3 = CONTRAINTE_UNDEFINED;
+	//Pcontrainte c3 = CONTRAINTE_UNDEFINED;
 
 	vect_add_elem(&v2, TCST, VALUE_ONE);
 	vect_add_elem(&v2, (Variable) e, VALUE_MONE);
-	c2 = contrainte_make(v2);
-	contrainte_succ(c1) = c2;
+	tf = transformer_inequality_add(tf, v2);
+	// c2 = contrainte_make(v2);
+	//contrainte_succ(c1) = c2;
 	vect_add_elem(&v3, (Variable) e, VALUE_MONE);
-	c3 = contrainte_make(v3);
-	contrainte_succ(c2) = c3;
+	//c3 = contrainte_make(v3);
+	//contrainte_succ(c2) = c3;
+	tf = transformer_inequality_add(tf, v3);
       }
 
-      tf = make_transformer(NIL,
-			    make_predicate(sc_make(CONTRAINTE_UNDEFINED, c1)));
+      //tf = make_transformer(NIL,
+      //		    make_predicate(sc_make(CONTRAINTE_UNDEFINED, c1)));
+
     }
     else if(d == -1) {
       /* The assigned value is 1 or -1 */
@@ -1835,6 +1891,7 @@ static transformer integer_minmax_to_transformer(entity v, /*value for minmax*/
 {
   transformer tf = transformer_identity();
   list cexpr;
+  intptr_t bound = is_min? LONG_MAX : LONG_MIN;
 
   pips_debug(8, "begin for %s %s\n",
 	     is_min? "minimum" : "maximum",
@@ -1842,6 +1899,15 @@ static transformer integer_minmax_to_transformer(entity v, /*value for minmax*/
 
   for(cexpr = args; !ENDP(cexpr); POP(cexpr)) {
     expression arg = EXPRESSION(CAR(cexpr));
+    intptr_t lb, ub;
+    if(precondition_minmax_of_expression(arg, pre, &lb, &ub)) {
+      // FI: useless precision loss, anticipating
+      // transformer_add_inequality_with+integer_constraint()
+      bound = is_min? (MIN(bound, lb)) : (MAX(bound, ub));
+    }
+    else {
+      bound = is_min? LONG_MIN : LONG_MAX;
+    }
     entity tv = make_local_temporary_value_entity(entity_type(v));
     transformer etf = integer_expression_to_transformer(tv, arg, pre,
 							is_internal);
@@ -1857,6 +1923,21 @@ static transformer integer_minmax_to_transformer(entity v, /*value for minmax*/
     tf = transformer_safe_image_intersection(tf, etf);
     free_transformer(etf);
   }
+
+  if(bound!=LONG_MIN && bound!=LONG_MAX) { // FI: this test does not
+					   // seem to work as expected...
+    int b = (int) bound;
+    if((intptr_t) b == bound) { // FI: for safety...
+      //tf = transformer_add_inequality_with_integer_constant(tf, v, bound, is_min);
+      tf = transformer_add_inequality_with_integer_constraint(tf, v, b, !is_min);
+    }
+  }
+
+  // FI: not strong enough to remove stupid redundancy. See
+  // Semantics/minmax3
+  // I do not dare add a stronger normalization because it could
+  // impact the execution time too much...
+  //tf = transformer_normalize(tf, 2);
 
   ifdebug(8) {
     pips_debug(8, "result:\n");
@@ -3736,7 +3817,10 @@ bool precondition_minmax_of_value(entity val,
 /* compute integer bounds @p pmax, @p pmin of expression @p exp under preconditions @p tr
  * require value mappings set !
  */
-bool precondition_minmax_of_expression(expression exp, transformer tr,intptr_t* pmin, intptr_t* pmax)
+bool precondition_minmax_of_expression(expression exp,
+				       transformer tr, // precondition
+				       intptr_t* pmin,
+				       intptr_t* pmax)
 {
     bool success;
     /* create a temporary value */
@@ -3746,8 +3830,10 @@ bool precondition_minmax_of_expression(expression exp, transformer tr,intptr_t* 
 
     /* compute its preconditions */
     transformer var_tr = safe_any_expression_to_transformer(var,exp,tr,false);
+    transformer pre = transformer_apply(var_tr, tr);
 
-    success = precondition_minmax_of_value(var, var_tr, pmin, pmax);
+    //success = precondition_minmax_of_value(var, var_tr, pmin, pmax);
+    success = precondition_minmax_of_value(var, pre, pmin, pmax);
 
     /* tidy & return */
     predicate_system(transformer_relation(var_tr))=SC_UNDEFINED;
