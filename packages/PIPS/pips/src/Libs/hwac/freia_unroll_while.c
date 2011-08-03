@@ -48,19 +48,132 @@
 #include "freia.h"
 #include "hwac.h"
 
+typedef struct {
+  int morpho;
+  int comp;
+  int vol;
+  bool bad_stuff;
+} fcs_ctx;
+
+static bool fcs_count(statement s, fcs_ctx * ctx)
+{
+  if (!statement_call_p(s))
+  {
+    ctx->bad_stuff = true;
+    gen_recurse_stop(NULL);
+  }
+  else
+  {
+    call c = freia_statement_to_call(s);
+    if (c)
+    {
+      string called = entity_local_name(call_function(c));
+      // could be: dilate + inf + vol or erode + sup + vol
+      if (same_string_p(called, AIPO "erode_8c") ||
+          same_string_p(called, AIPO "erode_6c") ||
+          same_string_p(called, AIPO "dilate_8c") ||
+          same_string_p(called, AIPO "dilate_6c"))
+        ctx->morpho++;
+      else if (same_string_p(called, AIPO "inf") ||
+               same_string_p(called, AIPO "sup"))
+        ctx->comp++;
+      else if (same_string_p(called, AIPO "global_vol"))
+        ctx->vol++;
+      // else { // should do more filtering!
+      // ctx->bad_stuff = true;
+      // gen_recurse_stop(NULL);
+      // }
+    }
+  }
+  return false;
+}
+
+/* @return whether sq contains freia simple calls to E/D, </>, vol, =
+ * this is rather an over approximation of whether it is a convergence
+ * sequence, should be refined...
+ */
+static bool freia_convergence_sequence_p(sequence sq)
+{
+  fcs_ctx ctx = { 0, 0, 0, false };
+  gen_context_recurse(sq, &ctx, statement_domain, fcs_count, gen_null);
+  return ctx.morpho==1 && ctx.comp==1 && ctx.vol==1 && !ctx.bad_stuff;
+}
+
+static void maybe_unroll_while_rwt(whileloop wl, bool * changed)
+{
+  if (statement_sequence_p(whileloop_body(wl)))
+  {
+    sequence sq = statement_sequence(whileloop_body(wl));
+    if (freia_convergence_sequence_p(sq))
+    {
+      // unroll!
+      int factor = get_int_property(spoc_depth_prop);
+      pips_assert("some unrolling factor", factor>0);
+      list ol = sequence_statements(sq);
+
+      // sorry, just a hack to avoid a precise pattern matching
+      statement first = STATEMENT(CAR(ol));
+      pips_assert("s is an assignement", statement_call_p(first));
+      gen_remove_once(&ol, first);
+      list col = gen_copy_seq(ol), nl = NIL;
+
+      // cleanup vol from col
+      FOREACH(statement, s, col)
+      {
+        call c = freia_statement_to_call(s);
+        if (c && same_string_p(entity_local_name(call_function(c)),
+                               AIPO "global_vol"))
+        {
+          gen_remove_once(&col, s);
+          break;
+        }
+      }
+
+      // do factor-1
+      while (--factor)
+        nl = gen_nconc(gen_full_copy_list(col), nl);
+
+      // then reuse initial list for the last one
+      sequence_statements(sq) = CONS(statement, first, gen_nconc(nl, ol));
+
+      // cleanup temporary list
+      gen_free_list(col);
+
+      // must renumber...
+      *changed = true;
+    }
+  }
+}
+
+// this should exists somewhere???
+static bool sr_flt(statement s, int * number)
+{
+  if (statement_number(s)!=STATEMENT_NUMBER_UNDEFINED)
+    statement_number(s) = (*number)++;
+  return true;
+}
+
+static void stmt_renumber(statement s)
+{
+  int number=1;
+  gen_context_recurse(s, &number, statement_domain, sr_flt, gen_null);
+}
+
 static void freia_unroll_while_for_spoc(statement s)
 {
-  pips_internal_error("not implemented yet!");
+  bool changed = false;
+  gen_context_recurse(s, &changed,
+                      whileloop_domain, gen_true, maybe_unroll_while_rwt);
+  if (changed)
+  {
+    stmt_renumber(s);
+    module_reorder(s);
+  }
 }
 
 int freia_unroll_while(string module)
 {
   debug_on("PIPS_HWAC_DEBUG_LEVEL");
-
-  if (!get_bool_property("HWAC_FREIA_SPOC_UNROLL_WHILE"))
-    // do nothing... should be prevented from pipsmake?
-    return true;
-
   pips_debug(1, "considering module %s\n", module);
 
   // else do the stuff
