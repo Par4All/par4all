@@ -989,29 +989,31 @@ bool inlining_simple(char *module_name)
 static bool
 run_inlining(string caller_name, string module_name, inlining_parameters p)
 {
-    /* Get the module ressource */
-    inlined_module (p)= module_name_to_entity( module_name );
-    inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, true);
-    
+  /* Get the module ressource */
+  inlined_module (p)= module_name_to_entity( module_name );
+  inlined_module_statement (p) =
+    (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
-    if(statement_block_p(inlined_module_statement (p)) && ENDP(statement_block(inlined_module_statement (p))))
-    {
-        pips_user_warning("not inlining empty function, this should be a generated skeleton ...\n");
-        return false;
-    }
-    else {
+  if(statement_block_p(inlined_module_statement (p)) &&
+     ENDP(statement_block(inlined_module_statement (p))))
+  {
+    pips_user_warning("not inlining empty function %s, "
+                      "this should be a generated skeleton ...\n",
+                      module_name);
+    return false;
+  }
+  else {
+    if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true));
 
-        if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true));
+    /* check them */
+    pips_assert("is a functionnal",entity_function_p(inlined_module(p)) || entity_subroutine_p(inlined_module(p)) );
+    pips_assert("statements found", !statement_undefined_p(inlined_module_statement(p)) );
 
-        /* check them */
-        pips_assert("is a functionnal",entity_function_p(inlined_module(p)) || entity_subroutine_p(inlined_module(p)) );
-        pips_assert("statements found", !statement_undefined_p(inlined_module_statement(p)) );
-
-        /* inline call */
-        inline_calls( p, caller_name );
-        if(use_effects(p)) reset_cumulated_rw_effects();
-        return true;
-    }
+    /* inline call */
+    inline_calls( p, caller_name );
+    if(use_effects(p)) reset_cumulated_rw_effects();
+    return true;
+  }
 }
 
 
@@ -1113,8 +1115,8 @@ bool do_unfolding(inlining_parameters p, char* module_name)
  */
 bool unfolding(char* module_name)
 {
-    iparam p = IPARAM_INIT;
-    use_effects(&p)=true;
+  iparam p = IPARAM_INIT;
+  use_effects(&p)=true;
 	return do_unfolding(&p,module_name);
 }
 

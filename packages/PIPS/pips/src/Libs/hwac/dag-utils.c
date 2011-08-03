@@ -648,6 +648,59 @@ switch_vertex_to_assign(dagvtx target, dagvtx source)
   return false;
 }
 
+/* subtitute produced or used image in the statement of vertex v.
+ * @param v vertex
+ * @param source image variable to replace
+ * @param target new image variable to use
+ * @param used whether to replace used image (input, forward propagation)
+ *             or procuded image (output, backward propagation)
+ */
+static void substitute_image_in_statement
+(dagvtx v, entity source, entity target, bool used)
+{
+  pips_debug(8, "image %s -> %s in %"_intFMT"\n",
+             entity_name(source), entity_name(target), dagvtx_number(v));
+
+  int nsubs=0;
+  vtxcontent vc = dagvtx_content(v);
+  pstatement ps = vtxcontent_source(vc);
+  pips_assert("is a statement", pstatement_statement_p(ps));
+
+  // get call
+  call c = freia_statement_to_call(pstatement_statement(ps));
+  list args = call_arguments(c);
+
+  const freia_api_t * api = dagvtx_freia_api(v);
+
+  // how many argument to skip, how many to replace
+  unsigned int skip, subs;
+
+  if (used)
+    skip = api->arg_img_out, subs = api->arg_img_in;
+  else
+    skip = 0, subs = api->arg_img_out;
+
+  pips_assert("call length is okay", gen_length(args)>=skip+subs);
+
+  while (skip--)
+    args = CDR(args);
+
+  while (subs--)
+  {
+    expression e = EXPRESSION(CAR(args));
+    // I'm not sure what to do if an image is not a simple reference...
+    pips_assert("image argument is a reference", expression_reference_p(e));
+    reference r = expression_reference(e);
+
+    if (reference_variable(r)==source)
+      nsubs++, reference_variable(r) = target;
+    args = CDR(args);
+  }
+
+  // ??? Hmmm... this happens in freia_3muls, not sure why.
+  // pips_assert("some image substitutions", nsubs>0);
+}
+
 /* replace target vertex by a copy of source results...
  * @param target to be removed
  * @param source does perform the same computation
@@ -656,7 +709,7 @@ switch_vertex_to_assign(dagvtx target, dagvtx source)
 static void switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
 {
   pips_debug(5, "replacing %"_intFMT" by %"_intFMT"\n",
-       dagvtx_number(target), dagvtx_number(source));
+             dagvtx_number(target), dagvtx_number(source));
 
   ifdebug(9) {
     dagvtx_dump(stderr, "in source", source);
@@ -672,13 +725,16 @@ static void switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
   vtxcontent_inputs(cot) = CONS(entity, src_img, NIL);
 
   // fix vertices
-
   FOREACH(dagvtx, v, tpreds)
     gen_remove(&dagvtx_succs(v), target);
 
+  entity trg_img = dagvtx_image(target);
   FOREACH(dagvtx, s, dagvtx_succs(target))
-    gen_list_patch(vtxcontent_inputs(dagvtx_content(s)),
-       dagvtx_image(target), src_img);
+  {
+    gen_list_patch(vtxcontent_inputs(dagvtx_content(s)), trg_img, src_img);
+    // also fix subsequent statements, for AIPO output
+    substitute_image_in_statement(s, trg_img, src_img, true);
+  }
   dagvtx_succs(source) = gen_once(target, dagvtx_succs(source));
   dagvtx_succs(source) = gen_nconc(dagvtx_succs(target), dagvtx_succs(source));
   dagvtx_succs(target) = NIL;
@@ -722,62 +778,13 @@ static bool list_commuted_p(const list l1, const list l2)
     CHUNKP(CAR(l1))==CHUNKP(CAR(CDR(l2)));
 }
 
-/* subtitute produced or used image in the statement of vertex v.
- * @param v vertex
- * @param source image variable to replace
- * @param target new image variable to use
- * @param used whether to replace used image (input, forward propagation)
- *             or procuded image (output, backward propagation)
- */
-static void substitute_image_in_statement
-(dagvtx v, entity source, entity target, bool used)
-{
-  int nsubs=0;
-  vtxcontent vc = dagvtx_content(v);
-  pstatement ps = vtxcontent_source(vc);
-  pips_assert("is a statement", pstatement_statement_p(ps));
-
-  // get call
-  call c = freia_statement_to_call(pstatement_statement(ps));
-  list args = call_arguments(c);
-
-  const freia_api_t * api = dagvtx_freia_api(v);
-
-  // how many argument to skip, how many to replace
-  unsigned int skip, subs;
-
-  if (used)
-    skip = api->arg_img_out, subs = api->arg_img_in;
-  else
-    skip = 0, subs = api->arg_img_out;
-
-  pips_assert("call length is okay", gen_length(args)>=skip+subs);
-
-  while (skip--)
-    args = CDR(args);
-
-  while (subs--)
-  {
-    expression e = EXPRESSION(CAR(args));
-    // I'm not sure what to do if an image is not a simple reference...
-    pips_assert("image argument is a reference", expression_reference_p(e));
-    reference r = expression_reference(e);
-
-    if (reference_variable(r)==source)
-      nsubs++, reference_variable(r) = target;
-    args = CDR(args);
-  }
-
-  // ??? Hmmm... this happens in freia_3muls, not sure why.
-  // pips_assert("some image substitutions", nsubs>0);
-}
-
-
 /* "copy" copies "source" image in dag "d".
  * remove it properly (forward copy propagation)
  */
 static void unlink_copy_vertex(dag d, const entity source, dagvtx copy)
 {
+  pips_debug(8, "unlinking %"_intFMT"\n", dagvtx_number(copy));
+
   entity target = vtxcontent_out(dagvtx_content(copy));
   // may be NULL if source is an input
   dagvtx prod = dagvtx_get_producer(d, copy, source, 0);
@@ -1554,7 +1561,8 @@ static bool any_use_statement(set stats)
 
 /* @return whether there is a significant use of e outside of stats
  */
-static bool other_significant_uses(entity e, hash_table occs, set stats)
+static bool other_significant_uses
+(entity e, const hash_table occs, const set stats)
 {
   if (!occs) return true; // safe
   set all_stats = (set) hash_get(occs, e);
@@ -1572,9 +1580,12 @@ static bool other_significant_uses(entity e, hash_table occs, set stats)
  * ??? BUG the output is rather an approximation
  * should rely on used defs or out effects for the underlying
  * sequence. however, the status of chains and effects on C does not
- * allow it.
+ * allow it at the time.
+ * @param d dag to consider
+ * @param occs statement image occurences, may be NULL
+ * @param output_images images that are output, may be NULL
  */
-void dag_compute_outputs(dag d, hash_table occs)
+void dag_compute_outputs(dag d, const hash_table occs, const set output_images)
 {
   set outvars = set_make(set_pointer);
   set outs = set_make(set_pointer);
@@ -1593,9 +1604,10 @@ void dag_compute_outputs(dag d, hash_table occs)
 
       pips_debug(8, "entity is %s\n", safe_entity_name(out));
 
-      if (out!=entity_undefined &&
-          // no successors to this vertex BUT it is used somewhere
-          ((!dagvtx_succs(v) && other_significant_uses(out, occs, stats)) ||
+      if (out!=entity_undefined && !set_belong_p(outvars, out) &&
+          ((output_images && set_belong_p(output_images, out)) ||
+           // no successors to this vertex BUT it is used somewhere
+           (!dagvtx_succs(v) && other_significant_uses(out, occs, stats)) ||
            // all non-empty successors are measures?!
            (dagvtx_succs(v) && all_mesures_p(dagvtx_succs(v))) ||
            // new function parameter not yet an output
@@ -1914,15 +1926,19 @@ static void dag_append_freia_call(dag d, statement s)
  * @param list of statements in sequence
  * @param number dag identifier in function
  * @param occurrences entity -> set of statements where they appear
+ * @param output_images set of images that are output
  */
-dag build_freia_dag(string module, list ls, int number, hash_table occurrences)
+dag freia_build_dag(string module, list ls, int number,
+                    const hash_table occurrences, const set output_images)
 {
   // build full dag
   dag fulld = make_dag(NIL, NIL, NIL);
 
   FOREACH(statement, s, ls)
     dag_append_freia_call(fulld, s);
-  dag_compute_outputs(fulld, occurrences);
+
+  dag_compute_outputs(fulld, occurrences, output_images);
+
   ifdebug(3) dag_dump(stderr, "fulld", fulld);
 
   // dump resulting dag
@@ -1979,9 +1995,89 @@ static expression do_point_to(entity var, string field_name)
                   NULL)));
 }
 
+/************************************* FIND FIRST REFERENCED IMAGE SOMEWHERE */
+// hmmm... only works if initialized at the declaration level
+
+static bool image_ref_flt(reference r, entity * image)
+{
+  entity var = reference_variable(r);
+  if (freia_image_variable_p(var))
+  {
+    *image = var;
+    gen_recurse_stop(NULL);
+  }
+  // do not go in array indexes
+  return false;
+}
+
+// ??? l'arrache (tm)
+static entity get_upper_model(entity model, const hash_table occs)
+{
+  entity image = NULL;
+  // first look in declarations
+  gen_context_recurse(entity_initial(model), &image,
+                      reference_domain, image_ref_flt, gen_null);
+  // then look for statements...
+  if (!image && hash_defined_p(occs, model))
+  {
+    SET_FOREACH(statement, s, (set) hash_get(occs, model))
+    {
+      if (is_freia_alloc(s))
+        gen_context_recurse(freia_statement_to_call(s), &image,
+                            reference_domain, image_ref_flt, gen_null);
+      if (image && image!=model) break;
+      image = NULL;
+    }
+  }
+  // go upwards!
+  if (image && image!=model) image = get_upper_model(image, occs);
+  return image? image: model;
+}
+
+/* @return statement where image is allocated/deallocated
+ * maybe I should build another hash_table for this purpose?
+ */
+statement freia_memory_management_statement
+(entity image, const hash_table occs, bool alloc)
+{
+  pips_debug(8, "look for %s statement for %s\n",
+             alloc? "allocation": "deallocation", entity_name(image));
+
+  if (hash_defined_p(occs, image))
+  {
+    SET_FOREACH(statement, s, (set) hash_get(occs, image))
+    {
+      // it may already have been switched to a sequence by a prior insert...
+      // ??? it is unclear why I encounter nested sequences
+      while (statement_sequence_p(s))
+        s = STATEMENT(CAR(sequence_statements(statement_sequence(s))));
+
+      // fprintf(stderr, "statement %"_intFMT"?\n", statement_number(s));
+      if (alloc && is_freia_alloc(s))
+      {
+        call c = statement_call(s);
+        pips_assert("must be an assignment", ENTITY_ASSIGN_P(call_function(c)));
+        entity var;
+        gen_context_recurse(EXPRESSION(CAR(call_arguments(c))), &var,
+                            reference_domain, image_ref_flt, gen_null);
+        if (var==image) return s;
+      }
+      else if (!alloc && is_freia_dealloc(s))
+      {
+        call c = statement_call(s);
+        entity var;
+        gen_context_recurse(EXPRESSION(CAR(call_arguments(c))), &var,
+                            reference_domain, image_ref_flt, gen_null);
+        if (var==image) return s;
+      }
+    }
+  }
+  return NULL;
+}
+
 /* @return a new image from the model
  */
-static entity new_local_image_variable(entity model)
+static entity new_local_image_variable(entity model, const hash_table occs)
 {
   entity img = NULL;
   int index = 1;
@@ -1996,17 +2092,48 @@ static entity new_local_image_variable(entity model)
     index++;
     if (img)
     {
-      // handle allocation as the declaration initial value
-      free_value(entity_initial(img));
-      entity_initial(img) =
-        make_value_expression(
-          call_to_expression(
-            make_call(local_name_to_top_level_entity(FREIA_ALLOC),
-                      gen_make_list(expression_domain,
-                                    do_point_to(model, "bpp"),
-                                    do_point_to(model, "width"),
-                                    do_point_to(model, "height"),
-                                    NULL))));
+      // use the reference of the model instead of the model itself, if found.
+      entity ref = get_upper_model(model, occs);
+
+      call alloc = make_call(local_name_to_top_level_entity(FREIA_ALLOC),
+                             gen_make_list(expression_domain,
+                                           do_point_to(ref, "bpp"),
+                                           do_point_to(ref, "widthWa"),
+                                           do_point_to(ref, "heightWa"),
+                                           NULL));
+
+      // handle allocation as the declaration initial value, if possible
+      if (formal_parameter_p(ref))
+      {
+        free_value(entity_initial(img));
+        entity_initial(img) = make_value_expression(call_to_expression(alloc));
+      }
+      else
+      {
+        statement sa = freia_memory_management_statement(ref, occs, true);
+
+        if (sa)
+        {
+          // insert statement just after the reference declaration
+          free_value(entity_initial(img));
+          entity_initial(img) = make_value_expression(int_to_expression(0));
+
+          statement na = make_assign_statement(entity_to_expression(img),
+                                               call_to_expression(alloc));
+          insert_statement(sa, na, false);
+        }
+        else
+        {
+          // this may happen if the "ref" is allocated at its declaration point,
+          // as this statement is not currently found by our search
+
+          // ??? try with a direct declaration
+          free_value(entity_initial(img));
+          entity_initial(img) =
+            make_value_expression(call_to_expression(alloc));
+        }
+      }
+
       // should not be a parameter! overwrite storage if so...
       if (formal_parameter_p(img))
       {
@@ -2055,7 +2182,7 @@ static void switch_image_variable(dagvtx v, entity old, entity img)
 /* fix intermediate image reuse in dag
  * @return new image entities to be added to declarations
  */
-list dag_fix_image_reuse(dag d, hash_table init)
+list dag_fix_image_reuse(dag d, hash_table init, const hash_table occs)
 {
   list images = NIL;
   set seen = set_make(hash_pointer);
@@ -2070,7 +2197,7 @@ list dag_fix_image_reuse(dag d, hash_table init)
 
     if (set_belong_p(seen, img))
     {
-      entity new_img = new_local_image_variable(img);
+      entity new_img = new_local_image_variable(img, occs);
       switch_image_variable(v, img, new_img);
       images = CONS(entity, new_img, images);
       // keep track of new->old image mapping, to reverse it latter eventually
