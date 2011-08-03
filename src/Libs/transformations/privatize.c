@@ -751,10 +751,23 @@ bool localize_declaration(char *mod_name) {
 
         /* Renumber the statement with a new ordering */
         module_reorder(get_current_module_statement());
-        DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
 
         /* postlude */
         debug_off();
+
+        /* Apply clean declarations ! */
+        debug_on("CLEAN_DECLARATIONS_DEBUG_LEVEL");
+        set_cumulated_rw_effects(
+            (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+                                                      mod_name,
+                                                      true));
+        module_clean_declarations(get_current_module_entity(),
+                                  get_current_module_statement());
+        reset_cumulated_rw_effects();
+        debug_off();
+
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
+
         reset_current_module_entity();
         reset_current_module_statement();
         pips_debug(1,"end localize_declaration\n");
