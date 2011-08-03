@@ -214,7 +214,7 @@ extern int Read_spec_mode ;
 		 (dom)>=0 && (dom)<MAX_DOMAIN)
 
 #define check_read_spec_performed() \
-  message_assert("gen_read_spec not performed prior to use", \
+  message_assert("gen_read_spec performed prior to use", \
 		 Read_spec_performed);
 
 #define NEWGEN_FREED ((void*)NULL)
