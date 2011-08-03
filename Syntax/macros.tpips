@@ -5,9 +5,9 @@ setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS=TRUE
 delete macros
 create macros macros.f
 echo Code...
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALLFUNC]
 echo Callgraph...
-display CALLGRAPH_FILE($ALL)
+display CALLGRAPH_FILE[%ALLFUNC]
 close
 delete macros
 quit

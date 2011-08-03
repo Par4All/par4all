@@ -9,6 +9,6 @@ activate MUST_REGIONS
 activate PRINT_CODE_REGIONS
 display PRINTED_FILE
 activate PRINT_CODE_OUT_REGIONS
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALLFUNC]
 close
 delete trad
