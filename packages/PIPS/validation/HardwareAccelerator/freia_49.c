@@ -2,10 +2,10 @@
 
 freia_status freia_49(freia_data2d * out, freia_data2d * in)
 {
-  freia_data2d * ta = freia_common_create_data(16, 128, 128);
-  freia_data2d * tb = freia_common_create_data(16, 128, 128);
-  freia_data2d * tc = freia_common_create_data(16, 128, 128);
-  freia_data2d * td = freia_common_create_data(16, 128, 128);
+  freia_data2d * ta = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+  freia_data2d * tb = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+  freia_data2d * tc = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+  freia_data2d * td = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
 
   freia_aipo_set_constant(ta, 255);
   freia_aipo_dilate_8c(tb, in, freia_morpho_kernel_8c);

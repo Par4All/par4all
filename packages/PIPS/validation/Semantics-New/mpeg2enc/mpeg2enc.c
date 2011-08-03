@@ -44,6 +44,7 @@ int main(argc,argv)
 int argc;
 char *argv[];
 {
+  if(1) {
   if (argc!=3)
   {
     printf("\n%s, %s\n",version,author);
@@ -69,7 +70,7 @@ char *argv[];
 
   fclose(outfile);
   fclose(statfile);
-
+  }
   return 0;
 }
 

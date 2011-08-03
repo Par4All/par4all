@@ -313,7 +313,7 @@ freia_status my_replace_const_helper_0_0_0(
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
   // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][1];
+  terapix_mcu_macrocode mcu_macro[2][2];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][1];
   // imagelets definitions:
@@ -346,18 +346,15 @@ freia_status my_replace_const_helper_0_0_0(
   redres.size = sizeof(terapix_reduction);
 
   // 0: :(1,2) -> 1
-  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
-  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  // *special* set parameter for replace_const
+  mcu_macro[0][0].xmin1 = 0;
+  mcu_macro[1][0].xmin1 = 0;
   mcu_macro[0][0].ymin1 = 0;
   mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][0].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][0].xmin2 = 0;
+  mcu_macro[1][0].xmin2 = 0;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
-  mcu_macro[0][0].xmin3 = imagelet_io_1_0;
-  mcu_macro[1][0].xmin3 = imagelet_io_1_1;
-  mcu_macro[0][0].ymin3 = 0;
-  mcu_macro[1][0].ymin3 = 0;
   // copy of operation 0 parameters
   p_0[0] = pi3;
   gram.xoffset = x_0;
@@ -372,14 +369,37 @@ freia_status my_replace_const_helper_0_0_0(
   mcu_macro[1][0].ymin3 = y_0;
   mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][0].iter2 = imagelet_size;
-  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter2 = 0;
+  mcu_macro[1][0].iter2 = 0;
   mcu_macro[0][0].iter3 = 0;
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_CONV_REPLACE_EQ_CONST;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_CONV_REPLACE_EQ_CONST;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_SET_CONST_RAMREG;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_SET_CONST_RAMREG;
+  // now take care of actual operation
+  mcu_macro[0][1].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][1].ymin1 = 0;
+  mcu_macro[1][1].ymin1 = 0;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][1].ymin2 = 0;
+  mcu_macro[1][1].ymin2 = 0;
+  mcu_macro[0][1].xmin3 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin3 = imagelet_io_1_1;
+  mcu_macro[0][1].ymin3 = 0;
+  mcu_macro[1][1].ymin3 = 0;
+  mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][1].iter2 = imagelet_size;
+  mcu_macro[1][1].iter2 = imagelet_size;
+  mcu_macro[0][1].iter3 = 0;
+  mcu_macro[1][1].iter3 = 0;
+  mcu_macro[0][1].iter4 = 0;
+  mcu_macro[1][1].iter4 = 0;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_CONV_REPLACE_EQ_CONST;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_CONV_REPLACE_EQ_CONST;
 
 
   // inputs:
@@ -420,7 +440,7 @@ freia_status my_replace_const_helper_0_0_0(
   mcu_instr.in1 = tile_in[1];
 
   // actual instructions
-  mcu_instr.nbinstr = 1;
+  mcu_instr.nbinstr = 2;
   mcu_instr.instr0   = mcu_macro[0];
   mcu_instr.instr1   = mcu_macro[1];
 

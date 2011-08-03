@@ -1,0 +1,71 @@
+
+Transformers for "MINMAX5"
+
+
+C  T() {}
+
+! To check impact of non-affine expressions as arguments of min and max
+
+      SUBROUTINE MINMAX5
+
+C  T() {4<=M, M<=10}
+
+
+      IF (4.GT.M.OR.M.GT.10) STOP                                       0005
+
+C  T() {4<=M, M<=10, 5<=N, N<=11}
+
+      IF (5.GT.N.OR.N.GT.11) STOP                                       0006
+
+C  T(I) {2<=I, 2I<=M, 2I<=N, 4<=M, M<=10, 5<=N, N<=11}
+
+
+      I = MIN(M/2, N/2)                                                 0008
+
+C  T(J) {2<=I, 2I<=M, 2I<=N, J<=5, M<=2J+1, N<=2J+1, 4<=M, M<=10,
+C    5<=N, N<=11}
+
+      J = MAX(M/2, N/2)                                                 0009
+
+C  T() {2<=I, 2I<=M, 2I<=N, J<=5, M<=2J+1, N<=2J+1, 4<=M, M<=10, 5<=N,
+C    N<=11}
+
+
+      PRINT *, I, J                                                     0011
+
+      END
+
+Preconditions for "MINMAX5"
+
+
+C  P() {}
+
+! To check impact of non-affine expressions as arguments of min and max
+
+      SUBROUTINE MINMAX5
+
+C  P() {}
+
+
+      IF (4.GT.M.OR.M.GT.10) STOP                                       0005
+
+C  P() {4<=M, M<=10}
+
+      IF (5.GT.N.OR.N.GT.11) STOP                                       0006
+
+C  P() {4<=M, M<=10, 5<=N, N<=11}
+
+
+      I = MIN(M/2, N/2)                                                 0008
+
+C  P(I) {2<=I, 2I<=M, 2I<=N, 4<=M, M<=10, 5<=N, N<=11}
+
+      J = MAX(M/2, N/2)                                                 0009
+
+C  P(I,J) {2<=I, 2I<=M, 2I<=N, J<=5, M<=2J+1, N<=2J+1, 4<=M, M<=10,
+C    5<=N, N<=11}
+
+
+      PRINT *, I, J                                                     0011
+
+      END

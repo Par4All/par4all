@@ -1,0 +1,56 @@
+setenv WS=effects_anywhere01
+delete $WS
+create $WS $WS.c
+
+#echo Select some options to deal with the C Language:
+#echo Parse as C:
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+#echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+#echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+
+activate PRINT_CODE_PROPER_EFFECTS
+
+echo
+echo Proper effects
+echo
+display PRINTED_FILE[$WS]
+
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+
+echo
+echo Cumulated effects 
+echo
+display PRINTED_FILE[$WS]
+#quit
+activate PRINT_CODE_TRANSFORMERS
+
+echo
+echo Transformers
+echo
+display PRINTED_FILE[$WS]
+
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Preconditions in "main"
+echo
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions
+echo
+display PRINTED_FILE[$WS]
+
+close
+delete $WS
+quit

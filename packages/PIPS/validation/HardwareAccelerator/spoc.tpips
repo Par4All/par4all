@@ -1,4 +1,6 @@
 # WSPACE=foo FILE=foo.c tpips spoc.tpips
 # setenv PIPS_HWAC_DEBUG_LEVEL=7
 setenv FREIA_TARGET=SPOC
+setenv DO_UNROLL=apply
 source target.tpips
+unsetenv DO_UNROLL

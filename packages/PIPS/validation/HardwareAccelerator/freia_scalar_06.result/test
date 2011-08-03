@@ -757,21 +757,21 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // look for order issues when reusing a temporary image
    // A
+   freia_scalar_06_helper_0_0_0(X, i, &sA, k, &sA2);                    /*0017*/
    // B
+   freia_scalar_06_helper_0_1_0(tC, X, X, i, sA-10, sA-1, false, k, &sB, sA2-10, sA2-1, false);       /*0019*/
    // A
    // A
-   freia_scalar_06_helper_0_0_0(X, i, &sA, k, &sA2);                    /*0023*/
    // C with X from A
    // C
+   freia_scalar_06_helper_0_2_0(tC3, tC, k);                            /*0027*/
    // C
-   freia_scalar_06_helper_0_2_0(tC3, tC, k);                            /*0029*/
    // B
    // B
-   freia_scalar_06_helper_0_1_0(tC, X, X, i, sA-10, sA-1, false, k, &sB, sA2-10, sA2-1, false);       /*0033*/
    // D with X from B
+   freia_scalar_06_helper_0_3_0(o, X, tC3, sB-10, sB-1, false);         /*0035*/
    // D
-   freia_scalar_06_helper_0_3_0(o, X, tC3, sB-10, sB-1, false);         /*0037*/
-
+   
    freia_common_destruct_data(X);                                       /*0039*/
    freia_common_destruct_data(tC);                                      /*0041*/
    return FREIA_OK;                                                     /*0043*/
@@ -792,21 +792,21 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // look for order issues when reusing a temporary image
    // A
+   freia_scalar_06_helper_0_0_0(X, i, &sA, k, &sA2);                    /*0017*/
    // B
+   freia_scalar_06_helper_0_1_0(tC, X, X, i, sA-10, sA-1, 0, k, &sB, sA2-10, sA2-1, 0);               /*0019*/
    // A
    // A
-   freia_scalar_06_helper_0_0_0(X, i, &sA, k, &sA2);                    /*0023*/
    // C with X from A
    // C
+   freia_scalar_06_helper_0_2_0(tC3, tC, k);                            /*0027*/
    // C
-   freia_scalar_06_helper_0_2_0(tC3, tC, k);                            /*0029*/
    // B
    // B
-   freia_scalar_06_helper_0_1_0(tC, X, X, i, sA-10, sA-1, 0, k, &sB, sA2-10, sA2-1, 0);               /*0033*/
    // D with X from B
+   freia_scalar_06_helper_0_3_0(o, X, tC3, sB-10, sB-1, 0);             /*0035*/
    // D
-   freia_scalar_06_helper_0_3_0(o, X, tC3, sB-10, sB-1, 0);             /*0037*/
-
+   
    freia_common_destruct_data(X);                                       /*0039*/
    freia_common_destruct_data(tC);                                      /*0041*/
    return 0;                                                            /*0043*/
@@ -1917,20 +1917,20 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // look for order issues when reusing a temporary image
    // A
+   freia_scalar_06_helper_0_2_0(X, i, &sA, k, &sA2);                    /*0017*/
    // B
+   freia_scalar_06_helper_0_1_0(tC3, X, X, i, sA-10, sA-1, false, k, &sB, sA2-10, sA2-1, false);      /*0019*/
    // A
    // A
-   freia_scalar_06_helper_0_2_0(X, i, &sA, k, &sA2);                    /*0023*/
    // C with X from A
    // C
    // C
    // B
    // B
-   freia_scalar_06_helper_0_1_0(tC3, X, X, i, sA-10, sA-1, false, k, &sB, sA2-10, sA2-1, false);      /*0033*/
    // D with X from B
+   freia_scalar_06_helper_0_0_0(o, X, tC3, sB-10, sB-1, false);         /*0035*/
    // D
-   freia_scalar_06_helper_0_0_0(o, X, tC3, sB-10, sB-1, false);         /*0037*/
-
+   
    freia_common_destruct_data(X);                                       /*0039*/
    return FREIA_OK;                                                     /*0043*/
 }
@@ -1950,20 +1950,20 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // look for order issues when reusing a temporary image
    // A
+   freia_scalar_06_helper_0_2_0(X, i, &sA, k, &sA2);                    /*0017*/
    // B
+   freia_scalar_06_helper_0_1_0(tC3, X, X, i, sA-10, sA-1, 0, k, &sB, sA2-10, sA2-1, 0);              /*0019*/
    // A
    // A
-   freia_scalar_06_helper_0_2_0(X, i, &sA, k, &sA2);                    /*0023*/
    // C with X from A
    // C
    // C
    // B
    // B
-   freia_scalar_06_helper_0_1_0(tC3, X, X, i, sA-10, sA-1, 0, k, &sB, sA2-10, sA2-1, 0);              /*0033*/
    // D with X from B
+   freia_scalar_06_helper_0_0_0(o, X, tC3, sB-10, sB-1, 0);             /*0035*/
    // D
-   freia_scalar_06_helper_0_0_0(o, X, tC3, sB-10, sB-1, 0);             /*0037*/
-
+   
    freia_common_destruct_data(X);                                       /*0039*/
    return 0;                                                            /*0043*/
 }

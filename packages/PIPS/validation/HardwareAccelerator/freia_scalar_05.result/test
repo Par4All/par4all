@@ -700,10 +700,10 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    int sA, sB, sC;                                                      /*0012*/
    
    // look for order issues when reusing a temporary image
-   freia_scalar_05_helper_0_0_0(X, i, &sA, k, &sB);                     /*0018*/
+   freia_scalar_05_helper_0_0_0(X, i, &sA, k, &sB);                     /*0015*/
+   freia_scalar_05_helper_0_1_0(tC, X, X, i, sA-10, sA-1, false, k, &sC, sB-10, sB-1, false);         /*0016*/
    freia_scalar_05_helper_0_2_0(tC2, tC);                               /*0020*/
-   freia_scalar_05_helper_0_1_0(tC, X, X, i, sA-10, sA-1, false, k, &sC, sB-10, sB-1, false);         /*0022*/
-   freia_scalar_05_helper_0_3_0(o, X, tC2, sC-10, sC-1, false);         /*0024*/
+   freia_scalar_05_helper_0_3_0(o, X, tC2, sC-10, sC-1, false);         /*0023*/
 
    freia_common_destruct_data(X);                                       /*0026*/
    freia_common_destruct_data(tC);                                      /*0028*/
@@ -724,10 +724,10 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    int sA, sB, sC;                                                      /*0012*/
    
    // look for order issues when reusing a temporary image
-   freia_scalar_05_helper_0_0_0(X, i, &sA, k, &sB);                     /*0018*/
+   freia_scalar_05_helper_0_0_0(X, i, &sA, k, &sB);                     /*0015*/
+   freia_scalar_05_helper_0_1_0(tC, X, X, i, sA-10, sA-1, 0, k, &sC, sB-10, sB-1, 0);  /*0016*/
    freia_scalar_05_helper_0_2_0(tC2, tC);                               /*0020*/
-   freia_scalar_05_helper_0_1_0(tC, X, X, i, sA-10, sA-1, 0, k, &sC, sB-10, sB-1, 0);  /*0022*/
-   freia_scalar_05_helper_0_3_0(o, X, tC2, sC-10, sC-1, 0);             /*0024*/
+   freia_scalar_05_helper_0_3_0(o, X, tC2, sC-10, sC-1, 0);             /*0023*/
 
    freia_common_destruct_data(X);                                       /*0026*/
    freia_common_destruct_data(tC);                                      /*0028*/
@@ -1797,9 +1797,9 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    int sA, sB, sC;                                                      /*0012*/
    
    // look for order issues when reusing a temporary image
-   freia_scalar_05_helper_0_2_0(X, i, &sA, k, &sB);                     /*0018*/
-   freia_scalar_05_helper_0_1_0(tC2, X, X, i, sA-10, sA-1, false, k, &sC, sB-10, sB-1, false);        /*0022*/
-   freia_scalar_05_helper_0_0_0(o, X, tC2, sC-10, sC-1, false);         /*0024*/
+   freia_scalar_05_helper_0_2_0(X, i, &sA, k, &sB);                     /*0015*/
+   freia_scalar_05_helper_0_1_0(tC2, X, X, i, sA-10, sA-1, false, k, &sC, sB-10, sB-1, false);        /*0016*/
+   freia_scalar_05_helper_0_0_0(o, X, tC2, sC-10, sC-1, false);         /*0023*/
 
    freia_common_destruct_data(X);                                       /*0026*/
    freia_common_destruct_data(tC2);                                     /*0029*/
@@ -1819,9 +1819,9 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    int sA, sB, sC;                                                      /*0012*/
    
    // look for order issues when reusing a temporary image
-   freia_scalar_05_helper_0_2_0(X, i, &sA, k, &sB);                     /*0018*/
-   freia_scalar_05_helper_0_1_0(tC2, X, X, i, sA-10, sA-1, 0, k, &sC, sB-10, sB-1, 0);                /*0022*/
-   freia_scalar_05_helper_0_0_0(o, X, tC2, sC-10, sC-1, 0);             /*0024*/
+   freia_scalar_05_helper_0_2_0(X, i, &sA, k, &sB);                     /*0015*/
+   freia_scalar_05_helper_0_1_0(tC2, X, X, i, sA-10, sA-1, 0, k, &sC, sB-10, sB-1, 0);                /*0016*/
+   freia_scalar_05_helper_0_0_0(o, X, tC2, sC-10, sC-1, 0);             /*0023*/
 
    freia_common_destruct_data(X);                                       /*0026*/
    freia_common_destruct_data(tC2);                                     /*0029*/

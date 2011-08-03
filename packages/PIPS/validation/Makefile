@@ -138,19 +138,20 @@ SUMUP	= pips_validation_summary.pl --aggregate
 
 # generate summary header
 # hmmm... not sure that start date is before the validation
+# pyps version?
 $(HEAD): check-run-consistency
 	{ \
 	  echo "parallel validation" ; \
 	  echo "on dirs: $(TARGET)" ; \
 	  echo "host name: $$(hostname)" ; \
 	  echo "in directory: $(PWD)" ; \
-	  test -d .svn && \
-	    echo " $(SVN.URL)@$(SVN.R) ($(SVN.C))" ; \
+	  test -d .svn && echo " $(SVN.URL)@$(SVN.R) ($(SVN.C))" ; \
 	  echo "with pips: $(shell which pips)" ; \
 	  pips -v ; \
 	  echo "with tpips: $(shell which tpips)" ; \
 	  tpips -v ; \
 	  echo "by user: $$USER" ; \
+	  echo "options: SLOW=$(DO_SLOW) EXE=$(PIPS_VALIDATION_EXE)" ; \
 	  echo "start date: $$(date) [$$(date +%s)]" ; \
 	} > $@
 

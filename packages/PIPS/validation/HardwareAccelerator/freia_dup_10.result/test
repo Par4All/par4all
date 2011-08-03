@@ -221,10 +221,10 @@ freia_status freia_dup_10(freia_data2d *o, freia_data2d *t, freia_data2d *i0, fr
 {
    // same operation performed twice, with commutation
    // t = inf(i0, i1)
-   freia_dup_10_helper_0_0_0(t, i0, i1);
-   freia_aipo_copy(o, t);
+   freia_dup_10_helper_0_0_0(t, i0, i1);                                /*0008*/
    // o = inf(i1, i0)
    // could be replaced by o = t
+   freia_aipo_copy(o, t);
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -234,10 +234,10 @@ freia_status freia_dup_10(freia_data2d *o, freia_data2d *t, freia_data2d *i0, fr
 {
    // same operation performed twice, with commutation
    // t = inf(i0, i1)
-   freia_dup_10_helper_0_0_0(t, i0, i1);
-   freia_aipo_copy(o, t);
+   freia_dup_10_helper_0_0_0(t, i0, i1);                                /*0008*/
    // o = inf(i1, i0)
    // could be replaced by o = t
+   freia_aipo_copy(o, t);
    return 0;                                                            /*0012*/
 }
 #
@@ -473,10 +473,10 @@ freia_status freia_dup_10(freia_data2d *o, freia_data2d *t, freia_data2d *i0, fr
 {
    // same operation performed twice, with commutation
    // t = inf(i0, i1)
-   freia_dup_10_helper_0_0_0(t, i0, i1);
-   freia_aipo_copy(o, t);
+   freia_dup_10_helper_0_0_0(t, i0, i1);                                /*0008*/
    // o = inf(i1, i0)
    // could be replaced by o = t
+   freia_aipo_copy(o, t);
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -486,10 +486,10 @@ freia_status freia_dup_10(freia_data2d *o, freia_data2d *t, freia_data2d *i0, fr
 {
    // same operation performed twice, with commutation
    // t = inf(i0, i1)
-   freia_dup_10_helper_0_0_0(t, i0, i1);
-   freia_aipo_copy(o, t);
+   freia_dup_10_helper_0_0_0(t, i0, i1);                                /*0008*/
    // o = inf(i1, i0)
    // could be replaced by o = t
+   freia_aipo_copy(o, t);
    return 0;                                                            /*0012*/
 }
 #

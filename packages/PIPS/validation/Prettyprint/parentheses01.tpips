@@ -1,0 +1,25 @@
+setenv WS=parentheses01
+delete $WS
+
+create $WS $WS.c
+
+#echo "prettyprint with PRETTYPRINT_ALL_PARENTHESES = FALSE"
+#echo ""
+#display PRINTED_FILE(main)
+#apply UNSPLIT
+
+#shell gcc float_operation.database/Src/float_operation.c -o float_operation.database/Src/float_operation
+
+#echo ""
+#echo "prettyprint with PRETTYPRINT_ALL_PARENTHESES = TRUE"
+#echo ""
+
+#setproperty PRETTYPRINT_ALL_PARENTHESES TRUE
+
+display PARSED_PRINTED_FILE(main)
+#apply UNSPLIT
+
+close
+delete $WS
+quit
+

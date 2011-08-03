@@ -2997,7 +2997,7 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= 0;                                                          /*0064*/
+   ret_0 |= license_plate_copies_helper_0_0_0(imopen, imcloseth, in, kernel1x3, 150, 255, 1);         /*0064*/
    ret_0 |= 0;                                                          /*0065*/
    ret_0 |= 0;                                                          /*0066*/
    ret_0 |= 0;                                                          /*0067*/
@@ -3035,7 +3035,7 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0099*/
    ret_0 |= 0;                                                          /*0100*/
    ret_0 |= 0;                                                          /*0101*/
-   ret_0 |= 0;                                                          /*0102*/
+   ret_0 |= license_plate_copies_helper_0_0_1(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0102*/
    ret_0 |= 0;                                                          /*0103*/
    ret_0 |= 0;                                                          /*0104*/
    ret_0 |= 0;                                                          /*0105*/
@@ -3102,8 +3102,7 @@ int license_plate_copies(void)
    i_1 = 8;                                                             /*0170*/
 
    _return0 = ret_1;                                                    /*0174*/
-
-   license_plate_copies_helper_0_0_0(imopen, imcloseth, in, kernel1x3, 150, 255, 1);   /*0177*/
+   
    
    
    ret_2 = 0;                                                           /*0183*/
@@ -3118,9 +3117,9 @@ int license_plate_copies(void)
    ret_2 |= 0;                                                          /*0192*/
    i_2 = 4;                                                             /*0193*/
 
-   ret_2 |= license_plate_copies_helper_0_0_1(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0195*/
+   ret_2 |= 0;                                                          /*0195*/
    ret_2 |= 0;                                                          /*0196*/
-   ret_2 |= 0;                                                          /*0197*/
+   ret_2 |= license_plate_copies_helper_0_0_2(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);            /*0197*/
    ret_2 |= 0;                                                          /*0198*/
    ret_2 |= 0;                                                          /*0199*/
    ret_2 |= 0;                                                          /*0200*/
@@ -3154,7 +3153,6 @@ int license_plate_copies(void)
 
    _return3 = ret_3;                                                    /*0235*/
 
-   license_plate_copies_helper_0_0_2(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);      /*0239*/
    i_4 = 3;                                                             /*0240*/
 
    _return4 = 0;                                                        /*0242*/
@@ -3226,8 +3224,10 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
+   ret_0 |= license_plate_copies_helper_0_0_0(imopen, imcloseth, in, kernel1x3, 150, 255, 1);         /*0064*/
    i_0 = 15;                                                            /*0094*/
 
+   ret_0 |= license_plate_copies_helper_0_0_1(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0102*/
    i_0 = 15;                                                            /*0126*/
 
    _return1 = ret_0;                                                    /*0130*/
@@ -3239,15 +3239,14 @@ int license_plate_copies(void)
    i_1 = 8;                                                             /*0170*/
 
    _return0 = ret_1;                                                    /*0174*/
-
-   license_plate_copies_helper_0_0_0(imopen, imcloseth, in, kernel1x3, 150, 255, 1);   /*0177*/
+   
    
    
    ret_2 = 0;                                                           /*0183*/
 
    i_2 = 4;                                                             /*0193*/
 
-   ret_2 |= license_plate_copies_helper_0_0_1(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0195*/
+   ret_2 |= license_plate_copies_helper_0_0_2(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);            /*0197*/
    i_2 = 4;                                                             /*0203*/
 
    _return2 = ret_2;                                                    /*0207*/
@@ -3260,7 +3259,6 @@ int license_plate_copies(void)
 
    _return3 = ret_3;                                                    /*0235*/
 
-   license_plate_copies_helper_0_0_2(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);      /*0239*/
    i_4 = 3;                                                             /*0240*/
 
    _return4 = 0;                                                        /*0242*/
@@ -7335,13 +7333,13 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= 0;                                                          /*0064*/
+   ret_0 |= license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);         /*0064*/
    ret_0 |= 0;                                                          /*0065*/
    ret_0 |= 0;                                                          /*0066*/
    ret_0 |= 0;                                                          /*0067*/
    ret_0 |= 0;                                                          /*0068*/
    ret_0 |= 0;                                                          /*0069*/
-   ret_0 |= 0;                                                          /*0070*/
+   ret_0 |= license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);           /*0070*/
    ret_0 |= 0;                                                          /*0071*/
    ret_0 |= 0;                                                          /*0072*/
    ret_0 |= 0;                                                          /*0073*/
@@ -7351,7 +7349,7 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0077*/
    ret_0 |= 0;                                                          /*0078*/
    ret_0 |= 0;                                                          /*0079*/
-   ret_0 |= 0;                                                          /*0080*/
+   ret_0 |= license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);           /*0080*/
    ret_0 |= 0;                                                          /*0081*/
    ret_0 |= 0;                                                          /*0082*/
    ret_0 |= 0;                                                          /*0083*/
@@ -7361,7 +7359,7 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0087*/
    ret_0 |= 0;                                                          /*0088*/
    ret_0 |= 0;                                                          /*0089*/
-   ret_0 |= 0;                                                          /*0090*/
+   ret_0 |= license_plate_copies_helper_0_0_3(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);           /*0090*/
    ret_0 |= 0;                                                          /*0091*/
    ret_0 |= 0;                                                          /*0092*/
    ret_0 |= 0;                                                          /*0093*/
@@ -7373,7 +7371,7 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0099*/
    ret_0 |= 0;                                                          /*0100*/
    ret_0 |= 0;                                                          /*0101*/
-   ret_0 |= 0;                                                          /*0102*/
+   ret_0 |= license_plate_copies_helper_0_0_4(imopen, imopen, kernel1x3);              /*0102*/
    ret_0 |= 0;                                                          /*0103*/
    ret_0 |= 0;                                                          /*0104*/
    ret_0 |= 0;                                                          /*0105*/
@@ -7381,9 +7379,9 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0107*/
    ret_0 |= 0;                                                          /*0108*/
    ret_0 |= 0;                                                          /*0109*/
-   ret_0 |= license_plate_copies_helper_0_0_4(imopen, imopen, kernel1x3);              /*0110*/
+   ret_0 |= 0;                                                          /*0110*/
    ret_0 |= 0;                                                          /*0111*/
-   ret_0 |= 0;                                                          /*0112*/
+   ret_0 |= license_plate_copies_helper_0_0_5(imopen, imopen, kernel1x3);              /*0112*/
    ret_0 |= 0;                                                          /*0113*/
    ret_0 |= 0;                                                          /*0114*/
    ret_0 |= 0;                                                          /*0115*/
@@ -7393,9 +7391,9 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0119*/
    ret_0 |= 0;                                                          /*0120*/
    ret_0 |= 0;                                                          /*0121*/
-   ret_0 |= license_plate_copies_helper_0_0_5(imopen, imopen, kernel1x3);              /*0122*/
+   ret_0 |= 0;                                                          /*0122*/
    ret_0 |= 0;                                                          /*0123*/
-   ret_0 |= 0;                                                          /*0124*/
+   ret_0 |= license_plate_copies_helper_0_0_6(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0124*/
    ret_0 |= 0;                                                          /*0125*/
    i_0 = 15;                                                            /*0126*/
 
@@ -7407,7 +7405,7 @@ int license_plate_copies(void)
    ret_1 |= 0;                                                          /*0137*/
    ret_1 |= 0;                                                          /*0138*/
    ret_1 |= 0;                                                          /*0139*/
-   ret_1 |= license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);         /*0140*/
+   ret_1 |= 0;                                                          /*0140*/
    ret_1 |= 0;                                                          /*0141*/
    ret_1 |= 0;                                                          /*0142*/
    ret_1 |= 0;                                                          /*0143*/
@@ -7417,7 +7415,7 @@ int license_plate_copies(void)
    ret_1 |= 0;                                                          /*0147*/
    ret_1 |= 0;                                                          /*0148*/
    ret_1 |= 0;                                                          /*0149*/
-   ret_1 |= license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);           /*0150*/
+   ret_1 |= 0;                                                          /*0150*/
    ret_1 |= 0;                                                          /*0151*/
    i_1 = 8;                                                             /*0152*/
 
@@ -7429,7 +7427,7 @@ int license_plate_copies(void)
    ret_1 |= 0;                                                          /*0159*/
    ret_1 |= 0;                                                          /*0160*/
    ret_1 |= 0;                                                          /*0161*/
-   ret_1 |= license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);           /*0162*/
+   ret_1 |= 0;                                                          /*0162*/
    ret_1 |= 0;                                                          /*0163*/
    ret_1 |= 0;                                                          /*0164*/
    ret_1 |= 0;                                                          /*0165*/
@@ -7440,8 +7438,7 @@ int license_plate_copies(void)
    i_1 = 8;                                                             /*0170*/
 
    _return0 = ret_1;                                                    /*0174*/
-
-   license_plate_copies_helper_0_0_3(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);     /*0177*/
+   
    
    
    ret_2 = 0;                                                           /*0183*/
@@ -7458,9 +7455,9 @@ int license_plate_copies(void)
 
    ret_2 |= 0;                                                          /*0195*/
    ret_2 |= 0;                                                          /*0196*/
-   ret_2 |= license_plate_copies_helper_0_0_6(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0197*/
+   ret_2 |= 0;                                                          /*0197*/
    ret_2 |= 0;                                                          /*0198*/
-   ret_2 |= 0;                                                          /*0199*/
+   ret_2 |= license_plate_copies_helper_0_0_7(imout, imfilt, kernel3x1, kernel1x3);    /*0199*/
    ret_2 |= 0;                                                          /*0200*/
    ret_2 |= 0;                                                          /*0201*/
    ret_2 |= 0;                                                          /*0202*/
@@ -7480,9 +7477,9 @@ int license_plate_copies(void)
    ret_3 |= 0;                                                          /*0220*/
    i_3 = 4;                                                             /*0221*/
 
-   ret_3 |= license_plate_copies_helper_0_0_7(imout, imfilt, kernel3x1, kernel1x3);    /*0223*/
+   ret_3 |= 0;                                                          /*0223*/
    ret_3 |= 0;                                                          /*0224*/
-   ret_3 |= 0;                                                          /*0225*/
+   ret_3 |= license_plate_copies_helper_0_0_8(out, imout, in, kernel1x3, freia_morpho_kernel_8c);     /*0225*/
    ret_3 |= 0;                                                          /*0226*/
    ret_3 |= 0;                                                          /*0227*/
    ret_3 |= 0;                                                          /*0228*/
@@ -7495,8 +7492,7 @@ int license_plate_copies(void)
    i_4 = 3;                                                             /*0240*/
 
    _return4 = 0;                                                        /*0242*/
-
-   license_plate_copies_helper_0_0_8(out, imout, in, kernel1x3, freia_morpho_kernel_8c);              /*0244*/
+   
    
    
    
@@ -7569,33 +7565,34 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
+   ret_0 |= license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);         /*0064*/
+   ret_0 |= license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);           /*0070*/
+   ret_0 |= license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);           /*0080*/
+   ret_0 |= license_plate_copies_helper_0_0_3(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);           /*0090*/
    i_0 = 15;                                                            /*0094*/
 
-   ret_0 |= license_plate_copies_helper_0_0_4(imopen, imopen, kernel1x3);              /*0110*/
-   ret_0 |= license_plate_copies_helper_0_0_5(imopen, imopen, kernel1x3);              /*0122*/
+   ret_0 |= license_plate_copies_helper_0_0_4(imopen, imopen, kernel1x3);              /*0102*/
+   ret_0 |= license_plate_copies_helper_0_0_5(imopen, imopen, kernel1x3);              /*0112*/
+   ret_0 |= license_plate_copies_helper_0_0_6(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0124*/
    i_0 = 15;                                                            /*0126*/
 
    _return1 = ret_0;                                                    /*0130*/
 
    ret_1 = 0;                                                           /*0134*/
 
-   ret_1 |= license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);         /*0140*/
-   ret_1 |= license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);           /*0150*/
    i_1 = 8;                                                             /*0152*/
 
-   ret_1 |= license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);           /*0162*/
    i_1 = 8;                                                             /*0170*/
 
    _return0 = ret_1;                                                    /*0174*/
-
-   license_plate_copies_helper_0_0_3(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);     /*0177*/
+   
    
    
    ret_2 = 0;                                                           /*0183*/
 
    i_2 = 4;                                                             /*0193*/
 
-   ret_2 |= license_plate_copies_helper_0_0_6(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0197*/
+   ret_2 |= license_plate_copies_helper_0_0_7(imout, imfilt, kernel3x1, kernel1x3);    /*0199*/
    i_2 = 4;                                                             /*0203*/
 
    _return2 = ret_2;                                                    /*0207*/
@@ -7604,7 +7601,7 @@ int license_plate_copies(void)
 
    i_3 = 4;                                                             /*0221*/
 
-   ret_3 |= license_plate_copies_helper_0_0_7(imout, imfilt, kernel3x1, kernel1x3);    /*0223*/
+   ret_3 |= license_plate_copies_helper_0_0_8(out, imout, in, kernel1x3, freia_morpho_kernel_8c);     /*0225*/
    i_3 = 4;                                                             /*0231*/
 
    _return3 = ret_3;                                                    /*0235*/
@@ -7612,8 +7609,7 @@ int license_plate_copies(void)
    i_4 = 3;                                                             /*0240*/
 
    _return4 = 0;                                                        /*0242*/
-
-   license_plate_copies_helper_0_0_8(out, imout, in, kernel1x3, freia_morpho_kernel_8c);              /*0244*/
+   
    
    
    

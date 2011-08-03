@@ -6,6 +6,7 @@ setenv FREIA_TARGET ${FREIA_TARGET:-SPOC}
 # props...
 setproperty ABORT_ON_USER_ERROR=TRUE
 setproperty FREIA_DAG_LABEL_ARCS=TRUE
+#setproperty FREIA_DAG_LABEL_NODES=TRUE
 setproperty MEMORY_EFFECTS_ONLY=FALSE
 # use "old" effects...
 setproperty CONSTANT_PATH_EFFECTS=FALSE
@@ -18,6 +19,11 @@ echo
 echo ! initial function
 echo
 display PRINTED_FILE[${NAME}]
+#
+# possibly to some unrolling, for SPoC only
+#
+${DO_UNROLL:-#} FREIA_UNROLL_WHILE[${NAME}]
+#display PRINTED_FILE
 #
 # apply compiler and clean unused images
 #
@@ -33,7 +39,10 @@ setproperty ABORT_ON_USER_ERROR FALSE
 echo
 echo ! graphs
 echo
+# this fails in some case where there is no graph
 shell cat ./${WSPACE}.database/${NAME}/*.dot
+# back to normal
+setproperty ABORT_ON_USER_ERROR TRUE
 echo
 echo ! acceleration function
 echo
