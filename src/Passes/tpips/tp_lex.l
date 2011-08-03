@@ -76,14 +76,16 @@ char * tpips_get_line_to_parse(void)
   return line_to_parse;
 }
 
+static int back = 0;
+
 void tpips_lex_print_pos(FILE* fout)
 {
   fprintf(fout,
           "%s\n"
           "%*s^\n"
           "at line %d in \"%s\"\n",
-          line_parsed, (int)((long) line_to_parse - (long)line_parsed), "",
-          tpips_current_line(), tpips_current_name());
+          line_parsed, (int)((long) line_to_parse - (long)line_parsed - back),
+          "", tpips_current_line(), tpips_current_name());
 }
 
 static int tpips_lex_input (void)
@@ -103,14 +105,14 @@ static char unk[2]; /* one char lines are not implicit shells */
 #define RETURN(x)  pips_debug(8, "init %d\n", x); return x
 #define KEYWORD(x) pips_debug(8, "key %d\n", x); BEGIN INITIAL; return x
 #define LITTERAL(x)                              \
-  pips_debug(8, "lit %d\n", x);                  \
-  BEGIN LIT;                                     \
+  pips_debug(8, "spc %d\n", x);                  \
+  BEGIN SPC;                                     \
   return x
 #define RESTART(x) pips_debug(8, "rst %d\n", x); BEGIN KEY; return x
 
 %}
 
-%s KEY STR LIT UNK
+%s KEY STR SPC LIT UNK
 
 %%
 
@@ -157,7 +159,13 @@ static char unk[2]; /* one char lines are not implicit shells */
 <UNK>[^\r\n]*    { yylval.name = strdup(concatenate(unk, yytext, NULL));
    KEYWORD(TK_UNKNOWN); }
 
-<LIT>[^\r\n]*    { yylval.name = strdup(yytext); RETURN(TK_LINE); }
+<SPC>[ \t]+      { BEGIN LIT; }
+<SPC>[^ \t\r\n][^\r\n]* {
+   back = strlen(yytext);
+   yyerror("space expected after initial keyword");
+   back = 0;
+ }
+<LIT>[^\r\n]* { yylval.name = strdup(yytext); RETURN(TK_LINE); }
 <INITIAL,KEY>#[^\r\n]*  { BEGIN INITIAL;
    /* skip comments... (not for echo, shell set). */}
 <KEY>.      { unk[0]=yytext[0]; unk[1]='\0'; BEGIN UNK; }
@@ -171,7 +179,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <INITIAL>\,    { RETURN(TK_COMMA); }
 <INITIAL>=     { RETURN(TK_EQUAL); }
 
-<LIT,INITIAL>(\n|\r|\r\n|;)  { RESTART(TK_ENDOFLINE); }
+<LIT,INITIAL,SPC>(\n|\r|\r\n|;)  { RESTART(TK_ENDOFLINE); }
 <LIT,INITIAL><<EOF>>         { RESTART(TK_ENDOFLINE); }
 
 <STR>[^\"]*\"    {
