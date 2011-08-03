@@ -1,3 +1,6 @@
+#
+# compile initial empty_arguments_02
+#
 static int count;
 
 void foo();
