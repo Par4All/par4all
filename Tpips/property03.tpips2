@@ -1,0 +1,7 @@
+setproperty ABORT_ON_USER_ERROR FALSE
+# check for syntax error messages...
+# portability? it may depends on the parser/lexer used.
+setpropertycoelho
+setpropfabien
+echofoo
+shellecho foo
