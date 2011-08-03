@@ -1,3 +1,5 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
 setpropertycoelho
 setpropfabien
 
