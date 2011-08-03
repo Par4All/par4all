@@ -22,29 +22,6 @@ void c_est_pourtant_magnifique()
 //
 void c_est_pourtant_magnifique()
 {
-   int y, m, c, a;
-   int u[2];
-   y = 2;
-   while (y!=45) {
-      m = y;
-      {
-         //PIPS generated variable
-         int c;
-#pragma omp for private(c)
-         for(c = m; c <= y*2; c += 1) {
-            a = m*4;
-            u[0] = 2;
-         }
-      }
-      u[0] = a;
-      y += 8;
-   }
-}
-//
-// Code after clean_declarations for module c_est_pourtant_magnifique
-//
-void c_est_pourtant_magnifique()
-{
    int y, m, a;
    int u[2];
    y = 2;
