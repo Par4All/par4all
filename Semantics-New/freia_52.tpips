@@ -13,7 +13,7 @@ display CALLGRAPH_FILE[$WS]
 
 echo
 echo ==============================================
-shell echo initial `date`
+#shell echo initial `date`
 echo ==============================================
 echo
 
@@ -26,7 +26,7 @@ display PRINTED_FILE[$WS]
 
 echo
 echo ==============================================
-shell echo after cumulated effects `date`
+#shell echo after cumulated effects `date`
 echo ==============================================
 echo
 
@@ -39,7 +39,7 @@ display PRINTED_FILE[$WS]
 
 echo
 echo ==============================================
-shell echo After transformers `date`
+#shell echo After transformers `date`
 echo ==============================================
 echo
 
@@ -47,7 +47,7 @@ apply PRECONDITIONS_INTER_FULL[$WS]
 
 echo
 echo ==============================================
-shell echo After preconditions `date`
+#shell echo After preconditions `date`
 echo ==============================================
 echo
 
@@ -60,7 +60,7 @@ display PRINTED_FILE[$WS]
 
 echo
 echo ==============================================
-shell echo After printing the preconditions `date`
+#shell echo After printing the preconditions `date`
 echo ==============================================
 echo
 
