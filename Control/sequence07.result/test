@@ -1,0 +1,48 @@
+
+Parsed printed file
+
+void sequence07(int argc, char *argv[])
+{
+   int xshift, yshift;
+
+   if (0)
+      goto break_1;
+   {
+      int *x0 = &xshift, *y0 = &yshift;
+      {
+         int i;
+
+         for (i = 0;i<=9;i += 1)
+            // commenting next lines makes unfolding work...
+            *x0 = 18;
+
+break_1:         ;
+         goto l99998;
+l99998:         ;
+      }
+   }
+
+break_1:   ;
+   return;
+}
+
+Printed file
+
+void sequence07(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int *x0, *y0;
+   //PIPS generated variable
+   int i;
+   int xshift, yshift;
+
+   if (0) goto break_1;
+   x0 = &xshift;
+   y0 = &yshift;
+   for(i = 0; i <= 9; i += 1)
+      // commenting next lines makes unfolding work...
+      *x0 = 18;
+
+break_1:   ;
+   return;
+}
