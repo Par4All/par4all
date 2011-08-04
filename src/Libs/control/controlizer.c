@@ -1638,9 +1638,16 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 		      " dead code behind declarations:-(",
 		      gen_length(control_successors(c))==1);
 	  control succ = CONTROL(CAR(control_successors(c)));
+	  control fic = CONTROL(CAR(icl));
+	  control cic = fic;
 	  control lic = CONTROL(CAR(gen_last(icl)));
+	  FOREACH(CONTROL, c, CDR(icl)) {
+	    /* The nodes in icl must be linked together */
+	    link_2_control_nodes(cic, c);
+	    cic = c;
+	  }
 	  unlink_2_control_nodes(c, succ);
-	  link_2_control_nodes(c, CONTROL(CAR(icl)));
+	  link_2_control_nodes(c, fic);
 	  link_2_control_nodes(lic, succ);
 	  /* They should be added into ctls too... because the
 	     initialization expressions may require some renaming... */
