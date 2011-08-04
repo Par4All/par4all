@@ -1335,6 +1335,9 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
         }
         else {
             free_basic(rb);
+	    // FI: within declaration initializations, rb may be
+	    // undefined because the expressions uses a variable that
+	    // has not yet been typed by the parser. See C_syntax/simplify01.c
             rb = basic_of_expression(EXPRESSION(CAR(args)));
 
             FOREACH(EXPRESSION, arg, CDR(args)){
@@ -1346,7 +1349,7 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
               rb = new_rb;
             }
 	    /* logical variables can be used as integer arguments */
-	    if(basic_logical_p(rb))
+	    if(!basic_undefined_p(rb) && basic_logical_p(rb))
 	      if(arithmetic_intrinsic_p(f)) {
 		free_basic(rb);
 		rb = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
