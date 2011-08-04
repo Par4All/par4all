@@ -184,7 +184,7 @@ static void parse_properties(void)
 	n = strdup(yytext);
 
 	if (update_property && property_undefined_p(get_property(n, true))) {
-	  property_user_error("Unknown property %s to update\n", n);
+	  property_user_error("Unknown property \"%s\" to update\n", n);
 	  free(n);
 	  return;
 	}
