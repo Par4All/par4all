@@ -839,6 +839,9 @@ transformer statement_to_postcondition(
 	/* pre = transformer_normalize(pre, 2); */
 	if(get_int_property("SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE")
 	   == 4)
+	  // FI HardwareAccelerator/freia_52: this level does not
+	  // handle the signs properly for simple equations like -i==0
+	  // and it does not sort constraints lexicographically!
 	  pre = transformer_normalize(pre, 4);
 	else
 	  pre = transformer_normalize(pre, 2);
