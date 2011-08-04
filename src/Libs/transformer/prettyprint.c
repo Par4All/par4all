@@ -68,7 +68,7 @@ string arguments_to_string(string s, list args)
     return string_undefined;
 }
 
-string 
+string
 relation_to_string(
     string s,
     Psysteme ps,
