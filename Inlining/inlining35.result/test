@@ -1,5 +1,35 @@
 int main(int argc, char *argv[])
 {
+   int xshift, yshift;
+   //PIPS generated variable
+   int _return0;
+   if (1)
+      ;
+   else
+      goto break_1;
+   if (0)
+      goto break_1;
+   {
+      //PIPS generated variable
+      int *x0, *y0;
+      {
+         int i;
+
+         for (i = 0;i<=9;i += 1)
+            // commenting next lines makes unfolding work...
+            *x0 = 18;
+break_1:         ;
+         _return0 = 0;
+         goto l99998;
+l99998:         ;
+      }
+   }
+   _return0;
+break_1:   ;
+   return 0;
+}
+int main(int argc, char *argv[])
+{
    //PIPS generated variable
    int *x0, *y0;
    //PIPS generated variable
@@ -7,15 +37,16 @@ int main(int argc, char *argv[])
    int xshift, yshift;
    //PIPS generated variable
    int _return0;
-   if (1) {
-   }
-   else {
-      goto l99999;
-   }
-   if (0) goto l99999;
-   //PIPS generated variable
-   x0 = &xshift;
-l99999:   ;
-
+   if (1)
+      if (0)
+         ;
+      else {
+         //PIPS generated variable
+         x0 = &xshift;
+         y0 = &yshift;
+         for(i = 0; i <= 9; i += 1)
+            // commenting next lines makes unfolding work...
+            *x0 = 18;
+      }
    return 0;
 }
