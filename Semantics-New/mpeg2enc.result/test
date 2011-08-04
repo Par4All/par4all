@@ -436,30 +436,31 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
 }
 int main(int argc, char *argv[])
 {
-   if (argc!=3) {
-      printf("\n%s, %s\n", version, author);
-      printf("Usage: mpeg2encode in.par out.m2v\n");
-      exit(0);
-   }
-   
-   /* read parameter file */
-   readparmfile(argv[1]);
-   
-   /* read quantization matrices */
-   readquantmat();
-   if (!(outfile = fopen(argv[2], "wb"))) {
+   if (1) {
+      if (argc!=3) {
+         printf("\n%s, %s\n", version, author);
+         printf("Usage: mpeg2encode in.par out.m2v\n");
+         exit(0);
+      }
       
-      /* open output file */
-      sprintf(errortext, "Couldn't create output file %s", argv[2]);
-      error(errortext);
+      /* read parameter file */
+      readparmfile(argv[1]);
+      
+      /* read quantization matrices */
+      readquantmat();
+      if (!(outfile = fopen(argv[2], "wb"))) {
+         
+         /* open output file */
+         sprintf(errortext, "Couldn't create output file %s", argv[2]);
+         error(errortext);
+      }
+
+      init();
+      putseq();
+
+      fclose(outfile);
+      fclose(statfile);
    }
-
-   init();
-   putseq();
-
-   fclose(outfile);
-   fclose(statfile);
-
    return 0;
 }
 static int bdist1(unsigned char *pf, unsigned char *pb, unsigned char *p2, int lx, int hxf, int hyf, int hxb, int hyb, int h)
@@ -7225,6 +7226,273 @@ void calcSNR(unsigned char *org[3], unsigned char *rec[3])
    fprintf(statfile, "V: variance=%4.4g, MSE=%3.3g (%3.3g dB), SNR=%3.3g dB\n", v, e, 10.0*log10(255.0*255.0/e), 10.0*log10(v/e));
 }
 
+Cumulated effects for "main"
+
+//             <may be read   >: stderr stderr[0] stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stderr[0] stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+int main(int argc, char *argv[])
+{
+//             <may be read   >: stderr stderr[0] stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stderr[0] stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+   if (1) {
+//             <may be read   >: author[*] stdout stdout[0] version[*]
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: argc
+      if (argc!=3) {
+//             <may be read   >: author[*] stdout[0] version[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("\n%s, %s\n", version, author);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("Usage: mpeg2encode in.par out.m2v\n");
+         exit(0);
+      }
+//             <may be read   >: altscan_tab[*] argv[1][*] 
+//                               conceal_tab[*] errortext[*] 
+//                               frame_pred_dct_tab[*] intravlc_tab[*]
+//                               level motion_data[*].back_hor_f_code 
+//                               motion_data[*].back_vert_f_code 
+//                               motion_data[*].forw_hor_f_code 
+//                               motion_data[*].forw_vert_f_code 
+//                               motion_data[*].sxb motion_data[*].sxf
+//                               motion_data[*].syb motion_data[*].syf
+//                               motion_data[*].back_hor_f_code 
+//                               motion_data[*].back_vert_f_code 
+//                               motion_data[*].forw_hor_f_code 
+//                               motion_data[*].forw_vert_f_code 
+//                               motion_data[*].sxb motion_data[*].sxf
+//                               motion_data[*].syb motion_data[*].syf
+//                               profile qscale_tab[*] quiet stderr 
+//                               stderr[0] __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*] 
+//                               conform!:profile_level_defined[*][*] 
+//                               mpeg2enc!readparmfile:0`ratetab[*]
+//             <may be written>: M N P Xb Xi Xp altscan_tab[*] 
+//                               aspectratio avg_act bit_rate 
+//                               chroma_format color_primaries 
+//                               conceal_tab[*] d0b d0i d0p dc_prec 
+//                               display_horizontal_size 
+//                               display_vertical_size errortext[*] 
+//                               frame0 frame_pred_dct_tab[*] 
+//                               frame_rate_code horizontal_size 
+//                               id_string[*] inputtype 
+//                               intravlc_tab[*] iqname[*] level 
+//                               matrix_coefficients 
+//                               motion_data[*].sxb motion_data[*].sxf
+//                               motion_data[*].syb motion_data[*].syf
+//                               motion_data[*][*] nframes niqname[*] 
+//                               profile qscale_tab[*] r statname[*] 
+//                               stderr[0] tplorg[*] tplref[*] 
+//                               transfer_characteristics 
+//                               vbv_buffer_size vertical_size 
+//                               video_format __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: M N argv[1] aspectratio bit_rate 
+//                               chroma_format color_primaries 
+//                               constrparms dc_prec 
+//                               display_horizontal_size 
+//                               display_vertical_size fieldpic 
+//                               frame_rate frame_rate_code 
+//                               horizontal_size low_delay 
+//                               matrix_coefficients motion_data mpeg1
+//                               prog_frame prog_seq repeatfirst tc0 
+//                               topfirst transfer_characteristics 
+//                               vbv_buffer_size vertical_size 
+//                               video_format _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: constrparms fieldpic frame_rate 
+//                               low_delay motion_data mpeg1 
+//                               prog_frame prog_seq repeatfirst tc0 
+//                               topfirst _MALLOC_EFFECTS:_MALLOC_
+      
+      /* read parameter file */
+      readparmfile(argv[1]);
+//             <may be read   >: default_intra_quantizer_matrix[*] 
+//                               errortext[*] iqname[*] niqname[*] 
+//                               stderr stderr[0] __IO_EFFECTS:LUNS[2]
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: errortext[*] inter_q[*] intra_q[*] 
+//                               stderr[0] __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: iqname[0] niqname[0]
+//             <    is written>: load_iquant load_niquant
+      
+      /* read quantization matrices */
+      readquantmat();
+//             <may be read   >: argv[2][*] errortext[*] stderr 
+//                               stderr[0] __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: errortext[*] stderr[0] 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: argv[2]
+//             <    is written>: outfile
+      if (!(outfile = fopen(argv[2], "wb"))) {
+//             <may be read   >: argv[2][*]
+//             <may be written>: errortext[*]
+//             <    is read   >: argv[2]
+         
+         /* open output file */
+         sprintf(errortext, "Couldn't create output file %s", argv[2]);
+//             <may be read   >: errortext[*] stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+         error(errortext);
+      }
+//             <may be read   >: chrom_height errortext[*] statname[*]
+//                               stderr stderr[0] stdout 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*] idct!:iclp 
+//                               mpeg2enc!init:0`block_count_tab[*]
+//             <may be written>: auxframe[*] auxorgframe[*] clp[*] 
+//                               errortext[*] neworgframe[*] 
+//                               newrefframe[*] oldorgframe[*] 
+//                               oldrefframe[*] predframe[*] stderr[0]
+//                               __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*] fdctref!:c[*][*]
+//                               idct!:iclp[*]
+//             <    is read   >: block_count blocks chrom_width 
+//                               chroma_format clp fieldpic height 
+//                               horizontal_size mb_height mb_height2 
+//                               mb_width mbinfo prog_seq statname[0] 
+//                               vertical_size width 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: block_count blocks chrom_height 
+//                               chrom_width chrom_width2 clp height 
+//                               height2 mb_height mb_height2 mb_width
+//                               mbinfo statfile width width2 
+//                               _MALLOC_EFFECTS:_MALLOC_ idct!:iclp 
+//                               putbits!:bytecnt putbits!:outcnt
+
+      init();
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               __IO_EFFECTS:LUNS[*]
+      putseq();
+//             <may be read   >: outfile[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: outfile[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: outfile
+
+      fclose(outfile);
+//             <may be read   >: statfile[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: statfile[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: statfile
+      fclose(statfile);
+   }
+   return 0;
+}
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main(int argc, char *argv[])
+{
+
+//  T() {argc==3}
+
+   if (1) {
+
+//  T() {argc==3}
+
+      if (argc!=3) {
+
+//  T() {}
+
+         printf("\n%s, %s\n", version, author);
+
+//  T() {}
+
+         printf("Usage: mpeg2encode in.par out.m2v\n");
+
+//  T() {0==-1}
+
+         exit(0);
+      }
+
+//  T() {}
+
+      
+      /* read parameter file */
+      readparmfile(argv[1]);
+
+//  T() {}
+
+      
+      /* read quantization matrices */
+      readquantmat();
+
+//  T() {}
+
+      if (!(outfile = fopen(argv[2], "wb"))) {
+
+//  T() {}
+
+         
+         /* open output file */
+         sprintf(errortext, "Couldn't create output file %s", argv[2]);
+
+//  T() {0==-1}
+
+         error(errortext);
+      }
+
+//  T() {}
+
+
+      init();
+
+//  T() {}
+
+      putseq();
+
+//  T() {}
+
+
+      fclose(outfile);
+
+//  T() {}
+
+      fclose(statfile);
+   }
+
+//  T(main) {main==0}
+
+   return 0;
+}
+
 Transformers for %ALLFUNC
 
 
@@ -8458,75 +8726,79 @@ void itransform(unsigned char *pred[], unsigned char *cur[], struct mbinfo *mbi,
       }
 }
 
-//  T(main) {argc==3, main==0}
+//  T(main) {main==0}
 
 int main(int argc, char *argv[])
 {
 
 //  T() {argc==3}
 
-   if (argc!=3) {
+   if (1) {
+
+//  T() {argc==3}
+
+      if (argc!=3) {
 
 //  T() {}
 
-      printf("\n%s, %s\n", version, author);
+         printf("\n%s, %s\n", version, author);
 
 //  T() {}
 
-      printf("Usage: mpeg2encode in.par out.m2v\n");
+         printf("Usage: mpeg2encode in.par out.m2v\n");
 
 //  T() {0==-1}
 
-      exit(0);
-   }
-
-//  T() {}
-
-   
-   /* read parameter file */
-   readparmfile(argv[1]);
-
-//  T() {}
-
-   
-   /* read quantization matrices */
-   readquantmat();
-
-//  T() {}
-
-   if (!(outfile = fopen(argv[2], "wb"))) {
+         exit(0);
+      }
 
 //  T() {}
 
       
-      /* open output file */
-      sprintf(errortext, "Couldn't create output file %s", argv[2]);
+      /* read parameter file */
+      readparmfile(argv[1]);
+
+//  T() {}
+
+      
+      /* read quantization matrices */
+      readquantmat();
+
+//  T() {}
+
+      if (!(outfile = fopen(argv[2], "wb"))) {
+
+//  T() {}
+
+         
+         /* open output file */
+         sprintf(errortext, "Couldn't create output file %s", argv[2]);
 
 //  T() {0==-1}
 
-      error(errortext);
+         error(errortext);
+      }
+
+//  T() {}
+
+
+      init();
+
+//  T() {}
+
+      putseq();
+
+//  T() {}
+
+
+      fclose(outfile);
+
+//  T() {}
+
+      fclose(statfile);
    }
 
-//  T() {}
-
-
-   init();
-
-//  T() {}
-
-   putseq();
-
-//  T() {}
-
-
-   fclose(outfile);
-
-//  T() {}
-
-   fclose(statfile);
-
 //  T(main) {main==0}
-
 
    return 0;
 }
@@ -23044,68 +23316,72 @@ int main(int argc, char *argv[])
 
 //  P() {}
 
-   if (argc!=3) {
+   if (1) {
 
 //  P() {}
 
-      printf("\n%s, %s\n", version, author);
+      if (argc!=3) {
 
 //  P() {}
 
-      printf("Usage: mpeg2encode in.par out.m2v\n");
+         printf("\n%s, %s\n", version, author);
 
 //  P() {}
 
-      exit(0);
-   }
+         printf("Usage: mpeg2encode in.par out.m2v\n");
 
-//  P() {argc==3}
+//  P() {}
 
-   
-   /* read parameter file */
-   readparmfile(argv[1]);
-
-//  P() {argc==3}
-
-   
-   /* read quantization matrices */
-   readquantmat();
-
-//  P() {argc==3}
-
-   if (!(outfile = fopen(argv[2], "wb"))) {
+         exit(0);
+      }
 
 //  P() {argc==3}
 
       
-      /* open output file */
-      sprintf(errortext, "Couldn't create output file %s", argv[2]);
+      /* read parameter file */
+      readparmfile(argv[1]);
 
 //  P() {argc==3}
 
-      error(errortext);
+      
+      /* read quantization matrices */
+      readquantmat();
+
+//  P() {argc==3}
+
+      if (!(outfile = fopen(argv[2], "wb"))) {
+
+//  P() {argc==3}
+
+         
+         /* open output file */
+         sprintf(errortext, "Couldn't create output file %s", argv[2]);
+
+//  P() {argc==3}
+
+         error(errortext);
+      }
+
+//  P() {argc==3}
+
+
+      init();
+
+//  P() {argc==3}
+
+      putseq();
+
+//  P() {argc==3}
+
+
+      fclose(outfile);
+
+//  P() {argc==3}
+
+      fclose(statfile);
    }
 
 //  P() {argc==3}
-
-
-   init();
-
-//  P() {argc==3}
-
-   putseq();
-
-//  P() {argc==3}
-
-
-   fclose(outfile);
-
-//  P() {argc==3}
-
-   fclose(statfile);
-
-//  P() {argc==3}
-
 
    return 0;
 }
