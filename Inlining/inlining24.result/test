@@ -35,30 +35,30 @@ freia_error freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t c
       ret = 0;
    }
    else {
-      if (connexity==4) goto switch_1_case_4;
-      if (connexity==6) goto switch_1_case_6;
-      if (connexity==8) goto switch_1_case_8;
-switch_1_default:      ;
+      if (connexity==4) goto freia_cipo_dilate_switch_1_case_4;
+      if (connexity==6) goto freia_cipo_dilate_switch_1_case_6;
+      if (connexity==8) goto freia_cipo_dilate_switch_1_case_8;
+freia_cipo_dilate_switch_1_default:      ;
       ret = 2;
-      goto break_1;
-switch_1_case_8:      ;
+      goto freia_cipo_dilate_break_1;
+freia_cipo_dilate_switch_1_case_8:      ;
       freia_aipo_dilate_8c(imout, imin, kernel_8c);
       for(i = 1; i <= size-1; i += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c);
       ret = 0;
-      goto break_1;
-switch_1_case_6:      ;
+      goto freia_cipo_dilate_break_1;
+freia_cipo_dilate_switch_1_case_6:      ;
       freia_aipo_dilate_6c(imout, imin, kernel_6c);
       for(i = 1; i <= size-1; i += 1)
          freia_aipo_dilate_6c(imout, imout, kernel_6c);
       ret = 0;
-      goto break_1;
-switch_1_case_4:      ;
+      goto freia_cipo_dilate_break_1;
+freia_cipo_dilate_switch_1_case_4:      ;
       freia_aipo_dilate_8c(imout, imin, kernel_4c);
       for(i = 1; i <= size-1; i += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_4c);
       ret = 0;
-break_1:      ;
+freia_cipo_dilate_break_1:      ;
    }
 
    return ret;
@@ -117,30 +117,30 @@ freia_error freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t c
       ret = 0;
    }
    else {
-      if (connexity==4) goto switch_1_case_4;
-      if (connexity==6) goto switch_1_case_6;
-      if (connexity==8) goto switch_1_case_8;
-switch_1_default:      ;
+      if (connexity==4) goto freia_cipo_dilate_switch_1_case_4;
+      if (connexity==6) goto freia_cipo_dilate_switch_1_case_6;
+      if (connexity==8) goto freia_cipo_dilate_switch_1_case_8;
+freia_cipo_dilate_switch_1_default:      ;
       ret = 2;
-      goto break_1;
-switch_1_case_8:      ;
+      goto freia_cipo_dilate_break_1;
+freia_cipo_dilate_switch_1_case_8:      ;
       freia_aipo_dilate_8c(imout, imin, kernel_8c);
       for(i = 1; i <= size-1; i += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c);
       ret = 0;
-      goto break_1;
-switch_1_case_6:      ;
+      goto freia_cipo_dilate_break_1;
+freia_cipo_dilate_switch_1_case_6:      ;
       freia_aipo_dilate_6c(imout, imin, kernel_6c);
       for(i = 1; i <= size-1; i += 1)
          freia_aipo_dilate_6c(imout, imout, kernel_6c);
       ret = 0;
-      goto break_1;
-switch_1_case_4:      ;
+      goto freia_cipo_dilate_break_1;
+freia_cipo_dilate_switch_1_case_4:      ;
       freia_aipo_dilate_8c(imout, imin, kernel_4c);
       for(i = 1; i <= size-1; i += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_4c);
       ret = 0;
-break_1:      ;
+freia_cipo_dilate_break_1:      ;
    }
 
    return ret;
@@ -228,6 +228,7 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
          freia_aipo_dilate_8c(imout, imin, kernel_8c);
          for(i = 1; i <= size-1; i += 1)
             freia_aipo_dilate_8c(imout, imout, kernel_8c);
+         ret = 0;
       }
       else
          ret = 2;
@@ -333,6 +334,7 @@ int main()
             freia_aipo_dilate_8c(imout, imin, kernel_8c);
             for(i = 1; i <= size-1; i += 1)
                freia_aipo_dilate_8c(imout, imout, kernel_8c);
+            ret = 0;
          }
          else
             ret = 2;
@@ -429,6 +431,7 @@ int main()
             freia_aipo_dilate_8c(imout, imin, kernel_8c);
             for(i = 1; i <= size-1; i += 1)
                freia_aipo_dilate_8c(imout, imout, kernel_8c);
+            ret = 0;
          }
          else
             ret = 2;
@@ -538,6 +541,7 @@ int main()
       freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
       for(i_0 = 1; i_0 <= size-1; i_0 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
+      ret_1 = 0;
    }
    else
       ret_1 = 2;
@@ -623,6 +627,7 @@ int main()
       freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
       for(i_1 = 1; i_1 <= size-1; i_1 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
+      ret_3 = 0;
    }
    else
       ret_3 = 2;
@@ -945,6 +950,11 @@ int main()
 //    ret_1,ret_2,ret_3,size) {connexity==8, size==4, 1<=i_0, i_0<=3}
 
          freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
+
+//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
+//    ret_1,ret_2,ret_3,size) {connexity==8, i_0==4, size==4}
+
+      ret_1 = 0;
    }
    else
 
@@ -953,7 +963,8 @@ int main()
       ret_1 = 2;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
-//    ret_1,ret_2,ret_3,size) {connexity==8, size==4}
+//    ret_1,ret_2,ret_3,size) {connexity==8, size==4, 0<=ret_1,
+//    ret_1<=1}
 
    
    
@@ -961,19 +972,19 @@ int main()
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_1, connexity==8,
-//    size==4}
+//    size==4, 0<=_return0_0, _return0_0<=1}
 
    ret_0 = _return0_0;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, _return0_0==ret_1,
-//    connexity==8, size==4}
+//    connexity==8, size==4, 0<=_return0_0, _return0_0<=1}
 
    ret_0 |= freia_aipo_sub(imout, imout, imin);
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_1, connexity==8,
-//    size==4}
+//    size==4, 0<=_return0_0, _return0_0<=1}
 
    
    
@@ -981,13 +992,13 @@ int main()
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    (void) _return0;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    
    
@@ -1006,182 +1017,182 @@ int main()
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_8c_1[1] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_8c_1[2] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_8c_1[3] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_8c_1[4] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_8c_1[5] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_8c_1[6] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_8c_1[7] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_8c_1[8] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_6c_1[0] = 0;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_6c_1[1] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_6c_1[2] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_6c_1[3] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_6c_1[4] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_6c_1[5] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_6c_1[6] = 0;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_6c_1[7] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_6c_1[8] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_4c_1[0] = 0;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_4c_1[1] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_4c_1[2] = 0;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_4c_1[3] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_4c_1[4] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_4c_1[5] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_4c_1[6] = 0;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_4c_1[7] = 1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    kernel_4c_1[8] = 0;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
 
       fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
       freia_common_print_backtrace();
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
       ret_3 = 1;
    }
@@ -1189,7 +1200,7 @@ int main()
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
       
       
@@ -1197,13 +1208,13 @@ int main()
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
       freia_common_print_backtrace();
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
       ret_3 = 1;
    }
@@ -1257,21 +1268,27 @@ int main()
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
       freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1}
 
       for(i_1 = 1; i_1 <= size-1; i_1 += 1)
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4, 1<=i_1, i_1<=3}
+//    size==4, 1<=i_1, i_1<=3, 0<=ret_1, ret_1<=1}
 
          freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
+
+//  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
+//    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
+//    i_1==4, size==4, 0<=ret_1, ret_1<=1}
+
+      ret_3 = 0;
    }
    else
 
@@ -1281,7 +1298,7 @@ int main()
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, connexity==8,
-//    size==4}
+//    size==4, 0<=ret_1, ret_1<=1, 0<=ret_3, ret_3<=1}
 
    
    
@@ -1289,19 +1306,22 @@ int main()
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, _return0_1==ret_3,
-//    connexity==8, size==4}
+//    connexity==8, size==4, 0<=_return0_1, _return0_1<=1, 0<=ret_1,
+//    ret_1<=1}
 
    ret_2 = _return0_1;
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, _return0_1==ret_2,
-//    _return0_1==ret_3, connexity==8, size==4}
+//    _return0_1==ret_3, connexity==8, size==4, 0<=_return0_1,
+//    _return0_1<=1, 0<=ret_1, ret_1<=1}
 
    ret_2 |= freia_aipo_sub(imout, imout, imin);
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, _return0_1==ret_3,
-//    connexity==8, size==4}
+//    connexity==8, size==4, 0<=_return0_1, _return0_1<=1, 0<=ret_1,
+//    ret_1<=1}
 
    
    
@@ -1309,7 +1329,8 @@ int main()
 
 //  P(_return0,_return0_0,_return0_1,_return1,connexity,i_0,i_1,ret_0,
 //    ret_1,ret_2,ret_3,size) {_return0_0==ret_0, _return0_1==ret_3,
-//    _return1==ret_2, connexity==8, size==4}
+//    _return1==ret_2, connexity==8, size==4, 0<=_return0_1,
+//    _return0_1<=1, 0<=ret_1, ret_1<=1}
 
    (void) _return1;
 }
@@ -1407,6 +1428,7 @@ int main()
       freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
       for(i_0 = 1; i_0 <= 3; i_0 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
+      ret_1 = 0;
    }
    else
       ret_1 = 2;
@@ -1492,6 +1514,7 @@ int main()
       freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
       for(i_1 = 1; i_1 <= 3; i_1 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
+      ret_3 = 0;
    }
    else
       ret_3 = 2;
@@ -1583,6 +1606,7 @@ int main()
       freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
       for(i_0 = 1; i_0 <= 3; i_0 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
+      ret_1 = 0;
    }
    
    
@@ -1649,6 +1673,7 @@ int main()
       freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
       for(i_1 = 1; i_1 <= 3; i_1 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
+      ret_3 = 0;
    }
    
    
@@ -1738,6 +1763,7 @@ int main()
       freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
       freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
       freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
+      ret_1 = 0;
    }
    
    
@@ -1805,6 +1831,7 @@ int main()
       freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
       freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
       freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
+      ret_3 = 0;
    }
    
    

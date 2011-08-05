@@ -6,9 +6,9 @@ int main(int argc, char *argv[])
    if (1)
       ;
    else
-      goto break_1;
+      goto main_break_1;
    if (0)
-      goto break_1;
+      goto main_break_1;
    {
       //PIPS generated variable
       int *x0, *y0;
@@ -18,14 +18,14 @@ int main(int argc, char *argv[])
          for (i = 0;i<=9;i += 1)
             // commenting next lines makes unfolding work...
             *x0 = 18;
-break_1:         ;
+main_break_1:         ;
          _return0 = 0;
          goto l99998;
 l99998:         ;
       }
    }
    _return0;
-break_1:   ;
+main_break_1:   ;
    return 0;
 }
 int main(int argc, char *argv[])
