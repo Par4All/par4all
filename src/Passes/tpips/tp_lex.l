@@ -80,12 +80,12 @@ static int back = 0;
 
 void tpips_lex_print_pos(FILE* fout)
 {
+  int shift = (int)((long) line_to_parse - (long)line_parsed) - back;
   fprintf(fout,
           "%s\n"
           "%*s^\n"
-          "at line %d in \"%s\"\n",
-          line_parsed, (int)((long) line_to_parse - (long)line_parsed - back),
-          "", tpips_current_line(), tpips_current_name());
+          "at line %d in \"%s\"\n", line_parsed, shift, "",
+          tpips_current_line(), tpips_current_name());
 }
 
 static int tpips_lex_input (void)
