@@ -47,7 +47,7 @@ include $(ROOT)/makes/pips-bin.mk
 endif # BIN_TARGET
 
 ifdef LIB_TARGET
-ifdef OLD_TEST 
+ifdef OLD_TEST
 
 # build pips executables on request?
 include $(ROOT)/makes/pips-old.mk
@@ -83,8 +83,13 @@ fast-pips: $(ARCH)/pips compile
 # generate both pips and tpips, useful for validation
 fast: fast-tpips fast-pips
 
+# shortcut for auto-pips users
+auto-comp:
+	echo $(MAKE) -C $(ROOT) auto-comp
+# todo: auto-fast:
+
 # helper with old targets
-test ttest ftest: 
+test ttest ftest:
 	@$(ECHO) -e "\a\n\ttry 'fast' (just link) or 'full' (recompilation)\n"
 
 endif # BIN_TARGET
