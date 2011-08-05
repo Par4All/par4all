@@ -2749,9 +2749,11 @@ set get_referenced_entities_filtered(void *elem,
       /* gather all entities referenced by referenced entities */
       list ltmp = set_to_list(referenced_entities);
       FOREACH(ENTITY,e,ltmp) {
-        set tmp = get_referenced_entities_filtered(e,chunk_filter,entity_filter);
-        set_union(referenced_entities,referenced_entities,tmp);
-        set_free(tmp);
+        if(e!=elem) {
+          set tmp = get_referenced_entities_filtered(e,chunk_filter,entity_filter);
+          set_union(referenced_entities,referenced_entities,tmp);
+          set_free(tmp);
+        }
       }
       gen_free_list(ltmp);
 
