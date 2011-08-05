@@ -21,19 +21,19 @@ void decl39(int size)
 // (statement ordering unavailable)
    if (0==0)
 // (statement ordering unavailable)
-      goto switch_2_case_0;                                             /*0010*/
+      goto decl39_switch_2_case_0;                                      /*0010*/
    else
 // (statement ordering unavailable)
 
 // (statement ordering unavailable)
-   goto break_2;                                                        /*0012*/
+   goto decl39_break_2;                                                 /*0012*/
    // END BLOCK
 // (statement ordering unavailable)
-switch_2_case_0:   ;
+decl39_switch_2_case_0:   ;
 // (statement ordering unavailable)
    x = 1;                                                               /*0011*/
 // (statement ordering unavailable)
-break_2:   ;
+decl39_break_2:   ;
    // END BLOCK
    // END BLOCK
 }
@@ -56,16 +56,16 @@ void decl39(int size)
    if (0==0) {
    }
    else {
-      goto break_2;
+      goto decl39_break_2;
    }
 // (2,1)
    // BEGIN BLOCK
 // (2,2)
-switch_2_case_0:   ;
+decl39_switch_2_case_0:   ;
 // (2,3)
    x = 1;                                                               /*0011*/
    // END BLOCK
 // (3,1)
-break_2:   ;
+decl39_break_2:   ;
    // END BLOCK
 }
