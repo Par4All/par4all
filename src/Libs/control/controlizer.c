@@ -1641,16 +1641,18 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 	  control fic = CONTROL(CAR(icl));
 	  control cic = fic;
 	  control lic = CONTROL(CAR(gen_last(icl)));
-	  FOREACH(CONTROL, c, CDR(icl)) {
+	  FOREACH(CONTROL, nc, CDR(icl)) {
 	    /* The nodes in icl must be linked together */
-	    link_2_control_nodes(cic, c);
-	    cic = c;
+	    link_2_control_nodes(cic, nc);
+	    cic = nc;
 	  }
 	  unlink_2_control_nodes(c, succ);
 	  link_2_control_nodes(c, fic);
 	  link_2_control_nodes(lic, succ);
 	  /* They should be added into ctls too... because the
-	     initialization expressions may require some renaming... */
+	     initialization expressions may require some
+	     renaming... but nctls probably takes care of that. */
+	  gen_free_list(icl);
 	}
 	statement_declarations(s) = NIL;
       }
