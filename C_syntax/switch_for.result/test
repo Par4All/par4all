@@ -6,14 +6,14 @@ void gl_enable()
    int cap, p;
 
    if (cap==1)
-      goto switch_1_case_1;
-   goto break_1;
-switch_1_case_1:   ;
+      goto gl_enable_switch_1_case_1;
+   goto gl_enable_break_1;
+gl_enable_switch_1_case_1:   ;
 
    for (p = 0;p<6;p++)
-      goto break_2;
-break_2:   ;
-break_1:   ;
+      goto gl_enable_break_2;
+gl_enable_break_2:   ;
+gl_enable_break_1:   ;
 }
 
 PRINTED FILE
@@ -24,14 +24,14 @@ void gl_enable()
    if (cap==1) {
    }
    else {
-      goto break_1;
+      goto gl_enable_break_1;
    }
-switch_1_case_1:   ;
+gl_enable_switch_1_case_1:   ;
    p = 0;
    if (!(p<6)) {
    }
-break_2:   ;
-break_1:   ;
+gl_enable_break_2:   ;
+gl_enable_break_1:   ;
 }
 
 printed file after RESTRUCTURE_CONTROL
@@ -40,11 +40,11 @@ void gl_enable()
 {
    int cap, p;
    if (cap==1) {
-switch_1_case_1:      ;
+gl_enable_switch_1_case_1:      ;
       p = 0;
       if (!(p<6))
          ;
-break_2:      ;
+gl_enable_break_2:      ;
    }
-break_1:   ;
+gl_enable_break_1:   ;
 }

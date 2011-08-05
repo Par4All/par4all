@@ -25,10 +25,10 @@ int unstructured02()
                goto SKIP;
          }
 SKIP:         if (a2==a1)
-            goto break_2;
+            goto unstructured02_break_2;
          a2 = a1;
       }
-break_2:      ;
+unstructured02_break_2:      ;
    }
    return 1;
 }
@@ -42,14 +42,14 @@ int unstructured02()
    i = 1;
    while (i<=n) {
 l99997:      ;
-      if (!(a2!=0)) goto break_2;
+      if (!(a2!=0)) goto unstructured02_break_2;
       i = 0;
 l99998:      ;
       if (!(i<n)) goto l99999;
       if (a2==a1) goto SKIP;
       i++;
       goto l99998;
-SKIP:      if (a2==a1) goto break_2;
+SKIP:      if (a2==a1) goto unstructured02_break_2;
       a2 = a1;
       goto l99997;
 l99999:      ;
@@ -70,7 +70,7 @@ l99996:      ;
       else {
          goto SKIP;
       }
-break_2:      ;
+unstructured02_break_2:      ;
       i++;
    }
    return 1;
@@ -86,14 +86,14 @@ int unstructured02()
    i = 1;
    while (i<=n) {
 l99997:      ;
-      if (!(a2!=0)) goto break_2;
+      if (!(a2!=0)) goto unstructured02_break_2;
       i = 0;
 l99998:      ;
       if (!(i<n)) goto l99999;
       if (a2==a1) goto SKIP;
       i++;
       goto l99998;
-SKIP:      if (a2==a1) goto break_2;
+SKIP:      if (a2==a1) goto unstructured02_break_2;
       a2 = a1;
       goto l99997;
 l99999:      ;
@@ -108,7 +108,7 @@ l99999:      ;
       else if (1>b)
          ;
       goto SKIP;
-break_2:      ;
+unstructured02_break_2:      ;
       i++;
    }
    return 1;

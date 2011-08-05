@@ -6,27 +6,27 @@ void unstructured01()
    int a, b, c;
 
    if (a==1)
-      goto switch_1_case_1;
-   goto break_1;
-switch_1_case_1:   ;
+      goto unstructured01_switch_1_case_1;
+   goto unstructured01_break_1;
+unstructured01_switch_1_case_1:   ;
 
    if (b==1)
-      goto switch_2_case_1;
-   goto switch_2_default;
-switch_2_case_1:   ;
-   goto break_2;
-switch_2_default:   ;
+      goto unstructured01_switch_2_case_1;
+   goto unstructured01_switch_2_default;
+unstructured01_switch_2_case_1:   ;
+   goto unstructured01_break_2;
+unstructured01_switch_2_default:   ;
    printf("Error\n");
-break_2:   ;
-   goto break_1;
-break_1:   ;
+unstructured01_break_2:   ;
+   goto unstructured01_break_1;
+unstructured01_break_1:   ;
 
    if (c==1)
-      goto switch_3_case_1;
-   goto break_3;
-switch_3_case_1:   ;
-   goto break_3;
-break_3:   ;
+      goto unstructured01_switch_3_case_1;
+   goto unstructured01_break_3;
+unstructured01_switch_3_case_1:   ;
+   goto unstructured01_break_3;
+unstructured01_break_3:   ;
 }
 
 Printed file
@@ -34,24 +34,24 @@ Printed file
 void unstructured01()
 {
    int a, b, c;
-   if (a==1) goto switch_1_case_1;
-break_1:   ;
+   if (a==1) goto unstructured01_switch_1_case_1;
+unstructured01_break_1:   ;
    if (c==1) {
    }
    else {
-      goto break_3;
+      goto unstructured01_break_3;
    }
-switch_3_case_1:   ;
-   goto break_3;
-switch_1_case_1:   ;
-   if (b==1) goto switch_2_case_1;
-switch_2_default:   ;
+unstructured01_switch_3_case_1:   ;
+   goto unstructured01_break_3;
+unstructured01_switch_1_case_1:   ;
+   if (b==1) goto unstructured01_switch_2_case_1;
+unstructured01_switch_2_default:   ;
    printf("Error\n");
-break_2:   ;
-   goto break_1;
-switch_2_case_1:   ;
-   goto break_2;
-break_3:   ;
+unstructured01_break_2:   ;
+   goto unstructured01_break_1;
+unstructured01_switch_2_case_1:   ;
+   goto unstructured01_break_2;
+unstructured01_break_3:   ;
 }
 Try more aggressive restructuring:
 
@@ -61,15 +61,15 @@ void unstructured01()
 {
    int a, b, c;
    if (a==1)
-switch_1_case_1:      if (b==1)
+unstructured01_switch_1_case_1:      if (b==1)
          ;
       else {
-switch_2_default:         ;
+unstructured01_switch_2_default:         ;
          printf("Error\n");
       }
-switch_2_case_1:   ;
+unstructured01_switch_2_case_1:   ;
    if (c==1)
       ;
-switch_3_case_1:   ;
-break_3:   ;
+unstructured01_switch_3_case_1:   ;
+unstructured01_break_3:   ;
 }
