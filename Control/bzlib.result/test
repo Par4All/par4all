@@ -5,10 +5,10 @@ static Bool unRLE_obuf_to_output_FAST(DState *s)
    if (s->blockRandomised)                                              /*0075*/
       while ((Bool) 1) {                                                /*0077*/
 l99999:         ;
-         if (!((Bool) 1)) goto bzlib!unRLE_obuf_to_output_FAST_break_2;                /*0089*/
+         if (!((Bool) 1)) goto bzlib_unRLE_obuf_to_output_FAST_break_2;                /*0089*/
          if (s->strm->avail_out==0)                                     /*0080*/
             return (Bool) 0;                                            /*0080*/
-         if (s->state_out_len==0) goto bzlib!unRLE_obuf_to_output_FAST_break_2;        /*0081*/
+         if (s->state_out_len==0) goto bzlib_unRLE_obuf_to_output_FAST_break_2;        /*0081*/
          *((UChar *) s->strm->next_out) = s->state_out_ch;              /*0082*/
          s->calculatedBlockCRC = s->calculatedBlockCRC<<8^BZ2_crc32Table[s->calculatedBlockCRC>>24^(UChar) s->state_out_ch];        /*0083*/
          s->state_out_len--;                                            /*0084*/
@@ -18,7 +18,7 @@ l99999:         ;
          if (s->strm->total_out_lo32==0)                                /*0088*/
             s->strm->total_out_hi32++;                                  /*0088*/
          goto l99999;
-bzlib!unRLE_obuf_to_output_FAST_break_2:         ;
+bzlib_unRLE_obuf_to_output_FAST_break_2:         ;
          
          /* can a new run be started? */
          if (s->nblock_used==s->save_nblock+1)                          /*0092*/
@@ -42,7 +42,7 @@ bzlib!unRLE_obuf_to_output_FAST_break_2:         ;
          s->rNToGo--;                                                   /*0100*/
          k1 ^= s->rNToGo==1?1:0;                                        /*0101*/
          s->nblock_used++;                                              /*0101*/
-         if (s->nblock_used==s->save_nblock+1) goto bzlib!unRLE_obuf_to_output_FAST_loop_end_1;       /*0102*/
+         if (s->nblock_used==s->save_nblock+1) goto bzlib_unRLE_obuf_to_output_FAST_loop_end_1;       /*0102*/
          if (k1!=s->k0) goto l99998;                                    /*0103*/
 
          s->state_out_len = 2;                                          /*0105*/
@@ -58,7 +58,7 @@ bzlib!unRLE_obuf_to_output_FAST_break_2:         ;
          s->rNToGo--;                                                   /*0106*/
          k1 ^= s->rNToGo==1?1:0;                                        /*0107*/
          s->nblock_used++;                                              /*0107*/
-         if (s->nblock_used==s->save_nblock+1) goto bzlib!unRLE_obuf_to_output_FAST_loop_end_1;       /*0108*/
+         if (s->nblock_used==s->save_nblock+1) goto bzlib_unRLE_obuf_to_output_FAST_loop_end_1;       /*0108*/
          if (k1!=s->k0) goto l99997;                                    /*0109*/
 
          s->state_out_len = 3;                                          /*0111*/
@@ -74,7 +74,7 @@ bzlib!unRLE_obuf_to_output_FAST_break_2:         ;
          s->rNToGo--;                                                   /*0112*/
          k1 ^= s->rNToGo==1?1:0;                                        /*0113*/
          s->nblock_used++;                                              /*0113*/
-         if (s->nblock_used==s->save_nblock+1) goto bzlib!unRLE_obuf_to_output_FAST_loop_end_1;       /*0114*/
+         if (s->nblock_used==s->save_nblock+1) goto bzlib_unRLE_obuf_to_output_FAST_loop_end_1;       /*0114*/
          if (k1!=s->k0) goto l99996;                                    /*0115*/
 
          s->tPos = (s->tt)[s->tPos];                                    /*0117*/
@@ -102,16 +102,16 @@ bzlib!unRLE_obuf_to_output_FAST_break_2:         ;
          s->rNToGo--;                                                   /*0120*/
          s->k0 ^= s->rNToGo==1?1:0;                                     /*0121*/
          s->nblock_used++;                                              /*0121*/
-         goto bzlib!unRLE_obuf_to_output_FAST_loop_end_1;
+         goto bzlib_unRLE_obuf_to_output_FAST_loop_end_1;
 l99996:         ;
          s->k0 = k1;                                                    /*0115*/
-         goto bzlib!unRLE_obuf_to_output_FAST_loop_end_1;
+         goto bzlib_unRLE_obuf_to_output_FAST_loop_end_1;
 l99997:         ;
          s->k0 = k1;                                                    /*0109*/
-         goto bzlib!unRLE_obuf_to_output_FAST_loop_end_1;
+         goto bzlib_unRLE_obuf_to_output_FAST_loop_end_1;
 l99998:         ;
          s->k0 = k1;                                                    /*0103*/
-bzlib!unRLE_obuf_to_output_FAST_loop_end_1:         ;
+bzlib_unRLE_obuf_to_output_FAST_loop_end_1:         ;
       }
    else {
       
@@ -155,7 +155,7 @@ l99988:      ;
       k1 = (UChar) (c_tPos&0xff);                                       /*0183*/
       c_tPos >>= 8;                                                     /*0183*/
       c_nblock_used++;                                                  /*0183*/
-      if (c_nblock_used==s_save_nblockPP) goto bzlib!unRLE_obuf_to_output_FAST_loop_end_3;            /*0184*/
+      if (c_nblock_used==s_save_nblockPP) goto bzlib_unRLE_obuf_to_output_FAST_loop_end_3;            /*0184*/
       if (k1!=c_k0) goto l99992;                                        /*0185*/
 
       c_state_out_len = 3;                                              /*0187*/
@@ -163,7 +163,7 @@ l99988:      ;
       k1 = (UChar) (c_tPos&0xff);                                       /*0188*/
       c_tPos >>= 8;                                                     /*0188*/
       c_nblock_used++;                                                  /*0188*/
-      if (c_nblock_used==s_save_nblockPP) goto bzlib!unRLE_obuf_to_output_FAST_loop_end_3;            /*0189*/
+      if (c_nblock_used==s_save_nblockPP) goto bzlib_unRLE_obuf_to_output_FAST_loop_end_3;            /*0189*/
       if (k1!=c_k0) goto l99991;                                        /*0190*/
 
       c_tPos = c_tt[c_tPos];                                            /*0192*/
@@ -175,14 +175,14 @@ l99988:      ;
       c_k0 = (UChar) (c_tPos&0xff);                                     /*0194*/
       c_tPos >>= 8;                                                     /*0194*/
       c_nblock_used++;                                                  /*0194*/
-bzlib!unRLE_obuf_to_output_FAST_loop_end_3:      ;
+bzlib_unRLE_obuf_to_output_FAST_loop_end_3:      ;
       goto l99990;
 l99991:      ;
       c_k0 = k1;                                                        /*0190*/
-      goto bzlib!unRLE_obuf_to_output_FAST_loop_end_3;
+      goto bzlib_unRLE_obuf_to_output_FAST_loop_end_3;
 l99992:      ;
       c_k0 = k1;                                                        /*0185*/
-      goto bzlib!unRLE_obuf_to_output_FAST_loop_end_3;
+      goto bzlib_unRLE_obuf_to_output_FAST_loop_end_3;
 s_state_out_len_eq_one:      ;
       if (cs_avail_out==0) goto l99989;                                 /*0157*/
       *((UChar *) cs_next_out) = c_state_out_ch;                        /*0160*/
@@ -200,16 +200,16 @@ l99994:      ;
       c_state_out_len = 0;                                              /*0172*/
       goto return_notr;
 l99995:      ;
-      if (!((Bool) 1)) goto bzlib!unRLE_obuf_to_output_FAST_break_4;    /*0154*/
+      if (!((Bool) 1)) goto bzlib_unRLE_obuf_to_output_FAST_break_4;    /*0154*/
       if (cs_avail_out==0) goto return_notr;                            /*0147*/
-      if (c_state_out_len==1) goto bzlib!unRLE_obuf_to_output_FAST_break_4;            /*0148*/
+      if (c_state_out_len==1) goto bzlib_unRLE_obuf_to_output_FAST_break_4;            /*0148*/
       *((UChar *) cs_next_out) = c_state_out_ch;                        /*0149*/
       c_calculatedBlockCRC = c_calculatedBlockCRC<<8^BZ2_crc32Table[c_calculatedBlockCRC>>24^(UChar) c_state_out_ch];               /*0150*/
       c_state_out_len--;                                                /*0151*/
       cs_next_out++;                                                    /*0152*/
       cs_avail_out--;                                                   /*0153*/
       goto l99995;
-bzlib!unRLE_obuf_to_output_FAST_break_4:      ;
+bzlib_unRLE_obuf_to_output_FAST_break_4:      ;
       goto s_state_out_len_eq_one;
 
 return_notr:      ;
