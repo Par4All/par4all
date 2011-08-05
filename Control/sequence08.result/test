@@ -1,14 +1,14 @@
 
 Parsed printed file
 
-void sequence07(int argc, char *argv[])
+void sequence08(int argc, char *argv[])
 {
    int xshift, yshift;
 
    if (0)
       goto break_1;
    {
-      int *x0 = &xshift, *y0 = &yshift;
+      int *x0 = &xshift;
       {
          int i;
          for (i = 0;i<=9;i += 1)
@@ -18,29 +18,41 @@ void sequence07(int argc, char *argv[])
 l99998:         ;
       }
    }
-
+   yshift--;
 break_1:   ;
+   xshift++;
    return;
 }
 
 Printed file
 
-void sequence07(int argc, char *argv[])
+void sequence08(int argc, char *argv[])
 {
+   // BEGIN BLOCK
    int xshift, yshift;
 
    if (0) goto break_1;
+   // BEGIN BLOCK
    {
-      int *x0 = &xshift, *y0 = &yshift;
+      // BEGIN BLOCK
+      int *x0 = &xshift;
       {
+         // BEGIN BLOCK
          int i;
+         // BEGIN BLOCK
          for(i = 0; i <= 9; i += 1)
             // commenting next lines makes unfolding work...
             *x0 = 18;
+         // END BLOCK
 l99998:         ;
+         // END BLOCK
       }
+      // END BLOCK
    }
-
+   yshift--;
+   // END BLOCK
 break_1:   ;
+   xshift++;
    return;
+   // END BLOCK
 }

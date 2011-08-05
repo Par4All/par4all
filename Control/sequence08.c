@@ -1,17 +1,19 @@
 // Bug inherited from FREIA after unfolding. See Ticket 555.
 
-// Some code seems to be lost by the controlizer
+// Some code seems to be lost by the controlizer: yshift--;
 
-// To start with, the initialization of y0 is lost, then the following block...
+// Note: the parsed printed file is badly printed too; it cannot be
+// compiled because label break_1 is repeated...
 
-void sequence07(int argc, char *argv[])
+
+void sequence08(int argc, char *argv[])
 {
   int xshift, yshift;
 
   if (0) goto break_1;
 
   {
-    int *x0 = &xshift, *y0 = &yshift;
+    int *x0 = &xshift;
     {
       int i;
       for(i = 0; i <= 9; i += 1)
@@ -21,12 +23,13 @@ void sequence07(int argc, char *argv[])
     l99998: ;
     }
   }
-
+  yshift--;
  break_1:   ;
+  xshift++;
   return;
 }
 
 int main(int argc, char * argv[])
 {
-  sequence07(argc, argv);
+  sequence08(argc, argv);
 }

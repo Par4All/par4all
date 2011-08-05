@@ -1,0 +1,35 @@
+delete sequence08
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create sequence08 sequence08.c
+
+#setproperty C89_CODE_GENERATION TRUE
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[sequence08]
+
+echo
+echo Printed file
+echo
+
+activate NEW_CONTROLIZER
+
+setenv CONTROL_DEBUG_LEVEL 8
+
+display PRINTED_FILE[sequence08]
+
+#echo
+#echo Execute result
+#echo
+
+#apply UNSPLIT
+
+#shell gcc sequence08.database/Src/sequence08.c -o sequence08.database/a.out
+#shell sequence08.database/a.out
+
+close
+quit
