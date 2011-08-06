@@ -282,7 +282,7 @@ string get_label_prefix()
   string s = get_current_module_name();
   string ns = s;
   char * p;
-  if(p = strchr(s, '!')) {
+  if((p = strchr(s, '!')) != NULL) {
     /* memory leak only for static functions */
     ns = strdup(s);
     p = strchr(ns, '!');
