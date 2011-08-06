@@ -130,9 +130,9 @@ int freia_scalar_08(int argc, char *argv[])
    freia_common_rx_image(in, &fdin);                                    /*0035*/
 
    transposeNeighbor(neighborTransposed_0, k8_ce);                      /*0037*/
+   transposeNeighbor(neighborTransposed_1, k8_cn);                      /*0040*/
    freia_aipo_dilate_8c(imw_1, in, freia_morpho_kernel_8c);             /*0038*/
    freia_aipo_erode_8c(imw, imw_1, neighborTransposed_0);               /*0039*/
-   transposeNeighbor(neighborTransposed_1, k8_cn);                      /*0040*/
    freia_aipo_erode_8c(out, imw_1, neighborTransposed_1);               /*0042*/
    freia_aipo_inf(imc, imw, out);                                       /*0043*/
 
@@ -403,8 +403,8 @@ int freia_scalar_08(int argc, char *argv[])
    freia_common_rx_image(in, &fdin);                                    /*0035*/
 
    transposeNeighbor(neighborTransposed_0, k8_ce);                      /*0037*/
-   freia_scalar_08_helper_0_0_0(imc, in, freia_morpho_kernel_8c, neighborTransposed_0, neighborTransposed_1);        /*0038*/
    transposeNeighbor(neighborTransposed_1, k8_cn);                      /*0040*/
+   freia_scalar_08_helper_0_0_0(imc, in, freia_morpho_kernel_8c, neighborTransposed_0, neighborTransposed_1);        /*0038*/
 
    freia_common_tx_image(imc, &fdout);                                  /*0045*/
 
@@ -444,8 +444,8 @@ int freia_scalar_08(int argc, char *argv[])
    freia_common_rx_image(in, &fdin);                                    /*0035*/
 
    transposeNeighbor(neighborTransposed_0, k8_ce);                      /*0037*/
-   freia_scalar_08_helper_0_0_0(imc, in, freia_morpho_kernel_8c, neighborTransposed_0, neighborTransposed_1);        /*0038*/
    transposeNeighbor(neighborTransposed_1, k8_cn);                      /*0040*/
+   freia_scalar_08_helper_0_0_0(imc, in, freia_morpho_kernel_8c, neighborTransposed_0, neighborTransposed_1);        /*0038*/
 
    freia_common_tx_image(imc, &fdout);                                  /*0045*/
 
@@ -862,8 +862,8 @@ int freia_scalar_08(int argc, char *argv[])
    freia_common_rx_image(in, &fdin);                                    /*0035*/
 
    transposeNeighbor(neighborTransposed_0, k8_ce);                      /*0037*/
-   freia_scalar_08_helper_0_0_0(imc, in, freia_morpho_kernel_8c, neighborTransposed_0, neighborTransposed_1);        /*0038*/
    transposeNeighbor(neighborTransposed_1, k8_cn);                      /*0040*/
+   freia_scalar_08_helper_0_0_0(imc, in, freia_morpho_kernel_8c, neighborTransposed_0, neighborTransposed_1);        /*0038*/
 
    freia_common_tx_image(imc, &fdout);                                  /*0045*/
 
@@ -903,8 +903,8 @@ int freia_scalar_08(int argc, char *argv[])
    freia_common_rx_image(in, &fdin);                                    /*0035*/
 
    transposeNeighbor(neighborTransposed_0, k8_ce);                      /*0037*/
-   freia_scalar_08_helper_0_0_0(imc, in, freia_morpho_kernel_8c, neighborTransposed_0, neighborTransposed_1);        /*0038*/
    transposeNeighbor(neighborTransposed_1, k8_cn);                      /*0040*/
+   freia_scalar_08_helper_0_0_0(imc, in, freia_morpho_kernel_8c, neighborTransposed_0, neighborTransposed_1);        /*0038*/
 
    freia_common_tx_image(imc, &fdout);                                  /*0045*/
 

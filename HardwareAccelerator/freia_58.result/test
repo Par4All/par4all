@@ -46,8 +46,6 @@ digraph "dag_0" {
   "14 <" -> "17 vol" [label="out"];
   "14 <" -> "out";
   "in" -> "14 <";
-  "13 ?" [shape=none];
-  "13 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out"];
   "out" -> "10 D8";
@@ -80,8 +78,6 @@ digraph "dag_cleaned_0" {
   "14 <" -> "17 vol" [label="out"];
   "14 <" -> "out";
   "in" -> "14 <";
-  "13 ?" [shape=none];
-  "13 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out_1"];
   "out" -> "10 D8";
@@ -106,10 +102,10 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
    ret = freia_aipo_global_vol(out, &volcurrent);                       /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
-      freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
       i = 1;                                                            /*0011*/
       k = 0;                                                            /*0012*/
       j = 0;                                                            /*0013*/
+      freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
       j |= freia_aipo_inf(out, out, in);                                /*0014*/
       l = j;                                                            /*0015*/
       m |= l;                                                           /*0016*/
@@ -200,23 +196,6 @@ digraph "dag_0" {
   "57 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "57 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "57 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "56 ?" [shape=none];
-  "56 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "55 ?" [shape=none];
-  "55 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "54 D8" [shape=box];
   "54 D8" -> "58 <" [label="out"];
   "53 ?" [shape=none];
@@ -260,23 +239,6 @@ digraph "dag_0" {
   "50 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "50 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "50 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "49 ?" [shape=none];
-  "49 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "48 ?" [shape=none];
-  "48 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "47 D8" [shape=box];
   "47 D8" -> "51 <" [label="out"];
   "46 ?" [shape=none];
@@ -320,23 +282,6 @@ digraph "dag_0" {
   "43 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "43 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "43 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "42 ?" [shape=none];
-  "42 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "41 ?" [shape=none];
-  "41 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "40 D8" [shape=box];
   "40 D8" -> "44 <" [label="out"];
   "39 ?" [shape=none];
@@ -380,23 +325,6 @@ digraph "dag_0" {
   "36 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "36 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "36 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "35 ?" [shape=none];
-  "35 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "34 ?" [shape=none];
-  "34 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "33 D8" [shape=box];
   "33 D8" -> "37 <" [label="out"];
   "32 ?" [shape=none];
@@ -440,23 +368,6 @@ digraph "dag_0" {
   "29 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "29 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "29 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "28 ?" [shape=none];
-  "28 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "27 ?" [shape=none];
-  "27 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "26 D8" [shape=box];
   "26 D8" -> "30 <" [label="out"];
   "25 ?" [shape=none];
@@ -500,23 +411,6 @@ digraph "dag_0" {
   "22 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "22 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "22 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "21 ?" [shape=none];
-  "21 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "20 ?" [shape=none];
-  "20 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "19 D8" [shape=box];
   "19 D8" -> "23 <" [label="out"];
   "18 ?" [shape=none];
@@ -560,23 +454,6 @@ digraph "dag_0" {
   "15 ?" -> "22 ?" [arrowhead=empty,label="j"];
   "15 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "15 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "14 ?" [shape=none];
-  "14 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "13 ?" [shape=none];
-  "13 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "12 D8" [shape=box];
   "12 D8" -> "16 <" [label="out"];
   "11 ?" [shape=none];
@@ -613,38 +490,6 @@ digraph "dag_0" {
   "in" -> "23 <";
   "in" -> "16 <";
   "in" -> "9 <";
-  "8 ?" [shape=none];
-  "8 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "7 ?" [shape=none];
-  "7 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "6 ?" [shape=none];
-  "6 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "13 ?" [arrowhead=empty,label="i"];
   "5 D8" [shape=box];
   "5 D8" -> "9 <" [label="out"];
   "out" -> "5 D8";
@@ -713,23 +558,6 @@ digraph "dag_cleaned_0" {
   "57 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "57 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "57 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "56 ?" [shape=none];
-  "56 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "55 ?" [shape=none];
-  "55 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "54 D8" [shape=box];
   "54 D8" -> "58 <" [label="out"];
   "53 ?" [shape=none];
@@ -773,23 +601,6 @@ digraph "dag_cleaned_0" {
   "50 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "50 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "50 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "49 ?" [shape=none];
-  "49 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "48 ?" [shape=none];
-  "48 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "47 D8" [shape=box];
   "47 D8" -> "51 <" [label="out"];
   "46 ?" [shape=none];
@@ -833,23 +644,6 @@ digraph "dag_cleaned_0" {
   "43 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "43 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "43 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "42 ?" [shape=none];
-  "42 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "41 ?" [shape=none];
-  "41 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "40 D8" [shape=box];
   "40 D8" -> "44 <" [label="out"];
   "39 ?" [shape=none];
@@ -893,23 +687,6 @@ digraph "dag_cleaned_0" {
   "36 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "36 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "36 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "35 ?" [shape=none];
-  "35 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "34 ?" [shape=none];
-  "34 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "33 D8" [shape=box];
   "33 D8" -> "37 <" [label="out"];
   "32 ?" [shape=none];
@@ -953,23 +730,6 @@ digraph "dag_cleaned_0" {
   "29 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "29 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "29 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "28 ?" [shape=none];
-  "28 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "27 ?" [shape=none];
-  "27 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "26 D8" [shape=box];
   "26 D8" -> "30 <" [label="out"];
   "25 ?" [shape=none];
@@ -1013,23 +773,6 @@ digraph "dag_cleaned_0" {
   "22 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "22 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "22 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "21 ?" [shape=none];
-  "21 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "20 ?" [shape=none];
-  "20 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "19 D8" [shape=box];
   "19 D8" -> "23 <" [label="out"];
   "18 ?" [shape=none];
@@ -1073,23 +816,6 @@ digraph "dag_cleaned_0" {
   "15 ?" -> "22 ?" [arrowhead=empty,label="j"];
   "15 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "15 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "14 ?" [shape=none];
-  "14 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "13 ?" [shape=none];
-  "13 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "12 D8" [shape=box];
   "12 D8" -> "16 <" [label="out"];
   "11 ?" [shape=none];
@@ -1126,38 +852,6 @@ digraph "dag_cleaned_0" {
   "in" -> "23 <";
   "in" -> "16 <";
   "in" -> "9 <";
-  "8 ?" [shape=none];
-  "8 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "7 ?" [shape=none];
-  "7 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "6 ?" [shape=none];
-  "6 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "13 ?" [arrowhead=empty,label="i"];
   "5 D8" [shape=box];
   "5 D8" -> "9 <" [label="out"];
   "out" -> "5 D8";
@@ -1538,51 +1232,51 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
    ret = freia_58_helper_1_0_0(out, &volcurrent);                       /*0002*/
    do {                                                                 /*0003*/
       volprevious = volcurrent;                                         /*0004*/
-      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0005*/
       i = 1;                                                            /*0006*/
       k = 0;                                                            /*0007*/
       j = 0;                                                            /*0008*/
+      i = 1;                                                            /*0013*/
+      k = 0;                                                            /*0014*/
+      i = 1;                                                            /*0020*/
+      k = 0;                                                            /*0021*/
+      i = 1;                                                            /*0027*/
+      k = 0;                                                            /*0028*/
+      i = 1;                                                            /*0034*/
+      k = 0;                                                            /*0035*/
+      i = 1;                                                            /*0041*/
+      k = 0;                                                            /*0042*/
+      i = 1;                                                            /*0048*/
+      k = 0;                                                            /*0049*/
+      i = 1;                                                            /*0055*/
+      k = 0;                                                            /*0056*/
+      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0005*/
       j |= 0;                                                           /*0009*/
       l = j;                                                            /*0010*/
       m |= l;                                                           /*0011*/
-      i = 1;                                                            /*0013*/
-      k = 0;                                                            /*0014*/
       j = 0;                                                            /*0015*/
       j |= 0;                                                           /*0016*/
       l = j;                                                            /*0017*/
       m |= l;                                                           /*0018*/
-      i = 1;                                                            /*0020*/
-      k = 0;                                                            /*0021*/
       j = 0;                                                            /*0022*/
       j |= 0;                                                           /*0023*/
       l = j;                                                            /*0024*/
       m |= l;                                                           /*0025*/
-      i = 1;                                                            /*0027*/
-      k = 0;                                                            /*0028*/
       j = 0;                                                            /*0029*/
       j |= 0;                                                           /*0030*/
       l = j;                                                            /*0031*/
       m |= l;                                                           /*0032*/
-      i = 1;                                                            /*0034*/
-      k = 0;                                                            /*0035*/
       j = 0;                                                            /*0036*/
       j |= 0;                                                           /*0037*/
       l = j;                                                            /*0038*/
       m |= l;                                                           /*0039*/
-      i = 1;                                                            /*0041*/
-      k = 0;                                                            /*0042*/
       j = 0;                                                            /*0043*/
       j |= 0;                                                           /*0044*/
       l = j;                                                            /*0045*/
       m |= l;                                                           /*0046*/
-      i = 1;                                                            /*0048*/
-      k = 0;                                                            /*0049*/
       j = 0;                                                            /*0050*/
       j |= 0;                                                           /*0051*/
       l = j;                                                            /*0052*/
       m |= l;                                                           /*0053*/
-      i = 1;                                                            /*0055*/
-      k = 0;                                                            /*0056*/
       j = 0;                                                            /*0057*/
       j |= 0;                                                           /*0058*/
       l = j;                                                            /*0059*/
@@ -1602,44 +1296,44 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
    ret = freia_58_helper_1_0_0(out, &volcurrent);                       /*0002*/
    do {                                                                 /*0003*/
       volprevious = volcurrent;                                         /*0004*/
-      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0005*/
       i = 1;                                                            /*0006*/
       k = 0;                                                            /*0007*/
       j = 0;                                                            /*0008*/
-      l = j;                                                            /*0010*/
-      m |= l;                                                           /*0011*/
       i = 1;                                                            /*0013*/
       k = 0;                                                            /*0014*/
+      i = 1;                                                            /*0020*/
+      k = 0;                                                            /*0021*/
+      i = 1;                                                            /*0027*/
+      k = 0;                                                            /*0028*/
+      i = 1;                                                            /*0034*/
+      k = 0;                                                            /*0035*/
+      i = 1;                                                            /*0041*/
+      k = 0;                                                            /*0042*/
+      i = 1;                                                            /*0048*/
+      k = 0;                                                            /*0049*/
+      i = 1;                                                            /*0055*/
+      k = 0;                                                            /*0056*/
+      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0005*/
+      l = j;                                                            /*0010*/
+      m |= l;                                                           /*0011*/
       j = 0;                                                            /*0015*/
       l = j;                                                            /*0017*/
       m |= l;                                                           /*0018*/
-      i = 1;                                                            /*0020*/
-      k = 0;                                                            /*0021*/
       j = 0;                                                            /*0022*/
       l = j;                                                            /*0024*/
       m |= l;                                                           /*0025*/
-      i = 1;                                                            /*0027*/
-      k = 0;                                                            /*0028*/
       j = 0;                                                            /*0029*/
       l = j;                                                            /*0031*/
       m |= l;                                                           /*0032*/
-      i = 1;                                                            /*0034*/
-      k = 0;                                                            /*0035*/
       j = 0;                                                            /*0036*/
       l = j;                                                            /*0038*/
       m |= l;                                                           /*0039*/
-      i = 1;                                                            /*0041*/
-      k = 0;                                                            /*0042*/
       j = 0;                                                            /*0043*/
       l = j;                                                            /*0045*/
       m |= l;                                                           /*0046*/
-      i = 1;                                                            /*0048*/
-      k = 0;                                                            /*0049*/
       j = 0;                                                            /*0050*/
       l = j;                                                            /*0052*/
       m |= l;                                                           /*0053*/
-      i = 1;                                                            /*0055*/
-      k = 0;                                                            /*0056*/
       j = 0;                                                            /*0057*/
       l = j;                                                            /*0059*/
       m |= l;                                                           /*0060*/
@@ -1693,8 +1387,6 @@ digraph "dag_0" {
   "14 <" -> "17 vol" [label="out"];
   "14 <" -> "out";
   "in" -> "14 <";
-  "13 ?" [shape=none];
-  "13 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out"];
   "out" -> "10 D8";
@@ -1727,8 +1419,6 @@ digraph "dag_cleaned_0" {
   "14 <" -> "17 vol" [label="out"];
   "14 <" -> "out";
   "in" -> "14 <";
-  "13 ?" [shape=none];
-  "13 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out"];
   "out" -> "10 D8";
@@ -2233,10 +1923,10 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
    ret = freia_58_helper_1_0_0(out, &volcurrent);                       /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
-      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0010*/
       i = 1;                                                            /*0011*/
       k = 0;                                                            /*0012*/
       j = 0;                                                            /*0013*/
+      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0010*/
       j |= 0;                                                           /*0014*/
       l = j;                                                            /*0015*/
       m |= l;                                                           /*0016*/
@@ -2255,10 +1945,10 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
    ret = freia_58_helper_1_0_0(out, &volcurrent);                       /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
-      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0010*/
       i = 1;                                                            /*0011*/
       k = 0;                                                            /*0012*/
       j = 0;                                                            /*0013*/
+      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0010*/
       l = j;                                                            /*0015*/
       m |= l;                                                           /*0016*/
    }
