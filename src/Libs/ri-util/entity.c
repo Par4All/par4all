@@ -501,6 +501,18 @@ string label_local_name(entity e)
   return name+strlen(LABEL_PREFIX);
 }
 
+bool label_name_conflict_with_labels(string n, list ll)
+{
+  bool conflict_p = false;
+  if(!empty_label_p(n)) {
+    FOREACH(ENTITY, l, ll) {
+      if(strcmp(label_local_name(l), n) == 0)
+	conflict_p = true;
+    }
+  }
+  return conflict_p;
+}
+
 /* Return a name valid for sorting variables in vectors and constraint
    systems.
 
