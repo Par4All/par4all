@@ -1606,6 +1606,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
       // initializations contained by the declarations. Also old
       // declarations must be transformed into assignments.
       if(declaration_statement_p(s)) {
+	int sn = statement_number(s);
 	list icl = NIL;
 	/* If old is declared in s, its declaration must be removed
 	   and replaced if necessary by an assignment with its
@@ -1621,8 +1622,11 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 	    if(!value_unknown_p(iv)) {
 	      expression ie = variable_initial_expression(dv);
 	      expression lhs= entity_to_expression(dv);
-	      statement s = make_assign_statement(lhs, ie);
-	      control ic = make_control(s, NIL, NIL);
+	      statement is = make_assign_statement(lhs, ie);
+	      statement_number(is) = sn;
+	      control ic = make_control(is, NIL, NIL);
+	      /* FI: it would be better to use a comma expression in
+		 order to replace a statement by a unique statement */
 	      nctls = gen_nconc(nctls, CONS(CONTROL, ic, NIL));
 	      icl = gen_nconc(icl, CONS(CONTROL, ic, NIL));
 	      entity n = (entity) hash_get(old_to_new_variables, (void *) dv);
