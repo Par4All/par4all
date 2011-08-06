@@ -1601,7 +1601,7 @@ split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx),
 {
   if (!single_image_assignement_p(initial))
     // well, it should work most of the time, so only a warning
-    pips_user_warning("image reuse may result in subtly wrong code...\n");
+    pips_user_warning("still some image reuse...\n");
 
   // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
   // if everything was removed by optimizations, there is nothing to do.
@@ -1776,11 +1776,6 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
 {
   pips_debug(2, "cutting with cut=%d\n", cut);
   pips_assert("something cut width", cut>0);
-
-  // already warned while splitting on scalars
-  // if (!single_image_assignement_p(initial))
-    // well, it should work most of the time, so only a warning
-    // pips_user_warning("image reuse may result in subtly wrong code...\n");
 
   set
     // current set of vertices to group

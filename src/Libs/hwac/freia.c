@@ -42,11 +42,39 @@
 #include "effects.h"
 #include "ri-util.h"
 #include "effects-util.h"
+#include "properties.h"
 
 #include "freia_spoc_private.h"
 #include "hwac.h"
 
 #define FUNC_C "functions.c"
+
+/**************************************************** LOOK FOR IMAGE SHUFFLE */
+
+static bool fis_call_flt(call c, bool * shuffle)
+{
+  list args = call_arguments(c);
+  if (ENTITY_ASSIGN_P(call_function(c)))
+  {
+    entity a1 = expression_to_entity(EXPRESSION(CAR(args)));
+    entity a2 = expression_to_entity(EXPRESSION(CAR(CDR(args))));
+    if (a2!=entity_undefined &&
+        freia_image_variable_p(a1) && freia_image_variable_p(a2))
+    {
+      *shuffle = true;
+      gen_recurse_stop(NULL);
+      return false;
+    }
+  }
+  return true;
+}
+
+static bool freia_image_shuffle(statement s)
+{
+  bool shuffle = false;
+  gen_context_recurse(s, &shuffle, call_domain, fis_call_flt, gen_null);
+  return shuffle;
+}
 
 /*************************************************************** BASIC UTILS */
 
@@ -60,7 +88,7 @@ static string helper_file_name(string func_name)
   return fn;
 }
 
-static bool freia_skip_op_p(const statement s)
+bool freia_skip_op_p(const statement s)
 {
   call c = freia_statement_to_call(s);
   const char* called = c? entity_user_name(call_function(c)): "";
@@ -159,7 +187,7 @@ static void sort_subsequence(list ls, sequence sq)
  * and just skipped, provided stat scalar dependencies
  * are taken care of.
  */
-static bool some_effects_on_images(statement s)
+bool freia_some_effects_on_images(statement s)
 {
   int img_effect = false;
   list cumu = effects_effects(load_cumulated_rw_effects(s));
@@ -196,7 +224,7 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
     bool keep_stat = freia_api ||
       // ??? it is an image allocation in the middle of the code...
       // or it has no image effects
-      (ls && (freia_skip_op_p(s) || !some_effects_on_images(s)));
+      (ls && (freia_skip_op_p(s) || !freia_some_effects_on_images(s)));
 
     pips_debug(7, "statement %"_intFMT": %skept\n",
                statement_number(s), keep_stat? "": "not ");
@@ -251,6 +279,19 @@ string freia_compile(string module, statement mod_stat, string target)
   if (!freia_valid_target_p(target))
     pips_internal_error("unexpected target %s", target);
 
+  // check for image shuffles...
+  if (freia_image_shuffle(mod_stat))
+  {
+    if (get_bool_property("FREIA_ALLOW_IMAGE_SHUFFLE"))
+      pips_user_warning("image shuffle found in %s, "
+                        "freia compilation may result in wrong code!\n",
+                        module);
+    else
+      pips_user_error("image shuffle found in %s, "
+                      "see FREIA_ALLOW_IMAGE_SHUFFLE property to continue.\n",
+                      module);
+  }
+
   freia_info fsi;
   fsi.seqs = NIL;
   freia_init_dep_cache();
@@ -288,7 +329,7 @@ string freia_compile(string module, statement mod_stat, string target)
     fprintf(helper, FREIA_TRPX_INCLUDES);
 
   // hmmm...
-  hash_table occs = freia_build_image_occurrences(mod_stat);
+  hash_table occs = freia_build_image_occurrences(mod_stat, NULL);
   set output_images = freia_compute_current_output_images();
 
   int n_dags = 0;
@@ -303,7 +344,8 @@ string freia_compile(string module, statement mod_stat, string target)
       allocated = freia_trpx_compile_calls(module, ls, occs, output_images,
                                            helper, n_dags);
     else if (freia_aipo_p(target))
-      freia_aipo_compile_calls(module, ls, occs, output_images, n_dags);
+      allocated = freia_aipo_compile_calls(module, ls, occs, output_images,
+                                           n_dags);
     gen_free_list(ls);
 
     if (allocated)

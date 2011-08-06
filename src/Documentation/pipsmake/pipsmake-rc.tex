@@ -9914,7 +9914,6 @@ Whether to simplify the DAG using algebraic properties.
 FREIA_SIMPLIFY_OPERATIONS TRUE
 \end{PipsProp}
 
-
 Whether to remove dead image operations in the DAG.
 Should always be beneficial.
 \begin{PipsProp}{FREIA_REMOVE_DEAD_OPERATIONS}
@@ -9943,6 +9942,19 @@ Whether to merge identical arguments, especially kernels, when calling
 an accelerated function:
 \begin{PipsProp}{FREIA_MERGE_ARGUMENTS}
 FREIA_MERGE_ARGUMENTS TRUE
+\end{PipsProp}
+
+Whether to attempt to reuse initial images if possible, instead
+of keeping possibly newly introduced temporary images.
+\begin{PipsProp}{FREIA_REUSE_INITIAL_IMAGES}
+FREIA_REUSE_INITIAL_IMAGES TRUE
+\end{PipsProp}
+
+Try to allow shuffling image pointers, but this is not allowed by
+default because it may lead to wrong code as the compiler currently
+ignores the information and mixes up images.
+\begin{PipsProp}{FREIA_ALLOW_IMAGE_SHUFFLE}
+FREIA_ALLOW_IMAGE_SHUFFLE FALSE
 \end{PipsProp}
 
 Assume this pixel size in bits:

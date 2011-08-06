@@ -2029,7 +2029,10 @@ static dagvtx first_which_may_be_added
  */
 static list /* of dags */ split_dag(dag initial, const set output_images)
 {
-  pips_assert("no image reuse", single_image_assignement_p(initial));
+  // this may happen if an input image is also an output image...
+  // pips_assert("no image reuse", single_image_assignement_p(initial));
+  if (!single_image_assignement_p(initial))
+    pips_user_warning("still some image reuse...\n");
 
   // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
   // if everything was removed by optimizations, there is nothing to do.

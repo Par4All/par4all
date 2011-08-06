@@ -337,24 +337,29 @@ static const freia_api_t FREIA_AIPO_API[] = {
 
 #define FREIA_AIPO_API_SIZE (sizeof(*FREIA_AIPO_API)/sizeof(freia_api_t))
 
-/* returns the index of the description of an AIPO function
- */
-int hwac_freia_api_index(const string function)
-{
-  const freia_api_t * api;
-  for (api = FREIA_AIPO_API; api->function_name; api++)
-    if (same_string_p(function, api->function_name))
-      return api - FREIA_AIPO_API;
-  return -1;
-}
-
 /* @returns the description of a FREIA AIPO API function.
  * may be moved elswhere. raise an error if not found.
  */
 const freia_api_t * hwac_freia_api(const string function)
 {
-  int index = hwac_freia_api_index(function);
-  return index>=0? &FREIA_AIPO_API[index]: NULL;
+  static hash_table cache = NULL;
+  if (!cache)
+  {
+    const freia_api_t * api;
+    cache = hash_table_make(hash_string, 0);
+    for (api = FREIA_AIPO_API; api->function_name; api++)
+      hash_put(cache, api->function_name, api);
+  }
+  return (const freia_api_t *)
+    (hash_defined_p(cache, function)? hash_get(cache, function): NULL);
+}
+
+/* returns the index of the description of an AIPO function
+ */
+int hwac_freia_api_index(const string function)
+{
+  const freia_api_t * api = hwac_freia_api(function);
+  return api? (api - FREIA_AIPO_API): -1;
 }
 
 const freia_api_t * get_freia_api(int index)
@@ -1044,6 +1049,8 @@ typedef struct {
   hash_table occs;
   // enclosing statement for inner recursion
   statement enclosing;
+  // set of statements with image occurences
+  set image_occs_stats;
 } occs_ctx;
 
 /* hack to help replace use-def chains which did not work initially with C.
@@ -1069,6 +1076,8 @@ static void check_ref(reference r, occs_ctx * ctx)
     pips_assert("some containing statement", up);
     // store result
     set_add_element(stats, stats, (void*) up);
+    if (ctx->image_occs_stats)
+      set_add_element(ctx->image_occs_stats, ctx->image_occs_stats, up);
 
     pips_debug(9, "entity %s in statement %"_intFMT"\n",
                entity_name(v), statement_number(up));
@@ -1086,11 +1095,12 @@ static void check_stmt(statement s, occs_ctx * ctx)
 
 /* @return build occurrence hash table: { entity -> set of statements }
  */
-hash_table freia_build_image_occurrences(statement s)
+hash_table freia_build_image_occurrences(statement s, set image_occs_stats)
 {
   occs_ctx ctx;
   ctx.occs = hash_table_make(hash_pointer, 0);
   ctx.enclosing = NULL;
+  ctx.image_occs_stats = image_occs_stats;
   gen_context_multi_recurse(s, &ctx,
                             statement_domain, gen_true, check_stmt,
                             reference_domain, gen_true, check_ref,
@@ -1168,6 +1178,8 @@ static statement image_alloc(entity v)
 }
 */
 
+/* generate statement: "freia_free(v);"
+ */
 static statement image_free(entity v)
 {
   return call_to_statement(
@@ -1175,16 +1187,23 @@ static statement image_free(entity v)
               CONS(expression, entity_to_expression(v), NIL)));
 }
 
-static void entref(reference r, hash_table count)
+/* tell whether there is no image processing statements between s1 and s2
+ */
+static bool only_minor_statements_in_between(
+  list ls, statement s1, statement s2, set image_occurences)
 {
-  // ??? I should rather count in how many distinct statements
-  // the variable is used, instead of counting occurences
-  entity var = reference_variable(r);
-  // pips_debug(7, "ref to %s\n", entity_local_name(var));
-  if (hash_defined_p(count, var))
-    hash_put(count, var, (void*) ((_int) hash_get(count, var)+1));
-  else
-    hash_put(count, var, (void*) (_int) (1));
+  bool in_sequence = false;
+  FOREACH(statement, s, ls)
+  {
+    if (!in_sequence && s==s1)
+      in_sequence = true;
+    else if (in_sequence && s==s2)
+      return true;
+    else if (in_sequence && set_belong_p(image_occurences, s))
+      return false;
+  }
+  pips_internal_error("should not get there");
+  return true;
 }
 
 /* insert image allocation if needed, for intermediate image inserted before
@@ -1198,27 +1217,72 @@ list freia_allocate_new_images_if_needed
 (list ls, list images, const hash_table occs, const hash_table init)
 {
   // check for used images
-  hash_table count = hash_table_make(hash_pointer, 0);
-
-  FOREACH(statement, s, ls)
-    gen_context_recurse(s, (void*) count, reference_domain, gen_true, entref);
+  set img_stats = set_make(hash_pointer);
+  sequence sq = make_sequence(ls);
+  hash_table newoccs = freia_build_image_occurrences((statement) sq, img_stats);
+  sequence_statements(sq) = NIL;
+  free_sequence(sq);
 
   list allocated = NIL;
   FOREACH(entity, v, images)
   {
-    _int n = (_int) hash_get(count, v);
-    if (n>=3)
-      allocated = CONS(entity, v, allocated);
-    else if (n>=1)
+    if (!hash_defined_p(newoccs, v))
+      // no occurences, the image is not kept
+      continue;
+
+    if (get_bool_property("FREIA_REUSE_INITIAL_IMAGES"))
     {
-      // used twice, substitude back to initial variable???
-      // ??? not sure, guard with a property?
-      FOREACH(statement, s, ls)
-        freia_switch_image_in_statement(s, v, (entity) hash_get(init, v));
+      set where = (set) hash_get(newoccs, v);
+      int n = set_size(where);
+
+      pips_debug(8, "image %s used in %d statements\n", entity_name(v), n);
+
+      // n>1 ??
+      // if used only twice, substitude back to initial variable???
+      // well, it may depends whether the the initial variable is used?
+      // there is possibly something intelligent to do here, but it should
+      // be checked carefully...
+      if (n==2 && hash_defined_p(init, v))
+      {
+        statement s1 = NULL, s2 = NULL;
+        SET_FOREACH(statement, s, where)
+          if (!s1) s1 = s; else s2 = s;
+        // sort s1 < s2
+        if (statement_ordering(s2)<statement_ordering(s1))
+        {
+          statement tmp = s1; s1 = s2; s2 = tmp;
+        }
+        if (only_minor_statements_in_between(ls, s1, s2, img_stats))
+        {
+          // yes, they are successive, just remove?? Am I that sure???
+          // ??? hmmm, maybe we could have :
+          //   X   = stuff(...)
+          //   X_1 = stuff(...)
+          //   ... = stuff(X_1, ...)
+          //   ... = stuff(X...)
+          // where X_1 -> X is just a bad idea because it overwrites X?
+          // I'm not sure this can happen with AIPO, as X would be X_2
+          // and will not be changed?
+          entity old = (entity) hash_get(init, v);
+          pips_debug(7, "substituting back %s by %s\n",
+                     entity_local_name(v), entity_local_name(old));
+
+          // we can perform any substitution here
+          // note that it may be generated helper functions
+          freia_switch_image_in_statement(s1, v, old, true);
+          freia_switch_image_in_statement(s2, v, old, false);
+        }
+        else
+          allocated = CONS(entity, v, allocated);
+      }
+      else
+        allocated = CONS(entity, v, allocated);
     }
-    // not used
+    else
+      allocated = CONS(entity, v, allocated);
   }
-  hash_table_free(count), count = NULL;
+  freia_clean_image_occurrences(newoccs);
+  set_free(img_stats);
 
   // allocate those which are finally used
   if (allocated)

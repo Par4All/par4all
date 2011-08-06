@@ -1192,11 +1192,14 @@ list /* of statements */ freia_dag_optimize(dag d)
   }
 
   if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
+  {
     dag_simplify(d);
 
-  ifdebug(8) {
-    pips_debug(8, "considering dag:\n");
-    dag_dump(stderr, "simplified", d);
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS:\n");
+      dag_dump(stderr, "simplified", d);
+      // dag_dot_dump_prefix("main", "simplified", 0, d);
+    }
   }
 
   // remove dead image operations
@@ -1227,6 +1230,12 @@ list /* of statements */ freia_dag_optimize(dag d)
         pips_debug(8, "vertex %"_intFMT" is alive\n", dagvtx_number(v));
     }
     gen_free_list(vertices), vertices = NULL;
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_REMOVE_DEAD_OPERATIONS:\n");
+      dag_dump(stderr, "remove dead", d);
+      // dag_dot_dump_prefix("main", "remove_dead", 0, d);
+    }
   }
 
   // look for identical image operations (same inputs, same params)
@@ -1300,15 +1309,16 @@ list /* of statements */ freia_dag_optimize(dag d)
         hash_put(previous, vr, preds);
     }
 
-    ifdebug(8) {
-      pips_debug(4, "after pass 1, dag:\n");
-      dag_dump(stderr, "optim 1", d);
-    }
-
     // cleanup
     HASH_MAP(k, v, if (v) gen_free_list(v), previous);
     hash_table_free(previous), previous = NULL;
     gen_free_list(vertices), vertices = NULL;
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_REMOVE_DUPLICATE_OPERATIONS:\n");
+      dag_dump(stderr, "remove duplicate", d);
+      // dag_dot_dump_prefix("main", "remove_duplicates", 0, d);
+    }
   }
 
   if (get_bool_property("FREIA_REMOVE_USELESS_COPIES"))
@@ -1399,6 +1409,12 @@ list /* of statements */ freia_dag_optimize(dag d)
           set_add_element(remove, remove, v);
       }
     }
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_REMOVE_USELESS_COPIES:\n");
+      dag_dump(stderr, "remove useless copies", d);
+      // dag_dot_dump_prefix("main", "useless_copies", 0, d);
+    }
   }
 
   if (get_bool_property("FREIA_MOVE_DIRECT_COPIES"))
@@ -1465,6 +1481,12 @@ list /* of statements */ freia_dag_optimize(dag d)
       }
     }
     hash_table_free(intra_pipe_copies);
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_MOVE_DIRECT_COPIES:\n");
+      dag_dump(stderr, "move direct copies", d);
+      // dag_dot_dump_prefix("main", "direct_copies", 0, d);
+    }
   }
 
   // cleanup dag (argh, beware that the order is not deterministic...)
@@ -1502,6 +1524,7 @@ list /* of statements */ freia_dag_optimize(dag d)
   ifdebug(6) {
     pips_debug(4, "resulting dag:\n");
     dag_dump(stderr, "cleaned", d);
+    // dag_dot_dump_prefix("main", "cleaned", 0, d);
   }
 
   return lstats;
@@ -2148,20 +2171,63 @@ static entity new_local_image_variable(entity model, const hash_table occs)
   return img;
 }
 
-typedef struct { entity old; entity new; } two_vars;
+/************************************************** FREIA IMAGE SUBSTITUTION */
 
-static void ref_rwt(reference r, two_vars * ctx)
+typedef struct { entity old, new; bool write; } swis_ctx;
+
+static void swis_ref_rwt(reference r, swis_ctx * ctx)
 {
   if (reference_variable(r)==ctx->old)
     reference_variable(r) = ctx->new;
 }
 
-// ??? must be available somewhere?
-// see substitute_entity_in_expression
-void freia_switch_image_in_statement(statement s, entity old, entity img)
+static bool swis_call_flt(call c, swis_ctx * ctx)
 {
-  two_vars ctx = { old, img };
-  gen_context_recurse(s, &ctx, reference_domain, gen_true, ref_rwt);
+  const freia_api_t * api = hwac_freia_api(entity_local_name(call_function(c)));
+  if (api)
+  {
+    list args = call_arguments(c);
+    pips_assert("freia api call length is ok",
+                gen_length(args)== (api->arg_img_out + api->arg_img_in +
+                                    api->arg_misc_out + api->arg_misc_in));
+    unsigned int i;
+    // output arguments
+    for(i=0; i<api->arg_img_out; i++)
+    {
+      if (!ctx->write)
+        gen_recurse_stop(EXPRESSION(CAR(args)));
+      args = CDR(args);
+    }
+    // input arguments
+    for(i=0; i<api->arg_img_in; i++)
+    {
+      if (ctx->write)
+        gen_recurse_stop(EXPRESSION(CAR(args)));
+      args = CDR(args);
+    }
+    // skip remainder anyway
+    while (args)
+    {
+      gen_recurse_stop(EXPRESSION(CAR(args)));
+      args = CDR(args);
+    }
+  }
+  // else this is not an AIPO call... we substitute everywhere
+  return true;
+}
+
+/* switch read or written image in statement
+ * if this is an AIPO call, only substitute output or input depending on write
+ * otherwise all occurrences are substituted
+ */
+void freia_switch_image_in_statement(
+  statement s, entity old, entity img, bool write)
+{
+  swis_ctx ctx = { old, img, write };
+  gen_context_multi_recurse(s, &ctx,
+                            call_domain, swis_call_flt, gen_null,
+                            reference_domain, gen_true, swis_ref_rwt,
+                            NULL);
 }
 
 /* switch to new image variable in v & its direct successors
@@ -2171,11 +2237,16 @@ static void switch_image_variable(dagvtx v, entity old, entity img)
   vtxcontent c = dagvtx_content(v);
   pips_assert("switch image output", vtxcontent_out(c)==old);
   vtxcontent_out(c) = img;
+  statement st = dagvtx_statement(v);
+  pips_assert("some production statement", st!=NULL);
+  freia_switch_image_in_statement(st, old, img, true);
   FOREACH(dagvtx, s, dagvtx_succs(v))
   {
     vtxcontent cs = dagvtx_content(s);
     gen_replace_in_list(vtxcontent_inputs(cs), old, img);
-    freia_switch_image_in_statement(dagvtx_statement(s), old, img);
+    statement st = dagvtx_statement(s);
+    pips_assert("some producer statement", st!=NULL);
+    freia_switch_image_in_statement(st, old, img, false);
   }
 }
 
@@ -2195,7 +2266,9 @@ list dag_fix_image_reuse(dag d, hash_table init, const hash_table occs)
     if (!img || img==entity_undefined)
       continue;
 
-    if (set_belong_p(seen, img))
+    if (set_belong_p(seen, img) &&
+        // but take care of image reuse, we must keep input images!
+        !gen_in_list_p(v, dag_inputs(d)))
     {
       entity new_img = new_local_image_variable(img, occs);
       switch_image_variable(v, img, new_img);
