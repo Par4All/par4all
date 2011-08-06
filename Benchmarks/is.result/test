@@ -174,40 +174,40 @@ int main(int argc, char **argv)
    /*  Initialize the verification arrays if a valid class */
 #pragma omp parallel for 
    for(i = 0; i <= 4; i += 1) {
-      if ('S'=='S') goto main_switch_2_case_S;
-      if ('S'=='A') goto main_switch_2_case_A;
-      if ('S'=='W') goto main_switch_2_case_W;
-      if ('S'=='B') goto main_switch_2_case_B;
-      if ('S'=='C') goto main_switch_2_case_C;
+      if ('S'=='S') goto _switch_2_case_S;
+      if ('S'=='A') goto _switch_2_case_A;
+      if ('S'=='W') goto _switch_2_case_W;
+      if ('S'=='B') goto _switch_2_case_B;
+      if ('S'=='C') goto _switch_2_case_C;
       if ('S'=='D') {
       }
       else {
-         goto main_break_2;
+         goto _break_2;
       }
-main_switch_2_case_D:      ;
+_switch_2_case_D:      ;
       test_index_array[i] = D_test_index_array[i];
       test_rank_array[i] = D_test_rank_array[i];
-      goto main_break_2;
-main_switch_2_case_C:      ;
+      goto _break_2;
+_switch_2_case_C:      ;
       test_index_array[i] = C_test_index_array[i];
       test_rank_array[i] = C_test_rank_array[i];
-      goto main_break_2;
-main_switch_2_case_B:      ;
+      goto _break_2;
+_switch_2_case_B:      ;
       test_index_array[i] = B_test_index_array[i];
       test_rank_array[i] = B_test_rank_array[i];
-      goto main_break_2;
-main_switch_2_case_W:      ;
+      goto _break_2;
+_switch_2_case_W:      ;
       test_index_array[i] = W_test_index_array[i];
       test_rank_array[i] = W_test_rank_array[i];
-      goto main_break_2;
-main_switch_2_case_A:      ;
+      goto _break_2;
+_switch_2_case_A:      ;
       test_index_array[i] = A_test_index_array[i];
       test_rank_array[i] = A_test_rank_array[i];
-      goto main_break_2;
-main_switch_2_case_S:      ;
+      goto _break_2;
+_switch_2_case_S:      ;
       test_index_array[i] = S_test_index_array[i];
       test_rank_array[i] = S_test_rank_array[i];
-main_break_2:      ;
+_break_2:      ;
    }
    
    
@@ -453,17 +453,17 @@ void rank(int iteration)
          INT_TYPE key_rank = key_buff_ptr[k-1];
          int failed = 0;
 
-         if ('S'=='S') goto rank_switch_10_case_S;
-         if ('S'=='W') goto rank_switch_10_case_W;
-         if ('S'=='A') goto rank_switch_10_case_A;
-         if ('S'=='B') goto rank_switch_10_case_B;
-         if ('S'=='C') goto rank_switch_10_case_C;
+         if ('S'=='S') goto _switch_10_case_S;
+         if ('S'=='W') goto _switch_10_case_W;
+         if ('S'=='A') goto _switch_10_case_A;
+         if ('S'=='B') goto _switch_10_case_B;
+         if ('S'=='C') goto _switch_10_case_C;
          if ('S'=='D') {
          }
          else {
-            goto rank_break_10;
+            goto _break_10;
          }
-rank_switch_10_case_D:         ;
+_switch_10_case_D:         ;
          if (i<2)
             if (key_rank!=test_rank_array[i]+iteration)
                failed = 1;
@@ -473,8 +473,8 @@ rank_switch_10_case_D:         ;
             failed = 1;
          else
             passed_verification++;
-         goto rank_break_10;
-rank_switch_10_case_C:         ;
+         goto _break_10;
+_switch_10_case_C:         ;
          if (i<=2)
             if (key_rank!=test_rank_array[i]+iteration)
                failed = 1;
@@ -484,8 +484,8 @@ rank_switch_10_case_C:         ;
             failed = 1;
          else
             passed_verification++;
-         goto rank_break_10;
-rank_switch_10_case_B:         ;
+         goto _break_10;
+_switch_10_case_B:         ;
          if (i==1||i==2||i==4)
             if (key_rank!=test_rank_array[i]+iteration)
                failed = 1;
@@ -495,8 +495,8 @@ rank_switch_10_case_B:         ;
             failed = 1;
          else
             passed_verification++;
-         goto rank_break_10;
-rank_switch_10_case_A:         ;
+         goto _break_10;
+_switch_10_case_A:         ;
          if (i<=2)
             if (key_rank!=test_rank_array[i]+(iteration-1))
                failed = 1;
@@ -506,8 +506,8 @@ rank_switch_10_case_A:         ;
             failed = 1;
          else
             passed_verification++;
-         goto rank_break_10;
-rank_switch_10_case_W:         ;
+         goto _break_10;
+_switch_10_case_W:         ;
          if (i<2)
             if (key_rank!=test_rank_array[i]+(iteration-2))
                failed = 1;
@@ -517,8 +517,8 @@ rank_switch_10_case_W:         ;
             failed = 1;
          else
             passed_verification++;
-         goto rank_break_10;
-rank_switch_10_case_S:         ;
+         goto _break_10;
+_switch_10_case_S:         ;
          if (i<=2)
             if (key_rank!=test_rank_array[i]+iteration)
                /* test vals were put here */
@@ -529,7 +529,7 @@ rank_switch_10_case_S:         ;
             failed = 1;
          else
             passed_verification++;
-rank_break_10:         ;
+_break_10:         ;
          if (failed==1)
             
             
