@@ -15,16 +15,16 @@ int control01(int *in, int *val)
             if ((c = pnm_getc(in))==-1)                                 /*0013*/
                return -1;                                               /*0014*/
             if (c=='\n')                                                /*0016*/
-               goto control01_break_2;                                  /*0017*/
+               goto _break_2;                                           /*0017*/
          }
-control01_break_2:         ;
+_break_2:         ;
       }
       else if (c=='0'||c=='1') {                                        /*0011*/
          v = c-'0';                                                     /*0021*/
-         goto control01_break_1;                                        /*0022*/
+         goto _break_1;                                                 /*0022*/
       }
    }
-control01_break_1:   ;
+_break_1:   ;
    if (val)                                                             /*0025*/
       *val = v;                                                         /*0026*/
    return 0;                                                            /*0028*/
@@ -37,7 +37,7 @@ int control01(int *in, int *val)
    int c;                                                               /*0005*/
    int v;                                                               /*0006*/
 l99998:   ;
-   if (!1) goto control01_break_1;                                      /*0024*/
+   if (!1) goto _break_1;                                               /*0024*/
    if ((c = pnm_getc(in))==-1)                                          /*0008*/
       return -1;                                                        /*0009*/
    if (c=='#') goto l99999;                                             /*0011*/
@@ -47,10 +47,10 @@ l99998:   ;
       goto l99998;
    }
    v = c-'0';                                                           /*0021*/
-   goto control01_break_1;
+   goto _break_1;
 l99999:   ;
 l99997:   ;
-   if (!1) goto control01_break_2;                                      /*0019*/
+   if (!1) goto _break_2;                                               /*0019*/
    if ((c = pnm_getc(in))==-1)                                          /*0013*/
       return -1;                                                        /*0014*/
    if (c=='\n') {                                                       /*0016*/
@@ -58,9 +58,9 @@ l99997:   ;
    else {
       goto l99997;
    }
-control01_break_2:   ;
+_break_2:   ;
    goto l99998;
-control01_break_1:   ;
+_break_1:   ;
    if (val)                                                             /*0025*/
       *val = v;                                                         /*0026*/
    return 0;                                                            /*0028*/
@@ -73,7 +73,7 @@ int control01(int *in, int *val)
    int c;                                                               /*0005*/
    int v;                                                               /*0006*/
 l99998:   ;
-   if (!1) goto control01_break_1;                                      /*0024*/
+   if (!1) goto _break_1;                                               /*0024*/
    if ((c = pnm_getc(in))==-1)                                          /*0008*/
       return -1;                                                        /*0009*/
    if (c=='#') goto l99999;                                             /*0011*/
@@ -83,10 +83,10 @@ l99998:   ;
       goto l99998;
    }
    v = c-'0';                                                           /*0021*/
-   goto control01_break_1;
+   goto _break_1;
 l99999:   ;
 l99997:   ;
-   if (!1) goto control01_break_2;                                      /*0019*/
+   if (!1) goto _break_2;                                               /*0019*/
    if ((c = pnm_getc(in))==-1)                                          /*0013*/
       return -1;                                                        /*0014*/
    if (c=='\n') {                                                       /*0016*/
@@ -94,9 +94,9 @@ l99997:   ;
    else {
       goto l99997;
    }
-control01_break_2:   ;
+_break_2:   ;
    goto l99998;
-control01_break_1:   ;
+_break_1:   ;
    if (val)                                                             /*0025*/
       *val = v;                                                         /*0026*/
    return 0;                                                            /*0028*/
@@ -110,7 +110,7 @@ int control01(int *in, int *val)
    int c;                                                               /*0005*/
    int v;                                                               /*0006*/
 l99998:   ;
-   if (!1) goto control01_break_1;                                      /*0024*/
+   if (!1) goto _break_1;                                               /*0024*/
    if ((c = pnm_getc(in))==-1)                                          /*0008*/
       return -1;                                                        /*0009*/
    if (c=='#') goto l99999;                                             /*0011*/
@@ -120,10 +120,10 @@ l99998:   ;
       goto l99998;
    }
    v = c-'0';                                                           /*0021*/
-   goto control01_break_1;
+   goto _break_1;
 l99999:   ;
 l99997:   ;
-   if (!1) goto control01_break_2;                                      /*0019*/
+   if (!1) goto _break_2;                                               /*0019*/
    if ((c = pnm_getc(in))==-1)                                          /*0013*/
       return -1;                                                        /*0014*/
    if (c=='\n') {                                                       /*0016*/
@@ -131,9 +131,9 @@ l99997:   ;
    else {
       goto l99997;
    }
-control01_break_2:   ;
+_break_2:   ;
    goto l99998;
-control01_break_1:   ;
+_break_1:   ;
    if (val)                                                             /*0025*/
       *val = v;                                                         /*0026*/
    return 0;                                                            /*0028*/

@@ -7,9 +7,9 @@ int main()
 
    while (c>0) {
       c -= 1;
-      goto main_break_1;
+      goto _break_1;
    }
-main_break_1:   ;
+_break_1:   ;
 }
 
 Controlizer output
@@ -17,7 +17,7 @@ Controlizer output
 int main()
 {
    int c = 5;
-   if (!(c>0)) goto main_break_1;
+   if (!(c>0)) goto _break_1;
    c -= 1;
-main_break_1:   ;
+_break_1:   ;
 }

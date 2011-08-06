@@ -10,9 +10,9 @@ void loop_break01()
    for (i = 0;i<n;i++)
       if (i==0) {
          a[i] = 0.;
-         goto loop_break01_break_1;
+         goto _break_1;
       }
-loop_break01_break_1:   ;
+_break_1:   ;
    i = -1;
 break_1:   return;
 }

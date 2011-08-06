@@ -1,22 +1,22 @@
 int foo(int predicate)
 {
    int x = 0;
-   if (predicate==0) goto foo_switch_1_case_0;
-   if (predicate==1) goto foo_switch_1_case_1;
-   if (predicate==2) goto foo_switch_1_case_2;
-   if (predicate==3) goto foo_switch_1_case_3;
-foo_switch_1_default:   ;
+   if (predicate==0) goto _switch_1_case_0;
+   if (predicate==1) goto _switch_1_case_1;
+   if (predicate==2) goto _switch_1_case_2;
+   if (predicate==3) goto _switch_1_case_3;
+_switch_1_default:   ;
    return 222;
-foo_switch_1_case_3:   ;
-   goto foo_break_1;
-foo_switch_1_case_2:   ;
+_switch_1_case_3:   ;
+   goto _break_1;
+_switch_1_case_2:   ;
    return x+3;
-foo_switch_1_case_1:   ;
+_switch_1_case_1:   ;
    x = x+1;
-   goto foo_switch_1_case_2;
-foo_switch_1_case_0:   ;
+   goto _switch_1_case_2;
+_switch_1_case_0:   ;
    return 111;
-foo_break_1:   ;
+_break_1:   ;
    return 333;
 }
 
@@ -25,21 +25,21 @@ printed file after RESTRUCTURE_CONTROL
 int foo(int predicate)
 {
    int x = 0;
-   if (predicate==0) goto foo_switch_1_case_0;
-   if (predicate==1) goto foo_switch_1_case_1;
-   if (predicate==2) goto foo_switch_1_case_2;
-   if (predicate==3) goto foo_switch_1_case_3;
-foo_switch_1_default:   ;
+   if (predicate==0) goto _switch_1_case_0;
+   if (predicate==1) goto _switch_1_case_1;
+   if (predicate==2) goto _switch_1_case_2;
+   if (predicate==3) goto _switch_1_case_3;
+_switch_1_default:   ;
    return 222;
-foo_switch_1_case_3:   ;
-   goto foo_break_1;
-foo_switch_1_case_2:   ;
+_switch_1_case_3:   ;
+   goto _break_1;
+_switch_1_case_2:   ;
    return x+3;
-foo_switch_1_case_1:   ;
+_switch_1_case_1:   ;
    x = x+1;
-   goto foo_switch_1_case_2;
-foo_switch_1_case_0:   ;
+   goto _switch_1_case_2;
+_switch_1_case_0:   ;
    return 111;
-foo_break_1:   ;
+_break_1:   ;
    return 333;
 }

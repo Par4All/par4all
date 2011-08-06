@@ -6,25 +6,25 @@ int switch02(int predicate)
    int x = 0;
 
    if (predicate==0)
-      goto switch02_switch_1_case_0;
+      goto _switch_1_case_0;
    if (predicate==1)
-      goto switch02_switch_1_case_1;
+      goto _switch_1_case_1;
    if (predicate==2)
-      goto switch02_switch_1_case_2;
+      goto _switch_1_case_2;
    if (predicate==3)
-      goto switch02_switch_1_case_3;
-   goto switch02_switch_1_default;
-switch02_switch_1_case_0:   ;
+      goto _switch_1_case_3;
+   goto _switch_1_default;
+_switch_1_case_0:   ;
    return 111;
-switch02_switch_1_default:   ;
+_switch_1_default:   ;
    return 222;
-switch02_switch_1_case_1:   ;
+_switch_1_case_1:   ;
    x = x+1;
-switch02_switch_1_case_2:   ;
+_switch_1_case_2:   ;
    return x+3;
-switch02_switch_1_case_3:   ;
-   goto switch02_break_1;
-switch02_break_1:   ;
+_switch_1_case_3:   ;
+   goto _break_1;
+_break_1:   ;
    return 333;
 }
 
@@ -53,19 +53,19 @@ Printed file for "switch02"
 int switch02(int predicate)
 {
    int x = 0;
-   if (predicate==0) goto switch02_switch_1_case_0;
-   if (predicate==1) goto switch02_switch_1_case_1;
-   if (predicate==2) goto switch02_switch_1_case_2;
-   if (predicate==3) goto switch02_switch_1_case_3;
-switch02_switch_1_default:   ;
+   if (predicate==0) goto _switch_1_case_0;
+   if (predicate==1) goto _switch_1_case_1;
+   if (predicate==2) goto _switch_1_case_2;
+   if (predicate==3) goto _switch_1_case_3;
+_switch_1_default:   ;
    return 222;
-switch02_switch_1_case_1:   ;
+_switch_1_case_1:   ;
    x = x+1;
-switch02_switch_1_case_2:   ;
+_switch_1_case_2:   ;
    return x+3;
-switch02_switch_1_case_0:   ;
+_switch_1_case_0:   ;
    return 111;
-switch02_switch_1_case_3:   ;
-switch02_break_1:   ;
+_switch_1_case_3:   ;
+_break_1:   ;
    return 333;
 }
