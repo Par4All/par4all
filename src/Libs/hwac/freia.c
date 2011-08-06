@@ -56,6 +56,7 @@ static bool fis_call_flt(call c, bool * shuffle)
   list args = call_arguments(c);
   if (ENTITY_ASSIGN_P(call_function(c)))
   {
+    pips_assert("assign takes two args", gen_length(args)==2);
     entity a1 = expression_to_entity(EXPRESSION(CAR(args)));
     entity a2 = expression_to_entity(EXPRESSION(CAR(CDR(args))));
     if (a2!=entity_undefined &&
@@ -79,6 +80,7 @@ static bool freia_image_shuffle(statement s)
 /*************************************************************** BASIC UTILS */
 
 /* return malloc'ed "foo.database/Src/%{module}_helper_functions.c"
+ * should depend on target? could mix targets?
  */
 static string helper_file_name(string func_name)
 {
@@ -156,7 +158,7 @@ static void sort_subsequence(list ls, sequence sq)
   // sort ls
   gen_sort_list(ls, (gen_cmp_func_t) freia_cmp_statement);
 
-  // extract sub sequence
+  // extract sub sequence in a separate list
   list head = NIL, lcmp = NIL, tail = NIL;
   FOREACH(statement, s, sequence_statements(sq))
   {
@@ -180,6 +182,8 @@ static void sort_subsequence(list ls, sequence sq)
   set_free(cmp);
 }
 
+/*********************************************************** LOOK AT EFFECTS */
+
 #include "effects-generic.h"
 
 /* tell whether a statement has no effects on images.
@@ -191,13 +195,74 @@ bool freia_some_effects_on_images(statement s)
 {
   int img_effect = false;
   list cumu = effects_effects(load_cumulated_rw_effects(s));
-  FOREACH(effect, e, cumu) {
-    if (freia_image_variable_p(effect_variable(e))) {
+  FOREACH(effect, e, cumu)
+  {
+    if (freia_image_variable_p(effect_variable(e)))
+    {
       img_effect = true;
       break;
     }
   }
   return img_effect;
+}
+
+/* update the set of written variables, as seen from effects, with a statement
+ * this is really to rebuild a poor's man dependency graph in order to move
+ * some statements around...
+ */
+static void update_written_variables(set written, statement s)
+{
+  list cumu = effects_effects(load_cumulated_rw_effects(s));
+  FOREACH(effect, e, cumu)
+    if (effect_write_p(e))
+      set_add_element(written, written, effect_variable(e));
+}
+
+/* @return whether statement depends on some written variables
+ */
+static bool statement_depends_p(set written, statement s)
+{
+  bool depends = false;
+  list cumu = effects_effects(load_cumulated_rw_effects(s));
+  FOREACH(effect, e, cumu)
+  {
+    if (effect_read_p(e) && set_belong_p(written, effect_variable(e)))
+    {
+      depends = true;
+      break;
+    }
+  }
+  return depends;
+}
+
+/* move statements in l ahead of s in sq
+ * note that ls is in reverse order...
+ */
+static void move_ahead(list ls, statement target, sequence sq)
+{
+  // for faster list inclusion test
+  set tomove = set_make(hash_pointer);
+  set_append_list(tomove, ls);
+
+  // build new sequence list in reverse order
+  list nsq = NIL;
+  FOREACH(statement, s, sequence_statements(sq))
+  {
+    if (set_belong_p(tomove, s))
+      continue; // skip!
+    if (s==target)
+      // insert list now!
+      nsq = gen_nconc(gen_copy_seq(ls), nsq);
+    // and keep current statement
+    nsq = CONS(statement, s, nsq);
+  }
+
+  // update sequence with new list
+  gen_free_list(sequence_statements(sq));
+  sequence_statements(sq) = gen_nreverse(nsq);
+
+  // clean up
+  set_free(tomove);
 }
 
 /********************************************************* RECURSION HELPERS */
@@ -211,11 +276,13 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
 {
   pips_debug(9, "considering sequence...\n");
 
-  list /* of statements */ ls = NIL, ltail = NIL;
+  list /* of statements */ ls = NIL, ltail = NIL, lup = NIL;
 
   // use a copy, because the sequence is rewritten inside the loop...
   // see sort_subsequence. I guess should rather delay it...
   list lseq = gen_copy_seq(sequence_statements(sq));
+
+  set written = set_make(hash_pointer);
 
   FOREACH(statement, s, lseq)
   {
@@ -235,14 +302,27 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
       {
         ls = gen_nconc(ltail, ls), ltail = NIL;
         ls = CONS(statement, s, ls);
+        update_written_variables(written, s);
       }
       else // else accumulate in the "other list" waiting for something...
       {
-        ltail = CONS(statement, s, ltail);
+        if (statement_depends_p(written, s) ||
+            (statement_call_p(s) &&
+             ENTITY_C_RETURN_P(call_function(statement_call(s)))))
+        {
+          ltail = CONS(statement, s, ltail);
+          update_written_variables(written, s);
+        }
+        else
+          // we can move it up...
+          lup = CONS(statement, s, lup);
       }
     }
     else // the sequence is cut on this statement
     {
+      if (lup && ls)
+        move_ahead(lup, STATEMENT(CAR(gen_last(ls))), sq);
+      if (lup) gen_free_list(lup), lup = NIL;
       if (ls!=NIL)
       {
         sort_subsequence(ls, sq);
@@ -250,19 +330,25 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
         ls = NIL;
       }
       if (ltail) gen_free_list(ltail), ltail = NIL;
+      set_clear(written);
     }
   }
 
   // end of sequence reached
   if (ls!=NIL)
   {
+    if (lup && ls)
+      move_ahead(lup, STATEMENT(CAR(gen_last(ls))), sq);
     sort_subsequence(ls, sq);
     fsip->seqs = CONS(list, ls, fsip->seqs);
     ls = NIL;
   }
 
+  // cleanup
   if (ltail) gen_free_list(ltail), ltail = NIL;
+  if (lup) gen_free_list(lup), lup = NIL;
   gen_free_list(lseq);
+  set_free(written);
   return true;
 }
 
@@ -292,8 +378,7 @@ string freia_compile(string module, statement mod_stat, string target)
                       module);
   }
 
-  freia_info fsi;
-  fsi.seqs = NIL;
+  freia_info fsi = { NIL };
   freia_init_dep_cache();
 
   // collect freia api functions...
