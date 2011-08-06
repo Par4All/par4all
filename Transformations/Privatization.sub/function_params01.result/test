@@ -1,0 +1,57 @@
+//
+// Code after privatize_module for module privatize_function_params
+//
+void privatize_function_params(float sum)
+{
+   int j;
+   float a[10];
+#pragma omp for private(j,sum)
+   for(j = 0; j <= size-1; j += 1)
+      sum += a[10];
+}
+//
+// Code after privatize_module for module privatize_local_variable
+//
+void privatize_local_variable()
+{
+   int j;
+   float sum;
+   float a[10];
+#pragma omp for private(j,sum)
+   for(j = 0; j <= size-1; j += 1)
+      sum += a[10];
+}
+//
+// Code after localize_declaration for module privatize_function_params
+//
+void privatize_function_params(float sum)
+{
+   float a[10];
+   {
+      //PIPS generated variable
+      int j1;
+#pragma omp for private(j1)
+      for(j1 = 0; j1 <= size-1; j1 += 1) {
+         //PIPS generated variable
+         float sum;
+         sum += a[10];
+      }
+   }
+}
+//
+// Code after localize_declaration for module privatize_local_variable
+//
+void privatize_local_variable()
+{
+   float a[10];
+   {
+      //PIPS generated variable
+      int j1;
+#pragma omp for private(j1)
+      for(j1 = 0; j1 <= size-1; j1 += 1) {
+         //PIPS generated variable
+         float sum1;
+         sum1 += a[10];
+      }
+   }
+}

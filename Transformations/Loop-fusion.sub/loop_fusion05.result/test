@@ -1,0 +1,32 @@
+//
+// Code before fusion
+//
+void loop_fusion05(int a[100], int b[100])
+{
+   int i, j;
+   
+   /* The first loop can't be fused */
+   for(i = 0; i <= 99; i += 1)
+      a[i] = i;
+
+   for(j = 0; j <= 99; j += 1)
+      b[j] += a[j+1];
+
+   printf("Is j initialized ? %d\n", j);
+}
+//
+// Code after fusion
+//
+void loop_fusion05(int a[100], int b[100])
+{
+   int i, j;
+   
+   /* The first loop can't be fused */
+   for(i = 0; i <= 99; i += 1)
+      a[i] = i;
+
+   for(j = 0; j <= 99; j += 1)
+      b[j] += a[j+1];
+
+   printf("Is j initialized ? %d\n", j);
+}

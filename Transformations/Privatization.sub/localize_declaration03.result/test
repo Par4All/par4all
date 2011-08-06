@@ -1,0 +1,41 @@
+//
+// Code after privatize_module for module getimage
+//
+void getimage(char *filename)
+{
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
+   unsigned char c;
+   FILE *fp;
+   
+   /* Erase the memory, in case the image is not big enough: */
+#pragma omp for private(i,j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp for private(j)
+      for(j = 0; j <= 63; j += 1) {
+         imagein[i][j].re = 0.0;
+         imagein[i][j].im = 0.0;
+      }
+}
+//
+// Code after localize_declaration for module getimage
+//
+void getimage(char *filename)
+{
+   {
+      //PIPS generated variable
+      int i;
+      
+      /* Erase the memory, in case the image is not big enough: */
+#pragma omp for private(i)
+      for(i = 0; i <= 63; i += 1) {
+         //PIPS generated variable
+         int j;
+#pragma omp for private(j)
+         for(j = 0; j <= 63; j += 1) {
+            imagein[i][j].re = 0.0;
+            imagein[i][j].im = 0.0;
+         }
+      }
+   }
+}

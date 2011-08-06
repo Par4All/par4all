@@ -1,16 +1,16 @@
 int main()
 {
-   if (1==0) goto _switch_1_case_0;
+   if (1==0) goto main_switch_1_case_0;
    if (1==1) {
    }
    else {
-      goto _switch_1_default;
+      goto main_switch_1_default;
    }
-_switch_1_case_1:   ;
+main_switch_1_case_1:   ;
    return 1;
-_switch_1_case_0:   ;
+main_switch_1_case_0:   ;
    return 0;
-_switch_1_default:   ;
+main_switch_1_default:   ;
    return 2;
 }
 int main()

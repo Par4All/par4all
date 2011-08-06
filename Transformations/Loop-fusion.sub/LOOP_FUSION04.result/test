@@ -1,0 +1,31 @@
+//
+// Code before fusion
+//
+      SUBROUTINE LOOP_FUSION04(A,N,F)
+      INTEGER N,I
+      REAL F(N),A(N), S
+      DO I = 1, N                                                       0004
+         A(I) = F(I)                                                    0005
+      ENDDO
+
+      S = 0.                                                            0008
+
+      DO I = 1, N                                                       0010
+         S = S+A(I)                                                     0011
+      ENDDO
+
+      END
+//
+// Code after fusion
+//
+      SUBROUTINE LOOP_FUSION04(A,N,F)
+      INTEGER N,I
+      REAL F(N),A(N), S
+
+      S = 0.                                                            0008
+      DO I = 1, N                                                       0004
+         A(I) = F(I)                                                    0005
+         S = S+A(I)                                                     0011
+      ENDDO
+
+      END

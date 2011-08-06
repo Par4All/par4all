@@ -1,0 +1,34 @@
+//
+// Code after scalarization for module main
+//
+int main()
+{
+   int a[10], b[10], c[10];
+   {
+      int i;
+
+      for(i = 0; i <= 9; i += 1)
+         a[i] = 1;
+   }
+   {
+      int i;
+
+      for(i = 0; i <= 9; i += 1) {
+         a[i] = 0;
+         {
+            int j;
+            for(j = i; j <= 9; j += 1)
+               // Scalarization of a[] make this affectation wrong !
+               b[j] = a[j];
+         }
+      }
+   }
+   {
+      int j;
+
+      for(j = 0; j <= 9; j += 1)
+         printf("%d - %d\n", b[j], a[j]);
+   }
+
+   return 0;
+}

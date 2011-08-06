@@ -1,0 +1,24 @@
+//
+// Code after privatize_module for module j_aime_les_moulinettes_a_fromage
+//
+void j_aime_les_moulinettes_a_fromage()
+{
+   int i, j = 0;
+#pragma omp for private(i)
+   for(i = 0; i <= 11; i += 1)
+      j++;
+}
+//
+// Code after localize_declaration for module j_aime_les_moulinettes_a_fromage
+//
+void j_aime_les_moulinettes_a_fromage()
+{
+   int j = 0;
+   {
+      //PIPS generated variable
+      int i1;
+#pragma omp for private(i1)
+      for(i1 = 0; i1 <= 11; i1 += 1)
+         j++;
+   }
+}

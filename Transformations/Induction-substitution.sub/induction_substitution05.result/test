@@ -1,0 +1,52 @@
+//
+// Display print_code_preconditions for module induction05
+//
+
+//  P() {}
+
+void induction05(int SIZE, double A[SIZE], double B[SIZE][SIZE])
+{
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   int k = SIZE;
+
+//  P(i,j,k) {SIZE==k}
+
+   for(i = 0; i <= SIZE-1; i += 1) {
+
+//  P(i,j,k) {2i+k==SIZE, 0<=i, 1<=i+k}
+
+      if (k--)
+
+//  P(i,j,k) {2i+k==SIZE-1, i+1<=SIZE, 0<=i}
+
+         A[k] = B[j-k][k]+A[k];
+
+//  P(i,j,k) {2i+k==SIZE-1, 0<=i, 0<=i+k}
+
+      if (--k)
+
+//  P(i,j,k) {2i+k==SIZE-2, i+1<=SIZE, 0<=i}
+
+         A[k] = B[j-k][k]+A[k];
+   }
+}
+//
+// Code after induction_substitution for module induction05
+//
+void induction05(int SIZE, double A[SIZE], double B[SIZE][SIZE])
+{
+   int i, j;
+   int k = SIZE;
+   for(i = 0; i <= SIZE-1; i += 1) {
+      if (k = -((-SIZE)+2*i)-1, k-1)
+         A[-(1+(2*i+(-SIZE)))] = B[j-(-(1+(2*i+(-SIZE))))][-(1+(2*i+(-SIZE)))]+A[-(1+(2*i+(-SIZE)))];
+      if (k = -((-SIZE)+(2*i+1))-1)
+         A[-(2+(2*i+(-SIZE)))] = B[j-(-(2+(2*i+(-SIZE))))][-(2+(2*i+(-SIZE)))]+A[-(2+(2*i+(-SIZE)))];
+   }
+}

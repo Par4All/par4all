@@ -1,0 +1,20 @@
+//
+// Code after privatize_module for module PRIVATIZATION02
+//
+Check that J is privatized in the outermost loop
+
+      SUBROUTINE PRIVATIZATION02
+      INTEGER A(10)
+
+
+!$OMP DO PRIVATE(I,J,K)
+      DO I = 1, 10                                                      0006
+         J = 0                                                          0007
+
+!$OMP    DO PRIVATE(K)
+         DO K = 1, 10                                                   0008
+            J = J+1                                                     0009
+         ENDDO
+         A(I) = J                                                       0011
+      ENDDO
+      END
