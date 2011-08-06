@@ -6,7 +6,7 @@ void sequence08(int argc, char *argv[])
    int xshift, yshift;
 
    if (0)
-      goto break_1;
+      goto _break_1;
    {
       int *x0 = &xshift;
       {
@@ -19,7 +19,7 @@ l99998:         ;
       }
    }
    yshift--;
-break_1:   ;
+_break_1:   ;
    xshift++;
    return;
 }
@@ -31,7 +31,7 @@ void sequence08(int argc, char *argv[])
    // BEGIN BLOCK
    int xshift, yshift;
 
-   if (0) goto break_1;
+   if (0) goto _break_1;
    // BEGIN BLOCK
    {
       // BEGIN BLOCK
@@ -51,7 +51,7 @@ l99998:         ;
    }
    yshift--;
    // END BLOCK
-break_1:   ;
+_break_1:   ;
    xshift++;
    return;
    // END BLOCK

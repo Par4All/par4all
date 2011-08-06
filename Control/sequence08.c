@@ -10,7 +10,7 @@ void sequence08(int argc, char *argv[])
 {
   int xshift, yshift;
 
-  if (0) goto break_1;
+  if (0) goto _break_1;
 
   {
     int *x0 = &xshift;
@@ -24,7 +24,7 @@ void sequence08(int argc, char *argv[])
     }
   }
   yshift--;
- break_1:   ;
+ _break_1:   ;
   xshift++;
   return;
 }

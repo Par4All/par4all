@@ -4,12 +4,12 @@ void gl_enable()
    if (cap==1) {
    }
    else {
-      goto gl_enable_break_1;
+      goto _break_1;
    }
-gl_enable_switch_1_case_1:   ;
+_switch_1_case_1:   ;
    p = 0;                                                               /*0008*/
    if (!(p<6)) {                                                        /*0008*/
    }
-gl_enable_break_2:   ;
-gl_enable_break_1:   ;
+_break_2:   ;
+_break_1:   ;
 }
