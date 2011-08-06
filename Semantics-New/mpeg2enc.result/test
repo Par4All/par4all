@@ -547,7 +547,7 @@ static int dist1(unsigned char *blk1, unsigned char *blk2, int lx, int hx, int h
    if (!hx&&!hy) {
       j = 0;
 l99999:      ;
-      if (!(j<h)) goto motion!dist1_break_1;
+      if (!(j<h)) goto _break_1;
       if ((v = p1[0]-p2[0])<0)
          v = -v;
       s += v;
@@ -597,13 +597,13 @@ l99999:      ;
          v = -v;
       s += v;
 
-      if (s>=distlim) goto motion!dist1_break_1;
+      if (s>=distlim) goto _break_1;
 
       p1 += lx;
       p2 += lx;
       j++;
       goto l99999;
-motion!dist1_break_1:      ;
+_break_1:      ;
    }
    else if (hx&&!hy)
       for(j = 0; j <= h-1; j += 1) {
@@ -857,7 +857,7 @@ l99998:         ;
                      }
                   }
                }
-         goto motion!dpframe_estimate_loop_end_2;
+         goto _loop_end_2;
 l99999:         ;
          /* vertical field shift adjustment */
          if (ppred==0)
@@ -871,12 +871,12 @@ l99999:         ;
          if (topfirst==ppred) {
          }
          else {
-            goto motion!dpframe_estimate_loop_end_2;
+            goto _loop_end_2;
          }
          is = is>=0?(is+1)/3:-(((-is)+1)/3);
          js = js>=0?(js+1)/3:-(((-js)+1)/3);
          goto l99998;
-motion!dpframe_estimate_loop_end_2:         ;
+_loop_end_2:         ;
       }
    
    
@@ -1911,7 +1911,7 @@ static void readparmfile(char *fname)
       if (constrparms) {
          i = 0;
 l99996:         ;
-         if (!(i<M)) goto mpeg2enc!readparmfile_break_3;
+         if (!(i<M)) goto _break_3;
          if (motion_data[i].forw_hor_f_code>4) goto l99999;
 
          if (motion_data[i].forw_vert_f_code>4) goto l99998;
@@ -1931,22 +1931,22 @@ l99997:         ;
          if (!quiet)
             fprintf(stderr, "Warning: setting constrained_parameters_flag = 0\n");
          constrparms = 0;
-         goto mpeg2enc!readparmfile_break_3;
+         goto _break_3;
 l99995:         ;
          if (!quiet)
             fprintf(stderr, "Warning: setting constrained_parameters_flag = 0\n");
          constrparms = 0;
-         goto mpeg2enc!readparmfile_break_3;
+         goto _break_3;
 l99998:         ;
          if (!quiet)
             fprintf(stderr, "Warning: setting constrained_parameters_flag = 0\n");
          constrparms = 0;
-         goto mpeg2enc!readparmfile_break_3;
+         goto _break_3;
 l99999:         ;
          if (!quiet)
             fprintf(stderr, "Warning: setting constrained_parameters_flag = 0\n");
          constrparms = 0;
-mpeg2enc!readparmfile_break_3:         ;
+_break_3:         ;
       }
    }
    
@@ -3081,7 +3081,7 @@ l99996:         ;
 
          mbinfo[k].mb_type = mb_type;
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99999:         ;
          if (pict_type==2&&!(mb_type&8)) goto l99998;
          if (pict_type==3&&pict_struct==3&&mbinfo[k].motion_type==2&&((mbinfo[k-1].mb_type^mb_type)&(8|4))==0&&(!(mb_type&8)||PMV[0][0][0]==(((mbinfo[k].MV)[0])[0])[0]&&PMV[0][0][1]==(((mbinfo[k].MV)[0])[0])[1])&&(!(mb_type&4)||PMV[0][1][0]==(((mbinfo[k].MV)[0])[1])[0]&&PMV[0][1][1]==(((mbinfo[k].MV)[0])[1])[1])) goto l99997;
@@ -3104,7 +3104,7 @@ l99999:         ;
          mbinfo[k].skipped = 1;
          MBAinc++;
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99997:         ;
          /* conditions for skipping in B frame pictures:
                     * - must be frame predicted
@@ -3118,7 +3118,7 @@ l99997:         ;
          mbinfo[k].skipped = 1;
          MBAinc++;
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99998:         ;
          /* P picture, no motion vectors -> skip */
          
@@ -3136,7 +3136,7 @@ l99998:         ;
          mbinfo[k].skipped = 1;
          MBAinc++;
          k++;
-putpict_loop_end_2:         ;
+_loop_end_2:         ;
       }
 
    rc_update_pict();
@@ -3924,25 +3924,25 @@ void rc_init_pict(unsigned char *frame)
 {
    double Tmin;
 
-   if (pict_type==1) goto rc_init_pict_switch_1_case_1;
-   if (pict_type==2) goto rc_init_pict_switch_1_case_2;
+   if (pict_type==1) goto _switch_1_case_1;
+   if (pict_type==2) goto _switch_1_case_2;
    if (pict_type==3) {
    }
    else {
-      goto rc_init_pict_break_1;
+      goto _break_1;
    }
-rc_init_pict_switch_1_case_3:   ;
+_switch_1_case_3:   ;
    T = (int) floor(R/(Nb+Np*1.4*Xp/(1.0*Xb))+0.5);
    d = d0b;
-   goto rc_init_pict_break_1;
-rc_init_pict_switch_1_case_2:   ;
+   goto _break_1;
+_switch_1_case_2:   ;
    T = (int) floor(R/(Np+Nb*1.0*Xb/(1.4*Xp))+0.5);
    d = d0p;
-   goto rc_init_pict_break_1;
-rc_init_pict_switch_1_case_1:   ;
+   goto _break_1;
+_switch_1_case_1:   ;
    T = (int) floor(R/(1.0+Np*Xp/(Xi*1.0)+Nb*Xb/(Xi*1.4))+0.5);
    d = d0i;
-rc_init_pict_break_1:   ;
+_break_1:   ;
 
    Tmin = (int) floor(bit_rate/(8.0*frame_rate)+0.5);
 
@@ -4049,27 +4049,27 @@ void rc_update_pict()
    d += S-T;
    avg_act = actsum/(mb_width*mb_height2);
 
-   if (pict_type==1) goto rc_update_pict_switch_1_case_1;
-   if (pict_type==2) goto rc_update_pict_switch_1_case_2;
+   if (pict_type==1) goto _switch_1_case_1;
+   if (pict_type==2) goto _switch_1_case_2;
    if (pict_type==3) {
    }
    else {
-      goto rc_update_pict_break_1;
+      goto _break_1;
    }
-rc_update_pict_switch_1_case_3:   ;
+_switch_1_case_3:   ;
    Xb = X;
    d0b = d;
    Nb--;
-   goto rc_update_pict_break_1;
-rc_update_pict_switch_1_case_2:   ;
+   goto _break_1;
+_switch_1_case_2:   ;
    Xp = X;
    d0p = d;
    Np--;
-   goto rc_update_pict_break_1;
-rc_update_pict_switch_1_case_1:   ;
+   goto _break_1;
+_switch_1_case_1:   ;
    Xi = X;
    d0i = d;
-rc_update_pict_break_1:   ;
+_break_1:   ;
 
    fprintf(statfile, "\nrate control: end of picture\n");
    fprintf(statfile, " actual number of bits: S=%d\n", S);
@@ -4088,20 +4088,20 @@ rc_update_pict_break_1:   ;
 }
 void readframe(char *fname, unsigned char *frame[])
 {
-   if (inputtype==0) goto readframe_switch_1_case_0;
-   if (inputtype==1) goto readframe_switch_1_case_1;
-   if (inputtype==2) goto readframe_switch_1_case_2;
-readframe_switch_1_default:   ;
-   goto readframe_break_1;
-readframe_switch_1_case_2:   ;
+   if (inputtype==0) goto _switch_1_case_0;
+   if (inputtype==1) goto _switch_1_case_1;
+   if (inputtype==2) goto _switch_1_case_2;
+_switch_1_default:   ;
+   goto _break_1;
+_switch_1_case_2:   ;
    read_ppm(fname, frame);
-   goto readframe_break_1;
-readframe_switch_1_case_1:   ;
+   goto _break_1;
+_switch_1_case_1:   ;
    read_yuv(fname, frame);
-   goto readframe_break_1;
-readframe_switch_1_case_0:   ;
+   goto _break_1;
+_switch_1_case_0:   ;
    read_y_u_v(fname, frame);
-readframe_break_1:   ;
+_break_1:   ;
 }
 static void border_extend(unsigned char *frame, int w1, int h1, int w2, int h2)
 {
@@ -4482,25 +4482,25 @@ void stats()
          else if (mb_type&1)
             _IO_putc('I', statfile);
          else {
-            if ((mb_type&(8|4))==8) goto stats_switch_5_case_8;
-            if ((mb_type&(8|4))==4) goto stats_switch_5_case_4;
-            if ((mb_type&(8|4))==(8|4)) goto stats_switch_5_case_8|4;
+            if ((mb_type&(8|4))==8) goto _switch_5_case_8;
+            if ((mb_type&(8|4))==4) goto _switch_5_case_4;
+            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
 
-stats_switch_5_default:            ;
+_switch_5_default:            ;
             _IO_putc('0', statfile);
-            goto stats_break_5;
+            goto _break_5;
 
-stats_switch_5_case_8|4:            ;
+_switch_5_case_8|4:            ;
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
-            goto stats_break_5;
+            goto _break_5;
             
             
-stats_switch_5_case_4:            ;
+_switch_5_case_4:            ;
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
-            goto stats_break_5;
-stats_switch_5_case_8:            ;
+            goto _break_5;
+_switch_5_case_8:            ;
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
-stats_break_5:            ;
+_break_5:            ;
          }
 
          if (mb_type&16)
@@ -6344,7 +6344,7 @@ l99996:         ;
 //             <    is read   >: k mb_height2 mb_width
 //             <    is written>: k
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99999:         ;
 //             <    is read   >: mb_height2 mb_type mb_width pict_type
          if (pict_type==2&&!(mb_type&8)) goto l99998;
@@ -6398,7 +6398,7 @@ l99999:         ;
 //             <    is read   >: k mb_height2 mb_width
 //             <    is written>: k
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99997:         ;
 //             <may be written>: mbinfo[*].mb_type
 //             <    is read   >: k mb_height2 mb_type mb_width mbinfo
@@ -6420,7 +6420,7 @@ l99997:         ;
 //             <    is read   >: k mb_height2 mb_width
 //             <    is written>: k
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99998:         ;
 //             <may be read   >: cc
 //             <may be written>: dc_dct_pred[*]
@@ -6459,7 +6459,7 @@ l99998:         ;
 //             <    is written>: k
          k++;
 //             <    is read   >: mb_height2 mb_width
-putpict_loop_end_2:         ;
+_loop_end_2:         ;
       }
 //             <may be read   >: pict_type statfile[0] 
 //                               __IO_EFFECTS:LUNS[*]
@@ -6869,7 +6869,7 @@ l99996:         ;
 //  T(k) {k==k#init+1}
 
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99999:         ;
 
 //  T() {}
@@ -6913,7 +6913,7 @@ l99999:         ;
 //  T(k) {k==k#init+1}
 
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99997:         ;
 
 //  T() {}
@@ -6939,7 +6939,7 @@ l99997:         ;
 //  T(k) {k==k#init+1}
 
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99998:         ;
 
 //  T(cc) {0<=cc, cc<=2}
@@ -6984,7 +6984,7 @@ l99998:         ;
 
 //  T() {}
 
-putpict_loop_end_2:         ;
+_loop_end_2:         ;
       }
 
 //  T() {}
@@ -9072,7 +9072,7 @@ l99999:      ;
 
 //  T() {}
 
-      if (!(j<h)) goto motion!dist1_break_1;
+      if (!(j<h)) goto _break_1;
 
 //  T(v) {0<=v}
 
@@ -9269,7 +9269,7 @@ l99999:      ;
 //  T() {}
 
 
-      if (s>=distlim) goto motion!dist1_break_1;
+      if (s>=distlim) goto _break_1;
 
 //  T() {}
 
@@ -9287,7 +9287,7 @@ l99999:      ;
 
 //  T() {}
 
-motion!dist1_break_1:      ;
+_break_1:      ;
    }
    else if (hx&&!hy)
 
@@ -9998,7 +9998,7 @@ l99998:         ;
                      }
                   }
                }
-         goto motion!dpframe_estimate_loop_end_2;
+         goto _loop_end_2;
 l99999:         ;
 
 //  T(js) {js#init<=js+1, js<=js#init+1}
@@ -10030,7 +10030,7 @@ l99999:         ;
          if (topfirst==ppred) {
          }
          else {
-            goto motion!dpframe_estimate_loop_end_2;
+            goto _loop_end_2;
          }
 
 //  T(is) {is#init<=3is+1, 3is<=is#init+1}
@@ -10044,7 +10044,7 @@ l99999:         ;
 
 //  T() {}
 
-motion!dpframe_estimate_loop_end_2:         ;
+_loop_end_2:         ;
       }
 
 //  T(local_dist) {0<=local_dist}
@@ -12955,7 +12955,7 @@ l99996:         ;
 
 //  T() {}
 
-         if (!(i<M)) goto mpeg2enc!readparmfile_break_3;
+         if (!(i<M)) goto _break_3;
 
 //  T() {}
 
@@ -13002,7 +13002,7 @@ l99997:         ;
 //  T(constrparms) {constrparms==0}
 
          constrparms = 0;
-         goto mpeg2enc!readparmfile_break_3;
+         goto _break_3;
 l99995:         ;
 
 //  T() {}
@@ -13016,7 +13016,7 @@ l99995:         ;
 //  T(constrparms) {constrparms==0}
 
          constrparms = 0;
-         goto mpeg2enc!readparmfile_break_3;
+         goto _break_3;
 l99998:         ;
 
 //  T() {}
@@ -13030,7 +13030,7 @@ l99998:         ;
 //  T(constrparms) {constrparms==0}
 
          constrparms = 0;
-         goto mpeg2enc!readparmfile_break_3;
+         goto _break_3;
 l99999:         ;
 
 //  T() {}
@@ -13047,7 +13047,7 @@ l99999:         ;
 
 //  T() {}
 
-mpeg2enc!readparmfile_break_3:         ;
+_break_3:         ;
       }
    }
 
@@ -16471,7 +16471,7 @@ l99996:         ;
 //  T(k) {k==k#init+1}
 
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99999:         ;
 
 //  T() {}
@@ -16515,7 +16515,7 @@ l99999:         ;
 //  T(k) {k==k#init+1}
 
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99997:         ;
 
 //  T() {}
@@ -16541,7 +16541,7 @@ l99997:         ;
 //  T(k) {k==k#init+1}
 
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99998:         ;
 
 //  T(cc) {0<=cc, cc<=2}
@@ -16586,7 +16586,7 @@ l99998:         ;
 
 //  T() {}
 
-putpict_loop_end_2:         ;
+_loop_end_2:         ;
       }
 
 //  T() {}
@@ -19369,23 +19369,23 @@ void rc_init_pict(unsigned char *frame)
 //  T() {}
 
 
-   if (pict_type==1) goto rc_init_pict_switch_1_case_1;
+   if (pict_type==1) goto _switch_1_case_1;
 
 //  T() {}
 
-   if (pict_type==2) goto rc_init_pict_switch_1_case_2;
+   if (pict_type==2) goto _switch_1_case_2;
 
 //  T() {}
 
    if (pict_type==3) {
    }
    else {
-      goto rc_init_pict_break_1;
+      goto _break_1;
    }
 
 //  T() {}
 
-rc_init_pict_switch_1_case_3:   ;
+_switch_1_case_3:   ;
 
 //  T() {}
 
@@ -19394,11 +19394,11 @@ rc_init_pict_switch_1_case_3:   ;
 //  T() {}
 
    d = d0b;
-   goto rc_init_pict_break_1;
+   goto _break_1;
 
 //  T() {}
 
-rc_init_pict_switch_1_case_2:   ;
+_switch_1_case_2:   ;
 
 //  T() {}
 
@@ -19407,11 +19407,11 @@ rc_init_pict_switch_1_case_2:   ;
 //  T() {}
 
    d = d0p;
-   goto rc_init_pict_break_1;
+   goto _break_1;
 
 //  T() {}
 
-rc_init_pict_switch_1_case_1:   ;
+_switch_1_case_1:   ;
 
 //  T() {}
 
@@ -19423,7 +19423,7 @@ rc_init_pict_switch_1_case_1:   ;
 
 //  T() {}
 
-rc_init_pict_break_1:   ;
+_break_1:   ;
 
 //  T() {}
 
@@ -19705,23 +19705,23 @@ void rc_update_pict(void)
 //  T() {}
 
 
-   if (pict_type==1) goto rc_update_pict_switch_1_case_1;
+   if (pict_type==1) goto _switch_1_case_1;
 
 //  T() {}
 
-   if (pict_type==2) goto rc_update_pict_switch_1_case_2;
+   if (pict_type==2) goto _switch_1_case_2;
 
 //  T() {}
 
    if (pict_type==3) {
    }
    else {
-      goto rc_update_pict_break_1;
+      goto _break_1;
    }
 
 //  T() {}
 
-rc_update_pict_switch_1_case_3:   ;
+_switch_1_case_3:   ;
 
 //  T(Xb) {}
 
@@ -19734,11 +19734,11 @@ rc_update_pict_switch_1_case_3:   ;
 //  T(Nb) {Nb==ratectl!:Nb#init-1}
 
    Nb--;
-   goto rc_update_pict_break_1;
+   goto _break_1;
 
 //  T() {}
 
-rc_update_pict_switch_1_case_2:   ;
+_switch_1_case_2:   ;
 
 //  T(Xp) {}
 
@@ -19751,11 +19751,11 @@ rc_update_pict_switch_1_case_2:   ;
 //  T(Np) {Np==ratectl!:Np#init-1}
 
    Np--;
-   goto rc_update_pict_break_1;
+   goto _break_1;
 
 //  T() {}
 
-rc_update_pict_switch_1_case_1:   ;
+_switch_1_case_1:   ;
 
 //  T(Xi) {}
 
@@ -19767,7 +19767,7 @@ rc_update_pict_switch_1_case_1:   ;
 
 //  T() {}
 
-rc_update_pict_break_1:   ;
+_break_1:   ;
 
 //  T() {}
 
@@ -19820,43 +19820,43 @@ void readframe(char *fname, unsigned char *frame[])
 
 //  T() {}
 
-   if (inputtype==0) goto readframe_switch_1_case_0;
+   if (inputtype==0) goto _switch_1_case_0;
 
 //  T() {}
 
-   if (inputtype==1) goto readframe_switch_1_case_1;
+   if (inputtype==1) goto _switch_1_case_1;
 
 //  T() {}
 
-   if (inputtype==2) goto readframe_switch_1_case_2;
+   if (inputtype==2) goto _switch_1_case_2;
 
 //  T() {}
 
-readframe_switch_1_default:   ;
-   goto readframe_break_1;
+_switch_1_default:   ;
+   goto _break_1;
 
 //  T() {}
 
-readframe_switch_1_case_2:   ;
+_switch_1_case_2:   ;
 
 //  T() {}
 
    read_ppm(fname, frame);
-   goto readframe_break_1;
+   goto _break_1;
 
 //  T() {}
 
-readframe_switch_1_case_1:   ;
+_switch_1_case_1:   ;
 
 //  T(chrom_height,chrom_width,chroma_format,height,horizontal_size,
 //    vertical_size,width) {}
 
    read_yuv(fname, frame);
-   goto readframe_break_1;
+   goto _break_1;
 
 //  T() {}
 
-readframe_switch_1_case_0:   ;
+_switch_1_case_0:   ;
 
 //  T(chrom_height,chrom_width,chroma_format,height,horizontal_size,
 //    vertical_size,width) {}
@@ -19865,7 +19865,7 @@ readframe_switch_1_case_0:   ;
 
 //  T() {}
 
-readframe_break_1:   ;
+_break_1:   ;
 }
 
 //  T() {}
@@ -21025,50 +21025,50 @@ void stats(void)
 
 //  T() {}
 
-            if ((mb_type&(8|4))==8) goto stats_switch_5_case_8;
+            if ((mb_type&(8|4))==8) goto _switch_5_case_8;
 
 //  T() {}
 
-            if ((mb_type&(8|4))==4) goto stats_switch_5_case_4;
+            if ((mb_type&(8|4))==4) goto _switch_5_case_4;
 
 //  T() {}
 
-            if ((mb_type&(8|4))==(8|4)) goto stats_switch_5_case_8|4;
+            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
 
 //  T() {}
 
 
-stats_switch_5_default:            ;
+_switch_5_default:            ;
 
 //  T() {}
 
             _IO_putc('0', statfile);
-            goto stats_break_5;
+            goto _break_5;
 
 //  T() {}
 
 
-stats_switch_5_case_8|4:            ;
+_switch_5_case_8|4:            ;
 
 //  T() {}
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
-            goto stats_break_5;
+            goto _break_5;
 
 //  T() {}
 
             
             
-stats_switch_5_case_4:            ;
+_switch_5_case_4:            ;
 
 //  T() {}
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
-            goto stats_break_5;
+            goto _break_5;
 
 //  T() {}
 
-stats_switch_5_case_8:            ;
+_switch_5_case_8:            ;
 
 //  T() {}
 
@@ -21076,7 +21076,7 @@ stats_switch_5_case_8:            ;
 
 //  T() {}
 
-stats_break_5:            ;
+_break_5:            ;
          }
 
 //  T() {}
@@ -23655,7 +23655,7 @@ l99999:      ;
 
 //  P(i,j,s,v) {8<=h, h<=16, j<=h, hx<=0, hy<=0, 0<=j, 0<=s}
 
-      if (!(j<h)) goto motion!dist1_break_1;
+      if (!(j<h)) goto _break_1;
 
 //  P(i,j,s,v) {8<=h, h<=16, j+1<=h, hx<=0, hy<=0, 0<=j, 0<=s}
 
@@ -23852,7 +23852,7 @@ l99999:      ;
 //  P(i,j,s,v) {8<=h, h<=16, j+1<=h, hx<=0, hy<=0, 0<=j, v<=s, 0<=v}
 
 
-      if (s>=distlim) goto motion!dist1_break_1;
+      if (s>=distlim) goto _break_1;
 
 //  P(i,j,s,v) {s+1<=distlim, 8<=h, h<=16, j+1<=h, hx<=0, hy<=0, 0<=j,
 //    v<=s, 0<=v}
@@ -23873,7 +23873,7 @@ l99999:      ;
 
 //  P(i,j,s,v) {8<=h, h<=16, j<=h, hx<=0, hy<=0, 0<=j, 0<=s}
 
-motion!dist1_break_1:      ;
+_break_1:      ;
    }
    else if (hx&&!hy)
 
@@ -24846,7 +24846,7 @@ l99998:         ;
                      }
                   }
                }
-         goto motion!dpframe_estimate_loop_end_2;
+         goto _loop_end_2;
 l99999:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -24894,7 +24894,7 @@ l99999:         ;
          if (topfirst==ppred) {
          }
          else {
-            goto motion!dpframe_estimate_loop_end_2;
+            goto _loop_end_2;
          }
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -24917,7 +24917,7 @@ l99999:         ;
 //    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
 //    vmc<=1073741824}
 
-motion!dpframe_estimate_loop_end_2:         ;
+_loop_end_2:         ;
       }
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
@@ -30158,7 +30158,7 @@ l99996:         ;
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=576,
 //    0<=video_format, video_format<=4}
 
-         if (!(i<M)) goto mpeg2enc!readparmfile_break_3;
+         if (!(i<M)) goto _break_3;
 
 //  P(M,N,P,Xb,Xi,Xp,aspectratio,chroma_format,color_primaries,
 //    constrparms,d0b,d0i,d0p,dc_prec,display_horizontal_size,
@@ -30385,7 +30385,7 @@ l99997:         ;
 //    0<=video_format, video_format<=4}
 
          constrparms = 0;
-         goto mpeg2enc!readparmfile_break_3;
+         goto _break_3;
 l99995:         ;
 
 //  P(M,N,P,Xb,Xi,Xp,aspectratio,chroma_format,color_primaries,
@@ -30459,7 +30459,7 @@ l99995:         ;
 //    0<=video_format, video_format<=4}
 
          constrparms = 0;
-         goto mpeg2enc!readparmfile_break_3;
+         goto _break_3;
 l99998:         ;
 
 //  P(M,N,P,Xb,Xi,Xp,aspectratio,chroma_format,color_primaries,
@@ -30533,7 +30533,7 @@ l99998:         ;
 //    0<=video_format, video_format<=4}
 
          constrparms = 0;
-         goto mpeg2enc!readparmfile_break_3;
+         goto _break_3;
 l99999:         ;
 
 //  P(M,N,P,Xb,Xi,Xp,aspectratio,chroma_format,color_primaries,
@@ -30631,7 +30631,7 @@ l99999:         ;
 //    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=576,
 //    0<=video_format, video_format<=4}
 
-mpeg2enc!readparmfile_break_3:         ;
+_break_3:         ;
       }
    }
 
@@ -36465,7 +36465,7 @@ l99996:         ;
 //    0<=comp, 0<=i, i<=k, 0<=j}
 
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99999:         ;
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {cbp<=0, 0<=comp,
@@ -36516,7 +36516,7 @@ l99999:         ;
 //    1<=i, i<=k, 0<=j}
 
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99997:         ;
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {cbp<=0, 0<=comp,
@@ -36546,7 +36546,7 @@ l99997:         ;
 //    1<=i, i<=k, 0<=j}
 
          k++;
-         goto putpict_loop_end_2;
+         goto _loop_end_2;
 l99998:         ;
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {cbp<=0, 0<=comp,
@@ -36600,7 +36600,7 @@ l99998:         ;
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {0<=comp, 0<=i,
 //    i+1<=k, 0<=j}
 
-putpict_loop_end_2:         ;
+_loop_end_2:         ;
       }
 
 //  P(MBAinc,cbp,cc,comp,i,j,k,mb_type,prev_mquant) {0<=j, 0<=k}
@@ -41235,23 +41235,23 @@ void rc_init_pict(unsigned char *frame)
 //  P() {}
 
 
-   if (pict_type==1) goto rc_init_pict_switch_1_case_1;
+   if (pict_type==1) goto _switch_1_case_1;
 
 //  P() {}
 
-   if (pict_type==2) goto rc_init_pict_switch_1_case_2;
+   if (pict_type==2) goto _switch_1_case_2;
 
 //  P() {}
 
    if (pict_type==3) {
    }
    else {
-      goto rc_init_pict_break_1;
+      goto _break_1;
    }
 
 //  P() {}
 
-rc_init_pict_switch_1_case_3:   ;
+_switch_1_case_3:   ;
 
 //  P() {}
 
@@ -41260,11 +41260,11 @@ rc_init_pict_switch_1_case_3:   ;
 //  P() {}
 
    d = d0b;
-   goto rc_init_pict_break_1;
+   goto _break_1;
 
 //  P() {}
 
-rc_init_pict_switch_1_case_2:   ;
+_switch_1_case_2:   ;
 
 //  P() {}
 
@@ -41273,11 +41273,11 @@ rc_init_pict_switch_1_case_2:   ;
 //  P() {}
 
    d = d0p;
-   goto rc_init_pict_break_1;
+   goto _break_1;
 
 //  P() {}
 
-rc_init_pict_switch_1_case_1:   ;
+_switch_1_case_1:   ;
 
 //  P() {}
 
@@ -41289,7 +41289,7 @@ rc_init_pict_switch_1_case_1:   ;
 
 //  P() {}
 
-rc_init_pict_break_1:   ;
+_break_1:   ;
 
 //  P() {}
 
@@ -41571,12 +41571,12 @@ void rc_update_pict(void)
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8}
 
 
-   if (pict_type==1) goto rc_update_pict_switch_1_case_1;
+   if (pict_type==1) goto _switch_1_case_1;
 
 //  P(R,S,d) {R+S==ratectl!:R#init, S+ratectl!:d#init==T+d,
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8}
 
-   if (pict_type==2) goto rc_update_pict_switch_1_case_2;
+   if (pict_type==2) goto _switch_1_case_2;
 
 //  P(R,S,d) {R+S==ratectl!:R#init, S+ratectl!:d#init==T+d,
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8}
@@ -41584,14 +41584,14 @@ void rc_update_pict(void)
    if (pict_type==3) {
    }
    else {
-      goto rc_update_pict_break_1;
+      goto _break_1;
    }
 
 //  P(R,S,d) {R+S==ratectl!:R#init, S+ratectl!:d#init==T+d,
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
 //    pict_type==3}
 
-rc_update_pict_switch_1_case_3:   ;
+_switch_1_case_3:   ;
 
 //  P(R,S,d) {R+S==ratectl!:R#init, S+ratectl!:d#init==T+d,
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
@@ -41610,13 +41610,13 @@ rc_update_pict_switch_1_case_3:   ;
 //    pict_type==3}
 
    Nb--;
-   goto rc_update_pict_break_1;
+   goto _break_1;
 
 //  P(R,S,d) {R+S==ratectl!:R#init, S+ratectl!:d#init==T+d,
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
 //    pict_type==2}
 
-rc_update_pict_switch_1_case_2:   ;
+_switch_1_case_2:   ;
 
 //  P(R,S,d) {R+S==ratectl!:R#init, S+ratectl!:d#init==T+d,
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
@@ -41635,13 +41635,13 @@ rc_update_pict_switch_1_case_2:   ;
 //    pict_type==2}
 
    Np--;
-   goto rc_update_pict_break_1;
+   goto _break_1;
 
 //  P(R,S,d) {R+S==ratectl!:R#init, S+ratectl!:d#init==T+d,
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
 //    pict_type==1}
 
-rc_update_pict_switch_1_case_1:   ;
+_switch_1_case_1:   ;
 
 //  P(R,S,d) {R+S==ratectl!:R#init, S+ratectl!:d#init==T+d,
 //    S+putbits!:outcnt+ratectl!:S#init==8putbits!:bytecnt+8,
@@ -41662,7 +41662,7 @@ rc_update_pict_switch_1_case_1:   ;
 //    ratectl!:d#init+8, ratectl!:Nb#init+ratectl!:Np#init<=Nb+Np+1,
 //    Nb<=ratectl!:Nb#init, Np<=ratectl!:Np#init}
 
-rc_update_pict_break_1:   ;
+_break_1:   ;
 
 //  P(Nb,Np,R,S,Xb,Xi,Xp,d,d0b,d0i,d0p) {R+S==ratectl!:R#init,
 //    putbits!:outcnt+ratectl!:R#init+ratectl!:S#init==R+8
@@ -41759,42 +41759,42 @@ void readframe(char *fname, unsigned char *frame[])
 
 //  P() {}
 
-   if (inputtype==0) goto readframe_switch_1_case_0;
+   if (inputtype==0) goto _switch_1_case_0;
 
 //  P() {}
 
-   if (inputtype==1) goto readframe_switch_1_case_1;
+   if (inputtype==1) goto _switch_1_case_1;
 
 //  P() {}
 
-   if (inputtype==2) goto readframe_switch_1_case_2;
+   if (inputtype==2) goto _switch_1_case_2;
 
 //  P() {}
 
-readframe_switch_1_default:   ;
-   goto readframe_break_1;
+_switch_1_default:   ;
+   goto _break_1;
 
 //  P() {inputtype==2}
 
-readframe_switch_1_case_2:   ;
+_switch_1_case_2:   ;
 
 //  P() {inputtype==2}
 
    read_ppm(fname, frame);
-   goto readframe_break_1;
+   goto _break_1;
 
 //  P() {inputtype==1}
 
-readframe_switch_1_case_1:   ;
+_switch_1_case_1:   ;
 
 //  P() {inputtype==1}
 
    read_yuv(fname, frame);
-   goto readframe_break_1;
+   goto _break_1;
 
 //  P() {inputtype==0}
 
-readframe_switch_1_case_0:   ;
+_switch_1_case_0:   ;
 
 //  P() {inputtype==0}
 
@@ -41803,7 +41803,7 @@ readframe_switch_1_case_0:   ;
 //  P(chrom_height,chrom_width,chroma_format,height,horizontal_size,
 //    vertical_size,width) {}
 
-readframe_break_1:   ;
+_break_1:   ;
 }
 
 //  P() {}
@@ -43309,21 +43309,21 @@ void stats(void)
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-            if ((mb_type&(8|4))==8) goto stats_switch_5_case_8;
+            if ((mb_type&(8|4))==8) goto _switch_5_case_8;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-            if ((mb_type&(8|4))==4) goto stats_switch_5_case_4;
+            if ((mb_type&(8|4))==4) goto _switch_5_case_4;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-            if ((mb_type&(8|4))==(8|4)) goto stats_switch_5_case_8|4;
+            if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
@@ -43331,7 +43331,7 @@ void stats(void)
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
 
-stats_switch_5_default:            ;
+_switch_5_default:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
@@ -43339,7 +43339,7 @@ stats_switch_5_default:            ;
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
             _IO_putc('0', statfile);
-            goto stats_break_5;
+            goto _break_5;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
@@ -43347,7 +43347,7 @@ stats_switch_5_default:            ;
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
 
-stats_switch_5_case_8|4:            ;
+_switch_5_case_8|4:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
@@ -43355,7 +43355,7 @@ stats_switch_5_case_8|4:            ;
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
-            goto stats_break_5;
+            goto _break_5;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
@@ -43364,7 +43364,7 @@ stats_switch_5_case_8|4:            ;
 
             
             
-stats_switch_5_case_4:            ;
+_switch_5_case_4:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
@@ -43372,14 +43372,14 @@ stats_switch_5_case_4:            ;
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
-            goto stats_break_5;
+            goto _break_5;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-stats_switch_5_case_8:            ;
+_switch_5_case_8:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
@@ -43393,7 +43393,7 @@ stats_switch_5_case_8:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-stats_break_5:            ;
+_break_5:            ;
          }
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
