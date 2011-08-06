@@ -3,13 +3,13 @@ int desugar_loop(int i)
    int j = 0;                                                           /*0004*/
 l99999:   ;
 
-   if (!(j<i)) goto desugar_loop_break_1;                               /*0009*/
+   if (!(j<i)) goto _break_1;                                           /*0009*/
    if (j>100) {                                                         /*0007*/
    }
    else {
       goto l99999;
    }
-desugar_loop_break_1:   ;
+_break_1:   ;
    return i;                                                            /*0010*/
 }
 int desugar_loop(int i)
@@ -22,7 +22,7 @@ int desugar_loop(int i)
       ;
 ƒUnstructured Successor -> c_2_1 c_3_1
 ‚Unstructured Item c_2_1
-desugar_loop_break_1:   ;
+_break_1:   ;
 ƒUnstructured Successor ->
 ‚Unstructured Item c_3_1
    if (j>100)                                                           /*0007*/
@@ -41,7 +41,7 @@ int desugar_loop(int i)
       ;
 ƒUnstructured Successor -> c_2_1 c_3_1
 ‚Unstructured Item c_2_1
-desugar_loop_break_1:   ;
+_break_1:   ;
 ƒUnstructured Successor ->
 ‚Unstructured Item c_3_1
    if (j>100)                                                           /*0007*/
@@ -55,12 +55,12 @@ int desugar_loop(int i)
    int j = 0;                                                           /*0004*/
 l99999:   ;
 
-   if (!(j<i)) goto desugar_loop_break_1;                               /*0009*/
+   if (!(j<i)) goto _break_1;                                           /*0009*/
    if (j>100) {                                                         /*0007*/
    }
    else {
       goto l99999;
    }
-desugar_loop_break_1:   ;
+_break_1:   ;
    return i;                                                            /*0010*/
 }

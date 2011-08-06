@@ -5,27 +5,27 @@ int desugar_loop(int i)
    while (j<i) {                                                        /*0006*/
       j = j+1;                                                          /*0007*/
 // This test should be structured at the end:
-      if (j>100) goto desugar_loop_loop_end_1;                          /*0009*/
+      if (j>100) goto _loop_end_1;                                      /*0009*/
       j += i;                                                           /*0011*/
-desugar_loop_loop_end_1:      ;
+_loop_end_1:      ;
    }
 l99999:   ;
-   if (!(j<i)) goto desugar_loop_break_2;                               /*0018*/
+   if (!(j<i)) goto _break_2;                                           /*0018*/
    j = j+1;                                                             /*0014*/
-   if (j>100) goto desugar_loop_break_2;                                /*0015*/
+   if (j>100) goto _break_2;                                            /*0015*/
    j += i;                                                              /*0017*/
    goto l99999;
-desugar_loop_break_2:   ;
+_break_2:   ;
 l99998:   ;
 
-   if (!(j<i)) goto desugar_loop_break_3;                               /*0027*/
+   if (!(j<i)) goto _break_3;                                           /*0027*/
    j = j+1;                                                             /*0021*/
-   if (j>100) goto desugar_loop_break_3;                                /*0022*/
-   if (j>50) goto desugar_loop_loop_end_3;                              /*0024*/
+   if (j>100) goto _break_3;                                            /*0022*/
+   if (j>50) goto _loop_end_3;                                          /*0024*/
    j += i;                                                              /*0026*/
-desugar_loop_loop_end_3:   ;
+_loop_end_3:   ;
    goto l99998;
-desugar_loop_break_3:   ;
+_break_3:   ;
    return i;                                                            /*0028*/
 }
 int desugar_loop(int i)
@@ -39,15 +39,15 @@ int desugar_loop(int i)
          ;
       else
          j += i;                                                        /*0011*/
-desugar_loop_loop_end_1:      ;
+_loop_end_1:      ;
    }
 l99999:   ;
-   if (!(j<i)) goto desugar_loop_break_2;                               /*0018*/
+   if (!(j<i)) goto _break_2;                                           /*0018*/
    j = j+1;                                                             /*0014*/
-   if (j>100) goto desugar_loop_break_2;                                /*0015*/
+   if (j>100) goto _break_2;                                            /*0015*/
    j += i;                                                              /*0017*/
    goto l99999;
-desugar_loop_break_2:   ;
+_break_2:   ;
 l99997:   ;
 
    if (!(j<i)) goto l99998;                                             /*0027*/
@@ -57,10 +57,10 @@ l99997:   ;
       ;
    else
       j += i;                                                           /*0026*/
-desugar_loop_loop_end_3:   ;
+_loop_end_3:   ;
    goto l99997;
 l99998:   ;
-desugar_loop_break_3:   ;
+_break_3:   ;
    return i;                                                            /*0028*/
 }
 int desugar_loop(int i)
@@ -74,15 +74,15 @@ int desugar_loop(int i)
          ;
       else
          j += i;                                                        /*0011*/
-desugar_loop_loop_end_1:      ;
+_loop_end_1:      ;
    }
 l99999:   ;
-   if (!(j<i)) goto desugar_loop_break_2;                               /*0018*/
+   if (!(j<i)) goto _break_2;                                           /*0018*/
    j = j+1;                                                             /*0014*/
-   if (j>100) goto desugar_loop_break_2;                                /*0015*/
+   if (j>100) goto _break_2;                                            /*0015*/
    j += i;                                                              /*0017*/
    goto l99999;
-desugar_loop_break_2:   ;
+_break_2:   ;
 l99997:   ;
 
    if (!(j<i)) goto l99998;                                             /*0027*/
@@ -92,10 +92,10 @@ l99997:   ;
       ;
    else
       j += i;                                                           /*0026*/
-desugar_loop_loop_end_3:   ;
+_loop_end_3:   ;
    goto l99997;
 l99998:   ;
-desugar_loop_break_3:   ;
+_break_3:   ;
    return i;                                                            /*0028*/
 }
 int desugar_loop(int i)
@@ -109,15 +109,15 @@ int desugar_loop(int i)
          ;
       else
          j += i;                                                        /*0011*/
-desugar_loop_loop_end_1:      ;
+_loop_end_1:      ;
    }
 l99999:   ;
-   if (!(j<i)) goto desugar_loop_break_2;                               /*0018*/
+   if (!(j<i)) goto _break_2;                                           /*0018*/
    j = j+1;                                                             /*0014*/
-   if (j>100) goto desugar_loop_break_2;                                /*0015*/
+   if (j>100) goto _break_2;                                            /*0015*/
    j += i;                                                              /*0017*/
    goto l99999;
-desugar_loop_break_2:   ;
+_break_2:   ;
 l99997:   ;
 
    if (!(j<i)) goto l99998;                                             /*0027*/
@@ -127,9 +127,9 @@ l99997:   ;
       ;
    else
       j += i;                                                           /*0026*/
-desugar_loop_loop_end_3:   ;
+_loop_end_3:   ;
    goto l99997;
 l99998:   ;
-desugar_loop_break_3:   ;
+_break_3:   ;
    return i;                                                            /*0028*/
 }
