@@ -15,9 +15,12 @@ typedef struct {
   void * raw, **row;
   int stuff;
 } freia_data2d;
-typedef enum { FREIA_OK, FREIA_ERROR } freia_status;
+typedef enum {
+  FREIA_OK, FREIA_ERROR,
+  FREIA_SIZE_ERROR, FREIA_INVALID_PARAM
+} freia_status;
 typedef struct {
-  int framebpp, framewidth, frameheight, stuff;
+  int framebpp, framewidth, frameheight, frameindex, stuff;
 } freia_dataio;
 typedef void * freia_ptr;
 

@@ -42,6 +42,7 @@ freia_status freia_common_open_input(freia_dataio * in, uint32_t n)
   in->framebpp = 16;
   in->frameheight = 256;
   in->framewidth = 512;
+  in->frameindex = 0;
   in->stuff = n;
   global_io_effect++;
   return FREIA_OK;
@@ -53,6 +54,7 @@ freia_status freia_common_open_output(freia_dataio *out,
   out->framebpp = b;
   out->frameheight = h;
   out->framewidth = w;
+  out->frameindex = 0;
   out->stuff = n;
   global_io_effect++;
   return FREIA_OK;
@@ -61,6 +63,7 @@ freia_status freia_common_open_output(freia_dataio *out,
 freia_status freia_common_rx_image(freia_data2d * img, freia_dataio * in)
 {
   img->stuff = in->stuff;
+  in->frameindex++;
   global_io_effect++;
   return FREIA_OK;
 }
@@ -68,6 +71,7 @@ freia_status freia_common_rx_image(freia_data2d * img, freia_dataio * in)
 freia_status freia_common_tx_image(const freia_data2d * img, freia_dataio * out)
 {
   out->stuff += img->stuff;
+  out->frameindex++;
   global_io_effect++;
   return FREIA_OK;
 }
