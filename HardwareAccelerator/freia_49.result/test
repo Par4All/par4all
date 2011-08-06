@@ -73,8 +73,8 @@ digraph "dag_cleaned_0" {
   "12 <." [shape=trapezium,orientation=270];
   "12 <." -> "14 <" [label="tc"];
   "11 D8" [shape=box];
-  "11 D8" -> "13 E8" [label="tb"];
-  "11 D8" -> "12 <." [label="tb"];
+  "11 D8" -> "13 E8" [label="tb_1"];
+  "11 D8" -> "12 <." [label="tb_1"];
   "in" -> "15 -";
   "in" -> "11 D8";
 }
@@ -86,14 +86,17 @@ freia_status freia_49(freia_data2d *out, freia_data2d *in)
    freia_data2d *tb = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
    freia_data2d *tc = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
    freia_data2d *td = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0008*/
+   // hardware accelerator generated variable
+   freia_data2d *tb_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
 
-   freia_aipo_dilate_8c(tb, in, freia_morpho_kernel_8c);                /*0011*/
-   freia_aipo_inf_const(tc, tb, 255);                                   /*0012*/
-   freia_aipo_erode_8c(tb, tb, freia_morpho_kernel_8c);                 /*0013*/
+   freia_aipo_dilate_8c(tb_1, in, freia_morpho_kernel_8c);              /*0011*/
+   freia_aipo_inf_const(tc, tb_1, 255);                                 /*0012*/
+   freia_aipo_erode_8c(tb, tb_1, freia_morpho_kernel_8c);               /*0013*/
    freia_aipo_inf(td, tc, tb);                                          /*0014*/
    freia_aipo_sub(out, in, td);                                         /*0015*/
 
    freia_common_destruct_data(tb);                                      /*0018*/
+   freia_common_destruct_data(tb_1);
    freia_common_destruct_data(tc);                                      /*0019*/
    freia_common_destruct_data(td);                                      /*0020*/
    return FREIA_OK;                                                     /*0021*/

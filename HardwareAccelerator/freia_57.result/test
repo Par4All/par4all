@@ -124,7 +124,7 @@ digraph "dag_cleaned_0" {
 digraph "freia_57_helper_0_0" {
   // inputs
   "i" [shape=circle];
-  "io_1" [shape=circle];
+  "io" [shape=circle];
 
   // outputs
   "o" [shape=circle];
@@ -137,8 +137,8 @@ digraph "freia_57_helper_0_0" {
   "6 +" -> "7 <" [label="o"];
   "6 +" -> "o";
   "i" -> "6 +";
-  "io_1" -> "7 <";
-  "io_1" -> "6 +";
+  "io" -> "7 <";
+  "io" -> "6 +";
 }
 
 ! acceleration function
@@ -172,7 +172,7 @@ freia_status freia_57_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // STAGE 0
   // i [0 input 0] -> [0 alu] 6 add
   // nope
-  // io_1 [0 input 1] -> [0 alu] 6 add
+  // io [0 input 1] -> [0 alu] 6 add
   // nope
   // alu 6 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
@@ -184,9 +184,9 @@ freia_status freia_57_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   si.mux[0][2].op = SPOC_MUX_IN0;
   // o [1 input 0] -> [1 alu] 7 inf
   // nope
-  // io_1 [0 input 1] -> [1 alu] 7 inf
+  // io [0 input 1] -> [1 alu] 7 inf
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // io_1 [1 input 1] -> [1 alu] 7 inf
+  // io [1 input 1] -> [1 alu] 7 inf
   // nope
   // alu 7 inf stage 1
   si.alu[1][0].op = SPOC_ALU_INF_IN0_IN1;
@@ -322,7 +322,7 @@ digraph "dag_cleaned_0" {
 digraph "freia_57_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
-  "io_1" [shape=circle];
+  "io" [shape=circle];
 
   // outputs
   "o" [shape=circle];
@@ -335,8 +335,8 @@ digraph "freia_57_helper_0_0_0" {
   "6 +" -> "7 <" [label="o"];
   "6 +" -> "o";
   "i" -> "6 +";
-  "io_1" -> "7 <";
-  "io_1" -> "6 +";
+  "io" -> "7 <";
+  "io" -> "6 +";
 }
 
 ! acceleration function
@@ -473,7 +473,7 @@ freia_status freia_57_helper_0_0_0(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for io_1
+  // - imagelet 2 is i1 for io
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;

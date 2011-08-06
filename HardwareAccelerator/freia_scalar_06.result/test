@@ -117,8 +117,8 @@ digraph "dag_cleaned_0" {
   "23 min" [shape=diamond];
   "23 min" -> "25 thr" [arrowhead=empty,label="sA2"];
   "21 E8" [shape=box];
-  "21 E8" -> "25 thr" [label="X"];
-  "21 E8" -> "23 min" [label="X"];
+  "21 E8" -> "25 thr" [label="X_1"];
+  "21 E8" -> "23 min" [label="X_1"];
   "19 thr" [shape=parallelogram];
   "19 thr" -> "31 D8" [label="tB"];
   "17 max" [shape=diamond];
@@ -140,6 +140,8 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tC3 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);     /*0012*/
    int32_t sA, sA2, sB;                                                 /*0013*/
+   // hardware accelerator generated variable
+   freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
    
    // look for order issues when reusing a temporary image
    // A
@@ -147,11 +149,11 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    // B
    freia_aipo_threshold(tB, i, sA-10, sA-1, false);                     /*0019*/
    // A
-   freia_aipo_erode_8c(X, i, k);                                        /*0021*/
+   freia_aipo_erode_8c(X_1, i, k);                                      /*0021*/
    // A
-   freia_aipo_global_min(X, &sA2);                                      /*0023*/
+   freia_aipo_global_min(X_1, &sA2);                                    /*0023*/
    // C with X from A
-   freia_aipo_threshold(tC, X, sA2-10, sA2-1, false);                   /*0025*/
+   freia_aipo_threshold(tC, X_1, sA2-10, sA2-1, false);                 /*0025*/
    // C
    freia_aipo_dilate_6c(tC2, tC, k);                                    /*0027*/
    // C
@@ -166,6 +168,7 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_aipo_add(o, tC3, tD);                                          /*0037*/
 
    freia_common_destruct_data(X);                                       /*0039*/
+   freia_common_destruct_data(X_1);
    freia_common_destruct_data(tB);                                      /*0040*/
    freia_common_destruct_data(tC);                                      /*0041*/
    freia_common_destruct_data(tD);                                      /*0042*/

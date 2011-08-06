@@ -87,12 +87,12 @@ digraph "dag_cleaned_0" {
   "34 -" [shape=trapezium,orientation=270];
   "34 -" -> "og";
   "33 E8" [shape=box];
-  "33 E8" -> "34 -" [label="og"];
+  "33 E8" -> "34 -" [label="og_1"];
   "30 D8" [shape=box];
   "30 D8" -> "od";
   "29 D8" [shape=box];
-  "29 D8" -> "34 -" [label="od"];
-  "29 D8" -> "30 D8" [label="od"];
+  "29 D8" -> "34 -" [label="od_1"];
+  "29 D8" -> "30 D8" [label="od_1"];
   "in" -> "33 E8";
   "in" -> "29 D8";
 }
@@ -106,21 +106,24 @@ int anr999_03(void)
    freia_data2d *in;                                                    /*0014*/
    freia_data2d *og;                                                    /*0015*/
    freia_data2d *od;                                                    /*0016*/
+   // hardware accelerator generated variable
+   freia_data2d *od_1 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0019*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0020*/
 
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0022*/
    od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0023*/
+   od_1 = freia_common_create_data(od->bpp, od->widthWa, od->heightWa);
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0024*/
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
 
-   freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0029*/
-   freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0030*/
+   freia_aipo_dilate_8c(od_1, in, freia_morpho_kernel_8c);              /*0029*/
+   freia_aipo_dilate_8c(od, od_1, freia_morpho_kernel_8c);              /*0030*/
 
    freia_aipo_erode_8c(og, in, freia_morpho_kernel_8c);                 /*0033*/
-   freia_aipo_sub(og, od, og);                                          /*0034*/
+   freia_aipo_sub(og, od_1, og);                                        /*0034*/
 
    freia_common_tx_image(in, &fdout);                                   /*0036*/
    freia_common_tx_image(od, &fdout);                                   /*0037*/
@@ -128,6 +131,7 @@ int anr999_03(void)
 
    freia_common_destruct_data(in);                                      /*0041*/
    freia_common_destruct_data(od);                                      /*0042*/
+   freia_common_destruct_data(od_1);
    freia_common_destruct_data(og);                                      /*0043*/
 
    freia_common_close_input(&fdin);                                     /*0045*/

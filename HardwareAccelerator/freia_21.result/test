@@ -62,7 +62,7 @@ digraph "dag_cleaned_0" {
   "13 -" [shape=trapezium,orientation=270];
   "13 -" -> "14 &" [label="t"];
   "12 *" [shape=trapezium,orientation=270];
-  "12 *" -> "13 -" [label="t"];
+  "12 *" -> "13 -" [label="t_1"];
   "i1" -> "12 *";
   "i0" -> "14 &";
   "i0" -> "13 -";

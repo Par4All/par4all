@@ -83,7 +83,7 @@ digraph "dag_cleaned_0" {
   "13 ?" [shape=none];
   "13 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "10 D8" [shape=box];
-  "10 D8" -> "14 <" [label="out"];
+  "10 D8" -> "14 <" [label="out_1"];
   "out" -> "10 D8";
 }
 // graph for dag "dag_cleaned_1" of module "freia_58" in dot format
@@ -1177,7 +1177,7 @@ digraph "dag_cleaned_1" {
 digraph "freia_58_helper_0_0" {
   // inputs
   "in" [shape=circle];
-  "out_16" [shape=circle];
+  "out" [shape=circle];
 
   // outputs
   "out" [shape=circle];
@@ -1225,7 +1225,7 @@ digraph "freia_58_helper_0_0" {
   "in" -> "9 <";
   "5 D8" [shape=box];
   "5 D8" -> "9 <" [label="out_15"];
-  "out_16" -> "5 D8";
+  "out" -> "5 D8";
 }
 // graph for dag "freia_58_helper_1_0" of module "freia_58" in dot format
 digraph "freia_58_helper_1_0" {
@@ -1270,7 +1270,7 @@ freia_status freia_58_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // out_16 [0 input 1] -> [0 poc 1] 5 dilate_8c
+  // out [0 input 1] -> [0 poc 1] 5 dilate_8c
   // nope
   // poc 5 dilate_8c stage 0 side 1
   si.poc[0][1].op = SPOC_POC_DILATE;
@@ -1748,7 +1748,7 @@ digraph "dag_cleaned_1" {
 digraph "freia_58_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
-  "out_2" [shape=circle];
+  "out" [shape=circle];
 
   // outputs
   "out" [shape=circle];
@@ -1761,7 +1761,7 @@ digraph "freia_58_helper_0_0_0" {
   "in" -> "14 <";
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out_1"];
-  "out_2" -> "10 D8";
+  "out" -> "10 D8";
 }
 // graph for dag "freia_58_helper_1_0_0" of module "freia_58" in dot format
 digraph "freia_58_helper_1_0_0" {
@@ -1981,7 +1981,7 @@ freia_status freia_58_helper_0_0_0(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for out_2
+  // - imagelet 2 is i1 for out
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;

@@ -60,9 +60,9 @@ digraph "dag_cleaned_0" {
   "14 E8" [shape=box];
   "14 E8" -> "15 D8" [label="t"];
   "13 D6" [shape=box];
-  "13 D6" -> "14 E8" [label="t"];
+  "13 D6" -> "14 E8" [label="t_1"];
   "12 E6" [shape=box];
-  "12 E6" -> "13 D6" [label="t"];
+  "12 E6" -> "13 D6" [label="t_2"];
   "i" -> "12 E6";
 }
 

@@ -1650,7 +1650,7 @@ digraph "dag_cleaned_0" {
   "873 ?" [shape=none];
   "873 ?" -> "877 ?" [arrowhead=empty,label="ret_20"];
   "868 D8" [shape=box];
-  "868 D8" -> "874 <" [label="imWork1"];
+  "868 D8" -> "874 <" [label="imWork1_1"];
   "imWork1" -> "868 D8";
 }
 // graph for dag "dag_cleaned_1" of module "freia_52" in dot format
@@ -1668,7 +1668,7 @@ digraph "dag_cleaned_1" {
   "887 *." [shape=trapezium,orientation=270];
   "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon"];
+  "886 -" -> "887 *." [label="imout_tophatLinRecon_1"];
   "imWork1" -> "886 -";
   "imin" -> "886 -";
 }
@@ -1705,25 +1705,25 @@ digraph "dag_cleaned_2" {
   "844 E8" [shape=box];
   "844 E8" -> "852 <" [label="w1_1"];
   "843 E8" [shape=box];
-  "843 E8" -> "844 E8" [label="w1_1"];
+  "843 E8" -> "844 E8" [label="w1_1_1"];
   "842 E8" [shape=box];
-  "842 E8" -> "843 E8" [label="w1_1"];
+  "842 E8" -> "843 E8" [label="w1_1_2"];
   "841 E8" [shape=box];
-  "841 E8" -> "842 E8" [label="w1_1"];
+  "841 E8" -> "842 E8" [label="w1_1_3"];
   "840 E8" [shape=box];
-  "840 E8" -> "841 E8" [label="w1_1"];
+  "840 E8" -> "841 E8" [label="w1_1_4"];
   "837 ?" [shape=none];
   "837 ?" -> "850 ?" [arrowhead=empty,label="ret_18"];
   "833 D8" [shape=box];
-  "833 D8" -> "840 E8" [label="w1_1"];
+  "833 D8" -> "840 E8" [label="w1_1_5"];
   "832 D8" [shape=box];
-  "832 D8" -> "833 D8" [label="w1_1"];
+  "832 D8" -> "833 D8" [label="w1_1_6"];
   "831 D8" [shape=box];
-  "831 D8" -> "832 D8" [label="w1_1"];
+  "831 D8" -> "832 D8" [label="w1_1_7"];
   "830 D8" [shape=box];
-  "830 D8" -> "831 D8" [label="w1_1"];
+  "830 D8" -> "831 D8" [label="w1_1_8"];
   "816 <" [shape=trapezium,orientation=270];
-  "816 <" -> "852 <" [label="w2_1"];
+  "816 <" -> "852 <" [label="w2_1_1"];
   "815 ?" [shape=none];
   "815 ?" -> "859 ?" [arrowhead=empty,label="err_3"];
   "815 ?" -> "851 ?" [arrowhead=empty,label="err_3"];
@@ -1736,27 +1736,27 @@ digraph "dag_cleaned_2" {
   "814 ?" [shape=none];
   "814 ?" -> "815 ?" [arrowhead=empty,label="_return23"];
   "808 E8" [shape=box];
-  "808 E8" -> "816 <" [label="w1_1"];
+  "808 E8" -> "816 <" [label="w1_1_9"];
   "807 E8" [shape=box];
-  "807 E8" -> "808 E8" [label="w1_1"];
+  "807 E8" -> "808 E8" [label="w1_1_10"];
   "806 E8" [shape=box];
-  "806 E8" -> "807 E8" [label="w1_1"];
+  "806 E8" -> "807 E8" [label="w1_1_11"];
   "805 E8" [shape=box];
-  "805 E8" -> "806 E8" [label="w1_1"];
+  "805 E8" -> "806 E8" [label="w1_1_12"];
   "804 E8" [shape=box];
-  "804 E8" -> "805 E8" [label="w1_1"];
+  "804 E8" -> "805 E8" [label="w1_1_13"];
   "801 ?" [shape=none];
   "801 ?" -> "814 ?" [arrowhead=empty,label="ret_17"];
   "797 D8" [shape=box];
-  "797 D8" -> "804 E8" [label="w1_1"];
+  "797 D8" -> "804 E8" [label="w1_1_14"];
   "796 D8" [shape=box];
-  "796 D8" -> "797 D8" [label="w1_1"];
+  "796 D8" -> "797 D8" [label="w1_1_15"];
   "795 D8" [shape=box];
-  "795 D8" -> "796 D8" [label="w1_1"];
+  "795 D8" -> "796 D8" [label="w1_1_16"];
   "794 D8" [shape=box];
-  "794 D8" -> "795 D8" [label="w1_1"];
+  "794 D8" -> "795 D8" [label="w1_1_17"];
   "780 <" [shape=trapezium,orientation=270];
-  "780 <" -> "816 <" [label="w2_1"];
+  "780 <" -> "816 <" [label="w2_1_2"];
   "779 ?" [shape=none];
   "779 ?" -> "859 ?" [arrowhead=empty,label="err_3"];
   "779 ?" -> "851 ?" [arrowhead=empty,label="err_3"];
@@ -1769,27 +1769,27 @@ digraph "dag_cleaned_2" {
   "778 ?" [shape=none];
   "778 ?" -> "779 ?" [arrowhead=empty,label="_return22"];
   "772 E8" [shape=box];
-  "772 E8" -> "780 <" [label="w1_1"];
+  "772 E8" -> "780 <" [label="w1_1_18"];
   "771 E8" [shape=box];
-  "771 E8" -> "772 E8" [label="w1_1"];
+  "771 E8" -> "772 E8" [label="w1_1_19"];
   "770 E8" [shape=box];
-  "770 E8" -> "771 E8" [label="w1_1"];
+  "770 E8" -> "771 E8" [label="w1_1_20"];
   "769 E8" [shape=box];
-  "769 E8" -> "770 E8" [label="w1_1"];
+  "769 E8" -> "770 E8" [label="w1_1_21"];
   "768 E8" [shape=box];
-  "768 E8" -> "769 E8" [label="w1_1"];
+  "768 E8" -> "769 E8" [label="w1_1_22"];
   "765 ?" [shape=none];
   "765 ?" -> "778 ?" [arrowhead=empty,label="ret_16"];
   "761 D8" [shape=box];
-  "761 D8" -> "768 E8" [label="w1_1"];
+  "761 D8" -> "768 E8" [label="w1_1_23"];
   "760 D8" [shape=box];
-  "760 D8" -> "761 D8" [label="w1_1"];
+  "760 D8" -> "761 D8" [label="w1_1_24"];
   "759 D8" [shape=box];
-  "759 D8" -> "760 D8" [label="w1_1"];
+  "759 D8" -> "760 D8" [label="w1_1_25"];
   "758 D8" [shape=box];
-  "758 D8" -> "759 D8" [label="w1_1"];
+  "758 D8" -> "759 D8" [label="w1_1_26"];
   "744 <" [shape=trapezium,orientation=270];
-  "744 <" -> "780 <" [label="w2_1"];
+  "744 <" -> "780 <" [label="w2_1_3"];
   "743 ?" [shape=none];
   "743 ?" -> "859 ?" [arrowhead=empty,label="err_3"];
   "743 ?" -> "851 ?" [arrowhead=empty,label="err_3"];
@@ -1802,27 +1802,27 @@ digraph "dag_cleaned_2" {
   "742 ?" [shape=none];
   "742 ?" -> "743 ?" [arrowhead=empty,label="_return26"];
   "736 E8" [shape=box];
-  "736 E8" -> "744 <" [label="w1_1"];
+  "736 E8" -> "744 <" [label="w1_1_27"];
   "735 E8" [shape=box];
-  "735 E8" -> "736 E8" [label="w1_1"];
+  "735 E8" -> "736 E8" [label="w1_1_28"];
   "734 E8" [shape=box];
-  "734 E8" -> "735 E8" [label="w1_1"];
+  "734 E8" -> "735 E8" [label="w1_1_29"];
   "733 E8" [shape=box];
-  "733 E8" -> "734 E8" [label="w1_1"];
+  "733 E8" -> "734 E8" [label="w1_1_30"];
   "732 E8" [shape=box];
-  "732 E8" -> "733 E8" [label="w1_1"];
+  "732 E8" -> "733 E8" [label="w1_1_31"];
   "729 ?" [shape=none];
   "729 ?" -> "742 ?" [arrowhead=empty,label="ret_15"];
   "725 D8" [shape=box];
-  "725 D8" -> "732 E8" [label="w1_1"];
+  "725 D8" -> "732 E8" [label="w1_1_32"];
   "724 D8" [shape=box];
-  "724 D8" -> "725 D8" [label="w1_1"];
+  "724 D8" -> "725 D8" [label="w1_1_33"];
   "723 D8" [shape=box];
-  "723 D8" -> "724 D8" [label="w1_1"];
+  "723 D8" -> "724 D8" [label="w1_1_34"];
   "722 D8" [shape=box];
-  "722 D8" -> "723 D8" [label="w1_1"];
+  "722 D8" -> "723 D8" [label="w1_1_35"];
   "708 <" [shape=trapezium,orientation=270];
-  "708 <" -> "744 <" [label="w2_1"];
+  "708 <" -> "744 <" [label="w2_1_4"];
   "707 ?" [shape=none];
   "707 ?" -> "859 ?" [arrowhead=empty,label="err_3"];
   "707 ?" -> "851 ?" [arrowhead=empty,label="err_3"];
@@ -1835,27 +1835,27 @@ digraph "dag_cleaned_2" {
   "706 ?" [shape=none];
   "706 ?" -> "707 ?" [arrowhead=empty,label="_return25"];
   "700 E8" [shape=box];
-  "700 E8" -> "708 <" [label="w1_1"];
+  "700 E8" -> "708 <" [label="w1_1_36"];
   "699 E8" [shape=box];
-  "699 E8" -> "700 E8" [label="w1_1"];
+  "699 E8" -> "700 E8" [label="w1_1_37"];
   "698 E8" [shape=box];
-  "698 E8" -> "699 E8" [label="w1_1"];
+  "698 E8" -> "699 E8" [label="w1_1_38"];
   "697 E8" [shape=box];
-  "697 E8" -> "698 E8" [label="w1_1"];
+  "697 E8" -> "698 E8" [label="w1_1_39"];
   "696 E8" [shape=box];
-  "696 E8" -> "697 E8" [label="w1_1"];
+  "696 E8" -> "697 E8" [label="w1_1_40"];
   "693 ?" [shape=none];
   "693 ?" -> "706 ?" [arrowhead=empty,label="ret_14"];
   "689 D8" [shape=box];
-  "689 D8" -> "696 E8" [label="w1_1"];
+  "689 D8" -> "696 E8" [label="w1_1_41"];
   "688 D8" [shape=box];
-  "688 D8" -> "689 D8" [label="w1_1"];
+  "688 D8" -> "689 D8" [label="w1_1_42"];
   "687 D8" [shape=box];
-  "687 D8" -> "688 D8" [label="w1_1"];
+  "687 D8" -> "688 D8" [label="w1_1_43"];
   "686 D8" [shape=box];
-  "686 D8" -> "687 D8" [label="w1_1"];
+  "686 D8" -> "687 D8" [label="w1_1_44"];
   "672 <" [shape=trapezium,orientation=270];
-  "672 <" -> "708 <" [label="w2_1"];
+  "672 <" -> "708 <" [label="w2_1_5"];
   "671 ?" [shape=none];
   "671 ?" -> "859 ?" [arrowhead=empty,label="err_3"];
   "671 ?" -> "851 ?" [arrowhead=empty,label="err_3"];
@@ -1868,27 +1868,27 @@ digraph "dag_cleaned_2" {
   "670 ?" [shape=none];
   "670 ?" -> "671 ?" [arrowhead=empty,label="_return29"];
   "664 E8" [shape=box];
-  "664 E8" -> "672 <" [label="w1_1"];
+  "664 E8" -> "672 <" [label="w1_1_45"];
   "663 E8" [shape=box];
-  "663 E8" -> "664 E8" [label="w1_1"];
+  "663 E8" -> "664 E8" [label="w1_1_46"];
   "662 E8" [shape=box];
-  "662 E8" -> "663 E8" [label="w1_1"];
+  "662 E8" -> "663 E8" [label="w1_1_47"];
   "661 E8" [shape=box];
-  "661 E8" -> "662 E8" [label="w1_1"];
+  "661 E8" -> "662 E8" [label="w1_1_48"];
   "660 E8" [shape=box];
-  "660 E8" -> "661 E8" [label="w1_1"];
+  "660 E8" -> "661 E8" [label="w1_1_49"];
   "657 ?" [shape=none];
   "657 ?" -> "670 ?" [arrowhead=empty,label="ret_13"];
   "653 D8" [shape=box];
-  "653 D8" -> "660 E8" [label="w1_1"];
+  "653 D8" -> "660 E8" [label="w1_1_50"];
   "652 D8" [shape=box];
-  "652 D8" -> "653 D8" [label="w1_1"];
+  "652 D8" -> "653 D8" [label="w1_1_51"];
   "651 D8" [shape=box];
-  "651 D8" -> "652 D8" [label="w1_1"];
+  "651 D8" -> "652 D8" [label="w1_1_52"];
   "650 D8" [shape=box];
-  "650 D8" -> "651 D8" [label="w1_1"];
+  "650 D8" -> "651 D8" [label="w1_1_53"];
   "636 <" [shape=trapezium,orientation=270];
-  "636 <" -> "672 <" [label="w2_1"];
+  "636 <" -> "672 <" [label="w2_1_6"];
   "635 ?" [shape=none];
   "635 ?" -> "859 ?" [arrowhead=empty,label="err_3"];
   "635 ?" -> "851 ?" [arrowhead=empty,label="err_3"];
@@ -1901,27 +1901,27 @@ digraph "dag_cleaned_2" {
   "634 ?" [shape=none];
   "634 ?" -> "635 ?" [arrowhead=empty,label="_return28"];
   "628 E8" [shape=box];
-  "628 E8" -> "636 <" [label="w1_1"];
+  "628 E8" -> "636 <" [label="w1_1_54"];
   "627 E8" [shape=box];
-  "627 E8" -> "628 E8" [label="w1_1"];
+  "627 E8" -> "628 E8" [label="w1_1_55"];
   "626 E8" [shape=box];
-  "626 E8" -> "627 E8" [label="w1_1"];
+  "626 E8" -> "627 E8" [label="w1_1_56"];
   "625 E8" [shape=box];
-  "625 E8" -> "626 E8" [label="w1_1"];
+  "625 E8" -> "626 E8" [label="w1_1_57"];
   "624 E8" [shape=box];
-  "624 E8" -> "625 E8" [label="w1_1"];
+  "624 E8" -> "625 E8" [label="w1_1_58"];
   "621 ?" [shape=none];
   "621 ?" -> "634 ?" [arrowhead=empty,label="ret_12"];
   "617 D8" [shape=box];
-  "617 D8" -> "624 E8" [label="w1_1"];
+  "617 D8" -> "624 E8" [label="w1_1_59"];
   "616 D8" [shape=box];
-  "616 D8" -> "617 D8" [label="w1_1"];
+  "616 D8" -> "617 D8" [label="w1_1_60"];
   "615 D8" [shape=box];
-  "615 D8" -> "616 D8" [label="w1_1"];
+  "615 D8" -> "616 D8" [label="w1_1_61"];
   "614 D8" [shape=box];
-  "614 D8" -> "615 D8" [label="w1_1"];
+  "614 D8" -> "615 D8" [label="w1_1_62"];
   "600 <." [shape=trapezium,orientation=270];
-  "600 <." -> "636 <" [label="w2_1"];
+  "600 <." -> "636 <" [label="w2_1_7"];
   "599 ?" [shape=none];
   "599 ?" -> "859 ?" [arrowhead=empty,label="err_3"];
   "599 ?" -> "851 ?" [arrowhead=empty,label="err_3"];
@@ -1934,36 +1934,36 @@ digraph "dag_cleaned_2" {
   "598 ?" [shape=none];
   "598 ?" -> "599 ?" [arrowhead=empty,label="_return27"];
   "592 E8" [shape=box];
-  "592 E8" -> "600 <." [label="w1_1"];
+  "592 E8" -> "600 <." [label="w1_1_63"];
   "591 E8" [shape=box];
-  "591 E8" -> "592 E8" [label="w1_1"];
+  "591 E8" -> "592 E8" [label="w1_1_64"];
   "590 E8" [shape=box];
-  "590 E8" -> "591 E8" [label="w1_1"];
+  "590 E8" -> "591 E8" [label="w1_1_65"];
   "589 E8" [shape=box];
-  "589 E8" -> "590 E8" [label="w1_1"];
+  "589 E8" -> "590 E8" [label="w1_1_66"];
   "588 E8" [shape=box];
-  "588 E8" -> "589 E8" [label="w1_1"];
+  "588 E8" -> "589 E8" [label="w1_1_67"];
   "585 ?" [shape=none];
   "585 ?" -> "598 ?" [arrowhead=empty,label="ret_11"];
   "581 D8" [shape=box];
-  "581 D8" -> "588 E8" [label="w1_1"];
+  "581 D8" -> "588 E8" [label="w1_1_68"];
   "580 D8" [shape=box];
-  "580 D8" -> "581 D8" [label="w1_1"];
+  "580 D8" -> "581 D8" [label="w1_1_69"];
   "579 D8" [shape=box];
-  "579 D8" -> "580 D8" [label="w1_1"];
+  "579 D8" -> "580 D8" [label="w1_1_70"];
   "578 D8" [shape=box];
-  "578 D8" -> "579 D8" [label="w1_1"];
+  "578 D8" -> "579 D8" [label="w1_1_71"];
   "577 D8" [shape=box];
-  "577 D8" -> "830 D8" [label="w1_1"];
-  "577 D8" -> "794 D8" [label="w1_1"];
-  "577 D8" -> "758 D8" [label="w1_1"];
-  "577 D8" -> "722 D8" [label="w1_1"];
-  "577 D8" -> "686 D8" [label="w1_1"];
-  "577 D8" -> "650 D8" [label="w1_1"];
-  "577 D8" -> "614 D8" [label="w1_1"];
-  "577 D8" -> "578 D8" [label="w1_1"];
+  "577 D8" -> "830 D8" [label="w1_1_72"];
+  "577 D8" -> "794 D8" [label="w1_1_72"];
+  "577 D8" -> "758 D8" [label="w1_1_72"];
+  "577 D8" -> "722 D8" [label="w1_1_72"];
+  "577 D8" -> "686 D8" [label="w1_1_72"];
+  "577 D8" -> "650 D8" [label="w1_1_72"];
+  "577 D8" -> "614 D8" [label="w1_1_72"];
+  "577 D8" -> "578 D8" [label="w1_1_72"];
   "558 !" [shape=trapezium,orientation=270];
-  "558 !" -> "577 D8" [label="imWork1"];
+  "558 !" -> "577 D8" [label="imWork1_2"];
   "549 ?" [shape=none];
   "549 ?" -> "551 ?" [arrowhead=empty,label="err_0"];
   "548 ?" [shape=none];
@@ -2209,6 +2209,8 @@ int freia_52(void)
    freia_status ret_20;                                                 /*0169*/
    //PIPS generated variable
    int i_52;                                                            /*0171*/
+   // hardware accelerator generated variable
+   freia_data2d *w2_1_1 = 0, *w2_1_2 = 0, *w2_1_3 = 0, *w2_1_4 = 0, *w2_1_5 = 0, *w2_1_6 = 0, *w2_1_7 = 0, *w1_1_72 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0173*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0174*/
@@ -2218,6 +2220,14 @@ int freia_52(void)
    imin = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0178*/
    imout_tophatLinRecon = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0180*/
    imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);              /*0182*/
+   w1_1_72 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
+   w2_1_7 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
+   w2_1_6 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
+   w2_1_5 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
+   w2_1_4 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
+   w2_1_3 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
+   w2_1_2 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
+   w2_1_1 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    
    // input
    freia_common_rx_image(imin, &fdin);                                  /*0186*/
@@ -2502,8 +2512,8 @@ int freia_52(void)
    neighborTransposed_8[-8+8] = freia_morpho_k8_0[8];                   /*0574*/
    
    
-   freia_aipo_dilate_8c(w1_1, imWork1, freia_morpho_kernel_8c);         /*0577*/
-   freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_0);                 /*0578*/
+   freia_aipo_dilate_8c(w1_1_72, imWork1, freia_morpho_kernel_8c);      /*0577*/
+   freia_aipo_dilate_8c(w1_1, w1_1_72, freia_morpho_k8_0);              /*0578*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_0);                 /*0579*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_0);                 /*0580*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_0);                 /*0581*/
@@ -2525,7 +2535,7 @@ int freia_52(void)
    
    _return27 = ret_11;                                                  /*0598*/
    err_3 |= _return27;                                                  /*0599*/
-   err_3 |= freia_aipo_inf_const(w2_1, w1_1, 255);                      /*0600*/
+   err_3 |= freia_aipo_inf_const(w2_1_7, w1_1, 255);                    /*0600*/
 
    neighborTransposed_9[-0+8] = freia_morpho_k8_1[0];                   /*0602*/
    neighborTransposed_9[-1+8] = freia_morpho_k8_1[1];                   /*0603*/
@@ -2538,7 +2548,7 @@ int freia_52(void)
    neighborTransposed_9[-8+8] = freia_morpho_k8_1[8];                   /*0610*/
    
    
-   freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_1);                 /*0614*/
+   freia_aipo_dilate_8c(w1_1, w1_1_72, freia_morpho_k8_1);              /*0614*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_1);                 /*0615*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_1);                 /*0616*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_1);                 /*0617*/
@@ -2560,7 +2570,7 @@ int freia_52(void)
    
    _return28 = ret_12;                                                  /*0634*/
    err_3 |= _return28;                                                  /*0635*/
-   err_3 |= freia_aipo_inf(w2_1, w2_1, w1_1);                           /*0636*/
+   err_3 |= freia_aipo_inf(w2_1_6, w2_1_7, w1_1);                       /*0636*/
 
    neighborTransposed_10[-0+8] = freia_morpho_k8_2[0];                  /*0638*/
    neighborTransposed_10[-1+8] = freia_morpho_k8_2[1];                  /*0639*/
@@ -2573,7 +2583,7 @@ int freia_52(void)
    neighborTransposed_10[-8+8] = freia_morpho_k8_2[8];                  /*0646*/
    
    
-   freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_2);                 /*0650*/
+   freia_aipo_dilate_8c(w1_1, w1_1_72, freia_morpho_k8_2);              /*0650*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_2);                 /*0651*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_2);                 /*0652*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k8_2);                 /*0653*/
@@ -2595,7 +2605,7 @@ int freia_52(void)
    
    _return29 = ret_13;                                                  /*0670*/
    err_3 |= _return29;                                                  /*0671*/
-   err_3 |= freia_aipo_inf(w2_1, w2_1, w1_1);                           /*0672*/
+   err_3 |= freia_aipo_inf(w2_1_5, w2_1_6, w1_1);                       /*0672*/
 
    neighborTransposed_11[-0+8] = freia_morpho_k4_0[0];                  /*0674*/
    neighborTransposed_11[-1+8] = freia_morpho_k4_0[1];                  /*0675*/
@@ -2608,7 +2618,7 @@ int freia_52(void)
    neighborTransposed_11[-8+8] = freia_morpho_k4_0[8];                  /*0682*/
    
    
-   freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k4_0);                 /*0686*/
+   freia_aipo_dilate_8c(w1_1, w1_1_72, freia_morpho_k4_0);              /*0686*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k4_0);                 /*0687*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k4_0);                 /*0688*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k4_0);                 /*0689*/
@@ -2630,7 +2640,7 @@ int freia_52(void)
    
    _return25 = ret_14;                                                  /*0706*/
    err_3 |= _return25;                                                  /*0707*/
-   err_3 |= freia_aipo_inf(w2_1, w2_1, w1_1);                           /*0708*/
+   err_3 |= freia_aipo_inf(w2_1_4, w2_1_5, w1_1);                       /*0708*/
 
    neighborTransposed_12[-0+8] = freia_morpho_k4_1[0];                  /*0710*/
    neighborTransposed_12[-1+8] = freia_morpho_k4_1[1];                  /*0711*/
@@ -2643,7 +2653,7 @@ int freia_52(void)
    neighborTransposed_12[-8+8] = freia_morpho_k4_1[8];                  /*0718*/
    
    
-   freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k4_1);                 /*0722*/
+   freia_aipo_dilate_8c(w1_1, w1_1_72, freia_morpho_k4_1);              /*0722*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k4_1);                 /*0723*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k4_1);                 /*0724*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k4_1);                 /*0725*/
@@ -2665,7 +2675,7 @@ int freia_52(void)
    
    _return26 = ret_15;                                                  /*0742*/
    err_3 |= _return26;                                                  /*0743*/
-   err_3 |= freia_aipo_inf(w2_1, w2_1, w1_1);                           /*0744*/
+   err_3 |= freia_aipo_inf(w2_1_3, w2_1_4, w1_1);                       /*0744*/
 
    neighborTransposed_13[-0+8] = freia_morpho_k6_0[0];                  /*0746*/
    neighborTransposed_13[-1+8] = freia_morpho_k6_0[1];                  /*0747*/
@@ -2678,7 +2688,7 @@ int freia_52(void)
    neighborTransposed_13[-8+8] = freia_morpho_k6_0[8];                  /*0754*/
    
    
-   freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_0);                 /*0758*/
+   freia_aipo_dilate_8c(w1_1, w1_1_72, freia_morpho_k6_0);              /*0758*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_0);                 /*0759*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_0);                 /*0760*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_0);                 /*0761*/
@@ -2700,7 +2710,7 @@ int freia_52(void)
    
    _return22 = ret_16;                                                  /*0778*/
    err_3 |= _return22;                                                  /*0779*/
-   err_3 |= freia_aipo_inf(w2_1, w2_1, w1_1);                           /*0780*/
+   err_3 |= freia_aipo_inf(w2_1_2, w2_1_3, w1_1);                       /*0780*/
 
    neighborTransposed_14[-0+8] = freia_morpho_k6_1[0];                  /*0782*/
    neighborTransposed_14[-1+8] = freia_morpho_k6_1[1];                  /*0783*/
@@ -2713,7 +2723,7 @@ int freia_52(void)
    neighborTransposed_14[-8+8] = freia_morpho_k6_1[8];                  /*0790*/
    
    
-   freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_1);                 /*0794*/
+   freia_aipo_dilate_8c(w1_1, w1_1_72, freia_morpho_k6_1);              /*0794*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_1);                 /*0795*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_1);                 /*0796*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_1);                 /*0797*/
@@ -2735,7 +2745,7 @@ int freia_52(void)
    
    _return23 = ret_17;                                                  /*0814*/
    err_3 |= _return23;                                                  /*0815*/
-   err_3 |= freia_aipo_inf(w2_1, w2_1, w1_1);                           /*0816*/
+   err_3 |= freia_aipo_inf(w2_1_1, w2_1_2, w1_1);                       /*0816*/
 
    neighborTransposed_15[-0+8] = freia_morpho_k6_2[0];                  /*0818*/
    neighborTransposed_15[-1+8] = freia_morpho_k6_2[1];                  /*0819*/
@@ -2748,7 +2758,7 @@ int freia_52(void)
    neighborTransposed_15[-8+8] = freia_morpho_k6_2[8];                  /*0826*/
    
    
-   freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_2);                 /*0830*/
+   freia_aipo_dilate_8c(w1_1, w1_1_72, freia_morpho_k6_2);              /*0830*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_2);                 /*0831*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_2);                 /*0832*/
    freia_aipo_dilate_8c(w1_1, w1_1, freia_morpho_k6_2);                 /*0833*/
@@ -2770,7 +2780,7 @@ int freia_52(void)
    
    _return24 = ret_18;                                                  /*0850*/
    err_3 |= _return24;                                                  /*0851*/
-   err_3 |= freia_aipo_inf(w2_1, w2_1, w1_1);                           /*0852*/
+   err_3 |= freia_aipo_inf(w2_1, w2_1_1, w1_1);                         /*0852*/
 
    err_3 |= 0;                                                          /*0854*/
    
@@ -2782,7 +2792,15 @@ int freia_52(void)
 
    ret_19 = freia_aipo_global_vol(imWork1, &volcurrent);                /*0864*/
    freia_common_destruct_data(w1_1);                                    /*0855*/
+   freia_common_destruct_data(w1_1_72);
    freia_common_destruct_data(w2_1);                                    /*0856*/
+   freia_common_destruct_data(w2_1_1);
+   freia_common_destruct_data(w2_1_2);
+   freia_common_destruct_data(w2_1_3);
+   freia_common_destruct_data(w2_1_4);
+   freia_common_destruct_data(w2_1_5);
+   freia_common_destruct_data(w2_1_6);
+   freia_common_destruct_data(w2_1_7);
    do {                                                                 /*0882*/
       
       
@@ -5987,7 +6005,7 @@ digraph "dag_cleaned_2" {
 // graph for dag "freia_52_helper_0_0" of module "freia_52" in dot format
 digraph "freia_52_helper_0_0" {
   // inputs
-  "imWork1_9" [shape=circle];
+  "imWork1" [shape=circle];
   "imin" [shape=circle];
 
   // outputs
@@ -6022,12 +6040,12 @@ digraph "freia_52_helper_0_0" {
   "imin" -> "551 <";
   "547 D8" [shape=box];
   "547 D8" -> "551 <" [label="imWork1_8"];
-  "imWork1_9" -> "547 D8";
+  "imWork1" -> "547 D8";
 }
 // graph for dag "freia_52_helper_1_0" of module "freia_52" in dot format
 digraph "freia_52_helper_1_0" {
   // inputs
-  "imWork1_10" [shape=circle];
+  "imWork1" [shape=circle];
   "imin" [shape=circle];
 
   // outputs
@@ -6040,7 +6058,7 @@ digraph "freia_52_helper_1_0" {
   "607 *." -> "608 thr" [label="imout_tophatLinRecon"];
   "606 -" [shape=trapezium,orientation=270];
   "606 -" -> "607 *." [label="imout_tophatLinRecon_1"];
-  "imWork1_10" -> "606 -";
+  "imWork1" -> "606 -";
   "imin" -> "606 -";
 }
 // graph for dag "freia_52_helper_2_0" of module "freia_52" in dot format
@@ -6077,7 +6095,7 @@ digraph "freia_52_helper_2_0" {
   "347 D8" -> "348 D8" [label="w1_1_72"];
   "347 D8" -> "w1_1_72";
   "334 !" [shape=trapezium,orientation=270];
-  "334 !" -> "347 D8" [label="imWork1_11"];
+  "334 !" -> "347 D8" [label="imWork1_9"];
   "imin" -> "334 !";
 }
 // graph for dag "freia_52_helper_2_1" of module "freia_52" in dot format
@@ -6347,7 +6365,7 @@ freia_status freia_52_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`imWork1_9 [0 input 0] -> [0 poc 0] 547 dilate_8c
+  // 0`imWork1 [0 input 0] -> [0 poc 0] 547 dilate_8c
   // nope
   // poc 547 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -6523,7 +6541,7 @@ freia_status freia_52_helper_1_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`imWork1_10 [0 input 0] -> [0 alu] 606 sub
+  // 0`imWork1 [0 input 0] -> [0 alu] 606 sub
   // nope
   // 0`imin [0 input 1] -> [0 alu] 606 sub
   // nope
@@ -6626,10 +6644,10 @@ freia_status freia_52_helper_2_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 1
-  // 0`imWork1_11 [0 alu] -> [1 poc 0] 347 dilate_8c
+  // 0`imWork1_9 [0 alu] -> [1 poc 0] 347 dilate_8c
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // 0`imWork1_11 [1 input 0] -> [1 poc 0] 347 dilate_8c
+  // 0`imWork1_9 [1 input 0] -> [1 poc 0] 347 dilate_8c
   // nope
   // poc 347 dilate_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_DILATE;
@@ -11977,7 +11995,7 @@ digraph "dag_cleaned_2" {
 // graph for dag "freia_52_helper_0_0_0" of module "freia_52" in dot format
 digraph "freia_52_helper_0_0_0" {
   // inputs
-  "imWork1_2" [shape=circle];
+  "imWork1" [shape=circle];
   "imin" [shape=circle];
 
   // outputs
@@ -11991,12 +12009,12 @@ digraph "freia_52_helper_0_0_0" {
   "imin" -> "874 <";
   "868 D8" [shape=box];
   "868 D8" -> "874 <" [label="imWork1_1"];
-  "imWork1_2" -> "868 D8";
+  "imWork1" -> "868 D8";
 }
 // graph for dag "freia_52_helper_1_0_0" of module "freia_52" in dot format
 digraph "freia_52_helper_1_0_0" {
   // inputs
-  "imWork1_3" [shape=circle];
+  "imWork1" [shape=circle];
   "imin" [shape=circle];
 
   // outputs
@@ -12009,7 +12027,7 @@ digraph "freia_52_helper_1_0_0" {
   "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
   "886 -" -> "887 *." [label="imout_tophatLinRecon_1"];
-  "imWork1_3" -> "886 -";
+  "imWork1" -> "886 -";
   "imin" -> "886 -";
 }
 // graph for dag "freia_52_helper_2_0_0" of module "freia_52" in dot format
@@ -12070,7 +12088,7 @@ digraph "freia_52_helper_2_0_0" {
   "577 D8" -> "614 D8" [label="w1_1_72"];
   "577 D8" -> "578 D8" [label="w1_1_72"];
   "558 !" [shape=trapezium,orientation=270];
-  "558 !" -> "577 D8" [label="imWork1_4"];
+  "558 !" -> "577 D8" [label="imWork1_2"];
   "imin" -> "558 !";
 }
 // graph for dag "freia_52_helper_2_0_1" of module "freia_52" in dot format
@@ -12464,7 +12482,7 @@ freia_status freia_52_helper_0_0_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for imWork1_2
+  // - imagelet 1 is i0 for imWork1
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
@@ -12704,7 +12722,7 @@ freia_status freia_52_helper_1_0_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for imWork1_3
+  // - imagelet 1 is i0 for imWork1
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
