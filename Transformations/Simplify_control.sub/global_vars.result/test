@@ -1,6 +1,0 @@
-//
-// Initial code for module global_vars!
-//
-int size = 1000;
-
-int main();
