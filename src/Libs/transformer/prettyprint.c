@@ -78,18 +78,6 @@ relation_to_string(
     return string_undefined;
 }
 
-const char * pips_user_value_name(entity e)
-{
-    if(e == (entity) TCST) {
-	return "";
-    }
-    else {
-	(void) gen_check((gen_chunk *) e, entity_domain);
-	return entity_has_values_p(e)? entity_minimal_name(e) :
-	    external_value_name(e);
-    }
-}
-
 const char * generic_value_name(entity e)
 {
   const char* n = string_undefined;
