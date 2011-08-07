@@ -352,6 +352,35 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
   return true;
 }
 
+/****************************************** SORT LIST OF EXTRACTED SEQUENCES */
+
+static hash_table fsi_number = NULL;
+
+static _int min_statement(list ls)
+{
+  _int min = -1;
+  FOREACH(statement, s, ls)
+    min = (min==-1)? statement_number(s):
+    (min<statement_number(s)? min: statement_number(s));
+  return min;
+}
+
+static int fsi_cmp(list * l1, list * l2)
+{
+  return (int) ((_int) hash_get(fsi_number, *l1) -
+                (_int) hash_get(fsi_number, *l2));
+}
+
+static void fsi_sort(list lls)
+{
+  pips_assert("static fsi_number is clean", !fsi_number);
+  fsi_number = hash_table_make(hash_pointer, 0);
+  FOREACH(list, ls, lls)
+    hash_put(fsi_number, ls, (void*) min_statement(ls));
+  gen_sort_list(lls, (gen_cmp_func_t) fsi_cmp);
+  hash_table_free(fsi_number), fsi_number = NULL;
+}
+
 /**************************************************************** DO THE JOB */
 
 /* freia_compile:
@@ -393,6 +422,8 @@ string freia_compile(string module, statement mod_stat, string target)
     gen_context_recurse(mod_stat, &fsi,
                         sequence_domain, sequence_flt, gen_null);
   }
+  // sort sequences by increasing statement numbers
+  fsi_sort(fsi.seqs);
 
   // output file if any
   string file = NULL;
