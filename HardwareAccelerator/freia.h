@@ -72,6 +72,7 @@ extern freia_status freia_cipo_gradient(freia_data2d *, const freia_data2d *, in
 extern freia_status freia_cipo_inner_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
 extern freia_status freia_cipo_close(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
 extern freia_status freia_cipo_open(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
+extern freia_status freia_cipo_fast_correlation(freia_data2d *, const freia_data2d *, const freia_data2d *, uint32_t);
 
 // AIPO function definitions
 // Arithmetic
