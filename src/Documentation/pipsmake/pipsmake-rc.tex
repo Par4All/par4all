@@ -9965,11 +9965,13 @@ FREIA_PIXEL_SIZE 16
 \subsection{SPoC}
 \label{hwac-spoc}
 
+FREIA Compiler for SPoC target.
+Consider applying  \verb|freia_unroll_while| beforehand.
+
 \begin{PipsMake}
 freia_spoc_compiler	> MODULE.code
 			> MODULE.callees
 			> MODULE.spoc_file
-        ! MODULE.freia_unroll_while
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
