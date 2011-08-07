@@ -1,0 +1,73 @@
+
+Source code with transformers
+
+
+//  T(main) {main==0}
+
+int main(void)
+{
+
+//  T(bla) {}
+
+   int bla;
+
+//  T() {}
+
+   int *pbla;
+
+//  T(b) {b==1}
+
+   _Bool b = 1;
+
+//  T() {}
+
+
+   pbla = &bla;
+
+//  T(b,bla) {}
+
+   // kill all preconditions
+   *pbla = 1;
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int bla;
+
+//  P(bla) {}
+
+   int *pbla;
+
+//  P(bla) {}
+
+   _Bool b = 1;
+
+//  P(b,bla) {b==1}
+
+
+   pbla = &bla;
+
+//  P(b,bla) {b==1}
+
+   // kill all preconditions
+   *pbla = 1;
+
+//  P(b,bla) {}
+
+
+   return 0;
+}
+
