@@ -54,14 +54,18 @@ extern freia_status freia_common_draw_line(freia_data2d *, int32_t, int32_t, int
 extern freia_status freia_common_draw_rect(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
 extern freia_status freia_common_draw_disc(freia_data2d *, int32_t, int32_t, int32_t, int32_t);
 extern freia_status freia_common_set_wa(freia_data2d *, int32_t, int32_t, int32_t, int32_t);
+extern freia_status freia_common_get_wa(const freia_data2d *, int32_t *, int32_t *, int32_t *, int32_t *);
 extern freia_status freia_common_reset_wa(freia_data2d *);
 
 // Misc
 extern void freia_initialize(int, char **);
 extern void freia_shutdown(void);
-extern int32_t freia_common_get(freia_data2d *, int32_t, int32_t);
+
 extern freia_ptr freia_common_alloc(uint32_t);
 extern void freia_common_free(freia_ptr);
+
+extern int32_t freia_common_get(const freia_data2d *, int32_t, int32_t);
+extern void freia_common_set(freia_data2d *, int32_t, int32_t, int32_t);
 
 // some CIPO functions
 extern freia_status freia_cipo_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);

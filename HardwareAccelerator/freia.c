@@ -22,9 +22,14 @@ freia_status freia_common_destruct_data(freia_data2d * img)
   return FREIA_OK;
 }
 
-int32_t freia_common_get(freia_data2d * img, int32_t i, int32_t j)
+int32_t freia_common_get(const freia_data2d * img, int32_t i, int32_t j)
 {
   return img->stuff + i + j;
+}
+
+void freia_common_set(freia_data2d * img, int32_t i, int32_t j, int32_t v)
+{
+  img->stuff += (i+j+v);
 }
 
 freia_ptr freia_common_alloc(uint32_t s)
@@ -115,6 +120,16 @@ freia_status freia_common_set_wa(freia_data2d *image,
    int32_t x1, int32_t y1, int32_t w, int32_t h)
 {
   image->stuff += x1+y1+w+h;
+  return FREIA_OK;
+}
+
+freia_status freia_common_get_wa(const freia_data2d *image,
+   int32_t * x, int32_t * y, int32_t * w, int32_t * h)
+{
+  *x = image->xStartWa;
+  *y = image->yStartWa;
+  *w = image->widthWa;
+  *h = image->heightWa;
   return FREIA_OK;
 }
 
