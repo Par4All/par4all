@@ -1,0 +1,2 @@
+t1 not extracted from SPoC (dag output bad computation)
+if is lost, sub not seen, possibly because not in a sequence.
