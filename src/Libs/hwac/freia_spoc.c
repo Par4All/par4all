@@ -2222,6 +2222,8 @@ list freia_spoc_compile_calls
 
   int n_spoc_calls = 0;
   int n_pipes = 0;
+  int stnb = -1;
+
   FOREACH(dag, d, ld)
   {
     // skip non implemented stuff
@@ -2258,8 +2260,8 @@ list freia_spoc_compile_calls
 
       freia_spoc_pipeline(module, fname_split, code, d, &lparams,
                           output_images);
-      freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                      ls, fname_split, lparams);
+      stnb = freia_substitute_by_helper_call(d, global_remainings, remainings,
+                                             ls, fname_split, lparams, stnb);
 
       free(fname_split), fname_split = NULL;
     }

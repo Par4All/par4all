@@ -1363,8 +1363,9 @@ static void freia_terapix_call
 /******************************************************************* ONE DAG */
 
 /* generate terapix code for this one dag, which should be already split.
+ * return the statement number of the helper insertion
  */
-static void freia_trpx_compile_one_dag(
+static int freia_trpx_compile_one_dag(
   string module,
   list /* of statements */ ls,
   dag d,
@@ -1372,7 +1373,8 @@ static void freia_trpx_compile_one_dag(
   int n_split,
   int n_cut,
   set global_remainings,
-  FILE * helper_file)
+  FILE * helper_file,
+  int stnb)
 {
   ifdebug(4) {
     dag_consistency_asserts(d);
@@ -1402,11 +1404,13 @@ static void freia_trpx_compile_one_dag(
   string_buffer_free(&code);
 
   // - and substitute its call...
-  freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                  ls, fname_dag, lparams);
+  stnb = freia_substitute_by_helper_call(d, global_remainings, remainings,
+                                         ls, fname_dag, lparams, stnb);
 
   // cleanup
   free(fname_dag), fname_dag = NULL;
+
+  return stnb;
 }
 
 /************************************************** TERAPIX DAG SCALAR SPLIT */
@@ -1696,7 +1700,7 @@ split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx),
   while (set_size(current));
 
   free_dag(dall);
-  return ld;
+  return gen_nreverse(ld);
 }
 
 /*********************************************************** TERAPIX DAG CUT */
@@ -1910,6 +1914,8 @@ list freia_trpx_compile_calls
   set_assign_list(global_remainings, ls);
 
   int n_split = 0;
+  int stnb = -1;
+
   FOREACH(dag, d, ld)
   {
     // skip if something is not implemented
@@ -1922,8 +1928,8 @@ list freia_trpx_compile_calls
     if (trpx_dag_cut_none_p(dag_cut))
     {
       // direct handling of the dag
-      freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split, -1,
-                                 global_remainings, helper_file);
+      stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
+                                   -1, global_remainings, helper_file, stnb);
     }
     else if (trpx_dag_cut_compute_p(dag_cut))
     {
@@ -1941,14 +1947,14 @@ list freia_trpx_compile_calls
       {
         dag dc = cut_perform(d, cut, erosion, fulld, output_images);
         // generate code for cut
-        freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag, n_split,
-                                   n_cut++, global_remainings, helper_file);
+        stnb = freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag,
+                  n_split, n_cut++, global_remainings, helper_file, stnb);
         // cleanup
         free_dag(dc);
         hash_table_clear(erosion);
       }
-      freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
-                                 n_cut++, global_remainings, helper_file);
+      stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
+                                n_cut++, global_remainings, helper_file, stnb);
       hash_table_free(erosion);
     }
     else if (trpx_dag_cut_enumerate_p(dag_cut))

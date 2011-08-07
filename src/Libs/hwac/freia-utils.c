@@ -906,20 +906,23 @@ bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
   return same;
 }
 
-/* freia_statement_by_helper_call
- * substitute those statement in ls that are in dag d and accelerated
+/* substitute those statement in ls that are in dag d and accelerated
  * by a call to function_name(lparams)
  * also update sets of remainings and global_remainings
+ * the function must chose one of the statements?
+ * ??? ISTM that something intelligent needs to be done for code generation,
+ * instead of these pseudo-random substitutions...
  */
-void freia_substitute_by_helper_call
-  (dag d,
-   set global_remainings,
-   set remainings,
-   list /* of statement */ ls,
-   string function_name,
-   list lparams)
+int freia_substitute_by_helper_call(
+  dag d,
+  set global_remainings,
+  set remainings,
+  list /* of statement */ ls,
+  string function_name,
+  list lparams,
+  int preceeding)
 {
-  // statements that are not yet computed in d...
+  // buid the set of statements that are not yet computed
   set not_dones = set_make(set_pointer), dones = set_make(set_pointer);
   FOREACH(dagvtx, vs, dag_vertices(d))
   {
@@ -927,23 +930,36 @@ void freia_substitute_by_helper_call
     if (pstatement_statement_p(ps))
       set_add_element(not_dones, not_dones, pstatement_statement(ps));
   }
+  // dones: those statements which are handled by this helper
   set_difference(dones, remainings, not_dones);
+  // now update remainings & global_remainings
   set_difference(remainings, remainings, dones);
   set_difference(global_remainings, global_remainings, dones);
 
-  // replace first statement of dones in ls ???
-  statement found = NULL;
+  // replace first statement of dones in ls,
+  // which comes after the preceeding ones
+  statement found = NULL, sos = NULL;
   FOREACH(statement, sc, ls)
   {
     pips_debug(5, "in statement %" _intFMT "\n", statement_number(sc));
     if (set_belong_p(dones, sc))
     {
-      pips_assert("statement is a call", statement_call_p(sc));
-      if (found)
-        found = statement_number(sc)<statement_number(found)? sc: found;
-      else
-        found = sc;
+      sos = sos? (statement_number(sc)<statement_number(sos)? sc: sos): sc;
+      if (statement_number(sc)>preceeding)
+      {
+        pips_assert("statement is a call", statement_call_p(sc));
+        found = found?
+          (statement_number(sc)<statement_number(found)? sc: found): sc;
+      }
     }
+  }
+
+  if (!found)
+  {
+    pips_user_warning("no statement found after preceeding insertion, "
+                      "using first statement as backup...\n");
+    // use backup
+    found = sos;
   }
 
   pips_assert("some statement found", found);
@@ -972,6 +988,8 @@ void freia_substitute_by_helper_call
 
   set_free(not_dones);
   set_free(dones);
+
+  return statement_number(found);
 }
 
 static statement find_last_aipo_statement(list ls)
