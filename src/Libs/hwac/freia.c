@@ -354,8 +354,6 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
 
 /****************************************** SORT LIST OF EXTRACTED SEQUENCES */
 
-static hash_table fsi_number = NULL;
-
 static _int min_statement(list ls)
 {
   _int min = -1;
@@ -365,7 +363,9 @@ static _int min_statement(list ls)
   return min;
 }
 
-static int fsi_cmp(list * l1, list * l2)
+static hash_table fsi_number = NULL;
+
+static int fsi_cmp(const list * l1, const list * l2)
 {
   return (int) ((_int) hash_get(fsi_number, *l1) -
                 (_int) hash_get(fsi_number, *l2));
