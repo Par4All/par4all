@@ -581,8 +581,8 @@ int freia_60(freia_dataio *in, freia_dataio *out)
    
    // computation
    freia_60_helper_0_0_0(im1, im2, im1, im2, 150, 200);                 /*0020*/
-   freia_60_helper_0_2_0(im3, im3, im4, 250);                           /*0022*/
    freia_60_helper_0_1_0(im4, im1, im2);                                /*0023*/
+   freia_60_helper_0_2_0(im3, im3, im4, 250);                           /*0024*/
    
    // output images
    freia_common_tx_image(im1, out);                                     /*0027*/
@@ -618,8 +618,8 @@ int freia_60(freia_dataio *in, freia_dataio *out)
    
    // computation
    freia_60_helper_0_0_0(im1, im2, im1, im2, 150, 200);                 /*0020*/
-   freia_60_helper_0_2_0(im3, im3, im4, 250);                           /*0022*/
    freia_60_helper_0_1_0(im4, im1, im2);                                /*0023*/
+   freia_60_helper_0_2_0(im3, im3, im4, 250);                           /*0024*/
    
    // output images
    freia_common_tx_image(im1, out);                                     /*0027*/
