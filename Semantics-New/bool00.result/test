@@ -1,4 +1,23 @@
 
+Source code with cumulated effects
+
+int main(void)
+{
+   int bla;
+   int *pbla;
+//             <    is written>: b
+   _Bool b = 1;
+//             <    is written>: pbla
+
+   pbla = &bla;
+//             <    is read   >: pbla
+//             <    is written>: bla
+   // kill all preconditions
+   *pbla = 1;
+
+   return 0;
+}
+
 Source code with transformers
 
 
@@ -24,7 +43,7 @@ int main(void)
 
    pbla = &bla;
 
-//  T(b,bla) {}
+//  T(bla) {}
 
    // kill all preconditions
    *pbla = 1;
@@ -65,7 +84,7 @@ int main(void)
    // kill all preconditions
    *pbla = 1;
 
-//  P(b,bla) {}
+//  P(b,bla) {b==1}
 
 
    return 0;

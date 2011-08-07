@@ -1,11 +1,23 @@
 delete bool00
+
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create bool00 bool00.c
 
 #setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 #setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT  TRUE
+
 setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+
+activate CUMULATED_POINTER_EFFECTS_WITH_POINTS_TO
+activate PROPER_EFFECTS_WITH_POINTS_TO
+
+echo
+echo Source code with cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
 
 echo
 echo Source code with transformers
