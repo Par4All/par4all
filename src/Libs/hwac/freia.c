@@ -456,8 +456,16 @@ string freia_compile(string module, statement mod_stat, string target)
   set output_images = freia_compute_current_output_images();
 
   int n_dags = 0;
+  bool compile_lone = get_bool_property("FREIA_COMPILE_LONE_OPERATIONS");
   FOREACH(list, ls, fsi.seqs)
   {
+    // maybe skip lone operations
+    if (!compile_lone && gen_length(ls)==1)
+    {
+      n_dags++;
+      continue;
+    }
+
     list allocated = NIL;
 
     if (freia_spoc_p(target))
