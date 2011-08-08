@@ -6,7 +6,18 @@
 #ifndef NULL
 #define NULL ((void*)0)
 #endif // NULL
+// hmmm... override some defines?
+#ifdef false
+#undef false
+#endif // false
+#ifdef true
+#undef true
+#endif // true
+#ifdef bool
+#undef bool
+#endif // bool
 typedef enum { false, true } bool;
+// integer types
 typedef int int32_t;
 typedef unsigned int uint32_t; // ??? for convolution & correlation
 typedef struct {
