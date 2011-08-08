@@ -1,0 +1,2 @@
+Since foo is a function, foo is a constant. The memory is not read at foo. When a symbol is referenced,
+the effect analysis should detect functional symbols and not generate a read effect.

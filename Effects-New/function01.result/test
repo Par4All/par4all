@@ -1,0 +1,13 @@
+void function01()
+{
+   int f(int);
+   int j;
+//             <    is read   >: f foo
+
+   if (f==foo)
+//             <    is read   >: i
+//             <    is written>: j
+      j = foo(i);
+
+   return;
+}
