@@ -132,24 +132,21 @@ set_control_statement_father(control c)
 static void
 build_statement_to_statement_father_mapping(statement s)
 {
-   pips_debug(4, "build_statement_to_statement_father_mapping statement %p (%#zx)\n",
-              s, statement_ordering(s));
+  pips_debug(4, "statement %p (%#zx)\n", s, statement_ordering(s));
 
-   make_current_statement_stack();
-   /* The first statement has no father: */
-   current_statement_push(statement_undefined);
-   
-   gen_multi_recurse(s, statement_domain,
-                     /* Just push the current statement on the
-                        current_statement_stack: */
-                     current_statement_filter,
-                     add_statement_to_the_statement_to_statement_father_mapping,
-                     /* Build a mapping from a statement to its
-                        eventual control father. */
-                     control_domain, gen_true, set_control_statement_father,
-                     NULL);
+  make_current_statement_stack();
+  // The first statement has no father:
+  current_statement_push(statement_undefined);
 
-   free_current_statement_stack();
+  gen_multi_recurse(s, statement_domain,
+         // Just push the current statement on the current_statement_stack:
+                    current_statement_filter,
+                    add_statement_to_the_statement_to_statement_father_mapping,
+         // Build a mapping from a statement to its eventual control father.
+                    control_domain, gen_true, set_control_statement_father,
+                    NULL);
+
+  free_current_statement_stack();
 }
 
 
@@ -158,86 +155,72 @@ build_statement_to_statement_father_mapping(statement s)
 static void
 build_statement_to_statement_dependence_mapping(graph dependence_graph)
 {
-   statements_use_def_dependence = hash_table_make(hash_pointer, 0);
-   
-   MAP(VERTEX,
-       a_vertex,
-       {
-          statement s1 = vertex_to_statement(a_vertex);
+  statements_use_def_dependence = hash_table_make(hash_pointer, 0);
 
-          debug(7, "build_statement_to_statement_dependence_mapping",
-                "\tSuccessor list: %p for statement ordering %p\n", 
-                vertex_successors(a_vertex),
-                dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
-          MAP(SUCCESSOR, a_successor,
-              {
-                 vertex v2 = successor_vertex(a_successor);
-                 statement s2 = vertex_to_statement(v2);
-                 dg_arc_label an_arc_label = successor_arc_label(a_successor);
-                 pips_debug(7, "\t%p (%#zx) --> %p (%#zx) with conflicts\n",
-                            s1, statement_ordering(s1),
-                            s2, statement_ordering(s2));
-                 /* Try to find at least one of the use-def chains between
-                    s and a successor: */
-                 MAP(CONFLICT, a_conflict,
-                     {
-                        statement use;
-                        statement def;
-                        
-                        ifdebug(7)
-                           {
-                              fprintf(stderr, "\t\tfrom ");
-                              print_words(stderr, words_effect(conflict_source(a_conflict)));
-                              fprintf(stderr, " to ");
-                              print_words(stderr, words_effect(conflict_sink(a_conflict)));
-                              fprintf(stderr, "\n");
-                           }
-                    
-                        /* Something is useful for the current statement if
-                           it writes something that is used in the current
-                           statement: */
-                        if (action_write_p(effect_action(conflict_source(a_conflict)))
-                                 && action_read_p(effect_action(conflict_sink(a_conflict)))) {
-                           def = s1;
-                           use = s2;
-                           /* Mark that we will visit the node that defined a
-                              source for this statement, if not already
-                              visited: */
-                           set statements_set =
-                              (set) hash_get(statements_use_def_dependence,
-                                             (char *) use);
-                                       
-                           if (statements_set == (set) HASH_UNDEFINED_VALUE) {
-                              /* It is the first dependence we found
-                                 for s1. Create the set: */
-                              statements_set = set_make(set_pointer);
-                              hash_put(statements_use_def_dependence,
-                                       (char *) use,
-                                       (char *) statements_set);
-                           }
+  FOREACH(vertex, a_vertex, graph_vertices(dependence_graph))
+  {
+    statement s1 = vertex_to_statement(a_vertex);
 
-                           /* Mark the fact that s2 create something
-                              useful for s1: */
-                           set_add_element(statements_set,
-                                           statements_set,
-                                           (char *) def);
+    pips_debug(7, "build_statement_to_statement_dependence_mapping",
+               "\tSuccessor list: %p for statement ordering %p\n",
+               vertex_successors(a_vertex),
+               dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
 
-                           ifdebug(6)
-                              fprintf(stderr, "\tUse: statement %p (%#zx). Def: statement %p (%#zx).\n",
-                                      use, statement_ordering(use),
-                                      def, statement_ordering(def));
-                           /* One use-def is enough for this variable
-                              couple: */
-                           break;
-                        }
-                        
-                     },
-                        dg_arc_label_conflicts(an_arc_label));
-              },
-                 vertex_successors(a_vertex));
+    FOREACH(successor, a_successor, vertex_successors(a_vertex))
+    {
+      vertex v2 = successor_vertex(a_successor);
+      statement s2 = vertex_to_statement(v2);
+      dg_arc_label an_arc_label = successor_arc_label(a_successor);
+      pips_debug(7, "\t%p (%#zx) --> %p (%#zx) with conflicts\n",
+                 s1, statement_ordering(s1),
+                 s2, statement_ordering(s2));
+      // Try to find at least one of the use-def chains
+      // between s and a successor:
+      FOREACH(conflict, a_conflict, dg_arc_label_conflicts(an_arc_label))
+      {
+        statement use, def;
 
-       },
-          graph_vertices(dependence_graph));
+        ifdebug(7)
+        {
+          fprintf(stderr, "\t\tfrom ");
+          print_words(stderr, words_effect(conflict_source(a_conflict)));
+          fprintf(stderr, " to ");
+          print_words(stderr, words_effect(conflict_sink(a_conflict)));
+          fprintf(stderr, "\n");
+        }
+
+        // Something is useful for the current statement
+        // if it writes something that is used in the current statement:
+        if (action_write_p(effect_action(conflict_source(a_conflict)))
+            && action_read_p(effect_action(conflict_sink(a_conflict)))) {
+          def = s1;
+          use = s2;
+          // Mark that we will visit the node that defined a
+          // source for this statement, if not already visited:
+          set statements_set =
+            (set) hash_get(statements_use_def_dependence, (void *) use);
+
+          if (statements_set == (set) HASH_UNDEFINED_VALUE) {
+            // It is the first dependence we found for s1. Create the set:
+            statements_set = set_make(set_pointer);
+            hash_put(statements_use_def_dependence,
+                     (void *) use, (void *) statements_set);
+          }
+
+          // Mark the fact that s2 create something useful for s1:
+          set_add_element(statements_set, statements_set, (void *) def);
+
+          ifdebug(6)
+            fprintf(stderr, "\tUse: statement %p (%#zx). "
+                    "Def: statement %p (%#zx).\n",
+                    use, statement_ordering(use),
+                    def, statement_ordering(def));
+          // One use-def is enough for this variable couple:
+          break;
+        }
+      }
+    }
+  }
 }
 
 
