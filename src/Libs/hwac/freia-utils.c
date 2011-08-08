@@ -994,6 +994,7 @@ int freia_substitute_by_helper_call(
 
 static statement find_last_aipo_statement(list ls)
 {
+  pips_assert("some statements", ls);
   statement found = NULL;
   FOREACH(statement, s, ls)
   {

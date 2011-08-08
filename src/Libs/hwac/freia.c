@@ -455,29 +455,45 @@ string freia_compile(string module, statement mod_stat, string target)
   hash_table occs = freia_build_image_occurrences(mod_stat, NULL);
   set output_images = freia_compute_current_output_images();
 
-  int n_dags = 0;
+  // first explicitely build and fix the list of dags,
+  // with some reverse order hocus-pocus for outputs computations...
+  list lsi = gen_nreverse(gen_copy_seq(fsi.seqs));
+  list ldags = NIL;
+  int n_dags = gen_length(fsi.seqs);
+  FOREACH(list, ls, lsi)
+  {
+    dag d = freia_build_dag(module, ls, --n_dags, occs, output_images, ldags);
+    ldags = CONS(dag, d, ldags);
+  }
+  gen_free_list(lsi), lsi = NIL;
+
+  list lcurrent = ldags;
+  n_dags = 0;
   bool compile_lone = get_bool_property("FREIA_COMPILE_LONE_OPERATIONS");
   FOREACH(list, ls, fsi.seqs)
   {
+    // get corresponding dag, which should be destroyed by the called compiler
+    dag d = DAG(CAR(lcurrent));
+    lcurrent = CDR(lcurrent);
+
     // maybe skip lone operations
     if (!compile_lone && gen_length(ls)==1)
     {
       n_dags++;
+      gen_free_list(ls);
       continue;
     }
 
     list allocated = NIL;
 
     if (freia_spoc_p(target))
-      allocated = freia_spoc_compile_calls(module, ls, occs, output_images,
+      allocated = freia_spoc_compile_calls(module, d, ls, occs, output_images,
                                            helper, n_dags);
     else if (freia_terapix_p(target))
-      allocated = freia_trpx_compile_calls(module, ls, occs, output_images,
+      allocated = freia_trpx_compile_calls(module, d, ls, occs, output_images,
                                            helper, n_dags);
     else if (freia_aipo_p(target))
-      allocated = freia_aipo_compile_calls(module, ls, occs, output_images,
-                                           n_dags);
-    gen_free_list(ls);
+      allocated = freia_aipo_compile_calls(module, d, ls, occs, n_dags);
 
     if (allocated)
     {
@@ -487,6 +503,10 @@ string freia_compile(string module, statement mod_stat, string target)
     }
 
     n_dags++;
+
+    // cleanup list contents on the fly
+    gen_free_list(ls);
+    free_dag(d);
   }
 
   // cleanup
@@ -494,6 +514,7 @@ string freia_compile(string module, statement mod_stat, string target)
   freia_close_dep_cache();
   set_free(output_images), output_images = NULL;
   gen_free_list(fsi.seqs);
+  gen_free_list(ldags);
   if (helper) safe_fclose(helper, file);
 
   return file;

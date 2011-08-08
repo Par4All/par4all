@@ -42,16 +42,14 @@
 
 list freia_aipo_compile_calls
 (string module,
+ dag fulld,
  list /* of statements */ ls,
  const hash_table occs,
- const set output_images,
  int number)
 {
-  // build DAG for ls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  dag fulld = freia_build_dag(module, ls, number, occs, output_images);
   list added_stats = freia_dag_optimize(fulld);
 
   // intermediate images
@@ -64,14 +62,13 @@ list freia_aipo_compile_calls
   // now may put actual allocations, which messes up statement numbers
   list reals = freia_allocate_new_images_if_needed(ls, new_images, occs, init);
 
-  // ??? append possibly extracted copies?
-  // should it be NIL because it is not useful in AIPO->AIPO?
+  // ??? should it be NIL because it is not useful in AIPO->AIPO?
   freia_insert_added_stats(ls, added_stats);
+  added_stats = NIL;
 
   // cleanup
   gen_free_list(new_images);
   hash_table_free(init);
-  free_dag(fulld);
 
   return reals;
 }

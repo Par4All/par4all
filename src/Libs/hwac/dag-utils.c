@@ -1185,6 +1185,7 @@ list /* of statements */ freia_dag_optimize(dag d)
 {
   list lstats = NIL;
   set remove = set_make(set_pointer);
+  size_t dag_output_count = gen_length(dag_outputs(d));
 
   ifdebug(6) {
     pips_debug(6, "considering dag:\n");
@@ -1527,6 +1528,9 @@ list /* of statements */ freia_dag_optimize(dag d)
     // dag_dot_dump_prefix("main", "cleaned", 0, d);
   }
 
+  pips_assert("right output count after optimizations",
+         gen_length(dag_outputs(d)) + gen_length(lstats)==dag_output_count);
+
   return lstats;
 }
 
@@ -1599,16 +1603,40 @@ static bool other_significant_uses
   return used;
 }
 
+/* hmmm...
+ */
+static bool variable_used_as_later_input(entity img, list ld)
+{
+  bool used = false;
+  FOREACH(dag, d, ld)
+  {
+    FOREACH(dagvtx, v, dag_inputs(d))
+    {
+      if (dagvtx_image(v)==img)
+      {
+        used = true;
+        break;
+      }
+    }
+    if (used) break;
+  }
+  pips_debug(8, "%s: %s\n", entity_name(img), used? "true": "false");
+  return used;
+}
+
 /* (re)compute the list of *GLOBAL* input & output images for this dag
  * ??? BUG the output is rather an approximation
  * should rely on used defs or out effects for the underlying
  * sequence. however, the status of chains and effects on C does not
- * allow it at the time.
+ * allow it at the time. again after a look at DG (FC 08/08/2011)
  * @param d dag to consider
  * @param occs statement image occurences, may be NULL
  * @param output_images images that are output, may be NULL
+ * @param ld list of some other dags, possibly NIL
  */
-void dag_compute_outputs(dag d, const hash_table occs, const set output_images)
+void dag_compute_outputs(
+  dag d,
+  const hash_table occs, const set output_images, const list ld)
 {
   set outvars = set_make(set_pointer);
   set outs = set_make(set_pointer);
@@ -1622,7 +1650,7 @@ void dag_compute_outputs(dag d, const hash_table occs, const set output_images)
     // skip special input nodes...
     if (dagvtx_number(v)!=0)
     {
-      // get entity produce by vertex
+      // get entity produced by vertex
       entity out = vtxcontent_out(c);
 
       pips_debug(8, "entity is %s\n", safe_entity_name(out));
@@ -1634,7 +1662,9 @@ void dag_compute_outputs(dag d, const hash_table occs, const set output_images)
            // all non-empty successors are measures?!
            (dagvtx_succs(v) && all_mesures_p(dagvtx_succs(v))) ||
            // new function parameter not yet an output
-           (formal_parameter_p(out) && !set_belong_p(outvars, out))))
+           (formal_parameter_p(out) && !set_belong_p(outvars, out)) ||
+           // hmmm... yet another hack for freia_61
+           (variable_used_as_later_input(out, ld))))
       {
         pips_debug(7, "appending %" _intFMT "\n", dagvtx_number(v));
         set_add_element(outvars, outvars, out);
@@ -1684,8 +1714,9 @@ static dagvtx find_twin_vertex(dag d, dagvtx target)
 /* catch some cases of missing outs between splits...
  * for "freia_scalar_03"...
  * I'm not that sure about the algorithm.
+ * This should rely be based on the CHAINS/DG, but the status still seems
+ * hopeless, as too many arcs currently kept (FC 08/08/2011)
  * @param dfull full dag
- * @param ld list of sub dags of d
  */
 void freia_hack_fix_global_ins_outs(dag dfull, dag d)
 {
@@ -1950,9 +1981,11 @@ static void dag_append_freia_call(dag d, statement s)
  * @param number dag identifier in function
  * @param occurrences entity -> set of statements where they appear
  * @param output_images set of images that are output
+ * @param ld list of other dags...
  */
-dag freia_build_dag(string module, list ls, int number,
-                    const hash_table occurrences, const set output_images)
+dag freia_build_dag(
+  string module, list ls, int number,
+  const hash_table occurrences, const set output_images, const list ld)
 {
   // build full dag
   dag fulld = make_dag(NIL, NIL, NIL);
@@ -1960,7 +1993,7 @@ dag freia_build_dag(string module, list ls, int number,
   FOREACH(statement, s, ls)
     dag_append_freia_call(fulld, s);
 
-  dag_compute_outputs(fulld, occurrences, output_images);
+  dag_compute_outputs(fulld, occurrences, output_images, ld);
 
   ifdebug(3) dag_dump(stderr, "fulld", fulld);
 
