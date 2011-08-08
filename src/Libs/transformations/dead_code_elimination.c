@@ -751,6 +751,7 @@ bool dead_code_elimination(char * module_name)
 {
   debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
   return dead_code_elimination_on_module(module_name);
+  debug_off();
 }
 
 
@@ -762,6 +763,7 @@ bool use_def_elimination(char * module_name)
 {
   debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
   return dead_code_elimination_on_module(module_name);
+  debug_off();
 }
 
 /* moved from ri-util/statements.c */
