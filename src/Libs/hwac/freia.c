@@ -271,8 +271,22 @@ typedef struct {
   list /* of list of statements */ seqs;
 } freia_info;
 
+/* detect one lone aipo statement out of a sequence...
+ */
+static bool fsi_stmt_flt(statement s, freia_info * fsip)
+{
+  if (freia_statement_aipo_call_p(s))
+  {
+    instruction i = (instruction) gen_get_ancestor(instruction_domain, s);
+    if (i && instruction_sequence_p(i)) return false;
+    // not a sequence handled by fsi_seq_flt...
+    fsip->seqs = CONS(list, CONS(statement, s, NIL), fsip->seqs);
+  }
+  return true;
+}
+
 /** consider a sequence */
-static bool sequence_flt(sequence sq, freia_info * fsip)
+static bool fsi_seq_flt(sequence sq, freia_info * fsip)
 {
   pips_debug(9, "considering sequence...\n");
 
@@ -411,17 +425,10 @@ string freia_compile(string module, statement mod_stat, string target)
   freia_init_dep_cache();
 
   // collect freia api functions...
-  if (statement_call_p(mod_stat))
-  {
-    // argh, there is only one statement in the code, and no sequence
-    if (freia_statement_aipo_call_p(mod_stat))
-      fsi.seqs = CONS(list, CONS(statement, mod_stat, NIL), NIL);
-  }
-  else // look for sequences
-  {
-    gen_context_recurse(mod_stat, &fsi,
-                        sequence_domain, sequence_flt, gen_null);
-  }
+  gen_context_multi_recurse(mod_stat, &fsi,
+                            sequence_domain, fsi_seq_flt, gen_null,
+                            statement_domain, fsi_stmt_flt, gen_null,
+                            NULL);
   // sort sequences by increasing statement numbers
   fsi_sort(fsi.seqs);
 
