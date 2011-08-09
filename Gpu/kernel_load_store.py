@@ -9,8 +9,8 @@ with vworkspace("include/p4a_stubs.c") as w:
 
   w.all_functions.privatize_module(concurrent=True)
   w.all_functions.coarse_grain_parallelization(concurrent=True)
+  w.all_functions.gpu_ify();
+  w.filter(lambda m: m.name.startswith("p4a_launcher")).kernel_load_store()
 
-  w.all_functions.validate_phases("gpu_ify");
-  w.filter(lambda m: m.name.startswith("p4a_launcher")).validate_phases("kernel_load_store")
-
+  w.all_functions.display()
 

@@ -1,0 +1,226 @@
+void P4A_accel_free(void *address)
+{
+   free(address);
+}
+void P4A_accel_malloc(void **address, size_t size)
+{
+   *address = malloc(size);
+}
+void P4A_copy_from_accel(size_t element_size, void *host_address, const void *accel_address)
+{
+   size_t i;
+   char *cdest = host_address;
+   const char *csrc = accel_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address)
+{
+   size_t i;
+   char *cdest = d1_offset*element_size+(char *) host_address;
+   const char *csrc = accel_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, const void *accel_address)
+{
+   size_t i, j;
+   char *cdest = d2_offset*element_size+(char *) host_address;
+   char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+         cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
+}
+void P4A_copy_from_accel_3d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, void *host_address, const void *accel_address)
+{
+   size_t i, j, k;
+   char *cdest = d3_offset*element_size+(char *) host_address;
+   const char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size-1; j += 1)
+         for(k = 0; k <= d3_block_size*element_size-1; k += 1)
+            cdest[((i+d1_offset)*d2_block_size+j+d2_offset)*element_size*d3_size+k] = csrc[(i*d2_block_size+j)*d3_block_size*element_size+k];
+}
+void P4A_copy_from_accel_4d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset, void *host_address, const void *accel_address)
+{
+   size_t i, j, k, l;
+   char *cdest = (char *) host_address;
+   const char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size-1; j += 1)
+         for(k = 0; k <= d3_block_size-1; k += 1)
+            for(l = 0; l <= d4_block_size-1; l += 1) {
+               int h_index = (i+d1_offset)*d2_size*d3_size*d4_size+(j+d2_offset)*d3_size*d4_size+(k+d3_offset)*d4_size+(l+d4_offset);
+               
+               
+               
+               int a_index = i*d2_block_size*d3_block_size*d4_block_size+j*d3_block_size*d4_block_size+k*d4_block_size+l;
+               cdest[h_index] = csrc[a_index];
+            }
+}
+void P4A_copy_to_accel(size_t element_size, const void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   const char *csrc = host_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, const void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   const char *csrc = d1_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, const void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = (char *) accel_address;
+   const char *csrc = d2_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+
+         cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
+}
+void P4A_copy_to_accel_3d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, const void *host_address, void *accel_address)
+{
+   size_t i, j, k;
+   char *cdest = (char *) accel_address;
+   const char *csrc = d3_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size-1; j += 1)
+         for(k = 0; k <= d3_block_size*element_size-1; k += 1)
+            cdest[(i*d2_block_size+j)*d3_block_size*element_size+k] = csrc[((i+d1_offset)*d2_block_size+j+d2_offset)*element_size*d3_size+k];
+}
+void P4A_copy_to_accel_4d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset, const void *host_address, void *accel_address)
+{
+   size_t i, j, k, l;
+   char *cdest = (char *) accel_address;
+   const char *csrc = (char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size-1; j += 1)
+         for(k = 0; k <= d3_block_size-1; k += 1)
+            for(l = 0; l <= d4_block_size-1; l += 1) {
+               int h_index = (i+d1_offset)*d2_size*d3_size*d4_size+(j+d2_offset)*d3_size*d4_size+(k+d3_offset)*d4_size+(l+d4_offset);
+               
+               
+               
+               int a_index = i*d2_block_size*d3_block_size*d4_block_size+j*d3_block_size*d4_block_size+k*d4_block_size+l;
+               cdest[a_index] = csrc[h_index];
+            }
+}
+void do_one_iteration(int m, int n, IMAGE_RGB x[m][n], RGB ui[m][n], RGB uj[m][n], int q, FLOAT weights[q][q], FLOAT kInv[3][3], FLOAT alpha)
+{
+   // Offset to take 0..(q-1) to zero-center coordinates,
+   // [-r .. r] where r = (q-1)/2
+   int qofs = (int) q/(-2);
+   {
+      //PIPS generated variable
+      FLOAT (*P4A_var_kInv0)[3][3] = (FLOAT (*)[3][3]) 0, (*P4A_var_ui0)[m][n][3] = (RGB (*)[m][n][3]) 0, (*P4A_var_uj0)[m][n][3] = (RGB (*)[m][n][3]) 0, (*P4A_var_weights0)[q][q] = (FLOAT (*)[q][q]) 0;
+      //PIPS generated variable
+      IMAGE_RGB (*P4A_var_x0)[m][n][3] = (IMAGE_RGB (*)[m][n][3]) 0;
+      P4A_accel_malloc((void **) &P4A_var_x0, sizeof(unsigned char)*m*n*3);
+      P4A_accel_malloc((void **) &P4A_var_weights0, sizeof(float)*q*q);
+      P4A_accel_malloc((void **) &P4A_var_uj0, sizeof(float)*m*n*3);
+      P4A_accel_malloc((void **) &P4A_var_ui0, sizeof(float)*m*n*3);
+      P4A_accel_malloc((void **) &P4A_var_kInv0, sizeof(float)*9);
+      P4A_copy_to_accel_4d(sizeof(unsigned char), m, n, 3, m, n, 3, 0, 0, 0, &x[0][0][0], *P4A_var_x0);
+      P4A_copy_to_accel_2d(sizeof(float), q, q, q, q, 0, 0, &weights[0][0], *P4A_var_weights0);
+      P4A_copy_to_accel_4d(sizeof(float), m, n, 3, m, n, 3, 0, 0, 0, &ui[0][0][0], *P4A_var_ui0);
+      P4A_copy_to_accel_2d(sizeof(float), 3, 3, 3, 3, 0, 0, &kInv[0][0], *P4A_var_kInv0);
+
+      p4a_launcher_do_one_iteration(m, n, q, qofs, alpha, *P4A_var_kInv0, *P4A_var_ui0, *P4A_var_uj0, *P4A_var_weights0, *P4A_var_x0);
+      P4A_copy_from_accel_4d(sizeof(float), m, n, 3, m, n, 3, 0, 0, 0, &uj[0][0][0], *P4A_var_uj0);
+      P4A_accel_free(P4A_var_x0);
+      P4A_accel_free(P4A_var_weights0);
+      P4A_accel_free(P4A_var_uj0);
+      P4A_accel_free(P4A_var_ui0);
+      P4A_accel_free(P4A_var_kInv0);
+   }
+}
+FLOAT error(FLOAT x)
+{
+   return step(x)-x;
+}
+static FLOAT step(FLOAT x)
+{
+   return 0.5f*(1.0f+tanhf(M*(x-0.5f)));
+}
+void p4a_kernel_do_one_iteration(int m, int n, int q, int j, int i, int qofs, FLOAT alpha, FLOAT kInv[3][3], RGB ui[m][n], RGB uj[m][n], FLOAT weights[q][q], IMAGE_RGB x[m][n])
+{
+   
+   // Error convolution.
+   RGB err = {0, 0, 0};
+   {
+      int s;
+      for(s = 0; s <= q-1; s += 1) {
+         int t;
+         for(t = 0; t <= q-1; t += 1) {
+            int i_q = i+qofs+s;
+            int j_q = j+qofs+t;
+            
+            // Clamp error to 0 when kernel point is outside image.
+            if (0<=i_q&&i_q<m&&0<=j_q&&j_q<=n) {
+               int k;
+               for(k = 0; k <= 2; k += 1)
+                  err[k] += weights[s][t]*error(ui[i_q][j_q][k]);
+            }
+         }
+      }
+   }
+   // for s
+   
+   // Error signal for middle of kernel is handled specially.
+   RGB err0;
+   {
+      int k;
+      for(k = 0; k <= 2; k += 1)
+         err0[k] = err[k]-error(ui[i][j][k]);
+   }
+   {
+      int s;
+      
+      // Color mixing to obtain final error signal.
+      for(s = 0; s <= 2; s += 1) {
+         int t;
+         for(t = 0; t <= 2; t += 1)
+            err[s] += kInv[s][t]*err0[t];
+      }
+   }
+   {
+      int k;
+      
+      // Result.
+      for(k = 0; k <= 2; k += 1)
+         uj[i][j][k] = (1.0f-alpha)*ui[i][j][k]+alpha*((FLOAT) (1./256.)*x[i][j][k]-err[k]);
+   }
+}
+void p4a_launcher_do_one_iteration(int m, int n, int q, int qofs, FLOAT alpha, FLOAT kInv[3][3], RGB ui[m][n], RGB uj[m][n], FLOAT weights[q][q], IMAGE_RGB x[m][n])
+{
+   //PIPS generated variable
+   RGB err = {0, 0, 0}, err0;
+   {
+      int i;
+      
+      // Loops over the entire 2d signal
+      for(i = 0; i <= m-1; i += 1) {
+         int j;
+         for(j = 0; j <= n-1; j += 1)
+            // To be assigned to a call to P4A_vp_1: i
+            // To be assigned to a call to P4A_vp_0: j
+            p4a_wrapper_do_one_iteration(m, n, q, j, i, qofs, alpha, kInv, ui, uj, weights, x);
+      }
+   }
+}
+void p4a_wrapper_do_one_iteration(int m, int n, int q, int j, int i, int qofs, FLOAT alpha, FLOAT kInv[3][3], RGB ui[m][n], RGB uj[m][n], FLOAT weights[q][q], IMAGE_RGB x[m][n])
+{
+   // To be assigned to a call to P4A_vp_1: i
+   // To be assigned to a call to P4A_vp_0: j
+   p4a_kernel_do_one_iteration(m, n, q, j, i, qofs, alpha, kInv, ui, uj, weights, x);
+}
+FLOAT uniform_random(FLOAT min, FLOAT max)
+{
+   return min+(max-min)*rand()/((FLOAT) RAND_MAX);
+}
