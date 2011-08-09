@@ -1,0 +1,22 @@
+void function02()
+{
+//             <    is written>: f
+//             <    is referenced>: f
+//             <    is declared>: f
+   int (*f)(int) = foo;
+//             <    is declared>: j
+   int j;
+//             <    is read   >: f
+//             <    is referenced>: f foo
+
+   if (f==foo)
+//             <    is written>: j
+//             <    is referenced>: j
+      j = foo(2);
+   else
+//             <    is written>: f
+//             <    is referenced>: f foo
+      f = foo;
+
+   return;
+}
