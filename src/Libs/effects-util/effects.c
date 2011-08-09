@@ -218,7 +218,7 @@ bool effect_abstract_location_p(effect eff)
 bool cell_abstract_location_p(cell c)
 {
   pips_assert("cell is not a GAP", !cell_gap_p(c));
-  
+
   return (entity_abstract_location_p(reference_variable(cell_any_reference(c))));
 }
 

@@ -1403,6 +1403,14 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 			free_effect(e);
 		      }
 		  }
+		else if (type_functional_p(addexp_t))
+		  {
+		    // FI: we must have bumped into a pointer to a
+		    // function. It may be dereferenced or not. See
+		    // Effects-New/function03
+		    print_expression(addexp);
+		    pips_internal_error("case of address expression not handled yet\n");
+		  }
 		else
 		  {
 		    pips_internal_error("case not handled yet ");
@@ -1543,8 +1551,22 @@ generic_proper_effects_of_expression(expression e)
 	    ENTITY_POINT_TO_P(op) ||
 	    ENTITY_DEREFERENCING_P(op))
 	  le = generic_proper_effects_of_address_expression(e, false);
-	else
+	else {
 	  le = generic_r_proper_effects_of_call(syntax_call(s));
+	  if(entity_variable_p(op)) {
+	    /* op is a pointer to a function. A memory read effect
+	       must be added as this is in fact a read reference. See
+	       Effects-new/function03.c */
+	    reference r = make_reference(op, NIL);
+	    list ople = generic_proper_effects_of_read_reference(r);
+	    // FI: by default, a preference will be used. This
+	    //artifical reference cannot be freed. I whish there would
+	    //be a cleaner way to do this:
+	    // generic_proper_effects_of_read_entity()?
+	    //free_reference(r);
+	    le = gen_nconc(ople, le);
+	  }
+	}
 	break;
       }
     case is_syntax_cast:
