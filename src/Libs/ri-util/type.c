@@ -2412,6 +2412,21 @@ bool array_type_p(type t)
   return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
 }
 
+bool variable_length_array_type_p(type t)
+{
+  bool return_val = false;
+  if(array_type_p(t)) {
+    FOREACH(dimension,dim,variable_dimensions(type_variable(t))) {
+      if(!extended_expression_constant_p(dimension_lower(dim)) ||
+          !extended_expression_constant_p(dimension_upper(dim))) {
+        return_val=true;
+        break;
+      }
+    }
+  }
+  return return_val;
+}
+
 bool pointer_type_p(type t)
 {
   return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
