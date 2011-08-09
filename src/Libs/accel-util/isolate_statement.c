@@ -119,7 +119,9 @@ static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, l
       entity e = reference_variable(region_any_reference(eff));
       /* create dummy empty effects */
       effects dumbo = make_effects(NIL);
+      set_live_loop_indices();
       partial_eval_declaration(e,predicate_system(transformer_relation(tr)),dumbo);
+      reset_live_loop_indices();
       free_effects(dumbo);
       descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
     }
