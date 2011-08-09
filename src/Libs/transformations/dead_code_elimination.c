@@ -161,10 +161,10 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
   {
     statement s1 = vertex_to_statement(a_vertex);
 
-    pips_debug(7, "build_statement_to_statement_dependence_mapping",
+    pips_debug(7, "build_statement_to_statement_dependence_mapping"
                "\tSuccessor list: %p for statement ordering %p\n",
                vertex_successors(a_vertex),
-               dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
+               (void *)dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
 
     FOREACH(successor, a_successor, vertex_successors(a_vertex))
     {
