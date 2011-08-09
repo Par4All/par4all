@@ -42,17 +42,19 @@
 #include "misc.h"
 #include "resources.h"
 
+/************************************************* DETECT REGISTER VARIABLES */
+
 // formal parameters and local variables can be declared registers
 // for registers, the cannot be referenced (&i)
 // for arrays, the address cannot be used, a[i] and not a, but on sizeof(a)
 
 typedef struct {
-  set invalidated; // of entities
+  set invalidated; // of entities, which cannot be declared "register"
 } drv_context;
 
 // loop indexes are ok as registers.
 
-// detect explicit address-of
+// detect explicit address-of operators
 static bool drv_call_flt(const call c, drv_context * ctx)
 {
   entity fun = call_function(c);
@@ -89,6 +91,8 @@ static bool drv_sizeof_flt(
   return false;
 }
 
+/* recurse in object to detect which variables cannot be declared register
+ */
 static void drv_collect(gen_chunk * object, drv_context * ctx)
 {
   gen_context_multi_recurse(object, ctx,
@@ -98,6 +102,8 @@ static void drv_collect(gen_chunk * object, drv_context * ctx)
                             NULL);
 }
 
+/********************************************************** CUT DECLARATIONS */
+
 typedef struct {
   set switched;
   hash_table newdecls;
@@ -105,8 +111,13 @@ typedef struct {
 
 static bool cut_declarations_flt(statement s, cd_context * ctx)
 {
+  // argh! do not strust statement_declarations necessarily
+  if (!declaration_statement_p(s))
+    return true;
+
   list decls = statement_declarations(s);
-  if (decls && gen_length(decls)>1)
+  int ndecls = gen_length(decls);
+  if (ndecls>1)
   {
     // built list of declaration statements
     list lds = NIL;
@@ -129,6 +140,7 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
           {
             pips_debug(7, "cutting on %s\n", entity_name(v));
             // cut list
+            ndecls -= gen_length(nl);
             lds =
               CONS(statement,
                    make_declarations_statement
@@ -149,6 +161,7 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
           {
             pips_debug(8, "cutting S on %s\n", entity_name(v));
             // cut list
+            ndecls -= gen_length(nl);
             lds =
               CONS(statement,
                    make_declarations_statement
@@ -164,6 +177,8 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
           nl = CONS(entity, v, NIL), nswitched = false;
       }
     }
+
+    pips_assert("all declarations are managed", ndecls==gen_length(nl));
 
     // store lds for later insertions
     // I do not that now because we are still recurring in the statements...
