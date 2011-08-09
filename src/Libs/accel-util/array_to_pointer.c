@@ -780,12 +780,17 @@ static void insert_statements_after_declarations(statement st, list stats) {
         }
         else {
             for(list iter=statement_block(st),prev=NIL;!ENDP(iter);POP(iter)) {
-                if(declaration_statement_p(STATEMENT(CAR(iter)))) prev=iter;
-                else {
-                    CDR(prev)=stats;
-                    while(!ENDP(CDR(stats))) POP(stats);
-                    CDR(stats)=iter;
-                    break;
+                if(declaration_statement_p(STATEMENT(CAR(iter)))) {
+                  prev=iter;
+                } else if(prev == NIL) {
+                  /* No declarations */
+                  insert_statement(st, make_block_statement(stats), true);
+                } else {
+                  CDR(prev) = stats;
+                  while(!ENDP(CDR(stats)))
+                    POP(stats);
+                  CDR(stats) = iter;
+                  break;
                 }
             }
         }
