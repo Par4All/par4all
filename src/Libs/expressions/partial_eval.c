@@ -143,13 +143,13 @@ void reset_live_loop_indices()
 
 void dump_live_loop_indices()
 {
-  pips_assert("set_live_loop_indices", live_loop_indices==list_undefined);
+  pips_assert("set_live_loop_indices", live_loop_indices!=list_undefined);
   dump_arguments(live_loop_indices);
 }
 
 static bool live_loop_index_p(entity i)
 {
-  pips_assert("set_live_loop_indices", live_loop_indices==list_undefined);
+  pips_assert("set_live_loop_indices", live_loop_indices!=list_undefined);
   return entity_is_argument_p(i, live_loop_indices);
 }
 
@@ -162,7 +162,7 @@ static void add_live_loop_index(entity i)
 
 static void rm_live_loop_index(entity i)
 {
-  pips_assert("set_live_loop_indices", live_loop_indices==list_undefined);
+  pips_assert("set_live_loop_indices", live_loop_indices!=list_undefined);
   live_loop_indices = arguments_rm_entity(live_loop_indices, i);
 }
 
