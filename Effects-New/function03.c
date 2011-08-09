@@ -19,7 +19,7 @@ void function03()
   else
     f = foo;
 
-  // Two possible syntax to use pointer f
+  // Two possible syntaxes (?) to use pointer f
   j = f(2);
   j = (*f)(2);
 

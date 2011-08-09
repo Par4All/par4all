@@ -17,10 +17,11 @@ void function03()
 //             <    is written>: f
 //             <    is referenced>: f foo
       f = foo;
+//             <    is read   >: f
 //             <    is written>: j
-//             <    is referenced>: j
+//             <    is referenced>: f j
    
-   // Two possible syntax to use pointer f
+   // Two possible syntaxes (?) to use pointer f
    j = f(2);
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
