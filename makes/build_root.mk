@@ -114,6 +114,9 @@ ifndef EXTERN_ROOT
 EXTERN_ROOT	= $(HERE)/../extern
 endif
 
+# add ENABLE='doc devel-mode paws'
+ENABLE	=
+
 .PHONY: auto auto-comp auto-clean
 auto-clean:
 	$(RM) -r $(BUILD.dir) autom4te.cache
@@ -128,7 +131,8 @@ $(BUILD.dir):
 	../configure --disable-static --prefix=$(INSTALL.dir) \
 		PATH=$(INSTALL.dir)/bin:$$PATH \
 		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(EXTERN_ROOT)/lib/pkgconfig \
-		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
+		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips \
+		$(ENABLE:%=--enable-%)
 
 # just compile
 auto-comp: $(BUILD.dir)
@@ -141,6 +145,9 @@ auto-comp: $(BUILD.dir)
 # clean & compile
 auto: auto-clean
 	$(MAKE) auto-comp
+
+# with paws
+auto-paws:; $(MAKE) ENABLE=paws auto
 
 # force tags target
 tags: tags-clean
