@@ -10463,6 +10463,29 @@ DYNAMIC_ALLOCATION "malloc"
 DYNAMIC_DEALLOCATION "free"
 \end{PipsProp}
 
+Detecting and forcing variables in the \texttt{register} storage class can
+help subsequent analyses, as they cannot be referenced by pointers.
+\begin{PipsMake}
+force_register_declarations > PROGRAM.entities
+                            > MODULE.code
+         < PROGRAM.entities
+         < MODULE.code
+\end{PipsMake}
+
+Whether to allow arrays to be qualified as registers:
+\begin{PipsProp}{FORCE_REGISTER_ARRAY}
+FORCE_REGISTER_ARRAY TRUE
+\end{PipsProp}
+
+Whether to allow pointers to be qualified as registers:
+\begin{PipsProp}{FORCE_REGISTER_POINTER}
+FORCE_REGISTER_POINTER TRUE
+\end{PipsProp}
+
+Whether to allow formal parameters to be qualified as registers:
+\begin{PipsProp}{FORCE_REGISTER_FORMAL}
+FORCE_REGISTER_FORMAL TRUE
+\end{PipsProp}
 
 \subsection{Array Resizing}
 \label{subsubsection-array-resizing}
