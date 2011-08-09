@@ -1,8 +1,6 @@
-from pyps import *
+from validation import vworkspace
 
-w=workspace("linearize_array05.c")
-w.compile()
-for f in w.fun:
-	f.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True)
-	f.display()
-w.compile()
+with vworkspace() as w:
+  w.all_functions.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True)
+  w.all_functions.display()
+
