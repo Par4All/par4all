@@ -5898,7 +5898,7 @@ phase: \PipsPassRef{if_conversion_init}, \PipsPassRef{if_conversion} and
 \PipsPassRef{if_conversion_compact}.
 \end{PipsPass}
 
-Use \PipsPropRef{IF_CONVERSION_INIT_THRESHOLD} to control wether if conversion will occur or not:
+Use \PipsPropRef{IF_CONVERSION_INIT_THRESHOLD} to control whether if conversion will occur or not:
 beyhond this number of call, no conversion is done.
 \begin{PipsProp}{IF_CONVERSION_INIT_THRESHOLD}
 IF_CONVERSION_INIT_THRESHOLD 40
@@ -9699,20 +9699,20 @@ linearize_array_fortran > MODULE.code
 		        < CALLERS.code
 \end{PipsMake}
 
-Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are
+Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control whether arrays are
 declared as 1D arrays or pointers. Pointers are accessed using dereferencement
 and arrays using subscripts. This property does not apply to the fortran case.
 \begin{PipsProp}{LINEARIZE_ARRAY_USE_POINTERS}
 LINEARIZE_ARRAY_USE_POINTERS FALSE
 \end{PipsProp}
 
-Use \PipsPropRef{LINEARIZE_ARRAY_MODIFY_CALL_SITE} to control wether the call site
+Use \PipsPropRef{LINEARIZE_ARRAY_MODIFY_CALL_SITE} to control whether the call site
 is modified or not.
 \begin{PipsProp}{LINEARIZE_ARRAY_MODIFY_CALL_SITE}
 LINEARIZE_ARRAY_MODIFY_CALL_SITE TRUE
 \end{PipsProp}
 
-Use \PipsPropRef{LINEARIZE_ARRAY_CAST_AT_CALL_SITE} to control wether a cast is
+Use \PipsPropRef{LINEARIZE_ARRAY_CAST_AT_CALL_SITE} to control whether a cast is
  inserted at call sites. Turning it on break further effects analysis, but
 without the cast it might break compilation or at least generate warnings for
 type mismatch. This property does not apply to the fortran case.
@@ -9720,6 +9720,11 @@ type mismatch. This property does not apply to the fortran case.
 LINEARIZE_ARRAY_CAST_AT_CALL_SITE FALSE
 \end{PipsProp}
 
+
+Use \PipsPropRef{LINEARIZE_ARRAY_VLA_ONLY} to limit this pass to C99 VLA array.
+\begin{PipsProp}{LINEARIZE_ARRAY_VLA_ONLY}
+LINEARIZE_ARRAY_VLA_ONLY FALSE
+\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EOLE
 
