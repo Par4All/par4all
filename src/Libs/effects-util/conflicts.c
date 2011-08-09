@@ -723,9 +723,14 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 		  conflict_p = abstract_locations_conflict_p( abstract_location, concrete_location_al );
 		}
 	    }
+	  else if(entity_function_p(concrete_location)) {
+	      pips_internal_error("Meaningless conflict tested for function \"%s\".",
+				  entity_user_name(concrete_location));
+	  }
 	  else
 	    {
-	      pips_internal_error("Unexpected case.");
+	      pips_internal_error("Unexpected case for variable \"%s\".",
+				  entity_user_name(concrete_location));
 	    }
 	}
       else

@@ -463,13 +463,23 @@ list generic_p_proper_effect_of_reference(reference ref,
     }
   else
     {
+      /* Just compute the main memory effect of the reference
 
-      /* just compute the main effect on the reference
+	 This should maybe be refined ? */
 
-       This should maybe be refined ? */
+      /* If the entity referenced is a function, we do not want a
+	 memory effect since it is a constant. Note: we end up here
+	 because its type as been converted to a pointer to a
+	 function above. */
+      entity rv= reference_variable(ref);
+      type rvt = ultimate_type(entity_type(rv));
 
-      *pme = (*reference_to_effect_func)
-	(ref, write_p? make_action_write_memory() : make_action_read_memory(), true);
+      if(type_functional_p(rvt))
+	*pme = effect_undefined;
+      else
+	*pme = (*reference_to_effect_func)
+	  (ref, write_p? make_action_write_memory() : make_action_read_memory(), true);
+
       if(!effect_undefined_p(*pme))
 	pips_assert("*pme is weakly consistent", region_weakly_consistent_p(*pme));
     }
