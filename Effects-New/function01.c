@@ -11,11 +11,11 @@ int foo(int i)
 
 void function01()
 {
-  int f(int) = foo;
+  int (*f)(int) = foo;
   int j;
 
   if(f==foo)
-    j = foo(i);
+    j = foo(2);
 
   return;
 }

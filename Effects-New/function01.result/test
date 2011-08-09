@@ -1,13 +1,13 @@
 void function01()
 {
-   int f(int);
+//             <    is written>: f
+   int (*f)(int) = foo;
    int j;
-//             <    is read   >: f foo
+//             <    is read   >: f
 
    if (f==foo)
-//             <    is read   >: i
 //             <    is written>: j
-      j = foo(i);
+      j = foo(2);
 
    return;
 }
