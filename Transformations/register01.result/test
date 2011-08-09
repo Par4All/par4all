@@ -34,8 +34,6 @@ int register01(register int i, int *register p)
 {
    register int j = i;
    int k = 1;
-   register int j = i;
-   int k = 1;
 
    *p = j;
    p = &k;
