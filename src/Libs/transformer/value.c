@@ -664,8 +664,8 @@ const char * pips_user_value_name(entity e)
 
     if(uvn==HASH_UNDEFINED_VALUE) {
       (void) gen_check((gen_chunk *) e, entity_domain);
-      uvn = entity_has_values_p(e)? entity_minimal_name(e) :
-	external_value_name(e);
+      uvn = entity_has_values_p(e)? (string)entity_minimal_name(e) :
+                                  external_value_name(e);
       hash_put(hash_entity_to_user_value_name, (char *) e, uvn);
     }
   }
