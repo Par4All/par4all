@@ -644,17 +644,24 @@ bool entity_pointer_p(entity e)
 
 bool entity_array_p(entity e)
 {
-  if (entity_variable_p(e))
-    {
-      variable var = type_variable(ultimate_type(entity_type(e)));
-      if (!ENDP(variable_dimensions(var)))  return true;
-    }
+  if (entity_variable_p(e)) {
+    return array_type_p(ultimate_type(entity_type(e)));
+  }
   return false;
 }
 bool array_entity_p(entity e)
 {
     return entity_array_p(e);
 }
+
+bool entity_variable_length_array_p(entity e) {
+  bool return_val = false;
+  if (entity_variable_p(e)) {
+    return_val=variable_length_array_type_p(ultimate_type(entity_type(e)));
+  }
+  return return_val;
+}
+
 
 bool assumed_size_array_p(entity e)
 {
