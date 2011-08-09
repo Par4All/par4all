@@ -937,25 +937,33 @@ statement make_plain_continue_statement()
 }
 
 
-/* Make a declaration statement
+/* Make a declaration(s) statement
 
    To preserve declaration lines and comments, declaration statements are
    used
 
-   @param v is the variable to add in the declaration
+   @param l list of variables to add in the declaration
 
    @param sn is the statement number to use
 
    @param cs is the comment string to associate with the declaration
 */
-statement make_declaration_statement(entity v, int sn, string cs) {
+statement make_declarations_statement(list l, int sn, string cs)
+{
   statement ds = make_plain_continue_statement();
-  statement_declarations(ds) = CONS(ENTITY, v, NIL);
+  statement_declarations(ds) = l;
   statement_number(ds) = sn;
   statement_comments(ds) = cs;
-
   return ds;
 }
+
+/* Make *one* declaration statement.
+ */
+statement make_declaration_statement(entity v, int sn, string cs)
+{
+  return make_declarations_statement(CONS(ENTITY, v, NIL), sn, cs);
+}
+
 
 /* Build a while loop statement.
 
@@ -2296,9 +2304,7 @@ statement_to_line_number(statement s)
  *
  */
 
-void insert_statement(statement s,
-		      statement s1,
-		      bool before)
+void insert_statement(statement s, statement s1, bool before)
 {
   list ls;
   instruction i = statement_instruction(s);
