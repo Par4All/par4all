@@ -9968,6 +9968,12 @@ ignores the information and mixes up images.
 FREIA_ALLOW_IMAGE_SHUFFLE FALSE
 \end{PipsProp}
 
+Whether to assume that casts are simple image copies.
+Default is to keep a cast as cast, which is not accelerated.
+\begin{PipsProp}{FREIA_CAST_IS_COPY}
+FREIA_CAST_IS_COPY FALSE
+\end{PipsProp}
+
 Assume this pixel size in bits:
 \begin{PipsProp}{FREIA_PIXEL_SIZE}
 FREIA_PIXEL_SIZE 16

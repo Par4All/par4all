@@ -77,6 +77,28 @@ static bool freia_image_shuffle(statement s)
   return shuffle;
 }
 
+/******************************************************* SWITCH CAST TO COPY */
+
+static void sctc_call_rwt(call c, int * count)
+{
+  entity func = call_function(c);
+  if (same_string_p(entity_local_name(func), AIPO "cast"))
+  {
+    call_function(c) = local_name_to_top_level_entity(AIPO "copy");
+    (*count)++;
+  }
+}
+
+static void switch_cast_to_copy(statement s)
+{
+  int count = 0;
+  gen_context_recurse(s, &count, call_domain, gen_true, sctc_call_rwt);
+  // ??? I may have look into declarations? freia calls in declarations
+  // are not really implemented yet.
+  pips_user_warning("freia_cast switched to freia_copy: %d\n", count);
+}
+
+
 /*************************************************************** BASIC UTILS */
 
 /* return malloc'ed "foo.database/Src/%{module}_helper_functions.c"
@@ -442,6 +464,10 @@ string freia_compile(string module, statement mod_stat, string target)
                       "see FREIA_ALLOW_IMAGE_SHUFFLE property to continue.\n",
                       module);
   }
+
+  // freia_aipo_cast -> freia_aipo_copy before further compilation
+  if (get_bool_property("FREIA_CAST_IS_COPY"))
+    switch_cast_to_copy(mod_stat);
 
   freia_info fsi = { NIL, 0, set_make(hash_pointer) };
   freia_init_dep_cache();
