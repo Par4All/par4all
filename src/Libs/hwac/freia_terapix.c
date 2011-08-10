@@ -344,7 +344,7 @@ static void terapix_gram_allocate
 static _int select_imagelet(set availables, int * nimgs, bool first)
 {
   ifdebug(8) {
-    pips_debug(8, "selecting first=%s\n", first? "true": "false");
+    pips_debug(8, "selecting first=%s\n", bool_to_string(first));
     set_fprint(stderr, "availables", availables, (gen_string_func_t) itoa);
   }
 
@@ -818,7 +818,7 @@ static void freia_terapix_call
   sb_cat(head, " * GRAM W   = ", ip2s(trpx_gram_width), "\n");
   sb_cat(head, " * GRAM H   = ", ip2s(trpx_gram_height), "\n");
   sb_cat(head, " * DAG CUT  = ", get_string_property(trpx_dag_cut), "\n");
-  sb_cat(head, " * OVERLAP  = ", trpx_overlap_io_p()? "true": "false", "\n");
+  sb_cat(head, " * OVERLAP  = ", bool_to_string(trpx_overlap_io_p()), "\n");
   sb_cat(head, " * IMAGE H  = ", ip2s(trpx_image_height), "\n");
   sb_cat(head, " * MAX SIZE = ", ip2s(trpx_max_size), "\n");
   sb_cat(head, " *\n");
@@ -1675,7 +1675,7 @@ split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx),
         pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
         dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd, NULL, output_images, NIL);
+      dag_compute_outputs(nd, NULL, output_images, NIL, false);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
@@ -1839,7 +1839,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
     // pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
     dag_append_vertex(nd, copy_dagvtx_norec(v));
   }
-  dag_compute_outputs(nd, NULL, output_images, NIL);
+  dag_compute_outputs(nd, NULL, output_images, NIL, false);
   dag_cleanup_other_statements(nd);
 
   // cleanup full dag

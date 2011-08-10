@@ -1497,7 +1497,7 @@ static void freia_spoc_pipeline
   }
 
   // hmmm???
-  dag_compute_outputs(dpipe, NULL, output_images, NIL);
+  dag_compute_outputs(dpipe, NULL, output_images, NIL, false);
 
   gen_free_list(vertices), vertices = NIL;
   set_free(computed), computed = NULL;
@@ -2127,7 +2127,7 @@ static list /* of dags */ split_dag(dag initial, const set output_images)
         pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
         dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd, NULL, output_images, NIL);
+      dag_compute_outputs(nd, NULL, output_images, NIL, false);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {

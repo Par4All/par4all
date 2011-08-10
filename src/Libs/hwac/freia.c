@@ -99,6 +99,36 @@ bool freia_skip_op_p(const statement s)
     ||   same_string_p(called, FREIA_FREE);
 }
 
+/* move statements in l ahead of s in sq
+ * note that ls is in reverse order...
+ */
+static void move_ahead(list ls, statement target, sequence sq)
+{
+  // for faster list inclusion test
+  set tomove = set_make(hash_pointer);
+  set_append_list(tomove, ls);
+
+  // build new sequence list in reverse order
+  list nsq = NIL;
+  FOREACH(statement, s, sequence_statements(sq))
+  {
+    if (set_belong_p(tomove, s))
+      continue; // skip!
+    if (s==target)
+      // insert list now!
+      nsq = gen_nconc(gen_copy_seq(ls), nsq);
+    // and keep current statement
+    nsq = CONS(statement, s, nsq);
+  }
+
+  // update sequence with new list
+  gen_free_list(sequence_statements(sq));
+  sequence_statements(sq) = gen_nreverse(nsq);
+
+  // clean up
+  set_free(tomove);
+}
+
 /******************************************************** REORDER STATEMENTS */
 
 /* I reorder a little bit statements, so that allocs & deallocs are up
@@ -235,41 +265,26 @@ static bool statement_depends_p(set written, statement s)
   return depends;
 }
 
-/* move statements in l ahead of s in sq
- * note that ls is in reverse order...
- */
-static void move_ahead(list ls, statement target, sequence sq)
-{
-  // for faster list inclusion test
-  set tomove = set_make(hash_pointer);
-  set_append_list(tomove, ls);
-
-  // build new sequence list in reverse order
-  list nsq = NIL;
-  FOREACH(statement, s, sequence_statements(sq))
-  {
-    if (set_belong_p(tomove, s))
-      continue; // skip!
-    if (s==target)
-      // insert list now!
-      nsq = gen_nconc(gen_copy_seq(ls), nsq);
-    // and keep current statement
-    nsq = CONS(statement, s, nsq);
-  }
-
-  // update sequence with new list
-  gen_free_list(sequence_statements(sq));
-  sequence_statements(sq) = gen_nreverse(nsq);
-
-  // clean up
-  set_free(tomove);
-}
-
-/********************************************************* RECURSION HELPERS */
+/************************************ RECURSION HELPERS TO EXTRACT SEQUENCES */
 
 typedef struct {
-  list /* of list of statements */ seqs;
+  list seqs; // of list of statements
+  int enclosing_loops; // count kept while recurring
+  set in_loops; // elements in the list encountered in inclosing loops
 } freia_info;
+
+static bool fsi_loop_flt( __attribute__((unused)) gen_chunk * o,
+                          freia_info * fsip)
+{
+  fsip->enclosing_loops++;
+  return true;
+}
+
+static void fsi_loop_rwt( __attribute__((unused)) gen_chunk * o,
+                          freia_info * fsip)
+{
+  fsip->enclosing_loops--;
+}
 
 /* detect one lone aipo statement out of a sequence...
  */
@@ -280,7 +295,10 @@ static bool fsi_stmt_flt(statement s, freia_info * fsip)
     instruction i = (instruction) gen_get_ancestor(instruction_domain, s);
     if (i && instruction_sequence_p(i)) return false;
     // not a sequence handled by fsi_seq_flt...
-    fsip->seqs = CONS(list, CONS(statement, s, NIL), fsip->seqs);
+    list ls = CONS(statement, s, NIL);
+    fsip->seqs = CONS(list, ls, fsip->seqs);
+    if (fsip->enclosing_loops)
+      set_add_element(fsip->in_loops, fsip->in_loops, ls);
   }
   return true;
 }
@@ -341,6 +359,8 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
       {
         sort_subsequence(ls, sq);
         fsip->seqs = CONS(list, ls, fsip->seqs);
+        if (fsip->enclosing_loops)
+          set_add_element(fsip->in_loops, fsip->in_loops, ls);
         ls = NIL;
       }
       if (ltail) gen_free_list(ltail), ltail = NIL;
@@ -355,6 +375,8 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
       move_ahead(lup, STATEMENT(CAR(gen_last(ls))), sq);
     sort_subsequence(ls, sq);
     fsip->seqs = CONS(list, ls, fsip->seqs);
+    if (fsip->enclosing_loops)
+      set_add_element(fsip->in_loops, fsip->in_loops, ls);
     ls = NIL;
   }
 
@@ -421,14 +443,24 @@ string freia_compile(string module, statement mod_stat, string target)
                       module);
   }
 
-  freia_info fsi = { NIL };
+  freia_info fsi = { NIL, 0, set_make(hash_pointer) };
   freia_init_dep_cache();
 
   // collect freia api functions...
   gen_context_multi_recurse(mod_stat, &fsi,
+                            // collect sequences
                             sequence_domain, fsi_seq_flt, gen_null,
                             statement_domain, fsi_stmt_flt, gen_null,
+                            // just count enclosing loops...
+                            loop_domain, fsi_loop_flt, fsi_loop_rwt,
+                            whileloop_domain, fsi_loop_flt, fsi_loop_rwt,
+                            forloop_domain, fsi_loop_flt, fsi_loop_rwt,
+                            unstructured_domain,  fsi_loop_flt, fsi_loop_rwt,
                             NULL);
+
+  // check safe return
+  pips_assert("loop count back to zero", fsi.enclosing_loops==0);
+
   // sort sequences by increasing statement numbers
   fsi_sort(fsi.seqs);
 
@@ -462,7 +494,8 @@ string freia_compile(string module, statement mod_stat, string target)
   int n_dags = gen_length(fsi.seqs);
   FOREACH(list, ls, lsi)
   {
-    dag d = freia_build_dag(module, ls, --n_dags, occs, output_images, ldags);
+    dag d = freia_build_dag(module, ls, --n_dags, occs, output_images, ldags,
+                            set_belong_p(fsi.in_loops, ls));
     ldags = CONS(dag, d, ldags);
   }
   gen_free_list(lsi), lsi = NIL;
@@ -514,6 +547,7 @@ string freia_compile(string module, statement mod_stat, string target)
   freia_close_dep_cache();
   set_free(output_images), output_images = NULL;
   gen_free_list(fsi.seqs);
+  set_free(fsi.in_loops);
   gen_free_list(ldags);
   if (helper) safe_fclose(helper, file);
 

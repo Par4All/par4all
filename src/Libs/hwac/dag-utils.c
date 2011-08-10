@@ -211,8 +211,6 @@ void dag_dump(FILE * out, const string what, const dag d)
   }
 
   fprintf(out, "\n");
-
-  // ifdebug(1) dag_consistent_p(d);
 }
 
 // #define IMG_DEP " [arrowhead=normal]"
@@ -375,10 +373,8 @@ void dag_dot(FILE * out, const string what, const dag d)
     }
   }
 
-  // end of graph
   fprintf(out, "}\n");
 
-  // cleanup
   set_free(inputs);
 }
 
@@ -1640,8 +1636,26 @@ static bool variable_used_as_later_input(entity img, list ld)
     }
     if (used) break;
   }
-  pips_debug(8, "%s: %s\n", entity_name(img), used? "true": "false");
+  pips_debug(8, "%s: %s\n", entity_name(img), bool_to_string(used));
   return used;
+}
+
+static bool dag_image_is_an_input(dag d, entity img)
+{
+  bool is_input = false;
+  FOREACH(dagvtx, v, dag_inputs(d))
+  {
+    if (dagvtx_image(v)==img)
+    {
+      is_input = true;
+      break;
+    }
+  }
+
+  pips_debug(4, "image %s input: %s\n",
+             entity_name(img), bool_to_string(is_input));
+
+  return is_input;
 }
 
 /* (re)compute the list of *GLOBAL* input & output images for this dag
@@ -1656,8 +1670,10 @@ static bool variable_used_as_later_input(entity img, list ld)
  */
 void dag_compute_outputs(
   dag d,
-  const hash_table occs, const set output_images, const list ld)
+  const hash_table occs, const set output_images, const list ld, bool inloop)
 {
+  pips_debug(4, "inloop=%s\n", bool_to_string(inloop));
+
   set outvars = set_make(set_pointer);
   set outs = set_make(set_pointer);
   set toremove = set_make(set_pointer);
@@ -1675,16 +1691,23 @@ void dag_compute_outputs(
 
       pips_debug(8, "entity is %s\n", safe_entity_name(out));
 
-      if (out!=entity_undefined && !set_belong_p(outvars, out) &&
-          ((output_images && set_belong_p(output_images, out)) ||
-           // no successors to this vertex BUT it is used somewhere
+      if (// we have an image
+          out!=entity_undefined &&
+          // it is not already an output
+          !set_belong_p(outvars, out) &&
+          // and either...
+          (// this image is used as output (typically a tx call)
+           (output_images && set_belong_p(output_images, out)) ||
+           // no successors to this vertex BUT it is used somewhere (else?)
            (!dagvtx_succs(v) && other_significant_uses(out, occs, stats)) ||
            // all non-empty successors are measures?!
            (dagvtx_succs(v) && all_mesures_p(dagvtx_succs(v))) ||
            // new function parameter not yet an output
            (formal_parameter_p(out) && !set_belong_p(outvars, out)) ||
            // hmmm... yet another hack for freia_61
-           (variable_used_as_later_input(out, ld))))
+           (variable_used_as_later_input(out, ld)) ||
+           // an output image is only reused by this dag within a loop?
+           (inloop && dag_image_is_an_input(d, out))))
       {
         pips_debug(7, "appending %" _intFMT "\n", dagvtx_number(v));
         set_add_element(outvars, outvars, out);
@@ -2001,11 +2024,13 @@ static void dag_append_freia_call(dag d, statement s)
  * @param number dag identifier in function
  * @param occurrences entity -> set of statements where they appear
  * @param output_images set of images that are output
- * @param ld list of other dags...
+ * @param ld list of other dags... (???)
+ * @param inloop whether we might be in a loop
  */
 dag freia_build_dag(
   string module, list ls, int number,
-  const hash_table occurrences, const set output_images, const list ld)
+  const hash_table occurrences, const set output_images, const list ld,
+  bool inloop)
 {
   // build full dag
   dag fulld = make_dag(NIL, NIL, NIL);
@@ -2013,7 +2038,7 @@ dag freia_build_dag(
   FOREACH(statement, s, ls)
     dag_append_freia_call(fulld, s);
 
-  dag_compute_outputs(fulld, occurrences, output_images, ld);
+  dag_compute_outputs(fulld, occurrences, output_images, ld, inloop);
 
   ifdebug(3) dag_dump(stderr, "fulld", fulld);
 
