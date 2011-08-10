@@ -322,12 +322,17 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
   }
 }
 
-static void dagvtx_list_dot(FILE * out, const string comment, const list l)
+static void dagvtx_list_dot(
+  FILE * out, const string comment, const list l, const set used)
 {
   if (comment) fprintf(out, "  // %s\n", comment);
   FOREACH(dagvtx, v, l)
-    fprintf(out, "  \"%s\" [shape=circle];\n",
-      entity_dot_name(vtxcontent_out(dagvtx_content(v))));
+  {
+    entity img = vtxcontent_out(dagvtx_content(v));
+    fprintf(out, "  \"%s%s\" [shape=circle];\n",
+            entity_dot_name(img),
+            used? (set_belong_p(used, img)? "'": ""): "");
+  }
   fprintf(out, "\n");
 }
 
@@ -340,9 +345,18 @@ void dag_dot(FILE * out, const string what, const dag d)
 {
   fprintf(out, "digraph \"%s\" {\n", what);
 
+  // collect set of input images
+  set inputs = set_make(hash_pointer);
+  FOREACH(dagvtx, i, dag_inputs(d))
+  {
+    entity img = dagvtx_image(i);
+    if (img && img!=entity_undefined)
+      set_add_element(inputs, inputs, img);
+  }
+
   // first, declare inputs and outputs as circles
-  dagvtx_list_dot(out, "inputs", dag_inputs(d));
-  dagvtx_list_dot(out, "outputs", dag_outputs(d));
+  dagvtx_list_dot(out, "inputs", dag_inputs(d), NULL);
+  dagvtx_list_dot(out, "outputs", dag_outputs(d), inputs);
 
   // second, show computations
   fprintf(out, "  // computation vertices\n");
@@ -354,12 +368,18 @@ void dag_dot(FILE * out, const string what, const dag d)
     // outputs arcs for vx when the result is extracted
     if (gen_in_list_p(vx, dag_outputs(d)))
     {
+      entity img = vtxcontent_out(c);
       dagvtx_dot_node(out, "  ", vx);
-      fprintf(out, " -> \"%s\";\n", entity_dot_name(vtxcontent_out(c)));
+      fprintf(out, " -> \"%s%s\";\n",
+              entity_dot_name(img),  set_belong_p(inputs, img)? "'": "");
     }
   }
 
+  // end of graph
   fprintf(out, "}\n");
+
+  // cleanup
+  set_free(inputs);
 }
 
 #define DOT_SUFFIX ".dot"
