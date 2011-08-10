@@ -477,10 +477,11 @@ void P4A_copy_to_accel_3d(size_t element_size,
     int tpb = P4A_min(p4a_max_threads_per_block,(int)ceil((n_x_iter)*(n_y_iter)/(float)P4A_CUDA_MIN_BLOCKS)); \
     tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
     tpb = P4A_max(tpb,32); \
+    p4a_block_x = P4A_max((int)ceil(sqrt((float)tpb)),32); \
     p4a_block_x = P4A_min((int) n_x_iter,				\
-                          (int) tpb);			\
+                          (int) p4a_block_x);			\
     p4a_block_y = P4A_min((int) n_y_iter,				\
-                          tpb/p4a_block_x);		\
+                          tpb/(float)p4a_block_x);		\
   }									\
   dim3 block_descriptor_name(p4a_block_x, p4a_block_y);			\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
