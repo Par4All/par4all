@@ -134,7 +134,7 @@ RemoveLocalEntityFromDeclarations(entity e, entity module, statement s)
             gen_remove(&statement_declarations(s), e);
         if(statement_block_p(s))
         {
-            // iterate over a copy becuase FOREACH does not
+            // iterate over a copy because FOREACH does not
             // support inplace modification
             list theblock = gen_copy_seq(statement_block(s));
             FOREACH(STATEMENT,stat,theblock)
