@@ -1701,7 +1701,7 @@ type intrinsic_call_to_type(call c)
 
     pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
 	       module_local_name(f),
-	       words_to_string(words_type(rt, NIL)));
+	       words_to_string(words_type(rt, NIL, false)));
 
     if(basic_overloaded_p(rb))
       {
@@ -1840,7 +1840,7 @@ type intrinsic_call_to_type(call c)
   pips_debug(7, "Intrinsic call to intrinsic \"%s\" "
 	     "with a posteriori result type \"%s\"\n",
 	     module_local_name(f),
-	     words_to_string(words_type(t, NIL)));
+	     words_to_string(words_type(t, NIL, false)));
 
   return t;
 }
@@ -1890,12 +1890,12 @@ type call_to_type(call c)
 type reference_to_type(reference ref)
 {
   type t = type_undefined;
-  pips_debug(6, "input entity type %s\n", words_to_string(words_type(entity_type(reference_variable(ref)), NIL)));
+  pips_debug(6, "input entity type %s\n", words_to_string(words_type(entity_type(reference_variable(ref)), NIL, false)));
 
   type exp_type = basic_concrete_type(entity_type(reference_variable(ref)));
 
   pips_debug(6, "reference case \n");
-  pips_debug(6, "exp_type %s\n", words_to_string(words_type(exp_type, NIL)));
+  pips_debug(6, "exp_type %s\n", words_to_string(words_type(exp_type, NIL, false)));
 
   if(type_variable_p(exp_type))
     {
@@ -1913,7 +1913,7 @@ type reference_to_type(reference ref)
 
 	  ifdebug(7) {
 	    pips_debug(7, "new iteration : current type : %s\n",
-		       words_to_string(words_type(ct, NIL)));
+		       words_to_string(words_type(ct, NIL, false)));
 	    pips_debug(7, "current list of indices: \n");
 	    print_expressions(l_inds);
 	  }
@@ -1942,7 +1942,7 @@ type reference_to_type(reference ref)
 		    make_variable(copy_basic(cb),
 				  gen_full_copy_list(cd),
 				  NIL));
-      pips_debug(6, "t at the end of reference case %s\n", words_to_string(words_type(t, NIL)));
+      pips_debug(6, "t at the end of reference case %s\n", words_to_string(words_type(t, NIL, false)));
     }
   else if(type_functional_p(exp_type))
     {
@@ -1962,7 +1962,7 @@ type reference_to_type(reference ref)
 			  entity_name(reference_variable(ref)));
     }
   free_type(exp_type);
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL)));
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
   return t;
 }
 
@@ -2067,9 +2067,9 @@ type expression_to_type(expression exp)
 		  pips_internal_error("unhandled case");
 		}
 	      }
-	    POP(l_inds);	
+	    POP(l_inds);
 	  }
-	
+
 	/* Warning : qualifiers are set to NIL, because I do not see
 	   the need for something else for the moment. BC.
 	*/
@@ -2094,13 +2094,13 @@ type expression_to_type(expression exp)
 	t = copy_type(sizeofexpression_type(soe));
 	break;
       }
-      
+
     default:
       pips_internal_error("Bad syntax tag %d", syntax_tag(s_exp));
       /* Never go there... */
     }
 
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL)));
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
 
   return t;
 }
@@ -2800,11 +2800,11 @@ type ultimate_type(type t)
 
 
 /**
-   
+
  @param t is a type
 
  @return : a new type in which typedefs have been expanded to reach a basic
-           concrete type, except for struct, union, and enum because 
+           concrete type, except for struct, union, and enum because
 	   the inner types of the fields cannot be changed (they are entities).
 
 */
@@ -2812,7 +2812,8 @@ type basic_concrete_type(type t)
 {
   type nt;
 
-  pips_debug(8, "Begin with type \"%s\"\n", words_to_string(words_type(t, NIL)));
+  pips_debug(8, "Begin with type \"%s\"\n",
+	     words_to_string(words_type(t, NIL, false)));
 
   switch (type_tag(t))
     {
@@ -2822,7 +2823,7 @@ type basic_concrete_type(type t)
 	basic bt = variable_basic(vt);
 	list lt = variable_dimensions(vt);
 
-	pips_debug(9, "of basic \"%s\"and number of dimensions %d.\n", 
+	pips_debug(9, "of basic \"%s\"and number of dimensions %d.\n",
 		   basic_to_string(bt),
 		   (int) gen_length(lt));
 
@@ -2862,7 +2863,8 @@ type basic_concrete_type(type t)
       nt = copy_type(t);
     }
 
-  pips_debug(8, "Ends with type \"%s\"\n", words_to_string(words_type(nt, NIL)));
+  pips_debug(8, "Ends with type \"%s\"\n",
+	     words_to_string(words_type(nt, NIL, false)));
   ifdebug(9)
     {
     if(type_variable_p(nt))
@@ -3995,7 +3997,9 @@ void print_types(list tl)
 /* For debugging */
 void print_type(type t)
 {
-  list wl = words_type(t, NIL);
+  // Might be better to pass true, or even more information, to see
+  // what happens with the unknown type
+  list wl = words_type(t, NIL, false);
   dump_words(wl);
 }
 

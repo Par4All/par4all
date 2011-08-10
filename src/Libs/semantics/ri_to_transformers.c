@@ -1264,6 +1264,20 @@ transformer any_user_call_site_to_transformer(entity f,
 	fpvl = CONS(ENTITY, fpv, fpvl);
 	ctf = safe_any_expression_to_transformer(fpv, e, cpre, false);
       }
+      else if((basic_int_p(ab) && derived_type_p(fpt))
+	      ||(basic_int_p(fb) && derived_type_p(apt)) ) {
+	/* FI: Let's assume it is an enum derived type... Too late
+	   for a better job... */
+
+	pips_user_warning("Integer/enum or enum/integer type conversion"
+			  " for argument \"%s\" (rank %d) of function \"%s\" "
+			  "called from function \"%s\".\n",
+			  entity_user_name(fpv), n, entity_user_name(f),
+			  entity_user_name(get_current_module_entity()));
+
+	fpvl = CONS(ENTITY, fpv, fpvl);
+	ctf = safe_any_expression_to_transformer(fpv, e, cpre, false);
+      }
       else {
 	/* Should be an error or a warning? */
 	list el = expression_to_proper_effects(e);

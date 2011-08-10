@@ -394,8 +394,8 @@ bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(t
 {
 
   pips_debug(8,"real_ct : %s \t formal_ct: %s\n",
-	     words_to_string(words_type(real_ct, NIL)),
-	     words_to_string(words_type(formal_ct,NIL)));
+	     words_to_string(words_type(real_ct, NIL,false)),
+	     words_to_string(words_type(formal_ct,NIL,false)));
 
   bool result = false; /* safe default result */
   /* easiest case */

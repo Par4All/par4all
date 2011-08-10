@@ -386,7 +386,7 @@ bool FILE_star_effect_reference_p(reference ref)
   bool res = false;
   type t = basic_concrete_type(entity_type(reference_variable(ref)));
   pips_debug(8, "begin with type %s\n",
-	     words_to_string(words_type(t,NIL)));
+	     words_to_string(words_type(t,NIL,false)));
   if (type_variable_p(t))
     {
       basic b = variable_basic(type_variable(t));

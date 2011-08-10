@@ -165,7 +165,7 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
   for(int i=0; i< (int) gen_length(l_dim); i++)
     (*effect_add_expression_dimension_func)(input_eff, make_unbounded_expression());
 
-  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL)));
+  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL, false)));
   list l_fields = type_fields(entity_type(basic_derived(b)));
 
   FOREACH(ENTITY, f, l_fields)
@@ -219,7 +219,7 @@ list generic_proper_effects_of_derived_reference(reference ref, bool write_p)
   basic b = variable_basic(type_variable(t));
   list le = NIL;
 
-  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL)));
+  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL, false)));
 
   /* should'nt it be something more direct here ? ?*/
   effect eff = (*reference_to_effect_func)
