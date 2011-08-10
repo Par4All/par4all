@@ -672,7 +672,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
   if (effects_package_entity_p(e1) || effects_package_entity_p(e2))
     conflict_p = (e1 == e2);
   // idem with "register" variables which are in a world of their own
-  if (entity_register_p(e1) || entity_register_p(e2))
+  else if (entity_register_p(e1) || entity_register_p(e2))
     conflict_p = (e1 == e2);
   else if (!c_module_p(get_current_module_entity()))
   {
