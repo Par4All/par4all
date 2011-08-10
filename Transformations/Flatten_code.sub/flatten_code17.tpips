@@ -1,0 +1,20 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS flatten_code17
+
+delete $WS
+create $WS $WS.c
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[$WS]
+
+echo
+echo Code after flatten_code
+echo
+apply FLATTEN_CODE[$WS]
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+close
+delete $WS
+quit
