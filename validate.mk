@@ -112,6 +112,10 @@ F.valid	= $(F.result:%.result=%.validate)
 # all base cases
 F.list	= $(F.result:%.result=%)
 
+# possible filtering
+F.later	= $(wildcard *.later)
+F.bug	= $(wildcard *.bug)
+
 # where are we?
 SUBDIR	= $(notdir $(PWD))
 here	:= $(shell pwd)
