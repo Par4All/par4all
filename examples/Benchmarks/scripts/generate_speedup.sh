@@ -28,12 +28,16 @@ if [[ -z $tests ]]; then
 tests=`echo "select testcase from timing $exclude_tests group by testcase;" | sqlite3 $dbfile`
 fi
 
+if [[ -z $strip_ver ]]; then
+strip_ver=run_
+fi
+
 # 1st line is header
 echo -n " run_seq" >> $out_dat
 nvers=0 #compute number of versions
 for ver in $versions; do
   nvers=$(($nvers + 1))
-  ver=`echo $ver|sed 's/run_//g'|sed 's/_/ /g'`
+  ver=`echo $ver|sed "s/$strip_ver//g"|sed 's/_/ /g'`
   echo -n " \"$ver\"" >> $out_dat
 done
 echo >> $out_dat
@@ -72,19 +76,21 @@ for test in $tests; do
   nmean=$((nmean+1))
 done
 
-element_count=${#mean_expr[@]}
-mean_idx=0
-echo -n "Geo.Mean" >> $out_dat
-while [ "$mean_idx" -lt "$element_count" ]
-do    # List all the elements in the array.
-  echo "e((${mean_expr[$mean_idx]})/$nmean)"
-  geomean=`echo "scale=2; e((${mean_expr[$mean_idx]})/$nmean)" | bc -l`
-  echo "$geomean"
-  echo -n " $geomean" >> $out_dat
-  ((mean_idx++))
-done
-echo >> $out_dat
 
+if [[ -z $disable_mean ]]; then
+  element_count=${#mean_expr[@]}
+  mean_idx=0
+  echo -n "Geo.Mean" >> $out_dat
+  while [ "$mean_idx" -lt "$element_count" ]
+  do    # List all the elements in the array.
+    echo "e((${mean_expr[$mean_idx]})/$nmean)"
+    geomean=`echo "scale=2; e((${mean_expr[$mean_idx]})/$nmean)" | bc -l`
+    echo "$geomean"
+    echo -n " $geomean" >> $out_dat
+    ((mean_idx++))
+  done
+  echo >> $out_dat
+fi
 
 
 cp speedup.gp $out_gp
