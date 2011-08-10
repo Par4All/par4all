@@ -635,6 +635,7 @@ bool entity_subroutine_p(entity e)
     !entity_blockdata_p(e) && /* ??? */
     !entity_function_p(e);
 }
+
 bool entity_pointer_p(entity e)
 {
     type t = ultimate_type(entity_type(e));
@@ -649,6 +650,20 @@ bool entity_array_p(entity e)
   }
   return false;
 }
+
+/* @return whether entity is a "register" variable
+ */
+bool entity_register_p(entity e)
+{
+  if (entity_variable_p(e))
+  {
+    FOREACH(qualifier, q, variable_qualifiers(type_variable(entity_type(e))))
+      if (qualifier_register_p(q))
+        return true;
+  }
+  return false;
+}
+
 bool array_entity_p(entity e)
 {
     return entity_array_p(e);
