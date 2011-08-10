@@ -117,6 +117,15 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
 
   list decls = statement_declarations(s);
   int ndecls = gen_length(decls);
+
+  pips_debug(3, "at statement %"_intFMT", %d declarations\n",
+             statement_number(s), ndecls);
+  ifdebug(7) {
+    // show details...
+    FOREACH(entity, vs, decls)
+      pips_debug(7, " - variable: %s\n", entity_name(vs));
+  }
+
   if (ndecls>1)
   {
     // built list of declaration statements
@@ -127,8 +136,9 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
     bool nswitched = false;
     FOREACH(entity, v, decls)
     {
-      pips_debug(6, "%s in statement %"_intFMT" declarations\n",
-                 entity_name(v), statement_ordering(s));
+      pips_debug(4, "%s (%sregister) in statement %"_intFMT"\n",
+                 entity_name(v), set_belong_p(ctx->switched, v)? "": "NOT ",
+                 statement_number(s));
 
       if (set_belong_p(ctx->switched, v))
       {
@@ -138,7 +148,7 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
             nl = CONS(entity, v, nl);
           else
           {
-            pips_debug(7, "cutting on %s\n", entity_name(v));
+            pips_debug(5, "cutting on %s\n", entity_name(v));
             // cut list
             ndecls -= gen_length(nl);
             lds =
@@ -159,7 +169,7 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
         {
           if (nswitched) // current list contains switched vars
           {
-            pips_debug(8, "cutting S on %s\n", entity_name(v));
+            pips_debug(5, "cutting S on %s\n", entity_name(v));
             // cut list
             ndecls -= gen_length(nl);
             lds =
@@ -178,7 +188,7 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
       }
     }
 
-    pips_assert("all declarations are managed", ndecls==gen_length(nl));
+    pips_assert("all declarations are managed", ndecls==(int) gen_length(nl));
 
     // store lds for later insertions
     // I do not that now because we are still recurring in the statements...
@@ -268,11 +278,13 @@ bool force_register_declarations(const char * module_name)
         !set_belong_p(ctx.invalidated, var) &&
         variable_can_switch_to_register(var))
     {
-      pips_debug(7, "force %s as register\n", entity_name(var));
+      pips_debug(2, "force %s as register\n", entity_name(var));
       variable v = type_variable(entity_type(var));
       variable_qualifiers(v) = make_it_register(variable_qualifiers(v));
       set_add_element(switched, switched, var);
     }
+    else
+      pips_debug(3, "variable %s kept\n", entity_name(var));
   }
 
   // now we have to possibly cut declaration lists as they must be homogeneous
