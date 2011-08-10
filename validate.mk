@@ -53,6 +53,11 @@ LIST	= svn status
 # prefix of tests to be run, default is all
 PREFIX	=
 
+# possible filtering
+F.later	= $(wildcard $(PREFIX)*.later)
+F.bug	= $(wildcard $(PREFIX)*.bug)
+F.slow	= $(wildcard $(PREFIX)*.slow)
+
 # automatic sub directories,
 # D.sub could be set explicitely to anywhere to recurse
 D.sub	= $(wildcard *.sub)
@@ -78,7 +83,7 @@ F.res	= \
 	$(F.f90:%.f90=%.result) \
 	$(F.f95:%.f95=%.result)
 
-# actual result directory to validate
+# actual result directories to validate
 F.result= $(wildcard $(PREFIX)*.result)
 
 # various validation scripts
@@ -107,14 +112,11 @@ F.output = \
 	$(F.result:%=%/$(TEST))
 
 # virtual target to trigger the validations
-F.valid	= $(F.result:%.result=%.validate)
+# with prioritized "slow" cases ahead
+F.valid	= $(F.slow:%.slow=%.validate) $(F.result:%.result=%.validate)
 
 # all base cases
 F.list	= $(F.result:%.result=%)
-
-# possible filtering
-F.later	= $(wildcard *.later)
-F.bug	= $(wildcard *.bug)
 
 # where are we?
 SUBDIR	= $(notdir $(PWD))
@@ -420,6 +422,10 @@ else # with pyps
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
+
+# special case for "slow" directories...
+%.validate:
+	echo "skipping $@, possibly a slow subdirectory" >&2
 
 # detect skipped stuff
 .PHONY: skipped
