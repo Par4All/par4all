@@ -1333,6 +1333,13 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
             free_basic(rb);
             rb = basic_of_expression(EXPRESSION(CAR(CDR(args))));
         }
+        else if(ENTITY_MINUS_C_P(f)) {
+            /* This must be a pointer difference. Else, the parser
+	       would have used ENTITY_MINUS (see
+	       simplify_C_expression()). */
+            free_basic(rb);
+	    rb = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
+        }
         else {
             free_basic(rb);
 	    // FI: within declaration initializations, rb may be
