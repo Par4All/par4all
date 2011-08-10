@@ -34,11 +34,11 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "15 =" [shape=circle];
-  "15 =" -> "out";
+  "15 =" -> "out'";
   "14 /." [shape=trapezium,orientation=270];
   "14 /." -> "15 =" [label="t1"];
   "13 +" [shape=trapezium,orientation=270];
@@ -59,11 +59,11 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "14 /." [label="out_1"];
   "12 *." [shape=trapezium,orientation=270];
@@ -123,11 +123,11 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "15 =" [shape=circle];
-  "15 =" -> "out";
+  "15 =" -> "out'";
   "14 /." [shape=trapezium,orientation=270];
   "14 /." -> "15 =" [label="t1"];
   "13 +" [shape=trapezium,orientation=270];
@@ -148,11 +148,11 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "14 /." [label="out"];
   "12 *." [shape=trapezium,orientation=270];
@@ -169,11 +169,11 @@ digraph "freia_48_helper_0_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "14 /." [label="out_1"];
   "12 *." [shape=trapezium,orientation=270];
@@ -351,11 +351,11 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "15 =" [shape=circle];
-  "15 =" -> "out";
+  "15 =" -> "out'";
   "14 /." [shape=trapezium,orientation=270];
   "14 /." -> "15 =" [label="t1"];
   "13 +" [shape=trapezium,orientation=270];
@@ -376,11 +376,11 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "14 /." [label="out"];
   "12 *." [shape=trapezium,orientation=270];
@@ -397,11 +397,11 @@ digraph "freia_48_helper_0_0_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "14 /." [label="out_1"];
   "12 *." [shape=trapezium,orientation=270];

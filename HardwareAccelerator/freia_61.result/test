@@ -47,11 +47,11 @@ digraph "dag_1" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "10 -" [shape=trapezium,orientation=270];
-  "10 -" -> "o";
+  "10 -" -> "o'";
   "o" -> "10 -";
   "t1" -> "10 -";
 }
@@ -81,11 +81,11 @@ digraph "dag_cleaned_1" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "10 -" [shape=trapezium,orientation=270];
-  "10 -" -> "o";
+  "10 -" -> "o'";
   "o" -> "10 -";
   "t1" -> "10 -";
 }
@@ -149,11 +149,11 @@ digraph "dag_1" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "10 -" [shape=trapezium,orientation=270];
-  "10 -" -> "o";
+  "10 -" -> "o'";
   "o" -> "10 -";
   "t1" -> "10 -";
 }
@@ -183,11 +183,11 @@ digraph "dag_cleaned_1" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "10 -" [shape=trapezium,orientation=270];
-  "10 -" -> "o";
+  "10 -" -> "o'";
   "o" -> "10 -";
   "t1" -> "10 -";
 }
@@ -217,11 +217,11 @@ digraph "freia_61_helper_1_0" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "10 -" [shape=trapezium,orientation=270];
-  "10 -" -> "o";
+  "10 -" -> "o'";
   "o" -> "10 -";
   "t1" -> "10 -";
 }
@@ -474,11 +474,11 @@ digraph "dag_1" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "10 -" [shape=trapezium,orientation=270];
-  "10 -" -> "o";
+  "10 -" -> "o'";
   "o" -> "10 -";
   "t1" -> "10 -";
 }
@@ -508,11 +508,11 @@ digraph "dag_cleaned_1" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "10 -" [shape=trapezium,orientation=270];
-  "10 -" -> "o";
+  "10 -" -> "o'";
   "o" -> "10 -";
   "t1" -> "10 -";
 }
@@ -542,11 +542,11 @@ digraph "freia_61_helper_1_0_0" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "10 -" [shape=trapezium,orientation=270];
-  "10 -" -> "o";
+  "10 -" -> "o'";
   "o" -> "10 -";
   "t1" -> "10 -";
 }

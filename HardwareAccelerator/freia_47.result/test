@@ -29,11 +29,11 @@ digraph "dag_0" {
 
   // outputs
   "o2" [shape=circle];
-  "o1" [shape=circle];
+  "o1'" [shape=circle];
 
   // computation vertices
   "11 =" [shape=circle];
-  "11 =" -> "o1";
+  "11 =" -> "o1'";
   "10 *" [shape=trapezium,orientation=270];
   "10 *" -> "o2";
   "9 +" [shape=trapezium,orientation=270];
@@ -51,14 +51,14 @@ digraph "dag_cleaned_0" {
 
   // outputs
   "o2" [shape=circle];
-  "o1" [shape=circle];
+  "o1'" [shape=circle];
 
   // computation vertices
   "10 *" [shape=trapezium,orientation=270];
   "10 *" -> "o2";
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "10 *" [label="o1"];
-  "9 +" -> "o1";
+  "9 +" -> "o1'";
   "o1" -> "9 +";
   "in" -> "10 *";
   "in" -> "9 +";
@@ -101,11 +101,11 @@ digraph "dag_0" {
 
   // outputs
   "o2" [shape=circle];
-  "o1" [shape=circle];
+  "o1'" [shape=circle];
 
   // computation vertices
   "11 =" [shape=circle];
-  "11 =" -> "o1";
+  "11 =" -> "o1'";
   "10 *" [shape=trapezium,orientation=270];
   "10 *" -> "o2";
   "9 +" [shape=trapezium,orientation=270];
@@ -123,14 +123,14 @@ digraph "dag_cleaned_0" {
 
   // outputs
   "o2" [shape=circle];
-  "o1" [shape=circle];
+  "o1'" [shape=circle];
 
   // computation vertices
   "10 *" [shape=trapezium,orientation=270];
   "10 *" -> "o2";
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "10 *" [label="o1"];
-  "9 +" -> "o1";
+  "9 +" -> "o1'";
   "o1" -> "9 +";
   "in" -> "10 *";
   "in" -> "9 +";
@@ -142,7 +142,7 @@ digraph "freia_47_helper_0_0" {
   "o1" [shape=circle];
 
   // outputs
-  "o1" [shape=circle];
+  "o1'" [shape=circle];
   "o2" [shape=circle];
 
   // computation vertices
@@ -150,7 +150,7 @@ digraph "freia_47_helper_0_0" {
   "10 *" -> "o2";
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "10 *" [label="o1"];
-  "9 +" -> "o1";
+  "9 +" -> "o1'";
   "o1" -> "9 +";
   "in" -> "10 *";
   "in" -> "9 +";
@@ -309,11 +309,11 @@ digraph "dag_0" {
 
   // outputs
   "o2" [shape=circle];
-  "o1" [shape=circle];
+  "o1'" [shape=circle];
 
   // computation vertices
   "11 =" [shape=circle];
-  "11 =" -> "o1";
+  "11 =" -> "o1'";
   "10 *" [shape=trapezium,orientation=270];
   "10 *" -> "o2";
   "9 +" [shape=trapezium,orientation=270];
@@ -331,14 +331,14 @@ digraph "dag_cleaned_0" {
 
   // outputs
   "o2" [shape=circle];
-  "o1" [shape=circle];
+  "o1'" [shape=circle];
 
   // computation vertices
   "10 *" [shape=trapezium,orientation=270];
   "10 *" -> "o2";
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "10 *" [label="o1"];
-  "9 +" -> "o1";
+  "9 +" -> "o1'";
   "o1" -> "9 +";
   "in" -> "10 *";
   "in" -> "9 +";
@@ -350,7 +350,7 @@ digraph "freia_47_helper_0_0_0" {
   "o1" [shape=circle];
 
   // outputs
-  "o1" [shape=circle];
+  "o1'" [shape=circle];
   "o2" [shape=circle];
 
   // computation vertices
@@ -358,7 +358,7 @@ digraph "freia_47_helper_0_0_0" {
   "10 *" -> "o2";
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "10 *" [label="o1"];
-  "9 +" -> "o1";
+  "9 +" -> "o1'";
   "o1" -> "9 +";
   "in" -> "10 *";
   "in" -> "9 +";

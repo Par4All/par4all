@@ -47,7 +47,7 @@ digraph "dag_1" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "17 vol" [shape=diamond];
@@ -55,7 +55,7 @@ digraph "dag_1" {
   "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
+  "14 <" -> "out'";
   "in" -> "14 <";
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out"];
@@ -79,7 +79,7 @@ digraph "dag_cleaned_1" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "17 vol" [shape=diamond];
@@ -87,7 +87,7 @@ digraph "dag_cleaned_1" {
   "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
+  "14 <" -> "out'";
   "in" -> "14 <";
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out_1"];
@@ -161,7 +161,7 @@ digraph "dag_1" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "61 vol" [shape=diamond];
@@ -191,7 +191,7 @@ digraph "dag_1" {
   "59 ?" -> "10 ?" [arrowhead=empty,label="l"];
   "58 <" [shape=trapezium,orientation=270];
   "58 <" -> "61 vol" [label="out"];
-  "58 <" -> "out";
+  "58 <" -> "out'";
   "57 ?" [shape=none];
   "57 ?" -> "59 ?" [arrowhead=empty,label="j"];
   "57 ?" -> "52 ?" [arrowhead=empty,label="j"];
@@ -523,7 +523,7 @@ digraph "dag_cleaned_1" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "61 vol" [shape=diamond];
@@ -553,7 +553,7 @@ digraph "dag_cleaned_1" {
   "59 ?" -> "10 ?" [arrowhead=empty,label="l"];
   "58 <" [shape=trapezium,orientation=270];
   "58 <" -> "61 vol" [label="out"];
-  "58 <" -> "out";
+  "58 <" -> "out'";
   "57 ?" [shape=none];
   "57 ?" -> "59 ?" [arrowhead=empty,label="j"];
   "57 ?" -> "52 ?" [arrowhead=empty,label="j"];
@@ -885,13 +885,13 @@ digraph "freia_58_helper_1_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "61 vol" [shape=diamond];
   "58 <" [shape=trapezium,orientation=270];
   "58 <" -> "61 vol" [label="out"];
-  "58 <" -> "out";
+  "58 <" -> "out'";
   "54 D8" [shape=box];
   "54 D8" -> "58 <" [label="out_1"];
   "51 <" [shape=trapezium,orientation=270];
@@ -1388,7 +1388,7 @@ digraph "dag_1" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "17 vol" [shape=diamond];
@@ -1396,7 +1396,7 @@ digraph "dag_1" {
   "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
+  "14 <" -> "out'";
   "in" -> "14 <";
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out"];
@@ -1420,7 +1420,7 @@ digraph "dag_cleaned_1" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "17 vol" [shape=diamond];
@@ -1428,7 +1428,7 @@ digraph "dag_cleaned_1" {
   "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
+  "14 <" -> "out'";
   "in" -> "14 <";
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out"];
@@ -1452,13 +1452,13 @@ digraph "freia_58_helper_1_0_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "17 vol" [shape=diamond];
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
+  "14 <" -> "out'";
   "in" -> "14 <";
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out_1"];

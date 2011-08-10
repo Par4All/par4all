@@ -65,7 +65,7 @@ digraph "dag_0" {
   "stab" [shape=circle];
 
   // outputs
-  "bg" [shape=circle];
+  "bg'" [shape=circle];
   "mv" [shape=circle];
 
   // computation vertices
@@ -96,7 +96,7 @@ digraph "dag_0" {
   "26 max" [shape=diamond];
   "26 max" -> "29 ?" [arrowhead=empty,label="maxmotion"];
   "23 =" [shape=circle];
-  "23 =" -> "bg";
+  "23 =" -> "bg'";
   "22 /." [shape=trapezium,orientation=270];
   "22 /." -> "23 =" [label="t3"];
   "21 +" [shape=trapezium,orientation=270];
@@ -124,7 +124,7 @@ digraph "dag_cleaned_0" {
   "stab" [shape=circle];
 
   // outputs
-  "bg" [shape=circle];
+  "bg'" [shape=circle];
   "mv" [shape=circle];
 
   // computation vertices
@@ -155,7 +155,7 @@ digraph "dag_cleaned_0" {
   "26 max" [shape=diamond];
   "26 max" -> "29 ?" [arrowhead=empty,label="maxmotion"];
   "22 /." [shape=trapezium,orientation=270];
-  "22 /." -> "bg";
+  "22 /." -> "bg'";
   "21 +" [shape=trapezium,orientation=270];
   "21 +" -> "22 /." [label="bg_1"];
   "20 *." [shape=trapezium,orientation=270];
@@ -286,7 +286,7 @@ digraph "dag_0" {
   "stab" [shape=circle];
 
   // outputs
-  "bg" [shape=circle];
+  "bg'" [shape=circle];
   "mv" [shape=circle];
 
   // computation vertices
@@ -317,7 +317,7 @@ digraph "dag_0" {
   "26 max" [shape=diamond];
   "26 max" -> "29 ?" [arrowhead=empty,label="maxmotion"];
   "23 =" [shape=circle];
-  "23 =" -> "bg";
+  "23 =" -> "bg'";
   "22 /." [shape=trapezium,orientation=270];
   "22 /." -> "23 =" [label="t3"];
   "21 +" [shape=trapezium,orientation=270];
@@ -345,7 +345,7 @@ digraph "dag_cleaned_0" {
   "stab" [shape=circle];
 
   // outputs
-  "bg" [shape=circle];
+  "bg'" [shape=circle];
   "mv" [shape=circle];
 
   // computation vertices
@@ -376,7 +376,7 @@ digraph "dag_cleaned_0" {
   "26 max" [shape=diamond];
   "26 max" -> "29 ?" [arrowhead=empty,label="maxmotion"];
   "22 /." [shape=trapezium,orientation=270];
-  "22 /." -> "bg";
+  "22 /." -> "bg'";
   "21 +" [shape=trapezium,orientation=270];
   "21 +" -> "22 /." [label="bg"];
   "20 *." [shape=trapezium,orientation=270];
@@ -422,11 +422,11 @@ digraph "vs_core_2_helper_0_1" {
   "bg" [shape=circle];
 
   // outputs
-  "bg" [shape=circle];
+  "bg'" [shape=circle];
 
   // computation vertices
   "22 /." [shape=trapezium,orientation=270];
-  "22 /." -> "bg";
+  "22 /." -> "bg'";
   "21 +" [shape=trapezium,orientation=270];
   "21 +" -> "22 /." [label="bg_1"];
   "t0" -> "21 +";
@@ -1033,7 +1033,7 @@ digraph "dag_0" {
   "stab" [shape=circle];
 
   // outputs
-  "bg" [shape=circle];
+  "bg'" [shape=circle];
   "mv" [shape=circle];
 
   // computation vertices
@@ -1064,7 +1064,7 @@ digraph "dag_0" {
   "26 max" [shape=diamond];
   "26 max" -> "29 ?" [arrowhead=empty,label="maxmotion"];
   "23 =" [shape=circle];
-  "23 =" -> "bg";
+  "23 =" -> "bg'";
   "22 /." [shape=trapezium,orientation=270];
   "22 /." -> "23 =" [label="t3"];
   "21 +" [shape=trapezium,orientation=270];
@@ -1092,7 +1092,7 @@ digraph "dag_cleaned_0" {
   "stab" [shape=circle];
 
   // outputs
-  "bg" [shape=circle];
+  "bg'" [shape=circle];
   "mv" [shape=circle];
 
   // computation vertices
@@ -1123,7 +1123,7 @@ digraph "dag_cleaned_0" {
   "26 max" [shape=diamond];
   "26 max" -> "29 ?" [arrowhead=empty,label="maxmotion"];
   "22 /." [shape=trapezium,orientation=270];
-  "22 /." -> "bg";
+  "22 /." -> "bg'";
   "21 +" [shape=trapezium,orientation=270];
   "21 +" -> "22 /." [label="bg"];
   "20 *." [shape=trapezium,orientation=270];
@@ -1147,11 +1147,11 @@ digraph "vs_core_2_helper_0_0_0" {
 
   // outputs
   "mv_6" [shape=circle];
-  "bg" [shape=circle];
+  "bg'" [shape=circle];
 
   // computation vertices
   "22 /." [shape=trapezium,orientation=270];
-  "22 /." -> "bg";
+  "22 /." -> "bg'";
   "21 +" [shape=trapezium,orientation=270];
   "21 +" -> "22 /." [label="bg_1"];
   "20 *." [shape=trapezium,orientation=270];

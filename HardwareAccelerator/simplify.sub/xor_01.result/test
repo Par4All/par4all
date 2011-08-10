@@ -24,11 +24,11 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o";
+  "8 +." -> "o'";
   "7 ^" [shape=trapezium,orientation=270];
   "7 ^" -> "8 +." [label="o"];
   "o" -> "7 ^";
@@ -78,11 +78,11 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o";
+  "8 +." -> "o'";
   "7 ^" [shape=trapezium,orientation=270];
   "7 ^" -> "8 +." [label="o"];
   "o" -> "7 ^";
@@ -228,11 +228,11 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // outputs
-  "o" [shape=circle];
+  "o'" [shape=circle];
 
   // computation vertices
   "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o";
+  "8 +." -> "o'";
   "7 ^" [shape=trapezium,orientation=270];
   "7 ^" -> "8 +." [label="o"];
   "o" -> "7 ^";

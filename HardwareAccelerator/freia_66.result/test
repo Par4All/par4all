@@ -73,15 +73,15 @@ digraph "dag_1" {
   "t" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
-  "t" [shape=circle];
+  "out'" [shape=circle];
+  "t'" [shape=circle];
 
   // computation vertices
   "27 >" [shape=trapezium,orientation=270];
-  "27 >" -> "t";
+  "27 >" -> "t'";
   "26 D8" [shape=box];
   "26 D8" -> "27 >" [label="out"];
-  "26 D8" -> "out";
+  "26 D8" -> "out'";
   "25 >" [shape=trapezium,orientation=270];
   "25 >" -> "27 >" [label="t"];
   "25 >" -> "26 D8" [label="t"];
@@ -105,15 +105,15 @@ digraph "dag_cleaned_1" {
   "t" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
-  "t" [shape=circle];
+  "out'" [shape=circle];
+  "t'" [shape=circle];
 
   // computation vertices
   "27 >" [shape=trapezium,orientation=270];
-  "27 >" -> "t";
+  "27 >" -> "t'";
   "26 D8" [shape=box];
   "26 D8" -> "27 >" [label="out"];
-  "26 D8" -> "out";
+  "26 D8" -> "out'";
   "25 >" [shape=trapezium,orientation=270];
   "25 >" -> "27 >" [label="t_1"];
   "25 >" -> "26 D8" [label="t_1"];
@@ -240,15 +240,15 @@ digraph "dag_1" {
   "t" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
-  "t" [shape=circle];
+  "out'" [shape=circle];
+  "t'" [shape=circle];
 
   // computation vertices
   "27 >" [shape=trapezium,orientation=270];
-  "27 >" -> "t";
+  "27 >" -> "t'";
   "26 D8" [shape=box];
   "26 D8" -> "27 >" [label="out"];
-  "26 D8" -> "out";
+  "26 D8" -> "out'";
   "25 >" [shape=trapezium,orientation=270];
   "25 >" -> "27 >" [label="t"];
   "25 >" -> "26 D8" [label="t"];
@@ -272,15 +272,15 @@ digraph "dag_cleaned_1" {
   "t" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
-  "t" [shape=circle];
+  "out'" [shape=circle];
+  "t'" [shape=circle];
 
   // computation vertices
   "27 >" [shape=trapezium,orientation=270];
-  "27 >" -> "t";
+  "27 >" -> "t'";
   "26 D8" [shape=box];
   "26 D8" -> "27 >" [label="out"];
-  "26 D8" -> "out";
+  "26 D8" -> "out'";
   "25 >" [shape=trapezium,orientation=270];
   "25 >" -> "27 >" [label="t"];
   "25 >" -> "26 D8" [label="t"];
@@ -296,15 +296,15 @@ digraph "freia_66_helper_1_0" {
   "t" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
-  "t" [shape=circle];
+  "out'" [shape=circle];
+  "t'" [shape=circle];
 
   // computation vertices
   "27 >" [shape=trapezium,orientation=270];
-  "27 >" -> "t";
+  "27 >" -> "t'";
   "26 D8" [shape=box];
   "26 D8" -> "27 >" [label="out"];
-  "26 D8" -> "out";
+  "26 D8" -> "out'";
   "25 >" [shape=trapezium,orientation=270];
   "25 >" -> "27 >" [label="t_1"];
   "25 >" -> "26 D8" [label="t_1"];
@@ -587,15 +587,15 @@ digraph "dag_1" {
   "t" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
-  "t" [shape=circle];
+  "out'" [shape=circle];
+  "t'" [shape=circle];
 
   // computation vertices
   "27 >" [shape=trapezium,orientation=270];
-  "27 >" -> "t";
+  "27 >" -> "t'";
   "26 D8" [shape=box];
   "26 D8" -> "27 >" [label="out"];
-  "26 D8" -> "out";
+  "26 D8" -> "out'";
   "25 >" [shape=trapezium,orientation=270];
   "25 >" -> "27 >" [label="t"];
   "25 >" -> "26 D8" [label="t"];
@@ -619,15 +619,15 @@ digraph "dag_cleaned_1" {
   "t" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
-  "t" [shape=circle];
+  "out'" [shape=circle];
+  "t'" [shape=circle];
 
   // computation vertices
   "27 >" [shape=trapezium,orientation=270];
-  "27 >" -> "t";
+  "27 >" -> "t'";
   "26 D8" [shape=box];
   "26 D8" -> "27 >" [label="out"];
-  "26 D8" -> "out";
+  "26 D8" -> "out'";
   "25 >" [shape=trapezium,orientation=270];
   "25 >" -> "27 >" [label="t"];
   "25 >" -> "26 D8" [label="t"];
@@ -643,15 +643,15 @@ digraph "freia_66_helper_1_0_0" {
   "t" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
-  "t" [shape=circle];
+  "out'" [shape=circle];
+  "t'" [shape=circle];
 
   // computation vertices
   "27 >" [shape=trapezium,orientation=270];
-  "27 >" -> "t";
+  "27 >" -> "t'";
   "26 D8" [shape=box];
   "26 D8" -> "27 >" [label="out"];
-  "26 D8" -> "out";
+  "26 D8" -> "out'";
   "25 >" [shape=trapezium,orientation=270];
   "25 >" -> "27 >" [label="t_1"];
   "25 >" -> "26 D8" [label="t_1"];

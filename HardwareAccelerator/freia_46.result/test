@@ -27,11 +27,11 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "10 =" [shape=circle];
-  "10 =" -> "out";
+  "10 =" -> "out'";
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "10 =" [label="t"];
   "out" -> "9 +";
@@ -44,11 +44,11 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "9 +" [shape=trapezium,orientation=270];
-  "9 +" -> "out";
+  "9 +" -> "out'";
   "out" -> "9 +";
   "in" -> "9 +";
 }
@@ -87,11 +87,11 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "10 =" [shape=circle];
-  "10 =" -> "out";
+  "10 =" -> "out'";
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "10 =" [label="t"];
   "out" -> "9 +";
@@ -104,11 +104,11 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "9 +" [shape=trapezium,orientation=270];
-  "9 +" -> "out";
+  "9 +" -> "out'";
   "out" -> "9 +";
   "in" -> "9 +";
 }
@@ -119,11 +119,11 @@ digraph "freia_46_helper_0_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "9 +" [shape=trapezium,orientation=270];
-  "9 +" -> "out";
+  "9 +" -> "out'";
   "out" -> "9 +";
   "in" -> "9 +";
 }
@@ -248,11 +248,11 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "10 =" [shape=circle];
-  "10 =" -> "out";
+  "10 =" -> "out'";
   "9 +" [shape=trapezium,orientation=270];
   "9 +" -> "10 =" [label="t"];
   "out" -> "9 +";
@@ -265,11 +265,11 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "9 +" [shape=trapezium,orientation=270];
-  "9 +" -> "out";
+  "9 +" -> "out'";
   "out" -> "9 +";
   "in" -> "9 +";
 }
@@ -280,11 +280,11 @@ digraph "freia_46_helper_0_0_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "9 +" [shape=trapezium,orientation=270];
-  "9 +" -> "out";
+  "9 +" -> "out'";
   "out" -> "9 +";
   "in" -> "9 +";
 }
