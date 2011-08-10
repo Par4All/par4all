@@ -13,6 +13,7 @@
 */
 
 #include <p4a_accel.h>
+#include <errno.h>
 
 /**
  *  This is used by P4A_TIMING routine to compute elapsed time for a kernel
@@ -156,9 +157,11 @@ void p4a_init_cuda_accel() {
     errno = 0;
     int tpb = strtol(env_p4a_max_tpb, NULL,10);
     if(errno==0) {
+      P4A_dump_message("Setting max TPB to %d\n",tpb);
       p4a_max_threads_per_block = tpb;
+    } else {
+      fprintf(stderr,"Invalid value for P4A_MAX_TPB : %s\n",env_p4a_max_tpb);
     }
-
   }
 }
 
