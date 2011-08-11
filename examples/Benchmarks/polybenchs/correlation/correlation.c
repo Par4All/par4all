@@ -22,7 +22,7 @@
 #endif
 
 /* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */DATA_TYPE
-    float_n = 321414134.01;
+float_n = 321414134.01;
 DATA_TYPE eps = 0.005;
 DATA_TYPE data[M + 1][N + 1];
 DATA_TYPE symmat[M + 1][M + 1];
