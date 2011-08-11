@@ -5,6 +5,6 @@ display PARSED_PRINTED_FILE[main]
 
 close
 
-delete register02 
+#delete register02 
 
 quit

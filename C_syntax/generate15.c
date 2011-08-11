@@ -5,6 +5,8 @@
 // It is even better to check that the source code submitted to PIPS
 // is correct, using gcc or another C compiler
 
+// Here, the C code is wrong, but it is on purpose,,,
+
 //int foo(int n)
 //{
 //  return n;
