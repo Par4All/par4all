@@ -1,6 +1,5 @@
 TARGET=bicg
-NTHREADS_OMP  = 10
-NTHREADS_CUDA = 128
+SIZE_PARAMS= -DNX=8000 -DNY=8000
 
 include ../../bench.mk
 

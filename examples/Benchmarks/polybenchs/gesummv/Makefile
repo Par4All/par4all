@@ -1,6 +1,5 @@
 TARGET=gesummv
-NTHREADS_OMP  = 10
-NTHREADS_CUDA = 128
+SIZE_PARAMS= -DN=8000
 
 include ../../bench.mk
 
