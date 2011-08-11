@@ -2310,11 +2310,12 @@ bool same_range_name_p(range r1, range r2)
     same_expression_name_p(range_upper(r1), range_upper(r2)) &&
     same_expression_name_p(range_increment(r1), range_increment(r2));
 }
-bool same_type_name_p(type t0, type t1)
-{
-    string s0 = type_to_string(t0),
-           s1 = type_to_string(t1);
+
+bool same_type_name_p(const type t0, const type t1) {
+    string s0 = string_of_type(t0),
+           s1 =string_of_type(t1);
     bool same = same_string_p(s0,s1);
+    free(s0);free(s1);
     return same;
 }
 

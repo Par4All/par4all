@@ -1561,10 +1561,14 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
   /* SG we cannot rely on same_type_p or type_equal_p because we want a syntactic comparison,
    * there used to be a hack in expression_equal_p to handle this particular case, I prefer to have the hack right here
    */
-  string tv = string_of_type(entity_type(v)),
-         tref =string_of_type(entity_type(ref));
-  if (ok) ok = st = same_string_p(tv,tref);
-  free(tv);free(tref);
+  if( ok ) {
+      if(entity_undefined_p(ref)) ok = st =false;
+      else {
+          type tv = entity_type(v),
+               tref = entity_type(ref);
+          ok = st = same_type_name_p(tv,tref);
+      }
+  }
 
   pips_debug(4, "%s ~ %s? %d: n=%d,o=%d,t=%d\n", entity_name(v),
 	     entity_undefined_p(ref)? "<undef>": entity_name(ref),

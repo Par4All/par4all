@@ -298,6 +298,7 @@ type MakeAnyScalarResult(tag t, _int size)
 }
 
 
+
 /* similar as type_equals but by passes typedefs
  * FI Warning: current version only compares ultimate_types
  * but check the various typedef that follows.
@@ -830,7 +831,7 @@ string safe_type_to_string(type t)
 }
 
 /* SG: I don't understand the previous functions */
-string string_of_type(type t)
+string string_of_type(const type t)
 {
   list wl = words_type(t, NIL, false);
   string s = words_to_string(wl);
