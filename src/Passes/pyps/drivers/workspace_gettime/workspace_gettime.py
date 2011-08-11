@@ -15,16 +15,12 @@ pyps_gettime_c = "pyps_gettime.c"
 pyps_gettime_h = "pyps_gettime.h"
 
 c_bench_start = r"""
-{
 struct timeval __pyps_time_start;
 __pyps_bench_start(&__pyps_time_start);
-{
 """
 
 c_bench_stop = r"""
-}
 __pyps_bench_stop("${mn}", &__pyps_time_start);
-}
 """
 
 def benchmark_module(module, **kwargs):
@@ -108,7 +104,7 @@ class workspace(pyps.workspace):
 		
 		self._module_rtimes = dict()
 		for i in range(0, iterations):
-			print >>sys.stderr, "Launch execution of %s %s..." % (outfile," ".join(args))
+			print >>sys.stderr, "Launch execution of %s %s..." % (outfile," ".join(map(str,args)))
 			rc,out,err = self.run(outfile,args)
 			if rc != 0:
 				message = "Program %s failed with return code %d.\nOutput:\n%s\nstderr:\n%s\n" %(outfile+" ".join(args), rc, out,err)
