@@ -5,7 +5,7 @@ TARGETS=2mm 3mm adi bicg correlation covariance doitgen fdtd-2d gauss-filter gem
 # durbin (?)
 # dynprog (hardly parallel)
 # fdtd-apml (Trigger a bug in cuda !)
-# ludcmp (not parallel)
+# ludcmp (not parallel, but should be !! See PLDI paper !)
 # seidel (missing double buffering)
 # trisolv (only little part parallel)
 # trmm (not parallel ?)
