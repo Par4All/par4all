@@ -453,7 +453,7 @@ bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(t
 			result = basic_concrete_types_compatible_for_effects_interprocedural_translation_p(real_dt, formal_dt);
 		      }
 		    else
-		      result = basic_equal_strict_p(real_b, formal_b);
+		      result = basic_equal_p(real_b, formal_b);
 		    finished = true;
 		  }
 		else

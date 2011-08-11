@@ -2450,8 +2450,11 @@ statement add_declaration_statement(statement s, entity e)
         if(!ENDP(pl)) {
             /* SG: if CAR(pl) has same comment and same type as ds, merge them */
             statement spl = STATEMENT(CAR(pl));
+            entity ecar = ENTITY(CAR(statement_declarations(spl)));
             if( comments_equal_p(statement_comments(spl),comment) &&
-                    basic_equal_strict_p(entity_basic(e),entity_basic(ENTITY(CAR(statement_declarations(spl))))))
+                    basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
+                    qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar))
+              )
             {
                 free_statement(ds);
                 statement_declarations(spl)=gen_nconc(statement_declarations(spl),CONS(ENTITY,e,NIL));

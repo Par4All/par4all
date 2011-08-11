@@ -1138,6 +1138,17 @@ basic entity_basic(entity e)
   }
   return (basic_undefined);
 }
+/* return the qualifiers associated to entity e if it's a variable
+ * NIL otherwise */
+list entity_qualifiers(entity e)
+{
+  if (e != entity_undefined) {
+    type t = entity_type(e);
+    if (type_variable_p(t))
+      return (variable_qualifiers(type_variable(t)));
+  }
+  return NIL;
+}
 
 /* return true if the basic associated with entity e matchs the passed tag */
 bool entity_basic_p(entity e,enum basic_utype basictag)
@@ -1547,7 +1558,13 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
 
   /* same TYPE?
    */
-  if (ok) ok = st = type_equal_p(entity_type(v), entity_type(ref));
+  /* SG we cannot rely on same_type_p or type_equal_p because we want a syntactic comparison,
+   * there used to be a hack in expression_equal_p to handle this particular case, I prefer to have the hack right here
+   */
+  string tv = string_of_type(entity_type(v)),
+         tref =string_of_type(entity_type(ref));
+  if (ok) ok = st = same_string_p(tv,tref);
+  free(tv);free(tref);
 
   pips_debug(4, "%s ~ %s? %d: n=%d,o=%d,t=%d\n", entity_name(v),
 	     entity_undefined_p(ref)? "<undef>": entity_name(ref),

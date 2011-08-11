@@ -1248,30 +1248,29 @@ bool expression_equal_p(expression e1, expression e2)
   return syntax_equal_p(s1, s2);
 }
 
+/* this is slightly different from expression_equal_p, as it will return true for
+ * a+b vs b+a
+ */
 bool same_expression_p(expression e1, expression e2)
 {
-  normalized n1, n2;
-
-  n1 = expression_normalized(e1);
-  n2 = expression_normalized(e2);
 
   /* lazy normalization.
    */
-  if (normalized_undefined_p(n1)) {
-    normalize_all_expressions_of(e1);
-    n1 = expression_normalized(e1);
-  }
+  NORMALIZE_EXPRESSION(e1);
+  NORMALIZE_EXPRESSION(e2);
 
-  if (normalized_undefined_p(n2)) {
-    normalize_all_expressions_of(e2);
-    n2 = expression_normalized(e2);
-  }
+  normalized n1, n2;
+  n1 = expression_normalized(e1);
+  n2 = expression_normalized(e2);
+
+
 
   if (normalized_linear_p(n1) && normalized_linear_p(n2))
     return vect_equal(normalized_linear(n1), normalized_linear(n2));
   else
     return expression_equal_p(e1, e2);
 }
+
 bool sizeofexpression_equal_p(sizeofexpression s0, sizeofexpression s1)
 {
     if(sizeofexpression_type_p(s0) && sizeofexpression_type_p(s1))

@@ -286,7 +286,7 @@ transformer declaration_to_transformer(entity v, transformer pre)
       type vt = ultimate_type(entity_type(v));
       basic vb = variable_basic(type_variable(vt));
 
-      if(basic_equal_p(eb, vb)) {
+      if(same_basic_p(eb, vb)) {
 	tf = safe_any_expression_to_transformer(v, e, pre, false);
 	tf = transformer_temporary_value_projection(tf);
       }
@@ -849,7 +849,7 @@ c_user_function_call_to_transformer(
   pips_assert("s is a call", syntax_call_p(s));
 
   /* if there is no implicit cast */
-  if(basic_equal_p(rbt, variable_basic(type_variable(entity_type(e))))) {
+  if(same_basic_p(rbt, entity_basic(e))) {
     string fn = module_local_name(f);
     entity rv = global_name_to_entity(fn, fn);
     entity orv = entity_undefined;

@@ -298,10 +298,8 @@ type MakeAnyScalarResult(tag t, _int size)
 }
 
 
-/* Warning: the lengths of string basics are not checked!!!
- * string_type_size() could be used but it is probably not very robust.
- *
- * Second Warning: current version only compares ultimate_types
+/* similar as type_equals but by passes typedefs
+ * FI Warning: current version only compares ultimate_types
  * but check the various typedef that follows.
  *
  * typedef int foo;
@@ -335,8 +333,19 @@ type MakeAnyScalarResult(tag t, _int size)
  *     int y;
  * } d_t;
  *
- * type_EQUAL_P(c_t, d_t)==FALSE because strcutures (or unions or
+ * type_EQUAL_P(c_t, d_t)==FALSE because structures (or unions or
  * enums) with implicit names receive each a unique name.
+ */
+bool same_type_p(type t1, type t2)
+{
+  bool tequal = false;
+  t1= ultimate_type(t1);
+  t2= ultimate_type(t2);
+  return type_equal_p(t1,t2);
+}
+
+/* Warning: the lengths of string basics are not checked!!!
+ * string_type_size() could be used but it is probably not very robust.
  *
  * typedef int foo[n+n];
  *
@@ -360,8 +369,6 @@ type MakeAnyScalarResult(tag t, _int size)
 bool type_equal_p(type t1, type t2)
 {
   bool tequal = false;
-  t1= ultimate_type(t1);
-  t2= ultimate_type(t2);
 
   if(t1 == t2)
     return true;
@@ -425,12 +432,17 @@ bool
 dimension_equal_p(dimension d1, dimension d2)
 {
     return /* same values */
-	same_expression_p(dimension_lower(d1), dimension_lower(d2)) &&
-	same_expression_p(dimension_upper(d1), dimension_upper(d2)) &&
-	/* and same names... */
-	same_expression_name_p(dimension_lower(d1), dimension_lower(d2)) &&
-	same_expression_name_p(dimension_upper(d1), dimension_upper(d2));
+        expression_equal_p(dimension_lower(d1), dimension_lower(d2)) &&
+        expression_equal_p(dimension_upper(d1), dimension_upper(d2)) ;
 }
+
+bool dimensions_equal_p(list dims1, list dims2) {
+    return gen_equals(dims1,dims2,(gen_eq_func_t)dimension_equal_p);
+}
+
+bool qualifiers_equal_p(list dims1, list dims2) {
+    return gen_equals(dims1,dims2,(gen_eq_func_t)qualifier_equal_p);
+}         
 
 bool variable_equal_p(variable v1, variable v2)
 {
@@ -440,9 +452,13 @@ bool variable_equal_p(variable v1, variable v2)
       return false;
   else if (v1 != variable_undefined && v2 == variable_undefined)
       return false;
-  else if (!basic_equal_p(variable_basic(v1), variable_basic(v2)))
-      return false;
   else {
+      /* must check basic, dimension and qualifiers */
+      return 
+          basic_equal_p(variable_basic(v1), variable_basic(v2)) &&
+          dimensions_equal_p(variable_dimensions(v1), variable_dimensions(v2)) &&
+          qualifiers_equal_p(variable_qualifiers(v1), variable_qualifiers(v2)) ;
+
       list ld1 = variable_dimensions(v1);
       list ld2 = variable_dimensions(v2);
 
@@ -472,7 +488,7 @@ bool variable_equal_p(variable v1, variable v2)
   }
   return true;
 }
-bool basic_equal_strict_p(basic b1, basic b2)
+bool basic_equal_p(basic b1, basic b2)
 {
   if(b1 == b2)
     return true;
@@ -545,7 +561,8 @@ bool basic_equal_strict_p(basic b1, basic b2)
   return false; /* just to avoid a warning */
 }
 
-bool basic_equal_p(basic b1, basic b2)
+/* check if two basics are similar. That is if they are equal modulo typedefs */
+bool same_basic_p(basic b1, basic b2)
 {
   if( basic_typedef_p(b1) )
     {
@@ -558,7 +575,7 @@ bool basic_equal_p(basic b1, basic b2)
       type t2 = ultimate_type( entity_type(basic_typedef(b2)) );
       b2 = variable_basic(type_variable(t2));
     }
-  return basic_equal_strict_p(b1,b2);
+  return basic_equal_p(b1,b2);
 
 }
 
@@ -810,6 +827,16 @@ string safe_type_to_string(type t)
     return "undefined type";
   else
     return type_to_string(t);
+}
+
+/* SG: I don't understand the previous functions */
+string string_of_type(type t)
+{
+  list wl = words_type(t, NIL, false);
+  string s = words_to_string(wl);
+  FOREACH(STRING,s,wl) free(s);
+  gen_free_list(wl);
+  return s;
 }
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
