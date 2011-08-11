@@ -45,7 +45,7 @@ ifdef debug
 CFLAGS+=-W -Wall -DP4A_DEBUG
 endif
 
-ifdef custom_size
+ifndef std_size
 CFLAGS+=$(SIZE_PARAMS)
 P4A_FLAGS+=$(SIZE_PARAMS)
 endif
