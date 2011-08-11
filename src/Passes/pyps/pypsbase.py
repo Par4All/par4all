@@ -551,7 +551,7 @@ class workspace(object):
         # Command to execute our binary
         cmd = [os.path.join("./",binary)]
         if args:
-            cmd += args
+            cmd += map(str,args)
         p = Popen(cmd, stdout = PIPE, stderr = PIPE)
         (out,err) = p.communicate()
         rc = p.returncode
