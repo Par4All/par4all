@@ -114,7 +114,7 @@ run_cuda_opt: $(CUDA_OPT_TARGET)
 
 # Clean targets
 clean: 
-	rm -Rf $(OMP_SOURCE) $(CUDA_SOURCE) $(CUDA_OPT_SOURCE) *.database *.build .*.tmp p4a_new_files
+	rm -Rf $(OMP_SOURCE) $(CUDA_SOURCE) $(CUDA_OPT_SOURCE) *.database *.build .*.tmp p4a_new_files P4A
 dist-clean: clean 
 	rm -f $(TARGET) $(CUDA_TARGET) $(CUDA_OPT_TARGET) $(OMP_TARGET) $(SEQ_TARGET) $(TARGET)_run_seq.time $(TARGET)_run_openmp.time $(TARGET)_run_cuda.time $(TARGET)_run_cuda_opt.time
 
