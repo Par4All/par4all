@@ -820,22 +820,21 @@ static void copy_to_call(statement st, call c) {
       set_free(at_call_site);
     }
 
-    // We remove from "copy to out" what is not written by this statement
-    set allowed_to_copy_to= MAKE_SET();
-    FOREACH(EFFECT, eff, load_proper_rw_effects_list(st) ) {
-      if(effect_write_p(eff) && store_effect_p(eff)) {
-        entity e_used = reference_variable(effect_any_reference(eff));
-        set_add_element(allowed_to_copy_to,allowed_to_copy_to,e_used);
-      }
-    }
-    set_intersection(copy_to_out,copy_to_out,allowed_to_copy_to);
-    set_free(allowed_to_copy_to);
   }
   //  copy_to_in = set_difference(copy_to_in, copy_to_in, COPY_FROM_IN(st));
 }
 
 static void copy_to_unstructured(statement st, unstructured u) {
   pips_user_warning("Unimplemented !! Results may be wrong...\n");
+}
+
+static void get_written_entities(statement s, set written_entities) {
+  FOREACH(EFFECT, eff, load_proper_rw_effects_list(s) ) {
+    if(effect_write_p(eff) && store_effect_p(eff)) {
+      entity e_used = reference_variable(effect_any_reference(eff));
+      set_add_element(written_entities,written_entities,e_used);
+    }
+  }
 }
 
 static void copy_to_statement(statement st) {
@@ -875,6 +874,14 @@ static void copy_to_statement(statement st) {
       pips_internal_error("Unknown tag %d\n", instruction_tag(i) );
   }
 
+
+  // We remove from "copy to out" what is not written by this statement
+  set allowed_to_copy_to= MAKE_SET();
+  gen_context_recurse(st,allowed_to_copy_to,statement_domain,gen_true,get_written_entities);
+  set_intersection(COPY_TO_OUT(st),COPY_TO_OUT(st),allowed_to_copy_to);
+  set_free(allowed_to_copy_to);
+
+
   ifdebug(4) {
     fprintf(stderr,
             "** stmt (%d) associated copy to : **\n",
@@ -903,6 +910,7 @@ static void copy_to_statement(statement st) {
     }
     fprintf(stderr, "*\n**********************************\n");
   }
+
 
 }
 
