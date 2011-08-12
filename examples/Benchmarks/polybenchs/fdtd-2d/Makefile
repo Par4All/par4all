@@ -1,6 +1,5 @@
 TARGET=fdtd-2d
-NTHREADS_OMP  = 10
-NTHREADS_CUDA = 128
+SIZE_PARAMS= -DTMAX=100 -DNX=8000 -DNY=8000
 
 include ../../bench.mk
 

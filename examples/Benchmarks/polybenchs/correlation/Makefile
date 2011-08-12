@@ -1,6 +1,5 @@
 TARGET=correlation
-NTHREADS_OMP  = 10
-NTHREADS_CUDA = 128
+SIZE_PARAMS= -DM=3000 -DN=3000
 
 include ../../bench.mk
 

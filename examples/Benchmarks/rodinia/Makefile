@@ -1,4 +1,4 @@
 
-TARGETS=hotspot lud
+TARGETS=hotspot lud srad99
 
 include ../forward.mk
