@@ -97,6 +97,16 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
+
+  // external copies: 2
+  "out" [shape=circle];
+  "out =" [shape=circle,label="=",style="dashed"]
+  "in" -> "out =";
+  "out =" -> "out";
+  "t" [shape=circle];
+  "t =" [shape=circle,label="=",style="dashed"]
+  "in" -> "t =";
+  "t =" -> "t";
 }
 // graph for dag "dag_cleaned_1" of module "freia_66" in dot format
 digraph "dag_cleaned_1" {
@@ -264,6 +274,16 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
+
+  // external copies: 2
+  "out" [shape=circle];
+  "out =" [shape=circle,label="=",style="dashed"]
+  "in" -> "out =";
+  "out =" -> "out";
+  "t" [shape=circle];
+  "t =" [shape=circle,label="=",style="dashed"]
+  "in" -> "t =";
+  "t =" -> "t";
 }
 // graph for dag "dag_cleaned_1" of module "freia_66" in dot format
 digraph "dag_cleaned_1" {
@@ -611,6 +631,16 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
+
+  // external copies: 2
+  "out" [shape=circle];
+  "out =" [shape=circle,label="=",style="dashed"]
+  "in" -> "out =";
+  "out =" -> "out";
+  "t" [shape=circle];
+  "t =" [shape=circle,label="=",style="dashed"]
+  "in" -> "t =";
+  "t =" -> "t";
 }
 // graph for dag "dag_cleaned_1" of module "freia_66" in dot format
 digraph "dag_cleaned_1" {

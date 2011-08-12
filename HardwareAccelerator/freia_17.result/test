@@ -77,6 +77,12 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
+
+  // external copies: 1
+  "o" [shape=circle];
+  "o =" [shape=circle,label="=",style="dashed"]
+  "i" -> "o =";
+  "o =" -> "o";
 }
 
 ! updated function for
@@ -179,6 +185,12 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
+
+  // external copies: 1
+  "o" [shape=circle];
+  "o =" [shape=circle,label="=",style="dashed"]
+  "i" -> "o =";
+  "o =" -> "o";
 }
 
 ! acceleration function
@@ -316,6 +328,12 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
+
+  // external copies: 1
+  "o" [shape=circle];
+  "o =" [shape=circle,label="=",style="dashed"]
+  "i" -> "o =";
+  "o =" -> "o";
 }
 
 ! acceleration function

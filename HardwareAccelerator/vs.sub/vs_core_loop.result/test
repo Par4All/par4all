@@ -268,6 +268,12 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "54 C" [shape=trapezium,orientation=270];
   "54 C" -> "imbg16";
+
+  // external copies: 1
+  "imbg" [shape=circle];
+  "imbg =" [shape=circle,label="=",style="dashed"]
+  "imbg16" -> "imbg =";
+  "imbg =" -> "imbg";
 }
 // graph for dag "dag_cleaned_1" of module "vs_core_loop" in dot format
 digraph "dag_cleaned_1" {
@@ -284,6 +290,12 @@ digraph "dag_cleaned_2" {
   // outputs
 
   // computation vertices
+
+  // external copies: 1
+  "imstab" [shape=circle];
+  "imstab =" [shape=circle,label="=",style="dashed"]
+  "imcurrent" -> "imstab =";
+  "imstab =" -> "imstab";
 }
 // graph for dag "dag_cleaned_3" of module "vs_core_loop" in dot format
 digraph "dag_cleaned_3" {
@@ -339,6 +351,12 @@ digraph "dag_cleaned_3" {
   "imstab" -> "87 -|";
   "imstab" -> "91 *.";
   "imstab" -> "120 *";
+
+  // external copies: 1
+  "imbg'" [shape=circle];
+  "imbg =" [shape=circle,label="=",style="dashed"]
+  "imbg16'" -> "imbg =";
+  "imbg =" -> "imbg'";
 }
 
 ! updated function for
@@ -737,6 +755,12 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "54 C" [shape=trapezium,orientation=270];
   "54 C" -> "imbg16";
+
+  // external copies: 1
+  "imbg" [shape=circle];
+  "imbg =" [shape=circle,label="=",style="dashed"]
+  "imbg16" -> "imbg =";
+  "imbg =" -> "imbg";
 }
 // graph for dag "dag_cleaned_1" of module "vs_core_loop" in dot format
 digraph "dag_cleaned_1" {
@@ -753,6 +777,12 @@ digraph "dag_cleaned_2" {
   // outputs
 
   // computation vertices
+
+  // external copies: 1
+  "imstab" [shape=circle];
+  "imstab =" [shape=circle,label="=",style="dashed"]
+  "imcurrent" -> "imstab =";
+  "imstab =" -> "imstab";
 }
 // graph for dag "dag_cleaned_3" of module "vs_core_loop" in dot format
 digraph "dag_cleaned_3" {
@@ -808,6 +838,12 @@ digraph "dag_cleaned_3" {
   "imstab" -> "87 -|";
   "imstab" -> "91 *.";
   "imstab" -> "120 *";
+
+  // external copies: 1
+  "imbg'" [shape=circle];
+  "imbg =" [shape=circle,label="=",style="dashed"]
+  "imbg16'" -> "imbg =";
+  "imbg =" -> "imbg'";
 }
 // graph for dag "vs_core_loop_helper_0_0" of module "vs_core_loop" in dot format
 digraph "vs_core_loop_helper_0_0" {
@@ -1889,6 +1925,12 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "54 C" [shape=trapezium,orientation=270];
   "54 C" -> "imbg16";
+
+  // external copies: 1
+  "imbg" [shape=circle];
+  "imbg =" [shape=circle,label="=",style="dashed"]
+  "imbg16" -> "imbg =";
+  "imbg =" -> "imbg";
 }
 // graph for dag "dag_cleaned_1" of module "vs_core_loop" in dot format
 digraph "dag_cleaned_1" {
@@ -1905,6 +1947,12 @@ digraph "dag_cleaned_2" {
   // outputs
 
   // computation vertices
+
+  // external copies: 1
+  "imstab" [shape=circle];
+  "imstab =" [shape=circle,label="=",style="dashed"]
+  "imcurrent" -> "imstab =";
+  "imstab =" -> "imstab";
 }
 // graph for dag "dag_cleaned_3" of module "vs_core_loop" in dot format
 digraph "dag_cleaned_3" {
@@ -1960,6 +2008,12 @@ digraph "dag_cleaned_3" {
   "imstab" -> "87 -|";
   "imstab" -> "91 *.";
   "imstab" -> "120 *";
+
+  // external copies: 1
+  "imbg'" [shape=circle];
+  "imbg =" [shape=circle,label="=",style="dashed"]
+  "imbg16'" -> "imbg =";
+  "imbg =" -> "imbg'";
 }
 // graph for dag "vs_core_loop_helper_0_0_0" of module "vs_core_loop" in dot format
 digraph "vs_core_loop_helper_0_0_0" {
