@@ -10,9 +10,7 @@ int main() {
  int a[n]; // Because of the C99 declaration, we are not precise enough ! (see loop04_static.c for a C89 version)
  int sum;
  for(i=0; i<n; i++) {
-    for(j=0; j<n; j++) {
-      sum += a[j]+1;
-    }
+    a[0]=a[0]+1;
     kernel(n,a);
  }
 

@@ -9,8 +9,7 @@ int main()
    // Because of the C99 declaration, we are not precise enough ! (see loop04_static.c for a C89 version)
    int sum;
    for(i = 0; i <= n-1; i += 1) {
-      for(j = 0; j <= n-1; j += 1)
-         sum += a[j]+1;
+      a[0] = a[0]+1;
       kernel(n, a);
    }
 
@@ -27,8 +26,7 @@ int main()
    // Because of the C99 declaration, we are not precise enough ! (see loop04_static.c for a C89 version)
    int sum;
    for(i = 0; i <= n-1; i += 1) {
-      for(j = 0; j <= n-1; j += 1)
-         sum += a[j]+1;
+      a[0] = a[0]+1;
       P4A_copy_to_accel(a, sizeof(int)*n);
       kernel(n, a);
       P4A_copy_from_accel(a, sizeof(int)*n);

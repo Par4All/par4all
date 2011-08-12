@@ -10,9 +10,7 @@ int main() {
  int a[10]; // Because we know it statically, we are more precise then (see loop04.c for C99 version)
  int sum;
  for(i=0; i<n; i++) {
-    for(j=0; j<n; j++) {
-      sum += a[j]+1;
-    }
+    a[0]=a[0]+1;
     kernel(n,a);
  }
 
