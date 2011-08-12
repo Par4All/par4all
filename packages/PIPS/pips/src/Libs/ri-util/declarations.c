@@ -141,7 +141,7 @@ static list words_parameters(entity e, list pdl)
           pips_internal_error("Language unknown !");
           break;
       }
-      pc = gen_nconc( pc, words_type( t, pdl ) );
+      pc = gen_nconc( pc, words_type( t, pdl, true ) );
       /* Should be correct, but seems useless */
       //if(!same_string_p(pn, "")) {
       //  pc = gen_nconc(pc, strdup(" "));
@@ -515,7 +515,7 @@ list words_basic(basic obj, list pdl)
            before it is fully defined (see ptr in decl42.c) */
           pc = CHAIN_SWORD(pc,"type_undefined *");
         } else {
-          pc = gen_nconc( pc, words_type( t, pdl ) );
+	  pc = gen_nconc( pc, words_type( t, pdl, false ) );
           pc = CHAIN_SWORD(pc," *");
         }
         break;
@@ -529,7 +529,7 @@ list words_basic(basic obj, list pdl)
         if ( strstr( lname, STRUCT_PREFIX DUMMY_STRUCT_PREFIX ) == NULL
             && strstr( lname, UNION_PREFIX DUMMY_UNION_PREFIX ) == NULL
             && strstr( lname, ENUM_PREFIX DUMMY_ENUM_PREFIX ) == NULL ) {
-          pc = gen_nconc( pc, words_type( t, pdl ) );
+	  pc = gen_nconc( pc, words_type( t, pdl, false ) );
           pc = CHAIN_SWORD(pc," ");
           pc = CHAIN_SWORD(pc,name);
           pc = CHAIN_SWORD(pc," "); /* FI: This space may not be always useful */
@@ -1992,7 +1992,18 @@ static list words_qualifier(list obj)
   return pc;
 }
 
-list words_type(type obj, list pdl)
+/* obj is the type to describe
+*
+* pdl is a list of already/previously declared data structures (not
+* 100 % sure)
+*
+* argument_p: the type is used as an argument type in a function
+* declaration; if an argument appears with the "unknown" type it is
+* explicitly declared "int"
+*
+* returns a list of strings, called "words".
+*/
+list words_type(type obj, list pdl, bool argument_p)
 {
   list pc = NIL;
   switch (type_tag(obj))
@@ -2013,6 +2024,11 @@ list words_type(type obj, list pdl)
       }
     case is_type_unknown:
       {
+	/* The default type is int. It can be skipped in direct
+	   declarations, but not as type of an argument in a function
+	   declaration */
+	if(argument_p)
+	  pc = CHAIN_SWORD(pc,"int");
 	break;
       }
     case is_type_struct:
@@ -2138,7 +2154,9 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
 {
 // If this function is still used, NIL should be replaced by the
 // module declaration list
-    return generic_c_words_simplified_entity(t, name, is_safe, add_dummy_parameter_name_p, true, false, pdl);
+  return generic_c_words_simplified_entity(t, name, is_safe,
+					   add_dummy_parameter_name_p,
+					   true, false, false, pdl);
 }
 
 /* Same as above, but the bool is_first is used to skip a type
@@ -2162,11 +2180,13 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
  * in_type_declaration is set to true when a variable is declared at
  * the same time as its type
  *
+ * argument_p: the type is used as argument type in a function declaration
+ *
  * list pdl: declaration list to decide if data structures appearing in
  * another data structure must be declared independently or not. See
  * validation cases struct03.c, struct04.c and struct05.c.
  */
-list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add_dummy_parameter_name_p, bool is_first, bool in_type_declaration, list pdl)
+list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add_dummy_parameter_name_p, bool is_first, bool in_type_declaration, bool argument_p, list pdl)
 {
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
@@ -2227,14 +2247,14 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 
 	  /*pips_debug(3,"Parameter type %s\n ",
 	    type_undefined_p(t1)? "type_undefined" :
-	    words_to_string(words_type(t1, pdl))); */
+	    words_to_string(words_type(t1, pdl, true))); */
 	  if (!first)
 	    pc = gen_nconc(pc,CHAIN_SWORD(NIL, space_p? ", " : ","));
 	  /* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
 	  pc = gen_nconc(pc,
 			 generic_c_words_simplified_entity(t1,
 							   string_undefined_p(pn)? NIL : CONS(STRING, strdup(pn), NIL),
-	    is_safe, false, true,in_type_declaration, pdl));
+							   is_safe, false, true,in_type_declaration, true, pdl));
 	  pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
 	  first = false;
 	}
@@ -2243,7 +2263,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       pc = CHAIN_SWORD(pc,")");
       return generic_c_words_simplified_entity(t2, pc, is_safe, false,
 					       is_first, in_type_declaration,
-					       pdl);
+					       argument_p, pdl);
     }
 
   if (pointer_type_p(t))
@@ -2262,7 +2282,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       pc = gen_nconc(pc,name);
       return generic_c_words_simplified_entity(t1, pc, is_safe, false,
 					       is_first, in_type_declaration,
-					       pdl);
+					       argument_p, pdl);
     }
 
   /* Add type qualifiers if there are */
@@ -2280,7 +2300,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       pips_debug(9,"Basic type with name = \"%s\"\n", sname);
 
       if(is_first) {
-	pc = gen_nconc(pc,words_type(t, pdl));
+	pc = gen_nconc(pc,words_type(t, pdl, argument_p));
       }
       if (string_type_p(t)) {
 	// pc = CHAIN_SWORD(pc," *");
@@ -2328,7 +2348,13 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       pips_debug(8, "Before concatenation, pc=\"\%s\"\n", list_to_string(pc));
       if(pc!=NIL)
 	pc = CHAIN_SWORD(pc, " ");
-      list ret = gen_nconc(pc,generic_c_words_simplified_entity(t1,gen_nconc(tmp,words_dimensions(dims, pdl)),is_safe, false, is_first, in_type_declaration, pdl));
+      list ret =
+	gen_nconc(pc,
+		  generic_c_words_simplified_entity(t1,gen_nconc(tmp,words_dimensions(dims, pdl)),
+						    is_safe, false, is_first,
+						    in_type_declaration,
+						    argument_p,
+						    pdl));
       free_type(t1);
       return ret;
     }
@@ -2346,7 +2372,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	  if(!gen_in_list_p((void *) ent, pdl)) {
 	    /* The derived type has been declared explicitly
 	       elsewhere: see struct05.c */
-	    pc = gen_nconc(pc,words_type(t1, pdl));
+	    pc = gen_nconc(pc,words_type(t1, pdl, argument_p));
 	    pc = CHAIN_SWORD(pc," ");
 	    pc = CHAIN_SWORD(pc,entity_user_name(ent));
 	  }
@@ -2364,7 +2390,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 						is_safe,
 						add_dummy_parameter_name_p,
 						is_first, in_type_declaration,
-						npdl);
+						argument_p, npdl);
 	    pc = gen_nconc(pc, epc);
 	    gen_free_list(npdl);
 	  }
@@ -2507,7 +2533,8 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
    declaration again. */
 list c_words_simplified_entity(type t, list name, bool is_first, bool in_type_declaration, list pdl)
 {
-  list pc = generic_c_words_simplified_entity(t, name, false, false, is_first,in_type_declaration, pdl);
+  list pc = generic_c_words_simplified_entity(t, name, false, false, is_first,
+					      in_type_declaration, false, pdl);
 
   ifdebug(8) {
     string s = list_to_string(pc);

@@ -28,7 +28,7 @@ def freeze():
 def develop():
     """Develop egg
     """
-    local('bin/python setup.py develop')
+    local('bin/python pawsapp/setup.py develop')
 
 # Clean-up project directories
 def clean():

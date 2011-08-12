@@ -373,12 +373,7 @@ static void loop_annotate(loop l, gpu_lna_context * p)
  *
  * @return true
  */
-bool gpu_loop_nest_annotate(char *module_name)
-{
-  // Use this module name and this environment variable to set
-  statement module_statement =
-    PIPS_PHASE_PRELUDE(module_name, "P4A_LOOP_NEST_ANOTATE_DEBUG_LEVEL");
-
+bool gpu_loop_nest_annotate_on_statement(statement s) {
   /* Initialize context */
   gpu_lna_context c;
   c.l_enclosing_loops = NIL;
@@ -393,10 +388,22 @@ bool gpu_loop_nest_annotate(char *module_name)
   c.guard_expression = expression_undefined;
 
   /* Annotate the loop nests of the module. */
-  gen_context_recurse(module_statement, &c, loop_domain, loop_push, loop_annotate);
+  gen_context_recurse(s, &c, loop_domain, loop_push, loop_annotate);
 
   /* Clean up things: (hasn't it been done previously in loop_annotate?) */
   gen_free_list(c.l_number_iter_exp);
+
+  return true;
+}
+
+
+bool gpu_loop_nest_annotate(char *module_name)
+{
+  // Use this module name and this environment variable to set
+  statement module_statement =
+    PIPS_PHASE_PRELUDE(module_name, "P4A_LOOP_NEST_ANOTATE_DEBUG_LEVEL");
+
+  gpu_loop_nest_annotate_on_statement(module_statement);
 
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);

@@ -2561,6 +2561,13 @@ m.clean_declarations()
 w.fun.main.ir_navigator(openBrowser=True,keep_existing=True)
 \end{lstlisting}
 
+The symbol table is huge and can overload the browser, thus it's not displayed 
+by default. You can activate its display:
+
+\begin{lstlisting}[showspaces=false]
+w.fun.main.ir_navigator(openBrowser=True,symbol_table=True)
+\end{lstlisting}
+
 
 \section{Documentation}
 \label{sec:documentation}

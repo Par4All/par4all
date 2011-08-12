@@ -165,7 +165,7 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
   for(int i=0; i< (int) gen_length(l_dim); i++)
     (*effect_add_expression_dimension_func)(input_eff, make_unbounded_expression());
 
-  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL)));
+  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL, false)));
   list l_fields = type_fields(entity_type(basic_derived(b)));
 
   FOREACH(ENTITY, f, l_fields)
@@ -219,7 +219,7 @@ list generic_proper_effects_of_derived_reference(reference ref, bool write_p)
   basic b = variable_basic(type_variable(t));
   list le = NIL;
 
-  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL)));
+  pips_debug(8, "type of basic derived : %s\n",words_to_string(words_type(entity_type(basic_derived(b)), NIL, false)));
 
   /* should'nt it be something more direct here ? ?*/
   effect eff = (*reference_to_effect_func)
@@ -463,13 +463,23 @@ list generic_p_proper_effect_of_reference(reference ref,
     }
   else
     {
+      /* Just compute the main memory effect of the reference
 
-      /* just compute the main effect on the reference
+	 This should maybe be refined ? */
 
-       This should maybe be refined ? */
+      /* If the entity referenced is a function, we do not want a
+	 memory effect since it is a constant. Note: we end up here
+	 because its type as been converted to a pointer to a
+	 function above. */
+      entity rv= reference_variable(ref);
+      type rvt = ultimate_type(entity_type(rv));
 
-      *pme = (*reference_to_effect_func)
-	(ref, write_p? make_action_write_memory() : make_action_read_memory(), true);
+      if(type_functional_p(rvt))
+	*pme = effect_undefined;
+      else
+	*pme = (*reference_to_effect_func)
+	  (ref, write_p? make_action_write_memory() : make_action_read_memory(), true);
+
       if(!effect_undefined_p(*pme))
 	pips_assert("*pme is weakly consistent", region_weakly_consistent_p(*pme));
     }
@@ -1393,6 +1403,14 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 			free_effect(e);
 		      }
 		  }
+		else if (type_functional_p(addexp_t))
+		  {
+		    // FI: we must have bumped into a pointer to a
+		    // function. It may be dereferenced or not. See
+		    // Effects-New/function03
+		    print_expression(addexp);
+		    pips_internal_error("case of address expression not handled yet\n");
+		  }
 		else
 		  {
 		    pips_internal_error("case not handled yet ");
@@ -1533,8 +1551,22 @@ generic_proper_effects_of_expression(expression e)
 	    ENTITY_POINT_TO_P(op) ||
 	    ENTITY_DEREFERENCING_P(op))
 	  le = generic_proper_effects_of_address_expression(e, false);
-	else
+	else {
 	  le = generic_r_proper_effects_of_call(syntax_call(s));
+	  if(entity_variable_p(op)) {
+	    /* op is a pointer to a function. A memory read effect
+	       must be added as this is in fact a read reference. See
+	       Effects-new/function03.c */
+	    reference r = make_reference(op, NIL);
+	    list ople = generic_proper_effects_of_read_reference(r);
+	    // FI: by default, a preference will be used. This
+	    //artifical reference cannot be freed. I whish there would
+	    //be a cleaner way to do this:
+	    // generic_proper_effects_of_read_entity()?
+	    //free_reference(r);
+	    le = gen_nconc(ople, le);
+	  }
+	}
 	break;
       }
     case is_syntax_cast:

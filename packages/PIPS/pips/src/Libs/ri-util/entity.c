@@ -501,6 +501,18 @@ string label_local_name(entity e)
   return name+strlen(LABEL_PREFIX);
 }
 
+bool label_name_conflict_with_labels(string n, list ll)
+{
+  bool conflict_p = false;
+  if(!empty_label_p(n)) {
+    FOREACH(ENTITY, l, ll) {
+      if(strcmp(label_local_name(l), n) == 0)
+	conflict_p = true;
+    }
+  }
+  return conflict_p;
+}
+
 /* Return a name valid for sorting variables in vectors and constraint
    systems.
 
@@ -623,6 +635,7 @@ bool entity_subroutine_p(entity e)
     !entity_blockdata_p(e) && /* ??? */
     !entity_function_p(e);
 }
+
 bool entity_pointer_p(entity e)
 {
     type t = ultimate_type(entity_type(e));
@@ -632,17 +645,38 @@ bool entity_pointer_p(entity e)
 
 bool entity_array_p(entity e)
 {
-  if (entity_variable_p(e))
-    {
-      variable var = type_variable(ultimate_type(entity_type(e)));
-      if (!ENDP(variable_dimensions(var)))  return true;
-    }
+  if (entity_variable_p(e)) {
+    return array_type_p(ultimate_type(entity_type(e)));
+  }
   return false;
 }
+
+/* @return whether entity is a "register" variable
+ */
+bool entity_register_p(entity e)
+{
+  if (entity_variable_p(e))
+  {
+    FOREACH(qualifier, q, variable_qualifiers(type_variable(entity_type(e))))
+      if (qualifier_register_p(q))
+        return true;
+  }
+  return false;
+}
+
 bool array_entity_p(entity e)
 {
     return entity_array_p(e);
 }
+
+bool entity_variable_length_array_p(entity e) {
+  bool return_val = false;
+  if (entity_variable_p(e)) {
+    return_val=variable_length_array_type_p(ultimate_type(entity_type(e)));
+  }
+  return return_val;
+}
+
 
 bool assumed_size_array_p(entity e)
 {
@@ -1104,6 +1138,17 @@ basic entity_basic(entity e)
   }
   return (basic_undefined);
 }
+/* return the qualifiers associated to entity e if it's a variable
+ * NIL otherwise */
+list entity_qualifiers(entity e)
+{
+  if (e != entity_undefined) {
+    type t = entity_type(e);
+    if (type_variable_p(t))
+      return (variable_qualifiers(type_variable(t)));
+  }
+  return NIL;
+}
 
 /* return true if the basic associated with entity e matchs the passed tag */
 bool entity_basic_p(entity e,enum basic_utype basictag)
@@ -1513,7 +1558,17 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
 
   /* same TYPE?
    */
-  if (ok) ok = st = type_equal_p(entity_type(v), entity_type(ref));
+  /* SG we cannot rely on same_type_p or type_equal_p because we want a syntactic comparison,
+   * there used to be a hack in expression_equal_p to handle this particular case, I prefer to have the hack right here
+   */
+  if( ok ) {
+      if(entity_undefined_p(ref)) ok = st =false;
+      else {
+          type tv = entity_type(v),
+               tref = entity_type(ref);
+          ok = st = same_type_name_p(tv,tref);
+      }
+  }
 
   pips_debug(4, "%s ~ %s? %d: n=%d,o=%d,t=%d\n", entity_name(v),
 	     entity_undefined_p(ref)? "<undef>": entity_name(ref),
@@ -2749,9 +2804,11 @@ set get_referenced_entities_filtered(void *elem,
       /* gather all entities referenced by referenced entities */
       list ltmp = set_to_list(referenced_entities);
       FOREACH(ENTITY,e,ltmp) {
-        set tmp = get_referenced_entities_filtered(e,chunk_filter,entity_filter);
-        set_union(referenced_entities,referenced_entities,tmp);
-        set_free(tmp);
+        if(e!=elem) {
+          set tmp = get_referenced_entities_filtered(e,chunk_filter,entity_filter);
+          set_union(referenced_entities,referenced_entities,tmp);
+          set_free(tmp);
+        }
       }
       gen_free_list(ltmp);
 

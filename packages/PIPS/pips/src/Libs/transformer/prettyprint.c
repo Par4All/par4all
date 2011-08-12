@@ -68,7 +68,7 @@ string arguments_to_string(string s, list args)
     return string_undefined;
 }
 
-string 
+string
 relation_to_string(
     string s,
     Psysteme ps,
@@ -76,18 +76,6 @@ relation_to_string(
 {
     pips_internal_error("not implemenented anymore, s=\"%s\", ps=%p, variable_name=%p", s, ps, variable_name);
     return string_undefined;
-}
-
-const char * pips_user_value_name(entity e)
-{
-    if(e == (entity) TCST) {
-	return "";
-    }
-    else {
-	(void) gen_check((gen_chunk *) e, entity_domain);
-	return entity_has_values_p(e)? entity_minimal_name(e) :
-	    external_value_name(e);
-    }
 }
 
 const char * generic_value_name(entity e)

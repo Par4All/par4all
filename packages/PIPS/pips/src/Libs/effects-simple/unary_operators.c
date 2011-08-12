@@ -405,6 +405,12 @@ simple_effect_dup(effect eff)
  reference_to_reference_effect(reference ref, action act,
 			       bool __attribute__((unused)) use_preference_p)
  {
+   /*
+   entity rv = reference_variable(ref);
+   type rvt = ultimate_type(entity_type(rv));
+   pips_assert("The referenced symbol has type variable. It is not a function",
+	       type_variable_p(rvt));
+   */
    cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
    approximation ap = make_approximation(is_approximation_exact, UU);
    action ac = copy_action(act);

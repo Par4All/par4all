@@ -42,6 +42,22 @@ do
   case $opt in
     # end of options
     --) break ;;
+    # help!
+    -h|--help)
+      echo -e \
+	  "usage: $0 [options] dbname\n" \
+	  "dbname is the prefix of the pips database, without the .database\n" \
+          "options include:\n" \
+	  "  -h: this help\n" \
+	  "  -i: process initial version\n" \
+	  "  -g: process generated version\n" \
+	  "  -b: process both initial & generated versions\n" \
+	  "  -c: compile only\n" \
+	  "  -cr: compile and run\n" \
+	  "  -crc: compile, run and compare\n" \
+	  "  -f file: use this file instead of dbname.[cf...]\n"
+      exit 0;
+      ;;
     # initial or generated only
     -i|--i|--initial)
       initial=1 generated=
@@ -122,9 +138,13 @@ unsplit=$database/Src/$source
 exe=$tmp/exe
 
 # some sanity checks. the first one cannot fail.
-[ -e $source ] || err 9 "expected source $source not found"
-[ -d $database ] || err 10 "expected database $database not found"
-[ -e $unsplit ] || err 11 "expected unsplit $unsplit not found"
+[ "$initial" ] && {
+  [ -e $source ] || err 9 "expected source $source not found"
+}
+[ "$generated" ] && {
+  [ -d $database ] || err 10 "expected database $database not found"
+  [ -e $unsplit ] || err 11 "expected unsplit $unsplit not found"
+}
 
 # check trigger
 [ "$PIPS_VALIDATION_EXE" ] || exit 0

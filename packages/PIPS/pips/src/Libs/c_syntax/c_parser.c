@@ -286,7 +286,72 @@ void CParserError(char *msg)
 		  msg, user_line_number, effective_line_number,
 		  c_parser_current_file_name);
 }
+
 
+static bool substitute_statement_label(statement s, hash_table l_to_nl)
+{
+  entity l = statement_label(s);
+
+  if(!entity_empty_label_p(l)) {
+    entity nl = (entity) hash_get(l_to_nl, (char *) l);
+    if(nl!=(entity) HASH_UNDEFINED_VALUE) {
+      statement_label(s) = nl;
+      /* FI: entity l could be destroyed right away... */
+    }
+  }
+
+  return true;
+}
+
+/* To avoid label name conflicts, the parser uses a special character
+   that cannot appear in a C label. Any label that uses this
+   character must be replaced. A new label entity must be introduced.
+*/
+static void FixCInternalLabels(statement s)
+{
+  list pll = statement_to_labels(s);
+  hash_table label_to_new_label = hash_table_make(hash_pointer, 0);
+  int count = 0;
+
+  /* Build the substitution table while avoiding label name conflicts */
+  FOREACH(ENTITY, l, pll) {
+    string ln = label_local_name(l);
+    string p = get_label_prefix(); // The prefix is assumed to be one
+				   // character long
+    if(*p==*ln) {
+      string nln = strdup(ln);
+      *nln = '_';
+      while(label_name_conflict_with_labels(nln, pll)) {
+	string nnln = strdup(concatenate("_", nln, NULL));
+	free(nln);
+	nln = nnln;
+      }
+      /* Here we end up with a conflict free label name */
+      string mn = entity_module_name(l);
+      // The current module is no longer definned at this point in the parser
+      //entity nl = MakeCLabel(nln);
+      string cln = strdup(concatenate(LABEL_PREFIX, nln, NULL));
+      entity nl = FindOrCreateEntity(mn, cln);
+      hash_put(label_to_new_label, (char *) l, (char *) nl);
+      free(nln), free(cln);
+      count++;
+    }
+  }
+
+  /* Substitute the labels by the new labels in all substatement of s */
+  if(count>0) {
+      gen_context_recurse(s, (void *) label_to_new_label, statement_domain,
+			  substitute_statement_label, gen_null);
+
+    /* Get rid of useless label entities, unless it has already been
+       performed by substitute_statement_label(). */
+    ;
+  }
+
+  hash_table_free(label_to_new_label);
+
+  return;
+}
 
 static bool actual_c_parser(string module_name,
 			    string dbr_file,
@@ -465,6 +530,11 @@ static bool actual_c_parser(string module_name,
     safe_fclose(c_in, file_name);
 
     FixCReturnStatements(ModuleStatement);
+
+    pips_assert("Module statement is consistent",
+		statement_consistent_p(ModuleStatement));
+
+    FixCInternalLabels(ModuleStatement);
 
     pips_assert("Module statement is consistent",
 		statement_consistent_p(ModuleStatement));

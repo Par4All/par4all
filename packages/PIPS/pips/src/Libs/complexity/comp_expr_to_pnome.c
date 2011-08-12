@@ -68,7 +68,7 @@ entity e;
 	    (char *)external_value_name(e);
 }
 
-/* 
+/*
  * This file contains routines named "xxx_to_polynome".
  * They don't care about the complexity of the expression they scan,
  * however care about their value. They return a complete complexity,
@@ -93,9 +93,9 @@ complexity make_complexity_unknown(const char * name) {
  *                                   bool keep_symbols,
  *                                   int maximize)
  * return the polynomial associated to the expression expr,
- * or POLYNOME_UNDEFINED if it's not a polynome. 
+ * or POLYNOME_UNDEFINED if it's not a polynome.
  * or POLYNOME_NULL if it's a 0 complexity.
- * If keep_symbols is false, we force evaluation of variables. 
+ * If keep_symbols is false, we force evaluation of variables.
  * If they can't be evaluated, they enter the polynomial,
  * but they are replaced by the pseudo-variable UNKNOWN_VARIABLE,
  * except when they appear in a loop range:
@@ -134,7 +134,7 @@ int maximize;
     }
 
     if ( normalized_linear_p(no) ) {
-	comp =  normalized_to_polynome(no, precond, effects_list, 
+	comp =  normalized_to_polynome(no, precond, effects_list,
 				       keep_symbols, maximize);
     }
     else {
@@ -150,7 +150,7 @@ int maximize;
     }
 
     /* The following line is merely for debugging */
-    
+
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "expr->pnome ");
 	complexity_fprint(stderr, comp, true, true);
@@ -160,7 +160,7 @@ int maximize;
     return (comp);
 }
 
-/* 1st element of expression */   
+/* 1st element of expression */
 complexity syntax_to_polynome(synt, precond, effects_list, keep_symbols, maximize)
 syntax synt;
 transformer precond;
@@ -168,35 +168,41 @@ list effects_list;
 bool keep_symbols;
 int maximize;
 {
-    complexity comp = complexity_undefined;
+  complexity comp = complexity_undefined;
 
-    trace_on("syntax -> pnome");
-   
-    switch (syntax_tag(synt)) {
-    case is_syntax_reference: 
-	comp = reference_to_polynome(syntax_reference(synt),
-				     precond, effects_list, keep_symbols, maximize);
-	break;
-    case is_syntax_range:
-	comp = range_to_polynome(syntax_range(synt),
+  trace_on("syntax -> pnome");
+
+  switch (syntax_tag(synt)) {
+  case is_syntax_reference:
+    comp = reference_to_polynome(syntax_reference(synt),
 				 precond, effects_list, keep_symbols, maximize);
-	break;
-    case is_syntax_call:
-	comp = call_to_polynome(syntax_call(synt),
-				precond, effects_list, keep_symbols, maximize);
-	break;
+    break;
+  case is_syntax_range:
+    comp = range_to_polynome(syntax_range(synt),
+			     precond, effects_list, keep_symbols, maximize);
+    break;
+  case is_syntax_call:
+    comp = call_to_polynome(syntax_call(synt),
+			    precond, effects_list, keep_symbols, maximize);
+    break;
+  case is_syntax_cast:
+    comp = cast_to_polynome(syntax_cast(synt),
+			    precond, effects_list, keep_symbols, maximize);
+    break;
+  case is_syntax_sizeofexpression:
+  case is_syntax_subscript:
+  case is_syntax_application:
+  case is_syntax_va_arg:
+    /* This expression cannot be used within a polynomial, just like
+       an array reference */
+    comp = make_zero_complexity();
+    break;
+  default:
+    pips_internal_error("Unexpected tag:%d\n", syntax_tag(synt));
+  }
 
-	/* cases below are added by Molka Becher, 17 March 2011 */
-    case is_syntax_cast:
-        comp = cast_to_polynome(syntax_cast(synt), 
-       				 precond, effects_list, keep_symbols, maximize); 
-        break;
-    default:
-	pips_internal_error("This tag:%d is not in 28->30", syntax_tag(synt));
-    }
-
-    trace_off();
-    return (comp);
+  trace_off();
+  return (comp);
 }
 
 /* 2nd element of expression */
@@ -249,20 +255,20 @@ int maximize;
 	var = vect_first_var(pv);
 	val = vect_coeff(var, pv);
 
-	we_must_evaluate = 
+	we_must_evaluate =
 	    (var != TCST) &&
 	    (keep_symbols ? (!hash_contains_p(hash_complexity_parameters,
 					      (char *)module_local_name((entity)var)))
 	                  : true);
 /*
-	must_be_written = is_must_be_written_var(effects_list, 
+	must_be_written = is_must_be_written_var(effects_list,
 						 variable_local_name(var));
- 
+
 	if ( get_debug_level() >= 3 ) {
 	    fprintf(stderr, "Must be written var %s\n", variable_local_name(var) );
 	}
 */
-/*	    
+/*	
 	if (we_must_evaluate && must_be_written) {
 */
 	if (we_must_evaluate && get_bool_property("COMPLEXITY_EARLY_EVALUATION")) {
@@ -272,7 +278,7 @@ int maximize;
 	    complexity_scalar_mult(&ctmp, VALUE_TO_FLOAT(val));
 	    complexity_add(&comp, ctmp);
         }
-	else { 
+	else {
 	    /* We keep this symbol (including TCST) in the polynome */
 	    Value exp = VALUE_ONE;
 	    float coeff = VALUE_TO_FLOAT(val);
@@ -295,13 +301,12 @@ int maximize;
     return (comp);
 }
 
-/* 1st element of syntax */
-complexity reference_to_polynome(ref, precond, effects_list, keep_symbols, maximize)
-reference ref;
-transformer precond;
-list effects_list;
-bool keep_symbols;
-int maximize;
+/* First element of the "syntax" domain */
+complexity reference_to_polynome(reference ref,
+				 transformer precond,
+				 list effects_list,
+				 bool keep_symbols,
+				 int maximize)
 {
     complexity comp = make_zero_complexity();
     bool we_must_evaluate;
@@ -310,15 +315,15 @@ int maximize;
 
     trace_on("reference -> pnome");
 
-    if ( reference_indices(ref) == NIL) {  
-	/* if it's an array: let fall */
+    if ( reference_indices(ref) == NIL) {
+	/* if it's an array: let us fail */
 	we_must_evaluate = (keep_symbols ?
 			    !hash_contains_p(hash_complexity_parameters,
 					     (char *)module_local_name((entity)var) ):
 			    true);
 /*
 	must_be_written = is_must_be_written_var(effects_list, var);
- 
+
 	if ( get_debug_level() >= 3 ) {
 	    fprintf(stderr, "Must be written var %s\n", noms_var(var) );
 	}
@@ -349,10 +354,10 @@ complexity range_to_polynome(range rg __attribute__ ((__unused__)),
 			     int maximize __attribute__ ((__unused__)))
 {
     complexity comp = make_zero_complexity();
-    
+
     trace_on("range -> pnome");
 
-    pips_internal_error("Don't you know");    
+    pips_internal_error("Don't you know");
 
     trace_off();
     return(comp);
@@ -381,7 +386,7 @@ int maximize;
 		   type_tag(t), value_tag(v), name);
 
     switch (value_tag(v)) {
-    case is_value_code:              
+    case is_value_code:
 	/* For the moment, we don't want to evaluate the complexity of the   */
 	break;                       /* function defined by the users    */
     case is_value_constant:
@@ -408,7 +413,7 @@ int maximize;
 	break;
     default:pips_internal_error("not handled case");
     }
-    
+
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "call->pnome '%s': ", name);
 	complexity_fprint(stderr, comp, true, true);
@@ -428,10 +433,10 @@ int maximize;
   expression exp = cast_expression(cast_instr);
 
   trace_on("CAST");
-  
-  complexity comp = expression_to_complexity_polynome(exp, precond, effects_list, 
+
+  complexity comp = expression_to_complexity_polynome(exp, precond, effects_list,
 						      keep_symbols, maximize);
-  
+
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
         fprintf(stderr, "cast->pnome");
 	complexity_fprint(stderr, comp, true, true);
@@ -552,7 +557,7 @@ int maximize;
 	denominateur = complexity_TCST(c2);
 	if (denominateur == 0)
 	    user_error("divide_op_handler", "division by zero\n");
-	else 
+	else
 	    complexity_mult(&c1, make_constant_complexity(1.0/denominateur));
     }
     else {
@@ -762,8 +767,8 @@ complexity evaluate_var_to_complexity(entity var,
 
 /* This function is recently added by L.Zhou   June 5, 91
  * simplify_sc_to_complexity(Psysteme ps, Variable var)
- * It looks for the egality formula containing (Variable)var 
- * in the system (Psysteme)ps. 
+ * It looks for the egality formula containing (Variable)var
+ * in the system (Psysteme)ps.
  * If ps->egalites is NULL, zero complexity is returned.
  * The rest of the variable in that formula should be the known variable
  * for example: formal parameter(s), inductible variable, etc.
@@ -777,7 +782,7 @@ Psysteme ps;
 Variable var;
 {
     complexity comp = make_zero_complexity();
-    Value var_coeff=VALUE_ONE; 
+    Value var_coeff=VALUE_ONE;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	sc_fprint(stderr, ps, (get_variable_name_t) noms_var);
@@ -808,11 +813,11 @@ Variable var;
     }
     else {
 	bool b = hash_contains_p(hash_complexity_parameters,
-		           (char *)module_local_name((entity)var)); 
+		           (char *)module_local_name((entity)var));
 
 	if ( b )
 	    comp = make_single_var_complexity(1.0, (Variable)var);
-	else 
+	else
 	    comp = make_complexity_unknown(UNKNOWN_VARIABLE_NAME);
     }
 

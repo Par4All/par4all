@@ -532,7 +532,7 @@ i_help: TK_HELP TK_NAME TK_ENDOFLINE
 
 i_setprop: TK_SET_PROPERTY TK_LINE TK_ENDOFLINE
 	{
-		user_log("setproperty%s\n", $2);
+		user_log("setproperty %s\n", $2);
 		reset_property_error(); // We start again at tpips
 					// level and should be able to
 					// avoid the fatal loop...
@@ -588,7 +588,7 @@ i_unknown: TK_UNKNOWN TK_ENDOFLINE
 i_echo: TK_ECHO TK_LINE TK_ENDOFLINE
 	{
 		string s = $2;
-		user_log("echo%s\n", $2);
+		user_log("echo %s\n", $2);
 		skip_blanks(s);
 		fprintf(stdout,"%s\n",s);
 		fflush(stdout);

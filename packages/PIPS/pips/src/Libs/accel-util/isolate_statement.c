@@ -119,7 +119,9 @@ static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, l
       entity e = reference_variable(region_any_reference(eff));
       /* create dummy empty effects */
       effects dumbo = make_effects(NIL);
+      set_live_loop_indices();
       partial_eval_declaration(e,predicate_system(transformer_relation(tr)),dumbo);
+      reset_live_loop_indices();
       free_effects(dumbo);
       descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
     }
@@ -418,10 +420,10 @@ statement effects_to_dma(statement stat,
       if(descriptor_convex_p(d)) {
           Psysteme sc_old = descriptor_convex(d);
           Psysteme sc_new = entity_declaration_sc(reference_variable(region_any_reference(eff)));
-	  sc_intersection(sc_new,sc_new,predicate_system(transformer_relation(tr)));
-	  sc_intersection(sc_old,sc_old,predicate_system(transformer_relation(tr)));
-	  sc_old=sc_normalize2(sc_old);
-	  sc_new=sc_normalize2(sc_new);
+          sc_intersection(sc_new,sc_new,predicate_system(transformer_relation(tr)));
+          sc_intersection(sc_old,sc_old,predicate_system(transformer_relation(tr)));
+          sc_old=sc_normalize2(sc_old);
+          sc_new=sc_normalize2(sc_new);
           if(!sc_equal_p(sc_old,sc_new)) {
               sc_free(sc_old);
               descriptor_convex(d)=sc_new;
@@ -517,11 +519,11 @@ statement effects_to_dma(statement stat,
               entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(entity_basic(re)),the_dims);
               entity declaring_module = 
                 get_current_module_entity();
-	      // PIER Here we need to add a P4A variable prefix to the name to help
-	      // p4a postprocessing
-	      string str = strdup (concatenate (prefix,entity_user_name(re), suffix, NULL));
+              // PIER Here we need to add a P4A variable prefix to the name to help
+              // p4a postprocessing
+              string str = strdup (concatenate (prefix,entity_user_name(re), suffix, NULL));
               eto = make_temporary_pointer_to_array_entity_with_prefix(str,renew,declaring_module,init);
-	      free (str);
+              free (str);
               AddLocalEntityToDeclarations(eto,get_current_module_entity(),stat);
               isolate_patch_entities(stat,re,eto,the_offsets);
 

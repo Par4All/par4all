@@ -205,6 +205,13 @@ set COPY_TO_OUT(statement st) {
 }
 */
 
+void dump_entity_set(set s) {
+  SET_FOREACH(entity, e, s) {
+    fprintf(stderr,"%s,",entity_name(e));
+  }
+  fprintf(stderr,"\n");
+}
+
 /**
  * Should be useful, but for some bullshit reason the array dimensions even
  * for simple case like a[512][512] might be previously normalized "COMPLEX"
@@ -346,7 +353,7 @@ static set interprocedural_mapping(string res, call c) {
       set_add_element(at_call_site,at_call_site,e);
     } else {
       pips_internal_error("Interprocedural error : entity %s is not a formal"
-          " not a global variable !\n");
+          " not a global variable !\n",entity_name(e));
     }
   }
   return at_call_site;
@@ -441,6 +448,15 @@ static void copy_from_all_kind_of_loop(statement st, statement body) {
   /* Compute loop body */
   copy_from_statement(body);
 
+  /* Fix point  */
+  /*
+  if(!set_equal_p(COPY_FROM_IN( body ),set_intersection(COPY_FROM_IN( st ),
+                                                        COPY_FROM_OUT( body ),
+                                                        COPY_FROM_IN( st )))) {
+    return copy_from_all_kind_of_loop(st,body);
+  }
+  */
+
   /* Compute "out" sets for the loop */
   if(true) { //loop_executed_once_p(st, l)) { FIXME !!!!
     pips_debug(1,"Loop executed once !\n");
@@ -459,6 +475,26 @@ static void copy_from_all_kind_of_loop(statement st, statement body) {
 static void copy_from_loop(statement st, loop l) {
   statement body = loop_body(l);
   copy_from_all_kind_of_loop(st, body);
+
+  /*
+   * For further "already_transfered" optimization to be correct !
+   * We have to force to transfert from the accelerator in the body of the loop
+   * if we can't know that the data won't be used on the CPU at the begin of the
+   * next iteration
+   * see validation/Gpu/Comm_optimization.sub/loop01.c
+   */
+  set to_delete = MAKE_SET();
+  SET_FOREACH(entity,e,COPY_FROM_OUT(st)) {
+    if(!set_belong_p(COPY_TO_IN(st),e)) {
+      //insert_statement(body,make_dma_transfert(e,dma_store),false);
+      pips_debug(1,"Removing %s from loop copy-out !\n",entity_name(e));
+      set_add_element(to_delete,to_delete,e);
+    }
+  }
+  set_difference(COPY_FROM_OUT(st),COPY_FROM_OUT(st),to_delete);
+  set_difference(COPY_FROM_OUT(body),COPY_FROM_OUT(body),to_delete);
+  set_free(to_delete);
+
 }
 static void copy_from_whileloop(statement st, whileloop l) {
   statement body = whileloop_body(l);
@@ -580,7 +616,8 @@ static void copy_from_statement(statement st) {
     fprintf(stderr, "*\n* OUT : ");
     {
       string str = concatenate("Copy from out : ", NULL);
-      SET_FOREACH(entity, e, COPY_FROM_OUT(st)) {
+      list t_from = set_to_sorted_list(COPY_FROM_OUT(st),(gen_cmp_func_t)compare_entities);
+      FOREACH(entity, e, t_from) {
         fprintf(stderr, "%s ", entity_name(e));
         str = concatenate(str, " ", entity_local_name(e), NULL);
       }
@@ -593,7 +630,8 @@ static void copy_from_statement(statement st) {
     fprintf(stderr, "* IN  : ");
     {
       string str = concatenate("Copy from in : ", NULL);
-      SET_FOREACH(entity, e, COPY_FROM_IN(st)) {
+      list t_from = set_to_sorted_list(COPY_FROM_IN(st),(gen_cmp_func_t)compare_entities);
+      FOREACH(entity, e, t_from) {
         fprintf(stderr, "%s ", entity_name(e));
         str = concatenate(str, " ", entity_local_name(e), NULL);
       }
@@ -620,7 +658,6 @@ static void copy_to_block(statement st, list sts) {
   /* loop over statements inside the block */
   FOREACH( statement, one, sts_reverse ) {
     /* propagate "out" sets */
-    set_difference(copy_to_out, copy_to_out, COPY_FROM_IN(one)); // ! important
     set_assign(COPY_TO_OUT( one ), copy_to_out);
 
     /* Compute the "copy to" for this statement */
@@ -674,10 +711,28 @@ static void copy_to_test(statement st, test t) {
 }
 static void copy_to_all_kind_of_loop(statement st, statement body) {
   /* Compute "out" sets for the loop body */
-  set_assign(COPY_TO_OUT( body ), COPY_TO_OUT( st ));
+  set body_out = COPY_TO_OUT(body);
+  set_union(body_out,
+            COPY_TO_OUT( st ),
+            COPY_TO_IN( body ));
+
+  /* Save result */
+  set tmp = MAKE_SET();
+  set_assign(tmp,body_out);
 
   /* Compute loop body */
   copy_to_statement(body);
+
+  /* Fix point  */
+  set_union(body_out ,
+            COPY_TO_OUT( st ),
+            COPY_TO_IN( body ));
+  if(!set_equal_p(tmp,body_out)) {
+    set_free(tmp);
+    return copy_to_all_kind_of_loop(st,body);
+  }
+  set_free(tmp);
+
 
   /* Compute "in" sets for the loop */
   if(true) { //loop_executed_once_p(st, l)) {
@@ -689,6 +744,9 @@ static void copy_to_all_kind_of_loop(statement st, statement body) {
     /* Body is not always done */
     set_intersection(COPY_TO_IN( st ), COPY_TO_IN( body ), COPY_TO_OUT( st ));
   }
+
+
+
 
 }
 static void copy_to_loop(statement st, loop l) {
@@ -747,14 +805,19 @@ static void copy_to_call(statement st, call c) {
     // Standard call (not a kernel)
     pips_debug(3,"%s is a simple call\n",
         func_name);
-    // We remove from "copy to" what is used by this statement
+    // We remove from "copy to" what is written by this statement
     FOREACH(EFFECT, eff, load_proper_rw_effects_list(st) ) {
-      entity e_used = reference_variable(effect_any_reference(eff));
-      if(entity_array_p(e_used)) {
-        pips_debug(6,"Removing %s from copy_in\n",entity_name(e_used));
+//      if(effect_write_p(eff)) { BUGGY at that time ! it breaks hoisting transfers out of loop... the scheme is broken by design !
+        entity e_used = reference_variable(effect_any_reference(eff));
+        ifdebug(6) {
+          if(entity_array_p(e_used)) {
+            pips_debug(6,"Removing %s from copy_in\n",entity_name(e_used));
+          }
+        }
         copy_to_in = set_del_element(copy_to_in, copy_to_in, e_used);
-      }
+//      }
     }
+
 
     // We add the inter-procedural results for copy in, but not for intrinsics
     if(!call_intrinsic_p(c)) { // Ignoring intrinsics
@@ -762,12 +825,22 @@ static void copy_to_call(statement st, call c) {
       copy_to_in = set_union(copy_to_in, at_call_site, copy_to_in);
       set_free(at_call_site);
     }
+
   }
   //  copy_to_in = set_difference(copy_to_in, copy_to_in, COPY_FROM_IN(st));
 }
 
 static void copy_to_unstructured(statement st, unstructured u) {
   pips_user_warning("Unimplemented !! Results may be wrong...\n");
+}
+
+static void get_written_entities(statement s, set written_entities) {
+  FOREACH(EFFECT, eff, load_proper_rw_effects_list(s) ) {
+    if(effect_write_p(eff) && store_effect_p(eff)) {
+      entity e_used = reference_variable(effect_any_reference(eff));
+      set_add_element(written_entities,written_entities,e_used);
+    }
+  }
 }
 
 static void copy_to_statement(statement st) {
@@ -807,6 +880,24 @@ static void copy_to_statement(statement st) {
       pips_internal_error("Unknown tag %d\n", instruction_tag(i) );
   }
 
+
+  // We remove from "copy to out" what is not written by this statement
+  set allowed_to_copy_to= MAKE_SET();
+  gen_context_recurse(st,allowed_to_copy_to,statement_domain,gen_true,get_written_entities);
+  ifdebug(4) {
+    pips_debug(0,"Removing from copy_to_out what is not written here : ");
+    set removed = MAKE_SET();
+    set_difference(removed,COPY_TO_OUT(st),allowed_to_copy_to);
+    list t_to = set_to_sorted_list(removed,(gen_cmp_func_t)compare_entities);
+    FOREACH(entity, e, t_to) {
+      fprintf(stderr, "%s ", entity_name(e));
+    }
+    fprintf(stderr, "\n");
+  }
+  set_intersection(COPY_TO_OUT(st),COPY_TO_OUT(st),allowed_to_copy_to);
+  set_free(allowed_to_copy_to);
+
+
   ifdebug(4) {
     fprintf(stderr,
             "** stmt (%d) associated copy to : **\n",
@@ -814,7 +905,8 @@ static void copy_to_statement(statement st) {
     fprintf(stderr, "*\n* OUT : ");
     {
       string str = concatenate("Copy to out : ", NULL);
-      SET_FOREACH(entity, e, COPY_TO_OUT(st)) {
+      list t_to = set_to_sorted_list(COPY_TO_OUT(st),(gen_cmp_func_t)compare_entities);
+      FOREACH(entity, e, t_to) {
         fprintf(stderr, "%s ", entity_name(e));
         str = concatenate(str, " ", entity_local_name(e), NULL);
       }
@@ -825,7 +917,8 @@ static void copy_to_statement(statement st) {
     fprintf(stderr, "* IN  : ");
     {
       string str = concatenate("Copy to in : ", NULL);
-      SET_FOREACH(entity, e, COPY_TO_IN(st)) {
+      list t_to = set_to_sorted_list(COPY_TO_IN(st),(gen_cmp_func_t)compare_entities);
+      FOREACH(entity, e, t_to) {
         fprintf(stderr, "%s ", entity_name(e));
         str = concatenate(str, " ", entity_local_name(e), NULL);
       }
@@ -835,6 +928,7 @@ static void copy_to_statement(statement st) {
     }
     fprintf(stderr, "*\n**********************************\n");
   }
+
 
 }
 
@@ -868,7 +962,7 @@ static void transfert_block(statement st,
     set transfert_to = MAKE_SET();
     set transfert_from = MAKE_SET();
 
-    /* Compute the transfert for this statement */
+    /* Compute the transfer for this statement */
     transfert_statement(one,
                         already_transfered,
                         already_transfered_from,
@@ -883,6 +977,8 @@ static void transfert_block(statement st,
       POP(current);
     }
     gen_free_list(t_from);
+
+
     list t_to = set_to_sorted_list(transfert_to,(gen_cmp_func_t)compare_entities);
     FOREACH(entity, e_to, t_to) {
       statement new_st_to = make_dma_transfert(e_to, dma_load);
@@ -891,22 +987,8 @@ static void transfert_block(statement st,
     }
     gen_free_list(t_to);
   }
-  /*
-   HASH_MAP(st, st_tr_to,
-   {
-   SET_FOREACH(statement, new_st, st_tr_to)
-   {
-   // loop over statements inside the block
-   for( list current = (sts);!ENDP(current);POP(current))
-   {
-   statement one = (statement)CAR(current);
-   if(one==st) {
-   list l = CONS(STATEMENT, st, l);
-   }
-   }
-   }
-   }, statement_transfert_to);
-   */
+
+
 }
 static void transfert_test(statement st,
                            test t,
@@ -962,6 +1044,37 @@ static void transfert_loop(statement st,
                       already_transfered_from,
                       transfert_to,
                       transfert_from);
+
+
+  /*
+   *  At the end of a loop, we check that any transfer that need to be done
+   */
+
+  // Retrieve the last statement of the loop body
+  set last_copy_from;
+  if(!statement_sequence_p(body)) {
+    last_copy_from=COPY_FROM_OUT(body);
+  } else {
+    FOREACH(statement,s,sequence_statements(statement_sequence(body))) {
+      set copy_from = COPY_FROM_OUT(s);
+      if(copy_from && !set_undefined_p(copy_from))
+        last_copy_from=copy_from;
+    }
+  }
+
+  /*
+   *  Compute the set of entity that are not on the GPU at the begin of the loop
+   *  but need a copy-out at the end, after the last statement
+   */
+  set fixed_transfert_from = MAKE_SET();
+  set_difference(fixed_transfert_from,last_copy_from,COPY_FROM_OUT(body));
+  list t_from = set_to_sorted_list(fixed_transfert_from,(gen_cmp_func_t)compare_entities);
+  set_free(fixed_transfert_from);
+  // Insert transfers at the end of the loop !
+  FOREACH(entity, e_from, t_from) {
+    insert_statement(body,make_dma_transfert(e_from, dma_store),false);
+  }
+
 
 }
 
@@ -1233,6 +1346,8 @@ bool kernel_data_mapping(char * module_name) {
   if(!is_a_kernel(module_name)) {
     copy_from_statement(module_stat);
     copy_to_statement(module_stat);
+    // Is it a bad hack ? Should we need a fix point here ?
+    copy_from_statement(module_stat);
 
     transfert_statement(module_stat, MAKE_SET(), MAKE_SET(), MAKE_SET(), MAKE_SET());
   }

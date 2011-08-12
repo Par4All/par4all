@@ -265,7 +265,8 @@ type malloc_arg_to_type(expression e)
 			 NIL));
       free_type(t_sizeof_exp);
     }
-  pips_debug(5, "end with type %s\n", words_to_string(words_type(t, NIL)));
+  pips_debug(5, "end with type %s\n",
+	     words_to_string(words_type(t, NIL, false)));
   return t;
 }
 
@@ -283,7 +284,7 @@ entity malloc_type_to_abstract_location(type t, sensitivity_information *psi)
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
   pips_debug(8, "begin for type %s\n",
-	     words_to_string(words_type(t, NIL)));
+	     words_to_string(words_type(t, NIL, false)));
   /* in case we want an anywhere abstract heap location : the property
      ABSTRACT_HEAP_LOCATIONS is set to "unique" and a unique abstract
      location is used for all heap buckets. */
@@ -329,7 +330,7 @@ entity malloc_type_to_abstract_location(type t, sensitivity_information *psi)
 		    " \"%s\"", opt);
 
   pips_debug(8, "returning entity %s of type %s\n", entity_name(e),
-	     words_to_string(words_type(entity_type(e), NIL)));
+	     words_to_string(words_type(entity_type(e), NIL, false)));
 
   return e;
 }
@@ -352,7 +353,7 @@ entity malloc_to_abstract_location(expression malloc_exp,
   e = malloc_type_to_abstract_location(t, psi);
   free_type(t);
   pips_debug(8, "returning entity %s of type %s\n", entity_name(e),
-	     words_to_string(words_type(entity_type(e), NIL)));
+	     words_to_string(words_type(entity_type(e), NIL, false)));
 
   return e;
 }

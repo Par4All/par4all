@@ -272,7 +272,34 @@ statement MakeGotoStatement(string label)
   return gts;
 }
 
-/* The labels in C have function scope. */
+/* The labels in C have function scope... but beware of
+   inlining... and conflict with user labels */
+
+/* To disambiguate labels, in case inlining is performed later and to
+   suppress the potential for conflicts with user labels.
+
+   Temporary entities have to be generated to be replaced later by the
+   final labels. The temporary entities should be eliminated from the
+   symbol table...
+ */
+string get_label_prefix()
+{
+  //    string s = get_current_module_name();
+  //string ns = s;
+  //char * p;
+  //if((p = strchr(s, '!'))!=NULL) {
+  ///* memory leak only for static functions */
+  //ns = strdup(s);
+  //p = strchr(ns, '!');
+  //*p = '_';
+  //}
+
+  string ns = "-"; // a character that cannot be used in a correct
+		   // label name; tobe substituted by _ or __ or ___
+		   // depending on conflicts
+
+  return ns;
+}
 
 entity MakeCLabel(string s)
 {
@@ -298,11 +325,11 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
   statement smt;
   int i = basic_int((basic) stack_head(LoopStack));
   string lab1;
-  asprintf(&lab1,"%s%d","loop_end_",i);
+  asprintf(&lab1,"%s%s%d", get_label_prefix(), "loop_end_", i);
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
   free(lab1);
   string lab2;
-  asprintf(&lab2,"%s%d","break_",i);
+  asprintf(&lab2,"%s%s%d", get_label_prefix(), "break_", i);
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
   free(lab2);
 
@@ -388,17 +415,30 @@ statement MakeForloop(expression e1,
   else
     simplify_C_expression(inc);
 
-
   int i = basic_int((basic) stack_head(LoopStack));
   /* Create some land-pad labels to deal with break and continue.
 
-     Looks like some memory leaks if no break or continue... */
-  string lab1;
-  asprintf(&lab1, "%s%d","loop_end_", i);
+     Looks like some memory leaks if no break or continue...
+
+     What happens if this label is already used by the programmer? If
+     I increment i, the label may not be retrieved when
+     needed... unless LoopStack is updated...
+ */
+  string lab1 = string_undefined;
+  //do {
+  //if(!string_undefined_p(lab1)) free(lab1);
+  asprintf(&lab1, "%s%s%d", get_label_prefix(), "loop_end_", i);
+    //i++;
+    //} while(label_string_defined_in_current_module_p(lab1)()
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
   free(lab1);
-  string lab2;
-  asprintf(&lab2, "%s%d", "break_", i);
+
+  string lab2 = string_undefined;
+  //do {
+  //if(!string_undefined_p(lab2)) free(lab2);
+    asprintf(&lab2, "%s%s%d", get_label_prefix(), "break_", i);
+    //i++;
+    //} while(label_string_defined_in_current_module_p(lab1)()
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
   free(lab2);
 
@@ -591,7 +631,7 @@ statement MakeSwitchStatement(statement s)
      before s and return the inserted statement.  */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab ;
-  asprintf(&lab,"break_%d",i);
+  asprintf(&lab, "%sbreak_%d", get_label_prefix(), i);
   statement smt = statement_undefined;
   statement seq = statement_undefined;
   sequence oseq = (sequence)stack_head(SwitchGotoStack);
@@ -687,12 +727,12 @@ statement MakeCaseStatement(expression e)
       /* Must be an illegal character for a label */
       /* FI: not too safe to make it octal among decimal because it
 	 can generate a label conflict. */
-      asprintf(&lab,"switch_%d_case_%hhd",i,*restr);
+      asprintf(&lab,"%sswitch_%d_case_%hhd",get_label_prefix(),i,*restr);
     }
     else if(*restr=='\\') {
       if(*(restr+1)=='0'||*(restr+1)=='1'||*(restr+1)=='2'||*(restr+1)=='3')
 	/* octal character */
-	asprintf(&lab,"switch_%d_case_%s",i,restr+1);
+	asprintf(&lab,"%sswitch_%d_case_%s",get_label_prefix(),i,restr+1);
       else {
 	/* FI: let's deal with special cases such as \n, \r, \t,...*/
 	char labc; // A string would carry more ASCII information
@@ -712,12 +752,12 @@ statement MakeCaseStatement(expression e)
 	  labc = '\v'; // "VT"
 	else
 	  pips_internal_error("Unexpected case.");
-	asprintf(&lab,"switch_%d_case_%hhd",i,labc);
+	asprintf(&lab,"%sswitch_%d_case_%hhd",get_label_prefix(),i,labc);
       }
     }
   }
   else
-    asprintf(&lab,"switch_%d_case_%s",i,restr);
+    asprintf(&lab,"%sswitch_%d_case_%s",get_label_prefix(),i,restr);
 
   free(estr);
   statement s = MakeLabeledStatement(lab,
@@ -742,7 +782,7 @@ statement MakeDefaultStatement()
      to the switch header */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab;
- asprintf(&lab,"switch_%d_default",i);
+  asprintf(&lab,"%sswitch_%d_default", get_label_prefix(), i);
   statement s = MakeLabeledStatement(lab,
 				     make_continue_statement(entity_empty_label()),
 				     get_current_C_comment());
@@ -757,10 +797,12 @@ statement MakeDefaultStatement()
 
 statement MakeBreakStatement(string cmt)
 {
-  /* NN : I did not add a bool variable to distinguish between loop and switch statements :-(*/
+  /* NN : I did not add a bool variable to distinguish between loop
+     and switch statements :-( FI: Also, there is no protection in case
+     the same label has been used by the programmer... */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab;
-  asprintf(&lab,"break_%d",i);
+  asprintf(&lab,"%sbreak_%d", get_label_prefix(), i);
   statement bs = MakeGotoStatement(lab);
   free(lab);
 
@@ -774,7 +816,7 @@ statement MakeContinueStatement(string cmt)
   /* Unique label with the LoopStack */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab;
-  asprintf(&lab,"loop_end_%d",i);
+  asprintf(&lab, "%sloop_end_%d", get_label_prefix(), i);
   statement cs = MakeGotoStatement(lab);
   free(lab);
 

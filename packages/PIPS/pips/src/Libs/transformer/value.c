@@ -220,6 +220,7 @@ static hash_table hash_entity_to_new_value = hash_table_undefined;
 static hash_table hash_entity_to_old_value = hash_table_undefined;
 static hash_table hash_entity_to_intermediate_value = hash_table_undefined;
 static hash_table hash_value_to_name = hash_table_undefined;
+static hash_table hash_entity_to_user_value_name = hash_table_undefined;
 
 bool hash_entity_to_values_undefined_p()
 {
@@ -644,6 +645,33 @@ string external_value_name(entity e)
   return s;
 }
 
+/* This function is called many times when the constraints and the
+   system of contraints are sorted using lexicographic information
+   based on this particular value name. See for instance
+   Semantics-New/freia_52.c. Hence it is memoized.
+*/
+const char * pips_user_value_name(entity e)
+{
+  string uvn = string_undefined;
+
+  if(e == (entity) TCST) {
+    uvn = "";
+  }
+  else {
+    // To check the execution speed, uncomment the next line
+    //return entity_name(e);
+    uvn = hash_get(hash_entity_to_user_value_name, (char *) e);
+
+    if(uvn==HASH_UNDEFINED_VALUE) {
+      (void) gen_check((gen_chunk *) e, entity_domain);
+      uvn = entity_has_values_p(e)? (string)entity_minimal_name(e) :
+                                  external_value_name(e);
+      hash_put(hash_entity_to_user_value_name, (char *) e, uvn);
+    }
+  }
+  return uvn;
+}
+
 entity entity_to_new_value(entity e)
 {
   entity n;
@@ -920,6 +948,8 @@ void allocate_value_mappings(int n, int o, int i)
     hash_table_make(hash_pointer, i);
   hash_value_to_name =
     hash_table_make(hash_pointer, n + o + i);
+  hash_entity_to_user_value_name =
+    hash_table_make(hash_pointer, n + o + i);
 }
 
 static void reset_value_mappings(void)
@@ -928,6 +958,7 @@ static void reset_value_mappings(void)
   hash_entity_to_old_value = hash_table_undefined;
   hash_entity_to_intermediate_value = hash_table_undefined;
   hash_value_to_name = hash_table_undefined;
+  hash_entity_to_user_value_name = hash_table_undefined;
 }
 
 bool hash_value_to_name_undefined_p()
@@ -963,11 +994,15 @@ void error_free_value_mappings(void)
      no value freeing */
   /* k is discovered unused by lint; it is syntaxically necessary */
   HASH_MAP(k, v, {free(v);}, hash_value_to_name);
+  // Do not deallocate the names: they are pointers towards parts of
+  // entity names
+  //HASH_MAP(k, v, {free(v);}, hash_entity_to_user_value_name);
   /* free the three tables themselves */
   hash_table_free(hash_entity_to_new_value);
   hash_table_free(hash_entity_to_old_value);
   hash_table_free(hash_entity_to_intermediate_value);
   hash_table_free(hash_value_to_name);
+  hash_table_free(hash_entity_to_user_value_name);
 
   reset_value_mappings();
   reset_temporary_value_counter();

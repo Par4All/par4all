@@ -64,6 +64,16 @@ typedef struct {
     bool modify_call_site_p;
 } param_t;
 
+
+bool array_to_pointer_VLA_only_p(entity e) {
+  if(get_bool_property("LINEARIZE_ARRAY_VLA_ONLY")
+      && !entity_variable_length_array_p(e)) {
+    return false;
+  }
+  return true;
+}
+
+
 /* @return the number of dimensions in @param t, 
  * counting pointers as a dimension
  *
@@ -90,6 +100,10 @@ size_t type_dereferencement_depth(type t) {
 
 static void do_linearize_array_reference(reference r) {
     entity e =reference_variable(r);
+    if(!array_to_pointer_VLA_only_p(e)) {
+      return;
+    }
+
     list indices = reference_indices(r);
     list to_be_free = indices;
     bool fortran_p = fortran_module_p(get_current_module_entity());
@@ -181,10 +195,12 @@ static bool do_linearize_type(type *t, bool *rr) {
         if(rr)*rr=false;
         variable v = type_variable(*t);
         type ut = ultimate_type(*t);
-        variable uv = type_variable(ut);
-        size_t uvl = gen_length(variable_dimensions(uv));
-        size_t vl = gen_length(variable_dimensions(v));
-        if(uvl > 1 ) {
+        if((!get_bool_property("LINEARIZE_ARRAY_VLA_ONLY")
+                         || variable_length_array_type_p(ut))) {
+          variable uv = type_variable(ut);
+          size_t uvl = gen_length(variable_dimensions(uv));
+          size_t vl = gen_length(variable_dimensions(v));
+          if(uvl > 1 ) {
             dimension nd = dimension_undefined;
             if (fortran_module_p(get_current_module_entity()) ) {
                 nd = make_dimension(int_to_expression(1),
@@ -220,6 +236,7 @@ static bool do_linearize_type(type *t, bool *rr) {
             linearized=true;
             if(rr)*rr=true;
             pips_debug (5, "type has been linearized\n");
+          }
         }
 
         if(basic_pointer_p(variable_basic(type_variable(*t))))
@@ -229,6 +246,8 @@ static bool do_linearize_type(type *t, bool *rr) {
 }
 
 static void do_array_to_pointer_type_aux(type *t) {
+  if(!get_bool_property("LINEARIZE_ARRAY_VLA_ONLY")
+      || variable_length_array_type_p(*t)) {
     variable v = type_variable(*t);
     if(basic_pointer_p(variable_basic(v)))
         do_array_to_pointer_type_aux(&basic_pointer(variable_basic(v)));
@@ -242,7 +261,9 @@ static void do_array_to_pointer_type_aux(type *t) {
                     )
                 );
     }
+  }
 }
+
 /* returns true if a dereferencment has been supressed */
 static bool do_array_to_pointer_type(type *t) {
     bool remove = false;
@@ -251,7 +272,9 @@ static bool do_array_to_pointer_type(type *t) {
                     variable vt = type_variable(*t);
                     basic bt = variable_basic(vt);
                     type t2 = basic_pointer(bt);
-                    if(array_type_p(t2)) {
+                    if(array_type_p(t2)
+                        && (!get_bool_property("LINEARIZE_ARRAY_VLA_ONLY")
+                         || variable_length_array_type_p(t2))) {
                             basic_pointer(bt) = type_undefined;
                             free_type(*t);
                             *t=t2;
@@ -549,12 +572,12 @@ static void do_linearize_array(entity m, statement s, param_t *param) {
     do_linearize_array_walker(s);
 
     FOREACH(ENTITY,e,entity_declarations(m))
-        if(entity_variable_p(e))
+        if(entity_variable_p(e) && array_to_pointer_VLA_only_p(e))
             do_linearize_array_walker(entity_initial(e));
 
     /* step2: the declarations */
     FOREACH(ENTITY,e,entity_declarations(m))
-      if(entity_variable_p(e)) {
+      if(entity_variable_p(e) && array_to_pointer_VLA_only_p(e)) {
         bool rr;
         pips_debug (5, "linearizing entity %s\n", entity_name (e));
         do_linearize_type(&entity_type(e),&rr);
@@ -604,7 +627,7 @@ static void do_array_to_pointer_walk_expression(expression exp) {
         reference r = expression_reference(exp);
         entity e =reference_variable(r);
         list indices = reference_indices(r);
-        if(!ENDP(indices)) {
+        if(!ENDP(indices) && array_to_pointer_VLA_only_p(e)) {
             expression new_expression = expression_undefined;
             reference_indices(r)=NIL;
             indices=gen_nreverse(indices);
@@ -733,7 +756,7 @@ list initialization_list_to_statements(entity e) {
                 }
             }
         }
-        if(!formal_parameter_p(e)) {
+        if(!formal_parameter_p(e) && array_to_pointer_VLA_only_p(e)) {
             /* use alloca when converting array to pointers, to make sure everything is initialized correctly */
             free_value(entity_initial(e));
             type ct = copy_type(ultimate_type(entity_type(e)));
@@ -780,12 +803,17 @@ static void insert_statements_after_declarations(statement st, list stats) {
         }
         else {
             for(list iter=statement_block(st),prev=NIL;!ENDP(iter);POP(iter)) {
-                if(declaration_statement_p(STATEMENT(CAR(iter)))) prev=iter;
-                else {
-                    CDR(prev)=stats;
-                    while(!ENDP(CDR(stats))) POP(stats);
-                    CDR(stats)=iter;
-                    break;
+                if(declaration_statement_p(STATEMENT(CAR(iter)))) {
+                  prev=iter;
+                } else if(prev == NIL) {
+                  /* No declarations */
+                  insert_statement(st, make_block_statement(stats), true);
+                } else {
+                  CDR(prev) = stats;
+                  while(!ENDP(CDR(stats)))
+                    POP(stats);
+                  CDR(stats) = iter;
+                  break;
                 }
             }
         }
@@ -798,13 +826,13 @@ static void do_array_to_pointer(entity m, statement s, param_t *p) {
     /* step1: the statements */
     do_array_to_pointer_walker(s);
     FOREACH(ENTITY,e,entity_declarations(m))
-        if(entity_variable_p(e))
+        if(entity_variable_p(e) && array_to_pointer_VLA_only_p(e))
             do_array_to_pointer_walker(entity_initial(e));
 
     /* step2: the declarations */
     list inits = NIL;
     FOREACH(ENTITY,e,entity_declarations(m))
-        if(entity_variable_p(e)) {
+        if(entity_variable_p(e) && array_to_pointer_VLA_only_p(e)) {
             // must do this before the type conversion
             inits=gen_append(inits,initialization_list_to_statements(e));
             if(do_array_to_pointer_type(&entity_type(e)))
@@ -821,6 +849,7 @@ static void do_array_to_pointer(entity m, statement s, param_t *p) {
             entity di = dummy_identifier(d);
             do_array_to_pointer_type(&entity_type(di));
         }
+
         do_array_to_pointer_type(&parameter_type(p));
         pips_assert("everything went well",parameter_consistent_p(p));
     }
