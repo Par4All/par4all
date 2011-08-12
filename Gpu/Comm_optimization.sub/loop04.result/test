@@ -1,0 +1,35 @@
+//
+// Initial code for module main
+//
+int main()
+{
+   int i, j;
+   int n = 10;
+   int a[n];
+   int sum;
+   for(i = 0; i <= n-1; i += 1) {
+      for(j = 0; j <= n-1; j += 1)
+         sum += a[j]+1;
+      kernel(n, a);
+   }
+
+   int c = a[0];
+}
+//
+// Code after kernel_data_mapping for module main
+//
+int main()
+{
+   int i, j;
+   int n = 10;
+   int a[n];
+   int sum;
+   for(i = 0; i <= n-1; i += 1) {
+      for(j = 0; j <= n-1; j += 1)
+         sum += a[j]+1;
+      kernel(n, a);
+      P4A_copy_from_accel(a, sizeof(int)*n);
+   }
+
+   int c = a[0];
+}
