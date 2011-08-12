@@ -672,7 +672,7 @@ def postpreprocess_simple(output_string):
                         # In the case of the simple method, just mark
                         # begin of #include that are at the top-level:
                         flush_lexer_output('/* P4A include '
-                                           + file_name + ' starts here */\n')
+                                           + file_name + ' starts here */\nvoid p4a_dummy_recover();\n')
                     #print(include_stack)
                 if m.group(3) == "2":
                     returning_from = include_stack.pop()
