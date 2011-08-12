@@ -1,7 +1,5 @@
 int main()
 {
-   int i, j;
-   int tmp;
    int a[10][10];
    {
       //PIPS generated variable
@@ -13,15 +11,9 @@ int main()
          //PIPS generated variable
          int j1, tmp1;
          a[i][0] = i;
-         {
-            //PIPS generated variable
-            int j;
-            for(j1 = 1; j1 <= 9; j1 += 1) {
-               //PIPS generated variable
-               int tmp;
-               tmp1 = a[i][j1-1];
-               a[i][j1] = tmp1+j1;
-            }
+         for(j1 = 1; j1 <= 9; j1 += 1) {
+            tmp1 = a[i][j1-1];
+            a[i][j1] = tmp1+j1;
          }
       }
    }

@@ -1,0 +1,44 @@
+delete generate15
+create generate15 generate15.c
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[generate15]
+
+echo
+echo Symbol table file
+echo
+
+display SYMBOL_TABLE_FILE[generate15]
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[generate15]
+#display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Printed file generate15 with intraprocedural preconditions
+echo
+
+display PRINTED_FILE[generate15]
+
+echo
+echo Printed file func with intraprocedural preconditions
+echo
+
+display PRINTED_FILE[func]
+
+# To be sure that the generated code is corret
+#shell (cd generate15.database/func; gcc -c func.c)
+
+close
+#delete generate15
+quit

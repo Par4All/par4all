@@ -5,14 +5,14 @@ echo
 echo Source code for all modules, including block data modules
 echo
 
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALLFUNC]
 
 echo 
 echo Initial preconditions for each module
 echo
 
 activate PRINT_INITIAL_PRECONDITION
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALLFUNC]
 # activate PRINT_PROGRAM_PRECONDITION
 
 echo 

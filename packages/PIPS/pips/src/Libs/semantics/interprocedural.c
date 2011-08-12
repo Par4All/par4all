@@ -312,7 +312,7 @@ transformer add_formal_to_actual_bindings(call c, transformer pre, entity caller
       basic bfp = variable_basic(type_variable(tfp));
       basic bexpr = basic_of_expression(expr);
 
-      if(!basic_equal_p(bfp, bexpr)) {
+      if(!same_basic_p(bfp, bexpr)) {
 	pips_user_warning("Type incompatibility\n(%s/%s)\nfor formal parameter %s"
 			  " (rank %d)\nin call to %s from %s\n",
 			  basic_to_string(bfp), basic_to_string(bexpr),

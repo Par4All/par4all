@@ -5,13 +5,13 @@ static void ABCDEFGHIJKLMNOPQRSTUVWXYZ_ABCDEGHIJKLMNO()
 l99998:      ;
       while (0)                                                         /*0008*/
          ;                                                              /*0008*/
-      goto loop_end_1;
+      goto _loop_end_1;
 l99999:      ;
       if (0) {                                                          /*0006*/
       }
       else {
          goto l99998;
       }
-loop_end_1:      ;
+_loop_end_1:      ;
    }
 }

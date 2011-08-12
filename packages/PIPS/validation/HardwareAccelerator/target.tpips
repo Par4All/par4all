@@ -10,6 +10,8 @@ setproperty FREIA_DAG_LABEL_ARCS=TRUE
 setproperty MEMORY_EFFECTS_ONLY=FALSE
 # use "old" effects...
 setproperty CONSTANT_PATH_EFFECTS=FALSE
+# faster on long sequences
+setproperty SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE 2
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING="generate"
 #setenv PIPS_HWAC_DEBUG_LEVEL=7
 create ${WSPACE} ${FILE} freia.c

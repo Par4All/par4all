@@ -87,7 +87,7 @@ bool entity_all_locations_p(entity e)
 }
 
 /* return *ANY_MODULE*:*NOWHERE* */
-   
+
 entity entity_nowhere_locations()
 {
   entity nowhere = entity_undefined;
@@ -117,7 +117,7 @@ bool entity_nowhere_locations_p(entity e)
   return nowhere_p;
 }
 
-/* return TOP-LEVEL:*NULL_POINTER*  
+/* return TOP-LEVEL:*NULL_POINTER*
  * The NULL pointer should be a global variable, unique for all modules
  * FI: why isn't it called entity_null_location()?
  */
@@ -152,7 +152,7 @@ bool entity_null_locations_p(entity e)
   return null_pointer_p;
 }
 
-/* return m:*ANYWHERE* 
+/* return m:*ANYWHERE*
    Set of all memory locations related to one module.
 
    FI: This may prove useless unless the compilation unit is taken into
@@ -241,7 +241,7 @@ entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
       entity_storage(e) = make_storage_rom();
       entity_initial(e) = make_value_unknown();
       found_p = true;
-      
+
     }
     else if(type_equal_p(t, ot))
       found_p = true;
@@ -527,7 +527,7 @@ entity variable_to_abstract_location(entity v)
   else if(entity_variable_p(v)
      && !dummy_parameter_entity_p(v)
      && !variable_return_p(v)) {
-    bool typed_p = get_bool_property("ALIASING_ACROSS_TYPES");
+    bool typed_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
     // Too simplistic
     //al = FindOrCreateEntity(mn, ln);
@@ -540,7 +540,7 @@ entity variable_to_abstract_location(entity v)
       else
 	al = entity_all_locations();
 
-    
+
 
     else { // must be a standard variable
       storage s = entity_storage(v);

@@ -218,7 +218,7 @@ bool effect_abstract_location_p(effect eff)
 bool cell_abstract_location_p(cell c)
 {
   pips_assert("cell is not a GAP", !cell_gap_p(c));
-  
+
   return (entity_abstract_location_p(reference_variable(cell_any_reference(c))));
 }
 
@@ -386,7 +386,7 @@ bool FILE_star_effect_reference_p(reference ref)
   bool res = false;
   type t = basic_concrete_type(entity_type(reference_variable(ref)));
   pips_debug(8, "begin with type %s\n",
-	     words_to_string(words_type(t,NIL)));
+	     words_to_string(words_type(t,NIL,false)));
   if (type_variable_p(t))
     {
       basic b = variable_basic(type_variable(t));

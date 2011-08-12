@@ -1,0 +1,166 @@
+//
+// Initial code for module main
+//
+int main(int argc, char *argv[])
+{
+   int rows, cols, size_I, size_R, niter = 10, iter;
+   float q0sqr, sum, sum2, tmp, meanROI, varROI;
+   float Jc, G2, L, num, den, qsqr;
+   int r1, r2, c1, c2;
+   float cN, cS, cW, cE;
+   float D;
+   float lambda;
+   int i, j;
+
+   if (argc==9) {
+      rows = atoi(argv[1]);
+      //number of rows in the domain
+      cols = atoi(argv[2]);
+      if (rows%16!=0||cols%16!=0) {
+         fprintf(stderr, "rows and cols must be multiples of 16\n");
+         exit(1);
+      }
+      r1 = atoi(argv[3]);
+      //y1 position of the speckle
+      r2 = atoi(argv[4]);
+      //y2 position of the speckle
+      c1 = atoi(argv[5]);
+      //x1 position of the speckle
+      c2 = atoi(argv[6]);
+      //x2 position of the speckle
+      lambda = atof(argv[7]);
+      //Lambda value
+      niter = atoi(argv[8]);
+   }
+   else
+      usage(argc, argv);
+
+   size_I = cols*rows;
+   size_R = (r2-r1+1)*(c2-c1+1);
+
+   float I[rows][cols];
+   float J[rows][cols];
+   float c[rows][cols];
+
+   int iN[rows];
+   int iS[rows];
+   int jW[cols];
+   int jE[cols];
+
+   float dN[rows][cols];
+   float dS[rows][cols];
+   float dW[rows][cols];
+   float dE[rows][cols];
+   
+   
+   // Initial data
+   init(rows, cols, I, J, iN, iS, jW, jE);
+   
+   
+   for(iter = 0; iter <= niter-1; iter += 1) {
+      sum = 0;
+      sum2 = 0;
+      for(i = r1; i <= r2; i += 1)
+         for(j = c1; j <= c2; j += 1) {
+            tmp = J[i][j];
+            sum += tmp;
+            sum2 += tmp*tmp;
+         }
+      // There shouldn't be a copy-in there because J is not written but only read in the previous loop
+      // This is a currently known limitation of the communication optimization scheme, hard work to improve !
+      meanROI = sum/size_R;
+      varROI = sum2/size_R-meanROI*meanROI;
+      q0sqr = varROI/(meanROI*meanROI);
+      p4a_launcher_main(cols, rows, J, c, dE, dN, dS, dW, iN, iS, jE, jW, q0sqr);
+      p4a_launcher_main_1(cols, rows, J, c, dE, dN, dS, dW, iS, jE, lambda);
+   }
+   //  printf("Computation Done\n");
+   
+   return 0;
+}
+//
+// Code after kernel_data_mapping for module main
+//
+int main(int argc, char *argv[])
+{
+   int rows, cols, size_I, size_R, niter = 10, iter;
+   float q0sqr, sum, sum2, tmp, meanROI, varROI;
+   float Jc, G2, L, num, den, qsqr;
+   int r1, r2, c1, c2;
+   float cN, cS, cW, cE;
+   float D;
+   float lambda;
+   int i, j;
+
+   if (argc==9) {
+      rows = atoi(argv[1]);
+      //number of rows in the domain
+      cols = atoi(argv[2]);
+      if (rows%16!=0||cols%16!=0) {
+         fprintf(stderr, "rows and cols must be multiples of 16\n");
+         exit(1);
+      }
+      r1 = atoi(argv[3]);
+      //y1 position of the speckle
+      r2 = atoi(argv[4]);
+      //y2 position of the speckle
+      c1 = atoi(argv[5]);
+      //x1 position of the speckle
+      c2 = atoi(argv[6]);
+      //x2 position of the speckle
+      lambda = atof(argv[7]);
+      //Lambda value
+      niter = atoi(argv[8]);
+   }
+   else
+      usage(argc, argv);
+
+   size_I = cols*rows;
+   size_R = (r2-r1+1)*(c2-c1+1);
+
+   float I[rows][cols];
+   float J[rows][cols];
+   float c[rows][cols];
+
+   int iN[rows];
+   int iS[rows];
+   int jW[cols];
+   int jE[cols];
+
+   float dN[rows][cols];
+   float dS[rows][cols];
+   float dW[rows][cols];
+   float dE[rows][cols];
+   
+   
+   // Initial data
+   init(rows, cols, I, J, iN, iS, jW, jE);
+   P4A_copy_to_accel(iN, sizeof(int)*rows);
+   P4A_copy_to_accel(iS, sizeof(int)*rows);
+   P4A_copy_to_accel(jE, sizeof(int)*cols);
+   P4A_copy_to_accel(jW, sizeof(int)*cols);
+   
+   
+   for(iter = 0; iter <= niter-1; iter += 1) {
+      sum = 0;
+      sum2 = 0;
+      for(i = r1; i <= r2; i += 1)
+         for(j = c1; j <= c2; j += 1) {
+            tmp = J[i][j];
+            sum += tmp;
+            sum2 += tmp*tmp;
+         }
+      P4A_copy_to_accel(J, sizeof(float)*rows*cols);
+      // There shouldn't be a copy-in there because J is not written but only read in the previous loop
+      // This is a currently known limitation of the communication optimization scheme, hard work to improve !
+      meanROI = sum/size_R;
+      varROI = sum2/size_R-meanROI*meanROI;
+      q0sqr = varROI/(meanROI*meanROI);
+      p4a_launcher_main(cols, rows, J, c, dE, dN, dS, dW, iN, iS, jE, jW, q0sqr);
+      p4a_launcher_main_1(cols, rows, J, c, dE, dN, dS, dW, iS, jE, lambda);
+      P4A_copy_from_accel(J, sizeof(float)*rows*cols);
+   }
+   //  printf("Computation Done\n");
+   
+   return 0;
+}

@@ -1,0 +1,25 @@
+void address_of01()
+{
+   /* register */
+//             <    is declared>: i
+   int i;
+//             <    is declared>: j
+   int j;
+//             <    is declared>: p
+   int *p;
+//             <    is written>: p
+//             <    is referenced>: i p
+
+   p = &i;
+//             <    is written>: j
+//             <    is referenced>: j
+   j = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+//             <    is referenced>: p
+   
+   // *p cannot write j because the address of j is never copied
+   *p = 2;
+
+   return;
+}

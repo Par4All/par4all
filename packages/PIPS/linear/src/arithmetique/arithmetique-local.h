@@ -27,7 +27,7 @@
  * Francois Irigoin, mai 1989
  *
  * Modifications
- *  - reprise de DIVIDE qui etait faux (Remi Triolet, Francois Irigoin, 
+ *  - reprise de DIVIDE qui etait faux (Remi Triolet, Francois Irigoin,
  *    april 90)
  *  - simplification de POSITIVE_DIVIDE par suppression d'un modulo
  */
@@ -37,7 +37,7 @@
  * be changed to "int" "long" or "long long". In an ideal world,
  * any source modification should be limited to this package.
  *
- * Indeed, we cannot switch easily to bignums that need constructors 
+ * Indeed, we cannot switch easily to bignums that need constructors
  * dans destructors... That would lead to too many modifications...
  * C++ would make things easier and cleaner...
  *
@@ -67,7 +67,7 @@ typedef enum {
 } linear_exception_t;
 
 
-/* 
+/*
    #        ####   #    #   ####           #        ####   #    #   ####
    #       #    #  ##   #  #    #          #       #    #  ##   #  #    #
    #       #    #  # #  #  #               #       #    #  # #  #  #
@@ -129,7 +129,7 @@ typedef long long int Value;
 /* end LINEAR_VALUE_IS_LONGLONG
  */
 
-/* 
+/*
    #        ####   #    #   ####
    #       #    #  ##   #  #    #
    #       #    #  # #  #  #
@@ -158,14 +158,14 @@ typedef long Value;
 /* end LINEAR_VALUE_IS_LONG
  */
 
-/* 
+/*
    ######  #        ####     ##     #####
    #       #       #    #   #  #      #
    #####   #       #    #  #    #     #
    #       #       #    #  ######     #
    #       #       #    #  #    #     #
    #       ######   ####   #    #     #
- 
+
    */
 /*
 #elif defined(LINEAR_VALUE_IS_FLOAT)
@@ -194,7 +194,7 @@ typedef float Value;
   #       #    #  ######  #####            # #
   #    #  #    #  #    #  #   #           #   #
    ####   #    #  #    #  #    #
-  
+
    */
 
 /* the purpose of the chars version is to detect invalid assignments
@@ -244,7 +244,7 @@ typedef int Value;
 #define VALUE_TO_DOUBLE(val) ((double)(val))
 /* end LINEAR_VALUE_IS_INT
  */
-#endif 
+#endif
 
 /************************** ************ MACROS FOR MANIPULATING VALUES... */
 
@@ -355,12 +355,12 @@ typedef int Value;
 
 /* protected versions
  */
-#define value_protected_mult(v,w) 				\
+#define value_protected_mult(v,w) \
     value_protected_multiply(v,w,THROW(overflow_error))
 #define value_protected_product(v,w)		\
     v=value_protected_mult(v,w)
 
-/* whether the default is protected or not 
+/* whether the default is protected or not
  * this define makes no sense any more... well, doesn't matter. FC.
  */
 #if defined(LINEAR_VALUE_PROTECT_MULTIPLY)
@@ -370,7 +370,7 @@ typedef int Value;
 
 /* I do enforce the protection whatever requested:-)
  * prints out a message and throws the exception, hoping
- * that some valid CATCH waits for it upwards. 
+ * that some valid CATCH waits for it upwards.
  */
 #define value_mult(v,w)							      \
   value_protected_multiply(v,w,						      \
@@ -451,7 +451,7 @@ typedef int Value;
 #define value_lshift(v1,v2) value_fake_binary(v1,v2)
 #undef value_rshift
 #define value_rshift(v1,v2) value_fake_binary(v1,v2)
-#endif 
+#endif
 
 
 /* valeur absolue
@@ -460,8 +460,8 @@ typedef int Value;
 #define ABS(x) (((x)>=0) ? (x) : -(x))
 #endif
 
-/* minimum et maximum 
- * if they are defined somewhere else, they are very likely 
+/* minimum and maximum
+ * if they are defined somewhere else, they are very likely
  * to be defined the same way. Thus the previous def is not overwritten.
  */
 #ifndef MIN
@@ -497,7 +497,7 @@ typedef int Value;
  */
 #define POSITIVE_MODULO(x,y) ((x) > 0 ? (x)%(y) : \
 			      ((x)%(y) == 0 ? 0 : ((y)-(-(x))%(y))))
-			      
+
 /* Pour la recherche de performance, selection d'une implementation
  * particuliere des fonctions
  */

@@ -1,0 +1,4 @@
+According to Fabien, more precise information should be obtained without points-to analysis. See comments
+in anywere01 (and anywhere02).
+
+Also, the value of variable m should be lost earlier. Issue with the comma operator? Bug for Francois.

@@ -1,0 +1,206 @@
+
+PROPER  EFFECTS 
+
+int bla(int *p)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p = 13;
+   return 17;
+}
+int call19(int *q)
+{
+   int i, k;
+   something st;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   // bla(int *)
+   i = bla(q);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: i
+   i += *q;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i
+   i += bla(&k);
+//             <    is read   >: i k
+//             <    is written>: i
+   i += k;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i
+   i += bla(&st.data);
+//             <    is read   >: i st.data
+//             <    is written>: i
+   i += st.data;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: i
+   // foo(int)
+   i += foo(*q);
+//             <    is read   >: i k
+//             <    is written>: i
+   i += foo(k);
+//             <    is read   >: i st.data
+//             <    is written>: i
+   i += foo(st.data);
+//             <    is read   >: i
+   return i;
+}
+int foo(int a)
+{
+//             <    is read   >: a
+   return a*3;
+}
+
+POINTS-TO
+
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+
+int bla(int *p)
+{
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+
+   *p = 13;
+
+// Points To:
+// p -> &_p_1[0] , EXACT
+
+   return 17;
+}
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+int call19(int *q)
+{
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   int i, k;
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   something st;
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   // bla(int *)
+   i = bla(q);
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   i += *q;
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   i += bla(&k);
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   i += k;
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   i += bla(&st.data);
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   i += st.data;
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   // foo(int)
+   i += foo(*q);
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   i += foo(k);
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   i += foo(st.data);
+
+// Points To:
+// q -> &_q_2[0] , EXACT
+
+   return i;
+}
+
+// Points To: none
+
+int foo(int a)
+{
+
+// Points To: none
+
+   return a*3;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int bla(int *p)
+{
+//             <    is read   >: p
+//             <    is written>: _p_1[0]
+   *p = 13;
+   return 17;
+}
+int call19(int *q)
+{
+   int i, k;
+   something st;
+//             <    is read   >: q
+//             <    is written>: _q_2[0] i
+   // bla(int *)
+   i = bla(q);
+//             <    is read   >: _q_2[0] i q
+//             <    is written>: i
+   i += *q;
+//             <    is read   >: i
+//             <    is written>: i k
+   i += bla(&k);
+//             <    is read   >: i k
+//             <    is written>: i
+   i += k;
+//             <    is read   >: i
+//             <    is written>: i st.data
+   i += bla(&st.data);
+//             <    is read   >: i st.data
+//             <    is written>: i
+   i += st.data;
+//             <    is read   >: _q_2[0] i q
+//             <    is written>: i
+   // foo(int)
+   i += foo(*q);
+//             <    is read   >: i k
+//             <    is written>: i
+   i += foo(k);
+//             <    is read   >: i st.data
+//             <    is written>: i
+   i += foo(st.data);
+//             <    is read   >: i
+   return i;
+}
+int foo(int a)
+{
+//             <    is read   >: a
+   return a*3;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

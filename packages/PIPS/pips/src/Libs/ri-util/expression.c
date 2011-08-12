@@ -1248,30 +1248,29 @@ bool expression_equal_p(expression e1, expression e2)
   return syntax_equal_p(s1, s2);
 }
 
+/* this is slightly different from expression_equal_p, as it will return true for
+ * a+b vs b+a
+ */
 bool same_expression_p(expression e1, expression e2)
 {
-  normalized n1, n2;
-
-  n1 = expression_normalized(e1);
-  n2 = expression_normalized(e2);
 
   /* lazy normalization.
    */
-  if (normalized_undefined_p(n1)) {
-    normalize_all_expressions_of(e1);
-    n1 = expression_normalized(e1);
-  }
+  NORMALIZE_EXPRESSION(e1);
+  NORMALIZE_EXPRESSION(e2);
 
-  if (normalized_undefined_p(n2)) {
-    normalize_all_expressions_of(e2);
-    n2 = expression_normalized(e2);
-  }
+  normalized n1, n2;
+  n1 = expression_normalized(e1);
+  n2 = expression_normalized(e2);
+
+
 
   if (normalized_linear_p(n1) && normalized_linear_p(n2))
     return vect_equal(normalized_linear(n1), normalized_linear(n2));
   else
     return expression_equal_p(e1, e2);
 }
+
 bool sizeofexpression_equal_p(sizeofexpression s0, sizeofexpression s1)
 {
     if(sizeofexpression_type_p(s0) && sizeofexpression_type_p(s1))
@@ -2311,11 +2310,12 @@ bool same_range_name_p(range r1, range r2)
     same_expression_name_p(range_upper(r1), range_upper(r2)) &&
     same_expression_name_p(range_increment(r1), range_increment(r2));
 }
-bool same_type_name_p(type t0, type t1)
-{
-    string s0 = type_to_string(t0),
-           s1 = type_to_string(t1);
+
+bool same_type_name_p(const type t0, const type t1) {
+    string s0 = string_of_type(t0),
+           s1 =string_of_type(t1);
     bool same = same_string_p(s0,s1);
+    free(s0);free(s1);
     return same;
 }
 

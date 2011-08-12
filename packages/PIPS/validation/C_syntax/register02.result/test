@@ -1,0 +1,6 @@
+int main()
+{
+   register int i;
+   register int j;
+   register int k, l;
+}

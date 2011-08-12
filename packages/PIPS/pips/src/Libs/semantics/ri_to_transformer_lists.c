@@ -153,7 +153,7 @@ list declaration_to_transformer_list(entity v, transformer pre)
       type vt = ultimate_type(entity_type(v));
       basic vb = variable_basic(type_variable(vt));
 
-      if(basic_equal_p(eb, vb)) {
+      if(same_basic_p(eb, vb)) {
 	tf = safe_any_expression_to_transformer(v, e, pre, false);
 	tf = transformer_temporary_value_projection(tf);
       }

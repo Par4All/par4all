@@ -7,11 +7,11 @@ activate PRECONDITIONS_INTER_FAST
 
 echo # proper effects
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALLFUNC]
 
 echo # cumulated effects
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALLFUNC]
 
 echo # preconditions
 module LOOPINIT

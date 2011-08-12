@@ -1,1 +1,18 @@
+setproperty ABORT_ON_USER_ERROR FALSE
+setpropertycoelho
+           ^
+at line 4 in "./property03.tpips2"
+user error in tp_error: space expected after initial keyword
+setpropfabien
+       ^
+at line 5 in "./property03.tpips2"
+user error in tp_error: space expected after initial keyword
+echofoo
+    ^
+at line 6 in "./property03.tpips2"
+user error in tp_error: space expected after initial keyword
+shellecho foo
+     ^
+at line 7 in "./property03.tpips2"
+user error in tp_error: space expected after initial keyword
 

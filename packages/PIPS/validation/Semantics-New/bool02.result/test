@@ -1,0 +1,73 @@
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int bla;
+
+//  P(bla) {}
+
+   int *pbla;
+
+//  P(bla) {}
+
+   _Bool b = 1;
+
+//  P(b,bla) {b==1}
+
+
+   pbla = &bla;
+
+//  P(b,bla) {b==1}
+
+   // kill all preconditions
+   *pbla = 1;
+
+//  P(b,bla) {}
+
+
+   return 0;
+}
+
+Idem After forcing registers
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int bla;
+
+//  P(bla) {}
+
+   int *register pbla;
+
+//  P(bla) {}
+
+   register _Bool b = 1;
+
+//  P(b,bla) {b==1}
+
+
+   pbla = &bla;
+
+//  P(b,bla) {b==1}
+
+   // kill all preconditions
+   *pbla = 1;
+
+//  P(b,bla) {b==1}
+
+
+   return 0;
+}
+

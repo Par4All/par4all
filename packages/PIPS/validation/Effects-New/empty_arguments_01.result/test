@@ -1,3 +1,6 @@
+#
+# compile initial empty_arguments_01
+#
 void foo();
 
 int main(void);

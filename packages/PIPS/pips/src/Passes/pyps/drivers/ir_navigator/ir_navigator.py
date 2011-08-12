@@ -3,9 +3,9 @@ import pypsutils
 import shutil, os, re
 import webbrowser
 
-def ir_navigator(m,openBrowser=False,output_dir="ir_navigator",keep_existing=False):
+def ir_navigator(m,openBrowser=False,output_dir="ir_navigator",keep_existing=False,symbol_table=False):
     """Produce IR (internal representation) output for a module"""
-    m.html_prettyprint()
+    m.html_prettyprint(symbol_table=symbol_table)
     filename = os.path.join(m.workspace.dirname,m.show("HTML_IR_FILE"))
     
     if not os.path.isfile(filename):

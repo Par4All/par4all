@@ -1,0 +1,39 @@
+delete typedef12
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create typedef12 typedef12.c
+quit
+#activate C_PARSER
+
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#echo
+#echo Symbol table file "typedef12!"
+#echo
+
+#display SYMBOL_TABLE_FILE[typedef12!]
+
+echo
+echo Parsed printed file "typedef12a"
+echo
+
+display PARSED_PRINTED_FILE[typedef12a]
+
+#echo
+#echo Symbol table file "typedef12b"
+#echo
+
+#display SYMBOL_TABLE_FILE[typedef12b]
+
+echo
+echo Parsed printed file "typedef12b"
+echo
+
+display PARSED_PRINTED_FILE[typedef12b]
+
+close
+delete typedef12	
+
+quit

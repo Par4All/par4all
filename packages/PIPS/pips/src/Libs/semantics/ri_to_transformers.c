@@ -286,7 +286,7 @@ transformer declaration_to_transformer(entity v, transformer pre)
       type vt = ultimate_type(entity_type(v));
       basic vb = variable_basic(type_variable(vt));
 
-      if(basic_equal_p(eb, vb)) {
+      if(same_basic_p(eb, vb)) {
 	tf = safe_any_expression_to_transformer(v, e, pre, false);
 	tf = transformer_temporary_value_projection(tf);
       }
@@ -849,7 +849,7 @@ c_user_function_call_to_transformer(
   pips_assert("s is a call", syntax_call_p(s));
 
   /* if there is no implicit cast */
-  if(basic_equal_p(rbt, variable_basic(type_variable(entity_type(e))))) {
+  if(same_basic_p(rbt, entity_basic(e))) {
     string fn = module_local_name(f);
     entity rv = global_name_to_entity(fn, fn);
     entity orv = entity_undefined;
@@ -1261,6 +1261,20 @@ transformer any_user_call_site_to_transformer(entity f,
 	  pips_user_warning("Signed/unsigned integer type conversion.\n");
 	else
 	  pips_user_warning("Integer type conversion: actual %d and formal %d\n", as, fs);
+	fpvl = CONS(ENTITY, fpv, fpvl);
+	ctf = safe_any_expression_to_transformer(fpv, e, cpre, false);
+      }
+      else if((basic_int_p(ab) && derived_type_p(fpt))
+	      ||(basic_int_p(fb) && derived_type_p(apt)) ) {
+	/* FI: Let's assume it is an enum derived type... Too late
+	   for a better job... */
+
+	pips_user_warning("Integer/enum or enum/integer type conversion"
+			  " for argument \"%s\" (rank %d) of function \"%s\" "
+			  "called from function \"%s\".\n",
+			  entity_user_name(fpv), n, entity_user_name(f),
+			  entity_user_name(get_current_module_entity()));
+
 	fpvl = CONS(ENTITY, fpv, fpvl);
 	ctf = safe_any_expression_to_transformer(fpv, e, cpre, false);
       }

@@ -1,0 +1,95 @@
+
+Parsed printed file
+
+void generate15()
+{
+   //  int i = 0;
+   
+   /*i,*/
+   func(foo);
+}
+
+Symbol table file
+
+generate15
+
+Declarations for module "generate15" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:func" with type "functional" "(() -> unknown) * -> int"
+	Declared entity "generate15!:*STATIC*" with type "area" with size 0
+	Declared entity "generate15:*DYNAMIC*" with type "area" with size 22
+	Declared entity "generate15:*HEAP*" with type "area" with size 0
+	Declared entity "generate15:*STACK*" with type "area" with size 0
+	Declared entity "generate15:*STATIC*" with type "area" with size 0
+	Declared entity "generate15:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "generate15:0`__func__" with type "variable" "char *"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "generate15!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "generate15:*DYNAMIC*" of size 22:
+	Variable "generate15:0`__func__"	offset = 0	size = 11
+	Variable "generate15:0`__FUNCTION__"	offset = 11	size = 11
+
+
+Layout for memory area "generate15:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "generate15:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "generate15:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module generate15
+
+
+Printed file
+
+void generate15()
+{
+   //  int i = 0;
+   
+   /*i,*/
+   func(foo);
+}
+
+Printed file generate15 with intraprocedural preconditions
+
+
+//  P() {}
+
+void generate15()
+{
+
+//  P() {}
+
+   //  int i = 0;
+   
+   /*i,*/
+   func(foo);
+}
+
+Printed file func with intraprocedural preconditions
+
+
+//  P() {}
+
+int func(int (*f1)())
+{
+}

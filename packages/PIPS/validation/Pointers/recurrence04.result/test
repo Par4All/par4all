@@ -1,0 +1,44 @@
+
+Proper effects for "recurrence04"
+
+void recurrence04(list l, list m)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l m
+   l->next = m;
+   return;
+}
+
+POINTS TO for "recurrence04"
+
+
+// Points To:
+// l -> &_l_1[0] , EXACT
+// m -> &_m_2[0] , EXACT
+
+void recurrence04(list l, list m)
+{
+
+// Points To:
+// l -> &_l_1[0] , EXACT
+// m -> &_m_2[0] , EXACT
+
+   l->next = m;
+
+// Points To:
+// l -> &_l_1[0] , EXACT
+// m -> &_m_2[0] , EXACT
+
+   return;
+}
+
+Proper effects using points_to
+
+void recurrence04(list l, list m)
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l m
+   l->next = m;
+   return;
+}
+

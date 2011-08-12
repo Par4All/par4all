@@ -1,0 +1,198 @@
+
+Proper effects for "anywhere02"
+
+void anywhere02(int n, int *p)
+{
+//             <    is written>: n
+   n = 17;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p = 19, n = 2;
+//             <    is written>: n
+   
+   /* The write effect on n is absorbed by the unknown write effect
+        due to *p =>anymodule:anywhere must imply a write on n */
+   
+   
+   n = 23;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   
+   // assuming this is an anywhere write effect (without points-to
+   // info), the information on n should be preserved because n is
+   // never referenced (i.e. &n does not appear in source code).
+   *p = 31;
+   
+   // n == 23
+   
+   return;
+}
+
+Transformers for "anywhere02"
+
+void anywhere02(int n, int *p)
+{
+//             <    is written>: n
+   n = 17;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p = 19, n = 2;
+//             <    is written>: n
+   
+   /* The write effect on n is absorbed by the unknown write effect
+        due to *p =>anymodule:anywhere must imply a write on n */
+   
+   
+   n = 23;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   
+   // assuming this is an anywhere write effect (without points-to
+   // info), the information on n should be preserved because n is
+   // never referenced (i.e. &n does not appear in source code).
+   *p = 31;
+   
+   // n == 23
+   
+   return;
+}
+
+Preconditions for "anywhere02"
+
+
+//  P() {}
+
+void anywhere02(int n, int *p)
+{
+
+//  P() {}
+
+   n = 17;
+
+//  P(n) {n==17}
+
+   *p = 19, n = 2;
+
+//  P(n) {n==2}
+
+   
+   /* The write effect on n is absorbed by the unknown write effect
+        due to *p =>anymodule:anywhere must imply a write on n */
+   
+   
+   n = 23;
+
+//  P(n) {n==23}
+
+   
+   // assuming this is an anywhere write effect (without points-to
+   // info), the information on n should be preserved because n is
+   // never referenced (i.e. &n does not appear in source code).
+   *p = 31;
+
+//  P(n) {}
+
+   
+   // n == 23
+   
+   return;
+}
+
+Proper effects for "anywhere02"
+
+void anywhere02(int n, int *p)
+{
+//             <    is written>: n
+   n = 17;
+//             <    is read   >: p
+//             <    is written>: _p_1[0] n
+   *p = 19, n = 2;
+//             <    is written>: n
+   
+   /* The write effect on n is absorbed by the unknown write effect
+        due to *p =>anymodule:anywhere must imply a write on n */
+   
+   
+   n = 23;
+//             <    is read   >: p
+//             <    is written>: _p_1[0]
+   
+   // assuming this is an anywhere write effect (without points-to
+   // info), the information on n should be preserved because n is
+   // never referenced (i.e. &n does not appear in source code).
+   *p = 31;
+   
+   // n == 23
+   
+   return;
+}
+
+Transformers for "anywhere02"
+
+void anywhere02(int n, int *p)
+{
+//             <    is written>: n
+   n = 17;
+//             <    is read   >: p
+//             <    is written>: _p_1[0] n
+   *p = 19, n = 2;
+//             <    is written>: n
+   
+   /* The write effect on n is absorbed by the unknown write effect
+        due to *p =>anymodule:anywhere must imply a write on n */
+   
+   
+   n = 23;
+//             <    is read   >: p
+//             <    is written>: _p_1[0]
+   
+   // assuming this is an anywhere write effect (without points-to
+   // info), the information on n should be preserved because n is
+   // never referenced (i.e. &n does not appear in source code).
+   *p = 31;
+   
+   // n == 23
+   
+   return;
+}
+
+Preconditions for "anywhere02"
+
+
+//  P() {}
+
+void anywhere02(int n, int *p)
+{
+
+//  P() {}
+
+   n = 17;
+
+//  P(n) {n==17}
+
+   *p = 19, n = 2;
+
+//  P(n) {n==2}
+
+   
+   /* The write effect on n is absorbed by the unknown write effect
+        due to *p =>anymodule:anywhere must imply a write on n */
+   
+   
+   n = 23;
+
+//  P(n) {n==23}
+
+   
+   // assuming this is an anywhere write effect (without points-to
+   // info), the information on n should be preserved because n is
+   // never referenced (i.e. &n does not appear in source code).
+   *p = 31;
+
+//  P(n) {n==23}
+
+   
+   // n == 23
+   
+   return;
+}

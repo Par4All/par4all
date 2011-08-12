@@ -125,13 +125,13 @@ static eformat_t  eformat_undefined = {expression_undefined, 1, 0, false};
 static list live_loop_indices = list_undefined;
 static statement  partial_eval_current_statement =statement_undefined;
 
-static void set_live_loop_indices()
+void set_live_loop_indices()
 {
   pips_assert("set_live_loop_indices", live_loop_indices==list_undefined);
   live_loop_indices = NIL;
 }
 
-static void reset_live_loop_indices()
+void reset_live_loop_indices()
 {
   /* The index set should be empty when leaving partial eval */
   pips_assert("reset_live_loop_indices", ENDP(live_loop_indices));
@@ -143,12 +143,14 @@ static void reset_live_loop_indices()
 
 void dump_live_loop_indices()
 {
+  pips_assert("set_live_loop_indices", live_loop_indices!=list_undefined);
   dump_arguments(live_loop_indices);
 }
 
 static bool live_loop_index_p(entity i)
 {
-    return entity_is_argument_p(i, live_loop_indices);
+  pips_assert("set_live_loop_indices", live_loop_indices!=list_undefined);
+  return entity_is_argument_p(i, live_loop_indices);
 }
 
 static void add_live_loop_index(entity i)
@@ -160,6 +162,7 @@ static void add_live_loop_index(entity i)
 
 static void rm_live_loop_index(entity i)
 {
+  pips_assert("set_live_loop_indices", live_loop_indices!=list_undefined);
   live_loop_indices = arguments_rm_entity(live_loop_indices, i);
 }
 

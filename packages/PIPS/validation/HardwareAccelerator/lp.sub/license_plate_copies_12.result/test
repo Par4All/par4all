@@ -284,8 +284,6 @@ digraph "dag_0" {
   "238 D8" -> "239 D8" [label="out"];
   "237 D8" [shape=box];
   "237 D8" -> "238 D8" [label="out"];
-  "231 ?" [shape=none];
-  "231 ?" -> "221 ?" [arrowhead=empty,label="i_3"];
   "230 =" [shape=circle];
   "229 D8" [shape=box];
   "229 D8" -> "237 D8" [label="imout"];
@@ -302,8 +300,6 @@ digraph "dag_0" {
   "224 =" -> "225 D8" [label="imtmp_3"];
   "223 D8" [shape=box];
   "223 D8" -> "224 =" [label="imout"];
-  "221 ?" [shape=none];
-  "221 ?" -> "231 ?" [arrowhead=empty,label="i_3"];
   "220 =" [shape=circle];
   "220 =" -> "223 D8" [label="imtmp_3"];
   "219 E8" [shape=box];
@@ -322,8 +318,6 @@ digraph "dag_0" {
   "213 E8" -> "214 =" [label="imout"];
   "211 =" [shape=circle];
   "211 =" -> "213 E8" [label="imtmp_3"];
-  "203 ?" [shape=none];
-  "203 ?" -> "193 ?" [arrowhead=empty,label="i_2"];
   "202 =" [shape=circle];
   "201 D8" [shape=box];
   "201 D8" -> "211 =" [label="imfilt"];
@@ -340,8 +334,6 @@ digraph "dag_0" {
   "196 =" -> "197 D8" [label="imtmp_2"];
   "195 D8" [shape=box];
   "195 D8" -> "196 =" [label="imfilt"];
-  "193 ?" [shape=none];
-  "193 ?" -> "203 ?" [arrowhead=empty,label="i_2"];
   "192 =" [shape=circle];
   "192 =" -> "195 D8" [label="imtmp_2"];
   "191 E8" [shape=box];
@@ -366,8 +358,6 @@ digraph "dag_0" {
   "177 thr" -> "179 &" [label="imcloseth"];
   "176 thr" [shape=parallelogram];
   "176 thr" -> "179 &" [label="imopenth"];
-  "170 ?" [shape=none];
-  "170 ?" -> "152 ?" [arrowhead=empty,label="i_1"];
   "169 =" [shape=circle];
   "168 E8" [shape=box];
   "168 E8" -> "177 thr" [label="imclose"];
@@ -400,8 +390,6 @@ digraph "dag_0" {
   "155 =" -> "156 E8" [label="imtmp_1"];
   "154 E8" [shape=box];
   "154 E8" -> "155 =" [label="imclose"];
-  "152 ?" [shape=none];
-  "152 ?" -> "170 ?" [arrowhead=empty,label="i_1"];
   "151 =" [shape=circle];
   "151 =" -> "154 E8" [label="imtmp_1"];
   "150 D8" [shape=box];
@@ -436,8 +424,6 @@ digraph "dag_0" {
   "136 D8" -> "137 =" [label="imclose"];
   "134 =" [shape=circle];
   "134 =" -> "136 D8" [label="imtmp_1"];
-  "126 ?" [shape=none];
-  "126 ?" -> "94 ?" [arrowhead=empty,label="i_0"];
   "125 =" [shape=circle];
   "124 D8" [shape=box];
   "124 D8" -> "176 thr" [label="imopen"];
@@ -498,8 +484,6 @@ digraph "dag_0" {
   "97 =" -> "98 D8" [label="imtmp_0"];
   "96 D8" [shape=box];
   "96 D8" -> "97 =" [label="imopen"];
-  "94 ?" [shape=none];
-  "94 ?" -> "126 ?" [arrowhead=empty,label="i_0"];
   "93 =" [shape=circle];
   "93 =" -> "96 D8" [label="imtmp_0"];
   "92 E8" [shape=box];
@@ -578,157 +562,141 @@ digraph "dag_cleaned_0" {
   "244 &" [shape=trapezium,orientation=270];
   "244 &" -> "out";
   "239 D8" [shape=box];
-  "239 D8" -> "244 &" [label="out"];
+  "239 D8" -> "244 &" [label="out_1"];
   "238 D8" [shape=box];
-  "238 D8" -> "239 D8" [label="out"];
+  "238 D8" -> "239 D8" [label="out_2"];
   "237 D8" [shape=box];
-  "237 D8" -> "238 D8" [label="out"];
-  "231 ?" [shape=none];
-  "231 ?" -> "221 ?" [arrowhead=empty,label="i_3"];
+  "237 D8" -> "238 D8" [label="out_3"];
   "229 D8" [shape=box];
   "229 D8" -> "237 D8" [label="imout"];
   "227 D8" [shape=box];
-  "227 D8" -> "229 D8" [label="imout"];
+  "227 D8" -> "229 D8" [label="imout_1"];
   "225 D8" [shape=box];
-  "225 D8" -> "227 D8" [label="imout"];
+  "225 D8" -> "227 D8" [label="imout_2"];
   "223 D8" [shape=box];
-  "223 D8" -> "225 D8" [label="imout"];
-  "221 ?" [shape=none];
-  "221 ?" -> "231 ?" [arrowhead=empty,label="i_3"];
+  "223 D8" -> "225 D8" [label="imout_3"];
   "219 E8" [shape=box];
-  "219 E8" -> "223 D8" [label="imout"];
+  "219 E8" -> "223 D8" [label="imout_4"];
   "217 E8" [shape=box];
-  "217 E8" -> "219 E8" [label="imout"];
+  "217 E8" -> "219 E8" [label="imout_5"];
   "215 E8" [shape=box];
-  "215 E8" -> "217 E8" [label="imout"];
+  "215 E8" -> "217 E8" [label="imout_6"];
   "213 E8" [shape=box];
-  "213 E8" -> "215 E8" [label="imout"];
-  "203 ?" [shape=none];
-  "203 ?" -> "193 ?" [arrowhead=empty,label="i_2"];
+  "213 E8" -> "215 E8" [label="imout_7"];
   "201 D8" [shape=box];
   "201 D8" -> "213 E8" [label="imfilt"];
   "199 D8" [shape=box];
-  "199 D8" -> "201 D8" [label="imfilt"];
+  "199 D8" -> "201 D8" [label="imfilt_1"];
   "197 D8" [shape=box];
-  "197 D8" -> "199 D8" [label="imfilt"];
+  "197 D8" -> "199 D8" [label="imfilt_2"];
   "195 D8" [shape=box];
-  "195 D8" -> "197 D8" [label="imfilt"];
-  "193 ?" [shape=none];
-  "193 ?" -> "203 ?" [arrowhead=empty,label="i_2"];
+  "195 D8" -> "197 D8" [label="imfilt_3"];
   "191 E8" [shape=box];
-  "191 E8" -> "195 D8" [label="imfilt"];
+  "191 E8" -> "195 D8" [label="imfilt_4"];
   "189 E8" [shape=box];
-  "189 E8" -> "191 E8" [label="imfilt"];
+  "189 E8" -> "191 E8" [label="imfilt_5"];
   "187 E8" [shape=box];
-  "187 E8" -> "189 E8" [label="imfilt"];
+  "187 E8" -> "189 E8" [label="imfilt_6"];
   "185 E8" [shape=box];
-  "185 E8" -> "187 E8" [label="imfilt"];
+  "185 E8" -> "187 E8" [label="imfilt_7"];
   "179 &" [shape=trapezium,orientation=270];
   "179 &" -> "185 E8" [label="imand"];
   "177 thr" [shape=parallelogram];
   "177 thr" -> "179 &" [label="imcloseth"];
   "176 thr" [shape=parallelogram];
   "176 thr" -> "179 &" [label="imopenth"];
-  "170 ?" [shape=none];
-  "170 ?" -> "152 ?" [arrowhead=empty,label="i_1"];
   "168 E8" [shape=box];
   "168 E8" -> "177 thr" [label="imclose"];
   "166 E8" [shape=box];
-  "166 E8" -> "168 E8" [label="imclose"];
+  "166 E8" -> "168 E8" [label="imclose_1"];
   "164 E8" [shape=box];
-  "164 E8" -> "166 E8" [label="imclose"];
+  "164 E8" -> "166 E8" [label="imclose_2"];
   "162 E8" [shape=box];
-  "162 E8" -> "164 E8" [label="imclose"];
+  "162 E8" -> "164 E8" [label="imclose_3"];
   "160 E8" [shape=box];
-  "160 E8" -> "162 E8" [label="imclose"];
+  "160 E8" -> "162 E8" [label="imclose_4"];
   "158 E8" [shape=box];
-  "158 E8" -> "160 E8" [label="imclose"];
+  "158 E8" -> "160 E8" [label="imclose_5"];
   "156 E8" [shape=box];
-  "156 E8" -> "158 E8" [label="imclose"];
+  "156 E8" -> "158 E8" [label="imclose_6"];
   "154 E8" [shape=box];
-  "154 E8" -> "156 E8" [label="imclose"];
-  "152 ?" [shape=none];
-  "152 ?" -> "170 ?" [arrowhead=empty,label="i_1"];
+  "154 E8" -> "156 E8" [label="imclose_7"];
   "150 D8" [shape=box];
-  "150 D8" -> "154 E8" [label="imclose"];
+  "150 D8" -> "154 E8" [label="imclose_8"];
   "148 D8" [shape=box];
-  "148 D8" -> "150 D8" [label="imclose"];
+  "148 D8" -> "150 D8" [label="imclose_9"];
   "146 D8" [shape=box];
-  "146 D8" -> "148 D8" [label="imclose"];
+  "146 D8" -> "148 D8" [label="imclose_10"];
   "144 D8" [shape=box];
-  "144 D8" -> "146 D8" [label="imclose"];
+  "144 D8" -> "146 D8" [label="imclose_11"];
   "142 D8" [shape=box];
-  "142 D8" -> "144 D8" [label="imclose"];
+  "142 D8" -> "144 D8" [label="imclose_12"];
   "140 D8" [shape=box];
-  "140 D8" -> "142 D8" [label="imclose"];
+  "140 D8" -> "142 D8" [label="imclose_13"];
   "138 D8" [shape=box];
-  "138 D8" -> "140 D8" [label="imclose"];
+  "138 D8" -> "140 D8" [label="imclose_14"];
   "136 D8" [shape=box];
-  "136 D8" -> "138 D8" [label="imclose"];
-  "126 ?" [shape=none];
-  "126 ?" -> "94 ?" [arrowhead=empty,label="i_0"];
+  "136 D8" -> "138 D8" [label="imclose_15"];
   "124 D8" [shape=box];
   "124 D8" -> "176 thr" [label="imopen"];
   "122 D8" [shape=box];
-  "122 D8" -> "124 D8" [label="imopen"];
+  "122 D8" -> "124 D8" [label="imopen_1"];
   "120 D8" [shape=box];
-  "120 D8" -> "122 D8" [label="imopen"];
+  "120 D8" -> "122 D8" [label="imopen_2"];
   "118 D8" [shape=box];
-  "118 D8" -> "120 D8" [label="imopen"];
+  "118 D8" -> "120 D8" [label="imopen_3"];
   "116 D8" [shape=box];
-  "116 D8" -> "118 D8" [label="imopen"];
+  "116 D8" -> "118 D8" [label="imopen_4"];
   "114 D8" [shape=box];
-  "114 D8" -> "116 D8" [label="imopen"];
+  "114 D8" -> "116 D8" [label="imopen_5"];
   "112 D8" [shape=box];
-  "112 D8" -> "114 D8" [label="imopen"];
+  "112 D8" -> "114 D8" [label="imopen_6"];
   "110 D8" [shape=box];
-  "110 D8" -> "112 D8" [label="imopen"];
+  "110 D8" -> "112 D8" [label="imopen_7"];
   "108 D8" [shape=box];
-  "108 D8" -> "110 D8" [label="imopen"];
+  "108 D8" -> "110 D8" [label="imopen_8"];
   "106 D8" [shape=box];
-  "106 D8" -> "108 D8" [label="imopen"];
+  "106 D8" -> "108 D8" [label="imopen_9"];
   "104 D8" [shape=box];
-  "104 D8" -> "106 D8" [label="imopen"];
+  "104 D8" -> "106 D8" [label="imopen_10"];
   "102 D8" [shape=box];
-  "102 D8" -> "104 D8" [label="imopen"];
+  "102 D8" -> "104 D8" [label="imopen_11"];
   "100 D8" [shape=box];
-  "100 D8" -> "102 D8" [label="imopen"];
+  "100 D8" -> "102 D8" [label="imopen_12"];
   "98 D8" [shape=box];
-  "98 D8" -> "100 D8" [label="imopen"];
+  "98 D8" -> "100 D8" [label="imopen_13"];
   "96 D8" [shape=box];
-  "96 D8" -> "98 D8" [label="imopen"];
-  "94 ?" [shape=none];
-  "94 ?" -> "126 ?" [arrowhead=empty,label="i_0"];
+  "96 D8" -> "98 D8" [label="imopen_14"];
   "92 E8" [shape=box];
-  "92 E8" -> "96 D8" [label="imopen"];
+  "92 E8" -> "96 D8" [label="imopen_15"];
   "90 E8" [shape=box];
-  "90 E8" -> "92 E8" [label="imopen"];
+  "90 E8" -> "92 E8" [label="imopen_16"];
   "88 E8" [shape=box];
-  "88 E8" -> "90 E8" [label="imopen"];
+  "88 E8" -> "90 E8" [label="imopen_17"];
   "86 E8" [shape=box];
-  "86 E8" -> "88 E8" [label="imopen"];
+  "86 E8" -> "88 E8" [label="imopen_18"];
   "84 E8" [shape=box];
-  "84 E8" -> "86 E8" [label="imopen"];
+  "84 E8" -> "86 E8" [label="imopen_19"];
   "82 E8" [shape=box];
-  "82 E8" -> "84 E8" [label="imopen"];
+  "82 E8" -> "84 E8" [label="imopen_20"];
   "80 E8" [shape=box];
-  "80 E8" -> "82 E8" [label="imopen"];
+  "80 E8" -> "82 E8" [label="imopen_21"];
   "78 E8" [shape=box];
-  "78 E8" -> "80 E8" [label="imopen"];
+  "78 E8" -> "80 E8" [label="imopen_22"];
   "76 E8" [shape=box];
-  "76 E8" -> "78 E8" [label="imopen"];
+  "76 E8" -> "78 E8" [label="imopen_23"];
   "74 E8" [shape=box];
-  "74 E8" -> "76 E8" [label="imopen"];
+  "74 E8" -> "76 E8" [label="imopen_24"];
   "72 E8" [shape=box];
-  "72 E8" -> "74 E8" [label="imopen"];
+  "72 E8" -> "74 E8" [label="imopen_25"];
   "70 E8" [shape=box];
-  "70 E8" -> "72 E8" [label="imopen"];
+  "70 E8" -> "72 E8" [label="imopen_26"];
   "68 E8" [shape=box];
-  "68 E8" -> "70 E8" [label="imopen"];
+  "68 E8" -> "70 E8" [label="imopen_27"];
   "66 E8" [shape=box];
-  "66 E8" -> "68 E8" [label="imopen"];
+  "66 E8" -> "68 E8" [label="imopen_28"];
   "64 E8" [shape=box];
-  "64 E8" -> "66 E8" [label="imopen"];
+  "64 E8" -> "66 E8" [label="imopen_29"];
   "in" -> "64 E8";
   "in" -> "136 D8";
   "in" -> "244 &";
@@ -781,7 +749,18 @@ int license_plate_copies(void)
    
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0058*/
-   
+
+   i_0 = 15;                                                            /*0094*/
+   i_0 = 15;                                                            /*0126*/
+   i_1 = 8;                                                             /*0152*/
+   i_1 = 8;                                                             /*0170*/
+   i_2 = 4;                                                             /*0193*/
+   i_2 = 4;                                                             /*0203*/
+   i_3 = 4;                                                             /*0221*/
+   i_3 = 4;                                                             /*0231*/
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
    
    
    
@@ -818,7 +797,6 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0091*/
    ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0092*/
    ret_0 |= 0;                                                          /*0093*/
-   i_0 = 15;                                                            /*0094*/
 
    ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0096*/
    ret_0 |= 0;                                                          /*0097*/
@@ -850,7 +828,6 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0123*/
    ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0124*/
    ret_0 |= 0;                                                          /*0125*/
-   i_0 = 15;                                                            /*0126*/
 
    _return1 = ret_0;                                                    /*0130*/
 
@@ -872,7 +849,6 @@ int license_plate_copies(void)
    ret_1 |= 0;                                                          /*0149*/
    ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0150*/
    ret_1 |= 0;                                                          /*0151*/
-   i_1 = 8;                                                             /*0152*/
 
    ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0154*/
    ret_1 |= 0;                                                          /*0155*/
@@ -890,7 +866,6 @@ int license_plate_copies(void)
    ret_1 |= 0;                                                          /*0167*/
    ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0168*/
    ret_1 |= 0;                                                          /*0169*/
-   i_1 = 8;                                                             /*0170*/
 
    _return0 = ret_1;                                                    /*0174*/
 
@@ -909,7 +884,6 @@ int license_plate_copies(void)
    ret_2 |= 0;                                                          /*0190*/
    ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0191*/
    ret_2 |= 0;                                                          /*0192*/
-   i_2 = 4;                                                             /*0193*/
 
    ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0195*/
    ret_2 |= 0;                                                          /*0196*/
@@ -919,7 +893,6 @@ int license_plate_copies(void)
    ret_2 |= 0;                                                          /*0200*/
    ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0201*/
    ret_2 |= 0;                                                          /*0202*/
-   i_2 = 4;                                                             /*0203*/
 
    _return2 = ret_2;                                                    /*0207*/
 
@@ -933,7 +906,6 @@ int license_plate_copies(void)
    ret_3 |= 0;                                                          /*0218*/
    ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0219*/
    ret_3 |= 0;                                                          /*0220*/
-   i_3 = 4;                                                             /*0221*/
 
    ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0223*/
    ret_3 |= 0;                                                          /*0224*/
@@ -943,16 +915,12 @@ int license_plate_copies(void)
    ret_3 |= 0;                                                          /*0228*/
    ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0229*/
    ret_3 |= 0;                                                          /*0230*/
-   i_3 = 4;                                                             /*0231*/
 
    _return3 = ret_3;                                                    /*0235*/
 
    freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0237*/
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0238*/
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0239*/
-   i_4 = 3;                                                             /*0240*/
-
-   _return4 = 0;                                                        /*0242*/
 
    freia_aipo_and(out, out, in);                                        /*0244*/
    
@@ -1261,8 +1229,6 @@ digraph "dag_0" {
   "238 D8" -> "239 D8" [label="out"];
   "237 D8" [shape=box];
   "237 D8" -> "238 D8" [label="out"];
-  "231 ?" [shape=none];
-  "231 ?" -> "221 ?" [arrowhead=empty,label="i_3"];
   "230 =" [shape=circle];
   "229 D8" [shape=box];
   "229 D8" -> "237 D8" [label="imout"];
@@ -1279,8 +1245,6 @@ digraph "dag_0" {
   "224 =" -> "225 D8" [label="imtmp_3"];
   "223 D8" [shape=box];
   "223 D8" -> "224 =" [label="imout"];
-  "221 ?" [shape=none];
-  "221 ?" -> "231 ?" [arrowhead=empty,label="i_3"];
   "220 =" [shape=circle];
   "220 =" -> "223 D8" [label="imtmp_3"];
   "219 E8" [shape=box];
@@ -1299,8 +1263,6 @@ digraph "dag_0" {
   "213 E8" -> "214 =" [label="imout"];
   "211 =" [shape=circle];
   "211 =" -> "213 E8" [label="imtmp_3"];
-  "203 ?" [shape=none];
-  "203 ?" -> "193 ?" [arrowhead=empty,label="i_2"];
   "202 =" [shape=circle];
   "201 D8" [shape=box];
   "201 D8" -> "211 =" [label="imfilt"];
@@ -1317,8 +1279,6 @@ digraph "dag_0" {
   "196 =" -> "197 D8" [label="imtmp_2"];
   "195 D8" [shape=box];
   "195 D8" -> "196 =" [label="imfilt"];
-  "193 ?" [shape=none];
-  "193 ?" -> "203 ?" [arrowhead=empty,label="i_2"];
   "192 =" [shape=circle];
   "192 =" -> "195 D8" [label="imtmp_2"];
   "191 E8" [shape=box];
@@ -1343,8 +1303,6 @@ digraph "dag_0" {
   "177 thr" -> "179 &" [label="imcloseth"];
   "176 thr" [shape=parallelogram];
   "176 thr" -> "179 &" [label="imopenth"];
-  "170 ?" [shape=none];
-  "170 ?" -> "152 ?" [arrowhead=empty,label="i_1"];
   "169 =" [shape=circle];
   "168 E8" [shape=box];
   "168 E8" -> "177 thr" [label="imclose"];
@@ -1377,8 +1335,6 @@ digraph "dag_0" {
   "155 =" -> "156 E8" [label="imtmp_1"];
   "154 E8" [shape=box];
   "154 E8" -> "155 =" [label="imclose"];
-  "152 ?" [shape=none];
-  "152 ?" -> "170 ?" [arrowhead=empty,label="i_1"];
   "151 =" [shape=circle];
   "151 =" -> "154 E8" [label="imtmp_1"];
   "150 D8" [shape=box];
@@ -1413,8 +1369,6 @@ digraph "dag_0" {
   "136 D8" -> "137 =" [label="imclose"];
   "134 =" [shape=circle];
   "134 =" -> "136 D8" [label="imtmp_1"];
-  "126 ?" [shape=none];
-  "126 ?" -> "94 ?" [arrowhead=empty,label="i_0"];
   "125 =" [shape=circle];
   "124 D8" [shape=box];
   "124 D8" -> "176 thr" [label="imopen"];
@@ -1475,8 +1429,6 @@ digraph "dag_0" {
   "97 =" -> "98 D8" [label="imtmp_0"];
   "96 D8" [shape=box];
   "96 D8" -> "97 =" [label="imopen"];
-  "94 ?" [shape=none];
-  "94 ?" -> "126 ?" [arrowhead=empty,label="i_0"];
   "93 =" [shape=circle];
   "93 =" -> "96 D8" [label="imtmp_0"];
   "92 E8" [shape=box];
@@ -1560,8 +1512,6 @@ digraph "dag_cleaned_0" {
   "238 D8" -> "239 D8" [label="out"];
   "237 D8" [shape=box];
   "237 D8" -> "238 D8" [label="out"];
-  "231 ?" [shape=none];
-  "231 ?" -> "221 ?" [arrowhead=empty,label="i_3"];
   "229 D8" [shape=box];
   "229 D8" -> "237 D8" [label="imout"];
   "227 D8" [shape=box];
@@ -1570,8 +1520,6 @@ digraph "dag_cleaned_0" {
   "225 D8" -> "227 D8" [label="imout"];
   "223 D8" [shape=box];
   "223 D8" -> "225 D8" [label="imout"];
-  "221 ?" [shape=none];
-  "221 ?" -> "231 ?" [arrowhead=empty,label="i_3"];
   "219 E8" [shape=box];
   "219 E8" -> "223 D8" [label="imout"];
   "217 E8" [shape=box];
@@ -1580,8 +1528,6 @@ digraph "dag_cleaned_0" {
   "215 E8" -> "217 E8" [label="imout"];
   "213 E8" [shape=box];
   "213 E8" -> "215 E8" [label="imout"];
-  "203 ?" [shape=none];
-  "203 ?" -> "193 ?" [arrowhead=empty,label="i_2"];
   "201 D8" [shape=box];
   "201 D8" -> "213 E8" [label="imfilt"];
   "199 D8" [shape=box];
@@ -1590,8 +1536,6 @@ digraph "dag_cleaned_0" {
   "197 D8" -> "199 D8" [label="imfilt"];
   "195 D8" [shape=box];
   "195 D8" -> "197 D8" [label="imfilt"];
-  "193 ?" [shape=none];
-  "193 ?" -> "203 ?" [arrowhead=empty,label="i_2"];
   "191 E8" [shape=box];
   "191 E8" -> "195 D8" [label="imfilt"];
   "189 E8" [shape=box];
@@ -1606,8 +1550,6 @@ digraph "dag_cleaned_0" {
   "177 thr" -> "179 &" [label="imcloseth"];
   "176 thr" [shape=parallelogram];
   "176 thr" -> "179 &" [label="imopenth"];
-  "170 ?" [shape=none];
-  "170 ?" -> "152 ?" [arrowhead=empty,label="i_1"];
   "168 E8" [shape=box];
   "168 E8" -> "177 thr" [label="imclose"];
   "166 E8" [shape=box];
@@ -1624,8 +1566,6 @@ digraph "dag_cleaned_0" {
   "156 E8" -> "158 E8" [label="imclose"];
   "154 E8" [shape=box];
   "154 E8" -> "156 E8" [label="imclose"];
-  "152 ?" [shape=none];
-  "152 ?" -> "170 ?" [arrowhead=empty,label="i_1"];
   "150 D8" [shape=box];
   "150 D8" -> "154 E8" [label="imclose"];
   "148 D8" [shape=box];
@@ -1642,8 +1582,6 @@ digraph "dag_cleaned_0" {
   "138 D8" -> "140 D8" [label="imclose"];
   "136 D8" [shape=box];
   "136 D8" -> "138 D8" [label="imclose"];
-  "126 ?" [shape=none];
-  "126 ?" -> "94 ?" [arrowhead=empty,label="i_0"];
   "124 D8" [shape=box];
   "124 D8" -> "176 thr" [label="imopen"];
   "122 D8" [shape=box];
@@ -1674,8 +1612,6 @@ digraph "dag_cleaned_0" {
   "98 D8" -> "100 D8" [label="imopen"];
   "96 D8" [shape=box];
   "96 D8" -> "98 D8" [label="imopen"];
-  "94 ?" [shape=none];
-  "94 ?" -> "126 ?" [arrowhead=empty,label="i_0"];
   "92 E8" [shape=box];
   "92 E8" -> "96 D8" [label="imopen"];
   "90 E8" [shape=box];
@@ -3081,7 +3017,18 @@ int license_plate_copies(void)
    
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0058*/
-   
+
+   i_0 = 15;                                                            /*0094*/
+   i_0 = 15;                                                            /*0126*/
+   i_1 = 8;                                                             /*0152*/
+   i_1 = 8;                                                             /*0170*/
+   i_2 = 4;                                                             /*0193*/
+   i_2 = 4;                                                             /*0203*/
+   i_3 = 4;                                                             /*0221*/
+   i_3 = 4;                                                             /*0231*/
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
    
    
    
@@ -3118,7 +3065,6 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0091*/
    ret_0 |= 0;                                                          /*0092*/
    ret_0 |= 0;                                                          /*0093*/
-   i_0 = 15;                                                            /*0094*/
 
    ret_0 |= 0;                                                          /*0096*/
    ret_0 |= 0;                                                          /*0097*/
@@ -3150,7 +3096,6 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0123*/
    ret_0 |= 0;                                                          /*0124*/
    ret_0 |= 0;                                                          /*0125*/
-   i_0 = 15;                                                            /*0126*/
 
    _return1 = ret_0;                                                    /*0130*/
 
@@ -3172,7 +3117,6 @@ int license_plate_copies(void)
    ret_1 |= 0;                                                          /*0149*/
    ret_1 |= 0;                                                          /*0150*/
    ret_1 |= 0;                                                          /*0151*/
-   i_1 = 8;                                                             /*0152*/
 
    ret_1 |= 0;                                                          /*0154*/
    ret_1 |= 0;                                                          /*0155*/
@@ -3190,7 +3134,6 @@ int license_plate_copies(void)
    ret_1 |= 0;                                                          /*0167*/
    ret_1 |= 0;                                                          /*0168*/
    ret_1 |= 0;                                                          /*0169*/
-   i_1 = 8;                                                             /*0170*/
 
    _return0 = ret_1;                                                    /*0174*/
    
@@ -3206,7 +3149,6 @@ int license_plate_copies(void)
    ret_2 |= 0;                                                          /*0190*/
    ret_2 |= 0;                                                          /*0191*/
    ret_2 |= 0;                                                          /*0192*/
-   i_2 = 4;                                                             /*0193*/
 
    ret_2 |= 0;                                                          /*0195*/
    ret_2 |= 0;                                                          /*0196*/
@@ -3216,7 +3158,6 @@ int license_plate_copies(void)
    ret_2 |= 0;                                                          /*0200*/
    ret_2 |= 0;                                                          /*0201*/
    ret_2 |= 0;                                                          /*0202*/
-   i_2 = 4;                                                             /*0203*/
 
    _return2 = ret_2;                                                    /*0207*/
 
@@ -3230,7 +3171,6 @@ int license_plate_copies(void)
    ret_3 |= 0;                                                          /*0218*/
    ret_3 |= 0;                                                          /*0219*/
    ret_3 |= 0;                                                          /*0220*/
-   i_3 = 4;                                                             /*0221*/
 
    ret_3 |= 0;                                                          /*0223*/
    ret_3 |= 0;                                                          /*0224*/
@@ -3240,14 +3180,10 @@ int license_plate_copies(void)
    ret_3 |= 0;                                                          /*0228*/
    ret_3 |= 0;                                                          /*0229*/
    ret_3 |= 0;                                                          /*0230*/
-   i_3 = 4;                                                             /*0231*/
 
    _return3 = ret_3;                                                    /*0235*/
 
    license_plate_copies_helper_0_0_4(out, out, freia_morpho_kernel_8c);                /*0238*/
-   i_4 = 3;                                                             /*0240*/
-
-   _return4 = 0;                                                        /*0242*/
 
    license_plate_copies_helper_0_1_0(out, in, out);                     /*0244*/
    
@@ -3312,7 +3248,18 @@ int license_plate_copies(void)
    
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0058*/
-   
+
+   i_0 = 15;                                                            /*0094*/
+   i_0 = 15;                                                            /*0126*/
+   i_1 = 8;                                                             /*0152*/
+   i_1 = 8;                                                             /*0170*/
+   i_2 = 4;                                                             /*0193*/
+   i_2 = 4;                                                             /*0203*/
+   i_3 = 4;                                                             /*0221*/
+   i_3 = 4;                                                             /*0231*/
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
    
    
    
@@ -3321,44 +3268,33 @@ int license_plate_copies(void)
 
    ret_0 |= license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);         /*0064*/
    ret_0 |= license_plate_copies_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);           /*0088*/
-   i_0 = 15;                                                            /*0094*/
 
    ret_0 |= license_plate_copies_helper_0_0_2(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0114*/
-   i_0 = 15;                                                            /*0126*/
 
    _return1 = ret_0;                                                    /*0130*/
 
    ret_1 = 0;                                                           /*0134*/
-
-   i_1 = 8;                                                             /*0152*/
-
-   i_1 = 8;                                                             /*0170*/
-
+   
+   
+   
    _return0 = ret_1;                                                    /*0174*/
    
    
    
    ret_2 = 0;                                                           /*0183*/
-
-   i_2 = 4;                                                             /*0193*/
-
+   
+   
    ret_2 |= license_plate_copies_helper_0_0_3(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);            /*0197*/
-   i_2 = 4;                                                             /*0203*/
 
    _return2 = ret_2;                                                    /*0207*/
 
    ret_3 = 0;                                                           /*0211*/
-
-   i_3 = 4;                                                             /*0221*/
-
-   i_3 = 4;                                                             /*0231*/
-
+   
+   
+   
    _return3 = ret_3;                                                    /*0235*/
 
    license_plate_copies_helper_0_0_4(out, out, freia_morpho_kernel_8c);                /*0238*/
-   i_4 = 3;                                                             /*0240*/
-
-   _return4 = 0;                                                        /*0242*/
 
    license_plate_copies_helper_0_1_0(out, in, out);                     /*0244*/
    
@@ -3664,8 +3600,6 @@ digraph "dag_0" {
   "238 D8" -> "239 D8" [label="out"];
   "237 D8" [shape=box];
   "237 D8" -> "238 D8" [label="out"];
-  "231 ?" [shape=none];
-  "231 ?" -> "221 ?" [arrowhead=empty,label="i_3"];
   "230 =" [shape=circle];
   "229 D8" [shape=box];
   "229 D8" -> "237 D8" [label="imout"];
@@ -3682,8 +3616,6 @@ digraph "dag_0" {
   "224 =" -> "225 D8" [label="imtmp_3"];
   "223 D8" [shape=box];
   "223 D8" -> "224 =" [label="imout"];
-  "221 ?" [shape=none];
-  "221 ?" -> "231 ?" [arrowhead=empty,label="i_3"];
   "220 =" [shape=circle];
   "220 =" -> "223 D8" [label="imtmp_3"];
   "219 E8" [shape=box];
@@ -3702,8 +3634,6 @@ digraph "dag_0" {
   "213 E8" -> "214 =" [label="imout"];
   "211 =" [shape=circle];
   "211 =" -> "213 E8" [label="imtmp_3"];
-  "203 ?" [shape=none];
-  "203 ?" -> "193 ?" [arrowhead=empty,label="i_2"];
   "202 =" [shape=circle];
   "201 D8" [shape=box];
   "201 D8" -> "211 =" [label="imfilt"];
@@ -3720,8 +3650,6 @@ digraph "dag_0" {
   "196 =" -> "197 D8" [label="imtmp_2"];
   "195 D8" [shape=box];
   "195 D8" -> "196 =" [label="imfilt"];
-  "193 ?" [shape=none];
-  "193 ?" -> "203 ?" [arrowhead=empty,label="i_2"];
   "192 =" [shape=circle];
   "192 =" -> "195 D8" [label="imtmp_2"];
   "191 E8" [shape=box];
@@ -3746,8 +3674,6 @@ digraph "dag_0" {
   "177 thr" -> "179 &" [label="imcloseth"];
   "176 thr" [shape=parallelogram];
   "176 thr" -> "179 &" [label="imopenth"];
-  "170 ?" [shape=none];
-  "170 ?" -> "152 ?" [arrowhead=empty,label="i_1"];
   "169 =" [shape=circle];
   "168 E8" [shape=box];
   "168 E8" -> "177 thr" [label="imclose"];
@@ -3780,8 +3706,6 @@ digraph "dag_0" {
   "155 =" -> "156 E8" [label="imtmp_1"];
   "154 E8" [shape=box];
   "154 E8" -> "155 =" [label="imclose"];
-  "152 ?" [shape=none];
-  "152 ?" -> "170 ?" [arrowhead=empty,label="i_1"];
   "151 =" [shape=circle];
   "151 =" -> "154 E8" [label="imtmp_1"];
   "150 D8" [shape=box];
@@ -3816,8 +3740,6 @@ digraph "dag_0" {
   "136 D8" -> "137 =" [label="imclose"];
   "134 =" [shape=circle];
   "134 =" -> "136 D8" [label="imtmp_1"];
-  "126 ?" [shape=none];
-  "126 ?" -> "94 ?" [arrowhead=empty,label="i_0"];
   "125 =" [shape=circle];
   "124 D8" [shape=box];
   "124 D8" -> "176 thr" [label="imopen"];
@@ -3878,8 +3800,6 @@ digraph "dag_0" {
   "97 =" -> "98 D8" [label="imtmp_0"];
   "96 D8" [shape=box];
   "96 D8" -> "97 =" [label="imopen"];
-  "94 ?" [shape=none];
-  "94 ?" -> "126 ?" [arrowhead=empty,label="i_0"];
   "93 =" [shape=circle];
   "93 =" -> "96 D8" [label="imtmp_0"];
   "92 E8" [shape=box];
@@ -3963,8 +3883,6 @@ digraph "dag_cleaned_0" {
   "238 D8" -> "239 D8" [label="out"];
   "237 D8" [shape=box];
   "237 D8" -> "238 D8" [label="out"];
-  "231 ?" [shape=none];
-  "231 ?" -> "221 ?" [arrowhead=empty,label="i_3"];
   "229 D8" [shape=box];
   "229 D8" -> "237 D8" [label="imout"];
   "227 D8" [shape=box];
@@ -3973,8 +3891,6 @@ digraph "dag_cleaned_0" {
   "225 D8" -> "227 D8" [label="imout"];
   "223 D8" [shape=box];
   "223 D8" -> "225 D8" [label="imout"];
-  "221 ?" [shape=none];
-  "221 ?" -> "231 ?" [arrowhead=empty,label="i_3"];
   "219 E8" [shape=box];
   "219 E8" -> "223 D8" [label="imout"];
   "217 E8" [shape=box];
@@ -3983,8 +3899,6 @@ digraph "dag_cleaned_0" {
   "215 E8" -> "217 E8" [label="imout"];
   "213 E8" [shape=box];
   "213 E8" -> "215 E8" [label="imout"];
-  "203 ?" [shape=none];
-  "203 ?" -> "193 ?" [arrowhead=empty,label="i_2"];
   "201 D8" [shape=box];
   "201 D8" -> "213 E8" [label="imfilt"];
   "199 D8" [shape=box];
@@ -3993,8 +3907,6 @@ digraph "dag_cleaned_0" {
   "197 D8" -> "199 D8" [label="imfilt"];
   "195 D8" [shape=box];
   "195 D8" -> "197 D8" [label="imfilt"];
-  "193 ?" [shape=none];
-  "193 ?" -> "203 ?" [arrowhead=empty,label="i_2"];
   "191 E8" [shape=box];
   "191 E8" -> "195 D8" [label="imfilt"];
   "189 E8" [shape=box];
@@ -4009,8 +3921,6 @@ digraph "dag_cleaned_0" {
   "177 thr" -> "179 &" [label="imcloseth"];
   "176 thr" [shape=parallelogram];
   "176 thr" -> "179 &" [label="imopenth"];
-  "170 ?" [shape=none];
-  "170 ?" -> "152 ?" [arrowhead=empty,label="i_1"];
   "168 E8" [shape=box];
   "168 E8" -> "177 thr" [label="imclose"];
   "166 E8" [shape=box];
@@ -4027,8 +3937,6 @@ digraph "dag_cleaned_0" {
   "156 E8" -> "158 E8" [label="imclose"];
   "154 E8" [shape=box];
   "154 E8" -> "156 E8" [label="imclose"];
-  "152 ?" [shape=none];
-  "152 ?" -> "170 ?" [arrowhead=empty,label="i_1"];
   "150 D8" [shape=box];
   "150 D8" -> "154 E8" [label="imclose"];
   "148 D8" [shape=box];
@@ -4045,8 +3953,6 @@ digraph "dag_cleaned_0" {
   "138 D8" -> "140 D8" [label="imclose"];
   "136 D8" [shape=box];
   "136 D8" -> "138 D8" [label="imclose"];
-  "126 ?" [shape=none];
-  "126 ?" -> "94 ?" [arrowhead=empty,label="i_0"];
   "124 D8" [shape=box];
   "124 D8" -> "176 thr" [label="imopen"];
   "122 D8" [shape=box];
@@ -4077,8 +3983,6 @@ digraph "dag_cleaned_0" {
   "98 D8" -> "100 D8" [label="imopen"];
   "96 D8" [shape=box];
   "96 D8" -> "98 D8" [label="imopen"];
-  "94 ?" [shape=none];
-  "94 ?" -> "126 ?" [arrowhead=empty,label="i_0"];
   "92 E8" [shape=box];
   "92 E8" -> "96 D8" [label="imopen"];
   "90 E8" [shape=box];
@@ -8026,7 +7930,18 @@ int license_plate_copies(void)
    
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0058*/
-   
+
+   i_0 = 15;                                                            /*0094*/
+   i_0 = 15;                                                            /*0126*/
+   i_1 = 8;                                                             /*0152*/
+   i_1 = 8;                                                             /*0170*/
+   i_2 = 4;                                                             /*0193*/
+   i_2 = 4;                                                             /*0203*/
+   i_3 = 4;                                                             /*0221*/
+   i_3 = 4;                                                             /*0231*/
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
    
    
    
@@ -8063,7 +7978,6 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0091*/
    ret_0 |= 0;                                                          /*0092*/
    ret_0 |= 0;                                                          /*0093*/
-   i_0 = 15;                                                            /*0094*/
 
    ret_0 |= 0;                                                          /*0096*/
    ret_0 |= 0;                                                          /*0097*/
@@ -8095,7 +8009,6 @@ int license_plate_copies(void)
    ret_0 |= 0;                                                          /*0123*/
    ret_0 |= license_plate_copies_helper_0_0_8(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0124*/
    ret_0 |= 0;                                                          /*0125*/
-   i_0 = 15;                                                            /*0126*/
 
    _return1 = ret_0;                                                    /*0130*/
 
@@ -8117,7 +8030,6 @@ int license_plate_copies(void)
    ret_1 |= 0;                                                          /*0149*/
    ret_1 |= 0;                                                          /*0150*/
    ret_1 |= 0;                                                          /*0151*/
-   i_1 = 8;                                                             /*0152*/
 
    ret_1 |= 0;                                                          /*0154*/
    ret_1 |= 0;                                                          /*0155*/
@@ -8135,7 +8047,6 @@ int license_plate_copies(void)
    ret_1 |= 0;                                                          /*0167*/
    ret_1 |= 0;                                                          /*0168*/
    ret_1 |= 0;                                                          /*0169*/
-   i_1 = 8;                                                             /*0170*/
 
    _return0 = ret_1;                                                    /*0174*/
    
@@ -8151,7 +8062,6 @@ int license_plate_copies(void)
    ret_2 |= 0;                                                          /*0190*/
    ret_2 |= 0;                                                          /*0191*/
    ret_2 |= 0;                                                          /*0192*/
-   i_2 = 4;                                                             /*0193*/
 
    ret_2 |= license_plate_copies_helper_0_0_9(imfilt, imfilt, kernel3x1);              /*0195*/
    ret_2 |= 0;                                                          /*0196*/
@@ -8161,7 +8071,6 @@ int license_plate_copies(void)
    ret_2 |= 0;                                                          /*0200*/
    ret_2 |= license_plate_copies_helper_0_0_10(imout, imfilt, kernel3x1, kernel1x3);   /*0201*/
    ret_2 |= 0;                                                          /*0202*/
-   i_2 = 4;                                                             /*0203*/
 
    _return2 = ret_2;                                                    /*0207*/
 
@@ -8175,7 +8084,6 @@ int license_plate_copies(void)
    ret_3 |= 0;                                                          /*0218*/
    ret_3 |= license_plate_copies_helper_0_0_11(imout, imout, kernel1x3);               /*0219*/
    ret_3 |= 0;                                                          /*0220*/
-   i_3 = 4;                                                             /*0221*/
 
    ret_3 |= 0;                                                          /*0223*/
    ret_3 |= 0;                                                          /*0224*/
@@ -8185,13 +8093,9 @@ int license_plate_copies(void)
    ret_3 |= 0;                                                          /*0228*/
    ret_3 |= license_plate_copies_helper_0_0_12(out, imout, in, kernel1x3, freia_morpho_kernel_8c);    /*0229*/
    ret_3 |= 0;                                                          /*0230*/
-   i_3 = 4;                                                             /*0231*/
 
    _return3 = ret_3;                                                    /*0235*/
-
-   i_4 = 3;                                                             /*0240*/
-
-   _return4 = 0;                                                        /*0242*/
+   
    
    
    
@@ -8258,7 +8162,18 @@ int license_plate_copies(void)
    
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0058*/
-   
+
+   i_0 = 15;                                                            /*0094*/
+   i_0 = 15;                                                            /*0126*/
+   i_1 = 8;                                                             /*0152*/
+   i_1 = 8;                                                             /*0170*/
+   i_2 = 4;                                                             /*0193*/
+   i_2 = 4;                                                             /*0203*/
+   i_3 = 4;                                                             /*0221*/
+   i_3 = 4;                                                             /*0231*/
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
    
    
    
@@ -8270,49 +8185,38 @@ int license_plate_copies(void)
    ret_0 |= license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);           /*0074*/
    ret_0 |= license_plate_copies_helper_0_0_3(imopen, imclose, imclose, imopen, kernel1x3);           /*0082*/
    ret_0 |= license_plate_copies_helper_0_0_4(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);           /*0090*/
-   i_0 = 15;                                                            /*0094*/
 
    ret_0 |= license_plate_copies_helper_0_0_5(imopen, imopen, kernel1x3);              /*0100*/
    ret_0 |= license_plate_copies_helper_0_0_6(imopen, imopen, kernel1x3);              /*0108*/
    ret_0 |= license_plate_copies_helper_0_0_7(imopen, imopen, kernel1x3);              /*0118*/
    ret_0 |= license_plate_copies_helper_0_0_8(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);            /*0124*/
-   i_0 = 15;                                                            /*0126*/
 
    _return1 = ret_0;                                                    /*0130*/
 
    ret_1 = 0;                                                           /*0134*/
-
-   i_1 = 8;                                                             /*0152*/
-
-   i_1 = 8;                                                             /*0170*/
-
+   
+   
+   
    _return0 = ret_1;                                                    /*0174*/
    
    
    
    ret_2 = 0;                                                           /*0183*/
-
-   i_2 = 4;                                                             /*0193*/
-
+   
+   
    ret_2 |= license_plate_copies_helper_0_0_9(imfilt, imfilt, kernel3x1);              /*0195*/
    ret_2 |= license_plate_copies_helper_0_0_10(imout, imfilt, kernel3x1, kernel1x3);   /*0201*/
-   i_2 = 4;                                                             /*0203*/
 
    _return2 = ret_2;                                                    /*0207*/
 
    ret_3 = 0;                                                           /*0211*/
 
    ret_3 |= license_plate_copies_helper_0_0_11(imout, imout, kernel1x3);               /*0219*/
-   i_3 = 4;                                                             /*0221*/
 
    ret_3 |= license_plate_copies_helper_0_0_12(out, imout, in, kernel1x3, freia_morpho_kernel_8c);    /*0229*/
-   i_3 = 4;                                                             /*0231*/
 
    _return3 = ret_3;                                                    /*0235*/
-
-   i_4 = 3;                                                             /*0240*/
-
-   _return4 = 0;                                                        /*0242*/
+   
    
    
    

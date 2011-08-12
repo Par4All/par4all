@@ -40,6 +40,7 @@ libtransformations_la_SOURCES=\
 		loop_fusion.c \
 		set_return_type.c \
 		cast_at_call_sites.c \
-		manage_parallel_loops.c
+		manage_parallel_loops.c \
+		registers.c
 
 include $(srcdir)/../pipslibs_includes.mk

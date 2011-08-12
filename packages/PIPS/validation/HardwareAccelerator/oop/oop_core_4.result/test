@@ -216,17 +216,17 @@ digraph "dag_cleaned_0" {
   "105 thr" [shape=parallelogram];
   "105 thr" -> "img3";
   "104 <" [shape=trapezium,orientation=270];
-  "104 <" -> "105 thr" [label="img3"];
+  "104 <" -> "105 thr" [label="img3_1"];
   "103 D6" [shape=box];
   "103 D6" -> "104 <" [label="img2"];
   "102 E6" [shape=box];
-  "102 E6" -> "103 D6" [label="img2"];
+  "102 E6" -> "103 D6" [label="img2_1"];
   "100 -|" [shape=trapezium,orientation=270];
-  "100 -|" -> "102 E6" [label="img2"];
+  "100 -|" -> "102 E6" [label="img2_2"];
   "97 -" [shape=trapezium,orientation=270];
-  "97 -" -> "100 -|" [label="img2"];
+  "97 -" -> "100 -|" [label="img2_3"];
   "96 E8" [shape=box];
-  "96 E8" -> "97 -" [label="img2"];
+  "96 E8" -> "97 -" [label="img2_4"];
   "95 D8" [shape=box];
   "95 D8" -> "97 -" [label="imtmp_7"];
   "imgtt4" -> "96 E8";
@@ -234,14 +234,14 @@ digraph "dag_cleaned_0" {
   "83 D6" [shape=box];
   "83 D6" -> "104 <" [label="img1"];
   "82 E6" [shape=box];
-  "82 E6" -> "83 D6" [label="img1"];
+  "82 E6" -> "83 D6" [label="img1_1"];
   "81 -|" [shape=trapezium,orientation=270];
-  "81 -|" -> "82 E6" [label="img1"];
+  "81 -|" -> "82 E6" [label="img1_2"];
   "78 -" [shape=trapezium,orientation=270];
-  "78 -" -> "100 -|" [label="img1"];
-  "78 -" -> "81 -|" [label="img1"];
+  "78 -" -> "100 -|" [label="img1_3"];
+  "78 -" -> "81 -|" [label="img1_3"];
   "77 E8" [shape=box];
-  "77 E8" -> "78 -" [label="img1"];
+  "77 E8" -> "78 -" [label="img1_4"];
   "76 D8" [shape=box];
   "76 D8" -> "78 -" [label="imtmp_5"];
   "imgtt2" -> "77 E8";
@@ -249,7 +249,7 @@ digraph "dag_cleaned_0" {
   "69 -" [shape=trapezium,orientation=270];
   "69 -" -> "81 -|" [label="imgtmp"];
   "68 E8" [shape=box];
-  "68 E8" -> "69 -" [label="imgtmp"];
+  "68 E8" -> "69 -" [label="imgtmp_1"];
   "67 D8" [shape=box];
   "67 D8" -> "69 -" [label="imtmp_4"];
   "img0" -> "68 E8";
@@ -280,6 +280,8 @@ int oop_core(void)
    freia_data2d *imtmp_7;                                               /*0027*/
 
    freia_status end;                                                    /*0029*/
+   // hardware accelerator generated variable
+   freia_data2d *img1_3 = 0;
    
    // Input/output stream and image creations
    freia_common_open_input(&fdin, 0);                                   /*0032*/
@@ -289,6 +291,7 @@ int oop_core(void)
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0036*/
 
    img1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0038*/
+   img1_3 = freia_common_create_data(img1->bpp, img1->widthWa, img1->heightWa);
    img2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0039*/
    img3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0040*/
 
@@ -327,9 +330,9 @@ int oop_core(void)
 
    freia_aipo_dilate_8c(imtmp_5, imgtt2, freia_morpho_kernel_8c);       /*0076*/
    freia_aipo_erode_8c(img1, imgtt2, freia_morpho_kernel_8c);           /*0077*/
-   freia_aipo_sub(img1, imtmp_5, img1);                                 /*0078*/
+   freia_aipo_sub(img1_3, imtmp_5, img1);                               /*0078*/
 
-   freia_aipo_absdiff(img1, imgtmp, img1);                              /*0081*/
+   freia_aipo_absdiff(img1, imgtmp, img1_3);                            /*0081*/
    freia_aipo_erode_6c(img1, img1, freia_morpho_kernel_6c);             /*0082*/
    freia_aipo_dilate_6c(img1, img1, freia_morpho_kernel_6c);            /*0083*/
 
@@ -337,7 +340,7 @@ int oop_core(void)
    freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
    freia_aipo_sub(img2, imtmp_7, img2);                                 /*0097*/
 
-   freia_aipo_absdiff(img2, img1, img2);                                /*0100*/
+   freia_aipo_absdiff(img2, img1_3, img2);                              /*0100*/
 
    freia_aipo_erode_6c(img2, img2, freia_morpho_kernel_6c);             /*0102*/
    freia_aipo_dilate_6c(img2, img2, freia_morpho_kernel_6c);            /*0103*/
@@ -355,6 +358,7 @@ int oop_core(void)
    /* images destruction */
    freia_common_destruct_data(img0);                                    /*0112*/
    freia_common_destruct_data(img1);                                    /*0113*/
+   freia_common_destruct_data(img1_3);
    freia_common_destruct_data(img2);                                    /*0114*/
    freia_common_destruct_data(img3);                                    /*0115*/
    freia_common_destruct_data(imgtt0);                                  /*0116*/
