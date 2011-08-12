@@ -114,6 +114,9 @@ ifndef EXTERN_ROOT
 EXTERN_ROOT	= $(HERE)/../extern
 endif
 
+# add ENABLE='doc devel-mode paws'
+ENABLE	=
+
 .PHONY: auto auto-comp auto-clean
 auto-clean:
 	$(RM) -r $(BUILD.dir) autom4te.cache
@@ -121,26 +124,30 @@ auto-clean:
 	       config.h.in missing aclocal.m4 install-sh compile py-compile
 	find . -name .svn -prune -o -name Makefile.in -print0 | xargs -0 rm -f
 
-# clean & compile
-auto: auto-clean
+# initial configuration
+$(BUILD.dir): 
 	autoreconf -vi
 	mkdir $(BUILD.dir) && cd $(BUILD.dir) ; \
 	../configure --disable-static --prefix=$(INSTALL.dir) \
 		PATH=$(INSTALL.dir)/bin:$$PATH \
 		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(EXTERN_ROOT)/lib/pkgconfig \
-		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
-	$(MAKE) auto-comp
+		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips \
+		$(ENABLE:%=--enable-%)
 
 # just compile
-auto-comp:
-	test -d $(BUILD.dir) || \
-	  { echo "missing directory: $(BUILD.dir)" ; exit 1 ; }
+auto-comp: $(BUILD.dir)
 	$(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
 	$(MAKE) -C $(BUILD.dir) install
 	# manual fix...
 	-[ -d $(BUILD.dir)/src/Scripts/validation ] && \
 	  $(MAKE) -C $(BUILD.dir)/src/Scripts/validation install
 
+# clean & compile
+auto: auto-clean
+	$(MAKE) auto-comp
+
+# with paws
+auto-paws:; $(MAKE) ENABLE=paws auto
 
 # force tags target
 tags: tags-clean
