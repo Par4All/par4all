@@ -1,9 +1,9 @@
 delete initial2
 create initial2 initial2.f
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALLFUNC]
 
 activate PRINT_INITIAL_PRECONDITION
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALLFUNC]
 # activate PRINT_PROGRAM_PRECONDITION
 
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION

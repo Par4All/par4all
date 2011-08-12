@@ -2,8 +2,7 @@
 int main(void)
 {
    int i;
-//             <    is read   >: true
-   if (true)
+   if (1)
 //             <    is written>: i
       i = 0;
    else
@@ -17,8 +16,7 @@ int main(void)
 int main(void)
 {
    int i;
-//             <    is read   >: true
-   if (true)
+   if (1)
 //             <    is written>: i
       i = 0;
    else

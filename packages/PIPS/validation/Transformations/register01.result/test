@@ -1,0 +1,44 @@
+/*
+ * file for register01.c
+ */
+int dixsept(int i);
+
+int register01(int i, int *p);
+int dixsept(int i)
+{
+   int l = i+17, m = 2*i+13;
+   return l+m;
+}
+int register01(int i, int *p)
+{
+   int j = i, k = 1;
+   *p = j;
+   p = &k;
+   return dixsept(k);
+}
+#
+# compile generated register01
+#
+/*
+ * file for register01.c
+ */
+int dixsept(int i);
+
+int register01(int i, int *p);
+int dixsept(register int i)
+{
+   register int l = i+17, m = 2*i+13;
+   return l+m;
+}
+int register01(register int i, int *register p)
+{
+   register int j = i;
+   int k = 1;
+
+   *p = j;
+   p = &k;
+   return dixsept(k);
+}
+#
+# compile generated register01
+#

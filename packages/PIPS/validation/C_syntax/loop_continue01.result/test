@@ -1,0 +1,17 @@
+void loop_continue01()
+{
+   int i = 0, n = 5;
+   float a[5];
+
+   if (0)
+      goto loop_end_1;
+
+   for (i = 0;i<n;i++) {
+      if (i==0)
+         goto _loop_end_1;
+      a[i] = 0.;
+_loop_end_1:      ;
+   }
+   i = -1;
+loop_end_1:   return;
+}

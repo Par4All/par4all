@@ -32,45 +32,22 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 // graph for dag "dag_0" of module "freia_58" in dot format
 digraph "dag_0" {
   // inputs
-  "in" [shape=circle];
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
 
   // computation vertices
-  "17 vol" [shape=diamond];
-  "15 ?" [shape=none];
-  "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
-  "14 <" [shape=trapezium,orientation=270];
-  "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
-  "in" -> "14 <";
-  "13 ?" [shape=none];
-  "13 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "10 D8" [shape=box];
-  "10 D8" -> "14 <" [label="out"];
-  "out" -> "10 D8";
+  "7 vol" [shape=diamond];
+  "out" -> "7 vol";
 }
 // graph for dag "dag_1" of module "freia_58" in dot format
 digraph "dag_1" {
   // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "7 vol" [shape=diamond];
-  "out" -> "7 vol";
-}
-// graph for dag "dag_cleaned_0" of module "freia_58" in dot format
-digraph "dag_cleaned_0" {
-  // inputs
   "in" [shape=circle];
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "17 vol" [shape=diamond];
@@ -78,16 +55,14 @@ digraph "dag_cleaned_0" {
   "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
+  "14 <" -> "out'";
   "in" -> "14 <";
-  "13 ?" [shape=none];
-  "13 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out"];
   "out" -> "10 D8";
 }
-// graph for dag "dag_cleaned_1" of module "freia_58" in dot format
-digraph "dag_cleaned_1" {
+// graph for dag "dag_cleaned_0" of module "freia_58" in dot format
+digraph "dag_cleaned_0" {
   // inputs
   "out" [shape=circle];
 
@@ -96,6 +71,27 @@ digraph "dag_cleaned_1" {
   // computation vertices
   "7 vol" [shape=diamond];
   "out" -> "7 vol";
+}
+// graph for dag "dag_cleaned_1" of module "freia_58" in dot format
+digraph "dag_cleaned_1" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "17 vol" [shape=diamond];
+  "15 ?" [shape=none];
+  "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "14 <" [shape=trapezium,orientation=270];
+  "14 <" -> "17 vol" [label="out"];
+  "14 <" -> "out'";
+  "in" -> "14 <";
+  "10 D8" [shape=box];
+  "10 D8" -> "14 <" [label="out_1"];
+  "out" -> "10 D8";
 }
 
 ! updated function for
@@ -106,10 +102,10 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
    ret = freia_aipo_global_vol(out, &volcurrent);                       /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
-      freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
       i = 1;                                                            /*0011*/
       k = 0;                                                            /*0012*/
       j = 0;                                                            /*0013*/
+      freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
       j |= freia_aipo_inf(out, out, in);                                /*0014*/
       l = j;                                                            /*0015*/
       m |= l;                                                           /*0016*/
@@ -150,524 +146,22 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 // graph for dag "dag_0" of module "freia_58" in dot format
 digraph "dag_0" {
   // inputs
-  "in" [shape=circle];
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
 
   // computation vertices
-  "61 vol" [shape=diamond];
-  "60 ?" [shape=none];
-  "60 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "60 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "60 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "60 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "60 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "60 ?" -> "18 ?" [arrowhead=empty,label="m"];
-  "60 ?" -> "11 ?" [arrowhead=empty,label="m"];
-  "59 ?" [shape=none];
-  "59 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "59 ?" -> "10 ?" [arrowhead=empty,label="l"];
-  "58 <" [shape=trapezium,orientation=270];
-  "58 <" -> "61 vol" [label="out"];
-  "58 <" -> "out";
-  "57 ?" [shape=none];
-  "57 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "56 ?" [shape=none];
-  "56 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "55 ?" [shape=none];
-  "55 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "6 ?" [arrowhead=empty,label="i"];
-  "54 D8" [shape=box];
-  "54 D8" -> "58 <" [label="out"];
-  "53 ?" [shape=none];
-  "53 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "53 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "53 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "53 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "53 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "53 ?" -> "18 ?" [arrowhead=empty,label="m"];
-  "53 ?" -> "11 ?" [arrowhead=empty,label="m"];
-  "52 ?" [shape=none];
-  "52 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "52 ?" -> "10 ?" [arrowhead=empty,label="l"];
-  "51 <" [shape=trapezium,orientation=270];
-  "51 <" -> "54 D8" [label="out"];
-  "50 ?" [shape=none];
-  "50 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "49 ?" [shape=none];
-  "49 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "48 ?" [shape=none];
-  "48 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "6 ?" [arrowhead=empty,label="i"];
-  "47 D8" [shape=box];
-  "47 D8" -> "51 <" [label="out"];
-  "46 ?" [shape=none];
-  "46 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "18 ?" [arrowhead=empty,label="m"];
-  "46 ?" -> "11 ?" [arrowhead=empty,label="m"];
-  "45 ?" [shape=none];
-  "45 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "45 ?" -> "10 ?" [arrowhead=empty,label="l"];
-  "44 <" [shape=trapezium,orientation=270];
-  "44 <" -> "47 D8" [label="out"];
-  "43 ?" [shape=none];
-  "43 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "42 ?" [shape=none];
-  "42 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "41 ?" [shape=none];
-  "41 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "6 ?" [arrowhead=empty,label="i"];
-  "40 D8" [shape=box];
-  "40 D8" -> "44 <" [label="out"];
-  "39 ?" [shape=none];
-  "39 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "18 ?" [arrowhead=empty,label="m"];
-  "39 ?" -> "11 ?" [arrowhead=empty,label="m"];
-  "38 ?" [shape=none];
-  "38 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "38 ?" -> "10 ?" [arrowhead=empty,label="l"];
-  "37 <" [shape=trapezium,orientation=270];
-  "37 <" -> "40 D8" [label="out"];
-  "36 ?" [shape=none];
-  "36 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "35 ?" [shape=none];
-  "35 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "34 ?" [shape=none];
-  "34 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "6 ?" [arrowhead=empty,label="i"];
-  "33 D8" [shape=box];
-  "33 D8" -> "37 <" [label="out"];
-  "32 ?" [shape=none];
-  "32 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "18 ?" [arrowhead=empty,label="m"];
-  "32 ?" -> "11 ?" [arrowhead=empty,label="m"];
-  "31 ?" [shape=none];
-  "31 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "31 ?" -> "10 ?" [arrowhead=empty,label="l"];
-  "30 <" [shape=trapezium,orientation=270];
-  "30 <" -> "33 D8" [label="out"];
-  "29 ?" [shape=none];
-  "29 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "28 ?" [shape=none];
-  "28 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "27 ?" [shape=none];
-  "27 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "6 ?" [arrowhead=empty,label="i"];
-  "26 D8" [shape=box];
-  "26 D8" -> "30 <" [label="out"];
-  "25 ?" [shape=none];
-  "25 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "18 ?" [arrowhead=empty,label="m"];
-  "25 ?" -> "11 ?" [arrowhead=empty,label="m"];
-  "24 ?" [shape=none];
-  "24 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "24 ?" -> "10 ?" [arrowhead=empty,label="l"];
-  "23 <" [shape=trapezium,orientation=270];
-  "23 <" -> "26 D8" [label="out"];
-  "22 ?" [shape=none];
-  "22 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "21 ?" [shape=none];
-  "21 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "20 ?" [shape=none];
-  "20 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "6 ?" [arrowhead=empty,label="i"];
-  "19 D8" [shape=box];
-  "19 D8" -> "23 <" [label="out"];
-  "18 ?" [shape=none];
-  "18 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "18 ?" -> "11 ?" [arrowhead=empty,label="m"];
-  "17 ?" [shape=none];
-  "17 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "17 ?" -> "10 ?" [arrowhead=empty,label="l"];
-  "16 <" [shape=trapezium,orientation=270];
-  "16 <" -> "19 D8" [label="out"];
-  "15 ?" [shape=none];
-  "15 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "14 ?" [shape=none];
-  "14 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "13 ?" [shape=none];
-  "13 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "6 ?" [arrowhead=empty,label="i"];
-  "12 D8" [shape=box];
-  "12 D8" -> "16 <" [label="out"];
-  "11 ?" [shape=none];
-  "11 ?" -> "60 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "53 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "46 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "39 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "32 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "25 ?" [arrowhead=empty,label="m"];
-  "11 ?" -> "18 ?" [arrowhead=empty,label="m"];
-  "10 ?" [shape=none];
-  "10 ?" -> "60 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "59 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "53 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "52 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "46 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "45 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "39 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "38 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "32 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "31 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "25 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "24 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "18 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "17 ?" [arrowhead=empty,label="l"];
-  "10 ?" -> "11 ?" [arrowhead=empty,label="l"];
-  "9 <" [shape=trapezium,orientation=270];
-  "9 <" -> "12 D8" [label="out"];
-  "in" -> "58 <";
-  "in" -> "51 <";
-  "in" -> "44 <";
-  "in" -> "37 <";
-  "in" -> "30 <";
-  "in" -> "23 <";
-  "in" -> "16 <";
-  "in" -> "9 <";
-  "8 ?" [shape=none];
-  "8 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "7 ?" [shape=none];
-  "7 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "6 ?" [shape=none];
-  "6 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "5 D8" [shape=box];
-  "5 D8" -> "9 <" [label="out"];
-  "out" -> "5 D8";
+  "2 vol" [shape=diamond];
+  "out" -> "2 vol";
 }
 // graph for dag "dag_1" of module "freia_58" in dot format
 digraph "dag_1" {
   // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "2 vol" [shape=diamond];
-  "out" -> "2 vol";
-}
-// graph for dag "dag_cleaned_0" of module "freia_58" in dot format
-digraph "dag_cleaned_0" {
-  // inputs
   "in" [shape=circle];
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "61 vol" [shape=diamond];
@@ -697,7 +191,7 @@ digraph "dag_cleaned_0" {
   "59 ?" -> "10 ?" [arrowhead=empty,label="l"];
   "58 <" [shape=trapezium,orientation=270];
   "58 <" -> "61 vol" [label="out"];
-  "58 <" -> "out";
+  "58 <" -> "out'";
   "57 ?" [shape=none];
   "57 ?" -> "59 ?" [arrowhead=empty,label="j"];
   "57 ?" -> "52 ?" [arrowhead=empty,label="j"];
@@ -713,23 +207,6 @@ digraph "dag_cleaned_0" {
   "57 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "57 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "57 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "57 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "56 ?" [shape=none];
-  "56 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "56 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "55 ?" [shape=none];
-  "55 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "55 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "54 D8" [shape=box];
   "54 D8" -> "58 <" [label="out"];
   "53 ?" [shape=none];
@@ -773,23 +250,6 @@ digraph "dag_cleaned_0" {
   "50 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "50 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "50 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "50 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "49 ?" [shape=none];
-  "49 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "49 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "48 ?" [shape=none];
-  "48 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "48 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "47 D8" [shape=box];
   "47 D8" -> "51 <" [label="out"];
   "46 ?" [shape=none];
@@ -833,23 +293,6 @@ digraph "dag_cleaned_0" {
   "43 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "43 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "43 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "43 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "42 ?" [shape=none];
-  "42 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "42 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "41 ?" [shape=none];
-  "41 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "41 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "40 D8" [shape=box];
   "40 D8" -> "44 <" [label="out"];
   "39 ?" [shape=none];
@@ -893,23 +336,6 @@ digraph "dag_cleaned_0" {
   "36 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "36 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "36 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "36 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "35 ?" [shape=none];
-  "35 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "35 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "34 ?" [shape=none];
-  "34 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "34 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "33 D8" [shape=box];
   "33 D8" -> "37 <" [label="out"];
   "32 ?" [shape=none];
@@ -953,23 +379,6 @@ digraph "dag_cleaned_0" {
   "29 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "29 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "29 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "29 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "28 ?" [shape=none];
-  "28 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "28 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "27 ?" [shape=none];
-  "27 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "27 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "26 D8" [shape=box];
   "26 D8" -> "30 <" [label="out"];
   "25 ?" [shape=none];
@@ -1013,23 +422,6 @@ digraph "dag_cleaned_0" {
   "22 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "22 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "22 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "22 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "21 ?" [shape=none];
-  "21 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "21 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "20 ?" [shape=none];
-  "20 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "13 ?" [arrowhead=empty,label="i"];
-  "20 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "19 D8" [shape=box];
   "19 D8" -> "23 <" [label="out"];
   "18 ?" [shape=none];
@@ -1073,23 +465,6 @@ digraph "dag_cleaned_0" {
   "15 ?" -> "22 ?" [arrowhead=empty,label="j"];
   "15 ?" -> "17 ?" [arrowhead=empty,label="j"];
   "15 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "15 ?" -> "8 ?" [arrowhead=empty,label="j"];
-  "14 ?" [shape=none];
-  "14 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "14 ?" -> "7 ?" [arrowhead=empty,label="k"];
-  "13 ?" [shape=none];
-  "13 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "13 ?" -> "6 ?" [arrowhead=empty,label="i"];
   "12 D8" [shape=box];
   "12 D8" -> "16 <" [label="out"];
   "11 ?" [shape=none];
@@ -1126,44 +501,12 @@ digraph "dag_cleaned_0" {
   "in" -> "23 <";
   "in" -> "16 <";
   "in" -> "9 <";
-  "8 ?" [shape=none];
-  "8 ?" -> "59 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "57 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "52 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "50 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "45 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "43 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "38 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "36 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "31 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "29 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "24 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "22 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "17 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "8 ?" -> "10 ?" [arrowhead=empty,label="j"];
-  "7 ?" [shape=none];
-  "7 ?" -> "56 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "49 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "42 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "35 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "28 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "21 ?" [arrowhead=empty,label="k"];
-  "7 ?" -> "14 ?" [arrowhead=empty,label="k"];
-  "6 ?" [shape=none];
-  "6 ?" -> "55 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "48 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "41 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "34 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "27 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "20 ?" [arrowhead=empty,label="i"];
-  "6 ?" -> "13 ?" [arrowhead=empty,label="i"];
   "5 D8" [shape=box];
   "5 D8" -> "9 <" [label="out"];
   "out" -> "5 D8";
 }
-// graph for dag "dag_cleaned_1" of module "freia_58" in dot format
-digraph "dag_cleaned_1" {
+// graph for dag "dag_cleaned_0" of module "freia_58" in dot format
+digraph "dag_cleaned_0" {
   // inputs
   "out" [shape=circle];
 
@@ -1173,20 +516,382 @@ digraph "dag_cleaned_1" {
   "2 vol" [shape=diamond];
   "out" -> "2 vol";
 }
+// graph for dag "dag_cleaned_1" of module "freia_58" in dot format
+digraph "dag_cleaned_1" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "61 vol" [shape=diamond];
+  "60 ?" [shape=none];
+  "60 ?" -> "53 ?" [arrowhead=empty,label="m"];
+  "60 ?" -> "46 ?" [arrowhead=empty,label="m"];
+  "60 ?" -> "39 ?" [arrowhead=empty,label="m"];
+  "60 ?" -> "32 ?" [arrowhead=empty,label="m"];
+  "60 ?" -> "25 ?" [arrowhead=empty,label="m"];
+  "60 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "60 ?" -> "11 ?" [arrowhead=empty,label="m"];
+  "59 ?" [shape=none];
+  "59 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "53 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "46 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "39 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "32 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "25 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "18 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "11 ?" [arrowhead=empty,label="l"];
+  "59 ?" -> "10 ?" [arrowhead=empty,label="l"];
+  "58 <" [shape=trapezium,orientation=270];
+  "58 <" -> "61 vol" [label="out"];
+  "58 <" -> "out'";
+  "57 ?" [shape=none];
+  "57 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "52 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "50 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "45 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "43 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "38 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "36 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "31 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "29 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "24 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "22 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "17 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "15 ?" [arrowhead=empty,label="j"];
+  "57 ?" -> "10 ?" [arrowhead=empty,label="j"];
+  "54 D8" [shape=box];
+  "54 D8" -> "58 <" [label="out"];
+  "53 ?" [shape=none];
+  "53 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "53 ?" -> "46 ?" [arrowhead=empty,label="m"];
+  "53 ?" -> "39 ?" [arrowhead=empty,label="m"];
+  "53 ?" -> "32 ?" [arrowhead=empty,label="m"];
+  "53 ?" -> "25 ?" [arrowhead=empty,label="m"];
+  "53 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "53 ?" -> "11 ?" [arrowhead=empty,label="m"];
+  "52 ?" [shape=none];
+  "52 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "53 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "46 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "39 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "32 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "25 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "18 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "11 ?" [arrowhead=empty,label="l"];
+  "52 ?" -> "10 ?" [arrowhead=empty,label="l"];
+  "51 <" [shape=trapezium,orientation=270];
+  "51 <" -> "54 D8" [label="out"];
+  "50 ?" [shape=none];
+  "50 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "52 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "45 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "43 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "38 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "36 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "31 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "29 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "24 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "22 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "17 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "15 ?" [arrowhead=empty,label="j"];
+  "50 ?" -> "10 ?" [arrowhead=empty,label="j"];
+  "47 D8" [shape=box];
+  "47 D8" -> "51 <" [label="out"];
+  "46 ?" [shape=none];
+  "46 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "46 ?" -> "53 ?" [arrowhead=empty,label="m"];
+  "46 ?" -> "39 ?" [arrowhead=empty,label="m"];
+  "46 ?" -> "32 ?" [arrowhead=empty,label="m"];
+  "46 ?" -> "25 ?" [arrowhead=empty,label="m"];
+  "46 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "46 ?" -> "11 ?" [arrowhead=empty,label="m"];
+  "45 ?" [shape=none];
+  "45 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "53 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "46 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "39 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "32 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "25 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "18 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "11 ?" [arrowhead=empty,label="l"];
+  "45 ?" -> "10 ?" [arrowhead=empty,label="l"];
+  "44 <" [shape=trapezium,orientation=270];
+  "44 <" -> "47 D8" [label="out"];
+  "43 ?" [shape=none];
+  "43 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "52 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "50 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "45 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "38 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "36 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "31 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "29 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "24 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "22 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "17 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "15 ?" [arrowhead=empty,label="j"];
+  "43 ?" -> "10 ?" [arrowhead=empty,label="j"];
+  "40 D8" [shape=box];
+  "40 D8" -> "44 <" [label="out"];
+  "39 ?" [shape=none];
+  "39 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "39 ?" -> "53 ?" [arrowhead=empty,label="m"];
+  "39 ?" -> "46 ?" [arrowhead=empty,label="m"];
+  "39 ?" -> "32 ?" [arrowhead=empty,label="m"];
+  "39 ?" -> "25 ?" [arrowhead=empty,label="m"];
+  "39 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "39 ?" -> "11 ?" [arrowhead=empty,label="m"];
+  "38 ?" [shape=none];
+  "38 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "53 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "46 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "39 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "32 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "25 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "18 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "11 ?" [arrowhead=empty,label="l"];
+  "38 ?" -> "10 ?" [arrowhead=empty,label="l"];
+  "37 <" [shape=trapezium,orientation=270];
+  "37 <" -> "40 D8" [label="out"];
+  "36 ?" [shape=none];
+  "36 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "52 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "50 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "45 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "43 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "38 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "31 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "29 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "24 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "22 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "17 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "15 ?" [arrowhead=empty,label="j"];
+  "36 ?" -> "10 ?" [arrowhead=empty,label="j"];
+  "33 D8" [shape=box];
+  "33 D8" -> "37 <" [label="out"];
+  "32 ?" [shape=none];
+  "32 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "32 ?" -> "53 ?" [arrowhead=empty,label="m"];
+  "32 ?" -> "46 ?" [arrowhead=empty,label="m"];
+  "32 ?" -> "39 ?" [arrowhead=empty,label="m"];
+  "32 ?" -> "25 ?" [arrowhead=empty,label="m"];
+  "32 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "32 ?" -> "11 ?" [arrowhead=empty,label="m"];
+  "31 ?" [shape=none];
+  "31 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "53 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "46 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "39 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "32 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "25 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "18 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "11 ?" [arrowhead=empty,label="l"];
+  "31 ?" -> "10 ?" [arrowhead=empty,label="l"];
+  "30 <" [shape=trapezium,orientation=270];
+  "30 <" -> "33 D8" [label="out"];
+  "29 ?" [shape=none];
+  "29 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "52 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "50 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "45 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "43 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "38 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "36 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "31 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "24 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "22 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "17 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "15 ?" [arrowhead=empty,label="j"];
+  "29 ?" -> "10 ?" [arrowhead=empty,label="j"];
+  "26 D8" [shape=box];
+  "26 D8" -> "30 <" [label="out"];
+  "25 ?" [shape=none];
+  "25 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "25 ?" -> "53 ?" [arrowhead=empty,label="m"];
+  "25 ?" -> "46 ?" [arrowhead=empty,label="m"];
+  "25 ?" -> "39 ?" [arrowhead=empty,label="m"];
+  "25 ?" -> "32 ?" [arrowhead=empty,label="m"];
+  "25 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "25 ?" -> "11 ?" [arrowhead=empty,label="m"];
+  "24 ?" [shape=none];
+  "24 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "53 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "46 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "39 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "32 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "25 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "18 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "11 ?" [arrowhead=empty,label="l"];
+  "24 ?" -> "10 ?" [arrowhead=empty,label="l"];
+  "23 <" [shape=trapezium,orientation=270];
+  "23 <" -> "26 D8" [label="out"];
+  "22 ?" [shape=none];
+  "22 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "52 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "50 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "45 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "43 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "38 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "36 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "31 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "29 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "24 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "17 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "15 ?" [arrowhead=empty,label="j"];
+  "22 ?" -> "10 ?" [arrowhead=empty,label="j"];
+  "19 D8" [shape=box];
+  "19 D8" -> "23 <" [label="out"];
+  "18 ?" [shape=none];
+  "18 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "18 ?" -> "53 ?" [arrowhead=empty,label="m"];
+  "18 ?" -> "46 ?" [arrowhead=empty,label="m"];
+  "18 ?" -> "39 ?" [arrowhead=empty,label="m"];
+  "18 ?" -> "32 ?" [arrowhead=empty,label="m"];
+  "18 ?" -> "25 ?" [arrowhead=empty,label="m"];
+  "18 ?" -> "11 ?" [arrowhead=empty,label="m"];
+  "17 ?" [shape=none];
+  "17 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "53 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "46 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "39 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "32 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "25 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "18 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "11 ?" [arrowhead=empty,label="l"];
+  "17 ?" -> "10 ?" [arrowhead=empty,label="l"];
+  "16 <" [shape=trapezium,orientation=270];
+  "16 <" -> "19 D8" [label="out"];
+  "15 ?" [shape=none];
+  "15 ?" -> "59 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "57 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "52 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "50 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "45 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "43 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "38 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "36 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "31 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "29 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "24 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "22 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "17 ?" [arrowhead=empty,label="j"];
+  "15 ?" -> "10 ?" [arrowhead=empty,label="j"];
+  "12 D8" [shape=box];
+  "12 D8" -> "16 <" [label="out"];
+  "11 ?" [shape=none];
+  "11 ?" -> "60 ?" [arrowhead=empty,label="m"];
+  "11 ?" -> "53 ?" [arrowhead=empty,label="m"];
+  "11 ?" -> "46 ?" [arrowhead=empty,label="m"];
+  "11 ?" -> "39 ?" [arrowhead=empty,label="m"];
+  "11 ?" -> "32 ?" [arrowhead=empty,label="m"];
+  "11 ?" -> "25 ?" [arrowhead=empty,label="m"];
+  "11 ?" -> "18 ?" [arrowhead=empty,label="m"];
+  "10 ?" [shape=none];
+  "10 ?" -> "60 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "59 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "53 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "52 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "46 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "45 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "39 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "38 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "32 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "31 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "25 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "24 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "18 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "17 ?" [arrowhead=empty,label="l"];
+  "10 ?" -> "11 ?" [arrowhead=empty,label="l"];
+  "9 <" [shape=trapezium,orientation=270];
+  "9 <" -> "12 D8" [label="out"];
+  "in" -> "58 <";
+  "in" -> "51 <";
+  "in" -> "44 <";
+  "in" -> "37 <";
+  "in" -> "30 <";
+  "in" -> "23 <";
+  "in" -> "16 <";
+  "in" -> "9 <";
+  "5 D8" [shape=box];
+  "5 D8" -> "9 <" [label="out"];
+  "out" -> "5 D8";
+}
 // graph for dag "freia_58_helper_0_0" of module "freia_58" in dot format
 digraph "freia_58_helper_0_0" {
   // inputs
-  "in" [shape=circle];
-  "out_16" [shape=circle];
+  "out" [shape=circle];
 
   // outputs
+
+  // computation vertices
+  "2 vol" [shape=diamond];
+  "out" -> "2 vol";
+}
+// graph for dag "freia_58_helper_1_0" of module "freia_58" in dot format
+digraph "freia_58_helper_1_0" {
+  // inputs
+  "in" [shape=circle];
   "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
 
   // computation vertices
   "61 vol" [shape=diamond];
   "58 <" [shape=trapezium,orientation=270];
   "58 <" -> "61 vol" [label="out"];
-  "58 <" -> "out";
+  "58 <" -> "out'";
   "54 D8" [shape=box];
   "54 D8" -> "58 <" [label="out_1"];
   "51 <" [shape=trapezium,orientation=270];
@@ -1225,18 +930,7 @@ digraph "freia_58_helper_0_0" {
   "in" -> "9 <";
   "5 D8" [shape=box];
   "5 D8" -> "9 <" [label="out_15"];
-  "out_16" -> "5 D8";
-}
-// graph for dag "freia_58_helper_1_0" of module "freia_58" in dot format
-digraph "freia_58_helper_1_0" {
-  // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "2 vol" [shape=diamond];
-  "out" -> "2 vol";
+  "out" -> "5 D8";
 }
 
 ! acceleration function
@@ -1246,12 +940,65 @@ digraph "freia_58_helper_1_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 17 ops (0 copies), optimized to 17 (0 copies)
+// dag 0: 1 ops (0 copies), optimized to 1 (0 copies)
 // split 0: 1 cut
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_58
-freia_status freia_58_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status freia_58_helper_0_0_0(freia_data2d * i0,
+  int32_t * po0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // out [0 input 0] -> [0 measure 0] 0 undefined
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+
+  // no output image
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, NULL, NULL, i0, NULL);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // measure 2 global_vol stage 0 side 0
+  *po0 = (int32_t) reduc.measure[0][0].volume;
+
+  return ret;
+}
+
+// dag 1: 17 ops (0 copies), optimized to 17 (0 copies)
+// split 0: 1 cut
+// # SPOC calls: 1
+
+// FREIA-SPoC helper function for module freia_58
+freia_status freia_58_helper_1_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
   const int32_t * pi0,
   int32_t * po1)
 {
@@ -1270,7 +1017,7 @@ freia_status freia_58_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // out_16 [0 input 1] -> [0 poc 1] 5 dilate_8c
+  // out [0 input 1] -> [0 poc 1] 5 dilate_8c
   // nope
   // poc 5 dilate_8c stage 0 side 1
   si.poc[0][1].op = SPOC_POC_DILATE;
@@ -1477,112 +1224,59 @@ freia_status freia_58_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   return ret;
 }
 
-// dag 1: 1 ops (0 copies), optimized to 1 (0 copies)
-// split 0: 1 cut
-// # SPOC calls: 1
-
-// FREIA-SPoC helper function for module freia_58
-freia_status freia_58_helper_1_0_0(freia_data2d * i0,
-  int32_t * po0)
-{
-  spoc_instr si;
-  spoc_param sp;
-  spoc_reduction reduc;
-  freia_microcode mcode;
-  freia_dynamic_param dynparam;
-  freia_reduction_results redres;
-  freia_op_param param;
-  freia_status ret;
-  int i;
-
-  // init pipe to nop
-  spoc_init_pipe(&si, &sp, 16);
-
-
-  // STAGE 0
-  // out [0 input 0] -> [0 measure 0] 0 undefined
-  si.mux[0][0].op = SPOC_MUX_IN0;
-
-
-  // no output image
-
-  mcode.raw = (freia_ptr) &si;
-  mcode.size = sizeof(spoc_instr);
-
-  dynparam.raw = (freia_ptr) &sp;
-  dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
-  ret = freia_cg_write_microcode(&mcode);
-  ret |= freia_cg_write_dynamic_param(&dynparam);
-
-  // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, NULL, NULL, i0, NULL);
-
-  // get reductions
-  freia_cg_read_reduction_results(&redres);
-
-  // measure 2 global_vol stage 0 side 0
-  *po0 = (int32_t) reduc.measure[0][0].volume;
-
-  return ret;
-}
-
 ! updated function
 
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
    int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0001*/
-   ret = freia_58_helper_1_0_0(out, &volcurrent);                       /*0002*/
+   ret = freia_58_helper_0_0_0(out, &volcurrent);                       /*0002*/
    do {                                                                 /*0003*/
       volprevious = volcurrent;                                         /*0004*/
-      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0005*/
       i = 1;                                                            /*0006*/
       k = 0;                                                            /*0007*/
       j = 0;                                                            /*0008*/
+      i = 1;                                                            /*0013*/
+      k = 0;                                                            /*0014*/
+      i = 1;                                                            /*0020*/
+      k = 0;                                                            /*0021*/
+      i = 1;                                                            /*0027*/
+      k = 0;                                                            /*0028*/
+      i = 1;                                                            /*0034*/
+      k = 0;                                                            /*0035*/
+      i = 1;                                                            /*0041*/
+      k = 0;                                                            /*0042*/
+      i = 1;                                                            /*0048*/
+      k = 0;                                                            /*0049*/
+      i = 1;                                                            /*0055*/
+      k = 0;                                                            /*0056*/
+      freia_58_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0005*/
       j |= 0;                                                           /*0009*/
       l = j;                                                            /*0010*/
       m |= l;                                                           /*0011*/
-      i = 1;                                                            /*0013*/
-      k = 0;                                                            /*0014*/
       j = 0;                                                            /*0015*/
       j |= 0;                                                           /*0016*/
       l = j;                                                            /*0017*/
       m |= l;                                                           /*0018*/
-      i = 1;                                                            /*0020*/
-      k = 0;                                                            /*0021*/
       j = 0;                                                            /*0022*/
       j |= 0;                                                           /*0023*/
       l = j;                                                            /*0024*/
       m |= l;                                                           /*0025*/
-      i = 1;                                                            /*0027*/
-      k = 0;                                                            /*0028*/
       j = 0;                                                            /*0029*/
       j |= 0;                                                           /*0030*/
       l = j;                                                            /*0031*/
       m |= l;                                                           /*0032*/
-      i = 1;                                                            /*0034*/
-      k = 0;                                                            /*0035*/
       j = 0;                                                            /*0036*/
       j |= 0;                                                           /*0037*/
       l = j;                                                            /*0038*/
       m |= l;                                                           /*0039*/
-      i = 1;                                                            /*0041*/
-      k = 0;                                                            /*0042*/
       j = 0;                                                            /*0043*/
       j |= 0;                                                           /*0044*/
       l = j;                                                            /*0045*/
       m |= l;                                                           /*0046*/
-      i = 1;                                                            /*0048*/
-      k = 0;                                                            /*0049*/
       j = 0;                                                            /*0050*/
       j |= 0;                                                           /*0051*/
       l = j;                                                            /*0052*/
       m |= l;                                                           /*0053*/
-      i = 1;                                                            /*0055*/
-      k = 0;                                                            /*0056*/
       j = 0;                                                            /*0057*/
       j |= 0;                                                           /*0058*/
       l = j;                                                            /*0059*/
@@ -1599,47 +1293,47 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
    int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0001*/
-   ret = freia_58_helper_1_0_0(out, &volcurrent);                       /*0002*/
+   ret = freia_58_helper_0_0_0(out, &volcurrent);                       /*0002*/
    do {                                                                 /*0003*/
       volprevious = volcurrent;                                         /*0004*/
-      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0005*/
       i = 1;                                                            /*0006*/
       k = 0;                                                            /*0007*/
       j = 0;                                                            /*0008*/
-      l = j;                                                            /*0010*/
-      m |= l;                                                           /*0011*/
       i = 1;                                                            /*0013*/
       k = 0;                                                            /*0014*/
+      i = 1;                                                            /*0020*/
+      k = 0;                                                            /*0021*/
+      i = 1;                                                            /*0027*/
+      k = 0;                                                            /*0028*/
+      i = 1;                                                            /*0034*/
+      k = 0;                                                            /*0035*/
+      i = 1;                                                            /*0041*/
+      k = 0;                                                            /*0042*/
+      i = 1;                                                            /*0048*/
+      k = 0;                                                            /*0049*/
+      i = 1;                                                            /*0055*/
+      k = 0;                                                            /*0056*/
+      freia_58_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0005*/
+      l = j;                                                            /*0010*/
+      m |= l;                                                           /*0011*/
       j = 0;                                                            /*0015*/
       l = j;                                                            /*0017*/
       m |= l;                                                           /*0018*/
-      i = 1;                                                            /*0020*/
-      k = 0;                                                            /*0021*/
       j = 0;                                                            /*0022*/
       l = j;                                                            /*0024*/
       m |= l;                                                           /*0025*/
-      i = 1;                                                            /*0027*/
-      k = 0;                                                            /*0028*/
       j = 0;                                                            /*0029*/
       l = j;                                                            /*0031*/
       m |= l;                                                           /*0032*/
-      i = 1;                                                            /*0034*/
-      k = 0;                                                            /*0035*/
       j = 0;                                                            /*0036*/
       l = j;                                                            /*0038*/
       m |= l;                                                           /*0039*/
-      i = 1;                                                            /*0041*/
-      k = 0;                                                            /*0042*/
       j = 0;                                                            /*0043*/
       l = j;                                                            /*0045*/
       m |= l;                                                           /*0046*/
-      i = 1;                                                            /*0048*/
-      k = 0;                                                            /*0049*/
       j = 0;                                                            /*0050*/
       l = j;                                                            /*0052*/
       m |= l;                                                           /*0053*/
-      i = 1;                                                            /*0055*/
-      k = 0;                                                            /*0056*/
       j = 0;                                                            /*0057*/
       l = j;                                                            /*0059*/
       m |= l;                                                           /*0060*/
@@ -1679,45 +1373,22 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 // graph for dag "dag_0" of module "freia_58" in dot format
 digraph "dag_0" {
   // inputs
-  "in" [shape=circle];
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
 
   // computation vertices
-  "17 vol" [shape=diamond];
-  "15 ?" [shape=none];
-  "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
-  "14 <" [shape=trapezium,orientation=270];
-  "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
-  "in" -> "14 <";
-  "13 ?" [shape=none];
-  "13 ?" -> "15 ?" [arrowhead=empty,label="j"];
-  "10 D8" [shape=box];
-  "10 D8" -> "14 <" [label="out"];
-  "out" -> "10 D8";
+  "7 vol" [shape=diamond];
+  "out" -> "7 vol";
 }
 // graph for dag "dag_1" of module "freia_58" in dot format
 digraph "dag_1" {
   // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "7 vol" [shape=diamond];
-  "out" -> "7 vol";
-}
-// graph for dag "dag_cleaned_0" of module "freia_58" in dot format
-digraph "dag_cleaned_0" {
-  // inputs
   "in" [shape=circle];
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "17 vol" [shape=diamond];
@@ -1725,16 +1396,14 @@ digraph "dag_cleaned_0" {
   "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
+  "14 <" -> "out'";
   "in" -> "14 <";
-  "13 ?" [shape=none];
-  "13 ?" -> "15 ?" [arrowhead=empty,label="j"];
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out"];
   "out" -> "10 D8";
 }
-// graph for dag "dag_cleaned_1" of module "freia_58" in dot format
-digraph "dag_cleaned_1" {
+// graph for dag "dag_cleaned_0" of module "freia_58" in dot format
+digraph "dag_cleaned_0" {
   // inputs
   "out" [shape=circle];
 
@@ -1744,35 +1413,56 @@ digraph "dag_cleaned_1" {
   "7 vol" [shape=diamond];
   "out" -> "7 vol";
 }
+// graph for dag "dag_cleaned_1" of module "freia_58" in dot format
+digraph "dag_cleaned_1" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "17 vol" [shape=diamond];
+  "15 ?" [shape=none];
+  "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "14 <" [shape=trapezium,orientation=270];
+  "14 <" -> "17 vol" [label="out"];
+  "14 <" -> "out'";
+  "in" -> "14 <";
+  "10 D8" [shape=box];
+  "10 D8" -> "14 <" [label="out"];
+  "out" -> "10 D8";
+}
 // graph for dag "freia_58_helper_0_0_0" of module "freia_58" in dot format
 digraph "freia_58_helper_0_0_0" {
   // inputs
-  "in" [shape=circle];
-  "out_2" [shape=circle];
+  "out" [shape=circle];
 
   // outputs
+
+  // computation vertices
+  "7 vol" [shape=diamond];
+  "out" -> "7 vol";
+}
+// graph for dag "freia_58_helper_1_0_0" of module "freia_58" in dot format
+digraph "freia_58_helper_1_0_0" {
+  // inputs
+  "in" [shape=circle];
   "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
 
   // computation vertices
   "17 vol" [shape=diamond];
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "17 vol" [label="out"];
-  "14 <" -> "out";
+  "14 <" -> "out'";
   "in" -> "14 <";
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out_1"];
-  "out_2" -> "10 D8";
-}
-// graph for dag "freia_58_helper_1_0_0" of module "freia_58" in dot format
-digraph "freia_58_helper_1_0_0" {
-  // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "7 vol" [shape=diamond];
-  "out" -> "7 vol";
+  "out" -> "10 D8";
 }
 
 ! acceleration function
@@ -1796,6 +1486,187 @@ digraph "freia_58_helper_1_0_0" {
  * IMAGE H  = 0
  * MAX SIZE = 0
  *
+ * 1 input image, 0 output image
+ * 1 image operations in dag
+ * dag length is 2, dag width is 1
+ * costs in cycles per imagelet row:
+ * - computation: 3
+ * - communication: 32
+ */
+freia_status freia_58_helper_0_0_0(
+  freia_data2d * i0,
+  int32_t * po1)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
+  // overall structure which describes the computation
+  terapix_mcu_instr mcu_instr;
+  // operation 0_val initialization
+  int16_t p_0_val[1];
+  const int32_t x_0_val = 0;
+  const int32_t y_0_val = 0;
+  // array for reduction 0 extraction
+  int32_t red_0[1];
+  // flip flop macro code and I/Os
+  terapix_mcu_macrocode mcu_macro[2][1];
+  terapix_tile_info tile_in[2][1];
+  // imagelets definitions:
+  // - 1 computation imagelets
+  // - 1 double buffer imagelets
+  int imagelet_size = 511;
+  int imagelet_1 = 0;
+  int imagelet_2 = 511;
+
+  // memory for reductions
+  int reduction_0 = 1022;
+
+  // double buffer assignment
+  int imagelet_io_1_0 = imagelet_1;
+  int imagelet_io_1_1 = imagelet_2;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // dyn_param contents
+  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
+  // 0: vol(1)
+  // initializing  0_val
+  p_0_val[0] = 0;
+  gram.xoffset = x_0_val;
+  gram.yoffset = y_0_val;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_0_val;
+  freia_mg_write_dynamic_param(&dyn_param);
+  // initialize memory for operation 0_val
+  mem_init.xmin1 = reduction_0;
+  mem_init.ymin1 = 0;
+  mem_init.xmin2 = 0;
+  mem_init.ymin2 = 0;
+  mem_init.xmin3 = 0;
+  mem_init.ymin3 = 0;
+  mem_init.iter1 = TERAPIX_PE_NUMBER;
+  mem_init.iter2 = 2;
+  mem_init.iter3 = 0;
+  mem_init.iter4 = 0;
+  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
+  param.size = sizeof(terapix_mcu_macrocode); // not used?
+  param.raw = (void*) (&mem_init);
+  ret |= freia_mg_work(&param);
+  ret |= freia_mg_end_work();
+  // set measure vol at reduction_0
+  mcu_macro[0][0].xmin2 = reduction_0;
+  mcu_macro[1][0].xmin2 = reduction_0;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
+  mcu_macro[0][0].xmin3 = 0;
+  mcu_macro[1][0].xmin3 = 0;
+  mcu_macro[0][0].ymin3 = 0;
+  mcu_macro[1][0].ymin3 = 0;
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
+  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][0].iter2 = imagelet_size;
+  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
+
+  // inputs:
+  // - imagelet 1 is i0 for out
+  tile_in[0][0].x = imagelet_io_1_0;
+  tile_in[0][0].y = 0;
+  tile_in[1][0].x = imagelet_io_1_1;
+  tile_in[1][0].y = 0;
+
+  // no output
+
+  // imagelet erosion for the computation
+  mcu_instr.borderTop    = 0;
+  mcu_instr.borderBottom = 0;
+  mcu_instr.borderLeft   = 0;
+  mcu_instr.borderRight  = 0;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
+
+  // outputs
+  mcu_instr.nbout = 0;
+  mcu_instr.out0 = NULL;
+  mcu_instr.out1 = NULL;
+
+  // inputs
+  mcu_instr.nbin = 1;
+  mcu_instr.in0 = tile_in[0];
+  mcu_instr.in1 = tile_in[1];
+
+  // actual instructions
+  mcu_instr.nbinstr = 1;
+  mcu_instr.instr0   = mcu_macro[0];
+  mcu_instr.instr1   = mcu_macro[1];
+
+  // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, i0);
+
+  // extract measures
+  // get measure vol result from reduction_0
+  redter.xres = reduction_0;
+  redter.yres = 0;
+  redter.width = 1;
+  redter.height = TERAPIX_PE_NUMBER;
+  redter.result = (void*) red_0;
+  redter.macroid = TERAPIX_UCODE_GLOBAL_VOL;
+  redter.imgwidth = i0->width;
+  redter.imgheight = i0->height;
+  redter.subimgwidth = TERAPIX_PE_NUMBER;
+  redter.subimgheight = imagelet_size;
+
+  ret |= freia_cg_read_reduction_results(&redres);
+
+  // assign reduction parameter
+  *po1 = (int32_t) red_0[0];
+
+  return ret;
+}
+
+
+/* FREIA terapix helper function for module freia_58
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * IMAGE H  = 0
+ * MAX SIZE = 0
+ *
  * 2 input images, 1 output image
  * 3 image operations in dag
  * dag length is 4, dag width is 2
@@ -1803,7 +1674,7 @@ digraph "freia_58_helper_1_0_0" {
  * - computation: 22
  * - communication: 96
  */
-freia_status freia_58_helper_0_0_0(
+freia_status freia_58_helper_1_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   freia_data2d * i1,
@@ -1981,7 +1852,7 @@ freia_status freia_58_helper_0_0_0(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for out_2
+  // - imagelet 2 is i1 for out
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;
@@ -2044,199 +1915,18 @@ freia_status freia_58_helper_0_0_0(
 }
 
 
-/* FREIA terapix helper function for module freia_58
- *
- * RAMPE    = 1024
- * NPE      = 128
- * DMA BW   = 32
- * GRAM W   = 64
- * GRAM H   = 32
- * DAG CUT  = compute
- * OVERLAP  = false
- * IMAGE H  = 0
- * MAX SIZE = 0
- *
- * 1 input image, 0 output image
- * 1 image operations in dag
- * dag length is 2, dag width is 1
- * costs in cycles per imagelet row:
- * - computation: 3
- * - communication: 32
- */
-freia_status freia_58_helper_1_0_0(
-  freia_data2d * i0,
-  int32_t * po1)
-{
-  // declarations:
-  freia_microcode mcode;
-  freia_op_param param;
-  freia_dynamic_param dyn_param;
-  terapix_gram gram;
-  int i;
-  freia_status ret = FREIA_OK;
-  // data structures for reductions
-  terapix_mcu_macrocode mem_init;
-  freia_reduction_results redres;
-  terapix_reduction redter;
-  // overall structure which describes the computation
-  terapix_mcu_instr mcu_instr;
-  // operation 0_val initialization
-  int16_t p_0_val[1];
-  const int32_t x_0_val = 0;
-  const int32_t y_0_val = 0;
-  // array for reduction 0 extraction
-  int32_t red_0[1];
-  // flip flop macro code and I/Os
-  terapix_mcu_macrocode mcu_macro[2][1];
-  terapix_tile_info tile_in[2][1];
-  // imagelets definitions:
-  // - 1 computation imagelets
-  // - 1 double buffer imagelets
-  int imagelet_size = 511;
-  int imagelet_1 = 0;
-  int imagelet_2 = 511;
-
-  // memory for reductions
-  int reduction_0 = 1022;
-
-  // double buffer assignment
-  int imagelet_io_1_0 = imagelet_1;
-  int imagelet_io_1_1 = imagelet_2;
-
-  // body:
-  // mcode param
-  mcode.raw = (void*) terapix_ucode_array;
-  mcode.size = TERAPIX_UCODE_SIZE_T;
-  freia_mg_write_microcode(&mcode);
-
-  // dyn_param contents
-  dyn_param.raw = &gram;
-  dyn_param.size = sizeof(terapix_gram);
-
-  // redres contents
-  redres.raw = (void*) &redter;
-  redres.size = sizeof(terapix_reduction);
-
-  // 0: vol(1)
-  // initializing  0_val
-  p_0_val[0] = 0;
-  gram.xoffset = x_0_val;
-  gram.yoffset = y_0_val;
-  gram.width = 1;
-  gram.height = 1;
-  gram.params = p_0_val;
-  freia_mg_write_dynamic_param(&dyn_param);
-  // initialize memory for operation 0_val
-  mem_init.xmin1 = reduction_0;
-  mem_init.ymin1 = 0;
-  mem_init.xmin2 = 0;
-  mem_init.ymin2 = 0;
-  mem_init.xmin3 = 0;
-  mem_init.ymin3 = 0;
-  mem_init.iter1 = TERAPIX_PE_NUMBER;
-  mem_init.iter2 = 2;
-  mem_init.iter3 = 0;
-  mem_init.iter4 = 0;
-  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
-  param.size = sizeof(terapix_mcu_macrocode); // not used?
-  param.raw = (void*) (&mem_init);
-  ret |= freia_mg_work(&param);
-  ret |= freia_mg_end_work();
-  // set measure vol at reduction_0
-  mcu_macro[0][0].xmin2 = reduction_0;
-  mcu_macro[1][0].xmin2 = reduction_0;
-  mcu_macro[0][0].ymin2 = 0;
-  mcu_macro[1][0].ymin2 = 0;
-  mcu_macro[0][0].xmin3 = 0;
-  mcu_macro[1][0].xmin3 = 0;
-  mcu_macro[0][0].ymin3 = 0;
-  mcu_macro[1][0].ymin3 = 0;
-  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
-  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
-  mcu_macro[0][0].ymin1 = 0;
-  mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][0].iter2 = imagelet_size;
-  mcu_macro[1][0].iter2 = imagelet_size;
-  mcu_macro[0][0].iter3 = 0;
-  mcu_macro[1][0].iter3 = 0;
-  mcu_macro[0][0].iter4 = 0;
-  mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
-
-  // inputs:
-  // - imagelet 1 is i0 for out
-  tile_in[0][0].x = imagelet_io_1_0;
-  tile_in[0][0].y = 0;
-  tile_in[1][0].x = imagelet_io_1_1;
-  tile_in[1][0].y = 0;
-
-  // no output
-
-  // imagelet erosion for the computation
-  mcu_instr.borderTop    = 0;
-  mcu_instr.borderBottom = 0;
-  mcu_instr.borderLeft   = 0;
-  mcu_instr.borderRight  = 0;
-  mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
-
-  // outputs
-  mcu_instr.nbout = 0;
-  mcu_instr.out0 = NULL;
-  mcu_instr.out1 = NULL;
-
-  // inputs
-  mcu_instr.nbin = 1;
-  mcu_instr.in0 = tile_in[0];
-  mcu_instr.in1 = tile_in[1];
-
-  // actual instructions
-  mcu_instr.nbinstr = 1;
-  mcu_instr.instr0   = mcu_macro[0];
-  mcu_instr.instr1   = mcu_macro[1];
-
-  // call terapix runtime
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-  ret |= freia_cg_template_process(&param, i0);
-
-  // extract measures
-  // get measure vol result from reduction_0
-  redter.xres = reduction_0;
-  redter.yres = 0;
-  redter.width = 1;
-  redter.height = TERAPIX_PE_NUMBER;
-  redter.result = (void*) red_0;
-  redter.macroid = TERAPIX_UCODE_GLOBAL_VOL;
-  redter.imgwidth = i0->width;
-  redter.imgheight = i0->height;
-  redter.subimgwidth = TERAPIX_PE_NUMBER;
-  redter.subimgheight = imagelet_size;
-
-  ret |= freia_cg_read_reduction_results(&redres);
-
-  // assign reduction parameter
-  *po1 = (int32_t) red_0[0];
-
-  return ret;
-}
-
-
 ! updated function
 
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
    int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
-   ret = freia_58_helper_1_0_0(out, &volcurrent);                       /*0007*/
+   ret = freia_58_helper_0_0_0(out, &volcurrent);                       /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
-      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0010*/
       i = 1;                                                            /*0011*/
       k = 0;                                                            /*0012*/
       j = 0;                                                            /*0013*/
+      freia_58_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0010*/
       j |= 0;                                                           /*0014*/
       l = j;                                                            /*0015*/
       m |= l;                                                           /*0016*/
@@ -2252,13 +1942,13 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
    int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
-   ret = freia_58_helper_1_0_0(out, &volcurrent);                       /*0007*/
+   ret = freia_58_helper_0_0_0(out, &volcurrent);                       /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
-      freia_58_helper_0_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0010*/
       i = 1;                                                            /*0011*/
       k = 0;                                                            /*0012*/
       j = 0;                                                            /*0013*/
+      freia_58_helper_1_0_0(out, in, out, freia_morpho_kernel_8c, &volcurrent);        /*0010*/
       l = j;                                                            /*0015*/
       m |= l;                                                           /*0016*/
    }

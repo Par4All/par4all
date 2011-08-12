@@ -1,0 +1,31 @@
+
+Initial code
+
+void flatten_code17(void)
+{
+   int i0;
+   register int i1;
+   {
+      int i2;
+      {
+         register int i3;
+         {
+            int i4;
+         }
+      }
+   }
+}
+
+Code after flatten_code
+
+void flatten_code17(void)
+{
+   int i0;
+   register int i1;
+   //PIPS generated variable
+   int i2;
+   //PIPS generated variable
+   register int i3;
+   //PIPS generated variable
+   int i4;
+}

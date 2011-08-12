@@ -1,0 +1,1169 @@
+#
+# AIPO
+#
+#
+# compile generated freia_60
+#
+
+! initial function
+
+int freia_60(freia_dataio *in, freia_dataio *out)
+{
+   freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
+   
+   // allocate
+   im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
+   im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
+   im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
+   im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
+   
+   // read images
+   freia_common_rx_image(im1, in);                                      /*0015*/
+   freia_common_rx_image(im2, in);                                      /*0016*/
+   freia_common_rx_image(im3, in);                                      /*0017*/
+   
+   // computation
+   freia_aipo_inf_const(im1, im1, 150);                                 /*0020*/
+   freia_aipo_inf_const(im2, im2, 200);                                 /*0021*/
+   freia_aipo_inf_const(im3, im3, 250);                                 /*0022*/
+   freia_aipo_sup(im4, im2, im1);                                       /*0023*/
+   freia_aipo_sup(im3, im3, im4);                                       /*0024*/
+   
+   // output images
+   freia_common_tx_image(im1, out);                                     /*0027*/
+   freia_common_tx_image(im2, out);                                     /*0028*/
+   freia_common_tx_image(im3, out);                                     /*0029*/
+   freia_common_tx_image(im4, out);                                     /*0030*/
+   
+   // cleanup
+   freia_common_destruct_data(im1);                                     /*0033*/
+   freia_common_destruct_data(im2);                                     /*0034*/
+   freia_common_destruct_data(im3);                                     /*0035*/
+   freia_common_destruct_data(im4);                                     /*0036*/
+
+   return 0;                                                            /*0038*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_60" in dot format
+digraph "dag_0" {
+  // inputs
+  "im1" [shape=circle];
+  "im2" [shape=circle];
+  "im3" [shape=circle];
+
+  // outputs
+  "im1'" [shape=circle];
+  "im2'" [shape=circle];
+  "im4" [shape=circle];
+  "im3'" [shape=circle];
+
+  // computation vertices
+  "24 >" [shape=trapezium,orientation=270];
+  "24 >" -> "im3'";
+  "23 >" [shape=trapezium,orientation=270];
+  "23 >" -> "24 >" [label="im4"];
+  "23 >" -> "im4";
+  "22 <." [shape=trapezium,orientation=270];
+  "22 <." -> "24 >" [label="im3"];
+  "im3" -> "22 <.";
+  "21 <." [shape=trapezium,orientation=270];
+  "21 <." -> "23 >" [label="im2"];
+  "21 <." -> "im2'";
+  "im2" -> "21 <.";
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "23 >" [label="im1"];
+  "20 <." -> "im1'";
+  "im1" -> "20 <.";
+}
+// graph for dag "dag_cleaned_0" of module "freia_60" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "im1" [shape=circle];
+  "im2" [shape=circle];
+  "im3" [shape=circle];
+
+  // outputs
+  "im1'" [shape=circle];
+  "im2'" [shape=circle];
+  "im4" [shape=circle];
+  "im3'" [shape=circle];
+
+  // computation vertices
+  "24 >" [shape=trapezium,orientation=270];
+  "24 >" -> "im3'";
+  "23 >" [shape=trapezium,orientation=270];
+  "23 >" -> "24 >" [label="im4"];
+  "23 >" -> "im4";
+  "22 <." [shape=trapezium,orientation=270];
+  "22 <." -> "24 >" [label="im3_1"];
+  "im3" -> "22 <.";
+  "21 <." [shape=trapezium,orientation=270];
+  "21 <." -> "23 >" [label="im2"];
+  "21 <." -> "im2'";
+  "im2" -> "21 <.";
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "23 >" [label="im1"];
+  "20 <." -> "im1'";
+  "im1" -> "20 <.";
+}
+
+! updated function for
+
+int freia_60(freia_dataio *in, freia_dataio *out)
+{
+   freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
+   // hardware accelerator generated variable
+   freia_data2d *im3_1 = 0;
+   
+   // allocate
+   im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
+   im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
+   im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
+   im3_1 = freia_common_create_data(im3->bpp, im3->widthWa, im3->heightWa);
+   im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
+   
+   // read images
+   freia_common_rx_image(im1, in);                                      /*0015*/
+   freia_common_rx_image(im2, in);                                      /*0016*/
+   freia_common_rx_image(im3, in);                                      /*0017*/
+   
+   // computation
+   freia_aipo_inf_const(im1, im1, 150);                                 /*0020*/
+   freia_aipo_inf_const(im2, im2, 200);                                 /*0021*/
+   freia_aipo_inf_const(im3_1, im3, 250);                               /*0022*/
+   freia_aipo_sup(im4, im2, im1);                                       /*0023*/
+   freia_aipo_sup(im3, im3_1, im4);                                     /*0024*/
+   
+   // output images
+   freia_common_tx_image(im1, out);                                     /*0027*/
+   freia_common_tx_image(im2, out);                                     /*0028*/
+   freia_common_tx_image(im3, out);                                     /*0029*/
+   freia_common_tx_image(im4, out);                                     /*0030*/
+   
+   // cleanup
+   freia_common_destruct_data(im1);                                     /*0033*/
+   freia_common_destruct_data(im2);                                     /*0034*/
+   freia_common_destruct_data(im3);                                     /*0035*/
+   freia_common_destruct_data(im3_1);
+   freia_common_destruct_data(im4);                                     /*0036*/
+
+   return 0;                                                            /*0038*/
+}
+#
+# SPOC
+#
+
+! initial function
+
+int freia_60(freia_dataio *in, freia_dataio *out)
+{
+   freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
+   
+   // allocate
+   im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
+   im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
+   im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
+   im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
+   
+   // read images
+   freia_common_rx_image(im1, in);                                      /*0015*/
+   freia_common_rx_image(im2, in);                                      /*0016*/
+   freia_common_rx_image(im3, in);                                      /*0017*/
+   
+   // computation
+   freia_aipo_inf_const(im1, im1, 150);                                 /*0020*/
+   freia_aipo_inf_const(im2, im2, 200);                                 /*0021*/
+   freia_aipo_inf_const(im3, im3, 250);                                 /*0022*/
+   freia_aipo_sup(im4, im2, im1);                                       /*0023*/
+   freia_aipo_sup(im3, im3, im4);                                       /*0024*/
+   
+   // output images
+   freia_common_tx_image(im1, out);                                     /*0027*/
+   freia_common_tx_image(im2, out);                                     /*0028*/
+   freia_common_tx_image(im3, out);                                     /*0029*/
+   freia_common_tx_image(im4, out);                                     /*0030*/
+   
+   // cleanup
+   freia_common_destruct_data(im1);                                     /*0033*/
+   freia_common_destruct_data(im2);                                     /*0034*/
+   freia_common_destruct_data(im3);                                     /*0035*/
+   freia_common_destruct_data(im4);                                     /*0036*/
+
+   return 0;                                                            /*0038*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_60" in dot format
+digraph "dag_0" {
+  // inputs
+  "im1" [shape=circle];
+  "im2" [shape=circle];
+  "im3" [shape=circle];
+
+  // outputs
+  "im1'" [shape=circle];
+  "im2'" [shape=circle];
+  "im4" [shape=circle];
+  "im3'" [shape=circle];
+
+  // computation vertices
+  "24 >" [shape=trapezium,orientation=270];
+  "24 >" -> "im3'";
+  "23 >" [shape=trapezium,orientation=270];
+  "23 >" -> "24 >" [label="im4"];
+  "23 >" -> "im4";
+  "22 <." [shape=trapezium,orientation=270];
+  "22 <." -> "24 >" [label="im3"];
+  "im3" -> "22 <.";
+  "21 <." [shape=trapezium,orientation=270];
+  "21 <." -> "23 >" [label="im2"];
+  "21 <." -> "im2'";
+  "im2" -> "21 <.";
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "23 >" [label="im1"];
+  "20 <." -> "im1'";
+  "im1" -> "20 <.";
+}
+// graph for dag "dag_cleaned_0" of module "freia_60" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "im1" [shape=circle];
+  "im2" [shape=circle];
+  "im3" [shape=circle];
+
+  // outputs
+  "im1'" [shape=circle];
+  "im2'" [shape=circle];
+  "im4" [shape=circle];
+  "im3'" [shape=circle];
+
+  // computation vertices
+  "24 >" [shape=trapezium,orientation=270];
+  "24 >" -> "im3'";
+  "23 >" [shape=trapezium,orientation=270];
+  "23 >" -> "24 >" [label="im4"];
+  "23 >" -> "im4";
+  "22 <." [shape=trapezium,orientation=270];
+  "22 <." -> "24 >" [label="im3"];
+  "im3" -> "22 <.";
+  "21 <." [shape=trapezium,orientation=270];
+  "21 <." -> "23 >" [label="im2"];
+  "21 <." -> "im2'";
+  "im2" -> "21 <.";
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "23 >" [label="im1"];
+  "20 <." -> "im1'";
+  "im1" -> "20 <.";
+}
+// graph for dag "freia_60_helper_0_0" of module "freia_60" in dot format
+digraph "freia_60_helper_0_0" {
+  // inputs
+  "im1" [shape=circle];
+  "im2" [shape=circle];
+
+  // outputs
+  "im1'" [shape=circle];
+  "im2'" [shape=circle];
+
+  // computation vertices
+  "21 <." [shape=trapezium,orientation=270];
+  "21 <." -> "im2'";
+  "im2" -> "21 <.";
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "im1'";
+  "im1" -> "20 <.";
+}
+// graph for dag "freia_60_helper_0_1" of module "freia_60" in dot format
+digraph "freia_60_helper_0_1" {
+  // inputs
+  "im1" [shape=circle];
+  "im2" [shape=circle];
+
+  // outputs
+  "im4" [shape=circle];
+
+  // computation vertices
+  "23 >" [shape=trapezium,orientation=270];
+  "23 >" -> "im4";
+  "im1" -> "23 >";
+  "im2" -> "23 >";
+}
+// graph for dag "freia_60_helper_0_2" of module "freia_60" in dot format
+digraph "freia_60_helper_0_2" {
+  // inputs
+  "im3" [shape=circle];
+  "im4" [shape=circle];
+
+  // outputs
+  "im3'" [shape=circle];
+
+  // computation vertices
+  "24 >" [shape=trapezium,orientation=270];
+  "24 >" -> "im3'";
+  "im4" -> "24 >";
+  "22 <." [shape=trapezium,orientation=270];
+  "22 <." -> "24 >" [label="im3_1"];
+  "im3" -> "22 <.";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// dag 0: 5 ops (0 copies), optimized to 5 (0 copies)
+// split 0: 1 cut
+// split 1: 1 cut
+// split 2: 1 cut
+// # SPOC calls: 3
+
+// FREIA-SPoC helper function for module freia_60
+freia_status freia_60_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+  int32_t pi0,
+  int32_t pi1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`im1 [0 input 0] -> [0 alu] 20 inf_const
+  // nope
+  // alu 20 inf_const stage 0
+  si.alu[0][0].op = SPOC_ALU_INF_IN0_CONST;
+  sp.alu[0][0].constant = pi0;
+
+
+  // STAGE 1
+  // 0`im2 [0 input 1] -> [1 alu] 21 inf_const
+  si.mux[0][3].op = SPOC_MUX_IN1;
+  // 0`im2 [1 input 1] -> [1 alu] 21 inf_const
+  // nope
+  // alu 21 inf_const stage 1 flipped
+  si.alu[1][0].op = SPOC_ALU_INF_IN1_CONST;
+  sp.alu[1][0].constant = pi1;
+
+
+  // output image 0`im1 on 0 and image 0`im2 on 1
+  // 0`im1 [0 alu] -> [1 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`im1 [1 input 0] -> [1 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`im1 [1 output 0] -> [7 output 0] 0 null
+  // 0`im1 [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`im1 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`im1 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`im1 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`im1 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`im1 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  // 0`im2 [1 alu] -> [1 output 1] 0 null
+  si.mux[1][1].op = SPOC_MUX_IN1;
+  si.mux[1][3].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`im2 [1 output 1] -> [7 output 1] 0 null
+  // 0`im2 [2 input 1] -> [7 output 1] 0 null
+  si.mux[2][3].op = SPOC_MUX_IN1;
+  // 0`im2 [3 input 1] -> [7 output 1] 0 null
+  si.mux[3][3].op = SPOC_MUX_IN1;
+  // 0`im2 [4 input 1] -> [7 output 1] 0 null
+  si.mux[4][3].op = SPOC_MUX_IN1;
+  // 0`im2 [5 input 1] -> [7 output 1] 0 null
+  si.mux[5][3].op = SPOC_MUX_IN1;
+  // 0`im2 [6 input 1] -> [7 output 1] 0 null
+  si.mux[6][3].op = SPOC_MUX_IN1;
+  // 0`im2 [7 input 1] -> [7 output 1] 0 null
+  si.mux[7][3].op = SPOC_MUX_IN1;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, o1, i0, i1);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module freia_60
+freia_status freia_60_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`im1 [0 input 0] -> [0 alu] 23 sup
+  // nope
+  // 0`im2 [0 input 1] -> [0 alu] 23 sup
+  // nope
+  // alu 23 sup stage 0
+  si.alu[0][0].op = SPOC_ALU_SUP_IN0_IN1;
+
+
+  // output image 0`im4 on 0
+  // 0`im4 [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`im4 [0 output 0] -> [7 output 0] 0 null
+  // 0`im4 [1 input 0] -> [7 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`im4 [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`im4 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`im4 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`im4 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`im4 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`im4 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module freia_60
+freia_status freia_60_helper_0_2_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+  int32_t pi0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`im3 [0 input 0] -> [0 alu] 22 inf_const
+  // nope
+  // alu 22 inf_const stage 0
+  si.alu[0][0].op = SPOC_ALU_INF_IN0_CONST;
+  sp.alu[0][0].constant = pi0;
+
+
+  // STAGE 1
+  // 0`im3_1 [0 alu] -> [1 alu] 24 sup
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`im3_1 [1 input 0] -> [1 alu] 24 sup
+  // nope
+  // 0`im4 [0 input 1] -> [1 alu] 24 sup
+  si.mux[0][3].op = SPOC_MUX_IN1;
+  // 0`im4 [1 input 1] -> [1 alu] 24 sup
+  // nope
+  // alu 24 sup stage 1
+  si.alu[1][0].op = SPOC_ALU_SUP_IN0_IN1;
+
+
+  // output image 0`im3 on 0
+  // 0`im3 [1 alu] -> [1 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`im3 [1 output 0] -> [7 output 0] 0 null
+  // 0`im3 [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`im3 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`im3 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`im3 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`im3 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`im3 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
+! updated function
+
+int freia_60(freia_dataio *in, freia_dataio *out)
+{
+   freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
+   
+   // allocate
+   im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
+   im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
+   im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
+   im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
+   
+   // read images
+   freia_common_rx_image(im1, in);                                      /*0015*/
+   freia_common_rx_image(im2, in);                                      /*0016*/
+   freia_common_rx_image(im3, in);                                      /*0017*/
+   
+   // computation
+   freia_60_helper_0_0_0(im1, im2, im1, im2, 150, 200);                 /*0020*/
+   freia_60_helper_0_1_0(im4, im1, im2);                                /*0023*/
+   freia_60_helper_0_2_0(im3, im3, im4, 250);                           /*0024*/
+   
+   // output images
+   freia_common_tx_image(im1, out);                                     /*0027*/
+   freia_common_tx_image(im2, out);                                     /*0028*/
+   freia_common_tx_image(im3, out);                                     /*0029*/
+   freia_common_tx_image(im4, out);                                     /*0030*/
+   
+   // cleanup
+   freia_common_destruct_data(im1);                                     /*0033*/
+   freia_common_destruct_data(im2);                                     /*0034*/
+   freia_common_destruct_data(im3);                                     /*0035*/
+   freia_common_destruct_data(im4);                                     /*0036*/
+
+   return 0;                                                            /*0038*/
+}
+
+! cleaned up function
+
+int freia_60(freia_dataio *in, freia_dataio *out)
+{
+   freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
+   
+   // allocate
+   im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
+   im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
+   im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
+   im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
+   
+   // read images
+   freia_common_rx_image(im1, in);                                      /*0015*/
+   freia_common_rx_image(im2, in);                                      /*0016*/
+   freia_common_rx_image(im3, in);                                      /*0017*/
+   
+   // computation
+   freia_60_helper_0_0_0(im1, im2, im1, im2, 150, 200);                 /*0020*/
+   freia_60_helper_0_1_0(im4, im1, im2);                                /*0023*/
+   freia_60_helper_0_2_0(im3, im3, im4, 250);                           /*0024*/
+   
+   // output images
+   freia_common_tx_image(im1, out);                                     /*0027*/
+   freia_common_tx_image(im2, out);                                     /*0028*/
+   freia_common_tx_image(im3, out);                                     /*0029*/
+   freia_common_tx_image(im4, out);                                     /*0030*/
+   
+   // cleanup
+   freia_common_destruct_data(im1);                                     /*0033*/
+   freia_common_destruct_data(im2);                                     /*0034*/
+   freia_common_destruct_data(im3);                                     /*0035*/
+   freia_common_destruct_data(im4);                                     /*0036*/
+
+   return 0;                                                            /*0038*/
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+int freia_60(freia_dataio *in, freia_dataio *out)
+{
+   freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
+   
+   // allocate
+   im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
+   im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
+   im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
+   im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
+   
+   // read images
+   freia_common_rx_image(im1, in);                                      /*0015*/
+   freia_common_rx_image(im2, in);                                      /*0016*/
+   freia_common_rx_image(im3, in);                                      /*0017*/
+   
+   // computation
+   freia_aipo_inf_const(im1, im1, 150);                                 /*0020*/
+   freia_aipo_inf_const(im2, im2, 200);                                 /*0021*/
+   freia_aipo_inf_const(im3, im3, 250);                                 /*0022*/
+   freia_aipo_sup(im4, im2, im1);                                       /*0023*/
+   freia_aipo_sup(im3, im3, im4);                                       /*0024*/
+   
+   // output images
+   freia_common_tx_image(im1, out);                                     /*0027*/
+   freia_common_tx_image(im2, out);                                     /*0028*/
+   freia_common_tx_image(im3, out);                                     /*0029*/
+   freia_common_tx_image(im4, out);                                     /*0030*/
+   
+   // cleanup
+   freia_common_destruct_data(im1);                                     /*0033*/
+   freia_common_destruct_data(im2);                                     /*0034*/
+   freia_common_destruct_data(im3);                                     /*0035*/
+   freia_common_destruct_data(im4);                                     /*0036*/
+
+   return 0;                                                            /*0038*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_60" in dot format
+digraph "dag_0" {
+  // inputs
+  "im1" [shape=circle];
+  "im2" [shape=circle];
+  "im3" [shape=circle];
+
+  // outputs
+  "im1'" [shape=circle];
+  "im2'" [shape=circle];
+  "im4" [shape=circle];
+  "im3'" [shape=circle];
+
+  // computation vertices
+  "24 >" [shape=trapezium,orientation=270];
+  "24 >" -> "im3'";
+  "23 >" [shape=trapezium,orientation=270];
+  "23 >" -> "24 >" [label="im4"];
+  "23 >" -> "im4";
+  "22 <." [shape=trapezium,orientation=270];
+  "22 <." -> "24 >" [label="im3"];
+  "im3" -> "22 <.";
+  "21 <." [shape=trapezium,orientation=270];
+  "21 <." -> "23 >" [label="im2"];
+  "21 <." -> "im2'";
+  "im2" -> "21 <.";
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "23 >" [label="im1"];
+  "20 <." -> "im1'";
+  "im1" -> "20 <.";
+}
+// graph for dag "dag_cleaned_0" of module "freia_60" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "im1" [shape=circle];
+  "im2" [shape=circle];
+  "im3" [shape=circle];
+
+  // outputs
+  "im1'" [shape=circle];
+  "im2'" [shape=circle];
+  "im4" [shape=circle];
+  "im3'" [shape=circle];
+
+  // computation vertices
+  "24 >" [shape=trapezium,orientation=270];
+  "24 >" -> "im3'";
+  "23 >" [shape=trapezium,orientation=270];
+  "23 >" -> "24 >" [label="im4"];
+  "23 >" -> "im4";
+  "22 <." [shape=trapezium,orientation=270];
+  "22 <." -> "24 >" [label="im3"];
+  "im3" -> "22 <.";
+  "21 <." [shape=trapezium,orientation=270];
+  "21 <." -> "23 >" [label="im2"];
+  "21 <." -> "im2'";
+  "im2" -> "21 <.";
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "23 >" [label="im1"];
+  "20 <." -> "im1'";
+  "im1" -> "20 <.";
+}
+// graph for dag "freia_60_helper_0_0_0" of module "freia_60" in dot format
+digraph "freia_60_helper_0_0_0" {
+  // inputs
+  "im1" [shape=circle];
+  "im2" [shape=circle];
+  "im3" [shape=circle];
+
+  // outputs
+  "im1'" [shape=circle];
+  "im2'" [shape=circle];
+  "im4" [shape=circle];
+  "im3'" [shape=circle];
+
+  // computation vertices
+  "24 >" [shape=trapezium,orientation=270];
+  "24 >" -> "im3'";
+  "22 <." [shape=trapezium,orientation=270];
+  "22 <." -> "24 >" [label="im3_1"];
+  "im3" -> "22 <.";
+  "23 >" [shape=trapezium,orientation=270];
+  "23 >" -> "24 >" [label="im4"];
+  "23 >" -> "im4";
+  "21 <." [shape=trapezium,orientation=270];
+  "21 <." -> "23 >" [label="im2"];
+  "21 <." -> "im2'";
+  "im2" -> "21 <.";
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "23 >" [label="im1"];
+  "20 <." -> "im1'";
+  "im1" -> "20 <.";
+}
+
+! acceleration function
+
+// freia terapix includes
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+/* FREIA terapix helper function for module freia_60
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * IMAGE H  = 0
+ * MAX SIZE = 0
+ *
+ * 3 input images, 4 output images
+ * 5 image operations in dag
+ * dag length is 4, dag width is 4
+ * costs in cycles per imagelet row:
+ * - computation: 17
+ * - communication: 224
+ */
+freia_status freia_60_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  freia_data2d * o2,
+  freia_data2d * o3,
+  freia_data2d * i0,
+  freia_data2d * i1,
+  freia_data2d * i2,
+  int32_t pi7,
+  int32_t pi8,
+  int32_t pi9)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
+  // overall structure which describes the computation
+  terapix_mcu_instr mcu_instr;
+  // operation 0 parameters
+  int16_t p_0[1];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
+  // operation 1 parameters
+  int16_t p_1[1];
+  const int32_t x_1 = 1;
+  const int32_t y_1 = 0;
+  // operation 3 parameters
+  int16_t p_3[1];
+  const int32_t x_3 = 2;
+  const int32_t y_3 = 0;
+  // flip flop macro code and I/Os
+  terapix_mcu_macrocode mcu_macro[2][5];
+  terapix_tile_info tile_in[2][3];
+  terapix_tile_info tile_out[2][4];
+  // imagelets definitions:
+  // - 4 computation imagelets
+  // - 4 double buffer imagelets
+  int imagelet_size = 128;
+  int imagelet_1 = 0;
+  int imagelet_2 = 128;
+  int imagelet_3 = 256;
+  int imagelet_4 = 384;
+  int imagelet_5 = 512;
+  int imagelet_6 = 640;
+  int imagelet_7 = 768;
+  int imagelet_8 = 896;
+
+  // double buffer assignment
+  int imagelet_io_1_0 = imagelet_1;
+  int imagelet_io_1_1 = imagelet_5;
+  int imagelet_io_2_0 = imagelet_2;
+  int imagelet_io_2_1 = imagelet_6;
+  int imagelet_io_3_0 = imagelet_3;
+  int imagelet_io_3_1 = imagelet_7;
+  int imagelet_io_4_0 = imagelet_4;
+  int imagelet_io_4_1 = imagelet_8;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // dyn_param contents
+  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
+  // 0: <.(1) -> 1
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
+  mcu_macro[0][0].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
+  // copy of operation 0 parameters
+  p_0[0] = pi7;
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][0].xmin3 = x_0;
+  mcu_macro[1][0].xmin3 = x_0;
+  mcu_macro[0][0].ymin3 = y_0;
+  mcu_macro[1][0].ymin3 = y_0;
+  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][0].iter2 = imagelet_size;
+  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_INF_CONST;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_INF_CONST;
+  // 1: <.(2) -> 2
+  mcu_macro[0][1].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][1].ymin1 = 0;
+  mcu_macro[1][1].ymin1 = 0;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][1].ymin2 = 0;
+  mcu_macro[1][1].ymin2 = 0;
+  // copy of operation 1 parameters
+  p_1[0] = pi8;
+  gram.xoffset = x_1;
+  gram.yoffset = y_1;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_1;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][1].xmin3 = x_1;
+  mcu_macro[1][1].xmin3 = x_1;
+  mcu_macro[0][1].ymin3 = y_1;
+  mcu_macro[1][1].ymin3 = y_1;
+  mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][1].iter2 = imagelet_size;
+  mcu_macro[1][1].iter2 = imagelet_size;
+  mcu_macro[0][1].iter3 = 0;
+  mcu_macro[1][1].iter3 = 0;
+  mcu_macro[0][1].iter4 = 0;
+  mcu_macro[1][1].iter4 = 0;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_INF_CONST;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_INF_CONST;
+  // 2: >(2,1) -> 4
+  mcu_macro[0][2].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][2].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][2].ymin1 = 0;
+  mcu_macro[1][2].ymin1 = 0;
+  mcu_macro[0][2].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][2].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][2].ymin2 = 0;
+  mcu_macro[1][2].ymin2 = 0;
+  mcu_macro[0][2].xmin3 = imagelet_io_4_0;
+  mcu_macro[1][2].xmin3 = imagelet_io_4_1;
+  mcu_macro[0][2].ymin3 = 0;
+  mcu_macro[1][2].ymin3 = 0;
+  mcu_macro[0][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][2].iter2 = imagelet_size;
+  mcu_macro[1][2].iter2 = imagelet_size;
+  mcu_macro[0][2].iter3 = 0;
+  mcu_macro[1][2].iter3 = 0;
+  mcu_macro[0][2].iter4 = 0;
+  mcu_macro[1][2].iter4 = 0;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_SUP3;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_SUP3;
+  // 3: <.(3) -> 3
+  mcu_macro[0][3].xmin1 = imagelet_io_3_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_3_1;
+  mcu_macro[0][3].ymin1 = 0;
+  mcu_macro[1][3].ymin1 = 0;
+  mcu_macro[0][3].xmin2 = imagelet_io_3_0;
+  mcu_macro[1][3].xmin2 = imagelet_io_3_1;
+  mcu_macro[0][3].ymin2 = 0;
+  mcu_macro[1][3].ymin2 = 0;
+  // copy of operation 3 parameters
+  p_3[0] = pi9;
+  gram.xoffset = x_3;
+  gram.yoffset = y_3;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_3;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][3].xmin3 = x_3;
+  mcu_macro[1][3].xmin3 = x_3;
+  mcu_macro[0][3].ymin3 = y_3;
+  mcu_macro[1][3].ymin3 = y_3;
+  mcu_macro[0][3].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][3].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][3].iter2 = imagelet_size;
+  mcu_macro[1][3].iter2 = imagelet_size;
+  mcu_macro[0][3].iter3 = 0;
+  mcu_macro[1][3].iter3 = 0;
+  mcu_macro[0][3].iter4 = 0;
+  mcu_macro[1][3].iter4 = 0;
+  mcu_macro[0][3].addrStart = TERAPIX_UCODE_INF_CONST;
+  mcu_macro[1][3].addrStart = TERAPIX_UCODE_INF_CONST;
+  // 4: >(3,4) -> 3
+  mcu_macro[0][4].xmin1 = imagelet_io_3_0;
+  mcu_macro[1][4].xmin1 = imagelet_io_3_1;
+  mcu_macro[0][4].ymin1 = 0;
+  mcu_macro[1][4].ymin1 = 0;
+  mcu_macro[0][4].xmin2 = imagelet_io_4_0;
+  mcu_macro[1][4].xmin2 = imagelet_io_4_1;
+  mcu_macro[0][4].ymin2 = 0;
+  mcu_macro[1][4].ymin2 = 0;
+  mcu_macro[0][4].xmin3 = imagelet_io_3_0;
+  mcu_macro[1][4].xmin3 = imagelet_io_3_1;
+  mcu_macro[0][4].ymin3 = 0;
+  mcu_macro[1][4].ymin3 = 0;
+  mcu_macro[0][4].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][4].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][4].iter2 = imagelet_size;
+  mcu_macro[1][4].iter2 = imagelet_size;
+  mcu_macro[0][4].iter3 = 0;
+  mcu_macro[1][4].iter3 = 0;
+  mcu_macro[0][4].iter4 = 0;
+  mcu_macro[1][4].iter4 = 0;
+  mcu_macro[0][4].addrStart = TERAPIX_UCODE_SUP3;
+  mcu_macro[1][4].addrStart = TERAPIX_UCODE_SUP3;
+
+
+  // inputs:
+  // - imagelet 1 is i0 for im1
+  tile_in[0][0].x = imagelet_io_1_0;
+  tile_in[0][0].y = 0;
+  tile_in[1][0].x = imagelet_io_1_1;
+  tile_in[1][0].y = 0;
+  // - imagelet 2 is i1 for im2
+  tile_in[0][1].x = imagelet_io_2_0;
+  tile_in[0][1].y = 0;
+  tile_in[1][1].x = imagelet_io_2_1;
+  tile_in[1][1].y = 0;
+  // - imagelet 3 is i2 for im3
+  tile_in[0][2].x = imagelet_io_3_0;
+  tile_in[0][2].y = 0;
+  tile_in[1][2].x = imagelet_io_3_1;
+  tile_in[1][2].y = 0;
+
+  // outputs:
+  // - imagelet 1 is o0 for im1
+  tile_out[0][0].x = imagelet_io_1_0;
+  tile_out[0][0].y = 0;
+  tile_out[1][0].x = imagelet_io_1_1;
+  tile_out[1][0].y = 0;
+  // - imagelet 2 is o1 for im2
+  tile_out[0][1].x = imagelet_io_2_0;
+  tile_out[0][1].y = 0;
+  tile_out[1][1].x = imagelet_io_2_1;
+  tile_out[1][1].y = 0;
+  // - imagelet 4 is o2 for im4
+  tile_out[0][2].x = imagelet_io_4_0;
+  tile_out[0][2].y = 0;
+  tile_out[1][2].x = imagelet_io_4_1;
+  tile_out[1][2].y = 0;
+  // - imagelet 3 is o3 for im3
+  tile_out[0][3].x = imagelet_io_3_0;
+  tile_out[0][3].y = 0;
+  tile_out[1][3].x = imagelet_io_3_1;
+  tile_out[1][3].y = 0;
+
+  // imagelet erosion for the computation
+  mcu_instr.borderTop    = 0;
+  mcu_instr.borderBottom = 0;
+  mcu_instr.borderLeft   = 0;
+  mcu_instr.borderRight  = 0;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
+
+  // outputs
+  mcu_instr.nbout = 4;
+  mcu_instr.out0 = tile_out[0];
+  mcu_instr.out1 = tile_out[1];
+
+  // inputs
+  mcu_instr.nbin = 3;
+  mcu_instr.in0 = tile_in[0];
+  mcu_instr.in1 = tile_in[1];
+
+  // actual instructions
+  mcu_instr.nbinstr = 5;
+  mcu_instr.instr0   = mcu_macro[0];
+  mcu_instr.instr1   = mcu_macro[1];
+
+  // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, o1, o2, o3, i0, i1, i2);
+
+  // extract measures
+
+  return ret;
+}
+
+
+! updated function
+
+int freia_60(freia_dataio *in, freia_dataio *out)
+{
+   freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
+   
+   // allocate
+   im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
+   im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
+   im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
+   im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
+   
+   // read images
+   freia_common_rx_image(im1, in);                                      /*0015*/
+   freia_common_rx_image(im2, in);                                      /*0016*/
+   freia_common_rx_image(im3, in);                                      /*0017*/
+   
+   // computation
+   freia_60_helper_0_0_0(im1, im2, im4, im3, im1, im2, im3, 150, 200, 250);            /*0020*/
+   
+   // output images
+   freia_common_tx_image(im1, out);                                     /*0027*/
+   freia_common_tx_image(im2, out);                                     /*0028*/
+   freia_common_tx_image(im3, out);                                     /*0029*/
+   freia_common_tx_image(im4, out);                                     /*0030*/
+   
+   // cleanup
+   freia_common_destruct_data(im1);                                     /*0033*/
+   freia_common_destruct_data(im2);                                     /*0034*/
+   freia_common_destruct_data(im3);                                     /*0035*/
+   freia_common_destruct_data(im4);                                     /*0036*/
+
+   return 0;                                                            /*0038*/
+}
+
+! cleaned up function
+
+int freia_60(freia_dataio *in, freia_dataio *out)
+{
+   freia_data2d *im1, *im2, *im3, *im4;                                 /*0006*/
+   
+   // allocate
+   im1 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0009*/
+   im2 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0010*/
+   im3 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0011*/
+   im4 = freia_common_create_data(in->framebpp, in->framewidth, in->frameheight);      /*0012*/
+   
+   // read images
+   freia_common_rx_image(im1, in);                                      /*0015*/
+   freia_common_rx_image(im2, in);                                      /*0016*/
+   freia_common_rx_image(im3, in);                                      /*0017*/
+   
+   // computation
+   freia_60_helper_0_0_0(im1, im2, im4, im3, im1, im2, im3, 150, 200, 250);            /*0020*/
+   
+   // output images
+   freia_common_tx_image(im1, out);                                     /*0027*/
+   freia_common_tx_image(im2, out);                                     /*0028*/
+   freia_common_tx_image(im3, out);                                     /*0029*/
+   freia_common_tx_image(im4, out);                                     /*0030*/
+   
+   // cleanup
+   freia_common_destruct_data(im1);                                     /*0033*/
+   freia_common_destruct_data(im2);                                     /*0034*/
+   freia_common_destruct_data(im3);                                     /*0035*/
+   freia_common_destruct_data(im4);                                     /*0036*/
+
+   return 0;                                                            /*0038*/
+}
+#
+# FREIA COMPILATION DONE
+#
+

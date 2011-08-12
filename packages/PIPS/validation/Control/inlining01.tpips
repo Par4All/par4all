@@ -1,0 +1,17 @@
+setenv WS=inlining01
+
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+activate NEW_CONTROLIZER
+
+display PARSED_PRINTED_FILE[main]
+display PRINTED_FILE[main]
+
+close
+quit

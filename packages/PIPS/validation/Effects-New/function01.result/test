@@ -1,0 +1,13 @@
+void function01()
+{
+//             <    is written>: f
+   int (*f)(int) = foo;
+   int j;
+//             <    is read   >: f
+
+   if (f==foo)
+//             <    is written>: j
+      j = foo(2);
+
+   return;
+}

@@ -34,29 +34,29 @@ freia_error freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t c
       return 0;
    }
 
-   if (connexity==4) goto switch_1_case_4;
-   if (connexity==6) goto switch_1_case_6;
-   if (connexity==8) goto switch_1_case_8;
+   if (connexity==4) goto _switch_1_case_4;
+   if (connexity==6) goto _switch_1_case_6;
+   if (connexity==8) goto _switch_1_case_8;
 
-switch_1_default:   ;
+_switch_1_default:   ;
    return 2;
 
-switch_1_case_8:   ;
+_switch_1_case_8:   ;
    freia_aipo_dilate_8c(imout, imin, kernel_8c);
    for (i = 1;i<size;i++)
       freia_aipo_dilate_8c(imout, imout, kernel_8c);
-   goto break_1;
+   goto _break_1;
 
-switch_1_case_6:   ;
+_switch_1_case_6:   ;
    freia_aipo_dilate_6c(imout, imin, kernel_6c);
    for (i = 1;i<size;i++)
       freia_aipo_dilate_6c(imout, imout, kernel_6c);
-   goto break_1;
-switch_1_case_4:   ;
+   goto _break_1;
+_switch_1_case_4:   ;
    freia_aipo_dilate_8c(imout, imin, kernel_4c);
    for (i = 1;i<size;i++)
       freia_aipo_dilate_8c(imout, imout, kernel_4c);
-break_1:   ;
+_break_1:   ;
 
    return 0;
 }

@@ -1,0 +1,69 @@
+setenv WS=freia_52
+
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+setproperty SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE 2
+
+create $WS $WS.c
+
+display CALLGRAPH_FILE[$WS]
+
+echo
+echo ==============================================
+#shell echo initial `date`
+echo ==============================================
+echo
+
+echo
+echo Cumulated effects for "$WS"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[$WS]
+
+echo
+echo ==============================================
+#shell echo after cumulated effects `date`
+echo ==============================================
+echo
+
+echo
+echo Transformers for $WS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[$WS]
+
+echo
+echo ==============================================
+#shell echo After transformers `date`
+echo ==============================================
+echo
+
+apply PRECONDITIONS_INTER_FULL[$WS]
+
+echo
+echo ==============================================
+#shell echo After preconditions `date`
+echo ==============================================
+echo
+
+echo
+echo Preconditions for $WS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[$WS]
+
+echo
+echo ==============================================
+#shell echo After printing the preconditions `date`
+echo ==============================================
+echo
+
+close
+delete $WS
+quit

@@ -1,0 +1,17 @@
+setenv WS=bool03
+
+delete $WS
+
+# Not set, on purpose to check the error recovery during a create
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+echo Let us try the creation... that is going to fail.
+
+create $WS $WS.c
+
+close
+
+# The database is not created...
+# shell cat $WS.database/Warnings
+
+quit

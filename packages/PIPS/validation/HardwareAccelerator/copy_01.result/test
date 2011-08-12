@@ -94,7 +94,7 @@ digraph "dag_cleaned_0" {
   "30 E8" [shape=box];
   "30 E8" -> "33 E8" [label="open"];
   "28 E8" [shape=box];
-  "28 E8" -> "30 E8" [label="open"];
+  "28 E8" -> "30 E8" [label="open_1"];
   "in" -> "28 E8";
 }
 

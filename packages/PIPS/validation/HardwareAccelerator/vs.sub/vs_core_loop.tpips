@@ -1,0 +1,5 @@
+setenv WSPACE vs_core_loop
+setenv NAME vs_core_loop
+setenv FILE $NAME.c
+setproperty FREIA_CAST_IS_COPY TRUE
+source default_tpips

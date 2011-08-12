@@ -6,18 +6,18 @@ int main()
    int i = 1;
 
    if (i==1)
-      goto switch_1_case_1;
+      goto _switch_1_case_1;
    if (i==2)
-      goto switch_1_case_2;
-   goto switch_1_default;
-switch_1_case_1:   ;
+      goto _switch_1_case_2;
+   goto _switch_1_default;
+_switch_1_case_1:   ;
    printf("1 = %d", i);
-   goto break_1;
-switch_1_case_2:   ;
+   goto _break_1;
+_switch_1_case_2:   ;
    printf("2 = %d", i);
-   goto break_1;
-switch_1_default:   ;
-break_1:   ;
+   goto _break_1;
+_switch_1_default:   ;
+_break_1:   ;
 }
 
 Printed file for main
@@ -25,16 +25,16 @@ Printed file for main
 int main()
 {
    int i = 1;
-   if (i==1) goto switch_1_case_1;
-   if (i==2) goto switch_1_case_2;
-switch_1_default:   ;
-   goto break_1;
-switch_1_case_2:   ;
+   if (i==1) goto _switch_1_case_1;
+   if (i==2) goto _switch_1_case_2;
+_switch_1_default:   ;
+   goto _break_1;
+_switch_1_case_2:   ;
    printf("2 = %d", i);
-   goto break_1;
-switch_1_case_1:   ;
+   goto _break_1;
+_switch_1_case_1:   ;
    printf("1 = %d", i);
-break_1:   ;
+_break_1:   ;
 }
 Try more aggressive restructuring:
 
@@ -44,13 +44,13 @@ int main()
 {
    int i = 1;
    if (i==1) {
-switch_1_case_1:      ;
+_switch_1_case_1:      ;
       printf("1 = %d", i);
    }
    else if (i==2) {
-switch_1_case_2:      ;
+_switch_1_case_2:      ;
       printf("2 = %d", i);
    }
-switch_1_default:   ;
-break_1:   ;
+_switch_1_default:   ;
+_break_1:   ;
 }

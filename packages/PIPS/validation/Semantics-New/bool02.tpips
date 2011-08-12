@@ -1,0 +1,30 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv NAME bool02
+# ATTENTION, réutilise le fichier bool00.c
+setenv FILE bool00.c
+# même test mais avec "register"
+
+delete $NAME
+create $NAME $FILE
+
+setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+
+#activate CUMULATED_POINTER_EFFECTS_WITH_POINTS_TO
+#activate PROPER_EFFECTS_WITH_POINTS_TO
+
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+# try with registers
+apply FORCE_REGISTER_DECLARATIONS[main]
+
+echo
+echo Idem After forcing registers
+echo
+display PRINTED_FILE[main]
+close
+delete $NAME

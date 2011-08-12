@@ -1,0 +1,6 @@
+The read memory effect on f was missed for its first use in function03.c.
+It is now OK, but the write any_module:anywhere is a bit excessive if correct.
+If the code of the function pointed by f is correct, it cannot change the value of f
+because it cannot be visible inside *f(2)...
+
+I'm kind of going Fabien's way. Time to stop and implement proper analyses.

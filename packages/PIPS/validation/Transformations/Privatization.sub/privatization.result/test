@@ -3,7 +3,8 @@
 //
 int main(int argc, char *argv[])
 {
-   int i = 0, j = i++, k = 0;
+   int i = 0;
+   int j = i++, k = 0;
 #pragma omp for private(i,j)
    for(i = 0; i <= 9; i += 1)
 #pragma omp for private(j)
@@ -17,7 +18,8 @@ int main(int argc, char *argv[])
 //
 int main(int argc, char *argv[])
 {
-   int i = 0, j = i++, k = 0;
+   int i = 0;
+   int j = i++, k = 0;
    {
       //PIPS generated variable
       int i;

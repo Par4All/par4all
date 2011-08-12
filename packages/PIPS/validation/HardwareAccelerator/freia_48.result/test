@@ -34,11 +34,11 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "15 =" [shape=circle];
-  "15 =" -> "out";
+  "15 =" -> "out'";
   "14 /." [shape=trapezium,orientation=270];
   "14 /." -> "15 =" [label="t1"];
   "13 +" [shape=trapezium,orientation=270];
@@ -59,15 +59,15 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
-  "13 +" -> "14 /." [label="out"];
+  "13 +" -> "14 /." [label="out_1"];
   "12 *." [shape=trapezium,orientation=270];
-  "12 *." -> "13 +" [label="out"];
+  "12 *." -> "13 +" [label="out_2"];
   "out" -> "12 *.";
   "11 *." [shape=trapezium,orientation=270];
   "11 *." -> "13 +" [label="t0"];
@@ -123,11 +123,11 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "15 =" [shape=circle];
-  "15 =" -> "out";
+  "15 =" -> "out'";
   "14 /." [shape=trapezium,orientation=270];
   "14 /." -> "15 =" [label="t1"];
   "13 +" [shape=trapezium,orientation=270];
@@ -148,11 +148,11 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "14 /." [label="out"];
   "12 *." [shape=trapezium,orientation=270];
@@ -166,19 +166,19 @@ digraph "dag_cleaned_0" {
 digraph "freia_48_helper_0_0" {
   // inputs
   "in" [shape=circle];
-  "out_3" [shape=circle];
+  "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "14 /." [label="out_1"];
   "12 *." [shape=trapezium,orientation=270];
   "12 *." -> "13 +" [label="out_2"];
-  "out_3" -> "12 *.";
+  "out" -> "12 *.";
   "11 *." [shape=trapezium,orientation=270];
   "11 *." -> "13 +" [label="t0"];
   "in" -> "11 *.";
@@ -224,9 +224,9 @@ freia_status freia_48_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 1
-  // out_3 [0 input 1] -> [1 alu] 12 mul_const
+  // out [0 input 1] -> [1 alu] 12 mul_const
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // out_3 [1 input 1] -> [1 alu] 12 mul_const
+  // out [1 input 1] -> [1 alu] 12 mul_const
   // nope
   // alu 12 mul_const stage 1 flipped
   si.alu[1][0].op = SPOC_ALU_MUL_IN1_CONST;
@@ -351,11 +351,11 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "15 =" [shape=circle];
-  "15 =" -> "out";
+  "15 =" -> "out'";
   "14 /." [shape=trapezium,orientation=270];
   "14 /." -> "15 =" [label="t1"];
   "13 +" [shape=trapezium,orientation=270];
@@ -376,11 +376,11 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "14 /." [label="out"];
   "12 *." [shape=trapezium,orientation=270];
@@ -394,19 +394,19 @@ digraph "dag_cleaned_0" {
 digraph "freia_48_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
-  "out_3" [shape=circle];
+  "out" [shape=circle];
 
   // outputs
-  "out" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
   "14 /." [shape=trapezium,orientation=270];
-  "14 /." -> "out";
+  "14 /." -> "out'";
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "14 /." [label="out_1"];
   "12 *." [shape=trapezium,orientation=270];
   "12 *." -> "13 +" [label="out_2"];
-  "out_3" -> "12 *.";
+  "out" -> "12 *.";
   "11 *." [shape=trapezium,orientation=270];
   "11 *." -> "13 +" [label="t0"];
   "in" -> "11 *.";
@@ -630,7 +630,7 @@ freia_status freia_48_helper_0_0_0(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for out_3
+  // - imagelet 2 is i1 for out
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;

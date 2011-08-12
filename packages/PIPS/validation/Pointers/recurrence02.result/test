@@ -1,0 +1,87 @@
+
+Proper effects for "recurrence02"
+
+void recurrence02(list l)
+{
+//             <    is written>: i
+   int i = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l
+   l->content = &i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   l->next->content = &i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   l->next->next->content = &i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   l->next->next->next->content = &i;
+   return;
+}
+
+POINTS TO for "recurrence02"
+
+
+// Points To:
+// l -> &_l_1[0] , EXACT
+
+void recurrence02(list l)
+{
+
+// Points To:
+// l -> &_l_1[0] , EXACT
+
+   int i = 0;
+
+// Points To:
+// l -> &_l_1[0] , EXACT
+
+   l->content = &i;
+
+// Points To:
+// *ANY_MODULE*:*NOWHERE*_b0 -> &i , EXACT
+// l -> &_l_1[0] , EXACT
+
+   l->next->content = &i;
+
+// Points To:
+// *ANY_MODULE*:*NOWHERE*_b0 -> &i , EXACT
+// l -> &_l_1[0] , EXACT
+
+   l->next->next->content = &i;
+
+// Points To:
+// *ANY_MODULE*:*NOWHERE*_b0 -> &i , EXACT
+// l -> &_l_1[0] , EXACT
+
+   l->next->next->next->content = &i;
+
+// Points To:
+// *ANY_MODULE*:*NOWHERE*_b0 -> &i , EXACT
+// l -> &_l_1[0] , EXACT
+
+   return;
+}
+
+Proper effects using points_to
+
+void recurrence02(list l)
+{
+//             <    is written>: i
+   int i = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l
+   l->content = &i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   l->next->content = &i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   l->next->next->content = &i;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   l->next->next->next->content = &i;
+   return;
+}
+

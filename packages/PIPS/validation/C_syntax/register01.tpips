@@ -1,0 +1,16 @@
+delete register01
+create register01 register01.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[main]
+
+
+close
+
+delete register01 
+
+quit

@@ -55,7 +55,7 @@ l99998:      ;
 
 //  T() {}
 
-      if (!(i<255)) goto break_2;
+      if (!(i<255)) goto _break_2;
 
 //  T() {}
 
@@ -79,7 +79,7 @@ l99998:      ;
 
 //  T() {}
 
-      if (line[i]=='\n') goto break_2;
+      if (line[i]=='\n') goto _break_2;
 
 //  T(i) {i#init<=i, i<=i#init+1}
 
@@ -97,7 +97,7 @@ l99999:      ;
 
 //  T() {}
 
-break_2:      ;
+_break_2:      ;
 
 //  T() {}
 

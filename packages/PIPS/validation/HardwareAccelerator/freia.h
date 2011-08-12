@@ -6,7 +6,18 @@
 #ifndef NULL
 #define NULL ((void*)0)
 #endif // NULL
+// hmmm... override some defines?
+#ifdef false
+#undef false
+#endif // false
+#ifdef true
+#undef true
+#endif // true
+#ifdef bool
+#undef bool
+#endif // bool
 typedef enum { false, true } bool;
+// integer types
 typedef int int32_t;
 typedef unsigned int uint32_t; // ??? for convolution & correlation
 typedef struct {
@@ -15,9 +26,12 @@ typedef struct {
   void * raw, **row;
   int stuff;
 } freia_data2d;
-typedef enum { FREIA_OK, FREIA_ERROR } freia_status;
+typedef enum {
+  FREIA_OK, FREIA_ERROR,
+  FREIA_SIZE_ERROR, FREIA_INVALID_PARAM
+} freia_status;
 typedef struct {
-  int framebpp, framewidth, frameheight, stuff;
+  int framebpp, framewidth, frameheight, frameindex, stuff;
 } freia_dataio;
 typedef void * freia_ptr;
 
@@ -51,20 +65,25 @@ extern freia_status freia_common_draw_line(freia_data2d *, int32_t, int32_t, int
 extern freia_status freia_common_draw_rect(freia_data2d *, int32_t, int32_t, int32_t, int32_t, int32_t);
 extern freia_status freia_common_draw_disc(freia_data2d *, int32_t, int32_t, int32_t, int32_t);
 extern freia_status freia_common_set_wa(freia_data2d *, int32_t, int32_t, int32_t, int32_t);
+extern freia_status freia_common_get_wa(const freia_data2d *, int32_t *, int32_t *, int32_t *, int32_t *);
 extern freia_status freia_common_reset_wa(freia_data2d *);
 
 // Misc
 extern void freia_initialize(int, char **);
 extern void freia_shutdown(void);
-extern int32_t freia_common_get(freia_data2d *, int32_t, int32_t);
+
 extern freia_ptr freia_common_alloc(uint32_t);
 extern void freia_common_free(freia_ptr);
+
+extern int32_t freia_common_get(const freia_data2d *, int32_t, int32_t);
+extern void freia_common_set(freia_data2d *, int32_t, int32_t, int32_t);
 
 // some CIPO functions
 extern freia_status freia_cipo_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
 extern freia_status freia_cipo_inner_gradient(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
 extern freia_status freia_cipo_close(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
 extern freia_status freia_cipo_open(freia_data2d *, const freia_data2d *, int32_t, uint32_t);
+extern freia_status freia_cipo_fast_correlation(freia_data2d *, const freia_data2d *, const freia_data2d *, uint32_t);
 
 // AIPO function definitions
 // Arithmetic
