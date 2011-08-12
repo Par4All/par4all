@@ -671,128 +671,138 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
   // effects package entities are not usual variables
   if (effects_package_entity_p(e1) || effects_package_entity_p(e2))
     conflict_p = (e1 == e2);
+  // idem with "register" variables which are in a world of their own
+  else if (entity_register_p(e1) || entity_register_p(e2))
+    conflict_p = (e1 == e2);
   else if (!c_module_p(get_current_module_entity()))
-    {
-      pips_debug(5, "fortran case\n");
-      if (same_entity_p(e1, e2))
-	conflict_p = true;
-      else
-	conflict_p = must_p ? false : variable_entity_may_conflict_p( e1, e2 );
-    }
+  {
+    pips_debug(5, "fortran case\n");
+    if (same_entity_p(e1, e2))
+      conflict_p = true;
+    else
+      conflict_p = must_p ? false : variable_entity_may_conflict_p( e1, e2 );
+  }
   else
+  {
+    // these are costly function calls; call them only once.
+    bool e1_abstract_location_p = entity_abstract_location_p( e1 );
+    bool e2_abstract_location_p = entity_abstract_location_p( e2 );
+
+    bool (*abstract_locations_conflict_p)(entity,entity);
+    abstract_locations_conflict_p =
+      must_p ? abstract_locations_must_conflict_p :
+      abstract_locations_may_conflict_p;
+
+    if (e1_abstract_location_p && e2_abstract_location_p)
     {
-      // these are costly function calls; call them only once.
-      bool e1_abstract_location_p = entity_abstract_location_p( e1 );
-      bool e2_abstract_location_p = entity_abstract_location_p( e2 );
+      // two abstract locations
+      conflict_p = abstract_locations_conflict_p( e1, e2 );
+    }
+    else if (e1_abstract_location_p || e2_abstract_location_p)
+    {
+      // one abstract location and a concrete one
+      entity abstract_location = e1_abstract_location_p? e1 : e2;
+      entity concrete_location = e1_abstract_location_p? e2 : e1;
 
-      bool (*abstract_locations_conflict_p)(entity,entity);
-      abstract_locations_conflict_p =
-	must_p ? abstract_locations_must_conflict_p :
-	abstract_locations_may_conflict_p;
+      if (entity_null_locations_p(concrete_location))
+        conflict_p = entity_all_locations_p(abstract_location);
 
-      if (e1_abstract_location_p && e2_abstract_location_p)
-	{
-	  // two abstract locations
-	  conflict_p = abstract_locations_conflict_p( e1, e2 );
-	}
-      else if (e1_abstract_location_p || e2_abstract_location_p)
-	{
-	  // one abstract location and a concrete one
-	  entity abstract_location = e1_abstract_location_p? e1 : e2;
-	  entity concrete_location = e1_abstract_location_p? e2 : e1;
-
-	  if (entity_null_locations_p(concrete_location))
-	    conflict_p = entity_all_locations_p(abstract_location);
-
-	  else if ( entity_variable_p(concrete_location) )
+      else if ( entity_variable_p(concrete_location) )
 	    {
 	      if ( variable_return_p( concrete_location ) )
-		{
-		  conflict_p = false;
-		}
+        {
+          conflict_p = false;
+        }
 	      else if ( entity_formal_p( concrete_location ) )
-		{
-		  /* FI: Either we need an new abstract location for the formal
-		     parameters or we need to deal explictly with this case
-		     here and declare conflict with *anywhere*. */
-		  conflict_p = entity_all_locations_p(abstract_location);
-		}
+        {
+          /* FI: Either we need an new abstract location for the formal
+             parameters or we need to deal explictly with this case
+             here and declare conflict with *anywhere*. */
+          conflict_p = entity_all_locations_p(abstract_location);
+        }
 	      else
-		{
-		  entity concrete_location_al = variable_to_abstract_location( concrete_location );
-		  conflict_p = abstract_locations_conflict_p( abstract_location, concrete_location_al );
-		}
+        {
+          entity concrete_location_al =
+            variable_to_abstract_location(concrete_location);
+          conflict_p = abstract_locations_conflict_p(abstract_location,
+                                                     concrete_location_al);
+        }
 	    }
-	  else
-	    {
-	      pips_internal_error("Unexpected case.");
-	    }
-	}
+      else if(entity_function_p(concrete_location)) {
+	      pips_internal_error("Meaningless conflict tested for function \"%s\".",
+                            entity_user_name(concrete_location));
+      }
       else
-	{
-	  // two concrete locations
-	  if ( variable_return_p( e1 ) && variable_return_p( e2 ) )
+	    {
+	      pips_internal_error("Unexpected case for variable \"%s\".",
+                            entity_user_name(concrete_location));
+	    }
+    }
+    else
+    {
+      // two concrete locations
+      if ( variable_return_p( e1 ) && variable_return_p( e2 ) )
 	    {
 	      conflict_p =  same_entity_p(e1,e2);
 	    }
-	  else if ( entity_formal_p( e1 ) && entity_formal_p( e2 ) )
+      else if ( entity_formal_p( e1 ) && entity_formal_p( e2 ) )
 	    {
 	      conflict_p = same_entity_p(e1,e2);
 	    }
-	  else if( entity_null_locations_p(e1) || entity_null_locations_p(e2) )
+      else if( entity_null_locations_p(e1) || entity_null_locations_p(e2) )
 	    {
 	      conflict_p = same_entity_p(e1,e2);
 	    }
-	  else if ( entity_variable_p(e1) && entity_variable_p(e2) )
+      else if ( entity_variable_p(e1) && entity_variable_p(e2) )
 	    {
 	      /* FIXME : variable_entity_must_conflict_p does not exist yet */
 	      if( !must_p)
-		{
-		  conflict_p = variable_entity_may_conflict_p( e1, e2 );
-		}
+        {
+          conflict_p = variable_entity_may_conflict_p( e1, e2 );
+        }
 	      else
-		{
-		  /* A must conflict is useful to guarantee a kill, but this
-		     shows that it is not related to the definition of the
-		     may case: two variables may share exactly the same set
-		     of memory locations but a reference to one of them does
-		     not necessarily imply that all locations are read or
-		     written. More comments (thinking) are needed to
-		     distinguish between entity and reference conflicts. */
-		  /* We assume that e1 and e2 are program variables. Because
-		     we do not have enough comments, we do not know if this
-		     only hold for variables and arrays of one element. It is
-		     easy to argue that an array cannot must conflict with
-		     itself. The test below does not solve the case of
-		     struct, and maybe union. */
-		  if(entity_scalar_p(e1)) // should always be the case here
-		    conflict_p = same_entity_p(e1,e2);
-		  else
-		    conflict_p = false;
-		}
+        {
+          /* A must conflict is useful to guarantee a kill, but this
+             shows that it is not related to the definition of the
+             may case: two variables may share exactly the same set
+             of memory locations but a reference to one of them does
+             not necessarily imply that all locations are read or
+             written. More comments (thinking) are needed to
+             distinguish between entity and reference conflicts. */
+          /* We assume that e1 and e2 are program variables. Because
+             we do not have enough comments, we do not know if this
+             only hold for variables and arrays of one element. It is
+             easy to argue that an array cannot must conflict with
+             itself. The test below does not solve the case of
+             struct, and maybe union. */
+          if(entity_scalar_p(e1)) // should always be the case here
+            conflict_p = same_entity_p(e1,e2);
+          else
+            conflict_p = false;
+        }
 	    }
-	  else
+      else
 	    {
 	      /* FI: we end up here if references linked to environment or
-		 type declarations are tested for conflicts. Should we
-		 perform such tests, basically e1==e2, or assume that they
-		 should have been handled at a higher level? */
+           type declarations are tested for conflicts. Should we
+           perform such tests, basically e1==e2, or assume that they
+           should have been handled at a higher level? */
 	      if(!variable_entity_p(e1) || variable_entity_p(e2))
-		{
-		  /* There are no conflicts between entities of different
-		     kinds */
-		  /* Since this implies e1!=e2, this case could be merged
-		     with the next one, but the spec would be less clear */
-		  conflict_p = false;
-		}
+        {
+          /* There are no conflicts between entities of different
+             kinds */
+          /* Since this implies e1!=e2, this case could be merged
+             with the next one, but the spec would be less clear */
+          conflict_p = false;
+        }
 	      else {
-		/* Environment and type declaration conflicts imply that
-		   the very same entity is involved. */
-		conflict_p = same_entity_p(e1,e2);
+          /* Environment and type declaration conflicts imply that
+             the very same entity is involved. */
+          conflict_p = same_entity_p(e1,e2);
 	      }
 	    }
-	} // end: two concrete locations
-    }
+    } // end: two concrete locations
+  }
   return conflict_p;
 }
 

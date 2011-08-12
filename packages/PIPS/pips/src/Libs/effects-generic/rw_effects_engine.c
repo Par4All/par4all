@@ -647,7 +647,7 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
       ifdebug(8)
 	{
 	  type ct = basic_concrete_type(entity_type(decl));
-	  pips_debug(8, "dealing with entity : %s with type %s\n", entity_local_name(decl),words_to_string(words_type(ct,NIL)));
+	  pips_debug(8, "dealing with entity : %s with type %s\n", entity_local_name(decl),words_to_string(words_type(ct,NIL,false)));
 	  free_type(ct);
 	}
 

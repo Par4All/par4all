@@ -1495,7 +1495,9 @@ static void freia_spoc_pipeline
       free_dagvtx(vr);
     }
   }
-  dag_compute_outputs(dpipe, NULL, output_images);
+
+  // hmmm???
+  dag_compute_outputs(dpipe, NULL, output_images, NIL, false);
 
   gen_free_list(vertices), vertices = NIL;
   set_free(computed), computed = NULL;
@@ -2029,7 +2031,10 @@ static dagvtx first_which_may_be_added
  */
 static list /* of dags */ split_dag(dag initial, const set output_images)
 {
-  pips_assert("no image reuse", single_image_assignement_p(initial));
+  // this may happen if an input image is also an output image...
+  // pips_assert("no image reuse", single_image_assignement_p(initial));
+  if (!single_image_assignement_p(initial))
+    pips_user_warning("still some image reuse...\n");
 
   // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
   // if everything was removed by optimizations, there is nothing to do.
@@ -2122,7 +2127,7 @@ static list /* of dags */ split_dag(dag initial, const set output_images)
         pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
         dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_compute_outputs(nd, NULL, output_images);
+      dag_compute_outputs(nd, NULL, output_images, NIL, false);
       dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
@@ -2168,6 +2173,7 @@ static list /* of dags */ split_dag(dag initial, const set output_images)
  */
 list freia_spoc_compile_calls
   (string module,
+   dag fulld,
    list /* of statements */ ls,
    const hash_table occs,
    const set output_images,
@@ -2178,13 +2184,13 @@ list freia_spoc_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  dag fulld = freia_build_dag(module, ls, number, occs, output_images);
   int n_op_init = freia_aipo_count(fulld, true);
   int n_op_init_copies = n_op_init - freia_aipo_count(fulld, false);
 
+  list added_stats =  freia_dag_optimize(fulld);
+
   // remove copies and duplicates if possible...
   // ??? maybe there should be an underlying transitive closure? not sure.
-  list added_stats = freia_dag_optimize(fulld);
   int n_op_opt = freia_aipo_count(fulld, true);
   int n_op_opt_copies = n_op_opt - freia_aipo_count(fulld, false);
 
@@ -2194,7 +2200,7 @@ list freia_spoc_compile_calls
           number, n_op_init, n_op_init_copies, n_op_opt, n_op_opt_copies);
 
   // dump final dag
-  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
 
   hash_table init = hash_table_make(hash_pointer, 0);
   list new_images = dag_fix_image_reuse(fulld, init, occs);
@@ -2219,6 +2225,8 @@ list freia_spoc_compile_calls
 
   int n_spoc_calls = 0;
   int n_pipes = 0;
+  int stnb = -1;
+
   FOREACH(dag, d, ld)
   {
     // skip non implemented stuff
@@ -2235,7 +2243,7 @@ list freia_spoc_compile_calls
     string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_pipes++)));
 
     ifdebug(4) dag_dump(stderr, "d", d);
-    dag_dot_dump(module, fname_dag, d);
+    dag_dot_dump(module, fname_dag, d, NIL);
 
     // one logical pipeline may be split because of overflow
     // the dag is updated to reflect that as a code generation side effect
@@ -2255,8 +2263,8 @@ list freia_spoc_compile_calls
 
       freia_spoc_pipeline(module, fname_split, code, d, &lparams,
                           output_images);
-      freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                      ls, fname_split, lparams);
+      stnb = freia_substitute_by_helper_call(d, global_remainings, remainings,
+                                             ls, fname_split, lparams, stnb);
 
       free(fname_split), fname_split = NULL;
     }
@@ -2271,9 +2279,6 @@ list freia_spoc_compile_calls
 
   fprintf(helper_file, "// # SPOC calls: %d\n", n_spoc_calls);
 
-  // no, copy statements are not done...
-  // pips_assert("all statements done", set_empty_p(global_remainings));
-
   freia_insert_added_stats(ls, added_stats);
   added_stats = NIL;
 
@@ -2283,7 +2288,6 @@ list freia_spoc_compile_calls
   // cleanup
   set_free(global_remainings), global_remainings = NULL;
   free(fname_fulldag), fname_fulldag = NULL;
-  free_dag(fulld);
   FOREACH(dag, dc, ld)
     free_dag(dc);
   gen_free_list(ld);

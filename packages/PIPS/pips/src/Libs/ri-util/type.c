@@ -298,10 +298,9 @@ type MakeAnyScalarResult(tag t, _int size)
 }
 
 
-/* Warning: the lengths of string basics are not checked!!!
- * string_type_size() could be used but it is probably not very robust.
- *
- * Second Warning: current version only compares ultimate_types
+
+/* similar as type_equals but by passes typedefs
+ * FI Warning: current version only compares ultimate_types
  * but check the various typedef that follows.
  *
  * typedef int foo;
@@ -335,8 +334,18 @@ type MakeAnyScalarResult(tag t, _int size)
  *     int y;
  * } d_t;
  *
- * type_EQUAL_P(c_t, d_t)==FALSE because strcutures (or unions or
+ * type_EQUAL_P(c_t, d_t)==FALSE because structures (or unions or
  * enums) with implicit names receive each a unique name.
+ */
+bool same_type_p(type t1, type t2)
+{
+  t1= ultimate_type(t1);
+  t2= ultimate_type(t2);
+  return type_equal_p(t1,t2);
+}
+
+/* Warning: the lengths of string basics are not checked!!!
+ * string_type_size() could be used but it is probably not very robust.
  *
  * typedef int foo[n+n];
  *
@@ -360,8 +369,6 @@ type MakeAnyScalarResult(tag t, _int size)
 bool type_equal_p(type t1, type t2)
 {
   bool tequal = false;
-  t1= ultimate_type(t1);
-  t2= ultimate_type(t2);
 
   if(t1 == t2)
     return true;
@@ -425,12 +432,17 @@ bool
 dimension_equal_p(dimension d1, dimension d2)
 {
     return /* same values */
-	same_expression_p(dimension_lower(d1), dimension_lower(d2)) &&
-	same_expression_p(dimension_upper(d1), dimension_upper(d2)) &&
-	/* and same names... */
-	same_expression_name_p(dimension_lower(d1), dimension_lower(d2)) &&
-	same_expression_name_p(dimension_upper(d1), dimension_upper(d2));
+        expression_equal_p(dimension_lower(d1), dimension_lower(d2)) &&
+        expression_equal_p(dimension_upper(d1), dimension_upper(d2)) ;
 }
+
+bool dimensions_equal_p(list dims1, list dims2) {
+    return gen_equals(dims1,dims2,(gen_eq_func_t)dimension_equal_p);
+}
+
+bool qualifiers_equal_p(list dims1, list dims2) {
+    return gen_equals(dims1,dims2,(gen_eq_func_t)qualifier_equal_p);
+}         
 
 bool variable_equal_p(variable v1, variable v2)
 {
@@ -440,9 +452,13 @@ bool variable_equal_p(variable v1, variable v2)
       return false;
   else if (v1 != variable_undefined && v2 == variable_undefined)
       return false;
-  else if (!basic_equal_p(variable_basic(v1), variable_basic(v2)))
-      return false;
   else {
+      /* must check basic, dimension and qualifiers */
+      return 
+          basic_equal_p(variable_basic(v1), variable_basic(v2)) &&
+          dimensions_equal_p(variable_dimensions(v1), variable_dimensions(v2)) &&
+          qualifiers_equal_p(variable_qualifiers(v1), variable_qualifiers(v2)) ;
+
       list ld1 = variable_dimensions(v1);
       list ld2 = variable_dimensions(v2);
 
@@ -472,7 +488,7 @@ bool variable_equal_p(variable v1, variable v2)
   }
   return true;
 }
-bool basic_equal_strict_p(basic b1, basic b2)
+bool basic_equal_p(basic b1, basic b2)
 {
   if(b1 == b2)
     return true;
@@ -545,7 +561,8 @@ bool basic_equal_strict_p(basic b1, basic b2)
   return false; /* just to avoid a warning */
 }
 
-bool basic_equal_p(basic b1, basic b2)
+/* check if two basics are similar. That is if they are equal modulo typedefs */
+bool same_basic_p(basic b1, basic b2)
 {
   if( basic_typedef_p(b1) )
     {
@@ -558,7 +575,7 @@ bool basic_equal_p(basic b1, basic b2)
       type t2 = ultimate_type( entity_type(basic_typedef(b2)) );
       b2 = variable_basic(type_variable(t2));
     }
-  return basic_equal_strict_p(b1,b2);
+  return basic_equal_p(b1,b2);
 
 }
 
@@ -810,6 +827,16 @@ string safe_type_to_string(type t)
     return "undefined type";
   else
     return type_to_string(t);
+}
+
+/* SG: I don't understand the previous functions */
+string string_of_type(const type t)
+{
+  list wl = words_type(t, NIL, false);
+  string s = words_to_string(wl);
+  FOREACH(STRING,s,wl) free(s);
+  gen_free_list(wl);
+  return s;
 }
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
@@ -1333,8 +1360,18 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
             free_basic(rb);
             rb = basic_of_expression(EXPRESSION(CAR(CDR(args))));
         }
+        else if(ENTITY_MINUS_C_P(f)) {
+            /* This must be a pointer difference. Else, the parser
+	       would have used ENTITY_MINUS (see
+	       simplify_C_expression()). */
+            free_basic(rb);
+	    rb = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
+        }
         else {
             free_basic(rb);
+	    // FI: within declaration initializations, rb may be
+	    // undefined because the expressions uses a variable that
+	    // has not yet been typed by the parser. See C_syntax/simplify01.c
             rb = basic_of_expression(EXPRESSION(CAR(args)));
 
             FOREACH(EXPRESSION, arg, CDR(args)){
@@ -1346,7 +1383,7 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
               rb = new_rb;
             }
 	    /* logical variables can be used as integer arguments */
-	    if(basic_logical_p(rb))
+	    if(!basic_undefined_p(rb) && basic_logical_p(rb))
 	      if(arithmetic_intrinsic_p(f)) {
 		free_basic(rb);
 		rb = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
@@ -1691,7 +1728,7 @@ type intrinsic_call_to_type(call c)
 
     pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
 	       module_local_name(f),
-	       words_to_string(words_type(rt, NIL)));
+	       words_to_string(words_type(rt, NIL, false)));
 
     if(basic_overloaded_p(rb))
       {
@@ -1830,7 +1867,7 @@ type intrinsic_call_to_type(call c)
   pips_debug(7, "Intrinsic call to intrinsic \"%s\" "
 	     "with a posteriori result type \"%s\"\n",
 	     module_local_name(f),
-	     words_to_string(words_type(t, NIL)));
+	     words_to_string(words_type(t, NIL, false)));
 
   return t;
 }
@@ -1880,12 +1917,12 @@ type call_to_type(call c)
 type reference_to_type(reference ref)
 {
   type t = type_undefined;
-  pips_debug(6, "input entity type %s\n", words_to_string(words_type(entity_type(reference_variable(ref)), NIL)));
+  pips_debug(6, "input entity type %s\n", words_to_string(words_type(entity_type(reference_variable(ref)), NIL, false)));
 
   type exp_type = basic_concrete_type(entity_type(reference_variable(ref)));
 
   pips_debug(6, "reference case \n");
-  pips_debug(6, "exp_type %s\n", words_to_string(words_type(exp_type, NIL)));
+  pips_debug(6, "exp_type %s\n", words_to_string(words_type(exp_type, NIL, false)));
 
   if(type_variable_p(exp_type))
     {
@@ -1903,7 +1940,7 @@ type reference_to_type(reference ref)
 
 	  ifdebug(7) {
 	    pips_debug(7, "new iteration : current type : %s\n",
-		       words_to_string(words_type(ct, NIL)));
+		       words_to_string(words_type(ct, NIL, false)));
 	    pips_debug(7, "current list of indices: \n");
 	    print_expressions(l_inds);
 	  }
@@ -1932,7 +1969,7 @@ type reference_to_type(reference ref)
 		    make_variable(copy_basic(cb),
 				  gen_full_copy_list(cd),
 				  NIL));
-      pips_debug(6, "t at the end of reference case %s\n", words_to_string(words_type(t, NIL)));
+      pips_debug(6, "t at the end of reference case %s\n", words_to_string(words_type(t, NIL, false)));
     }
   else if(type_functional_p(exp_type))
     {
@@ -1952,15 +1989,15 @@ type reference_to_type(reference ref)
 			  entity_name(reference_variable(ref)));
     }
   free_type(exp_type);
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL)));
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
   return t;
 }
 
 
-/** 
+/**
   For an array declared as int a[10][20], the type returned for a[i] is
   int [20].
-    
+
    @param exp is an expression
    @return a new allocated type which is the ntype of the expression in which
            typedef's are replaced by combination of basic types.
@@ -2057,9 +2094,9 @@ type expression_to_type(expression exp)
 		  pips_internal_error("unhandled case");
 		}
 	      }
-	    POP(l_inds);	
+	    POP(l_inds);
 	  }
-	
+
 	/* Warning : qualifiers are set to NIL, because I do not see
 	   the need for something else for the moment. BC.
 	*/
@@ -2084,13 +2121,13 @@ type expression_to_type(expression exp)
 	t = copy_type(sizeofexpression_type(soe));
 	break;
       }
-      
+
     default:
       pips_internal_error("Bad syntax tag %d", syntax_tag(s_exp));
       /* Never go there... */
     }
 
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL)));
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
 
   return t;
 }
@@ -2407,6 +2444,21 @@ bool type_fundamental_basic_p(type t)
 bool array_type_p(type t)
 {
   return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
+}
+
+bool variable_length_array_type_p(type t)
+{
+  bool return_val = false;
+  if(array_type_p(t)) {
+    FOREACH(dimension,dim,variable_dimensions(type_variable(t))) {
+      if(!extended_expression_constant_p(dimension_lower(dim)) ||
+          !extended_expression_constant_p(dimension_upper(dim))) {
+        return_val=true;
+        break;
+      }
+    }
+  }
+  return return_val;
 }
 
 bool pointer_type_p(type t)
@@ -2775,11 +2827,11 @@ type ultimate_type(type t)
 
 
 /**
-   
+
  @param t is a type
 
  @return : a new type in which typedefs have been expanded to reach a basic
-           concrete type, except for struct, union, and enum because 
+           concrete type, except for struct, union, and enum because
 	   the inner types of the fields cannot be changed (they are entities).
 
 */
@@ -2787,7 +2839,8 @@ type basic_concrete_type(type t)
 {
   type nt;
 
-  pips_debug(8, "Begin with type \"%s\"\n", words_to_string(words_type(t, NIL)));
+  pips_debug(8, "Begin with type \"%s\"\n",
+	     words_to_string(words_type(t, NIL, false)));
 
   switch (type_tag(t))
     {
@@ -2797,7 +2850,7 @@ type basic_concrete_type(type t)
 	basic bt = variable_basic(vt);
 	list lt = variable_dimensions(vt);
 
-	pips_debug(9, "of basic \"%s\"and number of dimensions %d.\n", 
+	pips_debug(9, "of basic \"%s\"and number of dimensions %d.\n",
 		   basic_to_string(bt),
 		   (int) gen_length(lt));
 
@@ -2837,7 +2890,8 @@ type basic_concrete_type(type t)
       nt = copy_type(t);
     }
 
-  pips_debug(8, "Ends with type \"%s\"\n", words_to_string(words_type(nt, NIL)));
+  pips_debug(8, "Ends with type \"%s\"\n",
+	     words_to_string(words_type(nt, NIL, false)));
   ifdebug(9)
     {
     if(type_variable_p(nt))
@@ -3970,7 +4024,9 @@ void print_types(list tl)
 /* For debugging */
 void print_type(type t)
 {
-  list wl = words_type(t, NIL);
+  // Might be better to pass true, or even more information, to see
+  // what happens with the unknown type
+  list wl = words_type(t, NIL, false);
   dump_words(wl);
 }
 

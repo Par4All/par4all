@@ -184,8 +184,6 @@
 	}
 
 	function get_checked_properties_values(properties_form, prefix) {
-		if (properties_form)
-			console.debug('form '+ properties_form);
 		if (properties_form instanceof NodeList) {
 			var props = "";
 			for (var i = 0; i < properties_form.length; i++) {

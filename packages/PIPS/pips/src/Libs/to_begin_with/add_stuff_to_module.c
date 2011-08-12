@@ -102,6 +102,12 @@ bool prepend_call(string mn) {
   PIPS_PHASE_POSTLUDE(module_statement);
 }
 
+static void do_add_pragma(statement s, statement p) {
+    if(return_statement_p(s)){
+        insert_statement(s,copy_statement(p),true);
+    }
+}
+
 bool add_pragma(string mn) {
   string pragma_name = get_string_property("PRAGMA_NAME");
   bool prepend = get_bool_property("PRAGMA_PREPEND");
@@ -109,6 +115,9 @@ bool add_pragma(string mn) {
   add_pragma_str_to_statement(pragma_s, pragma_name, true);
   statement module_statement = PIPS_PHASE_PRELUDE(mn, "ADD_PRAGMA_DEBUG_LEVEL");
   insert_statement(module_statement, pragma_s, prepend);
+  if(!prepend) /* a bit more complex: the directive must be added just before any return statement, if any */ {
+      gen_context_recurse(module_statement,pragma_s,statement_domain,gen_true,do_add_pragma);
+  }
   PIPS_PHASE_POSTLUDE(module_statement);
 }
 

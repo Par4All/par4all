@@ -211,8 +211,6 @@ void dag_dump(FILE * out, const string what, const dag d)
   }
 
   fprintf(out, "\n");
-
-  // ifdebug(1) dag_consistent_p(d);
 }
 
 // #define IMG_DEP " [arrowhead=normal]"
@@ -322,12 +320,17 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
   }
 }
 
-static void dagvtx_list_dot(FILE * out, const string comment, const list l)
+static void dagvtx_list_dot(
+  FILE * out, const string comment, const list l, const set used)
 {
   if (comment) fprintf(out, "  // %s\n", comment);
   FOREACH(dagvtx, v, l)
-    fprintf(out, "  \"%s\" [shape=circle];\n",
-      entity_dot_name(vtxcontent_out(dagvtx_content(v))));
+  {
+    entity img = vtxcontent_out(dagvtx_content(v));
+    fprintf(out, "  \"%s%s\" [shape=circle];\n",
+            entity_dot_name(img),
+            used? (set_belong_p(used, img)? "'": ""): "");
+  }
   fprintf(out, "\n");
 }
 
@@ -336,13 +339,22 @@ static void dagvtx_list_dot(FILE * out, const string comment, const list l)
  * @param what, name of dag
  * @param d, dag to output
  */
-void dag_dot(FILE * out, const string what, const dag d)
+void dag_dot(FILE * out, const string what, const dag d, const list ls)
 {
   fprintf(out, "digraph \"%s\" {\n", what);
 
+  // collect set of input images
+  set inputs = set_make(hash_pointer);
+  FOREACH(dagvtx, i, dag_inputs(d))
+  {
+    entity img = dagvtx_image(i);
+    if (img && img!=entity_undefined)
+      set_add_element(inputs, inputs, img);
+  }
+
   // first, declare inputs and outputs as circles
-  dagvtx_list_dot(out, "inputs", dag_inputs(d));
-  dagvtx_list_dot(out, "outputs", dag_outputs(d));
+  dagvtx_list_dot(out, "inputs", dag_inputs(d), NULL);
+  dagvtx_list_dot(out, "outputs", dag_outputs(d), inputs);
 
   // second, show computations
   fprintf(out, "  // computation vertices\n");
@@ -354,19 +366,52 @@ void dag_dot(FILE * out, const string what, const dag d)
     // outputs arcs for vx when the result is extracted
     if (gen_in_list_p(vx, dag_outputs(d)))
     {
+      entity img = vtxcontent_out(c);
       dagvtx_dot_node(out, "  ", vx);
-      fprintf(out, " -> \"%s\";\n", entity_dot_name(vtxcontent_out(c)));
+      fprintf(out, " -> \"%s%s\";\n",
+              entity_dot_name(img), set_belong_p(inputs, img)? "'": "");
+    }
+  }
+
+  // handle external copies after the computation
+  if (ls)
+  {
+    fprintf(out, "\n  // external copies: %d\n", (int) gen_length(ls));
+    FOREACH(statement, s, ls)
+    {
+      call c = freia_statement_to_call(s);
+      if (c && same_string_p(entity_local_name(call_function(c)), AIPO "copy"))
+      {
+        list args = call_arguments(c);
+        pips_assert("two args to aipo copy", gen_length(args)==2);
+        entity dst = expression_to_entity(EXPRESSION(CAR(args)));
+        entity src = expression_to_entity(EXPRESSION(CAR(CDR(args))));
+        fprintf(out,
+                "  \"%s%s\" [shape=circle];\n"
+                "  \"%s =\" [shape=circle,label=\"=\",style=\"dashed\"]\n"
+                "  \"%s%s\" -> \"%s =\";\n"
+                "  \"%s =\" -> \"%s%s\";\n",
+                entity_dot_name(dst), set_belong_p(inputs, dst)? "'": "",
+                entity_dot_name(dst),
+                entity_dot_name(src), set_belong_p(inputs, src)? "'": "",
+                entity_dot_name(dst), entity_dot_name(dst),
+                entity_dot_name(dst), set_belong_p(inputs, dst)? "'": "");
+      }
+      // should not be a else?
     }
   }
 
   fprintf(out, "}\n");
+
+  set_free(inputs);
 }
 
 #define DOT_SUFFIX ".dot"
 
 /* generate a "dot" format from a dag to a file.
  */
-void dag_dot_dump(const string module, const string name, const dag d)
+void dag_dot_dump(const string module, const string name,
+                  const dag d, const list ls)
 {
   // build file name
   string src_dir = db_get_directory_name_for_module(module);
@@ -376,15 +421,16 @@ void dag_dot_dump(const string module, const string name, const dag d)
   FILE * out = safe_fopen(fn, "w");
   fprintf(out, "// graph for dag \"%s\" of module \"%s\" in dot format\n",
     name, module);
-  dag_dot(out, name, d);
+  dag_dot(out, name, d, ls);
   safe_fclose(out, fn);
   free(fn);
 }
 
-void dag_dot_dump_prefix(string module, string prefix, int number, dag d)
+void dag_dot_dump_prefix(const string module, const string prefix, int number,
+                         const dag d, const list ls)
 {
   string name = strdup(cat(prefix, itoa(number), NULL));
-  dag_dot_dump(module, name, d);
+  dag_dot_dump(module, name, d, ls);
   free(name);
 }
 
@@ -1185,6 +1231,7 @@ list /* of statements */ freia_dag_optimize(dag d)
 {
   list lstats = NIL;
   set remove = set_make(set_pointer);
+  size_t dag_output_count = gen_length(dag_outputs(d));
 
   ifdebug(6) {
     pips_debug(6, "considering dag:\n");
@@ -1192,11 +1239,14 @@ list /* of statements */ freia_dag_optimize(dag d)
   }
 
   if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
+  {
     dag_simplify(d);
 
-  ifdebug(8) {
-    pips_debug(8, "considering dag:\n");
-    dag_dump(stderr, "simplified", d);
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS:\n");
+      dag_dump(stderr, "simplified", d);
+      // dag_dot_dump_prefix("main", "simplified", 0, d);
+    }
   }
 
   // remove dead image operations
@@ -1227,6 +1277,12 @@ list /* of statements */ freia_dag_optimize(dag d)
         pips_debug(8, "vertex %"_intFMT" is alive\n", dagvtx_number(v));
     }
     gen_free_list(vertices), vertices = NULL;
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_REMOVE_DEAD_OPERATIONS:\n");
+      dag_dump(stderr, "remove dead", d);
+      // dag_dot_dump_prefix("main", "remove_dead", 0, d);
+    }
   }
 
   // look for identical image operations (same inputs, same params)
@@ -1300,15 +1356,16 @@ list /* of statements */ freia_dag_optimize(dag d)
         hash_put(previous, vr, preds);
     }
 
-    ifdebug(8) {
-      pips_debug(4, "after pass 1, dag:\n");
-      dag_dump(stderr, "optim 1", d);
-    }
-
     // cleanup
     HASH_MAP(k, v, if (v) gen_free_list(v), previous);
     hash_table_free(previous), previous = NULL;
     gen_free_list(vertices), vertices = NULL;
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_REMOVE_DUPLICATE_OPERATIONS:\n");
+      dag_dump(stderr, "remove duplicate", d);
+      // dag_dot_dump_prefix("main", "remove_duplicates", 0, d);
+    }
   }
 
   if (get_bool_property("FREIA_REMOVE_USELESS_COPIES"))
@@ -1399,6 +1456,12 @@ list /* of statements */ freia_dag_optimize(dag d)
           set_add_element(remove, remove, v);
       }
     }
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_REMOVE_USELESS_COPIES:\n");
+      dag_dump(stderr, "remove useless copies", d);
+      // dag_dot_dump_prefix("main", "useless_copies", 0, d);
+    }
   }
 
   if (get_bool_property("FREIA_MOVE_DIRECT_COPIES"))
@@ -1465,6 +1528,12 @@ list /* of statements */ freia_dag_optimize(dag d)
       }
     }
     hash_table_free(intra_pipe_copies);
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_MOVE_DIRECT_COPIES:\n");
+      dag_dump(stderr, "move direct copies", d);
+      // dag_dot_dump_prefix("main", "direct_copies", 0, d);
+    }
   }
 
   // cleanup dag (argh, beware that the order is not deterministic...)
@@ -1502,7 +1571,11 @@ list /* of statements */ freia_dag_optimize(dag d)
   ifdebug(6) {
     pips_debug(4, "resulting dag:\n");
     dag_dump(stderr, "cleaned", d);
+    // dag_dot_dump_prefix("main", "cleaned", 0, d);
   }
+
+  pips_assert("right output count after optimizations",
+         gen_length(dag_outputs(d)) + gen_length(lstats)==dag_output_count);
 
   return lstats;
 }
@@ -1576,17 +1649,61 @@ static bool other_significant_uses
   return used;
 }
 
+/* hmmm...
+ */
+static bool variable_used_as_later_input(entity img, list ld)
+{
+  bool used = false;
+  FOREACH(dag, d, ld)
+  {
+    FOREACH(dagvtx, v, dag_inputs(d))
+    {
+      if (dagvtx_image(v)==img)
+      {
+        used = true;
+        break;
+      }
+    }
+    if (used) break;
+  }
+  pips_debug(8, "%s: %s\n", entity_name(img), bool_to_string(used));
+  return used;
+}
+
+static bool dag_image_is_an_input(dag d, entity img)
+{
+  bool is_input = false;
+  FOREACH(dagvtx, v, dag_inputs(d))
+  {
+    if (dagvtx_image(v)==img)
+    {
+      is_input = true;
+      break;
+    }
+  }
+
+  pips_debug(4, "image %s input: %s\n",
+             entity_name(img), bool_to_string(is_input));
+
+  return is_input;
+}
+
 /* (re)compute the list of *GLOBAL* input & output images for this dag
  * ??? BUG the output is rather an approximation
  * should rely on used defs or out effects for the underlying
  * sequence. however, the status of chains and effects on C does not
- * allow it at the time.
+ * allow it at the time. again after a look at DG (FC 08/08/2011)
  * @param d dag to consider
  * @param occs statement image occurences, may be NULL
  * @param output_images images that are output, may be NULL
+ * @param ld list of some other dags, possibly NIL
  */
-void dag_compute_outputs(dag d, const hash_table occs, const set output_images)
+void dag_compute_outputs(
+  dag d,
+  const hash_table occs, const set output_images, const list ld, bool inloop)
 {
+  pips_debug(4, "inloop=%s\n", bool_to_string(inloop));
+
   set outvars = set_make(set_pointer);
   set outs = set_make(set_pointer);
   set toremove = set_make(set_pointer);
@@ -1599,19 +1716,28 @@ void dag_compute_outputs(dag d, const hash_table occs, const set output_images)
     // skip special input nodes...
     if (dagvtx_number(v)!=0)
     {
-      // get entity produce by vertex
+      // get entity produced by vertex
       entity out = vtxcontent_out(c);
 
       pips_debug(8, "entity is %s\n", safe_entity_name(out));
 
-      if (out!=entity_undefined && !set_belong_p(outvars, out) &&
-          ((output_images && set_belong_p(output_images, out)) ||
-           // no successors to this vertex BUT it is used somewhere
+      if (// we have an image
+          out!=entity_undefined &&
+          // it is not already an output
+          !set_belong_p(outvars, out) &&
+          // and either...
+          (// this image is used as output (typically a tx call)
+           (output_images && set_belong_p(output_images, out)) ||
+           // no successors to this vertex BUT it is used somewhere (else?)
            (!dagvtx_succs(v) && other_significant_uses(out, occs, stats)) ||
            // all non-empty successors are measures?!
            (dagvtx_succs(v) && all_mesures_p(dagvtx_succs(v))) ||
            // new function parameter not yet an output
-           (formal_parameter_p(out) && !set_belong_p(outvars, out))))
+           (formal_parameter_p(out) && !set_belong_p(outvars, out)) ||
+           // hmmm... yet another hack for freia_61
+           (variable_used_as_later_input(out, ld)) ||
+           // an output image is only reused by this dag within a loop?
+           (inloop && dag_image_is_an_input(d, out))))
       {
         pips_debug(7, "appending %" _intFMT "\n", dagvtx_number(v));
         set_add_element(outvars, outvars, out);
@@ -1661,8 +1787,9 @@ static dagvtx find_twin_vertex(dag d, dagvtx target)
 /* catch some cases of missing outs between splits...
  * for "freia_scalar_03"...
  * I'm not that sure about the algorithm.
+ * This should rely be based on the CHAINS/DG, but the status still seems
+ * hopeless, as too many arcs currently kept (FC 08/08/2011)
  * @param dfull full dag
- * @param ld list of sub dags of d
  */
 void freia_hack_fix_global_ins_outs(dag dfull, dag d)
 {
@@ -1927,9 +2054,13 @@ static void dag_append_freia_call(dag d, statement s)
  * @param number dag identifier in function
  * @param occurrences entity -> set of statements where they appear
  * @param output_images set of images that are output
+ * @param ld list of other dags... (???)
+ * @param inloop whether we might be in a loop
  */
-dag freia_build_dag(string module, list ls, int number,
-                    const hash_table occurrences, const set output_images)
+dag freia_build_dag(
+  string module, list ls, int number,
+  const hash_table occurrences, const set output_images, const list ld,
+  bool inloop)
 {
   // build full dag
   dag fulld = make_dag(NIL, NIL, NIL);
@@ -1937,12 +2068,12 @@ dag freia_build_dag(string module, list ls, int number,
   FOREACH(statement, s, ls)
     dag_append_freia_call(fulld, s);
 
-  dag_compute_outputs(fulld, occurrences, output_images);
+  dag_compute_outputs(fulld, occurrences, output_images, ld, inloop);
 
   ifdebug(3) dag_dump(stderr, "fulld", fulld);
 
   // dump resulting dag
-  dag_dot_dump_prefix(module, "dag_", number, fulld);
+  dag_dot_dump_prefix(module, "dag_", number, fulld, NIL);
 
   return fulld;
 }
@@ -2148,20 +2279,63 @@ static entity new_local_image_variable(entity model, const hash_table occs)
   return img;
 }
 
-typedef struct { entity old; entity new; } two_vars;
+/************************************************** FREIA IMAGE SUBSTITUTION */
 
-static void ref_rwt(reference r, two_vars * ctx)
+typedef struct { entity old, new; bool write; } swis_ctx;
+
+static void swis_ref_rwt(reference r, swis_ctx * ctx)
 {
   if (reference_variable(r)==ctx->old)
     reference_variable(r) = ctx->new;
 }
 
-// ??? must be available somewhere?
-// see substitute_entity_in_expression
-void freia_switch_image_in_statement(statement s, entity old, entity img)
+static bool swis_call_flt(call c, swis_ctx * ctx)
 {
-  two_vars ctx = { old, img };
-  gen_context_recurse(s, &ctx, reference_domain, gen_true, ref_rwt);
+  const freia_api_t * api = hwac_freia_api(entity_local_name(call_function(c)));
+  if (api)
+  {
+    list args = call_arguments(c);
+    pips_assert("freia api call length is ok",
+                gen_length(args)== (api->arg_img_out + api->arg_img_in +
+                                    api->arg_misc_out + api->arg_misc_in));
+    unsigned int i;
+    // output arguments
+    for(i=0; i<api->arg_img_out; i++)
+    {
+      if (!ctx->write)
+        gen_recurse_stop(EXPRESSION(CAR(args)));
+      args = CDR(args);
+    }
+    // input arguments
+    for(i=0; i<api->arg_img_in; i++)
+    {
+      if (ctx->write)
+        gen_recurse_stop(EXPRESSION(CAR(args)));
+      args = CDR(args);
+    }
+    // skip remainder anyway
+    while (args)
+    {
+      gen_recurse_stop(EXPRESSION(CAR(args)));
+      args = CDR(args);
+    }
+  }
+  // else this is not an AIPO call... we substitute everywhere
+  return true;
+}
+
+/* switch read or written image in statement
+ * if this is an AIPO call, only substitute output or input depending on write
+ * otherwise all occurrences are substituted
+ */
+void freia_switch_image_in_statement(
+  statement s, entity old, entity img, bool write)
+{
+  swis_ctx ctx = { old, img, write };
+  gen_context_multi_recurse(s, &ctx,
+                            call_domain, swis_call_flt, gen_null,
+                            reference_domain, gen_true, swis_ref_rwt,
+                            NULL);
 }
 
 /* switch to new image variable in v & its direct successors
@@ -2171,11 +2345,16 @@ static void switch_image_variable(dagvtx v, entity old, entity img)
   vtxcontent c = dagvtx_content(v);
   pips_assert("switch image output", vtxcontent_out(c)==old);
   vtxcontent_out(c) = img;
+  statement st = dagvtx_statement(v);
+  pips_assert("some production statement", st!=NULL);
+  freia_switch_image_in_statement(st, old, img, true);
   FOREACH(dagvtx, s, dagvtx_succs(v))
   {
     vtxcontent cs = dagvtx_content(s);
     gen_replace_in_list(vtxcontent_inputs(cs), old, img);
-    freia_switch_image_in_statement(dagvtx_statement(s), old, img);
+    statement st = dagvtx_statement(s);
+    pips_assert("some producer statement", st!=NULL);
+    freia_switch_image_in_statement(st, old, img, false);
   }
 }
 
@@ -2195,7 +2374,9 @@ list dag_fix_image_reuse(dag d, hash_table init, const hash_table occs)
     if (!img || img==entity_undefined)
       continue;
 
-    if (set_belong_p(seen, img))
+    if (set_belong_p(seen, img) &&
+        // but take care of image reuse, we must keep input images!
+        !gen_in_list_p(v, dag_inputs(d)))
     {
       entity new_img = new_local_image_variable(img, occs);
       switch_image_variable(v, img, new_img);

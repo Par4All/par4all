@@ -937,25 +937,33 @@ statement make_plain_continue_statement()
 }
 
 
-/* Make a declaration statement
+/* Make a declaration(s) statement
 
    To preserve declaration lines and comments, declaration statements are
    used
 
-   @param v is the variable to add in the declaration
+   @param l list of variables to add in the declaration
 
    @param sn is the statement number to use
 
    @param cs is the comment string to associate with the declaration
 */
-statement make_declaration_statement(entity v, int sn, string cs) {
+statement make_declarations_statement(list l, int sn, string cs)
+{
   statement ds = make_plain_continue_statement();
-  statement_declarations(ds) = CONS(ENTITY, v, NIL);
+  statement_declarations(ds) = l;
   statement_number(ds) = sn;
   statement_comments(ds) = cs;
-
   return ds;
 }
+
+/* Make *one* declaration statement.
+ */
+statement make_declaration_statement(entity v, int sn, string cs)
+{
+  return make_declarations_statement(CONS(ENTITY, v, NIL), sn, cs);
+}
+
 
 /* Build a while loop statement.
 
@@ -2296,9 +2304,7 @@ statement_to_line_number(statement s)
  *
  */
 
-void insert_statement(statement s,
-		      statement s1,
-		      bool before)
+void insert_statement(statement s, statement s1, bool before)
 {
   list ls;
   instruction i = statement_instruction(s);
@@ -2444,8 +2450,11 @@ statement add_declaration_statement(statement s, entity e)
         if(!ENDP(pl)) {
             /* SG: if CAR(pl) has same comment and same type as ds, merge them */
             statement spl = STATEMENT(CAR(pl));
+            entity ecar = ENTITY(CAR(statement_declarations(spl)));
             if( comments_equal_p(statement_comments(spl),comment) &&
-                    basic_equal_strict_p(entity_basic(e),entity_basic(ENTITY(CAR(statement_declarations(spl))))))
+                    basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
+                    qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar))
+              )
             {
                 free_statement(ds);
                 statement_declarations(spl)=gen_nconc(statement_declarations(spl),CONS(ENTITY,e,NIL));
@@ -2670,21 +2679,21 @@ static bool find_implicit_goto(statement s, list * tl)
 
     if(ENTITY_WRITE_P(f) || ENTITY_READ_P(f) || ENTITY_OPEN_P(f) || ENTITY_CLOSE_P(f)) {
       list ce = list_undefined;
-    
+
       for(ce = call_arguments(c); !ENDP(ce); ce = CDR(CDR(ce))) {
 	expression e = EXPRESSION(CAR(ce));
 	entity f1 = call_function(syntax_call(expression_syntax(e)));
-      
+
 	pips_assert("expression e must be a call", expression_call_p(e));
-      
-	if (strcmp(entity_local_name(f1), "ERR=") == 0 || 
+
+	if (strcmp(entity_local_name(f1), "ERR=") == 0 ||
 	    strcmp(entity_local_name(f1), "END=") == 0) {
 	  expression ne = EXPRESSION(CAR(CDR(ce))); /* Next Expression */
 	  entity l = call_function(syntax_call(expression_syntax(ne)));
-      
+
 	  pips_assert("expression ne must be a call", expression_call_p(ne));
 	  pips_assert("l is a label", entity_label_p(l));
-	  
+
 	  *tl = CONS(ENTITY, l, *tl);
 	}
       }
@@ -2692,7 +2701,7 @@ static bool find_implicit_goto(statement s, list * tl)
     /* No need to go down in call statements */
     found = true;
   }
-  
+
   return !found;
 }
 
@@ -2701,13 +2710,41 @@ static bool find_implicit_goto(statement s, list * tl)
 list statement_to_implicit_target_labels(statement s)
 {
   list ll = NIL; /* Label List */
-   
+
   gen_context_recurse(s, (void *) &ll,statement_domain, find_implicit_goto, gen_null);
-  
+
   return ll;
 }
 
+static bool collect_labels(statement s, list * pll)
+{
+  entity l = statement_label(s);
+  if(!entity_empty_label_p(l))
+    *pll = CONS(ENTITY, l, *pll);
+  return true;
+}
 
+
+/* Look for non-empty labels appearing directly or indirectly and allocate a
+   label list.
+
+   The code is assumed correct. Usage of labels, for instance in
+   Fortran IOs, are not checked. Only the statement label field is checked.
+ */
+list statement_to_labels(statement s)
+{
+  list ll = NIL; /* Label List */
+
+  gen_context_recurse(s, (void *) &ll, statement_domain,
+		      collect_labels, gen_null);
+
+  /* To have labels in order of appearance */
+  ll = gen_nreverse(ll);
+
+  return ll;
+}
+
+
 /* Make sure that s and all its substatements are defined
 
    @addtogroup statement_predicate

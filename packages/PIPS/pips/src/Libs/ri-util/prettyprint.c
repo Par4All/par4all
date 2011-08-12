@@ -1804,11 +1804,11 @@ words_unary_minus(call obj, int precedence, bool leftmost, list pdl)
     expression e = EXPRESSION(CAR(call_arguments(obj)));
     int prec = words_intrinsic_precedence(obj);
 
-    if ( prec < precedence || !leftmost ||  !precedence_p)
+    if ( prec < precedence || !leftmost || (!precedence_p && precedence>0))
 	pc = CHAIN_SWORD(pc, "(");
     pc = CHAIN_SWORD(pc, "-");
     pc = gen_nconc(pc, words_subexpression(e, prec, false, pdl));
-    if ( prec < precedence || !leftmost ||  !precedence_p)
+    if ( prec < precedence || !leftmost || (!precedence_p && precedence>0))
 	pc = CHAIN_SWORD(pc, ")");
 
     return(pc);
@@ -2466,7 +2466,7 @@ static list words_va_arg(list obj, list pdl)
   pc = CHAIN_SWORD(pc,"va_arg(");
   pc = gen_nconc(pc, words_expression(e1, pdl));
   pc = CHAIN_SWORD(pc, space_p? ", " : ",");
-  pc = gen_nconc(pc, words_type(t2, pdl));
+  pc = gen_nconc(pc, words_type(t2, pdl, false));
   pc = CHAIN_SWORD(pc,")");
   return pc;
 }
@@ -4983,7 +4983,7 @@ static list words_sizeofexpression(sizeofexpression obj,
     if(derived_type_p(t)) {
       entity te = basic_derived(variable_basic(type_variable(t)));
       if(!gen_in_list_p((void *) te, pdl)) {
-	list pca = words_type(sizeofexpression_type(obj), pdl);
+	list pca = words_type(sizeofexpression_type(obj), pdl, false);
 	pc = gen_nconc(pc, pca);
       }
       else {
@@ -4993,7 +4993,7 @@ static list words_sizeofexpression(sizeofexpression obj,
       }
     }
     else {
-      list pca = words_type(sizeofexpression_type(obj), pdl);
+      list pca = words_type(sizeofexpression_type(obj), pdl, false);
       pc = gen_nconc(pc, pca);
     }
   }

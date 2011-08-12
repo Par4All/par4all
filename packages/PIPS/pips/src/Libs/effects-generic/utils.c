@@ -663,7 +663,9 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
   list l_res = NIL;
   pips_assert("the effect must be defined\n", !effect_undefined_p(eff));
   pips_debug_effect(6, "input effect:", eff);
-  pips_debug(6, "input type: %s (%s)\n", words_to_string(words_type(eff_type, NIL)), type_to_string(eff_type));
+  pips_debug(6, "input type: %s (%s)\n",
+	     words_to_string(words_type(eff_type, NIL, false)),
+	     type_to_string(eff_type));
   pips_debug(6, "add_eff is %s\n", add_eff? "true": "false");
   if (type_with_const_qualifier_p(eff_type))
     {
@@ -869,7 +871,7 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
   bool p = false, finished = false;
 
   pips_debug(7, "begin with type %s\n and number of indices : %d\n",
-	     words_to_string(words_type(ct,NIL)),
+	     words_to_string(words_type(ct,NIL,false)),
 	     (int) gen_length(l_ind));
   while (!finished)
     {
@@ -1110,7 +1112,7 @@ type simple_effect_reference_type(reference ref)
 
 
   free_type(bct);
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t,NIL)));
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t,NIL,false)));
   return t;
 
 }

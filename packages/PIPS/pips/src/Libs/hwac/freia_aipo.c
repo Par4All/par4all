@@ -40,27 +40,35 @@
 #include "freia_spoc_private.h"
 #include "hwac.h"
 
-void freia_aipo_compile_calls
+list freia_aipo_compile_calls
 (string module,
+ dag fulld,
  list /* of statements */ ls,
  const hash_table occs,
- const set output_images,
  int number)
 {
-  // build DAG for ls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  dag fulld = freia_build_dag(module, ls, number, occs, output_images);
   list added_stats = freia_dag_optimize(fulld);
 
-  // dump final dag
-  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
+  // intermediate images
+  hash_table init = hash_table_make(hash_pointer, 0);
+  list new_images = dag_fix_image_reuse(fulld, init, occs);
 
-  // ??? append possibly extracted copies?
-  // should it be NIL because it is not useful in AIPO->AIPO?
+  // dump final optimised dag
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
+
+  // now may put actual allocations, which messes up statement numbers
+  list reals = freia_allocate_new_images_if_needed(ls, new_images, occs, init);
+
+  // ??? should it be NIL because it is not useful in AIPO->AIPO?
   freia_insert_added_stats(ls, added_stats);
+  added_stats = NIL;
 
   // cleanup
-  free_dag(fulld);
+  gen_free_list(new_images);
+  hash_table_free(init);
+
+  return reals;
 }

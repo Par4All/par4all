@@ -2725,7 +2725,7 @@ static int compare_region_entities(entity *pe1, entity *pe2)
 Psysteme entity_declaration_sc(entity e)
 {
     Psysteme sc = sc_new();
-    list ldim = variable_dimensions(type_variable(entity_type(e)));
+    list ldim = variable_dimensions(type_variable(ultimate_type(entity_type(e))));
     int dim;
 
     for (dim = 1; !ENDP(ldim); dim++, ldim = CDR(ldim))

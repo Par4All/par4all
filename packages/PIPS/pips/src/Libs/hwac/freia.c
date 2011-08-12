@@ -42,15 +42,67 @@
 #include "effects.h"
 #include "ri-util.h"
 #include "effects-util.h"
+#include "properties.h"
 
 #include "freia_spoc_private.h"
 #include "hwac.h"
 
 #define FUNC_C "functions.c"
 
+/**************************************************** LOOK FOR IMAGE SHUFFLE */
+
+static bool fis_call_flt(call c, bool * shuffle)
+{
+  list args = call_arguments(c);
+  if (ENTITY_ASSIGN_P(call_function(c)))
+  {
+    pips_assert("assign takes two args", gen_length(args)==2);
+    entity a1 = expression_to_entity(EXPRESSION(CAR(args)));
+    entity a2 = expression_to_entity(EXPRESSION(CAR(CDR(args))));
+    if (a2!=entity_undefined &&
+        freia_image_variable_p(a1) && freia_image_variable_p(a2))
+    {
+      *shuffle = true;
+      gen_recurse_stop(NULL);
+      return false;
+    }
+  }
+  return true;
+}
+
+static bool freia_image_shuffle(statement s)
+{
+  bool shuffle = false;
+  gen_context_recurse(s, &shuffle, call_domain, fis_call_flt, gen_null);
+  return shuffle;
+}
+
+/******************************************************* SWITCH CAST TO COPY */
+
+static void sctc_call_rwt(call c, int * count)
+{
+  entity func = call_function(c);
+  if (same_string_p(entity_local_name(func), AIPO "cast"))
+  {
+    call_function(c) = local_name_to_top_level_entity(AIPO "copy");
+    (*count)++;
+  }
+}
+
+static void switch_cast_to_copy(statement s)
+{
+  int count = 0;
+  gen_context_recurse(s, &count, call_domain, gen_true, sctc_call_rwt);
+  // ??? I may have look into declarations? freia calls in declarations
+  // are not really implemented yet.
+  pips_user_warning("freia_cast switched to freia_copy: %d\n", count);
+}
+
+
 /*************************************************************** BASIC UTILS */
 
 /* return malloc'ed "foo.database/Src/%{module}_helper_functions.c"
+ * should depend on target? could mix targets?
  */
 static string helper_file_name(string func_name)
 {
@@ -60,13 +112,43 @@ static string helper_file_name(string func_name)
   return fn;
 }
 
-static bool freia_skip_op_p(const statement s)
+bool freia_skip_op_p(const statement s)
 {
   call c = freia_statement_to_call(s);
   const char* called = c? entity_user_name(call_function(c)): "";
   // ??? what about freia_common_check* ?
   return same_string_p(called, FREIA_ALLOC)
     ||   same_string_p(called, FREIA_FREE);
+}
+
+/* move statements in l ahead of s in sq
+ * note that ls is in reverse order...
+ */
+static void move_ahead(list ls, statement target, sequence sq)
+{
+  // for faster list inclusion test
+  set tomove = set_make(hash_pointer);
+  set_append_list(tomove, ls);
+
+  // build new sequence list in reverse order
+  list nsq = NIL;
+  FOREACH(statement, s, sequence_statements(sq))
+  {
+    if (set_belong_p(tomove, s))
+      continue; // skip!
+    if (s==target)
+      // insert list now!
+      nsq = gen_nconc(gen_copy_seq(ls), nsq);
+    // and keep current statement
+    nsq = CONS(statement, s, nsq);
+  }
+
+  // update sequence with new list
+  gen_free_list(sequence_statements(sq));
+  sequence_statements(sq) = gen_nreverse(nsq);
+
+  // clean up
+  set_free(tomove);
 }
 
 /******************************************************** REORDER STATEMENTS */
@@ -128,7 +210,7 @@ static void sort_subsequence(list ls, sequence sq)
   // sort ls
   gen_sort_list(ls, (gen_cmp_func_t) freia_cmp_statement);
 
-  // extract sub sequence
+  // extract sub sequence in a separate list
   list head = NIL, lcmp = NIL, tail = NIL;
   FOREACH(statement, s, sequence_statements(sq))
   {
@@ -152,6 +234,8 @@ static void sort_subsequence(list ls, sequence sq)
   set_free(cmp);
 }
 
+/*********************************************************** LOOK AT EFFECTS */
+
 #include "effects-generic.h"
 
 /* tell whether a statement has no effects on images.
@@ -159,12 +243,14 @@ static void sort_subsequence(list ls, sequence sq)
  * and just skipped, provided stat scalar dependencies
  * are taken care of.
  */
-static bool some_effects_on_images(statement s)
+bool freia_some_effects_on_images(statement s)
 {
   int img_effect = false;
   list cumu = effects_effects(load_cumulated_rw_effects(s));
-  FOREACH(effect, e, cumu) {
-    if (freia_image_variable_p(effect_variable(e))) {
+  FOREACH(effect, e, cumu)
+  {
+    if (freia_image_variable_p(effect_variable(e)))
+    {
       img_effect = true;
       break;
     }
@@ -172,22 +258,85 @@ static bool some_effects_on_images(statement s)
   return img_effect;
 }
 
-/********************************************************* RECURSION HELPERS */
+/* update the set of written variables, as seen from effects, with a statement
+ * this is really to rebuild a poor's man dependency graph in order to move
+ * some statements around...
+ */
+static void update_written_variables(set written, statement s)
+{
+  list cumu = effects_effects(load_cumulated_rw_effects(s));
+  FOREACH(effect, e, cumu)
+    if (effect_write_p(e))
+      set_add_element(written, written, effect_variable(e));
+}
+
+/* @return whether statement depends on some written variables
+ */
+static bool statement_depends_p(set written, statement s)
+{
+  bool depends = false;
+  list cumu = effects_effects(load_cumulated_rw_effects(s));
+  FOREACH(effect, e, cumu)
+  {
+    if (effect_read_p(e) && set_belong_p(written, effect_variable(e)))
+    {
+      depends = true;
+      break;
+    }
+  }
+  return depends;
+}
+
+/************************************ RECURSION HELPERS TO EXTRACT SEQUENCES */
 
 typedef struct {
-  list /* of list of statements */ seqs;
+  list seqs; // of list of statements
+  int enclosing_loops; // count kept while recurring
+  set in_loops; // elements in the list encountered in inclosing loops
 } freia_info;
 
+static bool fsi_loop_flt( __attribute__((unused)) gen_chunk * o,
+                          freia_info * fsip)
+{
+  fsip->enclosing_loops++;
+  return true;
+}
+
+static void fsi_loop_rwt( __attribute__((unused)) gen_chunk * o,
+                          freia_info * fsip)
+{
+  fsip->enclosing_loops--;
+}
+
+/* detect one lone aipo statement out of a sequence...
+ */
+static bool fsi_stmt_flt(statement s, freia_info * fsip)
+{
+  if (freia_statement_aipo_call_p(s))
+  {
+    instruction i = (instruction) gen_get_ancestor(instruction_domain, s);
+    if (i && instruction_sequence_p(i)) return false;
+    // not a sequence handled by fsi_seq_flt...
+    list ls = CONS(statement, s, NIL);
+    fsip->seqs = CONS(list, ls, fsip->seqs);
+    if (fsip->enclosing_loops)
+      set_add_element(fsip->in_loops, fsip->in_loops, ls);
+  }
+  return true;
+}
+
 /** consider a sequence */
-static bool sequence_flt(sequence sq, freia_info * fsip)
+static bool fsi_seq_flt(sequence sq, freia_info * fsip)
 {
   pips_debug(9, "considering sequence...\n");
 
-  list /* of statements */ ls = NIL, ltail = NIL;
+  list /* of statements */ ls = NIL, ltail = NIL, lup = NIL;
 
   // use a copy, because the sequence is rewritten inside the loop...
   // see sort_subsequence. I guess should rather delay it...
   list lseq = gen_copy_seq(sequence_statements(sq));
+
+  set written = set_make(hash_pointer);
 
   FOREACH(statement, s, lseq)
   {
@@ -196,7 +345,7 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
     bool keep_stat = freia_api ||
       // ??? it is an image allocation in the middle of the code...
       // or it has no image effects
-      (ls && (freia_skip_op_p(s) || !some_effects_on_images(s)));
+      (ls && (freia_skip_op_p(s) || !freia_some_effects_on_images(s)));
 
     pips_debug(7, "statement %"_intFMT": %skept\n",
                statement_number(s), keep_stat? "": "not ");
@@ -207,35 +356,87 @@ static bool sequence_flt(sequence sq, freia_info * fsip)
       {
         ls = gen_nconc(ltail, ls), ltail = NIL;
         ls = CONS(statement, s, ls);
+        update_written_variables(written, s);
       }
       else // else accumulate in the "other list" waiting for something...
       {
-        ltail = CONS(statement, s, ltail);
+        if (statement_depends_p(written, s) ||
+            (statement_call_p(s) &&
+             ENTITY_C_RETURN_P(call_function(statement_call(s)))))
+        {
+          ltail = CONS(statement, s, ltail);
+          update_written_variables(written, s);
+        }
+        else
+          // we can move it up...
+          lup = CONS(statement, s, lup);
       }
     }
     else // the sequence is cut on this statement
     {
+      if (lup && ls)
+        move_ahead(lup, STATEMENT(CAR(gen_last(ls))), sq);
+      if (lup) gen_free_list(lup), lup = NIL;
       if (ls!=NIL)
       {
         sort_subsequence(ls, sq);
         fsip->seqs = CONS(list, ls, fsip->seqs);
+        if (fsip->enclosing_loops)
+          set_add_element(fsip->in_loops, fsip->in_loops, ls);
         ls = NIL;
       }
       if (ltail) gen_free_list(ltail), ltail = NIL;
+      set_clear(written);
     }
   }
 
   // end of sequence reached
   if (ls!=NIL)
   {
+    if (lup && ls)
+      move_ahead(lup, STATEMENT(CAR(gen_last(ls))), sq);
     sort_subsequence(ls, sq);
     fsip->seqs = CONS(list, ls, fsip->seqs);
+    if (fsip->enclosing_loops)
+      set_add_element(fsip->in_loops, fsip->in_loops, ls);
     ls = NIL;
   }
 
+  // cleanup
   if (ltail) gen_free_list(ltail), ltail = NIL;
+  if (lup) gen_free_list(lup), lup = NIL;
   gen_free_list(lseq);
+  set_free(written);
   return true;
+}
+
+/****************************************** SORT LIST OF EXTRACTED SEQUENCES */
+
+static _int min_statement(list ls)
+{
+  _int min = -1;
+  FOREACH(statement, s, ls)
+    min = (min==-1)? statement_number(s):
+    (min<statement_number(s)? min: statement_number(s));
+  return min;
+}
+
+static hash_table fsi_number = NULL;
+
+static int fsi_cmp(const list * l1, const list * l2)
+{
+  return (int) ((_int) hash_get(fsi_number, *l1) -
+                (_int) hash_get(fsi_number, *l2));
+}
+
+static void fsi_sort(list lls)
+{
+  pips_assert("static fsi_number is clean", !fsi_number);
+  fsi_number = hash_table_make(hash_pointer, 0);
+  FOREACH(list, ls, lls)
+    hash_put(fsi_number, ls, (void*) min_statement(ls));
+  gen_sort_list(lls, (gen_cmp_func_t) fsi_cmp);
+  hash_table_free(fsi_number), fsi_number = NULL;
 }
 
 /**************************************************************** DO THE JOB */
@@ -251,22 +452,43 @@ string freia_compile(string module, statement mod_stat, string target)
   if (!freia_valid_target_p(target))
     pips_internal_error("unexpected target %s", target);
 
-  freia_info fsi;
-  fsi.seqs = NIL;
+  // check for image shuffles...
+  if (freia_image_shuffle(mod_stat))
+  {
+    if (get_bool_property("FREIA_ALLOW_IMAGE_SHUFFLE"))
+      pips_user_warning("image shuffle found in %s, "
+                        "freia compilation may result in wrong code!\n",
+                        module);
+    else
+      pips_user_error("image shuffle found in %s, "
+                      "see FREIA_ALLOW_IMAGE_SHUFFLE property to continue.\n",
+                      module);
+  }
+
+  // freia_aipo_cast -> freia_aipo_copy before further compilation
+  if (get_bool_property("FREIA_CAST_IS_COPY"))
+    switch_cast_to_copy(mod_stat);
+
+  freia_info fsi = { NIL, 0, set_make(hash_pointer) };
   freia_init_dep_cache();
 
   // collect freia api functions...
-  if (statement_call_p(mod_stat))
-  {
-    // argh, there is only one statement in the code, and no sequence
-    if (freia_statement_aipo_call_p(mod_stat))
-      fsi.seqs = CONS(list, CONS(statement, mod_stat, NIL), NIL);
-  }
-  else // look for sequences
-  {
-    gen_context_recurse(mod_stat, &fsi,
-                        sequence_domain, sequence_flt, gen_null);
-  }
+  gen_context_multi_recurse(mod_stat, &fsi,
+                            // collect sequences
+                            sequence_domain, fsi_seq_flt, gen_null,
+                            statement_domain, fsi_stmt_flt, gen_null,
+                            // just count enclosing loops...
+                            loop_domain, fsi_loop_flt, fsi_loop_rwt,
+                            whileloop_domain, fsi_loop_flt, fsi_loop_rwt,
+                            forloop_domain, fsi_loop_flt, fsi_loop_rwt,
+                            unstructured_domain,  fsi_loop_flt, fsi_loop_rwt,
+                            NULL);
+
+  // check safe return
+  pips_assert("loop count back to zero", fsi.enclosing_loops==0);
+
+  // sort sequences by increasing statement numbers
+  fsi_sort(fsi.seqs);
 
   // output file if any
   string file = NULL;
@@ -288,23 +510,49 @@ string freia_compile(string module, statement mod_stat, string target)
     fprintf(helper, FREIA_TRPX_INCLUDES);
 
   // hmmm...
-  hash_table occs = freia_build_image_occurrences(mod_stat);
+  hash_table occs = freia_build_image_occurrences(mod_stat, NULL);
   set output_images = freia_compute_current_output_images();
 
-  int n_dags = 0;
+  // first explicitely build and fix the list of dags,
+  // with some reverse order hocus-pocus for outputs computations...
+  list lsi = gen_nreverse(gen_copy_seq(fsi.seqs));
+  list ldags = NIL;
+  int n_dags = gen_length(fsi.seqs);
+  FOREACH(list, ls, lsi)
+  {
+    dag d = freia_build_dag(module, ls, --n_dags, occs, output_images, ldags,
+                            set_belong_p(fsi.in_loops, ls));
+    ldags = CONS(dag, d, ldags);
+  }
+  gen_free_list(lsi), lsi = NIL;
+
+  list lcurrent = ldags;
+  n_dags = 0;
+  bool compile_lone = get_bool_property("FREIA_COMPILE_LONE_OPERATIONS");
   FOREACH(list, ls, fsi.seqs)
   {
+    // get corresponding dag, which should be destroyed by the called compiler
+    dag d = DAG(CAR(lcurrent));
+    lcurrent = CDR(lcurrent);
+
+    // maybe skip lone operations
+    if (!compile_lone && gen_length(ls)==1)
+    {
+      n_dags++;
+      gen_free_list(ls);
+      continue;
+    }
+
     list allocated = NIL;
 
     if (freia_spoc_p(target))
-      allocated = freia_spoc_compile_calls(module, ls, occs, output_images,
+      allocated = freia_spoc_compile_calls(module, d, ls, occs, output_images,
                                            helper, n_dags);
     else if (freia_terapix_p(target))
-      allocated = freia_trpx_compile_calls(module, ls, occs, output_images,
+      allocated = freia_trpx_compile_calls(module, d, ls, occs, output_images,
                                            helper, n_dags);
     else if (freia_aipo_p(target))
-      freia_aipo_compile_calls(module, ls, occs, output_images, n_dags);
-    gen_free_list(ls);
+      allocated = freia_aipo_compile_calls(module, d, ls, occs, n_dags);
 
     if (allocated)
     {
@@ -314,6 +562,10 @@ string freia_compile(string module, statement mod_stat, string target)
     }
 
     n_dags++;
+
+    // cleanup list contents on the fly
+    gen_free_list(ls);
+    free_dag(d);
   }
 
   // cleanup
@@ -321,6 +573,8 @@ string freia_compile(string module, statement mod_stat, string target)
   freia_close_dep_cache();
   set_free(output_images), output_images = NULL;
   gen_free_list(fsi.seqs);
+  set_free(fsi.in_loops);
+  gen_free_list(ldags);
   if (helper) safe_fclose(helper, file);
 
   return file;
