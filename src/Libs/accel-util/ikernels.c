@@ -616,7 +616,8 @@ static void copy_from_statement(statement st) {
     fprintf(stderr, "*\n* OUT : ");
     {
       string str = concatenate("Copy from out : ", NULL);
-      SET_FOREACH(entity, e, COPY_FROM_OUT(st)) {
+      list t_from = set_to_sorted_list(COPY_FROM_OUT(st),(gen_cmp_func_t)compare_entities);
+      FOREACH(entity, e, t_from) {
         fprintf(stderr, "%s ", entity_name(e));
         str = concatenate(str, " ", entity_local_name(e), NULL);
       }
@@ -629,7 +630,8 @@ static void copy_from_statement(statement st) {
     fprintf(stderr, "* IN  : ");
     {
       string str = concatenate("Copy from in : ", NULL);
-      SET_FOREACH(entity, e, COPY_FROM_IN(st)) {
+      list t_from = set_to_sorted_list(COPY_FROM_IN(st),(gen_cmp_func_t)compare_entities);
+      FOREACH(entity, e, t_from) {
         fprintf(stderr, "%s ", entity_name(e));
         str = concatenate(str, " ", entity_local_name(e), NULL);
       }
@@ -709,21 +711,23 @@ static void copy_to_test(statement st, test t) {
 }
 static void copy_to_all_kind_of_loop(statement st, statement body) {
   /* Compute "out" sets for the loop body */
-  set_assign(COPY_TO_OUT( body ), COPY_TO_OUT( st ));
-  set_union(COPY_TO_OUT( body ),
-            COPY_TO_OUT( body ),
+  set body_out = COPY_TO_OUT(body);
+  set_union(body_out,
+            COPY_TO_OUT( st ),
             COPY_TO_IN( body ));
+
+  /* Save result */
+  set tmp = MAKE_SET();
+  set_assign(tmp,body_out);
 
   /* Compute loop body */
   copy_to_statement(body);
 
   /* Fix point  */
-  set tmp = MAKE_SET();
-  set_assign(tmp,COPY_TO_OUT(body));
-  set_union(COPY_TO_OUT( body ),
-            COPY_TO_OUT( body ),
+  set_union(body_out ,
+            COPY_TO_OUT( st ),
             COPY_TO_IN( body ));
-  if(!set_equal_p(tmp,COPY_TO_OUT(body))) {
+  if(!set_equal_p(tmp,body_out)) {
     set_free(tmp);
     return copy_to_all_kind_of_loop(st,body);
   }
@@ -801,15 +805,17 @@ static void copy_to_call(statement st, call c) {
     // Standard call (not a kernel)
     pips_debug(3,"%s is a simple call\n",
         func_name);
-    // We remove from "copy to" what is used by this statement
+    // We remove from "copy to" what is written by this statement
     FOREACH(EFFECT, eff, load_proper_rw_effects_list(st) ) {
-      entity e_used = reference_variable(effect_any_reference(eff));
-      ifdebug(6) {
-        if(entity_array_p(e_used)) {
-          pips_debug(6,"Removing %s from copy_in\n",entity_name(e_used));
+//      if(effect_write_p(eff)) { BUGGY at that time ! it breaks hoisting transfers out of loop... the scheme is broken by design !
+        entity e_used = reference_variable(effect_any_reference(eff));
+        ifdebug(6) {
+          if(entity_array_p(e_used)) {
+            pips_debug(6,"Removing %s from copy_in\n",entity_name(e_used));
+          }
         }
-      }
-      copy_to_in = set_del_element(copy_to_in, copy_to_in, e_used);
+        copy_to_in = set_del_element(copy_to_in, copy_to_in, e_used);
+//      }
     }
 
 
@@ -878,6 +884,16 @@ static void copy_to_statement(statement st) {
   // We remove from "copy to out" what is not written by this statement
   set allowed_to_copy_to= MAKE_SET();
   gen_context_recurse(st,allowed_to_copy_to,statement_domain,gen_true,get_written_entities);
+  ifdebug(4) {
+    pips_debug(0,"Removing from copy_to_out what is not written here : ");
+    set removed = MAKE_SET();
+    set_difference(removed,COPY_TO_OUT(st),allowed_to_copy_to);
+    list t_to = set_to_sorted_list(removed,(gen_cmp_func_t)compare_entities);
+    FOREACH(entity, e, t_to) {
+      fprintf(stderr, "%s ", entity_name(e));
+    }
+    fprintf(stderr, "\n");
+  }
   set_intersection(COPY_TO_OUT(st),COPY_TO_OUT(st),allowed_to_copy_to);
   set_free(allowed_to_copy_to);
 
@@ -889,7 +905,8 @@ static void copy_to_statement(statement st) {
     fprintf(stderr, "*\n* OUT : ");
     {
       string str = concatenate("Copy to out : ", NULL);
-      SET_FOREACH(entity, e, COPY_TO_OUT(st)) {
+      list t_to = set_to_sorted_list(COPY_TO_OUT(st),(gen_cmp_func_t)compare_entities);
+      FOREACH(entity, e, t_to) {
         fprintf(stderr, "%s ", entity_name(e));
         str = concatenate(str, " ", entity_local_name(e), NULL);
       }
@@ -900,7 +917,8 @@ static void copy_to_statement(statement st) {
     fprintf(stderr, "* IN  : ");
     {
       string str = concatenate("Copy to in : ", NULL);
-      SET_FOREACH(entity, e, COPY_TO_IN(st)) {
+      list t_to = set_to_sorted_list(COPY_TO_IN(st),(gen_cmp_func_t)compare_entities);
+      FOREACH(entity, e, t_to) {
         fprintf(stderr, "%s ", entity_name(e));
         str = concatenate(str, " ", entity_local_name(e), NULL);
       }
