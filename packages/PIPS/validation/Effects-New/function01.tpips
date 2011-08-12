@@ -1,0 +1,12 @@
+delete function01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create function01 function01.c
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[function01]
+
+close
+delete function01
+quit

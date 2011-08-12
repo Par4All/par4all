@@ -6,23 +6,23 @@ void main(int argc, char **argv)
    i = 0;                                                               /*0008*/
    j = 0;                                                               /*0009*/
    k = 0;                                                               /*0010*/
-   if (argc==2) goto switch_1_case_2;
-   if (argc==6) goto switch_1_case_6;
-switch_1_default:   ;
+   if (argc==2) goto _switch_1_case_2;
+   if (argc==6) goto _switch_1_case_6;
+_switch_1_default:   ;
 #pragma omp parallel for 
    for(k = k; k <= 9; k += 1)                                           /*0023*/
       a[k] = k;                                                         /*0024*/
-   goto break_1;
-switch_1_case_6:   ;
+   goto _break_1;
+_switch_1_case_6:   ;
 #pragma omp parallel for 
    for(j = 6; j <= 9; j += 1)                                           /*0018*/
       a[j] = j;                                                         /*0019*/
-   goto break_1;
-switch_1_case_2:   ;
+   goto _break_1;
+_switch_1_case_2:   ;
 #pragma omp parallel for 
    for(i = 2; i <= 9; i += 1)                                           /*0013*/
       a[i] = i;                                                         /*0014*/
-break_1:   ;
+_break_1:   ;
    return 0;                                                            /*0028*/
 }
 // This test case used to make pips ricedg phase to fail because of

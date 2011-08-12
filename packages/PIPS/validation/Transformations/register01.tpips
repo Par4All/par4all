@@ -1,0 +1,15 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv NAME=register01
+delete $NAME
+create $NAME $NAME.c
+module $NAME
+apply UNSPLIT
+shell cat $NAME.database/Src/$NAME.c
+shell pips_validation_exe.sh -c -g $NAME
+apply FORCE_REGISTER_DECLARATIONS[%ALLFUNC]
+apply UNSPLIT
+shell cat $NAME.database/Src/$NAME.c
+shell pips_validation_exe.sh -c -g $NAME
+close
+delete $NAME
+quit

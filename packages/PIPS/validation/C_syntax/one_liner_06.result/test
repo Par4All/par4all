@@ -37,10 +37,10 @@ void one_liner_06()
    if (x<0) {
       /* first switch */
       ;
-      goto switch_3_default;
-switch_3_default:      ;
-      goto break_3;
-break_3:      ;
+      goto _switch_3_default;
+_switch_3_default:      ;
+      goto _break_3;
+_break_3:      ;
    }
 }
 

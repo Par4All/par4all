@@ -1,0 +1,14 @@
+delete function02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create function02 function02.c
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[function02]
+
+close
+delete function02
+quit

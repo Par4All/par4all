@@ -1,0 +1,11 @@
+delete simplify01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create simplify01 simplify01.c
+
+display PARSED_PRINTED_FILE[main]
+close
+#delete simplify01
+quit
+

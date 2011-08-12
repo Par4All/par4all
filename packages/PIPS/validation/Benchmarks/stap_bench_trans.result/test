@@ -172,19 +172,19 @@ int HasNextBurst(FILE *fp, float *Tr)
       HasEqual = 0;
       i = 0;
 l99998:      ;
-      if (!(i<255)) goto break_2;
+      if (!(i<255)) goto _break_2;
       line[i] = fgetc(fp);
       chara = (int) line[i];
       if (chara<0) goto l99999;
       if (line[i]=='=')
          HasEqual = 1;
-      if (line[i]=='\n') goto break_2;
+      if (line[i]=='\n') goto _break_2;
       if (line[i]!=' ')
          i++;
       goto l99998;
 l99999:      ;
       EndOfFile = 1;
-break_2:      ;
+_break_2:      ;
       line[i+1] = '\0';
    }
    if (HasEqual) {

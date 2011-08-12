@@ -1,0 +1,74 @@
+
+Parsed printed file
+
+void sequence10(int argc, char *argv[])
+{
+   int i, j;
+   double a[5][5];
+
+
+   for (i = 0;i<10;i++) {
+      if (i==3)
+         goto _break_1;
+      for (j = 0;j<10;j++)
+         a[i][j] = foo(j);
+   }
+_break_1:   ;
+   return;
+}
+
+Printed file
+
+void sequence10(int argc, char *argv[])
+{
+   int i, j;
+   double a[5][5];
+
+   i = 0;
+l99999:   ;
+   if (i<10) {
+   }
+   else {
+      goto _break_1;
+   }
+   if (i==3) goto _break_1;
+   for(j = 0; j <= 9; j += 1)
+      a[i][j] = foo(j);
+   i++;
+   goto l99999;
+_break_1:   ;
+   return;
+}
+
+Printed file after inlining of "foo"
+
+void sequence10(int argc, char *argv[])
+{
+   int i, j;
+   double a[5][5];
+   //PIPS generated variable
+   int _return0;
+
+   i = 0;
+l99996:   ;
+
+   if (i<10) {
+   }
+   else {
+      goto l99997;
+   }
+   if (i==3) goto l99997;
+   for(j = 0; j <= 9; j += 1) {
+      {
+         //PIPS generated variable
+         int n0 = j;
+         _return0 = n0+14;
+      }
+      a[i][j] = _return0;
+   }
+   i++;
+   goto l99996;
+l99997:   ;
+
+   return;
+}

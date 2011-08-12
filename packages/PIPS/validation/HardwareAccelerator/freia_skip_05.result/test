@@ -28,7 +28,7 @@ digraph "dag_0" {
   "i1" [shape=circle];
 
   // outputs
-  "i1" [shape=circle];
+  "i1'" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -38,7 +38,7 @@ digraph "dag_0" {
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
   "8 -" -> "10 ^." [label="i1"];
-  "8 -" -> "i1";
+  "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
 }
@@ -49,7 +49,7 @@ digraph "dag_cleaned_0" {
   "i1" [shape=circle];
 
   // outputs
-  "i1" [shape=circle];
+  "i1'" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -59,7 +59,7 @@ digraph "dag_cleaned_0" {
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
   "8 -" -> "10 ^." [label="i1"];
-  "8 -" -> "i1";
+  "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
 }
@@ -103,7 +103,7 @@ digraph "dag_0" {
   "i1" [shape=circle];
 
   // outputs
-  "i1" [shape=circle];
+  "i1'" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -113,7 +113,7 @@ digraph "dag_0" {
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
   "8 -" -> "10 ^." [label="i1"];
-  "8 -" -> "i1";
+  "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
 }
@@ -124,7 +124,7 @@ digraph "dag_cleaned_0" {
   "i1" [shape=circle];
 
   // outputs
-  "i1" [shape=circle];
+  "i1'" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -134,7 +134,7 @@ digraph "dag_cleaned_0" {
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
   "8 -" -> "10 ^." [label="i1"];
-  "8 -" -> "i1";
+  "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
 }
@@ -142,10 +142,10 @@ digraph "dag_cleaned_0" {
 digraph "freia_skip_05_helper_0_0" {
   // inputs
   "i0" [shape=circle];
-  "i1_1" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i1" [shape=circle];
+  "i1'" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -155,8 +155,8 @@ digraph "freia_skip_05_helper_0_0" {
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
   "8 -" -> "10 ^." [label="i1"];
-  "8 -" -> "i1";
-  "i1_1" -> "8 -";
+  "8 -" -> "i1'";
+  "i1" -> "8 -";
   "i0" -> "8 -";
 }
 
@@ -195,7 +195,7 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   // STAGE 0
   // i0 [0 input 0] -> [0 alu] 8 sub
   // nope
-  // i1_1 [0 input 1] -> [0 alu] 8 sub
+  // i1 [0 input 1] -> [0 alu] 8 sub
   // nope
   // alu 8 sub stage 0
   si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
@@ -318,7 +318,7 @@ digraph "dag_0" {
   "i1" [shape=circle];
 
   // outputs
-  "i1" [shape=circle];
+  "i1'" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -328,7 +328,7 @@ digraph "dag_0" {
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
   "8 -" -> "10 ^." [label="i1"];
-  "8 -" -> "i1";
+  "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
 }
@@ -339,7 +339,7 @@ digraph "dag_cleaned_0" {
   "i1" [shape=circle];
 
   // outputs
-  "i1" [shape=circle];
+  "i1'" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -349,7 +349,7 @@ digraph "dag_cleaned_0" {
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
   "8 -" -> "10 ^." [label="i1"];
-  "8 -" -> "i1";
+  "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
 }
@@ -357,10 +357,10 @@ digraph "dag_cleaned_0" {
 digraph "freia_skip_05_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
-  "i1_1" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "i1" [shape=circle];
+  "i1'" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -370,8 +370,8 @@ digraph "freia_skip_05_helper_0_0_0" {
   "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
   "8 -" -> "10 ^." [label="i1"];
-  "8 -" -> "i1";
-  "i1_1" -> "8 -";
+  "8 -" -> "i1'";
+  "i1" -> "8 -";
   "i0" -> "8 -";
 }
 
@@ -562,7 +562,7 @@ freia_status freia_skip_05_helper_0_0_0(
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
   tile_in[1][0].y = 0;
-  // - imagelet 2 is i1 for i1_1
+  // - imagelet 2 is i1 for i1
   tile_in[0][1].x = imagelet_io_2_0;
   tile_in[0][1].y = 0;
   tile_in[1][1].x = imagelet_io_2_1;

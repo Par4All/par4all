@@ -5,7 +5,7 @@ int main()
       i = 0;
       if (!(i<5)) {
       }
-break_2:      ;
+_break_2:      ;
    }
 }
 Try more aggressive restructuring:
@@ -19,7 +19,7 @@ int main()
       i = 0;
       if (!(i<5))
          ;
-break_2:      ;
+_break_2:      ;
    }
 }
 

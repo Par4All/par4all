@@ -21,7 +21,7 @@ l99999:   ;
 //  T() {}
 
 
-   if (!true) goto break_1;
+   if (!true) goto _break_1;
 
 //  T(y) {y#init<=y+1, y<=y#init+1}
 
@@ -38,7 +38,7 @@ l99999:   ;
 
 //  T() {}
 
-   if (y<0) goto break_1;
+   if (y<0) goto _break_1;
 
 //  T(x) {x==x#init+1, 0<=y}
 
@@ -47,7 +47,7 @@ l99999:   ;
 
 //  T() {0<=x+51y, y<=x, 0<=y+1}
 
-break_1:   ;
+_break_1:   ;
 
 //  T() {0<=x+51y, y<=x, 0<=y+1}
 
@@ -81,7 +81,7 @@ l99999:   ;
 //  P(x,y) {y<=x, 0<=y}
 
 
-   if (!true) goto break_1;
+   if (!true) goto _break_1;
 
 //  P(x,y) {y<=x, 0<=y}
 
@@ -98,7 +98,7 @@ l99999:   ;
 
 //  P(x,y) {0<=x, y<=x+1, 0<=y+1}
 
-   if (y<0) goto break_1;
+   if (y<0) goto _break_1;
 
 //  P(x,y) {0<=x, y<=x+1, 0<=y}
 
@@ -107,7 +107,7 @@ l99999:   ;
 
 //  P(x,y) {0<=x, y<=x, 0<=y+1}
 
-break_1:   ;
+_break_1:   ;
 
 //  P(x,y) {0<=x, 0<=x+51y, y<=x, 0<=y+1}
 

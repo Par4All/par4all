@@ -1,7 +1,7 @@
 delete complexes
 create complexes complexes.f
 setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALLFUNC]
 close
 delete complexes
 quit

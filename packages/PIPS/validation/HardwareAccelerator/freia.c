@@ -22,9 +22,14 @@ freia_status freia_common_destruct_data(freia_data2d * img)
   return FREIA_OK;
 }
 
-int32_t freia_common_get(freia_data2d * img, int32_t i, int32_t j)
+int32_t freia_common_get(const freia_data2d * img, int32_t i, int32_t j)
 {
   return img->stuff + i + j;
+}
+
+void freia_common_set(freia_data2d * img, int32_t i, int32_t j, int32_t v)
+{
+  img->stuff += (i+j+v);
 }
 
 freia_ptr freia_common_alloc(uint32_t s)
@@ -42,6 +47,7 @@ freia_status freia_common_open_input(freia_dataio * in, uint32_t n)
   in->framebpp = 16;
   in->frameheight = 256;
   in->framewidth = 512;
+  in->frameindex = 0;
   in->stuff = n;
   global_io_effect++;
   return FREIA_OK;
@@ -53,6 +59,7 @@ freia_status freia_common_open_output(freia_dataio *out,
   out->framebpp = b;
   out->frameheight = h;
   out->framewidth = w;
+  out->frameindex = 0;
   out->stuff = n;
   global_io_effect++;
   return FREIA_OK;
@@ -61,6 +68,7 @@ freia_status freia_common_open_output(freia_dataio *out,
 freia_status freia_common_rx_image(freia_data2d * img, freia_dataio * in)
 {
   img->stuff = in->stuff;
+  in->frameindex++;
   global_io_effect++;
   return FREIA_OK;
 }
@@ -68,6 +76,7 @@ freia_status freia_common_rx_image(freia_data2d * img, freia_dataio * in)
 freia_status freia_common_tx_image(const freia_data2d * img, freia_dataio * out)
 {
   out->stuff += img->stuff;
+  out->frameindex++;
   global_io_effect++;
   return FREIA_OK;
 }
@@ -111,6 +120,16 @@ freia_status freia_common_set_wa(freia_data2d *image,
    int32_t x1, int32_t y1, int32_t w, int32_t h)
 {
   image->stuff += x1+y1+w+h;
+  return FREIA_OK;
+}
+
+freia_status freia_common_get_wa(const freia_data2d *image,
+   int32_t * x, int32_t * y, int32_t * w, int32_t * h)
+{
+  *x = image->xStartWa;
+  *y = image->yStartWa;
+  *w = image->widthWa;
+  *h = image->heightWa;
   return FREIA_OK;
 }
 
@@ -290,3 +309,4 @@ Fun2P(freia_cipo_gradient);
 Fun2P(freia_cipo_inner_gradient);
 Fun2P(freia_cipo_open);
 Fun2P(freia_cipo_close);
+FbinP(freia_cipo_fast_correlation, uint32_t);

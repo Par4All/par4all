@@ -1,0 +1,10 @@
+delete register02
+create register02 register02.c
+
+display PARSED_PRINTED_FILE[main]
+
+close
+
+#delete register02 
+
+quit

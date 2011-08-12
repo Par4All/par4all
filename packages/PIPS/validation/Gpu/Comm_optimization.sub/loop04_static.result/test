@@ -1,0 +1,35 @@
+//
+// Initial code for module main
+//
+int main()
+{
+   int i, j;
+   int n = 10;
+   int a[10];
+   // Because we know it statically, we are more precise then (see loop04.c for C99 version)
+   int sum;
+   for(i = 0; i <= n-1; i += 1) {
+      a[0] = a[0]+1;
+      kernel(n, a);
+   }
+
+   int c = a[0];
+}
+//
+// Code after kernel_data_mapping for module main
+//
+int main()
+{
+   int i, j;
+   int n = 10;
+   int a[10];
+   // Because we know it statically, we are more precise then (see loop04.c for C99 version)
+   int sum;
+   for(i = 0; i <= n-1; i += 1) {
+      a[0] = a[0]+1;
+      kernel(n, a);
+      P4A_copy_from_accel(a, sizeof(int)*10);
+   }
+
+   int c = a[0];
+}

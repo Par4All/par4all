@@ -49,4 +49,4 @@ echo
 #apply SUPPRESS_DEAD_CODE[${NAME}]
 display PRINTED_FILE[${NAME}]
 close
-delete ${WSPACE}
+#delete ${WSPACE}

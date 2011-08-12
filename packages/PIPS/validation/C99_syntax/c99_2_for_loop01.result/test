@@ -30,7 +30,7 @@ int main()
 // (1,9)
          
          /* First loop */
-         for (i = 0;(i<67);i++)
+         for (i = 0;i<67;i++)
 // (1,10)
             a += b;
       }}
@@ -47,7 +47,7 @@ int main()
 // (1,13)
          
          // Second loop
-         for (j = 32;(j>(-34));j--)
+         for (j = 32;j>(-34);j--)
 // (1,14)
             b -= a;
       }}
@@ -127,7 +127,7 @@ int main()
 // (1,9)
          
          /* First loop */
-         for (i = 0;(i<67);i++)
+         for (i = 0;i<67;i++)
 
 //  P(i) {0<=i, i<=66}
 
@@ -156,7 +156,7 @@ int main()
 // (1,13)
          
          // Second loop
-         for (j = 32;(j>(-34));j--)
+         for (j = 32;j>(-34);j--)
 
 //  P(j) {0<=j+33, j<=32}
 

@@ -105,10 +105,6 @@ digraph "dag_0" {
   // computation vertices
   "71 -" [shape=trapezium,orientation=270];
   "71 -" -> "og";
-  "70 ?" [shape=none];
-  "70 ?" -> "61 ?" [arrowhead=empty,label="ret_0"];
-  "69 ?" [shape=none];
-  "69 ?" -> "70 ?" [arrowhead=empty,label="I_10_0"];
   "66 E8" [shape=box];
   "66 E8" -> "71 -" [label="og"];
   "65 E8" [shape=box];
@@ -117,10 +113,6 @@ digraph "dag_0" {
   "64 E8" -> "65 E8" [label="og"];
   "63 E8" [shape=box];
   "63 E8" -> "64 E8" [label="og"];
-  "61 ?" [shape=none];
-  "61 ?" -> "70 ?" [arrowhead=empty,label="ret_0"];
-  "60 ?" [shape=none];
-  "60 ?" -> "61 ?" [arrowhead=empty,label="I_3_0"];
   "57 D8" [shape=box];
   "57 D8" -> "71 -" [label="t"];
   "56 D8" [shape=box];
@@ -161,35 +153,27 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "71 -" [shape=trapezium,orientation=270];
   "71 -" -> "og";
-  "70 ?" [shape=none];
-  "70 ?" -> "61 ?" [arrowhead=empty,label="ret_0"];
-  "69 ?" [shape=none];
-  "69 ?" -> "70 ?" [arrowhead=empty,label="I_10_0"];
   "66 E8" [shape=box];
-  "66 E8" -> "71 -" [label="og"];
+  "66 E8" -> "71 -" [label="og_1"];
   "65 E8" [shape=box];
-  "65 E8" -> "66 E8" [label="og"];
+  "65 E8" -> "66 E8" [label="og_2"];
   "64 E8" [shape=box];
-  "64 E8" -> "65 E8" [label="og"];
+  "64 E8" -> "65 E8" [label="og_3"];
   "63 E8" [shape=box];
-  "63 E8" -> "64 E8" [label="og"];
-  "61 ?" [shape=none];
-  "61 ?" -> "70 ?" [arrowhead=empty,label="ret_0"];
-  "60 ?" [shape=none];
-  "60 ?" -> "61 ?" [arrowhead=empty,label="I_3_0"];
+  "63 E8" -> "64 E8" [label="og_4"];
   "46 D8" [shape=box];
   "46 D8" -> "od";
   "45 D8" [shape=box];
-  "45 D8" -> "46 D8" [label="od"];
+  "45 D8" -> "46 D8" [label="od_1"];
   "44 D8" [shape=box];
-  "44 D8" -> "71 -" [label="od"];
-  "44 D8" -> "45 D8" [label="od"];
+  "44 D8" -> "71 -" [label="od_2"];
+  "44 D8" -> "45 D8" [label="od_2"];
   "43 D8" [shape=box];
-  "43 D8" -> "44 D8" [label="od"];
+  "43 D8" -> "44 D8" [label="od_3"];
   "42 D8" [shape=box];
-  "42 D8" -> "43 D8" [label="od"];
+  "42 D8" -> "43 D8" [label="od_4"];
   "41 D8" [shape=box];
-  "41 D8" -> "42 D8" [label="od"];
+  "41 D8" -> "42 D8" [label="od_5"];
   "39 vol" [shape=diamond];
   "38 min" [shape=diamond];
   "in" -> "63 E8";
@@ -217,26 +201,18 @@ int anr999_02(void)
    freia_status ret_0;                                                  /*0024*/
    int i_1;                                                             /*0026*/
    int i_2;                                                             /*0027*/
+   // hardware accelerator generated variable
+   freia_data2d *od_2 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0029*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0030*/
 
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0032*/
    od = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0033*/
+   od_2 = freia_common_create_data(od->bpp, od->widthWa, od->heightWa);
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
-   
-   
-   freia_aipo_global_min(in, &measure_min);                             /*0038*/
-   freia_aipo_global_vol(in, &measure_vol);                             /*0039*/
-
-   freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0041*/
-   freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0042*/
-   freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0043*/
-   freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0044*/
-   freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0045*/
-   freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0046*/
    i_0 = 10;                                                            /*0047*/
 
    I_6 = 0;                                                             /*0049*/
@@ -246,20 +222,31 @@ int anr999_02(void)
 
    I_3_0 = 0;                                                           /*0060*/
    ret_0 = I_3_0;                                                       /*0061*/
-
-   freia_aipo_erode_8c(og, in, freia_morpho_kernel_8c);                 /*0063*/
-   freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0064*/
-   freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0065*/
-   freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0066*/
    i_2 = 10;                                                            /*0067*/
 
    I_10_0 = 0;                                                          /*0069*/
    ret_0 |= I_10_0;                                                     /*0070*/
-   ret_0 |= freia_aipo_sub(og, od, og);                                 /*0071*/
-
    I_13 = 0;                                                            /*0074*/
    I_13;                                                                /*0075*/
 
+   freia_aipo_global_min(in, &measure_min);                             /*0038*/
+   freia_aipo_global_vol(in, &measure_vol);                             /*0039*/
+
+   freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0041*/
+   freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0042*/
+   freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0043*/
+   freia_aipo_dilate_8c(od_2, od, freia_morpho_kernel_8c);              /*0044*/
+   freia_aipo_dilate_8c(od, od_2, freia_morpho_kernel_8c);              /*0045*/
+   freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0046*/
+   
+   
+   freia_aipo_erode_8c(og, in, freia_morpho_kernel_8c);                 /*0063*/
+   freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0064*/
+   freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0065*/
+   freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0066*/
+   ret_0 |= freia_aipo_sub(og, od_2, og);                               /*0071*/
+   
+   
    printf("input global min = %d\n", measure_min);                      /*0077*/
    printf("input global volume = %d\n", measure_vol);                   /*0078*/
 
@@ -269,6 +256,7 @@ int anr999_02(void)
 
    freia_common_destruct_data(in);                                      /*0084*/
    freia_common_destruct_data(od);                                      /*0085*/
+   freia_common_destruct_data(od_2);
    freia_common_destruct_data(og);                                      /*0086*/
 
    freia_common_close_input(&fdin);                                     /*0088*/
@@ -420,10 +408,6 @@ digraph "dag_0" {
   // computation vertices
   "71 -" [shape=trapezium,orientation=270];
   "71 -" -> "og";
-  "70 ?" [shape=none];
-  "70 ?" -> "61 ?" [arrowhead=empty,label="ret_0"];
-  "69 ?" [shape=none];
-  "69 ?" -> "70 ?" [arrowhead=empty,label="I_10_0"];
   "66 E8" [shape=box];
   "66 E8" -> "71 -" [label="og"];
   "65 E8" [shape=box];
@@ -432,10 +416,6 @@ digraph "dag_0" {
   "64 E8" -> "65 E8" [label="og"];
   "63 E8" [shape=box];
   "63 E8" -> "64 E8" [label="og"];
-  "61 ?" [shape=none];
-  "61 ?" -> "70 ?" [arrowhead=empty,label="ret_0"];
-  "60 ?" [shape=none];
-  "60 ?" -> "61 ?" [arrowhead=empty,label="I_3_0"];
   "57 D8" [shape=box];
   "57 D8" -> "71 -" [label="t"];
   "56 D8" [shape=box];
@@ -476,10 +456,6 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "71 -" [shape=trapezium,orientation=270];
   "71 -" -> "og";
-  "70 ?" [shape=none];
-  "70 ?" -> "61 ?" [arrowhead=empty,label="ret_0"];
-  "69 ?" [shape=none];
-  "69 ?" -> "70 ?" [arrowhead=empty,label="I_10_0"];
   "66 E8" [shape=box];
   "66 E8" -> "71 -" [label="og"];
   "65 E8" [shape=box];
@@ -488,10 +464,6 @@ digraph "dag_cleaned_0" {
   "64 E8" -> "65 E8" [label="og"];
   "63 E8" [shape=box];
   "63 E8" -> "64 E8" [label="og"];
-  "61 ?" [shape=none];
-  "61 ?" -> "70 ?" [arrowhead=empty,label="ret_0"];
-  "60 ?" [shape=none];
-  "60 ?" -> "61 ?" [arrowhead=empty,label="I_3_0"];
   "46 D8" [shape=box];
   "46 D8" -> "od";
   "45 D8" [shape=box];
@@ -755,10 +727,6 @@ int anr999_02(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
-   
-   
-   anr999_02_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
-
    i_0 = 10;                                                            /*0047*/
 
    I_6 = 0;                                                             /*0049*/
@@ -768,16 +736,20 @@ int anr999_02(void)
 
    I_3_0 = 0;                                                           /*0060*/
    ret_0 = I_3_0;                                                       /*0061*/
-
    i_2 = 10;                                                            /*0067*/
 
    I_10_0 = 0;                                                          /*0069*/
    ret_0 |= I_10_0;                                                     /*0070*/
-   ret_0 |= 0;                                                          /*0071*/
-
    I_13 = 0;                                                            /*0074*/
    I_13;                                                                /*0075*/
 
+   anr999_02_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
+   
+   
+   
+   ret_0 |= 0;                                                          /*0071*/
+   
+   
    printf("input global min = %d\n", measure_min);                      /*0077*/
    printf("input global volume = %d\n", measure_vol);                   /*0078*/
 
@@ -823,10 +795,6 @@ int anr999_02(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
-   
-   
-   anr999_02_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
-
    i_0 = 10;                                                            /*0047*/
 
    I_6 = 0;                                                             /*0049*/
@@ -835,13 +803,17 @@ int anr999_02(void)
 
    I_3_0 = 0;                                                           /*0060*/
    ret_0 = 0;                                                           /*0061*/
-
    i_2 = 10;                                                            /*0067*/
 
    I_10_0 = 0;                                                          /*0069*/
-
    I_13 = 0;                                                            /*0074*/
 
+   anr999_02_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
+   
+   
+   
+   
+   
    printf("input global min = %d\n", measure_min);                      /*0077*/
    printf("input global volume = %d\n", measure_vol);                   /*0078*/
 
@@ -1002,10 +974,6 @@ digraph "dag_0" {
   // computation vertices
   "71 -" [shape=trapezium,orientation=270];
   "71 -" -> "og";
-  "70 ?" [shape=none];
-  "70 ?" -> "61 ?" [arrowhead=empty,label="ret_0"];
-  "69 ?" [shape=none];
-  "69 ?" -> "70 ?" [arrowhead=empty,label="I_10_0"];
   "66 E8" [shape=box];
   "66 E8" -> "71 -" [label="og"];
   "65 E8" [shape=box];
@@ -1014,10 +982,6 @@ digraph "dag_0" {
   "64 E8" -> "65 E8" [label="og"];
   "63 E8" [shape=box];
   "63 E8" -> "64 E8" [label="og"];
-  "61 ?" [shape=none];
-  "61 ?" -> "70 ?" [arrowhead=empty,label="ret_0"];
-  "60 ?" [shape=none];
-  "60 ?" -> "61 ?" [arrowhead=empty,label="I_3_0"];
   "57 D8" [shape=box];
   "57 D8" -> "71 -" [label="t"];
   "56 D8" [shape=box];
@@ -1058,10 +1022,6 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "71 -" [shape=trapezium,orientation=270];
   "71 -" -> "og";
-  "70 ?" [shape=none];
-  "70 ?" -> "61 ?" [arrowhead=empty,label="ret_0"];
-  "69 ?" [shape=none];
-  "69 ?" -> "70 ?" [arrowhead=empty,label="I_10_0"];
   "66 E8" [shape=box];
   "66 E8" -> "71 -" [label="og"];
   "65 E8" [shape=box];
@@ -1070,10 +1030,6 @@ digraph "dag_cleaned_0" {
   "64 E8" -> "65 E8" [label="og"];
   "63 E8" [shape=box];
   "63 E8" -> "64 E8" [label="og"];
-  "61 ?" [shape=none];
-  "61 ?" -> "70 ?" [arrowhead=empty,label="ret_0"];
-  "60 ?" [shape=none];
-  "60 ?" -> "61 ?" [arrowhead=empty,label="I_3_0"];
   "46 D8" [shape=box];
   "46 D8" -> "od";
   "45 D8" [shape=box];
@@ -1691,10 +1647,6 @@ int anr999_02(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
-   
-   
-   anr999_02_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
-
    i_0 = 10;                                                            /*0047*/
 
    I_6 = 0;                                                             /*0049*/
@@ -1704,16 +1656,20 @@ int anr999_02(void)
 
    I_3_0 = 0;                                                           /*0060*/
    ret_0 = I_3_0;                                                       /*0061*/
-
    i_2 = 10;                                                            /*0067*/
 
    I_10_0 = 0;                                                          /*0069*/
    ret_0 |= I_10_0;                                                     /*0070*/
-   ret_0 |= 0;                                                          /*0071*/
-
    I_13 = 0;                                                            /*0074*/
    I_13;                                                                /*0075*/
 
+   anr999_02_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
+   
+   
+   
+   ret_0 |= 0;                                                          /*0071*/
+   
+   
    printf("input global min = %d\n", measure_min);                      /*0077*/
    printf("input global volume = %d\n", measure_vol);                   /*0078*/
 
@@ -1759,10 +1715,6 @@ int anr999_02(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
-   
-   
-   anr999_02_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
-
    i_0 = 10;                                                            /*0047*/
 
    I_6 = 0;                                                             /*0049*/
@@ -1771,13 +1723,17 @@ int anr999_02(void)
 
    I_3_0 = 0;                                                           /*0060*/
    ret_0 = 0;                                                           /*0061*/
-
    i_2 = 10;                                                            /*0067*/
 
    I_10_0 = 0;                                                          /*0069*/
-
    I_13 = 0;                                                            /*0074*/
 
+   anr999_02_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);            /*0038*/
+   
+   
+   
+   
+   
    printf("input global min = %d\n", measure_min);                      /*0077*/
    printf("input global volume = %d\n", measure_vol);                   /*0078*/
 

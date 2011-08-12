@@ -54,6 +54,12 @@ digraph "dag_cleaned_0" {
   "8 <" -> "t";
   "i1" -> "8 <";
   "i0" -> "8 <";
+
+  // external copies: 1
+  "o" [shape=circle];
+  "o =" [shape=circle,label="=",style="dashed"]
+  "t" -> "o =";
+  "o =" -> "o";
 }
 
 ! updated function for
@@ -121,6 +127,12 @@ digraph "dag_cleaned_0" {
   "8 <" -> "t";
   "i1" -> "8 <";
   "i0" -> "8 <";
+
+  // external copies: 1
+  "o" [shape=circle];
+  "o =" [shape=circle,label="=",style="dashed"]
+  "t" -> "o =";
+  "o =" -> "o";
 }
 // graph for dag "freia_dup_10_helper_0_0" of module "freia_dup_10" in dot format
 digraph "freia_dup_10_helper_0_0" {
@@ -293,6 +305,12 @@ digraph "dag_cleaned_0" {
   "8 <" -> "t";
   "i1" -> "8 <";
   "i0" -> "8 <";
+
+  // external copies: 1
+  "o" [shape=circle];
+  "o =" [shape=circle,label="=",style="dashed"]
+  "t" -> "o =";
+  "o =" -> "o";
 }
 // graph for dag "freia_dup_10_helper_0_0_0" of module "freia_dup_10" in dot format
 digraph "freia_dup_10_helper_0_0_0" {

@@ -1,0 +1,43 @@
+delete sequence10
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create sequence10 sequence10.c
+
+#setproperty C89_CODE_GENERATION TRUE
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[sequence10]
+
+echo
+echo Printed file
+echo
+
+activate NEW_CONTROLIZER
+
+#setenv CONTROL_DEBUG_LEVEL 8
+
+display PRINTED_FILE[sequence10]
+
+echo
+echo Printed file after inlining of "foo"
+echo
+
+apply INLINING_SIMPLE[foo]
+
+display PRINTED_FILE[sequence10]
+
+#echo
+#echo Execute result
+#echo
+
+#apply UNSPLIT
+
+#shell gcc sequence10.database/Src/sequence10.c -o sequence10.database/a.out
+#shell sequence10.database/a.out
+
+close
+quit

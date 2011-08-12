@@ -1,0 +1,14 @@
+delete address_of01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create address_of01 address_of01.c
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[address_of01]
+
+close
+delete address_of01
+quit
