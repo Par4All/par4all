@@ -1393,7 +1393,7 @@ static int freia_trpx_compile_one_dag(
     fname_dag = s;
   }
 
-  dag_dot_dump(module, fname_dag, d);
+  dag_dot_dump(module, fname_dag, d, NIL);
 
   // - output function in helper file
   list lparams = NIL;
@@ -1889,7 +1889,7 @@ list freia_trpx_compile_calls
   list added_stats = freia_dag_optimize(fulld);
 
   // dump final dag
-  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
 
   hash_table init = hash_table_make(hash_pointer, 0);
   list new_images = dag_fix_image_reuse(fulld, init, occs);

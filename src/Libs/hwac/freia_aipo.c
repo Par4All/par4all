@@ -57,7 +57,7 @@ list freia_aipo_compile_calls
   list new_images = dag_fix_image_reuse(fulld, init, occs);
 
   // dump final optimised dag
-  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
 
   // now may put actual allocations, which messes up statement numbers
   list reals = freia_allocate_new_images_if_needed(ls, new_images, occs, init);

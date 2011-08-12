@@ -2200,7 +2200,7 @@ list freia_spoc_compile_calls
           number, n_op_init, n_op_init_copies, n_op_opt, n_op_opt_copies);
 
   // dump final dag
-  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld);
+  dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
 
   hash_table init = hash_table_make(hash_pointer, 0);
   list new_images = dag_fix_image_reuse(fulld, init, occs);
@@ -2243,7 +2243,7 @@ list freia_spoc_compile_calls
     string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_pipes++)));
 
     ifdebug(4) dag_dump(stderr, "d", d);
-    dag_dot_dump(module, fname_dag, d);
+    dag_dot_dump(module, fname_dag, d, NIL);
 
     // one logical pipeline may be split because of overflow
     // the dag is updated to reflect that as a code generation side effect

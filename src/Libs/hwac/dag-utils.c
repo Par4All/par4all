@@ -339,7 +339,7 @@ static void dagvtx_list_dot(
  * @param what, name of dag
  * @param d, dag to output
  */
-void dag_dot(FILE * out, const string what, const dag d)
+void dag_dot(FILE * out, const string what, const dag d, const list ls)
 {
   fprintf(out, "digraph \"%s\" {\n", what);
 
@@ -369,7 +369,35 @@ void dag_dot(FILE * out, const string what, const dag d)
       entity img = vtxcontent_out(c);
       dagvtx_dot_node(out, "  ", vx);
       fprintf(out, " -> \"%s%s\";\n",
-              entity_dot_name(img),  set_belong_p(inputs, img)? "'": "");
+              entity_dot_name(img), set_belong_p(inputs, img)? "'": "");
+    }
+  }
+
+  // handle external copies after the computation
+  if (ls)
+  {
+    fprintf(out, "\n  // external copies: %d\n", (int) gen_length(ls));
+    FOREACH(statement, s, ls)
+    {
+      call c = freia_statement_to_call(s);
+      if (c && same_string_p(entity_local_name(call_function(c)), AIPO "copy"))
+      {
+        list args = call_arguments(c);
+        pips_assert("two args to aipo copy", gen_length(args)==2);
+        entity dst = expression_to_entity(EXPRESSION(CAR(args)));
+        entity src = expression_to_entity(EXPRESSION(CAR(CDR(args))));
+        fprintf(out,
+                "  \"%s%s\" [shape=circle];\n"
+                "  \"%s =\" [shape=circle,label=\"=\",style=\"dashed\"]\n"
+                "  \"%s%s\" -> \"%s =\";\n"
+                "  \"%s =\" -> \"%s%s\";\n",
+                entity_dot_name(dst), set_belong_p(inputs, dst)? "'": "",
+                entity_dot_name(dst),
+                entity_dot_name(src), set_belong_p(inputs, src)? "'": "",
+                entity_dot_name(dst), entity_dot_name(dst),
+                entity_dot_name(dst), set_belong_p(inputs, dst)? "'": "");
+      }
+      // should not be a else?
     }
   }
 
@@ -382,7 +410,8 @@ void dag_dot(FILE * out, const string what, const dag d)
 
 /* generate a "dot" format from a dag to a file.
  */
-void dag_dot_dump(const string module, const string name, const dag d)
+void dag_dot_dump(const string module, const string name,
+                  const dag d, const list ls)
 {
   // build file name
   string src_dir = db_get_directory_name_for_module(module);
@@ -392,15 +421,16 @@ void dag_dot_dump(const string module, const string name, const dag d)
   FILE * out = safe_fopen(fn, "w");
   fprintf(out, "// graph for dag \"%s\" of module \"%s\" in dot format\n",
     name, module);
-  dag_dot(out, name, d);
+  dag_dot(out, name, d, ls);
   safe_fclose(out, fn);
   free(fn);
 }
 
-void dag_dot_dump_prefix(string module, string prefix, int number, dag d)
+void dag_dot_dump_prefix(const string module, const string prefix, int number,
+                         const dag d, const list ls)
 {
   string name = strdup(cat(prefix, itoa(number), NULL));
-  dag_dot_dump(module, name, d);
+  dag_dot_dump(module, name, d, ls);
   free(name);
 }
 
@@ -2043,7 +2073,7 @@ dag freia_build_dag(
   ifdebug(3) dag_dump(stderr, "fulld", fulld);
 
   // dump resulting dag
-  dag_dot_dump_prefix(module, "dag_", number, fulld);
+  dag_dot_dump_prefix(module, "dag_", number, fulld, NIL);
 
   return fulld;
 }
