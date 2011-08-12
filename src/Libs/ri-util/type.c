@@ -339,7 +339,6 @@ type MakeAnyScalarResult(tag t, _int size)
  */
 bool same_type_p(type t1, type t2)
 {
-  bool tequal = false;
   t1= ultimate_type(t1);
   t2= ultimate_type(t2);
   return type_equal_p(t1,t2);
