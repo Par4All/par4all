@@ -118,7 +118,11 @@ void do_one_iteration(int m, int n, IMAGE_RGB x[m][n], RGB ui[m][n], RGB uj[m][n
    int qofs = (int) q/(-2);
    {
       //PIPS generated variable
-      FLOAT (*P4A_var_kInv0)[3][3] = (FLOAT (*)[3][3]) 0, (*P4A_var_ui0)[m][n][3] = (RGB (*)[m][n][3]) 0, (*P4A_var_uj0)[m][n][3] = (RGB (*)[m][n][3]) 0, (*P4A_var_weights0)[q][q] = (FLOAT (*)[q][q]) 0;
+      FLOAT (*P4A_var_kInv0)[3][3] = (FLOAT (*)[3][3]) 0;
+      //PIPS generated variable
+      RGB (*P4A_var_ui0)[m][n][3] = (RGB (*)[m][n][3]) 0, (*P4A_var_uj0)[m][n][3] = (RGB (*)[m][n][3]) 0;
+      //PIPS generated variable
+      FLOAT (*P4A_var_weights0)[q][q] = (FLOAT (*)[q][q]) 0;
       //PIPS generated variable
       IMAGE_RGB (*P4A_var_x0)[m][n][3] = (IMAGE_RGB (*)[m][n][3]) 0;
       P4A_accel_malloc((void **) &P4A_var_x0, sizeof(unsigned char)*m*n*3);
