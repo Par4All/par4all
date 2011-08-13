@@ -10,7 +10,7 @@
 # define TSTEPS 10000
 #endif
 #ifndef N
-# define N 4096*10
+# define N 4096
 #endif
 
 /* Default data type is double. */
