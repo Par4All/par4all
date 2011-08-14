@@ -1,5 +1,6 @@
 user warning in tp_parse: user_error03: No such workspace
 Registering file user_error03.f
+user warning in process_user_file: No syntactic check on file "./user_error03.f"
 Splitting file    ./user_error03.f
   Module         B
   Module         USER_ERROR03

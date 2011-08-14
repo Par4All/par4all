@@ -1,4 +1,5 @@
 Registering file synthesis05.f
+user warning in process_user_file: No syntactic check on file "./synthesis05.f"
 Splitting file    ./synthesis05.f
   Module         SYNTHESIS05
 Workspace synthesis05 created and opened.
