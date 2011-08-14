@@ -867,7 +867,7 @@ Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
 \Pips{}.
 
 
-\section{Preprocessing and splitting}
+\section{Preprocessing and Splitting}
 \label{subsection-preprocessing-and-splitting}
 \index{Preprocessing}
 \index{Splitting}
@@ -882,13 +882,13 @@ Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
 The Fortran files specified as input to \Pips{} by the user are
 preprocessed in various ways.
 
-\subsubsection{Fortran syntax verification}
+\subsubsection{Fortran Syntactic Verification}
 \label{sec:fortr-synt-verif}
 
-If the \verb|PIPS_CHECK_FORTRAN| shell environment variable is defined to
-true, the syntax of the file is checked by compiling it with a Fortran 77
-compiler (namely, the \verb|PIPS_FLINT| variable is used for that purpose,
-and defaults to \verb|f77 -c -ansi|).
+If the \verb|PIPS_CHECK_FORTRAN| shell environment variable is defined
+to true, the syntax of the file is checked by compiling it with a
+Fortran 77 compiler (namely, the \verb|PIPS_FLINT| environement
+variable is used for that purpose, and defaults to \verb|f77 -c -ansi|).
 
 In case of failure, a warning is displayed. Note that if the program
 cannot be compiled properly with a Fortran compiler, it is likely that
@@ -1005,6 +1005,32 @@ environment variable.
 This \verb|PIPS_CPP_FLAGS| variable can also be used to locate the include
 files. Directories to search are specified with the \texttt{-I\emph{file}}
 option, as usual for the C preprocessor.
+
+\subsubsection{C Syntactic Verification}
+\label{sec:c-synt-verif}
+
+If the \verb|PIPS_CHECK_C| shell environment variable is defined to
+\verb|true| or \verb|yes|, the syntax of the file is checked by
+compiling it with a C compiler. The environment variable \verb|PIPS_CC|
+is used for that purpose. If it is undefined, the compiler chose is
+\verb|gcc -c |).
+
+In case of failure, a warning is displayed. Note that if the program
+cannot be compiled properly with a Fortran compiler, it is likely that
+many problems will be encountered within \Pips{}.
+
+The next property also triggers this preliminary syntactic verification.
+
+\begin{PipsProp}{CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS}
+CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+\end{PipsProp}
+
+Although its default value is \verb|FALSE|, it is much safer to set it
+to true when dealing with new sources files. PIPS is not designed to
+process non-standard source code. Bugs in source files are not well
+explained or localized. They can result in weird behaviors and
+inexpected core dumps. Before complaining about PIPS, it is higly
+recommended to set this property to \verb|TRUE|. 
 
 \subsection{Source File Hierarchy}
 \label{sec:source-file-hierarchy}
@@ -2172,7 +2198,7 @@ Note that the standard name in the Dragon book is likely to be {\em
   Gen} and {\em Kill} sets in the standard data flow analysis
 framework, but PIPS uses the more general concept of {\em effect}
 developped by P.~Jouvelot and D.~Gifford~\cite{JG89} and its analyses are mostly
-based on the abstgract syntac tree (AST) rather than the control flow
+based on the abstract syntac tree (AST) rather than the control flow
 graph (CFG).
 
 \subsection{Proper Memory Effects}
@@ -10099,7 +10125,7 @@ Inlining is a well known technique.  Basically, it replaces a function
 call by the function body. The current implementation does not work if
 the function has static declarations, access global variables \dots.
 Actually it (seems to) work(s) for pure, non-recursive functions \dots
-and not for any kind of call.
+and not to work for any other kind of call.
 
 Property \PipsPropRef{INLINING_CALLERS} can be set to define the list of
 functions where the call sites have to be inlined. By default, all
