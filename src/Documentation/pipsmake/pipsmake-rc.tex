@@ -1015,9 +1015,11 @@ compiling it with a C compiler. The environment variable \verb|PIPS_CC|
 is used for that purpose. If it is undefined, the compiler chose is
 \verb|gcc -c |).
 
-In case of failure, a warning is displayed. Note that if the program
-cannot be compiled properly with a Fortran compiler, it is likely that
-many problems will be encountered within \Pips{}.
+In case of failure, a warning is displayed.
+
+If the environement variable \verb|PIPS_CPP_FLAGS| is defined, it
+should contain the options \verb|-Wall| and \verb|-Werror| for the
+check to be effective.
 
 The next property also triggers this preliminary syntactic verification.
 
@@ -1026,11 +1028,14 @@ CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 \end{PipsProp}
 
 Although its default value is \verb|FALSE|, it is much safer to set it
-to true when dealing with new sources files. PIPS is not designed to
+to true when dealing with new sources files. \Pips{} is not designed to
 process non-standard source code. Bugs in source files are not well
 explained or localized. They can result in weird behaviors and
-inexpected core dumps. Before complaining about PIPS, it is higly
+inexpected core dumps. Before complaining about \Pips{}, it is higly
 recommended to set this property to \verb|TRUE|. 
+
+Note: the C and Fortran syntactic verifications could be controlled by
+a unique property.
 
 \subsection{Source File Hierarchy}
 \label{sec:source-file-hierarchy}
