@@ -56,6 +56,8 @@
 #define FPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
 #define DEFAULT_PIPS_FLINT "gfortran -c "
+#define DEFAULT_PIPS_CC "gcc -c "
+#define DEFAULT_PIPS_CC_FLAGS " -Wall -Werror "
 
 
 /* Define some functions from the .l or .y since cproto cannot dig them out: */
