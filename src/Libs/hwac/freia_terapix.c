@@ -587,8 +587,8 @@ static void terapix_macro_code
   case 0:
     pips_assert("no input, one output image", out);
     // const image generation... NSP
-    terapix_mcu_img(code, op, "xmin???", out);
-    terapix_mcu_int(code, op, "ymin???", 0);
+    terapix_mcu_img(code, op, "xmin1", out);
+    terapix_mcu_int(code, op, "ymin1", 0);
     terapix_gram_management(code, decl, op, api, v, hparams, used);
     break;
   default:
