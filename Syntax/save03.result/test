@@ -1,5 +1,6 @@
 user warning in tp_parse: save03: No such workspace
 Registering file save03.f
+user warning in process_user_file: No syntactic check on file "./save03.f"
 Splitting file    ./save03.f
   Module         FOO
   Module         SAVE03

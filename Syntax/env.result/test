@@ -12,6 +12,7 @@ echo
 shell sed /program/s/c// env.f >env.tmp/env1.f
 user warning in tp_parse: env: No such workspace
 Registering file env.tmp/env1.f
+user warning in process_user_file: No syntactic check on file "./env.tmp/env1.f"
 Splitting file    ./env.tmp/env1.f
   Module         BAR
   Module         FOO
@@ -61,6 +62,7 @@ echo
 
 shell sed /subroutine/s/c// env.f >env.tmp/env2.f
 Registering file env.tmp/env2.f
+user warning in process_user_file: No syntactic check on file "./env.tmp/env2.f"
 Splitting file    ./env.tmp/env2.f
   Module         BAR
   Module         FOO
@@ -108,6 +110,7 @@ echo
 
 shell sed /program/s/c// env.f >env.tmp/env3.f
 Registering file env.tmp/env3.f
+user warning in process_user_file: No syntactic check on file "./env.tmp/env3.f"
 Splitting file    ./env.tmp/env3.f
   Module         BAR
   Module         FOO
@@ -246,6 +249,7 @@ echo
 
 shell sed /program/s/c// env.f >env.tmp/env4.f
 Registering file env.tmp/env4.f
+user warning in process_user_file: No syntactic check on file "./env.tmp/env4.f"
 Splitting file    ./env.tmp/env4.f
   Module         BAR
   Module         FOO
@@ -312,6 +316,7 @@ echo
 
 shell sed /program/s/c// env.f >env.tmp/env5.f
 Registering file env.tmp/env5.f
+user warning in process_user_file: No syntactic check on file "./env.tmp/env5.f"
 Splitting file    ./env.tmp/env5.f
   Module         BAR
   Module         FOO

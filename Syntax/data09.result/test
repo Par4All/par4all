@@ -1,5 +1,6 @@
 user warning in tp_parse: data09: No such workspace
 Registering file data09.f
+user warning in process_user_file: No syntactic check on file "./data09.f"
 Splitting file    ./data09.f
   Module         INIT2
   Module         INIT1
@@ -116,6 +117,7 @@ Workspace data09 closed.
 
 Workspace data09 deleted.
 Registering file data09.f
+user warning in process_user_file: No syntactic check on file "./data09.f"
 Splitting file    ./data09.f
   Module         INIT2
   Module         INIT1

@@ -1,4 +1,5 @@
 Registering file equiv06.f
+user warning in process_user_file: No syntactic check on file "./equiv06.f"
 Splitting file    ./equiv06.f
   Module         EQUIV06
 Workspace equiv06 created and opened.

@@ -1,5 +1,6 @@
 user warning in tp_parse: equiv20: No such workspace
 Registering file equiv20.f
+user warning in process_user_file: No syntactic check on file "./equiv20.f"
 Splitting file    ./equiv20.f
   Module         EQUIV20
 Workspace equiv20 created and opened.

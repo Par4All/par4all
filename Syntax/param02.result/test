@@ -1,5 +1,6 @@
 user warning in tp_parse: param02: No such workspace
 Registering file param02.f
+user warning in process_user_file: No syntactic check on file "./param02.f"
 Splitting file    ./param02.f
   Module         PARAM02
 Workspace param02 created and opened.

@@ -1,5 +1,6 @@
 user warning in tp_parse: formel03: No such workspace
 Registering file formel03.f
+user warning in process_user_file: No syntactic check on file "./formel03.f"
 Splitting file    ./formel03.f
   Module         Q
   Module         FOO

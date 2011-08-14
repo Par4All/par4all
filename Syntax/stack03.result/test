@@ -1,5 +1,6 @@
 user warning in tp_parse: stack03: No such workspace
 Registering file stack03.f
+user warning in process_user_file: No syntactic check on file "./stack03.f"
 Splitting file    ./stack03.f
   Module         STACK03
 Workspace stack03 created and opened.

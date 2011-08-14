@@ -1,5 +1,6 @@
 user warning in tp_parse: ioilldef: No such workspace
 Registering file ioilldef.f
+user warning in process_user_file: No syntactic check on file "./ioilldef.f"
 Splitting file    ./ioilldef.f
   Module         IOILLDEF
 Workspace ioilldef created and opened.
