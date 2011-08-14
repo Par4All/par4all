@@ -1,5 +1,6 @@
 user warning in tp_parse: loops: No such workspace
 Registering file loops.f
+user warning in process_user_file: No syntactic check on file "./loops.f"
 Splitting file    ./loops.f
   Module         LOOPS
 Workspace loops created and opened.
