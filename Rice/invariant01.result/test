@@ -60,3 +60,4 @@ void invariant01(int n, int ni, int nj)
 
 Warnings
 
+unknown[unknown] (process_user_file) No syntactic check on file "./invariant01.c"

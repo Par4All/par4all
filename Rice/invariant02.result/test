@@ -32,3 +32,4 @@ void invariant02(int ni, int nj)
 
 Warnings
 
+unknown[unknown] (process_user_file) No syntactic check on file "./invariant02.c"
