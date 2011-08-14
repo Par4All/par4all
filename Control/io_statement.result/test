@@ -108,5 +108,6 @@ C     ======================================================
 
 Summary:
 
+unknown[unknown] (process_user_file) No syntactic check on file "./io_statement.f"
 TYPE_CHECKER[IO_STATEMENT] (put_summary) summary of 'IO_STATEMENT': 20 errors, 0 convertions., 0 simplifications
 
