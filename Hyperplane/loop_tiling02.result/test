@@ -36,4 +36,5 @@ l2:
 
 Warnings
 
+unknown[unknown] (process_user_file) No syntactic check on file "./loop_tiling02.c"
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
