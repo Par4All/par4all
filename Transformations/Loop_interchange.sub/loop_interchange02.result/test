@@ -34,6 +34,7 @@ l2:
 
 Warnings
 
+unknown[unknown] (process_user_file) No syntactic check on file "./loop_interchange02.c"
 unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_SUMMARY_PRECONDITION' already active
 unknown[unknown] (activate_phase) Rule `TRANSFORMERS_INTER_FULL' already active
 unknown[unknown] (activate_phase) Rule `PRECONDITIONS_INTER_FULL' already active
