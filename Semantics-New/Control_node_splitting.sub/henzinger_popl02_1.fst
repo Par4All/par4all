@@ -25,7 +25,7 @@ model henzinger_popl02_1 {
 		action := lock' = 0, x' = y, y' = y + 1;
 	};
 
-	transition t2 := {
+	transition t3 := {
 		from := k2;
 		to := k2;
 		guard := s = 1 && x = y;

@@ -99,6 +99,7 @@ void ts_singlestate(void) {
 void ts_restructured(void) {
 	int s, x, y;
 	INI; CHECK;
+	S1;
 	LOOP(OR(C1a; S1, C2a; S1));
 	OR(C1b; S2, C2b; S2);
 	C3; S3

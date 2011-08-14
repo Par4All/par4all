@@ -25,7 +25,7 @@ model gulwani_popl09_4b {
 		action := y' = y + 1, c2' = c2 + 1;
 	};
 
-	transition t2 := {
+	transition t3 := {
 		from := k2;
 		to := k2;
 		guard := s = 2;
