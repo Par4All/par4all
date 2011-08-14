@@ -611,6 +611,7 @@ int dag_computation_count(const dag d)
  */
 list dag_vertex_preds(const dag d, const dagvtx target)
 {
+  pips_debug(8, "building predecessors of %"_intFMT"\n", dagvtx_number(target));
   list inputs = vtxcontent_inputs(dagvtx_content(target));
   int nins = (int) gen_length(inputs);
   entity first_img = NULL, second_img = NULL;
@@ -945,7 +946,9 @@ static void set_aipo_copy(dagvtx v, entity e)
   set_aipo_call(v, "copy", e, NULL);
 }
 
-// forward declarations
+/************************************************************** DAG SIMPLIFY */
+
+// forward declarations for recursion
 static bool propagate_constant_image(dagvtx, entity, expression);
 static void set_aipo_constant(dagvtx, expression);
 static expression constant_image_p(dagvtx);
@@ -1182,9 +1185,10 @@ static entity copy_image_p(dagvtx v)
 
 /* @brief apply basic algebraic simplification to dag
  */
-static void dag_simplify(dag d)
+static bool dag_simplify(dag d)
 {
-  set setconst = set_make(hash_pointer);
+  bool changed = false;
+
   // propagate constants and detect copies
   FOREACH(dagvtx, v, dag_vertices(d))
   {
@@ -1192,33 +1196,67 @@ static void dag_simplify(dag d)
     entity img;
     if ((val=constant_image_p(v))!=NULL)
     {
+      changed = true;
+
+      // fix successors of predecessors of new "constant" operation
+      list preds = dag_vertex_preds(d, v);
+      FOREACH(dagvtx, p, preds)
+        gen_remove(&dagvtx_succs(p), v);
+      gen_free_list(preds);
+
+      // swich operation to constant
       set_aipo_constant(v, val);
       free_expression(val);
-      set_add_element(setconst, setconst, v);
     }
     else if ((img=copy_image_p(v))!=NULL)
     {
+      changed = true;
       set_aipo_copy(v, img);
     }
   }
 
-  // fix input node successors...
-  if (!set_empty_p(setconst))
+  return changed;
+}
+
+static bool dag_normalize(dag d)
+{
+  bool changed = false;
+  FOREACH(dagvtx, v, dag_vertices(d))
   {
-    FOREACH(dagvtx, v, dag_inputs(d))
+    vtxcontent ct = dagvtx_content(v);
+    statement s = dagvtx_statement(v);
+    call c = s? freia_statement_to_call(s): NULL;
+    if (c)
     {
-      list ni = NIL;
-      FOREACH(dagvtx, s, dagvtx_succs(v))
+      list args = call_arguments(c);
+      entity func = call_function(c);
+      if (same_string_p(entity_local_name(func), AIPO "sub_const"))
       {
-        if (!set_belong_p(setconst, s))
-          ni = CONS(dagvtx, s, ni);
+        changed = true;
+        // sub_const -> add_const(opposite)
+        vtxcontent_opid(ct) = hwac_freia_api_index(AIPO "add_const");
+        call_function(c) = local_name_to_top_level_entity(AIPO "add_const");
+        list l3 = CDR(CDR(args));
+        _int v;
+        if (expression_integer_value(EXPRESSION(CAR(l3)), &v))
+        {
+          // partial eval
+          free_expression(EXPRESSION(CAR(l3)));
+          EXPRESSION_(CAR(l3)) = int_to_expression(-v);
+        }
+        else
+        {
+          // symbolic
+          EXPRESSION_(CAR(l3)) =
+            MakeUnaryCall(
+              local_name_to_top_level_entity(UNARY_MINUS_OPERATOR_NAME),
+              EXPRESSION(CAR(l3)));
+        }
       }
-      gen_free_list(dagvtx_succs(v));
-      dagvtx_succs(v) = gen_nreverse(ni);
+      // what else?
     }
   }
-  // cleanup
-  set_free(setconst), setconst = NULL;
+  return changed;
 }
 
 /* remove dead image operations.
@@ -1238,50 +1276,13 @@ list /* of statements */ freia_dag_optimize(dag d)
     dag_dump(stderr, "input", d);
   }
 
-  if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
+  if (get_bool_property("FREIA_NORMALIZE_OPERATIONS"))
   {
-    dag_simplify(d);
+    dag_normalize(d);
 
     ifdebug(8) {
-      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS:\n");
-      dag_dump(stderr, "simplified", d);
-      // dag_dot_dump_prefix("main", "simplified", 0, d);
-    }
-  }
-
-  // remove dead image operations
-  // ??? hmmm... measures are kept because of the implicit scalar dependency?
-  if (get_bool_property("FREIA_REMOVE_DEAD_OPERATIONS"))
-  {
-    pips_debug(6, "removing dead code\n");
-    list vertices = gen_copy_seq(dag_vertices(d));
-    FOREACH(dagvtx, v, vertices)
-    {
-      // skip non-image operations
-      if (!vtxcontent_inputs(dagvtx_content(v)) &&
-          (vtxcontent_out(dagvtx_content(v))==entity_undefined ||
-           vtxcontent_out(dagvtx_content(v))==NULL))
-        continue;
-
-      if (// no successors or they are all removed
-          (!dagvtx_succs(v) || list_in_set_p(dagvtx_succs(v), remove)) &&
-          // but we keep output nodes...
-          !gen_in_list_p(v, dag_outputs(d)) &&
-          // and measures...
-          !dagvtx_is_measurement_p(v))
-      {
-        pips_debug(7, "vertex %"_intFMT" is dead\n", dagvtx_number(v));
-        set_add_element(remove, remove, v);
-      }
-      else
-        pips_debug(8, "vertex %"_intFMT" is alive\n", dagvtx_number(v));
-    }
-    gen_free_list(vertices), vertices = NULL;
-
-    ifdebug(8) {
-      pips_debug(4, "after FREIA_REMOVE_DEAD_OPERATIONS:\n");
-      dag_dump(stderr, "remove dead", d);
-      // dag_dot_dump_prefix("main", "remove_dead", 0, d);
+      pips_debug(4, "after FREIA_NORMALIZE_OPERATIONS:\n");
+      dag_dump(stderr, "normalized", d);
     }
   }
 
@@ -1290,7 +1291,6 @@ list /* of statements */ freia_dag_optimize(dag d)
   // but we should for terapix!)
   // the second one is replaced by a copy.
   // also handle commutations.
-
   if (get_bool_property("FREIA_REMOVE_DUPLICATE_OPERATIONS"))
   {
     pips_debug(6, "removing duplicate operations\n");
@@ -1365,6 +1365,53 @@ list /* of statements */ freia_dag_optimize(dag d)
       pips_debug(4, "after FREIA_REMOVE_DUPLICATE_OPERATIONS:\n");
       dag_dump(stderr, "remove duplicate", d);
       // dag_dot_dump_prefix("main", "remove_duplicates", 0, d);
+    }
+  }
+
+  if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
+  {
+    dag_simplify(d);
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_SIMPLIFY_OPERATIONS:\n");
+      dag_dump(stderr, "simplified", d);
+      // dag_dot_dump_prefix("main", "simplified", 0, d);
+    }
+  }
+
+  // remove dead image operations
+  // ??? hmmm... measures are kept because of the implicit scalar dependency?
+  if (get_bool_property("FREIA_REMOVE_DEAD_OPERATIONS"))
+  {
+    pips_debug(6, "removing dead code\n");
+    list vertices = gen_copy_seq(dag_vertices(d));
+    FOREACH(dagvtx, v, vertices)
+    {
+      // skip non-image operations
+      if (!vtxcontent_inputs(dagvtx_content(v)) &&
+          (vtxcontent_out(dagvtx_content(v))==entity_undefined ||
+           vtxcontent_out(dagvtx_content(v))==NULL))
+        continue;
+
+      if (// no successors or they are all removed
+          (!dagvtx_succs(v) || list_in_set_p(dagvtx_succs(v), remove)) &&
+          // but we keep output nodes...
+          !gen_in_list_p(v, dag_outputs(d)) &&
+          // and measures...
+          !dagvtx_is_measurement_p(v))
+      {
+        pips_debug(7, "vertex %"_intFMT" is dead\n", dagvtx_number(v));
+        set_add_element(remove, remove, v);
+      }
+      else
+        pips_debug(8, "vertex %"_intFMT" is alive\n", dagvtx_number(v));
+    }
+    gen_free_list(vertices), vertices = NULL;
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_REMOVE_DEAD_OPERATIONS:\n");
+      dag_dump(stderr, "remove dead", d);
+      // dag_dot_dump_prefix("main", "remove_dead", 0, d);
     }
   }
 
@@ -1575,7 +1622,8 @@ list /* of statements */ freia_dag_optimize(dag d)
   }
 
   pips_assert("right output count after optimizations",
-         gen_length(dag_outputs(d)) + gen_length(lstats)==dag_output_count);
+      // former output images are either still computed or copies of computed
+      gen_length(dag_outputs(d)) + gen_length(lstats)==dag_output_count);
 
   return lstats;
 }
