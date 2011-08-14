@@ -11,6 +11,7 @@ Proper effetcs for "memcpy03"
 
 Warnings should include a user error
 
+unknown[unknown] (process_user_file) No syntactic check on file "./memcpy03.c"
 PROPER_EFFECTS[main] (generic_string_effects) user error
 PROPER_EFFECTS[main] (generic_string_effects) constant expression as first argument not allowed for intrinsic TOP-LEVEL:memcpy
 PROPER_EFFECTS[main] (set_debug_stack_pointer) debug level stack is set to 2
