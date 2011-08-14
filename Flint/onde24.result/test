@@ -1499,6 +1499,7 @@ C     INITIALISE LE TIMER - INUTILE SUR DE NOMBREUSES MACHINES
       INTEGER FUNCTION TIME
       TIME = 0                                                          0003
       END
+unknown[unknown] (process_user_file) No syntactic check on file "./onde24.f"
 TYPE_CHECKER[GETIME] (put_summary) summary of 'GETIME': 0 errors, 0 convertions., 0 simplifications
 TYPE_CHECKER[ONDE24] (put_summary) summary of 'ONDE24': 11 errors, 20 convertions., 113 simplifications
 TYPE_CHECKER[OPENFILE] (put_summary) summary of 'OPENFILE': 0 errors, 0 convertions., 0 simplifications
