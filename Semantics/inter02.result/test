@@ -1,5 +1,6 @@
 user warning in tp_parse: inter02: No such workspace
 Registering file inter02.f
+user warning in process_user_file: No syntactic check on file "./inter02.f"
 Splitting file    ./inter02.f
   Module         INCR
   Module         INTER02

@@ -121,6 +121,7 @@ int main()
 
 Warnings
 
+unknown[unknown] (process_user_file) No syntactic check on file "./call11.c"
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return

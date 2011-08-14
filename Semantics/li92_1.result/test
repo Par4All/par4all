@@ -47,4 +47,5 @@ C  P(I,J,K,M) {1<=I, N+1<=I}
 
 Wrnings for "li921"
 
+unknown[unknown] (process_user_file) No syntactic check on file "./li92_1.f"
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning LI921 instead

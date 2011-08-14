@@ -191,6 +191,7 @@ int main()
 
 Warnings
 
+unknown[unknown] (process_user_file) No syntactic check on file "./for01.c"
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 TRANSFORMERS_INTRA_FAST[main] (transformers_intra_fast) Property SEMANTICS_FIX_POINT is ignored
 TRANSFORMERS_INTRA_FAST[main] (add_or_kill_equivalenced_variables) storage return
