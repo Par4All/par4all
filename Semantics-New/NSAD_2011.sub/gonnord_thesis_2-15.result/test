@@ -1,0 +1,907 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void ts_singlestate(void)
+{
+
+//  T(l,s,t,x) {}
+
+   int s, l, t, x;
+
+//  T(s) {s==0}
+
+   s = 0;
+
+//  T(l,t,x) {l==0, s==0, t==0, x==0}
+
+   l = t = x = 0;
+
+//  T() {l==0, s==0, t==0, x==0}
+
+   if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(l,s,t,x) {0<=l, l#init<=l, l+t#init<=l#init+t, l<=t, 6l<=t+50,
+//    0<=s, s<=1}
+
+   while (rand_b())
+
+//  T(l,s,t,x) {2l+s+s#init+t#init==2l#init+t+1, l#init<=l,
+//    l+s<=l#init+1, l#init+t<=l+s+t#init, l+t#init<=l#init+t,
+//    6l<=t+50}
+
+      if (rand_b()) {
+
+//  T() {s==0, x<=9}
+
+         if (!(s==0&&x<=9))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(t) {s==0, t==t#init+1, x<=9}
+
+         t++;
+
+//  T(l) {l==l#init+1, s==0, x<=9}
+
+         l++;
+
+//  T(x) {s==0, x==x#init+1, x<=10}
+
+         x++;
+
+//  T() {s==0, 6l<=t+50, x<=10}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {s==0}
+
+         if (!(s==0))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {s==0, x==0}
+
+         x = 0;
+
+//  T(s) {s==1, s#init==0, x==0}
+
+         s = 1;
+
+//  T() {s==1, x==0, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {s==1}
+
+         if (!(s==1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(t) {s==1, t==t#init+1}
+
+         t++;
+
+//  T(x) {s==1, x==x#init+1}
+
+         x++;
+
+//  T() {s==1, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {s==1, 50<=x}
+
+         if (!(s==1&&x>=50))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {s==1, x==0, 50<=x#init}
+
+         x = 0;
+
+//  T(s) {s==0, s#init==1, x==0}
+
+         s = 0;
+
+//  T() {s==0, x==0, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  T() {}
+
+void ts_restructured(void)
+{
+
+//  T(l,s,t,x) {}
+
+   int s, l, t, x;
+
+//  T(s) {s==0}
+
+   s = 0;
+
+//  T(l,t,x) {l==0, s==0, t==0, x==0}
+
+   l = t = x = 0;
+
+//  T() {l==0, s==0, t==0, x==0}
+
+   if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(l,s,t,x) {s==0, s#init==0, x==0, 0<=l, l#init<=l,
+//    l+t#init<=l#init+t, 6l<=t}
+
+   while (rand_b()) {
+
+//  T(l,t,x) {l+t#init==l#init+t, l+x#init==l#init+x, l#init<=l}
+
+      while (rand_b()) {
+
+//  T() {s==0, x<=8}
+
+         if (!(s==0&&x<=8))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(t) {s==0, t==t#init+1, x<=8}
+
+         t++;
+
+//  T(l) {l==l#init+1, s==0, x<=8}
+
+         l++;
+
+//  T(x) {s==0, x==x#init+1, x<=9}
+
+         x++;
+
+//  T() {s==0, 6l<=t+50, x<=9}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T(l,s,t,x) {l+t#init==l#init+t, s==1, s#init==0, x==0, 6l<=t+50,
+//    t#init<=t, t<=t#init+1}
+
+      if (rand_b()) {
+
+//  T() {s==0, x==9}
+
+         if (!(s==0&&x==9))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(t) {s==0, t==t#init+1, x==9}
+
+         t++;
+
+//  T(l) {l==l#init+1, s==0, x==9}
+
+         l++;
+
+//  T(x) {s==0, x==10, x#init==9}
+
+         x++;
+
+//  T() {s==0, x==10, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {s==0, x==10, 6l<=t+50}
+
+         if (!(s==0))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {s==0, x==0, x#init==10, 6l<=t+50}
+
+         x = 0;
+
+//  T(s) {s==1, s#init==0, x==0, 6l<=t+50}
+
+         s = 1;
+
+//  T() {s==1, x==0, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {s==0}
+
+         if (!(s==0))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {s==0, x==0}
+
+         x = 0;
+
+//  T(s) {s==1, s#init==0, x==0}
+
+         s = 1;
+
+//  T() {s==1, x==0, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T(t,x) {s==1, t+x#init==t#init+x, 6l+x<=t+50, t#init<=t, 0<=x,
+//    x<=9}
+
+      while (rand_b()) {
+
+//  T() {s==1, x<=8}
+
+         if (!(s==1&&x<=8))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(t) {s==1, t==t#init+1, x<=8}
+
+         t++;
+
+//  T(x) {s==1, x==x#init+1, x<=9}
+
+         x++;
+
+//  T() {s==1, 6l<=t+50, x<=9}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T() {s==1, x==9, 6l<=t+41}
+
+      if (!(s==1&&x==9))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T(t) {s==1, t==t#init+1, x==9, 6l<=t+40}
+
+      t++;
+
+//  T(x) {s==1, x==10, x#init==9, 6l<=t+40}
+
+      x++;
+
+//  T() {s==1, x==10, 6l<=t+40}
+
+      if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+         checking_error();
+
+//  T(t,x) {s==1, t+x#init==t#init+x, 6l+x<=t+50, t#init<=t, 10<=x,
+//    x<=49}
+
+      while (rand_b()) {
+
+//  T() {s==1, x<=48}
+
+         if (!(s==1&&x<=48))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(t) {s==1, t==t#init+1, x<=48}
+
+         t++;
+
+//  T(x) {s==1, x==x#init+1, x<=49}
+
+         x++;
+
+//  T() {s==1, 6l<=t+50, x<=49}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T() {s==1, x==49, 6l<=t+1}
+
+      if (!(s==1&&x==49))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T(t) {s==1, t==t#init+1, x==49, 6l<=t}
+
+      t++;
+
+//  T(x) {s==1, x==50, x#init==49, 6l<=t}
+
+      x++;
+
+//  T() {s==1, x==50, 6l<=t}
+
+      if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+         checking_error();
+
+//  T(t,x) {s==1, t+x#init==t#init+x, 6l+x<=t+50, t#init<=t, 50<=x}
+
+      while (rand_b()) {
+
+//  T() {s==1}
+
+         if (!(s==1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(t) {s==1, t==t#init+1}
+
+         t++;
+
+//  T(x) {s==1, x==x#init+1}
+
+         x++;
+
+//  T() {s==1, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T() {s==1, 6l+x<=t+50, 50<=x}
+
+      if (!(s==1&&x>=50))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T(x) {s==1, x==0, 6l+x#init<=t+50, 50<=x#init}
+
+      x = 0;
+
+//  T(s) {s==0, s#init==1, x==0, 6l<=t}
+
+      s = 0;
+
+//  T() {s==0, x==0, 6l<=t}
+
+      if (!(6*l<=t+50))
+
+//  T() {0==-1}
+
+         checking_error();
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int s, l, t, x;
+
+//  P(l,s,t,x) {}
+
+   s = 0;
+
+//  P(l,s,t,x) {s==0}
+
+   l = t = x = 0;
+
+//  P(l,s,t,x) {l==0, s==0, t==0, x==0}
+
+   if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(l,s,t,x) {l==0, s==0, t==0, x==0}
+
+   while (rand_b())
+
+//  P(l,s,t,x) {0<=l, l<=t, 6l<=t+50, 0<=s, s<=1}
+
+      if (rand_b()) {
+
+//  P(l,s,t,x) {0<=l, l<=t, 6l<=t+50, 0<=s, s<=1}
+
+         if (!(s==0&&x<=9))
+
+//  P(l,s,t,x) {0<=l, l<=t, 6l<=t+50, 0<=s, s<=1}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==0, 0<=l, l<=t, 6l<=t+50, x<=9}
+
+         t++;
+
+//  P(l,s,t,x) {s==0, 0<=l, l+1<=t, 6l<=t+49, x<=9}
+
+         l++;
+
+//  P(l,s,t,x) {s==0, 1<=l, l<=t, 6l<=t+55, x<=9}
+
+         x++;
+
+//  P(l,s,t,x) {s==0, 1<=l, l<=t, 6l<=t+55, x<=10}
+
+         if (!(6*l<=t+50))
+
+//  P(l,s,t,x) {s==0, 1<=l, t+51<=6l, l<=t, 6l<=t+55, x<=10}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(l,s,t,x) {0<=l, l<=t, 6l<=t+50, 0<=s, s<=1}
+
+         if (!(s==0))
+
+//  P(l,s,t,x) {s==1, 0<=l, l<=t, 6l<=t+50}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==0, 0<=l, l<=t, 6l<=t+50}
+
+         x = 0;
+
+//  P(l,s,t,x) {s==0, x==0, 0<=l, l<=t, 6l<=t+50}
+
+         s = 1;
+
+//  P(l,s,t,x) {s==1, x==0, 0<=l, l<=t, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(l,s,t,x) {0<=l, l<=t, 6l<=t+50, 0<=s, s<=1}
+
+         if (!(s==1))
+
+//  P(l,s,t,x) {s==0, 0<=l, l<=t, 6l<=t+50}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==1, 0<=l, l<=t, 6l<=t+50}
+
+         t++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+1<=t, 6l<=t+49}
+
+         x++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+1<=t, 6l<=t+49}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(l,s,t,x) {0<=l, l<=t, 6l<=t+50, 0<=s, s<=1}
+
+         if (!(s==1&&x>=50))
+
+//  P(l,s,t,x) {0<=l, l<=t, 6l<=t+50, 0<=s, s<=1}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==1, 0<=l, l<=t, 6l<=t+50, 50<=x}
+
+         x = 0;
+
+//  P(l,s,t,x) {s==1, x==0, 0<=l, l<=t, 6l<=t+50}
+
+         s = 0;
+
+//  P(l,s,t,x) {s==0, x==0, 0<=l, l<=t, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  P() {}
+
+void ts_restructured(void)
+{
+
+//  P() {}
+
+   int s, l, t, x;
+
+//  P(l,s,t,x) {}
+
+   s = 0;
+
+//  P(l,s,t,x) {s==0}
+
+   l = t = x = 0;
+
+//  P(l,s,t,x) {l==0, s==0, t==0, x==0}
+
+   if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(l,s,t,x) {l==0, s==0, t==0, x==0}
+
+   while (rand_b()) {
+
+//  P(l,s,t,x) {s==0, x==0, 0<=l, 6l<=t}
+
+      while (rand_b()) {
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=9}
+
+         if (!(s==0&&x<=8))
+
+//  P(l,s,t,x) {s==0, x==9, 9<=l, 6l<=t+45}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=8}
+
+         t++;
+
+//  P(l,s,t,x) {s==0, 6l+1<=t+5x, x<=l, 0<=x, x<=8}
+
+         l++;
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x+5, x+1<=l, 0<=x, x<=8}
+
+         x++;
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 1<=x, x<=9}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=9}
+
+      if (rand_b()) {
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=9}
+
+         if (!(s==0&&x==9))
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=8}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==0, x==9, 9<=l, 6l<=t+45}
+
+         t++;
+
+//  P(l,s,t,x) {s==0, x==9, 9<=l, 6l<=t+44}
+
+         l++;
+
+//  P(l,s,t,x) {s==0, x==9, 10<=l, 6l<=t+50}
+
+         x++;
+
+//  P(l,s,t,x) {s==0, x==10, 10<=l, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P(l,s,t,x) {s==0, x==10, 10<=l, 6l<=t+50}
+
+         if (!(s==0))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==0, x==10, 10<=l, 6l<=t+50}
+
+         x = 0;
+
+//  P(l,s,t,x) {s==0, x==0, 10<=l, 6l<=t+50}
+
+         s = 1;
+
+//  P(l,s,t,x) {s==1, x==0, 10<=l, 6l<=t+50}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=9}
+
+         if (!(s==0))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=9}
+
+         x = 0;
+
+//  P(l,s,t,x) {s==0, x==0, 0<=l, l<=t, 6l<=t+45}
+
+         s = 1;
+
+//  P(l,s,t,x) {s==1, x==0, 0<=l, l<=t, 6l<=t+45}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(l,s,t,x) {s==1, x==0, 0<=l, l<=t, 6l<=t+50}
+
+      while (rand_b()) {
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 0<=x, x<=9}
+
+         if (!(s==1&&x<=8))
+
+//  P(l,s,t,x) {s==1, x==9, 0<=l, l+9<=t, 6l<=t+41}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 0<=x, x<=8}
+
+         t++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x+1<=t, 6l+x<=t+49, 0<=x, x<=8}
+
+         x++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 1<=x, x<=9}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 0<=x, x<=9}
+
+      if (!(s==1&&x==9))
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 0<=x, x<=8}
+
+         deadlock();
+
+//  P(l,s,t,x) {s==1, x==9, 0<=l, l+9<=t, 6l<=t+41}
+
+      t++;
+
+//  P(l,s,t,x) {s==1, x==9, 0<=l, l+10<=t, 6l<=t+40}
+
+      x++;
+
+//  P(l,s,t,x) {s==1, x==10, 0<=l, l+10<=t, 6l<=t+40}
+
+      if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+         checking_error();
+
+//  P(l,s,t,x) {s==1, x==10, 0<=l, l+10<=t, 6l<=t+40}
+
+      while (rand_b()) {
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 10<=x, x<=49}
+
+         if (!(s==1&&x<=48))
+
+//  P(l,s,t,x) {s==1, x==49, 0<=l, l+49<=t, 6l<=t+1}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 10<=x, x<=48}
+
+         t++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x+1<=t, 6l+x<=t+49, 10<=x, x<=48}
+
+         x++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 11<=x, x<=49}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 10<=x, x<=49}
+
+      if (!(s==1&&x==49))
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 10<=x, x<=48}
+
+         deadlock();
+
+//  P(l,s,t,x) {s==1, x==49, 0<=l, l+49<=t, 6l<=t+1}
+
+      t++;
+
+//  P(l,s,t,x) {s==1, x==49, 0<=l, l+50<=t, 6l<=t}
+
+      x++;
+
+//  P(l,s,t,x) {s==1, x==50, 0<=l, l+50<=t, 6l<=t}
+
+      if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+         checking_error();
+
+//  P(l,s,t,x) {s==1, x==50, 0<=l, l+50<=t, 6l<=t}
+
+      while (rand_b()) {
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 50<=x}
+
+         if (!(s==1))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 50<=x}
+
+         t++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x+1<=t, 6l+x<=t+49, 50<=x}
+
+         x++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 51<=x}
+
+         if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 50<=x}
+
+      if (!(s==1&&x>=50))
+
+//  P() {0==-1}
+
+         deadlock();
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 50<=x}
+
+      x = 0;
+
+//  P(l,s,t,x) {s==1, x==0, 0<=l, l+50<=t, 6l<=t}
+
+      s = 0;
+
+//  P(l,s,t,x) {s==0, x==0, 0<=l, l+50<=t, 6l<=t}
+
+      if (!(6*l<=t+50))
+
+//  P() {0==-1}
+
+         checking_error();
+   }
+}

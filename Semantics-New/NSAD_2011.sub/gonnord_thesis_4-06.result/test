@@ -1,0 +1,1557 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void ts_singlestate(void)
+{
+
+//  T(d,s,t,v) {}
+
+   int s, d, v, t;
+
+//  T(s) {s==1}
+
+   s = 1;
+
+//  T(d,t,v) {d==0, s==1, t==0, v==0}
+
+   d = v = t = 0;
+
+//  T() {d==0, s==1, t==0, v==0}
+
+   if (s>=3)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(d,s,t,v) {0<=d, d#init<=d, 1<=s, s<=2, s#init<=s, 0<=t,
+//    t#init<=t}
+
+   while (rand_b())
+
+//  T(d,s,t,v) {d+s+t==d#init+t#init+2, s#init==1, d#init<=d,
+//    d+t<=d#init+t#init+1, t#init<=t}
+
+      if (rand_b()) {
+
+//  T() {s==1, t<=2}
+
+         if (!(s==1&&t<=2))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, v==0, t<=2}
+
+         v = 0;
+
+//  T(t) {s==1, t==t#init+1, v==0, t<=3}
+
+         t++;
+
+//  T() {s==1, v==0, t<=3}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {s==1, d<=8, v<=1}
+
+         if (!(s==1&&v<=1&&d<=8))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, v==v#init+1, d<=8, v<=2}
+
+         v++;
+
+//  T(d) {d==d#init+1, s==1, d<=9, v<=2}
+
+         d++;
+
+//  T() {s==1, d<=9, v<=2}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {s==1, 3<=t}
+
+         if (!(s==1&&t>=3))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(s) {s==2, s#init==1, 3<=t}
+
+         s = 2;
+
+//  T() {s==2, 3<=t}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {s==1, 10<=d}
+
+         if (!(s==1&&d>=10))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(s) {s==3, s#init==1, 10<=d}
+
+         s = 3;
+
+//  T() {0==-1}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {s==1, 3<=v}
+
+         if (!(s==1&&v>=3))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(s) {s==4, s#init==1, 3<=v}
+
+         s = 4;
+
+//  T() {0==-1}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  T() {}
+
+void ts_restructured(void)
+{
+
+//  T(d,s,t,v) {}
+
+   int s, d, v, t;
+
+//  T(s) {s==1}
+
+   s = 1;
+
+//  T(d,t,v) {d==0, s==1, t==0, v==0}
+
+   d = v = t = 0;
+
+//  T() {d==0, s==1, t==0, v==0}
+
+   if (s>=3)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(d,t,v) {s==1, 0<=d, d#init<=d, v<=d, 0<=t, t#init<=t, v<=1}
+
+   while (rand_b())
+
+//  T(d,t,v) {s==1, d<=d#init+1, d#init+t#init+1<=d+t, t<=t#init+1,
+//    t+v<=t#init+1}
+
+      if (rand_b()) {
+
+//  T() {s==1, t<=1}
+
+         if (!(s==1&&t<=1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, v==0, t<=1}
+
+         v = 0;
+
+//  T(t) {s==1, t==t#init+1, v==0, t<=2}
+
+         t++;
+
+//  T() {s==1, v==0, t<=2}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {s==1, d<=7, v<=0}
+
+         if (!(s==1&&v<=0&&d<=7))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, v==v#init+1, d<=7, v<=1}
+
+         v++;
+
+//  T(d) {d==d#init+1, s==1, d<=8, v<=1}
+
+         d++;
+
+//  T() {s==1, d<=8, v<=1}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {s==1, v==1, d<=7}
+
+         if (!(s==1&&v==1&&d<=7))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, v==2, v#init==1, d<=7}
+
+         v++;
+
+//  T(d) {d==d#init+1, s==1, v==2, d<=8}
+
+         d++;
+
+//  T() {s==1, v==2, d<=8}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {s==1, v==2, d<=8, t<=1}
+
+         if (!(s==1&&t<=1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, v==0, v#init==2, d<=8, t<=1}
+
+         v = 0;
+
+//  T(t) {s==1, t==t#init+1, v==0, d<=8, t<=2}
+
+         t++;
+
+//  T() {s==1, v==0, d<=8, t<=2}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T(d,s,t,v) {s==2, s#init==1, t==3, 2d#init+2v+2<=2d+t#init,
+//    d<=d#init+v+1, 8<=d#init+4t#init, t#init<=2, 0<=v}
+
+   if (rand_b()) {
+
+//  T(d,t,v) {s==1, t==3, t#init==2, v==0, d#init<=d, d<=d#init+1,
+//    0<=d#init}
+
+      if (rand_b()) {
+
+//  T() {s==1, v==1, 0<=d, d<=7, 0<=t}
+
+         if (!(s==1&&v==1&&d<=7))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, v==2, v#init==1, 0<=d, d<=7, 0<=t}
+
+         v++;
+
+//  T(d) {d==d#init+1, s==1, v==2, 1<=d, d<=8, 0<=t}
+
+         d++;
+
+//  T() {s==1, v==2, 1<=d, d<=8, 0<=t}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {s==1, t==2, v==2, 1<=d, d<=8}
+
+         if (!(s==1&&t==2))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, t==2, v==0, v#init==2, 1<=d, d<=8}
+
+         v = 0;
+
+//  T(t) {s==1, t==3, t#init==2, v==0, 1<=d, d<=8}
+
+         t++;
+
+//  T() {s==1, t==3, v==0, 1<=d, d<=8}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {s==1, t==2, 0<=d}
+
+         if (!(s==1&&t==2))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, t==2, v==0, 0<=d}
+
+         v = 0;
+
+//  T(t) {s==1, t==3, t#init==2, v==0, 0<=d}
+
+         t++;
+
+//  T() {s==1, t==3, v==0, 0<=d}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T(d,v) {d+v#init==d#init+v, s==1, t==3, v<=d, 0<=v, v<=1,
+//    v#init<=v}
+
+      while (rand_b()) {
+
+//  T() {s==1, t==3, d<=7, v<=0}
+
+         if (!(s==1&&v<=0&&d<=7))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, t==3, v==v#init+1, d<=7, v<=1}
+
+         v++;
+
+//  T(d) {d==d#init+1, s==1, t==3, d<=8, v<=1}
+
+         d++;
+
+//  T() {s==1, t==3, d<=8, v<=1}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T(d,s,v) {d+v#init==d#init+v, s==2, s#init==1, t==3, v<=d,
+//    9v<=d+16v#init, v#init<=v, v<=v#init+1, 0<=v#init}
+
+      if (rand_b()) {
+
+//  T() {s==1, t==3, v<=d, 0<=v}
+
+         if (!(s==1&&t>=3))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(s) {s==2, s#init==1, t==3, v<=d, 0<=v}
+
+         s = 2;
+
+//  T() {s==2, t==3, v<=d, 0<=v}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {s==1, t==3, v==1, 1<=d, d<=7}
+
+         if (!(s==1&&v==1&&d<=7))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {s==1, t==3, v==2, v#init==1, 1<=d, d<=7}
+
+         v++;
+
+//  T(d) {d==d#init+1, s==1, t==3, v==2, 2<=d, d<=8}
+
+         d++;
+
+//  T() {s==1, t==3, v==2, 2<=d, d<=8}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {s==1, t==3, v==2, 2<=d, d<=8}
+
+         if (!(s==1&&t>=3))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(s) {s==2, s#init==1, t==3, v==2, 2<=d, d<=8}
+
+         s = 2;
+
+//  T() {s==2, t==3, v==2, 2<=d, d<=8}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {d==8, s==1, t==3, v==1}
+
+         if (!(s==1&&v==1&&d==8))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {d==8, s==1, t==3, v==2, v#init==1}
+
+         v++;
+
+//  T(d) {d==9, d#init==8, s==1, t==3, v==2}
+
+         d++;
+
+//  T() {d==9, s==1, t==3, v==2}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {d==9, s==1, t==3, v==2}
+
+         if (!(s==1&&t>=3))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(s) {d==9, s==2, s#init==1, t==3, v==2}
+
+         s = 2;
+
+//  T() {d==9, s==2, t==3, v==2}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {d==8, s==1, t==3, v==0}
+
+         if (!(s==1&&v<=0&&d==8))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {d==8, s==1, t==3, v==1, v#init==0}
+
+         v++;
+
+//  T(d) {d==9, d#init==8, s==1, t==3, v==1}
+
+         d++;
+
+//  T() {d==9, s==1, t==3, v==1}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {d==9, s==1, t==3, v==1}
+
+         if (!(s==1&&t>=3))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(s) {d==9, s==2, s#init==1, t==3, v==1}
+
+         s = 2;
+
+//  T() {d==9, s==2, t==3, v==1}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+   }
+   else {
+
+//  T(d,t,v) {d==9, d#init==8, s==1, t==3, v==0, 0<=t#init, t#init<=2,
+//    v#init<=1}
+
+      if (rand_b()) {
+
+//  T(d,t,v) {d==9, d#init==8, s==1, 2t+v==2t#init+v#init+1,
+//    v#init+1<=2t+v, v#init<=v+1, v<=v#init+1, v+v#init<=1}
+
+         if (rand_b()) {
+
+//  T() {d==8, s==1, 0<=t, v<=0}
+
+            if (!(s==1&&v<=0&&d==8))
+
+//  T() {0==-1}
+
+               deadlock();
+
+//  T(v) {d==8, s==1, v==v#init+1, 0<=t, v<=1}
+
+            v++;
+
+//  T(d) {d==9, d#init==8, s==1, 0<=t, v<=1}
+
+            d++;
+
+//  T() {d==9, s==1, 0<=t, v<=1}
+
+            if (s>=3)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else {
+
+//  T() {d==8, s==1, v==1, 0<=t}
+
+            if (!(s==1&&v==1&&d==8))
+
+//  T() {0==-1}
+
+               deadlock();
+
+//  T(v) {d==8, s==1, v==2, v#init==1, 0<=t}
+
+            v++;
+
+//  T(d) {d==9, d#init==8, s==1, v==2, 0<=t}
+
+            d++;
+
+//  T() {d==9, s==1, v==2, 0<=t}
+
+            if (s>=3)
+
+//  T() {0==-1}
+
+               checking_error();
+
+//  T() {d==9, s==1, v==2, 0<=t, t<=1}
+
+            if (!(s==1&&t<=1))
+
+//  T() {0==-1}
+
+               deadlock();
+
+//  T(v) {d==9, s==1, v==0, v#init==2, 0<=t, t<=1}
+
+            v = 0;
+
+//  T(t) {d==9, s==1, t==t#init+1, v==0, 1<=t, t<=2}
+
+            t++;
+
+//  T() {d==9, s==1, v==0, 1<=t, t<=2}
+
+            if (s>=3)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+
+//  T(t,v) {d==9, s==1, 0<=t, t#init<=t, v<=1}
+
+         while (rand_b()) {
+
+//  T() {d==9, s==1, t<=1}
+
+            if (!(s==1&&t<=1))
+
+//  T() {0==-1}
+
+               deadlock();
+
+//  T(v) {d==9, s==1, v==0, t<=1}
+
+            v = 0;
+
+//  T(t) {d==9, s==1, t==t#init+1, v==0, t<=2}
+
+            t++;
+
+//  T() {d==9, s==1, v==0, t<=2}
+
+            if (s>=3)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+
+//  T() {d==9, s==1, t==2}
+
+         if (!(s==1&&t==2))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {d==9, s==1, t==2, v==0}
+
+         v = 0;
+
+//  T(t) {d==9, s==1, t==3, t#init==2, v==0}
+
+         t++;
+
+//  T() {d==9, s==1, t==3, v==0}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {d==8, s==1, v==1, 0<=t}
+
+         if (!(s==1&&v==1&&d==8))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {d==8, s==1, v==2, v#init==1, 0<=t}
+
+         v++;
+
+//  T(d) {d==9, d#init==8, s==1, v==2, 0<=t}
+
+         d++;
+
+//  T() {d==9, s==1, v==2, 0<=t}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {d==9, s==1, t==2, v==2}
+
+         if (!(s==1&&t==2))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(v) {d==9, s==1, t==2, v==0, v#init==2}
+
+         v = 0;
+
+//  T(t) {d==9, s==1, t==3, t#init==2, v==0}
+
+         t++;
+
+//  T() {d==9, s==1, t==3, v==0}
+
+         if (s>=3)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T() {d==9, s==1, t==3, v==0}
+
+      if (!(s==1&&t>=3))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T(s) {d==9, s==2, s#init==1, t==3, v==0}
+
+      s = 2;
+
+//  T() {d==9, s==2, t==3, v==0}
+
+      if (s>=3)
+
+//  T() {0==-1}
+
+         checking_error();
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int s, d, v, t;
+
+//  P(d,s,t,v) {}
+
+   s = 1;
+
+//  P(d,s,t,v) {s==1}
+
+   d = v = t = 0;
+
+//  P(d,s,t,v) {d==0, s==1, t==0, v==0}
+
+   if (s>=3)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(d,s,t,v) {d==0, s==1, t==0, v==0}
+
+   while (rand_b())
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+      if (rand_b()) {
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+         if (!(s==1&&t<=2))
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 6<=3s+t, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, 0<=d, 0<=t, t<=2}
+
+         v = 0;
+
+//  P(d,s,t,v) {s==1, v==0, 0<=d, 0<=t, t<=2}
+
+         t++;
+
+//  P(d,s,t,v) {s==1, v==0, 0<=d, 1<=t, t<=3}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+         if (!(s==1&&v<=1&&d<=8))
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, 0<=d, d<=8, 0<=t, v<=1}
+
+         v++;
+
+//  P(d,s,t,v) {s==1, 0<=d, d<=8, 0<=t, v<=2}
+
+         d++;
+
+//  P(d,s,t,v) {s==1, 1<=d, d<=9, 0<=t, v<=2}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+         if (!(s==1&&t>=3))
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, 0<=d, 3<=t}
+
+         s = 2;
+
+//  P(d,s,t,v) {s==2, 0<=d, 3<=t}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+         if (!(s==1&&d>=10))
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, 10<=d, 0<=t}
+
+         s = 3;
+
+//  P(d,s,t,v) {s==3, 10<=d, 0<=t}
+
+         if (s>=3)
+
+//  P(d,s,t,v) {s==3, 10<=d, 0<=t}
+
+            checking_error();
+      }
+      else {
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+         if (!(s==1&&v>=3))
+
+//  P(d,s,t,v) {0<=d, 1<=s, s<=2, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, 0<=d, 0<=t, 3<=v}
+
+         s = 4;
+
+//  P(d,s,t,v) {s==4, 0<=d, 0<=t, 3<=v}
+
+         if (s>=3)
+
+//  P(d,s,t,v) {s==4, 0<=d, 0<=t, 3<=v}
+
+            checking_error();
+      }
+}
+
+//  P() {}
+
+void ts_restructured(void)
+{
+
+//  P() {}
+
+   int s, d, v, t;
+
+//  P(d,s,t,v) {}
+
+   s = 1;
+
+//  P(d,s,t,v) {s==1}
+
+   d = v = t = 0;
+
+//  P(d,s,t,v) {d==0, s==1, t==0, v==0}
+
+   if (s>=3)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(d,s,t,v) {d==0, s==1, t==0, v==0}
+
+   while (rand_b())
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+      if (rand_b()) {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+         if (!(s==1&&t<=1))
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 2<=t, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, t<=1, v<=1}
+
+         v = 0;
+
+//  P(d,s,t,v) {s==1, v==0, 0<=d, 0<=t, t<=1}
+
+         t++;
+
+//  P(d,s,t,v) {s==1, v==0, 0<=d, 1<=t, t<=2}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+         if (!(s==1&&v<=0&&d<=7))
+
+//  P(d,s,t,v) {s==1, 1<=d, v<=d, 0<=t, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, 0<=d, d<=7, v<=d, 0<=t, v<=0}
+
+         v++;
+
+//  P(d,s,t,v) {s==1, 0<=d, d<=7, v<=d+1, 0<=t, v<=1}
+
+         d++;
+
+//  P(d,s,t,v) {s==1, 1<=d, d<=8, v<=d, 0<=t, v<=1}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+         if (!(s==1&&v==1&&d<=7))
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 8v<=d, 0<=t, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, v==1, 1<=d, d<=7, 0<=t}
+
+         v++;
+
+//  P(d,s,t,v) {s==1, v==2, 1<=d, d<=7, 0<=t}
+
+         d++;
+
+//  P(d,s,t,v) {s==1, v==2, 2<=d, d<=8, 0<=t}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P(d,s,t,v) {s==1, v==2, 2<=d, d<=8, 0<=t}
+
+         if (!(s==1&&t<=1))
+
+//  P(d,s,t,v) {s==1, v==2, 2<=d, d<=8, 2<=t}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, v==2, 2<=d, d<=8, 0<=t, t<=1}
+
+         v = 0;
+
+//  P(d,s,t,v) {s==1, v==0, 2<=d, d<=8, 0<=t, t<=1}
+
+         t++;
+
+//  P(d,s,t,v) {s==1, v==0, 2<=d, d<=8, 1<=t, t<=2}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+   if (rand_b()) {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+      if (rand_b()) {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+         if (!(s==1&&v==1&&d<=7))
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 8v<=d, 0<=t, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, v==1, 1<=d, d<=7, 0<=t}
+
+         v++;
+
+//  P(d,s,t,v) {s==1, v==2, 1<=d, d<=7, 0<=t}
+
+         d++;
+
+//  P(d,s,t,v) {s==1, v==2, 2<=d, d<=8, 0<=t}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P(d,s,t,v) {s==1, v==2, 2<=d, d<=8, 0<=t}
+
+         if (!(s==1&&t==2))
+
+//  P(d,s,t,v) {s==1, v==2, 2<=d, d<=8, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, t==2, v==2, 2<=d, d<=8}
+
+         v = 0;
+
+//  P(d,s,t,v) {s==1, t==2, v==0, 2<=d, d<=8}
+
+         t++;
+
+//  P(d,s,t,v) {s==1, t==3, v==0, 2<=d, d<=8}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+         if (!(s==1&&t==2))
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, t==2, 0<=d, v<=d, v<=1}
+
+         v = 0;
+
+//  P(d,s,t,v) {s==1, t==2, v==0, 0<=d}
+
+         t++;
+
+//  P(d,s,t,v) {s==1, t==3, v==0, 0<=d}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(d,s,t,v) {s==1, t==3, v==0, 0<=d}
+
+      while (rand_b()) {
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 0<=v, v<=1}
+
+         if (!(s==1&&v<=0&&d<=7))
+
+//  P(d,s,t,v) {s==1, t==3, 8<=d+7v, v<=d, 0<=v, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, t==3, v==0, 0<=d, d<=7}
+
+         v++;
+
+//  P(d,s,t,v) {s==1, t==3, v==1, 0<=d, d<=7}
+
+         d++;
+
+//  P(d,s,t,v) {s==1, t==3, v==1, 1<=d, d<=8}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 0<=v, v<=1}
+
+      if (rand_b()) {
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 0<=v, v<=1}
+
+         if (!(s==1&&t>=3))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 0<=v, v<=1}
+
+         s = 2;
+
+//  P(d,s,t,v) {s==2, t==3, v<=d, 0<=v, v<=1}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 0<=v, v<=1}
+
+         if (!(s==1&&v==1&&d<=7))
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 8v<=d, 0<=v, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, t==3, v==1, 1<=d, d<=7}
+
+         v++;
+
+//  P(d,s,t,v) {s==1, t==3, v==2, 1<=d, d<=7}
+
+         d++;
+
+//  P(d,s,t,v) {s==1, t==3, v==2, 2<=d, d<=8}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P(d,s,t,v) {s==1, t==3, v==2, 2<=d, d<=8}
+
+         if (!(s==1&&t>=3))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(d,s,t,v) {s==1, t==3, v==2, 2<=d, d<=8}
+
+         s = 2;
+
+//  P(d,s,t,v) {s==2, t==3, v==2, 2<=d, d<=8}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 0<=v, v<=1}
+
+         if (!(s==1&&v==1&&d==8))
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 0<=v, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {d==8, s==1, t==3, v==1}
+
+         v++;
+
+//  P(d,s,t,v) {d==8, s==1, t==3, v==2}
+
+         d++;
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==2}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==2}
+
+         if (!(s==1&&t>=3))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==2}
+
+         s = 2;
+
+//  P(d,s,t,v) {d==9, s==2, t==3, v==2}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 0<=v, v<=1}
+
+         if (!(s==1&&v<=0&&d==8))
+
+//  P(d,s,t,v) {s==1, t==3, v<=d, 0<=v, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {d==8, s==1, t==3, v==0}
+
+         v++;
+
+//  P(d,s,t,v) {d==8, s==1, t==3, v==1}
+
+         d++;
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==1}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==1}
+
+         if (!(s==1&&t>=3))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==1}
+
+         s = 2;
+
+//  P(d,s,t,v) {d==9, s==2, t==3, v==1}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+   }
+   else {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+      if (rand_b()) {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+         if (rand_b()) {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+            if (!(s==1&&v<=0&&d==8))
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+               deadlock();
+
+//  P(d,s,t,v) {d==8, s==1, 0<=t, v<=0}
+
+            v++;
+
+//  P(d,s,t,v) {d==8, s==1, 0<=t, v<=1}
+
+            d++;
+
+//  P(d,s,t,v) {d==9, s==1, 0<=t, v<=1}
+
+            if (s>=3)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+            if (!(s==1&&v==1&&d==8))
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+               deadlock();
+
+//  P(d,s,t,v) {d==8, s==1, v==1, 0<=t}
+
+            v++;
+
+//  P(d,s,t,v) {d==8, s==1, v==2, 0<=t}
+
+            d++;
+
+//  P(d,s,t,v) {d==9, s==1, v==2, 0<=t}
+
+            if (s>=3)
+
+//  P() {0==-1}
+
+               checking_error();
+
+//  P(d,s,t,v) {d==9, s==1, v==2, 0<=t}
+
+            if (!(s==1&&t<=1))
+
+//  P(d,s,t,v) {d==9, s==1, v==2, 2<=t}
+
+               deadlock();
+
+//  P(d,s,t,v) {d==9, s==1, v==2, 0<=t, t<=1}
+
+            v = 0;
+
+//  P(d,s,t,v) {d==9, s==1, v==0, 0<=t, t<=1}
+
+            t++;
+
+//  P(d,s,t,v) {d==9, s==1, v==0, 1<=t, t<=2}
+
+            if (s>=3)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+
+//  P(d,s,t,v) {d==9, s==1, 0<=t, v<=1}
+
+         while (rand_b()) {
+
+//  P(d,s,t,v) {d==9, s==1, 0<=t, v<=1}
+
+            if (!(s==1&&t<=1))
+
+//  P(d,s,t,v) {d==9, s==1, 2<=t, v<=1}
+
+               deadlock();
+
+//  P(d,s,t,v) {d==9, s==1, 0<=t, t<=1, v<=1}
+
+            v = 0;
+
+//  P(d,s,t,v) {d==9, s==1, v==0, 0<=t, t<=1}
+
+            t++;
+
+//  P(d,s,t,v) {d==9, s==1, v==0, 1<=t, t<=2}
+
+            if (s>=3)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+
+//  P(d,s,t,v) {d==9, s==1, 0<=t, v<=1}
+
+         if (!(s==1&&t==2))
+
+//  P(d,s,t,v) {d==9, s==1, 0<=t, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {d==9, s==1, t==2, v<=1}
+
+         v = 0;
+
+//  P(d,s,t,v) {d==9, s==1, t==2, v==0}
+
+         t++;
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==0}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+         if (!(s==1&&v==1&&d==8))
+
+//  P(d,s,t,v) {s==1, 0<=d, v<=d, 0<=t, v<=1}
+
+            deadlock();
+
+//  P(d,s,t,v) {d==8, s==1, v==1, 0<=t}
+
+         v++;
+
+//  P(d,s,t,v) {d==8, s==1, v==2, 0<=t}
+
+         d++;
+
+//  P(d,s,t,v) {d==9, s==1, v==2, 0<=t}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P(d,s,t,v) {d==9, s==1, v==2, 0<=t}
+
+         if (!(s==1&&t==2))
+
+//  P(d,s,t,v) {d==9, s==1, v==2, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t,v) {d==9, s==1, t==2, v==2}
+
+         v = 0;
+
+//  P(d,s,t,v) {d==9, s==1, t==2, v==0}
+
+         t++;
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==0}
+
+         if (s>=3)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==0}
+
+      if (!(s==1&&t>=3))
+
+//  P() {0==-1}
+
+         deadlock();
+
+//  P(d,s,t,v) {d==9, s==1, t==3, v==0}
+
+      s = 2;
+
+//  P(d,s,t,v) {d==9, s==2, t==3, v==0}
+
+      if (s>=3)
+
+//  P() {0==-1}
+
+         checking_error();
+   }
+}
