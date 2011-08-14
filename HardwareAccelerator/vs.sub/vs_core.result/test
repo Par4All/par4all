@@ -127,10 +127,10 @@ digraph "dag_cleaned_0" {
   "stab" -> "43 *";
   "42 &." [shape=trapezium,orientation=270];
   "42 &." -> "43 *" [label="mv_1"];
-  "41 -." [shape=trapezium,orientation=270];
-  "41 -." -> "42 &." [label="mv_2"];
+  "41 +." [shape=trapezium,orientation=270];
+  "41 +." -> "42 &." [label="mv_2"];
   "39 -" [shape=trapezium,orientation=270];
-  "39 -" -> "41 -." [label="mv_3"];
+  "39 -" -> "41 +." [label="mv_3"];
   "38 E8" [shape=box];
   "38 E8" -> "39 -" [label="mv_4"];
   "37 D8" [shape=box];
@@ -203,7 +203,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    freia_aipo_erode_8c(mv, t1, freia_morpho_kernel_8c);                 /*0038*/
    freia_aipo_sub(mv, t2, mv);                                          /*0039*/
 
-   freia_aipo_sub_const(mv, mv, 1);                                     /*0041*/
+   freia_aipo_add_const(mv, mv, -1);                                    /*0041*/
    freia_aipo_and_const(mv, mv, 1);                                     /*0042*/
    freia_aipo_mul(mv, stab, mv);                                        /*0043*/
    freia_common_destruct_data(mv_6);
@@ -339,10 +339,10 @@ digraph "dag_cleaned_0" {
   "stab" -> "43 *";
   "42 &." [shape=trapezium,orientation=270];
   "42 &." -> "43 *" [label="mv"];
-  "41 -." [shape=trapezium,orientation=270];
-  "41 -." -> "42 &." [label="mv"];
+  "41 +." [shape=trapezium,orientation=270];
+  "41 +." -> "42 &." [label="mv"];
   "39 -" [shape=trapezium,orientation=270];
-  "39 -" -> "41 -." [label="mv"];
+  "39 -" -> "41 +." [label="mv"];
   "38 E8" [shape=box];
   "38 E8" -> "39 -" [label="mv"];
   "37 D8" [shape=box];
@@ -430,10 +430,10 @@ digraph "vs_core_helper_0_2" {
   // computation vertices
   "42 &." [shape=trapezium,orientation=270];
   "42 &." -> "mv_1";
-  "41 -." [shape=trapezium,orientation=270];
-  "41 -." -> "42 &." [label="mv_2"];
+  "41 +." [shape=trapezium,orientation=270];
+  "41 +." -> "42 &." [label="mv_2"];
   "39 -" [shape=trapezium,orientation=270];
-  "39 -" -> "41 -." [label="mv_3"];
+  "39 -" -> "41 +." [label="mv_3"];
   "38 E8" [shape=box];
   "38 E8" -> "39 -" [label="mv_4"];
   "37 D8" [shape=box];
@@ -765,13 +765,13 @@ freia_status vs_core_helper_0_2_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 5
-  // mv_3 [4 alu] -> [5 alu] 41 sub_const
+  // mv_3 [4 alu] -> [5 alu] 41 add_const
   si.mux[4][0].op = SPOC_MUX_IN1;
   si.mux[4][2].op = SPOC_MUX_IN0;
-  // mv_3 [5 input 0] -> [5 alu] 41 sub_const
+  // mv_3 [5 input 0] -> [5 alu] 41 add_const
   // nope
-  // alu 41 sub_const stage 5
-  si.alu[5][0].op = SPOC_ALU_SUB_IN0_CONST;
+  // alu 41 add_const stage 5
+  si.alu[5][0].op = SPOC_ALU_ADD_IN0_CONST;
   sp.alu[5][0].constant = pi4;
 
 
@@ -901,7 +901,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    if (maxmotion-minmotion>motion_trig)                                 /*0027*/
       binvalue = maxmotion*motion_th/100;                               /*0028*/
 
-   vs_core_helper_0_2_0(mv, mv_6, binvalue, 255, true, freia_morpho_kernel_8c, 1, 1);  /*0030*/
+   vs_core_helper_0_2_0(mv, mv_6, binvalue, 255, true, freia_morpho_kernel_8c, -1, 1);                /*0030*/
    
    // open
    
@@ -935,7 +935,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    if (maxmotion-minmotion>motion_trig)                                 /*0027*/
       binvalue = maxmotion*motion_th/100;                               /*0028*/
 
-   vs_core_helper_0_2_0(mv, mv_6, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);     /*0030*/
+   vs_core_helper_0_2_0(mv, mv_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);    /*0030*/
    
    // open
    
@@ -1073,10 +1073,10 @@ digraph "dag_cleaned_0" {
   "stab" -> "43 *";
   "42 &." [shape=trapezium,orientation=270];
   "42 &." -> "43 *" [label="mv"];
-  "41 -." [shape=trapezium,orientation=270];
-  "41 -." -> "42 &." [label="mv"];
+  "41 +." [shape=trapezium,orientation=270];
+  "41 +." -> "42 &." [label="mv"];
   "39 -" [shape=trapezium,orientation=270];
-  "39 -" -> "41 -." [label="mv"];
+  "39 -" -> "41 +." [label="mv"];
   "38 E8" [shape=box];
   "38 E8" -> "39 -" [label="mv"];
   "37 D8" [shape=box];
@@ -1156,10 +1156,10 @@ digraph "vs_core_helper_0_1_0" {
   "stab" -> "43 *";
   "42 &." [shape=trapezium,orientation=270];
   "42 &." -> "43 *" [label="mv_1"];
-  "41 -." [shape=trapezium,orientation=270];
-  "41 -." -> "42 &." [label="mv_2"];
+  "41 +." [shape=trapezium,orientation=270];
+  "41 +." -> "42 &." [label="mv_2"];
   "39 -" [shape=trapezium,orientation=270];
-  "39 -" -> "41 -." [label="mv_3"];
+  "39 -" -> "41 +." [label="mv_3"];
   "38 E8" [shape=box];
   "38 E8" -> "39 -" [label="mv_4"];
   "37 D8" [shape=box];
@@ -1885,7 +1885,7 @@ freia_status vs_core_helper_0_1_0(
   mcu_macro[1][5].iter4 = 0;
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_SUB3;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_SUB3;
-  // 6: -.(4) -> 4
+  // 6: +.(4) -> 4
   mcu_macro[0][6].xmin1 = imagelet_4;
   mcu_macro[1][6].xmin1 = imagelet_4;
   mcu_macro[0][6].ymin1 = 0;
@@ -1914,8 +1914,8 @@ freia_status vs_core_helper_0_1_0(
   mcu_macro[1][6].iter3 = 0;
   mcu_macro[0][6].iter4 = 0;
   mcu_macro[1][6].iter4 = 0;
-  mcu_macro[0][6].addrStart = TERAPIX_UCODE_SUB_CONST;
-  mcu_macro[1][6].addrStart = TERAPIX_UCODE_SUB_CONST;
+  mcu_macro[0][6].addrStart = TERAPIX_UCODE_ADD_CONST;
+  mcu_macro[1][6].addrStart = TERAPIX_UCODE_ADD_CONST;
   // 7: &.(4) -> 4
   mcu_macro[0][7].xmin1 = imagelet_4;
   mcu_macro[1][7].xmin1 = imagelet_4;
@@ -2042,7 +2042,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    if (maxmotion-minmotion>motion_trig)                                 /*0027*/
       binvalue = maxmotion*motion_th/100;                               /*0028*/
 
-   vs_core_helper_0_1_0(mv, mv, stab, binvalue, 255, true, freia_morpho_kernel_8c, 1, 1);             /*0030*/
+   vs_core_helper_0_1_0(mv, mv, stab, binvalue, 255, true, freia_morpho_kernel_8c, -1, 1);            /*0030*/
    
    // open
    
@@ -2069,7 +2069,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    if (maxmotion-minmotion>motion_trig)                                 /*0027*/
       binvalue = maxmotion*motion_th/100;                               /*0028*/
 
-   vs_core_helper_0_1_0(mv, mv, stab, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);                /*0030*/
+   vs_core_helper_0_1_0(mv, mv, stab, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);               /*0030*/
    
    // open
    

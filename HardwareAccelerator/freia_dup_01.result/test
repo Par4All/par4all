@@ -49,10 +49,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 +" [shape=trapezium,orientation=270];
-  "11 +" -> "o";
-  "i1" -> "11 +";
-  "i0" -> "11 +";
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "o";
+  "i1" -> "9 +";
+  "i0" -> "9 +";
 }
 
 ! updated function for
@@ -61,8 +61,8 @@ freia_status freia_dup_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // same operation performed twice, first is dead
    // t = i0 + i1
+   freia_aipo_add(o, i0, i1);                                           /*0009*/
    // o = i0 + i1
-   freia_aipo_add(o, i0, i1);                                           /*0011*/
    return FREIA_OK;                                                     /*0013*/
 }
 #
@@ -113,10 +113,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 +" [shape=trapezium,orientation=270];
-  "11 +" -> "o";
-  "i1" -> "11 +";
-  "i0" -> "11 +";
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "o";
+  "i1" -> "9 +";
+  "i0" -> "9 +";
 }
 // graph for dag "freia_dup_01_helper_0_0" of module "freia_dup_01" in dot format
 digraph "freia_dup_01_helper_0_0" {
@@ -128,10 +128,10 @@ digraph "freia_dup_01_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 +" [shape=trapezium,orientation=270];
-  "11 +" -> "o";
-  "i1" -> "11 +";
-  "i0" -> "11 +";
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "o";
+  "i1" -> "9 +";
+  "i0" -> "9 +";
 }
 
 ! acceleration function
@@ -163,11 +163,11 @@ freia_status freia_dup_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, fre
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] 11 add
+  // i0 [0 input 0] -> [0 alu] 9 add
   // nope
-  // i1 [0 input 1] -> [0 alu] 11 add
+  // i1 [0 input 1] -> [0 alu] 9 add
   // nope
-  // alu 11 add stage 0
+  // alu 9 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
 
 
@@ -217,8 +217,8 @@ freia_status freia_dup_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // same operation performed twice, first is dead
    // t = i0 + i1
+   freia_dup_01_helper_0_0_0(o, i0, i1);                                /*0009*/
    // o = i0 + i1
-   freia_dup_01_helper_0_0_0(o, i0, i1);                                /*0011*/
    return FREIA_OK;                                                     /*0013*/
 }
 
@@ -228,8 +228,8 @@ freia_status freia_dup_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // same operation performed twice, first is dead
    // t = i0 + i1
+   freia_dup_01_helper_0_0_0(o, i0, i1);                                /*0009*/
    // o = i0 + i1
-   freia_dup_01_helper_0_0_0(o, i0, i1);                                /*0011*/
    return 0;                                                            /*0013*/
 }
 #
@@ -280,10 +280,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 +" [shape=trapezium,orientation=270];
-  "11 +" -> "o";
-  "i1" -> "11 +";
-  "i0" -> "11 +";
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "o";
+  "i1" -> "9 +";
+  "i0" -> "9 +";
 }
 // graph for dag "freia_dup_01_helper_0_0_0" of module "freia_dup_01" in dot format
 digraph "freia_dup_01_helper_0_0_0" {
@@ -295,10 +295,10 @@ digraph "freia_dup_01_helper_0_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 +" [shape=trapezium,orientation=270];
-  "11 +" -> "o";
-  "i1" -> "11 +";
-  "i0" -> "11 +";
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "o";
+  "i1" -> "9 +";
+  "i0" -> "9 +";
 }
 
 ! acceleration function
@@ -464,8 +464,8 @@ freia_status freia_dup_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // same operation performed twice, first is dead
    // t = i0 + i1
+   freia_dup_01_helper_0_0_0(o, i0, i1);                                /*0009*/
    // o = i0 + i1
-   freia_dup_01_helper_0_0_0(o, i0, i1);                                /*0011*/
    return FREIA_OK;                                                     /*0013*/
 }
 
@@ -475,8 +475,8 @@ freia_status freia_dup_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // same operation performed twice, first is dead
    // t = i0 + i1
+   freia_dup_01_helper_0_0_0(o, i0, i1);                                /*0009*/
    // o = i0 + i1
-   freia_dup_01_helper_0_0_0(o, i0, i1);                                /*0011*/
    return 0;                                                            /*0013*/
 }
 #
