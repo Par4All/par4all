@@ -330,10 +330,10 @@ freia_status xor_00_helper_0_0_0(
   redres.size = sizeof(terapix_reduction);
 
   // 0: C() -> 1
-  mcu_macro[0][0].xmin??? = imagelet_io_1_0;
-  mcu_macro[1][0].xmin??? = imagelet_io_1_1;
-  mcu_macro[0][0].ymin??? = 0;
-  mcu_macro[1][0].ymin??? = 0;
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
   // copy of operation 0 parameters
   p_0[0] = pi1;
   gram.xoffset = x_0;

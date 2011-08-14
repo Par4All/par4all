@@ -969,10 +969,10 @@ freia_status freia_03_helper_0_0_0(
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_AND3;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_AND3;
   // 6: C() -> 1
-  mcu_macro[0][6].xmin??? = imagelet_io_1_0;
-  mcu_macro[1][6].xmin??? = imagelet_io_1_1;
-  mcu_macro[0][6].ymin??? = 0;
-  mcu_macro[1][6].ymin??? = 0;
+  mcu_macro[0][6].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][6].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][6].ymin1 = 0;
+  mcu_macro[1][6].ymin1 = 0;
   // copy of operation 6 parameters
   p_6[0] = pi7;
   gram.xoffset = x_6;
