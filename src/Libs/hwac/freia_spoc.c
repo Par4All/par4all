@@ -2176,6 +2176,7 @@ list freia_spoc_compile_calls
    dag fulld,
    list /* of statements */ ls,
    const hash_table occs,
+   hash_table exchanges,
    const set output_images,
    FILE * helper_file,
    int number)
@@ -2187,7 +2188,7 @@ list freia_spoc_compile_calls
   int n_op_init = freia_aipo_count(fulld, true);
   int n_op_init_copies = n_op_init - freia_aipo_count(fulld, false);
 
-  list added_stats =  freia_dag_optimize(fulld);
+  list added_stats =  freia_dag_optimize(fulld, exchanges);
 
   // remove copies and duplicates if possible...
   // ??? maybe there should be an underlying transitive closure? not sure.

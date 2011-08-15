@@ -654,8 +654,7 @@ static bool gen_list_equals_p(const list l1, const list l2)
  * @param source to be kept
  * @return whether the statement is to be actually removed
  */
-static bool
-switch_vertex_to_assign(dagvtx target, dagvtx source)
+static bool switch_vertex_to_assign(dagvtx target, dagvtx source)
 {
   pips_debug(5, "replacing measure %"_intFMT" by %"_intFMT" result\n",
              dagvtx_number(target), dagvtx_number(source));
@@ -1218,6 +1217,9 @@ static bool dag_simplify(dag d)
   return changed;
 }
 
+/* normalize, that is use less image operators
+ * only transformation is: sub_const(i, v) -> add_const(i, -v)
+ */
 static bool dag_normalize(dag d)
 {
   bool changed = false;
@@ -1259,13 +1261,30 @@ static bool dag_normalize(dag d)
   return changed;
 }
 
+/* @return 0 keep both, 1 keep first, 2 keep second
+ */
+static int compatible_reduction_operation(const dagvtx v1, const dagvtx v2)
+{
+  const string
+    o1 = dagvtx_compact_operation(v1),
+    o2 = dagvtx_compact_operation(v2);
+  if ((same_string_p(o1, "max!") && same_string_p(o2, "max")) ||
+      (same_string_p(o1, "min!") && same_string_p(o2, "min")))
+    return 1;
+  else if ((same_string_p(o1, "max") && same_string_p(o2, "max!")) ||
+           (same_string_p(o1, "min") && same_string_p(o2, "min!")))
+    return 2;
+  else
+    return 0;
+}
+
 /* remove dead image operations.
  * remove AIPO copies detected as useless.
  * remove identical operations.
  * @return statements to be managed outside (external copies)...
  * ??? maybe there should be a transitive closure...
  */
-list /* of statements */ freia_dag_optimize(dag d)
+list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
 {
   list lstats = NIL;
   set remove = set_make(set_pointer);
@@ -1294,9 +1313,24 @@ list /* of statements */ freia_dag_optimize(dag d)
   if (get_bool_property("FREIA_REMOVE_DUPLICATE_OPERATIONS"))
   {
     pips_debug(6, "removing duplicate operations\n");
+
+    // all vertices in dependence order
     list vertices = gen_nreverse(gen_copy_seq(dag_vertices(d)));
+
+    // for all already processed vertices, the list of their predecessors
     hash_table previous = hash_table_make(hash_pointer, 10);
 
+    // subset of vertices to be investigated
+    set candidates = set_make(hash_pointer);
+
+    // subset of vertices already encountered which do not have predecessors
+    set sources = set_make(hash_pointer);
+
+    // already processed vertices
+    set processed = set_make(hash_pointer);
+
+    // potential n^2 loop, optimized by comparing only to the already processed
+    // successors of the vertex predecessors . See "candidates" computation.
     FOREACH(dagvtx, vr, vertices)
     {
       int op = (int) vtxcontent_optype(dagvtx_content(vr));
@@ -1308,36 +1342,93 @@ list /* of statements */ freia_dag_optimize(dag d)
       // skip already removed ops
       if (set_belong_p(remove, vr)) continue;
 
-      pips_debug(8, "investigating...\n");
+      // pips_debug(8, "investigating...\n");
       list preds = dag_vertex_preds(d, vr);
-      bool switched = false;
-      HASH_MAP(pp, lp,
-      {
-        dagvtx p = (dagvtx) pp;
 
+      // build only "interesting" vertices, which shared inputs
+      set_clear(candidates);
+
+      // successors of predecessors
+      FOREACH(dagvtx, p, preds)
+        set_append_list(candidates, dagvtx_succs(p));
+
+      // keep only already processed vertices
+      set_intersection(candidates, candidates, processed);
+
+      // possibly add those without predecessors (is that only set_const?)
+      if (!preds) set_union(candidates, candidates, sources);
+
+      // whether the vertex was changed
+      bool switched = false;
+
+      // I do not need to sort them, they are all different, only one can match
+      SET_FOREACH(dagvtx, p, candidates)
+      {
         pips_debug(8, "comparing %"_intFMT" and %"_intFMT"\n",
                    dagvtx_number(vr), dagvtx_number(p));
+
+        list lp = hash_get(previous, p);
 
         // ??? maybe I should not remove all duplicates, because
         // recomputing them may be cheaper?
         if (dagvtx_is_measurement_p(vr) || dagvtx_is_measurement_p(p))
         {
           // special handling for measures, esp for terapix
-          if (same_operation_p(vr, p) &&
-              gen_list_equals_p(preds, (list) lp))
+          if (gen_list_equals_p(preds, lp))
           {
-            // min(A, px), min(A, py) => min(A, px) && *py = *px
-            if (switch_vertex_to_assign(vr, p))
-              set_add_element(remove, remove, vr);
-            switched = true;
-            break;
+            if (same_operation_p(vr, p))
+            {
+              // min(A, px), min(A, py) => min(A, px) && *py = *px
+              if (switch_vertex_to_assign(vr, p))
+                set_add_element(remove, remove, vr);
+              // only one can match!
+              switched = true;
+              break;
+            }
+            else
+            {
+              int n = compatible_reduction_operation(p, vr);
+              if (n==2)
+              {
+                // exchange role of vr & p
+                set_del_element(processed, processed, p);
+                set_add_element(processed, processed, vr);
+                hash_del(previous, p);
+                hash_put(previous, vr, lp);
+                dagvtx t = p; p = vr; vr = t;
+                // also in the list of statements to fix dependencies!
+                if (exchanges) hash_put(exchanges, p, vr);
+              }
+              if (n==1 || n==2)
+              {
+                // we keep p which is a !, and vr is a simple reduction
+                if (switch_vertex_to_assign(vr, p))
+                  set_add_element(remove, remove, vr);
+
+                // ensure that vr is *after* p
+                /*
+                _int n = dagvtx_number(vr);
+                if (n<dagvtx_number(p))
+                {
+                  statement_number(dagvtx_statement(vr)) =
+                    statement_number(dagvtx_statement(p));
+                  statement_number(dagvtx_statement(p)) = n;
+                }
+                */
+
+                // done
+                switched = true;
+                break;
+              }
+            }
           }
         }
         else if (same_operation_p(vr, p) &&
-                 gen_list_equals_p(preds, (list) lp) &&
+                 gen_list_equals_p(preds, lp) &&
                  same_constant_parameters(vr, p))
         {
           switch_vertex_to_a_copy(vr, p, preds);
+          // only one can match!
           switched = true;
           break;
         }
@@ -1345,21 +1436,30 @@ list /* of statements */ freia_dag_optimize(dag d)
                  list_commuted_p(preds, (list) lp))
         {
           switch_vertex_to_a_copy(vr, p, preds);
+          // only one can match!
           switched = true;
           break;
         }
-      },  previous);
+      }
 
       if (switched)
         gen_free_list(preds);
       else
+      {
+        // update map & sets
         hash_put(previous, vr, preds);
+        set_add_element(processed, processed, vr);
+        if (!preds) set_add_element(sources, sources, vr);
+      }
     }
 
     // cleanup
     HASH_MAP(k, v, if (v) gen_free_list(v), previous);
     hash_table_free(previous), previous = NULL;
     gen_free_list(vertices), vertices = NULL;
+    set_free(candidates);
+    set_free(sources);
+    set_free(processed);
 
     ifdebug(8) {
       pips_debug(4, "after FREIA_REMOVE_DUPLICATE_OPERATIONS:\n");
