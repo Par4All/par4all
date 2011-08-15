@@ -13,6 +13,6 @@ int main(void)
   }
   n = list_len(l);
   fprintf(stdout, "n=%d", n);
-  list_clean(&l);
+  list_clean_2(l);
   return 0;
 }

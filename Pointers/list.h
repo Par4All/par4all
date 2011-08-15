@@ -10,6 +10,7 @@ const list nil = ((list) 0);
 list list_cons(double, list);
 void list_free(list);
 void list_clean(list*);
+#define list_clean_2(a) list_free(a), (a) = nil
 
 // getter
 list list_next(list);
