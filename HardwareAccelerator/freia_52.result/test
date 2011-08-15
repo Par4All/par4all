@@ -5529,7 +5529,7 @@ digraph "freia_52_helper_2_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 209 ops (2 copies), optimized to 84 (0 copies)
+// dag 0: 209 ops (2 copies), optimized to 84 (0+0 copies)
 // split 0: 2 cuts
 // split 1: 2 cuts
 // split 2: 1 cut
@@ -7436,7 +7436,7 @@ freia_status freia_52_helper_0_10_1(freia_data2d * o0, freia_data2d * i0, freia_
   return ret;
 }
 
-// dag 1: 10 ops (0 copies), optimized to 10 (0 copies)
+// dag 1: 10 ops (0 copies), optimized to 10 (0+0 copies)
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -7610,7 +7610,7 @@ freia_status freia_52_helper_1_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   return ret;
 }
 
-// dag 2: 4 ops (0 copies), optimized to 3 (0 copies)
+// dag 2: 4 ops (0 copies), optimized to 3 (0+0 copies)
 // split 0: 1 cut
 // # SPOC calls: 1
 

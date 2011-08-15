@@ -485,7 +485,7 @@ digraph "vs_core_2_helper_0_3" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 18 ops (2 copies), optimized to 16 (0 copies)
+// dag 0: 18 ops (2 copies), optimized to 16 (0+0 copies)
 // split 0: 2 cuts
 // split 1: 3 cuts
 // split 2: 6 cuts
