@@ -1405,17 +1405,6 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
                 if (switch_vertex_to_assign(vr, p))
                   set_add_element(remove, remove, vr);
 
-                // ensure that vr is *after* p
-                /*
-                _int n = dagvtx_number(vr);
-                if (n<dagvtx_number(p))
-                {
-                  statement_number(dagvtx_statement(vr)) =
-                    statement_number(dagvtx_statement(p));
-                  statement_number(dagvtx_statement(p)) = n;
-                }
-                */
-
                 // done
                 switched = true;
                 break;
