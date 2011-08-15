@@ -2196,8 +2196,10 @@ list freia_spoc_compile_calls
 
   fprintf(helper_file,
           "\n"
-          "// dag %d: %d ops (%d copies), optimized to %d (%d copies)\n",
-          number, n_op_init, n_op_init_copies, n_op_opt, n_op_opt_copies);
+          "// dag %d: %d ops (%d copies), "
+          "optimized to %d (%d+%d copies)\n",
+          number, n_op_init, n_op_init_copies,
+          n_op_opt, n_op_opt_copies, (int) gen_length(added_stats));
 
   // dump final dag
   dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
