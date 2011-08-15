@@ -9,16 +9,17 @@
 + may skip unrelated statements?
 + deal with |= ||= and similars
 + detect redundant operations? replace them with copies?
++ freia_aipo_cast: should it be managed as a copy? as an option
 - aliasing pointers img1 = img2 is not really managed
 - images used in the computations must all be "freia_data2d *"
 - what about full expressions: aipo_x() || aipo_y() || aipo_z()? atomizer?
 - check that there are references where expected?
 - handle different type of images (e.g. distinct BPP)
   issue: it is not clear how the image bpp can be derived from the source
+  or if it is a purely dynamic property
 - check/remove more implicit hypothesis?
 - image operations not in aipo/cipo: freia_common_draw_{line,rect}
   should it be in aipo or cipo? should I consider this operation?
-- freia_aipo_cast: should it be managed as a copy?
 
 * optimizations
 + remove useless images (computed but not used...) see licensePlate
@@ -28,20 +29,21 @@
 + other simple or complex algebraic optimization ideas?
   maybe at least A xor A => A = 0 would be useful?
 + check optimality of tests cases (for spoc)
-- redundancy: max coord includes max
++ redundancy: max coord includes max
 - min commutes with dilate & max with erode, or vice-versa ?
+  there is no tree rewriting in the dag, just simple operation optimizations
 - should keep AIPO/software calls if accelerator calls are slower?
   I would I know that?
 
 * code
 + cleanup data structures?
++ could separate DAG optimization as a separate phase? AIPO -> AIPO
 - record scalar deps in dag?
 - split first on scalar deps, as it is true for any accelerator?
   not that simple with limited depth?
 - remove type ctxcontent?
 - should make elementary ops absdiff(x,y) = abs(diff(x, y)) (no.. unsigned)
 - and then match back of necessary to available low level ops.
-+ could separate DAG optimization as a separate phase? AIPO -> AIPO
 
 * output
 + symmetry (flipping)
@@ -61,10 +63,10 @@
 + should detect "included" measurements (maxcoord includes max)?
   (done indirectly by the code generation, but could be done on the DAG?)
 + remove dead code on dag optimization
++ DAG dump should differentiate input/output images if same...
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
-- DAG dump shoud differentiate input/output images if same...
 
 * post-processing
 + remove malloc/free if not used
@@ -81,7 +83,7 @@
 * known bugs
 + allocs may be in the middle of the calls
 + license_plate_copies takes too much time to compile? 1mn -> 4.5s
-- reuse of images in some cases when nodes are reordered... SSA?
++ reuse of images in some cases when nodes are reordered... SSA?
 - wrong copy extraction order in vs_core_2, and copies not really removed
 - should turn = in image copies?
 
@@ -105,11 +107,11 @@
   is there anyway to somehow get the values of these pointers in a register
   and extract the six parameters independently?
 + complete measure ops! there is a needed initialization (setcst)...
-- check operators with constant arguments.
++ check operators with constant arguments.
++ skip non implemented ops? fast_correlation?
 - implement "enumerate" dag cutting strategy
 - it would be great if the simulator timings are ok for a paper...
 - cleanup declarations in the generated code, when not used?
-+ skip non implemented ops? fast_correlation?
 
 * Mixed target
 - could do something simple greedy first, spoc first, implemented first...
