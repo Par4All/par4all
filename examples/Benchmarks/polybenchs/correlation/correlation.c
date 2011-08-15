@@ -86,6 +86,10 @@ int main(int argc, char** argv) {
     mean[j] /= float_n;
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   /* Determine standard deviations of column vectors of data matrix. */
   for (j = 1; j <= m; j++) {
     stddev[j] = 0.0;
@@ -116,6 +120,9 @@ int main(int argc, char** argv) {
     }
   }
   symmat[m][m] = 1.0;
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

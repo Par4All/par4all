@@ -73,6 +73,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   for (t = 0; t < tsteps; t++) {
     for (i = 2; i < n - 1; i++)
       for (j = 2; j < n - 1; j++)
@@ -82,6 +86,9 @@ int main(int argc, char** argv) {
       for (j = 2; j < n - 1; j++)
         A[i][j] = B[i][j];
   }
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

@@ -96,6 +96,10 @@ void single_iteration(int row,
   double delta;
   int r, c;
   //printf("num_omp_threads: %d\n", num_omp_threads);
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
 #ifdef OPEN
   omp_set_num_threads(num_omp_threads);
 #pragma omp parallel for shared(power, temp,result) private(r, c, delta) firstprivate(row, col) schedule(static)
@@ -163,6 +167,11 @@ void single_iteration(int row,
       temp[r][c] = result[r][c];
     }
   }
+
+#ifdef PGI_ACC
+}
+#endif
+
 }
 
 /* Transient solver driver routine: simply converts the heat 

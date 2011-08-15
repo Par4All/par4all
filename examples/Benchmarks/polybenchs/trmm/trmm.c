@@ -69,12 +69,18 @@ int main(int argc, char** argv) {
   if(argv[0]==0) {
     init_array();
   }
-
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   /*  B := alpha*A'*B, A triangular */
   for (i = 1; i < n; i++)
     for (j = 0; j < n; j++)
       for (k = 0; k < i; k++)
         B[i][j] += alpha * A[i][k] * B[j][k];
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

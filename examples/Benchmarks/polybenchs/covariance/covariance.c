@@ -73,6 +73,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   /* Determine mean of column vectors of input data matrix */
   for (j = 1; j <= m; j++) {
     mean[j] = 0.0;
@@ -94,6 +98,10 @@ int main(int argc, char** argv) {
         symmat[j1][j2] += data[i][j1] * data[i][j2];
       symmat[j2][j1] = symmat[j1][j2];
     }
+
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

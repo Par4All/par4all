@@ -80,24 +80,7 @@ void usage(int argc, char **argv) {
 void init(int rows,
           int cols,
           float I[rows][cols],
-          float J[rows][cols],
-          int iN[rows],
-          int iS[rows],
-          int jW[cols],
-          int jE[cols]) {
-  for (int i = 0; i < rows; i++) {
-    iN[i] = i - 1;
-    iS[i] = i + 1;
-  }
-  for (int j = 0; j < cols; j++) {
-    jW[j] = j - 1;
-    jE[j] = j + 1;
-  }
-  iN[0] = 0;
-  iS[rows - 1] = rows - 1;
-  jW[0] = 0;
-  jE[cols - 1] = cols - 1;
-
+          float J[rows][cols]) {
   //printf("Randomizing the input matrix\n");
 
   random_matrix(rows, cols, I);
@@ -156,17 +139,41 @@ int main(int argc, char* argv[]) {
 
 
   // Initial data
-  init(rows,cols,I,J,iN,iS,jW,jE);
+  init(rows,cols,I,J);
 
   /* Start timer. */
   timer_start();
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[5]==0) {
-    init(rows,cols,I,J,iN,iS,jW,jE);
+    init(rows,cols,I,J);
   }
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
 
 
+  for (int i=0; i< rows; i++) {
+    iN[i] = i-1;
+    iS[i] = i+1;
+    if(i==0) {
+      iN[0] = 0;
+    }
+    if(i==rows-1) {
+      iS[rows-1] = rows-1;
+    }
+  }
+  for (int j=0; j< cols; j++) {
+    jW[j] = j-1;
+    jE[j] = j+1;
+    if(j==0) {
+      jW[0] = 0;
+    }
+    if(j==cols-1) {
+      jE[cols-1] = cols-1;
+    }
+  }
 
   for (iter = 0; iter < niter; iter++) {
     sum = 0;
@@ -240,6 +247,9 @@ int main(int argc, char* argv[]) {
 
   }
 
+#ifdef PGI_ACC
+}
+#endif
 
 
   /* Cheat the compiler to limit the scope of optimisation */

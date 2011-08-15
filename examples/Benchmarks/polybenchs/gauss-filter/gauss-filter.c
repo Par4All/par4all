@@ -83,6 +83,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   tot[0] = 0;
   for (k = t - 1; k <= 1 + t; k++)
     tot[k + 2 - t] = tot[k + 1 - t] + Gauss[k - t + 1];
@@ -106,6 +110,9 @@ int main(int argc, char** argv) {
       gauss_image[x][y] = g_acc2[x][y][3] / tot[3];
     }
   }
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {
