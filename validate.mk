@@ -438,7 +438,7 @@ endif # DO_PYPS
 
 # special case for "slow" directories...
 %.validate:
-	echo "skipping $@, possibly a slow subdirectory" >&2
+	@echo "skipping $@, possibly a slow subdirectory" >&2
 
 # detect skipped stuff
 .PHONY: skipped
