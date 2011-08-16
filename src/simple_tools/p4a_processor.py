@@ -31,35 +31,44 @@ default_properties = dict(
     # Useless to go on if something goes wrong... :-(
     #ABORT_ON_USER_ERROR = True,
     ABORT_ON_USER_ERROR = False,
+
     # Compute the intraprocedural preconditions at the same
     # Compute the intraprocedural preconditions at the same
     # time as transformers and use them to improve the
     # accuracy of expression and statement transformers:
     SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
+
     # Use the more precise fix point operator to cope with
     # while loops:
     SEMANTICS_FIX_POINT_OPERATOR = "derivative",
+
     # Try to restructure the code for more precision:
     UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
     UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
+
     # Simplify for loops into Fortran do-loops internally for
     # better precision of analysis:
     FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+
     # Warning: assume that there is no aliasing between IO
     # streams ('FILE *' variables):
     ALIASING_ACROSS_IO_STREAMS = False,
+
     # Warning: this is a work in progress. Assume no weird
     # aliasing
     CONSTANT_PATH_EFFECTS = False,
-    # Prevents automatic addition of OpenMP directives when
-    # unsplitting.  We will add them manually using ompify if
-    # requested.
+
+    # Prevents automatic pretty-printing of OpenMP directives when
+    # unsplitting.  We will add them using ompify if requested.
     PRETTYPRINT_SEQUENTIAL_STYLE = "do",
+
     # Required property since floating point arithmetic operations are not
-    # associatives. PIPS does not take that into account now and is based
-    # on theoretical math. Unfortunately floating points number implies
-    # rounding that breaks associativity. cf TRAC 551
-    PRETTYPRINT_ALL_PARENTHESES = True
+    # associative because of rounding. PIPS does not take that into
+    # account now and is based on theoretical math... cf PIPS TRAC #551
+
+    # Well, François Irigoin seems to have improved this, so avoid
+    # the spam of parenthesis...
+    # PRETTYPRINT_ALL_PARENTHESES = True
 )
 
 # The default values of some PIPS properties are OK for C but has to be
