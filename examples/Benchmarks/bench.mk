@@ -103,23 +103,23 @@ pgi: $(PGI_TARGET)
 # Run target
 run_seq: $(SEQ_TARGET)
 	for run in $(NRUNS); do \
-		$(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
+		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
 	done
 run_openmp: $(OMP_TARGET)
 	for run in $(NRUNS); do \
-		$(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
+		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
 	done
 run_cuda: $(CUDA_TARGET)
 	for run in $(NRUNS); do \
-		$(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
+		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
 	done
 run_cuda_opt: $(CUDA_OPT_TARGET)
 	for run in $(NRUNS); do \
-		$(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
+		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
 	done
 run_pgi: $(PGI_TARGET)
 	for run in $(NRUNS); do \
-		$(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
+		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
 	done
 
 # Clean targets

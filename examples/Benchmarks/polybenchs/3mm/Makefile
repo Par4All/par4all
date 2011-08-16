@@ -1,6 +1,6 @@
 TARGET=3mm
 SIZE_PARAMS=-DNI=2048 -DNJ=2048 -DNK=2048 -DNL=2048 -DNM=2048
 
-include ../../bench.mk
+include ../bench.mk
 
 

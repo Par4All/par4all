@@ -1,6 +1,6 @@
-TARGET=jacobi-1d-imper
+TARGET=jacobi-1d
 SIZE_PARAMS= -DN=65536
-
-include ../../bench.mk
+BENCH_SUITE:=Poly
+include ../bench.mk
 
 
