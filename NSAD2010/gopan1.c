@@ -2,6 +2,8 @@
 //
 #include <stdio.h>
 
+#define true (1)
+
 int main()
 {
 
@@ -18,5 +20,5 @@ int main()
   }
 
   if(x==102)
-    printf("property  verified\n"); 
+    printf("property  verified\n");
 }
