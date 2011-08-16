@@ -1,4 +1,6 @@
 delete typedef02
+# Type conversion error
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create typedef02 typedef02.c
 module main
 activate C_PARSER
