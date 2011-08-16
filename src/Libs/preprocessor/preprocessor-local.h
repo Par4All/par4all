@@ -58,7 +58,7 @@
 #define DEFAULT_PIPS_FLINT "gfortran -c "
 /* See necessary definitions in pipsmake-rc.tex */
 #define DEFAULT_PIPS_CC "gcc -D__PIPS__ -D__HPFC__ -U__GNUC__ -c "
-#define DEFAULT_PIPS_CC_FLAGS " -Wall -Werror "
+#define DEFAULT_PIPS_CC_FLAGS " -Wall "
 
 
 /* Define some functions from the .l or .y since cproto cannot dig them out: */
