@@ -4,7 +4,7 @@ enum
   b
 };
 
-main()
+int main()
 {
   int ia;
   int ib;
@@ -14,4 +14,5 @@ main()
   ib = b;
 
   t = ia + ib;
+  return 0;
 }

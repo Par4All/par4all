@@ -4,7 +4,6 @@ Parsed printed file for "rand"
 
 Warnings for "rand"
 
-unknown[unknown] (process_user_file) No syntactic check on file "./function_name_conflict01.c"
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
 C_PARSER[rand] (UpdateEntity) Intrinsic rand redefined.

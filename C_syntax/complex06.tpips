@@ -1,4 +1,5 @@
 delete complex06
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create complex06 complex06.c
 
 echo

@@ -1,5 +1,7 @@
 delete null_character
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create null_character null_character.c
 
 setproperty PRETTYPRINT_LANGUAGE "C"

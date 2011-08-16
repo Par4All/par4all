@@ -4,6 +4,8 @@ delete files
 # respect to the execution directory and not with respect to the
 # location of the files (see Fabien Coelho)
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 #create files files/*.c
 create files files/file1.c files/file2.c files/file3.c
 

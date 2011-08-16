@@ -1,4 +1,5 @@
 delete unsigned
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create unsigned unsigned.c
 
 activate C_PARSER

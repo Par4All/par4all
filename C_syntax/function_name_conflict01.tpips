@@ -2,6 +2,7 @@ delete function_name_conflict01
 
 # setproperty ABORT_ON_USER_ERROR TRUE
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create function_name_conflict01 function_name_conflict01.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9

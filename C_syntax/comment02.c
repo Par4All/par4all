@@ -14,6 +14,7 @@ int  main()
 
   j = filter(i);  // Function call comment
   i = j;
+  return 0;
 }
 
 int  filter(int x)

@@ -1,6 +1,6 @@
 user warning in tp_parse: multideclsinfile: No such workspace
 Registering file multideclsinfile.c
-user warning in process_user_file: No syntactic check on file "./multideclsinfile.c"
+Checking syntax of file "./multideclsinfile.c"
 Preprocessing file ./multideclsinfile.c
 Splitting file    ./multideclsinfile.database/Tmp/multideclsinfile.cpp_processed.c
   Module         multideclsinfile!

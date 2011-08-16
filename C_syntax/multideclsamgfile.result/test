@@ -1,11 +1,11 @@
 user warning in tp_parse: multideclsamgfile: No such workspace
 Registering file multideclsamgfile/foo.c
-user warning in process_user_file: No syntactic check on file "./multideclsamgfile/foo.c"
+Checking syntax of file "./multideclsamgfile/foo.c"
 Preprocessing file ./multideclsamgfile/foo.c
 Splitting file    ./multideclsamgfile.database/Tmp/foo.cpp_processed.c
   Module         foo!
 Registering file multideclsamgfile/bar.c
-user warning in process_user_file: No syntactic check on file "./multideclsamgfile/bar.c"
+Checking syntax of file "./multideclsamgfile/bar.c"
 Preprocessing file ./multideclsamgfile/bar.c
 Splitting file    ./multideclsamgfile.database/Tmp/bar.cpp_processed.c
   Module         bar!

@@ -1,5 +1,6 @@
 delete array_declarators
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create array_declarators array_declarators.c
 
 

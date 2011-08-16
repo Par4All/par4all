@@ -1,4 +1,5 @@
 delete enum
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create enum enum.c
 
 setproperty PRETTYPRINT_LANGUAGE "C"

@@ -1,6 +1,6 @@
 user warning in tp_parse: decl11: No such workspace
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file decl11.c
-user warning in process_user_file: No syntactic check on file "./decl11.c"
 Preprocessing file ./decl11.c
 Splitting file    ./decl11.database/Tmp/decl11.cpp_processed.c
   Module         decl11!

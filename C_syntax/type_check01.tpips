@@ -3,6 +3,8 @@ delete type_check01
 # To check the warning in the database
 # setproperty ABORT_ON_USER_ERROR TRUE
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create type_check01 type_check01.c
 
 activate C_PARSER
