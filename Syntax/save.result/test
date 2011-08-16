@@ -1,6 +1,6 @@
 user warning in tp_parse: save: No such workspace
 Registering file save.f
-user warning in process_user_file: No syntactic check on file "./save.f"
+Checking Fortran syntax of ./save.f
 Splitting file    ./save.f
   Module         FOO
   Module         SAVEGLOBAL

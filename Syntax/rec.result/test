@@ -1,6 +1,6 @@
 user warning in tp_parse: rec: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file rec.f
-user warning in process_user_file: No syntactic check on file "./rec.f"
 Splitting file    ./rec.f
   Module         REC
 Workspace rec created and opened.

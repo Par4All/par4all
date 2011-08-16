@@ -1,6 +1,6 @@
 user warning in tp_parse: alias: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file alias.f
-user warning in process_user_file: No syntactic check on file "./alias.f"
 Splitting file    ./alias.f
   Module         ALIAS
 Workspace alias created and opened.

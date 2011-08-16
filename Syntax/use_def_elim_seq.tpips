@@ -1,5 +1,6 @@
 # Pb de recuperation d'erreur syntaxique
 delete seq
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create seq use_def_elim_seq.f
 module USE_DEF_ELIM_SEQ
 apply USE_DEF_ELIMINATION

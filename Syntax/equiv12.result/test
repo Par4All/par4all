@@ -1,6 +1,6 @@
 user warning in tp_parse: equiv12: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file equiv12.f
-user warning in process_user_file: No syntactic check on file "./equiv12.f"
 Splitting file    ./equiv12.f
   Module         EQUIV12
 Workspace equiv12 created and opened.

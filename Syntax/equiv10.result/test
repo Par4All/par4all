@@ -1,6 +1,6 @@
 user warning in tp_parse: equiv10: No such workspace
 Registering file equiv10.f
-user warning in process_user_file: No syntactic check on file "./equiv10.f"
+Checking Fortran syntax of ./equiv10.f
 Splitting file    ./equiv10.f
   Module         EQUIV10
 Workspace equiv10 created and opened.

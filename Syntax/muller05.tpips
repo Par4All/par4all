@@ -1,5 +1,6 @@
 delete muller05
 
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create muller05 muller05.f
 
 display PRINTED_FILE [MULLER05]

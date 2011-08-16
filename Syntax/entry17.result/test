@@ -1,6 +1,6 @@
 user warning in tp_parse: entry17: No such workspace
 Registering file entry17.f
-user warning in process_user_file: No syntactic check on file "./entry17.f"
+Checking Fortran syntax of ./entry17.f
 Splitting file    ./entry17.f
   Module         ENTRY17
   Module         INCREMENT

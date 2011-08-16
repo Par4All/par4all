@@ -1,6 +1,6 @@
 user warning in tp_parse: altret11: No such workspace
 Registering file altret11.f
-user warning in process_user_file: No syntactic check on file "./altret11.f"
+Checking Fortran syntax of ./altret11.f
 Splitting file    ./altret11.f
   Module         ALTRET11
 Workspace altret11 created and opened.

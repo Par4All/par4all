@@ -1,7 +1,7 @@
 user warning in tp_parse: ovl: No such workspace
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 Registering file ovl.f
-user warning in process_user_file: No syntactic check on file "./ovl.f"
+Checking Fortran syntax of ./ovl.f
 Splitting file    ./ovl.f
   Module         OVL
 Workspace ovl created and opened.

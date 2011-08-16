@@ -1,6 +1,6 @@
 user warning in tp_parse: parsererror: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file parsererror.f
-user warning in process_user_file: No syntactic check on file "./parsererror.f"
 Splitting file    ./parsererror.f
   Module         PARSERERROR2
   Module         PARSERERROR1

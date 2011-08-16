@@ -1,6 +1,6 @@
 user warning in tp_parse: common04: No such workspace
 Registering file common04.f
-user warning in process_user_file: No syntactic check on file "./common04.f"
+Checking Fortran syntax of ./common04.f
 Splitting file    ./common04.f
   Module         BAR
   Module         FOO

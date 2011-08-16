@@ -1,5 +1,6 @@
 # Generate an error if a self-recursive call is found
 delete rec
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create rec rec.f
 display PRINTED_FILE 
 close

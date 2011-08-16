@@ -8,8 +8,8 @@ echo
 shell sed /cfirst/s/cfirst// corinne.f >corinne1.f
 shell sleep 1
 user warning in tp_parse: corinne: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file corinne1.f
-user warning in process_user_file: No syntactic check on file "./corinne1.f"
 Splitting file    ./corinne1.f
   Module         IFENDDO
   Module         DOENDIF
@@ -50,7 +50,6 @@ echo
 shell sed /csecond/s/csecond// corinne.f >corinne2.f
 shell sleep 1
 Registering file corinne2.f
-user warning in process_user_file: No syntactic check on file "./corinne2.f"
 Splitting file    ./corinne2.f
   Module         IFENDDO
   Module         DOENDIF
@@ -91,7 +90,6 @@ echo
 shell sed /cthird/s/cthird// corinne.f >corinne3.f
 shell sleep 1
 Registering file corinne3.f
-user warning in process_user_file: No syntactic check on file "./corinne3.f"
 Splitting file    ./corinne3.f
   Module         IFENDDO
   Module         DOENDIF
@@ -130,7 +128,6 @@ Fourth try: detect IF/ENDDO pair
 echo
 
 Registering file corinne.f
-user warning in process_user_file: No syntactic check on file "./corinne.f"
 Splitting file    ./corinne.f
   Module         IFENDDO
   Module         DOENDIF
@@ -169,7 +166,6 @@ Fifth try: detect DO/ENDIF pair
 echo
 
 Registering file corinne.f
-user warning in process_user_file: No syntactic check on file "./corinne.f"
 Splitting file    ./corinne.f
   Module         IFENDDO
   Module         DOENDIF

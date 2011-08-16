@@ -1,15 +1,15 @@
 #!/bin/sh
 
-# detection of equivalence errors
+# detection of equivalence errors: no syntactic check!
 
 tpips=${tpips_version:-tpips}
 
 ($tpips 2>&1 | sed '/file *\//d') <<EOF
 delete equiv04
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create equiv04 equiv04.f
 display PRINTED_FILE 
 close
 delete equiv04
 quit
 EOF
-

@@ -3,6 +3,7 @@ delete scalarization35
 # Do no abort on user error because this test the detection of a user error
 #setproperty ABORT_ON_USER_ERROR TRUE
 
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create scalarization35 scalarization35.f
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

@@ -1,6 +1,6 @@
 user warning in tp_parse: param05: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file param05.f
-user warning in process_user_file: No syntactic check on file "./param05.f"
 Splitting file    ./param05.f
   Module         PARAM05
 Workspace param05 created and opened.

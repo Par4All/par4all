@@ -1,6 +1,6 @@
 user warning in tp_parse: capture01: No such workspace
 Registering file capture01.f
-user warning in process_user_file: No syntactic check on file "./capture01.f"
+Checking Fortran syntax of ./capture01.f
 Splitting file    ./capture01.f
   Module         CAPTURE01
 Workspace capture01 created and opened.

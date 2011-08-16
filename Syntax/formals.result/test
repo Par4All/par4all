@@ -1,6 +1,6 @@
 user warning in tp_parse: formals: No such workspace
 Registering file formals.f
-user warning in process_user_file: No syntactic check on file "./formals.f"
+Checking Fortran syntax of ./formals.f
 Splitting file    ./formals.f
   Module         EXTEND
   Module         EXTINT

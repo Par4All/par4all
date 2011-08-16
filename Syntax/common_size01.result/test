@@ -1,6 +1,6 @@
 user warning in tp_parse: common_size01: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file common_size01.f
-user warning in process_user_file: No syntactic check on file "./common_size01.f"
 Splitting file    ./common_size01.f
   Module         REORDER
   Module         COMMON_SIZE01

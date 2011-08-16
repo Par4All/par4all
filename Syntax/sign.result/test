@@ -1,6 +1,6 @@
 user warning in tp_parse: sign: No such workspace
 Registering file sign.f
-user warning in process_user_file: No syntactic check on file "./sign.f"
+Checking Fortran syntax of ./sign.f
 Splitting file    ./sign.f
   Module         SIGN
 Workspace sign created and opened.

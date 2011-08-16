@@ -1,4 +1,3 @@
-unknown[unknown] (process_user_file) No syntactic check on file "./scalarization35.f"
 PARSER[SCALARIZATION35] (MakeFormalParameter) Formal parameter "X" may be used several times
 PARSER[SCALARIZATION35] (MakeFormalParameter) user error
 PARSER[SCALARIZATION35] (MakeFormalParameter) Parser error between lines 3 and 3

@@ -11,6 +11,7 @@ tpips=${tpips_version:-tpips}
 ($tpips 2>&1 | sed '/file *\//d') <<EOF
 
 delete ifunc02
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create ifunc02 ifunc02.f
 display PRINTED_FILE[FOO]
 close

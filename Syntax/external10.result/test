@@ -1,6 +1,6 @@
 user warning in tp_parse: external10: No such workspace
 Registering file external10.f
-user warning in process_user_file: No syntactic check on file "./external10.f"
+Checking Fortran syntax of ./external10.f
 Splitting file    ./external10.f
   Module         F
   Module         EXTERNAL10

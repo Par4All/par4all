@@ -1,6 +1,6 @@
 user warning in tp_parse: cmplx01: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file cmplx01.f
-user warning in process_user_file: No syntactic check on file "./cmplx01.f"
 Splitting file    ./cmplx01.f
   Module         FOO
   Module         CMPLX01

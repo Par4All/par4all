@@ -7,6 +7,7 @@ delete bug10b
 #
 # Il y a effectivement une erreur dans test1.f
 #
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create bug10a bug10.src/test1.f
 module COURC4
 display CALLGRAPH_FILE[COURC4]

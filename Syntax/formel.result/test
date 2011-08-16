@@ -1,6 +1,6 @@
 user warning in tp_parse: formel: No such workspace
 Registering file formel.f
-user warning in process_user_file: No syntactic check on file "./formel.f"
+Checking Fortran syntax of ./formel.f
 Splitting file    ./formel.f
   Module         Q
   Module         FOO

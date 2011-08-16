@@ -6,6 +6,7 @@ tpips=${tpips_version:-tpips}
 
 ($tpips 2>&1 | grep "user warning") <<EOF
 delete checkmax
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create checkmax checkmax.f
 setproperty PARSER_TYPE_CHECK_CALL_SITES   TRUE
 display PRINTED_FILE(CHECKMAX)

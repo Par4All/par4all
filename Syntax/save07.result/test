@@ -1,6 +1,6 @@
 user warning in tp_parse: save07: No such workspace
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file save07.f
-user warning in process_user_file: No syntactic check on file "./save07.f"
 Splitting file    ./save07.f
   Module         SAVE07
 Workspace save07 created and opened.
