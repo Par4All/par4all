@@ -31,12 +31,12 @@
          print *, 'i = ', i
       enddo
 
-      do i = 100*cos(n), 100*cos(n)
+      do i = 100*cos(float(n)), 100*cos(float(n))
          print *, 'i = ', i
       enddo
       
 ! loupe...
-      do i = 100*cos(n), cos(n)*100
+      do i = 100*cos(float(n)), cos(float(n))*100
          print *, 'i = ', i
       enddo
       

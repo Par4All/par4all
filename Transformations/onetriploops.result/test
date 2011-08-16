@@ -34,12 +34,12 @@ Initial code
          PRINT *, 'i = ', I                                             0031
       ENDDO
 
-      DO I = 100*COS(N), 100*COS(N)                                     0034
+      DO I = 100*COS(FLOAT(N)), 100*COS(FLOAT(N))                       0034
          PRINT *, 'i = ', I                                             0035
       ENDDO
 
 ! loupe...
-      DO I = 100*COS(N), COS(N)*100                                     0039
+      DO I = 100*COS(FLOAT(N)), COS(FLOAT(N))*100                       0039
          PRINT *, 'i = ', I                                             0040
       ENDDO
 
@@ -136,12 +136,12 @@ Code after one trip loop detection and simplification
       PRINT *, 'i = ', I                                                0031
       I = 2*N+3+1
 
-      I = 100*COS(N)
+      I = 100*COS(FLOAT(N))
       PRINT *, 'i = ', I                                                0035
-      I = 100*COS(N)+1
+      I = 100*COS(FLOAT(N))+1
 
 ! loupe...
-      DO I = 100*COS(N), COS(N)*100                                     0039
+      DO I = 100*COS(FLOAT(N)), COS(FLOAT(N))*100                       0039
          PRINT *, 'i = ', I                                             0040
       ENDDO
 
