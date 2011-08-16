@@ -686,7 +686,7 @@ class p4a_processor(object):
         # OpenCL there is a 3D limitation, so limit parallelism at 2D
         # top-level loops inside parallel loop nests:
         # Fermi and more recent device allows a 3D grid :)
-        if self.cuda_cc > 2 :
+        if self.cuda_cc >= 2 :
             kernel_launchers.limit_nested_parallelism(NESTED_PARALLELISM_THRESHOLD = 3, concurrent=True)
         else:
             kernel_launchers.limit_nested_parallelism(NESTED_PARALLELISM_THRESHOLD = 2, concurrent=True)
