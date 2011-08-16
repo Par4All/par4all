@@ -1,4 +1,8 @@
 delete camat02
+
+# gfortran detects an overflow in an expression
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create camat02 camat.f
 module CAMAT
 
