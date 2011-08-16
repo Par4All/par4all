@@ -12,7 +12,6 @@ int activate01(void)
 
 Warnings
 
-unknown[unknown] (process_user_file) No syntactic check on file "./activate02.c"
 unknown[unknown] (activate_phase) Rule `PRECONDITIONS_INTER' undefined.
 Check spelling and/or ACTIVE_PHASE property.
 INITIAL_PRECONDITION[activate01] (add_or_kill_equivalenced_variables) storage return
