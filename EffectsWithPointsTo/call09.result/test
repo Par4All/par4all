@@ -44,7 +44,7 @@ int main()
    tf_t *sp = &s;
 
 // Points To:
-// sp -> &s , EXACT
+// sp -> s , EXACT
 
 
    call09(s.one, sp->one);

@@ -36,30 +36,30 @@ int main()
    int *a, b, c, d;
 
 // Points To:
-// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    c = 3;
 
 // Points To:
-// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    /* S1 */
    a = &c;
 
 // Points To:
-// a -> &c , EXACT
+// a -> c , EXACT
 
    /* S2 */
    read(d);
 
 // Points To:
-// a -> &c , EXACT
+// a -> c , EXACT
 
    /* S3 */
    b = *a;
 
 // Points To:
-// a -> &c , EXACT
+// a -> c , EXACT
 
    /* S4 */
    

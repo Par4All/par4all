@@ -30,18 +30,18 @@ POINTS-TO
 
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
 void call07(int r, int m, int *x)
 {
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
    int j;
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
 
    x[4] = 10*r+4;

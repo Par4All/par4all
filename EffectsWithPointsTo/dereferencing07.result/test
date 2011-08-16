@@ -28,18 +28,18 @@ POINTS-TO
 
 
 // Points To:
-// col -> &_col_1[0] , EXACT
+// col -> _col_1[0] , EXACT
 
 void foo(int *col)
 {
 
 // Points To:
-// col -> &_col_1[0] , EXACT
+// col -> _col_1[0] , EXACT
 
    *col++;
 
 // Points To:
-// col -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// col -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 
 
    return;
@@ -55,22 +55,22 @@ int main()
    int x, tab1[10], tab2[10], *p;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    x++;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    x += 3;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    *(p+tab1[tab2[x]]) = 0;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    return 1;
 }

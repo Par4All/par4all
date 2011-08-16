@@ -230,189 +230,189 @@ int main()
    FILE *fp;
 
 // Points To:
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    size_t n, nr;
 
 // Points To:
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    char buf1[200];
 
 // Points To:
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    char *buf2 = malloc(200*sizeof(char));
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    char *fmt;
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    char *i_name;
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    int i, r, c, max;
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    fpos_t *fp_pos, pos;
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    long int fp_pos_indic;
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    va_list vl;
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    // formatted IO functions
    fmt = "%s%d";
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    max = 100;
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    n = 200;
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    fp = fopen("file.txt", "rb");
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    
    (void) fread(buf1, 8, 50, fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fscanf(fp, fmt, i_name, &i);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fprintf(fp, "%s%d", i_name, i);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    
    (void) scanf("%s%d", i_name, &i);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) printf(fmt, i_name, i);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    
    (void) sscanf(buf1, fmt, i_name, &i);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) sprintf(buf2, fmt, i_name, i);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) snprintf(buf2, 100, fmt, i_name, i);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    
@@ -421,104 +421,104 @@ int main()
    c = fgetc(fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fgets(buf1, max, fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fputc(c, fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fputs(buf1, fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    c = _IO_getc(fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) _IO_putc(c, fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) ungetc(c, fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    c = getchar();
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) putchar(c);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    (void) gets(buf1);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) puts(buf1);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    // direct IO functions
@@ -526,88 +526,88 @@ int main()
    nr = fread(buf2, sizeof(char), n, fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    nr = fwrite(buf2, sizeof(char), n, fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &*ANY_MODULE*:*NOWHERE*_b2 , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> *ANY_MODULE*:*NOWHERE*_b2 , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    // file positionning functions
    fp_pos = &pos;
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fgetpos(fp, fp_pos);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    (void) fgetpos(fp, &pos);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    (void) fseek(fp, 0L, 0);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    (void) fsetpos(fp, fp_pos);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    fp_pos_indic = ftell(fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    rewind(fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    
    // error handling functions
@@ -615,58 +615,58 @@ int main()
    clearerr(fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    r = feof(fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    r = ferror(fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    perror(buf1);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    fclose(fp);
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    fprintf(stderr, "The END\n");
 
 // Points To:
-// buf2 -> &*HEAP*_l_10[0] , EXACT
-// fmt -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// fp -> &*ANY_MODULE*:*ANYWHERE*_b1 , EXACT
-// fp_pos -> &pos , EXACT
-// i_name -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// buf2 -> *HEAP*_l_10[0] , EXACT
+// fmt -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// fp -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// fp_pos -> pos , EXACT
+// i_name -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    return 0;
 }

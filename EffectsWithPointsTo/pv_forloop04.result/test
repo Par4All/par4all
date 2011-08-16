@@ -30,35 +30,35 @@ int main()
    float *p;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    float a[10];
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int i;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    i = 0;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    while (i<10)
 
 // Points To:
-// p -> &a[*] , MAY
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> a[*] , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
       p = &a[i];
 
 // Points To:
-// p -> &a[*] , MAY
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> a[*] , MAY
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
    return 0;
 }

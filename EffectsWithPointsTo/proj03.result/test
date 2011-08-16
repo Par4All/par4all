@@ -77,64 +77,64 @@ int main(void)
    int *pi = &i;
 
 // Points To:
-// pi -> &i , EXACT
+// pi -> i , EXACT
 
    int **pp = &pi;
 
 // Points To:
-// pi -> &i , EXACT
-// pp -> &pi , EXACT
+// pi -> i , EXACT
+// pp -> pi , EXACT
 
    int j = 2;
 
 // Points To:
-// pi -> &i , EXACT
-// pp -> &pi , EXACT
+// pi -> i , EXACT
+// pp -> pi , EXACT
 
 
    srand(time((void *) 0));
 
 // Points To:
-// pi -> &i , EXACT
-// pp -> &pi , EXACT
+// pi -> i , EXACT
+// pp -> pi , EXACT
 
 
    if (alea()) {
 
 // Points To:
-// pi -> &i , EXACT
-// pp -> &pi , EXACT
+// pi -> i , EXACT
+// pp -> pi , EXACT
 
       int *pj = &j;
 
 // Points To:
-// pi -> &i , EXACT
-// pj -> &j , EXACT
-// pp -> &pi , EXACT
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pp -> pi , EXACT
 
       pp = &pj;
 
 // Points To:
-// pi -> &i , EXACT
-// pj -> &j , EXACT
-// pp -> &pj , EXACT
+// pi -> i , EXACT
+// pj -> j , EXACT
+// pp -> pj , EXACT
 
       **pp = 0;
    }
 
 // Points To:
-// pi -> &i , EXACT
-// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> &pi , MAY
+// pi -> i , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> pi , MAY
 
    
    // pp may points to a dead value in the stack
    printf("%p\n", pp);
 
 // Points To:
-// pi -> &i , EXACT
-// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> &pi , MAY
+// pi -> i , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> pi , MAY
 
    
    // possible segfault.
@@ -142,9 +142,9 @@ int main(void)
    **pp = 0;
 
 // Points To:
-// pi -> &i , EXACT
-// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> &pi , MAY
+// pi -> i , EXACT
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> pi , MAY
 
    return 0;
 }

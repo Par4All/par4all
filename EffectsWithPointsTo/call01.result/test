@@ -31,35 +31,35 @@ POINTS-TO
 
 
 // Points To:
-// pi -> &_pi_1[0] , EXACT
-// q -> &_q_2[0] , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> _q_2[0] , EXACT
 
 void call01(int *pi, tf_t *q)
 {
 
 // Points To:
-// pi -> &_pi_1[0] , EXACT
-// q -> &_q_2[0] , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    *pi = 1;
 
 // Points To:
-// pi -> &_pi_1[0] , EXACT
-// q -> &_q_2[0] , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
 
 // Points To:
-// pi -> &_pi_1[*] , EXACT
-// q -> &_q_2[0] , EXACT
+// pi -> _pi_1[*] , EXACT
+// q -> _q_2[0] , EXACT
 
    q->one = 1;
 
 // Points To:
-// pi -> &_pi_1[*] , EXACT
-// q -> &_q_2[0] , EXACT
+// pi -> _pi_1[*] , EXACT
+// q -> _q_2[0] , EXACT
 
    (q->two)[4] = 2;
 }
