@@ -957,7 +957,8 @@ static int pips_check_c(void)
  *
  * string compiler may/must contain the necessary options, e.g. PIPS_CC_FLAGS
  */
-static bool check_input_file_syntax(string file_name, string compiler, string options)
+static bool
+check_input_file_syntax(string file_name, string compiler, string options)
 {
   //string pips_flint = getenv("PIPS_FLINT");
   bool syntax_ok_p = true;
@@ -967,9 +968,10 @@ static bool check_input_file_syntax(string file_name, string compiler, string op
   if (safe_system_no_abort
       (concatenate(compiler, " ", options, "",
 		   " ", file_name, " ",
-		   " -o ", file_name, SUFFIX,
-		   " ; test -f ", file_name, SUFFIX,
-		   " && rm ", file_name, SUFFIX, NULL))) {
+      // DO NOT USE A POSSIBLY SHARED FILE NAME!
+      // the same "file_name.o" can be used by several creates
+      // performed in parallel, for instance by the validation...
+		   " -o /dev/null", NULL))) {
     /* f77, for instance, is rather silent on errors... They are
      * nevertheless detected if no output file is created.
      *
