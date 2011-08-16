@@ -29,7 +29,6 @@ int rand01()
 
 WARNINGS
 
-unknown[unknown] (process_user_file) No syntactic check on file "./rand01.c"
 INITIAL_PRECONDITION[rand01] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning rand01 instead
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return

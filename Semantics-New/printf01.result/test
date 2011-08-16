@@ -47,7 +47,6 @@ int printf01()
 
 WARNINGS
 
-unknown[unknown] (process_user_file) No syntactic check on file "./printf01.c"
 INITIAL_PRECONDITION[printf01] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning printf01 instead
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
