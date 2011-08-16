@@ -42,6 +42,9 @@ extern double P4A_accel_timer_stop_and_float_measure();
 /* Main debug level */
 extern int p4a_debug_level;
 
+/* Flag that trigger timing of kernel execution */
+extern int p4a_timing;
+
 #if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENMP)
 #error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
 #endif
