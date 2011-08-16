@@ -18,4 +18,3 @@ PATH=$prod/pips/bin:$prod/pips/utils:$prod/newgen/bin:$PATH
 # The Fortran compiler to use:
 export PIPS_F77=gfortran
 export PIPS_F90=gfortran
-export PIPS_VALIDATION_NO_PYPS=1

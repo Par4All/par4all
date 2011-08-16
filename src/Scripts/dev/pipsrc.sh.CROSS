@@ -17,7 +17,6 @@ export EXTERN_ROOT=/home/fabien/CROSS/prod/extern
 export COPT=-m32
 export LDOPT=-m32
 
-export PIPS_VALIDATION_NO_PYPS=1
 export PIPS_F77=gfortran
 export PIPS_F90=gfortran
 export PATH=$HOME/CROSS/bin:$HOME/CROSS/utils:/usr/bin:/bin
