@@ -161,7 +161,7 @@ EXCEPT =  [ "$(RECWHAT)" ] && \
 	    { echo "keptout: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
 
 # setup running a case
-PF	= echo "processing $(SUBDIR)/$+" ; \
+PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  $(EXCEPT) ; \
 	  $(RM) $*.result/$(TEST) ; \
 	  set -o pipefail ; unset CDPATH ; \
