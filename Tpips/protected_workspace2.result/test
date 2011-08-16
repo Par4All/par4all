@@ -2,7 +2,7 @@
 The message should be: workspace protected_workspace2: Permission denied
 
 Registering file protected_workspace2.f
-user warning in process_user_file: No syntactic check on file "./protected_workspace2.f"
+Checking Fortran syntax of ./protected_workspace2.f
 Splitting file    ./protected_workspace2.f
   Module         PROTECTED_WORKSPACE2
 Workspace protected_workspace2 created and opened.

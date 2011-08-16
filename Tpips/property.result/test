@@ -21,7 +21,6 @@ COMPUTE_ALL_DEPENDENCES TRUE
 
 Warnings
 
-unknown[unknown] (process_user_file) No syntactic check on file "./property.f"
 unknown[unknown] (parse_properties) user error
 unknown[unknown] (parse_properties) Unknown property "here" to update
 unknown[unknown] (tp_error) user error
