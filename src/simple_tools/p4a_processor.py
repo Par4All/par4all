@@ -126,6 +126,7 @@ class p4a_processor_input(object):
     accel = False
     cuda = False
     com_optimization = False
+    cuda_cc = 2
     fftw3 = False
     openmp = False
     scmp = False
@@ -202,7 +203,7 @@ class p4a_processor(object):
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
                  filter_exclude = None, accel = False, cuda = False,
-                 openmp = False, com_optimization = False, fftw3 = False,
+                 openmp = False, com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  c99 = False, use_pocc = False, atomic = False,
                  properties = {}, apply_phases={}, activates = []):
@@ -213,6 +214,7 @@ class p4a_processor(object):
         self.cuda = cuda
         self.openmp = openmp
         self.com_optimization = com_optimization
+        self.cuda_cc = cuda_cc
         self.fftw3 = fftw3
         self.c99 = c99
         self.pocc = use_pocc
@@ -683,7 +685,11 @@ class p4a_processor(object):
         # In CUDA there is a limitation on 2D grids of thread blocks, in
         # OpenCL there is a 3D limitation, so limit parallelism at 2D
         # top-level loops inside parallel loop nests:
-        kernel_launchers.limit_nested_parallelism(NESTED_PARALLELISM_THRESHOLD = 2, concurrent=True)
+        # Fermi and more recent device allows a 3D grid :)
+        if self.cuda_cc > 2 :
+            kernel_launchers.limit_nested_parallelism(NESTED_PARALLELISM_THRESHOLD = 3, concurrent=True)
+        else:
+            kernel_launchers.limit_nested_parallelism(NESTED_PARALLELISM_THRESHOLD = 2, concurrent=True)
         #kernel_launchers.localize_declaration()
 
         # Add iteration space decorations and insert iteration clamping

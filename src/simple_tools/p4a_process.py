@@ -60,6 +60,7 @@ def process(input):
                 cuda = input.cuda,
                 openmp=input.openmp,
                 com_optimization = input.com_optimization,
+                cuda_cc = input.cuda_cc,
                 fftw3 = input.fftw3,
                 c99 = input.c99,
                 atomic = input.atomic,
