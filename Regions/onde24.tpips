@@ -1,14 +1,16 @@
-delete loops
+setenv WSPACE=onde24
+delete $WSPACE
 
 setproperty ABORT_ON_USER_ERROR TRUE
-# gfortran is restrictive on IOs
+# Issue with gfortran, not understood
 setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
-create loops loops.f
-setproperty ABORT_ON_USER_ERROR FALSE
+create $WSPACE $WSPACE.f
+setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
 activate MUST_REGIONS
 activate PRINT_CODE_REGIONS
 display PRINTED_FILE[%ALL]
 close
+delete $WSPACE
 quit
