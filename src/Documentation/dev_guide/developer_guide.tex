@@ -2153,14 +2153,8 @@ to have the necessary targets, something like:
 See the \texttt{HardwareAccelerator} validation directory for a working
 example of validation subdirectories.
 
-Some provision are made to skip some validations under some circumstances.
-\begin{itemize}
-\item if PyPS is not available, define environment variable
-  \verb/PIPS_VALIDATION_NO_PYPS=1/
-\item if Fortran~95 support is not available, define environment variable
-  \verb/PIPS_VALIDATION_SKIP=F95_syntax/ to skip this validation directory.
-  Other directories can be skipped by adding their names to the definition.
-\end{itemize}
+The validation makefile tries to guess whether pyps or fortran95 cases
+should be validated, and skips them otherwise.
 
 \subsection{Intra-directory parallel validation}
 
