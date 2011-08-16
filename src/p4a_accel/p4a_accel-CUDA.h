@@ -88,12 +88,12 @@ static inline void checkErrorMessageInline(const char *errorMessage, const char 
 extern int p4a_max_threads_per_block;
 #ifndef P4A_CUDA_THREAD_MAX
 /** The maximum number of threads in a block of thread */
-#define P4A_CUDA_THREAD_MAX 512
+#define P4A_CUDA_THREAD_MAX 256
 #endif
 
 #ifndef P4A_CUDA_MIN_BLOCKS
 /** The minimum number of blocks */
-#define P4A_CUDA_MIN_BLOCKS 14
+#define P4A_CUDA_MIN_BLOCKS 28
 #endif
 
 #ifndef P4A_CUDA_THREAD_PER_BLOCK_IN_1D
