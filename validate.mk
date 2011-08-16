@@ -32,8 +32,8 @@ DO_DEFAULT = 1
 
 # for pyps user, if pyps is not available, the validation will just
 # skip the corresponding cases silently.
-DO_PYPS	:= $(type ipyps > /dev/null 2>&1 && echo 1)
-DO_F95	:= $(type gfc2pips > /dev/null 2>&1 && echo 1)
+DO_PYPS	:= $(shell type ipyps > /dev/null 2>&1 && echo 1)
+DO_F95	:= $(shell type gfc2pips > /dev/null 2>&1 && echo 1)
 
 # pips exes
 TPIPS	= tpips
@@ -158,7 +158,7 @@ EXCEPT =  [ "$(RECWHAT)" ] && \
 	    ! \( -f $*.bug -o -f $*.later -o -f $*.slow \) ] && \
 	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_F95)" -a -d $*.result -a \( -e $*.f90 -o -e $*.f95 \) ] && \
-	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
+	    { echo "keptout: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
 
 # setup running a case
 PF	= echo "processing $(SUBDIR)/$+" ; \
