@@ -56,7 +56,8 @@
 #define FPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
 #define DEFAULT_PIPS_FLINT "gfortran -c "
-#define DEFAULT_PIPS_CC "gcc -c "
+/* See necessary definitions in pipsmake-rc.tex */
+#define DEFAULT_PIPS_CC "gcc -D__PIPS__ -D__HPFC__ -U__GNUC__ -c "
 #define DEFAULT_PIPS_CC_FLAGS " -Wall -Werror "
 
 

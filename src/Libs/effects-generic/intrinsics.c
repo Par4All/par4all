@@ -1811,7 +1811,8 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	  // The output is written to stdout
 	  entity std_ent =  local_name_to_top_level_entity("stdout");
 	  if (entity_undefined_p(std_ent))
-	    pips_user_error("stdout is not defined (check if <stdio.h> is included)\n");
+	    pips_user_error("stdout is not defined: check if \"stdio.h\""
+			    " is included)\n");
 	  else
 	    std_ref = make_reference(std_ent, NIL);
 

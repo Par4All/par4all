@@ -891,22 +891,49 @@ static string process_thru_cpp(string name)
 
 /*************************************************** MANAGING A USER FILE */
 
-/* Fortran compiler triggerred from the environment (PIPS_CHECK_FORTRAN)
- * or a property (CHECK_FORTRAN_SYNTAX_BEFORE_PIPS)
- */
-static int pips_check_fortran(void)
+/* Why return an int rather than a bool? */
+static bool pips_check_syntax(string env, string prop)
 {
-    string v = getenv("PIPS_CHECK_FORTRAN");
+    string v = getenv(env);
 
     if (v && (*v=='o' || *v=='y' || *v=='t' || *v=='v' || *v=='1' ||
 	      *v=='O' || *v=='Y' || *v=='T' || *v=='V'))
 	return true;
 
-    return get_bool_property("CHECK_FORTRAN_SYNTAX_BEFORE_PIPS");
+    if (v && (*v=='n' || *v=='f'  || *v=='0' ||
+	      *v=='N' || *v=='F' ))
+	return false;
+
+    return get_bool_property(prop);
 }
-/* Fortran compiler triggerred from the environment (PIPS_CHECK_FORTRAN)
- * or a property (CHECK_FORTRAN_SYNTAX_BEFORE_PIPS)
+
+
+/* A Fortran compiler must be run or not before launching the PIPS
+ * Fortran parser, according to the environment variable
+ * PIPS_CHECK_FORTRAN firstly, and then according to property
+ * CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS. So the environment overrides the
+ * property.
  */
+static bool pips_check_fortran(void)
+{
+  string env = "PIPS_CHECK_FORTRAN";
+  string prop = "CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS";
+  return pips_check_syntax(env, prop);
+}
+
+/* A C compiler must be run or not before launching the PIPS C parser,
+ * according to the environment variable PIPS_CHECK_C firstly,
+ * and then according to property
+ * CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS. So the environment overrides
+ * the property.
+ */
+static bool pips_check_c(void)
+{
+  string env = "PIPS_CHECK_C";
+  string prop = "CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS";
+  return pips_check_syntax(env, prop);
+}
+/*
 static int pips_check_c(void)
 {
     string v = getenv("PIPS_CHECK_C");
@@ -915,8 +942,13 @@ static int pips_check_c(void)
 	      *v=='O' || *v=='Y' || *v=='T' || *v=='V'))
 	return true;
 
+    if (v && (*v=='n' || *v=='f'  || *v=='0' ||
+	      *v=='N' || *v=='F' ))
+	return false;
+
     return get_bool_property("CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS");
 }
+*/
 
 #define SUFFIX ".pips.o"
 
@@ -1050,8 +1082,10 @@ bool process_user_file(string file)
   else {
     /* Do not check the syntax in the input file: quite dangerous in
        case it is wrong because PIPS is not designed to work on
-       damaged source codes */
-    pips_user_warning("No syntactic check on file \"%s\"\n", nfile);
+       damaged source codes. But this may be useful is the input file
+       is a validation file or if the input file has already been
+       checked. */
+    pips_debug(1, "No syntactic check on file \"%s\"\n", nfile);
   }
   if(!syntax_ok_p)
     /* It is up to the caller to decide if the syntax must be checked

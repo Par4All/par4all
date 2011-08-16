@@ -886,9 +886,18 @@ preprocessed in various ways.
 \label{sec:fortr-synt-verif}
 
 If the \verb|PIPS_CHECK_FORTRAN| shell environment variable is defined
-to true, the syntax of the file is checked by compiling it with a
-Fortran 77 compiler (namely, the \verb|PIPS_FLINT| environement
-variable is used for that purpose, and defaults to \verb|f77 -c -ansi|).
+to \verb|false| or \verb|no| or \verb|0|, the syntax of the source
+files is not checked by compiling it with a C compiler.If the
+\verb|PIPS_CHECK_FORTRAN| shell environment variable is defined to
+\verb|true| or \verb|yes| or \verb|1|, the syntax of the file is
+checked by compiling it with a Fortran 77 compiler. If the
+\verb|PIPS_CHECK_FORTRAN| shell environment variable is not defined,
+the check is performed according to
+\PipsPropRef{CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS}.
+
+The Fortran compiler is defined by the \verb|PIPS_FLINT| environment
+variable. If it is undefined, the default compiler is
+\verb|f77 -c -ansi|).
 
 In case of failure, a warning is displayed. Note that if the program
 cannot be compiled properly with a Fortran compiler, it is likely that
@@ -896,8 +905,8 @@ many problems will be encountered within \Pips{}.
 
 The next property also triggers this preliminary syntactic verification.
 
-\begin{PipsProp}{CHECK_FORTRAN_SYNTAX_BEFORE_PIPS}
-CHECK_FORTRAN_SYNTAX_BEFORE_PIPS FALSE
+\begin{PipsProp}{CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS}
+CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS TRUE
 \end{PipsProp}
 
 \Pips{} requires source code for all leaves in its visible call graph. By
@@ -919,7 +928,7 @@ request using \PipsPropRef{PREPROCESSOR_MISSING_FILE_GENERATOR}. This
 script is passed the function name and prints the filename on standard
 output. When empty, it uses an internal one.
 
-Valid settings: \verb|error generate query|.
+Valid settings: \verb|error| or \verb|generate| or \verb|query|.
 
 \begin{PipsProp}{PREPROCESSOR_MISSING_FILE_HANDLING}
 PREPROCESSOR_MISSING_FILE_HANDLING "error"
@@ -942,7 +951,7 @@ Moreover the default preprocessing options are %
 with the \verb|PIPS_FPP_FLAGS| environment variable.
 
 
-\subsubsection{Fortran split}
+\subsubsection{Fortran Split}
 \label{sec:fortran-split}
 
 The file is then split into one file per module using a PIPS specialized
@@ -991,7 +1000,7 @@ Fortran file is. The Shell variable \verb|PIPS_CPP_FLAGS| is {\em not}
 used to locate these include files.
 
 
-\subsection{C case of preprocessing and splitting}
+\subsection{C Preprocessing and Splitting}
 \label{sec:c-case-preprocessing}
 
 The C preprocessor is applied before the splitting. By default PIPS uses
@@ -1010,10 +1019,17 @@ option, as usual for the C preprocessor.
 \label{sec:c-synt-verif}
 
 If the \verb|PIPS_CHECK_C| shell environment variable is defined to
-\verb|true| or \verb|yes|, the syntax of the file is checked by
-compiling it with a C compiler. The environment variable \verb|PIPS_CC|
-is used for that purpose. If it is undefined, the compiler chose is
-\verb|gcc -c |).
+\verb|false| or \verb|no| or \verb|0|, the syntax of the source files
+is not checked by compiling it with a C compiler. If the
+\verb|PIPS_CHECK_C| shell environment variable is defined to
+\verb|true| or \verb|yes| or \verb|1|, the syntax of the file is
+checked by compiling it with a C compiler. If the
+\verb|PIPS_CHECK_C| shell environment variable is not defined, the
+check is performed according to \PipsPropRef{CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS}.
+
+The environment variable
+\verb|PIPS_CC| is used to define the C compiler available. If it is undefined, the
+compiler chosen is \verb|gcc -c |).
 
 In case of failure, a warning is displayed.
 
@@ -1024,7 +1040,7 @@ check to be effective.
 The next property also triggers this preliminary syntactic verification.
 
 \begin{PipsProp}{CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS}
-CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS TRUE
 \end{PipsProp}
 
 Although its default value is \verb|FALSE|, it is much safer to set it
