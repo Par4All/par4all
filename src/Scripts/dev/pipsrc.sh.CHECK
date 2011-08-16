@@ -22,5 +22,8 @@ export PIPS_F90=gfortran
 export PATH=/usr/bin:/bin
 #export LD_LIBRARY_PATH=/usr/local/lib64
 
+export PIPS_CHECK_C=N
+export PIPS_CHECK_FORTRAN=N
+
 # fix path
 PATH=$prod/pips/bin:$prod/pips/utils:$prod/newgen/bin:$PATH
