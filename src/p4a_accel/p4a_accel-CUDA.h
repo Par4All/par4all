@@ -402,14 +402,16 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
     do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); toolTestExecMessage ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
 */
-#define P4A_call_accel_kernel(context, parameters)			\
+#define P4A_call_accel_kernel(kernel, grid, blocks, parameters)			\
   do {									\
-    P4A_skip_debug(P4A_dump_location());				\
-    P4A_skip_debug(P4A_dump_message("Invoking kernel %s with %s\n",	\
-				    #context,				\
-				    #parameters));			\
+    P4A_skip_debug(3,P4A_dump_location());				\
+    P4A_skip_debug(1,P4A_dump_message("Invoking kernel %s (%dx%dx%d ; %dx%d%d) with args %s\n",	\
+                                      #kernel,        \
+                                      grid.x,grid.y,grid.z,        \
+                                      blocks.x,blocks.y,blocks.z,        \
+                                      #parameters));			\
 		P4A_TIMING_accel_timer_start; \
-    P4A_call_accel_kernel_context context				\
+    P4A_call_accel_kernel_context(kernel,grid,blocks) \
     P4A_call_accel_kernel_parameters parameters;			\
     toolTestExecMessage("P4A CUDA kernel execution failed");			\
     P4A_TIMING_accel_timer_stop; \
@@ -423,10 +425,10 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
     Generate something like "kernel<<<block_dimension,thread_dimension>>>"
 */
-#define P4A_call_accel_kernel_context(kernel, ...)	\
+#define P4A_call_accel_kernel_context(kernel, grid, blocks)	\
   cudaFuncSetCacheConfig( kernel, cudaFuncCachePreferL1 ); \
   toolTestExecMessage("P4A CUDA cache config failed");      \
-  kernel<<<__VA_ARGS__>>>
+  kernel<<<grid,blocks>>>
 
 
 /** Add CUDA kernel parameters for invocation.
@@ -454,8 +456,8 @@ void P4A_copy_to_accel_3d(size_t element_size,
 				     (int)tpb )); \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   dim3 grid_descriptor_name((((int)size) + tpb - 1)/tpb); \
-  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
-  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
+  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name);)	\
+  P4A_skip_debug(4,P4A_dump_block_descriptor(block_descriptor_name);)
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
@@ -489,8 +491,8 @@ void P4A_copy_to_accel_3d(size_t element_size,
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   dim3 grid_descriptor_name((((int) n_x_iter) + p4a_block_x - 1)/p4a_block_x, \
 			    (((int) n_y_iter) + p4a_block_y - 1)/p4a_block_y); \
-  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
-  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
+  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name);)	\
+  P4A_skip_debug(4,P4A_dump_block_descriptor(block_descriptor_name);)
 
 
 /** Dump a CUDA dim3 descriptor with an introduction message */
@@ -527,12 +529,12 @@ void P4A_copy_to_accel_3d(size_t element_size,
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
   do {									\
     if(P4A_n_iter_0>0) { \
-      P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel "\" of size %d\n",	\
+      P4A_skip_debug(2,P4A_dump_message("Calling 1D kernel \"" #kernel "\" of size %d\n",	\
                                       P4A_n_iter_0));					\
       P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
                                        P4A_block_descriptor,		\
                                        P4A_n_iter_0);			\
-      P4A_call_accel_kernel((kernel, P4A_grid_descriptor, P4A_block_descriptor), \
+      P4A_call_accel_kernel(kernel, P4A_grid_descriptor, P4A_block_descriptor, \
                             (__VA_ARGS__));				\
 	  } \
   } while (0)
@@ -551,12 +553,12 @@ void P4A_copy_to_accel_3d(size_t element_size,
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {									\
     if(P4A_n_iter_0>0 && P4A_n_iter_1) { \
-      P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel "\" of size (%dx%d)\n", \
+      P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel "\" of size (%dx%d)\n", \
                                       P4A_n_iter_0, P4A_n_iter_1));			\
       P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
                                        P4A_block_descriptor,		\
                                        P4A_n_iter_0, P4A_n_iter_1);	\
-      P4A_call_accel_kernel((kernel, P4A_grid_descriptor, P4A_block_descriptor), \
+      P4A_call_accel_kernel(kernel, P4A_grid_descriptor, P4A_block_descriptor, \
 			  (__VA_ARGS__));				\
     } \
   } while (0)

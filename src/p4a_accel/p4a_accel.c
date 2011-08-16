@@ -21,7 +21,35 @@
  */
 float p4a_timing_elapsedTime = -1;
 
+/**
+ * The main debug level for p4a
+ */
+int p4a_debug_level = 0;
+
+void p4a_main_init() {
+  checkStackSize();
+
+  /* Debug level stuff */
+  char *env_p4a_debug= getenv ("P4A_DEBUG");
+  if(env_p4a_debug) {
+    printf("%s",env_p4a_debug);
+    errno = 0;
+    int debug_level = strtol(env_p4a_debug, NULL,10);
+    if(errno==0) {
+      P4A_dump_message("Setting debug level to %d\n",debug_level);
+      p4a_debug_level= debug_level;
+    } else {
+      fprintf(stderr,"Invalid value for P4A_DEBUG: %s\n",env_p4a_debug);
+    }
+  }
+}
+
+
 #ifdef P4A_ACCEL_OPENMP
+
+void p4a_init_openmp_accel() {
+  p4a_main_init();
+}
 
 /**
  * global structure used for timing purpose
@@ -149,9 +177,9 @@ void P4A_copy_to_accel(size_t element_size,
 int p4a_max_threads_per_block = P4A_CUDA_THREAD_MAX;
 
 void p4a_init_cuda_accel() {
+  p4a_main_init();
   toolTestExec(cudaEventCreate(&p4a_start_event));
   toolTestExec(cudaEventCreate(&p4a_stop_event));
-  checkStackSize();
   char *env_p4a_max_tpb = getenv ("P4A_MAX_TPB");
   if(env_p4a_max_tpb) {
     errno = 0;
