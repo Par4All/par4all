@@ -1,0 +1,73 @@
+
+Cumulated effects for "main"
+
+//             <    is read   >: delta delta2
+int main()
+{
+//             <    is read   >: delta delta2
+   // BEGIN BLOCK
+//             <    is written>: i
+   int i = 0;
+//             <    is read   >: delta i
+//             <    is written>: i
+
+   i = i+delta;
+//             <    is read   >: delta2 i
+//             <    is written>: i
+   i = i+delta2;
+   // END BLOCK
+}
+
+Transformers for "main"
+
+
+//  T() {delta==2, delta2==4}
+
+int main()
+{
+
+//  T() {delta==2, delta2==4}
+
+   // BEGIN BLOCK
+
+//  T(i) {delta==2, delta2==4, i==0}
+
+   int i = 0;
+
+//  T(i) {delta==2, delta2==4, i==2, i#init==0}
+
+
+   i = i+delta;
+
+//  T(i) {delta==2, delta2==4, i==6, i#init==2}
+
+   i = i+delta2;
+   // END BLOCK
+}
+
+Preconditions for "main"
+
+
+//  P() {delta==2, delta2==4}
+
+int main()
+{
+
+//  P() {delta==2, delta2==4}
+
+   // BEGIN BLOCK
+
+//  P() {delta==2, delta2==4}
+
+   int i = 0;
+
+//  P(i) {delta==2, delta2==4, i==0}
+
+
+   i = i+delta;
+
+//  P(i) {delta==2, delta2==4, i==2}
+
+   i = i+delta2;
+   // END BLOCK
+}

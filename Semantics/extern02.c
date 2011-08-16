@@ -1,5 +1,8 @@
 /* Check that successive external dependent initializationa are properly taken
-   into account. */
+   into account.
+
+   This is not standard C.
+ */
 
 int delta = 1;
 int delta2 = delta+2;
