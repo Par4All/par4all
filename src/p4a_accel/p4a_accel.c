@@ -196,9 +196,14 @@ void P4A_copy_to_accel(size_t element_size,
 int p4a_max_threads_per_block = P4A_CUDA_THREAD_MAX;
 
 void p4a_init_cuda_accel() {
+  // Main p4a initialization
   p4a_main_init();
+
+  // Timing stuff
   toolTestExec(cudaEventCreate(&p4a_start_event));
   toolTestExec(cudaEventCreate(&p4a_stop_event));
+
+  // Threads per blocks
   char *env_p4a_max_tpb = getenv ("P4A_MAX_TPB");
   if(env_p4a_max_tpb) {
     errno = 0;
@@ -210,6 +215,11 @@ void p4a_init_cuda_accel() {
       fprintf(stderr,"Invalid value for P4A_MAX_TPB : %s\n",env_p4a_max_tpb);
     }
   }
+
+  // We prefer to have more L1 cache and less shared since we don't make use of it
+  cudaDeviceSetCacheConfig( cudaFuncCachePreferL1 );
+  toolTestExecMessage("P4A CUDA cache config failed");
+
 }
 
 

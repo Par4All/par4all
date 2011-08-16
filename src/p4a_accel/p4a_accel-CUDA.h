@@ -412,8 +412,6 @@ void P4A_copy_to_accel_3d(size_t element_size,
     Generate something like "kernel<<<block_dimension,thread_dimension>>>"
 */
 #define P4A_call_accel_kernel_context(kernel, grid, blocks)	\
-  cudaFuncSetCacheConfig( kernel, cudaFuncCachePreferL1 ); \
-  toolTestExecMessage("P4A CUDA cache config failed");      \
   kernel<<<grid,blocks>>>
 
 
