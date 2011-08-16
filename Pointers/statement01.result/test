@@ -28,22 +28,22 @@ int main()
    int *i, j, k;
 
 // Points To:
-// i -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// i -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    k = 0;
 
 // Points To:
-// i -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// i -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    j = k;
 
 // Points To:
-// i -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// i -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    i = &j;
 
 // Points To:
-// i -> &j , EXACT
+// i -> j , EXACT
 
 
    return 0;

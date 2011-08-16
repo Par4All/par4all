@@ -50,39 +50,39 @@ void point_to01()
    } c, *p;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    p = &c;
 
 // Points To:
-// p -> &c , EXACT
+// p -> c , EXACT
 
 
    if (1) {
 
 // Points To:
-// p -> &c , EXACT
+// p -> c , EXACT
 
       p->a = 1;
 
 // Points To:
-// p -> &c , EXACT
+// p -> c , EXACT
 
       p->b = 2;
 
 // Points To:
-// p -> &c , EXACT
+// p -> c , EXACT
 
       p->c = 3;
 
 // Points To:
-// p -> &c , EXACT
+// p -> c , EXACT
 
       p->d = p->a;
 
 // Points To:
-// p -> &c , EXACT
+// p -> c , EXACT
 
       p->d = p->a = 4;
    }
