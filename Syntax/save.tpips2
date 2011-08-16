@@ -1,4 +1,5 @@
 delete save
+setenv PIPS_CHECK_FORTRAN="Y"
 create save save.f
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL 

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
 # detect unsupported implied do in data statements
 
 tpips=${tpips_version:-tpips}

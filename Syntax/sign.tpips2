@@ -1,5 +1,6 @@
 # Preconditions appear only if the SAVE declaration is processed
 delete sign
+setenv PIPS_CHECK_FORTRAN="Y"
 create sign sign.f
 display PRINTED_FILE 
 close

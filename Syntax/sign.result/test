@@ -1,4 +1,5 @@
 user warning in tp_parse: sign: No such workspace
+setenv PIPS_CHECK_FORTRAN "Y"
 Registering file sign.f
 Checking Fortran syntax of ./sign.f
 Splitting file    ./sign.f

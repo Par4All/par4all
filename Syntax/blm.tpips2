@@ -4,6 +4,7 @@
 
 delete blm
 
+setenv PIPS_CHECK_FORTRAN="Y"
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 create blm blm.f
 display PRINTED_FILE[OVL]

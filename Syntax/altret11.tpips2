@@ -1,4 +1,7 @@
 delete altret11
+
+setenv PIPS_CHECK_FORTRAN="Y"
+
 create altret11 altret11.f
 
 # Make sure that ParserError cleans up the data structures

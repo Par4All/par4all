@@ -1,4 +1,5 @@
 user warning in tp_parse: formel03: No such workspace
+setenv PIPS_CHECK_FORTRAN "Y"
 Registering file formel03.f
 Checking Fortran syntax of ./formel03.f
 Splitting file    ./formel03.f

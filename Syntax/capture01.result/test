@@ -1,4 +1,5 @@
 user warning in tp_parse: capture01: No such workspace
+setenv PIPS_CHECK_FORTRAN "Y"
 Registering file capture01.f
 Checking Fortran syntax of ./capture01.f
 Splitting file    ./capture01.f

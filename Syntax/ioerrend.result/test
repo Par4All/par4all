@@ -1,4 +1,5 @@
 user warning in tp_parse: ioerrend: No such workspace
+setenv PIPS_CHECK_FORTRAN "Y"
 Registering file ioerrend.f
 Checking Fortran syntax of ./ioerrend.f
 Splitting file    ./ioerrend.f

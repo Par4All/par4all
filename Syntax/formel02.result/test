@@ -1,4 +1,5 @@
 user warning in tp_parse: formel02: No such workspace
+setenv PIPS_CHECK_FORTRAN "Y"
 Registering file formel02.f
 Checking Fortran syntax of ./formel02.f
 Splitting file    ./formel02.f

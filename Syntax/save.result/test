@@ -1,4 +1,5 @@
 user warning in tp_parse: save: No such workspace
+setenv PIPS_CHECK_FORTRAN "Y"
 Registering file save.f
 Checking Fortran syntax of ./save.f
 Splitting file    ./save.f

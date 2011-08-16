@@ -1,4 +1,5 @@
 user warning in tp_parse: blm: No such workspace
+setenv PIPS_CHECK_FORTRAN "Y"
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 Registering file blm.f
 Checking Fortran syntax of ./blm.f
