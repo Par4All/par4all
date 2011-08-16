@@ -147,6 +147,5 @@ void complete04()
 
 Warnings
 
-unknown[unknown] (process_user_file) No syntactic check on file "./complete04.c"
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning complete04 instead

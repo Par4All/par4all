@@ -44,6 +44,5 @@ void call01(int i)
 
 Warnings
 
-unknown[unknown] (process_user_file) No syntactic check on file "./call01.c"
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning call01 instead

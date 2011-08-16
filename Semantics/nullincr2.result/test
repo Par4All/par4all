@@ -1,6 +1,6 @@
 setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
 Registering file nullincr2.f
-user warning in process_user_file: No syntactic check on file "./nullincr2.f"
+Checking Fortran syntax of ./nullincr2.f
 Splitting file    ./nullincr2.f
   Module         NULLINCR2
 Workspace nullincr2 created and opened.

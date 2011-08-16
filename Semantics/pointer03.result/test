@@ -82,7 +82,6 @@ int pointer03()
 
 Warnings
 
-unknown[unknown] (process_user_file) No syntactic check on file "./pointer03.c"
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[pointer03] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer03 instead

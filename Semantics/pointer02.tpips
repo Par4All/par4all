@@ -1,6 +1,8 @@
-# FI: I do not see hwy it is useful...
+# FI: I do not see why it is useful...
 
 delete pointer02
+# Fortran extension to pointers
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create pointer02 pointer02.f
 
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING  "generate"
