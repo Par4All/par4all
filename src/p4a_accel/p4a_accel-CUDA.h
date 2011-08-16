@@ -455,8 +455,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
   int p4a_block_x, p4a_block_y;           \
   /* Define the number of thread per block: */        \
                   \
-  /* Allocate a maximum of threads alog X axis (the warp dimension) for \
-     better average efficiency: */          \
+  /* Allocate a square as much as possible */          \
   int tpb = P4A_min(p4a_max_threads_per_block,(int)ceil((n_x_iter)*(n_y_iter)/(float)P4A_CUDA_MIN_BLOCKS)); \
   tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
   tpb = P4A_max(tpb,32); \
@@ -471,6 +470,35 @@ void P4A_copy_to_accel_3d(size_t element_size,
           (((int) n_y_iter) + p4a_block_y - 1)/p4a_block_y); \
   P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name);) \
   P4A_skip_debug(4,P4A_dump_block_descriptor(block_descriptor_name);)
+
+
+/** Allocate the descriptors for a 3D set of thread with a simple
+    strip-mining in each dimension for CUDA
+*/
+#define P4A_create_3d_thread_descriptors(grid_descriptor_name,    \
+           block_descriptor_name,   \
+           n_x_iter, n_y_iter, n_z_iter)    \
+  int p4a_block_x, p4a_block_y, p4a_block_z;           \
+  /* Define the number of thread per block: */        \
+                  \
+  /* Allocate a square on (x,y), do not use z dimension inside */          \
+  int tpb = P4A_min(p4a_max_threads_per_block,(int)ceil((n_x_iter)*(n_y_iter)/(float)P4A_CUDA_MIN_BLOCKS)); \
+  tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
+  tpb = P4A_max(tpb,32); \
+  p4a_block_x = P4A_max((int)ceil(sqrt((float)tpb)),32); \
+  p4a_block_x = P4A_min((int) n_x_iter,       \
+                        (int) p4a_block_x);     \
+  p4a_block_y = P4A_min((int) n_y_iter,       \
+                        tpb/(float)p4a_block_x);    \
+  /* Z is not used at that time */ \
+  p4a_block_z = 1; \
+  dim3 block_descriptor_name(p4a_block_x, p4a_block_y, p4a_block_z);     \
+  /* Define the ceil-rounded number of needed blocks of threads: */ \
+  dim3 grid_descriptor_name((((int) n_x_iter) + p4a_block_x - 1)/p4a_block_x, \
+          (((int) n_y_iter) + p4a_block_y - 1)/p4a_block_y, n_z_iter); \
+  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name);) \
+  P4A_skip_debug(4,P4A_dump_block_descriptor(block_descriptor_name);)
+
 
 /** Dump a CUDA dim3 descriptor with an introduction message */
 #define P4A_dump_descriptor(message, descriptor_name)			\
@@ -517,28 +545,54 @@ void P4A_copy_to_accel_3d(size_t element_size,
   } while (0)
 
 
-/** Call a kernel in a 2-dimension parallel loop in CUDA
+      /** Call a kernel in a 2-dimension parallel loop in CUDA
 
-    @param[in] kernel to call
+          @param[in] kernel to call
 
-    @param[in] P4A_n_iter_0 is the number of iterations in the first dimension
+          @param[in] P4A_n_iter_0 is the number of iterations in the first dimension
 
-    @param[in] P4A_n_iter_1 is the number of iterations in the first dimension
+          @param[in] P4A_n_iter_1 is the number of iterations in the second dimension
 
-    @param ... following parameters are given to the kernel
-*/
-#define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
-  do {									\
-    if(P4A_n_iter_0>0 && P4A_n_iter_1) { \
-      P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel "\" of size (%dx%d)\n", \
-                                      P4A_n_iter_0, P4A_n_iter_1));			\
-      P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
-                                       P4A_block_descriptor,		\
-                                       P4A_n_iter_0, P4A_n_iter_1);	\
-      P4A_call_accel_kernel(kernel, P4A_grid_descriptor, P4A_block_descriptor, \
-			  (__VA_ARGS__));				\
-    } \
-  } while (0)
+          @param ... following parameters are given to the kernel
+      */
+      #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
+        do {                  \
+          if(P4A_n_iter_0>0 && P4A_n_iter_1) { \
+            P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel "\" of size (%dx%d)\n", \
+                                            P4A_n_iter_0, P4A_n_iter_1));     \
+            P4A_create_2d_thread_descriptors(P4A_grid_descriptor,   \
+                                             P4A_block_descriptor,    \
+                                             P4A_n_iter_0, P4A_n_iter_1); \
+            P4A_call_accel_kernel(kernel, P4A_grid_descriptor, P4A_block_descriptor, \
+              (__VA_ARGS__));       \
+          } \
+        } while (0)
+
+
+  /** Call a kernel in a 3-dimension parallel loop in CUDA
+
+      @param[in] kernel to call
+
+      @param[in] P4A_n_iter_0 is the number of iterations in the first dimension
+
+      @param[in] P4A_n_iter_1 is the number of iterations in the second dimension
+
+      @param[in] P4A_n_iter_2 is the number of iterations in the third dimension
+
+      @param ... following parameters are given to the kernel
+  */
+  #define P4A_call_accel_kernel_3d(kernel, P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, ...) \
+    do {                  \
+      if(P4A_n_iter_0>0 && P4A_n_iter_1>0 && P4A_n_iter_2>0) { \
+        P4A_skip_debug(2,P4A_dump_message("Calling 3D kernel \"" #kernel "\" of size (%dx%dx%d)\n", \
+                                        P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2));     \
+        P4A_create_3d_thread_descriptors(P4A_grid_descriptor,   \
+                                         P4A_block_descriptor,    \
+                                         P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2); \
+        P4A_call_accel_kernel(kernel, P4A_grid_descriptor, P4A_block_descriptor, \
+          (__VA_ARGS__));       \
+      } \
+    } while (0)
 
 /** @} */
 
