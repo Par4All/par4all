@@ -146,6 +146,7 @@ RECWHAT	=
 # skip bug/later/slow cases depending on options
 # a case requires a result directory, so a "bug/later/slow"
 # tag is not counted if there is no corresponding result.
+# f95 test cases may be kept out of the validation from here as well.
 EXCEPT =  [ "$(RECWHAT)" ] && \
 	    { echo "$(RECWHAT): $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_BUG)" -a -f $*.bug -a -d $*.result ] && \
