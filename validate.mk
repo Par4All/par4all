@@ -14,6 +14,8 @@
 # - DO_LATER: idem with future "later" cases
 # - DO_SLOW: idem for lengthy to validate cases
 # - DO_DEFAULT: other test cases
+# - DO_PYPS: pyps must be available
+# - DO_F95: gfc2pips must be available
 # - D.sub: subdirectories in which to possibly recurse, defaults to *.sub
 #
 # example to do only later cases:
@@ -27,6 +29,11 @@ DO_BUG	=
 DO_LATER=
 DO_SLOW	= 1
 DO_DEFAULT = 1
+
+# for pyps user, if pyps is not available, the validation will just
+# skip the corresponding cases silently.
+DO_PYPS	:= $(type ipyps > /dev/null 2>&1 && echo 1)
+DO_F95	:= $(type gfc2pips > /dev/null 2>&1 && echo 1)
 
 # pips exes
 TPIPS	= tpips
@@ -148,11 +155,13 @@ EXCEPT =  [ "$(RECWHAT)" ] && \
 	  [ ! "$(DO_SLOW)" -a -f $*.slow -a -d $*.result ] && \
 	    { echo "slow: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_DEFAULT)" -a -d $*.result -a \
-	    ! \( -f $*.bug -o -f $*.later  -o -f $*.slow \) ] && \
+	    ! \( -f $*.bug -o -f $*.later -o -f $*.slow \) ] && \
+	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_F95)" -a -d $*.result -a \( -e $*.f90 -o -e $*.f95 \) ] && \
 	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
 
 # setup running a case
-PF	= @echo "processing $(SUBDIR)/$+" ; \
+PF	= echo "processing $(SUBDIR)/$+" ; \
 	  $(EXCEPT) ; \
 	  $(RM) $*.result/$(TEST) ; \
 	  set -o pipefail ; unset CDPATH ; \
@@ -314,7 +323,7 @@ generate-result: $(F.future_result)
 # always do target? does not seem to work as expected??
 #.PHONY: $(F.valid)
 
-# (shell) script
+# (shell) script, possibly uses "pips"?
 %.validate: %.test
 	$(PF) ; ./$< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
@@ -326,13 +335,14 @@ generate-result: $(F.future_result)
 	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 # python scripts
-ifdef PIPS_VALIDATION_NO_PYPS
+PYTHON	= python
+ifdef DO_PYPS
+%.validate: %.py
+	$(PF) ; $(PYTHON) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
+else # no pyps...
 %.validate: %.py
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-else # else we have pyps
-%.validate: %.py
-	$(PF) ; python $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
-endif # PIPS_VALIDATION_NO_PYPS
+endif # DO_PYPS
 
 # default_tpips
 # FILE could be $<
@@ -384,24 +394,8 @@ DEFTEST	= default_test
 
 
 # default_pyps relies on FILE & WSPACE
-PYTHON	= python
 DEFPYPS	= default_pyps.py
-ifdef PIPS_VALIDATION_NO_PYPS
-%.validate: %.c $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-
-%.validate: %.f $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-
-%.validate: %.F $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-
-%.validate: %.f90 $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-
-%.validate: %.f95 $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-else # with pyps
+ifdef DO_PYPS
 %.validate: %.c $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
@@ -421,7 +415,25 @@ else # with pyps
 %.validate: %.f95 $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
-endif # PIPS_VALIDATION_NO_PYPS
+
+else # without pyps
+
+%.validate: %.c $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.validate: %.f $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.validate: %.F $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.validate: %.f90 $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.validate: %.f95 $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+endif # DO_PYPS
 
 # special case for "slow" directories...
 %.validate:
