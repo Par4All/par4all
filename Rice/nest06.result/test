@@ -9,7 +9,7 @@
 
       SUBROUTINE INTERCHANGE(N, A, B, C)
       INTEGER N, I, J, K
-      REAL A(1:N,A1:N), B(1:N,1:N), C(1:N,1:N)
+      REAL A(1:N,1:N), B(1:N,1:N), C(1:N,1:N)
 
       DO K = 1, N                                                       0014
          DOALL J = 1, N                                                 0015

@@ -9,7 +9,7 @@
 
       subroutine interchange(n, a, b, c)
       integer n, i, j, k
-      real a(1:n,a1:n), b(1:n,1:n), c(1:n,1:n)
+      real a(1:n,1:n), b(1:n,1:n), c(1:n,1:n)
 
       do 300 k = 1, n
          do 200 j = 1, n

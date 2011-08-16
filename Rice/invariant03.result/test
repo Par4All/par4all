@@ -59,5 +59,4 @@ void invariant03(int n, int ni, int nj)
 
 Warnings
 
-unknown[unknown] (process_user_file) No syntactic check on file "./invariant03.c"
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
