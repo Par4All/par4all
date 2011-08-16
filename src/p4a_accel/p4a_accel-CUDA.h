@@ -112,42 +112,6 @@ extern int p4a_max_threads_per_block;
 #define P4A_CUDA_MIN_BLOCKS 28
 #endif
 
-#ifndef P4A_CUDA_THREAD_PER_BLOCK_IN_1D
-/** There is a maximum of p4a_max_threads_per_block threads per block. Use
-    them. May cause some trouble if too many resources per thread are
-    used. Change it with an option at compile time if that causes
-    trouble: */
-#define P4A_CUDA_THREAD_PER_BLOCK_IN_1D p4a_max_threads_per_block
-//P4A_CUDA_THREAD_PER_BLOCK_IN_1D = 5,
-#endif
-
-#ifndef P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D
-/** The thread layout size per block in 2D organization asymptotically. If
-    there are enough iterations along X and the amount of iteration is not
-    that big in Y, P4A_create_2d_thread_descriptors() allocates all
-    threads in X that seems to often leads to better performance if the
-    memory accesses are rather according to the X axis: */
-#define P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D (p4a_max_threads_per_block/16)
-#endif
-#ifndef P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D
-#define P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D (p4a_max_threads_per_block/P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D)
-#endif
-
-#ifndef P4A_CUDA_THREAD_X_PER_BLOCK_IN_3D
-/** The thread layout size per block in 3D organization
-
-    Well, the 3D is not really dealt in CUDA even it is described by a
-    dim3...
-*/
-#define P4A_CUDA_THREAD_X_PER_BLOCK_IN_3D 8
-#endif
-#ifndef P4A_CUDA_THREAD_Y_PER_BLOCK_IN_3D
-#define P4A_CUDA_THREAD_Y_PER_BLOCK_IN_3D 8
-#endif
-#ifndef P4A_CUDA_THREAD_Z_PER_BLOCK_IN_3D
-#define P4A_CUDA_THREAD_Z_PER_BLOCK_IN_3D 8
-#endif
-
 /** @} */
 
 /** Events for timing in CUDA: */
@@ -471,7 +435,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 					 block_descriptor_name,		\
 					 size)				\
   /* Define the number of thread per block: */				\
-  int tpb = P4A_min(P4A_CUDA_THREAD_PER_BLOCK_IN_1D,(size)/P4A_CUDA_MIN_BLOCKS); \
+  int tpb = P4A_min(p4a_max_threads_per_block,(size)/P4A_CUDA_MIN_BLOCKS); \
   tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
   tpb = P4A_max(tpb,32); \
   dim3 block_descriptor_name(P4A_min((int) size,			\
@@ -485,37 +449,28 @@ void P4A_copy_to_accel_3d(size_t element_size,
 /** Allocate the descriptors for a 2D set of thread with a simple
     strip-mining in each dimension for CUDA
 */
-#define P4A_create_2d_thread_descriptors(grid_descriptor_name,		\
-					 block_descriptor_name,		\
-					 n_x_iter, n_y_iter)		\
-  int p4a_block_x, p4a_block_y;						\
-  /* Define the number of thread per block: */				\
-									\
-  if (n_y_iter > 10000) {						\
-    /* If we have a lot of interations in Y, use asymptotical block	\
-       sizes: */							\
-    p4a_block_x = P4A_CUDA_THREAD_X_PER_BLOCK_IN_2D;			\
-    p4a_block_y = P4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D;			\
-  }									\
-  else {								\
-    /* Allocate a maximum of threads alog X axis (the warp dimension) for \
-       better average efficiency: */					\
-    int tpb = P4A_min(p4a_max_threads_per_block,(int)ceil((n_x_iter)*(n_y_iter)/(float)P4A_CUDA_MIN_BLOCKS)); \
-    tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
-    tpb = P4A_max(tpb,32); \
-    p4a_block_x = P4A_max((int)ceil(sqrt((float)tpb)),32); \
-    p4a_block_x = P4A_min((int) n_x_iter,				\
-                          (int) p4a_block_x);			\
-    p4a_block_y = P4A_min((int) n_y_iter,				\
-                          tpb/(float)p4a_block_x);		\
-  }									\
-  dim3 block_descriptor_name(p4a_block_x, p4a_block_y);			\
-  /* Define the ceil-rounded number of needed blocks of threads: */	\
+#define P4A_create_2d_thread_descriptors(grid_descriptor_name,    \
+           block_descriptor_name,   \
+           n_x_iter, n_y_iter)    \
+  int p4a_block_x, p4a_block_y;           \
+  /* Define the number of thread per block: */        \
+                  \
+  /* Allocate a maximum of threads alog X axis (the warp dimension) for \
+     better average efficiency: */          \
+  int tpb = P4A_min(p4a_max_threads_per_block,(int)ceil((n_x_iter)*(n_y_iter)/(float)P4A_CUDA_MIN_BLOCKS)); \
+  tpb = tpb & ~31; /* Truncate so that we have a 32 multiple */ \
+  tpb = P4A_max(tpb,32); \
+  p4a_block_x = P4A_max((int)ceil(sqrt((float)tpb)),32); \
+  p4a_block_x = P4A_min((int) n_x_iter,       \
+                        (int) p4a_block_x);     \
+  p4a_block_y = P4A_min((int) n_y_iter,       \
+                        tpb/(float)p4a_block_x);    \
+  dim3 block_descriptor_name(p4a_block_x, p4a_block_y);     \
+  /* Define the ceil-rounded number of needed blocks of threads: */ \
   dim3 grid_descriptor_name((((int) n_x_iter) + p4a_block_x - 1)/p4a_block_x, \
-			    (((int) n_y_iter) + p4a_block_y - 1)/p4a_block_y); \
-  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name);)	\
+          (((int) n_y_iter) + p4a_block_y - 1)/p4a_block_y); \
+  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name);) \
   P4A_skip_debug(4,P4A_dump_block_descriptor(block_descriptor_name);)
-
 
 /** Dump a CUDA dim3 descriptor with an introduction message */
 #define P4A_dump_descriptor(message, descriptor_name)			\
