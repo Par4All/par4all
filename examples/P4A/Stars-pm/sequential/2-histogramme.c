@@ -8,8 +8,8 @@
 
 static void _histogram(int data[NP][NP][NP],
               int histo[NP][NP][NP]) {
-#ifdef P4A_CUDA_CHEAT
   int i,j,k;
+#ifdef P4A_CUDA_CHEAT
   for (i = 0; i < NP; i++) {
     for (k = 0; k < NP; k++) {
       for (j = 0; j < NP; j++) {

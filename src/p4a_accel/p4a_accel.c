@@ -58,7 +58,7 @@ void p4a_main_init() {
       P4A_dump_message("Enable timing (%d)\n",timing);
       p4a_timing= timing;
     } else {
-      fprintf(stderr,"Invalid value for P4A_DEBUG: %s\n",env_p4a_timing);
+      fprintf(stderr,"Invalid value for P4A_TIMING: %s\n",env_p4a_timing);
     }
   }
 }

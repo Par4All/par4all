@@ -29,29 +29,45 @@
 #define toolTestExec(error)		checkErrorInline      	(error, __FILE__, __LINE__)
 #define toolTestExecMessage(message)	checkErrorMessageInline	(message, __FILE__, __LINE__)
 
-static inline void checkErrorInline(cudaError_t error, const char *currentFile, const int currentLine)
-{
-    if(cudaSuccess != error){
-	fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, cudaGetErrorString(error));
-        exit(-1);
-    }
+static inline void checkErrorInline(cudaError_t error,
+                                    const char *currentFile,
+                                    const int currentLine) {
+  if(cudaSuccess != error) {
+    fprintf(stderr,
+            "File %s - Line %i - The runtime error is %s\n",
+            currentFile,
+            currentLine,
+            cudaGetErrorString(error));
+    exit(-1);
+  }
 }
 
-static inline void checkErrorMessageInline(const char *errorMessage, const char *currentFile, const int currentLine)
-{
-    cudaError_t error = cudaGetLastError();
-    if(cudaSuccess != error){
-        fprintf(stderr, "File %s - Line %i - %s : %s\n", currentFile, currentLine, errorMessage, cudaGetErrorString(error));
-        exit(-1);
-    }
+static inline void checkErrorMessageInline(const char *errorMessage,
+                                           const char *currentFile,
+                                           const int currentLine) {
+  cudaError_t error = cudaGetLastError();
+  if(cudaSuccess != error) {
+    fprintf(stderr,
+            "File %s - Line %i - %s : %s\n",
+            currentFile,
+            currentLine,
+            errorMessage,
+            cudaGetErrorString(error));
+    exit(-1);
+  }
 
-#ifdef P4A_DEBUG
+  if(p4a_debug_level) { // For all debug level
     error = cudaThreadSynchronize();
-    if(cudaSuccess != error){
-	fprintf(stderr, "File %s - Line %i - Error after ThreadSynchronize %s : %s\n", currentFile, currentLine, errorMessage, cudaGetErrorString(error));
-        exit(-1);
+    if(cudaSuccess != error) {
+      fprintf(stderr,
+              "File %s - Line %i - Error after ThreadSynchronize %s : %s\n",
+              currentFile,
+              currentLine,
+              errorMessage,
+              cudaGetErrorString(error));
+      exit(-1);
     }
-#endif
+  }
 }
 
 
