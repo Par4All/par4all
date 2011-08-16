@@ -12,7 +12,6 @@ Source code
 
 Warnings
 
-unknown[unknown] (process_user_file) No syntactic check on file "./missing.f"
 unknown[unknown] (open_module) Module "CALLMISSING" selected instead of "callmissing" which was not found
 INITIALIZER[MISSING] (generic_initializer) user error
 INITIALIZER[MISSING] (generic_initializer) no source file for MISSING (might be an ENTRY point)

@@ -5,7 +5,7 @@ Direct computation of precondition for li921
 echo
 
 Registering file li92_1.f
-user warning in process_user_file: No syntactic check on file "./li92_1.f"
+Checking Fortran syntax of ./li92_1.f
 Splitting file    ./li92_1.f
   Module         LI921
 Workspace li92_1 created and opened.

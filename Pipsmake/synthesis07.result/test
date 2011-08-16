@@ -1,5 +1,5 @@
 Registering file synthesis07.f
-user warning in process_user_file: No syntactic check on file "./synthesis07.f"
+Checking Fortran syntax of ./synthesis07.f
 Splitting file    ./synthesis07.f
   Module         SYNTHESIS07
 Workspace synthesis07 created and opened.

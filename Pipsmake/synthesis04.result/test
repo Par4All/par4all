@@ -1,5 +1,5 @@
 Registering file synthesis04.f
-user warning in process_user_file: No syntactic check on file "./synthesis04.f"
+Checking Fortran syntax of ./synthesis04.f
 Splitting file    ./synthesis04.f
   Module         SYNTHESIS04
 Workspace synthesis04 created and opened.

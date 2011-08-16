@@ -1,6 +1,6 @@
  *some* pips -f unknownrule.f unknownrule
 Registering file unknownrule.f
-user warning in process_user_file: No syntactic check on file "./unknownrule.f"
+Checking Fortran syntax of ./unknownrule.f
 Splitting file    ./unknownrule.f
   Module         UNKNOWNRULE
 Workspace unknownrule created and opened.

@@ -1,6 +1,6 @@
 user warning in tp_parse: recursion01: No such workspace
 Registering file recursion01.f
-user warning in process_user_file: No syntactic check on file "./recursion01.f"
+Checking Fortran syntax of ./recursion01.f
 Splitting file    ./recursion01.f
   Module         FOO03
   Module         FOO02

@@ -1,5 +1,5 @@
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file synthesis09.f
-user warning in process_user_file: No syntactic check on file "./synthesis09.f"
 Splitting file    ./synthesis09.f
   Module         SYNTHESIS09
 Workspace synthesis09 created and opened.
