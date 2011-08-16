@@ -1,4 +1,7 @@
 delete o
+setproperty ABORT_ON_USER_ERROR TRUE
+# FI: I do not undestand the error message by gfortran
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create o onde24.f
 echo ### initial
 display PRINTED_FILE[%ALL]
