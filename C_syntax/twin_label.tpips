@@ -1,6 +1,7 @@
 delete miam
 
 setenv C_SYNTAX_DEBUG_LEVEL 9
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 setproperty ABORT_ON_USER_ERROR TRUE
 

@@ -1,6 +1,7 @@
 delete function_pointer02
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create function_pointer02 function_pointer02.c
 

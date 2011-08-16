@@ -3,6 +3,7 @@ delete return07
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create return07 return07.c
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1
 
