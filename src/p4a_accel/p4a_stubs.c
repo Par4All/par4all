@@ -341,15 +341,7 @@ void *P4A_runtime_host_ptr_to_accel_ptr(void *host_ptr, size_t size) {
 
 #ifdef P4A_RUNTIME_FFTW
 #include <fftw3.h>
-void fftwf_free(void *p) {
-  free(p);
-}
-
-void fftwf_destroy_plan( fftwf_plan p) {
-  free(p);
-}
-
-
+/*
 typedef struct fftwf_plan_s {
   int x,y,z;
   fftwf_complex *in;
@@ -358,15 +350,23 @@ typedef struct fftwf_plan_s {
   int params;
   size_t datasize;
 } fftwf_plan;
+*/
+void fftwf_free(void *p) {
+  free(p);
+}
 
+void fftwf_destroy_plan( fftwf_plan p) {
+  free(p);
+}
 
+static int fftwf_execute_x,fftwf_execute_y,fftwf_execute_z;
 void fftwf_execute(fftwf_plan plan) {
   int i,j,k;
-  for(i=0; i<plan.x;i++) {
-    for(j=0; j<plan.y;j++) {
-      for(k=0; k<plan.z;k++) {
-        plan.out[(i*plan.y*plan.z)+j*plan.z+k][0] = plan.in[(i*plan.y*plan.z)+j*plan.z+k][0];
-        plan.out[(i*plan.y*plan.z)+j*plan.z+k][1] = plan.in[(i*plan.y*plan.z)+j*plan.z+k][1];
+  for(i=0; i<fftwf_execute_x;i++) {
+    for(j=0; j<fftwf_execute_y;j++) {
+      for(k=0; k<fftwf_execute_z;k++) {
+//        plan->out[(i*fftwf_execute_y*fftwf_execute_z)+j*fftwf_execute_z+k][0] = plan->in[(i*fftwf_execute_y*fftwf_execute_z)+j*fftwf_execute_z+k][0];
+//        plan->out[(i*fftwf_execute_y*fftwf_execute_z)+j*fftwf_execute_z+k][1] = plan->in[(i*fftwf_execute_y*fftwf_execute_z)+j*fftwf_execute_z+k][1];
       }
     }
   }
@@ -374,13 +374,6 @@ void fftwf_execute(fftwf_plan plan) {
 
 fftwf_plan fftwf_plan_dft_3d(int nx, int ny, int nz, fftwf_complex *in, fftwf_complex *out, int direction, unsigned int params) {
   fftwf_plan plan;
-  plan.x = nx;
-  plan.y = ny;
-  plan.z = nz;
-  plan.in = in;
-  plan.out = out;
-  plan.direction = direction;
-  plan.params = params;
   return plan;
 }
 
