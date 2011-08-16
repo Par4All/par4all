@@ -24,11 +24,10 @@ set ytics(              \
         "128x"    7,    \
         "256x"    8)
 
-#set x2tics("PolyBench" -0.5, "Rodinia" 19.5, "Other" 22.5, "" 23.5)
-
 # We need 'in' ticks, so that the suite labels are
 # closer to the boundary
 set x2tics in nomirror offset 5
+
 # We then use arrows to add-back the out-labels
 set arrow 6 from -0.5,9 to -0.5,10 nohead
 set arrow 7 from 19.5,9 to 19.5,10 nohead
@@ -38,15 +37,6 @@ set arrow 9 from 23.5,9 to 23.5,10 nohead
 set xtics out nomirror
 set xtics rotate by -90
 
-# # divides Polybench from Rodinia
-# # divides Rodinia from others
-# # Divides Otehrs from geomean
-# set arrow 1 from 19.6125,-2 to 19.6125,8 nohead
-# set arrow 2 from 22.6125,-2 to 22.6125,4.25 nohead
-# set arrow 3 from 22.6125,8 to 22.6125,7.5 nohead
-# set arrow 4 from 23.6125,-2 to 23.6125,4.25 nohead
-# set arrow 5 from 23.6125,8 to 23.6125,7.5 nohead
-
 
 set grid ytics noxtics x2tics
 
@@ -54,11 +44,8 @@ g = 1
 set style histogram cluster gap 1
 set style data histogram
 
-#set key right width -3
-
 unset xtics
 set xtics out rotate by -30 nomirror offset 0,0 font "Arial,12" 
-#set key outside center bottom horizontal Right noreverse enhanced autotitles columnhead nobox 
 set key Right noreverse enhanced autotitles columnhead nobox 
 
 set style fill solid border -1
