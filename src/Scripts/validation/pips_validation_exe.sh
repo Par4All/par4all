@@ -32,6 +32,7 @@ message="compile run compare"
 what="both"
 copt=
 file=
+exit=0
 
 # option management
 # some more stuff could be added here if needed
@@ -55,6 +56,7 @@ do
 	  "  -c: compile only\n" \
 	  "  -cr: compile and run\n" \
 	  "  -crc: compile, run and compare\n" \
+          "  -e: expect this exit status from the program (default is 0)\n" \
 	  "  -f file: use this file instead of dbname.[cf...]\n"
       exit 0;
       ;;
@@ -175,12 +177,16 @@ fi
 if [ "$run" ]
 then
   if [ "$initial" ] ; then
-    $exe.1 > $exe.1.out 2> $exe.1.err ||
-      err 5 "error ($?) while executing initial code"
+    $exe.1 > $exe.1.out 2> $exe.1.err
+    status=$?
+    [ $status -eq $exit ] || \
+      err 5 "status $status instead of $exit while executing initial code"
   fi
   if [ "$generated" ] ; then
-    $exe.2 > $exe.2.out 2> $exe.2.err ||
-      err 6 "error ($?) while executing unsplit code"
+    $exe.2 > $exe.2.out 2> $exe.2.err
+    status=$?
+    [ $status -eq $exit ] || \
+      err 6 "status $status instead of $exit while executing unsplit code"
   fi
 fi
 
