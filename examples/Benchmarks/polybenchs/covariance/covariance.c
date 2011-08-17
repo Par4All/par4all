@@ -21,7 +21,8 @@
 # define DATA_PRINTF_MODIFIER "%0.2lf "
 #endif
 
-/* Array declaration. */DATA_TYPE float_n = 321414134.01;
+/* Array declaration. */
+DATA_TYPE float_n = 321414134.01;
 DATA_TYPE data[M + 1][N + 1];
 DATA_TYPE symmat[M + 1][M + 1];
 DATA_TYPE mean[M + 1];

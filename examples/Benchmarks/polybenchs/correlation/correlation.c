@@ -21,8 +21,8 @@
 # define DATA_PRINTF_MODIFIER "%0.2lf "
 #endif
 
-/* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */DATA_TYPE
-float_n = 321414134.01;
+/* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */
+DATA_TYPE float_n = 321414134.01;
 DATA_TYPE eps = 0.005;
 DATA_TYPE data[M + 1][N + 1];
 DATA_TYPE symmat[M + 1][M + 1];
@@ -78,6 +78,10 @@ int main(int argc, char** argv) {
 
 #define sqrt_of_array_cell(x,j) sqrt(x[j])
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   /* Determine mean of column vectors of input data matrix */
   for (j = 1; j <= m; j++) {
     mean[j] = 0.0;
@@ -86,10 +90,6 @@ int main(int argc, char** argv) {
     mean[j] /= float_n;
   }
 
-#ifdef PGI_ACC
-#pragma acc region
-{
-#endif
   /* Determine standard deviations of column vectors of data matrix. */
   for (j = 1; j <= m; j++) {
     stddev[j] = 0.0;

@@ -21,7 +21,8 @@
 # define DATA_PRINTF_MODIFIER "%0.2lf "
 #endif
 
-/* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */DATA_TYPE alpha;
+/* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */
+DATA_TYPE alpha;
 DATA_TYPE beta;
 DATA_TYPE acc[M][N];
 DATA_TYPE A[N][N];
