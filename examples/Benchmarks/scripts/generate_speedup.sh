@@ -64,7 +64,6 @@ EOF
 if [[ -z $dbfile ]]; then
 dbfile="timing.sqlite"
 fi
-echo $dbfile
 
 rm -f $out_dat;
 
@@ -133,15 +132,16 @@ for test in $tests; do
   mean_idx=0
   for ver in $versions; do
     time=`echo "select ROUND(AVG(measure),2) from timing where testcase=\"$test\" and version=\"$ver\";" | sqlite3 $dbfile`
+    #echo $ver $test $time
     speedup=0
     if [[ ! -z $time && ! -z $ref ]]; then
       #echo "speedup $test $ver $time : $ref/$time"
       speedup=`echo "scale=1; $ref/$time" | bc `
       assert_min=`echo "$speedup < $min_speedup" | bc`
       if [[ $assert_min == 1 ]]; then
-        echo "$speedup < $min_speedup" $assert_min
+        #echo "$speedup < $min_speedup" $assert_min
         speedup=$min_speedup
-      echo "$test $ver $speedup"
+        #echo "$test $ver $speedup"
       fi
     fi
 
@@ -168,9 +168,9 @@ if [[ -z $disable_mean ]]; then
   echo -n "Geo.Mean" >> $out_dat
   while [ "$mean_idx" -lt "$element_count" ]
   do    # List all the elements in the array.
-    echo "e((${mean_expr[$mean_idx]})/$nmean)"
+    #echo "e((${mean_expr[$mean_idx]})/$nmean)"
     geomean=`echo "scale=2; e((${mean_expr[$mean_idx]})/$nmean)" | bc -l`
-    echo "$geomean"
+    #echo "$geomean"
     echo -n " $geomean" >> $out_dat
     ((mean_idx++))
   done
