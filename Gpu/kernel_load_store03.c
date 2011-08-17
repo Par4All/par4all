@@ -1,4 +1,7 @@
+#include <math.h>
+#include <stdlib.h>
 
+#define M 1
 
 typedef float FLOAT;
 typedef FLOAT RGB[3];

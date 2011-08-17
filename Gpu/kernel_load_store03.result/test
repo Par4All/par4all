@@ -150,7 +150,7 @@ FLOAT error(FLOAT x)
 }
 static FLOAT step(FLOAT x)
 {
-   return 0.5f*(1.0f+tanhf(M*(x-0.5f)));
+   return 0.5f*(1.0f+tanhf(1*(x-0.5f)));
 }
 void p4a_kernel_do_one_iteration(int m, int n, int q, int j, int i, int qofs, FLOAT alpha, FLOAT kInv[3][3], RGB ui[m][n], RGB uj[m][n], FLOAT weights[q][q], IMAGE_RGB x[m][n])
 {
@@ -226,5 +226,5 @@ void p4a_wrapper_do_one_iteration(int m, int n, int q, int j, int i, int qofs, F
 }
 FLOAT uniform_random(FLOAT min, FLOAT max)
 {
-   return min+(max-min)*rand()/((FLOAT) RAND_MAX);
+   return min+(max-min)*rand()/((FLOAT) 2147483647);
 }
