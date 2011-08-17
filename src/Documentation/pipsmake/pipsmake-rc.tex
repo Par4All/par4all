@@ -7697,6 +7697,19 @@ GPU_LOOP_NEST_ANNOTATE_PARALLEL TRUE
 \end{PipsProp}
 
 
+\begin{PipsPass}{gpu_parallelize_annotated_loop_nest}
+Parallelize annotated loop nests based on the sentinel comments.
+\end{PipsPass}
+
+\begin{PipsMake}
+gpu_parallelize_annotated_loop_nest        > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+
+\end{PipsMake}
+
+
+
 \begin{PipsPass}{gpu_promote_sequential}
 This phase promote sequential code in GPU kernels to avoid memory transfers.
 \end{PipsPass}
