@@ -86,6 +86,11 @@ do
       compile=1 run=1 compare=1 initial=
       message="compile run compare"
       ;;
+    # expected exit status
+    -e|--exit) exit=$1 ; shift
+      ;;
+    --exit=*) exit=${opt//*=/}
+      ;;
     # file name, if not case.suffix
     -f|--file) file=$(basename $1) ; shift
       ;;
