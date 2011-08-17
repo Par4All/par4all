@@ -493,17 +493,17 @@ multi-source:
 	  echo "multi-source: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
-# all possible inconsistencies
-.PHONY: inconsistencies
-inconsistencies: skipped orphan multi-source multi-script missing-flt
-
 # check that all tpips2 have a corresponding flt
 .PHONY: missing-flt
 missing-flt:
 	@for f in $(F.tpips2) ; do \
 	  test -e $${f/.tpips2/.flt} || \
 	    echo "nofilter: $(SUBDIR)/$${f/.tpips2/}" ; \
-	done
+	done >> $(RESULTS)
+
+# all possible inconsistencies
+.PHONY: inconsistencies
+inconsistencies: skipped orphan multi-source multi-script missing-flt
 
 # what about nothing?
 # source files without corresponding result directory
