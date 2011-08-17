@@ -1,5 +1,8 @@
 #!/bin/sh
 
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
 # test behavior of pipsmake when resources are touched by user
 
 tpips=${tpips_version:-tpips}

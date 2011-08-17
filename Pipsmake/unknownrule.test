@@ -1,5 +1,8 @@
 #!/bin/sh
 
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
 # test ! -d unknownrule.database || Delete unknownrule
 
 {
