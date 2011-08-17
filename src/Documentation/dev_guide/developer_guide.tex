@@ -1838,11 +1838,16 @@ Three validation scripts are available:
   \item a \texttt{.tpips} file which is executed as a tpips script;
 
   \item a corresponding \texttt{.tpips2} file which is executed as a
-    tpips script, with the error stream redirect;
+    tpips script, with the error stream is appended and possibly filtered
+    by a \texttt{.flt} script afterwards.
 
     Validating the error stream is a \textbf{very bad idea} as it leads
     to never ending regression variations. It is even worth when the
     output comes from external tools such as compilers error output;
+
+    Please take care to filter only the significant part of the result,
+    and that it should depend on pips only, so that it is likely to
+    be replicated elsewhere.
 
   \item a \texttt{default\_test} file as a template for a \texttt{.test} file.
 
