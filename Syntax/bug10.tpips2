@@ -19,7 +19,6 @@ create bug10b bug10.src/test.f
 module COURC4
 display CALLGRAPH_FILE[COURC4]
 close
-
 delete bug10a
 delete bug10b
 quit

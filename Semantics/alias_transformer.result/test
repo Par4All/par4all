@@ -1,57 +1,3 @@
-user warning in tp_parse: alias_transformer: No such workspace
-setproperty ABORT_ON_USER_ERROR TRUE
-setenv PIPS_CHECK_FORTRAN "Y"
-Registering file alias_transformer.f
-Checking Fortran syntax of ./alias_transformer.f
-Splitting file    ./alias_transformer.f
-  Module         FOO
-  Module         ALIAS_TRANSFORMER
-Workspace alias_transformer created and opened.
-Main module PROGRAM "ALIAS_TRANSFORMER" selected.
-Module ALIAS_TRANSFORMER selected
-setproperty PRETTYPRINT_BLOCKS TRUE
-setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
-setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
-setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
-setproperty PRETTYPRINT_UNSTRUCTURED TRUE
-setproperty PRETTYPRINT_FINAL_RETURN TRUE
-setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
-Selecting rule: PRECONDITIONS_INTER_FULL
-Selecting rule: TRANSFORMERS_INTER_FULL
-Selecting rule: INTERPROCEDURAL_SUMMARY_PRECONDITION
-Selecting rule: PRINT_CODE_TRANSFORMERS
-Module ALIAS_TRANSFORMER already active.
-Request: build resource PRINTED_FILE for module ALIAS_TRANSFORMER.
-  BOOTSTRAP                      building   ENTITIES()
-  FILTER_FILE                    building   SOURCE_FILE(ALIAS_TRANSFORMER)
-  PARSER                         building   PARSED_CODE(ALIAS_TRANSFORMER)
-                                 building   CALLEES(ALIAS_TRANSFORMER)
-  CONTROLIZER                    building   CODE(ALIAS_TRANSFORMER)
-  FILTER_FILE                    building   SOURCE_FILE(FOO)
-  PARSER                         building   PARSED_CODE(FOO)
-                                 building   CALLEES(FOO)
-  CONTROLIZER                    building   CODE(FOO)
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(FOO)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(FOO)
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(FOO)
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(ALIAS_TRANSFORMER)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(ALIAS_TRANSFORMER)
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(ALIAS_TRANSFORMER)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(ALIAS_TRANSFORMER)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(FOO)
-  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(FOO)
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(ALIAS_TRANSFORMER)
-user warning in translate_global_value: Variable FOO:I is probably aliased with a formal parameter by the current call to FOO from ALIAS_TRANSFORMER.
-This is forbidden by the Fortran 77 standard.
-user warning in transformer_general_consistency_p: No value for argument FOO:I in value mappings
-user warning in fortran_user_call_to_transformer: Call to FOO seems never to return. This may be due to an infinite loop in FOO, or to a systematic exit in FOO, or to standard violations (see previous messages)
-  PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(ALIAS_TRANSFORMER)
-PRINTED_FILE made for ALIAS_TRANSFORMER.
-Module FOO selected
-Request: build resource PRINTED_FILE for module FOO.
-  PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(FOO)
-PRINTED_FILE made for FOO.
 
 C  T() {0==-1}
 
@@ -109,25 +55,6 @@ C  T() {}
       RETURN
 C     END BLOCK
       END
-Selecting rule: PRINT_CODE_PRECONDITIONS
-Module ALIAS_TRANSFORMER already active.
-Request: build resource PRINTED_FILE for module ALIAS_TRANSFORMER.
-  CALLGRAPH                      building   CALLERS(ALIAS_TRANSFORMER)
-                                 building   CALLERS(FOO)
-                                 building   HEIGHT(ALIAS_TRANSFORMER)
-                                 building   HEIGHT(FOO)
-                                 building   DEPTH(ALIAS_TRANSFORMER)
-                                 building   DEPTH(FOO)
-  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(ALIAS_TRANSFORMER)
-  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(ALIAS_TRANSFORMER)
-  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(ALIAS_TRANSFORMER)
-PRINTED_FILE made for ALIAS_TRANSFORMER.
-Module FOO selected
-Request: build resource PRINTED_FILE for module FOO.
-  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(FOO)
-  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(FOO)
-  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(FOO)
-PRINTED_FILE made for FOO.
 
 C  P() {}
 
@@ -185,13 +112,5 @@ C  P(I,J) {I==2, I#init==0, J==1, J#init==0}
       RETURN
 C     END BLOCK
       END
-Deletion of obsolete resources:
-none destroyed.
-Closing all modules.
-  Closing module ALIAS_TRANSFORMER.
-  Closing module FOO.
-Closing program.
-Closing workspace.
-Workspace alias_transformer closed.
-
-Workspace alias_transformer deleted.
+### stderr
+user warning in translate_global_value: Variable FOO:I is probably aliased with a formal parameter by the current call to FOO from ALIAS_TRANSFORMER.

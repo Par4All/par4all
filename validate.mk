@@ -332,8 +332,18 @@ generate-result: $(F.future_result)
 %.validate: %.tpips
 	$(PF) ; $(TPIPS) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
+# special case for stderr validation, which is basically a bad idea (tm),
+# with a provision to keep only part of the stderr output.
 %.validate: %.tpips2
-	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $*.result/$(TEST) ; $(OK)
+	$(PF) ; $(TPIPS) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; \
+	{ \
+	  echo "### stderr" ; \
+	  if [ -e $*.flt ] ; then \
+	    $(FLT) $*.err | ./$*.flt ; \
+	  else \
+	    $(FLT) $*.err ; \
+	  fi ; \
+	} >> $*.result/$(TEST) ; $(OK)
 
 # python scripts
 PYTHON	= python
@@ -485,7 +495,15 @@ multi-source:
 
 # all possible inconsistencies
 .PHONY: inconsistencies
-inconsistencies: skipped orphan multi-source multi-script
+inconsistencies: skipped orphan multi-source multi-script missing-flt
+
+# check that all tpips2 have a corresponding flt
+.PHONY: missing-flt
+missing-flt:
+	@for f in $(F.tpips2) ; do \
+	  test -e $${f/.tpips2/.flt} || \
+	    echo "nofilter: $(SUBDIR)/$${f/.tpips2/}" ; \
+	done
 
 # what about nothing?
 # source files without corresponding result directory
