@@ -2,7 +2,8 @@ delete nullincr2
 
 setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
 
-setproperty ABORT_ON_USER_ERROR TRUE
+# No abort: the error must be found
+#setproperty ABORT_ON_USER_ERROR TRUE
 setenv PIPS_CHECK_FORTRAN="Y"
 
 create nullincr2 nullincr2.f
