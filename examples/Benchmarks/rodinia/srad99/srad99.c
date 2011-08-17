@@ -236,13 +236,7 @@ int main(int argc, char* argv[]) {
 
         // image update (equ 61)
         J[i][j] = J[i][j] + 0.25 * lambda * D;
-#ifdef OUTPUT
-        //printf("%.5f ", J[k]);
-#endif //output
       }
-#ifdef OUTPUT
-      //printf("\n");
-#endif //output
     }
 
   }
