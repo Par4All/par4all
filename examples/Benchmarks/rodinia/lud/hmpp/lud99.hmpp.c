@@ -82,7 +82,7 @@ void lud_base(int size,float a[size][size])
 
 
 // This is the reference to parallelize
-#pragma hmpp myCodelet codelet, target=CUDA
+#pragma hmpp lud_99 codelet, target=CUDA
 void lud_99(int size, float a[size][size])
 {
      int i,j,k;
@@ -171,7 +171,7 @@ main ( int argc, char *argv[] )
   }
 
 
-#pragma hmpp myCodelet callsite
+#pragma hmpp lud_99 callsite
   lud_99(matrix_dim,mm);
 
   /* Cheat the compiler (again) to limit the scope of optimisation */
