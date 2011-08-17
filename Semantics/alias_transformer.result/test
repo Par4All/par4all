@@ -1,4 +1,6 @@
 user warning in tp_parse: alias_transformer: No such workspace
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv PIPS_CHECK_FORTRAN "Y"
 Registering file alias_transformer.f
 Checking Fortran syntax of ./alias_transformer.f
 Splitting file    ./alias_transformer.f

@@ -1,4 +1,6 @@
 user warning in tp_parse: inter06: No such workspace
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv PIPS_CHECK_FORTRAN "Y"
 Registering file inter06.f
 Checking Fortran syntax of ./inter06.f
 Splitting file    ./inter06.f

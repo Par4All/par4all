@@ -1,4 +1,7 @@
+user warning in tp_parse: nullincr2: No such workspace
 setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv PIPS_CHECK_FORTRAN "Y"
 Registering file nullincr2.f
 Checking Fortran syntax of ./nullincr2.f
 Splitting file    ./nullincr2.f
@@ -69,15 +72,4 @@ Request: build resource PRINTED_FILE for module NULLINCR2.
   INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(NULLINCR2)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(NULLINCR2)
 user error in add_index_range_conditions: Illegal null increment
-user warning in set_debug_stack_pointer: debug level stack is set to 2
-user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module NULLINCR2.
-user error in display_a_resource: Cannot build view file PRINTED_FILE
-Deletion of obsolete resources:
-none destroyed.
-Closing all modules.
-  Closing module NULLINCR2.
-Closing program.
-Closing workspace.
-Workspace nullincr2 closed.
-
-Workspace nullincr2 deleted.
+user warning in tpips_user_error: Abort on user error requested!
