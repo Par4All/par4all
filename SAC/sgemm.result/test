@@ -4,7 +4,7 @@
       EXTERNAL LSAME
       REAL*4 XERBLA
       EXTERNAL XERBLA
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, 
      &NROWB
@@ -12,8 +12,8 @@
      &SIZE, 1:SIZE), TEMP, ONE, ZERO
       LOGICAL NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -21,154 +21,154 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
-      IF (NOTA) THEN                                                    0044
-         NROWA = M                                                      0045
-         NCOLA = K                                                      0046
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
+      IF (NOTA) THEN                                                    0045
+         NROWA = M                                                      0046
+         NCOLA = K                                                      0047
       ELSE
-         NROWA = K                                                      0048
-         NCOLA = M                                                      0049
+         NROWA = K                                                      0049
+         NCOLA = M                                                      0050
       ENDIF
-      IF (NOTB) THEN                                                    0051
-         NROWB = K                                                      0052
+      IF (NOTB) THEN                                                    0052
+         NROWB = K                                                      0053
       ELSE
-         NROWB = N                                                      0054
+         NROWB = N                                                      0055
       ENDIF
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
-      ELSEIF (.NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(     0060
-     &TRANSB, 'T')) THEN                                                0060
-         INFO = 2                                                       0067
-      ELSEIF (M.LT.0) THEN                                              0060
-         INFO = 3                                                       0069
-      ELSEIF (N.LT.0) THEN                                              0060
-         INFO = 4                                                       0071
-      ELSEIF (K.LT.0) THEN                                              0060
-         INFO = 5                                                       0073
-      ELSEIF (LDA.LT.MAX(1, NROWA)) THEN                                0060
-         INFO = 8                                                       0075
-      ELSEIF (LDB.LT.MAX(1, NROWB)) THEN                                0060
-         INFO = 10                                                      0077
-      ELSEIF (LDC.LT.MAX(1, M)) THEN                                    0060
-         INFO = 13                                                      0079
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
+      ELSEIF (.NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(     0061
+     &TRANSB, 'T')) THEN                                                0061
+         INFO = 2                                                       0068
+      ELSEIF (M.LT.0) THEN                                              0061
+         INFO = 3                                                       0070
+      ELSEIF (N.LT.0) THEN                                              0061
+         INFO = 4                                                       0072
+      ELSEIF (K.LT.0) THEN                                              0061
+         INFO = 5                                                       0074
+      ELSEIF (LDA.LT.MAX(1, NROWA)) THEN                                0061
+         INFO = 8                                                       0076
+      ELSEIF (LDB.LT.MAX(1, NROWB)) THEN                                0061
+         INFO = 10                                                      0078
+      ELSEIF (LDC.LT.MAX(1, M)) THEN                                    0061
+         INFO = 13                                                      0080
       ENDIF
-      IF (INFO.NE.0) GOTO 99999                                         0081
+      IF (INFO.NE.0) GOTO 99999                                         0082
 *
 *     Quick return if possible.
 *
-      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0088
-     &ONE) RETURN                                                       0088
+      IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA.EQ.    0089
+     &ONE) RETURN                                                       0089
 *
 *     And if  alpha.eq.zero.
 *
-      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0094
+      IF (ALPHA.EQ.ZERO) GOTO 99998                                     0095
 *
 *     Start the operations.
 *
-      IF (NOTB) THEN                                                    0113
-         IF (NOTA) THEN                                                 0114
+      IF (NOTB) THEN                                                    0114
+         IF (NOTA) THEN                                                 0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-            DO 90 J = 1, N                                              0118
-               IF (BETA.EQ.ZERO) THEN                                   0119
-                  DO 50 I = 1, M                                        0120
-                     C(I,J) = ZERO                                      0121
-50                   CONTINUE                                           0122
-               ELSEIF (BETA.NE.ONE) THEN                                0119
-                  DO 60 I = 1, M                                        0124
-                     C(I,J) = BETA*C(I,J)                               0125
-60                   CONTINUE                                           0126
+            DO 90 J = 1, N                                              0119
+               IF (BETA.EQ.ZERO) THEN                                   0120
+                  DO 50 I = 1, M                                        0121
+                     C(I,J) = ZERO                                      0122
+50                   CONTINUE                                           0123
+               ELSEIF (BETA.NE.ONE) THEN                                0120
+                  DO 60 I = 1, M                                        0125
+                     C(I,J) = BETA*C(I,J)                               0126
+60                   CONTINUE                                           0127
                ENDIF
-               DO 80 L = 1, K                                           0128
-                  IF (B(L,J).NE.ZERO) THEN                              0129
-                     TEMP = ALPHA*B(L,J)                                0130
-                     DO 70 I = 1, M                                     0131
-                        C(I,J) = C(I,J)+TEMP*A(I,L)                     0132
-70                      CONTINUE                                        0133
+               DO 80 L = 1, K                                           0129
+                  IF (B(L,J).NE.ZERO) THEN                              0130
+                     TEMP = ALPHA*B(L,J)                                0131
+                     DO 70 I = 1, M                                     0132
+                        C(I,J) = C(I,J)+TEMP*A(I,L)                     0133
+70                      CONTINUE                                        0134
                   ENDIF
-80                CONTINUE                                              0135
-90             CONTINUE                                                 0136
+80                CONTINUE                                              0136
+90             CONTINUE                                                 0137
          ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-            DO 120 J = 1, N                                             0141
-               DO 110 I = 1, M                                          0142
-                  TEMP = ZERO                                           0143
-                  DO 100 L = 1, K                                       0144
-                     TEMP = TEMP+A(L,I)*B(L,J)                          0145
-100                  CONTINUE                                           0146
-                  IF (BETA.EQ.ZERO) THEN                                0147
-                     C(I,J) = ALPHA*TEMP                                0148
+            DO 120 J = 1, N                                             0142
+               DO 110 I = 1, M                                          0143
+                  TEMP = ZERO                                           0144
+                  DO 100 L = 1, K                                       0145
+                     TEMP = TEMP+A(L,I)*B(L,J)                          0146
+100                  CONTINUE                                           0147
+                  IF (BETA.EQ.ZERO) THEN                                0148
+                     C(I,J) = ALPHA*TEMP                                0149
                   ELSE
-                     C(I,J) = ALPHA*TEMP+BETA*C(I,J)                    0150
+                     C(I,J) = ALPHA*TEMP+BETA*C(I,J)                    0151
                   ENDIF
-110               CONTINUE                                              0152
-120            CONTINUE                                                 0153
+110               CONTINUE                                              0153
+120            CONTINUE                                                 0154
          ENDIF
-      ELSEIF (NOTA) THEN                                                0113
+      ELSEIF (NOTA) THEN                                                0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-         DO 170 J = 1, N                                                0160
-            IF (BETA.EQ.ZERO) THEN                                      0161
-               DO 130 I = 1, M                                          0162
-                  C(I,J) = ZERO                                         0163
-130               CONTINUE                                              0164
-            ELSEIF (BETA.NE.ONE) THEN                                   0161
-               DO 140 I = 1, M                                          0166
-                  C(I,J) = BETA*C(I,J)                                  0167
-140               CONTINUE                                              0168
+         DO 170 J = 1, N                                                0161
+            IF (BETA.EQ.ZERO) THEN                                      0162
+               DO 130 I = 1, M                                          0163
+                  C(I,J) = ZERO                                         0164
+130               CONTINUE                                              0165
+            ELSEIF (BETA.NE.ONE) THEN                                   0162
+               DO 140 I = 1, M                                          0167
+                  C(I,J) = BETA*C(I,J)                                  0168
+140               CONTINUE                                              0169
             ENDIF
-            DO 160 L = 1, K                                             0170
-               IF (B(J,L).NE.ZERO) THEN                                 0171
-                  TEMP = ALPHA*B(J,L)                                   0172
-                  DO 150 I = 1, M                                       0173
-                     C(I,J) = C(I,J)+TEMP*A(I,L)                        0174
-150                  CONTINUE                                           0175
+            DO 160 L = 1, K                                             0171
+               IF (B(J,L).NE.ZERO) THEN                                 0172
+                  TEMP = ALPHA*B(J,L)                                   0173
+                  DO 150 I = 1, M                                       0174
+                     C(I,J) = C(I,J)+TEMP*A(I,L)                        0175
+150                  CONTINUE                                           0176
                ENDIF
-160            CONTINUE                                                 0177
-170         CONTINUE                                                    0178
+160            CONTINUE                                                 0178
+170         CONTINUE                                                    0179
       ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-         DO 200 J = 1, N                                                0183
-            DO 190 I = 1, M                                             0184
-               TEMP = ZERO                                              0185
-               DO 180 L = 1, K                                          0186
-                  TEMP = TEMP+A(L,I)*B(J,L)                             0187
-180               CONTINUE                                              0188
-               IF (BETA.EQ.ZERO) THEN                                   0189
-                  C(I,J) = ALPHA*TEMP                                   0190
+         DO 200 J = 1, N                                                0184
+            DO 190 I = 1, M                                             0185
+               TEMP = ZERO                                              0186
+               DO 180 L = 1, K                                          0187
+                  TEMP = TEMP+A(L,I)*B(J,L)                             0188
+180               CONTINUE                                              0189
+               IF (BETA.EQ.ZERO) THEN                                   0190
+                  C(I,J) = ALPHA*TEMP                                   0191
                ELSE
-                  C(I,J) = ALPHA*TEMP+BETA*C(I,J)                       0192
+                  C(I,J) = ALPHA*TEMP+BETA*C(I,J)                       0193
                ENDIF
-190            CONTINUE                                                 0194
-200         CONTINUE                                                    0195
+190            CONTINUE                                                 0195
+200         CONTINUE                                                    0196
       ENDIF
 *
       RETURN
 99998 CONTINUE
-      IF (BETA.EQ.ZERO) THEN                                            0095
-         DO 20 J = 1, N                                                 0096
-            DO 10 I = 1, M                                              0097
-               C(I,J) = ZERO                                            0098
-10             CONTINUE                                                 0099
-20          CONTINUE                                                    0100
+      IF (BETA.EQ.ZERO) THEN                                            0096
+         DO 20 J = 1, N                                                 0097
+            DO 10 I = 1, M                                              0098
+               C(I,J) = ZERO                                            0099
+10             CONTINUE                                                 0100
+20          CONTINUE                                                    0101
       ELSE
-         DO 40 J = 1, N                                                 0102
-            DO 30 I = 1, M                                              0103
-               C(I,J) = BETA*C(I,J)                                     0104
-30             CONTINUE                                                 0105
-40          CONTINUE                                                    0106
+         DO 40 J = 1, N                                                 0103
+            DO 30 I = 1, M                                              0104
+               C(I,J) = BETA*C(I,J)                                     0105
+30             CONTINUE                                                 0106
+40          CONTINUE                                                    0107
       ENDIF
       RETURN
 99999 CONTINUE
@@ -183,7 +183,7 @@
       EXTERNAL LSAME
       REAL*4 XERBLA
       EXTERNAL XERBLA
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, 
      &NROWB
@@ -191,8 +191,8 @@
      &SIZE, 1:SIZE), TEMP, ONE, ZERO
       LOGICAL NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -200,155 +200,155 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
-      IF (NOTA) THEN                                                    0044
-         NROWA = M                                                      0045
-         NCOLA = K                                                      0046
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
+      IF (NOTA) THEN                                                    0045
+         NROWA = M                                                      0046
+         NCOLA = K                                                      0047
       ELSE
-         NROWA = K                                                      0048
-         NCOLA = M                                                      0049
+         NROWA = K                                                      0049
+         NCOLA = M                                                      0050
       ENDIF
-      IF (NOTB) THEN                                                    0051
-         NROWB = K                                                      0052
+      IF (NOTB) THEN                                                    0052
+         NROWB = K                                                      0053
       ELSE
-         NROWB = N                                                      0054
+         NROWB = N                                                      0055
       ENDIF
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
-      ELSEIF (.NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(     0060
-     &TRANSB, 'T')) THEN                                                0060
-         INFO = 2                                                       0067
-      ELSEIF (M.LT.0) THEN                                              0060
-         INFO = 3                                                       0069
-      ELSEIF (N.LT.0) THEN                                              0060
-         INFO = 4                                                       0071
-      ELSEIF (K.LT.0) THEN                                              0060
-         INFO = 5                                                       0073
-      ELSEIF (LDA.LT.MAX(1, NROWA)) THEN                                0060
-         INFO = 8                                                       0075
-      ELSEIF (LDB.LT.MAX(1, NROWB)) THEN                                0060
-         INFO = 10                                                      0077
-      ELSEIF (LDC.LT.MAX(1, M)) THEN                                    0060
-         INFO = 13                                                      0079
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
+      ELSEIF (.NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(     0061
+     &TRANSB, 'T')) THEN                                                0061
+         INFO = 2                                                       0068
+      ELSEIF (M.LT.0) THEN                                              0061
+         INFO = 3                                                       0070
+      ELSEIF (N.LT.0) THEN                                              0061
+         INFO = 4                                                       0072
+      ELSEIF (K.LT.0) THEN                                              0061
+         INFO = 5                                                       0074
+      ELSEIF (LDA.LT.MAX(1, NROWA)) THEN                                0061
+         INFO = 8                                                       0076
+      ELSEIF (LDB.LT.MAX(1, NROWB)) THEN                                0061
+         INFO = 10                                                      0078
+      ELSEIF (LDC.LT.MAX(1, M)) THEN                                    0061
+         INFO = 13                                                      0080
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
-                     DO 10 I = 1, M                                     0097
-                        C(I,J) = ZERO                                   0098
-10                      CONTINUE                                        0099
-20                   CONTINUE                                           0100
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
+                     DO 10 I = 1, M                                     0098
+                        C(I,J) = ZERO                                   0099
+10                      CONTINUE                                        0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
-                     DO 30 I = 1, M                                     0103
-                        C(I,J) = BETA*C(I,J)                            0104
-30                      CONTINUE                                        0105
-40                   CONTINUE                                           0106
+                  DO 40 J = 1, N                                        0103
+                     DO 30 I = 1, M                                     0104
+                        C(I,J) = BETA*C(I,J)                            0105
+30                      CONTINUE                                        0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
-                           DO 50 I = 1, M                               0120
-                              C(I,J) = ZERO                             0121
-50                            CONTINUE                                  0122
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
-                           DO 60 I = 1, M                               0124
-                              C(I,J) = BETA*C(I,J)                      0125
-60                            CONTINUE                                  0126
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
+                           DO 50 I = 1, M                               0121
+                              C(I,J) = ZERO                             0122
+50                            CONTINUE                                  0123
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
+                           DO 60 I = 1, M                               0125
+                              C(I,J) = BETA*C(I,J)                      0126
+60                            CONTINUE                                  0127
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
-                              DO 70 I = 1, M                            0131
-                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0132
-70                               CONTINUE                               0133
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
+                              DO 70 I = 1, M                            0132
+                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0133
+70                               CONTINUE                               0134
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
-                           DO 100 L = 1, K                              0144
-                              TEMP = TEMP+A(L,I)*B(L,J)                 0145
-100                           CONTINUE                                  0146
-                           IF (BETA.EQ.ZERO) THEN                       0147
-                              C(I,J) = ALPHA*TEMP                       0148
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
+                           DO 100 L = 1, K                              0145
+                              TEMP = TEMP+A(L,I)*B(L,J)                 0146
+100                           CONTINUE                                  0147
+                           IF (BETA.EQ.ZERO) THEN                       0148
+                              C(I,J) = ALPHA*TEMP                       0149
                            ELSE
-                              C(I,J) = ALPHA*TEMP+BETA*C(I,J)           0150
+                              C(I,J) = ALPHA*TEMP+BETA*C(I,J)           0151
                            ENDIF
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
-                        DO 130 I = 1, M                                 0162
-                           C(I,J) = ZERO                                0163
-130                        CONTINUE                                     0164
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
-                        DO 140 I = 1, M                                 0166
-                           C(I,J) = BETA*C(I,J)                         0167
-140                        CONTINUE                                     0168
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
+                        DO 130 I = 1, M                                 0163
+                           C(I,J) = ZERO                                0164
+130                        CONTINUE                                     0165
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
+                        DO 140 I = 1, M                                 0167
+                           C(I,J) = BETA*C(I,J)                         0168
+140                        CONTINUE                                     0169
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
-                           DO 150 I = 1, M                              0173
-                              C(I,J) = C(I,J)+TEMP*A(I,L)               0174
-150                           CONTINUE                                  0175
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
+                           DO 150 I = 1, M                              0174
+                              C(I,J) = C(I,J)+TEMP*A(I,L)               0175
+150                           CONTINUE                                  0176
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
-                        DO 180 L = 1, K                                 0186
-                           TEMP = TEMP+A(L,I)*B(J,L)                    0187
-180                        CONTINUE                                     0188
-                        IF (BETA.EQ.ZERO) THEN                          0189
-                           C(I,J) = ALPHA*TEMP                          0190
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
+                        DO 180 L = 1, K                                 0187
+                           TEMP = TEMP+A(L,I)*B(J,L)                    0188
+180                        CONTINUE                                     0189
+                        IF (BETA.EQ.ZERO) THEN                          0190
+                           C(I,J) = ALPHA*TEMP                          0191
                         ELSE
-                           C(I,J) = ALPHA*TEMP+BETA*C(I,J)              0192
+                           C(I,J) = ALPHA*TEMP+BETA*C(I,J)              0193
                         ENDIF
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -364,7 +364,7 @@
       EXTERNAL LSAME
       REAL*4 XERBLA
       EXTERNAL XERBLA
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, 
      &NROWB
@@ -372,8 +372,8 @@
      &SIZE, 1:SIZE), TEMP, ONE, ZERO
       LOGICAL NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -381,155 +381,155 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
-      IF (NOTA) THEN                                                    0044
-         NROWA = M                                                      0045
-         NCOLA = K                                                      0046
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
+      IF (NOTA) THEN                                                    0045
+         NROWA = M                                                      0046
+         NCOLA = K                                                      0047
       ELSE
-         NROWA = K                                                      0048
-         NCOLA = M                                                      0049
+         NROWA = K                                                      0049
+         NCOLA = M                                                      0050
       ENDIF
-      IF (NOTB) THEN                                                    0051
-         NROWB = K                                                      0052
+      IF (NOTB) THEN                                                    0052
+         NROWB = K                                                      0053
       ELSE
-         NROWB = N                                                      0054
+         NROWB = N                                                      0055
       ENDIF
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
-      ELSEIF (.NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(     0060
-     &TRANSB, 'T')) THEN                                                0060
-         INFO = 2                                                       0067
-      ELSEIF (M.LT.0) THEN                                              0060
-         INFO = 3                                                       0069
-      ELSEIF (N.LT.0) THEN                                              0060
-         INFO = 4                                                       0071
-      ELSEIF (K.LT.0) THEN                                              0060
-         INFO = 5                                                       0073
-      ELSEIF (LDA.LT.MAX(1, NROWA)) THEN                                0060
-         INFO = 8                                                       0075
-      ELSEIF (LDB.LT.MAX(1, NROWB)) THEN                                0060
-         INFO = 10                                                      0077
-      ELSEIF (LDC.LT.MAX(1, M)) THEN                                    0060
-         INFO = 13                                                      0079
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
+      ELSEIF (.NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(     0061
+     &TRANSB, 'T')) THEN                                                0061
+         INFO = 2                                                       0068
+      ELSEIF (M.LT.0) THEN                                              0061
+         INFO = 3                                                       0070
+      ELSEIF (N.LT.0) THEN                                              0061
+         INFO = 4                                                       0072
+      ELSEIF (K.LT.0) THEN                                              0061
+         INFO = 5                                                       0074
+      ELSEIF (LDA.LT.MAX(1, NROWA)) THEN                                0061
+         INFO = 8                                                       0076
+      ELSEIF (LDB.LT.MAX(1, NROWB)) THEN                                0061
+         INFO = 10                                                      0078
+      ELSEIF (LDC.LT.MAX(1, M)) THEN                                    0061
+         INFO = 13                                                      0080
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
-                     DO 10 I = 1, M                                     0097
-                        C(I,J) = ZERO                                   0098
-10                      CONTINUE                                        0099
-20                   CONTINUE                                           0100
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
+                     DO 10 I = 1, M                                     0098
+                        C(I,J) = ZERO                                   0099
+10                      CONTINUE                                        0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
-                     DO 30 I = 1, M                                     0103
-                        C(I,J) = BETA*C(I,J)                            0104
-30                      CONTINUE                                        0105
-40                   CONTINUE                                           0106
+                  DO 40 J = 1, N                                        0103
+                     DO 30 I = 1, M                                     0104
+                        C(I,J) = BETA*C(I,J)                            0105
+30                      CONTINUE                                        0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
-                           DO 50 I = 1, M                               0120
-                              C(I,J) = ZERO                             0121
-50                            CONTINUE                                  0122
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
-                           DO 60 I = 1, M                               0124
-                              C(I,J) = BETA*C(I,J)                      0125
-60                            CONTINUE                                  0126
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
+                           DO 50 I = 1, M                               0121
+                              C(I,J) = ZERO                             0122
+50                            CONTINUE                                  0123
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
+                           DO 60 I = 1, M                               0125
+                              C(I,J) = BETA*C(I,J)                      0126
+60                            CONTINUE                                  0127
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
-                              DO 70 I = 1, M                            0131
-                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0132
-70                               CONTINUE                               0133
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
+                              DO 70 I = 1, M                            0132
+                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0133
+70                               CONTINUE                               0134
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
-                           DO 100 L = 1, K                              0144
-                              TEMP = TEMP+A(L,I)*B(L,J)                 0145
-100                           CONTINUE                                  0146
-                           IF (BETA.EQ.ZERO) THEN                       0147
-                              C(I,J) = ALPHA*TEMP                       0148
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
+                           DO 100 L = 1, K                              0145
+                              TEMP = TEMP+A(L,I)*B(L,J)                 0146
+100                           CONTINUE                                  0147
+                           IF (BETA.EQ.ZERO) THEN                       0148
+                              C(I,J) = ALPHA*TEMP                       0149
                            ELSE
-                              C(I,J) = ALPHA*TEMP+BETA*C(I,J)           0150
+                              C(I,J) = ALPHA*TEMP+BETA*C(I,J)           0151
                            ENDIF
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
-                        DO 130 I = 1, M                                 0162
-                           C(I,J) = ZERO                                0163
-130                        CONTINUE                                     0164
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
-                        DO 140 I = 1, M                                 0166
-                           C(I,J) = BETA*C(I,J)                         0167
-140                        CONTINUE                                     0168
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
+                        DO 130 I = 1, M                                 0163
+                           C(I,J) = ZERO                                0164
+130                        CONTINUE                                     0165
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
+                        DO 140 I = 1, M                                 0167
+                           C(I,J) = BETA*C(I,J)                         0168
+140                        CONTINUE                                     0169
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
-                           DO 150 I = 1, M                              0173
-                              C(I,J) = C(I,J)+TEMP*A(I,L)               0174
-150                           CONTINUE                                  0175
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
+                           DO 150 I = 1, M                              0174
+                              C(I,J) = C(I,J)+TEMP*A(I,L)               0175
+150                           CONTINUE                                  0176
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
-                        DO 180 L = 1, K                                 0186
-                           TEMP = TEMP+A(L,I)*B(J,L)                    0187
-180                        CONTINUE                                     0188
-                        IF (BETA.EQ.ZERO) THEN                          0189
-                           C(I,J) = ALPHA*TEMP                          0190
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
+                        DO 180 L = 1, K                                 0187
+                           TEMP = TEMP+A(L,I)*B(J,L)                    0188
+180                        CONTINUE                                     0189
+                        IF (BETA.EQ.ZERO) THEN                          0190
+                           C(I,J) = ALPHA*TEMP                          0191
                         ELSE
-                           C(I,J) = ALPHA*TEMP+BETA*C(I,J)              0192
+                           C(I,J) = ALPHA*TEMP+BETA*C(I,J)              0193
                         ENDIF
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -545,7 +545,7 @@
       EXTERNAL LSAME
       REAL*4 XERBLA
       EXTERNAL XERBLA
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, 
      &NROWB
@@ -553,8 +553,8 @@
      &SIZE, 1:SIZE), TEMP, ONE, ZERO
       LOGICAL L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -562,18 +562,18 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
 !$PIPS IF_TO_CONVERT
       IF (NOTA) THEN
-         NROWA = M                                                      0045
-         NCOLA = K                                                      0046
+         NROWA = M                                                      0046
+         NCOLA = K                                                      0047
       ENDIF
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
       IF (.NOT.NOTA) THEN
-         NROWA = K                                                      0048
-         NCOLA = M                                                      0049
+         NROWA = K                                                      0049
+         NCOLA = M                                                      0050
       ENDIF
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
@@ -585,10 +585,10 @@
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
       ELSE
          L_6 = .NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(
      &   TRANSB, 'T')
@@ -638,70 +638,70 @@
      &   .NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))) INFO = 13
 !$omp end parallel do
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
-                     DO 10 I = 1, M                                     0097
-                        C(I,J) = ZERO                                   0098
-10                      CONTINUE                                        0099
-20                   CONTINUE                                           0100
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
+                     DO 10 I = 1, M                                     0098
+                        C(I,J) = ZERO                                   0099
+10                      CONTINUE                                        0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
-                     DO 30 I = 1, M                                     0103
-                        C(I,J) = BETA*C(I,J)                            0104
-30                      CONTINUE                                        0105
-40                   CONTINUE                                           0106
+                  DO 40 J = 1, N                                        0103
+                     DO 30 I = 1, M                                     0104
+                        C(I,J) = BETA*C(I,J)                            0105
+30                      CONTINUE                                        0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
-                           DO 50 I = 1, M                               0120
-                              C(I,J) = ZERO                             0121
-50                            CONTINUE                                  0122
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
-                           DO 60 I = 1, M                               0124
-                              C(I,J) = BETA*C(I,J)                      0125
-60                            CONTINUE                                  0126
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
+                           DO 50 I = 1, M                               0121
+                              C(I,J) = ZERO                             0122
+50                            CONTINUE                                  0123
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
+                           DO 60 I = 1, M                               0125
+                              C(I,J) = BETA*C(I,J)                      0126
+60                            CONTINUE                                  0127
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
-                              DO 70 I = 1, M                            0131
-                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0132
-70                               CONTINUE                               0133
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
+                              DO 70 I = 1, M                            0132
+                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0133
+70                               CONTINUE                               0134
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
-                           DO 100 L = 1, K                              0144
-                              TEMP = TEMP+A(L,I)*B(L,J)                 0145
-100                           CONTINUE                                  0146
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
+                           DO 100 L = 1, K                              0145
+                              TEMP = TEMP+A(L,I)*B(L,J)                 0146
+100                           CONTINUE                                  0147
                            L_7 = BETA.EQ.ZERO
 !$PIPS IF_TO_CONVERT
                            IF (L_7) C(I,J) = ALPHA*TEMP
@@ -710,42 +710,42 @@
                            IF (.NOT.L_7) C(I,J) = ALPHA*TEMP+BETA*C(I
      &                     ,J)
 !$omp end parallel do
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
-                        DO 130 I = 1, M                                 0162
-                           C(I,J) = ZERO                                0163
-130                        CONTINUE                                     0164
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
-                        DO 140 I = 1, M                                 0166
-                           C(I,J) = BETA*C(I,J)                         0167
-140                        CONTINUE                                     0168
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
+                        DO 130 I = 1, M                                 0163
+                           C(I,J) = ZERO                                0164
+130                        CONTINUE                                     0165
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
+                        DO 140 I = 1, M                                 0167
+                           C(I,J) = BETA*C(I,J)                         0168
+140                        CONTINUE                                     0169
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
-                           DO 150 I = 1, M                              0173
-                              C(I,J) = C(I,J)+TEMP*A(I,L)               0174
-150                           CONTINUE                                  0175
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
+                           DO 150 I = 1, M                              0174
+                              C(I,J) = C(I,J)+TEMP*A(I,L)               0175
+150                           CONTINUE                                  0176
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
-                        DO 180 L = 1, K                                 0186
-                           TEMP = TEMP+A(L,I)*B(J,L)                    0187
-180                        CONTINUE                                     0188
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
+                        DO 180 L = 1, K                                 0187
+                           TEMP = TEMP+A(L,I)*B(J,L)                    0188
+180                        CONTINUE                                     0189
                         L_8 = BETA.EQ.ZERO
 !$PIPS IF_TO_CONVERT
                         IF (L_8) C(I,J) = ALPHA*TEMP
@@ -753,8 +753,8 @@
 !$PIPS IF_TO_CONVERT
                         IF (.NOT.L_8) C(I,J) = ALPHA*TEMP+BETA*C(I,J)
 !$omp end parallel do
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -770,7 +770,7 @@
       EXTERNAL LSAME
       REAL*4 XERBLA
       EXTERNAL XERBLA
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, 
      &NROWB
@@ -778,8 +778,8 @@
      &SIZE, 1:SIZE), TEMP, ONE, ZERO
       LOGICAL L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -787,18 +787,18 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
 !$PIPS IF_TO_CONVERT
       IF (NOTA) THEN
-         NROWA = M                                                      0045
-         NCOLA = K                                                      0046
+         NROWA = M                                                      0046
+         NCOLA = K                                                      0047
       ENDIF
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
       IF (.NOT.NOTA) THEN
-         NROWA = K                                                      0048
-         NCOLA = M                                                      0049
+         NROWA = K                                                      0049
+         NCOLA = M                                                      0050
       ENDIF
 !$omp end parallel do
 !$PIPS IF_TO_CONVERT
@@ -810,10 +810,10 @@
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
       ELSE
          L_6 = .NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(
      &   TRANSB, 'T')
@@ -863,70 +863,70 @@
      &   .NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))) INFO = 13
 !$omp end parallel do
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
-                     DO 10 I = 1, M                                     0097
-                        C(I,J) = ZERO                                   0098
-10                      CONTINUE                                        0099
-20                   CONTINUE                                           0100
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
+                     DO 10 I = 1, M                                     0098
+                        C(I,J) = ZERO                                   0099
+10                      CONTINUE                                        0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
-                     DO 30 I = 1, M                                     0103
-                        C(I,J) = BETA*C(I,J)                            0104
-30                      CONTINUE                                        0105
-40                   CONTINUE                                           0106
+                  DO 40 J = 1, N                                        0103
+                     DO 30 I = 1, M                                     0104
+                        C(I,J) = BETA*C(I,J)                            0105
+30                      CONTINUE                                        0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
-                           DO 50 I = 1, M                               0120
-                              C(I,J) = ZERO                             0121
-50                            CONTINUE                                  0122
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
-                           DO 60 I = 1, M                               0124
-                              C(I,J) = BETA*C(I,J)                      0125
-60                            CONTINUE                                  0126
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
+                           DO 50 I = 1, M                               0121
+                              C(I,J) = ZERO                             0122
+50                            CONTINUE                                  0123
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
+                           DO 60 I = 1, M                               0125
+                              C(I,J) = BETA*C(I,J)                      0126
+60                            CONTINUE                                  0127
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
-                              DO 70 I = 1, M                            0131
-                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0132
-70                               CONTINUE                               0133
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
+                              DO 70 I = 1, M                            0132
+                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0133
+70                               CONTINUE                               0134
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
-                           DO 100 L = 1, K                              0144
-                              TEMP = TEMP+A(L,I)*B(L,J)                 0145
-100                           CONTINUE                                  0146
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
+                           DO 100 L = 1, K                              0145
+                              TEMP = TEMP+A(L,I)*B(L,J)                 0146
+100                           CONTINUE                                  0147
                            L_7 = BETA.EQ.ZERO
 !$PIPS IF_TO_CONVERT
                            IF (L_7) C(I,J) = ALPHA*TEMP
@@ -935,42 +935,42 @@
                            IF (.NOT.L_7) C(I,J) = ALPHA*TEMP+BETA*C(I
      &                     ,J)
 !$omp end parallel do
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
-                        DO 130 I = 1, M                                 0162
-                           C(I,J) = ZERO                                0163
-130                        CONTINUE                                     0164
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
-                        DO 140 I = 1, M                                 0166
-                           C(I,J) = BETA*C(I,J)                         0167
-140                        CONTINUE                                     0168
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
+                        DO 130 I = 1, M                                 0163
+                           C(I,J) = ZERO                                0164
+130                        CONTINUE                                     0165
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
+                        DO 140 I = 1, M                                 0167
+                           C(I,J) = BETA*C(I,J)                         0168
+140                        CONTINUE                                     0169
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
-                           DO 150 I = 1, M                              0173
-                              C(I,J) = C(I,J)+TEMP*A(I,L)               0174
-150                           CONTINUE                                  0175
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
+                           DO 150 I = 1, M                              0174
+                              C(I,J) = C(I,J)+TEMP*A(I,L)               0175
+150                           CONTINUE                                  0176
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
-                        DO 180 L = 1, K                                 0186
-                           TEMP = TEMP+A(L,I)*B(J,L)                    0187
-180                        CONTINUE                                     0188
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
+                        DO 180 L = 1, K                                 0187
+                           TEMP = TEMP+A(L,I)*B(J,L)                    0188
+180                        CONTINUE                                     0189
                         L_8 = BETA.EQ.ZERO
 !$PIPS IF_TO_CONVERT
                         IF (L_8) C(I,J) = ALPHA*TEMP
@@ -978,8 +978,8 @@
 !$PIPS IF_TO_CONVERT
                         IF (.NOT.L_8) C(I,J) = ALPHA*TEMP+BETA*C(I,J)
 !$omp end parallel do
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -995,7 +995,7 @@
       EXTERNAL LSAME
       REAL*4 XERBLA
       EXTERNAL XERBLA
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NCOLA, NROWA, 
      &NROWB
@@ -1004,8 +1004,8 @@
       LOGICAL L_00, L_10, L_20, L_30, L_40, L_50, L_8, L_7, L_6, L_5
      &, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -1013,8 +1013,8 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
       NROWA = NOTA?M:NROWA
       NCOLA = NOTA?K:NCOLA
       NROWA = .NOT.NOTA?K:NROWA
@@ -1024,10 +1024,10 @@
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
       ELSE
          L_6 = .NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(
      &   TRANSB, 'T')
@@ -1057,118 +1057,118 @@
          INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
      &   .AND.(.NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))?13:INFO
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
-                     DO 10 I = 1, M                                     0097
-                        C(I,J) = ZERO                                   0098
-10                      CONTINUE                                        0099
-20                   CONTINUE                                           0100
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
+                     DO 10 I = 1, M                                     0098
+                        C(I,J) = ZERO                                   0099
+10                      CONTINUE                                        0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
-                     DO 30 I = 1, M                                     0103
-                        C(I,J) = BETA*C(I,J)                            0104
-30                      CONTINUE                                        0105
-40                   CONTINUE                                           0106
+                  DO 40 J = 1, N                                        0103
+                     DO 30 I = 1, M                                     0104
+                        C(I,J) = BETA*C(I,J)                            0105
+30                      CONTINUE                                        0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
-                           DO 50 I = 1, M                               0120
-                              C(I,J) = ZERO                             0121
-50                            CONTINUE                                  0122
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
-                           DO 60 I = 1, M                               0124
-                              C(I,J) = BETA*C(I,J)                      0125
-60                            CONTINUE                                  0126
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
+                           DO 50 I = 1, M                               0121
+                              C(I,J) = ZERO                             0122
+50                            CONTINUE                                  0123
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
+                           DO 60 I = 1, M                               0125
+                              C(I,J) = BETA*C(I,J)                      0126
+60                            CONTINUE                                  0127
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
-                              DO 70 I = 1, M                            0131
-                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0132
-70                               CONTINUE                               0133
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
+                              DO 70 I = 1, M                            0132
+                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0133
+70                               CONTINUE                               0134
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
-                           DO 100 L = 1, K                              0144
-                              TEMP = TEMP+A(L,I)*B(L,J)                 0145
-100                           CONTINUE                                  0146
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
+                           DO 100 L = 1, K                              0145
+                              TEMP = TEMP+A(L,I)*B(L,J)                 0146
+100                           CONTINUE                                  0147
                            L_7 = BETA.EQ.ZERO
                            C0 = ALPHA*TEMP
                            C(I,J) = L_7?C0:C(I,J)
                            C1 = ALPHA*TEMP+BETA*C(I,J)
                            C(I,J) = .NOT.L_7?C1:C(I,J)
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
-                        DO 130 I = 1, M                                 0162
-                           C(I,J) = ZERO                                0163
-130                        CONTINUE                                     0164
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
-                        DO 140 I = 1, M                                 0166
-                           C(I,J) = BETA*C(I,J)                         0167
-140                        CONTINUE                                     0168
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
+                        DO 130 I = 1, M                                 0163
+                           C(I,J) = ZERO                                0164
+130                        CONTINUE                                     0165
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
+                        DO 140 I = 1, M                                 0167
+                           C(I,J) = BETA*C(I,J)                         0168
+140                        CONTINUE                                     0169
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
-                           DO 150 I = 1, M                              0173
-                              C(I,J) = C(I,J)+TEMP*A(I,L)               0174
-150                           CONTINUE                                  0175
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
+                           DO 150 I = 1, M                              0174
+                              C(I,J) = C(I,J)+TEMP*A(I,L)               0175
+150                           CONTINUE                                  0176
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
-                        DO 180 L = 1, K                                 0186
-                           TEMP = TEMP+A(L,I)*B(J,L)                    0187
-180                        CONTINUE                                     0188
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
+                        DO 180 L = 1, K                                 0187
+                           TEMP = TEMP+A(L,I)*B(J,L)                    0188
+180                        CONTINUE                                     0189
                         L_8 = BETA.EQ.ZERO
                         C2 = ALPHA*TEMP
                         C(I,J) = L_8?C2:C(I,J)
                         C3 = ALPHA*TEMP+BETA*C(I,J)
                         C(I,J) = .NOT.L_8?C3:C(I,J)
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -1182,7 +1182,7 @@
      &, BETA, C, LDC)
       LOGICAL*4 LSAME
       EXTERNAL LSAME
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER M, N, K, LDA, LDB, LDC, I, INFO, J, L, NROWA, NROWB
       REAL*4 C3, C2, C1, C0, ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:
@@ -1190,8 +1190,8 @@
       LOGICAL L_00, L_10, L_20, L_30, L_40, L_50, L_8, L_7, L_6, L_5
      &, L_4, L_3, L_2, L_1, L_0, NOTA, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -1199,17 +1199,17 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
       NROWA = NOTA?M:K
       NROWB = NOTB?K:N
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
       ELSE
          L_6 = .NOT.NOTB.AND..NOT.LSAME(TRANSB, 'C').AND..NOT.LSAME(
      &   TRANSB, 'T')
@@ -1239,118 +1239,118 @@
          INFO = .NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3
      &   .AND.(.NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))?13:INFO
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
-                     DO 10 I = 1, M                                     0097
-                        C(I,J) = ZERO                                   0098
-10                      CONTINUE                                        0099
-20                   CONTINUE                                           0100
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
+                     DO 10 I = 1, M                                     0098
+                        C(I,J) = ZERO                                   0099
+10                      CONTINUE                                        0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
-                     DO 30 I = 1, M                                     0103
-                        C(I,J) = BETA*C(I,J)                            0104
-30                      CONTINUE                                        0105
-40                   CONTINUE                                           0106
+                  DO 40 J = 1, N                                        0103
+                     DO 30 I = 1, M                                     0104
+                        C(I,J) = BETA*C(I,J)                            0105
+30                      CONTINUE                                        0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
-                           DO 50 I = 1, M                               0120
-                              C(I,J) = ZERO                             0121
-50                            CONTINUE                                  0122
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
-                           DO 60 I = 1, M                               0124
-                              C(I,J) = BETA*C(I,J)                      0125
-60                            CONTINUE                                  0126
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
+                           DO 50 I = 1, M                               0121
+                              C(I,J) = ZERO                             0122
+50                            CONTINUE                                  0123
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
+                           DO 60 I = 1, M                               0125
+                              C(I,J) = BETA*C(I,J)                      0126
+60                            CONTINUE                                  0127
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
-                              DO 70 I = 1, M                            0131
-                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0132
-70                               CONTINUE                               0133
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
+                              DO 70 I = 1, M                            0132
+                                 C(I,J) = C(I,J)+TEMP*A(I,L)            0133
+70                               CONTINUE                               0134
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
-                           DO 100 L = 1, K                              0144
-                              TEMP = TEMP+A(L,I)*B(L,J)                 0145
-100                           CONTINUE                                  0146
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
+                           DO 100 L = 1, K                              0145
+                              TEMP = TEMP+A(L,I)*B(L,J)                 0146
+100                           CONTINUE                                  0147
                            L_7 = BETA.EQ.ZERO
                            C0 = ALPHA*TEMP
                            C(I,J) = L_7?C0:C(I,J)
                            C1 = ALPHA*TEMP+BETA*C(I,J)
                            C(I,J) = .NOT.L_7?C1:C(I,J)
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
-                        DO 130 I = 1, M                                 0162
-                           C(I,J) = ZERO                                0163
-130                        CONTINUE                                     0164
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
-                        DO 140 I = 1, M                                 0166
-                           C(I,J) = BETA*C(I,J)                         0167
-140                        CONTINUE                                     0168
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
+                        DO 130 I = 1, M                                 0163
+                           C(I,J) = ZERO                                0164
+130                        CONTINUE                                     0165
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
+                        DO 140 I = 1, M                                 0167
+                           C(I,J) = BETA*C(I,J)                         0168
+140                        CONTINUE                                     0169
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
-                           DO 150 I = 1, M                              0173
-                              C(I,J) = C(I,J)+TEMP*A(I,L)               0174
-150                           CONTINUE                                  0175
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
+                           DO 150 I = 1, M                              0174
+                              C(I,J) = C(I,J)+TEMP*A(I,L)               0175
+150                           CONTINUE                                  0176
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
-                        DO 180 L = 1, K                                 0186
-                           TEMP = TEMP+A(L,I)*B(J,L)                    0187
-180                        CONTINUE                                     0188
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
+                        DO 180 L = 1, K                                 0187
+                           TEMP = TEMP+A(L,I)*B(J,L)                    0188
+180                        CONTINUE                                     0189
                         L_8 = BETA.EQ.ZERO
                         C2 = ALPHA*TEMP
                         C(I,J) = L_8?C2:C(I,J)
                         C3 = ALPHA*TEMP+BETA*C(I,J)
                         C(I,J) = .NOT.L_8?C3:C(I,J)
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -1364,7 +1364,7 @@
      &, BETA, C, LDC)
       LOGICAL*4 LSAME
       EXTERNAL LSAME
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER I_2, I_1, I_0, M, N, K, LDA, LDB, LDC, I, INFO, J, L, 
      &NROWA, NROWB
@@ -1383,8 +1383,8 @@
      &, L_40, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA
      &, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -1392,17 +1392,17 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
       NROWA = NOTA?M:K
       NROWB = NOTB?K:N
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
       ELSE
          L_9 = .NOT.NOTB
          L_11 = LSAME(TRANSB, 'C')
@@ -1512,72 +1512,72 @@
          L_97 = L_86.AND.L_96
          INFO = L_97?13:INFO
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
-                     DO 10 I = 1, M                                     0097
-                        C(I,J) = ZERO                                   0098
-10                      CONTINUE                                        0099
-20                   CONTINUE                                           0100
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
+                     DO 10 I = 1, M                                     0098
+                        C(I,J) = ZERO                                   0099
+10                      CONTINUE                                        0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
-                     DO 30 I = 1, M                                     0103
-                        C(I,J) = BETA*C(I,J)                            0104
-30                      CONTINUE                                        0105
-40                   CONTINUE                                           0106
+                  DO 40 J = 1, N                                        0103
+                     DO 30 I = 1, M                                     0104
+                        C(I,J) = BETA*C(I,J)                            0105
+30                      CONTINUE                                        0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
-                           DO 50 I = 1, M                               0120
-                              C(I,J) = ZERO                             0121
-50                            CONTINUE                                  0122
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
-                           DO 60 I = 1, M                               0124
-                              C(I,J) = BETA*C(I,J)                      0125
-60                            CONTINUE                                  0126
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
+                           DO 50 I = 1, M                               0121
+                              C(I,J) = ZERO                             0122
+50                            CONTINUE                                  0123
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
+                           DO 60 I = 1, M                               0125
+                              C(I,J) = BETA*C(I,J)                      0126
+60                            CONTINUE                                  0127
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
-                              DO 70 I = 1, M                            0131
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
+                              DO 70 I = 1, M                            0132
                                  F_0 = TEMP*A(I,L)
-                                 C(I,J) = C(I,J)+F_0                    0132
-70                               CONTINUE                               0133
+                                 C(I,J) = C(I,J)+F_0                    0133
+70                               CONTINUE                               0134
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
-                           DO 100 L = 1, K                              0144
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
+                           DO 100 L = 1, K                              0145
                               F_1 = A(L,I)*B(L,J)
-                              TEMP = TEMP+F_1                           0145
-100                           CONTINUE                                  0146
+                              TEMP = TEMP+F_1                           0146
+100                           CONTINUE                                  0147
                            L_7 = BETA.EQ.ZERO
                            C0 = ALPHA*TEMP
                            C(I,J) = L_7?C0:C(I,J)
@@ -1586,44 +1586,44 @@
                            C1 = F_2+F_3
                            L_98 = .NOT.L_7
                            C(I,J) = L_98?C1:C(I,J)
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
-                        DO 130 I = 1, M                                 0162
-                           C(I,J) = ZERO                                0163
-130                        CONTINUE                                     0164
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
-                        DO 140 I = 1, M                                 0166
-                           C(I,J) = BETA*C(I,J)                         0167
-140                        CONTINUE                                     0168
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
+                        DO 130 I = 1, M                                 0163
+                           C(I,J) = ZERO                                0164
+130                        CONTINUE                                     0165
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
+                        DO 140 I = 1, M                                 0167
+                           C(I,J) = BETA*C(I,J)                         0168
+140                        CONTINUE                                     0169
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
-                           DO 150 I = 1, M                              0173
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
+                           DO 150 I = 1, M                              0174
                               F_4 = TEMP*A(I,L)
-                              C(I,J) = C(I,J)+F_4                       0174
-150                           CONTINUE                                  0175
+                              C(I,J) = C(I,J)+F_4                       0175
+150                           CONTINUE                                  0176
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
-                        DO 180 L = 1, K                                 0186
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
+                        DO 180 L = 1, K                                 0187
                            F_5 = A(L,I)*B(J,L)
-                           TEMP = TEMP+F_5                              0187
-180                        CONTINUE                                     0188
+                           TEMP = TEMP+F_5                              0188
+180                        CONTINUE                                     0189
                         L_8 = BETA.EQ.ZERO
                         C2 = ALPHA*TEMP
                         C(I,J) = L_8?C2:C(I,J)
@@ -1632,8 +1632,8 @@
                         C3 = F_6+F_7
                         L_99 = .NOT.L_8
                         C(I,J) = L_99?C3:C(I,J)
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -1647,7 +1647,7 @@
      &, BETA, C, LDC)
       LOGICAL*4 LSAME
       EXTERNAL LSAME
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER LU_IND9, LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, 
      &LU_IND7, LU_IB7, LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, 
@@ -1670,8 +1670,8 @@
      &, L_40, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA
      &, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -1679,17 +1679,17 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
       NROWA = NOTA?M:K
       NROWB = NOTB?K:N
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
       ELSE
          L_9 = .NOT.NOTB
          L_11 = LSAME(TRANSB, 'C')
@@ -1799,21 +1799,21 @@
          L_97 = L_86.AND.L_96
          INFO = L_97?13:INFO
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
                      LU_NUB0 = M
                      LU_IB0 = MOD(LU_NUB0, 4)
                      DO 99999 LU_IND0 = 0, LU_IB0-1
@@ -1826,9 +1826,9 @@
                         C(LU_IND0+4,J) = ZERO
 99998                   CONTINUE
                      I = MAX0(LU_NUB0, 0)+1
-20                   CONTINUE                                           0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
+                  DO 40 J = 1, N                                        0103
                      LU_NUB1 = M
                      LU_IB1 = MOD(LU_NUB1, 4)
                      DO 99997 LU_IND1 = 0, LU_IB1-1
@@ -1841,19 +1841,19 @@
                         C(LU_IND1+4,J) = BETA*C(LU_IND1+4,J)
 99996                   CONTINUE
                      I = MAX0(LU_NUB1, 0)+1
-40                   CONTINUE                                           0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
                            LU_NUB2 = M
                            LU_IB2 = MOD(LU_NUB2, 4)
                            DO 99995 LU_IND2 = 0, LU_IB2-1
@@ -1866,7 +1866,7 @@
                               C(LU_IND2+4,J) = ZERO
 99994                         CONTINUE
                            I = MAX0(LU_NUB2, 0)+1
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
                            LU_NUB3 = M
                            LU_IB3 = MOD(LU_NUB3, 4)
                            DO 99993 LU_IND3 = 0, LU_IB3-1
@@ -1880,9 +1880,9 @@
 99992                         CONTINUE
                            I = MAX0(LU_NUB3, 0)+1
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
                               LU_NUB4 = M
                               LU_IB4 = MOD(LU_NUB4, 4)
                               DO 99991 LU_IND4 = 0, LU_IB4-1
@@ -1901,15 +1901,15 @@
 99990                            CONTINUE
                               I = MAX0(LU_NUB4, 0)+1
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
                            LU_NUB5 = K
                            LU_IB5 = MOD(LU_NUB5, 4)
                            DO 99989 LU_IND5 = 0, LU_IB5-1
@@ -1935,15 +1935,15 @@
                            C1 = F_2+F_3
                            L_98 = .NOT.L_7
                            C(I,J) = L_98?C1:C(I,J)
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
                         LU_NUB6 = M
                         LU_IB6 = MOD(LU_NUB6, 4)
                         DO 99987 LU_IND6 = 0, LU_IB6-1
@@ -1956,7 +1956,7 @@
                            C(LU_IND6+4,J) = ZERO
 99986                      CONTINUE
                         I = MAX0(LU_NUB6, 0)+1
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
                         LU_NUB7 = M
                         LU_IB7 = MOD(LU_NUB7, 4)
                         DO 99985 LU_IND7 = 0, LU_IB7-1
@@ -1970,9 +1970,9 @@
 99984                      CONTINUE
                         I = MAX0(LU_NUB7, 0)+1
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
                            LU_NUB8 = M
                            LU_IB8 = MOD(LU_NUB8, 4)
                            DO 99983 LU_IND8 = 0, LU_IB8-1
@@ -1991,15 +1991,15 @@
 99982                         CONTINUE
                            I = MAX0(LU_NUB8, 0)+1
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
                         LU_NUB9 = K
                         LU_IB9 = MOD(LU_NUB9, 4)
                         DO 99981 LU_IND9 = 0, LU_IB9-1
@@ -2025,8 +2025,8 @@
                         C3 = F_6+F_7
                         L_99 = .NOT.L_8
                         C(I,J) = L_99?C3:C(I,J)
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -2040,7 +2040,7 @@
      &, BETA, C, LDC)
       LOGICAL*4 LSAME
       EXTERNAL LSAME
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER LU_IND9, LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, 
      &LU_IND7, LU_IB7, LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, 
@@ -2063,8 +2063,8 @@
      &, L_40, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA
      &, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -2072,17 +2072,17 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
       NROWA = NOTA?M:K
       NROWB = NOTB?K:N
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
       ELSE
          L_9 = .NOT.NOTB
          L_11 = LSAME(TRANSB, 'C')
@@ -2192,21 +2192,21 @@
          L_97 = L_86.AND.L_96
          INFO = L_97?13:INFO
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
                      LU_NUB0 = M
                      LU_IB0 = MOD(LU_NUB0, 4)
                      DO 99999 LU_IND0 = 0, LU_IB0-1
@@ -2219,9 +2219,9 @@
                         C(4+LU_IND0,J) = ZERO
 99998                   CONTINUE
                      I = 1+MAX0(LU_NUB0, 0)
-20                   CONTINUE                                           0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
+                  DO 40 J = 1, N                                        0103
                      LU_NUB1 = M
                      LU_IB1 = MOD(LU_NUB1, 4)
                      DO 99997 LU_IND1 = 0, LU_IB1-1
@@ -2234,19 +2234,19 @@
                         C(4+LU_IND1,J) = BETA*C(4+LU_IND1,J)
 99996                   CONTINUE
                      I = 1+MAX0(LU_NUB1, 0)
-40                   CONTINUE                                           0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
                            LU_NUB2 = M
                            LU_IB2 = MOD(LU_NUB2, 4)
                            DO 99995 LU_IND2 = 0, LU_IB2-1
@@ -2259,7 +2259,7 @@
                               C(4+LU_IND2,J) = ZERO
 99994                         CONTINUE
                            I = 1+MAX0(LU_NUB2, 0)
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
                            LU_NUB3 = M
                            LU_IB3 = MOD(LU_NUB3, 4)
                            DO 99993 LU_IND3 = 0, LU_IB3-1
@@ -2273,9 +2273,9 @@
 99992                         CONTINUE
                            I = 1+MAX0(LU_NUB3, 0)
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
                               LU_NUB4 = M
                               LU_IB4 = MOD(LU_NUB4, 4)
                               DO 99991 LU_IND4 = 0, LU_IB4-1
@@ -2294,15 +2294,15 @@
 99990                            CONTINUE
                               I = 1+MAX0(LU_NUB4, 0)
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
                            LU_NUB5 = K
                            LU_IB5 = MOD(LU_NUB5, 4)
                            DO 99989 LU_IND5 = 0, LU_IB5-1
@@ -2328,15 +2328,15 @@
                            C1 = F_2+F_3
                            L_98 = .NOT.L_7
                            C(I,J) = L_98?C1:C(I,J)
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
                         LU_NUB6 = M
                         LU_IB6 = MOD(LU_NUB6, 4)
                         DO 99987 LU_IND6 = 0, LU_IB6-1
@@ -2349,7 +2349,7 @@
                            C(4+LU_IND6,J) = ZERO
 99986                      CONTINUE
                         I = 1+MAX0(LU_NUB6, 0)
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
                         LU_NUB7 = M
                         LU_IB7 = MOD(LU_NUB7, 4)
                         DO 99985 LU_IND7 = 0, LU_IB7-1
@@ -2363,9 +2363,9 @@
 99984                      CONTINUE
                         I = 1+MAX0(LU_NUB7, 0)
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
                            LU_NUB8 = M
                            LU_IB8 = MOD(LU_NUB8, 4)
                            DO 99983 LU_IND8 = 0, LU_IB8-1
@@ -2384,15 +2384,15 @@
 99982                         CONTINUE
                            I = 1+MAX0(LU_NUB8, 0)
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
                         LU_NUB9 = K
                         LU_IB9 = MOD(LU_NUB9, 4)
                         DO 99981 LU_IND9 = 0, LU_IB9-1
@@ -2418,8 +2418,8 @@
                         C3 = F_6+F_7
                         L_99 = .NOT.L_8
                         C(I,J) = L_99?C3:C(I,J)
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -2430,7 +2430,7 @@
      &, BETA, C, LDC)
       LOGICAL*4 LSAME
       EXTERNAL LSAME
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER LU_IND9, LU_IB9, LU_NUB9, LU_IND8, LU_IB8, LU_NUB8, 
      &LU_IND7, LU_IB7, LU_NUB7, LU_IND6, LU_IB6, LU_NUB6, LU_IND5, 
@@ -2453,8 +2453,8 @@
      &, L_40, L_50, L_8, L_7, L_6, L_5, L_4, L_3, L_2, L_1, L_0, NOTA
      &, NOTB
       CHARACTER TRANSA, TRANSB
-      ONE = 1.0E+0                                                      0033
-      ZERO = 0.0E+0                                                     0034
+      ONE = 1.0E+0                                                      0034
+      ZERO = 0.0E+0                                                     0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -2462,17 +2462,17 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA, 'N')                                         0042
-      NOTB = LSAME(TRANSB, 'N')                                         0043
+      NOTA = LSAME(TRANSA, 'N')                                         0043
+      NOTB = LSAME(TRANSB, 'N')                                         0044
       NROWA = NOTA?M:K
       NROWB = NOTB?K:N
 *
 *     Test the input parameters.
 *
-      INFO = 0                                                          0059
-      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0060
-     &, 'T')) THEN                                                      0060
-         INFO = 1                                                       0063
+      INFO = 0                                                          0060
+      IF (.NOT.NOTA.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(TRANSA   0061
+     &, 'T')) THEN                                                      0061
+         INFO = 1                                                       0064
       ELSE
          L_9 = .NOT.NOTB
          L_11 = LSAME(TRANSB, 'C')
@@ -2582,21 +2582,21 @@
          L_97 = L_86.AND.L_96
          INFO = L_97?13:INFO
       ENDIF
-      IF (INFO.NE.0) THEN                                               0081
+      IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0088
-     &   .EQ.ONE) THEN                                                  0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO.OR.K.EQ.0).AND.BETA     0089
+     &   .EQ.ONE) THEN                                                  0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO) THEN                                     0094
-               IF (BETA.EQ.ZERO) THEN                                   0095
-                  DO 20 J = 1, N                                        0096
+            IF (ALPHA.EQ.ZERO) THEN                                     0095
+               IF (BETA.EQ.ZERO) THEN                                   0096
+                  DO 20 J = 1, N                                        0097
                      LU_NUB0 = M
                      LU_IB0 = MOD(LU_NUB0, 4)
                      DO 99999 LU_IND0 = 0, LU_IB0-1
@@ -2608,9 +2608,9 @@
                         C(LU_IND0+3,J) = ZERO
                         C(LU_IND0+4,J) = ZERO
 99998                   CONTINUE
-20                   CONTINUE                                           0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J = 1, N                                        0102
+                  DO 40 J = 1, N                                        0103
                      LU_NUB1 = M
                      LU_IB1 = MOD(LU_NUB1, 4)
                      DO 99997 LU_IND1 = 0, LU_IB1-1
@@ -2622,19 +2622,19 @@
                         C(LU_IND1+3,J) = BETA*C(LU_IND1+3,J)
                         C(LU_IND1+4,J) = BETA*C(LU_IND1+4,J)
 99996                   CONTINUE
-40                   CONTINUE                                           0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB) THEN                                           0113
-                  IF (NOTA) THEN                                        0114
+               IF (NOTB) THEN                                           0114
+                  IF (NOTA) THEN                                        0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J = 1, N                                     0118
-                        IF (BETA.EQ.ZERO) THEN                          0119
+                     DO 90 J = 1, N                                     0119
+                        IF (BETA.EQ.ZERO) THEN                          0120
                            LU_NUB2 = M
                            LU_IB2 = MOD(LU_NUB2, 4)
                            DO 99995 LU_IND2 = 0, LU_IB2-1
@@ -2646,7 +2646,7 @@
                               C(LU_IND2+3,J) = ZERO
                               C(LU_IND2+4,J) = ZERO
 99994                         CONTINUE
-                        ELSEIF (BETA.NE.ONE) THEN                       0119
+                        ELSEIF (BETA.NE.ONE) THEN                       0120
                            LU_NUB3 = M
                            LU_IB3 = MOD(LU_NUB3, 4)
                            DO 99993 LU_IND3 = 0, LU_IB3-1
@@ -2659,9 +2659,9 @@
                               C(LU_IND3+4,J) = BETA*C(LU_IND3+4,J)
 99992                         CONTINUE
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J).NE.ZERO) THEN                     0129
-                              TEMP = ALPHA*B(L,J)                       0130
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J).NE.ZERO) THEN                     0130
+                              TEMP = ALPHA*B(L,J)                       0131
                               LU_NUB4 = M
                               LU_IB4 = MOD(LU_NUB4, 4)
                               DO 99991 LU_IND4 = 0, LU_IB4-1
@@ -2679,15 +2679,15 @@
                                  C(LU_IND4+4,J) = C(LU_IND4+4,J)+F_0
 99990                            CONTINUE
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J = 1, N                                    0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO                                  0143
+                     DO 120 J = 1, N                                    0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO                                  0144
                            LU_NUB5 = K
                            LU_IB5 = MOD(LU_NUB5, 4)
                            DO 99989 LU_IND5 = 0, LU_IB5-1
@@ -2712,15 +2712,15 @@
                            C1 = F_2+F_3
                            L_98 = .NOT.L_7
                            C(I,J) = L_98?C1:C(I,J)
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA) THEN                                       0113
+               ELSEIF (NOTA) THEN                                       0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J = 1, N                                       0160
-                     IF (BETA.EQ.ZERO) THEN                             0161
+                  DO 170 J = 1, N                                       0161
+                     IF (BETA.EQ.ZERO) THEN                             0162
                         LU_NUB6 = M
                         LU_IB6 = MOD(LU_NUB6, 4)
                         DO 99987 LU_IND6 = 0, LU_IB6-1
@@ -2732,7 +2732,7 @@
                            C(LU_IND6+3,J) = ZERO
                            C(LU_IND6+4,J) = ZERO
 99986                      CONTINUE
-                     ELSEIF (BETA.NE.ONE) THEN                          0161
+                     ELSEIF (BETA.NE.ONE) THEN                          0162
                         LU_NUB7 = M
                         LU_IB7 = MOD(LU_NUB7, 4)
                         DO 99985 LU_IND7 = 0, LU_IB7-1
@@ -2745,9 +2745,9 @@
                            C(LU_IND7+4,J) = BETA*C(LU_IND7+4,J)
 99984                      CONTINUE
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J,L).NE.ZERO) THEN                        0171
-                           TEMP = ALPHA*B(J,L)                          0172
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J,L).NE.ZERO) THEN                        0172
+                           TEMP = ALPHA*B(J,L)                          0173
                            LU_NUB8 = M
                            LU_IB8 = MOD(LU_NUB8, 4)
                            DO 99983 LU_IND8 = 0, LU_IB8-1
@@ -2765,15 +2765,15 @@
                               C(LU_IND8+4,J) = C(LU_IND8+4,J)+F_4
 99982                         CONTINUE
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J = 1, N                                       0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO                                     0185
+                  DO 200 J = 1, N                                       0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO                                     0186
                         LU_NUB9 = K
                         LU_IB9 = MOD(LU_NUB9, 4)
                         DO 99981 LU_IND9 = 0, LU_IB9-1
@@ -2798,8 +2798,8 @@
                         C3 = F_6+F_7
                         L_99 = .NOT.L_8
                         C(I,J) = L_99?C3:C(I,J)
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -2810,7 +2810,7 @@
      &, BETA, C, LDC)
       LOGICAL*4 LSAME
       EXTERNAL LSAME
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 10)
       INTEGER NROWB0, NROWA0, J5, J4, J3, J2, J1, J0, INFO1, INFO0, 
      &I_00, I_10, I_20, LU_IND00, LU_IND10, LU_IND20, LU_IND30, 
@@ -2837,8 +2837,8 @@
      &, L_940, L_950, L_960, L_970, L_99, L_98, L_8, L_7, L_5, L_4, 
      &L_3, L_2, L_1, L_0
       CHARACTER TRANSA, TRANSB
-      ONE0 = 1.0E+0                                                     0033
-      ZERO0 = 0.0E+0                                                    0034
+      ONE0 = 1.0E+0                                                     0034
+      ZERO0 = 0.0E+0                                                    0035
 *     ..
 *     .. Executable Statements ..
 *
@@ -2846,17 +2846,17 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA0 = LSAME(TRANSA, 'N')                                        0042
-      NOTB0 = LSAME(TRANSB, 'N')                                        0043
+      NOTA0 = LSAME(TRANSA, 'N')                                        0043
+      NOTB0 = LSAME(TRANSB, 'N')                                        0044
       NROWA0 = NOTA0?M:K
       NROWB0 = NOTB0?K:N
 *
 *     Test the input parameters.
 *
-      INFO0 = 0                                                         0059
-      IF (.NOT.NOTA0.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(        0060
-     &TRANSA, 'T')) THEN                                                0060
-         INFO1 = 1                                                      0063
+      INFO0 = 0                                                         0060
+      IF (.NOT.NOTA0.AND..NOT.LSAME(TRANSA, 'C').AND..NOT.LSAME(        0061
+     &TRANSA, 'T')) THEN                                                0061
+         INFO1 = 1                                                      0064
          INFO0 = INFO1
       ELSE
          L_911 = .NOT.NOTB0
@@ -2967,21 +2967,21 @@
          L_970 = L_860.AND.L_960
          INFO0 = L_970?13:INFO0
       ENDIF
-      IF (INFO0.NE.0) THEN                                              0081
+      IF (INFO0.NE.0) THEN                                              0082
 *         CALL XERBLA( 'SGEMM ', INFO )
       ELSE
 *
 *     Quick return if possible.
 *
-         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO0.OR.K.EQ.0).AND.BETA    0088
-     &   .EQ.ONE0) THEN                                                 0088
+         IF (M.EQ.0.OR.N.EQ.0.OR.(ALPHA.EQ.ZERO0.OR.K.EQ.0).AND.BETA    0089
+     &   .EQ.ONE0) THEN                                                 0089
          ELSE
 *
 *     And if  alpha.eq.zero.
 *
-            IF (ALPHA.EQ.ZERO0) THEN                                    0094
-               IF (BETA.EQ.ZERO0) THEN                                  0095
-                  DO 20 J0 = 1, N                                       0096
+            IF (ALPHA.EQ.ZERO0) THEN                                    0095
+               IF (BETA.EQ.ZERO0) THEN                                  0096
+                  DO 20 J0 = 1, N                                       0097
                      LU_NUB0 = M
                      LU_IB0 = MOD(LU_NUB0, 4)
                      DO 99999 LU_IND00 = 0, LU_IB0-1
@@ -2993,9 +2993,9 @@
                         C(LU_IND0+3,J0) = ZERO0
                         C(LU_IND0+4,J0) = ZERO0
 99998                   CONTINUE
-20                   CONTINUE                                           0100
+20                   CONTINUE                                           0101
                ELSE
-                  DO 40 J1 = 1, N                                       0102
+                  DO 40 J1 = 1, N                                       0103
                      LU_NUB1 = M
                      LU_IB1 = MOD(LU_NUB1, 4)
                      DO 99997 LU_IND10 = 0, LU_IB1-1
@@ -3007,19 +3007,19 @@
                         C(LU_IND1+3,J1) = BETA*C(LU_IND1+3,J1)
                         C(LU_IND1+4,J1) = BETA*C(LU_IND1+4,J1)
 99996                   CONTINUE
-40                   CONTINUE                                           0106
+40                   CONTINUE                                           0107
                ENDIF
             ELSE
 *
 *     Start the operations.
 *
-               IF (NOTB0) THEN                                          0113
-                  IF (NOTA0) THEN                                       0114
+               IF (NOTB0) THEN                                          0114
+                  IF (NOTA0) THEN                                       0115
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-                     DO 90 J2 = 1, N                                    0118
-                        IF (BETA.EQ.ZERO0) THEN                         0119
+                     DO 90 J2 = 1, N                                    0119
+                        IF (BETA.EQ.ZERO0) THEN                         0120
                            LU_NUB2 = M
                            LU_IB2 = MOD(LU_NUB2, 4)
                            DO 99995 LU_IND20 = 0, LU_IB2-1
@@ -3031,7 +3031,7 @@
                               C(LU_IND2+3,J2) = ZERO0
                               C(LU_IND2+4,J2) = ZERO0
 99994                         CONTINUE
-                        ELSEIF (BETA.NE.ONE0) THEN                      0119
+                        ELSEIF (BETA.NE.ONE0) THEN                      0120
                            LU_NUB3 = M
                            LU_IB3 = MOD(LU_NUB3, 4)
                            DO 99993 LU_IND30 = 0, LU_IB3-1
@@ -3045,9 +3045,9 @@
                               C(LU_IND3+4,J2) = BETA*C(LU_IND3+4,J2)
 99992                         CONTINUE
                         ENDIF
-                        DO 80 L = 1, K                                  0128
-                           IF (B(L,J2).NE.ZERO0) THEN                   0129
-                              TEMP = ALPHA*B(L,J2)                      0130
+                        DO 80 L = 1, K                                  0129
+                           IF (B(L,J2).NE.ZERO0) THEN                   0130
+                              TEMP = ALPHA*B(L,J2)                      0131
                               LU_NUB4 = M
                               LU_IB4 = MOD(LU_NUB4, 4)
                               DO 99991 LU_IND40 = 0, LU_IB4-1
@@ -3070,15 +3070,15 @@
      &                           F_03
 99990                            CONTINUE
                            ENDIF
-80                         CONTINUE                                     0135
-90                      CONTINUE                                        0136
+80                         CONTINUE                                     0136
+90                      CONTINUE                                        0137
                   ELSE
 *
 *           Form  C := alpha*A'*B + beta*C
 *
-                     DO 120 J3 = 1, N                                   0141
-                        DO 110 I = 1, M                                 0142
-                           TEMP = ZERO0                                 0143
+                     DO 120 J3 = 1, N                                   0142
+                        DO 110 I = 1, M                                 0143
+                           TEMP = ZERO0                                 0144
                            LU_NUB5 = K
                            LU_IB5 = MOD(LU_NUB5, 4)
                            DO 99989 LU_IND50 = 0, LU_IB5-1
@@ -3103,15 +3103,15 @@
                            C1 = F_2+F_3
                            L_98 = .NOT.L_7
                            C(I,J3) = L_98?C1:C(I,J3)
-110                        CONTINUE                                     0152
-120                     CONTINUE                                        0153
+110                        CONTINUE                                     0153
+120                     CONTINUE                                        0154
                   ENDIF
-               ELSEIF (NOTA0) THEN                                      0113
+               ELSEIF (NOTA0) THEN                                      0114
 *
 *           Form  C := alpha*A*B' + beta*C
 *
-                  DO 170 J4 = 1, N                                      0160
-                     IF (BETA.EQ.ZERO0) THEN                            0161
+                  DO 170 J4 = 1, N                                      0161
+                     IF (BETA.EQ.ZERO0) THEN                            0162
                         LU_NUB6 = M
                         LU_IB6 = MOD(LU_NUB6, 4)
                         DO 99987 LU_IND60 = 0, LU_IB6-1
@@ -3123,7 +3123,7 @@
                            C(LU_IND6+3,J4) = ZERO0
                            C(LU_IND6+4,J4) = ZERO0
 99986                      CONTINUE
-                     ELSEIF (BETA.NE.ONE0) THEN                         0161
+                     ELSEIF (BETA.NE.ONE0) THEN                         0162
                         LU_NUB7 = M
                         LU_IB7 = MOD(LU_NUB7, 4)
                         DO 99985 LU_IND70 = 0, LU_IB7-1
@@ -3136,9 +3136,9 @@
                            C(LU_IND7+4,J4) = BETA*C(LU_IND7+4,J4)
 99984                      CONTINUE
                      ENDIF
-                     DO 160 L = 1, K                                    0170
-                        IF (B(J4,L).NE.ZERO0) THEN                      0171
-                           TEMP = ALPHA*B(J4,L)                         0172
+                     DO 160 L = 1, K                                    0171
+                        IF (B(J4,L).NE.ZERO0) THEN                      0172
+                           TEMP = ALPHA*B(J4,L)                         0173
                            LU_NUB8 = M
                            LU_IB8 = MOD(LU_NUB8, 4)
                            DO 99983 LU_IND80 = 0, LU_IB8-1
@@ -3156,15 +3156,15 @@
                               C(LU_IND8+4,J4) = C(LU_IND8+4,J4)+F_43
 99982                         CONTINUE
                         ENDIF
-160                     CONTINUE                                        0177
-170                  CONTINUE                                           0178
+160                     CONTINUE                                        0178
+170                  CONTINUE                                           0179
                ELSE
 *
 *           Form  C := alpha*A'*B' + beta*C
 *
-                  DO 200 J5 = 1, N                                      0183
-                     DO 190 I = 1, M                                    0184
-                        TEMP = ZERO0                                    0185
+                  DO 200 J5 = 1, N                                      0184
+                     DO 190 I = 1, M                                    0185
+                        TEMP = ZERO0                                    0186
                         LU_NUB9 = K
                         LU_IB9 = MOD(LU_NUB9, 4)
                         DO 99981 LU_IND90 = 0, LU_IB9-1
@@ -3189,8 +3189,8 @@
                         C3 = F_6+F_7
                         L_99 = .NOT.L_8
                         C(I,J5) = L_99?C3:C(I,J5)
-190                     CONTINUE                                        0194
-200                  CONTINUE                                           0195
+190                     CONTINUE                                        0195
+200                  CONTINUE                                           0196
                ENDIF
 *
             ENDIF
@@ -3307,7 +3307,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
        float a[10][10], int *lda_p4a_copy, float b[10][10], int *ldb_p4a_copy,
        float *beta_p4a_copy, float c[10][10], int *ldc_p4a_copy)
 {
-  static const float size = 10;
+  static const int size = 10;
   a4sf pdata3;
   v4sf vec210;
   v4sf vec200;
