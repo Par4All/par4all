@@ -81,3 +81,15 @@ run_pgi:
 	for target in $(TARGETS) ; do \
 		make -C $$target $@ ; \
 	done
+
+hmpp:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
+
+run_hmpp:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
+
+

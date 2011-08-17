@@ -22,12 +22,14 @@ OMP_SOURCE := $(TARGET).openmp.c
 CUDA_SOURCE := $(TARGET).naive$(P4A_CUDA_SUFFIX)
 CUDA_OPT_SOURCE := $(TARGET).opt$(P4A_CUDA_SUFFIX)
 GENERATED_KERNELS = $(wildcard p4a_new_files/*.cu)
+HMPP_SOURCE := hmpp/$(TARGET).hmpp.c
 
 SEQ_TARGET := $(TARGET)_seq
 OMP_TARGET := $(TARGET)_openmp
 CUDA_TARGET := $(TARGET)_cuda
 CUDA_OPT_TARGET := $(TARGET)_cuda_opt
 PGI_TARGET := $(TARGET)_cuda_pgi
+HMPP_TARGET := $(TARGET)_cuda_hmpp
 
 
 # Compilation flags
@@ -99,6 +101,9 @@ cuda_opt: $(CUDA_OPT_TARGET)
 $(PGI_TARGET): $(SOURCE) $(COMMON)
 	pgcc $^ -o $@ $(COMMON_FLAGS) $(LDFLAGS) $(CFLAGS) -DPGI_ACC -ta=nvidia,cc13 $(PGI_FLAGS)
 pgi: $(PGI_TARGET)
+$(HMPP_TARGET): $(HMPP_SOURCE) $(COMMON)
+	hmpp --codelet-required --nvcc-options -arch,sm_13 gcc $(COMMON_FLAGS) $(CFLAGS) $(GCCFLAGS) $(LDFLAGS) $^ -o $@
+hmpp: $(HMPP_TARGET)
 
 # Run target
 run_seq: $(SEQ_TARGET)
@@ -121,11 +126,15 @@ run_pgi: $(PGI_TARGET)
 	for run in $(NRUNS); do \
 		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
 	done
+run_hmpp: $(HMPP_TARGET)
+	for run in $(NRUNS); do \
+		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
+	done
 
 # Clean targets
 clean: 
-	rm -Rf $(OMP_SOURCE) $(CUDA_SOURCE) $(CUDA_OPT_SOURCE) *.database *.build .*.tmp p4a_new_files P4A  *.o
+	rm -Rf $(OMP_SOURCE) $(CUDA_SOURCE) $(CUDA_OPT_SOURCE) *.database *.build .*.tmp p4a_new_files P4A  *.o mycodelet*.cu*
 dist-clean: clean 
-	rm -f $(TARGET) $(PGI_TARGET) $(CUDA_TARGET) $(CUDA_OPT_TARGET) $(OMP_TARGET) $(SEQ_TARGET) $(TARGET)_run_seq.time $(TARGET)_run_openmp.time $(TARGET)_run_cuda.time $(TARGET)_run_cuda_opt.time
+	rm -f $(TARGET) $(PGI_TARGET) $(HMPP_TARGET) $(CUDA_TARGET) $(CUDA_OPT_TARGET) $(OMP_TARGET) $(SEQ_TARGET) $(TARGET)_run_seq.time $(TARGET)_run_openmp.time $(TARGET)_run_cuda.time $(TARGET)_run_cuda_opt.time mycodelet*.so
 
 
