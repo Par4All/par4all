@@ -1020,9 +1020,7 @@ static bool check_c_file_syntax(string file_name)
   comp = comp? comp: DEFAULT_PIPS_CC;
   flags = flags? flags: DEFAULT_PIPS_CC_FLAGS;
 
-  flags = strdup(concatenate(flags," --std=gnu99",0));
   syntax_ok_p = check_input_file_syntax(file_name, comp, flags);
-  free(flags);
 
   return syntax_ok_p;
 }
