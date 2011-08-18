@@ -989,6 +989,7 @@ check_input_file_syntax(string file_name, string compiler, string options)
 		      file_name);
     syntax_ok_p = false;
   }
+  free(includes);
   return syntax_ok_p;
 }
 
