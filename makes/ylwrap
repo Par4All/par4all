@@ -66,6 +66,7 @@ esac
 
 # The input.
 input="$1"
+input_dir=
 shift
 case "$input" in
   [\\/]* | ?:[\\/]*)
@@ -74,6 +75,7 @@ case "$input" in
   *)
     # Relative path.  Make it absolute.
     input="`pwd`/$input"
+	input_dir="`pwd`/"
     ;;
 esac
 
@@ -132,8 +134,6 @@ if test $ret -eq 0; then
     y_tab_nodot="yes"
   fi
 
-  # The directory holding the input.
-  input_dir=`echo "$input" | sed -e 's,\([\\/]\)[^\\/]*$,\1,'`
   # Quote $INPUT_DIR so we can use it in a regexp.
   # FIXME: really we should care about more than `.' and `\'.
   input_rx=`echo "$input_dir" | sed 's,\\\\,\\\\\\\\,g;s,\\.,\\\\.,g'`
