@@ -1,4 +1,6 @@
 delete consel
+# Extension to variable lenth arrays
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create consel consel.f
 
 # setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE

@@ -1,4 +1,8 @@
 delete inter02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv PIPS_CHECK_FORTRAN="Y"
+
 create inter02 inter02.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE

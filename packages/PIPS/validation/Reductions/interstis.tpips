@@ -1,4 +1,9 @@
 delete interstis
+
+setproperty ABORT_ON_USER_ERROR TRUE
+# Argument type for intrinsics MIN()
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create interstis interstis.f
 
 #activate some debug mode

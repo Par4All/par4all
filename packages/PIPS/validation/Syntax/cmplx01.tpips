@@ -1,4 +1,5 @@
 delete cmplx01
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create cmplx01 cmplx01.f
 display PRINTED_FILE
 display PRINTED_FILE[FOO]

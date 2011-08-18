@@ -36,27 +36,27 @@ int main()
    int *p = 0;
 
 // Points To:
-// p -> &*NULL_POINTER* , EXACT
+// p -> *NULL_POINTER* , EXACT
 
    int **q = 0;
 
 // Points To:
-// p -> &*NULL_POINTER* , EXACT
-// q -> &*NULL_POINTER* , EXACT
+// p -> *NULL_POINTER* , EXACT
+// q -> *NULL_POINTER* , EXACT
 
 
    *p = 1;
 
 // Points To:
-// p -> &*NULL_POINTER* , EXACT
-// q -> &*NULL_POINTER* , EXACT
+// p -> *NULL_POINTER* , EXACT
+// q -> *NULL_POINTER* , EXACT
 
    *q = &i;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> &i , EXACT
-// p -> &*NULL_POINTER* , EXACT
-// q -> &*NULL_POINTER* , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
+// p -> *NULL_POINTER* , EXACT
+// q -> *NULL_POINTER* , EXACT
 
 
    return 0;

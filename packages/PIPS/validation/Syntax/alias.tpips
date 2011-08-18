@@ -1,0 +1,7 @@
+delete alias
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+create alias alias.f
+display PRINTED_FILE 
+close
+delete alias
+quit

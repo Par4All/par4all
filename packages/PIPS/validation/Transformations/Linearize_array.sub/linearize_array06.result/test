@@ -1,0 +1,50 @@
+typedef int ARRAY[10];
+
+int vla(int size, int *d, int e[3][3]);
+
+int vla(int size, int *d, int e[3][3]);
+//PIPS generated variable
+void *alloca(unsigned int);
+int vla(int size, int *d, int e[3][3])
+{
+   int n = d[size+1];
+   int *a = (int *) alloca(sizeof(int[n]));
+   int b[10];
+   ARRAY c;
+   {
+      int i;
+
+      i = 0;
+      while (i<n) {
+         b[i] = i;
+         *(a+i) = i*b[i];
+         *(d+(size+1)) = i;
+         i++;
+      }
+   }
+}
+typedef int ARRAY[10];
+
+int vla(int size, int *d, int *e);
+
+int vla(int size, int *d, int *e);
+//PIPS generated variable
+void *alloca(unsigned int);
+int vla(int size, int *d, int *e)
+{
+   int n = *(d+(size+1));
+   int *a = (int *) alloca(sizeof(int[n]));
+   int *b = (int *) alloca(sizeof(int[10]));
+   ARRAY c = (int *) alloca(sizeof(ARRAY));
+   {
+      int i;
+
+      i = 0;
+      while (i<n) {
+         *(b+i) = i;
+         *(a+i) = i**(b+i);
+         *(d+(size+1)) = i;
+         i++;
+      }
+   }
+}

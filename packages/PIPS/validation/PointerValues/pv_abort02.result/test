@@ -2,7 +2,7 @@ int main()
 {
    int **a;
    int b;
-   a = (int **) NULL;
+   a = (int **) 0;
    a[0] = &b;
    return 0;
 }

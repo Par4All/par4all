@@ -1,0 +1,2 @@
+case simplified from "retina" example in "freia"
+at least missing 'goto _break_1;' after '// BREAK 8'

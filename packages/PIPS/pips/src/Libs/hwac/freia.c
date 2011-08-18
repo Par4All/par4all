@@ -291,6 +291,7 @@ static bool statement_depends_p(set written, statement s)
 
 typedef struct {
   list seqs; // of list of statements
+  hash_table sequence; // list of statement -> its owner sequence if any
   int enclosing_loops; // count kept while recurring
   set in_loops; // elements in the list encountered in inclosing loops
 } freia_info;
@@ -381,6 +382,7 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
       {
         sort_subsequence(ls, sq);
         fsip->seqs = CONS(list, ls, fsip->seqs);
+        hash_put(fsip->sequence, ls, sq);
         if (fsip->enclosing_loops)
           set_add_element(fsip->in_loops, fsip->in_loops, ls);
         ls = NIL;
@@ -397,6 +399,7 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
       move_ahead(lup, STATEMENT(CAR(gen_last(ls))), sq);
     sort_subsequence(ls, sq);
     fsip->seqs = CONS(list, ls, fsip->seqs);
+    hash_put(fsip->sequence, ls, sq);
     if (fsip->enclosing_loops)
       set_add_element(fsip->in_loops, fsip->in_loops, ls);
     ls = NIL;
@@ -469,7 +472,8 @@ string freia_compile(string module, statement mod_stat, string target)
   if (get_bool_property("FREIA_CAST_IS_COPY"))
     switch_cast_to_copy(mod_stat);
 
-  freia_info fsi = { NIL, 0, set_make(hash_pointer) };
+  freia_info fsi = 
+    { NIL, hash_table_make(hash_pointer, 0), 0, set_make(hash_pointer) };
   freia_init_dep_cache();
 
   // collect freia api functions...
@@ -544,15 +548,27 @@ string freia_compile(string module, statement mod_stat, string target)
     }
 
     list allocated = NIL;
+    hash_table exchanges = NULL;
+    if (hash_defined_p(fsi.sequence, ls))
+      exchanges = hash_table_make(hash_pointer, 0);
 
     if (freia_spoc_p(target))
-      allocated = freia_spoc_compile_calls(module, d, ls, occs, output_images,
-                                           helper, n_dags);
+      allocated = freia_spoc_compile_calls(module, d, ls, occs, exchanges,
+                                           output_images, helper, n_dags);
     else if (freia_terapix_p(target))
-      allocated = freia_trpx_compile_calls(module, d, ls, occs, output_images,
-                                           helper, n_dags);
+      allocated = freia_trpx_compile_calls(module, d, ls, occs, exchanges,
+                                           output_images, helper, n_dags);
     else if (freia_aipo_p(target))
-      allocated = freia_aipo_compile_calls(module, d, ls, occs, n_dags);
+      allocated = freia_aipo_compile_calls(module, d, ls, occs,
+                                           exchanges, n_dags);
+
+    if (exchanges)
+    {
+      list lssq = sequence_statements((sequence) hash_get(fsi.sequence, ls));
+      HASH_FOREACH(dagvtx, v1, dagvtx, v2, exchanges)
+        gen_exchange_in_list(lssq, dagvtx_statement(v1), dagvtx_statement(v2));
+    }
+
 
     if (allocated)
     {
@@ -566,6 +582,7 @@ string freia_compile(string module, statement mod_stat, string target)
     // cleanup list contents on the fly
     gen_free_list(ls);
     free_dag(d);
+    if (exchanges) hash_table_free(exchanges);
   }
 
   // cleanup
@@ -574,6 +591,7 @@ string freia_compile(string module, statement mod_stat, string target)
   set_free(output_images), output_images = NULL;
   gen_free_list(fsi.seqs);
   set_free(fsi.in_loops);
+  hash_table_free(fsi.sequence);
   gen_free_list(ldags);
   if (helper) safe_fclose(helper, file);
 

@@ -1,4 +1,9 @@
 delete syntax_cast
+
+setproperty ABORT_ON_USER_ERROR TRUE
+# bugged excerpt
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create syntax_cast syntax_cast_test.c
 activate C_PARSER
 apply ATOMIC_CHAINS[%ALLFUNC]

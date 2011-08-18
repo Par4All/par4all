@@ -1,4 +1,6 @@
 delete adi02
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+# Variable k is used uninitialized...
 create adi02 adi02.c
 
 # echo cat adi02.database/[a-z_]*[a-z_]/*.c

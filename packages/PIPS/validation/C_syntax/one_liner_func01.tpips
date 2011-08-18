@@ -1,5 +1,6 @@
 delete one_liner_func01
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create one_liner_func01 one_liner_func01.c
 
 activate C_PARSER

@@ -1,6 +1,8 @@
 delete t
 
 setproperty ABORT_ON_USER_ERROR FALSE
+# A label is used for a FORMAT and for a GOTO
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create t io_statement.f
 

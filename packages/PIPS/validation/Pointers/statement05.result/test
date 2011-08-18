@@ -42,78 +42,78 @@ int main()
    int **x, **y, *z, *t;
 
 // Points To:
-// t -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// z -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    int i, j;
 
 // Points To:
-// t -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// z -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    i = 1;
 
 // Points To:
-// t -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// z -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    j = 2;
 
 // Points To:
-// t -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// z -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    z = &i;
 
 // Points To:
-// t -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> &i , EXACT
+// t -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// z -> i , EXACT
 
    t = &j;
 
 // Points To:
-// t -> &j , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> &i , EXACT
+// t -> j , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// z -> i , EXACT
 
 
    z = t;
 
 // Points To:
-// t -> &j , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> &j , EXACT
+// t -> j , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// z -> j , EXACT
 
    *x = z;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> &j , EXACT
-// t -> &j , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> &j , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
+// t -> j , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// z -> j , EXACT
 
    printf(" x = %p\n", x);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> &j , EXACT
-// t -> &j , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// z -> &j , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> j , EXACT
+// t -> j , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// z -> j , EXACT
 
    return 0;
 }

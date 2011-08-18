@@ -2,6 +2,8 @@ delete rule4
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setenv SHELL /bin/bash
+# Plenty of errors in C code
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create rule4 rule4.c
 

@@ -1,5 +1,10 @@
 set ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 delete vbl3
+
+setproperty ABORT_ON_USER_ERROR TRUE
+# gfortran limited on IO's
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create vbl3 vbl3.f
 module VBL3
 activate MUST_REGIONS # MUST regions

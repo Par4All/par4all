@@ -1,5 +1,7 @@
 delete data10
-delete data10
+
+# gfortran does not like the data statement
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create data10 data10.f
 

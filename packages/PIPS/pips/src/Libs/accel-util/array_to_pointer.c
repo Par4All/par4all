@@ -572,7 +572,7 @@ static void do_linearize_array(entity m, statement s, param_t *param) {
     do_linearize_array_walker(s);
 
     FOREACH(ENTITY,e,entity_declarations(m))
-        if(entity_variable_p(e) && array_to_pointer_VLA_only_p(e))
+        if(entity_variable_p(e))
             do_linearize_array_walker(entity_initial(e));
 
     /* step2: the declarations */

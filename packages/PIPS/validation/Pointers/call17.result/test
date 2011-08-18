@@ -16,20 +16,20 @@ POINTS-TO
 
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
 void call17(int *x)
 {
    /* check aliases */
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
    int *y = x;
 
 // Points To:
-// x -> &_x_1[0] , EXACT
-// y -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
+// y -> _x_1[0] , EXACT
 
    y[0] = 1;
 }

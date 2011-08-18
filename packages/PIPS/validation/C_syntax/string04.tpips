@@ -1,4 +1,5 @@
 delete string04
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create string04 string04.c
 
 activate C_PARSER

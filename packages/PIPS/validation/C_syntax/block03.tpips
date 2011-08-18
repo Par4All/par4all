@@ -1,6 +1,7 @@
 delete block03
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create block03 block03.c
 

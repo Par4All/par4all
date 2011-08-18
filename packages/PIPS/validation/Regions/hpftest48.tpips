@@ -1,4 +1,9 @@
 delete hpftest48
+
+setproperty ABORT_ON_USER_ERROR TRUE
+# Logical to integer implicit type conversion not supported by gfrotran
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create hpftest48 hpftest48.f
 module HPFTEST48
 activate MUST_REGIONS

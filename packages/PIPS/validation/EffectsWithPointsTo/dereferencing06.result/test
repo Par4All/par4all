@@ -40,14 +40,14 @@ void dereferencing06()
    double *p = &x;
 
 // Points To:
-// p -> &x , EXACT
+// p -> x , EXACT
 
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
 
 // Points To:
-// p -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 
    *p++ = 1;
 }

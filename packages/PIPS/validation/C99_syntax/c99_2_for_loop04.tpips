@@ -1,6 +1,7 @@
 setenv WS c99_2_for_loop04
 delete $WS
 # Recycle source from previous example:
+setenv PIPS_CPP_FLAGS=" -std=c99 "
 create $WS c99_2_for_loop03.c
 
 setproperty PRETTYPRINT_BLOCKS TRUE

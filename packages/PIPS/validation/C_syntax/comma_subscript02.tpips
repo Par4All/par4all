@@ -1,6 +1,7 @@
 delete comma_subscript02
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create comma_subscript02 comma_subscript02.c
 

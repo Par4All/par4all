@@ -1,4 +1,9 @@
 delete nbdiag
+
+setproperty ABORT_ON_USER_ERROR TRUE
+# adustable arrays not supported by gfrotran
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create nbdiag nbdiag.f
 module NBDIAG
 activate MUST_REGIONS

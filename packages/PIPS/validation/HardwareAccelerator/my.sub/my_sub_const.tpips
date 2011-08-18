@@ -1,0 +1,4 @@
+setproperty FREIA_NORMALIZE_OPERATIONS FALSE
+setenv WSPACE my_sub_const
+setenv FILE my_sub_const.c
+source default_tpips

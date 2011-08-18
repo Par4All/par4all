@@ -1,7 +1,7 @@
 // Check for lack of predicates in schrammel04.c, NSAD 2010
 
 main()
-`{
+{
   int i, j = 2, k;
   float x;
 

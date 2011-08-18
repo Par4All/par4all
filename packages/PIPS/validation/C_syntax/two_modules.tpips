@@ -1,5 +1,7 @@
 delete two_modules
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create two_modules two_modules.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5

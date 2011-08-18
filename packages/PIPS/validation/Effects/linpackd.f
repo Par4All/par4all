@@ -1,6 +1,6 @@
 C introduced a program header by Manju : 17-4-96
 C introduced a dummy function second() by Manju : 17-4-96
-      PROGRAM Linpackd()
+      PROGRAM Linpackd
       double precision aa(200,200),a(201,200),b(200),x(200)
       double precision time(8,6),cray,ops,total,norma,normx
       double precision resid,residn,eps,epslon

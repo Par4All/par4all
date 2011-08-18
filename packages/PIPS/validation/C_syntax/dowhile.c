@@ -10,4 +10,5 @@ main()
     } /* End of do while */
   while (c>0);
   /* End of function */
+  return 0;
 }

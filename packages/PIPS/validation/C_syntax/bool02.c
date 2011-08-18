@@ -9,4 +9,5 @@ int bool02()
   _Bool i;
 
   i = true;
+  return (int) i;
 }

@@ -16,7 +16,7 @@ int main()
 // s3.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
 // s3.c == *ANY_MODULE*:*UNDEFINED* (exact);
 
-   int b = 1, c = 2;
+   int b = 1, c = 2, d;
 
 // Pointer values:
 // s1.a == *ANY_MODULE*:*UNDEFINED* (exact);

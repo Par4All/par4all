@@ -5,6 +5,7 @@ delete $WSPACE
 setenv LANG C
 setenv LC_ALL C
 setenv LC_COLLATE C
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create $WSPACE $FILE include/hpfc_stubs.direct.f include/stub.f
 setproperty ABORT_ON_USER_ERROR TRUE
 #use this one because dirty tricks with include as comments are used

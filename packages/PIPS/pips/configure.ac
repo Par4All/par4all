@@ -120,9 +120,12 @@ AX_ARG_ENABLE([tpips],
 			 # These tests discover differences between readline 4.1 and 4.3, with modified cppflags
 			 ax_cppflags="$CPPFLAGS"
 			 CPPFLAGS="$CPPFLAGS $READLINE_CPPFLAGS"
-			 AC_CHECK_DECLS([rl_completion_matches], , ,[#include <readline/readline.h>])
-			 AC_CHECK_DECLS([rl_filename_completion_function], , ,[#include<readline/readline.h>])
-			 AC_CHECK_TYPES([rl_compentry_func_t], , , [#include <readline/readline.h>])
+			 AC_CHECK_DECLS([rl_completion_matches], , ,[#include <stdio.h>
+							 #include <readline/readline.h>])
+			 AC_CHECK_DECLS([rl_filename_completion_function], , ,[#include <stdio.h>
+							 #include<readline/readline.h>])
+			 AC_CHECK_TYPES([rl_compentry_func_t], , , [#include <stdio.h>
+							 #include <readline/readline.h>])
 			 #reset CPPFLAGS
 			 CPPFLAGS="$ax_cppflags"
 			 AX_CHECK_PKG([ncurses],[tgetent],[term.h])

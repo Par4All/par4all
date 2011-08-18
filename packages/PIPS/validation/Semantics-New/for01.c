@@ -4,7 +4,7 @@
 
 #define min(x,y) ((x)<=(y)?(x):(y))
 
-int inc(inti )
+int inc(int i)
 {
   return i+1;
 }

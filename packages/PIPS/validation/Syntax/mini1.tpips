@@ -1,4 +1,5 @@
 delete mini1
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create mini1 mini1.f
 
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE

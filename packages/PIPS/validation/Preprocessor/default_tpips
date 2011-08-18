@@ -2,6 +2,8 @@ delete ${WSPACE}
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setenv SHELL /bin/bash
+# FI: Stupid, but preserves restrict.c which is dead wrong
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create ${WSPACE} ${FILE}
 

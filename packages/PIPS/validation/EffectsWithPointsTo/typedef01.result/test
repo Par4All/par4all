@@ -54,30 +54,30 @@ void compute()
 }
 
 // Points To:
-// argv[*] -> &_argv_1[0] , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
 int main(int argc, char *argv[])
 {
 
 // Points To:
-// argv[*] -> &_argv_1[0] , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
    int t;
 
 // Points To:
-// argv[*] -> &_argv_1[0] , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
    
    
    for(t = 0; t <= 63; t += 1)
 
 // Points To:
-// argv[*] -> &_argv_1[0] , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
       compute();
 
 // Points To:
-// argv[*] -> &_argv_1[0] , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
    
    

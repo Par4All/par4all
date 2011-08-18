@@ -1,5 +1,6 @@
 setenv WS="varargs03"
 delete $WS
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create $WS $WS.c
 display PRINTED_FILE[%ALL]
 close

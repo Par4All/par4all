@@ -1,4 +1,8 @@
 #!/bin/sh
+PIPS_CHECK_FORTRAN="NO"
+export PIPS_CHECK_FORTRAN
+#echo $PIPS_CHECK_FORTRAN
+#exit 0
 if Pips -q -f prefix.f -w prefix -m prefix -b PRINTED_FILE 2>&1 \
     | sed '/\//d'
 then

@@ -1,4 +1,5 @@
 delete ifthenelse06
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create ifthenelse06 ifthenelse06.f
 
 echo

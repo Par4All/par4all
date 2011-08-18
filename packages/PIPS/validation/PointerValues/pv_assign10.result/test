@@ -66,7 +66,7 @@ int main()
 // l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
 // l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
-   l2.next = (my_list) NULL;
+   l2.next = (my_list *) (void *) 0;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
@@ -76,7 +76,7 @@ int main()
 // l3.next == *ANY_MODULE*:*UNDEFINED* (exact);
 // l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
-   l3.next = (my_list) NULL;
+   l3.next = (my_list *) (void *) 0;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
@@ -86,7 +86,7 @@ int main()
 // l3.next == *ANY_MODULE*:*NULL* (exact);
 // l4.next == *ANY_MODULE*:*UNDEFINED* (exact);
 
-   l4.next = (my_list) NULL;
+   l4.next = (my_list *) (void *) 0;
 
 // Pointer values:
 // l == *ANY_MODULE*:*UNDEFINED* (exact);
@@ -138,7 +138,7 @@ int main()
 // l3.next == *ANY_MODULE*:*NULL* (exact);
 // l4.next == *ANY_MODULE*:*NULL* (exact);
 
-   l3.next = (my_list) NULL;
+   l3.next = (my_list *) (void *) 0;
 
 // Pointer values:
 // l == &l4 (exact);

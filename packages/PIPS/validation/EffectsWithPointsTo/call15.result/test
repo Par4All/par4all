@@ -23,21 +23,21 @@ POINTS-TO
 
 
 // Points To:
-// pi -> &_pi_1[0] , EXACT
-// q -> &_q_2[0] , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> _q_2[0] , EXACT
 
 void call15(int *pi, tf_t *q)
 {
 
 // Points To:
-// pi -> &_pi_1[0] , EXACT
-// q -> &_q_2[0] , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    *pi = 1;
 
 // Points To:
-// pi -> &_pi_1[0] , EXACT
-// q -> &_q_2[0] , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    q->one = 1;
 }

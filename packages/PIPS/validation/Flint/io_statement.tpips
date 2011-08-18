@@ -1,4 +1,6 @@
 delete t
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create t io_statement.f
 apply TYPE_CHECKER[%ALL]
 display PRINTED_FILE

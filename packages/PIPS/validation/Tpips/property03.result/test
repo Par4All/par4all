@@ -1,3 +1,5 @@
+
+### stderr
 setproperty ABORT_ON_USER_ERROR FALSE
 setpropertycoelho
            ^
@@ -15,4 +17,3 @@ shellecho foo
      ^
 at line 7 in "./property03.tpips2"
 user error in tp_error: space expected after initial keyword
-

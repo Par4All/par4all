@@ -157,7 +157,7 @@ digraph "freia_13_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops (0 copies), optimized to 3 (0 copies)
+// dag 0: 3 ops (0 copies), optimized to 3 (0+0 copies)
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -452,10 +452,10 @@ freia_status freia_13_helper_0_0_0(
   redres.size = sizeof(terapix_reduction);
 
   // 0: C() -> 2
-  mcu_macro[0][0].xmin??? = imagelet_io_2_0;
-  mcu_macro[1][0].xmin??? = imagelet_io_2_1;
-  mcu_macro[0][0].ymin??? = 0;
-  mcu_macro[1][0].ymin??? = 0;
+  mcu_macro[0][0].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
   // copy of operation 0 parameters
   p_0[0] = pi2;
   gram.xoffset = x_0;

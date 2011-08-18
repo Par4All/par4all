@@ -3,6 +3,8 @@
 #
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 delete ft
+# Type conversion issue
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create ft funtype.f
 echo # before cleaning declarations
 display PRINTED_FILE[%ALL]

@@ -1,1 +1,2 @@
+      INTEGER SIZE
       PARAMETER (SIZE=1000)

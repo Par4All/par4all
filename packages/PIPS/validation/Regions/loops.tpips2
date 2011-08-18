@@ -1,4 +1,9 @@
 delete loops
+
+setproperty ABORT_ON_USER_ERROR TRUE
+# gfortran is restrictive on IOs
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create loops loops.f
 setproperty ABORT_ON_USER_ERROR FALSE
 setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE

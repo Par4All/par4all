@@ -1,5 +1,8 @@
 #!/bin/sh
 
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
 tpips=${tpips_version:-tpips}
 
 ($tpips 2>&1 | sed '/file *\//d') <<EOF

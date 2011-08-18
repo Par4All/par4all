@@ -1,6 +1,7 @@
 # Check parser property PARSER_WARN_FOR_COLUMNS_73_80
 # Check handling of long comments and long lines of instruction
 delete longline2
+setenv PIPS_CHECK_FORTRAN="Y"
 create longline2 longline2.f
 set PARSER_WARN_FOR_COLUMNS_73_80 TRUE
 display PRINTED_FILE[%ALL]

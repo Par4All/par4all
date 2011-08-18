@@ -6,4 +6,5 @@ int bool02()
    _Bool i;
 
    i = 1;
+   return (int) i;
 }

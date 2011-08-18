@@ -2,6 +2,9 @@
 
 # Typing inconsistency for FOO
 
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
 tpips=${tpips_version:-tpips}
 
 Delete synthesis06

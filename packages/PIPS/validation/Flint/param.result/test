@@ -147,4 +147,3 @@
       PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0042
       PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0043
       END
-run resulting code

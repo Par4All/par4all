@@ -16,4 +16,5 @@ typedef struct allocatable_2d {
 main()
 {
   allocatable_2d a;
+  return 0;
 }

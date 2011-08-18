@@ -1,0 +1,846 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void ts_singlestate(void)
+{
+
+//  T(i1,i2,n,n0,x,x0,z,z0) {}
+
+   int n0, x0, z0, n, x, z, i1, i2;
+
+//  T(n0) {0<=n0}
+
+   n0 = rand();
+
+//  T(x0) {0<=n0, 0<=x0}
+
+   x0 = rand();
+
+//  T(z0) {0<=n0, 0<=x0, 0<=z0}
+
+   z0 = rand();
+
+//  T() {0<=n0, x0<=n0, z0<=n0, 0<=x0, 0<=z0}
+
+   if (!(n0>=x0&&n0>=z0))
+
+//  T() {0==-1}
+
+      deadlock();
+
+//  T(n) {n==n0, 0<=n, x0<=n, z0<=n, 0<=x0, 0<=z0}
+
+   n = n0;
+
+//  T(x) {n==n0, x==x0, 0<=n, x<=n, z0<=n, 0<=x, 0<=z0}
+
+   x = x0;
+
+//  T(z) {n==n0, x==x0, z==z0, 0<=n, x<=n, z<=n, 0<=x, 0<=z}
+
+   z = z0;
+
+//  T(i1,i2) {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n, x<=n, z<=n,
+//    0<=x, 0<=z}
+
+   i1 = i2 = 0;
+
+//  T() {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n, x<=n, z<=n, 0<=x,
+//    0<=z}
+
+   if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(i1,i2,x,z) {i1+x#init==i1#init+x, i1+x0==x,
+//    i2+z#init==i2#init+z, i2+z0==z, n==n0, i1#init<=i1, x<=n, z<=n,
+//    x0<=x, 0<=x0, z#init<=z, z0<=z, 0<=z0}
+
+   while (rand_b())
+
+//  T(i1,i2,x,z) {i1+i2==i1#init+i2#init+1, i1+x#init==i1#init+x,
+//    i1+z==i1#init+z#init+1, n==n0, i1#init<=i1, i1<=i1#init+1,
+//    i1#init+x+1<=i1+n, i1+x0<=n, i2+z0<=n, x0<=n, z0<=n, 0<=x0,
+//    0<=z0}
+
+      if (rand_b()) {
+
+//  T() {n==n0, x+1<=n, x0<=n, z0<=n, x+1<=z, 0<=x0, 0<=z0}
+
+         if (!(x<n&&z>x))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {n==n0, x==x#init+1, x<=n, x0<=n, z0<=n, x<=z, 0<=x0, 0<=z0}
+
+         x++;
+
+//  T(i1) {i1==i1#init+1, n==n0, x<=n, x0<=n, z0<=n, x<=z, 0<=x0,
+//    0<=z0}
+
+         i1++;
+
+//  T() {n==n0, i1+x0<=n, i2+z0<=n, x<=n, x0<=n, z0<=n, x<=z, 0<=x0,
+//    0<=z0}
+
+         if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {n==n0, x+1<=n, x0<=n, z0<=n, z<=x, 0<=x0, 0<=z0}
+
+         if (!(x<n&&z<=x))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(z) {n==n0, z==z#init+1, x+1<=n, x0<=n, z0<=n, z<=x+1, 0<=x0,
+//    0<=z0}
+
+         z++;
+
+//  T(i2) {i2==i2#init+1, n==n0, x+1<=n, x0<=n, z0<=n, z<=x+1, 0<=x0,
+//    0<=z0}
+
+         i2++;
+
+//  T() {n==n0, i1+x0<=n, i2+z0<=n, x+1<=n, x0<=n, z0<=n, z<=x+1,
+//    0<=x0, 0<=z0}
+
+         if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  T() {}
+
+void ts_restructured(void)
+{
+
+//  T(i1,i2,n,n0,x,x0,z,z0) {}
+
+   int n0, x0, z0, n, x, z, i1, i2;
+
+//  T(n0) {0<=n0}
+
+   n0 = rand();
+
+//  T(x0) {0<=n0, 0<=x0}
+
+   x0 = rand();
+
+//  T(z0) {0<=n0, 0<=x0, 0<=z0}
+
+   z0 = rand();
+
+//  T() {0<=n0, x0<=n0, z0<=n0, 0<=x0, 0<=z0}
+
+   if (!(n0>=x0&&n0>=z0))
+
+//  T() {0==-1}
+
+      deadlock();
+
+//  T(n) {n==n0, 0<=n, x0<=n, z0<=n, 0<=x0, 0<=z0}
+
+   n = n0;
+
+//  T(x) {n==n0, x==x0, 0<=n, x<=n, z0<=n, 0<=x, 0<=z0}
+
+   x = x0;
+
+//  T(z) {n==n0, x==x0, z==z0, 0<=n, x<=n, z<=n, 0<=x, 0<=z}
+
+   z = z0;
+
+//  T(i1,i2) {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n, x<=n, z<=n,
+//    0<=x, 0<=z}
+
+   i1 = i2 = 0;
+
+//  T() {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n, x<=n, z<=n, 0<=x,
+//    0<=z}
+
+   if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(i1,i2,x,z) {i1+x#init==n, i1#init==0, i2+z#init==z, i2#init==0,
+//    n==n0, n==x, x#init==x0, z#init==z0, x#init<=n, n<=x#init+z,
+//    z<=n, z#init<=z, 0<=z#init}
+
+   if (x<n) {
+
+//  T(i2,z) {i1==0, i2+z#init==z, i2+z0==z, i2#init==0, n==n0, x==x0,
+//    0<=i2, i2<=x+1, z<=n, 0<=x, x+1<=z}
+
+      if (z<=x) {
+
+//  T(i2,z) {i1==0, i2+z#init==i2#init+z, i2+z0==z, n==n0, x==x0,
+//    x+1<=n, z<=x, z#init<=z, z0<=z, 0<=z0}
+
+         while (rand_b()) {
+
+//  T() {i1==0, n==n0, x==x0, x+1<=n, z+1<=x, z0<=x, 0<=z0}
+
+            if (!(x<n&&z<x))
+
+//  T() {0==-1}
+
+               deadlock();
+
+//  T(z) {i1==0, n==n0, x==x0, z==z#init+1, x+1<=n, z<=x, z0<=x,
+//    0<=z0}
+
+            z++;
+
+//  T(i2) {i1==0, i2==i2#init+1, n==n0, x==x0, x+1<=n, z<=x, z0<=x,
+//    0<=z0}
+
+            i2++;
+
+//  T() {i1==0, n==n0, x==x0, i2+z0<=n, x+1<=n, z<=x, z0<=x, 0<=z0}
+
+            if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+
+//  T() {i1==0, i2+z0==x, n==n0, x==x0, x==z, 0<=n, x+1<=n, z0<=n,
+//    0<=x, z0<=x, 0<=z0}
+
+         if (!(x<n&&z==x))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(z) {i1==0, i2+z0==x, n==n0, x==x0, x==z-1, x==z#init, 0<=n,
+//    x+1<=n, z0<=n, 0<=x, z0<=x, 0<=z0}
+
+         z++;
+
+//  T(i2) {i1==0, i2==i2#init+1, i2+z0==x+1, n==n0, x==x0, x==z-1,
+//    0<=n, x+1<=n, z0<=n, 0<=x, z0<=x, 0<=z0}
+
+         i2++;
+
+//  T() {i1==0, i2+z0==x+1, n==n0, x==x0, x==z-1, 0<=n, x+1<=n, z0<=n,
+//    0<=x, z0<=x, 0<=z0}
+
+         if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T(i1,i2,x,z) {i1+x#init==i1#init+x, i1+x0==x,
+//    i2+z#init==i2#init+z, i2+z0==z, n==n0, 0<=i1,
+//    i1#init+z<=i1+z#init, i2<=i1+x0+1, i1+x0+1<=i2+z0, 0<=i2,
+//    i2+z0<=n, 0<=x0, z#init<=z}
+
+      while (rand_b())
+
+//  T(i1,i2,x,z) {i1==i1#init+1, i2+z#init==i2#init+z, n==n0,
+//    x==x#init+1, i1+x0<=n, i2+z0<=n, x+1<=n, x0+1<=n, z0<=n, x+1<=z,
+//    0<=x0, z#init<=z, z<=z#init+1, 0<=z0}
+
+         if (rand_b()) {
+
+//  T() {n==n0, x+2<=n, x0+1<=n, z0<=n, x+2<=z, 0<=x0, 0<=z0}
+
+            if (!(x<n-1&&z>x+1))
+
+//  T() {0==-1}
+
+               deadlock();
+
+//  T(x) {n==n0, x==x#init+1, x+1<=n, x0+1<=n, z0<=n, x+1<=z, 0<=x0,
+//    0<=z0}
+
+            x++;
+
+//  T(i1) {i1==i1#init+1, n==n0, x+1<=n, x0+1<=n, z0<=n, x+1<=z,
+//    0<=x0, 0<=z0}
+
+            i1++;
+
+//  T() {n==n0, i1+x0<=n, i2+z0<=n, x+1<=n, x0+1<=n, z0<=n, x+1<=z,
+//    0<=x0, 0<=z0}
+
+            if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else {
+
+//  T() {n==n0, x==z-1, x+2<=n, x0+1<=n, z0<=n, 0<=x0, 0<=z0}
+
+            if (!(x<n-1&&z==x+1))
+
+//  T() {0==-1}
+
+               deadlock();
+
+//  T(x) {n==n0, x==x#init+1, x==z, x+1<=n, x0+1<=n, z0<=n, 0<=x0,
+//    0<=z0}
+
+            x++;
+
+//  T(i1) {i1==i1#init+1, n==n0, x==z, x+1<=n, x0+1<=n, z0<=n, 0<=x0,
+//    0<=z0}
+
+            i1++;
+
+//  T() {n==n0, x==z, i1+x0<=n, i2+z0<=n, x+1<=n, x0+1<=n, z0<=n,
+//    0<=x0, 0<=z0}
+
+            if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+               checking_error();
+
+//  T(i2,z) {i2+z#init==i2#init+x, n==n0, x==z, i1+x0<=n, i2+z0<=n,
+//    x+1<=n, x0+1<=n, z0<=n, z#init<=x, 0<=x0, 0<=z0}
+
+            while (rand_b()) {
+
+//  T() {n==n0, i1+x0<=n, x+1<=n, x0+1<=n, z0<=n, z+1<=x, 0<=x0,
+//    0<=z0}
+
+               if (!(x<n&&z<x))
+
+//  T() {0==-1}
+
+                  deadlock();
+
+//  T(z) {n==n0, z==z#init+1, i1+x0<=n, x+1<=n, x0+1<=n, z0<=n, z<=x,
+//    0<=x0, 0<=z0}
+
+               z++;
+
+//  T(i2) {i2==i2#init+1, n==n0, i1+x0<=n, x+1<=n, x0+1<=n, z0<=n,
+//    z<=x, 0<=x0, 0<=z0}
+
+               i2++;
+
+//  T() {n==n0, i1+x0<=n, i2+z0<=n, x+1<=n, x0+1<=n, z0<=n, z<=x,
+//    0<=x0, 0<=z0}
+
+               if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+                  checking_error();
+            }
+
+//  T() {n==n0, x==z, i1+x0<=n, i2+z0<=n, x+1<=n, x0+1<=n, z0<=n,
+//    0<=x0, 0<=z0}
+
+            if (!(x<n&&z==x))
+
+//  T() {0==-1}
+
+               deadlock();
+
+//  T(z) {n==n0, x==z-1, x==z#init, i1+x0<=n, i2+z0<=n, x+1<=n,
+//    x0+1<=n, z0<=n, 0<=x0, 0<=z0}
+
+            z++;
+
+//  T(i2) {i2==i2#init+1, n==n0, x==z-1, i1+x0<=n, i2+z0<=n+1, x+1<=n,
+//    x0+1<=n, z0<=n, 0<=x0, 0<=z0}
+
+            i2++;
+
+//  T() {n==n0, x==z-1, i1+x0<=n, i2+z0<=n, x+1<=n, x0+1<=n, z0<=n,
+//    0<=x0, 0<=z0}
+
+            if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+
+//  T() {i1+x0==n-1, i2+z0==z, n==n0, n==x+1, 0<=i2, i2<=n, z<=i2+n,
+//    i2<=z, 0<=n, x0+1<=n, x0+z+1<=2n, n<=z, 0<=x0, x0+1<=z}
+
+      if (!(x==n-1&&z>x))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T(x) {i1+x0==n-1, i2+z0==z, n==n0, n==x, n==x#init+1, 0<=i2,
+//    i2<=n, z<=i2+n, i2<=z, 0<=n, x0+1<=n, x0+z+1<=2n, n<=z, 0<=x0,
+//    x0+1<=z}
+
+      x++;
+
+//  T(i1) {i1==i1#init+1, i1+x0==n, i2+z0==z, n==n0, n==x, 0<=i2,
+//    i2<=n, z<=i2+n, i2<=z, 0<=n, x0+1<=n, x0+z+1<=2n, n<=z, 0<=x0,
+//    x0+1<=z}
+
+      i1++;
+
+//  T() {i1+x0==n, i2+z0==z, n==n0, n==x, 0<=i2, i2<=n, z<=i2+n,
+//    i2+z0<=n, i2<=z, 0<=n, x0+1<=n, x0+z+1<=2n, n<=z, 0<=x0,
+//    x0+1<=z}
+
+      if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  T() {0==-1}
+
+         checking_error();
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int n0, x0, z0, n, x, z, i1, i2;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {}
+
+   n0 = rand();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0}
+
+   x0 = rand();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0, 0<=x0}
+
+   z0 = rand();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0, 0<=x0, 0<=z0}
+
+   if (!(n0>=x0&&n0>=z0))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0, n0+1<=x0+z0, 0<=x0, 0<=z0}
+
+      deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0, x0<=n0, z0<=n0, 0<=x0, 0<=z0}
+
+   n = n0;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {n==n0, 0<=n, x0<=n, z0<=n, 0<=x0, 0<=z0}
+
+   x = x0;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {n==n0, x==x0, 0<=n, x<=n, z0<=n, 0<=x,
+//    0<=z0}
+
+   z = z0;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {n==n0, x==x0, z==z0, 0<=n, x<=n, z<=n,
+//    0<=x, 0<=z}
+
+   i1 = i2 = 0;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n,
+//    x<=n, z<=n, 0<=x, 0<=z}
+
+   if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n,
+//    x<=n, z<=n, 0<=x, 0<=z}
+
+   while (rand_b())
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, x<=n, z<=n,
+//    x0<=x, 0<=x0, z0<=z, 0<=z0}
+
+      if (rand_b()) {
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, x<=n, z<=n,
+//    x0<=x, 0<=x0, z0<=z, 0<=z0}
+
+         if (!(x<n&&z>x))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, 0<=i1,
+//    i2+z0<=i1+x0, i1+x0<=n, 0<=i2, z<=n, 0<=x0, 0<=z0}
+
+            deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, x+1<=n, z<=n,
+//    x0<=x, x+1<=z, 0<=x0, z0<=z, 0<=z0}
+
+         x++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x-1, i2+z0==z, n==n0, x<=n, x0<=n,
+//    z<=n, z0<=n, x0+1<=x, x<=z, 0<=x0, z0<=z, 0<=z0}
+
+         i1++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, x<=n, x0<=n,
+//    z<=n, z0<=n, x0+1<=x, x<=z, 0<=x0, z0<=z, 0<=z0}
+
+         if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, x<=n, z<=n,
+//    x0<=x, 0<=x0, z0<=z, 0<=z0}
+
+         if (!(x<n&&z<=x))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, 0<=i1,
+//    i1+x0<=n, 0<=i2, i2+z0<=n, 0<=x0, 0<=z0}
+
+            deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, x+1<=n, z<=n,
+//    x0<=x, z<=x, 0<=x0, z0<=z, 0<=z0}
+
+         z++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z-1, n==n0, x+1<=n,
+//    x0<=n, z<=n+1, z0<=n, x0<=x, z<=x+1, 0<=x0, z0+1<=z, 0<=z0}
+
+         i2++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, x+1<=n, x0<=n,
+//    z<=n+1, z0<=n, x0<=x, z<=x+1, 0<=x0, z0+1<=z, 0<=z0}
+
+         if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  P() {}
+
+void ts_restructured(void)
+{
+
+//  P() {}
+
+   int n0, x0, z0, n, x, z, i1, i2;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {}
+
+   n0 = rand();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0}
+
+   x0 = rand();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0, 0<=x0}
+
+   z0 = rand();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0, 0<=x0, 0<=z0}
+
+   if (!(n0>=x0&&n0>=z0))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0, n0+1<=x0+z0, 0<=x0, 0<=z0}
+
+      deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {0<=n0, x0<=n0, z0<=n0, 0<=x0, 0<=z0}
+
+   n = n0;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {n==n0, 0<=n, x0<=n, z0<=n, 0<=x0, 0<=z0}
+
+   x = x0;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {n==n0, x==x0, 0<=n, x<=n, z0<=n, 0<=x,
+//    0<=z0}
+
+   z = z0;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {n==n0, x==x0, z==z0, 0<=n, x<=n, z<=n,
+//    0<=x, 0<=z}
+
+   i1 = i2 = 0;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n,
+//    x<=n, z<=n, 0<=x, 0<=z}
+
+   if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n,
+//    x<=n, z<=n, 0<=x, 0<=z}
+
+   if (x<n) {
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n,
+//    x+1<=n, z<=n, 0<=x, 0<=z}
+
+      if (z<=x) {
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2==0, n==n0, x==x0, z==z0, 0<=n,
+//    x+1<=n, z<=n, 0<=x, z<=x, 0<=z}
+
+         while (rand_b()) {
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==z, n==n0, x==x0, x+1<=n,
+//    z<=x, z0<=z, 0<=z0}
+
+            if (!(x<n&&z<x))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==x, n==n0, x==x0, x==z,
+//    x+1<=n, z0<=x, 0<=z0}
+
+               deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==z, n==n0, x==x0, x+1<=n,
+//    z+1<=x, z0<=z, 0<=z0}
+
+            z++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==z-1, n==n0, x==x0, x+1<=n,
+//    z<=x, z0<=x, z0+1<=z, 0<=z0}
+
+            i2++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==z, n==n0, x==x0, x+1<=n,
+//    z<=x, z0<=x, z0+1<=z, 0<=z0}
+
+            if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==z, n==n0, x==x0, x+1<=n,
+//    z<=x, z0<=z, 0<=z0}
+
+         if (!(x<n&&z==x))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==z, n==n0, x==x0, x+1<=n,
+//    z+1<=x, z0<=z, 0<=z0}
+
+            deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==x, n==n0, x==x0, x==z,
+//    x+1<=n, z0<=x, 0<=z0}
+
+         z++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==x, n==n0, x==x0, x==z-1,
+//    0<=n, x+1<=n, z0<=n, 0<=x, z0<=x, 0<=z0}
+
+         i2++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==x+1, n==n0, x==x0, x==z-1,
+//    0<=n, x+1<=n, z0<=n, 0<=x, z0<=x, 0<=z0}
+
+         if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1==0, i2+z0==z, n==n0, x==x0, 0<=i2,
+//    i2+z0<=n, i2<=x+1, x+1<=i2+z0, 0<=x}
+
+      while (rand_b())
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, z<=n, x0<=x,
+//    x+1<=z, z<=x+z0+1, 0<=x0, z0<=z}
+
+         if (rand_b()) {
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, z<=n, x0<=x,
+//    x+1<=z, z<=x+z0+1, 0<=x0, z0<=z}
+
+            if (!(x<n-1&&z>x+1))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x+1, n==n0, x==z-1,
+//    0<=i1, i1<=x, x+1<=n, z0<=x+1, 0<=z0}
+
+               deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, x+2<=n, z<=n,
+//    x0<=x, x+2<=z, z<=x+z0+1, 0<=x0, z0<=z}
+
+            x++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x-1, i2+z0==z, n==n0, x+1<=n,
+//    x0+1<=n, z<=n, z0<=n, x0+1<=x, x+1<=z, z<=x+z0, 0<=x0, z0<=z,
+//    0<=z0}
+
+            i1++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, x+1<=n,
+//    x0+1<=n, z<=n, z0<=n, x0+1<=x, x+1<=z, z<=x+z0, 0<=x0, z0<=z,
+//    0<=z0}
+
+            if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else {
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, z<=n, x0<=x,
+//    x+1<=z, z<=x+z0+1, 0<=x0, z0<=z}
+
+            if (!(x<n-1&&z==x+1))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, 0<=i1, i1<=x,
+//    z<=n, x+1<=z, z<=x+z0+1, z0<=z}
+
+               deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x+1, n==n0, x==z-1,
+//    x+2<=n, x0<=x, z0<=x+1, 0<=x0, 0<=z0}
+
+            x++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x-1, i2+z0==x, n==n0, x==z,
+//    x+1<=n, x0+1<=n, z0<=n, x0+1<=x, z0<=x, 0<=x0, 0<=z0}
+
+            i1++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x, n==n0, x==z, x+1<=n,
+//    x0+1<=n, z0<=n, x0+1<=x, z0<=x, 0<=x0, 0<=z0}
+
+            if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+               checking_error();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x, n==n0, x==z, x+1<=n,
+//    x0+1<=n, z0<=n, x0+1<=x, z0<=x, 0<=x0, 0<=z0}
+
+            while (rand_b()) {
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x, n==n0, x==z, x+1<=n,
+//    x0+1<=n, z0<=n, x0+1<=x, z0<=x, 0<=x0, 0<=z0}
+
+               if (!(x<n&&z<x))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x, n==n0, x==z, x+1<=n,
+//    x0+1<=n, z0<=n, x0+1<=x, z0<=x, 0<=x0, 0<=z0}
+
+                  deadlock();
+
+//  P() {0==-1}
+
+               z++;
+
+//  P() {0==-1}
+
+               i2++;
+
+//  P() {0==-1}
+
+               if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+                  checking_error();
+            }
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x, n==n0, x==z, x+1<=n,
+//    x0+1<=n, z0<=n, x0+1<=x, z0<=x, 0<=x0, 0<=z0}
+
+            if (!(x<n&&z==x))
+
+//  P() {0==-1}
+
+               deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x, n==n0, x==z, x+1<=n,
+//    x0+1<=n, z0<=n, x0+1<=x, z0<=x, 0<=x0, 0<=z0}
+
+            z++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x, n==n0, x==z-1,
+//    x+1<=n, x0+1<=n, z0<=n, x0+1<=x, z0<=x, 0<=x0, 0<=z0}
+
+            i2++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==x+1, n==n0, x==z-1,
+//    x+1<=n, x0+1<=n, z0<=n, x0+1<=x, z0<=x, 0<=x0, 0<=z0}
+
+            if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, z<=n, x0<=x,
+//    x+1<=z, z<=x+z0+1, 0<=x0, z0<=z}
+
+      if (!(x==n-1&&z>x))
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==x, i2+z0==z, n==n0, 0<=i1, i1<=x,
+//    x+2<=n, z<=n, x+1<=z, z<=x+z0+1, z0<=z}
+
+         deadlock();
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==n-1, i2+z0==n, n==n0, n==x+1,
+//    n==z, x0+1<=n, z0<=n, 0<=x0, 0<=z0}
+
+      x++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==n-1, i2+z0==n, n==n0, n==x, n==z,
+//    0<=n, x0+1<=n, z0<=n, 0<=x0, 0<=z0}
+
+      i1++;
+
+//  P(i1,i2,n,n0,x,x0,z,z0) {i1+x0==n, i2+z0==n, n==n0, n==x, n==z,
+//    0<=n, x0+1<=n, z0<=n, 0<=x0, 0<=z0}
+
+      if (!(i1<=n0-x0&&i2<=n0-z0))
+
+//  P() {0==-1}
+
+         checking_error();
+   }
+}

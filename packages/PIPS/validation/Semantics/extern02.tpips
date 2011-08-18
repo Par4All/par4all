@@ -2,6 +2,8 @@ delete extern02
 
 setenv PIPS_CPP="cpp -C"
 setproperty ABORT_ON_USER_ERROR TRUE
+# Global variables cannot be initialized that way...
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create extern02 extern02.c
 

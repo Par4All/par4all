@@ -11,6 +11,7 @@ echo "However because of fsplit bugs & hacks:"
 ${tpips_version:-tpips} 2>&1 <<EOF | grep "  Module"
 
 delete b01
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create b01 bugsplit01.f
 close
 delete b01

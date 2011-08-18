@@ -34,40 +34,40 @@ int main()
    int **x, *y, k, h;
 
 // Points To:
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    k = 1;
 
 // Points To:
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    h = 2;
 
 // Points To:
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    y = &h;
 
 // Points To:
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &h , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> h , EXACT
 
    *x = y;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> &h , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &h , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> h , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> h , EXACT
 
    printf("x = %p \n", x);
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> &h , EXACT
-// x -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// y -> &h , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> h , EXACT
+// x -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// y -> h , EXACT
 
    return 0;
 }

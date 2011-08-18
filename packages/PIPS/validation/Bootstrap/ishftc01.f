@@ -8,7 +8,8 @@
       I = 2
       J = 3
       K = 3
-      H = ISHFTC(K,I,J)
+!     gfortran insists on the arguments being integers
+      H = ISHFTC(L1,L2,L3)
       PRINT *, 'H = ',H
 
       END

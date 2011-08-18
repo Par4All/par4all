@@ -1,4 +1,5 @@
 delete sizeofArray01
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create sizeofArray01 sizeofArray01.c
 
 

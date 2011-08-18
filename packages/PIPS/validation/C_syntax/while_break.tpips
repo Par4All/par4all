@@ -1,4 +1,5 @@
 delete while_break
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create while_break while_break.c
 
 activate C_PARSER

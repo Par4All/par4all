@@ -2,4 +2,6 @@ main()
 {
   restrict int i;
 }
+/* This piece of code is dead wrong */
+
 extern main();

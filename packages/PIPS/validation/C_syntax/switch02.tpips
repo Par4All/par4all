@@ -1,5 +1,7 @@
 delete switch02
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create switch02 switch02.c
 
 activate C_PARSER

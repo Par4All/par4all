@@ -1,6 +1,8 @@
 delete reference_01
 
 setproperty ABORT_ON_USER_ERROR TRUE
+# FI: I do not understand the error
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create reference_01 reference_01.c
 

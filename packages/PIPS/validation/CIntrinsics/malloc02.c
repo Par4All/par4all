@@ -6,7 +6,10 @@
 int main ()
 {
   int i,n;
-  char buffer[50];
+  // FI: this declaration is incompatible with an assignment of buffer
+  // via malloc()...
+  //char buffer[50];
+  char * buffer;
 
   printf ("How long do you want the string? ");
   scanf ("%d", &i);
