@@ -363,7 +363,7 @@ static bool internal_sc_feasibility
 (Psysteme sc, int heuristic, bool int_p, int ofl_ctrl)
 {   
   bool ok = true;
-  int method, n_var,  n_ref_eq = 0, n_ref_in = 0;
+  int method, n_ref_eq = 0, n_ref_in = 0;
  /* Automatic variables read in a CATCH block need to be declared volatile as
   * specified by the documentation*/
   int volatile n_cont_in = 0;
@@ -409,8 +409,8 @@ static bool internal_sc_feasibility
   switch(heuristic) {
   case (HEURISTIC1):
     {
-      method=0, n_var =0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
-      n_var = sc->dimension; value_assign(magnitude,VALUE_ZERO);
+      method=0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
+      value_assign(magnitude,VALUE_ZERO);
       decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, &magnitude, 1);
       decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, &magnitude, 1);
       /* HEURISTIC1
@@ -428,8 +428,8 @@ static bool internal_sc_feasibility
     }
   case (HEURISTIC2):
     {
-      method=0, n_var =0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
-      n_var = sc->dimension; value_assign(magnitude,VALUE_ZERO);
+      method=0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
+      value_assign(magnitude,VALUE_ZERO);
       decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, &magnitude, 1);
       decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, &magnitude, 1);
 
@@ -440,8 +440,8 @@ static bool internal_sc_feasibility
     }
   case (HEURISTIC3):
     {
-      method=0, n_var =0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
-      n_var = sc->dimension; value_assign(magnitude,VALUE_ZERO);
+      method=0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
+      value_assign(magnitude,VALUE_ZERO);
       decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, &magnitude, 1);
       decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, &magnitude, 1);
       
@@ -450,8 +450,8 @@ static bool internal_sc_feasibility
     }
   case (HEURISTIC4):
     {
-      method=0, n_var =0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
-      n_var = sc->dimension; value_assign(magnitude,VALUE_ZERO);
+      method=0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
+      value_assign(magnitude,VALUE_ZERO);
       decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, &magnitude, 1);
       decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, &magnitude, 1);
  
@@ -517,8 +517,8 @@ static bool internal_sc_feasibility
 
   default: /*use heuristic1*/
     {
-      method=0, n_var =0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
-      n_var = sc->dimension; value_assign(magnitude,VALUE_ZERO);
+      method=0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
+      value_assign(magnitude,VALUE_ZERO);
       decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, &magnitude, 1);
       decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, &magnitude, 1);
 
