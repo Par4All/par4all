@@ -473,7 +473,7 @@ static bool outline_block(statement stmt, string name, int from, int to)
 
   gen_free_list(block_list);
 
-  pips_debug(1,"end_p = %d\n", end_p);
+  pips_debug(1,"end_p = %d\n", (int)end_p);
   return end_p;
 }
 
@@ -606,7 +606,7 @@ static bool inline_outlined_block(statement stmt)
   else
     gen_free_list(treated);
 
-  pips_debug(1,"find_p = %d\n", find_p);
+  pips_debug(1,"find_p = %d\n", (int)find_p);
   return find_p;
 }
 

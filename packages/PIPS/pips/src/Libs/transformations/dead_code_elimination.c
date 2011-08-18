@@ -383,7 +383,7 @@ static bool entity_local_variable_p(entity var, entity func) {
     }
   }
   pips_debug(4,"Looked if variable %s is local to function %s, result is %d\n",
-             entity_name(var),entity_name(func), local);
+             entity_name(var),entity_name(func), (int)local);
   return local;
 }
 
@@ -789,7 +789,7 @@ static bool wipeout_entity(entity e) {
       !entity_union_p(e) &&
       !typedef_entity_p(e);
 
-  pips_debug(6,"return %d\n",return_val);
+  pips_debug(6,"return %d\n",(int)return_val);
 
   return return_val;
 }
