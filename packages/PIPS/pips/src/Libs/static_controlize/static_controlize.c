@@ -491,7 +491,6 @@ bool static_controlize(string mod_name)
 	entity		ent;
 	list		formal_integers;
 	static_control	sc;
-	int Gcount_nlc;
 
 	debug_on("STATIC_CONTROLIZE_DEBUG_LEVEL");
 
@@ -510,7 +509,6 @@ bool static_controlize(string mod_name)
 	  set_prettyprint_language_from_property(language_tag(code_language(c)));
 	}
 
-	Gcount_nlc = 0;
 	Gcount_nsp = 0;
 	Gcount_nub = 0;
 	Gstructure_parameters	= (list) NIL;
@@ -616,7 +614,6 @@ int *Gcount_nlc;
   range           lr;
   statement       before_stmt = make_continue_statement(entity_empty_label());
   statement       end_stmt = statement_undefined;
-  int             incre;
   list            stmt_list = NIL;
 
   pips_debug(4, "begin LOOP\n");
@@ -638,7 +635,6 @@ int *Gcount_nlc;
   rl = range_lower( lr );
   ru = range_upper( lr );
   ri = range_increment( lr );
-  incre = expression_to_int( ri );
 
   /* new upper bound, or at least iteration count */
   nub =   make_op_exp(DIVIDE_OPERATOR_NAME,

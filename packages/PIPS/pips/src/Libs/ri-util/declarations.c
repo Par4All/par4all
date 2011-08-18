@@ -1026,7 +1026,7 @@ static text text_equivalence_class(list /* of entities */ l_equiv)
   list l1, l2;
   entity ent1, ent2;
   int offset1, offset2;
-  Value size1, size2, offset_end1;
+  Value size1, offset_end1;
   bool first;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
@@ -1102,7 +1102,6 @@ static text text_equivalence_class(list /* of entities */ l_equiv)
 	  pips_assert("the equivalence class has been sorted\n",
 		      offset1 < offset2);
 
-	  size2 = ValueSizeOfArray(ent2);
 	  offset_end1 = value_plus(offset1, size1);
 
 	  /* If there is no overlap, we change the reference variable */

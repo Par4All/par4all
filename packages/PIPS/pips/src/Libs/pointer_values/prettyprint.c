@@ -49,7 +49,7 @@ text text_pv(entity __attribute__ ((unused)) module, int __attribute__ ((unused)
   return(text_pointer_values(lpv, "Pointer values:"));
 }
 
-void generic_print_code_pv(char * module_name, pv_context * ctxt)
+bool generic_print_code_pv(char * module_name, pv_context * ctxt)
 {
   bool success;
 
@@ -70,15 +70,16 @@ void generic_print_code_pv(char * module_name, pv_context * ctxt)
   reset_current_module_entity();
   reset_current_module_statement();
   reset_pv();
+  return success;
 }
 
 
 bool print_code_simple_pointer_values(char * module_name)
 {
   pv_context ctxt = make_simple_pv_context();
-  generic_print_code_pv(module_name, &ctxt);
+  bool success = generic_print_code_pv(module_name, &ctxt);
   reset_pv_context(&ctxt);
-  return(true);
+  return success;
 }
 
 void generic_print_code_gen_kill_pv(char * module_name)

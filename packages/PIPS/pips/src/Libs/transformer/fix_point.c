@@ -712,7 +712,6 @@ transformer transformer_pattern_fix_point(transformer tf)
     transformer fix_tf =  transformer_dup(tf);
     Psysteme fix_sc = (Psysteme) predicate_system(transformer_relation(fix_tf));
     Pvecteur v_inc = VECTEUR_UNDEFINED;
-    int inc = 1;
 
     ifdebug(8) {
 	pips_debug(8, "Begin for transformer %p:\n", tf);
@@ -732,9 +731,6 @@ transformer transformer_pattern_fix_point(transformer tf)
 
 	/* eliminate sharing between v_inc and fix_sc */
 	v_inc = vect_dup(v_inc);
-
-	/* retrieve inc from v_inc */
-	inc = vect_coeff(TCST, v_inc);
 
 	/* Replace constant terms in equalities and inequalities by
 	 * loop counter differences
@@ -801,8 +797,6 @@ transformer transformer_pattern_fix_point(transformer tf)
 Pvecteur look_for_the_best_counter(Pcontrainte egs)
 {
     Pvecteur v_inc = VECTEUR_UNDEFINED;
-    entity old_index = entity_undefined;
-    entity new_index = entity_undefined;
     Pcontrainte leq = CONTRAINTE_UNDEFINED;
     int inc = 0;
 
@@ -842,8 +836,6 @@ Pvecteur look_for_the_best_counter(Pcontrainte egs)
 	    if(!failed && value_to_variable(p_old_index) == value_to_variable(p_new_index)) {
 		if(ABS(c_inc) < ABS(inc) || c_inc == 1) {
 		    inc = c_inc;
-		    old_index = p_old_index;
-		    new_index = p_new_index;
 		    v_inc = v;
 		}
 	    }

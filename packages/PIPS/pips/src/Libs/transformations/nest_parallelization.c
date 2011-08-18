@@ -186,7 +186,6 @@ static bool current_loop_index_p(reference r)
 
 static statement tuned_loop_strip_mine(statement s)
 {
-    statement inner_loop = statement_undefined;
 
     debug(9, "tuned_loop_strip_mine", "begin\n");
 
@@ -203,7 +202,6 @@ static statement tuned_loop_strip_mine(statement s)
     }
 
     /* inner vector loop */
-    inner_loop = loop_body(statement_loop(s));
     pips_assert("tuned_loop_strip_mine", instruction_loop_p(statement_instruction(s)));
     if(get_vector_register_number() > 0) {
 	execution_tag(loop_execution(statement_loop(s))) = is_execution_parallel;

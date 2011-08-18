@@ -965,40 +965,21 @@ entity entity_empty_label(void)
   return empty;
 }
 
+/* Check if the scope of entity e is global.
+
+   People are likely to look for global_entity_p(), entity_global_p()
+   or, slightly different, global_variable_p(), variable_global_p(),
+   or still slightly different, global_function_p(),...
+ */
 bool top_level_entity_p(entity e)
 {
-  /* This code is wrong because it only checks that entity_module_name(e)
-   * is a prefix of TOP_LEVEL_MODULE_NAME. So it returns true for variables
-   * of a subroutine called TOP!
-   *
-   * The MODULE_SEP_STRING should be added to TOP_LEVEL_MODULE_NAME?
-   *
-   * To return false quickly, TOP_LEVEL_MODULE_NAME should begin with
-   * a special character never appearing in standard identifiers, for
-   * instance * (star).
-   */
-  /*
-    return(strncmp(TOP_LEVEL_MODULE_NAME,
-    entity_name(e),
-    strlen(entity_module_name(e))) == 0);
-  */
-
-  /* FI: It's late, I cannot think of anything better */
-  /*
-    int l = strlen(entity_module_name(e));
-    bool top = false;
-
-    if(l==strlen(TOP_LEVEL_MODULE_NAME)) {
-    top = (strncmp(TOP_LEVEL_MODULE_NAME,
-    entity_name(e), l) == 0);
-    }
-  */
-
   bool top = (strcmp(TOP_LEVEL_MODULE_NAME, entity_module_name(e)) == 0);
 
   return top;
 }
 
+/* Several implicit entities are declared to define the implicit
+   effects of IO statements. */
 bool io_entity_p(entity e)
 {
   return(strncmp(IO_EFFECTS_PACKAGE_NAME,

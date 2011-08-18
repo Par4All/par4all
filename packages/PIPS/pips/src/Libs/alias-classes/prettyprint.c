@@ -281,7 +281,7 @@ print_in_alias_pairs( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(true);
+    return success;
 }
 
 
@@ -298,7 +298,7 @@ print_out_alias_pairs( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(true);
+    return success;
 }
 
 bool
@@ -314,7 +314,7 @@ print_alias_lists( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(true);
+    return success;
 }
 
 bool
@@ -331,5 +331,5 @@ print_alias_classes( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(true);
+    return success;
 }

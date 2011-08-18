@@ -102,7 +102,6 @@ typedef dg_vertex_label vertex_label;
 
 bool fsm_generation(string module_name)
 {
-  entity module;
   entity state_variable = NULL;
 
    /* get the resources */
@@ -110,7 +109,6 @@ bool fsm_generation(string module_name)
 						      module_name, 
 						      true);
 
-  module = module_name_to_entity(module_name);
   
   set_current_module_statement(stat);
   set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant

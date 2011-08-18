@@ -1235,11 +1235,8 @@ void add_synonym_values(entity e, entity eq, bool readonly)
 	   (char *) new_value);
   if(!readonly) {
     entity old_value = entity_to_old_value(e);
-    entity old_value_eq = entity_undefined;
     intermediate_value = entity_to_intermediate_value(e);
-
     add_old_value(eq);
-    old_value_eq = entity_to_old_value(eq);
     hash_put(hash_entity_to_intermediate_value, (char *) eq,
 	     (char *) intermediate_value);
     hash_update(hash_entity_to_old_value, (char *) eq, 

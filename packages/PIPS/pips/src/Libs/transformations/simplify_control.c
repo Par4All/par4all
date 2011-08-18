@@ -334,7 +334,6 @@ remove_loop_statement(statement s, instruction i, loop l)
  */
 static bool loop_executed_once_p(statement s, loop l)
 {
-  entity ind;
   range rg;
   expression m1, m2, m3;
   normalized n_m1, n_m2, n_m3;
@@ -348,7 +347,6 @@ static bool loop_executed_once_p(statement s, loop l)
   Psysteme volatile ps;
 
   retour = false;
-  ind = loop_index(l);
   rg = loop_range(l);
   m1 = range_lower(rg);
   m2 = range_upper(rg);

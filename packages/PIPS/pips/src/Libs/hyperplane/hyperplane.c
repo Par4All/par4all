@@ -78,7 +78,7 @@ cons * lls;
     Pvecteur *pvg;
     Pbase pb;
     expression lower, upper;
-    Pvecteur pv1, pv2;
+    Pvecteur pv1;
     loop l;
 
     debug_on("HYPERPLANE_DEBUG_LEVEL");
@@ -212,7 +212,7 @@ cons * lls;
     pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
     scanning_base_to_vect(G,n,base_newindex,pvg);
     pv1 = sc_row_echelon->inegalites->succ->vecteur;
-    pv2 = vect_change_base(pv1,base_oldindex,pvg);
+    (void)vect_change_base(pv1,base_oldindex,pvg);
 
     l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
     lower = range_upper(loop_range(l));

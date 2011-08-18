@@ -484,9 +484,6 @@ int option;
  */
 void elim_last_pred()
 {
- expression aux_exp;
-
- aux_exp = EXPRESSION(CAR(pred_l));
  pred_l = CDR(pred_l);
 }
 

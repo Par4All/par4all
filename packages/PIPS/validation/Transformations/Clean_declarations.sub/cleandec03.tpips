@@ -1,3 +1,4 @@
+setenv PIPS_CHECK_C No
 setproperty ABORT_ON_USER_ERROR TRUE
 delete cleandec03
 create cleandec03 cleandec03.c

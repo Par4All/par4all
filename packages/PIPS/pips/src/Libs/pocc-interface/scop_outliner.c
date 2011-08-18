@@ -123,10 +123,8 @@ static bool outlining_scop(sequence s)
 }
 bool scop_outliner(char * module_name)
 { 
-  entity	module;
   statement	module_stat;
   lists_to_outline = NIL;
-  module = local_name_to_top_level_entity(module_name);
   set_current_module_entity(local_name_to_top_level_entity(module_name));
  
   set_current_module_statement((statement)

@@ -1410,7 +1410,6 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
  */
 static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
 {
-  list l_out;
 
   /* temporary settings : in an interprocedural context we need to keep track
      of visited modules */
@@ -1425,7 +1424,7 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
   debug_on("POINTER_VALUES_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-  l_out = statement_to_post_pv(get_current_module_statement(), NIL, ctxt);
+  (void)statement_to_post_pv(get_current_module_statement(), NIL, ctxt);
 
   (*ctxt->db_put_pv_func)(module_name, get_pv());
   //(*ctxt->db_put_gen_pv_func)(module_name, get_gen_pv());

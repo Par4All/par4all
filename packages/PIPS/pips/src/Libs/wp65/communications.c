@@ -192,11 +192,9 @@ void statement_to_communications(statement stmt, statement st_level1, statement 
 				 hash_table r_to_ud, list *lpv)
 {
     instruction inst = statement_instruction(stmt);
-    statement st_current_level;
     
     debug(8, "statement_to_communications", "begin with tag %d\n", 
 	  instruction_tag(inst));
-    st_current_level = stmt;
 
     switch(instruction_tag(inst)) {
     case is_instruction_block: {
@@ -236,7 +234,6 @@ void statement_to_communications(statement stmt, statement st_level1, statement 
     case is_instruction_call: {
 	ifdebug(7)
 	    (void) fprintf(stderr,"statement_to_communications-instruction call- begin\n");
-	st_current_level = stmt;
 	call_instruction_to_communications(stmt, st_level1, st_level2, 
 					   lwr, lwr_local,
 					   fetch_map,store_map,r_to_ud,lpv);

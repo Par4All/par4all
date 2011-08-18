@@ -1236,7 +1236,7 @@ static void update_operator_to_post_pv(entity func, list func_args, list l_in,
   if (pointer_type_p(t))
     {
       list l_lhs_eff = pv_res->result_paths;
-      list l_lhs_kind = pv_res->result_paths_interpretations;
+      //list l_lhs_kind = pv_res->result_paths_interpretations;
       string func_name = entity_local_name(func);
 
       pips_assert("update operators admit a single path\n",
@@ -1266,8 +1266,8 @@ static void update_operator_to_post_pv(entity func, list func_args, list l_in,
 	    pips_internal_error("unexpected update operator on pointers");
 
 	  (*effect_add_expression_dimension_func)(rhs_eff, new_dim);
-	  l_lhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
-			    NIL);
+	  /*l_lhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
+			    NIL);*/
 	}
       list l_rhs_eff = CONS(EFFECT, rhs_eff, NIL);
       single_pointer_assignment_to_post_pv(lhs_eff, l_rhs_eff, l_rhs_kind, false,
@@ -1424,7 +1424,6 @@ static void c_io_function_to_post_pv(entity func, list func_args, list l_in,
   string func_name = entity_local_name(func);
   list general_args = NIL;
   bool free_general_args = false;
-  expression file_star_arg = expression_undefined;
   list l_in_cur = l_in;
 
   /* first argument is a FILE*  */
@@ -1446,7 +1445,6 @@ static void c_io_function_to_post_pv(entity func, list func_args, list l_in,
       || same_string_p(func_name,FEOF_FUNCTION_NAME)
       || same_string_p(func_name,FERROR_FUNCTION_NAME))
     {
-      file_star_arg = EXPRESSION(CAR(func_args));
       general_args = CDR(func_args);
     }
   /* last argument is a FILE*  */
@@ -1464,7 +1462,6 @@ static void c_io_function_to_post_pv(entity func, list func_args, list l_in,
 	  general_args = CONS(EXPRESSION, EXPRESSION(CAR(func_args)), general_args);
 	}
       free_general_args = true;
-      file_star_arg = EXPRESSION(CAR(func_args));
     }
 
   /* we assume that there is no effects on aliasing due to FILE* argument if any */

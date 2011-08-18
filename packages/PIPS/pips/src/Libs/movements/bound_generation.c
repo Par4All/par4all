@@ -360,7 +360,6 @@ bound_generation(
     loop newloop;
     int space = (n+1) * sizeof(Ssysteme);
     bool debut = true;
-    entity mod;
     int j;
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(8,"bound_generation","begin\n");
@@ -472,7 +471,6 @@ bound_generation(
 					 NIL);
 
 		stat = loop_to_statement(newloop);
-		mod = local_name_to_top_level_entity(entity_local_name(module));
 	
 		loopbody = make_block_statement(CONS(STATEMENT,stat,NIL));
 		ifdebug(8) {

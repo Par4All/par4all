@@ -672,13 +672,11 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 			if(!ENDP(eff_ind))
 			  {
 			    effect eff_init = (*effect_dup_func)(eff);
-			    Psysteme sc_init ;
 
 			    /* we translate the initial region descriptor
 			       into the caller's name space
 			    */
 			    convex_region_descriptor_translation(eff_init);
-			    sc_init = region_system(eff_init);
 
 			    reference output_ref;
 			    descriptor output_desc;

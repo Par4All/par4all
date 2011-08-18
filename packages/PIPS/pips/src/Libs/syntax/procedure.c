@@ -228,19 +228,16 @@ void remove_ghost_variable_entities(bool substitute_p)
 	}
 	else {
 	    entity fe = local_name_to_top_level_entity(entity_local_name(e));
-	    type t = type_undefined;
 
 	    if(entity_undefined_p(fe)) {
 		pips_assert("Entity fe cannot be undefined", false);
 	    }
 	    else if(type_undefined_p(entity_type(fe))) {
-		t = entity_type(fe);
 		pips_assert("Type for entity fe cannot be undefined", false);
 	    }
 	    else if(type_functional_p(entity_type(fe))) {
 		statement stmt = function_body;
 
-		t = entity_type(fe);
 
 		/*
 		if(intrinsic_entity_p(fe)) {
@@ -262,7 +259,6 @@ void remove_ghost_variable_entities(bool substitute_p)
 		}
 	    }
 	    else {
-		t = entity_type(fe);
 		pips_assert("Type t for entity fe should be functional", false);
 	    }
 

@@ -1426,7 +1426,6 @@ static void reset_effects() {
  */
 bool chains( char * module_name, enum chain_type use ) {
   statement module_stat;
-  instruction module_inst;
   graph module_graph;
   void print_graph();
 
@@ -1446,7 +1445,6 @@ bool chains( char * module_name, enum chain_type use ) {
   pips_debug(1, "finding enclosing loops ...\n");
   set_enclosing_loops_map( loops_mapping_of_statement( module_stat ) );
 
-  module_inst = statement_instruction(module_stat);
 
   set_effects( module_name, use );
 

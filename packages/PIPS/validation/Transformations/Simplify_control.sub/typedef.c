@@ -1,7 +1,7 @@
 typedef int int32_t;
 
 // ok if following line are exchanged
-const int32_t k[] = 0;
+const int32_t k[1] = { 0 };
 //const int k[] = 0;
 
 int main(void)

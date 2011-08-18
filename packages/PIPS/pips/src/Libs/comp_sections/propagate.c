@@ -87,7 +87,6 @@ bool comp_regions(char *module_name)
 {
   /* {{{  code*/
   /* {{{  initialize*/
-  list CompSecs = NIL;
   /* regions_init(); */
   
   /* get the current properties concerning regions */
@@ -124,7 +123,7 @@ bool comp_regions(char *module_name)
   /* {{{  for dependence analysis : currently masked */
   /* set_proper_regions_map( MAKE_STATEMENT_MAPPING() ); */
   /* }}} */
-  CompSecs = comp_regions_of_statement(get_current_module_statement()); 
+  (void)comp_regions_of_statement(get_current_module_statement()); 
   /* {{{  code*/
   /* {{{  debug stmts*/
   /* if (op_statistics_p()) print_regions_op_statistics(module_name, R_RW); */
@@ -301,7 +300,6 @@ list comp_regions_of_block(list linst)
 {
     /* {{{  init*/
     statement first_statement;
-    transformer current_transformer;
     list remaining_block, first_s_regions, lres = NIL;
     
     pips_debug(3, "begin\n");
@@ -329,12 +327,12 @@ list comp_regions_of_block(list linst)
 	      /* {{{  load transformer*/
 	      list r_block_regions = NIL;
 	      
-	      current_transformer = load_statement_transformer(first_statement);    
 	      /* }}} */
 	      r_block_regions = comp_regions_of_block(remaining_block);
 	      /* {{{  perform union*/
 	      /* {{{  don't know that this means ???*/
 	      /* blocked : check later
+	      list current_transformer = load_statement_transformer(first_statement);    
 	      debug_regions_consistency(r_block_regions);
 	       project_regions_with_transformer_inverse(r_block_regions, 
 						     current_transformer, 

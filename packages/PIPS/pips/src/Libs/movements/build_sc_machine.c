@@ -84,7 +84,6 @@ Psysteme build_sc_machine(
     Pcontrainte pc;
     Pvecteur pv1,pv2;
     int nb_bytes=1;
-    basic bas;
 
     debug(8,"build_sc_machine","begin\n");
     if (type_variable_p(t)) {
@@ -102,7 +101,6 @@ Psysteme build_sc_machine(
 	}
 	ms = value_plus(value_minus(max_ms,min_ms), VALUE_ONE);
 
-	bas = variable_basic(var);
 	/* Si l'on veut utiliser le nombre d'octets il faut remplacer l'equation 
 	   par deux inequations du type 
 	   
