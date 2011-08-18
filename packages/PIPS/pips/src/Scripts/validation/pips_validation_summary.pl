@@ -34,7 +34,7 @@ my $status = 'failed|changed|passed|timeout|keptout|bug|later|slow';
 
 # other miscellaneous issues
 my $others =
-    'missing|skipped|multi-script|multi-source|orphan|broken-directory';
+  'missing|skipped|multi-script|multi-source|nofilter|orphan|broken-directory';
 
 # return ref to zero count status hash
 sub zeroed()
@@ -155,7 +155,7 @@ for my $c (sort keys %new)
 # extract various counts
 my $not_passed = $n{failed} + $n{changed} + $n{timeout};
 my $count = $not_passed + $n{passed};
-my $warned = $n{skipped} + $n{orphan} + $n{missing} +
+my $warned = $n{skipped} + $n{nofilter} + $n{orphan} + $n{missing} +
     $n{'multi-script'} + $n{'multi-source'} +
     $n{keptout} + $n{bug} + $n{later} + $n{slow};
 
@@ -194,7 +194,8 @@ print
   " * multi-script: $n{'multi-script'} (more than one validation script)\n" .
   " * multi-source: $n{'multi-source'} " .
     "(source files for test with different suffixes)\n" .
-  " * orphan: $n{orphan} (result available without source nor script)\n"
+  " * orphan: $n{orphan} (result available without source nor script)\n" .
+  " * nofilter: $n{nofilter} (tpips2 script without corresponding filter)\n"
     if $warned;
 
 print

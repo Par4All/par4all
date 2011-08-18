@@ -891,24 +891,101 @@ static string process_thru_cpp(string name)
 
 /*************************************************** MANAGING A USER FILE */
 
-/* Fortran compiler triggerred from the environment (PIPS_CHECK_FORTRAN)
- * or a property (CHECK_FORTRAN_SYNTAX_BEFORE_PIPS)
- */
-static int pips_check_fortran(void)
+/* Why return an int rather than a bool? */
+static bool pips_check_syntax(string env, string prop)
 {
-    string v = getenv("PIPS_CHECK_FORTRAN");
+    string v = getenv(env);
 
     if (v && (*v=='o' || *v=='y' || *v=='t' || *v=='v' || *v=='1' ||
 	      *v=='O' || *v=='Y' || *v=='T' || *v=='V'))
 	return true;
 
-    return get_bool_property("CHECK_FORTRAN_SYNTAX_BEFORE_PIPS");
+    if (v && (*v=='n' || *v=='f'  || *v=='0' ||
+	      *v=='N' || *v=='F' ))
+	return false;
+
+    return get_bool_property(prop);
 }
+
+
+/* A Fortran compiler must be run or not before launching the PIPS
+ * Fortran parser, according to the environment variable
+ * PIPS_CHECK_FORTRAN firstly, and then according to property
+ * CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS. So the environment overrides the
+ * property.
+ */
+static bool pips_check_fortran(void)
+{
+  string env = "PIPS_CHECK_FORTRAN";
+  string prop = "CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS";
+  return pips_check_syntax(env, prop);
+}
+
+/* A C compiler must be run or not before launching the PIPS C parser,
+ * according to the environment variable PIPS_CHECK_C firstly,
+ * and then according to property
+ * CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS. So the environment overrides
+ * the property.
+ */
+static bool pips_check_c(void)
+{
+  string env = "PIPS_CHECK_C";
+  string prop = "CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS";
+  return pips_check_syntax(env, prop);
+}
+/*
+static int pips_check_c(void)
+{
+    string v = getenv("PIPS_CHECK_C");
+
+    if (v && (*v=='o' || *v=='y' || *v=='t' || *v=='v' || *v=='1' ||
+	      *v=='O' || *v=='Y' || *v=='T' || *v=='V'))
+	return true;
+
+    if (v && (*v=='n' || *v=='f'  || *v=='0' ||
+	      *v=='N' || *v=='F' ))
+	return false;
+
+    return get_bool_property("CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS");
+}
+*/
 
 #define SUFFIX ".pips.o"
 
 /* Verify that the syntax of a program is correct by running a real
-   compiler on it. */
+ * compiler on it.
+ *
+ * string compiler may/must contain the necessary options, e.g. PIPS_CC_FLAGS
+ */
+static bool
+check_input_file_syntax(string file_name, string compiler, string options)
+{
+  //string pips_flint = getenv("PIPS_FLINT");
+  bool syntax_ok_p = true;
+
+  user_log("Checking syntax of file \"%s\"\n", file_name);
+
+  if (safe_system_no_abort
+      (concatenate(compiler, " ", options, "",
+		   " ", file_name, " ",
+      // DO NOT USE A POSSIBLY SHARED FILE NAME!
+      // the same "file_name.o" can be used by several creates
+      // performed in parallel, for instance by the validation...
+		   " -o /dev/null", NULL))) {
+    /* f77, for instance, is rather silent on errors... They are
+     * nevertheless detected if no output file is created.
+     *
+     * Note that TAB is avoided in warning to simplify validation.
+     */
+    pips_user_warning("\n\n        Syntax errors in file %s!\007\n\n",
+		      file_name);
+    syntax_ok_p = false;
+  }
+  return syntax_ok_p;
+}
+
+/* Verify that the Fortran syntax of a source file is correct by
+   compiling it. */
 static bool check_fortran_syntax_before_pips(string file_name)
 {
   string pips_flint = getenv("PIPS_FLINT");
@@ -932,6 +1009,22 @@ static bool check_fortran_syntax_before_pips(string file_name)
   return syntax_ok_p;
 }
 
+/* Verify that the C syntax of a source file is correct by
+   compiling it. */
+static bool check_c_file_syntax(string file_name)
+{
+  string comp = getenv("PIPS_CC");
+  string flags = getenv("PIPS_CPP_FLAGS");
+  bool syntax_ok_p = true;
+
+  comp = comp? comp: DEFAULT_PIPS_CC;
+  flags = flags? flags: DEFAULT_PIPS_CC_FLAGS;
+
+  syntax_ok_p = check_input_file_syntax(file_name, comp, flags);
+
+  return syntax_ok_p;
+}
+
 /* "foo bla fun  ./e.database/foo.f" -> "./e.database/foo.f"
  */
 static string extract_last_name(string line)
@@ -978,18 +1071,28 @@ bool process_user_file(string file)
    */
   user_log("Registering file %s\n", file);
 
-  /* Fortran compiler if required.
-   */
+  bool syntax_ok_p = true;
   if (pips_check_fortran() && (dot_F_file_p(nfile) || dot_f_file_p(nfile))) {
-    bool syntax_ok_p = check_fortran_syntax_before_pips(nfile);
-
-    if(!syntax_ok_p)
-      return false;
+    /* Note: a Fortran compiler is required on the machine. */
+    syntax_ok_p = check_fortran_syntax_before_pips(nfile);
   }
-  else if(false) {
+  else if (pips_check_c() && dot_c_file_p(nfile)) {
+    /* Note: a C compiler is required on the machine. */
     /* Run the C compiler */
-    ;
+    syntax_ok_p = check_c_file_syntax(nfile);
   }
+  else {
+    /* Do not check the syntax in the input file: quite dangerous in
+       case it is wrong because PIPS is not designed to work on
+       damaged source codes. But this may be useful is the input file
+       is a validation file or if the input file has already been
+       checked. */
+    pips_debug(1, "No syntactic check on file \"%s\"\n", nfile);
+  }
+  if(!syntax_ok_p)
+    /* It is up to the caller to decide if the syntax must be checked
+       for other files as well */
+    return false;
 
   /* CPP if file extension is .F or .c
    * (assumes string_equal_p(nfile, initial_file))

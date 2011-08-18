@@ -611,6 +611,7 @@ int dag_computation_count(const dag d)
  */
 list dag_vertex_preds(const dag d, const dagvtx target)
 {
+  pips_debug(8, "building predecessors of %"_intFMT"\n", dagvtx_number(target));
   list inputs = vtxcontent_inputs(dagvtx_content(target));
   int nins = (int) gen_length(inputs);
   entity first_img = NULL, second_img = NULL;
@@ -653,8 +654,7 @@ static bool gen_list_equals_p(const list l1, const list l2)
  * @param source to be kept
  * @return whether the statement is to be actually removed
  */
-static bool
-switch_vertex_to_assign(dagvtx target, dagvtx source)
+static bool switch_vertex_to_assign(dagvtx target, dagvtx source)
 {
   pips_debug(5, "replacing measure %"_intFMT" by %"_intFMT" result\n",
              dagvtx_number(target), dagvtx_number(source));
@@ -945,7 +945,9 @@ static void set_aipo_copy(dagvtx v, entity e)
   set_aipo_call(v, "copy", e, NULL);
 }
 
-// forward declarations
+/************************************************************** DAG SIMPLIFY */
+
+// forward declarations for recursion
 static bool propagate_constant_image(dagvtx, entity, expression);
 static void set_aipo_constant(dagvtx, expression);
 static expression constant_image_p(dagvtx);
@@ -1182,9 +1184,10 @@ static entity copy_image_p(dagvtx v)
 
 /* @brief apply basic algebraic simplification to dag
  */
-static void dag_simplify(dag d)
+static bool dag_simplify(dag d)
 {
-  set setconst = set_make(hash_pointer);
+  bool changed = false;
+
   // propagate constants and detect copies
   FOREACH(dagvtx, v, dag_vertices(d))
   {
@@ -1192,33 +1195,87 @@ static void dag_simplify(dag d)
     entity img;
     if ((val=constant_image_p(v))!=NULL)
     {
+      changed = true;
+
+      // fix successors of predecessors of new "constant" operation
+      list preds = dag_vertex_preds(d, v);
+      FOREACH(dagvtx, p, preds)
+        gen_remove(&dagvtx_succs(p), v);
+      gen_free_list(preds);
+
+      // swich operation to constant
       set_aipo_constant(v, val);
       free_expression(val);
-      set_add_element(setconst, setconst, v);
     }
     else if ((img=copy_image_p(v))!=NULL)
     {
+      changed = true;
       set_aipo_copy(v, img);
     }
   }
 
-  // fix input node successors...
-  if (!set_empty_p(setconst))
+  return changed;
+}
+
+/* normalize, that is use less image operators
+ * only transformation is: sub_const(i, v) -> add_const(i, -v)
+ */
+static bool dag_normalize(dag d)
+{
+  bool changed = false;
+  FOREACH(dagvtx, v, dag_vertices(d))
   {
-    FOREACH(dagvtx, v, dag_inputs(d))
+    vtxcontent ct = dagvtx_content(v);
+    statement s = dagvtx_statement(v);
+    call c = s? freia_statement_to_call(s): NULL;
+    if (c)
     {
-      list ni = NIL;
-      FOREACH(dagvtx, s, dagvtx_succs(v))
+      list args = call_arguments(c);
+      entity func = call_function(c);
+      if (same_string_p(entity_local_name(func), AIPO "sub_const"))
       {
-        if (!set_belong_p(setconst, s))
-          ni = CONS(dagvtx, s, ni);
+        changed = true;
+        // sub_const -> add_const(opposite)
+        vtxcontent_opid(ct) = hwac_freia_api_index(AIPO "add_const");
+        call_function(c) = local_name_to_top_level_entity(AIPO "add_const");
+        list l3 = CDR(CDR(args));
+        _int v;
+        if (expression_integer_value(EXPRESSION(CAR(l3)), &v))
+        {
+          // partial eval
+          free_expression(EXPRESSION(CAR(l3)));
+          EXPRESSION_(CAR(l3)) = int_to_expression(-v);
+        }
+        else
+        {
+          // symbolic
+          EXPRESSION_(CAR(l3)) =
+            MakeUnaryCall(
+              local_name_to_top_level_entity(UNARY_MINUS_OPERATOR_NAME),
+              EXPRESSION(CAR(l3)));
+        }
       }
-      gen_free_list(dagvtx_succs(v));
-      dagvtx_succs(v) = gen_nreverse(ni);
+      // what else?
     }
   }
-  // cleanup
-  set_free(setconst), setconst = NULL;
+  return changed;
+}
+
+/* @return 0 keep both, 1 keep first, 2 keep second
+ */
+static int compatible_reduction_operation(const dagvtx v1, const dagvtx v2)
+{
+  const string
+    o1 = dagvtx_compact_operation(v1),
+    o2 = dagvtx_compact_operation(v2);
+  if ((same_string_p(o1, "max!") && same_string_p(o2, "max")) ||
+      (same_string_p(o1, "min!") && same_string_p(o2, "min")))
+    return 1;
+  else if ((same_string_p(o1, "max") && same_string_p(o2, "max!")) ||
+           (same_string_p(o1, "min") && same_string_p(o2, "min!")))
+    return 2;
+  else
+    return 0;
 }
 
 /* remove dead image operations.
@@ -1227,7 +1284,7 @@ static void dag_simplify(dag d)
  * @return statements to be managed outside (external copies)...
  * ??? maybe there should be a transitive closure...
  */
-list /* of statements */ freia_dag_optimize(dag d)
+list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
 {
   list lstats = NIL;
   set remove = set_make(set_pointer);
@@ -1236,6 +1293,168 @@ list /* of statements */ freia_dag_optimize(dag d)
   ifdebug(6) {
     pips_debug(6, "considering dag:\n");
     dag_dump(stderr, "input", d);
+  }
+
+  if (get_bool_property("FREIA_NORMALIZE_OPERATIONS"))
+  {
+    dag_normalize(d);
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_NORMALIZE_OPERATIONS:\n");
+      dag_dump(stderr, "normalized", d);
+    }
+  }
+
+  // look for identical image operations (same inputs, same params)
+  // (that produce image, we do not care about measures for SPOC,
+  // but we should for terapix!)
+  // the second one is replaced by a copy.
+  // also handle commutations.
+  if (get_bool_property("FREIA_REMOVE_DUPLICATE_OPERATIONS"))
+  {
+    pips_debug(6, "removing duplicate operations\n");
+
+    // all vertices in dependence order
+    list vertices = gen_nreverse(gen_copy_seq(dag_vertices(d)));
+
+    // for all already processed vertices, the list of their predecessors
+    hash_table previous = hash_table_make(hash_pointer, 10);
+
+    // subset of vertices to be investigated
+    set candidates = set_make(hash_pointer);
+
+    // subset of vertices already encountered which do not have predecessors
+    set sources = set_make(hash_pointer);
+
+    // already processed vertices
+    set processed = set_make(hash_pointer);
+
+    // potential n^2 loop, optimized by comparing only to the already processed
+    // successors of the vertex predecessors . See "candidates" computation.
+    FOREACH(dagvtx, vr, vertices)
+    {
+      int op = (int) vtxcontent_optype(dagvtx_content(vr));
+      pips_debug(7, "at vertex %"_intFMT" (op=%d)\n", dagvtx_number(vr), op);
+
+      // skip no-operations
+      if (op<spoc_type_poc || op>spoc_type_mes) continue;
+
+      // skip already removed ops
+      if (set_belong_p(remove, vr)) continue;
+
+      // pips_debug(8, "investigating...\n");
+      list preds = dag_vertex_preds(d, vr);
+
+      // build only "interesting" vertices, which shared inputs
+      set_clear(candidates);
+
+      // successors of predecessors
+      FOREACH(dagvtx, p, preds)
+        set_append_list(candidates, dagvtx_succs(p));
+
+      // keep only already processed vertices
+      set_intersection(candidates, candidates, processed);
+
+      // possibly add those without predecessors (is that only set_const?)
+      if (!preds) set_union(candidates, candidates, sources);
+
+      // whether the vertex was changed
+      bool switched = false;
+
+      // I do not need to sort them, they are all different, only one can match
+      SET_FOREACH(dagvtx, p, candidates)
+      {
+        pips_debug(8, "comparing %"_intFMT" and %"_intFMT"\n",
+                   dagvtx_number(vr), dagvtx_number(p));
+
+        list lp = hash_get(previous, p);
+
+        // ??? maybe I should not remove all duplicates, because
+        // recomputing them may be cheaper?
+        if (dagvtx_is_measurement_p(vr) || dagvtx_is_measurement_p(p))
+        {
+          // special handling for measures, esp for terapix
+          if (gen_list_equals_p(preds, lp))
+          {
+            if (same_operation_p(vr, p))
+            {
+              // min(A, px), min(A, py) => min(A, px) && *py = *px
+              if (switch_vertex_to_assign(vr, p))
+                set_add_element(remove, remove, vr);
+              // only one can match!
+              switched = true;
+              break;
+            }
+            else
+            {
+              int n = compatible_reduction_operation(p, vr);
+              if (n==2)
+              {
+                // exchange role of vr & p
+                set_del_element(processed, processed, p);
+                set_add_element(processed, processed, vr);
+                hash_del(previous, p);
+                hash_put(previous, vr, lp);
+                dagvtx t = p; p = vr; vr = t;
+                // also in the list of statements to fix dependencies!
+                if (exchanges) hash_put(exchanges, p, vr);
+              }
+              if (n==1 || n==2)
+              {
+                // we keep p which is a !, and vr is a simple reduction
+                if (switch_vertex_to_assign(vr, p))
+                  set_add_element(remove, remove, vr);
+
+                // done
+                switched = true;
+                break;
+              }
+            }
+          }
+        }
+        else if (same_operation_p(vr, p) &&
+                 gen_list_equals_p(preds, lp) &&
+                 same_constant_parameters(vr, p))
+        {
+          switch_vertex_to_a_copy(vr, p, preds);
+          // only one can match!
+          switched = true;
+          break;
+        }
+        else if (commutative_operation_p(vr, p) &&
+                 list_commuted_p(preds, (list) lp))
+        {
+          switch_vertex_to_a_copy(vr, p, preds);
+          // only one can match!
+          switched = true;
+          break;
+        }
+      }
+
+      if (switched)
+        gen_free_list(preds);
+      else
+      {
+        // update map & sets
+        hash_put(previous, vr, preds);
+        set_add_element(processed, processed, vr);
+        if (!preds) set_add_element(sources, sources, vr);
+      }
+    }
+
+    // cleanup
+    HASH_MAP(k, v, if (v) gen_free_list(v), previous);
+    hash_table_free(previous), previous = NULL;
+    gen_free_list(vertices), vertices = NULL;
+    set_free(candidates);
+    set_free(sources);
+    set_free(processed);
+
+    ifdebug(8) {
+      pips_debug(4, "after FREIA_REMOVE_DUPLICATE_OPERATIONS:\n");
+      dag_dump(stderr, "remove duplicate", d);
+      // dag_dot_dump_prefix("main", "remove_duplicates", 0, d);
+    }
   }
 
   if (get_bool_property("FREIA_SIMPLIFY_OPERATIONS"))
@@ -1282,89 +1501,6 @@ list /* of statements */ freia_dag_optimize(dag d)
       pips_debug(4, "after FREIA_REMOVE_DEAD_OPERATIONS:\n");
       dag_dump(stderr, "remove dead", d);
       // dag_dot_dump_prefix("main", "remove_dead", 0, d);
-    }
-  }
-
-  // look for identical image operations (same inputs, same params)
-  // (that produce image, we do not care about measures for SPOC,
-  // but we should for terapix!)
-  // the second one is replaced by a copy.
-  // also handle commutations.
-
-  if (get_bool_property("FREIA_REMOVE_DUPLICATE_OPERATIONS"))
-  {
-    pips_debug(6, "removing duplicate operations\n");
-    list vertices = gen_nreverse(gen_copy_seq(dag_vertices(d)));
-    hash_table previous = hash_table_make(hash_pointer, 10);
-
-    FOREACH(dagvtx, vr, vertices)
-    {
-      int op = (int) vtxcontent_optype(dagvtx_content(vr));
-      pips_debug(7, "at vertex %"_intFMT" (op=%d)\n", dagvtx_number(vr), op);
-
-      // skip no-operations
-      if (op<spoc_type_poc || op>spoc_type_mes) continue;
-
-      // skip already removed ops
-      if (set_belong_p(remove, vr)) continue;
-
-      pips_debug(8, "investigating...\n");
-      list preds = dag_vertex_preds(d, vr);
-      bool switched = false;
-      HASH_MAP(pp, lp,
-      {
-        dagvtx p = (dagvtx) pp;
-
-        pips_debug(8, "comparing %"_intFMT" and %"_intFMT"\n",
-                   dagvtx_number(vr), dagvtx_number(p));
-
-        // ??? maybe I should not remove all duplicates, because
-        // recomputing them may be cheaper?
-        if (dagvtx_is_measurement_p(vr) || dagvtx_is_measurement_p(p))
-        {
-          // special handling for measures, esp for terapix
-          if (same_operation_p(vr, p) &&
-              gen_list_equals_p(preds, (list) lp))
-          {
-            // min(A, px), min(A, py) => min(A, px) && *py = *px
-            if (switch_vertex_to_assign(vr, p))
-              set_add_element(remove, remove, vr);
-            switched = true;
-            break;
-          }
-        }
-        else if (same_operation_p(vr, p) &&
-                 gen_list_equals_p(preds, (list) lp) &&
-                 same_constant_parameters(vr, p))
-        {
-          switch_vertex_to_a_copy(vr, p, preds);
-          switched = true;
-          break;
-        }
-        else if (commutative_operation_p(vr, p) &&
-                 list_commuted_p(preds, (list) lp))
-        {
-          switch_vertex_to_a_copy(vr, p, preds);
-          switched = true;
-          break;
-        }
-      },  previous);
-
-      if (switched)
-        gen_free_list(preds);
-      else
-        hash_put(previous, vr, preds);
-    }
-
-    // cleanup
-    HASH_MAP(k, v, if (v) gen_free_list(v), previous);
-    hash_table_free(previous), previous = NULL;
-    gen_free_list(vertices), vertices = NULL;
-
-    ifdebug(8) {
-      pips_debug(4, "after FREIA_REMOVE_DUPLICATE_OPERATIONS:\n");
-      dag_dump(stderr, "remove duplicate", d);
-      // dag_dot_dump_prefix("main", "remove_duplicates", 0, d);
     }
   }
 
@@ -1575,7 +1711,8 @@ list /* of statements */ freia_dag_optimize(dag d)
   }
 
   pips_assert("right output count after optimizations",
-         gen_length(dag_outputs(d)) + gen_length(lstats)==dag_output_count);
+      // former output images are either still computed or copies of computed
+      gen_length(dag_outputs(d)) + gen_length(lstats)==dag_output_count);
 
   return lstats;
 }

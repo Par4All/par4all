@@ -949,10 +949,6 @@ static void transfert_block(statement st,
 
   pips_debug(4,"Entering transfert_block\n");
 
-  /* Store mapping between statement and copy from */
-//  hash_table statement_transfert_from = hash_table_make(hash_pointer, 10);
-//  hash_table statement_transfert_to = hash_table_make(hash_pointer, 10);
-
   /* loop over statements inside the block */
   for (list current = (sts); !ENDP(current); POP(current)) {
     statement one = STATEMENT(CAR(current));
@@ -1134,6 +1130,23 @@ static void transfert_statement(statement st,
   set_difference(transferts_to, transferts_to, COPY_FROM_OUT(st));
   set_difference(transferts_to, transferts_to, already_transfered_to);
 
+  // We remove from "transfers_to" what is not written by this statement
+  set allowed_to_transfer_to= MAKE_SET();
+  gen_context_recurse(st,allowed_to_transfer_to,statement_domain,gen_true,get_written_entities);
+  ifdebug(4) {
+    pips_debug(0,"Removing from transfer_to what is not written here : ");
+    set removed = MAKE_SET();
+    set_difference(removed,transferts_to,allowed_to_transfer_to);
+    list t_to = set_to_sorted_list(removed,(gen_cmp_func_t)compare_entities);
+    FOREACH(entity, e, t_to) {
+      fprintf(stderr, "%s ", entity_name(e));
+    }
+    fprintf(stderr, "\n");
+  }
+  set_intersection(transferts_to,transferts_to,allowed_to_transfer_to);
+  set_free(allowed_to_transfer_to);
+
+
   SET_FOREACH(entity, e, transferts_to) {
     set_add_element(already_transfered_to, already_transfered_to, e);
     set_add_element(array_to_transfer_to_after, array_to_transfer_to_after, e);
@@ -1238,6 +1251,8 @@ static void transfert_statement(statement st,
     default:
       pips_internal_error("Unknown tag %d\n", instruction_tag(i) );
   }
+
+
 
   set killed_transfer = MAKE_SET();
   set_difference(killed_transfer, COPY_TO_OUT(st), COPY_TO_IN(st));

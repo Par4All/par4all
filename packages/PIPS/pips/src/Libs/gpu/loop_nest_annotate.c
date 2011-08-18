@@ -409,3 +409,46 @@ bool gpu_loop_nest_annotate(char *module_name)
   PIPS_PHASE_POSTLUDE(module_statement);
   // The macro above does a "return TRUE" indeed.
 }
+
+
+
+/**
+ * Callback for gen_recurse
+ * Parallelize perfectly nested loop nest, till we reach the magic comment
+ *
+ * FIXME : should detect the begining sentinel, but since we use it in launcher,
+ * it has no importance at that time
+ */
+bool parallelize_annotated_loop_nest(statement s) {
+  string comment = string_undefined;
+  if(statement_loop_p(s)) {
+    execution_tag(loop_execution(statement_loop(s))) = is_execution_parallel;
+    // Check the inner comment to find out the sentinel and stop recursion
+    comment = find_first_statement_comment(loop_body(statement_loop(s)));
+  } else {
+    comment = find_first_statement_comment(s);
+  }
+
+  // Check sentinel
+  if(comment && !string_undefined_p(comment) && NULL!=strstr(comment,"Loop nest P4A end")) {
+    // stop recursion
+    return false;
+  }
+  return true;
+}
+
+
+/** Parallelize the launcher based on loop nest annotate sentinels */
+bool gpu_parallelize_annotated_loop_nest(const string mod_name) {
+  // Use this module name and this environment variable to set
+  statement module_statement = PIPS_PHASE_PRELUDE(mod_name,
+              "GPU_IFY_DEBUG_LEVEL");
+
+  // Parallelize loops
+  gen_recurse(module_statement,
+        statement_domain, parallelize_annotated_loop_nest, gen_identity);
+
+  // Put back the new statement module
+  PIPS_PHASE_POSTLUDE(module_statement);
+  // The macro above does a "return TRUE" indeed.
+}
