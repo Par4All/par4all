@@ -481,7 +481,7 @@ statement unimodular(s)
   Pvecteur *pvg;
   Pbase pb;  
   expression lower, upper;
-  Pvecteur pv1, pv2;
+  Pvecteur pv1 ;
   loop l;
   while(instruction_loop_p(statement_instruction (s))) {
     lls = CONS(STATEMENT,s,lls);
@@ -530,7 +530,7 @@ statement unimodular(s)
   pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
   scanning_base_to_vect(G_inv,n,base_newindex,pvg);
   pv1 = sc_row_echelon->inegalites->succ->vecteur;
-  pv2 = vect_change_base(pv1,base_oldindex,pvg);    
+  (void)vect_change_base(pv1,base_oldindex,pvg);    
   l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
   lower = range_upper(loop_range(l));
   upper= expression_to_expression_newbase(lower, pvg, base_oldindex);
@@ -1142,7 +1142,10 @@ statement  free_guards( s)
   lis= gen_nreverse(lis);
   i=-1;
   lisp=lis; 
-  MAP(STATEMENT,s,{i++;if((i!=isoler)&&(i%2==0)&&(i!=isoler2)) {
+  FOREACH(STATEMENT,s,lis)
+  {
+      s=s;
+      i++;if((i!=isoler)&&(i%2==0)&&(i!=isoler2)) {
     if(i==0) {
       CHUNK( CAR(lisp))= (gen_chunk *) make_block_statement(NIL); 
       range_lower(loop_range(tab_loop[i+1]))= 
@@ -1196,7 +1199,6 @@ statement  free_guards( s)
   };
   lisp=CDR(lisp); 
    }
-   ,lis) 
     seq=make_sequence (lis);
      ins= make_instruction_sequence(seq);
      return(  instruction_to_statement(ins)); 

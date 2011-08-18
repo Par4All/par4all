@@ -264,13 +264,12 @@ static void call_rwt(call  ca, context_p context)
       if (strcmp(entity_name(call_function(ca)),"TOP-LEVEL:=")==0)
 	{
 	  list lis;
-	  expression exp, gauche=NULL, droite=NULL;
+	  expression gauche=NULL, droite=NULL;
 	  syntax stg,std;
           normalized norm;
 	  Pvecteur pv;       
 	  int i=0,j=0;
 	  lis =call_arguments(ca);
-	  exp=(expression )CHUNK(CAR(lis));
 	  MAP(EXPRESSION,exp,{  
 	    if (i==0)  gauche=exp;
 	    if (i==1)  droite=exp;
@@ -621,10 +620,7 @@ static statement  fusion()
   for(j=0;j<=depth-1;j++)
     {
       range range1;
-      expression lower, upper;
       range1=loop_range(ls); 
-      lower=range_lower(range1);  
-      upper=range_upper(range1); 
       range_lower(range1)=make_integer_constant_expression(merged_nest[j].lower);
       range_upper(range1)= make_integer_constant_expression(merged_nest[j].upper);
       if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
@@ -865,11 +861,8 @@ static statement fusion_buffer()
   for(j=0;j<=depth-1;j++)
     {
       range range1;
-      expression lower, upper;
     
       range1=loop_range(ls); 
-      lower=range_lower(range1);  
-      upper=range_upper(range1); 
       range_lower(range1)=
 	make_integer_constant_expression(merged_nest[j].lower);
       range_upper(range1)=
@@ -1031,7 +1024,6 @@ statement Hierarchical_tiling ()
   statement s,s1;
   loop ls=NULL;
   cons *lls=NULL;
-  Psysteme sci;			/* sc initial */
   Pbase base_oldindex = NULL;
   Pbase base_newindex = NULL;
   Pbase pb;
@@ -1053,10 +1045,7 @@ statement Hierarchical_tiling ()
   for(j=0;j<=depth-1;j++)
     {
       range range1;  
-      expression lower, upper;
       range1=loop_range(ls); 
-      lower=range_lower(range1);  
-      upper=range_upper(range1); 
       range_lower(range1)=make_integer_constant_expression(tiled_nest[j].lower);
       range_upper(range1)= make_integer_constant_expression(tiled_nest[j].upper);
       if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
@@ -1066,7 +1055,7 @@ statement Hierarchical_tiling ()
     lls = CONS(STATEMENT,s1,lls);
     s1 = loop_body(instruction_loop(statement_instruction(s1)));
   }
-  sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
+  (void)loop_iteration_domaine_to_sc(lls, &base_oldindex);
 
   derive_new_basis_deux(base_oldindex, &base_newindex , make_tile_index_entity_n);
   tiling_indice= ( Pvecteur  *)malloc(depth *sizeof( Pvecteur*));
@@ -1256,7 +1245,6 @@ statement Tiling_buffer_allocation ()
   statement s,s1,sequenp[nid_nbr],ps1,ps2/*,*pst1*/;
   loop ls=NULL;
   cons *lls=NULL;
-  Psysteme sci;			/* sc initial */
   Pbase base_oldindex = NULL;
   Pbase base_newindex = NULL;
   Pbase pb;
@@ -1316,7 +1304,7 @@ statement Tiling_buffer_allocation ()
     s1 = loop_body(instruction_loop(statement_instruction(s1)));
   }
  
-  sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
+  (void)loop_iteration_domaine_to_sc(lls, &base_oldindex);
   derive_new_basis_une(base_oldindex, &base_newindex , make_tile_index_entity_n);
  
   iter= ( Variable  *)malloc(depth *sizeof( Variable));
@@ -1337,7 +1325,7 @@ statement Tiling_buffer_allocation ()
 
       Pvecteur pv;
       Value con;
-      expression e,gauche,droite,cavite;
+      expression e,gauche,cavite;
       test t;
       statement s;
       call c;
@@ -1457,7 +1445,6 @@ statement Tiling_buffer_allocation ()
 	      m=0;
 	      MAP(EXPRESSION,exp,{  
 		if (m==0)  gauche=exp;
-		if (m==1)  droite=exp;
 		m++;
 	      },call_arguments(c)) ;
 	      syntax_reference(expression_syntax(gauche))= buf_ref[i][j-1];
@@ -1494,7 +1481,6 @@ statement Tiling_buffer_allocation ()
 	  m=0;
 	  MAP(EXPRESSION,exp,{  
 	    if (m==0)  gauche=exp;
-	    if (m==1)  droite=exp;
 	    m++;
 	  },call_arguments(c)) ;
 	  syntax_reference(expression_syntax(gauche))= buf_ref[i][depth];
@@ -1541,7 +1527,7 @@ statement Tiling_buffer_allocation ()
 	}
       for(j=0;j<=depth;j++) 
 	{
-	  expression gauche,droite,expt;
+	  expression droite,expt;
 	  statement s1,s2,s3;
           sequence seq;
 	  instruction ins;
@@ -1554,7 +1540,6 @@ statement Tiling_buffer_allocation ()
 	  c= instruction_call(statement_instruction(( s1)));
 	  m=0;
 	  MAP(EXPRESSION,exp,{  
-	    if (m==0)  gauche=exp;
 	    if (m==1)  droite=exp;
 	    m++;
 	  },call_arguments(c)) ;
@@ -1639,15 +1624,12 @@ statement Tiling_buffer_allocation ()
 	      for(l=depth-1;l>=0;l--)
 		{
 		  int pos;
-		  Pvecteur pv1,pv2;
+		  Pvecteur pv2;
 		  //statement s1/*,s2*/;
 		  test t;
-		  expression exp1,exp2,exp;
+		  expression exp;
 		  pos=position_one_element(P1,l+1);
-		  pv1= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST ,VALUE_ZERO);
-		  exp1= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv1 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
 		  pv2= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST , -MATRIX_ELEM(temp[k],pos,1));
-		  exp2= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv2 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
 		  exp=lt_expression(Pvecteur_to_expression(pv2 ),Value_to_expression(VALUE_ZERO));
 		  t= make_test(exp,stemp[l],s);
 		  s=test_to_statement(t);
@@ -1660,7 +1642,6 @@ statement Tiling_buffer_allocation ()
 	  c= instruction_call(statement_instruction(( s3)));
 	  m=0;
 	  MAP(EXPRESSION,exp,{  
-	    if (m==0)  gauche=exp;
 	    if (m==1)  droite=exp;
 	    m++;
 	  },call_arguments(c)) ;
@@ -1722,7 +1703,7 @@ statement Tiling_buffer_allocation ()
       //int m1;
       /* */
 
-      expression gauche,droite,expt;
+      expression droite,expt;
       statement s1,s2,s3;
       sequence seq;
       instruction ins;
@@ -1780,7 +1761,6 @@ statement Tiling_buffer_allocation ()
       c= instruction_call(statement_instruction(( s1)));
       m=0;
       MAP(EXPRESSION,exp,{  
-	if (m==0)  gauche=exp;
 	if (m==1)  droite=exp;
 	m++;
       },call_arguments(c)) ;
@@ -1870,15 +1850,12 @@ statement Tiling_buffer_allocation ()
 	  for(l=depth-1;l>=0;l--)
 	    {
 	      int pos;
-	      Pvecteur pv1,pv2;
+	      Pvecteur pv2;
 	      //statement s1,s2;
 	      test t;
-	      expression exp1,exp2,exp;
+	      expression exp;
 	      pos=position_one_element(P1,l+1);
-	      pv1= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST ,VALUE_ZERO);
-	      exp1= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv1 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
 	      pv2= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST , -MATRIX_ELEM(temp[k],pos,1));
-	      exp2= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv2 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
 	      exp=lt_expression( Pvecteur_to_expression(pv2 ) ,Value_to_expression(VALUE_ZERO) );
 	      t= make_test(exp,stemp[l],s);
 	      s=test_to_statement(t);
@@ -1891,7 +1868,6 @@ statement Tiling_buffer_allocation ()
       c= instruction_call(statement_instruction(( s3)));
       m=0;
       MAP(EXPRESSION,exp,{  
-	if (m==0)  gauche=exp;
 	if (m==1)  droite=exp;
 	m++;
       },call_arguments(c)) ;
@@ -1932,10 +1908,7 @@ statement Tiling_buffer_allocation ()
   for(j=0;j<=depth-1;j++)
     {
       range range1;  
-      expression lower, upper;
       range1=loop_range(ls); 
-      lower=range_lower(range1);  
-      upper=range_upper(range1); 
       range_lower(range1)=make_integer_constant_expression(tiled_nest[j].lower);
       range_upper(range1)= make_integer_constant_expression(tiled_nest[j].upper);
       if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
@@ -2272,7 +2245,6 @@ statement  Tiling2_buffer()
   statement s,s1,s2;
   loop ls=NULL;
   cons *lls=NULL;
-  Psysteme sci;			/* sc initial */
   Pbase base_oldindex = NULL;
   Pbase base_newindex = NULL;
   Pbase pb;
@@ -2345,10 +2317,7 @@ statement  Tiling2_buffer()
   for(j=0;j<=depth-1;j++)
     {
       range range1;  
-      expression lower, upper;
       range1=loop_range(ls); 
-      lower=range_lower(range1);  
-      upper=range_upper(range1); 
       range_lower(range1)=make_integer_constant_expression(tiled_nest[j].lower);
       range_upper(range1)= make_integer_constant_expression(tiled_nest[j].upper);
       if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
@@ -2358,7 +2327,7 @@ statement  Tiling2_buffer()
     lls = CONS(STATEMENT,s1,lls);
     s1 = loop_body(instruction_loop(statement_instruction(s1)));
   }
-  sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
+  (void)loop_iteration_domaine_to_sc(lls, &base_oldindex);
 
   derive_new_basis_deux(base_oldindex, &base_newindex , make_tile_index_entity_n);
   tiling_indice= ( Pvecteur  *)malloc(depth *sizeof( Pvecteur*));

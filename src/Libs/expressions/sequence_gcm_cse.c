@@ -424,7 +424,7 @@ static gen_array_t /* of list of expressions */
 group_expr_by_level(int nlevels, list le)
 {
   gen_array_t result = gen_array_make(nlevels+1);
-  int i, lastlevel;
+  int i;
   bool first_alone;
 
   /* initialize chunks. */
@@ -453,12 +453,6 @@ group_expr_by_level(int nlevels, list le)
           eatlevel = CONS(EXPRESSION, e, eatlevel);
       }
       gen_array_addto(result, elevel, eatlevel);
-  }
-
-  for (i=0; i<=nlevels; i++)
-  {
-    if (((list)gen_array_item(result, i)) != list_undefined)
-      lastlevel = i;
   }
 
   /* Fix expressions by useful levels, with some operations.
@@ -557,7 +551,7 @@ static void atomize_or_associate_for_level(expression e, int level)
   call c;
   entity func;
   list /* of expression */ args;
-  int lenargs, exprlevel;
+  int lenargs;
 
   /* Some depth, otherwise no ICM needed!
    * should be fixed if root statement is pushed?
@@ -582,7 +576,6 @@ static void atomize_or_associate_for_level(expression e, int level)
   func = call_function(c);
   args = call_arguments(c);
   lenargs = gen_length(args);
-  exprlevel = expr_level_of(e);
 
   if (Is_Associative_Commutative(func) && lenargs>2)
   {

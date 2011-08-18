@@ -602,11 +602,9 @@ static void phrase_remove_dependences_rwt(statement stat)
 bool phrase_remove_dependences(string module_name)
 {
   statement module_stat;
-  entity module;
 
   /* Get the code of the module. */
   set_current_module_entity(module_name_to_entity(module_name));
-  module = get_current_module_entity();
   set_current_module_statement( (statement)
 				db_get_memory_resource(DBR_CODE, module_name, true) );
   module_stat = get_current_module_statement();

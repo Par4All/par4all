@@ -129,7 +129,6 @@ static bool print_code_with_comp_regions(string module_name,
 				    string file_suffix)
 {
     char *file_name, *file_resource_name;
-    bool success = true;
 
     file_name = strdup(concatenate(file_suffix,
                                   get_bool_property
@@ -140,7 +139,7 @@ static bool print_code_with_comp_regions(string module_name,
 	DBR_GRAPH_PRINTED_FILE : 
 	    (is_user_view_p ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE);
 
-    success = make_text_resource(module_name, file_resource_name,
+    bool success = make_text_resource(module_name, file_resource_name,
 				 file_name,
 				 get_any_comp_regions_text(module_name,
 				    resource_name,
@@ -148,7 +147,7 @@ static bool print_code_with_comp_regions(string module_name,
 				    true));
 
     free(file_name);
-    return(true);
+    return success ;
 }
 
 /*{{{  get any comp_regions text*/
@@ -290,9 +289,9 @@ list l_reg;
     /* GO: No redundant test anymore, see  text_statement_array_comp_regions */
     if (l_reg != (list) HASH_UNDEFINED_VALUE && l_reg != list_undefined) 
     {
+/*
 	MAP(COMP_DESC, reg,
 	{
-/*
 	    entity ent = effect_entity(reg);
 	    if ( get_bool_property("PRETTYPRINT_SCALAR_comp_regions") || 
 		! entity_scalar_p(ent)) 
@@ -306,9 +305,9 @@ list l_reg;
 		}
 		MERGE_TEXTS(reg_text, text_comp_region(reg));
 	    }	
-	    */
 	},
 	    l_reg);
+	    */
 
 	if (loose_p && one_p)
 	    ADD_SENTENCE_TO_TEXT(reg_text, 

@@ -524,9 +524,8 @@ static string st_declaration_init(entity var)
     {
       int dimensions;
       variable v = type_variable(t);
-      string svar, st;
+      string svar;
       value val = entity_initial(var);
-      st = c_basic_string(variable_basic(v));
 
       svar = st_entity_local_name(var);
 

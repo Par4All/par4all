@@ -145,7 +145,6 @@ char *s;
 bool same_predicate_p(p1, p2)
 predicate p1, p2;
 {
-  Psysteme s1, s2;
 
   if( (p1 == predicate_undefined) && (p2 == predicate_undefined) )
     return(true);
@@ -153,9 +152,6 @@ predicate p1, p2;
     return(false);
   else if(p2 == predicate_undefined)
     return(false);
-
-  s1 = (Psysteme) predicate_system(p1);
-  s2 = (Psysteme) predicate_system(p2);
 
   if( (p1 == NULL) && (p2 == NULL) )
     return(true);

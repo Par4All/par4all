@@ -421,7 +421,7 @@ print_source_or_code_effects_engine(
     if (prettyprint_with_attachments_p)
 	end_attachment_prettyprint();
 
-    return true;
+    return success;
 }
 
 

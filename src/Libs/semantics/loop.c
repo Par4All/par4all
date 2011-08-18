@@ -1537,7 +1537,6 @@ list complete_forloop_transformer_list(transformer t_body_star,
 				       forloop fl)
 {
   list tfl = list_undefined;
-  transformer ct = transformer_undefined;
   statement body_s = forloop_body(fl);
   transformer t_body = load_statement_transformer(body_s);
   transformer ct_body = transformer_undefined;
@@ -1566,7 +1565,7 @@ list complete_forloop_transformer_list(transformer t_body_star,
   pre_body = transformer_apply(t_body_star, pre);
   ct_body = complete_statement_transformer(t_body, pre_body, body_s);
 
-  ct = complete_any_loop_transformer(t_init, t_enter, t_skip, t_body_star, ct_body, t_continue, t_inc, t_exit);
+  (void)complete_any_loop_transformer(t_init, t_enter, t_skip, t_body_star, ct_body, t_continue, t_inc, t_exit);
 
   free_transformer(ct_body);
   free_transformer(pre_body);

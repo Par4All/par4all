@@ -202,9 +202,8 @@ summary_out_effects_engine(char *module_name)
     reset_out_summary_effects_list();
     MAP(STRING, caller_name,
     {
-	list l_tmp;
 	entity caller = module_name_to_entity(caller_name);
-	l_tmp = out_effects_from_caller_to_callee(caller,callee);
+	(void)out_effects_from_caller_to_callee(caller,callee);
     },
 	callees_callees(callers));
 
@@ -793,7 +792,6 @@ bool
 out_effects_engine(char *module_name)
 {
 
-    entity module;
     statement module_stat;
     list l_sum_out = NIL;
 
@@ -803,7 +801,6 @@ out_effects_engine(char *module_name)
     make_effects_private_current_context_stack();
    
     set_current_module_entity(module_name_to_entity(module_name));
-    module = get_current_module_entity();
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)

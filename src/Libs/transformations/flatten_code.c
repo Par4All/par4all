@@ -643,12 +643,10 @@ void statement_split_initializations(statement s)
  */
 bool split_initializations(string module_name)
 {
-  entity module;
   statement module_stat;
   bool good_result_p = true;
 
   set_current_module_entity(module_name_to_entity(module_name));
-  module = get_current_module_entity();
   set_current_module_statement( (statement)
 				db_get_memory_resource(DBR_CODE, module_name, true) );
   module_stat = get_current_module_statement();

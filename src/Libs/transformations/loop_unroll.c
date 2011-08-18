@@ -177,7 +177,6 @@ static void do_loop_unroll_with_epilogue(statement loop_statement,
   //expression rhs_expr, expr;
   //entity label_entity;
   statement body = statement_undefined;
-  statement top_stmt = statement_undefined; // block stmt containing the two loops
   statement loop_stmt1 = statement_undefined; // stmt for loop 1,
 					      // unrolled loop
   statement loop_stmt2 = statement_undefined; // stmt for loop 2, epilogue
@@ -196,7 +195,6 @@ static void do_loop_unroll_with_epilogue(statement loop_statement,
 
   /* Instruction block is created and will contain the two new loops */
   block = make_instruction_block(NIL);
-  top_stmt = instruction_to_statement(block);
 
   /* compute the new intermediate loop bounds, nlow and nup=nlow-1 */
   /* span = up-low+1 */
@@ -1013,7 +1011,6 @@ bool
 unroll(char *mod_name)
 {
     statement mod_stmt;
-    instruction mod_inst;
     char *lp_label = NULL;
     entity lb_ent;
     int rate;
@@ -1058,7 +1055,6 @@ unroll(char *mod_name)
                data base after unrolling */
 
             mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
-            mod_inst = statement_instruction(mod_stmt);
 
             /* prelude */
             set_current_module_entity(module_name_to_entity( mod_name ));

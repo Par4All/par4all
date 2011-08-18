@@ -156,10 +156,6 @@ static_control sc;
     text sc_text = make_text(NIL);
     char *t = NULL;
     string comment;
-    static char yes[MAX_STATIC_CONTROL_LINE_NUMBER];
-    static char params[MAX_STATIC_CONTROL_LINE_NUMBER];
-    static char loops[MAX_STATIC_CONTROL_LINE_NUMBER];
-    static char tests[MAX_STATIC_CONTROL_LINE_NUMBER];
 
     /* pips_assert("store_text_line", sefs_list != NIL); */
     if (get_prettyprint_language_tag() == is_language_c)
@@ -167,10 +163,6 @@ static_control sc;
     else 
       comment = "C";
 
-    yes[0] 	= '\0';
-    params[0] 	= '\0';
-    loops[0] 	= '\0';
-    tests[0]	= '\0';
 
     t = concatenate(comment,"\t\t< is static >",
 		(static_control_yes(sc)?" TRUE":" FALSE"), "\n", NULL);

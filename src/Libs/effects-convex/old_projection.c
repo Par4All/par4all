@@ -1299,7 +1299,6 @@ static Psysteme region_sc_projection_ofl_along_parameter(Psysteme sc, Variable p
 {
     Pcontrainte eq;
     Pbase base_sc;
-    Psysteme sc_tmp;
     bool hermite_sc_p;
 
     pips_debug(8, "begin\n");
@@ -1321,7 +1320,7 @@ static Psysteme region_sc_projection_ofl_along_parameter(Psysteme sc, Variable p
 
     /* if the last equation is not explicit, it may be implicit
      */
-    sc_tmp = region_sc_minimal(sc, &hermite_sc_p);
+    (void)region_sc_minimal(sc, &hermite_sc_p);
 
     if (hermite_sc_p)
     {

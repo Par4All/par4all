@@ -576,10 +576,8 @@ bool effects_interfere_p(effect eff1, effect eff2)
       reference wr = reference_undefined;
       entity wv = entity_undefined;
       reference rr = reference_undefined;
-      entity rv = entity_undefined;
 
       list rind = list_undefined;
-      list wind = list_undefined;
 
       if(action_write_p(ac1)) {
 	wr = effect_any_reference(eff1);
@@ -591,8 +589,6 @@ bool effects_interfere_p(effect eff1, effect eff2)
       }
 
       wv = reference_variable(wr);
-      wind = reference_indices(wr);
-      rv = reference_variable(rr);
       rind = reference_indices(rr);
 
       /* Does the write impact the indices of the read? */

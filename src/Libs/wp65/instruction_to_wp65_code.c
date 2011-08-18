@@ -590,7 +590,6 @@ loop_nest_to_wp65_code(
 {
 
     Psysteme iteration_domain = sc_new();  
-    Psysteme full_iteration_domain = sc_new();
     Psysteme  iteration_domain2 = sc_new();
     Psysteme sc_tile = SC_UNDEFINED;
     tiling tile;
@@ -666,7 +665,6 @@ loop_nest_to_wp65_code(
     find_iteration_domain(loop_nest,&iteration_domain, &initial_basis,
 			  &nested_level,&list_statement_block, &binst);
     full_initial_basis = base_dup(initial_basis); 
-    full_iteration_domain =iteration_domain;
     perfect_nested_loop_size= vect_size(initial_basis);
 
     /* pour eviter tous les problemes de tiling sur les nids de boucles
@@ -755,7 +753,6 @@ loop_nest_to_wp65_code(
     }
     else {
 	Pbase tbib2 = BASE_NULLE;
-	Pbase tbib3 = BASE_NULLE;
 	Pbase tbtl3 = BASE_NULLE;
 	Pbase tbtl4 = BASE_NULLE;
 	Pbase lba3 = BASE_NULLE; 
@@ -802,7 +799,7 @@ loop_nest_to_wp65_code(
 				   &tbib2, &tbtl3, &lba3, &tbtl4, &lba4);
 		 tbtl5= base_reversal(vect_add(tile_basis_in_tile_basis, tbtl3));
 		 tbtl6= base_reversal(vect_add(tile_basis_in_tile_basis2, tbtl4));
-		 tbib3=base_reversal(vect_add(tile_basis_in_initial_basis, tbib2));
+		 //Pbase tbib3=base_reversal(vect_add(tile_basis_in_initial_basis, tbib2));
 		 lba5= base_reversal(vect_add( local_basis, lba3));
 		 lba6= base_reversal(vect_add( local_basis2, lba4));
 		 /* a modifie pour tenir compte des dimensions reelles des domaines */

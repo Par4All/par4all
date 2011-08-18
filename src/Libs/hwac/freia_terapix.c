@@ -87,7 +87,7 @@ static void erosion_optimization
         pips_assert("must be a kernel...", gen_length(iargs)==9);
 
         // tell whether each kernel element is zero. If in doubt, count as 1.
-        bool k00, k10, k20, k01, k11, k21, k02, k12, k22;
+        bool k00, k10, k20, k01, k21, k02, k12, k22;
         intptr_t i = 0;
         k00 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
         iargs = CDR(iargs);
@@ -97,7 +97,7 @@ static void erosion_optimization
         iargs = CDR(iargs);
         k01 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
         iargs = CDR(iargs);
-        k11 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
+        //bool k11 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
         iargs = CDR(iargs);
         k21 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
         iargs = CDR(iargs);
@@ -1712,8 +1712,8 @@ split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx),
 static int cut_decision(dag d, hash_table erosion)
 {
   int com_cost_per_row = get_int_property(trpx_dmabw_prop);
-  int len, width, cost, nops, n, s, w, e;
-  len = dag_terapix_measures(d, erosion, &width, &cost, &nops, &n, &s, &w, &e);
+  int  width, cost, nops, n, s, w, e;
+  (void)dag_terapix_measures(d, erosion, &width, &cost, &nops, &n, &s, &w, &e);
   int nins = gen_length(dag_inputs(d)), nouts = gen_length(dag_outputs(d));
 
   // if we assume that the imagelet size is quite large, say around 128
