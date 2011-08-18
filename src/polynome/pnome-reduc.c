@@ -70,10 +70,7 @@ Ppolynome ppsubst;
 		if (POLYNOME_UNDEFINED_P(ppsubst))
 		    return (POLYNOME_UNDEFINED);
 		else {
-		    Ppolynome pptmp;
 		    newpm = monome_del_var(curpm, var);
-		    pptmp = monome_to_new_polynome(newpm);
-
 		    ppsubst_n = polynome_power_n(ppsubst, varpower);
 		    ppmult = polynome_monome_mult(ppsubst_n, newpm);
 		    polynome_add(&newpp, ppmult);

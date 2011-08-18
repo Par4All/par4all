@@ -239,12 +239,11 @@ Pbase base;
  */ 
 static void sc_to_matrix(Psysteme sc, Matrix *mat)
 {
-    int nbrows, nbcolumns, i, j;
+    int nbrows, i, j;
     Pcontrainte peq;
     Pvecteur pv;
 
     nbrows = mat->NbRows;
-    nbcolumns = mat->NbColumns;
 
     /* Differentiation equations and inequations */
     for (i=0; i<=sc->nb_eq-1;i++)
@@ -690,8 +689,6 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     } else  if (A2->NbRays == 0) {
 	a= Polyhedron2Constraints(A1); 
     } else {
-	int i1p;
-	int cpp;
 
 	Dimension = A1->Dimension+2;
 	a = Matrix_Alloc(A1->NbRays + A2->NbRays,Dimension);
@@ -714,8 +711,6 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	    cp++; i2++;
 	}
 
-	i1p = i1;
-	cpp = cp;
 	while (i1 < A1->NbRays && A1->Ray[i1][0] ==1 
 	       && A1->Ray[i1][Dimension-1]==0) {
 	    for (j=0; j < Dimension ; j++) 
@@ -730,8 +725,6 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	    cp++; i2++;
 	}
 
-	i1p = i1;
-	cpp = cp;
 	while (i1 < A1->NbRays && A1->Ray[i1][0] == 1 
 	       && A1->Ray[i1][Dimension-1]!= 0) {
 	    for (j=0; j < Dimension ; j++)  
