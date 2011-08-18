@@ -112,6 +112,10 @@ int main(int argc, char** argv) {
   }
 
   /* E := A*B*D */
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   for (i = 0; i < ni; i++)
     for (j = 0; j < nj; j++) {
       C[i][j] = 0;
@@ -124,6 +128,9 @@ int main(int argc, char** argv) {
       for (k = 0; k < nj; ++k)
         E[i][j] += C[i][k] * D[k][j];
     }
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0] == 0) {

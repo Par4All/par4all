@@ -1,4 +1,3 @@
-#define P4A_DEBUG
 #define P4A_ACCEL_CUDA
 #include <p4a_accel.h>
 

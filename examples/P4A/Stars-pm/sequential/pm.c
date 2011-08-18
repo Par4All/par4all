@@ -59,6 +59,10 @@ int main(int argc, char **argv) {
   start_time = get_time();
   /***        ***/
 
+  // Force the copy-in here so that we are timing it !
+  if(argc==0)
+    readDataFile(mp, pos, vel, icfile);
+
 
   /******************************************************
    *                  MAIN LOOP !!
@@ -117,7 +121,10 @@ int main(int argc, char **argv) {
   //************************************  END LOOP  ********************************
 
   // Force synchro when using async launch on the GPU
-  coord unused = pos[0][0][0];
+  // Force a copy-out here so that we are timing it !
+  if(argc==0)
+    dump_pos(pos,npdt);
+
 
   /*** TIMING ***/
   end_time = get_time();

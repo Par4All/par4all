@@ -1,0 +1,12 @@
+p4a_new_files
+*_cuda_opt
+*_cuda
+*_seq
+*_openmp
+*.opt.cu
+*.opt.c
+*.naive.cu
+*.naive.c
+*.p4a.c
+*.p4a.cu
+*.openmp.c

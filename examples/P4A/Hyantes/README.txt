@@ -82,9 +82,9 @@ debugging, without any GPU):
 You can set the P4A_OPTIONS variable to pass some options to p4a.
 
   For example, globally with an:
-  export P4A_OPTIONS='--nvcc-flags="-gencode arch=compute_20,code=sm_20 -DP4A_DEBUG"'
+  export P4A_OPTIONS='--nvcc-flags="-gencode arch=compute_20,code=sm_20"'
   or locally with:
-  make P4A_OPTIONS='--nvcc-flags="-DP4A_DEBUG"' run_cuda
+  make P4A_OPTIONS='--nvcc-flags="-gencode arch=compute_20,code=sm_20"' run_cuda
 
 
 For a full demo:

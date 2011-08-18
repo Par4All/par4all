@@ -7,10 +7,10 @@
 
 /* Default problem size. */
 #ifndef TSTEPS
-# define TSTEPS 10000
+# define TSTEPS 20
 #endif
 #ifndef N
-# define N 4096
+# define N 1000
 #endif
 
 /* Default data type is double. */
@@ -21,17 +21,22 @@
 # define DATA_PRINTF_MODIFIER "%0.2lf "
 #endif
 
-DATA_TYPE A[N];
-DATA_TYPE B[N];
+/* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */
+DATA_TYPE A[N][N];
+DATA_TYPE B[N][N];
 
 static void init_array() {
   int i, j;
 
   for (i = 0; i < N;) {
-    A[i] = ((DATA_TYPE)4 * i + 10) / N;
-    B[i] = ((DATA_TYPE)7 * i + 11) / N;
+    for (j = 0; j < N;) {
+      A[i][j] = ((DATA_TYPE)i * (j + 2) + 10) / N;
+      B[i][j] = ((DATA_TYPE)(i - 4) * (j - 1) + 11) / N;
+      j++;
+    }
     i++;
   }
+
 }
 
 /* Define the live-out variables. Code is not executed unless
@@ -42,11 +47,12 @@ static void print_array(int argc, char** argv) {
   if(argc > 42 && !strcmp(argv[0], ""))
 #endif
   {
-    for (i = 0; i < N; i++) {
-      fprintf(stderr, DATA_PRINTF_MODIFIER, A[i]);
-      if(i % 80 == 20)
-        fprintf(stderr, "\n");
-    }
+    for (i = 0; i < N; i++)
+      for (j = 0; j < N; j++) {
+        fprintf(stderr, DATA_PRINTF_MODIFIER, A[i][j]);
+        if((i * N + j) % 80 == 20)
+          fprintf(stderr, "\n");
+      }
     fprintf(stderr, "\n");
   }
 }
@@ -67,13 +73,22 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   for (t = 0; t < tsteps; t++) {
     for (i = 2; i < n - 1; i++)
-      B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
-
-    for (j = 2; j < n - 1; j++)
-      A[j] = B[j];
+      for (j = 2; j < n - 1; j++)
+        B[i][j] = 0.2 * (A[i][j] + A[i][j - 1] + A[i][1 + j] + A[1 + i][j]
+            + A[i - 1][j]);
+    for (i = 2; i < n - 1; i++)
+      for (j = 2; j < n - 1; j++)
+        A[i][j] = B[i][j];
   }
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {
@@ -81,7 +96,7 @@ int main(int argc, char** argv) {
   }
 
   /* Stop and print timer. */
-  timer_stop_display();;
+  timer_stop_display();
 
   print_array(argc, argv);
 

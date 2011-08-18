@@ -82,9 +82,14 @@ void lud_base(int size,float a[size][size])
 
 
 // This is the reference to parallelize
+#pragma hmpp lud_99 codelet, target=CUDA
 void lud_99(int size, float a[size][size])
 {
      int i,j,k;
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
 
      for (i=0; i<size; i++){
          for (j=i; j<size; j++){
@@ -99,6 +104,9 @@ void lud_99(int size, float a[size][size])
              a[j][i]=sum/a[i][i];
          }
      }
+#ifdef PGI_ACC
+}
+#endif
 }
 
 
@@ -162,7 +170,8 @@ main ( int argc, char *argv[] )
     memset(m,0,sizeof(mm));
   }
 
-  
+
+#pragma hmpp lud_99 callsite
   lud_99(matrix_dim,mm);
 
   /* Cheat the compiler (again) to limit the scope of optimisation */

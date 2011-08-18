@@ -73,10 +73,13 @@ def add_own_options(parser):
         help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
 
     proc_group.add_option("--atomic", action = "store_true", default = False,
-        help = "Use atomic operations for parallelizing reductions on GPU.")
+        help = "Use atomic operations for parallelizing reductions on GPU (experimental).")
 
     proc_group.add_option("--pocc", action = "store_true", default = False,
-        help = "Use PoCC to optimize loop nest.")
+        help = "Use PoCC to optimize loop nest (experimental).")
+
+    proc_group.add_option("--cuda-cc", action = "append", default = "2.0",
+        help = "Compile capabilities of Cuda target (default is 2.0)")
 
     proc_group.add_option("--select-modules", metavar = "REGEXP", default = None,
         help = "Process only the modules (functions and subroutines) whith names matching the regular expression. For example '^saxpy$|dgemm\' will keep only functions or procedures which name is exactly saxpy or contains \"dgemm\". For more information about regular expressions, look at the section 're' of the Python library reference for example. In Fortran, the regex should match uppercase names. Be careful to escape special characters from the shell. Simple quotes are a good way to go for it.")
@@ -344,6 +347,20 @@ def main():
         if len(args) == 0:
             p4a_util.die("Missing input files")
 
+        if options.cuda_cc == "1.0":
+            options.cuda_cc=1
+        elif options.cuda_cc == "1.1":
+            options.cuda_cc=1.1
+        elif options.cuda_cc == "1.2":
+            options.cuda_cc=1.2
+        elif options.cuda_cc == "1.3":
+            options.cuda_cc=1.3
+        elif options.cuda_cc == "2.0":
+            options.cuda_cc=2
+        else:
+            p4a_util.die("Unknow cuda compute capability requested : '" + options.cuda_cc + "' (allowed : 1.0 1.1 1.2 1.3 2.0)")            
+
+
         if options.simple and (options.cuda or options.openmp or options.scmp):
             p4a_util.die("Cannot combine --simple with --cuda and/or --openmp and/or --scmp")
 
@@ -473,6 +490,7 @@ def main():
             cuda = options.cuda,
             atomic = options.atomic,
             com_optimization = options.com_optimization,
+            cuda_cc = options.cuda_cc,
             fftw3 = options.fftw3,
             add_debug_flags = options.debug,
             add_optimization_flags = not options.no_fast,
@@ -510,6 +528,7 @@ def main():
             input.accel = options.accel
             input.cuda = options.cuda
             input.com_optimization = options.com_optimization
+            input.cuda_cc = options.cuda_cc
             input.fftw3 = options.fftw3
             input.openmp = options.openmp
             input.scmp = options.scmp

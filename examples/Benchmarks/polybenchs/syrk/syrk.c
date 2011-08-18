@@ -78,6 +78,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   /*  C := alpha*A*A' + beta*C */
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
@@ -86,6 +90,9 @@ int main(int argc, char** argv) {
     for (j = 0; j < n; j++)
       for (k = 0; k < m; k++)
         C[i][j] += alpha * A[i][k] * A[j][k];
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

@@ -6,37 +6,36 @@
 #include "timing.h"
 
 /* Default problem size. */
-#ifndef TSTEPS
-# define TSTEPS 20
-#endif
 #ifndef N
-# define N 1000
+# define N 4000
 #endif
 
 /* Default data type is double. */
 #ifndef DATA_TYPE
 # define DATA_TYPE double
 #endif
-#ifndef DATA_PRINTF_MODIFIER
-# define DATA_PRINTF_MODIFIER "%0.2lf "
-#endif
 
-/* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */
+DATA_TYPE alpha;
+DATA_TYPE beta;
 DATA_TYPE A[N][N];
 DATA_TYPE B[N][N];
+DATA_TYPE x[N];
+DATA_TYPE y[N];
+DATA_TYPE tmp[N];
 
 static void init_array() {
   int i, j;
 
-  for (i = 0; i < N;) {
-    for (j = 0; j < N;) {
-      A[i][j] = ((DATA_TYPE)i * (j + 2) + 10) / N;
-      B[i][j] = ((DATA_TYPE)(i - 4) * (j - 1) + 11) / N;
+  alpha = 43532;
+  beta = 12313;
+  for (i = 0; i < N; ) {
+    x[i] = ((DATA_TYPE)i) / N;
+    for (j = 0; j < N; ) {
+      A[i][j] = ((DATA_TYPE)i * j) / N;
       j++;
     }
     i++;
   }
-
 }
 
 /* Define the live-out variables. Code is not executed unless
@@ -47,19 +46,38 @@ static void print_array(int argc, char** argv) {
   if(argc > 42 && !strcmp(argv[0], ""))
 #endif
   {
-    for (i = 0; i < N; i++)
-      for (j = 0; j < N; j++) {
-        fprintf(stderr, DATA_PRINTF_MODIFIER, A[i][j]);
-        if((i * N + j) % 80 == 20)
-          fprintf(stderr, "\n");
-      }
+    for (i = 0; i < N; i++) {
+      fprintf(stderr, "%0.2lf ", y[i]);
+      if(i % 80 == 20)
+        fprintf(stderr, "\n");
+    }
     fprintf(stderr, "\n");
   }
 }
 
+#pragma hmpp myCodelet codelet, target=CUDA
+void codelet(int n,
+             DATA_TYPE alpha,
+             DATA_TYPE beta,
+             DATA_TYPE A[N][N],
+             DATA_TYPE B[N][N],
+             DATA_TYPE x[N],
+             DATA_TYPE y[N],
+             DATA_TYPE tmp[N]) {
+  int i, j;
+  for (i = 0; i < n; i++) {
+    tmp[i] = 0;
+    y[i] = 0;
+    for (j = 0; j < n; j++) {
+      tmp[i] = A[i][j] * x[j] + tmp[i];
+      y[i] = B[i][j] * x[j] + y[i];
+    }
+    y[i] = alpha * tmp[i] + beta * y[i];
+  }
+}
+
 int main(int argc, char** argv) {
-  int t, i, j;
-  int tsteps = TSTEPS;
+  int i, j;
   int n = N;
 
   /* Initialize array. */
@@ -73,15 +91,8 @@ int main(int argc, char** argv) {
     init_array();
   }
 
-  for (t = 0; t < tsteps; t++) {
-    for (i = 2; i < n - 1; i++)
-      for (j = 2; j < n - 1; j++)
-        B[i][j] = 0.2 * (A[i][j] + A[i][j - 1] + A[i][1 + j] + A[1 + i][j]
-            + A[i - 1][j]);
-    for (i = 2; i < n - 1; i++)
-      for (j = 2; j < n - 1; j++)
-        A[i][j] = B[i][j];
-  }
+#pragma hmpp myCodelet callsite
+  codelet(n,alpha,beta,A,B,x,y,tmp);
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {
@@ -89,7 +100,7 @@ int main(int argc, char** argv) {
   }
 
   /* Stop and print timer. */
-  timer_stop_display();
+  timer_stop_display(); ;
 
   print_array(argc, argv);
 
