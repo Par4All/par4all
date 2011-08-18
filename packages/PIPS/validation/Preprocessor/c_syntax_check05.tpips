@@ -1,0 +1,27 @@
+setenv WS=c_syntax_check05
+delete $WS
+
+# Should not be set since we are checking user error detection
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS TRUE
+
+# Same as c_syntax_check03, but use PIPS_SRCPATH to retrieve source
+# and include files
+
+#setenv PIPS_CPP_FLAGS " -I ./$WS.inc -Wall -Werror "
+
+setenv PIPS_SRCPATH=" $WS.src:$WS.inc "
+
+create $WS $WS.c
+
+display PRINTED_FILE[main]
+
+close
+
+# The database is deleted because of the failure of create, before
+# this "cat" is performed
+shell cat $WS.database/Warnings
+
+delete $WS
+quit

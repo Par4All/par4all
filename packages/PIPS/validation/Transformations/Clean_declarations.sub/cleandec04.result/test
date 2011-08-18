@@ -1,6 +1,7 @@
 void c_clean_declarations04(int x)
 {
-   /* Hide the formal parameter */
+   // Hide the formal parameter
+   // this is illegal C!?
    int x;
    int y = 0;
 
@@ -16,7 +17,8 @@ void c_clean_declarations04(int x)
 }
 void c_clean_declarations04(int x)
 {
-   /* Hide the formal parameter */
+   // Hide the formal parameter
+   // this is illegal C!?
    int x;
    int y = 0;
 

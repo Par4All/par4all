@@ -16,6 +16,7 @@ typedef struct {
 	float  im;
 } Cplfloat;
 
+#define Lchirp 16
 Cplfloat A[128][128][(int)128];
 Cplfloat B[64];
 
@@ -47,6 +48,7 @@ void func2(char* filename, Cplfloat Val[185][7][32] ){
 
 	fclose(fp);
 }
+
 void func1(  Cplfloat Chirp[4*Lchirp],  float Kchirp)
 {
 	int t;

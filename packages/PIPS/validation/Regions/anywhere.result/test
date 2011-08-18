@@ -1,0 +1,101 @@
+//
+// Display print_code_out_regions for module out1
+//
+void out1()
+{
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0}>
+
+   b[0] = 0;
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0}>
+
+   for(j = 0; j <= 0; j += 1) {
+
+//  <a[PHI1]-OUT-EXACT-{PHI1==j, j==0}>
+
+      a[j] = 1;
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0, j==0}>
+
+      for(k = 0; k <= 0; k += 1)
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0, j==0, k==0}>
+
+         // There is an out region here
+         b[k] = a[j];
+   }
+   printf("%d", b[0]);
+}
+//
+// Display print_code_out_regions for module out2
+//
+void out2()
+{
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0}>
+
+   b[0] = 0;
+
+//  <a[PHI1]-OUT-MAY-{PHI1==0}>
+//  <b[PHI1]-OUT-MAY-{PHI1==0}>
+
+   for(j = 0; j <= 0; j += 1) {
+
+//  <a[PHI1]-OUT-EXACT-{PHI1==0, j==0}>
+
+      a[j] = 1;
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0, j==0}>
+
+      for(k = 0; k <= 0; k += 1)
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0, j==0, k==0}>
+
+         // There must also be an OUT region here!
+         b[k] = a[j];
+   }
+
+//  <stdout[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+
+   printf("%d", b[0]);
+   // use of b[0] must generate an out region before!
+   
+   /* This printf generates an ANYWHERE effect that
+        used to make OUT regions buggy  */
+   printf("%s", name);
+}
+//
+// Display print_code_out_regions for module out3
+//
+void out3()
+{
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0}>
+
+   b[0] = 0;
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0}>
+
+   for(j = 0; j <= 0; j += 1)
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0, j==0}>
+
+      for(k = 0; k <= 0; k += 1)
+
+//  <b[PHI1]-OUT-MAY-{PHI1==0, j==0, k==0}>
+
+         // without read on a[j], there's no issue with the OUT region
+         b[k] = 0;
+
+//  <stdout[PHI1]-OUT-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+
+   printf("%d", b[0]);
+   // use of b[0]: must generate an OUT region before!
+   
+   /* This printf generates an ANYWHERE effect that
+        used to make OUT regions buggy ... sometimes but not here!  */
+   printf("%s", name);
+}
