@@ -39,32 +39,32 @@ int main()
    int *p = &j;
 
 // Points To:
-// p -> &j , EXACT
+// p -> j , EXACT
 
    int *q = tab[1];
 
 // Points To:
-// p -> &j , EXACT
-// q -> &tab[1] , EXACT
+// p -> j , EXACT
+// q -> tab[1] , EXACT
 
 
    k = 1;
 
 // Points To:
-// p -> &j , EXACT
-// q -> &tab[1] , EXACT
+// p -> j , EXACT
+// q -> tab[1] , EXACT
 
    j = k;
 
 // Points To:
-// p -> &j , EXACT
-// q -> &tab[1] , EXACT
+// p -> j , EXACT
+// q -> tab[1] , EXACT
 
    p = &k;
 
 // Points To:
-// p -> &k , EXACT
-// q -> &tab[1] , EXACT
+// p -> k , EXACT
+// q -> tab[1] , EXACT
 
 
    return 0;

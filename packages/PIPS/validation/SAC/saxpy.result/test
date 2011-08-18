@@ -1,26 +1,26 @@
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER I, INCX, INCY, IX, IY, M, MP1
       REAL*4 SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) RETURN                                             0021
-      IF (INCX.EQ.1.AND.INCY.EQ.1) GOTO 20                              0022
+      IF (SA.EQ.0.0) RETURN                                             0023
+      IF (INCX.EQ.1.AND.INCY.EQ.1) GOTO 20                              0024
 c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-      IX = 1                                                            0027
-      IY = 1                                                            0028
-      DO 10 I = 1, SIZE                                                 0029
-         SY(IY) = SY(IY)+SA*SX(IX)                                      0030
-         IX = IX+INCX                                                   0031
-         IY = IY+INCY                                                   0032
-10       CONTINUE                                                       0033
+      IX = 1                                                            0029
+      IY = 1                                                            0030
+      DO 10 I = 1, SIZE                                                 0031
+         SY(IY) = SY(IY)+SA*SX(IX)                                      0032
+         IX = IX+INCX                                                   0033
+         IY = IY+INCY                                                   0034
+10       CONTINUE                                                       0035
       RETURN
 c
 c        code for both increments equal to 1
@@ -32,23 +32,23 @@ c
 
 
 c 20   PRINT *, 'bef'
-20    DO 50 I = 1, SIZE                                                 0045
-         SY(I) = SY(I)+SA*SX(I)                                         0046
-50       CONTINUE                                                       0047
+20    DO 50 I = 1, SIZE                                                 0047
+         SY(I) = SY(I)+SA*SX(I)                                         0048
+50       CONTINUE                                                       0049
 c      PRINT *, 'aft'
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER I, INCX, INCY, IX, IY, M, MP1
       REAL*4 SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) THEN                                               0021
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0021
+      IF (SA.EQ.0.0) THEN                                               0023
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0023
 c
 c        code for both increments equal to 1
 c
@@ -59,36 +59,36 @@ c
 
 
 c 20   PRINT *, 'bef'
-20       DO 50 I = 1, SIZE                                              0045
-            SY(I) = SY(I)+SA*SX(I)                                      0046
-50          CONTINUE                                                    0047
+20       DO 50 I = 1, SIZE                                              0047
+            SY(I) = SY(I)+SA*SX(I)                                      0048
+50          CONTINUE                                                    0049
 c      PRINT *, 'aft'
       ELSE
 c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-         IX = 1                                                         0027
-         IY = 1                                                         0028
-         DO 10 I = 1, SIZE                                              0029
-            SY(IY) = SY(IY)+SA*SX(IX)                                   0030
-            IX = IX+INCX                                                0031
-            IY = IY+INCY                                                0032
-10          CONTINUE                                                    0033
+         IX = 1                                                         0029
+         IY = 1                                                         0030
+         DO 10 I = 1, SIZE                                              0031
+            SY(IY) = SY(IY)+SA*SX(IX)                                   0032
+            IX = IX+INCX                                                0033
+            IY = IY+INCY                                                0034
+10          CONTINUE                                                    0035
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER I, INCX, INCY, IX, IY, M, MP1
       REAL*4 SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) THEN                                               0021
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0021
+      IF (SA.EQ.0.0) THEN                                               0023
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0023
 c
 c        code for both increments equal to 1
 c
@@ -99,36 +99,36 @@ c
 
 
 c 20   PRINT *, 'bef'
-20       DO 50 I = 1, SIZE                                              0045
-            SY(I) = SY(I)+SA*SX(I)                                      0046
-50          CONTINUE                                                    0047
+20       DO 50 I = 1, SIZE                                              0047
+            SY(I) = SY(I)+SA*SX(I)                                      0048
+50          CONTINUE                                                    0049
 c      PRINT *, 'aft'
       ELSE
 c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-         IX = 1                                                         0027
-         IY = 1                                                         0028
-         DO 10 I = 1, SIZE                                              0029
-            SY(IY) = SY(IY)+SA*SX(IX)                                   0030
-            IX = IX+INCX                                                0031
-            IY = IY+INCY                                                0032
-10          CONTINUE                                                    0033
+         IX = 1                                                         0029
+         IY = 1                                                         0030
+         DO 10 I = 1, SIZE                                              0031
+            SY(IY) = SY(IY)+SA*SX(IX)                                   0032
+            IX = IX+INCX                                                0033
+            IY = IY+INCY                                                0034
+10          CONTINUE                                                    0035
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER I, INCX, INCY, IX, IY, M, MP1
       REAL*4 SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) THEN                                               0021
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0021
+      IF (SA.EQ.0.0) THEN                                               0023
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0023
 c
 c        code for both increments equal to 1
 c
@@ -139,36 +139,36 @@ c
 
 
 c 20   PRINT *, 'bef'
-20       DO 50 I = 1, SIZE                                              0045
-            SY(I) = SY(I)+SA*SX(I)                                      0046
-50          CONTINUE                                                    0047
+20       DO 50 I = 1, SIZE                                              0047
+            SY(I) = SY(I)+SA*SX(I)                                      0048
+50          CONTINUE                                                    0049
 c      PRINT *, 'aft'
       ELSE
 c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-         IX = 1                                                         0027
-         IY = 1                                                         0028
-         DO 10 I = 1, SIZE                                              0029
-            SY(IY) = SY(IY)+SA*SX(IX)                                   0030
-            IX = IX+INCX                                                0031
-            IY = IY+INCY                                                0032
-10          CONTINUE                                                    0033
+         IX = 1                                                         0029
+         IY = 1                                                         0030
+         DO 10 I = 1, SIZE                                              0031
+            SY(IY) = SY(IY)+SA*SX(IX)                                   0032
+            IX = IX+INCX                                                0033
+            IY = IY+INCY                                                0034
+10          CONTINUE                                                    0035
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER I, INCX, INCY, IX, IY, M, MP1
       REAL*4 SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) THEN                                               0021
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0021
+      IF (SA.EQ.0.0) THEN                                               0023
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0023
 c
 c        code for both increments equal to 1
 c
@@ -179,36 +179,36 @@ c
 
 
 c 20   PRINT *, 'bef'
-20       DO 50 I = 1, SIZE                                              0045
-            SY(I) = SY(I)+SA*SX(I)                                      0046
-50          CONTINUE                                                    0047
+20       DO 50 I = 1, SIZE                                              0047
+            SY(I) = SY(I)+SA*SX(I)                                      0048
+50          CONTINUE                                                    0049
 c      PRINT *, 'aft'
       ELSE
 c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-         IX = 1                                                         0027
-         IY = 1                                                         0028
-         DO 10 I = 1, SIZE                                              0029
-            SY(IY) = SY(IY)+SA*SX(IX)                                   0030
-            IX = IX+INCX                                                0031
-            IY = IY+INCY                                                0032
-10          CONTINUE                                                    0033
+         IX = 1                                                         0029
+         IY = 1                                                         0030
+         DO 10 I = 1, SIZE                                              0031
+            SY(IY) = SY(IY)+SA*SX(IX)                                   0032
+            IX = IX+INCX                                                0033
+            IY = IY+INCY                                                0034
+10          CONTINUE                                                    0035
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER I, INCX, INCY, IX, IY, M, MP1
       REAL*4 SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) THEN                                               0021
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0021
+      IF (SA.EQ.0.0) THEN                                               0023
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0023
 c
 c        code for both increments equal to 1
 c
@@ -219,36 +219,36 @@ c
 
 
 c 20   PRINT *, 'bef'
-20       DO 50 I = 1, SIZE                                              0045
-            SY(I) = SY(I)+SA*SX(I)                                      0046
-50          CONTINUE                                                    0047
+20       DO 50 I = 1, SIZE                                              0047
+            SY(I) = SY(I)+SA*SX(I)                                      0048
+50          CONTINUE                                                    0049
 c      PRINT *, 'aft'
       ELSE
 c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-         IX = 1                                                         0027
-         IY = 1                                                         0028
-         DO 10 I = 1, SIZE                                              0029
-            SY(IY) = SY(IY)+SA*SX(IX)                                   0030
-            IX = IX+INCX                                                0031
-            IY = IY+INCY                                                0032
-10          CONTINUE                                                    0033
+         IX = 1                                                         0029
+         IY = 1                                                         0030
+         DO 10 I = 1, SIZE                                              0031
+            SY(IY) = SY(IY)+SA*SX(IX)                                   0032
+            IX = IX+INCX                                                0033
+            IY = IY+INCY                                                0034
+10          CONTINUE                                                    0035
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER I, INCX, INCY, IX, IY
       REAL*4 SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) THEN                                               0021
-      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0021
+      IF (SA.EQ.0.0) THEN                                               0023
+      ELSEIF (INCX.EQ.1.AND.INCY.EQ.1) THEN                             0023
 c
 c        code for both increments equal to 1
 c
@@ -259,32 +259,32 @@ c
 
 
 c 20   PRINT *, 'bef'
-20       DO 50 I = 1, SIZE                                              0045
-            SY(I) = SY(I)+SA*SX(I)                                      0046
-50          CONTINUE                                                    0047
+20       DO 50 I = 1, SIZE                                              0047
+            SY(I) = SY(I)+SA*SX(I)                                      0048
+50          CONTINUE                                                    0049
 c      PRINT *, 'aft'
       ELSE
 c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-         DO 10 I = 1, SIZE                                              0029
-            SY(IY) = SY(IY)+SA*SX(IX)                                   0030
-10          CONTINUE                                                    0033
+         DO 10 I = 1, SIZE                                              0031
+            SY(IY) = SY(IY)+SA*SX(IX)                                   0032
+10          CONTINUE                                                    0035
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER I, INCX, INCY, IX, IY
       REAL*4 F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) THEN                                               0021
-      ELSEIF (1.EQ.1.AND.1.EQ.1) THEN                                   0021
+      IF (SA.EQ.0.0) THEN                                               0023
+      ELSEIF (1.EQ.1.AND.1.EQ.1) THEN                                   0023
 c
 c        code for both increments equal to 1
 c
@@ -295,34 +295,34 @@ c
 
 
 c 20   PRINT *, 'bef'
-20       DO 50 I = 1, 1000                                              0045
+20       DO 50 I = 1, 1000                                              0047
             F_0 = SA*SX(I)
-            SY(I) = SY(I)+F_0                                           0046
-50          CONTINUE                                                    0047
+            SY(I) = SY(I)+F_0                                           0048
+50          CONTINUE                                                    0049
 c      PRINT *, 'aft'
       ELSE
 c
 c        code for unequal increments or equal increments
 c          not equal to 1
 c
-         DO 10 I = 1, 1000                                              0029
+         DO 10 I = 1, 1000                                              0031
             F_1 = SA*SX(IX)
-            SY(IY) = SY(IY)+F_1                                         0030
-10          CONTINUE                                                    0033
+            SY(IY) = SY(IY)+F_1                                         0032
+10          CONTINUE                                                    0035
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I, 
      &INCX, INCY, IX, IY
       REAL*4 F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) THEN                                               0021
+      IF (SA.EQ.0.0) THEN                                               0023
       ELSE
 c
 c        code for both increments equal to 1
@@ -353,17 +353,17 @@ c      PRINT *, 'aft'
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I, 
      &INCX, INCY, IX, IY
       REAL*4 F_1, F_0, SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
-      INCX = 1                                                          0018
-      INCY = 1                                                          0019
+      SA = 3                                                            0019
+      INCX = 1                                                          0020
+      INCY = 1                                                          0021
 c
-      IF (SA.EQ.0.0) THEN                                               0021
+      IF (SA.EQ.0.0) THEN                                               0023
       ELSE
 c
 c        code for both increments equal to 1
@@ -394,14 +394,14 @@ c      PRINT *, 'aft'
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND0
       REAL*4 F_0, SX(1:SIZE), SY(1:SIZE), SA
 
-      SA = 3                                                            0017
+      SA = 3                                                            0019
 c
-      IF (SA.EQ.0.0) THEN                                               0021
+      IF (SA.EQ.0.0) THEN                                               0023
       ELSE
 c
 c        code for both increments equal to 1
@@ -429,14 +429,14 @@ c      PRINT *, 'aft'
       ENDIF
       END
       SUBROUTINE SAXPY(SX, SY)
-      REAL*4 SIZE
+      INTEGER*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND00
       REAL*4 SA0, F_03, F_02, F_01, F_00, SX(1:SIZE), SY(1:SIZE)
 
-      SA0 = 3                                                           0017
+      SA0 = 3                                                           0019
 c
-      IF (SA0.EQ.0.0) THEN                                              0021
+      IF (SA0.EQ.0.0) THEN                                              0023
       ELSE
 c
 c        code for both increments equal to 1
@@ -528,7 +528,7 @@ nsucc = 0
 void
 saxpy (float sx[1000], float sy[1000])
 {
-  static const float size = 1000;
+  static const int size = 1000;
   v4sf vec30;
   v4sf vec20;
   v4sf vec10;

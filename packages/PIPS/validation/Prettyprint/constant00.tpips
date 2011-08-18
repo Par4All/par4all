@@ -1,6 +1,8 @@
 setenv WSPC constant00
 delete $WSPC
 setproperty ABORT_ON_USER_ERROR TRUE
+# Variable i redeclared - used to be OK
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create $WSPC $WSPC.c
 activate C_PARSER
 setproperty PRETTYPRINT_LANGUAGE "C"

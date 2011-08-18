@@ -12,4 +12,5 @@ main()
   double b[m][n];
   printf("size of a = %d\n", (int) sizeof(a));
   printf("size of b = %d\n", (int) sizeof(b));
+  return 0;
 }

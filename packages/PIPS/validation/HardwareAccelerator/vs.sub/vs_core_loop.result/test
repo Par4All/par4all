@@ -313,10 +313,10 @@ digraph "dag_cleaned_3" {
   "120 *" -> "immotion";
   "119 &." [shape=trapezium,orientation=270];
   "119 &." -> "120 *" [label="immotion_1"];
-  "118 -." [shape=trapezium,orientation=270];
-  "118 -." -> "119 &." [label="immotion_2"];
+  "118 +." [shape=trapezium,orientation=270];
+  "118 +." -> "119 &." [label="immotion_2"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 -." [label="immotion_3"];
+  "113 -" -> "118 +." [label="immotion_3"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion_4"];
   "111 D8" [shape=box];
@@ -458,7 +458,7 @@ l99979:   ;                                                                    /
    freia_aipo_sub(immotion, imtmp, immotion);                           /*0113*/
    
    // save contrast motion detection
-   freia_aipo_sub_const(immotion, immotion, 1);                         /*0118*/
+   freia_aipo_add_const(immotion, immotion, -1);                        /*0118*/
    freia_aipo_and_const(immotion, immotion, 1);                         /*0119*/
    freia_aipo_mul(immotion, imstab, immotion);
    freia_aipo_copy(imbg, imbg16);
@@ -800,10 +800,10 @@ digraph "dag_cleaned_3" {
   "120 *" -> "immotion";
   "119 &." [shape=trapezium,orientation=270];
   "119 &." -> "120 *" [label="immotion"];
-  "118 -." [shape=trapezium,orientation=270];
-  "118 -." -> "119 &." [label="immotion"];
+  "118 +." [shape=trapezium,orientation=270];
+  "118 +." -> "119 &." [label="immotion"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 -." [label="immotion"];
+  "113 -" -> "118 +." [label="immotion"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion"];
   "111 D8" [shape=box];
@@ -909,10 +909,10 @@ digraph "vs_core_loop_helper_3_2" {
   // computation vertices
   "119 &." [shape=trapezium,orientation=270];
   "119 &." -> "immotion_1";
-  "118 -." [shape=trapezium,orientation=270];
-  "118 -." -> "119 &." [label="immotion_2"];
+  "118 +." [shape=trapezium,orientation=270];
+  "118 +." -> "119 &." [label="immotion_2"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 -." [label="immotion_3"];
+  "113 -" -> "118 +." [label="immotion_3"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion_4"];
   "111 D8" [shape=box];
@@ -949,7 +949,7 @@ digraph "vs_core_loop_helper_3_3" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops (0 copies), optimized to 1 (0 copies)
+// dag 0: 3 ops (0 copies), optimized to 1 (0+1 copies)
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -1017,13 +1017,13 @@ freia_status vs_core_loop_helper_0_0_0(freia_data2d * o0,
   return ret;
 }
 
-// dag 1: 1 ops (1 copies), optimized to 0 (0 copies)
+// dag 1: 1 ops (1 copies), optimized to 0 (0+0 copies)
 // # SPOC calls: 0
 
-// dag 2: 1 ops (1 copies), optimized to 0 (0 copies)
+// dag 2: 1 ops (1 copies), optimized to 0 (0+1 copies)
 // # SPOC calls: 0
 
-// dag 3: 19 ops (3 copies), optimized to 16 (0 copies)
+// dag 3: 19 ops (3 copies), optimized to 16 (0+1 copies)
 // split 0: 1 cut
 // split 1: 1 cut
 // split 2: 1 cut
@@ -1318,13 +1318,13 @@ freia_status vs_core_loop_helper_3_2_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 5
-  // 0`immotion_3 [4 alu] -> [5 alu] 118 sub_const
+  // 0`immotion_3 [4 alu] -> [5 alu] 118 add_const
   si.mux[4][0].op = SPOC_MUX_IN1;
   si.mux[4][2].op = SPOC_MUX_IN0;
-  // 0`immotion_3 [5 input 0] -> [5 alu] 118 sub_const
+  // 0`immotion_3 [5 input 0] -> [5 alu] 118 add_const
   // nope
-  // alu 118 sub_const stage 5
-  si.alu[5][0].op = SPOC_ALU_SUB_IN0_CONST;
+  // alu 118 add_const stage 5
+  si.alu[5][0].op = SPOC_ALU_ADD_IN0_CONST;
   sp.alu[5][0].constant = pi4;
 
 
@@ -1514,7 +1514,7 @@ l99979:   ;                                                                    /
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);   /*0105*/
+   vs_core_loop_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);  /*0105*/
    
    
    // save contrast motion detection
@@ -1627,7 +1627,7 @@ l99998:   ;
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);   /*0105*/
+   vs_core_loop_helper_3_2_0(immotion, immotion_6, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);  /*0105*/
    
    
    // save contrast motion detection
@@ -1970,10 +1970,10 @@ digraph "dag_cleaned_3" {
   "120 *" -> "immotion";
   "119 &." [shape=trapezium,orientation=270];
   "119 &." -> "120 *" [label="immotion"];
-  "118 -." [shape=trapezium,orientation=270];
-  "118 -." -> "119 &." [label="immotion"];
+  "118 +." [shape=trapezium,orientation=270];
+  "118 +." -> "119 &." [label="immotion"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 -." [label="immotion"];
+  "113 -" -> "118 +." [label="immotion"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion"];
   "111 D8" [shape=box];
@@ -2072,10 +2072,10 @@ digraph "vs_core_loop_helper_3_1_0" {
   "imstab" -> "120 *";
   "119 &." [shape=trapezium,orientation=270];
   "119 &." -> "120 *" [label="immotion_1"];
-  "118 -." [shape=trapezium,orientation=270];
-  "118 -." -> "119 &." [label="immotion_2"];
+  "118 +." [shape=trapezium,orientation=270];
+  "118 +." -> "119 &." [label="immotion_2"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 -." [label="immotion_3"];
+  "113 -" -> "118 +." [label="immotion_3"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion_4"];
   "111 D8" [shape=box];
@@ -2168,10 +2168,10 @@ freia_status vs_core_loop_helper_0_0_0(
   redres.size = sizeof(terapix_reduction);
 
   // 0: C() -> 1
-  mcu_macro[0][0].xmin??? = imagelet_io_1_0;
-  mcu_macro[1][0].xmin??? = imagelet_io_1_1;
-  mcu_macro[0][0].ymin??? = 0;
-  mcu_macro[1][0].ymin??? = 0;
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
   // copy of operation 0 parameters
   p_0[0] = pi1;
   gram.xoffset = x_0;
@@ -2931,7 +2931,7 @@ freia_status vs_core_loop_helper_3_1_0(
   mcu_macro[1][5].iter4 = 0;
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_SUB3;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_SUB3;
-  // 6: -.(4) -> 4
+  // 6: +.(4) -> 4
   mcu_macro[0][6].xmin1 = imagelet_4;
   mcu_macro[1][6].xmin1 = imagelet_4;
   mcu_macro[0][6].ymin1 = 0;
@@ -2960,8 +2960,8 @@ freia_status vs_core_loop_helper_3_1_0(
   mcu_macro[1][6].iter3 = 0;
   mcu_macro[0][6].iter4 = 0;
   mcu_macro[1][6].iter4 = 0;
-  mcu_macro[0][6].addrStart = TERAPIX_UCODE_SUB_CONST;
-  mcu_macro[1][6].addrStart = TERAPIX_UCODE_SUB_CONST;
+  mcu_macro[0][6].addrStart = TERAPIX_UCODE_ADD_CONST;
+  mcu_macro[1][6].addrStart = TERAPIX_UCODE_ADD_CONST;
   // 7: &.(4) -> 4
   mcu_macro[0][7].xmin1 = imagelet_4;
   mcu_macro[1][7].xmin1 = imagelet_4;
@@ -3146,7 +3146,7 @@ l99979:   ;                                                                    /
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_helper_3_1_0(immotion, immotion, imstab, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);            /*0105*/
+   vs_core_loop_helper_3_1_0(immotion, immotion, imstab, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);           /*0105*/
    
    
    // save contrast motion detection
@@ -3250,7 +3250,7 @@ l99998:   ;
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
    // threshold
-   vs_core_loop_helper_3_1_0(immotion, immotion, imstab, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);            /*0105*/
+   vs_core_loop_helper_3_1_0(immotion, immotion, imstab, binvalue, 255, 1, freia_morpho_kernel_8c, -1, 1);           /*0105*/
    
    
    // save contrast motion detection

@@ -1,6 +1,7 @@
 delete forloop04
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create forloop04 forloop04.c
 

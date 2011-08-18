@@ -1,4 +1,5 @@
 delete typedef_name
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create typedef_name typedef_name.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5

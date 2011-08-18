@@ -1,4 +1,5 @@
 delete static_function
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create static_function static_function.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5

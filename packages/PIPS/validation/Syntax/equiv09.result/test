@@ -1,5 +1,6 @@
 user warning in tp_parse: equiv09: No such workspace
 Registering file equiv09.f
+Checking Fortran syntax of ./equiv09.f
 Splitting file    ./equiv09.f
   Module         EQUIV09
 Workspace equiv09 created and opened.

@@ -1,4 +1,5 @@
 delete ndecl13
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create ndecl13 ndecl13.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5

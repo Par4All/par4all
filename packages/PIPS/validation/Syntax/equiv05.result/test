@@ -1,3 +1,4 @@
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 Registering file equiv05.f
 Splitting file    ./equiv05.f
   Module         EQUIV05

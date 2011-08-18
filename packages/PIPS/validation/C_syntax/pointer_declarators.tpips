@@ -1,5 +1,7 @@
 delete pointer_declarators
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create pointer_declarators pointer_declarators.c
 
 

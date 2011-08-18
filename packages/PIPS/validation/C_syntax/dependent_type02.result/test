@@ -60,4 +60,5 @@ Code for "main"
 int main()
 {
    allocatable_2d a;                                                    /*0018*/
+   return 0;                                                            /*0019*/
 }

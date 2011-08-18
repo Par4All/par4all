@@ -1,0 +1,7 @@
+delete capture01
+setenv PIPS_CHECK_FORTRAN="Y"
+create capture01 capture01.f
+display PRINTED_FILE[CAPTURE01]
+close
+delete capture01
+quit

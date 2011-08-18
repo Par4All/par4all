@@ -1,6 +1,7 @@
 delete array
 
 create array array.c
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5

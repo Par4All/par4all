@@ -1,4 +1,5 @@
 delete comment01
+#setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create comment01 comment01.c
 
 setproperty PRETTYPRINT_LANGUAGE "C"

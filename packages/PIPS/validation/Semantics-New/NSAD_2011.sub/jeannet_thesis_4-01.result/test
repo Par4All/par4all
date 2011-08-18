@@ -1,0 +1,1024 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void ts_singlestate(void)
+{
+
+//  T(ok,x,y) {}
+
+   int x, y, ok;
+
+//  T(x,y) {x==0, y==0}
+
+   x = y = 0;
+
+//  T(ok) {ok==1, x==0, y==0}
+
+   ok = 1;
+
+//  T() {ok==1, x==0, y==0}
+
+   if (!ok)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(ok,x,y) {ok==1, ok#init==1, x#init+y<=x+y#init, y<=x, 0<=y,
+//    y#init<=y}
+
+   while (rand_b())
+
+//  T(ok,x,y) {ok==1, ok#init==1, x==x#init+1, y#init<=y, y<=y#init+1}
+
+      if (rand_b()) {
+
+//  T() {ok==1, 14<=x}
+
+         if (!(x>=14&&ok==1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {ok==1, x==x#init+1, 15<=x}
+
+         x++;
+
+//  T(y) {ok==1, y==y#init+1, 15<=x}
+
+         y++;
+
+//  T(ok) {ok==1, ok#init==1, 15<=x}
+
+         ok = 1;
+
+//  T() {ok==1, 15<=x}
+
+         if (!ok)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {ok==1, 10<=x, y<=3}
+
+         if (!(x>=10&&y<=3&&ok==1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {ok==1, x==x#init+1, 11<=x, y<=3}
+
+         x++;
+
+//  T(y) {ok==1, y==y#init+1, 11<=x, y<=4}
+
+         y++;
+
+//  T(ok) {ok==1, ok#init==1, 11<=x, y<=4}
+
+         ok = 1;
+
+//  T() {ok==1, 11<=x, y<=4}
+
+         if (!ok)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {ok==1, 10<=x, x<=13, 4<=y}
+
+         if (!(x>=10&&x<=13&&y>=4&&ok==1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {ok==1, x==x#init+1, 11<=x, x<=14, 4<=y}
+
+         x++;
+
+//  T(y) {ok==1, y==y#init+1, 11<=x, x<=14, 5<=y}
+
+         y++;
+
+//  T(ok) {ok==0, ok#init==1, 11<=x, x<=14, 5<=y}
+
+         ok = 0;
+
+//  T() {0==-1}
+
+         if (!ok)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {ok==1, x<=9, y<=3}
+
+         if (!(x<=9&&y<=3&&ok==1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {ok==1, x==x#init+1, x<=10, y<=3}
+
+         x++;
+
+//  T(ok) {ok==1, ok#init==1, x<=10, y<=3}
+
+         ok = 1;
+
+//  T() {ok==1, x<=10, y<=3}
+
+         if (!ok)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {ok==1, x<=9, 4<=y}
+
+         if (!(x<=9&&y>=4&&ok==1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {ok==1, x==x#init+1, x<=10, 4<=y}
+
+         x++;
+
+//  T(ok) {ok==0, ok#init==1, x<=10, 4<=y}
+
+         ok = 0;
+
+//  T() {0==-1}
+
+         if (!ok)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  T() {}
+
+void ts_restructured(void)
+{
+
+//  T(ok,x,y) {}
+
+   int x, y, ok;
+
+//  T(x,y) {x==0, y==0}
+
+   x = y = 0;
+
+//  T(ok) {ok==1, x==0, y==0}
+
+   ok = 1;
+
+//  T() {ok==1, x==0, y==0}
+
+   if (!ok)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(ok,x) {ok==1, ok#init==1, y==0, 0<=x, x<=9, x#init<=x}
+
+   while (rand_b()) {
+
+//  T() {ok==1, y==0, x<=8}
+
+      if (!(x<=8&&(x<=9&&y<=3&&ok==1)))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T(x) {ok==1, x==x#init+1, y==0, x<=9}
+
+      x++;
+
+//  T(ok) {ok==1, ok#init==1, y==0, x<=9}
+
+      ok = 1;
+
+//  T() {ok==1, y==0, x<=9}
+
+      if (!ok)
+
+//  T() {0==-1}
+
+         checking_error();
+   }
+
+//  T() {ok==1, x==9, y==0}
+
+   if (!(x==9&&(x<=9&&y<=3&&ok==1)))
+
+//  T() {0==-1}
+
+      deadlock();
+
+//  T(x) {ok==1, x==10, x#init==9, y==0}
+
+   x++;
+
+//  T(ok) {ok==1, ok#init==1, x==10, y==0}
+
+   ok = 1;
+
+//  T() {ok==1, x==10, y==0}
+
+   if (!ok)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(ok,x,y) {ok==1, ok#init==1, x==y+10, x#init==y#init+10, 10<=x,
+//    x<=13, y#init+10<=x}
+
+   while (rand_b()) {
+
+//  T() {ok==1, 10<=x, x<=12, y<=2}
+
+      if (!(x<=12&&y<=2&&(x>=10&&y<=3&&ok==1)))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T(x) {ok==1, x==x#init+1, 11<=x, x<=13, y<=2}
+
+      x++;
+
+//  T(y) {ok==1, y==y#init+1, 11<=x, x<=13, y<=3}
+
+      y++;
+
+//  T(ok) {ok==1, ok#init==1, 11<=x, x<=13, y<=3}
+
+      ok = 1;
+
+//  T() {ok==1, 11<=x, x<=13, y<=3}
+
+      if (!ok)
+
+//  T() {0==-1}
+
+         checking_error();
+   }
+
+//  T(ok,x,y) {ok==1, ok#init==1, x==y+10, x#init==13, y#init==3,
+//    14<=x}
+
+   if (rand_b()) {
+
+//  T() {0==-1}
+
+      if (!(x<=12&&y==3&&(x>=10&&y<=3&&ok==1)))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T() {0==-1}
+
+      x++;
+
+//  T() {0==-1}
+
+      y++;
+
+//  T() {0==-1}
+
+      ok = 1;
+
+//  T() {0==-1}
+
+      if (!ok)
+
+//  T() {0==-1}
+
+         checking_error();
+
+//  T() {0==-1}
+
+      if (!(x>=10&&x<=13&&y>=4&&ok==1))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T() {0==-1}
+
+      x++;
+
+//  T() {0==-1}
+
+      y++;
+
+//  T() {0==-1}
+
+      ok = 0;
+
+//  T() {0==-1}
+
+      if (!ok)
+
+//  T() {0==-1}
+
+         checking_error();
+   }
+   else {
+
+//  T(ok,x,y) {ok==1, ok#init==1, x==14, x#init==13, y==4, y#init==3}
+
+      if (rand_b()) {
+
+//  T() {ok==1, x==13, y==3}
+
+         if (!(x==13&&y==3&&(x>=10&&y<=3&&ok==1)))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {ok==1, x==14, x#init==13, y==3}
+
+         x++;
+
+//  T(y) {ok==1, x==14, y==4, y#init==3}
+
+         y++;
+
+//  T(ok) {ok==1, ok#init==1, x==14, y==4}
+
+         ok = 1;
+
+//  T() {ok==1, x==14, y==4}
+
+         if (!ok)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {0==-1}
+
+         if (!(x==13&&y<=2&&(x>=10&&y<=3&&ok==1)))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T() {0==-1}
+
+         x++;
+
+//  T() {0==-1}
+
+         y++;
+
+//  T() {0==-1}
+
+         ok = 1;
+
+//  T() {0==-1}
+
+         if (!ok)
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {0==-1}
+
+         while (rand_b()) {
+
+//  T() {0==-1}
+
+            if (!(y<=2&&(x>=14&&ok==1)))
+
+//  T() {0==-1}
+
+               deadlock();
+
+//  T() {0==-1}
+
+            x++;
+
+//  T() {0==-1}
+
+            y++;
+
+//  T() {0==-1}
+
+            ok = 1;
+
+//  T() {0==-1}
+
+            if (!ok)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+
+//  T() {0==-1}
+
+         if (!(y==3&&(x>=14&&ok==1)))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T() {0==-1}
+
+         x++;
+
+//  T() {0==-1}
+
+         y++;
+
+//  T() {0==-1}
+
+         ok = 1;
+
+//  T() {0==-1}
+
+         if (!ok)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T(ok,x,y) {ok==1, ok#init==1, x==y+10, x#init==y#init+10, 14<=x,
+//    y#init+10<=x}
+
+      while (rand_b()) {
+
+//  T() {ok==1, 14<=x}
+
+         if (!(x>=14&&ok==1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {ok==1, x==x#init+1, 15<=x}
+
+         x++;
+
+//  T(y) {ok==1, y==y#init+1, 15<=x}
+
+         y++;
+
+//  T(ok) {ok==1, ok#init==1, 15<=x}
+
+         ok = 1;
+
+//  T() {ok==1, 15<=x}
+
+         if (!ok)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int x, y, ok;
+
+//  P(ok,x,y) {}
+
+   x = y = 0;
+
+//  P(ok,x,y) {x==0, y==0}
+
+   ok = 1;
+
+//  P(ok,x,y) {ok==1, x==0, y==0}
+
+   if (!ok)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(ok,x,y) {ok==1, x==0, y==0}
+
+   while (rand_b())
+
+//  P(ok,x,y) {ok==1, y<=x, 0<=y}
+
+      if (rand_b()) {
+
+//  P(ok,x,y) {ok==1, y<=x, 0<=y}
+
+         if (!(x>=14&&ok==1))
+
+//  P(ok,x,y) {ok==1, x<=13, y<=x, 0<=y}
+
+            deadlock();
+
+//  P(ok,x,y) {ok==1, 14<=x, y<=x, 0<=y}
+
+         x++;
+
+//  P(ok,x,y) {ok==1, 15<=x, y+1<=x, 0<=y}
+
+         y++;
+
+//  P(ok,x,y) {ok==1, 15<=x, y<=x, 1<=y}
+
+         ok = 1;
+
+//  P(ok,x,y) {ok==1, 15<=x, y<=x, 1<=y}
+
+         if (!ok)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(ok,x,y) {ok==1, y<=x, 0<=y}
+
+         if (!(x>=10&&y<=3&&ok==1))
+
+//  P(ok,x,y) {ok==1, y<=x, 0<=y}
+
+            deadlock();
+
+//  P(ok,x,y) {ok==1, 10<=x, y<=x, 0<=y, y<=3}
+
+         x++;
+
+//  P(ok,x,y) {ok==1, 11<=x, y+1<=x, 0<=y, y<=3}
+
+         y++;
+
+//  P(ok,x,y) {ok==1, 11<=x, y<=x, 1<=y, y<=4}
+
+         ok = 1;
+
+//  P(ok,x,y) {ok==1, 11<=x, y<=x, 1<=y, y<=4}
+
+         if (!ok)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(ok,x,y) {ok==1, y<=x, 0<=y}
+
+         if (!(x>=10&&x<=13&&y>=4&&ok==1))
+
+//  P(ok,x,y) {ok==1, y<=x, 0<=y}
+
+            deadlock();
+
+//  P(ok,x,y) {ok==1, 10<=x, x<=13, y<=x, 4<=y}
+
+         x++;
+
+//  P(ok,x,y) {ok==1, 11<=x, x<=14, y+1<=x, 4<=y}
+
+         y++;
+
+//  P(ok,x,y) {ok==1, 11<=x, x<=14, y<=x, 5<=y}
+
+         ok = 0;
+
+//  P(ok,x,y) {ok==0, 11<=x, x<=14, y<=x, 5<=y}
+
+         if (!ok)
+
+//  P(ok,x,y) {ok==0, 11<=x, x<=14, y<=x, 5<=y}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(ok,x,y) {ok==1, y<=x, 0<=y}
+
+         if (!(x<=9&&y<=3&&ok==1))
+
+//  P(ok,x,y) {ok==1, 20<=2x+3y, y<=x, 0<=y}
+
+            deadlock();
+
+//  P(ok,x,y) {ok==1, x<=9, y<=x, 0<=y, y<=3}
+
+         x++;
+
+//  P(ok,x,y) {ok==1, x<=10, y+1<=x, 0<=y, y<=3}
+
+         ok = 1;
+
+//  P(ok,x,y) {ok==1, x<=10, y+1<=x, 0<=y, y<=3}
+
+         if (!ok)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(ok,x,y) {ok==1, y<=x, 0<=y}
+
+         if (!(x<=9&&y>=4&&ok==1))
+
+//  P(ok,x,y) {ok==1, y<=x, 0<=y}
+
+            deadlock();
+
+//  P(ok,x,y) {ok==1, x<=9, y<=x, 4<=y}
+
+         x++;
+
+//  P(ok,x,y) {ok==1, x<=10, y+1<=x, 4<=y}
+
+         ok = 0;
+
+//  P(ok,x,y) {ok==0, x<=10, y+1<=x, 4<=y}
+
+         if (!ok)
+
+//  P(ok,x,y) {ok==0, x<=10, y+1<=x, 4<=y}
+
+            checking_error();
+      }
+}
+
+//  P() {}
+
+void ts_restructured(void)
+{
+
+//  P() {}
+
+   int x, y, ok;
+
+//  P(ok,x,y) {}
+
+   x = y = 0;
+
+//  P(ok,x,y) {x==0, y==0}
+
+   ok = 1;
+
+//  P(ok,x,y) {ok==1, x==0, y==0}
+
+   if (!ok)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(ok,x,y) {ok==1, x==0, y==0}
+
+   while (rand_b()) {
+
+//  P(ok,x,y) {ok==1, y==0, 0<=x, x<=9}
+
+      if (!(x<=8&&(x<=9&&y<=3&&ok==1)))
+
+//  P(ok,x,y) {ok==1, x==9, y==0}
+
+         deadlock();
+
+//  P(ok,x,y) {ok==1, y==0, 0<=x, x<=8}
+
+      x++;
+
+//  P(ok,x,y) {ok==1, y==0, 1<=x, x<=9}
+
+      ok = 1;
+
+//  P(ok,x,y) {ok==1, y==0, 1<=x, x<=9}
+
+      if (!ok)
+
+//  P() {0==-1}
+
+         checking_error();
+   }
+
+//  P(ok,x,y) {ok==1, y==0, 0<=x, x<=9}
+
+   if (!(x==9&&(x<=9&&y<=3&&ok==1)))
+
+//  P(ok,x,y) {ok==1, y==0, 0<=x, x<=8}
+
+      deadlock();
+
+//  P(ok,x,y) {ok==1, x==9, y==0}
+
+   x++;
+
+//  P(ok,x,y) {ok==1, x==10, y==0}
+
+   ok = 1;
+
+//  P(ok,x,y) {ok==1, x==10, y==0}
+
+   if (!ok)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(ok,x,y) {ok==1, x==10, y==0}
+
+   while (rand_b()) {
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=13}
+
+      if (!(x<=12&&y<=2&&(x>=10&&y<=3&&ok==1)))
+
+//  P(ok,x,y) {ok==1, x==13, y==3}
+
+         deadlock();
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=12}
+
+      x++;
+
+//  P(ok,x,y) {ok==1, x==y+11, 11<=x, x<=13}
+
+      y++;
+
+//  P(ok,x,y) {ok==1, x==y+10, 11<=x, x<=13}
+
+      ok = 1;
+
+//  P(ok,x,y) {ok==1, x==y+10, 11<=x, x<=13}
+
+      if (!ok)
+
+//  P() {0==-1}
+
+         checking_error();
+   }
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=13}
+
+   if (rand_b()) {
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=13}
+
+      if (!(x<=12&&y==3&&(x>=10&&y<=3&&ok==1)))
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=13}
+
+         deadlock();
+
+//  P() {0==-1}
+
+      x++;
+
+//  P() {0==-1}
+
+      y++;
+
+//  P() {0==-1}
+
+      ok = 1;
+
+//  P() {0==-1}
+
+      if (!ok)
+
+//  P() {0==-1}
+
+         checking_error();
+
+//  P() {0==-1}
+
+      if (!(x>=10&&x<=13&&y>=4&&ok==1))
+
+//  P() {0==-1}
+
+         deadlock();
+
+//  P() {0==-1}
+
+      x++;
+
+//  P() {0==-1}
+
+      y++;
+
+//  P() {0==-1}
+
+      ok = 0;
+
+//  P() {0==-1}
+
+      if (!ok)
+
+//  P() {0==-1}
+
+         checking_error();
+   }
+   else {
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=13}
+
+      if (rand_b()) {
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=13}
+
+         if (!(x==13&&y==3&&(x>=10&&y<=3&&ok==1)))
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=12}
+
+            deadlock();
+
+//  P(ok,x,y) {ok==1, x==13, y==3}
+
+         x++;
+
+//  P(ok,x,y) {ok==1, x==14, y==3}
+
+         y++;
+
+//  P(ok,x,y) {ok==1, x==14, y==4}
+
+         ok = 1;
+
+//  P(ok,x,y) {ok==1, x==14, y==4}
+
+         if (!ok)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=13}
+
+         if (!(x==13&&y<=2&&(x>=10&&y<=3&&ok==1)))
+
+//  P(ok,x,y) {ok==1, x==y+10, 10<=x, x<=13}
+
+            deadlock();
+
+//  P() {0==-1}
+
+         x++;
+
+//  P() {0==-1}
+
+         y++;
+
+//  P() {0==-1}
+
+         ok = 1;
+
+//  P() {0==-1}
+
+         if (!ok)
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P() {0==-1}
+
+         while (rand_b()) {
+
+//  P() {0==-1}
+
+            if (!(y<=2&&(x>=14&&ok==1)))
+
+//  P() {0==-1}
+
+               deadlock();
+
+//  P() {0==-1}
+
+            x++;
+
+//  P() {0==-1}
+
+            y++;
+
+//  P() {0==-1}
+
+            ok = 1;
+
+//  P() {0==-1}
+
+            if (!ok)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+
+//  P() {0==-1}
+
+         if (!(y==3&&(x>=14&&ok==1)))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P() {0==-1}
+
+         x++;
+
+//  P() {0==-1}
+
+         y++;
+
+//  P() {0==-1}
+
+         ok = 1;
+
+//  P() {0==-1}
+
+         if (!ok)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(ok,x,y) {ok==1, x==14, y==4}
+
+      while (rand_b()) {
+
+//  P(ok,x,y) {ok==1, x==y+10, 14<=x}
+
+         if (!(x>=14&&ok==1))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(ok,x,y) {ok==1, x==y+10, 14<=x}
+
+         x++;
+
+//  P(ok,x,y) {ok==1, x==y+11, 15<=x}
+
+         y++;
+
+//  P(ok,x,y) {ok==1, x==y+10, 15<=x}
+
+         ok = 1;
+
+//  P(ok,x,y) {ok==1, x==y+10, 15<=x}
+
+         if (!ok)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+   }
+}

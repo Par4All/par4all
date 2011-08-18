@@ -78,7 +78,7 @@ c      IF((ABS(a(i) - aRef(i)) / aRef(i)) .GT. 0.000001) THEN
       PRINT *, 'a = ', a(1)
       PRINT *, 'aRef = ', aRef(1)
 
-      IF(success .EQ. .TRUE.) THEN
+      IF(success .EQV. .TRUE.) THEN
          PRINT *, 'SUCCESS'
       ELSE
          PRINT *, 'ERROR'

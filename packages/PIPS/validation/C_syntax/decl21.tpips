@@ -1,4 +1,5 @@
 delete decl21
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create decl21 decl21.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1

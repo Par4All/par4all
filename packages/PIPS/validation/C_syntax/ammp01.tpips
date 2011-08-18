@@ -2,6 +2,7 @@ delete ammp01
 
 setenv PIPS_CPP="cpp -C"
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create ammp01 ammp01.c
 

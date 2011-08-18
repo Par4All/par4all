@@ -73,7 +73,7 @@ int main()
    tf_t *sp = &s;
 
 // Points To:
-// sp -> &s , EXACT
+// sp -> s , EXACT
 
 
    call10(s.one, s.two, sp->one, sp->two);

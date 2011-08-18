@@ -2,6 +2,7 @@ delete io_intrinsics
 
 setenv PIPS_CPP="cpp -C"
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create io_intrinsics io_intrinsics.c
 

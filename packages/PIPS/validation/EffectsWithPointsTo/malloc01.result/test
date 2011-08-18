@@ -25,54 +25,54 @@ POINTS-TO
 
 
 // Points To:
-// argv[*] -> &_argv_1[0] , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
 int main(int argc, char *argv[])
 {
 
 // Points To:
-// argv[*] -> &_argv_1[0] , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
    int i, j;
 
 // Points To:
-// argv[*] -> &_argv_1[0] , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
    int *a[64];
 
 // Points To:
-// a[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// argv[*] -> &_argv_1[0] , EXACT
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
 
    for(i = 0; i <= 63; i += 1) {
 
 // Points To:
-// a[*] -> &*HEAP*_l_13[0] , MAY
-// a[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// argv[*] -> &_argv_1[0] , EXACT
+// a[*] -> *HEAP*_l_13[0] , MAY
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
       a[i] = (float) malloc(64*sizeof(float));
 
 // Points To:
-// a[*] -> &*HEAP*_l_13[0] , MAY
-// a[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// argv[*] -> &_argv_1[0] , EXACT
+// a[*] -> *HEAP*_l_13[0] , MAY
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
       for(j = 0; j <= 63; j += 1)
 
 // Points To:
-// a[*] -> &*HEAP*_l_13[0] , EXACT
-// a[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// argv[*] -> &_argv_1[0] , EXACT
+// a[*] -> *HEAP*_l_13[0] , EXACT
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
          a[i][j] = 0.;
    }
 
 // Points To:
-// a[*] -> &*HEAP*_l_13[0] , MAY
-// a[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// argv[*] -> &_argv_1[0] , EXACT
+// a[*] -> *HEAP*_l_13[0] , MAY
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// argv[*] -> _argv_1[0] , EXACT
 
 
    return 0;

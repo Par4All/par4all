@@ -1,4 +1,5 @@
 echo trying file nimportequoi.f
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create n1 nimportequoi.f
 echo trying another file
 create n2 test.f

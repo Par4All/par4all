@@ -1,4 +1,5 @@
 delete cachanbug4
+setenv PIPS_CHECK_FORTRAN="Y"
 create cachanbug4 cachanbug4.f
 
 echo

@@ -6,6 +6,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 # abstract locations
 
 setproperty ALIASING_ACROSS_TYPES TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create whetstone whetstone.c
 module main

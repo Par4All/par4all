@@ -1,0 +1,9 @@
+# No core dump please when closing the database after a parser error
+# Parser detection of non-supported ERR and END
+delete ioerrend
+setenv PIPS_CHECK_FORTRAN="Y"
+create ioerrend ioerrend.f
+display PRINTED_FILE 
+close
+delete ioerrend
+quit

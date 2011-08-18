@@ -44,19 +44,19 @@ int main()
       static int *p = &a;
 
 // Points To:
-// p -> &a , EXACT
+// p -> a , EXACT
 
       static int *q;
 
 // Points To:
-// p -> &a , EXACT
-// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> a , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       q = &b;
 
 // Points To:
-// p -> &a , EXACT
-// q -> &b , EXACT
+// p -> a , EXACT
+// q -> b , EXACT
 
       a = a-1;
    }
@@ -67,28 +67,28 @@ int main()
       static int *r = &a;
 
 // Points To:
-// r -> &a , EXACT
+// r -> a , EXACT
 
       static int *s;
 
 // Points To:
-// r -> &a , EXACT
-// s -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> a , EXACT
+// s -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       s = &b;
 
 // Points To:
-// r -> &a , EXACT
-// s -> &b , EXACT
+// r -> a , EXACT
+// s -> b , EXACT
 
       a = a+2;
    }
 
 // Points To:
-// p -> &a , MAY
-// q -> &b , MAY
-// r -> &a , MAY
-// s -> &b , MAY
+// p -> a , MAY
+// q -> b , MAY
+// r -> a , MAY
+// s -> b , MAY
 
    return 0;
 }

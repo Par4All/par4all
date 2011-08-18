@@ -1,3 +1,7 @@
+
+// stdio.h is not included
+#define NULL ((void *) 0)
+
 int main()
 {
   int *p, *q, *r;

@@ -1,4 +1,6 @@
 delete non_linear13
+# Array used as scalar...
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create non_linear13 non_linear13.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8

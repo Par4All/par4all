@@ -1,0 +1,79 @@
+#
+# initial sources
+#
+int deep(int ret)
+{
+   return ret;
+}
+int foo(int c)
+{
+   int err = 0;
+   
+   // BEFORE SWITCH
+   if (c==4) goto _switch_1_case_4;
+   if (c==8) goto _switch_1_case_8;
+_switch_1_default:   ;
+   // memory leak & RETURN
+   return 1;
+_switch_1_case_8:   ;
+   err |= deep(8);
+   // BREAK 8
+   ;
+   goto _break_1;
+_switch_1_case_4:   ;
+   err |= deep(4);
+   // BREAK 4
+   ;
+_break_1:   ;
+   
+   // AFTER SWITCH
+   return err;
+}
+int main(int argc, char *argv[])
+{
+   foo(8);
+   return 0;
+}
+#
+# after unfolding
+#
+int main(int argc, char *argv[])
+{
+   //PIPS generated variable
+   int _return0, _return1, _return2;
+   {
+      int err = 0;
+      
+      // BEFORE SWITCH
+      if (8==4) goto _switch_1_case_4;
+      if (8==8) goto _switch_1_case_8;
+_switch_1_default:      ;
+      // memory leak & RETURN
+      ;
+      _return0 = 1;
+      goto l99999;
+_switch_1_case_8:      ;
+      _return2 = 8;
+      goto l99997;
+l99997:      ;
+      err |= _return2;
+      // BREAK 8
+      ;
+_switch_1_case_4:      ;
+      _return1 = 4;
+      goto l99998;
+l99998:      ;
+      err |= _return1;
+      // BREAK 4
+      ;
+_break_1:      ;
+      
+      // AFTER SWITCH
+      ;
+      _return0 = err;
+      goto l99999;
+l99999:      ;
+   }
+   _return0;
+   return 0;
+}

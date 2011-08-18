@@ -74,51 +74,51 @@ int main(void)
    int **pp = (void *) 0;
 
 // Points To:
-// pp -> &*NULL_POINTER* , EXACT
+// pp -> *NULL_POINTER* , EXACT
 
 
    srand(time((void *) 0));
 
 // Points To:
-// pp -> &*NULL_POINTER* , EXACT
+// pp -> *NULL_POINTER* , EXACT
 
    if (alea()) {
 
 // Points To:
-// pp -> &*NULL_POINTER* , EXACT
+// pp -> *NULL_POINTER* , EXACT
 
       int *pi = &i;
 
 // Points To:
-// pi -> &i , EXACT
-// pp -> &*NULL_POINTER* , EXACT
+// pi -> i , EXACT
+// pp -> *NULL_POINTER* , EXACT
 
       pp = &pi;
    }
    else {
 
 // Points To:
-// pp -> &*NULL_POINTER* , EXACT
+// pp -> *NULL_POINTER* , EXACT
 
       int *pj = &j;
 
 // Points To:
-// pj -> &j , EXACT
-// pp -> &*NULL_POINTER* , EXACT
+// pj -> j , EXACT
+// pp -> *NULL_POINTER* , EXACT
 
       pp = &pj;
    }
 
 // Points To:
-// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> &*NULL_POINTER* , MAY
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> *NULL_POINTER* , MAY
 
 
    printf("pp=%p\n", pp);
 
 // Points To:
-// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> &*NULL_POINTER* , MAY
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> *NULL_POINTER* , MAY
 
    
    // possible segfault.
@@ -126,8 +126,8 @@ int main(void)
    **pp = 0;
 
 // Points To:
-// pp -> &*ANY_MODULE*:*NOWHERE*_b0 , MAY
-// pp -> &*NULL_POINTER* , MAY
+// pp -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// pp -> *NULL_POINTER* , MAY
 
    return 0;
 }

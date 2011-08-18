@@ -1,4 +1,5 @@
 delete pointer02
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create pointer02 pointer02.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE

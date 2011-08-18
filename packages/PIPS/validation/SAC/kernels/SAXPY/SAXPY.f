@@ -8,6 +8,7 @@ c     uses unrolled loop for increments equal to one.
 c     jack dongarra, linpack, 3/11/78.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
+
       real sx(SIZE),sy(SIZE),sa
       integer i,incx,incy,ix,iy,m,mp1
 
@@ -146,7 +147,7 @@ c      PRINT *, 'aft2'
          ENDIF
 22    ENDDO
       PRINT *, sy(100), syRef(100)
-      IF(success .EQ. .TRUE.) THEN
+      IF(success .EQV. .TRUE.) THEN
          PRINT *, 'SUCCESS'
       ELSE
          PRINT *, 'ERROR'

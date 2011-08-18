@@ -1,4 +1,5 @@
 delete internal_static
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create internal_static internal_static.c
 
 activate C_PARSER

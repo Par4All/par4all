@@ -31,45 +31,45 @@ POINTS-TO
 
 
 // Points To:
-// argv -> &_argv_1[0] , EXACT
+// argv -> _argv_1[0] , EXACT
 
 long long int get_result(int argc, char **argv)
 {
 
 // Points To:
-// argv -> &_argv_1[0] , EXACT
+// argv -> _argv_1[0] , EXACT
 
    long long int result = 0;
 
 // Points To:
-// argv -> &_argv_1[0] , EXACT
+// argv -> _argv_1[0] , EXACT
 
    result = atoll(argv[1]);
 
 // Points To:
-// argv -> &_argv_1[0] , EXACT
+// argv -> _argv_1[0] , EXACT
 
    printf("return value will be %lld\n", result);
 
 // Points To:
-// argv -> &_argv_1[0] , EXACT
+// argv -> _argv_1[0] , EXACT
 
    return result;
 }
 
 // Points To:
-// argv -> &_argv_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
 
 int main(int argc, char **argv)
 {
 
 // Points To:
-// argv -> &_argv_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
 
    long long int size = get_result(argc, argv);
 
 // Points To:
-// argv -> &_argv_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
 
    return size;
 }

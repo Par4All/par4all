@@ -1,4 +1,6 @@
-# delete necrir
+delete necrir
+# Impossible type conversion
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create necrir necrir.f
 activate PRINT_CODE_PRECONDITIONS
 activate TRANSFORMERS_INTER_FAST

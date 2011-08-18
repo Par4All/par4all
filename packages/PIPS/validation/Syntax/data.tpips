@@ -1,4 +1,5 @@
 delete data
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create data data.f
 
 setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE

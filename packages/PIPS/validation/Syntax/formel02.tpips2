@@ -1,4 +1,5 @@
 delete formel02
+setenv PIPS_CHECK_FORTRAN="Y"
 create formel02 formel02.f
 
 echo

@@ -1,7 +1,7 @@
 delete mini3
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create mini3 mini3.f
 display PRINTED_FILE[%ALL]
 close
 delete mini3
 quit
-

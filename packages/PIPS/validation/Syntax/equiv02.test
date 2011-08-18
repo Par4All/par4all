@@ -1,5 +1,8 @@
 #!/bin/sh
 
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
 # Preconditions appear only if the SAVE declaration is processed
 
 tpips=${tpips_version:-tpips}

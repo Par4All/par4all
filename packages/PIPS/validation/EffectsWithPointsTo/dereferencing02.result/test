@@ -58,64 +58,64 @@ void dereferencing02()
    double *p = &x;
 
 // Points To:
-// p -> &x , EXACT
+// p -> x , EXACT
 
    double **q = &p;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &p , EXACT
+// p -> x , EXACT
+// q -> p , EXACT
 
    double **w;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &p , EXACT
-// w -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int i = 1;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &p , EXACT
-// w -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    
    
    **q = 2.;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &p , EXACT
-// w -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    **(q+(i = 0)) = 3.;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &p , EXACT
-// w -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    **(w+(i = 2)) = 4.;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &p , EXACT
-// w -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    x = **q;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &p , EXACT
-// w -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> x , EXACT
+// q -> p , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    q++;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &*ANY_MODULE*:*ANYWHERE*_b0 , EXACT
-// w -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> x , EXACT
+// q -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// w -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    *q++;
 }

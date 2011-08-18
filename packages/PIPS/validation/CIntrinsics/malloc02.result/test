@@ -4,7 +4,10 @@ Parsed printed file for "malloc02"
 int main()
 {
    int i, n;
-   char buffer[50];
+   // FI: this declaration is incompatible with an assignment of buffer
+   // via malloc()...
+   //char buffer[50];
+   char *buffer;
 
    printf("How long do you want the string? ");
    scanf("%d", &i);
@@ -30,7 +33,10 @@ Proper effetcs for "malloc02"
 int main()
 {
    int i, n;
-   char buffer[50];
+   // FI: this declaration is incompatible with an assignment of buffer
+   // via malloc()...
+   //char buffer[50];
+   char *buffer;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
@@ -43,32 +49,32 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[0]
    scanf("%d", &i);
 //             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: buffer _MALLOC_EFFECTS:_MALLOC_
 
    buffer = (char *) malloc(i+1);
+//             <    is read   >: buffer
    if (buffer==(void *) 0)
       exit(1);
 //             <    is read   >: i
 //             <    is written>: n
 
    for(n = 0; n <= i-1; n += 1)
-//             <    is read   >: i n _RANDOM_EFFECTS:GEN_SEED
-//             <    is written>: buffer[n] _RANDOM_EFFECTS:GEN_SEED
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: buffer i n _RANDOM_EFFECTS:GEN_SEED
       buffer[n] = rand()%26+'a';
-//             <    is read   >: i
-//             <    is written>: buffer[i]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: buffer i
    buffer[i] = '\0';
-//             <may be read   >: buffer[*] stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("Random string: %s\n", buffer);
-//             <    is read   >: _MEMMOVE_EFFECTS:_MEMMOVE_
-//             <    is written>: buffer[0:7-1] 
-//                               _MEMMOVE_EFFECTS:_MEMMOVE_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: buffer _MEMMOVE_EFFECTS:_MEMMOVE_
    memmove(buffer, "bonjour", 7);
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: buffer _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer);
    

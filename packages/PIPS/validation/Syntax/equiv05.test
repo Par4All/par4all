@@ -8,6 +8,7 @@ tpips=${tpips_version:-tpips}
 
 # Detection of a mistake in an equivalence chain
 
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create equiv05 equiv05.f
 display PRINTED_FILE
 close

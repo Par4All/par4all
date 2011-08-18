@@ -1,4 +1,5 @@
 delete formal_variables
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create formal_variables formal_variables.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9

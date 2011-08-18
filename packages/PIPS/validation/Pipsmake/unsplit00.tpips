@@ -1,3 +1,4 @@
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create u00 unsplit00.f
 apply UNSPLIT[ONE]
 shell cat u00.database/Src/unsplit00.f

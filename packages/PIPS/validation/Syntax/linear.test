@@ -6,6 +6,7 @@ tpips=${tpips_version:-tpips}
 
 ($tpips 2>&1 | sed '/file *\//d') <<EOF
 delete linear
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create linear linear.f
 # This make is going to fail with user error in PARSER
 make CODE[RELAX]

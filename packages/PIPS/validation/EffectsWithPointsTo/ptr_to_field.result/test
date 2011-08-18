@@ -54,60 +54,60 @@ int ptr_to_field()
    my_str *m, *n;
 
 // Points To:
-// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int i = 0, j = 1;
 
 // Points To:
-// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    m = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
-// m -> &*HEAP*_l_12 , EXACT
-// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> *HEAP*_l_12 , EXACT
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    n = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
-// m -> &*HEAP*_l_12 , EXACT
-// n -> &*HEAP*_l_13 , EXACT
+// m -> *HEAP*_l_12 , EXACT
+// n -> *HEAP*_l_13 , EXACT
 
    m->q = &i;
 
 // Points To:
-// *HEAP*_l_12.q -> &i , EXACT
-// m -> &*HEAP*_l_12 , EXACT
-// n -> &*HEAP*_l_13 , EXACT
+// *HEAP*_l_12.q -> i , EXACT
+// m -> *HEAP*_l_12 , EXACT
+// n -> *HEAP*_l_13 , EXACT
 
    m->p = &j;
 
 // Points To:
-// *HEAP*_l_12.p -> &j , EXACT
-// *HEAP*_l_12.q -> &i , EXACT
-// m -> &*HEAP*_l_12 , EXACT
-// n -> &*HEAP*_l_13 , EXACT
+// *HEAP*_l_12.p -> j , EXACT
+// *HEAP*_l_12.q -> i , EXACT
+// m -> *HEAP*_l_12 , EXACT
+// n -> *HEAP*_l_13 , EXACT
 
    n->q = m->p;
 
 // Points To:
-// *HEAP*_l_12.p -> &j , EXACT
-// *HEAP*_l_12.q -> &i , EXACT
-// *HEAP*_l_13.q -> &j , EXACT
-// m -> &*HEAP*_l_12 , EXACT
-// n -> &*HEAP*_l_13 , EXACT
+// *HEAP*_l_12.p -> j , EXACT
+// *HEAP*_l_12.q -> i , EXACT
+// *HEAP*_l_13.q -> j , EXACT
+// m -> *HEAP*_l_12 , EXACT
+// n -> *HEAP*_l_13 , EXACT
 
    n->p = m->q;
 
 // Points To:
-// *HEAP*_l_12.p -> &j , EXACT
-// *HEAP*_l_12.q -> &i , EXACT
-// *HEAP*_l_13.p -> &i , EXACT
-// *HEAP*_l_13.q -> &j , EXACT
-// m -> &*HEAP*_l_12 , EXACT
-// n -> &*HEAP*_l_13 , EXACT
+// *HEAP*_l_12.p -> j , EXACT
+// *HEAP*_l_12.q -> i , EXACT
+// *HEAP*_l_13.p -> i , EXACT
+// *HEAP*_l_13.q -> j , EXACT
+// m -> *HEAP*_l_12 , EXACT
+// n -> *HEAP*_l_13 , EXACT
 
 
    return 0;

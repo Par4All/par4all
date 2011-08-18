@@ -41,7 +41,7 @@ int main()
 
    i = 0;
 
-//  T(i) {i#init==0, i<=m, i<=n, 0<=m, 0<=n}
+//  T(i) {i#init==0, 0<=i, i<=m, i<=n, 0<=m, 0<=n}
 
    while (i<=(n<=m?n:m)) {
 
@@ -49,7 +49,7 @@ int main()
 
       a[i] = i;
 
-//  T(i) {i#init<=m, i#init<=n, 0<=m, 0<=n}
+//  T(i) {i==i#init+1, i<=m+1, i<=n+1, 0<=m, 0<=n}
 
       i = inc(i);
    }
@@ -105,11 +105,11 @@ int main()
 
    while (i<=(n<=m?n:m)) {
 
-//  P(i,k,m,n) {i<=m, i<=n, 0<=m, 0<=n}
+//  P(i,k,m,n) {0<=i, i<=m, i<=n}
 
       a[i] = i;
 
-//  P(i,k,m,n) {i<=m, i<=n, 0<=m, 0<=n}
+//  P(i,k,m,n) {0<=i, i<=m, i<=n, 0<=m, 0<=n}
 
       i = inc(i);
    }

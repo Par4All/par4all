@@ -14,6 +14,8 @@
 # - DO_LATER: idem with future "later" cases
 # - DO_SLOW: idem for lengthy to validate cases
 # - DO_DEFAULT: other test cases
+# - DO_PYPS: pyps must be available
+# - DO_F95: gfc2pips must be available
 # - D.sub: subdirectories in which to possibly recurse, defaults to *.sub
 #
 # example to do only later cases:
@@ -27,6 +29,11 @@ DO_BUG	=
 DO_LATER=
 DO_SLOW	= 1
 DO_DEFAULT = 1
+
+# for pyps user, if pyps is not available, the validation will just
+# skip the corresponding cases silently.
+DO_PYPS	:= $(shell type ipyps > /dev/null 2>&1 && echo 1)
+DO_F95	:= $(shell type gfc2pips > /dev/null 2>&1 && echo 1)
 
 # pips exes
 TPIPS	= tpips
@@ -139,6 +146,7 @@ RECWHAT	=
 # skip bug/later/slow cases depending on options
 # a case requires a result directory, so a "bug/later/slow"
 # tag is not counted if there is no corresponding result.
+# f95 test cases may be kept out of the validation from here as well.
 EXCEPT =  [ "$(RECWHAT)" ] && \
 	    { echo "$(RECWHAT): $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_BUG)" -a -f $*.bug -a -d $*.result ] && \
@@ -148,8 +156,10 @@ EXCEPT =  [ "$(RECWHAT)" ] && \
 	  [ ! "$(DO_SLOW)" -a -f $*.slow -a -d $*.result ] && \
 	    { echo "slow: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_DEFAULT)" -a -d $*.result -a \
-	    ! \( -f $*.bug -o -f $*.later  -o -f $*.slow \) ] && \
-	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
+	    ! \( -f $*.bug -o -f $*.later -o -f $*.slow \) ] && \
+	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_F95)" -a -d $*.result -a \( -e $*.f90 -o -e $*.f95 \) ] && \
+	    { echo "keptout: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
 
 # setup running a case
 PF	= @echo "processing $(SUBDIR)/$+" ; \
@@ -314,7 +324,7 @@ generate-result: $(F.future_result)
 # always do target? does not seem to work as expected??
 #.PHONY: $(F.valid)
 
-# (shell) script
+# (shell) script, possibly uses "pips"?
 %.validate: %.test
 	$(PF) ; ./$< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
@@ -322,17 +332,28 @@ generate-result: $(F.future_result)
 %.validate: %.tpips
 	$(PF) ; $(TPIPS) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
+# special case for stderr validation, which is basically a bad idea (tm),
+# with a provision to keep only part of the stderr output.
 %.validate: %.tpips2
-	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $*.result/$(TEST) ; $(OK)
+	$(PF) ; $(TPIPS) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; \
+	{ \
+	  echo "### stderr" ; \
+	  if [ -e $*.flt ] ; then \
+	    $(FLT) $*.err | ./$*.flt ; \
+	  else \
+	    $(FLT) $*.err ; \
+	  fi ; \
+	} >> $*.result/$(TEST) ; $(OK)
 
 # python scripts
-ifdef PIPS_VALIDATION_NO_PYPS
+PYTHON	= python
+ifdef DO_PYPS
+%.validate: %.py
+	$(PF) ; $(PYTHON) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
+else # no pyps...
 %.validate: %.py
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-else # else we have pyps
-%.validate: %.py
-	$(PF) ; python $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
-endif # PIPS_VALIDATION_NO_PYPS
+endif # DO_PYPS
 
 # default_tpips
 # FILE could be $<
@@ -384,24 +405,8 @@ DEFTEST	= default_test
 
 
 # default_pyps relies on FILE & WSPACE
-PYTHON	= python
 DEFPYPS	= default_pyps.py
-ifdef PIPS_VALIDATION_NO_PYPS
-%.validate: %.c $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-
-%.validate: %.f $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-
-%.validate: %.F $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-
-%.validate: %.f90 $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-
-%.validate: %.f95 $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
-else # with pyps
+ifdef DO_PYPS
 %.validate: %.c $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
@@ -421,11 +426,29 @@ else # with pyps
 %.validate: %.f95 $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
-endif # PIPS_VALIDATION_NO_PYPS
+
+else # without pyps
+
+%.validate: %.c $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.validate: %.f $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.validate: %.F $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.validate: %.f90 $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.validate: %.f95 $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+endif # DO_PYPS
 
 # special case for "slow" directories...
 %.validate:
-	echo "skipping $@, possibly a slow subdirectory" >&2
+	@echo "skipping $@, possibly a slow subdirectory" >&2
 
 # detect skipped stuff
 .PHONY: skipped
@@ -470,9 +493,17 @@ multi-source:
 	  echo "multi-source: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
+# check that all tpips2 have a corresponding flt
+.PHONY: missing-flt
+missing-flt:
+	@for f in $(F.tpips2) ; do \
+	  test -e $${f/.tpips2/.flt} || \
+	    echo "nofilter: $(SUBDIR)/$${f/.tpips2/}" ; \
+	done >> $(RESULTS)
+
 # all possible inconsistencies
 .PHONY: inconsistencies
-inconsistencies: skipped orphan multi-source multi-script
+inconsistencies: skipped orphan multi-source multi-script missing-flt
 
 # what about nothing?
 # source files without corresponding result directory

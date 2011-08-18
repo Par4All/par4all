@@ -1,5 +1,5 @@
-
 delete sizeofArray05
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create sizeofArray05 sizeofArray05.c
 
 

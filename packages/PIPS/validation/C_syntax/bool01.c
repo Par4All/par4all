@@ -5,4 +5,5 @@
 int bool01()
 {
   _Bool i;
+  return (int) i;
 }

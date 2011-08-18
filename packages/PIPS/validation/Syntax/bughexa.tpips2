@@ -1,4 +1,5 @@
 delete bughexa
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create bughexa bughexa.f
 display PRINTED_FILE 
 close

@@ -1,4 +1,7 @@
 delete capture03
+
+setenv PIPS_CHECK_FORTRAN="Y"
+
 create capture03 capture03.f
 module CAPTURE03
 display PRINTED_FILE[CAPTURE03]

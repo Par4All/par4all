@@ -50,7 +50,7 @@ void P4A_copy_from_accel_4d(size_t element_size, size_t d1_size, size_t d2_size,
       for(j = 0; j <= d2_block_size-1; j += 1)
          for(k = 0; k <= d3_block_size-1; k += 1)
             for(l = 0; l <= d4_block_size-1; l += 1) {
-               int h_index = (i+d1_offset)*d2_size*d3_size*d4_size+(j+d2_offset)*d3_size*d4_size+(k+d3_offset)*d4_size+l+d4_offset;
+               int h_index = (i+d1_offset)*d2_size*d3_size*d4_size+(j+d2_offset)*d3_size*d4_size+(k+d3_offset)*d4_size+(l+d4_offset);
                
                
                
@@ -103,7 +103,7 @@ void P4A_copy_to_accel_4d(size_t element_size, size_t d1_size, size_t d2_size, s
       for(j = 0; j <= d2_block_size-1; j += 1)
          for(k = 0; k <= d3_block_size-1; k += 1)
             for(l = 0; l <= d4_block_size-1; l += 1) {
-               int h_index = (i+d1_offset)*d2_size*d3_size*d4_size+(j+d2_offset)*d3_size*d4_size+(k+d3_offset)*d4_size+l+d4_offset;
+               int h_index = (i+d1_offset)*d2_size*d3_size*d4_size+(j+d2_offset)*d3_size*d4_size+(k+d3_offset)*d4_size+(l+d4_offset);
                
                
                

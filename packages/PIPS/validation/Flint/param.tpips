@@ -1,4 +1,6 @@
 delete p
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create p param.f
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 echo #### before type checking
@@ -9,10 +11,13 @@ display PRINTED_FILE[%ALL]
 apply UNSPLIT
 close
 
-echo run resulting code
-! f77 -o p.out p.database/Src/param.f
-! ./p.out
-! rm ./p.out
+# The output code cannot be compiled since the input code does not fit
+# f77 or gfortran. The name of the PIPS Fortran compiler should be used anyway
 
-delete p
+#echo run resulting code
+#! gfortran -o p.out p.database/Src/param.f
+#! ./p.out
+#! rm ./p.out
+
+#delete p
 quit

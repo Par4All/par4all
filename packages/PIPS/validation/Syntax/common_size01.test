@@ -11,6 +11,7 @@ tpips=${tpips_version:-tpips}
 ($tpips 2>&1 | sed '/file *\//d') <<EOF
 
 delete common_size01
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create common_size01 common_size01.f
 display PRINTED_FILE[REORDER]
 # setproperty PARSER_DUMP_SYMBOL_TABLE TRUE

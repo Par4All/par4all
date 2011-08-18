@@ -2,6 +2,9 @@
 
 # test behavior fo pipsmake when resources are touched by user
 
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
 tpips=${tpips_version:-tpips}
 
 ($tpips 2>&1 | sed /db_check_time/d | sed '/file *\//d' ) <<EOF

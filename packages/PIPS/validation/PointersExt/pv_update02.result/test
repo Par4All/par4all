@@ -46,49 +46,49 @@ int main()
    int *p;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int b = 0, c = 1;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    if (b==c)
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       p = &a[0];
    else
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       p = &a[1];
 
 // Points To:
-// p -> &a[0] , MAY
-// p -> &a[1] , MAY
+// p -> a[0] , MAY
+// p -> a[1] , MAY
 
    p++;
 
 // Points To:
-// p -> &a[*] , EXACT
+// p -> a[*] , EXACT
 
    ++p;
 
 // Points To:
-// p -> &a[*] , EXACT
+// p -> a[*] , EXACT
 
    p--;
 
 // Points To:
-// p -> &a[*] , EXACT
+// p -> a[*] , EXACT
 
    --p;
 
 // Points To:
-// p -> &a[*] , EXACT
+// p -> a[*] , EXACT
 
    return 0;
 }

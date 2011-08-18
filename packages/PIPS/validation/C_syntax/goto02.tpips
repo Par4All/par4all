@@ -1,4 +1,5 @@
 delete goto02
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create goto02 goto02.c
 
 #setenv CONTROL_DEBUG_LEVEL 5

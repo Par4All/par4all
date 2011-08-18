@@ -2,6 +2,9 @@
 
 tpips=${tpips_version:-tpips}
 
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
 # In case something went wrong during a previous execution
 chmod a+rwx protected_workspace.database
 Delete protected_workspace

@@ -40,40 +40,40 @@ int main()
    int *p;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int **q;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    p = 0;
 
 // Points To:
-// p -> &*NULL_POINTER* , EXACT
-// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> *NULL_POINTER* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    **q = 0;
 
 // Points To:
-// p -> &*NULL_POINTER* , EXACT
-// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> *NULL_POINTER* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    *p = 1;
 
 // Points To:
-// p -> &*NULL_POINTER* , EXACT
-// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// p -> *NULL_POINTER* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    *q = &i;
 
 // Points To:
-// *ANY_MODULE*:*ANYWHERE*_b0 -> &i , EXACT
-// p -> &*NULL_POINTER* , EXACT
-// q -> &*ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// *ANY_MODULE*:*ANYWHERE*_b0 -> i , EXACT
+// p -> *NULL_POINTER* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    return 0;

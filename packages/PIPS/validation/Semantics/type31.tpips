@@ -1,4 +1,6 @@
 delete type31
+# Type conversion refused by gfortran
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create type31 type31.f
 
 # setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE

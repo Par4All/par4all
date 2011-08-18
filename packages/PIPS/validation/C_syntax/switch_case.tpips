@@ -2,6 +2,7 @@ delete switch_case
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PREPROCESSOR_FILE_NAME_CONFLICT_HANDLING TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create switch_case switch_case.c
 

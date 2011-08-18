@@ -41,62 +41,62 @@ int main()
    int *a, *b, c, d, i;
 
 // Points To:
-// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    c = 0;
 
 // Points To:
-// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    d = 1;
 
 // Points To:
-// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    i = 2;
 
 // Points To:
-// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    b = &c;
 
 // Points To:
-// a -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// b -> &c , EXACT
+// a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// b -> c , EXACT
 
    do {
 
 // Points To:
-// a -> &d , MAY
-// a -> &c , MAY
-// b -> &d , EXACT
+// a -> d , MAY
+// a -> c , MAY
+// b -> d , EXACT
 
       i = i+1;
 
 // Points To:
-// a -> &d , MAY
-// a -> &c , MAY
-// b -> &d , EXACT
+// a -> d , MAY
+// a -> c , MAY
+// b -> d , EXACT
 
       a = b;
 
 // Points To:
-// a -> &d , MAY
-// a -> &c , MAY
-// b -> &d , EXACT
+// a -> d , MAY
+// a -> c , MAY
+// b -> d , EXACT
 
       b = &d;
    }
    while (i<5);
 
 // Points To:
-// a -> &d , MAY
-// a -> &c , MAY
-// b -> &d , EXACT
+// a -> d , MAY
+// a -> c , MAY
+// b -> d , EXACT
 
 
    return 0;

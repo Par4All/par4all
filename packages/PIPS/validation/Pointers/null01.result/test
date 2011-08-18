@@ -23,12 +23,12 @@ int main()
    int *p;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    p = (void *) 0;
 
 // Points To:
-// p -> &*NULL_POINTER* , EXACT
+// p -> *NULL_POINTER* , EXACT
 
 
    return 0;

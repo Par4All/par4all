@@ -1,5 +1,6 @@
 delete char03
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create char03 char03.c
 
 #activate some debug mode

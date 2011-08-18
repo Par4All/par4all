@@ -1,5 +1,8 @@
 #!/bin/sh
 
+PIPS_CHECK_FORTRAN="NO"
+export PIPS_CHECK_FORTRAN
+
 # To display the memory layout, a property is used
 # instead of a debug leve, but more information would be
 # available with SYNTAX_DEBUG_LEVEL=1.

@@ -1,6 +1,8 @@
 delete csplit13
 
 setproperty ABORT_ON_USER_ERROR TRUE
+# Buggy C code
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 setenv PIPS_SRCPATH "csplit13.include:$PIPS_SRCPATH"
 

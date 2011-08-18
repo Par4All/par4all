@@ -3,6 +3,8 @@ setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
 setproperty PRETTYPRINT_COMMONS "include"
 
 delete d7
+# Several parameters have not been typed
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create d7 decl7.f
 
 apply CLEAN_DECLARATIONS[%ALL]
