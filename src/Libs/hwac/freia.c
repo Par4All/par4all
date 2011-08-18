@@ -175,9 +175,9 @@ static int freia_cmp_statement(const statement * s1, const statement * s2)
   if (s1r || s2r) pips_assert("one return in sequence", s1r ^ s2r);
 
   pips_debug(9, "%"_intFMT" %s is %d %d %d\n", statement_number(*s1),
-             c1? entity_name(call_function(c1)): "", s1r, s1a, s1d);
+             c1? entity_name(call_function(c1)): "", (int)s1r, (int)s1a, (int)s1d);
   pips_debug(9, "%"_intFMT" %s is %d %d %d\n", statement_number(*s2),
-             c2? entity_name(call_function(c2)): "", s2r, s2a, s2d);
+             c2? entity_name(call_function(c2)): "", (int)s2r, (int)s2a, (int)s2d);
 
   int order = 0;
   string why = "";

@@ -287,7 +287,7 @@ align_check(
 		((dim1==0) && (!bconst2))) /* replicated reference...*/
             {
 		pips_debug(8, "%s[DIM=%d] not aligned aff %d shi %d cst %d\n",
-			   entity_name(e2), i, baffin2, bshift2, bconst2);
+			   entity_name(e2), i, (int)baffin2, (int)bshift2, (int)bconst2);
 
                 *plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
                 *plvect = gen_nconc(*plvect, CONS(PVECTOR, 

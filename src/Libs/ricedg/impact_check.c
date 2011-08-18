@@ -450,7 +450,7 @@ static int loop_executed_approximation(statement s)
 	UNCATCH(overflow_error);
       }
       pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
-		 m3_positif, m3_negatif);
+                 (int)m3_positif, (int)m3_negatif);
 
       /* Vire aussi pv3 & pc3 : */
       sc_rm(ps);

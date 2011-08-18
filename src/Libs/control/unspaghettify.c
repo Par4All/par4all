@@ -27,7 +27,7 @@
 /* Ronan Keryell, 1995. */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision: 14223 $, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision: 14223 $, got on %D%, %T% [%P%].\n Copyright (c) ï¿½cole des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -295,7 +295,7 @@ fuse_sequences_in_unstructured(statement s)
 				   number_of_successors_of_the_successor,
 				   number_of_predecessors_of_the_successor,
 				   the_successor == entry_node,
-				   aggressive_restructure_p ? empty_statement_or_continue_p(s) : empty_statement_or_continue_without_comment_p(s));
+				   (int)(aggressive_restructure_p ? empty_statement_or_continue_p(s) : empty_statement_or_continue_without_comment_p(s)));
 			/* Since I use an O(n) algorithm instead of an
                            O(n^2) all this condition must be checked
                            again later since these topological and
@@ -722,8 +722,8 @@ try_to_structure_the_unstructured(statement s,
    unstructured. We just return the statement directly containing the
    unstructured.
 
-   Right now, it does not extract a RETURN since as explained in « PIPS:
-   Internal Representation of Fortran and C Code » about RETURN_LABEL_NAME
+   Right now, it does not extract a RETURN since as explained in ï¿½ PIPS:
+   Internal Representation of Fortran and C Code ï¿½ about RETURN_LABEL_NAME
    in the Entities section, since a RETURN with a label at the exit of un
    unstructured is always the representation of a RETURN in Fortran
    unstructured code... So even for C code, a return stay inside an

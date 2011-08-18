@@ -1553,7 +1553,7 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
 
   pips_debug(4, "%s ~ %s? %d: n=%d,o=%d,t=%d\n", entity_name(v),
 	     entity_undefined_p(ref)? "<undef>": entity_name(ref),
-	     ok, sn, so, st);
+	                            (int)ok, (int)sn, (int)so, (int)st);
 
   /* temporary for CA
    */
@@ -1561,7 +1561,7 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
     pips_debug(1, "common /%s/: %s != %s (n=%d,o=%d,t=%d)\n",
 	       entity_name(common), entity_name(v),
 	       entity_undefined_p(ref)? "<undef>": entity_name(ref),
-	       sn, so, st);
+	                              (int)sn, (int)so, (int)st);
   }
 
   return ok;

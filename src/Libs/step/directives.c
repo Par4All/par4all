@@ -309,7 +309,7 @@ static bool optional_end_directive_p(directive current)
       b = true;
     }
 
-  pips_debug(1,"b = %d\n", b);
+  pips_debug(1,"b = %d\n", (int)b);
   return b;
 }
 
@@ -512,7 +512,7 @@ static bool directive_statement_p(statement stmt)
   f = call_function(statement_call(stmt));
   b = (top_level_entity_p(f) && strncmp(DIR_CALL, entity_local_name(f), strlen(DIR_CALL))==0);
 
-  pips_debug(1, "b = %d\n", b);
+  pips_debug(1, "b = %d\n", (int)b);
   return b;
 }
 
@@ -1044,7 +1044,7 @@ static string directive_formate(string unformated,string directive_guard,string 
 
 string directive_to_string(directive d,bool close)
 {
-  pips_debug(1, "d=%p, close=%u\n",d,close);
+  pips_debug(1, "d=%p, close=%u\n",d,(int)close);
   string d_txt=string_undefined;
   string c_txt=string_undefined;
   string directive_formated;
