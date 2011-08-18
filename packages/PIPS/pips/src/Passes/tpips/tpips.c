@@ -362,12 +362,10 @@ static char * param_generator(const char *texte, int state)
      variable to 0. */
   if (!state)
   {
-    char **matches;
     int number_of_sep = 0;
     int current_pos = 0;
     struct t_completion_scheme * cs = completion_scheme;
     int completion_type;
-    matches = (char **)NULL;
 
     pips_debug (9, "completing parameters\n\n");
 

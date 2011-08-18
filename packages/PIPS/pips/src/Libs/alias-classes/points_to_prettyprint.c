@@ -177,7 +177,7 @@ bool print_code_points_to(string module_name,
   reset_current_module_statement();
   reset_printed_points_to_list();
   debug_off();
-  return true;
+  return res;
 }
 
 

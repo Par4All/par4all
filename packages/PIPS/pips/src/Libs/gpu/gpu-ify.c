@@ -286,6 +286,11 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
   if (get_bool_property("GPU_USE_LAUNCHER")) {
     /* Outline the kernel launcher with a prefix defined in the
        GPU_LAUNCHER_PREFIX property: */
+    if(get_bool_property("GPU_IFY_ANNOTATE_LOOP_NESTS")) {
+      // Annotate loop nest now, so that we know which are parallel !
+      bool gpu_loop_nest_annotate_on_statement(statement s);
+      gpu_loop_nest_annotate_on_statement(s);
+    }
     list sl = CONS(STATEMENT, s, NIL);
     statement st;
     // Choose if we want the launcher in its own file:
@@ -358,3 +363,5 @@ bool gpu_ify(const string mod_name) {
   PIPS_PHASE_POSTLUDE(module_statement);
   // The macro above does a "return TRUE" indeed.
 }
+
+

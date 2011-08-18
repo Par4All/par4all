@@ -294,7 +294,7 @@ statement interchange_two_loops(list lls, int n1, int n2)
   Pvecteur *pvg;
   Pbase pb;
   expression lower, upper;
-  Pvecteur pv1, pv2;
+  Pvecteur pv1 ;
   loop l;
   statement s1 = STATEMENT(gen_nth(n1-1,lls));
   statement s2 = STATEMENT(gen_nth(n2-1,lls));
@@ -361,7 +361,7 @@ statement interchange_two_loops(list lls, int n1, int n2)
   pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
   scanning_base_to_vect(G,n,base_newindex,pvg);
   pv1 = sc_row_echelon->inegalites->succ->vecteur;
-  pv2 = vect_change_base(pv1,base_oldindex,pvg);
+  (void)vect_change_base(pv1,base_oldindex,pvg);
 
   l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
   lower = range_upper(loop_range(l));

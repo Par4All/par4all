@@ -323,7 +323,7 @@ static void synch_viewmenu_and_opframe(GtkWidget * widget, gpointer data) {
  to be created after it: */
 void build_options_menu_and_panel(GtkWidget * menu_options,
 		GtkWidget * frame_vbox) {
-	int i, j;
+	int i;
 	option_type *all_the_options;
 	makefile m = parse_makefile();
 	//int max_item_width = 0;
@@ -417,7 +417,6 @@ void build_options_menu_and_panel(GtkWidget * menu_options,
 		gtk_table_attach_defaults(GTK_TABLE(table), choices_combobox, 1, 2, i,
 				i + 1);
 
-		j = 0;
 		GtkWidget * subsubmenu_option_item;
 		MAPL(vrn, {
 					string alias2 = hash_get_key_by_value(aliases,

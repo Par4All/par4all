@@ -368,7 +368,6 @@ extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec
   Pcontrainte pc;
   Value v_phi = VALUE_ZERO;
   Pvecteur p_var = VECTEUR_NUL, ptmp = VECTEUR_NUL, p_max = VECTEUR_NUL, p_min = VECTEUR_NUL ; 
-  bool result;
   p_max = *pe;
   if (VECTEUR_NUL_P(*pe)) 
     p_min = vect_new(TCST, VALUE_ONE);
@@ -384,7 +383,7 @@ extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec
     p_var = contrainte_vecteur(pc);
     v_phi = vect_coeff(var,p_var);
     if (v_phi) {
-      result =  extract_constraint_on_var(p_var,var,v_phi,&ptmp);
+      (void)extract_constraint_on_var(p_var,var,v_phi,&ptmp);
       
       if (value_pos_p(v_phi)) 
 	p_max = sc_minmax_of_pvector(ps_prec, p_max, ptmp, false);
@@ -412,7 +411,7 @@ sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *mi
   Pbase b;
   Pvecteur pe = VECTEUR_NUL;
   Psysteme ps_e, ps_i;
-  bool ok1,ok2;
+  bool ok2;
   assert(var!=TCST);  
   *min = vect_new(TCST, VALUE_MIN);
   *max = vect_new(TCST, VALUE_MAX);
@@ -432,7 +431,7 @@ sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *mi
     return(false);  
   ps_e = sc_dup(ps);
   ps_i = sc_dup(ps); 
-  ok1 = extract_constraint_from_equalitites(ps_e, var, &pe);  
+  (void)extract_constraint_from_equalitites(ps_e, var, &pe);  
   ok2 = extract_constraint_from_inequalities(ps_i, var, ps_prec, &pe, min, max);
   if (ok2) {
     pips_debug(8, "The upper bound has been found\n");

@@ -206,7 +206,6 @@ int number_of_lower_bounds,number_of_upper_bounds;
      cons * args, * args2, * lex2, * lex3;
     char *str1;
     Psysteme sctmp=NULL;
-    bool b2 ;
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(8,"make_movements_loop_body_wp65","begin\n");
 
@@ -301,7 +300,7 @@ int number_of_lower_bounds,number_of_upper_bounds;
     sctmp = sc_append(sctmp,sc_neg);
 
 
-    b2 = sc_minmax_of_variable(sctmp, vecteur_var(ofs), &pmin, &pmax);
+    (void)sc_minmax_of_variable(sctmp, vecteur_var(ofs), &pmin, &pmax);
     ifdebug(4) {
 	fprint_string_Value(stderr, "borne min ", pmin);
 	fprint_string_Value(stderr, ", borne sup ", pmax);

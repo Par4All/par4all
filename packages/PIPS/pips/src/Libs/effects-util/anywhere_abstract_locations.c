@@ -650,13 +650,6 @@ entity entity_locations_max(entity al1, entity al2)
     e = al1;
   }
   else {
-    string mn = string_undefined;
-
-    /* Can we preserve information about the module? */
-    if(strcmp(mn1, mn2)==0)
-      mn = mn1;
-    else
-      mn = ANY_MODULE_NAME;
 
     if(entity_abstract_location_p(al1))
       if(entity_abstract_location_p(al2)) {

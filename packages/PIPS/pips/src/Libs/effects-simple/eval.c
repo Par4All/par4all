@@ -192,14 +192,7 @@ list simple_effect_to_constant_path_effects_with_pointer_values(effect __attribu
     {
       pips_debug(8, "dereferencing case \n");
       bool exact_p = false;
-      transformer context;
-      if (effects_private_current_context_empty_p())
-	context = transformer_undefined;
-      else {
-	context = effects_private_current_context_head();
-      }
 
-      //list lpv = cell_relations_list(load_pv(effects_private_current_stmt_head()));
       if (effect_reference_dereferencing_p(ref, &exact_p))
 	{
 	  pips_debug(8, "dereferencing case \n");

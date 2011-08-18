@@ -486,12 +486,9 @@ static list identify_statements_to_distribute(statement module_stat)
 */   
 bool safescale_distributor_init(string module_name)
 {
-  entity module;
-  
   /* Get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   
-  module = module_name_to_entity(module_name); 
 
   set_current_module_statement(stat);
   set_current_module_entity(module_name_to_entity(module_name));

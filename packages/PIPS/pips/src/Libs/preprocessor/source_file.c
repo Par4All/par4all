@@ -739,7 +739,26 @@ int find_eol_coding(string name)
 
   return eol_code;
 }
+
+static string include_path_to_include_flags(string include_path)
+{
+  /* At least include files from the current directory: */
+  string includes = strdup("");
 
+  /* Transform the include path p1:p2:... into -Ip1 -Ip2...*/
+  for(int i = 0;; i++) {
+    // Get the path i:
+    string p = nth_path(include_path, i);
+    if (p == NULL)
+      // No more directory
+      break;
+    string old_includes = includes;
+    includes = strdup(concatenate(includes, " -I", p, NULL));
+    free(p);
+    free(old_includes);
+  }
+  return includes;
+}
 
 /* Process a file name.c through the C preprocessor to generate a
    name.cpp_processed.c file
@@ -767,22 +786,7 @@ static string process_thru_C_pp(string name) {
     cpp = getenv(CPP_PIPS_ENV);
     cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
 
-
-    /* At least include files from the current directory: */
-    string includes = strdup("");
-
-    /* Transform the include path p1:p2:... into -Ip1 -Ip2...*/
-    for(int i = 0;; i++) {
-      // Get the path i:
-      string p = nth_path(include_path, i);
-      if (p == NULL)
-	// No more directory
-	break;
-      string old_includes = includes;
-      includes = strdup(concatenate(includes, " -I", p, NULL));
-      free(p);
-      free(old_includes);
-    }
+    string includes = include_path_to_include_flags(include_path);
 
     pips_debug(1, "PIPS_SRCPATH=\"%s\"\n", include_path);
     pips_debug(1, "INCLUDE=\"%s\"\n", includes);
@@ -962,11 +966,15 @@ check_input_file_syntax(string file_name, string compiler, string options)
 {
   //string pips_flint = getenv("PIPS_FLINT");
   bool syntax_ok_p = true;
+  // SRCPATH has already been used to locate the file and generate a
+  // full file name, file_name
+  string include_path = getenv(SRCPATH);
+  string includes = include_path_to_include_flags(include_path);
 
   user_log("Checking syntax of file \"%s\"\n", file_name);
 
   if (safe_system_no_abort
-      (concatenate(compiler, " ", options, "",
+      (concatenate(compiler, " ", options, "", includes,
 		   " ", file_name, " ",
       // DO NOT USE A POSSIBLY SHARED FILE NAME!
       // the same "file_name.o" can be used by several creates

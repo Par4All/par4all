@@ -144,13 +144,14 @@ void CCleanLocalEntities(entity function)
 void RemoveLocalEntities(function)
 entity function;
 {
-    list function_local_entities;
 
     set_current_function(function);
 
-    function_local_entities =
+#if 0
+    list function_local_entities =
 	gen_filter_tabulated(local_entity_of_current_function_p, 
 			     entity_domain);
+#endif
 
     /* FI: dangling pointers? Some variables may be referenced in area_layouts of
        global common entities! */

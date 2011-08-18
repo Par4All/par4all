@@ -237,7 +237,7 @@ char *module_name;
     reset_current_module_entity();
     reset_current_module_statement();
 
-    return true;
+    return success;
 }
 
 text text_summary_complexity(module)

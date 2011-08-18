@@ -249,7 +249,7 @@ void egalite_distribution(
   Psysteme *bound_systems,
   Pbase index_base)
 {
-    Pcontrainte pc1,pc2;
+    Pcontrainte pc1;
     int rank;
 
     debug_on("MOVEMENT_DEBUG_LEVEL");
@@ -257,7 +257,6 @@ void egalite_distribution(
 
     for (pc1=sc->egalites; !CONTRAINTE_UNDEFINED_P(pc1); pc1 = pc1->succ) {
 	if ((rank = search_higher_rank(pc1->vecteur,index_base))>0) {
-	    pc2=contrainte_dup(pc1);
 	    sc_add_eg(bound_systems[rank],pc1);
 	}
     }

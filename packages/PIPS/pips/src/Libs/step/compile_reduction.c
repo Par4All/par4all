@@ -84,7 +84,7 @@ bool array_reduction_p (entity directive_module, entity array)
 list step_reduction_before(entity directive_module, entity mpi_module)
 {
   list arglist;
-  expression variable,variable_reduc,operator;
+  expression variable,operator;
   list entity_reduction=NIL;
   map_entity_string reductions=get_reductions_clause(directive_module);
   list lstmt=NIL;
@@ -101,7 +101,6 @@ list step_reduction_before(entity directive_module, entity mpi_module)
       string op=apply_map_entity_string(reductions,e);
       step_declare_reduction_variable(mpi_module,e);
       variable=entity_to_expression(e);
-      variable_reduc=entity_to_expression(load_reduction_entities(e));
       operator=entity_to_expression(MakeConstant(op_to_step_op(op),is_basic_string));
       arglist=CONS(EXPRESSION,variable,
 		   CONS(EXPRESSION,operator,NIL));
@@ -115,7 +114,7 @@ list step_reduction_before(entity directive_module, entity mpi_module)
 list step_reduction_after(entity directive_module)
 {
   list arglist;
-  expression variable,variable_reduc,operator;
+  expression variable;
   list entity_reduction=NIL;
   map_entity_string reductions=get_reductions_clause(directive_module);
   list lstmt=NIL;
@@ -129,8 +128,6 @@ list step_reduction_after(entity directive_module)
     {
       string op=apply_map_entity_string(reductions,e); 
       variable=entity_to_expression(e);
-      variable_reduc=entity_to_expression(load_reduction_entities(e));
-      operator=entity_to_expression(MakeConstant(op_to_step_op(op),is_basic_string));
       arglist=CONS(EXPRESSION,variable,NIL);
       lstmt=CONS(STATEMENT,call_STEP_subroutine(RT_STEP_Reduction, arglist, type_undefined), lstmt);
       pips_debug(1,"reduction %s : %s\n",entity_name(e),op);

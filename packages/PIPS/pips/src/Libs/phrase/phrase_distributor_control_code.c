@@ -618,13 +618,9 @@ static statement controlize_distribution (statement module_stat,
   statement returned_statement = module_stat;
   list l_calls;
   string function_name;
-  entity called_module;
-  statement called_module_stat;
 
   entity start_ru_module;
   entity wait_ru_module;
-  list send_params_modules;
-  list receive_params_modules;
   statement start_ru_module_statement;
   statement wait_ru_module_statement;
 
@@ -749,17 +745,19 @@ static statement controlize_distribution (statement module_stat,
 					    global_common,
 					    l_commons);
      
+#if 0
       /* Build SEND_PARAMS modules */
-      send_params_modules = make_send_scalar_params_modules (ht_in_communications,
+      list send_params_modules = make_send_scalar_params_modules (ht_in_communications,
 							     number_of_deployment_units,
 							     global_common,
 							     l_commons);
      
       /* Build RECEIVE_PARAMS modules */
-      receive_params_modules = make_receive_scalar_params_modules (ht_out_communications,
+      list receive_params_modules = make_receive_scalar_params_modules (ht_out_communications,
 								   number_of_deployment_units,
 								   global_common,
 								   l_commons);
+#endif
 
       /* Let's begin to iterate on all externalized functions and statements,
        * in order to add controlization code  */
@@ -806,12 +804,14 @@ static statement controlize_distribution (statement module_stat,
 
 	  }
 	 
+#if 0
 	  /* Get the called module */
-	  called_module_stat = (statement) db_get_memory_resource(DBR_CODE,
+	  statement called_module_stat = (statement) db_get_memory_resource(DBR_CODE,
 								  function_name,
 								  true);
+	  entity called_module = module_name_to_entity(function_name);
+#endif
 	 
-	  called_module = module_name_to_entity(function_name);
 	 
 	  /* SEND PARAMS calls */
 	  MAP (REGION, reg, {

@@ -396,7 +396,6 @@ perform_clone(
     int number         /* the statement number to clone a call */,
     entity substitute  /* entity to substitute to module */)
 {
-    entity caller;
     statement stat;
 
     pips_assert("coherent arguments",
@@ -407,7 +406,6 @@ perform_clone(
     pips_debug(2, "cloning %s in %s on %d\n", 
 	       entity_local_name(module), caller_name, argn);
 
-    caller = module_name_to_entity(caller_name);
     stat = (statement) db_get_memory_resource(DBR_CODE, caller_name, true);
 
     if (argn!=0)
