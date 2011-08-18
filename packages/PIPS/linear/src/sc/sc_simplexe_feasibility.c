@@ -909,7 +909,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     frac * volatile nlle_colonne = NULL;
     /* les colonnes 0 et 1 sont reservees au terme const: */
     int compteur = 2 ;
-    intptr_t i, j, k, h, trouve, hh=0, ligne, i0, i1, jj, ii ;
+    intptr_t i, j, k, h, trouve, ligne, i0, i1, jj, ii ;
     Value poidsM, valeur, tmpval;
     intptr_t w ;
     int soluble; /* valeur retournee par feasible */
@@ -926,7 +926,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 
     rapport1 =frac0, rapport2 =frac0, min1 =frac0, min2 =frac0, piv=frac0, cc =frac0 ;
     objectif[0] = frac0, objectif[1] = frac0;
-    i=-1, j=-1, k=-1, h=-1, trouve=-1, hh=0, ligne=-1, i0=-1, i1=-1, jj=-1, ii=-1;
+    i=-1, j=-1, k=-1, h=-1, trouve=-1, ligne=-1, i0=-1, i1=-1, jj=-1, ii=-1;
     poidsM =-1, valeur=-1, tmpval=-1,w=-1;/*DN.*/
 
     /* recompute the base so as to only allocate necessary columns
