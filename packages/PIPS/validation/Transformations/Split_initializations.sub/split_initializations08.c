@@ -4,6 +4,7 @@
 int split_initializations08()
 {
   int i = 1, l = 4;
+  // gcc does not allow variable size array direct initialization
   int a[l] = { 1 , 2, 3, i };
   i++;
 }
