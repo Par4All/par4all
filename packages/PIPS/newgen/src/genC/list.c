@@ -607,6 +607,18 @@ bool gen_replace_in_list(list l, const void * s, const void * t)
   return done;
 }
 
+/* exchange items i1 & i2 in the list
+ */
+void gen_exchange_in_list(list l, const void * i1, const void * i2)
+{
+  while (l)
+  {
+    if (CHUNK(CAR(l))==i1) CHUNK(CAR(l)) = (gen_chunk*) i2;
+    else if (CHUNK(CAR(l))==i2) CHUNK(CAR(l)) = (gen_chunk*) i1;
+    l = CDR(l);
+  }
+}
+
 /* remove item o from list *pl which is modified as a side effect.
  * @param once whether to do it once, or to look for all occurences.
  */
