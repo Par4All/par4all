@@ -1322,7 +1322,7 @@ static void add_test_successor(control t, control new_s, bool is_true_successor)
   size_t pos = 0;
 
   pips_debug(8, "Begin with t=%p, new_s=%p and is_true_successor=%d",
-	     t, new_s, is_true_successor);
+	     t, new_s, (int)is_true_successor);
 
   pips_assert("t is a control with a test", control_test_p(t));
   pips_assert("is_true_successor is 0 or 1",
@@ -1414,7 +1414,7 @@ static void update_successor_in_copy(control new_pred,
     pips_assert("The position is not zero since c is among the sucessors of pred"
 		" (see previous assert)", pos!=0);
 
-    pips_debug(4, "position=%d, is_true_succ=%d \n", pos, is_true_succ);
+    pips_debug(4, "position=%d, is_true_succ=%d \n", pos, (int)is_true_succ);
     pips_assert("pred is a test, new_pred is a test too", control_test_p(new_pred));
     pips_assert("pred is still a predecessor of new_c",
 		gen_in_list_p(pred, control_predecessors(new_c)));

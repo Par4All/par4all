@@ -541,7 +541,7 @@ same_alignment_p(entity e1, entity t1, alignment a1,
     if (alignment_undefined_p(a1) || alignment_undefined_p(a2))
     {
         b=alignment_undefined_p(a1) && alignment_undefined_p(a2);
-	RETAL("some undefined", b);
+	RETAL("some undefined", (int)b);
     }
 
     pips_debug(7, "considering %s[dim=%"PRIdPTR"] and %s[dim=%"PRIdPTR"]\n",
@@ -568,7 +568,7 @@ same_alignment_p(entity e1, entity t1, alignment a1,
 	(dimension_lower(FindIthDimension(t2,alignment_templatedim(a2))));
 
     b=(b1-l1)==(b2-l2);
-    RETAL("shift", b);
+    RETAL("shift", (int)b);
 }
 
 #define RET(msg, what) \
@@ -955,7 +955,7 @@ static void simple_switch_old_to_new(statement s)
      * (caution, was just switched to the new_variable!)
      */
     pips_debug(8, "statement %p, array %s, rw proper %d\n", 
-	       s, entity_name(new_variable), bound_proper_rw_effects_p(s));
+	       s, entity_name(new_variable), (int)bound_proper_rw_effects_p(s));
 
     if (!array_modified && bound_proper_rw_effects_p(s))
     {

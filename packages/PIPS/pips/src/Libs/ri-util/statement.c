@@ -91,7 +91,7 @@ empty_code_p(statement s)
     bool statement_is_empty = true;
     gen_context_recurse(s,&statement_is_empty, call_domain, call_filter, gen_null);
 
-    pips_debug(3, "returning %d\n", statement_is_empty);
+    pips_debug(3, "returning %d\n", (int)statement_is_empty);
 
     return statement_is_empty;
 }

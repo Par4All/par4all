@@ -21,14 +21,14 @@ directive make_directive_omp_barrier(statement stmt)
 bool begin_directive_omp_barrier(directive __attribute__ ((unused)) current,directive next)
 {
   bool rep=type_directive_omp_barrier_p(directive_type(next));
-  pips_debug(2,"%d\n",rep);
+  pips_debug(2,"%d\n",(int)rep);
   return rep;
 }
 
 bool end_directive_omp_barrier(directive __attribute__ ((unused)) current,directive next)
 {
   bool rep= type_directive_omp_barrier_p(directive_type(next));
-  pips_debug(2,"%d\n",rep);
+  pips_debug(2,"%d\n",(int)rep);
   return rep;
 }
 
@@ -60,7 +60,7 @@ instruction handle_omp_barrier(directive begin,directive __attribute__ ((unused)
 
 string directive_omp_barrier_to_string(directive d,bool close)
 {
-  pips_debug(1, "d=%p, close=%u\n",d,close);
+  pips_debug(1, "d=%p, close=%u\n",d,(int)close);
   if (close)
     return strdup("");
   else

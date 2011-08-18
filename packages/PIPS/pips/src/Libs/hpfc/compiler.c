@@ -648,7 +648,7 @@ statement *hoststatp, *nodestatp;
 	    in_in = indirections_inside_statement_p(stat),
 	    is_full_copy = full_copy_p(stat, &left, &right);
 	
-	pips_debug(5, "condition results: aa %d, in %d\n", at_ac, in_in);
+	pips_debug(5, "condition results: aa %d, in %d\n", (int)at_ac, (int)in_in);
 
 	
 	if (is_full_copy)
@@ -717,9 +717,9 @@ hpf_compiler(
 
     DEBUG_STAT(9, "stat is", stat);
     pips_debug(9, "only io %d, remapping %d, reduction %d\n",
-	       load_statement_only_io(stat),
-	       bound_renamings_p(stat),
-	       bound_hpf_reductions_p(stat));
+               (int)load_statement_only_io(stat),
+               (int)bound_renamings_p(stat),
+               (int)bound_hpf_reductions_p(stat));
 
     if (load_statement_only_io(stat)==1) /* necessary */
     {
