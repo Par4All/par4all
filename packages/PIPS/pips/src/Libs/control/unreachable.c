@@ -110,7 +110,7 @@ control_propagate(control c)
     }
   }
   pips_debug(1, "Ending control_propagate for control %p and statement %p returning continued %d\n",
-	     c, s, continued);
+	     c, s, (int)continued);
   //  store_continued(control_statement(c), continued);
   return continued;
 }
@@ -211,7 +211,7 @@ propagate(statement s) {
 	pips_internal_error("unexpected instruction tag");
     }
 
-    pips_debug(1, "Continued for statement %p = %d\n", s, continued);
+    pips_debug(1, "Continued for statement %p = %d\n", s, (int)continued);
     store_continued(s, continued);
     return continued;
 }

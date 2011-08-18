@@ -661,7 +661,7 @@ complexity evaluate_var_to_complexity(entity var,
 		if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 		    fprintf(stderr,"var_of is %s -- variable is %s --bool is %d\n",
 		       module_local_name((entity)(var_of(pv)) ),
-		       module_local_name((entity)(var) ), b);
+		       module_local_name((entity)(var) ), (int)b);
 		}
 
 		if (!b) {
@@ -696,7 +696,7 @@ complexity evaluate_var_to_complexity(entity var,
 					 &min, &max);
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	    fprintf(stderr," faisable is %d\n",faisable);
+	    fprintf(stderr," faisable is %d\n",(int)faisable);
 	    fprintf(stderr,"Variable %s -- ", noms_var(var));
 	    fprint_string_Value(stderr, "min is ", min);
 	    fprint_string_Value(stderr, ", max is ", max);

@@ -576,7 +576,7 @@ static bool com_optimizable_p(map_entity_bool optimizable, entity v, entity dire
     optimizable_p = true;
 
  end:
-  pips_debug(1, "optimizable_p = %d\n", optimizable_p);
+  pips_debug(1, "optimizable_p = %d\n", (int)optimizable_p);
   return optimizable_p;
 }
 

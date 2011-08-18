@@ -628,7 +628,7 @@ control_graph_recursive_decomposition(unstructured u)
            only one node or an irreductible graph: */
 	/* Construct the interval graph from the previous one: */
 	modified = interval_graph(intervals);
-	pips_debug(6, "Modified = %d\n", modified);
+	pips_debug(6, "Modified = %d\n", (int)modified);
 	ifdebug(6)
 	    display_interval_graph(intervals);
     } while (modified);

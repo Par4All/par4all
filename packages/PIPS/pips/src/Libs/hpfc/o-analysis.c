@@ -79,7 +79,7 @@ static bool simple_indices_p(reference r)
 	 bool b2 = ((!b1) ? local_integer_constant_expression(e) : false);
 
 	 pips_debug(7, "%s(DIM=%d), distributed %d, locally constant %d\n",
-		    entity_name(array), dim, b1, b2);
+		    entity_name(array), dim, (int)b1, (int)b2);
 
 	 if (!b2)
 	 {
