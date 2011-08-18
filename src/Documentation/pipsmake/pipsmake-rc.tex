@@ -7550,7 +7550,14 @@ wrap_kernel_argument > CALLERS.code
 
 \begin{PipsPass}{gpu_ify}
 This phase generate GPU kernels from perfect parallel loop nests.
+\PipsPropRef{GPU_IFY_ANNOTATE_LOOP_NESTS} property triggers automatically the 
+annotation of the loop nest (see \PipsPassRef{GPU_LOOP_NEST_ANNOTATE}).
 \end{PipsPass}
+
+\begin{PipsProp}{GPU_IFY_ANNOTATE_LOOP_NESTS}
+GPU_IFY_ANNOTATE_LOOP_NESTS FALSE
+\end{PipsProp}
+
 
 \begin{PipsMake}
 alias gpu_ify 'Distribute // loop nests on GPU'
@@ -7676,6 +7683,7 @@ stands for \emph{virtual processor} dimension and is a reminiscence from
 PompC and HyperC...
 
 Please, do not use this feature for buffer-overflow attack...
+
 
 
 \begin{PipsPass}{gpu_loop_nest_annotate}
