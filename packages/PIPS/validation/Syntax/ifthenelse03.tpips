@@ -1,4 +1,5 @@
 delete ifthenelse03
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create ifthenelse03 ifthenelse03.f
 display PRINTED_FILE
 close

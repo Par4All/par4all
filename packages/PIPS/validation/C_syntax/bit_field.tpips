@@ -1,5 +1,6 @@
 delete bit_field
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create bit_field bit_field.c
 
 setproperty PRETTYPRINT_LANGUAGE "C"

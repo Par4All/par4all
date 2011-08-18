@@ -1,4 +1,5 @@
 delete const02
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create const02 const02.c
 
 setproperty PRETTYPRINT_LANGUAGE "C"

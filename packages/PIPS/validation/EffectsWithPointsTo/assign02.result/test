@@ -115,28 +115,28 @@ s_t make_s(int i, float x)
    s_t *p;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    char *malloc(int);
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    p = (s_t *) malloc(sizeof(s_t));
 
 // Points To:
-// p -> &*HEAP*_l_8 , EXACT
+// p -> *HEAP*_l_8 , EXACT
 
    p->entier = i;
 
 // Points To:
-// p -> &*HEAP*_l_8 , EXACT
+// p -> *HEAP*_l_8 , EXACT
 
    p->reel = x;
 
 // Points To:
-// p -> &*HEAP*_l_8 , EXACT
+// p -> *HEAP*_l_8 , EXACT
 
    return *p;
 }

@@ -54,87 +54,87 @@ POINTS-TO
 
 
 // Points To:
-// p -> &_p_1[0] , EXACT
+// p -> _p_1[0] , EXACT
 
 int bla(int *p)
 {
 
 // Points To:
-// p -> &_p_1[0] , EXACT
+// p -> _p_1[0] , EXACT
 
    *p = 13;
 
 // Points To:
-// p -> &_p_1[0] , EXACT
+// p -> _p_1[0] , EXACT
 
    return 17;
 }
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
 int call19(int *q)
 {
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    int i, k;
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    something st;
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    // bla(int *)
    i = bla(q);
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    i += *q;
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    i += bla(&k);
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    i += k;
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    i += bla(&st.data);
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    i += st.data;
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    // foo(int)
    i += foo(*q);
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    i += foo(k);
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    i += foo(st.data);
 
 // Points To:
-// q -> &_q_2[0] , EXACT
+// q -> _q_2[0] , EXACT
 
    return i;
 }

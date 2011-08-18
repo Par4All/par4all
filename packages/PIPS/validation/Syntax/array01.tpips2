@@ -1,4 +1,5 @@
 delete array01
+setenv PIPS_CHECK_FORTRAN="Y"
 create array01 array01.f
 # Make sure the array section is not parsed
 module ARRAY01

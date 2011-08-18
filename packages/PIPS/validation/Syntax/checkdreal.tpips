@@ -1,6 +1,7 @@
 # Check that DREAL is recognized as an intrinsic
 
 delete checkdreal
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create checkdreal checkdreal.f
 module CHECKDREAL
 display CALLGRAPH_FILE[CHECKDREAL]

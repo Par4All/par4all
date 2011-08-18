@@ -1,4 +1,5 @@
 delete block_scope
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create block_scope block_scope.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9

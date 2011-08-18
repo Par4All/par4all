@@ -24,13 +24,13 @@ int global01()
    i = &k;
 
 // Points To:
-// i -> &k , EXACT
+// i -> k , EXACT
 
    j = i;
 
 // Points To:
-// i -> &k , EXACT
-// j -> &k , EXACT
+// i -> k , EXACT
+// j -> k , EXACT
 
    return 0;
 }

@@ -48,4 +48,8 @@ int main()
 
 
    t = ia+ib;
+
+//  P(ia,ib,t) {ia==t-1, ib==1}
+
+   return 0;
 }

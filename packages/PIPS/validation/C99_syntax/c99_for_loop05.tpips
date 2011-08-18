@@ -1,5 +1,6 @@
 setenv WS c99_for_loop05
 delete $WS
+setenv PIPS_CPP_FLAGS=" -std=c99 "
 create $WS $WS.c
 
 setproperty PRETTYPRINT_LANGUAGE "C"

@@ -7,4 +7,6 @@ int main()
       c -= 1;
    }
    while (c>0);
+   /* End of function */
+   return 0;
 }

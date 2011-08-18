@@ -47,46 +47,46 @@ int main()
    my_str *m, *n;
 
 // Points To:
-// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int j;
 
 // Points To:
-// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    j = 2;
 
 // Points To:
-// m -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    m = (my_str *) malloc(sizeof(my_str));
 
 // Points To:
-// m -> &*HEAP*_l_10 , EXACT
-// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> *HEAP*_l_10 , EXACT
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    m->i = 1;
 
 // Points To:
-// m -> &*HEAP*_l_10 , EXACT
-// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// m -> *HEAP*_l_10 , EXACT
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    m->p = &j;
 
 // Points To:
-// *HEAP*_l_10.p -> &j , EXACT
-// m -> &*HEAP*_l_10 , EXACT
-// n -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// *HEAP*_l_10.p -> j , EXACT
+// m -> *HEAP*_l_10 , EXACT
+// n -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    n = m;
 
 // Points To:
-// *HEAP*_l_10.p -> &j , EXACT
-// m -> &*HEAP*_l_10 , EXACT
-// n -> &*HEAP*_l_10 , EXACT
+// *HEAP*_l_10.p -> j , EXACT
+// m -> *HEAP*_l_10 , EXACT
+// n -> *HEAP*_l_10 , EXACT
 
 
    return 0;

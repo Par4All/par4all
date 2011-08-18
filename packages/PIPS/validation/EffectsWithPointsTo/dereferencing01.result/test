@@ -40,31 +40,31 @@ int main()
    double *p = &x;
 
 // Points To:
-// p -> &x , EXACT
+// p -> x , EXACT
 
    double *q = 0;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &*NULL_POINTER* , EXACT
+// p -> x , EXACT
+// q -> *NULL_POINTER* , EXACT
 
    printf("q = %p", q);
 
 // Points To:
-// p -> &x , EXACT
-// q -> &*NULL_POINTER* , EXACT
+// p -> x , EXACT
+// q -> *NULL_POINTER* , EXACT
 
    q = p;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &x , EXACT
+// p -> x , EXACT
+// q -> x , EXACT
 
    *p = 2.;
 
 // Points To:
-// p -> &x , EXACT
-// q -> &x , EXACT
+// p -> x , EXACT
+// q -> x , EXACT
 
    return 0;
 }

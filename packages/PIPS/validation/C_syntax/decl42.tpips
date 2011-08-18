@@ -1,6 +1,7 @@
 setenv WSPC decl42
 setenv MAIN $WSPC.c
 delete $WSPC
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create $WSPC $MAIN
 activate C_PARSER
 activate PRINT_CODE

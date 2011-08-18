@@ -1,4 +1,6 @@
 delete lecopt
+# Array or function KFLU undeclared
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create lecopt lecopt.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE

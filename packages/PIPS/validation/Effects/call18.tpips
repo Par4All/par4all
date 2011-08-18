@@ -1,6 +1,8 @@
 delete call18
 
 setproperty ABORT_ON_USER_ERROR TRUE
+# fmt undeclared
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create call18 call18.c
 

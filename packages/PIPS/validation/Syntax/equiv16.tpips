@@ -1,4 +1,5 @@
 delete equiv16
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create equiv16 equiv16.f
 display PRINTED_FILE[EQUIV16]
 # try again to check that the error is well recovered

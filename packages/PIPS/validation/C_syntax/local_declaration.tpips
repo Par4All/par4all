@@ -1,5 +1,7 @@
 delete local_declaration
 
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+
 create local_declaration local_declaration.c
 
 setproperty PRETTYPRINT_LANGUAGE "C"

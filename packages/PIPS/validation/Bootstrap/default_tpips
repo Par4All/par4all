@@ -2,6 +2,9 @@ delete ${WSPACE}
 
 setenv PIPS_CPP="cpp -C"
 setproperty ABORT_ON_USER_ERROR TRUE
+# FI: This is pretty stupid... Might be better to fix ishifc01.f
+#setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+#setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create ${WSPACE} ${FILE}
 

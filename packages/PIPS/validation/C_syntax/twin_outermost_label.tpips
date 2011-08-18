@@ -3,6 +3,7 @@ delete miam
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create miam twin_outermost_label.c
 

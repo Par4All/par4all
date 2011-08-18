@@ -5,6 +5,9 @@ test -d protected_workspace2.database && {
   Delete protected_workspace2.database
 }
 
+PIPS_CHECK_FORTRAN="Y"
+export PIPS_CHECK_FORTRAN
+
 echo
 echo The message should be: workspace protected_workspace2: Permission denied
 echo

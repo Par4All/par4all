@@ -1,4 +1,5 @@
 delete decl12
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create decl12 decl12.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1

@@ -11,8 +11,9 @@ Parsed printed file
       I = 2                                                             0008
       J = 3                                                             0009
       K = 3                                                             0010
-      H = ISHFTC(K, I, J)                                               0011
-      PRINT *, 'H = ', H                                                0012
+!     gfortran insists on the arguments being integers
+      H = ISHFTC(L1, L2, L3)                                            0012
+      PRINT *, 'H = ', H                                                0013
 
       END
 
@@ -31,12 +32,13 @@ C             <    is written>: J
       J = 3                                                             0009
 C             <    is written>: K
       K = 3                                                             0010
-C             <    is read   >: I J K
+C             <    is read   >: L1 L2 L3
 C             <    is written>: H
-      H = ISHFTC(K, I, J)                                               0011
+!     gfortran insists on the arguments being integers
+      H = ISHFTC(L1, L2, L3)                                            0012
 C             <    is read   >: H __IO_EFFECTS:LUNS(6)
 C             <    is written>: __IO_EFFECTS:LUNS(6)
-      PRINT *, 'H = ', H                                                0012
+      PRINT *, 'H = ', H                                                0013
 
       END
 
@@ -57,11 +59,12 @@ C             <    is written>: J
       J = 3                                                             0009
 C             <    is written>: K
       K = 3                                                             0010
-C             <    is read   >: I J K
+C             <    is read   >: L1 L2 L3
 C             <    is written>: H
-      H = ISHFTC(K, I, J)                                               0011
+!     gfortran insists on the arguments being integers
+      H = ISHFTC(L1, L2, L3)                                            0012
 C             <    is read   >: H __IO_EFFECTS:LUNS(6)
 C             <    is written>: __IO_EFFECTS:LUNS(6)
-      PRINT *, 'H = ', H                                                0012
+      PRINT *, 'H = ', H                                                0013
 
       END

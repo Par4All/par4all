@@ -35,29 +35,29 @@ POINTS-TO
 
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
 void call06(int r, int m, int *x)
 {
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
    int j;
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
 
    for(j = 0; j <= m-1; j += 1)
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
       x[j] = 10*r+j;
 
 // Points To:
-// x -> &_x_1[0] , EXACT
+// x -> _x_1[0] , EXACT
 
    return;
 }

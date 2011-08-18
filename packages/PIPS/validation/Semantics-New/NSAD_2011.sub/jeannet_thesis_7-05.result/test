@@ -1,0 +1,352 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void ts_singlestate(void)
+{
+
+//  T(b,x) {}
+
+   int b, x;
+
+//  T(x) {}
+
+   x = rand_z();
+
+//  T(b) {0<=b, b<=1}
+
+   b = rand_b();
+
+//  T() {0<=b, b<=1, x+1<=0}
+
+   if (!(x<0))
+
+//  T() {0==-1}
+
+      deadlock();
+
+//  T() {0<=b, b<=1, x+1<=0}
+
+   if (b==0&&x>=0)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(x) {0<=b, b<=1}
+
+   while (rand_b())
+
+//  T(x) {2b+x#init==x+1, x#init<=x+1, x<=x#init+1}
+
+      if (rand_b()) {
+
+//  T() {b==1}
+
+         if (!(b==1))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {b==1, x==x#init+1}
+
+         x++;
+
+//  T() {b==1}
+
+         if (b==0&&x>=0)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {b==0}
+
+         if (!(b==0))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {b==0, x==x#init-1}
+
+         x--;
+
+//  T() {b==0, x+1<=0}
+
+         if (b==0&&x>=0)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  T() {0==-1}
+
+void ts_restructured(void)
+{
+
+//  T(b,x) {}
+
+   int b, x;
+
+//  T(x) {}
+
+   x = rand_z();
+
+//  T(b) {0<=b, b<=1}
+
+   b = rand_b();
+
+//  T() {0<=b, b<=1, x+1<=0}
+
+   if (!(x<0))
+
+//  T() {0==-1}
+
+      deadlock();
+
+//  T() {0<=b, b<=1, x+1<=0}
+
+   if (b==0&&x>=0)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T() {0<=b, b<=1, x+1<=0}
+
+   if (b==1) goto L1;
+
+//  T() {b==0}
+
+L2:   ;
+
+//  T() {b==0}
+
+   if (!(b==0))
+
+//  T() {0==-1}
+
+      deadlock();
+
+//  T(x) {b==0, x==x#init-1}
+
+   x--;
+
+//  T() {b==0, x+1<=0}
+
+   if (b==0&&x>=0)
+
+//  T() {0==-1}
+
+      checking_error();
+   goto L2;
+
+//  T() {b==1}
+
+L1:   ;
+
+//  T() {b==1}
+
+   if (!(b==1))
+
+//  T() {0==-1}
+
+      deadlock();
+
+//  T(x) {b==1, x==x#init+1}
+
+   x++;
+
+//  T() {b==1}
+
+   if (b==0&&x>=0)
+
+//  T() {0==-1}
+
+      checking_error();
+   goto L1;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int b, x;
+
+//  P(b,x) {}
+
+   x = rand_z();
+
+//  P(b,x) {}
+
+   b = rand_b();
+
+//  P(b,x) {0<=b, b<=1}
+
+   if (!(x<0))
+
+//  P(b,x) {0<=b, b<=1, 0<=x}
+
+      deadlock();
+
+//  P(b,x) {0<=b, b<=1, x+1<=0}
+
+   if (b==0&&x>=0)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(b,x) {0<=b, b<=1, x+1<=0}
+
+   while (rand_b())
+
+//  P(b,x) {0<=b, b<=1}
+
+      if (rand_b()) {
+
+//  P(b,x) {0<=b, b<=1}
+
+         if (!(b==1))
+
+//  P(b,x) {b==0}
+
+            deadlock();
+
+//  P(b,x) {b==1}
+
+         x++;
+
+//  P(b,x) {b==1}
+
+         if (b==0&&x>=0)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(b,x) {0<=b, b<=1}
+
+         if (!(b==0))
+
+//  P(b,x) {b==1}
+
+            deadlock();
+
+//  P(b,x) {b==0}
+
+         x--;
+
+//  P(b,x) {b==0}
+
+         if (b==0&&x>=0)
+
+//  P(b,x) {b==0, 0<=x}
+
+            checking_error();
+      }
+}
+
+//  P() {}
+
+void ts_restructured(void)
+{
+
+//  P() {}
+
+   int b, x;
+
+//  P(b,x) {}
+
+   x = rand_z();
+
+//  P(b,x) {}
+
+   b = rand_b();
+
+//  P(b,x) {0<=b, b<=1}
+
+   if (!(x<0))
+
+//  P(b,x) {0<=b, b<=1, 0<=x}
+
+      deadlock();
+
+//  P(b,x) {0<=b, b<=1, x+1<=0}
+
+   if (b==0&&x>=0)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(b,x) {0<=b, b<=1, x+1<=0}
+
+   if (b==1) goto L1;
+
+//  P(b,x) {b==0, x+1<=0}
+
+L2:   ;
+
+//  P(b,x) {b==0, x+1<=0}
+
+   if (!(b==0))
+
+//  P() {0==-1}
+
+      deadlock();
+
+//  P(b,x) {b==0, x+1<=0}
+
+   x--;
+
+//  P(b,x) {b==0, x+2<=0}
+
+   if (b==0&&x>=0)
+
+//  P() {0==-1}
+
+      checking_error();
+   goto L2;
+
+//  P(b,x) {b==1}
+
+L1:   ;
+
+//  P(b,x) {b==1}
+
+   if (!(b==1))
+
+//  P() {0==-1}
+
+      deadlock();
+
+//  P(b,x) {b==1}
+
+   x++;
+
+//  P(b,x) {b==1}
+
+   if (b==0&&x>=0)
+
+//  P() {0==-1}
+
+      checking_error();
+   goto L1;
+}

@@ -1,4 +1,5 @@
 delete stack03
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create stack03 stack03.f
 module STACK03
 

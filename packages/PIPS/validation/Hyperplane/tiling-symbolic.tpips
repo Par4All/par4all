@@ -1,4 +1,6 @@
 delete A
+# Floating poiint variables used as DO loop bounds
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create A tiling-symbolic.f
 #create A tiling.c
 

@@ -1,4 +1,6 @@
 delete inimod2
+# format 1000 undefined
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create inimod2 inimod2.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8

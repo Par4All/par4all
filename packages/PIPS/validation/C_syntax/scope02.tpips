@@ -1,4 +1,5 @@
 delete scope02
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create scope02 scope02/scope02_a.c  scope02/scope02_b.c  scope02/scope02_c.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 6

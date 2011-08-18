@@ -3,6 +3,8 @@ setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 setproperty FSMIZE_WITH_GLOBAL_VARIABLE FALSE
 setproperty UNSPAGHETTIFY_IN_CONTROLIZER TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+# Undeclared variable with implicit none
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create guerin02 guerin02.f
 apply FULL_SPAGHETTIFY
 display PRINTED_FILE
@@ -12,10 +14,3 @@ apply PARTIAL_EVAL
 close
 delete guerin02
 quit
-
-
-
-
-
-
-

@@ -50,10 +50,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 +" [shape=trapezium,orientation=270];
-  "12 +" -> "o";
-  "i1" -> "12 +";
-  "i0" -> "12 +";
+  "10 +" [shape=trapezium,orientation=270];
+  "10 +" -> "o";
+  "i1" -> "10 +";
+  "i0" -> "10 +";
 }
 
 ! updated function for
@@ -63,8 +63,8 @@ freia_status freia_dup_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // same operation performed twice, with commutativity
    // first is dead
    // t = i0 + i1
+   freia_aipo_add(o, i0, i1);                                           /*0010*/
    // o = i1 + i0
-   freia_aipo_add(o, i1, i0);                                           /*0012*/
    return FREIA_OK;                                                     /*0014*/
 }
 #
@@ -116,10 +116,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 +" [shape=trapezium,orientation=270];
-  "12 +" -> "o";
-  "i1" -> "12 +";
-  "i0" -> "12 +";
+  "10 +" [shape=trapezium,orientation=270];
+  "10 +" -> "o";
+  "i1" -> "10 +";
+  "i0" -> "10 +";
 }
 // graph for dag "freia_dup_06_helper_0_0" of module "freia_dup_06" in dot format
 digraph "freia_dup_06_helper_0_0" {
@@ -131,10 +131,10 @@ digraph "freia_dup_06_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 +" [shape=trapezium,orientation=270];
-  "12 +" -> "o";
-  "i0" -> "12 +";
-  "i1" -> "12 +";
+  "10 +" [shape=trapezium,orientation=270];
+  "10 +" -> "o";
+  "i1" -> "10 +";
+  "i0" -> "10 +";
 }
 
 ! acceleration function
@@ -144,7 +144,7 @@ digraph "freia_dup_06_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops (0 copies), optimized to 1 (0 copies)
+// dag 0: 2 ops (0 copies), optimized to 1 (0+0 copies)
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -166,11 +166,11 @@ freia_status freia_dup_06_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, fre
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] 12 add
+  // i0 [0 input 0] -> [0 alu] 10 add
   // nope
-  // i1 [0 input 1] -> [0 alu] 12 add
+  // i1 [0 input 1] -> [0 alu] 10 add
   // nope
-  // alu 12 add stage 0
+  // alu 10 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
 
 
@@ -221,8 +221,8 @@ freia_status freia_dup_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // same operation performed twice, with commutativity
    // first is dead
    // t = i0 + i1
+   freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0010*/
    // o = i1 + i0
-   freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0012*/
    return FREIA_OK;                                                     /*0014*/
 }
 
@@ -233,8 +233,8 @@ freia_status freia_dup_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // same operation performed twice, with commutativity
    // first is dead
    // t = i0 + i1
+   freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0010*/
    // o = i1 + i0
-   freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0012*/
    return 0;                                                            /*0014*/
 }
 #
@@ -286,10 +286,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 +" [shape=trapezium,orientation=270];
-  "12 +" -> "o";
-  "i1" -> "12 +";
-  "i0" -> "12 +";
+  "10 +" [shape=trapezium,orientation=270];
+  "10 +" -> "o";
+  "i1" -> "10 +";
+  "i0" -> "10 +";
 }
 // graph for dag "freia_dup_06_helper_0_0_0" of module "freia_dup_06" in dot format
 digraph "freia_dup_06_helper_0_0_0" {
@@ -301,10 +301,10 @@ digraph "freia_dup_06_helper_0_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 +" [shape=trapezium,orientation=270];
-  "12 +" -> "o";
-  "i0" -> "12 +";
-  "i1" -> "12 +";
+  "10 +" [shape=trapezium,orientation=270];
+  "10 +" -> "o";
+  "i1" -> "10 +";
+  "i0" -> "10 +";
 }
 
 ! acceleration function
@@ -386,13 +386,13 @@ freia_status freia_dup_06_helper_0_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: +(2,1) -> 1
-  mcu_macro[0][0].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][0].xmin1 = imagelet_io_2_1;
+  // 0: +(1,2) -> 1
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
   mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].xmin2 = imagelet_io_1_0;
-  mcu_macro[1][0].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][0].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][0].xmin2 = imagelet_io_2_1;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
   mcu_macro[0][0].xmin3 = imagelet_io_1_0;
@@ -471,8 +471,8 @@ freia_status freia_dup_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // same operation performed twice, with commutativity
    // first is dead
    // t = i0 + i1
+   freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0010*/
    // o = i1 + i0
-   freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0012*/
    return FREIA_OK;                                                     /*0014*/
 }
 
@@ -483,8 +483,8 @@ freia_status freia_dup_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // same operation performed twice, with commutativity
    // first is dead
    // t = i0 + i1
+   freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0010*/
    // o = i1 + i0
-   freia_dup_06_helper_0_0_0(o, i0, i1);                                /*0012*/
    return 0;                                                            /*0014*/
 }
 #

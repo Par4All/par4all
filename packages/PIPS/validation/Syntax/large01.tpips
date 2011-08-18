@@ -3,6 +3,7 @@ echo Check syntactic analysis of large constants
 echo
 
 delete large01
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create large01 large01.f
 
 echo

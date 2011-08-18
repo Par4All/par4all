@@ -1,4 +1,5 @@
 delete one_liner_04
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create one_liner_04 one_liner_04.c
 
 setproperty PRETTYPRINT_LANGUAGE "C"

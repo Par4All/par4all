@@ -3,6 +3,7 @@
 #
 setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS=TRUE
 delete macros
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create macros macros.f
 echo Code...
 display PRINTED_FILE[%ALLFUNC]

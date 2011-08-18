@@ -1,0 +1,20 @@
+setenv WS=c_syntax_check02
+delete $WS
+
+# Should not be set since we are checking user error detection
+# setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS TRUE
+
+create $WS $WS.c
+
+display PRINTED_FILE[main]
+
+close
+
+# The database is deleted because of the failure of create, before
+# this "cat" is performed
+shell cat $WS.database/Warnings
+
+delete $WS
+quit

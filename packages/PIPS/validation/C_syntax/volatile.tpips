@@ -1,6 +1,6 @@
-
-
 delete volatile
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create volatile volatile.c
 

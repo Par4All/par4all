@@ -1,6 +1,7 @@
 # No core dump please when closing the database after a parser error
 # Parser error for IO illegal default parameter
 delete ioilldef
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create ioilldef ioilldef.f
 display PRINTED_FILE 
 close

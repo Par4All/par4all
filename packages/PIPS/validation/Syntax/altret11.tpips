@@ -1,0 +1,25 @@
+delete altret11
+
+setenv PIPS_CHECK_FORTRAN="Y"
+
+create altret11 altret11.f
+
+# Make sure that ParserError cleans up the data structures
+# altret11.f is not compatible with PIPS parser.
+# The first attempt at displaying fails.
+# The second attempt due to UNSPLIT fails too, but gracefully.
+# Then the compilation fails (do not set ABORD_ON_USER_ERROR)
+# or the scheme is dead.
+# well, it does not fail, so the scheme must be dead.
+
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+display PRINTED_FILE[ALTRET11]
+apply UNSPLIT
+
+shell pips_validation_exe.sh -c altret11
+close
+delete altret11
+quit

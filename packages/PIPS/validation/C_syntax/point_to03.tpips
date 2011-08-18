@@ -1,4 +1,5 @@
 delete point_to03
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create point_to03 point_to03.c
 
 activate C_PARSER

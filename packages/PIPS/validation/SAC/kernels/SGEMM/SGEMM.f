@@ -539,7 +539,7 @@
 40        ENDDO 
 30    ENDDO
 
-      IF(success .EQ. .TRUE.) THEN
+      IF(success .EQV. .TRUE.) THEN
          PRINT *, 'SUCCESS'
       ELSE
          PRINT *, 'ERROR'

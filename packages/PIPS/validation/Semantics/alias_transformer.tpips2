@@ -1,4 +1,8 @@
 delete alias_transformer 
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv PIPS_CHECK_FORTRAN="Y"
+
 create alias_transformer alias_transformer.f
 
 setproperty PRETTYPRINT_BLOCKS TRUE

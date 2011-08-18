@@ -1,4 +1,6 @@
 delete unstruc02
+# FI: I do not understand the gfortran error message
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create unstruc02 unstruc02.f
 
 # Make sure that labels referenced thru END= are not lost

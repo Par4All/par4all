@@ -3,6 +3,8 @@ setenv WS="putnonintrablk"
 delete $WS
 
 setproperty ABORT_ON_USER_ERROR TRUE
+# Variable altscan undeclared and many more problems in an excerpt
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create $WS putnonintrablk.c
 

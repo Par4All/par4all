@@ -32,41 +32,41 @@ int main()
    int *p, *q, *r;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int a = 0, b = 1, c = 2, d = 4;
 
 // Points To:
-// p -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    p = &a;
 
 // Points To:
-// p -> &a , EXACT
-// q -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
-// r -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> a , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    q = a==b?&c:&d;
 
 // Points To:
-// p -> &a , EXACT
-// q -> &d , MAY
-// q -> &c , MAY
-// r -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> a , EXACT
+// q -> d , MAY
+// q -> c , MAY
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    r = a<b?&c:q;
 
 // Points To:
-// p -> &a , EXACT
-// q -> &d , MAY
-// q -> &c , MAY
-// r -> &d , MAY
-// r -> &c , MAY
+// p -> a , EXACT
+// q -> d , MAY
+// q -> c , MAY
+// r -> d , MAY
+// r -> c , MAY
 
    return 0;
 }

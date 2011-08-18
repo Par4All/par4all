@@ -79,4 +79,5 @@ int main()
    double b[m][n];                                                      /*0012*/
    printf("size of a = %d\n", (int) sizeof(a));                         /*0013*/
    printf("size of b = %d\n", (int) sizeof(b));                         /*0014*/
+   return 0;                                                            /*0015*/
 }

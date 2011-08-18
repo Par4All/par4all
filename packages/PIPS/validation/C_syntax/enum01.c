@@ -1,6 +1,6 @@
 //#include <stdio.h>
 
-main()
+int main()
 {
   enum fleurs {rose=0x0001, marguerite=0, jasmin};
   enum legumes{carotte=rose+50, haricot};
@@ -26,5 +26,5 @@ main()
 
   // printf("rose=%d, margueritte=%d, jasmin=%d\n", ma1, ma2, ma3);
   //printf("carotte=%d, haricot=%d\n", mon1, mon2);
-  return;
+  return 0;
 }

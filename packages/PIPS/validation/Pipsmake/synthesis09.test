@@ -7,6 +7,7 @@ tpips=${tpips_version:-tpips}
 Delete synthesis09
 
 ( $tpips 2>&1 | sed '/file *\//d' ) <<EOF
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create synthesis09 synthesis09.f
 
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"

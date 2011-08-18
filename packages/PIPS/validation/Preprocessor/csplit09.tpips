@@ -7,7 +7,8 @@ delete csplit09
 
 # You end up with a core dump...
 
-# setenv PIPS_CHECK_FORTRAN TRUE
+# force check whatever?
+setenv PIPS_CHECK_FORTRAN TRUE
 
 setproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS TRUE
 

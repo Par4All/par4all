@@ -166,7 +166,7 @@ digraph "freia_dead_08_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops (1 copies), optimized to 2 (0 copies)
+// dag 0: 3 ops (1 copies), optimized to 2 (0+1 copies)
 // split 0: 1 cut
 // # SPOC calls: 1
 

@@ -5,8 +5,9 @@ enum e
   a
 };
 
-main()
+int main()
 {
   enum e i;
   i = a;
+  return 0;
 }

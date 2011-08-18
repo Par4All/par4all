@@ -1,6 +1,8 @@
 #
 # fun with hollerith;-)
 #
+delete holle
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create holle hollerith.f
 display PRINTED_FILE
 close

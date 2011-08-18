@@ -1,4 +1,4 @@
- main ()
+main ()
 {
   int a[10];
   int nga;

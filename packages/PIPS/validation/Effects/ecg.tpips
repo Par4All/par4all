@@ -1,4 +1,6 @@
 delete ecg
+# Fortran extension
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create ecg ecg.f
 
 echo

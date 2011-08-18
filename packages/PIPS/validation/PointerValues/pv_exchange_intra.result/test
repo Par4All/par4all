@@ -54,7 +54,7 @@ int main()
 // q == &a (exact);
 // r == &b (exact);
 
-   r = (int *) NULL;
+   r = (int *) (void *) 0;
 
 // Pointer values:
 // p == &b (exact);

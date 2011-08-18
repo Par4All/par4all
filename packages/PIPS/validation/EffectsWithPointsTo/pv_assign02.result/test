@@ -30,34 +30,34 @@ int main()
    int *a[2];
 
 // Points To:
-// a[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int b = 0;
 
 // Points To:
-// a[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int c = 1;
 
 // Points To:
-// a[*] -> &*ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// a[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    a[0] = &b;
 
 // Points To:
-// a[0] -> &b , EXACT
+// a[0] -> b , EXACT
 
    a[1] = &b;
 
 // Points To:
-// a[1] -> &b , EXACT
-// a[0] -> &b , EXACT
+// a[1] -> b , EXACT
+// a[0] -> b , EXACT
 
    a[1] = &c;
 
 // Points To:
-// a[1] -> &c , EXACT
-// a[0] -> &b , EXACT
+// a[1] -> c , EXACT
+// a[0] -> b , EXACT
 
    return 0;
 }

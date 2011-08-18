@@ -68,11 +68,11 @@ digraph "dag_cleaned_0" {
   "13 +." -> "15 thr" [label="t1"];
   "12 ?" [shape=none];
   "12 ?" -> "14 ?" [arrowhead=empty,label="mvol"];
-  "11 -." [shape=trapezium,orientation=270];
-  "11 -." -> "13 +." [label="t0"];
+  "11 +." [shape=trapezium,orientation=270];
+  "11 +." -> "13 +." [label="t0"];
   "10 vol" [shape=diamond];
   "10 vol" -> "12 ?" [arrowhead=empty,label="vol"];
-  "i" -> "11 -.";
+  "i" -> "11 +.";
   "i" -> "10 vol";
 }
 
@@ -86,7 +86,7 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    int32_t vol, mvol, seuil;                                            /*0008*/
    // sub_const must be reordered *before* seuil assignment...
    freia_aipo_global_vol(i, &vol);                                      /*0010*/
-   freia_aipo_sub_const(t0, i, 127);                                    /*0011*/
+   freia_aipo_add_const(t0, i, -127);                                   /*0011*/
    mvol = vol/1000+1;                                                   /*0012*/
    freia_aipo_add_const(t1, t0, 3);                                     /*0013*/
    seuil = mvol+3;                                                      /*0014*/
@@ -162,11 +162,11 @@ digraph "dag_cleaned_0" {
   "13 +." -> "15 thr" [label="t1"];
   "12 ?" [shape=none];
   "12 ?" -> "14 ?" [arrowhead=empty,label="mvol"];
-  "11 -." [shape=trapezium,orientation=270];
-  "11 -." -> "13 +." [label="t0"];
+  "11 +." [shape=trapezium,orientation=270];
+  "11 +." -> "13 +." [label="t0"];
   "10 vol" [shape=diamond];
   "10 vol" -> "12 ?" [arrowhead=empty,label="vol"];
-  "i" -> "11 -.";
+  "i" -> "11 +.";
   "i" -> "10 vol";
 }
 // graph for dag "freia_skip_03_helper_0_0" of module "freia_skip_03" in dot format
@@ -180,10 +180,10 @@ digraph "freia_skip_03_helper_0_0" {
   // computation vertices
   "13 +." [shape=trapezium,orientation=270];
   "13 +." -> "t1";
-  "11 -." [shape=trapezium,orientation=270];
-  "11 -." -> "13 +." [label="t0"];
+  "11 +." [shape=trapezium,orientation=270];
+  "11 +." -> "13 +." [label="t0"];
   "10 vol" [shape=diamond];
-  "i" -> "11 -.";
+  "i" -> "11 +.";
   "i" -> "10 vol";
 }
 // graph for dag "freia_skip_03_helper_0_1" of module "freia_skip_03" in dot format
@@ -207,7 +207,7 @@ digraph "freia_skip_03_helper_0_1" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 4 ops (0 copies), optimized to 4 (0 copies)
+// dag 0: 4 ops (0 copies), optimized to 4 (0+0 copies)
 // split 0: 1 cut
 // split 1: 1 cut
 // # SPOC calls: 2
@@ -238,11 +238,11 @@ freia_status freia_skip_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
 
 
   // STAGE 1
-  // i [0 measure 0] -> [1 alu] 11 sub_const
-  // i [1 input 0] -> [1 alu] 11 sub_const
+  // i [0 measure 0] -> [1 alu] 11 add_const
+  // i [1 input 0] -> [1 alu] 11 add_const
   // nope
-  // alu 11 sub_const stage 1
-  si.alu[1][0].op = SPOC_ALU_SUB_IN0_CONST;
+  // alu 11 add_const stage 1
+  si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
   sp.alu[1][0].constant = pi1;
 
 
@@ -376,7 +376,7 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0007*/
    int32_t vol, mvol, seuil;                                            /*0008*/
    // sub_const must be reordered *before* seuil assignment...
-   freia_skip_03_helper_0_0_0(t1, i, &vol, 127, 3);                     /*0010*/
+   freia_skip_03_helper_0_0_0(t1, i, &vol, -127, 3);                    /*0010*/
    mvol = vol/1000+1;                                                   /*0012*/
    seuil = mvol+3;                                                      /*0014*/
    freia_skip_03_helper_0_1_0(o, t1, seuil, 250, false);                /*0015*/
@@ -393,7 +393,7 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0007*/
    int32_t vol, mvol, seuil;                                            /*0008*/
    // sub_const must be reordered *before* seuil assignment...
-   freia_skip_03_helper_0_0_0(t1, i, &vol, 127, 3);                     /*0010*/
+   freia_skip_03_helper_0_0_0(t1, i, &vol, -127, 3);                    /*0010*/
    mvol = vol/1000+1;                                                   /*0012*/
    seuil = mvol+3;                                                      /*0014*/
    freia_skip_03_helper_0_1_0(o, t1, seuil, 250, 0);                    /*0015*/
@@ -467,11 +467,11 @@ digraph "dag_cleaned_0" {
   "13 +." -> "15 thr" [label="t1"];
   "12 ?" [shape=none];
   "12 ?" -> "14 ?" [arrowhead=empty,label="mvol"];
-  "11 -." [shape=trapezium,orientation=270];
-  "11 -." -> "13 +." [label="t0"];
+  "11 +." [shape=trapezium,orientation=270];
+  "11 +." -> "13 +." [label="t0"];
   "10 vol" [shape=diamond];
   "10 vol" -> "12 ?" [arrowhead=empty,label="vol"];
-  "i" -> "11 -.";
+  "i" -> "11 +.";
   "i" -> "10 vol";
 }
 // graph for dag "freia_skip_03_helper_0_0_0" of module "freia_skip_03" in dot format
@@ -485,10 +485,10 @@ digraph "freia_skip_03_helper_0_0_0" {
   // computation vertices
   "13 +." [shape=trapezium,orientation=270];
   "13 +." -> "t1";
-  "11 -." [shape=trapezium,orientation=270];
-  "11 -." -> "13 +." [label="t0"];
+  "11 +." [shape=trapezium,orientation=270];
+  "11 +." -> "13 +." [label="t0"];
   "10 vol" [shape=diamond];
-  "i" -> "11 -.";
+  "i" -> "11 +.";
   "i" -> "10 vol";
 }
 // graph for dag "freia_skip_03_helper_0_1_0" of module "freia_skip_03" in dot format
@@ -647,7 +647,7 @@ freia_status freia_skip_03_helper_0_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
-  // 1: -.(1) -> 1
+  // 1: +.(1) -> 1
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -676,8 +676,8 @@ freia_status freia_skip_03_helper_0_0_0(
   mcu_macro[1][1].iter3 = 0;
   mcu_macro[0][1].iter4 = 0;
   mcu_macro[1][1].iter4 = 0;
-  mcu_macro[0][1].addrStart = TERAPIX_UCODE_SUB_CONST;
-  mcu_macro[1][1].addrStart = TERAPIX_UCODE_SUB_CONST;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_ADD_CONST;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_ADD_CONST;
   // 2: +.(1) -> 1
   mcu_macro[0][2].xmin1 = imagelet_io_1_0;
   mcu_macro[1][2].xmin1 = imagelet_io_1_1;
@@ -939,7 +939,7 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0007*/
    int32_t vol, mvol, seuil;                                            /*0008*/
    // sub_const must be reordered *before* seuil assignment...
-   freia_skip_03_helper_0_0_0(t1, i, &vol, 127, 3);                     /*0010*/
+   freia_skip_03_helper_0_0_0(t1, i, &vol, -127, 3);                    /*0010*/
    mvol = vol/1000+1;                                                   /*0012*/
    seuil = mvol+3;                                                      /*0014*/
    freia_skip_03_helper_0_1_0(o, t1, seuil, 250, false);                /*0015*/
@@ -956,7 +956,7 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0007*/
    int32_t vol, mvol, seuil;                                            /*0008*/
    // sub_const must be reordered *before* seuil assignment...
-   freia_skip_03_helper_0_0_0(t1, i, &vol, 127, 3);                     /*0010*/
+   freia_skip_03_helper_0_0_0(t1, i, &vol, -127, 3);                    /*0010*/
    mvol = vol/1000+1;                                                   /*0012*/
    seuil = mvol+3;                                                      /*0014*/
    freia_skip_03_helper_0_1_0(o, t1, seuil, 250, 0);                    /*0015*/

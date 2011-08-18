@@ -1,5 +1,6 @@
 setenv WS=struct14
 delete $WS
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 create $WS $WS.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5

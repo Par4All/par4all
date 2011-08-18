@@ -1,5 +1,7 @@
 #! /bin/sh
 
+setenv PIPS_CHECK_FORTRAN="NO"
+
 # The purpose was to make sure that the precompilation mecanism works
 # for Fortran code and that errors are detected as expected. Because
 # the workspace creation fails, the key user warning "Fortran syntax

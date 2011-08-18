@@ -150,7 +150,6 @@ int main(int argc, char *argv[])
             sum += tmp;
             sum2 += tmp*tmp;
          }
-      P4A_copy_to_accel(J, sizeof(float)*rows*cols);
       // There shouldn't be a copy-in there because J is not written but only read in the previous loop
       // This is a currently known limitation of the communication optimization scheme, hard work to improve !
       meanROI = sum/size_R;
