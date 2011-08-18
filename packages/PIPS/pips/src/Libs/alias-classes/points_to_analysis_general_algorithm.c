@@ -357,7 +357,6 @@ set basic_ref_array(set pts_to_set, expression lhs, expression rhs) {
   reference r1 = reference_undefined;
   reference r2 = reference_undefined;
   cell source = cell_undefined;
-  cell sink = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
 
@@ -392,7 +391,6 @@ set basic_ref_array(set pts_to_set, expression lhs, expression rhs) {
   effect_add_dereferencing_dimension(e2);
   r2 = effect_any_reference(copy_effect(e2));
   free(l3);
-  sink = make_cell_reference(copy_reference(r2));
   new_sink = make_cell_reference(copy_reference(r2));
   rel = make_approximation_exact();
   pt_to = make_points_to(source, new_sink, rel,
@@ -1202,7 +1200,7 @@ set points_to_general_assignment(__attribute__ ((__unused__)) statement s,
 {
   set res = set_generic_make(set_private, points_to_equal_p,
 				    points_to_rank);
-  list lhs_list = NIL, rhs_list = NIL;
+  list lhs_list = NIL ;
   bool nowhere_lhs_p = false, nowhere_rhs_p = false;
 
 /* we test the type of lhs by using expression_pointer_p(), I'm  not
@@ -1227,7 +1225,7 @@ set points_to_general_assignment(__attribute__ ((__unused__)) statement s,
        /* if it's a call to &, replace rhs by the first argument of & */
        if (entity_an_operator_p(call_function(c), ADDRESS_OF)){
 	 rhs = EXPRESSION(CAR(call_arguments(c)));
-	 rhs_list = expression_to_constant_paths(rhs, pts_in);//, &nowhere_rhs_p);
+	 (void)expression_to_constant_paths(rhs, pts_in);//, &nowhere_rhs_p);
 	 if(nowhere_rhs_p)
 	   set_assign(res, points_to_nowhere_typed(lhs_list, pts_in));
 	 else{
@@ -1240,7 +1238,7 @@ set points_to_general_assignment(__attribute__ ((__unused__)) statement s,
      }else if(syntax_cast_p(s)){
        set_assign(res, points_to_null_pointer(lhs_list, pts_in));
      }else if(expression_reference_p(rhs)){
-       rhs_list = expression_to_constant_paths(rhs, pts_in);//, &nowhere_rhs_p);
+       (void)expression_to_constant_paths(rhs, pts_in);//, &nowhere_rhs_p);
        if(nowhere_rhs_p)
 	 set_assign(res, points_to_nowhere_typed(lhs_list, pts_in));
        else{

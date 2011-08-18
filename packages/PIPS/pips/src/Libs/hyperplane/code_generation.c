@@ -64,7 +64,6 @@ statement code_generation(list lls,
 {
     statement state_lhyp = statement_undefined;
     instruction instr_lhyp = instruction_undefined;
-    loop l_old = loop_undefined;
     loop l_hyp = loop_undefined;
     range rl = range_undefined;
     expression lower = expression_undefined;
@@ -80,13 +79,14 @@ statement code_generation(list lls,
     for(pb=base_reversal(base_newindex);lls!=NIL; lls=CDR(lls), pb = pb->succ) {
 	/* handling of current loop */
 	s_loop = STATEMENT(CAR(lls));
-	l_old = instruction_loop(statement_instruction(s_loop));
 
 	/* new bounds for new index related to the old index of the old loop*/
 	make_bound_expression(pb->var, base_newindex,sc_newbase, &lower, &upper);
 	rl = make_range(lower, upper, make_integer_constant_expression(1));
 
 	/*
+    loop l_old = loop_undefined;
+	l_old = instruction_loop(statement_instruction(s_loop));
 	l_hyp = make_loop((entity) pb->var,
 			  rl,
 			  bl,

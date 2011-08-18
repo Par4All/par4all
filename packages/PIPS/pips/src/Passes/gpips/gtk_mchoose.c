@@ -213,7 +213,6 @@ void mchoose(char * title, gen_array_t array, void(*function_ok)( gen_array_t),
 	int i, argc = gen_array_nitems(array);
 
 	GtkTreeIter iter;
-	GtkTreeSelection * selection;
 	gen_array_nitems(array);
 
 	apply_on_mchoices = function_ok;
@@ -221,8 +220,6 @@ void mchoose(char * title, gen_array_t array, void(*function_ok)( gen_array_t),
 
 	gtk_window_set_title(GTK_WINDOW(mchoose_window), title);
 	gtk_list_store_clear(choices);
-
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(choices_list));
 
 	for (i = 0; i < argc; i++) {
 		string name = gen_array_item(array, i);

@@ -411,6 +411,7 @@ void print_region(effect r)
 void print_regions_op_statistics(char __attribute__ ((unused)) *mod_name,
 				 int regions_type)
 {
+    /*
     string prefix = string_undefined;
 
     switch (regions_type) {
@@ -425,7 +426,7 @@ void print_regions_op_statistics(char __attribute__ ((unused)) *mod_name,
 	break;
     }
 
-/*    print_proj_op_statistics(mod_name, prefix);
+    print_proj_op_statistics(mod_name, prefix);
     print_umust_statistics(mod_name, prefix);
     print_umay_statistics(mod_name, prefix);
     print_dsup_statistics(mod_name, prefix); */

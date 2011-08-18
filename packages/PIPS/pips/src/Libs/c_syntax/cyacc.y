@@ -374,11 +374,10 @@ void PushContext(c_parser_context c)
 void PopContext()
 {
   c_parser_context fc = (c_parser_context) stack_head(ContextStack);
-  c_parser_context c = c_parser_context_undefined;
 
   pips_debug(8, "Context %p with scope \"%s\" is popped from stack position %d\n",
 	     fc, c_parser_context_scope(fc), stack_size(ContextStack));
-  c = (c_parser_context) stack_pop(ContextStack);
+  (void)stack_pop(ContextStack);
   if(stack_empty_p(ContextStack)) {
     pips_debug(8, "context stack is now empty\n");
   }

@@ -77,8 +77,6 @@ entity make_start_ru_module (hash_table ht_params,
   entity func_id;
   entity unit_id = NULL;
   string function_name;
-  entity called_module;
-  statement called_module_stat;
   list stat_seq = NIL;
   sequence new_sequence;
   instruction sequence_instruction;
@@ -123,12 +121,13 @@ entity make_start_ru_module (hash_table ht_params,
     list call_params ;
      
     function_name = entity_local_name(function);
-       
-    called_module_stat = (statement) db_get_memory_resource(DBR_CODE,
+#if 0
+    statement called_module_stat = (statement) db_get_memory_resource(DBR_CODE,
 							    function_name,
 							    true);
    
-    called_module = local_name_to_top_level_entity(function_name);
+#endif
+    entity called_module = local_name_to_top_level_entity(function_name);
  
     /* Compute the parameters of call function */
     call_params = NIL;
@@ -222,24 +221,25 @@ entity make_wait_ru_module (statement* module_statement,
 			    list l_commons)
 {
   entity wait_ru_module;
-  entity func_id;
-  entity unit_id = NULL;
   entity set_entity = get_current_module_entity();
 
   wait_ru_module = make_empty_subroutine(WAIT_RU_MODULE_NAME,make_language_unknown());
   pips_debug(2, "Creating module %s\n", entity_global_name(wait_ru_module));
   reset_current_module_entity();
   set_current_module_entity(wait_ru_module);
-  func_id = create_integer_parameter_for_new_module (WAIT_RU_PARAM1_NAME,
+#if 0
+  entity func_id = create_integer_parameter_for_new_module (WAIT_RU_PARAM1_NAME,
 						     WAIT_RU_MODULE_NAME,
 						     wait_ru_module,
 						     1);
+  entity unit_id = NULL;
   if (number_of_deployment_units > 1) {
     unit_id = create_integer_parameter_for_new_module (WAIT_RU_PARAM2_NAME,
 						       WAIT_RU_MODULE_NAME,
 						       wait_ru_module,
 						       2);
   }
+#endif
  
   /* Declare CONTROL_DATA common to be visible here */
   declare_common_variables_in_module (global_common, wait_ru_module);

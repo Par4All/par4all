@@ -135,14 +135,12 @@ bool check_the_call(c)
     type            the_tp = entity_type(the_fnct);
     functional      ft;
     list            lt;
-    type            result;
 
     if (!type_functional_p(the_tp))
 	return (BOOL_UNDEF);
 
     ft = type_functional(the_tp);
     lt = functional_parameters(ft);
-    result = functional_result(ft);
 
 
     if (!check_call_args_number(la, lt, c))

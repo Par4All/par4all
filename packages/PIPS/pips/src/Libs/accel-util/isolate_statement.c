@@ -414,8 +414,10 @@ statement effects_to_dma(statement stat,
   if(!fine_grain_analysis) {
     FOREACH(EFFECT,eff,rw_effects) {
         if(entity_pointer_p(reference_variable(region_any_reference(eff)))
-                && ! std_file_effect_p(eff))
+                && ! std_file_effect_p(eff)) {
+          print_effect(eff);
             pips_user_error("pointers wreak havoc with isolate_statement\n");
+        }
       descriptor d = effect_descriptor(eff);
       if(descriptor_convex_p(d)) {
           Psysteme sc_old = descriptor_convex(d);

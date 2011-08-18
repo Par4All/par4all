@@ -141,6 +141,7 @@ bool check_transformer_list(list tl)
 {
   bool identity_p = false;
   bool one_p = false; // useless for the time being
+  one_p=one_p;
 
   if(ENDP(tl)) {
     /* The empty transformer list is used to represent the empty

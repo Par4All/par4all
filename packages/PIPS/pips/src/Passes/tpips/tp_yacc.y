@@ -398,7 +398,7 @@ static void tp_some_info(const char* about)
 static gen_array_t get_main(void)
 {
 	gen_array_t result = gen_array_make(0), modules;
-	int number_of_main = 0, nmodules = 0;
+	int number_of_main = 0;
 	int n = 0;
 	string main_name = get_first_main_module();
 
@@ -415,7 +415,6 @@ static gen_array_t get_main(void)
 	{
 		n++;
 		modules = db_get_module_list();
-		nmodules = gen_array_nitems(modules);
 
 		if (n==2)
 		{

@@ -389,7 +389,7 @@ static control connect_unstructured (statement unstructured_statement,
 {
   unstructured the_unstructured
     = instruction_unstructured(statement_instruction(unstructured_statement));
-  control entry, exit;
+  control exit;
 
   pips_assert("Control with 1 successors in CONNECT_UNSTRUCTURED",
 	      gen_length(control_successors(current_control)) == 1);
@@ -399,7 +399,6 @@ static control connect_unstructured (statement unstructured_statement,
 	      CONTROL(gen_nth(0,control_successors(current_control)))
 	      == next_control);
 
-  entry = unstructured_entry (the_unstructured);
   exit = unstructured_exit (the_unstructured);
 
   pips_assert("Exit with no successors in CONNECT_UNSTRUCTURED",
@@ -419,7 +418,6 @@ static control connect_unstructured (statement unstructured_statement,
     print_statement (unstructured_statement);
   }
 
-  entry = unstructured_entry (the_unstructured);
   exit = unstructured_exit (the_unstructured);
   unlink_2_control_nodes (current_control, next_control);
   link_2_control_nodes (current_control, unstructured_entry(the_unstructured));
@@ -602,17 +600,13 @@ static control full_spaghettify_statement (statement stat,
 
 bool full_spaghettify(string module_name)
 {
-  entity module;
-
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE,
 						      module_name,
 						      true);
 
-  module = module_name_to_entity(module_name);
- 
   set_current_module_statement(stat);
-  set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant
+  set_current_module_entity(module_name_to_entity(module_name));
  
   debug_on("SPAGUETTIFY_DEBUG_LEVEL");
 

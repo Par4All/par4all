@@ -279,7 +279,6 @@ expression MakeFunctionExpression(expression e, list le)
       {
 	entity ent = reference_variable(syntax_reference(s));
     free_expression(e);
-	bool ok = true;
 	entity cf = get_current_module_entity();
 
 	ifdebug(8) {
@@ -316,7 +315,7 @@ expression MakeFunctionExpression(expression e, list le)
 	  }
 	}
 	pips_debug(6,"Normal function or intrinsics call\n");
-	ok = check_C_function_type(ent, le);
+    (void)check_C_function_type(ent,le);
 	exp = make_call_expression(ent,le);
 	/* This cannot be checked unless bootstrap typing is improved
 	   for varargs intrinsics, mostly IOs. */

@@ -1205,7 +1205,6 @@ int last_parallel_level)
     Pbase var_id;
     Pvecteur ppid = vect_new((char *) Proc_id, VALUE_ONE);
     Psysteme sc_image2= SC_UNDEFINED;
-    Pvecteur pv;
     debug(8,"make_store_blocks",
 	  "begin variable=%s, shared_variable=%s, local_variable=%s\n",
 	  entity_local_name(var), entity_local_name(shared_variable),
@@ -1270,7 +1269,6 @@ int last_parallel_level)
 					 tile_indices,&new_tile_indices,
 					 pn,bn,ls,
 					 &n,&dim_h);
-	pv =tile_indices;
 	nullify_offsets();
 	sc_image2 = sc_dup(sc_image);
 	bank_code = true ;

@@ -461,7 +461,6 @@ bool privatize_module(char *mod_name)
 {
     entity module;
     statement mod_stat;
-    instruction mod_inst;
     graph mod_graph;
 
     set_current_module_entity(module_name_to_entity(mod_name) );
@@ -470,13 +469,6 @@ bool privatize_module(char *mod_name)
     set_current_module_statement( (statement)
         db_get_memory_resource(DBR_CODE, mod_name, true) );
     mod_stat = get_current_module_statement();
-
-    mod_inst = statement_instruction(mod_stat);
-
-    /*
-    if (! instruction_unstructured_p(mod_inst))
-        pips_internal_error("unstructured expected");
-        */
 
     set_proper_rw_effects((statement_effects)
         db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));

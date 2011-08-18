@@ -420,7 +420,6 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
 
   cons *block = NIL, *eblock = NIL;
   statement stata = statement_undefined;
-  statement statb = statement_undefined;
   statement rst = statement_undefined;
   int nbl =0;
 
@@ -487,12 +486,12 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
 	pips_debug(9, "generated statement:\n") ;
 	print_parallel_statement(stata);
       }
-      statb = MakeNestOfStatementList(l, nbl, &lst, loops, &block, &eblock, task_parallelize_p);
+      (void)MakeNestOfStatementList(l, nbl, &lst, loops, &block, &eblock, task_parallelize_p);
       INSERT_AT_END(block, eblock, CONS(STATEMENT, stata, NIL));
     }
   }
 
-  statb = MakeNestOfStatementList(l,nbl,&lst, loops,&block,&eblock,task_parallelize_p);
+  (void)MakeNestOfStatementList(l,nbl,&lst, loops,&block,&eblock,task_parallelize_p);
 
   switch(gen_length(block)) {
   case 0:

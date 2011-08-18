@@ -463,6 +463,7 @@ statement comEngine_opt_loop_interchange(statement stat, statement innerStat,
   //printf("glSeqs\n");
   MAP(LIST, curList,
   {
+  /*
     //printf("glSeqs it 1\n");
     MAP(STATEMENT, curStat,
     {
@@ -471,6 +472,7 @@ statement comEngine_opt_loop_interchange(statement stat, statement innerStat,
       //printf("glSeqs it 2 end\n");
 
     }, curList);
+    */
 
     statement seqStat = make_seqStat(stat, loopPattern, curList, newInd);
 

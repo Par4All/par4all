@@ -224,7 +224,6 @@ bool atomizer(mod_name)
 char *mod_name;
 {
     statement mod_stat;
-    instruction mod_inst;
     entity module;
     pips_user_warning("this transformation is being obsoleted by SIMD_ATOMIZER\nIt is no longer maintained and is likely to crash soon\n");
 
@@ -251,7 +250,6 @@ char *mod_name;
     } 
     else {
 
-	mod_inst = statement_instruction(mod_stat);
 
 	initialize_global_variables(mod_name);
 

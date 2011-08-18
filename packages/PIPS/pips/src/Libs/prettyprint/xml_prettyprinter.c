@@ -3231,7 +3231,6 @@ static void xml_Connection(list  ActualArrayInd,int ActualArrayDim, int FormalAr
 {
   Pmatrix mat;
   int i,j;
-  Pvecteur pv;
   string_buffer_append_word("Connection",sb_result);
   mat = matrix_new(ActualArrayDim,FormalArrayDim);
   matrix_init(mat,ActualArrayDim,FormalArrayDim);
@@ -3245,9 +3244,7 @@ static void xml_Connection(list  ActualArrayInd,int ActualArrayDim, int FormalAr
   // Normalise les expressions lors du premier parcours
   // Utile aussi a  xml_LoopOffset
   MAP(EXPRESSION, e , {
-      if (expression_normalized(e) == normalized_undefined)
-	expression_normalized(e)= NormalizeExpression(e);
-      pv = (Pvecteur)normalized_linear(expression_normalized(e));
+          NORMALIZE_EXPRESSION(e);
     },
     ActualArrayInd);
 

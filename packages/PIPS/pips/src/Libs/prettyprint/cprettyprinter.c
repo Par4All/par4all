@@ -2002,7 +2002,6 @@ static string interface_argument_type_string (entity var) {
 static string interface_argument_declaration (entity module, string separator,
 					      string indent) {
   code c;
-  bool first = true;
   string tmp = NULL;
   string args = strdup ("");
   string result = NULL;
@@ -2020,7 +2019,6 @@ static string interface_argument_declaration (entity module, string separator,
 				  separator,
 				  NULL));
       free(tmp);
-      first = false;
     }
   }
   result = strdup (args);

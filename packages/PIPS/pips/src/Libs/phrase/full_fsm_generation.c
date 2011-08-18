@@ -63,18 +63,13 @@ typedef dg_vertex_label vertex_label;
 
 bool full_fsm_generation(string module_name)
 {
-  entity module;
-  //entity state_variable;
-
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 
 						      module_name, 
 						      true);
 
-  module = module_name_to_entity(module_name);
-  
   set_current_module_statement(stat);
-  set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant
+  set_current_module_entity(module_name_to_entity(module_name));
   
   debug_on("FSM_GENERATION_DEBUG_LEVEL");
 

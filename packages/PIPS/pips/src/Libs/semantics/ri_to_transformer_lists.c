@@ -534,6 +534,7 @@ list  intrinsic_to_transformer_list(entity e,
 
   pips_debug(8, "end\n");
 
+  tl=CONS(TRANSFORMER,tf,NIL);
   return tl;
 }
 

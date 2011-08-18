@@ -103,7 +103,6 @@ char *module_name;
 {
     transformer precond = transformer_undefined;
     list effects_list = NIL;
-    complexity comp;
     entity module_entity;
     statement module_stat;
 
@@ -143,8 +142,7 @@ char *module_name;
     add_common_variables_to_hash_table(module_entity,
 				       hash_complexity_parameters);
 
-    /* a` quoi sert comp ? */
-    comp = statement_to_complexity(module_stat, precond, effects_list);
+    (void)statement_to_complexity(module_stat, precond, effects_list);
 
     remove_common_variables_from_hash_table(module_entity,
 					    hash_complexity_parameters);

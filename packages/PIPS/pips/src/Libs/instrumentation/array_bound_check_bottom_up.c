@@ -1565,21 +1565,24 @@ static expression
 strcpy_check_expression(expression args[], int nargs)
 {
     //statement smt;
-    expression arg1_size_expr, arg2_size_expr;
-    entity arg2ent;
-    int arg2size;
+    expression arg1_size_expr ;
 
     CHECK_NARGS(2);
 
-    arg2ent = reference_variable(expression_reference(args[1]));
     arg1_size_expr = expression_try_find_size(args[0]);
     if (arg1_size_expr == expression_undefined)
         return expression_undefined;
+    /*
+    expression arg2_size_expr;
+    int arg2size;
+    entity arg2ent;
+    arg2ent = reference_variable(expression_reference(args[1]));
 
     if ((arg2size = entity_constant_string_size(arg2ent)) >= 0)
         arg2_size_expr = int_to_expression(arg2size);
     else
         arg2_size_expr = make_strlen_expression(args[1]);
+        */
 
     return cf_ge_expression(expression_try_find_string_size(args[1]), arg1_size_expr);
 }
