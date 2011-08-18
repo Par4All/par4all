@@ -1,3 +1,4 @@
+setenv PIPS_CHECK_C No
 setproperty ABORT_ON_USER_ERROR TRUE
 delete split_initializations08
 create split_initializations08 split_initializations08.c

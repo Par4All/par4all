@@ -17,6 +17,7 @@
       end
 
       subroutine reset(buffer)
+      integer buffer_size
       parameter (buffer_size=1024)
       integer buffer(buffer_size)
 

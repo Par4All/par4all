@@ -1,3 +1,6 @@
+// array a overflow?
+
+#define size 10
 
 void privatize_local_variable()
 {
@@ -8,8 +11,6 @@ void privatize_local_variable()
      sum+=a[10];
    }
 }
-
-
 
 void privatize_function_params(float sum )
 {
