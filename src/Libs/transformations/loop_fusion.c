@@ -1111,8 +1111,15 @@ static void compute_fusion_on_statement(statement s) {
   params.maximize_parallelism = get_bool_property("LOOP_FUSION_MAXIMIZE_PARALLELISM");
   params.greedy = get_bool_property("LOOP_FUSION_GREEDY");
 
+  // Disable warnings when redefining a key in a hashtable
+  bool save_warn = hash_warn_on_redefinition_p();
+  hash_dont_warn_on_redefinition();
+
   // Go on fusion on every sequence of statement founded
   gen_context_recurse( s, &params, sequence_domain, fusion_in_sequence, gen_true);
+
+  if(save_warn)
+    hash_warn_on_redefinition();
 }
 
 /**
