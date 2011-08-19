@@ -499,7 +499,7 @@ void hash_update(hash_table htp, const void * key, const void * val)
   htp->n_upd++;
   hep = hash_find_entry(htp, key, &n, &htp->n_upd_iter);
 
-  message_assert("no previous entry", htp->equals(hep->key, key));
+  message_assert("some previous entry", htp->equals(hep->key, key));
 
   hep->val = (void *) val;
 }
