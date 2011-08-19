@@ -73,7 +73,9 @@ typedef uintptr_t _uint;
     #error newgen header not compatible with stdbool.h
 #endif
 
-typedef int bool; /* we cannot use an enum or stdbool because we need to be compatible with newgen */
+/* we cannot use an enum or stdbool because we need to be compatible with newgen,
+ * thus boolean need to handle 3 states : true, false, and undefined  */
+typedef int bool;
 
 #define false 0
 #define true 1
