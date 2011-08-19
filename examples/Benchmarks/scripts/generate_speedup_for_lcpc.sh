@@ -6,10 +6,10 @@
 export tests="2mm 3mm adi bicg correlation covariance doitgen fdtd-2d gauss-filter gemm gemver gesummv gramschmidt jacobi-1d jacobi-2d lu mvt symm-exp syrk syr2k hotspot99 lud99 srad99 Stars-PM"
 
 # size for fonts (number over histogram bars)
-export labelfontsize=9.5 
+export labelfontsize=10
 
 # The differents version involved
-export versions="OpenMP Cuda-naive Cuda-opt HMPP-2.5.1 PGI-11.8"
+export versions="OpenMP HMPP PGI Cuda-naive Cuda-opt"
 
 
 # Get script dir
