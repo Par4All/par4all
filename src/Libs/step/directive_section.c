@@ -73,7 +73,7 @@ bool is_begin_directive_omp_parallel_sections(directive __attribute__ ((unused))
 
   b = type_directive_omp_parallel_sections_p(directive_type(next));
 
-  pips_debug(1,"b = %d\n", (int)b);
+  pips_debug(1,"b = %d\n", b);
   return b;
 }
 
@@ -100,7 +100,7 @@ bool is_end_directive_omp_end_parallel_sections(directive  __attribute__ ((unuse
 
   b = true;
 
-  pips_debug(1,"b = %d\n", (int)b);
+  pips_debug(1,"b = %d\n", b);
   return b;
 }
 
@@ -127,7 +127,7 @@ bool is_begin_directive_omp_sections(directive __attribute__ ((unused)) current,
 
   b = type_directive_omp_sections_p(directive_type(next));
 
-  pips_debug(1,"b = %d\n", (int)b);
+  pips_debug(1,"b = %d\n", b);
   return b;
 }
 
@@ -148,7 +148,7 @@ bool is_begin_directive_omp_section(directive current, directive next)
   */
   b = false;
 
-  pips_debug(1,"b = %d\n", (int)b);
+  pips_debug(1,"b = %d\n", b);
   return b;
 }
 
@@ -183,7 +183,7 @@ bool is_end_directive_omp_section(directive current, directive next)
   /* if body of current is not empty then it is end */
   b = !ENDP(directive_body(current));
 
-  pips_debug(1, "b = %d\n", (int)b);
+  pips_debug(1, "b = %d\n", b);
   return b;
 }
 
@@ -212,7 +212,7 @@ bool is_end_directive_omp_end_sections(directive current, directive next)
 
   b = type_directive_omp_end_sections_p(directive_type(next));
 
-  pips_debug(1,"b = %d\n", (int)b);
+  pips_debug(1,"b = %d\n", b);
   return b;
 }
 

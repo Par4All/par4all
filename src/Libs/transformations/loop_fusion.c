@@ -285,7 +285,7 @@ static bool fusion_loops(statement sloop1,
       && loop_parallel_p(loop2)))) {
     pips_debug(4,"Fusion aborted because of fuse_maximize_parallelism property"
         ", loop_parallel_p(loop1)=>%d | loop_parallel_p(loop2)=>%d\n"
-        ,(int)loop_parallel_p(loop1),(int)loop_parallel_p(loop2));
+        ,loop_parallel_p(loop1),loop_parallel_p(loop2));
 
     // Abort to preserve parallelism
     return false;
@@ -549,7 +549,7 @@ static fusion_block make_block_from_statement(statement s, int num) {
   }
 
   pips_debug(3,"Block created : num %d ; is_a_loop : %d\n",
-             b->num,(int)b->is_a_loop);
+             b->num,b->is_a_loop);
   return b;
 }
 
@@ -973,7 +973,7 @@ restart_loop: ;
         pips_debug(2,
             "Operate on block %d (is_a_loop %d)\n",
             block->num,
-            (int)block->is_a_loop);
+            block->is_a_loop);
 
         if(try_to_fuse_with_successors(block, &fuse_count,params->maximize_parallelism)) {
           // We fused some blocks, let's restart the process !
