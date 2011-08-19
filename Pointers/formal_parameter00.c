@@ -4,7 +4,7 @@ void formal_parameter00(int *pi)
 	int i;
 
 	i = 0;
-  q = pi;
+	q = pi;
 	pi = &i;
 	return 0;
 }
