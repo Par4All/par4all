@@ -339,6 +339,16 @@ void hash_table_free(hash_table htp)
   gen_free_area((void**) htp, sizeof(struct __hash_table));
 }
 
+/* hash_put which allows silent overwrite...
+ */
+void hash_overwrite(hash_table htp, const void * key, const void * val)
+{
+  if (hash_defined_p(htp, key))
+    hash_update(htp, key, val);
+  else
+    hash_put(htp, key, val);
+}
+
 /* This functions stores a couple (key,val) in the hash table pointed to
    by htp. If a couple with the same key was already stored in the table
    and if hash_warn_on_redefintion was requested, hash_put complains but
