@@ -896,8 +896,14 @@ static bool statement_scalarization(statement s)
 		 must be constant within the statement, i.e. wrt to the
 		 statement transformer tran */
 	      /* prec might have to be replaced by prec_r, its range. */
-	      if (constant_region_in_context_p(pr, tran)
-		  && singleton_region_in_context_p(pr, prec, loop_indices_b)) {
+	      /* It is not clear if a unique element of pv should
+		 always be used, wasting some opportunities but
+		 making sure that no non-existing reference is added,
+		 or if at most a unique element is used, which may to
+		 spurious out of bounds accesses. See scalarization30
+		 for an example and explanations. */
+	      if (constant_region_in_context_p(pru, tran)
+		  && singleton_region_in_context_p(pru, prec, loop_indices_b)) {
 		/* The array references can be replaced a references to a
 		   scalar */
 		// FI: this must be postponed to the bottom up phase
@@ -1006,8 +1012,25 @@ static bool scalarization_statement_in(statement s)
   // In fact, only sequences and loops are good candidates... although
   // the comma and the assignment operator could also lead to
   // some scalarization...
-  if(!declaration_statement_p(s))
+  //
+  // Call statements are not appropriate for the profitability
+  // criterion... but this should be fixed
+  //
+  // This test must be exactly replicated in scalaration_statement_out
+  if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/) {
     result_p = statement_scalarization(s);
+
+    if (statement_loop_p(s)) {
+      loop l   = statement_loop(s);
+      entity i = loop_index(l);
+
+      pips_debug(1, "Exiting loop with index %s, size=%d\n",
+		 entity_name(i), base_dimension(loop_indices_b));
+
+      loop_indices_b = base_add_variable(loop_indices_b, (Variable) i);
+    }
+  }
+
   return result_p;
 }
 
@@ -1016,7 +1039,24 @@ static bool scalarization_statement_in(statement s)
    variables collected during the top-down phase */
 static void scalarization_statement_out(statement s)
 {
-  if(!declaration_statement_p(s)) {
+  // This test must be exactly replicated in scalaration_statement_in
+  if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/) {
+
+    /* If statement s is a loop, remove its loop index from basis
+       loop_indices_b which keep track of loop nesting. Do it before
+       s is updated by privatization: the added declarations may
+       require s to be changed into a sequence and the loop moved
+       down in the AST */
+    if (statement_loop_p(s)) {
+      loop l   = statement_loop(s);
+      entity i = loop_index(l);
+
+      pips_debug(1, "Exiting loop with index %s, size=%d\n",
+		 entity_name(i), base_dimension(loop_indices_b));
+
+      loop_indices_b = base_remove_variable(loop_indices_b, (Variable) i);
+    }
+
     /* Retrieve the variables to privatize for statement s */
     list local_scalarized_variables =
       (list) hash_get(statement_scalarized_variables, (void *) s);
@@ -1051,18 +1091,6 @@ static void scalarization_statement_out(statement s)
 	 visited again. If the lists are not freed one by one, they
 	 should be freed later when the hash_tabe itself is freed */
       gen_free_list(local_scalarized_variables);
-
-      /* If statement s is a loop, remove its loop index from basis
-	 loop_indices_b which keep track of loop nesting */
-      if (statement_loop_p(s)) {
-	loop l   = statement_loop(s);
-	entity i = loop_index(l);
-
-	pips_debug(1, "Exiting loop with index %s, size=%d\n",
-		   entity_name(i), base_dimension(loop_indices_b));
-
-	loop_indices_b = base_remove_variable(loop_indices_b, (Variable) i);
-      }
     }
   }
   return;
@@ -1102,7 +1130,7 @@ bool scalarization (char * module_name)
   debug_on("SCALARIZATION_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-  if(true) {
+  if(false) {
     /* We now traverse our module's statements looking for loop statements. */
     loop_indices_b = BASE_NULLE;
     scalarized_variables = NIL;
