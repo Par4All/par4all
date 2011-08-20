@@ -349,7 +349,7 @@ static void generate_make(
 	/* code */
 	fprintf(code,
 		"%s make_%s_%s(%s _field_) {\n"
-		"  return make_%s(is_%s_%s, (void*) _field_);\n"
+		"  return make_%s(is_%s_%s, (void*)(intptr_t) _field_);\n"
 		"}\n",
 		name, name, field, typen,
 		name, name, field);
@@ -586,19 +586,19 @@ static void generate_arrow(
 
   fprintf(code,
 	  "%s apply_%s(%s f, %s k) {\n"
-	  "  return (%s) HASH_GET(%c, %c, %s_hash_table(f), k);\n"
+	  "  return (%s) (intptr_t)HASH_GET(%c, %c, %s_hash_table(f), k);\n"
 	  "}\n"
 	  "void update_%s(%s f, %s k, %s v) {\n"
-	  "  HASH_UPDATE(%c, %c, %s_hash_table(f), k, v);\n"
+	  "  HASH_UPDATE(%c, %c, %s_hash_table(f), k, (intptr_t)v);\n"
 	  "}\n"
 	  "void extend_%s(%s f, %s k, %s v) {\n"
-	  "  HASH_EXTEND(%c, %c, %s_hash_table(f), k, v);\n"
+	  "  HASH_EXTEND(%c, %c, %s_hash_table(f), k, (intptr_t)v);\n"
 	  "}\n"
 	  "%s delete_%s(%s f, %s k) {\n"
-	  "  return (%s) HASH_DELETE(%c, %c, %s_hash_table(f), k);\n"
+	  "  return (%s)(intptr_t) HASH_DELETE(%c, %c, %s_hash_table(f), k);\n"
 	  "}\n"
 	  "bool bound_%s_p(%s f, %s k) {\n"
-	  "  return HASH_BOUND_P(%c, %c, %s_hash_table(f), k);\n"
+	  "  return (intptr_t)HASH_BOUND_P(%c, %c, %s_hash_table(f), k);\n"
 	  "}\n",
 	  vname, name, name, kname, vname, kc, vc, name, /* apply */
 	  name, name, kname, vname, kc, vc, name, /* update */

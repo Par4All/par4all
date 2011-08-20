@@ -46,7 +46,6 @@ typedef int (* hash_equals_t)(const void *, const void *);
 
 /* Value of an undefined hash_table
  */
-
 #define hash_table_undefined ((hash_table)gen_chunk_undefined)
 #define hash_table_undefined_p(h) ((h)==hash_table_undefined)
 
@@ -58,7 +57,7 @@ typedef int (* hash_equals_t)(const void *, const void *);
 
 #define hash_table_empty_p(htp) (hash_table_entry_count(htp) == 0)
 
-#define HASH_MAP(k,v,code,h)                                      \
+#define HASH_MAP(k, v, code, h)                                   \
   {                                                               \
     hash_table _map_hash_h = (h) ;                                \
     register void * _map_hash_p = NULL;                           \
@@ -76,23 +75,15 @@ typedef int (* hash_equals_t)(const void *, const void *);
 #define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
 #define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
 
-#define HASH_FOREACH(key_type,k,value_type, v, h)                 \
+#define HASH_FOREACH(key_type, k, value_type, v, h)               \
   register void * UNIQUE_NAME = NULL;                             \
   key_type k;                                                     \
   value_type v;                                                   \
   while((UNIQUE_NAME =                                            \
          hash_table_scan(h,UNIQUE_NAME,(void**)&k,(void**)&v)))
 
-
 // hash_put_or_update() uses the warn_on_redefinition
-#define hash_put_or_update(h, k, v)                   \
-  if (hash_warn_on_redefinition_p())                  \
-  {                                                   \
-    hash_dont_warn_on_redefinition();                 \
-    hash_put((hash_table) h, (void *) k, (void *) v);	\
-    hash_warn_on_redefinition();                      \
-  } else                                              \
-    hash_put((hash_table) h, (void *) k, (void *) v);
+#define hash_put_or_update(h, k, v) hash_overwrite(h, k, v)
 
 // functions implemented in hash.c
 
@@ -121,6 +112,7 @@ extern list hash_get_default_empty_list(const hash_table, const void *);
 extern void hash_put(hash_table, const void *, const void *);
 extern void hash_update(hash_table, const void *, const void *);
 extern bool hash_defined_p(const hash_table, const void *);
+extern void hash_overwrite(hash_table, const void *, const void *);
 
 // DUMP
 extern void hash_table_print_header(const hash_table, FILE *);
