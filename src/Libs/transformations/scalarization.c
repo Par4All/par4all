@@ -490,9 +490,14 @@ static void scalarize_variable_in_statement(entity pv,
   entity sv = make_new_scalar_variable_with_prefix(epref, get_current_module_entity(), svb);
   entity m = get_current_module_entity();
 
-  // Declare the scalar variable as local as possible
-  //AddEntityToCurrentModule(sv); // declaration at module level
-  AddLocalEntityToDeclarations(sv, m, s);
+  if(get_bool_property("SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST")) {
+    // declaration at module level
+    AddEntityToCurrentModule(sv);
+  }
+  else {
+    // Declare the scalar variable as local as possible
+    AddLocalEntityToDeclarations(sv, m, s);
+  }
 
   pips_debug(1,"Creating variable %s for variable %s\n",
 	     entity_name(sv), entity_name(pv));
@@ -514,7 +519,8 @@ static void scalarize_variable_in_statement(entity pv,
   }
 
   if (!entity_undefined_p(iv)) {
-    if(fortran_language_module_p(m)) {
+    if(fortran_language_module_p(m)
+       || get_bool_property("SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST")) {
       // Generate copy-in code with an assignment statement:
       statement ci_s =
 	make_assign_statement(entity_to_expression(sv),
