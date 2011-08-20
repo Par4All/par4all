@@ -324,7 +324,7 @@ static effect  effect_write_or_read_on_variable(list el, entity v, bool write_p)
  *
  * This criterion is for constant singleton region in context...
  */
-bool constant_region_in_context_p(effect pr,
+static bool constant_region_in_context_p(effect pr,
 				  transformer t __attribute__ ((__unused__)))
 {
   entity v = effect_variable(pr);
@@ -386,7 +386,7 @@ bool constant_region_in_context_p(effect pr,
    function must be a total function. FI: I do not remember why we
    need a total function.
 */
-bool region_totally_functional_graph_p(effect pr,
+static bool region_totally_functional_graph_p(effect pr,
 				       Pbase loop_indices_b,
 				       transformer p)
 {
@@ -419,9 +419,9 @@ bool region_totally_functional_graph_p(effect pr,
 }
 
 
-bool singleton_region_in_context_p(effect pr,
-				   transformer prec, // a range
-				   Pbase loop_indices_b) // domain
+static bool singleton_region_in_context_p(effect pr,
+					  transformer prec __attribute__ ((__unused__)), // a range
+					  Pbase loop_indices_b) // domain
 {
   bool singleton_p = false;
   // Check if the referenced variable is scalar or array
@@ -549,7 +549,7 @@ static void scalarize_variable_in_statement(entity pv,
  * The return effect is given a read action on memory. A read-or-write
  * action would be more meaningful.
  */
-effect unified_rw_effect_of_variable(entity pv, list crwl)
+static effect unified_rw_effect_of_variable(entity pv, list crwl)
 {
   effect pru = effect_undefined;
 
