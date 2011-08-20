@@ -245,7 +245,7 @@ static bool unused_local_variable_p(entity var, set used, string module)
     && !formal_parameter_p(var)
     && type_variable_p(ultimate_type(entity_type(var)));
   pips_debug(8, "%s is %sused (%d)\n",
-             entity_name(var), unused? "UN": "", (int)set_belong_p(used, var));
+             entity_name(var), unused? "UN": "", set_belong_p(used, var));
   return unused;
 }
 

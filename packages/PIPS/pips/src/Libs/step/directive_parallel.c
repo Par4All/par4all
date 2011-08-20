@@ -32,7 +32,7 @@ bool is_begin_directive_omp_parallel(directive __attribute__ ((unused)) current,
 
   b = type_directive_omp_parallel_p(directive_type(next));
 
-  pips_debug(1,"b = %d\n", (int)b);
+  pips_debug(1,"b = %d\n", b);
   return b;
 }
 
@@ -58,7 +58,7 @@ bool is_end_directive_omp_end_parallel(directive current,directive next)
   b1 = type_directive_omp_end_parallel_p(directive_type(next));
   b2 = type_directive_omp_parallel_p(directive_type(current));
 
-  pips_debug(1,"b1 = %d, b2 = %d\n", (int)b1, (int)b2);
+  pips_debug(1,"b1 = %d, b2 = %d\n", b1, b2);
   return b1 && b2;
 }
 
@@ -109,7 +109,7 @@ instruction handle_omp_parallel(directive begin, directive end)
 
 string directive_omp_parallel_to_string(directive d,bool close)
 {
-  pips_debug(1, "d=%p, close=%u\n",d,(int)close);
+  pips_debug(1, "d=%p, close=%u\n",d,close);
   if (close)
     return strdup(END_PARALLEL_TXT);
   else

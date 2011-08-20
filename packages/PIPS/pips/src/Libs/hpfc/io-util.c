@@ -51,7 +51,7 @@ static statement_mapping
   stat_bool_map = hash_table_undefined;
 
 #define Load(stat) \
-    ((bool) (hash_get(stat_bool_map,  stat)))
+    ((bool)(intptr_t) (hash_get(stat_bool_map,  stat)))
 
 #define Store(stat, val) \
     (hash_put(stat_bool_map,  (void*)stat, (void*) (val)))

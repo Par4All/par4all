@@ -135,6 +135,18 @@ bool add_ordering_of_the_statement_to_current_mapping( statement stat )
   return true;
 }
 
+/* Overwrite the statement for its ordering, if any, in the hash-map.
+ * The difference with add_ordering_of_the_statement_to_current_mapping() is
+ * that this version won't trigger a warning if the mapping already exist
+ */
+bool overwrite_ordering_of_the_statement_to_current_mapping( statement stat )
+{
+  pips_assert("ordering is defined",
+        statement_ordering(stat) != STATEMENT_ORDERING_UNDEFINED);
+  hash_overwrite(OrderingToStatement, (void *) statement_ordering(stat), (void *) stat);
+  return true;
+}
+
 
 /* Initialize the ordering to statement mapping by iterating from a given
    statement
