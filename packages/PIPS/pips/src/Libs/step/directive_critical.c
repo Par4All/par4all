@@ -20,7 +20,7 @@ directive make_directive_omp_critical(statement stmt)
 bool begin_directive_omp_critical(directive __attribute__ ((unused)) current,directive next)
 {
   bool rep=type_directive_omp_critical_p(directive_type(next));
-  pips_debug(2,"%d\n",(int)rep);
+  pips_debug(2,"%d\n",rep);
   return rep;
 }
 
@@ -33,7 +33,7 @@ bool end_directive_omp_end_critical(directive current,directive next)
 {
   bool rep= type_directive_omp_end_critical_p(directive_type(next))
     &&   type_directive_omp_critical_p(directive_type(current));
-  pips_debug(2,"%d\n",(int)rep);
+  pips_debug(2,"%d\n",rep);
   return rep;
 }
 
@@ -66,7 +66,7 @@ instruction handle_omp_critical(directive begin,directive end)
 
 string directive_omp_critical_to_string(directive d,bool close)
 {
-  pips_debug(1, "d=%p, close=%u\n",d,(int)close);
+  pips_debug(1, "d=%p, close=%u\n",d,close);
   if (close)
     return strdup(END_CRITICAL_TXT);
   else

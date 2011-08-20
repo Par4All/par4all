@@ -20,7 +20,7 @@ directive make_directive_omp_master(statement stmt)
 bool begin_directive_omp_master(directive __attribute__ ((unused)) current,directive next)
 {
   bool rep=type_directive_omp_master_p(directive_type(next));
-  pips_debug(2,"%d\n",(int)rep);
+  pips_debug(2,"%d\n",rep);
   return rep;
 }
 
@@ -33,7 +33,7 @@ bool end_directive_omp_end_master(directive current,directive next)
 {
   bool rep= type_directive_omp_end_master_p(directive_type(next))
     &&   type_directive_omp_master_p(directive_type(current));
-  pips_debug(2,"%d\n",(int)rep);
+  pips_debug(2,"%d\n",rep);
   return rep;
 }
 
@@ -66,7 +66,7 @@ instruction handle_omp_master(directive begin,directive end)
 
 string directive_omp_master_to_string(directive d,bool close)
 {
-  pips_debug(1, "d=%p, close=%u\n",d,(int)close);
+  pips_debug(1, "d=%p, close=%u\n",d,close);
   if (close)
     return strdup(END_MASTER_TXT);
   else

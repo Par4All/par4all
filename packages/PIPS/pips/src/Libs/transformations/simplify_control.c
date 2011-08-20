@@ -396,7 +396,7 @@ static bool loop_executed_once_p(statement s, loop l)
       UNCATCH(overflow_error);
     }
     pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
-               (int)m3_positif, (int)m3_negatif);
+	       m3_positif, m3_negatif);
     
     /* Vire aussi pv3 & pc3 : */
     sc_rm(ps);

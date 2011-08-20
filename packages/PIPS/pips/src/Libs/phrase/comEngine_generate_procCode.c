@@ -1197,9 +1197,9 @@ This function adds some bubbles in the pipeline if needed
  */
 list process_gLoopToSync_proc(statement stat, list lInStats)
 {
-  bool loopSync = (bool)hash_get(gLoopToSync, stat);
+  bool loopSync = (intptr_t)hash_get(gLoopToSync, stat);
 
-  if(loopSync == (bool)HASH_UNDEFINED_VALUE)
+  if(loopSync == (intptr_t)HASH_UNDEFINED_VALUE)
     {
       return lInStats;
     }

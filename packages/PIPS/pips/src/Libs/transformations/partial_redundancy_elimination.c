@@ -218,7 +218,7 @@ bool efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
 	  }
 	retour = sc_integer_feasibility_ofl_ctrl(s, OFL_CTRL,true);
 	ifdebug(2) 
-	  fprintf(stderr, " Retour: %d", (int)retour);
+	  fprintf(stderr, " Retour: %d", retour); 	
 	sc_rm(s);
       
       /* if retour = true : the system is feasible or there are overflows
@@ -252,7 +252,7 @@ bool efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
     default: pips_internal_error("unexpected return...");
     }
   ifdebug(2) 	  
-    fprintf(stderr, " Retour: %d", (int)retour);
+    fprintf(stderr, " Retour: %d", retour); 	
   return retour;
 }
 

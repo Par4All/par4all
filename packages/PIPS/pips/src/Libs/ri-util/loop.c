@@ -202,7 +202,7 @@ distributable_statement_p(statement stat, set region)
 	pips_internal_error("unexpected tag %d", instruction_tag(i));
     }
 
-    return((bool) NULL); /* just to avoid a gcc warning */
+    return((bool) 0); /* just to avoid a gcc warning */
 }
 
 
