@@ -292,13 +292,14 @@ void compute(int p, int n, float a[n][n])
    float t[100];
    int k = 100;
    int i, j;
-   //PIPS generated variable
-   float __scalar__0;
 #pragma omp parallel for private(k)
-   for(i = 0; i <= 99; i += 1)
-      k = -i+99;
-#pragma omp parallel for private(__scalar__0,j)
    for(i = 0; i <= 99; i += 1) {
+      k = -i+99;
+   }
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 99; i += 1) {
+      //PIPS generated variable
+      float __scalar__0;
       __scalar__0 = a[i][i];
 #pragma omp parallel for 
       for(j = 0; j <= 99; j += 1)
@@ -316,12 +317,15 @@ void compute(int p, int n, float a[n][n])
 //  <i-OUTE-EXACT-{}>
 
    int i, j;
-   //PIPS generated variable
-   float __scalar__0;
 
 //  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, n==100, 1<=p}>
 
    for(i = 0; i <= 99; i += 1) {
+      //PIPS generated variable
+
+//  <__scalar__0-OUTE-EXACT-{}>
+
+      float __scalar__0;
       k = -i+99;
 
 //  <__scalar__0-OUT-EXACT-{}>
@@ -342,9 +346,9 @@ void compute(int p, int n, float a[n][n])
 void compute(int p, int n, float a[n][n])
 {
    int i, j;
-   //PIPS generated variable
-   float __scalar__0;
    for(i = 0; i <= 99; i += 1) {
+      //PIPS generated variable
+      float __scalar__0;
       __scalar__0 = a[i][i];
       for(j = 0; j <= 99; j += 1)
          a[i][j] /= __scalar__0;
@@ -353,10 +357,10 @@ void compute(int p, int n, float a[n][n])
 void compute(int p, int n, float a[n][n])
 {
    int i, j;
-   //PIPS generated variable
-   float __scalar__0;
-#pragma omp parallel for private(__scalar__0,j)
+#pragma omp parallel for private(j)
    for(i = 0; i <= 99; i += 1) {
+      //PIPS generated variable
+      float __scalar__0;
       __scalar__0 = a[i][i];
 #pragma omp parallel for 
       for(j = 0; j <= 99; j += 1)
