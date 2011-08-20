@@ -93,8 +93,8 @@ PREFIX void __attribute__ ((unused)) make_##name##_map() {		\
 PREFIX result __attribute__ ((unused)) load_##type##_##name(type s) {	\
   result t;								\
   message_assert("key defined", s != type##_undefined);			\
-  t = (result) hash_get((hash_table) (name##_map), (void*) (s));	\
-  if (t ==(result) HASH_UNDEFINED_VALUE)				\
+  t = (result)(intptr_t) hash_get((hash_table) (name##_map), (void*) (s));	\
+  if (t ==(result)(intptr_t) HASH_UNDEFINED_VALUE)				\
     t = result##_undefined;						\
   return t;								\
 }									\
@@ -108,12 +108,12 @@ PREFIX bool __attribute__ ((unused)) type##_##name##_undefined_p(type s) { \
 PREFIX void __attribute__ ((unused)) store_##type##_##name(type s, result t) { \
   message_assert("key defined", s != type##_undefined);			\
   message_assert("value defined", t != result##_undefined);		\
-  hash_put((hash_table) name##_map, (void*) s, (void*) t);		\
+  hash_put((hash_table) name##_map, (void*) s, (void*)(intptr_t) t);		\
 }									\
 PREFIX void __attribute__ ((unused)) update_##type##_##name(type s, result t) {	\
   message_assert("key defined", s != type##_undefined);			\
   message_assert("value defined", t != result##_undefined);		\
-  hash_update((hash_table) name##_map, (void*) s, (void*) t);		\
+  hash_update((hash_table) name##_map, (void*) s, (void*)(intptr_t) t);		\
 }
 
 #define GENERIC_CURRENT_MAPPING(name, result, type) \
