@@ -399,7 +399,7 @@ bool db_open_workspace(const char* name)
     }
     else ok = false;
 
-    pips_debug(1, "done (%d)\n", (int)ok);
+    pips_debug(1, "done (%d)\n", ok);
     debug_off();
     free(dir_name);
     return ok;

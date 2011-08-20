@@ -983,7 +983,7 @@ void EndOfProcedure()
 	  entity_name(CurrentFunction));
 
     pips_debug(8, "checking code consistency = %d\n",
-               (int)statement_consistent_p( function_body )) ;
+	       statement_consistent_p( function_body )) ;
 
     ifdebug(8) {
 	pips_debug(8, "Declarations inherited from module %s:\n",
@@ -1055,7 +1055,7 @@ void EndOfProcedure()
 
     ifdebug(5){
 	fprintf(stderr, "Parser: checking callees consistency = %d\n",
-	        (int)callees_consistent_p( make_callees( called_modules ))) ;
+		callees_consistent_p( make_callees( called_modules ))) ;
     }
 
     /*  remove hpfc special routines if required.
@@ -1100,7 +1100,7 @@ void EndOfProcedure()
 			   (char*) make_callees(called_modules));
 
     pips_debug(5, "checking code consistency = %d\n",
-               (int)statement_consistent_p( function_body )) ;
+		statement_consistent_p( function_body )) ;
 
     DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE,
 			   module_local_name(CurrentFunction),
@@ -1114,7 +1114,7 @@ void EndOfProcedure()
     reset_current_module_entity();
 
     pips_debug(5, "checking code consistency after resettings = %d\n",
-               (int)statement_consistent_p( function_body )) ;
+		statement_consistent_p( function_body )) ;
 
     pips_debug(8, "End for module %s\n", entity_name(CurrentFunction));
 }

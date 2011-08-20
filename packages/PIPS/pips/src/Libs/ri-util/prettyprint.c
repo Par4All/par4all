@@ -4307,7 +4307,7 @@ text text_statement_enclosed(entity module,
   }
 
   pips_debug(2, "Begin for statement %s with braces_p=%d\n",
-	     statement_identification(stmt),(int)braces_p);
+	     statement_identification(stmt),braces_p);
   pips_debug(9, "statement_comments: --%s--\n",
 	     string_undefined_p(comments)? "<undef>": comments);
 

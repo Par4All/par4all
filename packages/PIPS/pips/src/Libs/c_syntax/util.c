@@ -961,10 +961,10 @@ entity FindOrCreateCurrentEntity(string name,
       pips_assert("block_scope is a block scope", string_block_scope_p(block_scope));
     }
     pips_debug(5,"type %p: %s\n", ct, list_to_string(safe_c_words_entity(ct, NIL)));
-    pips_debug(5,"is_typedef: %d\n",(int)is_typedef);
-    pips_debug(5,"is_static: %d\n",(int)is_static);
-    pips_debug(5,"is_external: %d\n",(int)is_external);
-    pips_debug(5,"is_formal: %d\n",(int)is_formal);
+    pips_debug(5,"is_typedef: %d\n",is_typedef);
+    pips_debug(5,"is_static: %d\n",is_static);
+    pips_debug(5,"is_external: %d\n",is_external);
+    pips_debug(5,"is_formal: %d\n",is_formal);
     if (is_formal)
       pips_debug(5,"of current function %s\n",entity_user_name(function));
     /* function is only used for formal variables*/

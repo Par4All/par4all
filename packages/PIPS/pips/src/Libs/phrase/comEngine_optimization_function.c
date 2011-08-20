@@ -424,10 +424,10 @@ statement comEngine_opt_loop_interchange(statement stat, statement innerStat,
   printf("stat\n");
   print_statement(stat);
 
-  bool allowedOpt = (bool)hash_get(gLoopToOpt, stat);
+  bool allowedOpt = (intptr_t)hash_get(gLoopToOpt, stat);
 
   pips_assert("allowedOpt != HASH_UNDEFINED_VALUE",
-	      allowedOpt != (bool)HASH_UNDEFINED_VALUE);
+	      allowedOpt != (intptr_t)HASH_UNDEFINED_VALUE);
 
   if(!allowedOpt)
     {

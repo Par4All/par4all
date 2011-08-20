@@ -85,5 +85,13 @@ def simdizer(module,**kwargs):
 pyps.module.simdizer=simdizer
 
 
-
-
+# Unfolding, pyps way ! :-)
+def unfold(module,**kwargs):
+    while module.callees:
+      for callee in module.callees:
+        callee.inlining()
+pyps.module.unfold = unfold
+def unfold(modules,**kwargs):
+    for m in modules:
+    	m.unfold()
+pyps.modules.unfold = unfold

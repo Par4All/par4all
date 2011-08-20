@@ -571,7 +571,7 @@ static bool has_elsif_test_p(test t) {
   
   has_elsif_p = instruction_test_p(tfi);
 
-  pips_debug (3, "has_elsif_p = %d\n", (int)has_elsif_p);
+  pips_debug (3, "has_elsif_p = %d\n", has_elsif_p);
   pips_debug (3, ">>>has_elsif_test_p ends for test=%p\n", t);
 
   return (has_elsif_p);
@@ -589,7 +589,7 @@ static bool test_flt (test t)
 
   if (print_ifs) {
     current_margin += offset;
-    pips_debug( 4, "is_elsif_p = %d\n", (int)is_elsif_p);
+    pips_debug( 4, "is_elsif_p = %d\n", is_elsif_p);
     pips_debug( 4, "current_margin increased: %d -> %d\n",
 		current_margin - offset, current_margin
 		);
@@ -628,7 +628,7 @@ static void test_rwt (test l)
 
   if (print_ifs) {
     current_margin -= offset;
-    pips_debug( 4, "is_elsif_p = %d\n", (int)is_elsif_p);
+    pips_debug( 4, "is_elsif_p = %d\n", is_elsif_p);
     pips_debug( 4, "current_margin decreased: %d -> %d\n",
 		current_margin + offset, current_margin
 		);
