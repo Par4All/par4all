@@ -775,6 +775,7 @@ bool inline_has_inlinable_calls(entity inlined_module,void* elem)
 static
 void inline_statement_crawler(statement stmt, inlining_parameters p)
 {
+    control cprev = (control)gen_get_ancestor(control_domain,stmt);
     instruction sti = statement_instruction(stmt);
     if( instruction_call_p(sti) && inline_has_inlinable_calls(inlined_module(p),sti) )
     {
@@ -799,6 +800,17 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
             list iter=statement_block(stmt);
             for(stmt=STATEMENT(CAR(iter));continue_statement_p(stmt);POP(iter))
                 stmt=STATEMENT(CAR(iter));
+        }
+
+        if(cprev!=NULL){
+            new_statements(p)=instruction_to_statement(
+                    make_instruction_test(
+                        make_test(
+                            int_to_expression(1),
+                            new_statements(p),
+                            make_block_statement(NIL))
+                        )
+                    );
         }
         update_statement_instruction(stmt,statement_instruction(new_statements(p)));
         ifdebug(2) {
