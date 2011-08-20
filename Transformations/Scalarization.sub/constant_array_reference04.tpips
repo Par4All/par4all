@@ -1,4 +1,5 @@
-delete scalarization34
+setenv WS=constant_array_reference04
+delete $WS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 #setproperty PRETTYPRINT_BLOCKS TRUE
@@ -6,18 +7,16 @@ setproperty ABORT_ON_USER_ERROR TRUE
 ##TODO: explain
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 
-create scalarization34 scalarization34.f
-
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+create $WS $WS.c
 
 ## Needed for substracting set approximations
 activate MUST_REGIONS
 
 setproperty SCALARIZATION_PREFIX ""
-apply SCALARIZATION[SCALARIZATION34]
-display PRINTED_FILE[SCALARIZATION34]
+apply SCALARIZATION[p4a_kernel_main_1]
+display PRINTED_FILE[p4a_kernel_main_1]
 
 close
-delete scalarization34
+delete $WS
 quit
 

@@ -3,12 +3,10 @@ Initial code
 
 void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 {
-   // BEGIN BLOCK
    int i, j;
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1)
          A[i][j] = B[i][j]*B[i][j]+B[i][j];
-   // END BLOCK
 }
 
 Initial code with preconditions
@@ -18,10 +16,6 @@ Initial code with preconditions
 
 void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 {
-
-//  P() {SIZE==10}
-
-   // BEGIN BLOCK
 
 //  P() {SIZE==10}
 
@@ -38,7 +32,6 @@ void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 //  P(i,j) {SIZE==10, 0<=i, i<=9, 0<=j, j<=9}
 
          A[i][j] = B[i][j]*B[i][j]+B[i][j];
-   // END BLOCK
 }
 
 IN regions
@@ -49,11 +42,6 @@ IN regions
 
 void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 {
-
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=SIZE, 0<=PHI2, PHI2<=9,
-//    SIZE==10}>
-
-   // BEGIN BLOCK
    int i, j;
 
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=SIZE, 0<=PHI2, PHI2<=9,
@@ -70,7 +58,6 @@ void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 //    0<=j, j<=9}>
 
          A[i][j] = B[i][j]*B[i][j]+B[i][j];
-   // END BLOCK
 }
 
 OUT regions
@@ -80,10 +67,6 @@ OUT regions
 
 void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 {
-
-//  <A[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, SIZE==10}>
-
-   // BEGIN BLOCK
    int i, j;
 
 //  <A[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, SIZE==10}>
@@ -98,23 +81,18 @@ void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 //    SIZE==10}>
 
          A[i][j] = B[i][j]*B[i][j]+B[i][j];
-   // END BLOCK
 }
 
 Code after scalarization
 
 void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 {
-   // BEGIN BLOCK
    int i, j;
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1) {
-         // BEGIN BLOCK
          //PIPS generated variable
-         double __scalar__0 = B[i][j];
+         double B_0 = B[i][j];
 
-         A[i][j] = __scalar__0*__scalar__0+__scalar__0;
-         // END BLOCK
+         A[i][j] = B_0*B_0+B_0;
       }
-   // END BLOCK
 }

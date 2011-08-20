@@ -3,26 +3,20 @@ Code after scalarization
 
 int scalarization16(int n)
 {
-   // BEGIN BLOCK
    int x[n], y[n][n];
    int i, j;
 
    for(i = 0; i <= n-1; i += 1) {
-      // BEGIN BLOCK
       //PIPS generated variable
-      int __scalar__0;
-      __scalar__0 = i;
+      int x_0;
+      x_0 = i;
       for(j = 0; j <= n-1; j += 1) {
-         // BEGIN BLOCK
          //PIPS generated variable
-         int __scalar__1;
-         __scalar__1 = __scalar__0^2;
-         __scalar__1 = __scalar__1+__scalar__0+j;
-         y[i][j] = __scalar__1;
-         // END BLOCK
+         int y_0;
+         y_0 = x_0^2;
+         y_0 = y_0+x_0+j;
+         y[i][j] = y_0;
       }
-      // END BLOCK
    }
    return y[n-1][n-1];
-   // END BLOCK
 }

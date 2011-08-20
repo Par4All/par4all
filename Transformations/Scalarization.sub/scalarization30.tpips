@@ -17,6 +17,7 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 ## Needed for substracting set approximations
 activate MUST_REGIONS
 
+setproperty SCALARIZATION_PREFIX ""
 apply SCALARIZATION[SCALARIZATION30]
 display PRINTED_FILE[SCALARIZATION30]
 
@@ -36,6 +37,7 @@ setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
 ## Needed for substracting set approximations
 activate MUST_REGIONS
 
+setproperty SCALARIZATION_PREFIX ""
 apply SCALARIZATION[SCALARIZATION30]
 display PRINTED_FILE[SCALARIZATION30]
 

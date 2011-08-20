@@ -1,62 +1,56 @@
 void out0()
 {
-   // BEGIN BLOCK
    b[0] = 0;
    for(j = 0; j <= 9; j += 1) {
-      // BEGIN BLOCK
       a[j] = 1;
       for(k = j; k <= 9; k += 1)
          // There should be an out region out here !
          b[k] = a[k];
-      // END BLOCK
    }
    printf("%d", b[0]);
-   // END BLOCK
 }
 void out1()
 {
-   // BEGIN BLOCK
    b[0] = 0;
    for(j = 0; j <= 9; j += 1) {
-      // BEGIN BLOCK
       a[j] = 1;
       for(k = 0; k <= 9; k += 1)
          // There should be an out region out here !
          b[k] = a[j];
-      // END BLOCK
    }
    printf("%d", b[0]);
-   // END BLOCK
 }
 void out0()
 {
-   // BEGIN BLOCK
-   b[0] = 0;
+   {
+      //PIPS generated variable
+      int b_0;
+
+      b_0 = 0;
+   }
    for(j = 0; j <= 9; j += 1) {
-      // BEGIN BLOCK
       a[j] = 1;
       for(k = j; k <= 9; k += 1)
          // There should be an out region out here !
          b[k] = a[k];
-      // END BLOCK
    }
    printf("%d", b[0]);
-   // END BLOCK
 }
 void out1()
 {
-   // BEGIN BLOCK
-   b[0] = 0;
-   for(j = 0; j <= 9; j += 1) {
-      // BEGIN BLOCK
+   {
       //PIPS generated variable
-      int __scalar__0;
-      __scalar__0 = 1;
+      int b_0;
+
+      b_0 = 0;
+   }
+   for(j = 0; j <= 9; j += 1) {
+      //PIPS generated variable
+      int a_0;
+      a_0 = 1;
       for(k = 0; k <= 9; k += 1)
          // There should be an out region out here !
-         b[k] = __scalar__0;
-      // END BLOCK
+         b[k] = a_0;
    }
    printf("%d", b[0]);
-   // END BLOCK
 }

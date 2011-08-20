@@ -11,4 +11,5 @@ int main(int argc, char **argv)
     x[i] = y[i];
     y[i] = t[i+1];
   }
+  return x[0]+y[0]+t[0];
 }

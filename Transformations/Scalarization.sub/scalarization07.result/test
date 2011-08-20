@@ -3,7 +3,6 @@ Initial code
 
 int main(int argc, char **argv)
 {
-   // BEGIN BLOCK
    int i, n = 100;
    typedef int myarray[100];
    myarray x, y, t;
@@ -12,21 +11,20 @@ int main(int argc, char **argv)
       scanf("%d %d", &x[i], &y[i]);
 
    for(i = 0; i <= n-1; i += 1) {
-      // BEGIN BLOCK
       t[i] = x[i];
       x[i] = y[i];
       y[i] = t[i];
-      // END BLOCK
    }
-   printf("%d %d", x[n], y[n]);
-   // END BLOCK
+   // Do not forget the printf nor the proper indexing of x and y, or
+   // you will be surprized by crazy outputs... that are just as
+   // correct or incorrect than your input code
+   printf("%d %d", x[n-1], y[n-1]);
 }
 
 Code after scalarization
 
 int main(int argc, char **argv)
 {
-   // BEGIN BLOCK
    int i, n = 100;
    typedef int myarray[100];
    myarray x, y, t;
@@ -35,14 +33,14 @@ int main(int argc, char **argv)
       scanf("%d %d", &x[i], &y[i]);
 
    for(i = 0; i <= n-1; i += 1) {
-      // BEGIN BLOCK
       //PIPS generated variable
-      int __scalar__0;
-      __scalar__0 = x[i];
+      int t_0;
+      t_0 = x[i];
       x[i] = y[i];
-      y[i] = __scalar__0;
-      // END BLOCK
+      y[i] = t_0;
    }
-   printf("%d %d", x[n], y[n]);
-   // END BLOCK
+   // Do not forget the printf nor the proper indexing of x and y, or
+   // you will be surprized by crazy outputs... that are just as
+   // correct or incorrect than your input code
+   printf("%d %d", x[n-1], y[n-1]);
 }

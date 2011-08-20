@@ -1,5 +1,5 @@
 delete scalarization41
-setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 
@@ -15,6 +15,7 @@ activate MUST_REGIONS
 activate PRINT_CODE
 display PRINTED_FILE[%ALLFUNC]
 
+setproperty SCALARIZATION_PREFIX ""
 apply SCALARIZATION[out0]
 display PRINTED_FILE[out0]
 apply SCALARIZATION[out1]
