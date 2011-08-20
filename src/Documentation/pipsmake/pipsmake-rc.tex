@@ -10764,7 +10764,12 @@ If needed according to the IN and OUT convex array regions, the new
 variables are initialized, e.g. \verb/__scalar0__ = A[i]/, and/or
 copied back into the initial array, e.g. \verb/A[i] = __scalar0__/.
 
-Scalarization is currently applicable both to Fortran and C code.
+Scalarization is currently applicable both to Fortran and C code, but
+the code generation slightly differs because local declarations are
+possible with C. However, this may destroy perfect loop nests required
+by other passes. Property
+\PipsPropRef{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST} can be used to
+preserve C perfect loop nests.
 
 
 Pass \PipsPassRef{scalarization} uses the read and written convex
@@ -10796,9 +10801,20 @@ this is puzzling for programmers because they expect all loops to be
 entered at least once...
 
 As explained above, Property \PipsPropRef{SCALARIZATION_PREFIX} is
-used to select the names of the new scalar variables.
+used to select the names of the new scalar variables. If it is set to
+the empty string, \verb/""/, the scalarized variable name is used as prefix. 
 \begin{PipsProp}{SCALARIZATION_PREFIX}
 SCALARIZATION_PREFIX "__scalar__"
+\end{PipsProp}
+
+Also, 1lAs explained above, Property
+\PipsPropRef{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST} is used to
+control the way new scalar variables are declared and initialized in
+C. The current default value is FALSE because it is better for
+automatic loop parallelization, but this could be changed as a
+privatization pass should do as well while preserving perfect loop nests.
+\begin{PipsProp}{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST}
+SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST FALSE
 \end{PipsProp}
 
 Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation of a copy-out statement
