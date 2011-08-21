@@ -1300,6 +1300,8 @@ static void freia_spoc_pipeline
 
   FOREACH(dagvtx, v, vertices)
   {
+    pips_debug(3, "considering vertex %"_intFMT"\n", dagvtx_number(v));
+
     // skip inputs
     if (dagvtx_number(v)==0) break;
 
@@ -1445,7 +1447,11 @@ static void freia_spoc_pipeline
           pips_internal_error("should not get there (same image)?");
       }
       else
-        pips_internal_error("should not get there (3 live images)...");
+      {
+        //pips_internal_error("should not get there (3 live images)...");
+        // ??? hmmm, we get there on overflow, if an input image is
+        // still to be used, but 2 computed images are extracted...
+      }
 
       // anyway, we must clean unuseful variables, because
       // the scheduling  on image entities to check deps (still ?)
