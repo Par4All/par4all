@@ -1,0 +1,83 @@
+#
+# AIPO
+#
+#
+# compile generated freia_67
+#
+
+! initial function
+
+void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
+{
+   freia_aipo_erode_8c(out, in, kernel);                                /*0010*/
+   freia_aipo_erode_8c(tmp, in, kernel);                                /*0011*/
+   freia_aipo_sub(tmp, in, tmp);                                        /*0012*/
+   freia_aipo_not(out, in);                                             /*0013*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_67" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "tmp" [shape=circle];
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 !" [shape=trapezium,orientation=270];
+  "13 !" -> "out";
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "tmp";
+  "11 E8" [shape=box];
+  "11 E8" -> "12 -" [label="tmp"];
+  "10 E8" [shape=box];
+  "in" -> "13 !";
+  "in" -> "12 -";
+  "in" -> "11 E8";
+  "in" -> "10 E8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_67" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "tmp" [shape=circle];
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 !" [shape=trapezium,orientation=270];
+  "13 !" -> "out";
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "tmp";
+  "10 E8" [shape=box];
+  "10 E8" -> "12 -" [label="out_1"];
+  "in" -> "13 !";
+  "in" -> "12 -";
+  "in" -> "10 E8";
+}
+
+! updated function for
+
+void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
+{
+   freia_aipo_erode_8c(out, in, kernel);                                /*0010*/
+   freia_aipo_sub(tmp, in, out);                                        /*0012*/
+   freia_aipo_not(out, in);                                             /*0013*/
+}
+#
+# SPOC
+#
+
+! initial function
+
+void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
+{
+   freia_aipo_erode_8c(out, in, kernel);                                /*0010*/
+   freia_aipo_erode_8c(tmp, in, kernel);                                /*0011*/
+   freia_aipo_sub(tmp, in, tmp);                                        /*0012*/
+   freia_aipo_not(out, in);                                             /*0013*/
+}
