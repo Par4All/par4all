@@ -1,0 +1,185 @@
+#
+# AIPO
+#
+#
+# compile generated freia_69
+#
+
+! initial function
+
+int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
+{
+   freia_data2d *t1, *t2;                                               /*0005*/
+   t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
+   t2 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0007*/
+
+   freia_aipo_add_const(o0, in, 1);                                     /*0009*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0010*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0011*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0012*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0013*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0014*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0015*/
+   freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0016*/
+   freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0017*/
+   freia_aipo_sub(o0, in, o0);                                          /*0018*/
+   freia_aipo_not(t1, in);                                              /*0019*/
+   freia_aipo_inf_const(o1, t1, 255);                                   /*0020*/
+   freia_aipo_erode_8c(t2, t1, freia_morpho_kernel_8c);                 /*0021*/
+   freia_aipo_inf(o1, o1, t2);                                          /*0022*/
+
+   freia_common_destruct_data(t1);                                      /*0024*/
+   freia_common_destruct_data(t2);                                      /*0025*/
+   return 0;                                                            /*0026*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_69" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "22 <" [shape=trapezium,orientation=270];
+  "22 <" -> "o1";
+  "21 E8" [shape=box];
+  "21 E8" -> "22 <" [label="t2"];
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "22 <" [label="o1"];
+  "19 !" [shape=trapezium,orientation=270];
+  "19 !" -> "21 E8" [label="t1"];
+  "19 !" -> "20 <." [label="t1"];
+  "18 -" [shape=trapezium,orientation=270];
+  "18 -" -> "o0";
+  "17 E8" [shape=box];
+  "17 E8" -> "18 -" [label="o0"];
+  "16 E8" [shape=box];
+  "16 E8" -> "17 E8" [label="o0"];
+  "15 +." [shape=trapezium,orientation=270];
+  "15 +." -> "16 E8" [label="o0"];
+  "14 +." [shape=trapezium,orientation=270];
+  "14 +." -> "15 +." [label="o0"];
+  "13 +." [shape=trapezium,orientation=270];
+  "13 +." -> "14 +." [label="o0"];
+  "12 +." [shape=trapezium,orientation=270];
+  "12 +." -> "13 +." [label="o0"];
+  "11 +." [shape=trapezium,orientation=270];
+  "11 +." -> "12 +." [label="o0"];
+  "10 +." [shape=trapezium,orientation=270];
+  "10 +." -> "11 +." [label="o0"];
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "10 +." [label="o0"];
+  "in" -> "19 !";
+  "in" -> "18 -";
+  "in" -> "9 +.";
+}
+// graph for dag "dag_cleaned_0" of module "freia_69" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "22 <" [shape=trapezium,orientation=270];
+  "22 <" -> "o1";
+  "21 E8" [shape=box];
+  "21 E8" -> "22 <" [label="t2"];
+  "20 <." [shape=trapezium,orientation=270];
+  "20 <." -> "22 <" [label="o1_1"];
+  "19 !" [shape=trapezium,orientation=270];
+  "19 !" -> "21 E8" [label="t1"];
+  "19 !" -> "20 <." [label="t1"];
+  "18 -" [shape=trapezium,orientation=270];
+  "18 -" -> "o0";
+  "17 E8" [shape=box];
+  "17 E8" -> "18 -" [label="o0_1"];
+  "16 E8" [shape=box];
+  "16 E8" -> "17 E8" [label="o0_2"];
+  "15 +." [shape=trapezium,orientation=270];
+  "15 +." -> "16 E8" [label="o0_3"];
+  "14 +." [shape=trapezium,orientation=270];
+  "14 +." -> "15 +." [label="o0_4"];
+  "13 +." [shape=trapezium,orientation=270];
+  "13 +." -> "14 +." [label="o0_5"];
+  "12 +." [shape=trapezium,orientation=270];
+  "12 +." -> "13 +." [label="o0_6"];
+  "11 +." [shape=trapezium,orientation=270];
+  "11 +." -> "12 +." [label="o0_7"];
+  "10 +." [shape=trapezium,orientation=270];
+  "10 +." -> "11 +." [label="o0_8"];
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "10 +." [label="o0_9"];
+  "in" -> "19 !";
+  "in" -> "18 -";
+  "in" -> "9 +.";
+}
+
+! updated function for
+
+int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
+{
+   freia_data2d *t1, *t2;                                               /*0005*/
+   // hardware accelerator generated variable
+   freia_data2d *o1_1 = freia_common_create_data(o1->bpp, o1->widthWa, o1->heightWa);
+   t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
+   t2 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0007*/
+
+   freia_aipo_add_const(o0, in, 1);                                     /*0009*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0010*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0011*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0012*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0013*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0014*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0015*/
+   freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0016*/
+   freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0017*/
+   freia_aipo_sub(o0, in, o0);                                          /*0018*/
+   freia_aipo_not(t1, in);                                              /*0019*/
+   freia_aipo_inf_const(o1_1, t1, 255);                                 /*0020*/
+   freia_aipo_erode_8c(t2, t1, freia_morpho_kernel_8c);                 /*0021*/
+   freia_aipo_inf(o1, o1_1, t2);                                        /*0022*/
+   freia_common_destruct_data(o1_1);
+
+   freia_common_destruct_data(t1);                                      /*0024*/
+   freia_common_destruct_data(t2);                                      /*0025*/
+   return 0;                                                            /*0026*/
+}
+#
+# SPOC
+#
+
+! initial function
+
+int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
+{
+   freia_data2d *t1, *t2;                                               /*0005*/
+   t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
+   t2 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0007*/
+
+   freia_aipo_add_const(o0, in, 1);                                     /*0009*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0010*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0011*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0012*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0013*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0014*/
+   freia_aipo_add_const(o0, o0, 1);                                     /*0015*/
+   freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0016*/
+   freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0017*/
+   freia_aipo_sub(o0, in, o0);                                          /*0018*/
+   freia_aipo_not(t1, in);                                              /*0019*/
+   freia_aipo_inf_const(o1, t1, 255);                                   /*0020*/
+   freia_aipo_erode_8c(t2, t1, freia_morpho_kernel_8c);                 /*0021*/
+   freia_aipo_inf(o1, o1, t2);                                          /*0022*/
+
+   freia_common_destruct_data(t1);                                      /*0024*/
+   freia_common_destruct_data(t2);                                      /*0025*/
+   return 0;                                                            /*0026*/
+}
