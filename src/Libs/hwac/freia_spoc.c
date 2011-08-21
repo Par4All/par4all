@@ -1964,18 +1964,22 @@ static dagvtx first_which_may_be_added
    set current, // of dagvtx
    list lv,     // of candidate dagvtx
    set sure,    // of dagvtx
-   __attribute__((unused)) set maybe)   // image entities
+   set maybe)   // image entities
 {
   dagvtx chosen = NULL;
   set inputs = set_make(set_pointer);
-  int n_outputs = number_of_output_arcs(dall, current);
+  set current_output = output_arcs(dall, current);
+  int n_outputs = set_size(current_output);
   pips_assert("should be okay at first!", n_outputs<=2);
+
+  pips_debug(8, "#outputs = %d\n", n_outputs);
 
   // output arcs from this subset
   // set outputs = output_arcs(current);
 
   FOREACH(dagvtx, v, lv)
   {
+    pips_debug(8, "considering vertex %"_intFMT"\n", dagvtx_number(v));
     pips_assert("not yet there", !set_belong_p(current, v));
 
     // some intermediate stuff
@@ -1995,6 +1999,7 @@ static dagvtx first_which_may_be_added
 
     list preds = dag_vertex_preds(dall, v);
     set_assign_list(inputs, preds);
+    pips_debug(8, "#inputs = %d\n", set_size(inputs));
     int npreds = gen_length(preds);
     gen_free_list(preds), preds = NIL;
 
@@ -2007,6 +2012,17 @@ static dagvtx first_which_may_be_added
       // two lives, but the var reuse will break the pipe by hidding
       // the other live which is not used by the computation of v.
       if (n_outputs==2 && set_size(inputs)==1)
+        continue;
+
+      // another more general case from freia_68
+      set all_lives = set_make(hash_pointer);
+      set_intersection(all_lives, inputs, maybe);
+      set_union(all_lives, current_output, all_lives);
+      int n_lives = set_size(all_lives);
+      set_free(all_lives);
+
+      // cannot do, we would go over the limit...
+      if (n_lives>2)
         continue;
     }
 
