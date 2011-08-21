@@ -10807,12 +10807,15 @@ the empty string, \verb/""/, the scalarized variable name is used as prefix.
 SCALARIZATION_PREFIX "__scalar__"
 \end{PipsProp}
 
-Also, 1lAs explained above, Property
+Also, as explained above, Property
 \PipsPropRef{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST} is used to
 control the way new scalar variables are declared and initialized in
-C. The current default value is FALSE because it is better for
-automatic loop parallelization, but this could be changed as a
-privatization pass should do as well while preserving perfect loop nests.
+C. The current default value is FALSE because the locality of
+declarations is better for automatic loop parallelization, but this
+could be changed as a privatization pass should do as well while
+preserving perfect loop nests. Note that initializations may have to
+be placed in such a way that a perfect loop nest is nevertheless
+destroyed, even with this property set to true.
 \begin{PipsProp}{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST}
 SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST FALSE
 \end{PipsProp}
@@ -10822,6 +10825,31 @@ when it is useless according to the OUT region, for instance when dealing
 with a library function.
 \begin{PipsProp}{SCALARIZATION_FORCE_OUT}
 SCALARIZATION_FORCE_OUT FALSE
+\end{PipsProp}
+
+Numerical property \PipsPropRef{SCALARIZATION_THRESHOLD} is used to
+decide profitability: the estimated complexity of the scalarized code
+must be less than the initial complexity. Its minimal value is 2. It
+can be set to around 5 to forbid scalarization in sequences with no
+loop benefit.
+\begin{PipsProp}{SCALARIZATION_THRESHOLD}
+SCALARIZATION_THRESHOLD 2
+\end{PipsProp}
+
+Property \PipsPropRef{SCALARIZATION_STRICT_MEMORY_ACCESSES} is used to
+control the insertion of new memory accesses. A memory access may be
+moved out of a loop, which is the best case for performance, but it
+then is no longer control dependent on the loop bounds. A new access
+is thus added if the compiler cannot prove that the loop is always
+entered. However, the burden of the proof may be too much, if only
+because nothing can be proven when the loop is sometimes entered and
+sometimes not. Also, the memory access may be always perfectly
+legal. The default value is FALSE, going for performance before
+safety. This property is pretty hard to understand, as well as its
+impact. See sequence06, 07 and 08 in the validaiton suite of the
+scalarization pass.
+\begin{PipsProp}{SCALARIZATION_STRICT_MEMORY_ACCESSES}
+SCALARIZATION_STRICT_MEMORY_ACCESSES FALSE
 \end{PipsProp}
 
 This pass was designed by Fran\c{c}ois Irigoin and implemented by
