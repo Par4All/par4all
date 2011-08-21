@@ -9,10 +9,10 @@
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_aipo_erode_8c(out, in, kernel);                                /*0010*/
-   freia_aipo_erode_8c(tmp, in, kernel);                                /*0011*/
-   freia_aipo_sub(tmp, in, tmp);                                        /*0012*/
-   freia_aipo_not(out, in);                                             /*0013*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0009*/
+   freia_aipo_erode_8c(tmp, in, kernel);                                /*0010*/
+   freia_aipo_sub(tmp, in, tmp);                                        /*0011*/
+   freia_aipo_not(out, in);                                             /*0012*/
 }
 
 ! graphs
@@ -27,17 +27,17 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 !" [shape=trapezium,orientation=270];
-  "13 !" -> "out";
-  "12 -" [shape=trapezium,orientation=270];
-  "12 -" -> "tmp";
-  "11 E8" [shape=box];
-  "11 E8" -> "12 -" [label="tmp"];
+  "12 !" [shape=trapezium,orientation=270];
+  "12 !" -> "out";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "tmp";
   "10 E8" [shape=box];
-  "in" -> "13 !";
-  "in" -> "12 -";
-  "in" -> "11 E8";
+  "10 E8" -> "11 -" [label="tmp"];
+  "9 E8" [shape=box];
+  "in" -> "12 !";
+  "in" -> "11 -";
   "in" -> "10 E8";
+  "in" -> "9 E8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_67" in dot format
 digraph "dag_cleaned_0" {
@@ -49,24 +49,24 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 !" [shape=trapezium,orientation=270];
-  "13 !" -> "out";
-  "12 -" [shape=trapezium,orientation=270];
-  "12 -" -> "tmp";
-  "10 E8" [shape=box];
-  "10 E8" -> "12 -" [label="out_1"];
-  "in" -> "13 !";
-  "in" -> "12 -";
-  "in" -> "10 E8";
+  "12 !" [shape=trapezium,orientation=270];
+  "12 !" -> "out";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "tmp";
+  "9 E8" [shape=box];
+  "9 E8" -> "11 -" [label="out_1"];
+  "in" -> "12 !";
+  "in" -> "11 -";
+  "in" -> "9 E8";
 }
 
 ! updated function for
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_aipo_erode_8c(out, in, kernel);                                /*0010*/
-   freia_aipo_sub(tmp, in, out);                                        /*0012*/
-   freia_aipo_not(out, in);                                             /*0013*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0009*/
+   freia_aipo_sub(tmp, in, out);                                        /*0011*/
+   freia_aipo_not(out, in);                                             /*0012*/
 }
 #
 # SPOC
@@ -76,10 +76,10 @@ void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, cons
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_aipo_erode_8c(out, in, kernel);                                /*0010*/
-   freia_aipo_erode_8c(tmp, in, kernel);                                /*0011*/
-   freia_aipo_sub(tmp, in, tmp);                                        /*0012*/
-   freia_aipo_not(out, in);                                             /*0013*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0009*/
+   freia_aipo_erode_8c(tmp, in, kernel);                                /*0010*/
+   freia_aipo_sub(tmp, in, tmp);                                        /*0011*/
+   freia_aipo_not(out, in);                                             /*0012*/
 }
 
 ! graphs
@@ -94,17 +94,17 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 !" [shape=trapezium,orientation=270];
-  "13 !" -> "out";
-  "12 -" [shape=trapezium,orientation=270];
-  "12 -" -> "tmp";
-  "11 E8" [shape=box];
-  "11 E8" -> "12 -" [label="tmp"];
+  "12 !" [shape=trapezium,orientation=270];
+  "12 !" -> "out";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "tmp";
   "10 E8" [shape=box];
-  "in" -> "13 !";
-  "in" -> "12 -";
-  "in" -> "11 E8";
+  "10 E8" -> "11 -" [label="tmp"];
+  "9 E8" [shape=box];
+  "in" -> "12 !";
+  "in" -> "11 -";
   "in" -> "10 E8";
+  "in" -> "9 E8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_67" in dot format
 digraph "dag_cleaned_0" {
@@ -116,15 +116,15 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 !" [shape=trapezium,orientation=270];
-  "13 !" -> "out";
-  "12 -" [shape=trapezium,orientation=270];
-  "12 -" -> "tmp";
-  "10 E8" [shape=box];
-  "10 E8" -> "12 -" [label="out"];
-  "in" -> "13 !";
-  "in" -> "12 -";
-  "in" -> "10 E8";
+  "12 !" [shape=trapezium,orientation=270];
+  "12 !" -> "out";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "tmp";
+  "9 E8" [shape=box];
+  "9 E8" -> "11 -" [label="out"];
+  "in" -> "12 !";
+  "in" -> "11 -";
+  "in" -> "9 E8";
 }
 // graph for dag "freia_67_helper_0_0" of module "freia_67" in dot format
 digraph "freia_67_helper_0_0" {
@@ -136,12 +136,12 @@ digraph "freia_67_helper_0_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "10 E8" [shape=box];
-  "10 E8" -> "out_1";
-  "13 !" [shape=trapezium,orientation=270];
-  "13 !" -> "out";
-  "in" -> "10 E8";
-  "in" -> "13 !";
+  "9 E8" [shape=box];
+  "9 E8" -> "out_1";
+  "12 !" [shape=trapezium,orientation=270];
+  "12 !" -> "out";
+  "in" -> "9 E8";
+  "in" -> "12 !";
 }
 // graph for dag "freia_67_helper_0_1" of module "freia_67" in dot format
 digraph "freia_67_helper_0_1" {
@@ -153,10 +153,10 @@ digraph "freia_67_helper_0_1" {
   "tmp" [shape=circle];
 
   // computation vertices
-  "12 -" [shape=trapezium,orientation=270];
-  "12 -" -> "tmp";
-  "out_1" -> "12 -";
-  "in" -> "12 -";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "tmp";
+  "out_1" -> "11 -";
+  "in" -> "11 -";
 }
 
 ! acceleration function
@@ -190,14 +190,14 @@ freia_status freia_67_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 0
-  // in [0 input 0] -> [0 alu] 13 not
+  // in [0 input 0] -> [0 alu] 12 not
   // nope
-  // alu 13 not stage 0
+  // alu 12 not stage 0
   si.alu[0][0].op = SPOC_ALU_NOT_IN0;
 
-  // in [0 input 1] -> [0 poc 1] 10 erode_8c
+  // in [0 input 1] -> [0 poc 1] 9 erode_8c
   // nope
-  // poc 10 erode_8c stage 0 side 1
+  // poc 9 erode_8c stage 0 side 1
   si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
@@ -283,11 +283,11 @@ freia_status freia_67_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // in [0 input 0] -> [0 alu] 12 sub
+  // in [0 input 0] -> [0 alu] 11 sub
   // nope
-  // out_1 [0 input 1] -> [0 alu] 12 sub
+  // out_1 [0 input 1] -> [0 alu] 11 sub
   // nope
-  // alu 12 sub stage 0
+  // alu 11 sub stage 0
   si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
 
 
@@ -335,16 +335,16 @@ freia_status freia_67_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_67_helper_0_0_0(out, out, in, kernel);                         /*0010*/
-   freia_67_helper_0_1_0(tmp, in, out);                                 /*0012*/
+   freia_67_helper_0_0_0(out, out, in, kernel);                         /*0009*/
+   freia_67_helper_0_1_0(tmp, in, out);                                 /*0011*/
 }
 
 ! cleaned up function
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_67_helper_0_0_0(out, out, in, kernel);                         /*0010*/
-   freia_67_helper_0_1_0(tmp, in, out);                                 /*0012*/
+   freia_67_helper_0_0_0(out, out, in, kernel);                         /*0009*/
+   freia_67_helper_0_1_0(tmp, in, out);                                 /*0011*/
 }
 #
 # TERAPIX
@@ -354,10 +354,10 @@ void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, cons
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_aipo_erode_8c(out, in, kernel);                                /*0010*/
-   freia_aipo_erode_8c(tmp, in, kernel);                                /*0011*/
-   freia_aipo_sub(tmp, in, tmp);                                        /*0012*/
-   freia_aipo_not(out, in);                                             /*0013*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0009*/
+   freia_aipo_erode_8c(tmp, in, kernel);                                /*0010*/
+   freia_aipo_sub(tmp, in, tmp);                                        /*0011*/
+   freia_aipo_not(out, in);                                             /*0012*/
 }
 
 ! graphs
@@ -372,17 +372,17 @@ digraph "dag_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 !" [shape=trapezium,orientation=270];
-  "13 !" -> "out";
-  "12 -" [shape=trapezium,orientation=270];
-  "12 -" -> "tmp";
-  "11 E8" [shape=box];
-  "11 E8" -> "12 -" [label="tmp"];
+  "12 !" [shape=trapezium,orientation=270];
+  "12 !" -> "out";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "tmp";
   "10 E8" [shape=box];
-  "in" -> "13 !";
-  "in" -> "12 -";
-  "in" -> "11 E8";
+  "10 E8" -> "11 -" [label="tmp"];
+  "9 E8" [shape=box];
+  "in" -> "12 !";
+  "in" -> "11 -";
   "in" -> "10 E8";
+  "in" -> "9 E8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_67" in dot format
 digraph "dag_cleaned_0" {
@@ -394,15 +394,15 @@ digraph "dag_cleaned_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "13 !" [shape=trapezium,orientation=270];
-  "13 !" -> "out";
-  "12 -" [shape=trapezium,orientation=270];
-  "12 -" -> "tmp";
-  "10 E8" [shape=box];
-  "10 E8" -> "12 -" [label="out"];
-  "in" -> "13 !";
-  "in" -> "12 -";
-  "in" -> "10 E8";
+  "12 !" [shape=trapezium,orientation=270];
+  "12 !" -> "out";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "tmp";
+  "9 E8" [shape=box];
+  "9 E8" -> "11 -" [label="out"];
+  "in" -> "12 !";
+  "in" -> "11 -";
+  "in" -> "9 E8";
 }
 // graph for dag "freia_67_helper_0_0_0" of module "freia_67" in dot format
 digraph "freia_67_helper_0_0_0" {
@@ -414,15 +414,15 @@ digraph "freia_67_helper_0_0_0" {
   "out" [shape=circle];
 
   // computation vertices
-  "12 -" [shape=trapezium,orientation=270];
-  "12 -" -> "tmp";
-  "13 !" [shape=trapezium,orientation=270];
-  "13 !" -> "out";
-  "10 E8" [shape=box];
-  "10 E8" -> "12 -" [label="out_1"];
-  "in" -> "12 -";
-  "in" -> "13 !";
-  "in" -> "10 E8";
+  "11 -" [shape=trapezium,orientation=270];
+  "11 -" -> "tmp";
+  "12 !" [shape=trapezium,orientation=270];
+  "12 !" -> "out";
+  "9 E8" [shape=box];
+  "9 E8" -> "11 -" [label="out_1"];
+  "in" -> "11 -";
+  "in" -> "12 !";
+  "in" -> "9 E8";
 }
 
 ! acceleration function
@@ -662,14 +662,14 @@ freia_status freia_67_helper_0_0_0(
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_67_helper_0_0_0(tmp, out, in, kernel);                         /*0010*/
+   freia_67_helper_0_0_0(tmp, out, in, kernel);                         /*0009*/
 }
 
 ! cleaned up function
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_67_helper_0_0_0(tmp, out, in, kernel);                         /*0010*/
+   freia_67_helper_0_0_0(tmp, out, in, kernel);                         /*0009*/
 }
 #
 # FREIA COMPILATION DONE

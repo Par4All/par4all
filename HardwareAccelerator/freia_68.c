@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "freia.h"
 
 void freia_68(
