@@ -1,0 +1,82 @@
+
+RW regions
+
+int main(int argc, char **argv)
+{
+
+   int N = argc;
+   int a[N][N];
+   {
+      int i;
+
+//  <a[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+PHI2+2<=2N, PHI1+1<=N,
+//    0<=PHI2, PHI2+1<=N, N==argc}>
+
+      
+      
+      for(i = 1; i <= N; i += 1) {
+         int j;
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1+i<=2PHI2+N, PHI1+i<=PHI2+N,
+//    PHI1+2PHI2+3<=i+2N, 3PHI1+2PHI2+5<=i+4N, i<=PHI1+1, PHI1+1<=N,
+//    0<=PHI2, N==argc, 1<=i}>
+
+         for(j = 1; j <= N; j += 1) {
+
+//  <a[PHI1][PHI2]-W-MAY-{N<=PHI1+PHI2+j+2, PHI1+PHI2+2<=j+N,
+//    i<=PHI1+1, PHI1+i+1<=N, i+1<=PHI2+j, j+1<=PHI2+i, PHI2+i+3<=j+N,
+//    PHI2+j+3<=i+N, N==argc, 1<=j, 2j+2<=N, 1<=i, 2i+2<=N}>
+
+            if (i*j<N/2) {
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1+i==N-1, j+i==PHI2+1, N==argc, 1<=j,
+//    2j+2<=N, 1<=i, i<=N, 2i+2<=N}>
+
+               a[N-1-i][i+j-1] = 1;
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2+j+i==N-1, N==argc, 1<=j,
+//    2j+2<=N, 1<=i, i<=N, 2i+2<=N}>
+
+               a[i-1][N-i-j-1] = 1;
+            }
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1==i-1, PHI2==j-1, j==i, N==argc, 1<=i,
+//    i<=N}>
+
+            if (i==j)
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2==j-1, j==i, N==argc, 1<=i,
+//    i<=N}>
+
+               a[i-1][j-1] = 1;
+         }
+      }
+   }
+}
+
+Code after scalarization
+
+int main(int argc, char **argv)
+{
+
+   int N = argc;
+   int a[N][N];
+   //PIPS generated variable
+   int a_0, a_1, a_2;
+   {
+      int i;
+      
+      
+      for(i = 1; i <= N; i += 1) {
+         int j;
+         for(j = 1; j <= N; j += 1) {
+            if (i*j<N/2) {
+               a_0 = 1;
+               a_1 = 1;
+            }
+            if (i==j)
+               a_2 = 1;
+         }
+      }
+   }
+}

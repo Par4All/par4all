@@ -1,15 +1,12 @@
-/* Expected result:
-   x[i] can be scalarized, but the scalar must be copied back into x[i]
-
-   NOTES:
-   - this code is meaningless: x[i] is redefined before it is used.
+/* Same as scalarization08, but the perfect loop nest must be
+   preserved
 
  */
 
 #include <stdio.h>
 #define SIZE 10
 
-int scalarization08(int x[SIZE], int y[SIZE][SIZE])
+int perfect_loop01(int x[SIZE], int y[SIZE][SIZE])
 {
   int i,j,k;
   for(i=0 ; i < SIZE ; i++)
@@ -30,7 +27,7 @@ int main(int argc, char **argv)
       //scanf("%d", &y[i][j]);
       y[i][j] = 100*i+j;
 
-  i= scalarization08(x, y);
+  i= perfect_loop01(x, y);
 
   printf("%d\n", i);
 }

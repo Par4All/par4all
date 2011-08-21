@@ -1,4 +1,5 @@
-delete scalarization08
+setenv WS=sequence03
+delete $WS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
@@ -7,7 +8,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 ##TODO: explain
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 
-create scalarization08 scalarization08.c
+create $WS $WS.c
 
 ## Needed for substracting set approximations
 activate MUST_REGIONS
@@ -15,35 +16,39 @@ activate MUST_REGIONS
 #echo
 #echo Initial code
 #echo
-#display PRINTED_FILE[scalarization08]
+#display PRINTED_FILE[$WS]
 
 #echo
 #echo IN regions
 #echo
 #activate PRINT_CODE_IN_REGIONS
-#display PRINTED_FILE[scalarization08]
+#display PRINTED_FILE[$WS]
 
 
-echo
-echo OUT regions
-echo
-activate PRINT_CODE_OUT_REGIONS
-display PRINTED_FILE[scalarization08]
+#echo
+#echo OUT regions
+#echo
+#activate PRINT_CODE_OUT_REGIONS
+#display PRINTED_FILE[$WS]
 
 #echo
 #echo Privatized regions
 #echo
 #activate PRINT_CODE_PRIVATIZED_REGIONS
-#display PRINTED_FILE[scalarization08]
+#display PRINTED_FILE[$WS]
 
 echo
 echo Code after scalarization
 echo
+
+# Must be set around 5 or 6 to allow scalarization of x but not of y
+setproperty SCALARIZATION_THRESHOLD 5
 setproperty SCALARIZATION_PREFIX ""
-apply SCALARIZATION[scalarization08]
+setproperty SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST TRUE
+apply SCALARIZATION[$WS]
 activate PRINT_CODE
-display PRINTED_FILE[scalarization08]
+display PRINTED_FILE[$WS]
 
 close
-delete scalarization08
+delete $WS
 quit
