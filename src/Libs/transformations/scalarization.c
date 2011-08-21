@@ -420,8 +420,9 @@ static bool region_totally_functional_graph_p(effect pr,
 
 
 static bool singleton_region_in_context_p(effect pr,
-					  transformer prec __attribute__ ((__unused__)), // a range
-					  Pbase loop_indices_b) // domain
+					  transformer prec, // a range
+					  Pbase loop_indices_b, // domain
+					  bool strict_p)
 {
   bool singleton_p = false;
   // Check if the referenced variable is scalar or array
@@ -435,29 +436,37 @@ static bool singleton_region_in_context_p(effect pr,
   Psysteme sc_union = SC_UNDEFINED;
   if (descriptor_convex_p(d))
     sc_union = descriptor_convex(d);
+  else
+    pips_internal_error("convex region expected\n");
 
-  Pbase phi_b = make_phi_base(1, nd);
-  Pbase d_phi_b = BASE_NULLE;
-  Pbase cr = BASE_NULLE;
+  if(!sc_empty_p(sc_union)) {
+    Pbase phi_b = make_phi_base(1, nd);
+    Pbase d_phi_b = BASE_NULLE;
+    Pbase cr = BASE_NULLE;
 
-  /* Build base d_phi_b using
-     make_local_temporary_integer_value_entity(void) */
-  for ( cr = phi_b ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
-    entity e_d_phi_b = make_local_temporary_integer_value_entity();
-    d_phi_b = base_add_variable(d_phi_b, (Variable) e_d_phi_b);
+    /* Build base d_phi_b using
+       make_local_temporary_integer_value_entity(void) */
+    for ( cr = phi_b ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
+      entity e_d_phi_b = make_local_temporary_integer_value_entity();
+      d_phi_b = base_add_variable(d_phi_b, (Variable) e_d_phi_b);
+    }
+
+    if(strict_p) {
+      Psysteme D = predicate_system(transformer_relation(prec));
+      singleton_p = sc_totally_functional_graph_p(sc_union, loop_indices_b,
+						  D, phi_b, d_phi_b);
+    }
+    else {
+      // A loop may be entered or not, so the region is not a total
+      //function, Maybe the name of this function should be changed
+      singleton_p = sc_functional_graph_p(sc_union, loop_indices_b,
+					  phi_b, d_phi_b);
+    }
+
+    // Clean-up
+    base_rm(phi_b);
+    base_rm(d_phi_b);
   }
-
-  // singleton_p = sc_totally_functional_graph_p(sc_union, loop_indices_b,
-  //D, phi_b, d_phi_b);
-  // A loop may be entered or not, so the region is not a total
-  //function, Maybe the name of this function should be changed
-  singleton_p = sc_functional_graph_p(sc_union, loop_indices_b,
-					      phi_b, d_phi_b);
-
-  // Clean-up
-  base_rm(phi_b);
-  base_rm(d_phi_b);
-
   return singleton_p;
 }
 
@@ -848,6 +857,10 @@ static bool statement_scalarization(statement s)
 	    bool read_pv    = effects_read_variable_p(crwl, pv);
 	    bool written_pv = effects_write_variable_p(crwl, pv);
 	    bool read_and_written_pv = read_pv && written_pv;
+	    int threshold = get_int_property("SCALARIZATION_THRESHOLD");
+
+	    if(threshold<2)
+	      pips_user_error("The scalarization threshold should be at least 2\nCheck property SCALARIZATION_THRESHOLD\n");
 
 	    /* Profitability criterion:
 
@@ -870,8 +883,8 @@ static bool statement_scalarization(statement s)
 	    */
 
 	    if (nd <= 0 // Scalar -> FI: this is already tested above...
-		|| (neo <= 2 && // Two or fewer references
-		    (neo < 2 || read_and_written_pv) && // ...
+		|| (neo <= threshold && // Two or fewer references
+		    (neo < threshold || read_and_written_pv) && // ...
 		    (!entity_undefined_p(iv) || !entity_undefined_p(ov)) // At least copy in or copy out !
 		    )
 		) {
@@ -892,6 +905,8 @@ static bool statement_scalarization(statement s)
 			   entity_undefined_p(ov));
 	      }
 	    } else {
+	      bool strict_p =
+		get_bool_property("SCALARIZATION_STRICT_MEMORY_ACCESSES");
 	      /* Check that a unique element of pv is used. Its region
 		 must be constant within the statement, i.e. wrt to the
 		 statement transformer tran */
@@ -903,7 +918,8 @@ static bool statement_scalarization(statement s)
 		 spurious out of bounds accesses. See scalarization30
 		 for an example and explanations. */
 	      if (constant_region_in_context_p(pru, tran)
-		  && singleton_region_in_context_p(pru, prec, loop_indices_b)) {
+		  && singleton_region_in_context_p(pru, prec,
+						   loop_indices_b, strict_p)) {
 		/* The array references can be replaced a references to a
 		   scalar */
 		// FI: this must be postponed to the bottom up phase
@@ -1013,8 +1029,8 @@ static bool scalarization_statement_in(statement s)
   // the comma and the assignment operator could also lead to
   // some scalarization...
   //
-  // Call statements are not appropriate for the profitability
-  // criterion... but this should be fixed
+  // Call statements are not as appropriate for the profitability
+  // criterion... but this has been fixed with a profitability threshold
   //
   // This test must be exactly replicated in scalaration_statement_out
   if(!declaration_statement_p(s) /*&& !statement_call_p(s)*/) {
