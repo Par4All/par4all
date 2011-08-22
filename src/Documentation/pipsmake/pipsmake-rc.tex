@@ -8142,6 +8142,7 @@ full_unroll                          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
 Or directives can be inserted as comments for loops to be unrolled with:
 \begin{PipsMake}
 alias full_unroll_pragma 'Full Loop Unroll (Pragma)'
@@ -8159,13 +8160,23 @@ must specify the loop label. This default feature can be turned off
 and all loops with constant loop bounds and constant increment are
 fully unrolled.
 
-Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you don't want to give it interactively
+Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you do not
+want to give it interactively
 
 % no longer used {
 % \begin{PipsProp}{FULL_UNROLL_INTERACTIVELY}
 % FULL_UNROLL_INTERACTIVELY TRUE
 % \end{PipsProp}
 % }
+
+Property \PipsPropRef{FULL_LOOP_UNROLL_EXCEPTIONS} is used to forbid loop
+unrolling when specific user functions are called in the loop
+body. The function names are separated by SPACEs. The default value is
+the empy set, i.e. the empry string.
+\begin{PipsProp}{FULL_LOOP_UNROLL_EXCEPTIONS}
+FULL_LOOP_UNROLL_EXCEPTIONS ""
+\end{PipsProp}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% fusion
 \subsection{Loop Fusion}
 \begin{PipsPass}{force_loop_fusion}
