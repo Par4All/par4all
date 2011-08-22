@@ -260,7 +260,11 @@ digraph "freia_62_helper_1_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_62
-freia_status freia_62_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+freia_status freia_62_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   int32_t pi0,
   int32_t pi1,
   int32_t pi2)
@@ -361,7 +365,10 @@ freia_status freia_62_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_62
-freia_status freia_62_helper_1_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status freia_62_helper_1_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   int32_t * po0)
 {
   spoc_instr si;
@@ -631,8 +638,8 @@ digraph "freia_62_helper_1_0_0" {
 freia_status freia_62_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   int32_t pi4,
   int32_t pi5,
   int32_t pi6)
@@ -824,8 +831,8 @@ freia_status freia_62_helper_0_0_0(
  */
 freia_status freia_62_helper_1_0_0(
   freia_data2d * o0,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   int32_t * po3)
 {
   // declarations:

@@ -471,7 +471,10 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 2
 
 // FREIA-SPoC helper function for module anr999_01
-freia_status anr999_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+freia_status anr999_01_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
   int32_t * po0,
   int32_t * po1,
   const int32_t * pi2)
@@ -601,7 +604,10 @@ freia_status anr999_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
 }
 
 // FREIA-SPoC helper function for module anr999_01
-freia_status anr999_01_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status anr999_01_helper_0_1_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -1082,7 +1088,7 @@ digraph "dag_cleaned_0" {
 freia_status anr999_01_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   int32_t * po3,
   int32_t * po4,
   const int32_t * pi5)

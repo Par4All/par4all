@@ -182,7 +182,9 @@ digraph "gradient_thick_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module gradient_thick
-freia_status gradient_thick_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+freia_status gradient_thick_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -410,7 +412,7 @@ digraph "gradient_thick_helper_0_0_0" {
  */
 freia_status gradient_thick_helper_0_0_0(
   freia_data2d * o0,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   const int32_t * pi2)
 {
   // declarations:

@@ -280,7 +280,9 @@ digraph "freia_scalar_08_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_scalar_08
-freia_status freia_scalar_08_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+freia_status freia_scalar_08_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
   const int32_t * pi0,
   const int32_t * pi1,
   const int32_t * pi2)
@@ -606,7 +608,7 @@ digraph "freia_scalar_08_helper_0_0_0" {
  */
 freia_status freia_scalar_08_helper_0_0_0(
   freia_data2d * o0,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   const int32_t * pi2,
   const int32_t * pi3,
   const int32_t * pi4)

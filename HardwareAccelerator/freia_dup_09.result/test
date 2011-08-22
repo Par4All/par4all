@@ -115,7 +115,8 @@ digraph "freia_dup_09_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_dup_09
-freia_status freia_dup_09_helper_0_0_0(freia_data2d * i0,
+freia_status freia_dup_09_helper_0_0_0(
+  const freia_data2d * i0,
   int32_t * po0)
 {
   spoc_instr si;
@@ -260,7 +261,7 @@ digraph "freia_dup_09_helper_0_0_0" {
  * - communication: 32
  */
 freia_status freia_dup_09_helper_0_0_0(
-  freia_data2d * i0,
+  const freia_data2d * i0,
   int32_t * po1)
 {
   // declarations:

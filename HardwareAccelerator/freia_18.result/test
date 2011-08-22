@@ -244,7 +244,10 @@ digraph "freia_18_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_18
-freia_status freia_18_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+freia_status freia_18_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -514,8 +517,8 @@ digraph "freia_18_helper_0_0_0" {
  */
 freia_status freia_18_helper_0_0_0(
   freia_data2d * o0,
-  freia_data2d * i0,
-  freia_data2d * i1)
+  const freia_data2d * i0,
+  const freia_data2d * i1)
 {
   // declarations:
   freia_microcode mcode;

@@ -656,7 +656,10 @@ digraph "dag_cleaned_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+freia_status anr999_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
   int32_t * po0,
   int32_t * po1,
   const int32_t * pi2)
@@ -1554,7 +1557,7 @@ digraph "dag_cleaned_0" {
 freia_status anr999_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   int32_t * po3,
   int32_t * po4,
   const int32_t * pi5)
@@ -1906,8 +1909,8 @@ freia_status anr999_helper_0_0_0(
 freia_status anr999_helper_0_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4)
 {
   // declarations:
@@ -2118,8 +2121,8 @@ freia_status anr999_helper_0_0_1(
 freia_status anr999_helper_0_0_2(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4)
 {
   // declarations:
@@ -2330,8 +2333,8 @@ freia_status anr999_helper_0_0_2(
 freia_status anr999_helper_0_0_3(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4)
 {
   // declarations:
@@ -2542,8 +2545,8 @@ freia_status anr999_helper_0_0_3(
 freia_status anr999_helper_0_0_4(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4)
 {
   // declarations:
@@ -2754,8 +2757,8 @@ freia_status anr999_helper_0_0_4(
 freia_status anr999_helper_0_0_5(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4)
 {
   // declarations:
@@ -2966,8 +2969,8 @@ freia_status anr999_helper_0_0_5(
 freia_status anr999_helper_0_0_6(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4)
 {
   // declarations:
@@ -3178,8 +3181,8 @@ freia_status anr999_helper_0_0_6(
 freia_status anr999_helper_0_0_7(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4)
 {
   // declarations:
@@ -3390,8 +3393,8 @@ freia_status anr999_helper_0_0_7(
 freia_status anr999_helper_0_0_8(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4)
 {
   // declarations:
