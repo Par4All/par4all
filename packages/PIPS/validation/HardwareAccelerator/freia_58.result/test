@@ -945,7 +945,8 @@ digraph "freia_58_helper_1_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_58
-freia_status freia_58_helper_0_0_0(freia_data2d * i0,
+freia_status freia_58_helper_0_0_0(
+  const freia_data2d * i0,
   int32_t * po0)
 {
   spoc_instr si;
@@ -998,7 +999,10 @@ freia_status freia_58_helper_0_0_0(freia_data2d * i0,
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_58
-freia_status freia_58_helper_1_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status freia_58_helper_1_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi0,
   int32_t * po1)
 {
@@ -1494,7 +1498,7 @@ digraph "freia_58_helper_1_0_0" {
  * - communication: 32
  */
 freia_status freia_58_helper_0_0_0(
-  freia_data2d * i0,
+  const freia_data2d * i0,
   int32_t * po1)
 {
   // declarations:
@@ -1676,8 +1680,8 @@ freia_status freia_58_helper_0_0_0(
  */
 freia_status freia_58_helper_1_0_0(
   freia_data2d * o0,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi3,
   int32_t * po4)
 {

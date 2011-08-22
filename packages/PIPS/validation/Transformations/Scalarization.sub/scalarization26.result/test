@@ -24,11 +24,11 @@ void microcode(short image[512][512], short kernel[3][3], short new_image[512][5
 {
    // BEGIN BLOCK
    short i, j, k, l;
-   //PIPS generated variable
-   short __scalar__0;
    for(i = 0; i <= N1-1; i += 1)
       for(j = 0; j <= N2-1; j += 1) {
          // BEGIN BLOCK
+         //PIPS generated variable
+         register short __scalar__0;
          __scalar__0 = 0;
          for(k = 0; k <= 2; k += 1)
             for(l = 0; l <= 2; l += 1)

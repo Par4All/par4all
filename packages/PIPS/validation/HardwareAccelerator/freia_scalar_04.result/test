@@ -204,7 +204,10 @@ digraph "freia_scalar_04_helper_0_1" {
 // # SPOC calls: 2
 
 // FREIA-SPoC helper function for module freia_scalar_04
-freia_status freia_scalar_04_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status freia_scalar_04_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   int32_t * po0,
   const int32_t * pi1)
 {
@@ -290,7 +293,9 @@ freia_status freia_scalar_04_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, 
 }
 
 // FREIA-SPoC helper function for module freia_scalar_04
-freia_status freia_scalar_04_helper_0_1_0(freia_data2d * o0, freia_data2d * i0,
+freia_status freia_scalar_04_helper_0_1_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
   int32_t pi0,
   int32_t pi1,
   int32_t pi2)
@@ -520,8 +525,8 @@ digraph "freia_scalar_04_helper_0_1_0" {
  */
 freia_status freia_scalar_04_helper_0_0_0(
   freia_data2d * o0,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   int32_t * po3,
   const int32_t * pi4)
 {
@@ -779,7 +784,7 @@ freia_status freia_scalar_04_helper_0_0_0(
  */
 freia_status freia_scalar_04_helper_0_1_0(
   freia_data2d * o0,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   int32_t pi2,
   int32_t pi3,
   int32_t pi4)

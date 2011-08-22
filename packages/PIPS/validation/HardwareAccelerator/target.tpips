@@ -63,6 +63,7 @@ display PRINTED_FILE[${NAME}]
 echo
 echo ! cleaned up function
 echo
+make SUMMARY_EFFECTS[freia_common_create_data freia_common_destruct_data]
 apply PARTIAL_EVAL[${NAME}]
 # no, too efficient, helper functions are removed.
 #apply USE_DEF_ELIMINATION[${NAME}]

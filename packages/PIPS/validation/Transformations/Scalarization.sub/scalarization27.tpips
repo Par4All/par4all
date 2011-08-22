@@ -1,7 +1,7 @@
-setproperty ABORT_ON_USER_ERROR TRUE
 delete scalarization27
 
-setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
 
 ##TODO: explain
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
@@ -31,6 +31,7 @@ display PRINTED_FILE[main]
 echo
 echo Code after scalarization
 echo
+setproperty SCALARIZATION_PREFIX ""
 apply SCALARIZATION[main]
 activate PRINT_CODE
 display PRINTED_FILE[main]

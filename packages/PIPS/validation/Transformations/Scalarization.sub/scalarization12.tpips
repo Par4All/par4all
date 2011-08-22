@@ -31,6 +31,7 @@ activate MUST_REGIONS
 echo
 echo Code after scalarization
 echo
+setproperty SCALARIZATION_PREFIX ""
 apply SCALARIZATION[main]
 activate PRINT_CODE
 display PRINTED_FILE[main]

@@ -11,9 +11,24 @@ int main(int argc, char **argv)
    for(i = 1; i <= n-1; i += 1) {
       // BEGIN BLOCK
       t[i] = x[i];
-      x[i] = y[i];
-      y[i] = t[i-1];
+      {
+         // BEGIN BLOCK
+         //PIPS generated variable
+         register int x_0;
+
+         x_0 = y[i];
+         // END BLOCK
+      }
+      {
+         // BEGIN BLOCK
+         //PIPS generated variable
+         register int y_0;
+
+         y_0 = t[i-1];
+         // END BLOCK
+      }
       // END BLOCK
    }
+   return x[0]+y[0]+t[0];
    // END BLOCK
 }

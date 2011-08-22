@@ -1,0 +1,19 @@
+
+Code after scalarization
+
+int sequence05(int x[10], int y[10][10])
+{
+   int i, j, k;
+   //PIPS generated variable
+   register int x_0;
+   {
+      int l;
+      // to preserve the internal sequence
+      x_0 = y[i][i];
+      x_0 = x_0+y[i][j];
+      x_0 = x_0+y[i][i];
+      x_0 = x_0+y[i][i];
+      k = x_0;
+   }
+   return k;
+}

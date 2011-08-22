@@ -1,0 +1,19 @@
+double p4a_kernel_main_1(int i, int j, double C[2048][2048], double D[2048][2048], double E[2048][2048], int ni, int nj, int nl)
+{
+   //PIPS generated variable
+   int k;
+   {
+      //PIPS generated variable
+      register double E_0;
+
+      // Loop nest P4A end
+      if (i<=ni-1&&j<=nl-1) {
+         E_0 = 0;
+         for(k = 0; k <= nj-1; k += 1)
+            E_0 += C[i][k]*D[k][j];
+      }
+      E[i][j] = E_0;
+   }
+   printf("%g\n", E[0][0]);
+   return E[0][0];
+}

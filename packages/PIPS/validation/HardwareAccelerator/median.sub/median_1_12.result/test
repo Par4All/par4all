@@ -358,7 +358,9 @@ digraph "median_1_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module median_1
-freia_status median_1_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+freia_status median_1_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -906,7 +908,7 @@ digraph "median_1_helper_0_0_5" {
  */
 freia_status median_1_helper_0_0_0(
   freia_data2d * o0,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   const int32_t * pi2)
 {
   // declarations:
@@ -1082,7 +1084,7 @@ freia_status median_1_helper_0_0_0(
  */
 freia_status median_1_helper_0_0_1(
   freia_data2d * o0,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   const int32_t * pi2)
 {
   // declarations:
@@ -1259,8 +1261,8 @@ freia_status median_1_helper_0_0_1(
 freia_status median_1_helper_0_0_2(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4)
 {
   // declarations:
@@ -1473,7 +1475,7 @@ freia_status median_1_helper_0_0_2(
  */
 freia_status median_1_helper_0_0_3(
   freia_data2d * o0,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   const int32_t * pi2)
 {
   // declarations:
@@ -1649,7 +1651,7 @@ freia_status median_1_helper_0_0_3(
  */
 freia_status median_1_helper_0_0_4(
   freia_data2d * o0,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   const int32_t * pi2)
 {
   // declarations:
@@ -1825,8 +1827,8 @@ freia_status median_1_helper_0_0_4(
  */
 freia_status median_1_helper_0_0_5(
   freia_data2d * o0,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi3)
 {
   // declarations:

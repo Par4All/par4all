@@ -44,8 +44,10 @@ display PRINTED_FILE[scalarization20]
 echo
 echo Code after scalarization
 echo
-activate PRINT_CODE
+
+setproperty SCALARIZATION_PREFIX "__scalar__"
 apply SCALARIZATION[scalarization20]
+activate PRINT_CODE
 display PRINTED_FILE[scalarization20]
 
 close

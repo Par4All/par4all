@@ -19,6 +19,6 @@ int main() {
    for(int j=0;j<10;j++) {
      printf("%d - %d\n",b[j],a[j]);
    }
-   
+
    return 0;
 }

@@ -12,6 +12,9 @@ C     that the profitability analysis is different, as well as the
 C     importation and exportation of the initial and final values, if
 C     any
 C
+C     b(k) is scalarized by the second scalarization algorithm
+C     implemented in PIPS
+C
 C     Also, we do not try to carry a value from one iteration to the next
 
       subroutine scalarization34(a, b, c, d, e, m, n)

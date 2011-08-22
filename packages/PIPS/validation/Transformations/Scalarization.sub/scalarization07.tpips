@@ -1,7 +1,7 @@
-setproperty ABORT_ON_USER_ERROR TRUE
 delete scalarization07
 
-setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
 
 ##TODO: explain
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
@@ -22,6 +22,13 @@ display PRINTED_FILE[main]
 #activate PRINT_CODE_IN_REGIONS
 #display PRINTED_FILE[main]
 
+# FI: the source code was wrong and the OUT regions were simply empty...
+#echo
+#echo OUT regions
+#echo
+#activate PRINT_CODE_OUT_REGIONS
+#display PRINTED_FILE[main]
+
 #echo
 #echo Privatized regions
 #echo
@@ -31,6 +38,7 @@ display PRINTED_FILE[main]
 echo
 echo Code after scalarization
 echo
+setproperty SCALARIZATION_PREFIX ""
 apply SCALARIZATION[main]
 activate PRINT_CODE
 display PRINTED_FILE[main]

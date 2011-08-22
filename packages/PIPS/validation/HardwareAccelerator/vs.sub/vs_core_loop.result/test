@@ -954,7 +954,8 @@ digraph "vs_core_loop_helper_3_3" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_0_0_0(freia_data2d * o0,
+freia_status vs_core_loop_helper_0_0_0(
+  freia_data2d * o0,
   int32_t pi0)
 {
   spoc_instr si;
@@ -1031,7 +1032,11 @@ freia_status vs_core_loop_helper_0_0_0(freia_data2d * o0,
 // # SPOC calls: 4
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_3_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+freia_status vs_core_loop_helper_3_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   int32_t * po0,
   int32_t * po1,
   int32_t pi2)
@@ -1143,7 +1148,10 @@ freia_status vs_core_loop_helper_3_0_0(freia_data2d * o0, freia_data2d * o1, fre
 }
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_3_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status vs_core_loop_helper_3_1_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   int32_t pi0,
   int32_t pi1)
 {
@@ -1231,7 +1239,9 @@ freia_status vs_core_loop_helper_3_1_0(freia_data2d * o0, freia_data2d * i0, fre
 }
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_3_2_0(freia_data2d * o0, freia_data2d * i0,
+freia_status vs_core_loop_helper_3_2_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
   int32_t pi0,
   int32_t pi1,
   int32_t pi2,
@@ -1368,7 +1378,10 @@ freia_status vs_core_loop_helper_3_2_0(freia_data2d * o0, freia_data2d * i0,
 }
 
 // FREIA-SPoC helper function for module vs_core_loop
-freia_status vs_core_loop_helper_3_3_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+freia_status vs_core_loop_helper_3_3_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -2261,9 +2274,9 @@ freia_status vs_core_loop_helper_0_0_0(
 freia_status vs_core_loop_helper_3_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
-  freia_data2d * i2,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const freia_data2d * i2,
   int32_t * po5,
   int32_t * po6,
   int32_t pi7,
@@ -2701,8 +2714,8 @@ freia_status vs_core_loop_helper_3_0_0(
  */
 freia_status vs_core_loop_helper_3_1_0(
   freia_data2d * o0,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   int32_t pi3,
   int32_t pi4,
   int32_t pi5,

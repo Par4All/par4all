@@ -1,0 +1,23 @@
+int main()
+{
+   int n;
+   // The declarations below are legal C for gcc, even when n is not
+   // initialized by scanf()!
+   scanf("%d", &n);
+   int a[n], b[n];
+   int i;
+
+   a[0] = 2;
+   {
+      //PIPS generated variable
+      register int a_0 = a[0];
+
+      // This loop use only one element of a, it should be scalarized
+      // Since b is not used later, its value does not matter and it can be
+      // scalarized too, however suprising this is
+      for(i = 0; i <= n-1; i += 1)
+         b[i] = rand()*a_0/10;
+   }
+   printf("%d\n", b[0]);
+   return 0;
+}

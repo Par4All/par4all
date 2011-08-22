@@ -31,6 +31,8 @@ display PRINTED_FILE[main]
 echo
 echo Code after scalarization
 echo
+
+setproperty SCALARIZATION_PREFIX "__scalar__"
 apply SCALARIZATION[main]
 activate PRINT_CODE
 display PRINTED_FILE[main]
