@@ -138,7 +138,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    freia_status ret;                                                    /*0005*/
    freia_data2d *t = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);        /*0006*/
    // hardware accelerator generated variable
-   freia_data2d *o_1 = freia_common_create_data(o->bpp, o->widthWa, o->heightWa), *t_6 = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);
+   freia_data2d *o_1 = freia_common_create_data(o->bpp, o->widthWa, o->heightWa);
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
@@ -151,12 +151,12 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // ret |= freia_cipo_close(t, t, c, 1);
    ret |= freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);           /*0018*/
-   ret |= freia_aipo_erode_8c(t_6, t, freia_morpho_kernel_8c);          /*0019*/
+   ret |= freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);            /*0019*/
 
-   ret |= freia_aipo_inf(o_1, t_6, i);                                  /*0021*/
+   ret |= freia_aipo_inf(o_1, t, i);                                    /*0021*/
    
    // ret |= freia_cipo_open(t, i, c, 1);
-   ret |= freia_aipo_erode_8c(t, t_6, freia_morpho_kernel_8c);          /*0024*/
+   ret |= freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);            /*0024*/
    ret |= freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);           /*0025*/
    
    // ret |= freia_cipo_close(t, t, c, 1);
@@ -168,7 +168,6 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    ret |= freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);           /*0033*/
 
    ret |= freia_aipo_sup(o, o_1, t);                                    /*0035*/
-   freia_common_destruct_data(t_6);
    freia_common_destruct_data(o_1);
    
    // cleanup

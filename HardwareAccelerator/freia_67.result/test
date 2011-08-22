@@ -341,16 +341,22 @@ freia_status freia_67_helper_0_1_0(
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_67_helper_0_0_0(out, out, in, kernel);                         /*0009*/
-   freia_67_helper_0_1_0(tmp, in, out);                                 /*0011*/
+   // hardware accelerator generated variable
+   freia_data2d *out_1 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
+   freia_67_helper_0_0_0(out_1, out, in, kernel);                       /*0009*/
+   freia_67_helper_0_1_0(tmp, in, out_1);                               /*0011*/
+   freia_common_destruct_data(out_1);
 }
 
 ! cleaned up function
 
 void freia_67(freia_data2d *out, freia_data2d *tmp, const freia_data2d *in, const int32_t *kernel)
 {
-   freia_67_helper_0_0_0(out, out, in, kernel);                         /*0009*/
-   freia_67_helper_0_1_0(tmp, in, out);                                 /*0011*/
+   // hardware accelerator generated variable
+   freia_data2d *out_1 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
+   freia_67_helper_0_0_0(out_1, out, in, kernel);                       /*0009*/
+   freia_67_helper_0_1_0(tmp, in, out_1);                               /*0011*/
+   freia_common_destruct_data(out_1);
 }
 #
 # TERAPIX

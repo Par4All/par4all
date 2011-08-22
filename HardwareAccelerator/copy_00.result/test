@@ -115,7 +115,7 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
 {
    freia_data2d *a, *b, *c, *d;                                         /*0005*/
    // hardware accelerator generated variable
-   freia_data2d *c_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *d_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *c_2 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *a_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
+   freia_data2d *c_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *d_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *a_1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
    a = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0006*/
    b = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
    c = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0008*/
@@ -123,11 +123,11 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
    
    // 1
    freia_aipo_dilate_8c(a_1, in, freia_morpho_kernel_8c);               /*0012*/
-   freia_aipo_erode_8c(c_2, in, freia_morpho_kernel_8c);                /*0013*/
+   freia_aipo_erode_8c(c, in, freia_morpho_kernel_8c);                  /*0013*/
    
    // 2
-   freia_aipo_dilate_8c(d_1, c_2, freia_morpho_kernel_8c);              /*0016*/
-   freia_aipo_erode_8c(c_1, c_2, freia_morpho_kernel_8c);               /*0017*/
+   freia_aipo_dilate_8c(d_1, c, freia_morpho_kernel_8c);                /*0016*/
+   freia_aipo_erode_8c(c_1, c, freia_morpho_kernel_8c);                 /*0017*/
    freia_aipo_dilate_8c(b, a_1, freia_morpho_kernel_8c);                /*0018*/
    freia_aipo_erode_8c(a, a_1, freia_morpho_kernel_8c);                 /*0019*/
    
@@ -139,7 +139,6 @@ int copy_00(freia_data2d *o0, freia_data2d *o1, freia_data2d *in)
    // 4
    freia_aipo_sub(o1, d, c);                                            /*0027*/
    freia_common_destruct_data(a_1);
-   freia_common_destruct_data(c_2);
    freia_common_destruct_data(d_1);
    freia_common_destruct_data(c_1);
 

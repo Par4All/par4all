@@ -139,8 +139,6 @@ int freia_66(int32_t *kernel)
 {
    int n = 10;                                                          /*0005*/
    freia_dataio fdin, fdout;                                            /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *t_1 = 0;
    freia_common_open_input(&fdin, 0);                                   /*0007*/
    freia_common_open_output(&fdout, 1, 1024, 720, 16);                  /*0008*/
 
@@ -148,7 +146,6 @@ int freia_66(int32_t *kernel)
 
    in = freia_common_create_data(16, 1024, 720);                        /*0012*/
    t = freia_common_create_data(16, 1024, 720);                         /*0013*/
-   t_1 = freia_common_create_data(t->bpp, t->widthWa, t->heightWa);
    out = freia_common_create_data(16, 1024, 720);                       /*0014*/
    
    // input
@@ -159,9 +156,9 @@ int freia_66(int32_t *kernel)
 
    while (n--) {                                                        /*0022*/
       freia_aipo_erode_8c(out, out, kernel);                            /*0024*/
-      freia_aipo_sup(t_1, out, t);                                      /*0025*/
-      freia_aipo_dilate_8c(out, t_1, kernel);                           /*0026*/
-      freia_aipo_sup(t, out, t_1);                                      /*0027*/
+      freia_aipo_sup(t, out, t);                                        /*0025*/
+      freia_aipo_dilate_8c(out, t, kernel);                             /*0026*/
+      freia_aipo_sup(t, out, t);                                        /*0027*/
    }
    
    // output
@@ -170,7 +167,6 @@ int freia_66(int32_t *kernel)
    // cleanup
    freia_common_destruct_data(in);                                      /*0034*/
    freia_common_destruct_data(t);                                       /*0035*/
-   freia_common_destruct_data(t_1);
    freia_common_destruct_data(out);                                     /*0036*/
 
    freia_common_close_input(&fdin);                                     /*0038*/

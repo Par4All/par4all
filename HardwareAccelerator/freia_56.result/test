@@ -75,14 +75,11 @@ freia_status freia_56(freia_data2d *out, freia_data2d *in)
 {
    // same as freia_55, but out is used as a temporary
    freia_data2d *tb = freia_common_create_data(16, 128, 128);           /*0007*/
-   // hardware accelerator generated variable
-   freia_data2d *out_2 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
 
-   freia_aipo_dilate_8c(out_2, in, freia_morpho_kernel_8c);             /*0010*/
-   freia_aipo_inf_const(tb, out_2, 255);                                /*0011*/
-   freia_aipo_erode_8c(out, out_2, freia_morpho_kernel_8c);             /*0012*/
+   freia_aipo_dilate_8c(out, in, freia_morpho_kernel_8c);               /*0010*/
+   freia_aipo_inf_const(tb, out, 255);                                  /*0011*/
+   freia_aipo_erode_8c(out, out, freia_morpho_kernel_8c);               /*0012*/
    freia_aipo_inf(out, tb, out);                                        /*0013*/
-   freia_common_destruct_data(out_2);
 
    freia_common_destruct_data(tb);                                      /*0016*/
    return FREIA_OK;                                                     /*0017*/
