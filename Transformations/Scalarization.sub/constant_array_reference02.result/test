@@ -10,7 +10,7 @@ int main()
       a[i] = i*rand();
    {
       //PIPS generated variable
-      int a_0 = a[k];
+      register int a_0 = a[k];
 
       
       // This loop use only one element of a, it should be scalarized
@@ -19,7 +19,7 @@ int main()
    }
    {
       //PIPS generated variable
-      int a_1 = a[k];
+      register int a_1 = a[k];
 
       
       

@@ -4,7 +4,7 @@ double p4a_kernel_main_1(int i, int j, double C[2048][2048], double D[2048][2048
    int k;
    {
       //PIPS generated variable
-      double E_0;
+      register double E_0;
 
       // Loop nest P4A end
       if (i<=ni-1&&j<=nl-1) {

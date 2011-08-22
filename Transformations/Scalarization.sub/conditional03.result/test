@@ -87,13 +87,13 @@ int main(int argc, char **argv)
             if (i*j<N/2) {
                {
                   //PIPS generated variable
-                  int a_0;
+                  register int a_0;
 
                   a_0 = 1;
                }
                {
                   //PIPS generated variable
-                  int a_1;
+                  register int a_1;
 
                   a_1 = 1;
                }

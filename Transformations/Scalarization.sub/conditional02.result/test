@@ -62,7 +62,7 @@ int main(int argc, char **argv)
    int N = argc;
    int a[N][N];
    //PIPS generated variable
-   int a_0, a_1, a_2;
+   register int a_0, a_1, a_2;
    {
       int i;
       

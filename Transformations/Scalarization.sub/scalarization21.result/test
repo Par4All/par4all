@@ -91,7 +91,7 @@ void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1) {
          //PIPS generated variable
-         double B_0 = B[i][j];
+         register double B_0 = B[i][j];
 
          A[i][j] = B_0*B_0+B_0;
       }

@@ -10,7 +10,7 @@ int main()
    a[0] = 2;
    {
       //PIPS generated variable
-      int a_0 = a[0];
+      register int a_0 = a[0];
 
       // This loop use only one element of a, it should be scalarized
       // Since b is not used later, its value does not matter and it can be

@@ -24,7 +24,7 @@ void out0()
 {
    {
       //PIPS generated variable
-      int b_0;
+      register int b_0;
 
       b_0 = 0;
    }
@@ -40,13 +40,13 @@ void out1()
 {
    {
       //PIPS generated variable
-      int b_0;
+      register int b_0;
 
       b_0 = 0;
    }
    for(j = 0; j <= 9; j += 1) {
       //PIPS generated variable
-      int a_0;
+      register int a_0;
       a_0 = 1;
       for(k = 0; k <= 9; k += 1)
          // There should be an out region out here !

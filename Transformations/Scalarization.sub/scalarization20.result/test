@@ -140,7 +140,7 @@ void scalarization20(double B[SIZE][SIZE])
       for(j = 0; j <= SIZE-1; j += 1) {
          // BEGIN BLOCK
          //PIPS generated variable
-         double __scalar__0;
+         register double __scalar__0;
          __scalar__0 = 0.;
          __scalar__0 = __scalar__0+__scalar__0;
          __scalar__0 = __scalar__0*__scalar__0;

@@ -14,7 +14,7 @@ int main(int argc, char **argv)
       {
          // BEGIN BLOCK
          //PIPS generated variable
-         int x_0;
+         register int x_0;
 
          x_0 = y[i];
          // END BLOCK
@@ -22,7 +22,7 @@ int main(int argc, char **argv)
       {
          // BEGIN BLOCK
          //PIPS generated variable
-         int y_0;
+         register int y_0;
 
          y_0 = t[i-1];
          // END BLOCK
