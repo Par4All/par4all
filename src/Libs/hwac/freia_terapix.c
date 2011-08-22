@@ -752,8 +752,9 @@ static void terapix_get_reduction(
 /* generate a terapix call for dag thedag.
  * the memory allocation is managed here.
  * however this function is dumb, the scheduling is just inherited as is...
+ * @return number of output images...
  */
-static void freia_terapix_call
+static _int freia_terapix_call
   (const string module,
    const string fname_dag,
    string_buffer code,
@@ -1358,6 +1359,8 @@ static void freia_terapix_call
   set_free(computed);
   set_free(deads);
   free(used);
+
+  return n_outs;
 }
 
 /******************************************************************* ONE DAG */
@@ -1374,7 +1377,8 @@ static int freia_trpx_compile_one_dag(
   int n_cut,
   set global_remainings,
   FILE * helper_file,
-  int stnb)
+  int stnb,
+  hash_table signatures)
 {
   ifdebug(4) {
     dag_consistency_asserts(d);
@@ -1399,13 +1403,16 @@ static int freia_trpx_compile_one_dag(
   list lparams = NIL;
 
   string_buffer code = string_buffer_make(true);
-  freia_terapix_call(module, fname_dag, code, d, &lparams);
+  _int nout = freia_terapix_call(module, fname_dag, code, d, &lparams);
   string_buffer_to_file(code, helper_file);
   string_buffer_free(&code);
 
   // - and substitute its call...
   stnb = freia_substitute_by_helper_call(d, global_remainings, remainings,
                                          ls, fname_dag, lparams, stnb);
+
+  // record (simple) signature
+  hash_put(signatures, local_name_to_top_level_entity(fname_dag), (void*) nout);
 
   // cleanup
   free(fname_dag), fname_dag = NULL;
@@ -1930,7 +1937,7 @@ list freia_trpx_compile_calls
     {
       // direct handling of the dag
       stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
-                                   -1, global_remainings, helper_file, stnb);
+                               -1, global_remainings, helper_file, stnb, init);
     }
     else if (trpx_dag_cut_compute_p(dag_cut))
     {
@@ -1949,13 +1956,13 @@ list freia_trpx_compile_calls
         dag dc = cut_perform(d, cut, erosion, fulld, output_images);
         // generate code for cut
         stnb = freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag,
-                  n_split, n_cut++, global_remainings, helper_file, stnb);
+                 n_split, n_cut++, global_remainings, helper_file, stnb, init);
         // cleanup
         free_dag(dc);
         hash_table_clear(erosion);
       }
       stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
-                                n_cut++, global_remainings, helper_file, stnb);
+                          n_cut++, global_remainings, helper_file, stnb, init);
       hash_table_free(erosion);
     }
     else if (trpx_dag_cut_enumerate_p(dag_cut))
@@ -1978,7 +1985,7 @@ list freia_trpx_compile_calls
 
   // deal with new images
   list real_new_images =
-    freia_allocate_new_images_if_needed(ls, new_images, occs, init);
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init, init);
   gen_free_list(new_images);
   hash_table_free(init);
   return real_new_images;

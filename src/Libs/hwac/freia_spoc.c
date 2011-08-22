@@ -1206,6 +1206,7 @@ static bool is_consummed_by_vertex(dagvtx prod, dagvtx v, dag d, set todo)
  * @param code output here
  * @param dpipe dag to consider
  * @param lparams parameters to call helper
+ * @return number of output images
  *
  * some side effects:
  * - if there is an overflow, dpipe updated with remaining vertices.
@@ -1215,7 +1216,7 @@ static bool is_consummed_by_vertex(dagvtx prod, dagvtx v, dag d, set todo)
  * and then cut it, instead of this half measure to handle overflows,
  * but that would change a lot of things to go back.
  */
-static void freia_spoc_pipeline
+static _int freia_spoc_pipeline
 (string module, string helper, string_buffer code, dag dpipe, list * lparams,
  const set output_images)
 {
@@ -1688,6 +1689,8 @@ static void freia_spoc_pipeline
   string_buffer_free(&head);
   string_buffer_free(&body);
   string_buffer_free(&tail);
+
+  return n_im_out;
 }
 
 /***************************************************************** MISC UTIL */
@@ -2309,11 +2312,12 @@ list freia_spoc_compile_calls
       string fname_split = strdup(cat(fname_dag, "_", itoa(split++)));
       list /* of expression */ lparams = NIL;
 
-      freia_spoc_pipeline(module, fname_split, code, d, &lparams,
-                          output_images);
+      _int nout = freia_spoc_pipeline(module, fname_split, code, d, &lparams,
+                                      output_images);
       stnb = freia_substitute_by_helper_call(d, global_remainings, remainings,
                                              ls, fname_split, lparams, stnb);
-
+      // record (simple) signature
+      hash_put(init, local_name_to_top_level_entity(fname_split), (void*) nout);
       free(fname_split), fname_split = NULL;
     }
 
@@ -2342,7 +2346,7 @@ list freia_spoc_compile_calls
 
   // deal with new images
   list real_new_images =
-    freia_allocate_new_images_if_needed(ls, new_images, occs, init);
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init, init);
   gen_free_list(new_images);
   hash_table_free(init);
   return real_new_images;

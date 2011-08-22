@@ -61,7 +61,8 @@ list freia_aipo_compile_calls
   dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
 
   // now may put actual allocations, which messes up statement numbers
-  list reals = freia_allocate_new_images_if_needed(ls, new_images, occs, init);
+  list reals =
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init, NULL);
 
   // ??? should it be NIL because it is not useful in AIPO->AIPO?
   freia_insert_added_stats(ls, added_stats);

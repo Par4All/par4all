@@ -514,7 +514,7 @@ string freia_compile(string module, statement mod_stat, string target)
     fprintf(helper, FREIA_TRPX_INCLUDES);
 
   // hmmm...
-  hash_table occs = freia_build_image_occurrences(mod_stat, NULL);
+  hash_table occs = freia_build_image_occurrences(mod_stat, NULL, NULL);
   set output_images = freia_compute_current_output_images();
 
   // first explicitely build and fix the list of dags,

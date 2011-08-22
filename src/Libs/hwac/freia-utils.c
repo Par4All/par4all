@@ -1063,13 +1063,74 @@ void freia_add_image_arguments
 
 /********************************************************* IMAGE OCCURRENCES */
 
+#define E_WRITE(v) (v)
+#define E_READ(v) ((void*)(((_int)v)+1))
+
+/* return the argument number, starting from 1, of this reference
+ * or 0 if not found.
+ */
+static int reference_argument_number(const reference r, const list le)
+{
+  int n = 0, i=0;
+  FOREACH(expression, e, le)
+  {
+    i++;
+    if (expression_reference_p(e) && expression_reference(e)==r)
+      n = i;
+  }
+  return n;
+}
+
+/* tell about the image effect. if in doubt, return true.
+ */
+static bool reference_written_p(
+  const reference r,
+  const hash_table signatures)
+{
+  string why = "default";
+  bool written = false;
+  call c = (call) gen_get_ancestor(call_domain, r);
+  if (c)
+  {
+    entity called = call_function(c);
+    int n = reference_argument_number(r, call_arguments(c));
+    if (n==0)
+      written=true, why = "not found";
+    else
+    {
+      const freia_api_t * api = hwac_freia_api(entity_local_name(called));
+      if (api)
+        written = n <= (int) api->arg_img_out, why = "api";
+      else
+        if (signatures && hash_defined_p(signatures, called))
+          written = n <= (_int) hash_get(signatures, called), why = "sig";
+        else
+          written = true, why = "no sig";
+    }
+  }
+  else
+    // in doubt, assume a write effect?
+    pips_internal_error("reference to %s outside of a call?\n",
+                        entity_local_name(reference_variable(r)));
+
+  pips_debug(8, "reference to %s is %s (%s)\n",
+             entity_local_name(reference_variable(r)),
+             written? "written": "read", why);
+
+  return written;
+}
+
 typedef struct {
-  // built image occurences
+  // built image occurences:
+  // image -> set of statements with written effects
+  // image+1 -> set of statements with read effects
   hash_table occs;
   // enclosing statement for inner recursion
   statement enclosing;
-  // set of statements with image occurences
+  // set of statements, to record statements with image occurences
   set image_occs_stats;
+  // helper entity -> number of written args
+  const hash_table signatures;
 } occs_ctx;
 
 /* hack to help replace use-def chains which did not work initially with C.
@@ -1086,8 +1147,12 @@ static void check_ref(reference r, occs_ctx * ctx)
   {
     // ensure that target set exists
     if (!hash_defined_p(ctx->occs, v))
-      hash_put(ctx->occs, v, set_make(set_pointer));
-    set stats = (set) hash_get(ctx->occs, v);
+    {
+      hash_put(ctx->occs, E_WRITE(v), set_make(set_pointer));
+      hash_put(ctx->occs, E_READ(v), set_make(set_pointer));
+    }
+    bool written = reference_written_p(r, ctx->signatures);
+    set stats = (set) hash_get(ctx->occs, written? E_WRITE(v): E_READ(v));
     // get containing statement
     statement up = ctx->enclosing? ctx->enclosing:
       (statement) gen_get_ancestor(statement_domain, r);
@@ -1112,14 +1177,17 @@ static void check_stmt(statement s, occs_ctx * ctx)
   ctx->enclosing = NULL;
 }
 
-/* @return build occurrence hash table: { entity -> set of statements }
+/* @param image_occs_stats set of statements with image occurences (may be NULL)
+ * @param signatures helper entity -> (_int) # out args
+ * @return build occurrence hash table: { entity -> set of statements }
  */
-hash_table freia_build_image_occurrences(statement s, set image_occs_stats)
+hash_table freia_build_image_occurrences(
+  statement s,
+  set image_occs_stats,
+  const hash_table signatures)
 {
-  occs_ctx ctx;
-  ctx.occs = hash_table_make(hash_pointer, 0);
-  ctx.enclosing = NULL;
-  ctx.image_occs_stats = image_occs_stats;
+  occs_ctx ctx = { hash_table_make(hash_pointer, 0), NULL,
+                   image_occs_stats, signatures };
   gen_context_multi_recurse(s, &ctx,
                             statement_domain, gen_true, check_stmt,
                             reference_domain, gen_true, check_ref,
@@ -1209,15 +1277,19 @@ static statement image_free(entity v)
 /* tell whether there is no image processing statements between s1 and s2
  */
 static bool only_minor_statements_in_between(
-  list ls, statement s1, statement s2, set image_occurences)
+  list ls, statement s1, list l2, set image_occurences)
 {
   bool in_sequence = false;
+  int n2 = gen_length(l2);
   FOREACH(statement, s, ls)
   {
     if (!in_sequence && s==s1)
       in_sequence = true;
-    else if (in_sequence && s==s2)
-      return true;
+    else if (in_sequence && gen_in_list_p(s, l2))
+    {
+      n2--;
+      if (!n2) return true;
+    }
     else if (in_sequence && set_belong_p(image_occurences, s))
       return false;
   }
@@ -1230,15 +1302,21 @@ static bool only_minor_statements_in_between(
  * @param ls list of statements to consider
  * @param images list of entities to check and maybe allocate
  * @param init new image -> initial image
+ * @param signatures helper -> _int # written args ahead (may be NULL)
  * @return actually allocated images
  */
 list freia_allocate_new_images_if_needed
-(list ls, list images, const hash_table occs, const hash_table init)
+(list ls,
+ list images,
+ const hash_table occs,
+ const hash_table init,
+ const hash_table signatures)
 {
   // check for used images
-  set img_stats = set_make(hash_pointer);
+  set img_stats = set_make(set_pointer);
   sequence sq = make_sequence(ls);
-  hash_table newoccs = freia_build_image_occurrences((statement) sq, img_stats);
+  hash_table newoccs =
+    freia_build_image_occurrences((statement) sq, img_stats, signatures);
   sequence_statements(sq) = NIL;
   free_sequence(sq);
 
@@ -1246,32 +1324,59 @@ list freia_allocate_new_images_if_needed
   FOREACH(entity, v, images)
   {
     if (!hash_defined_p(newoccs, v))
-      // no occurences, the image is not kept
+      // no written occurences, the image is not kept
       continue;
 
     if (get_bool_property("FREIA_REUSE_INITIAL_IMAGES"))
     {
-      set where = (set) hash_get(newoccs, v);
-      int n = set_size(where);
+      set where_write = (set) hash_get(newoccs, E_WRITE(v));
+      set where_read = (set) hash_get(newoccs, E_READ(v));
+      int nw = set_size(where_write), nr = set_size(where_read);
 
-      pips_debug(8, "image %s used in %d statements\n", entity_name(v), n);
+      pips_debug(8, "image %s used %d+%d statements\n", entity_name(v), nw, nr);
+
+      // ??? should be used once only in the statement if written!
+      // how to I know about W/R for helper functions?
+      // its siblings should also be take into account
 
       // n>1 ??
       // if used only twice, substitude back to initial variable???
       // well, it may depends whether the the initial variable is used?
       // there is possibly something intelligent to do here, but it should
       // be checked carefully...
-      if (n==2 && hash_defined_p(init, v))
+      if (nw==1 && nr>=1 && hash_defined_p(init, v))
       {
-        statement s1 = NULL, s2 = NULL;
-        SET_FOREACH(statement, s, where)
-          if (!s1) s1 = s; else s2 = s;
-        // sort s1 < s2
-        if (statement_ordering(s2)<statement_ordering(s1))
+        entity old = (entity) hash_get(init, v);
+
+        // get statements
+        list l1 = set_to_list(where_write), l2 = set_to_list(where_read);
+        statement s1 = STATEMENT(CAR(l1));
+        gen_free_list(l1), l1 = NIL;
+
+        pips_debug(8, "testing for %s -> %s\n",
+                   entity_local_name(v), entity_local_name(old));
+
+        // does not interact with possibly used old
+        // if we could differentiate read & write, we could do better,
+        // but the information is not currently available.
+        bool skip = false;
+        if (hash_defined_p(newoccs, old))
         {
-          statement tmp = s1; s1 = s2; s2 = tmp;
+          set old_write = (set) hash_get(newoccs, E_WRITE(old));
+          set old_read = (set) hash_get(newoccs, E_READ(old));
+          if (set_belong_p(old_write, s1))
+            skip = true;
+          else
+          {
+            FOREACH(statement, s2, l2)
+              if (set_belong_p(old_read, s2))
+                skip = true;
+          }
+          // note that we can handle a read in s1 and a write in s2
         }
-        if (only_minor_statements_in_between(ls, s1, s2, img_stats))
+
+        // do we want to switch back?
+        if (!skip && only_minor_statements_in_between(ls, s1, l2, img_stats))
         {
           // yes, they are successive, just remove?? Am I that sure???
           // ??? hmmm, maybe we could have :
@@ -1282,14 +1387,26 @@ list freia_allocate_new_images_if_needed
           // where X_1 -> X is just a bad idea because it overwrites X?
           // I'm not sure this can happen with AIPO, as X would be X_2
           // and will not be changed?
-          entity old = (entity) hash_get(init, v);
           pips_debug(7, "substituting back %s by %s\n",
                      entity_local_name(v), entity_local_name(old));
 
           // we can perform any substitution here
           // note that it may be generated helper functions
           freia_switch_image_in_statement(s1, v, old, true);
-          freia_switch_image_in_statement(s2, v, old, false);
+          FOREACH(statement, s2, l2)
+            freia_switch_image_in_statement(s2, v, old, false);
+
+          // create/update uses of "old" to avoid interactions
+          if (!hash_defined_p(newoccs, old))
+          {
+            hash_put(newoccs, E_WRITE(old), set_make(set_pointer));
+            hash_put(newoccs, E_READ(old), set_make(set_pointer));
+          }
+          set old_write = (set) hash_get(newoccs, E_WRITE(old));
+          set_add_element(old_write, old_write, s1);
+          set old_read = (set) hash_get(newoccs, E_READ(old));
+          FOREACH(statement, s2, l2)
+            set_add_element(old_read, old_read, s2);
         }
         else
           allocated = CONS(entity, v, allocated);
@@ -1373,7 +1490,7 @@ static void oi_stmt_rwt(statement s, set images)
  */
 set freia_compute_output_images(entity module, statement s)
 {
-  set images = set_make(hash_pointer);
+  set images = set_make(set_pointer);
 
   // image formal parameters
   FOREACH(entity, var, module_functional_parameters(module))
