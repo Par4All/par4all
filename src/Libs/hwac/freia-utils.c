@@ -1447,18 +1447,20 @@ list freia_allocate_new_images_if_needed
 
 /* @return the number for FREIA AIPO ops in dag
  */
-int freia_aipo_count(dag d, bool with_copies)
+int freia_aipo_count(dag d, int * pa, int * pc)
 {
-  int count = 0;
+  int aipos = 0, copies = 0;
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     string op = dagvtx_function_name(v);
-    if (strncmp(op, AIPO, strlen(AIPO))==0) count++;
+    if (strncmp(op, AIPO, strlen(AIPO))==0) aipos++;
     // handle exceptions afterwards
-    if (!with_copies && same_string_p(op, AIPO "copy")) count--;
-    if (same_string_p(op, AIPO "scalar_copy")) count--;
+    if (same_string_p(op, AIPO "copy")) copies++, aipos--;
+    else if (same_string_p(op, AIPO "cast")) copies++, aipos--;
+    else if (same_string_p(op, AIPO "scalar_copy")) aipos--;
   }
-  return count;
+  *pa = aipos, *pc = copies;
+  return aipos+copies;
 }
 
 /******************************************************* BUILD OUTPUT IMAGES */

@@ -2233,20 +2233,20 @@ list freia_spoc_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  int n_op_init = freia_aipo_count(fulld, true);
-  int n_op_init_copies = n_op_init - freia_aipo_count(fulld, false);
+  int n_op_init, n_op_init_copies;
+  freia_aipo_count(fulld, &n_op_init, &n_op_init_copies);
 
   list added_stats =  freia_dag_optimize(fulld, exchanges);
 
   // remove copies and duplicates if possible...
   // ??? maybe there should be an underlying transitive closure? not sure.
-  int n_op_opt = freia_aipo_count(fulld, true);
-  int n_op_opt_copies = n_op_opt - freia_aipo_count(fulld, false);
+  int n_op_opt, n_op_opt_copies;
+  freia_aipo_count(fulld, &n_op_opt, &n_op_opt_copies);
 
   fprintf(helper_file,
           "\n"
-          "// dag %d: %d ops (%d copies), "
-          "optimized to %d (%d+%d copies)\n",
+          "// dag %d: %d ops and %d copies, "
+          "optimized to %d ops and %d+%d copies\n",
           number, n_op_init, n_op_init_copies,
           n_op_opt, n_op_opt_copies, (int) gen_length(added_stats));
 

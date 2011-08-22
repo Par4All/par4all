@@ -51,6 +51,8 @@ list freia_aipo_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
+  // about aipo statistics: no helper file to put them
+
   list added_stats = freia_dag_optimize(fulld, exchanges);
 
   // intermediate images
