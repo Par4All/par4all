@@ -1,0 +1,37 @@
+
+Initial code
+
+int flatten_code18()
+{
+   int k;                                                               /*0019*/
+   float a[3];                                                          /*0020*/
+
+   for(k = 0; k <= 2; k += 1) {                                         /*0022*/
+      a[k] = 0.;                                                        /*0024*/
+      foo();                                                            /*0025*/
+   }
+
+   for(k = 0; k <= 2; k += 1)                                           /*0028*/
+      a[k] = 0.;                                                        /*0030*/
+
+   return k;                                                            /*0033*/
+}
+
+Code after flatten_code
+
+int flatten_code18()
+{
+   int k;                                                               /*0019*/
+   float a[3];                                                          /*0020*/
+
+   for(k = 0; k <= 2; k += 1) {                                         /*0022*/
+      a[k] = 0.;                                                        /*0024*/
+      foo();                                                            /*0025*/
+   }
+
+   a[0] = 0.;
+   a[1] = 0.;
+   a[2] = 0.;
+
+   return k;                                                            /*0033*/
+}
