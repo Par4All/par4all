@@ -19,6 +19,7 @@ display PRINTED_FILE
 echo
 echo After scalarization
 echo
+setproperty SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST TRUE
 apply SCALARIZATION
 display PRINTED_FILE
 

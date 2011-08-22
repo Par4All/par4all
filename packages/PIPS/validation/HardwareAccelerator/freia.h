@@ -27,13 +27,13 @@ typedef struct {
   int stuff;
 } freia_data2d;
 typedef enum {
-  FREIA_OK, FREIA_ERROR,
-  FREIA_SIZE_ERROR, FREIA_INVALID_PARAM
+  FREIA_OK, FREIA_SIZE_ERROR, FREIA_INVALID_PARAM
 } freia_status;
 typedef struct {
   int framebpp, framewidth, frameheight, frameindex, stuff;
 } freia_dataio;
 typedef void * freia_ptr;
+#define FREIA_ERROR(args...) fprintf(stderr, args)
 
 // no checks, code is assume correct
 // see freiaCommonData.c for details

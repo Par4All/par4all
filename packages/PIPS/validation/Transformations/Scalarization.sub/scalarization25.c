@@ -1,7 +1,7 @@
 /* Expected result: A[i] could be scalarized, as it is profitable here
    due to the many references to A[i].
-   
-   NOTES: 
+
+   NOTES:
 
    This test is derived from scalarization24, by separating the
    side-effects and the hidden reference to A[i] into two different
@@ -12,7 +12,7 @@
 */
 
 int SIZE = 10;
-    
+
 double get(double f[SIZE],int i) {
   return f[i];
 }

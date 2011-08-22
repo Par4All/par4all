@@ -20,6 +20,7 @@ display PARSED_PRINTED_FILE[main]
 
 make PRINTED_FILE[main]
 
+apply SUPPRESS_DEAD_CODE[main]
 display PRINTED_FILE[main]
 close
 #delete $NAME

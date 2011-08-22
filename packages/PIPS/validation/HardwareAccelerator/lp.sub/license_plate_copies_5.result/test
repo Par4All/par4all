@@ -1823,7 +1823,10 @@ digraph "license_plate_copies_helper_0_1" {
 // # SPOC calls: 11
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+freia_status license_plate_copies_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -1990,7 +1993,11 @@ freia_status license_plate_copies_helper_0_0_0(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+freia_status license_plate_copies_helper_0_0_1(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -2157,7 +2164,11 @@ freia_status license_plate_copies_helper_0_0_1(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_2(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+freia_status license_plate_copies_helper_0_0_2(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -2324,7 +2335,11 @@ freia_status license_plate_copies_helper_0_0_2(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_3(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1,
+freia_status license_plate_copies_helper_0_0_3(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi0,
   int32_t pi1,
   int32_t pi2,
@@ -2460,7 +2475,10 @@ freia_status license_plate_copies_helper_0_0_3(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_4(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status license_plate_copies_helper_0_0_4(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -2562,7 +2580,10 @@ freia_status license_plate_copies_helper_0_0_4(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_5(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status license_plate_copies_helper_0_0_5(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi0,
   int32_t pi1,
   int32_t pi2,
@@ -2674,7 +2695,10 @@ freia_status license_plate_copies_helper_0_0_5(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_6(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status license_plate_copies_helper_0_0_6(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -2776,7 +2800,9 @@ freia_status license_plate_copies_helper_0_0_6(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_7(freia_data2d * o0, freia_data2d * i0,
+freia_status license_plate_copies_helper_0_0_7(
+  freia_data2d * o0,
+  const freia_data2d * i0,
   const int32_t * pi0,
   const int32_t * pi1)
 {
@@ -2879,7 +2905,9 @@ freia_status license_plate_copies_helper_0_0_7(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_8(freia_data2d * o0, freia_data2d * i0,
+freia_status license_plate_copies_helper_0_0_8(
+  freia_data2d * o0,
+  const freia_data2d * i0,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -2981,7 +3009,9 @@ freia_status license_plate_copies_helper_0_0_8(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_0_9(freia_data2d * o0, freia_data2d * i0,
+freia_status license_plate_copies_helper_0_0_9(
+  freia_data2d * o0,
+  const freia_data2d * i0,
   const int32_t * pi0,
   const int32_t * pi1)
 {
@@ -3084,7 +3114,10 @@ freia_status license_plate_copies_helper_0_0_9(freia_data2d * o0, freia_data2d *
 }
 
 // FREIA-SPoC helper function for module license_plate_copies
-freia_status license_plate_copies_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+freia_status license_plate_copies_helper_0_1_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -4413,7 +4446,7 @@ digraph "license_plate_copies_helper_0_0_2" {
 freia_status license_plate_copies_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   const int32_t * pi3)
 {
   // declarations:
@@ -5032,8 +5065,8 @@ freia_status license_plate_copies_helper_0_0_0(
 freia_status license_plate_copies_helper_0_0_1(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
-  freia_data2d * i1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi4,
   int32_t pi5,
   int32_t pi6,
@@ -5719,9 +5752,9 @@ freia_status license_plate_copies_helper_0_0_1(
  */
 freia_status license_plate_copies_helper_0_0_2(
   freia_data2d * o0,
-  freia_data2d * i0,
-  freia_data2d * i1,
-  freia_data2d * i2,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const freia_data2d * i2,
   const int32_t * pi4,
   int32_t pi5,
   int32_t pi6,

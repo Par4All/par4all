@@ -13,7 +13,7 @@ void out1() {
     a[j] = 1;
     for (k = 0; k < N; k += 1)
       // There should be an out region out here !
-      b[k] = a[j]; 
+      b[k] = a[j];
   }
   printf("%d", b[0]);  // use of b[0] will generated a region out before !
 }
@@ -24,7 +24,7 @@ void out0() {
     a[j] = 1;
     for (k = j; k < N; k += 1)
       // There should be an out region out here !
-      b[k] = a[k]; 
+      b[k] = a[k];
   }
   printf("%d", b[0]);  // use of b[0] will generated a region out before !
 }

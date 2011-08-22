@@ -2,6 +2,10 @@
    Expected results:
    a) t[1] scalarized
    b) declaration created for the corresponding scalar
+
+   The scalarization occurs as soon as the loop is analyzed and,
+   hence, the declaration of the scalar is a bit to
+   high. Privatization must be applied to end up with a parallel loop.
 */
 
 #include <stdio.h>
@@ -20,5 +24,5 @@ int main(int argc, char **argv)
     x[i] = y[i];
     y[i] = t[1];
   }
-  printf("%d %d", x[n], y[n]);
+  printf("%d %d", x[n-1], y[n-1]);
 }

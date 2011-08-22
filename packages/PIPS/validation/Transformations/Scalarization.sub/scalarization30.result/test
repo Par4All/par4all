@@ -19,9 +19,11 @@ C     not exist in the initial code
 C
 C     Except if declarations can be trusted
       DO I = 1, N
+         A_0 = A(I)
          DO J = 1, M
-            A(I) = A(I)+B(J)
+            A_0 = A_0+B(J)
          ENDDO
+         A(I) = A_0
       ENDDO
 
 C     Let's make sure that the inner loop is executed
@@ -29,18 +31,18 @@ C     Let's make sure that the inner loop is executed
 
 C     The result is copied out for the next loop nest
       DO I = 1, N
-         __SCALAR__0 = A(I)
+         A_1 = A(I)
          DO J = 1, M
-            __SCALAR__0 = __SCALAR__0+B(J)
+            A_1 = A_1+B(J)
          ENDDO
-         A(I) = __SCALAR__0
+         A(I) = A_1
       ENDDO
 
 C     The inner loop is certainly executed when the outer loop is entered
       DO I = 1, N
-         __SCALAR__1 = A(I)
+         A_2 = A(I)
          DO J = 1, N
-            __SCALAR__1 = __SCALAR__1+B(J)
+            A_2 = A_2+B(J)
          ENDDO
 C     No copy out because of the interprocedural analysis: no caller here
       ENDDO
@@ -67,11 +69,11 @@ C     not exist in the initial code
 C
 C     Except if declarations can be trusted
       DO I = 1, N
-         __SCALAR__0 = A(I)
+         A_0 = A(I)
          DO J = 1, M
-            __SCALAR__0 = __SCALAR__0+B(J)
+            A_0 = A_0+B(J)
          ENDDO
-         A(I) = __SCALAR__0
+         A(I) = A_0
       ENDDO
 
 C     Let's make sure that the inner loop is executed
@@ -79,18 +81,18 @@ C     Let's make sure that the inner loop is executed
 
 C     The result is copied out for the next loop nest
       DO I = 1, N
-         __SCALAR__1 = A(I)
+         A_1 = A(I)
          DO J = 1, M
-            __SCALAR__1 = __SCALAR__1+B(J)
+            A_1 = A_1+B(J)
          ENDDO
-         A(I) = __SCALAR__1
+         A(I) = A_1
       ENDDO
 
 C     The inner loop is certainly executed when the outer loop is entered
       DO I = 1, N
-         __SCALAR__2 = A(I)
+         A_2 = A(I)
          DO J = 1, N
-            __SCALAR__2 = __SCALAR__2+B(J)
+            A_2 = A_2+B(J)
          ENDDO
 C     No copy out because of the interprocedural analysis: no caller here
       ENDDO

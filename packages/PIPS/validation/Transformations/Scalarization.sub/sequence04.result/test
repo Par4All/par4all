@@ -1,0 +1,13 @@
+
+Code after scalarization
+
+int sequence04(int x[10], int y[10][10])
+{
+   int i, j, k;
+   x[i] = y[i][i];
+   x[i] = x[i]+y[i][j];
+   x[i] = x[i]+y[i][i];
+   x[i] = x[i]+y[i][i];
+   k = x[i];
+   return k;
+}

@@ -193,7 +193,7 @@ digraph "my_convolution_35_helper_0_0_0" {
  */
 freia_status my_convolution_35_helper_0_0_0(
   freia_data2d * o0,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   int32_t * pi2,
   uint32_t pi3,
   uint32_t pi4)

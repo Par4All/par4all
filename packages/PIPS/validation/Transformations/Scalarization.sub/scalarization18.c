@@ -1,5 +1,5 @@
 /* Check that A[i] is scalarized in the two successive loop nests
-   
+
    NOTE: derived from scalarization17
  */
 
@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 int SIZE = 10;
-    
+
 void scalarization18(double A[SIZE], double B[SIZE][SIZE])
 {
   int i,j;

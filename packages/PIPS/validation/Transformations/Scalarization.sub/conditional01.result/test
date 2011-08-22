@@ -1,0 +1,128 @@
+
+RW regions
+
+
+//  <stdout-R-MAY-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+int main()
+{
+
+   int N = 10;
+   int a[N][N];
+   {
+      int i;
+
+//  <a[PHI1][PHI2]-W-MAY-{0==-1}>
+//  <stdout-R-MAY-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+      
+      
+      for(i = 1; i <= N; i += 1) {
+         int j;
+
+//  <a[PHI1][PHI2]-W-MAY-{0==-1}>
+//  <stdout-R-MAY-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+         for(j = 1; j <= N; j += 1) {
+
+//  <a[PHI1][PHI2]-W-MAY-{402<=39PHI1+49PHI2+49j+10i,
+//    27j+4<=3PHI1+23PHI2+20i, PHI2+j+4i<=3PHI1+12,
+//    3PHI1+j+4i<=PHI2+28, 3PHI1+23PHI2+27j<=20i+204,
+//    39PHI1+49PHI2<=49j+10i+302, i+1<=PHI2+j, PHI2+i<=j+7, N==10,
+//    1<=j, j<=4, j<=10i}>
+//  <stdout-R-MAY-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+            if (i*j<N/2) {
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1+i==N-1, j+i==PHI2+1, N==10, 1<=j,
+//    j<=4, j<=10i, i<=4}>
+
+               a[N-1-i][i+j-1] = 1;
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2+j+i==N-1, N==10, 1<=j,
+//    j<=4, j<=10i, i<=4}>
+
+               a[i-1][N-i-j-1] = 1;
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+               printf("i=%d, j=%d\n", i, j);
+            }
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1==i-1, PHI2==j-1, j==i, N==10, 1<=i,
+//    i<=10}>
+//  <stdout-R-MAY-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+            if (i==j) {
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2==j-1, j==i, N==10, 1<=i,
+//    i<=10}>
+
+               a[i-1][j-1] = 1;
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+               printf("i=%d, j=%d\n", i, j);
+            }
+         }
+      }
+   }
+}
+
+Code after scalarization
+
+int main()
+{
+
+   int N = 10;
+   int a[N][N];
+   //PIPS generated variable
+   int a_0, a_1, a_2;
+   {
+      int i;
+      
+      
+      for(i = 1; i <= N; i += 1) {
+         int j;
+         for(j = 1; j <= N; j += 1) {
+            if (i*j<N/2) {
+               a_0 = 1;
+               a_1 = 1;
+               printf("i=%d, j=%d\n", i, j);
+            }
+            if (i==j) {
+               a_2 = 1;
+               printf("i=%d, j=%d\n", i, j);
+            }
+         }
+      }
+   }
+}
