@@ -340,7 +340,7 @@ digraph "freia_69_helper_0_1" {
 // # SPOC calls: 3
 
 // FREIA-SPoC helper function for module freia_69
-freia_status freia_69_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+freia_status freia_69_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
   int32_t pi0,
   int32_t pi1,
   int32_t pi2,
@@ -470,12 +470,20 @@ freia_status freia_69_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   si.alu[7][0].op = SPOC_ALU_NOT_IN1;
 
 
-  // output image o0_2 on 0
+  // output image o0_2 on 0 and image 0`t1 on 1
   // o0_2 [7 poc 0] -> [7 output 0] 0 null
   si.mux[7][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
   // o0_2 [7 output 0] -> [7 output 0] 0 null
+  // nope
+
+  // 0`t1 [7 alu] -> [7 output 1] 0 null
+  si.mux[7][1].op = SPOC_MUX_IN1;
+  si.mux[7][3].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`t1 [7 output 1] -> [7 output 1] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -491,7 +499,7 @@ freia_status freia_69_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i0);
+  freia_cg_template_process_2i_2o(&param, o0, o1, i0, i0);
 
   return ret;
 }
@@ -665,7 +673,7 @@ int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
    freia_data2d *t1;                                                    /*0005*/
    t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
 
-   freia_69_helper_0_0_0(o0, in, 1, 1, 1, 1, 1, 1, 1, freia_morpho_kernel_8c);         /*0009*/
+   freia_69_helper_0_0_0(o0, t1, in, 1, 1, 1, 1, 1, 1, 1, freia_morpho_kernel_8c);     /*0009*/
    freia_69_helper_0_0_1(o0, in, o0, freia_morpho_kernel_8c);           /*0017*/
    freia_69_helper_0_1_0(o1, t1, freia_morpho_kernel_8c, 255);          /*0020*/
 
@@ -680,7 +688,7 @@ int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
    freia_data2d *t1;                                                    /*0005*/
    t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
 
-   freia_69_helper_0_0_0(o0, in, 1, 1, 1, 1, 1, 1, 1, freia_morpho_kernel_8c);         /*0009*/
+   freia_69_helper_0_0_0(o0, t1, in, 1, 1, 1, 1, 1, 1, 1, freia_morpho_kernel_8c);     /*0009*/
    freia_69_helper_0_0_1(o0, in, o0, freia_morpho_kernel_8c);           /*0017*/
    freia_69_helper_0_1_0(o1, t1, freia_morpho_kernel_8c, 255);          /*0020*/
 
