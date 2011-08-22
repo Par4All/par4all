@@ -1210,6 +1210,10 @@ static bool is_consummed_by_vertex(dagvtx prod, dagvtx v, dag d, set todo)
  * some side effects:
  * - if there is an overflow, dpipe updated with remaining vertices.
  * - accelerated statements are cleaned
+ *
+ * I should have really done an allocation on a infinite pipeline,
+ * and then cut it, instead of this half measure to handle overflows,
+ * but that would change a lot of things to go back.
  */
 static void freia_spoc_pipeline
 (string module, string helper, string_buffer code, dag dpipe, list * lparams,
@@ -1448,9 +1452,28 @@ static void freia_spoc_pipeline
       }
       else
       {
-        //pips_internal_error("should not get there (3 live images)...");
+        pips_assert("overflow mode", !set_empty_p(skipped));
         // ??? hmmm, we get there on overflow, if an input image is
-        // still to be used, but 2 computed images are extracted...
+        // still to be used, but 2 computed images are extracted.
+        // what we are in effect doing is to modify the schedule,
+        // possibly breaking the 2 live image property in the process,
+        // in order to attempt to fill in the pipe a little more...
+        if (out.image)
+        {
+          if (in0.just_used)
+          {
+            in0 = out;
+            in0_needed = true;
+          }
+          else if (in1.just_used)
+          {
+            in1 = out;
+            in1_needed = true;
+          }
+          else
+            // not sure of the conditions above to choose between in0 and in1
+            pips_internal_error("computed image not extracted...");
+        }
       }
 
       // anyway, we must clean unuseful variables, because
