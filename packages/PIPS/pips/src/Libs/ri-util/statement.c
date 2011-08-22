@@ -3019,7 +3019,7 @@ static bool first_reference_to_v_p(reference r)
   return result;
 }
 
-reference find_reference_to_variable(statement s, entity v) 
+reference find_reference_to_variable(statement s, entity v)
 {
   reference r = reference_undefined;
   first_reference_to_v = reference_undefined;
@@ -3044,7 +3044,7 @@ static bool count_static_references_to_v_p(reference r)
   return result;
 }
 
-int count_static_references_to_variable(statement s, entity v) 
+int count_static_references_to_variable(statement s, entity v)
 {
   reference_count = 0;
   variable_searched = v;

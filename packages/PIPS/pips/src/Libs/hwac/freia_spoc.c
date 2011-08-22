@@ -1131,13 +1131,13 @@ static void freia_spoc_code_buildup
   sb_cat(code,
          "\n"
          "// FREIA-SPoC helper function for module ", module, "\n"
-         "freia_status ", function_name, "(");
+         "freia_status ", function_name, "(\n");
   // first, image arguments
-  if (n_im_out>0) sb_cat(code, FREIA_IMAGE "o0");
-  if (n_im_out>1) sb_cat(code, ", " FREIA_IMAGE "o1");
-  if (n_im_out!=0 && n_im_in>0) sb_cat(code, ", ");
-  if (n_im_in>0) sb_cat(code, FREIA_IMAGE "i0");
-  if (n_im_in>1) sb_cat(code, ", " FREIA_IMAGE "i1");
+  if (n_im_out>0) sb_cat(code, "  " FREIA_IMAGE "o0");
+  if (n_im_out>1) sb_cat(code, ",\n  " FREIA_IMAGE "o1");
+  if (n_im_out!=0 && n_im_in>0) sb_cat(code, ",\n");
+  if (n_im_in>0) sb_cat(code, "  const " FREIA_IMAGE "i0");
+  if (n_im_in>1) sb_cat(code, ",\n  const " FREIA_IMAGE "i1");
 
   string_buffer_append_sb(code, head);
 
@@ -1210,6 +1210,10 @@ static bool is_consummed_by_vertex(dagvtx prod, dagvtx v, dag d, set todo)
  * some side effects:
  * - if there is an overflow, dpipe updated with remaining vertices.
  * - accelerated statements are cleaned
+ *
+ * I should have really done an allocation on a infinite pipeline,
+ * and then cut it, instead of this half measure to handle overflows,
+ * but that would change a lot of things to go back.
  */
 static void freia_spoc_pipeline
 (string module, string helper, string_buffer code, dag dpipe, list * lparams,
@@ -1300,6 +1304,8 @@ static void freia_spoc_pipeline
 
   FOREACH(dagvtx, v, vertices)
   {
+    pips_debug(3, "considering vertex %"_intFMT"\n", dagvtx_number(v));
+
     // skip inputs
     if (dagvtx_number(v)==0) break;
 
@@ -1445,7 +1451,30 @@ static void freia_spoc_pipeline
           pips_internal_error("should not get there (same image)?");
       }
       else
-        pips_internal_error("should not get there (3 live images)...");
+      {
+        pips_assert("overflow mode", !set_empty_p(skipped));
+        // ??? hmmm, we get there on overflow, if an input image is
+        // still to be used, but 2 computed images are extracted.
+        // what we are in effect doing is to modify the schedule,
+        // possibly breaking the 2 live image property in the process,
+        // in order to attempt to fill in the pipe a little more...
+        if (out.image)
+        {
+          if (in0.just_used)
+          {
+            in0 = out;
+            in0_needed = true;
+          }
+          else if (in1.just_used)
+          {
+            in1 = out;
+            in1_needed = true;
+          }
+          else
+            // not sure of the conditions above to choose between in0 and in1
+            pips_internal_error("computed image not extracted...");
+        }
+      }
 
       // anyway, we must clean unuseful variables, because
       // the scheduling  on image entities to check deps (still ?)
@@ -1964,18 +1993,22 @@ static dagvtx first_which_may_be_added
    set current, // of dagvtx
    list lv,     // of candidate dagvtx
    set sure,    // of dagvtx
-   __attribute__((unused)) set maybe)   // image entities
+   set maybe)   // image entities
 {
   dagvtx chosen = NULL;
   set inputs = set_make(set_pointer);
-  int n_outputs = number_of_output_arcs(dall, current);
+  set current_output = output_arcs(dall, current);
+  int n_outputs = set_size(current_output);
   pips_assert("should be okay at first!", n_outputs<=2);
+
+  pips_debug(8, "#outputs = %d\n", n_outputs);
 
   // output arcs from this subset
   // set outputs = output_arcs(current);
 
   FOREACH(dagvtx, v, lv)
   {
+    pips_debug(8, "considering vertex %"_intFMT"\n", dagvtx_number(v));
     pips_assert("not yet there", !set_belong_p(current, v));
 
     // some intermediate stuff
@@ -1995,6 +2028,7 @@ static dagvtx first_which_may_be_added
 
     list preds = dag_vertex_preds(dall, v);
     set_assign_list(inputs, preds);
+    pips_debug(8, "#inputs = %d\n", set_size(inputs));
     int npreds = gen_length(preds);
     gen_free_list(preds), preds = NIL;
 
@@ -2007,6 +2041,17 @@ static dagvtx first_which_may_be_added
       // two lives, but the var reuse will break the pipe by hidding
       // the other live which is not used by the computation of v.
       if (n_outputs==2 && set_size(inputs)==1)
+        continue;
+
+      // another more general case from freia_68
+      set all_lives = set_make(hash_pointer);
+      set_intersection(all_lives, inputs, maybe);
+      set_union(all_lives, current_output, all_lives);
+      int n_lives = set_size(all_lives);
+      set_free(all_lives);
+
+      // cannot do, we would go over the limit...
+      if (n_lives>2)
         continue;
     }
 
