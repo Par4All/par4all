@@ -497,6 +497,10 @@ static void scalarize_variable_in_statement(entity pv,
     concatenate(entity_user_name(pv), "_", NULL)
     : dpref;
   entity sv = make_new_scalar_variable_with_prefix(epref, get_current_module_entity(), svb);
+  /* FI: the language could be checked, but Fortran prettyprinter
+     ignores the qualifier and the qualifier benefits the complexity
+     analyzer. */
+  set_register_qualifier(sv);
   entity m = get_current_module_entity();
 
   if(get_bool_property("SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST")) {
@@ -621,6 +625,7 @@ static list scalarized_variables = list_undefined;
 // To associate a list of privatized variables to each statement
 static hash_table statement_scalarized_variables = hash_table_undefined;
 
+/* This function has been replaced by statement_scalarization() */
 static bool loop_scalarization(loop l)
 {
   entity i    = loop_index(l);
@@ -686,6 +691,8 @@ static bool loop_scalarization(loop l)
            substitution might break dependence arcs.
 
            So, we go on only if the two are equal.
+
+	   We assume that array variables cannot be declared volatile
         */
 
         if (nvo != neo) {
@@ -814,9 +821,13 @@ static bool statement_scalarization(statement s)
     entity pv  = effect_variable(pr); // Private variable
     int nd = type_depth(entity_type(pv));
 
-    if(!entity_is_argument_p(pv, scalarized_variables)
-       && !vect_coeff(pv,var_already_seen)
-       && nd>0) {
+    if(!entity_is_argument_p(pv, scalarized_variables) // sclarized at
+						       // a higher level?
+       && !vect_coeff(pv,var_already_seen) // Each variable may appear
+					   // several times in the
+					   // effect list
+       && nd > 0 // Only array references can be scalarized
+       && !volatile_variable_p(pv)) { // Volatile arrays cannot be scalarized
       // Does the current variable appear in the in effect?
       entity iv  = (entity) gen_find(pv, irl, (bool (*)())gen_eq, car_effect_to_variable);
       // Does the current variable appear in the out effect?
