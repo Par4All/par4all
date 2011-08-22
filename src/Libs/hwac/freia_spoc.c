@@ -1131,13 +1131,13 @@ static void freia_spoc_code_buildup
   sb_cat(code,
          "\n"
          "// FREIA-SPoC helper function for module ", module, "\n"
-         "freia_status ", function_name, "(");
+         "freia_status ", function_name, "(\n");
   // first, image arguments
-  if (n_im_out>0) sb_cat(code, FREIA_IMAGE "o0");
-  if (n_im_out>1) sb_cat(code, ", " FREIA_IMAGE "o1");
-  if (n_im_out!=0 && n_im_in>0) sb_cat(code, ", ");
-  if (n_im_in>0) sb_cat(code, FREIA_IMAGE "i0");
-  if (n_im_in>1) sb_cat(code, ", " FREIA_IMAGE "i1");
+  if (n_im_out>0) sb_cat(code, "  " FREIA_IMAGE "o0");
+  if (n_im_out>1) sb_cat(code, ",\n  " FREIA_IMAGE "o1");
+  if (n_im_out!=0 && n_im_in>0) sb_cat(code, ",\n");
+  if (n_im_in>0) sb_cat(code, "  const " FREIA_IMAGE "i0");
+  if (n_im_in>1) sb_cat(code, ",\n  const " FREIA_IMAGE "i1");
 
   string_buffer_append_sb(code, head);
 
