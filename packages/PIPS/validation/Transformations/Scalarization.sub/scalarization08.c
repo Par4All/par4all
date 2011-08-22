@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #define SIZE 10
-    
+
 int scalarization08(int x[SIZE], int y[SIZE][SIZE])
 {
   int i,j,k;

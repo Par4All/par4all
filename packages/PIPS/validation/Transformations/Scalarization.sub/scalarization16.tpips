@@ -1,7 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 delete scalarization16
 
-setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
 
 ##TODO: explain
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
@@ -43,6 +43,7 @@ activate MUST_REGIONS
 echo
 echo Code after scalarization
 echo
+setproperty SCALARIZATION_PREFIX ""
 apply SCALARIZATION[scalarization16]
 display PRINTED_FILE[scalarization16]
 

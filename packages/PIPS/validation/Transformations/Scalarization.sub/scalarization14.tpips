@@ -43,6 +43,8 @@ activate MUST_REGIONS
 echo
 echo Code after scalarization
 echo
+
+setproperty SCALARIZATION_PREFIX "__scalar__"
 apply SCALARIZATION[scalarization14]
 display PRINTED_FILE[scalarization14]
 

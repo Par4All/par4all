@@ -58,14 +58,15 @@ l99996:   ;
       goto l99997;
    }
    if (i==3) goto l99997;
-   for(j = 0; j <= 9; j += 1) {
-      {
-         //PIPS generated variable
-         int n0 = j;
-         _return0 = n0+14;
+   for(j = 0; j <= 9; j += 1)
+      if (1) {
+         {
+            //PIPS generated variable
+            int n0 = j;
+            _return0 = n0+14;
+         }
+         a[i][j] = _return0;
       }
-      a[i][j] = _return0;
-   }
    i++;
    goto l99996;
 l99997:   ;

@@ -1,0 +1,30 @@
+setenv WS=flatten_code18
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+create $WS $WS.c
+
+#setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[$WS]
+
+echo
+echo Code after flatten_code
+echo
+
+setproperty FULL_LOOP_UNROLL_EXCEPTIONS "foo"
+
+apply FLATTEN_CODE[$WS]
+activate PRINT_CODE
+display PRINTED_FILE[$WS]
+
+close
+delete $WS
+quit
+

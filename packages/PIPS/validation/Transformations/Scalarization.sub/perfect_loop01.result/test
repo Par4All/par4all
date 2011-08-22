@@ -1,0 +1,17 @@
+
+Code after scalarization
+
+int perfect_loop01(int x[10], int y[10][10])
+{
+   int i, j, k;
+   //PIPS generated variable
+   register int x_0;
+   for(i = 0; i <= 9; i += 1) {
+      for(j = 0; j <= 9; j += 1)
+         x_0 = y[i][j];
+      x[i] = x_0;
+   }
+   //printf("%d", x[1]);
+   k = x[1];
+   return k;
+}

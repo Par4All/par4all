@@ -112,7 +112,9 @@ digraph "my_dilate_8c_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module my_dilate_8c
-freia_status my_dilate_8c_helper_0_0_0(freia_data2d * o0, freia_data2d * i0,
+freia_status my_dilate_8c_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -274,7 +276,7 @@ digraph "my_dilate_8c_helper_0_0_0" {
  */
 freia_status my_dilate_8c_helper_0_0_0(
   freia_data2d * o0,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   const int32_t * pi2)
 {
   // declarations:

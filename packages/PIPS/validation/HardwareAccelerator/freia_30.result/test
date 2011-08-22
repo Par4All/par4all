@@ -155,7 +155,10 @@ digraph "freia_30_helper_0_0" {
 // # SPOC calls: 1
 
 // FREIA-SPoC helper function for module freia_30
-freia_status freia_30_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+freia_status freia_30_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
   int32_t pi0,
   int32_t pi1,
   int32_t pi2)
@@ -378,7 +381,7 @@ digraph "freia_30_helper_0_0_0" {
 freia_status freia_30_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   int32_t pi3,
   int32_t pi4,
   int32_t pi5)

@@ -13,6 +13,7 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 ## Needed for substracting set approximations
 activate MUST_REGIONS
 
+setproperty SCALARIZATION_PREFIX ""
 apply SCALARIZATION[SCALARIZATION34]
 display PRINTED_FILE[SCALARIZATION34]
 

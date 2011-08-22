@@ -8142,6 +8142,7 @@ full_unroll                          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
 Or directives can be inserted as comments for loops to be unrolled with:
 \begin{PipsMake}
 alias full_unroll_pragma 'Full Loop Unroll (Pragma)'
@@ -8159,13 +8160,23 @@ must specify the loop label. This default feature can be turned off
 and all loops with constant loop bounds and constant increment are
 fully unrolled.
 
-Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you don't want to give it interactively
+Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you do not
+want to give it interactively
 
 % no longer used {
 % \begin{PipsProp}{FULL_UNROLL_INTERACTIVELY}
 % FULL_UNROLL_INTERACTIVELY TRUE
 % \end{PipsProp}
 % }
+
+Property \PipsPropRef{FULL_LOOP_UNROLL_EXCEPTIONS} is used to forbid loop
+unrolling when specific user functions are called in the loop
+body. The function names are separated by SPACEs. The default value is
+the empy set, i.e. the empry string.
+\begin{PipsProp}{FULL_LOOP_UNROLL_EXCEPTIONS}
+FULL_LOOP_UNROLL_EXCEPTIONS ""
+\end{PipsProp}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% fusion
 \subsection{Loop Fusion}
 \begin{PipsPass}{force_loop_fusion}
@@ -10764,7 +10775,12 @@ If needed according to the IN and OUT convex array regions, the new
 variables are initialized, e.g. \verb/__scalar0__ = A[i]/, and/or
 copied back into the initial array, e.g. \verb/A[i] = __scalar0__/.
 
-Scalarization is currently applicable both to Fortran and C code.
+Scalarization is currently applicable both to Fortran and C code, but
+the code generation slightly differs because local declarations are
+possible with C. However, this may destroy perfect loop nests required
+by other passes. Property
+\PipsPropRef{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST} can be used to
+preserve C perfect loop nests.
 
 
 Pass \PipsPassRef{scalarization} uses the read and written convex
@@ -10796,9 +10812,24 @@ this is puzzling for programmers because they expect all loops to be
 entered at least once...
 
 As explained above, Property \PipsPropRef{SCALARIZATION_PREFIX} is
-used to select the names of the new scalar variables.
+used to select the names of the new scalar variables. If it is set to
+the empty string, \verb/""/, the scalarized variable name is used as
+prefix, which improves readability.
 \begin{PipsProp}{SCALARIZATION_PREFIX}
-SCALARIZATION_PREFIX "__scalar__"
+SCALARIZATION_PREFIX ""
+\end{PipsProp}
+
+Also, as explained above, Property
+\PipsPropRef{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST} is used to
+control the way new scalar variables are declared and initialized in
+C. The current default value is FALSE because the locality of
+declarations is better for automatic loop parallelization, but this
+could be changed as a privatization pass should do as well while
+preserving perfect loop nests. Note that initializations may have to
+be placed in such a way that a perfect loop nest is nevertheless
+destroyed, even with this property set to true.
+\begin{PipsProp}{SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST}
+SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST FALSE
 \end{PipsProp}
 
 Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation of a copy-out statement
@@ -10806,6 +10837,31 @@ when it is useless according to the OUT region, for instance when dealing
 with a library function.
 \begin{PipsProp}{SCALARIZATION_FORCE_OUT}
 SCALARIZATION_FORCE_OUT FALSE
+\end{PipsProp}
+
+Numerical property \PipsPropRef{SCALARIZATION_THRESHOLD} is used to
+decide profitability: the estimated complexity of the scalarized code
+must be less than the initial complexity. Its minimal value is 2. It
+can be set to around 5 to forbid scalarization in sequences with no
+loop benefit.
+\begin{PipsProp}{SCALARIZATION_THRESHOLD}
+SCALARIZATION_THRESHOLD 2
+\end{PipsProp}
+
+Property \PipsPropRef{SCALARIZATION_STRICT_MEMORY_ACCESSES} is used to
+control the insertion of new memory accesses. A memory access may be
+moved out of a loop, which is the best case for performance, but it
+then is no longer control dependent on the loop bounds. A new access
+is thus added if the compiler cannot prove that the loop is always
+entered. However, the burden of the proof may be too much, if only
+because nothing can be proven when the loop is sometimes entered and
+sometimes not. Also, the memory access may be always perfectly
+legal. The default value is FALSE, going for performance before
+safety. This property is pretty hard to understand, as well as its
+impact. See sequence06, 07 and 08 in the validaiton suite of the
+scalarization pass.
+\begin{PipsProp}{SCALARIZATION_STRICT_MEMORY_ACCESSES}
+SCALARIZATION_STRICT_MEMORY_ACCESSES FALSE
 \end{PipsProp}
 
 This pass was designed by Fran\c{c}ois Irigoin and implemented by
@@ -10896,7 +10952,8 @@ resulting code further.
 The transformation \PipsPassRef{flatten_code} firstly moves declarations
 up in the abstract syntax tree, secondly remove useless braces and thirdly
 fully unroll loops when there iteration counts are known and the
-\verb/FLATTEN_CODE_UNROLL/ property is true..
+\verb/FLATTEN_CODE_UNROLL/ property is true. Unrolling can also be
+controlled using Property \PipsPropRef{FULL_LOOP_UNROLL_EXCEPTIONS}.
 
 Inlining(s), which must be performed explicitly by the user with tpips
 or another PIPS interface, can be used first to create lots of

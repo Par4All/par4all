@@ -837,8 +837,20 @@ bool loop_fully_unrollable_p(loop l)
     && expression_integer_value(ub, &ubval)
     && expression_integer_value(inc, &incval);
 
+  if(unroll_p) {
+    string s = get_string_property("FULL_LOOP_UNROLL_EXCEPTIONS");
+    if(*s!=0) {
+      list callees = statement_to_called_user_entities(loop_body(l));
+      list exceptions = string_to_user_modules(s);
+      list p = arguments_intersection(callees, exceptions);
+      unroll_p = ENDP(p);
+      gen_free_list(p);
+    }
+  }
+
   return unroll_p;
 }
+
 /* get rid of the loop by body duplication;
  *
  * the loop body is duplicated as many times as there were iterations

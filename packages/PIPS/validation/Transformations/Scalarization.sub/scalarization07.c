@@ -21,5 +21,8 @@ int main(int argc, char **argv)
     x[i] = y[i];
     y[i] = t[i];
   }
-  printf("%d %d", x[n], y[n]);
+  // Do not forget the printf nor the proper indexing of x and y, or
+  // you will be surprized by crazy outputs... that are just as
+  // correct or incorrect than your input code
+  printf("%d %d", x[n-1], y[n-1]);
 }

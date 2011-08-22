@@ -12,17 +12,22 @@ C     that the profitability analysis is different, as well as the
 C     importation and exportation of the initial and final values, if
 C     any
 C
+C     b(k) is scalarized by the second scalarization algorithm
+C     implemented in PIPS
+C
 C     Also, we do not try to carry a value from one iteration to the next
 
       SUBROUTINE SCALARIZATION34(A, B, C, D, E, M, N)
       REAL A(N), B(N), C(N), D(N), E(N), M(N)
+      B_0 = B(K)
 
       DO I = 1, 100
-         __SCALAR__0 = C(I)
-         IF (M(I).LT.0.) E(I) = __SCALAR__0
-         A(I) = __SCALAR__0+D(I)
-         B(K) = B(K)+A(I-1)
+         C_0 = C(I)
+         IF (M(I).LT.0.) E(I) = C_0
+         A(I) = C_0+D(I)
+         B_0 = B_0+A(I-1)
       ENDDO
+      B(K) = B_0
 
       PRINT *, B, E
 

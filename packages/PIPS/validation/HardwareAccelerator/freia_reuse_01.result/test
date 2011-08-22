@@ -219,7 +219,10 @@ digraph "freia_reuse_01_helper_0_1" {
 // # SPOC calls: 2
 
 // FREIA-SPoC helper function for module freia_reuse_01
-freia_status freia_reuse_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0,
+freia_status freia_reuse_01_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -315,7 +318,10 @@ freia_status freia_reuse_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, f
 }
 
 // FREIA-SPoC helper function for module freia_reuse_01
-freia_status freia_reuse_01_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1,
+freia_status freia_reuse_01_helper_0_1_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
   const int32_t * pi0)
 {
   spoc_instr si;
@@ -561,7 +567,7 @@ digraph "freia_reuse_01_helper_0_0_0" {
 freia_status freia_reuse_01_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
-  freia_data2d * i0,
+  const freia_data2d * i0,
   const int32_t * pi3)
 {
   // declarations:
