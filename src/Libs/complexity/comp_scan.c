@@ -24,7 +24,7 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-/* 
+/*
  * scan the Abstract Syntax Tree of a program to count operations
  */
 
@@ -136,7 +136,7 @@ char *module_name;
     hash_callee_to_complexity = fetch_callees_complexities(module_name);
     hash_complexity_parameters = fetch_complexity_parameters(module_name);
 
-    add_formal_parameters_to_hash_table(module_entity, 
+    add_formal_parameters_to_hash_table(module_entity,
 					hash_complexity_parameters);
 
     add_common_variables_to_hash_table(module_entity,
@@ -714,7 +714,7 @@ complexity whileloop_to_complexity(whileloop while_instr, transformer precond, l
         complexity_fprint(stderr, cbody, true, true);
         fprintf(stderr, "\n");
     }
-    complexity_check_and_warn(__FUNCTION__, cbody);    
+    complexity_check_and_warn(__FUNCTION__, cbody);
 
     return cbody;
 }
@@ -785,7 +785,7 @@ list effects_list;
 /* 2nd element of call */
 /* arguments_to_complexity
  * Return the sum of the complexities of the list of expressions passed.
- * Return also in *pbasic the basic of the "biggest" argument 
+ * Return also in *pbasic the basic of the "biggest" argument
  * (int/float/double/...)
  */
 complexity arguments_to_complexity(exprlist, pbasic, precond, effects_list)
@@ -838,7 +838,7 @@ list effects_list;
     else
 	pips_internal_error("syntax undefined");
 
-    complexity_check_and_warn("expression_to_complexity", comp);    
+    complexity_check_and_warn("expression_to_complexity", comp);
 
     trace_off();
     return(comp);
@@ -877,7 +877,7 @@ list effects_list;
 
   switch (syntax_tag(s)) {
   case is_syntax_reference:
-    comp = reference_to_complexity(syntax_reference(s), pbasic, 
+    comp = reference_to_complexity(syntax_reference(s), pbasic,
 				   precond, effects_list);
     break;
   case is_syntax_range:
@@ -919,7 +919,7 @@ list effects_list;
   case is_syntax_va_arg:
     pips_internal_error("Not implemented yet");
     break;
-  default: 
+  default:
     pips_internal_error("syntax_tag %d, not in %d->%d", (int)syntax_tag(s),
 	       is_syntax_reference, is_syntax_va_arg);
   }
@@ -952,10 +952,10 @@ list effects_list;
 
     trace_on("reference %s", entity_name(var));
 
-    if ( basic_int_p(b)     || basic_float_p(b)   || 
+    if ( basic_int_p(b)     || basic_float_p(b)   ||
 	 basic_complex_p(b) || basic_logical_p(b) )
 	*pbasic = simple_basic_dup(b);
-    else if (basic_string_p(b)) 
+    else if (basic_string_p(b))
 	*pbasic = MAKE_STRING_BASIC;
     else {
 	user_warning("reference_to_complexity",
@@ -968,40 +968,44 @@ list effects_list;
     /* ci=compindexation counts multi-dimension arrays indexation costs */
 
     switch ( gen_length(ind) ) {
-    case 0: 
+    case 0:
 	ci = make_zero_complexity();
 	break;
-    case 1: 
+    case 1:
 	ci = make_constant_complexity((float)
-				      intrinsic_cost(ONE_INDEX_NAME, &ib)); 
+				      intrinsic_cost(ONE_INDEX_NAME, &ib));
 	break;
-    case 2: 
+    case 2:
 	ci = make_constant_complexity((float)
-				      intrinsic_cost(TWO_INDEX_NAME, &ib)); 
+				      intrinsic_cost(TWO_INDEX_NAME, &ib));
 	break;
-    case 3: 
+    case 3:
 	ci = make_constant_complexity((float)
-				      intrinsic_cost(THREE_INDEX_NAME, &ib)); 
+				      intrinsic_cost(THREE_INDEX_NAME, &ib));
 	break;
-    case 4: 
+    case 4:
 	ci = make_constant_complexity((float)
-				      intrinsic_cost(FOUR_INDEX_NAME, &ib)); 
+				      intrinsic_cost(FOUR_INDEX_NAME, &ib));
 	break;
-    case 5: 
+    case 5:
 	ci = make_constant_complexity((float)
-				      intrinsic_cost(FIVE_INDEX_NAME, &ib)); 
+				      intrinsic_cost(FIVE_INDEX_NAME, &ib));
 	break;
-    case 6: 
+    case 6:
 	ci = make_constant_complexity((float)
-				      intrinsic_cost(SIX_INDEX_NAME, &ib)); 
+				      intrinsic_cost(SIX_INDEX_NAME, &ib));
 	break;
-    default: 
+    default:
 	ci = make_constant_complexity((float)
-				      intrinsic_cost(SEVEN_INDEX_NAME, &ib)); 
+				      intrinsic_cost(SEVEN_INDEX_NAME, &ib));
     }
-    
-    ca = make_constant_complexity((float)
-				  intrinsic_cost(MEMORY_READ_NAME, &ib)); 
+
+    if(entity_register_p(var))
+      ca = make_zero_complexity();
+    else
+      ca = make_constant_complexity((float)
+				    intrinsic_cost(MEMORY_READ_NAME,
+						   &ib));
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "\n");

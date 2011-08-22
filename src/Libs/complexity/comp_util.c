@@ -603,7 +603,7 @@ float file_factor;
 	    fprintf(stderr, "\nScale factor is %f\n", scale_factor);
 	}
 	fclose(fd);
- 
+
     free(intrinsic_name);
     free(line);
 }
@@ -653,7 +653,7 @@ basic *pargsbasic;
     }
   }
   /* To satisfy cproto . LZ 02 Feb. 93 */
-  return (STRING_INTRINSICS_COST); 
+  return (STRING_INTRINSICS_COST);
 }
 
 
