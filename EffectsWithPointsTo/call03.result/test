@@ -39,11 +39,13 @@ void call03()
 
    pi++;
 
-// Points To: none
+// Points To:
+// pi -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 
    q->one = 1;
 
-// Points To: none
+// Points To:
+// pi -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 
    (q->two)[4] = 2;
 }
