@@ -949,7 +949,7 @@ digraph "vs_core_loop_helper_3_3" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops (0 copies), optimized to 1 (0+1 copies)
+// dag 0: 3 ops and 0 copies, optimized to 1 ops and 0+1 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -1018,13 +1018,13 @@ freia_status vs_core_loop_helper_0_0_0(
   return ret;
 }
 
-// dag 1: 1 ops (1 copies), optimized to 0 (0+0 copies)
+// dag 1: 0 ops and 1 copies, optimized to 0 ops and 0+0 copies
 // # SPOC calls: 0
 
-// dag 2: 1 ops (1 copies), optimized to 0 (0+1 copies)
+// dag 2: 0 ops and 1 copies, optimized to 0 ops and 0+1 copies
 // # SPOC calls: 0
 
-// dag 3: 19 ops (3 copies), optimized to 16 (0+1 copies)
+// dag 3: 16 ops and 3 copies, optimized to 16 ops and 0+1 copies
 // split 0: 1 cut
 // split 1: 1 cut
 // split 2: 1 cut
@@ -2112,6 +2112,8 @@ digraph "vs_core_loop_helper_3_1_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
+// dag 0: 3 ops and 0 copies, optimized to 1 ops and 0+1 copies
+
 /* FREIA terapix helper function for module vs_core_loop
  *
  * RAMPE    = 1024
@@ -2251,6 +2253,12 @@ freia_status vs_core_loop_helper_0_0_0(
   return ret;
 }
 
+
+// dag 1: 0 ops and 1 copies, optimized to 0 ops and 0+0 copies
+
+// dag 2: 0 ops and 1 copies, optimized to 0 ops and 0+1 copies
+
+// dag 3: 16 ops and 3 copies, optimized to 16 ops and 0+1 copies
 
 /* FREIA terapix helper function for module vs_core_loop
  *

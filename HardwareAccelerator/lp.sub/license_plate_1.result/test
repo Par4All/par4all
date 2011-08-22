@@ -1301,7 +1301,7 @@ digraph "license_plate_helper_0_1" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 69 ops (0 copies), optimized to 69 (0+0 copies)
+// dag 0: 69 ops and 0 copies, optimized to 69 ops and 0+0 copies
 // split 0: 3 cuts
 // split 1: 1 cut
 // # SPOC calls: 4
@@ -3336,6 +3336,8 @@ digraph "license_plate_helper_0_0_4" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 69 ops and 0 copies, optimized to 69 ops and 0+0 copies
 
 /* FREIA terapix helper function for module license_plate
  *

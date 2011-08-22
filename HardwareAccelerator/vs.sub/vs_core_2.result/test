@@ -485,7 +485,7 @@ digraph "vs_core_2_helper_0_3" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 18 ops (2 copies), optimized to 16 (0+0 copies)
+// dag 0: 16 ops and 2 copies, optimized to 16 ops and 0+0 copies
 // split 0: 1 cut
 // split 1: 1 cut
 // split 2: 1 cut
@@ -1221,6 +1221,8 @@ digraph "vs_core_2_helper_0_1_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 16 ops and 2 copies, optimized to 16 ops and 0+0 copies
 
 /* FREIA terapix helper function for module vs_core_2
  *

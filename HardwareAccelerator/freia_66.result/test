@@ -337,10 +337,10 @@ digraph "freia_66_helper_1_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops (2 copies), optimized to 0 (0+2 copies)
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2 copies
 // # SPOC calls: 0
 
-// dag 1: 4 ops (0 copies), optimized to 4 (0+0 copies)
+// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -699,6 +699,10 @@ digraph "freia_66_helper_1_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2 copies
+
+// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_66
  *

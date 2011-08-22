@@ -130,7 +130,7 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops (2 copies), optimized to 0 (0+1 copies)
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+1 copies
 // # SPOC calls: 0
 
 ! updated function
@@ -224,6 +224,8 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+1 copies
 
 ! updated function
 
