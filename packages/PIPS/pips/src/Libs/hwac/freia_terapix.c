@@ -840,7 +840,7 @@ static void freia_terapix_call
   for (int i = 0; i<n_outs; i++)
     sb_cat(head, nargs++? ",": "", "\n  " FREIA_IMAGE "o", itoa(i));
   for (int i = 0; i<n_ins; i++)
-    sb_cat(head, nargs++? ",": "", "\n  " FREIA_IMAGE "i", itoa(i));
+    sb_cat(head, nargs++? ",": "", "\n  const " FREIA_IMAGE "i", itoa(i));
   // other arguments to come...
 
   // corresponding helper call arguments

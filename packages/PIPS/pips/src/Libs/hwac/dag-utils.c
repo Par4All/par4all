@@ -608,6 +608,8 @@ int dag_computation_count(const dag d)
 /* return target predecessors as a list.
  * the same predecessor appears twice in b = a+a
  * build them in call order!
+ * ??? maybe I should build a cache for performance,
+ * but I would have to keep track of when dags are modified...
  */
 list dag_vertex_preds(const dag d, const dagvtx target)
 {

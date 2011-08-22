@@ -564,6 +564,36 @@ bool void_function_p(entity m)
 
   return void_p;
 }
+
+/* Build a list of functions from a string s containing SPACE
+ * separated function names.
+ *
+ * Beware of ambiguities that static function names may cause.
+ *
+ * See also string_to_entities() and a similar piece of code in
+ * inlining.c that was used to code this function.
+ */
+list string_to_user_modules(string s)
+{
+  list ml = NIL; // module list
+  string ds = strdup(s);
+
+  string c_name= NULL;
+  for(c_name = strtok(s," ") ;
+      c_name ;
+      c_name=strtok(NULL," ") ) {
+    entity m = local_name_to_top_level_entity(c_name);
+    if(entity_undefined_p(m))
+      /* FI: warning at a very low level, with no information about
+	 the context. Might be better to return list_undefined on a
+	 conversion failure? */
+      pips_user_warning("No function found for \"%s\".\n", c_name);
+    else
+      ml = CONS(ENTITY, m, ml);
+  }
+  free(ds);
+  return ml;
+}
 /*
  *  that is all
  */
