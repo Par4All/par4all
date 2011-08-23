@@ -4276,6 +4276,20 @@ text text_statement_enclosed(entity module,
    */
   list dl = statement_declarations(stmt);
 
+  /* FI: consistency check - incompatible with unfolding*/
+  ifdebug(1) {
+    if(statement_block_p(stmt) && ENDP(dl)) {
+      list idl = statement_to_declarations(stmt);
+      if(!ENDP(idl)) {
+	// Do not forget: the error is detected within the prettyprinter...
+	//print_statement(stmt);
+	print_entities(idl);
+	pips_internal_error("A block statement with no declarations"
+			    " contains declarations");
+      }
+    }
+  }
+
   if (!ENDP(dl) && prettyprint_language_is_c_p()) {
     if(statement_block_p(stmt)) {
       if(!braces_p && !braces_added) {
