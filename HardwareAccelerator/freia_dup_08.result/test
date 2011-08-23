@@ -128,13 +128,12 @@ freia_status freia_dup_08_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
+  spoc_reduction reduc;
+  freia_reduction_results redres;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
