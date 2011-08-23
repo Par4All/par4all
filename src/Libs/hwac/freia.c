@@ -127,7 +127,7 @@ bool freia_skip_op_p(const statement s)
 static void move_ahead(list ls, statement target, sequence sq)
 {
   // for faster list inclusion test
-  set tomove = set_make(hash_pointer);
+  set tomove = set_make(set_pointer);
   set_append_list(tomove, ls);
 
   // build new sequence list in reverse order
@@ -337,7 +337,7 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
   // see sort_subsequence. I guess should rather delay it...
   list lseq = gen_copy_seq(sequence_statements(sq));
 
-  set written = set_make(hash_pointer);
+  set written = set_make(set_pointer);
 
   FOREACH(statement, s, lseq)
   {
@@ -472,8 +472,8 @@ string freia_compile(string module, statement mod_stat, string target)
   if (get_bool_property("FREIA_CAST_IS_COPY"))
     switch_cast_to_copy(mod_stat);
 
-  freia_info fsi = 
-    { NIL, hash_table_make(hash_pointer, 0), 0, set_make(hash_pointer) };
+  freia_info fsi =
+    { NIL, hash_table_make(hash_pointer, 0), 0, set_make(set_pointer) };
   freia_init_dep_cache();
 
   // collect freia api functions...
