@@ -1,20 +1,18 @@
 setenv WS=struct06
+setenv PIPS_CHECK_C=No
+
 delete $WS
 create $WS $WS.c
-
+#setproperty ABORT_ON_USER_ERROR TRUE
 #setenv C_SYNTAX_DEBUG_LEVEL 5
-
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER
 
-display PARSED_PRINTED_FILE[struct05!]
+display PARSED_PRINTED_FILE[$WS!]
 
 apply UNSPLIT
-shell pips_validation_exe.sh  -c -g $WS
 close
-
 delete $WS
-
 quit

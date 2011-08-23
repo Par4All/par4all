@@ -1,4 +1,5 @@
-#
-# compile generated struct06
-#
-## /home/fabien/DEV/PROJECTS/prod/pips/utils/pips_validation_exe.sh expected database struct06.database not found
+### stderr
+user warning in c_parse: Variable "l" is redefined at line 12 (16)
+Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
+user warning in c_parse: Variable "l" is redefined at line 12 (16)
+Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
