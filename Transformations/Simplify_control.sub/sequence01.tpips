@@ -2,6 +2,7 @@ setenv WS=sequence01
 delete $WS
 
 setproperty ABORT_ON_USER_ERROR TRUE
+
 # The source code is wrong, on purpose, to try to reproduce a bug situation
 setenv PIPS_CHECK_C="N"
 
@@ -9,15 +10,15 @@ create $WS $WS.c
 
 module $WS
 
-echo
-echo Parsed printed file
-echo
+echo #
+echo # Parsed printed file
+echo #
 
 display PARSED_PRINTED_FILE
 
-echo
-echo Printed file
-echo
+echo #
+echo # Printed file
+echo #
 
 activate NEW_CONTROLIZER
 
@@ -25,9 +26,12 @@ activate NEW_CONTROLIZER
 
 display PRINTED_FILE
 
+echo #
+echo # simplify control
+echo #
 apply SIMPLIFY_CONTROL[$WS]
-
 display PRINTED_FILE
 
 close
+delete $WS
 quit

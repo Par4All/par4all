@@ -1,6 +1,6 @@
-
-Parsed printed file
-
+#
+# Parsed printed file
+#
 void sequence01()
 {
    int i = 4;
@@ -13,9 +13,9 @@ void sequence01()
    
    return;
 }
-
-Printed file
-
+#
+# Printed file
+#
 void sequence01()
 {
    int i = 4;
@@ -28,11 +28,13 @@ void sequence01()
    
    return;
 }
+#
+# simplify control
+#
 void sequence01()
 {
    int i = 4;
    {
-      int j;
    }
 
    foo(j);
