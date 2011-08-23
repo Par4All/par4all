@@ -50,12 +50,14 @@ TEST	= test
 
 # is it a subversion working copy?
 IS_SVN	= test -d .svn
+CHECK	= $(IS_SVN)
 
 # some parametric commands
-CHECK	= $(IS_SVN)
-DIFF	= svn diff
-UNDO	= svn revert
-LIST	= svn status
+SVN	= svn
+DIFF	= $(SVN) diff
+UNDO	= $(SVN) revert
+LIST	= $(SVN) status
+INFO	= $(SVN) info
 
 # prefix of tests to be run, default is all
 PREFIX	=
@@ -453,7 +455,8 @@ endif # DO_PYPS
 # detect skipped stuff
 .PHONY: skipped
 skipped:
-	for base in $(sort $(basename $(F.src) $(F.exe))) ; do \
+	@[ "$(D.rec)" ] && $(MAKE) FORWARD=skipped $(D.rec) || exit 0
+	@for base in $(sort $(basename $(F.src) $(F.exe))) ; do \
 	  if ! test -d $$base.result ; \
 	  then \
 	    echo "skipped: $(SUBDIR)/$$base" ; \
@@ -466,7 +469,8 @@ skipped:
 # test RESULT directory without any script
 .PHONY: orphan
 orphan:
-	for base in $(sort $(F.list)) ; do \
+	@[ "$(D.rec)" ] && $(MAKE) FORWARD=orphan $(D.rec) || exit 0
+	@for base in $(sort $(F.list)) ; do \
 	  test -f $$base.tpips -o \
 	       -f $$base.tpips2 -o \
 	       -f $$base.test -o \
@@ -480,7 +484,8 @@ orphan:
 # test case with multiple scripts... one is randomly (?) chosen
 .PHONY: multi-script
 multi-script:
-	for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
+	@[ "$(D.rec)" ] && $(MAKE) FORWARD=multi-script $(D.rec) || exit 0
+	@for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
 	do \
 	  echo "multi-script: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
@@ -488,22 +493,35 @@ multi-script:
 # test case with multiple sources (c/f/F...)
 .PHONY: multi-source
 multi-source:
-	for base in $$(echo $(basename $(F.src))|tr ' ' '\012'|sort|uniq -d); \
+	@[ "$(D.rec)" ] && $(MAKE) FORWARD=multi-source $(D.rec) || exit 0
+	@for base in $$(echo $(basename $(F.src))|tr ' ' '\012'|sort|uniq -d); \
 	do \
 	  echo "multi-source: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
 # check that all tpips2 have a corresponding flt
-.PHONY: missing-flt
-missing-flt:
+.PHONY: nofilter
+nofilter:
+	@[ "$(D.rec)" ] && $(MAKE) FORWARD=missing-flt $(D.rec) || exit 0
 	@for f in $(F.tpips2) ; do \
 	  test -e $${f/.tpips2/.flt} || \
 	    echo "nofilter: $(SUBDIR)/$${f/.tpips2/}" ; \
 	done >> $(RESULTS)
 
+# check that *.result/test are indeed under svn
+.PHONY: notest
+notest:
+	@[ "$(D.rec)" ] && $(MAKE) FORWARD=notest $(D.rec) || exit 0
+	@for d in $(F.result) ; do \
+	    $(INFO) $$d/test > /dev/null 2>&1 || \
+	    echo "notest: $(SUBDIR)/$${d/.result/}" ; \
+	done >> $(RESULTS)
+
 # all possible inconsistencies
 .PHONY: inconsistencies
-inconsistencies: skipped orphan multi-source multi-script missing-flt
+inconsistencies: skipped orphan multi-source multi-script nofilter notest
+
+########################################################### LOCAL CHECK HELPERS
 
 # what about nothing?
 # source files without corresponding result directory
