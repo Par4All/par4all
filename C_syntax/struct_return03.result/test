@@ -22,3 +22,6 @@ struct_test foo(int r);
 
 
 int main();
+#
+# compile generated struct_return03
+#

@@ -16,3 +16,6 @@ int main()
 
    return 0;
 }
+#
+# compile generated precedence_operator2
+#

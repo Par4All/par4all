@@ -67,3 +67,6 @@ Layout for memory area "decl30:*STATIC*" of size 0:
 
 End of declarations for module decl30
 
+#
+# compile generated decl30
+#

@@ -22,3 +22,6 @@ int main()
    FUNC fu = functions[0];                                              /*0016*/
    return (*fu)(1,1);                                                   /*0017*/
 }
+#
+# compile generated func_array02
+#

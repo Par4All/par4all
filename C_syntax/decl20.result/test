@@ -66,3 +66,6 @@ void decl20(char *dir)
 {
    dir[0]=='.';
 }
+#
+# compile generated decl20
+#

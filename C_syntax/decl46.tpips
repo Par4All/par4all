@@ -34,7 +34,7 @@ echo
 display CALLGRAPH_FILE[decl46]
 
 apply UNSPLIT
-shell cc -c decl46.database/Src/decl46.c
+shell pips_validation_exe.sh -c -g decl46
 
 close
 delete $WSPC

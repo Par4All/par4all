@@ -17,8 +17,7 @@ echo Compile parsed file one_liner_04
 echo
 
 apply UNSPLIT[%PROGRAM]
-# shell $(PIPS_CC) -c one_liner_04.database/Src/one_liner_04.c ?!?
-shell cc -c one_liner_04.database/Src/one_liner_04.c
+shell pips_validation_exe.sh -c -g one_liner_04
 close
 delete one_liner_04 
 quit

@@ -16,3 +16,6 @@ void decl28(int d)
 {
    d = 1;
 }
+#
+# compile generated decl28
+#

@@ -10,3 +10,6 @@ void * safe_malloc(size_t n)
    else
       return ptr;                                                       /*0014*/
 }
+#
+# compile generated decl42
+#

@@ -21,7 +21,7 @@ echo
 display PRINTED_FILE[safe_malloc]
 
 apply UNSPLIT
-shell cc -c decl49.database/Src/decl49.c
+shell pips_validation_exe.sh -c -g decl49
 
 close
 #delete $WSPC

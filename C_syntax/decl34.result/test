@@ -9,3 +9,6 @@ void decl34(void)
 {
    int i = 0, j = i;                                                    /*0005*/
 }
+#
+# compile generated decl34
+#

@@ -282,3 +282,6 @@ void tridag(double *a, double *b, double *c, double *r, double *u, int n)
       u[j] -= gam[j+1]*u[j+1];
    free_dvector(gam, 1, n);
 }
+#
+# compile generated adi
+#

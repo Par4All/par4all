@@ -8,3 +8,6 @@ typedef struct _hdl_progress_handler {
    const int i;
    int j;
 } HDL_progress_handler;
+#
+# compile generated decl54
+#

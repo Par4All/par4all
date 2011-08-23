@@ -11,7 +11,7 @@ display SYMBOL_TABLE_FILE[decl44]
 display PRINTED_FILE[decl44]
 
 apply UNSPLIT
-shell cc -c decl44.database/Src/decl44.c
+shell pips_validation_exe.sh -c -g decl44
 
 close
 delete $WSPC

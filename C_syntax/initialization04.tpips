@@ -33,7 +33,7 @@ echo
 display PRINTED_FILE[initialization04]
 
 apply UNSPLIT
-shell cc -c initialization04.database/Src/initialization04.c
+shell pips_validation_exe.sh -c -g initialization04
 
 close
 delete initialization04

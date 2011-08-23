@@ -11,3 +11,6 @@ struct s  struct23()
    s.in = 0;
    return s;
 }
+#
+# compile generated struct23
+#

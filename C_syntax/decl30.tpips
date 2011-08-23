@@ -28,9 +28,10 @@ echo
 display SYMBOL_TABLE_FILE[decl30]
 
 apply UNSPLIT
-shell cc -Wall -Werror -c decl30.database/Src/decl30.c
+# -Wall -Werror
+shell pips_validation_exe.sh -c -g decl30
 
 close
-# delete decl30
+delete decl30
 
 quit

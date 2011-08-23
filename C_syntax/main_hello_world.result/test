@@ -2169,3 +2169,6 @@ int main()
    int i = 0;
    printf("Hello, world %d\n", i);
 }
+#
+# compile generated main_hello_world
+#

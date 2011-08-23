@@ -7,3 +7,6 @@ Parsed printed file for "decl31!"
    one. */
 
 void decl31(int n, double a[n]);
+#
+# compile generated decl31
+#

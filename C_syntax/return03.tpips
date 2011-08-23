@@ -38,11 +38,8 @@ apply RESTRUCTURE_CONTROL[return03]
 display PRINTED_FILE[return03]
 
 apply UNSPLIT
-shell ${PIPS_CC:-cc} -c return03.database/Src/return03.c -o return03.database/return03.o
+shell pips_validation_exe.sh -c -g return03
 
 close
-
-
 delete return03
-
 quit

@@ -8,3 +8,6 @@ struct s {
 };
 
 typedef struct s s_t;
+#
+# compile generated decl25
+#

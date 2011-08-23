@@ -5,3 +5,6 @@ int foo(void)
    int bla(void);                                                       /*0005*/
    bla();                                                               /*0006*/
 }
+#
+# compile generated decl40
+#

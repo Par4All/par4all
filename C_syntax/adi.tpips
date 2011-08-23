@@ -37,7 +37,7 @@ echo
 
 apply UNSPLIT[%PROGRAM]
 shell cat adi.database/Src/adi.c
-shell cc -c adi.database/Src/adi.c
+shell pips_validation_exe.sh -c -g adi
 shell rm -f adi.o
 
 close

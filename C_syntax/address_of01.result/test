@@ -95,6 +95,9 @@ int address_of01(int i, REAL *b)
    q = &b[i+j*k];
    x = x+bar(i, &b[i+j*k]);
 }
+#
+# compile generated address_of01
+#
 int address_of01(int i, REAL *b)
 {
    int a[100];

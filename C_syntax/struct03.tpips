@@ -14,8 +14,7 @@ display PRINTED_FILE[%ALL]
 
 apply UNSPLIT
 
-# shell $(PIPS_CC) -c $WS.database/Src/$WS.c
-shell cc -c $WS.database/Src/$WS.c
+shell pips_validation_exe.sh  -c -g $WS
 
 close
 

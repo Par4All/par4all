@@ -11,3 +11,6 @@ typedef struct _hdl_progress_handler {
 const void *next_data;
 
 int i;
+#
+# compile generated decl51
+#

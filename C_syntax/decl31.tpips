@@ -31,7 +31,7 @@ display PARSED_PRINTED_FILE[decl31!]
 #display SYMBOL_TABLE_FILE[decl31]
 
 apply UNSPLIT
-shell cc -c decl31.database/Src/decl31.c
+shell pips_validation_exe.sh -c -g decl31
 
 close
 # delete decl31

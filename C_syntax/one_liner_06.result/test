@@ -46,3 +46,6 @@ _break_3:      ;
 
 Compile parsed file one_liner_06
 
+#
+# compile generated one_liner_06
+#

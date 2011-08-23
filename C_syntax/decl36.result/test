@@ -21,4 +21,7 @@ void decl36(int i);
 int main();
 
 void decl36(int i);
+#
+# compile generated decl36
+#
 

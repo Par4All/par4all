@@ -22,7 +22,7 @@ display PARSED_PRINTED_FILE[typedef04!]
 display PARSED_PRINTED_FILE[typedef04]
 
 apply UNSPLIT
-shell cc -c typedef04.database/Src/typedef04.c
+shell pips_validation_exe.sh -c -g typedef04
 
 close
 delete typedef04
