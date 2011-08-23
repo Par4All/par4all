@@ -1122,9 +1122,18 @@ static void generate_wiring
  * @param p_* variables sent and received from pipeline
  */
 static void freia_spoc_code_buildup
-(string module, string function_name, string_buffer code,
- const string_buffer head, const string_buffer body, const string_buffer tail,
- int n_im_out, int n_im_in, bool some_reductions,
+(string module,
+ string function_name,
+ // buffers which hold different parts of the code
+ string_buffer code,
+ const string_buffer head,
+ const string_buffer body,
+ const string_buffer tail,
+ // number of images in & out
+ int n_im_out, int n_im_in,
+ // parts which may be needed
+ bool some_reductions, bool some_kernels,
+ // input/output parameters
  const string out0, const string out1, const string in0, const string in1)
 {
   // function header: freia_error helper_function(freia_data_2d ...
@@ -1144,6 +1153,13 @@ static void freia_spoc_code_buildup
   // end of headers (some arguments may have been added by stages),
   // and begin the function body
   sb_cat(code, ")\n{\n" FREIA_SPOC_DECL);
+  if (some_reductions)
+    sb_cat(code,
+           "  spoc_reduction reduc;\n"
+           "  freia_reduction_results redres;\n");
+  if (some_kernels) sb_cat(code, "  int i;\n");
+  sb_cat(code, "\n");
+
   sb_cat(code,
          "  // init pipe to nop\n"
          "  spoc_init_pipe(&si, &sp, ", itoa(FREIA_DEFAULT_BPP), ");\n"
@@ -1152,8 +1168,10 @@ static void freia_spoc_code_buildup
   string_buffer_append_sb(code, body);
 
   // generate actual call to the accelerator
-  sb_cat(code,
-         FREIA_SPOC_CALL
+  sb_cat(code, FREIA_SPOC_CALL_START);
+  if (some_reductions)
+    sb_cat(code, FREIA_SPOC_CALL_REDUC);
+  sb_cat(code, FREIA_SPOC_CALL_END
          "  // actual call of spoc hardware\n"
          "  freia_cg_template_process_2i_2o",
          "(&param, ", out0, ", ", out1, ", ", in0, ", ", in1, ");\n",
@@ -1222,7 +1240,7 @@ static _int freia_spoc_pipeline
 {
   hash_table wiring = hash_table_make(hash_int, 128);
   list outs = NIL;
-  bool some_reductions = false;
+  bool some_reductions = false, some_kernels = false;
   int pipeline_depth = get_int_property(spoc_depth_prop);
 
   pips_debug(3, "running on '%s' for %d operations\n",
@@ -1380,6 +1398,7 @@ static _int freia_spoc_pipeline
            freia_extract_params(opid, call_arguments(c), head, hparams, &cst));
 
       some_reductions |= vtxcontent_optype(vc)==spoc_type_mes;
+      some_kernels |= vtxcontent_optype(vc)==spoc_type_poc;
 
       // there may be regressions if it is a little bit out of order...
       // add a comment each time a new stage is started.
@@ -1678,8 +1697,8 @@ static _int freia_spoc_pipeline
 
   // build whole code from various pieces
   freia_spoc_code_buildup(module, helper, code, head, body, tail,
-			  n_im_out, n_im_in, some_reductions,
-			  p_out0, p_out1, p_in0, p_in1);
+                          n_im_out, n_im_in, some_reductions, some_kernels,
+                          p_out0, p_out1, p_in0, p_in1);
 
   // cleanup
   gen_free_list(outs);
