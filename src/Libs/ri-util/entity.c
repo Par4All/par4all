@@ -673,11 +673,9 @@ void set_register_qualifier(entity v)
     //type uvt = ultimate_type(entity_type(v))
     type vt = entity_type(v);
     if(type_variable_p(vt)) {
-      list ql = variable_qualifiers(type_variable(vt));
+      list *ql = &variable_qualifiers(type_variable(vt));
       qualifier q = make_qualifier_register();
-      variable_qualifiers(type_variable(vt)) =
-	gen_nconc(variable_qualifiers(type_variable(vt)),
-		  CONS(QUALIFIER, q , NIL));
+      *ql =	gen_nconc(*ql, CONS(QUALIFIER, q , NIL));
     }
     else
       pips_internal_error("Improper argument\n");
