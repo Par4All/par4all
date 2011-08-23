@@ -31,7 +31,7 @@ echo Result after partial evaluation
 echo
 
 apply UNSPLIT
-shell pips_validation_exe.sh partial_eval12
+shell pips_validation_exe.sh -e 255 partial_eval12
 
 close
 delete partial_eval12

@@ -39,4 +39,3 @@ Result after partial evaluation
 #
 # compile run compare both partial_eval12
 #
-## /home/fabien/DEV/PROJECTS/prod/pips/utils/pips_validation_exe.sh status 255 instead of 0 while executing initial code
