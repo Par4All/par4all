@@ -310,11 +310,17 @@ bool force_register_declarations(const char * module_name)
              CONS(statement, last, l));
     l = gen_nreverse(l);
 
-    // put initial comment on the front statement
-    statement_comments(STATEMENT(CAR(l))) = statement_comments(s);
+    // put initial comment, number & label on the front statement
+    statement front = STATEMENT(CAR(l));
+    statement_comments(front) = statement_comments(s);
     statement_comments(s) = string_undefined;
+    statement_number(front) = statement_number(s);
+    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+    entity no_label = statement_label(front);
+    statement_label(front) = statement_label(s);
+    statement_label(s) = no_label;
 
-    // buid a sequence... what about scoping informations?
+    // now this is a sequence... what about scoping informations & consistency?
     statement_instruction(s) = make_instruction_sequence(make_sequence(l));
   }
 
@@ -325,7 +331,8 @@ bool force_register_declarations(const char * module_name)
 
   debug_off();
 
-  // return result to pipsdbm
+  // cleanup & return result to pipsdbm
+  clean_up_sequences(stat);
   module_reorder(stat);
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stat);
 
