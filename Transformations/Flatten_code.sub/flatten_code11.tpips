@@ -13,14 +13,6 @@ setproperty PRETTYPRINT_EXECUTION_CONTEXT TRUE
 setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
 
 echo
-echo Execute initial code
-echo
-
-shell cc flatten_code11.database/Tmp/flatten_code11.cpp_processed.c -o flatten_code11.out
-shell ./flatten_code11.out
-shell rm flatten_code11.out
-
-echo
 echo Initial code
 echo
 display PRINTED_FILE[flatten_code11]
@@ -45,15 +37,7 @@ echo Unsplit and compile resulting code
 echo
 
 apply UNSPLIT
-# shell cat flatten_code11.database/Src/flatten_code11.c
-shell cc flatten_code11.database/Src/flatten_code11.c -o flatten_code11.out
-
-echo
-echo Execute resulting code
-echo
-
-shell ./flatten_code11.out
-shell rm flatten_code11.out
+shell pips_validation_exe.sh flatten_code11
 
 close
 delete flatten_code11
