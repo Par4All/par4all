@@ -80,8 +80,10 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell cc -O3 silber02.c -o silber02.database/Tmp/ref
-shell cc -O3 include/adds.c silber02.database/Src/silber02.c -o silber02.database/Tmp/out
+
+# hmmm... cannot use pips_validation_exe easilly
+shell ${PIPS_CC:-cc} -O3 silber02.c -o silber02.database/Tmp/ref
+shell ${PIPS_CC:-cc} -O3 include/adds.c silber02.database/Src/silber02.c -o silber02.database/Tmp/out
 shell ./silber02.database/Tmp/ref include/input.pgm include/mapfile.amp silber02.database/Tmp/ref.pgm
 shell ./silber02.database/Tmp/out include/input.pgm include/mapfile.amp silber02.database/Tmp/out.pgm
 shell cmp silber02.database/Tmp/ref.pgm silber02.database/Tmp/out.pgm

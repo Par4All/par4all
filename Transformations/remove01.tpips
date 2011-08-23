@@ -26,8 +26,7 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc -c remove01.database/Src/remove01.c  -o remove01.database/Src/v.o
-shell rm -rf remove01.database/Src/v.o
+shell pips_validation_exe.sh -c -g remove01
 
 close
 delete remove01
