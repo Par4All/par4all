@@ -294,19 +294,27 @@ bool force_register_declarations(const char * module_name)
                       statement_domain, cut_declarations_flt, gen_null);
 
   // perform actual insertions.
-  // attempt at using insert_statement where quite unproductive.
-  // I do an in-place substitution of the master statement instead.
   HASH_FOREACH(statement, s, list, l, cd.newdecls)
   {
     statement last = make_declarations_statement(statement_declarations(s),
                                                  statement_number(s),
                                                  string_undefined);
+
+    // attempt at using insert_statement where quite unproductive:
+    // this make some variables disappear, while others are duplacated.
+    // insert_statement(s, last, true);
+
+    // in-place substitution of the master statement instead.
     statement_declarations(s) = NIL;
     l = CONS(statement, instruction_to_statement(statement_instruction(s)),
              CONS(statement, last, l));
     l = gen_nreverse(l);
+
+    // put initial comment on the front statement
     statement_comments(STATEMENT(CAR(l))) = statement_comments(s);
     statement_comments(s) = string_undefined;
+
+    // buid a sequence... what about scoping informations?
     statement_instruction(s) = make_instruction_sequence(make_sequence(l));
   }
 
