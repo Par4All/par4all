@@ -4281,11 +4281,22 @@ text text_statement_enclosed(entity module,
     if(statement_block_p(stmt) && ENDP(dl)) {
       list idl = statement_to_declarations(stmt);
       if(!ENDP(idl)) {
+	/* This may occur when declaration statements are added using
+	   subsequences by somebody forgetfull of scope issues */
 	// Do not forget: the error is detected within the prettyprinter...
 	//print_statement(stmt);
 	print_entities(idl);
 	pips_internal_error("A block statement with no declarations"
-			    " contains declarations");
+			    " contains declarations\n");
+      }
+    }
+    if(statement_block_p(stmt) && !ENDP(dl)) {
+      /* See for instance
+	 Transformations/Simplify_control.sub/sequence01 */
+      list sl = statement_block(stmt);
+      if(ENDP(sl)) {
+	pips_internal_error("A block statement with declarations"
+			    " contains no declaration statements\n");
       }
     }
   }
