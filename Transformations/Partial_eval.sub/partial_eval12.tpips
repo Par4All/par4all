@@ -16,7 +16,6 @@ echo Result before partial evaluation
 echo
 
 apply UNSPLIT
-shell cc partial_eval12.database/Src/partial_eval12.c -o partial_eval12.database/Tmp/a.out ; ./partial_eval12.database/Tmp/a.out 
 
 apply PARTIAL_EVAL[main]
 
@@ -32,7 +31,7 @@ echo Result after partial evaluation
 echo
 
 apply UNSPLIT
-shell cc partial_eval12.database/Src/partial_eval12.c -o partial_eval12.database/Tmp/a.out ; ./partial_eval12.database/Tmp/a.out 
+shell pips_validation_exe.sh partial_eval12
 
 close
 delete partial_eval12

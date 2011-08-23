@@ -17,10 +17,6 @@ int main()
 
 Result before partial evaluation
 
-pos-pos 3%2=1 (must be 1)
-neg pos (-3)%2=-1 (must be -1)
-pos neg 3%(-2)1 (must be 1)
-neg neg (-3)%(-2)=-1 (must be -1)
 
 "main" file after partial evaluation
 
@@ -40,7 +36,7 @@ int main()
 
 Result after partial evaluation
 
-pos-pos 3%2=1 (must be 1)
-neg pos (-3)%2=-1 (must be -1)
-pos neg 3%(-2)1 (must be 1)
-neg neg (-3)%(-2)=-1 (must be -1)
+#
+# compile run compare both partial_eval12
+#
+## /home/fabien/DEV/PROJECTS/prod/pips/utils/pips_validation_exe.sh status 255 instead of 0 while executing initial code
