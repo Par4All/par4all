@@ -264,6 +264,38 @@ list gen_insert_before(const void * no, const void * o, list l)
   return r;
 }
 
+/* insert nl before or after item in list l, both initial lists are consumed
+   @return the new list
+ */
+list gen_insert_list(list nl, const void * item, list l, bool before)
+{
+  // fast case
+  if (!nl) return l;
+
+  // find insertion position in l
+  list p = NIL, c = l, head;
+  while (c && CHUNK(CAR(c))!=item)
+    p = c, c = CDR(c);
+  message_assert("item is in list", c!=NIL);
+
+  // possibly forward one link if insertion is "after" the item
+  if (!before)
+    p = c, c = CDR(c);
+
+  // link and set list head
+  if (p) // some previous
+    CDR(p) = nl, head = l;
+  else // no previous
+    p = nl, head = nl;
+
+  // forward to link the tail, hold by "c"
+  while (CDR(p)) p = CDR(p);
+  CDR(p) = c;
+
+  // done
+  return head;
+}
+
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
 
 /* @brief reverse a list in place
