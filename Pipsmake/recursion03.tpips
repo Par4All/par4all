@@ -1,10 +1,3 @@
-#!/bin/sh
-
-# test behavior fo pipsmake when resources are touched by user
-
-tpips=${tpips_version:-tpips}
-
-($tpips 2>&1 | sed /db_check_time/d | sed '/file *\//d' ) <<EOF
 delete recursion03
 create recursion03 recursion03.f
 
@@ -14,5 +7,3 @@ make CALLERS[%ALL]
 close
 delete recursion03
 quit
-EOF
-
