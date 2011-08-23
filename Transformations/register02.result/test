@@ -36,10 +36,8 @@ int main(void)
    // scalars
    int in = 1;
    register int ir = 1;
-
    register int kr;
    int kn;
-
    register int nr = 10;
    kr = 3;
    a_int(&in, ir);
@@ -47,10 +45,8 @@ int main(void)
 
    double jn = 2.0;
    register double jr = 2.0;
-
    double ln;
    register double lr;
-
    ln = 17.0;
    lr = 13.0;
    a_double(&ln, lr+17);
@@ -72,7 +68,6 @@ int main(void)
    // struct
    register stuff_t s1r;
    stuff_t s1n;
-
    s1r.data = 10;
    s1n.data = 11;
    a_stuff(&s1n, 18);
