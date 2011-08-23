@@ -1,4 +1,11 @@
-// Make sure that useful scooping is not lost
+// Make sure that useful scoping is not lost: the sequence containing
+// "int j;" must stay a block. simplify_control must delete the spurious
+// declaration "int j;".
+
+// Apparently, simplify_control fails to clean up the declaration list
+// at the block level, which may explain why the empty block is
+// preserved. So the current output is correct, but buggy. An internal
+// consistency check would probably detect the issue.
 
 
 // The C source code is wrong on purpose. This is designed to track a
