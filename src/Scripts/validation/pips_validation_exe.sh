@@ -88,7 +88,8 @@ do
       compile=1 run=1 compare=1 initial=
       message="compile run compare"
       ;;
-    # display
+    # display: do not use, this more for debug...
+    # the display cannot be performed when PIPS_VALIDATION_EXE is off
     -d|--display) display=1
       ;;
     # expected exit status
