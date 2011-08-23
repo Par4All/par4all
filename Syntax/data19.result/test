@@ -50,3 +50,6 @@ C ---- BARILLET -----
       PRINT *, IELEXT                                                   0023
 
       END
+#
+# compile both data19
+#

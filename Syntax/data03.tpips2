@@ -1,13 +1,5 @@
-#!/bin/sh
-
-PIPS_CHECK_FORTRAN="Y"
-export PIPS_CHECK_FORTRAN
-
+setenv PIPS_CHECK_FORTRAN="Y"
 # detect unsupported implied do in data statements
-
-tpips=${tpips_version:-tpips}
-
-($tpips 2>&1 | sed '/file *\//d') <<EOF
 delete data03
 create data03 data03.f
 activate PRINT_CODE_PRECONDITIONS
@@ -15,5 +7,3 @@ display PRINTED_FILE
 close
 delete data03
 quit
-EOF
-

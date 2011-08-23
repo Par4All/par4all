@@ -1,11 +1,4 @@
-#!/bin/sh
-
-PIPS_CHECK_FORTRAN="Y"
-export PIPS_CHECK_FORTRAN
-
-tpips=${tpips_version:-tpips}
-
-($tpips 2>&1 | sed '/file *\//d') <<EOF
+setenv PIPS_CHECK_FORTRAN="Y"
 delete data08
 create data08 data08.f
 
@@ -16,4 +9,3 @@ display PRINTED_FILE[DATA08]
 close
 delete data08
 quit
-EOF
