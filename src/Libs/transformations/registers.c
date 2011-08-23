@@ -83,14 +83,6 @@ static bool drv_reference_flt(const reference r, drv_context * ctx)
   return true;
 }
 
-// ignore sizeof
-static bool drv_sizeof_flt(
-  __attribute__((unused)) const sizeofexpression s,
-  __attribute__((unused)) drv_context * ctx)
-{
-  return false;
-}
-
 /* recurse in object to detect which variables cannot be declared register
  */
 static void drv_collect(gen_chunk * object, drv_context * ctx)
@@ -98,15 +90,20 @@ static void drv_collect(gen_chunk * object, drv_context * ctx)
   gen_context_multi_recurse(object, ctx,
                             call_domain, drv_call_flt, gen_null,
                             reference_domain, drv_reference_flt, gen_null,
-                            sizeofexpression_domain, drv_sizeof_flt, gen_null,
+                            // ignore sizeof
+                            sizeofexpression_domain, gen_false, gen_null,
                             NULL);
 }
 
 /********************************************************** CUT DECLARATIONS */
 
 typedef struct {
+  // entities switched to "register"
   set switched;
+  // statement -> list of declaration statements to insert before it
   hash_table newdecls;
+  // statement -> direct enclosing sequence
+  hash_table outside;
 } cd_context;
 
 static bool cut_declarations_flt(statement s, cd_context * ctx)
@@ -126,13 +123,18 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
       pips_debug(7, " - variable: %s\n", entity_name(vs));
   }
 
+  // check IR consistency
+  sequence sq = (sequence) gen_get_ancestor_type(sequence_domain, s);
+  pips_assert("declaration statement is in a sequence",
+              sq && gen_in_list_p(s, sequence_statements(sq)));
+
   if (ndecls>1)
   {
     // built list of declaration statements
     list lds = NIL;
     // current list of variables
     list nl = NIL;
-    // whether statements in nl re switched or not
+    // whether statements in nl are switched or not
     bool nswitched = false;
     FOREACH(entity, v, decls)
     {
@@ -163,7 +165,7 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
         else // first new list
           nl = CONS(entity, v, NIL), nswitched = true;
       }
-      else // another unchaged variable
+      else // another unchanged variable
       {
         if (nl)
         {
@@ -194,7 +196,8 @@ static bool cut_declarations_flt(statement s, cd_context * ctx)
     // I do not that now because we are still recurring in the statements...
     if (lds)
     {
-      hash_put(ctx->newdecls, s, lds);
+      hash_put(ctx->newdecls, s, gen_nreverse(lds));
+      hash_put(ctx->outside, s, sq);
       // last list kept in current statement
       gen_free_list(statement_declarations(s));
       statement_declarations(s) = gen_nreverse(nl);
@@ -258,8 +261,8 @@ bool force_register_declarations(const char * module_name)
   debug_on("PIPS_REGISTERS_DEBUG_LEVEL");
 
   // collect variables that cannot be registers
-  drv_context ctx = { set_make(hash_pointer) };
-  set switched = set_make(hash_pointer);
+  drv_context ctx = { set_make(set_pointer) };
+  set switched = set_make(set_pointer);
 
   // in the code
   drv_collect((void *) stat, &ctx);
@@ -289,50 +292,38 @@ bool force_register_declarations(const char * module_name)
 
   // now we have to possibly cut declaration lists as they must be homogeneous
   // think of "int i1, r1, i2;" where only r1 switched to register.
-  cd_context cd = { switched, hash_table_make(hash_pointer, 0) };
+  cd_context cd = {
+    switched, hash_table_make(hash_pointer, 0), hash_table_make(hash_pointer, 0)
+  };
   gen_context_recurse(stat, &cd,
                       statement_domain, cut_declarations_flt, gen_null);
 
   // perform actual insertions.
   HASH_FOREACH(statement, s, list, l, cd.newdecls)
   {
-    statement last = make_declarations_statement(statement_declarations(s),
-                                                 statement_number(s),
-                                                 string_undefined);
+    pips_assert("sequence of statement", hash_defined_p(cd.outside, s));
+    sequence sq = (sequence) hash_get(cd.outside, s);
 
-    // attempt at using insert_statement where quite unproductive:
-    // this make some variables disappear, while others are duplacated.
-    // insert_statement(s, last, true);
-
-    // in-place substitution of the master statement instead.
-    statement_declarations(s) = NIL;
-    l = CONS(statement, instruction_to_statement(statement_instruction(s)),
-             CONS(statement, last, l));
-    l = gen_nreverse(l);
-
-    // put initial comment, number & label on the front statement
+    // put initial comment on the front statement
     statement front = STATEMENT(CAR(l));
     statement_comments(front) = statement_comments(s);
     statement_comments(s) = string_undefined;
-    statement_number(front) = statement_number(s);
-    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-    entity no_label = statement_label(front);
-    statement_label(front) = statement_label(s);
-    statement_label(s) = no_label;
 
-    // now this is a sequence... what about scoping informations & consistency?
-    statement_instruction(s) = make_instruction_sequence(make_sequence(l));
+    // link into the sequence
+    sequence_statements(sq) =
+      gen_insert_list(l, s, sequence_statements(sq), true);
   }
 
   // cleanup allocated stuff
   set_free(ctx.invalidated), ctx.invalidated = NULL;
   set_free(switched), switched = NULL;
   hash_table_free(cd.newdecls);
+  hash_table_free(cd.outside);
 
   debug_off();
 
-  // cleanup & return result to pipsdbm
-  clean_up_sequences(stat);
+  // return result to pipsdbm
+  // should not be needed: clean_up_sequences(stat);
   module_reorder(stat);
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stat);
 
