@@ -1,0 +1,42 @@
+
+Parsed printed file
+
+void sequence01()
+{
+   int i = 4;
+   {
+      int j;
+   }
+
+   foo(j);
+   //j = 2;
+   
+   return;
+}
+
+Printed file
+
+void sequence01()
+{
+   int i = 4;
+   {
+      int j;
+   }
+
+   foo(j);
+   //j = 2;
+   
+   return;
+}
+void sequence01()
+{
+   int i = 4;
+   {
+      int j;
+   }
+
+   foo(j);
+   //j = 2;
+   
+   return;
+}
