@@ -24,6 +24,35 @@ extern "C" {
 
 
   /*!  
+    \brief Median imin using kernel declared in 8 connexity and
+    store the result in imout
+
+    The erosion will be done in-place if pointers to imin and imout
+    are equals. The kernel must be an array of nine values
+    [a,b,c,d,e,f,g,h,i] corresponding to the following shape :
+
+    a b c
+
+    d e f
+
+    g h i
+
+    The kernel is centered on "e".
+
+    In order to take into account a specific neighbor during
+    computations, the value at the corresponding index in the kernel
+    must be set to something different of 0. To desactivate a specific
+    neighbor, the corresponding value in the kernel must be set to 0.
+    
+
+    \param[out] imout destination image 
+    \param[in] imin source image
+    \param[in] kernel kernel declaration for the erosion.    
+  */
+  extern freia_status freia_aipo_median_8c(freia_data2d *imout, freia_data2d *imin, const int32_t *kernel);
+ 
+
+  /*!  
     \brief Erode imin using kernel declared in 8 connexity and
     store the result in imout
 

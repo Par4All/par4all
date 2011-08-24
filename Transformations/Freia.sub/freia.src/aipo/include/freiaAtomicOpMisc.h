@@ -93,6 +93,20 @@ extern "C" {
   extern freia_status freia_aipo_threshold(freia_data2d *imout, freia_data2d *imin, int32_t boundinf, int32_t boundsup, bool binarize);
 
 
+  /*!  
+    \brief copy pixel of input to output when immask pixels equal to constant
+
+    Pixels between boundinf and boundsup are conserved. others are replaced by zero :
+    - imout(p) = ( immask(p) == constant) ? imin(p) : 0 )
+
+    \param[out] imout
+    \param[in] imask
+    \param[in] imin
+    \param[in] constant
+    \return error code
+  */    
+  extern freia_status freia_aipo_replace_const(freia_data2d *imout, freia_data2d *immask, freia_data2d *imin, int32_t constant);
+
 
   /*!@}*/
 

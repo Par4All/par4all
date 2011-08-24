@@ -18,6 +18,7 @@ extern "C" {
 #include <freiaCommonDataIO.h>
 #include <freiaCommonIO.h>
 #include <freiaCommonDraw.h>
+#include <freiaCommonInit.h>
 
   /*!
    * \defgroup freia_example Freia Application Example

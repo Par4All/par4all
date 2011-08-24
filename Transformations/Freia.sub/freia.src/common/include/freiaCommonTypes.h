@@ -16,6 +16,10 @@ extern "C" {
 #include <stdbool.h>
 #include <stdio.h>
 #include <stddef.h>
+#include <stdarg.h>
+
+
+
 
   /*!
    * \defgroup freia_common_type Specific declaration of types
@@ -44,7 +48,8 @@ extern "C" {
     FREIA_SIZE_ERROR = -8,
     FREIA_NULL_PARAM = -16,
     FREIA_UNDEF_ERROR = -32,
-    FREIA_NOT_IMPLEMENTED = -64
+    FREIA_NOT_IMPLEMENTED = -64,
+    FREIA_POOL_EXHAUSTED = -128
   }freia_status_enum;
 
 
@@ -61,6 +66,9 @@ extern "C" {
     uint32_t yStartWa;  /*!< Y coordinate of the working area (upper left) */
     uint32_t widthWa;   /*!< Working area width */
     uint32_t heightWa;  /*!< Working area height */
+    uint32_t originalWidth ;    /*!< for openCL. original width */
+    uint32_t clId ; /*!<OpenCL target extension structure */
+
   }freia_data2d;
 
 
@@ -72,6 +80,7 @@ extern "C" {
     uint32_t framewidth;   /*!< frames width*/
     uint32_t frameheight;  /*!< frames height */
     uint32_t framebpp;     /*!< frames bit per pixel */
+    int32_t  framecount;   /*!< max number of frames, -1 for no limit */
     uint32_t vidchan;      /*!< video channel index */
     bool isinput;          /*!< boolean set to true if instance will be dedicated to video input flow  */
     freia_ptr extend;      /*!< pointer to anything (spare) */

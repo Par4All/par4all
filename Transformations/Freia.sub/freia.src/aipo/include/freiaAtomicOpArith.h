@@ -436,6 +436,21 @@ extern "C" {
 
 
 
+  /*!  
+    \brief log2 of input image pixels
+
+    imout(p) = log2(imin(p))
+
+    This operation could be done in-place 
+
+    \param[out] imout destination image 
+    \param[in] imin source image
+    \return error code
+  */
+  extern freia_status freia_aipo_log2(freia_data2d *imout, freia_data2d *imin);
+
+
+
   /*!@}*/
 
 

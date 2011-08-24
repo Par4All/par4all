@@ -17,6 +17,7 @@ const int32_t freia_morpho_kernel_8c[9] = {1,1,1, 1,1,1, 1,1,1};
 const int32_t freia_morpho_kernel_6c[9] = {0,1,1, 1,1,1, 0,1,1};
 const int32_t freia_morpho_kernel_4c[9] = {0,1,0, 1,1,1, 0,1,0};
 
+
 freia_status freia_cipo_erode(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size) {
   int i;
 
@@ -90,6 +91,104 @@ freia_status freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t 
 
   return FREIA_OK;
 }
+
+/* freia_status freia_cipo_erode(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size) { */
+/*   freia_status ret; */
+/*   freia_data2d *imtmp; */
+/*   int i; */
+
+/*   if(freia_common_check_image_window_compat(imout,imin, NULL) != true) { */
+/*     FREIA_ERROR("working areas of images are not compatibles\n"); */
+/*     return FREIA_SIZE_ERROR; */
+/*   } */
+
+/*   if(freia_common_check_image_bpp_compat(imout,imin, NULL) != true) { */
+/*     FREIA_ERROR("bpp of images are not compatibles\n"); */
+/*     return FREIA_SIZE_ERROR; */
+/*   } */
+
+/*   if(size==0) { */
+/*     return freia_aipo_copy(imout,imin); */
+/*   }	        */
+
+/*   imtmp = freia_common_create_data(imout->bpp,  imout->widthWa, imout->heightWa); */
+  
+/*   if (connexity==4) { */
+/*     ret = freia_aipo_erode_8c(imout,imin,freia_morpho_kernel_4c); */
+/*     for(i=1 ; i<size ; i++) { */
+/*       ret |= freia_aipo_copy(imtmp,imout); */
+/*       ret |= freia_aipo_erode_8c(imout,imtmp,freia_morpho_kernel_4c); */
+/*     } */
+/*   } else if (connexity==6) { */
+/*     ret = freia_aipo_erode_6c(imout,imin,freia_morpho_kernel_6c); */
+/*     for(i=1 ; i<size ; i++) { */
+/*       ret |= freia_aipo_copy(imtmp,imout); */
+/*       ret |= freia_aipo_erode_6c(imout,imtmp,freia_morpho_kernel_6c); */
+/*     } */
+/*   } else if (connexity==8) { */
+/*     ret = freia_aipo_erode_8c(imout,imin,freia_morpho_kernel_8c); */
+/*     for(i=1 ; i<size ; i++) { */
+/*       ret |= freia_aipo_copy(imtmp,imout); */
+/*       ret |= freia_aipo_erode_8c(imout,imtmp,freia_morpho_kernel_8c); */
+/*     } */
+/*   } else { */
+/*     ret = FREIA_INVALID_PARAM; */
+/*   } */
+
+/*   ret |= freia_common_destruct_data(imtmp); */
+
+/*   return ret; */
+/* } */
+
+
+
+/* freia_status freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size) { */
+/*   freia_status ret; */
+/*   freia_data2d *imtmp; */
+/*   int i; */
+
+/*   if(freia_common_check_image_window_compat(imout,imin, NULL) != true) { */
+/*     FREIA_ERROR("working areas of images are not compatibles\n"); */
+/*     return FREIA_SIZE_ERROR; */
+/*   } */
+
+/*   if(freia_common_check_image_bpp_compat(imout,imin, NULL) != true) { */
+/*     FREIA_ERROR("bpp of images are not compatibles\n"); */
+/*     return FREIA_SIZE_ERROR; */
+/*   } */
+
+/*   if(size==0) { */
+/*     return freia_aipo_copy(imout,imin); */
+/*   }	        */
+
+/*   imtmp = freia_common_create_data(imout->bpp,  imout->widthWa, imout->heightWa); */
+  
+/*   if (connexity==4) { */
+/*     ret = freia_aipo_dilate_8c(imout,imin,freia_morpho_kernel_4c); */
+/*     for(i=1 ; i<size ; i++) { */
+/*       ret |= freia_aipo_copy(imtmp,imout); */
+/*       ret |= freia_aipo_dilate_8c(imout,imtmp,freia_morpho_kernel_4c); */
+/*     } */
+/*   } else if (connexity==6) { */
+/*     ret = freia_aipo_dilate_6c(imout,imin,freia_morpho_kernel_6c); */
+/*     for(i=1 ; i<size ; i++) { */
+/*       ret |= freia_aipo_copy(imtmp,imout); */
+/*       ret |= freia_aipo_dilate_6c(imout,imtmp,freia_morpho_kernel_6c); */
+/*     } */
+/*   } else if (connexity==8) { */
+/*     ret = freia_aipo_dilate_8c(imout,imin,freia_morpho_kernel_8c); */
+/*     for(i=1 ; i<size ; i++) { */
+/*       ret |= freia_aipo_copy(imtmp,imout); */
+/*       ret |= freia_aipo_dilate_8c(imout,imtmp,freia_morpho_kernel_8c); */
+/*     } */
+/*   } else { */
+/*     ret = FREIA_INVALID_PARAM; */
+/*   } */
+
+/*   ret |= freia_common_destruct_data(imtmp); */
+
+/*   return ret; */
+/* } */
 
 
 
@@ -225,8 +324,8 @@ freia_status freia_cipo_geodesic_reconstruct_erode(freia_data2d *immarker, freia
   ret = freia_aipo_global_vol(immarker, &volcurrent);
 
   do{
-    ret |= freia_cipo_geodesic_erode(immarker,immarker,immask,connexity,1);
     volprevious = volcurrent;
+    ret |= freia_cipo_geodesic_erode(immarker,immarker,immask,connexity,1);
     ret |= freia_aipo_global_vol(immarker, &volcurrent);
   }while(volcurrent != volprevious);
 
@@ -251,8 +350,8 @@ freia_status freia_cipo_geodesic_reconstruct_dilate(freia_data2d *immarker, frei
   ret = freia_aipo_global_vol(immarker, &volcurrent);
 
   do{
-    ret |= freia_cipo_geodesic_dilate(immarker,immarker,immask,connexity,1);
     volprevious = volcurrent;
+    ret |= freia_cipo_geodesic_dilate(immarker,immarker,immask,connexity,1);
     ret |= freia_aipo_global_vol(immarker, &volcurrent);
   }while(volcurrent != volprevious);
 

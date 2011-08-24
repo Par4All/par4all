@@ -13,14 +13,18 @@
 
 
 
-freia_status freia_cipo_fast_correlation(freia_data2d *imout, freia_data2d *imin, freia_data2d *imref,  uint32_t horizon) {
+freia_status freia_cipo_fast_correlation(freia_data2d *imout, freia_data2d *imin, freia_data2d *imref,  uint32_t horizon)
+{
   uint32_t m,n;
   uint32_t sav_xStartWa, sav_yStartWa;
   uint32_t sav_widthWa, sav_heightWa;
   uint32_t sad;
   uint32_t wsize;
-  
-  if((imout==NULL) || (imin==NULL) || (imref==NULL)) {
+
+  if(!(freia_common_check_image_not_null(imout) &&
+       freia_common_check_image_not_null(imin) &&
+       freia_common_check_image_not_null(imref)))
+  {
     FREIA_ERROR("Null pointers\n");
     return FREIA_INVALID_PARAM;
   }
@@ -35,25 +39,26 @@ freia_status freia_cipo_fast_correlation(freia_data2d *imout, freia_data2d *imin
     return FREIA_SIZE_ERROR;
   }
 
-  if(imref->widthWa != (imin->widthWa+2*horizon)) {
+  if(freia_common_check_value_compat(imref->widthWa, imin->widthWa+2*horizon) != true) {
     FREIA_ERROR("working areas of images are not compatibles\n");
     return FREIA_SIZE_ERROR;
   }
 
-  if(imref->heightWa != (imin->heightWa+2*horizon)) {
+  if(freia_common_check_value_compat(imref->heightWa, imin->heightWa+2*horizon) != true) {
     FREIA_ERROR("working areas of images are not compatibles\n");
     return FREIA_SIZE_ERROR;
   }
 
-  if(imout->widthWa != (2*horizon+1)) {
+  if(freia_common_check_value_compat(imout->widthWa, 2*horizon+1) != true) {
     FREIA_ERROR("image output width must be (2*horizon+1)\n");
     return FREIA_SIZE_ERROR;
   }
 
-  if(imout->heightWa != (2*horizon+1)) {
+  if(freia_common_check_value_compat(imout->heightWa, 2*horizon+1) != true) {
     FREIA_ERROR("image output height must be (2*horizon+1)\n");
     return FREIA_SIZE_ERROR;
   }
+
 
   wsize = imin->heightWa * imin->widthWa;
 

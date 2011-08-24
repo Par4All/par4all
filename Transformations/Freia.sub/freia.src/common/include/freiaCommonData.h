@@ -49,7 +49,7 @@ extern "C" {
 					     uint32_t bpp, uint32_t width, uint32_t height);
 
 
-  /**
+ /**
      @brief Create an instance of freia_data2d structure
 
      Example:
@@ -70,6 +70,16 @@ extern "C" {
   extern freia_data2d *freia_common_create_data(uint32_t bpp, uint32_t width, uint32_t height);
 
 
+
+  /**
+     @brief Initialize an existing instance of freia_data2d structure and share the
+     payload with the given freia_data2d
+     
+     @param[out] data pointer to a valid instance of freia_data2d to be initialized
+     @param[in] data_to_share_payload
+     @return error code 
+  */
+  freia_status freia_common_init_data_link(freia_data2d *data, freia_data2d *data_to_share_payload);
 
   /**
      @brief Create an instance of freia_data2d structure and share the
@@ -179,6 +189,15 @@ extern "C" {
   extern bool freia_common_check_image_bpp_compat(freia_data2d *imin1, ...);
 
 
+  /*
+    @brief check if to integer arguments are equals
+   */
+  extern bool freia_common_check_value_compat(int, int);
+
+  /*
+    @brief check that there is indeed an image
+   */
+  extern bool freia_common_check_image_not_null(freia_data2d *);
 
   /**
      
@@ -205,6 +224,8 @@ extern "C" {
 #define freia_common_check_image_window_compat(args...) (true)
 #define freia_common_check_image_size_compat(args...) (true)
 #define freia_common_check_image_bpp_compat(args...) (true)
+#define freia_common_check_value_compat(args...) (true)
+#define freia_common_check_image_not_null(args...) (true)
 #endif /* FREIA_ASSUME_CORRECT_CODE */
 
 #endif
