@@ -7,12 +7,14 @@ delete $WSPACE
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-setenv PIPS_CPP_FLAGS="-I./freia.src/cipo/include -I./freia.src/common/include/ -I./freia.src/aipo/include -I./freia.src/debug/include -DFREIA_ASSUME_CORRECT_CODE "
+setenv PIPS_CPP_FLAGS="-I./freia.src/cipo/include -I./freia.src/common/include/ -I./freia.src/aipo/include -I./freia.src/debug/include -I./freia.src/misc/include -DFREIA_ASSUME_CORRECT_CODE "
 
 create $WSPACE $FILE \
         ./freia.src/cipo/src/freiaComplexOpMorpho.c \
         ./freia.src/cipo/src/freiaComplexOpLinear.c \
-        ./freia.src/cipo/src/freiaComplexOpMeasure.c
+        ./freia.src/cipo/src/freiaComplexOpMeasure.c \
+        ./freia.src/misc/src/freiaExtendedOpenMorpho.c \
+        ./freia.src/misc/src/geometrie.c
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
@@ -36,7 +38,7 @@ echo # initial main
 echo #
 display PRINTED_FILE[main]
 
-setproperty UNFOLDING_CALLEES "median freia_cipo_fast_correlation freia_cipo_global_sad freia_cipo_close freia_cipo_close_tophat freia_cipo_dilate freia_cipo_erode freia_cipo_geodesic_dilate freia_cipo_geodesic_erode freia_cipo_geodesic_reconstruct_close freia_cipo_geodesic_reconstruct_close_tophat freia_cipo_geodesic_reconstruct_dilate freia_cipo_geodesic_reconstruct_dual freia_cipo_geodesic_reconstruct_erode freia_cipo_geodesic_reconstruct_open freia_cipo_geodesic_reconstruct_open_tophat freia_cipo_gradient freia_cipo_inner_gradient freia_cipo_open freia_cipo_open_tophat freia_cipo_outer_gradient freia_cipo_regional_hmaxima freia_cipo_regional_hminima freia_open_8c freia_close_8c"
+setproperty UNFOLDING_CALLEES "freia_ecipo_inf_close freia_ecipo_sup_open freia_ecipo_sup_open2 freia_ecipo_erode freia_ecipo_dilate freia_ecipo_close freia_ecipo_open median freia_cipo_fast_correlation freia_cipo_global_sad freia_cipo_close freia_cipo_close_tophat freia_cipo_dilate freia_cipo_erode freia_cipo_geodesic_dilate freia_cipo_geodesic_erode freia_cipo_geodesic_reconstruct_close freia_cipo_geodesic_reconstruct_close_tophat freia_cipo_geodesic_reconstruct_dilate freia_cipo_geodesic_reconstruct_dual freia_cipo_geodesic_reconstruct_erode freia_cipo_geodesic_reconstruct_open freia_cipo_geodesic_reconstruct_open_tophat freia_cipo_gradient freia_cipo_inner_gradient freia_cipo_open freia_cipo_open_tophat freia_cipo_outer_gradient freia_cipo_regional_hmaxima freia_cipo_regional_hminima freia_open_8c freia_close_8c"
 
 # apply all transformations
 
