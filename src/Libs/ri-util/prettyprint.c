@@ -4276,8 +4276,12 @@ text text_statement_enclosed(entity module,
    */
   list dl = statement_declarations(stmt);
 
-  /* FI: consistency check - incompatible with unfolding*/
+  /* FI: consistency check - incompatible with unfolding */
   ifdebug(1) {
+    /* The real check is that dl and idl are equal, that is
+     ENDP(gen_list_and_not(dl,idl)) && ENDP(gen_list_and_not(idl,dl)),
+     except for the side effects of gen_list_and_not(), so dl and idl
+     should be copied first. */
     if(statement_block_p(stmt) && ENDP(dl)) {
       list idl = statement_to_declarations(stmt);
       if(!ENDP(idl)) {
@@ -4289,6 +4293,8 @@ text text_statement_enclosed(entity module,
 	pips_internal_error("A block statement with no declarations"
 			    " contains declarations\n");
       }
+      else
+	gen_free_list(idl);
     }
     if(statement_block_p(stmt) && !ENDP(dl)) {
       /* See for instance

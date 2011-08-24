@@ -878,11 +878,17 @@ dead_statement_rewrite(statement s)
 	   s);
 
    switch(t) {
-   case is_instruction_sequence:
-       /* It is now dealt with clean_up_sequences_internal() at the
+   case is_instruction_sequence: {
+       /* It is now mostly dealt with clean_up_sequences_internal() at the
           end of the function: */
+     /* Make sure the declaration list at the block level fits the
+	declarations in the sequence in case some where eliminated */
+      list dl = statement_declarations(s);
+      list idl = statement_to_declarations(s);
+      gen_free_list(dl);
+      statement_declarations(s) = idl;
        break;
-
+   }
    case is_instruction_loop:
    case is_instruction_forloop:
    case is_instruction_whileloop:
