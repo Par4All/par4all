@@ -50,32 +50,31 @@ int main()
    int **q, *r, i;
 
 // Points To:
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
 
    q = p;
 
 // Points To:
-// _p_1 -> __p_1_2 , EXACT
-// p -> _p_1 , EXACT
-// q -> _p_1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// p -> _p_1[0] , EXACT
+// q -> _p_1[0] , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    *q = &i;
 
 // Points To:
-// _p_1 -> i , EXACT
-// p -> _p_1 , EXACT
-// q -> _p_1 , EXACT
-// r -> *ANY_MODULE*:*NOWHERE* , EXACT
+// _p_1[0] -> i , EXACT
+// p -> _p_1[0] , EXACT
+// q -> _p_1[0] , EXACT
+// r -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    r = &**q;
 
 // Points To:
-// _p_1 -> i , EXACT
-// p -> _p_1 , EXACT
-// q -> _p_1 , EXACT
+// _p_1[0] -> i , EXACT
+// p -> _p_1[0] , EXACT
+// q -> _p_1[0] , EXACT
 // r -> i , EXACT
 
 
