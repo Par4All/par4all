@@ -241,7 +241,9 @@ if ($aggregate)
 print "directory", " " x 19,"cases  bads success (F+C+T|K+B+L+S) changes...\n";
 for my $dir (sort keys %d)
 {
-  my $failures = $d{$dir}{failed} + $d{$dir}{changed} + $d{$dir}{timeout};
+  my $failures =
+    $d{$dir}{failed} + $d{$dir}{changed} + $d{$dir}{timeout} +
+    $d{$dir}{orphan} + $d{$dir}{notest};
   # dircount may be null if all tests are kept out
   my $dircount = $d{$dir}{passed} + $failures;
 
