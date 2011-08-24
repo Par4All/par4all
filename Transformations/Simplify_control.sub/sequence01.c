@@ -5,7 +5,7 @@
 // Apparently, simplify_control fails to clean up the declaration list
 // at the block level, which may explain why the empty block is
 // preserved. So the current output is correct, but buggy. An internal
-// consistency check would probably detect the issue.
+// consistency check does detect the issue. Now fixed.
 
 
 // The C source code is wrong on purpose. This is designed to track a
@@ -24,7 +24,9 @@ void sequence01()
     int j;
   }
 
+  // j is probably interpreted as an int function...
   foo(j);
+  // even PIPS parser detects that j is not declared...
   //j = 2;
 
   return;
