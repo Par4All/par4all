@@ -184,3 +184,6 @@ int main(void)
    freia_commen_destruct_data(in);
    return 0;
 }
+#
+# compile generated median_1
+#

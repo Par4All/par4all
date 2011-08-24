@@ -64,6 +64,10 @@ echo # processed main
 echo #
 display PRINTED_FILE[main]
 
+# final check
+apply UNSPLIT
+shell pips_validation_exe.sh -c -g $WSPACE
+
 close
 delete $WSPACE
 quit
