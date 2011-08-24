@@ -155,10 +155,9 @@ for my $c (sort keys %new)
 # extract various counts
 my $not_passed = $n{failed} + $n{changed} + $n{timeout};
 my $not_executed = $n{notest} + $n{orphan} + $n{missing};
-my $count = ${not_passed} + ${not_executed} + $n{passed} ;
-my $warned = $n{skipped} + $n{nofilter} + $n{notest} + $n{orphan} +
-    $n{missing} + $n{'multi-script'} + $n{'multi-source'} +
-    $n{keptout} + $n{bug} + $n{later} + $n{slow};
+my $count = ${not_passed} + ${not_executed} + $n{passed};
+my $warned = $n{skipped} + $n{nofilter} +  $n{'multi-script'} +
+    $n{'multi-source'} +  $n{keptout} + $n{bug} + $n{later} + $n{slow};
 
 # status change summary
 my $status_changes = '';
@@ -176,7 +175,11 @@ print
   " * not passed: $not_passed\n" .
   " - failed: $n{failed} (voluntary and unvoluntary core dumps)\n" .
   " - changed: $n{changed} (modified output)\n" .
-  " - timeout: $n{timeout} (time was out)\n";
+  " - timeout: $n{timeout} (time was out)\n" .
+  " * not executed: $not_executed\n" .
+  " - missing: $n{missing} (empty result directory)\n" .
+  " - orphan: $n{orphan} (result available without source nor script)\n" .
+  " - notest: $n{notest} (test files not under svn)\n";
 
 print
   " * status changes:$status_changes\n" .
@@ -191,13 +194,10 @@ print
   " * later: $n{later} (future test case)\n" .
   " * slow: $n{slow} (cases keptout because they take too much time to run)\n" .
   " * skipped: $n{skipped} (source without validation scripts)\n" .
-  " * missing: $n{missing} (empty result directory)\n" .
   " * multi-script: $n{'multi-script'} (more than one validation script)\n" .
   " * multi-source: $n{'multi-source'} " .
     "(source files for test with different suffixes)\n" .
-  " * orphan: $n{orphan} (result available without source nor script)\n" .
-  " * nofilter: $n{nofilter} (tpips2 script without corresponding filter)\n" .
-  " * notest: $n{notest} (test files not under svn)\n"
+  " * nofilter: $n{nofilter} (tpips2 script without corresponding filter)\n"
     if $warned;
 
 print
