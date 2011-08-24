@@ -154,7 +154,8 @@ for my $c (sort keys %new)
 
 # extract various counts
 my $not_passed = $n{failed} + $n{changed} + $n{timeout};
-my $count = $not_passed + $n{passed};
+my $not_executed = $n{notest} + $n{orphan} + $n{missing};
+my $count = ${not_passed} + ${not_executed} + $n{passed} ;
 my $warned = $n{skipped} + $n{nofilter} + $n{notest} + $n{orphan} +
     $n{missing} + $n{'multi-script'} + $n{'multi-source'} +
     $n{keptout} + $n{bug} + $n{later} + $n{slow};
