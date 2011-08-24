@@ -5,6 +5,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty ALIASING_ACROSS_TYPES FALSE
+
 ##TODO: explain
 
 echo 
