@@ -161,7 +161,10 @@ EXCEPT =  [ "$(RECWHAT)" ] && \
 	    ! \( -f $*.bug -o -f $*.later -o -f $*.slow \) ] && \
 	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_F95)" -a -d $*.result -a \( -e $*.f90 -o -e $*.f95 \) ] && \
-	    { echo "keptout: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
+	    { echo "keptout: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  $(INFO) $*.result/test > /dev/null 2>&1 || \
+	    { echo "notest: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
+
 
 # setup running a case
 PF	= @echo "processing $(SUBDIR)/$+" ; \
@@ -354,7 +357,7 @@ ifdef DO_PYPS
 	$(PF) ; $(PYTHON) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 else # no pyps...
 %.validate: %.py
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 endif # DO_PYPS
 
 # default_tpips
@@ -432,19 +435,19 @@ ifdef DO_PYPS
 else # without pyps
 
 %.validate: %.c $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.validate: %.f $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.validate: %.F $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.validate: %.f90 $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.validate: %.f95 $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 endif # DO_PYPS
 
@@ -503,17 +506,9 @@ nofilter:
 	    echo "nofilter: $(SUBDIR)/$${f/.tpips2/}" ; \
 	done >> $(RESULTS)
 
-# check that *.result/test are indeed under svn
-.PHONY: notest
-notest:
-	@for d in $(F.result) ; do \
-	    $(INFO) $$d/test > /dev/null 2>&1 || \
-	    echo "notest: $(SUBDIR)/$${d/.result/}" ; \
-	done >> $(RESULTS)
-
 # all possible inconsistencies
 .PHONY: inconsistencies
-inconsistencies: skipped orphan multi-source multi-script nofilter notest
+inconsistencies: skipped orphan multi-source multi-script nofilter
 	@[ "$(D.rec)" ] && $(MAKE) FORWARD=inconsistencies $(D.rec) || exit 0
 
 ########################################################### LOCAL CHECK HELPERS
