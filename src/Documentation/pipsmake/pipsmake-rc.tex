@@ -10163,6 +10163,20 @@ an imagelet size.
 HWAC_TERAPIX_IMAGELET_MAX_SIZE 0
 \end{PipsProp}
 
+\subsection{OpenCL}
+\label{hwac-opencl}
+
+FREIA compiler for OpenCL target, which may run on both multi-core and GPU.
+
+\begin{PipsMake}
+freia_opencl_compiler  > MODULE.code
+                       > MODULE.callees
+                       > MODULE.opencl_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
 \section{Function Level Transformations}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INLINING

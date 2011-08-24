@@ -70,6 +70,8 @@ static bool fis_call_flt(call c, bool * shuffle)
   return true;
 }
 
+/* @return whether there is an image shuffle, i.e. image pointer assignments
+ */
 static bool freia_image_shuffle(statement s)
 {
   bool shuffle = false;
@@ -89,6 +91,8 @@ static void sctc_call_rwt(call c, int * count)
   }
 }
 
+/* @brief switch all image casts to image copies in "s"
+ */
 static void switch_cast_to_copy(statement s)
 {
   int count = 0;
@@ -153,10 +157,6 @@ static void move_ahead(list ls, statement target, sequence sq)
 
 /******************************************************** REORDER STATEMENTS */
 
-/* I reorder a little bit statements, so that allocs & deallocs are up
- * front or in the back.
- */
-
 /* order two statements for qsort.
  * s1 before s2 => -1
  */
@@ -202,6 +202,9 @@ static int freia_cmp_statement(const statement * s1, const statement * s2)
   return order;
 }
 
+/* reorder a little bit statements, so that allocs & deallocs are up
+ * front or in the back.
+ */
 static void sort_subsequence(list ls, sequence sq)
 {
   set cmp = set_make(set_pointer);
@@ -290,10 +293,15 @@ static bool statement_depends_p(set written, statement s)
 /************************************ RECURSION HELPERS TO EXTRACT SEQUENCES */
 
 typedef struct {
-  list seqs; // of list of statements
-  hash_table sequence; // list of statement -> its owner sequence if any
-  int enclosing_loops; // count kept while recurring
-  set in_loops; // elements in the list encountered in inclosing loops
+  // list of list of statements extracted from sequences
+  list seqs;
+   // list of statement (from seqs) -> its owner sequence if any
+  hash_table sequence;
+  // count kept while recursing
+  int enclosing_loops;
+  // elements in the list encountered in potential inclosing loops,
+  // which impacts recomputed use-def dependencies that can be loop-carried.
+  set in_loops;
 } freia_info;
 
 static bool fsi_loop_flt( __attribute__((unused)) gen_chunk * o,
@@ -481,11 +489,11 @@ string freia_compile(string module, statement mod_stat, string target)
                             // collect sequences
                             sequence_domain, fsi_seq_flt, gen_null,
                             statement_domain, fsi_stmt_flt, gen_null,
-                            // just count enclosing loops...
+                            // just count potential enclosing loops...
                             loop_domain, fsi_loop_flt, fsi_loop_rwt,
                             whileloop_domain, fsi_loop_flt, fsi_loop_rwt,
                             forloop_domain, fsi_loop_flt, fsi_loop_rwt,
-                            unstructured_domain,  fsi_loop_flt, fsi_loop_rwt,
+                            unstructured_domain, fsi_loop_flt, fsi_loop_rwt,
                             NULL);
 
   // check safe return
@@ -561,6 +569,8 @@ string freia_compile(string module, statement mod_stat, string target)
     else if (freia_aipo_p(target))
       allocated = freia_aipo_compile_calls(module, d, ls, occs,
                                            exchanges, n_dags);
+    else if (freia_opencl_p(target))
+      pips_internal_error("OpenCL FREIA target not implemented yet\n");
 
     if (exchanges)
     {

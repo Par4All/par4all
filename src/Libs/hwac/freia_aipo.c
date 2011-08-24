@@ -31,15 +31,20 @@
 
 #include "genC.h"
 #include "misc.h"
-
 #include "linear.h"
 
 #include "ri.h"
 
 #include "freia.h"
-#include "freia_spoc_private.h"
 #include "hwac.h"
 
+/*
+  @brief compile one dag with AIPO optimizations
+  @param ls statements underlying the full dag
+  @param occs image occurences
+  @param exchanges statements to exchange because of dependences
+  @return the list of allocated intermediate images
+*/
 list freia_aipo_compile_calls
 (string module,
  dag fulld,
@@ -51,7 +56,7 @@ list freia_aipo_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  // about aipo statistics: no helper file to put them
+  // about aipo statistics: no helper file to put them...
 
   list added_stats = freia_dag_optimize(fulld, exchanges);
 
