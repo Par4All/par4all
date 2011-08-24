@@ -1,7 +1,4 @@
-#include <freiaDebug.h>
-#include <freiaCommon.h>
-#include <freiaAtomicOp.h>
-#include <freiaComplexOp.h>
+#include "freia.h"
 
 int main(void)
 {
@@ -40,8 +37,8 @@ int main(void)
     binvalue = (maxmotion*motion_th)/100;
 
   freia_aipo_threshold(mv, mv, binvalue, 255, true);
-  freia_cipo_open(t1, mv, 8, 1);
-  freia_cipo_gradient(mv, t1, 8, 1);
+  freia_cipo_open(t1, mv, 8, 10);
+  freia_cipo_gradient(mv, t1, 8, 10);
 
   freia_aipo_sub_const(mv, mv, 1);
   freia_aipo_and_const(mv, mv, 1);
