@@ -24,29 +24,31 @@ int main(void)
    //PIPS generated variable
    freia_status _return0, _return1, _return2, _return3, _return4;
    //PIPS generated variable
-   freia_data2d *imtmp_0;
+   int i_0;
    //PIPS generated variable
    freia_status ret_0;
    //PIPS generated variable
-   int i_0;
-   //PIPS generated variable
-   freia_data2d *imtmp_1;
-   //PIPS generated variable
-   freia_status ret_1;
+   freia_data2d *imtmp_0;
    //PIPS generated variable
    int i_1;
    //PIPS generated variable
-   freia_data2d *imtmp_2;
+   freia_status ret_1;
    //PIPS generated variable
-   freia_status ret_2;
+   freia_data2d *imtmp_1;
    //PIPS generated variable
    int i_2;
    //PIPS generated variable
-   freia_data2d *imtmp_3;
+   freia_status ret_2;
+   //PIPS generated variable
+   freia_data2d *imtmp_2;
+   //PIPS generated variable
+   int i_3;
    //PIPS generated variable
    freia_status ret_3;
    //PIPS generated variable
-   int i_3, i_4;
+   freia_data2d *imtmp_3;
+   //PIPS generated variable
+   int i_4;
    
    
    /* open videos flow */
