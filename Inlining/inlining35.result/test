@@ -3,6 +3,8 @@ int main(int argc, char *argv[])
    int xshift, yshift;
    //PIPS generated variable
    int _return0;
+   
+   /* This program loops forever on purpose */
 l99999:   ;
    if (1)
       ;
@@ -37,14 +39,20 @@ int main(int argc, char *argv[])
    int _return0;
 l99997:   ;
    {
-      //PIPS generated variable
-      int *x0 = &xshift, *y0 = &yshift;
       {
-         int i;
-         for(i = 0; i <= 9; i += 1)
-            // commenting next lines makes unfolding work...
-            *x0 = 18;
-         _return0 = 0;
+         {
+            
+            /* This program loops forever on purpose */
+            //PIPS generated variable
+            int *x0 = &xshift, *y0 = &yshift;
+            {
+               int i;
+               for(i = 0; i <= 9; i += 1)
+                  // commenting next lines makes unfolding work...
+                  *x0 = 18;
+               _return0 = 0;
+            }
+         }
       }
    }
    goto l99997;

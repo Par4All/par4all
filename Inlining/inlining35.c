@@ -11,6 +11,8 @@ int foo(int *x, int *y)
 int main(int argc, char * argv[])
 {
   int xshift, yshift;
+
+  /* This program loops forever on purpose */
   while(1)
   {
     if (0) break;
