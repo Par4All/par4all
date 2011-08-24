@@ -1,20 +1,60 @@
+#
+# initial main
+#
+int main(void)
+{
+   freia_dataio fdin, fdout;
+   freia_data2d *imin, *imout_gradient, *imout_dilate;
+   int32_t measure_min, measure_vol;
+
+   freia_common_open_input(&fdin, 0);
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);
+
+   imin = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imout_dilate = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imout_gradient = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   freia_common_rx_image(imin, &fdin);
+   
+   // 33 "elementary" operation calls (2 + 10 + 2*10+1)
+   // manually optimized library for spoc hardware: 6 calls
+   freia_aipo_global_min(imin, &measure_min);
+   freia_aipo_global_vol(imin, &measure_vol);
+   freia_cipo_dilate(imout_dilate, imin, 8, 10);
+   freia_cipo_gradient(imout_gradient, imin, 8, 10);
+
+   printf("input global min = %d\n", measure_min);
+   printf("input global volume = %d\n", measure_vol);
+
+   freia_common_tx_image(imin, &fdout);
+   freia_common_tx_image(imout_dilate, &fdout);
+   freia_common_tx_image(imout_gradient, &fdout);
+
+   freia_common_destruct_data(imin);
+   freia_common_destruct_data(imout_dilate);
+   freia_common_destruct_data(imout_gradient);
+
+   freia_common_close_input(&fdin);
+   freia_common_close_output(&fdout);
+
+   return 0;
+}
+#
+# processed main
+#
 int main(void)
 {
    freia_dataio fdin, fdout;
    freia_data2d *imin, *imout_gradient, *imout_dilate;
    int32_t measure_min, measure_vol;
    //PIPS generated variable
-   freia_status _return0;
+   register freia_status _return0, _return1, _return2, _return3;
    //PIPS generated variable
-   freia_status _return1;
-   //PIPS generated variable
-   int i_0, i_1, i_2;
-   //PIPS generated variable
-   freia_status _return1_0, _return0_0;
+   register int i_0, i_1, i_2;
    //PIPS generated variable
    freia_data2d *imtmp;
    //PIPS generated variable
-   freia_status ret;
+   register freia_status ret;
 
    freia_common_open_input(&fdin, 0);
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);
@@ -44,9 +84,7 @@ int main(void)
    
    
    _return0 = 0;
-   //PIPS generated variable
-   //PIPS generated variable
-   
+
    imtmp = freia_common_create_data(imout_gradient->bpp, imout_gradient->widthWa, imout_gradient->heightWa);
    
    
@@ -62,7 +100,7 @@ int main(void)
    freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
    
    
-   _return0_0 = 0;
+   _return2 = 0;
    ret = 0;
    
    
@@ -78,11 +116,11 @@ int main(void)
    freia_aipo_erode_8c(imout_gradient, imout_gradient, freia_morpho_kernel_8c);
    
    
-   _return1_0 = 0;
+   _return3 = 0;
    ret |= freia_aipo_sub(imout_gradient, imtmp, imout_gradient);
 
    freia_common_destruct_data(imtmp);
-   _return1_0 = 0;
+   _return1 = 0;
 
    printf("input global min = %d\n", measure_min);
    printf("input global volume = %d\n", measure_vol);

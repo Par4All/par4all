@@ -1,152 +1,186 @@
-freia_status median_2(freia_data2d *o, freia_data2d *i)
+#
+# initial main
+#
+int main(void)
 {
-   int32_t c = 8;
-   freia_status ret;
-   freia_data2d *t = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);
+   freia_dataio fdin, fdout;
+   freia_data2d *out, *in;
+   in = freia_common_create_data(16, 1024, 720);
+   out = freia_common_create_data(16, 1024, 720);
+   freia_common_rx_image(in, &fdin);
+   median(out, in);
+   freia_common_tx_image(out, &fdout);
+   freia_commen_destruct_data(out);
+   freia_commen_destruct_data(in);
+   return 0;
+}
+#
+# processed main
+#
+int main(void)
+{
+   freia_dataio fdin, fdout;
+   freia_data2d *out, *in;
    //PIPS generated variable
-   freia_status _return0, _return1, _return2, _return3, _return4, _return5, _return6, _return7, _return8, _return9, _return10, _return11, _return12, _return13, _return14, _return15, _return16, _return17;
+   register freia_status _return0;
    //PIPS generated variable
-   int i_0, i__0;
+   register freia_status _return1, _return2, _return3, _return4, _return5, _return6, _return7, _return8, _return9, _return10, _return11, _return12, _return13, _return14, _return15, _return16, _return17, _return18;
    //PIPS generated variable
-   freia_status ret_0;
+   register int i_0, i_1;
    //PIPS generated variable
-   int i_1, i_2;
+   register freia_status ret_0;
    //PIPS generated variable
-   freia_status ret_1;
+   register int i_2, i_3;
    //PIPS generated variable
-   int i_3, i_4;
+   register freia_status ret_1;
    //PIPS generated variable
-   freia_status ret_2;
+   register int i_4, i_5;
    //PIPS generated variable
-   int i_5, i__1;
+   register freia_status ret_2;
    //PIPS generated variable
-   freia_status ret_3;
+   register int i_6, i_7;
    //PIPS generated variable
-   int i_6, i_7;
+   register freia_status ret_3;
    //PIPS generated variable
-   freia_status ret_4;
+   register int i_8, i_9;
    //PIPS generated variable
-   int i_8, i_9;
+   register freia_status ret_4;
    //PIPS generated variable
-   freia_status ret_5;
+   register int i_10, i_11;
+   //PIPS generated variable
+   register freia_status ret_5;
+   //PIPS generated variable
+   freia_data2d *t;
+   //PIPS generated variable
+   register freia_status ret_6;
+   //PIPS generated variable
+   register int32_t c = 8;
+   in = freia_common_create_data(16, 1024, 720);
+   out = freia_common_create_data(16, 1024, 720);
+   freia_common_rx_image(in, &fdin);
+   t = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);
    
    
-   freia_aipo_dilate_8c(t, i, freia_morpho_kernel_8c);
-   i__0 = 1;
-   
-   
-   _return6 = 0;
-   ret_0 = 0;
-   
-   
-   freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);
-   i_0 = 1;
-   
-   
-   _return12 = 0;
-   
-   
-   _return0 = ret_0;
-   ret = _return0;
-   
-   
-   freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);
-   i_2 = 1;
-   
-   
-   _return13 = 0;
-   ret_1 = 0;
-   
-   
-   freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);
-   i_1 = 1;
+   freia_aipo_dilate_8c(t, in, freia_morpho_kernel_8c);
+   i_11 = 1;
    
    
    _return7 = 0;
-   
-   
-   _return3 = ret_1;
-   ret |= _return3;
-   
-   
-   freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);
-   i_4 = 1;
-   
-   
-   _return8 = 0;
-   ret_2 = 0;
+   ret_5 = 0;
    
    
    freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);
-   i_3 = 1;
+   i_10 = 1;
    
    
-   _return14 = 0;
+   _return13 = 0;
    
    
-   _return1 = ret_2;
-   ret |= _return1;
-
-   ret |= freia_aipo_inf(o, t, i);
-   
-   
-   freia_aipo_erode_8c(t, i, freia_morpho_kernel_8c);
-   i__1 = 1;
-   
-   
-   _return15 = 0;
-   ret_3 = 0;
-   
-   
-   freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);
-   i_5 = 1;
-   
-   
-   _return9 = 0;
-   
-   
-   _return4 = ret_3;
-   ret |= _return4;
-   
-   
-   freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);
-   i_7 = 1;
-   
-   
-   _return10 = 0;
-   ret_4 = 0;
-   
-   
-   freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);
-   i_6 = 1;
-   
-   
-   _return16 = 0;
-   
-   
-   _return2 = ret_4;
-   ret |= _return2;
+   _return1 = ret_5;
+   ret_6 = _return1;
    
    
    freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);
    i_9 = 1;
    
    
-   _return17 = 0;
-   ret_5 = 0;
+   _return14 = 0;
+   ret_4 = 0;
    
    
    freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);
    i_8 = 1;
    
    
-   _return11 = 0;
+   _return8 = 0;
    
    
-   _return5 = ret_5;
-   ret |= _return5;
+   _return4 = ret_4;
+   ret_6 |= _return4;
+   
+   
+   freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);
+   i_7 = 1;
+   
+   
+   _return9 = 0;
+   ret_3 = 0;
+   
+   
+   freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);
+   i_6 = 1;
+   
+   
+   _return15 = 0;
+   
+   
+   _return2 = ret_3;
+   ret_6 |= _return2;
 
-   ret |= freia_aipo_sup(o, o, t);
-   ret |= freia_common_destruct_data(t);
-   return ret;
+   ret_6 |= freia_aipo_inf(out, t, in);
+   
+   
+   freia_aipo_erode_8c(t, in, freia_morpho_kernel_8c);
+   i_5 = 1;
+   
+   
+   _return16 = 0;
+   ret_2 = 0;
+   
+   
+   freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);
+   i_4 = 1;
+   
+   
+   _return10 = 0;
+   
+   
+   _return5 = ret_2;
+   ret_6 |= _return5;
+   
+   
+   freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);
+   i_3 = 1;
+   
+   
+   _return11 = 0;
+   ret_1 = 0;
+   
+   
+   freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);
+   i_2 = 1;
+   
+   
+   _return17 = 0;
+   
+   
+   _return3 = ret_1;
+   ret_6 |= _return3;
+   
+   
+   freia_aipo_erode_8c(t, t, freia_morpho_kernel_8c);
+   i_1 = 1;
+   
+   
+   _return18 = 0;
+   ret_0 = 0;
+   
+   
+   freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);
+   i_0 = 1;
+   
+   
+   _return12 = 0;
+   
+   
+   _return6 = ret_0;
+   ret_6 |= _return6;
+
+   ret_6 |= freia_aipo_sup(out, out, t);
+   ret_6 |= freia_common_destruct_data(t);
+   _return0 = ret_6;
+   freia_common_tx_image(out, &fdout);
+   freia_commen_destruct_data(out);
+   freia_commen_destruct_data(in);
+   return 0;
 }
