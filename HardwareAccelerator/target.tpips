@@ -52,7 +52,7 @@ echo
 # I have an issue here...
 #touch ${FREIA_TARGET}_FILE[${NAME}]
 #display ${FREIA_TARGET}_FILE[${NAME}]
-shell cat ./${WSPACE}.database/${NAME}/*_helper_functions.c
+shell cat ./${WSPACE}.database/${NAME}/*_helper_functions.c*
 #
 # new function code
 #

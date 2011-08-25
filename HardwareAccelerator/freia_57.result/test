@@ -541,6 +541,158 @@ freia_status freia_57(freia_data2d *o, freia_data2d *io, freia_data2d *i)
    return 0;                                                            /*0008*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_57(freia_data2d *o, freia_data2d *io, freia_data2d *i)
+{
+   freia_aipo_add(o, io, i);                                            /*0006*/
+   freia_aipo_inf(io, o, io);                                           /*0007*/
+   return FREIA_OK;                                                     /*0008*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_57" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+  "io" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+  "io'" [shape=circle];
+
+  // computation vertices
+  "7 <" [shape=trapezium,orientation=270];
+  "7 <" -> "io'";
+  "6 +" [shape=trapezium,orientation=270];
+  "6 +" -> "7 <" [label="o"];
+  "6 +" -> "o";
+  "i" -> "6 +";
+  "io" -> "7 <";
+  "io" -> "6 +";
+}
+// graph for dag "dag_cleaned_0" of module "freia_57" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+  "io" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+  "io'" [shape=circle];
+
+  // computation vertices
+  "7 <" [shape=trapezium,orientation=270];
+  "7 <" -> "io'";
+  "6 +" [shape=trapezium,orientation=270];
+  "6 +" -> "7 <" [label="o"];
+  "6 +" -> "o";
+  "i" -> "6 +";
+  "io" -> "7 <";
+  "io" -> "6 +";
+}
+// graph for dag "freia_57_helper_0_0" of module "freia_57" in dot format
+digraph "freia_57_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+  "io" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+  "io'" [shape=circle];
+
+  // computation vertices
+  "7 <" [shape=trapezium,orientation=270];
+  "7 <" -> "io'";
+  "6 +" [shape=trapezium,orientation=270];
+  "6 +" -> "7 <" [label="o"];
+  "6 +" -> "o";
+  "i" -> "6 +";
+  "io" -> "7 <";
+  "io" -> "6 +";
+}
+// graph for dag "freia_57_helper_0_0_0" of module "freia_57" in dot format
+digraph "freia_57_helper_0_0_0" {
+  // inputs
+  "i" [shape=circle];
+  "io" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+  "io'" [shape=circle];
+
+  // computation vertices
+  "7 <" [shape=trapezium,orientation=270];
+  "7 <" -> "io'";
+  "6 +" [shape=trapezium,orientation=270];
+  "6 +" -> "7 <" [label="o"];
+  "6 +" -> "o";
+  "i" -> "6 +";
+  "io" -> "7 <";
+  "io" -> "6 +";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
+
+// helper function freia_57_helper_0_0_0
+freia_status freia_57_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1)
+{
+  call opencl kernel freia_57_helper_0_0_0(o0, o1, i0, i1);
+  return FREIA_OK;
+}
+// generated opencl for function freia_57
+
+// opencl for dag 0
+
+// opencl function freia_57_helper_0_0_0
+kernel freia_57_helper_0_0_0(
+  opencl image o0,
+  opencl image o1,
+  const opencl image i0,
+  const opencl image i1)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    // pixel computations
+    register pixel t6 = PIXEL_ADD(in1, in0);
+    register pixel t7 = PIXEL_INF(t6, in1);
+    // set output pixels
+    o0[i] = t6;
+    o1[i] = t7;
+  }
+}
+
+! updated function
+
+freia_status freia_57(freia_data2d *o, freia_data2d *io, freia_data2d *i)
+{
+   freia_57_helper_0_0_0(o, io, i, io);                                 /*0006*/
+   return FREIA_OK;                                                     /*0008*/
+}
+
+! cleaned up function
+
+freia_status freia_57(freia_data2d *o, freia_data2d *io, freia_data2d *i)
+{
+   freia_57_helper_0_0_0(o, io, i, io);                                 /*0006*/
+   return 0;                                                            /*0008*/
+}
+#
 # FREIA COMPILATION DONE
 #
 

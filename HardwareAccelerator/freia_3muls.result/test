@@ -553,6 +553,161 @@ void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_da
    freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0005*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_data2d *in1)
+{
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128);           /*0004*/
+   freia_aipo_mul(t0, in0, in1);                                        /*0005*/
+   freia_aipo_mul(o1, in0, in1);                                        /*0006*/
+   freia_aipo_mul(o2, t0, o1);                                          /*0007*/
+   freia_common_destruct_data(t0);                                      /*0008*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_3muls" in dot format
+digraph "dag_0" {
+  // inputs
+  "in0" [shape=circle];
+  "in1" [shape=circle];
+
+  // outputs
+  "o1" [shape=circle];
+  "o2" [shape=circle];
+
+  // computation vertices
+  "7 *" [shape=trapezium,orientation=270];
+  "7 *" -> "o2";
+  "6 *" [shape=trapezium,orientation=270];
+  "6 *" -> "7 *" [label="o1"];
+  "6 *" -> "o1";
+  "5 *" [shape=trapezium,orientation=270];
+  "5 *" -> "7 *" [label="t0"];
+  "in1" -> "6 *";
+  "in1" -> "5 *";
+  "in0" -> "6 *";
+  "in0" -> "5 *";
+}
+// graph for dag "dag_cleaned_0" of module "freia_3muls" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in0" [shape=circle];
+  "in1" [shape=circle];
+
+  // outputs
+  "o1" [shape=circle];
+  "o2" [shape=circle];
+
+  // computation vertices
+  "7 *" [shape=trapezium,orientation=270];
+  "7 *" -> "o2";
+  "5 *" [shape=trapezium,orientation=270];
+  "5 *" -> "7 *" [label="o1"];
+  "5 *" -> "7 *" [label="o1"];
+  "5 *" -> "o1";
+  "in1" -> "5 *";
+  "in0" -> "5 *";
+}
+// graph for dag "freia_3muls_helper_0_0" of module "freia_3muls" in dot format
+digraph "freia_3muls_helper_0_0" {
+  // inputs
+  "in0" [shape=circle];
+  "in1" [shape=circle];
+
+  // outputs
+  "o1" [shape=circle];
+  "o2" [shape=circle];
+
+  // computation vertices
+  "7 *" [shape=trapezium,orientation=270];
+  "7 *" -> "o2";
+  "5 *" [shape=trapezium,orientation=270];
+  "5 *" -> "7 *" [label="o1"];
+  "5 *" -> "7 *" [label="o1"];
+  "5 *" -> "o1";
+  "in1" -> "5 *";
+  "in0" -> "5 *";
+}
+// graph for dag "freia_3muls_helper_0_0_0" of module "freia_3muls" in dot format
+digraph "freia_3muls_helper_0_0_0" {
+  // inputs
+  "in0" [shape=circle];
+  "in1" [shape=circle];
+
+  // outputs
+  "o1" [shape=circle];
+  "o2" [shape=circle];
+
+  // computation vertices
+  "7 *" [shape=trapezium,orientation=270];
+  "7 *" -> "o2";
+  "5 *" [shape=trapezium,orientation=270];
+  "5 *" -> "7 *" [label="o1"];
+  "5 *" -> "7 *" [label="o1"];
+  "5 *" -> "o1";
+  "in1" -> "5 *";
+  "in0" -> "5 *";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 3 ops and 0 copies, optimized to 2 ops and 0+0 copies
+
+// helper function freia_3muls_helper_0_0_0
+freia_status freia_3muls_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1)
+{
+  call opencl kernel freia_3muls_helper_0_0_0(o0, o1, i0, i1);
+  return FREIA_OK;
+}
+// generated opencl for function freia_3muls
+
+// opencl for dag 0
+
+// opencl function freia_3muls_helper_0_0_0
+kernel freia_3muls_helper_0_0_0(
+  opencl image o0,
+  opencl image o1,
+  const opencl image i0,
+  const opencl image i1)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    // pixel computations
+    register pixel t5 = PIXEL_MUL(in0, in1);
+    register pixel t7 = PIXEL_MUL(t5, t5);
+    // set output pixels
+    o0[i] = t5;
+    o1[i] = t7;
+  }
+}
+
+! updated function
+
+void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_data2d *in1)
+{
+   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0005*/
+}
+
+! cleaned up function
+
+void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_data2d *in1)
+{
+   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0005*/
+}
+#
 # FREIA COMPILATION DONE
 #
 

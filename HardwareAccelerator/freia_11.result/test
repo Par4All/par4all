@@ -434,6 +434,93 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
    return 0;                                                            /*0009*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_11(freia_data2d *o, freia_data2d *i)
+{
+   // input used twice
+   // o = i - i
+   freia_aipo_sub(o, i, i);                                             /*0008*/
+   return FREIA_OK;                                                     /*0009*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_11" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+// graph for dag "dag_cleaned_0" of module "freia_11" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+// graph for dag "freia_11_helper_0_0" of module "freia_11" in dot format
+digraph "freia_11_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 -" [shape=trapezium,orientation=270];
+  "8 -" -> "o";
+  "i" -> "8 -";
+  "i" -> "8 -";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// generated opencl for function freia_11
+
+// opencl for dag 0
+
+! updated function
+
+freia_status freia_11(freia_data2d *o, freia_data2d *i)
+{
+   // input used twice
+   // o = i - i
+   freia_aipo_sub(o, i, i);                                             /*0008*/
+   return FREIA_OK;                                                     /*0009*/
+}
+
+! cleaned up function
+
+freia_status freia_11(freia_data2d *o, freia_data2d *i)
+{
+   // input used twice
+   // o = i - i
+   freia_aipo_sub(o, i, i);                                             /*0008*/
+   return 0;                                                            /*0009*/
+}
+#
 # FREIA COMPILATION DONE
 #
 

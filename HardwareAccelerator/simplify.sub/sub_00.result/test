@@ -579,6 +579,152 @@ void sub_00(freia_data2d *o, freia_data2d *i)
    sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0007*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+void sub_00(freia_data2d *o, freia_data2d *i)
+{
+   int32_t seuil;                                                       /*0005*/
+   freia_data2d *t;                                                     /*0006*/
+   freia_aipo_sub(i, i, i);                                             /*0007*/
+   t = freia_common_create_data(16, 128, 128);                          /*0008*/
+   freia_aipo_xor_const(t, i, 111);                                     /*0009*/
+   freia_aipo_threshold(o, t, 8, 100, true);                            /*0010*/
+   freia_common_destruct_data(t);                                       /*0011*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "sub_00" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "i'" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "10 thr" [shape=parallelogram];
+  "10 thr" -> "o";
+  "9 ^." [shape=trapezium,orientation=270];
+  "9 ^." -> "10 thr" [label="t"];
+  "7 -" [shape=trapezium,orientation=270];
+  "7 -" -> "9 ^." [label="i"];
+  "7 -" -> "i'";
+  "i" -> "7 -";
+  "i" -> "7 -";
+}
+// graph for dag "dag_cleaned_0" of module "sub_00" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "10 thr" [shape=parallelogram];
+  "10 thr" -> "o";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "10 thr" [label="t"];
+  "7 C" [shape=trapezium,orientation=270];
+  "7 C" -> "i";
+}
+// graph for dag "sub_00_helper_0_0" of module "sub_00" in dot format
+digraph "sub_00_helper_0_0" {
+  // inputs
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "10 thr" [shape=parallelogram];
+  "10 thr" -> "o";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "10 thr" [label="t"];
+  "7 C" [shape=trapezium,orientation=270];
+  "7 C" -> "i";
+}
+// graph for dag "sub_00_helper_0_0_0" of module "sub_00" in dot format
+digraph "sub_00_helper_0_0_0" {
+  // inputs
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "10 thr" [shape=parallelogram];
+  "10 thr" -> "o";
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "10 thr" [label="t"];
+  "7 C" [shape=trapezium,orientation=270];
+  "7 C" -> "i";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+
+// helper function sub_00_helper_0_0_0
+freia_status sub_00_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2,
+  int32_t c3,
+  int32_t c4)
+{
+  call opencl kernel sub_00_helper_0_0_0(o0, o1, c0, c1, c2, c3, c4);
+  return FREIA_OK;
+}
+// generated opencl for function sub_00
+
+// opencl for dag 0
+
+// opencl function sub_00_helper_0_0_0
+kernel sub_00_helper_0_0_0(
+  opencl image o0,
+  opencl image o1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2,
+  int32_t c3,
+  int32_t c4)
+{
+  for (i)
+  {
+    // pixel computations
+    register pixel t7 = PIXEL_SET_CONST(c0);
+    register pixel t9 = PIXEL_SET_CONST(c1);
+    register pixel t10 = PIXEL_THRESHOLD(t9, c2, c3, c4);
+    // set output pixels
+    o0[i] = t7;
+    o1[i] = t10;
+  }
+}
+
+! updated function
+
+void sub_00(freia_data2d *o, freia_data2d *i)
+{
+   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);                   /*0007*/
+}
+
+! cleaned up function
+
+void sub_00(freia_data2d *o, freia_data2d *i)
+{
+   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0007*/
+}
+#
 # FREIA COMPILATION DONE
 #
 

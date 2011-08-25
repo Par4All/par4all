@@ -2075,6 +2075,449 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    return 0;                                                            /*0048*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia_data2d *stab, int motion_a, int motion_b, int motion_trig, int motion_th)
+{
+   
+   
+   
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);         /*0011*/
+   int binvalue, maxmotion, minmotion;                                  /*0012*/
+
+   freia_aipo_absdiff(mv, in, bg);                                      /*0014*/
+   
+   // bg update
+   freia_aipo_copy(t0, in);                                             /*0017*/
+   freia_aipo_mul_const(t0, t0, motion_a);                              /*0018*/
+   freia_aipo_mul_const(bg, bg, motion_b);                              /*0019*/
+   freia_aipo_add(bg, bg, t0);                                          /*0020*/
+   freia_aipo_div_const(bg, bg, motion_a+motion_b);                     /*0021*/
+   
+   // measure
+   freia_aipo_global_max(mv, &maxmotion);                               /*0024*/
+   freia_aipo_global_min(mv, &minmotion);                               /*0025*/
+   if (maxmotion-minmotion>motion_trig)                                 /*0027*/
+      binvalue = maxmotion*motion_th/100;                               /*0028*/
+
+   freia_aipo_threshold(mv, mv, binvalue, 255, true);                   /*0030*/
+   
+   // open
+   freia_aipo_erode_8c(t1, mv, freia_morpho_kernel_8c);                 /*0033*/
+   freia_aipo_dilate_8c(t1, t1, freia_morpho_kernel_8c);                /*0034*/
+   
+   // gradient
+   freia_aipo_dilate_8c(t2, t1, freia_morpho_kernel_8c);                /*0037*/
+   freia_aipo_erode_8c(mv, t1, freia_morpho_kernel_8c);                 /*0038*/
+   freia_aipo_sub(mv, t2, mv);                                          /*0039*/
+
+   freia_aipo_sub_const(mv, mv, 1);                                     /*0041*/
+   freia_aipo_and_const(mv, mv, 1);                                     /*0042*/
+   freia_aipo_mul(mv, stab, mv);                                        /*0043*/
+
+   freia_common_destruct_data(t0);                                      /*0045*/
+   freia_common_destruct_data(t1);                                      /*0046*/
+   freia_common_destruct_data(t2);                                      /*0047*/
+   return FREIA_OK;                                                     /*0048*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "vs_core" in dot format
+digraph "dag_0" {
+  // inputs
+  "bg" [shape=circle];
+  "in" [shape=circle];
+  "stab" [shape=circle];
+
+  // outputs
+  "bg'" [shape=circle];
+  "mv" [shape=circle];
+
+  // computation vertices
+  "43 *" [shape=trapezium,orientation=270];
+  "43 *" -> "mv";
+  "stab" -> "43 *";
+  "42 &." [shape=trapezium,orientation=270];
+  "42 &." -> "43 *" [label="mv"];
+  "41 -." [shape=trapezium,orientation=270];
+  "41 -." -> "42 &." [label="mv"];
+  "39 -" [shape=trapezium,orientation=270];
+  "39 -" -> "41 -." [label="mv"];
+  "38 E8" [shape=box];
+  "38 E8" -> "39 -" [label="mv"];
+  "37 D8" [shape=box];
+  "37 D8" -> "39 -" [label="t2"];
+  "34 D8" [shape=box];
+  "34 D8" -> "38 E8" [label="t1"];
+  "34 D8" -> "37 D8" [label="t1"];
+  "33 E8" [shape=box];
+  "33 E8" -> "34 D8" [label="t1"];
+  "30 thr" [shape=parallelogram];
+  "30 thr" -> "33 E8" [label="mv"];
+  "27 ?" [shape=none];
+  "27 ?" -> "30 thr" [arrowhead=empty,label="binvalue"];
+  "25 min" [shape=diamond];
+  "25 min" -> "27 ?" [arrowhead=empty,label="minmotion"];
+  "24 max" [shape=diamond];
+  "24 max" -> "27 ?" [arrowhead=empty,label="maxmotion"];
+  "21 /." [shape=trapezium,orientation=270];
+  "21 /." -> "bg'";
+  "20 +" [shape=trapezium,orientation=270];
+  "20 +" -> "21 /." [label="bg"];
+  "19 *." [shape=trapezium,orientation=270];
+  "19 *." -> "20 +" [label="bg"];
+  "18 *." [shape=trapezium,orientation=270];
+  "18 *." -> "20 +" [label="t0"];
+  "17 =" [shape=circle];
+  "17 =" -> "18 *." [label="t0"];
+  "14 -|" [shape=trapezium,orientation=270];
+  "14 -|" -> "30 thr" [label="mv"];
+  "14 -|" -> "25 min" [label="mv"];
+  "14 -|" -> "24 max" [label="mv"];
+  "bg" -> "19 *.";
+  "bg" -> "14 -|";
+  "in" -> "17 =";
+  "in" -> "14 -|";
+}
+// graph for dag "dag_cleaned_0" of module "vs_core" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "bg" [shape=circle];
+  "in" [shape=circle];
+  "stab" [shape=circle];
+
+  // outputs
+  "bg'" [shape=circle];
+  "mv" [shape=circle];
+
+  // computation vertices
+  "43 *" [shape=trapezium,orientation=270];
+  "43 *" -> "mv";
+  "stab" -> "43 *";
+  "42 &." [shape=trapezium,orientation=270];
+  "42 &." -> "43 *" [label="mv_1"];
+  "41 +." [shape=trapezium,orientation=270];
+  "41 +." -> "42 &." [label="mv_2"];
+  "39 -" [shape=trapezium,orientation=270];
+  "39 -" -> "41 +." [label="mv_3"];
+  "38 E8" [shape=box];
+  "38 E8" -> "39 -" [label="mv_4"];
+  "37 D8" [shape=box];
+  "37 D8" -> "39 -" [label="t2"];
+  "34 D8" [shape=box];
+  "34 D8" -> "38 E8" [label="t1"];
+  "34 D8" -> "37 D8" [label="t1"];
+  "33 E8" [shape=box];
+  "33 E8" -> "34 D8" [label="t1_1"];
+  "30 thr" [shape=parallelogram];
+  "30 thr" -> "33 E8" [label="mv_5"];
+  "27 ?" [shape=none];
+  "27 ?" -> "30 thr" [arrowhead=empty,label="binvalue"];
+  "25 min" [shape=diamond];
+  "25 min" -> "27 ?" [arrowhead=empty,label="minmotion"];
+  "24 max" [shape=diamond];
+  "24 max" -> "27 ?" [arrowhead=empty,label="maxmotion"];
+  "21 /." [shape=trapezium,orientation=270];
+  "21 /." -> "bg'";
+  "20 +" [shape=trapezium,orientation=270];
+  "20 +" -> "21 /." [label="bg_1"];
+  "19 *." [shape=trapezium,orientation=270];
+  "19 *." -> "20 +" [label="bg_2"];
+  "18 *." [shape=trapezium,orientation=270];
+  "18 *." -> "20 +" [label="t0"];
+  "14 -|" [shape=trapezium,orientation=270];
+  "14 -|" -> "30 thr" [label="mv_6"];
+  "14 -|" -> "25 min" [label="mv_6"];
+  "14 -|" -> "24 max" [label="mv_6"];
+  "bg" -> "19 *.";
+  "bg" -> "14 -|";
+  "in" -> "18 *.";
+  "in" -> "14 -|";
+}
+// graph for dag "vs_core_helper_0_0" of module "vs_core" in dot format
+digraph "vs_core_helper_0_0" {
+  // inputs
+  "bg" [shape=circle];
+  "in" [shape=circle];
+
+  // outputs
+  "mv_6" [shape=circle];
+  "bg'" [shape=circle];
+
+  // computation vertices
+  "25 min" [shape=diamond];
+  "24 max" [shape=diamond];
+  "21 /." [shape=trapezium,orientation=270];
+  "21 /." -> "bg'";
+  "20 +" [shape=trapezium,orientation=270];
+  "20 +" -> "21 /." [label="bg_1"];
+  "19 *." [shape=trapezium,orientation=270];
+  "19 *." -> "20 +" [label="bg_2"];
+  "18 *." [shape=trapezium,orientation=270];
+  "18 *." -> "20 +" [label="t0"];
+  "14 -|" [shape=trapezium,orientation=270];
+  "14 -|" -> "25 min" [label="mv_6"];
+  "14 -|" -> "24 max" [label="mv_6"];
+  "14 -|" -> "mv_6";
+  "bg" -> "19 *.";
+  "bg" -> "14 -|";
+  "in" -> "18 *.";
+  "in" -> "14 -|";
+}
+// graph for dag "vs_core_helper_0_0_0" of module "vs_core" in dot format
+digraph "vs_core_helper_0_0_0" {
+  // inputs
+  "bg" [shape=circle];
+  "in" [shape=circle];
+
+  // outputs
+  "mv_6" [shape=circle];
+  "bg'" [shape=circle];
+
+  // computation vertices
+  "21 /." [shape=trapezium,orientation=270];
+  "21 /." -> "bg'";
+  "20 +" [shape=trapezium,orientation=270];
+  "20 +" -> "21 /." [label="bg_1"];
+  "19 *." [shape=trapezium,orientation=270];
+  "19 *." -> "20 +" [label="bg_2"];
+  "18 *." [shape=trapezium,orientation=270];
+  "18 *." -> "20 +" [label="t0"];
+  "14 -|" [shape=trapezium,orientation=270];
+  "14 -|" -> "mv_6";
+  "bg" -> "19 *.";
+  "bg" -> "14 -|";
+  "in" -> "18 *.";
+  "in" -> "14 -|";
+}
+// graph for dag "vs_core_helper_0_1" of module "vs_core" in dot format
+digraph "vs_core_helper_0_1" {
+  // inputs
+  "mv_6" [shape=circle];
+  "stab" [shape=circle];
+
+  // outputs
+  "mv" [shape=circle];
+
+  // computation vertices
+  "43 *" [shape=trapezium,orientation=270];
+  "43 *" -> "mv";
+  "stab" -> "43 *";
+  "42 &." [shape=trapezium,orientation=270];
+  "42 &." -> "43 *" [label="mv_1"];
+  "41 +." [shape=trapezium,orientation=270];
+  "41 +." -> "42 &." [label="mv_2"];
+  "39 -" [shape=trapezium,orientation=270];
+  "39 -" -> "41 +." [label="mv_3"];
+  "38 E8" [shape=box];
+  "38 E8" -> "39 -" [label="mv_4"];
+  "37 D8" [shape=box];
+  "37 D8" -> "39 -" [label="t2"];
+  "34 D8" [shape=box];
+  "34 D8" -> "38 E8" [label="t1"];
+  "34 D8" -> "37 D8" [label="t1"];
+  "33 E8" [shape=box];
+  "33 E8" -> "34 D8" [label="t1_1"];
+  "30 thr" [shape=parallelogram];
+  "30 thr" -> "33 E8" [label="mv_5"];
+  "mv_6" -> "30 thr";
+}
+// graph for dag "vs_core_helper_0_1_2" of module "vs_core" in dot format
+digraph "vs_core_helper_0_1_2" {
+  // inputs
+  "t2" [shape=circle];
+  "mv_4" [shape=circle];
+  "stab" [shape=circle];
+
+  // outputs
+  "mv" [shape=circle];
+
+  // computation vertices
+  "43 *" [shape=trapezium,orientation=270];
+  "43 *" -> "mv";
+  "stab" -> "43 *";
+  "42 &." [shape=trapezium,orientation=270];
+  "42 &." -> "43 *" [label="mv_1"];
+  "41 +." [shape=trapezium,orientation=270];
+  "41 +." -> "42 &." [label="mv_2"];
+  "39 -" [shape=trapezium,orientation=270];
+  "39 -" -> "41 +." [label="mv_3"];
+  "mv_4" -> "39 -";
+  "t2" -> "39 -";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 16 ops and 1 copies, optimized to 16 ops and 0+0 copies
+
+// helper function vs_core_helper_0_0_0
+freia_status vs_core_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  call opencl kernel vs_core_helper_0_0_0(o0, o1, i0, i1, c0, c1, c2);
+  return FREIA_OK;
+}
+
+// helper function vs_core_helper_0_1_2
+freia_status vs_core_helper_0_1_2(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const freia_data2d * i2,
+  int32_t c0,
+  int32_t c1)
+{
+  call opencl kernel vs_core_helper_0_1_2(o0, i0, i1, i2, c0, c1);
+  return FREIA_OK;
+}
+// generated opencl for function vs_core
+
+// opencl for dag 0
+
+// opencl function vs_core_helper_0_0_0
+kernel vs_core_helper_0_0_0(
+  opencl image o0,
+  opencl image o1,
+  const opencl image i0,
+  const opencl image i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    // pixel computations
+    register pixel t14 = PIXEL_ABSDIFF(in1, in0);
+    register pixel t18 = PIXEL_MUL_CONST(in1, c0);
+    register pixel t19 = PIXEL_MUL_CONST(in0, c1);
+    register pixel t20 = PIXEL_ADD(t19, t18);
+    register pixel t21 = PIXEL_DIV_CONST(t20, c2);
+    // set output pixels
+    o0[i] = t14;
+    o1[i] = t21;
+  }
+}
+
+// opencl function vs_core_helper_0_1_2
+kernel vs_core_helper_0_1_2(
+  opencl image o0,
+  const opencl image i0,
+  const opencl image i1,
+  const opencl image i2,
+  int32_t c0,
+  int32_t c1)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    register pixel in2 = i2[i];
+    // pixel computations
+    register pixel t39 = PIXEL_SUB(in0, in1);
+    register pixel t41 = PIXEL_ADD_CONST(t39, c0);
+    register pixel t42 = PIXEL_AND_CONST(t41, c1);
+    register pixel t43 = PIXEL_MUL(in2, t42);
+    // set output pixels
+    o0[i] = t43;
+  }
+}
+
+! updated function
+
+freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia_data2d *stab, int motion_a, int motion_b, int motion_trig, int motion_th)
+{
+   
+   
+   
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0011*/
+   int binvalue, maxmotion, minmotion;                                  /*0012*/
+   // hardware accelerator generated variable
+   freia_data2d *mv_4 = freia_common_create_data(mv->bpp, mv->widthWa, mv->heightWa);
+
+   vs_core_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, motion_a+motion_b);        /*0014*/
+   
+   // bg update
+   
+   // measure
+   freia_aipo_global_max(mv, &maxmotion);                               /*0024*/
+   freia_aipo_global_min(mv, &minmotion);                               /*0025*/
+   if (maxmotion-minmotion>motion_trig)                                 /*0027*/
+      binvalue = maxmotion*motion_th/100;                               /*0028*/
+
+   freia_aipo_threshold(mv, mv, binvalue, 255, true);                   /*0030*/
+   
+   // open
+   freia_aipo_erode_8c(t1, mv, freia_morpho_kernel_8c);                 /*0033*/
+   freia_aipo_dilate_8c(t1, t1, freia_morpho_kernel_8c);                /*0034*/
+   
+   // gradient
+   freia_aipo_dilate_8c(t2, t1, freia_morpho_kernel_8c);                /*0037*/
+   freia_aipo_erode_8c(mv_4, t1, freia_morpho_kernel_8c);               /*0038*/
+   vs_core_helper_0_1_2(mv, t2, mv_4, stab, -1, 1);                     /*0039*/
+
+   freia_common_destruct_data(mv_4);
+
+   freia_common_destruct_data(t1);                                      /*0046*/
+   freia_common_destruct_data(t2);                                      /*0047*/
+   return FREIA_OK;                                                     /*0048*/
+}
+
+! cleaned up function
+
+freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia_data2d *stab, int motion_a, int motion_b, int motion_trig, int motion_th)
+{
+   
+   
+   
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0011*/
+   int binvalue, maxmotion, minmotion;                                  /*0012*/
+   // hardware accelerator generated variable
+   freia_data2d *mv_4 = freia_common_create_data(mv->bpp, mv->widthWa, mv->heightWa);
+
+   vs_core_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, motion_a+motion_b);        /*0014*/
+   
+   // bg update
+   
+   // measure
+   freia_aipo_global_max(mv, &maxmotion);                               /*0024*/
+   freia_aipo_global_min(mv, &minmotion);                               /*0025*/
+   if (maxmotion-minmotion>motion_trig)                                 /*0027*/
+      binvalue = maxmotion*motion_th/100;                               /*0028*/
+
+   freia_aipo_threshold(mv, mv, binvalue, 255, 1);                      /*0030*/
+   
+   // open
+   freia_aipo_erode_8c(t1, mv, freia_morpho_kernel_8c);                 /*0033*/
+   freia_aipo_dilate_8c(t1, t1, freia_morpho_kernel_8c);                /*0034*/
+   
+   // gradient
+   freia_aipo_dilate_8c(t2, t1, freia_morpho_kernel_8c);                /*0037*/
+   freia_aipo_erode_8c(mv_4, t1, freia_morpho_kernel_8c);               /*0038*/
+   vs_core_helper_0_1_2(mv, t2, mv_4, stab, -1, 1);                     /*0039*/
+
+   freia_common_destruct_data(mv_4);
+
+   freia_common_destruct_data(t1);                                      /*0046*/
+   freia_common_destruct_data(t2);                                      /*0047*/
+   return 0;                                                            /*0048*/
+}
+#
 # FREIA COMPILATION DONE
 #
 

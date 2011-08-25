@@ -183,6 +183,71 @@ freia_status my_copy(freia_data2d *o, freia_data2d *i0)
    return 0;
 }
 #
+# OPENCL
+#
+
+! initial function
+
+freia_status my_copy(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_copy(o, i0);                                       /*0004*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_copy" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =" [shape=circle];
+  "4 =" -> "o";
+  "i0" -> "4 =";
+}
+// graph for dag "dag_cleaned_0" of module "my_copy" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+
+  // external copies: 1
+  "o" [shape=circle];
+  "o =" [shape=circle,label="=",style="dashed"]
+  "i0" -> "o =";
+  "o =" -> "o";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 0 ops and 1 copies, optimized to 0 ops and 0+1 copies
+// generated opencl for function my_copy
+
+// opencl for dag 0
+
+! updated function
+
+freia_status my_copy(freia_data2d *o, freia_data2d *i0)
+{
+   freia_aipo_copy(o, i0);
+   return 0;
+}
+
+! cleaned up function
+
+freia_status my_copy(freia_data2d *o, freia_data2d *i0)
+{
+   freia_aipo_copy(o, i0);
+   return 0;
+}
+#
 # FREIA COMPILATION DONE
 #
 

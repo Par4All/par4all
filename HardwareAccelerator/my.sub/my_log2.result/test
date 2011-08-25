@@ -396,6 +396,81 @@ freia_status my_log2(freia_data2d *o, freia_data2d *i0)
    return my_log2_helper_0_0_0(o, i0);                                  /*0005*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+freia_status my_log2(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_log2(o, i0);                                       /*0005*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_log2" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 l2" [shape=trapezium,orientation=270];
+  "5 l2" -> "o";
+  "i0" -> "5 l2";
+}
+// graph for dag "dag_cleaned_0" of module "my_log2" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 l2" [shape=trapezium,orientation=270];
+  "5 l2" -> "o";
+  "i0" -> "5 l2";
+}
+// graph for dag "my_log2_helper_0_0" of module "my_log2" in dot format
+digraph "my_log2_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 l2" [shape=trapezium,orientation=270];
+  "5 l2" -> "o";
+  "i0" -> "5 l2";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// generated opencl for function my_log2
+
+// opencl for dag 0
+
+! updated function
+
+freia_status my_log2(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_log2(o, i0);                                       /*0005*/
+}
+
+! cleaned up function
+
+freia_status my_log2(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_log2(o, i0);                                       /*0005*/
+}
+#
 # FREIA COMPILATION DONE
 #
 

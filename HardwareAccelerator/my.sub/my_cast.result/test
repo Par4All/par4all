@@ -175,6 +175,81 @@ freia_status my_cast(freia_data2d *o, freia_data2d *i0)
    return freia_aipo_cast(o, i0);                                       /*0004*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+freia_status my_cast(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_cast(o, i0);                                       /*0004*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_cast" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =()" [shape=circle];
+  "4 =()" -> "o";
+  "i0" -> "4 =()";
+}
+// graph for dag "dag_cleaned_0" of module "my_cast" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =()" [shape=circle];
+  "4 =()" -> "o";
+  "i0" -> "4 =()";
+}
+// graph for dag "my_cast_helper_0_0" of module "my_cast" in dot format
+digraph "my_cast_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 =()" [shape=circle];
+  "4 =()" -> "o";
+  "i0" -> "4 =()";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 0 ops and 1 copies, optimized to 0 ops and 1+0 copies
+// generated opencl for function my_cast
+
+// opencl for dag 0
+
+! updated function
+
+freia_status my_cast(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_cast(o, i0);                                       /*0004*/
+}
+
+! cleaned up function
+
+freia_status my_cast(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_cast(o, i0);                                       /*0004*/
+}
+#
 # FREIA COMPILATION DONE
 #
 

@@ -1964,6 +1964,194 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
    return n;                                                            /*0021*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+int freia_58(freia_data2d *out, const freia_data2d *in)
+{
+   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
+   ret = freia_aipo_global_vol(out, &volcurrent);                       /*0007*/
+   do {                                                                 /*0019*/
+      volprevious = volcurrent;                                         /*0009*/
+      freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
+      i = 1;                                                            /*0011*/
+      k = 0;                                                            /*0012*/
+      j = 0;                                                            /*0013*/
+      j |= freia_aipo_inf(out, out, in);                                /*0014*/
+      l = j;                                                            /*0015*/
+      m |= l;                                                           /*0016*/
+      m |= freia_aipo_global_vol(out, &volcurrent);                     /*0017*/
+   }
+   while (volcurrent!=volprevious);                                     /*0019*/
+   n = m;                                                               /*0020*/
+   return n;                                                            /*0021*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_58" in dot format
+digraph "dag_0" {
+  // inputs
+  "out" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 vol" [shape=diamond];
+  "out" -> "7 vol";
+}
+// graph for dag "dag_1" of module "freia_58" in dot format
+digraph "dag_1" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "17 vol" [shape=diamond];
+  "15 ?" [shape=none];
+  "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "14 <" [shape=trapezium,orientation=270];
+  "14 <" -> "17 vol" [label="out"];
+  "14 <" -> "out'";
+  "in" -> "14 <";
+  "10 D8" [shape=box];
+  "10 D8" -> "14 <" [label="out"];
+  "out" -> "10 D8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_58" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "out" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 vol" [shape=diamond];
+  "out" -> "7 vol";
+}
+// graph for dag "dag_cleaned_1" of module "freia_58" in dot format
+digraph "dag_cleaned_1" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "17 vol" [shape=diamond];
+  "15 ?" [shape=none];
+  "15 ?" -> "16 ?" [arrowhead=empty,label="l"];
+  "14 <" [shape=trapezium,orientation=270];
+  "14 <" -> "17 vol" [label="out"];
+  "14 <" -> "out'";
+  "in" -> "14 <";
+  "10 D8" [shape=box];
+  "10 D8" -> "14 <" [label="out_1"];
+  "out" -> "10 D8";
+}
+// graph for dag "freia_58_helper_0_0" of module "freia_58" in dot format
+digraph "freia_58_helper_0_0" {
+  // inputs
+  "out" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 vol" [shape=diamond];
+  "out" -> "7 vol";
+}
+// graph for dag "freia_58_helper_1_0" of module "freia_58" in dot format
+digraph "freia_58_helper_1_0" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "14 <" [shape=trapezium,orientation=270];
+  "14 <" -> "out'";
+  "in" -> "14 <";
+  "10 D8" [shape=box];
+  "10 D8" -> "14 <" [label="out_1"];
+  "out" -> "10 D8";
+}
+// graph for dag "freia_58_helper_1_1" of module "freia_58" in dot format
+digraph "freia_58_helper_1_1" {
+  // inputs
+  "out" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "17 vol" [shape=diamond];
+  "out" -> "17 vol";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+
+// dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// generated opencl for function freia_58
+
+// opencl for dag 0
+
+// opencl for dag 1
+
+! updated function
+
+int freia_58(freia_data2d *out, const freia_data2d *in)
+{
+   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
+   ret = freia_aipo_global_vol(out, &volcurrent);                       /*0007*/
+   do {                                                                 /*0019*/
+      volprevious = volcurrent;                                         /*0009*/
+      i = 1;                                                            /*0011*/
+      k = 0;                                                            /*0012*/
+      j = 0;                                                            /*0013*/
+      freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
+      j |= freia_aipo_inf(out, out, in);                                /*0014*/
+      l = j;                                                            /*0015*/
+      m |= l;                                                           /*0016*/
+      m |= freia_aipo_global_vol(out, &volcurrent);                     /*0017*/
+   }
+   while (volcurrent!=volprevious);                                     /*0019*/
+   n = m;                                                               /*0020*/
+   return n;                                                            /*0021*/
+}
+
+! cleaned up function
+
+int freia_58(freia_data2d *out, const freia_data2d *in)
+{
+   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
+   ret = freia_aipo_global_vol(out, &volcurrent);                       /*0007*/
+   do {                                                                 /*0019*/
+      volprevious = volcurrent;                                         /*0009*/
+      i = 1;                                                            /*0011*/
+      k = 0;                                                            /*0012*/
+      j = 0;                                                            /*0013*/
+      freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
+      j |= freia_aipo_inf(out, out, in);                                /*0014*/
+      l = j;                                                            /*0015*/
+      m |= l;                                                           /*0016*/
+      m |= freia_aipo_global_vol(out, &volcurrent);                     /*0017*/
+   }
+   while (volcurrent!=volprevious);                                     /*0019*/
+   n = m;                                                               /*0020*/
+   return n;                                                            /*0021*/
+}
+#
 # FREIA COMPILATION DONE
 #
 

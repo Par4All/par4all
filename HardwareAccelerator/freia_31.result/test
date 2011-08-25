@@ -567,6 +567,165 @@ freia_status freia_31(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
    return 0;                                                            /*0012*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_31(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
+{
+   // parallel reuses (similar to freia_27)
+   // o0 = i ^ i
+   // o1 = f(i)
+   freia_aipo_xor(o0, i, i);                                            /*0009*/
+   freia_aipo_threshold(o1, i, 10, 20, true);                           /*0010*/
+
+   return FREIA_OK;                                                     /*0012*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_31" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 thr" [shape=parallelogram];
+  "10 thr" -> "o1";
+  "9 ^" [shape=trapezium,orientation=270];
+  "9 ^" -> "o0";
+  "i" -> "10 thr";
+  "i" -> "9 ^";
+  "i" -> "9 ^";
+}
+// graph for dag "dag_cleaned_0" of module "freia_31" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 thr" [shape=parallelogram];
+  "10 thr" -> "o1";
+  "9 ^" [shape=trapezium,orientation=270];
+  "9 ^" -> "o0";
+  "i" -> "10 thr";
+  "i" -> "9 ^";
+  "i" -> "9 ^";
+}
+// graph for dag "freia_31_helper_0_0" of module "freia_31" in dot format
+digraph "freia_31_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 thr" [shape=parallelogram];
+  "10 thr" -> "o1";
+  "9 ^" [shape=trapezium,orientation=270];
+  "9 ^" -> "o0";
+  "i" -> "10 thr";
+  "i" -> "9 ^";
+  "i" -> "9 ^";
+}
+// graph for dag "freia_31_helper_0_0_0" of module "freia_31" in dot format
+digraph "freia_31_helper_0_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 thr" [shape=parallelogram];
+  "10 thr" -> "o1";
+  "9 ^" [shape=trapezium,orientation=270];
+  "9 ^" -> "o0";
+  "i" -> "10 thr";
+  "i" -> "9 ^";
+  "i" -> "9 ^";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
+
+// helper function freia_31_helper_0_0_0
+freia_status freia_31_helper_0_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  call opencl kernel freia_31_helper_0_0_0(o0, o1, i0, c0, c1, c2);
+  return FREIA_OK;
+}
+// generated opencl for function freia_31
+
+// opencl for dag 0
+
+// opencl function freia_31_helper_0_0_0
+kernel freia_31_helper_0_0_0(
+  opencl image o0,
+  opencl image o1,
+  const opencl image i0,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    // pixel computations
+    register pixel t9 = PIXEL_XOR(in0, in0);
+    register pixel t10 = PIXEL_THRESHOLD(in0, c0, c1, c2);
+    // set output pixels
+    o0[i] = t9;
+    o1[i] = t10;
+  }
+}
+
+! updated function
+
+freia_status freia_31(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
+{
+   // parallel reuses (similar to freia_27)
+   // o0 = i ^ i
+   // o1 = f(i)
+   freia_31_helper_0_0_0(o0, o1, i, 10, 20, true);                      /*0009*/
+
+   return FREIA_OK;                                                     /*0012*/
+}
+
+! cleaned up function
+
+freia_status freia_31(freia_data2d *o0, freia_data2d *o1, freia_data2d *i)
+{
+   // parallel reuses (similar to freia_27)
+   // o0 = i ^ i
+   // o1 = f(i)
+   freia_31_helper_0_0_0(o0, o1, i, 10, 20, 1);                         /*0009*/
+
+   return 0;                                                            /*0012*/
+}
+#
 # FREIA COMPILATION DONE
 #
 

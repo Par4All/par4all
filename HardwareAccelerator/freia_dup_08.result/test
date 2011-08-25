@@ -493,6 +493,90 @@ int freia_dup_08(freia_data2d *i)
    return max1+max2+x+y;                                                /*0009*/
 }
 #
+# OPENCL
+#
+
+! initial function
+
+int freia_dup_08(freia_data2d *i)
+{
+   int max1, max2, x, y;                                                /*0005*/
+   // same measure performed twice
+   freia_aipo_global_max(i, &max1);                                     /*0007*/
+   freia_aipo_global_max_coord(i, &max2, &x, &y);                       /*0008*/
+   return max1+max2+x+y;                                                /*0009*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_08" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "8 max!" [shape=diamond];
+  "7 max" [shape=diamond];
+  "i" -> "8 max!";
+  "i" -> "7 max";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_08" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "8 max!" [shape=diamond];
+  "i" -> "8 max!";
+  "i" -> "7 ?=";
+}
+// graph for dag "freia_dup_08_helper_0_0" of module "freia_dup_08" in dot format
+digraph "freia_dup_08_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "8 max!" [shape=diamond];
+  "i" -> "8 max!";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// generated opencl for function freia_dup_08
+
+// opencl for dag 0
+
+! updated function
+
+int freia_dup_08(freia_data2d *i)
+{
+   int max1, max2, x, y;                                                /*0005*/
+   freia_aipo_global_max_coord(i, &max2, &x, &y);                       /*0008*/
+   // same measure performed twice
+   max1 = max2;                                                         /*0007*/
+   return max1+max2+x+y;                                                /*0009*/
+}
+
+! cleaned up function
+
+int freia_dup_08(freia_data2d *i)
+{
+   int max1, max2, x, y;                                                /*0005*/
+   freia_aipo_global_max_coord(i, &max2, &x, &y);                       /*0008*/
+   // same measure performed twice
+   max1 = max2;                                                         /*0007*/
+   return max1+max2+x+y;                                                /*0009*/
+}
+#
 # FREIA COMPILATION DONE
 #
 
