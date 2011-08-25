@@ -49,64 +49,61 @@
  */
 FILE * check_fopen(char * file, char * mode)
 {
-    FILE * fd = fopen(file, mode);
-    if (fd==(FILE*)NULL)
-    {
-	pips_user_warning("fopen failed on file \"%s\" (mode \"%s\")\n%s\n",
-			  file, mode, strerror(errno));
-    }
-    return fd;
+  FILE * fd = fopen(file, mode);
+  if (fd==(FILE*)NULL)
+  {
+    pips_user_warning("fopen failed on file \"%s\" (mode \"%s\")\n%s\n",
+                      file, mode, strerror(errno));
+  }
+  return fd;
 }
 
 FILE * safe_fopen(const char *filename, const char *what)
 {
-    FILE * f;
-    if((f = fopen( filename, what)) == (FILE *) NULL) {
-	pips_internal_error("fopen failed on file %s\n%s",
-		   filename, strerror(errno));
-    }
-    return(f);
+  FILE * f;
+  if((f = fopen( filename, what)) == (FILE *) NULL) {
+    pips_internal_error("fopen failed on file %s\n%s",
+                        filename, strerror(errno));
+  }
+  return f;
 }
 
-int
-safe_fclose(FILE * stream, char *filename)
+int safe_fclose(FILE * stream, char *filename)
 {
-    if(fclose(stream) == EOF) {
-	if(errno==ENOSPC)
+  if(fclose(stream) == EOF) {
+    if(errno==ENOSPC)
 	    user_irrecoverable_error("safe_fclose",
-				     "fclose failed on file %s (%s)\n",
-				     filename,
-				     strerror(errno));
-	else
+                               "fclose failed on file %s (%s)\n",
+                               filename,
+                               strerror(errno));
+    else
 	    pips_internal_error("fclose failed on file %s (%s)",
-		       filename,
-		       strerror(errno));
-    }
-    return(0);
+                          filename,
+                          strerror(errno));
+  }
+  return 0;
 }
 
-int
-safe_fflush(FILE * stream, char *filename)
+int safe_fflush(FILE * stream, char *filename)
 {
-    if(fflush(stream) == EOF) {
-	pips_internal_error("fflush failed on file %s (%s)",
-		   filename,
-		   strerror(errno));
-    }
-    return(0);
+  if(fflush(stream) == EOF) {
+    pips_internal_error("fflush failed on file %s (%s)",
+                        filename,
+                        strerror(errno));
+  }
+  return 0;
 }
 
-FILE *
-safe_freopen(char *filename, char *what, FILE * stream)
+FILE * safe_freopen(char *filename, char *what, FILE * stream)
 {
-    FILE *f;
+  FILE *f;
 
-    if((f = freopen( filename, what, stream)) == (FILE *) NULL) {
-	pips_internal_error("freopen failed on file %s (%s)",
-		   filename,
-		   strerror(errno));
-    }
-    return(f);
+  if((f = freopen( filename, what, stream)) == (FILE *) NULL) {
+    pips_internal_error("freopen failed on file %s (%s)",
+                        filename,
+                        strerror(errno));
+  }
+  return f;
 }
 
 int
