@@ -1719,7 +1719,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
       {
         set_add_element(current, current, v);
         set_add_element(done, done, v);
-        lcurrent = gen_nconc(lcurrent, CONS(dagvtx, v, NIL));
+        lcurrent = CONS(dagvtx, v, lcurrent);
         changed = true;
       }
     }
@@ -1731,6 +1731,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
   // cleanup GLOBAL
   hash_table_free(erosion), erosion = NULL;
 
+  lcurrent = gen_nreverse(lcurrent);
   pips_assert("some vertices where extracted", lcurrent!=NIL);
 
   // build extracted dag
