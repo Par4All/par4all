@@ -176,7 +176,7 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 # in which case while recurring this mark take precedence about
 # local information made available within the directory
 %.rec: %
-	recwhat= ; d=$* ; d=$${d%.sub} ; \
+	@recwhat= ; d=$* ; d=$${d%.sub} ; \
 	[ ! "$(DO_BUG)" -a -f $$d.bug ] && recwhat=bug ; \
 	[ ! "$(DO_LATER)" -a -f $$d.later ] && recwhat=later ; \
 	[ ! "$(DO_SLOW)" -a -f $$d.slow ] && recwhat=slow ; \
