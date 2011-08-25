@@ -108,7 +108,7 @@ echo
 echo AFTER DEAD CODE ELIMINATION
 echo
 
-apply SUPPRESS_DEAD_CODE[main]
+apply SIMPLIFY_CONTROL[main]
 activate PRINT_CODE
 display PRINTED_FILE
 

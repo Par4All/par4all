@@ -24,7 +24,7 @@ echo
 
 open suppress01
 
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 
 activate PRINT_CODE
 display PRINTED_FILE[%ALL]

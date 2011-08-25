@@ -49,9 +49,9 @@ display CALLGRAPH_FILE[freia_cipo_outer_gradient]
 # echo
 #
 # activate PRINT_CODE
-# apply SUPPRESS_DEAD_CODE[freia_cipo_dilate]
+# apply SIMPLIFY_CONTROL[freia_cipo_dilate]
 # display PRINTED_FILE[freia_cipo_dilate]
-# apply SUPPRESS_DEAD_CODE[freia_cipo_outer_gradient]
+# apply SIMPLIFY_CONTROL[freia_cipo_outer_gradient]
 # display PRINTED_FILE[freia_cipo_outer_gradient]
 
 #echo
@@ -121,7 +121,7 @@ echo Code after dead code elimination of inlined "main"
 echo
 
 activate PRINT_CODE
-apply SUPPRESS_DEAD_CODE[main]
+apply SIMPLIFY_CONTROL[main]
 display PRINTED_FILE[main]
 
 echo

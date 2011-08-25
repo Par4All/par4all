@@ -92,7 +92,7 @@ display PRINTED_FILE[compute,get_data]
 
 #display PRINTED_FILE[kernel_launcher_0,kernel_launcher_1,kernel_launcher_2]
 
-#apply SUPPRESS_DEAD_CODE
+#apply SIMPLIFY_CONTROL
 #display PRINTED_FILE
 
 echo

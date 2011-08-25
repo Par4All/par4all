@@ -13,7 +13,7 @@ echo #
 echo # after unfolding
 echo #
 display C_SOURCE_FILE[main]
-apply SUPPRESS_DEAD_CODE[main]
+apply SIMPLIFY_CONTROL[main]
 display PRINTED_FILE[main]
 close
 #delete unfolding09

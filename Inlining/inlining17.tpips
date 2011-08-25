@@ -47,9 +47,9 @@ echo Code after dead code elimination
 echo
 
 activate PRINT_CODE
-apply SUPPRESS_DEAD_CODE[freia_cipo_dilate]
+apply SIMPLIFY_CONTROL[freia_cipo_dilate]
 display PRINTED_FILE[freia_cipo_dilate]
-apply SUPPRESS_DEAD_CODE[freia_cipo_outer_gradient]
+apply SIMPLIFY_CONTROL[freia_cipo_outer_gradient]
 display PRINTED_FILE[freia_cipo_outer_gradient]
 
 #echo

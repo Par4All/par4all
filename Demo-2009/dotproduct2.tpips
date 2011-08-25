@@ -80,10 +80,10 @@ shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT06.f
 
 echo
 echo "************************"
-echo "** SUPPRESS_DEAD_CODE **"
+echo "** SIMPLIFY_CONTROL **"
 echo "************************"
 # suppression de la boucle vide du prologue
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 display PRINTED_FILE
 shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT07.f
 

@@ -59,9 +59,9 @@ display PRINTED_FILE[%ALLFUNC]
 shell cp clone01.database/clone01_1/clone01_1.pre.c clone01.database/clone01_1/clone01_1.pre-partial-eval.c
 
 #echo # applying dead code elimination...
-#apply SUPPRESS_DEAD_CODE[clone01_0]
-#apply SUPPRESS_DEAD_CODE[clone01_1]
-#apply SUPPRESS_DEAD_CODE[clone01_2]
+#apply SIMPLIFY_CONTROL[clone01_0]
+#apply SIMPLIFY_CONTROL[clone01_1]
+#apply SIMPLIFY_CONTROL[clone01_2]
 #
 #display PRINTED_FILE[%ALLFUNC]
 
@@ -72,9 +72,9 @@ apply DEAD_CODE_ELIMINATION[clone01_2]
 display PRINTED_FILE[clone01_1]
 shell cp clone01.database/clone01_1/clone01_1.pre.c clone01.database/clone01_1/clone01_1.pre-use-def.c
 
-apply SUPPRESS_DEAD_CODE[clone01_0]
-apply SUPPRESS_DEAD_CODE[clone01_1]
-apply SUPPRESS_DEAD_CODE[clone01_2]
+apply SIMPLIFY_CONTROL[clone01_0]
+apply SIMPLIFY_CONTROL[clone01_1]
+apply SIMPLIFY_CONTROL[clone01_2]
 display PRINTED_FILE[clone01_1]
 shell cp clone01.database/clone01_1/clone01_1.pre.c clone01.database/clone01_1/clone01_1.pre-suppress.c
 
@@ -83,7 +83,7 @@ apply RESTRUCTURE_CONTROL[clone01_1]
 apply RESTRUCTURE_CONTROL[clone01_2]
 display PRINTED_FILE[%ALLFUNC]
 #quit
-#apply SUPPRESS_DEAD_CODE[%ALL]
+#apply SIMPLIFY_CONTROL[%ALL]
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 

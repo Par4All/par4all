@@ -88,7 +88,7 @@ apply INLINING[p4a_kernel_main]
 #apply USE_DEF_ELIMINATION[p4a_launcher_main,p4a_launcher_main_1]
 #display PRINTED_FILE[p4a_launcher_main,p4a_launcher_main_1]
 
-#apply SUPPRESS_DEAD_CODE
+#apply SIMPLIFY_CONTROL
 #display PRINTED_FILE
 
 setproperty PREPEND_COMMENT "// Prepend here P4A_INIT_ACCEL"

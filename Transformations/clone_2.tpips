@@ -24,7 +24,7 @@ display CALLGRAPH_FILE[%MAIN]
 echo # new codes.
 display PRINTED_FILE[%ALL]
 echo # applying dead code elimination...
-apply SUPPRESS_DEAD_CODE[%ALL]
+apply SIMPLIFY_CONTROL[%ALL]
 display PRINTED_FILE[%ALL]
 echo # done
 close

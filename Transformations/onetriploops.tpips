@@ -2,7 +2,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete otl
 create otl onetriploops.f
 # display PRINTED_FILE[onetriploops]
-# capply SUPPRESS_DEAD_CODE[onetriploops]
+# capply SIMPLIFY_CONTROL[onetriploops]
 # display PRINTED_FILE[onetriploops]
 
 echo
@@ -23,7 +23,7 @@ echo
 echo Code after one trip loop detection and simplification
 echo
 
-capply SUPPRESS_DEAD_CODE[%ALL]
+capply SIMPLIFY_CONTROL[%ALL]
 display PRINTED_FILE[%ALL]
 close
 delete otl

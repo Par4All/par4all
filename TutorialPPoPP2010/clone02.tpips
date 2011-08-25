@@ -59,16 +59,16 @@ display PRINTED_FILE[%ALLFUNC]
 shell cp clone02.database/clone02_1/clone02_1.pre.c clone02.database/clone02_1/clone02_1.pre-partial-eval.c
 
 #echo # applying dead code elimination...
-#apply SUPPRESS_DEAD_CODE[clone02_0]
-#apply SUPPRESS_DEAD_CODE[clone02_1]
-#apply SUPPRESS_DEAD_CODE[clone02_2]
+#apply SIMPLIFY_CONTROL[clone02_0]
+#apply SIMPLIFY_CONTROL[clone02_1]
+#apply SIMPLIFY_CONTROL[clone02_2]
 #
 #display PRINTED_FILE[%ALLFUNC]
 
 echo # applying suppress dead code...
-apply SUPPRESS_DEAD_CODE[clone02_0]
-apply SUPPRESS_DEAD_CODE[clone02_1]
-apply SUPPRESS_DEAD_CODE[clone02_2]
+apply SIMPLIFY_CONTROL[clone02_0]
+apply SIMPLIFY_CONTROL[clone02_1]
+apply SIMPLIFY_CONTROL[clone02_2]
 display PRINTED_FILE[clone02_1]
 shell cp clone02.database/clone02_1/clone02_1.pre.c clone02.database/clone02_1/clone02_1.pre-suppress.c
 
@@ -84,7 +84,7 @@ apply RESTRUCTURE_CONTROL[clone02_1]
 apply RESTRUCTURE_CONTROL[clone02_2]
 display PRINTED_FILE[%ALLFUNC]
 #quit
-#apply SUPPRESS_DEAD_CODE[%ALL]
+#apply SIMPLIFY_CONTROL[%ALL]
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
