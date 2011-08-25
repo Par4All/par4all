@@ -3037,6 +3037,7 @@ freia_status oop_core_helper_0_4_1(
   call opencl kernel oop_core_helper_0_4_1(o0, i0, i1, c0, c1, c2);
   return FREIA_OK;
 }
+// freia opencl includes
 // generated opencl for function oop_core
 
 // opencl for dag 0

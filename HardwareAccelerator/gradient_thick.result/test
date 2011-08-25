@@ -709,6 +709,7 @@ digraph "gradient_thick_helper_0_0" {
 // freia opencl includes
 
 // dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// freia opencl includes
 // generated opencl for function gradient_thick
 
 // opencl for dag 0

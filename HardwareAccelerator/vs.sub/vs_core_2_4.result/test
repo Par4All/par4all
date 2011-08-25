@@ -2594,6 +2594,7 @@ freia_status vs_core_2_helper_0_1_2(
   call opencl kernel vs_core_2_helper_0_1_2(o0, i0, i1, i2, c0, c1);
   return FREIA_OK;
 }
+// freia opencl includes
 // generated opencl for function vs_core_2
 
 // opencl for dag 0

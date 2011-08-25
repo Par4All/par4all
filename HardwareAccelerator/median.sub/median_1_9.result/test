@@ -1795,6 +1795,7 @@ freia_status median_1_helper_0_0_1(
   call opencl kernel median_1_helper_0_0_1(o0, i0, i1, i2);
   return FREIA_OK;
 }
+// freia opencl includes
 // generated opencl for function median_1
 
 // opencl for dag 0

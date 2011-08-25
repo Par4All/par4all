@@ -232,6 +232,7 @@ digraph "my_cast_helper_0_0" {
 // freia opencl includes
 
 // dag 0: 0 ops and 1 copies, optimized to 0 ops and 1+0 copies
+// freia opencl includes
 // generated opencl for function my_cast
 
 // opencl for dag 0

@@ -453,6 +453,7 @@ digraph "my_not_helper_0_0" {
 // freia opencl includes
 
 // dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// freia opencl includes
 // generated opencl for function my_not
 
 // opencl for dag 0

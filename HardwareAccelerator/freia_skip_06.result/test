@@ -884,6 +884,7 @@ freia_status freia_skip_06_helper_0_0_0(
   call opencl kernel freia_skip_06_helper_0_0_0(o0, o1, i0, c0, c1);
   return FREIA_OK;
 }
+// freia opencl includes
 // generated opencl for function freia_skip_06
 
 // opencl for dag 0

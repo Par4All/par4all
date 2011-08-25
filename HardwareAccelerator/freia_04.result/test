@@ -1267,6 +1267,7 @@ freia_status freia_04_helper_0_0_1(
   call opencl kernel freia_04_helper_0_0_1(o0, o1, o2, i0, i1, c0, c1, c2, c3, c4, c5);
   return FREIA_OK;
 }
+// freia opencl includes
 // generated opencl for function freia_04
 
 // opencl for dag 0

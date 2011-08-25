@@ -1933,6 +1933,7 @@ freia_status freia_24_helper_0_2_0(
   call opencl kernel freia_24_helper_0_2_0(o0, i0, i1, c0, c1, c2);
   return FREIA_OK;
 }
+// freia opencl includes
 // generated opencl for function freia_24
 
 // opencl for dag 0

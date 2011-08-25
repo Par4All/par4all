@@ -1077,6 +1077,7 @@ digraph "freia_41_helper_0_0" {
 // freia opencl includes
 
 // dag 0: 9 ops and 0 copies, optimized to 9 ops and 0+0 copies
+// freia opencl includes
 // generated opencl for function freia_41
 
 // opencl for dag 0

@@ -7654,6 +7654,7 @@ freia_status license_plate_copies_helper_0_1_1(
   call opencl kernel license_plate_copies_helper_0_1_1(o0, i0, i1, c0, c1, c2);
   return FREIA_OK;
 }
+// freia opencl includes
 // generated opencl for function license_plate_copies
 
 // opencl for dag 0

@@ -3056,6 +3056,7 @@ digraph "dag_cleaned_0" {
 // freia opencl includes
 
 // dag 0: 33 ops and 0 copies, optimized to 23 ops and 0+0 copies
+// freia opencl includes
 // generated opencl for function anr999
 
 // opencl for dag 0

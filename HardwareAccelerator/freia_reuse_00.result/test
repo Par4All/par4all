@@ -738,6 +738,7 @@ digraph "freia_reuse_00_helper_0_0" {
 // freia opencl includes
 
 // dag 0: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
+// freia opencl includes
 // generated opencl for function freia_reuse_00
 
 // opencl for dag 0

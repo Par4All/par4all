@@ -557,6 +557,7 @@ digraph "freia_dup_03_helper_0_0" {
 // freia opencl includes
 
 // dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
+// freia opencl includes
 // generated opencl for function freia_dup_03
 
 // opencl for dag 0

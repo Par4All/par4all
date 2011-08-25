@@ -636,6 +636,7 @@ digraph "freia_dead_08_helper_0_0" {
 // freia opencl includes
 
 // dag 0: 2 ops and 1 copies, optimized to 2 ops and 0+1 copies
+// freia opencl includes
 // generated opencl for function freia_dead_08
 
 // opencl for dag 0

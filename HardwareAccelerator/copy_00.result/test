@@ -1310,6 +1310,7 @@ freia_status copy_00_helper_0_0_1(
   call opencl kernel copy_00_helper_0_0_1(o0, o1, i0, i1, i2, i3);
   return FREIA_OK;
 }
+// freia opencl includes
 // generated opencl for function copy_00
 
 // opencl for dag 0

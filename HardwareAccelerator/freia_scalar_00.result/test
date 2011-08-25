@@ -957,6 +957,7 @@ digraph "freia_scalar_00_helper_0_1" {
 // freia opencl includes
 
 // dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// freia opencl includes
 // generated opencl for function freia_scalar_00
 
 // opencl for dag 0

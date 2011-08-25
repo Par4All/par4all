@@ -737,6 +737,7 @@ freia_status freia_35_helper_0_0_0(
   call opencl kernel freia_35_helper_0_0_0(o0, i0, i1);
   return FREIA_OK;
 }
+// freia opencl includes
 // generated opencl for function freia_35
 
 // opencl for dag 0
