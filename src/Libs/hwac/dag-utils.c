@@ -2529,3 +2529,117 @@ list dag_fix_image_reuse(dag d, hash_table init, const hash_table occs)
   set_free(seen);
   return images;
 }
+
+/************************************************************* DAG SPLITTING */
+
+/* @brief split a dag on scalar dependencies only, with a greedy heuristics.
+ * @param initial dag to split
+ * @param alone_only whether to keep it alone (for non implemented cases)
+ * @param priority how to prioritize computable vertices
+ * @param priority_update stuff to help prioritization
+ * @return a list of sub-dags, some of which may contain no image operations
+ * this pass also decides the schedule of image operations, with the aim
+ * or reducing the number of necessary imagelets, so as to maximise
+ * imagelet size.
+ */
+list // of dags
+dag_split_on_scalars(const dag initial,
+                     bool (*alone_only)(dagvtx),
+                     gen_cmp_func_t priority,
+                     void (*priority_update)(const dag),
+                     const set output_images)
+{
+  if (!single_image_assignement_p(initial))
+    // well, it should work most of the time, so only a warning
+    pips_user_warning("still some image reuse...\n");
+
+  // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
+  // if everything was removed by optimizations, there is nothing to do.
+  if (dag_computation_count(initial)==0) return NIL;
+
+  // work on a copy of the dag.
+  dag dall = copy_dag(initial);
+  list ld = NIL;
+  set
+    // current set of vertices to group
+    current = set_make(set_pointer),
+    // all vertices which are considered computed
+    computed = set_make(set_pointer);
+
+  do
+  {
+    list lcurrent = NIL, computables;
+    set_clear(current);
+    set_clear(computed);
+    set_assign_list(computed, dag_inputs(dall));
+
+    // GLOBAL for sorting
+    if (priority_update) priority_update(dall);
+
+    // transitive closure
+    while ((computables =
+            get_computable_vertices(dall, computed, computed, current)))
+    {
+      ifdebug(7) {
+        FOREACH(dagvtx, v, computables)
+          dagvtx_dump(stderr, "computable", v);
+      }
+
+      gen_sort_list(computables, priority);
+
+      // choose one while building the schedule?
+      dagvtx first = DAGVTX(CAR(computables));
+      gen_free_list(computables), computables = NIL;
+
+      ifdebug(7)
+        dagvtx_dump(stderr, "choice", first);
+
+      // do not add if not alone
+      if (alone_only && alone_only(first) && lcurrent)
+        break;
+
+      set_add_element(current, current, first);
+      set_add_element(computed, computed, first);
+      lcurrent = gen_nconc(lcurrent, CONS(dagvtx, first, NIL));
+
+      // getout if was alone
+      if (alone_only && alone_only(first))
+        break;
+    }
+
+    // is there something?
+    if (lcurrent)
+    {
+      // build extracted dag
+      dag nd = make_dag(NIL, NIL, NIL);
+      FOREACH(dagvtx, v, lcurrent)
+      {
+        pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
+        dag_append_vertex(nd, copy_dagvtx_norec(v));
+      }
+      dag_compute_outputs(nd, NULL, output_images, NIL, false);
+      dag_cleanup_other_statements(nd);
+
+      ifdebug(7) {
+        // dag_dump(stderr, "updated dall", dall);
+        dag_dump(stderr, "pushed dag", nd);
+      }
+
+      // ??? hmmm... should not be needed?
+      freia_hack_fix_global_ins_outs(initial, nd);
+
+      // update global list of dags to return.
+      ld = CONS(dag, nd, ld);
+
+      // cleanup full dag for next round
+      FOREACH(dagvtx, w, lcurrent)
+        dag_remove_vertex(dall, w);
+
+      gen_free_list(lcurrent), lcurrent = NIL;
+    }
+  }
+  while (set_size(current));
+
+  free_dag(dall);
+  return gen_nreverse(ld);
+}

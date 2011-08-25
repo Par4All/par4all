@@ -264,14 +264,6 @@ static int dag_terapix_measures
   return dlength;
 }
 
-/* fill in erosion hash table from dag d.
- */
-static void dag_terapix_erosion(const dag d, hash_table erosion)
-{
-  int i = 0;
-  dag_terapix_measures(d, erosion, &i, &i, &i, &i, &i, &i, &i);
-}
-
 /* @return the list of inputs to vertex v as imagelet numbers.
  */
 static list /* of ints */ dag_vertex_pred_imagelets
@@ -1422,10 +1414,25 @@ static int freia_trpx_compile_one_dag(
 
 /************************************************** TERAPIX DAG SCALAR SPLIT */
 
+/* fill in erosion hash table from dag d.
+ */
+static void dag_terapix_erosion(const dag d, hash_table erosion)
+{
+  int i = 0;
+  dag_terapix_measures(d, erosion, &i, &i, &i, &i, &i, &i, &i);
+}
+
 /* global variable used by the dagvtx_terapix_priority function,
  * because qsort does not allow to pass some descriptor.
  */
 static hash_table erosion = NULL;
+
+static void dag_terapix_reset_erosion(const dag d)
+{
+  pips_assert("erosion is allocated", erosion!=NULL);
+  hash_table_clear(erosion);
+  dag_terapix_erosion(d, erosion);
+}
 
 /* comparison function for sorting dagvtx in qsort,
  * this is deep voodoo, because the priority has an impact on
@@ -1598,118 +1605,6 @@ static bool terapix_not_implemented(dag d)
   return false;
 }
 
-/* @brief split a dag on scalar dependencies only, with a greedy heuristics.
- * @param initial dag to split
- * @param alone_only whether to keep it alone (for non implemented cases)
- * @return a list of sub-dags, some of which may contain no image operations
- * this pass also decides the schedule of image operations, with the aim
- * or reducing the number of necessary imagelets, so as to maximise
- * imagelet size.
- */
-static list /* of dags */
-split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx),
-                     const set output_images)
-{
-  if (!single_image_assignement_p(initial))
-    // well, it should work most of the time, so only a warning
-    pips_user_warning("still some image reuse...\n");
-
-  // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
-  // if everything was removed by optimizations, there is nothing to do.
-  if (dag_computation_count(initial)==0) return NIL;
-
-  // work on a copy of the dag.
-  dag dall = copy_dag(initial);
-  list ld = NIL;
-  set
-    // current set of vertices to group
-    current = set_make(set_pointer),
-    // all vertices which are considered computed
-    computed = set_make(set_pointer);
-
-  do
-  {
-    list lcurrent = NIL, computables;
-    set_clear(current);
-    set_clear(computed);
-    set_assign_list(computed, dag_inputs(dall));
-
-    // GLOBAL for sorting
-    // ??? is this the same as erodes?
-    pips_assert("erosion is clean", erosion==NULL);
-    erosion = hash_table_make(hash_pointer, 0);
-    dag_terapix_erosion(dall, erosion);
-
-    // transitive closure
-    while ((computables =
-            get_computable_vertices(dall, computed, computed, current)))
-    {
-      ifdebug(7) {
-        FOREACH(dagvtx, v, computables)
-          dagvtx_dump(stderr, "computable", v);
-      }
-
-      gen_sort_list(computables,
-                    (int(*)(const void*,const void*)) dagvtx_terapix_priority);
-
-      // choose one while building the schedule?
-      dagvtx first = DAGVTX(CAR(computables));
-      gen_free_list(computables), computables = NIL;
-
-      ifdebug(7)
-        dagvtx_dump(stderr, "choice", first);
-
-      // do not add if not alone
-      if (alone_only && alone_only(first) && lcurrent)
-        break;
-
-      set_add_element(current, current, first);
-      set_add_element(computed, computed, first);
-      lcurrent = gen_nconc(lcurrent, CONS(dagvtx, first, NIL));
-
-      // getout if was alone
-      if (alone_only && alone_only(first))
-        break;
-    }
-
-    // is there something?
-    if (lcurrent)
-    {
-      // build extracted dag
-      dag nd = make_dag(NIL, NIL, NIL);
-      FOREACH(dagvtx, v, lcurrent)
-      {
-        pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
-        dag_append_vertex(nd, copy_dagvtx_norec(v));
-      }
-      dag_compute_outputs(nd, NULL, output_images, NIL, false);
-      dag_cleanup_other_statements(nd);
-
-      ifdebug(7) {
-        // dag_dump(stderr, "updated dall", dall);
-        dag_dump(stderr, "pushed dag", nd);
-      }
-
-      // ??? hmmm... should not be needed?
-      freia_hack_fix_global_ins_outs(initial, nd);
-
-      // update global list of dags to return.
-      ld = CONS(dag, nd, ld);
-
-      // cleanup full dag for next round
-      FOREACH(dagvtx, w, lcurrent)
-        dag_remove_vertex(dall, w);
-
-      gen_free_list(lcurrent), lcurrent = NIL;
-    }
-    hash_table_free(erosion), erosion = NULL;
-  }
-  while (set_size(current));
-
-  free_dag(dall);
-  return gen_nreverse(ld);
-}
-
 /*********************************************************** TERAPIX DAG CUT */
 
 /* would it seem interesting to split d?
@@ -1808,8 +1703,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
          (computables = get_computable_vertices(d, done, done, current)))
   {
     // ensure determinism
-    gen_sort_list(computables,
-                  (int(*)(const void*,const void*)) dagvtx_terapix_priority);
+    gen_sort_list(computables, (gen_cmp_func_t) dagvtx_terapix_priority);
     changed = false;
     FOREACH(dagvtx, v, computables)
     {
@@ -1922,8 +1816,16 @@ list freia_trpx_compile_calls
   // consider A -> B -> s -> C -> D
   //           \-> E -> F />
   // then ABEF / CD is chosen
-  // although ABE / FCD and AB / EFCD would be also possible...
-  list ld = split_dag_on_scalars(fulld, not_implemented, output_images);
+  // although ABE / FCD and AB / EFCD would be also possible..
+
+  pips_assert("erosion is clean", erosion==NULL);
+  erosion = hash_table_make(hash_pointer, 0);
+  list ld = dag_split_on_scalars(fulld,
+                                 not_implemented,
+                                 (gen_cmp_func_t) dagvtx_terapix_priority,
+                                 dag_terapix_reset_erosion,
+                                 output_images);
+  hash_table_free(erosion), erosion = NULL;
 
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
