@@ -1,13 +1,4 @@
-#!/bin/sh
-
-PIPS_CHECK_FORTRAN="Y"
-export PIPS_CHECK_FORTRAN
-
-tpips=${tpips_version:-tpips}
-
-Delete user_error02
-
-( $tpips 2>&1 | sed '/file *\//d' ) <<EOF
+setenv PIPS_CHECK_FORTRAN="Y"
 delete user_error03
 create user_error03 user_error03.f
 # activate PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS
@@ -19,4 +10,3 @@ display PARALLELPRINTED_FILE[B]
 close
 delete user_error03
 quit
-EOF
