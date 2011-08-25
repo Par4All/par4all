@@ -161,9 +161,7 @@ EXCEPT =  [ "$(RECWHAT)" ] && \
 	    ! \( -f $*.bug -o -f $*.later -o -f $*.slow \) ] && \
 	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_F95)" -a -d $*.result -a \( -e $*.f90 -o -e $*.f95 \) ] && \
-	    { echo "keptout: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
-	  $(INFO) $*.result/test > /dev/null 2>&1 || \
-	    { echo "notest: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
+	    { echo "keptout: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
 
 
 # setup running a case
@@ -194,17 +192,21 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 # 134 is for pips_internal_error, could allow to distinguish voluntary aborts.
 OK	= status=$$? ; \
 	  if [ "$$status" -eq 203 ] ; then \
-	     echo "timeout: $(SUBDIR)/$* $$SECONDS" ; \
+	   echo "timeout: $(SUBDIR)/$* $$SECONDS" ; \
 	  elif [ "$$status" != 0 ] ; then \
-	     echo "failed: $(SUBDIR)/$* $$SECONDS" ; \
+	   echo "failed: $(SUBDIR)/$* $$SECONDS" ; \
 	  else \
-	     $(DIFF) $*.result/test > $*.diff ; \
-	     if [ -s $*.diff ] ; then \
+	    if $(INFO) $*.result/test > /dev/null 2>&1 ; then \
+	      $(DIFF) $*.result/test > $*.diff ; \
+	      if [ -s $*.diff ] ; then \
 	        echo "changed: $(SUBDIR)/$* $$SECONDS" ; \
-	     else \
+	      else \
 	        $(RM) $*.err $*.diff ; \
 	        echo "passed: $(SUBDIR)/$* $$SECONDS" ; \
-	     fi ; \
+	      fi ; \
+	    else \
+	      echo "notest: $(SUBDIR)/$* $$SECONDS" ; \
+            fi ; \
 	  fi >> $(RESULTS)
 
 # default target is to clean
