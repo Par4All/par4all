@@ -1,15 +1,5 @@
-#!/bin/sh
-
-PIPS_CHECK_FORTRAN="Y"
-export PIPS_CHECK_FORTRAN
-
+setenv PIPS_CHECK_FORTRAN="Y"
 # Typing inconsistency for FOO
-
-tpips=${tpips_version:-tpips}
-
-Delete synthesis04
-
-( $tpips 2>&1 | sed '/file *\//d' ) <<EOF
 create synthesis04 synthesis04.f
 
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
@@ -40,4 +30,3 @@ display PRINTED_FILE
 close
 delete synthesis04
 quit
-EOF

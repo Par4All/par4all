@@ -1,32 +1,23 @@
-#!/bin/sh
-
+setenv PIPS_CHECK_FORTRAN="Y"
 # Typing inconsistency for FOO
 
-PIPS_CHECK_FORTRAN="Y"
-export PIPS_CHECK_FORTRAN
-
-tpips=${tpips_version:-tpips}
-
-Delete synthesis06
-
-( $tpips 2>&1 | sed '/file *\//d' ) <<EOF
-create synthesis06 synthesis06.f
+create synthesis05 synthesis05.f
 
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 setproperty PARSER_TYPE_CHECK_CALL_SITES TRUE
 
 echo
-echo User source code for SYNTHESIS06
+echo User source code for SYNTHESIS05
 echo
 
-module SYNTHESIS06
+module SYNTHESIS05
 display PRINTED_FILE
 
 echo
-echo Call graph for synthesis06
+echo Call graph for synthesis05
 echo
 
-module SYNTHESIS06
+module SYNTHESIS05
 activate PRINT_CALL_GRAPH
 display CALLGRAPH_FILE
 
@@ -38,6 +29,5 @@ module HIDENH
 display PRINTED_FILE
 
 close
-delete synthesis06
+delete synthesis05
 quit
-EOF
