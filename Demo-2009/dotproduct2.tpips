@@ -80,7 +80,7 @@ shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT06.f
 
 echo
 echo "************************"
-echo "** SIMPLIFY_CONTROL **"
+echo "*** SIMPLIFY_CONTROL ***"
 echo "************************"
 # suppression de la boucle vide du prologue
 apply SIMPLIFY_CONTROL
