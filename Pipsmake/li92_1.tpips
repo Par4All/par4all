@@ -1,19 +1,6 @@
-#!/bin/sh
+setenv PIPS_CHECK_FORTRAN="Y"
 
-PIPS_CHECK_FORTRAN="Y"
-export PIPS_CHECK_FORTRAN
-
-# test behavior of pipsmake when resources are touched by user
-
-tpips=${tpips_version:-tpips}
-
-Delete li92_1
-
-# Initialization:
-# rm -f li92_1.result/test
-# tpips >li92_1.result/test <<EOF
-
-($tpips 2>&1 | sed /db_check_time/d | sed '/file *\//d' ) <<EOF
+delete li92_1
 
 echo
 echo Direct computation of precondition for li921
@@ -58,5 +45,3 @@ close
 
 delete li92_1
 quit
-EOF
-
