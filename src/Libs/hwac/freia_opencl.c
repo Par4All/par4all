@@ -422,7 +422,8 @@ list freia_opencl_compile_calls
   else
   {
     opencl = safe_fopen(opencl_file, "w");
-    fprintf(opencl, "// generated opencl for function %s\n", module);
+    fprintf(opencl, FREIA_OPENCL_INCLUDES
+            "// generated opencl for function %s\n", module);
   }
   fprintf(opencl, "\n// opencl for dag %d\n", number);
 
