@@ -1,8 +1,5 @@
-delete recursion02
-
-setproperty ABORT_ON_USER_ERROR TRUE
 setenv PIPS_CHECK_FORTRAN="Y"
-
+delete recursion02
 create recursion02 recursion02.f
 
 # display PRINTED_FILE[%ALL]
