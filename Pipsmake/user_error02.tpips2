@@ -1,8 +1,5 @@
-delete user_error02
-
-setproperty ABORT_ON_USER_ERROR TRUE
 setenv PIPS_CHECK_FORTRAN="Y"
-
+delete user_error02
 create user_error02 user_error02.f
 # activate PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS
 # display CALLGRAPH_FILE
