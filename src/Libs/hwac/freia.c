@@ -31,9 +31,8 @@
 
 #include "genC.h"
 #include "misc.h"
+
 #include "freia.h"
-#include "freia_spoc.h"
-#include "freia_terapix.h"
 
 #include "linear.h"
 #include "pipsdbm.h"
@@ -207,6 +206,13 @@ static int freia_cmp_statement(const statement * s1, const statement * s2)
  */
 static void sort_subsequence(list ls, sequence sq)
 {
+  ifdebug(8) {
+    pips_debug(8, "ls = { ");
+    FOREACH(statement, s, ls)
+      fprintf(stderr, "%d ", (int) statement_number(s));
+    fprintf(stderr, "}\n");
+  }
+
   set cmp = set_make(set_pointer);
   set_assign_list(cmp, ls);
 
@@ -271,6 +277,9 @@ static void update_written_variables(set written, statement s)
   FOREACH(effect, e, cumu)
     if (effect_write_p(e))
       set_add_element(written, written, effect_variable(e));
+  ifdebug(9)
+    set_fprint(stderr, "written", written,
+               (gen_string_func_t) entity_local_name);
 }
 
 /* @return whether statement depends on some written variables
@@ -373,12 +382,16 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
             (statement_call_p(s) &&
              ENTITY_C_RETURN_P(call_function(statement_call(s)))))
         {
+          pips_debug(8, "statement %d in ltail\n", (int) statement_number(s));
           ltail = CONS(statement, s, ltail);
           update_written_variables(written, s);
         }
         else
+        {
+          pips_debug(8, "statement %d in lup\n", (int) statement_number(s));
           // we can move it up...
           lup = CONS(statement, s, lup);
+        }
       }
     }
     else // the sequence is cut on this statement
@@ -460,6 +473,9 @@ static void fsi_sort(list lls)
  */
 string freia_compile(string module, statement mod_stat, string target)
 {
+  pips_assert("some dependable effects for our purpose",
+              !get_bool_property("CONSTANT_PATH_EFFECTS"));
+
   if (!freia_valid_target_p(target))
     pips_internal_error("unexpected target %s", target);
 
@@ -505,7 +521,7 @@ string freia_compile(string module, statement mod_stat, string target)
   // output file if any
   string file = NULL;
   FILE * helper = NULL;
-  if (freia_spoc_p(target) || freia_terapix_p(target))
+  if (freia_spoc_p(target) || freia_terapix_p(target) || freia_opencl_p(target))
   {
     file = helper_file_name(module);
     if (file_readable_p(file))
@@ -520,6 +536,8 @@ string freia_compile(string module, statement mod_stat, string target)
     fprintf(helper, FREIA_SPOC_INCLUDES);
   else if (freia_terapix_p(target))
     fprintf(helper, FREIA_TRPX_INCLUDES);
+  else if (freia_opencl_p(target))
+    fprintf(helper, FREIA_OPENCL_INCLUDES);
 
   // hmmm...
   hash_table occs = freia_build_image_occurrences(mod_stat, NULL, NULL);
@@ -566,11 +584,12 @@ string freia_compile(string module, statement mod_stat, string target)
     else if (freia_terapix_p(target))
       allocated = freia_trpx_compile_calls(module, d, ls, occs, exchanges,
                                            output_images, helper, n_dags);
-    else if (freia_aipo_p(target))
-      allocated = freia_aipo_compile_calls(module, d, ls, occs,
-                                           exchanges, n_dags);
     else if (freia_opencl_p(target))
-      pips_internal_error("OpenCL FREIA target not implemented yet\n");
+      allocated = freia_opencl_compile_calls(module, d, ls, occs, exchanges,
+                                             output_images, helper, n_dags);
+    else if (freia_aipo_p(target))
+      allocated = freia_aipo_compile_calls(module, d, ls, occs, exchanges,
+                                           n_dags);
 
     if (exchanges)
     {

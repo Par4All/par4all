@@ -605,7 +605,7 @@ int dag_computation_count(const dag d)
   return count;
 }
 
-/* return target predecessors as a list.
+/* return target predecessor vertices as a list.
  * the same predecessor appears twice in b = a+a
  * build them in call order!
  * ??? maybe I should build a cache for performance,
@@ -1918,7 +1918,7 @@ static dagvtx find_twin_vertex(dag d, dagvtx target)
   FOREACH(dagvtx, v, dag_vertices(d))
     if (dagvtx_number(target)==dagvtx_number(v))
       return v;
-  pips_internal_error("twin vertex not found for %" _intFMT "",
+  pips_internal_error("twin vertex not found for %" _intFMT "\n",
                       dagvtx_number(target));
   return NULL;
 }
@@ -1936,13 +1936,15 @@ void freia_hack_fix_global_ins_outs(dag dfull, dag d)
   // cleanup outputs
   FOREACH(dagvtx, v, dag_vertices(d))
   {
-    dagvtx twin = find_twin_vertex(dfull, v);
+    // skip input nodes
+    if (dagvtx_number(v)==0)
+      continue;
 
-    if (dagvtx_number(v)!=0 &&
-        // the vertex was an output node in the full dag
-        (gen_in_list_p(twin, dag_outputs(dfull)) ||
-         // OR there were more successors in the full dag
-         gen_length(dagvtx_succs(v))!=gen_length(dagvtx_succs(twin))))
+    dagvtx twin = find_twin_vertex(dfull, v);
+    if (// the vertex was an output node in the full dag
+        gen_in_list_p(twin, dag_outputs(dfull)) ||
+        // OR there were more successors in the full dag
+        gen_length(dagvtx_succs(v))!=gen_length(dagvtx_succs(twin)))
     {
       pips_debug(4, "adding %" _intFMT " as output\n", dagvtx_number(v));
       dag_outputs(d) = gen_once(v, dag_outputs(d));
@@ -2005,14 +2007,25 @@ static bool any_scalar_dep(dagvtx v, set vs)
 {
   bool dep = false;
   statement target = dagvtx_statement(v);
+
+  // hmmm... may be called on a input node
+  if (!target) return dep;
+
   SET_FOREACH(dagvtx, source, vs)
   {
+    if (source==v)
+      continue;
+
+    pips_debug(9, "%"_intFMT" rw dep to %"_intFMT"?\n",
+               dagvtx_number(source), statement_number(target));
     if (freia_scalar_rw_dep(dagvtx_statement(source), target, NULL))
     {
       dep = true;
       break;
     }
   }
+  pips_debug(8, "scalar rw dep on %d: %s\n",
+             (int) dagvtx_number(v), bool_to_string(dep));
   return dep;
 }
 
@@ -2037,6 +2050,9 @@ all_previous_stats_with_deps_are_computed(dag d, const set computed, dagvtx v)
     }
   }
   gen_free_list(lv);
+
+  pips_debug(8, "all %d deps are okay: %s\n",
+             (int) dagvtx_number(v), bool_to_string(okay));
   return okay;
 }
 
@@ -2048,12 +2064,17 @@ all_previous_stats_with_deps_are_computed(dag d, const set computed, dagvtx v)
  * @param currents holds those in the current pipeline
  * @params maybe holds vertices with live images
  */
-list /* of dagvtx */ get_computable_vertices
+list /* of dagvtx */ dag_computable_vertices
   (dag d, const set computed, const set maybe, const set currents)
 {
   list computable = NIL;
   set local_currents = set_make(set_pointer);
   set_assign(local_currents, currents);
+
+  set not_computed = set_make(set_pointer);
+  FOREACH(dagvtx, v, dag_vertices(d))
+    if (!set_belong_p(computed, v))
+      set_add_element(not_computed, not_computed, v);
 
   // hmmm... should reverse the list to handle implicit dependencies?
   // where, there is an assert() to check that it does not happen.
@@ -2073,22 +2094,26 @@ list /* of dagvtx */ get_computable_vertices
       {
         computable = CONS(dagvtx, v, computable);
         set_add_element(local_currents, local_currents, v);
+        set_del_element(not_computed, not_computed, v);
       }
     }
     else // we have an image computation
     {
       list preds = dag_vertex_preds(d, v);
-      pips_debug(9, "%d predecessors to %" _intFMT "\n",
+      pips_debug(8, "%d predecessors to %" _intFMT "\n",
                  (int) gen_length(preds), dagvtx_number(v));
 
       if(// no scalar dependencies in the current pipeline
         !any_scalar_dep(v, local_currents) &&
+        // or in the future!
+        !any_scalar_dep(v, not_computed) &&
         // and image dependencies are fulfilled.
         list_in_set_p(preds, maybe))
       {
         computable = CONS(dagvtx, v, computable);
         // we do not want deps with other currents considered!
         set_add_element(local_currents, local_currents, v);
+        set_del_element(not_computed, not_computed, v);
       }
 
       gen_free_list(preds), preds = NIL;
@@ -2101,6 +2126,7 @@ list /* of dagvtx */ get_computable_vertices
 
   // cleanup
   set_free(local_currents);
+  set_free(not_computed);
   gen_free_list(lv);
   return computable;
 }
@@ -2538,13 +2564,13 @@ list dag_fix_image_reuse(dag d, hash_table init, const hash_table occs)
  * @param priority how to prioritize computable vertices
  * @param priority_update stuff to help prioritization
  * @return a list of sub-dags, some of which may contain no image operations
- * this pass also decides the schedule of image operations, with the aim
- * or reducing the number of necessary imagelets, so as to maximise
- * imagelet size.
+ * For terapix, this pass also decides the schedule of image operations,
+ * with the aim or reducing the number of necessary imagelets, so as to
+ * maximise imagelet size.
  */
 list // of dags
 dag_split_on_scalars(const dag initial,
-                     bool (*alone_only)(dagvtx),
+                     bool (*alone_only)(const dagvtx),
                      gen_cmp_func_t priority,
                      void (*priority_update)(const dag),
                      const set output_images)
@@ -2578,7 +2604,7 @@ dag_split_on_scalars(const dag initial,
 
     // transitive closure
     while ((computables =
-            get_computable_vertices(dall, computed, computed, current)))
+            dag_computable_vertices(dall, computed, computed, current)))
     {
       ifdebug(7) {
         FOREACH(dagvtx, v, computables)

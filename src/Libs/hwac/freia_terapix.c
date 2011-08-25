@@ -208,7 +208,7 @@ static int dag_terapix_measures
     update_erosions(d, in, erosion);
 
   list lv;
-  while ((lv = get_computable_vertices(d, processed, processed, processed)))
+  while ((lv = dag_computable_vertices(d, processed, processed, processed)))
   {
     dlength++;
     int level_width = 0;
@@ -1014,7 +1014,7 @@ static _int freia_terapix_call
     // update helper call arguments...
     *params = gen_nconc(*params,
                         freia_extract_params(opid, call_arguments(c),
-                                             head, hparams, &nargs));
+                                             head, NULL, hparams, &nargs));
 
     // special case for replace_const, which needs a 4th argument
     if (same_string_p(api->compact_name, ":"))
@@ -1700,7 +1700,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
   // transitive closure
   bool changed = true;
   while (changed &&
-         (computables = get_computable_vertices(d, done, done, current)))
+         (computables = dag_computable_vertices(d, done, done, current)))
   {
     // ensure determinism
     gen_sort_list(computables, (gen_cmp_func_t) dagvtx_terapix_priority);

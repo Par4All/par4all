@@ -31,6 +31,7 @@
 // additionnal hardware specific definitions
 #include "freia_spoc.h"
 #include "freia_terapix.h"
+#include "freia_opencl.h"
 
 // do not require NULL at the end of a vararg.
 #define cat(args...) concatenate(args , NULL)
@@ -76,7 +77,7 @@ typedef struct {
   // corresponding hardware settings
   spoc_hw_t spoc;
   terapix_hw_t terapix;
-  // opencl_hw_t?
+  opencl_hw_t opencl;
 } freia_api_t;
 
 #define dagvtx_freia_api(v) get_freia_api(vtxcontent_opid(dagvtx_content(v)))

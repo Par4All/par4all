@@ -1395,7 +1395,8 @@ static _int freia_spoc_pipeline
 
       // get needed parameters if any
       *lparams = gen_nconc(*lparams,
-           freia_extract_params(opid, call_arguments(c), head, hparams, &cst));
+         freia_extract_params(opid, call_arguments(c), head, NULL,
+                              hparams, &cst));
 
       some_reductions |= vtxcontent_optype(vc)==spoc_type_mes;
       some_kernels |= vtxcontent_optype(vc)==spoc_type_poc;
@@ -2140,7 +2141,7 @@ static list /* of dags */ split_dag(dag initial, const set output_images)
       set_fprint(stderr, "sure", sure, (gen_string_func_t) dagvtx_to_string);
     }
 
-    list computables = get_computable_vertices(dall, computed, avails, current);
+    list computables = dag_computable_vertices(dall, computed, avails, current);
     dagvtx_spoc_priority_computables = computables;
     dagvtx_spoc_priority_current = lcurrent;
     gen_sort_list(computables,
