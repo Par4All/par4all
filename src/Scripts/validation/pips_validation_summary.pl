@@ -155,9 +155,9 @@ for my $c (sort keys %new)
 }
 
 # extract various counts
-my $not_passed = $n{failed} + $n{changed} + $n{timeout};
-my $not_executed = $n{notest} + $n{orphan};
-my $count = ${not_passed} + ${not_executed} + $n{passed};
+my $not_passed = $n{failed} + $n{changed} + $n{timeout} + $n{notest};
+my $cannot_execute = $n{orphan};
+my $count = ${not_passed} + ${cannot_execute} + $n{passed};
 my $warned = $n{skipped} + $n{nofilter} +  $n{'multi-script'} + $n{missing} +
     $n{'multi-source'} +  $n{keptout} + $n{bug} + $n{later} + $n{slow};
 
@@ -178,9 +178,8 @@ print
   " - failed: $n{failed} (voluntary and unvoluntary core dumps)\n" .
   " - changed: $n{changed} (modified output)\n" .
   " - timeout: $n{timeout} (time was out)\n" .
-  " * not executed: $not_executed\n" .
-  " - orphan: $n{orphan} (result available without source nor script)\n" .
-  " - notest: $n{notest} (test file not under svn)\n";
+  " - notest: $n{notest} (test file not under svn, cannot compare)\n" .
+  " * cannot execute: $cannot_execute (result without source nor script)\n";
 
 print
   " * status changes:$status_changes\n" .
@@ -238,7 +237,8 @@ if ($aggregate)
 }
 
 # print detailed per-directory summary
-print "directory", " " x 19,"cases  bads success (F+C+T|K+B+L+S) changes...\n";
+print "directory", " " x 19,
+      "cases  bads success (F+C+T+N+O|K+B+L+S) changes...\n";
 for my $dir (sort keys %d)
 {
   my $failures =
@@ -257,9 +257,9 @@ for my $dir (sort keys %d)
       $d{$dir}{keptout} or $d{$dir}{bug} or $d{$dir}{later} or $d{$dir}{slow} or
       (exists $diff{$dir} and $differential))
   {
-    printf " (%d+%d+%d|%d+%d|%d+%d+%d+%d)",
+    printf " (%d+%d+%d+%d+%d|%d+%d+%d+%d)",
       $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout},
-      $d{$dir}{orphan}, $d{$dir}{notest},
+      $d{$dir}{notest}, $d{$dir}{orphan},
       $d{$dir}{keptout}, $d{$dir}{bug}, $d{$dir}{later}, $d{$dir}{slow};
 
     if ($differential) {
@@ -284,8 +284,7 @@ if ($n{passed} == $count)
 }
 else
 {
-  print "ISSUES $not_passed+$not_executed/$count " .
-        "($n{failed}+$n{changed}+$n{timeout}|" .
-	"$n{orphan}+$n{notest}|" .
+  print "ISSUES $not_passed+$cannot_execute/$count " .
+        "($n{failed}+$n{changed}+$n{timeout}+$n{notest}+$n{orphan}|" .
 	"$n{keptout}+$n{bug}+$n{later}+$n{slow})$status_changes $delay\n";
 }
