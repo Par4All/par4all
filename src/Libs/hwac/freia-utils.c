@@ -989,11 +989,16 @@ int freia_substitute_by_helper_call(
   // update type of parameters
   list larg_params = NIL;
   FOREACH(expression, e, lparams)
+  {
+    debug_on("RI_UTILS_DEBUG_LEVEL");
+    type t = expression_to_user_type(e);
+    debug_off();
     larg_params = CONS(parameter,
-                       make_parameter(expression_to_user_type(e),
+                       make_parameter(t,
                                       make_mode_value(),
                                       make_dummy_unknown()),
                        larg_params);
+  }
   larg_params = gen_nreverse(larg_params);
   module_functional_parameters(helper) = larg_params;
 
