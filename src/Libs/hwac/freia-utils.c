@@ -1296,17 +1296,20 @@ static statement image_free(entity v)
               CONS(expression, entity_to_expression(v), NIL)));
 }
 
-/* tell whether there is no image processing statements between s1 and s2
+/* tell whether there is no image processing statements between s1 and l2
  */
 static bool only_minor_statements_in_between(
   list ls, statement s1, list l2, set image_occurences)
 {
-  bool in_sequence = false;
+  bool s1_seen = false, in_sequence = false;
+  pips_assert("consistent statement & list", !gen_in_list_p(s1, l2));
   int n2 = gen_length(l2);
+
+  // scan the sequence list, looking for s1 & l2 statements
   FOREACH(statement, s, ls)
   {
     if (!in_sequence && s==s1)
-      in_sequence = true;
+      in_sequence = true, s1_seen = true;
     else if (in_sequence && gen_in_list_p(s, l2))
     {
       n2--;
@@ -1315,12 +1318,22 @@ static bool only_minor_statements_in_between(
     else if (in_sequence && set_belong_p(image_occurences, s))
       return false;
   }
-  pips_internal_error("should not get there");
+
+  // ??? should really be an error...
+  pips_user_warning("should not get there: s1 seen=%s, seq=%s, n2=%d\n",
+                    bool_to_string(s1_seen), bool_to_string(in_sequence), n2);
+
+  // let us be optimistic, this is a prototype
   return true;
 }
 
 /* insert image allocation if needed, for intermediate image inserted before
  * if an image is used only twice, then it is switched back to the initial one
+ *
+ * This could/should be improved:
+ * - temporary images kept could be reused if possible, instead of new ones
+ * - not sure about the condition to move back to the initial image
+ *
  * @param ls list of statements to consider
  * @param images list of entities to check and maybe allocate
  * @param init new image -> initial image
