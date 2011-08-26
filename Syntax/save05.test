@@ -1,6 +1,8 @@
 #!/bin/sh
 
-PIPS_CHECK_FORTRAN="Y"
+# The Fortran code is wrong, no initialization of variables w and y,
+# but it does not matter
+PIPS_CHECK_FORTRAN="N"
 export PIPS_CHECK_FORTRAN
 
 tpips=${tpips_version:-tpips}

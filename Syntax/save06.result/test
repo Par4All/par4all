@@ -1,6 +1,5 @@
 user warning in tp_parse: save06: No such workspace
 Registering file save06.f
-Checking Fortran syntax of ./save06.f
 Splitting file    ./save06.f
   Module         SAVE06
 Workspace save06 created and opened.

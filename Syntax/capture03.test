@@ -1,6 +1,7 @@
 #!/bin/sh
 
-PIPS_CHECK_FORTRAN="Y"
+# No compilation issue
+PIPS_CHECK_FORTRAN="N"
 export PIPS_CHECK_FORTRAN
 
 # Type check the max operators

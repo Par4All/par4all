@@ -1,6 +1,7 @@
 #!/bin/sh
 
-PIPS_CHECK_FORTRAN="Y"
+# z1 and z2 used initialized. No other compilation issue.
+PIPS_CHECK_FORTRAN="N"
 export PIPS_CHECK_FORTRAN
 
 tpips=${tpips_version:-tpips}

@@ -1,6 +1,7 @@
 #!/bin/sh
 
-PIPS_CHECK_FORTRAN="Y"
+# Variable v is not used, not need for further check
+PIPS_CHECK_FORTRAN="N"
 export PIPS_CHECK_FORTRAN
 
 tpips=${tpips_version:-tpips}
