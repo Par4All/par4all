@@ -1108,12 +1108,13 @@ static bool reference_written_p(
   const reference r,
   const hash_table signatures)
 {
-  string why = "default";
+  string why = "default", func = "?";
   bool written = false;
   call c = (call) gen_get_ancestor(call_domain, r);
   if (c)
   {
     entity called = call_function(c);
+    func = entity_local_name(called);
     int n = reference_argument_number(r, call_arguments(c));
     if (n==0)
       written=true, why = "not found";
@@ -1134,9 +1135,9 @@ static bool reference_written_p(
     pips_internal_error("reference to %s outside of a call?\n",
                         entity_local_name(reference_variable(r)));
 
-  pips_debug(8, "reference to %s is %s (%s)\n",
+  pips_debug(8, "reference to %s is %s (%s in %s)\n",
              entity_local_name(reference_variable(r)),
-             written? "written": "read", why);
+             written? "written": "read", why, func);
 
   return written;
 }
