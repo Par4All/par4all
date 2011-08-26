@@ -1218,18 +1218,15 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
 {
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *t_1 = freia_common_create_data(t->bpp, t->widthWa, t->heightWa);
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t_1, i, 111, 12);                         /*0008*/
-   freia_aipo_global_max(t_1, &max);                                    /*0010*/
+   freia_skip_08_helper_0_0_0(t, i, 111, 12);                           /*0008*/
+   freia_aipo_global_max(t, &max);                                      /*0010*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else
       seuil = max+15;                                                   /*0014*/
-   freia_skip_08_helper_0_1_0(o, t_1, 8, seuil-4, true, -12);           /*0015*/
+   freia_skip_08_helper_0_1_0(o, t, 8, seuil-4, true, -12);             /*0015*/
    freia_common_destruct_data(t);                                       /*0017*/
-   freia_common_destruct_data(t_1);
 }
 
 ! cleaned up function
@@ -1238,18 +1235,15 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
 {
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *t_1 = freia_common_create_data(t->bpp, t->widthWa, t->heightWa);
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t_1, i, 111, 12);                         /*0008*/
-   freia_aipo_global_max(t_1, &max);                                    /*0010*/
+   freia_skip_08_helper_0_0_0(t, i, 111, 12);                           /*0008*/
+   freia_aipo_global_max(t, &max);                                      /*0010*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else
       seuil = max+15;                                                   /*0014*/
-   freia_skip_08_helper_0_1_0(o, t_1, 8, seuil-4, 1, -12);              /*0015*/
+   freia_skip_08_helper_0_1_0(o, t, 8, seuil-4, 1, -12);                /*0015*/
    freia_common_destruct_data(t);                                       /*0017*/
-   freia_common_destruct_data(t_1);
 }
 #
 # FREIA COMPILATION DONE

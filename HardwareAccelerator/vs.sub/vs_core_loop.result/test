@@ -3893,9 +3893,7 @@ int vs_core_loop(void)
    register int32_t xshiftacc, yshiftacc;                               /*0024*/
    register freia_status end = 0;                                       /*0025*/
    
-   // hardware accelerator generated variable
-   freia_data2d *immotion_4 = 0;
-
+   
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -3903,7 +3901,6 @@ int vs_core_loop(void)
    imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0039*/
 
    imstab = freia_common_create_data(16, fdin.framewidth-20, fdin.frameheight-20);     /*0043*/
-   immotion_4 = freia_common_create_data(imstab->bpp, imstab->widthWa, imstab->heightWa);
    imtmp2 = freia_common_create_data(16, imstab->width, imstab->height);               /*0044*/
 
    imbg16 = freia_common_create_data(16, imstab->width, imstab->height);               /*0048*/
@@ -3961,9 +3958,9 @@ l99979:   ;                                                                    /
    freia_aipo_dilate_8c(imtmp2, imtmp2, freia_morpho_kernel_8c);        /*0107*/
 
    freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
-   freia_aipo_erode_8c(immotion_4, imtmp2, freia_morpho_kernel_8c);
+   freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);
    freia_aipo_copy(imbg, imbg16);
-   vs_core_loop_helper_3_2_1(immotion, immotion_4, imstab, imtmp, -1, 1);              /*0113*/
+   vs_core_loop_helper_3_2_1(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
    
    // save contrast motion detection
    
@@ -3983,7 +3980,6 @@ l99980:   ;
    freia_common_destruct_data(imbg16);                                  /*0137*/
    freia_common_destruct_data(imbg);                                    /*0138*/
    freia_common_destruct_data(immotion);                                /*0139*/
-   freia_common_destruct_data(immotion_4);
 
    freia_common_close_input(&fdin);                                     /*0141*/
    freia_common_close_output(&fdmotion);                                /*0142*/
@@ -4013,9 +4009,7 @@ int vs_core_loop(void)
    register int32_t xshiftacc, yshiftacc;                               /*0024*/
    register freia_status end = 0;                                       /*0025*/
    
-   // hardware accelerator generated variable
-   freia_data2d *immotion_4 = 0;
-
+   
    freia_initialize(0, (void *) 0);                                     /*0035*/
 
    freia_common_open_input(&fdin, 0);                                   /*0037*/
@@ -4023,7 +4017,6 @@ int vs_core_loop(void)
    imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0039*/
 
    imstab = freia_common_create_data(16, fdin.framewidth-20, fdin.frameheight-20);     /*0043*/
-   immotion_4 = freia_common_create_data(imstab->bpp, imstab->widthWa, imstab->heightWa);
    imtmp2 = freia_common_create_data(16, imstab->width, imstab->height);               /*0044*/
 
    imbg16 = freia_common_create_data(16, imstab->width, imstab->height);               /*0048*/
@@ -4082,9 +4075,9 @@ l99998:   ;
    freia_aipo_dilate_8c(imtmp2, imtmp2, freia_morpho_kernel_8c);        /*0107*/
 
    freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
-   freia_aipo_erode_8c(immotion_4, imtmp2, freia_morpho_kernel_8c);
+   freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);
    freia_aipo_copy(imbg, imbg16);
-   vs_core_loop_helper_3_2_1(immotion, immotion_4, imstab, imtmp, -1, 1);              /*0113*/
+   vs_core_loop_helper_3_2_1(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
    
    // save contrast motion detection
    
@@ -4105,7 +4098,6 @@ l99999:   ;
    freia_common_destruct_data(imbg16);                                  /*0137*/
    freia_common_destruct_data(imbg);                                    /*0138*/
    freia_common_destruct_data(immotion);                                /*0139*/
-   freia_common_destruct_data(immotion_4);
 
    freia_common_close_input(&fdin);                                     /*0141*/
    freia_common_close_output(&fdmotion);                                /*0142*/

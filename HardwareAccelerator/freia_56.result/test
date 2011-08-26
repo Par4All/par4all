@@ -807,12 +807,11 @@ freia_status freia_56(freia_data2d *out, freia_data2d *in)
 {
    // same as freia_55, but out is used as a temporary
    // hardware accelerator generated variable
-   freia_data2d *out_1 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa), *out_2 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
+   freia_data2d *out_1 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
 
-   freia_aipo_dilate_8c(out_2, in, freia_morpho_kernel_8c);             /*0010*/
-   freia_56_helper_0_0_1(out, out_1, out_2, 255);                       /*0011*/
-   freia_aipo_erode_8c(out_1, out_2, freia_morpho_kernel_8c);           /*0012*/
-   freia_common_destruct_data(out_2);
+   freia_aipo_dilate_8c(out, in, freia_morpho_kernel_8c);               /*0010*/
+   freia_56_helper_0_0_1(out, out_1, out, 255);                         /*0011*/
+   freia_aipo_erode_8c(out_1, out, freia_morpho_kernel_8c);             /*0012*/
    freia_common_destruct_data(out_1);
 
    return FREIA_OK;                                                     /*0017*/
@@ -824,12 +823,11 @@ freia_status freia_56(freia_data2d *out, freia_data2d *in)
 {
    // same as freia_55, but out is used as a temporary
    // hardware accelerator generated variable
-   freia_data2d *out_1 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa), *out_2 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
+   freia_data2d *out_1 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
 
-   freia_aipo_dilate_8c(out_2, in, freia_morpho_kernel_8c);             /*0010*/
-   freia_56_helper_0_0_1(out, out_1, out_2, 255);                       /*0011*/
-   freia_aipo_erode_8c(out_1, out_2, freia_morpho_kernel_8c);           /*0012*/
-   freia_common_destruct_data(out_2);
+   freia_aipo_dilate_8c(out, in, freia_morpho_kernel_8c);               /*0010*/
+   freia_56_helper_0_0_1(out, out_1, out, 255);                         /*0011*/
+   freia_aipo_erode_8c(out_1, out, freia_morpho_kernel_8c);             /*0012*/
    freia_common_destruct_data(out_1);
 
    return 0;                                                            /*0017*/

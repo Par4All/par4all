@@ -2448,8 +2448,6 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    
    freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0011*/
    int binvalue, maxmotion, minmotion;                                  /*0012*/
-   // hardware accelerator generated variable
-   freia_data2d *mv_4 = freia_common_create_data(mv->bpp, mv->widthWa, mv->heightWa);
 
    vs_core_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, motion_a+motion_b);        /*0014*/
    
@@ -2469,11 +2467,10 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    
    // gradient
    freia_aipo_dilate_8c(t2, t1, freia_morpho_kernel_8c);                /*0037*/
-   freia_aipo_erode_8c(mv_4, t1, freia_morpho_kernel_8c);               /*0038*/
-   vs_core_helper_0_1_2(mv, t2, mv_4, stab, -1, 1);                     /*0039*/
-
-   freia_common_destruct_data(mv_4);
-
+   freia_aipo_erode_8c(mv, t1, freia_morpho_kernel_8c);                 /*0038*/
+   vs_core_helper_0_1_2(mv, t2, mv, stab, -1, 1);                       /*0039*/
+   
+   
    freia_common_destruct_data(t1);                                      /*0046*/
    freia_common_destruct_data(t2);                                      /*0047*/
    return FREIA_OK;                                                     /*0048*/
@@ -2488,8 +2485,6 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    
    freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0011*/
    int binvalue, maxmotion, minmotion;                                  /*0012*/
-   // hardware accelerator generated variable
-   freia_data2d *mv_4 = freia_common_create_data(mv->bpp, mv->widthWa, mv->heightWa);
 
    vs_core_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, motion_a+motion_b);        /*0014*/
    
@@ -2509,11 +2504,10 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    
    // gradient
    freia_aipo_dilate_8c(t2, t1, freia_morpho_kernel_8c);                /*0037*/
-   freia_aipo_erode_8c(mv_4, t1, freia_morpho_kernel_8c);               /*0038*/
-   vs_core_helper_0_1_2(mv, t2, mv_4, stab, -1, 1);                     /*0039*/
-
-   freia_common_destruct_data(mv_4);
-
+   freia_aipo_erode_8c(mv, t1, freia_morpho_kernel_8c);                 /*0038*/
+   vs_core_helper_0_1_2(mv, t2, mv, stab, -1, 1);                       /*0039*/
+   
+   
    freia_common_destruct_data(t1);                                      /*0046*/
    freia_common_destruct_data(t2);                                      /*0047*/
    return 0;                                                            /*0048*/
