@@ -463,7 +463,7 @@ list freia_opencl_compile_calls
 
   // now may put actual allocations, which messes up statement numbers
   list reals =
-    freia_allocate_new_images_if_needed(ls, new_images, occs, init, NULL);
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init, init);
 
   freia_insert_added_stats(ls, added_stats);
   added_stats = NIL;
