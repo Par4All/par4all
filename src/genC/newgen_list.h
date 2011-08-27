@@ -338,6 +338,7 @@ extern void gen_closure(list (*)(), const list);
 
 extern list gen_copy_string_list(const list);
 extern void gen_free_string_list(list);
+void gen_fprint(FILE *, const string, const list, gen_string_func_t);
 
 // UTILS
 extern list gen_cons(const void *, const list);
