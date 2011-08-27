@@ -2236,6 +2236,7 @@ static list /* of dags */ split_dag(dag initial, const set output_images)
  * @param module
  * @param ls list of statements for the dag (in reverse order)
  * @param helper output file
+ * @param helpers created functions
  * @param number current helper dag count
  * @return list of intermediate images to allocate
  */
@@ -2247,6 +2248,7 @@ list freia_spoc_compile_calls
    hash_table exchanges,
    const set output_images,
    FILE * helper_file,
+   set helpers,
    int number)
 {
   // build DAG for ls
@@ -2335,7 +2337,7 @@ list freia_spoc_compile_calls
       _int nout = freia_spoc_pipeline(module, fname_split, code, d, &lparams,
                                       output_images);
       stnb = freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                             ls, fname_split, lparams, stnb);
+                                      ls, fname_split, lparams, helpers, stnb);
       // record (simple) signature
       hash_put(init, local_name_to_top_level_entity(fname_split), (void*) nout);
       free(fname_split), fname_split = NULL;

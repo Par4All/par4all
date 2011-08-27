@@ -84,7 +84,7 @@ static int opencl_compile_mergeable_dag(
   dag d, list ls,
   string split_name, int n_cut,
   set global_remainings, hash_table signatures,
-  FILE * helper, FILE * opencl, int stnb)
+  FILE * helper, FILE * opencl, set helpers, int stnb)
 {
   string cut_name = strdup(cat(split_name, "_", itoa(n_cut)));
   pips_debug(3, "compiling %s cut %d, %d stats\n",
@@ -238,7 +238,7 @@ static int opencl_compile_mergeable_dag(
 
   // - and substitute its call...
   stnb = freia_substitute_by_helper_call(NULL, global_remainings, remainings,
-                                         ls, cut_name, lparams, stnb);
+                                         ls, cut_name, lparams, helpers, stnb);
 
   hash_put(signatures, local_name_to_top_level_entity(cut_name),
            (void*) (_int) n_outs);
@@ -272,6 +272,7 @@ static void opencl_merge_and_compile(
   const set output_images,
   FILE * helper,
   FILE * opencl,
+  set helpers,
   hash_table signatures)
 {
   string split_name = strdup(cat(fname_fulldag, "_", itoa(n_split)));
@@ -354,7 +355,7 @@ static void opencl_merge_and_compile(
       // and compile!
       stnb = opencl_compile_mergeable_dag
         (module, nd, ls, split_name, n_cut, global_remainings,
-         signatures, helper, opencl, stnb);
+         signatures, helper, opencl, helpers, stnb);
     }
 
     // cleanup initial dag??
@@ -394,6 +395,7 @@ list freia_opencl_compile_calls
  hash_table exchanges,
  const set output_images,
  FILE * helper_file,
+ set helpers,
  int number)
 {
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
@@ -454,7 +456,7 @@ list freia_opencl_compile_calls
 
       opencl_merge_and_compile(module, ls, d, fname_fulldag, n_split,
                                fulld, output_images, helper_file, opencl,
-                               init);
+                               helpers, init);
 
       n_split++;
     }

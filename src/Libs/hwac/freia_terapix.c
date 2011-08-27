@@ -1369,6 +1369,7 @@ static int freia_trpx_compile_one_dag(
   int n_cut,
   set global_remainings,
   FILE * helper_file,
+  set helpers,
   int stnb,
   hash_table signatures)
 {
@@ -1401,7 +1402,7 @@ static int freia_trpx_compile_one_dag(
 
   // - and substitute its call...
   stnb = freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                         ls, fname_dag, lparams, stnb);
+                                         ls, fname_dag, lparams, helpers, stnb);
 
   // record (simple) signature
   hash_put(signatures, local_name_to_top_level_entity(fname_dag), (void*) nout);
@@ -1783,6 +1784,7 @@ list freia_trpx_compile_calls
  hash_table exchanges,
  const set output_images,
  FILE * helper_file,
+ set helpers,
  int number)
 {
   // build DAG for ls
@@ -1853,7 +1855,7 @@ list freia_trpx_compile_calls
     {
       // direct handling of the dag
       stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
-                               -1, global_remainings, helper_file, stnb, init);
+                       -1, global_remainings, helper_file, helpers, stnb, init);
     }
     else if (trpx_dag_cut_compute_p(dag_cut))
     {
@@ -1871,14 +1873,15 @@ list freia_trpx_compile_calls
       {
         dag dc = cut_perform(d, cut, erosion, fulld, output_images);
         // generate code for cut
-        stnb = freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag,
-                 n_split, n_cut++, global_remainings, helper_file, stnb, init);
+        stnb =
+          freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag, n_split,
+                n_cut++, global_remainings, helper_file, helpers, stnb, init);
         // cleanup
         free_dag(dc);
         hash_table_clear(erosion);
       }
       stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
-                          n_cut++, global_remainings, helper_file, stnb, init);
+                 n_cut++, global_remainings, helper_file, helpers, stnb, init);
       hash_table_free(erosion);
     }
     else if (trpx_dag_cut_enumerate_p(dag_cut))

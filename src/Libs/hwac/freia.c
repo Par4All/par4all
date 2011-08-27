@@ -48,6 +48,82 @@
 
 #define FUNC_C "functions.c"
 
+/************************************************************ CLEANUP STATUS */
+
+typedef struct {
+  // entities: variables used to hold freia status returns
+  set used_for_status;
+  // entities: set of generated helper functions, may be NULL
+  set helper_functions;
+} fcs_ctx;
+
+static bool fcs_call_flt(call c, fcs_ctx * ctx)
+{
+  if (freia_assignment_p(call_function(c)))
+  {
+    list largs = call_arguments(c);
+    pips_assert("two arguments to = or |=", gen_length(largs)==2);
+    syntax op = expression_syntax(EXPRESSION(CAR(CDR(largs))));
+    if (!syntax_call_p(op))
+      return false;
+
+    // is it an aipo or helper call?
+    call rhs = syntax_call(op);
+    if (entity_freia_api_p(call_function(rhs)) ||
+        (ctx->helper_functions &&
+         set_belong_p(ctx->helper_functions, call_function(rhs))))
+    {
+      // record scrapped status variable
+      syntax slhs = expression_syntax(EXPRESSION(CAR(largs)));
+      pips_assert("left hand side is a scalar reference",
+                  syntax_reference_p(slhs) &&
+                  !reference_indices(syntax_reference(slhs)));
+      set_add_element(ctx->used_for_status, ctx->used_for_status,
+                      reference_variable(syntax_reference(slhs)));
+
+      // and scrap its assignement!
+      call_function(c) = call_function(rhs);
+      call_arguments(c) = call_arguments(rhs);
+
+      // hmmm... small memory leak in assigned lhs,
+      // but I'm not sure of effect references...
+      call_arguments(rhs) = NIL;
+      free_call(rhs);
+      gen_free_list(largs);
+    }
+  }
+  // no second level anyway? what about ","?
+  return false;
+}
+
+/*
+  foo |= freia_aipo_* or helpers  -> freia_aipo_*
+  foo = freia_aipo_*  or helpers  -> freia_aipo_*
+  declaration: foo = FREIA_OK, if it is not initialized.
+  ??? not managed: freia_aipo_ calls in declarations, return, ","?
+*/
+static void freia_cleanup_status(statement s, set helpers)
+{
+  fcs_ctx ctx = { set_make(set_pointer), helpers };
+
+  // cleanup statements
+  gen_context_recurse(s, &ctx, call_domain, fcs_call_flt, gen_null);
+
+  // fix status variable initializations
+  SET_FOREACH(entity, var, ctx.used_for_status)
+  {
+    if (value_unknown_p(entity_initial(var)))
+    {
+      free_value(entity_initial(var));
+      entity_initial(var) =
+        make_value_expression(call_to_expression(freia_ok()));
+    }
+  }
+
+  // cleanup
+  set_free(ctx.used_for_status);
+}
+
 /**************************************************** LOOK FOR IMAGE SHUFFLE */
 
 static bool fis_call_flt(call c, bool * shuffle)
@@ -520,6 +596,7 @@ string freia_compile(string module, statement mod_stat, string target)
 
   // output file if any
   string file = NULL;
+  set helpers = NULL;
   FILE * helper = NULL;
   if (freia_spoc_p(target) || freia_terapix_p(target) || freia_opencl_p(target))
   {
@@ -529,6 +606,9 @@ string freia_compile(string module, statement mod_stat, string target)
                       "cannot reapply transformation\n", file);
     helper = safe_fopen(file, "w");
     pips_debug(1, "generating file '%s'\n", file);
+
+    // we will also record created helpers
+    helpers = set_make(set_pointer);
   }
 
   // headers
@@ -580,13 +660,13 @@ string freia_compile(string module, statement mod_stat, string target)
 
     if (freia_spoc_p(target))
       allocated = freia_spoc_compile_calls(module, d, ls, occs, exchanges,
-                                           output_images, helper, n_dags);
+                                       output_images, helper, helpers, n_dags);
     else if (freia_terapix_p(target))
       allocated = freia_trpx_compile_calls(module, d, ls, occs, exchanges,
-                                           output_images, helper, n_dags);
+                                       output_images, helper, helpers, n_dags);
     else if (freia_opencl_p(target))
       allocated = freia_opencl_compile_calls(module, d, ls, occs, exchanges,
-                                             output_images, helper, n_dags);
+                                       output_images, helper, helpers, n_dags);
     else if (freia_aipo_p(target))
       allocated = freia_aipo_compile_calls(module, d, ls, occs, exchanges,
                                            n_dags);
@@ -597,7 +677,6 @@ string freia_compile(string module, statement mod_stat, string target)
       HASH_FOREACH(dagvtx, v1, dagvtx, v2, exchanges)
         gen_exchange_in_list(lssq, dagvtx_statement(v1), dagvtx_statement(v2));
     }
-
 
     if (allocated)
     {
@@ -614,10 +693,15 @@ string freia_compile(string module, statement mod_stat, string target)
     if (exchanges) hash_table_free(exchanges);
   }
 
+  // some code cleanup
+  if (get_bool_property("FREIA_CLEANUP_STATUS"))
+    freia_cleanup_status(mod_stat, helpers);
+
   // cleanup
   freia_clean_image_occurrences(occs);
   freia_close_dep_cache();
   set_free(output_images), output_images = NULL;
+  if (helpers) set_free(helpers), helpers = NULL;
   gen_free_list(fsi.seqs);
   set_free(fsi.in_loops);
   hash_table_free(fsi.sequence);

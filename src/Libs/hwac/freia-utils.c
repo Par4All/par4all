@@ -582,9 +582,9 @@ list /* of expression */ freia_extract_params
 
 /* @brief build all is well freia constant
  */
-static call freia_ok(void)
+call freia_ok(void)
 {
-  // how to build the "FREIA_OK" constant?
+  // how to build the "FREIA_OK" enum value constant?
   return make_call(local_name_to_top_level_entity("0"), NIL);
 }
 
@@ -930,6 +930,7 @@ int freia_substitute_by_helper_call(
   list /* of statement */ ls,
   string function_name,
   list lparams,
+  set helpers,
   int preceeding)
 {
   pips_debug(7, "%d statements, before %d\n",
@@ -986,6 +987,9 @@ int freia_substitute_by_helper_call(
   entity helper = make_empty_function(function_name,
         copy_type(functional_result(type_functional(entity_type(example)))),
                                       make_language_c());
+  // record helper function
+  set_add_element(helpers, helpers, helper);
+
   // update type of parameters
   list larg_params = NIL;
   FOREACH(expression, e, lparams)
