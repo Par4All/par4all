@@ -42,7 +42,7 @@
 #include "freia.h"
 #include "hwac.h"
 
-/* (re)open opencl file
+/* @return OpenCL helper file name for function
  */
 static string get_opencl_file_name(string func_name)
 {
