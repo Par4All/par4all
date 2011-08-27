@@ -464,16 +464,24 @@ skipped:
 	  if ! test -d $$base.result ; \
 	  then \
 	    echo "skipped: $(SUBDIR)/$$base" ; \
-	  elif ! [ -f $$base.result/test -o -f $$base.result/test.$(ARCH) ] ; \
+	  elif ! [ -f $$base.result/test ] ; \
 	  then \
 	    echo "missing: $(SUBDIR)/$$base" ; \
 	  fi ; \
 	done >> $(RESULTS)
 
-# test RESULT directory without any script
+# test RESULT directory without any script...
+# this warning is reported only if the case would be executed in the
+# current validation context (i.e. it may be ignored for bug/later/slow).
 .PHONY: orphan
 orphan:
-	@for base in $(sort $(F.list)) ; do \
+	@for base in $(sort $(F.list)) ; \
+	do \
+	  [ ! "$(DO_BUG)" -a -e $$base.bug ] && continue ; \
+	  [ ! "$(DO_LATER)" -a -e $$base.later ] && continue ; \
+	  [ ! "$(DO_SLOW)" -a -e $$base.slow ] && continue ; \
+	  [ ! "$(DO_F95)" -a \( -e $$base.f90 -o -e $$base.f95 \) ] && \
+	    continue ; \
 	  test -f $$base.tpips -o \
 	       -f $$base.tpips2 -o \
 	       -f $$base.test -o \
