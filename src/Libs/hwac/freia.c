@@ -59,11 +59,25 @@ typedef struct {
 
 static bool fcs_call_flt(call c, fcs_ctx * ctx)
 {
-  if (freia_assignment_p(call_function(c)))
+  entity called = call_function(c);
+  if (freia_assignment_p(called))
   {
     list largs = call_arguments(c);
     pips_assert("two arguments to = or |=", gen_length(largs)==2);
-    syntax op = expression_syntax(EXPRESSION(CAR(CDR(largs))));
+    expression erhs = EXPRESSION(CAR(CDR(largs)));
+
+    // catch and eat-up "foo |= 0;"
+    _int val;
+    if (ENTITY_BITWISE_OR_UPDATE_P(called) &&
+        expression_integer_value(erhs, &val) && val==0)
+    {
+      call_function(c) = entity_intrinsic(CONTINUE_FUNCTION_NAME);
+      gen_free_list(call_arguments(c)), call_arguments(c) = NIL;
+      return false;
+    }
+
+    // else, is it a call to some aipo or helper function?
+    syntax op = expression_syntax(erhs);
     if (!syntax_call_p(op))
       return false;
 
@@ -97,9 +111,10 @@ static bool fcs_call_flt(call c, fcs_ctx * ctx)
 }
 
 /*
-  foo |= freia_aipo_* or helpers  -> freia_aipo_*
-  foo = freia_aipo_*  or helpers  -> freia_aipo_*
-  declaration: foo = FREIA_OK, if it is not initialized.
+  foo |= freia_aipo_* or helpers  -> freia_aipo_* or helpers
+  foo = freia_aipo_*  or helpers  -> freia_aipo_* or helpers
+  foo |= 0                        -> <nope>
+  declaration: foo = 0 (FREIA_OK), if it is not initialized.
   ??? not managed: freia_aipo_ calls in declarations, return, ","?
 */
 static void freia_cleanup_status(statement s, set helpers)
