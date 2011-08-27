@@ -759,11 +759,11 @@ digraph "freia_71_helper_0_0" {
   "in" -> "13 E8";
   "in" -> "15 !";
 }
-// graph for dag "freia_71_helper_0_0_2" of module "freia_71" in dot format
-digraph "freia_71_helper_0_0_2" {
+// graph for dag "freia_71_helper_0_0_1" of module "freia_71" in dot format
+digraph "freia_71_helper_0_0_1" {
   // inputs
   "t0" [shape=circle];
-  "t2" [shape=circle];
+  "in" [shape=circle];
 
   // outputs
   "out" [shape=circle];
@@ -771,7 +771,9 @@ digraph "freia_71_helper_0_0_2" {
   // computation vertices
   "16 &" [shape=trapezium,orientation=270];
   "16 &" -> "out";
-  "t2" -> "16 &";
+  "15 !" [shape=trapezium,orientation=270];
+  "15 !" -> "16 &" [label="t2"];
+  "in" -> "15 !";
   "14 +." [shape=trapezium,orientation=270];
   "14 +." -> "16 &" [label="t1"];
   "t0" -> "14 +.";
@@ -783,14 +785,14 @@ digraph "freia_71_helper_0_0_2" {
 
 // dag 0: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
 
-// helper function freia_71_helper_0_0_2
-freia_status freia_71_helper_0_0_2(
+// helper function freia_71_helper_0_0_1
+freia_status freia_71_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
   int32_t c0)
 {
-  call opencl kernel freia_71_helper_0_0_2(o0, i0, i1, c0);
+  call opencl kernel freia_71_helper_0_0_1(o0, i0, i1, c0);
   return FREIA_OK;
 }
 // freia opencl includes
@@ -798,8 +800,8 @@ freia_status freia_71_helper_0_0_2(
 
 // opencl for dag 0
 
-// opencl function freia_71_helper_0_0_2
-kernel freia_71_helper_0_0_2(
+// opencl function freia_71_helper_0_0_1
+kernel freia_71_helper_0_0_1(
   opencl image o0,
   const opencl image i0,
   const opencl image i1,
@@ -812,7 +814,8 @@ kernel freia_71_helper_0_0_2(
     register pixel in1 = i1[i];
     // pixel computations
     register pixel t14 = PIXEL_ADD_CONST(in0, c0);
-    register pixel t16 = PIXEL_AND(in1, t14);
+    register pixel t15 = PIXEL_NOT(in1);
+    register pixel t16 = PIXEL_AND(t15, t14);
     // set output pixels
     o0[i] = t16;
   }
@@ -822,18 +825,15 @@ kernel freia_71_helper_0_0_2(
 
 int freia_71(freia_data2d *out, freia_data2d *in)
 {
-   freia_data2d *t0, *t2;                                               /*0006*/
+   freia_data2d *t0;                                                    /*0006*/
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0007*/
 
    t0 = freia_common_create_data(16, 1024, 720);                        /*0009*/
-   t2 = freia_common_create_data(16, 1024, 720);                        /*0011*/
 
    freia_aipo_erode_8c(t0, in, kernel1x3);                              /*0013*/
-   freia_71_helper_0_0_2(out, t0, t2, 1);                               /*0014*/
-   freia_aipo_not(t2, in);                                              /*0015*/
+   freia_71_helper_0_0_1(out, t0, in, 1);                               /*0014*/
 
    freia_common_destruct_data(t0);                                      /*0018*/
-   freia_common_destruct_data(t2);                                      /*0020*/
 
    return FREIA_OK;                                                     /*0022*/
 }
@@ -842,18 +842,15 @@ int freia_71(freia_data2d *out, freia_data2d *in)
 
 int freia_71(freia_data2d *out, freia_data2d *in)
 {
-   freia_data2d *t0, *t2;                                               /*0006*/
+   freia_data2d *t0;                                                    /*0006*/
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0007*/
 
    t0 = freia_common_create_data(16, 1024, 720);                        /*0009*/
-   t2 = freia_common_create_data(16, 1024, 720);                        /*0011*/
 
    freia_aipo_erode_8c(t0, in, kernel1x3);                              /*0013*/
-   freia_71_helper_0_0_2(out, t0, t2, 1);                               /*0014*/
-   freia_aipo_not(t2, in);                                              /*0015*/
+   freia_71_helper_0_0_1(out, t0, in, 1);                               /*0014*/
 
    freia_common_destruct_data(t0);                                      /*0018*/
-   freia_common_destruct_data(t2);                                      /*0020*/
 
    return 0;                                                            /*0022*/
 }
