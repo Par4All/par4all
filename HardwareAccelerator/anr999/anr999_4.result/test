@@ -265,7 +265,7 @@ int anr999(void)
    int i_0;                                                             /*0021*/
    int I_10_0;                                                          /*0022*/
    int I_3_0;                                                           /*0023*/
-   freia_status ret_0;                                                  /*0024*/
+   freia_status ret_0 = 0;                                              /*0024*/
    int i_1;                                                             /*0026*/
    int i_2;                                                             /*0027*/
 
@@ -318,7 +318,7 @@ int anr999(void)
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0080*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0081*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0082*/
-   ret_0 |= freia_aipo_sub(og, od, og);                                 /*0087*/
+   freia_aipo_sub(og, od, og);                                          /*0087*/
    
    
    printf("input global min = %d\n", measure_min);                      /*0093*/
@@ -2756,7 +2756,7 @@ int anr999(void)
    int i_0;                                                             /*0021*/
    int I_10_0;                                                          /*0022*/
    int I_3_0;                                                           /*0023*/
-   freia_status ret_0;                                                  /*0024*/
+   freia_status ret_0 = 0;                                              /*0024*/
    int i_1;                                                             /*0026*/
    int i_2;                                                             /*0027*/
 
@@ -2809,7 +2809,7 @@ int anr999(void)
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0080*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0081*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0082*/
-   ret_0 |= freia_aipo_sub(og, od, og);                                 /*0087*/
+   freia_aipo_sub(og, od, og);                                          /*0087*/
    
    
    printf("input global min = %d\n", measure_min);                      /*0093*/
@@ -2844,7 +2844,7 @@ int anr999(void)
    int i_0;                                                             /*0021*/
    int I_10_0;                                                          /*0022*/
    int I_3_0;                                                           /*0023*/
-   freia_status ret_0;                                                  /*0024*/
+   freia_status ret_0 = 0;                                              /*0024*/
    int i_1;                                                             /*0026*/
    int i_2;                                                             /*0027*/
 
@@ -2894,7 +2894,7 @@ int anr999(void)
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0080*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0081*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0082*/
-   ret_0 |= freia_aipo_sub(og, od, og);                                 /*0087*/
+   freia_aipo_sub(og, od, og);                                          /*0087*/
    
    
    printf("input global min = %d\n", measure_min);                      /*0093*/

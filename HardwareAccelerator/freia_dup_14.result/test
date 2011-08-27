@@ -126,8 +126,8 @@ int freia_dup_14(void)
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0014*/
 
-   freia_status ret_0;                                                  /*0019*/
-   freia_status ret_1;                                                  /*0021*/
+   freia_status ret_0 = 0;                                              /*0019*/
+   freia_status ret_1 = 0;                                              /*0021*/
    
    /* open videos flow */
    freia_common_open_input(&fdin, 0);                                   /*0024*/
@@ -144,10 +144,10 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imin, kernel1x3);               /*0038*/
+   freia_aipo_erode_8c(imopen, imin, kernel1x3);                        /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imin, kernel1x3);             /*0045*/
+   freia_aipo_dilate_8c(imclose, imin, kernel1x3);                      /*0045*/
 
    freia_aipo_and(imout, imopen, imclose);                              /*0049*/
    
@@ -399,7 +399,7 @@ int freia_dup_14(void)
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0014*/
 
-   freia_status ret_0;                                                  /*0019*/
+   freia_status ret_0 = 0;                                              /*0019*/
    freia_status ret_1;                                                  /*0021*/
    
    /* open videos flow */
@@ -415,7 +415,7 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   ret_0 |= freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);          /*0038*/
+   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
    ret_1 |= 0;                                                          /*0045*/
@@ -448,7 +448,7 @@ int freia_dup_14(void)
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0014*/
 
-   freia_status ret_0;                                                  /*0019*/
+   freia_status ret_0 = 0;                                              /*0019*/
    freia_status ret_1;                                                  /*0021*/
    
    /* open videos flow */
@@ -464,7 +464,7 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   ret_0 |= freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);          /*0038*/
+   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
    
@@ -835,7 +835,7 @@ int freia_dup_14(void)
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0014*/
 
-   freia_status ret_0;                                                  /*0019*/
+   freia_status ret_0 = 0;                                              /*0019*/
    freia_status ret_1;                                                  /*0021*/
    
    /* open videos flow */
@@ -851,7 +851,7 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   ret_0 |= freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);          /*0038*/
+   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
    ret_1 |= 0;                                                          /*0045*/
@@ -884,7 +884,7 @@ int freia_dup_14(void)
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0014*/
 
-   freia_status ret_0;                                                  /*0019*/
+   freia_status ret_0 = 0;                                              /*0019*/
    freia_status ret_1;                                                  /*0021*/
    
    /* open videos flow */
@@ -900,7 +900,7 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   ret_0 |= freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);          /*0038*/
+   freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
    
@@ -1084,8 +1084,8 @@ int freia_dup_14(void)
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0014*/
 
-   freia_status ret_0;                                                  /*0019*/
-   freia_status ret_1;                                                  /*0021*/
+   freia_status ret_0 = 0;                                              /*0019*/
+   freia_status ret_1 = 0;                                              /*0021*/
    
    /* open videos flow */
    freia_common_open_input(&fdin, 0);                                   /*0024*/
@@ -1102,10 +1102,10 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imin, kernel1x3);               /*0038*/
+   freia_aipo_erode_8c(imopen, imin, kernel1x3);                        /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imin, kernel1x3);             /*0045*/
+   freia_aipo_dilate_8c(imclose, imin, kernel1x3);                      /*0045*/
 
    freia_aipo_and(imout, imopen, imclose);                              /*0049*/
    
@@ -1140,8 +1140,8 @@ int freia_dup_14(void)
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0014*/
 
-   freia_status ret_0;                                                  /*0019*/
-   freia_status ret_1;                                                  /*0021*/
+   freia_status ret_0 = 0;                                              /*0019*/
+   freia_status ret_1 = 0;                                              /*0021*/
    
    /* open videos flow */
    freia_common_open_input(&fdin, 0);                                   /*0024*/
@@ -1158,10 +1158,10 @@ int freia_dup_14(void)
    
    
    ret_0 = 0;                                                           /*0037*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imin, kernel1x3);               /*0038*/
+   freia_aipo_erode_8c(imopen, imin, kernel1x3);                        /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imin, kernel1x3);             /*0045*/
+   freia_aipo_dilate_8c(imclose, imin, kernel1x3);                      /*0045*/
 
    freia_aipo_and(imout, imopen, imclose);                              /*0049*/
    

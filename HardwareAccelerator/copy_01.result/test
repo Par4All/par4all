@@ -104,7 +104,7 @@ int copy_01(void)
 {
    freia_dataio fdin, fdout;                                            /*0006*/
    freia_data2d *in, *open, *out;                                       /*0007*/
-   int32_t ret_0;                                                       /*0008*/
+   int32_t ret_0 = 0;                                                   /*0008*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
    
@@ -122,12 +122,12 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= freia_aipo_erode_8c(open, in, kernel1x3);                   /*0028*/
+   freia_aipo_erode_8c(open, in, kernel1x3);                            /*0028*/
    ret_0 |= 0;                                                          /*0029*/
-   ret_0 |= freia_aipo_erode_8c(open, open, kernel1x3);                 /*0030*/
+   freia_aipo_erode_8c(open, open, kernel1x3);                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
 
-   ret_0 |= freia_aipo_erode_8c(out, open, kernel1x3);                  /*0033*/
+   freia_aipo_erode_8c(out, open, kernel1x3);                           /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/
@@ -358,7 +358,7 @@ int copy_01(void)
 {
    freia_dataio fdin, fdout;                                            /*0006*/
    freia_data2d *in, *out;                                              /*0007*/
-   int32_t ret_0;                                                       /*0008*/
+   int32_t ret_0 = 0;                                                   /*0008*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
    
@@ -375,7 +375,7 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
+   copy_01_helper_0_0_0(out, in, kernel1x3);                            /*0028*/
    ret_0 |= 0;                                                          /*0029*/
    ret_0 |= 0;                                                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
@@ -402,7 +402,7 @@ int copy_01(void)
 {
    freia_dataio fdin, fdout;                                            /*0006*/
    freia_data2d *in, *out;                                              /*0007*/
-   int32_t ret_0;                                                       /*0008*/
+   int32_t ret_0 = 0;                                                   /*0008*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
    
@@ -419,7 +419,7 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
+   copy_01_helper_0_0_0(out, in, kernel1x3);                            /*0028*/
    
    
    
@@ -784,7 +784,7 @@ int copy_01(void)
 {
    freia_dataio fdin, fdout;                                            /*0006*/
    freia_data2d *in, *out;                                              /*0007*/
-   int32_t ret_0;                                                       /*0008*/
+   int32_t ret_0 = 0;                                                   /*0008*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
    
@@ -801,7 +801,7 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
+   copy_01_helper_0_0_0(out, in, kernel1x3);                            /*0028*/
    ret_0 |= 0;                                                          /*0029*/
    ret_0 |= 0;                                                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
@@ -828,7 +828,7 @@ int copy_01(void)
 {
    freia_dataio fdin, fdout;                                            /*0006*/
    freia_data2d *in, *out;                                              /*0007*/
-   int32_t ret_0;                                                       /*0008*/
+   int32_t ret_0 = 0;                                                   /*0008*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
    
@@ -845,7 +845,7 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= copy_01_helper_0_0_0(out, in, kernel1x3);                   /*0028*/
+   copy_01_helper_0_0_0(out, in, kernel1x3);                            /*0028*/
    
    
    
@@ -991,7 +991,7 @@ int copy_01(void)
 {
    freia_dataio fdin, fdout;                                            /*0006*/
    freia_data2d *in, *open, *out;                                       /*0007*/
-   int32_t ret_0;                                                       /*0008*/
+   int32_t ret_0 = 0;                                                   /*0008*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
    
@@ -1009,12 +1009,12 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= freia_aipo_erode_8c(open, in, kernel1x3);                   /*0028*/
+   freia_aipo_erode_8c(open, in, kernel1x3);                            /*0028*/
    ret_0 |= 0;                                                          /*0029*/
-   ret_0 |= freia_aipo_erode_8c(open, open, kernel1x3);                 /*0030*/
+   freia_aipo_erode_8c(open, open, kernel1x3);                          /*0030*/
    ret_0 |= 0;                                                          /*0031*/
 
-   ret_0 |= freia_aipo_erode_8c(out, open, kernel1x3);                  /*0033*/
+   freia_aipo_erode_8c(out, open, kernel1x3);                           /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/
@@ -1037,7 +1037,7 @@ int copy_01(void)
 {
    freia_dataio fdin, fdout;                                            /*0006*/
    freia_data2d *in, *open, *out;                                       /*0007*/
-   int32_t ret_0;                                                       /*0008*/
+   int32_t ret_0 = 0;                                                   /*0008*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0010*/
    
@@ -1055,10 +1055,10 @@ int copy_01(void)
    
    
    ret_0 = 0;                                                           /*0027*/
-   ret_0 |= freia_aipo_erode_8c(open, in, kernel1x3);                   /*0028*/
-   ret_0 |= freia_aipo_erode_8c(open, open, kernel1x3);                 /*0030*/
+   freia_aipo_erode_8c(open, in, kernel1x3);                            /*0028*/
+   freia_aipo_erode_8c(open, open, kernel1x3);                          /*0030*/
 
-   ret_0 |= freia_aipo_erode_8c(out, open, kernel1x3);                  /*0033*/
+   freia_aipo_erode_8c(out, open, kernel1x3);                           /*0033*/
    
    
    freia_common_tx_image(out, &fdout);                                  /*0037*/

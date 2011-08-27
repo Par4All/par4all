@@ -98,18 +98,18 @@ digraph "dag_cleaned_1" {
 
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
-   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
-   ret = freia_aipo_global_vol(out, &volcurrent);                       /*0007*/
+   int volprevious, volcurrent, i, j = 0, k, l, m = 0, n;               /*0006*/
+   freia_aipo_global_vol(out, &volcurrent);                             /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
       i = 1;                                                            /*0011*/
       k = 0;                                                            /*0012*/
       j = 0;                                                            /*0013*/
       freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
-      j |= freia_aipo_inf(out, out, in);                                /*0014*/
+      freia_aipo_inf(out, out, in);                                     /*0014*/
       l = j;                                                            /*0015*/
       m |= l;                                                           /*0016*/
-      m |= freia_aipo_global_vol(out, &volcurrent);                     /*0017*/
+      freia_aipo_global_vol(out, &volcurrent);                          /*0017*/
    }
    while (volcurrent!=volprevious);                                     /*0019*/
    n = m;                                                               /*0020*/
@@ -1231,8 +1231,8 @@ freia_status freia_58_helper_1_0_0(
 
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
-   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0001*/
-   ret = freia_58_helper_0_0_0(out, &volcurrent);                       /*0002*/
+   int volprevious, volcurrent, i, j, k, l, m, n;                       /*0001*/
+   freia_58_helper_0_0_0(out, &volcurrent);                             /*0002*/
    do {                                                                 /*0003*/
       volprevious = volcurrent;                                         /*0004*/
       i = 1;                                                            /*0006*/
@@ -1295,8 +1295,8 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
-   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0001*/
-   ret = freia_58_helper_0_0_0(out, &volcurrent);                       /*0002*/
+   int volprevious, volcurrent, i, j, k, l, m, n;                       /*0001*/
+   freia_58_helper_0_0_0(out, &volcurrent);                             /*0002*/
    do {                                                                 /*0003*/
       volprevious = volcurrent;                                         /*0004*/
       i = 1;                                                            /*0006*/
@@ -1926,8 +1926,8 @@ freia_status freia_58_helper_1_0_0(
 
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
-   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
-   ret = freia_58_helper_0_0_0(out, &volcurrent);                       /*0007*/
+   int volprevious, volcurrent, i, j, k, l, m, n;                       /*0006*/
+   freia_58_helper_0_0_0(out, &volcurrent);                             /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
       i = 1;                                                            /*0011*/
@@ -1948,8 +1948,8 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
-   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
-   ret = freia_58_helper_0_0_0(out, &volcurrent);                       /*0007*/
+   int volprevious, volcurrent, i, j, k, l, m, n;                       /*0006*/
+   freia_58_helper_0_0_0(out, &volcurrent);                             /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
       i = 1;                                                            /*0011*/
@@ -2113,18 +2113,18 @@ digraph "freia_58_helper_1_1" {
 
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
-   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
-   ret = freia_aipo_global_vol(out, &volcurrent);                       /*0007*/
+   int volprevious, volcurrent, i, j = 0, k, l, m = 0, n;               /*0006*/
+   freia_aipo_global_vol(out, &volcurrent);                             /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
       i = 1;                                                            /*0011*/
       k = 0;                                                            /*0012*/
       j = 0;                                                            /*0013*/
       freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
-      j |= freia_aipo_inf(out, out, in);                                /*0014*/
+      freia_aipo_inf(out, out, in);                                     /*0014*/
       l = j;                                                            /*0015*/
       m |= l;                                                           /*0016*/
-      m |= freia_aipo_global_vol(out, &volcurrent);                     /*0017*/
+      freia_aipo_global_vol(out, &volcurrent);                          /*0017*/
    }
    while (volcurrent!=volprevious);                                     /*0019*/
    n = m;                                                               /*0020*/
@@ -2135,18 +2135,17 @@ int freia_58(freia_data2d *out, const freia_data2d *in)
 
 int freia_58(freia_data2d *out, const freia_data2d *in)
 {
-   int ret, volprevious, volcurrent, i, j, k, l, m, n;                  /*0006*/
-   ret = freia_aipo_global_vol(out, &volcurrent);                       /*0007*/
+   int volprevious, volcurrent, i, j = 0, k, l, m = 0, n;               /*0006*/
+   freia_aipo_global_vol(out, &volcurrent);                             /*0007*/
    do {                                                                 /*0019*/
       volprevious = volcurrent;                                         /*0009*/
       i = 1;                                                            /*0011*/
       k = 0;                                                            /*0012*/
       j = 0;                                                            /*0013*/
       freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0010*/
-      j |= freia_aipo_inf(out, out, in);                                /*0014*/
-      l = j;                                                            /*0015*/
-      m |= l;                                                           /*0016*/
-      m |= freia_aipo_global_vol(out, &volcurrent);                     /*0017*/
+      freia_aipo_inf(out, out, in);                                     /*0014*/
+      l = 0;                                                            /*0015*/
+      freia_aipo_global_vol(out, &volcurrent);                          /*0017*/
    }
    while (volcurrent!=volprevious);                                     /*0019*/
    n = m;                                                               /*0020*/
