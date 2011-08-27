@@ -162,7 +162,7 @@ Character constants are typed as int.
     basic be = basic_undefined;
 
     if (bt == is_basic_string) {
-      /* Drop the two qotes, but add space for '\0' in C */
+      /* Drop the two quotes, but add space for '\0' in C */
       be = make_basic(bt, (make_value(is_value_constant,
 				      (make_constant(is_constant_int,
 						     (void*) (strlen(name)-2+1-is_fortran))))));
@@ -174,8 +174,8 @@ Character constants are typed as int.
     fe = make_functional(NIL, MakeTypeVariable(be, NIL));
 
     if (bt == is_basic_int && (size==4 || size==8)) { // int constant
-      //string unsignedintsuffix = "uU";
-      //string longintsuffix = "lL";
+      //string unsigned int suffix = "uU";
+      //string long int suffix = "lL";
       bool usuffix = (strchr(name, 'U') != NULL) || (strchr(name, 'u') != NULL);
       bool lsuffix = (strchr(name, 'L') != NULL) || (strchr(name, 'l') != NULL);
       int basis = is_fortran? 10 : 0;
