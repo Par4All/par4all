@@ -292,16 +292,41 @@ static int freia_cmp_statement(const statement * s1, const statement * s2)
   return order;
 }
 
+/* debug helper */
+static string stmt_nb(void * s)
+{
+  return itoa((int) statement_number((statement) s));
+}
+
+/* remove non aipo statements at the head of ls
+   @return updated list
+*/
+static list clean_list_head(list ls)
+{
+  list head = ls, prev = NIL;
+  while (ls && !freia_statement_aipo_call_p(STATEMENT(CAR(ls))))
+    prev = ls, ls = CDR(ls);
+  if (prev) CDR(prev) = NIL, gen_free_list(head);
+  return ls;
+}
+
+/* remove unrelated stuff at head & tail, so that it does not come in later on
+   and possibly trouble the compilation.
+   @return updated list
+*/
+static list clean_statement_list_for_aipo(list ls)
+{
+  return gen_nreverse(clean_list_head(gen_nreverse(clean_list_head(ls))));
+}
+
 /* reorder a little bit statements, so that allocs & deallocs are up
- * front or in the back.
+ * front or in the back, and may be removed by the previous function.
  */
 static void sort_subsequence(list ls, sequence sq)
 {
   ifdebug(8) {
-    pips_debug(8, "ls = { ");
-    FOREACH(statement, s, ls)
-      fprintf(stderr, "%d ", (int) statement_number(s));
-    fprintf(stderr, "}\n");
+    pips_debug(8, "input: ");
+    gen_fprint(stderr, "ls", ls, (gen_string_func_t) stmt_nb);
   }
 
   set cmp = set_make(set_pointer);
@@ -332,6 +357,11 @@ static void sort_subsequence(list ls, sequence sq)
     gen_nconc(gen_nreverse(head), gen_nconc(lcmp, gen_nreverse(tail)));
 
   set_free(cmp);
+
+  ifdebug(8) {
+    pips_debug(8, "output: ");
+    gen_fprint(stderr, "ls", ls, (gen_string_func_t) stmt_nb);
+  }
 }
 
 /*********************************************************** LOOK AT EFFECTS */
@@ -493,6 +523,7 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
       if (ls!=NIL)
       {
         sort_subsequence(ls, sq);
+        ls = clean_statement_list_for_aipo(ls);
         fsip->seqs = CONS(list, ls, fsip->seqs);
         hash_put(fsip->sequence, ls, sq);
         if (fsip->enclosing_loops)
@@ -510,6 +541,7 @@ static bool fsi_seq_flt(sequence sq, freia_info * fsip)
     if (lup && ls)
       move_ahead(lup, STATEMENT(CAR(gen_last(ls))), sq);
     sort_subsequence(ls, sq);
+    ls = clean_statement_list_for_aipo(ls);
     fsip->seqs = CONS(list, ls, fsip->seqs);
     hash_put(fsip->sequence, ls, sq);
     if (fsip->enclosing_loops)
