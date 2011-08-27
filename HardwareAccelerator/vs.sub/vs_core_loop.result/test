@@ -1507,9 +1507,9 @@ l99979:   ;                                                                    /
    
    
    // save contrast motion detection
-   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);               /*0120*/
-
+   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);
    freia_aipo_copy(imbg, imbg16);
+   
    
    // output image
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
@@ -1620,9 +1620,9 @@ l99998:   ;
    
    
    // save contrast motion detection
-   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);               /*0120*/
-
+   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);
    freia_aipo_copy(imbg, imbg16);
+   
    
    // output image
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
@@ -3147,8 +3147,8 @@ l99979:   ;                                                                    /
    
    
    // save contrast motion detection
-   
    freia_aipo_copy(imbg, imbg16);
+   
    
    // output image
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
@@ -3251,8 +3251,8 @@ l99998:   ;
    
    
    // save contrast motion detection
-   
    freia_aipo_copy(imbg, imbg16);
+   
    
    // output image
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
@@ -3705,24 +3705,7 @@ digraph "vs_core_loop_helper_3_0_0" {
 digraph "vs_core_loop_helper_3_1" {
   // inputs
   "immotion_6" [shape=circle];
-
-  // outputs
-  "imtmp2" [shape=circle];
-
-  // computation vertices
-  "107 D8" [shape=box];
-  "107 D8" -> "imtmp2";
-  "106 E8" [shape=box];
-  "106 E8" -> "107 D8" [label="imtmp2_1"];
-  "105 thr" [shape=parallelogram];
-  "105 thr" -> "106 E8" [label="immotion_5"];
-  "immotion_6" -> "105 thr";
-}
-// graph for dag "vs_core_loop_helper_3_2" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_2" {
-  // inputs
   "imstab" [shape=circle];
-  "imtmp2" [shape=circle];
 
   // outputs
   "immotion" [shape=circle];
@@ -3741,11 +3724,17 @@ digraph "vs_core_loop_helper_3_2" {
   "112 E8" -> "113 -" [label="immotion_4"];
   "111 D8" [shape=box];
   "111 D8" -> "113 -" [label="imtmp"];
-  "imtmp2" -> "112 E8";
-  "imtmp2" -> "111 D8";
+  "107 D8" [shape=box];
+  "107 D8" -> "112 E8" [label="imtmp2"];
+  "107 D8" -> "111 D8" [label="imtmp2"];
+  "106 E8" [shape=box];
+  "106 E8" -> "107 D8" [label="imtmp2_1"];
+  "105 thr" [shape=parallelogram];
+  "105 thr" -> "106 E8" [label="immotion_5"];
+  "immotion_6" -> "105 thr";
 }
-// graph for dag "vs_core_loop_helper_3_2_1" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_2_1" {
+// graph for dag "vs_core_loop_helper_3_1_2" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_helper_3_1_2" {
   // inputs
   "immotion_4" [shape=circle];
   "imstab" [shape=circle];
@@ -3795,8 +3784,8 @@ freia_status vs_core_loop_helper_3_0_0(
   return FREIA_OK;
 }
 
-// helper function vs_core_loop_helper_3_2_1
-freia_status vs_core_loop_helper_3_2_1(
+// helper function vs_core_loop_helper_3_1_2
+freia_status vs_core_loop_helper_3_1_2(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -3804,7 +3793,7 @@ freia_status vs_core_loop_helper_3_2_1(
   int32_t c0,
   int32_t c1)
 {
-  call opencl kernel vs_core_loop_helper_3_2_1(o0, i0, i1, i2, c0, c1);
+  call opencl kernel vs_core_loop_helper_3_1_2(o0, i0, i1, i2, c0, c1);
   return FREIA_OK;
 }
 // freia opencl includes
@@ -3847,8 +3836,8 @@ kernel vs_core_loop_helper_3_0_0(
   }
 }
 
-// opencl function vs_core_loop_helper_3_2_1
-kernel vs_core_loop_helper_3_2_1(
+// opencl function vs_core_loop_helper_3_1_2
+kernel vs_core_loop_helper_3_1_2(
   opencl image o0,
   const opencl image i0,
   const opencl image i1,
@@ -3960,7 +3949,7 @@ l99979:   ;                                                                    /
    freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
    freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);
    freia_aipo_copy(imbg, imbg16);
-   vs_core_loop_helper_3_2_1(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
+   vs_core_loop_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
    
    // save contrast motion detection
    
@@ -4077,7 +4066,7 @@ l99998:   ;
    freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
    freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);
    freia_aipo_copy(imbg, imbg16);
-   vs_core_loop_helper_3_2_1(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
+   vs_core_loop_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
    
    // save contrast motion detection
    

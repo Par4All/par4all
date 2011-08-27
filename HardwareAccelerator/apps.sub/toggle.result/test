@@ -2340,7 +2340,9 @@ digraph "main_helper_0_0" {
   "out" [shape=circle];
 
   // computation vertices
+  "51 vol" [shape=diamond];
   "45 >" [shape=trapezium,orientation=270];
+  "45 >" -> "51 vol" [label="out"];
   "45 >" -> "out";
   "44 :" [shape=trapezium,orientation=270];
   "44 :" -> "45 >" [label="work2"];
@@ -2403,17 +2405,6 @@ digraph "main_helper_0_0_1" {
   "in" -> "37 -";
   "in" -> "36 -";
   "imWork1" -> "36 -";
-}
-// graph for dag "main_helper_0_1" of module "main" in dot format
-digraph "main_helper_0_1" {
-  // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "51 vol" [shape=diamond];
-  "out" -> "51 vol";
 }
 
 ! acceleration function

@@ -18,8 +18,8 @@ freia_status freia_72(freia_data2d * out, const freia_data2d * in)
   freia_common_destruct_data(t4);
 
   freia_aipo_dilate_8c(t1, in, kernel1x3);
-  freia_aipo_threshold(t2, t0, 1, 50, 1);
-  freia_aipo_threshold(t3, t1, 150, 255, 1);
+  freia_aipo_add_const(t2, t0, 1);
+  freia_aipo_not(t3, t1);
   freia_aipo_and(out, t2, t3);
 
   freia_common_destruct_data(t0);

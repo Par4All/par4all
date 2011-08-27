@@ -7010,11 +7010,87 @@ digraph "main_helper_0_0" {
   "in" [shape=circle];
 
   // outputs
-  "imopenth" [shape=circle];
+  "out" [shape=circle];
 
   // computation vertices
+  "197 &" [shape=trapezium,orientation=270];
+  "197 &" -> "out";
+  "196 D8" [shape=box];
+  "196 D8" -> "197 &" [label="out_1"];
+  "195 D8" [shape=box];
+  "195 D8" -> "196 D8" [label="out_2"];
+  "194 D8" [shape=box];
+  "194 D8" -> "195 D8" [label="out_3"];
+  "189 D8" [shape=box];
+  "189 D8" -> "194 D8" [label="imout"];
+  "187 D8" [shape=box];
+  "187 D8" -> "189 D8" [label="imout_1"];
+  "185 D8" [shape=box];
+  "185 D8" -> "187 D8" [label="imout_2"];
+  "183 D8" [shape=box];
+  "183 D8" -> "185 D8" [label="imout_3"];
+  "180 E8" [shape=box];
+  "180 E8" -> "183 D8" [label="imout_4"];
+  "178 E8" [shape=box];
+  "178 E8" -> "180 E8" [label="imout_5"];
+  "176 E8" [shape=box];
+  "176 E8" -> "178 E8" [label="imout_6"];
+  "174 E8" [shape=box];
+  "174 E8" -> "176 E8" [label="imout_7"];
+  "165 D8" [shape=box];
+  "165 D8" -> "174 E8" [label="imfilt"];
+  "163 D8" [shape=box];
+  "163 D8" -> "165 D8" [label="imfilt_1"];
+  "161 D8" [shape=box];
+  "161 D8" -> "163 D8" [label="imfilt_2"];
+  "159 D8" [shape=box];
+  "159 D8" -> "161 D8" [label="imfilt_3"];
+  "156 E8" [shape=box];
+  "156 E8" -> "159 D8" [label="imfilt_4"];
+  "154 E8" [shape=box];
+  "154 E8" -> "156 E8" [label="imfilt_5"];
+  "152 E8" [shape=box];
+  "152 E8" -> "154 E8" [label="imfilt_6"];
+  "150 E8" [shape=box];
+  "150 E8" -> "152 E8" [label="imfilt_7"];
+  "144 &" [shape=trapezium,orientation=270];
+  "144 &" -> "150 E8" [label="imand"];
+  "143 thr" [shape=parallelogram];
+  "143 thr" -> "144 &" [label="imcloseth"];
+  "137 E8" [shape=box];
+  "137 E8" -> "143 thr" [label="imclose"];
+  "135 E8" [shape=box];
+  "135 E8" -> "137 E8" [label="imclose_1"];
+  "133 E8" [shape=box];
+  "133 E8" -> "135 E8" [label="imclose_2"];
+  "131 E8" [shape=box];
+  "131 E8" -> "133 E8" [label="imclose_3"];
+  "129 E8" [shape=box];
+  "129 E8" -> "131 E8" [label="imclose_4"];
+  "127 E8" [shape=box];
+  "127 E8" -> "129 E8" [label="imclose_5"];
+  "125 E8" [shape=box];
+  "125 E8" -> "127 E8" [label="imclose_6"];
+  "123 E8" [shape=box];
+  "123 E8" -> "125 E8" [label="imclose_7"];
+  "120 D8" [shape=box];
+  "120 D8" -> "123 E8" [label="imclose_8"];
+  "118 D8" [shape=box];
+  "118 D8" -> "120 D8" [label="imclose_9"];
+  "116 D8" [shape=box];
+  "116 D8" -> "118 D8" [label="imclose_10"];
+  "114 D8" [shape=box];
+  "114 D8" -> "116 D8" [label="imclose_11"];
+  "112 D8" [shape=box];
+  "112 D8" -> "114 D8" [label="imclose_12"];
+  "110 D8" [shape=box];
+  "110 D8" -> "112 D8" [label="imclose_13"];
+  "108 D8" [shape=box];
+  "108 D8" -> "110 D8" [label="imclose_14"];
+  "106 D8" [shape=box];
+  "106 D8" -> "108 D8" [label="imclose_15"];
   "142 thr" [shape=parallelogram];
-  "142 thr" -> "imopenth";
+  "142 thr" -> "144 &" [label="imopenth"];
   "97 D8" [shape=box];
   "97 D8" -> "142 thr" [label="imopen"];
   "95 D8" [shape=box];
@@ -7075,62 +7151,15 @@ digraph "main_helper_0_0" {
   "40 E8" -> "42 E8" [label="imopen_28"];
   "38 E8" [shape=box];
   "38 E8" -> "40 E8" [label="imopen_29"];
+  "in" -> "197 &";
+  "in" -> "106 D8";
   "in" -> "38 E8";
 }
-// graph for dag "main_helper_0_1" of module "main" in dot format
-digraph "main_helper_0_1" {
-  // inputs
-  "imopenth" [shape=circle];
-  "in" [shape=circle];
-
-  // outputs
-  "imand" [shape=circle];
-
-  // computation vertices
-  "144 &" [shape=trapezium,orientation=270];
-  "144 &" -> "imand";
-  "imopenth" -> "144 &";
-  "143 thr" [shape=parallelogram];
-  "143 thr" -> "144 &" [label="imcloseth"];
-  "137 E8" [shape=box];
-  "137 E8" -> "143 thr" [label="imclose"];
-  "135 E8" [shape=box];
-  "135 E8" -> "137 E8" [label="imclose_1"];
-  "133 E8" [shape=box];
-  "133 E8" -> "135 E8" [label="imclose_2"];
-  "131 E8" [shape=box];
-  "131 E8" -> "133 E8" [label="imclose_3"];
-  "129 E8" [shape=box];
-  "129 E8" -> "131 E8" [label="imclose_4"];
-  "127 E8" [shape=box];
-  "127 E8" -> "129 E8" [label="imclose_5"];
-  "125 E8" [shape=box];
-  "125 E8" -> "127 E8" [label="imclose_6"];
-  "123 E8" [shape=box];
-  "123 E8" -> "125 E8" [label="imclose_7"];
-  "120 D8" [shape=box];
-  "120 D8" -> "123 E8" [label="imclose_8"];
-  "118 D8" [shape=box];
-  "118 D8" -> "120 D8" [label="imclose_9"];
-  "116 D8" [shape=box];
-  "116 D8" -> "118 D8" [label="imclose_10"];
-  "114 D8" [shape=box];
-  "114 D8" -> "116 D8" [label="imclose_11"];
-  "112 D8" [shape=box];
-  "112 D8" -> "114 D8" [label="imclose_12"];
-  "110 D8" [shape=box];
-  "110 D8" -> "112 D8" [label="imclose_13"];
-  "108 D8" [shape=box];
-  "108 D8" -> "110 D8" [label="imclose_14"];
-  "106 D8" [shape=box];
-  "106 D8" -> "108 D8" [label="imclose_15"];
-  "in" -> "106 D8";
-}
-// graph for dag "main_helper_0_1_1" of module "main" in dot format
-digraph "main_helper_0_1_1" {
+// graph for dag "main_helper_0_0_1" of module "main" in dot format
+digraph "main_helper_0_0_1" {
   // inputs
   "imclose" [shape=circle];
-  "imopenth" [shape=circle];
+  "imopen" [shape=circle];
 
   // outputs
   "imand" [shape=circle];
@@ -7138,85 +7167,12 @@ digraph "main_helper_0_1_1" {
   // computation vertices
   "144 &" [shape=trapezium,orientation=270];
   "144 &" -> "imand";
-  "imopenth" -> "144 &";
   "143 thr" [shape=parallelogram];
   "143 thr" -> "144 &" [label="imcloseth"];
   "imclose" -> "143 thr";
-}
-// graph for dag "main_helper_0_2" of module "main" in dot format
-digraph "main_helper_0_2" {
-  // inputs
-  "imand" [shape=circle];
-
-  // outputs
-  "imfilt" [shape=circle];
-
-  // computation vertices
-  "165 D8" [shape=box];
-  "165 D8" -> "imfilt";
-  "163 D8" [shape=box];
-  "163 D8" -> "165 D8" [label="imfilt_1"];
-  "161 D8" [shape=box];
-  "161 D8" -> "163 D8" [label="imfilt_2"];
-  "159 D8" [shape=box];
-  "159 D8" -> "161 D8" [label="imfilt_3"];
-  "156 E8" [shape=box];
-  "156 E8" -> "159 D8" [label="imfilt_4"];
-  "154 E8" [shape=box];
-  "154 E8" -> "156 E8" [label="imfilt_5"];
-  "152 E8" [shape=box];
-  "152 E8" -> "154 E8" [label="imfilt_6"];
-  "150 E8" [shape=box];
-  "150 E8" -> "152 E8" [label="imfilt_7"];
-  "imand" -> "150 E8";
-}
-// graph for dag "main_helper_0_3" of module "main" in dot format
-digraph "main_helper_0_3" {
-  // inputs
-  "imfilt" [shape=circle];
-
-  // outputs
-  "imout" [shape=circle];
-
-  // computation vertices
-  "189 D8" [shape=box];
-  "189 D8" -> "imout";
-  "187 D8" [shape=box];
-  "187 D8" -> "189 D8" [label="imout_1"];
-  "185 D8" [shape=box];
-  "185 D8" -> "187 D8" [label="imout_2"];
-  "183 D8" [shape=box];
-  "183 D8" -> "185 D8" [label="imout_3"];
-  "180 E8" [shape=box];
-  "180 E8" -> "183 D8" [label="imout_4"];
-  "178 E8" [shape=box];
-  "178 E8" -> "180 E8" [label="imout_5"];
-  "176 E8" [shape=box];
-  "176 E8" -> "178 E8" [label="imout_6"];
-  "174 E8" [shape=box];
-  "174 E8" -> "176 E8" [label="imout_7"];
-  "imfilt" -> "174 E8";
-}
-// graph for dag "main_helper_0_4" of module "main" in dot format
-digraph "main_helper_0_4" {
-  // inputs
-  "imout" [shape=circle];
-  "in" [shape=circle];
-
-  // outputs
-  "out" [shape=circle];
-
-  // computation vertices
-  "197 &" [shape=trapezium,orientation=270];
-  "197 &" -> "out";
-  "in" -> "197 &";
-  "196 D8" [shape=box];
-  "196 D8" -> "197 &" [label="out_1"];
-  "195 D8" [shape=box];
-  "195 D8" -> "196 D8" [label="out_2"];
-  "194 D8" [shape=box];
-  "194 D8" -> "195 D8" [label="out_3"];
-  "imout" -> "194 D8";
+  "142 thr" [shape=parallelogram];
+  "142 thr" -> "144 &" [label="imopenth"];
+  "imopen" -> "142 thr";
 }
 
 ! acceleration function
@@ -7225,16 +7181,19 @@ digraph "main_helper_0_4" {
 
 // dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0 copies
 
-// helper function main_helper_0_1_1
-freia_status main_helper_0_1_1(
+// helper function main_helper_0_0_1
+freia_status main_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
   int32_t c0,
   int32_t c1,
-  int32_t c2)
+  int32_t c2,
+  int32_t c3,
+  int32_t c4,
+  int32_t c5)
 {
-  call opencl kernel main_helper_0_1_1(o0, i0, i1, c0, c1, c2);
+  call opencl kernel main_helper_0_0_1(o0, i0, i1, c0, c1, c2, c3, c4, c5);
   return FREIA_OK;
 }
 // freia opencl includes
@@ -7242,14 +7201,17 @@ freia_status main_helper_0_1_1(
 
 // opencl for dag 0
 
-// opencl function main_helper_0_1_1
-kernel main_helper_0_1_1(
+// opencl function main_helper_0_0_1
+kernel main_helper_0_0_1(
   opencl image o0,
   const opencl image i0,
   const opencl image i1,
   int32_t c0,
   int32_t c1,
-  int32_t c2)
+  int32_t c2,
+  int32_t c3,
+  int32_t c4,
+  int32_t c5)
 {
   for (i)
   {
@@ -7257,8 +7219,9 @@ kernel main_helper_0_1_1(
     register pixel in0 = i0[i];
     register pixel in1 = i1[i];
     // pixel computations
-    register pixel t143 = PIXEL_THRESHOLD(in0, c0, c1, c2);
-    register pixel t144 = PIXEL_AND(in1, t143);
+    register pixel t142 = PIXEL_THRESHOLD(in1, c0, c1, c2);
+    register pixel t143 = PIXEL_THRESHOLD(in0, c3, c4, c5);
+    register pixel t144 = PIXEL_AND(t142, t143);
     // set output pixels
     o0[i] = t144;
   }
@@ -7270,7 +7233,7 @@ int main(int argc, char *argv[])
 {
    freia_dataio fdin, fdout;                                            /*0006*/
 
-   freia_data2d *in, *imopen, *imclose, *imopenth;                      /*0008*/
+   freia_data2d *in, *imopen, *imclose;                                 /*0008*/
    freia_data2d *imand, *imfilt, *imout, *out;                          /*0009*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0011*/
@@ -7285,7 +7248,6 @@ int main(int argc, char *argv[])
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0021*/
    imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0023*/
    imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0024*/
-   imopenth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);         /*0025*/
    imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0027*/
    imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0028*/
    imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0029*/
@@ -7350,8 +7312,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0135*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0137*/
 
-   freia_aipo_threshold(imopenth, imopen, 1, 50, 1);                    /*0142*/
-   main_helper_0_1_1(imand, imclose, imopenth, 150, 255, 1);            /*0143*/
+   main_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);    /*0142*/
    
    
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0150*/
@@ -7389,7 +7350,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(in);                                      /*0201*/
    freia_common_destruct_data(imopen);                                  /*0203*/
    freia_common_destruct_data(imclose);                                 /*0204*/
-   freia_common_destruct_data(imopenth);                                /*0205*/
    freia_common_destruct_data(imand);                                   /*0207*/
    freia_common_destruct_data(imfilt);                                  /*0208*/
    freia_common_destruct_data(imout);                                   /*0209*/
@@ -7408,7 +7368,7 @@ int main(int argc, char *argv[])
 {
    freia_dataio fdin, fdout;                                            /*0006*/
 
-   freia_data2d *in, *imopen, *imclose, *imopenth;                      /*0008*/
+   freia_data2d *in, *imopen, *imclose;                                 /*0008*/
    freia_data2d *imand, *imfilt, *imout, *out;                          /*0009*/
 
    const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0011*/
@@ -7423,7 +7383,6 @@ int main(int argc, char *argv[])
    in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0021*/
    imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0023*/
    imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0024*/
-   imopenth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);         /*0025*/
    imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0027*/
    imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0028*/
    imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0029*/
@@ -7488,8 +7447,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0135*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0137*/
 
-   freia_aipo_threshold(imopenth, imopen, 1, 50, 1);                    /*0142*/
-   main_helper_0_1_1(imand, imclose, imopenth, 150, 255, 1);            /*0143*/
+   main_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);    /*0142*/
    
    
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0150*/
@@ -7527,7 +7485,6 @@ int main(int argc, char *argv[])
    freia_common_destruct_data(in);                                      /*0201*/
    freia_common_destruct_data(imopen);                                  /*0203*/
    freia_common_destruct_data(imclose);                                 /*0204*/
-   freia_common_destruct_data(imopenth);                                /*0205*/
    freia_common_destruct_data(imand);                                   /*0207*/
    freia_common_destruct_data(imfilt);                                  /*0208*/
    freia_common_destruct_data(imout);                                   /*0209*/

@@ -2523,19 +2523,6 @@ digraph "freia_51_helper_0_0" {
   "in" [shape=circle];
 
   // outputs
-  "out_1" [shape=circle];
-
-  // computation vertices
-  "23 !" [shape=trapezium,orientation=270];
-  "23 !" -> "out_1";
-  "in" -> "23 !";
-}
-// graph for dag "freia_51_helper_0_1" of module "freia_51" in dot format
-digraph "freia_51_helper_0_1" {
-  // inputs
-  "out_1" [shape=circle];
-
-  // outputs
   "out" [shape=circle];
 
   // computation vertices
@@ -2552,10 +2539,12 @@ digraph "freia_51_helper_0_1" {
   "29 <." -> "33 D8" [label="t3"];
   "28 D8" [shape=box];
   "28 D8" -> "29 <." [label="t2"];
-  "out_1" -> "28 D8";
+  "23 !" [shape=trapezium,orientation=270];
+  "23 !" -> "28 D8" [label="out_1"];
+  "in" -> "23 !";
 }
-// graph for dag "freia_51_helper_0_1_3" of module "freia_51" in dot format
-digraph "freia_51_helper_0_1_3" {
+// graph for dag "freia_51_helper_0_0_4" of module "freia_51" in dot format
+digraph "freia_51_helper_0_0_4" {
   // inputs
   "t4" [shape=circle];
 
@@ -2630,13 +2619,13 @@ digraph "freia_51_helper_2_0_0" {
 
 // dag 0: 14 ops and 1 copies, optimized to 7 ops and 0+0 copies
 
-// helper function freia_51_helper_0_1_3
-freia_status freia_51_helper_0_1_3(
+// helper function freia_51_helper_0_0_4
+freia_status freia_51_helper_0_0_4(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t c0)
 {
-  call opencl kernel freia_51_helper_0_1_3(o0, i0, c0);
+  call opencl kernel freia_51_helper_0_0_4(o0, i0, c0);
   return FREIA_OK;
 }
 
@@ -2659,8 +2648,8 @@ freia_status freia_51_helper_2_0_0(
 
 // opencl for dag 0
 
-// opencl function freia_51_helper_0_1_3
-kernel freia_51_helper_0_1_3(
+// opencl function freia_51_helper_0_0_4
+kernel freia_51_helper_0_0_4(
   opencl image o0,
   const opencl image i0,
   int32_t c0)
@@ -2723,7 +2712,7 @@ int freia_51(int32_t *k)
    freia_aipo_dilate_8c(t2, out, k);                                    /*0028*/
    freia_aipo_inf_const(t3, t2, 255);                                   /*0029*/
    freia_aipo_dilate_8c(t4, t3, k);                                     /*0033*/
-   freia_51_helper_0_1_3(out, t4, 255);                                 /*0034*/
+   freia_51_helper_0_0_4(out, t4, 255);                                 /*0034*/
 
    freia_aipo_global_vol(out, &volcurrent);                             /*0038*/
    do {                                                                 /*0045*/
@@ -2769,7 +2758,7 @@ int freia_51(int32_t *k)
    freia_aipo_dilate_8c(t2, out, k);                                    /*0028*/
    freia_aipo_inf_const(t3, t2, 255);                                   /*0029*/
    freia_aipo_dilate_8c(t4, t3, k);                                     /*0033*/
-   freia_51_helper_0_1_3(out, t4, 255);                                 /*0034*/
+   freia_51_helper_0_0_4(out, t4, 255);                                 /*0034*/
 
    freia_aipo_global_vol(out, &volcurrent);                             /*0038*/
    do {                                                                 /*0045*/

@@ -6580,70 +6580,12 @@ digraph "main_helper_0_0" {
   "in" [shape=circle];
 
   // outputs
-  "out_1" [shape=circle];
-
-  // computation vertices
-  "73 !" [shape=trapezium,orientation=270];
-  "73 !" -> "out_1";
-  "in" -> "73 !";
-}
-// graph for dag "main_helper_0_1" of module "main" in dot format
-digraph "main_helper_0_1" {
-  // inputs
-  "out_1" [shape=circle];
-
-  // outputs
-  "w1_0_10" [shape=circle];
-  "w1_0_5" [shape=circle];
-  "w1_0" [shape=circle];
-
-  // computation vertices
-  "118 D8" [shape=box];
-  "118 D8" -> "w1_0";
-  "117 D8" [shape=box];
-  "117 D8" -> "118 D8" [label="w1_0_1"];
-  "116 D8" [shape=box];
-  "116 D8" -> "117 D8" [label="w1_0_2"];
-  "115 D8" [shape=box];
-  "115 D8" -> "116 D8" [label="w1_0_3"];
-  "114 D8" [shape=box];
-  "114 D8" -> "115 D8" [label="w1_0_4"];
-  "102 D8" [shape=box];
-  "102 D8" -> "w1_0_5";
-  "101 D8" [shape=box];
-  "101 D8" -> "102 D8" [label="w1_0_6"];
-  "100 D8" [shape=box];
-  "100 D8" -> "101 D8" [label="w1_0_7"];
-  "99 D8" [shape=box];
-  "99 D8" -> "100 D8" [label="w1_0_8"];
-  "98 D8" [shape=box];
-  "98 D8" -> "99 D8" [label="w1_0_9"];
-  "86 D8" [shape=box];
-  "86 D8" -> "w1_0_10";
-  "85 D8" [shape=box];
-  "85 D8" -> "86 D8" [label="w1_0_11"];
-  "84 D8" [shape=box];
-  "84 D8" -> "85 D8" [label="w1_0_12"];
-  "83 D8" [shape=box];
-  "83 D8" -> "84 D8" [label="w1_0_13"];
-  "82 D8" [shape=box];
-  "82 D8" -> "83 D8" [label="w1_0_14"];
-  "out_1" -> "114 D8";
-  "out_1" -> "98 D8";
-  "out_1" -> "82 D8";
-}
-// graph for dag "main_helper_0_2" of module "main" in dot format
-digraph "main_helper_0_2" {
-  // inputs
-  "w1_0" [shape=circle];
-  "w1_0_10" [shape=circle];
-  "w1_0_5" [shape=circle];
-
-  // outputs
   "out" [shape=circle];
 
   // computation vertices
+  "201 vol" [shape=diamond];
   "199 !" [shape=trapezium,orientation=270];
+  "199 !" -> "201 vol" [label="out"];
   "199 !" -> "out";
   "192 <" [shape=trapezium,orientation=270];
   "192 <" -> "199 !" [label="w2_1"];
@@ -6657,7 +6599,6 @@ digraph "main_helper_0_2" {
   "187 E8" -> "188 E8" [label="w1_1_3"];
   "186 E8" [shape=box];
   "186 E8" -> "187 E8" [label="w1_1_4"];
-  "w1_0" -> "186 E8";
   "176 <" [shape=trapezium,orientation=270];
   "176 <" -> "192 <" [label="w2_1_1"];
   "174 E8" [shape=box];
@@ -6670,7 +6611,6 @@ digraph "main_helper_0_2" {
   "171 E8" -> "172 E8" [label="w1_1_8"];
   "170 E8" [shape=box];
   "170 E8" -> "171 E8" [label="w1_1_9"];
-  "w1_0_5" -> "170 E8";
   "160 <." [shape=trapezium,orientation=270];
   "160 <." -> "176 <" [label="w2_1_2"];
   "158 E8" [shape=box];
@@ -6683,10 +6623,44 @@ digraph "main_helper_0_2" {
   "155 E8" -> "156 E8" [label="w1_1_13"];
   "154 E8" [shape=box];
   "154 E8" -> "155 E8" [label="w1_1_14"];
-  "w1_0_10" -> "154 E8";
+  "118 D8" [shape=box];
+  "118 D8" -> "186 E8" [label="w1_0"];
+  "117 D8" [shape=box];
+  "117 D8" -> "118 D8" [label="w1_0_1"];
+  "116 D8" [shape=box];
+  "116 D8" -> "117 D8" [label="w1_0_2"];
+  "115 D8" [shape=box];
+  "115 D8" -> "116 D8" [label="w1_0_3"];
+  "114 D8" [shape=box];
+  "114 D8" -> "115 D8" [label="w1_0_4"];
+  "102 D8" [shape=box];
+  "102 D8" -> "170 E8" [label="w1_0_5"];
+  "101 D8" [shape=box];
+  "101 D8" -> "102 D8" [label="w1_0_6"];
+  "100 D8" [shape=box];
+  "100 D8" -> "101 D8" [label="w1_0_7"];
+  "99 D8" [shape=box];
+  "99 D8" -> "100 D8" [label="w1_0_8"];
+  "98 D8" [shape=box];
+  "98 D8" -> "99 D8" [label="w1_0_9"];
+  "86 D8" [shape=box];
+  "86 D8" -> "154 E8" [label="w1_0_10"];
+  "85 D8" [shape=box];
+  "85 D8" -> "86 D8" [label="w1_0_11"];
+  "84 D8" [shape=box];
+  "84 D8" -> "85 D8" [label="w1_0_12"];
+  "83 D8" [shape=box];
+  "83 D8" -> "84 D8" [label="w1_0_13"];
+  "82 D8" [shape=box];
+  "82 D8" -> "83 D8" [label="w1_0_14"];
+  "73 !" [shape=trapezium,orientation=270];
+  "73 !" -> "114 D8" [label="out_1"];
+  "73 !" -> "98 D8" [label="out_1"];
+  "73 !" -> "82 D8" [label="out_1"];
+  "in" -> "73 !";
 }
-// graph for dag "main_helper_0_2_1" of module "main" in dot format
-digraph "main_helper_0_2_1" {
+// graph for dag "main_helper_0_0_2" of module "main" in dot format
+digraph "main_helper_0_0_2" {
   // inputs
   "w1_1" [shape=circle];
   "w1_1_10" [shape=circle];
@@ -6707,17 +6681,6 @@ digraph "main_helper_0_2_1" {
   "160 <." [shape=trapezium,orientation=270];
   "160 <." -> "176 <" [label="w2_1_2"];
   "w1_1_10" -> "160 <.";
-}
-// graph for dag "main_helper_0_3" of module "main" in dot format
-digraph "main_helper_0_3" {
-  // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "201 vol" [shape=diamond];
-  "out" -> "201 vol";
 }
 // graph for dag "main_helper_1_0" of module "main" in dot format
 digraph "main_helper_1_0" {
@@ -6783,15 +6746,15 @@ digraph "main_helper_2_0_0" {
 
 // dag 0: 97 ops and 2 copies, optimized to 36 ops and 0+0 copies
 
-// helper function main_helper_0_2_1
-freia_status main_helper_0_2_1(
+// helper function main_helper_0_0_2
+freia_status main_helper_0_0_2(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
   const freia_data2d * i2,
   int32_t c0)
 {
-  call opencl kernel main_helper_0_2_1(o0, i0, i1, i2, c0);
+  call opencl kernel main_helper_0_0_2(o0, i0, i1, i2, c0);
   return FREIA_OK;
 }
 
@@ -6817,8 +6780,8 @@ freia_status main_helper_2_0_0(
 
 // opencl for dag 0
 
-// opencl function main_helper_0_2_1
-kernel main_helper_0_2_1(
+// opencl function main_helper_0_0_2
+kernel main_helper_0_0_2(
   opencl image o0,
   const opencl image i0,
   const opencl image i1,
@@ -6965,7 +6928,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_5);               /*0157*/
    freia_aipo_erode_8c(w1_1_10, w1_1, neighborTransposed_5);            /*0158*/
 
-   main_helper_0_2_1(out, w1_1, w1_1_10, w1_1_5, 255);                  /*0160*/
+   main_helper_0_0_2(out, w1_1, w1_1_10, w1_1_5, 255);                  /*0160*/
    
    
    freia_aipo_erode_8c(w1_1, w1_0_5, neighborTransposed_4);             /*0170*/
@@ -7116,7 +7079,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_5);               /*0157*/
    freia_aipo_erode_8c(w1_1_10, w1_1, neighborTransposed_5);            /*0158*/
 
-   main_helper_0_2_1(out, w1_1, w1_1_10, w1_1_5, 255);                  /*0160*/
+   main_helper_0_0_2(out, w1_1, w1_1_10, w1_1_5, 255);                  /*0160*/
    
    
    freia_aipo_erode_8c(w1_1, w1_0_5, neighborTransposed_4);             /*0170*/

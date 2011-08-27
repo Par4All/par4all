@@ -1033,29 +1033,17 @@ digraph "freia_dup_14_helper_0_0" {
   "imin" [shape=circle];
 
   // outputs
-  "imopen" [shape=circle];
-
-  // computation vertices
-  "38 E8" [shape=box];
-  "38 E8" -> "imopen";
-  "imin" -> "38 E8";
-}
-// graph for dag "freia_dup_14_helper_0_1" of module "freia_dup_14" in dot format
-digraph "freia_dup_14_helper_0_1" {
-  // inputs
-  "imin" [shape=circle];
-  "imopen" [shape=circle];
-
-  // outputs
   "imout" [shape=circle];
 
   // computation vertices
   "49 &" [shape=trapezium,orientation=270];
   "49 &" -> "imout";
-  "imopen" -> "49 &";
   "45 D8" [shape=box];
   "45 D8" -> "49 &" [label="imclose"];
+  "38 E8" [shape=box];
+  "38 E8" -> "49 &" [label="imopen"];
   "imin" -> "45 D8";
+  "imin" -> "38 E8";
 }
 
 ! acceleration function
