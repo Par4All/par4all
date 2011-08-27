@@ -473,7 +473,7 @@ static void fsi_sort(list lls)
  */
 string freia_compile(string module, statement mod_stat, string target)
 {
-  pips_assert("some dependable effects for our purpose",
+  pips_assert("we need some dependable effects for our purpose",
               !get_bool_property("CONSTANT_PATH_EFFECTS"));
 
   if (!freia_valid_target_p(target))
