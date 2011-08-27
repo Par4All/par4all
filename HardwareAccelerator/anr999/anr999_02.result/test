@@ -750,7 +750,6 @@ int anr999_02(void)
    
    
    
-   ret_0 |= 0;                                                          /*0071*/
    
    
    printf("input global min = %d\n", measure_min);                      /*0077*/
@@ -1672,7 +1671,6 @@ int anr999_02(void)
    
    
    
-   ret_0 |= 0;                                                          /*0071*/
    
    
    printf("input global min = %d\n", measure_min);                      /*0077*/

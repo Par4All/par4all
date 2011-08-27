@@ -232,7 +232,6 @@ freia_status freia_ret_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = 0;                                                /*0006*/
    freia_ret_00_helper_0_0_0(o, i0, i1);                                /*0008*/
-   ret |= 0;                                                            /*0009*/
    return ret;                                                          /*0011*/
 }
 
@@ -505,7 +504,6 @@ freia_status freia_ret_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = 0;                                                /*0006*/
    freia_ret_00_helper_0_0_0(o, i0, i1);                                /*0008*/
-   ret |= 0;                                                            /*0009*/
    return ret;                                                          /*0011*/
 }
 
@@ -653,7 +651,6 @@ freia_status freia_ret_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = 0;                                                /*0006*/
    freia_ret_00_helper_0_0_0(o, i0, i1);                                /*0008*/
-   ret |= 0;                                                            /*0009*/
    return ret;                                                          /*0011*/
 }
 

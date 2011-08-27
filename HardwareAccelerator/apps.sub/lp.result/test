@@ -696,146 +696,81 @@ int main(int argc, char *argv[])
    ret = 0;                                                             /*0036*/
 
    freia_aipo_erode_8c(imopen, in, kernel1x3);                          /*0038*/
-   ret |= 0;                                                            /*0039*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0040*/
-   ret |= 0;                                                            /*0041*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0042*/
-   ret |= 0;                                                            /*0043*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0044*/
-   ret |= 0;                                                            /*0045*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0046*/
-   ret |= 0;                                                            /*0047*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0048*/
-   ret |= 0;                                                            /*0049*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0050*/
-   ret |= 0;                                                            /*0051*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0052*/
-   ret |= 0;                                                            /*0053*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0054*/
-   ret |= 0;                                                            /*0055*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0056*/
-   ret |= 0;                                                            /*0057*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0058*/
-   ret |= 0;                                                            /*0059*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0060*/
-   ret |= 0;                                                            /*0061*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0062*/
-   ret |= 0;                                                            /*0063*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0064*/
-   ret |= 0;                                                            /*0065*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0066*/
-   ret |= 0;                                                            /*0067*/
 
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0069*/
-   ret |= 0;                                                            /*0070*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0071*/
-   ret |= 0;                                                            /*0072*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0073*/
-   ret |= 0;                                                            /*0074*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0075*/
-   ret |= 0;                                                            /*0076*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0077*/
-   ret |= 0;                                                            /*0078*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0079*/
-   ret |= 0;                                                            /*0080*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0081*/
-   ret |= 0;                                                            /*0082*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0083*/
-   ret |= 0;                                                            /*0084*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0085*/
-   ret |= 0;                                                            /*0086*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0087*/
-   ret |= 0;                                                            /*0088*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0089*/
-   ret |= 0;                                                            /*0090*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0091*/
-   ret |= 0;                                                            /*0092*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0093*/
-   ret |= 0;                                                            /*0094*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0095*/
-   ret |= 0;                                                            /*0096*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0097*/
-   ret |= 0;                                                            /*0098*/
-
-   ret |= 0;                                                            /*0104*/
-
+   
+   
    freia_aipo_dilate_8c(imclose, in, kernel1x3);                        /*0106*/
-   ret |= 0;                                                            /*0107*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0108*/
-   ret |= 0;                                                            /*0109*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0110*/
-   ret |= 0;                                                            /*0111*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0112*/
-   ret |= 0;                                                            /*0113*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0114*/
-   ret |= 0;                                                            /*0115*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0116*/
-   ret |= 0;                                                            /*0117*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0118*/
-   ret |= 0;                                                            /*0119*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0120*/
-   ret |= 0;                                                            /*0121*/
 
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0123*/
-   ret |= 0;                                                            /*0124*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0125*/
-   ret |= 0;                                                            /*0126*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0127*/
-   ret |= 0;                                                            /*0128*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0129*/
-   ret |= 0;                                                            /*0130*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0131*/
-   ret |= 0;                                                            /*0132*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0133*/
-   ret |= 0;                                                            /*0134*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0135*/
-   ret |= 0;                                                            /*0136*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0137*/
-   ret |= 0;                                                            /*0138*/
 
    freia_aipo_threshold(imopenth, imopen, 1, 50, 1);                    /*0142*/
    freia_aipo_threshold(imcloseth, imclose, 150, 255, 1);               /*0143*/
    freia_aipo_and(imand, imopenth, imcloseth);                          /*0144*/
-
-   ret |= 0;                                                            /*0148*/
-
+   
+   
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0150*/
-   ret |= 0;                                                            /*0151*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0152*/
-   ret |= 0;                                                            /*0153*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0154*/
-   ret |= 0;                                                            /*0155*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0156*/
-   ret |= 0;                                                            /*0157*/
 
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0159*/
-   ret |= 0;                                                            /*0160*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0161*/
-   ret |= 0;                                                            /*0162*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0163*/
-   ret |= 0;                                                            /*0164*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0165*/
-   ret |= 0;                                                            /*0166*/
-
-   ret |= 0;                                                            /*0172*/
-
+   
+   
    freia_aipo_erode_8c(imout, imfilt, kernel1x3);                       /*0174*/
-   ret |= 0;                                                            /*0175*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0176*/
-   ret |= 0;                                                            /*0177*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0178*/
-   ret |= 0;                                                            /*0179*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0180*/
-   ret |= 0;                                                            /*0181*/
 
    freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0183*/
-   ret |= 0;                                                            /*0184*/
    freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0185*/
-   ret |= 0;                                                            /*0186*/
    freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0187*/
-   ret |= 0;                                                            /*0188*/
    freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0189*/
-   ret |= 0;                                                            /*0190*/
 
    freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0194*/
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0195*/
@@ -2920,150 +2855,24 @@ int main(int argc, char *argv[])
    ret = 0;                                                             /*0036*/
 
    main_helper_0_0_0(imopen, imclose, in, kernel1x3);                   /*0038*/
-   ret |= 0;                                                            /*0039*/
-   ret |= 0;                                                            /*0040*/
-   ret |= 0;                                                            /*0041*/
-   ret |= 0;                                                            /*0042*/
-   ret |= 0;                                                            /*0043*/
-   ret |= 0;                                                            /*0044*/
-   ret |= 0;                                                            /*0045*/
-   ret |= 0;                                                            /*0046*/
-   ret |= 0;                                                            /*0047*/
-   ret |= 0;                                                            /*0048*/
-   ret |= 0;                                                            /*0049*/
-   ret |= 0;                                                            /*0050*/
-   ret |= 0;                                                            /*0051*/
-   ret |= 0;                                                            /*0052*/
-   ret |= 0;                                                            /*0053*/
    main_helper_0_0_1(imcloseth, imopen, imclose, imopen, kernel1x3, 150, 255, 1);      /*0054*/
-   ret |= 0;                                                            /*0055*/
-   ret |= 0;                                                            /*0056*/
-   ret |= 0;                                                            /*0057*/
-   ret |= 0;                                                            /*0058*/
-   ret |= 0;                                                            /*0059*/
-   ret |= 0;                                                            /*0060*/
-   ret |= 0;                                                            /*0061*/
-   ret |= 0;                                                            /*0062*/
-   ret |= 0;                                                            /*0063*/
-   ret |= 0;                                                            /*0064*/
-   ret |= 0;                                                            /*0065*/
-   ret |= 0;                                                            /*0066*/
-   ret |= 0;                                                            /*0067*/
 
-   ret |= 0;                                                            /*0069*/
-   ret |= 0;                                                            /*0070*/
    main_helper_0_0_2(imopen, imcloseth, imopen, kernel1x3);             /*0071*/
-   ret |= 0;                                                            /*0072*/
-   ret |= 0;                                                            /*0073*/
-   ret |= 0;                                                            /*0074*/
-   ret |= 0;                                                            /*0075*/
-   ret |= 0;                                                            /*0076*/
-   ret |= 0;                                                            /*0077*/
-   ret |= 0;                                                            /*0078*/
-   ret |= 0;                                                            /*0079*/
-   ret |= 0;                                                            /*0080*/
-   ret |= 0;                                                            /*0081*/
-   ret |= 0;                                                            /*0082*/
-   ret |= 0;                                                            /*0083*/
-   ret |= 0;                                                            /*0084*/
-   ret |= 0;                                                            /*0085*/
-   ret |= 0;                                                            /*0086*/
    main_helper_0_0_3(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);       /*0087*/
-   ret |= 0;                                                            /*0088*/
-   ret |= 0;                                                            /*0089*/
-   ret |= 0;                                                            /*0090*/
-   ret |= 0;                                                            /*0091*/
-   ret |= 0;                                                            /*0092*/
-   ret |= 0;                                                            /*0093*/
-   ret |= 0;                                                            /*0094*/
-   ret |= 0;                                                            /*0095*/
-   ret |= 0;                                                            /*0096*/
-   ret |= 0;                                                            /*0097*/
-   ret |= 0;                                                            /*0098*/
-
-   ret |= 0;                                                            /*0104*/
-
-   ret |= 0;                                                            /*0106*/
-   ret |= 0;                                                            /*0107*/
-   ret |= 0;                                                            /*0108*/
-   ret |= 0;                                                            /*0109*/
-   ret |= 0;                                                            /*0110*/
-   ret |= 0;                                                            /*0111*/
-   ret |= 0;                                                            /*0112*/
-   ret |= 0;                                                            /*0113*/
-   ret |= 0;                                                            /*0114*/
-   ret |= 0;                                                            /*0115*/
-   ret |= 0;                                                            /*0116*/
-   ret |= 0;                                                            /*0117*/
-   ret |= 0;                                                            /*0118*/
-   ret |= 0;                                                            /*0119*/
-   ret |= 0;                                                            /*0120*/
-   ret |= 0;                                                            /*0121*/
-
-   ret |= 0;                                                            /*0123*/
-   ret |= 0;                                                            /*0124*/
-   ret |= 0;                                                            /*0125*/
-   ret |= 0;                                                            /*0126*/
-   ret |= 0;                                                            /*0127*/
-   ret |= 0;                                                            /*0128*/
-   ret |= 0;                                                            /*0129*/
-   ret |= 0;                                                            /*0130*/
-   ret |= 0;                                                            /*0131*/
-   ret |= 0;                                                            /*0132*/
-   ret |= 0;                                                            /*0133*/
-   ret |= 0;                                                            /*0134*/
-   ret |= 0;                                                            /*0135*/
-   ret |= 0;                                                            /*0136*/
-   ret |= 0;                                                            /*0137*/
-   ret |= 0;                                                            /*0138*/
-
-   ret |= 0;                                                            /*0142*/
-   ret |= 0;                                                            /*0143*/
-   ret |= 0;                                                            /*0144*/
-
-   ret |= 0;                                                            /*0148*/
-
-   ret |= 0;                                                            /*0150*/
-   ret |= 0;                                                            /*0151*/
+   
+   
+   
+   
+   
+   
    main_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);              /*0152*/
-   ret |= 0;                                                            /*0153*/
-   ret |= 0;                                                            /*0154*/
-   ret |= 0;                                                            /*0155*/
-   ret |= 0;                                                            /*0156*/
-   ret |= 0;                                                            /*0157*/
-
-   ret |= 0;                                                            /*0159*/
-   ret |= 0;                                                            /*0160*/
-   ret |= 0;                                                            /*0161*/
-   ret |= 0;                                                            /*0162*/
-   ret |= 0;                                                            /*0163*/
-   ret |= 0;                                                            /*0164*/
-   ret |= 0;                                                            /*0165*/
-   ret |= 0;                                                            /*0166*/
-
-   ret |= 0;                                                            /*0172*/
-
-   ret |= 0;                                                            /*0174*/
-   ret |= 0;                                                            /*0175*/
+   
+   
+   
    main_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);    /*0176*/
-   ret |= 0;                                                            /*0177*/
-   ret |= 0;                                                            /*0178*/
-   ret |= 0;                                                            /*0179*/
-   ret |= 0;                                                            /*0180*/
-   ret |= 0;                                                            /*0181*/
-
-   ret |= 0;                                                            /*0183*/
-   ret |= 0;                                                            /*0184*/
-   ret |= 0;                                                            /*0185*/
-   ret |= 0;                                                            /*0186*/
-   ret |= 0;                                                            /*0187*/
-   ret |= 0;                                                            /*0188*/
-   ret |= 0;                                                            /*0189*/
-   ret |= 0;                                                            /*0190*/
-
-   ret |= 0;                                                            /*0194*/
+   
+   
    main_helper_0_0_6(out, out, freia_morpho_kernel_8c);                 /*0195*/
-   ret |= 0;                                                            /*0196*/
    main_helper_0_1_0(out, in, out);                                     /*0197*/
    
    
@@ -6431,151 +6240,22 @@ int main(int argc, char *argv[])
    ret = 0;                                                             /*0036*/
 
    main_helper_0_0_0(imopen, imclose, in, kernel1x3);                   /*0038*/
-   ret |= 0;                                                            /*0039*/
-   ret |= 0;                                                            /*0040*/
-   ret |= 0;                                                            /*0041*/
-   ret |= 0;                                                            /*0042*/
-   ret |= 0;                                                            /*0043*/
-   ret |= 0;                                                            /*0044*/
-   ret |= 0;                                                            /*0045*/
-   ret |= 0;                                                            /*0046*/
-   ret |= 0;                                                            /*0047*/
    main_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);      /*0048*/
-   ret |= 0;                                                            /*0049*/
-   ret |= 0;                                                            /*0050*/
-   ret |= 0;                                                            /*0051*/
-   ret |= 0;                                                            /*0052*/
-   ret |= 0;                                                            /*0053*/
-   ret |= 0;                                                            /*0054*/
-   ret |= 0;                                                            /*0055*/
-   ret |= 0;                                                            /*0056*/
-   ret |= 0;                                                            /*0057*/
-   ret |= 0;                                                            /*0058*/
-   ret |= 0;                                                            /*0059*/
-   ret |= 0;                                                            /*0060*/
-   ret |= 0;                                                            /*0061*/
-   ret |= 0;                                                            /*0062*/
-   ret |= 0;                                                            /*0063*/
-   ret |= 0;                                                            /*0064*/
-   ret |= 0;                                                            /*0065*/
    main_helper_0_0_2(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);      /*0066*/
-   ret |= 0;                                                            /*0067*/
 
-   ret |= 0;                                                            /*0069*/
-   ret |= 0;                                                            /*0070*/
-   ret |= 0;                                                            /*0071*/
-   ret |= 0;                                                            /*0072*/
-   ret |= 0;                                                            /*0073*/
-   ret |= 0;                                                            /*0074*/
-   ret |= 0;                                                            /*0075*/
-   ret |= 0;                                                            /*0076*/
-   ret |= 0;                                                            /*0077*/
-   ret |= 0;                                                            /*0078*/
-   ret |= 0;                                                            /*0079*/
-   ret |= 0;                                                            /*0080*/
-   ret |= 0;                                                            /*0081*/
-   ret |= 0;                                                            /*0082*/
-   ret |= 0;                                                            /*0083*/
-   ret |= 0;                                                            /*0084*/
    main_helper_0_0_3(imout, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);        /*0085*/
-   ret |= 0;                                                            /*0086*/
-   ret |= 0;                                                            /*0087*/
-   ret |= 0;                                                            /*0088*/
-   ret |= 0;                                                            /*0089*/
-   ret |= 0;                                                            /*0090*/
-   ret |= 0;                                                            /*0091*/
-   ret |= 0;                                                            /*0092*/
-   ret |= 0;                                                            /*0093*/
-   ret |= 0;                                                            /*0094*/
-   ret |= 0;                                                            /*0095*/
-   ret |= 0;                                                            /*0096*/
-   ret |= 0;                                                            /*0097*/
-   ret |= 0;                                                            /*0098*/
-
-   ret |= 0;                                                            /*0104*/
-
-   ret |= 0;                                                            /*0106*/
-   ret |= 0;                                                            /*0107*/
-   ret |= 0;                                                            /*0108*/
-   ret |= 0;                                                            /*0109*/
-   ret |= 0;                                                            /*0110*/
-   ret |= 0;                                                            /*0111*/
-   ret |= 0;                                                            /*0112*/
-   ret |= 0;                                                            /*0113*/
-   ret |= 0;                                                            /*0114*/
-   ret |= 0;                                                            /*0115*/
-   ret |= 0;                                                            /*0116*/
-   ret |= 0;                                                            /*0117*/
-   ret |= 0;                                                            /*0118*/
-   ret |= 0;                                                            /*0119*/
-   ret |= 0;                                                            /*0120*/
-   ret |= 0;                                                            /*0121*/
-
-   ret |= 0;                                                            /*0123*/
-   ret |= 0;                                                            /*0124*/
-   ret |= 0;                                                            /*0125*/
-   ret |= 0;                                                            /*0126*/
-   ret |= 0;                                                            /*0127*/
-   ret |= 0;                                                            /*0128*/
-   ret |= 0;                                                            /*0129*/
-   ret |= 0;                                                            /*0130*/
-   ret |= 0;                                                            /*0131*/
-   ret |= 0;                                                            /*0132*/
-   ret |= 0;                                                            /*0133*/
-   ret |= 0;                                                            /*0134*/
-   ret |= 0;                                                            /*0135*/
-   ret |= 0;                                                            /*0136*/
-   ret |= 0;                                                            /*0137*/
-   ret |= 0;                                                            /*0138*/
-
-   ret |= 0;                                                            /*0142*/
-   ret |= 0;                                                            /*0143*/
-   ret |= 0;                                                            /*0144*/
-
-   ret |= 0;                                                            /*0148*/
-
-   ret |= 0;                                                            /*0150*/
-   ret |= 0;                                                            /*0151*/
-   ret |= 0;                                                            /*0152*/
-   ret |= 0;                                                            /*0153*/
-   ret |= 0;                                                            /*0154*/
-   ret |= 0;                                                            /*0155*/
-   ret |= 0;                                                            /*0156*/
-   ret |= 0;                                                            /*0157*/
-
-   ret |= 0;                                                            /*0159*/
-   ret |= 0;                                                            /*0160*/
-   ret |= 0;                                                            /*0161*/
-   ret |= 0;                                                            /*0162*/
-   ret |= 0;                                                            /*0163*/
-   ret |= 0;                                                            /*0164*/
-   ret |= 0;                                                            /*0165*/
-   ret |= 0;                                                            /*0166*/
-
-   ret |= 0;                                                            /*0172*/
-
-   ret |= 0;                                                            /*0174*/
-   ret |= 0;                                                            /*0175*/
-   ret |= 0;                                                            /*0176*/
-   ret |= 0;                                                            /*0177*/
+   
+   
+   
+   
+   
+   
+   
+   
+   
    main_helper_0_0_4(out, imout, in, kernel1x3, freia_morpho_kernel_8c);               /*0178*/
-   ret |= 0;                                                            /*0179*/
-   ret |= 0;                                                            /*0180*/
-   ret |= 0;                                                            /*0181*/
-
-   ret |= 0;                                                            /*0183*/
-   ret |= 0;                                                            /*0184*/
-   ret |= 0;                                                            /*0185*/
-   ret |= 0;                                                            /*0186*/
-   ret |= 0;                                                            /*0187*/
-   ret |= 0;                                                            /*0188*/
-   ret |= 0;                                                            /*0189*/
-   ret |= 0;                                                            /*0190*/
-
-   ret |= 0;                                                            /*0194*/
-   ret |= 0;                                                            /*0195*/
-   ret |= 0;                                                            /*0196*/
-   ret |= 0;                                                            /*0197*/
+   
+   
    
    
    
@@ -7620,146 +7300,80 @@ int main(int argc, char *argv[])
    ret = 0;                                                             /*0036*/
 
    freia_aipo_erode_8c(imopen, in, kernel1x3);                          /*0038*/
-   ret |= 0;                                                            /*0039*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0040*/
-   ret |= 0;                                                            /*0041*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0042*/
-   ret |= 0;                                                            /*0043*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0044*/
-   ret |= 0;                                                            /*0045*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0046*/
-   ret |= 0;                                                            /*0047*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0048*/
-   ret |= 0;                                                            /*0049*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0050*/
-   ret |= 0;                                                            /*0051*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0052*/
-   ret |= 0;                                                            /*0053*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0054*/
-   ret |= 0;                                                            /*0055*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0056*/
-   ret |= 0;                                                            /*0057*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0058*/
-   ret |= 0;                                                            /*0059*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0060*/
-   ret |= 0;                                                            /*0061*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0062*/
-   ret |= 0;                                                            /*0063*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0064*/
-   ret |= 0;                                                            /*0065*/
    freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0066*/
-   ret |= 0;                                                            /*0067*/
 
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0069*/
-   ret |= 0;                                                            /*0070*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0071*/
-   ret |= 0;                                                            /*0072*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0073*/
-   ret |= 0;                                                            /*0074*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0075*/
-   ret |= 0;                                                            /*0076*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0077*/
-   ret |= 0;                                                            /*0078*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0079*/
-   ret |= 0;                                                            /*0080*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0081*/
-   ret |= 0;                                                            /*0082*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0083*/
-   ret |= 0;                                                            /*0084*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0085*/
-   ret |= 0;                                                            /*0086*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0087*/
-   ret |= 0;                                                            /*0088*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0089*/
-   ret |= 0;                                                            /*0090*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0091*/
-   ret |= 0;                                                            /*0092*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0093*/
-   ret |= 0;                                                            /*0094*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0095*/
-   ret |= 0;                                                            /*0096*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0097*/
-   ret |= 0;                                                            /*0098*/
-
-   ret |= 0;                                                            /*0104*/
-
+   
+   
    freia_aipo_dilate_8c(imclose, in, kernel1x3);                        /*0106*/
-   ret |= 0;                                                            /*0107*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0108*/
-   ret |= 0;                                                            /*0109*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0110*/
-   ret |= 0;                                                            /*0111*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0112*/
-   ret |= 0;                                                            /*0113*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0114*/
-   ret |= 0;                                                            /*0115*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0116*/
-   ret |= 0;                                                            /*0117*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0118*/
-   ret |= 0;                                                            /*0119*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0120*/
-   ret |= 0;                                                            /*0121*/
 
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0123*/
-   ret |= 0;                                                            /*0124*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0125*/
-   ret |= 0;                                                            /*0126*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0127*/
-   ret |= 0;                                                            /*0128*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0129*/
-   ret |= 0;                                                            /*0130*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0131*/
-   ret |= 0;                                                            /*0132*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0133*/
-   ret |= 0;                                                            /*0134*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0135*/
-   ret |= 0;                                                            /*0136*/
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0137*/
-   ret |= 0;                                                            /*0138*/
 
    freia_aipo_threshold(imopenth, imopen, 1, 50, 1);                    /*0142*/
    main_helper_0_1_1(imand, imclose, imopenth, 150, 255, 1);            /*0143*/
-   ret |= 0;                                                            /*0144*/
-
-   ret |= 0;                                                            /*0148*/
-
+   
+   
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0150*/
-   ret |= 0;                                                            /*0151*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0152*/
-   ret |= 0;                                                            /*0153*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0154*/
-   ret |= 0;                                                            /*0155*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0156*/
-   ret |= 0;                                                            /*0157*/
 
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0159*/
-   ret |= 0;                                                            /*0160*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0161*/
-   ret |= 0;                                                            /*0162*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0163*/
-   ret |= 0;                                                            /*0164*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0165*/
-   ret |= 0;                                                            /*0166*/
-
-   ret |= 0;                                                            /*0172*/
-
+   
+   
    freia_aipo_erode_8c(imout, imfilt, kernel1x3);                       /*0174*/
-   ret |= 0;                                                            /*0175*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0176*/
-   ret |= 0;                                                            /*0177*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0178*/
-   ret |= 0;                                                            /*0179*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0180*/
-   ret |= 0;                                                            /*0181*/
 
    freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0183*/
-   ret |= 0;                                                            /*0184*/
    freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0185*/
-   ret |= 0;                                                            /*0186*/
    freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0187*/
-   ret |= 0;                                                            /*0188*/
    freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0189*/
-   ret |= 0;                                                            /*0190*/
 
    freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0194*/
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0195*/

@@ -59,7 +59,6 @@ freia_status freia_dead_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = FREIA_OK;                                         /*0007*/
    freia_aipo_add(o, i0, i1);                                           /*0008*/
-   ret |= 0;                                                            /*0009*/
    ret |= 0;                                                            /*0010*/
    return FREIA_OK;                                                     /*0011*/
 }
@@ -210,7 +209,6 @@ freia_status freia_dead_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = FREIA_OK;                                         /*0007*/
    freia_dead_01_helper_0_0_0(o, i0, i1);                               /*0008*/
-   ret |= 0;                                                            /*0009*/
    ret |= 0;                                                            /*0010*/
    return FREIA_OK;                                                     /*0011*/
 }
@@ -455,7 +453,6 @@ freia_status freia_dead_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = FREIA_OK;                                         /*0007*/
    freia_dead_01_helper_0_0_0(o, i0, i1);                               /*0008*/
-   ret |= 0;                                                            /*0009*/
    ret |= 0;                                                            /*0010*/
    return FREIA_OK;                                                     /*0011*/
 }
@@ -551,7 +548,6 @@ freia_status freia_dead_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret = FREIA_OK;                                         /*0007*/
    freia_aipo_add(o, i0, i1);                                           /*0008*/
-   ret |= 0;                                                            /*0009*/
    ret |= 0;                                                            /*0010*/
    return FREIA_OK;                                                     /*0011*/
 }

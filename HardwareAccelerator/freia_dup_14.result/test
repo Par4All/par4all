@@ -418,7 +418,6 @@ int freia_dup_14(void)
    freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
-   ret_1 |= 0;                                                          /*0045*/
    
    
    
@@ -854,7 +853,6 @@ int freia_dup_14(void)
    freia_dup_14_helper_0_0_0(imout, imin, kernel1x3);                   /*0038*/
 
    ret_1 = 0;                                                           /*0044*/
-   ret_1 |= 0;                                                          /*0045*/
    
    
    

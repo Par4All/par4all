@@ -763,7 +763,6 @@ int anr999_01(void)
    
    
    anr999_01_helper_0_1_0(og, in, t, freia_morpho_kernel_8c);           /*0059*/
-   ret_0 |= 0;                                                          /*0067*/
 
    freia_common_destruct_data(t);                                       /*0069*/
 
@@ -1605,7 +1604,6 @@ int anr999_01(void)
    
    
    
-   ret_0 |= 0;                                                          /*0067*/
    
    
    printf("input global min = %d\n", measure_min);                      /*0073*/

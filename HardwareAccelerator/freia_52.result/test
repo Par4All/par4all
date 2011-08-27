@@ -2386,7 +2386,6 @@ int freia_52(void)
    
    
    
-   ret_1 |= 0;                                                          /*0239*/
    
    
    _return2 = ret_1;                                                    /*0242*/
@@ -2404,7 +2403,6 @@ int freia_52(void)
    freia_aipo_dilate_8c(w1_0_28, w1_0, freia_morpho_k8_0);              /*0270*/
    
    
-   err_1 |= 0;                                                          /*0289*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_1);              /*0303*/
@@ -2414,7 +2412,6 @@ int freia_52(void)
    
    
    err_1 |= _return20;                                                  /*0324*/
-   err_1 |= 0;                                                          /*0325*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_2);              /*0339*/
@@ -2424,7 +2421,6 @@ int freia_52(void)
    
    
    err_1 |= _return21;                                                  /*0360*/
-   err_1 |= 0;                                                          /*0361*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_0);              /*0375*/
@@ -2434,7 +2430,6 @@ int freia_52(void)
    
    
    err_1 |= _return17;                                                  /*0396*/
-   err_1 |= 0;                                                          /*0397*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_1);              /*0411*/
@@ -2444,7 +2439,6 @@ int freia_52(void)
    
    
    err_1 |= _return18;                                                  /*0432*/
-   err_1 |= 0;                                                          /*0433*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_0);              /*0447*/
@@ -2454,7 +2448,6 @@ int freia_52(void)
    
    
    err_1 |= _return14;                                                  /*0468*/
-   err_1 |= 0;                                                          /*0469*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_1);              /*0483*/
@@ -2464,7 +2457,6 @@ int freia_52(void)
    
    
    err_1 |= _return15;                                                  /*0504*/
-   err_1 |= 0;                                                          /*0505*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_2);              /*0519*/
@@ -2474,20 +2466,16 @@ int freia_52(void)
    
    
    err_1 |= _return16;                                                  /*0540*/
-   err_1 |= 0;                                                          /*0541*/
-
-   err_1 |= 0;                                                          /*0543*/
+   
    
    
    _return9 = err_1;                                                    /*0548*/
    err_0 |= _return9;                                                   /*0549*/
-   err_0 |= 0;                                                          /*0550*/
    _return3 = err_0;                                                    /*0551*/
    // freia_common_tx_image(imWork1, &fdout);
    // for display
    
    // 3nd tophat
-   err_2 |= 0;                                                          /*0558*/
    
    
    
@@ -2576,8 +2564,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0844*/
    err_3 |= _return24;                                                  /*0851*/
    freia_aipo_inf(w2_1, w2_1_1, w1_1);                                  /*0852*/
-
-   err_3 |= 0;                                                          /*0854*/
+   
    
    
    _return10 = err_3;                                                   /*0859*/
@@ -8178,7 +8165,6 @@ int freia_52(void)
    
    
    
-   ret_1 |= 0;                                                          /*0118*/
    
    
    _return2 = ret_1;                                                    /*0119*/
@@ -8191,69 +8177,57 @@ int freia_52(void)
    
    
    
-   err_1 |= 0;                                                          /*0149*/
    
    
    
    
    err_1 |= _return20;                                                  /*0173*/
-   err_1 |= 0;                                                          /*0174*/
    
    
    
    
    err_1 |= _return21;                                                  /*0198*/
-   err_1 |= 0;                                                          /*0199*/
    
    
    
    
    err_1 |= _return17;                                                  /*0223*/
-   err_1 |= 0;                                                          /*0224*/
    
    
    
    
    err_1 |= _return18;                                                  /*0248*/
-   err_1 |= 0;                                                          /*0249*/
    
    
    
    
    err_1 |= _return14;                                                  /*0273*/
-   err_1 |= 0;                                                          /*0274*/
    
    
    
    
    err_1 |= _return15;                                                  /*0298*/
-   err_1 |= 0;                                                          /*0299*/
    
    
    
    
    err_1 |= _return16;                                                  /*0323*/
-   err_1 |= 0;                                                          /*0324*/
-
-   err_1 |= 0;                                                          /*0325*/
+   
    
    
    _return9 = err_1;                                                    /*0328*/
    err_0 |= _return9;                                                   /*0329*/
-   err_0 |= 0;                                                          /*0330*/
    _return3 = err_0;                                                    /*0331*/
    // freia_common_tx_image(imWork1, &fdout);
    // for display
    
    // 3nd tophat
-   err_2 |= 0;                                                          /*0334*/
    
    
    
    
    
    freia_52_helper_0_0_1(w2_1_7, w1_1, neighborTransposed_8, 255);      /*0355*/
-   err_3 |= 0;                                                          /*0362*/
    
    
    
@@ -8303,14 +8277,11 @@ int freia_52(void)
    freia_52_helper_0_10_0(w1_1, w1_0_32, w2_1, freia_morpho_k6_2, neighborTransposed_15);             /*0529*/
    freia_52_helper_0_10_1(imWork1, w1_1, w2_1, neighborTransposed_15, &volcurrent);    /*0533*/
    err_3 |= _return24;                                                  /*0536*/
-   err_3 |= 0;                                                          /*0537*/
-
-   err_3 |= 0;                                                          /*0538*/
+   
    
    
    _return10 = err_3;                                                   /*0541*/
    err_2 |= _return10;                                                  /*0542*/
-   err_2 |= 0;                                                          /*0543*/
    _return4 = err_2;                                                    /*0544*/
 
    ret_19 = 0;                                                          /*0545*/
@@ -8371,54 +8342,45 @@ int freia_52(void)
       
       
       freia_52_helper_1_0_0(imWork1, imWork1, imin, freia_morpho_kernel_8c, &volcurrent);             /*0547*/
-      ret_20 |= 0;                                                      /*0551*/
       
       
       _return7 = ret_20;                                                /*0552*/
       ret_19 |= _return7;                                               /*0553*/
       ret_20 = 0;                                                       /*0557*/
-      ret_20 |= 0;                                                      /*0558*/
       
       
       _return7 = ret_20;                                                /*0559*/
       ret_19 |= _return7;                                               /*0560*/
       ret_20 = 0;                                                       /*0564*/
-      ret_20 |= 0;                                                      /*0565*/
       
       
       _return7 = ret_20;                                                /*0566*/
       ret_19 |= _return7;                                               /*0567*/
       ret_20 = 0;                                                       /*0571*/
-      ret_20 |= 0;                                                      /*0572*/
       
       
       _return7 = ret_20;                                                /*0573*/
       ret_19 |= _return7;                                               /*0574*/
       ret_20 = 0;                                                       /*0578*/
-      ret_20 |= 0;                                                      /*0579*/
       
       
       _return7 = ret_20;                                                /*0580*/
       ret_19 |= _return7;                                               /*0581*/
       ret_20 = 0;                                                       /*0585*/
-      ret_20 |= 0;                                                      /*0586*/
       
       
       _return7 = ret_20;                                                /*0587*/
       ret_19 |= _return7;                                               /*0588*/
       ret_20 = 0;                                                       /*0592*/
-      ret_20 |= 0;                                                      /*0593*/
       
       
       _return7 = ret_20;                                                /*0594*/
       ret_19 |= _return7;                                               /*0595*/
       ret_20 = 0;                                                       /*0599*/
-      ret_20 |= 0;                                                      /*0600*/
       
       
       _return7 = ret_20;                                                /*0601*/
       ret_19 |= _return7;                                               /*0602*/
-      ret_19 |= 0;                                                      /*0604*/
    }
    while (volcurrent!=volprevious);                                     /*0546*/
    
@@ -15441,7 +15403,6 @@ int freia_52(void)
    
    
    
-   ret_1 |= 0;                                                          /*0239*/
    
    
    _return2 = ret_1;                                                    /*0242*/
@@ -15455,118 +15416,97 @@ int freia_52(void)
    freia_52_helper_0_0_1(w1_1, w1_1_34, w1_1_29, w1_1_24, w1_1_19, w1_1_14, w1_1_9, w1_1_4, w1_0_10, w1_0_14, w1_0_18, w1_0_2, w1_0_22, w1_0_26, w1_0, w1_0_6, freia_morpho_k8_0, freia_morpho_k8_1, freia_morpho_k4_0, freia_morpho_k4_1, freia_morpho_k6_0, freia_morpho_k6_1, freia_morpho_k6_2, freia_morpho_k8_2, neighborTransposed_8, neighborTransposed_9, neighborTransposed_11, neighborTransposed_12, neighborTransposed_13, neighborTransposed_14, neighborTransposed_15, neighborTransposed_10);              /*0269*/
    
    
-   err_1 |= 0;                                                          /*0289*/
    
    
    
    
    err_1 |= _return20;                                                  /*0324*/
-   err_1 |= 0;                                                          /*0325*/
    
    
    
    
    err_1 |= _return21;                                                  /*0360*/
-   err_1 |= 0;                                                          /*0361*/
    
    
    
    
    err_1 |= _return17;                                                  /*0396*/
-   err_1 |= 0;                                                          /*0397*/
    
    
    
    
    err_1 |= _return18;                                                  /*0432*/
-   err_1 |= 0;                                                          /*0433*/
    
    
    
    
    err_1 |= _return14;                                                  /*0468*/
-   err_1 |= 0;                                                          /*0469*/
    
    
    
    
    err_1 |= _return15;                                                  /*0504*/
-   err_1 |= 0;                                                          /*0505*/
    
    
    
    
    err_1 |= _return16;                                                  /*0540*/
-   err_1 |= 0;                                                          /*0541*/
-
-   err_1 |= 0;                                                          /*0543*/
+   
    
    
    _return9 = err_1;                                                    /*0548*/
    err_0 |= _return9;                                                   /*0549*/
-   err_0 |= 0;                                                          /*0550*/
    _return3 = err_0;                                                    /*0551*/
    // freia_common_tx_image(imWork1, &fdout);
    // for display
    
    // 3nd tophat
-   err_2 |= 0;                                                          /*0558*/
    
    
    
    
    
    freia_52_helper_0_0_2(imWork1, w1_1_14, w1_1_19, w1_1_24, w1_1_29, w1_1_34, w1_1, w1_1_4, w1_1_9, neighborTransposed_8, neighborTransposed_9, neighborTransposed_11, neighborTransposed_12, neighborTransposed_13, neighborTransposed_14, neighborTransposed_15, neighborTransposed_10, 255, &volcurrent);           /*0589*/
-   err_3 |= 0;                                                          /*0600*/
    
    
    
    
    err_3 |= _return28;                                                  /*0635*/
-   err_3 |= 0;                                                          /*0636*/
    
    
    
    
    err_3 |= _return29;                                                  /*0671*/
-   err_3 |= 0;                                                          /*0672*/
    
    
    
    
    err_3 |= _return25;                                                  /*0707*/
-   err_3 |= 0;                                                          /*0708*/
    
    
    
    
    err_3 |= _return26;                                                  /*0743*/
-   err_3 |= 0;                                                          /*0744*/
    
    
    
    
    err_3 |= _return22;                                                  /*0779*/
-   err_3 |= 0;                                                          /*0780*/
    
    
    
    
    err_3 |= _return23;                                                  /*0815*/
-   err_3 |= 0;                                                          /*0816*/
    
    
    
    
    err_3 |= _return24;                                                  /*0851*/
-   err_3 |= 0;                                                          /*0852*/
-
-   err_3 |= 0;                                                          /*0854*/
+   
    
    
    _return10 = err_3;                                                   /*0859*/
    err_2 |= _return10;                                                  /*0860*/
-   err_2 |= 0;                                                          /*0861*/
    _return4 = err_2;                                                    /*0862*/
 
    ret_19 = 0;                                                          /*0864*/
@@ -15596,12 +15536,10 @@ int freia_52(void)
       
       
       freia_52_helper_1_0_0(imWork1, imWork1, imin, freia_morpho_kernel_8c, &volcurrent);             /*0868*/
-      ret_20 |= 0;                                                      /*0874*/
       
       
       _return7 = ret_20;                                                /*0877*/
       ret_19 |= _return7;                                               /*0878*/
-      ret_19 |= 0;                                                      /*0880*/
    }
    while (volcurrent!=volprevious);                                     /*0882*/
    
@@ -19271,7 +19209,6 @@ int freia_52(void)
    
    
    
-   ret_1 |= 0;                                                          /*0239*/
    
    
    _return2 = ret_1;                                                    /*0242*/
@@ -19289,7 +19226,6 @@ int freia_52(void)
    freia_aipo_dilate_8c(w1_0_28, w1_0, freia_morpho_k8_0);              /*0270*/
    
    
-   err_1 |= 0;                                                          /*0289*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_1);              /*0303*/
@@ -19299,7 +19235,6 @@ int freia_52(void)
    
    
    err_1 |= _return20;                                                  /*0324*/
-   err_1 |= 0;                                                          /*0325*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_2);              /*0339*/
@@ -19309,7 +19244,6 @@ int freia_52(void)
    
    
    err_1 |= _return21;                                                  /*0360*/
-   err_1 |= 0;                                                          /*0361*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_0);              /*0375*/
@@ -19319,7 +19253,6 @@ int freia_52(void)
    
    
    err_1 |= _return17;                                                  /*0396*/
-   err_1 |= 0;                                                          /*0397*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_1);              /*0411*/
@@ -19329,7 +19262,6 @@ int freia_52(void)
    
    
    err_1 |= _return18;                                                  /*0432*/
-   err_1 |= 0;                                                          /*0433*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_0);              /*0447*/
@@ -19339,7 +19271,6 @@ int freia_52(void)
    
    
    err_1 |= _return14;                                                  /*0468*/
-   err_1 |= 0;                                                          /*0469*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_1);              /*0483*/
@@ -19349,7 +19280,6 @@ int freia_52(void)
    
    
    err_1 |= _return15;                                                  /*0504*/
-   err_1 |= 0;                                                          /*0505*/
    
    
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_2);              /*0519*/
@@ -19359,20 +19289,16 @@ int freia_52(void)
    
    
    err_1 |= _return16;                                                  /*0540*/
-   err_1 |= 0;                                                          /*0541*/
-
-   err_1 |= 0;                                                          /*0543*/
+   
    
    
    _return9 = err_1;                                                    /*0548*/
    err_0 |= _return9;                                                   /*0549*/
-   err_0 |= 0;                                                          /*0550*/
    _return3 = err_0;                                                    /*0551*/
    // freia_common_tx_image(imWork1, &fdout);
    // for display
    
    // 3nd tophat
-   err_2 |= 0;                                                          /*0558*/
    
    
    
@@ -19394,7 +19320,6 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0627*/
    freia_aipo_erode_8c(w1_1_30, w1_1, neighborTransposed_9);            /*0628*/
    err_3 |= _return28;                                                  /*0635*/
-   err_3 |= 0;                                                          /*0636*/
    
    
    
@@ -19461,13 +19386,11 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0844*/
    err_3 |= _return24;                                                  /*0851*/
    freia_52_helper_0_14_1(imWork1, w1_1, w2_1_1);                       /*0852*/
-
-   err_3 |= 0;                                                          /*0854*/
+   
    
    
    _return10 = err_3;                                                   /*0859*/
    err_2 |= _return10;                                                  /*0860*/
-   err_2 |= 0;                                                          /*0861*/
    _return4 = err_2;                                                    /*0862*/
 
    freia_aipo_global_vol(imWork1, &volcurrent);                         /*0864*/
