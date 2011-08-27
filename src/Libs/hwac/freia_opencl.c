@@ -283,7 +283,6 @@ static void opencl_merge_and_compile(
   int n_cut = 0;
 
   set done = set_make(set_pointer);
-  set_assign_list(done, dag_inputs(d));
   set current = set_make(set_pointer);
   list lcurrent = NIL;
 
@@ -296,28 +295,37 @@ static void opencl_merge_and_compile(
   {
     pips_debug(3, "%s cut %d\n", split_name, n_cut);
 
-    // build homogeneous sub dag
+    set_clear(done);
+    set_assign_list(done, dag_inputs(d));
+
+    // build an homogeneous sub dag
     list computables;
-    bool again = true, mergeable = false;
+    bool again = true, mergeable = true;
     while (again &&
            (computables = dag_computable_vertices(d, done, done, current)))
     {
       gen_sort_list(computables, (gen_cmp_func_t) dagvtx_opencl_priority);
       again = false;
-      FOREACH(dagvtx, v, computables)
+      // first, try to extract non mergeable nodes ahead
+      if (!lcurrent)
       {
-        // append only if consistent, necessarily true for the first
-        if (dagvtx_number(v)==0) // just eat them
+        FOREACH(dagvtx, v, computables)
         {
-          set_add_element(done, done, v);
-          again = true;
+          if (!opencl_mergeable_p(v))
+          {
+            lcurrent = CONS(dagvtx, v, lcurrent);
+            set_add_element(done, done, v);
+            set_add_element(current, current, v);
+            again = true;
+            mergeable = false;
+          }
         }
-        // extract all homogeneous vertices consistent with the current
-        else
+      }
+      // then accumulate current status
+      if (!again)
+      {
+        FOREACH(dagvtx, v, computables)
         {
-          if (!lcurrent)
-            // first one set the pitch
-            mergeable = opencl_mergeable_p(v);
           if (opencl_mergeable_p(v)==mergeable)
           {
             lcurrent = CONS(dagvtx, v, lcurrent);
