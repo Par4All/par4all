@@ -284,7 +284,8 @@ if ($n{passed} == $count)
 }
 else
 {
-  print "ISSUES $not_passed+$cannot_execute/$count " .
+  my $issues = $not_passed+$cannot_execute;
+  print "ISSUES $issues/$count " .
         "($n{failed}+$n{changed}+$n{timeout}+$n{notest}+$n{orphan}|" .
 	"$n{keptout}+$n{bug}+$n{later}+$n{slow})$status_changes $delay\n";
 }
