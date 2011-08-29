@@ -47,10 +47,8 @@ echo
 echo Compile the generated code
 echo
 
-setenv DB generate07.database
-shell cat $DB/func!/func!.c $DB/func/func.c > $DB/func.c
-shell cat $DB/func.c
-shell cc -c $DB/func.c -o $DB/func.o
+apply UNSPLIT[generate07]
+shell pips_validation_exe.sh -c -g generate07
 
 close
 delete generate07

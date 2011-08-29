@@ -109,3 +109,6 @@ void decl18(int iarg2)
 {
    iarg2++;
 }
+#
+# compile generated decl18
+#

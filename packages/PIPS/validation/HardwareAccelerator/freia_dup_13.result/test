@@ -109,7 +109,7 @@ digraph "freia_dup_13_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops (0 copies), optimized to 1 (0+0 copies)
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -120,13 +120,12 @@ freia_status freia_dup_13_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
+  spoc_reduction reduc;
+  freia_reduction_results redres;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -240,6 +239,8 @@ digraph "freia_dup_13_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_dup_13
  *
@@ -437,6 +438,85 @@ void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
    // redudant measure
    freia_dup_13_helper_0_0_0(in0, x);                                   /*0006*/
+   *y = *x;                                                             /*0007*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
+{
+   // redudant measure
+   freia_aipo_global_min(in0, x);                                       /*0006*/
+   freia_aipo_global_min(in0, y);                                       /*0007*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_13" in dot format
+digraph "dag_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 min" [shape=diamond];
+  "6 min" [shape=diamond];
+  "in0" -> "7 min";
+  "in0" -> "6 min";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_13" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "6 min" [shape=diamond];
+  "in0" -> "7 ?=";
+  "in0" -> "6 min";
+}
+// graph for dag "freia_dup_13_helper_0_0" of module "freia_dup_13" in dot format
+digraph "freia_dup_13_helper_0_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "6 min" [shape=diamond];
+  "in0" -> "6 min";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function freia_dup_13
+
+// opencl for dag 0
+
+! updated function
+
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
+{
+   // redudant measure
+   freia_aipo_global_min(in0, x);                                       /*0006*/
+   *y = *x;                                                             /*0007*/
+}
+
+! cleaned up function
+
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
+{
+   // redudant measure
+   freia_aipo_global_min(in0, x);                                       /*0006*/
    *y = *x;                                                             /*0007*/
 }
 #

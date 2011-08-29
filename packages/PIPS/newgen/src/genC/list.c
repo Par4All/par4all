@@ -129,11 +129,10 @@ bool gen_list_cyclic_p (const list ml)
 
     for (cl = ml; !ENDP(cl); POP(cl), i++) {
       if (set_belong_p ( adresses, cl)) {
-	fprintf(stderr, "warning: cycle found");
-	fprintf(stderr, "next elem %d:'%p' already in list\n",
-		i, cl);
-	cyclic_p = true;
-	break;
+        fprintf(stderr, "warning: cycle found");
+        fprintf(stderr, "next elem %d:'%p' already in list\n",  i, cl);
+        cyclic_p = true;
+        break;
       }
       set_add_element (adresses, adresses, cl);
       cyclic_p = false;
@@ -262,6 +261,38 @@ list gen_insert_before(const void * no, const void * o, list l)
     r = CONS(CHUNK, new_obj, c);
   }
   return r;
+}
+
+/* insert nl before or after item in list l, both initial lists are consumed
+   @return the new list
+ */
+list gen_insert_list(list nl, const void * item, list l, bool before)
+{
+  // fast case
+  if (!nl) return l;
+
+  // find insertion position in l
+  list p = NIL, c = l, head;
+  while (c && CHUNK(CAR(c))!=item)
+    p = c, c = CDR(c);
+  message_assert("item is in list", c!=NIL);
+
+  // possibly forward one link if insertion is "after" the item
+  if (!before)
+    p = c, c = CDR(c);
+
+  // link and set list head
+  if (p) // some previous
+    CDR(p) = nl, head = l;
+  else // no previous
+    p = nl, head = nl;
+
+  // forward to link the tail, hold by "c"
+  while (CDR(p)) p = CDR(p);
+  CDR(p) = c;
+
+  // done
+  return head;
 }
 
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
@@ -690,6 +721,8 @@ list gen_once(const void * vo, list l)
   return CONS(CHUNK, item, l);
 }
 
+/* tell whether vo belongs to lx
+ */
 bool gen_in_list_p(const void * vo, const list lx)
 {
   list l = (list) lx;
@@ -700,6 +733,8 @@ bool gen_in_list_p(const void * vo, const list lx)
   return false; /* else no found */
 }
 
+/* count occurences of vo in l
+ */
 int gen_occurences(const void * vo, const list l)
 {
   list c = (list) l;
@@ -717,7 +752,7 @@ bool gen_once_p(list l)
   list c;
   for(c=l; c!=NIL && CDR(c)!=NIL; c=CDR(c)) {
     gen_chunk * item = CHUNK(CAR(c));
-    if(gen_in_list_p(item , CDR(c)))
+    if (gen_in_list_p(item , CDR(c)))
 	    return false;
   }
   return true;
@@ -822,6 +857,21 @@ list gen_make_list(int domain, ...)
   }
   va_end(args);
   return l;
+}
+
+void gen_fprint(FILE * out, string name, const list l,
+                gen_string_func_t item_name)
+{
+  fprintf(out, "%s = ( ", name);
+  bool nitems = 0;
+  list c = l;
+  while (c)
+  {
+    if (nitems++) fprintf(out, ", ");
+    fprintf(out, "%s", item_name(CHUNK(CAR(c))));
+    c = CDR(c);
+  }
+  fprintf(out, " )\n");
 }
 
 list gen_cons(const void * item, const list next)

@@ -15,7 +15,7 @@ echo
 # we should generate a user_error in db_update_file_time_of_resource()
 # if we cannot 'stat' a file
 
-tpips <<EOF 2>&1
+tpips <<EOF 2>&1 | grep 'cannot create directory'
 create protected_workspace2 protected_workspace2.f
 shell chmod u-rwx protected_workspace2.database
 display PRINTED_FILE

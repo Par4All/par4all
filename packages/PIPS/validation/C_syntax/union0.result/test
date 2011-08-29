@@ -3,3 +3,6 @@ typedef union {
    char __size[24];
    long int __align;
 } pthread_mutex_t;
+#
+# compile generated union0
+#

@@ -33,6 +33,7 @@ what="both"
 copt=
 file=
 exit=0
+display=
 
 # option management
 # some more stuff could be added here if needed
@@ -57,7 +58,8 @@ do
 	  "  -cr: compile and run\n" \
 	  "  -crc: compile, run and compare\n" \
           "  -e: expect this exit status from the program (default is 0)\n" \
-	  "  -f file: use this file instead of dbname.[cf...]\n"
+	  "  -f file: use this file instead of dbname.[cf...]\n" \
+	  "  -d: display output (not really portable across compilers)\n"
       exit 0;
       ;;
     # initial or generated only
@@ -85,6 +87,10 @@ do
     -crc|--crc|--compile-run-compare)
       compile=1 run=1 compare=1 initial=
       message="compile run compare"
+      ;;
+    # display: do not use, this more for debug...
+    # the display cannot be performed when PIPS_VALIDATION_EXE is off
+    -d|--display) display=1
       ;;
     # expected exit status
     -e|--exit) exit=$1 ; shift
@@ -186,12 +192,20 @@ then
     status=$?
     [ $status -eq $exit ] || \
       err 5 "status $status instead of $exit while executing initial code"
+    if [ "$display" ] ; then
+      echo "# initial version output"
+      cat $exe.1.out
+    fi
   fi
   if [ "$generated" ] ; then
     $exe.2 > $exe.2.out 2> $exe.2.err
     status=$?
     [ $status -eq $exit ] || \
       err 6 "status $status instead of $exit while executing unsplit code"
+    if [ "$display" ] ; then
+      echo "# generated version output"
+      cat $exe.2.out
+    fi
   fi
 fi
 

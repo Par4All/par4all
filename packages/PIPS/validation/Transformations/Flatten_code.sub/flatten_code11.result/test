@@ -1,11 +1,4 @@
 
-Execute initial code
-
-foo=1
-foo=2
-foo=3
-foo=4
-
 Initial code
 
 void flatten_code11(void)
@@ -95,10 +88,6 @@ void flatten_code11(void)
 
 Unsplit and compile resulting code
 
-
-Execute resulting code
-
-foo=1
-foo=2
-foo=3
-foo=4
+#
+# compile run compare both flatten_code11
+#

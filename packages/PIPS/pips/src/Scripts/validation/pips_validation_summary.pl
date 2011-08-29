@@ -29,12 +29,14 @@ die "expecting one or two arguments" unless @ARGV <= 2 and @ARGV >= 1;
 my $summary = $ARGV[0];
 my $differential = @ARGV==2;
 
-# all possible validation status, with distinct first letters
-my $status = 'failed|changed|passed|timeout|keptout|bug|later|slow';
+# all possible validation "status", with distinct first letters
+# it may happen with warnings that some cases may be multi state?
+my $status =
+  'failed|changed|passed|timeout|keptout|bug|later|slow|orphan|noref';
 
 # other miscellaneous issues
 my $others =
-  'missing|skipped|multi-script|multi-source|nofilter|orphan|broken-directory';
+  'skipped|multi-script|multi-source|nofilter|broken-directory|missing';
 
 # return ref to zero count status hash
 sub zeroed()
@@ -153,11 +155,11 @@ for my $c (sort keys %new)
 }
 
 # extract various counts
-my $not_passed = $n{failed} + $n{changed} + $n{timeout};
-my $count = $not_passed + $n{passed};
-my $warned = $n{skipped} + $n{nofilter} + $n{orphan} + $n{missing} +
-    $n{'multi-script'} + $n{'multi-source'} +
-    $n{keptout} + $n{bug} + $n{later} + $n{slow};
+my $not_passed = $n{failed} + $n{changed} + $n{timeout} + $n{noref};
+my $cannot_execute = $n{orphan};
+my $count = ${not_passed} + ${cannot_execute} + $n{passed};
+my $warned = $n{skipped} + $n{nofilter} +  $n{'multi-script'} + $n{missing} +
+    $n{'multi-source'} +  $n{keptout} + $n{bug} + $n{later} + $n{slow};
 
 # status change summary
 my $status_changes = '';
@@ -175,12 +177,14 @@ print
   " * not passed: $not_passed\n" .
   " - failed: $n{failed} (voluntary and unvoluntary core dumps)\n" .
   " - changed: $n{changed} (modified output)\n" .
-  " - timeout: $n{timeout} (time was out)\n";
+  " - timeout: $n{timeout} (time was out)\n" .
+  " - noref: $n{noref} (no reference file for comparison)\n" .
+  " * cannot execute: $cannot_execute (result without source nor script)\n";
 
 print
   " * status changes:$status_changes\n" .
   "   .=none P=passed F=failed C=changed T=timeout " .
-    "K=keptout B=bug L=later S=slow\n"
+  "K=keptout B=bug L=later S=slow O=orphan N=noref\n"
     if $status_changes;
 
 print
@@ -194,7 +198,6 @@ print
   " * multi-script: $n{'multi-script'} (more than one validation script)\n" .
   " * multi-source: $n{'multi-source'} " .
     "(source files for test with different suffixes)\n" .
-  " * orphan: $n{orphan} (result available without source nor script)\n" .
   " * nofilter: $n{nofilter} (tpips2 script without corresponding filter)\n"
     if $warned;
 
@@ -234,10 +237,13 @@ if ($aggregate)
 }
 
 # print detailed per-directory summary
-print "directory", " " x 19,"cases  bads success (F+C+T|K+B+L+S) changes...\n";
+print "directory", " " x 19,
+      "cases  bads success (F+C+T+N+O|K+B+L+S) changes...\n";
 for my $dir (sort keys %d)
 {
-  my $failures = $d{$dir}{failed} + $d{$dir}{changed} + $d{$dir}{timeout};
+  my $failures =
+    $d{$dir}{failed} + $d{$dir}{changed} + $d{$dir}{timeout} +
+    $d{$dir}{orphan} + $d{$dir}{noref};
   # dircount may be null if all tests are kept out
   my $dircount = $d{$dir}{passed} + $failures;
 
@@ -251,8 +257,9 @@ for my $dir (sort keys %d)
       $d{$dir}{keptout} or $d{$dir}{bug} or $d{$dir}{later} or $d{$dir}{slow} or
       (exists $diff{$dir} and $differential))
   {
-    printf " (%d+%d+%d|%d+%d+%d+%d)",
+    printf " (%d+%d+%d+%d+%d|%d+%d+%d+%d)",
       $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout},
+      $d{$dir}{noref}, $d{$dir}{orphan},
       $d{$dir}{keptout}, $d{$dir}{bug}, $d{$dir}{later}, $d{$dir}{slow};
 
     if ($differential) {
@@ -277,7 +284,8 @@ if ($n{passed} == $count)
 }
 else
 {
-  print "ISSUES $not_passed/$count " .
-        "($n{failed}+$n{changed}+$n{timeout}|" .
+  my $issues = $not_passed+$cannot_execute;
+  print "ISSUES $issues/$count " .
+        "($n{failed}+$n{changed}+$n{timeout}+$n{noref}+$n{orphan}|" .
 	"$n{keptout}+$n{bug}+$n{later}+$n{slow})$status_changes $delay\n";
 }

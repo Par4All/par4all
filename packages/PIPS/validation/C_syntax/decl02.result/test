@@ -77,3 +77,6 @@ static STD_uint32 line;
 const  char MEM_checked_class[] = "allocateur avec suivi";
 
 int array[] = {1, 2, 3};
+#
+# compile generated decl02
+#

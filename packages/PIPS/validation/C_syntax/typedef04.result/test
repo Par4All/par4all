@@ -17,3 +17,6 @@ void typedef04(int n, struct s d, struct s *pd)
    narray_t a1;
    darray_t a2;
 }
+#
+# compile generated typedef04
+#

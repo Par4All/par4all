@@ -29,7 +29,7 @@ display PARSED_PRINTED_FILE[decl51!]
 #quit
 
 apply UNSPLIT
-shell cc -c decl51.database/Src/decl51.c
+shell pips_validation_exe.sh -c -g decl51
 
 close
 #delete decl51

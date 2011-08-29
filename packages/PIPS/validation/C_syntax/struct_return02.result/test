@@ -20,3 +20,6 @@ struct test foo();
 
 
 int main();
+#
+# compile generated struct_return02
+#

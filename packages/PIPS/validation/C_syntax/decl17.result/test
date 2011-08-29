@@ -105,3 +105,6 @@ void decl17(int iarg)
 {
    iarg++;
 }
+#
+# compile generated decl17
+#

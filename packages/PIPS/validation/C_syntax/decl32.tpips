@@ -31,7 +31,7 @@ display PARSED_PRINTED_FILE[decl32!]
 #display SYMBOL_TABLE_FILE[decl32]
 
 apply UNSPLIT
-shell cc -c decl32.database/Src/decl32.c
+shell pips_validation_exe.sh -c -g decl32
 
 close
 # delete decl32

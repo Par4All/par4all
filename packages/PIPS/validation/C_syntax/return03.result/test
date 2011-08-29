@@ -40,3 +40,6 @@ void return03()
       j = 2;
    ;
 }
+#
+# compile generated return03
+#

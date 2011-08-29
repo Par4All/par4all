@@ -21,7 +21,7 @@ echo
 display PRINTED_FILE[$WS]
 
 apply UNSPLIT
-shell cc -c $WS.database/Src/$WS.c
+shell pips_validation_exe.sh  -c -g $WS
 
 close
 #delete $WS

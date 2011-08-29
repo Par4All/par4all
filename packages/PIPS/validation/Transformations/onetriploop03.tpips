@@ -8,7 +8,7 @@ setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 # display PRINTED_FILE[onetriploop03]
-# capply SUPPRESS_DEAD_CODE[onetriploop03]
+# capply SIMPLIFY_CONTROL[onetriploop03]
 # display PRINTED_FILE[onetriploop03]
 
 echo
@@ -33,7 +33,7 @@ echo Code after one trip loop detection and simplification
 echo
 
 activate PRINT_CODE
-capply SUPPRESS_DEAD_CODE[onetriploop03]
+capply SIMPLIFY_CONTROL[onetriploop03]
 display PRINTED_FILE[foo]
 display PRINTED_FILE[onetriploop03]
 display PRINTED_FILE[main]

@@ -53,7 +53,7 @@ echo
 display SYMBOL_TABLE_FILE[decl33]
 
 apply UNSPLIT
-shell cc -c decl33.database/Src/decl33.c
+shell pips_validation_exe.sh -c -g decl33
 
 close
 # delete decl33

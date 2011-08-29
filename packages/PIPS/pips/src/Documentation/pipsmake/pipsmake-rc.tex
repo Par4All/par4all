@@ -9964,11 +9964,12 @@ level) and the resource which is produced (should it be an accelerated
 file?). The current choice does not allow to easily mix different
 accelerators.
 
-\subsection{GPGPU}
-\label{hwac-gpgpu}
+\subsection{FREIA Software}
+\label{hwac-freia-software}
 
-Generate code for GPGPU, possibly through an OpenCL programmed library
-implementing the FREIA AIPO functions.
+Generate code for a software FREIA implementation, by applying various
+optimizations at the library API level, but without generating accelerated
+functions.
 
 \begin{PipsMake}
 freia_aipo_compiler   > MODULE.code
@@ -10063,8 +10064,15 @@ Assume this pixel size in bits:
 FREIA_PIXEL_SIZE 16
 \end{PipsProp}
 
-\subsection{SPoC}
-\label{hwac-spoc}
+Whether to cleanup freia returned status, as the code is assumed correct
+when compiled.
+\begin{PipsProp}{FREIA_CLEANUP_STATUS}
+FREIA_CLEANUP_STATUS TRUE
+\end{PipsProp}
+
+
+\subsection{FREIA SPoC}
+\label{hwac-freia-spoc}
 
 FREIA Compiler for SPoC target.
 Consider applying  \verb|freia_unroll_while| beforehand.
@@ -10087,8 +10095,8 @@ Default depth of the target SPoC accelerator:
 HWAC_SPOC_DEPTH 8
 \end{PipsProp}
 
-\subsection{Terapix}
-\label{hwac-terapix}
+\subsection{FREIA Terapix}
+\label{hwac-freia-terapix}
 
 FREIA compiler for Terapix target.
 
@@ -10162,6 +10170,29 @@ an imagelet size.
 \begin{PipsProp}{HWAC_TERAPIX_IMAGELET_MAX_SIZE}
 HWAC_TERAPIX_IMAGELET_MAX_SIZE 0
 \end{PipsProp}
+
+\subsection{FREIA OpenCL}
+\label{hwac-freia-opencl}
+
+FREIA compiler for OpenCL target, which may run on both multi-core and GPU.
+
+\begin{PipsMake}
+freia_opencl_compiler  > MODULE.code
+                       > MODULE.callees
+                       > MODULE.opencl_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+Whether we should attempt to generate merged OpenCL image operations.
+If not, the result will be simular to simple AIPO compilation,
+no actual helper functions will be generated.
+\begin{PipsProp}{HWAC_OPENCL_MERGE_OPERATIONS}
+HWAC_OPENCL_MERGE_OPERATIONS TRUE
+\end{PipsProp}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS TRANSFORMATIONS
 
 \section{Function Level Transformations}
 

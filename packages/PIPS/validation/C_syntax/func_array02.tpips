@@ -22,10 +22,9 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 display PRINTED_FILE(%ALL)
 apply UNSPLIT(%ALL)
-shell cc -c func_array02.database/Src/func_array02.c
-shell rm func_array02.o
+shell pips_validation_exe.sh -c -g func_array02
 
 close
 
-#delete func_array02 
+delete func_array02 
 quit

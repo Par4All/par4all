@@ -13,7 +13,7 @@ display PRINTED_FILE[%ALL]
 # impact on the code..
 #
 capply PARTIAL_EVAL[%ALL]
-capply SUPPRESS_DEAD_CODE[%ALL]
+capply SIMPLIFY_CONTROL[%ALL]
 # It is not possible to get rid of useless J = 1 in FOO1 because
 # use-def chains are not interprocedural
 # capply USE_DEF_ELIMINATION[%ALL]

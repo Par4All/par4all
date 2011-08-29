@@ -9,7 +9,7 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 display PRINTED_FILE[safe_malloc]
 
 apply UNSPLIT
-shell cc -c decl43.database/Src/decl43.c
+shell pips_validation_exe.sh -c -g decl43
 
 close
 delete $WSPC

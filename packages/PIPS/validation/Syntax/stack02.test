@@ -1,6 +1,7 @@
 #!/bin/sh
 
-PIPS_CHECK_FORTRAN="Y"
+# Unused dummy argument b, unused variable c, no other compilation issues
+PIPS_CHECK_FORTRAN="N"
 export PIPS_CHECK_FORTRAN
 
 tpips=${tpips_version:-tpips}

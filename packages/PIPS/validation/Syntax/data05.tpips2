@@ -1,0 +1,12 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+delete data05
+create data05 data05.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+
+display PRINTED_FILE[DATA05]
+
+close
+delete data05
+quit

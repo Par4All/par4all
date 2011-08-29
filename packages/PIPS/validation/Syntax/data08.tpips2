@@ -1,0 +1,11 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+delete data08
+create data08 data08.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[DATA08]
+
+close
+delete data08
+quit

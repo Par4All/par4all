@@ -147,7 +147,7 @@ digraph "freia_12_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops (0 copies), optimized to 2 (0+0 copies)
+// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -161,10 +161,8 @@ freia_status freia_12_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -237,9 +235,6 @@ freia_status freia_12_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -352,6 +347,8 @@ digraph "freia_12_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_12
  *
@@ -583,6 +580,112 @@ freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    // o0 = h(i0)
    // o1 = h(i1)
    freia_12_helper_0_0_0(o0, o1, i0, i1, kern);                         /*0011*/
+   return 0;                                                            /*0013*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, int32_t kern)
+{
+   // two parallel computations
+   // o0 = h(i0)
+   // o1 = h(i1)
+   freia_aipo_erode_8c(o0, i0, kern);                                   /*0011*/
+   freia_aipo_dilate_8c(o1, i1, kern);                                  /*0012*/
+   return FREIA_OK;                                                     /*0013*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_12" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "12 D8" [shape=box];
+  "12 D8" -> "o1";
+  "i1" -> "12 D8";
+  "11 E8" [shape=box];
+  "11 E8" -> "o0";
+  "i0" -> "11 E8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_12" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "12 D8" [shape=box];
+  "12 D8" -> "o1";
+  "i1" -> "12 D8";
+  "11 E8" [shape=box];
+  "11 E8" -> "o0";
+  "i0" -> "11 E8";
+}
+// graph for dag "freia_12_helper_0_0" of module "freia_12" in dot format
+digraph "freia_12_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "12 D8" [shape=box];
+  "12 D8" -> "o1";
+  "i1" -> "12 D8";
+  "11 E8" [shape=box];
+  "11 E8" -> "o0";
+  "i0" -> "11 E8";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function freia_12
+
+// opencl for dag 0
+
+! updated function
+
+freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, int32_t kern)
+{
+   // two parallel computations
+   // o0 = h(i0)
+   // o1 = h(i1)
+   freia_aipo_erode_8c(o0, i0, kern);                                   /*0011*/
+   freia_aipo_dilate_8c(o1, i1, kern);                                  /*0012*/
+   return FREIA_OK;                                                     /*0013*/
+}
+
+! cleaned up function
+
+freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, int32_t kern)
+{
+   // two parallel computations
+   // o0 = h(i0)
+   // o1 = h(i1)
+   freia_aipo_erode_8c(o0, i0, kern);                                   /*0011*/
+   freia_aipo_dilate_8c(o1, i1, kern);                                  /*0012*/
    return 0;                                                            /*0013*/
 }
 #

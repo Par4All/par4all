@@ -79,7 +79,7 @@ activate PRINT_CODE_REGIONS
 display PRINTED_FILE[decl35]
 
 apply UNSPLIT
-shell cc -c decl35.database/Src/decl35.c
+shell pips_validation_exe.sh -c -g decl35
 
 close
 

@@ -262,6 +262,23 @@ class modules:
         """ get concatenation of all outermost loops"""
         return reduce(lambda l1,l2:l1+l2.loops(), self.__modules, [])
 
+    @property
+    def callers(self):
+        """ get concatenation of all modules' callers"""
+        callers = []
+        for m in self.__modules:
+            for c in m.callers:
+                callers=callers+[c.name]
+        return modules([ self.__ws[name] for name in callers] if callers else [])
+
+    @property
+    def callees(self):
+        """ get concatenation of all modules' callers"""
+        callees = []
+        for m in self.__modules:
+            for c in m.callees:
+                callees=callees+[c.name]
+        return modules([ self.__ws[name] for name in callees] if callees else [])
 
 
 class workspace(object):

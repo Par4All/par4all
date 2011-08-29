@@ -139,8 +139,6 @@ int freia_66(int32_t *kernel)
 {
    int n = 10;                                                          /*0005*/
    freia_dataio fdin, fdout;                                            /*0006*/
-   // hardware accelerator generated variable
-   freia_data2d *t_1 = 0;
    freia_common_open_input(&fdin, 0);                                   /*0007*/
    freia_common_open_output(&fdout, 1, 1024, 720, 16);                  /*0008*/
 
@@ -148,7 +146,6 @@ int freia_66(int32_t *kernel)
 
    in = freia_common_create_data(16, 1024, 720);                        /*0012*/
    t = freia_common_create_data(16, 1024, 720);                         /*0013*/
-   t_1 = freia_common_create_data(t->bpp, t->widthWa, t->heightWa);
    out = freia_common_create_data(16, 1024, 720);                       /*0014*/
    
    // input
@@ -159,9 +156,9 @@ int freia_66(int32_t *kernel)
 
    while (n--) {                                                        /*0022*/
       freia_aipo_erode_8c(out, out, kernel);                            /*0024*/
-      freia_aipo_sup(t_1, out, t);                                      /*0025*/
-      freia_aipo_dilate_8c(out, t_1, kernel);                           /*0026*/
-      freia_aipo_sup(t, out, t_1);                                      /*0027*/
+      freia_aipo_sup(t, out, t);                                        /*0025*/
+      freia_aipo_dilate_8c(out, t, kernel);                             /*0026*/
+      freia_aipo_sup(t, out, t);                                        /*0027*/
    }
    
    // output
@@ -170,7 +167,6 @@ int freia_66(int32_t *kernel)
    // cleanup
    freia_common_destruct_data(in);                                      /*0034*/
    freia_common_destruct_data(t);                                       /*0035*/
-   freia_common_destruct_data(t_1);
    freia_common_destruct_data(out);                                     /*0036*/
 
    freia_common_close_input(&fdin);                                     /*0038*/
@@ -341,10 +337,10 @@ digraph "freia_66_helper_1_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops (2 copies), optimized to 0 (0+2 copies)
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2 copies
 // # SPOC calls: 0
 
-// dag 1: 4 ops (0 copies), optimized to 4 (0+0 copies)
+// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -358,10 +354,8 @@ freia_status freia_66_helper_1_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -451,9 +445,6 @@ freia_status freia_66_helper_1_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -703,6 +694,10 @@ digraph "freia_66_helper_1_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2 copies
+
+// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_66
  *
@@ -1003,6 +998,259 @@ int freia_66(int32_t *kernel)
 
    while (n--)                                                          /*0022*/
       freia_66_helper_1_0_0(out, t, out, t, kernel);                    /*0024*/
+   
+   // output
+   freia_common_tx_image(out, &fdout);                                  /*0031*/
+   
+   // cleanup
+   freia_common_destruct_data(in);                                      /*0034*/
+   freia_common_destruct_data(t);                                       /*0035*/
+   freia_common_destruct_data(out);                                     /*0036*/
+
+   freia_common_close_input(&fdin);                                     /*0038*/
+   freia_common_close_output(&fdout);                                   /*0039*/
+
+   return 0;                                                            /*0041*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+int freia_66(int32_t *kernel)
+{
+   int n = 10;                                                          /*0005*/
+   freia_dataio fdin, fdout;                                            /*0006*/
+   freia_common_open_input(&fdin, 0);                                   /*0007*/
+   freia_common_open_output(&fdout, 1, 1024, 720, 16);                  /*0008*/
+
+   freia_data2d *in, *t, *out;                                          /*0010*/
+
+   in = freia_common_create_data(16, 1024, 720);                        /*0012*/
+   t = freia_common_create_data(16, 1024, 720);                         /*0013*/
+   out = freia_common_create_data(16, 1024, 720);                       /*0014*/
+   
+   // input
+   freia_common_rx_image(in, &fdin);                                    /*0017*/
+
+   freia_aipo_copy(out, in);                                            /*0019*/
+   freia_aipo_copy(t, in);                                              /*0020*/
+
+   while (n--) {                                                        /*0022*/
+      freia_aipo_erode_8c(out, out, kernel);                            /*0024*/
+      freia_aipo_sup(t, out, t);                                        /*0025*/
+      freia_aipo_dilate_8c(out, t, kernel);                             /*0026*/
+      freia_aipo_sup(t, out, t);                                        /*0027*/
+   }
+   
+   // output
+   freia_common_tx_image(out, &fdout);                                  /*0031*/
+   
+   // cleanup
+   freia_common_destruct_data(in);                                      /*0034*/
+   freia_common_destruct_data(t);                                       /*0035*/
+   freia_common_destruct_data(out);                                     /*0036*/
+
+   freia_common_close_input(&fdin);                                     /*0038*/
+   freia_common_close_output(&fdout);                                   /*0039*/
+
+   return 0;                                                            /*0041*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_66" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+  "t" [shape=circle];
+
+  // computation vertices
+  "20 =" [shape=circle];
+  "20 =" -> "t";
+  "19 =" [shape=circle];
+  "19 =" -> "out";
+  "in" -> "20 =";
+  "in" -> "19 =";
+}
+// graph for dag "dag_1" of module "freia_66" in dot format
+digraph "dag_1" {
+  // inputs
+  "out" [shape=circle];
+  "t" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+  "t'" [shape=circle];
+
+  // computation vertices
+  "27 >" [shape=trapezium,orientation=270];
+  "27 >" -> "t'";
+  "26 D8" [shape=box];
+  "26 D8" -> "27 >" [label="out"];
+  "26 D8" -> "out'";
+  "25 >" [shape=trapezium,orientation=270];
+  "25 >" -> "27 >" [label="t"];
+  "25 >" -> "26 D8" [label="t"];
+  "t" -> "25 >";
+  "24 E8" [shape=box];
+  "24 E8" -> "25 >" [label="out"];
+  "out" -> "24 E8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_66" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+
+  // external copies: 2
+  "out" [shape=circle];
+  "out =" [shape=circle,label="=",style="dashed"]
+  "in" -> "out =";
+  "out =" -> "out";
+  "t" [shape=circle];
+  "t =" [shape=circle,label="=",style="dashed"]
+  "in" -> "t =";
+  "t =" -> "t";
+}
+// graph for dag "dag_cleaned_1" of module "freia_66" in dot format
+digraph "dag_cleaned_1" {
+  // inputs
+  "out" [shape=circle];
+  "t" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+  "t'" [shape=circle];
+
+  // computation vertices
+  "27 >" [shape=trapezium,orientation=270];
+  "27 >" -> "t'";
+  "26 D8" [shape=box];
+  "26 D8" -> "27 >" [label="out"];
+  "26 D8" -> "out'";
+  "25 >" [shape=trapezium,orientation=270];
+  "25 >" -> "27 >" [label="t_1"];
+  "25 >" -> "26 D8" [label="t_1"];
+  "t" -> "25 >";
+  "24 E8" [shape=box];
+  "24 E8" -> "25 >" [label="out_1"];
+  "out" -> "24 E8";
+}
+// graph for dag "freia_66_helper_1_0" of module "freia_66" in dot format
+digraph "freia_66_helper_1_0" {
+  // inputs
+  "out" [shape=circle];
+  "t" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+  "t'" [shape=circle];
+
+  // computation vertices
+  "27 >" [shape=trapezium,orientation=270];
+  "27 >" -> "t'";
+  "26 D8" [shape=box];
+  "26 D8" -> "27 >" [label="out"];
+  "26 D8" -> "out'";
+  "25 >" [shape=trapezium,orientation=270];
+  "25 >" -> "27 >" [label="t_1"];
+  "25 >" -> "26 D8" [label="t_1"];
+  "t" -> "25 >";
+  "24 E8" [shape=box];
+  "24 E8" -> "25 >" [label="out_1"];
+  "out" -> "24 E8";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2 copies
+
+// dag 1: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function freia_66
+
+// opencl for dag 0
+
+// opencl for dag 1
+
+! updated function
+
+int freia_66(int32_t *kernel)
+{
+   int n = 10;                                                          /*0005*/
+   freia_dataio fdin, fdout;                                            /*0006*/
+   freia_common_open_input(&fdin, 0);                                   /*0007*/
+   freia_common_open_output(&fdout, 1, 1024, 720, 16);                  /*0008*/
+
+   freia_data2d *in, *t, *out;                                          /*0010*/
+
+   in = freia_common_create_data(16, 1024, 720);                        /*0012*/
+   t = freia_common_create_data(16, 1024, 720);                         /*0013*/
+   out = freia_common_create_data(16, 1024, 720);                       /*0014*/
+   
+   // input
+   freia_common_rx_image(in, &fdin);                                    /*0017*/
+
+   freia_aipo_copy(out, in);
+   freia_aipo_copy(t, in);
+
+   while (n--) {                                                        /*0022*/
+      freia_aipo_erode_8c(out, out, kernel);                            /*0024*/
+      freia_aipo_sup(t, out, t);                                        /*0025*/
+      freia_aipo_dilate_8c(out, t, kernel);                             /*0026*/
+      freia_aipo_sup(t, out, t);                                        /*0027*/
+   }
+   
+   // output
+   freia_common_tx_image(out, &fdout);                                  /*0031*/
+   
+   // cleanup
+   freia_common_destruct_data(in);                                      /*0034*/
+   freia_common_destruct_data(t);                                       /*0035*/
+   freia_common_destruct_data(out);                                     /*0036*/
+
+   freia_common_close_input(&fdin);                                     /*0038*/
+   freia_common_close_output(&fdout);                                   /*0039*/
+
+   return 0;                                                            /*0041*/
+}
+
+! cleaned up function
+
+int freia_66(int32_t *kernel)
+{
+   int n = 10;                                                          /*0005*/
+   freia_dataio fdin, fdout;                                            /*0006*/
+   freia_common_open_input(&fdin, 0);                                   /*0007*/
+   freia_common_open_output(&fdout, 1, 1024, 720, 16);                  /*0008*/
+
+   freia_data2d *in, *t, *out;                                          /*0010*/
+
+   in = freia_common_create_data(16, 1024, 720);                        /*0012*/
+   t = freia_common_create_data(16, 1024, 720);                         /*0013*/
+   out = freia_common_create_data(16, 1024, 720);                       /*0014*/
+   
+   // input
+   freia_common_rx_image(in, &fdin);                                    /*0017*/
+
+   freia_aipo_copy(out, in);
+   freia_aipo_copy(t, in);
+
+   while (n--) {                                                        /*0022*/
+      freia_aipo_erode_8c(out, out, kernel);                            /*0024*/
+      freia_aipo_sup(t, out, t);                                        /*0025*/
+      freia_aipo_dilate_8c(out, t, kernel);                             /*0026*/
+      freia_aipo_sup(t, out, t);                                        /*0027*/
+   }
    
    // output
    freia_common_tx_image(out, &fdout);                                  /*0031*/

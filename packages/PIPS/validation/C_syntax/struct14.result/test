@@ -13,3 +13,6 @@ void struct14()
    struct s2 u2;
    struct foo u3;
 }
+#
+# compile generated struct14
+#

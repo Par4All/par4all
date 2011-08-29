@@ -89,3 +89,6 @@ void decl01(char *dir)
    struct c x;
    x.foo = 1;
 }
+#
+# compile generated decl01
+#

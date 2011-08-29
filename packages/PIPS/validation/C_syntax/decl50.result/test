@@ -8,3 +8,6 @@ Parsed printed file for "decl50!"
    cannot keep the information. */
 const void *next_data;
 volatile void *previous_data;
+#
+# compile generated decl50
+#

@@ -1,0 +1,9 @@
+delete omp_include
+create omp_include omp_include.c
+
+display PARSED_PRINTED_FILE[main]
+
+close
+
+quit
+

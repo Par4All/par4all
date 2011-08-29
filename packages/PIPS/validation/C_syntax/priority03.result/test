@@ -7,3 +7,6 @@ int main()
    i = (float) (4554>>3&7845211);
    return 0;
 }
+#
+# compile generated priority03
+#

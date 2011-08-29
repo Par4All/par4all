@@ -33,7 +33,7 @@ display PRINTED_FILE[decl20]
 
 
 apply UNSPLIT
-shell cc -c decl20.database/Src/decl20.c
+shell pips_validation_exe.sh -c -g decl20
 
 close
 delete decl20

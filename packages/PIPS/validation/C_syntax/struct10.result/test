@@ -13,3 +13,6 @@ void struct10()
       int i;
    } u;
 }
+#
+# compile generated struct10
+#

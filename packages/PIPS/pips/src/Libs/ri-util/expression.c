@@ -3317,7 +3317,7 @@ list string_to_expressions(const char * str, const char * seed, entity module) {
     return gen_nreverse(expressions);
 }
 /* split a string using @p seed as separator
- * and call string_to_expression on each chunk */
+ * and call string_to_entity on each chunk */
 list string_to_entities(const char * str, const char * seed, entity module) {
     list strings = strsplit(str,seed);
     list entities = NIL;

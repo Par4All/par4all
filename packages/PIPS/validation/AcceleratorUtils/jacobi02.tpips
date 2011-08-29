@@ -26,7 +26,7 @@ echo
 echo Code after cleanup
 echo
 
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 display PRINTED_FILE
 
 echo

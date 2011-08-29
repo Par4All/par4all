@@ -56,3 +56,6 @@ int main(int argc, char *argv[])
 
 Unsplit resulting code
 
+#
+# compile generated c_unroll1
+#

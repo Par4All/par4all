@@ -31,15 +31,20 @@
 
 #include "genC.h"
 #include "misc.h"
-
 #include "linear.h"
 
 #include "ri.h"
 
 #include "freia.h"
-#include "freia_spoc_private.h"
 #include "hwac.h"
 
+/*
+  @brief compile one dag with AIPO optimizations
+  @param ls statements underlying the full dag
+  @param occs image occurences
+  @param exchanges statements to exchange because of dependences
+  @return the list of allocated intermediate images
+*/
 list freia_aipo_compile_calls
 (string module,
  dag fulld,
@@ -51,6 +56,8 @@ list freia_aipo_compile_calls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
+  // about aipo statistics: no helper file to put them...
+
   list added_stats = freia_dag_optimize(fulld, exchanges);
 
   // intermediate images
@@ -61,7 +68,8 @@ list freia_aipo_compile_calls
   dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
 
   // now may put actual allocations, which messes up statement numbers
-  list reals = freia_allocate_new_images_if_needed(ls, new_images, occs, init);
+  list reals =
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init, NULL);
 
   // ??? should it be NIL because it is not useful in AIPO->AIPO?
   freia_insert_added_stats(ls, added_stats);

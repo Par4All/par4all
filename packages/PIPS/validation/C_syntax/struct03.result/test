@@ -16,3 +16,6 @@ typedef union {
 } pthread_mutex_t;
 
 void main();
+#
+# compile generated struct03
+#

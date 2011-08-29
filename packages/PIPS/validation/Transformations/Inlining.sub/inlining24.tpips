@@ -1,0 +1,144 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+# To test inlining and flattening without any code simplification
+
+delete inlining24
+create inlining24 inlining24.c
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty C89_CODE_GENERATION TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[freia_cipo_dilate]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Because %ALL is modified by code synthesis, let's get ready
+echo
+
+display CALLGRAPH_FILE[freia_cipo_outer_gradient]
+
+# echo
+# echo Preconditions before inlining and before partial eval
+# echo
+#
+# activate PRINT_CODE_PRECONDITIONS
+# display PRINTED_FILE[main]
+# display PRINTED_FILE[freia_cipo_outer_gradient]
+# display PRINTED_FILE[freia_cipo_dilate]
+#
+# echo
+# echo Code after partial eval
+# echo
+#
+# activate PRINT_CODE
+# apply PARTIAL_EVAL[freia_cipo_dilate]
+# display PRINTED_FILE[freia_cipo_dilate]
+# apply PARTIAL_EVAL[freia_cipo_outer_gradient]
+# display PRINTED_FILE[freia_cipo_outer_gradient]
+#
+# echo
+# echo Code after dead code elimination
+# echo
+#
+# activate PRINT_CODE
+# apply SIMPLIFY_CONTROL[freia_cipo_dilate]
+# display PRINTED_FILE[freia_cipo_dilate]
+# apply SIMPLIFY_CONTROL[freia_cipo_outer_gradient]
+# display PRINTED_FILE[freia_cipo_outer_gradient]
+
+#echo
+#echo Code after full loop unrolling
+#echo
+#
+# The main implies connectivity 8
+#
+# apply FULL_UNROLL[freia_cipo_outer_gradient]
+# l4
+# apply FULL_UNROLL[freia_cipo_outer_gradient]
+# l6
+# apply FULL_UNROLL[freia_cipo_outer_gradient]
+# l8
+#apply FULL_UNROLL[freia_cipo_dilate]
+#l8
+
+# display PRINTED_FILE[freia_cipo_outer_gradient]
+display PRINTED_FILE[freia_cipo_dilate]
+
+# echo
+# echo Code after use-def elimination: bad results due to synthetic code, among other things
+# echo
+# 
+# activate PRINT_CODE
+# apply USE_DEF_ELIMINATION[freia_cipo_outer_gradient]
+# display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after inlining of "freia_cipo_dilate"
+echo
+
+apply INLINING[freia_cipo_dilate]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after inlining of "freia_cipo_outer_gradient"
+echo
+
+apply INLINING[freia_cipo_outer_gradient]
+display PRINTED_FILE[main]
+
+echo
+echo Code after flattening of "freia_cipo_outer_gradient"
+echo
+
+apply FLATTEN_CODE[main]
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions after inlining and before partial eval
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo Code after partial eval of inlined "main"
+echo
+
+activate PRINT_CODE
+apply PARTIAL_EVAL[main]
+display PRINTED_FILE[main]
+
+echo
+echo Code after dead code elimination of inlined "main"
+echo
+
+activate PRINT_CODE
+apply SIMPLIFY_CONTROL[main]
+display PRINTED_FILE[main]
+
+echo
+echo Code after second flattening of "freia_cipo_outer_gradient" (unrolling should be performed this time)
+echo
+
+apply FLATTEN_CODE[main]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit and compile resulting code
+echo
+
+apply UNSPLIT
+shell cc -c inlining24.database/Src/inlining24.c
+shell rm inlining24.o
+
+close
+delete inlining24
+quit

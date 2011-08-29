@@ -37,55 +37,48 @@ POINTS TO
 
 
 // Points To:
-// _pi_1 -> __pi_1_2 , EXACT
-// pi -> _pi_1 , EXACT
+// pi -> _pi_1[0] , EXACT
 
 int formal_parameter01(int **pi)
 {
 
 // Points To:
-// _pi_1 -> __pi_1_2 , EXACT
-// pi -> _pi_1 , EXACT
+// pi -> _pi_1[0] , EXACT
 
    int **q;
 
 // Points To:
-// _pi_1 -> __pi_1_2 , EXACT
-// pi -> _pi_1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    int *i;
 
 // Points To:
-// _pi_1 -> __pi_1_2 , EXACT
-// i -> *ANY_MODULE*:*NOWHERE* , EXACT
-// pi -> _pi_1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// i -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
 
    i = 0;
 
 // Points To:
-// _pi_1 -> __pi_1_2 , EXACT
 // i -> *NULL_POINTER* , EXACT
-// pi -> _pi_1 , EXACT
-// q -> *ANY_MODULE*:*NOWHERE* , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    q = pi;
 
 // Points To:
-// _pi_1 -> __pi_1_2 , EXACT
 // i -> *NULL_POINTER* , EXACT
-// pi -> _pi_1 , EXACT
-// q -> _pi_1 , EXACT
+// pi -> _pi_1[0] , EXACT
+// q -> _pi_1[0] , EXACT
 
    pi = &i;
 
 // Points To:
-// _pi_1 -> __pi_1_2 , EXACT
 // i -> *NULL_POINTER* , EXACT
 // pi -> i , EXACT
-// q -> _pi_1 , EXACT
+// q -> _pi_1[0] , EXACT
 
    return 0;
 }

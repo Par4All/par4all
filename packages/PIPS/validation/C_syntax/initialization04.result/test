@@ -147,3 +147,6 @@ void initialization04()
    si_t tab2[] = {0, {ini, inc, dec}};
    si_t tab3[] = {{0, {ini, inc, dec}}};
 }
+#
+# compile generated initialization04
+#

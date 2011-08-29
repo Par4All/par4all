@@ -1,0 +1,49 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+# Detection of input errors	
+
+delete hyper02
+create hyper02 hyper02.f
+module HYPER02
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE
+
+echo
+echo Unknown loop label
+echo
+
+apply LOOP_HYPERPLANE[HYPER02]
+300
+
+echo
+echo Too many vector components
+echo
+
+apply LOOP_HYPERPLANE[HYPER02]
+100
+1 0 0
+
+echo
+echo Too few vector components
+echo
+
+apply LOOP_HYPERPLANE[HYPER02]
+100
+1 
+
+echo
+echo Vector component with wrong type
+echo
+
+apply LOOP_HYPERPLANE[HYPER02]
+100
+1.2 0
+
+display PRINTED_FILE
+
+close
+delete hyper02
+quit

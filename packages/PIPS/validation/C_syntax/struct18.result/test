@@ -13,3 +13,6 @@ void struct18()
       int i;
    } u;
 }
+#
+# compile generated struct18
+#

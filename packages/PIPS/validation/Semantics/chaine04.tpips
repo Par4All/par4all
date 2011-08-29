@@ -13,7 +13,7 @@ display PRINTED_FILE[%ALL]
 
 # activate PRINT_CODE
 # apply PARTIAL_EVAL[%ALL]
-# apply SUPPRESS_DEAD_CODE[%ALL]
+# apply SIMPLIFY_CONTROL[%ALL]
 
 display PRINTED_FILE[%ALL]
 close

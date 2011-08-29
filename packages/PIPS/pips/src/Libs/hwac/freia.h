@@ -31,6 +31,7 @@
 // additionnal hardware specific definitions
 #include "freia_spoc.h"
 #include "freia_terapix.h"
+#include "freia_opencl.h"
 
 // do not require NULL at the end of a vararg.
 #define cat(args...) concatenate(args , NULL)
@@ -47,12 +48,14 @@
 #define FREIA_DEFAULT_BPP get_int_property("FREIA_PIXEL_SIZE")
 
 // check the hardware target
+#define freia_aipo_p(s) same_string_p((s), "aipo")
 #define freia_spoc_p(s) same_string_p((s), "spoc")
 #define freia_terapix_p(s) same_string_p((s), "terapix")
-#define freia_aipo_p(s) same_string_p((s), "aipo")
+#define freia_opencl_p(s) same_string_p((s), "opencl")
 
-#define freia_valid_target_p(s)                               \
-  (freia_spoc_p(s) || freia_terapix_p(s) || freia_aipo_p(s))
+#define freia_valid_target_p(s)             \
+  (freia_spoc_p(s) || freia_terapix_p(s) || \
+   freia_aipo_p(s) || freia_opencl_p(s))
 
 /* FREIA API function name -> SPoC hardware description (and others?)
  */
@@ -74,6 +77,7 @@ typedef struct {
   // corresponding hardware settings
   spoc_hw_t spoc;
   terapix_hw_t terapix;
+  opencl_hw_t opencl;
 } freia_api_t;
 
 #define dagvtx_freia_api(v) get_freia_api(vtxcontent_opid(dagvtx_content(v)))

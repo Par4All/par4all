@@ -12,3 +12,6 @@ void enum11()
       union {enum {gaga} f3;} u;
    } s;
 }
+#
+# compile generated enum11
+#

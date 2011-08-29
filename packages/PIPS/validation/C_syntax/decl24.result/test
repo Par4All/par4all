@@ -69,3 +69,6 @@ void HDL_progress_start_monitor(HDL_progress_handler *progress)
       progress->end_monitor = HDL_progress_end;
    }
 }
+#
+# compile generated decl24
+#

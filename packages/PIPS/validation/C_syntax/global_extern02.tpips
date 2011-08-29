@@ -7,7 +7,7 @@ create global_extern02 global_extern02.c
 display PARSED_PRINTED_FILE[global_extern02!]
 
 apply UNSPLIT
-shell gcc -c global_extern02.database/Src/global_extern02.c
+shell pips_validation_exe.sh -c -g global_extern02
 
 close
 # delete global_extern02

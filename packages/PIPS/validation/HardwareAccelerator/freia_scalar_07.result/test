@@ -140,8 +140,6 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tB2 = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);     /*0012*/
    int sA, sB, sC;                                                      /*0013*/
-   // hardware accelerator generated variable
-   freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
    
    // BUG: issue with X reuse...
    // A
@@ -149,11 +147,11 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    // B
    freia_aipo_threshold(tB, i, sA-10, sA-1, false);                     /*0019*/
    // A
-   freia_aipo_erode_8c(X_1, i, k);                                      /*0021*/
+   freia_aipo_erode_8c(X, i, k);                                        /*0021*/
    // A
-   freia_aipo_global_min(X_1, &sB);                                     /*0023*/
+   freia_aipo_global_min(X, &sB);                                       /*0023*/
    // C with X from A
-   freia_aipo_threshold(tC, X_1, sB-10, sB-1, false);                   /*0025*/
+   freia_aipo_threshold(tC, X, sB-10, sB-1, false);                     /*0025*/
    freia_aipo_add(tC2, tC, tC);                                         /*0026*/
    // B
    freia_aipo_dilate_8c(tB2, tB, k);                                    /*0028*/
@@ -164,7 +162,6 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_aipo_add(o, tC2, tD);                                          /*0033*/
 
    freia_common_destruct_data(X);                                       /*0035*/
-   freia_common_destruct_data(X_1);
    freia_common_destruct_data(tB);                                      /*0036*/
    freia_common_destruct_data(tB2);                                     /*0037*/
    freia_common_destruct_data(tC);                                      /*0038*/
@@ -390,7 +387,7 @@ digraph "freia_scalar_07_helper_0_4" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 11 ops (0 copies), optimized to 11 (0+0 copies)
+// dag 0: 11 ops and 0 copies, optimized to 11 ops and 0+0 copies
 // split 0: 1 cut
 // split 1: 1 cut
 // split 2: 1 cut
@@ -408,12 +405,12 @@ freia_status freia_scalar_07_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
+  spoc_reduction reduc;
+  freia_reduction_results redres;
   int i;
 
   // init pipe to nop
@@ -497,12 +494,12 @@ freia_status freia_scalar_07_helper_0_1_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
+  spoc_reduction reduc;
+  freia_reduction_results redres;
   int i;
 
   // init pipe to nop
@@ -601,13 +598,10 @@ freia_status freia_scalar_07_helper_0_2_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -676,9 +670,6 @@ freia_status freia_scalar_07_helper_0_2_0(
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
@@ -695,13 +686,10 @@ freia_status freia_scalar_07_helper_0_3_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -744,9 +732,6 @@ freia_status freia_scalar_07_helper_0_3_0(
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
@@ -764,13 +749,10 @@ freia_status freia_scalar_07_helper_0_4_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -812,9 +794,6 @@ freia_status freia_scalar_07_helper_0_4_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -1095,6 +1074,8 @@ digraph "freia_scalar_07_helper_0_2_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 11 ops and 0 copies, optimized to 11 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_scalar_07
  *
@@ -2027,6 +2008,402 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_scalar_07_helper_0_2_0(o, X, tC2, sC-10, sC-1, 0);             /*0032*/
 
    freia_common_destruct_data(X);                                       /*0035*/
+   freia_common_destruct_data(tC2);                                     /*0039*/
+   return 0;                                                            /*0041*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
+{
+   
+   
+   
+   
+   
+   
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tB2 = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);     /*0012*/
+   int sA, sB, sC;                                                      /*0013*/
+   
+   // BUG: issue with X reuse...
+   // A
+   freia_aipo_global_max(i, &sA);                                       /*0017*/
+   // B
+   freia_aipo_threshold(tB, i, sA-10, sA-1, false);                     /*0019*/
+   // A
+   freia_aipo_erode_8c(X, i, k);                                        /*0021*/
+   // A
+   freia_aipo_global_min(X, &sB);                                       /*0023*/
+   // C with X from A
+   freia_aipo_threshold(tC, X, sB-10, sB-1, false);                     /*0025*/
+   freia_aipo_add(tC2, tC, tC);                                         /*0026*/
+   // B
+   freia_aipo_dilate_8c(tB2, tB, k);                                    /*0028*/
+   freia_aipo_mul(X, tB2, tB);                                          /*0029*/
+   freia_aipo_global_vol(X, &sC);                                       /*0030*/
+   // D with X from B
+   freia_aipo_threshold(tD, X, sC-10, sC-1, false);                     /*0032*/
+   freia_aipo_add(o, tC2, tD);                                          /*0033*/
+
+   freia_common_destruct_data(X);                                       /*0035*/
+   freia_common_destruct_data(tB);                                      /*0036*/
+   freia_common_destruct_data(tB2);                                     /*0037*/
+   freia_common_destruct_data(tC);                                      /*0038*/
+   freia_common_destruct_data(tC2);                                     /*0039*/
+   freia_common_destruct_data(tD);                                      /*0040*/
+   return FREIA_OK;                                                     /*0041*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_scalar_07" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "33 +" [shape=trapezium,orientation=270];
+  "33 +" -> "o";
+  "32 thr" [shape=parallelogram];
+  "32 thr" -> "33 +" [label="tD"];
+  "30 vol" [shape=diamond];
+  "30 vol" -> "32 thr" [arrowhead=empty,label="sC"];
+  "29 *" [shape=trapezium,orientation=270];
+  "29 *" -> "32 thr" [label="X"];
+  "29 *" -> "30 vol" [label="X"];
+  "28 D8" [shape=box];
+  "28 D8" -> "29 *" [label="tB2"];
+  "26 +" [shape=trapezium,orientation=270];
+  "26 +" -> "33 +" [label="tC2"];
+  "25 thr" [shape=parallelogram];
+  "25 thr" -> "26 +" [label="tC"];
+  "25 thr" -> "26 +" [label="tC"];
+  "23 min" [shape=diamond];
+  "23 min" -> "25 thr" [arrowhead=empty,label="sB"];
+  "21 E8" [shape=box];
+  "21 E8" -> "25 thr" [label="X"];
+  "21 E8" -> "23 min" [label="X"];
+  "19 thr" [shape=parallelogram];
+  "19 thr" -> "29 *" [label="tB"];
+  "19 thr" -> "28 D8" [label="tB"];
+  "17 max" [shape=diamond];
+  "17 max" -> "19 thr" [arrowhead=empty,label="sA"];
+  "i" -> "21 E8";
+  "i" -> "19 thr";
+  "i" -> "17 max";
+}
+// graph for dag "dag_cleaned_0" of module "freia_scalar_07" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "33 +" [shape=trapezium,orientation=270];
+  "33 +" -> "o";
+  "32 thr" [shape=parallelogram];
+  "32 thr" -> "33 +" [label="tD"];
+  "30 vol" [shape=diamond];
+  "30 vol" -> "32 thr" [arrowhead=empty,label="sC"];
+  "29 *" [shape=trapezium,orientation=270];
+  "29 *" -> "32 thr" [label="X"];
+  "29 *" -> "30 vol" [label="X"];
+  "28 D8" [shape=box];
+  "28 D8" -> "29 *" [label="tB2"];
+  "26 +" [shape=trapezium,orientation=270];
+  "26 +" -> "33 +" [label="tC2"];
+  "25 thr" [shape=parallelogram];
+  "25 thr" -> "26 +" [label="tC"];
+  "25 thr" -> "26 +" [label="tC"];
+  "23 min" [shape=diamond];
+  "23 min" -> "25 thr" [arrowhead=empty,label="sB"];
+  "21 E8" [shape=box];
+  "21 E8" -> "25 thr" [label="X_1"];
+  "21 E8" -> "23 min" [label="X_1"];
+  "19 thr" [shape=parallelogram];
+  "19 thr" -> "29 *" [label="tB"];
+  "19 thr" -> "28 D8" [label="tB"];
+  "17 max" [shape=diamond];
+  "17 max" -> "19 thr" [arrowhead=empty,label="sA"];
+  "i" -> "21 E8";
+  "i" -> "19 thr";
+  "i" -> "17 max";
+}
+// graph for dag "freia_scalar_07_helper_0_0" of module "freia_scalar_07" in dot format
+digraph "freia_scalar_07_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "X_1" [shape=circle];
+
+  // computation vertices
+  "23 min" [shape=diamond];
+  "21 E8" [shape=box];
+  "21 E8" -> "23 min" [label="X_1"];
+  "21 E8" -> "X_1";
+  "17 max" [shape=diamond];
+  "i" -> "21 E8";
+  "i" -> "17 max";
+}
+// graph for dag "freia_scalar_07_helper_0_1" of module "freia_scalar_07" in dot format
+digraph "freia_scalar_07_helper_0_1" {
+  // inputs
+  "X_1" [shape=circle];
+  "i" [shape=circle];
+
+  // outputs
+  "tC2" [shape=circle];
+  "X" [shape=circle];
+
+  // computation vertices
+  "30 vol" [shape=diamond];
+  "29 *" [shape=trapezium,orientation=270];
+  "29 *" -> "30 vol" [label="X"];
+  "29 *" -> "X";
+  "28 D8" [shape=box];
+  "28 D8" -> "29 *" [label="tB2"];
+  "26 +" [shape=trapezium,orientation=270];
+  "26 +" -> "tC2";
+  "25 thr" [shape=parallelogram];
+  "25 thr" -> "26 +" [label="tC"];
+  "25 thr" -> "26 +" [label="tC"];
+  "X_1" -> "25 thr";
+  "19 thr" [shape=parallelogram];
+  "19 thr" -> "29 *" [label="tB"];
+  "19 thr" -> "28 D8" [label="tB"];
+  "i" -> "19 thr";
+}
+// graph for dag "freia_scalar_07_helper_0_1_0" of module "freia_scalar_07" in dot format
+digraph "freia_scalar_07_helper_0_1_0" {
+  // inputs
+  "X_1" [shape=circle];
+  "i" [shape=circle];
+
+  // outputs
+  "tB" [shape=circle];
+  "tC2" [shape=circle];
+
+  // computation vertices
+  "26 +" [shape=trapezium,orientation=270];
+  "26 +" -> "tC2";
+  "25 thr" [shape=parallelogram];
+  "25 thr" -> "26 +" [label="tC"];
+  "25 thr" -> "26 +" [label="tC"];
+  "X_1" -> "25 thr";
+  "19 thr" [shape=parallelogram];
+  "19 thr" -> "tB";
+  "i" -> "19 thr";
+}
+// graph for dag "freia_scalar_07_helper_0_2" of module "freia_scalar_07" in dot format
+digraph "freia_scalar_07_helper_0_2" {
+  // inputs
+  "X" [shape=circle];
+  "tC2" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "33 +" [shape=trapezium,orientation=270];
+  "33 +" -> "o";
+  "tC2" -> "33 +";
+  "32 thr" [shape=parallelogram];
+  "32 thr" -> "33 +" [label="tD"];
+  "X" -> "32 thr";
+}
+// graph for dag "freia_scalar_07_helper_0_2_0" of module "freia_scalar_07" in dot format
+digraph "freia_scalar_07_helper_0_2_0" {
+  // inputs
+  "X" [shape=circle];
+  "tC2" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "33 +" [shape=trapezium,orientation=270];
+  "33 +" -> "o";
+  "tC2" -> "33 +";
+  "32 thr" [shape=parallelogram];
+  "32 thr" -> "33 +" [label="tD"];
+  "X" -> "32 thr";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 11 ops and 0 copies, optimized to 11 ops and 0+0 copies
+
+// helper function freia_scalar_07_helper_0_1_0
+freia_status freia_scalar_07_helper_0_1_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2,
+  int32_t c3,
+  int32_t c4,
+  int32_t c5)
+{
+  call opencl kernel freia_scalar_07_helper_0_1_0(o0, o1, i0, i1, c0, c1, c2, c3, c4, c5);
+  return FREIA_OK;
+}
+
+// helper function freia_scalar_07_helper_0_2_0
+freia_status freia_scalar_07_helper_0_2_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  call opencl kernel freia_scalar_07_helper_0_2_0(o0, i0, i1, c0, c1, c2);
+  return FREIA_OK;
+}
+// freia opencl includes
+// generated opencl for function freia_scalar_07
+
+// opencl for dag 0
+
+// opencl function freia_scalar_07_helper_0_1_0
+kernel freia_scalar_07_helper_0_1_0(
+  opencl image o0,
+  opencl image o1,
+  const opencl image i0,
+  const opencl image i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2,
+  int32_t c3,
+  int32_t c4,
+  int32_t c5)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    // pixel computations
+    register pixel t19 = PIXEL_THRESHOLD(in1, c0, c1, c2);
+    register pixel t25 = PIXEL_THRESHOLD(in0, c3, c4, c5);
+    register pixel t26 = PIXEL_ADD(t25, t25);
+    // set output pixels
+    o0[i] = t19;
+    o1[i] = t26;
+  }
+}
+
+// opencl function freia_scalar_07_helper_0_2_0
+kernel freia_scalar_07_helper_0_2_0(
+  opencl image o0,
+  const opencl image i0,
+  const opencl image i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    // pixel computations
+    register pixel t32 = PIXEL_THRESHOLD(in0, c0, c1, c2);
+    register pixel t33 = PIXEL_ADD(in1, t32);
+    // set output pixels
+    o0[i] = t33;
+  }
+}
+
+! updated function
+
+freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
+{
+   
+   
+   
+   
+   
+   
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tB2 = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128);       /*0012*/
+   int sA, sB, sC;                                                      /*0013*/
+   // hardware accelerator generated variable
+   freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
+   
+   // BUG: issue with X reuse...
+   // A
+   freia_aipo_global_max(i, &sA);                                       /*0017*/
+   // B
+   freia_scalar_07_helper_0_1_0(tB, tC2, X_1, i, sA-10, sA-1, false, sB-10, sB-1, false);             /*0019*/
+   // A
+   freia_aipo_erode_8c(X_1, i, k);                                      /*0021*/
+   // A
+   freia_aipo_global_min(X_1, &sB);                                     /*0023*/
+   // C with X from A
+   // B
+   freia_aipo_dilate_8c(tB2, tB, k);                                    /*0028*/
+   freia_aipo_mul(X, tB2, tB);                                          /*0029*/
+   freia_aipo_global_vol(X, &sC);                                       /*0030*/
+   // D with X from B
+   freia_scalar_07_helper_0_2_0(o, X, tC2, sC-10, sC-1, false);         /*0032*/
+
+   freia_common_destruct_data(X);                                       /*0035*/
+   freia_common_destruct_data(X_1);
+   freia_common_destruct_data(tB);                                      /*0036*/
+   freia_common_destruct_data(tB2);                                     /*0037*/
+   freia_common_destruct_data(tC2);                                     /*0039*/
+   return FREIA_OK;                                                     /*0041*/
+}
+
+! cleaned up function
+
+freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
+{
+   
+   
+   
+   
+   
+   
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tB2 = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128);       /*0012*/
+   int sA, sB, sC;                                                      /*0013*/
+   // hardware accelerator generated variable
+   freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
+   
+   // BUG: issue with X reuse...
+   // A
+   freia_aipo_global_max(i, &sA);                                       /*0017*/
+   // B
+   freia_scalar_07_helper_0_1_0(tB, tC2, X_1, i, sA-10, sA-1, 0, sB-10, sB-1, 0);      /*0019*/
+   // A
+   freia_aipo_erode_8c(X_1, i, k);                                      /*0021*/
+   // A
+   freia_aipo_global_min(X_1, &sB);                                     /*0023*/
+   // C with X from A
+   // B
+   freia_aipo_dilate_8c(tB2, tB, k);                                    /*0028*/
+   freia_aipo_mul(X, tB2, tB);                                          /*0029*/
+   freia_aipo_global_vol(X, &sC);                                       /*0030*/
+   // D with X from B
+   freia_scalar_07_helper_0_2_0(o, X, tC2, sC-10, sC-1, 0);             /*0032*/
+
+   freia_common_destruct_data(X);                                       /*0035*/
+   freia_common_destruct_data(X_1);
+   freia_common_destruct_data(tB);                                      /*0036*/
+   freia_common_destruct_data(tB2);                                     /*0037*/
    freia_common_destruct_data(tC2);                                     /*0039*/
    return 0;                                                            /*0041*/
 }

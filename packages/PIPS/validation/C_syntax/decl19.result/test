@@ -133,3 +133,6 @@ int decl19(int cookie)
       /* Fun for my student :-) */
       (*****************x)(cookie+1);
 }
+#
+# compile generated decl19
+#

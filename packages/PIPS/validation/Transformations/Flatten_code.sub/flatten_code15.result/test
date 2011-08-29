@@ -1,12 +1,4 @@
 
-Execute initial code
-
-foo=1
-foo=2
-foo=3
-foo=4
-foo_0=4.000000
-
 Initial code
 
 void flatten_code15(int foo)
@@ -68,14 +60,6 @@ void flatten_code15(int foo)
 
 Unsplit and compile resulting code
 
-
-Execute resulting code
-
-foo=1
-foo=2
-foo=3
-foo=4
-foo_0=4.000000
-
-Show diffs, must be empty
-
+#
+# compile run compare both flatten_code15
+#

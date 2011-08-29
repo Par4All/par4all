@@ -81,3 +81,6 @@ Call graph for "main"
 
  main
      foo
+#
+# compile generated decl45
+#

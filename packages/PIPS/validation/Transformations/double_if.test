@@ -24,7 +24,7 @@ echo
 echo Preconditions computed after dead code elimination
 echo
 
-apply SUPPRESS_DEAD_CODE 
+apply SIMPLIFY_CONTROL 
 display PRINTED_FILE
 close
 delete double_if
