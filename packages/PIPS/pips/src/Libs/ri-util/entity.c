@@ -673,11 +673,9 @@ void set_register_qualifier(entity v)
     //type uvt = ultimate_type(entity_type(v))
     type vt = entity_type(v);
     if(type_variable_p(vt)) {
-      list ql = variable_qualifiers(type_variable(vt));
+      list *ql = &variable_qualifiers(type_variable(vt));
       qualifier q = make_qualifier_register();
-      variable_qualifiers(type_variable(vt)) =
-	gen_nconc(variable_qualifiers(type_variable(vt)),
-		  CONS(QUALIFIER, q , NIL));
+      *ql =	gen_nconc(*ql, CONS(QUALIFIER, q , NIL));
     }
     else
       pips_internal_error("Improper argument\n");
@@ -1019,6 +1017,12 @@ bool malloc_entity_p(entity e)
   return same_string_p(entity_local_name(e), MALLOC_EFFECTS_NAME);
 }
 
+/**
+   checks if an entity is an IO_EFFECTS_PACKAGE_NAME, a
+   MALLOC_EFFECTS_NAME or a RAND_EFFECTS_PACKAGE_NAME entity. These
+   entities are used to model some internal effects of standard libraries
+   and they do not conflict with other entities.
+ */
 bool effects_package_entity_p(entity e)
 {
   return (strstr(entity_module_name(e), "_EFFECTS") != 0);

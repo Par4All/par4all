@@ -1122,9 +1122,18 @@ static void generate_wiring
  * @param p_* variables sent and received from pipeline
  */
 static void freia_spoc_code_buildup
-(string module, string function_name, string_buffer code,
- const string_buffer head, const string_buffer body, const string_buffer tail,
- int n_im_out, int n_im_in, bool some_reductions,
+(string module,
+ string function_name,
+ // buffers which hold different parts of the code
+ string_buffer code,
+ const string_buffer head,
+ const string_buffer body,
+ const string_buffer tail,
+ // number of images in & out
+ int n_im_out, int n_im_in,
+ // parts which may be needed
+ bool some_reductions, bool some_kernels,
+ // input/output parameters
  const string out0, const string out1, const string in0, const string in1)
 {
   // function header: freia_error helper_function(freia_data_2d ...
@@ -1144,6 +1153,13 @@ static void freia_spoc_code_buildup
   // end of headers (some arguments may have been added by stages),
   // and begin the function body
   sb_cat(code, ")\n{\n" FREIA_SPOC_DECL);
+  if (some_reductions)
+    sb_cat(code,
+           "  spoc_reduction reduc;\n"
+           "  freia_reduction_results redres;\n");
+  if (some_kernels) sb_cat(code, "  int i;\n");
+  sb_cat(code, "\n");
+
   sb_cat(code,
          "  // init pipe to nop\n"
          "  spoc_init_pipe(&si, &sp, ", itoa(FREIA_DEFAULT_BPP), ");\n"
@@ -1152,8 +1168,10 @@ static void freia_spoc_code_buildup
   string_buffer_append_sb(code, body);
 
   // generate actual call to the accelerator
-  sb_cat(code,
-         FREIA_SPOC_CALL
+  sb_cat(code, FREIA_SPOC_CALL_START);
+  if (some_reductions)
+    sb_cat(code, FREIA_SPOC_CALL_REDUC);
+  sb_cat(code, FREIA_SPOC_CALL_END
          "  // actual call of spoc hardware\n"
          "  freia_cg_template_process_2i_2o",
          "(&param, ", out0, ", ", out1, ", ", in0, ", ", in1, ");\n",
@@ -1206,6 +1224,7 @@ static bool is_consummed_by_vertex(dagvtx prod, dagvtx v, dag d, set todo)
  * @param code output here
  * @param dpipe dag to consider
  * @param lparams parameters to call helper
+ * @return number of output images
  *
  * some side effects:
  * - if there is an overflow, dpipe updated with remaining vertices.
@@ -1215,13 +1234,13 @@ static bool is_consummed_by_vertex(dagvtx prod, dagvtx v, dag d, set todo)
  * and then cut it, instead of this half measure to handle overflows,
  * but that would change a lot of things to go back.
  */
-static void freia_spoc_pipeline
+static _int freia_spoc_pipeline
 (string module, string helper, string_buffer code, dag dpipe, list * lparams,
  const set output_images)
 {
   hash_table wiring = hash_table_make(hash_int, 128);
   list outs = NIL;
-  bool some_reductions = false;
+  bool some_reductions = false, some_kernels = false;
   int pipeline_depth = get_int_property(spoc_depth_prop);
 
   pips_debug(3, "running on '%s' for %d operations\n",
@@ -1376,9 +1395,11 @@ static void freia_spoc_pipeline
 
       // get needed parameters if any
       *lparams = gen_nconc(*lparams,
-           freia_extract_params(opid, call_arguments(c), head, hparams, &cst));
+         freia_extract_params(opid, call_arguments(c), head, NULL,
+                              hparams, &cst));
 
       some_reductions |= vtxcontent_optype(vc)==spoc_type_mes;
+      some_kernels |= vtxcontent_optype(vc)==spoc_type_poc;
 
       // there may be regressions if it is a little bit out of order...
       // add a comment each time a new stage is started.
@@ -1677,8 +1698,8 @@ static void freia_spoc_pipeline
 
   // build whole code from various pieces
   freia_spoc_code_buildup(module, helper, code, head, body, tail,
-			  n_im_out, n_im_in, some_reductions,
-			  p_out0, p_out1, p_in0, p_in1);
+                          n_im_out, n_im_in, some_reductions, some_kernels,
+                          p_out0, p_out1, p_in0, p_in1);
 
   // cleanup
   gen_free_list(outs);
@@ -1688,6 +1709,8 @@ static void freia_spoc_pipeline
   string_buffer_free(&head);
   string_buffer_free(&body);
   string_buffer_free(&tail);
+
+  return n_im_out;
 }
 
 /***************************************************************** MISC UTIL */
@@ -2118,7 +2141,7 @@ static list /* of dags */ split_dag(dag initial, const set output_images)
       set_fprint(stderr, "sure", sure, (gen_string_func_t) dagvtx_to_string);
     }
 
-    list computables = get_computable_vertices(dall, computed, avails, current);
+    list computables = dag_computable_vertices(dall, computed, avails, current);
     dagvtx_spoc_priority_computables = computables;
     dagvtx_spoc_priority_current = lcurrent;
     gen_sort_list(computables,
@@ -2213,6 +2236,7 @@ static list /* of dags */ split_dag(dag initial, const set output_images)
  * @param module
  * @param ls list of statements for the dag (in reverse order)
  * @param helper output file
+ * @param helpers created functions
  * @param number current helper dag count
  * @return list of intermediate images to allocate
  */
@@ -2224,26 +2248,27 @@ list freia_spoc_compile_calls
    hash_table exchanges,
    const set output_images,
    FILE * helper_file,
+   set helpers,
    int number)
 {
   // build DAG for ls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
-  int n_op_init = freia_aipo_count(fulld, true);
-  int n_op_init_copies = n_op_init - freia_aipo_count(fulld, false);
+  int n_op_init, n_op_init_copies;
+  freia_aipo_count(fulld, &n_op_init, &n_op_init_copies);
 
   list added_stats =  freia_dag_optimize(fulld, exchanges);
 
   // remove copies and duplicates if possible...
   // ??? maybe there should be an underlying transitive closure? not sure.
-  int n_op_opt = freia_aipo_count(fulld, true);
-  int n_op_opt_copies = n_op_opt - freia_aipo_count(fulld, false);
+  int n_op_opt, n_op_opt_copies;
+  freia_aipo_count(fulld, &n_op_opt, &n_op_opt_copies);
 
   fprintf(helper_file,
           "\n"
-          "// dag %d: %d ops (%d copies), "
-          "optimized to %d (%d+%d copies)\n",
+          "// dag %d: %d ops and %d copies, "
+          "optimized to %d ops and %d+%d copies\n",
           number, n_op_init, n_op_init_copies,
           n_op_opt, n_op_opt_copies, (int) gen_length(added_stats));
 
@@ -2309,11 +2334,12 @@ list freia_spoc_compile_calls
       string fname_split = strdup(cat(fname_dag, "_", itoa(split++)));
       list /* of expression */ lparams = NIL;
 
-      freia_spoc_pipeline(module, fname_split, code, d, &lparams,
-                          output_images);
+      _int nout = freia_spoc_pipeline(module, fname_split, code, d, &lparams,
+                                      output_images);
       stnb = freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                             ls, fname_split, lparams, stnb);
-
+                                      ls, fname_split, lparams, helpers, stnb);
+      // record (simple) signature
+      hash_put(init, local_name_to_top_level_entity(fname_split), (void*) nout);
       free(fname_split), fname_split = NULL;
     }
 
@@ -2342,7 +2368,7 @@ list freia_spoc_compile_calls
 
   // deal with new images
   list real_new_images =
-    freia_allocate_new_images_if_needed(ls, new_images, occs, init);
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init, init);
   gen_free_list(new_images);
   hash_table_free(init);
   return real_new_images;

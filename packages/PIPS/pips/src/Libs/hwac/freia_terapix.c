@@ -208,7 +208,7 @@ static int dag_terapix_measures
     update_erosions(d, in, erosion);
 
   list lv;
-  while ((lv = get_computable_vertices(d, processed, processed, processed)))
+  while ((lv = dag_computable_vertices(d, processed, processed, processed)))
   {
     dlength++;
     int level_width = 0;
@@ -262,14 +262,6 @@ static int dag_terapix_measures
   *north = n, *south = s, *west = w, *east = e,
     *width = dwidth, *cost = dcost, *nops = dnops;
   return dlength;
-}
-
-/* fill in erosion hash table from dag d.
- */
-static void dag_terapix_erosion(const dag d, hash_table erosion)
-{
-  int i = 0;
-  dag_terapix_measures(d, erosion, &i, &i, &i, &i, &i, &i, &i);
 }
 
 /* @return the list of inputs to vertex v as imagelet numbers.
@@ -752,8 +744,9 @@ static void terapix_get_reduction(
 /* generate a terapix call for dag thedag.
  * the memory allocation is managed here.
  * however this function is dumb, the scheduling is just inherited as is...
+ * @return number of output images...
  */
-static void freia_terapix_call
+static _int freia_terapix_call
   (const string module,
    const string fname_dag,
    string_buffer code,
@@ -1021,7 +1014,7 @@ static void freia_terapix_call
     // update helper call arguments...
     *params = gen_nconc(*params,
                         freia_extract_params(opid, call_arguments(c),
-                                             head, hparams, &nargs));
+                                             head, NULL, hparams, &nargs));
 
     // special case for replace_const, which needs a 4th argument
     if (same_string_p(api->compact_name, ":"))
@@ -1358,6 +1351,8 @@ static void freia_terapix_call
   set_free(computed);
   set_free(deads);
   free(used);
+
+  return n_outs;
 }
 
 /******************************************************************* ONE DAG */
@@ -1374,7 +1369,9 @@ static int freia_trpx_compile_one_dag(
   int n_cut,
   set global_remainings,
   FILE * helper_file,
-  int stnb)
+  set helpers,
+  int stnb,
+  hash_table signatures)
 {
   ifdebug(4) {
     dag_consistency_asserts(d);
@@ -1399,13 +1396,16 @@ static int freia_trpx_compile_one_dag(
   list lparams = NIL;
 
   string_buffer code = string_buffer_make(true);
-  freia_terapix_call(module, fname_dag, code, d, &lparams);
+  _int nout = freia_terapix_call(module, fname_dag, code, d, &lparams);
   string_buffer_to_file(code, helper_file);
   string_buffer_free(&code);
 
   // - and substitute its call...
   stnb = freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                         ls, fname_dag, lparams, stnb);
+                                         ls, fname_dag, lparams, helpers, stnb);
+
+  // record (simple) signature
+  hash_put(signatures, local_name_to_top_level_entity(fname_dag), (void*) nout);
 
   // cleanup
   free(fname_dag), fname_dag = NULL;
@@ -1415,10 +1415,25 @@ static int freia_trpx_compile_one_dag(
 
 /************************************************** TERAPIX DAG SCALAR SPLIT */
 
+/* fill in erosion hash table from dag d.
+ */
+static void dag_terapix_erosion(const dag d, hash_table erosion)
+{
+  int i = 0;
+  dag_terapix_measures(d, erosion, &i, &i, &i, &i, &i, &i, &i);
+}
+
 /* global variable used by the dagvtx_terapix_priority function,
  * because qsort does not allow to pass some descriptor.
  */
 static hash_table erosion = NULL;
+
+static void dag_terapix_reset_erosion(const dag d)
+{
+  pips_assert("erosion is allocated", erosion!=NULL);
+  hash_table_clear(erosion);
+  dag_terapix_erosion(d, erosion);
+}
 
 /* comparison function for sorting dagvtx in qsort,
  * this is deep voodoo, because the priority has an impact on
@@ -1591,118 +1606,6 @@ static bool terapix_not_implemented(dag d)
   return false;
 }
 
-/* @brief split a dag on scalar dependencies only, with a greedy heuristics.
- * @param initial dag to split
- * @param alone_only whether to keep it alone (for non implemented cases)
- * @return a list of sub-dags, some of which may contain no image operations
- * this pass also decides the schedule of image operations, with the aim
- * or reducing the number of necessary imagelets, so as to maximise
- * imagelet size.
- */
-static list /* of dags */
-split_dag_on_scalars(const dag initial, bool (*alone_only)(dagvtx),
-                     const set output_images)
-{
-  if (!single_image_assignement_p(initial))
-    // well, it should work most of the time, so only a warning
-    pips_user_warning("still some image reuse...\n");
-
-  // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
-  // if everything was removed by optimizations, there is nothing to do.
-  if (dag_computation_count(initial)==0) return NIL;
-
-  // work on a copy of the dag.
-  dag dall = copy_dag(initial);
-  list ld = NIL;
-  set
-    // current set of vertices to group
-    current = set_make(set_pointer),
-    // all vertices which are considered computed
-    computed = set_make(set_pointer);
-
-  do
-  {
-    list lcurrent = NIL, computables;
-    set_clear(current);
-    set_clear(computed);
-    set_assign_list(computed, dag_inputs(dall));
-
-    // GLOBAL for sorting
-    // ??? is this the same as erodes?
-    pips_assert("erosion is clean", erosion==NULL);
-    erosion = hash_table_make(hash_pointer, 0);
-    dag_terapix_erosion(dall, erosion);
-
-    // transitive closure
-    while ((computables =
-            get_computable_vertices(dall, computed, computed, current)))
-    {
-      ifdebug(7) {
-        FOREACH(dagvtx, v, computables)
-          dagvtx_dump(stderr, "computable", v);
-      }
-
-      gen_sort_list(computables,
-                    (int(*)(const void*,const void*)) dagvtx_terapix_priority);
-
-      // choose one while building the schedule?
-      dagvtx first = DAGVTX(CAR(computables));
-      gen_free_list(computables), computables = NIL;
-
-      ifdebug(7)
-        dagvtx_dump(stderr, "choice", first);
-
-      // do not add if not alone
-      if (alone_only && alone_only(first) && lcurrent)
-        break;
-
-      set_add_element(current, current, first);
-      set_add_element(computed, computed, first);
-      lcurrent = gen_nconc(lcurrent, CONS(dagvtx, first, NIL));
-
-      // getout if was alone
-      if (alone_only && alone_only(first))
-        break;
-    }
-
-    // is there something?
-    if (lcurrent)
-    {
-      // build extracted dag
-      dag nd = make_dag(NIL, NIL, NIL);
-      FOREACH(dagvtx, v, lcurrent)
-      {
-        pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
-        dag_append_vertex(nd, copy_dagvtx_norec(v));
-      }
-      dag_compute_outputs(nd, NULL, output_images, NIL, false);
-      dag_cleanup_other_statements(nd);
-
-      ifdebug(7) {
-        // dag_dump(stderr, "updated dall", dall);
-        dag_dump(stderr, "pushed dag", nd);
-      }
-
-      // ??? hmmm... should not be needed?
-      freia_hack_fix_global_ins_outs(initial, nd);
-
-      // update global list of dags to return.
-      ld = CONS(dag, nd, ld);
-
-      // cleanup full dag for next round
-      FOREACH(dagvtx, w, lcurrent)
-        dag_remove_vertex(dall, w);
-
-      gen_free_list(lcurrent), lcurrent = NIL;
-    }
-    hash_table_free(erosion), erosion = NULL;
-  }
-  while (set_size(current));
-
-  free_dag(dall);
-  return gen_nreverse(ld);
-}
-
 /*********************************************************** TERAPIX DAG CUT */
 
 /* would it seem interesting to split d?
@@ -1798,11 +1701,10 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
   // transitive closure
   bool changed = true;
   while (changed &&
-         (computables = get_computable_vertices(d, done, done, current)))
+         (computables = dag_computable_vertices(d, done, done, current)))
   {
     // ensure determinism
-    gen_sort_list(computables,
-                  (int(*)(const void*,const void*)) dagvtx_terapix_priority);
+    gen_sort_list(computables, (gen_cmp_func_t) dagvtx_terapix_priority);
     changed = false;
     FOREACH(dagvtx, v, computables)
     {
@@ -1818,7 +1720,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
       {
         set_add_element(current, current, v);
         set_add_element(done, done, v);
-        lcurrent = gen_nconc(lcurrent, CONS(dagvtx, v, NIL));
+        lcurrent = CONS(dagvtx, v, lcurrent);
         changed = true;
       }
     }
@@ -1830,6 +1732,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
   // cleanup GLOBAL
   hash_table_free(erosion), erosion = NULL;
 
+  lcurrent = gen_nreverse(lcurrent);
   pips_assert("some vertices where extracted", lcurrent!=NIL);
 
   // build extracted dag
@@ -1881,13 +1784,27 @@ list freia_trpx_compile_calls
  hash_table exchanges,
  const set output_images,
  FILE * helper_file,
+ set helpers,
  int number)
 {
   // build DAG for ls
   pips_debug(3, "considering %d statements\n", (int) gen_length(ls));
   pips_assert("some statements", ls);
 
+  int n_op_init, n_op_init_copies;
+  freia_aipo_count(fulld, &n_op_init, &n_op_init_copies);
+
   list added_stats = freia_dag_optimize(fulld, exchanges);
+
+  int n_op_opt, n_op_opt_copies;
+  freia_aipo_count(fulld, &n_op_opt, &n_op_opt_copies);
+
+  fprintf(helper_file,
+          "\n"
+          "// dag %d: %d ops and %d copies, "
+          "optimized to %d ops and %d+%d copies\n",
+          number, n_op_init, n_op_init_copies,
+          n_op_opt, n_op_opt_copies, (int) gen_length(added_stats));
 
   // dump final dag
   dag_dot_dump_prefix(module, "dag_cleaned_", number, fulld, added_stats);
@@ -1902,8 +1819,16 @@ list freia_trpx_compile_calls
   // consider A -> B -> s -> C -> D
   //           \-> E -> F />
   // then ABEF / CD is chosen
-  // although ABE / FCD and AB / EFCD would be also possible...
-  list ld = split_dag_on_scalars(fulld, not_implemented, output_images);
+  // although ABE / FCD and AB / EFCD would be also possible..
+
+  pips_assert("erosion is clean", erosion==NULL);
+  erosion = hash_table_make(hash_pointer, 0);
+  list ld = dag_split_on_scalars(fulld,
+                                 not_implemented,
+                                 (gen_cmp_func_t) dagvtx_terapix_priority,
+                                 dag_terapix_reset_erosion,
+                                 output_images);
+  hash_table_free(erosion), erosion = NULL;
 
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
@@ -1930,7 +1855,7 @@ list freia_trpx_compile_calls
     {
       // direct handling of the dag
       stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
-                                   -1, global_remainings, helper_file, stnb);
+                       -1, global_remainings, helper_file, helpers, stnb, init);
     }
     else if (trpx_dag_cut_compute_p(dag_cut))
     {
@@ -1948,14 +1873,15 @@ list freia_trpx_compile_calls
       {
         dag dc = cut_perform(d, cut, erosion, fulld, output_images);
         // generate code for cut
-        stnb = freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag,
-                  n_split, n_cut++, global_remainings, helper_file, stnb);
+        stnb =
+          freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag, n_split,
+                n_cut++, global_remainings, helper_file, helpers, stnb, init);
         // cleanup
         free_dag(dc);
         hash_table_clear(erosion);
       }
       stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
-                                n_cut++, global_remainings, helper_file, stnb);
+                 n_cut++, global_remainings, helper_file, helpers, stnb, init);
       hash_table_free(erosion);
     }
     else if (trpx_dag_cut_enumerate_p(dag_cut))
@@ -1978,7 +1904,7 @@ list freia_trpx_compile_calls
 
   // deal with new images
   list real_new_images =
-    freia_allocate_new_images_if_needed(ls, new_images, occs, init);
+    freia_allocate_new_images_if_needed(ls, new_images, occs, init, init);
   gen_free_list(new_images);
   hash_table_free(init);
   return real_new_images;

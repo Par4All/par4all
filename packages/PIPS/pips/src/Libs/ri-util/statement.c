@@ -2302,6 +2302,9 @@ statement_to_line_number(statement s)
  *
  * ATTENTION !!! : this version is not for unstructured case
  *
+ * s cannot be a declaration statement, because the insertion scheme
+ * used would modify its scope. Also s1 cannot be a declaration if s
+ * is not a sequence.
  */
 
 void insert_statement(statement s, statement s1, bool before)

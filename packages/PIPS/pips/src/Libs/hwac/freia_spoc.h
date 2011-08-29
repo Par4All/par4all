@@ -194,26 +194,26 @@ typedef enum {
 #define FREIA_SPOC_DECL                 \
   "  spoc_instr si;\n"                  \
   "  spoc_param sp;\n"                  \
-  "  spoc_reduction reduc;\n"           \
   "  freia_microcode mcode;\n"          \
   "  freia_dynamic_param dynparam;\n"   \
-  "  freia_reduction_results redres;\n" \
   "  freia_op_param param;\n"           \
-  "  freia_status ret;\n"               \
-  "  int i;\n"                          \
+  "  freia_status ret;\n"
+
+#define FREIA_SPOC_CALL_START                \
+  "\n"                                       \
+  "  mcode.raw = (freia_ptr) &si;\n"         \
+  "  mcode.size = sizeof(spoc_instr);\n"     \
+  "\n"                                       \
+  "  dynparam.raw = (freia_ptr) &sp;\n"      \
+  "  dynparam.size = sizeof(spoc_param);\n"  \
   "\n"
 
-#define FREIA_SPOC_CALL                                 \
-  "\n"                                                  \
-  "  mcode.raw = (freia_ptr) &si;\n"                    \
-  "  mcode.size = sizeof(spoc_instr);\n"                \
-  "\n"                                                  \
-  "  dynparam.raw = (freia_ptr) &sp;\n"                 \
-  "  dynparam.size = sizeof(spoc_param);\n"             \
-  "\n"                                                  \
-  "  redres.raw = (freia_ptr) &reduc;\n"                \
-  "  redres.size = sizeof(spoc_reduction);\n"           \
-  "\n"                                                  \
+#define FREIA_SPOC_CALL_REDUC                 \
+  "  redres.raw = (freia_ptr) &reduc;\n"      \
+  "  redres.size = sizeof(spoc_reduction);\n" \
+  "\n"
+
+#define FREIA_SPOC_CALL_END                             \
   "  ret = freia_cg_write_microcode(&mcode);\n"         \
   "  ret |= freia_cg_write_dynamic_param(&dynparam);\n" \
   "\n"

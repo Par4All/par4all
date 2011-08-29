@@ -502,7 +502,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
      */
     {
         list tail = sequence_statements(instruction_sequence(statement_instruction(expanded)));
-        pips_assert("inlinined statement is not empty",!ENDP(tail) && !ENDP(CDR(tail)));
+        if(!ENDP(tail) && !ENDP(CDR(tail)))
         {
             tail_ins(p)= statement_instruction(STATEMENT(CAR(gen_last(tail))));
 
