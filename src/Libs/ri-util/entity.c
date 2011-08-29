@@ -1017,6 +1017,12 @@ bool malloc_entity_p(entity e)
   return same_string_p(entity_local_name(e), MALLOC_EFFECTS_NAME);
 }
 
+/**
+   checks if an entity is an IO_EFFECTS_PACKAGE_NAME, a
+   MALLOC_EFFECTS_NAME or a RAND_EFFECTS_PACKAGE_NAME entity. These
+   entities are used to model some internal effects of standard libraries
+   and they do not conflict with other entities.
+ */
 bool effects_package_entity_p(entity e)
 {
   return (strstr(entity_module_name(e), "_EFFECTS") != 0);
