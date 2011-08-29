@@ -11,7 +11,7 @@ echo
 display PRINTED_FILE
 
 apply PARTIAL_EVAL
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 
 echo
 echo file after cleanup

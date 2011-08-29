@@ -52,7 +52,7 @@ echo
 # I have an issue here...
 #touch ${FREIA_TARGET}_FILE[${NAME}]
 #display ${FREIA_TARGET}_FILE[${NAME}]
-shell cat ./${WSPACE}.database/${NAME}/*_helper_functions.c
+shell cat ./${WSPACE}.database/${NAME}/*_helper_functions.c*
 #
 # new function code
 #
@@ -67,7 +67,7 @@ make SUMMARY_EFFECTS[freia_common_create_data freia_common_destruct_data]
 apply PARTIAL_EVAL[${NAME}]
 # no, too efficient, helper functions are removed.
 #apply USE_DEF_ELIMINATION[${NAME}]
-apply SUPPRESS_DEAD_CODE[${NAME}]
+apply SIMPLIFY_CONTROL[${NAME}]
 display PRINTED_FILE[${NAME}]
 close
 delete ${WSPACE}

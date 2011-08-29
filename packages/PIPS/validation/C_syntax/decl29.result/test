@@ -5,3 +5,6 @@ void decl29(void)
 {
    int i = 0, j = i;
 }
+#
+# compile generated decl29
+#

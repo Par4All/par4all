@@ -1,0 +1,584 @@
+#
+# initial main
+#
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin;
+   freia_dataio fdout;
+   freia_dataio fdout1;
+
+   freia_data2d *i0;
+   freia_data2d *i1;
+   freia_data2d *i2;
+   freia_data2d *i3;
+   freia_data2d *im;
+
+   freia_data2d *t0;
+   // five last images
+   freia_data2d *t1;
+   freia_data2d *t2;
+   freia_data2d *t3;
+   freia_data2d *t4;
+
+   freia_data2d *imgtmp;
+
+   freia_data2d *imgg1;
+   freia_data2d *imgg2;
+   freia_data2d *imgsav;
+
+   unsigned int nbpix;
+   int32_t x, y;
+   int32_t valx, valy, valmax, valx_pre = 0;
+   
+   // int32_t startx=10,starty=231, endx=183,endy=142; // hard-coded calibration
+   //int32_t startx=10,starty=250, endx=152,endy=132; // hard-coded calibration
+   int32_t startx = 33, starty = 272, endx = 152, endy = 132;
+   // hard-coded calibration
+   int32_t countfalsedetect = 0;
+   //  int32_t epaisseur=17;
+   int32_t epaisseur = 17;
+   int32_t mx1, my1, mx2, my2, idx = 10;
+
+   int32_t dx;
+   uint32_t *tabeqt;
+   freia_status end = FREIA_OK;
+
+   freia_initialize(argc, argv);
+   
+   // Input/output stream and image creations
+   freia_common_open_input(&fdin, 0);
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   
+   
+   
+   
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   im = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   // printf("width = %d height %d bpp %d\n", img0->width, img0->height,img0->bpp);
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   imgg1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));
+   x = fdin.framewidth;
+   y = fdin.frameheight;
+   dx = idx;
+
+   nbpix = y*x;
+   
+   
+   ligneInitTabEqt(tabeqt, fdin.framewidth, startx, starty, endx, endy, 255);
+   
+   
+   
+   mx1 = startx;
+   my1 = starty;
+   mx2 = endx;
+   my2 = endy;
+   valx = mx2;
+   end = freia_common_rx_image(i0, &fdin);
+
+   while (end==FREIA_OK) {
+      
+      // for debug freia_aipo_set_constant(imgMask, 0);
+      // for debug ligneEpaisse(imgMask, mx1,my1, mx2,my2,epaisseur,255);
+      
+      // ??? POINTER SHUFFLING is not supported by pips!
+      // It leads to wrong results...
+      // ??? should use freia_copy instead...
+      // hmmm... only every two images is used by the computation?
+      imgsav = t4;
+      t4 = t3;
+      t3 = t2;
+      t2 = t1;
+      t1 = t0;
+      t0 = imgsav;
+      /*       imgsav=imgtt2; */
+      /*       imgtt2=imgtt1; */
+      /*       imgtt1=imgtt0; */
+      /*       imgtt0=imgsav; */
+      
+      // freia_auto_median(img1, img0, 8);
+      freia_aipo_copy(i1, i0);
+      freia_aipo_copy(t0, i1);
+
+      freia_cipo_gradient(imgtmp, t0, 8, 1);
+      freia_cipo_gradient(i1, t2, 8, 1);
+      freia_aipo_absdiff(i1, imgtmp, i1);
+
+      freia_cipo_open(i1, i1, 8, 1);
+
+      freia_cipo_gradient(imgtmp, t2, 8, 1);
+      freia_cipo_gradient(i2, t4, 8, 1);
+      freia_aipo_absdiff(i2, imgtmp, i2);
+
+      freia_cipo_open(i2, i2, 8, 1);
+
+      freia_aipo_inf(i3, i2, i1);
+
+      freia_aipo_threshold(i3, i3, 15, 255, 1);
+      // freia_aipo_inf(img3, img3, imgMask);
+      //	freia_aipo_sup(imgMask, img0, imgMask);
+      //	 freia_common_tx_image(img3, &fdout);
+      
+      valx_pre = valx;
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, epaisseur, &valx, &valy);
+      
+      
+      
+      
+      
+      // ??? freia compiler work around "illegal" pointer shuffle:
+      // show output on imgtt0
+      
+      
+      
+      // barre(img0, valx, 0, 2,x, 255);  
+      //	countfalsedetect++;
+      
+      dx = 10;
+      if (valmax==0) {
+         countfalsedetect++;
+         valx = valx_pre;
+         if (countfalsedetect>45) {
+            countfalsedetect = 1000;
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;
+            if (valx>mx2)
+               valx = mx2;
+            if (valx<mx1)
+               valx = mx1;
+            dx = 10;
+         }
+      }
+      else {
+         countfalsedetect = 0;
+         dx = 20;
+      }
+      barre(t0, valx, 0, 2, x, 255);
+
+      mx1 = valx-dx;
+      if (mx1<startx)
+         mx1 = startx;
+      my1 = tabeqt[mx1];
+
+      mx2 = valx+dx;
+      if (mx2>endx)
+         mx2 = endx;
+      my2 = tabeqt[mx2];
+
+      valx_pre = endx-valx;
+
+      freia_common_tx_image(t0, &fdout);
+      
+      
+      
+      //#ifdef DEBUG
+      //#undef img0
+      //#endif // DEBUG
+      
+      end = freia_common_rx_image(i0, &fdin);
+   }
+   
+   /* images destruction */
+   freia_common_destruct_data(i0);
+   freia_common_destruct_data(i1);
+   freia_common_destruct_data(i2);
+   freia_common_destruct_data(i3);
+   freia_common_destruct_data(im);
+   freia_common_destruct_data(t0);
+   freia_common_destruct_data(t1);
+   freia_common_destruct_data(t2);
+   freia_common_destruct_data(t3);
+   freia_common_destruct_data(t4);
+   freia_common_destruct_data(imgg1);
+   freia_common_destruct_data(imgg2);
+
+   freia_common_destruct_data(imgtmp);
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);
+   freia_common_close_output(&fdout);
+
+   freia_shutdown();
+   return 0;
+}
+#
+# processed main
+#
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin;
+   freia_dataio fdout;
+   freia_dataio fdout1;
+
+   freia_data2d *i0;
+   freia_data2d *i1;
+   freia_data2d *i2;
+   freia_data2d *i3;
+   freia_data2d *im;
+
+   freia_data2d *t0;
+   // five last images
+   freia_data2d *t1;
+   freia_data2d *t2;
+   freia_data2d *t3;
+   freia_data2d *t4;
+
+   freia_data2d *imgtmp;
+
+   freia_data2d *imgg1;
+   freia_data2d *imgg2;
+   freia_data2d *imgsav;
+
+   register unsigned int nbpix;
+   register int32_t x, y;
+   int32_t valx, valy;
+   register int32_t valmax, valx_pre = 0;
+   
+   // int32_t startx=10,starty=231, endx=183,endy=142; // hard-coded calibration
+   //int32_t startx=10,starty=250, endx=152,endy=132; // hard-coded calibration
+   register int32_t startx = 33, starty = 272, endx = 152, endy = 132;
+   // hard-coded calibration
+   register int32_t countfalsedetect = 0;
+   //  int32_t epaisseur=17;
+   register int32_t epaisseur = 17;
+   register int32_t mx1, my1, mx2, my2, idx = 10;
+
+   register int32_t dx;
+   uint32_t *tabeqt;
+   register freia_status end = 0;
+   //PIPS generated variable
+   register freia_status _return0, _return1, _return2, _return3, _return4, _return5, _return6, _return7, _return8, _return9, _return10, _return11, _return12, _return13, _return14, _return15, _return16, _return17;
+   //PIPS generated variable
+   register int i_0, i_1;
+   //PIPS generated variable
+   register freia_status ret_0;
+   //PIPS generated variable
+   register int i_2, i_3;
+   //PIPS generated variable
+   freia_data2d *imtmp_0;
+   //PIPS generated variable
+   register freia_status ret_1;
+   //PIPS generated variable
+   register int i_4, i_5;
+   //PIPS generated variable
+   freia_data2d *imtmp_1;
+   //PIPS generated variable
+   register freia_status ret_2;
+   //PIPS generated variable
+   register int i_6, i_7;
+   //PIPS generated variable
+   register freia_status ret_3;
+   //PIPS generated variable
+   register int i_8, i_9;
+   //PIPS generated variable
+   freia_data2d *imtmp_2;
+   //PIPS generated variable
+   register freia_status ret_4;
+   //PIPS generated variable
+   register int i_10, i_11;
+   //PIPS generated variable
+   freia_data2d *imtmp_3;
+   //PIPS generated variable
+   register freia_status ret_5;
+
+   freia_initialize(argc, argv);
+   
+   // Input/output stream and image creations
+   freia_common_open_input(&fdin, 0);
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   
+   
+   
+   
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   im = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   // printf("width = %d height %d bpp %d\n", img0->width, img0->height,img0->bpp);
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   imgg1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));
+   x = fdin.framewidth;
+   y = fdin.frameheight;
+   dx = 10;
+
+   nbpix = y*x;
+   
+   
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);
+   
+   
+   
+   mx1 = 33;
+   my1 = 272;
+   mx2 = 152;
+   my2 = 132;
+   valx = 152;
+   end = freia_common_rx_image(i0, &fdin);
+
+   while (end==FREIA_OK) {
+      
+      // for debug freia_aipo_set_constant(imgMask, 0);
+      // for debug ligneEpaisse(imgMask, mx1,my1, mx2,my2,epaisseur,255);
+      
+      // ??? POINTER SHUFFLING is not supported by pips!
+      // It leads to wrong results...
+      // ??? should use freia_copy instead...
+      // hmmm... only every two images is used by the computation?
+      imgsav = t4;
+      t4 = t3;
+      t3 = t2;
+      t2 = t1;
+      t1 = t0;
+      t0 = imgsav;
+      /*       imgsav=imgtt2; */
+      /*       imgtt2=imgtt1; */
+      /*       imgtt1=imgtt0; */
+      /*       imgtt0=imgsav; */
+      
+      // freia_auto_median(img1, img0, 8);
+      freia_aipo_copy(i1, i0);
+      freia_aipo_copy(t0, i1);
+
+      imtmp_3 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
+      
+      
+      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);
+      i_11 = 1;
+      
+      
+      _return6 = 0;
+      ret_5 = 0;
+      
+      
+      freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);
+      i_10 = 1;
+      
+      
+      _return12 = 0;
+      ret_5 |= freia_aipo_sub(imgtmp, imtmp_3, imgtmp);
+
+      freia_common_destruct_data(imtmp_3);
+      _return0 = 0;
+
+      imtmp_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
+      
+      
+      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);
+      i_9 = 1;
+      
+      
+      _return7 = 0;
+      ret_4 = 0;
+      
+      
+      freia_aipo_erode_8c(i1, t2, freia_morpho_kernel_8c);
+      i_8 = 1;
+      
+      
+      _return13 = 0;
+      ret_4 |= freia_aipo_sub(i1, imtmp_2, i1);
+
+      freia_common_destruct_data(imtmp_2);
+      _return1 = 0;
+      freia_aipo_absdiff(i1, imgtmp, i1);
+      
+      
+      freia_aipo_erode_8c(i1, i1, freia_morpho_kernel_8c);
+      i_7 = 1;
+      
+      
+      _return14 = 0;
+      ret_3 = 0;
+      
+      
+      freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);
+      i_6 = 1;
+      
+      
+      _return8 = 0;
+      
+      
+      _return4 = ret_3;
+
+      imtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
+      
+      
+      freia_aipo_dilate_8c(imtmp_1, t2, freia_morpho_kernel_8c);
+      i_5 = 1;
+      
+      
+      _return9 = 0;
+      ret_2 = 0;
+      
+      
+      freia_aipo_erode_8c(imgtmp, t2, freia_morpho_kernel_8c);
+      i_4 = 1;
+      
+      
+      _return15 = 0;
+      ret_2 |= freia_aipo_sub(imgtmp, imtmp_1, imgtmp);
+
+      freia_common_destruct_data(imtmp_1);
+      _return2 = 0;
+
+      imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);
+      
+      
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);
+      i_3 = 1;
+      
+      
+      _return10 = 0;
+      ret_1 = 0;
+      
+      
+      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);
+      i_2 = 1;
+      
+      
+      _return16 = 0;
+      ret_1 |= freia_aipo_sub(i2, imtmp_0, i2);
+
+      freia_common_destruct_data(imtmp_0);
+      _return3 = 0;
+      freia_aipo_absdiff(i2, imgtmp, i2);
+      
+      
+      freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);
+      i_1 = 1;
+      
+      
+      _return17 = 0;
+      ret_0 = 0;
+      
+      
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);
+      i_0 = 1;
+      
+      
+      _return11 = 0;
+      
+      
+      _return5 = ret_0;
+
+      freia_aipo_inf(i3, i2, i1);
+
+      freia_aipo_threshold(i3, i3, 15, 255, 1);
+      // freia_aipo_inf(img3, img3, imgMask);
+      //	freia_aipo_sup(imgMask, img0, imgMask);
+      //	 freia_common_tx_image(img3, &fdout);
+      
+      valx_pre = valx;
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);
+      
+      
+      
+      
+      
+      // ??? freia compiler work around "illegal" pointer shuffle:
+      // show output on imgtt0
+      
+      
+      
+      // barre(img0, valx, 0, 2,x, 255);  
+      //	countfalsedetect++;
+      
+      dx = 10;
+      if (valmax==0) {
+         countfalsedetect++;
+         valx = valx_pre;
+         if (countfalsedetect>45) {
+            countfalsedetect = 1000;
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;
+            if (valx>mx2)
+               valx = mx2;
+            if (valx<mx1)
+               valx = mx1;
+            dx = 10;
+         }
+      }
+      else {
+         countfalsedetect = 0;
+         dx = 20;
+      }
+      barre(t0, valx, 0, 2, x, 255);
+
+      mx1 = valx-dx;
+      if (mx1<33)
+         mx1 = 33;
+      my1 = tabeqt[mx1];
+
+      mx2 = dx+valx;
+      if (mx2>152)
+         mx2 = 152;
+      my2 = tabeqt[mx2];
+
+      valx_pre = -valx+152;
+
+      freia_common_tx_image(t0, &fdout);
+      
+      
+      
+      //#ifdef DEBUG
+      //#undef img0
+      //#endif // DEBUG
+      
+      end = freia_common_rx_image(i0, &fdin);
+   }
+   
+   /* images destruction */
+   freia_common_destruct_data(i0);
+   freia_common_destruct_data(i1);
+   freia_common_destruct_data(i2);
+   freia_common_destruct_data(i3);
+   freia_common_destruct_data(im);
+   freia_common_destruct_data(t0);
+   freia_common_destruct_data(t1);
+   freia_common_destruct_data(t2);
+   freia_common_destruct_data(t3);
+   freia_common_destruct_data(t4);
+   freia_common_destruct_data(imgg1);
+   freia_common_destruct_data(imgg2);
+
+   freia_common_destruct_data(imgtmp);
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);
+   freia_common_close_output(&fdout);
+
+   freia_shutdown();
+   return 0;
+}
+#
+# compile generated oop
+#

@@ -10,7 +10,7 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 display PRINTED_FILE[foo]
 
 apply UNSPLIT
-shell cc -c decl40.database/Src/decl40.c
+shell pips_validation_exe.sh -c -g decl40
 
 close
 delete $WSPC

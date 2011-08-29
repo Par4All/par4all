@@ -207,7 +207,7 @@ digraph "freia_64_helper_1_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 1 ops (0 copies), optimized to 1 (0+0 copies)
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -219,13 +219,10 @@ freia_status freia_64_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -268,9 +265,6 @@ freia_status freia_64_helper_0_0_0(
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
@@ -280,7 +274,7 @@ freia_status freia_64_helper_0_0_0(
   return ret;
 }
 
-// dag 1: 1 ops (0 copies), optimized to 1 (0+0 copies)
+// dag 1: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -292,13 +286,10 @@ freia_status freia_64_helper_1_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -340,9 +331,6 @@ freia_status freia_64_helper_1_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -494,6 +482,8 @@ digraph "freia_64_helper_1_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+
 /* FREIA terapix helper function for module freia_64
  *
  * RAMPE    = 1024
@@ -641,6 +631,8 @@ freia_status freia_64_helper_0_0_0(
   return ret;
 }
 
+
+// dag 1: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_64
  *
@@ -811,6 +803,152 @@ freia_status freia_64(freia_data2d *o, const freia_data2d *i0, const freia_data2
       freia_64_helper_0_0_0(o, i0, i1);                                 /*0008*/
    else
       freia_64_helper_1_0_0(o, i0, i1);                                 /*0010*/
+   return 0;                                                            /*0011*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_64(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1, bool b)
+{
+   // two statements that may be out of a sequence...
+   if (b)                                                               /*0007*/
+      freia_aipo_add(o, i0, i1);                                        /*0008*/
+   else
+      freia_aipo_sub(o, i0, i1);                                        /*0010*/
+   return FREIA_OK;                                                     /*0011*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_64" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 +" [shape=trapezium,orientation=270];
+  "8 +" -> "o";
+  "i1" -> "8 +";
+  "i0" -> "8 +";
+}
+// graph for dag "dag_1" of module "freia_64" in dot format
+digraph "dag_1" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "10 -" [shape=trapezium,orientation=270];
+  "10 -" -> "o";
+  "i1" -> "10 -";
+  "i0" -> "10 -";
+}
+// graph for dag "dag_cleaned_0" of module "freia_64" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 +" [shape=trapezium,orientation=270];
+  "8 +" -> "o";
+  "i1" -> "8 +";
+  "i0" -> "8 +";
+}
+// graph for dag "dag_cleaned_1" of module "freia_64" in dot format
+digraph "dag_cleaned_1" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "10 -" [shape=trapezium,orientation=270];
+  "10 -" -> "o";
+  "i1" -> "10 -";
+  "i0" -> "10 -";
+}
+// graph for dag "freia_64_helper_0_0" of module "freia_64" in dot format
+digraph "freia_64_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "8 +" [shape=trapezium,orientation=270];
+  "8 +" -> "o";
+  "i1" -> "8 +";
+  "i0" -> "8 +";
+}
+// graph for dag "freia_64_helper_1_0" of module "freia_64" in dot format
+digraph "freia_64_helper_1_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "10 -" [shape=trapezium,orientation=270];
+  "10 -" -> "o";
+  "i1" -> "10 -";
+  "i0" -> "10 -";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+
+// dag 1: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function freia_64
+
+// opencl for dag 0
+
+// opencl for dag 1
+
+! updated function
+
+freia_status freia_64(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1, bool b)
+{
+   // two statements that may be out of a sequence...
+   if (b)                                                               /*0007*/
+      freia_aipo_add(o, i0, i1);                                        /*0008*/
+   else
+      freia_aipo_sub(o, i0, i1);                                        /*0010*/
+   return FREIA_OK;                                                     /*0011*/
+}
+
+! cleaned up function
+
+freia_status freia_64(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1, bool b)
+{
+   // two statements that may be out of a sequence...
+   if (b)                                                               /*0007*/
+      freia_aipo_add(o, i0, i1);                                        /*0008*/
+   else
+      freia_aipo_sub(o, i0, i1);                                        /*0010*/
    return 0;                                                            /*0011*/
 }
 #

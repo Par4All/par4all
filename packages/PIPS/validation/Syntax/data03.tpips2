@@ -1,0 +1,9 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+# detect unsupported implied do in data statements
+delete data03
+create data03 data03.f
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE 
+close
+delete data03
+quit

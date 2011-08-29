@@ -1,0 +1,48 @@
+#
+# Parsed printed file
+#
+void sequence01()
+{
+   int i = 4;
+   {
+      int j;
+   }
+   
+   // j is probably interpreted as an int function...
+   foo(j);
+   // even PIPS parser detects that j is not declared...
+   //j = 2;
+   
+   return;
+}
+#
+# Printed file
+#
+void sequence01()
+{
+   int i = 4;
+   {
+      int j;
+   }
+   
+   // j is probably interpreted as an int function...
+   foo(j);
+   // even PIPS parser detects that j is not declared...
+   //j = 2;
+   
+   return;
+}
+#
+# simplify control
+#
+void sequence01()
+{
+   int i = 4;
+   
+   // j is probably interpreted as an int function...
+   foo(j);
+   // even PIPS parser detects that j is not declared...
+   //j = 2;
+   
+   return;
+}

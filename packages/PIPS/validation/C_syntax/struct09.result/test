@@ -3,3 +3,6 @@ union {
    struct s d2;
    int i;
 } u;
+#
+# compile generated struct09
+#

@@ -1,0 +1,677 @@
+#
+# initial main
+#
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout;
+   freia_data2d *imin, *in, *imTophat, *imClose, *imZone1, *imZone2, *imZone3, *imWork1, *out;
+
+   static const  int32_t freia_morpho_k8_center_east[9] = {0, 0, 0, 0, 1, 1, 0, 0, 0};
+   static const  int32_t freia_morpho_k8_center_north[9] = {0, 1, 0, 0, 1, 0, 0, 0, 0};
+   
+   // there should be a freia_initialize()? yup we should have one for opencl
+   // 1st arg: 1=GPU, 2=CPU, 2nd arg sub-device
+   freia_initialize(argc, argv);
+   freia_common_open_input(&fdin, 0);
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);
+   
+   
+   
+   
+   
+   
+   
+   imin = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imClose = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imTophat = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imZone1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imZone2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imZone3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   
+   // input
+   freia_common_rx_image(imin, &fdin);
+   drawBorder(in, imin, 255);
+   
+   // Closing
+   freia_ecipo_close(imWork1, in, freia_morpho_k8_center_east, 8, 100);
+   freia_ecipo_close(out, in, freia_morpho_k8_center_north, 8, 100);
+   freia_aipo_inf(imClose, imWork1, out);
+   
+   // Tophat
+   freia_aipo_sub(imTophat, imClose, imin);
+   
+   // Thresholding in different zones
+   freia_aipo_threshold(imZone1, imTophat, 105, 255, 1);
+   freia_aipo_threshold(imZone2, imTophat, 60, 105, 1);
+   freia_aipo_threshold(imZone3, imClose, 100, 150, 1);
+   
+   // Put all zones in one and filter it
+   freia_aipo_sup(imWork1, imZone1, imZone2);
+   freia_aipo_sup(imWork1, imWork1, imZone3);
+   freia_aipo_not(imWork1, imWork1);
+   freia_cipo_geodesic_reconstruct_close(out, imWork1, 8, 2);
+   
+   // Change  pixel values for the display
+   freia_aipo_inf_const(imZone1, imZone1, 40);
+   freia_aipo_inf_const(imZone2, imZone2, 100);
+   freia_aipo_inf_const(imZone3, imZone3, 170);
+   freia_aipo_inf_const(out, out, 250);
+
+   freia_aipo_sup(imWork1, imZone2, imZone1);
+   freia_aipo_sup(imWork1, imZone3, imWork1);
+   freia_aipo_sup(out, out, imWork1);
+   
+   // output
+   freia_common_tx_image(imin, &fdout);
+   freia_common_tx_image(out, &fdout);
+   // cleanup
+   freia_common_destruct_data(imin);
+   freia_common_destruct_data(in);
+   freia_common_destruct_data(imTophat);
+   freia_common_destruct_data(imClose);
+   freia_common_destruct_data(imZone1);
+   freia_common_destruct_data(imZone2);
+   freia_common_destruct_data(imZone3);
+   freia_common_destruct_data(imWork1);
+   freia_common_destruct_data(out);
+
+   freia_common_close_input(&fdin);
+   freia_common_close_output(&fdout);
+
+   freia_shutdown();
+   return 0;
+}
+#
+# processed main
+#
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout;
+   freia_data2d *imin, *in, *imTophat, *imClose, *imZone1, *imZone2, *imZone3, *imWork1, *out;
+
+   static const  int32_t freia_morpho_k8_center_east[9] = {0, 0, 0, 0, 1, 1, 0, 0, 0};
+   static const  int32_t freia_morpho_k8_center_north[9] = {0, 1, 0, 0, 1, 0, 0, 0, 0};
+   //PIPS generated variable
+   register freia_status _return0;
+   //PIPS generated variable
+   register freia_status _return1, _return2;
+   //PIPS generated variable
+   register freia_status _return3, _return4;
+   //PIPS generated variable
+   register freia_status _return5, _return6, _return7, _return8;
+   //PIPS generated variable
+   register freia_status _return9, _return10;
+   //PIPS generated variable
+   register uint32_t i_0, i_1;
+   //PIPS generated variable
+   int32_t neighborTransposed_0[9];
+   //PIPS generated variable
+   register freia_status ret_0;
+   //PIPS generated variable
+   register uint32_t i_2, i_3;
+   //PIPS generated variable
+   int32_t neighborTransposed_1[9];
+   //PIPS generated variable
+   register freia_status ret_1;
+   //PIPS generated variable
+   register int i_4;
+   //PIPS generated variable
+   register freia_status ret_2;
+   //PIPS generated variable
+   register int32_t volprevious;
+   //PIPS generated variable
+   int32_t volcurrent;
+   //PIPS generated variable
+   register freia_status ret_3 = 0;
+   //PIPS generated variable
+   register int i_5;
+   //PIPS generated variable
+   register freia_status ret_4;
+   
+   // there should be a freia_initialize()? yup we should have one for opencl
+   // 1st arg: 1=GPU, 2=CPU, 2nd arg sub-device
+   freia_initialize(argc, argv);
+   freia_common_open_input(&fdin, 0);
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);
+   
+   
+   
+   
+   
+   
+   
+   imin = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imClose = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imTophat = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imZone1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imZone2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   imZone3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+
+   imWork1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);
+   
+   // input
+   freia_common_rx_image(imin, &fdin);
+   drawBorder(in, imin, 255);
+   
+   // Closing
+   transposeNeighbor(neighborTransposed_0, freia_morpho_k8_center_east);
+   
+   
+   freia_aipo_dilate_8c(imWork1, in, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   freia_aipo_dilate_8c(imWork1, imWork1, freia_morpho_k8_center_east);
+   
+   
+   _return5 = 0;
+   ret_0 = 0;
+   
+   
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   freia_aipo_erode_8c(imWork1, imWork1, neighborTransposed_0);
+   
+   
+   _return7 = 0;
+   
+   
+   _return1 = ret_0;
+   transposeNeighbor(neighborTransposed_1, freia_morpho_k8_center_north);
+   
+   
+   freia_aipo_dilate_8c(out, in, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   freia_aipo_dilate_8c(out, out, freia_morpho_k8_center_north);
+   
+   
+   _return6 = 0;
+   ret_1 = 0;
+   
+   
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   freia_aipo_erode_8c(out, out, neighborTransposed_1);
+   
+   
+   _return8 = 0;
+   
+   
+   _return2 = ret_1;
+   freia_aipo_inf(imClose, imWork1, out);
+   
+   // Tophat
+   freia_aipo_sub(imTophat, imClose, imin);
+   
+   // Thresholding in different zones
+   freia_aipo_threshold(imZone1, imTophat, 105, 255, 1);
+   freia_aipo_threshold(imZone2, imTophat, 60, 105, 1);
+   freia_aipo_threshold(imZone3, imClose, 100, 150, 1);
+   
+   // Put all zones in one and filter it
+   freia_aipo_sup(imWork1, imZone1, imZone2);
+   freia_aipo_sup(imWork1, imWork1, imZone3);
+   freia_aipo_not(imWork1, imWork1);
+   
+   
+   freia_aipo_dilate_8c(out, imWork1, freia_morpho_kernel_8c);
+   i_5 = 1;
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);
+   i_5 = 1+1;
+   
+   
+   _return3 = 0;
+   ret_4 = 0;
+
+   ret_3 = freia_aipo_global_vol(out, &volcurrent);
+   do {
+      volprevious = volcurrent;
+      
+      
+      freia_aipo_erode_8c(out, out, freia_morpho_kernel_8c);
+      i_4 = 1;
+      
+      
+      _return10 = 0;
+      ret_2 = 0;
+      ret_2 |= freia_aipo_sup(out, out, imWork1);
+      
+      
+      _return9 = ret_2;
+      ret_3 |= _return9;
+      ret_3 |= freia_aipo_global_vol(out, &volcurrent);
+   }
+   while (volcurrent!=volprevious);
+   
+   
+   _return4 = ret_3;
+   ret_4 |= _return4;
+   
+   
+   _return0 = ret_4;
+   
+   // Change  pixel values for the display
+   freia_aipo_inf_const(imZone1, imZone1, 40);
+   freia_aipo_inf_const(imZone2, imZone2, 100);
+   freia_aipo_inf_const(imZone3, imZone3, 170);
+   freia_aipo_inf_const(out, out, 250);
+
+   freia_aipo_sup(imWork1, imZone2, imZone1);
+   freia_aipo_sup(imWork1, imZone3, imWork1);
+   freia_aipo_sup(out, out, imWork1);
+   
+   // output
+   freia_common_tx_image(imin, &fdout);
+   freia_common_tx_image(out, &fdout);
+   // cleanup
+   freia_common_destruct_data(imin);
+   freia_common_destruct_data(in);
+   freia_common_destruct_data(imTophat);
+   freia_common_destruct_data(imClose);
+   freia_common_destruct_data(imZone1);
+   freia_common_destruct_data(imZone2);
+   freia_common_destruct_data(imZone3);
+   freia_common_destruct_data(imWork1);
+   freia_common_destruct_data(out);
+
+   freia_common_close_input(&fdin);
+   freia_common_close_output(&fdout);
+
+   freia_shutdown();
+   return 0;
+}
+#
+# compile generated burner
+#

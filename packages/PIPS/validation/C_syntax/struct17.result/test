@@ -4,3 +4,6 @@ struct s {
    struct s *right;
    int a;
 };
+#
+# compile generated struct17
+#

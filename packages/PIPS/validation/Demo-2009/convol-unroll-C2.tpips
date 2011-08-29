@@ -65,7 +65,7 @@ echo after code cleaning
 echo
 display PRINTED_FILE[microcode]
 apply PARTIAL_EVAL[microcode]
-apply SUPPRESS_DEAD_CODE[microcode]
+apply SIMPLIFY_CONTROL[microcode]
 display PRINTED_FILE[microcode]
 
 echo

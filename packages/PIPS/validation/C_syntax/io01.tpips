@@ -18,7 +18,7 @@ display PARSED_PRINTED_FILE[io01!]
 #display PRINTED_FILE[io01!]
 
 apply UNSPLIT
-shell cc -c io01.database/Src/io01.c
+shell pips_validation_exe.sh -c -g io01
 
 close
 #delete io01

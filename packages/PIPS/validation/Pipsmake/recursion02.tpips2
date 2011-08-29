@@ -1,0 +1,13 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+delete recursion02
+create recursion02 recursion02.f
+
+# display PRINTED_FILE[%ALL]
+
+display CALLGRAPH_FILE[FOO01]
+
+close
+display CALLGRAPH_FILE[FOO04]
+
+delete recursion02
+quit

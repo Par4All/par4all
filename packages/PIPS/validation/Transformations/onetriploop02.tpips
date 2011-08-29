@@ -2,7 +2,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete onetriploop02
 create onetriploop02 onetriploop02.f
 # display PRINTED_FILE[onetriploop02]
-# capply SUPPRESS_DEAD_CODE[onetriploop02]
+# capply SIMPLIFY_CONTROL[onetriploop02]
 # display PRINTED_FILE[onetriploop02]
 
 echo
@@ -23,7 +23,7 @@ echo Code after one trip loop detection and simplification
 echo
 
 activate PRINT_CODE
-capply SUPPRESS_DEAD_CODE[%ALL]
+capply SIMPLIFY_CONTROL[%ALL]
 display PRINTED_FILE[%ALL]
 close
 delete onetriploop02

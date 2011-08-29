@@ -41,7 +41,7 @@ display PRINTED_FILE[compute]
 # Discard the useless test
 
 #apply SIMPLIFY_CONTROL[compute]
-apply SUPPRESS_DEAD_CODE[compute]
+apply SIMPLIFY_CONTROL[compute]
 
 activate PRINT_CODE
 display PRINTED_FILE[compute]

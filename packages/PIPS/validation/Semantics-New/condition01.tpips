@@ -33,7 +33,7 @@ echo
 echo After suppress_dead_code
 echo
 
-apply SUPPRESS_DEAD_CODE[main]
+apply SIMPLIFY_CONTROL[main]
 activate PRINT_CODE
 display PRINTED_FILE[main]
 

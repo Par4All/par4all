@@ -9,7 +9,7 @@ echo
 display PARSED_PRINTED_FILE[main]
 
 apply UNSPLIT
-shell (cd complex03.database/Src; gcc -c complex03.c)
+shell pips_validation_exe.sh -c -g complex03
 
 close
 delete complex03

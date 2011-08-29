@@ -1,0 +1,70 @@
+
+PROPER EFFECTS
+
+void call03()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pi
+   *pi = 1;
+//             <    is read   >: pi
+//             <    is written>: pi
+   pi++;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   q->one = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   (q->two)[4] = 2;
+}
+int main()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pi q
+   call03();
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+//             <    is read   >: pi q
+//             <    is written>: pi pi[0] q[0].one q[0].two[4]
+   call03();
+}
+
+POINTS TO
+
+
+// Points To: none
+
+void call03()
+{
+
+// Points To: none
+
+   *pi = 1;
+
+// Points To: none
+
+   pi++;
+
+// Points To:
+// pi -> i[*] , EXACT
+
+   q->one = 1;
+
+// Points To:
+// pi -> i[*] , EXACT
+
+   (q->two)[4] = 2;
+}
+
+// Points To: none
+
+int main()
+{
+
+// Points To: none
+
+   call03();
+}

@@ -12,7 +12,7 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[%ALL]
 activate PRINT_CODE
 echo # dead code elimination...
-apply SUPPRESS_DEAD_CODE[%ALL]
+apply SIMPLIFY_CONTROL[%ALL]
 apply UNSPAGHETTIFY[%ALL]
 # apply RESTRUCTURE_CONTROL[%ALL]
 display PRINTED_FILE[%ALL]

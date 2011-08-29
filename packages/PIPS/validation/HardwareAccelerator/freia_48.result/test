@@ -191,7 +191,7 @@ digraph "freia_48_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 6 ops (2 copies), optimized to 4 (0+0 copies)
+// dag 0: 4 ops and 2 copies, optimized to 4 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -206,13 +206,10 @@ freia_status freia_48_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -285,9 +282,6 @@ freia_status freia_48_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -423,6 +417,8 @@ digraph "freia_48_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 4 ops and 2 copies, optimized to 4 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_48
  *
@@ -679,6 +675,191 @@ freia_status freia_48_helper_0_0_0(
   return ret;
 }
 
+
+! updated function
+
+freia_status freia_48(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   
+   freia_48_helper_0_0_0(out, in, out, 3, 4, 7);                        /*0011*/
+
+   return FREIA_OK;                                                     /*0019*/
+}
+
+! cleaned up function
+
+freia_status freia_48(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   
+   freia_48_helper_0_0_0(out, in, out, 3, 4, 7);                        /*0011*/
+
+   return 0;                                                            /*0019*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_48(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128);          /*0008*/
+
+   freia_aipo_copy(t0, in);                                             /*0010*/
+   freia_aipo_mul_const(t0, t0, 3);                                     /*0011*/
+   freia_aipo_mul_const(out, out, 4);                                   /*0012*/
+   freia_aipo_add(out, out, t0);                                        /*0013*/
+   freia_aipo_div_const(t1, out, 7);                                    /*0014*/
+   freia_aipo_copy(out, t1);                                            /*0015*/
+
+   freia_common_destruct_data(t0);                                      /*0017*/
+   freia_common_destruct_data(t1);                                      /*0018*/
+   return FREIA_OK;                                                     /*0019*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_48" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "15 =" [shape=circle];
+  "15 =" -> "out'";
+  "14 /." [shape=trapezium,orientation=270];
+  "14 /." -> "15 =" [label="t1"];
+  "13 +" [shape=trapezium,orientation=270];
+  "13 +" -> "14 /." [label="out"];
+  "12 *." [shape=trapezium,orientation=270];
+  "12 *." -> "13 +" [label="out"];
+  "out" -> "12 *.";
+  "11 *." [shape=trapezium,orientation=270];
+  "11 *." -> "13 +" [label="t0"];
+  "10 =" [shape=circle];
+  "10 =" -> "11 *." [label="t0"];
+  "in" -> "10 =";
+}
+// graph for dag "dag_cleaned_0" of module "freia_48" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "14 /." [shape=trapezium,orientation=270];
+  "14 /." -> "out'";
+  "13 +" [shape=trapezium,orientation=270];
+  "13 +" -> "14 /." [label="out_1"];
+  "12 *." [shape=trapezium,orientation=270];
+  "12 *." -> "13 +" [label="out_2"];
+  "out" -> "12 *.";
+  "11 *." [shape=trapezium,orientation=270];
+  "11 *." -> "13 +" [label="t0"];
+  "in" -> "11 *.";
+}
+// graph for dag "freia_48_helper_0_0" of module "freia_48" in dot format
+digraph "freia_48_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "14 /." [shape=trapezium,orientation=270];
+  "14 /." -> "out'";
+  "13 +" [shape=trapezium,orientation=270];
+  "13 +" -> "14 /." [label="out_1"];
+  "12 *." [shape=trapezium,orientation=270];
+  "12 *." -> "13 +" [label="out_2"];
+  "out" -> "12 *.";
+  "11 *." [shape=trapezium,orientation=270];
+  "11 *." -> "13 +" [label="t0"];
+  "in" -> "11 *.";
+}
+// graph for dag "freia_48_helper_0_0_0" of module "freia_48" in dot format
+digraph "freia_48_helper_0_0_0" {
+  // inputs
+  "in" [shape=circle];
+  "out" [shape=circle];
+
+  // outputs
+  "out'" [shape=circle];
+
+  // computation vertices
+  "14 /." [shape=trapezium,orientation=270];
+  "14 /." -> "out'";
+  "13 +" [shape=trapezium,orientation=270];
+  "13 +" -> "14 /." [label="out_1"];
+  "12 *." [shape=trapezium,orientation=270];
+  "12 *." -> "13 +" [label="out_2"];
+  "out" -> "12 *.";
+  "11 *." [shape=trapezium,orientation=270];
+  "11 *." -> "13 +" [label="t0"];
+  "in" -> "11 *.";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 4 ops and 2 copies, optimized to 4 ops and 0+0 copies
+
+// helper function freia_48_helper_0_0_0
+freia_status freia_48_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  call opencl kernel freia_48_helper_0_0_0(o0, i0, i1, c0, c1, c2);
+  return FREIA_OK;
+}
+// freia opencl includes
+// generated opencl for function freia_48
+
+// opencl for dag 0
+
+// opencl function freia_48_helper_0_0_0
+kernel freia_48_helper_0_0_0(
+  opencl image o0,
+  const opencl image i0,
+  const opencl image i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    // pixel computations
+    register pixel t11 = PIXEL_MUL_CONST(in0, c0);
+    register pixel t12 = PIXEL_MUL_CONST(in1, c1);
+    register pixel t13 = PIXEL_ADD(t12, t11);
+    register pixel t14 = PIXEL_DIV_CONST(t13, c2);
+    // set output pixels
+    o0[i] = t14;
+  }
+}
 
 ! updated function
 

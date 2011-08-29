@@ -66,6 +66,9 @@ int array02()
    for (i = 0;i<sizeof(int);i += sizeof(char))
       a[i] = 0.;
 }
+#
+# compile generated array02
+#
 int array02()
 {
    int a[sizeof(int)];

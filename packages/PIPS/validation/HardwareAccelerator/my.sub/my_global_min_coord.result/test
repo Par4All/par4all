@@ -97,7 +97,7 @@ digraph "my_global_min_coord_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 1 ops (0 copies), optimized to 1 (0+0 copies)
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -110,13 +110,12 @@ freia_status my_global_min_coord_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
+  spoc_reduction reduc;
+  freia_reduction_results redres;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -223,6 +222,8 @@ digraph "my_global_min_coord_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 
 /* FREIA terapix helper function for module my_global_min_coord
  *
@@ -449,6 +450,76 @@ freia_status my_global_min_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int
 freia_status my_global_min_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2)
 {
    return my_global_min_coord_helper_0_0_0(i0, p0, p1, p2);             /*0005*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status my_global_min_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2)
+{
+   return freia_aipo_global_min_coord(i0, p0, p1, p2);                  /*0005*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_global_min_coord" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "5 min!" [shape=diamond];
+  "i0" -> "5 min!";
+}
+// graph for dag "dag_cleaned_0" of module "my_global_min_coord" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "5 min!" [shape=diamond];
+  "i0" -> "5 min!";
+}
+// graph for dag "my_global_min_coord_helper_0_0" of module "my_global_min_coord" in dot format
+digraph "my_global_min_coord_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "5 min!" [shape=diamond];
+  "i0" -> "5 min!";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function my_global_min_coord
+
+// opencl for dag 0
+
+! updated function
+
+freia_status my_global_min_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2)
+{
+   return freia_aipo_global_min_coord(i0, p0, p1, p2);                  /*0005*/
+}
+
+! cleaned up function
+
+freia_status my_global_min_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2)
+{
+   return freia_aipo_global_min_coord(i0, p0, p1, p2);                  /*0005*/
 }
 #
 # FREIA COMPILATION DONE

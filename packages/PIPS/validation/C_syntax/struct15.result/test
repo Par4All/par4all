@@ -11,3 +11,6 @@ void struct15()
    int j = sizeof(struct s_prime {int i; int j;} );
    struct s_prime u;
 }
+#
+# compile generated struct15
+#

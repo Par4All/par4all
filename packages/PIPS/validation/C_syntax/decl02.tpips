@@ -32,7 +32,7 @@ echo
 display PRINTED_FILE[decl02!]
 
 apply UNSPLIT
-shell cc -c decl02.database/Src/decl02.c
+shell pips_validation_exe.sh -c -g decl02
 
 close
 delete decl02

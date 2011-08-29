@@ -3,3 +3,6 @@
 extern double sqrt(double);
 
 int filter();
+#
+# compile generated global_extern04
+#

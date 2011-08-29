@@ -151,7 +151,7 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 8 ops (1 copies), optimized to 1 (0+0 copies)
+// dag 0: 7 ops and 1 copies, optimized to 1 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -162,13 +162,10 @@ freia_status cst_00_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -207,9 +204,6 @@ freia_status cst_00_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -318,6 +312,8 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 7 ops and 1 copies, optimized to 1 ops and 0+0 copies
 
 /* FREIA terapix helper function for module cst_00
  *
@@ -474,6 +470,106 @@ freia_status cst_00(freia_data2d *o, uint32_t k)
 {
    // this means o := 0
    cst_00_helper_0_0_0(o, 0);                                           /*0009*/
+   return 0;                                                            /*0014*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status cst_00(freia_data2d *o, uint32_t k)
+{
+   // this means o := 0
+   freia_aipo_xor(o, o, o);                                             /*0006*/
+   freia_aipo_erode_8c(o, o, k);                                        /*0007*/
+   freia_aipo_copy(o, o);                                               /*0008*/
+   freia_aipo_dilate_6c(o, o, k);                                       /*0009*/
+   freia_aipo_add_const(o, o, 0);                                       /*0010*/
+   freia_aipo_sub_const(o, o, 0);                                       /*0011*/
+   freia_aipo_mul_const(o, o, 1);                                       /*0012*/
+   freia_aipo_div_const(o, o, 1);                                       /*0013*/
+   return FREIA_OK;                                                     /*0014*/
+}
+
+! graphs
+
+// graph for dag "cst_00_helper_0_0" of module "cst_00" in dot format
+digraph "cst_00_helper_0_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "o";
+}
+// graph for dag "dag_0" of module "cst_00" in dot format
+digraph "dag_0" {
+  // inputs
+  "o" [shape=circle];
+
+  // outputs
+  "o'" [shape=circle];
+
+  // computation vertices
+  "13 /." [shape=trapezium,orientation=270];
+  "13 /." -> "o'";
+  "12 *." [shape=trapezium,orientation=270];
+  "12 *." -> "13 /." [label="o"];
+  "11 -." [shape=trapezium,orientation=270];
+  "11 -." -> "12 *." [label="o"];
+  "10 +." [shape=trapezium,orientation=270];
+  "10 +." -> "11 -." [label="o"];
+  "9 D6" [shape=box];
+  "9 D6" -> "10 +." [label="o"];
+  "8 =" [shape=circle];
+  "8 =" -> "9 D6" [label="o"];
+  "7 E8" [shape=box];
+  "7 E8" -> "8 =" [label="o"];
+  "6 ^" [shape=trapezium,orientation=270];
+  "6 ^" -> "7 E8" [label="o"];
+  "o" -> "6 ^";
+  "o" -> "6 ^";
+}
+// graph for dag "dag_cleaned_0" of module "cst_00" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "o";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 7 ops and 1 copies, optimized to 1 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function cst_00
+
+// opencl for dag 0
+
+! updated function
+
+freia_status cst_00(freia_data2d *o, uint32_t k)
+{
+   // this means o := 0
+   freia_aipo_set_constant(o, 0);                                       /*0009*/
+   return FREIA_OK;                                                     /*0014*/
+}
+
+! cleaned up function
+
+freia_status cst_00(freia_data2d *o, uint32_t k)
+{
+   // this means o := 0
+   freia_aipo_set_constant(o, 0);                                       /*0009*/
    return 0;                                                            /*0014*/
 }
 #

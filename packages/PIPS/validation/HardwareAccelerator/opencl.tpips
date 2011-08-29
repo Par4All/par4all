@@ -1,0 +1,4 @@
+# WSPACE=foo FILE=foo.c tpips terapix.tpips
+# setenv PIPS_HWAC_DEBUG_LEVEL=7
+setenv FREIA_TARGET=OPENCL
+source target.tpips

@@ -949,7 +949,7 @@ digraph "vs_core_loop_helper_3_3" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops (0 copies), optimized to 1 (0+1 copies)
+// dag 0: 3 ops and 0 copies, optimized to 1 ops and 0+1 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -960,13 +960,10 @@ freia_status vs_core_loop_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -1006,9 +1003,6 @@ freia_status vs_core_loop_helper_0_0_0(
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
@@ -1018,13 +1012,13 @@ freia_status vs_core_loop_helper_0_0_0(
   return ret;
 }
 
-// dag 1: 1 ops (1 copies), optimized to 0 (0+0 copies)
+// dag 1: 0 ops and 1 copies, optimized to 0 ops and 0+0 copies
 // # SPOC calls: 0
 
-// dag 2: 1 ops (1 copies), optimized to 0 (0+1 copies)
+// dag 2: 0 ops and 1 copies, optimized to 0 ops and 0+1 copies
 // # SPOC calls: 0
 
-// dag 3: 19 ops (3 copies), optimized to 16 (0+1 copies)
+// dag 3: 16 ops and 3 copies, optimized to 16 ops and 0+1 copies
 // split 0: 1 cut
 // split 1: 1 cut
 // split 2: 1 cut
@@ -1043,13 +1037,12 @@ freia_status vs_core_loop_helper_3_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
+  spoc_reduction reduc;
+  freia_reduction_results redres;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -1157,13 +1150,10 @@ freia_status vs_core_loop_helper_3_1_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -1226,9 +1216,6 @@ freia_status vs_core_loop_helper_3_1_0(
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
@@ -1251,10 +1238,8 @@ freia_status vs_core_loop_helper_3_2_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -1365,9 +1350,6 @@ freia_status vs_core_loop_helper_3_2_0(
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
@@ -1385,13 +1367,10 @@ freia_status vs_core_loop_helper_3_3_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -1433,9 +1412,6 @@ freia_status vs_core_loop_helper_3_3_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -1531,9 +1507,9 @@ l99979:   ;                                                                    /
    
    
    // save contrast motion detection
-   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);               /*0120*/
-
+   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);
    freia_aipo_copy(imbg, imbg16);
+   
    
    // output image
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
@@ -1644,9 +1620,9 @@ l99998:   ;
    
    
    // save contrast motion detection
-   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);               /*0120*/
-
+   vs_core_loop_helper_3_3_0(immotion, immotion, imstab);
    freia_aipo_copy(imbg, imbg16);
+   
    
    // output image
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
@@ -2112,6 +2088,8 @@ digraph "vs_core_loop_helper_3_1_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
+// dag 0: 3 ops and 0 copies, optimized to 1 ops and 0+1 copies
+
 /* FREIA terapix helper function for module vs_core_loop
  *
  * RAMPE    = 1024
@@ -2251,6 +2229,12 @@ freia_status vs_core_loop_helper_0_0_0(
   return ret;
 }
 
+
+// dag 1: 0 ops and 1 copies, optimized to 0 ops and 0+0 copies
+
+// dag 2: 0 ops and 1 copies, optimized to 0 ops and 0+1 copies
+
+// dag 3: 16 ops and 3 copies, optimized to 16 ops and 0+1 copies
 
 /* FREIA terapix helper function for module vs_core_loop
  *
@@ -3163,8 +3147,8 @@ l99979:   ;                                                                    /
    
    
    // save contrast motion detection
-   
    freia_aipo_copy(imbg, imbg16);
+   
    
    // output image
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
@@ -3267,8 +3251,8 @@ l99998:   ;
    
    
    // save contrast motion detection
-   
    freia_aipo_copy(imbg, imbg16);
+   
    
    // output image
    freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
@@ -3281,6 +3265,825 @@ l99999:   ;
    // cleanup at end of application
    freia_common_destruct_data(imcurrent);                               /*0130*/
    freia_common_destruct_data(imstab);                                  /*0133*/
+   freia_common_destruct_data(imbg16);                                  /*0137*/
+   freia_common_destruct_data(imbg);                                    /*0138*/
+   freia_common_destruct_data(immotion);                                /*0139*/
+
+   freia_common_close_input(&fdin);                                     /*0141*/
+   freia_common_close_output(&fdmotion);                                /*0142*/
+
+   freia_shutdown();                                                    /*0144*/
+   return 0;                                                            /*0145*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+int vs_core_loop(void)
+{
+   freia_dataio fdin;                                                   /*0006*/
+   freia_dataio fdmotion;                                               /*0007*/
+
+   freia_data2d *imcurrent;                                             /*0009*/
+   freia_data2d *imprevious;                                            /*0010*/
+   freia_data2d *imstab;                                                /*0011*/
+   freia_data2d *imtmp1;                                                /*0012*/
+   freia_data2d *imtmp2;                                                /*0013*/
+   freia_data2d *imehn;                                                 /*0014*/
+   freia_data2d *imtmp3;                                                /*0015*/
+   freia_data2d *imbg16;                                                /*0016*/
+   freia_data2d *imbg;                                                  /*0017*/
+   freia_data2d *immotion;                                              /*0018*/
+   freia_data2d *imtmp;                                                 /*0019*/
+
+   int32_t maxmotion, minmotion;                                        /*0021*/
+   register int32_t binvalue = 128;                                     /*0022*/
+
+   register int32_t xshiftacc, yshiftacc;                               /*0024*/
+   register freia_status end = 0;                                       /*0025*/
+
+   register uint32_t horizon = 10;                                      /*0027*/
+   register int32_t maximal_shape = 21;                                 /*0028*/
+   register int32_t minimal_contrast = 50;                              /*0029*/
+   register int32_t motion_a = 10;                                      /*0030*/
+   register int32_t motion_b = 90;                                      /*0031*/
+   register int32_t motion_th = 30;                                     /*0032*/
+   register int32_t motion_trig = 75;                                   /*0033*/
+
+   freia_initialize(0, (void *) 0);                                     /*0035*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0037*/
+
+   imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0039*/
+   imprevious = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);       /*0040*/
+   imtmp1 = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0041*/
+
+   imstab = freia_common_create_data(16, fdin.framewidth-20, fdin.frameheight-20);     /*0043*/
+   imtmp2 = freia_common_create_data(16, imstab->width, imstab->height);               /*0044*/
+
+   imtmp3 = freia_common_create_data(16, imstab->width, imstab->height);               /*0046*/
+   imehn = freia_common_create_data(16, imstab->width, imstab->height);                /*0047*/
+   imbg16 = freia_common_create_data(16, imstab->width, imstab->height);               /*0048*/
+   imbg = freia_common_create_data(16, imstab->width, imstab->height);  /*0049*/
+   immotion = freia_common_create_data(16, imstab->width, imstab->height);             /*0050*/
+
+   freia_common_open_output(&fdmotion, 2, imstab->width, imstab->height, imstab->bpp);                /*0052*/
+
+   freia_aipo_set_constant(imbg16, 0);                                  /*0054*/
+   freia_aipo_set_constant(imbg, 0);                                    /*0055*/
+   freia_aipo_xor(imtmp1, imtmp1, imtmp1);                              /*0056*/
+   
+   // application start
+   xshiftacc = 0;                                                       /*0059*/
+   yshiftacc = 0;                                                       /*0060*/
+
+   end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
+   
+   // video loop
+l99979:   ;                                                                    /*0065*/
+
+   if (end==0) {                                                        /*0067*/
+   }
+   else {
+      goto l99980;
+   }
+   
+   // stabilization
+   freia_aipo_copy(imprevious, imcurrent);                              /*0074*/
+   end = freia_common_rx_image(imcurrent, &fdin);                       /*0075*/
+
+   if (end!=0) goto l99980;                                             /*0077*/
+
+   freia_common_set_wa(imcurrent, xshiftacc+10, yshiftacc+10, fdin.framewidth-20, fdin.frameheight-20);              /*0079*/
+   freia_aipo_copy(imstab, imcurrent);                                  /*0080*/
+   freia_common_reset_wa(imcurrent);                                    /*0081*/
+   
+   // constrast enhance
+   freia_aipo_copy(imehn, imstab);                                      /*0084*/
+   
+   // absolute difference background and current frame
+   freia_aipo_absdiff(immotion, imehn, imbg);                           /*0087*/
+   
+   // background update
+   freia_aipo_cast(imtmp3, imehn);                                      /*0090*/
+   freia_aipo_mul_const(imtmp3, imtmp3, 10);                            /*0091*/
+   freia_aipo_mul_const(imbg16, imbg16, 90);                            /*0092*/
+   freia_aipo_add(imbg16, imbg16, imtmp3);                              /*0093*/
+   freia_aipo_div_const(imbg16, imbg16, 100);                           /*0094*/
+   freia_aipo_cast(imbg, imbg16);                                       /*0095*/
+   
+   // measures
+   freia_aipo_global_max(immotion, &maxmotion);                         /*0098*/
+   freia_aipo_global_min(immotion, &minmotion);                         /*0099*/
+
+   if (maxmotion-minmotion>75)                                          /*0101*/
+      binvalue = 30*maxmotion/100;                                      /*0102*/
+   
+   // threshold
+   freia_aipo_threshold(immotion, immotion, binvalue, 255, 1);          /*0105*/
+   freia_aipo_erode_8c(imtmp2, immotion, freia_morpho_kernel_8c);       /*0106*/
+   freia_aipo_dilate_8c(imtmp2, imtmp2, freia_morpho_kernel_8c);        /*0107*/
+
+   imtmp = freia_common_create_data(immotion->bpp, immotion->widthWa, immotion->heightWa);            /*0109*/
+
+   freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
+   freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);       /*0112*/
+   freia_aipo_sub(immotion, imtmp, immotion);                           /*0113*/
+
+   freia_common_destruct_data(imtmp);                                   /*0115*/
+   
+   // save contrast motion detection
+   freia_aipo_sub_const(immotion, immotion, 1);                         /*0118*/
+   freia_aipo_and_const(immotion, immotion, 1);                         /*0119*/
+   freia_aipo_mul(immotion, imstab, immotion);                          /*0120*/
+   
+   // output image
+   freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
+
+   fprintf(stdout, "INFO: %s: ""frame %d processed\n", __FUNCTION__, fdin.frameindex);                /*0125*/
+   goto l99979;
+l99980:   ;
+   
+   // cleanup at end of application
+   freia_common_destruct_data(imcurrent);                               /*0130*/
+   freia_common_destruct_data(imprevious);                              /*0131*/
+   freia_common_destruct_data(imtmp1);                                  /*0132*/
+   freia_common_destruct_data(imstab);                                  /*0133*/
+   freia_common_destruct_data(imtmp2);                                  /*0134*/
+   freia_common_destruct_data(imtmp3);                                  /*0135*/
+   freia_common_destruct_data(imehn);                                   /*0136*/
+   freia_common_destruct_data(imbg16);                                  /*0137*/
+   freia_common_destruct_data(imbg);                                    /*0138*/
+   freia_common_destruct_data(immotion);                                /*0139*/
+
+   freia_common_close_input(&fdin);                                     /*0141*/
+   freia_common_close_output(&fdmotion);                                /*0142*/
+
+   freia_shutdown();                                                    /*0144*/
+   return 0;                                                            /*0145*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "vs_core_loop" in dot format
+digraph "dag_0" {
+  // inputs
+  "imtmp1" [shape=circle];
+
+  // outputs
+  "imbg16" [shape=circle];
+  "imbg" [shape=circle];
+
+  // computation vertices
+  "56 ^" [shape=trapezium,orientation=270];
+  "imtmp1" -> "56 ^";
+  "imtmp1" -> "56 ^";
+  "55 C" [shape=trapezium,orientation=270];
+  "55 C" -> "imbg";
+  "54 C" [shape=trapezium,orientation=270];
+  "54 C" -> "imbg16";
+}
+// graph for dag "dag_1" of module "vs_core_loop" in dot format
+digraph "dag_1" {
+  // inputs
+  "imcurrent" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "74 =" [shape=circle];
+  "imcurrent" -> "74 =";
+}
+// graph for dag "dag_2" of module "vs_core_loop" in dot format
+digraph "dag_2" {
+  // inputs
+  "imcurrent" [shape=circle];
+
+  // outputs
+  "imstab" [shape=circle];
+
+  // computation vertices
+  "80 =" [shape=circle];
+  "80 =" -> "imstab";
+  "imcurrent" -> "80 =";
+}
+// graph for dag "dag_3" of module "vs_core_loop" in dot format
+digraph "dag_3" {
+  // inputs
+  "imbg" [shape=circle];
+  "imbg16" [shape=circle];
+  "imstab" [shape=circle];
+
+  // outputs
+  "imbg16'" [shape=circle];
+  "imbg'" [shape=circle];
+  "immotion" [shape=circle];
+
+  // computation vertices
+  "120 *" [shape=trapezium,orientation=270];
+  "120 *" -> "immotion";
+  "119 &." [shape=trapezium,orientation=270];
+  "119 &." -> "120 *" [label="immotion"];
+  "118 -." [shape=trapezium,orientation=270];
+  "118 -." -> "119 &." [label="immotion"];
+  "113 -" [shape=trapezium,orientation=270];
+  "113 -" -> "118 -." [label="immotion"];
+  "112 E8" [shape=box];
+  "112 E8" -> "113 -" [label="immotion"];
+  "111 D8" [shape=box];
+  "111 D8" -> "113 -" [label="imtmp"];
+  "107 D8" [shape=box];
+  "107 D8" -> "112 E8" [label="imtmp2"];
+  "107 D8" -> "111 D8" [label="imtmp2"];
+  "106 E8" [shape=box];
+  "106 E8" -> "107 D8" [label="imtmp2"];
+  "105 thr" [shape=parallelogram];
+  "105 thr" -> "106 E8" [label="immotion"];
+  "101 ?" [shape=none];
+  "101 ?" -> "105 thr" [arrowhead=empty,label="binvalue"];
+  "99 min" [shape=diamond];
+  "99 min" -> "101 ?" [arrowhead=empty,label="minmotion"];
+  "98 max" [shape=diamond];
+  "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
+  "95 =" [shape=circle];
+  "95 =" -> "imbg'";
+  "94 /." [shape=trapezium,orientation=270];
+  "94 /." -> "95 =" [label="imbg16"];
+  "94 /." -> "imbg16'";
+  "93 +" [shape=trapezium,orientation=270];
+  "93 +" -> "94 /." [label="imbg16"];
+  "92 *." [shape=trapezium,orientation=270];
+  "92 *." -> "93 +" [label="imbg16"];
+  "imbg16" -> "92 *.";
+  "91 *." [shape=trapezium,orientation=270];
+  "91 *." -> "93 +" [label="imtmp3"];
+  "90 =" [shape=circle];
+  "90 =" -> "91 *." [label="imtmp3"];
+  "87 -|" [shape=trapezium,orientation=270];
+  "87 -|" -> "105 thr" [label="immotion"];
+  "87 -|" -> "99 min" [label="immotion"];
+  "87 -|" -> "98 max" [label="immotion"];
+  "imbg" -> "87 -|";
+  "84 =" [shape=circle];
+  "84 =" -> "90 =" [label="imehn"];
+  "84 =" -> "87 -|" [label="imehn"];
+  "imstab" -> "120 *";
+  "imstab" -> "84 =";
+}
+// graph for dag "dag_cleaned_0" of module "vs_core_loop" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+  "imbg16" [shape=circle];
+
+  // computation vertices
+  "54 C" [shape=trapezium,orientation=270];
+  "54 C" -> "imbg16";
+
+  // external copies: 1
+  "imbg" [shape=circle];
+  "imbg =" [shape=circle,label="=",style="dashed"]
+  "imbg16" -> "imbg =";
+  "imbg =" -> "imbg";
+}
+// graph for dag "dag_cleaned_1" of module "vs_core_loop" in dot format
+digraph "dag_cleaned_1" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+}
+// graph for dag "dag_cleaned_2" of module "vs_core_loop" in dot format
+digraph "dag_cleaned_2" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+
+  // external copies: 1
+  "imstab" [shape=circle];
+  "imstab =" [shape=circle,label="=",style="dashed"]
+  "imcurrent" -> "imstab =";
+  "imstab =" -> "imstab";
+}
+// graph for dag "dag_cleaned_3" of module "vs_core_loop" in dot format
+digraph "dag_cleaned_3" {
+  // inputs
+  "imbg" [shape=circle];
+  "imbg16" [shape=circle];
+  "imstab" [shape=circle];
+
+  // outputs
+  "imbg16'" [shape=circle];
+  "immotion" [shape=circle];
+
+  // computation vertices
+  "120 *" [shape=trapezium,orientation=270];
+  "120 *" -> "immotion";
+  "119 &." [shape=trapezium,orientation=270];
+  "119 &." -> "120 *" [label="immotion_1"];
+  "118 +." [shape=trapezium,orientation=270];
+  "118 +." -> "119 &." [label="immotion_2"];
+  "113 -" [shape=trapezium,orientation=270];
+  "113 -" -> "118 +." [label="immotion_3"];
+  "112 E8" [shape=box];
+  "112 E8" -> "113 -" [label="immotion_4"];
+  "111 D8" [shape=box];
+  "111 D8" -> "113 -" [label="imtmp"];
+  "107 D8" [shape=box];
+  "107 D8" -> "112 E8" [label="imtmp2"];
+  "107 D8" -> "111 D8" [label="imtmp2"];
+  "106 E8" [shape=box];
+  "106 E8" -> "107 D8" [label="imtmp2_1"];
+  "105 thr" [shape=parallelogram];
+  "105 thr" -> "106 E8" [label="immotion_5"];
+  "101 ?" [shape=none];
+  "101 ?" -> "105 thr" [arrowhead=empty,label="binvalue"];
+  "99 min" [shape=diamond];
+  "99 min" -> "101 ?" [arrowhead=empty,label="minmotion"];
+  "98 max" [shape=diamond];
+  "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
+  "94 /." [shape=trapezium,orientation=270];
+  "94 /." -> "imbg16'";
+  "93 +" [shape=trapezium,orientation=270];
+  "93 +" -> "94 /." [label="imbg16_1"];
+  "92 *." [shape=trapezium,orientation=270];
+  "92 *." -> "93 +" [label="imbg16_2"];
+  "imbg16" -> "92 *.";
+  "91 *." [shape=trapezium,orientation=270];
+  "91 *." -> "93 +" [label="imtmp3"];
+  "87 -|" [shape=trapezium,orientation=270];
+  "87 -|" -> "105 thr" [label="immotion_6"];
+  "87 -|" -> "99 min" [label="immotion_6"];
+  "87 -|" -> "98 max" [label="immotion_6"];
+  "imbg" -> "87 -|";
+  "imstab" -> "87 -|";
+  "imstab" -> "91 *.";
+  "imstab" -> "120 *";
+
+  // external copies: 1
+  "imbg'" [shape=circle];
+  "imbg =" [shape=circle,label="=",style="dashed"]
+  "imbg16'" -> "imbg =";
+  "imbg =" -> "imbg'";
+}
+// graph for dag "vs_core_loop_helper_0_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_helper_0_0" {
+  // inputs
+
+  // outputs
+  "imbg16" [shape=circle];
+
+  // computation vertices
+  "54 C" [shape=trapezium,orientation=270];
+  "54 C" -> "imbg16";
+}
+// graph for dag "vs_core_loop_helper_3_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_helper_3_0" {
+  // inputs
+  "imbg" [shape=circle];
+  "imbg16" [shape=circle];
+  "imstab" [shape=circle];
+
+  // outputs
+  "immotion_6" [shape=circle];
+  "imbg16'" [shape=circle];
+
+  // computation vertices
+  "99 min" [shape=diamond];
+  "98 max" [shape=diamond];
+  "94 /." [shape=trapezium,orientation=270];
+  "94 /." -> "imbg16'";
+  "93 +" [shape=trapezium,orientation=270];
+  "93 +" -> "94 /." [label="imbg16_1"];
+  "92 *." [shape=trapezium,orientation=270];
+  "92 *." -> "93 +" [label="imbg16_2"];
+  "imbg16" -> "92 *.";
+  "91 *." [shape=trapezium,orientation=270];
+  "91 *." -> "93 +" [label="imtmp3"];
+  "87 -|" [shape=trapezium,orientation=270];
+  "87 -|" -> "99 min" [label="immotion_6"];
+  "87 -|" -> "98 max" [label="immotion_6"];
+  "87 -|" -> "immotion_6";
+  "imbg" -> "87 -|";
+  "imstab" -> "91 *.";
+  "imstab" -> "87 -|";
+}
+// graph for dag "vs_core_loop_helper_3_0_0" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_helper_3_0_0" {
+  // inputs
+  "imbg" [shape=circle];
+  "imbg16" [shape=circle];
+  "imstab" [shape=circle];
+
+  // outputs
+  "immotion_6" [shape=circle];
+  "imbg16'" [shape=circle];
+
+  // computation vertices
+  "94 /." [shape=trapezium,orientation=270];
+  "94 /." -> "imbg16'";
+  "93 +" [shape=trapezium,orientation=270];
+  "93 +" -> "94 /." [label="imbg16_1"];
+  "92 *." [shape=trapezium,orientation=270];
+  "92 *." -> "93 +" [label="imbg16_2"];
+  "imbg16" -> "92 *.";
+  "91 *." [shape=trapezium,orientation=270];
+  "91 *." -> "93 +" [label="imtmp3"];
+  "87 -|" [shape=trapezium,orientation=270];
+  "87 -|" -> "immotion_6";
+  "imbg" -> "87 -|";
+  "imstab" -> "91 *.";
+  "imstab" -> "87 -|";
+}
+// graph for dag "vs_core_loop_helper_3_1" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_helper_3_1" {
+  // inputs
+  "immotion_6" [shape=circle];
+  "imstab" [shape=circle];
+
+  // outputs
+  "immotion" [shape=circle];
+
+  // computation vertices
+  "120 *" [shape=trapezium,orientation=270];
+  "120 *" -> "immotion";
+  "imstab" -> "120 *";
+  "119 &." [shape=trapezium,orientation=270];
+  "119 &." -> "120 *" [label="immotion_1"];
+  "118 +." [shape=trapezium,orientation=270];
+  "118 +." -> "119 &." [label="immotion_2"];
+  "113 -" [shape=trapezium,orientation=270];
+  "113 -" -> "118 +." [label="immotion_3"];
+  "112 E8" [shape=box];
+  "112 E8" -> "113 -" [label="immotion_4"];
+  "111 D8" [shape=box];
+  "111 D8" -> "113 -" [label="imtmp"];
+  "107 D8" [shape=box];
+  "107 D8" -> "112 E8" [label="imtmp2"];
+  "107 D8" -> "111 D8" [label="imtmp2"];
+  "106 E8" [shape=box];
+  "106 E8" -> "107 D8" [label="imtmp2_1"];
+  "105 thr" [shape=parallelogram];
+  "105 thr" -> "106 E8" [label="immotion_5"];
+  "immotion_6" -> "105 thr";
+}
+// graph for dag "vs_core_loop_helper_3_1_2" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_helper_3_1_2" {
+  // inputs
+  "immotion_4" [shape=circle];
+  "imstab" [shape=circle];
+  "imtmp" [shape=circle];
+
+  // outputs
+  "immotion" [shape=circle];
+
+  // computation vertices
+  "120 *" [shape=trapezium,orientation=270];
+  "120 *" -> "immotion";
+  "imstab" -> "120 *";
+  "119 &." [shape=trapezium,orientation=270];
+  "119 &." -> "120 *" [label="immotion_1"];
+  "118 +." [shape=trapezium,orientation=270];
+  "118 +." -> "119 &." [label="immotion_2"];
+  "113 -" [shape=trapezium,orientation=270];
+  "113 -" -> "118 +." [label="immotion_3"];
+  "immotion_4" -> "113 -";
+  "imtmp" -> "113 -";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 3 ops and 0 copies, optimized to 1 ops and 0+1 copies
+
+// dag 1: 0 ops and 1 copies, optimized to 0 ops and 0+0 copies
+
+// dag 2: 0 ops and 1 copies, optimized to 0 ops and 0+1 copies
+
+// dag 3: 16 ops and 3 copies, optimized to 16 ops and 0+1 copies
+
+// helper function vs_core_loop_helper_3_0_0
+freia_status vs_core_loop_helper_3_0_0(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const freia_data2d * i2,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  call opencl kernel vs_core_loop_helper_3_0_0(o0, o1, i0, i1, i2, c0, c1, c2);
+  return FREIA_OK;
+}
+
+// helper function vs_core_loop_helper_3_1_2
+freia_status vs_core_loop_helper_3_1_2(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const freia_data2d * i2,
+  int32_t c0,
+  int32_t c1)
+{
+  call opencl kernel vs_core_loop_helper_3_1_2(o0, i0, i1, i2, c0, c1);
+  return FREIA_OK;
+}
+// freia opencl includes
+// generated opencl for function vs_core_loop
+
+// opencl for dag 0
+
+// opencl for dag 1
+
+// opencl for dag 2
+
+// opencl for dag 3
+
+// opencl function vs_core_loop_helper_3_0_0
+kernel vs_core_loop_helper_3_0_0(
+  opencl image o0,
+  opencl image o1,
+  const opencl image i0,
+  const opencl image i1,
+  const opencl image i2,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    register pixel in2 = i2[i];
+    // pixel computations
+    register pixel t87 = PIXEL_ABSDIFF(in2, in0);
+    register pixel t91 = PIXEL_MUL_CONST(in2, c0);
+    register pixel t92 = PIXEL_MUL_CONST(in1, c1);
+    register pixel t93 = PIXEL_ADD(t92, t91);
+    register pixel t94 = PIXEL_DIV_CONST(t93, c2);
+    // set output pixels
+    o0[i] = t87;
+    o1[i] = t94;
+  }
+}
+
+// opencl function vs_core_loop_helper_3_1_2
+kernel vs_core_loop_helper_3_1_2(
+  opencl image o0,
+  const opencl image i0,
+  const opencl image i1,
+  const opencl image i2,
+  int32_t c0,
+  int32_t c1)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    register pixel in2 = i2[i];
+    // pixel computations
+    register pixel t113 = PIXEL_SUB(in2, in0);
+    register pixel t118 = PIXEL_ADD_CONST(t113, c0);
+    register pixel t119 = PIXEL_AND_CONST(t118, c1);
+    register pixel t120 = PIXEL_MUL(in1, t119);
+    // set output pixels
+    o0[i] = t120;
+  }
+}
+
+! updated function
+
+int vs_core_loop(void)
+{
+   freia_dataio fdin;                                                   /*0006*/
+   freia_dataio fdmotion;                                               /*0007*/
+
+   freia_data2d *imcurrent;                                             /*0009*/
+   freia_data2d *imstab;                                                /*0011*/
+   freia_data2d *imtmp2;                                                /*0013*/
+   freia_data2d *imbg16;                                                /*0016*/
+   freia_data2d *imbg;                                                  /*0017*/
+   freia_data2d *immotion;                                              /*0018*/
+   freia_data2d *imtmp;                                                 /*0019*/
+
+   int32_t maxmotion, minmotion;                                        /*0021*/
+   register int32_t binvalue = 128;                                     /*0022*/
+
+   register int32_t xshiftacc, yshiftacc;                               /*0024*/
+   register freia_status end = 0;                                       /*0025*/
+   
+   
+   freia_initialize(0, (void *) 0);                                     /*0035*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0037*/
+
+   imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0039*/
+
+   imstab = freia_common_create_data(16, fdin.framewidth-20, fdin.frameheight-20);     /*0043*/
+   imtmp2 = freia_common_create_data(16, imstab->width, imstab->height);               /*0044*/
+
+   imbg16 = freia_common_create_data(16, imstab->width, imstab->height);               /*0048*/
+   imbg = freia_common_create_data(16, imstab->width, imstab->height);  /*0049*/
+   immotion = freia_common_create_data(16, imstab->width, imstab->height);             /*0050*/
+
+   freia_common_open_output(&fdmotion, 2, imstab->width, imstab->height, imstab->bpp);                /*0052*/
+   
+   // application start
+   xshiftacc = 0;                                                       /*0059*/
+   yshiftacc = 0;                                                       /*0060*/
+
+   freia_aipo_set_constant(imbg16, 0);
+   freia_aipo_copy(imbg, imbg16);
+
+   end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
+   
+   // video loop
+l99979:   ;                                                                    /*0065*/
+
+   if (end==0) {                                                        /*0067*/
+   }
+   else {
+      goto l99980;
+   }
+   
+   // stabilization
+   end = freia_common_rx_image(imcurrent, &fdin);                       /*0075*/
+
+   if (end!=0) goto l99980;                                             /*0077*/
+
+   freia_common_set_wa(imcurrent, xshiftacc+10, yshiftacc+10, fdin.framewidth-20, fdin.frameheight-20);              /*0079*/
+   freia_aipo_copy(imstab, imcurrent);
+   freia_common_reset_wa(imcurrent);                                    /*0081*/
+
+   imtmp = freia_common_create_data(immotion->bpp, immotion->widthWa, immotion->heightWa);            /*0109*/
+   
+   // constrast enhance
+   
+   // absolute difference background and current frame
+   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, 100);     /*0087*/
+   
+   // background update
+   
+   // measures
+   freia_aipo_global_max(immotion, &maxmotion);                         /*0098*/
+   freia_aipo_global_min(immotion, &minmotion);                         /*0099*/
+
+   if (maxmotion-minmotion>75)                                          /*0101*/
+      binvalue = 30*maxmotion/100;                                      /*0102*/
+   
+   // threshold
+   freia_aipo_threshold(immotion, immotion, binvalue, 255, 1);          /*0105*/
+   freia_aipo_erode_8c(imtmp2, immotion, freia_morpho_kernel_8c);       /*0106*/
+   freia_aipo_dilate_8c(imtmp2, imtmp2, freia_morpho_kernel_8c);        /*0107*/
+
+   freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
+   freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);
+   freia_aipo_copy(imbg, imbg16);
+   vs_core_loop_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
+   
+   // save contrast motion detection
+   
+   freia_common_destruct_data(imtmp);                                   /*0115*/
+   
+   // output image
+   freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
+
+   fprintf(stdout, "INFO: %s: ""frame %d processed\n", __FUNCTION__, fdin.frameindex);                /*0125*/
+   goto l99979;
+l99980:   ;
+   
+   // cleanup at end of application
+   freia_common_destruct_data(imcurrent);                               /*0130*/
+   freia_common_destruct_data(imstab);                                  /*0133*/
+   freia_common_destruct_data(imtmp2);                                  /*0134*/
+   freia_common_destruct_data(imbg16);                                  /*0137*/
+   freia_common_destruct_data(imbg);                                    /*0138*/
+   freia_common_destruct_data(immotion);                                /*0139*/
+
+   freia_common_close_input(&fdin);                                     /*0141*/
+   freia_common_close_output(&fdmotion);                                /*0142*/
+
+   freia_shutdown();                                                    /*0144*/
+   return 0;                                                            /*0145*/
+}
+
+! cleaned up function
+
+int vs_core_loop(void)
+{
+   freia_dataio fdin;                                                   /*0006*/
+   freia_dataio fdmotion;                                               /*0007*/
+
+   freia_data2d *imcurrent;                                             /*0009*/
+   freia_data2d *imstab;                                                /*0011*/
+   freia_data2d *imtmp2;                                                /*0013*/
+   freia_data2d *imbg16;                                                /*0016*/
+   freia_data2d *imbg;                                                  /*0017*/
+   freia_data2d *immotion;                                              /*0018*/
+   freia_data2d *imtmp;                                                 /*0019*/
+
+   int32_t maxmotion, minmotion;                                        /*0021*/
+   register int32_t binvalue = 128;                                     /*0022*/
+
+   register int32_t xshiftacc, yshiftacc;                               /*0024*/
+   register freia_status end = 0;                                       /*0025*/
+   
+   
+   freia_initialize(0, (void *) 0);                                     /*0035*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0037*/
+
+   imcurrent = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0039*/
+
+   imstab = freia_common_create_data(16, fdin.framewidth-20, fdin.frameheight-20);     /*0043*/
+   imtmp2 = freia_common_create_data(16, imstab->width, imstab->height);               /*0044*/
+
+   imbg16 = freia_common_create_data(16, imstab->width, imstab->height);               /*0048*/
+   imbg = freia_common_create_data(16, imstab->width, imstab->height);  /*0049*/
+   immotion = freia_common_create_data(16, imstab->width, imstab->height);             /*0050*/
+
+   freia_common_open_output(&fdmotion, 2, imstab->width, imstab->height, imstab->bpp);                /*0052*/
+   
+   // application start
+   xshiftacc = 0;                                                       /*0059*/
+   yshiftacc = 0;                                                       /*0060*/
+
+   freia_aipo_set_constant(imbg16, 0);
+   freia_aipo_copy(imbg, imbg16);
+
+   end = freia_common_rx_image(imcurrent, &fdin);                       /*0062*/
+l99998:   ;
+   
+   // video loop
+   ;                                                                    /*0065*/
+
+   if (end==0) {                                                        /*0067*/
+   }
+   else {
+      goto l99999;
+   }
+   
+   // stabilization
+   end = freia_common_rx_image(imcurrent, &fdin);                       /*0075*/
+
+   if (end!=0) goto l99999;                                             /*0077*/
+
+   freia_common_set_wa(imcurrent, 10, 10, fdin.framewidth-20, fdin.frameheight-20);    /*0079*/
+   freia_aipo_copy(imstab, imcurrent);
+   freia_common_reset_wa(imcurrent);                                    /*0081*/
+
+   imtmp = freia_common_create_data(immotion->bpp, immotion->widthWa, immotion->heightWa);            /*0109*/
+   
+   // constrast enhance
+   
+   // absolute difference background and current frame
+   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, 100);     /*0087*/
+   
+   // background update
+   
+   // measures
+   freia_aipo_global_max(immotion, &maxmotion);                         /*0098*/
+   freia_aipo_global_min(immotion, &minmotion);                         /*0099*/
+
+   if (maxmotion-minmotion>75)                                          /*0101*/
+      binvalue = 30*maxmotion/100;                                      /*0102*/
+   
+   // threshold
+   freia_aipo_threshold(immotion, immotion, binvalue, 255, 1);          /*0105*/
+   freia_aipo_erode_8c(imtmp2, immotion, freia_morpho_kernel_8c);       /*0106*/
+   freia_aipo_dilate_8c(imtmp2, imtmp2, freia_morpho_kernel_8c);        /*0107*/
+
+   freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
+   freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);
+   freia_aipo_copy(imbg, imbg16);
+   vs_core_loop_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
+   
+   // save contrast motion detection
+   
+   freia_common_destruct_data(imtmp);                                   /*0115*/
+   
+   // output image
+   freia_common_tx_image(immotion, &fdmotion);                          /*0123*/
+
+   fprintf(stdout, "INFO: %s: ""frame %d processed\n", __FUNCTION__, fdin.frameindex);                /*0125*/
+   goto l99998;
+l99999:   ;
+
+   
+   // cleanup at end of application
+   freia_common_destruct_data(imcurrent);                               /*0130*/
+   freia_common_destruct_data(imstab);                                  /*0133*/
+   freia_common_destruct_data(imtmp2);                                  /*0134*/
    freia_common_destruct_data(imbg16);                                  /*0137*/
    freia_common_destruct_data(imbg);                                    /*0138*/
    freia_common_destruct_data(immotion);                                /*0139*/

@@ -16,7 +16,7 @@ display PRINTED_FILE
 
 # This SHOULD be useless
 module DEAD1
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 
 echo
 echo After dead code elimination:

@@ -11,9 +11,6 @@ export PIPS_CHECK_FORTRAN
   Perform -v -m unknownrule FOO
   Build -v -m unknownrule BAR
   Delete unknownrule
-} 2>&1 | \
-	sed '/file *\//d;
-	     s,^[-/a-zA-Z0-9\.]*/pips , *some* pips ,;
-	     s,[-/a-zA-Z0-9\.]*/unknownrule.f , *some* unknownrule.f ,'
+} 2>&1 | grep 'safe_do_something'
 
 exit 0

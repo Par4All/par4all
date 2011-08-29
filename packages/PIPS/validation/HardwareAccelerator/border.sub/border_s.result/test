@@ -116,7 +116,7 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 1 ops (0 copies), optimized to 1 (0+0 copies)
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -128,10 +128,8 @@ freia_status border_s_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -176,9 +174,6 @@ freia_status border_s_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -272,6 +267,8 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 
 /* FREIA terapix helper function for module border_s
  *
@@ -463,6 +460,91 @@ void border_s(freia_data2d *out, freia_data2d *in)
    
    const int32_t kernel = {0, 0, 0, 0, 1, 0, 0, 1, 0};                  /*0007*/
    border_s_helper_0_0_0(out, in, kernel);                              /*0008*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+void border_s(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 1, 0, 0, 1, 0};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+
+! graphs
+
+// graph for dag "border_s_helper_0_0" of module "border_s" in dot format
+digraph "border_s_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_0" of module "border_s" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+// graph for dag "dag_cleaned_0" of module "border_s" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "8 E8" [shape=box];
+  "8 E8" -> "out";
+  "in" -> "8 E8";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function border_s
+
+// opencl for dag 0
+
+! updated function
+
+void border_s(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 1, 0, 0, 1, 0};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
+}
+
+! cleaned up function
+
+void border_s(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   const int32_t kernel = {0, 0, 0, 0, 1, 0, 0, 1, 0};                  /*0007*/
+   freia_aipo_erode_8c(out, in, kernel);                                /*0008*/
 }
 #
 # FREIA COMPILATION DONE

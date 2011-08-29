@@ -176,7 +176,7 @@ digraph "freia_reuse_00_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 4 ops (0 copies), optimized to 4 (0+0 copies)
+// dag 0: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -188,10 +188,8 @@ freia_status freia_reuse_00_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -266,9 +264,6 @@ freia_status freia_reuse_00_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -400,6 +395,8 @@ digraph "freia_reuse_00_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_reuse_00
  *
@@ -650,6 +647,139 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
    
    
+   return 0;                                                            /*0019*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   // reuse same variable over and over
+   // t = E6(i)
+   // t = D6(t)
+   // t = E8(t)
+   // o = D8(t)
+   freia_aipo_erode_6c(t, i, k);                                        /*0012*/
+   freia_aipo_dilate_6c(t, t, k);                                       /*0013*/
+   freia_aipo_erode_8c(t, t, k);                                        /*0014*/
+   freia_aipo_dilate_8c(o, t, k);                                       /*0015*/
+
+   freia_common_destruct_data(t);                                       /*0017*/
+
+   return FREIA_OK;                                                     /*0019*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_reuse_00" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "15 D8" [shape=box];
+  "15 D8" -> "o";
+  "14 E8" [shape=box];
+  "14 E8" -> "15 D8" [label="t"];
+  "13 D6" [shape=box];
+  "13 D6" -> "14 E8" [label="t"];
+  "12 E6" [shape=box];
+  "12 E6" -> "13 D6" [label="t"];
+  "i" -> "12 E6";
+}
+// graph for dag "dag_cleaned_0" of module "freia_reuse_00" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "15 D8" [shape=box];
+  "15 D8" -> "o";
+  "14 E8" [shape=box];
+  "14 E8" -> "15 D8" [label="t"];
+  "13 D6" [shape=box];
+  "13 D6" -> "14 E8" [label="t_1"];
+  "12 E6" [shape=box];
+  "12 E6" -> "13 D6" [label="t_2"];
+  "i" -> "12 E6";
+}
+// graph for dag "freia_reuse_00_helper_0_0" of module "freia_reuse_00" in dot format
+digraph "freia_reuse_00_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "15 D8" [shape=box];
+  "15 D8" -> "o";
+  "14 E8" [shape=box];
+  "14 E8" -> "15 D8" [label="t"];
+  "13 D6" [shape=box];
+  "13 D6" -> "14 E8" [label="t_1"];
+  "12 E6" [shape=box];
+  "12 E6" -> "13 D6" [label="t_2"];
+  "i" -> "12 E6";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function freia_reuse_00
+
+// opencl for dag 0
+
+! updated function
+
+freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   // reuse same variable over and over
+   // t = E6(i)
+   // t = D6(t)
+   // t = E8(t)
+   // o = D8(t)
+   freia_aipo_erode_6c(t, i, k);                                        /*0012*/
+   freia_aipo_dilate_6c(t, t, k);                                       /*0013*/
+   freia_aipo_erode_8c(t, t, k);                                        /*0014*/
+   freia_aipo_dilate_8c(o, t, k);                                       /*0015*/
+
+   freia_common_destruct_data(t);                                       /*0017*/
+
+   return FREIA_OK;                                                     /*0019*/
+}
+
+! cleaned up function
+
+freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   // reuse same variable over and over
+   // t = E6(i)
+   // t = D6(t)
+   // t = E8(t)
+   // o = D8(t)
+   freia_aipo_erode_6c(t, i, k);                                        /*0012*/
+   freia_aipo_dilate_6c(t, t, k);                                       /*0013*/
+   freia_aipo_erode_8c(t, t, k);                                        /*0014*/
+   freia_aipo_dilate_8c(o, t, k);                                       /*0015*/
+
+   freia_common_destruct_data(t);                                       /*0017*/
+
    return 0;                                                            /*0019*/
 }
 #

@@ -18,7 +18,7 @@ display PARSED_PRINTED_FILE[main_hello_world!]
 display PARSED_PRINTED_FILE[main]
 
 apply UNSPLIT
-shell cc -c main_hello_world.database/Src/main_hello_world.c -o main_hello_world.database/Src/main_hello_world.o
+shell pips_validation_exe.sh -c -g main_hello_world
 
 close
 

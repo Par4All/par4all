@@ -177,7 +177,7 @@ digraph "gradient_thick_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops (0 copies), optimized to 3 (0+0 copies)
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -189,10 +189,8 @@ freia_status gradient_thick_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -253,9 +251,6 @@ freia_status gradient_thick_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -390,6 +385,8 @@ digraph "gradient_thick_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
 
 /* FREIA terapix helper function for module gradient_thick
  *
@@ -622,6 +619,142 @@ freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
    
    /* images destruction */
    
+   return 0;                                                            /*0020*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   freia_data2d *erode = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *dilate = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
+   int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
+   
+   /* gradient thick using aipo calls*/
+   freia_aipo_erode_8c(erode, in, kernel);                              /*0011*/
+   freia_aipo_dilate_8c(dilate, in, kernel);                            /*0012*/
+   freia_aipo_sub(out, dilate, erode);                                  /*0013*/
+   // freia_aipo_not(imout, imin);
+   
+   /* images destruction */
+   freia_common_destruct_data(erode);                                   /*0017*/
+   freia_common_destruct_data(dilate);                                  /*0018*/
+
+   return FREIA_OK;                                                     /*0020*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "gradient_thick" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "out";
+  "12 D8" [shape=box];
+  "12 D8" -> "13 -" [label="dilate"];
+  "11 E8" [shape=box];
+  "11 E8" -> "13 -" [label="erode"];
+  "in" -> "12 D8";
+  "in" -> "11 E8";
+}
+// graph for dag "dag_cleaned_0" of module "gradient_thick" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "out";
+  "12 D8" [shape=box];
+  "12 D8" -> "13 -" [label="dilate"];
+  "11 E8" [shape=box];
+  "11 E8" -> "13 -" [label="erode"];
+  "in" -> "12 D8";
+  "in" -> "11 E8";
+}
+// graph for dag "gradient_thick_helper_0_0" of module "gradient_thick" in dot format
+digraph "gradient_thick_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "out";
+  "12 D8" [shape=box];
+  "12 D8" -> "13 -" [label="dilate"];
+  "11 E8" [shape=box];
+  "11 E8" -> "13 -" [label="erode"];
+  "in" -> "12 D8";
+  "in" -> "11 E8";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function gradient_thick
+
+// opencl for dag 0
+
+! updated function
+
+freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   freia_data2d *erode = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *dilate = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
+   int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
+   
+   /* gradient thick using aipo calls*/
+   freia_aipo_erode_8c(erode, in, kernel);                              /*0011*/
+   freia_aipo_dilate_8c(dilate, in, kernel);                            /*0012*/
+   freia_aipo_sub(out, dilate, erode);                                  /*0013*/
+   // freia_aipo_not(imout, imin);
+   
+   /* images destruction */
+   freia_common_destruct_data(erode);                                   /*0017*/
+   freia_common_destruct_data(dilate);                                  /*0018*/
+
+   return FREIA_OK;                                                     /*0020*/
+}
+
+! cleaned up function
+
+freia_status gradient_thick(freia_data2d *out, freia_data2d *in)
+{
+   
+   
+   freia_data2d *erode = freia_common_create_data(in->bpp, in->widthWa, in->heightWa), *dilate = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);    /*0007*/
+   int32_t kernel[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};                     /*0008*/
+   
+   /* gradient thick using aipo calls*/
+   freia_aipo_erode_8c(erode, in, kernel);                              /*0011*/
+   freia_aipo_dilate_8c(dilate, in, kernel);                            /*0012*/
+   freia_aipo_sub(out, dilate, erode);                                  /*0013*/
+   // freia_aipo_not(imout, imin);
+   
+   /* images destruction */
+   freia_common_destruct_data(erode);                                   /*0017*/
+   freia_common_destruct_data(dilate);                                  /*0018*/
+
    return 0;                                                            /*0020*/
 }
 #

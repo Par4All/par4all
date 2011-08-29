@@ -117,7 +117,7 @@ digraph "my_subsat_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 1 ops (0 copies), optimized to 1 (0+0 copies)
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -129,13 +129,10 @@ freia_status my_subsat_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -177,9 +174,6 @@ freia_status my_subsat_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -270,6 +264,8 @@ digraph "my_subsat_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 
 /* FREIA terapix helper function for module my_subsat
  *
@@ -431,6 +427,88 @@ freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    return my_subsat_helper_0_0_0(o, i0, i1);                            /*0005*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_subsat(o, i0, i1);                                 /*0005*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_subsat" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 -s" [shape=trapezium,orientation=270];
+  "5 -s" -> "o";
+  "i1" -> "5 -s";
+  "i0" -> "5 -s";
+}
+// graph for dag "dag_cleaned_0" of module "my_subsat" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 -s" [shape=trapezium,orientation=270];
+  "5 -s" -> "o";
+  "i1" -> "5 -s";
+  "i0" -> "5 -s";
+}
+// graph for dag "my_subsat_helper_0_0" of module "my_subsat" in dot format
+digraph "my_subsat_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "5 -s" [shape=trapezium,orientation=270];
+  "5 -s" -> "o";
+  "i1" -> "5 -s";
+  "i0" -> "5 -s";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function my_subsat
+
+// opencl for dag 0
+
+! updated function
+
+freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_subsat(o, i0, i1);                                 /*0005*/
+}
+
+! cleaned up function
+
+freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_subsat(o, i0, i1);                                 /*0005*/
 }
 #
 # FREIA COMPILATION DONE

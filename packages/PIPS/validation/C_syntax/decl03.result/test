@@ -48,3 +48,6 @@ int a[] = {1, 2, 3};
 Printed file
 
 int a[] = {1, 2, 3};
+#
+# compile generated decl03
+#

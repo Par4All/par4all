@@ -14,5 +14,6 @@ apply UNSPLIT
 
 shell pips_validation_exe.sh -e 1 altret06
 
+close
 delete altret06
 quit

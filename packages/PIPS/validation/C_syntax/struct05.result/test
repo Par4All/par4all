@@ -14,3 +14,6 @@ union u_u {
    struct s d;
    int i;
 } u;
+#
+# compile generated struct05
+#

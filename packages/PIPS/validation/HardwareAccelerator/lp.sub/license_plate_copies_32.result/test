@@ -723,13 +723,13 @@ int license_plate_copies(void)
    const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
 
    freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
-   freia_status ret_0;                                                  /*0029*/
+   freia_status ret_0 = 0;                                              /*0029*/
    int i_0;                                                             /*0030*/
-   freia_status ret_1;                                                  /*0032*/
+   freia_status ret_1 = 0;                                              /*0032*/
    int i_1;                                                             /*0033*/
-   freia_status ret_2;                                                  /*0035*/
+   freia_status ret_2 = 0;                                              /*0035*/
    int i_2;                                                             /*0036*/
-   freia_status ret_3;                                                  /*0038*/
+   freia_status ret_3 = 0;                                              /*0038*/
    int i_3, i_4;                                                        /*0039*/
    
    /* open videos flow */
@@ -767,105 +767,59 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= freia_aipo_erode_8c(imopen, in, kernel1x3);                 /*0064*/
-   ret_0 |= 0;                                                          /*0065*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0066*/
-   ret_0 |= 0;                                                          /*0067*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0068*/
-   ret_0 |= 0;                                                          /*0069*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0070*/
-   ret_0 |= 0;                                                          /*0071*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0072*/
-   ret_0 |= 0;                                                          /*0073*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0074*/
-   ret_0 |= 0;                                                          /*0075*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0076*/
-   ret_0 |= 0;                                                          /*0077*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0078*/
-   ret_0 |= 0;                                                          /*0079*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0080*/
-   ret_0 |= 0;                                                          /*0081*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0082*/
-   ret_0 |= 0;                                                          /*0083*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0084*/
-   ret_0 |= 0;                                                          /*0085*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0086*/
-   ret_0 |= 0;                                                          /*0087*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0088*/
-   ret_0 |= 0;                                                          /*0089*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0090*/
-   ret_0 |= 0;                                                          /*0091*/
-   ret_0 |= freia_aipo_erode_8c(imopen, imopen, kernel1x3);             /*0092*/
-   ret_0 |= 0;                                                          /*0093*/
+   freia_aipo_erode_8c(imopen, in, kernel1x3);                          /*0064*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0066*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0068*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0070*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0072*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0074*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0076*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0078*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0080*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0082*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0084*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0086*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0088*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0090*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0092*/
 
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0096*/
-   ret_0 |= 0;                                                          /*0097*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0098*/
-   ret_0 |= 0;                                                          /*0099*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0100*/
-   ret_0 |= 0;                                                          /*0101*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0102*/
-   ret_0 |= 0;                                                          /*0103*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0104*/
-   ret_0 |= 0;                                                          /*0105*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0106*/
-   ret_0 |= 0;                                                          /*0107*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0108*/
-   ret_0 |= 0;                                                          /*0109*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0110*/
-   ret_0 |= 0;                                                          /*0111*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0112*/
-   ret_0 |= 0;                                                          /*0113*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0114*/
-   ret_0 |= 0;                                                          /*0115*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0116*/
-   ret_0 |= 0;                                                          /*0117*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0118*/
-   ret_0 |= 0;                                                          /*0119*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0120*/
-   ret_0 |= 0;                                                          /*0121*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0122*/
-   ret_0 |= 0;                                                          /*0123*/
-   ret_0 |= freia_aipo_dilate_8c(imopen, imopen, kernel1x3);            /*0124*/
-   ret_0 |= 0;                                                          /*0125*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0096*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0098*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0100*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0102*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0104*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0106*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0108*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0110*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0112*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0114*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0116*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0118*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0120*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0122*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0124*/
 
    _return1 = ret_0;                                                    /*0130*/
 
    ret_1 = 0;                                                           /*0134*/
 
-   ret_1 |= freia_aipo_dilate_8c(imclose, in, kernel1x3);               /*0136*/
-   ret_1 |= 0;                                                          /*0137*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0138*/
-   ret_1 |= 0;                                                          /*0139*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0140*/
-   ret_1 |= 0;                                                          /*0141*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0142*/
-   ret_1 |= 0;                                                          /*0143*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0144*/
-   ret_1 |= 0;                                                          /*0145*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0146*/
-   ret_1 |= 0;                                                          /*0147*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0148*/
-   ret_1 |= 0;                                                          /*0149*/
-   ret_1 |= freia_aipo_dilate_8c(imclose, imclose, kernel1x3);          /*0150*/
-   ret_1 |= 0;                                                          /*0151*/
+   freia_aipo_dilate_8c(imclose, in, kernel1x3);                        /*0136*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0138*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0140*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0142*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0144*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0146*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0148*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0150*/
 
-   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0154*/
-   ret_1 |= 0;                                                          /*0155*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0156*/
-   ret_1 |= 0;                                                          /*0157*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0158*/
-   ret_1 |= 0;                                                          /*0159*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0160*/
-   ret_1 |= 0;                                                          /*0161*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0162*/
-   ret_1 |= 0;                                                          /*0163*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0164*/
-   ret_1 |= 0;                                                          /*0165*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0166*/
-   ret_1 |= 0;                                                          /*0167*/
-   ret_1 |= freia_aipo_erode_8c(imclose, imclose, kernel1x3);           /*0168*/
-   ret_1 |= 0;                                                          /*0169*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0154*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0156*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0158*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0160*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0162*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0164*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0166*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0168*/
 
    _return0 = ret_1;                                                    /*0174*/
 
@@ -876,45 +830,29 @@ int license_plate_copies(void)
 
    ret_2 = 0;                                                           /*0183*/
 
-   ret_2 |= freia_aipo_erode_8c(imfilt, imand, kernel3x1);              /*0185*/
-   ret_2 |= 0;                                                          /*0186*/
-   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0187*/
-   ret_2 |= 0;                                                          /*0188*/
-   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0189*/
-   ret_2 |= 0;                                                          /*0190*/
-   ret_2 |= freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);             /*0191*/
-   ret_2 |= 0;                                                          /*0192*/
+   freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0185*/
+   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0187*/
+   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0189*/
+   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0191*/
 
-   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0195*/
-   ret_2 |= 0;                                                          /*0196*/
-   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0197*/
-   ret_2 |= 0;                                                          /*0198*/
-   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0199*/
-   ret_2 |= 0;                                                          /*0200*/
-   ret_2 |= freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);            /*0201*/
-   ret_2 |= 0;                                                          /*0202*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0195*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0197*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0199*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0201*/
 
    _return2 = ret_2;                                                    /*0207*/
 
    ret_3 = 0;                                                           /*0211*/
 
-   ret_3 |= freia_aipo_erode_8c(imout, imfilt, kernel1x3);              /*0213*/
-   ret_3 |= 0;                                                          /*0214*/
-   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0215*/
-   ret_3 |= 0;                                                          /*0216*/
-   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0217*/
-   ret_3 |= 0;                                                          /*0218*/
-   ret_3 |= freia_aipo_erode_8c(imout, imout, kernel1x3);               /*0219*/
-   ret_3 |= 0;                                                          /*0220*/
+   freia_aipo_erode_8c(imout, imfilt, kernel1x3);                       /*0213*/
+   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0215*/
+   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0217*/
+   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0219*/
 
-   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0223*/
-   ret_3 |= 0;                                                          /*0224*/
-   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0225*/
-   ret_3 |= 0;                                                          /*0226*/
-   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0227*/
-   ret_3 |= 0;                                                          /*0228*/
-   ret_3 |= freia_aipo_dilate_8c(imout, imout, kernel1x3);              /*0229*/
-   ret_3 |= 0;                                                          /*0230*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0223*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0225*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0227*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0229*/
 
    _return3 = ret_3;                                                    /*0235*/
 
@@ -1817,7 +1755,7 @@ digraph "license_plate_copies_helper_0_1" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 135 ops (66 copies), optimized to 69 (0+0 copies)
+// dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0 copies
 // split 0: 2 cuts
 // split 1: 1 cut
 // # SPOC calls: 3
@@ -1837,10 +1775,8 @@ freia_status license_plate_copies_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -2481,9 +2417,6 @@ freia_status license_plate_copies_helper_0_0_0(
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
@@ -2503,10 +2436,8 @@ freia_status license_plate_copies_helper_0_0_1(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -2770,9 +2701,6 @@ freia_status license_plate_copies_helper_0_0_1(
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
@@ -2790,13 +2718,10 @@ freia_status license_plate_copies_helper_0_1_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -2887,9 +2812,6 @@ freia_status license_plate_copies_helper_0_1_0(
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
@@ -2914,11 +2836,11 @@ int license_plate_copies(void)
    const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
 
    freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
-   freia_status ret_0;                                                  /*0029*/
+   freia_status ret_0 = 0;                                              /*0029*/
    int i_0;                                                             /*0030*/
    freia_status ret_1;                                                  /*0032*/
    int i_1;                                                             /*0033*/
-   freia_status ret_2;                                                  /*0035*/
+   freia_status ret_2 = 0;                                              /*0035*/
    int i_2;                                                             /*0036*/
    freia_status ret_3;                                                  /*0038*/
    int i_3, i_4;                                                        /*0039*/
@@ -2952,152 +2874,30 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= license_plate_copies_helper_0_0_0(imfilt, in, kernel1x3, 1, 50, 1, 150, 255, 1, kernel3x1);              /*0064*/
-   ret_0 |= 0;                                                          /*0065*/
-   ret_0 |= 0;                                                          /*0066*/
-   ret_0 |= 0;                                                          /*0067*/
-   ret_0 |= 0;                                                          /*0068*/
-   ret_0 |= 0;                                                          /*0069*/
-   ret_0 |= 0;                                                          /*0070*/
-   ret_0 |= 0;                                                          /*0071*/
-   ret_0 |= 0;                                                          /*0072*/
-   ret_0 |= 0;                                                          /*0073*/
-   ret_0 |= 0;                                                          /*0074*/
-   ret_0 |= 0;                                                          /*0075*/
-   ret_0 |= 0;                                                          /*0076*/
-   ret_0 |= 0;                                                          /*0077*/
-   ret_0 |= 0;                                                          /*0078*/
-   ret_0 |= 0;                                                          /*0079*/
-   ret_0 |= 0;                                                          /*0080*/
-   ret_0 |= 0;                                                          /*0081*/
-   ret_0 |= 0;                                                          /*0082*/
-   ret_0 |= 0;                                                          /*0083*/
-   ret_0 |= 0;                                                          /*0084*/
-   ret_0 |= 0;                                                          /*0085*/
-   ret_0 |= 0;                                                          /*0086*/
-   ret_0 |= 0;                                                          /*0087*/
-   ret_0 |= 0;                                                          /*0088*/
-   ret_0 |= 0;                                                          /*0089*/
-   ret_0 |= 0;                                                          /*0090*/
-   ret_0 |= 0;                                                          /*0091*/
-   ret_0 |= 0;                                                          /*0092*/
-   ret_0 |= 0;                                                          /*0093*/
-
-   ret_0 |= 0;                                                          /*0096*/
-   ret_0 |= 0;                                                          /*0097*/
-   ret_0 |= 0;                                                          /*0098*/
-   ret_0 |= 0;                                                          /*0099*/
-   ret_0 |= 0;                                                          /*0100*/
-   ret_0 |= 0;                                                          /*0101*/
-   ret_0 |= 0;                                                          /*0102*/
-   ret_0 |= 0;                                                          /*0103*/
-   ret_0 |= 0;                                                          /*0104*/
-   ret_0 |= 0;                                                          /*0105*/
-   ret_0 |= 0;                                                          /*0106*/
-   ret_0 |= 0;                                                          /*0107*/
-   ret_0 |= 0;                                                          /*0108*/
-   ret_0 |= 0;                                                          /*0109*/
-   ret_0 |= 0;                                                          /*0110*/
-   ret_0 |= 0;                                                          /*0111*/
-   ret_0 |= 0;                                                          /*0112*/
-   ret_0 |= 0;                                                          /*0113*/
-   ret_0 |= 0;                                                          /*0114*/
-   ret_0 |= 0;                                                          /*0115*/
-   ret_0 |= 0;                                                          /*0116*/
-   ret_0 |= 0;                                                          /*0117*/
-   ret_0 |= 0;                                                          /*0118*/
-   ret_0 |= 0;                                                          /*0119*/
-   ret_0 |= 0;                                                          /*0120*/
-   ret_0 |= 0;                                                          /*0121*/
-   ret_0 |= 0;                                                          /*0122*/
-   ret_0 |= 0;                                                          /*0123*/
-   ret_0 |= 0;                                                          /*0124*/
-   ret_0 |= 0;                                                          /*0125*/
-
+   license_plate_copies_helper_0_0_0(imfilt, in, kernel1x3, 1, 50, 1, 150, 255, 1, kernel3x1);        /*0064*/
+   
+   
    _return1 = ret_0;                                                    /*0130*/
 
    ret_1 = 0;                                                           /*0134*/
-
-   ret_1 |= 0;                                                          /*0136*/
-   ret_1 |= 0;                                                          /*0137*/
-   ret_1 |= 0;                                                          /*0138*/
-   ret_1 |= 0;                                                          /*0139*/
-   ret_1 |= 0;                                                          /*0140*/
-   ret_1 |= 0;                                                          /*0141*/
-   ret_1 |= 0;                                                          /*0142*/
-   ret_1 |= 0;                                                          /*0143*/
-   ret_1 |= 0;                                                          /*0144*/
-   ret_1 |= 0;                                                          /*0145*/
-   ret_1 |= 0;                                                          /*0146*/
-   ret_1 |= 0;                                                          /*0147*/
-   ret_1 |= 0;                                                          /*0148*/
-   ret_1 |= 0;                                                          /*0149*/
-   ret_1 |= 0;                                                          /*0150*/
-   ret_1 |= 0;                                                          /*0151*/
-
-   ret_1 |= 0;                                                          /*0154*/
-   ret_1 |= 0;                                                          /*0155*/
-   ret_1 |= 0;                                                          /*0156*/
-   ret_1 |= 0;                                                          /*0157*/
-   ret_1 |= 0;                                                          /*0158*/
-   ret_1 |= 0;                                                          /*0159*/
-   ret_1 |= 0;                                                          /*0160*/
-   ret_1 |= 0;                                                          /*0161*/
-   ret_1 |= 0;                                                          /*0162*/
-   ret_1 |= 0;                                                          /*0163*/
-   ret_1 |= 0;                                                          /*0164*/
-   ret_1 |= 0;                                                          /*0165*/
-   ret_1 |= 0;                                                          /*0166*/
-   ret_1 |= 0;                                                          /*0167*/
-   ret_1 |= 0;                                                          /*0168*/
-   ret_1 |= 0;                                                          /*0169*/
-
+   
+   
+   
    _return0 = ret_1;                                                    /*0174*/
    
    
    
    ret_2 = 0;                                                           /*0183*/
 
-   ret_2 |= 0;                                                          /*0185*/
-   ret_2 |= 0;                                                          /*0186*/
-   ret_2 |= license_plate_copies_helper_0_0_1(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);            /*0187*/
-   ret_2 |= 0;                                                          /*0188*/
-   ret_2 |= 0;                                                          /*0189*/
-   ret_2 |= 0;                                                          /*0190*/
-   ret_2 |= 0;                                                          /*0191*/
-   ret_2 |= 0;                                                          /*0192*/
-
-   ret_2 |= 0;                                                          /*0195*/
-   ret_2 |= 0;                                                          /*0196*/
-   ret_2 |= 0;                                                          /*0197*/
-   ret_2 |= 0;                                                          /*0198*/
-   ret_2 |= 0;                                                          /*0199*/
-   ret_2 |= 0;                                                          /*0200*/
-   ret_2 |= 0;                                                          /*0201*/
-   ret_2 |= 0;                                                          /*0202*/
-
+   license_plate_copies_helper_0_0_1(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);      /*0187*/
+   
+   
    _return2 = ret_2;                                                    /*0207*/
 
    ret_3 = 0;                                                           /*0211*/
-
-   ret_3 |= 0;                                                          /*0213*/
-   ret_3 |= 0;                                                          /*0214*/
-   ret_3 |= 0;                                                          /*0215*/
-   ret_3 |= 0;                                                          /*0216*/
-   ret_3 |= 0;                                                          /*0217*/
-   ret_3 |= 0;                                                          /*0218*/
-   ret_3 |= 0;                                                          /*0219*/
-   ret_3 |= 0;                                                          /*0220*/
-
-   ret_3 |= 0;                                                          /*0223*/
-   ret_3 |= 0;                                                          /*0224*/
-   ret_3 |= 0;                                                          /*0225*/
-   ret_3 |= 0;                                                          /*0226*/
-   ret_3 |= 0;                                                          /*0227*/
-   ret_3 |= 0;                                                          /*0228*/
-   ret_3 |= 0;                                                          /*0229*/
-   ret_3 |= 0;                                                          /*0230*/
-
+   
+   
+   
    _return3 = ret_3;                                                    /*0235*/
    
    
@@ -3135,11 +2935,11 @@ int license_plate_copies(void)
    const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
 
    freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
-   freia_status ret_0;                                                  /*0029*/
+   freia_status ret_0 = 0;                                              /*0029*/
    int i_0;                                                             /*0030*/
    freia_status ret_1;                                                  /*0032*/
    int i_1;                                                             /*0033*/
-   freia_status ret_2;                                                  /*0035*/
+   freia_status ret_2 = 0;                                              /*0035*/
    int i_2;                                                             /*0036*/
    freia_status ret_3;                                                  /*0038*/
    int i_3, i_4;                                                        /*0039*/
@@ -3173,7 +2973,7 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= license_plate_copies_helper_0_0_0(imfilt, in, kernel1x3, 1, 50, 1, 150, 255, 1, kernel3x1);              /*0064*/
+   license_plate_copies_helper_0_0_0(imfilt, in, kernel1x3, 1, 50, 1, 150, 255, 1, kernel3x1);        /*0064*/
    
    
    _return1 = ret_0;                                                    /*0130*/
@@ -3188,7 +2988,7 @@ int license_plate_copies(void)
    
    ret_2 = 0;                                                           /*0183*/
 
-   ret_2 |= license_plate_copies_helper_0_0_1(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);            /*0187*/
+   license_plate_copies_helper_0_0_1(out, imfilt, kernel3x1, kernel1x3, freia_morpho_kernel_8c);      /*0187*/
    
    
    _return2 = ret_2;                                                    /*0207*/
@@ -4392,6 +4192,8 @@ digraph "license_plate_copies_helper_0_0_9" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0 copies
 
 /* FREIA terapix helper function for module license_plate_copies
  *
@@ -9990,13 +9792,13 @@ int license_plate_copies(void)
    const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
 
    freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
-   freia_status ret_0;                                                  /*0029*/
+   freia_status ret_0 = 0;                                              /*0029*/
    int i_0;                                                             /*0030*/
    freia_status ret_1;                                                  /*0032*/
    int i_1;                                                             /*0033*/
-   freia_status ret_2;                                                  /*0035*/
+   freia_status ret_2 = 0;                                              /*0035*/
    int i_2;                                                             /*0036*/
-   freia_status ret_3;                                                  /*0038*/
+   freia_status ret_3 = 0;                                              /*0038*/
    int i_3, i_4;                                                        /*0039*/
    
    /* open videos flow */
@@ -10032,151 +9834,53 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);         /*0064*/
-   ret_0 |= 0;                                                          /*0065*/
-   ret_0 |= license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);           /*0066*/
-   ret_0 |= 0;                                                          /*0067*/
-   ret_0 |= 0;                                                          /*0068*/
-   ret_0 |= 0;                                                          /*0069*/
-   ret_0 |= license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);           /*0070*/
-   ret_0 |= 0;                                                          /*0071*/
-   ret_0 |= 0;                                                          /*0072*/
-   ret_0 |= 0;                                                          /*0073*/
-   ret_0 |= license_plate_copies_helper_0_0_3(imopen, imclose, imclose, imopen, kernel1x3);           /*0074*/
-   ret_0 |= 0;                                                          /*0075*/
-   ret_0 |= 0;                                                          /*0076*/
-   ret_0 |= 0;                                                          /*0077*/
-   ret_0 |= license_plate_copies_helper_0_0_4(imopen, imclose, imclose, imopen, kernel1x3);           /*0078*/
-   ret_0 |= 0;                                                          /*0079*/
-   ret_0 |= 0;                                                          /*0080*/
-   ret_0 |= 0;                                                          /*0081*/
-   ret_0 |= license_plate_copies_helper_0_0_5(imopen, imclose, imclose, imopen, kernel1x3);           /*0082*/
-   ret_0 |= 0;                                                          /*0083*/
-   ret_0 |= 0;                                                          /*0084*/
-   ret_0 |= 0;                                                          /*0085*/
-   ret_0 |= license_plate_copies_helper_0_0_6(imopen, imclose, imclose, imopen, kernel1x3);           /*0086*/
-   ret_0 |= 0;                                                          /*0087*/
-   ret_0 |= 0;                                                          /*0088*/
-   ret_0 |= 0;                                                          /*0089*/
-   ret_0 |= license_plate_copies_helper_0_0_7(imopen, imclose, imclose, imopen, kernel1x3);           /*0090*/
-   ret_0 |= 0;                                                          /*0091*/
-   ret_0 |= 0;                                                          /*0092*/
-   ret_0 |= 0;                                                          /*0093*/
+   license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);   /*0064*/
+   license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);     /*0066*/
+   license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);     /*0070*/
+   license_plate_copies_helper_0_0_3(imopen, imclose, imclose, imopen, kernel1x3);     /*0074*/
+   license_plate_copies_helper_0_0_4(imopen, imclose, imclose, imopen, kernel1x3);     /*0078*/
+   license_plate_copies_helper_0_0_5(imopen, imclose, imclose, imopen, kernel1x3);     /*0082*/
+   license_plate_copies_helper_0_0_6(imopen, imclose, imclose, imopen, kernel1x3);     /*0086*/
+   license_plate_copies_helper_0_0_7(imopen, imclose, imclose, imopen, kernel1x3);     /*0090*/
 
-   ret_0 |= license_plate_copies_helper_0_0_8(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);           /*0096*/
-   ret_0 |= 0;                                                          /*0097*/
-   ret_0 |= 0;                                                          /*0098*/
-   ret_0 |= 0;                                                          /*0099*/
-   ret_0 |= license_plate_copies_helper_0_0_9(imopen, imopen, kernel1x3);              /*0100*/
-   ret_0 |= 0;                                                          /*0101*/
-   ret_0 |= 0;                                                          /*0102*/
-   ret_0 |= 0;                                                          /*0103*/
-   ret_0 |= license_plate_copies_helper_0_0_10(imopen, imopen, kernel1x3);             /*0104*/
-   ret_0 |= 0;                                                          /*0105*/
-   ret_0 |= 0;                                                          /*0106*/
-   ret_0 |= 0;                                                          /*0107*/
-   ret_0 |= license_plate_copies_helper_0_0_11(imopen, imopen, kernel1x3);             /*0108*/
-   ret_0 |= 0;                                                          /*0109*/
-   ret_0 |= 0;                                                          /*0110*/
-   ret_0 |= 0;                                                          /*0111*/
-   ret_0 |= license_plate_copies_helper_0_0_12(imopen, imopen, kernel1x3);             /*0112*/
-   ret_0 |= 0;                                                          /*0113*/
-   ret_0 |= 0;                                                          /*0114*/
-   ret_0 |= 0;                                                          /*0115*/
-   ret_0 |= license_plate_copies_helper_0_0_13(imopen, imopen, kernel1x3);             /*0116*/
-   ret_0 |= 0;                                                          /*0117*/
-   ret_0 |= 0;                                                          /*0118*/
-   ret_0 |= 0;                                                          /*0119*/
-   ret_0 |= license_plate_copies_helper_0_0_14(imopen, imopen, kernel1x3);             /*0120*/
-   ret_0 |= 0;                                                          /*0121*/
-   ret_0 |= 0;                                                          /*0122*/
-   ret_0 |= 0;                                                          /*0123*/
-   ret_0 |= license_plate_copies_helper_0_0_15(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);           /*0124*/
-   ret_0 |= 0;                                                          /*0125*/
+   license_plate_copies_helper_0_0_8(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);     /*0096*/
+   license_plate_copies_helper_0_0_9(imopen, imopen, kernel1x3);        /*0100*/
+   license_plate_copies_helper_0_0_10(imopen, imopen, kernel1x3);       /*0104*/
+   license_plate_copies_helper_0_0_11(imopen, imopen, kernel1x3);       /*0108*/
+   license_plate_copies_helper_0_0_12(imopen, imopen, kernel1x3);       /*0112*/
+   license_plate_copies_helper_0_0_13(imopen, imopen, kernel1x3);       /*0116*/
+   license_plate_copies_helper_0_0_14(imopen, imopen, kernel1x3);       /*0120*/
+   license_plate_copies_helper_0_0_15(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);     /*0124*/
 
    _return1 = ret_0;                                                    /*0130*/
 
    ret_1 = 0;                                                           /*0134*/
-
-   ret_1 |= 0;                                                          /*0136*/
-   ret_1 |= 0;                                                          /*0137*/
-   ret_1 |= 0;                                                          /*0138*/
-   ret_1 |= 0;                                                          /*0139*/
-   ret_1 |= 0;                                                          /*0140*/
-   ret_1 |= 0;                                                          /*0141*/
-   ret_1 |= 0;                                                          /*0142*/
-   ret_1 |= 0;                                                          /*0143*/
-   ret_1 |= 0;                                                          /*0144*/
-   ret_1 |= 0;                                                          /*0145*/
-   ret_1 |= 0;                                                          /*0146*/
-   ret_1 |= 0;                                                          /*0147*/
-   ret_1 |= 0;                                                          /*0148*/
-   ret_1 |= 0;                                                          /*0149*/
-   ret_1 |= 0;                                                          /*0150*/
-   ret_1 |= 0;                                                          /*0151*/
-
-   ret_1 |= 0;                                                          /*0154*/
-   ret_1 |= 0;                                                          /*0155*/
-   ret_1 |= 0;                                                          /*0156*/
-   ret_1 |= 0;                                                          /*0157*/
-   ret_1 |= 0;                                                          /*0158*/
-   ret_1 |= 0;                                                          /*0159*/
-   ret_1 |= 0;                                                          /*0160*/
-   ret_1 |= 0;                                                          /*0161*/
-   ret_1 |= 0;                                                          /*0162*/
-   ret_1 |= 0;                                                          /*0163*/
-   ret_1 |= 0;                                                          /*0164*/
-   ret_1 |= 0;                                                          /*0165*/
-   ret_1 |= 0;                                                          /*0166*/
-   ret_1 |= 0;                                                          /*0167*/
-   ret_1 |= 0;                                                          /*0168*/
-   ret_1 |= 0;                                                          /*0169*/
-
+   
+   
+   
    _return0 = ret_1;                                                    /*0174*/
    
    
    
    ret_2 = 0;                                                           /*0183*/
 
-   ret_2 |= 0;                                                          /*0185*/
-   ret_2 |= 0;                                                          /*0186*/
-   ret_2 |= 0;                                                          /*0187*/
-   ret_2 |= 0;                                                          /*0188*/
-   ret_2 |= license_plate_copies_helper_0_0_16(imfilt, imfilt, kernel3x1);             /*0189*/
-   ret_2 |= 0;                                                          /*0190*/
-   ret_2 |= license_plate_copies_helper_0_0_17(imfilt, imfilt, kernel3x1);             /*0191*/
-   ret_2 |= 0;                                                          /*0192*/
+   license_plate_copies_helper_0_0_16(imfilt, imfilt, kernel3x1);       /*0189*/
+   license_plate_copies_helper_0_0_17(imfilt, imfilt, kernel3x1);       /*0191*/
 
-   ret_2 |= license_plate_copies_helper_0_0_18(imfilt, imfilt, kernel3x1);             /*0195*/
-   ret_2 |= 0;                                                          /*0196*/
-   ret_2 |= license_plate_copies_helper_0_0_19(imfilt, imfilt, kernel3x1);             /*0197*/
-   ret_2 |= 0;                                                          /*0198*/
-   ret_2 |= license_plate_copies_helper_0_0_20(imfilt, imfilt, kernel3x1);             /*0199*/
-   ret_2 |= 0;                                                          /*0200*/
-   ret_2 |= license_plate_copies_helper_0_0_21(imout, imfilt, kernel3x1, kernel1x3);   /*0201*/
-   ret_2 |= 0;                                                          /*0202*/
+   license_plate_copies_helper_0_0_18(imfilt, imfilt, kernel3x1);       /*0195*/
+   license_plate_copies_helper_0_0_19(imfilt, imfilt, kernel3x1);       /*0197*/
+   license_plate_copies_helper_0_0_20(imfilt, imfilt, kernel3x1);       /*0199*/
+   license_plate_copies_helper_0_0_21(imout, imfilt, kernel3x1, kernel1x3);            /*0201*/
 
    _return2 = ret_2;                                                    /*0207*/
 
    ret_3 = 0;                                                           /*0211*/
 
-   ret_3 |= 0;                                                          /*0213*/
-   ret_3 |= 0;                                                          /*0214*/
-   ret_3 |= license_plate_copies_helper_0_0_22(imout, imout, kernel1x3);               /*0215*/
-   ret_3 |= 0;                                                          /*0216*/
-   ret_3 |= 0;                                                          /*0217*/
-   ret_3 |= 0;                                                          /*0218*/
-   ret_3 |= license_plate_copies_helper_0_0_23(imout, imout, kernel1x3);               /*0219*/
-   ret_3 |= 0;                                                          /*0220*/
+   license_plate_copies_helper_0_0_22(imout, imout, kernel1x3);         /*0215*/
+   license_plate_copies_helper_0_0_23(imout, imout, kernel1x3);         /*0219*/
 
-   ret_3 |= 0;                                                          /*0223*/
-   ret_3 |= 0;                                                          /*0224*/
-   ret_3 |= license_plate_copies_helper_0_0_24(imout, imout, kernel1x3);               /*0225*/
-   ret_3 |= 0;                                                          /*0226*/
-   ret_3 |= 0;                                                          /*0227*/
-   ret_3 |= 0;                                                          /*0228*/
-   ret_3 |= license_plate_copies_helper_0_0_25(out, imout, kernel1x3, freia_morpho_kernel_8c);        /*0229*/
-   ret_3 |= 0;                                                          /*0230*/
+   license_plate_copies_helper_0_0_24(imout, imout, kernel1x3);         /*0225*/
+   license_plate_copies_helper_0_0_25(out, imout, kernel1x3, freia_morpho_kernel_8c);  /*0229*/
 
    _return3 = ret_3;                                                    /*0235*/
 
@@ -10223,13 +9927,13 @@ int license_plate_copies(void)
    const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
 
    freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
-   freia_status ret_0;                                                  /*0029*/
+   freia_status ret_0 = 0;                                              /*0029*/
    int i_0;                                                             /*0030*/
    freia_status ret_1;                                                  /*0032*/
    int i_1;                                                             /*0033*/
-   freia_status ret_2;                                                  /*0035*/
+   freia_status ret_2 = 0;                                              /*0035*/
    int i_2;                                                             /*0036*/
-   freia_status ret_3;                                                  /*0038*/
+   freia_status ret_3 = 0;                                              /*0038*/
    int i_3, i_4;                                                        /*0039*/
    
    /* open videos flow */
@@ -10265,23 +9969,23 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);         /*0064*/
-   ret_0 |= license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);           /*0066*/
-   ret_0 |= license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);           /*0070*/
-   ret_0 |= license_plate_copies_helper_0_0_3(imopen, imclose, imclose, imopen, kernel1x3);           /*0074*/
-   ret_0 |= license_plate_copies_helper_0_0_4(imopen, imclose, imclose, imopen, kernel1x3);           /*0078*/
-   ret_0 |= license_plate_copies_helper_0_0_5(imopen, imclose, imclose, imopen, kernel1x3);           /*0082*/
-   ret_0 |= license_plate_copies_helper_0_0_6(imopen, imclose, imclose, imopen, kernel1x3);           /*0086*/
-   ret_0 |= license_plate_copies_helper_0_0_7(imopen, imclose, imclose, imopen, kernel1x3);           /*0090*/
+   license_plate_copies_helper_0_0_0(imopen, imclose, in, kernel1x3);   /*0064*/
+   license_plate_copies_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);     /*0066*/
+   license_plate_copies_helper_0_0_2(imopen, imclose, imclose, imopen, kernel1x3);     /*0070*/
+   license_plate_copies_helper_0_0_3(imopen, imclose, imclose, imopen, kernel1x3);     /*0074*/
+   license_plate_copies_helper_0_0_4(imopen, imclose, imclose, imopen, kernel1x3);     /*0078*/
+   license_plate_copies_helper_0_0_5(imopen, imclose, imclose, imopen, kernel1x3);     /*0082*/
+   license_plate_copies_helper_0_0_6(imopen, imclose, imclose, imopen, kernel1x3);     /*0086*/
+   license_plate_copies_helper_0_0_7(imopen, imclose, imclose, imopen, kernel1x3);     /*0090*/
 
-   ret_0 |= license_plate_copies_helper_0_0_8(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);           /*0096*/
-   ret_0 |= license_plate_copies_helper_0_0_9(imopen, imopen, kernel1x3);              /*0100*/
-   ret_0 |= license_plate_copies_helper_0_0_10(imopen, imopen, kernel1x3);             /*0104*/
-   ret_0 |= license_plate_copies_helper_0_0_11(imopen, imopen, kernel1x3);             /*0108*/
-   ret_0 |= license_plate_copies_helper_0_0_12(imopen, imopen, kernel1x3);             /*0112*/
-   ret_0 |= license_plate_copies_helper_0_0_13(imopen, imopen, kernel1x3);             /*0116*/
-   ret_0 |= license_plate_copies_helper_0_0_14(imopen, imopen, kernel1x3);             /*0120*/
-   ret_0 |= license_plate_copies_helper_0_0_15(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);           /*0124*/
+   license_plate_copies_helper_0_0_8(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);     /*0096*/
+   license_plate_copies_helper_0_0_9(imopen, imopen, kernel1x3);        /*0100*/
+   license_plate_copies_helper_0_0_10(imopen, imopen, kernel1x3);       /*0104*/
+   license_plate_copies_helper_0_0_11(imopen, imopen, kernel1x3);       /*0108*/
+   license_plate_copies_helper_0_0_12(imopen, imopen, kernel1x3);       /*0112*/
+   license_plate_copies_helper_0_0_13(imopen, imopen, kernel1x3);       /*0116*/
+   license_plate_copies_helper_0_0_14(imopen, imopen, kernel1x3);       /*0120*/
+   license_plate_copies_helper_0_0_15(imfilt, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);     /*0124*/
 
    _return1 = ret_0;                                                    /*0130*/
 
@@ -10295,23 +9999,23 @@ int license_plate_copies(void)
    
    ret_2 = 0;                                                           /*0183*/
 
-   ret_2 |= license_plate_copies_helper_0_0_16(imfilt, imfilt, kernel3x1);             /*0189*/
-   ret_2 |= license_plate_copies_helper_0_0_17(imfilt, imfilt, kernel3x1);             /*0191*/
+   license_plate_copies_helper_0_0_16(imfilt, imfilt, kernel3x1);       /*0189*/
+   license_plate_copies_helper_0_0_17(imfilt, imfilt, kernel3x1);       /*0191*/
 
-   ret_2 |= license_plate_copies_helper_0_0_18(imfilt, imfilt, kernel3x1);             /*0195*/
-   ret_2 |= license_plate_copies_helper_0_0_19(imfilt, imfilt, kernel3x1);             /*0197*/
-   ret_2 |= license_plate_copies_helper_0_0_20(imfilt, imfilt, kernel3x1);             /*0199*/
-   ret_2 |= license_plate_copies_helper_0_0_21(imout, imfilt, kernel3x1, kernel1x3);   /*0201*/
+   license_plate_copies_helper_0_0_18(imfilt, imfilt, kernel3x1);       /*0195*/
+   license_plate_copies_helper_0_0_19(imfilt, imfilt, kernel3x1);       /*0197*/
+   license_plate_copies_helper_0_0_20(imfilt, imfilt, kernel3x1);       /*0199*/
+   license_plate_copies_helper_0_0_21(imout, imfilt, kernel3x1, kernel1x3);            /*0201*/
 
    _return2 = ret_2;                                                    /*0207*/
 
    ret_3 = 0;                                                           /*0211*/
 
-   ret_3 |= license_plate_copies_helper_0_0_22(imout, imout, kernel1x3);               /*0215*/
-   ret_3 |= license_plate_copies_helper_0_0_23(imout, imout, kernel1x3);               /*0219*/
+   license_plate_copies_helper_0_0_22(imout, imout, kernel1x3);         /*0215*/
+   license_plate_copies_helper_0_0_23(imout, imout, kernel1x3);         /*0219*/
 
-   ret_3 |= license_plate_copies_helper_0_0_24(imout, imout, kernel1x3);               /*0225*/
-   ret_3 |= license_plate_copies_helper_0_0_25(out, imout, kernel1x3, freia_morpho_kernel_8c);        /*0229*/
+   license_plate_copies_helper_0_0_24(imout, imout, kernel1x3);         /*0225*/
+   license_plate_copies_helper_0_0_25(out, imout, kernel1x3, freia_morpho_kernel_8c);  /*0229*/
 
    _return3 = ret_3;                                                    /*0235*/
 
@@ -10328,6 +10032,1323 @@ int license_plate_copies(void)
    freia_common_destruct_data(imopen);                                  /*0250*/
    freia_common_destruct_data(imclose);                                 /*0251*/
    freia_common_destruct_data(imcloseth);                               /*0253*/
+   freia_common_destruct_data(imfilt);                                  /*0255*/
+   freia_common_destruct_data(imout);                                   /*0256*/
+   freia_common_destruct_data(out);                                     /*0257*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0260*/
+   freia_common_close_output(&fdout);                                   /*0261*/
+
+   return 0;                                                            /*0263*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+int license_plate_copies(void)
+{
+   freia_dataio fdin;                                                   /*0010*/
+   freia_dataio fdout;                                                  /*0011*/
+
+   freia_data2d *in;                                                    /*0013*/
+   freia_data2d *immir;                                                 /*0014*/
+   freia_data2d *imopen;                                                /*0015*/
+   freia_data2d *imclose;                                               /*0016*/
+   freia_data2d *imopenth;                                              /*0017*/
+   freia_data2d *imcloseth;                                             /*0018*/
+   freia_data2d *imand;                                                 /*0019*/
+   freia_data2d *imfilt;                                                /*0020*/
+   freia_data2d *imout;                                                 /*0021*/
+   freia_data2d *out;                                                   /*0022*/
+
+   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0024*/
+   const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
+
+   freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
+   freia_data2d *imtmp_0;                                               /*0028*/
+   freia_status ret_0;                                                  /*0029*/
+   int i_0;                                                             /*0030*/
+   freia_data2d *imtmp_1;                                               /*0031*/
+   freia_status ret_1;                                                  /*0032*/
+   int i_1;                                                             /*0033*/
+   freia_data2d *imtmp_2;                                               /*0034*/
+   freia_status ret_2;                                                  /*0035*/
+   int i_2;                                                             /*0036*/
+   freia_data2d *imtmp_3;                                               /*0037*/
+   freia_status ret_3;                                                  /*0038*/
+   int i_3, i_4;                                                        /*0039*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0042*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0043*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0046*/
+   immir = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0047*/
+   imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0048*/
+   imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0049*/
+   imopenth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);         /*0050*/
+   imcloseth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);        /*0051*/
+   imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0052*/
+   imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
+   imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0054*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0055*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0058*/
+
+   imtmp_0 = freia_common_create_data(imopen->bpp, imopen->widthWa, imopen->heightWa);                /*0060*/
+
+   ret_0 = freia_aipo_copy(imtmp_0, in);                                /*0062*/
+
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0064*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0065*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0066*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0067*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0068*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0069*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0070*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0071*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0072*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0073*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0074*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0075*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0076*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0077*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0078*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0079*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0080*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0081*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0082*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0083*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0084*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0085*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0086*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0087*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0088*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0089*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0090*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0091*/
+   ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);            /*0092*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0093*/
+   i_0 = 15;                                                            /*0094*/
+
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0096*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0097*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0098*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0099*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0100*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0101*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0102*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0103*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0104*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0105*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0106*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0107*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0108*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0109*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0110*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0111*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0112*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0113*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0114*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0115*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0116*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0117*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0118*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0119*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0120*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0121*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0122*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0123*/
+   ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);           /*0124*/
+   ret_0 |= freia_aipo_copy(imtmp_0, imopen);                           /*0125*/
+   i_0 = 15;                                                            /*0126*/
+
+   freia_common_destruct_data(imtmp_0);                                 /*0128*/
+
+   _return1 = ret_0;                                                    /*0130*/
+
+   imtmp_1 = freia_common_create_data(imclose->bpp, imclose->widthWa, imclose->heightWa);             /*0132*/
+
+   ret_1 = freia_aipo_copy(imtmp_1, in);                                /*0134*/
+
+   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0136*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0137*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0138*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0139*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0140*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0141*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0142*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0143*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0144*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0145*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0146*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0147*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0148*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0149*/
+   ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);          /*0150*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0151*/
+   i_1 = 8;                                                             /*0152*/
+
+   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0154*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0155*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0156*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0157*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0158*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0159*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0160*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0161*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0162*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0163*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0164*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0165*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0166*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0167*/
+   ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);           /*0168*/
+   ret_1 |= freia_aipo_copy(imtmp_1, imclose);                          /*0169*/
+   i_1 = 8;                                                             /*0170*/
+
+   freia_common_destruct_data(imtmp_1);                                 /*0172*/
+
+   _return0 = ret_1;                                                    /*0174*/
+
+   freia_aipo_threshold(imopenth, imopen, 1, 50, 1);                    /*0176*/
+   freia_aipo_threshold(imcloseth, imclose, 150, 255, 1);               /*0177*/
+
+   freia_aipo_and(imand, imopenth, imcloseth);                          /*0179*/
+
+   imtmp_2 = freia_common_create_data(imfilt->bpp, imfilt->widthWa, imfilt->heightWa);                /*0181*/
+
+   ret_2 = freia_aipo_copy(imtmp_2, imand);                             /*0183*/
+
+   ret_2 |= freia_aipo_erode_8c(imfilt, imtmp_2, kernel3x1);            /*0185*/
+   ret_2 |= freia_aipo_copy(imtmp_2, imfilt);                           /*0186*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imtmp_2, kernel3x1);            /*0187*/
+   ret_2 |= freia_aipo_copy(imtmp_2, imfilt);                           /*0188*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imtmp_2, kernel3x1);            /*0189*/
+   ret_2 |= freia_aipo_copy(imtmp_2, imfilt);                           /*0190*/
+   ret_2 |= freia_aipo_erode_8c(imfilt, imtmp_2, kernel3x1);            /*0191*/
+   ret_2 |= freia_aipo_copy(imtmp_2, imfilt);                           /*0192*/
+   i_2 = 4;                                                             /*0193*/
+
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);           /*0195*/
+   ret_2 |= freia_aipo_copy(imtmp_2, imfilt);                           /*0196*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);           /*0197*/
+   ret_2 |= freia_aipo_copy(imtmp_2, imfilt);                           /*0198*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);           /*0199*/
+   ret_2 |= freia_aipo_copy(imtmp_2, imfilt);                           /*0200*/
+   ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);           /*0201*/
+   ret_2 |= freia_aipo_copy(imtmp_2, imfilt);                           /*0202*/
+   i_2 = 4;                                                             /*0203*/
+
+   freia_common_destruct_data(imtmp_2);                                 /*0205*/
+
+   _return2 = ret_2;                                                    /*0207*/
+
+   imtmp_3 = freia_common_create_data(imout->bpp, imout->widthWa, imout->heightWa);    /*0209*/
+
+   ret_3 = freia_aipo_copy(imtmp_3, imfilt);                            /*0211*/
+
+   ret_3 |= freia_aipo_erode_8c(imout, imtmp_3, kernel1x3);             /*0213*/
+   ret_3 |= freia_aipo_copy(imtmp_3, imout);                            /*0214*/
+   ret_3 |= freia_aipo_erode_8c(imout, imtmp_3, kernel1x3);             /*0215*/
+   ret_3 |= freia_aipo_copy(imtmp_3, imout);                            /*0216*/
+   ret_3 |= freia_aipo_erode_8c(imout, imtmp_3, kernel1x3);             /*0217*/
+   ret_3 |= freia_aipo_copy(imtmp_3, imout);                            /*0218*/
+   ret_3 |= freia_aipo_erode_8c(imout, imtmp_3, kernel1x3);             /*0219*/
+   ret_3 |= freia_aipo_copy(imtmp_3, imout);                            /*0220*/
+   i_3 = 4;                                                             /*0221*/
+
+   ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);            /*0223*/
+   ret_3 |= freia_aipo_copy(imtmp_3, imout);                            /*0224*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);            /*0225*/
+   ret_3 |= freia_aipo_copy(imtmp_3, imout);                            /*0226*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);            /*0227*/
+   ret_3 |= freia_aipo_copy(imtmp_3, imout);                            /*0228*/
+   ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);            /*0229*/
+   ret_3 |= freia_aipo_copy(imtmp_3, imout);                            /*0230*/
+   i_3 = 4;                                                             /*0231*/
+
+   freia_common_destruct_data(imtmp_3);                                 /*0233*/
+
+   _return3 = ret_3;                                                    /*0235*/
+
+   freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0237*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0238*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0239*/
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
+
+   freia_aipo_and(out, out, in);                                        /*0244*/
+   freia_common_tx_image(out, &fdout);                                  /*0245*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0248*/
+   freia_common_destruct_data(immir);                                   /*0249*/
+   freia_common_destruct_data(imopen);                                  /*0250*/
+   freia_common_destruct_data(imclose);                                 /*0251*/
+   freia_common_destruct_data(imopenth);                                /*0252*/
+   freia_common_destruct_data(imcloseth);                               /*0253*/
+   freia_common_destruct_data(imand);                                   /*0254*/
+   freia_common_destruct_data(imfilt);                                  /*0255*/
+   freia_common_destruct_data(imout);                                   /*0256*/
+   freia_common_destruct_data(out);                                     /*0257*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0260*/
+   freia_common_close_output(&fdout);                                   /*0261*/
+
+   return 0;                                                            /*0263*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "license_plate_copies" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "244 &" [shape=trapezium,orientation=270];
+  "244 &" -> "out";
+  "239 D8" [shape=box];
+  "239 D8" -> "244 &" [label="out"];
+  "238 D8" [shape=box];
+  "238 D8" -> "239 D8" [label="out"];
+  "237 D8" [shape=box];
+  "237 D8" -> "238 D8" [label="out"];
+  "230 =" [shape=circle];
+  "229 D8" [shape=box];
+  "229 D8" -> "237 D8" [label="imout"];
+  "229 D8" -> "230 =" [label="imout"];
+  "228 =" [shape=circle];
+  "228 =" -> "229 D8" [label="imtmp_3"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 =" [label="imout"];
+  "226 =" [shape=circle];
+  "226 =" -> "227 D8" [label="imtmp_3"];
+  "225 D8" [shape=box];
+  "225 D8" -> "226 =" [label="imout"];
+  "224 =" [shape=circle];
+  "224 =" -> "225 D8" [label="imtmp_3"];
+  "223 D8" [shape=box];
+  "223 D8" -> "224 =" [label="imout"];
+  "220 =" [shape=circle];
+  "220 =" -> "223 D8" [label="imtmp_3"];
+  "219 E8" [shape=box];
+  "219 E8" -> "220 =" [label="imout"];
+  "218 =" [shape=circle];
+  "218 =" -> "219 E8" [label="imtmp_3"];
+  "217 E8" [shape=box];
+  "217 E8" -> "218 =" [label="imout"];
+  "216 =" [shape=circle];
+  "216 =" -> "217 E8" [label="imtmp_3"];
+  "215 E8" [shape=box];
+  "215 E8" -> "216 =" [label="imout"];
+  "214 =" [shape=circle];
+  "214 =" -> "215 E8" [label="imtmp_3"];
+  "213 E8" [shape=box];
+  "213 E8" -> "214 =" [label="imout"];
+  "211 =" [shape=circle];
+  "211 =" -> "213 E8" [label="imtmp_3"];
+  "202 =" [shape=circle];
+  "201 D8" [shape=box];
+  "201 D8" -> "211 =" [label="imfilt"];
+  "201 D8" -> "202 =" [label="imfilt"];
+  "200 =" [shape=circle];
+  "200 =" -> "201 D8" [label="imtmp_2"];
+  "199 D8" [shape=box];
+  "199 D8" -> "200 =" [label="imfilt"];
+  "198 =" [shape=circle];
+  "198 =" -> "199 D8" [label="imtmp_2"];
+  "197 D8" [shape=box];
+  "197 D8" -> "198 =" [label="imfilt"];
+  "196 =" [shape=circle];
+  "196 =" -> "197 D8" [label="imtmp_2"];
+  "195 D8" [shape=box];
+  "195 D8" -> "196 =" [label="imfilt"];
+  "192 =" [shape=circle];
+  "192 =" -> "195 D8" [label="imtmp_2"];
+  "191 E8" [shape=box];
+  "191 E8" -> "192 =" [label="imfilt"];
+  "190 =" [shape=circle];
+  "190 =" -> "191 E8" [label="imtmp_2"];
+  "189 E8" [shape=box];
+  "189 E8" -> "190 =" [label="imfilt"];
+  "188 =" [shape=circle];
+  "188 =" -> "189 E8" [label="imtmp_2"];
+  "187 E8" [shape=box];
+  "187 E8" -> "188 =" [label="imfilt"];
+  "186 =" [shape=circle];
+  "186 =" -> "187 E8" [label="imtmp_2"];
+  "185 E8" [shape=box];
+  "185 E8" -> "186 =" [label="imfilt"];
+  "183 =" [shape=circle];
+  "183 =" -> "185 E8" [label="imtmp_2"];
+  "179 &" [shape=trapezium,orientation=270];
+  "179 &" -> "183 =" [label="imand"];
+  "177 thr" [shape=parallelogram];
+  "177 thr" -> "179 &" [label="imcloseth"];
+  "176 thr" [shape=parallelogram];
+  "176 thr" -> "179 &" [label="imopenth"];
+  "169 =" [shape=circle];
+  "168 E8" [shape=box];
+  "168 E8" -> "177 thr" [label="imclose"];
+  "168 E8" -> "169 =" [label="imclose"];
+  "167 =" [shape=circle];
+  "167 =" -> "168 E8" [label="imtmp_1"];
+  "166 E8" [shape=box];
+  "166 E8" -> "167 =" [label="imclose"];
+  "165 =" [shape=circle];
+  "165 =" -> "166 E8" [label="imtmp_1"];
+  "164 E8" [shape=box];
+  "164 E8" -> "165 =" [label="imclose"];
+  "163 =" [shape=circle];
+  "163 =" -> "164 E8" [label="imtmp_1"];
+  "162 E8" [shape=box];
+  "162 E8" -> "163 =" [label="imclose"];
+  "161 =" [shape=circle];
+  "161 =" -> "162 E8" [label="imtmp_1"];
+  "160 E8" [shape=box];
+  "160 E8" -> "161 =" [label="imclose"];
+  "159 =" [shape=circle];
+  "159 =" -> "160 E8" [label="imtmp_1"];
+  "158 E8" [shape=box];
+  "158 E8" -> "159 =" [label="imclose"];
+  "157 =" [shape=circle];
+  "157 =" -> "158 E8" [label="imtmp_1"];
+  "156 E8" [shape=box];
+  "156 E8" -> "157 =" [label="imclose"];
+  "155 =" [shape=circle];
+  "155 =" -> "156 E8" [label="imtmp_1"];
+  "154 E8" [shape=box];
+  "154 E8" -> "155 =" [label="imclose"];
+  "151 =" [shape=circle];
+  "151 =" -> "154 E8" [label="imtmp_1"];
+  "150 D8" [shape=box];
+  "150 D8" -> "151 =" [label="imclose"];
+  "149 =" [shape=circle];
+  "149 =" -> "150 D8" [label="imtmp_1"];
+  "148 D8" [shape=box];
+  "148 D8" -> "149 =" [label="imclose"];
+  "147 =" [shape=circle];
+  "147 =" -> "148 D8" [label="imtmp_1"];
+  "146 D8" [shape=box];
+  "146 D8" -> "147 =" [label="imclose"];
+  "145 =" [shape=circle];
+  "145 =" -> "146 D8" [label="imtmp_1"];
+  "144 D8" [shape=box];
+  "144 D8" -> "145 =" [label="imclose"];
+  "143 =" [shape=circle];
+  "143 =" -> "144 D8" [label="imtmp_1"];
+  "142 D8" [shape=box];
+  "142 D8" -> "143 =" [label="imclose"];
+  "141 =" [shape=circle];
+  "141 =" -> "142 D8" [label="imtmp_1"];
+  "140 D8" [shape=box];
+  "140 D8" -> "141 =" [label="imclose"];
+  "139 =" [shape=circle];
+  "139 =" -> "140 D8" [label="imtmp_1"];
+  "138 D8" [shape=box];
+  "138 D8" -> "139 =" [label="imclose"];
+  "137 =" [shape=circle];
+  "137 =" -> "138 D8" [label="imtmp_1"];
+  "136 D8" [shape=box];
+  "136 D8" -> "137 =" [label="imclose"];
+  "134 =" [shape=circle];
+  "134 =" -> "136 D8" [label="imtmp_1"];
+  "125 =" [shape=circle];
+  "124 D8" [shape=box];
+  "124 D8" -> "176 thr" [label="imopen"];
+  "124 D8" -> "125 =" [label="imopen"];
+  "123 =" [shape=circle];
+  "123 =" -> "124 D8" [label="imtmp_0"];
+  "122 D8" [shape=box];
+  "122 D8" -> "123 =" [label="imopen"];
+  "121 =" [shape=circle];
+  "121 =" -> "122 D8" [label="imtmp_0"];
+  "120 D8" [shape=box];
+  "120 D8" -> "121 =" [label="imopen"];
+  "119 =" [shape=circle];
+  "119 =" -> "120 D8" [label="imtmp_0"];
+  "118 D8" [shape=box];
+  "118 D8" -> "119 =" [label="imopen"];
+  "117 =" [shape=circle];
+  "117 =" -> "118 D8" [label="imtmp_0"];
+  "116 D8" [shape=box];
+  "116 D8" -> "117 =" [label="imopen"];
+  "115 =" [shape=circle];
+  "115 =" -> "116 D8" [label="imtmp_0"];
+  "114 D8" [shape=box];
+  "114 D8" -> "115 =" [label="imopen"];
+  "113 =" [shape=circle];
+  "113 =" -> "114 D8" [label="imtmp_0"];
+  "112 D8" [shape=box];
+  "112 D8" -> "113 =" [label="imopen"];
+  "111 =" [shape=circle];
+  "111 =" -> "112 D8" [label="imtmp_0"];
+  "110 D8" [shape=box];
+  "110 D8" -> "111 =" [label="imopen"];
+  "109 =" [shape=circle];
+  "109 =" -> "110 D8" [label="imtmp_0"];
+  "108 D8" [shape=box];
+  "108 D8" -> "109 =" [label="imopen"];
+  "107 =" [shape=circle];
+  "107 =" -> "108 D8" [label="imtmp_0"];
+  "106 D8" [shape=box];
+  "106 D8" -> "107 =" [label="imopen"];
+  "105 =" [shape=circle];
+  "105 =" -> "106 D8" [label="imtmp_0"];
+  "104 D8" [shape=box];
+  "104 D8" -> "105 =" [label="imopen"];
+  "103 =" [shape=circle];
+  "103 =" -> "104 D8" [label="imtmp_0"];
+  "102 D8" [shape=box];
+  "102 D8" -> "103 =" [label="imopen"];
+  "101 =" [shape=circle];
+  "101 =" -> "102 D8" [label="imtmp_0"];
+  "100 D8" [shape=box];
+  "100 D8" -> "101 =" [label="imopen"];
+  "99 =" [shape=circle];
+  "99 =" -> "100 D8" [label="imtmp_0"];
+  "98 D8" [shape=box];
+  "98 D8" -> "99 =" [label="imopen"];
+  "97 =" [shape=circle];
+  "97 =" -> "98 D8" [label="imtmp_0"];
+  "96 D8" [shape=box];
+  "96 D8" -> "97 =" [label="imopen"];
+  "93 =" [shape=circle];
+  "93 =" -> "96 D8" [label="imtmp_0"];
+  "92 E8" [shape=box];
+  "92 E8" -> "93 =" [label="imopen"];
+  "91 =" [shape=circle];
+  "91 =" -> "92 E8" [label="imtmp_0"];
+  "90 E8" [shape=box];
+  "90 E8" -> "91 =" [label="imopen"];
+  "89 =" [shape=circle];
+  "89 =" -> "90 E8" [label="imtmp_0"];
+  "88 E8" [shape=box];
+  "88 E8" -> "89 =" [label="imopen"];
+  "87 =" [shape=circle];
+  "87 =" -> "88 E8" [label="imtmp_0"];
+  "86 E8" [shape=box];
+  "86 E8" -> "87 =" [label="imopen"];
+  "85 =" [shape=circle];
+  "85 =" -> "86 E8" [label="imtmp_0"];
+  "84 E8" [shape=box];
+  "84 E8" -> "85 =" [label="imopen"];
+  "83 =" [shape=circle];
+  "83 =" -> "84 E8" [label="imtmp_0"];
+  "82 E8" [shape=box];
+  "82 E8" -> "83 =" [label="imopen"];
+  "81 =" [shape=circle];
+  "81 =" -> "82 E8" [label="imtmp_0"];
+  "80 E8" [shape=box];
+  "80 E8" -> "81 =" [label="imopen"];
+  "79 =" [shape=circle];
+  "79 =" -> "80 E8" [label="imtmp_0"];
+  "78 E8" [shape=box];
+  "78 E8" -> "79 =" [label="imopen"];
+  "77 =" [shape=circle];
+  "77 =" -> "78 E8" [label="imtmp_0"];
+  "76 E8" [shape=box];
+  "76 E8" -> "77 =" [label="imopen"];
+  "75 =" [shape=circle];
+  "75 =" -> "76 E8" [label="imtmp_0"];
+  "74 E8" [shape=box];
+  "74 E8" -> "75 =" [label="imopen"];
+  "73 =" [shape=circle];
+  "73 =" -> "74 E8" [label="imtmp_0"];
+  "72 E8" [shape=box];
+  "72 E8" -> "73 =" [label="imopen"];
+  "71 =" [shape=circle];
+  "71 =" -> "72 E8" [label="imtmp_0"];
+  "70 E8" [shape=box];
+  "70 E8" -> "71 =" [label="imopen"];
+  "69 =" [shape=circle];
+  "69 =" -> "70 E8" [label="imtmp_0"];
+  "68 E8" [shape=box];
+  "68 E8" -> "69 =" [label="imopen"];
+  "67 =" [shape=circle];
+  "67 =" -> "68 E8" [label="imtmp_0"];
+  "66 E8" [shape=box];
+  "66 E8" -> "67 =" [label="imopen"];
+  "65 =" [shape=circle];
+  "65 =" -> "66 E8" [label="imtmp_0"];
+  "64 E8" [shape=box];
+  "64 E8" -> "65 =" [label="imopen"];
+  "62 =" [shape=circle];
+  "62 =" -> "64 E8" [label="imtmp_0"];
+  "in" -> "244 &";
+  "in" -> "134 =";
+  "in" -> "62 =";
+}
+// graph for dag "dag_cleaned_0" of module "license_plate_copies" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "244 &" [shape=trapezium,orientation=270];
+  "244 &" -> "out";
+  "239 D8" [shape=box];
+  "239 D8" -> "244 &" [label="out_1"];
+  "238 D8" [shape=box];
+  "238 D8" -> "239 D8" [label="out_2"];
+  "237 D8" [shape=box];
+  "237 D8" -> "238 D8" [label="out_3"];
+  "229 D8" [shape=box];
+  "229 D8" -> "237 D8" [label="imout"];
+  "227 D8" [shape=box];
+  "227 D8" -> "229 D8" [label="imout_1"];
+  "225 D8" [shape=box];
+  "225 D8" -> "227 D8" [label="imout_2"];
+  "223 D8" [shape=box];
+  "223 D8" -> "225 D8" [label="imout_3"];
+  "219 E8" [shape=box];
+  "219 E8" -> "223 D8" [label="imout_4"];
+  "217 E8" [shape=box];
+  "217 E8" -> "219 E8" [label="imout_5"];
+  "215 E8" [shape=box];
+  "215 E8" -> "217 E8" [label="imout_6"];
+  "213 E8" [shape=box];
+  "213 E8" -> "215 E8" [label="imout_7"];
+  "201 D8" [shape=box];
+  "201 D8" -> "213 E8" [label="imfilt"];
+  "199 D8" [shape=box];
+  "199 D8" -> "201 D8" [label="imfilt_1"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 D8" [label="imfilt_2"];
+  "195 D8" [shape=box];
+  "195 D8" -> "197 D8" [label="imfilt_3"];
+  "191 E8" [shape=box];
+  "191 E8" -> "195 D8" [label="imfilt_4"];
+  "189 E8" [shape=box];
+  "189 E8" -> "191 E8" [label="imfilt_5"];
+  "187 E8" [shape=box];
+  "187 E8" -> "189 E8" [label="imfilt_6"];
+  "185 E8" [shape=box];
+  "185 E8" -> "187 E8" [label="imfilt_7"];
+  "179 &" [shape=trapezium,orientation=270];
+  "179 &" -> "185 E8" [label="imand"];
+  "177 thr" [shape=parallelogram];
+  "177 thr" -> "179 &" [label="imcloseth"];
+  "176 thr" [shape=parallelogram];
+  "176 thr" -> "179 &" [label="imopenth"];
+  "168 E8" [shape=box];
+  "168 E8" -> "177 thr" [label="imclose"];
+  "166 E8" [shape=box];
+  "166 E8" -> "168 E8" [label="imclose_1"];
+  "164 E8" [shape=box];
+  "164 E8" -> "166 E8" [label="imclose_2"];
+  "162 E8" [shape=box];
+  "162 E8" -> "164 E8" [label="imclose_3"];
+  "160 E8" [shape=box];
+  "160 E8" -> "162 E8" [label="imclose_4"];
+  "158 E8" [shape=box];
+  "158 E8" -> "160 E8" [label="imclose_5"];
+  "156 E8" [shape=box];
+  "156 E8" -> "158 E8" [label="imclose_6"];
+  "154 E8" [shape=box];
+  "154 E8" -> "156 E8" [label="imclose_7"];
+  "150 D8" [shape=box];
+  "150 D8" -> "154 E8" [label="imclose_8"];
+  "148 D8" [shape=box];
+  "148 D8" -> "150 D8" [label="imclose_9"];
+  "146 D8" [shape=box];
+  "146 D8" -> "148 D8" [label="imclose_10"];
+  "144 D8" [shape=box];
+  "144 D8" -> "146 D8" [label="imclose_11"];
+  "142 D8" [shape=box];
+  "142 D8" -> "144 D8" [label="imclose_12"];
+  "140 D8" [shape=box];
+  "140 D8" -> "142 D8" [label="imclose_13"];
+  "138 D8" [shape=box];
+  "138 D8" -> "140 D8" [label="imclose_14"];
+  "136 D8" [shape=box];
+  "136 D8" -> "138 D8" [label="imclose_15"];
+  "124 D8" [shape=box];
+  "124 D8" -> "176 thr" [label="imopen"];
+  "122 D8" [shape=box];
+  "122 D8" -> "124 D8" [label="imopen_1"];
+  "120 D8" [shape=box];
+  "120 D8" -> "122 D8" [label="imopen_2"];
+  "118 D8" [shape=box];
+  "118 D8" -> "120 D8" [label="imopen_3"];
+  "116 D8" [shape=box];
+  "116 D8" -> "118 D8" [label="imopen_4"];
+  "114 D8" [shape=box];
+  "114 D8" -> "116 D8" [label="imopen_5"];
+  "112 D8" [shape=box];
+  "112 D8" -> "114 D8" [label="imopen_6"];
+  "110 D8" [shape=box];
+  "110 D8" -> "112 D8" [label="imopen_7"];
+  "108 D8" [shape=box];
+  "108 D8" -> "110 D8" [label="imopen_8"];
+  "106 D8" [shape=box];
+  "106 D8" -> "108 D8" [label="imopen_9"];
+  "104 D8" [shape=box];
+  "104 D8" -> "106 D8" [label="imopen_10"];
+  "102 D8" [shape=box];
+  "102 D8" -> "104 D8" [label="imopen_11"];
+  "100 D8" [shape=box];
+  "100 D8" -> "102 D8" [label="imopen_12"];
+  "98 D8" [shape=box];
+  "98 D8" -> "100 D8" [label="imopen_13"];
+  "96 D8" [shape=box];
+  "96 D8" -> "98 D8" [label="imopen_14"];
+  "92 E8" [shape=box];
+  "92 E8" -> "96 D8" [label="imopen_15"];
+  "90 E8" [shape=box];
+  "90 E8" -> "92 E8" [label="imopen_16"];
+  "88 E8" [shape=box];
+  "88 E8" -> "90 E8" [label="imopen_17"];
+  "86 E8" [shape=box];
+  "86 E8" -> "88 E8" [label="imopen_18"];
+  "84 E8" [shape=box];
+  "84 E8" -> "86 E8" [label="imopen_19"];
+  "82 E8" [shape=box];
+  "82 E8" -> "84 E8" [label="imopen_20"];
+  "80 E8" [shape=box];
+  "80 E8" -> "82 E8" [label="imopen_21"];
+  "78 E8" [shape=box];
+  "78 E8" -> "80 E8" [label="imopen_22"];
+  "76 E8" [shape=box];
+  "76 E8" -> "78 E8" [label="imopen_23"];
+  "74 E8" [shape=box];
+  "74 E8" -> "76 E8" [label="imopen_24"];
+  "72 E8" [shape=box];
+  "72 E8" -> "74 E8" [label="imopen_25"];
+  "70 E8" [shape=box];
+  "70 E8" -> "72 E8" [label="imopen_26"];
+  "68 E8" [shape=box];
+  "68 E8" -> "70 E8" [label="imopen_27"];
+  "66 E8" [shape=box];
+  "66 E8" -> "68 E8" [label="imopen_28"];
+  "64 E8" [shape=box];
+  "64 E8" -> "66 E8" [label="imopen_29"];
+  "in" -> "64 E8";
+  "in" -> "136 D8";
+  "in" -> "244 &";
+}
+// graph for dag "license_plate_copies_helper_0_0" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_helper_0_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "imopenth" [shape=circle];
+
+  // computation vertices
+  "176 thr" [shape=parallelogram];
+  "176 thr" -> "imopenth";
+  "124 D8" [shape=box];
+  "124 D8" -> "176 thr" [label="imopen"];
+  "122 D8" [shape=box];
+  "122 D8" -> "124 D8" [label="imopen_1"];
+  "120 D8" [shape=box];
+  "120 D8" -> "122 D8" [label="imopen_2"];
+  "118 D8" [shape=box];
+  "118 D8" -> "120 D8" [label="imopen_3"];
+  "116 D8" [shape=box];
+  "116 D8" -> "118 D8" [label="imopen_4"];
+  "114 D8" [shape=box];
+  "114 D8" -> "116 D8" [label="imopen_5"];
+  "112 D8" [shape=box];
+  "112 D8" -> "114 D8" [label="imopen_6"];
+  "110 D8" [shape=box];
+  "110 D8" -> "112 D8" [label="imopen_7"];
+  "108 D8" [shape=box];
+  "108 D8" -> "110 D8" [label="imopen_8"];
+  "106 D8" [shape=box];
+  "106 D8" -> "108 D8" [label="imopen_9"];
+  "104 D8" [shape=box];
+  "104 D8" -> "106 D8" [label="imopen_10"];
+  "102 D8" [shape=box];
+  "102 D8" -> "104 D8" [label="imopen_11"];
+  "100 D8" [shape=box];
+  "100 D8" -> "102 D8" [label="imopen_12"];
+  "98 D8" [shape=box];
+  "98 D8" -> "100 D8" [label="imopen_13"];
+  "96 D8" [shape=box];
+  "96 D8" -> "98 D8" [label="imopen_14"];
+  "92 E8" [shape=box];
+  "92 E8" -> "96 D8" [label="imopen_15"];
+  "90 E8" [shape=box];
+  "90 E8" -> "92 E8" [label="imopen_16"];
+  "88 E8" [shape=box];
+  "88 E8" -> "90 E8" [label="imopen_17"];
+  "86 E8" [shape=box];
+  "86 E8" -> "88 E8" [label="imopen_18"];
+  "84 E8" [shape=box];
+  "84 E8" -> "86 E8" [label="imopen_19"];
+  "82 E8" [shape=box];
+  "82 E8" -> "84 E8" [label="imopen_20"];
+  "80 E8" [shape=box];
+  "80 E8" -> "82 E8" [label="imopen_21"];
+  "78 E8" [shape=box];
+  "78 E8" -> "80 E8" [label="imopen_22"];
+  "76 E8" [shape=box];
+  "76 E8" -> "78 E8" [label="imopen_23"];
+  "74 E8" [shape=box];
+  "74 E8" -> "76 E8" [label="imopen_24"];
+  "72 E8" [shape=box];
+  "72 E8" -> "74 E8" [label="imopen_25"];
+  "70 E8" [shape=box];
+  "70 E8" -> "72 E8" [label="imopen_26"];
+  "68 E8" [shape=box];
+  "68 E8" -> "70 E8" [label="imopen_27"];
+  "66 E8" [shape=box];
+  "66 E8" -> "68 E8" [label="imopen_28"];
+  "64 E8" [shape=box];
+  "64 E8" -> "66 E8" [label="imopen_29"];
+  "in" -> "64 E8";
+}
+// graph for dag "license_plate_copies_helper_0_1" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_helper_0_1" {
+  // inputs
+  "imopenth" [shape=circle];
+  "in" [shape=circle];
+
+  // outputs
+  "imand" [shape=circle];
+
+  // computation vertices
+  "179 &" [shape=trapezium,orientation=270];
+  "179 &" -> "imand";
+  "imopenth" -> "179 &";
+  "177 thr" [shape=parallelogram];
+  "177 thr" -> "179 &" [label="imcloseth"];
+  "168 E8" [shape=box];
+  "168 E8" -> "177 thr" [label="imclose"];
+  "166 E8" [shape=box];
+  "166 E8" -> "168 E8" [label="imclose_1"];
+  "164 E8" [shape=box];
+  "164 E8" -> "166 E8" [label="imclose_2"];
+  "162 E8" [shape=box];
+  "162 E8" -> "164 E8" [label="imclose_3"];
+  "160 E8" [shape=box];
+  "160 E8" -> "162 E8" [label="imclose_4"];
+  "158 E8" [shape=box];
+  "158 E8" -> "160 E8" [label="imclose_5"];
+  "156 E8" [shape=box];
+  "156 E8" -> "158 E8" [label="imclose_6"];
+  "154 E8" [shape=box];
+  "154 E8" -> "156 E8" [label="imclose_7"];
+  "150 D8" [shape=box];
+  "150 D8" -> "154 E8" [label="imclose_8"];
+  "148 D8" [shape=box];
+  "148 D8" -> "150 D8" [label="imclose_9"];
+  "146 D8" [shape=box];
+  "146 D8" -> "148 D8" [label="imclose_10"];
+  "144 D8" [shape=box];
+  "144 D8" -> "146 D8" [label="imclose_11"];
+  "142 D8" [shape=box];
+  "142 D8" -> "144 D8" [label="imclose_12"];
+  "140 D8" [shape=box];
+  "140 D8" -> "142 D8" [label="imclose_13"];
+  "138 D8" [shape=box];
+  "138 D8" -> "140 D8" [label="imclose_14"];
+  "136 D8" [shape=box];
+  "136 D8" -> "138 D8" [label="imclose_15"];
+  "in" -> "136 D8";
+}
+// graph for dag "license_plate_copies_helper_0_1_1" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_helper_0_1_1" {
+  // inputs
+  "imclose" [shape=circle];
+  "imopenth" [shape=circle];
+
+  // outputs
+  "imand" [shape=circle];
+
+  // computation vertices
+  "179 &" [shape=trapezium,orientation=270];
+  "179 &" -> "imand";
+  "imopenth" -> "179 &";
+  "177 thr" [shape=parallelogram];
+  "177 thr" -> "179 &" [label="imcloseth"];
+  "imclose" -> "177 thr";
+}
+// graph for dag "license_plate_copies_helper_0_2" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_helper_0_2" {
+  // inputs
+  "imand" [shape=circle];
+
+  // outputs
+  "imfilt" [shape=circle];
+
+  // computation vertices
+  "201 D8" [shape=box];
+  "201 D8" -> "imfilt";
+  "199 D8" [shape=box];
+  "199 D8" -> "201 D8" [label="imfilt_1"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 D8" [label="imfilt_2"];
+  "195 D8" [shape=box];
+  "195 D8" -> "197 D8" [label="imfilt_3"];
+  "191 E8" [shape=box];
+  "191 E8" -> "195 D8" [label="imfilt_4"];
+  "189 E8" [shape=box];
+  "189 E8" -> "191 E8" [label="imfilt_5"];
+  "187 E8" [shape=box];
+  "187 E8" -> "189 E8" [label="imfilt_6"];
+  "185 E8" [shape=box];
+  "185 E8" -> "187 E8" [label="imfilt_7"];
+  "imand" -> "185 E8";
+}
+// graph for dag "license_plate_copies_helper_0_3" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_helper_0_3" {
+  // inputs
+  "imfilt" [shape=circle];
+
+  // outputs
+  "imout" [shape=circle];
+
+  // computation vertices
+  "229 D8" [shape=box];
+  "229 D8" -> "imout";
+  "227 D8" [shape=box];
+  "227 D8" -> "229 D8" [label="imout_1"];
+  "225 D8" [shape=box];
+  "225 D8" -> "227 D8" [label="imout_2"];
+  "223 D8" [shape=box];
+  "223 D8" -> "225 D8" [label="imout_3"];
+  "219 E8" [shape=box];
+  "219 E8" -> "223 D8" [label="imout_4"];
+  "217 E8" [shape=box];
+  "217 E8" -> "219 E8" [label="imout_5"];
+  "215 E8" [shape=box];
+  "215 E8" -> "217 E8" [label="imout_6"];
+  "213 E8" [shape=box];
+  "213 E8" -> "215 E8" [label="imout_7"];
+  "imfilt" -> "213 E8";
+}
+// graph for dag "license_plate_copies_helper_0_4" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_helper_0_4" {
+  // inputs
+  "imout" [shape=circle];
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "244 &" [shape=trapezium,orientation=270];
+  "244 &" -> "out";
+  "in" -> "244 &";
+  "239 D8" [shape=box];
+  "239 D8" -> "244 &" [label="out_1"];
+  "238 D8" [shape=box];
+  "238 D8" -> "239 D8" [label="out_2"];
+  "237 D8" [shape=box];
+  "237 D8" -> "238 D8" [label="out_3"];
+  "imout" -> "237 D8";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0 copies
+
+// helper function license_plate_copies_helper_0_1_1
+freia_status license_plate_copies_helper_0_1_1(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  call opencl kernel license_plate_copies_helper_0_1_1(o0, i0, i1, c0, c1, c2);
+  return FREIA_OK;
+}
+// freia opencl includes
+// generated opencl for function license_plate_copies
+
+// opencl for dag 0
+
+// opencl function license_plate_copies_helper_0_1_1
+kernel license_plate_copies_helper_0_1_1(
+  opencl image o0,
+  const opencl image i0,
+  const opencl image i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    // pixel computations
+    register pixel t177 = PIXEL_THRESHOLD(in0, c0, c1, c2);
+    register pixel t179 = PIXEL_AND(in1, t177);
+    // set output pixels
+    o0[i] = t179;
+  }
+}
+
+! updated function
+
+int license_plate_copies(void)
+{
+   freia_dataio fdin;                                                   /*0010*/
+   freia_dataio fdout;                                                  /*0011*/
+
+   freia_data2d *in;                                                    /*0013*/
+   freia_data2d *imopen;                                                /*0015*/
+   freia_data2d *imclose;                                               /*0016*/
+   freia_data2d *imopenth;                                              /*0017*/
+   freia_data2d *imand;                                                 /*0019*/
+   freia_data2d *imfilt;                                                /*0020*/
+   freia_data2d *imout;                                                 /*0021*/
+   freia_data2d *out;                                                   /*0022*/
+
+   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0024*/
+   const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
+
+   freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
+   freia_status ret_0 = 0;                                              /*0029*/
+   int i_0;                                                             /*0030*/
+   freia_status ret_1 = 0;                                              /*0032*/
+   int i_1;                                                             /*0033*/
+   freia_status ret_2 = 0;                                              /*0035*/
+   int i_2;                                                             /*0036*/
+   freia_status ret_3 = 0;                                              /*0038*/
+   int i_3, i_4;                                                        /*0039*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0042*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0043*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0046*/
+   imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0048*/
+   imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0049*/
+   imopenth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);         /*0050*/
+   imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0052*/
+   imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
+   imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0054*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0055*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0058*/
+
+   i_0 = 15;                                                            /*0094*/
+   i_0 = 15;                                                            /*0126*/
+   i_1 = 8;                                                             /*0152*/
+   i_1 = 8;                                                             /*0170*/
+   i_2 = 4;                                                             /*0193*/
+   i_2 = 4;                                                             /*0203*/
+   i_3 = 4;                                                             /*0221*/
+   i_3 = 4;                                                             /*0231*/
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
+   
+   
+   
+   
+   ret_0 = 0;                                                           /*0062*/
+
+   freia_aipo_erode_8c(imopen, in, kernel1x3);                          /*0064*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0066*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0068*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0070*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0072*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0074*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0076*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0078*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0080*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0082*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0084*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0086*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0088*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0090*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0092*/
+
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0096*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0098*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0100*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0102*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0104*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0106*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0108*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0110*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0112*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0114*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0116*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0118*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0120*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0122*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0124*/
+
+   _return1 = ret_0;                                                    /*0130*/
+
+   ret_1 = 0;                                                           /*0134*/
+
+   freia_aipo_dilate_8c(imclose, in, kernel1x3);                        /*0136*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0138*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0140*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0142*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0144*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0146*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0148*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0150*/
+
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0154*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0156*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0158*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0160*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0162*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0164*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0166*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0168*/
+
+   _return0 = ret_1;                                                    /*0174*/
+
+   freia_aipo_threshold(imopenth, imopen, 1, 50, 1);                    /*0176*/
+   license_plate_copies_helper_0_1_1(imand, imclose, imopenth, 150, 255, 1);           /*0177*/
+   
+   
+   ret_2 = 0;                                                           /*0183*/
+
+   freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0185*/
+   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0187*/
+   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0189*/
+   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0191*/
+
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0195*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0197*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0199*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0201*/
+
+   _return2 = ret_2;                                                    /*0207*/
+
+   ret_3 = 0;                                                           /*0211*/
+
+   freia_aipo_erode_8c(imout, imfilt, kernel1x3);                       /*0213*/
+   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0215*/
+   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0217*/
+   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0219*/
+
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0223*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0225*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0227*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0229*/
+
+   _return3 = ret_3;                                                    /*0235*/
+
+   freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0237*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0238*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0239*/
+
+   freia_aipo_and(out, out, in);                                        /*0244*/
+   
+   
+   
+   
+   freia_common_tx_image(out, &fdout);                                  /*0245*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0248*/
+   freia_common_destruct_data(imopen);                                  /*0250*/
+   freia_common_destruct_data(imclose);                                 /*0251*/
+   freia_common_destruct_data(imopenth);                                /*0252*/
+   freia_common_destruct_data(imand);                                   /*0254*/
+   freia_common_destruct_data(imfilt);                                  /*0255*/
+   freia_common_destruct_data(imout);                                   /*0256*/
+   freia_common_destruct_data(out);                                     /*0257*/
+   
+   /* close videos flow */
+   freia_common_close_input(&fdin);                                     /*0260*/
+   freia_common_close_output(&fdout);                                   /*0261*/
+
+   return 0;                                                            /*0263*/
+}
+
+! cleaned up function
+
+int license_plate_copies(void)
+{
+   freia_dataio fdin;                                                   /*0010*/
+   freia_dataio fdout;                                                  /*0011*/
+
+   freia_data2d *in;                                                    /*0013*/
+   freia_data2d *imopen;                                                /*0015*/
+   freia_data2d *imclose;                                               /*0016*/
+   freia_data2d *imopenth;                                              /*0017*/
+   freia_data2d *imand;                                                 /*0019*/
+   freia_data2d *imfilt;                                                /*0020*/
+   freia_data2d *imout;                                                 /*0021*/
+   freia_data2d *out;                                                   /*0022*/
+
+   const  int32_t kernel1x3[9] = {0, 0, 0, 1, 1, 1, 0, 0, 0};           /*0024*/
+   const  int32_t kernel3x1[9] = {0, 1, 0, 0, 1, 0, 0, 1, 0};           /*0025*/
+
+   freia_status _return0, _return1, _return2, _return3, _return4;       /*0027*/
+   freia_status ret_0 = 0;                                              /*0029*/
+   int i_0;                                                             /*0030*/
+   freia_status ret_1 = 0;                                              /*0032*/
+   int i_1;                                                             /*0033*/
+   freia_status ret_2 = 0;                                              /*0035*/
+   int i_2;                                                             /*0036*/
+   freia_status ret_3 = 0;                                              /*0038*/
+   int i_3, i_4;                                                        /*0039*/
+   
+   /* open videos flow */
+   freia_common_open_input(&fdin, 0);                                   /*0042*/
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0043*/
+   
+   /* images creation */
+   in = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);               /*0046*/
+   imopen = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0048*/
+   imclose = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);          /*0049*/
+   imopenth = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);         /*0050*/
+   imand = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0052*/
+   imfilt = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);           /*0053*/
+   imout = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);            /*0054*/
+   out = freia_common_create_data(16, fdin.framewidth, fdin.frameheight);              /*0055*/
+   
+   /* processing */
+   freia_common_rx_image(in, &fdin);                                    /*0058*/
+
+   i_0 = 15;                                                            /*0094*/
+   i_0 = 15;                                                            /*0126*/
+   i_1 = 8;                                                             /*0152*/
+   i_1 = 8;                                                             /*0170*/
+   i_2 = 4;                                                             /*0193*/
+   i_2 = 4;                                                             /*0203*/
+   i_3 = 4;                                                             /*0221*/
+   i_3 = 4;                                                             /*0231*/
+   i_4 = 3;                                                             /*0240*/
+
+   _return4 = 0;                                                        /*0242*/
+   
+   
+   
+   
+   ret_0 = 0;                                                           /*0062*/
+
+   freia_aipo_erode_8c(imopen, in, kernel1x3);                          /*0064*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0066*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0068*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0070*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0072*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0074*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0076*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0078*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0080*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0082*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0084*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0086*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0088*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0090*/
+   freia_aipo_erode_8c(imopen, imopen, kernel1x3);                      /*0092*/
+
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0096*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0098*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0100*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0102*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0104*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0106*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0108*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0110*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0112*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0114*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0116*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0118*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0120*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0122*/
+   freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0124*/
+
+   _return1 = ret_0;                                                    /*0130*/
+
+   ret_1 = 0;                                                           /*0134*/
+
+   freia_aipo_dilate_8c(imclose, in, kernel1x3);                        /*0136*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0138*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0140*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0142*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0144*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0146*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0148*/
+   freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0150*/
+
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0154*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0156*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0158*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0160*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0162*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0164*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0166*/
+   freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0168*/
+
+   _return0 = ret_1;                                                    /*0174*/
+
+   freia_aipo_threshold(imopenth, imopen, 1, 50, 1);                    /*0176*/
+   license_plate_copies_helper_0_1_1(imand, imclose, imopenth, 150, 255, 1);           /*0177*/
+   
+   
+   ret_2 = 0;                                                           /*0183*/
+
+   freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0185*/
+   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0187*/
+   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0189*/
+   freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0191*/
+
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0195*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0197*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0199*/
+   freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0201*/
+
+   _return2 = ret_2;                                                    /*0207*/
+
+   ret_3 = 0;                                                           /*0211*/
+
+   freia_aipo_erode_8c(imout, imfilt, kernel1x3);                       /*0213*/
+   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0215*/
+   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0217*/
+   freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0219*/
+
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0223*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0225*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0227*/
+   freia_aipo_dilate_8c(imout, imout, kernel1x3);                       /*0229*/
+
+   _return3 = ret_3;                                                    /*0235*/
+
+   freia_aipo_dilate_8c(out, imout, freia_morpho_kernel_8c);            /*0237*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0238*/
+   freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0239*/
+
+   freia_aipo_and(out, out, in);                                        /*0244*/
+   
+   
+   
+   
+   freia_common_tx_image(out, &fdout);                                  /*0245*/
+   
+   /* images destruction */
+   freia_common_destruct_data(in);                                      /*0248*/
+   freia_common_destruct_data(imopen);                                  /*0250*/
+   freia_common_destruct_data(imclose);                                 /*0251*/
+   freia_common_destruct_data(imopenth);                                /*0252*/
+   freia_common_destruct_data(imand);                                   /*0254*/
    freia_common_destruct_data(imfilt);                                  /*0255*/
    freia_common_destruct_data(imout);                                   /*0256*/
    freia_common_destruct_data(out);                                     /*0257*/

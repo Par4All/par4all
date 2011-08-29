@@ -62,7 +62,8 @@ echo
 echo Compilation of block_scope11.c
 echo
 
-shell gcc block_scope11.database/Src/main.c block_scope11.database/Src/global.c -o block_scope11.database/a.out
+# not sure how to use pips_validation_exe there
+shell ${PIPS_CC:-cc} block_scope11.database/Src/main.c block_scope11.database/Src/global.c -o block_scope11.database/a.out
 
 echo
 echo Execution of block_scope11.c
@@ -72,5 +73,5 @@ shell block_scope11.database/a.out
 
 close
 
-#delete block_scope11
+delete block_scope11
 quit

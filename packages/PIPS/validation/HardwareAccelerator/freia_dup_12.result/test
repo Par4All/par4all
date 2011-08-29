@@ -157,7 +157,7 @@ digraph "freia_dup_12_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops (0 copies), optimized to 1 (0+1 copies)
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -169,13 +169,10 @@ freia_status freia_dup_12_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -217,9 +214,6 @@ freia_status freia_dup_12_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -339,6 +333,8 @@ digraph "freia_dup_12_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
 
 /* FREIA terapix helper function for module freia_dup_12
  *
@@ -511,6 +507,117 @@ freia_status freia_dup_12(freia_data2d *o, freia_data2d *t, freia_data2d *i0, fr
    // o = i0 + i1
    // could be replaced by o = t
    freia_aipo_copy(o, t);
+   return 0;                                                            /*0012*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_dup_12(freia_data2d *o, freia_data2d *t, freia_data2d *i0, freia_data2d *i1)
+{
+   // same operation performed twice
+   // t = i0 + i1
+   freia_aipo_add(t, i0, i1);                                           /*0008*/
+   // o = i0 + i1
+   // could be replaced by o = t
+   freia_aipo_add(o, i0, i1);                                           /*0011*/
+   return FREIA_OK;                                                     /*0012*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_12" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "t" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 +" [shape=trapezium,orientation=270];
+  "11 +" -> "o";
+  "8 +" [shape=trapezium,orientation=270];
+  "8 +" -> "t";
+  "i1" -> "11 +";
+  "i1" -> "8 +";
+  "i0" -> "11 +";
+  "i0" -> "8 +";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_12" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "t" [shape=circle];
+
+  // computation vertices
+  "8 +" [shape=trapezium,orientation=270];
+  "8 +" -> "t";
+  "i1" -> "8 +";
+  "i0" -> "8 +";
+
+  // external copies: 1
+  "o" [shape=circle];
+  "o =" [shape=circle,label="=",style="dashed"]
+  "t" -> "o =";
+  "o =" -> "o";
+}
+// graph for dag "freia_dup_12_helper_0_0" of module "freia_dup_12" in dot format
+digraph "freia_dup_12_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "t" [shape=circle];
+
+  // computation vertices
+  "8 +" [shape=trapezium,orientation=270];
+  "8 +" -> "t";
+  "i1" -> "8 +";
+  "i0" -> "8 +";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
+// freia opencl includes
+// generated opencl for function freia_dup_12
+
+// opencl for dag 0
+
+! updated function
+
+freia_status freia_dup_12(freia_data2d *o, freia_data2d *t, freia_data2d *i0, freia_data2d *i1)
+{
+   // same operation performed twice
+   // t = i0 + i1
+   freia_aipo_add(t, i0, i1);
+   freia_aipo_copy(o, t);
+   // o = i0 + i1
+   // could be replaced by o = t
+   return FREIA_OK;                                                     /*0012*/
+}
+
+! cleaned up function
+
+freia_status freia_dup_12(freia_data2d *o, freia_data2d *t, freia_data2d *i0, freia_data2d *i1)
+{
+   // same operation performed twice
+   // t = i0 + i1
+   freia_aipo_add(t, i0, i1);
+   freia_aipo_copy(o, t);
+   // o = i0 + i1
+   // could be replaced by o = t
    return 0;                                                            /*0012*/
 }
 #

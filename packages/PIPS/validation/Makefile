@@ -151,7 +151,8 @@ $(HEAD): check-run-consistency
 	  echo "with tpips: $(shell which tpips)" ; \
 	  tpips -v ; \
 	  echo "by user: $$USER" ; \
-	  echo "options: SLOW=$(DO_SLOW) EXE=$(PIPS_VALIDATION_EXE)" ; \
+	  echo "options: EXE=$(PIPS_VALIDATION_EXE)" \
+	       "C-CHECK=$(PIPS_CHECK_C) FORTRAN-CHECK=$(PIPS_CHECK_FORTRAN)" ; \
 	  echo "start date: $$(date) [$$(date +%s)]" ; \
 	} > $@
 

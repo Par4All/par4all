@@ -21,7 +21,7 @@ activate TRANSFORMERS_INTER_FULL
 apply PARTIAL_EVAL 
 
 # First possible position for dead code elimination
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 
 # Debugging partial eval
 # activate PRINT_CODE_PRECONDITIONS
@@ -36,7 +36,7 @@ apply PARTIAL_EVAL
 # display PRINTED_FILE
 
 # Second possible position for dead code elimination
-# apply SUPPRESS_DEAD_CODE
+# apply SIMPLIFY_CONTROL
 display PRINTED_FILE
 
 close

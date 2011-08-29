@@ -21,7 +21,7 @@ echo ## apres unspaghettify
 display PRINTED_FILE[TEST1]
 
 
-apply SUPPRESS_DEAD_CODE[TEST1]
+apply SIMPLIFY_CONTROL[TEST1]
 echo ## apres DeadCode
 display PRINTED_FILE[TEST1]
 

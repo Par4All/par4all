@@ -1,0 +1,33 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+# Typing inconsistency for FOO
+
+create synthesis07 synthesis07.f
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty PARSER_TYPE_CHECK_CALL_SITES TRUE
+
+echo
+echo User source code for SYNTHESIS07
+echo
+
+module SYNTHESIS07
+display PRINTED_FILE
+
+echo
+echo Call graph for synthesis07
+echo
+
+module SYNTHESIS07
+activate PRINT_CALL_GRAPH
+display CALLGRAPH_FILE
+
+echo
+echo Synthesized source code for HIDENH
+echo
+
+module HIDENH
+display PRINTED_FILE
+
+close
+delete synthesis07
+quit

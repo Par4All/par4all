@@ -9,7 +9,7 @@ activate C_PARSER
 display PARSED_PRINTED_FILE[enum03!]
 
 apply UNSPLIT
-shell cc -c enum03.database/Src/enum03.c
+shell pips_validation_exe.sh -c -g enum03
 
 activate PRINT_CODE_PRECONDITIONS
 

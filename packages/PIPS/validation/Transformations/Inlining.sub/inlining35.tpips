@@ -1,0 +1,27 @@
+setenv NAME inlining35
+
+delete ${NAME}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${NAME} ${NAME}.c
+
+activate NEW_CONTROLIZER
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+setproperty UNFOLDING_CALLEES "foo"
+
+apply UNFOLDING[main]
+
+display PARSED_PRINTED_FILE[main]
+
+# cat inlining35.database/main/main.c 
+
+make PRINTED_FILE[main]
+
+apply SIMPLIFY_CONTROL[main]
+display PRINTED_FILE[main]
+close
+#delete $NAME
+quit

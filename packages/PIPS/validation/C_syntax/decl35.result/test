@@ -75,3 +75,6 @@ void decl35(int i)
 {
    i++;
 }
+#
+# compile generated decl35
+#

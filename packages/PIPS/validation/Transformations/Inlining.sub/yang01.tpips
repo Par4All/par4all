@@ -1,0 +1,44 @@
+delete yang01
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create yang01 yang01.c
+
+activate C_PARSER
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo After inlining/unfolding of "bar"
+echo
+
+apply UNFOLDING[bar]
+activate PRINT_CODE
+display PRINTED_FILE[bar]
+
+echo
+echo After unspahettify of "bar"
+echo
+
+apply UNSPAGHETTIFY[bar]
+display PRINTED_FILE[bar]
+
+echo
+echo After dead code elimination of "bar"
+echo
+
+apply SIMPLIFY_CONTROL[bar]
+display PRINTED_FILE[bar]
+
+close
+# delete yang01
+quit
