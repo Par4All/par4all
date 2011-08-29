@@ -1,0 +1,47 @@
+#
+# Code after gpu_loop_nest_annotate for module main
+#
+int main()
+{
+   float a[501];
+   float b[501][501];
+   float c[501][501][501];
+   int i, j, k;
+   // Loop nest P4A begin,2D(499, 124)
+   for(i = 0; i <= 123; i += 1)
+      for(j = 0; j <= 498; j += 1)
+         // Loop nest P4A end
+         if (i<=123&&j<=498)
+            if (i==0)
+               a[i] = (float) i;
+            else
+               a[i] = a[i]+1.0;
+   // Loop nest P4A begin,2D(499, 124)
+   for(i = 0; i <= 123; i += 1)
+      for(j = 0; j <= 498; j += 1)
+         // Loop nest P4A end
+         if (i<=123&&j<=498)
+            b[i][j] = (float) i*j;
+   // Loop nest P4A begin,3D(499, 235, 124)
+   for(i = 0; i <= 123; i += 1)
+      for(j = 0; j <= 234; j += 1)
+         for(k = 0; k <= 498; k += 1)
+            // Loop nest P4A end
+            if (i<=123&&j<=234&&k<=498)
+               c[i][j][k] = (float) i*j;
+   // Loop nest P4A begin,2D(499, 499)
+   for(i = 10; i <= 508; i += 1)
+      for(j = 20; j <= 518; j += 1)
+         // Loop nest P4A end
+         if (i<=508&&j<=518)
+            b[i-10][j-20] = (float) i*j;
+   // Loop nest P4A begin,2D(499, 124)
+   for(i = 0; i <= 123; i += 1)
+      for(j = 0; j <= 498; j += 1)
+         // Loop nest P4A end
+         if (i<=123&&j<=498)
+            b[i+1][j] = b[i][j]*2.0;
+   
+   
+   return 0;
+}
