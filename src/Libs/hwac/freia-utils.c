@@ -69,7 +69,7 @@
 // preliminary stuff for volume/min/max/...
 #define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, false, "TERAPIX_UCODE_" op }
 
-#define OPCL(op) { T, "PIXEL_" op }
+#define OPCL(op) { T, op "_OP" }
 
 // types used by AIPO parameters
 #define TY_INT "int32_t"
@@ -161,7 +161,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_not_0, NO_MES },
     // ??? why not less?
-    TRPX_OP(4, "NOT"), OPCL("NOT")
+    TRPX_OP(4, "NOT"), OPCL("NOTU")
   },
   { AIPO "log2", "l2", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_log2_0, NO_MES },
@@ -169,72 +169,72 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "add_const", "+.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_add_0cst, NO_MES },
-    TRPX_OP(3, "ADD_CONST"), OPCL("ADD_CONST")
+    TRPX_OP(3, "ADD_CONST"), OPCL("ADD")
   },
   { AIPO "inf_const", "<.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_inf_0cst, NO_MES },
-    TRPX_OP(3, "INF_CONST"), OPCL("INF_CONST")
+    TRPX_OP(3, "INF_CONST"), OPCL("INF")
   },
   { AIPO "sup_const", ">.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES },
-    TRPX_OP(3, "SUP_CONST?"), OPCL("SUP_CONST")
+    TRPX_OP(3, "SUP_CONST?"), OPCL("SUP")
   },
   { AIPO "sub_const", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES },
-    TRPX_OP(3, "SUB_CONST"), OPCL("SUB_CONST")
+    TRPX_OP(3, "SUB_CONST"), OPCL("SUB")
   },
   { AIPO "const_sub", ".-", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_cst0, NO_MES },
-    TRPX_OP(3, "CONST_SUB"), OPCL("CONST_SUB")
+    TRPX_OP(3, "CONST_SUB"), OPCL("SUBC")
   },
   { AIPO "and_const", "&.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_and_0cst, NO_MES },
-    TRPX_OP(3, "AND_CONST"), OPCL("AND_CONST")
+    TRPX_OP(3, "AND_CONST"), OPCL("AND")
   },
   { AIPO "or_const", "|.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_or_0cst, NO_MES },
-    TRPX_OP(3, "OR_CONST?"), OPCL("OR_CONST")
+    TRPX_OP(3, "OR_CONST?"), OPCL("OR")
   },
   { AIPO "xor_const", "^.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_xor_0cst, NO_MES },
-    TRPX_OP(3, "XOR_CONST?"), OPCL("XOR_CONST")
+    TRPX_OP(3, "XOR_CONST?"), OPCL("XOR")
   },
   { AIPO "addsat_const", "+s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_addsat_0cst, NO_MES },
-    TRPX_OP(3, "ADDSAT_CONST?"), OPCL("ADDSAT_CONST")
+    TRPX_OP(3, "ADDSAT_CONST?"), OPCL("ADDSAT")
   },
   { AIPO "subsat_const", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES },
-    TRPX_OP(3, "SUBSAT_CONST?"), OPCL("SUBSAT_CONST")
+    TRPX_OP(3, "SUBSAT_CONST?"), OPCL("SUBSAT")
   },
   { AIPO "const_subsat", ".-s", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_cst0, NO_MES },
-    TRPX_OP(3, "CONST_SUBSAT?"), OPCL("CONST_SUBSAT")
+    TRPX_OP(3, "CONST_SUBSAT?"), OPCL("SUBSATC")
   },
   { AIPO "absdiff_const", "-|.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_abssub_0cst, NO_MES },
-    TRPX_OP(3, "ABSDIFF_CONST?"), OPCL("ABSDIFF_CONST")
+    TRPX_OP(3, "ABSDIFF_CONST?"), OPCL("ABSDIFF")
   },
   { AIPO "mul_const", "*.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_mul_0cst, NO_MES },
-    TRPX_OP(3, "MUL_CONST"), OPCL("MUL_CONST")
+    TRPX_OP(3, "MUL_CONST"), OPCL("MUL")
   },
   { AIPO "div_const", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES },
-    TRPX_OP(3, "DIV_CONST"), OPCL("DIV_CONST")
+    TRPX_OP(3, "DIV_CONST"), OPCL("DIV")
   },
   { AIPO "const_div", "./", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_cst0, NO_MES },
-    TRPX_OP(3, "CONST_DIV?"), OPCL("CONST_DIV")
+    TRPX_OP(3, "CONST_DIV?"), OPCL("DIVC")
   },
   // nullary
   { AIPO "set_constant", "C", NULL, 1, 0, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES },
-    TRPX_OP(2, "SET_CONST"), OPCL("SET_CONST")
+    TRPX_OP(2, "SET_CONST"), OPCL("SET_CONST") // simple assign?
   },
   // not a real one, this is used internally only
   // semantics of "scalar_copy(a, b);" is "*a = *b;"
@@ -247,7 +247,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "copy", "=", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     // hmmm... would NO_SPOC do?
     { spoc_input_0|spoc_output_0, NO_POC, alu_unused, NO_MES },
-    TRPX_OP(3, "COPY"), OPCL("COPY")
+    TRPX_OP(3, "COPY"), OPCL("COPY") // simple assign!
   },
   { // not implemented by SPOC! nor TERAPIX!
     AIPO "cast", "=()", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
@@ -256,7 +256,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "threshold", "thr", NULL, 1, 1, 0, 3, NO_PARAM,
     { TY_INT, TY_INT, TY_INT },
     { spoc_input_0|spoc_output_0|spoc_th_0, NO_POC, alu_unused, NO_MES },
-    TRPX_OP(5, "THRESHOLD"), OPCL("THRESHOLD")
+    TRPX_OP(5, "THRESHOLD"), NO_OPCL // OPCL("THRESHOLD")
   },
   // MORPHO
   { AIPO "erode_6c", "E6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_CIP, NULL, NULL },

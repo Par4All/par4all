@@ -39,31 +39,17 @@
 // includes for OpenCL helper
 #define FREIA_OPENCL_INCLUDES                                 \
   "// FREIA OpenCL includes\n"                                \
-  "#include <CL/OpenCL.h>\n"                                  \
-  "#include <private/freiaGatewayOpenCL.h>\n"                 \
+  "#include <CL/opencl.h>\n"                                  \
+  "#include \"freia.h\"\n"                                    \
+  "#include \"private/freiaGatewayOpenCL.h\"\n"               \
   "\n"                                                        \
-  "// support function, should be in FREIA runtime?\n"        \
-  "static freia_status get_compiled_opencl(\n"                \
-  "  const char * source, // opencl source\n"                 \
-  "  const char * kname, // expected kernel name\n"           \
-  "  const char * option // compiler option\n"                \
-  "  cl_kernel * kernel) // where to put the kernel\n"        \
-  "{\n"                                                       \
-  "  freia_status err;\n"                                     \
-  "  char * opts;\n"                                          \
-  "  int n = asprint(&ops, \"%s %s \","                       \
-                   " frclTarget.compileOptions, option);\n"   \
-  "  if (n==-1) return FREIA_UNLISTED_ERROR;\n"               \
-  "  cl_program prg =\n"                                      \
-  "    freia_op_compile_string_opencl(source, ops, &err);\n"  \
-  "  if (err != FREIA_OK) return err;\n"                      \
-  "  *kernel = freia_op_get_kernel(prg, kname, &err);\n"      \
-  "  return err;\n"                                           \
-  "}\n"
+  "// FREIA OpenCL runtime helper\n"                          \
+  "extern freia_status freia_op_compile_kernel(\n"            \
+  "   const char*, const char*, const char*, cl_kernel *);\n"
 
+// raw include for opencl code generation
 #define FREIA_OPENCL_CL_INCLUDES                \
-  "// FREIA OpenCL specific includes\n"         \
-  "#include <freiaAtomicOpCommonOpenCL.hcl>\n"
+  "#include <freia_opencl_runtime.hcl>"
 
 // information about OpenCL handling of an operation
 typedef struct {

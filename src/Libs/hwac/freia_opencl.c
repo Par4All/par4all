@@ -139,10 +139,11 @@ static int opencl_compile_mergeable_dag(
   if (n_outs) ref = "o0";
   sb_cat(helper_decls,
          "  int pitch = ", ref, "->row[1] - ", ref, "->row[0];\n"
+         "  int width = ", ref, "->widthWa;\n",
          "  size_t workSize[2];\n" // why 2?
          "  workSize[0] = ", ref, "->heightWa;\n"
          "  uint32_t bpp = ", ref, "->bpp>>4;\n"
-         "  cl_kernel kernel,\n"
+         "  cl_kernel kernel;\n"
          "\n"
          "  // handle on the fly compilation...\n"
          "  static int to_compile = 1;\n"
@@ -183,6 +184,8 @@ static int opencl_compile_mergeable_dag(
            "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
            ", sizeof(cl_mem), &pool[o", si, "->clId]);\n");
     cl_args++;
+    sb_cat(helper_decls,
+       "  cl_int ofs_o", si, " = freia_common_data_get_offset(o", si, ");\n");
     sb_cat(helper_body,
            "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
            ", sizeof(cl_int), &ofs_o", si, ");\n");
@@ -211,6 +214,8 @@ static int opencl_compile_mergeable_dag(
            "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
            ", sizeof(cl_mem), &pool[i", si, "->clId]);\n");
     cl_args++;
+    sb_cat(helper_decls,
+        "  cl_int ofs_i", si, " = freia_common_data_get_offset(i", si, ");\n");
     sb_cat(helper_body,
            "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
            ", sizeof(cl_int), &ofs_i", si, ");\n");
@@ -349,18 +354,18 @@ static int opencl_compile_mergeable_dag(
          "static freia_status ", cut_name, "_compile(void)\n"
          "{\n"
          "  // OpenCL source for ", cut_name, "\n"
-         "  const char * ", cut_name, "_source = \"\n",
-         FREIA_OPENCL_CL_INCLUDES);
-  string_buffer_append_sb(compile, opencl);
+         "  const char * ", cut_name, "_source =\n");
+  sb_cat(compile, "    \"" FREIA_OPENCL_CL_INCLUDES "\\n\"\n    ");
+  string_buffer_append_c_string_buffer(compile, opencl, 4);
   sb_cat(compile,
-         "\";\n"
+         ";\n"
          "  freia_status err = FREIA_OK;\n"
-         "  err |= get_compiled_opencl(", cut_name, "_source, \"",
-                              cut_name, "\", \"-DPIXEL8\", &",
-                              cut_name, "_kernel[0]);\n"
-         "  err |= get_compiled_opencl(", cut_name, "_source, \"",
-                              cut_name, "\", \"-DPIXEL16\", &",
-                              cut_name, "_kernel[1]);\n"
+         "  err |= freia_op_compile_kernel(", cut_name, "_source, "
+                                        "\"", cut_name, "\", \"-DPIXEL8\","
+                                        " &", cut_name, "_kernel[0]);\n"
+         "  err |= freia_op_compile_kernel(", cut_name, "_source, "
+                                        "\"", cut_name, "\", \"-DPIXEL16\","
+                                        " &", cut_name, "_kernel[1]);\n"
          "  return err;\n"
          "}\n");
 
@@ -576,7 +581,7 @@ list freia_opencl_compile_calls
   {
     opencl = safe_fopen(opencl_file, "w");
     fprintf(opencl,
-            FREIA_OPENCL_CL_INCLUDES
+            FREIA_OPENCL_CL_INCLUDES "\n"
             "// generated OpenCL kernels for function %s\n", module);
   }
   fprintf(opencl, "\n" "// opencl for dag %d\n", number);
