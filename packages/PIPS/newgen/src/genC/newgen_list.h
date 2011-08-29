@@ -321,6 +321,7 @@ extern list gen_some(gen_filter_func_t, const list);
 extern bool gen_replace_in_list(list, const void *, const void *);
 extern void gen_exchange_in_list(list, const void *, const void *);
 
+extern list gen_insert_list(list, const void *, list, bool);
 extern void gen_insert_after(const void *, const void *, list);
 extern list gen_insert_before(const void *, const void *, list);
 extern list gen_once(const void *, list);
@@ -337,6 +338,7 @@ extern void gen_closure(list (*)(), const list);
 
 extern list gen_copy_string_list(const list);
 extern void gen_free_string_list(list);
+void gen_fprint(FILE *, const string, const list, gen_string_func_t);
 
 // UTILS
 extern list gen_cons(const void *, const list);
