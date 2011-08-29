@@ -1824,26 +1824,13 @@ digraph "freia_42_helper_0_0_1" {
 ! acceleration function
 
 // FREIA OpenCL includes
-#include <CL/OpenCL.h>
-#include <private/freiaGatewayOpenCL.h>
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freiaGatewayOpenCL.h"
 
-// support function, should be in FREIA runtime?
-static freia_status get_compiled_opencl(
-  const char * source, // opencl source
-  const char * kname, // expected kernel name
-  const char * option // compiler option
-  cl_kernel * kernel) // where to put the kernel
-{
-  freia_status err;
-  char * opts;
-  int n = asprint(&ops, "%s %s ", frclTarget.compileOptions, option);
-  if (n==-1) return FREIA_UNLISTED_ERROR;
-  cl_program prg =
-    freia_op_compile_string_opencl(source, ops, &err);
-  if (err != FREIA_OK) return err;
-  *kernel = freia_op_get_kernel(prg, kname, &err);
-  return err;
-}
+// FREIA OpenCL runtime helper
+extern freia_status freia_op_compile_kernel(
+   const char*, const char*, const char*, cl_kernel *);
 
 // dag 0: 11 ops and 0 copies, optimized to 8 ops and 0+0 copies
 
@@ -1854,53 +1841,52 @@ static cl_kernel freia_42_helper_0_0_1_kernel[2];
 static freia_status freia_42_helper_0_0_1_compile(void)
 {
   // OpenCL source for freia_42_helper_0_0_1
-  const char * freia_42_helper_0_0_1_source = "
-// FREIA OpenCL specific includes
-#include <freiaAtomicOpCommonOpenCL.hcl>
-
-// opencl function freia_42_helper_0_0_1
-KERNEL void freia_42_helper_0_0_1(
-  GLOBAL PIXEL * o0,
-  int ofs_o0,
-  GLOBAL PIXEL * i0, // const?
-  int ofs_i0,
-  GLOBAL PIXEL * i1, // const?
-  int ofs_i1,
-  GLOBAL PIXEL * i2, // const?
-  int ofs_i2,
-  GLOBAL PIXEL * i3, // const?
-  int ofs_i3,
-  int width,
-  int pitch)
-{
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  GLOBAL PIXEL * j2 = i2 + ofs_i2;
-  GLOBAL PIXEL * j3 = i3 + ofs_i3;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
-  int i;
-  for (i=gid; i < (gid+width); i++)
-  {
-    // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    PIXEL in2 = j2[i];
-    PIXEL in3 = j3[i];
-    // pixel computations
-    PIXEL t37 = PIXEL_SUB(in2, in0);
-    PIXEL t43 = PIXEL_SUB(in2, in3);
-    PIXEL t38 = PIXEL_ABSDIFF(in1, t37);
-    PIXEL t44 = PIXEL_ABSDIFF(t37, t43);
-    PIXEL t45 = PIXEL_INF(t44, t38);
-    // set output pixels
-    p0[i] = t45;
-  }
-}
-";
+  const char * freia_42_helper_0_0_1_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function freia_42_helper_0_0_1\n"
+    "KERNEL void freia_42_helper_0_0_1(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  GLOBAL PIXEL * i1, // const?\n"
+    "  int ofs_i1,\n"
+    "  GLOBAL PIXEL * i2, // const?\n"
+    "  int ofs_i2,\n"
+    "  GLOBAL PIXEL * i3, // const?\n"
+    "  int ofs_i3,\n"
+    "  int width,\n"
+    "  int pitch)\n"
+    "{\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
+    "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
+    "  GLOBAL PIXEL * j3 = i3 + ofs_i3;\n"
+    "  int gid = get_global_id(1)*pitch + get_global_id(0);\n"
+    "  int i;\n"
+    "  for (i=gid; i < (gid+width); i++)\n"
+    "  {\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in2 = j2[i];\n"
+    "    PIXEL in3 = j3[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t37 = SUB_OP(in2, in0);\n"
+    "    PIXEL t43 = SUB_OP(in2, in3);\n"
+    "    PIXEL t38 = ABSDIFF_OP(in1, t37);\n"
+    "    PIXEL t44 = ABSDIFF_OP(t37, t43);\n"
+    "    PIXEL t45 = INF_OP(t44, t38);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t45;\n"
+    "  }\n"
+    "}\n"
+    "";
   freia_status err = FREIA_OK;
-  err |= get_compiled_opencl(freia_42_helper_0_0_1_source, "freia_42_helper_0_0_1", "-DPIXEL8", &freia_42_helper_0_0_1_kernel[0]);
-  err |= get_compiled_opencl(freia_42_helper_0_0_1_source, "freia_42_helper_0_0_1", "-DPIXEL16", &freia_42_helper_0_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(freia_42_helper_0_0_1_source, "freia_42_helper_0_0_1", "-DPIXEL8", &freia_42_helper_0_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(freia_42_helper_0_0_1_source, "freia_42_helper_0_0_1", "-DPIXEL16", &freia_42_helper_0_0_1_kernel[1]);
   return err;
 }
 
@@ -1915,10 +1901,11 @@ freia_status freia_42_helper_0_0_1(
   freia_status err = FREIA_OK;
   freia_data2d_opencl *pool= frclTarget.pool;
   int pitch = o0->row[1] - o0->row[0];
+  int width = o0->widthWa;
   size_t workSize[2];
   workSize[0] = o0->heightWa;
   uint32_t bpp = o0->bpp>>4;
-  cl_kernel kernel,
+  cl_kernel kernel;
 
   // handle on the fly compilation...
   static int to_compile = 1;
@@ -1932,6 +1919,11 @@ freia_status freia_42_helper_0_0_1(
 
   // now get kernel, which must be there...
   kernel = freia_42_helper_0_0_1_kernel[bpp];
+  cl_int ofs_o0 = freia_common_data_get_offset(o0);
+  cl_int ofs_i0 = freia_common_data_get_offset(i0);
+  cl_int ofs_i1 = freia_common_data_get_offset(i1);
+  cl_int ofs_i2 = freia_common_data_get_offset(i2);
+  cl_int ofs_i3 = freia_common_data_get_offset(i3);
 
   // set kernel parameters
   err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId]);
@@ -1961,8 +1953,7 @@ freia_status freia_42_helper_0_0_1(
 
   return err;
 }
-// FREIA OpenCL specific includes
-#include <freiaAtomicOpCommonOpenCL.hcl>
+#include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_42
 
 // opencl for dag 0
@@ -1997,11 +1988,11 @@ KERNEL void freia_42_helper_0_0_1(
     PIXEL in2 = j2[i];
     PIXEL in3 = j3[i];
     // pixel computations
-    PIXEL t37 = PIXEL_SUB(in2, in0);
-    PIXEL t43 = PIXEL_SUB(in2, in3);
-    PIXEL t38 = PIXEL_ABSDIFF(in1, t37);
-    PIXEL t44 = PIXEL_ABSDIFF(t37, t43);
-    PIXEL t45 = PIXEL_INF(t44, t38);
+    PIXEL t37 = SUB_OP(in2, in0);
+    PIXEL t43 = SUB_OP(in2, in3);
+    PIXEL t38 = ABSDIFF_OP(in1, t37);
+    PIXEL t44 = ABSDIFF_OP(t37, t43);
+    PIXEL t45 = INF_OP(t44, t38);
     // set output pixels
     p0[i] = t45;
   }

@@ -2182,46 +2182,29 @@ digraph "freia_scalar_07_helper_0_1" {
   "19 thr" -> "28 D8" [label="tB"];
   "i" -> "19 thr";
 }
-// graph for dag "freia_scalar_07_helper_0_1_0" of module "freia_scalar_07" in dot format
-digraph "freia_scalar_07_helper_0_1_0" {
+// graph for dag "freia_scalar_07_helper_0_1_1" of module "freia_scalar_07" in dot format
+digraph "freia_scalar_07_helper_0_1_1" {
   // inputs
-  "X_1" [shape=circle];
-  "i" [shape=circle];
+  "tB" [shape=circle];
+  "tB2" [shape=circle];
+  "tC" [shape=circle];
 
   // outputs
-  "tB" [shape=circle];
   "tC2" [shape=circle];
+  "X" [shape=circle];
 
   // computation vertices
+  "29 *" [shape=trapezium,orientation=270];
+  "29 *" -> "X";
+  "tB" -> "29 *";
+  "tB2" -> "29 *";
   "26 +" [shape=trapezium,orientation=270];
   "26 +" -> "tC2";
-  "25 thr" [shape=parallelogram];
-  "25 thr" -> "26 +" [label="tC"];
-  "25 thr" -> "26 +" [label="tC"];
-  "X_1" -> "25 thr";
-  "19 thr" [shape=parallelogram];
-  "19 thr" -> "tB";
-  "i" -> "19 thr";
+  "tC" -> "26 +";
+  "tC" -> "26 +";
 }
 // graph for dag "freia_scalar_07_helper_0_2" of module "freia_scalar_07" in dot format
 digraph "freia_scalar_07_helper_0_2" {
-  // inputs
-  "X" [shape=circle];
-  "tC2" [shape=circle];
-
-  // outputs
-  "o" [shape=circle];
-
-  // computation vertices
-  "33 +" [shape=trapezium,orientation=270];
-  "33 +" -> "o";
-  "tC2" -> "33 +";
-  "32 thr" [shape=parallelogram];
-  "32 thr" -> "33 +" [label="tD"];
-  "X" -> "32 thr";
-}
-// graph for dag "freia_scalar_07_helper_0_2_0" of module "freia_scalar_07" in dot format
-digraph "freia_scalar_07_helper_0_2_0" {
   // inputs
   "X" [shape=circle];
   "tC2" [shape=circle];
@@ -2241,119 +2224,103 @@ digraph "freia_scalar_07_helper_0_2_0" {
 ! acceleration function
 
 // FREIA OpenCL includes
-#include <CL/OpenCL.h>
-#include <private/freiaGatewayOpenCL.h>
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freiaGatewayOpenCL.h"
 
-// support function, should be in FREIA runtime?
-static freia_status get_compiled_opencl(
-  const char * source, // opencl source
-  const char * kname, // expected kernel name
-  const char * option // compiler option
-  cl_kernel * kernel) // where to put the kernel
-{
-  freia_status err;
-  char * opts;
-  int n = asprint(&ops, "%s %s ", frclTarget.compileOptions, option);
-  if (n==-1) return FREIA_UNLISTED_ERROR;
-  cl_program prg =
-    freia_op_compile_string_opencl(source, ops, &err);
-  if (err != FREIA_OK) return err;
-  *kernel = freia_op_get_kernel(prg, kname, &err);
-  return err;
-}
+// FREIA OpenCL runtime helper
+extern freia_status freia_op_compile_kernel(
+   const char*, const char*, const char*, cl_kernel *);
 
 // dag 0: 11 ops and 0 copies, optimized to 11 ops and 0+0 copies
 
-// hold kernels forfreia_scalar_07_helper_0_1_0
-static cl_kernel freia_scalar_07_helper_0_1_0_kernel[2];
+// hold kernels forfreia_scalar_07_helper_0_1_1
+static cl_kernel freia_scalar_07_helper_0_1_1_kernel[2];
 
-// compile kernels for freia_scalar_07_helper_0_1_0
-static freia_status freia_scalar_07_helper_0_1_0_compile(void)
+// compile kernels for freia_scalar_07_helper_0_1_1
+static freia_status freia_scalar_07_helper_0_1_1_compile(void)
 {
-  // OpenCL source for freia_scalar_07_helper_0_1_0
-  const char * freia_scalar_07_helper_0_1_0_source = "
-// FREIA OpenCL specific includes
-#include <freiaAtomicOpCommonOpenCL.hcl>
-
-// opencl function freia_scalar_07_helper_0_1_0
-KERNEL void freia_scalar_07_helper_0_1_0(
-  GLOBAL PIXEL * o0,
-  int ofs_o0,
-  GLOBAL PIXEL * o1,
-  int ofs_o1,
-  GLOBAL PIXEL * i0, // const?
-  int ofs_i0,
-  GLOBAL PIXEL * i1, // const?
-  int ofs_i1,
-  int width,
-  int pitch,
-  int c0,
-  int c1,
-  int c2,
-  int c3,
-  int c4,
-  int c5)
-{
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * p1 = o1 + ofs_o1;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
-  int i;
-  for (i=gid; i < (gid+width); i++)
-  {
-    // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    // pixel computations
-    PIXEL t19 = PIXEL_THRESHOLD(in1, c0, c1, c2);
-    PIXEL t25 = PIXEL_THRESHOLD(in0, c3, c4, c5);
-    PIXEL t26 = PIXEL_ADD(t25, t25);
-    // set output pixels
-    p0[i] = t19;
-    p1[i] = t26;
-  }
-}
-";
+  // OpenCL source for freia_scalar_07_helper_0_1_1
+  const char * freia_scalar_07_helper_0_1_1_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function freia_scalar_07_helper_0_1_1\n"
+    "KERNEL void freia_scalar_07_helper_0_1_1(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * o1,\n"
+    "  int ofs_o1,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  GLOBAL PIXEL * i1, // const?\n"
+    "  int ofs_i1,\n"
+    "  GLOBAL PIXEL * i2, // const?\n"
+    "  int ofs_i2,\n"
+    "  int width,\n"
+    "  int pitch)\n"
+    "{\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
+    "  GLOBAL PIXEL * p1 = o1 + ofs_o1;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
+    "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
+    "  int gid = get_global_id(1)*pitch + get_global_id(0);\n"
+    "  int i;\n"
+    "  for (i=gid; i < (gid+width); i++)\n"
+    "  {\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in2 = j2[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t26 = ADD_OP(in2, in2);\n"
+    "    PIXEL t29 = MUL_OP(in1, in0);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t26;\n"
+    "    p1[i] = t29;\n"
+    "  }\n"
+    "}\n"
+    "";
   freia_status err = FREIA_OK;
-  err |= get_compiled_opencl(freia_scalar_07_helper_0_1_0_source, "freia_scalar_07_helper_0_1_0", "-DPIXEL8", &freia_scalar_07_helper_0_1_0_kernel[0]);
-  err |= get_compiled_opencl(freia_scalar_07_helper_0_1_0_source, "freia_scalar_07_helper_0_1_0", "-DPIXEL16", &freia_scalar_07_helper_0_1_0_kernel[1]);
+  err |= freia_op_compile_kernel(freia_scalar_07_helper_0_1_1_source, "freia_scalar_07_helper_0_1_1", "-DPIXEL8", &freia_scalar_07_helper_0_1_1_kernel[0]);
+  err |= freia_op_compile_kernel(freia_scalar_07_helper_0_1_1_source, "freia_scalar_07_helper_0_1_1", "-DPIXEL16", &freia_scalar_07_helper_0_1_1_kernel[1]);
   return err;
 }
 
-// helper function freia_scalar_07_helper_0_1_0
-freia_status freia_scalar_07_helper_0_1_0(
+// helper function freia_scalar_07_helper_0_1_1
+freia_status freia_scalar_07_helper_0_1_1(
   freia_data2d * o0,
   freia_data2d * o1,
   const freia_data2d * i0,
   const freia_data2d * i1,
-  int32_t c0,
-  int32_t c1,
-  int32_t c2,
-  int32_t c3,
-  int32_t c4,
-  int32_t c5)
+  const freia_data2d * i2)
 {
   freia_status err = FREIA_OK;
   freia_data2d_opencl *pool= frclTarget.pool;
   int pitch = o0->row[1] - o0->row[0];
+  int width = o0->widthWa;
   size_t workSize[2];
   workSize[0] = o0->heightWa;
   uint32_t bpp = o0->bpp>>4;
-  cl_kernel kernel,
+  cl_kernel kernel;
 
   // handle on the fly compilation...
   static int to_compile = 1;
 
   if (to_compile) {
-    freia_status cerr = freia_scalar_07_helper_0_1_0_compile();
+    freia_status cerr = freia_scalar_07_helper_0_1_1_compile();
     // compilation may have failed
     if (cerr) return cerr;
     to_compile = 0;
   }
 
   // now get kernel, which must be there...
-  kernel = freia_scalar_07_helper_0_1_0_kernel[bpp];
+  kernel = freia_scalar_07_helper_0_1_1_kernel[bpp];
+  cl_int ofs_o0 = freia_common_data_get_offset(o0);
+  cl_int ofs_o1 = freia_common_data_get_offset(o1);
+  cl_int ofs_i0 = freia_common_data_get_offset(i0);
+  cl_int ofs_i1 = freia_common_data_get_offset(i1);
+  cl_int ofs_i2 = freia_common_data_get_offset(i2);
 
   // set kernel parameters
   err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId]);
@@ -2364,16 +2331,12 @@ freia_status freia_scalar_07_helper_0_1_0(
   err |= clSetKernelArg(kernel, 5, sizeof(cl_int), &ofs_i0);
   err |= clSetKernelArg(kernel, 6, sizeof(cl_mem), &pool[i1->clId]);
   err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &ofs_i1);
-  err |= clSetKernelArg(kernel, 8, sizeof(cl_int), &width);
-  err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &pitch);
-  err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &c0);
-  err |= clSetKernelArg(kernel, 11, sizeof(cl_int), &c1);
-  err |= clSetKernelArg(kernel, 12, sizeof(cl_int), &c2);
-  err |= clSetKernelArg(kernel, 13, sizeof(cl_int), &c3);
-  err |= clSetKernelArg(kernel, 14, sizeof(cl_int), &c4);
-  err |= clSetKernelArg(kernel, 15, sizeof(cl_int), &c5);
+  err |= clSetKernelArg(kernel, 8, sizeof(cl_mem), &pool[i2->clId]);
+  err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &ofs_i2);
+  err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &width);
+  err |= clSetKernelArg(kernel, 11, sizeof(cl_int), &pitch);
 
-  // call kernel freia_scalar_07_helper_0_1_0
+  // call kernel freia_scalar_07_helper_0_1_1
   err |= clEnqueueNDRangeKernel(
             frclTarget.queue,
             kernel,
@@ -2387,121 +2350,13 @@ freia_status freia_scalar_07_helper_0_1_0(
 
   return err;
 }
-
-// hold kernels forfreia_scalar_07_helper_0_2_0
-static cl_kernel freia_scalar_07_helper_0_2_0_kernel[2];
-
-// compile kernels for freia_scalar_07_helper_0_2_0
-static freia_status freia_scalar_07_helper_0_2_0_compile(void)
-{
-  // OpenCL source for freia_scalar_07_helper_0_2_0
-  const char * freia_scalar_07_helper_0_2_0_source = "
-// FREIA OpenCL specific includes
-#include <freiaAtomicOpCommonOpenCL.hcl>
-
-// opencl function freia_scalar_07_helper_0_2_0
-KERNEL void freia_scalar_07_helper_0_2_0(
-  GLOBAL PIXEL * o0,
-  int ofs_o0,
-  GLOBAL PIXEL * i0, // const?
-  int ofs_i0,
-  GLOBAL PIXEL * i1, // const?
-  int ofs_i1,
-  int width,
-  int pitch,
-  int c0,
-  int c1,
-  int c2)
-{
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
-  int i;
-  for (i=gid; i < (gid+width); i++)
-  {
-    // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    // pixel computations
-    PIXEL t32 = PIXEL_THRESHOLD(in0, c0, c1, c2);
-    PIXEL t33 = PIXEL_ADD(in1, t32);
-    // set output pixels
-    p0[i] = t33;
-  }
-}
-";
-  freia_status err = FREIA_OK;
-  err |= get_compiled_opencl(freia_scalar_07_helper_0_2_0_source, "freia_scalar_07_helper_0_2_0", "-DPIXEL8", &freia_scalar_07_helper_0_2_0_kernel[0]);
-  err |= get_compiled_opencl(freia_scalar_07_helper_0_2_0_source, "freia_scalar_07_helper_0_2_0", "-DPIXEL16", &freia_scalar_07_helper_0_2_0_kernel[1]);
-  return err;
-}
-
-// helper function freia_scalar_07_helper_0_2_0
-freia_status freia_scalar_07_helper_0_2_0(
-  freia_data2d * o0,
-  const freia_data2d * i0,
-  const freia_data2d * i1,
-  int32_t c0,
-  int32_t c1,
-  int32_t c2)
-{
-  freia_status err = FREIA_OK;
-  freia_data2d_opencl *pool= frclTarget.pool;
-  int pitch = o0->row[1] - o0->row[0];
-  size_t workSize[2];
-  workSize[0] = o0->heightWa;
-  uint32_t bpp = o0->bpp>>4;
-  cl_kernel kernel,
-
-  // handle on the fly compilation...
-  static int to_compile = 1;
-
-  if (to_compile) {
-    freia_status cerr = freia_scalar_07_helper_0_2_0_compile();
-    // compilation may have failed
-    if (cerr) return cerr;
-    to_compile = 0;
-  }
-
-  // now get kernel, which must be there...
-  kernel = freia_scalar_07_helper_0_2_0_kernel[bpp];
-
-  // set kernel parameters
-  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId]);
-  err |= clSetKernelArg(kernel, 1, sizeof(cl_int), &ofs_o0);
-  err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &pool[i0->clId]);
-  err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &ofs_i0);
-  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &pool[i1->clId]);
-  err |= clSetKernelArg(kernel, 5, sizeof(cl_int), &ofs_i1);
-  err |= clSetKernelArg(kernel, 6, sizeof(cl_int), &width);
-  err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &pitch);
-  err |= clSetKernelArg(kernel, 8, sizeof(cl_int), &c0);
-  err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &c1);
-  err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &c2);
-
-  // call kernel freia_scalar_07_helper_0_2_0
-  err |= clEnqueueNDRangeKernel(
-            frclTarget.queue,
-            kernel,
-            1, // number of dimensions
-            NULL, // undefined for OpenCL 1.0
-            workSize, // x and y dimensions
-            NULL, // local size
-            0, // don't wait events
-            NULL,
-            NULL); // do not produce an event
-
-  return err;
-}
-// FREIA OpenCL specific includes
-#include <freiaAtomicOpCommonOpenCL.hcl>
+#include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_scalar_07
 
 // opencl for dag 0
 
-// opencl function freia_scalar_07_helper_0_1_0
-KERNEL void freia_scalar_07_helper_0_1_0(
+// opencl function freia_scalar_07_helper_0_1_1
+KERNEL void freia_scalar_07_helper_0_1_1(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * o1,
@@ -2510,19 +2365,16 @@ KERNEL void freia_scalar_07_helper_0_1_0(
   int ofs_i0,
   GLOBAL PIXEL * i1, // const?
   int ofs_i1,
+  GLOBAL PIXEL * i2, // const?
+  int ofs_i2,
   int width,
-  int pitch,
-  int c0,
-  int c1,
-  int c2,
-  int c3,
-  int c4,
-  int c5)
+  int pitch)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * p1 = o1 + ofs_o1;
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
   GLOBAL PIXEL * j1 = i1 + ofs_i1;
+  GLOBAL PIXEL * j2 = i2 + ofs_i2;
   int gid = get_global_id(1)*pitch + get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
@@ -2530,45 +2382,13 @@ KERNEL void freia_scalar_07_helper_0_1_0(
     // get input pixels
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
+    PIXEL in2 = j2[i];
     // pixel computations
-    PIXEL t19 = PIXEL_THRESHOLD(in1, c0, c1, c2);
-    PIXEL t25 = PIXEL_THRESHOLD(in0, c3, c4, c5);
-    PIXEL t26 = PIXEL_ADD(t25, t25);
+    PIXEL t26 = ADD_OP(in2, in2);
+    PIXEL t29 = MUL_OP(in1, in0);
     // set output pixels
-    p0[i] = t19;
-    p1[i] = t26;
-  }
-}
-
-// opencl function freia_scalar_07_helper_0_2_0
-KERNEL void freia_scalar_07_helper_0_2_0(
-  GLOBAL PIXEL * o0,
-  int ofs_o0,
-  GLOBAL PIXEL * i0, // const?
-  int ofs_i0,
-  GLOBAL PIXEL * i1, // const?
-  int ofs_i1,
-  int width,
-  int pitch,
-  int c0,
-  int c1,
-  int c2)
-{
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
-  int i;
-  for (i=gid; i < (gid+width); i++)
-  {
-    // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    // pixel computations
-    PIXEL t32 = PIXEL_THRESHOLD(in0, c0, c1, c2);
-    PIXEL t33 = PIXEL_ADD(in1, t32);
-    // set output pixels
-    p0[i] = t33;
+    p0[i] = t26;
+    p1[i] = t29;
   }
 }
 
@@ -2582,33 +2402,34 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    
    
-   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tB2 = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128);       /*0012*/
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tB2 = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);     /*0012*/
    int sA, sB, sC;                                                      /*0013*/
-   // hardware accelerator generated variable
-   freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
    
    // BUG: issue with X reuse...
    // A
    freia_aipo_global_max(i, &sA);                                       /*0017*/
    // B
-   freia_scalar_07_helper_0_1_0(tB, tC2, X_1, i, sA-10, sA-1, false, sB-10, sB-1, false);             /*0019*/
+   freia_aipo_threshold(tB, i, sA-10, sA-1, false);                     /*0019*/
    // A
-   freia_aipo_erode_8c(X_1, i, k);                                      /*0021*/
+   freia_aipo_erode_8c(X, i, k);                                        /*0021*/
    // A
-   freia_aipo_global_min(X_1, &sB);                                     /*0023*/
+   freia_aipo_global_min(X, &sB);                                       /*0023*/
    // C with X from A
+   freia_aipo_threshold(tC, X, sB-10, sB-1, false);                     /*0025*/
+   freia_scalar_07_helper_0_1_1(tC2, X, tB, tB2, tC);                   /*0026*/
    // B
    freia_aipo_dilate_8c(tB2, tB, k);                                    /*0028*/
-   freia_aipo_mul(X, tB2, tB);                                          /*0029*/
    freia_aipo_global_vol(X, &sC);                                       /*0030*/
    // D with X from B
-   freia_scalar_07_helper_0_2_0(o, X, tC2, sC-10, sC-1, false);         /*0032*/
+   freia_aipo_threshold(tD, X, sC-10, sC-1, false);                     /*0032*/
+   freia_aipo_add(o, tC2, tD);                                          /*0033*/
 
    freia_common_destruct_data(X);                                       /*0035*/
-   freia_common_destruct_data(X_1);
    freia_common_destruct_data(tB);                                      /*0036*/
    freia_common_destruct_data(tB2);                                     /*0037*/
+   freia_common_destruct_data(tC);                                      /*0038*/
    freia_common_destruct_data(tC2);                                     /*0039*/
+   freia_common_destruct_data(tD);                                      /*0040*/
    return FREIA_OK;                                                     /*0041*/
 }
 
@@ -2622,33 +2443,34 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    
    
-   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tB2 = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128);       /*0012*/
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tB2 = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);     /*0012*/
    int sA, sB, sC;                                                      /*0013*/
-   // hardware accelerator generated variable
-   freia_data2d *X_1 = freia_common_create_data(X->bpp, X->widthWa, X->heightWa);
    
    // BUG: issue with X reuse...
    // A
    freia_aipo_global_max(i, &sA);                                       /*0017*/
    // B
-   freia_scalar_07_helper_0_1_0(tB, tC2, X_1, i, sA-10, sA-1, 0, sB-10, sB-1, 0);      /*0019*/
+   freia_aipo_threshold(tB, i, sA-10, sA-1, 0);                         /*0019*/
    // A
-   freia_aipo_erode_8c(X_1, i, k);                                      /*0021*/
+   freia_aipo_erode_8c(X, i, k);                                        /*0021*/
    // A
-   freia_aipo_global_min(X_1, &sB);                                     /*0023*/
+   freia_aipo_global_min(X, &sB);                                       /*0023*/
    // C with X from A
+   freia_aipo_threshold(tC, X, sB-10, sB-1, 0);                         /*0025*/
+   freia_scalar_07_helper_0_1_1(tC2, X, tB, tB2, tC);                   /*0026*/
    // B
    freia_aipo_dilate_8c(tB2, tB, k);                                    /*0028*/
-   freia_aipo_mul(X, tB2, tB);                                          /*0029*/
    freia_aipo_global_vol(X, &sC);                                       /*0030*/
    // D with X from B
-   freia_scalar_07_helper_0_2_0(o, X, tC2, sC-10, sC-1, 0);             /*0032*/
+   freia_aipo_threshold(tD, X, sC-10, sC-1, 0);                         /*0032*/
+   freia_aipo_add(o, tC2, tD);                                          /*0033*/
 
    freia_common_destruct_data(X);                                       /*0035*/
-   freia_common_destruct_data(X_1);
    freia_common_destruct_data(tB);                                      /*0036*/
    freia_common_destruct_data(tB2);                                     /*0037*/
+   freia_common_destruct_data(tC);                                      /*0038*/
    freia_common_destruct_data(tC2);                                     /*0039*/
+   freia_common_destruct_data(tD);                                      /*0040*/
    return 0;                                                            /*0041*/
 }
 #

@@ -1758,26 +1758,13 @@ digraph "median_1_helper_0_0_1" {
 ! acceleration function
 
 // FREIA OpenCL includes
-#include <CL/OpenCL.h>
-#include <private/freiaGatewayOpenCL.h>
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freiaGatewayOpenCL.h"
 
-// support function, should be in FREIA runtime?
-static freia_status get_compiled_opencl(
-  const char * source, // opencl source
-  const char * kname, // expected kernel name
-  const char * option // compiler option
-  cl_kernel * kernel) // where to put the kernel
-{
-  freia_status err;
-  char * opts;
-  int n = asprint(&ops, "%s %s ", frclTarget.compileOptions, option);
-  if (n==-1) return FREIA_UNLISTED_ERROR;
-  cl_program prg =
-    freia_op_compile_string_opencl(source, ops, &err);
-  if (err != FREIA_OK) return err;
-  *kernel = freia_op_get_kernel(prg, kname, &err);
-  return err;
-}
+// FREIA OpenCL runtime helper
+extern freia_status freia_op_compile_kernel(
+   const char*, const char*, const char*, cl_kernel *);
 
 // dag 0: 14 ops and 0 copies, optimized to 14 ops and 0+0 copies
 
@@ -1788,46 +1775,45 @@ static cl_kernel median_1_helper_0_0_1_kernel[2];
 static freia_status median_1_helper_0_0_1_compile(void)
 {
   // OpenCL source for median_1_helper_0_0_1
-  const char * median_1_helper_0_0_1_source = "
-// FREIA OpenCL specific includes
-#include <freiaAtomicOpCommonOpenCL.hcl>
-
-// opencl function median_1_helper_0_0_1
-KERNEL void median_1_helper_0_0_1(
-  GLOBAL PIXEL * o0,
-  int ofs_o0,
-  GLOBAL PIXEL * i0, // const?
-  int ofs_i0,
-  GLOBAL PIXEL * i1, // const?
-  int ofs_i1,
-  GLOBAL PIXEL * i2, // const?
-  int ofs_i2,
-  int width,
-  int pitch)
-{
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  GLOBAL PIXEL * j2 = i2 + ofs_i2;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
-  int i;
-  for (i=gid; i < (gid+width); i++)
-  {
-    // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    PIXEL in2 = j2[i];
-    // pixel computations
-    PIXEL t21 = PIXEL_INF(in1, in2);
-    PIXEL t35 = PIXEL_SUP(t21, in0);
-    // set output pixels
-    p0[i] = t35;
-  }
-}
-";
+  const char * median_1_helper_0_0_1_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function median_1_helper_0_0_1\n"
+    "KERNEL void median_1_helper_0_0_1(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  GLOBAL PIXEL * i1, // const?\n"
+    "  int ofs_i1,\n"
+    "  GLOBAL PIXEL * i2, // const?\n"
+    "  int ofs_i2,\n"
+    "  int width,\n"
+    "  int pitch)\n"
+    "{\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
+    "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
+    "  int gid = get_global_id(1)*pitch + get_global_id(0);\n"
+    "  int i;\n"
+    "  for (i=gid; i < (gid+width); i++)\n"
+    "  {\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    PIXEL in2 = j2[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t21 = INF_OP(in1, in2);\n"
+    "    PIXEL t35 = SUP_OP(t21, in0);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t35;\n"
+    "  }\n"
+    "}\n"
+    "";
   freia_status err = FREIA_OK;
-  err |= get_compiled_opencl(median_1_helper_0_0_1_source, "median_1_helper_0_0_1", "-DPIXEL8", &median_1_helper_0_0_1_kernel[0]);
-  err |= get_compiled_opencl(median_1_helper_0_0_1_source, "median_1_helper_0_0_1", "-DPIXEL16", &median_1_helper_0_0_1_kernel[1]);
+  err |= freia_op_compile_kernel(median_1_helper_0_0_1_source, "median_1_helper_0_0_1", "-DPIXEL8", &median_1_helper_0_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(median_1_helper_0_0_1_source, "median_1_helper_0_0_1", "-DPIXEL16", &median_1_helper_0_0_1_kernel[1]);
   return err;
 }
 
@@ -1841,10 +1827,11 @@ freia_status median_1_helper_0_0_1(
   freia_status err = FREIA_OK;
   freia_data2d_opencl *pool= frclTarget.pool;
   int pitch = o0->row[1] - o0->row[0];
+  int width = o0->widthWa;
   size_t workSize[2];
   workSize[0] = o0->heightWa;
   uint32_t bpp = o0->bpp>>4;
-  cl_kernel kernel,
+  cl_kernel kernel;
 
   // handle on the fly compilation...
   static int to_compile = 1;
@@ -1858,6 +1845,10 @@ freia_status median_1_helper_0_0_1(
 
   // now get kernel, which must be there...
   kernel = median_1_helper_0_0_1_kernel[bpp];
+  cl_int ofs_o0 = freia_common_data_get_offset(o0);
+  cl_int ofs_i0 = freia_common_data_get_offset(i0);
+  cl_int ofs_i1 = freia_common_data_get_offset(i1);
+  cl_int ofs_i2 = freia_common_data_get_offset(i2);
 
   // set kernel parameters
   err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId]);
@@ -1885,8 +1876,7 @@ freia_status median_1_helper_0_0_1(
 
   return err;
 }
-// FREIA OpenCL specific includes
-#include <freiaAtomicOpCommonOpenCL.hcl>
+#include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function median_1
 
 // opencl for dag 0
@@ -1917,8 +1907,8 @@ KERNEL void median_1_helper_0_0_1(
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
     // pixel computations
-    PIXEL t21 = PIXEL_INF(in1, in2);
-    PIXEL t35 = PIXEL_SUP(t21, in0);
+    PIXEL t21 = INF_OP(in1, in2);
+    PIXEL t35 = SUP_OP(t21, in0);
     // set output pixels
     p0[i] = t35;
   }

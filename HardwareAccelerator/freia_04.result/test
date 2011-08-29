@@ -1201,6 +1201,9 @@ digraph "freia_04_helper_0_0" {
   "31 vol" [shape=diamond];
   "33 +" [shape=trapezium,orientation=270];
   "33 +" -> "o";
+  "30 thr" [shape=parallelogram];
+  "30 thr" -> "32 min" [label="t4"];
+  "30 thr" -> "33 +" [label="t4"];
   "29 thr" [shape=parallelogram];
   "29 thr" -> "31 vol" [label="t3"];
   "29 thr" -> "33 +" [label="t3"];
@@ -1208,249 +1211,29 @@ digraph "freia_04_helper_0_0" {
   "28 -" -> "29 thr" [label="t2"];
   "27 D6" [shape=box];
   "27 D6" -> "28 -" [label="t1"];
-  "30 thr" [shape=parallelogram];
-  "30 thr" -> "32 min" [label="t4"];
-  "30 thr" -> "33 +" [label="t4"];
   "26 E8" [shape=box];
-  "26 E8" -> "28 -" [label="t0"];
   "26 E8" -> "30 thr" [label="t0"];
+  "26 E8" -> "28 -" [label="t0"];
   "i" -> "27 D6";
   "i" -> "26 E8";
-}
-// graph for dag "freia_04_helper_0_0_1" of module "freia_04" in dot format
-digraph "freia_04_helper_0_0_1" {
-  // inputs
-  "t0" [shape=circle];
-  "t1" [shape=circle];
-
-  // outputs
-  "t4" [shape=circle];
-  "t3" [shape=circle];
-  "o" [shape=circle];
-
-  // computation vertices
-  "33 +" [shape=trapezium,orientation=270];
-  "33 +" -> "o";
-  "29 thr" [shape=parallelogram];
-  "29 thr" -> "33 +" [label="t3"];
-  "29 thr" -> "t3";
-  "30 thr" [shape=parallelogram];
-  "30 thr" -> "33 +" [label="t4"];
-  "30 thr" -> "t4";
-  "28 -" [shape=trapezium,orientation=270];
-  "28 -" -> "29 thr" [label="t2"];
-  "t0" -> "30 thr";
-  "t0" -> "28 -";
-  "t1" -> "28 -";
 }
 
 ! acceleration function
 
 // FREIA OpenCL includes
-#include <CL/OpenCL.h>
-#include <private/freiaGatewayOpenCL.h>
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freiaGatewayOpenCL.h"
 
-// support function, should be in FREIA runtime?
-static freia_status get_compiled_opencl(
-  const char * source, // opencl source
-  const char * kname, // expected kernel name
-  const char * option // compiler option
-  cl_kernel * kernel) // where to put the kernel
-{
-  freia_status err;
-  char * opts;
-  int n = asprint(&ops, "%s %s ", frclTarget.compileOptions, option);
-  if (n==-1) return FREIA_UNLISTED_ERROR;
-  cl_program prg =
-    freia_op_compile_string_opencl(source, ops, &err);
-  if (err != FREIA_OK) return err;
-  *kernel = freia_op_get_kernel(prg, kname, &err);
-  return err;
-}
+// FREIA OpenCL runtime helper
+extern freia_status freia_op_compile_kernel(
+   const char*, const char*, const char*, cl_kernel *);
 
 // dag 0: 8 ops and 0 copies, optimized to 8 ops and 0+0 copies
-
-// hold kernels forfreia_04_helper_0_0_1
-static cl_kernel freia_04_helper_0_0_1_kernel[2];
-
-// compile kernels for freia_04_helper_0_0_1
-static freia_status freia_04_helper_0_0_1_compile(void)
-{
-  // OpenCL source for freia_04_helper_0_0_1
-  const char * freia_04_helper_0_0_1_source = "
-// FREIA OpenCL specific includes
-#include <freiaAtomicOpCommonOpenCL.hcl>
-
-// opencl function freia_04_helper_0_0_1
-KERNEL void freia_04_helper_0_0_1(
-  GLOBAL PIXEL * o0,
-  int ofs_o0,
-  GLOBAL PIXEL * o1,
-  int ofs_o1,
-  GLOBAL PIXEL * o2,
-  int ofs_o2,
-  GLOBAL PIXEL * i0, // const?
-  int ofs_i0,
-  GLOBAL PIXEL * i1, // const?
-  int ofs_i1,
-  int width,
-  int pitch,
-  int c0,
-  int c1,
-  int c2,
-  int c3,
-  int c4,
-  int c5)
-{
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * p1 = o1 + ofs_o1;
-  GLOBAL PIXEL * p2 = o2 + ofs_o2;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
-  int i;
-  for (i=gid; i < (gid+width); i++)
-  {
-    // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    // pixel computations
-    PIXEL t28 = PIXEL_SUB(in1, in0);
-    PIXEL t30 = PIXEL_THRESHOLD(in0, c0, c1, c2);
-    PIXEL t29 = PIXEL_THRESHOLD(t28, c3, c4, c5);
-    PIXEL t33 = PIXEL_ADD(t29, t30);
-    // set output pixels
-    p0[i] = t30;
-    p1[i] = t29;
-    p2[i] = t33;
-  }
-}
-";
-  freia_status err = FREIA_OK;
-  err |= get_compiled_opencl(freia_04_helper_0_0_1_source, "freia_04_helper_0_0_1", "-DPIXEL8", &freia_04_helper_0_0_1_kernel[0]);
-  err |= get_compiled_opencl(freia_04_helper_0_0_1_source, "freia_04_helper_0_0_1", "-DPIXEL16", &freia_04_helper_0_0_1_kernel[1]);
-  return err;
-}
-
-// helper function freia_04_helper_0_0_1
-freia_status freia_04_helper_0_0_1(
-  freia_data2d * o0,
-  freia_data2d * o1,
-  freia_data2d * o2,
-  const freia_data2d * i0,
-  const freia_data2d * i1,
-  int32_t c0,
-  int32_t c1,
-  int32_t c2,
-  int32_t c3,
-  int32_t c4,
-  int32_t c5)
-{
-  freia_status err = FREIA_OK;
-  freia_data2d_opencl *pool= frclTarget.pool;
-  int pitch = o0->row[1] - o0->row[0];
-  size_t workSize[2];
-  workSize[0] = o0->heightWa;
-  uint32_t bpp = o0->bpp>>4;
-  cl_kernel kernel,
-
-  // handle on the fly compilation...
-  static int to_compile = 1;
-
-  if (to_compile) {
-    freia_status cerr = freia_04_helper_0_0_1_compile();
-    // compilation may have failed
-    if (cerr) return cerr;
-    to_compile = 0;
-  }
-
-  // now get kernel, which must be there...
-  kernel = freia_04_helper_0_0_1_kernel[bpp];
-
-  // set kernel parameters
-  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId]);
-  err |= clSetKernelArg(kernel, 1, sizeof(cl_int), &ofs_o0);
-  err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &pool[o1->clId]);
-  err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &ofs_o1);
-  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &pool[o2->clId]);
-  err |= clSetKernelArg(kernel, 5, sizeof(cl_int), &ofs_o2);
-  err |= clSetKernelArg(kernel, 6, sizeof(cl_mem), &pool[i0->clId]);
-  err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &ofs_i0);
-  err |= clSetKernelArg(kernel, 8, sizeof(cl_mem), &pool[i1->clId]);
-  err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &ofs_i1);
-  err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &width);
-  err |= clSetKernelArg(kernel, 11, sizeof(cl_int), &pitch);
-  err |= clSetKernelArg(kernel, 12, sizeof(cl_int), &c0);
-  err |= clSetKernelArg(kernel, 13, sizeof(cl_int), &c1);
-  err |= clSetKernelArg(kernel, 14, sizeof(cl_int), &c2);
-  err |= clSetKernelArg(kernel, 15, sizeof(cl_int), &c3);
-  err |= clSetKernelArg(kernel, 16, sizeof(cl_int), &c4);
-  err |= clSetKernelArg(kernel, 17, sizeof(cl_int), &c5);
-
-  // call kernel freia_04_helper_0_0_1
-  err |= clEnqueueNDRangeKernel(
-            frclTarget.queue,
-            kernel,
-            1, // number of dimensions
-            NULL, // undefined for OpenCL 1.0
-            workSize, // x and y dimensions
-            NULL, // local size
-            0, // don't wait events
-            NULL,
-            NULL); // do not produce an event
-
-  return err;
-}
-// FREIA OpenCL specific includes
-#include <freiaAtomicOpCommonOpenCL.hcl>
+#include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_04
 
 // opencl for dag 0
-
-// opencl function freia_04_helper_0_0_1
-KERNEL void freia_04_helper_0_0_1(
-  GLOBAL PIXEL * o0,
-  int ofs_o0,
-  GLOBAL PIXEL * o1,
-  int ofs_o1,
-  GLOBAL PIXEL * o2,
-  int ofs_o2,
-  GLOBAL PIXEL * i0, // const?
-  int ofs_i0,
-  GLOBAL PIXEL * i1, // const?
-  int ofs_i1,
-  int width,
-  int pitch,
-  int c0,
-  int c1,
-  int c2,
-  int c3,
-  int c4,
-  int c5)
-{
-  GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  GLOBAL PIXEL * p1 = o1 + ofs_o1;
-  GLOBAL PIXEL * p2 = o2 + ofs_o2;
-  GLOBAL PIXEL * j0 = i0 + ofs_i0;
-  GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
-  int i;
-  for (i=gid; i < (gid+width); i++)
-  {
-    // get input pixels
-    PIXEL in0 = j0[i];
-    PIXEL in1 = j1[i];
-    // pixel computations
-    PIXEL t28 = PIXEL_SUB(in1, in0);
-    PIXEL t30 = PIXEL_THRESHOLD(in0, c0, c1, c2);
-    PIXEL t29 = PIXEL_THRESHOLD(t28, c3, c4, c5);
-    PIXEL t33 = PIXEL_ADD(t29, t30);
-    // set output pixels
-    p0[i] = t30;
-    p1[i] = t29;
-    p2[i] = t33;
-  }
-}
 
 ! updated function
 
@@ -1461,7 +1244,7 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    
    
    
-   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128);        /*0015*/
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128);       /*0015*/
    
    // to test operator compaction
    // t0 = erode(i)
@@ -1474,12 +1257,16 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    // o  = t4 + t3
    freia_aipo_erode_8c(t0, i, k);                                       /*0026*/
    freia_aipo_dilate_6c(t1, i, k);                                      /*0027*/
-   freia_04_helper_0_0_1(t4, t3, o, t0, t1, inf, sup, bin, inf, sup, bin);             /*0028*/
+   freia_aipo_sub(t2, t1, t0);                                          /*0028*/
+   freia_aipo_threshold(t3, t2, inf, sup, bin);                         /*0029*/
+   freia_aipo_threshold(t4, t0, inf, sup, bin);                         /*0030*/
    freia_aipo_global_vol(t3, v);                                        /*0031*/
    freia_aipo_global_min(t4, m);                                        /*0032*/
+   freia_aipo_add(o, t3, t4);                                           /*0033*/
 
    freia_common_destruct_data(t0);                                      /*0035*/
    freia_common_destruct_data(t1);                                      /*0036*/
+   freia_common_destruct_data(t2);                                      /*0037*/
    freia_common_destruct_data(t3);                                      /*0038*/
    freia_common_destruct_data(t4);                                      /*0039*/
 
@@ -1495,7 +1282,7 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    
    
    
-   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128);        /*0015*/
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128);       /*0015*/
    
    // to test operator compaction
    // t0 = erode(i)
@@ -1508,12 +1295,16 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    // o  = t4 + t3
    freia_aipo_erode_8c(t0, i, k);                                       /*0026*/
    freia_aipo_dilate_6c(t1, i, k);                                      /*0027*/
-   freia_04_helper_0_0_1(t4, t3, o, t0, t1, inf, sup, bin, inf, sup, bin);             /*0028*/
+   freia_aipo_sub(t2, t1, t0);                                          /*0028*/
+   freia_aipo_threshold(t3, t2, inf, sup, bin);                         /*0029*/
+   freia_aipo_threshold(t4, t0, inf, sup, bin);                         /*0030*/
    freia_aipo_global_vol(t3, v);                                        /*0031*/
    freia_aipo_global_min(t4, m);                                        /*0032*/
+   freia_aipo_add(o, t3, t4);                                           /*0033*/
 
    freia_common_destruct_data(t0);                                      /*0035*/
    freia_common_destruct_data(t1);                                      /*0036*/
+   freia_common_destruct_data(t2);                                      /*0037*/
    freia_common_destruct_data(t3);                                      /*0038*/
    freia_common_destruct_data(t4);                                      /*0039*/
 
