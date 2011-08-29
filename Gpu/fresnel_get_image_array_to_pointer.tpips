@@ -1,0 +1,33 @@
+setenv WS fresnel_get_image_array_to_pointer
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c include/p4a_stubs.c
+
+
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+setproperty LINEARIZE_ARRAY_CAST_AT_CALL_SITE TRUE
+setproperty ISOLATE_STATEMENT_EVEN_NON_LOCAL TRUE
+
+module getimage
+capply PRIVATIZE_MODULE
+capply COARSE_GRAIN_PARALLELIZATION
+setproperty GPU_USE_WRAPPER FALSE
+setproperty GPU_USE_KERNEL FALSE
+capply GPU_IFY
+#capply LOOP_NORMALIZE[p4a_kernel_launcher_0]
+#capply PRIVATIZE_MODULE[p4a_kernel_launcher_0]
+#display PRINTED_FILE[p4a_kernel_launcher_0,main,init]
+#capply COARSE_GRAIN_PARALLELIZATION[p4a_kernel_launcher_0]
+#capply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
+#capply GPU_IFY[p4a_kernel_launcher_0]
+capply KERNEL_LOAD_STORE[p4a_kernel_launcher_0]
+module main
+
+capply LINEARIZE_ARRAY[%ALLFUNC]
+display PRINTED_FILE
+apply UNSPLIT[%PROGRAM]
+
+#display PRINTED_FILE[%ALL]
+close
+quit
