@@ -32,7 +32,7 @@ my $differential = @ARGV==2;
 # all possible validation "status", with distinct first letters
 # it may happen with warnings that some cases may be multi state?
 my $status =
-  'failed|changed|passed|timeout|keptout|bug|later|slow|orphan|notest';
+  'failed|changed|passed|timeout|keptout|bug|later|slow|orphan|noref';
 
 # other miscellaneous issues
 my $others =
@@ -155,7 +155,7 @@ for my $c (sort keys %new)
 }
 
 # extract various counts
-my $not_passed = $n{failed} + $n{changed} + $n{timeout} + $n{notest};
+my $not_passed = $n{failed} + $n{changed} + $n{timeout} + $n{noref};
 my $cannot_execute = $n{orphan};
 my $count = ${not_passed} + ${cannot_execute} + $n{passed};
 my $warned = $n{skipped} + $n{nofilter} +  $n{'multi-script'} + $n{missing} +
@@ -178,13 +178,13 @@ print
   " - failed: $n{failed} (voluntary and unvoluntary core dumps)\n" .
   " - changed: $n{changed} (modified output)\n" .
   " - timeout: $n{timeout} (time was out)\n" .
-  " - notest: $n{notest} (test file not under svn, cannot compare)\n" .
+  " - noref: $n{noref} (no reference file for comparison)\n" .
   " * cannot execute: $cannot_execute (result without source nor script)\n";
 
 print
   " * status changes:$status_changes\n" .
   "   .=none P=passed F=failed C=changed T=timeout " .
-  "K=keptout B=bug L=later S=slow O=orphan N=notest\n"
+  "K=keptout B=bug L=later S=slow O=orphan N=noref\n"
     if $status_changes;
 
 print
@@ -243,7 +243,7 @@ for my $dir (sort keys %d)
 {
   my $failures =
     $d{$dir}{failed} + $d{$dir}{changed} + $d{$dir}{timeout} +
-    $d{$dir}{orphan} + $d{$dir}{notest};
+    $d{$dir}{orphan} + $d{$dir}{noref};
   # dircount may be null if all tests are kept out
   my $dircount = $d{$dir}{passed} + $failures;
 
@@ -259,7 +259,7 @@ for my $dir (sort keys %d)
   {
     printf " (%d+%d+%d+%d+%d|%d+%d+%d+%d)",
       $d{$dir}{failed}, $d{$dir}{changed}, $d{$dir}{timeout},
-      $d{$dir}{notest}, $d{$dir}{orphan},
+      $d{$dir}{noref}, $d{$dir}{orphan},
       $d{$dir}{keptout}, $d{$dir}{bug}, $d{$dir}{later}, $d{$dir}{slow};
 
     if ($differential) {
@@ -286,6 +286,6 @@ else
 {
   my $issues = $not_passed+$cannot_execute;
   print "ISSUES $issues/$count " .
-        "($n{failed}+$n{changed}+$n{timeout}+$n{notest}+$n{orphan}|" .
+        "($n{failed}+$n{changed}+$n{timeout}+$n{noref}+$n{orphan}|" .
 	"$n{keptout}+$n{bug}+$n{later}+$n{slow})$status_changes $delay\n";
 }
