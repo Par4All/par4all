@@ -180,6 +180,8 @@ void string_buffer_append_c_string_buffer(
                 }
                 if (*c=='\n')
                 {
+                  buffer[i++] = '\\';
+                  buffer[i++] = 'n';
                   buffer[i++] = '"';
                   buffer[i++] = '\n';
                   for (j=0; j<indent; j++)
