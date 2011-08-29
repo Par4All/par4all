@@ -668,9 +668,76 @@ digraph "sub_00_helper_0_0_0" {
 
 ! acceleration function
 
-// freia opencl includes
+// FREIA OpenCL includes
+#include <CL/OpenCL.h>
+#include <private/freiaGatewayOpenCL.h>
+
+// support function, should be in FREIA runtime?
+static freia_status get_compiled_opencl(
+  const char * source, // opencl source
+  const char * kname, // expected kernel name
+  const char * option // compiler option
+  cl_kernel * kernel) // where to put the kernel
+{
+  freia_status err;
+  char * opts;
+  int n = asprint(&ops, "%s %s ", frclTarget.compileOptions, option);
+  if (n==-1) return FREIA_UNLISTED_ERROR;
+  cl_program prg =
+    freia_op_compile_string_opencl(source, ops, &err);
+  if (err != FREIA_OK) return err;
+  *kernel = freia_op_get_kernel(prg, kname, &err);
+  return err;
+}
 
 // dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+
+// hold kernels forsub_00_helper_0_0_0
+static cl_kernel sub_00_helper_0_0_0_kernel[2];
+
+// compile kernels for sub_00_helper_0_0_0
+static freia_status sub_00_helper_0_0_0_compile(void)
+{
+  // OpenCL source for sub_00_helper_0_0_0
+  const char * sub_00_helper_0_0_0_source = "
+// FREIA OpenCL specific includes
+#include <freiaAtomicOpCommonOpenCL.hcl>
+
+// opencl function sub_00_helper_0_0_0
+KERNEL void sub_00_helper_0_0_0(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * o1,
+  int ofs_o1,
+  int width,
+  int pitch,
+  int c0,
+  int c1,
+  int c2,
+  int c3,
+  int c4)
+{
+  GLOBAL PIXEL * p0 = o0 + ofs_o0;
+  GLOBAL PIXEL * p1 = o1 + ofs_o1;
+  int gid = get_global_id(1)*pitch + get_global_id(0);
+  int i;
+  for (i=gid; i < (gid+width); i++)
+  {
+    // pixel computations
+    PIXEL t7 = PIXEL_SET_CONST(c0);
+    PIXEL t9 = PIXEL_SET_CONST(c1);
+    PIXEL t10 = PIXEL_THRESHOLD(t9, c2, c3, c4);
+    // set output pixels
+    p0[i] = t7;
+    p1[i] = t10;
+  }
+}
+";
+  freia_status err = FREIA_OK;
+  err |= get_compiled_opencl(sub_00_helper_0_0_0_source, "sub_00_helper_0_0_0", "-DPIXEL8", &sub_00_helper_0_0_0_kernel[0]);
+  err |= get_compiled_opencl(sub_00_helper_0_0_0_source, "sub_00_helper_0_0_0", "-DPIXEL16", &sub_00_helper_0_0_0_kernel[1]);
+  return err;
+}
 
 // helper function sub_00_helper_0_0_0
 freia_status sub_00_helper_0_0_0(
@@ -682,33 +749,87 @@ freia_status sub_00_helper_0_0_0(
   int32_t c3,
   int32_t c4)
 {
-  call opencl kernel sub_00_helper_0_0_0(o0, o1, c0, c1, c2, c3, c4);
-  return FREIA_OK;
+  freia_status err = FREIA_OK;
+  freia_data2d_opencl *pool= frclTarget.pool;
+  int pitch = o0->row[1] - o0->row[0];
+  size_t workSize[2];
+  workSize[0] = o0->heightWa;
+  uint32_t bpp = o0->bpp>>4;
+  cl_kernel kernel,
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+
+  if (to_compile) {
+    freia_status cerr = sub_00_helper_0_0_0_compile();
+    // compilation may have failed
+    if (cerr) return cerr;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be there...
+  kernel = sub_00_helper_0_0_0_kernel[bpp];
+
+  // set kernel parameters
+  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId]);
+  err |= clSetKernelArg(kernel, 1, sizeof(cl_int), &ofs_o0);
+  err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &pool[o1->clId]);
+  err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &ofs_o1);
+  err |= clSetKernelArg(kernel, 4, sizeof(cl_int), &width);
+  err |= clSetKernelArg(kernel, 5, sizeof(cl_int), &pitch);
+  err |= clSetKernelArg(kernel, 6, sizeof(cl_int), &c0);
+  err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &c1);
+  err |= clSetKernelArg(kernel, 8, sizeof(cl_int), &c2);
+  err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &c3);
+  err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &c4);
+
+  // call kernel sub_00_helper_0_0_0
+  err |= clEnqueueNDRangeKernel(
+            frclTarget.queue,
+            kernel,
+            1, // number of dimensions
+            NULL, // undefined for OpenCL 1.0
+            workSize, // x and y dimensions
+            NULL, // local size
+            0, // don't wait events
+            NULL,
+            NULL); // do not produce an event
+
+  return err;
 }
-// freia opencl includes
-// generated opencl for function sub_00
+// FREIA OpenCL specific includes
+#include <freiaAtomicOpCommonOpenCL.hcl>
+// generated OpenCL kernels for function sub_00
 
 // opencl for dag 0
 
 // opencl function sub_00_helper_0_0_0
-kernel sub_00_helper_0_0_0(
-  opencl image o0,
-  opencl image o1,
-  int32_t c0,
-  int32_t c1,
-  int32_t c2,
-  int32_t c3,
-  int32_t c4)
+KERNEL void sub_00_helper_0_0_0(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * o1,
+  int ofs_o1,
+  int width,
+  int pitch,
+  int c0,
+  int c1,
+  int c2,
+  int c3,
+  int c4)
 {
-  for (i)
+  GLOBAL PIXEL * p0 = o0 + ofs_o0;
+  GLOBAL PIXEL * p1 = o1 + ofs_o1;
+  int gid = get_global_id(1)*pitch + get_global_id(0);
+  int i;
+  for (i=gid; i < (gid+width); i++)
   {
     // pixel computations
-    register pixel t7 = PIXEL_SET_CONST(c0);
-    register pixel t9 = PIXEL_SET_CONST(c1);
-    register pixel t10 = PIXEL_THRESHOLD(t9, c2, c3, c4);
+    PIXEL t7 = PIXEL_SET_CONST(c0);
+    PIXEL t9 = PIXEL_SET_CONST(c1);
+    PIXEL t10 = PIXEL_THRESHOLD(t9, c2, c3, c4);
     // set output pixels
-    o0[i] = t7;
-    o1[i] = t10;
+    p0[i] = t7;
+    p1[i] = t10;
   }
 }
 
