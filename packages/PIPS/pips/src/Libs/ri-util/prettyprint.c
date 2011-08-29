@@ -4276,6 +4276,37 @@ text text_statement_enclosed(entity module,
    */
   list dl = statement_declarations(stmt);
 
+  /* FI: consistency check - incompatible with unfolding */
+  ifdebug(1) {
+    /* The real check is that dl and idl are equal, that is
+     ENDP(gen_list_and_not(dl,idl)) && ENDP(gen_list_and_not(idl,dl)),
+     except for the side effects of gen_list_and_not(), so dl and idl
+     should be copied first. */
+    if(statement_block_p(stmt) && ENDP(dl)) {
+      list idl = statement_to_declarations(stmt);
+      if(!ENDP(idl)) {
+	/* This may occur when declaration statements are added using
+	   subsequences by somebody forgetfull of scope issues */
+	// Do not forget: the error is detected within the prettyprinter...
+	//print_statement(stmt);
+	print_entities(idl);
+	pips_internal_error("A block statement with no declarations"
+			    " contains declarations\n");
+      }
+      else
+	gen_free_list(idl);
+    }
+    if(statement_block_p(stmt) && !ENDP(dl)) {
+      /* See for instance
+	 Transformations/Simplify_control.sub/sequence01 */
+      list sl = statement_block(stmt);
+      if(ENDP(sl)) {
+	pips_internal_error("A block statement with declarations"
+			    " contains no declaration statements\n");
+      }
+    }
+  }
+
   if (!ENDP(dl) && prettyprint_language_is_c_p()) {
     if(statement_block_p(stmt)) {
       if(!braces_p && !braces_added) {

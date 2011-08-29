@@ -88,10 +88,13 @@ static int freia_compiler(string module, string hardware)
   // put updated code and accelerated helpers
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
 
+  // other possibly generated resources
   if (freia_spoc_p(hardware))
     DB_PUT_NEW_FILE_RESOURCE(DBR_SPOC_FILE, module, freia_file);
   else if (freia_terapix_p(hardware))
     DB_PUT_NEW_FILE_RESOURCE(DBR_TERAPIX_FILE, module, freia_file);
+  else if (freia_opencl_p(hardware))
+    DB_PUT_NEW_FILE_RESOURCE(DBR_OPENCL_FILE, module, freia_file);
   // else no helper file for AIPO target
 
   // update callees
@@ -125,6 +128,11 @@ int freia_terapix_compiler(string module)
 int freia_aipo_compiler(string module)
 {
   return freia_compiler(module, "aipo");
+}
+
+int freia_opencl_compiler(string module)
+{
+  return freia_compiler(module, "opencl");
 }
 
 /* int freia_vhdl_compiler(string module) :-)

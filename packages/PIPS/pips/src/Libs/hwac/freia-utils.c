@@ -55,10 +55,12 @@
 // no operation
 #define NOPE_SPOC { spoc_nothing, NO_POC, alu_unused, NO_MES }
 #define NOPE_TRPX { 0, 0, 0, 0, 0, 0, false, false, NULL }
+#define NOPE_OPCL { F, NULL }
 
 // not implemented
 #define NO_SPOC { spoc_not_implemented, NO_POC, alu_unused, NO_MES }
 #define NO_TRPX { 0, 0, 0, 0, 0, -1, false, false, NULL }
+#define NO_OPCL { F, NULL }
 
 #define TRPX_OP(c, op) { 0, 0, 0, 0, 0, c, true, false, "TERAPIX_UCODE_" op }
 #define TRPX_IO(c, op) { 0, 0, 0, 0, 0, c, true, true, "TERAPIX_UCODE_" op }
@@ -66,6 +68,8 @@
 
 // preliminary stuff for volume/min/max/...
 #define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, false, "TERAPIX_UCODE_" op }
+
+#define OPCL(op) { T, "PIXEL_" op }
 
 // types used by AIPO parameters
 #define TY_INT "int32_t"
@@ -83,7 +87,7 @@
  */
 static const freia_api_t FREIA_AIPO_API[] = {
   { "undefined", "?", NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    NOPE_SPOC, NOPE_TRPX
+    NOPE_SPOC, NOPE_TRPX, NOPE_OPCL
   },
   {
     // ARITHMETIC
@@ -100,181 +104,184 @@ static const freia_api_t FREIA_AIPO_API[] = {
       // global measures
       NO_MES
     },
-    TRPX_OP(4, "ADD3")
+    TRPX_OP(4, "ADD3"),
+    OPCL("ADD")
   },
   { AIPO "sub", "-", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_sub_01, NO_MES }, TRPX_OP(4, "SUB3")
+      NO_POC, alu_sub_01, NO_MES }, TRPX_OP(4, "SUB3"), OPCL("SUB")
   },
   { AIPO "mul", "*",  AIPO "mul", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_mul, NO_MES }, TRPX_OP(4, "MUL3")
+      NO_POC, alu_mul, NO_MES }, TRPX_OP(4, "MUL3"), OPCL("MUL")
   },
   { AIPO "div", "/", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_div_01, NO_MES }, TRPX_OP(4, "DIV3")
+      NO_POC, alu_div_01, NO_MES }, TRPX_OP(4, "DIV3"), OPCL("DIV")
   },
   { AIPO "addsat", "+s", AIPO "addsat", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_addsat, NO_MES }, TRPX_OP(4, "ADDSAT?")
+      NO_POC, alu_addsat, NO_MES }, TRPX_OP(4, "ADDSAT?"), OPCL("ADDSAT")
   },
   { AIPO "subsat", "-s", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_subsat_01, NO_MES }, TRPX_OP(4, "SUBSAT?")
+      NO_POC, alu_subsat_01, NO_MES }, TRPX_OP(4, "SUBSAT?"), OPCL("SUBSAT")
   },
   { AIPO "absdiff", "-|", AIPO "absdiff", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_abssub, NO_MES }, TRPX_OP(4, "ABS_DIFF3")
+      NO_POC, alu_abssub, NO_MES }, TRPX_OP(4, "ABS_DIFF3"), OPCL("ABSDIFF")
   },
   { AIPO "inf", "<", AIPO "inf", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_inf_01, NO_MES }, TRPX_OP(4, "INF3")
+      NO_POC, alu_inf_01, NO_MES }, TRPX_OP(4, "INF3"), OPCL("INF")
   },
   { AIPO "sup", ">", AIPO "sup", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_sup_01, NO_MES }, TRPX_OP(4, "SUP3")
+      NO_POC, alu_sup_01, NO_MES }, TRPX_OP(4, "SUP3"), OPCL("SUP")
   },
   { AIPO "and", "&", AIPO "and", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_and, NO_MES }, TRPX_OP(4, "AND3")
+      NO_POC, alu_and, NO_MES }, TRPX_OP(4, "AND3"), OPCL("AND")
   },
   { AIPO "or", "|", AIPO "or", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_or, NO_MES }, TRPX_OP(4, "OR3")
+      NO_POC, alu_or, NO_MES }, TRPX_OP(4, "OR3"), OPCL("OR")
   },
   { AIPO "xor", "^", AIPO "xor", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_xor, NO_MES }, TRPX_OP(4, "XOR3")
+      NO_POC, alu_xor, NO_MES }, TRPX_OP(4, "XOR3"), OPCL("XOR")
   },
   { AIPO "replace_const", ":", AIPO "replace_const",
     1, 2, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_repcst_0, NO_MES }, TRPX_IO(3, "CONV_REPLACE_EQ_CONST")
+      NO_POC, alu_repcst_0, NO_MES }, TRPX_IO(3, "CONV_REPLACE_EQ_CONST"),
+    NO_OPCL
   },
   // unary
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_not_0, NO_MES },
-    TRPX_OP(4, "NOT") // ??? why not less
+    // ??? why not less?
+    TRPX_OP(4, "NOT"), OPCL("NOT")
   },
   { AIPO "log2", "l2", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_log2_0, NO_MES },
-    TRPX_OP(3, "LOG2")
+    TRPX_OP(3, "LOG2"), OPCL("LOG2")
   },
   { AIPO "add_const", "+.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_add_0cst, NO_MES },
-    TRPX_OP(3, "ADD_CONST")
+    TRPX_OP(3, "ADD_CONST"), OPCL("ADD_CONST")
   },
   { AIPO "inf_const", "<.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_inf_0cst, NO_MES },
-    TRPX_OP(3, "INF_CONST")
+    TRPX_OP(3, "INF_CONST"), OPCL("INF_CONST")
   },
   { AIPO "sup_const", ">.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES },
-    TRPX_OP(3, "SUP_CONST?")
+    TRPX_OP(3, "SUP_CONST?"), OPCL("SUP_CONST")
   },
   { AIPO "sub_const", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES },
-    TRPX_OP(3, "SUB_CONST")
+    TRPX_OP(3, "SUB_CONST"), OPCL("SUB_CONST")
   },
   { AIPO "const_sub", ".-", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_cst0, NO_MES },
-    TRPX_OP(3, "CONST_SUB")
+    TRPX_OP(3, "CONST_SUB"), OPCL("CONST_SUB")
   },
   { AIPO "and_const", "&.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_and_0cst, NO_MES },
-    TRPX_OP(3, "AND_CONST")
+    TRPX_OP(3, "AND_CONST"), OPCL("AND_CONST")
   },
   { AIPO "or_const", "|.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_or_0cst, NO_MES },
-    TRPX_OP(3, "OR_CONST?")
+    TRPX_OP(3, "OR_CONST?"), OPCL("OR_CONST")
   },
   { AIPO "xor_const", "^.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_xor_0cst, NO_MES },
-    TRPX_OP(3, "XOR_CONST?")
+    TRPX_OP(3, "XOR_CONST?"), OPCL("XOR_CONST")
   },
   { AIPO "addsat_const", "+s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_addsat_0cst, NO_MES },
-    TRPX_OP(3, "ADDSAT_CONST?")
+    TRPX_OP(3, "ADDSAT_CONST?"), OPCL("ADDSAT_CONST")
   },
   { AIPO "subsat_const", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES },
-    TRPX_OP(3, "SUBSAT_CONST?")
+    TRPX_OP(3, "SUBSAT_CONST?"), OPCL("SUBSAT_CONST")
   },
   { AIPO "const_subsat", ".-s", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_cst0, NO_MES },
-    TRPX_OP(3, "CONST_SUBSAT?")
+    TRPX_OP(3, "CONST_SUBSAT?"), OPCL("CONST_SUBSAT")
   },
   { AIPO "absdiff_const", "-|.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_abssub_0cst, NO_MES },
-    TRPX_OP(3, "ABSDIFF_CONST?")
+    TRPX_OP(3, "ABSDIFF_CONST?"), OPCL("ABSDIFF_CONST")
   },
   { AIPO "mul_const", "*.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_mul_0cst, NO_MES },
-    TRPX_OP(3, "MUL_CONST")
+    TRPX_OP(3, "MUL_CONST"), OPCL("MUL_CONST")
   },
   { AIPO "div_const", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES },
-    TRPX_OP(3, "DIV_CONST")
+    TRPX_OP(3, "DIV_CONST"), OPCL("DIV_CONST")
   },
   { AIPO "const_div", "./", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_cst0, NO_MES },
-    TRPX_OP(3, "CONST_DIV?")
+    TRPX_OP(3, "CONST_DIV?"), OPCL("CONST_DIV")
   },
   // nullary
   { AIPO "set_constant", "C", NULL, 1, 0, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES },
-    TRPX_OP(2, "SET_CONST")
+    TRPX_OP(2, "SET_CONST"), OPCL("SET_CONST")
   },
   // not a real one, this is used internally only
   // semantics of "scalar_copy(a, b);" is "*a = *b;"
   { AIPO "scalar_copy", "?=", NULL, 0, 0, 1, 1, NO_PARAM,
       { TY_INT, TY_INT, NULL},
-    NOPE_SPOC, NOPE_TRPX
+    NOPE_SPOC, NOPE_TRPX, NOPE_OPCL
   },
   // MISC
   // this one may be ignored?!
   { AIPO "copy", "=", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     // hmmm... would NO_SPOC do?
     { spoc_input_0|spoc_output_0, NO_POC, alu_unused, NO_MES },
-    TRPX_OP(3, "COPY")
+    TRPX_OP(3, "COPY"), OPCL("COPY")
   },
   { // not implemented by SPOC! nor TERAPIX!
     AIPO "cast", "=()", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
-    NO_SPOC, NO_TRPX
+    NO_SPOC, NO_TRPX, NO_OPCL
   },
   { AIPO "threshold", "thr", NULL, 1, 1, 0, 3, NO_PARAM,
     { TY_INT, TY_INT, TY_INT },
     { spoc_input_0|spoc_output_0|spoc_th_0, NO_POC, alu_unused, NO_MES },
-    TRPX_OP(5, "THRESHOLD")
+    TRPX_OP(5, "THRESHOLD"), OPCL("THRESHOLD")
   },
   // MORPHO
   { AIPO "erode_6c", "E6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_erode, 6 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(10, "ERODE_3_3?")
+    TRPX_NG(10, "ERODE_3_3?"), NO_OPCL
   },
   { AIPO "dilate_6c", "D6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_dilate, 6 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(10, "DILATE_3_3?")
+    TRPX_NG(10, "DILATE_3_3?"), NO_OPCL
   },
   { AIPO "erode_8c", "E8", NULL, 1, 1, 0, 1, NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_erode, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(15, "ERODE_3_3")
+    TRPX_NG(15, "ERODE_3_3"), NO_OPCL
   },
   { AIPO "dilate_8c", "D8", NULL, 1, 1, 0, 1,  NO_PARAM, { TY_CIP, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_dilate, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     },
-    TRPX_NG(15, "DILATE_3_3")
+    TRPX_NG(15, "DILATE_3_3"), NO_OPCL
   },
   // MEASURES
   { AIPO "global_min", "min", NULL, 0, 1, 1, 0,
@@ -282,34 +289,34 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min, measure_none }
     },
-    TRPX_MS(1, 3, "GLOBAL_MIN")
+    TRPX_MS(1, 3, "GLOBAL_MIN"), NO_OPCL
   },
   { AIPO "global_max", "max", NULL, 0, 1, 1, 0, { TY_PIN, NULL, NULL },
     NO_PARAM, { spoc_input_0 | spoc_measure_0,
-      NO_POC, alu_unused, { measure_max, measure_none }
+                NO_POC, alu_unused, { measure_max, measure_none }
     },
-    TRPX_MS(1, 3, "GLOBAL_MAX")
+    TRPX_MS(1, 3, "GLOBAL_MAX"), NO_OPCL
   },
   { AIPO "global_min_coord", "min!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PUI, TY_PUI }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min_coord, measure_none }
     },
-    TRPX_MS(5, 3, "GLOBAL_MIN_COORD")
+    TRPX_MS(5, 3, "GLOBAL_MIN_COORD"), NO_OPCL
   },
   { AIPO "global_max_coord", "max!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PUI, TY_PUI }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_max_coord, measure_none }
     },
-    TRPX_MS(5, 3, "GLOBAL_MAX_COORD")
+    TRPX_MS(5, 3, "GLOBAL_MAX_COORD"), NO_OPCL
   },
   { AIPO "global_vol", "vol", NULL, 0, 1, 1, 0,
     { TY_PIN, NULL, NULL }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_vol, measure_none }
     },
-    TRPX_MS(2, 3, "GLOBAL_VOL")
+    TRPX_MS(2, 3, "GLOBAL_VOL"), NO_OPCL
   },
   // LINEAR
   // not implemented by SPOC!
@@ -322,16 +329,16 @@ static const freia_api_t FREIA_AIPO_API[] = {
     },
     // for terapix, this is a special case
     // I'm not sure about the cost model (h*35) for 3x3?
-    { -1, -1, -1, -1, 0, 3, false, false, "TERAPIX_UCODE_CONV" }
+    { -1, -1, -1, -1, 0, 3, false, false, "TERAPIX_UCODE_CONV" }, NO_OPCL
   },
   // not implemented by SPOC! nor by TERAPIX!
   { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
     NO_PARAM, { TY_UIN, NULL, NULL },
-    NO_SPOC, NO_TRPX
+    NO_SPOC, NO_TRPX, NO_OPCL
   },
   // last entry
   { NULL, NULL, NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
-    NO_SPOC, NO_TRPX
+    NO_SPOC, NO_TRPX, NO_OPCL
   }
 };
 
@@ -496,6 +503,7 @@ list /* of expression */ freia_extract_params
   (const int napi,     // api function number
    list args,          // actual arguments to call
    string_buffer head, // function headers
+   string_buffer head2, // function header, the retour
    hash_table params,  // argument/variable to parameter mapping
    int * nparams)      // current number of parameters
 {
@@ -529,6 +537,7 @@ list /* of expression */ freia_extract_params
           // choose new name
           string name = get_var("pi", nparams);
           if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
+          if (head2) sb_cat(head2, ",\n  ", api->arg_in_types[i], " ", name);
           hash_put(params, e, name);
           res = CONS(expression, copy_expression(e), res);
           // keep record for the *variable* as well...
@@ -545,6 +554,7 @@ list /* of expression */ freia_extract_params
         // append and record new parameter
         string name = get_var("pi", nparams);
         if (head) sb_cat(head, ",\n  ", api->arg_in_types[i], " ", name);
+        if (head2) sb_cat(head2, ",\n  ", api->arg_in_types[i], " ", name);
         hash_put(params, e, name);
         res = CONS(expression, copy_expression(e), res);
       }
@@ -559,6 +569,7 @@ list /* of expression */ freia_extract_params
     args = CDR(args);
     string name = get_var("po", nparams);
     if (head) sb_cat(head, ",\n  ", api->arg_out_types[i], " ", name);
+    if (head2) sb_cat(head2, ",\n  ", api->arg_out_types[i], " ", name);
     if (params)
       hash_put(params, e, name);
     else
@@ -571,9 +582,9 @@ list /* of expression */ freia_extract_params
 
 /* @brief build all is well freia constant
  */
-static call freia_ok(void)
+call freia_ok(void)
 {
-  // how to build the "FREIA_OK" constant?
+  // how to build the "FREIA_OK" enum value constant?
   return make_call(local_name_to_top_level_entity("0"), NIL);
 }
 
@@ -897,9 +908,9 @@ bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
     c2 = freia_statement_to_call(dagvtx_statement(v2));
   list
     lp1 = freia_extract_params
-    (dagvtx_opid(v1), call_arguments(c1), NULL, NULL, NULL),
+    (dagvtx_opid(v1), call_arguments(c1), NULL, NULL, NULL, NULL),
     lp2 = freia_extract_params
-    (dagvtx_opid(v1), call_arguments(c2), NULL, NULL, NULL);
+    (dagvtx_opid(v1), call_arguments(c2), NULL, NULL, NULL, NULL);
   bool same = lexpression_equal_p(lp1, lp2);
   gen_free_list(lp1), gen_free_list(lp2);
   // should also check that there is no w effects on parameters in between
@@ -910,25 +921,31 @@ bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
  * by a call to function_name(lparams)
  * also update sets of remainings and global_remainings
  * the function must chose one of the statements?
- * ??? ISTM that something intelligent needs to be done for code generation,
- * instead of these pseudo-random substitutions...
  */
 int freia_substitute_by_helper_call(
+  // dag reminder, may be null
   dag d,
   set global_remainings,
   set remainings,
   list /* of statement */ ls,
   string function_name,
   list lparams,
+  set helpers,
   int preceeding)
 {
+  pips_debug(7, "%d statements, before %d\n",
+             (int) gen_length(ls), preceeding);
+
   // buid the set of statements that are not yet computed
   set not_dones = set_make(set_pointer), dones = set_make(set_pointer);
-  FOREACH(dagvtx, vs, dag_vertices(d))
+  if (d)
   {
-    pstatement ps = vtxcontent_source(dagvtx_content(vs));
-    if (pstatement_statement_p(ps))
-      set_add_element(not_dones, not_dones, pstatement_statement(ps));
+    FOREACH(dagvtx, vs, dag_vertices(d))
+    {
+      pstatement ps = vtxcontent_source(dagvtx_content(vs));
+      if (pstatement_statement_p(ps))
+        set_add_element(not_dones, not_dones, pstatement_statement(ps));
+    }
   }
   // dones: those statements which are handled by this helper
   set_difference(dones, remainings, not_dones);
@@ -970,14 +987,22 @@ int freia_substitute_by_helper_call(
   entity helper = make_empty_function(function_name,
         copy_type(functional_result(type_functional(entity_type(example)))),
                                       make_language_c());
+  // record helper function
+  set_add_element(helpers, helpers, helper);
+
   // update type of parameters
   list larg_params = NIL;
   FOREACH(expression, e, lparams)
+  {
+    debug_on("RI_UTILS_DEBUG_LEVEL");
+    type t = expression_to_user_type(e);
+    debug_off();
     larg_params = CONS(parameter,
-                       make_parameter(expression_to_user_type(e),
+                       make_parameter(t,
                                       make_mode_value(),
                                       make_dummy_unknown()),
                        larg_params);
+  }
   larg_params = gen_nreverse(larg_params);
   module_functional_parameters(helper) = larg_params;
 
@@ -1063,13 +1088,75 @@ void freia_add_image_arguments
 
 /********************************************************* IMAGE OCCURRENCES */
 
+#define E_WRITE(v) (v)
+#define E_READ(v) ((void*)(((_int)v)+1))
+
+/* return the argument number, starting from 1, of this reference
+ * or 0 if not found.
+ */
+static int reference_argument_number(const reference r, const list le)
+{
+  int n = 0, i=0;
+  FOREACH(expression, e, le)
+  {
+    i++;
+    if (expression_reference_p(e) && expression_reference(e)==r)
+      n = i;
+  }
+  return n;
+}
+
+/* tell about the image effect. if in doubt, return true.
+ */
+static bool reference_written_p(
+  const reference r,
+  const hash_table signatures)
+{
+  string why = "default", func = "?";
+  bool written = false;
+  call c = (call) gen_get_ancestor(call_domain, r);
+  if (c)
+  {
+    entity called = call_function(c);
+    func = entity_local_name(called);
+    int n = reference_argument_number(r, call_arguments(c));
+    if (n==0)
+      written=true, why = "not found";
+    else
+    {
+      const freia_api_t * api = hwac_freia_api(entity_local_name(called));
+      if (api)
+        written = n <= (int) api->arg_img_out, why = "api";
+      else
+        if (signatures && hash_defined_p(signatures, called))
+          written = n <= (_int) hash_get(signatures, called), why = "sig";
+        else
+          written = true, why = "no sig";
+    }
+  }
+  else
+    // in doubt, assume a write effect?
+    pips_internal_error("reference to %s outside of a call?\n",
+                        entity_local_name(reference_variable(r)));
+
+  pips_debug(8, "reference to %s is %s (%s in %s)\n",
+             entity_local_name(reference_variable(r)),
+             written? "written": "read", why, func);
+
+  return written;
+}
+
 typedef struct {
-  // built image occurences
+  // built image occurences:
+  // image -> set of statements with written effects
+  // image+1 -> set of statements with read effects
   hash_table occs;
   // enclosing statement for inner recursion
   statement enclosing;
-  // set of statements with image occurences
+  // set of statements, to record statements with image occurences
   set image_occs_stats;
+  // helper entity -> number of written args
+  const hash_table signatures;
 } occs_ctx;
 
 /* hack to help replace use-def chains which did not work initially with C.
@@ -1086,8 +1173,12 @@ static void check_ref(reference r, occs_ctx * ctx)
   {
     // ensure that target set exists
     if (!hash_defined_p(ctx->occs, v))
-      hash_put(ctx->occs, v, set_make(set_pointer));
-    set stats = (set) hash_get(ctx->occs, v);
+    {
+      hash_put(ctx->occs, E_WRITE(v), set_make(set_pointer));
+      hash_put(ctx->occs, E_READ(v), set_make(set_pointer));
+    }
+    bool written = reference_written_p(r, ctx->signatures);
+    set stats = (set) hash_get(ctx->occs, written? E_WRITE(v): E_READ(v));
     // get containing statement
     statement up = ctx->enclosing? ctx->enclosing:
       (statement) gen_get_ancestor(statement_domain, r);
@@ -1112,14 +1203,17 @@ static void check_stmt(statement s, occs_ctx * ctx)
   ctx->enclosing = NULL;
 }
 
-/* @return build occurrence hash table: { entity -> set of statements }
+/* @param image_occs_stats set of statements with image occurences (may be NULL)
+ * @param signatures helper entity -> (_int) # out args
+ * @return build occurrence hash table: { entity -> set of statements }
  */
-hash_table freia_build_image_occurrences(statement s, set image_occs_stats)
+hash_table freia_build_image_occurrences(
+  statement s,
+  set image_occs_stats,
+  const hash_table signatures)
 {
-  occs_ctx ctx;
-  ctx.occs = hash_table_make(hash_pointer, 0);
-  ctx.enclosing = NULL;
-  ctx.image_occs_stats = image_occs_stats;
+  occs_ctx ctx = { hash_table_make(hash_pointer, 0), NULL,
+                   image_occs_stats, signatures };
   gen_context_multi_recurse(s, &ctx,
                             statement_domain, gen_true, check_stmt,
                             reference_domain, gen_true, check_ref,
@@ -1206,39 +1300,62 @@ static statement image_free(entity v)
               CONS(expression, entity_to_expression(v), NIL)));
 }
 
-/* tell whether there is no image processing statements between s1 and s2
+/* tell whether there is no image processing statements between s1 and l2
  */
 static bool only_minor_statements_in_between(
-  list ls, statement s1, statement s2, set image_occurences)
+  list ls, statement s1, list l2, set image_occurences)
 {
-  bool in_sequence = false;
+  bool s1_seen = false, in_sequence = false;
+  pips_assert("consistent statement & list", !gen_in_list_p(s1, l2));
+  int n2 = gen_length(l2);
+
+  // scan the sequence list, looking for s1 & l2 statements
   FOREACH(statement, s, ls)
   {
     if (!in_sequence && s==s1)
-      in_sequence = true;
-    else if (in_sequence && s==s2)
-      return true;
+      in_sequence = true, s1_seen = true;
+    else if (in_sequence && gen_in_list_p(s, l2))
+    {
+      n2--;
+      if (!n2) return true;
+    }
     else if (in_sequence && set_belong_p(image_occurences, s))
       return false;
   }
-  pips_internal_error("should not get there");
+
+  // ??? should really be an error...
+  pips_user_warning("should not get there: s1 seen=%s, seq=%s, n2=%d\n",
+                    bool_to_string(s1_seen), bool_to_string(in_sequence), n2);
+
+  // let us be optimistic, this is a prototype
   return true;
 }
 
 /* insert image allocation if needed, for intermediate image inserted before
  * if an image is used only twice, then it is switched back to the initial one
+ *
+ * This could/should be improved:
+ * - temporary images kept could be reused if possible, instead of new ones
+ * - not sure about the condition to move back to the initial image
+ *
  * @param ls list of statements to consider
  * @param images list of entities to check and maybe allocate
  * @param init new image -> initial image
+ * @param signatures helper -> _int # written args ahead (may be NULL)
  * @return actually allocated images
  */
 list freia_allocate_new_images_if_needed
-(list ls, list images, const hash_table occs, const hash_table init)
+(list ls,
+ list images,
+ const hash_table occs,
+ const hash_table init,
+ const hash_table signatures)
 {
   // check for used images
-  set img_stats = set_make(hash_pointer);
+  set img_stats = set_make(set_pointer);
   sequence sq = make_sequence(ls);
-  hash_table newoccs = freia_build_image_occurrences((statement) sq, img_stats);
+  hash_table newoccs =
+    freia_build_image_occurrences((statement) sq, img_stats, signatures);
   sequence_statements(sq) = NIL;
   free_sequence(sq);
 
@@ -1246,32 +1363,59 @@ list freia_allocate_new_images_if_needed
   FOREACH(entity, v, images)
   {
     if (!hash_defined_p(newoccs, v))
-      // no occurences, the image is not kept
+      // no written occurences, the image is not kept
       continue;
 
     if (get_bool_property("FREIA_REUSE_INITIAL_IMAGES"))
     {
-      set where = (set) hash_get(newoccs, v);
-      int n = set_size(where);
+      set where_write = (set) hash_get(newoccs, E_WRITE(v));
+      set where_read = (set) hash_get(newoccs, E_READ(v));
+      int nw = set_size(where_write), nr = set_size(where_read);
 
-      pips_debug(8, "image %s used in %d statements\n", entity_name(v), n);
+      pips_debug(8, "image %s used %d+%d statements\n", entity_name(v), nw, nr);
+
+      // ??? should be used once only in the statement if written!
+      // how to I know about W/R for helper functions?
+      // its siblings should also be take into account
 
       // n>1 ??
       // if used only twice, substitude back to initial variable???
       // well, it may depends whether the the initial variable is used?
       // there is possibly something intelligent to do here, but it should
       // be checked carefully...
-      if (n==2 && hash_defined_p(init, v))
+      if (nw==1 && nr>=1 && hash_defined_p(init, v))
       {
-        statement s1 = NULL, s2 = NULL;
-        SET_FOREACH(statement, s, where)
-          if (!s1) s1 = s; else s2 = s;
-        // sort s1 < s2
-        if (statement_ordering(s2)<statement_ordering(s1))
+        entity old = (entity) hash_get(init, v);
+
+        // get statements
+        list l1 = set_to_list(where_write), l2 = set_to_list(where_read);
+        statement s1 = STATEMENT(CAR(l1));
+        gen_free_list(l1), l1 = NIL;
+
+        pips_debug(8, "testing for %s -> %s\n",
+                   entity_local_name(v), entity_local_name(old));
+
+        // does not interact with possibly used old
+        // if we could differentiate read & write, we could do better,
+        // but the information is not currently available.
+        bool skip = false;
+        if (hash_defined_p(newoccs, old))
         {
-          statement tmp = s1; s1 = s2; s2 = tmp;
+          set old_write = (set) hash_get(newoccs, E_WRITE(old));
+          set old_read = (set) hash_get(newoccs, E_READ(old));
+          if (set_belong_p(old_write, s1))
+            skip = true;
+          else
+          {
+            FOREACH(statement, s2, l2)
+              if (set_belong_p(old_read, s2))
+                skip = true;
+          }
+          // note that we can handle a read in s1 and a write in s2
         }
-        if (only_minor_statements_in_between(ls, s1, s2, img_stats))
+
+        // do we want to switch back?
+        if (!skip && only_minor_statements_in_between(ls, s1, l2, img_stats))
         {
           // yes, they are successive, just remove?? Am I that sure???
           // ??? hmmm, maybe we could have :
@@ -1282,14 +1426,26 @@ list freia_allocate_new_images_if_needed
           // where X_1 -> X is just a bad idea because it overwrites X?
           // I'm not sure this can happen with AIPO, as X would be X_2
           // and will not be changed?
-          entity old = (entity) hash_get(init, v);
           pips_debug(7, "substituting back %s by %s\n",
                      entity_local_name(v), entity_local_name(old));
 
           // we can perform any substitution here
           // note that it may be generated helper functions
           freia_switch_image_in_statement(s1, v, old, true);
-          freia_switch_image_in_statement(s2, v, old, false);
+          FOREACH(statement, s2, l2)
+            freia_switch_image_in_statement(s2, v, old, false);
+
+          // create/update uses of "old" to avoid interactions
+          if (!hash_defined_p(newoccs, old))
+          {
+            hash_put(newoccs, E_WRITE(old), set_make(set_pointer));
+            hash_put(newoccs, E_READ(old), set_make(set_pointer));
+          }
+          set old_write = (set) hash_get(newoccs, E_WRITE(old));
+          set_add_element(old_write, old_write, s1);
+          set old_read = (set) hash_get(newoccs, E_READ(old));
+          FOREACH(statement, s2, l2)
+            set_add_element(old_read, old_read, s2);
         }
         else
           allocated = CONS(entity, v, allocated);
@@ -1330,18 +1486,20 @@ list freia_allocate_new_images_if_needed
 
 /* @return the number for FREIA AIPO ops in dag
  */
-int freia_aipo_count(dag d, bool with_copies)
+int freia_aipo_count(dag d, int * pa, int * pc)
 {
-  int count = 0;
+  int aipos = 0, copies = 0;
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     string op = dagvtx_function_name(v);
-    if (strncmp(op, AIPO, strlen(AIPO))==0) count++;
+    if (strncmp(op, AIPO, strlen(AIPO))==0) aipos++;
     // handle exceptions afterwards
-    if (!with_copies && same_string_p(op, AIPO "copy")) count--;
-    if (same_string_p(op, AIPO "scalar_copy")) count--;
+    if (same_string_p(op, AIPO "copy")) copies++, aipos--;
+    else if (same_string_p(op, AIPO "cast")) copies++, aipos--;
+    else if (same_string_p(op, AIPO "scalar_copy")) aipos--;
   }
-  return count;
+  *pa = aipos, *pc = copies;
+  return aipos+copies;
 }
 
 /******************************************************* BUILD OUTPUT IMAGES */
@@ -1373,7 +1531,7 @@ static void oi_stmt_rwt(statement s, set images)
  */
 set freia_compute_output_images(entity module, statement s)
 {
-  set images = set_make(hash_pointer);
+  set images = set_make(set_pointer);
 
   // image formal parameters
   FOREACH(entity, var, module_functional_parameters(module))

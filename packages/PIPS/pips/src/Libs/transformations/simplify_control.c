@@ -878,11 +878,17 @@ dead_statement_rewrite(statement s)
 	   s);
 
    switch(t) {
-   case is_instruction_sequence:
-       /* It is now dealt with clean_up_sequences_internal() at the
+   case is_instruction_sequence: {
+       /* It is now mostly dealt with clean_up_sequences_internal() at the
           end of the function: */
+     /* Make sure the declaration list at the block level fits the
+	declarations in the sequence in case some where eliminated */
+      list dl = statement_declarations(s);
+      list idl = statement_to_declarations(s);
+      gen_free_list(dl);
+      statement_declarations(s) = idl;
        break;
-
+   }
    case is_instruction_loop:
    case is_instruction_forloop:
    case is_instruction_whileloop:
@@ -976,8 +982,15 @@ static bool dead_statement_filter(statement s)
 
     /* If a statement has no write effects on the store and if it
        cannot hides a control effect in a user-defined function*/
-    if (ENDP(crwl) && !statement_may_have_control_effects_p(s)
-	&& !format_statement_p(s) && ! declaration_statement_p(s) ) {
+    if (ENDP(crwl) // No effects, store, declaration, type
+	// Beware of Property MEMORY_EFFECTS_ONLY
+	&& !statement_may_have_control_effects_p(s)
+	&& !format_statement_p(s) // Fortran format
+	&& ! declaration_statement_p(s) // a declaration
+	/*&& ENDP(statement_declarations(s))*/) { // sequence with
+						  // decl. only
+						  // possible impact:
+						  // stack space ovfl.
       pips_debug(2, "Ignored statement %td (%td, %td)\n",
 		 statement_number(s),
 		 ORDERING_NUMBER(statement_ordering(s)),
