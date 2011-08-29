@@ -47,7 +47,7 @@ display PRINTED_FILE[SHALOW]
 
 #display PRINTED_FILE[%ALL]
 
-#capply SUPPRESS_DEAD_CODE[%ALL]
+#capply SIMPLIFY_CONTROL[%ALL]
 #display PRINTED_FILE[%ALL]
 
 #apply UNSPLIT

@@ -5,3 +5,6 @@
 struct s {
    int a;
 };
+#
+# compile generated struct16
+#

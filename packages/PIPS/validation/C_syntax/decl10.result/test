@@ -62,3 +62,6 @@ typedef union {
    double b;
 } B;
 typedef enum {x1, x2} C;
+#
+# compile generated decl10
+#

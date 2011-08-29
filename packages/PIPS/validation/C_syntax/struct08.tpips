@@ -18,8 +18,7 @@ echo
 echo Compilation of the prettyprinted code
 echo
 
-# shell $(PIPS_CC) -c $WS.database/Src/$WS.c
-shell cc -c $WS.database/Src/$WS.c
+shell pips_validation_exe.sh  -c -g $WS
 close
 
 delete $WS

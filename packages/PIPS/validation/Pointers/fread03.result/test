@@ -164,7 +164,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    buffer = (char *) calloc(80, sizeof(char));
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -176,7 +176,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    file = fopen(filename, "rb");
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -188,7 +188,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    if (file==(void *) 0)
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -200,7 +200,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
       nrerror("ouverture du fichier impossible\n");
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -215,7 +215,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    if (strcmp(buffer, "P5")!=0)
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -227,7 +227,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
       nrerror("entete du fichier %s invalide\n");
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -244,7 +244,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    *nrl = 0;
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -256,7 +256,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    *nrh = height-1;
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -268,7 +268,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    *ncl = 0;
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -280,7 +280,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    *nch = width-1;
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -292,7 +292,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    m = bmatrix(*nrl, *nrh, *ncl, *nch);
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
@@ -305,7 +305,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    for(i = 0; i <= height-1; i += 1)
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
@@ -317,7 +317,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
       ReadPGMrow(file, width, m[i]);
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
@@ -330,7 +330,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    fclose(file);
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
@@ -342,7 +342,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    free(buffer);
 
 // Points To:
-// buffer -> *ANY_MODULE*:*HEAP* , EXACT
+// buffer -> *ANY_MODULE*:*HEAP*_b0[0] , EXACT
 // file -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // filename -> _filename_1[0] , EXACT
 // m -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT

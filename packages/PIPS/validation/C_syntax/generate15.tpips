@@ -37,7 +37,6 @@ echo
 
 display PRINTED_FILE[func]
 
-# To be sure that the generated code is corret
 #shell (cd generate15.database/func; gcc -c func.c)
 
 close

@@ -171,7 +171,7 @@ digraph "freia_22_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops (0 copies), optimized to 3 (0+0 copies)
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -183,13 +183,10 @@ freia_status freia_22_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -255,9 +252,6 @@ freia_status freia_22_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -386,6 +380,8 @@ digraph "freia_22_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_22
  *
@@ -580,6 +576,177 @@ freia_status freia_22_helper_0_0_0(
   return ret;
 }
 
+
+! updated function
+
+freia_status freia_22(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   // external variable reuse
+   // o = i0 / i1
+   // o = o | i0
+   // o = o +sat i0
+   freia_22_helper_0_0_0(o, i0, i1);                                    /*0010*/
+
+   return FREIA_OK;                                                     /*0014*/
+}
+
+! cleaned up function
+
+freia_status freia_22(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   // external variable reuse
+   // o = i0 / i1
+   // o = o | i0
+   // o = o +sat i0
+   freia_22_helper_0_0_0(o, i0, i1);                                    /*0010*/
+
+   return 0;                                                            /*0014*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_22(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   // external variable reuse
+   // o = i0 / i1
+   // o = o | i0
+   // o = o +sat i0
+   freia_aipo_div(o, i0, i1);                                           /*0010*/
+   freia_aipo_or(o, o, i0);                                             /*0011*/
+   freia_aipo_addsat(o, o, i0);                                         /*0012*/
+
+   return FREIA_OK;                                                     /*0014*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_22" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 +s" [shape=trapezium,orientation=270];
+  "12 +s" -> "o";
+  "11 |" [shape=trapezium,orientation=270];
+  "11 |" -> "12 +s" [label="o"];
+  "10 /" [shape=trapezium,orientation=270];
+  "10 /" -> "11 |" [label="o"];
+  "i1" -> "10 /";
+  "i0" -> "12 +s";
+  "i0" -> "11 |";
+  "i0" -> "10 /";
+}
+// graph for dag "dag_cleaned_0" of module "freia_22" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 +s" [shape=trapezium,orientation=270];
+  "12 +s" -> "o";
+  "11 |" [shape=trapezium,orientation=270];
+  "11 |" -> "12 +s" [label="o_1"];
+  "10 /" [shape=trapezium,orientation=270];
+  "10 /" -> "11 |" [label="o_2"];
+  "i1" -> "10 /";
+  "i0" -> "12 +s";
+  "i0" -> "11 |";
+  "i0" -> "10 /";
+}
+// graph for dag "freia_22_helper_0_0" of module "freia_22" in dot format
+digraph "freia_22_helper_0_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 +s" [shape=trapezium,orientation=270];
+  "12 +s" -> "o";
+  "11 |" [shape=trapezium,orientation=270];
+  "11 |" -> "12 +s" [label="o_1"];
+  "10 /" [shape=trapezium,orientation=270];
+  "10 /" -> "11 |" [label="o_2"];
+  "i1" -> "10 /";
+  "i0" -> "12 +s";
+  "i0" -> "11 |";
+  "i0" -> "10 /";
+}
+// graph for dag "freia_22_helper_0_0_0" of module "freia_22" in dot format
+digraph "freia_22_helper_0_0_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 +s" [shape=trapezium,orientation=270];
+  "12 +s" -> "o";
+  "11 |" [shape=trapezium,orientation=270];
+  "11 |" -> "12 +s" [label="o_1"];
+  "10 /" [shape=trapezium,orientation=270];
+  "10 /" -> "11 |" [label="o_2"];
+  "i1" -> "10 /";
+  "i0" -> "12 +s";
+  "i0" -> "11 |";
+  "i0" -> "10 /";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+
+// helper function freia_22_helper_0_0_0
+freia_status freia_22_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1)
+{
+  call opencl kernel freia_22_helper_0_0_0(o0, i0, i1);
+  return FREIA_OK;
+}
+// freia opencl includes
+// generated opencl for function freia_22
+
+// opencl for dag 0
+
+// opencl function freia_22_helper_0_0_0
+kernel freia_22_helper_0_0_0(
+  opencl image o0,
+  const opencl image i0,
+  const opencl image i1)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    // pixel computations
+    register pixel t10 = PIXEL_DIV(in0, in1);
+    register pixel t11 = PIXEL_OR(t10, in0);
+    register pixel t12 = PIXEL_ADDSAT(t11, in0);
+    // set output pixels
+    o0[i] = t12;
+  }
+}
 
 ! updated function
 

@@ -1,0 +1,11 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+delete user_error02
+create user_error02 user_error02.f
+# activate PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS
+# display CALLGRAPH_FILE
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+display PRINTED_FILE[B]
+close
+delete user_error02
+quit

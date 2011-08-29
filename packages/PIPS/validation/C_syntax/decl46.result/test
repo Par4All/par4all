@@ -111,3 +111,6 @@ void decl46(double a)
 Call graph for "decl46"
 
  decl46
+#
+# compile generated decl46
+#

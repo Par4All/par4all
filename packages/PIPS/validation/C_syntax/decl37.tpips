@@ -24,7 +24,7 @@ echo
 display PRINTED_FILE[decl37!]
 
 apply UNSPLIT
-shell cc -c decl37.database/Src/decl37.c
+shell pips_validation_exe.sh -c -g decl37
 
 close
 

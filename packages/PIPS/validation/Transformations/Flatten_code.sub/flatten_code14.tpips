@@ -12,14 +12,6 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 echo
-echo Compile initial code
-echo
-
-shell cc -c $WSPC.database/Tmp/$WSPC.cpp_processed.c -o $WSPC.database/Tmp/$WSP.o
-#shell cc -c $WSPC.c
-#shell ./a.out
-
-echo
 echo Initial code
 echo
 
@@ -36,10 +28,10 @@ apply FLATTEN_CODE[$WSPC]
 display PRINTED_FILE[$WSPC]
 
 apply UNSPLIT[$WSPC]
+shell pips_validation_exe.sh -c $WSPC
 close
 
 # reentry
-shell cc -c -Wall $WSPC.database/Src/$WSPC.c -o $WSPC.database/Tmp/$WSP.1.o
 create ${WSPC}_2 $WSPC.database/Src/$WSPC.c 
 
 activate PRINT_CODE

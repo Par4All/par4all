@@ -1,0 +1,19 @@
+delete ${WSPACE}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${WSPACE} ${FILE}
+
+echo /\* Code with PROPER REDUCTIONS \*/
+
+activate PRINT_CODE_PROPER_REDUCTIONS
+display PRINTED_FILE[%ALLFUNC]
+
+echo /\* Code with CUMULATED REDUCTIONS \*/
+
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete ${WSPACE}
+quit

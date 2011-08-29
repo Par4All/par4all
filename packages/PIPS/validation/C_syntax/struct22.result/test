@@ -23,3 +23,6 @@ struct s5 {
    int q;
    int r;
 } (*pfoo)();
+#
+# compile generated struct22
+#

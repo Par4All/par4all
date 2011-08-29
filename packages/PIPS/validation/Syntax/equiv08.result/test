@@ -1,6 +1,5 @@
 user warning in tp_parse: equiv08: No such workspace
 Registering file equiv08.f
-Checking Fortran syntax of ./equiv08.f
 Splitting file    ./equiv08.f
   Module         SUBEQUIV08
   Module         EQUIV08

@@ -19,3 +19,6 @@ void enum09()
    i = a;
    j = x;
 }
+#
+# compile generated enum09
+#

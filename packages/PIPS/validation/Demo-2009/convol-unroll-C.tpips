@@ -71,7 +71,7 @@ setproperty LOOP_LABEL "l200"
 apply FULL_UNROLL[convol]
 
 apply PARTIAL_EVAL
-apply SUPPRESS_DEAD_CODE[convol]
+apply SIMPLIFY_CONTROL[convol]
 #apply USE_DEF_ELIMINATION
 display PRINTED_FILE[convol]
 

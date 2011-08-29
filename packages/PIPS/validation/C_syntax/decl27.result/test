@@ -54,3 +54,6 @@ long long int i1;
 long int i2;
 int i3;
 short i4;
+#
+# compile generated decl27
+#

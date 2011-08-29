@@ -21,4 +21,7 @@ int main()
    // This does not work
    return a-- -0;
 }
+#
+# compile both increment
+#
 

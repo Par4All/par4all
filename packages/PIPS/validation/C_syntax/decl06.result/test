@@ -70,3 +70,6 @@ struct _err_manager {
 
 
 void ERR_mgr_ctor(const char *file, const char *function);
+#
+# compile generated decl06
+#

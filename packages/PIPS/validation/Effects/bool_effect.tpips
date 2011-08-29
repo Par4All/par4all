@@ -1,0 +1,7 @@
+delete bool_effect
+create bool_effect bool_effect.c
+
+apply TRANSFORMERS_INTER_FULL (main)
+
+close bool_effect
+

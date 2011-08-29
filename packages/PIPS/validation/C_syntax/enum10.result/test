@@ -12,3 +12,6 @@ void enum10()
       enum {gaga} f3;
    } ss;
 }
+#
+# compile generated enum10
+#

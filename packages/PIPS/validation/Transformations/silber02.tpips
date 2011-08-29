@@ -45,7 +45,7 @@ display PRINTED_FILE
 
 apply CLEAN_DECLARATIONS
 display PRINTED_FILE
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 display PRINTED_FILE
 
 apply FLAG_LOOPS
@@ -53,13 +53,13 @@ display PRINTED_FILE
 
 setproperty LOOP_LABEL "l99995"
 apply FORCE_LOOP_FUSION
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 apply FLAG_LOOPS
 display PRINTED_FILE
 
 setproperty LOOP_LABEL "l99989"
 apply FORCE_LOOP_FUSION
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 display PRINTED_FILE
 
 
@@ -67,7 +67,7 @@ display PRINTED_FILE
 setproperty FORWARD_SUBSTITUTE_OPTIMISTIC_CLEAN TRUE
 apply FORWARD_SUBSTITUTE
 display PRINTED_FILE
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 display PRINTED_FILE
 
 apply PARTIAL_EVAL[adds]
@@ -80,8 +80,10 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell cc -O3 silber02.c -o silber02.database/Tmp/ref
-shell cc -O3 include/adds.c silber02.database/Src/silber02.c -o silber02.database/Tmp/out
+
+# hmmm... cannot use pips_validation_exe easilly
+shell ${PIPS_CC:-cc} -O3 silber02.c -o silber02.database/Tmp/ref
+shell ${PIPS_CC:-cc} -O3 include/adds.c silber02.database/Src/silber02.c -o silber02.database/Tmp/out
 shell ./silber02.database/Tmp/ref include/input.pgm include/mapfile.amp silber02.database/Tmp/ref.pgm
 shell ./silber02.database/Tmp/out include/input.pgm include/mapfile.amp silber02.database/Tmp/out.pgm
 shell cmp silber02.database/Tmp/ref.pgm silber02.database/Tmp/out.pgm

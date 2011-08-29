@@ -157,10 +157,12 @@ int main()
 # applying suppress dead code...
 int clone02_1(int n, int s)
 {
-   // PIPS: s is assumed a constant reaching value
-   int r = 0;
-   r = 1;
-   return 1;
+   {
+      // PIPS: s is assumed a constant reaching value
+      int r = 0;
+      r = 1;
+      return 1;
+   }
 }
 # applying use-def elimination...
 int clone02_1(int n, int s)

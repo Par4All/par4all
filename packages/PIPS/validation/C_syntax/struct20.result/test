@@ -2,3 +2,6 @@
 struct s {
    struct s *p;
 } u;
+#
+# compile generated struct20
+#

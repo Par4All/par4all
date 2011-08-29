@@ -13,7 +13,7 @@ display PARSED_PRINTED_FILE[main]
 
 apply UNSPLIT
 
-shell gcc -o priority03.database/Src/prio priority03.database/Src/priority03.c
+shell pips_validation_exe.sh -c -g priority03
 
 close
 delete priority03

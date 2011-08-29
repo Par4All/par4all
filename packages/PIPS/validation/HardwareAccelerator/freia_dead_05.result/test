@@ -103,7 +103,7 @@ digraph "freia_dead_05_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 1 ops (0 copies), optimized to 1 (0+0 copies)
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -114,13 +114,10 @@ freia_status freia_dead_05_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -159,9 +156,6 @@ freia_status freia_dead_05_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -246,6 +240,8 @@ digraph "freia_dead_05_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_dead_05
  *
@@ -402,6 +398,82 @@ freia_data2d * freia_dead_05(void)
 {
    freia_data2d *result = result = freia_common_create_data(16, 1024, 720);            /*0006*/
    freia_dead_05_helper_0_0_0(result, 127);                             /*0007*/
+   return result;                                                       /*0008*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_data2d * freia_dead_05(void)
+{
+   freia_data2d *result = result = freia_common_create_data(16, 1024, 720);            /*0006*/
+   freia_aipo_set_constant(result, 127);                                /*0007*/
+   return result;                                                       /*0008*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dead_05" in dot format
+digraph "dag_0" {
+  // inputs
+
+  // outputs
+  "result" [shape=circle];
+
+  // computation vertices
+  "7 C" [shape=trapezium,orientation=270];
+  "7 C" -> "result";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dead_05" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+  "result" [shape=circle];
+
+  // computation vertices
+  "7 C" [shape=trapezium,orientation=270];
+  "7 C" -> "result";
+}
+// graph for dag "freia_dead_05_helper_0_0" of module "freia_dead_05" in dot format
+digraph "freia_dead_05_helper_0_0" {
+  // inputs
+
+  // outputs
+  "result" [shape=circle];
+
+  // computation vertices
+  "7 C" [shape=trapezium,orientation=270];
+  "7 C" -> "result";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function freia_dead_05
+
+// opencl for dag 0
+
+! updated function
+
+freia_data2d * freia_dead_05(void)
+{
+   freia_data2d *result = result = freia_common_create_data(16, 1024, 720);            /*0006*/
+   freia_aipo_set_constant(result, 127);                                /*0007*/
+   return result;                                                       /*0008*/
+}
+
+! cleaned up function
+
+freia_data2d * freia_dead_05(void)
+{
+   freia_data2d *result = result = freia_common_create_data(16, 1024, 720);            /*0006*/
+   freia_aipo_set_constant(result, 127);                                /*0007*/
    return result;                                                       /*0008*/
 }
 #

@@ -5,3 +5,6 @@ int a;
 /* a is not static, but it is not fully external as it is declared and
    allocated and potentially initialized in this module. */
 int a;
+#
+# compile generated global_extern01
+#

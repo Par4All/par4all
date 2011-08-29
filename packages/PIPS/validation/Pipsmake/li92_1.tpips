@@ -1,0 +1,47 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+
+delete li92_1
+
+echo
+echo Direct computation of precondition for li921
+echo
+
+create li92_1 li92_1.f
+module LI921
+
+activate TRANSFORMERS_INTRA_FAST
+activate PRECONDITIONS_INTRA
+activate INTRAPROCEDURAL_SUMMARY_PRECONDITION
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+
+echo
+echo Computation of precondition for li921 after touching the source code
+echo
+
+shell sleep 2
+shell touch li92_1.database/li921.f
+
+open li92_1
+module LI921
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+
+echo
+echo Computation of precondition for li921 after touching its summary effects
+echo
+
+shell sleep 2
+shell touch li92_1.database/LI921.SUMMARY_EFFECTS
+
+open li92_1
+module LI921
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+
+delete li92_1
+quit

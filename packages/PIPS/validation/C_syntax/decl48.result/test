@@ -81,3 +81,6 @@ static void flat_color_z_triangle()
 
    eMaj.v0 = 1;                                                         /*0013*/
 }
+#
+# compile generated decl48
+#

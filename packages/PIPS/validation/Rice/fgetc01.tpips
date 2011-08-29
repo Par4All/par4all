@@ -63,7 +63,7 @@ echo
 echo Clean-up the mess with dead code elimination
 echo
 
-apply SUPPRESS_DEAD_CODE[getimage]
+apply SIMPLIFY_CONTROL[getimage]
 display PRINTED_FILE[getimage]
 
 #quit

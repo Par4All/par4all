@@ -17,3 +17,6 @@ void decl23()
    //s.foo = decl23a;
    s.foo = decl23;
 }
+#
+# compile generated decl23
+#

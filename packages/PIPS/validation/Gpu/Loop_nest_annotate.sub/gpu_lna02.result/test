@@ -1,0 +1,13 @@
+#
+# Code after gpu_loop_nest_annotate for module p4a_kernel_launcher_1
+#
+void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
+{
+   int i;
+   // Loop nest P4A begin,1D(499)
+kernel2:
+   for(i = 0; i <= 498; i += 1)
+      // Loop nest P4A end
+      if (i<=498)
+         p4a_kernel_wrapper_1(save, space, i+1);
+}

@@ -25,7 +25,7 @@ echo
 display PARSED_PRINTED_FILE[decl27!]
 
 apply UNSPLIT
-shell cc -c decl27.database/Src/decl27.c
+shell pips_validation_exe.sh -c -g decl27
 
 close
 delete decl27

@@ -88,3 +88,6 @@ void ERR_mgr_ctor(const char *file, const char *function);
 
 /*ERR_mgr * emgr*/
 void ERR_mgr_dtor();
+#
+# compile generated decl05
+#

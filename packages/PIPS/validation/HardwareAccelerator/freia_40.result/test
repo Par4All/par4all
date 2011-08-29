@@ -171,7 +171,7 @@ digraph "freia_40_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops (0 copies), optimized to 3 (0+0 copies)
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -183,10 +183,8 @@ freia_status freia_40_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -247,9 +245,6 @@ freia_status freia_40_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -378,6 +373,8 @@ digraph "freia_40_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
 
 /* FREIA terapix helper function for module freia_40
  *
@@ -606,6 +603,136 @@ freia_status freia_40(freia_data2d *o, freia_data2d *i, int32_t *kern)
    freia_40_helper_0_0_0(o, i, kern);                                   /*0010*/
    
    
+   return 0;                                                            /*0017*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_40(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
+   
+   // preschedule example for terapix tests
+   
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
+   freia_aipo_sub(o, d, e);                                             /*0012*/
+
+   freia_common_destruct_data(e);                                       /*0014*/
+   freia_common_destruct_data(d);                                       /*0015*/
+
+   return FREIA_OK;                                                     /*0017*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_40" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "o";
+  "11 D8" [shape=box];
+  "11 D8" -> "12 -" [label="d"];
+  "10 E8" [shape=box];
+  "10 E8" -> "12 -" [label="e"];
+  "i" -> "11 D8";
+  "i" -> "10 E8";
+}
+// graph for dag "dag_cleaned_0" of module "freia_40" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "o";
+  "11 D8" [shape=box];
+  "11 D8" -> "12 -" [label="d"];
+  "10 E8" [shape=box];
+  "10 E8" -> "12 -" [label="e"];
+  "i" -> "11 D8";
+  "i" -> "10 E8";
+}
+// graph for dag "freia_40_helper_0_0" of module "freia_40" in dot format
+digraph "freia_40_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "12 -" [shape=trapezium,orientation=270];
+  "12 -" -> "o";
+  "11 D8" [shape=box];
+  "11 D8" -> "12 -" [label="d"];
+  "10 E8" [shape=box];
+  "10 E8" -> "12 -" [label="e"];
+  "i" -> "11 D8";
+  "i" -> "10 E8";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function freia_40
+
+// opencl for dag 0
+
+! updated function
+
+freia_status freia_40(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
+   
+   // preschedule example for terapix tests
+   
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
+   freia_aipo_sub(o, d, e);                                             /*0012*/
+
+   freia_common_destruct_data(e);                                       /*0014*/
+   freia_common_destruct_data(d);                                       /*0015*/
+
+   return FREIA_OK;                                                     /*0017*/
+}
+
+! cleaned up function
+
+freia_status freia_40(freia_data2d *o, freia_data2d *i, int32_t *kern)
+{
+   
+   
+   freia_data2d *e = freia_common_create_data(i->bpp, i->widthWa, i->heightWa), *d = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);    /*0006*/
+   
+   // preschedule example for terapix tests
+   
+   freia_aipo_erode_8c(e, i, kern);                                     /*0010*/
+   freia_aipo_dilate_8c(d, i, kern);                                    /*0011*/
+   freia_aipo_sub(o, d, e);                                             /*0012*/
+
+   freia_common_destruct_data(e);                                       /*0014*/
+   freia_common_destruct_data(d);                                       /*0015*/
+
    return 0;                                                            /*0017*/
 }
 #

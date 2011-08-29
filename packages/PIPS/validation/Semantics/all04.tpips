@@ -53,7 +53,7 @@ make PRECONDITIONS[FOO3]
 
 # quit
 
-capply SUPPRESS_DEAD_CODE[%ALL]
+capply SIMPLIFY_CONTROL[%ALL]
 # It is not possible to get rid of useless J = 1 in FOO1 because
 # use-def chains are not interprocedural
 # capply USE_DEF_ELIMINATION[%ALL]

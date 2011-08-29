@@ -1,139 +1,13 @@
-void P4A_accel_free(void *address)
-{
-   free(address);
-}
-void P4A_accel_malloc(void **address, size_t size)
-{
-   *address = malloc(size);
-}
-void P4A_copy_from_accel(size_t element_size, void *host_address, const void *accel_address)
-{
-   size_t i;
-   char *cdest = host_address;
-   const char *csrc = accel_address;
-   for(i = 0; i <= element_size-1; i += 1)
-      cdest[i] = csrc[i];
-}
-void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address)
-{
-   size_t i;
-   char *cdest = d1_offset*element_size+(char *) host_address;
-   const char *csrc = accel_address;
-   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
-      cdest[i] = csrc[i];
-}
-void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, const void *accel_address)
-{
-   size_t i, j;
-   char *cdest = d2_offset*element_size+(char *) host_address;
-   char *csrc = (char *) accel_address;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
-         cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
-}
-void P4A_copy_from_accel_3d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, void *host_address, const void *accel_address)
-{
-   size_t i, j, k;
-   char *cdest = d3_offset*element_size+(char *) host_address;
-   const char *csrc = (char *) accel_address;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size-1; j += 1)
-         for(k = 0; k <= d3_block_size*element_size-1; k += 1)
-            cdest[((i+d1_offset)*d2_block_size+j+d2_offset)*element_size*d3_size+k] = csrc[(i*d2_block_size+j)*d3_block_size*element_size+k];
-}
-void P4A_copy_from_accel_4d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset, void *host_address, const void *accel_address)
-{
-   size_t i, j, k, l;
-   char *cdest = (char *) host_address;
-   const char *csrc = (char *) accel_address;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size-1; j += 1)
-         for(k = 0; k <= d3_block_size-1; k += 1)
-            for(l = 0; l <= d4_block_size-1; l += 1) {
-               int h_index = (i+d1_offset)*d2_size*d3_size*d4_size+(j+d2_offset)*d3_size*d4_size+(k+d3_offset)*d4_size+(l+d4_offset);
-               
-               
-               
-               int a_index = i*d2_block_size*d3_block_size*d4_block_size+j*d3_block_size*d4_block_size+k*d4_block_size+l;
-               cdest[h_index] = csrc[a_index];
-            }
-}
-void P4A_copy_to_accel(size_t element_size, const void *host_address, void *accel_address)
-{
-   size_t i;
-   char *cdest = accel_address;
-   const char *csrc = host_address;
-   for(i = 0; i <= element_size-1; i += 1)
-      cdest[i] = csrc[i];
-}
-void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, const void *host_address, void *accel_address)
-{
-   size_t i;
-   char *cdest = accel_address;
-   const char *csrc = d1_offset*element_size+(char *) host_address;
-   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
-      cdest[i] = csrc[i];
-}
-void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, const void *host_address, void *accel_address)
-{
-   size_t i, j;
-   char *cdest = (char *) accel_address;
-   const char *csrc = d2_offset*element_size+(char *) host_address;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
-
-         cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
-}
-void P4A_copy_to_accel_3d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, const void *host_address, void *accel_address)
-{
-   size_t i, j, k;
-   char *cdest = (char *) accel_address;
-   const char *csrc = d3_offset*element_size+(char *) host_address;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size-1; j += 1)
-         for(k = 0; k <= d3_block_size*element_size-1; k += 1)
-            cdest[(i*d2_block_size+j)*d3_block_size*element_size+k] = csrc[((i+d1_offset)*d2_block_size+j+d2_offset)*element_size*d3_size+k];
-}
-void P4A_copy_to_accel_4d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset, const void *host_address, void *accel_address)
-{
-   size_t i, j, k, l;
-   char *cdest = (char *) accel_address;
-   const char *csrc = (char *) host_address;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size-1; j += 1)
-         for(k = 0; k <= d3_block_size-1; k += 1)
-            for(l = 0; l <= d4_block_size-1; l += 1) {
-               int h_index = (i+d1_offset)*d2_size*d3_size*d4_size+(j+d2_offset)*d3_size*d4_size+(k+d3_offset)*d4_size+(l+d4_offset);
-               
-               
-               
-               int a_index = i*d2_block_size*d3_block_size*d4_block_size+j*d3_block_size*d4_block_size+k*d4_block_size+l;
-               cdest[a_index] = csrc[h_index];
-            }
-}
-void getimage(char *filename)
-{
-   //PIPS generated variable
-   complex (*P4A_var_imageout0)[128][128] = (complex (*)[128][128]) 0;
-   P4A_accel_malloc((void **) &P4A_var_imageout0, sizeof(imageout[0][0])*16384);
-   P4A_copy_to_accel_2d(sizeof(imageout[0][0]), 128, 128, 128, 128, 0, 0, &imageout[0][0], *P4A_var_imageout0);
-
-   p4a_launcher_getimage(*P4A_var_imageout0);
-   P4A_copy_from_accel_2d(sizeof(imageout[0][0]), 128, 128, 128, 128, 0, 0, &imageout[0][0], *P4A_var_imageout0);
-   P4A_accel_free(P4A_var_imageout0);
-}
-int main(int argc, char *argv[])
-{
-   internal_float_t lambda, pixin, pixout, amp, pha, d, x, y, z, z2, z3;
-   internal_float_t a, b, c, fact, pi2, twopi, centin, centout;
-   int i, j, k, l;
-
-   getimage(argv[1]);
-}
 void p4a_kernel_getimage(complex imageout[128][128], int i, int j)
 {
    imageout[i][j].re = 0.0;
    imageout[i][j].im = 0.0;
+}
+void p4a_wrapper_getimage(complex imageout[128][128], int i, int j)
+{
+   // To be assigned to a call to P4A_vp_1: i
+   // To be assigned to a call to P4A_vp_0: j
+   p4a_kernel_getimage(imageout, i, j);
 }
 void p4a_launcher_getimage(complex imageout[128][128])
 {
@@ -149,9 +23,14 @@ void p4a_launcher_getimage(complex imageout[128][128])
          // To be assigned to a call to P4A_vp_0: j
          p4a_wrapper_getimage(imageout, i, j);
 }
-void p4a_wrapper_getimage(complex imageout[128][128], int i, int j)
+void getimage(char *filename)
 {
-   // To be assigned to a call to P4A_vp_1: i
-   // To be assigned to a call to P4A_vp_0: j
-   p4a_kernel_getimage(imageout, i, j);
+   //PIPS generated variable
+   complex (*P4A_var_imageout0)[128][128] = (complex (*)[128][128]) 0;
+   P4A_accel_malloc((void **) &P4A_var_imageout0, sizeof(imageout[0][0])*16384);
+   P4A_copy_to_accel_2d(sizeof(imageout[0][0]), 128, 128, 128, 128, 0, 0, &imageout[0][0], *P4A_var_imageout0);
+
+   p4a_launcher_getimage(*P4A_var_imageout0);
+   P4A_copy_from_accel_2d(sizeof(imageout[0][0]), 128, 128, 128, 128, 0, 0, &imageout[0][0], *P4A_var_imageout0);
+   P4A_accel_free(P4A_var_imageout0);
 }

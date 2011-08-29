@@ -2,3 +2,6 @@ struct {
    struct s {int l;} d;
    int i;
 } u;
+#
+# compile generated struct19
+#

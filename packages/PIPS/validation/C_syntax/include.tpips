@@ -20,7 +20,7 @@ display PRINTED_FILE[main]
 #make PRECONDITIONS[%ALL]
 
 apply UNSPLIT
-shell cc -c include.database/Src/include.c
+shell pips_validation_exe.sh -c -g include
 
 close
 

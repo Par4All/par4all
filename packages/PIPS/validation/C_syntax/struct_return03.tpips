@@ -5,7 +5,7 @@ create $WS $WS.c
 display PRINTED_FILE[%ALL]
 
 apply UNSPLIT
-shell cc -c $WS.database/Src/$WS.c -o $WS.database/Src/$WS.c
+shell pips_validation_exe.sh -c -g $WS
 close
 
 delete $WS

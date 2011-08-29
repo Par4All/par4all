@@ -25,7 +25,7 @@ display PRINTED_FILE
 
 apply UNSPLIT
 
-shell ${PIPS_F77:-f77} -c data19.database/Src/data19.f
+shell pips_validation_exe.sh -c data19
 
 close
 delete data19

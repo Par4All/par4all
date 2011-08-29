@@ -28,3 +28,6 @@ void * safe_malloc(int n)
    else
       return (void *) i;                                                /*0017*/
 }
+#
+# compile generated decl49
+#

@@ -1,7 +1,4 @@
 
-Compile initial code
-
-
 Initial code
 
 int flatten_code13(void)
@@ -59,6 +56,9 @@ int flatten_code13(void)
    i2 = _return1;
    return i1+i2;
 }
+#
+# compile both flatten_code13
+#
 int flatten_code13(void)
 {
    int i1, i2;

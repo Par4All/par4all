@@ -23,7 +23,7 @@ setproperty SEMANTICS_FIX_POINT TRUE
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
-apply SUPPRESS_DEAD_CODE
+apply SIMPLIFY_CONTROL
 display PRINTED_FILE
 quit
 
@@ -52,7 +52,7 @@ display PRINTED_FILE[%ALLFUNC]
 echo # applying partial evaluation...
 apply PARTIAL_EVAL[%ALLFUNC]
 echo # applying dead code elimination...
-apply SUPPRESS_DEAD_CODE[%ALL]
+apply SIMPLIFY_CONTROL[%ALL]
 activate PRINT_CODE
 display PRINTED_FILE[%ALLFUNC]
 

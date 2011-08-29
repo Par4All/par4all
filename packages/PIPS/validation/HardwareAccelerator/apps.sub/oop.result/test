@@ -1,0 +1,3679 @@
+#
+# AIPO
+#
+#
+# compile generated oop
+#
+
+! initial function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i1, *i2, *i3, *im, *t0, *t1, *t2, *t3, *t4;       /*0124*/
+   freia_data2d *imgtmp;                                                /*0125*/
+   freia_data2d *imgg1, *imgg2, *imgsav;                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t startx = 33, starty = 272, endx = 152, endy = 132;  /*0133*/
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t epaisseur = 17;                                     /*0135*/
+   register int32_t mx1, my1, mx2, my2, idx = 10;                       /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+   freia_data2d *imtmp_0, *imtmp_1, *imtmp_2, *imtmp_3;                 /*0141*/
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+   im = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0154*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+
+   imgg1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0162*/
+   imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0163*/
+
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      freia_aipo_copy(i1, i0);                                          /*0193*/
+      freia_aipo_copy(t0, i1);                                          /*0194*/
+
+      imtmp_3 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0196*/
+      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);          /*0198*/
+      freia_aipo_sub(imgtmp, imtmp_3, imgtmp);                          /*0199*/
+      freia_common_destruct_data(imtmp_3);                              /*0200*/
+
+      imtmp_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);          /*0202*/
+      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
+      freia_aipo_erode_8c(i1, t2, freia_morpho_kernel_8c);              /*0204*/
+      freia_aipo_sub(i1, imtmp_2, i1);                                  /*0205*/
+      freia_common_destruct_data(imtmp_2);                              /*0206*/
+
+      freia_aipo_absdiff(i1, imgtmp, i1);                               /*0208*/
+      freia_aipo_erode_8c(i1, i1, freia_morpho_kernel_8c);              /*0209*/
+      freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
+
+      imtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0212*/
+      freia_aipo_dilate_8c(imtmp_1, t2, freia_morpho_kernel_8c);        /*0213*/
+      freia_aipo_erode_8c(imgtmp, t2, freia_morpho_kernel_8c);          /*0214*/
+      freia_aipo_sub(imgtmp, imtmp_1, imgtmp);                          /*0215*/
+
+      freia_common_destruct_data(imtmp_1);                              /*0217*/
+
+      imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
+      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);              /*0221*/
+      freia_aipo_sub(i2, imtmp_0, i2);                                  /*0222*/
+      freia_common_destruct_data(imtmp_0);                              /*0223*/
+
+      freia_aipo_absdiff(i2, imgtmp, i2);                               /*0225*/
+      freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);              /*0226*/
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);             /*0227*/
+      freia_aipo_inf(i3, i2, i1);                                       /*0228*/
+
+      freia_aipo_threshold(i3, i3, 15, 255, 1);                         /*0230*/
+      valx_pre = valx;                                                  /*0231*/
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i1);                                      /*0271*/
+   freia_common_destruct_data(i2);                                      /*0272*/
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(im);                                      /*0274*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+   freia_common_destruct_data(imgg1);                                   /*0280*/
+   freia_common_destruct_data(imgg2);                                   /*0281*/
+   freia_common_destruct_data(imgtmp);                                  /*0282*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "main" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "t0" [shape=circle];
+  "i3" [shape=circle];
+
+  // computation vertices
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "215 -" [shape=trapezium,orientation=270];
+  "215 -" -> "225 -|" [label="imgtmp"];
+  "214 E8" [shape=box];
+  "214 E8" -> "215 -" [label="imgtmp"];
+  "213 D8" [shape=box];
+  "213 D8" -> "215 -" [label="imtmp_1"];
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "208 -|" [label="i1"];
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "214 E8";
+  "t2" -> "213 D8";
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+  "194 =" [shape=circle];
+  "194 =" -> "198 E8" [label="t0"];
+  "194 =" -> "197 D8" [label="t0"];
+  "194 =" -> "t0";
+  "193 =" [shape=circle];
+  "193 =" -> "194 =" [label="i1"];
+  "i0" -> "193 =";
+}
+// graph for dag "dag_cleaned_0" of module "main" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "t0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "i3" [shape=circle];
+
+  // computation vertices
+  "t0" -> "198 E8";
+  "t0" -> "197 D8";
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3_1"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2_1"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2_2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2_3"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2_4"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1_1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1_2"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "225 -|" [label="i1_3"];
+  "205 -" -> "208 -|" [label="i1_3"];
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1_4"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp_1"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+
+  // external copies: 1
+  "t0'" [shape=circle];
+  "t0 =" [shape=circle,label="=",style="dashed"]
+  "i0" -> "t0 =";
+  "t0 =" -> "t0'";
+}
+
+! updated function for
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i1, *i2, *i3, *t0, *t1, *t2, *t3, *t4;            /*0124*/
+   freia_data2d *imgtmp;                                                /*0125*/
+   freia_data2d *imgsav;                                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t mx1, my1, mx2, my2;                                 /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+   freia_data2d *imtmp_0, *imtmp_2, *imtmp_3;                           /*0141*/
+   // hardware accelerator generated variable
+   freia_data2d *i1_3 = 0;
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
+   i1_3 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+   
+   
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      imtmp_3 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0196*/
+      valx_pre = valx;                                                  /*0231*/
+
+      imtmp_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);          /*0202*/
+      
+      
+      imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
+
+      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);          /*0198*/
+      freia_aipo_sub(imgtmp, imtmp_3, imgtmp);                          /*0199*/
+      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
+      freia_aipo_erode_8c(i1, t2, freia_morpho_kernel_8c);              /*0204*/
+      freia_aipo_sub(i1_3, imtmp_2, i1);                                /*0205*/
+
+      freia_aipo_absdiff(i1, imgtmp, i1_3);                             /*0208*/
+      freia_aipo_erode_8c(i1, i1, freia_morpho_kernel_8c);              /*0209*/
+      freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
+      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);              /*0221*/
+      freia_aipo_sub(i2, imtmp_0, i2);                                  /*0222*/
+
+      freia_aipo_absdiff(i2, i1_3, i2);                                 /*0225*/
+      freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);              /*0226*/
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);             /*0227*/
+      freia_aipo_inf(i3, i2, i1);                                       /*0228*/
+
+      freia_aipo_threshold(i3, i3, 15, 255, 1);
+      freia_aipo_copy(t0, i0);
+      freia_common_destruct_data(imtmp_3);                              /*0200*/
+      freia_common_destruct_data(imtmp_2);                              /*0206*/
+
+      freia_common_destruct_data(imtmp_0);                              /*0223*/
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i1);                                      /*0271*/
+   freia_common_destruct_data(i1_3);
+   freia_common_destruct_data(i2);                                      /*0272*/
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+   freia_common_destruct_data(imgtmp);                                  /*0282*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+#
+# SPOC
+#
+
+! initial function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i1, *i2, *i3, *im, *t0, *t1, *t2, *t3, *t4;       /*0124*/
+   freia_data2d *imgtmp;                                                /*0125*/
+   freia_data2d *imgg1, *imgg2, *imgsav;                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t startx = 33, starty = 272, endx = 152, endy = 132;  /*0133*/
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t epaisseur = 17;                                     /*0135*/
+   register int32_t mx1, my1, mx2, my2, idx = 10;                       /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+   freia_data2d *imtmp_0, *imtmp_1, *imtmp_2, *imtmp_3;                 /*0141*/
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+   im = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0154*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+
+   imgg1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0162*/
+   imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0163*/
+
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      freia_aipo_copy(i1, i0);                                          /*0193*/
+      freia_aipo_copy(t0, i1);                                          /*0194*/
+
+      imtmp_3 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0196*/
+      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);          /*0198*/
+      freia_aipo_sub(imgtmp, imtmp_3, imgtmp);                          /*0199*/
+      freia_common_destruct_data(imtmp_3);                              /*0200*/
+
+      imtmp_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);          /*0202*/
+      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
+      freia_aipo_erode_8c(i1, t2, freia_morpho_kernel_8c);              /*0204*/
+      freia_aipo_sub(i1, imtmp_2, i1);                                  /*0205*/
+      freia_common_destruct_data(imtmp_2);                              /*0206*/
+
+      freia_aipo_absdiff(i1, imgtmp, i1);                               /*0208*/
+      freia_aipo_erode_8c(i1, i1, freia_morpho_kernel_8c);              /*0209*/
+      freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
+
+      imtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0212*/
+      freia_aipo_dilate_8c(imtmp_1, t2, freia_morpho_kernel_8c);        /*0213*/
+      freia_aipo_erode_8c(imgtmp, t2, freia_morpho_kernel_8c);          /*0214*/
+      freia_aipo_sub(imgtmp, imtmp_1, imgtmp);                          /*0215*/
+
+      freia_common_destruct_data(imtmp_1);                              /*0217*/
+
+      imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
+      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);              /*0221*/
+      freia_aipo_sub(i2, imtmp_0, i2);                                  /*0222*/
+      freia_common_destruct_data(imtmp_0);                              /*0223*/
+
+      freia_aipo_absdiff(i2, imgtmp, i2);                               /*0225*/
+      freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);              /*0226*/
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);             /*0227*/
+      freia_aipo_inf(i3, i2, i1);                                       /*0228*/
+
+      freia_aipo_threshold(i3, i3, 15, 255, 1);                         /*0230*/
+      valx_pre = valx;                                                  /*0231*/
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i1);                                      /*0271*/
+   freia_common_destruct_data(i2);                                      /*0272*/
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(im);                                      /*0274*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+   freia_common_destruct_data(imgg1);                                   /*0280*/
+   freia_common_destruct_data(imgg2);                                   /*0281*/
+   freia_common_destruct_data(imgtmp);                                  /*0282*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "main" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "t0" [shape=circle];
+  "i3" [shape=circle];
+
+  // computation vertices
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "215 -" [shape=trapezium,orientation=270];
+  "215 -" -> "225 -|" [label="imgtmp"];
+  "214 E8" [shape=box];
+  "214 E8" -> "215 -" [label="imgtmp"];
+  "213 D8" [shape=box];
+  "213 D8" -> "215 -" [label="imtmp_1"];
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "208 -|" [label="i1"];
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "214 E8";
+  "t2" -> "213 D8";
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+  "194 =" [shape=circle];
+  "194 =" -> "198 E8" [label="t0"];
+  "194 =" -> "197 D8" [label="t0"];
+  "194 =" -> "t0";
+  "193 =" [shape=circle];
+  "193 =" -> "194 =" [label="i1"];
+  "i0" -> "193 =";
+}
+// graph for dag "dag_cleaned_0" of module "main" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "t0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "i3" [shape=circle];
+
+  // computation vertices
+  "t0" -> "198 E8";
+  "t0" -> "197 D8";
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "225 -|" [label="i1"];
+  "205 -" -> "208 -|" [label="i1"];
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+
+  // external copies: 1
+  "t0'" [shape=circle];
+  "t0 =" [shape=circle,label="=",style="dashed"]
+  "i0" -> "t0 =";
+  "t0 =" -> "t0'";
+}
+// graph for dag "main_helper_0_0" of module "main" in dot format
+digraph "main_helper_0_0" {
+  // inputs
+  "t0" [shape=circle];
+
+  // outputs
+  "imgtmp" [shape=circle];
+
+  // computation vertices
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "imgtmp";
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp_1"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+  "t0" -> "198 E8";
+  "t0" -> "197 D8";
+}
+// graph for dag "main_helper_0_1" of module "main" in dot format
+digraph "main_helper_0_1" {
+  // inputs
+  "t2" [shape=circle];
+
+  // outputs
+  "i1_3" [shape=circle];
+
+  // computation vertices
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "i1_3";
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1_4"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+}
+// graph for dag "main_helper_0_2" of module "main" in dot format
+digraph "main_helper_0_2" {
+  // inputs
+  "i1_3" [shape=circle];
+  "imgtmp" [shape=circle];
+
+  // outputs
+  "i1" [shape=circle];
+
+  // computation vertices
+  "210 D8" [shape=box];
+  "210 D8" -> "i1";
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1_1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1_2"];
+  "i1_3" -> "208 -|";
+  "imgtmp" -> "208 -|";
+}
+// graph for dag "main_helper_0_3" of module "main" in dot format
+digraph "main_helper_0_3" {
+  // inputs
+  "t4" [shape=circle];
+
+  // outputs
+  "i2_3" [shape=circle];
+
+  // computation vertices
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "i2_3";
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2_4"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+}
+// graph for dag "main_helper_0_4" of module "main" in dot format
+digraph "main_helper_0_4" {
+  // inputs
+  "i1_3" [shape=circle];
+  "i2_3" [shape=circle];
+
+  // outputs
+  "i2" [shape=circle];
+
+  // computation vertices
+  "227 D8" [shape=box];
+  "227 D8" -> "i2";
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2_1"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2_2"];
+  "i2_3" -> "225 -|";
+  "i1_3" -> "225 -|";
+}
+// graph for dag "main_helper_0_5" of module "main" in dot format
+digraph "main_helper_0_5" {
+  // inputs
+  "i1" [shape=circle];
+  "i2" [shape=circle];
+
+  // outputs
+  "i3" [shape=circle];
+
+  // computation vertices
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3_1"];
+  "i1" -> "228 <";
+  "i2" -> "228 <";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+1 copies
+// split 0: 1 cut
+// split 1: 1 cut
+// split 2: 1 cut
+// split 3: 1 cut
+// split 4: 1 cut
+// split 5: 1 cut
+// # SPOC calls: 6
+
+// FREIA-SPoC helper function for module main
+freia_status main_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const int32_t * pi0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`t0 [0 input 0] -> [0 poc 0] 197 dilate_8c
+  // nope
+  // poc 197 dilate_8c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_DILATE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = pi0[i];
+
+  // 0`t0 [0 input 1] -> [0 poc 1] 198 erode_8c
+  // nope
+  // poc 198 erode_8c stage 0 side 1
+  si.poc[0][1].op = SPOC_POC_ERODE;
+  si.poc[0][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][1].kernel[i] = pi0[i];
+
+  // 0`imtmp_3 [0 poc 0] -> [0 alu] 199 sub
+  // nope
+  // 0`imgtmp_1 [0 poc 1] -> [0 alu] 199 sub
+  // nope
+  // alu 199 sub stage 0
+  si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
+
+
+  // output image 0`imgtmp on 0
+  // 0`imgtmp [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`imgtmp [0 output 0] -> [7 output 0] 0 null
+  // 0`imgtmp [1 input 0] -> [7 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`imgtmp [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`imgtmp [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`imgtmp [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`imgtmp [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`imgtmp [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`imgtmp [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i0);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module main
+freia_status main_helper_0_1_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const int32_t * pi0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`t2 [0 input 0] -> [0 poc 0] 203 dilate_8c
+  // nope
+  // poc 203 dilate_8c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_DILATE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = pi0[i];
+
+  // 0`t2 [0 input 1] -> [0 poc 1] 204 erode_8c
+  // nope
+  // poc 204 erode_8c stage 0 side 1
+  si.poc[0][1].op = SPOC_POC_ERODE;
+  si.poc[0][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][1].kernel[i] = pi0[i];
+
+  // 0`imtmp_2 [0 poc 0] -> [0 alu] 205 sub
+  // nope
+  // 0`i1_4 [0 poc 1] -> [0 alu] 205 sub
+  // nope
+  // alu 205 sub stage 0
+  si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
+
+
+  // output image 0`i1_3 on 0
+  // 0`i1_3 [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`i1_3 [0 output 0] -> [7 output 0] 0 null
+  // 0`i1_3 [1 input 0] -> [7 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`i1_3 [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`i1_3 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`i1_3 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`i1_3 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`i1_3 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`i1_3 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i0);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module main
+freia_status main_helper_0_2_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const int32_t * pi0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`i1_3 [0 input 0] -> [0 alu] 208 absdiff
+  // nope
+  // 0`imgtmp [0 input 1] -> [0 alu] 208 absdiff
+  // nope
+  // alu 208 absdiff stage 0
+  si.alu[0][0].op = SPOC_ALU_ABSSUB_IN0_IN1;
+
+
+  // STAGE 1
+  // 0`i1_2 [0 alu] -> [1 poc 0] 209 erode_8c
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`i1_2 [1 input 0] -> [1 poc 0] 209 erode_8c
+  // nope
+  // poc 209 erode_8c stage 1 side 0
+  si.poc[1][0].op = SPOC_POC_ERODE;
+  si.poc[1][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[1][0].kernel[i] = pi0[i];
+
+
+  // STAGE 2
+  // 0`i1_1 [1 poc 0] -> [2 poc 0] 210 dilate_8c
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`i1_1 [2 input 0] -> [2 poc 0] 210 dilate_8c
+  // nope
+  // poc 210 dilate_8c stage 2 side 0
+  si.poc[2][0].op = SPOC_POC_DILATE;
+  si.poc[2][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[2][0].kernel[i] = pi0[i];
+
+
+  // output image 0`i1 on 0
+  // 0`i1 [2 poc 0] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`i1 [2 output 0] -> [7 output 0] 0 null
+  // 0`i1 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`i1 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`i1 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`i1 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`i1 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module main
+freia_status main_helper_0_3_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const int32_t * pi0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`t4 [0 input 0] -> [0 poc 0] 220 dilate_8c
+  // nope
+  // poc 220 dilate_8c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_DILATE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = pi0[i];
+
+  // 0`t4 [0 input 1] -> [0 poc 1] 221 erode_8c
+  // nope
+  // poc 221 erode_8c stage 0 side 1
+  si.poc[0][1].op = SPOC_POC_ERODE;
+  si.poc[0][1].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][1].kernel[i] = pi0[i];
+
+  // 0`imtmp_0 [0 poc 0] -> [0 alu] 222 sub
+  // nope
+  // 0`i2_4 [0 poc 1] -> [0 alu] 222 sub
+  // nope
+  // alu 222 sub stage 0
+  si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
+
+
+  // output image 0`i2_3 on 0
+  // 0`i2_3 [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`i2_3 [0 output 0] -> [7 output 0] 0 null
+  // 0`i2_3 [1 input 0] -> [7 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`i2_3 [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`i2_3 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`i2_3 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`i2_3 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`i2_3 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`i2_3 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i0);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module main
+freia_status main_helper_0_4_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const int32_t * pi0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`i1_3 [0 input 0] -> [0 alu] 225 absdiff
+  // nope
+  // 0`i2_3 [0 input 1] -> [0 alu] 225 absdiff
+  // nope
+  // alu 225 absdiff stage 0
+  si.alu[0][0].op = SPOC_ALU_ABSSUB_IN0_IN1;
+
+
+  // STAGE 1
+  // 0`i2_2 [0 alu] -> [1 poc 0] 226 erode_8c
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`i2_2 [1 input 0] -> [1 poc 0] 226 erode_8c
+  // nope
+  // poc 226 erode_8c stage 1 side 0
+  si.poc[1][0].op = SPOC_POC_ERODE;
+  si.poc[1][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[1][0].kernel[i] = pi0[i];
+
+
+  // STAGE 2
+  // 0`i2_1 [1 poc 0] -> [2 poc 0] 227 dilate_8c
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`i2_1 [2 input 0] -> [2 poc 0] 227 dilate_8c
+  // nope
+  // poc 227 dilate_8c stage 2 side 0
+  si.poc[2][0].op = SPOC_POC_DILATE;
+  si.poc[2][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[2][0].kernel[i] = pi0[i];
+
+
+  // output image 0`i2 on 0
+  // 0`i2 [2 poc 0] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // 0`i2 [2 output 0] -> [7 output 0] 0 null
+  // 0`i2 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`i2 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`i2 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`i2 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`i2 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module main
+freia_status main_helper_0_5_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  int32_t pi0,
+  int32_t pi1,
+  int32_t pi2)
+{
+  spoc_instr si;
+  spoc_param sp;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`i1 [0 input 0] -> [0 alu] 228 inf
+  // nope
+  // 0`i2 [0 input 1] -> [0 alu] 228 inf
+  // nope
+  // alu 228 inf stage 0
+  si.alu[0][0].op = SPOC_ALU_INF_IN0_IN1;
+
+  // 0`i3_1 [0 alu] -> [0 threshold 0] 230 threshold
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // threshold 230 threshold stage 0 side 0
+  si.th[0][0].op = pi2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][0].boundmin = pi0;
+  sp.th[0][0].boundmax = pi1;
+
+
+  // output image 0`i3 on 0
+  // 0`i3 [0 threshold 0] -> [0 output 0] 0 null
+  // nope
+
+  // fill in to the end...
+  // 0`i3 [0 output 0] -> [7 output 0] 0 null
+  // 0`i3 [1 input 0] -> [7 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`i3 [2 input 0] -> [7 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`i3 [3 input 0] -> [7 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // 0`i3 [4 input 0] -> [7 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`i3 [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`i3 [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // 0`i3 [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(&param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
+! updated function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i1, *i2, *i3, *t0, *t1, *t2, *t3, *t4;            /*0124*/
+   freia_data2d *imgtmp;                                                /*0125*/
+   freia_data2d *imgsav;                                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t mx1, my1, mx2, my2;                                 /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+   // hardware accelerator generated variable
+   freia_data2d *i1_3 = 0;
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
+   i1_3 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+   
+   
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      valx_pre = valx;                                                  /*0231*/
+      
+      
+      
+      
+      main_helper_0_0_0(imgtmp, t0, freia_morpho_kernel_8c);            /*0197*/
+      main_helper_0_1_0(i1_3, t2, freia_morpho_kernel_8c);              /*0203*/
+
+      main_helper_0_2_0(i1, i1_3, imgtmp, freia_morpho_kernel_8c);      /*0208*/
+      main_helper_0_3_0(i2, t4, freia_morpho_kernel_8c);                /*0220*/
+
+      main_helper_0_4_0(i2, i1_3, i2, freia_morpho_kernel_8c);          /*0225*/
+      main_helper_0_5_0(i3, i1, i2, 15, 255, 1);                        /*0228*/
+
+      freia_aipo_copy(t0, i0);
+
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i1);                                      /*0271*/
+   freia_common_destruct_data(i1_3);
+   freia_common_destruct_data(i2);                                      /*0272*/
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+   freia_common_destruct_data(imgtmp);                                  /*0282*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+
+! cleaned up function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i1, *i2, *i3, *t0, *t1, *t2, *t3, *t4;            /*0124*/
+   freia_data2d *imgtmp;                                                /*0125*/
+   freia_data2d *imgsav;                                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t mx1, my1, mx2, my2;                                 /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+   // hardware accelerator generated variable
+   freia_data2d *i1_3 = 0;
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
+   i1_3 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+   
+   
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      valx_pre = valx;                                                  /*0231*/
+      
+      
+      
+      
+      main_helper_0_0_0(imgtmp, t0, freia_morpho_kernel_8c);            /*0197*/
+      main_helper_0_1_0(i1_3, t2, freia_morpho_kernel_8c);              /*0203*/
+
+      main_helper_0_2_0(i1, i1_3, imgtmp, freia_morpho_kernel_8c);      /*0208*/
+      main_helper_0_3_0(i2, t4, freia_morpho_kernel_8c);                /*0220*/
+
+      main_helper_0_4_0(i2, i1_3, i2, freia_morpho_kernel_8c);          /*0225*/
+      main_helper_0_5_0(i3, i1, i2, 15, 255, 1);                        /*0228*/
+
+      freia_aipo_copy(t0, i0);
+
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i1);                                      /*0271*/
+   freia_common_destruct_data(i1_3);
+   freia_common_destruct_data(i2);                                      /*0272*/
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+   freia_common_destruct_data(imgtmp);                                  /*0282*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i1, *i2, *i3, *im, *t0, *t1, *t2, *t3, *t4;       /*0124*/
+   freia_data2d *imgtmp;                                                /*0125*/
+   freia_data2d *imgg1, *imgg2, *imgsav;                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t startx = 33, starty = 272, endx = 152, endy = 132;  /*0133*/
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t epaisseur = 17;                                     /*0135*/
+   register int32_t mx1, my1, mx2, my2, idx = 10;                       /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+   freia_data2d *imtmp_0, *imtmp_1, *imtmp_2, *imtmp_3;                 /*0141*/
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+   im = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0154*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+
+   imgg1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0162*/
+   imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0163*/
+
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      freia_aipo_copy(i1, i0);                                          /*0193*/
+      freia_aipo_copy(t0, i1);                                          /*0194*/
+
+      imtmp_3 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0196*/
+      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);          /*0198*/
+      freia_aipo_sub(imgtmp, imtmp_3, imgtmp);                          /*0199*/
+      freia_common_destruct_data(imtmp_3);                              /*0200*/
+
+      imtmp_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);          /*0202*/
+      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
+      freia_aipo_erode_8c(i1, t2, freia_morpho_kernel_8c);              /*0204*/
+      freia_aipo_sub(i1, imtmp_2, i1);                                  /*0205*/
+      freia_common_destruct_data(imtmp_2);                              /*0206*/
+
+      freia_aipo_absdiff(i1, imgtmp, i1);                               /*0208*/
+      freia_aipo_erode_8c(i1, i1, freia_morpho_kernel_8c);              /*0209*/
+      freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
+
+      imtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0212*/
+      freia_aipo_dilate_8c(imtmp_1, t2, freia_morpho_kernel_8c);        /*0213*/
+      freia_aipo_erode_8c(imgtmp, t2, freia_morpho_kernel_8c);          /*0214*/
+      freia_aipo_sub(imgtmp, imtmp_1, imgtmp);                          /*0215*/
+
+      freia_common_destruct_data(imtmp_1);                              /*0217*/
+
+      imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
+      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);              /*0221*/
+      freia_aipo_sub(i2, imtmp_0, i2);                                  /*0222*/
+      freia_common_destruct_data(imtmp_0);                              /*0223*/
+
+      freia_aipo_absdiff(i2, imgtmp, i2);                               /*0225*/
+      freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);              /*0226*/
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);             /*0227*/
+      freia_aipo_inf(i3, i2, i1);                                       /*0228*/
+
+      freia_aipo_threshold(i3, i3, 15, 255, 1);                         /*0230*/
+      valx_pre = valx;                                                  /*0231*/
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i1);                                      /*0271*/
+   freia_common_destruct_data(i2);                                      /*0272*/
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(im);                                      /*0274*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+   freia_common_destruct_data(imgg1);                                   /*0280*/
+   freia_common_destruct_data(imgg2);                                   /*0281*/
+   freia_common_destruct_data(imgtmp);                                  /*0282*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "main" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "t0" [shape=circle];
+  "i3" [shape=circle];
+
+  // computation vertices
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "215 -" [shape=trapezium,orientation=270];
+  "215 -" -> "225 -|" [label="imgtmp"];
+  "214 E8" [shape=box];
+  "214 E8" -> "215 -" [label="imgtmp"];
+  "213 D8" [shape=box];
+  "213 D8" -> "215 -" [label="imtmp_1"];
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "208 -|" [label="i1"];
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "214 E8";
+  "t2" -> "213 D8";
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+  "194 =" [shape=circle];
+  "194 =" -> "198 E8" [label="t0"];
+  "194 =" -> "197 D8" [label="t0"];
+  "194 =" -> "t0";
+  "193 =" [shape=circle];
+  "193 =" -> "194 =" [label="i1"];
+  "i0" -> "193 =";
+}
+// graph for dag "dag_cleaned_0" of module "main" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "t0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "i3" [shape=circle];
+
+  // computation vertices
+  "t0" -> "198 E8";
+  "t0" -> "197 D8";
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "225 -|" [label="i1"];
+  "205 -" -> "208 -|" [label="i1"];
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+
+  // external copies: 1
+  "t0'" [shape=circle];
+  "t0 =" [shape=circle,label="=",style="dashed"]
+  "i0" -> "t0 =";
+  "t0 =" -> "t0'";
+}
+// graph for dag "main_helper_0_0_0" of module "main" in dot format
+digraph "main_helper_0_0_0" {
+  // inputs
+  "t0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "i3" [shape=circle];
+
+  // computation vertices
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3_1"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2_1"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2_2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2_3"];
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1_1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1_2"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "225 -|" [label="i1_3"];
+  "205 -" -> "208 -|" [label="i1_3"];
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2_4"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1_4"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp_1"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+  "t0" -> "198 E8";
+  "t0" -> "197 D8";
+}
+
+! acceleration function
+
+// freia terapix includes
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+// dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+1 copies
+
+/* FREIA terapix helper function for module main
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * IMAGE H  = 0
+ * MAX SIZE = 0
+ *
+ * 3 input images, 1 output image
+ * 17 image operations in dag
+ * dag length is 8, dag width is 6
+ * costs in cycles per imagelet row:
+ * - computation: 179
+ * - communication: 128
+ */
+freia_status main_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const freia_data2d * i2,
+  const int32_t * pi4,
+  int32_t pi5,
+  int32_t pi6,
+  int32_t pi7)
+{
+  // declarations:
+  freia_microcode mcode;
+  freia_op_param param;
+  freia_dynamic_param dyn_param;
+  terapix_gram gram;
+  int i;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
+  // overall structure which describes the computation
+  terapix_mcu_instr mcu_instr;
+  // operation 0 parameters
+  int16_t p_0[9];
+  const int32_t x_0 = 0;
+  const int32_t y_0 = 0;
+  // operation 16 parameters
+  int16_t p_16[3];
+  const int32_t x_16 = 3;
+  const int32_t y_16 = 0;
+  // flip flop macro code and I/Os
+  terapix_mcu_macrocode mcu_macro[2][17];
+  terapix_tile_info tile_in[2][3];
+  terapix_tile_info tile_out[2][1];
+  // imagelets definitions:
+  // - 7 computation imagelets
+  // - 3 double buffer imagelets
+  int imagelet_size = 102;
+  int imagelet_1 = 0;
+  int imagelet_2 = 102;
+  int imagelet_3 = 204;
+  int imagelet_4 = 306;
+  int imagelet_5 = 408;
+  int imagelet_6 = 510;
+  int imagelet_7 = 612;
+  int imagelet_8 = 714;
+  int imagelet_9 = 816;
+  int imagelet_10 = 918;
+
+  // double buffer assignment
+  int imagelet_io_1_0 = imagelet_1;
+  int imagelet_io_1_1 = imagelet_8;
+  int imagelet_io_2_0 = imagelet_2;
+  int imagelet_io_2_1 = imagelet_9;
+  int imagelet_io_3_0 = imagelet_3;
+  int imagelet_io_3_1 = imagelet_10;
+
+  // body:
+  // mcode param
+  mcode.raw = (void*) terapix_ucode_array;
+  mcode.size = TERAPIX_UCODE_SIZE_T;
+  freia_mg_write_microcode(&mcode);
+
+  // dyn_param contents
+  dyn_param.raw = &gram;
+  dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
+  // 0: D8(1) -> 4
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
+  mcu_macro[0][0].xmin2 = imagelet_4;
+  mcu_macro[1][0].xmin2 = imagelet_4;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
+  // copy of operation 0 parameters
+  for(i=0; i<9; i++)
+    p_0[i] = pi4[i];
+  gram.xoffset = x_0;
+  gram.yoffset = y_0;
+  gram.width = 3;
+  gram.height = 3;
+  gram.params = p_0;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][0].xmin3 = x_0;
+  mcu_macro[1][0].xmin3 = x_0;
+  mcu_macro[0][0].ymin3 = y_0;
+  mcu_macro[1][0].ymin3 = y_0;
+  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][0].iter2 = imagelet_size;
+  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 1: E8(1) -> 5
+  mcu_macro[0][1].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][1].ymin1 = 0;
+  mcu_macro[1][1].ymin1 = 0;
+  mcu_macro[0][1].xmin2 = imagelet_5;
+  mcu_macro[1][1].xmin2 = imagelet_5;
+  mcu_macro[0][1].ymin2 = 0;
+  mcu_macro[1][1].ymin2 = 0;
+  mcu_macro[0][1].xmin3 = x_0;
+  mcu_macro[1][1].xmin3 = x_0;
+  mcu_macro[0][1].ymin3 = y_0;
+  mcu_macro[1][1].ymin3 = y_0;
+  mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][1].iter2 = imagelet_size;
+  mcu_macro[1][1].iter2 = imagelet_size;
+  mcu_macro[0][1].iter3 = 0;
+  mcu_macro[1][1].iter3 = 0;
+  mcu_macro[0][1].iter4 = 0;
+  mcu_macro[1][1].iter4 = 0;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 2: D8(2) -> 1
+  mcu_macro[0][2].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][2].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][2].ymin1 = 0;
+  mcu_macro[1][2].ymin1 = 0;
+  mcu_macro[0][2].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][2].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][2].ymin2 = 0;
+  mcu_macro[1][2].ymin2 = 0;
+  mcu_macro[0][2].xmin3 = x_0;
+  mcu_macro[1][2].xmin3 = x_0;
+  mcu_macro[0][2].ymin3 = y_0;
+  mcu_macro[1][2].ymin3 = y_0;
+  mcu_macro[0][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][2].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][2].iter2 = imagelet_size;
+  mcu_macro[1][2].iter2 = imagelet_size;
+  mcu_macro[0][2].iter3 = 0;
+  mcu_macro[1][2].iter3 = 0;
+  mcu_macro[0][2].iter4 = 0;
+  mcu_macro[1][2].iter4 = 0;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 3: E8(2) -> 6
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][3].ymin1 = 0;
+  mcu_macro[1][3].ymin1 = 0;
+  mcu_macro[0][3].xmin2 = imagelet_6;
+  mcu_macro[1][3].xmin2 = imagelet_6;
+  mcu_macro[0][3].ymin2 = 0;
+  mcu_macro[1][3].ymin2 = 0;
+  mcu_macro[0][3].xmin3 = x_0;
+  mcu_macro[1][3].xmin3 = x_0;
+  mcu_macro[0][3].ymin3 = y_0;
+  mcu_macro[1][3].ymin3 = y_0;
+  mcu_macro[0][3].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][3].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][3].iter2 = imagelet_size;
+  mcu_macro[1][3].iter2 = imagelet_size;
+  mcu_macro[0][3].iter3 = 0;
+  mcu_macro[1][3].iter3 = 0;
+  mcu_macro[0][3].iter4 = 0;
+  mcu_macro[1][3].iter4 = 0;
+  mcu_macro[0][3].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][3].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 4: D8(3) -> 2
+  mcu_macro[0][4].xmin1 = imagelet_io_3_0;
+  mcu_macro[1][4].xmin1 = imagelet_io_3_1;
+  mcu_macro[0][4].ymin1 = 0;
+  mcu_macro[1][4].ymin1 = 0;
+  mcu_macro[0][4].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][4].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][4].ymin2 = 0;
+  mcu_macro[1][4].ymin2 = 0;
+  mcu_macro[0][4].xmin3 = x_0;
+  mcu_macro[1][4].xmin3 = x_0;
+  mcu_macro[0][4].ymin3 = y_0;
+  mcu_macro[1][4].ymin3 = y_0;
+  mcu_macro[0][4].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][4].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][4].iter2 = imagelet_size;
+  mcu_macro[1][4].iter2 = imagelet_size;
+  mcu_macro[0][4].iter3 = 0;
+  mcu_macro[1][4].iter3 = 0;
+  mcu_macro[0][4].iter4 = 0;
+  mcu_macro[1][4].iter4 = 0;
+  mcu_macro[0][4].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][4].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 5: E8(3) -> 7
+  mcu_macro[0][5].xmin1 = imagelet_io_3_0;
+  mcu_macro[1][5].xmin1 = imagelet_io_3_1;
+  mcu_macro[0][5].ymin1 = 0;
+  mcu_macro[1][5].ymin1 = 0;
+  mcu_macro[0][5].xmin2 = imagelet_7;
+  mcu_macro[1][5].xmin2 = imagelet_7;
+  mcu_macro[0][5].ymin2 = 0;
+  mcu_macro[1][5].ymin2 = 0;
+  mcu_macro[0][5].xmin3 = x_0;
+  mcu_macro[1][5].xmin3 = x_0;
+  mcu_macro[0][5].ymin3 = y_0;
+  mcu_macro[1][5].ymin3 = y_0;
+  mcu_macro[0][5].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][5].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][5].iter2 = imagelet_size;
+  mcu_macro[1][5].iter2 = imagelet_size;
+  mcu_macro[0][5].iter3 = 0;
+  mcu_macro[1][5].iter3 = 0;
+  mcu_macro[0][5].iter4 = 0;
+  mcu_macro[1][5].iter4 = 0;
+  mcu_macro[0][5].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][5].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 6: -(4,5) -> 5
+  mcu_macro[0][6].xmin1 = imagelet_4;
+  mcu_macro[1][6].xmin1 = imagelet_4;
+  mcu_macro[0][6].ymin1 = 0;
+  mcu_macro[1][6].ymin1 = 0;
+  mcu_macro[0][6].xmin2 = imagelet_5;
+  mcu_macro[1][6].xmin2 = imagelet_5;
+  mcu_macro[0][6].ymin2 = 0;
+  mcu_macro[1][6].ymin2 = 0;
+  mcu_macro[0][6].xmin3 = imagelet_5;
+  mcu_macro[1][6].xmin3 = imagelet_5;
+  mcu_macro[0][6].ymin3 = 0;
+  mcu_macro[1][6].ymin3 = 0;
+  mcu_macro[0][6].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][6].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][6].iter2 = imagelet_size;
+  mcu_macro[1][6].iter2 = imagelet_size;
+  mcu_macro[0][6].iter3 = 0;
+  mcu_macro[1][6].iter3 = 0;
+  mcu_macro[0][6].iter4 = 0;
+  mcu_macro[1][6].iter4 = 0;
+  mcu_macro[0][6].addrStart = TERAPIX_UCODE_SUB3;
+  mcu_macro[1][6].addrStart = TERAPIX_UCODE_SUB3;
+  // 7: -(1,6) -> 6
+  mcu_macro[0][7].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][7].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][7].ymin1 = 0;
+  mcu_macro[1][7].ymin1 = 0;
+  mcu_macro[0][7].xmin2 = imagelet_6;
+  mcu_macro[1][7].xmin2 = imagelet_6;
+  mcu_macro[0][7].ymin2 = 0;
+  mcu_macro[1][7].ymin2 = 0;
+  mcu_macro[0][7].xmin3 = imagelet_6;
+  mcu_macro[1][7].xmin3 = imagelet_6;
+  mcu_macro[0][7].ymin3 = 0;
+  mcu_macro[1][7].ymin3 = 0;
+  mcu_macro[0][7].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][7].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][7].iter2 = imagelet_size;
+  mcu_macro[1][7].iter2 = imagelet_size;
+  mcu_macro[0][7].iter3 = 0;
+  mcu_macro[1][7].iter3 = 0;
+  mcu_macro[0][7].iter4 = 0;
+  mcu_macro[1][7].iter4 = 0;
+  mcu_macro[0][7].addrStart = TERAPIX_UCODE_SUB3;
+  mcu_macro[1][7].addrStart = TERAPIX_UCODE_SUB3;
+  // 8: -|(5,6) -> 5
+  mcu_macro[0][8].xmin1 = imagelet_5;
+  mcu_macro[1][8].xmin1 = imagelet_5;
+  mcu_macro[0][8].ymin1 = 0;
+  mcu_macro[1][8].ymin1 = 0;
+  mcu_macro[0][8].xmin2 = imagelet_6;
+  mcu_macro[1][8].xmin2 = imagelet_6;
+  mcu_macro[0][8].ymin2 = 0;
+  mcu_macro[1][8].ymin2 = 0;
+  mcu_macro[0][8].xmin3 = imagelet_5;
+  mcu_macro[1][8].xmin3 = imagelet_5;
+  mcu_macro[0][8].ymin3 = 0;
+  mcu_macro[1][8].ymin3 = 0;
+  mcu_macro[0][8].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][8].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][8].iter2 = imagelet_size;
+  mcu_macro[1][8].iter2 = imagelet_size;
+  mcu_macro[0][8].iter3 = 0;
+  mcu_macro[1][8].iter3 = 0;
+  mcu_macro[0][8].iter4 = 0;
+  mcu_macro[1][8].iter4 = 0;
+  mcu_macro[0][8].addrStart = TERAPIX_UCODE_ABS_DIFF3;
+  mcu_macro[1][8].addrStart = TERAPIX_UCODE_ABS_DIFF3;
+  // 9: E8(5) -> 4
+  mcu_macro[0][9].xmin1 = imagelet_5;
+  mcu_macro[1][9].xmin1 = imagelet_5;
+  mcu_macro[0][9].ymin1 = 0;
+  mcu_macro[1][9].ymin1 = 0;
+  mcu_macro[0][9].xmin2 = imagelet_4;
+  mcu_macro[1][9].xmin2 = imagelet_4;
+  mcu_macro[0][9].ymin2 = 0;
+  mcu_macro[1][9].ymin2 = 0;
+  mcu_macro[0][9].xmin3 = x_0;
+  mcu_macro[1][9].xmin3 = x_0;
+  mcu_macro[0][9].ymin3 = y_0;
+  mcu_macro[1][9].ymin3 = y_0;
+  mcu_macro[0][9].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][9].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][9].iter2 = imagelet_size;
+  mcu_macro[1][9].iter2 = imagelet_size;
+  mcu_macro[0][9].iter3 = 0;
+  mcu_macro[1][9].iter3 = 0;
+  mcu_macro[0][9].iter4 = 0;
+  mcu_macro[1][9].iter4 = 0;
+  mcu_macro[0][9].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][9].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 10: D8(4) -> 5
+  mcu_macro[0][10].xmin1 = imagelet_4;
+  mcu_macro[1][10].xmin1 = imagelet_4;
+  mcu_macro[0][10].ymin1 = 0;
+  mcu_macro[1][10].ymin1 = 0;
+  mcu_macro[0][10].xmin2 = imagelet_5;
+  mcu_macro[1][10].xmin2 = imagelet_5;
+  mcu_macro[0][10].ymin2 = 0;
+  mcu_macro[1][10].ymin2 = 0;
+  mcu_macro[0][10].xmin3 = x_0;
+  mcu_macro[1][10].xmin3 = x_0;
+  mcu_macro[0][10].ymin3 = y_0;
+  mcu_macro[1][10].ymin3 = y_0;
+  mcu_macro[0][10].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][10].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][10].iter2 = imagelet_size;
+  mcu_macro[1][10].iter2 = imagelet_size;
+  mcu_macro[0][10].iter3 = 0;
+  mcu_macro[1][10].iter3 = 0;
+  mcu_macro[0][10].iter4 = 0;
+  mcu_macro[1][10].iter4 = 0;
+  mcu_macro[0][10].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][10].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 11: -(2,7) -> 7
+  mcu_macro[0][11].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][11].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][11].ymin1 = 0;
+  mcu_macro[1][11].ymin1 = 0;
+  mcu_macro[0][11].xmin2 = imagelet_7;
+  mcu_macro[1][11].xmin2 = imagelet_7;
+  mcu_macro[0][11].ymin2 = 0;
+  mcu_macro[1][11].ymin2 = 0;
+  mcu_macro[0][11].xmin3 = imagelet_7;
+  mcu_macro[1][11].xmin3 = imagelet_7;
+  mcu_macro[0][11].ymin3 = 0;
+  mcu_macro[1][11].ymin3 = 0;
+  mcu_macro[0][11].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][11].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][11].iter2 = imagelet_size;
+  mcu_macro[1][11].iter2 = imagelet_size;
+  mcu_macro[0][11].iter3 = 0;
+  mcu_macro[1][11].iter3 = 0;
+  mcu_macro[0][11].iter4 = 0;
+  mcu_macro[1][11].iter4 = 0;
+  mcu_macro[0][11].addrStart = TERAPIX_UCODE_SUB3;
+  mcu_macro[1][11].addrStart = TERAPIX_UCODE_SUB3;
+  // 12: -|(6,7) -> 7
+  mcu_macro[0][12].xmin1 = imagelet_6;
+  mcu_macro[1][12].xmin1 = imagelet_6;
+  mcu_macro[0][12].ymin1 = 0;
+  mcu_macro[1][12].ymin1 = 0;
+  mcu_macro[0][12].xmin2 = imagelet_7;
+  mcu_macro[1][12].xmin2 = imagelet_7;
+  mcu_macro[0][12].ymin2 = 0;
+  mcu_macro[1][12].ymin2 = 0;
+  mcu_macro[0][12].xmin3 = imagelet_7;
+  mcu_macro[1][12].xmin3 = imagelet_7;
+  mcu_macro[0][12].ymin3 = 0;
+  mcu_macro[1][12].ymin3 = 0;
+  mcu_macro[0][12].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][12].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][12].iter2 = imagelet_size;
+  mcu_macro[1][12].iter2 = imagelet_size;
+  mcu_macro[0][12].iter3 = 0;
+  mcu_macro[1][12].iter3 = 0;
+  mcu_macro[0][12].iter4 = 0;
+  mcu_macro[1][12].iter4 = 0;
+  mcu_macro[0][12].addrStart = TERAPIX_UCODE_ABS_DIFF3;
+  mcu_macro[1][12].addrStart = TERAPIX_UCODE_ABS_DIFF3;
+  // 13: E8(7) -> 6
+  mcu_macro[0][13].xmin1 = imagelet_7;
+  mcu_macro[1][13].xmin1 = imagelet_7;
+  mcu_macro[0][13].ymin1 = 0;
+  mcu_macro[1][13].ymin1 = 0;
+  mcu_macro[0][13].xmin2 = imagelet_6;
+  mcu_macro[1][13].xmin2 = imagelet_6;
+  mcu_macro[0][13].ymin2 = 0;
+  mcu_macro[1][13].ymin2 = 0;
+  mcu_macro[0][13].xmin3 = x_0;
+  mcu_macro[1][13].xmin3 = x_0;
+  mcu_macro[0][13].ymin3 = y_0;
+  mcu_macro[1][13].ymin3 = y_0;
+  mcu_macro[0][13].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][13].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][13].iter2 = imagelet_size;
+  mcu_macro[1][13].iter2 = imagelet_size;
+  mcu_macro[0][13].iter3 = 0;
+  mcu_macro[1][13].iter3 = 0;
+  mcu_macro[0][13].iter4 = 0;
+  mcu_macro[1][13].iter4 = 0;
+  mcu_macro[0][13].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  mcu_macro[1][13].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // 14: D8(6) -> 7
+  mcu_macro[0][14].xmin1 = imagelet_6;
+  mcu_macro[1][14].xmin1 = imagelet_6;
+  mcu_macro[0][14].ymin1 = 0;
+  mcu_macro[1][14].ymin1 = 0;
+  mcu_macro[0][14].xmin2 = imagelet_7;
+  mcu_macro[1][14].xmin2 = imagelet_7;
+  mcu_macro[0][14].ymin2 = 0;
+  mcu_macro[1][14].ymin2 = 0;
+  mcu_macro[0][14].xmin3 = x_0;
+  mcu_macro[1][14].xmin3 = x_0;
+  mcu_macro[0][14].ymin3 = y_0;
+  mcu_macro[1][14].ymin3 = y_0;
+  mcu_macro[0][14].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][14].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][14].iter2 = imagelet_size;
+  mcu_macro[1][14].iter2 = imagelet_size;
+  mcu_macro[0][14].iter3 = 0;
+  mcu_macro[1][14].iter3 = 0;
+  mcu_macro[0][14].iter4 = 0;
+  mcu_macro[1][14].iter4 = 0;
+  mcu_macro[0][14].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  mcu_macro[1][14].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // 15: <(7,5) -> 7
+  mcu_macro[0][15].xmin1 = imagelet_7;
+  mcu_macro[1][15].xmin1 = imagelet_7;
+  mcu_macro[0][15].ymin1 = 0;
+  mcu_macro[1][15].ymin1 = 0;
+  mcu_macro[0][15].xmin2 = imagelet_5;
+  mcu_macro[1][15].xmin2 = imagelet_5;
+  mcu_macro[0][15].ymin2 = 0;
+  mcu_macro[1][15].ymin2 = 0;
+  mcu_macro[0][15].xmin3 = imagelet_7;
+  mcu_macro[1][15].xmin3 = imagelet_7;
+  mcu_macro[0][15].ymin3 = 0;
+  mcu_macro[1][15].ymin3 = 0;
+  mcu_macro[0][15].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][15].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][15].iter2 = imagelet_size;
+  mcu_macro[1][15].iter2 = imagelet_size;
+  mcu_macro[0][15].iter3 = 0;
+  mcu_macro[1][15].iter3 = 0;
+  mcu_macro[0][15].iter4 = 0;
+  mcu_macro[1][15].iter4 = 0;
+  mcu_macro[0][15].addrStart = TERAPIX_UCODE_INF3;
+  mcu_macro[1][15].addrStart = TERAPIX_UCODE_INF3;
+  // 16: thr(7) -> 1
+  mcu_macro[0][16].xmin1 = imagelet_7;
+  mcu_macro[1][16].xmin1 = imagelet_7;
+  mcu_macro[0][16].ymin1 = 0;
+  mcu_macro[1][16].ymin1 = 0;
+  mcu_macro[0][16].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][16].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][16].ymin2 = 0;
+  mcu_macro[1][16].ymin2 = 0;
+  // copy of operation 16 parameters
+  p_16[0] = pi5;
+  p_16[1] = pi6;
+  p_16[2] = pi7;
+  gram.xoffset = x_16;
+  gram.yoffset = y_16;
+  gram.width = 3;
+  gram.height = 1;
+  gram.params = p_16;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mcu_macro[0][16].xmin3 = x_16;
+  mcu_macro[1][16].xmin3 = x_16;
+  mcu_macro[0][16].ymin3 = y_16;
+  mcu_macro[1][16].ymin3 = y_16;
+  mcu_macro[0][16].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][16].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][16].iter2 = imagelet_size;
+  mcu_macro[1][16].iter2 = imagelet_size;
+  mcu_macro[0][16].iter3 = 0;
+  mcu_macro[1][16].iter3 = 0;
+  mcu_macro[0][16].iter4 = 0;
+  mcu_macro[1][16].iter4 = 0;
+  mcu_macro[0][16].addrStart = TERAPIX_UCODE_THRESHOLD;
+  mcu_macro[1][16].addrStart = TERAPIX_UCODE_THRESHOLD;
+
+
+  // inputs:
+  // - imagelet 1 is i0 for t0
+  tile_in[0][0].x = imagelet_io_1_0;
+  tile_in[0][0].y = 0;
+  tile_in[1][0].x = imagelet_io_1_1;
+  tile_in[1][0].y = 0;
+  // - imagelet 2 is i1 for t2
+  tile_in[0][1].x = imagelet_io_2_0;
+  tile_in[0][1].y = 0;
+  tile_in[1][1].x = imagelet_io_2_1;
+  tile_in[1][1].y = 0;
+  // - imagelet 3 is i2 for t4
+  tile_in[0][2].x = imagelet_io_3_0;
+  tile_in[0][2].y = 0;
+  tile_in[1][2].x = imagelet_io_3_1;
+  tile_in[1][2].y = 0;
+
+  // outputs:
+  // - imagelet 1 is o0 for i3
+  tile_out[0][0].x = imagelet_io_1_0;
+  tile_out[0][0].y = 0;
+  tile_out[1][0].x = imagelet_io_1_1;
+  tile_out[1][0].y = 0;
+
+  // imagelet erosion for the computation
+  mcu_instr.borderTop    = 3;
+  mcu_instr.borderBottom = 3;
+  mcu_instr.borderLeft   = 3;
+  mcu_instr.borderRight  = 3;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
+
+  // outputs
+  mcu_instr.nbout = 1;
+  mcu_instr.out0 = tile_out[0];
+  mcu_instr.out1 = tile_out[1];
+
+  // inputs
+  mcu_instr.nbin = 3;
+  mcu_instr.in0 = tile_in[0];
+  mcu_instr.in1 = tile_in[1];
+
+  // actual instructions
+  mcu_instr.nbinstr = 17;
+  mcu_instr.instr0   = mcu_macro[0];
+  mcu_instr.instr1   = mcu_macro[1];
+
+  // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0, i1, i2);
+
+  // extract measures
+
+  return ret;
+}
+
+
+! updated function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i3, *t0, *t1, *t2, *t3, *t4;                      /*0124*/
+   freia_data2d *imgsav;                                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t mx1, my1, mx2, my2;                                 /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+   
+   
+   
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      valx_pre = valx;                                                  /*0231*/
+      
+      
+      
+      
+      main_helper_0_0_0(i3, t0, t2, t4, freia_morpho_kernel_8c, 15, 255, 1);           /*0197*/
+      
+      
+      
+      freia_aipo_copy(t0, i0);
+
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+
+! cleaned up function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i3, *t0, *t1, *t2, *t3, *t4;                      /*0124*/
+   freia_data2d *imgsav;                                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t mx1, my1, mx2, my2;                                 /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+   
+   
+   
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      valx_pre = valx;                                                  /*0231*/
+      
+      
+      
+      
+      main_helper_0_0_0(i3, t0, t2, t4, freia_morpho_kernel_8c, 15, 255, 1);           /*0197*/
+      
+      
+      
+      freia_aipo_copy(t0, i0);
+
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i1, *i2, *i3, *im, *t0, *t1, *t2, *t3, *t4;       /*0124*/
+   freia_data2d *imgtmp;                                                /*0125*/
+   freia_data2d *imgg1, *imgg2, *imgsav;                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t startx = 33, starty = 272, endx = 152, endy = 132;  /*0133*/
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t epaisseur = 17;                                     /*0135*/
+   register int32_t mx1, my1, mx2, my2, idx = 10;                       /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+   freia_data2d *imtmp_0, *imtmp_1, *imtmp_2, *imtmp_3;                 /*0141*/
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+   im = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0154*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+
+   imgg1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0162*/
+   imgg2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);                /*0163*/
+
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      freia_aipo_copy(i1, i0);                                          /*0193*/
+      freia_aipo_copy(t0, i1);                                          /*0194*/
+
+      imtmp_3 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0196*/
+      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);          /*0198*/
+      freia_aipo_sub(imgtmp, imtmp_3, imgtmp);                          /*0199*/
+      freia_common_destruct_data(imtmp_3);                              /*0200*/
+
+      imtmp_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);          /*0202*/
+      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
+      freia_aipo_erode_8c(i1, t2, freia_morpho_kernel_8c);              /*0204*/
+      freia_aipo_sub(i1, imtmp_2, i1);                                  /*0205*/
+      freia_common_destruct_data(imtmp_2);                              /*0206*/
+
+      freia_aipo_absdiff(i1, imgtmp, i1);                               /*0208*/
+      freia_aipo_erode_8c(i1, i1, freia_morpho_kernel_8c);              /*0209*/
+      freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
+
+      imtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0212*/
+      freia_aipo_dilate_8c(imtmp_1, t2, freia_morpho_kernel_8c);        /*0213*/
+      freia_aipo_erode_8c(imgtmp, t2, freia_morpho_kernel_8c);          /*0214*/
+      freia_aipo_sub(imgtmp, imtmp_1, imgtmp);                          /*0215*/
+
+      freia_common_destruct_data(imtmp_1);                              /*0217*/
+
+      imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
+      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);              /*0221*/
+      freia_aipo_sub(i2, imtmp_0, i2);                                  /*0222*/
+      freia_common_destruct_data(imtmp_0);                              /*0223*/
+
+      freia_aipo_absdiff(i2, imgtmp, i2);                               /*0225*/
+      freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);              /*0226*/
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);             /*0227*/
+      freia_aipo_inf(i3, i2, i1);                                       /*0228*/
+
+      freia_aipo_threshold(i3, i3, 15, 255, 1);                         /*0230*/
+      valx_pre = valx;                                                  /*0231*/
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i1);                                      /*0271*/
+   freia_common_destruct_data(i2);                                      /*0272*/
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(im);                                      /*0274*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+   freia_common_destruct_data(imgg1);                                   /*0280*/
+   freia_common_destruct_data(imgg2);                                   /*0281*/
+   freia_common_destruct_data(imgtmp);                                  /*0282*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "main" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "t0" [shape=circle];
+  "i3" [shape=circle];
+
+  // computation vertices
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "215 -" [shape=trapezium,orientation=270];
+  "215 -" -> "225 -|" [label="imgtmp"];
+  "214 E8" [shape=box];
+  "214 E8" -> "215 -" [label="imgtmp"];
+  "213 D8" [shape=box];
+  "213 D8" -> "215 -" [label="imtmp_1"];
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "208 -|" [label="i1"];
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "214 E8";
+  "t2" -> "213 D8";
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+  "194 =" [shape=circle];
+  "194 =" -> "198 E8" [label="t0"];
+  "194 =" -> "197 D8" [label="t0"];
+  "194 =" -> "t0";
+  "193 =" [shape=circle];
+  "193 =" -> "194 =" [label="i1"];
+  "i0" -> "193 =";
+}
+// graph for dag "dag_cleaned_0" of module "main" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "t0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "i3" [shape=circle];
+
+  // computation vertices
+  "t0" -> "198 E8";
+  "t0" -> "197 D8";
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3_1"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2_1"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2_2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2_3"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2_4"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1_1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1_2"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "225 -|" [label="i1_3"];
+  "205 -" -> "208 -|" [label="i1_3"];
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1_4"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp_1"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+
+  // external copies: 1
+  "t0'" [shape=circle];
+  "t0 =" [shape=circle,label="=",style="dashed"]
+  "i0" -> "t0 =";
+  "t0 =" -> "t0'";
+}
+// graph for dag "main_helper_0_0" of module "main" in dot format
+digraph "main_helper_0_0" {
+  // inputs
+  "t0" [shape=circle];
+  "t2" [shape=circle];
+  "t4" [shape=circle];
+
+  // outputs
+  "i3" [shape=circle];
+
+  // computation vertices
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3_1"];
+  "227 D8" [shape=box];
+  "227 D8" -> "228 <" [label="i2"];
+  "226 E8" [shape=box];
+  "226 E8" -> "227 D8" [label="i2_1"];
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "226 E8" [label="i2_2"];
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2_3"];
+  "221 E8" [shape=box];
+  "221 E8" -> "222 -" [label="i2_4"];
+  "220 D8" [shape=box];
+  "220 D8" -> "222 -" [label="imtmp_0"];
+  "t4" -> "221 E8";
+  "t4" -> "220 D8";
+  "210 D8" [shape=box];
+  "210 D8" -> "228 <" [label="i1"];
+  "209 E8" [shape=box];
+  "209 E8" -> "210 D8" [label="i1_1"];
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "209 E8" [label="i1_2"];
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "225 -|" [label="i1_3"];
+  "205 -" -> "208 -|" [label="i1_3"];
+  "204 E8" [shape=box];
+  "204 E8" -> "205 -" [label="i1_4"];
+  "203 D8" [shape=box];
+  "203 D8" -> "205 -" [label="imtmp_2"];
+  "t2" -> "204 E8";
+  "t2" -> "203 D8";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "198 E8" [shape=box];
+  "198 E8" -> "199 -" [label="imgtmp_1"];
+  "197 D8" [shape=box];
+  "197 D8" -> "199 -" [label="imtmp_3"];
+  "t0" -> "198 E8";
+  "t0" -> "197 D8";
+}
+// graph for dag "main_helper_0_0_1" of module "main" in dot format
+digraph "main_helper_0_0_1" {
+  // inputs
+  "i1_4" [shape=circle];
+  "i2_4" [shape=circle];
+  "imgtmp_1" [shape=circle];
+  "imtmp_0" [shape=circle];
+  "imtmp_2" [shape=circle];
+  "imtmp_3" [shape=circle];
+
+  // outputs
+  "i1_2" [shape=circle];
+  "i2_2" [shape=circle];
+
+  // computation vertices
+  "225 -|" [shape=trapezium,orientation=270];
+  "225 -|" -> "i2_2";
+  "208 -|" [shape=trapezium,orientation=270];
+  "208 -|" -> "i1_2";
+  "222 -" [shape=trapezium,orientation=270];
+  "222 -" -> "225 -|" [label="i2_3"];
+  "i2_4" -> "222 -";
+  "imtmp_0" -> "222 -";
+  "205 -" [shape=trapezium,orientation=270];
+  "205 -" -> "225 -|" [label="i1_3"];
+  "205 -" -> "208 -|" [label="i1_3"];
+  "i1_4" -> "205 -";
+  "imtmp_2" -> "205 -";
+  "199 -" [shape=trapezium,orientation=270];
+  "199 -" -> "208 -|" [label="imgtmp"];
+  "imgtmp_1" -> "199 -";
+  "imtmp_3" -> "199 -";
+}
+// graph for dag "main_helper_0_0_3" of module "main" in dot format
+digraph "main_helper_0_0_3" {
+  // inputs
+  "i1" [shape=circle];
+  "i2" [shape=circle];
+
+  // outputs
+  "i3" [shape=circle];
+
+  // computation vertices
+  "230 thr" [shape=parallelogram];
+  "230 thr" -> "i3";
+  "228 <" [shape=trapezium,orientation=270];
+  "228 <" -> "230 thr" [label="i3_1"];
+  "i1" -> "228 <";
+  "i2" -> "228 <";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 20 ops and 2 copies, optimized to 17 ops and 0+1 copies
+
+// helper function main_helper_0_0_1
+freia_status main_helper_0_0_1(
+  freia_data2d * o0,
+  freia_data2d * o1,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  const freia_data2d * i2,
+  const freia_data2d * i3,
+  const freia_data2d * i4,
+  const freia_data2d * i5)
+{
+  call opencl kernel main_helper_0_0_1(o0, o1, i0, i1, i2, i3, i4, i5);
+  return FREIA_OK;
+}
+
+// helper function main_helper_0_0_3
+freia_status main_helper_0_0_3(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  call opencl kernel main_helper_0_0_3(o0, i0, i1, c0, c1, c2);
+  return FREIA_OK;
+}
+// freia opencl includes
+// generated opencl for function main
+
+// opencl for dag 0
+
+// opencl function main_helper_0_0_1
+kernel main_helper_0_0_1(
+  opencl image o0,
+  opencl image o1,
+  const opencl image i0,
+  const opencl image i1,
+  const opencl image i2,
+  const opencl image i3,
+  const opencl image i4,
+  const opencl image i5)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    register pixel in2 = i2[i];
+    register pixel in3 = i3[i];
+    register pixel in4 = i4[i];
+    register pixel in5 = i5[i];
+    // pixel computations
+    register pixel t199 = PIXEL_SUB(in5, in2);
+    register pixel t205 = PIXEL_SUB(in4, in0);
+    register pixel t222 = PIXEL_SUB(in3, in1);
+    register pixel t208 = PIXEL_ABSDIFF(t199, t205);
+    register pixel t225 = PIXEL_ABSDIFF(t205, t222);
+    // set output pixels
+    o0[i] = t208;
+    o1[i] = t225;
+  }
+}
+
+// opencl function main_helper_0_0_3
+kernel main_helper_0_0_3(
+  opencl image o0,
+  const opencl image i0,
+  const opencl image i1,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
+{
+  for (i)
+  {
+    // get input pixels
+    register pixel in0 = i0[i];
+    register pixel in1 = i1[i];
+    // pixel computations
+    register pixel t228 = PIXEL_INF(in1, in0);
+    register pixel t230 = PIXEL_THRESHOLD(t228, c0, c1, c2);
+    // set output pixels
+    o0[i] = t230;
+  }
+}
+
+! updated function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i1, *i2, *i3, *t0, *t1, *t2, *t3, *t4;            /*0124*/
+   freia_data2d *imgtmp;                                                /*0125*/
+   freia_data2d *imgsav;                                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t mx1, my1, mx2, my2;                                 /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+   freia_data2d *imtmp_0, *imtmp_2, *imtmp_3;                           /*0141*/
+   // hardware accelerator generated variable
+   freia_data2d *i2_2 = 0, *i2_4 = 0, *i1_2 = 0, *i1_4 = 0;
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
+   i1_4 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
+   i1_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
+   i2_4 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);
+   i2_2 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+   
+   
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      imtmp_3 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0196*/
+      valx_pre = valx;                                                  /*0231*/
+
+      imtmp_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);          /*0202*/
+      
+      
+      imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
+
+      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);          /*0198*/
+      main_helper_0_0_1(i1_2, i2_2, i1_4, i2_4, imgtmp, imtmp_0, imtmp_2, imtmp_3);    /*0199*/
+      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
+      freia_aipo_erode_8c(i1_4, t2, freia_morpho_kernel_8c);            /*0204*/
+
+      freia_aipo_erode_8c(i1, i1_2, freia_morpho_kernel_8c);            /*0209*/
+      freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
+      freia_aipo_erode_8c(i2_4, t4, freia_morpho_kernel_8c);            /*0221*/
+
+      freia_aipo_erode_8c(i2, i2_2, freia_morpho_kernel_8c);            /*0226*/
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);
+      freia_aipo_copy(t0, i0);
+      main_helper_0_0_3(i3, i1, i2, 15, 255, 1);                        /*0228*/
+
+      freia_common_destruct_data(imtmp_3);                              /*0200*/
+      freia_common_destruct_data(imtmp_2);                              /*0206*/
+
+      freia_common_destruct_data(imtmp_0);                              /*0223*/
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i1);                                      /*0271*/
+   freia_common_destruct_data(i1_2);
+   freia_common_destruct_data(i1_4);
+   freia_common_destruct_data(i2);                                      /*0272*/
+   freia_common_destruct_data(i2_2);
+   freia_common_destruct_data(i2_4);
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+   freia_common_destruct_data(imgtmp);                                  /*0282*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+
+! cleaned up function
+
+int main(int argc, char *argv[])
+{
+   freia_dataio fdin, fdout, fdout1;                                    /*0122*/
+
+   freia_data2d *i0, *i1, *i2, *i3, *t0, *t1, *t2, *t3, *t4;            /*0124*/
+   freia_data2d *imgtmp;                                                /*0125*/
+   freia_data2d *imgsav;                                                /*0126*/
+
+   register unsigned int nbpix;                                         /*0128*/
+   register int32_t x, y;                                               /*0129*/
+   int32_t valx, valy;                                                  /*0130*/
+   register int32_t valmax, valx_pre = 0;                               /*0131*/
+
+   register int32_t countfalsedetect = 0;                               /*0134*/
+   register int32_t mx1, my1, mx2, my2;                                 /*0136*/
+
+   register int32_t dx;                                                 /*0138*/
+   uint32_t *tabeqt;                                                    /*0139*/
+   register freia_status end = 0;                                       /*0140*/
+   freia_data2d *imtmp_0, *imtmp_2, *imtmp_3;                           /*0141*/
+   // hardware accelerator generated variable
+   freia_data2d *i2_2 = 0, *i2_4 = 0, *i1_2 = 0, *i1_4 = 0;
+
+   freia_initialize(argc, argv);                                        /*0143*/
+
+   freia_common_open_input(&fdin, 0);                                   /*0145*/
+
+   i0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0147*/
+
+   freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, 8);          /*0149*/
+   freia_common_open_output(&fdout1, 1, fdin.framewidth, fdin.frameheight, 8);         /*0150*/
+   i1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0151*/
+   i1_4 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
+   i1_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
+   i2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0152*/
+   i2_4 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);
+   i2_2 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);
+   i3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0153*/
+
+   t0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0156*/
+   t1 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0157*/
+   t2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0158*/
+   t3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0159*/
+   t4 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0160*/
+   
+   
+   imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0165*/
+
+   tabeqt = freia_common_alloc(fdin.framewidth*sizeof(*tabeqt));        /*0167*/
+   x = fdin.framewidth;                                                 /*0168*/
+   y = fdin.frameheight;                                                /*0169*/
+   dx = 10;                                                             /*0170*/
+
+   nbpix = y*x;                                                         /*0172*/
+
+   ligneInitTabEqt(tabeqt, fdin.framewidth, 33, 272, 152, 132, 255);    /*0174*/
+
+   mx1 = 33;                                                            /*0176*/
+   my1 = 272;                                                           /*0177*/
+   mx2 = 152;                                                           /*0178*/
+   my2 = 132;                                                           /*0179*/
+   valx = 152;                                                          /*0180*/
+   end = freia_common_rx_image(i0, &fdin);                              /*0181*/
+
+   while (end==FREIA_OK) {                                              /*0183*/
+      // ??? POINTER SHUFFLING is not supported by pips freia compiler!
+      imgsav = t4;                                                      /*0186*/
+      t4 = t3;                                                          /*0187*/
+      t3 = t2;                                                          /*0188*/
+      t2 = t1;                                                          /*0189*/
+      t1 = t0;                                                          /*0190*/
+      t0 = imgsav;                                                      /*0191*/
+
+      imtmp_3 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);             /*0196*/
+      valx_pre = valx;                                                  /*0231*/
+
+      imtmp_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);          /*0202*/
+      
+      
+      imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
+
+      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);          /*0198*/
+      main_helper_0_0_1(i1_2, i2_2, i1_4, i2_4, imgtmp, imtmp_0, imtmp_2, imtmp_3);    /*0199*/
+      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
+      freia_aipo_erode_8c(i1_4, t2, freia_morpho_kernel_8c);            /*0204*/
+
+      freia_aipo_erode_8c(i1, i1_2, freia_morpho_kernel_8c);            /*0209*/
+      freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
+      freia_aipo_erode_8c(i2_4, t4, freia_morpho_kernel_8c);            /*0221*/
+
+      freia_aipo_erode_8c(i2, i2_2, freia_morpho_kernel_8c);            /*0226*/
+      freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);
+      freia_aipo_copy(t0, i0);
+      main_helper_0_0_3(i3, i1, i2, 15, 255, 1);                        /*0228*/
+
+      freia_common_destruct_data(imtmp_3);                              /*0200*/
+      freia_common_destruct_data(imtmp_2);                              /*0206*/
+
+      freia_common_destruct_data(imtmp_0);                              /*0223*/
+      valmax = getMaxInLigneEpaisse(i3, tabeqt, mx1, my1, mx2, my2, 17, &valx, &valy);                /*0232*/
+      dx = 10;                                                          /*0233*/
+      if (valmax==0) {                                                  /*0234*/
+         countfalsedetect++;                                            /*0235*/
+         valx = valx_pre;                                               /*0236*/
+         if (countfalsedetect>45) {                                     /*0237*/
+            countfalsedetect = 1000;                                    /*0238*/
+            //valx=(valx_pre+5)%mx2;
+            valx += 5;                                                  /*0240*/
+            if (valx>mx2)                                               /*0241*/
+               valx = mx2;                                              /*0242*/
+            if (valx<mx1)                                               /*0243*/
+               valx = mx1;                                              /*0244*/
+            dx = 10;                                                    /*0245*/
+         }
+      }
+      else {
+         countfalsedetect = 0;                                          /*0249*/
+         dx = 20;                                                       /*0250*/
+      }
+      barre(t0, valx, 0, 2, x, 255);                                    /*0252*/
+
+      mx1 = valx-dx;                                                    /*0254*/
+      if (mx1<33)                                                       /*0255*/
+         mx1 = 33;                                                      /*0256*/
+      my1 = tabeqt[mx1];                                                /*0257*/
+
+      mx2 = dx+valx;                                                    /*0259*/
+      if (mx2>152)                                                      /*0260*/
+         mx2 = 152;                                                     /*0261*/
+      my2 = tabeqt[mx2];                                                /*0262*/
+
+      valx_pre = -valx+152;                                             /*0264*/
+
+      freia_common_tx_image(t0, &fdout);                                /*0266*/
+      end = freia_common_rx_image(i0, &fdin);                           /*0267*/
+   }
+
+   freia_common_destruct_data(i0);                                      /*0270*/
+   freia_common_destruct_data(i1);                                      /*0271*/
+   freia_common_destruct_data(i1_2);
+   freia_common_destruct_data(i1_4);
+   freia_common_destruct_data(i2);                                      /*0272*/
+   freia_common_destruct_data(i2_2);
+   freia_common_destruct_data(i2_4);
+   freia_common_destruct_data(i3);                                      /*0273*/
+   freia_common_destruct_data(t0);                                      /*0275*/
+   freia_common_destruct_data(t1);                                      /*0276*/
+   freia_common_destruct_data(t2);                                      /*0277*/
+   freia_common_destruct_data(t3);                                      /*0278*/
+   freia_common_destruct_data(t4);                                      /*0279*/
+   freia_common_destruct_data(imgtmp);                                  /*0282*/
+
+   freia_common_close_input(&fdin);                                     /*0284*/
+   freia_common_close_output(&fdout);                                   /*0285*/
+
+   freia_shutdown();                                                    /*0287*/
+   return 0;                                                            /*0288*/
+}
+#
+# FREIA COMPILATION DONE
+#
+

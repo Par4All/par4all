@@ -50,3 +50,6 @@ Parsed printed file for "decl14!"
 int filter();
 
 int filter();
+#
+# compile generated decl14
+#

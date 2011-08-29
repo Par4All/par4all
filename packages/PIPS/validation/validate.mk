@@ -50,12 +50,14 @@ TEST	= test
 
 # is it a subversion working copy?
 IS_SVN	= test -d .svn
+CHECK	= $(IS_SVN)
 
 # some parametric commands
-CHECK	= $(IS_SVN)
-DIFF	= svn diff
-UNDO	= svn revert
-LIST	= svn status
+SVN	= svn
+DIFF	= $(SVN) diff
+UNDO	= $(SVN) revert
+LIST	= $(SVN) status
+INFO	= $(SVN) info
 
 # prefix of tests to be run, default is all
 PREFIX	=
@@ -161,6 +163,7 @@ EXCEPT =  [ "$(RECWHAT)" ] && \
 	  [ ! "$(DO_F95)" -a -d $*.result -a \( -e $*.f90 -o -e $*.f95 \) ] && \
 	    { echo "keptout: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
 
+
 # setup running a case
 PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  $(EXCEPT) ; \
@@ -173,7 +176,7 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 # in which case while recurring this mark take precedence about
 # local information made available within the directory
 %.rec: %
-	recwhat= ; d=$* ; d=$${d%.sub} ; \
+	@recwhat= ; d=$* ; d=$${d%.sub} ; \
 	[ ! "$(DO_BUG)" -a -f $$d.bug ] && recwhat=bug ; \
 	[ ! "$(DO_LATER)" -a -f $$d.later ] && recwhat=later ; \
 	[ ! "$(DO_SLOW)" -a -f $$d.slow ] && recwhat=slow ; \
@@ -185,21 +188,29 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  echo "broken-directory: $(SUBDIR)/$^" >> $(RESULTS)
 
 # extract validation result for summary when the case was run
-# four possible outcomes: passed, changed, failed, timeout
+# five possible outcomes: passed, changed, failed, timeout, noref
+# noref means there is no reference file for comparison
 # 134 is for pips_internal_error, could allow to distinguish voluntary aborts.
 OK	= status=$$? ; \
 	  if [ "$$status" -eq 203 ] ; then \
-	     echo "timeout: $(SUBDIR)/$* $$SECONDS" ; \
+	   echo "timeout: $(SUBDIR)/$* $$SECONDS" ; \
 	  elif [ "$$status" != 0 ] ; then \
-	     echo "failed: $(SUBDIR)/$* $$SECONDS" ; \
+	   echo "failed: $(SUBDIR)/$* $$SECONDS" ; \
 	  else \
-	     $(DIFF) $*.result/test > $*.diff ; \
-	     if [ -s $*.diff ] ; then \
+	    novcref= ; \
+	    $(INFO) $*.result/test > /dev/null 2>&1 || novcref=1 ; \
+	    if [ \( $(TEST) = 'test' -a "$$novcref" \) -o \
+	         \( $(TEST) = 'out' -a ! -e $*.result/test \) ] ; then \
+	      echo "noref: $(SUBDIR)/$* $$SECONDS" ; \
+	    else \
+	      $(DIFF) $*.result/test > $*.diff ; \
+	      if [ -s $*.diff ] ; then \
 	        echo "changed: $(SUBDIR)/$* $$SECONDS" ; \
-	     else \
+	      else \
 	        $(RM) $*.err $*.diff ; \
 	        echo "passed: $(SUBDIR)/$* $$SECONDS" ; \
-	     fi ; \
+	      fi ; \
+            fi ; \
 	  fi >> $(RESULTS)
 
 # default target is to clean
@@ -352,7 +363,7 @@ ifdef DO_PYPS
 	$(PF) ; $(PYTHON) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 else # no pyps...
 %.validate: %.py
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 endif # DO_PYPS
 
 # default_tpips
@@ -430,19 +441,19 @@ ifdef DO_PYPS
 else # without pyps
 
 %.validate: %.c $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.validate: %.f $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.validate: %.F $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.validate: %.f90 $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.validate: %.f95 $(DEFPYPS)
-	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	@$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 endif # DO_PYPS
 
@@ -453,20 +464,28 @@ endif # DO_PYPS
 # detect skipped stuff
 .PHONY: skipped
 skipped:
-	for base in $(sort $(basename $(F.src) $(F.exe))) ; do \
+	@for base in $(sort $(basename $(F.src) $(F.exe))) ; do \
 	  if ! test -d $$base.result ; \
 	  then \
 	    echo "skipped: $(SUBDIR)/$$base" ; \
-	  elif ! [ -f $$base.result/test -o -f $$base.result/test.$(ARCH) ] ; \
+	  elif ! [ -f $$base.result/test ] ; \
 	  then \
 	    echo "missing: $(SUBDIR)/$$base" ; \
 	  fi ; \
 	done >> $(RESULTS)
 
-# test RESULT directory without any script
+# test RESULT directory without any script...
+# this warning is reported only if the case would be executed in the
+# current validation context (i.e. it may be ignored for bug/later/slow).
 .PHONY: orphan
 orphan:
-	for base in $(sort $(F.list)) ; do \
+	@for base in $(sort $(F.list)) ; \
+	do \
+	  [ ! "$(DO_BUG)" -a -e $$base.bug ] && continue ; \
+	  [ ! "$(DO_LATER)" -a -e $$base.later ] && continue ; \
+	  [ ! "$(DO_SLOW)" -a -e $$base.slow ] && continue ; \
+	  [ ! "$(DO_F95)" -a \( -e $$base.f90 -o -e $$base.f95 \) ] && \
+	    continue ; \
 	  test -f $$base.tpips -o \
 	       -f $$base.tpips2 -o \
 	       -f $$base.test -o \
@@ -480,7 +499,7 @@ orphan:
 # test case with multiple scripts... one is randomly (?) chosen
 .PHONY: multi-script
 multi-script:
-	for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
+	@for base in $$(echo $(basename $(F.exe))|tr ' ' '\012'|sort|uniq -d); \
 	do \
 	  echo "multi-script: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
@@ -488,14 +507,14 @@ multi-script:
 # test case with multiple sources (c/f/F...)
 .PHONY: multi-source
 multi-source:
-	for base in $$(echo $(basename $(F.src))|tr ' ' '\012'|sort|uniq -d); \
+	@for base in $$(echo $(basename $(F.src))|tr ' ' '\012'|sort|uniq -d); \
 	do \
 	  echo "multi-source: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
 
 # check that all tpips2 have a corresponding flt
-.PHONY: missing-flt
-missing-flt:
+.PHONY: nofilter
+nofilter:
 	@for f in $(F.tpips2) ; do \
 	  test -e $${f/.tpips2/.flt} || \
 	    echo "nofilter: $(SUBDIR)/$${f/.tpips2/}" ; \
@@ -503,7 +522,10 @@ missing-flt:
 
 # all possible inconsistencies
 .PHONY: inconsistencies
-inconsistencies: skipped orphan multi-source multi-script missing-flt
+inconsistencies: skipped orphan multi-source multi-script nofilter
+	@[ "$(D.rec)" ] && $(MAKE) FORWARD=inconsistencies $(D.rec) || exit 0
+
+########################################################### LOCAL CHECK HELPERS
 
 # what about nothing?
 # source files without corresponding result directory

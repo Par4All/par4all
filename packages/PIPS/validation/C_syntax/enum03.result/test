@@ -1,6 +1,9 @@
 enum {a=sizeof(int), b};
 
 int main();
+#
+# compile generated enum03
+#
 
 Preconditions derived from enum
 

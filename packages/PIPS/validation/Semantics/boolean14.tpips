@@ -29,7 +29,7 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 #apply CONTROL_SIMPLIFICATION[main]
-#apply SUPPRESS_DEAD_CODE[main]
+#apply SIMPLIFY_CONTROL[main]
 apply SIMPLIFY_CONTROL[main]
 
 echo

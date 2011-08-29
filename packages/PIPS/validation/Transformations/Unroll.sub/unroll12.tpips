@@ -29,7 +29,7 @@ echo
 echo Code after suppress dead code for "UNROLL12"
 echo
 
-apply SUPPRESS_DEAD_CODE[UNROLL12]
+apply SIMPLIFY_CONTROL[UNROLL12]
 display PRINTED_FILE[UNROLL12]
 
 close

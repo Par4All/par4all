@@ -198,7 +198,7 @@
       END
 
 ************************
-** SUPPRESS_DEAD_CODE **
+*** SIMPLIFY_CONTROL ***
 ************************
       REAL FUNCTION DOTPRODUCT(N,X,Y)
       

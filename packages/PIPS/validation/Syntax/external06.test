@@ -1,6 +1,7 @@
 #!/bin/sh
 
-PIPS_CHECK_FORTRAN="Y"
+# Three unused formal arguments for "dance". No other compilation issue
+PIPS_CHECK_FORTRAN="N"
 export PIPS_CHECK_FORTRAN
 
 tpips=${tpips_version:-tpips}

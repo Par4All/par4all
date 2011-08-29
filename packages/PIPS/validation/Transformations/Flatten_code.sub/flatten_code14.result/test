@@ -1,7 +1,4 @@
 
-Compile initial code
-
-
 Initial code
 
 int flatten_code14(void)
@@ -220,6 +217,9 @@ int flatten_code14(void)
    return i1+i2;                                                        /*0077*/
    // END BLOCK
 }
+#
+# compile both flatten_code14
+#
 int flatten_code14(void)
 {
 // (0,1)

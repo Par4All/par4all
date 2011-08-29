@@ -84,7 +84,7 @@ open tsvc
 
 apply RESTRUCTURE_CONTROL[$modules]
 capply RECOVER_FOR_LOOP[$modules]
-#apply SUPPRESS_DEAD_CODE[$modules]
+#apply SIMPLIFY_CONTROL[$modules]
 
 #apply PRINT_PARALLELIZEDOMP_CODE[$modules]
 apply PRINT_PARALLELIZED77_CODE[$modules]

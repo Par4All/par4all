@@ -142,7 +142,7 @@ digraph "freia_dup_03_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 2 ops (0 copies), optimized to 1 (0+1 copies)
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -154,13 +154,10 @@ freia_status freia_dup_03_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
-  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
@@ -201,9 +198,6 @@ freia_status freia_dup_03_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -313,6 +307,8 @@ digraph "freia_dup_03_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
 
 /* FREIA terapix helper function for module freia_dup_03
  *
@@ -485,6 +481,107 @@ freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // o0 = i +. c
    // o1 = i +. c
    freia_dup_03_helper_0_0_0(o0, i, c);                                 /*0009*/
+   freia_aipo_copy(o1, o0);
+   return 0;                                                            /*0011*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c)
+{
+   // same operation performed twice
+   // o0 = i +. c
+   // o1 = i +. c
+   freia_aipo_add_const(o0, i, c);                                      /*0009*/
+   freia_aipo_add_const(o1, i, c);                                      /*0010*/
+   return FREIA_OK;                                                     /*0011*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_03" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+
+  // computation vertices
+  "10 +." [shape=trapezium,orientation=270];
+  "10 +." -> "o1";
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "o0";
+  "i" -> "10 +.";
+  "i" -> "9 +.";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_03" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+
+  // computation vertices
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "o0";
+  "i" -> "9 +.";
+
+  // external copies: 1
+  "o1" [shape=circle];
+  "o1 =" [shape=circle,label="=",style="dashed"]
+  "o0" -> "o1 =";
+  "o1 =" -> "o1";
+}
+// graph for dag "freia_dup_03_helper_0_0" of module "freia_dup_03" in dot format
+digraph "freia_dup_03_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+
+  // computation vertices
+  "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "o0";
+  "i" -> "9 +.";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 2 ops and 0 copies, optimized to 1 ops and 0+1 copies
+// freia opencl includes
+// generated opencl for function freia_dup_03
+
+// opencl for dag 0
+
+! updated function
+
+freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c)
+{
+   // same operation performed twice
+   // o0 = i +. c
+   // o1 = i +. c
+   freia_aipo_add_const(o0, i, c);
+   freia_aipo_copy(o1, o0);
+   return FREIA_OK;                                                     /*0011*/
+}
+
+! cleaned up function
+
+freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c)
+{
+   // same operation performed twice
+   // o0 = i +. c
+   // o1 = i +. c
+   freia_aipo_add_const(o0, i, c);
    freia_aipo_copy(o1, o0);
    return 0;                                                            /*0011*/
 }

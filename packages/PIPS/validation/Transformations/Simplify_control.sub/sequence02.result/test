@@ -1,0 +1,95 @@
+#
+# Parsed printed file
+#
+void sequence02()
+{
+   int i = 4;
+   {
+      int j;
+      if (j!=j) {
+         int k = 3;
+         i = k;
+      }
+   }
+
+   foo(j);
+   foo(i);
+
+   return;
+}
+#
+# Printed file
+#
+void sequence02()
+{
+   int i = 4;
+   {
+      int j;
+      if (j!=j) {
+         int k = 3;
+         i = k;
+      }
+   }
+
+   foo(j);
+   foo(i);
+
+   return;
+}
+#
+# Cumulated effects
+#
+void sequence02()
+{
+//             <    is written>: i
+   int i = 4;
+   {
+      int j;
+//             <may be written>: i
+//             <    is read   >: j
+      if (j!=j) {
+//             <    is written>: k
+         int k = 3;
+//             <    is read   >: k
+//             <    is written>: i
+         i = k;
+      }
+   }
+
+   foo(j);
+//             <    is read   >: i
+   foo(i);
+
+   return;
+}
+#
+# simplify control
+#
+void sequence02()
+{
+//             <    is written>: i
+   int i = 4;
+   {
+      int j;
+   }
+
+   foo(j);
+//             <    is read   >: i
+   foo(i);
+
+   return;
+}
+#
+# simplify control a second time...
+#
+void sequence02()
+{
+//             <    is written>: i
+   int i = 4;
+
+   foo(j);
+//             <    is read   >: i
+   foo(i);
+
+   return;
+}

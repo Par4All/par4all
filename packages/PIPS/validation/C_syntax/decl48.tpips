@@ -29,7 +29,7 @@ echo
 display PRINTED_FILE
 
 apply UNSPLIT
-shell cc -c decl48.database/Src/decl48.c
+shell pips_validation_exe.sh -c -g decl48
 
 close
 delete $WSPC

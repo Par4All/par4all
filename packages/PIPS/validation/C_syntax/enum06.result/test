@@ -2,3 +2,6 @@
 enum e {a};
 
 int main();
+#
+# compile generated enum06
+#

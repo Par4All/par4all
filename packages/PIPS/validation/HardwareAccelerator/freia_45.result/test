@@ -121,7 +121,7 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 3 ops (3 copies), optimized to 0 (0+1 copies)
+// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+1 copies
 // # SPOC calls: 0
 
 ! updated function
@@ -200,6 +200,86 @@ digraph "dag_cleaned_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+1 copies
+
+! updated function
+
+freia_status freia_45(freia_data2d *in, freia_data2d *out)
+{
+   freia_aipo_copy(out, in);
+   return FREIA_OK;                                                     /*0014*/
+}
+
+! cleaned up function
+
+freia_status freia_45(freia_data2d *in, freia_data2d *out)
+{
+   freia_aipo_copy(out, in);
+   return 0;                                                            /*0014*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status freia_45(freia_data2d *in, freia_data2d *out)
+{
+   freia_data2d *t0, *t1;                                               /*0006*/
+   t0 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0007*/
+   t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0008*/
+   freia_aipo_copy(t0, in);                                             /*0009*/
+   freia_aipo_copy(out, t0);                                            /*0010*/
+   freia_aipo_copy(t1, out);                                            /*0011*/
+   freia_common_destruct_data(t0);                                      /*0012*/
+   freia_common_destruct_data(t1);                                      /*0013*/
+   return FREIA_OK;                                                     /*0014*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_45" in dot format
+digraph "dag_0" {
+  // inputs
+  "in" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "11 =" [shape=circle];
+  "10 =" [shape=circle];
+  "10 =" -> "11 =" [label="out"];
+  "10 =" -> "out";
+  "9 =" [shape=circle];
+  "9 =" -> "10 =" [label="t0"];
+  "in" -> "9 =";
+}
+// graph for dag "dag_cleaned_0" of module "freia_45" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+
+  // external copies: 1
+  "out" [shape=circle];
+  "out =" [shape=circle,label="=",style="dashed"]
+  "in" -> "out =";
+  "out =" -> "out";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+1 copies
+// freia opencl includes
+// generated opencl for function freia_45
+
+// opencl for dag 0
 
 ! updated function
 

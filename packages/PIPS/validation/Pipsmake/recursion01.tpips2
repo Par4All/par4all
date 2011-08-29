@@ -1,0 +1,7 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+delete recursion01
+create recursion01 recursion01.f
+display CALLGRAPH_FILE[%ALL]
+close
+delete recursion01
+quit

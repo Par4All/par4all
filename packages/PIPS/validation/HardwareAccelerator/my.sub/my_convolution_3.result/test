@@ -107,7 +107,7 @@ digraph "my_convolution_3_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// dag 0: 1 ops (0 copies), optimized to 1 (0+0 copies)
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 // split 0: 1 cut
 // # SPOC calls: 1
 
@@ -121,10 +121,8 @@ freia_status my_convolution_3_helper_0_0_0(
 {
   spoc_instr si;
   spoc_param sp;
-  spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
-  freia_reduction_results redres;
   freia_op_param param;
   freia_status ret;
   int i;
@@ -169,9 +167,6 @@ freia_status my_convolution_3_helper_0_0_0(
 
   dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
 
   ret = freia_cg_write_microcode(&mcode);
   ret |= freia_cg_write_dynamic_param(&dynparam);
@@ -256,6 +251,8 @@ digraph "my_convolution_3_helper_0_0_0" {
 #include <freiaCoarseGrain.h>
 #include <terapix.h>
 #include <terapix_ucode.h>
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 
 /* FREIA terapix helper function for module my_convolution_3
  *
@@ -443,6 +440,82 @@ freia_status my_convolution_3(freia_data2d *o, freia_data2d *i, int32_t *k)
 freia_status my_convolution_3(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
    return my_convolution_3_helper_0_0_0(o, i, k, 3, 3);                 /*0004*/
+}
+#
+# OPENCL
+#
+
+! initial function
+
+freia_status my_convolution_3(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   return freia_aipo_convolution(o, i, k, 3, 3);                        /*0004*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "my_convolution_3" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 conv" [shape=box];
+  "4 conv" -> "o";
+  "i" -> "4 conv";
+}
+// graph for dag "dag_cleaned_0" of module "my_convolution_3" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 conv" [shape=box];
+  "4 conv" -> "o";
+  "i" -> "4 conv";
+}
+// graph for dag "my_convolution_3_helper_0_0" of module "my_convolution_3" in dot format
+digraph "my_convolution_3_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "4 conv" [shape=box];
+  "4 conv" -> "o";
+  "i" -> "4 conv";
+}
+
+! acceleration function
+
+// freia opencl includes
+
+// dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+// freia opencl includes
+// generated opencl for function my_convolution_3
+
+// opencl for dag 0
+
+! updated function
+
+freia_status my_convolution_3(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   return freia_aipo_convolution(o, i, k, 3, 3);                        /*0004*/
+}
+
+! cleaned up function
+
+freia_status my_convolution_3(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   return freia_aipo_convolution(o, i, k, 3, 3);                        /*0004*/
 }
 #
 # FREIA COMPILATION DONE

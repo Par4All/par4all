@@ -1,0 +1,4 @@
+setproperty FREIA_ALLOW_IMAGE_SHUFFLE TRUE
+setenv FILE oop.c
+setenv WSPACE oop
+source default_tpips

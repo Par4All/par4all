@@ -21,7 +21,7 @@ echo
 echo Code after dead code elimination
 echo
 
-apply SUPPRESS_DEAD_CODE[main]
+apply SIMPLIFY_CONTROL[main]
 display PRINTED_FILE[main]
 
 echo
@@ -29,8 +29,7 @@ echo Unsplit resulting code
 echo
 apply UNSPLIT
 
-shell cc -c c_unroll1.database/Src/c_unroll1.c
-shell rm -f c_unroll1.o
+shell pips_validation_exe.sh -c -g c_unroll1
 
 close
 delete c_unroll1

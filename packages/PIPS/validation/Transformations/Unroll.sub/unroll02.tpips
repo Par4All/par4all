@@ -61,7 +61,7 @@ echo
 echo Code after suppress dead code for "UNROLL02"
 echo
 
-apply SUPPRESS_DEAD_CODE[UNROLL02]
+apply SIMPLIFY_CONTROL[UNROLL02]
 display PRINTED_FILE[UNROLL02]
 
 echo

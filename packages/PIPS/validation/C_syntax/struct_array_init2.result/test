@@ -51,3 +51,6 @@ Layout for memory area "struct_array_init2!:*STATIC*" of size 0:
 
 End of declarations for module main
 
+#
+# compile generated struct_array_init2
+#
