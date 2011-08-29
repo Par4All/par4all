@@ -77,14 +77,24 @@ static int dagvtx_opencl_priority(const dagvtx * pv1, const dagvtx * pv2)
     return dagvtx_number(v1)-dagvtx_number(v2);
 }
 
-/* @brief perform opencl compilation on mergeable dag
+/* @return opencl type for freia type
  */
+static string opencl_type(string t)
+{
+  if (same_string_p(t, "int32_t")) return "int";
+  pips_internal_error("unexpected type: %s\n", t);
+  return NULL;
+}
+
+/* @brief perform OpenCL compilation on mergeable dag
+   the generated code relies on some freia-provided runtime
+*/
 static int opencl_compile_mergeable_dag(
   string module,
   dag d, list ls,
   string split_name, int n_cut,
   set global_remainings, hash_table signatures,
-  FILE * helper, FILE * opencl, set helpers, int stnb)
+  FILE * helper_file, FILE * opencl_file, set helpers, int stnb)
 {
   string cut_name = strdup(cat(split_name, "_", itoa(n_cut)));
   pips_debug(3, "compiling %s cut %d, %d stats\n",
@@ -101,54 +111,129 @@ static int opencl_compile_mergeable_dag(
   list lparams = NIL;
 
   string_buffer
-    help = string_buffer_make(true),
-    help_body = string_buffer_make(true),
-    opcl = string_buffer_make(true),
-    opcl_body = string_buffer_make(true),
-    opcl_tail = string_buffer_make(true);
+    helper = string_buffer_make(true),
+    helper_decls = string_buffer_make(true),
+    helper_body = string_buffer_make(true),
+    opencl = string_buffer_make(true),
+    opencl_init = string_buffer_make(true),
+    opencl_body = string_buffer_make(true),
+    opencl_tail = string_buffer_make(true),
+    compile = string_buffer_make(true);
 
-  sb_cat(help,
+  sb_cat(helper,
          "\n"
          "// helper function ", cut_name, "\n"
          "freia_status ", cut_name, "(");
-  sb_cat(opcl,
+
+  sb_cat(helper_decls,
+         "  freia_status err = FREIA_OK;\n"
+         "  freia_data2d_opencl *pool= frclTarget.pool;\n");
+
+  int n_outs = gen_length(dag_outputs(d)), n_ins = gen_length(dag_inputs(d));
+
+  // ??? hey, what about vol(cst(3))?
+  pips_assert("some images to process", n_ins+n_outs);
+
+  // set pitch and other stuff... we need an image!
+  string ref = "i0";
+  if (n_outs) ref = "o0";
+  sb_cat(helper_decls,
+         "  int pitch = ", ref, "->row[1] - ", ref, "->row[0];\n"
+         "  size_t workSize[2];\n" // why 2?
+         "  workSize[0] = ", ref, "->heightWa;\n"
+         "  uint32_t bpp = ", ref, "->bpp>>4;\n"
+         "  cl_kernel kernel,\n"
+         "\n"
+         "  // handle on the fly compilation...\n"
+         "  static int to_compile = 1;\n"
+         "\n"
+         "  if (to_compile) {\n"
+         "    freia_status cerr = ", cut_name, "_compile();\n"
+         "    // compilation may have failed\n"
+         "    if (cerr) return cerr;\n"
+         "    to_compile = 0;\n"
+         "  }\n"
+         "\n"
+         "  // now get kernel, which must be there...\n"
+         "  kernel = ", cut_name, "_kernel[bpp];\n");
+
+  sb_cat(opencl,
          "\n"
          "// opencl function ", cut_name, "\n"
-         "kernel ", cut_name, "(");
+         "KERNEL void ", cut_name, "(");
 
-  int n_outs = gen_length(dag_outputs(d));
-  int n_ins = gen_length(dag_inputs(d));
-  int nargs = 0;
-  int n_params = 0;
+  // count stuff in the generated code
+  int nargs = 0, n_params = 0, cl_args = 0;
 
   if (n_outs)
-    sb_cat(opcl_tail, "    // set output pixels\n");
+    sb_cat(opencl_tail, "    // set output pixels\n");
   int i = 0;
   FOREACH(dagvtx, v, dag_outputs(d))
   {
-    sb_cat(help, nargs? ",": "", "\n  " FREIA_IMAGE "o", itoa(i));
-    sb_cat(opcl, nargs? ",": "", "\n  " OPENCL_IMAGE "o", itoa(i));
-    sb_cat(help_body, nargs? ", ": "", "o", itoa(i));
-    // o<out>[i] = t<n>;
-    sb_cat(opcl_tail, "    o", itoa(i), "[i] = t");
-    sb_cat(opcl_tail, itoa((int) dagvtx_number(v)), ";\n");
+    string si = strdup(itoa(i));
+    sb_cat(helper, nargs? ",": "", "\n  " FREIA_IMAGE "o", si);
+    sb_cat(opencl, nargs? ",": "",
+           "\n  " OPENCL_IMAGE "o", si,
+           ",\n  int ofs_o", si);
+    // image p<out> = o<out> + ofs_o<out>;
+    sb_cat(opencl_init,
+           "  " OPENCL_IMAGE "p", si, " = ", "o", si, " + ofs_o", si, ";\n");
+    // sb_cat(helper_body, nargs? ", ": "", "o", itoa(i));
+    sb_cat(helper_body,
+           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
+           ", sizeof(cl_mem), &pool[o", si, "->clId]);\n");
+    cl_args++;
+    sb_cat(helper_body,
+           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
+           ", sizeof(cl_int), &ofs_o", si, ");\n");
+    cl_args++;
+    // p<out>[i] = t<n>;
+    sb_cat(opencl_tail,
+           "    p", si, "[i] = t", itoa((int) dagvtx_number(v)), ";\n");
     nargs++;
+    free(si);
     i++;
   }
 
   if (n_ins)
-    sb_cat(opcl_body, "    // get input pixels\n");
+    sb_cat(opencl_body, "    // get input pixels\n");
   for (i = 0; i<n_ins; i++)
   {
-    sb_cat(help, nargs? ",": "", "\n  const " FREIA_IMAGE "i", itoa(i));
-    sb_cat(opcl, nargs? ",": "", "\n  const " OPENCL_IMAGE "i", itoa(i));
-    sb_cat(help_body, nargs? ", ": "", "i", itoa(i));
-    // pixel in<in> = i<in>[i];
-    sb_cat(opcl_body, "    " OPENCL_PIXEL "in", itoa(i), " = i");
-    sb_cat(opcl_body, itoa(i), "[i];\n");
+    string si = strdup(itoa(i));
+    sb_cat(helper, nargs? ",": "", "\n  const " FREIA_IMAGE "i", si);
+    sb_cat(opencl, nargs? ",": "",
+           "\n  " OPENCL_IMAGE "i", si, ", // const?\n  int ofs_i", si);
+    // image j<in> = i<in> + ofs_i<out>;
+    sb_cat(opencl_init,
+           "  " OPENCL_IMAGE "j", si, " = ", "i", si, " + ofs_i", si, ";\n");
+    // sb_cat(helper_body, nargs? ", ": "", "i", si);
+    sb_cat(helper_body,
+           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
+           ", sizeof(cl_mem), &pool[i", si, "->clId]);\n");
+    cl_args++;
+    sb_cat(helper_body,
+           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
+           ", sizeof(cl_int), &ofs_i", si, ");\n");
+    cl_args++;
+    // pixel in<in> = j<in>[i];
+    sb_cat(opencl_body,
+           "    " OPENCL_PIXEL "in", si, " = j", si, "[i];\n");
     nargs++;
+    free(si);
   }
-  // other arguments to come...
+
+  // size parameters to handle an image row
+  sb_cat(opencl, cl_args? ",": "", "\n  int width,\n  int pitch");
+  sb_cat(helper_body,
+         "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
+         ", sizeof(cl_int), &width);\n");
+  cl_args++;
+  sb_cat(helper_body,
+         "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
+         ", sizeof(cl_int), &pitch);\n");
+  cl_args++;
+
+  // there are possibly other kernel arguments yet to come...
 
   // helper call image arguments
   list limg = NIL;
@@ -158,7 +243,7 @@ static int opencl_compile_mergeable_dag(
     limg = CONS(entity, vtxcontent_out(dagvtx_content(via)), limg);
   limg = gen_nreverse(limg);
 
-  sb_cat(opcl_body, "    // pixel computations\n");
+  sb_cat(opencl_body, "    // pixel computations\n");
 
   // actual computations...
   list vertices = gen_nreverse(gen_copy_seq(dag_vertices(d)));
@@ -180,10 +265,10 @@ static int opencl_compile_mergeable_dag(
     // update for helper call arguments...
     lparams = gen_nconc(lparams,
                         freia_extract_params(opid, call_arguments(c),
-                                             help, opcl, NULL, &nargs));
+                                             helper, opencl, NULL, &nargs));
 
     // pixel t<vertex> = <op>(args...);
-    sb_cat(opcl_body,
+    sb_cat(opencl_body,
            "    " OPENCL_PIXEL "t", itoa((int) dagvtx_number(v)),
            " = ", api->opencl.macro, "(");
 
@@ -193,10 +278,10 @@ static int opencl_compile_mergeable_dag(
     FOREACH(dagvtx, p, preds)
     {
       if (dagvtx_number(p)==0)
-        sb_cat(opcl_body, nao++? ", ": "",
+        sb_cat(opencl_body, nao++? ", ": "",
                "in", itoa(gen_position(p, dag_inputs(d))-1));
       else
-        sb_cat(opcl_body, nao++? ", ": "", "t", itoa(dagvtx_number(p)));
+        sb_cat(opencl_body, nao++? ", ": "", "t", itoa(dagvtx_number(p)));
     }
     gen_free_list(preds), preds = NIL;
 
@@ -204,26 +289,80 @@ static int opencl_compile_mergeable_dag(
     pips_assert("no output parameters", !api->arg_misc_out);
     for (int i=0; i<(int) api->arg_misc_in; i++)
     {
-      sb_cat(help, ",\n  ", api->arg_in_types[i], " c", itoa(n_params));
-      sb_cat(opcl, ",\n  ", api->arg_in_types[i], " c", itoa(n_params));
-      sb_cat(help_body, ", c", itoa(n_params));
-      sb_cat(opcl_body, nao++? ", ": "", "c", itoa(n_params));
+      string sn = strdup(itoa(n_params));
+      sb_cat(helper, ",\n  ", api->arg_in_types[i], " c", sn);
+      sb_cat(opencl, ",\n  ", opencl_type(api->arg_in_types[i]), " c", sn);
+      //sb_cat(helper_body, ", c", sn);
+      sb_cat(helper_body,
+           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
+           ", sizeof(cl_int), &c", sn, ");\n");
+      cl_args++;
+      sb_cat(opencl_body, nao++? ", ": "", "c", sn);
+      free(sn);
       n_params++;
     }
 
-    sb_cat(opcl_body, ");\n");
+    sb_cat(opencl_body, ");\n");
   }
   gen_free_list(vertices), vertices = NIL;
 
   // tail
-  sb_cat(help, ")\n{\n  call opencl kernel ", cut_name, "(");
-  string_buffer_append_sb(help, help_body);
-  sb_cat(help, ");\n  return FREIA_OK;\n}\n");
+  sb_cat(helper, ")\n{\n");
+  string_buffer_append_sb(helper, helper_decls);
+  sb_cat(helper,
+         "\n"
+         "  // set kernel parameters\n");
+  string_buffer_append_sb(helper, helper_body);
+  sb_cat(helper,
+         "\n"
+         "  // call kernel ", cut_name, "\n",
+         "  err |= clEnqueueNDRangeKernel(\n"
+         "            frclTarget.queue,\n"
+         "            kernel,\n"
+         "            1, // number of dimensions\n"
+         "            NULL, // undefined for OpenCL 1.0\n"
+         "            workSize, // x and y dimensions\n"
+         "            NULL, // local size\n"
+         "            0, // don't wait events\n"
+         "            NULL,\n"
+         "            NULL); // do not produce an event\n"
+         "\n"
+         "  return err;\n}\n");
 
-  sb_cat(opcl, ")\n{\n  for (i)\n  {\n");
-  string_buffer_append_sb(opcl, opcl_body);
-  string_buffer_append_sb(opcl, opcl_tail);
-  sb_cat(opcl, "  }\n}\n");
+  sb_cat(opencl, ")\n{\n");
+  string_buffer_append_sb(opencl, opencl_init);
+  sb_cat(opencl,
+         "  int gid = get_global_id(1)*pitch + get_global_id(0);\n"
+         "  int i;\n"
+         "  for (i=gid; i < (gid+width); i++)\n  {\n");
+  string_buffer_append_sb(opencl, opencl_body);
+  string_buffer_append_sb(opencl, opencl_tail);
+  sb_cat(opencl, "  }\n}\n");
+
+  // OpenCL compilation
+  sb_cat(compile,
+         "\n"
+         "// hold kernels for", cut_name, "\n"
+         "static cl_kernel ", cut_name, "_kernel[2];\n"
+         "\n"
+         "// compile kernels for ", cut_name, "\n"
+         "static freia_status ", cut_name, "_compile(void)\n"
+         "{\n"
+         "  // OpenCL source for ", cut_name, "\n"
+         "  const char * ", cut_name, "_source = \"\n",
+         FREIA_OPENCL_CL_INCLUDES);
+  string_buffer_append_sb(compile, opencl);
+  sb_cat(compile,
+         "\";\n"
+         "  freia_status err = FREIA_OK;\n"
+         "  err |= get_compiled_opencl(", cut_name, "_source, \"",
+                              cut_name, "\", \"-DPIXEL8\", &",
+                              cut_name, "_kernel[0]);\n"
+         "  err |= get_compiled_opencl(", cut_name, "_source, \"",
+                              cut_name, "\", \"-DPIXEL16\", &",
+                              cut_name, "_kernel[1]);\n"
+         "  return err;\n"
+         "}\n");
 
   // cleanup compiled statements
   FOREACH(dagvtx, v, dag_vertices(d))
@@ -243,16 +382,20 @@ static int opencl_compile_mergeable_dag(
   hash_put(signatures, local_name_to_top_level_entity(cut_name),
            (void*) (_int) n_outs);
 
-  // actual print
-  string_buffer_to_file(help, helper);
-  string_buffer_to_file(opcl, opencl);
+  // actual printing...
+  string_buffer_to_file(compile, helper_file);
+  string_buffer_to_file(helper, helper_file);
+  string_buffer_to_file(opencl, opencl_file);
 
   // cleanup
-  string_buffer_free(&help);
-  string_buffer_free(&help_body);
-  string_buffer_free(&opcl);
-  string_buffer_free(&opcl_body);
-  string_buffer_free(&opcl_tail);
+  string_buffer_free(&helper);
+  string_buffer_free(&helper_decls);
+  string_buffer_free(&helper_body);
+  string_buffer_free(&compile);
+  string_buffer_free(&opencl);
+  string_buffer_free(&opencl_init);
+  string_buffer_free(&opencl_body);
+  string_buffer_free(&opencl_tail);
 
   free(cut_name);
 
@@ -270,7 +413,7 @@ static void opencl_merge_and_compile(
   int n_split,
   const dag fulld,
   const set output_images,
-  FILE * helper,
+  FILE * helper_file,
   FILE * opencl,
   set helpers,
   hash_table signatures)
@@ -363,7 +506,7 @@ static void opencl_merge_and_compile(
       // and compile!
       stnb = opencl_compile_mergeable_dag
         (module, nd, ls, split_name, n_cut, global_remainings,
-         signatures, helper, opencl, helpers, stnb);
+         signatures, helper_file, opencl, helpers, stnb);
     }
 
     // cleanup initial dag??
@@ -432,10 +575,11 @@ list freia_opencl_compile_calls
   else
   {
     opencl = safe_fopen(opencl_file, "w");
-    fprintf(opencl, FREIA_OPENCL_INCLUDES
-            "// generated opencl for function %s\n", module);
+    fprintf(opencl,
+            FREIA_OPENCL_CL_INCLUDES
+            "// generated OpenCL kernels for function %s\n", module);
   }
-  fprintf(opencl, "\n// opencl for dag %d\n", number);
+  fprintf(opencl, "\n" "// opencl for dag %d\n", number);
 
   // intermediate images
   hash_table init = hash_table_make(hash_pointer, 0);
