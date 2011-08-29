@@ -1,9 +1,0 @@
-delete particle
-create particle particle.c
-
-setproperty CONSTANT_PATH_EFFECTS FALSE
-
-apply ATOMIC_CHAINS (append_int_to_list)
-
-close particle
-
