@@ -10,7 +10,8 @@
 + deal with |= ||= and similars
 + detect redundant operations? replace them with copies?
 + freia_aipo_cast: should it be managed as a copy? as an option
-- aliasing pointers img1 = img2 is not really managed
++ aliasing pointers img1 = img2 is not really managed
+  but are detected
 - images used in the computations must all be "freia_data2d *"
 - what about full expressions: aipo_x() || aipo_y() || aipo_z()? atomizer?
 - check that there are references where expected?
@@ -122,7 +123,7 @@
 - could use terapix-like tiling to help with cache?
   if so, how to tell about the actual image "erosion"?
 - expensive memory accesses => aggregate computations would help?
-- could there be other benefits from a compiler?
++ could there be other benefits from a compiler?
 - use on-demand image transfers in "clever" runtime?
 - MA: what about starpu http://runtime.bordeaux.inria.fr/StarPU/
 
@@ -130,7 +131,7 @@
 - use optimized expression DAG(s) for hardware generation
 
 * general purpose software generation target
-- use optimized DAG
++ use optimized DAG
 - generate tiled code which mimics spoc with its delay lines?
 - also reuse automatic image boundary management with constants?
 - what if something different should be done on boundaries?
