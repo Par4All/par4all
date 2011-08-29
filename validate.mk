@@ -188,7 +188,8 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  echo "broken-directory: $(SUBDIR)/$^" >> $(RESULTS)
 
 # extract validation result for summary when the case was run
-# four possible outcomes: passed, changed, failed, timeout
+# five possible outcomes: passed, changed, failed, timeout, noref
+# noref means there is no reference file for comparison
 # 134 is for pips_internal_error, could allow to distinguish voluntary aborts.
 OK	= status=$$? ; \
 	  if [ "$$status" -eq 203 ] ; then \
@@ -196,7 +197,12 @@ OK	= status=$$? ; \
 	  elif [ "$$status" != 0 ] ; then \
 	   echo "failed: $(SUBDIR)/$* $$SECONDS" ; \
 	  else \
-	    if $(INFO) $*.result/test > /dev/null 2>&1 ; then \
+	    novcref= ; \
+	    $(INFO) $*.result/test > /dev/null 2>&1 || novcref=1 ; \
+	    if [ \( $(TEST) = 'test' -a "$$novcref" \) -o \
+	         \( $(TEST) = 'out' -a ! -e $*.result/test \) ] ; then \
+	      echo "noref: $(SUBDIR)/$* $$SECONDS" ; \
+	    else \
 	      $(DIFF) $*.result/test > $*.diff ; \
 	      if [ -s $*.diff ] ; then \
 	        echo "changed: $(SUBDIR)/$* $$SECONDS" ; \
@@ -204,8 +210,6 @@ OK	= status=$$? ; \
 	        $(RM) $*.err $*.diff ; \
 	        echo "passed: $(SUBDIR)/$* $$SECONDS" ; \
 	      fi ; \
-	    else \
-	      echo "notest: $(SUBDIR)/$* $$SECONDS" ; \
             fi ; \
 	  fi >> $(RESULTS)
 
