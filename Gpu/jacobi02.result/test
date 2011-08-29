@@ -1,0 +1,190 @@
+void p4a_kernel_get_data(float_t space[501][501], int i, int j)
+{
+   space[i][j] = 0;
+}
+void p4a_kernel_iteration(int i, int j, float_t save[501][501], float_t space[501][501])
+{
+
+   save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+}
+void p4a_kernel_iteration_1(int i, int j, float_t save[501][501], float_t space[501][501])
+{
+
+   space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+void p4a_wrapper_get_data(float_t space[501][501], int i, int j)
+{
+   // To be assigned to a call to P4A_vp_0: j
+   p4a_kernel_get_data(space, i, j);
+}
+void p4a_wrapper_iteration(int i, int j, float_t save[501][501], float_t space[501][501])
+{
+   // To be assigned to a call to P4A_vp_1: i
+   // To be assigned to a call to P4A_vp_0: j
+   
+   p4a_kernel_iteration(i, j, save, space);
+}
+void p4a_wrapper_iteration_1(int i, int j, float_t save[501][501], float_t space[501][501])
+{
+   // To be assigned to a call to P4A_vp_1: i
+   // To be assigned to a call to P4A_vp_0: j
+   
+   p4a_kernel_iteration_1(i, j, save, space);
+}
+void p4a_launcher_get_data(float_t space[501][501], int i, int j_0[1])
+{
+   //PIPS generated variable
+   int j;
+   j = *j_0;
+   for(j = 0; j <= 500; j += 1)
+      // To be assigned to a call to P4A_vp_0: j
+      p4a_wrapper_get_data(space, i, j);
+   *j_0 = j;
+}
+void p4a_launcher_iteration(float_t save[501][501], float_t space[501][501])
+{
+   //PIPS generated variable
+   int i, j;
+   
+   /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
+           could use also a flip-flop dimension instead... */
+   for(i = 1; i <= 499; i += 1)
+      for(j = 1; j <= 499; j += 1)
+         // To be assigned to a call to P4A_vp_1: i
+         // To be assigned to a call to P4A_vp_0: j
+         
+         p4a_wrapper_iteration(i, j, save, space);
+}
+void p4a_launcher_iteration_1(float_t save[501][501], float_t space[501][501])
+{
+   //PIPS generated variable
+   int i, j;
+
+   for(i = 1; i <= 499; i += 1)
+      for(j = 1; j <= 499; j += 1)
+         // To be assigned to a call to P4A_vp_1: i
+         // To be assigned to a call to P4A_vp_0: j
+         
+         p4a_wrapper_iteration_1(i, j, save, space);
+}
+void get_data(char filename[])
+{
+   int i, j, nx, ny;
+   unsigned char c;
+   FILE *fp;
+   if ((fp = fopen(filename, "r"))==(void *) 0) {
+      perror("Error loading file");
+      exit(0);
+   }
+   
+   /* Get *.pgm file type */
+   c = fgetc(fp);
+   c = fgetc(fp);
+   do {
+      while ((c = fgetc(fp))!='\n')
+         ;
+   }
+   while ((c = fgetc(fp))=='#');
+   
+   /* Put back good char */
+   ungetc(c, fp);
+   
+   /* Get image dimensions */
+   fscanf(fp, "%d %d\n", &nx, &ny);
+   /* Get grey levels */
+   fscanf(fp, "%d", &i);
+   /* Get ONE carriage return */
+   fgetc(fp);
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
+   
+   /* Erase the memory, in case the image is not big enough: */
+   for(i = 0; i <= 500; i += 1) {
+      //PIPS generated variable
+      float_t (*P4A_var_space0)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &P4A_var_space0, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
+
+      p4a_launcher_get_data(*P4A_var_space0, i, &j);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
+      P4A_accel_free(P4A_var_space0);
+   }
+   
+   /* Read the pixel grey value: */
+   for(j = 0; j <= ny-1; j += 1)
+      for(i = 0; i <= nx-1; i += 1) {
+         c = fgetc(fp);
+         /* Truncate the image if too big: */
+         if (i<501&&j<501)
+            space[i][j] = c;
+      }
+
+   fclose(fp);
+}
+void iteration(float_t space[501][501], float_t save[501][501])
+{
+   int i, j;
+   {
+      //PIPS generated variable
+      float_t (*P4A_var_save0)[501][501] = (float_t (*)[501][501]) 0, (*P4A_var_space0)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &P4A_var_space0, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &P4A_var_save0, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
+
+      
+      /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
+           could use also a flip-flop dimension instead... */
+      p4a_launcher_iteration(*P4A_var_save0, *P4A_var_space0);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
+      P4A_accel_free(P4A_var_space0);
+      P4A_accel_free(P4A_var_save0);
+   }
+   {
+      //PIPS generated variable
+      float_t (*P4A_var_save1)[501][501] = (float_t (*)[501][501]) 0, (*P4A_var_space1)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &P4A_var_space1, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &P4A_var_save1, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save1);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
+
+
+      p4a_launcher_iteration_1(*P4A_var_save1, *P4A_var_space1);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
+      P4A_accel_free(P4A_var_space1);
+      P4A_accel_free(P4A_var_save1);
+   }
+}
+void iteration(float_t space[501][501], float_t save[501][501])
+{
+   int i, j;
+   {
+      //PIPS generated variable
+      float_t (*P4A_var_save0)[501][501] = (float_t (*)[501][501]) 0, (*P4A_var_space0)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &P4A_var_space0, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &P4A_var_save0, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space0);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
+
+      
+      /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
+           could use also a flip-flop dimension instead... */
+      p4a_launcher_iteration(*P4A_var_save0, *P4A_var_space0);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save0);
+      P4A_accel_free(P4A_var_space0);
+      P4A_accel_free(P4A_var_save0);
+   }
+   {
+      //PIPS generated variable
+      float_t (*P4A_var_save1)[501][501] = (float_t (*)[501][501]) 0, (*P4A_var_space1)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &P4A_var_space1, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &P4A_var_save1, sizeof(float)*251001);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *P4A_var_save1);
+      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
+
+
+      p4a_launcher_iteration_1(*P4A_var_save1, *P4A_var_space1);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *P4A_var_space1);
+      P4A_accel_free(P4A_var_space1);
+      P4A_accel_free(P4A_var_save1);
+   }
+}
