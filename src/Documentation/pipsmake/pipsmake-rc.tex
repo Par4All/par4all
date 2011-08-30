@@ -3573,9 +3573,11 @@ available.
 \index{Intraprocedural Summary Precondition}
 \index{Precondition (Summary)}
 
+\begin{PipsPass}{intraprocedural_summary_precondition}
 A summary precondition is of type "transformer", but the argument list
 must be empty as it is a simple predicate on the initial state. So in fact
 it is a state predicate.
+\end{PipsPass}
 
 The intraprocedural summary precondition uses DATA statement for the main
 module and is the TRUE constant for all other modules.
@@ -7458,6 +7460,11 @@ You may want to skip loop bounds from the grouping
 GROUP_CONSTANTS_SKIP_LOOP_RANGE FALSE
 \end{PipsProp}
 
+You may want to skip litterals too.
+\begin{PipsProp}{GROUP_CONSTANTS_LITERAL}
+GROUP_CONSTANTS_LITERAL TRUE
+\end{PipsProp}
+
 
 
 \begin{PipsPass}{normalize_microcode}
@@ -7474,6 +7481,18 @@ normalize_microcode				> MODULE.code
         < MODULE.callers
         < MODULE.cumulated_effects
 \end{PipsMake}
+\begin{PipsPass}{terapix_warmup}
+  normalize array access in a loop nest for terapixification.
+\end{PipsPass}
+
+This pass is meaningless for any other target :(.
+
+\begin{PipsMake}
+terapix_warmup > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
 \begin{PipsPass}{terapix_remove_divide}
  converts divide operator into multiply operator using formula
   $a/cste = a* (1/b) \simeq a * ( 128 / cste ) / 128$
@@ -9946,8 +9965,7 @@ COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \begin{PipsPass}{icm}
 Performs invariant code motion over sub expressions
 \end{PipsPass}
-It is required to set \PipsPropRef{MASK_EFFECTS_ON_PRIVATE_VARIABLES} to
-FALSE when computing effects needed by this pass.
+
 
 %-----------End of Expression Transformations -------------------------
 

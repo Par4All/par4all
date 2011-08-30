@@ -60,6 +60,11 @@ static bool do_solve_hardware_constraints_on_nb_proc(entity e, statement s) {
     list read_regions = regions_read_regions(regions);
     list write_regions = regions_write_regions(regions);
     transformer tr = transformer_range(load_statement_precondition(s));
+    /* add a new constraint to the system */
+    Pvecteur pv = vect_new(e,-1);
+    vect_add_elem(&pv,TCST,3);
+    sc_add_inegalite(predicate_system(transformer_relation(tr)),
+            contrainte_make(pv));
 
     set visited_entities = set_make(set_pointer);
 
@@ -181,7 +186,7 @@ static bool do_solve_hardware_constraints_on_volume(entity unknown, statement s)
 
                 region hregion = rw_region;//region_hypercube(rw_region);
                 Ppolynome p = region_enumerate(hregion);
-                if(p) {
+                if(!POLYNOME_UNDEFINED_P(p)) {
                     polynome_add(&volume_used,p);
                     polynome_rm(&p);
                 }

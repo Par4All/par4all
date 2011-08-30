@@ -46,10 +46,12 @@
 #include "control.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
+#include "alias-classes.h"
 #include "effects-convex.h"
 #include "expressions.h"
 #include "callgraph.h"
 #include "text-util.h"
+#include "transformations.h"
 #include "parser_private.h"
 #include "accel-util.h"
 
@@ -127,6 +129,7 @@ bool  entity_used_in_loop_bound_p(entity e)
 #define TERAPIX_MASK_PREFIX "ma"
 #define TERAPIX_REGISTER_PREFIX "re"
 
+
 static bool terapix_renamed_local_p(const char* s, const char* prefix)
 {
     string found = strstr(s,prefix);
@@ -142,6 +145,9 @@ static bool terapix_renamed_local_p(const char* s, const char* prefix)
 static bool terapix_renamed_entity_p(entity e, const char* prefix) {
     return terapix_renamed_local_p(entity_local_name(e),prefix);
 }
+static bool terapix_mask_entity_p(entity e) {
+    return terapix_renamed_entity_p(e,TERAPIX_MASK_PREFIX);
+}
 
 static bool terapix_renamed_p(const char *s)
 {
@@ -153,10 +159,10 @@ static bool terapix_renamed_p(const char *s)
 }
 
 static
-void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt)
+void do_terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt,bool force)
 {
     /* change parameter name and generate an assignment */
-    if(arg_prefix && !terapix_renamed_p(entity_user_name(e)) ) {
+    if(arg_prefix && (force || !terapix_renamed_p(entity_user_name(e))) ) {
         string new_name;
         asprintf(&new_name,"%s" MODULE_SEP_STRING  "%s%zd",entity_module_name(e),arg_prefix,(*arg_cnt)++);
         entity ne = make_entity_copy_with_new_name(e,new_name,false);
@@ -197,7 +203,7 @@ void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,strin
     }
 
     /* to respect terapix asm, we also have to change the name of variable e */
-    if(ass_prefix && !terapix_renamed_p(entity_user_name(e))) {
+    if(ass_prefix && (force ||!terapix_renamed_p(entity_user_name(e)))) {
         string new_name;
         asprintf(&new_name,"%s" MODULE_SEP_STRING "%s%zd",entity_module_name(e),ass_prefix,(*ass_cnt)++);
         entity ne = make_entity_copy_with_new_name(e,new_name,false);
@@ -205,6 +211,12 @@ void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,strin
         free(new_name);
         replace_entity(get_current_module_statement(),e,ne);
     }
+}
+static void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt) {
+    do_terapix_argument_handler(e,arg_prefix,arg_cnt,ass_prefix,ass_cnt,false);
+}
+static void force_terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt) {
+    do_terapix_argument_handler(e,arg_prefix,arg_cnt,ass_prefix,ass_cnt,true);
 }
 
 static
@@ -305,6 +317,305 @@ static void normalize_microcode_parameter_orders(entity module) {
     sort_parameters(module,compare_formal_parameters);
 }
 
+typedef struct {
+    entity ref;
+    bool res;
+} context;
+
+static void do_terapix_pointer_initialized_from_a_mask_p(call c,context * ctxt) {
+    entity op = call_function(c);
+    if(ENTITY_ASSIGN_P(op)) {
+        expression lhs = binary_call_lhs(c),
+                   rhs = binary_call_rhs(c);
+        if(expression_pointer_p(lhs)) {
+            reference r = expression_reference(lhs);
+            if(same_entity_p(reference_variable(r),ctxt->ref)) {
+                /* check that lhs only contains reference to mask */
+                set s = get_referenced_entities(rhs);
+                bool only_mask = true,
+                     at_least_one_mask = false;
+                SET_FOREACH(entity,e,s) {
+                    if(terapix_mask_entity_p(e)) {
+                        at_least_one_mask=true;
+                    }
+                    else
+                        only_mask=false;
+                }
+                set_free(s);
+                ctxt->res = only_mask && at_least_one_mask;
+                gen_recurse_stop(0);
+            }
+        }
+    }
+}
+
+static bool terapix_pointer_initialized_from_a_mask_p(entity e) {
+    context c = { .ref=e, .res=false };
+    gen_context_recurse(get_current_module_statement(),&c,
+            call_domain,gen_true,do_terapix_pointer_initialized_from_a_mask_p);
+    return c.res;
+}
+
+/* a test is normalized when it is in the form a>0 */
+static void terapix_normalize_tests(call c) {
+    entity op = call_function(c);
+    if(ENTITY_CONDITIONAL_P(op)) {
+        expression cond = binary_call_lhs(c);
+        if(expression_call_p(cond)) {
+            call c = expression_call(cond);
+            entity op = call_function(c);
+            if(ENTITY_GREATER_THAN_P(op)) {
+                expression etmp = MakeBinaryCall(
+                        entity_intrinsic(MINUS_OPERATOR_NAME),
+                        copy_expression(binary_call_lhs(c)),
+                        copy_expression(binary_call_rhs(c))
+                        );
+                    update_expression_syntax(binary_call_lhs(c),
+                            copy_syntax(expression_syntax(etmp))
+                            );
+                free_expression(etmp);
+            }
+            else if(ENTITY_LESS_THAN_P(op)) {
+                expression etmp = MakeBinaryCall(
+                        entity_intrinsic(MINUS_OPERATOR_NAME),
+                        copy_expression(binary_call_rhs(c)),
+                        copy_expression(binary_call_lhs(c))
+                        );
+                call_function(c)=entity_intrinsic(GREATER_THAN_OPERATOR_NAME);
+                update_expression_syntax(binary_call_lhs(c),
+                        copy_syntax(expression_syntax(etmp)));
+                free_expression(etmp);
+            }
+            else
+                pips_internal_error("case not handled yet\n");
+        }
+        else
+            pips_internal_error("does not know how to handle this conditional");
+    }
+}
+
+static void terapixify_loop_purge(statement s, entity e) {
+    if(statement_call_p(s)) {
+        set re = get_referenced_entities(s);
+        if(set_belong_p(re,e)) {
+            update_statement_instruction(s,make_continue_instruction());
+        }
+        set_free(re);
+    }
+}
+
+
+void normalize_microcode_anotate() {
+    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,get_current_module_name(), true));
+    /* there should be only one caller */
+    string caller = STRING(CAR(callers));
+    /* Eeny, meeny, miny, moe */
+    FOREACH(entity,fa, module_formal_parameters(get_current_module_entity())) {
+        if(entity_pointer_p(fa)) {
+            const char* fa_name = entity_user_name(fa);
+            entity caller_faname = FindEntity(caller,fa_name);
+            if(entity_undefined_p(caller_faname)){
+                string tmp=strdup(fa_name);
+                tmp[strlen(tmp)-1]=0;
+                caller_faname = FindEntity(caller,tmp);
+                free(tmp);
+            }
+            pips_assert("parameter found",!entity_undefined_p(caller_faname));
+            /* get ready for annotation insertion */
+            string pragma;
+            asprintf(&pragma,"terapix %s",  fa_name);
+            FOREACH(DIMENSION, d, variable_dimensions(type_variable(entity_type(caller_faname)))) {
+                string tmp = pragma;
+                asprintf(&pragma,"%s %d",pragma, dimension_size(d));
+                free(tmp);
+            }
+            add_pragma_str_to_statement(
+                    STATEMENT(CAR(statement_block(get_current_module_statement()))),
+                    pragma,false);
+        }
+    }
+}
+
+/* if only one register is ever written by a sequence of assignment, take advantage of it */
+static void terapix_optimize_accumulator(statement st) {
+    if(statement_block_p(st)) {
+        /* first ensure it's a sequence of assignment */
+        FOREACH(STATEMENT,s,statement_block(st))
+            if(!assignment_statement_p(s) && !continue_statement_p(s) )
+                return;
+        /* then check that the written register is always the same */
+        entity reg=entity_undefined;
+        FOREACH(STATEMENT,s,statement_block(st)) {
+            if(!continue_statement_p(s)) {
+                expression lhs = binary_call_lhs(statement_call(s));
+                entity scalar = expression_int_scalar(lhs);
+                if(entity_undefined_p(scalar))
+                    continue;
+                if(entity_undefined_p(reg))
+                    reg=scalar;
+                else if(!same_entity_p(reg,scalar))
+                    return;
+            }
+        }
+        /* finally, rename this entity as the accumulator P */
+#define TERAPIX_ACC "P"
+        entity P = FindEntity(get_current_module_name(),TERAPIX_ACC);
+        if(entity_undefined_p(P)) {
+            P=make_scalar_entity(TERAPIX_ACC,get_current_module_name(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
+            AddEntityToCurrentModule(P);
+        }
+        replace_entity(st,reg,P);
+    }
+}
+
+typedef struct {
+    entity iterator;
+    bool plus;
+    bool success;
+} tlo_context_t ;
+
+static bool do_terapix_loop_optimizer(call c, tlo_context_t *ctxt) {
+    if(ENTITY_DEREFERENCING_P(call_function(c))) {
+        expression exp = binary_call_lhs(c);
+        if(expression_reference_p(exp) && same_entity_p(expression_to_entity(exp),ctxt->iterator)) {
+            update_expression_syntax(exp,
+                    make_syntax_call(
+                        make_call(
+                            entity_intrinsic(ctxt->plus?PRE_INCREMENT_OPERATOR_NAME:PRE_DECREMENT_OPERATOR_NAME),
+                            CONS(EXPRESSION,copy_expression(exp),NIL)
+                            )
+                        )
+                    );
+            ctxt->success=true;
+            gen_recurse_stop(0);
+        }
+    }
+    return true;
+}
+
+void terapix_loop_optimizer(statement st) {
+    if(statement_loop_p(st)) {
+        loop l =statement_loop(st);
+
+        statement sb = loop_body(l);
+        entity fake = make_new_scalar_variable(get_current_module_entity(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
+        AddLocalEntityToDeclarations(fake,get_current_module_entity(),sb);
+        if(statement_block_p(sb)) {
+            list block = statement_block(sb);
+            list bblock = gen_nreverse(gen_copy_seq(block));
+            list added = NIL;
+
+            /* look for iterators from the end */
+            FOREACH(STATEMENT,s,bblock) {
+                if(assignment_statement_p(s)) {
+                    call c = statement_call(s);
+                    expression lhs = binary_call_lhs(c),
+                               rhs = binary_call_rhs(c);
+                    if(expression_call_p(rhs)) {
+                        call c = expression_call(rhs);
+                        entity op = call_function(c);
+                        if(ENTITY_PLUS_C_P(op) || ENTITY_MINUS_C_P(op)) {
+                            bool plus = ENTITY_PLUS_C_P(op);
+                            intptr_t step;
+                            if(expression_equal_p(binary_call_lhs(c),lhs) &&
+                                    expression_integer_value(binary_call_rhs(c),&step)&&step==1) {
+                                entity iterator = expression_to_entity(lhs);
+                                statement copy = copy_statement(s);
+                                call_function(expression_call(binary_call_rhs(statement_call(copy))))=
+                                    entity_intrinsic(plus?MINUS_C_OPERATOR_NAME:PLUS_C_OPERATOR_NAME);
+
+                                gen_remove(&block,s);
+                                /* now try to hide the iteration in a pointer access somewhere */
+                                tlo_context_t ctxt = {iterator,plus,false };
+                                FOREACH(STATEMENT,ss,block) {
+                                    set re = get_referenced_entities(ss);
+                                    if(set_belong_p(re,iterator)) {
+                                        gen_context_recurse(ss,&ctxt,call_domain,do_terapix_loop_optimizer,gen_null);
+                                        if(ctxt.success) {
+                                            set_free(re);
+                                            break;
+                                        }
+                                    }
+                                    set_free(re);
+                                }
+                                if(!ctxt.success)
+                                    block=CONS(STATEMENT,s,block);
+                                else
+                                    free_statement(s);
+                                added=CONS(STATEMENT,copy,added);
+                                continue;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            sequence_statements(statement_sequence(sb))=block;
+            gen_free_list(bblock);
+            if(!ENDP(added)) {
+                added=gen_nreverse(added);
+                insert_statement(st,make_block_statement(added),true);
+            }
+        }
+    }
+}
+
+static void terapixify_loops(statement s) {
+    if(statement_loop_p(s)) {
+        loop l =statement_loop(s);
+        entity index = loop_index(l);
+        range r = loop_range(l);
+        if(expression_constant_p(range_upper(r)) &&
+                expression_constant_p(range_lower(r)) &&
+                expression_constant_p(range_increment(r))) {
+            full_loop_unroll(s);
+            if(statement_block_p(s)) {
+                list block = statement_block(s);
+                list bblock= gen_copy_seq(block);
+                /* look for iterators */
+                for(list iter = bblock; !ENDP(iter) ; POP(iter)) {
+                    statement s = STATEMENT(CAR(iter));
+                    if(assignment_statement_p(s)) {
+                        call c = statement_call(s);
+                        expression lhs = binary_call_lhs(c),
+                                   rhs = binary_call_rhs(c);
+                        if(expression_call_p(rhs)) {
+                            call c = expression_call(rhs);
+                            entity op = call_function(c);
+                            if(ENTITY_PLUS_C_P(op) || ENTITY_MINUS_C_P(op)) {
+                                bool plus = ENTITY_PLUS_C_P(op);
+                                intptr_t step;
+                                if(expression_equal_p(binary_call_lhs(c),lhs) &&
+                                        expression_integer_value(binary_call_rhs(c),&step)&&step==1) {
+                                    entity iterator = expression_to_entity(lhs);
+                                    /* now try to hide the iteration in a pointer access somewhere */
+                                    tlo_context_t ctxt = {iterator,plus,false };
+                                    FOREACH(STATEMENT,ss,iter) {
+                                        set re = get_referenced_entities(ss);
+                                        if(set_belong_p(re,iterator)) {
+                                            gen_context_recurse(ss,&ctxt,call_domain,do_terapix_loop_optimizer,gen_null);
+                                            if(ctxt.success) {
+                                                set_free(re);
+                                                break;
+                                            }
+                                        }
+                                        set_free(re);
+                                    }
+                                    /* be optimistic: even if we failed, remove the iterator */
+                                    gen_remove(&block,s);
+                                    free_statement(s);
+                                }
+                            }
+                        }
+                    }
+                }
+                gen_free_list(bblock);
+                gen_context_recurse(s, index, statement_domain, gen_true,terapixify_loop_purge);
+            }
+        }
+    }
+}
+
 bool normalize_microcode( char * module_name)
 {
     bool can_terapixify =true;
@@ -327,18 +638,29 @@ bool normalize_microcode( char * module_name)
             expression_domain,can_terapixify_expression_p,gen_null,
             NULL);
 
+    /* unroll some loops with constant trip count */
+    gen_recurse(get_current_module_statement(),statement_domain, gen_true, terapixify_loops);
+    clean_up_sequences(get_current_module_statement());
+
+    /* reorder some loops */
+    gen_recurse(get_current_module_statement(),statement_domain,gen_true,terapix_loop_optimizer);
+
+
+    /* detect initial array sizes */
+    normalize_microcode_anotate();
 
     /* now, try to guess the goal of the parameters
-     * - parameters are 16 bits signed integers (TODO)
+     * - parameters are 32 bits signed integers (TODO)
      * - read-only arrays might be mask, but can also be images (depend of their size ?)
      * - written arrays must be images
      * - integer are loop parameters
-     * - others are not allowded
+     * - others are not allowed
      */
-    size_t nb_fifo = 0;
-    size_t nb_lu = 0;
-    size_t nb_ptr = 0;
-    size_t nb_re = 0;
+    size_t nb_fifo = 1;
+    size_t nb_lu = 1;
+    size_t nb_ptr = 1;
+    size_t nb_ma = 1;
+    size_t nb_re = 5;/* reserve some register for internal use */
     FOREACH(ENTITY,e,entity_declarations(get_current_module_entity()))
     {
         if(!entity_area_p(e))
@@ -435,30 +757,43 @@ bool normalize_microcode( char * module_name)
                     gen_free_list(callers_statement);
 
                     printf("%s seems a mask\n",entity_user_name(e));
-                    terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,TERAPIX_MASK_PREFIX,&nb_ptr);
+                    terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,TERAPIX_MASK_PREFIX,&nb_ma);
                 }
             }
-            else if( basic_pointer_p(vb) ) /* it's a pointer */
+            else if( basic_pointer_p(vb) ) {
                 terapix_argument_handler(e,NULL,NULL,TERAPIX_IMAGE_PREFIX,&nb_ptr);
-            else if( entity_scalar_p(e))
+            } else if( entity_scalar_p(e))
                 terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
             else
-                terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,TERAPIX_MASK_PREFIX,&nb_ptr);
+                terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,TERAPIX_MASK_PREFIX,&nb_ma);
         }
     }
 
     /* rename all declared entities using terasm convention*/
-    FOREACH(ENTITY,e,statement_declarations(get_current_module_statement()))
-    {
-        if(entity_variable_p(e))
+    list tmp = gen_copy_seq(statement_declarations(get_current_module_statement()));
+    bool stop=true;
+    do {
+        stop=true;
+        /* need a copy otherwise goes in infinite loop */
+        FOREACH(ENTITY,e,tmp)
         {
-            variable v = type_variable(entity_type(e));
-            if( basic_pointer_p(variable_basic(v)) ) /* it's a pointer */
-                terapix_argument_handler(e,NULL,NULL,TERAPIX_IMAGE_PREFIX,&nb_ptr);
-            else if( basic_int_p(variable_basic(v))) /* it's an int */
-                terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
+            if(entity_variable_p(e))
+            {
+                variable v = type_variable(entity_type(e));
+                if( basic_pointer_p(variable_basic(v)) ) {/* it's a pointer */
+                    if(terapix_pointer_initialized_from_a_mask_p(e)) {
+                        force_terapix_argument_handler(e,NULL,NULL,TERAPIX_MASK_PREFIX,&nb_ma);
+                        stop=false;
+                    }
+                    else
+                        terapix_argument_handler(e,NULL,NULL,TERAPIX_IMAGE_PREFIX,&nb_ptr);
+                }
+                else if( basic_int_p(variable_basic(v))) /* it's an int */
+                    terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
+            }
         }
-    }
+    } while(!stop);
+    gen_free_list(tmp);
 
     /* reorder arguments to match terapix conventions */
     normalize_microcode_parameter_orders(get_current_module_entity());
@@ -473,8 +808,14 @@ bool normalize_microcode( char * module_name)
         gen_context_recurse(get_current_module_statement(),&p,statement_domain,gen_true,terapix_loop_handler);
     }
 
-    gen_recurse(get_current_module_statement(),statement_domain,gen_true,statement_remove_extensions);
     gen_recurse(get_current_module_statement(),statement_domain,gen_true,statement_remove_useless_label);
+
+    /* normalize test */
+    gen_recurse(get_current_module_statement(),call_domain,gen_true,terapix_normalize_tests);
+
+    /* try some simple optimizations */
+    clean_up_sequences(get_current_module_statement());
+    gen_recurse(get_current_module_statement(),statement_domain,gen_true,terapix_optimize_accumulator);
 
 
     /* validate */
@@ -486,6 +827,94 @@ bool normalize_microcode( char * module_name)
     reset_current_module_statement();
     reset_cumulated_rw_effects();
     return true || can_terapixify;
+}
+static entity tw_loop_index;
+static void do_terapix_warmup_patching(reference r, entity e) {
+    if(same_entity_p(e,reference_variable(r))) {
+        variable v = type_variable(entity_type(e));
+        dimension d1=DIMENSION(CAR(CDR(variable_dimensions(v))));
+        expression *index0 = (expression*)REFCAR(reference_indices(r));
+        NORMALIZE_EXPRESSION(*index0);
+        normalized n = expression_normalized(*index0);
+        if(normalized_linear_p(n)) {
+            for(Pvecteur piter = normalized_linear(n);
+                    !VECTEUR_NUL_P(piter);
+                    piter=vecteur_succ(piter)) {
+
+                if(vecteur_var(piter)!=tw_loop_index) {
+                    Value offset = vecteur_val(piter);
+                    if(offset!=VALUE_ZERO) {
+                        Pvecteur opv = vect_new(vecteur_var(piter),offset);
+                        expression eoffset = Pvecteur_to_expression(opv),
+                                   Eoffset = copy_expression(eoffset);
+                        vect_rm(opv);
+                        eoffset=MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+                                SizeOfDimension(d1),
+                                eoffset);
+                        *index0=make_op_exp(MINUS_OPERATOR_NAME,*index0,Eoffset);
+                        expression * index1 = (expression*)REFCAR(CDR(reference_indices(r)));
+                        *index1=MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+                                *index1,
+                                eoffset);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* make sure s is of the form 
+ * decl
+ * loop nest
+ *
+ * and then assume each array is a 2+ dimensional array and make sure there is no constant in the first array index. That's all.
+ */
+static bool do_terapix_warmup(statement top) {
+    if(statement_block_p(top)) {
+        FOREACH(STATEMENT,s, statement_block(top)) {
+            if(declaration_statement_p(s)) continue;
+            else if(statement_loop_p(s)) {
+                loop l =statement_loop(s);
+                tw_loop_index = loop_index(l);
+                set re = get_referenced_entities(loop_body(l));
+                list arrays = NIL;
+                SET_FOREACH(entity, e, re) {
+                    if(entity_array_p(e) && gen_length(variable_dimensions(
+                                    type_variable(entity_type(e))))>1) {
+                        arrays=CONS(ENTITY,e,arrays);
+                    }
+                }
+                set_free(re);
+                FOREACH(ENTITY,e,arrays) {
+                    gen_context_recurse(l,e,reference_domain,gen_true,do_terapix_warmup_patching);
+                }
+                gen_free_list(arrays);
+                return true;
+            }
+            else break;
+        }
+    }
+    return false;
+}
+
+bool terapix_warmup(const char * module_name) {
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+
+    /* go go power rangers */
+    bool can_terapixify =
+        do_terapix_warmup(get_current_module_statement());
+    
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    return  can_terapixify;
+
 }
 
 /** 
