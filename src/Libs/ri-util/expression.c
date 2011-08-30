@@ -1167,6 +1167,15 @@ void print_expression(expression e)
     }
 }
 
+string expression_to_string(expression e) {
+    list l = words_expression(e,NIL) ;
+    string out = words_to_string(l);
+    FOREACH(STRING,w,l) free(w);
+    gen_free_list(l);
+    return out;
+}
+
+
 void print_expressions(list le)
 {
 
