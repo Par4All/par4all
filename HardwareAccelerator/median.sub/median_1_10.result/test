@@ -1944,8 +1944,7 @@ static freia_status median_1_helper_0_0_1_compile(void)
     "    // set output pixels\n"
     "    p0[i] = t35;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(median_1_helper_0_0_1_source, "median_1_helper_0_0_1", "-DPIXEL8", &median_1_helper_0_0_1_kernel[0]);
   err |= freia_op_compile_kernel(median_1_helper_0_0_1_source, "median_1_helper_0_0_1", "-DPIXEL16", &median_1_helper_0_0_1_kernel[1]);

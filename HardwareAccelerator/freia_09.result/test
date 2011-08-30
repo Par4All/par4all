@@ -1020,8 +1020,7 @@ static freia_status freia_09_helper_0_0_0_compile(void)
     "    // set output pixels\n"
     "    p0[i] = t31;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_09_helper_0_0_0_source, "freia_09_helper_0_0_0", "-DPIXEL8", &freia_09_helper_0_0_0_kernel[0]);
   err |= freia_op_compile_kernel(freia_09_helper_0_0_0_source, "freia_09_helper_0_0_0", "-DPIXEL16", &freia_09_helper_0_0_0_kernel[1]);

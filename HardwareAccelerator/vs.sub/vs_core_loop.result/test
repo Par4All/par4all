@@ -3827,8 +3827,7 @@ static freia_status vs_core_loop_helper_3_0_0_compile(void)
     "    p0[i] = t87;\n"
     "    p1[i] = t94;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(vs_core_loop_helper_3_0_0_source, "vs_core_loop_helper_3_0_0", "-DPIXEL8", &vs_core_loop_helper_3_0_0_kernel[0]);
   err |= freia_op_compile_kernel(vs_core_loop_helper_3_0_0_source, "vs_core_loop_helper_3_0_0", "-DPIXEL16", &vs_core_loop_helper_3_0_0_kernel[1]);
@@ -3950,8 +3949,7 @@ static freia_status vs_core_loop_helper_3_1_1_compile(void)
     "    // set output pixels\n"
     "    p0[i] = t120;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(vs_core_loop_helper_3_1_1_source, "vs_core_loop_helper_3_1_1", "-DPIXEL8", &vs_core_loop_helper_3_1_1_kernel[0]);
   err |= freia_op_compile_kernel(vs_core_loop_helper_3_1_1_source, "vs_core_loop_helper_3_1_1", "-DPIXEL16", &vs_core_loop_helper_3_1_1_kernel[1]);

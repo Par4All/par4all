@@ -2279,8 +2279,7 @@ static freia_status freia_scalar_07_helper_0_1_1_compile(void)
     "    p0[i] = t26;\n"
     "    p1[i] = t29;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_scalar_07_helper_0_1_1_source, "freia_scalar_07_helper_0_1_1", "-DPIXEL8", &freia_scalar_07_helper_0_1_1_kernel[0]);
   err |= freia_op_compile_kernel(freia_scalar_07_helper_0_1_1_source, "freia_scalar_07_helper_0_1_1", "-DPIXEL16", &freia_scalar_07_helper_0_1_1_kernel[1]);

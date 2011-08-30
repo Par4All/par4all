@@ -18627,8 +18627,7 @@ static freia_status freia_52_helper_0_8_1_compile(void)
     "    // set output pixels\n"
     "    p0[i] = t636;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_52_helper_0_8_1_source, "freia_52_helper_0_8_1", "-DPIXEL8", &freia_52_helper_0_8_1_kernel[0]);
   err |= freia_op_compile_kernel(freia_52_helper_0_8_1_source, "freia_52_helper_0_8_1", "-DPIXEL16", &freia_52_helper_0_8_1_kernel[1]);
@@ -18730,8 +18729,7 @@ static freia_status freia_52_helper_0_14_1_compile(void)
     "    // set output pixels\n"
     "    p0[i] = t861;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_52_helper_0_14_1_source, "freia_52_helper_0_14_1", "-DPIXEL8", &freia_52_helper_0_14_1_kernel[0]);
   err |= freia_op_compile_kernel(freia_52_helper_0_14_1_source, "freia_52_helper_0_14_1", "-DPIXEL16", &freia_52_helper_0_14_1_kernel[1]);
@@ -18836,8 +18834,7 @@ static freia_status freia_52_helper_2_0_0_compile(void)
     "    // set output pixels\n"
     "    p0[i] = t887;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_52_helper_2_0_0_source, "freia_52_helper_2_0_0", "-DPIXEL8", &freia_52_helper_2_0_0_kernel[0]);
   err |= freia_op_compile_kernel(freia_52_helper_2_0_0_source, "freia_52_helper_2_0_0", "-DPIXEL16", &freia_52_helper_2_0_0_kernel[1]);

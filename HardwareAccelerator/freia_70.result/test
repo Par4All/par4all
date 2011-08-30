@@ -1735,8 +1735,7 @@ static freia_status freia_70_helper_0_0_2_compile(void)
     "    // set output pixels\n"
     "    p0[i] = t52;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_70_helper_0_0_2_source, "freia_70_helper_0_0_2", "-DPIXEL8", &freia_70_helper_0_0_2_kernel[0]);
   err |= freia_op_compile_kernel(freia_70_helper_0_0_2_source, "freia_70_helper_0_0_2", "-DPIXEL16", &freia_70_helper_0_0_2_kernel[1]);

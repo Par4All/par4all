@@ -1354,8 +1354,7 @@ static freia_status copy_00_helper_0_0_1_compile(void)
     "    p0[i] = t22;\n"
     "    p1[i] = t27;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(copy_00_helper_0_0_1_source, "copy_00_helper_0_0_1", "-DPIXEL8", &copy_00_helper_0_0_1_kernel[0]);
   err |= freia_op_compile_kernel(copy_00_helper_0_0_1_source, "copy_00_helper_0_0_1", "-DPIXEL16", &copy_00_helper_0_0_1_kernel[1]);

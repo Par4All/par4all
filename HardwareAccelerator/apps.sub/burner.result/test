@@ -33902,8 +33902,7 @@ static freia_status main_helper_1_0_1_compile(void)
     "    p0[i] = t460;\n"
     "    p1[i] = t461;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_helper_1_0_1_source, "main_helper_1_0_1", "-DPIXEL8", &main_helper_1_0_1_kernel[0]);
   err |= freia_op_compile_kernel(main_helper_1_0_1_source, "main_helper_1_0_1", "-DPIXEL16", &main_helper_1_0_1_kernel[1]);
@@ -34016,8 +34015,7 @@ static freia_status main_helper_1_0_3_compile(void)
     "    // set output pixels\n"
     "    p0[i] = t469;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_helper_1_0_3_source, "main_helper_1_0_3", "-DPIXEL8", &main_helper_1_0_3_kernel[0]);
   err |= freia_op_compile_kernel(main_helper_1_0_3_source, "main_helper_1_0_3", "-DPIXEL16", &main_helper_1_0_3_kernel[1]);
@@ -34142,8 +34140,7 @@ static freia_status main_helper_3_0_0_compile(void)
     "    // set output pixels\n"
     "    p0[i] = t491;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_helper_3_0_0_source, "main_helper_3_0_0", "-DPIXEL8", &main_helper_3_0_0_kernel[0]);
   err |= freia_op_compile_kernel(main_helper_3_0_0_source, "main_helper_3_0_0", "-DPIXEL16", &main_helper_3_0_0_kernel[1]);

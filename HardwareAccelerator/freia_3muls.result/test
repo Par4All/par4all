@@ -707,8 +707,7 @@ static freia_status freia_3muls_helper_0_0_0_compile(void)
     "    p0[i] = t5;\n"
     "    p1[i] = t7;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_3muls_helper_0_0_0_source, "freia_3muls_helper_0_0_0", "-DPIXEL8", &freia_3muls_helper_0_0_0_kernel[0]);
   err |= freia_op_compile_kernel(freia_3muls_helper_0_0_0_source, "freia_3muls_helper_0_0_0", "-DPIXEL16", &freia_3muls_helper_0_0_0_kernel[1]);

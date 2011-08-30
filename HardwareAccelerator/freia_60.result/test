@@ -1399,8 +1399,7 @@ static freia_status freia_60_helper_0_0_0_compile(void)
     "    p2[i] = t23;\n"
     "    p3[i] = t24;\n"
     "  }\n"
-    "}\n"
-    "";
+    "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_60_helper_0_0_0_source, "freia_60_helper_0_0_0", "-DPIXEL8", &freia_60_helper_0_0_0_kernel[0]);
   err |= freia_op_compile_kernel(freia_60_helper_0_0_0_source, "freia_60_helper_0_0_0", "-DPIXEL16", &freia_60_helper_0_0_0_kernel[1]);
