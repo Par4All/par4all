@@ -121,11 +121,11 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "addsat", "+s", AIPO "addsat", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_addsat, NO_MES }, TRPX_OP(4, "ADDSAT?"), OPCL("ADDSAT")
+      NO_POC, alu_addsat, NO_MES }, TRPX_OP(4, "ADDSAT"), OPCL("ADDSAT")
   },
   { AIPO "subsat", "-s", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_subsat_01, NO_MES }, TRPX_OP(4, "SUBSAT?"), OPCL("SUBSAT")
+      NO_POC, alu_subsat_01, NO_MES }, TRPX_OP(4, "SUBSAT"), OPCL("SUBSAT")
   },
   { AIPO "absdiff", "-|", AIPO "absdiff", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
@@ -177,7 +177,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "sup_const", ">.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES },
-    TRPX_OP(3, "SUP_CONST?"), OPCL("SUP")
+    TRPX_OP(3, "SUP_CONST"), OPCL("SUP")
   },
   { AIPO "sub_const", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES },
@@ -193,31 +193,31 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "or_const", "|.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_or_0cst, NO_MES },
-    TRPX_OP(3, "OR_CONST?"), OPCL("OR")
+    TRPX_OP(3, "OR_CONST"), OPCL("OR")
   },
   { AIPO "xor_const", "^.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_xor_0cst, NO_MES },
-    TRPX_OP(3, "XOR_CONST?"), OPCL("XOR")
+    TRPX_OP(3, "XOR_CONST"), OPCL("XOR")
   },
   { AIPO "addsat_const", "+s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_addsat_0cst, NO_MES },
-    TRPX_OP(3, "ADDSAT_CONST?"), OPCL("ADDSAT")
+    TRPX_OP(3, "ADDSAT_CONST"), OPCL("ADDSAT")
   },
   { AIPO "subsat_const", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES },
-    TRPX_OP(3, "SUBSAT_CONST?"), OPCL("SUBSAT")
+    TRPX_OP(3, "SUBSAT_CONST"), OPCL("SUBSAT")
   },
   { AIPO "const_subsat", ".-s", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_cst0, NO_MES },
-    TRPX_OP(3, "CONST_SUBSAT?"), OPCL("SUBSATC")
+    TRPX_OP(3, "CONST_SUBSAT"), OPCL("SUBSATC")
   },
   { AIPO "absdiff_const", "-|.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_abssub_0cst, NO_MES },
-    TRPX_OP(3, "ABSDIFF_CONST?"), OPCL("ABSDIFF")
+    TRPX_OP(3, "ABSDIFF_CONST"), OPCL("ABSDIFF")
   },
   { AIPO "mul_const", "*.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_mul_0cst, NO_MES },
@@ -229,12 +229,12 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "const_div", "./", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_cst0, NO_MES },
-    TRPX_OP(3, "CONST_DIV?"), OPCL("DIVC")
+    TRPX_OP(3, "CONST_DIV"), OPCL("DIVC")
   },
   // nullary
   { AIPO "set_constant", "C", NULL, 1, 0, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES },
-    TRPX_OP(2, "SET_CONST"), OPCL("SET_CONST") // simple assign?
+    TRPX_OP(2, "SET_CONST"), OPCL("SET")
   },
   // not a real one, this is used internally only
   // semantics of "scalar_copy(a, b);" is "*a = *b;"
@@ -247,7 +247,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "copy", "=", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     // hmmm... would NO_SPOC do?
     { spoc_input_0|spoc_output_0, NO_POC, alu_unused, NO_MES },
-    TRPX_OP(3, "COPY"), OPCL("COPY") // simple assign!
+    TRPX_OP(3, "COPY"), OPCL("COPY")
   },
   { // not implemented by SPOC! nor TERAPIX!
     AIPO "cast", "=()", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
