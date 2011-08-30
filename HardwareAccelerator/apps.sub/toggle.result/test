@@ -2387,11 +2387,13 @@ digraph "main_helper_0_0_1" {
   "in" [shape=circle];
 
   // outputs
-  "mask_1" [shape=circle];
+  "mask" [shape=circle];
 
   // computation vertices
+  "41 thr" [shape=parallelogram];
+  "41 thr" -> "mask";
   "40 -" [shape=trapezium,orientation=270];
-  "40 -" -> "mask_1";
+  "40 -" -> "41 thr" [label="mask_1"];
   "39 >" [shape=trapezium,orientation=270];
   "39 >" -> "40 -" [label="mask_2"];
   "37 -" [shape=trapezium,orientation=270];
@@ -2436,7 +2438,10 @@ static freia_status main_helper_0_0_1_compile(void)
     "  GLOBAL PIXEL * i2, // const?\n"
     "  int ofs_i2,\n"
     "  int width,\n"
-    "  int pitch)\n"
+    "  int pitch,\n"
+    "  int c0,\n"
+    "  int c1,\n"
+    "  int c2)\n"
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
@@ -2451,12 +2456,13 @@ static freia_status main_helper_0_0_1_compile(void)
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t36 = SUB_OP(in0, in2);\n"
-    "    PIXEL t37 = SUB_OP(in2, in1);\n"
-    "    PIXEL t39 = SUP_OP(t36, t37);\n"
-    "    PIXEL t40 = SUB_OP(t36, t39);\n"
+    "    PIXEL t36 = PIXEL_SUB(in0, in2);\n"
+    "    PIXEL t37 = PIXEL_SUB(in2, in1);\n"
+    "    PIXEL t39 = PIXEL_SUP(t36, t37);\n"
+    "    PIXEL t40 = PIXEL_SUB(t36, t39);\n"
+    "    PIXEL t41 = PIXEL_THRESHOLD(t40, c0, c1, c2);\n"
     "    // set output pixels\n"
-    "    p0[i] = t40;\n"
+    "    p0[i] = t41;\n"
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
@@ -2470,7 +2476,10 @@ freia_status main_helper_0_0_1(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
-  const freia_data2d * i2)
+  const freia_data2d * i2,
+  int32_t c0,
+  int32_t c1,
+  int32_t c2)
 {
   freia_status err = FREIA_OK;
   freia_data2d_opencl *pool= frclTarget.pool;
@@ -2509,6 +2518,9 @@ freia_status main_helper_0_0_1(
   err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &ofs_i2);
   err |= clSetKernelArg(kernel, 8, sizeof(cl_int), &width);
   err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &pitch);
+  err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &c0);
+  err |= clSetKernelArg(kernel, 11, sizeof(cl_int), &c1);
+  err |= clSetKernelArg(kernel, 12, sizeof(cl_int), &c2);
 
   // call kernel main_helper_0_0_1
   err |= clEnqueueNDRangeKernel(
@@ -2540,7 +2552,10 @@ KERNEL void main_helper_0_0_1(
   GLOBAL PIXEL * i2, // const?
   int ofs_i2,
   int width,
-  int pitch)
+  int pitch,
+  int c0,
+  int c1,
+  int c2)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
@@ -2555,12 +2570,13 @@ KERNEL void main_helper_0_0_1(
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
     // pixel computations
-    PIXEL t36 = SUB_OP(in0, in2);
-    PIXEL t37 = SUB_OP(in2, in1);
-    PIXEL t39 = SUP_OP(t36, t37);
-    PIXEL t40 = SUB_OP(t36, t39);
+    PIXEL t36 = PIXEL_SUB(in0, in2);
+    PIXEL t37 = PIXEL_SUB(in2, in1);
+    PIXEL t39 = PIXEL_SUP(t36, t37);
+    PIXEL t40 = PIXEL_SUB(t36, t39);
+    PIXEL t41 = PIXEL_THRESHOLD(t40, c0, c1, c2);
     // set output pixels
-    p0[i] = t40;
+    p0[i] = t41;
   }
 }
 
@@ -2597,10 +2613,9 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imWork2, imWork2, freia_morpho_kernel_8c);       /*0029*/
    freia_aipo_erode_8c(imWork2, imWork2, freia_morpho_kernel_8c);       /*0030*/
 
-   main_helper_0_0_1(mask, imWork1, imWork2, in);                       /*0036*/
-
-   freia_aipo_threshold(mask, mask, 1, 255, 1);                         /*0041*/
-
+   main_helper_0_0_1(mask, imWork1, imWork2, in, 1, 255, 1);            /*0036*/
+   
+   
    freia_aipo_replace_const(work1, mask, imWork1, 255);                 /*0043*/
    freia_aipo_replace_const(work2, mask, imWork2, 0);                   /*0044*/
    freia_aipo_sup(out, work1, work2);                                   /*0045*/
@@ -2661,10 +2676,9 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imWork2, imWork2, freia_morpho_kernel_8c);       /*0029*/
    freia_aipo_erode_8c(imWork2, imWork2, freia_morpho_kernel_8c);       /*0030*/
 
-   main_helper_0_0_1(mask, imWork1, imWork2, in);                       /*0036*/
-
-   freia_aipo_threshold(mask, mask, 1, 255, 1);                         /*0041*/
-
+   main_helper_0_0_1(mask, imWork1, imWork2, in, 1, 255, 1);            /*0036*/
+   
+   
    freia_aipo_replace_const(work1, mask, imWork1, 255);                 /*0043*/
    freia_aipo_replace_const(work2, mask, imWork2, 0);                   /*0044*/
    freia_aipo_sup(out, work1, work2);                                   /*0045*/

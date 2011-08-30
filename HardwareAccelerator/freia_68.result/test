@@ -791,9 +791,9 @@ static freia_status freia_68_helper_0_0_0_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t9 = ADD_OP(in0, c0);\n"
-    "    PIXEL t11 = NOTU_OP(in0);\n"
-    "    PIXEL t10 = SUB_OP(in0, t9);\n"
+    "    PIXEL t9 = PIXEL_ADD(in0, c0);\n"
+    "    PIXEL t11 = PIXEL_NOTU(in0);\n"
+    "    PIXEL t10 = PIXEL_SUB(in0, t9);\n"
     "    // set output pixels\n"
     "    p0[i] = t10;\n"
     "    p1[i] = t11;\n"
@@ -889,9 +889,9 @@ KERNEL void freia_68_helper_0_0_0(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t9 = ADD_OP(in0, c0);
-    PIXEL t11 = NOTU_OP(in0);
-    PIXEL t10 = SUB_OP(in0, t9);
+    PIXEL t9 = PIXEL_ADD(in0, c0);
+    PIXEL t11 = PIXEL_NOTU(in0);
+    PIXEL t10 = PIXEL_SUB(in0, t9);
     // set output pixels
     p0[i] = t10;
     p1[i] = t11;

@@ -6727,11 +6727,13 @@ digraph "main_helper_2_0_0" {
   "out" [shape=circle];
 
   // outputs
-  "rec" [shape=circle];
+  "out'" [shape=circle];
 
   // computation vertices
+  "212 thr" [shape=parallelogram];
+  "212 thr" -> "out'";
   "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "rec";
+  "211 *." -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
   "210 -" -> "211 *." [label="rec_1"];
   "out" -> "210 -";
@@ -6785,10 +6787,10 @@ static freia_status main_helper_0_0_2_compile(void)
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t160 = INF_OP(in1, c0);\n"
-    "    PIXEL t176 = INF_OP(t160, in2);\n"
-    "    PIXEL t192 = INF_OP(t176, in0);\n"
-    "    PIXEL t199 = NOTU_OP(t192);\n"
+    "    PIXEL t160 = PIXEL_INF(in1, c0);\n"
+    "    PIXEL t176 = PIXEL_INF(t160, in2);\n"
+    "    PIXEL t192 = PIXEL_INF(t176, in0);\n"
+    "    PIXEL t199 = PIXEL_NOTU(t192);\n"
     "    // set output pixels\n"
     "    p0[i] = t199;\n"
     "  }\n"
@@ -6885,7 +6887,10 @@ static freia_status main_helper_2_0_0_compile(void)
     "  int ofs_i1,\n"
     "  int width,\n"
     "  int pitch,\n"
-    "  int c0)\n"
+    "  int c0,\n"
+    "  int c1,\n"
+    "  int c2,\n"
+    "  int c3)\n"
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
@@ -6898,10 +6903,11 @@ static freia_status main_helper_2_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t210 = SUB_OP(in0, in1);\n"
-    "    PIXEL t211 = MUL_OP(t210, c0);\n"
+    "    PIXEL t210 = PIXEL_SUB(in0, in1);\n"
+    "    PIXEL t211 = PIXEL_MUL(t210, c0);\n"
+    "    PIXEL t212 = PIXEL_THRESHOLD(t211, c1, c2, c3);\n"
     "    // set output pixels\n"
-    "    p0[i] = t211;\n"
+    "    p0[i] = t212;\n"
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
@@ -6915,7 +6921,10 @@ freia_status main_helper_2_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
-  int32_t c0)
+  int32_t c0,
+  int32_t c1,
+  int32_t c2,
+  int32_t c3)
 {
   freia_status err = FREIA_OK;
   freia_data2d_opencl *pool= frclTarget.pool;
@@ -6952,6 +6961,9 @@ freia_status main_helper_2_0_0(
   err |= clSetKernelArg(kernel, 6, sizeof(cl_int), &width);
   err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &pitch);
   err |= clSetKernelArg(kernel, 8, sizeof(cl_int), &c0);
+  err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &c1);
+  err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &c2);
+  err |= clSetKernelArg(kernel, 11, sizeof(cl_int), &c3);
 
   // call kernel main_helper_2_0_0
   err |= clEnqueueNDRangeKernel(
@@ -6999,10 +7011,10 @@ KERNEL void main_helper_0_0_2(
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
     // pixel computations
-    PIXEL t160 = INF_OP(in1, c0);
-    PIXEL t176 = INF_OP(t160, in2);
-    PIXEL t192 = INF_OP(t176, in0);
-    PIXEL t199 = NOTU_OP(t192);
+    PIXEL t160 = PIXEL_INF(in1, c0);
+    PIXEL t176 = PIXEL_INF(t160, in2);
+    PIXEL t192 = PIXEL_INF(t176, in0);
+    PIXEL t199 = PIXEL_NOTU(t192);
     // set output pixels
     p0[i] = t199;
   }
@@ -7022,7 +7034,10 @@ KERNEL void main_helper_2_0_0(
   int ofs_i1,
   int width,
   int pitch,
-  int c0)
+  int c0,
+  int c1,
+  int c2,
+  int c3)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
@@ -7035,10 +7050,11 @@ KERNEL void main_helper_2_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t210 = SUB_OP(in0, in1);
-    PIXEL t211 = MUL_OP(t210, c0);
+    PIXEL t210 = PIXEL_SUB(in0, in1);
+    PIXEL t211 = PIXEL_MUL(t210, c0);
+    PIXEL t212 = PIXEL_THRESHOLD(t211, c1, c2, c3);
     // set output pixels
-    p0[i] = t211;
+    p0[i] = t212;
   }
 }
 
@@ -7047,7 +7063,7 @@ KERNEL void main_helper_2_0_0(
 int main(int argc, char *argv[])
 {
    freia_dataio fdin, fdout;                                            /*0018*/
-   freia_data2d *in, *rec, *out;                                        /*0019*/
+   freia_data2d *in, *out;                                              /*0019*/
    int32_t neighborTransposed_0[9];                                     /*0020*/
    int32_t neighborTransposed_1[9];                                     /*0021*/
    int32_t neighborTransposed_2[9];                                     /*0022*/
@@ -7068,7 +7084,6 @@ int main(int argc, char *argv[])
    // there should be a freia_initialize()?
    // for opencl freia_op_init_opencl(0xffffffff, 2, false, fdin.framewidth, fdin.frameheight);
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0037*/
-   rec = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0039*/
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0041*/
    out_1 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
    w1_0_10 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
@@ -7176,8 +7191,7 @@ int main(int argc, char *argv[])
    }
    while (volcurrent!=volprevious);                                     /*0208*/
 
-   main_helper_2_0_0(rec, in, out, 2);                                  /*0210*/
-   freia_aipo_threshold(out, rec, 90, 255, 1);                          /*0212*/
+   main_helper_2_0_0(out, in, out, 2, 90, 255, 1);                      /*0210*/
    
    // output
    freia_common_tx_image(in, &fdout);                                   /*0216*/
@@ -7185,7 +7199,6 @@ int main(int argc, char *argv[])
    
    // cleanup
    freia_common_destruct_data(in);                                      /*0220*/
-   freia_common_destruct_data(rec);                                     /*0223*/
    freia_common_destruct_data(out);                                     /*0224*/
    freia_common_destruct_data(out_1);
 
@@ -7201,7 +7214,7 @@ int main(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
    freia_dataio fdin, fdout;                                            /*0018*/
-   freia_data2d *in, *rec, *out;                                        /*0019*/
+   freia_data2d *in, *out;                                              /*0019*/
    int32_t neighborTransposed_0[9];                                     /*0020*/
    int32_t neighborTransposed_1[9];                                     /*0021*/
    int32_t neighborTransposed_2[9];                                     /*0022*/
@@ -7222,7 +7235,6 @@ int main(int argc, char *argv[])
    // there should be a freia_initialize()?
    // for opencl freia_op_init_opencl(0xffffffff, 2, false, fdin.framewidth, fdin.frameheight);
    in = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0037*/
-   rec = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0039*/
    out = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);   /*0041*/
    out_1 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
    w1_0_10 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);
@@ -7330,8 +7342,7 @@ int main(int argc, char *argv[])
    }
    while (volcurrent!=volprevious);                                     /*0208*/
 
-   main_helper_2_0_0(rec, in, out, 2);                                  /*0210*/
-   freia_aipo_threshold(out, rec, 90, 255, 1);                          /*0212*/
+   main_helper_2_0_0(out, in, out, 2, 90, 255, 1);                      /*0210*/
    
    // output
    freia_common_tx_image(in, &fdout);                                   /*0216*/
@@ -7339,7 +7350,6 @@ int main(int argc, char *argv[])
    
    // cleanup
    freia_common_destruct_data(in);                                      /*0220*/
-   freia_common_destruct_data(rec);                                     /*0223*/
    freia_common_destruct_data(out);                                     /*0224*/
    freia_common_destruct_data(out_1);
 

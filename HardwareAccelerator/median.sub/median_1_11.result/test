@@ -2146,8 +2146,8 @@ static freia_status median_1_helper_0_0_1_compile(void)
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t21 = INF_OP(in1, in2);\n"
-    "    PIXEL t35 = SUP_OP(t21, in0);\n"
+    "    PIXEL t21 = PIXEL_INF(in1, in2);\n"
+    "    PIXEL t35 = PIXEL_SUP(t21, in0);\n"
     "    // set output pixels\n"
     "    p0[i] = t35;\n"
     "  }\n"
@@ -2248,8 +2248,8 @@ KERNEL void median_1_helper_0_0_1(
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
     // pixel computations
-    PIXEL t21 = INF_OP(in1, in2);
-    PIXEL t35 = SUP_OP(t21, in0);
+    PIXEL t21 = PIXEL_INF(in1, in2);
+    PIXEL t35 = PIXEL_SUP(t21, in0);
     // set output pixels
     p0[i] = t35;
   }

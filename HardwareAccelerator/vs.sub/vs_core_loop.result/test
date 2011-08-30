@@ -3733,8 +3733,8 @@ digraph "vs_core_loop_helper_3_1" {
   "105 thr" -> "106 E8" [label="immotion_5"];
   "immotion_6" -> "105 thr";
 }
-// graph for dag "vs_core_loop_helper_3_1_1" of module "vs_core_loop" in dot format
-digraph "vs_core_loop_helper_3_1_1" {
+// graph for dag "vs_core_loop_helper_3_1_2" of module "vs_core_loop" in dot format
+digraph "vs_core_loop_helper_3_1_2" {
   // inputs
   "immotion_4" [shape=circle];
   "imstab" [shape=circle];
@@ -3815,11 +3815,11 @@ static freia_status vs_core_loop_helper_3_0_0_compile(void)
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t87 = ABSDIFF_OP(in2, in0);\n"
-    "    PIXEL t91 = MUL_OP(in2, c0);\n"
-    "    PIXEL t92 = MUL_OP(in1, c1);\n"
-    "    PIXEL t93 = ADD_OP(t92, t91);\n"
-    "    PIXEL t94 = DIV_OP(t93, c2);\n"
+    "    PIXEL t87 = PIXEL_ABSDIFF(in2, in0);\n"
+    "    PIXEL t91 = PIXEL_MUL(in2, c0);\n"
+    "    PIXEL t92 = PIXEL_MUL(in1, c1);\n"
+    "    PIXEL t93 = PIXEL_ADD(t92, t91);\n"
+    "    PIXEL t94 = PIXEL_DIV(t93, c2);\n"
     "    // set output pixels\n"
     "    p0[i] = t87;\n"
     "    p1[i] = t94;\n"
@@ -3901,18 +3901,18 @@ freia_status vs_core_loop_helper_3_0_0(
   return err;
 }
 
-// hold kernels forvs_core_loop_helper_3_1_1
-static cl_kernel vs_core_loop_helper_3_1_1_kernel[2];
+// hold kernels forvs_core_loop_helper_3_1_2
+static cl_kernel vs_core_loop_helper_3_1_2_kernel[2];
 
-// compile kernels for vs_core_loop_helper_3_1_1
-static freia_status vs_core_loop_helper_3_1_1_compile(void)
+// compile kernels for vs_core_loop_helper_3_1_2
+static freia_status vs_core_loop_helper_3_1_2_compile(void)
 {
-  // OpenCL source for vs_core_loop_helper_3_1_1
-  const char * vs_core_loop_helper_3_1_1_source =
+  // OpenCL source for vs_core_loop_helper_3_1_2
+  const char * vs_core_loop_helper_3_1_2_source =
     "#include <freia_opencl_runtime.hcl>\n"
     "\n"
-    "// opencl function vs_core_loop_helper_3_1_1\n"
-    "KERNEL void vs_core_loop_helper_3_1_1(\n"
+    "// opencl function vs_core_loop_helper_3_1_2\n"
+    "KERNEL void vs_core_loop_helper_3_1_2(\n"
     "  GLOBAL PIXEL * o0,\n"
     "  int ofs_o0,\n"
     "  GLOBAL PIXEL * i0, // const?\n"
@@ -3939,22 +3939,22 @@ static freia_status vs_core_loop_helper_3_1_1_compile(void)
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t113 = SUB_OP(in2, in0);\n"
-    "    PIXEL t118 = ADD_OP(t113, c0);\n"
-    "    PIXEL t119 = AND_OP(t118, c1);\n"
-    "    PIXEL t120 = MUL_OP(in1, t119);\n"
+    "    PIXEL t113 = PIXEL_SUB(in2, in0);\n"
+    "    PIXEL t118 = PIXEL_ADD(t113, c0);\n"
+    "    PIXEL t119 = PIXEL_AND(t118, c1);\n"
+    "    PIXEL t120 = PIXEL_MUL(in1, t119);\n"
     "    // set output pixels\n"
     "    p0[i] = t120;\n"
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
-  err |= freia_op_compile_kernel(vs_core_loop_helper_3_1_1_source, "vs_core_loop_helper_3_1_1", "-DPIXEL8", &vs_core_loop_helper_3_1_1_kernel[0]);
-  err |= freia_op_compile_kernel(vs_core_loop_helper_3_1_1_source, "vs_core_loop_helper_3_1_1", "-DPIXEL16", &vs_core_loop_helper_3_1_1_kernel[1]);
+  err |= freia_op_compile_kernel(vs_core_loop_helper_3_1_2_source, "vs_core_loop_helper_3_1_2", "-DPIXEL8", &vs_core_loop_helper_3_1_2_kernel[0]);
+  err |= freia_op_compile_kernel(vs_core_loop_helper_3_1_2_source, "vs_core_loop_helper_3_1_2", "-DPIXEL16", &vs_core_loop_helper_3_1_2_kernel[1]);
   return err;
 }
 
-// helper function vs_core_loop_helper_3_1_1
-freia_status vs_core_loop_helper_3_1_1(
+// helper function vs_core_loop_helper_3_1_2
+freia_status vs_core_loop_helper_3_1_2(
   freia_data2d * o0,
   const freia_data2d * i0,
   const freia_data2d * i1,
@@ -3975,14 +3975,14 @@ freia_status vs_core_loop_helper_3_1_1(
   static int to_compile = 1;
 
   if (to_compile) {
-    freia_status cerr = vs_core_loop_helper_3_1_1_compile();
+    freia_status cerr = vs_core_loop_helper_3_1_2_compile();
     // compilation may have failed
     if (cerr) return cerr;
     to_compile = 0;
   }
 
   // now get kernel, which must be there...
-  kernel = vs_core_loop_helper_3_1_1_kernel[bpp];
+  kernel = vs_core_loop_helper_3_1_2_kernel[bpp];
   cl_int ofs_o0 = freia_common_data_get_offset(o0);
   cl_int ofs_i0 = freia_common_data_get_offset(i0);
   cl_int ofs_i1 = freia_common_data_get_offset(i1);
@@ -4002,7 +4002,7 @@ freia_status vs_core_loop_helper_3_1_1(
   err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &c0);
   err |= clSetKernelArg(kernel, 11, sizeof(cl_int), &c1);
 
-  // call kernel vs_core_loop_helper_3_1_1
+  // call kernel vs_core_loop_helper_3_1_2
   err |= clEnqueueNDRangeKernel(
             frclTarget.queue,
             kernel,
@@ -4059,19 +4059,19 @@ KERNEL void vs_core_loop_helper_3_0_0(
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
     // pixel computations
-    PIXEL t87 = ABSDIFF_OP(in2, in0);
-    PIXEL t91 = MUL_OP(in2, c0);
-    PIXEL t92 = MUL_OP(in1, c1);
-    PIXEL t93 = ADD_OP(t92, t91);
-    PIXEL t94 = DIV_OP(t93, c2);
+    PIXEL t87 = PIXEL_ABSDIFF(in2, in0);
+    PIXEL t91 = PIXEL_MUL(in2, c0);
+    PIXEL t92 = PIXEL_MUL(in1, c1);
+    PIXEL t93 = PIXEL_ADD(t92, t91);
+    PIXEL t94 = PIXEL_DIV(t93, c2);
     // set output pixels
     p0[i] = t87;
     p1[i] = t94;
   }
 }
 
-// opencl function vs_core_loop_helper_3_1_1
-KERNEL void vs_core_loop_helper_3_1_1(
+// opencl function vs_core_loop_helper_3_1_2
+KERNEL void vs_core_loop_helper_3_1_2(
   GLOBAL PIXEL * o0,
   int ofs_o0,
   GLOBAL PIXEL * i0, // const?
@@ -4098,10 +4098,10 @@ KERNEL void vs_core_loop_helper_3_1_1(
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
     // pixel computations
-    PIXEL t113 = SUB_OP(in2, in0);
-    PIXEL t118 = ADD_OP(t113, c0);
-    PIXEL t119 = AND_OP(t118, c1);
-    PIXEL t120 = MUL_OP(in1, t119);
+    PIXEL t113 = PIXEL_SUB(in2, in0);
+    PIXEL t118 = PIXEL_ADD(t113, c0);
+    PIXEL t119 = PIXEL_AND(t118, c1);
+    PIXEL t120 = PIXEL_MUL(in1, t119);
     // set output pixels
     p0[i] = t120;
   }
@@ -4195,7 +4195,7 @@ l99979:   ;                                                                    /
    freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
    freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);
    freia_aipo_copy(imbg, imbg16);
-   vs_core_loop_helper_3_1_1(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
+   vs_core_loop_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
    
    // save contrast motion detection
    
@@ -4312,7 +4312,7 @@ l99998:   ;
    freia_aipo_dilate_8c(imtmp, imtmp2, freia_morpho_kernel_8c);         /*0111*/
    freia_aipo_erode_8c(immotion, imtmp2, freia_morpho_kernel_8c);
    freia_aipo_copy(imbg, imbg16);
-   vs_core_loop_helper_3_1_1(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
+   vs_core_loop_helper_3_1_2(immotion, immotion, imstab, imtmp, -1, 1);                /*0113*/
    
    // save contrast motion detection
    

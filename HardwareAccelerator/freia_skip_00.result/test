@@ -661,8 +661,8 @@ static freia_status freia_skip_00_helper_0_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t8 = SUBSAT_OP(in0, in1);\n"
-    "    PIXEL t10 = XOR_OP(in0, t8);\n"
+    "    PIXEL t8 = PIXEL_SUBSAT(in0, in1);\n"
+    "    PIXEL t10 = PIXEL_XOR(in0, t8);\n"
     "    // set output pixels\n"
     "    p0[i] = t10;\n"
     "  }\n"
@@ -755,8 +755,8 @@ KERNEL void freia_skip_00_helper_0_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t8 = SUBSAT_OP(in0, in1);
-    PIXEL t10 = XOR_OP(in0, t8);
+    PIXEL t8 = PIXEL_SUBSAT(in0, in1);
+    PIXEL t10 = PIXEL_XOR(in0, t8);
     // set output pixels
     p0[i] = t10;
   }

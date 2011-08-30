@@ -1963,11 +1963,11 @@ static freia_status freia_43_helper_0_0_1_compile(void)
     "    PIXEL in2 = j2[i];\n"
     "    PIXEL in3 = j3[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t49 = SUB_OP(in2, in0);\n"
-    "    PIXEL t55 = SUB_OP(in2, in3);\n"
-    "    PIXEL t50 = ABSDIFF_OP(in1, t49);\n"
-    "    PIXEL t56 = ABSDIFF_OP(t49, t55);\n"
-    "    PIXEL t57 = INF_OP(t56, t50);\n"
+    "    PIXEL t49 = PIXEL_SUB(in2, in0);\n"
+    "    PIXEL t55 = PIXEL_SUB(in2, in3);\n"
+    "    PIXEL t50 = PIXEL_ABSDIFF(in1, t49);\n"
+    "    PIXEL t56 = PIXEL_ABSDIFF(t49, t55);\n"
+    "    PIXEL t57 = PIXEL_INF(t56, t50);\n"
     "    // set output pixels\n"
     "    p0[i] = t57;\n"
     "  }\n"
@@ -2076,11 +2076,11 @@ KERNEL void freia_43_helper_0_0_1(
     PIXEL in2 = j2[i];
     PIXEL in3 = j3[i];
     // pixel computations
-    PIXEL t49 = SUB_OP(in2, in0);
-    PIXEL t55 = SUB_OP(in2, in3);
-    PIXEL t50 = ABSDIFF_OP(in1, t49);
-    PIXEL t56 = ABSDIFF_OP(t49, t55);
-    PIXEL t57 = INF_OP(t56, t50);
+    PIXEL t49 = PIXEL_SUB(in2, in0);
+    PIXEL t55 = PIXEL_SUB(in2, in3);
+    PIXEL t50 = PIXEL_ABSDIFF(in1, t49);
+    PIXEL t56 = PIXEL_ABSDIFF(t49, t55);
+    PIXEL t57 = PIXEL_INF(t56, t50);
     // set output pixels
     p0[i] = t57;
   }

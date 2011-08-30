@@ -801,9 +801,9 @@ static freia_status freia_23_helper_0_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t10 = XOR_OP(in1, in0);\n"
-    "    PIXEL t11 = SUB_OP(t10, in1);\n"
-    "    PIXEL t12 = ADD_OP(t10, t11);\n"
+    "    PIXEL t10 = PIXEL_XOR(in1, in0);\n"
+    "    PIXEL t11 = PIXEL_SUB(t10, in1);\n"
+    "    PIXEL t12 = PIXEL_ADD(t10, t11);\n"
     "    // set output pixels\n"
     "    p0[i] = t11;\n"
     "    p1[i] = t12;\n"
@@ -904,9 +904,9 @@ KERNEL void freia_23_helper_0_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t10 = XOR_OP(in1, in0);
-    PIXEL t11 = SUB_OP(t10, in1);
-    PIXEL t12 = ADD_OP(t10, t11);
+    PIXEL t10 = PIXEL_XOR(in1, in0);
+    PIXEL t11 = PIXEL_SUB(t10, in1);
+    PIXEL t12 = PIXEL_ADD(t10, t11);
     // set output pixels
     p0[i] = t11;
     p1[i] = t12;

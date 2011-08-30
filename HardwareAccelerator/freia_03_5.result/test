@@ -1342,14 +1342,14 @@ static freia_status freia_03_helper_0_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t27 = ADD_OP(in0, c0);\n"
-    "    PIXEL t28 = ADDSAT_OP(in1, c1);\n"
-    "    PIXEL t33 = SET_OP(c2);\n"
-    "    PIXEL t29 = ADD_OP(t27, t28);\n"
-    "    PIXEL t30 = MUL_OP(t27, c3);\n"
-    "    PIXEL t31 = DIV_OP(t29, c4);\n"
-    "    PIXEL t32 = AND_OP(t30, t31);\n"
-    "    PIXEL t34 = MUL_OP(t32, t33);\n"
+    "    PIXEL t27 = PIXEL_ADD(in0, c0);\n"
+    "    PIXEL t28 = PIXEL_ADDSAT(in1, c1);\n"
+    "    PIXEL t33 = PIXEL_SET(c2);\n"
+    "    PIXEL t29 = PIXEL_ADD(t27, t28);\n"
+    "    PIXEL t30 = PIXEL_MUL(t27, c3);\n"
+    "    PIXEL t31 = PIXEL_DIV(t29, c4);\n"
+    "    PIXEL t32 = PIXEL_AND(t30, t31);\n"
+    "    PIXEL t34 = PIXEL_MUL(t32, t33);\n"
     "    // set output pixels\n"
     "    p0[i] = t34;\n"
     "  }\n"
@@ -1457,14 +1457,14 @@ KERNEL void freia_03_helper_0_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t27 = ADD_OP(in0, c0);
-    PIXEL t28 = ADDSAT_OP(in1, c1);
-    PIXEL t33 = SET_OP(c2);
-    PIXEL t29 = ADD_OP(t27, t28);
-    PIXEL t30 = MUL_OP(t27, c3);
-    PIXEL t31 = DIV_OP(t29, c4);
-    PIXEL t32 = AND_OP(t30, t31);
-    PIXEL t34 = MUL_OP(t32, t33);
+    PIXEL t27 = PIXEL_ADD(in0, c0);
+    PIXEL t28 = PIXEL_ADDSAT(in1, c1);
+    PIXEL t33 = PIXEL_SET(c2);
+    PIXEL t29 = PIXEL_ADD(t27, t28);
+    PIXEL t30 = PIXEL_MUL(t27, c3);
+    PIXEL t31 = PIXEL_DIV(t29, c4);
+    PIXEL t32 = PIXEL_AND(t30, t31);
+    PIXEL t34 = PIXEL_MUL(t32, t33);
     // set output pixels
     p0[i] = t34;
   }

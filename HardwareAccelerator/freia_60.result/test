@@ -1385,11 +1385,11 @@ static freia_status freia_60_helper_0_0_0_compile(void)
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t20 = INF_OP(in0, c0);\n"
-    "    PIXEL t21 = INF_OP(in1, c1);\n"
-    "    PIXEL t22 = INF_OP(in2, c2);\n"
-    "    PIXEL t23 = SUP_OP(t21, t20);\n"
-    "    PIXEL t24 = SUP_OP(t22, t23);\n"
+    "    PIXEL t20 = PIXEL_INF(in0, c0);\n"
+    "    PIXEL t21 = PIXEL_INF(in1, c1);\n"
+    "    PIXEL t22 = PIXEL_INF(in2, c2);\n"
+    "    PIXEL t23 = PIXEL_SUP(t21, t20);\n"
+    "    PIXEL t24 = PIXEL_SUP(t22, t23);\n"
     "    // set output pixels\n"
     "    p0[i] = t20;\n"
     "    p1[i] = t21;\n"
@@ -1523,11 +1523,11 @@ KERNEL void freia_60_helper_0_0_0(
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
     // pixel computations
-    PIXEL t20 = INF_OP(in0, c0);
-    PIXEL t21 = INF_OP(in1, c1);
-    PIXEL t22 = INF_OP(in2, c2);
-    PIXEL t23 = SUP_OP(t21, t20);
-    PIXEL t24 = SUP_OP(t22, t23);
+    PIXEL t20 = PIXEL_INF(in0, c0);
+    PIXEL t21 = PIXEL_INF(in1, c1);
+    PIXEL t22 = PIXEL_INF(in2, c2);
+    PIXEL t23 = PIXEL_SUP(t21, t20);
+    PIXEL t24 = PIXEL_SUP(t22, t23);
     // set output pixels
     p0[i] = t20;
     p1[i] = t21;

@@ -720,11 +720,13 @@ digraph "freia_skip_05_helper_0_0_0" {
 
   // outputs
   "i1'" [shape=circle];
-  "t" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
   "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "t";
+  "10 ^." -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
   "8 -" -> "10 ^." [label="i1"];
   "8 -" -> "i1'";
@@ -764,7 +766,10 @@ static freia_status freia_skip_05_helper_0_0_0_compile(void)
     "  int ofs_i1,\n"
     "  int width,\n"
     "  int pitch,\n"
-    "  int c0)\n"
+    "  int c0,\n"
+    "  int c1,\n"
+    "  int c2,\n"
+    "  int c3)\n"
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * p1 = o1 + ofs_o1;\n"
@@ -778,11 +783,12 @@ static freia_status freia_skip_05_helper_0_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t8 = SUB_OP(in0, in1);\n"
-    "    PIXEL t10 = XOR_OP(t8, c0);\n"
+    "    PIXEL t8 = PIXEL_SUB(in0, in1);\n"
+    "    PIXEL t10 = PIXEL_XOR(t8, c0);\n"
+    "    PIXEL t11 = PIXEL_THRESHOLD(t10, c1, c2, c3);\n"
     "    // set output pixels\n"
     "    p0[i] = t8;\n"
-    "    p1[i] = t10;\n"
+    "    p1[i] = t11;\n"
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
@@ -797,7 +803,10 @@ freia_status freia_skip_05_helper_0_0_0(
   freia_data2d * o1,
   const freia_data2d * i0,
   const freia_data2d * i1,
-  int32_t c0)
+  int32_t c0,
+  int32_t c1,
+  int32_t c2,
+  int32_t c3)
 {
   freia_status err = FREIA_OK;
   freia_data2d_opencl *pool= frclTarget.pool;
@@ -837,6 +846,9 @@ freia_status freia_skip_05_helper_0_0_0(
   err |= clSetKernelArg(kernel, 8, sizeof(cl_int), &width);
   err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &pitch);
   err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &c0);
+  err |= clSetKernelArg(kernel, 11, sizeof(cl_int), &c1);
+  err |= clSetKernelArg(kernel, 12, sizeof(cl_int), &c2);
+  err |= clSetKernelArg(kernel, 13, sizeof(cl_int), &c3);
 
   // call kernel freia_skip_05_helper_0_0_0
   err |= clEnqueueNDRangeKernel(
@@ -869,7 +881,10 @@ KERNEL void freia_skip_05_helper_0_0_0(
   int ofs_i1,
   int width,
   int pitch,
-  int c0)
+  int c0,
+  int c1,
+  int c2,
+  int c3)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * p1 = o1 + ofs_o1;
@@ -883,11 +898,12 @@ KERNEL void freia_skip_05_helper_0_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t8 = SUB_OP(in0, in1);
-    PIXEL t10 = XOR_OP(t8, c0);
+    PIXEL t8 = PIXEL_SUB(in0, in1);
+    PIXEL t10 = PIXEL_XOR(t8, c0);
+    PIXEL t11 = PIXEL_THRESHOLD(t10, c1, c2, c3);
     // set output pixels
     p0[i] = t8;
-    p1[i] = t10;
+    p1[i] = t11;
   }
 }
 
@@ -895,24 +911,16 @@ KERNEL void freia_skip_05_helper_0_0_0(
 
 void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_data2d *t;                                                     /*0006*/
-   t = freia_common_create_data(16, 128, 128);                          /*0009*/
    // allocation in the middle of the stream
-   freia_skip_05_helper_0_0_0(i1, t, i0, i1, 111);                      /*0008*/
-   freia_aipo_threshold(o, t, 8, 100, true);                            /*0011*/
-   freia_common_destruct_data(t);                                       /*0012*/
+   freia_skip_05_helper_0_0_0(i1, o, i0, i1, 111, 8, 100, true);        /*0008*/
 }
 
 ! cleaned up function
 
 void freia_skip_05(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_data2d *t;                                                     /*0006*/
-   t = freia_common_create_data(16, 128, 128);                          /*0009*/
    // allocation in the middle of the stream
-   freia_skip_05_helper_0_0_0(i1, t, i0, i1, 111);                      /*0008*/
-   freia_aipo_threshold(o, t, 8, 100, 1);                               /*0011*/
-   freia_common_destruct_data(t);                                       /*0012*/
+   freia_skip_05_helper_0_0_0(i1, o, i0, i1, 111, 8, 100, 1);           /*0008*/
 }
 #
 # FREIA COMPILATION DONE

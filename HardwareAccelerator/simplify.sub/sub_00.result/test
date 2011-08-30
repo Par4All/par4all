@@ -655,11 +655,13 @@ digraph "sub_00_helper_0_0_0" {
 
   // outputs
   "i" [shape=circle];
-  "t" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
+  "10 thr" [shape=parallelogram];
+  "10 thr" -> "o";
   "9 C" [shape=trapezium,orientation=270];
-  "9 C" -> "t";
+  "9 C" -> "10 thr" [label="t"];
   "7 C" [shape=trapezium,orientation=270];
   "7 C" -> "i";
 }
@@ -693,7 +695,10 @@ static freia_status sub_00_helper_0_0_0_compile(void)
     "  int width,\n"
     "  int pitch,\n"
     "  int c0,\n"
-    "  int c1)\n"
+    "  int c1,\n"
+    "  int c2,\n"
+    "  int c3,\n"
+    "  int c4)\n"
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * p1 = o1 + ofs_o1;\n"
@@ -702,11 +707,12 @@ static freia_status sub_00_helper_0_0_0_compile(void)
     "  for (i=gid; i < (gid+width); i++)\n"
     "  {\n"
     "    // pixel computations\n"
-    "    PIXEL t7 = SET_OP(c0);\n"
-    "    PIXEL t9 = SET_OP(c1);\n"
+    "    PIXEL t7 = PIXEL_SET(c0);\n"
+    "    PIXEL t9 = PIXEL_SET(c1);\n"
+    "    PIXEL t10 = PIXEL_THRESHOLD(t9, c2, c3, c4);\n"
     "    // set output pixels\n"
     "    p0[i] = t7;\n"
-    "    p1[i] = t9;\n"
+    "    p1[i] = t10;\n"
     "  }\n"
     "}\n";
   freia_status err = FREIA_OK;
@@ -720,7 +726,10 @@ freia_status sub_00_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   int32_t c0,
-  int32_t c1)
+  int32_t c1,
+  int32_t c2,
+  int32_t c3,
+  int32_t c4)
 {
   freia_status err = FREIA_OK;
   freia_data2d_opencl *pool= frclTarget.pool;
@@ -755,6 +764,9 @@ freia_status sub_00_helper_0_0_0(
   err |= clSetKernelArg(kernel, 5, sizeof(cl_int), &pitch);
   err |= clSetKernelArg(kernel, 6, sizeof(cl_int), &c0);
   err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &c1);
+  err |= clSetKernelArg(kernel, 8, sizeof(cl_int), &c2);
+  err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &c3);
+  err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &c4);
 
   // call kernel sub_00_helper_0_0_0
   err |= clEnqueueNDRangeKernel(
@@ -784,7 +796,10 @@ KERNEL void sub_00_helper_0_0_0(
   int width,
   int pitch,
   int c0,
-  int c1)
+  int c1,
+  int c2,
+  int c3,
+  int c4)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * p1 = o1 + ofs_o1;
@@ -793,11 +808,12 @@ KERNEL void sub_00_helper_0_0_0(
   for (i=gid; i < (gid+width); i++)
   {
     // pixel computations
-    PIXEL t7 = SET_OP(c0);
-    PIXEL t9 = SET_OP(c1);
+    PIXEL t7 = PIXEL_SET(c0);
+    PIXEL t9 = PIXEL_SET(c1);
+    PIXEL t10 = PIXEL_THRESHOLD(t9, c2, c3, c4);
     // set output pixels
     p0[i] = t7;
-    p1[i] = t9;
+    p1[i] = t10;
   }
 }
 
@@ -805,22 +821,14 @@ KERNEL void sub_00_helper_0_0_0(
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   freia_data2d *t;                                                     /*0006*/
-   t = freia_common_create_data(16, 128, 128);                          /*0008*/
-   sub_00_helper_0_0_0(i, t, 0, 0^111);                                 /*0007*/
-   freia_aipo_threshold(o, t, 8, 100, true);                            /*0010*/
-   freia_common_destruct_data(t);                                       /*0011*/
+   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, true);                   /*0007*/
 }
 
 ! cleaned up function
 
 void sub_00(freia_data2d *o, freia_data2d *i)
 {
-   freia_data2d *t;                                                     /*0006*/
-   t = freia_common_create_data(16, 128, 128);                          /*0008*/
-   sub_00_helper_0_0_0(i, t, 0, 0^111);                                 /*0007*/
-   freia_aipo_threshold(o, t, 8, 100, 1);                               /*0010*/
-   freia_common_destruct_data(t);                                       /*0011*/
+   sub_00_helper_0_0_0(i, o, 0, 0^111, 8, 100, 1);                      /*0007*/
 }
 #
 # FREIA COMPILATION DONE

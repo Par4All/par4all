@@ -929,9 +929,9 @@ static freia_status freia_72_helper_0_0_1_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t21 = ADD_OP(in0, c0);\n"
-    "    PIXEL t22 = NOTU_OP(in1);\n"
-    "    PIXEL t23 = AND_OP(t21, t22);\n"
+    "    PIXEL t21 = PIXEL_ADD(in0, c0);\n"
+    "    PIXEL t22 = PIXEL_NOTU(in1);\n"
+    "    PIXEL t23 = PIXEL_AND(t21, t22);\n"
     "    // set output pixels\n"
     "    p0[i] = t23;\n"
     "  }\n"
@@ -1027,9 +1027,9 @@ KERNEL void freia_72_helper_0_0_1(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t21 = ADD_OP(in0, c0);
-    PIXEL t22 = NOTU_OP(in1);
-    PIXEL t23 = AND_OP(t21, t22);
+    PIXEL t21 = PIXEL_ADD(in0, c0);
+    PIXEL t22 = PIXEL_NOTU(in1);
+    PIXEL t23 = PIXEL_AND(t21, t22);
     // set output pixels
     p0[i] = t23;
   }

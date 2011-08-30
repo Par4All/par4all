@@ -940,9 +940,9 @@ static freia_status freia_06_helper_0_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t15 = MUL_OP(in0, in1);\n"
-    "    PIXEL t16 = AND_OP(in0, in1);\n"
-    "    PIXEL t17 = OR_OP(t15, t16);\n"
+    "    PIXEL t15 = PIXEL_MUL(in0, in1);\n"
+    "    PIXEL t16 = PIXEL_AND(in0, in1);\n"
+    "    PIXEL t17 = PIXEL_OR(t15, t16);\n"
     "    // set output pixels\n"
     "    p0[i] = t17;\n"
     "  }\n"
@@ -1035,9 +1035,9 @@ KERNEL void freia_06_helper_0_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t15 = MUL_OP(in0, in1);
-    PIXEL t16 = AND_OP(in0, in1);
-    PIXEL t17 = OR_OP(t15, t16);
+    PIXEL t15 = PIXEL_MUL(in0, in1);
+    PIXEL t16 = PIXEL_AND(in0, in1);
+    PIXEL t17 = PIXEL_OR(t15, t16);
     // set output pixels
     p0[i] = t17;
   }

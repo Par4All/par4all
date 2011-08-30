@@ -1097,8 +1097,8 @@ static freia_status freia_skip_02_helper_0_0_1_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t11 = AND_OP(in0, c0);\n"
-    "    PIXEL t13 = DIV_OP(t11, c1);\n"
+    "    PIXEL t11 = PIXEL_AND(in0, c0);\n"
+    "    PIXEL t13 = PIXEL_DIV(t11, c1);\n"
     "    // set output pixels\n"
     "    p0[i] = t13;\n"
     "  }\n"
@@ -1189,8 +1189,8 @@ KERNEL void freia_skip_02_helper_0_0_1(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL t11 = AND_OP(in0, c0);
-    PIXEL t13 = DIV_OP(t11, c1);
+    PIXEL t11 = PIXEL_AND(in0, c0);
+    PIXEL t13 = PIXEL_DIV(t11, c1);
     // set output pixels
     p0[i] = t13;
   }

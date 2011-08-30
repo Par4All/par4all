@@ -725,10 +725,10 @@ static freia_status cst_03_helper_0_0_0_compile(void)
     "  for (i=gid; i < (gid+width); i++)\n"
     "  {\n"
     "    // pixel computations\n"
-    "    PIXEL t5 = SET_OP(c0);\n"
-    "    PIXEL t6 = ADDSAT_OP(t5, c1);\n"
-    "    PIXEL t7 = ABSDIFF_OP(t6, c2);\n"
-    "    PIXEL t8 = SUBSAT_OP(t7, c3);\n"
+    "    PIXEL t5 = PIXEL_SET(c0);\n"
+    "    PIXEL t6 = PIXEL_ADDSAT(t5, c1);\n"
+    "    PIXEL t7 = PIXEL_ABSDIFF(t6, c2);\n"
+    "    PIXEL t8 = PIXEL_SUBSAT(t7, c3);\n"
     "    // set output pixels\n"
     "    p0[i] = t8;\n"
     "  }\n"
@@ -816,10 +816,10 @@ KERNEL void cst_03_helper_0_0_0(
   for (i=gid; i < (gid+width); i++)
   {
     // pixel computations
-    PIXEL t5 = SET_OP(c0);
-    PIXEL t6 = ADDSAT_OP(t5, c1);
-    PIXEL t7 = ABSDIFF_OP(t6, c2);
-    PIXEL t8 = SUBSAT_OP(t7, c3);
+    PIXEL t5 = PIXEL_SET(c0);
+    PIXEL t6 = PIXEL_ADDSAT(t5, c1);
+    PIXEL t7 = PIXEL_ABSDIFF(t6, c2);
+    PIXEL t8 = PIXEL_SUBSAT(t7, c3);
     // set output pixels
     p0[i] = t8;
   }

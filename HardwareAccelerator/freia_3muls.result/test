@@ -698,8 +698,8 @@ static freia_status freia_3muls_helper_0_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t5 = MUL_OP(in0, in1);\n"
-    "    PIXEL t7 = MUL_OP(t5, t5);\n"
+    "    PIXEL t5 = PIXEL_MUL(in0, in1);\n"
+    "    PIXEL t7 = PIXEL_MUL(t5, t5);\n"
     "    // set output pixels\n"
     "    p0[i] = t5;\n"
     "    p1[i] = t7;\n"
@@ -800,8 +800,8 @@ KERNEL void freia_3muls_helper_0_0_0(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t5 = MUL_OP(in0, in1);
-    PIXEL t7 = MUL_OP(t5, t5);
+    PIXEL t5 = PIXEL_MUL(in0, in1);
+    PIXEL t7 = PIXEL_MUL(t5, t5);
     // set output pixels
     p0[i] = t5;
     p1[i] = t7;

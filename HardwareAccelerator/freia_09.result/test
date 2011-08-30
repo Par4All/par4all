@@ -1011,9 +1011,9 @@ static freia_status freia_09_helper_0_0_0_compile(void)
     "    PIXEL in1 = j1[i];\n"
     "    PIXEL in2 = j2[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t29 = ABSDIFF_OP(in2, in1);\n"
-    "    PIXEL t30 = ABSDIFF_OP(in1, in0);\n"
-    "    PIXEL t31 = INF_OP(t29, t30);\n"
+    "    PIXEL t29 = PIXEL_ABSDIFF(in2, in1);\n"
+    "    PIXEL t30 = PIXEL_ABSDIFF(in1, in0);\n"
+    "    PIXEL t31 = PIXEL_INF(t29, t30);\n"
     "    // set output pixels\n"
     "    p0[i] = t31;\n"
     "  }\n"
@@ -1114,9 +1114,9 @@ KERNEL void freia_09_helper_0_0_0(
     PIXEL in1 = j1[i];
     PIXEL in2 = j2[i];
     // pixel computations
-    PIXEL t29 = ABSDIFF_OP(in2, in1);
-    PIXEL t30 = ABSDIFF_OP(in1, in0);
-    PIXEL t31 = INF_OP(t29, t30);
+    PIXEL t29 = PIXEL_ABSDIFF(in2, in1);
+    PIXEL t30 = PIXEL_ABSDIFF(in1, in0);
+    PIXEL t31 = PIXEL_INF(t29, t30);
     // set output pixels
     p0[i] = t31;
   }
