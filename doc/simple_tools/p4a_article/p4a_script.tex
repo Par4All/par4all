@@ -164,7 +164,9 @@ For iterative algorithms for example, some data can often remain on the
 this, there is an optional optimization that can be used with the
 \verb|--com-optimization| option: a static interprocedural data-flow
 analysis keep track of data movement and allocation to remove redundant
-communications and allocation, leading to great performance improvements.
+communications and allocation, leading to great performance improvements. This
+options supposes that you make use of static and/or C99 VLA array, it would 
+be broken by malloc'ed arrays in parallel section.
 
 Parallelization of some functions can be avoided by using
 \texttt{-{}-exclude-modules=\emph{regex}}. This is preferable when the
