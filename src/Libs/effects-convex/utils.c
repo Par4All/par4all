@@ -3104,7 +3104,7 @@ region region_rectangular_hull(region reg, bool nofield)
 
     /* the real rectangular hull begins now */
 
-    /* fist gather all phis */
+    /* first gather all phis */
     list phis = NIL;
     FOREACH(EXPRESSION,exp,reference_indices(region_any_reference(hyper)))
         if(expression_reference_p(exp) &&
@@ -3243,7 +3243,7 @@ Ppolynome region_enumerate(region reg)
                         }
                     }
                     else {
-                        pips_internal_error("failed to analyse region\n");
+                        pips_user_warning("failed to analyse region\n");
                     }
                     sc_free(sc);
                 }
