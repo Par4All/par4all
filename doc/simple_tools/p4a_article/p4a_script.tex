@@ -72,8 +72,9 @@ This script can take C or Fortran source files and generate \Aopenmp or
 \Acuda output to run on shared memory multicore processors or
 \Agpu, respectively.
 
-The output is created in local \texttt{...p4a...} files extracted from a
-temporary \texttt{\emph{x}.database} directory that can be kept
+The output is created in files with the same name as the original ones, with a
+\emph{.p4a} extension added before the original extension. The generated files are
+extracted from a temporary \texttt{\emph{x}.database} directory that can be kept
 for later inspection (standard practice for \Apips usage).
 
 This script can also be used to call a back-end compiler such as
