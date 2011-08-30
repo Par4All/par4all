@@ -428,7 +428,8 @@ The \Apfa distribution contains the following directories:
   \item[\texttt{p4a\_slides}] is a very simplified version of the previous
     manual as slides;
   \end{description}
-\item[\texttt{examples}] contains some examples to exercise \Apfa;
+\item[\texttt{examples}] contains some examples and benchmarks to exercise
+  \Apfa;
 \item[\texttt{packages}] contains the different components of \Apfa:
   \begin{description}
   \item[\texttt{PIPS}] contains the components of \Apips framework
@@ -1179,14 +1180,17 @@ P4A_DIST='/opt/usr/local/par4all'
 P4A_ROOT='/opt/usr/local/par4all'
 \end{alltt}
 
+
 \section{Examples and demos}
 \label{sec:examples-demos}
 
-The \texttt{examples} directory contains examples to demonstrated the
-different features
-of \Apfa. There are many more examples in the validation directory of \Apfa
-(\S~\ref{sec:validation}), but they are less useful for training
-purposes.
+The \texttt{examples} directory contains examples and benchmarks to
+demonstrate the different features of \Apfa. Look at the local
+\texttt{README.txt} for more information.
+
+There are many more examples in the validation directory of \Apfa
+(\S~\ref{sec:validation}), but they are less useful for training purposes.
+
 
 \section{Validation}
 \label{sec:validation}
@@ -1197,6 +1201,15 @@ Since \Apfa relies heavily on \Apips, the \Apips validation can be run
 into the \texttt{package/PIPS/validation} directory of the \Agit working
 copy. Refer to the validation section of the \Apips developer guide for
 more information.
+
+Note that since the validation relies on the presence of some directories,
+old directories that may have been automatically created in the past but
+are useless now may create parasitic failure entries in validation
+results. So it may be useful to do a \texttt{git clean -d} in
+\texttt{package/PIPS/validation} before running the \Apips validation.  It
+is typically necessary also when validation directories have been moved
+around in the \Apips \Asvn and this is not well managed at the \Agit level
+since \Agit ignores empty directories.
 
 There is a private validation in the \texttt{validation} directory of the
 \texttt{par4all-priv} private directory. Refer to the
@@ -1617,4 +1630,3 @@ indeed. \smiley
 %%% mode: latex
 %%% ispell-local-dictionary: "american"
 %%% End:
-
