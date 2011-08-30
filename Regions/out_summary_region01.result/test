@@ -1,13 +1,13 @@
-//
-// Initial code for module my_getopt_long
-//
+#
+# Initial code for module my_getopt_long
+#
 int my_getopt_long(int argc, char *argv[], const char *optstring, const struct option *longopts, int *longindex)
 {
    return rand()-1;
 }
-//
-// Display print_code_out_regions for module my_getopt_long
-//
+#
+# Display print_code_out_regions for module my_getopt_long
+#
 int my_getopt_long(int argc, char *argv[], const char *optstring, const struct option *longopts, int *longindex)
 {
    return rand()-1;

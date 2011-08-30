@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module main
-//
+#
+# Code after privatize_module for module main
+#
 int main(int argc, char *argv[])
 {
    int i = 0;
@@ -15,9 +15,9 @@ int main(int argc, char *argv[])
    //printf("%d\n",k);
    return 0;
 }
-//
-// Code after localize_declaration for module main
-//
+#
+# Code after localize_declaration for module main
+#
 int main(int argc, char *argv[])
 {
    int i = 0;

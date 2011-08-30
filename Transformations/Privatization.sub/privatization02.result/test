@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module PRIVATIZATION02
-//
+#
+# Code after privatize_module for module PRIVATIZATION02
+#
 Check that J is privatized in the outermost loop
 
       SUBROUTINE PRIVATIZATION02

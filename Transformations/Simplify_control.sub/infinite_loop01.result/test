@@ -1,6 +1,6 @@
-//
-// Code after simplify_control for module suppress_dead_code01
-//
+#
+# Code after simplify_control for module suppress_dead_code01
+#
 void suppress_dead_code01(int *x)
 {
    char *p;

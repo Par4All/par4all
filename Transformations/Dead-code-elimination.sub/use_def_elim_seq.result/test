@@ -1,6 +1,6 @@
-//
-// Initial code for module USE_DEF_ELIM_SEQ
-//
+#
+# Initial code for module USE_DEF_ELIM_SEQ
+#
       PROGRAM USE_DEF_ELIM_SEQ
 
 c     Goal: test the consistency of the
@@ -28,9 +28,9 @@ c     ordering_to_statement tables.
       CALL DIGITALIZE(D, LX, MX, NX)                                    0025
 
       END
-//
-// Code after dead_code_elimination for module USE_DEF_ELIM_SEQ
-//
+#
+# Code after dead_code_elimination for module USE_DEF_ELIM_SEQ
+#
       PROGRAM USE_DEF_ELIM_SEQ
 
 c     Goal: test the consistency of the

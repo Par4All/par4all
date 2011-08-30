@@ -1,6 +1,6 @@
-//
-// Code after loop_fusion for module main
-//
+#
+# Code after loop_fusion for module main
+#
 int main(int argc, char **argv)
 {
    int n = argc>1?atoi(argv[1]):1000;
@@ -25,9 +25,9 @@ int main(int argc, char **argv)
    return 0;
 }
 // w.props.loop_fusion_greedy=True
-//
-// Code after loop_fusion for module main
-//
+#
+# Code after loop_fusion for module main
+#
 int main(int argc, char **argv)
 {
    int n = argc>1?atoi(argv[1]):1000;

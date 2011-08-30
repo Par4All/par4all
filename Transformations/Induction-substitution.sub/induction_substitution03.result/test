@@ -1,6 +1,6 @@
-//
-// Display print_code_preconditions for module induction03
-//
+#
+# Display print_code_preconditions for module induction03
+#
 
 //  P() {}
 
@@ -39,9 +39,9 @@ int induction03(int a)
 
    return b;
 }
-//
-// Code after induction_substitution for module induction03
-//
+#
+# Code after induction_substitution for module induction03
+#
 int induction03(int a)
 {
    /*a,*/

@@ -1,6 +1,6 @@
-//
-// Code after dead_code_elimination for module USE_DEF_ELIM03
-//
+#
+# Code after dead_code_elimination for module USE_DEF_ELIM03
+#
       INTEGER FUNCTION USE_DEF_ELIM03( I)
       INTEGER I, J, K
 

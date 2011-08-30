@@ -1,6 +1,6 @@
-//
-// Initial code for module flgr1d_arith_add_fgINT32
-//
+#
+# Initial code for module flgr1d_arith_add_fgINT32
+#
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
    int j;
@@ -20,9 +20,9 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    }
    return;
 }
-//
-// Code after unfold for module flgr1d_arith_add_fgINT32
-//
+#
+# Code after unfold for module flgr1d_arith_add_fgINT32
+#
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
    int j;

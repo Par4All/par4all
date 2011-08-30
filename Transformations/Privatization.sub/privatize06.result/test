@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module erminable
-//
+#
+# Code after privatize_module for module erminable
+#
 int erminable(char isme)
 {
    int the, follow, ce, luke;
@@ -15,9 +15,9 @@ int erminable(char isme)
       luke = ce;
    }
 }
-//
-// Code after localize_declaration for module erminable
-//
+#
+# Code after localize_declaration for module erminable
+#
 int erminable(char isme)
 {
    int the, follow, ce, luke;

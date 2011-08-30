@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module main
-//
+#
+# Code after privatize_module for module main
+#
 int main()
 {
    int i, j;
@@ -21,9 +21,9 @@ int main()
    }
    return 0;
 }
-//
-// Code after localize_declaration for module main
-//
+#
+# Code after localize_declaration for module main
+#
 int main()
 {
    int a[10][10];

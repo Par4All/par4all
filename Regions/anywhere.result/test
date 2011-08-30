@@ -1,6 +1,6 @@
-//
-// Display print_code_out_regions for module out1
-//
+#
+# Display print_code_out_regions for module out1
+#
 void out1()
 {
 
@@ -27,9 +27,9 @@ void out1()
    }
    printf("%d", b[0]);
 }
-//
-// Display print_code_out_regions for module out2
-//
+#
+# Display print_code_out_regions for module out2
+#
 void out2()
 {
 
@@ -66,9 +66,9 @@ void out2()
         used to make OUT regions buggy  */
    printf("%s", name);
 }
-//
-// Display print_code_out_regions for module out3
-//
+#
+# Display print_code_out_regions for module out3
+#
 void out3()
 {
 
