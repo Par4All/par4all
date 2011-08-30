@@ -1198,6 +1198,15 @@ into the \texttt{package/PIPS/validation} directory of the \Agit working
 copy. Refer to the validation section of the \Apips developer guide for
 more information.
 
+Note that since the validation relies on the presence of some directories,
+old directories that may have been automatically created in the past but
+are useless now may create parasitic failure entries in validation
+results. So it may be useful to do a \texttt{git clean -d} in
+\texttt{package/PIPS/validation} before running the \Apips validation.  It
+is typically necessary also when validation directories have been moved
+around in the \Apips \Asvn and this is not well managed at the \Agit level
+since \Agit ignores empty directories.
+
 There is a private validation in the \texttt{validation} directory of the
 \texttt{par4all-priv} private directory. Refer to the
 \texttt{par4all-priv/validation/README.txt} file to have documentation on
@@ -1617,4 +1626,3 @@ indeed. \smiley
 %%% mode: latex
 %%% ispell-local-dictionary: "american"
 %%% End:
-
