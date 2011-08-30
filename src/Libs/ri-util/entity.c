@@ -2443,7 +2443,8 @@ commutative_call_p(call c)
 {
     entity op  = call_function(c);
     bool commut_p = false;
-    if(ENTITY_PLUS_P(op)||ENTITY_MULTIPLY_P(op)||ENTITY_AND_P(op)||ENTITY_OR_P(op))
+    if(ENTITY_PLUS_P(op)||ENTITY_MULTIPLY_P(op)||ENTITY_AND_P(op)||ENTITY_OR_P(op)
+            || ENTITY_PLUS_C_P(op) )
     {
         basic b = basic_of_call(c,false,true);
         switch(basic_tag(b))
@@ -2455,8 +2456,8 @@ commutative_call_p(call c)
             case is_basic_logical:
             case is_basic_overloaded:
             case is_basic_int:
-                commut_p=true;
             case is_basic_pointer:
+                commut_p=true;
                 break;
             default:
                 pips_internal_error("unhandled case");
