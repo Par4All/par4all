@@ -1339,7 +1339,8 @@ void convert_to_c_operator(call c) {
         call_function(c)=entity_intrinsic(MINUS_C_OPERATOR_NAME);
 }
 
-void convert_to_standard_operators(call c) {
+static
+void do_convert_to_standard_operators(call c) {
     entity op = call_function(c);
     if(ENTITY_PLUS_C_P(op) || ENTITY_MINUS_C_P(op) ) {
         basic b0 = basic_of_expression(binary_call_lhs(c)),
@@ -1353,8 +1354,10 @@ void convert_to_standard_operators(call c) {
         free_basic(b0);
         free_basic(b1);
     }
-    for(list iter = call_arguments(c);!ENDP(iter);POP(iter))
-        simplify_expression((expression*)REFCAR(iter));
+}
+
+void convert_to_standard_operators(void * v) {
+    gen_recurse(v,call_domain,gen_true,do_convert_to_standard_operators);
 }
 
 
@@ -1446,7 +1449,8 @@ bool optimize_expressions(string module_name)
     /* check consistency after optimizations */
     unnormalize_expression(s);
     clean_up_sequences(s);
-    gen_recurse(s,call_domain,gen_true,convert_to_standard_operators);
+    convert_to_standard_operators(s);
+    simplify_expressions(s);
     pips_assert("consistency checking after optimizations",
 		statement_consistent_p(s));
 

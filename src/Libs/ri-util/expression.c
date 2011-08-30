@@ -367,6 +367,15 @@ bool expression_field_p(expression e)
 {
     return expression_call_p(e) && ENTITY_FIELD_P(call_function(expression_call(e)));
 }
+/* we get the type of the expression by calling expression_to_type()
+ * which allocates a new one. Then we call ultimate_type() to have
+ * the final type. Finally we test if it's a pointer by using pointer_type_p().*/
+bool expression_pointer_p(expression e) {
+  type et = expression_to_type(e);
+  type t = ultimate_type(et);
+  return pointer_type_p(t);
+
+}
 
 bool array_argument_p(expression e)
 {
@@ -3546,6 +3555,15 @@ bool simplify_expression(expression * pexp) {
         }
     }
     return result;
+}
+
+static void do_simplify_expressions(call c) {
+    for(list iter = call_arguments(c);!ENDP(iter);POP(iter))
+        simplify_expression((expression*)REFCAR(iter));
+}
+
+void simplify_expressions(void *obj) {
+    gen_recurse(obj,call_domain,gen_true, do_simplify_expressions);
 }
 
 /* call maxima to simplify an expression 

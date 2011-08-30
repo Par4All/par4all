@@ -932,7 +932,7 @@ static bool cse_call_flt(call c, __attribute__((unused))list* inserted)
   if(ENTITY_ASSIGN_P(call_function(c)))
   {
       expression lhs = binary_call_lhs(c);
-      if(get_bool_property("COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS") || expression_scalar_p(lhs))
+      if(get_bool_property("COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS") || expression_scalar_p(lhs) || expression_pointer_p(lhs) )
           gen_recurse_stop(lhs);
   }
   /* Go down! */
@@ -1767,7 +1767,7 @@ static void atom_cse_expression(expression e,list * skip_list)
      *   - constant (ex: 2.6 , 5)
      *   - Unary minus (ex: -a , -5)
      */
-    if (!expression_scalar_p(e) &&
+    if (!(expression_scalar_p(e)||expression_pointer_p(e)) &&
             !expression_constant_p(e) &&
             !call_unary_minus_p(e))
     {
