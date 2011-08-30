@@ -46,6 +46,8 @@
 #define AIPO "freia_aipo_"
 #define FREIA_IMAGE FREIA_IMAGE_TYPE " * "
 #define FREIA_DEFAULT_BPP get_int_property("FREIA_PIXEL_SIZE")
+#define FREIA_DEFAULT_HEIGHT get_int_property("FREIA_IMAGE_HEIGHT")
+#define FREIA_DEFAULT_WIDTH get_int_property("FREIA_IMAGE_WIDTH")
 
 // check the hardware target
 #define freia_aipo_p(s) same_string_p((s), "aipo")

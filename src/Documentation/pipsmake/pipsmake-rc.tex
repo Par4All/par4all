@@ -10077,17 +10077,27 @@ Default is to keep a cast as cast, which is not accelerated.
 FREIA_CAST_IS_COPY FALSE
 \end{PipsProp}
 
-Assume this pixel size in bits:
-\begin{PipsProp}{FREIA_PIXEL_SIZE}
-FREIA_PIXEL_SIZE 16
-\end{PipsProp}
-
 Whether to cleanup freia returned status, as the code is assumed correct
 when compiled.
 \begin{PipsProp}{FREIA_CLEANUP_STATUS}
 FREIA_CLEANUP_STATUS TRUE
 \end{PipsProp}
 
+Assume this pixel size in bits:
+\begin{PipsProp}{FREIA_PIXEL_SIZE}
+FREIA_PIXEL_SIZE 16
+\end{PipsProp}
+
+If set to a non-zero value, assume this image size when generating code.
+If zero, try generic code.
+In particular, the height is useful to compute a better imagelet size
+when generating code for the Terapix hardware accelerator.
+\begin{PipsProp}{FREIA_IMAGE_HEIGHT}
+FREIA_IMAGE_HEIGHT 0
+\end{PipsProp}
+\begin{PipsProp}{FREIA_IMAGE_WIDTH}
+FREIA_IMAGE_WIDTH 0
+\end{PipsProp}
 
 \subsection{FREIA SPoC}
 \label{hwac-freia-spoc}
@@ -10172,14 +10182,6 @@ which is good, but the imagelet memory cannot be reused for inputs
 because it is still live while being stored, which is bad for
 memory pressure.
 
-If set to a non-zero value, optimize the imagelet size (height) with respect
-to this size of image, so as to minimize the border effects. This should
-not be needed if the runtime could adjust the computed size within the
-imagelet.
-\begin{PipsProp}{HWAC_TERAPIX_IMAGE_HEIGHT}
-HWAC_TERAPIX_IMAGE_HEIGHT 0
-\end{PipsProp}
-
 Use this maximum size (height) of an imagelet if set to non-zero.
 It may be useful to set this value to the image height (if known) so
 that compiler generates code for smaller imagelets, so that the
@@ -10208,6 +10210,14 @@ If not, the result will be simular to simple AIPO compilation,
 no actual helper functions will be generated.
 \begin{PipsProp}{HWAC_OPENCL_MERGE_OPERATIONS}
 HWAC_OPENCL_MERGE_OPERATIONS TRUE
+\end{PipsProp}
+
+Whether to generate OpenCL code for one operation on its own.
+It is not interesting to do so because it is just equivalent to
+the already existing AIPO implementation, but it can be useful for
+debug.
+\begin{PipsProp}{HWAC_OPENCL_COMPILE_ONE_OPERATION}
+HWAC_OPENCL_COMPILE_ONE_OPERATION FALSE
 \end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS TRANSFORMATIONS

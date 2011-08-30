@@ -496,7 +496,8 @@ static void opencl_merge_and_compile(
     pips_debug(4, "got %d %smergeable vertices\n",
                (int) gen_length(lcurrent), mergeable? "": "non ");
 
-    if (mergeable && gen_length(lcurrent)>1)
+    if (mergeable && (gen_length(lcurrent)>1 ||
+                      get_bool_property("HWAC_OPENCL_COMPILE_ONE_OPERATION")))
     {
       // actually build subdag if something to merge
       dag nd = make_dag(NIL, NIL, NIL);
