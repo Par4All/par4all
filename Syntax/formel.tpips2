@@ -1,13 +1,4 @@
-#!/bin/sh
-
-PIPS_CHECK_FORTRAN="Y"
-export PIPS_CHECK_FORTRAN
-
-# Detect functional formal parameters
-
-tpips=${tpips_version:-tpips}
-
-($tpips 2>&1 | sed '/file *\//d') <<EOF
+setenv PIPS_CHECK_FORTRAN="Y"
 delete formel
 create formel formel.f
 
@@ -21,5 +12,3 @@ display PRINTED_FILE[Q]
 close
 delete formel
 quit
-EOF
-
