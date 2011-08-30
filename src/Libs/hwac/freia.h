@@ -62,15 +62,17 @@
 typedef struct {
   // function name
   string function_name;
-  string compact_name; // something very short for graph nodes
-  string commutator; // if the function is commutative
+  // something very short for graph nodes
+  string compact_name;
+  // if the function is commutative/has a corresponding commuted version
+  string commutator;
   // expected number of in/out arguments, that we should be able to use...
   unsigned int arg_img_out;  // 0 1
   unsigned int arg_img_in;   // 0 1 2
   // cst, bool, kernel...
   unsigned int arg_misc_out; // 0 1 2 3
   unsigned int arg_misc_in;  // 0 1 2 3
-  // mmmh...
+  // mmmh... hardcoded to max 3 in or outs (threshold, global_*_coord...)
   string arg_out_types[3];
   string arg_in_types[3];
   // ...
@@ -78,6 +80,7 @@ typedef struct {
   spoc_hw_t spoc;
   terapix_hw_t terapix;
   opencl_hw_t opencl;
+  // others? vhdl?:-)
 } freia_api_t;
 
 #define dagvtx_freia_api(v) get_freia_api(vtxcontent_opid(dagvtx_content(v)))
