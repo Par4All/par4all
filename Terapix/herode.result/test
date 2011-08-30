@@ -1,581 +1,769 @@
+void runner(int n, int img_out[n][n-4], int img[n][n])
+{
+   int x, y;
+#pragma terapix
+   for(y = 0; y <= n-1; y += 1)
+      for(x = 2; x <= n-2-1; x += 1)
+         img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+}
 tidy the code just in case of
 void runner(int n, int img_out[n][n-4], int img[n][n])
 {
    int x, y;
+#pragma terapix
    for(y = 0; y <= n-1; y += 1)
-      for(x = 2; x <= n-3; x += 1)
-         img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+      for(x = 0; x <= n-5; x += 1)
+         img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
 }
+**** check ok ******
 void runner(int n, int img_out[n][n-4], int img[n][n])
+{
+   int x, y;
+#pragma terapix
+   for(y = 0; y <= n-1; y += 1)
+      for(x = 0; x <= n-5; x += 1)
+         img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+}
+detection and extraction
+tiling
+void runner_l99998(int n, int img[n][n], int img_out[n][n-4])
 {
    unsigned int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
-   int x, y;
-   for(y = 0; y <= n-1; y += 1)
-      for(x = 2; x <= n-3; x += 1)
-         img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int x, y;
+l99998:
+#pragma terapix
+      for(y = 0; y <= n-1; y += 1)
+l99999:
+         for(x = 0; x <= n-5; x += 1)
+            img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+   }
 }
-tiling
-void runner(int n, int img_out[n][n-4], int img[n][n])
+void runner_l99998(int n, int img[n][n], int img_out[n][n-4])
 {
    int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
-   int x, y;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28;
-l99998:   ;
-   for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
-      I_1 = 2+MAX(INT((n-3)/__TERAPYPS_HEIGHT-2+1), 0);
-      I_6 = I_0*__TERAPYPS_WIDTH;
-      for(I_1 = 2; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         y = I_6+MAX(INT(MIN(n-1, I_6+__TERAPYPS_WIDTH-1)-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         for(y = I_6; y <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); y += 1)
-            for(x = I_11; x <= MIN(n-3, I_11+__TERAPYPS_HEIGHT-1); x += 1)
-               img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int x, y;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (-1+n)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((-5+n)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (-5+n)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            for(y = I_9; y <= MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1); y += 1)
+               for(x = I_14; x <= MIN(-5+n, I_14+__TERAPYPS_HEIGHT+-1); x += 1)
+                  img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][1+x]), img[y][2+x]), img[y][3+x]), img[y][4+x]);
+         }
       }
    }
 }
-void runner(int n, int img_out[n][n-4], int img[n][n])
+void runner_l99998(int n, int img[n][n], int img_out[n][n-4])
 {
    int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
-   int x, y;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28;
-l99998:   ;
-   for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
-      I_1 = MAX(INT((n-3)/__TERAPYPS_HEIGHT-1), 0)+2;
-      I_6 = I_0*__TERAPYPS_WIDTH;
-      for(I_1 = 2; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         y = I_6+MAX(INT(MIN(n-1, I_6+__TERAPYPS_WIDTH-1)-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         if (n-1>I_6+__TERAPYPS_WIDTH-1)
-            if (n-3>I_11+__TERAPYPS_HEIGHT-1)
-               for(y = I_6; y <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); y += 1)
-                  for(x = I_11; x <= MIN(n-3, I_11+__TERAPYPS_HEIGHT-1); x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int x, y;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-5)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (n-5)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+__TERAPYPS_WIDTH-1)
+               if (n-5>I_14+__TERAPYPS_HEIGHT-1)
+                  for(y = I_9; y <= I_9+__TERAPYPS_WIDTH-1; y += 1)
+                     for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+               else
+                  for(y = I_9; y <= I_9+__TERAPYPS_WIDTH-1; y += 1)
+                     for(x = I_14; x <= n-5; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+            else if (n-5>I_14+__TERAPYPS_HEIGHT-1)
+               for(y = I_9; y <= n-1; y += 1)
+                  for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
             else
-               for(y = I_6; y <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); y += 1)
-                  for(x = I_11; x <= MIN(n-3, I_11+__TERAPYPS_HEIGHT-1); x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else if (n-3>I_11+__TERAPYPS_HEIGHT-1)
-            for(y = I_6; y <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); y += 1)
-               for(x = I_11; x <= MIN(n-3, I_11+__TERAPYPS_HEIGHT-1); x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else
-            for(y = I_6; y <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); y += 1)
-               for(x = I_11; x <= MIN(n-3, I_11+__TERAPYPS_HEIGHT-1); x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+               for(y = I_9; y <= n-1; y += 1)
+                  for(x = I_14; x <= n-5; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+         }
       }
    }
 }
-void runner(int n, int img_out[n][n-4], int img[n][n])
+void runner_l99998(int n, int img[n][n], int img_out[n][n-4])
 {
    int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
-   int x, y;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28;
-l99998:   ;
-   for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
-      I_1 = MAX(INT((n-3)/__TERAPYPS_HEIGHT-1), 0)+2;
-      I_6 = I_0*__TERAPYPS_WIDTH;
-      for(I_1 = 2; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         y = I_6+MAX(INT(MIN(n-1, I_6+__TERAPYPS_WIDTH-1)-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         if (n-1>I_6+__TERAPYPS_WIDTH-1)
-            if (n-3>I_11+__TERAPYPS_HEIGHT-1)
-               for(y = I_6; y <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); y += 1)
-                  for(x = I_11; x <= MIN(n-3, I_11+__TERAPYPS_HEIGHT-1); x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int x, y;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-5)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (n-5)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+__TERAPYPS_WIDTH-1)
+               if (n-5>I_14+__TERAPYPS_HEIGHT-1)
+                  for(y = I_9; y <= I_9+__TERAPYPS_WIDTH-1; y += 1)
+                     for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+               else
+                  for(y = I_9; y <= I_9+__TERAPYPS_WIDTH-1; y += 1)
+                     for(x = I_14; x <= n-5; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+            else if (n-5>I_14+__TERAPYPS_HEIGHT-1)
+               for(y = I_9; y <= n-1; y += 1)
+                  for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
             else
-               for(y = I_6; y <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); y += 1)
-                  for(x = I_11; x <= MIN(n-3, I_11+__TERAPYPS_HEIGHT-1); x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else if (n-3>I_11+__TERAPYPS_HEIGHT-1)
-            for(y = I_6; y <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); y += 1)
-               for(x = I_11; x <= MIN(n-3, I_11+__TERAPYPS_HEIGHT-1); x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else
-            for(y = I_6; y <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); y += 1)
-               for(x = I_11; x <= MIN(n-3, I_11+__TERAPYPS_HEIGHT-1); x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+               for(y = I_9; y <= n-1; y += 1)
+                  for(x = I_14; x <= n-5; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+         }
       }
    }
 }
 group constants and isolate
-void runner(int n, int img_out[n][n-4], int img[n][n])
+void runner_l99998(int n, int img[n][n], int img_out[n][n-4])
 {
    int __TERAPYPS_WIDTH = 128, __TERAPYPS_HEIGHT;
-   int x, y;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28;
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-      I_1 = MAX(INT((n-3)/__TERAPYPS_HEIGHT-1), 0)+2;
-      I_6 = 128*I_0;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31;
+   if (__TERAPYPS_HEIGHT>3||3<128) {
+      //PIPS generated variable
+      int x, y;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+         I_1 = MAX(INT((n-5)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = 128*I_0;
 l99989:
-      for(I_1 = 2; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         y = I_6+MAX(INT(MIN(n-1, I_6+127)-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         if (n-1>I_6+127)
-            if (n-3>I_11+__TERAPYPS_HEIGHT-1)
+         for(I_1 = 0; I_1 <= (n-5)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(n-1, I_9+127)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+127)
+               if (n-5>I_14+__TERAPYPS_HEIGHT-1)
 l99996:
-               for(y = I_6; y <= I_6+127; y += 1)
+                  for(y = I_9; y <= I_9+127; y += 1)
 l99997:
-                  for(x = I_11; x <= I_11+__TERAPYPS_HEIGHT-1; x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-            else
+                     for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+               else
 l99994:
-               for(y = I_6; y <= I_6+127; y += 1)
+                  for(y = I_9; y <= I_9+127; y += 1)
 l99995:
-                  for(x = I_11; x <= n-3; x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else if (n-3>I_11+__TERAPYPS_HEIGHT-1)
+                     for(x = I_14; x <= n-5; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+            else if (n-5>I_14+__TERAPYPS_HEIGHT-1)
 l99992:
-            for(y = I_6; y <= n-1; y += 1)
+               for(y = I_9; y <= n-1; y += 1)
 l99993:
-               for(x = I_11; x <= I_11+__TERAPYPS_HEIGHT-1; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else
+                  for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+            else
 l99990:
-            for(y = I_6; y <= n-1; y += 1)
+               for(y = I_9; y <= n-1; y += 1)
 l99991:
-               for(x = I_11; x <= n-3; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+                  for(x = I_14; x <= n-5; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+         }
       }
    }
 }
-void runner(int n, int img_out[n][n-4], int img[n][n])
+void runner_l99998(int n, int img[n][n], int img_out[n][n-4])
 {
    int __TERAPYPS_WIDTH = 128, __TERAPYPS_HEIGHT;
-   int x, y;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31;
    __TERAPYPS_HEIGHT = 254;
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-      I_1 = MAX(INT((n-3)/__TERAPYPS_HEIGHT-1), 0)+2;
-      I_6 = 128*I_0;
+   if (__TERAPYPS_HEIGHT>3||3<128) {
+      //PIPS generated variable
+      int x, y;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+         I_1 = MAX(INT((n-5)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = 128*I_0;
 l99989:
-      for(I_1 = 2; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         y = I_6+MAX(INT(MIN(n-1, I_6+127)-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         if (n-1>I_6+127)
-            if (n-3>I_11+__TERAPYPS_HEIGHT-1)
+         for(I_1 = 0; I_1 <= (n-5)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(n-1, I_9+127)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+127)
+               if (n-5>I_14+__TERAPYPS_HEIGHT-1)
 l99996:
-               for(y = I_6; y <= I_6+127; y += 1)
+                  for(y = I_9; y <= I_9+127; y += 1)
 l99997:
-                  for(x = I_11; x <= I_11+__TERAPYPS_HEIGHT-1; x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-            else
+                     for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+               else
 l99994:
-               for(y = I_6; y <= I_6+127; y += 1)
+                  for(y = I_9; y <= I_9+127; y += 1)
 l99995:
-                  for(x = I_11; x <= n-3; x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else if (n-3>I_11+__TERAPYPS_HEIGHT-1)
+                     for(x = I_14; x <= n-5; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+            else if (n-5>I_14+__TERAPYPS_HEIGHT-1)
 l99992:
-            for(y = I_6; y <= n-1; y += 1)
+               for(y = I_9; y <= n-1; y += 1)
 l99993:
-               for(x = I_11; x <= I_11+__TERAPYPS_HEIGHT-1; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else
-l99990:
-            for(y = I_6; y <= n-1; y += 1)
-l99991:
-               for(x = I_11; x <= n-3; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-      }
-   }
-}
-void runner(int n, int img_out[n][n-4], int img[n][n])
-{
-   int x, y;
-   //PIPS generated variable
-   int I_0, I_1;
-
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-
-
-l99989:
-      for(I_1 = 2; I_1 <= (n-3)/254; I_1 += 1) {
-
-
-         if (n-1>128*I_0+127)
-            if (n-3>254*I_1+253)
-l99996:
-               for(y = 128*I_0; y <= 128*I_0+127; y += 1)
-l99997:
-                  for(x = 254*I_1; x <= 254*I_1+253; x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+                  for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
             else
-l99994:
-               for(y = 128*I_0; y <= 128*I_0+127; y += 1)
-l99995:
-                  for(x = 254*I_1; x <= n-3; x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else if (n-3>254*I_1+253)
-l99992:
-            for(y = 128*I_0; y <= n-1; y += 1)
-l99993:
-               for(x = 254*I_1; x <= 254*I_1+253; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else
 l99990:
-            for(y = 128*I_0; y <= n-1; y += 1)
+               for(y = I_9; y <= n-1; y += 1)
 l99991:
-               for(x = 254*I_1; x <= n-3; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+                  for(x = I_14; x <= n-5; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+         }
       }
    }
 }
 **** check ok ******
-void runner(int n, int img_out[n][n-4], int img[n][n])
+void runner_l99998(int n, int img[n][n], int img_out[n][n-4])
 {
-   int x, y;
    //PIPS generated variable
    int I_0, I_1;
 
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+   if (254>3||3<128) {
+      //PIPS generated variable
+      int x, y;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
 
 
 l99989:
-      for(I_1 = 2; I_1 <= (n-3)/254; I_1 += 1) {
+         for(I_1 = 0; I_1 <= (n-5)/254; I_1 += 1) {
 
 
-         if (n-1>128*I_0+127)
-            if (n-3>254*I_1+253)
+            if (n-1>128*I_0+127)
+               if (n-5>254*I_1+253)
 l99996:
-               for(y = 128*I_0; y <= 128*I_0+127; y += 1)
+                  for(y = 128*I_0; y <= 128*I_0+127; y += 1)
 l99997:
-                  for(x = 254*I_1; x <= 254*I_1+253; x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-            else
+                     for(x = 254*I_1; x <= 254*I_1+253; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+               else
 l99994:
-               for(y = 128*I_0; y <= 128*I_0+127; y += 1)
+                  for(y = 128*I_0; y <= 128*I_0+127; y += 1)
 l99995:
-                  for(x = 254*I_1; x <= n-3; x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else if (n-3>254*I_1+253)
+                     for(x = 254*I_1; x <= n-5; x += 1)
+                        img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+            else if (n-5>254*I_1+253)
 l99992:
-            for(y = 128*I_0; y <= n-1; y += 1)
+               for(y = 128*I_0; y <= n-1; y += 1)
 l99993:
-               for(x = 254*I_1; x <= 254*I_1+253; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else
+                  for(x = 254*I_1; x <= 254*I_1+253; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+            else
 l99990:
-            for(y = 128*I_0; y <= n-1; y += 1)
+               for(y = 128*I_0; y <= n-1; y += 1)
 l99991:
-               for(x = 254*I_1; x <= n-3; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
+                  for(x = 254*I_1; x <= n-5; x += 1)
+                     img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+         }
       }
    }
 }
-void runner(int n, int img_out[n][n-4], int img[n][n])
+void tile_l99996(int n, int I_0, int I_1, int img[n][n], int img_out[n][n-4])
 {
-   int x, y;
    //PIPS generated variable
-   int I_0, I_1;
-
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-
-
-l99989:
-      for(I_1 = 2; I_1 <= (n-3)/254; I_1 += 1) {
-
-
-         if (n-1>128*I_0+127)
-            if (n-3>254*I_1+253) {
-               //PIPS generated variable
-               int (*img0)[128][258] = (int (*)[128][258]) 0, (*img_out0)[128][254] = (int (*)[128][254]) 0;
-               P4A_accel_malloc((void **) &img_out0, sizeof(int)*32512);
-               P4A_accel_malloc((void **) &img0, sizeof(int)*33024);
-               P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 258, 128*I_0, 254*I_1-2, &img[0][0], *img0);
+   int x, y;
+l99996:
+   for(y = 128*I_0; y <= 128*I_0+127; y += 1)
+l99997:
+      for(x = 254*I_1; x <= 254*I_1+253; x += 1)
+         img_out[y][x] = MIN(MIN(MIN(MIN(img[y][x], img[y][x+1]), img[y][x+2]), img[y][x+3]), img[y][x+4]);
+}
+void tile_l99996(int n, int I_0, int I_1, int img[n][n], int img_out[n][n-4])
+{
+   //PIPS generated variable
+   int x, y;
+   {
+      //PIPS generated variable
+      int (*img0)[128][258] = (int (*)[128][258]) 0, (*img_out0)[128][254] = (int (*)[128][254]) 0;
+      P4A_accel_malloc((void **) &img_out0, sizeof(int)*32512);
+      P4A_accel_malloc((void **) &img0, sizeof(int)*33024);
+      P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 258, 128*I_0, 254*I_1, &img[0][0], *img0);
 
 l99996:
-               for(y = 128*I_0; y <= 128*I_0+127; y += 1)
+      for(y = 128*I_0; y <= 128*I_0+127; y += 1)
 l99997:
-                  for(x = 254*I_1; x <= 254*I_1+253; x += 1)
-                     (*img_out0)[y-128*I_0][x-2-(254*I_1-2)] = MIN(MIN(MIN(MIN((*img0)[y-128*I_0][x-2-(254*I_1-2)], (*img0)[y-128*I_0][x-1-(254*I_1-2)]), (*img0)[y-128*I_0][x-(254*I_1-2)]), (*img0)[y-128*I_0][x+1-(254*I_1-2)]), (*img0)[y-128*I_0][x+2-(254*I_1-2)]);
-               P4A_copy_from_accel_2d(sizeof(int), n, n-4, 128, 254, 128*I_0, 254*I_1-2, &img_out[0][0], *img_out0);
-               P4A_accel_free(img_out0);
-               P4A_accel_free(img0);
-            }
-            else
-l99994:
-               for(y = 128*I_0; y <= 128*I_0+127; y += 1)
-l99995:
-                  for(x = 254*I_1; x <= n-3; x += 1)
-                     img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else if (n-3>254*I_1+253)
-l99992:
-            for(y = 128*I_0; y <= n-1; y += 1)
-l99993:
-               for(x = 254*I_1; x <= 254*I_1+253; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-         else
-l99990:
-            for(y = 128*I_0; y <= n-1; y += 1)
-l99991:
-               for(x = 254*I_1; x <= n-3; x += 1)
-                  img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
-      }
+         for(x = 254*I_1; x <= 254*I_1+253; x += 1)
+            (*img_out0)[y-128*I_0][x-254*I_1] = MIN(MIN(MIN(MIN((*img0)[y-128*I_0][x-254*I_1], (*img0)[y-128*I_0][x+1-254*I_1]), (*img0)[y-128*I_0][x+2-254*I_1]), (*img0)[y-128*I_0][x+3-254*I_1]), (*img0)[y-128*I_0][x+4-254*I_1]);
+      P4A_copy_from_accel_2d(sizeof(int), n, n-4, 128, 254, 128*I_0, 254*I_1, &img_out[0][0], *img_out0);
+      P4A_accel_free(img_out0);
+      P4A_accel_free(img0);
    }
 }
 **** check ok ******
 outlining to launcher
-void runner(int n, int img_out[n][n-4], int img[n][n])
+void tile_l99996(int n, int I_0, int I_1, int img[n][n], int img_out[n][n-4])
 {
-   int x, y;
    //PIPS generated variable
-   int I_0, I_1;
+   int x, y;
+   {
+      //PIPS generated variable
+      int (*img0)[128][258] = (int (*)[128][258]) 0, (*img_out0)[128][254] = (int (*)[128][254]) 0;
+      P4A_accel_malloc((void **) &img_out0, 32512*sizeof(int));
+      P4A_accel_malloc((void **) &img0, 33024*sizeof(int));
+      P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 258, 128*I_0, 254*I_1, &img[0][0], *img0);
 
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-
-
-l99989:
-      for(I_1 = 0; I_1 <= (n-3)/254-2; I_1 += 1) {
-
-
-         if (n-1>128*I_0+127)
-            if (n-3>254*I_1+761) {
-               //PIPS generated variable
-               int (*img0)[128][258] = (int (*)[128][258]) 0, (*img_out0)[128][254] = (int (*)[128][254]) 0;
-               P4A_accel_malloc((void **) &img_out0, 32512*sizeof(int));
-               P4A_accel_malloc((void **) &img0, 33024*sizeof(int));
-               P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 258, 128*I_0, 254*I_1+506, &img[0][0], *img0);
-
-l99996:               launcher_0(253+1, *img0, *img_out0);
-               P4A_copy_from_accel_2d(sizeof(int), n, n-4, 128, 254, 128*I_0, 254*I_1+506, &img_out[0][0], *img_out0);
-               P4A_accel_free(img_out0);
-               P4A_accel_free(img0);
-            }
-            else
-l99994:
-               for(y = 0; y <= 127; y += 1)
-l99995:
-                  for(x = 0; x <= n-254*I_1-511; x += 1)
-                     img_out[128*I_0+y][254*I_1+x+506] = MIN(MIN(MIN(MIN(img[128*I_0+y][254*I_1+x+506], img[128*I_0+y][254*I_1+x+507]), img[128*I_0+y][254*I_1+x+508]), img[128*I_0+y][254*I_1+x+509]), img[128*I_0+y][254*I_1+x+510]);
-         else if (n-3>254*I_1+761)
-l99992:
-            for(y = 0; y <= n-128*I_0-1; y += 1)
-l99993:
-               for(x = 0; x <= 253; x += 1)
-                  img_out[128*I_0+y][254*I_1+x+506] = MIN(MIN(MIN(MIN(img[128*I_0+y][254*I_1+x+506], img[128*I_0+y][254*I_1+x+507]), img[128*I_0+y][254*I_1+x+508]), img[128*I_0+y][254*I_1+x+509]), img[128*I_0+y][254*I_1+x+510]);
-         else
-l99990:
-            for(y = 0; y <= n-128*I_0-1; y += 1)
-l99991:
-               for(x = 0; x <= n-254*I_1-511; x += 1)
-                  img_out[128*I_0+y][254*I_1+x+506] = MIN(MIN(MIN(MIN(img[128*I_0+y][254*I_1+x+506], img[128*I_0+y][254*I_1+x+507]), img[128*I_0+y][254*I_1+x+508]), img[128*I_0+y][254*I_1+x+509]), img[128*I_0+y][254*I_1+x+510]);
-      }
+l99996:      launcher_0(253+1, *img0, *img_out0);
+      P4A_copy_from_accel_2d(sizeof(int), n, n-4, 128, 254, 128*I_0, 254*I_1, &img_out[0][0], *img_out0);
+      P4A_accel_free(img_out0);
+      P4A_accel_free(img0);
    }
 }
 
 //  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=257,
-//    I_29==254}>
+//    I_32==254}>
 //  <img_out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2<=253, I_29==254}>
+//    PHI2<=253, I_32==254}>
 
-void launcher_0(int I_29, int img0[128][258], int img_out0[128][254])
+void launcher_0(int I_32, int img0[128][258], int img_out0[128][254])
 {
    //PIPS generated variable
    int x, y;
 
 //  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=257,
-//    I_29==254}>
+//    I_32==254}>
 //  <img_out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2<=253, I_29==254}>
+//    PHI2<=253, I_32==254}>
 
 l99996:
    for(y = 0; y <= 127; y += 1)
 
-//  <img0[PHI1][PHI2]-R-EXACT-{PHI1==y, 0<=PHI2, PHI2<=257, I_29==254,
+//  <img0[PHI1][PHI2]-R-EXACT-{PHI1==y, 0<=PHI2, PHI2<=257, I_32==254,
 //    0<=y, y<=127}>
 //  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==y, 0<=PHI2, PHI2<=253,
-//    I_29==254, 0<=y, y<=127}>
+//    I_32==254, 0<=y, y<=127}>
 
 l99997:
-      for(x = 0; x <= I_29-1; x += 1)
+      for(x = 0; x <= I_32-1; x += 1)
 
-//  <img0[PHI1][PHI2]-R-EXACT-{PHI1==y, x<=PHI2, PHI2<=x+4, I_29==254,
+//  <img0[PHI1][PHI2]-R-EXACT-{PHI1==y, x<=PHI2, PHI2<=x+4, I_32==254,
 //    0<=x, x<=253, 0<=y, y<=127}>
-//  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==y, PHI2==x, I_29==254, 0<=x,
+//  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==y, PHI2==x, I_32==254, 0<=x,
 //    x<=253, 0<=y, y<=127}>
 
          img_out0[y][x] = MIN(MIN(MIN(MIN(img0[y][x], img0[y][x+1]), img0[y][x+2]), img0[y][x+3]), img0[y][x+4]);
 }
 outlining to microcode
-void launcher_0(int I_29, int img0[128][258], int img_out0[128][254])
+void launcher_0(int I_32, int img0[128][258], int img_out0[128][254])
 {
    //PIPS generated variable
    int x, y;
 l99996:
    for(y = 0; y <= 127; y += 1)
-l99997:      launcher_0_microcode(I_29, *&img0[y], *&img_out0[y]);
+l99997:
+      for(x = 0; x <= I_32-1; x += 1)
+         img_out0[y][x] = MIN(MIN(MIN(MIN(img0[y][x], img0[y][x+1]), img0[y][x+2]), img0[y][x+3]), img0[y][x+4]);
 }
-void launcher_0_microcode(int I_29, int img00[258], int img_out00[254])
+void launcher_0(int I_32, int img0[128][258], int img_out0[128][254])
+{
+   //PIPS generated variable
+   int x, y;
+l99996:
+   for(y = 0; y <= 127; y += 1)
+l99997:
+      for(x = 0; x <= I_32-1; x += 1)
+         img_out0[y][x] = MIN(MIN(MIN(MIN(img0[y][x], img0[y][x+1]), img0[y][x+2]), img0[y][x+3]), img0[y][x+4]);
+}
+void launcher_0(int I_32, int img0[128][258], int img_out0[128][254])
+{
+   //PIPS generated variable
+   int x, y;
+l99996:
+   for(y = 0; y <= 127; y += 1)
+l99997:      launcher_0_microcode(I_32, *&img0[y], *&img_out0[y]);
+}
+void launcher_0_microcode(int I_32, int img00[258], int img_out00[254])
 {
    //PIPS generated variable
    int x;
 l99997:
-   for(x = 0; x <= I_29-1; x += 1)
+   for(x = 0; x <= I_32-1; x += 1)
       img_out00[x] = MIN(MIN(MIN(MIN(img00[x], img00[x+1]), img00[x+2]), img00[x+3]), img00[x+4]);
 }
 **** check ok ******
 refining microcode
-void launcher_0_microcode(int I_29, int *img00, int *img_out00)
+void launcher_0_microcode(int I_32, int img00[258], int img_out00[254])
 {
    //PIPS generated variable
    int x;
 l99997:
-   for(x = 0; x <= I_29-1; x += 1)
-      *(img_out00+x) = MIN(MIN(MIN(MIN(*(img00+x), *(img00+x+1)), *(img00+x+2)), *(img00+x+3)), *(img00+x+4));
+   for(x = 0; x <= I_32-1; x += 1)
+      img_out00[x] = MIN(MIN(MIN(MIN(img00[x], img00[x+1]), img00[x+2]), img00[x+3]), img00[x+4]);
+}
+void launcher_0_microcode(int I_32, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int x;
+l99997:
+   for(x = 0; x <= I_32-1; x += 1)
+      *(img_out00+x) = MIN(MIN(MIN(MIN(*(img00+x), *(img00+(x+1))), *(img00+(x+2))), *(img00+(x+3))), *(img00+(x+4)));
 }
 **** check ok ******
-void launcher_0_microcode(int I_29, int *img00, int *img_out00)
+void launcher_0_microcode(int I_32, int *img00, int *img_out00)
 {
    //PIPS generated variable
    int x;
    //PIPS generated variable
-   int *img_out000, *img000, *P_0;
+   int *P_0, *P_1, *P_2, *P_3;
+   P_0 = img00+1;
+   P_1 = img00+2;
+   P_2 = img00+3;
+   P_3 = img00+4;
+l99997:
+   for(x = 0; x <= I_32-1; x += 1)
+      *(img_out00+x) = MIN(MIN(MIN(MIN(*(x+img00), *(x+P_0)), *(x+P_1)), *(x+P_2)), *(x+P_3));
+}
+void launcher_0_microcode(int I_32, int *img00, int *img_out00)
+{
    //PIPS generated variable
-   int I_30;
+   int x;
    //PIPS generated variable
-   int *P_1;
-   //PIPS generated variable
-   int I_31;
-   //PIPS generated variable
-   int *P_2;
-   //PIPS generated variable
-   int I_32;
-   //PIPS generated variable
-   int *P_3;
+   int *P_0, *P_1, *P_2, *P_3, *img_out000, *img000, *P_00, *P_10, *P_20, *P_30;
+   P_0 = img00+1;
+   P_1 = img00+2;
+   P_2 = img00+3;
+   P_3 = img00+4;
+   P_30 = P_3;
+   P_20 = P_2;
+   P_10 = P_1;
+   P_00 = P_0;
    img000 = img00;
    img_out000 = img_out00;
 l99997:
-   for(x = 0; x <= I_29-1; x += 1) {
-      P_0 = img000+1;
-      I_30 = MIN(*img000, *P_0);
-      P_1 = img000+2;
-      I_31 = MIN(I_30, *P_1);
-      P_2 = img000+3;
-      I_32 = MIN(I_31, *P_2);
-      P_3 = img000+4;
-      *img_out000 = MIN(I_32, *P_3);
+   for(x = 0; x <= I_32-1; x += 1) {
+      *img_out000 = MIN(MIN(MIN(MIN(*img000, *P_00), *P_10), *P_20), *P_30);
+      P_30 += 1;
+      P_20 += 1;
+      P_10 += 1;
+      P_00 += 1;
+      img000 += 1;
+      img_out000 += 1;
+   }
+}
+**** check ok ******
+void launcher_0_microcode(int I_32, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int x;
+   //PIPS generated variable
+   int *P_0, *P_1, *P_2, *P_3, *img_out000, *img000, *P_00, *P_10, *P_20, *P_30;
+   P_0 = img00+1;
+   P_1 = img00+2;
+   P_2 = img00+3;
+   P_3 = img00+4;
+   P_30 = P_3;
+   P_20 = P_2;
+   P_10 = P_1;
+   P_00 = P_0;
+   img000 = img00;
+   img_out000 = img_out00;
+l99997:
+   for(x = 0; x <= I_32-1; x += 1) {
+      *img_out000 = MIN(MIN(MIN(MIN(*img000, *P_00), *P_10), *P_20), *P_30);
+      P_30 += 1;
+      P_20 += 1;
+      P_10 += 1;
+      P_00 += 1;
+      img000 += 1;
+      img_out000 += 1;
+   }
+}
+**** check ok ******
+**** check ok ******
+void launcher_0_microcode(int I_32, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int x;
+   //PIPS generated variable
+   int *P_0, *P_1, *P_2, *P_3, *img_out000, *img000, *P_00, *P_10, *P_20, *P_30;
+   P_0 = img00+1;
+   P_1 = img00+2;
+   P_2 = img00+3;
+   P_3 = img00+4;
+   P_30 = P_3;
+   P_20 = P_2;
+   P_10 = P_1;
+   P_00 = P_0;
+   img000 = img00;
+   img_out000 = img_out00;
+l99997:
+   for(x = 0; x <= I_32-1; x += 1) {
+      *img_out000 = MIN(MIN(MIN(MIN(*img000, *P_00), *P_10), *P_20), *P_30);
+      P_30 += 1;
+      P_20 += 1;
+      P_10 += 1;
+      P_00 += 1;
+      img000 += 1;
+      img_out000 += 1;
+   }
+}
+void launcher_0_microcode(int I_32, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int x;
+   //PIPS generated variable
+   int *P_0, *P_1, *P_2, *P_3, *img_out000, *img000, *P_00, *P_10, *P_20, *P_30;
+   P_0 = img00+1;
+   P_1 = img00+2;
+   P_2 = img00+3;
+   P_3 = img00+4;
+   P_30 = P_3;
+   P_20 = P_2;
+   P_10 = P_1;
+   P_00 = P_0;
+   img000 = img00;
+   img_out000 = img_out00;
+l99997:
+   for(x = 0; x <= I_32-1; x += 1) {
+      *img_out000 = MIN(MIN(MIN(MIN(*img000, *P_00), *P_10), *P_20), *P_30);
+      P_30 = P_30+1;
+      P_20 = P_20+1;
+      P_10 = P_10+1;
+      P_00 = P_00+1;
+      img000 = img000+1;
+      img_out000 = img_out000+1;
+   }
+}
+void launcher_0_microcode(int I_32, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int x;
+   //PIPS generated variable
+   int *P_0, *P_1, *P_2, *P_3, *img_out000, *img000, *P_00, *P_10, *P_20, *P_30;
+   //PIPS generated variable
+   int I_33, I_34, I_35;
+   P_0 = img00+1;
+   P_1 = img00+2;
+   P_2 = img00+3;
+   P_3 = img00+4;
+   P_30 = P_3;
+   P_20 = P_2;
+   P_10 = P_1;
+   P_00 = P_0;
+   img000 = img00;
+   img_out000 = img_out00;
+l99997:
+   for(x = 0; x <= I_32-1; x += 1) {
+      I_33 = MIN(*img000, *P_00);
+      I_34 = MIN(I_33, *P_10);
+      I_35 = MIN(I_34, *P_20);
+      *img_out000 = MIN(I_35, *P_30);
+      P_30 = P_30+1;
+      P_20 = P_20+1;
+      P_10 = P_10+1;
+      P_00 = P_00+1;
       img000 = img000+1;
       img_out000 = img_out000+1;
    }
 }
 **** check ok ******
-I_29 belongs to a loop bound
-img00 seems an image
-img_out00 seems an image
-void launcher_0_microcode(int *FIFO1, int *FIFO0, int N0)
+void launcher_0_microcode(int I_32, int *img00, int *img_out00)
 {
    //PIPS generated variable
-   int *im0;
+   int x;
    //PIPS generated variable
-   int re0;
+   int *P_0, *P_1, *P_2, *P_3, *img_out000, *img000, *P_00, *P_10, *P_20, *P_30;
    //PIPS generated variable
-   int *im1;
-   //PIPS generated variable
-   int re1;
-   //PIPS generated variable
-   int *im2;
-   //PIPS generated variable
-   int re2;
-   //PIPS generated variable
-   int *im3, *im4, *im5, *im6, *im7;
-   //PIPS generated variable
-   int re3;
-   im7 = FIFO1;
-   im6 = FIFO0;
-   im4 = im6;
-   im5 = im7;
+   int I_33, I_34, I_35;
+   P_0 = img00+1;
+   P_1 = img00+2;
+   P_2 = img00+3;
+   P_3 = img00+4;
+   P_30 = P_3;
+   P_20 = P_2;
+   P_10 = P_1;
+   P_00 = P_0;
+   img000 = img00;
+   img_out000 = img_out00;
 l99997:
-   for(re3 = 0; re3 <= N0; re3 += 1) {
-      im3 = im4+1;
-      re2 = MIN(*im4, *im3);
-      im2 = im4+2;
-      re1 = MIN(re2, *im2);
-      im1 = im4+3;
-      re0 = MIN(re1, *im1);
-      im0 = im4+4;
-      *im5 = MIN(re0, *im0);
-      im4 = im4+1;
-      im5 = im5+1;
+   for(x = 0; x <= I_32-1; x += 1) {
+      I_33 = MIN(*img000, *P_00);
+      I_34 = MIN(I_33, *P_10);
+      I_35 = MIN(I_34, *P_20);
+      *img_out000 = MIN(I_35, *P_30);
+      P_30 = P_30+1;
+      P_20 = P_20+1;
+      P_10 = P_10+1;
+      P_00 = P_00+1;
+      img000 = img000+1;
+      img_out000 = img_out000+1;
    }
 }
-void launcher_0(int I_29, int img0[128][258], int img_out0[128][254])
+**** check ok ******
+I_32 belongs to a loop bound
+img00 seems an image
+img_out00 seems an image
+void launcher_0_microcode(int *FIFO2, int *FIFO1, int N1)
+{
+   //PIPS generated variable
+#pragma terapix img_out00 128 254
+#pragma terapix img00 128 258
+   int x;
+   //PIPS generated variable
+   int *P_0, *P_1, *P_2, *P_3, *img_out000, *img000, *P_00, *P_10, *P_20, *P_30;
+   //PIPS generated variable
+   int I_33, I_34, I_35, re5, re6, re7, re8;
+   //PIPS generated variable
+   int *im1, *im2, *im3, *im4, *im5, *im6, *im7, *im8, *im9, *im10, *img00, *im11, *img_out00, *im12;
+   //PIPS generated variable
+   int re9, re10;
+   //PIPS generated variable
+   int *im13, *im14, *im15, *im16, *im17, *im18, *im19, *im20, *im21, *im22;
+   //PIPS generated variable
+   int re11, re12, re13;
+   //PIPS generated variable
+   int *im23, *im24;
+   im12 = FIFO2;
+   im11 = FIFO1;
+   im10 = im11+1;
+   im9 = im11+2;
+   im8 = im11+3;
+   im7 = im11+4;
+   im1 = im7;
+   im2 = im8;
+   im3 = im9;
+   im4 = im10;
+   im5 = im11;
+   im6 = im12;
+   im6 = im6-1;
+   im5 = im5-1;
+   im4 = im4-1;
+   im3 = im3-1;
+   im2 = im2-1;
+   im1 = im1-1;
+l99997:
+   for(re9 = 0; re9 <= N1; re9 += 1) {
+      //PIPS generated variable
+      int I_36;
+      re8 = MIN(*++im5, *++im4);
+      re7 = MIN(re8, *++im3);
+      re6 = MIN(re7, *++im2);
+      *++im6 = MIN(re6, *++im1);
+   }
+}
+**** check ok ******
+void launcher_0_microcode(int *FIFO2, int *FIFO1, int N1)
+{
+   //PIPS generated variable
+#pragma terapix img_out00 128 254
+#pragma terapix img00 128 258
+   int x;
+   //PIPS generated variable
+   int *P_0, *P_1, *P_2, *P_3, *img_out000, *img000, *P_00, *P_10, *P_20, *P_30;
+   //PIPS generated variable
+   int I_33, I_34, I_35, re5, re6, re7, re8;
+   //PIPS generated variable
+   int *im1, *im2, *im3, *im4, *im5, *im6, *im7, *im8, *im9, *im10, *img00, *im11, *img_out00, *im12;
+   //PIPS generated variable
+   int re9, re10;
+   //PIPS generated variable
+   int *im13, *im14, *im15, *im16, *im17, *im18, *im19, *im20, *im21, *im22;
+   //PIPS generated variable
+   int re11, re12, re13;
+   //PIPS generated variable
+   int *im23, *im24;
+   im12 = FIFO2;
+   im11 = FIFO1;
+   im10 = im11+1;
+   im9 = im11+2;
+   im8 = im11+3;
+   im7 = im11+4;
+   im1 = im7;
+   im2 = im8;
+   im3 = im9;
+   im4 = im10;
+   im5 = im11;
+   im6 = im12;
+   im6 = im6-1;
+   im5 = im5-1;
+   im4 = im4-1;
+   im3 = im3-1;
+   im2 = im2-1;
+   im1 = im1-1;
+l99997:
+   for(re9 = 0; re9 <= N1; re9 += 1) {
+      //PIPS generated variable
+      int I_36;
+      re8 = MIN(*++im5, *++im4);
+      re7 = MIN(re8, *++im3);
+      re6 = MIN(re7, *++im2);
+      *++im6 = MIN(re6, *++im1);
+   }
+}
+void launcher_0(int I_32, int img0[128][258], int img_out0[128][254])
 {
    //PIPS generated variable
    int x, y;
 l99996:
    for(y = 0; y <= 127; y += 1)
-l99997:      launcher_0_microcode(*&img_out0[y], *&img0[y], I_29);
+l99997:      launcher_0_microcode(*&img_out0[y], *&img0[y], I_32);
 }
 **** check ok ******
-void launcher_0_microcode(int *FIFO1, int *FIFO0, int N0)
+int main(int argc, char **argv)
 {
-   //PIPS generated variable
-   int *im0;
-   //PIPS generated variable
-   int re0;
-   //PIPS generated variable
-   int *im1;
-   //PIPS generated variable
-   int re1;
-   //PIPS generated variable
-   int *im2;
-   //PIPS generated variable
-   int re2;
-   //PIPS generated variable
-   int *im3, *im4, *im5, *im6, *im7;
-   //PIPS generated variable
-   int re3;
-   im7 = FIFO1;
-   im6 = FIFO0;
-   im4 = im6;
-   im5 = im7;
-l99997:
-   for(re3 = 0; re3 <= N0; re3 += 1) {
-      im3 = im4+1;
-      re2 = MIN(*im4, *im3);
-      im2 = im4+2;
-      re1 = MIN(re2, *im2);
-      im1 = im4+3;
-      re0 = MIN(re1, *im1);
-      im0 = im4+4;
-      *im5 = MIN(re0, *im0);
-      im4 = im4+1;
-      im5 = im5+1;
-   }
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int out[n][n-4], in[n][n];
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         in[i][j] = j;
+   runner(n, out, in);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-4-1; j += 1)
+         check += out[i][j];
+   printf("%d\n", check);
+   return 0;
 }
-sub launcher_0_microcode
-im7 = FIFO1
-im6 = FIFO0
-im4 = im6
-im5 = im7
-l99997:
-                        ||                        ||                        ||         do_N0          ||                        
-im3 = im4+1
-re2 = MIN(*im4, *im3)
-im2 = im4+2
-re1 = MIN(re2, *im2)
-im1 = im4+3
-re0 = MIN(re1, *im1)
-im0 = im4+4
-*im5 = MIN(re0, *im0)
-im4 = im4+1
-im5 = im5+1
-                        ||                        ||                        ||          loop          ||                        
-endsub
+tidy the code just in case of
+int main(int argc, char **argv)
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int out[n][n-5+1], in[n][n];
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         in[i][j] = j;
+   runner(n, out, in);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-5; j += 1)
+         check += out[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+**** check ok ******
+int main(int argc, char **argv)
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int out[n][n-5+1], in[n][n];
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         in[i][j] = j;
+   runner(n, out, in);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-5; j += 1)
+         check += out[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+detection and extraction
+tiling

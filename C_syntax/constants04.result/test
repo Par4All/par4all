@@ -1,0 +1,44 @@
+void foo(int *FIFO2, int *FIFO1, int I_41, int y)
+{
+   //PIPS generated variable
+   int re5, re6, re7;
+   //PIPS generated variable
+   int *im1;
+   //PIPS generated variable
+   int re8;
+   //PIPS generated variable
+   int *im2, *im3, *im4, *im5, *im6, *im7, *im8, *im9, *im10, *im11, *im12, *im13, *im14;
+   //PIPS generated variable
+   int re9;
+   int N1 = I_41/(0+1);
+   //PIPS generated variable
+   im14 = FIFO2;
+   im13 = FIFO1;
+   re8 = 260*y;
+   im1 = re8+im13;
+   im12 = im1;
+   im11 = 260+im1;
+   im10 = 520+im1;
+   im9 = 780+im1;
+   im8 = 1040+im1;
+   im2 = im8;
+   im3 = im9;
+   im4 = im10;
+   im5 = im11;
+   im6 = im12;
+   im7 = im14;
+l99997:
+   for(re9 = 0; re9 <= N1; re9 += 1) {
+      re7 = MIN(*im6, *im5);
+      re6 = MIN(re7, *im4);
+      re5 = MIN(re6, *im3);
+
+      *im7 = MIN(re5, *im2);
+      im2 = im2+1;
+      im3 = im3+1;
+      im4 = im4+1;
+      im5 = im5+1;
+      im6 = im6+1;
+      im7 = im7+1;
+   }
+}

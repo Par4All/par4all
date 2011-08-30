@@ -11,7 +11,7 @@ int main()
    int a[2][4] = {{0, 1, 2, 3}, {4, 5, 6, 7}}, b = 3;
    {
       //PIPS generated variable
-      int caillou[10], z0, z1;
+      int z0, z1, caillou[10];
       caillou[0] = "%d";
       for(z1 = 0; z1 <= 2-1; z1 += 1)
          for(z0 = 0; z0 <= 4-1; z0 += 1)
