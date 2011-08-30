@@ -73,16 +73,14 @@
    is a name.database directory in the current directory): */
 void pips_get_workspace_list(gen_array_t array)
 {
-   int i, n;
-
-   /* Find all directories with name ending with ".database": */
-
-   list_files_in_directory(array, ".", "^.*\\.database$", directory_exists_p);
-   n = gen_array_nitems(array);
-   /* Remove the ".database": */
-   for (i = 0; i < n; i++) {
-      *strchr(gen_array_item(array, i), '.') = '\0';
-   }
+  int i, n;
+  // Find all directories with name ending with ".database":
+  list_files_in_directory(array, ".", "^.*\\.database$", directory_exists_p);
+  n = gen_array_nitems(array);
+  // Remove the ".database":
+  for (i = 0; i < n; i++) {
+    *strchr(gen_array_item(array, i), '.') = '\0';
+  }
 }
 
 
@@ -90,7 +88,7 @@ void pips_get_workspace_list(gen_array_t array)
    arg list: */
 void pips_get_fortran_list(gen_array_t array)
 {
-    list_files_in_directory(array, ".", "^.*\\.[fF]$", file_exists_p);
+  list_files_in_directory(array, ".", "^.*\\.[fF]$", file_exists_p);
 }
 
 
@@ -98,59 +96,63 @@ void pips_get_fortran_list(gen_array_t array)
    directory. Can be freed by the caller. */
 string hpfc_generate_path_name_of_file_name(const char* file_name)
 {
-    string dir_name = db_get_current_workspace_directory(),
-	name = strdup(concatenate(
-	    dir_name, "/", HPFC_COMPILED_FILE_DIR, "/", file_name, NULL));
-    free(dir_name);
-    return name;
+  string dir_name = db_get_current_workspace_directory(),
+    name = strdup(concatenate(
+         dir_name, "/", HPFC_COMPILED_FILE_DIR, "/", file_name, NULL));
+  free(dir_name);
+  return name;
 }
 
-
 int hpfc_get_file_list(gen_array_t file_names,
-		       char ** hpfc_directory_name)
+                       char ** hpfc_directory_name)
 {
-    /* some static but dynamic buffer.
-     */
-    static int hpfc_bsz = 0;
-    static char * hpfc_dir = NULL;
+  // some static but dynamic buffer.
+  static int hpfc_bsz = 0;
+  static char * hpfc_dir = NULL;
 
-    int return_code, len;
-    char * dir = build_pgmwd(db_get_current_workspace_name());
+  int return_code, len;
+  char * dir = build_pgmwd(db_get_current_workspace_name());
 
-    len = strlen(dir) + strlen(HPFC_COMPILED_FILE_DIR) + 5;
+  len = strlen(dir) + strlen(HPFC_COMPILED_FILE_DIR) + 5;
 
-    if (hpfc_bsz<len) {
-	if (hpfc_dir) free(hpfc_dir), hpfc_dir=NULL;
-	hpfc_bsz = len;
-	hpfc_dir = (char*) malloc(hpfc_bsz);
-	message_assert("malloc succeeded", hpfc_dir);
-    }
+  if (hpfc_bsz<len) {
+    if (hpfc_dir) free(hpfc_dir), hpfc_dir=NULL;
+    hpfc_bsz = len;
+    hpfc_dir = (char*) malloc(hpfc_bsz);
+    message_assert("malloc succeeded", hpfc_dir);
+  }
 
-   /* Get the HPFC file name list: */
-   sprintf(hpfc_dir, "%s/%s", dir, HPFC_COMPILED_FILE_DIR);
+  // Get the HPFC file name list:
+  sprintf(hpfc_dir, "%s/%s", dir, HPFC_COMPILED_FILE_DIR);
 
-   return_code = safe_list_files_in_directory(
-       file_names,
-       hpfc_dir, /* Where is the output of HPFC: */
-       "^[A-Z].*\\.[fh]$", /* generated files start with upercases */
-       file_exists_p /* Plain files only: */);
-   *hpfc_directory_name = hpfc_dir;
+  return_code = safe_list_files_in_directory(
+    file_names,
+    hpfc_dir, /* Where is the output of HPFC: */
+    "^[A-Z].*\\.[fh]$", /* generated files start with upercases */
+    file_exists_p /* Plain files only: */);
+  *hpfc_directory_name = hpfc_dir;
 
-   return return_code;
+  return return_code;
 }
 
 
 /* Change to the given directory if it exists and return a canonical name.
-
-   Return NULL if it does not exist. */
+   Return NULL if it does not exist, or fails
+*/
 string pips_change_directory(const char *dir)
 {
-    if (directory_exists_p(dir)) {
-	chdir(dir);
-	return(get_cwd());
+  if (directory_exists_p(dir))
+  {
+    int status = chdir(dir);
+    if (status==-1)
+    {
+      perror("chdir");
+      return NULL;
     }
-
-    return NULL;
+    // should check status...
+    return get_cwd();
+  }
+  return NULL;
 }
 
 /********************************************************* PIPS SOURCE PATH */
@@ -254,49 +256,51 @@ static regex_t
  */
 static string find_file(string name)
 {
-    string srcpath = getenv(SRCPATH), result;
-    string path = strdup(concatenate(
-	srcpath? srcpath: "", ":",
-	user_file_directory? user_file_directory: "", ":.:..", NULL));
-    result = find_file_in_directories(name, path);
-    free(path);
-    return result;
+  string srcpath = getenv(SRCPATH), result;
+  string path = strdup(concatenate(
+                         srcpath? srcpath: "", ":",
+                         user_file_directory? user_file_directory: "", ":.:..",
+                         NULL));
+  result = find_file_in_directories(name, path);
+  free(path);
+  return result;
 }
 
 /* cache of preprocessed includes
  */
 static hash_table processed_cache = hash_table_undefined;
-void init_processed_include_cache(void) {
-  /* Since these functions are called in different context, the
-     conventional pips_debug() is not well suitable, so revert to plain
-     old fprintf for debug... */
+void init_processed_include_cache(void)
+{
+  // Since these functions are called in different context, the
+  // conventional pips_debug() is not well suitable, so revert to plain
+  // old fprintf for debug...
   //fprintf(stderr, "[init_processed_include_cache] Entering\n");
   pips_assert("undefined cache", hash_table_undefined_p(processed_cache));
   processed_cache = hash_table_make(hash_string, 100);
 }
 
 
-void close_processed_include_cache(void) {
+void close_processed_include_cache(void)
+{
   //fprintf(stderr, "[close_processed_include_cache] Entering\n");
   if (hash_table_undefined_p(processed_cache))
-    {
-      /* pips may call this without a prior call to
-       * init_processed_include_cache under some error conditions,
-       * such as a file not found in the initializer, or a failed cpp.
-       */
-      /*
-	Do not warn the user about PIPS internal architecture issues... :-/
-	pips_user_warning("no 'processed include cache' to close, "
-	"skipping...\n");
-      */
-      return;
-    }
+  {
+    /* pips may call this without a prior call to
+     * init_processed_include_cache under some error conditions,
+     * such as a file not found in the initializer, or a failed cpp.
+     */
+    /*
+      Do not warn the user about PIPS internal architecture issues... :-/
+      pips_user_warning("no 'processed include cache' to close, "
+      "skipping...\n");
+    */
+    return;
+  }
   pips_assert("defined cache", !hash_table_undefined_p(processed_cache));
   HASH_MAP(k, v, { unlink(v); free(v); }, processed_cache);
   hash_table_free(processed_cache);
   processed_cache = hash_table_undefined;
 }
-
 
 /* Returns the processed cached file name, or null if none.
  */
@@ -937,24 +941,6 @@ static bool pips_check_c(void)
   string prop = "CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS";
   return pips_check_syntax(env, prop);
 }
-/*
-static int pips_check_c(void)
-{
-    string v = getenv("PIPS_CHECK_C");
-
-    if (v && (*v=='o' || *v=='y' || *v=='t' || *v=='v' || *v=='1' ||
-	      *v=='O' || *v=='Y' || *v=='T' || *v=='V'))
-	return true;
-
-    if (v && (*v=='n' || *v=='f'  || *v=='0' ||
-	      *v=='N' || *v=='F' ))
-	return false;
-
-    return get_bool_property("CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS");
-}
-*/
-
-#define SUFFIX ".pips.o"
 
 /* Verify that the syntax of a program is correct by running a real
  * compiler on it.
@@ -962,28 +948,27 @@ static int pips_check_c(void)
  * string compiler may/must contain the necessary options, e.g. PIPS_CC_FLAGS
  */
 static bool
-check_input_file_syntax(string file_name, string compiler, string options)
+check_input_file_syntax(
+  string file_name, string compiler, string options, string language)
 {
-  //string pips_flint = getenv("PIPS_FLINT");
   bool syntax_ok_p = true;
   // SRCPATH has already been used to locate the file and generate a
   // full file name, file_name
   string include_path = getenv(SRCPATH);
   string includes = include_path_to_include_flags(include_path);
 
-  user_log("Checking syntax of file \"%s\"\n", file_name);
+  user_log("Checking %s syntax of file \"%s\"\n", language, file_name);
 
   if (safe_system_no_abort
-      (concatenate(compiler, " ", options, "", includes,
-		   " ", file_name, " ",
+      (concatenate(compiler, " ", options, includes, " ", file_name, " ",
       // DO NOT USE A POSSIBLY SHARED FILE NAME!
       // the same "file_name.o" can be used by several creates
       // performed in parallel, for instance by the validation...
-		   " -o /dev/null", NULL))) {
-
+		   " -o /dev/null", NULL)))
+  {
     // Note that TAB is avoided in warning to simplify validation.
-    pips_user_warning("\n\n        Syntax errors in file %s!\007\n\n",
-		      file_name);
+    pips_user_warning("\n\n        %s syntax errors in file %s!\007\n\n",
+                      language, file_name);
     syntax_ok_p = false;
   }
   free(includes);
@@ -991,28 +976,17 @@ check_input_file_syntax(string file_name, string compiler, string options)
 }
 
 /* Verify that the Fortran syntax of a source file is correct by
-   compiling it. */
+   compiling it.
+*/
 static bool check_fortran_syntax_before_pips(string file_name)
 {
-  string pips_flint = getenv("PIPS_FLINT");
-  bool syntax_ok_p = true;
-
-  user_log("Checking Fortran syntax of %s\n", file_name);
-
-  if (safe_system_no_abort
-      (concatenate(pips_flint? pips_flint: DEFAULT_PIPS_FLINT, " ",
-                   // DO NOT USE A POSSIBLY SHARED FILE NAME!
-                   // the same "file_name.o" can be used by several creates
-                   // performed in parallel, for instance by the validation...
-                   file_name, " -o /dev/null", NULL)))
-  {
-    // f77 is rather silent on errors... which is detected if no
-    // file was output as expected.
-    pips_user_warning("\n\n\tFortran syntax errors in file %s!\007\n\n",
-                      file_name);
-    syntax_ok_p = false;
-  }
-  return syntax_ok_p;
+  // get compiler & flags...
+  string fortran = getenv("PIPS_FLINT");
+  if (!fortran) fortran = getenv("PIPS_F77");
+  if (!fortran) fortran = DEFAULT_PIPS_FLINT;
+  string flags = getenv("PIPS_CPP_FLAGS");
+  flags = flags? flags: "";
+  return check_input_file_syntax(file_name, fortran, flags, "Fortran");
 }
 
 /* Verify that the C syntax of a source file is correct by
@@ -1026,11 +1000,11 @@ static bool check_c_file_syntax(string file_name)
   comp = comp? comp: DEFAULT_PIPS_CC;
   flags = flags? flags: DEFAULT_PIPS_CC_FLAGS;
 
-  syntax_ok_p = check_input_file_syntax(file_name, comp, flags);
+  syntax_ok_p = check_input_file_syntax(file_name, comp, flags, "C");
 
   return syntax_ok_p;
 }
-
+
 /* "foo bla fun  ./e.database/foo.f" -> "./e.database/foo.f"
  */
 static string extract_last_name(string line)
