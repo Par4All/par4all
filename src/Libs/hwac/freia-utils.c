@@ -69,7 +69,7 @@
 // preliminary stuff for volume/min/max/...
 #define TRPX_MS(m, c, op) { 0, 0, 0, 0, m, c, true, false, "TERAPIX_UCODE_" op }
 
-#define OPCL(op) { T, op "_OP" }
+#define OPCL(op) { T, "PIXEL_" op }
 
 // types used by AIPO parameters
 #define TY_INT "int32_t"
@@ -256,7 +256,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "threshold", "thr", NULL, 1, 1, 0, 3, NO_PARAM,
     { TY_INT, TY_INT, TY_INT },
     { spoc_input_0|spoc_output_0|spoc_th_0, NO_POC, alu_unused, NO_MES },
-    TRPX_OP(5, "THRESHOLD"), NO_OPCL // OPCL("THRESHOLD")
+    TRPX_OP(5, "THRESHOLD"), OPCL("THRESHOLD")
   },
   // MORPHO
   { AIPO "erode_6c", "E6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_CIP, NULL, NULL },
