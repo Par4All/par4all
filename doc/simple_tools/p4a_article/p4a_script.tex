@@ -172,7 +172,10 @@ Parallelization of some functions can be avoided by using
 \texttt{-{}-exclude-modules=\emph{regex}}. This is preferable when the
 parallel part is not compute-intensive enough to compensate for
 the overhead of transferring data and launching a kernel. In this
-case, parallel execution is more expensive than sequential execution.
+case, parallel execution is more expensive than sequential execution. 
+The option \texttt{-{}-select-modules=\emph{regex}} is complementary to the
+previous one and can be useful to speedup the process by focusing on specific
+functions.
 
 There is also an option to exclude some files from the back-end
 compilation, for example, to use libraries that have been optimized
