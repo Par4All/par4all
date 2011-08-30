@@ -291,11 +291,11 @@ number of threads per block under the default value of 256.
 For efficiency reasons on \textsc{NVIDIA} Fermi \Agpu, the threads are 
 allocated as much as possible as a square. For instance with the default 256 
 threads per block, it will end up with 16 along the $X$ dimension and 16 along
-the $Y$ dimension. In the current revision, parallel loop nests are
-limited to the 3 outer parallel dimensions (2 with compute capabilities lower 
-than 2.0) to cope more easily with \Acuda \Agpu hardware limitation. The inner 
-selected parallel loop is mapped onto the $X$ \Agpu dimension, which must have a sufficient number of processors
-for the level of parallelism.
+the $Y$ dimension. The threads per block allocation take into account unbalanced 
+loop nests. In the current revision, parallel loop nests are limited to the 3 
+outer parallel dimensions (2 with compute capabilities lower than 2.0) to cope 
+more easily with \Acuda \Agpu hardware limitation. The inner selected parallel 
+loop is mapped onto the $X$ \Agpu dimension.
 
 For more tweaking, look at the \Apfa Accel runtime source on
 \url{http://download.par4all.org/doc/Par4All_Accel_runtime/graph} or
