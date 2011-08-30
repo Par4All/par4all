@@ -70,7 +70,9 @@ static char * table_of_AC_operators[] =
   MIN_OPERATOR_NAME,
   MAX_OPERATOR_NAME,
   PLUS_OPERATOR_NAME,
+  PLUS_C_OPERATOR_NAME,
   MINUS_OPERATOR_NAME,
+  MINUS_C_OPERATOR_NAME,
   MULTIPLY_OPERATOR_NAME,
   NULL
 };
@@ -113,7 +115,7 @@ DEFINE_LOCAL_STACK(current_statement, statement)
 GENERIC_LOCAL_FUNCTION(inserted, persistant_statement_to_statement)
 
 /* For CSE */
-static list current_availables = NIL;
+static list current_available = NIL;
 static statement current_statement = statement_undefined;
 
 /* PDSon: w_effect store all the variables modified
@@ -222,10 +224,25 @@ static int level_of(list /* of effects */ le)
 static int expr_level_of(expression e)
 {
   list le;
-  if (!bound_expr_prw_effects_p(e)) return -1; /* assigns... */
-  le = effects_effects(load_expr_prw_effects(e));
-
-  return level_of(le);
+  if (!bound_expr_prw_effects_p(e)) {
+      /* try again ! */
+      le = proper_effects_of_expression(e);
+      bool writes = false;
+      FOREACH(EFFECT,eff,le) {
+          if((writes=effect_write_p(eff))) break;
+      }
+      if(writes)
+          return -1; /* assigns... */
+      else {
+          int res = level_of(le);
+          gen_full_free_list(le);
+          return res;
+      }
+  }
+  else {
+      le = effects_effects(load_expr_prw_effects(e));
+      return level_of(le);
+  }
 }
 
 /* or for a statement. */
@@ -952,11 +969,25 @@ static void insert_rwt(statement s)
         /* Remove statements redundant */
         remove_statement_redundant(s, &sequence_statements(seq));
 
-        sequence_statements(seq)=CONS(STATEMENT,instruction_to_statement(copy_instruction(statement_instruction(s))),sequence_statements(seq));
+        statement clone = instruction_to_statement(copy_instruction(statement_instruction(s)));
+        /* need some patching */
+        free_extensions(statement_extensions(clone));
+        statement_extensions(clone)=statement_extensions(s);
+        statement_extensions(s)=empty_extensions();
+        statement_label(clone)=statement_label(s);
+        statement_label(s)=entity_empty_label();
+        sequence_statements(seq)=CONS(STATEMENT,clone,sequence_statements(seq));
         sequence_statements(seq) = gen_nreverse(sequence_statements(seq));
 
         update_statement_instruction(s,i);
     }
+}
+
+static bool prepare_icm(statement s) {
+    if(statement_loop_p(s)) {
+        try_reorder_expressions(s,true);
+    }
+    return true;
 }
 
 /* Perform ICM and association on operators.
@@ -975,9 +1006,6 @@ void perform_icm_association(string name, /* of the module */
 	      inserted_undefined_p() &&
 	      (nesting==NIL));
 
-  /* Set full (expr and statements) PROPER EFFECTS
-   */
-  full_simple_proper_effects(name, s);
   /*
   simple_cumulated_effects(name, s);
   set_cumulated_rw_effects(get_rw_effects());
@@ -987,6 +1015,13 @@ void perform_icm_association(string name, /* of the module */
    */
   set_cumulated_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, true));
+
+  /* SG: reorder expression so that the icm algorithm matches more cases */
+  gen_recurse(s,statement_domain,prepare_icm,gen_null);
+
+  /* Set full (expr and statements) PROPER EFFECTS
+   */
+  full_simple_proper_effects(name, s);
 
   /* Initialize the "inserted" mapping: */
   init_inserted();
@@ -1101,7 +1136,7 @@ typedef struct
 }
   available_scalar_t, * available_scalar_pt;
 
-/*
+#if 0
 static void dump_aspt(available_scalar_pt aspt)
 {
   syntax s;
@@ -1130,19 +1165,143 @@ static void dump_aspt(available_scalar_pt aspt)
     print_expression(e);
   }, aspt->available_contents);
 }
-*/
+#endif
+
+static bool try_reorder_expression_call(expression e, list availables) {
+    /* update normalized field, and make sure it is consistent */
+    unnormalize_expression(e);
+    NORMALIZE_EXPRESSION(e);
+    normalized n = expression_normalized(e);
+    /* the idea is to split an expression into two linear parts, one that is already available and one that is not */
+    if(normalized_linear_p(n)){
+        Pvecteur pv =normalized_linear(n);
+        int cplx =vect_size(pv);
+        int bestcplx = INT_MAX;
+        expression bestexp = expression_undefined;
+        FOREACH(EXPRESSION,eavailable, availables){
+            NORMALIZE_EXPRESSION(eavailable);
+            normalized navailable = expression_normalized(eavailable);
+            if(normalized_linear_p(navailable)) {
+                Pvecteur pva = normalized_linear(navailable);
+                Pvecteur diff = vect_substract(pv,pva);
+                int dcplx = vect_size(diff);
+                if(dcplx < cplx && dcplx < bestcplx) {
+                    bestexp = eavailable;
+                    bestcplx=dcplx;
+                }
+                vect_rm(diff);
+            }
+        }
+        if(!expression_undefined_p(bestexp) && !same_expression_p(e,bestexp)) {
+            update_expression_syntax(e,
+                    make_syntax_call(
+                        make_call(
+                            entity_intrinsic(PLUS_C_OPERATOR_NAME),
+                            make_expression_list(
+                                make_op_exp(MINUS_OPERATOR_NAME,
+                                    copy_expression(e),
+                                    copy_expression(bestexp)
+                                    ),
+                                copy_expression(bestexp)
+                                )
+                            )
+                        )
+                    );
+            return false;
+        }
+    }
+    return true;
+}
+
+/* make sure expressions are ordered with pointer first */
+static void reorder_pointer_expression(expression e) {
+    if(expression_call_p(e)) {
+        call c = expression_call(e);
+        if(commutative_call_p(c)) {
+            expression lhs = binary_call_lhs(c),
+                       rhs = binary_call_rhs(c);
+            basic brhs = basic_of_expression(rhs);
+            if(basic_pointer_p(brhs)) {
+                gen_free_list(call_arguments(c));
+                call_arguments(c)=make_expression_list(
+                        rhs,lhs);
+            }
+        }
+        FOREACH(EXPRESSION,e,call_arguments(c))
+            reorder_pointer_expression(e);
+    }
+}
+
+static void do_gather_all_expressions_perms(list sterns,list * perms) {
+    if(ENDP(sterns)) *perms=NIL;
+    else {
+        expression head = EXPRESSION(CAR(sterns));
+        unnormalize_expression(head);
+        NORMALIZE_EXPRESSION(head);
+        POP(sterns);
+        *perms = CONS(EXPRESSION,copy_expression(head),*perms);
+        list nperms = NIL;
+        do_gather_all_expressions_perms(sterns,&nperms);
+        FOREACH(EXPRESSION,exp,nperms) {
+            NORMALIZE_EXPRESSION(exp);
+            Pvecteur pv = vect_add(normalized_linear(expression_normalized(exp)),
+                    normalized_linear(expression_normalized(head)));
+            expression epv = Pvecteur_to_expression(pv);
+            reorder_pointer_expression(epv);
+            gen_recurse(epv,call_domain,gen_true,convert_to_c_operator);
+            *perms=CONS(EXPRESSION,epv,*perms);
+        }
+        *perms=gen_nconc(*perms,nperms);
+    }
+}
+
+static bool do_gather_all_expressions(expression e, list * gathered) {
+    NORMALIZE_EXPRESSION(e);
+    normalized n = expression_normalized(e);
+    if(normalized_linear_p(n)) {
+        Pvecteur pv = normalized_linear(n);
+        list sterns=NIL;
+        for(Pvecteur ipv = pv; !VECTEUR_NUL_P(ipv) ; ipv=vecteur_succ(ipv)) {
+            expression stern = int_to_expression(vecteur_val(ipv));
+            if(TCST != vecteur_var(ipv)) {
+                stern = make_op_exp(MULTIPLY_OPERATOR_NAME,
+                    stern,
+                    entity_to_expression(vecteur_var(ipv)));
+            }
+            sterns=CONS(EXPRESSION,stern,sterns);
+        }
+        list perms = NIL;
+        do_gather_all_expressions_perms(sterns,&perms);
+        *gathered=gen_nconc(*gathered,perms);
+        return false;
+    }
+    return true;
+}
+
+static void prune_singleton(list * l) {
+    list new = NIL;
+    FOREACH(EXPRESSION,e0,*l) {
+        FOREACH(EXPRESSION,e1,*l) {
+            if(e0!=e1 && same_expression_p(e0,e1) ) {
+                new=CONS(EXPRESSION,copy_expression(e0),new);
+                break;
+            }
+        }
+    }
+    gen_full_free_list(*l);
+    *l=new;
+}
 
 /* whether to get in here, whether to atomize... */
 static bool expr_cse_flt(expression e,__attribute__((unused))list *skip_list)
 {
     pips_debug(2,"considering expression:");
     ifdebug(2) print_expression(e);
-
     syntax s = expression_syntax(e);
     switch (syntax_tag(s))
     {
         case is_syntax_call:
-            return !IO_CALL_P(syntax_call(s));
+             return !IO_CALL_P(expression_call(e));
         case is_syntax_reference:
             //return entity_scalar_p(reference_variable(syntax_reference(s)));
         case is_syntax_subscript:
@@ -1339,7 +1498,7 @@ static available_scalar_pt best_similar_expression(expression e, int * best_qual
     available_scalar_pt best = NULL;
     (*best_quality) = 0;
 
-    FOREACH(STRING,caspt,current_availables)
+    FOREACH(STRING,caspt,current_available)
     {
         available_scalar_pt aspt = (available_scalar_pt) caspt;
         int quality = similarity(e, aspt);
@@ -1485,7 +1644,7 @@ static void atom_cse_expression(expression e,list * skip_list)
                         call c = syntax_call(s);
                         if (quality==MAX_SIMILARITY)
                         {
-                            /* identical, just make a reference to the scalar.
+                            /* identical, just make a reference to the scalar,
                                whatever the stuff stored inside.
                                */
 
@@ -1590,7 +1749,7 @@ static void atom_cse_expression(expression e,list * skip_list)
                                         aspt->container,
                                         EXPRESSION(CAR(CDR(call_arguments(
                                                         instruction_call(statement_instruction(scse)))))));
-                                current_availables = CONS(STRING, (char*)naspt, current_availables);
+                                current_available = CONS(STRING, (char*)naspt, current_available);
                             }
                         }
                         break;
@@ -1657,7 +1816,7 @@ static void atom_cse_expression(expression e,list * skip_list)
                             current_statement,
                             EXPRESSION(CAR(CDR(call_arguments(ic)))));
 
-                    current_availables = CONS(STRING, (char*)aspt, current_availables);
+                    current_available = CONS(STRING, (char*)aspt, current_available);
                 }
             }
         }
@@ -1690,7 +1849,7 @@ static void atom_cse_expression(expression e,list * skip_list)
                 insert_before_statement(assign, current_statement, true);
 
                 aspt = make_available_scalar(scalar, current_statement, rhs);
-                current_availables = CONS(STRING, (char*)aspt, current_availables);
+                current_available = CONS(STRING, (char*)aspt, current_available);
             }
         }
     }
@@ -1741,12 +1900,12 @@ static bool cse_atom_call_flt(call c,list *skip_list)
   return !(io_intrinsic_p(called) || ENTITY_IMPLIEDDO_P(called));
 }
 
-/* side effects: use current_availables and current_statement
+/* side effects: use current_available and current_statement
  */
 static list /* of available_scalar_pt */
 atomize_cse_this_statement_expressions(statement s, list availables)
 {
-  current_availables = availables;
+  current_available = availables;
   current_statement = s;
   list skip_list = NIL;
 
@@ -1773,10 +1932,10 @@ atomize_cse_this_statement_expressions(statement s, list availables)
   gen_free_list(skip_list);
 
   /* free_current_statement_stack(); */
-  availables = current_availables;
+  availables = current_available;
 
   current_statement = statement_undefined;
-  current_availables = NIL;
+  current_available = NIL;
 
   /* Update w_effects: add the variable modified by the current statement */
   if (assignment_statement_p(s))
@@ -1794,6 +1953,34 @@ atomize_cse_this_statement_expressions(statement s, list availables)
 
   return availables;
 }
+static void prune_non_constant(list effects,list * perms) {
+    list out = NIL;
+    FOREACH(EXPRESSION,exp,*perms) {
+        set re = get_referenced_entities(exp);
+        bool conflict = false;
+        SET_FOREACH(entity,e,re) {
+            if(effects_write_variable_p(effects,e)) {
+                conflict=true;
+                break;
+            }
+        }
+        set_free(re);
+        if(!conflict) out=CONS(EXPRESSION,exp,out);
+    }
+    gen_free_list(*perms);
+    *perms=out;
+}
+
+void try_reorder_expressions(void* s,bool icm) 
+    {
+        list gathered = NIL;
+        gen_context_recurse(s,&gathered,expression_domain,do_gather_all_expressions,gen_null);
+        if(icm) prune_non_constant(load_cumulated_rw_effects_list(s),&gathered);
+        else prune_singleton(&gathered);
+        gen_context_recurse(s,gathered,expression_domain,
+                try_reorder_expression_call,gen_null);
+        gen_full_free_list(gathered);
+    }
 
 /* top down. */
 static bool seq_flt(sequence s)
@@ -1814,6 +2001,11 @@ static bool seq_flt(sequence s)
      * It is used to free memory later
      */
     top_of_w_effects = w_effects;
+
+    /* SG we try to perform some reordering of linear expression to ease matching.
+     * To do so we (optimistically) gather similar expressions, and when pairs are found, they are kept for further matching.
+     * The pair gathering is store unaware, but the later process takes care of this. At worse we did some useless reordering.*/
+    try_reorder_expressions(s,false);
 
     FOREACH(STATEMENT, ss,sequence_statements(s))
     {
@@ -1919,3 +2111,4 @@ bool icm(string module_name)
 
   return result;
 }
+
