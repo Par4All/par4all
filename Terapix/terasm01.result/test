@@ -176,7 +176,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 155630432;
+         __scalar__0 = 165583872;
          I_18 = i_1_0+-1;
          I_19 = isj*I_18;
          I_5 = I_19+j;
@@ -214,7 +214,7 @@ l99994:
          __scalar__0 = F_17+__scalar__0;
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 155874400*__scalar__0;
+         __scalar__0 = 165827808*__scalar__0;
          I_7 = I_38;
          I_8 = j+I_7;
          new_image[I_8] = __scalar__0;
@@ -255,7 +255,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 155630432;
+         __scalar__0 = 165583872;
          I_18 = i_1_0;
          I_18 = I_18+-1;
          I_19 = isj;
@@ -325,7 +325,7 @@ l99994:
          __scalar__0 = __scalar__0+__scalar__0;
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 155874400;
+         __scalar__0 = 165827808;
          __scalar__0 = __scalar__0*__scalar__0;
          I_7 = I_38;
          I_8 = j;
@@ -368,7 +368,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 155630432;
+         __scalar__0 = 165583872;
          I_18 = i_1_0;
          addi(I_18, I_18, -1);
          I_19 = isj;
@@ -380,17 +380,17 @@ l99994:
          F_9 = image[I_0];
          muli(F_9, kernel[0]);
          __scalar__0 = F_9;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          F_10 = image[I_5];
          muli(F_10, kernel[1]);
          __scalar__0 = F_10;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          I_1 = I_5;
          addi(I_1, I_1, 1);
          F_11 = image[I_1];
          muli(F_11, kernel[2]);
          __scalar__0 = F_11;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          kj_0 = 3;
          I_38 = isj;
          muli(I_38, i_1_0);
@@ -402,17 +402,17 @@ l99994:
          F_12 = image[I_2];
          muli(F_12, kernel[3]);
          __scalar__0 = F_12;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          F_13 = image[I_9];
          muli(F_13, kernel[4]);
          __scalar__0 = F_13;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          I_3 = I_9;
          addi(I_3, I_3, 1);
          F_14 = image[I_3];
          muli(F_14, kernel[5]);
          __scalar__0 = F_14;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          kj_0 = 3;
          I_21 = i_1_0;
          addi(I_21, I_21, 1);
@@ -425,20 +425,20 @@ l99994:
          F_15 = image[I_4];
          muli(F_15, kernel[6]);
          __scalar__0 = F_15;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          F_16 = image[I_14];
          muli(F_16, kernel[7]);
          __scalar__0 = F_16;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          I_6 = I_14;
          addi(I_6, I_6, 1);
          F_17 = image[I_6];
          muli(F_17, kernel[8]);
          __scalar__0 = F_17;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 155874400;
+         __scalar__0 = 165827808;
          muli(__scalar__0, __scalar__0);
          I_7 = I_38;
          I_8 = j;
@@ -481,7 +481,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 155630432;
+         __scalar__0 = 165583872;
          I_18 = i_1_0;
          addi(I_18, I_18, -1);
          I_19 = isj;
@@ -493,17 +493,17 @@ l99994:
          F_9 = image[I_0];
          muli(F_9, kernel[0]);
          __scalar__0 = F_9;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          F_10 = image[I_5];
          muli(F_10, kernel[1]);
          __scalar__0 = F_10;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          I_1 = I_5;
          addi(I_1, I_1, 1);
          F_11 = image[I_1];
          muli(F_11, kernel[2]);
          __scalar__0 = F_11;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          kj_0 = 3;
          I_38 = isj;
          muli(I_38, i_1_0);
@@ -515,17 +515,17 @@ l99994:
          F_12 = image[I_2];
          muli(F_12, kernel[3]);
          __scalar__0 = F_12;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          F_13 = image[I_9];
          muli(F_13, kernel[4]);
          __scalar__0 = F_13;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          I_3 = I_9;
          addi(I_3, I_3, 1);
          F_14 = image[I_3];
          muli(F_14, kernel[5]);
          __scalar__0 = F_14;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          kj_0 = 3;
          I_21 = i_1_0;
          addi(I_21, I_21, 1);
@@ -538,20 +538,20 @@ l99994:
          F_15 = image[I_4];
          muli(F_15, kernel[6]);
          __scalar__0 = F_15;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          F_16 = image[I_14];
          muli(F_16, kernel[7]);
          __scalar__0 = F_16;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          I_6 = I_14;
          addi(I_6, I_6, 1);
          F_17 = image[I_6];
          muli(F_17, kernel[8]);
          __scalar__0 = F_17;
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 155874400;
+         __scalar__0 = 165827808;
          muli(__scalar__0, __scalar__0);
          I_7 = I_38;
          I_8 = j;
@@ -594,7 +594,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         seti(__scalar__0, 155630432);
+         seti(__scalar__0, 165583872);
          seti(I_18, i_1_0);
          addi(I_18, I_18, -1);
          seti(I_19, isj);
@@ -606,17 +606,17 @@ l99994:
          seti(F_9, image[I_0]);
          muli(F_9, kernel[0]);
          seti(__scalar__0, F_9);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(F_10, image[I_5]);
          muli(F_10, kernel[1]);
          seti(__scalar__0, F_10);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(I_1, I_5);
          addi(I_1, I_1, 1);
          seti(F_11, image[I_1]);
          muli(F_11, kernel[2]);
          seti(__scalar__0, F_11);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(kj_0, 3);
          seti(I_38, isj);
          muli(I_38, i_1_0);
@@ -628,17 +628,17 @@ l99994:
          seti(F_12, image[I_2]);
          muli(F_12, kernel[3]);
          seti(__scalar__0, F_12);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(F_13, image[I_9]);
          muli(F_13, kernel[4]);
          seti(__scalar__0, F_13);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(I_3, I_9);
          addi(I_3, I_3, 1);
          seti(F_14, image[I_3]);
          muli(F_14, kernel[5]);
          seti(__scalar__0, F_14);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(kj_0, 3);
          seti(I_21, i_1_0);
          addi(I_21, I_21, 1);
@@ -651,20 +651,20 @@ l99994:
          seti(F_15, image[I_4]);
          muli(F_15, kernel[6]);
          seti(__scalar__0, F_15);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(F_16, image[I_14]);
          muli(F_16, kernel[7]);
          seti(__scalar__0, F_16);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(I_6, I_14);
          addi(I_6, I_6, 1);
          seti(F_17, image[I_6]);
          muli(F_17, kernel[8]);
          seti(__scalar__0, F_17);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(kj_0, 3);
          seti(ki_0, 3);
-         seti(__scalar__0, 155874400);
+         seti(__scalar__0, 165827808);
          muli(__scalar__0, __scalar__0);
          seti(I_7, I_38);
          seti(I_8, j);
@@ -707,7 +707,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         seti(__scalar__0, 155630432);
+         seti(__scalar__0, 165583872);
          seti(I_18, i_1_0);
          addi(I_18, I_18, -1);
          seti(I_19, isj);
@@ -719,17 +719,17 @@ l99994:
          seti(F_9, image[I_0]);
          muli(F_9, kernel[0]);
          seti(__scalar__0, F_9);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(F_10, image[I_5]);
          muli(F_10, kernel[1]);
          seti(__scalar__0, F_10);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(I_1, I_5);
          addi(I_1, I_1, 1);
          seti(F_11, image[I_1]);
          muli(F_11, kernel[2]);
          seti(__scalar__0, F_11);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(kj_0, 3);
          seti(I_38, isj);
          muli(I_38, i_1_0);
@@ -741,17 +741,17 @@ l99994:
          seti(F_12, image[I_2]);
          muli(F_12, kernel[3]);
          seti(__scalar__0, F_12);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(F_13, image[I_9]);
          muli(F_13, kernel[4]);
          seti(__scalar__0, F_13);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(I_3, I_9);
          addi(I_3, I_3, 1);
          seti(F_14, image[I_3]);
          muli(F_14, kernel[5]);
          seti(__scalar__0, F_14);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(kj_0, 3);
          seti(I_21, i_1_0);
          addi(I_21, I_21, 1);
@@ -764,20 +764,20 @@ l99994:
          seti(F_15, image[I_4]);
          muli(F_15, kernel[6]);
          seti(__scalar__0, F_15);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(F_16, image[I_14]);
          muli(F_16, kernel[7]);
          seti(__scalar__0, F_16);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(I_6, I_14);
          addi(I_6, I_6, 1);
          seti(F_17, image[I_6]);
          muli(F_17, kernel[8]);
          seti(__scalar__0, F_17);
-         muli(2, __scalar__0);
+         addi(__scalar__0, __scalar__0, __scalar__0);
          seti(kj_0, 3);
          seti(ki_0, 3);
-         seti(__scalar__0, 155874400);
+         seti(__scalar__0, 165827808);
          muli(__scalar__0, __scalar__0);
          seti(I_7, I_38);
          seti(I_8, j);
