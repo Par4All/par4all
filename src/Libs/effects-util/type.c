@@ -392,6 +392,8 @@ type cell_to_type(cell c)
  */
 bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(type real_ct, type formal_ct)
 {
+  static list real_structured_types = NIL;
+  static list formal_structured_types = NIL;
 
   pips_debug(8,"real_ct : %s \t formal_ct: %s\n",
 	     words_to_string(words_type(real_ct, NIL,false)),
@@ -445,12 +447,46 @@ bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(t
 		      }
 		    else if (basic_derived_p(real_b) && basic_derived_p(formal_b))
 		      {
+			entity real_basic_e = basic_derived(real_b);
+			entity formal_basic_e = basic_derived(formal_b);
 			pips_debug(8, "derived case, real: %s, formal: %s\n",
-				   entity_name(basic_derived(real_b)),
-				   entity_name(basic_derived(formal_b)));
-			type formal_dt = entity_type(basic_derived(formal_b));
-			type real_dt =  entity_type(basic_derived(real_b));
-			result = basic_concrete_types_compatible_for_effects_interprocedural_translation_p(real_dt, formal_dt);
+				   entity_name(real_basic_e),
+				   entity_name(formal_basic_e));
+			if (same_entity_p(real_basic_e, formal_basic_e))
+			  {
+			    pips_debug(8, "same entities (1) \n");
+			    result = true;
+			  }
+			else
+			  {
+			    type formal_dt = entity_type(formal_basic_e);
+			    type real_dt =  entity_type(real_basic_e);
+
+			    void * found_formal_t = (type) gen_find_eq(formal_dt,formal_structured_types);
+			    void * found_real_t = (type) gen_find_eq(real_dt,real_structured_types);
+
+			    if (!gen_chunk_undefined_p(found_formal_t))
+			      {
+				pips_debug(8, "types already encountered (1) \n");
+			  	result = gen_position(found_formal_t, formal_structured_types)
+				  == gen_position(found_real_t, real_structured_types);
+			      }
+			    else
+			      {
+				pips_debug(8, "types not encountered (1) \n");
+			  	formal_structured_types = gen_type_cons(formal_dt, formal_structured_types);
+				real_structured_types = gen_type_cons(real_dt, real_structured_types);
+				result = basic_concrete_types_compatible_for_effects_interprocedural_translation_p(real_dt, formal_dt);
+				list old_formal_structured_types = formal_structured_types;
+				list old_real_structured_types = real_structured_types;
+				POP(formal_structured_types);
+				POP(real_structured_types);
+				CDR(old_formal_structured_types) = NIL;
+				CDR(old_real_structured_types) = NIL;
+				gen_free_list(old_formal_structured_types);
+				gen_free_list(old_real_structured_types);
+			      }
+			  }
 		      }
 		    else
 		      result = basic_equal_p(real_b, formal_b);
@@ -514,18 +550,61 @@ bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(t
 	      result = true;
 	      while(result && !ENDP(real_fields))
 		{
+		  entity real_fe = ENTITY(CAR(real_fields));
+		  entity formal_fe = ENTITY(CAR(formal_fields));
 		  pips_debug(8, "fields, real: %s, formal: %s\n",
-			     entity_name(ENTITY(CAR(real_fields))),
-			     entity_name(ENTITY(CAR(formal_fields))));
-		  type real_ft = basic_concrete_type(entity_type(ENTITY(CAR(real_fields))));
-		  type formal_ft = basic_concrete_type(entity_type(ENTITY(CAR(formal_fields))));
-		  /* It should be a type equality here, but type_equal_p is*/
-		  result =
-		    basic_concrete_types_compatible_for_effects_interprocedural_translation_p
-		    (real_ft, formal_ft);
+			     entity_name(real_fe),
+			     entity_name(formal_fe));
 
-		  free_type(real_ft);
-		  free_type(formal_ft);
+		  if (same_entity_p(real_fe, formal_fe))
+		    {
+		      pips_debug(8, "same entities (2)\n");
+		      result = true;
+		    }
+		  else
+		    {
+		      type real_ft = entity_type(real_fe);
+		      type formal_ft = entity_type(formal_fe);
+
+		      void * found_formal_ft = (type) gen_find_eq(formal_ft,formal_structured_types);
+		      void * found_real_ft = (type) gen_find_eq(real_ft,real_structured_types);
+
+		      if (!gen_chunk_undefined_p(found_formal_ft))
+			{
+			  pips_debug(8, "types already encountered (2)\n");
+			  result = gen_position(found_formal_ft, formal_structured_types)
+			    == gen_position(found_real_ft, real_structured_types);
+			}
+		      else
+			{
+			  pips_debug(8, "types not encountered (2)\n");
+			  /* store types and not bct becasue bct cannot be equal,
+			     since a new type is generated each time.
+			     We really need a global table for bcts */
+			  formal_structured_types = gen_type_cons(formal_ft, formal_structured_types);
+			  real_structured_types = gen_type_cons(real_ft, real_structured_types);
+			  type real_fbct = basic_concrete_type(real_ft);
+			  type formal_fbct = basic_concrete_type(formal_ft);
+			  /* It should be a strict type equality here, but I don't think type_equal_p
+			     is very robust when types are declared in headers
+			  */
+			  result =
+			    basic_concrete_types_compatible_for_effects_interprocedural_translation_p
+			    (real_fbct, formal_fbct);
+
+			  free_type(real_fbct);
+			  free_type(formal_fbct);
+
+			  list old_formal_structured_types = formal_structured_types;
+			  list old_real_structured_types = real_structured_types;
+			  POP(formal_structured_types);
+			  POP(real_structured_types);
+			  CDR(old_formal_structured_types) = NIL;
+			  CDR(old_real_structured_types) = NIL;
+			  gen_free_list(old_formal_structured_types);
+			  gen_free_list(old_real_structured_types);
+			}
+		    }
 		  POP(real_fields);
 		  POP(formal_fields);
 		}
