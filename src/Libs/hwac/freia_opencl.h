@@ -42,10 +42,7 @@
   "#include <CL/opencl.h>\n"                                  \
   "#include \"freia.h\"\n"                                    \
   "#include \"private/freiaGatewayOpenCL.h\"\n"               \
-  "\n"                                                        \
-  "// FREIA OpenCL runtime helper\n"                          \
-  "extern freia_status freia_op_compile_kernel(\n"            \
-  "   const char*, const char*, const char*, cl_kernel *);\n"
+  "\n"
 
 // raw include for opencl code generation
 #define FREIA_OPENCL_CL_INCLUDES                \
