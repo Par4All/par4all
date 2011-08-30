@@ -1,3 +1,5 @@
+# why force?
+setenv PIPS_CHECK_FORTRAN="Y"
 delete stack01
 create stack01 stack01.f
 module STACK01
