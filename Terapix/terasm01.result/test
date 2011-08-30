@@ -176,7 +176,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 165583872;
+         __scalar__0 = 18095536;
          I_18 = i_1_0+-1;
          I_19 = isj*I_18;
          I_5 = I_19+j;
@@ -214,7 +214,7 @@ l99994:
          __scalar__0 = F_17+__scalar__0;
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 165827808*__scalar__0;
+         __scalar__0 = 18350912*__scalar__0;
          I_7 = I_38;
          I_8 = j+I_7;
          new_image[I_8] = __scalar__0;
@@ -255,7 +255,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 165583872;
+         __scalar__0 = 18095536;
          I_18 = i_1_0;
          I_18 = I_18+-1;
          I_19 = isj;
@@ -325,7 +325,7 @@ l99994:
          __scalar__0 = __scalar__0+__scalar__0;
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 165827808;
+         __scalar__0 = 18350912;
          __scalar__0 = __scalar__0*__scalar__0;
          I_7 = I_38;
          I_8 = j;
@@ -368,7 +368,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 165583872;
+         __scalar__0 = 18095536;
          I_18 = i_1_0;
          addi(I_18, I_18, -1);
          I_19 = isj;
@@ -438,7 +438,7 @@ l99994:
          addi(__scalar__0, __scalar__0, __scalar__0);
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 165827808;
+         __scalar__0 = 18350912;
          muli(__scalar__0, __scalar__0);
          I_7 = I_38;
          I_8 = j;
@@ -481,7 +481,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 165583872;
+         __scalar__0 = 18095536;
          I_18 = i_1_0;
          addi(I_18, I_18, -1);
          I_19 = isj;
@@ -551,7 +551,7 @@ l99994:
          addi(__scalar__0, __scalar__0, __scalar__0);
          kj_0 = 3;
          ki_0 = 3;
-         __scalar__0 = 165827808;
+         __scalar__0 = 18350912;
          muli(__scalar__0, __scalar__0);
          I_7 = I_38;
          I_8 = j;
@@ -594,7 +594,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         seti(__scalar__0, 165583872);
+         seti(__scalar__0, 18095536);
          seti(I_18, i_1_0);
          addi(I_18, I_18, -1);
          seti(I_19, isj);
@@ -664,7 +664,7 @@ l99994:
          addi(__scalar__0, __scalar__0, __scalar__0);
          seti(kj_0, 3);
          seti(ki_0, 3);
-         seti(__scalar__0, 165827808);
+         seti(__scalar__0, 18350912);
          muli(__scalar__0, __scalar__0);
          seti(I_7, I_38);
          seti(I_8, j);
@@ -707,7 +707,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         seti(__scalar__0, 165583872);
+         seti(__scalar__0, 18095536);
          seti(I_18, i_1_0);
          addi(I_18, I_18, -1);
          seti(I_19, isj);
@@ -777,7 +777,7 @@ l99994:
          addi(__scalar__0, __scalar__0, __scalar__0);
          seti(kj_0, 3);
          seti(ki_0, 3);
-         seti(__scalar__0, 165827808);
+         seti(__scalar__0, 18350912);
          muli(__scalar__0, __scalar__0);
          seti(I_7, I_38);
          seti(I_8, j);
