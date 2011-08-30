@@ -200,7 +200,11 @@ direct \Acuda code and instead generates calls to functions and
 macrofunctions defined in the P4A Accel runtime.
 
 There are many parameters that can be changed to better suit a given
-application on a given target.
+application on a given target. 
+
+The \texttt{--cuda-cc} option defines the compute capability of your target 
+\Agpu. The default value is 2.0, and allowed values are 1.0, 1.1, 1.2 and 1.3. 
+% FIXME : the following is thus not compatible !
 
 In the case of \Acuda generation, you can pass flags to the \texttt{nvcc}
 back-end compiler with the \verb|--nvcc-flags=...| option.
