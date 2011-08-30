@@ -1988,12 +1988,24 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
  *       a "value_intrinsic". In that case it is an unary minus operation
  *       upon an expression for which the function expression_constant_p()
  *       returns true (See the commentary given for it).
+ *
+ * SG: improvement: the integer value of a extended_integer_constant_expression_p
+ *  is computed too, for instance 0+5
  */
 int expression_to_int(expression exp)
 {
   int rv = 0;
-
   debug( 7, "expression_to_int", "doing\n");
+
+  /* use the normalize field first */
+  NORMALIZE_EXPRESSION(exp);
+  normalized n = expression_normalized(exp);
+  if(normalized_linear_p(n)) {
+      Pvecteur pv = normalized_linear(n);
+      if(vect_constant_p(pv))
+          return (int)vect_coeff(TCST, pv);
+  }
+
   if(expression_constant_p(exp)) {
     call c = syntax_call(expression_syntax(exp));
     switch(value_tag(entity_initial(call_function(c)))) {
@@ -2006,7 +2018,7 @@ int expression_to_int(expression exp)
       break;
     }
     default:
-      pips_internal_error("expression is not an integer constant");
+      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
     }
   }
   else if(expression_call_p(exp)) {
@@ -2018,11 +2030,11 @@ int expression_to_int(expression exp)
       rv = constant_int(symbolic_constant(value_symbolic(v)));
     }
     else {
-      pips_internal_error("expression is not an integer constant");
+      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
     }
   }
   else
-    pips_internal_error("expression is not an integer constant");
+      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
   return(rv);
 }
 /* same as above for floats */
@@ -3406,9 +3418,10 @@ Ppolynome expression_to_polynome(expression exp)
     {
         case is_syntax_reference:
             {
-                entity en = reference_variable(syntax_reference(sy));
+                reference r = syntax_reference(sy);
+                entity en = reference_variable(r);
 
-                if(entity_scalar_p(en))
+                if(entity_scalar_p(en)||(entity_pointer_p(en)&&ENDP(reference_indices(r))))
                     pp_new = make_polynome(1.0, (Variable) en, (Value) 1);
                 break;
             }
@@ -3453,13 +3466,13 @@ Ppolynome expression_to_polynome(expression exp)
                         if(cl == 2)
                             arg2 = EXPRESSION(CAR(CDR(call_arguments(syntax_call(sy)))));
 
-                        if (ENTITY_PLUS_P(op_ent)) /* arg1 + arg2 */
+                        if (ENTITY_PLUS_P(op_ent)||ENTITY_PLUS_C_P(op_ent)) /* arg1 + arg2 */
                         {
                             pp_new = expression_to_polynome(arg1);
                             if(!POLYNOME_UNDEFINED_P(pp_new))
                                 polynome_add(&pp_new, expression_to_polynome(arg2));
                         }
-                        else if(ENTITY_MINUS_P(op_ent)) /* -arg2 + arg1 */
+                        else if(ENTITY_MINUS_P(op_ent)||ENTITY_MINUS_C_P(op_ent)) /* -arg2 + arg1 */
                         {
                             pp_new = expression_to_polynome(arg2);
                             if(!POLYNOME_UNDEFINED_P(pp_new)) {
