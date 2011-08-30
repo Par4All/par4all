@@ -166,9 +166,11 @@ void string_buffer_append_c_string_buffer(
 {
   message_assert("distinct string buffers", sb!=src);
   // internal buffer...
-  char buffer[512];
+  char buffer[BUFFER_SIZE];
   int i = 0, j;
+  // start string
   buffer[i++] = '"';
+  bool in_string = true;
   STACK_MAP_X(s, string,
               for (char * c = s; *c; c++)
               {
@@ -178,31 +180,43 @@ void string_buffer_append_c_string_buffer(
                   string_buffer_append(sb, buffer);
                   i = 0;
                 }
-                if (*c=='\n')
+                if (!in_string)
                 {
-                  buffer[i++] = '\\';
-                  buffer[i++] = 'n';
-                  buffer[i++] = '"';
                   buffer[i++] = '\n';
                   for (j=0; j<indent; j++)
                     buffer[i++] = ' ';
                   buffer[i++] = '"';
+                  in_string = true;
                 }
-                else if (*c=='\\')
+                switch (*c)
                 {
+                case '\n':
+                  buffer[i++] = '\\';
+                  buffer[i++] = 'n';
+                  // the string is closed on newlines
+                  buffer[i++] = '"';
+                  in_string = false;
+                  break;
+                case '\\':
                   buffer[i++] = '\\';
                   buffer[i++] = '\\';
-                }
-                else if (*c=='"')
-                {
+                  break;
+                case '\t':
+                  buffer[i++] = '\\';
+                  buffer[i++] = 't';
+                  break;
+                case '"':
                   buffer[i++] = '\\';
                   buffer[i++] = '"';
-                }
-                else
+                  break;
+                default:
                   buffer[i++] = *c;
+                }
               },
               src->ins, 0);
-  buffer[i++] = '"';
+  // end string if needed
+  if (in_string)
+    buffer[i++] = '"';
   buffer[i++] = '\0';
   string_buffer_append(sb, buffer);
 }
