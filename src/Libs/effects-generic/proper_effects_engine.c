@@ -742,15 +742,17 @@ static list generic_proper_effects_of_complex_address_dereferencing_op(list l_ar
 		  expression e22 = EXPRESSION(CAR(CDR(e1_args)));
 
           /* SG this is a way to handle commutativity of PLUS_C */
-          basic b1 = basic_of_expression(e1);
-          basic b2 = basic_of_expression(e2);
-          if(basic_pointer_p(b2)) {
-              expression etmp = e1;
-              e1=e2;
-              e2=etmp;
+          if(ENTITY_PLUS_C_P(e1_op)) {
+              basic b1 = basic_of_expression(e1);
+              basic b2 = basic_of_expression(e2);
+              if(basic_pointer_p(b2)) {
+                  expression etmp = e1;
+                  e1=e2;
+                  e2=etmp;
+              }
+              free_basic(b1);
+              free_basic(b2);
           }
-          free_basic(b1);
-          free_basic(b2);
 
 
 		  pips_debug(8,"p is itself a complicated expression, with e11 = %s and e22 = %s\n",
