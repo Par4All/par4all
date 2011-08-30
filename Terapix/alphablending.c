@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 #define alpha 40
 void alphablending(int n,int src0[n][n], int src1[n][n])
 {

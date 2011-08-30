@@ -5,4 +5,4 @@ workspace.delete("alphablending")
 with terapyps.workspace("alphablending.c", name="alphablending", deleteOnClose=False) as w:
     for f in w.fun:
         f.terapix_code_generation(debug=True)
-    w.compile(terapyps.Maker())
+#    w.compile(terapyps.Maker())
