@@ -964,7 +964,7 @@ check_input_file_syntax(
       // DO NOT USE A POSSIBLY SHARED FILE NAME!
       // the same "file_name.o" can be used by several creates
       // performed in parallel, for instance by the validation...
-		   " -o /dev/null", NULL)))
+		   " -c -o /dev/null", NULL)))
   {
     // Note that TAB is avoided in warning to simplify validation.
     pips_user_warning("\n\n        %s syntax errors in file %s!\007\n\n",
@@ -984,6 +984,7 @@ static bool check_fortran_syntax_before_pips(string file_name)
   string fortran = getenv("PIPS_FLINT");
   if (!fortran) fortran = getenv("PIPS_F77");
   if (!fortran) fortran = DEFAULT_PIPS_FLINT;
+  // yes, cpp
   string flags = getenv("PIPS_CPP_FLAGS");
   flags = flags? flags: "";
   return check_input_file_syntax(file_name, fortran, flags, "Fortran");
