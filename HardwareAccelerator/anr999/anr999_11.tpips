@@ -3,5 +3,5 @@ setenv NAME anr999
 setenv FILE $NAME.c
 setproperty HWAC_SPOC_DEPTH 11
 setproperty HWAC_TERAPIX_DMABW 10
-setproperty HWAC_TERAPIX_IMAGE_HEIGHT 240
+setproperty FREIA_IMAGE_HEIGHT 240
 source default_tpips
