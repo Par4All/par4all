@@ -87,9 +87,10 @@ static inline void checkErrorMessageInline(const char *errorMessage,
     It should be OK for big iteration spaces, but quite suboptimal for
     small ones.
 
-    They can be redefined at compilation time with definition options such
-    as -DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=128, or given in p4a with
-    --nvcc_flags=-DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=16 for example.
+    They can be redefined with the environment variable P4A_MAX_TPB at 
+    runtime or at compilation time with definition options such 
+    as -DP4A_CUDA_THREAD_MAX=128, or given in p4a with
+    --nvcc_flags=-DP4A_CUDA_THREAD_MAX=128 for example.
 
     If you get arrors such as "P4A CUDA kernel execution failed : too many 
     resources requested for launch.", there is not enough registers to run
