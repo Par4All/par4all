@@ -1614,14 +1614,23 @@ basic basic_maximum(basic fb1, basic fb2)
 	  type t2 = basic_pointer(b2);
 
 	  if(type_variable_p(t1) && type_variable_p(t2)) {
-	    basic nb1 = variable_basic(type_variable(t1));
-	    basic nb2 = variable_basic(type_variable(t2));
+        /* SG checks for equality, he doesn't understand the meaning of
+         * having a float as the basic maximum of two float* 
+         * and cowardly refuses to fix the code */
+          if(type_equal_p(t1,t2))
+              b = copy_basic(b1);
+          else {
+              basic nb1 = variable_basic(type_variable(t1));
+              basic nb2 = variable_basic(type_variable(t2));
 
-	    /* FI: not convvincing. As in other palces, assuming this
-	       is meaning ful, it would be better to use a basic
-	       comparator, basic_greater_p(), which could return 1, -1
-	       or 0 or ??? and deal with non comparable type. */
-	    b = basic_maximum(nb1, nb2);
+
+              /* FI: not convincing. As in other places, assuming this
+                 is meaningful, it would be better to use a basic
+                 comparator, basic_greater_p(), which could return 1, -1
+                 or 0 or ??? and deal with non comparable type. */
+              b = basic_maximum(nb1, nb2);
+          }
+
 	  }
 	  else if (type_void_p(t1) && type_void_p(t2) )
           b = copy_basic(b1);
