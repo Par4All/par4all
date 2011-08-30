@@ -702,8 +702,8 @@ static freia_status sub_00_helper_0_0_0_compile(void)
     "  for (i=gid; i < (gid+width); i++)\n"
     "  {\n"
     "    // pixel computations\n"
-    "    PIXEL t7 = SET_CONST_OP(c0);\n"
-    "    PIXEL t9 = SET_CONST_OP(c1);\n"
+    "    PIXEL t7 = SET_OP(c0);\n"
+    "    PIXEL t9 = SET_OP(c1);\n"
     "    // set output pixels\n"
     "    p0[i] = t7;\n"
     "    p1[i] = t9;\n"
@@ -793,8 +793,8 @@ KERNEL void sub_00_helper_0_0_0(
   for (i=gid; i < (gid+width); i++)
   {
     // pixel computations
-    PIXEL t7 = SET_CONST_OP(c0);
-    PIXEL t9 = SET_CONST_OP(c1);
+    PIXEL t7 = SET_OP(c0);
+    PIXEL t9 = SET_OP(c1);
     // set output pixels
     p0[i] = t7;
     p1[i] = t9;

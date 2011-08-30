@@ -1021,7 +1021,7 @@ static freia_status freia_55_helper_0_0_1_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
-    "    PIXEL t9 = SET_CONST_OP(c0);\n"
+    "    PIXEL t9 = SET_OP(c0);\n"
     "    PIXEL t11 = INF_OP(t9, in1);\n"
     "    PIXEL t13 = INF_OP(t11, in0);\n"
     "    // set output pixels\n"
@@ -1119,7 +1119,7 @@ KERNEL void freia_55_helper_0_0_1(
     PIXEL in0 = j0[i];
     PIXEL in1 = j1[i];
     // pixel computations
-    PIXEL t9 = SET_CONST_OP(c0);
+    PIXEL t9 = SET_OP(c0);
     PIXEL t11 = INF_OP(t9, in1);
     PIXEL t13 = INF_OP(t11, in0);
     // set output pixels

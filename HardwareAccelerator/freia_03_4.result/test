@@ -824,8 +824,8 @@ freia_status freia_03_helper_0_0_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST?;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST?;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST;
   // 1: +.(1) -> 1
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
@@ -1341,7 +1341,7 @@ static freia_status freia_03_helper_0_0_0_compile(void)
     "    // pixel computations\n"
     "    PIXEL t27 = ADD_OP(in0, c0);\n"
     "    PIXEL t28 = ADDSAT_OP(in1, c1);\n"
-    "    PIXEL t33 = SET_CONST_OP(c2);\n"
+    "    PIXEL t33 = SET_OP(c2);\n"
     "    PIXEL t29 = ADD_OP(t27, t28);\n"
     "    PIXEL t30 = MUL_OP(t27, c3);\n"
     "    PIXEL t31 = DIV_OP(t29, c4);\n"
@@ -1456,7 +1456,7 @@ KERNEL void freia_03_helper_0_0_0(
     // pixel computations
     PIXEL t27 = ADD_OP(in0, c0);
     PIXEL t28 = ADDSAT_OP(in1, c1);
-    PIXEL t33 = SET_CONST_OP(c2);
+    PIXEL t33 = SET_OP(c2);
     PIXEL t29 = ADD_OP(t27, t28);
     PIXEL t30 = MUL_OP(t27, c3);
     PIXEL t31 = DIV_OP(t29, c4);

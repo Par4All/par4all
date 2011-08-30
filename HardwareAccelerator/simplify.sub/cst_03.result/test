@@ -475,8 +475,8 @@ freia_status cst_03_helper_0_0_0(
   mcu_macro[1][1].iter3 = 0;
   mcu_macro[0][1].iter4 = 0;
   mcu_macro[1][1].iter4 = 0;
-  mcu_macro[0][1].addrStart = TERAPIX_UCODE_ADDSAT_CONST?;
-  mcu_macro[1][1].addrStart = TERAPIX_UCODE_ADDSAT_CONST?;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_ADDSAT_CONST;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_ADDSAT_CONST;
   // 2: -|.(1) -> 1
   mcu_macro[0][2].xmin1 = imagelet_io_1_0;
   mcu_macro[1][2].xmin1 = imagelet_io_1_1;
@@ -506,8 +506,8 @@ freia_status cst_03_helper_0_0_0(
   mcu_macro[1][2].iter3 = 0;
   mcu_macro[0][2].iter4 = 0;
   mcu_macro[1][2].iter4 = 0;
-  mcu_macro[0][2].addrStart = TERAPIX_UCODE_ABSDIFF_CONST?;
-  mcu_macro[1][2].addrStart = TERAPIX_UCODE_ABSDIFF_CONST?;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_ABSDIFF_CONST;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_ABSDIFF_CONST;
   // 3: -s.(1) -> 1
   mcu_macro[0][3].xmin1 = imagelet_io_1_0;
   mcu_macro[1][3].xmin1 = imagelet_io_1_1;
@@ -537,8 +537,8 @@ freia_status cst_03_helper_0_0_0(
   mcu_macro[1][3].iter3 = 0;
   mcu_macro[0][3].iter4 = 0;
   mcu_macro[1][3].iter4 = 0;
-  mcu_macro[0][3].addrStart = TERAPIX_UCODE_SUBSAT_CONST?;
-  mcu_macro[1][3].addrStart = TERAPIX_UCODE_SUBSAT_CONST?;
+  mcu_macro[0][3].addrStart = TERAPIX_UCODE_SUBSAT_CONST;
+  mcu_macro[1][3].addrStart = TERAPIX_UCODE_SUBSAT_CONST;
 
 
   // no input
@@ -725,7 +725,7 @@ static freia_status cst_03_helper_0_0_0_compile(void)
     "  for (i=gid; i < (gid+width); i++)\n"
     "  {\n"
     "    // pixel computations\n"
-    "    PIXEL t5 = SET_CONST_OP(c0);\n"
+    "    PIXEL t5 = SET_OP(c0);\n"
     "    PIXEL t6 = ADDSAT_OP(t5, c1);\n"
     "    PIXEL t7 = ABSDIFF_OP(t6, c2);\n"
     "    PIXEL t8 = SUBSAT_OP(t7, c3);\n"
@@ -816,7 +816,7 @@ KERNEL void cst_03_helper_0_0_0(
   for (i=gid; i < (gid+width); i++)
   {
     // pixel computations
-    PIXEL t5 = SET_CONST_OP(c0);
+    PIXEL t5 = SET_OP(c0);
     PIXEL t6 = ADDSAT_OP(t5, c1);
     PIXEL t7 = ABSDIFF_OP(t6, c2);
     PIXEL t8 = SUBSAT_OP(t7, c3);

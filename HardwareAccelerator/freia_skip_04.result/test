@@ -618,8 +618,8 @@ freia_status freia_skip_04_helper_0_0_0(
   mcu_macro[1][1].iter3 = 0;
   mcu_macro[0][1].iter4 = 0;
   mcu_macro[1][1].iter4 = 0;
-  mcu_macro[0][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
-  mcu_macro[1][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_XOR_CONST;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_XOR_CONST;
 
 
   // inputs:

@@ -358,8 +358,8 @@ freia_status my_subsat_helper_0_0_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_SUBSAT?;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_SUBSAT?;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_SUBSAT;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_SUBSAT;
 
 
   // inputs:
