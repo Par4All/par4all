@@ -1201,7 +1201,7 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 {
     entity f = call_function(c);
     type rt = functional_result(type_functional(entity_type(f)));
-    pips_assert("not calling basic_of_intrinsic on something returing void",!type_void_p(rt));
+    pips_assert("not calling basic_of_intrinsic on something returning void",!type_void_p(rt));
     basic rb = copy_basic(variable_basic(type_variable(rt)));
 
     pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
