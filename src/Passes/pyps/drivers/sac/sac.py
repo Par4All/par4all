@@ -80,7 +80,7 @@ class sacbase(object):
         # translated in pyps.
 
         ws.activate("preconditions_intra")
-        ws.activate("transformers_intra_fast")
+        ws.activate("transformers_intra_full")
 
         ws.props.loop_unroll_with_prologue = False
         ws.props.constant_path_effects = False
@@ -92,6 +92,10 @@ class sacbase(object):
         ws.props.sac_simd_register_width = cond["register_width"]
         ws.props.prettyprint_all_declarations = True
         ws.props.compute_all_dependences = True
+        module.recover_for_loop()
+        module.for_loop_to_do_loop()
+        module.split_initializations()
+
         module.forward_substitute()
 
         if cond.get("verbose"):
