@@ -392,7 +392,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 #define P4A_call_accel_kernel(kernel, grid, blocks, parameters)			\
   do {									\
     P4A_skip_debug(3,P4A_dump_location());				\
-    P4A_skip_debug(1,P4A_dump_message("Invoking kernel %s (%dx%dx%d ; %dx%d%d) with args %s\n",	\
+    P4A_skip_debug(1,P4A_dump_message("Invoking kernel %s (%dx%dx%d ; %dx%dx%d) with args %s\n",	\
                                       #kernel,        \
                                       grid.x,grid.y,grid.z,        \
                                       blocks.x,blocks.y,blocks.z,        \
