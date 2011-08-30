@@ -7183,7 +7183,7 @@ digraph "license_plate_copies_helper_0_4" {
 // FREIA OpenCL includes
 #include <CL/opencl.h>
 #include "freia.h"
-#include "private/freiaGatewayOpenCL.h"
+#include "freia_opencl_runtime.h"
 
 
 // dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0 copies
