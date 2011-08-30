@@ -33912,7 +33912,7 @@ static freia_status main_helper_1_0_1_compile(void)
     "    PIXEL t464 = PIXEL_THRESHOLD(t461, c6, c7, c8);\n"
     "    PIXEL t467 = PIXEL_SUP(t463, t464);\n"
     "    PIXEL t468 = PIXEL_SUP(t467, t465);\n"
-    "    PIXEL t469 = PIXEL_NOTU(t468);\n"
+    "    PIXEL t469 = PIXEL_NOT(t468);\n"
     "    // set output pixels\n"
     "    p0[i] = t465;\n"
     "    p1[i] = t463;\n"
@@ -34210,7 +34210,7 @@ KERNEL void main_helper_1_0_1(
     PIXEL t464 = PIXEL_THRESHOLD(t461, c6, c7, c8);
     PIXEL t467 = PIXEL_SUP(t463, t464);
     PIXEL t468 = PIXEL_SUP(t467, t465);
-    PIXEL t469 = PIXEL_NOTU(t468);
+    PIXEL t469 = PIXEL_NOT(t468);
     // set output pixels
     p0[i] = t465;
     p1[i] = t463;

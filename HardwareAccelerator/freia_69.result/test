@@ -1736,7 +1736,7 @@ static freia_status freia_69_helper_0_0_0_compile(void)
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
     "    PIXEL t9 = PIXEL_ADD(in0, c0);\n"
-    "    PIXEL t19 = PIXEL_NOTU(in0);\n"
+    "    PIXEL t19 = PIXEL_NOT(in0);\n"
     "    PIXEL t10 = PIXEL_ADD(t9, c1);\n"
     "    PIXEL t20 = PIXEL_INF(t19, c2);\n"
     "    PIXEL t11 = PIXEL_ADD(t10, c3);\n"
@@ -1993,7 +1993,7 @@ KERNEL void freia_69_helper_0_0_0(
     PIXEL in0 = j0[i];
     // pixel computations
     PIXEL t9 = PIXEL_ADD(in0, c0);
-    PIXEL t19 = PIXEL_NOTU(in0);
+    PIXEL t19 = PIXEL_NOT(in0);
     PIXEL t10 = PIXEL_ADD(t9, c1);
     PIXEL t20 = PIXEL_INF(t19, c2);
     PIXEL t11 = PIXEL_ADD(t10, c3);
