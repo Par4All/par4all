@@ -659,7 +659,7 @@ bool freia_image_variable_p(const entity var)
 {
   bool is_image = false;
   if (var && var!=entity_undefined &&
-      entity_variable_p(var) && entity_scalar_p(var))
+      entity_variable_p(var) && entity_pointer_p(var))
   {
     type t = ultimate_type(entity_type(var));
     basic b = variable_basic(type_variable(t));
@@ -753,7 +753,7 @@ static void set_add_scalars(set s, const statement stat, const bool written)
     {
       entity var = reference_variable(effect_any_reference(e));
       if (entity_variable_p(var) && var!=skip &&
-          !freia_image_variable_p(var) && entity_scalar_p(var))
+          !freia_image_variable_p(var) && (entity_scalar_p(var) || entity_pointer_p(var)))
         set_add_element(s, s, var);
     }
   }

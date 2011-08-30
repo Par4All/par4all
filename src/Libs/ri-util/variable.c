@@ -990,7 +990,8 @@ bool entity_scalar_p(entity e)
 
   type t = ultimate_type(entity_type(e));
   if(type_variable_p(t)) {
-    return_value = ENDP(variable_dimensions(type_variable(t)));
+    return_value = ENDP(variable_dimensions(type_variable(t)))
+        && ! pointer_type_p(t);
   }
   return return_value;
 }

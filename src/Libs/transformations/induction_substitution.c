@@ -733,7 +733,7 @@ static bool do_strength_reduction_gather(expression exp, strength_reduction_cont
                 vect_normalize(pv);
                 Value v = vect_coeff(var,pv);
                 if(value_one_p(v)&& // prefer pointer over scalars to hold the increment
-                        (entity_undefined_p(other)||entity_scalar_p(other)))
+                        (entity_undefined_p(other)||entity_scalar_p(other)||entity_pointer_p(other)))
                     other= var;
                 //else {other=entity_undefined;};//do not manage this case as of now
             }
@@ -743,7 +743,7 @@ static bool do_strength_reduction_gather(expression exp, strength_reduction_cont
             }*/
         }
         /* we only take care of scalar variables */
-        if(!entity_undefined_p(other) && entity_scalar_p(other) ) {
+        if(!entity_undefined_p(other) && (entity_scalar_p(other) || entity_pointer_p(other)) ) {
             /* look for an entity that olds the same increment as ours */
             entity already_there = entity_undefined;
             HASH_FOREACH(entity,e,intptr_t,v,ctxt->entity_to_coeff) {

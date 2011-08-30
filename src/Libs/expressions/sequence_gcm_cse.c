@@ -1248,7 +1248,7 @@ static void do_gather_all_expressions_perms(list sterns,list * perms) {
                     normalized_linear(expression_normalized(head)));
             expression epv = Pvecteur_to_expression(pv);
             reorder_pointer_expression(epv);
-            gen_recurse(epv,call_domain,gen_true,convert_to_c_operator);
+            convert_to_c_operators(epv);
             *perms=CONS(EXPRESSION,epv,*perms);
         }
         *perms=gen_nconc(*perms,nperms);

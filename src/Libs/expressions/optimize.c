@@ -1331,12 +1331,16 @@ static void davinci_dump_expressions(
 }
 
 
-void convert_to_c_operator(call c) {
+static
+void do_convert_to_c_operator(call c) {
     entity op = call_function(c);
     if(ENTITY_PLUS_P(op))
         call_function(c)=entity_intrinsic(PLUS_C_OPERATOR_NAME);
     if(ENTITY_MINUS_P(op))
         call_function(c)=entity_intrinsic(MINUS_C_OPERATOR_NAME);
+}
+void convert_to_c_operators(void * v) {
+    gen_recurse(v,call_domain,gen_true,do_convert_to_c_operator);
 }
 
 static
@@ -1398,7 +1402,7 @@ bool optimize_expressions(string module_name)
 
 
     s = get_current_module_statement();
-    gen_recurse(s,call_domain,gen_true,convert_to_c_operator);
+    convert_to_c_operators(s);
 
     /* check consistency before optimizations */
     pips_assert("consistency checking before optimizations",
