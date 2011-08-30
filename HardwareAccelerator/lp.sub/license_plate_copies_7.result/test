@@ -7168,9 +7168,6 @@ digraph "license_plate_copies_helper_0_4" {
 #include "freia.h"
 #include "private/freiaGatewayOpenCL.h"
 
-// FREIA OpenCL runtime helper
-extern freia_status freia_op_compile_kernel(
-   const char*, const char*, const char*, cl_kernel *);
 
 // dag 0: 69 ops and 66 copies, optimized to 69 ops and 0+0 copies
 #include <freia_opencl_runtime.hcl>

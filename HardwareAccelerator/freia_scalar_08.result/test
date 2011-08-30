@@ -1037,9 +1037,6 @@ digraph "freia_scalar_08_helper_0_0" {
 #include "freia.h"
 #include "private/freiaGatewayOpenCL.h"
 
-// FREIA OpenCL runtime helper
-extern freia_status freia_op_compile_kernel(
-   const char*, const char*, const char*, cl_kernel *);
 
 // dag 0: 5 ops and 0 copies, optimized to 4 ops and 0+0 copies
 #include <freia_opencl_runtime.hcl>
