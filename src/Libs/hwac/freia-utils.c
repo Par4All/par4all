@@ -161,7 +161,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_not_0, NO_MES },
     // ??? why not less?
-    TRPX_OP(4, "NOT"), OPCL("NOTU")
+    TRPX_OP(4, "NOT"), OPCL("NOT")
   },
   { AIPO "log2", "l2", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_log2_0, NO_MES },
