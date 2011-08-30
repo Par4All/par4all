@@ -162,16 +162,23 @@ GenericAddLocalEntityToDeclarations(entity e, entity module, statement s,
    * it basically recompute the offset of a scalar variable
    * I have not found how to do it for a variable size array, so I just dropped the case
    */
-  if( storage_undefined_p(entity_storage(e)) && entity_variable_p(e) && entity_scalar_p(e) )
+  if( storage_undefined_p(entity_storage(e)) && entity_variable_p(e) )
     {
       entity dynamic_area = global_name_to_entity(module_local_name(module),
 						  DYNAMIC_AREA_LOCAL_NAME);
+      int tmp;
+      if(SizeOfArray(e,&tmp)) { // << CurrentOffsetOfArea fails if SizeOfArray is not computable
       entity_storage(e) = make_storage_ram(
 					   make_ram(module,
 						    dynamic_area,
 						    CurrentOffsetOfArea(dynamic_area, e),
 						    NIL)
 					   );
+      }
+      else {
+          pips_user_warning("Varying size for array \"%s\"\n", entity_name(e));
+          pips_user_warning("Not yet supported properly by PIPS\n");
+      }
     }
 
   /* Both in C and Fortran, all variables and useful entities are
