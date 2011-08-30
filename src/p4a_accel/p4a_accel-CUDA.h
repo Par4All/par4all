@@ -87,9 +87,10 @@ static inline void checkErrorMessageInline(const char *errorMessage,
     It should be OK for big iteration spaces, but quite suboptimal for
     small ones.
 
-    They can be redefined at compilation time with definition options such
-    as -DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=128, or given in p4a with
-    --nvcc_flags=-DP4A_CUDA_THREAD_Y_PER_BLOCK_IN_2D=16 for example.
+    They can be redefined with the environment variable P4A_MAX_TPB at 
+    runtime or at compilation time with definition options such 
+    as -DP4A_CUDA_THREAD_MAX=128, or given in p4a with
+    --nvcc_flags=-DP4A_CUDA_THREAD_MAX=128 for example.
 
     If you get arrors such as "P4A CUDA kernel execution failed : too many 
     resources requested for launch.", there is not enough registers to run
@@ -391,7 +392,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 #define P4A_call_accel_kernel(kernel, grid, blocks, parameters)			\
   do {									\
     P4A_skip_debug(3,P4A_dump_location());				\
-    P4A_skip_debug(1,P4A_dump_message("Invoking kernel %s (%dx%dx%d ; %dx%d%d) with args %s\n",	\
+    P4A_skip_debug(1,P4A_dump_message("Invoking kernel %s (%dx%dx%d ; %dx%dx%d) with args %s\n",	\
                                       #kernel,        \
                                       grid.x,grid.y,grid.z,        \
                                       blocks.x,blocks.y,blocks.z,        \
@@ -462,6 +463,8 @@ void P4A_copy_to_accel_3d(size_t element_size,
                         (int) p4a_block_x);     \
   p4a_block_y = P4A_min((int) n_y_iter,       \
                         tpb/(float)p4a_block_x);    \
+  p4a_block_x = P4A_max((int) p4a_block_x, \
+                        tpb/(float)p4a_block_y); \
   dim3 block_descriptor_name(p4a_block_x, p4a_block_y);     \
   /* Define the ceil-rounded number of needed blocks of threads: */ \
   dim3 grid_descriptor_name((((int) n_x_iter) + p4a_block_x - 1)/p4a_block_x, \
@@ -488,6 +491,8 @@ void P4A_copy_to_accel_3d(size_t element_size,
                         (int) p4a_block_x);     \
   p4a_block_y = P4A_min((int) n_y_iter,       \
                         tpb/(float)p4a_block_x);    \
+  p4a_block_x = P4A_max((int) p4a_block_x, \
+                        tpb/(float)p4a_block_y); \
   /* Z is not used at that time */ \
   p4a_block_z = 1; \
   dim3 block_descriptor_name(p4a_block_x, p4a_block_y, p4a_block_z);     \

@@ -79,7 +79,7 @@ def add_own_options(parser):
         help = "Use PoCC to optimize loop nest (experimental).")
 
     proc_group.add_option("--cuda-cc", action = "append", default = "2.0",
-        help = "Compile capabilities of Cuda target (default is 2.0)")
+        help = "Compute capabilities of Cuda target (default is 2.0)")
 
     proc_group.add_option("--select-modules", metavar = "REGEXP", default = None,
         help = "Process only the modules (functions and subroutines) whith names matching the regular expression. For example '^saxpy$|dgemm\' will keep only functions or procedures which name is exactly saxpy or contains \"dgemm\". For more information about regular expressions, look at the section 're' of the Python library reference for example. In Fortran, the regex should match uppercase names. Be careful to escape special characters from the shell. Simple quotes are a good way to go for it.")

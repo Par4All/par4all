@@ -56,26 +56,21 @@ void lud_base(int size,float a[size][size])
 {
      int i,j,k;
 
-     // We cheat on the increment so that we won't parallelize this version 
      for (i=0; i<size; i++){
-         for (j=i; j<size; ){
+         for (j=i; j<size;j++ ){
              float sum=a[i][j];
-             for (k=0; k<i; ) {
+             for (k=0; k<i; k++ ) {
                sum -= a[i][k]*a[k][j];
-               k++;
              }
              a[i][j]=sum;
-             j++;
          }
 
-         for (j=i+1;j<size; ){
+         for (j=i+1;j<size;j++){
              float sum=a[j][i];
-             for (k=0; k<i; ) {
+             for (k=0; k<i; k++ ) {
                sum -=a[j][k]*a[k][i];
-               k++;
              }
              a[j][i]=sum/a[i][i];
-             j++;
          }
      }
 }
@@ -99,7 +94,7 @@ void lud_99(int size, float a[size][size])
 
          for (j=i+1;j<size; j++){
              float sum=a[j][i];
-             for (k=0; k<i; k++) sum -=a[j][k]*a[k][i];
+             for (k=0; k<i; k++) sum -= a[j][k]*a[k][i];
              a[j][i]=sum/a[i][i];
          }
      }
@@ -166,7 +161,7 @@ main ( int argc, char *argv[] )
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {
-    memset(m,0,sizeof(mm));
+    memset(mm,0,sizeof(mm));
   }
 
   
