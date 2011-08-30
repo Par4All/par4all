@@ -980,11 +980,8 @@ check_input_file_syntax(string file_name, string compiler, string options)
       // the same "file_name.o" can be used by several creates
       // performed in parallel, for instance by the validation...
 		   " -o /dev/null", NULL))) {
-    /* f77, for instance, is rather silent on errors... They are
-     * nevertheless detected if no output file is created.
-     *
-     * Note that TAB is avoided in warning to simplify validation.
-     */
+
+    // Note that TAB is avoided in warning to simplify validation.
     pips_user_warning("\n\n        Syntax errors in file %s!\007\n\n",
 		      file_name);
     syntax_ok_p = false;
@@ -1004,15 +1001,15 @@ static bool check_fortran_syntax_before_pips(string file_name)
 
   if (safe_system_no_abort
       (concatenate(pips_flint? pips_flint: DEFAULT_PIPS_FLINT, " ",
-		   file_name,
-		   " -o ", file_name, SUFFIX,
-		   " ; test -f ", file_name, SUFFIX,
-		   " && rm ", file_name, SUFFIX, NULL))) {
-    /* f77 is rather silent on errors... which is detected if no
-     * file was output as expected.
-     */
+                   // DO NOT USE A POSSIBLY SHARED FILE NAME!
+                   // the same "file_name.o" can be used by several creates
+                   // performed in parallel, for instance by the validation...
+                   file_name, " -o /dev/null", NULL)))
+  {
+    // f77 is rather silent on errors... which is detected if no
+    // file was output as expected.
     pips_user_warning("\n\n\tFortran syntax errors in file %s!\007\n\n",
-		      file_name);
+                      file_name);
     syntax_ok_p = false;
   }
   return syntax_ok_p;
