@@ -463,6 +463,8 @@ void P4A_copy_to_accel_3d(size_t element_size,
                         (int) p4a_block_x);     \
   p4a_block_y = P4A_min((int) n_y_iter,       \
                         tpb/(float)p4a_block_x);    \
+  p4a_block_x = P4A_max((int) p4a_block_x, \
+                        tpb/(float)p4a_block_y); \
   dim3 block_descriptor_name(p4a_block_x, p4a_block_y);     \
   /* Define the ceil-rounded number of needed blocks of threads: */ \
   dim3 grid_descriptor_name((((int) n_x_iter) + p4a_block_x - 1)/p4a_block_x, \
@@ -489,6 +491,8 @@ void P4A_copy_to_accel_3d(size_t element_size,
                         (int) p4a_block_x);     \
   p4a_block_y = P4A_min((int) n_y_iter,       \
                         tpb/(float)p4a_block_x);    \
+  p4a_block_x = P4A_max((int) p4a_block_x, \
+                        tpb/(float)p4a_block_y); \
   /* Z is not used at that time */ \
   p4a_block_z = 1; \
   dim3 block_descriptor_name(p4a_block_x, p4a_block_y, p4a_block_z);     \
