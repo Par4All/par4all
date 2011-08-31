@@ -1,4 +1,5 @@
 /* Header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
+#ifndef __PIPS__ /* for PIPS re entrance */
 #ifndef MAX0
 # define MAX0(a, b) ((a) > (b) ? (a) : (b))
 #endif
@@ -33,4 +34,4 @@
 #    define SIN(a) (sin(a))
 #  endif
 #endif
-/* End header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
+#endif

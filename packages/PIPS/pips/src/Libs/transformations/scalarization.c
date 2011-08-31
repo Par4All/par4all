@@ -246,6 +246,9 @@ static bool sc_totally_functional_graph_p( Psysteme g, // function graph
 static Pbase loop_indices_b = BASE_NULLE;
 
 // These are needed for callback function reference_substitute
+// FI: I am sure somebody is going to complain about a context not
+// being used; but remember you do not know when, why or how this piece of
+// code was written
 static reference scalarized_reference = reference_undefined;
 static entity scalarized_replacement_variable = entity_undefined;
 
@@ -254,7 +257,11 @@ static entity scalarized_replacement_variable = entity_undefined;
 static bool reference_substitute(reference r) {
   bool result = false;
   entity v = reference_variable(r);
-  if(reference_equal_p(r,scalarized_reference)) {
+  entity scalarized_v = reference_variable(scalarized_reference);
+  // This test proved to strong by conditional04 because the region
+  // computation does too good a job...
+  // if(reference_equal_p(r,scalarized_reference)) {
+  if(v==scalarized_v) {
     // Scalarize only if r refers to an array element and not to a slice
     list inds = reference_indices(r);
     size_t d = type_depth(ultimate_type(entity_type(v)));

@@ -121,11 +121,11 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "addsat", "+s", AIPO "addsat", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_addsat, NO_MES }, TRPX_OP(4, "ADDSAT?"), OPCL("ADDSAT")
+      NO_POC, alu_addsat, NO_MES }, TRPX_OP(4, "ADDSAT"), OPCL("ADDSAT")
   },
   { AIPO "subsat", "-s", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
-      NO_POC, alu_subsat_01, NO_MES }, TRPX_OP(4, "SUBSAT?"), OPCL("SUBSAT")
+      NO_POC, alu_subsat_01, NO_MES }, TRPX_OP(4, "SUBSAT"), OPCL("SUBSAT")
   },
   { AIPO "absdiff", "-|", AIPO "absdiff", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
@@ -169,72 +169,72 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   { AIPO "add_const", "+.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_add_0cst, NO_MES },
-    TRPX_OP(3, "ADD_CONST"), OPCL("ADD_CONST")
+    TRPX_OP(3, "ADD_CONST"), OPCL("ADD")
   },
   { AIPO "inf_const", "<.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_inf_0cst, NO_MES },
-    TRPX_OP(3, "INF_CONST"), OPCL("INF_CONST")
+    TRPX_OP(3, "INF_CONST"), OPCL("INF")
   },
   { AIPO "sup_const", ">.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES },
-    TRPX_OP(3, "SUP_CONST?"), OPCL("SUP_CONST")
+    TRPX_OP(3, "SUP_CONST"), OPCL("SUP")
   },
   { AIPO "sub_const", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES },
-    TRPX_OP(3, "SUB_CONST"), OPCL("SUB_CONST")
+    TRPX_OP(3, "SUB_CONST"), OPCL("SUB")
   },
   { AIPO "const_sub", ".-", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_cst0, NO_MES },
-    TRPX_OP(3, "CONST_SUB"), OPCL("CONST_SUB")
+    TRPX_OP(3, "CONST_SUB"), OPCL("SUBC")
   },
   { AIPO "and_const", "&.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_and_0cst, NO_MES },
-    TRPX_OP(3, "AND_CONST"), OPCL("AND_CONST")
+    TRPX_OP(3, "AND_CONST"), OPCL("AND")
   },
   { AIPO "or_const", "|.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_or_0cst, NO_MES },
-    TRPX_OP(3, "OR_CONST?"), OPCL("OR_CONST")
+    TRPX_OP(3, "OR_CONST"), OPCL("OR")
   },
   { AIPO "xor_const", "^.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_xor_0cst, NO_MES },
-    TRPX_OP(3, "XOR_CONST?"), OPCL("XOR_CONST")
+    TRPX_OP(3, "XOR_CONST"), OPCL("XOR")
   },
   { AIPO "addsat_const", "+s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_addsat_0cst, NO_MES },
-    TRPX_OP(3, "ADDSAT_CONST?"), OPCL("ADDSAT_CONST")
+    TRPX_OP(3, "ADDSAT_CONST"), OPCL("ADDSAT")
   },
   { AIPO "subsat_const", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES },
-    TRPX_OP(3, "SUBSAT_CONST?"), OPCL("SUBSAT_CONST")
+    TRPX_OP(3, "SUBSAT_CONST"), OPCL("SUBSAT")
   },
   { AIPO "const_subsat", ".-s", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_cst0, NO_MES },
-    TRPX_OP(3, "CONST_SUBSAT?"), OPCL("CONST_SUBSAT")
+    TRPX_OP(3, "CONST_SUBSAT"), OPCL("SUBSATC")
   },
   { AIPO "absdiff_const", "-|.", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_abssub_0cst, NO_MES },
-    TRPX_OP(3, "ABSDIFF_CONST?"), OPCL("ABSDIFF_CONST")
+    TRPX_OP(3, "ABSDIFF_CONST"), OPCL("ABSDIFF")
   },
   { AIPO "mul_const", "*.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_mul_0cst, NO_MES },
-    TRPX_OP(3, "MUL_CONST"), OPCL("MUL_CONST")
+    TRPX_OP(3, "MUL_CONST"), OPCL("MUL")
   },
   { AIPO "div_const", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES },
-    TRPX_OP(3, "DIV_CONST"), OPCL("DIV_CONST")
+    TRPX_OP(3, "DIV_CONST"), OPCL("DIV")
   },
   { AIPO "const_div", "./", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_cst0, NO_MES },
-    TRPX_OP(3, "CONST_DIV?"), OPCL("CONST_DIV")
+    TRPX_OP(3, "CONST_DIV"), OPCL("DIVC")
   },
   // nullary
   { AIPO "set_constant", "C", NULL, 1, 0, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES },
-    TRPX_OP(2, "SET_CONST"), OPCL("SET_CONST")
+    TRPX_OP(2, "SET_CONST"), OPCL("SET")
   },
   // not a real one, this is used internally only
   // semantics of "scalar_copy(a, b);" is "*a = *b;"
@@ -659,7 +659,7 @@ bool freia_image_variable_p(const entity var)
 {
   bool is_image = false;
   if (var && var!=entity_undefined &&
-      entity_variable_p(var) && entity_scalar_p(var))
+      entity_variable_p(var) && entity_pointer_p(var))
   {
     type t = ultimate_type(entity_type(var));
     basic b = variable_basic(type_variable(t));
@@ -753,7 +753,7 @@ static void set_add_scalars(set s, const statement stat, const bool written)
     {
       entity var = reference_variable(effect_any_reference(e));
       if (entity_variable_p(var) && var!=skip &&
-          !freia_image_variable_p(var) && entity_scalar_p(var))
+          !freia_image_variable_p(var) && (entity_scalar_p(var) || entity_pointer_p(var)))
         set_add_element(s, s, var);
     }
   }

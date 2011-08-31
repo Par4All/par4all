@@ -1,6 +1,5 @@
-import re
 import pyps
-from pyps import module, workspace, Maker
+from pyps import module, Maker
 
 class ompMaker(Maker):
     ''' A makefile builder for openmp '''

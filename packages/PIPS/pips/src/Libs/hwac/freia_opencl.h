@@ -29,15 +29,24 @@
 #ifndef HWAC_FREIA_OPENCL_H_
 #define HWAC_FREIA_OPENCL_H_
 
+// property name, whether to attempt to merge operations
 #define opencl_merge_prop "HWAC_OPENCL_MERGE_OPERATIONS"
 
-// types
-#define OPENCL_IMAGE "opencl image "
-#define OPENCL_PIXEL "register pixel "
+// OpenCL types for the generated code
+#define OPENCL_PIXEL "PIXEL "
+#define OPENCL_IMAGE "GLOBAL " OPENCL_PIXEL "* "
 
-// includes for generated opencl helper
-#define FREIA_OPENCL_INCLUDES                   \
-  "// freia opencl includes\n"
+// includes for OpenCL helper
+#define FREIA_OPENCL_INCLUDES                                 \
+  "// FREIA OpenCL includes\n"                                \
+  "#include <CL/opencl.h>\n"                                  \
+  "#include \"freia.h\"\n"                                    \
+  "#include \"private/freia_opencl_runtime.h\"\n"             \
+  "\n"
+
+// raw include for opencl code generation
+#define FREIA_OPENCL_CL_INCLUDES                \
+  "#include <freia_opencl_runtime.hcl>"
 
 // information about OpenCL handling of an operation
 typedef struct {

@@ -812,7 +812,7 @@ static _int freia_terapix_call
   sb_cat(head, " * GRAM H   = ", ip2s(trpx_gram_height), "\n");
   sb_cat(head, " * DAG CUT  = ", get_string_property(trpx_dag_cut), "\n");
   sb_cat(head, " * OVERLAP  = ", bool_to_string(trpx_overlap_io_p()), "\n");
-  sb_cat(head, " * IMAGE H  = ", ip2s(trpx_image_height), "\n");
+  sb_cat(head, " * IMAGE H  = ", ip2s("FREIA_IMAGE_HEIGHT"), "\n");
   sb_cat(head, " * MAX SIZE = ", ip2s(trpx_max_size), "\n");
   sb_cat(head, " *\n");
   // show dag statistics
@@ -1193,8 +1193,8 @@ static _int freia_terapix_call
   sb_cat(decl, "  // - ", itoa(n_imagelets), " computation imagelets\n");
   sb_cat(decl, "  // - ", itoa(n_double_buffers), " double buffer imagelets\n");
 
-  // we may optimize the row size for a target image height
-  int image_height = get_int_property(trpx_image_height);
+  // we may optimize the row size for a target image height, if available
+  int image_height = FREIA_DEFAULT_HEIGHT;
   if (image_height!=0)
   {
     // we adjust the imagelet size so that we avoid recomputing pixels
@@ -1212,6 +1212,8 @@ static _int freia_terapix_call
     sb_cat(decl, "  // imagelet max size: ", itoa(imagelet_rows), "\n");
     imagelet_rows = optim_rows;
   }
+  else
+    pips_user_warning("no image height hint, cannot optimize imagelet size\n");
 
   // this is really a MAXIMUM available size
   int max_size = get_int_property(trpx_max_size);

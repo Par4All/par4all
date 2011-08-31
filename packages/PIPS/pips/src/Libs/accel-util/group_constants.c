@@ -49,8 +49,13 @@ static void do_group_constant_entity(expression exp, set constants)
     if(expression_call_p(exp))
     {
         call c = expression_call(exp);
-        if (call_constant_p(c))
+        value cv = entity_initial(call_function(c));
+        if (value_symbolic_p(cv))
             set_add_element(constants,constants,call_function(c));
+        else if (value_constant_p(cv) && get_bool_property("GROUP_CONSTANTS_LITERAL")) {
+            set_add_element(constants,constants,call_function(c));
+
+        }
     }
 }
 
@@ -94,7 +99,7 @@ static void do_group_statement_constant(statement st, set constants)
 
 
     /* then search among all read and not written variables
-     * thoses who have constant phis
+     * those who have constant phis
      */
     FOREACH(REGION,reg,read_regions)
     {
@@ -108,6 +113,7 @@ static void do_group_statement_constant(statement st, set constants)
             FOREACH(EXPRESSION,index,reference_indices(ref))
             {
                 Variable phi = expression_to_entity(index);
+                bool phi_found_p =false;
                 for(Pcontrainte iter = sc_inegalites(sc);iter;iter=contrainte_succ(iter))
                 {
                     Pvecteur cvect = contrainte_vecteur(iter);
@@ -115,14 +121,31 @@ static void do_group_statement_constant(statement st, set constants)
                     /* we have found the right vector, now check for other vectors */
                     if(phi_coeff != VALUE_ZERO )
                     {
+                        phi_found_p=true;
                         Pvecteur other_vects = vect_del_var(cvect,phi);
                         found_not_constant_constraint|=vect_size(other_vects)!=1 || VARIABLE_DEFINED_P(other_vects->var);
                         vect_rm(other_vects);
                     }
                 }
+                found_not_constant_constraint |=!phi_found_p;
             }
-            if(!found_not_constant_constraint)
-                set_add_element(constants,constants,var);
+            if(!found_not_constant_constraint) {
+                    set_add_element(constants,constants,var);
+            }
+            else {
+                /* check the size too : small means mask */
+                Ppolynome pp = region_enumerate(reg);
+                if(!POLYNOME_UNDEFINED_P(pp)) {
+                    expression epp = polynome_to_expression(pp);
+                    intptr_t ipp;
+                    if(expression_integer_value(epp,&ipp) && ipp < 33)
+                        found_not_constant_constraint=false;
+                    free_expression(epp);
+                    polynome_free(pp);
+                }
+                if(!found_not_constant_constraint) 
+                    set_add_element(constants,constants,var);
+            }
         }
     }
     /* then prune this set, because it contains the preconditions too */
@@ -238,7 +261,6 @@ static void do_group_constants_terapix(statement in,set constants)
          * to be more general
          */
         list initializations_holder_seq = NIL;
-        AddLocalEntityToDeclarations(constant_holder,get_current_module_entity(),in);
         expression index = int_to_expression(0);
 
         FOREACH(ENTITY,econstant,lconstants)
@@ -279,6 +301,7 @@ static void do_group_constants_terapix(statement in,set constants)
             }
         }
         insert_statement(in,make_block_statement(gen_nreverse(initializations_holder_seq)),true);
+        AddLocalEntityToDeclarations(constant_holder,get_current_module_entity(),in);
     }
     gen_free_list(lconstants);
 }
@@ -319,7 +342,7 @@ group_constants(const char *module_name)
             reference_domain,gen_false,gen_null,
             expression_domain,gen_true,do_group_constant_entity,NULL);
 
-    /* pack all constants and perform replacment */
+    /* pack all constants and perform replacement */
     do_group_constants(constant_statement,constants);
 
     set_free(constants);

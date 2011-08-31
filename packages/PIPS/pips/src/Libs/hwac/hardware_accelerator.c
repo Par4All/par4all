@@ -88,18 +88,20 @@ static int freia_compiler(string module, string hardware)
   // put updated code and accelerated helpers
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
 
+  // update callees
+  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module,
+                         (void*) compute_callees(mod_stat));
+
   // other possibly generated resources
+  // Argh, as soon as it is put, it is obsolete. Indeed, the code is updated,
+  // and the file depends on the code and resources derived from the code.
   if (freia_spoc_p(hardware))
     DB_PUT_NEW_FILE_RESOURCE(DBR_SPOC_FILE, module, freia_file);
   else if (freia_terapix_p(hardware))
     DB_PUT_NEW_FILE_RESOURCE(DBR_TERAPIX_FILE, module, freia_file);
   else if (freia_opencl_p(hardware))
     DB_PUT_NEW_FILE_RESOURCE(DBR_OPENCL_FILE, module, freia_file);
-  // else no helper file for AIPO target
-
-  // update callees
-  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module,
-                         (void*) compute_callees(mod_stat));
+  // else no helper file for AIPO target, which is just a code transformation
 
   // release resources
   // ??? free statement_effects? MEMORY LEAK...

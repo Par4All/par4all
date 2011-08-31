@@ -3573,9 +3573,11 @@ available.
 \index{Intraprocedural Summary Precondition}
 \index{Precondition (Summary)}
 
+\begin{PipsPass}{intraprocedural_summary_precondition}
 A summary precondition is of type "transformer", but the argument list
 must be empty as it is a simple predicate on the initial state. So in fact
 it is a state predicate.
+\end{PipsPass}
 
 The intraprocedural summary precondition uses DATA statement for the main
 module and is the TRUE constant for all other modules.
@@ -7458,6 +7460,11 @@ You may want to skip loop bounds from the grouping
 GROUP_CONSTANTS_SKIP_LOOP_RANGE FALSE
 \end{PipsProp}
 
+You may want to skip litterals too.
+\begin{PipsProp}{GROUP_CONSTANTS_LITERAL}
+GROUP_CONSTANTS_LITERAL TRUE
+\end{PipsProp}
+
 
 
 \begin{PipsPass}{normalize_microcode}
@@ -7474,6 +7481,18 @@ normalize_microcode				> MODULE.code
         < MODULE.callers
         < MODULE.cumulated_effects
 \end{PipsMake}
+\begin{PipsPass}{terapix_warmup}
+  normalize array access in a loop nest for terapixification.
+\end{PipsPass}
+
+This pass is meaningless for any other target :(.
+
+\begin{PipsMake}
+terapix_warmup > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
 \begin{PipsPass}{terapix_remove_divide}
  converts divide operator into multiply operator using formula
   $a/cste = a* (1/b) \simeq a * ( 128 / cste ) / 128$
@@ -9377,6 +9396,7 @@ It can be useful for asm generation
 \begin{PipsMake}
 generate_two_addresses_code > MODULE.code
 			< MODULE.code
+			< MODULE.cumulated_effects
 			< PROGRAM.entities
 \end{PipsMake}
 Set following property to false if you want to split dereferencing:
@@ -9946,8 +9966,7 @@ COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \begin{PipsPass}{icm}
 Performs invariant code motion over sub expressions
 \end{PipsPass}
-It is required to set \PipsPropRef{MASK_EFFECTS_ON_PRIVATE_VARIABLES} to
-FALSE when computing effects needed by this pass.
+
 
 %-----------End of Expression Transformations -------------------------
 
@@ -10059,17 +10078,27 @@ Default is to keep a cast as cast, which is not accelerated.
 FREIA_CAST_IS_COPY FALSE
 \end{PipsProp}
 
-Assume this pixel size in bits:
-\begin{PipsProp}{FREIA_PIXEL_SIZE}
-FREIA_PIXEL_SIZE 16
-\end{PipsProp}
-
 Whether to cleanup freia returned status, as the code is assumed correct
 when compiled.
 \begin{PipsProp}{FREIA_CLEANUP_STATUS}
 FREIA_CLEANUP_STATUS TRUE
 \end{PipsProp}
 
+Assume this pixel size in bits:
+\begin{PipsProp}{FREIA_PIXEL_SIZE}
+FREIA_PIXEL_SIZE 16
+\end{PipsProp}
+
+If set to a non-zero value, assume this image size when generating code.
+If zero, try generic code.
+In particular, the height is useful to compute a better imagelet size
+when generating code for the Terapix hardware accelerator.
+\begin{PipsProp}{FREIA_IMAGE_HEIGHT}
+FREIA_IMAGE_HEIGHT 0
+\end{PipsProp}
+\begin{PipsProp}{FREIA_IMAGE_WIDTH}
+FREIA_IMAGE_WIDTH 0
+\end{PipsProp}
 
 \subsection{FREIA SPoC}
 \label{hwac-freia-spoc}
@@ -10154,14 +10183,6 @@ which is good, but the imagelet memory cannot be reused for inputs
 because it is still live while being stored, which is bad for
 memory pressure.
 
-If set to a non-zero value, optimize the imagelet size (height) with respect
-to this size of image, so as to minimize the border effects. This should
-not be needed if the runtime could adjust the computed size within the
-imagelet.
-\begin{PipsProp}{HWAC_TERAPIX_IMAGE_HEIGHT}
-HWAC_TERAPIX_IMAGE_HEIGHT 0
-\end{PipsProp}
-
 Use this maximum size (height) of an imagelet if set to non-zero.
 It may be useful to set this value to the image height (if known) so
 that compiler generates code for smaller imagelets, so that the
@@ -10190,6 +10211,14 @@ If not, the result will be simular to simple AIPO compilation,
 no actual helper functions will be generated.
 \begin{PipsProp}{HWAC_OPENCL_MERGE_OPERATIONS}
 HWAC_OPENCL_MERGE_OPERATIONS TRUE
+\end{PipsProp}
+
+Whether to generate OpenCL code for one operation on its own.
+It is not interesting to do so because it is just equivalent to
+the already existing AIPO implementation, but it can be useful for
+debug.
+\begin{PipsProp}{HWAC_OPENCL_COMPILE_ONE_OPERATION}
+HWAC_OPENCL_COMPILE_ONE_OPERATION FALSE
 \end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS TRANSFORMATIONS

@@ -72,7 +72,7 @@ class vworkspace(workspace_check.workspace):
         """ check resulting code after the apply """
         if "main" in self.fun:
             if self.__should_run :
-                print '// Execution after ' + phase
+                print '# Execution after ' + phase
                 print self.compile_and_run()
             elif self.__should_compile :
                 self.compile()
@@ -83,22 +83,22 @@ def validate_phases(self,*phases,**kwargs):
     display_after= kwargs.setdefault("display_after",  True)
     display_initial= kwargs.setdefault("display_initial",  True)
     if display_initial:
-        print "//"
-        print "// Initial code for module " + self.name
-        print "//"
+        print "#"
+        print "# Initial code for module " + self.name
+        print "#"
         self.display()
     for phase in list(phases):
         if "print_code_" in phase:
-            print "//"
-            print "// Display " + phase + " for module " + self.name
-            print "//"
+            print "#"
+            print "# Display " + phase + " for module " + self.name
+            print "#"
             self.display(phase);
         else:
             getattr(self,phase)()
             if display_after:
-                print "//"
-                print "// Code after " + phase + " for module " + self.name
-                print "//"
+                print "#"
+                print "# Code after " + phase + " for module " + self.name
+                print "#"
                 self.display()
         
 pyps.module.validate_phases = validate_phases
@@ -109,9 +109,9 @@ def validate_phases(self, *phases,**kwargs):
     display_after= kwargs.setdefault("display_after",  True)
     if display_initial:
         for m in self:
-            print "//"
-            print "// Initial code for module " + m.name
-            print "//"
+            print "#"
+            print "# Initial code for module " + m.name
+            print "#"
             m.display()
     for phase in list(phases):
         for m in self:

@@ -1519,7 +1519,9 @@
 
 
 #define ENTITY_FIVE_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
+                                     ENTITY_PLUS_C_P(e) || \
                                      ENTITY_MINUS_P(e) || \
+                                     ENTITY_MINUS_C_P(e) || \
                                      ENTITY_UNARY_MINUS_P(e) || \
                                      ENTITY_MULTIPLY_P(e) || \
                                      ENTITY_MODULO_P(e) ||\

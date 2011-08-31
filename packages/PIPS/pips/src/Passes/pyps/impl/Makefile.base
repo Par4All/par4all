@@ -1,10 +1,14 @@
 TARGET=a.out
+ifndef OBJS
 OBJS=$(patsubst %.c,%.o,$(filter %.c,$(SOURCES)))
+endif
 ##pipsrules##
 all: $(TARGET)
 
+ifndef OVERRIDE_TARGET
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $(LIBS) $(OBJS) -o $(TARGET)
+endif
 
 clean: 
 	$(RM) $(OBJS)

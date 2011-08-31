@@ -18,7 +18,7 @@
     #define rl_compentry_func_t CPFunction
 #endif
 
-/* in bsd, there is a bacward compatible mode, we skip it here */
+/* in bsd, there is a backward compatible mode, we skip it here */
 #if !HAVE_RL_COMPENTRY_FUNC_T || !HAVE_DECL_RL_COMPLETION_MATCHES || !HAVE_DECL_RL_FILENAME_COMPLETION_FUNCTION
     #define RL_NO_COMPAT
 #endif

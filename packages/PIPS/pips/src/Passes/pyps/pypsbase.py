@@ -532,7 +532,7 @@ class workspace(object):
         shutil.copy(pypsutils.get_runtimefile("pipsdef.h","pypsbase"),rep)
         return saved,headers+[os.path.join(rep,"pipsdef.h")]
 
-    def make(self, rep=None, maker=Maker()):
+    def divert(self, rep=None, maker=Maker()):
         """ save the workspace and generates a  makefile according to `maker' """
         if rep == None:
             rep = self.tmpdirname
@@ -545,7 +545,7 @@ class workspace(object):
         Returns the executable's path"""    
         if rep == None:
             rep = self.tmpdirname
-        self.make(rep,maker)
+        self.divert(rep,maker)
         commandline = pypsutils.gen_compile_command(rep,maker.makefile,outfile,rule,**opts)
 
         if self.verbose:
