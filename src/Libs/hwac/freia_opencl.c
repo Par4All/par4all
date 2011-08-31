@@ -351,7 +351,7 @@ static int opencl_compile_mergeable_dag(
   // OpenCL compilation
   sb_cat(compile,
          "\n"
-         "// hold kernels for", cut_name, "\n"
+         "// hold kernels for ", cut_name, "\n"
          "static cl_kernel ", cut_name, "_kernel[2];\n"
          "\n"
          "// compile kernels for ", cut_name, "\n"
