@@ -1,0 +1,27 @@
+CFLAGS+=
+LIBS+=
+OBJS=$(patsubst %.asl,%.bin,$(filter %.asl,$(SOURCES)))
+
+ASM_TERAPIX=asm_terapix
+ASL_TERAPIX=asl_terapix
+
+##pipsrules##
+
+.SECONDARY:
+
+%.asm:%.asl
+	$(ASL_TERAPIX) $< $@
+	@test -s $@ || ( $(RM) $@ ; exit 1 )
+
+
+%.bin:%.asm
+	mkdir asm
+	cp $< asm/
+	echo $< > Compile_list_asm.txt
+	$(ASM_TERAPIX) 
+	@$(RM) -r asm
+	@grep -q "Nombre d'erreurs :               0" Compile_Report.txt
+
+OVERRIDE_TARGET=yes
+$(TARGET): $(OBJS)
+	touch $@

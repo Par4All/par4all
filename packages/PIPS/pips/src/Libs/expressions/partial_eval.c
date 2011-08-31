@@ -1638,6 +1638,7 @@ expression generate_monome(int coef, expression expr)
  * partial evaluation of expressions in dimensions and of
  * initialization expression.
  */
+
 void partial_eval_declaration(entity v, Psysteme pre_sc, effects fx)
 {
   type vt = entity_type(v);
@@ -1660,6 +1661,7 @@ void partial_eval_declaration(entity v, Psysteme pre_sc, effects fx)
        the expression might be shared*/
   }
 }
+
 
 void partial_eval_declarations(list el, Psysteme pre_sc, effects fx)
 {

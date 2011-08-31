@@ -801,6 +801,7 @@ bool redundant_load_store_elimination(char * module_name)
     //do_sac_reduction_optimizations(dependence_graph);
     do_redundant_load_store_elimination(dependence_graph);
 
+    unnormalize_expression(module_stat);
     module_reorder(module_stat);
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));

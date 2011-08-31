@@ -38,7 +38,6 @@
 #define trpx_dag_cut      "HWAC_TERAPIX_DAG_CUT"
 #define trpx_overlap_io   "HWAC_TERAPIX_OVERLAP_IO"
 #define trpx_max_size     "HWAC_TERAPIX_IMAGELET_MAX_SIZE"
-#define trpx_image_height "HWAC_TERAPIX_IMAGE_HEIGHT"
 
 // various dag cutting strategies for terapix
 #define trpx_dag_cut_none_p(s) same_string_p(s, "none")

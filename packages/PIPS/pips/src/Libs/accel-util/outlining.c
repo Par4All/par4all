@@ -222,10 +222,10 @@ static hash_table outliner_smart_references_computation(list referenced_entities
                             Value phi_coeff = vect_coeff(phi,cvect);
                             if(phi_coeff != VALUE_ZERO )
                             {
-                                pips_assert("phi coeff sould be one",phi_coeff == VALUE_ONE);
+                                pips_assert("phi coef should be one",phi_coeff == VALUE_ONE);
                                 Pvecteur lhs_vect = vect_del_var(cvect,phi);
                                 vect_chg_sgn(lhs_vect);
-                                pips_assert("phi coef should be mentionned only once",expression_undefined_p(index_value));
+                                pips_assert("phi coef should be mentioned only once",expression_undefined_p(index_value));
                                 index_value = VECTEUR_NUL_P(lhs_vect) ? int_to_expression(0) : Pvecteur_to_expression(lhs_vect);
                                 vect_rm(lhs_vect);
                             }

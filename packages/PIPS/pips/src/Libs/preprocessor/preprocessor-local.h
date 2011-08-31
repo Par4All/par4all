@@ -55,11 +55,11 @@
 /** The default preprocessor flags to use with Fortran files */
 #define FPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
-#define DEFAULT_PIPS_FLINT "gfortran -c "
-/* See necessary definitions in pipsmake-rc.tex */
-#define DEFAULT_PIPS_CC "gcc -D__PIPS__ -D__HPFC__ -U__GNUC__ -c --std=gnu99"
-#define DEFAULT_PIPS_CC_FLAGS " -Wall "
+#define DEFAULT_PIPS_FLINT "gfortran -Wall"
 
+/* See necessary definitions in pipsmake-rc.tex */
+#define DEFAULT_PIPS_CC "gcc -D__PIPS__ -D__HPFC__ -U__GNUC__ --std=gnu99"
+#define DEFAULT_PIPS_CC_FLAGS " -Wall "
 
 /* Define some functions from the .l or .y since cproto cannot dig them out: */
 void MakeTypedefStack();

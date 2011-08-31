@@ -16,9 +16,9 @@ TYPE OP(addr,SUFF)(TYPE lhs, TYPE *rhs)
 {
     return lhs=lhs+*rhs;
 }
-TYPE OP(sub,SUFF)(TYPE lhs, TYPE rhs)
+TYPE OP(sub,SUFF)(TYPE lhs, TYPE rhs0, TYPE rhs1)
 {
-    return lhs=lhs-rhs;
+    return lhs=rhs0-rhs1;
 }
 TYPE OP(subr,SUFF)(TYPE lhs, TYPE *rhs)
 {
@@ -63,6 +63,10 @@ TYPE OP(setp,SUFF)(TYPE lhs, TYPE *rhs)
 TYPE OP(psetp,SUFF)(TYPE *lhs, TYPE *rhs)
 {
     return *lhs=*rhs;
+}
+TYPE* OP(ppsetpp,SUFF)(TYPE *lhs, TYPE *rhs)
+{
+    return lhs=rhs;
 }
 TYPE* OP(padd,SUFF)(TYPE *lhs, TYPE *rhs, int val)
 {

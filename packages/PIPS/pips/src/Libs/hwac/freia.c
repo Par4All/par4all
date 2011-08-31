@@ -660,11 +660,11 @@ string freia_compile(string module, statement mod_stat, string target)
 
   // headers
   if (freia_spoc_p(target))
-    fprintf(helper, FREIA_SPOC_INCLUDES);
+    fprintf(helper, "%s", FREIA_SPOC_INCLUDES);
   else if (freia_terapix_p(target))
-    fprintf(helper, FREIA_TRPX_INCLUDES);
+    fprintf(helper, "%s", FREIA_TRPX_INCLUDES);
   else if (freia_opencl_p(target))
-    fprintf(helper, FREIA_OPENCL_INCLUDES);
+    fprintf(helper, "%s", FREIA_OPENCL_INCLUDES);
 
   // hmmm...
   hash_table occs = freia_build_image_occurrences(mod_stat, NULL, NULL);
