@@ -44,5 +44,6 @@ void string_buffer_append_list(string_buffer, const list);
 string string_buffer_to_string(const string_buffer);
 string string_buffer_to_string_reverse(const string_buffer);
 void string_buffer_to_file(const string_buffer, FILE *);
+void string_buffer_append_c_string_buffer(const string_buffer, string_buffer, int);
 
 #endif /* STRING_BUFFER_INCLUDED */
