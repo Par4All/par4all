@@ -1077,7 +1077,7 @@ digraph "freia_61_helper_1_0" {
 
 // dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
 
-// hold kernels forfreia_61_helper_0_0_0
+// hold kernels for freia_61_helper_0_0_0
 static cl_kernel freia_61_helper_0_0_0_kernel[2];
 
 // compile kernels for freia_61_helper_0_0_0

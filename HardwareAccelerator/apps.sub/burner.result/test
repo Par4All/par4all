@@ -33851,7 +33851,7 @@ digraph "main_helper_3_0_0" {
 
 // dag 1: 411 ops and 0 copies, optimized to 411 ops and 0+0 copies
 
-// hold kernels formain_helper_1_0_1
+// hold kernels for main_helper_1_0_1
 static cl_kernel main_helper_1_0_1_kernel[2];
 
 // compile kernels for main_helper_1_0_1
@@ -34018,7 +34018,7 @@ freia_status main_helper_1_0_1(
 
 // dag 3: 7 ops and 0 copies, optimized to 7 ops and 0+0 copies
 
-// hold kernels formain_helper_3_0_0
+// hold kernels for main_helper_3_0_0
 static cl_kernel main_helper_3_0_0_kernel[2];
 
 // compile kernels for main_helper_3_0_0

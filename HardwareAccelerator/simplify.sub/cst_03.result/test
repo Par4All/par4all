@@ -698,7 +698,7 @@ digraph "dag_cleaned_0" {
 
 // dag 0: 4 ops and 0 copies, optimized to 4 ops and 0+0 copies
 
-// hold kernels forcst_03_helper_0_0_0
+// hold kernels for cst_03_helper_0_0_0
 static cl_kernel cst_03_helper_0_0_0_kernel[2];
 
 // compile kernels for cst_03_helper_0_0_0

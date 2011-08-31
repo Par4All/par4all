@@ -3773,7 +3773,7 @@ digraph "vs_core_loop_helper_3_1_2" {
 
 // dag 3: 16 ops and 3 copies, optimized to 16 ops and 0+1 copies
 
-// hold kernels forvs_core_loop_helper_3_0_0
+// hold kernels for vs_core_loop_helper_3_0_0
 static cl_kernel vs_core_loop_helper_3_0_0_kernel[2];
 
 // compile kernels for vs_core_loop_helper_3_0_0
@@ -3899,7 +3899,7 @@ freia_status vs_core_loop_helper_3_0_0(
   return err;
 }
 
-// hold kernels forvs_core_loop_helper_3_1_2
+// hold kernels for vs_core_loop_helper_3_1_2
 static cl_kernel vs_core_loop_helper_3_1_2_kernel[2];
 
 // compile kernels for vs_core_loop_helper_3_1_2

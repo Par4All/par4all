@@ -2623,7 +2623,7 @@ digraph "freia_51_helper_2_0_0" {
 
 // dag 0: 14 ops and 1 copies, optimized to 7 ops and 0+0 copies
 
-// hold kernels forfreia_51_helper_0_0_4
+// hold kernels for freia_51_helper_0_0_4
 static cl_kernel freia_51_helper_0_0_4_kernel[2];
 
 // compile kernels for freia_51_helper_0_0_4
@@ -2720,7 +2720,7 @@ freia_status freia_51_helper_0_0_4(
 
 // dag 2: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
 
-// hold kernels forfreia_51_helper_2_0_0
+// hold kernels for freia_51_helper_2_0_0
 static cl_kernel freia_51_helper_2_0_0_kernel[2];
 
 // compile kernels for freia_51_helper_2_0_0

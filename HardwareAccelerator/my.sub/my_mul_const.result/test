@@ -490,7 +490,7 @@ digraph "my_mul_const_helper_0_0_0" {
 
 // dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
 
-// hold kernels formy_mul_const_helper_0_0_0
+// hold kernels for my_mul_const_helper_0_0_0
 static cl_kernel my_mul_const_helper_0_0_0_kernel[2];
 
 // compile kernels for my_mul_const_helper_0_0_0
