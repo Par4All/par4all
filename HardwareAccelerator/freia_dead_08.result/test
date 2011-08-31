@@ -636,7 +636,7 @@ digraph "freia_dead_08_helper_0_0" {
 // FREIA OpenCL includes
 #include <CL/opencl.h>
 #include "freia.h"
-#include "freia_opencl_runtime.h"
+#include "private/freia_opencl_runtime.h"
 
 
 // dag 0: 2 ops and 1 copies, optimized to 2 ops and 0+1 copies

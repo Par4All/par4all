@@ -1173,7 +1173,7 @@ digraph "freia_66_helper_1_0" {
 // FREIA OpenCL includes
 #include <CL/opencl.h>
 #include "freia.h"
-#include "freia_opencl_runtime.h"
+#include "private/freia_opencl_runtime.h"
 
 
 // dag 0: 0 ops and 2 copies, optimized to 0 ops and 0+2 copies

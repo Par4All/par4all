@@ -1979,7 +1979,7 @@ digraph "dag_cleaned_0" {
 // FREIA OpenCL includes
 #include <CL/opencl.h>
 #include "freia.h"
-#include "freia_opencl_runtime.h"
+#include "private/freia_opencl_runtime.h"
 
 
 // dag 0: 17 ops and 0 copies, optimized to 13 ops and 0+0 copies

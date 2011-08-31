@@ -1826,7 +1826,7 @@ digraph "freia_42_helper_0_0_1" {
 // FREIA OpenCL includes
 #include <CL/opencl.h>
 #include "freia.h"
-#include "freia_opencl_runtime.h"
+#include "private/freia_opencl_runtime.h"
 
 
 // dag 0: 11 ops and 0 copies, optimized to 8 ops and 0+0 copies
@@ -1898,14 +1898,12 @@ freia_status freia_42_helper_0_0_1(
   freia_data2d_opencl *pool= frclTarget.pool;
   int pitch = o0->row[1] - o0->row[0];
   int width = o0->widthWa;
-  size_t workSize[2];
+  size_t workSize[1];
   workSize[0] = o0->heightWa;
   uint32_t bpp = o0->bpp>>4;
-  cl_kernel kernel;
 
   // handle on the fly compilation...
   static int to_compile = 1;
-
   if (to_compile) {
     freia_status cerr = freia_42_helper_0_0_1_compile();
     // compilation may have failed
@@ -1913,8 +1911,8 @@ freia_status freia_42_helper_0_0_1(
     to_compile = 0;
   }
 
-  // now get kernel, which must be there...
-  kernel = freia_42_helper_0_0_1_kernel[bpp];
+  // now get kernel, which must be have be compiled.
+  cl_kernel kernel = freia_42_helper_0_0_1_kernel[bpp];
   cl_int ofs_o0 = freia_common_data_get_offset(o0);
   cl_int ofs_i0 = freia_common_data_get_offset(i0);
   cl_int ofs_i1 = freia_common_data_get_offset(i1);
