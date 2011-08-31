@@ -19131,7 +19131,7 @@ int freia_52(void)
    //PIPS generated variable
    int i_52;                                                            /*0171*/
    // hardware accelerator generated variable
-   freia_data2d *w2_1_1 = 0, *w2_1_2 = 0, *w2_1_3 = 0, *w2_1_4 = 0, *w2_1_5 = 0, *w2_1_6 = 0, *w1_1_30 = 0, *w1_0_4 = 0, *w1_0_8 = 0, *w1_0_12 = 0, *w1_0_16 = 0, *w1_0_20 = 0, *w1_0_24 = 0, *w1_0_28 = 0, *w1_0_32 = 0;
+   freia_data2d *w2_1_1 = 0, *w2_1_2 = 0, *w2_1_3 = 0, *w2_1_4 = 0, *w2_1_5 = 0, *w2_1_6 = 0, *w1_1_35 = 0, *w1_0_4 = 0, *w1_0_8 = 0, *w1_0_12 = 0, *w1_0_16 = 0, *w1_0_20 = 0, *w1_0_24 = 0, *w1_0_28 = 0, *w1_0_32 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0173*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0174*/
@@ -19148,7 +19148,7 @@ int freia_52(void)
    w1_0_12 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_0_8 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_0_4 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w1_1_30 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
+   w1_1_35 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w2_1_6 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w2_1_5 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w2_1_4 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
@@ -19617,8 +19617,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0589*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0590*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0591*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0592*/
-   freia_52_helper_0_8_1(w2_1_6, w1_1_30, w1_1, 255);                   /*0600*/
+   freia_aipo_erode_8c(w1_1_35, w1_1, neighborTransposed_8);            /*0592*/
    
    
    
@@ -19627,8 +19626,9 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0625*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0626*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0627*/
-   freia_aipo_erode_8c(w1_1_30, w1_1, neighborTransposed_9);            /*0628*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0628*/
    err_3 |= _return28;                                                  /*0635*/
+   freia_52_helper_0_8_1(w2_1_6, w1_1, w1_1_35, 255);                   /*0636*/
    
    
    
@@ -19713,7 +19713,7 @@ int freia_52(void)
    freia_common_destruct_data(w1_0_28);
    freia_common_destruct_data(w1_0_32);
    freia_common_destruct_data(w1_1);                                    /*0855*/
-   freia_common_destruct_data(w1_1_30);
+   freia_common_destruct_data(w1_1_35);
    freia_common_destruct_data(w2_1_1);
    freia_common_destruct_data(w2_1_2);
    freia_common_destruct_data(w2_1_3);
@@ -19894,7 +19894,7 @@ int freia_52(void)
    //PIPS generated variable
    int i_52;                                                            /*0171*/
    // hardware accelerator generated variable
-   freia_data2d *w2_1_1 = 0, *w2_1_2 = 0, *w2_1_3 = 0, *w2_1_4 = 0, *w2_1_5 = 0, *w2_1_6 = 0, *w1_1_30 = 0, *w1_0_4 = 0, *w1_0_8 = 0, *w1_0_12 = 0, *w1_0_16 = 0, *w1_0_20 = 0, *w1_0_24 = 0, *w1_0_28 = 0, *w1_0_32 = 0;
+   freia_data2d *w2_1_1 = 0, *w2_1_2 = 0, *w2_1_3 = 0, *w2_1_4 = 0, *w2_1_5 = 0, *w2_1_6 = 0, *w1_1_35 = 0, *w1_0_4 = 0, *w1_0_8 = 0, *w1_0_12 = 0, *w1_0_16 = 0, *w1_0_20 = 0, *w1_0_24 = 0, *w1_0_28 = 0, *w1_0_32 = 0;
 
    freia_common_open_input(&fdin, 0);                                   /*0173*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0174*/
@@ -19911,7 +19911,7 @@ int freia_52(void)
    w1_0_12 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_0_8 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w1_0_4 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
-   w1_1_30 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
+   w1_1_35 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w2_1_6 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w2_1_5 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
    w2_1_4 = freia_common_create_data(imWork1->bpp, imWork1->widthWa, imWork1->heightWa);
@@ -20380,8 +20380,7 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0589*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0590*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0591*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0592*/
-   freia_52_helper_0_8_1(w2_1_6, w1_1_30, w1_1, 255);                   /*0600*/
+   freia_aipo_erode_8c(w1_1_35, w1_1, neighborTransposed_8);            /*0592*/
    
    
    
@@ -20390,8 +20389,9 @@ int freia_52(void)
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0625*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0626*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0627*/
-   freia_aipo_erode_8c(w1_1_30, w1_1, neighborTransposed_9);            /*0628*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0628*/
    err_3 |= _return28;                                                  /*0635*/
+   freia_52_helper_0_8_1(w2_1_6, w1_1, w1_1_35, 255);                   /*0636*/
    
    
    
@@ -20476,7 +20476,7 @@ int freia_52(void)
    freia_common_destruct_data(w1_0_28);
    freia_common_destruct_data(w1_0_32);
    freia_common_destruct_data(w1_1);                                    /*0855*/
-   freia_common_destruct_data(w1_1_30);
+   freia_common_destruct_data(w1_1_35);
    freia_common_destruct_data(w2_1_1);
    freia_common_destruct_data(w2_1_2);
    freia_common_destruct_data(w2_1_3);
