@@ -2058,7 +2058,7 @@ int expression_to_int(expression exp)
 /* same as above for floats */
 float expression_to_float(expression exp)
 {
-  int rv = 0;
+  float rv = 0;
 
   pips_debug( 7, "doing\n");
   if(expression_constant_p(exp)) {
@@ -3449,8 +3449,8 @@ Ppolynome expression_to_polynome(expression exp)
                  *             _ a "real" call, ie an intrinsic or external function
                  */
                 if (expression_constant_p(exp)) {
-                    int	etoi = expression_to_int(exp);
-                    pp_new = make_polynome((float) etoi,
+                    float etof = expression_to_float(exp);
+                    pp_new = make_polynome( etof,
                             (Variable) entity_undefined, (Value) 0);
                     /* We should have a real null polynome : 0*TCST^1 AL, AC 04 11 93
                      *else  {
