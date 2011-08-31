@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module c_est_pourtant_magnifique
-//
+#
+# Code after privatize_module for module c_est_pourtant_magnifique
+#
 void c_est_pourtant_magnifique()
 {
    int y, m, c, a;
@@ -17,9 +17,9 @@ void c_est_pourtant_magnifique()
       y += 8;
    }
 }
-//
-// Code after localize_declaration for module c_est_pourtant_magnifique
-//
+#
+# Code after localize_declaration for module c_est_pourtant_magnifique
+#
 void c_est_pourtant_magnifique()
 {
    int y, m, a;

@@ -127,7 +127,11 @@ freia_status freia_dead_02(void)
 
 ! acceleration function
 
-// freia opencl includes
+// FREIA OpenCL includes
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freia_opencl_runtime.h"
+
 
 ! updated function
 

@@ -1,6 +1,6 @@
-//
-// Initial code for module main
-//
+#
+# Initial code for module main
+#
 int main()
 {
    int b[10];
@@ -17,9 +17,9 @@ int main()
       printf("%d\n", *a[i].n);
    return 0;
 }
-//
-// Display print_code_proper_effects for module main
-//
+#
+# Display print_code_proper_effects for module main
+#
 int main()
 {
 //             <    is declared>: b

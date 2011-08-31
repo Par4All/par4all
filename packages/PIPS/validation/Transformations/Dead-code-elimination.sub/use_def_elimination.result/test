@@ -1,6 +1,6 @@
-//
-// Initial code for module TESTIF1
-//
+#
+# Initial code for module TESTIF1
+#
       PROGRAM TEST IF 1
       INTEGER A, B, J
 
@@ -38,9 +38,9 @@ C     BEGIN UNSTRUCTURED
       ENDIF
 C     END UNSTRUCTURED
       END
-//
-// Initial code for module TESTIF2
-//
+#
+# Initial code for module TESTIF2
+#
       SUBROUTINE TEST IF 2(B)
       INTEGER A, B, J
 
@@ -61,9 +61,9 @@ c      endif
 
       RETURN
       END
-//
-// Initial code for module TESTIF3
-//
+#
+# Initial code for module TESTIF3
+#
 
       SUBROUTINE TEST IF 3(B)
       INTEGER A, B, J
@@ -97,9 +97,9 @@ c      endif
       GOTO 100
 C     END UNSTRUCTURED
       END
-//
-// Initial code for module TESTIF4
-//
+#
+# Initial code for module TESTIF4
+#
 
       SUBROUTINE TEST IF 4(B)
       INTEGER A, B, J
@@ -112,9 +112,9 @@ C     END UNSTRUCTURED
 
       RETURN
       END
-//
-// Initial code for module TESTIF5
-//
+#
+# Initial code for module TESTIF5
+#
 
       SUBROUTINE TEST IF 5(B)
 c test the propagation of control usefulness through the predecesors      
@@ -135,9 +135,9 @@ C     END UNSTRUCTURED
 
       RETURN
       END
-//
-// Code after unspaghettify for module TESTIF1
-//
+#
+# Code after unspaghettify for module TESTIF1
+#
       PROGRAM TEST IF 1
       INTEGER A, B, J
 
@@ -175,9 +175,9 @@ C     BEGIN UNSTRUCTURED
       ENDIF
 C     END UNSTRUCTURED
       END
-//
-// Code after unspaghettify for module TESTIF2
-//
+#
+# Code after unspaghettify for module TESTIF2
+#
       SUBROUTINE TEST IF 2(B)
       INTEGER A, B, J
 
@@ -198,9 +198,9 @@ c      endif
 
       RETURN
       END
-//
-// Code after unspaghettify for module TESTIF3
-//
+#
+# Code after unspaghettify for module TESTIF3
+#
 
       SUBROUTINE TEST IF 3(B)
       INTEGER A, B, J
@@ -234,9 +234,9 @@ c      endif
       GOTO 100
 C     END UNSTRUCTURED
       END
-//
-// Code after unspaghettify for module TESTIF4
-//
+#
+# Code after unspaghettify for module TESTIF4
+#
 
       SUBROUTINE TEST IF 4(B)
       INTEGER A, B, J
@@ -249,9 +249,9 @@ C     END UNSTRUCTURED
 
       RETURN
       END
-//
-// Code after unspaghettify for module TESTIF5
-//
+#
+# Code after unspaghettify for module TESTIF5
+#
 
       SUBROUTINE TEST IF 5(B)
 c test the propagation of control usefulness through the predecesors      
@@ -272,9 +272,9 @@ C     END UNSTRUCTURED
 
       RETURN
       END
-//
-// Code after suppress_dead_code for module TESTIF1
-//
+#
+# Code after suppress_dead_code for module TESTIF1
+#
       PROGRAM TEST IF 1
       INTEGER A, B, J
 
@@ -298,33 +298,33 @@ C     BEGIN UNSTRUCTURED
 C     END UNSTRUCTURED
       RETURN
       END
-//
-// Code after suppress_dead_code for module TESTIF2
-//
+#
+# Code after suppress_dead_code for module TESTIF2
+#
       SUBROUTINE TEST IF 2(B)
       INTEGER A, B, J
       RETURN
       END
-//
-// Code after suppress_dead_code for module TESTIF3
-//
+#
+# Code after suppress_dead_code for module TESTIF3
+#
 
       SUBROUTINE TEST IF 3(B)
       INTEGER A, B, J
       RETURN
       END
-//
-// Code after suppress_dead_code for module TESTIF4
-//
+#
+# Code after suppress_dead_code for module TESTIF4
+#
 
       SUBROUTINE TEST IF 4(B)
       INTEGER A, B, J
       REAL X(10), Y(10)
       RETURN
       END
-//
-// Code after suppress_dead_code for module TESTIF5
-//
+#
+# Code after suppress_dead_code for module TESTIF5
+#
 
       SUBROUTINE TEST IF 5(B)
 c test the propagation of control usefulness through the predecesors      
@@ -332,9 +332,9 @@ c test the propagation of control usefulness through the predecesors
       REAL X(10), Y(10)
       RETURN
       END
-//
-// Code after dead_code_elimination for module TESTIF1
-//
+#
+# Code after dead_code_elimination for module TESTIF1
+#
       PROGRAM TEST IF 1
       INTEGER A, B, J
 
@@ -358,33 +358,33 @@ C     BEGIN UNSTRUCTURED
 C     END UNSTRUCTURED
       RETURN
       END
-//
-// Code after dead_code_elimination for module TESTIF2
-//
+#
+# Code after dead_code_elimination for module TESTIF2
+#
       SUBROUTINE TEST IF 2(B)
       INTEGER A, B, J
       RETURN
       END
-//
-// Code after dead_code_elimination for module TESTIF3
-//
+#
+# Code after dead_code_elimination for module TESTIF3
+#
 
       SUBROUTINE TEST IF 3(B)
       INTEGER A, B, J
       RETURN
       END
-//
-// Code after dead_code_elimination for module TESTIF4
-//
+#
+# Code after dead_code_elimination for module TESTIF4
+#
 
       SUBROUTINE TEST IF 4(B)
       INTEGER A, B, J
       REAL X(10), Y(10)
       RETURN
       END
-//
-// Code after dead_code_elimination for module TESTIF5
-//
+#
+# Code after dead_code_elimination for module TESTIF5
+#
 
       SUBROUTINE TEST IF 5(B)
 c test the propagation of control usefulness through the predecesors      

@@ -728,21 +728,22 @@ static bool do_strength_reduction_gather(expression exp, strength_reduction_cont
              * it will lead to 2a; a-=3;
              * but not 3a-4i
              */
-            else if(entity_undefined_p(other)) {
+            else /*if(entity_undefined_p(other))*/ {
                 Pvecteur pv = vect_copy(normalized_linear(n));
                 vect_normalize(pv);
                 Value v = vect_coeff(var,pv);
-                if(value_one_p(v))
+                if(value_one_p(v)&& // prefer pointer over scalars to hold the increment
+                        (entity_undefined_p(other)||entity_scalar_p(other)||entity_pointer_p(other)))
                     other= var;
-                else break;//do not manage this case as of now
+                //else {other=entity_undefined;};//do not manage this case as of now
             }
-            else {
+            /*else {
                 other=entity_undefined;// cannot decide between two not constant entities
                 break;
-            }
+            }*/
         }
         /* we only take care of scalar variables */
-        if(!entity_undefined_p(other) && entity_scalar_p(other) ) {
+        if(!entity_undefined_p(other) && (entity_scalar_p(other) || entity_pointer_p(other)) ) {
             /* look for an entity that olds the same increment as ours */
             entity already_there = entity_undefined;
             HASH_FOREACH(entity,e,intptr_t,v,ctxt->entity_to_coeff) {
@@ -785,12 +786,12 @@ static bool do_strength_reduction_gather(expression exp, strength_reduction_cont
                             ),
                         ctxt->header_statements);
                 /* compute the value of the new increment */
-                expression new_increment=int_to_expression((int)coeff);
+                expression new_increment=int_to_expression(coeff>0?coeff:-coeff);
                 ctxt->incr_statements=CONS(
                         STATEMENT,
                         call_to_statement(
                             make_call(
-                                entity_intrinsic(PLUS_UPDATE_OPERATOR_NAME),
+                                entity_intrinsic(coeff>0?PLUS_UPDATE_OPERATOR_NAME:MINUS_UPDATE_OPERATOR_NAME),
                                 make_expression_list(
                                     entity_to_expression(already_there),
                                     make_op_exp(MULTIPLY_OPERATOR_NAME,
@@ -820,7 +821,7 @@ static bool do_strength_reduction_gather(expression exp, strength_reduction_cont
 /* looks for expression in @p l's body that are linear combination of @p l's index
  * those expressions are strength reduced
  */
-static void do_strength_reduction_in_loop(loop l) {
+static bool do_strength_reduction_in_loop(loop l) {
     // parent statement
     statement s = (statement) gen_get_ancestor(statement_domain,l);
     // context
@@ -846,13 +847,14 @@ static void do_strength_reduction_in_loop(loop l) {
 
     hash_table_free(ctxt.entity_to_coeff);
     hash_table_free(ctxt.entity_to_entity);
+    return true;
 }
 
 /* dispatch over all loops */
 static
 void do_strength_reduction(entity module, statement module_statement) {
     gen_recurse(module_statement,loop_domain,
-            gen_true,do_strength_reduction_in_loop);
+            do_strength_reduction_in_loop,gen_null);
 }
 
 /* this phase is the opposite of induction substitution:

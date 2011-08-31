@@ -1,8 +1,10 @@
 setenv WS scilab01
+delete $WS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create $WS $WS.c
+module f
 
 display PRINTED_FILE
 

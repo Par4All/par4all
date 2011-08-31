@@ -1,6 +1,6 @@
-//
-// Code after loop_fusion for module fuse_reuse
-//
+#
+# Code after loop_fusion for module fuse_reuse
+#
 void fuse_reuse(int n, int a[n], int b[n], int c[n])
 {
    int i;
@@ -11,9 +11,9 @@ void fuse_reuse(int n, int a[n], int b[n], int c[n])
       c[i] = a[i];
 }
 // With read_read dependence :
-//
-// Code after loop_fusion for module fuse_reuse
-//
+#
+# Code after loop_fusion for module fuse_reuse
+#
 void fuse_reuse(int n, int a[n], int b[n], int c[n])
 {
    int i;

@@ -101,15 +101,6 @@ points_to_statement
 /* } */
 
 
-/* we get the type of the expression by calling expression_to_type()
- * which allocates a new one. Then we call ultimate_type() to have
- * the final type. Finally we test if it's a pointer by using pointer_type_p().*/
-bool expression_pointer_p(expression e) {
-  type et = expression_to_type(e);
-  type t = ultimate_type(et);
-  return pointer_type_p(t);
-
-}
 
 /* Same as previous function, but for double pointers. */
 bool expression_double_pointer_p(expression e) {

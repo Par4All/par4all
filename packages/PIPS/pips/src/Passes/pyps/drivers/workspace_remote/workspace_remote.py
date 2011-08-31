@@ -111,10 +111,10 @@ class workspace(pyps.workspace):
             print >> sys.stderr, "Copying files to remote host %s..." % self.__remoteExec.host()
         return rcopy(files),rcopy(headers)
 
-    def make(self,rep=None, maker=pyps.Maker()):
+    def divert(self,rep=None, maker=pyps.Maker()):
         if rep ==None:
             rep = self.tmpdirname
-        makefile,others = super(workspace,self).make(rep,maker)
+        makefile,others = super(workspace,self).divert(rep,maker)
         self.__remoteExec.copy(os.path.join(rep,makefile),rep)
         for f in others:
             self.__remoteExec.copy(os.path.join(rep,f),rep)
@@ -124,7 +124,7 @@ class workspace(pyps.workspace):
         """ Uses makefiles on the remote host to compile the workspace"""
         if rep == None:
             rep = self.tmpdirname
-        self.make(rep,maker)
+        self.divert(rep,maker)
 
         rep = os.path.join(self.__remoteExec.working_dir(),rep)
         commandline = pypsutils.gen_compile_command(rep,maker.makefile,outfile,rule,**opts)

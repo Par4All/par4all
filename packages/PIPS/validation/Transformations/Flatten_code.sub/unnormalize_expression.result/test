@@ -1,6 +1,6 @@
-//
-// Code after coarse_grain_parallelization for module main
-//
+#
+# Code after coarse_grain_parallelization for module main
+#
 int main(int argc, char *argv[])
 {
    int a[10], b[10];
@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
          b[i] = a[i];
    }
 }
-//
-// Code after flatten_code for module main
-//
+#
+# Code after flatten_code for module main
+#
 int main(int argc, char *argv[])
 {
    int a[10], b[10];
@@ -32,9 +32,9 @@ int main(int argc, char *argv[])
    for(i_1 = 0; i_1 <= 10; i_1 += 1)
       b[i_1] = a[i_1];
 }
-//
-// Code after loop_fusion for module main
-//
+#
+# Code after loop_fusion for module main
+#
 int main(int argc, char *argv[])
 {
    int a[10], b[10];

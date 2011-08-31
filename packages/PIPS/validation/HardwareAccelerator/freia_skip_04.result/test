@@ -618,8 +618,8 @@ freia_status freia_skip_04_helper_0_0_0(
   mcu_macro[1][1].iter3 = 0;
   mcu_macro[0][1].iter4 = 0;
   mcu_macro[1][1].iter4 = 0;
-  mcu_macro[0][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
-  mcu_macro[1][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_XOR_CONST;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_XOR_CONST;
 
 
   // inputs:
@@ -966,11 +966,15 @@ digraph "freia_skip_04_helper_0_1" {
 
 ! acceleration function
 
-// freia opencl includes
+// FREIA OpenCL includes
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freia_opencl_runtime.h"
+
 
 // dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
-// freia opencl includes
-// generated opencl for function freia_skip_04
+#include <freia_opencl_runtime.hcl>
+// generated OpenCL kernels for function freia_skip_04
 
 // opencl for dag 0
 

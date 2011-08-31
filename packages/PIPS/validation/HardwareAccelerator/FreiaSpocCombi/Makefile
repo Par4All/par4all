@@ -7,8 +7,8 @@ include ../../validate.mk
 include ../counts.mk
 
 # combinatorial test cases are generated
-validate: .generate
-
+validate: validate-test
+validate-test: .generate
 generate: .generate
 
 SHELL	= /bin/bash

@@ -367,6 +367,15 @@ bool expression_field_p(expression e)
 {
     return expression_call_p(e) && ENTITY_FIELD_P(call_function(expression_call(e)));
 }
+/* we get the type of the expression by calling expression_to_type()
+ * which allocates a new one. Then we call ultimate_type() to have
+ * the final type. Finally we test if it's a pointer by using pointer_type_p().*/
+bool expression_pointer_p(expression e) {
+  type et = expression_to_type(e);
+  type t = ultimate_type(et);
+  return pointer_type_p(t);
+
+}
 
 bool array_argument_p(expression e)
 {
@@ -1166,6 +1175,15 @@ void print_expression(expression e)
 	    (void) fprintf(stderr,"NORMALIZED UNDEFINED\n");
     }
 }
+
+string expression_to_string(expression e) {
+    list l = words_expression(e,NIL) ;
+    string out = words_to_string(l);
+    FOREACH(STRING,w,l) free(w);
+    gen_free_list(l);
+    return out;
+}
+
 
 void print_expressions(list le)
 {
@@ -1988,12 +2006,24 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
  *       a "value_intrinsic". In that case it is an unary minus operation
  *       upon an expression for which the function expression_constant_p()
  *       returns true (See the commentary given for it).
+ *
+ * SG: improvement: the integer value of a extended_integer_constant_expression_p
+ *  is computed too, for instance 0+5
  */
 int expression_to_int(expression exp)
 {
   int rv = 0;
-
   debug( 7, "expression_to_int", "doing\n");
+
+  /* use the normalize field first */
+  NORMALIZE_EXPRESSION(exp);
+  normalized n = expression_normalized(exp);
+  if(normalized_linear_p(n)) {
+      Pvecteur pv = normalized_linear(n);
+      if(vect_constant_p(pv))
+          return (int)vect_coeff(TCST, pv);
+  }
+
   if(expression_constant_p(exp)) {
     call c = syntax_call(expression_syntax(exp));
     switch(value_tag(entity_initial(call_function(c)))) {
@@ -2006,7 +2036,7 @@ int expression_to_int(expression exp)
       break;
     }
     default:
-      pips_internal_error("expression is not an integer constant");
+      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
     }
   }
   else if(expression_call_p(exp)) {
@@ -2018,17 +2048,17 @@ int expression_to_int(expression exp)
       rv = constant_int(symbolic_constant(value_symbolic(v)));
     }
     else {
-      pips_internal_error("expression is not an integer constant");
+      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
     }
   }
   else
-    pips_internal_error("expression is not an integer constant");
+      pips_internal_error("expression %s is not an integer constant\n",expression_to_string(exp));
   return(rv);
 }
 /* same as above for floats */
 float expression_to_float(expression exp)
 {
-  int rv = 0;
+  float rv = 0;
 
   pips_debug( 7, "doing\n");
   if(expression_constant_p(exp)) {
@@ -3406,9 +3436,10 @@ Ppolynome expression_to_polynome(expression exp)
     {
         case is_syntax_reference:
             {
-                entity en = reference_variable(syntax_reference(sy));
+                reference r = syntax_reference(sy);
+                entity en = reference_variable(r);
 
-                if(entity_scalar_p(en))
+                if(entity_scalar_p(en)||(entity_pointer_p(en)&&ENDP(reference_indices(r))))
                     pp_new = make_polynome(1.0, (Variable) en, (Value) 1);
                 break;
             }
@@ -3418,8 +3449,8 @@ Ppolynome expression_to_polynome(expression exp)
                  *             _ a "real" call, ie an intrinsic or external function
                  */
                 if (expression_constant_p(exp)) {
-                    int	etoi = expression_to_int(exp);
-                    pp_new = make_polynome((float) etoi,
+                    float etof = expression_to_float(exp);
+                    pp_new = make_polynome( etof,
                             (Variable) entity_undefined, (Value) 0);
                     /* We should have a real null polynome : 0*TCST^1 AL, AC 04 11 93
                      *else  {
@@ -3453,13 +3484,13 @@ Ppolynome expression_to_polynome(expression exp)
                         if(cl == 2)
                             arg2 = EXPRESSION(CAR(CDR(call_arguments(syntax_call(sy)))));
 
-                        if (ENTITY_PLUS_P(op_ent)) /* arg1 + arg2 */
+                        if (ENTITY_PLUS_P(op_ent)||ENTITY_PLUS_C_P(op_ent)) /* arg1 + arg2 */
                         {
                             pp_new = expression_to_polynome(arg1);
                             if(!POLYNOME_UNDEFINED_P(pp_new))
                                 polynome_add(&pp_new, expression_to_polynome(arg2));
                         }
-                        else if(ENTITY_MINUS_P(op_ent)) /* -arg2 + arg1 */
+                        else if(ENTITY_MINUS_P(op_ent)||ENTITY_MINUS_C_P(op_ent)) /* -arg2 + arg1 */
                         {
                             pp_new = expression_to_polynome(arg2);
                             if(!POLYNOME_UNDEFINED_P(pp_new)) {
@@ -3524,6 +3555,15 @@ bool simplify_expression(expression * pexp) {
         }
     }
     return result;
+}
+
+static void do_simplify_expressions(call c) {
+    for(list iter = call_arguments(c);!ENDP(iter);POP(iter))
+        simplify_expression((expression*)REFCAR(iter));
+}
+
+void simplify_expressions(void *obj) {
+    gen_recurse(obj,call_domain,gen_true, do_simplify_expressions);
 }
 
 /* call maxima to simplify an expression 

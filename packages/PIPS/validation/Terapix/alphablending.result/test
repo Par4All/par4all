@@ -1,946 +1,650 @@
-
-//  <result[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=511, 0<=PHI2,
-//    PHI2<=511}>
-//  <src0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=511, 0<=PHI2,
-//    PHI2<=511}>
-//  <src1[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=511, 0<=PHI2,
-//    PHI2<=511}>
-
-void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
+void alphablending(int n, int src0[n][n], int src1[n][n])
 {
    unsigned int i, j;
-
-//  <result[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=511, 0<=PHI2,
-//    PHI2<=511}>
-//  <src0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=511, 0<=PHI2,
-//    PHI2<=511}>
-//  <src1[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=511, 0<=PHI2,
-//    PHI2<=511}>
-
-   for(i = 0; i <= 511; i += 1)
-
-//  <result[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=511, 0<=i,
-//    i<=511}>
-//  <src0[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=511, 0<=i,
-//    i<=511}>
-//  <src1[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=511, 0<=i,
-//    i<=511}>
-
-      for(j = 0; j <= 511; j += 1)
-
-//  <result[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=511, 0<=j,
-//    j<=511}>
-//  <src0[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=511, 0<=j,
-//    j<=511}>
-//  <src1[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=511, 0<=j,
-//    j<=511}>
-
-         result[i][j] = (40*src0[i][j]+(100-40)*src1[i][j])/100;
-}
-void P4A_accel_malloc(void **ptr, size_t n)
-{
-   if (n)
-      *ptr = malloc(n);
-   else
-      *ptr = (void *) 0;
-}
-int * psubi(int *lhs, int rhs)
-{
-   return lhs = lhs-rhs;
-}
-void P4A_accel_free(void *ptr)
-{
-   free(ptr);
-}
-int refi(int *ptr, int index)
-{
-   return *(ptr+index);
-}
-void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, int host_address[d2_size], int accel_address[d1_block_size][d2_block_size])
-{
-   size_t i, j;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size-1; j += 1)
-
-         accel_address[i][j] = host_address[d2_offset+(i+d1_offset)*d2_size+j];
-}
-int * paddi(int *lhs, int *rhs, int val)
-{
-   return lhs = rhs+val;
-}
-int subi(int lhs, int rhs)
-{
-   return lhs = lhs-rhs;
-}
-int rshifti(int lhs, int rhs)
-{
-   return lhs = lhs>>rhs;
-}
-int psetpi(int *lhs, int *rhs)
-{
-   return *lhs = *rhs;
-}
-void P4A_copy_from_accel(size_t element_size, int *host_address, int *accel_address)
-{
-   host_address[0] = accel_address[0];
-}
-int main()
-{
-   short a[512][512], b[512][512], c[512][512];
-
-//  <a[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=511, 0<=PHI2, PHI2<=511}>
-//  <b[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=511, 0<=PHI2, PHI2<=511}>
-//  <c[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=511, 0<=PHI2, PHI2<=511}>
-
-   alphablending(a, b, c);
-   return 0;
-}
-int setpi(int lhs, int *rhs)
-{
-   return lhs = *rhs;
-}
-void P4A_copy_to_accel(size_t element_size, int *host_address, int *accel_address)
-{
-   size_t i;
-   for(i = 0; i <= element_size-1; i += 1)
-      accel_address[i] = host_address[i];
-}
-int addi(int lhs, int rhs0, int rhs1)
-{
-   return lhs = rhs0+rhs1;
-}
-int muli(int lhs, int rhs)
-{
-   return lhs = lhs*rhs;
-}
-int divi(int lhs, int rhs)
-{
-   return lhs = lhs/rhs;
-}
-void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, int host_address[d2_size], int accel_address[d1_block_size][d2_block_size])
-{
-   size_t i, j;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      for(j = 0; j <= d2_block_size-1; j += 1)
-         host_address[d2_offset+(i+d1_offset)*d2_size+j] = accel_address[i][j];
-}
-int addri(int lhs, int *rhs)
-{
-   return lhs = lhs+*rhs;
-}
-void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, int *host_address, int *accel_address)
-{
-   size_t i;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      accel_address[i] = host_address[i+d1_offset];
-}
-void P4A_copy_to_accel_3d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, int host_address[d3_size], int accel_address[d1_block_size][d2_block_size][d3_block_size])
-{
-}
-int prshifti(int *lhs, int rhs)
-{
-   return *lhs = *lhs>>rhs;
-}
-int pseti(int *lhs, int rhs)
-{
-   return *lhs = rhs;
-}
-int lshifti(int lhs, int rhs)
-{
-   return lhs = lhs<<rhs;
-}
-int subri(int lhs, int *rhs)
-{
-   return lhs = lhs-*rhs;
-}
-int seti(int lhs, int rhs)
-{
-   return lhs = rhs;
-}
-void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, int *host_address, int *accel_address)
-{
-   size_t i;
-   for(i = 0; i <= d1_block_size-1; i += 1)
-      host_address[i+d1_offset] = accel_address[i];
-}
-int mulri(int lhs, int *rhs)
-{
-   return lhs = lhs**rhs;
+#pragma terapix
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         /*/100*/
+         src0[i][j] = 40*src0[i][j]+(100-40)*src1[i][j];
 }
 tidy the code just in case of
-I have to do this early
-void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
+void alphablending(int n, int src0[n][n], int src1[n][n])
 {
    unsigned int i, j;
-   for(i = 0; i <= 511; i += 1)
-      for(j = 0; j <= 511; j += 1)
-         result[i][j] = (40*src0[i][j]+60*src1[i][j])*(1/100<<4)>>4;
+#pragma terapix
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         /*/100*/
+         src0[i][j] = 40*src0[i][j]+60*src1[i][j];
 }
+**** check ok ******
+void alphablending(int n, int src0[n][n], int src1[n][n])
+{
+   unsigned int i, j;
+#pragma terapix
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         /*/100*/
+         src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+}
+detection and extraction
 tiling
+void alphablending_l99998(int n, int src0[n][n], int src1[n][n])
+{
+   unsigned int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      unsigned int i, j;
+l99998:
+#pragma terapix
+      for(i = 0; i <= n-1; i += 1)
+l99999:
+         for(j = 0; j <= n-1; j += 1)
+            /*/100*/
+            src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+   }
+}
+void alphablending_l99998(int n, int src0[n][n], int src1[n][n])
+{
+   int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (-1+n)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((-1+n)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (-1+n)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            for(i = I_9; i <= MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1); i += 1)
+               for(j = I_14; j <= MIN(-1+n, I_14+__TERAPYPS_HEIGHT+-1); j += 1)
+                  /*/100*/
+                  src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+         }
+      }
+   }
+}
+void alphablending_l99998(int n, int src0[n][n], int src1[n][n])
+{
+   int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+__TERAPYPS_WIDTH-1)
+               if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+                  for(i = I_9; i <= I_9+__TERAPYPS_WIDTH-1; i += 1)
+                     for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+               else
+                  for(i = I_9; i <= I_9+__TERAPYPS_WIDTH-1; i += 1)
+                     for(j = I_14; j <= n-1; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+               for(i = I_9; i <= n-1; i += 1)
+                  for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else
+               for(i = I_9; i <= n-1; i += 1)
+                  for(j = I_14; j <= n-1; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+         }
+      }
+   }
+}
+void alphablending_l99998(int n, int src0[n][n], int src1[n][n])
+{
+   int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+__TERAPYPS_WIDTH-1)
+               if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+                  for(i = I_9; i <= I_9+__TERAPYPS_WIDTH-1; i += 1)
+                     for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+               else
+                  for(i = I_9; i <= I_9+__TERAPYPS_WIDTH-1; i += 1)
+                     for(j = I_14; j <= n-1; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+               for(i = I_9; i <= n-1; i += 1)
+                  for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else
+               for(i = I_9; i <= n-1; i += 1)
+                  for(j = I_14; j <= n-1; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+         }
+      }
+   }
+}
 group constants and isolate
-void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
+void alphablending_l99998(int n, int src0[n][n], int src1[n][n])
 {
-   unsigned int i, j;
+   int __TERAPYPS_WIDTH = 128, __TERAPYPS_HEIGHT;
    //PIPS generated variable
-   unsigned int i_t, j_t;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23;
+   if (__TERAPYPS_HEIGHT>3||3<128) {
+      //PIPS generated variable
+      int i, j;
 l99998:
-   for(i_t = 0; i_t <= 3; i_t += 1)
-l99995:
-      for(j_t = 0; j_t <= 63; j_t += 1) {
-         //PIPS generated variable
-         int caillou[4];
-         caillou[0] = 0;
-         caillou[1] = 4;
-         caillou[2] = 40;
-         caillou[3] = 60;
-
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+         I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = 128*I_0;
+l99989:
+         for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(n-1, I_9+127)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+127)
+               if (n-1>I_14+__TERAPYPS_HEIGHT-1)
 l99996:
-         for(i = 128*i_t; i <= 128*i_t+127; i += 1)
+                  for(i = I_9; i <= I_9+127; i += 1)
 l99997:
-            for(j = 8*j_t; j <= 8*j_t+7; j += 1)
-               result[i][j] = (caillou[2]*src0[i][j]+caillou[3]*src1[i][j])*(caillou[0]<<caillou[1])>>caillou[1];
-      }
-}
-void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
-{
-   unsigned int i, j;
-   //PIPS generated variable
-   unsigned int i_t, j_t;
-l99998:
-   for(i_t = 0; i_t <= 3; i_t += 1)
+                     for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+               else
+l99994:
+                  for(i = I_9; i <= I_9+127; i += 1)
 l99995:
-      for(j_t = 0; j_t <= 63; j_t += 1) {
-         //PIPS generated variable
-         int caillou[4];
-         caillou[0] = 0;
-         caillou[1] = 4;
-         caillou[2] = 40;
-         caillou[3] = 60;
-
-         {
-            //PIPS generated variable
-            short (*src00)[128][8] = (short (*)[128][8]) 0, (*src10)[128][8] = (short (*)[128][8]) 0;
-            //PIPS generated variable
-            int (*caillou0)[4] = (int (*)[4]) 0;
-            //PIPS generated variable
-            short (*result0)[128][8] = (short (*)[128][8]) 0;
-            P4A_accel_malloc((void **) &result0, sizeof(short)*1024);
-            P4A_accel_malloc((void **) &caillou0, sizeof(int)*4);
-            P4A_accel_malloc((void **) &src10, sizeof(short)*1024);
-            P4A_accel_malloc((void **) &src00, sizeof(short)*1024);
-            P4A_copy_to_accel_1d(sizeof(int), 3-caillou[0]+1, 4, 0, &caillou[0], *caillou0);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t, 8*j_t, &src1[0][0], *src10);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t, 8*j_t, &src0[0][0], *src00);
-
-l99996:
-            for(i = 128*i_t; i <= 128*i_t+127; i += 1)
-l99997:
-               for(j = 8*j_t; j <= 8*j_t+7; j += 1)
-                  (*result0)[i-128*i_t][j-8*j_t] = ((*caillou0)[2-0]*(*src00)[i-128*i_t][j-8*j_t]+(*caillou0)[3-0]*(*src10)[i-128*i_t][j-8*j_t])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
-            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t, 8*j_t, &result[0][0], *result0);
-            P4A_accel_free(result0);
-            P4A_accel_free(caillou0);
-            P4A_accel_free(src10);
-            P4A_accel_free(src00);
+                     for(j = I_14; j <= n-1; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+l99992:
+               for(i = I_9; i <= n-1; i += 1)
+l99993:
+                  for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else
+l99990:
+               for(i = I_9; i <= n-1; i += 1)
+l99991:
+                  for(j = I_14; j <= n-1; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
          }
       }
+   }
 }
-void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
+void alphablending_l99998(int n, int src0[n][n], int src1[n][n])
 {
-   unsigned int i, j;
+   int __TERAPYPS_WIDTH = 128, __TERAPYPS_HEIGHT;
    //PIPS generated variable
-   unsigned int i_t, j_t;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23;
+   __TERAPYPS_HEIGHT = 256;
+   if (__TERAPYPS_HEIGHT>3||3<128) {
+      //PIPS generated variable
+      int i, j;
 l99998:
-   for(i_t = 1; i_t <= 4; i_t += 1)
-l99995:
-      for(j_t = 1; j_t <= 64; j_t += 1) {
-         //PIPS generated variable
-         int caillou[4];
-         caillou[0] = 0;
-         caillou[1] = 4;
-         caillou[2] = 40;
-         caillou[3] = 60;
-
-         {
-            //PIPS generated variable
-            short (*src00)[128][8] = (short (*)[128][8]) 0, (*src10)[128][8] = (short (*)[128][8]) 0;
-            //PIPS generated variable
-            int (*caillou0)[4] = (int (*)[4]) 0;
-            //PIPS generated variable
-            short (*result0)[128][8] = (short (*)[128][8]) 0;
-            P4A_accel_malloc((void **) &result0, sizeof(short)*1024);
-            P4A_accel_malloc((void **) &caillou0, sizeof(int)*4);
-            P4A_accel_malloc((void **) &src10, sizeof(short)*1024);
-            P4A_accel_malloc((void **) &src00, sizeof(short)*1024);
-            P4A_copy_to_accel_1d(sizeof(int), 3-caillou[0]+1, 4, 0, &caillou[0], *caillou0);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(i_t-1), 8*(j_t-1), &src1[0][0], *src10);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(i_t-1), 8*(j_t-1), &src0[0][0], *src00);
-
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+         I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = 128*I_0;
+l99989:
+         for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(n-1, I_9+127)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+127)
+               if (n-1>I_14+__TERAPYPS_HEIGHT-1)
 l99996:
-            for(i = 1; i <= 128; i += 1)
+                  for(i = I_9; i <= I_9+127; i += 1)
 l99997:
-               for(j = 1; j <= 8; j += 1)
-                  (*result0)[i+128*(i_t-1)-1-128*(i_t-1)][j+8*(j_t-1)-1-8*(j_t-1)] = ((*caillou0)[2-0]*(*src00)[i+128*(i_t-1)-1-128*(i_t-1)][j+8*(j_t-1)-1-8*(j_t-1)]+(*caillou0)[3-0]*(*src10)[i+128*(i_t-1)-1-128*(i_t-1)][j+8*(j_t-1)-1-8*(j_t-1)])*((*caillou0)[0-0]<<(*caillou0)[1-0])>>(*caillou0)[1-0];
-            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*(i_t-1), 8*(j_t-1), &result[0][0], *result0);
-            P4A_accel_free(result0);
-            P4A_accel_free(caillou0);
-            P4A_accel_free(src10);
-            P4A_accel_free(src00);
+                     for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+               else
+l99994:
+                  for(i = I_9; i <= I_9+127; i += 1)
+l99995:
+                     for(j = I_14; j <= n-1; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+l99992:
+               for(i = I_9; i <= n-1; i += 1)
+l99993:
+                  for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else
+l99990:
+               for(i = I_9; i <= n-1; i += 1)
+l99991:
+                  for(j = I_14; j <= n-1; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
          }
       }
+   }
 }
-void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
+**** check ok ******
+void alphablending_l99998(int n, int src0[n][n], int src1[n][n])
 {
-   unsigned int i, j;
    //PIPS generated variable
-   unsigned int i_t, j_t;
+   int I_0, I_1;
+
+   if (256>3||3<128) {
+      //PIPS generated variable
+      int i, j;
 l99998:
-   for(i_t = 1; i_t <= 4; i_t += 1)
-l99995:
-      for(j_t = 1; j_t <= 64; j_t += 1) {
-         //PIPS generated variable
-         int caillou[4];
-         caillou[0] = 0;
-         caillou[1] = 4;
-         caillou[2] = 40;
-         caillou[3] = 60;
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
 
-         {
-            //PIPS generated variable
-            short (*src00)[128][8] = (short (*)[128][8]) 0, (*src10)[128][8] = (short (*)[128][8]) 0;
-            //PIPS generated variable
-            int (*caillou0)[4] = (int (*)[4]) 0;
-            //PIPS generated variable
-            short (*result0)[128][8] = (short (*)[128][8]) 0;
-            P4A_accel_malloc((void **) &result0, 1024*sizeof(short));
-            P4A_accel_malloc((void **) &caillou0, 4*sizeof(int));
-            P4A_accel_malloc((void **) &src10, 1024*sizeof(short));
-            P4A_accel_malloc((void **) &src00, 1024*sizeof(short));
-            P4A_copy_to_accel_1d(sizeof(int), -caillou[0]+4, 4, 0, &caillou[0], *caillou0);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src1[0][0], *src10);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src0[0][0], *src00);
 
+l99989:
+         for(I_1 = 0; I_1 <= (n-1)/256; I_1 += 1) {
+
+
+            if (n-1>128*I_0+127)
+               if (n-1>256*I_1+255)
 l99996:
-            for(i = 1; i <= 128; i += 1)
+                  for(i = 128*I_0; i <= 128*I_0+127; i += 1)
 l99997:
-               for(j = 1; j <= 8; j += 1)
-                  (*result0)[i-1][j-1] = ((*caillou0)[2]*(*src00)[i-1][j-1]+(*caillou0)[3]*(*src10)[i-1][j-1])*((*caillou0)[0]<<(*caillou0)[1])>>(*caillou0)[1];
-            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
-            P4A_accel_free(result0);
-            P4A_accel_free(caillou0);
-            P4A_accel_free(src10);
-            P4A_accel_free(src00);
+                     for(j = 256*I_1; j <= 256*I_1+255; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+               else
+l99994:
+                  for(i = 128*I_0; i <= 128*I_0+127; i += 1)
+l99995:
+                     for(j = 256*I_1; j <= n-1; j += 1)
+                        src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else if (n-1>256*I_1+255)
+l99992:
+               for(i = 128*I_0; i <= n-1; i += 1)
+l99993:
+                  for(j = 256*I_1; j <= 256*I_1+255; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+            else
+l99990:
+               for(i = 128*I_0; i <= n-1; i += 1)
+l99991:
+                  for(j = 256*I_1; j <= n-1; j += 1)
+                     src0[i][j] = 40*src0[i][j]+60*src1[i][j];
          }
       }
+   }
 }
+void tile_l99996(int n, int I_0, int I_1, int src0[n][n], int src1[n][n])
+{
+   //PIPS generated variable
+   int i, j;
+l99996:
+   for(i = 128*I_0; i <= 128*I_0+127; i += 1)
+l99997:
+      for(j = 256*I_1; j <= 256*I_1+255; j += 1)
+         src0[i][j] = 40*src0[i][j]+60*src1[i][j];
+}
+void tile_l99996(int n, int I_0, int I_1, int src0[n][n], int src1[n][n])
+{
+   //PIPS generated variable
+   int i, j;
+   {
+      //PIPS generated variable
+      int (*src00)[128][256] = (int (*)[128][256]) 0, (*src10)[128][256] = (int (*)[128][256]) 0;
+      P4A_accel_malloc((void **) &src10, sizeof(int)*32768);
+      P4A_accel_malloc((void **) &src00, sizeof(int)*32768);
+      P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src1[0][0], *src10);
+      P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src0[0][0], *src00);
+
+l99996:
+      for(i = 128*I_0; i <= 128*I_0+127; i += 1)
+l99997:
+         for(j = 256*I_1; j <= 256*I_1+255; j += 1)
+            (*src00)[i-128*I_0][j-256*I_1] = 40*(*src00)[i-128*I_0][j-256*I_1]+60*(*src10)[i-128*I_0][j-256*I_1];
+      P4A_copy_from_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src0[0][0], *src00);
+      P4A_accel_free(src10);
+      P4A_accel_free(src00);
+   }
+}
+**** check ok ******
 outlining to launcher
-
-//  <result[PHI1][PHI2]-W-MAY-{PHI1==0}>
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==0}>
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==0}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-
-void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
+void tile_l99996(int n, int I_0, int I_1, int src0[n][n], int src1[n][n])
 {
-   unsigned int i, j;
    //PIPS generated variable
-   unsigned int i_t, j_t;
+   int i, j;
+   {
+      //PIPS generated variable
+      int (*src00)[128][256] = (int (*)[128][256]) 0, (*src10)[128][256] = (int (*)[128][256]) 0;
+      P4A_accel_malloc((void **) &src10, 32768*sizeof(int));
+      P4A_accel_malloc((void **) &src00, 32768*sizeof(int));
+      P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src1[0][0], *src10);
+      P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src0[0][0], *src00);
 
-//  <result[PHI1][PHI2]-W-MAY-{PHI1==0}>
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==0}>
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==0}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-
-l99998:
-   for(i_t = 1; i_t <= 4; i_t += 1)
-
-//  <result[PHI1][PHI2]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4}>
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4}>
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-
-l99995:
-      for(j_t = 1; j_t <= 64; j_t += 1) {
-         //PIPS generated variable
-         int caillou[4];
-
-//  <caillou[PHI1]-W-EXACT-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-
-         caillou[0] = 0;
-
-//  <caillou[PHI1]-W-EXACT-{PHI1==1, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-
-         caillou[1] = 4;
-
-//  <caillou[PHI1]-W-EXACT-{PHI1==2, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-
-         caillou[2] = 40;
-
-//  <caillou[PHI1]-W-EXACT-{PHI1==3, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-
-         caillou[3] = 60;
-
-         {
-            //PIPS generated variable
-
-//  <src00-W-EXACT-{}>
-//  <src10-W-EXACT-{}>
-
-            short (*src00)[128][8] = (short (*)[128][8]) 0, (*src10)[128][8] = (short (*)[128][8]) 0;
-            //PIPS generated variable
-
-//  <caillou0-W-EXACT-{}>
-
-            int (*caillou0)[4] = (int (*)[4]) 0;
-            //PIPS generated variable
-
-//  <result0-W-EXACT-{}>
-
-            short (*result0)[128][8] = (short (*)[128][8]) 0;
-
-//  <result0-W-MAY-{}>
-//  <result0[PHI1][PHI2][PHI3]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
-
-            P4A_accel_malloc((void **) &result0, 1024*sizeof(short));
-
-//  <caillou0-W-MAY-{}>
-//  <caillou0[PHI1][PHI2]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
-
-            P4A_accel_malloc((void **) &caillou0, 4*sizeof(int));
-
-//  <src10-W-MAY-{}>
-//  <src10[PHI1][PHI2][PHI3]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
-
-            P4A_accel_malloc((void **) &src10, 1024*sizeof(short));
-
-//  <src00-W-MAY-{}>
-//  <src00[PHI1][PHI2][PHI3]-W-MAY-{1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
-
-            P4A_accel_malloc((void **) &src00, 1024*sizeof(short));
-
-//  <caillou[PHI1]-R-EXACT-{0<=PHI1, PHI1<=3, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
-//  <caillou0-R-EXACT-{}>
-//  <caillou0[PHI1][PHI2]-W-EXACT-{PHI1==0, 0<=PHI2, PHI2<=3, 1<=i_t,
-//    i_t<=4, 1<=j_t, j_t<=64}>
-
-            P4A_copy_to_accel_1d(sizeof(int), -caillou[0]+4, 4, 0, &caillou[0], *caillou0);
-
-//  <src1[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
-//  <src10-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
-
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src1[0][0], *src10);
-
-//  <src0[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
-//  <src00-R-EXACT-{}>
-//  <src00[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
-
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src0[0][0], *src00);
-
-
-//  <caillou0-R-EXACT-{}>
-//  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 0<=PHI2, PHI2<=3, 1<=i_t,
-//    i_t<=4, 1<=j_t, j_t<=64}>
-//  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src00-R-EXACT-{}>
-//  <src00[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src10-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
-//    0<=PHI3, PHI3<=7, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-
-l99996:
-            for(i = 1; i <= 128; i += 1)
-
-//  <caillou0-R-EXACT-{}>
-//  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 0<=PHI2, PHI2<=3, 1<=i,
-//    i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==i-1, 0<=PHI3,
-//    PHI3<=7, 1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src00-R-EXACT-{}>
-//  <src00[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==i-1, 0<=PHI3,
-//    PHI3<=7, 1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-//  <src10-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==i-1, 0<=PHI3,
-//    PHI3<=7, 1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
-
-l99997:
-               for(j = 1; j <= 8; j += 1)
-
-//  <caillou0-R-EXACT-{}>
-//  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 0<=PHI2, PHI2<=3, 1<=i,
-//    i<=128, 1<=i_t, i_t<=4, 1<=j, j<=8, 1<=j_t, j_t<=64}>
-//  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==i-1, PHI3==j-1,
-//    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j, j<=8, 1<=j_t, j_t<=64}>
-//  <src00-R-EXACT-{}>
-//  <src00[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==i-1, PHI3==j-1,
-//    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j, j<=8, 1<=j_t, j_t<=64}>
-//  <src10-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==i-1, PHI3==j-1,
-//    1<=i, i<=128, 1<=i_t, i_t<=4, 1<=j, j<=8, 1<=j_t, j_t<=64}>
-
-                  (*result0)[i-1][j-1] = ((*caillou0)[2]*(*src00)[i-1][j-1]+(*caillou0)[3]*(*src10)[i-1][j-1])*((*caillou0)[0]<<(*caillou0)[1])>>(*caillou0)[1];
-
-//  <result[PHI1][PHI2]-W-MAY-{PHI1==0, i==129, j==9, 1<=i_t, i_t<=4,
-//    1<=j_t, j_t<=64}>
-//  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-R-MAY-{PHI1==0, i==129, j==9, 1<=i_t,
-//    i_t<=4, 1<=j_t, j_t<=64}>
-
-            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
-
-//  <result0-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-
-            P4A_accel_free(result0);
-
-//  <caillou0-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-
-            P4A_accel_free(caillou0);
-
-//  <src10-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-
-            P4A_accel_free(src10);
-
-//  <src00-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
-//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-
-            P4A_accel_free(src00);
-         }
-      }
-}
-void alphablending(short src0[512][512], short src1[512][512], short result[512][512])
-{
-   unsigned int i, j;
-   //PIPS generated variable
-   unsigned int i_t, j_t;
-l99998:
-   for(i_t = 1; i_t <= 4; i_t += 1)
-l99995:
-      for(j_t = 1; j_t <= 64; j_t += 1) {
-         //PIPS generated variable
-         int caillou[4];
-         caillou[0] = 0;
-         caillou[1] = 4;
-         caillou[2] = 40;
-         caillou[3] = 60;
-
-         {
-            //PIPS generated variable
-            short (*src00)[128][8] = (short (*)[128][8]) 0, (*src10)[128][8] = (short (*)[128][8]) 0;
-            //PIPS generated variable
-            int (*caillou0)[4] = (int (*)[4]) 0;
-            //PIPS generated variable
-            short (*result0)[128][8] = (short (*)[128][8]) 0;
-            P4A_accel_malloc((void **) &result0, 1024*sizeof(short));
-            P4A_accel_malloc((void **) &caillou0, 4*sizeof(int));
-            P4A_accel_malloc((void **) &src10, 1024*sizeof(short));
-            P4A_accel_malloc((void **) &src00, 1024*sizeof(short));
-            P4A_copy_to_accel_1d(sizeof(int), -caillou[0]+4, 4, 0, &caillou[0], *caillou0);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src1[0][0], *src10);
-            P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src0[0][0], *src00);
-
-l99996:            launcher_0(8+1, *caillou0, *result0, *src00, *src10);
-            P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
-            P4A_accel_free(result0);
-            P4A_accel_free(caillou0);
-            P4A_accel_free(src10);
-            P4A_accel_free(src00);
-         }
-      }
+l99996:      launcher_0(255+1, *src00, *src10);
+      P4A_copy_from_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &src0[0][0], *src00);
+      P4A_accel_free(src10);
+      P4A_accel_free(src00);
+   }
 }
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==9}>
-//  <result0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2<=7, I_0==9}>
-//  <src00[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
-//    I_0==9}>
-//  <src10[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
-//    I_0==9}>
+//  <src00[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=255, I_24==256}>
+//  <src00[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=255, I_24==256}>
+//  <src10[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=255, I_24==256}>
 
-void launcher_0(int I_0, int caillou0[4], short result0[128][8], short src00[128][8], short src10[128][8])
+void launcher_0(int I_24, int src00[128][256], int src10[128][256])
 {
    //PIPS generated variable
-   unsigned int i, j;
+   int i, j;
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==9}>
-//  <result0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
-//    PHI2<=7, I_0==9}>
-//  <src00[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
-//    I_0==9}>
-//  <src10[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=7,
-//    I_0==9}>
+//  <src00[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=255, I_24==256}>
+//  <src00[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=255, I_24==256}>
+//  <src10[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=255, I_24==256}>
 
 l99996:
-   for(i = 1; i <= 128; i += 1)
+   for(i = 0; i <= 127; i += 1)
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==9, 1<=i, i<=128}>
-//  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_0==9,
-//    1<=i, i<=128}>
-//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_0==9,
-//    1<=i, i<=128}>
-//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, 0<=PHI2, PHI2<=7, I_0==9,
-//    1<=i, i<=128}>
+//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=255,
+//    I_24==256, 0<=i, i<=127}>
+//  <src00[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=255,
+//    I_24==256, 0<=i, i<=127}>
+//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=255,
+//    I_24==256, 0<=i, i<=127}>
 
 l99997:
-      for(j = 1; j <= I_0-1; j += 1)
+      for(j = 0; j <= I_24-1; j += 1)
 
-//  <caillou0[PHI1]-R-MAY-{0<=PHI1, PHI1<=3, I_0==9, 1<=i, i<=128,
-//    1<=j, j<=8}>
-//  <result0[PHI1][PHI2]-W-EXACT-{PHI1==i-1, PHI2==j-1, I_0==9, 1<=i,
-//    i<=128, 1<=j, j<=8}>
-//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_0==9, 1<=i,
-//    i<=128, 1<=j, j<=8}>
-//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i-1, PHI2==j-1, I_0==9, 1<=i,
-//    i<=128, 1<=j, j<=8}>
+//  <src00[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, I_24==256, 0<=i,
+//    i<=127, 0<=j, j<=255}>
+//  <src00[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, I_24==256, 0<=i,
+//    i<=127, 0<=j, j<=255}>
+//  <src10[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, I_24==256, 0<=i,
+//    i<=127, 0<=j, j<=255}>
 
-         result0[i-1][j-1] = (caillou0[2]*src00[i-1][j-1]+caillou0[3]*src10[i-1][j-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
+         src00[i][j] = 40*src00[i][j]+60*src10[i][j];
 }
 outlining to microcode
-label: l99997
-void launcher_0(int I_0, int caillou0[4], short result0[128][8], short src00[128][8], short src10[128][8])
+void launcher_0(int I_24, int src00[128][256], int src10[128][256])
 {
    //PIPS generated variable
-   unsigned int i, j;
+   int i, j;
 l99996:
-   for(i = 1; i <= 128; i += 1)
-l99997:      launcher_0_microcode(caillou0, *&result0[i-1], *&src00[i-1], *&src10[i-1]);
+   for(i = 0; i <= 127; i += 1)
+l99997:
+      for(j = 0; j <= I_24-1; j += 1)
+         src00[i][j] = 40*src00[i][j]+60*src10[i][j];
 }
-void launcher_0_microcode(int caillou0[4], short result00[8], short src000[8], short src100[8])
+void launcher_0(int I_24, int src00[128][256], int src10[128][256])
 {
    //PIPS generated variable
-   unsigned int j;
+   int i, j;
+l99996:
+   for(i = 0; i <= 127; i += 1)
 l99997:
-   for(j = 1; j <= 8; j += 1)
-      result00[j-1] = (caillou0[2]*src000[j-1]+caillou0[3]*src100[j-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
+      for(j = 0; j <= I_24-1; j += 1)
+         src00[i][j] = 40*src00[i][j]+60*src10[i][j];
 }
-normalize microcode launcher_0_microcode
-void launcher_0_microcode(int caillou0[4], short result00[8], short src000[8], short src100[8])
+void launcher_0(int I_24, int src00[128][256], int src10[128][256])
 {
    //PIPS generated variable
-   unsigned int j;
-l99997:
-   for(j = 0; j <= 7; j += 1)
-      result00[j+1-1] = (caillou0[2]*src000[j+1-1]+caillou0[3]*src100[j+1-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
+   int i, j;
+l99996:
+   for(i = 0; i <= 127; i += 1)
+l99997:      launcher_0_microcode(I_24, *&src00[i], *&src10[i]);
 }
-void launcher_0_microcode(int caillou0[4], short result00[8], short src000[8], short src100[8])
+void launcher_0_microcode(int I_24, int src000[256], int src100[256])
 {
    //PIPS generated variable
-   unsigned int j;
+   int j;
 l99997:
-   for(j = 0; j <= 7; j += 1)
-      result00[j+1-1] = (caillou0[2]*src000[j+1-1]+caillou0[3]*src100[j+1-1])*(caillou0[0]<<caillou0[1])>>caillou0[1];
+   for(j = 0; j <= I_24-1; j += 1)
+      src000[j] = 40*src000[j]+60*src100[j];
 }
-void launcher_0_microcode(int *caillou0, short *result00, short *src000, short *src100)
+**** check ok ******
+refining microcode
+void launcher_0_microcode(int I_24, int src000[256], int src100[256])
 {
    //PIPS generated variable
-   unsigned int j;
+   int j;
 l99997:
-   for(j = 0; j <= 7; j += 1)
-      *(result00+(j+1-1)) = (*(caillou0+2)**(src000+(j+1-1))+*(caillou0+3)**(src100+(j+1-1)))*(*(caillou0+0)<<*(caillou0+1))>>*(caillou0+1);
+   for(j = 0; j <= I_24-1; j += 1)
+      src000[j] = 40*src000[j]+60*src100[j];
 }
-caillou0 seems a mask
-result00 seems an image
+void launcher_0_microcode(int I_24, int *src000, int *src100)
+{
+   //PIPS generated variable
+   int j;
+l99997:
+   for(j = 0; j <= I_24-1; j += 1)
+      *(src000+j) = 40**(src000+j)+60**(src100+j);
+}
+**** check ok ******
+void launcher_0_microcode(int I_24, int *src000, int *src100)
+{
+   //PIPS generated variable
+   int j;
+l99997:
+   for(j = 0; j <= I_24-1; j += 1)
+      *(src000+j) = 40**(src000+j)+60**(j+src100);
+}
+void launcher_0_microcode(int I_24, int *src000, int *src100)
+{
+   //PIPS generated variable
+   int j;
+   //PIPS generated variable
+   int *src0000, *src1000;
+   src1000 = src100;
+   src0000 = src000;
+l99997:
+   for(j = 0; j <= I_24-1; j += 1) {
+      *src0000 = 40**src0000+60**src1000;
+      src1000 += 1;
+      src0000 += 1;
+   }
+}
+**** check ok ******
+void launcher_0_microcode(int I_24, int *src000, int *src100)
+{
+   //PIPS generated variable
+   int j;
+   //PIPS generated variable
+   int *src0000, *src1000;
+   src1000 = src100;
+   src0000 = src000;
+l99997:
+   for(j = 0; j <= I_24-1; j += 1) {
+      *src0000 = 40**src0000+60**src1000;
+      src1000 += 1;
+      src0000 += 1;
+   }
+}
+**** check ok ******
+**** check ok ******
+void launcher_0_microcode(int I_24, int *src000, int *src100)
+{
+   //PIPS generated variable
+   int j;
+   //PIPS generated variable
+   int *src0000, *src1000;
+   src1000 = src100;
+   src0000 = src000;
+l99997:
+   for(j = 0; j <= I_24-1; j += 1) {
+      *src0000 = 40**src0000+60**src1000;
+      src1000 += 1;
+      src0000 += 1;
+   }
+}
+void launcher_0_microcode(int I_24, int *src000, int *src100)
+{
+   //PIPS generated variable
+   int j;
+   //PIPS generated variable
+   int *src0000, *src1000;
+   src1000 = src100;
+   src0000 = src000;
+l99997:
+   for(j = 0; j <= I_24-1; j += 1) {
+      *src0000 = 40**src0000+60**src1000;
+      src1000 = src1000+1;
+      src0000 = src0000+1;
+   }
+}
+**** check ok ******
+void launcher_0_microcode(int I_24, int *src000, int *src100)
+{
+   //PIPS generated variable
+   int j;
+   //PIPS generated variable
+   int *src0000, *src1000;
+   src1000 = src100;
+   src0000 = src000;
+l99997:
+   for(j = 0; j <= I_24-1; j += 1) {
+      *src0000 = 40**src0000+60**src1000;
+      src1000 = src1000+1;
+      src0000 = src0000+1;
+   }
+}
+**** check ok ******
+I_24 belongs to a loop bound
 src000 seems an image
 src100 seems an image
-void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
+void launcher_0_microcode(int *FIFO2, int *FIFO1, int N1)
 {
    //PIPS generated variable
-   unsigned int j;
+#pragma terapix src100 128 256
+#pragma terapix src000 128 256
+   int j;
    //PIPS generated variable
-   char * re0, re1;
+   int *src0000, *src1000;
    //PIPS generated variable
-   int *caillou0, *ma0;
+   int re5;
    //PIPS generated variable
-   short *result00, *im1, *src000, *im2, *src100, *im3;
+   int *im1, *im2, *src000, *im3, *src100, *im4;
    //PIPS generated variable
-   unsigned int re2, re3;
+   int re6, re7;
    //PIPS generated variable
-   int *im4;
+   int *im5, *im6, *im7, *im8;
    //PIPS generated variable
-   short *im5, *im6, *im7;
-   //PIPS generated variable
-   int N0 = 8;
-   im3 = FIFO3;
-   im2 = FIFO2;
-   im1 = FIFO1;
-   ma0 = FIFO0;
+   int P;
+   im4 = FIFO2;
+   im3 = FIFO1;
+   im1 = im4;
+   im2 = im3;
+   im2 = im2-1;
+   im1 = im1-1;
 l99997:
-   for(re2 = 0; re2 <= N0; re2 += 1)
-      *(im1+(re2+1-1)) = (*(ma0+2)**(im2+(re2+1-1))+*(ma0+3)**(im3+(re2+1-1)))*(*(ma0+0)<<*(ma0+1))>>*(ma0+1);
-}
-void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
-{
-   //PIPS generated variable
-   unsigned int j;
-   //PIPS generated variable
-   char * re0, re1;
-   //PIPS generated variable
-   int *caillou0, *ma0;
-   //PIPS generated variable
-   short *result00, *im1, *src000, *im2, *src100, *im3;
-   //PIPS generated variable
-   unsigned int re2, re3;
-   //PIPS generated variable
-   int *im4;
-   //PIPS generated variable
-   short *im5, *im6, *im7;
-   //PIPS generated variable
-   int N0 = 8;
-   //PIPS generated variable
-   int *P_0;
-   //PIPS generated variable
-   int I_1, I_2;
-   //PIPS generated variable
-   short *P_1;
-   //PIPS generated variable
-   int I_3;
-   //PIPS generated variable
-   int *P_2;
-   //PIPS generated variable
-   int I_4, I_5;
-   //PIPS generated variable
-   short *P_3;
-   //PIPS generated variable
-   int I_6, I_7;
-   //PIPS generated variable
-   int *P_4, *P_5;
-   //PIPS generated variable
-   int I_8, I_9;
-   //PIPS generated variable
-   int *P_6;
-   //PIPS generated variable
-   int I_10, I_11;
-   //PIPS generated variable
-   short *P_7;
-   im3 = FIFO3;
-   im2 = FIFO2;
-   im1 = FIFO1;
-   ma0 = FIFO0;
-l99997:
-   for(re2 = 0; re2 <= N0; re2 += 1) {
-      P_0 = ma0+2;
-      I_1 = re2+1;
-      I_2 = I_1-1;
-      P_1 = im2+I_2;
-      I_3 = *P_0**P_1;
-      P_2 = ma0+3;
-      I_4 = re2+1;
-      I_5 = I_4-1;
-      P_3 = im3+I_5;
-      I_6 = *P_2**P_3;
-      I_7 = I_3+I_6;
-      P_4 = ma0+0;
-      P_5 = ma0+1;
-      I_8 = *P_4<<*P_5;
-      I_9 = I_7*I_8;
-      P_6 = ma0+1;
-      I_10 = re2+1;
-      I_11 = I_10-1;
-      P_7 = im1+I_11;
-      *P_7 = I_9>>*P_6;
+   for(re6 = 0; re6 <= N1; re6 += 1) {
+      //PIPS generated variable
+      int I_25;
+      *++im2 = 40**im2+60**++im1;
    }
 }
-void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
+**** check ok ******
+void launcher_0_microcode(int *FIFO2, int *FIFO1, int N1)
 {
    //PIPS generated variable
-   unsigned int j;
+#pragma terapix src100 128 256
+#pragma terapix src000 128 256
+   int j;
    //PIPS generated variable
-   char * re0, re1;
+   int *src0000, *src1000;
    //PIPS generated variable
-   int *caillou0, *ma0;
+   int re5;
    //PIPS generated variable
-   short *result00, *im1, *src000, *im2, *src100, *im3;
+   int *im1, *im2, *src000, *im3, *src100, *im4;
    //PIPS generated variable
-   unsigned int re2, re3;
+   int re6, re7;
    //PIPS generated variable
-   int *im4;
+   int *im5, *im6, *im7, *im8;
    //PIPS generated variable
-   short *im5, *im6, *im7;
-   //PIPS generated variable
-   int N0 = 8;
-   //PIPS generated variable
-   int *P_0;
-   //PIPS generated variable
-   int I_1, I_2;
-   //PIPS generated variable
-   short *P_1;
-   //PIPS generated variable
-   int I_3;
-   //PIPS generated variable
-   int *P_2;
-   //PIPS generated variable
-   int I_4, I_5;
-   //PIPS generated variable
-   short *P_3;
-   //PIPS generated variable
-   int I_6, I_7;
-   //PIPS generated variable
-   int *P_4, *P_5;
-   //PIPS generated variable
-   int I_8, I_9;
-   //PIPS generated variable
-   int *P_6;
-   //PIPS generated variable
-   int I_10, I_11;
-   //PIPS generated variable
-   short *P_7;
-   im3 = FIFO3;
-   im2 = FIFO2;
-   im1 = FIFO1;
-   ma0 = FIFO0;
+   int P;
+   im4 = FIFO2;
+   im3 = FIFO1;
+   im1 = im4;
+   im2 = im3;
+   im2 = im2-1;
+   im1 = im1-1;
 l99997:
-   for(re2 = 0; re2 <= N0; re2 += 1) {
-      P_0 = ma0;
-      P_0 = P_0+2;
-      I_1 = re2;
-      I_1 = I_1+1;
-      I_2 = I_1;
-      I_2 = I_2-1;
-      P_1 = im2;
-      P_1 = P_1+I_2;
-      I_3 = *P_0;
-      I_3 = I_3**P_1;
-      P_2 = ma0;
-      P_2 = P_2+3;
-      I_4 = re2;
-      I_4 = I_4+1;
-      I_5 = I_4;
-      I_5 = I_5-1;
-      P_3 = im3;
-      P_3 = P_3+I_5;
-      I_6 = *P_2;
-      I_6 = I_6**P_3;
-      I_7 = I_3;
-      I_7 = I_7+I_6;
-      P_4 = ma0;
-      P_4 = P_4+0;
-      P_5 = ma0;
-      P_5 = P_5+1;
-      I_8 = *P_4;
-      I_8 = I_8<<*P_5;
-      I_9 = I_7;
-      I_9 = I_9*I_8;
-      P_6 = ma0;
-      P_6 = P_6+1;
-      I_10 = re2;
-      I_10 = I_10+1;
-      I_11 = I_10;
-      I_11 = I_11-1;
-      P_7 = im1;
-      P_7 = P_7+I_11;
-      *P_7 = I_9;
-      *P_7 = *P_7>>*P_6;
+   for(re6 = 0; re6 <= N1; re6 += 1) {
+      //PIPS generated variable
+      int I_25;
+      *++im2 = 40**im2+60**++im1;
    }
 }
-void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
+void launcher_0(int I_24, int src00[128][256], int src10[128][256])
 {
    //PIPS generated variable
-   int *ma0;
-   //PIPS generated variable
-   short *im1, *im2, *im3;
-   //PIPS generated variable
-   unsigned int re2;
-   //PIPS generated variable
-   int N0 = 8;
-   //PIPS generated variable
-   int *P_0;
-   //PIPS generated variable
-   int I_1, I_2;
-   //PIPS generated variable
-   short *P_1;
-   //PIPS generated variable
-   int I_3;
-   //PIPS generated variable
-   int *P_2;
-   //PIPS generated variable
-   int I_4, I_5;
-   //PIPS generated variable
-   short *P_3;
-   //PIPS generated variable
-   int I_6, I_7;
-   //PIPS generated variable
-   int *P_4, *P_5;
-   //PIPS generated variable
-   int I_8, I_9;
-   //PIPS generated variable
-   int *P_6;
-   //PIPS generated variable
-   int I_10, I_11;
-   //PIPS generated variable
-   short *P_7;
-   im3 = FIFO3;
-   im2 = FIFO2;
-   im1 = FIFO1;
-   ma0 = FIFO0;
-l99997:
-   for(re2 = 0; re2 <= N0; re2 += 1) {
-      P_0 = ma0;
-      P_0 = P_0+2;
-      seti(I_1, re2);
-      addi(I_1, I_1, 1);
-      seti(I_2, I_1);
-      subi(I_2, 1);
-      P_1 = im2;
-      P_1 = P_1+I_2;
-      seti(I_3, *P_0);
-      muli(I_3, *P_1);
-      P_2 = ma0;
-      P_2 = P_2+3;
-      seti(I_4, re2);
-      addi(I_4, I_4, 1);
-      seti(I_5, I_4);
-      subi(I_5, 1);
-      P_3 = im3;
-      P_3 = P_3+I_5;
-      seti(I_6, *P_2);
-      muli(I_6, *P_3);
-      seti(I_7, I_3);
-      addi(I_7, I_7, I_6);
-      P_4 = ma0;
-      P_4 = P_4+0;
-      P_5 = ma0;
-      P_5 = P_5+1;
-      seti(I_8, *P_4);
-      seti(I_8, I_8<<*P_5);
-      seti(I_9, I_7);
-      muli(I_9, I_8);
-      P_6 = ma0;
-      P_6 = P_6+1;
-      seti(I_10, re2);
-      addi(I_10, I_10, 1);
-      seti(I_11, I_10);
-      subi(I_11, 1);
-      P_7 = im1;
-      P_7 = P_7+I_11;
-      seti(*P_7, I_9);
-      seti(*P_7, *P_7>>*P_6);
-   }
+   int i, j;
+l99996:
+   for(i = 0; i <= 127; i += 1)
+l99997:      launcher_0_microcode(*&src10[i], *&src00[i], I_24);
 }
+**** check ok ******
+int main(int argc, char *argv[])
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int a[n][n], b[n][n];
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         a[i][j] = 1, b[i][j] = 1;
+
+   alphablending(n, a, b);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         check += a[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+tidy the code just in case of
+int main(int argc, char *argv[])
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int a[n][n], b[n][n];
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         a[i][j] = 1, b[i][j] = 1;
+
+   alphablending(n, a, b);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         check += a[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+**** check ok ******
+int main(int argc, char *argv[])
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int a[n][n], b[n][n];
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         a[i][j] = 1, b[i][j] = 1;
+
+   alphablending(n, a, b);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         check += a[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+detection and extraction
+tiling

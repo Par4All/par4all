@@ -442,7 +442,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             {
                 entity new;
                 if(entity_variable_p(e)) {
-                    if(entity_scalar_p(e)) {
+                    if(entity_scalar_p(e)||entity_pointer_p(e)) {
                         new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
                     }
                     else {
@@ -497,7 +497,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     insert_statement(expanded,laststmt(p),false);
 
     /* fix `return' calls
-     * in case a goto is immediatly followed by its targeted label
+     * in case a goto is immediately followed by its targeted label
      * the goto is not needed (SG: seems difficult to do in the previous gen_recurse)
      */
     {
@@ -542,7 +542,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
 
     /* fix declarations */
     {
-        /* retreive formal parameters*/
+        /* retrieve formal parameters*/
         list formal_parameters = module_formal_parameters(inlined_module(p));
         list new_old_pairs = NIL ; /* store association between new and old declarations */
         { /* some basic checks */
@@ -562,7 +562,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             entity new = entity_undefined;
             if(need_copy)
             {
-                if(entity_scalar_p(e)) {
+                if(entity_scalar_p(e)||entity_pointer_p(e)) {
                     new = make_new_scalar_variable_with_prefix(entity_user_name(e),get_current_module_entity(),copy_basic(entity_basic(e)));
                 }
                 else {

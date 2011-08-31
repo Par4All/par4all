@@ -229,11 +229,15 @@ digraph "my_cast_helper_0_0" {
 
 ! acceleration function
 
-// freia opencl includes
+// FREIA OpenCL includes
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freia_opencl_runtime.h"
+
 
 // dag 0: 0 ops and 1 copies, optimized to 0 ops and 1+0 copies
-// freia opencl includes
-// generated opencl for function my_cast
+#include <freia_opencl_runtime.hcl>
+// generated OpenCL kernels for function my_cast
 
 // opencl for dag 0
 

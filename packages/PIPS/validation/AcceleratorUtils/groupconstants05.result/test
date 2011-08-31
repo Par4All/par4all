@@ -18,7 +18,6 @@ int main()
       caillou[0] = 0;
       caillou[1] = 1;
       caillou[2] = 3;
-
 ou_est_charlie:
       for(i = caillou[0]; i <= caillou[2]; i += caillou[1])
          a[caillou[0]][i] = caillou[1];

@@ -63,9 +63,9 @@ sub genfunc($$$$)
   print FILE ($temp & 1)? "": "$t o0, ";
   print FILE ($temp & 2)? "": "$t o1, ";
   print FILE
-      "$t o2, $t in0, $t in1, ",
+      "$t o2, const $t in0, const $t in1, ",
       "int32_t * m0, int32_t * m1, int32_t * m2, ",
-      "int32_t * k0, int32_t * k1, int32_t * k2)\n";
+      "const int32_t * k0, const int32_t * k1, const int32_t * k2)\n";
   print FILE "{\n";
   print FILE "  $t t0 = freia_common_create_data(16,128,128);\n" if $temp & 1;
   print FILE "  $t t1 = freia_common_create_data(16,128,128);\n" if $temp & 2;

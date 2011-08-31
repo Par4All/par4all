@@ -3051,11 +3051,15 @@ digraph "dag_cleaned_0" {
 
 ! acceleration function
 
-// freia opencl includes
+// FREIA OpenCL includes
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freia_opencl_runtime.h"
+
 
 // dag 0: 33 ops and 0 copies, optimized to 23 ops and 0+0 copies
-// freia opencl includes
-// generated opencl for function anr999
+#include <freia_opencl_runtime.hcl>
+// generated OpenCL kernels for function anr999
 
 // opencl for dag 0
 

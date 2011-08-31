@@ -1331,6 +1331,41 @@ static void davinci_dump_expressions(
 }
 
 
+static
+void do_convert_to_c_operator(call c) {
+    entity op = call_function(c);
+    if(ENTITY_PLUS_P(op))
+        call_function(c)=entity_intrinsic(PLUS_C_OPERATOR_NAME);
+    if(ENTITY_MINUS_P(op))
+        call_function(c)=entity_intrinsic(MINUS_C_OPERATOR_NAME);
+}
+void convert_to_c_operators(void * v) {
+    gen_recurse(v,call_domain,gen_true,do_convert_to_c_operator);
+}
+
+static
+void do_convert_to_standard_operators(call c) {
+    entity op = call_function(c);
+    if(ENTITY_PLUS_C_P(op) || ENTITY_MINUS_C_P(op) ) {
+        basic b0 = basic_of_expression(binary_call_lhs(c)),
+              b1 = basic_of_expression(binary_call_rhs(c));
+        if(!basic_pointer_p(b0)  && !basic_pointer_p(b1)) {
+            if(ENTITY_PLUS_C_P(op))
+                call_function(c)=entity_intrinsic(PLUS_OPERATOR_NAME);
+            if(ENTITY_MINUS_C_P(op))
+                call_function(c)=entity_intrinsic(MINUS_OPERATOR_NAME);
+        }
+        free_basic(b0);
+        free_basic(b1);
+    }
+}
+
+void convert_to_standard_operators(void * v) {
+    gen_recurse(v,call_domain,gen_true,do_convert_to_standard_operators);
+}
+
+
+
 /* pipsmake interface to apply expression optimization according to
    various strategy.
 
@@ -1365,7 +1400,9 @@ bool optimize_expressions(string module_name)
         db_get_memory_resource(DBR_CODE, module_name, true));
     set_current_optimization_strategy();
 
+
     s = get_current_module_statement();
+    convert_to_c_operators(s);
 
     /* check consistency before optimizations */
     pips_assert("consistency checking before optimizations",
@@ -1414,7 +1451,10 @@ bool optimize_expressions(string module_name)
      */
 
     /* check consistency after optimizations */
+    unnormalize_expression(s);
     clean_up_sequences(s);
+    convert_to_standard_operators(s);
+    simplify_expressions(s);
     pips_assert("consistency checking after optimizations",
 		statement_consistent_p(s));
 

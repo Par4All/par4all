@@ -1,6 +1,6 @@
-//
-// Initial code for module main
-//
+#
+# Initial code for module main
+#
 int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0010*/
@@ -15,28 +15,9 @@ int main(int argc, char *argv[])
 
    return 0;                                                            /*0020*/
 }
-//
-// Code after privatize_module for module main
-//
-int main(int argc, char *argv[])
-{
-   int i, j;                                                            /*0010*/
-   float *a[64];                                                        /*0011*/
-
-#pragma omp for private(i,j)
-   for(i = 0; i <= 63; i += 1) {                                        /*0013*/
-      /*sizeof(float)*/
-      a[i] = malloc(64*4);                                              /*0014*/
-#pragma omp for private(j)
-      for(j = 0; j <= 63; j += 1)                                       /*0015*/
-         a[i][j] = 0.;                                                  /*0016*/
-   }
-
-   return 0;                                                            /*0020*/
-}
-//
-// Initial code for module main
-//
+#
+# Code after privatize_module for module main
+#
 int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0010*/
@@ -53,9 +34,28 @@ int main(int argc, char *argv[])
 
    return 0;                                                            /*0020*/
 }
-//
-// Code after coarse_grain_parallelization for module main
-//
+#
+# Initial code for module main
+#
+int main(int argc, char *argv[])
+{
+   int i, j;                                                            /*0010*/
+   float *a[64];                                                        /*0011*/
+
+#pragma omp for private(i,j)
+   for(i = 0; i <= 63; i += 1) {                                        /*0013*/
+      /*sizeof(float)*/
+      a[i] = malloc(64*4);                                              /*0014*/
+#pragma omp for private(j)
+      for(j = 0; j <= 63; j += 1)                                       /*0015*/
+         a[i][j] = 0.;                                                  /*0016*/
+   }
+
+   return 0;                                                            /*0020*/
+}
+#
+# Code after coarse_grain_parallelization for module main
+#
 int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0010*/

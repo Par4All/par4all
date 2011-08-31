@@ -45,6 +45,7 @@
 
 #include "resources.h"
 #include "properties.h"
+#include "expressions.h"
 
 static expression pattern = expression_undefined;
 static string pattern_module_name = string_undefined;
@@ -73,6 +74,7 @@ bool set_pattern()
             pips_user_warning("%s used as pattern for expression substitution, but is not a module with a single return !\n", pattern_module_name);
             return false;
         }
+        convert_to_standard_operators(pattern);
 
     }
     else
@@ -162,6 +164,7 @@ bool expression_substitution(string module_name)
     bool pattern_set_p = set_pattern();
     if( pattern_set_p )
     {
+        convert_to_standard_operators(get_current_module_statement());
         gen_multi_recurse(
             get_current_module_statement(),
             reference_domain, gen_false, gen_null,

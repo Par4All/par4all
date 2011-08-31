@@ -897,7 +897,7 @@ list gen_typed_cons(_int type, const void * item, const list next)
 /* typed cons for "basic" types */
 list gen_bool_cons(bool b, const list l)
 {
-  return gen_cons((const void *) b, l);
+  return gen_cons((const void *) (intptr_t)b, l);
 }
 
 list gen_int_cons(_int i, const list l)

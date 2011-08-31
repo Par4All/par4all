@@ -1,6 +1,6 @@
-//
-// Code after dead_code_elimination for module formal
-//
+#
+# Code after dead_code_elimination for module formal
+#
 void formal(int a[10])
 {
    a[0] = 0;

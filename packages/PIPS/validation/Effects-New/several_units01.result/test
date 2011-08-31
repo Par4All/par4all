@@ -1,6 +1,6 @@
-//
-// Display print_code_proper_effects for module foo
-//
+#
+# Display print_code_proper_effects for module foo
+#
 int foo(my_type t)
 {
 //             <    is written>: t.a
@@ -10,9 +10,9 @@ int foo(my_type t)
 //             <    is referenced>: t
    return t.a;
 }
-//
-// Display print_code_proper_effects for module main
-//
+#
+# Display print_code_proper_effects for module main
+#
 int main()
 {
 //             <    is referenced>: my_type
@@ -22,9 +22,9 @@ int main()
 //             <    is referenced>: t
    return foo(t);
 }
-//
-// Display print_code_cumulated_effects for module foo
-//
+#
+# Display print_code_cumulated_effects for module foo
+#
 //             <    is read   >: t.a
 //             <    is written>: t.a
 //             <    is referenced>: t
@@ -37,9 +37,9 @@ int foo(my_type t)
 //             <    is referenced>: t
    return t.a;
 }
-//
-// Display print_code_cumulated_effects for module main
-//
+#
+# Display print_code_cumulated_effects for module main
+#
 int main()
 {
 //             <    is referenced>: my_type

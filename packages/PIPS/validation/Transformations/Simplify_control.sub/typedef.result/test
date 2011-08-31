@@ -1,6 +1,6 @@
-//
-// Code after simplify_control for module main
-//
+#
+# Code after simplify_control for module main
+#
 int main(void)
 {
    // ok if following line is uncommented

@@ -27,6 +27,6 @@ export PIPS_CHECK_FORTRAN
 ${pips_version:-pips} \
 	-f syntax_errors.f \
  	syntax_error 
-} 2>&1 | grep 'Fortran syntax errors in file'
+} 2>&1 | fgrep -o 'Fortran syntax errors in file'
 
 Delete syntax_error

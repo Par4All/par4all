@@ -920,11 +920,15 @@ digraph "freia_dup_15_helper_0_0" {
 
 ! acceleration function
 
-// freia opencl includes
+// FREIA OpenCL includes
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freia_opencl_runtime.h"
+
 
 // dag 0: 4 ops and 0 copies, optimized to 3 ops and 0+0 copies
-// freia opencl includes
-// generated opencl for function freia_dup_15
+#include <freia_opencl_runtime.hcl>
+// generated OpenCL kernels for function freia_dup_15
 
 // opencl for dag 0
 

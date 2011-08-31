@@ -1,6 +1,6 @@
-//
-// Initial code for module conv
-//
+#
+# Initial code for module conv
+#
 void conv(int M, float h[1+M], int L, float x[L+M], float y[L+M])
 {
    int n, m;
@@ -33,9 +33,9 @@ l99996:      ;
    }
    n = M+MAX0(LU_NUB0, 0)*1;
 }
-//
-// Code after partial_eval for module conv
-//
+#
+# Code after partial_eval for module conv
+#
 void conv(int M, float h[1+M], int L, float x[L+M], float y[L+M])
 {
    int n, m;
@@ -68,9 +68,9 @@ l99996:      ;
    }
    n = M+MAX0(LU_NUB0, 0);
 }
-//
-// Code after flatten_code for module conv
-//
+#
+# Code after flatten_code for module conv
+#
 void conv(int M, float h[1+M], int L, float x[L+M], float y[L+M])
 {
    int n, m;
@@ -102,9 +102,9 @@ l99996:      ;
    }
    n = M+MAX0(LU_NUB0, 0);
 }
-//
-// Code after loop_fusion for module conv
-//
+#
+# Code after loop_fusion for module conv
+#
 void conv(int M, float h[1+M], int L, float x[L+M], float y[L+M])
 {
    int n, m;
