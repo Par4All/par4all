@@ -920,7 +920,13 @@ bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
 /* substitute those statement in ls that are in dag d and accelerated
  * by a call to function_name(lparams)
  * also update sets of remainings and global_remainings
+ *
  * the function must chose one of the statements?
+ * the current implementation is a buggy mess.
+ * it should be fully re-thought from scratch.
+ *
+ * what should be done, is to chose the FIRST statement after the LAST
+ * dependency of the compiled statements.
  */
 int freia_substitute_by_helper_call(
   // dag reminder, may be null
@@ -930,10 +936,10 @@ int freia_substitute_by_helper_call(
   list /* of statement */ ls,
   string function_name,
   list lparams,
-  set helpers,
-  int preceeding)
+  set helpers,    // for signatures
+  int preceeding) // statement which stored the previous insert, -1 for none
 {
-  pips_debug(7, "%d statements, before %d\n",
+  pips_debug(7, "%d statements, must come after statement %d\n",
              (int) gen_length(ls), preceeding);
 
   // buid the set of statements that are not yet computed
