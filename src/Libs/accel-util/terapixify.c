@@ -947,7 +947,21 @@ void two_addresses_code_generator(statement s)
             list args = call_arguments(c);
             expression lhs = EXPRESSION(CAR(args));
             expression rhs = EXPRESSION(CAR(CDR(args)));
-            if(!two_addresses_code_generator_split_p(lhs) && two_addresses_code_generator_split_p(rhs)) {
+            list w_effects = effects_write_effects(load_cumulated_rw_effects_list(s));
+            list e_effects = proper_effects_of_expression(rhs);
+            bool conflict=false;
+            FOREACH(EFFECT,we,w_effects) {
+                FOREACH(EFFECT,e,e_effects) {
+                    if((conflict=effects_may_conflict_p(e,we))) {
+                        goto end;
+                    }
+                }
+            }
+end:
+            gen_full_free_list(e_effects);
+            gen_free_list(w_effects);
+            
+            if(!conflict && !two_addresses_code_generator_split_p(lhs) && two_addresses_code_generator_split_p(rhs)) {
                 call parent_call = call_undefined;
                 do {
                     parent_call=expression_call(rhs);
@@ -972,6 +986,7 @@ generate_two_addresses_code(char *module_name)
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true));
 
     gen_recurse(get_current_module_statement(),statement_domain,gen_true,two_addresses_code_generator);
 
@@ -980,6 +995,7 @@ generate_two_addresses_code(char *module_name)
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
 
     /*postlude*/
+    reset_cumulated_rw_effects();
     reset_current_module_entity();
     reset_current_module_statement();
     return true;
