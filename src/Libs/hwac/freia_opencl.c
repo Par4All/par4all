@@ -186,11 +186,10 @@ static int opencl_compile_mergeable_dag(
     // sb_cat(helper_body, nargs? ", ": "", "o", itoa(i));
     sb_cat(helper_body,
            "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
-           ", sizeof(cl_mem), &pool[o", si, "->clId]);\n");
+           ", sizeof(cl_mem), &pool[o", si, "->clId].mem);\n");
     cl_args++;
-    sb_cat(helper_decls,
-       "  cl_int ofs_o", si, " = freia_common_data_get_offset(o", si, ");\n");
     sb_cat(helper_body,
+           "  cl_int ofs_o", si, " = freia_common_data_get_offset(o", si, ");\n"
            "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
            ", sizeof(cl_int), &ofs_o", si, ");\n");
     cl_args++;
@@ -216,11 +215,10 @@ static int opencl_compile_mergeable_dag(
     // sb_cat(helper_body, nargs? ", ": "", "i", si);
     sb_cat(helper_body,
            "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
-           ", sizeof(cl_mem), &pool[i", si, "->clId]);\n");
+           ", sizeof(cl_mem), &pool[i", si, "->clId].mem);\n");
     cl_args++;
-    sb_cat(helper_decls,
-        "  cl_int ofs_i", si, " = freia_common_data_get_offset(i", si, ");\n");
     sb_cat(helper_body,
+           "  cl_int ofs_i", si, " = freia_common_data_get_offset(i", si, ");\n"
            "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
            ", sizeof(cl_int), &ofs_i", si, ");\n");
     cl_args++;
@@ -341,7 +339,8 @@ static int opencl_compile_mergeable_dag(
   sb_cat(opencl, ")\n{\n");
   string_buffer_append_sb(opencl, opencl_init);
   sb_cat(opencl,
-         "  int gid = get_global_id(1)*pitch + get_global_id(0);\n"
+         // depends on worksize #dims: get_global_id(1)*pitch + g..g..id(0)
+         "  int gid = pitch*get_global_id(0);\n"
          "  int i;\n"
          "  for (i=gid; i < (gid+width); i++)\n  {\n");
   string_buffer_append_sb(opencl, opencl_body);
