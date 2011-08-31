@@ -1,0 +1,337 @@
+#
+# AIPO
+#
+#
+# compile generated freia_73
+#
+
+! initial function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);                                            /*0005*/
+   freia_aipo_copy(o1, in0);                                            /*0006*/
+   freia_aipo_copy(o2, o0);                                             /*0007*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_73" in dot format
+digraph "dag_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+  "o2" [shape=circle];
+
+  // computation vertices
+  "7 =" [shape=circle];
+  "7 =" -> "o2";
+  "6 =" [shape=circle];
+  "6 =" -> "o1";
+  "5 =" [shape=circle];
+  "5 =" -> "7 =" [label="o0"];
+  "5 =" -> "o0";
+  "in0" -> "6 =";
+  "in0" -> "5 =";
+}
+// graph for dag "dag_cleaned_0" of module "freia_73" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+
+  // external copies: 3
+  "o0" [shape=circle];
+  "o0 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o0 =";
+  "o0 =" -> "o0";
+  "o1" [shape=circle];
+  "o1 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o1 =";
+  "o1 =" -> "o1";
+  "o2" [shape=circle];
+  "o2 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o2 =";
+  "o2 =" -> "o2";
+}
+
+! updated function for
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);
+   freia_aipo_copy(o1, in0);
+   freia_aipo_copy(o2, in0);
+}
+#
+# SPOC
+#
+
+! initial function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);                                            /*0005*/
+   freia_aipo_copy(o1, in0);                                            /*0006*/
+   freia_aipo_copy(o2, o0);                                             /*0007*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_73" in dot format
+digraph "dag_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+  "o2" [shape=circle];
+
+  // computation vertices
+  "7 =" [shape=circle];
+  "7 =" -> "o2";
+  "6 =" [shape=circle];
+  "6 =" -> "o1";
+  "5 =" [shape=circle];
+  "5 =" -> "7 =" [label="o0"];
+  "5 =" -> "o0";
+  "in0" -> "6 =";
+  "in0" -> "5 =";
+}
+// graph for dag "dag_cleaned_0" of module "freia_73" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+
+  // external copies: 3
+  "o0" [shape=circle];
+  "o0 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o0 =";
+  "o0 =" -> "o0";
+  "o1" [shape=circle];
+  "o1 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o1 =";
+  "o1 =" -> "o1";
+  "o2" [shape=circle];
+  "o2 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o2 =";
+  "o2 =" -> "o2";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+3 copies
+// # SPOC calls: 0
+
+! updated function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);
+   freia_aipo_copy(o1, in0);
+   freia_aipo_copy(o2, in0);
+}
+
+! cleaned up function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);
+   freia_aipo_copy(o1, in0);
+   freia_aipo_copy(o2, in0);
+}
+#
+# TERAPIX
+#
+
+! initial function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);                                            /*0005*/
+   freia_aipo_copy(o1, in0);                                            /*0006*/
+   freia_aipo_copy(o2, o0);                                             /*0007*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_73" in dot format
+digraph "dag_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+  "o2" [shape=circle];
+
+  // computation vertices
+  "7 =" [shape=circle];
+  "7 =" -> "o2";
+  "6 =" [shape=circle];
+  "6 =" -> "o1";
+  "5 =" [shape=circle];
+  "5 =" -> "7 =" [label="o0"];
+  "5 =" -> "o0";
+  "in0" -> "6 =";
+  "in0" -> "5 =";
+}
+// graph for dag "dag_cleaned_0" of module "freia_73" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+
+  // external copies: 3
+  "o0" [shape=circle];
+  "o0 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o0 =";
+  "o0 =" -> "o0";
+  "o1" [shape=circle];
+  "o1 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o1 =";
+  "o1 =" -> "o1";
+  "o2" [shape=circle];
+  "o2 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o2 =";
+  "o2 =" -> "o2";
+}
+
+! acceleration function
+
+// freia terapix includes
+#include <freiaCommon.h>
+#include <freiaMediumGrain.h>
+#include <freiaCoarseGrain.h>
+#include <terapix.h>
+#include <terapix_ucode.h>
+
+// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+3 copies
+
+! updated function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);
+   freia_aipo_copy(o1, in0);
+   freia_aipo_copy(o2, in0);
+}
+
+! cleaned up function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);
+   freia_aipo_copy(o1, in0);
+   freia_aipo_copy(o2, in0);
+}
+#
+# OPENCL
+#
+
+! initial function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);                                            /*0005*/
+   freia_aipo_copy(o1, in0);                                            /*0006*/
+   freia_aipo_copy(o2, o0);                                             /*0007*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_73" in dot format
+digraph "dag_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+  "o0" [shape=circle];
+  "o1" [shape=circle];
+  "o2" [shape=circle];
+
+  // computation vertices
+  "7 =" [shape=circle];
+  "7 =" -> "o2";
+  "6 =" [shape=circle];
+  "6 =" -> "o1";
+  "5 =" [shape=circle];
+  "5 =" -> "7 =" [label="o0"];
+  "5 =" -> "o0";
+  "in0" -> "6 =";
+  "in0" -> "5 =";
+}
+// graph for dag "dag_cleaned_0" of module "freia_73" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
+
+  // external copies: 3
+  "o0" [shape=circle];
+  "o0 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o0 =";
+  "o0 =" -> "o0";
+  "o1" [shape=circle];
+  "o1 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o1 =";
+  "o1 =" -> "o1";
+  "o2" [shape=circle];
+  "o2 =" [shape=circle,label="=",style="dashed"]
+  "in0" -> "o2 =";
+  "o2 =" -> "o2";
+}
+
+! acceleration function
+
+// FREIA OpenCL includes
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freia_opencl_runtime.h"
+
+
+// dag 0: 0 ops and 3 copies, optimized to 0 ops and 0+3 copies
+#include <freia_opencl_runtime.hcl>
+// generated OpenCL kernels for function freia_73
+
+// opencl for dag 0
+
+! updated function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);
+   freia_aipo_copy(o1, in0);
+   freia_aipo_copy(o2, in0);
+}
+
+! cleaned up function
+
+void freia_73(freia_data2d *o0, freia_data2d *o1, freia_data2d *o2, const freia_data2d *in0)
+{
+   freia_aipo_copy(o0, in0);
+   freia_aipo_copy(o1, in0);
+   freia_aipo_copy(o2, in0);
+}
+#
+# FREIA COMPILATION DONE
+#
+
