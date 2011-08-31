@@ -131,23 +131,27 @@ static int opencl_compile_mergeable_dag(
 
   int n_outs = gen_length(dag_outputs(d)), n_ins = gen_length(dag_inputs(d));
 
-  // ??? hey, what about vol(cst(3))?
+  // ??? what about vol(cst(3))?
   pips_assert("some images to process", n_ins+n_outs);
 
   // set pitch and other stuff... we need an image!
   string ref = "i0";
   if (n_outs) ref = "o0";
   sb_cat(helper_decls,
+         // offset between lines computed by pointer arithmetic
          "  int pitch = ", ref, "->row[1] - ", ref, "->row[0];\n"
+         // lines width
          "  int width = ", ref, "->widthWa;\n",
-         "  size_t workSize[2];\n" // why 2?
+         // set block of threads
+         "  size_t workSize[1];\n" // 1D, per row
          "  workSize[0] = ", ref, "->heightWa;\n"
+         // current bpp is taken from the output image...
+         // should it be from the input image, if any?
          "  uint32_t bpp = ", ref, "->bpp>>4;\n"
-         "  cl_kernel kernel;\n"
          "\n"
+         // hmmm... should be really done at init time. how to do that?
          "  // handle on the fly compilation...\n"
          "  static int to_compile = 1;\n"
-         "\n"
          "  if (to_compile) {\n"
          "    freia_status cerr = ", cut_name, "_compile();\n"
          "    // compilation may have failed\n"
@@ -155,8 +159,8 @@ static int opencl_compile_mergeable_dag(
          "    to_compile = 0;\n"
          "  }\n"
          "\n"
-         "  // now get kernel, which must be there...\n"
-         "  kernel = ", cut_name, "_kernel[bpp];\n");
+         "  // now get kernel, which must be have be compiled.\n"
+         "  cl_kernel kernel = ", cut_name, "_kernel[bpp];\n");
 
   sb_cat(opencl,
          "\n"

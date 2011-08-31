@@ -41,7 +41,7 @@
   "// FREIA OpenCL includes\n"                                \
   "#include <CL/opencl.h>\n"                                  \
   "#include \"freia.h\"\n"                                    \
-  "#include \"freia_opencl_runtime.h\"\n"                     \
+  "#include \"private/freia_opencl_runtime.h\"\n"             \
   "\n"
 
 // raw include for opencl code generation
