@@ -1,3 +1,39 @@
+STACK01
+
+Declarations for module "STACK01" with type "INTEGER*4 -> void"
+
+Variable list:
+
+	Declared entity "STACK01:*DYNAMIC*" with type "area" with size 0
+	Declared entity "STACK01:*HEAP*" with type "area" with size 0
+	Declared entity "STACK01:*STACK*" with type "area" with size 0
+	Declared entity "STACK01:*STATIC*" with type "area" with size 0
+	Declared entity "STACK01:A" with type "variable" "REAL*4"
+	Declared entity "STACK01:N" with type "variable" "INTEGER*4"
+
+Layout for formal parameters:
+
+	Variable STACK01:N	offset = 1
+
+Layouts for commons:
+
+Layout for common /STACK01:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /STACK01:*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /STACK01:*STACK*/ of size 0:
+	Variable STACK01:A	offset = -1	size = -1
+
+
+Layout for common /STACK01:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module STACK01
+
       SUBROUTINE STACK01(N)
       REAL A(N)
 

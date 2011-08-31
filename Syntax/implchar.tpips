@@ -4,13 +4,43 @@ delete implchar
 create implchar implchar.f
 setproperty PARSER_DUMP_SYMBOL_TABLE=TRUE 
 
+echo
+echo Symbol table for "DUMMY"
+echo
+
 module DUMMY
+display SYMBOL_TABLE_FILE
+
+echo
+echo Code for "DUMMY"
+echo
+
 display PRINTED_FILE
+
+echo
+echo Symbol table for "DANCE"
+echo
 
 module DANCE
+display SYMBOL_TABLE_FILE
+
+echo
+echo Code for "DANCE"
+echo
+
 display PRINTED_FILE
 
+echo
+echo Symbol table for "IMPLCHAR"
+echo
+
 module IMPLCHAR
+display SYMBOL_TABLE_FILE
+
+echo
+echo Code for "IMPLCHAR"
+echo
+
 display PRINTED_FILE
 
 close
