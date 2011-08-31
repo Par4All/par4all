@@ -1,6 +1,7 @@
 #include <stdio.h>
 void runner(int n,int out[n][n], int in0[n][n], int in1[n][n]) {
     int i,j;
+#pragma terapix
     for(i=0;i<n;i++)
         for(j=0;j<n;j++)
             out[i][j]=in0[i][j]+in1[i][j];

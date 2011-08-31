@@ -26,13 +26,13 @@ void scilab2c()
    int ____temp4Size[2];
    double *U = (void *) 0;
    int __USize[2];
-   ____temp3Size[0] = dabss(dfloors((__temp2-0)/step_u+1));
-   ____temp3Size[1] = dabss(dfloors((__temp2-0)/step_u+1));
-   __temp3 = (double *) realloc(__temp3, dabss(dfloors((__temp2-0)/step_u+1))*dabss(dfloors((__temp2-0)/step_u+1))*sizeof(double));
+   ____temp3Size[0] = dabss(dfloors(__temp2*1/step_u+1));
+   ____temp3Size[1] = dabss(dfloors(__temp2*1/step_u+1));
+   __temp3 = (double *) realloc(__temp3, dabss(dfloors(__temp2*1/step_u+1))*dabss(dfloors(__temp2*1/step_u+1))*sizeof(double));
    dcosa(U, __USize[0]*__USize[1], __temp3);
-   ____temp4Size[0] = dabss(dfloors((__temp2-0)/step_u+1));
-   ____temp4Size[1] = dabss(dfloors((__temp2-0)/step_u+1));
-   __temp4 = (double *) realloc(__temp4, dabss(dfloors((__temp2-0)/step_u+1))*dabss(dfloors((__temp2-0)/step_u+1))*sizeof(double));
+   ____temp4Size[0] = dabss(dfloors(__temp2*1/step_u+1));
+   ____temp4Size[1] = dabss(dfloors(__temp2*1/step_u+1));
+   __temp4 = (double *) realloc(__temp4, dabss(dfloors(__temp2*1/step_u+1))*dabss(dfloors(__temp2*1/step_u+1))*sizeof(double));
 }
 void scilab2c()
 {
@@ -47,16 +47,8 @@ void scilab2c()
    //PIPS generated variable
    double F_0, F_1, F_2, F_3, F_4, F_5, F_6;
    //PIPS generated variable
-   void *P_0;
-   //PIPS generated variable
-   double *P_1;
-   //PIPS generated variable
    int I_0, I_1, I_2;
-   //PIPS generated variable
-   void *P_2;
-   //PIPS generated variable
-   double *P_3;
-   F_4 = dabss(dfloors((__temp2-0)/step_u+1));
+   F_4 = dabss(dfloors(__temp2*1/step_u+1));
    ____temp3Size[0] = F_4;
    ____temp3Size[1] = F_4;
    F_6 = F_4*F_4*sizeof(double);
@@ -78,7 +70,7 @@ void scilab2c()
    int __USize[2];
    //PIPS generated variable
    double F_4, F_6;
-   F_4 = dabss(dfloors((__temp2-0)/step_u+1));
+   F_4 = dabss(dfloors(__temp2*1/step_u+1));
    ____temp3Size[0] = F_4;
    ____temp3Size[1] = F_4;
    F_6 = F_4*F_4*sizeof(double);

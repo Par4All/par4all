@@ -4,6 +4,7 @@
 #endif
 void runner(int n, int img_out[n][n-4], int img[n][n]) {
     int x, y;
+#pragma terapix
     for (y = 0 ; y < n  ; ++y) {
         for (x = 2; x < n - 2; x++) {
             img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);  

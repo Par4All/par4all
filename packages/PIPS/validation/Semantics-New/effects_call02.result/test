@@ -107,7 +107,7 @@ Pointer Regions for "effects_call02"
 //  <j-R-EXACT-{}>
 //  <p-R-EXACT-{}>
 //  <p[PHI1].one-W-EXACT-{PHI1==0}>
-//  <p[PHI1].two[PHI3]-W-EXACT-{PHI1==0}>
+//  <p[PHI1].two[PHI3]-W-MAY-{PHI1==0}>
 //  <q[PHI1]-R-MAY-{}>
 //  <q[PHI1][PHI2]-W-MAY-{PHI2==0}>
 //  <y[PHI1]-W-EXACT-{PHI1==j+1}>
@@ -166,7 +166,7 @@ int main()
 //  <b-R-EXACT-{}>
 //  <sp-R-EXACT-{}>
 //  <sp[PHI1].one-W-EXACT-{PHI1==0}>
-//  <sp[PHI1].two[PHI3]-W-EXACT-{PHI1==0}>
+//  <sp[PHI1].two[PHI3]-W-MAY-{PHI1==0}>
 //  <x[PHI1]-W-EXACT-{PHI1==b+1}>
 
 

@@ -64,7 +64,7 @@ static REAL second   (void);
 static void *mempool;
 
 
-void main(void)
+void main(int argc, char ** argv)
 
     {
     char    buf[80];
@@ -74,14 +74,7 @@ void main(void)
 
     while (1)
         {
-        printf("Enter array size (q to quit) [200]:  ");
-        fgets(buf,79,stdin);
-        if (buf[0]=='q' || buf[0]=='Q')
-            break;
-        if (buf[0]=='\0' || buf[0]=='\n')
-            arsize=200;
-        else
-            arsize=atoi(buf);
+        arsize=argc>1?atoi(argv[1]):200;
         arsize/=2;
         arsize*=2;
         if (arsize<10)
@@ -109,6 +102,7 @@ void main(void)
             nreps*=2;
         free(mempool);
         printf("\n");
+        return ;
         }
     }
 

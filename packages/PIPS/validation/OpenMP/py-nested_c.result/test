@@ -1,6 +1,6 @@
-//
-// Code after openmp for module main
-//
+#
+# Code after openmp for module main
+#
 int main(void)
 {
    int k, i;

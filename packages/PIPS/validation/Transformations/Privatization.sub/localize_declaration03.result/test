@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module getimage
-//
+#
+# Code after privatize_module for module getimage
+#
 void getimage(char *filename)
 {
    double z, amp, sum, squares;
@@ -17,9 +17,9 @@ void getimage(char *filename)
          imagein[i][j].im = 0.0;
       }
 }
-//
-// Code after localize_declaration for module getimage
-//
+#
+# Code after localize_declaration for module getimage
+#
 void getimage(char *filename)
 {
    {

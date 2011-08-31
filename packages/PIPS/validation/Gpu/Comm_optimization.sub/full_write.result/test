@@ -1,6 +1,6 @@
-//
-// Initial code for module main
-//
+#
+# Initial code for module main
+#
 int main()
 {
    // This variable is only here to include a preconditions an make it harder for us to clean regions ;-)
@@ -23,9 +23,9 @@ int main()
 
    res = a[0];
 }
-//
-// Code after kernel_data_mapping for module main
-//
+#
+# Code after kernel_data_mapping for module main
+#
 int main()
 {
    // This variable is only here to include a preconditions an make it harder for us to clean regions ;-)

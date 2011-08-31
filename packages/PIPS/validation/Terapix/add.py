@@ -1,9 +1,8 @@
 from __future__ import with_statement # this is to work with python2.5
-from pyps import workspace,module
-from terapyps import workspace as teraw
-from os import system
+import terapyps
+from pyps import workspace
 workspace.delete("add")
-with teraw("add.c", name="add", deleteOnClose=True) as w:
-	for f in w.fun:
-		if f.name != 'main':
-			f.terapix_code_generation(debug=True)
+with terapyps.workspace("add.c", name="add", deleteOnClose=False,recoverInclude=False) as w:
+    for f in w.fun:
+        f.terapix_code_generation(debug=True)
+#    w.compile(terapyps.Maker())

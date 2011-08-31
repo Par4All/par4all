@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module pas_vous
-//
+#
+# Code after privatize_module for module pas_vous
+#
 void pas_vous()
 {
    int i, j, k;
@@ -10,9 +10,9 @@ void pas_vous()
       for(j = 12; j <= i-1; j += 1)
          printf("%d", j);
 }
-//
-// Code after localize_declaration for module pas_vous
-//
+#
+# Code after localize_declaration for module pas_vous
+#
 void pas_vous()
 {
    int k;

@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module privatize_function_params
-//
+#
+# Code after privatize_module for module privatize_function_params
+#
 void privatize_function_params(float sum)
 {
    int j;
@@ -9,9 +9,9 @@ void privatize_function_params(float sum)
    for(j = 0; j <= 9; j += 1)
       sum += a[10];
 }
-//
-// Code after privatize_module for module privatize_local_variable
-//
+#
+# Code after privatize_module for module privatize_local_variable
+#
 void privatize_local_variable()
 {
    int j;
@@ -21,9 +21,9 @@ void privatize_local_variable()
    for(j = 0; j <= 9; j += 1)
       sum += a[10];
 }
-//
-// Code after localize_declaration for module privatize_function_params
-//
+#
+# Code after localize_declaration for module privatize_function_params
+#
 void privatize_function_params(float sum)
 {
    float a[10];
@@ -38,9 +38,9 @@ void privatize_function_params(float sum)
       }
    }
 }
-//
-// Code after localize_declaration for module privatize_local_variable
-//
+#
+# Code after localize_declaration for module privatize_local_variable
+#
 void privatize_local_variable()
 {
    float a[10];

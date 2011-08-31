@@ -15,19 +15,19 @@ void matrix_mul_vect(size_t N, float C[N], float A[N][N], float B[N]) {
 
 int main(int argc, char ** argv) {
     int i,j,n = argc==1 ? 10 : atoi(argv[1]);
-    float (*a)[n][n],(*b)[n][n], (*c)[n];
+    float (*a)[n][n],(*b)[n], (*c)[n];
     a=malloc(sizeof(float)*n*n);
-    b=malloc(sizeof(float)*n*n);
+    b=malloc(sizeof(float)*n);
     c=malloc(sizeof(float)*n);
     for(i=0;i<n;i++) {
-        (*c)[i]=i;
+        (*b)[i]=1+i;
         for(j=0;j<n;j++)
-            (*a)[i][j]=i*j;
+            (*a)[i][j]=1+i*j;
     }
     matrix_mul_vect(n,c,a,b);
 
     for(i=0;i<n;i++)
-        printf("%f",(*b)[i][i]);
+        printf("|%f|",(*c)[i]);
     free(a);
     free(b);
     return 0;

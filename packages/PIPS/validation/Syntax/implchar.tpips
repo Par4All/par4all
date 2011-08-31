@@ -1,23 +1,48 @@
-#!/bin/sh
+# why force this one?
+setenv PIPS_CHECK_FORTRAN="Y"
+delete implchar
+create implchar implchar.f
+setproperty PARSER_DUMP_SYMBOL_TABLE=TRUE 
 
-# To display the memory layout, a property should be used
-# instead of a debug level.
+echo
+echo Symbol table for "DUMMY"
+echo
 
-if [ -f properties.rc ]
-then
-    echo Incompatible with a local properties.rc file >&2
-    exit 2
-fi
+module DUMMY
+display SYMBOL_TABLE_FILE
 
-echo PARSER_DUMP_SYMBOL_TABLE TRUE >properties.rc
+echo
+echo Code for "DUMMY"
+echo
 
-if Pips -q -f implchar.f -w implchar -m implchar -b PARSED_PRINTED_FILE 2>&1 \
-    | sed '/\//d'
-then
-	exit_code=0
-else
-	exit_code=1
-fi
-Delete implchar 2>/dev/null
-rm properties.rc
-exit $exit_code
+display PRINTED_FILE
+
+echo
+echo Symbol table for "DANCE"
+echo
+
+module DANCE
+display SYMBOL_TABLE_FILE
+
+echo
+echo Code for "DANCE"
+echo
+
+display PRINTED_FILE
+
+echo
+echo Symbol table for "IMPLCHAR"
+echo
+
+module IMPLCHAR
+display SYMBOL_TABLE_FILE
+
+echo
+echo Code for "IMPLCHAR"
+echo
+
+display PRINTED_FILE
+
+close
+delete implchar
+quit

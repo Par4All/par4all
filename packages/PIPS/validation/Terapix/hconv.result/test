@@ -1,0 +1,972 @@
+void runner(int n, int img_out[n][n-2], int img[n][n], int mask[3])
+{
+   int x, y, z;
+#pragma terapix
+   for(y = 0; y <= n-1; y += 1)
+      for(x = 1; x <= n-1-1; x += 1) {
+         int val = 0;
+         for(z = -1; z <= 1; z += 1)
+            val += img[y][x+z]*mask[1+z];
+         img_out[y][x-1] = val;
+      }
+}
+tidy the code just in case of
+void runner(int n, int img_out[n][n-2], int img[n][n], int mask[3])
+{
+   int x, y, z;
+#pragma terapix
+   for(y = 0; y <= n-1; y += 1)
+      for(x = 0; x <= n-3; x += 1) {
+         int val = 0;
+         for(z = 0; z <= 2; z += 1)
+            val += img[y][x+z]*mask[z];
+         img_out[y][x] = val;
+      }
+}
+**** check ok ******
+void runner(int n, int img_out[n][n-2], int img[n][n], int mask[3])
+{
+   int x, y, z;
+#pragma terapix
+   for(y = 0; y <= n-1; y += 1)
+      for(x = 0; x <= n-3; x += 1) {
+         int val = 0;
+         for(z = 0; z <= 2; z += 1)
+            val += img[y][x+z]*mask[z];
+         img_out[y][x] = val;
+      }
+}
+detection and extraction
+tiling
+void runner_l99997(int n, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   unsigned int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int x, y, z;
+l99997:
+#pragma terapix
+      for(y = 0; y <= n-1; y += 1)
+l99998:
+         for(x = 0; x <= n-3; x += 1) {
+            int val = 0;
+l99999:
+            for(z = 0; z <= 2; z += 1)
+               val += img[y][x+z]*mask[z];
+            img_out[y][x] = val;
+         }
+   }
+}
+void runner_l99997(int n, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int x, y, z;
+l99997:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (-1+n)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((-3+n)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (-3+n)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            for(y = I_9; y <= MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1); y += 1)
+               for(x = I_14; x <= MIN(-3+n, I_14+__TERAPYPS_HEIGHT+-1); x += 1) {
+                  int val = 0;
+                  for(z = 0; z <= 2; z += 1)
+                     val += img[y][z+x]*mask[z];
+                  img_out[y][x] = val;
+               }
+         }
+      }
+   }
+}
+void runner_l99997(int n, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, val0, val1, val2, val3;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int x, y, z;
+l99997:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-3)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+__TERAPYPS_WIDTH-1)
+               if (n-3>I_14+__TERAPYPS_HEIGHT-1)
+                  for(y = I_9; y <= I_9+__TERAPYPS_WIDTH-1; y += 1)
+                     for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1) {
+                        val3 = 0;
+                        val3 = 0;
+
+                        for(z = 0; z <= 2; z += 1)
+                           val3 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val3;
+                     }
+               else
+                  for(y = I_9; y <= I_9+__TERAPYPS_WIDTH-1; y += 1)
+                     for(x = I_14; x <= n-3; x += 1) {
+                        val2 = 0;
+                        val2 = 0;
+
+                        for(z = 0; z <= 2; z += 1)
+                           val2 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val2;
+                     }
+            else if (n-3>I_14+__TERAPYPS_HEIGHT-1)
+               for(y = I_9; y <= n-1; y += 1)
+                  for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1) {
+                     val1 = 0;
+                     val1 = 0;
+
+                     for(z = 0; z <= 2; z += 1)
+                        val1 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val1;
+                  }
+            else
+               for(y = I_9; y <= n-1; y += 1)
+                  for(x = I_14; x <= n-3; x += 1) {
+                     val0 = 0;
+                     val0 = 0;
+
+                     for(z = 0; z <= 2; z += 1)
+                        val0 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val0;
+                  }
+         }
+      }
+   }
+}
+void runner_l99997(int n, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, val0, val1, val2, val3;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int x, y, z;
+l99997:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-3)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+__TERAPYPS_WIDTH-1)
+               if (n-3>I_14+__TERAPYPS_HEIGHT-1)
+                  for(y = I_9; y <= I_9+__TERAPYPS_WIDTH-1; y += 1)
+                     for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1) {
+                        val3 = 0;
+                        val3 = 0;
+
+                        for(z = 0; z <= 2; z += 1)
+                           val3 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val3;
+                     }
+               else
+                  for(y = I_9; y <= I_9+__TERAPYPS_WIDTH-1; y += 1)
+                     for(x = I_14; x <= n-3; x += 1) {
+                        val2 = 0;
+                        val2 = 0;
+
+                        for(z = 0; z <= 2; z += 1)
+                           val2 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val2;
+                     }
+            else if (n-3>I_14+__TERAPYPS_HEIGHT-1)
+               for(y = I_9; y <= n-1; y += 1)
+                  for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1) {
+                     val1 = 0;
+                     val1 = 0;
+
+                     for(z = 0; z <= 2; z += 1)
+                        val1 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val1;
+                  }
+            else
+               for(y = I_9; y <= n-1; y += 1)
+                  for(x = I_14; x <= n-3; x += 1) {
+                     val0 = 0;
+                     val0 = 0;
+
+                     for(z = 0; z <= 2; z += 1)
+                        val0 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val0;
+                  }
+         }
+      }
+   }
+}
+group constants and isolate
+void runner_l99997(int n, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   int __TERAPYPS_WIDTH = 128, __TERAPYPS_HEIGHT;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, val0, val1, val2, val3;
+   if (__TERAPYPS_HEIGHT>3||3<128) {
+      //PIPS generated variable
+      int x, y, z;
+l99997:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+         I_1 = MAX(INT((n-3)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = 128*I_0;
+l99984:
+         for(I_1 = 0; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(n-1, I_9+127)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+127)
+               if (n-3>I_14+__TERAPYPS_HEIGHT-1)
+l99994:
+                  for(y = I_9; y <= I_9+127; y += 1)
+l99995:
+                     for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1) {
+                        val3 = 0;
+                        val3 = 0;
+
+l99996:
+                        for(z = 0; z <= 2; z += 1)
+                           val3 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val3;
+                     }
+               else
+l99991:
+                  for(y = I_9; y <= I_9+127; y += 1)
+l99992:
+                     for(x = I_14; x <= n-3; x += 1) {
+                        val2 = 0;
+                        val2 = 0;
+
+l99993:
+                        for(z = 0; z <= 2; z += 1)
+                           val2 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val2;
+                     }
+            else if (n-3>I_14+__TERAPYPS_HEIGHT-1)
+l99988:
+               for(y = I_9; y <= n-1; y += 1)
+l99989:
+                  for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1) {
+                     val1 = 0;
+                     val1 = 0;
+
+l99990:
+                     for(z = 0; z <= 2; z += 1)
+                        val1 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val1;
+                  }
+            else
+l99985:
+               for(y = I_9; y <= n-1; y += 1)
+l99986:
+                  for(x = I_14; x <= n-3; x += 1) {
+                     val0 = 0;
+                     val0 = 0;
+
+l99987:
+                     for(z = 0; z <= 2; z += 1)
+                        val0 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val0;
+                  }
+         }
+      }
+   }
+}
+void runner_l99997(int n, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   int __TERAPYPS_WIDTH = 128, __TERAPYPS_HEIGHT;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, val0, val1, val2, val3;
+   __TERAPYPS_HEIGHT = 254;
+   if (__TERAPYPS_HEIGHT>3||3<128) {
+      //PIPS generated variable
+      int x, y, z;
+l99997:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+         I_1 = MAX(INT((n-3)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = 128*I_0;
+l99984:
+         for(I_1 = 0; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(n-1, I_9+127)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+127)
+               if (n-3>I_14+__TERAPYPS_HEIGHT-1)
+l99994:
+                  for(y = I_9; y <= I_9+127; y += 1)
+l99995:
+                     for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1) {
+                        val3 = 0;
+                        val3 = 0;
+
+l99996:
+                        for(z = 0; z <= 2; z += 1)
+                           val3 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val3;
+                     }
+               else
+l99991:
+                  for(y = I_9; y <= I_9+127; y += 1)
+l99992:
+                     for(x = I_14; x <= n-3; x += 1) {
+                        val2 = 0;
+                        val2 = 0;
+
+l99993:
+                        for(z = 0; z <= 2; z += 1)
+                           val2 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val2;
+                     }
+            else if (n-3>I_14+__TERAPYPS_HEIGHT-1)
+l99988:
+               for(y = I_9; y <= n-1; y += 1)
+l99989:
+                  for(x = I_14; x <= I_14+__TERAPYPS_HEIGHT-1; x += 1) {
+                     val1 = 0;
+                     val1 = 0;
+
+l99990:
+                     for(z = 0; z <= 2; z += 1)
+                        val1 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val1;
+                  }
+            else
+l99985:
+               for(y = I_9; y <= n-1; y += 1)
+l99986:
+                  for(x = I_14; x <= n-3; x += 1) {
+                     val0 = 0;
+                     val0 = 0;
+
+l99987:
+                     for(z = 0; z <= 2; z += 1)
+                        val0 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val0;
+                  }
+         }
+      }
+   }
+}
+**** check ok ******
+void runner_l99997(int n, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   //PIPS generated variable
+   int I_0, I_1, val0, val1, val2, val3;
+
+   if (254>3||3<128) {
+      //PIPS generated variable
+      int x, y, z;
+l99997:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+
+
+l99984:
+         for(I_1 = 0; I_1 <= (n-3)/254; I_1 += 1) {
+
+
+            if (n-1>128*I_0+127)
+               if (n-3>254*I_1+253)
+l99994:
+                  for(y = 128*I_0; y <= 128*I_0+127; y += 1)
+l99995:
+                     for(x = 254*I_1; x <= 254*I_1+253; x += 1) {
+
+                        val3 = 0;
+
+l99996:
+                        for(z = 0; z <= 2; z += 1)
+                           val3 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val3;
+                     }
+               else
+l99991:
+                  for(y = 128*I_0; y <= 128*I_0+127; y += 1)
+l99992:
+                     for(x = 254*I_1; x <= n-3; x += 1) {
+
+                        val2 = 0;
+
+l99993:
+                        for(z = 0; z <= 2; z += 1)
+                           val2 += img[y][x+z]*mask[z];
+                        img_out[y][x] = val2;
+                     }
+            else if (n-3>254*I_1+253)
+l99988:
+               for(y = 128*I_0; y <= n-1; y += 1)
+l99989:
+                  for(x = 254*I_1; x <= 254*I_1+253; x += 1) {
+
+                     val1 = 0;
+
+l99990:
+                     for(z = 0; z <= 2; z += 1)
+                        val1 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val1;
+                  }
+            else
+l99985:
+               for(y = 128*I_0; y <= n-1; y += 1)
+l99986:
+                  for(x = 254*I_1; x <= n-3; x += 1) {
+
+                     val0 = 0;
+
+l99987:
+                     for(z = 0; z <= 2; z += 1)
+                        val0 += img[y][x+z]*mask[z];
+                     img_out[y][x] = val0;
+                  }
+         }
+      }
+   }
+}
+void tile_l99994(int n, int I_0, int I_1, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   //PIPS generated variable
+   int x, y, z, val3;
+   {
+      //PIPS generated variable
+      int z0, caillou[3];
+      for(z0 = 0; z0 <= 3-1; z0 += 1)
+         caillou[z0] = mask[z0];
+
+l99994:
+      for(y = 128*I_0; y <= 128*I_0+127; y += 1)
+l99995:
+         for(x = 254*I_1; x <= 254*I_1+253; x += 1) {
+
+            val3 = 0;
+
+l99996:
+            for(z = 0; z <= 2; z += 1)
+               val3 += img[y][x+z]*caillou[z];
+            img_out[y][x] = val3;
+         }
+   }
+}
+void tile_l99994(int n, int I_0, int I_1, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   //PIPS generated variable
+   int x, y, z, val3;
+   {
+      //PIPS generated variable
+      int z0, caillou[3];
+      for(z0 = 0; z0 <= 3-1; z0 += 1)
+         caillou[z0] = mask[z0];
+
+      {
+         //PIPS generated variable
+         int (*img0)[128][256] = (int (*)[128][256]) 0, (*caillou0)[3] = (int (*)[3]) 0, (*img_out0)[128][254] = (int (*)[128][254]) 0;
+         P4A_accel_malloc((void **) &img_out0, sizeof(int)*32512);
+         P4A_accel_malloc((void **) &caillou0, sizeof(int)*3);
+         P4A_accel_malloc((void **) &img0, sizeof(int)*32768);
+         P4A_copy_to_accel_1d(sizeof(int), 3, 3, 0, &caillou[0], *caillou0);
+         P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 254*I_1, &img[0][0], *img0);
+
+l99994:
+         for(y = 128*I_0; y <= 128*I_0+127; y += 1)
+l99995:
+            for(x = 254*I_1; x <= 254*I_1+253; x += 1) {
+
+               val3 = 0;
+
+l99996:
+               for(z = 0; z <= 2; z += 1)
+                  val3 += (*img0)[y-128*I_0][x+z-254*I_1]*(*caillou0)[z-0];
+               (*img_out0)[y-128*I_0][x-254*I_1] = val3;
+            }
+         P4A_copy_from_accel_2d(sizeof(int), n, n-2, 128, 254, 128*I_0, 254*I_1, &img_out[0][0], *img_out0);
+         P4A_accel_free(img_out0);
+         P4A_accel_free(caillou0);
+         P4A_accel_free(img0);
+      }
+   }
+}
+**** check ok ******
+outlining to launcher
+void tile_l99994(int n, int I_0, int I_1, int img[n][n], int img_out[n][n-2], int mask[3])
+{
+   //PIPS generated variable
+   int x, y, z, val3;
+   {
+      //PIPS generated variable
+      int z0, caillou[3];
+l99999:
+      for(z0 = 0; z0 <= 2; z0 += 1)
+         caillou[z0] = mask[z0];
+
+      {
+         //PIPS generated variable
+         int (*img0)[128][256] = (int (*)[128][256]) 0, (*caillou0)[3] = (int (*)[3]) 0, (*img_out0)[128][254] = (int (*)[128][254]) 0;
+         P4A_accel_malloc((void **) &img_out0, 32512*sizeof(int));
+         P4A_accel_malloc((void **) &caillou0, 3*sizeof(int));
+         P4A_accel_malloc((void **) &img0, 32768*sizeof(int));
+         P4A_copy_to_accel_1d(sizeof(int), 3, 3, 0, &caillou[0], *caillou0);
+         P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 254*I_1, &img[0][0], *img0);
+
+l99994:         launcher_0(253+1, *caillou0, *img0, *img_out0);
+         P4A_copy_from_accel_2d(sizeof(int), n, n-2, 128, 254, 128*I_0, 254*I_1, &img_out[0][0], *img_out0);
+         P4A_accel_free(img_out0);
+         P4A_accel_free(caillou0);
+         P4A_accel_free(img0);
+      }
+   }
+}
+
+//  <caillou0[PHI1]-R-EXACT-{0<=PHI1, PHI1<=2, I_23==254}>
+//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=I_23+1, I_23==254}>
+//  <img_out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2+1<=I_23, I_23==254}>
+
+void launcher_0(int I_23, int caillou0[3], int img0[128][256], int img_out0[128][254])
+{
+   //PIPS generated variable
+   int val3, x, y, z;
+
+//  <caillou0[PHI1]-R-EXACT-{0<=PHI1, PHI1<=2, I_23==254}>
+//  <img0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2<=I_23+1, I_23==254}>
+//  <img_out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
+//    PHI2+1<=I_23, I_23==254}>
+
+l99994:
+   for(y = 0; y <= 127; y += 1)
+
+//  <caillou0[PHI1]-R-EXACT-{0<=PHI1, PHI1<=2, I_23==254, 0<=y,
+//    y<=127}>
+//  <img0[PHI1][PHI2]-R-EXACT-{PHI1==y, 0<=PHI2, PHI2<=I_23+1,
+//    I_23==254, 0<=y, y<=127}>
+//  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==y, 0<=PHI2, PHI2+1<=I_23,
+//    I_23==254, 0<=y, y<=127}>
+
+l99995:
+      for(x = 0; x <= I_23-1; x += 1) {
+
+         val3 = 0;
+
+//  <caillou0[PHI1]-R-EXACT-{0<=PHI1, PHI1<=2, I_23==254, 0<=x,
+//    x<=253, 0<=y, y<=127}>
+//  <img0[PHI1][PHI2]-R-EXACT-{PHI1==y, x<=PHI2, PHI2<=x+2, I_23==254,
+//    0<=x, x<=253, 0<=y, y<=127}>
+
+
+l99996:
+         for(z = 0; z <= 2; z += 1)
+
+//  <caillou0[PHI1]-R-EXACT-{PHI1==z, I_23==254, 0<=x, x<=253, 0<=y,
+//    y<=127, 0<=z, z<=2}>
+//  <img0[PHI1][PHI2]-R-EXACT-{PHI1==y, x+z==PHI2, I_23==254, 0<=x,
+//    x<=253, 0<=y, y<=127, 0<=z, z<=2}>
+
+            val3 += img0[y][x+z]*caillou0[z];
+
+//  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==y, PHI2==x, z==3, I_23==254,
+//    0<=x, x<=253, 0<=y, y<=127}>
+
+         img_out0[y][x] = val3;
+      }
+}
+outlining to microcode
+void launcher_0(int I_23, int caillou0[3], int img0[128][256], int img_out0[128][254])
+{
+   //PIPS generated variable
+   int val3, x, y, z;
+l99994:
+   for(y = 0; y <= 127; y += 1)
+l99995:
+      for(x = 0; x <= I_23-1; x += 1) {
+
+         val3 = 0;
+
+l99996:
+         for(z = 0; z <= 2; z += 1)
+            val3 += img0[y][x+z]*caillou0[z];
+         img_out0[y][x] = val3;
+      }
+}
+void launcher_0(int I_23, int caillou0[3], int img0[128][256], int img_out0[128][254])
+{
+   //PIPS generated variable
+   int val3, x, y, z;
+l99994:
+   for(y = 0; y <= 127; y += 1)
+l99995:
+      for(x = 0; x <= I_23-1; x += 1) {
+
+         val3 = 0;
+
+l99996:
+         for(z = 0; z <= 2; z += 1)
+            val3 += img0[y][x+z]*caillou0[z];
+         img_out0[y][x] = val3;
+      }
+}
+void launcher_0(int I_23, int caillou0[3], int img0[128][256], int img_out0[128][254])
+{
+   //PIPS generated variable
+   int val3, x, y, z;
+l99994:
+   for(y = 0; y <= 127; y += 1)
+l99995:      launcher_0_microcode(I_23, caillou0, *&img0[y], *&img_out0[y]);
+}
+void launcher_0_microcode(int I_23, int caillou0[3], int img00[256], int img_out00[254])
+{
+   //PIPS generated variable
+   int val3, x, z;
+l99995:
+   for(x = 0; x <= I_23-1; x += 1) {
+
+      val3 = 0;
+
+l99996:
+      for(z = 0; z <= 2; z += 1)
+         val3 += img00[x+z]*caillou0[z];
+      img_out00[x] = val3;
+   }
+}
+**** check ok ******
+refining microcode
+void launcher_0_microcode(int I_23, int caillou0[3], int img00[256], int img_out00[254])
+{
+   //PIPS generated variable
+   int val3, x, z;
+l99995:
+   for(x = 0; x <= I_23-1; x += 1) {
+
+      val3 = 0;
+
+l99996:
+      for(z = 0; z <= 2; z += 1)
+         val3 += img00[x+z]*caillou0[z];
+      img_out00[x] = val3;
+   }
+}
+void launcher_0_microcode(int I_23, int *caillou0, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int val3, x, z;
+l99995:
+   for(x = 0; x <= I_23-1; x += 1) {
+
+      val3 = 0;
+
+l99996:
+      for(z = 0; z <= 2; z += 1)
+         val3 += *(img00+(x+z))**(caillou0+z);
+      *(img_out00+x) = val3;
+   }
+}
+**** check ok ******
+void launcher_0_microcode(int I_23, int *caillou0, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int val3, x, z;
+   //PIPS generated variable
+   int *P_0;
+l99995:
+   for(x = 0; x <= I_23-1; x += 1) {
+
+      val3 = 0;
+      P_0 = img00+x;
+      for(z = 0; z <= 2; z += 1)
+         val3 += *(z+P_0)**(z+caillou0);
+      *(img_out00+x) = val3;
+   }
+}
+void launcher_0_microcode(int I_23, int *caillou0, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int val3, x, z;
+   //PIPS generated variable
+   int *P_0, *img000, *img_out000, *P_00, *caillou00;
+   img_out000 = img_out00;
+   img000 = img00;
+l99995:
+   for(x = 0; x <= I_23-1; x += 1) {
+
+      val3 = 0;
+      P_0 = img000;
+      caillou00 = caillou0;
+      P_00 = P_0;
+      for(z = 0; z <= 2; z += 1) {
+         val3 += *P_00**caillou00;
+         caillou00 += 1;
+         P_00 += 1;
+      }
+      *img_out000 = val3;
+      img_out000 += 1;
+      img000 += 1;
+   }
+}
+**** check ok ******
+void launcher_0_microcode(int I_23, int *caillou0, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int val3, x, z;
+   //PIPS generated variable
+   int *P_0, *img000, *img_out000, *P_00, *caillou00;
+   img_out000 = img_out00;
+   img000 = img00;
+l99995:
+   for(x = 0; x <= I_23-1; x += 1) {
+
+      val3 = 0;
+      P_0 = img000;
+      caillou00 = caillou0;
+      P_00 = P_0;
+      for(z = 0; z <= 2; z += 1) {
+         val3 += *P_00**caillou00;
+         caillou00 += 1;
+         P_00 += 1;
+      }
+      *img_out000 = val3;
+      img_out000 += 1;
+      img000 += 1;
+   }
+}
+**** check ok ******
+**** check ok ******
+void launcher_0_microcode(int I_23, int *caillou0, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int val3, x, z;
+   //PIPS generated variable
+   int *P_0, *img000, *img_out000, *P_00, *caillou00;
+   img_out000 = img_out00;
+   img000 = img00;
+l99995:
+   for(x = 0; x <= I_23-1; x += 1) {
+
+      val3 = 0;
+      P_0 = img000;
+      caillou00 = caillou0;
+      P_00 = P_0;
+      for(z = 0; z <= 2; z += 1) {
+         val3 += *P_00**caillou00;
+         caillou00 += 1;
+         P_00 += 1;
+      }
+      *img_out000 = val3;
+      img_out000 += 1;
+      img000 += 1;
+   }
+}
+void launcher_0_microcode(int I_23, int *caillou0, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int val3, x, z;
+   //PIPS generated variable
+   int *P_0, *img000, *img_out000, *P_00, *caillou00;
+   img_out000 = img_out00;
+   img000 = img00;
+l99995:
+   for(x = 0; x <= I_23-1; x += 1) {
+
+      val3 = 0;
+      P_0 = img000;
+      caillou00 = caillou0;
+      P_00 = P_0;
+      for(z = 0; z <= 2; z += 1) {
+         val3 = val3+*P_00**caillou00;
+         caillou00 = caillou00+1;
+         P_00 = P_00+1;
+      }
+      *img_out000 = val3;
+      img_out000 = img_out000+1;
+      img000 = img000+1;
+   }
+}
+**** check ok ******
+void launcher_0_microcode(int I_23, int *caillou0, int *img00, int *img_out00)
+{
+   //PIPS generated variable
+   int val3, x, z;
+   //PIPS generated variable
+   int *P_0, *img000, *img_out000, *P_00, *caillou00;
+   img_out000 = img_out00;
+   img000 = img00;
+l99995:
+   for(x = 0; x <= I_23-1; x += 1) {
+
+      val3 = 0;
+      P_0 = img000;
+      caillou00 = caillou0;
+      P_00 = P_0;
+      for(z = 0; z <= 2; z += 1) {
+         val3 = val3+*P_00**caillou00;
+         caillou00 = caillou00+1;
+         P_00 = P_00+1;
+      }
+      *img_out000 = val3;
+      img_out000 = img_out000+1;
+      img000 = img000+1;
+   }
+}
+**** check ok ******
+I_23 belongs to a loop bound
+caillou0 seems a mask
+img00 seems an image
+img_out00 seems an image
+void launcher_0_microcode(int *FIFO3, int *FIFO2, int *FIFO1, int N1)
+{
+   //PIPS generated variable
+#pragma terapix img_out00 128 254
+#pragma terapix img00 128 256
+#pragma terapix caillou0 3
+   int val3, x, z;
+   //PIPS generated variable
+   int *P_0, *img000, *img_out000, *P_00, *caillou00;
+   //PIPS generated variable
+   int re5;
+   //PIPS generated variable
+   int *im1, *im2, *im3, *im4, *im5, *caillou0, *ma6, *img00, *im7, *img_out00, *im8;
+   //PIPS generated variable
+   int re6, re7, re8, re9, re10, re11;
+   //PIPS generated variable
+   int *im9, *im10, *im11, *im12, *im13, *ma1, *im14, *im15, *im16;
+   //PIPS generated variable
+   int re12, re13, re14;
+   //PIPS generated variable
+   int *im17, *im18, *im19, *im20, *im21, *im22, *im23, *im24;
+   //PIPS generated variable
+   int P;
+   im8 = FIFO3;
+   im7 = FIFO2;
+   ma6 = FIFO1;
+   im3 = im8;
+   im4 = im7;
+   im4 = im4-1;
+   im3 = im3-1;
+l99995:
+   for(re7 = 0; re7 <= N1; re7 += 1) {
+      im4 = im4+1;
+      //PIPS generated variable
+      int I_24;
+
+      P = 0;
+      im5 = im4;
+      ma1 = ma6;
+      im2 = im5;
+      P = P+*im2**ma1;
+      P = P+*++im2**++ma1;
+      P = P+*++im2**++ma1;
+      *++im3 = P;
+   }
+}
+**** check ok ******
+void launcher_0_microcode(int *FIFO3, int *FIFO2, int *FIFO1, int N1)
+{
+   //PIPS generated variable
+#pragma terapix img_out00 128 254
+#pragma terapix img00 128 256
+#pragma terapix caillou0 3
+   int val3, x, z;
+   //PIPS generated variable
+   int *P_0, *img000, *img_out000, *P_00, *caillou00;
+   //PIPS generated variable
+   int re5;
+   //PIPS generated variable
+   int *im1, *im2, *im3, *im4, *im5, *caillou0, *ma6, *img00, *im7, *img_out00, *im8;
+   //PIPS generated variable
+   int re6, re7, re8, re9, re10, re11;
+   //PIPS generated variable
+   int *im9, *im10, *im11, *im12, *im13, *ma1, *im14, *im15, *im16;
+   //PIPS generated variable
+   int re12, re13, re14;
+   //PIPS generated variable
+   int *im17, *im18, *im19, *im20, *im21, *im22, *im23, *im24;
+   //PIPS generated variable
+   int P;
+   im8 = FIFO3;
+   im7 = FIFO2;
+   ma6 = FIFO1;
+   im3 = im8;
+   im4 = im7;
+   im4 = im4-1;
+   im3 = im3-1;
+l99995:
+   for(re7 = 0; re7 <= N1; re7 += 1) {
+      im4 = im4+1;
+      //PIPS generated variable
+      int I_24;
+
+      P = 0;
+      im5 = im4;
+      ma1 = ma6;
+      im2 = im5;
+      P = P+*im2**ma1;
+      P = P+*++im2**++ma1;
+      P = P+*++im2**++ma1;
+      *++im3 = P;
+   }
+}
+void launcher_0(int I_23, int caillou0[3], int img0[128][256], int img_out0[128][254])
+{
+   //PIPS generated variable
+   int val3, x, y, z;
+l99994:
+   for(y = 0; y <= 127; y += 1)
+l99995:      launcher_0_microcode(*&img_out0[y], *&img0[y], caillou0, I_23);
+}
+**** check ok ******
+int main(int argc, char **argv)
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int out[n][n-2], in[n][n], mask[3] = {1, 1, 1};
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         in[i][j] = j;
+   runner(n, out, in, mask);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-4-1; j += 1)
+         check += out[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+tidy the code just in case of
+int main(int argc, char **argv)
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int out[n][n-3+1], in[n][n], mask[3] = {1, 1, 1};
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         in[i][j] = j;
+   runner(n, out, in, mask);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-5; j += 1)
+         check += out[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+**** check ok ******
+int main(int argc, char **argv)
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int out[n][n-3+1], in[n][n], mask[3] = {1, 1, 1};
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         in[i][j] = j;
+   runner(n, out, in, mask);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-5; j += 1)
+         check += out[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+detection and extraction
+tiling

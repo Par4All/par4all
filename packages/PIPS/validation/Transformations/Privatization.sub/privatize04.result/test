@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module c_est_dommage
-//
+#
+# Code after privatize_module for module c_est_dommage
+#
 void c_est_dommage()
 {
    int i, j, k, l;
@@ -16,9 +16,9 @@ void c_est_dommage()
    }
    j = l;
 }
-//
-// Code after localize_declaration for module c_est_dommage
-//
+#
+# Code after localize_declaration for module c_est_dommage
+#
 void c_est_dommage()
 {
    int j, l;

@@ -1,6 +1,6 @@
-//
-// Display print_code_preconditions for module induction04
-//
+#
+# Display print_code_preconditions for module induction04
+#
 
 //  P() {}
 
@@ -41,9 +41,9 @@ void induction04(int SIZE, double A[SIZE], double B[SIZE][SIZE])
       }
    }
 }
-//
-// Code after induction_substitution for module induction04
-//
+#
+# Code after induction_substitution for module induction04
+#
 void induction04(int SIZE, double A[SIZE], double B[SIZE][SIZE])
 {
    int i, j;

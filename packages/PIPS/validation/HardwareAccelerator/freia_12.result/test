@@ -657,11 +657,15 @@ digraph "freia_12_helper_0_0" {
 
 ! acceleration function
 
-// freia opencl includes
+// FREIA OpenCL includes
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freia_opencl_runtime.h"
+
 
 // dag 0: 2 ops and 0 copies, optimized to 2 ops and 0+0 copies
-// freia opencl includes
-// generated opencl for function freia_12
+#include <freia_opencl_runtime.hcl>
+// generated OpenCL kernels for function freia_12
 
 // opencl for dag 0
 

@@ -1,1 +1,4 @@
-../default_tpips
+# force OpenCL compilation
+setproperty HWAC_OPENCL_COMPILE_ONE_OPERATION TRUE
+# use common version
+source ../default_tpips

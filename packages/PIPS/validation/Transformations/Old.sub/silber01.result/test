@@ -240,7 +240,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
             current = dest[j*w+i];
-            dest[j*w+i] = lut[dest[j*w+i]];
+            dest[j*w+i] = lut[current];
          }
    }
    {
@@ -250,7 +250,7 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
             current = dest[j*w+i];
-            dest[j*w+i] = (int) dest[j*w+i]+val>255?255:dest[j*w+i]+val;
+            dest[j*w+i] = (int) current+val>255?255:current+val;
          }
    }
 }
@@ -288,13 +288,9 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
       for(i = 0; i <= I_0; i += 1)
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
-            //1
-            I_6 = j*w;
-            //3
-            I_7 = i+I_6;
-            I_8 = dest[I_7];
-            current = I_8;
-            dest[I_7] = lut[I_8];
+            I_7 = j*w+i;
+            current = dest[I_7];
+            dest[I_7] = lut[current];
          }
    }
    {
@@ -303,13 +299,9 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
       for(i = 0; i <= I_0; i += 1)
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
-            //1
-            I_11 = j*w;
-            //4
-            I_12 = i+I_11;
-            I_13 = dest[I_12];
-            current = I_13;
-            dest[I_12] = (int) I_13+val>255?255:I_13+val;
+            I_12 = j*w+i;
+            current = dest[I_12];
+            dest[I_12] = (int) current+val>255?255:current+val;
          }
    }
 }
@@ -347,13 +339,9 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
       for(i = 0; i <= I_0; i += 1)
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
-            //1
-            I_6 = j*w;
-            //3
-            I_7 = i+I_6;
-            I_8 = dest[I_7];
-            current = I_8;
-            dest[I_7] = lut[I_8];
+            I_7 = j*w+i;
+            current = dest[I_7];
+            dest[I_7] = lut[current];
          }
    }
    {
@@ -362,13 +350,9 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
       for(i = 0; i <= I_0; i += 1)
          for(j = 0; j <= h-1; j += 1) {
             unsigned char current;
-            //1
-            I_11 = j*w;
-            //4
-            I_12 = i+I_11;
-            I_13 = dest[I_12];
-            current = I_13;
-            dest[I_12] = (int) I_13+val>255?255:I_13+val;
+            I_12 = j*w+i;
+            current = dest[I_12];
+            dest[I_12] = (int) current+val>255?255:current+val;
          }
    }
 }
@@ -409,24 +393,16 @@ void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned c
 
    for(i_0 = 0; i_0 <= I_0; i_0 += 1)
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-         //1
-         I_6 = j_0*w;
-         //3
-         I_7 = i_0+I_6;
-         I_8 = dest[I_7];
-         current_0 = I_8;
-         dest[I_7] = lut[I_8];
+         I_7 = j_0*w+i_0;
+         current_0 = dest[I_7];
+         dest[I_7] = lut[current_0];
       }
 
    for(i_1 = 0; i_1 <= I_0; i_1 += 1)
       for(j_1 = 0; j_1 <= h-1; j_1 += 1) {
-         //1
-         I_11 = j_1*w;
-         //4
-         I_12 = i_1+I_11;
-         I_13 = dest[I_12];
-         current_1 = I_13;
-         dest[I_12] = (int) I_13+val>255?255:I_13+val;
+         I_12 = j_1*w+i_1;
+         current_1 = dest[I_12];
+         dest[I_12] = (int) current_1+val>255?255:current_1+val;
       }
 }
 

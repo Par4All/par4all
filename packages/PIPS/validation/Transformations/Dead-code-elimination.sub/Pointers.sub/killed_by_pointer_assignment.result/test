@@ -1,6 +1,6 @@
-//
-// Code after dead_code_elimination for module dead_code_elim01
-//
+#
+# Code after dead_code_elimination for module dead_code_elim01
+#
 int dead_code_elim01()
 {
    int i, *x, *y;
@@ -18,9 +18,9 @@ int dead_code_elim01()
    return i;
 }
 // With points-to
-//
-// Code after dead_code_elimination for module dead_code_elim01
-//
+#
+# Code after dead_code_elimination for module dead_code_elim01
+#
 int dead_code_elim01()
 {
    int i, *x, *y;

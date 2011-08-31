@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module main
-//
+#
+# Code after privatize_module for module main
+#
 int main(int argc, char *argv[])
 {
    float b[N], c[N], a;
@@ -22,9 +22,9 @@ compute:
    printf("Result = %f\n", a);
    return 0;
 }
-//
-// Code after localize_declaration for module main
-//
+#
+# Code after localize_declaration for module main
+#
 int main(int argc, char *argv[])
 {
    float b[N], c[N], a;
