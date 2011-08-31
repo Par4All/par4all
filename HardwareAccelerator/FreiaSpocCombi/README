@@ -6,6 +6,6 @@ To run this validation:
 
   sh> make generate
   # generate 1005 files
-  sh> make validate
+  sh> make validate-test
   # there should be no coredumps, i.e. no remaining databases
   sh> make full-clean   
