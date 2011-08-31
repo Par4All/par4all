@@ -2919,7 +2919,7 @@ static freia_status oop_core_helper_0_0_1_compile(void)
     "  GLOBAL PIXEL * j3 = i3 + ofs_i3;\n"
     "  GLOBAL PIXEL * j4 = i4 + ofs_i4;\n"
     "  GLOBAL PIXEL * j5 = i5 + ofs_i5;\n"
-    "  int gid = get_global_id(1)*pitch + get_global_id(0);\n"
+    "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
     "  {\n"
@@ -2977,31 +2977,31 @@ freia_status oop_core_helper_0_0_1(
 
   // now get kernel, which must be have be compiled.
   cl_kernel kernel = oop_core_helper_0_0_1_kernel[bpp];
-  cl_int ofs_o0 = freia_common_data_get_offset(o0);
-  cl_int ofs_o1 = freia_common_data_get_offset(o1);
-  cl_int ofs_i0 = freia_common_data_get_offset(i0);
-  cl_int ofs_i1 = freia_common_data_get_offset(i1);
-  cl_int ofs_i2 = freia_common_data_get_offset(i2);
-  cl_int ofs_i3 = freia_common_data_get_offset(i3);
-  cl_int ofs_i4 = freia_common_data_get_offset(i4);
-  cl_int ofs_i5 = freia_common_data_get_offset(i5);
 
   // set kernel parameters
-  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId]);
+  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId].mem);
+  cl_int ofs_o0 = freia_common_data_get_offset(o0);
   err |= clSetKernelArg(kernel, 1, sizeof(cl_int), &ofs_o0);
-  err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &pool[o1->clId]);
+  err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &pool[o1->clId].mem);
+  cl_int ofs_o1 = freia_common_data_get_offset(o1);
   err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &ofs_o1);
-  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &pool[i0->clId]);
+  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &pool[i0->clId].mem);
+  cl_int ofs_i0 = freia_common_data_get_offset(i0);
   err |= clSetKernelArg(kernel, 5, sizeof(cl_int), &ofs_i0);
-  err |= clSetKernelArg(kernel, 6, sizeof(cl_mem), &pool[i1->clId]);
+  err |= clSetKernelArg(kernel, 6, sizeof(cl_mem), &pool[i1->clId].mem);
+  cl_int ofs_i1 = freia_common_data_get_offset(i1);
   err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &ofs_i1);
-  err |= clSetKernelArg(kernel, 8, sizeof(cl_mem), &pool[i2->clId]);
+  err |= clSetKernelArg(kernel, 8, sizeof(cl_mem), &pool[i2->clId].mem);
+  cl_int ofs_i2 = freia_common_data_get_offset(i2);
   err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &ofs_i2);
-  err |= clSetKernelArg(kernel, 10, sizeof(cl_mem), &pool[i3->clId]);
+  err |= clSetKernelArg(kernel, 10, sizeof(cl_mem), &pool[i3->clId].mem);
+  cl_int ofs_i3 = freia_common_data_get_offset(i3);
   err |= clSetKernelArg(kernel, 11, sizeof(cl_int), &ofs_i3);
-  err |= clSetKernelArg(kernel, 12, sizeof(cl_mem), &pool[i4->clId]);
+  err |= clSetKernelArg(kernel, 12, sizeof(cl_mem), &pool[i4->clId].mem);
+  cl_int ofs_i4 = freia_common_data_get_offset(i4);
   err |= clSetKernelArg(kernel, 13, sizeof(cl_int), &ofs_i4);
-  err |= clSetKernelArg(kernel, 14, sizeof(cl_mem), &pool[i5->clId]);
+  err |= clSetKernelArg(kernel, 14, sizeof(cl_mem), &pool[i5->clId].mem);
+  cl_int ofs_i5 = freia_common_data_get_offset(i5);
   err |= clSetKernelArg(kernel, 15, sizeof(cl_int), &ofs_i5);
   err |= clSetKernelArg(kernel, 16, sizeof(cl_int), &width);
   err |= clSetKernelArg(kernel, 17, sizeof(cl_int), &pitch);
@@ -3048,7 +3048,7 @@ static freia_status oop_core_helper_0_0_3_compile(void)
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
-    "  int gid = get_global_id(1)*pitch + get_global_id(0);\n"
+    "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
     "  {\n"
@@ -3096,16 +3096,16 @@ freia_status oop_core_helper_0_0_3(
 
   // now get kernel, which must be have be compiled.
   cl_kernel kernel = oop_core_helper_0_0_3_kernel[bpp];
-  cl_int ofs_o0 = freia_common_data_get_offset(o0);
-  cl_int ofs_i0 = freia_common_data_get_offset(i0);
-  cl_int ofs_i1 = freia_common_data_get_offset(i1);
 
   // set kernel parameters
-  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId]);
+  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId].mem);
+  cl_int ofs_o0 = freia_common_data_get_offset(o0);
   err |= clSetKernelArg(kernel, 1, sizeof(cl_int), &ofs_o0);
-  err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &pool[i0->clId]);
+  err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &pool[i0->clId].mem);
+  cl_int ofs_i0 = freia_common_data_get_offset(i0);
   err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &ofs_i0);
-  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &pool[i1->clId]);
+  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &pool[i1->clId].mem);
+  cl_int ofs_i1 = freia_common_data_get_offset(i1);
   err |= clSetKernelArg(kernel, 5, sizeof(cl_int), &ofs_i1);
   err |= clSetKernelArg(kernel, 6, sizeof(cl_int), &width);
   err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &pitch);
@@ -3161,7 +3161,7 @@ KERNEL void oop_core_helper_0_0_1(
   GLOBAL PIXEL * j3 = i3 + ofs_i3;
   GLOBAL PIXEL * j4 = i4 + ofs_i4;
   GLOBAL PIXEL * j5 = i5 + ofs_i5;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
+  int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
   {
@@ -3201,7 +3201,7 @@ KERNEL void oop_core_helper_0_0_3(
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
   GLOBAL PIXEL * j1 = i1 + ofs_i1;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
+  int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
   {

@@ -603,7 +603,7 @@ static freia_status freia_14_helper_0_0_0_compile(void)
     "  int c0)\n"
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
-    "  int gid = get_global_id(1)*pitch + get_global_id(0);\n"
+    "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
     "  {\n"
@@ -644,10 +644,10 @@ freia_status freia_14_helper_0_0_0(
 
   // now get kernel, which must be have be compiled.
   cl_kernel kernel = freia_14_helper_0_0_0_kernel[bpp];
-  cl_int ofs_o0 = freia_common_data_get_offset(o0);
 
   // set kernel parameters
-  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId]);
+  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId].mem);
+  cl_int ofs_o0 = freia_common_data_get_offset(o0);
   err |= clSetKernelArg(kernel, 1, sizeof(cl_int), &ofs_o0);
   err |= clSetKernelArg(kernel, 2, sizeof(cl_int), &width);
   err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &pitch);
@@ -681,7 +681,7 @@ KERNEL void freia_14_helper_0_0_0(
   int c0)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
-  int gid = get_global_id(1)*pitch + get_global_id(0);
+  int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
   {
