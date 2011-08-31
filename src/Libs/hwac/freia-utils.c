@@ -926,7 +926,11 @@ bool same_constant_parameters(const dagvtx v1, const dagvtx v2)
  * it should be fully re-thought from scratch.
  *
  * what should be done, is to chose the FIRST statement after the LAST
- * dependency of the compiled statements.
+ * dependency of the compiled statements? at least it must exist beacause
+ * one of the dependent statement must appear after that, but is it enough
+ * for all possible graph? so maybe we should do a topological sort of
+ * all the statements and reshuffle everything instead of trying to preserver
+ * the initial code as much as possible?
  */
 int freia_substitute_by_helper_call(
   // dag reminder, may be null
