@@ -13,16 +13,25 @@ import os, string, re, optparse, glob, shutil, stat, multiprocessing, subprocess
 
 # Init variables
 p4a_root = ''
+par4ll_validation_dir = ''
+log_file_path = ''
 
-for root, subfolders, files in os.walk(os.environ.get("PWD")):
+# Define directories for validation, path for log file, and check P4A_ROOT exists.
+for root, subfolders, files in os.walk(os.getcwd()):
 	if os.path.exists(root+'/p4a_validate_class.py'):
-		p4a_root = root
+		if os.getenv('P4A_ROOT') is None:
+			p4a_root = root
+			par4ll_validation_dir = str(p4a_root)+'/../../packages/PIPS/validation/'
+		else:
+			p4a_root = os.getenv('P4A_ROOT')
+			par4ll_validation_dir = str(p4a_root)+'/packages/PIPS/validation/'
+
+		# path for log file
+		log_file_path = root
 
 	if (not p4a_root):
 		print ('You need to define P4A_ROOT environment variable')
 		exit()
-
-par4ll_validation_dir = p4a_root+'/../../packages/PIPS/validation/'
 
 extension = ['.c','.F','.f','.f90','.f95']
 script = ['.tpips','.tpips2','.test','.py']
@@ -65,7 +74,7 @@ def write_log(status,log_file,test_name_path):
 	lock = multiprocessing.Lock()
 	lock.acquire()
 	# Write status
-	file_result = open(p4a_root+'/'+log_file,'a')
+	file_result = open(log_file,'a')
 	file_result.write ('%s: %s\n' % (status,test_name_path.replace(par4ll_validation_dir,'')))
 	file_result.close()
 	# Unlock
@@ -245,7 +254,7 @@ def test_par4all(directory_test_path,test_file_path,log_file):
 		if (os.path.isfile(err_file_path) == True):
 			# copy error file on RESULT directories of par4all validation
 			new_err = err_file_path.replace(par4ll_validation_dir,'')
-			shutil.move(err_file_path,p4a_root+'/RESULT/'+new_err.replace('/','_'))
+			shutil.move(err_file_path,log_file_path+'/RESULT/'+new_err.replace('/','_'))
 
 		if (int_status == timeout_value):
 			status = 'timeout'
@@ -346,22 +355,22 @@ def test_par4all(directory_test_path,test_file_path,log_file):
 ###### Validate only test what we want ######
 def valid_par4all():
 	os.chdir(p4a_root)
-	if os.path.isfile('par4all_validation.txt'):
-		f = open("par4all_validation.txt")
+	if os.path.isfile(log_file_path+'/par4all_validation.txt'):
+		f = open(log_file_path+"/par4all_validation.txt")
 	else:
 		print ('No par4all_validation.txt file in %s. Create one before launch validation par4all'%(p4a_root))
 		exit()
 
 	# Create directory for result
-	if (os.path.isdir("RESULT") == True):
-		shutil.rmtree("RESULT", ignore_errors=True)
-	os.mkdir("RESULT")
+	if (os.path.isdir(log_file_path+"/RESULT") == True):
+		shutil.rmtree(log_file_path+"/RESULT", ignore_errors=True)
+	os.mkdir(log_file_path+"/RESULT")
 
-	if os.path.isfile('p4a_log.txt'):
-		os.remove("p4a_log.txt")
+	if os.path.isfile(log_file_path+'/p4a_log.txt'):
+		os.remove(log_file_path+"/p4a_log.txt")
 
 	test_list = list()
-	log_file = "p4a_log.txt"
+	log_file = log_file_path+"/p4a_log.txt"
 
 	# Open the file where par4all tests are:
 	for line in f:
@@ -488,7 +497,7 @@ def count_failed_warn(log_file):
 
 		log_file_h.close()
 
-		if ('diff.txt' != log_file):
+		if (log_file_path+'/diff.txt' != log_file):
 			print('%s failed and %s warning %s in %s tests'%(nb_failed,nb_warning,warning,nb_test))
 		else:
 			print('%i tests are not done by --p4a options or their status is "skipped"'%(nb_test))
@@ -537,7 +546,7 @@ def recursive_list_test(dir_list,par4all_string):
 			resultdir_list = list()
 			listing = os.listdir(directory_test)
 			for dirfile in listing:
-				dir_sublist,resultdir_list = subdir_list_test(directory_test,"diff.txt",resultdir_list,dirfile,dir_sublist)
+				dir_sublist,resultdir_list = subdir_list_test(directory_test,log_file_path+"/diff.txt",resultdir_list,dirfile,dir_sublist)
 
 			for result_dir in resultdir_list:
 				# Search a correspondig file of .result folder
@@ -548,7 +557,7 @@ def recursive_list_test(dir_list,par4all_string):
 
 					# Is test is in par4all_validation.txt ?
 					if int(par4all_string.count(test_string)) == 0:
-						diff_test_h = open('diff.txt','a')
+						diff_test_h = open(log_file_path+'/diff.txt','a')
 						diff_test_h.write(test_name_path.replace(par4ll_validation_dir,'')+'\n')
 						diff_test_h.close()
 
@@ -623,7 +632,7 @@ def multithread_test(test_list,log_file):
 			directory_test = ''
 			for j in range(0,len(test_array)-1):
 				directory_test = directory_test+'/'+test_array[j]
-				
+
 			print (('# Considering %s')%(test.replace(par4ll_validation_dir,'').strip('\n')))
 
 			process = multiprocessing.Process(target=test_par4all,args=(directory_test,test,log_file))
@@ -640,17 +649,17 @@ def valid_pips():
 	os.chdir(p4a_root)
 
 	# Create directory for result
-	if (os.path.isdir("RESULT") == True):
-		shutil.rmtree("RESULT", ignore_errors=True)
-	os.mkdir("RESULT")
+	if (os.path.isdir(log_file_path+"/RESULT") == True):
+		shutil.rmtree(log_file_path+"/RESULT", ignore_errors=True)
+	os.mkdir(log_file_path+"/RESULT")
 
 	# Default file (where directories to test is listed
 	default_file_path = par4ll_validation_dir+"defaults"
 
 	default_file = open(default_file_path)
 
-	if os.path.isfile('pips_log.txt'):
-		os.remove("pips_log.txt")
+	if os.path.isfile(log_file_path+'/pips_log.txt'):
+		os.remove(log_file_path+"/pips_log.txt")
 
 	# List all directories that we must test
 	for line in default_file:
@@ -660,11 +669,11 @@ def valid_pips():
 
 	# Multithreading test
 	if len(dir_list) != 0:
-		dir_subdir_test(dir_list,'pips_log.txt')
+		dir_subdir_test(dir_list,log_file_path+'/pips_log.txt')
 	else:
 		print "No folder to test according to"+par4ll_validation_dir+"defaults"
 
-	count_failed_warn('pips_log.txt')
+	count_failed_warn(log_file_path+'/pips_log.txt')
 	default_file.close()
 
 ###### Diff between p4a and pips options ######
@@ -673,11 +682,11 @@ def diff():
 	# Read default file to build a file with all tests
 	default_file = open(par4ll_validation_dir+"defaults")
 
-	diff_file = open('diff.txt','w')
+	diff_file = open(log_file_path+'/diff.txt','w')
 	diff_file.close()
 
-	if os.path.isfile(p4a_root+'/par4all_validation.txt'):
-		par4all_h = open(p4a_root+"/par4all_validation.txt")
+	if os.path.isfile(log_file_path+'/par4all_validation.txt'):
+		par4all_h = open(log_file_path+"/par4all_validation.txt")
 		par4all_string = par4all_h.read()
 		par4all_string = par4all_string.replace('\\','/').strip('\n')
 		par4all_h.close()
@@ -688,22 +697,25 @@ def diff():
 	for line in default_file:
 		if (not re.match('#',line)):
 			line  = line.strip('\n')
-			dir_list = [par4ll_validation_dir+line]
-			recursive_list_test(dir_list,par4all_string)
+			if os.path.isdir(par4ll_validation_dir+line):
+				dir_list = [par4ll_validation_dir+line]
+				recursive_list_test(dir_list,par4all_string)
+			else:
+				print ('None valid directory to list: %s does not exist'%(line.strip('\n'))) 
 
-	count_failed_warn('diff.txt')
+	count_failed_warn(log_file_path+'/diff.txt')
 
 ###### Validate all tests of a specific directory ################
 def valid_dir(arg_dir):
 	global dir_list
 	os.chdir(p4a_root)
-	if os.path.isfile('directory_log.txt'):
-		os.remove("directory_log.txt")
+	if os.path.isfile(log_file_path+'/directory_log.txt'):
+		os.remove(log_file_path+"/directory_log.txt")
 
 	# Create directory for result
-	if (os.path.isdir("RESULT") == True):
-		shutil.rmtree("RESULT", ignore_errors=True)
-	os.mkdir("RESULT")
+	if (os.path.isdir(log_file_path+"/RESULT") == True):
+		shutil.rmtree(log_file_path+"/RESULT", ignore_errors=True)
+	os.mkdir(log_file_path+"/RESULT")
 
 	# Build directory list to test
 	for directory_name in arg_dir:
@@ -715,23 +727,23 @@ def valid_dir(arg_dir):
 
 	# Multithreading test
 	if len(dir_list) != 0:
-		dir_subdir_test(dir_list,"directory_log.txt")
+		dir_subdir_test(dir_list,log_file_path+"/directory_log.txt")
 	else:
 		print ('None valid folder to test in %s'%(arg_dir))
 
-	count_failed_warn('directory_log.txt')
+	count_failed_warn(log_file_path+'/directory_log.txt')
 
 ###### Validate all desired tests ################
 def valid_test(arg_test):
 	os.chdir(p4a_root)
 	# Create directory for result
-	if (os.path.isdir("RESULT") == True):
-		shutil.rmtree("RESULT", ignore_errors=True)
-	os.mkdir("RESULT")
+	if (os.path.isdir(log_file_path+"/RESULT") == True):
+		shutil.rmtree(log_file_path+"/RESULT", ignore_errors=True)
+	os.mkdir(log_file_path+"/RESULT")
 
-	if os.path.isfile('test_log.txt'):
-		os.remove("test_log.txt")
-	log_file = 'test_log.txt'
+	if os.path.isfile(log_file_path+'/test_log.txt'):
+		os.remove(log_file_path+"/test_log.txt")
+	log_file = log_file_path+'/test_log.txt'
 
 	test_list = list()
 
@@ -790,7 +802,7 @@ def make_validate(options):
 	process_valid = subprocess.Popen(command, stdout=subprocess.PIPE)
 	output = process_valid.communicate()[0]
 
-	makeval_file = open(p4a_root+'/make_validate.txt','w')
+	makeval_file = open(log_file_path+'/make_validate.txt','w')
 	makeval_file.write(output)
 	makeval_file.close()
 
@@ -798,7 +810,7 @@ def make_validate(options):
 	string_command = str(command)
 	string_command = string_command.replace("[","").replace("]","").replace("'","").replace(",","")
 
-	print ('Output of the "'+string_command+'" is in '+p4a_root+'/make_validate.txt')
+	print ('Output of the "'+string_command+'" is in '+log_file_path+'/make_validate.txt')
 
 ### return test and directory for filter options ###
 def test_dir(line):
@@ -824,7 +836,7 @@ def filter_makeval():
 		validout_file = open(par4ll_validation_dir+"/validation.out")
 
 		# The new file with desired content
-		valid_file = open(p4a_root+'/pips_valid.txt',"w")
+		valid_file = open(log_file_path+'/pips_valid.txt',"w")
 
 		multi_source_list = set() # multi-source list
 		multi_script_list = set() # multi-script list
