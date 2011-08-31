@@ -1,6 +1,11 @@
+/* Bug: partial substitution (submitted by Mehdi Amini)
+ *
+ * Note: this code should be optimized by loop peeling, by removing
+ * the first and the last iterations, and then by removing the dead code
+*/
 
-
-void conditional(int cols, int jW[cols], int jE[cols]) { 
+void conditional04(int cols, int jW[cols], int jE[cols])
+{
   for (int j=0; j< cols; j++) {
     jW[j] = j-1;
     jE[j] = j+1;
@@ -15,8 +20,8 @@ void conditional(int cols, int jW[cols], int jE[cols]) {
 
 int caller(int cols) {
   int jW[cols],jE[cols];
-  
-  conditional(cols,jW,jE);
+
+  conditional04(cols,jW,jE);
 
   return jW[0]+jE[cols-1];
 
