@@ -16,7 +16,6 @@ int main()
       //PIPS generated variable
       int caillou[1];
       caillou[0] = 1;
-
 ou_est_charlie:
       for(i = 0; i <= 3; i += 1)
          a[0][i] = caillou[0];

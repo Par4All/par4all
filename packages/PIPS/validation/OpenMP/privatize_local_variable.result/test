@@ -1,6 +1,6 @@
-//
-// Code after coarse_grain_parallelization for module main
-//
+#
+# Code after coarse_grain_parallelization for module main
+#
 int main()
 {
    int k;
@@ -17,9 +17,9 @@ int main()
    }
    return 0;
 }
-//
-// Code after ompify_code for module main
-//
+#
+# Code after ompify_code for module main
+#
 int main()
 {
    int k;
@@ -39,9 +39,9 @@ int main()
    }
    return 0;
 }
-//
-// Code after omp_merge_pragma for module main
-//
+#
+# Code after omp_merge_pragma for module main
+#
 int main()
 {
    int k;

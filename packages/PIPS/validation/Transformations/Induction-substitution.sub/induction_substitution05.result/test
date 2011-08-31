@@ -1,6 +1,6 @@
-//
-// Display print_code_preconditions for module induction05
-//
+#
+# Display print_code_preconditions for module induction05
+#
 
 //  P() {}
 
@@ -36,9 +36,9 @@ void induction05(int SIZE, double A[SIZE], double B[SIZE][SIZE])
          A[k] = B[j-k][k]+A[k];
    }
 }
-//
-// Code after induction_substitution for module induction05
-//
+#
+# Code after induction_substitution for module induction05
+#
 void induction05(int SIZE, double A[SIZE], double B[SIZE][SIZE])
 {
    int i, j;

@@ -1,0 +1,25 @@
+#
+# Initial code for module unfold
+#
+int unfold()
+{
+   printf("I have to be unfolded !\n");
+   callee1();
+   callee2();
+}
+#
+# Code after unfold for module unfold
+#
+int unfold()
+{
+   printf("I have to be unfolded !\n");
+   printf("In callee 1 !\n");
+   printf("In callee 2, I will call callee1 !\n");
+   printf("In callee 1 !\n");
+}
+int non_unfold()
+{
+   printf("I have to be unfolded !\n");
+   callee1();
+   callee2();
+}

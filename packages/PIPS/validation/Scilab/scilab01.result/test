@@ -90,7 +90,7 @@ void f()
    //PIPS generated variable
    int i_1 = 0;
    I_30 = __USize[0]*__USize[1];
-   for(i_0 = 0; i_0 <= I_30-1; i_0 += 1) {
+   for(i_0 = 0; i_0 <= I_30+-1; i_0 += 1) {
       F_212 = U[i_0];
       _return391 = cos(F_212);
       __temp3[i_0] = _return391;
@@ -112,7 +112,7 @@ void f()
    //PIPS generated variable
    int i_1 = 0;
    I_30 = __USize[0]*__USize[1];
-   for(i_0 = 0; i_0 <= I_30-1; i_0 += 1) {
+   for(i_0 = 0; i_0 <= I_30+-1; i_0 += 1) {
       F_212 = U[i_0];
       _return391 = cos(F_212);
       __temp3[i_0] = _return391;
@@ -135,7 +135,7 @@ void f()
    int i_1 = 0;
    I_30 = __USize[0]*__USize[1];
 #pragma omp parallel for private(F_212,_return391)
-   for(i_0 = 0; i_0 <= I_30-1; i_0 += 1) {
+   for(i_0 = 0; i_0 <= I_30+-1; i_0 += 1) {
       F_212 = U[i_0];
       _return391 = cos(F_212);
       __temp3[i_0] = _return391;

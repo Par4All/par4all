@@ -1,480 +1,458 @@
-tidy the code just in case of
-void runner(int n, int out[n][n], int in[n][n])
+void runner(int n, int out[n][n], int in[n][n], int mask)
 {
    int i, j;
+#pragma terapix
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1)
-         out[i][j] = in[i][j]+2;
+         out[i][j] = in[i][j]+mask;
 }
-void runner(int n, int out[n][n], int in[n][n])
+tidy the code just in case of
+void runner(int n, int out[n][n], int in[n][n], int mask)
+{
+   int i, j;
+#pragma terapix
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         out[i][j] = in[i][j]+mask;
+}
+**** check ok ******
+void runner(int n, int out[n][n], int in[n][n], int mask)
+{
+   int i, j;
+#pragma terapix
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         out[i][j] = in[i][j]+mask;
+}
+detection and extraction
+tiling
+void runner_l99998(int n, int in[n][n], int mask, int out[n][n])
 {
    unsigned int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
-   int i, j;
-   for(i = 0; i <= n-1; i += 1)
-      for(j = 0; j <= n-1; j += 1)
-         out[i][j] = in[i][j]+2;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(i = 0; i <= n-1; i += 1)
+l99999:
+         for(j = 0; j <= n-1; j += 1)
+            out[i][j] = in[i][j]+mask;
+   }
 }
-tiling
-void runner(int n, int out[n][n], int in[n][n])
+void runner_l99998(int n, int in[n][n], int mask, int out[n][n])
 {
    int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
-   int i, j;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17;
-l99998:   ;
-   for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
-      I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
-      I_6 = I_0*__TERAPYPS_WIDTH;
-      for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         i = I_6+MAX(INT(MIN(n-1, I_6+(__TERAPYPS_WIDTH-1))-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         for(i = I_6; i <= MIN(n-1, I_6+(__TERAPYPS_WIDTH-1)); i += 1)
-            for(j = I_11; j <= MIN(n-1, I_11+(__TERAPYPS_HEIGHT-1)); j += 1)
-               out[i][j] = in[i][j]+2;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (-1+n)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((-1+n)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (-1+n)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            for(i = I_9; i <= MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1); i += 1)
+               for(j = I_14; j <= MIN(-1+n, I_14+__TERAPYPS_HEIGHT+-1); j += 1)
+                  out[i][j] = in[i][j]+mask;
+         }
       }
    }
 }
-void runner(int n, int out[n][n], int in[n][n])
+void runner_l99998(int n, int in[n][n], int mask, int out[n][n])
 {
    int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
-   int i, j;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17;
-l99998:   ;
-   for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
-      I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
-      I_6 = I_0*__TERAPYPS_WIDTH;
-      for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         i = I_6+MAX(INT(MIN(n-1, I_6+__TERAPYPS_WIDTH-1)-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         if (n-1>I_6+__TERAPYPS_WIDTH-1)
-            if (n-1>I_11+__TERAPYPS_HEIGHT-1)
-               for(i = I_6; i <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); i += 1)
-                  for(j = I_11; j <= MIN(n-1, I_11+__TERAPYPS_HEIGHT-1); j += 1)
-                     out[i][j] = in[i][j]+2;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+__TERAPYPS_WIDTH-1)
+               if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+                  for(i = I_9; i <= I_9+__TERAPYPS_WIDTH-1; i += 1)
+                     for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                        out[i][j] = in[i][j]+mask;
+               else
+                  for(i = I_9; i <= I_9+__TERAPYPS_WIDTH-1; i += 1)
+                     for(j = I_14; j <= n-1; j += 1)
+                        out[i][j] = in[i][j]+mask;
+            else if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+               for(i = I_9; i <= n-1; i += 1)
+                  for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                     out[i][j] = in[i][j]+mask;
             else
-               for(i = I_6; i <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); i += 1)
-                  for(j = I_11; j <= MIN(n-1, I_11+__TERAPYPS_HEIGHT-1); j += 1)
-                     out[i][j] = in[i][j]+2;
-         else if (n-1>I_11+__TERAPYPS_HEIGHT-1)
-            for(i = I_6; i <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); i += 1)
-               for(j = I_11; j <= MIN(n-1, I_11+__TERAPYPS_HEIGHT-1); j += 1)
-                  out[i][j] = in[i][j]+2;
-         else
-            for(i = I_6; i <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); i += 1)
-               for(j = I_11; j <= MIN(n-1, I_11+__TERAPYPS_HEIGHT-1); j += 1)
-                  out[i][j] = in[i][j]+2;
+               for(i = I_9; i <= n-1; i += 1)
+                  for(j = I_14; j <= n-1; j += 1)
+                     out[i][j] = in[i][j]+mask;
+         }
       }
    }
 }
-void runner(int n, int out[n][n], int in[n][n])
+void runner_l99998(int n, int in[n][n], int mask, int out[n][n])
 {
    int __TERAPYPS_WIDTH, __TERAPYPS_HEIGHT;
-   int i, j;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17;
-l99998:   ;
-   for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
-      I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
-      I_6 = I_0*__TERAPYPS_WIDTH;
-      for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         i = I_6+MAX(INT(MIN(n-1, I_6+__TERAPYPS_WIDTH-1)-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         if (n-1>I_6+__TERAPYPS_WIDTH-1)
-            if (n-1>I_11+__TERAPYPS_HEIGHT-1)
-               for(i = I_6; i <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); i += 1)
-                  for(j = I_11; j <= MIN(n-1, I_11+__TERAPYPS_HEIGHT-1); j += 1)
-                     out[i][j] = in[i][j]+2;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20;
+   if (__TERAPYPS_HEIGHT>3||3<__TERAPYPS_WIDTH) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = I_0*__TERAPYPS_WIDTH;
+         for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+__TERAPYPS_WIDTH-1)
+               if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+                  for(i = I_9; i <= I_9+__TERAPYPS_WIDTH-1; i += 1)
+                     for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                        out[i][j] = in[i][j]+mask;
+               else
+                  for(i = I_9; i <= I_9+__TERAPYPS_WIDTH-1; i += 1)
+                     for(j = I_14; j <= n-1; j += 1)
+                        out[i][j] = in[i][j]+mask;
+            else if (n-1>I_14+__TERAPYPS_HEIGHT-1)
+               for(i = I_9; i <= n-1; i += 1)
+                  for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                     out[i][j] = in[i][j]+mask;
             else
-               for(i = I_6; i <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); i += 1)
-                  for(j = I_11; j <= MIN(n-1, I_11+__TERAPYPS_HEIGHT-1); j += 1)
-                     out[i][j] = in[i][j]+2;
-         else if (n-1>I_11+__TERAPYPS_HEIGHT-1)
-            for(i = I_6; i <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); i += 1)
-               for(j = I_11; j <= MIN(n-1, I_11+__TERAPYPS_HEIGHT-1); j += 1)
-                  out[i][j] = in[i][j]+2;
-         else
-            for(i = I_6; i <= MIN(n-1, I_6+__TERAPYPS_WIDTH-1); i += 1)
-               for(j = I_11; j <= MIN(n-1, I_11+__TERAPYPS_HEIGHT-1); j += 1)
-                  out[i][j] = in[i][j]+2;
+               for(i = I_9; i <= n-1; i += 1)
+                  for(j = I_14; j <= n-1; j += 1)
+                     out[i][j] = in[i][j]+mask;
+         }
       }
    }
 }
 group constants and isolate
-void runner(int n, int out[n][n], int in[n][n])
+void runner_l99998(int n, int in[n][n], int mask, int out[n][n])
 {
    int __TERAPYPS_WIDTH = 128, __TERAPYPS_HEIGHT;
-   int i, j;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17;
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-      I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
-      I_6 = 128*I_0;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20;
+   if (__TERAPYPS_HEIGHT>3||3<128) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+         I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = 128*I_0;
 l99989:
-      for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         i = I_6+MAX(INT(MIN(n-1, I_6+127)-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         if (n-1>I_6+127)
-            if (n-1>I_11+__TERAPYPS_HEIGHT-1)
+         for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(n-1, I_9+127)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+127)
+               if (n-1>I_14+__TERAPYPS_HEIGHT-1)
 l99996:
-               for(i = I_6; i <= I_6+127; i += 1)
+                  for(i = I_9; i <= I_9+127; i += 1)
 l99997:
-                  for(j = I_11; j <= I_11+__TERAPYPS_HEIGHT-1; j += 1)
-                     out[i][j] = in[i][j]+2;
-            else
+                     for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                        out[i][j] = in[i][j]+mask;
+               else
 l99994:
-               for(i = I_6; i <= I_6+127; i += 1)
+                  for(i = I_9; i <= I_9+127; i += 1)
 l99995:
-                  for(j = I_11; j <= n-1; j += 1)
-                     out[i][j] = in[i][j]+2;
-         else if (n-1>I_11+__TERAPYPS_HEIGHT-1)
+                     for(j = I_14; j <= n-1; j += 1)
+                        out[i][j] = in[i][j]+mask;
+            else if (n-1>I_14+__TERAPYPS_HEIGHT-1)
 l99992:
-            for(i = I_6; i <= n-1; i += 1)
+               for(i = I_9; i <= n-1; i += 1)
 l99993:
-               for(j = I_11; j <= I_11+__TERAPYPS_HEIGHT-1; j += 1)
-                  out[i][j] = in[i][j]+2;
-         else
+                  for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                     out[i][j] = in[i][j]+mask;
+            else
 l99990:
-            for(i = I_6; i <= n-1; i += 1)
+               for(i = I_9; i <= n-1; i += 1)
 l99991:
-               for(j = I_11; j <= n-1; j += 1)
-                  out[i][j] = in[i][j]+2;
+                  for(j = I_14; j <= n-1; j += 1)
+                     out[i][j] = in[i][j]+mask;
+         }
       }
    }
 }
-void runner(int n, int out[n][n], int in[n][n])
+void runner_l99998(int n, int in[n][n], int mask, int out[n][n])
 {
    int __TERAPYPS_WIDTH = 128, __TERAPYPS_HEIGHT;
-   int i, j;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20;
    __TERAPYPS_HEIGHT = 256;
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-      I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
-      I_6 = 128*I_0;
+   if (__TERAPYPS_HEIGHT>3||3<128) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+         I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
+         I_9 = 128*I_0;
 l99989:
-      for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
-         i = I_6+MAX(INT(MIN(n-1, I_6+127)-I_6+1), 0);
-         I_11 = I_1*__TERAPYPS_HEIGHT;
-         if (n-1>I_6+127)
-            if (n-1>I_11+__TERAPYPS_HEIGHT-1)
+         for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(n-1, I_9+127)-I_9+1), 0);
+            I_14 = I_1*__TERAPYPS_HEIGHT;
+            if (n-1>I_9+127)
+               if (n-1>I_14+__TERAPYPS_HEIGHT-1)
 l99996:
-               for(i = I_6; i <= I_6+127; i += 1)
+                  for(i = I_9; i <= I_9+127; i += 1)
 l99997:
-                  for(j = I_11; j <= I_11+__TERAPYPS_HEIGHT-1; j += 1)
-                     out[i][j] = in[i][j]+2;
-            else
+                     for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                        out[i][j] = in[i][j]+mask;
+               else
 l99994:
-               for(i = I_6; i <= I_6+127; i += 1)
+                  for(i = I_9; i <= I_9+127; i += 1)
 l99995:
-                  for(j = I_11; j <= n-1; j += 1)
-                     out[i][j] = in[i][j]+2;
-         else if (n-1>I_11+__TERAPYPS_HEIGHT-1)
+                     for(j = I_14; j <= n-1; j += 1)
+                        out[i][j] = in[i][j]+mask;
+            else if (n-1>I_14+__TERAPYPS_HEIGHT-1)
 l99992:
-            for(i = I_6; i <= n-1; i += 1)
+               for(i = I_9; i <= n-1; i += 1)
 l99993:
-               for(j = I_11; j <= I_11+__TERAPYPS_HEIGHT-1; j += 1)
-                  out[i][j] = in[i][j]+2;
-         else
-l99990:
-            for(i = I_6; i <= n-1; i += 1)
-l99991:
-               for(j = I_11; j <= n-1; j += 1)
-                  out[i][j] = in[i][j]+2;
-      }
-   }
-}
-void runner(int n, int out[n][n], int in[n][n])
-{
-   int i, j;
-   //PIPS generated variable
-   int I_0, I_1;
-
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-
-
-l99989:
-      for(I_1 = 0; I_1 <= (n-1)/256; I_1 += 1) {
-
-
-         if (n-1>128*I_0+127)
-            if (n-1>256*I_1+255) {
-               //PIPS generated variable
-               int caillou[1];
-               caillou[0] = 2;
-
-l99996:
-               for(i = 128*I_0; i <= 128*I_0+127; i += 1)
-l99997:
-                  for(j = 256*I_1; j <= 256*I_1+255; j += 1)
-                     out[i][j] = in[i][j]+caillou[0];
-            }
+                  for(j = I_14; j <= I_14+__TERAPYPS_HEIGHT-1; j += 1)
+                     out[i][j] = in[i][j]+mask;
             else
-l99994:
-               for(i = 128*I_0; i <= 128*I_0+127; i += 1)
-l99995:
-                  for(j = 256*I_1; j <= n-1; j += 1)
-                     out[i][j] = in[i][j]+2;
-         else if (n-1>256*I_1+255)
-l99992:
-            for(i = 128*I_0; i <= n-1; i += 1)
-l99993:
-               for(j = 256*I_1; j <= 256*I_1+255; j += 1)
-                  out[i][j] = in[i][j]+2;
-         else
 l99990:
-            for(i = 128*I_0; i <= n-1; i += 1)
+               for(i = I_9; i <= n-1; i += 1)
 l99991:
-               for(j = 256*I_1; j <= n-1; j += 1)
-                  out[i][j] = in[i][j]+2;
+                  for(j = I_14; j <= n-1; j += 1)
+                     out[i][j] = in[i][j]+mask;
+         }
       }
    }
 }
 **** check ok ******
-void runner(int n, int out[n][n], int in[n][n])
+void runner_l99998(int n, int in[n][n], int mask, int out[n][n])
 {
-   int i, j;
    //PIPS generated variable
    int I_0, I_1;
 
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
+   if (256>3||3<128) {
+      //PIPS generated variable
+      int i, j;
+l99998:
+#pragma terapix
+      for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
 
 
 l99989:
-      for(I_1 = 0; I_1 <= (n-1)/256; I_1 += 1) {
+         for(I_1 = 0; I_1 <= (n-1)/256; I_1 += 1) {
 
 
-         if (n-1>128*I_0+127)
-            if (n-1>256*I_1+255) {
-               //PIPS generated variable
-               int caillou[1];
-               caillou[0] = 2;
-
-l99996:
-               for(i = 128*I_0; i <= 128*I_0+127; i += 1)
-l99997:
-                  for(j = 256*I_1; j <= 256*I_1+255; j += 1)
-                     out[i][j] = in[i][j]+caillou[0];
-            }
-            else
-l99994:
-               for(i = 128*I_0; i <= 128*I_0+127; i += 1)
-l99995:
-                  for(j = 256*I_1; j <= n-1; j += 1)
-                     out[i][j] = in[i][j]+2;
-         else if (n-1>256*I_1+255)
-l99992:
-            for(i = 128*I_0; i <= n-1; i += 1)
-l99993:
-               for(j = 256*I_1; j <= 256*I_1+255; j += 1)
-                  out[i][j] = in[i][j]+2;
-         else
-l99990:
-            for(i = 128*I_0; i <= n-1; i += 1)
-l99991:
-               for(j = 256*I_1; j <= n-1; j += 1)
-                  out[i][j] = in[i][j]+2;
-      }
-   }
-}
-void runner(int n, int out[n][n], int in[n][n])
-{
-   int i, j;
-   //PIPS generated variable
-   int I_0, I_1;
-
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-
-
-l99989:
-      for(I_1 = 0; I_1 <= (n-1)/256; I_1 += 1) {
-
-
-         if (n-1>128*I_0+127)
-            if (n-1>256*I_1+255) {
-               //PIPS generated variable
-               int caillou[1];
-               caillou[0] = 2;
-
-               {
-                  //PIPS generated variable
-                  int (*in0)[128][256] = (int (*)[128][256]) 0, (*caillou0)[1] = (int (*)[1]) 0, (*out0)[128][256] = (int (*)[128][256]) 0;
-                  P4A_accel_malloc((void **) &out0, sizeof(int)*32768);
-                  P4A_accel_malloc((void **) &caillou0, sizeof(int)*1);
-                  P4A_accel_malloc((void **) &in0, sizeof(int)*32768);
-                  P4A_copy_to_accel_1d(sizeof(int), 1, 1, 0, &caillou[0], *caillou0);
-                  P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &in[0][0], *in0);
-
+            if (n-1>128*I_0+127)
+               if (n-1>256*I_1+255)
 l99996:
                   for(i = 128*I_0; i <= 128*I_0+127; i += 1)
 l99997:
                      for(j = 256*I_1; j <= 256*I_1+255; j += 1)
-                        (*out0)[i-128*I_0][j-256*I_1] = (*in0)[i-128*I_0][j-256*I_1]+(*caillou0)[0-0];
-                  P4A_copy_from_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &out[0][0], *out0);
-                  P4A_accel_free(out0);
-                  P4A_accel_free(caillou0);
-                  P4A_accel_free(in0);
-               }
-            }
-            else
+                        out[i][j] = in[i][j]+mask;
+               else
 l99994:
-               for(i = 128*I_0; i <= 128*I_0+127; i += 1)
+                  for(i = 128*I_0; i <= 128*I_0+127; i += 1)
 l99995:
-                  for(j = 256*I_1; j <= n-1; j += 1)
-                     out[i][j] = in[i][j]+2;
-         else if (n-1>256*I_1+255)
+                     for(j = 256*I_1; j <= n-1; j += 1)
+                        out[i][j] = in[i][j]+mask;
+            else if (n-1>256*I_1+255)
 l99992:
-            for(i = 128*I_0; i <= n-1; i += 1)
+               for(i = 128*I_0; i <= n-1; i += 1)
 l99993:
-               for(j = 256*I_1; j <= 256*I_1+255; j += 1)
-                  out[i][j] = in[i][j]+2;
-         else
+                  for(j = 256*I_1; j <= 256*I_1+255; j += 1)
+                     out[i][j] = in[i][j]+mask;
+            else
 l99990:
-            for(i = 128*I_0; i <= n-1; i += 1)
+               for(i = 128*I_0; i <= n-1; i += 1)
 l99991:
-               for(j = 256*I_1; j <= n-1; j += 1)
-                  out[i][j] = in[i][j]+2;
+                  for(j = 256*I_1; j <= n-1; j += 1)
+                     out[i][j] = in[i][j]+mask;
+         }
+      }
+   }
+}
+void tile_l99996(int n, int I_0, int I_1, int in[n][n], int mask, int out[n][n])
+{
+   //PIPS generated variable
+   int i, j;
+   {
+      //PIPS generated variable
+      int caillou[1];
+      caillou[0] = mask;
+l99996:
+      for(i = 128*I_0; i <= 128*I_0+127; i += 1)
+l99997:
+         for(j = 256*I_1; j <= 256*I_1+255; j += 1)
+            out[i][j] = in[i][j]+caillou[0];
+   }
+}
+void tile_l99996(int n, int I_0, int I_1, int in[n][n], int mask, int out[n][n])
+{
+   //PIPS generated variable
+   int i, j;
+   {
+      //PIPS generated variable
+      int caillou[1];
+      caillou[0] = mask;
+      {
+         //PIPS generated variable
+         int (*in0)[128][256] = (int (*)[128][256]) 0, (*caillou0)[1] = (int (*)[1]) 0, (*out0)[128][256] = (int (*)[128][256]) 0;
+         P4A_accel_malloc((void **) &out0, sizeof(int)*32768);
+         P4A_accel_malloc((void **) &caillou0, sizeof(int)*1);
+         P4A_accel_malloc((void **) &in0, sizeof(int)*32768);
+         P4A_copy_to_accel_1d(sizeof(int), 1, 1, 0, &caillou[0], *caillou0);
+         P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &in[0][0], *in0);
+
+l99996:
+         for(i = 128*I_0; i <= 128*I_0+127; i += 1)
+l99997:
+            for(j = 256*I_1; j <= 256*I_1+255; j += 1)
+               (*out0)[i-128*I_0][j-256*I_1] = (*in0)[i-128*I_0][j-256*I_1]+(*caillou0)[0-0];
+         P4A_copy_from_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &out[0][0], *out0);
+         P4A_accel_free(out0);
+         P4A_accel_free(caillou0);
+         P4A_accel_free(in0);
       }
    }
 }
 **** check ok ******
 outlining to launcher
-void runner(int n, int out[n][n], int in[n][n])
+void tile_l99996(int n, int I_0, int I_1, int in[n][n], int mask, int out[n][n])
 {
-   int i, j;
    //PIPS generated variable
-   int I_0, I_1;
+   int i, j;
+   {
+      //PIPS generated variable
+      int caillou[1];
+      caillou[0] = mask;
+      {
+         //PIPS generated variable
+         int (*in0)[128][256] = (int (*)[128][256]) 0, (*caillou0)[1] = (int (*)[1]) 0, (*out0)[128][256] = (int (*)[128][256]) 0;
+         P4A_accel_malloc((void **) &out0, 32768*sizeof(int));
+         P4A_accel_malloc((void **) &caillou0, sizeof(int));
+         P4A_accel_malloc((void **) &in0, 32768*sizeof(int));
+         P4A_copy_to_accel_1d(sizeof(int), 1, 1, 0, &caillou[0], *caillou0);
+         P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &in[0][0], *in0);
 
-l99998:   ;
-l99988:
-   for(I_0 = 0; I_0 <= (n-1)/128; I_0 += 1) {
-
-
-l99989:
-      for(I_1 = 0; I_1 <= (n-1)/256; I_1 += 1) {
-
-
-         if (n-1>128*I_0+127)
-            if (n-1>256*I_1+255) {
-               //PIPS generated variable
-               int caillou[1];
-               caillou[0] = 2;
-
-               {
-                  //PIPS generated variable
-                  int (*in0)[128][256] = (int (*)[128][256]) 0, (*caillou0)[1] = (int (*)[1]) 0, (*out0)[128][256] = (int (*)[128][256]) 0;
-                  P4A_accel_malloc((void **) &out0, 32768*sizeof(int));
-                  P4A_accel_malloc((void **) &caillou0, sizeof(int));
-                  P4A_accel_malloc((void **) &in0, 32768*sizeof(int));
-                  P4A_copy_to_accel_1d(sizeof(int), 1, 1, 0, &caillou[0], *caillou0);
-                  P4A_copy_to_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &in[0][0], *in0);
-
-l99996:                  launcher_0(255+1, *caillou0, *in0, *out0);
-                  P4A_copy_from_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &out[0][0], *out0);
-                  P4A_accel_free(out0);
-                  P4A_accel_free(caillou0);
-                  P4A_accel_free(in0);
-               }
-            }
-            else
-l99994:
-               for(i = 0; i <= 127; i += 1)
-l99995:
-                  for(j = 0; j <= n-256*I_1-1; j += 1)
-                     out[128*I_0+i][256*I_1+j] = in[128*I_0+i][256*I_1+j]+2;
-         else if (n-1>256*I_1+255)
-l99992:
-            for(i = 0; i <= n-128*I_0-1; i += 1)
-l99993:
-               for(j = 0; j <= 255; j += 1)
-                  out[128*I_0+i][256*I_1+j] = in[128*I_0+i][256*I_1+j]+2;
-         else
-l99990:
-            for(i = 0; i <= n-128*I_0-1; i += 1)
-l99991:
-               for(j = 0; j <= n-256*I_1-1; j += 1)
-                  out[128*I_0+i][256*I_1+j] = in[128*I_0+i][256*I_1+j]+2;
+l99996:         launcher_0(255+1, *caillou0, *in0, *out0);
+         P4A_copy_from_accel_2d(sizeof(int), n, n, 128, 256, 128*I_0, 256*I_1, &out[0][0], *out0);
+         P4A_accel_free(out0);
+         P4A_accel_free(caillou0);
+         P4A_accel_free(in0);
       }
    }
 }
 
-//  <caillou0[PHI1]-R-EXACT-{PHI1==0, I_18==256}>
+//  <caillou0[PHI1]-R-EXACT-{PHI1==0, I_21==256}>
 //  <in0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=255,
-//    I_18==256}>
+//    I_21==256}>
 //  <out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=255,
-//    I_18==256}>
+//    I_21==256}>
 
-void launcher_0(int I_18, int caillou0[1], int in0[128][256], int out0[128][256])
+void launcher_0(int I_21, int caillou0[1], int in0[128][256], int out0[128][256])
 {
    //PIPS generated variable
    int i, j;
 
-//  <caillou0[PHI1]-R-EXACT-{PHI1==0, I_18==256}>
+//  <caillou0[PHI1]-R-EXACT-{PHI1==0, I_21==256}>
 //  <in0[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=255,
-//    I_18==256}>
+//    I_21==256}>
 //  <out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2, PHI2<=255,
-//    I_18==256}>
+//    I_21==256}>
 
 l99996:
    for(i = 0; i <= 127; i += 1)
 
-//  <caillou0[PHI1]-R-EXACT-{PHI1==0, I_18==256, 0<=i, i<=127}>
-//  <in0[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=255, I_18==256,
+//  <caillou0[PHI1]-R-EXACT-{PHI1==0, I_21==256, 0<=i, i<=127}>
+//  <in0[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=255, I_21==256,
 //    0<=i, i<=127}>
-//  <out0[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=255, I_18==256,
+//  <out0[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=255, I_21==256,
 //    0<=i, i<=127}>
 
 l99997:
-      for(j = 0; j <= I_18-1; j += 1)
+      for(j = 0; j <= I_21-1; j += 1)
 
-//  <caillou0[PHI1]-R-EXACT-{PHI1==0, I_18==256, 0<=i, i<=127, 0<=j,
+//  <caillou0[PHI1]-R-EXACT-{PHI1==0, I_21==256, 0<=i, i<=127, 0<=j,
 //    j<=255}>
-//  <in0[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, I_18==256, 0<=i,
+//  <in0[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, I_21==256, 0<=i,
 //    i<=127, 0<=j, j<=255}>
-//  <out0[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, I_18==256, 0<=i,
+//  <out0[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, I_21==256, 0<=i,
 //    i<=127, 0<=j, j<=255}>
 
          out0[i][j] = in0[i][j]+caillou0[0];
 }
 outlining to microcode
-void launcher_0(int I_18, int caillou0[1], int in0[128][256], int out0[128][256])
+void launcher_0(int I_21, int caillou0[1], int in0[128][256], int out0[128][256])
 {
    //PIPS generated variable
    int i, j;
 l99996:
    for(i = 0; i <= 127; i += 1)
-l99997:      launcher_0_microcode(I_18, *&in0[i], *&out0[i], caillou0[0]);
+l99997:
+      for(j = 0; j <= I_21-1; j += 1)
+         out0[i][j] = in0[i][j]+caillou0[0];
 }
-void launcher_0_microcode(int I_18, int in00[256], int out00[256], int caillou0)
+void launcher_0(int I_21, int caillou0[1], int in0[128][256], int out0[128][256])
+{
+   //PIPS generated variable
+   int i, j;
+l99996:
+   for(i = 0; i <= 127; i += 1)
+l99997:
+      for(j = 0; j <= I_21-1; j += 1)
+         out0[i][j] = in0[i][j]+caillou0[0];
+}
+void launcher_0(int I_21, int caillou0[1], int in0[128][256], int out0[128][256])
+{
+   //PIPS generated variable
+   int i, j;
+l99996:
+   for(i = 0; i <= 127; i += 1)
+l99997:      launcher_0_microcode(I_21, *&in0[i], *&out0[i], caillou0[0]);
+}
+void launcher_0_microcode(int I_21, int in00[256], int out00[256], int caillou0)
 {
    //PIPS generated variable
    int j;
 l99997:
-   for(j = 0; j <= I_18-1; j += 1)
+   for(j = 0; j <= I_21-1; j += 1)
       out00[j] = in00[j]+caillou0;
 }
 **** check ok ******
 refining microcode
-void launcher_0_microcode(int I_18, int *in00, int *out00, int caillou0)
+void launcher_0_microcode(int I_21, int in00[256], int out00[256], int caillou0)
 {
    //PIPS generated variable
    int j;
 l99997:
-   for(j = 0; j <= I_18-1; j += 1)
+   for(j = 0; j <= I_21-1; j += 1)
+      out00[j] = in00[j]+caillou0;
+}
+void launcher_0_microcode(int I_21, int *in00, int *out00, int caillou0)
+{
+   //PIPS generated variable
+   int j;
+l99997:
+   for(j = 0; j <= I_21-1; j += 1)
       *(out00+j) = *(in00+j)+caillou0;
 }
 **** check ok ******
-void launcher_0_microcode(int I_18, int *in00, int *out00, int caillou0)
+void launcher_0_microcode(int I_21, int *in00, int *out00, int caillou0)
+{
+   //PIPS generated variable
+   int j;
+l99997:
+   for(j = 0; j <= I_21-1; j += 1)
+      *(out00+j) = *(j+in00)+caillou0;
+}
+void launcher_0_microcode(int I_21, int *in00, int *out00, int caillou0)
 {
    //PIPS generated variable
    int j;
@@ -483,72 +461,201 @@ void launcher_0_microcode(int I_18, int *in00, int *out00, int caillou0)
    in000 = in00;
    out000 = out00;
 l99997:
-   for(j = 0; j <= I_18-1; j += 1) {
+   for(j = 0; j <= I_21-1; j += 1) {
+      *out000 = *in000+caillou0;
+      in000 += 1;
+      out000 += 1;
+   }
+}
+**** check ok ******
+void launcher_0_microcode(int I_21, int *in00, int *out00, int caillou0)
+{
+   //PIPS generated variable
+   int j;
+   //PIPS generated variable
+   int *out000, *in000;
+   in000 = in00;
+   out000 = out00;
+l99997:
+   for(j = 0; j <= I_21-1; j += 1) {
+      *out000 = *in000+caillou0;
+      in000 += 1;
+      out000 += 1;
+   }
+}
+**** check ok ******
+**** check ok ******
+void launcher_0_microcode(int I_21, int *in00, int *out00, int caillou0)
+{
+   //PIPS generated variable
+   int j;
+   //PIPS generated variable
+   int *out000, *in000;
+   in000 = in00;
+   out000 = out00;
+l99997:
+   for(j = 0; j <= I_21-1; j += 1) {
+      *out000 = *in000+caillou0;
+      in000 += 1;
+      out000 += 1;
+   }
+}
+void launcher_0_microcode(int I_21, int *in00, int *out00, int caillou0)
+{
+   //PIPS generated variable
+   int j;
+   //PIPS generated variable
+   int *out000, *in000;
+   in000 = in00;
+   out000 = out00;
+l99997:
+   for(j = 0; j <= I_21-1; j += 1) {
       *out000 = *in000+caillou0;
       in000 = in000+1;
       out000 = out000+1;
    }
 }
 **** check ok ******
-I_18 belongs to a loop bound
+void launcher_0_microcode(int I_21, int *in00, int *out00, int caillou0)
+{
+   //PIPS generated variable
+   int j;
+   //PIPS generated variable
+   int *out000, *in000;
+   in000 = in00;
+   out000 = out00;
+l99997:
+   for(j = 0; j <= I_21-1; j += 1) {
+      *out000 = *in000+caillou0;
+      in000 = in000+1;
+      out000 = out000+1;
+   }
+}
+**** check ok ******
+I_21 belongs to a loop bound
 in00 seems an image
 out00 seems an image
 caillou0 seems a mask
-void launcher_0_microcode(int *FIFO2, int *FIFO1, int *FIFO0, int N0)
+void launcher_0_microcode(int *FIFO3, int *FIFO2, int *FIFO1, int N1)
 {
    //PIPS generated variable
-   int *im0, *im1, *im2, *im3, *ma4;
+#pragma terapix out00 128 256
+#pragma terapix in00 128 256
+   int j;
    //PIPS generated variable
-   int re0;
-   ma4 = FIFO2;
+   int *out000, *in000;
+   //PIPS generated variable
+   int re5;
+   //PIPS generated variable
+   int *im1, *im2, *in00, *im3, *out00, *im4, *caillou0, *ma1;
+   //PIPS generated variable
+   int re6, re7;
+   //PIPS generated variable
+   int *im5, *im6, *im7, *im8, *im9;
+   //PIPS generated variable
+   int P;
+   ma1 = FIFO3;
+   im4 = FIFO2;
    im3 = FIFO1;
-   im2 = FIFO0;
-   im0 = im2;
    im1 = im3;
+   im2 = im4;
+   im2 = im2-1;
+   im1 = im1-1;
 l99997:
-   for(re0 = 0; re0 <= N0; re0 += 1) {
-      *im1 = *im0+*ma4;
-      im0 = im0+1;
-      im1 = im1+1;
+   for(re6 = 0; re6 <= N1; re6 += 1) {
+      //PIPS generated variable
+      int I_22;
+      *++im2 = *++im1+*ma1;
    }
 }
-void launcher_0(int I_18, int caillou0[1], int in0[128][256], int out0[128][256])
+**** check ok ******
+void launcher_0_microcode(int *FIFO3, int *FIFO2, int *FIFO1, int N1)
+{
+   //PIPS generated variable
+#pragma terapix out00 128 256
+#pragma terapix in00 128 256
+   int j;
+   //PIPS generated variable
+   int *out000, *in000;
+   //PIPS generated variable
+   int re5;
+   //PIPS generated variable
+   int *im1, *im2, *in00, *im3, *out00, *im4, *caillou0, *ma1;
+   //PIPS generated variable
+   int re6, re7;
+   //PIPS generated variable
+   int *im5, *im6, *im7, *im8, *im9;
+   //PIPS generated variable
+   int P;
+   ma1 = FIFO3;
+   im4 = FIFO2;
+   im3 = FIFO1;
+   im1 = im3;
+   im2 = im4;
+   im2 = im2-1;
+   im1 = im1-1;
+l99997:
+   for(re6 = 0; re6 <= N1; re6 += 1) {
+      //PIPS generated variable
+      int I_22;
+      *++im2 = *++im1+*ma1;
+   }
+}
+void launcher_0(int I_21, int caillou0[1], int in0[128][256], int out0[128][256])
 {
    //PIPS generated variable
    int i, j;
 l99996:
    for(i = 0; i <= 127; i += 1)
-l99997:      launcher_0_microcode(&caillou0[0], *&out0[i], *&in0[i], I_18);
+l99997:      launcher_0_microcode(&caillou0[0], *&out0[i], *&in0[i], I_21);
 }
 **** check ok ******
-void launcher_0_microcode(int *FIFO2, int *FIFO1, int *FIFO0, int N0)
+int main(int argc, char **argv)
 {
-   //PIPS generated variable
-   int *im0, *im1, *im2, *im3, *ma4;
-   //PIPS generated variable
-   int re0;
-   ma4 = FIFO2;
-   im3 = FIFO1;
-   im2 = FIFO0;
-   im0 = im2;
-   im1 = im3;
-l99997:
-   for(re0 = 0; re0 <= N0; re0 += 1) {
-      addi(*im1, *im0, *ma4);
-      im0 = im0+1;
-      im1 = im1+1;
-   }
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int out[n][n], in[n][n], mask[1] = {2};
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         in[i][j] = 1;
+   runner(n, out, in, mask[0]);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         check += out[i][j];
+   printf("%d\n", check);
+   return 0;
 }
-sub launcher_0_microcode
-ma4 = FIFO2
-im3 = FIFO1
-im2 = FIFO0
-im0 = im2
-im1 = im3
-l99997:
-                        ||                        ||                        ||         do_N0          ||                        
-                        ||                        ||     P,im1=im0+ma4      ||                        ||                        
-im0 = im0+1
-im1 = im1+1
-                        ||                        ||                        ||          loop          ||                        
-endsub
+tidy the code just in case of
+int main(int argc, char **argv)
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int out[n][n], in[n][n], mask[1] = {2};
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         in[i][j] = 1;
+   runner(n, out, in, mask[0]);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         check += out[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+**** check ok ******
+int main(int argc, char **argv)
+{
+   int check, i, j, n = argc>1?atoi(argv[1]):200;
+   int out[n][n], in[n][n], mask[1] = {2};
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         in[i][j] = 1;
+   runner(n, out, in, mask[0]);
+   check = 0;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         check += out[i][j];
+   printf("%d\n", check);
+   return 0;
+}
+detection and extraction
+tiling

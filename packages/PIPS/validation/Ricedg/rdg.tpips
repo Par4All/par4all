@@ -1,0 +1,10 @@
+delete rdg
+create rdg rdg.f
+display PRINTED_FILE[MAIN]
+activate REGION_CHAINS
+setproperty COMPUTE_ALL_DEPENDENCES TRUE
+apply RICE_REGIONS_DEPENDENCE_GRAPH[MAIN]
+# display something???
+close
+delete rdg
+quit

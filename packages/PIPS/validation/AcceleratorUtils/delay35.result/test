@@ -1,0 +1,57 @@
+void a(int i, int j[2], int k[2])
+{
+   while (i-->=0) {
+      load(k, j);
+      k[0]++;
+      store(j, k);
+   }
+}
+int main()
+{
+   int j[2] = {1, 2}, k[2];
+   a(0, j, k);
+   a(1, j, k);
+   printf("%d\n", k[1]);
+   return 0;
+}
+void a(int i, int j[2], int k[2])
+{
+   load(k, j);
+   while (i-->=0)
+      k[0]++;
+   store(j, k);
+}
+int main()
+{
+   int j[2] = {1, 2}, k[2];
+   load(k, j);
+   a(0, j, k);
+   store(j, k);
+   load(k, j);
+   a(1, j, k);
+   store(j, k);
+   printf("%d\n", k[1]);
+   return 0;
+}
+void a(int i, int j[2], int k[2])
+{
+   while (i-->=0)
+      k[0]++;
+}
+int main()
+{
+   int j[2] = {1, 2}, k[2];
+   load(k, j);
+   a(0, j, k);
+   store(j, k);
+   a(1, j, k);
+   printf("%d\n", k[1]);
+   store(j, k);
+   return 0;
+}
+void a(int i, int j[2], int k[2])
+{
+   while (i-->=0)
+      k[0]++;
+}
+

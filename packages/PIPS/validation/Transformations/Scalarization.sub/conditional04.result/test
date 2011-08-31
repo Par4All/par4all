@@ -1,0 +1,60 @@
+
+RW regions
+
+
+//  <jE[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=cols}>
+//  <jW[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=cols}>
+
+void conditional04(int cols, int jW[cols], int jE[cols])
+{
+   int j;
+
+//  <jE[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=cols}>
+//  <jW[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=cols}>
+
+   for(j = 0; j <= cols-1; j += 1) {
+
+//  <jW[PHI1]-W-EXACT-{PHI1==j, 0<=j, j+1<=cols}>
+
+      jW[j] = j-1;
+
+//  <jE[PHI1]-W-EXACT-{PHI1==j, 0<=j, j+1<=cols}>
+
+      jE[j] = j+1;
+
+//  <jW[PHI1]-W-MAY-{PHI1==0, j==0, 1<=cols}>
+
+      if (j==0)
+
+//  <jW[PHI1]-W-EXACT-{PHI1==0, j==0, 1<=cols}>
+
+         jW[0] = 0;
+
+//  <jE[PHI1]-W-MAY-{PHI1==cols-1, j==cols-1, 1<=cols}>
+
+      if (j==cols-1)
+
+//  <jE[PHI1]-W-EXACT-{PHI1==cols-1, j==cols-1, 1<=cols}>
+
+         jE[cols-1] = cols-1;
+   }
+}
+
+Code after scalarization
+
+void conditional04(int cols, int jW[cols], int jE[cols])
+{
+   int j;
+   for(j = 0; j <= cols-1; j += 1) {
+      //PIPS generated variable
+      register int jE_0, jW_0;
+      jW_0 = j-1;
+      jE_0 = j+1;
+      if (j==0)
+         jW_0 = 0;
+      if (j==cols-1)
+         jE_0 = cols-1;
+      jE[j] = jE_0;
+      jW[j] = jW_0;
+   }
+}

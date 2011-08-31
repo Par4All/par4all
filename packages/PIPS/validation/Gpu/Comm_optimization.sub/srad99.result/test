@@ -1,6 +1,6 @@
-//
-// Initial code for module main
-//
+#
+# Initial code for module main
+#
 int main(int argc, char *argv[])
 {
    int rows, cols, size_I, size_R, niter = 10, iter;
@@ -78,9 +78,9 @@ int main(int argc, char *argv[])
    
    return 0;
 }
-//
-// Code after kernel_data_mapping for module main
-//
+#
+# Code after kernel_data_mapping for module main
+#
 int main(int argc, char *argv[])
 {
    int rows, cols, size_I, size_R, niter = 10, iter;

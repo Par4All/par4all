@@ -15,7 +15,7 @@ display PRINTED_FILE[%ALL]
 
 display C_PRINTED_FILE[FOO]
 
-shell cc -Wall -Werror -c $WS.database/FOO/FOO.c -o $WS.database/FOO/FOO.o
+shell cc -Wall -c $WS.database/FOO/FOO.c -o $WS.database/FOO/FOO.o
 
 close
 delete $WS

@@ -1,0 +1,37 @@
+setenv PIPS_CHECK_FORTRAN="Y"
+delete formel
+create formel formel.f
+
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+
+echo
+echo Symbol table for "FORMEL"
+echo
+
+display SYMBOL_TABLE_FILE[FORMEL]
+
+echo
+echo Code for "FORMEL"
+echo
+
+display PRINTED_FILE[FORMEL]
+
+echo
+echo Symbol table for "FOO"
+echo
+
+display SYMBOL_TABLE_FILE[FOO]
+display PRINTED_FILE[FOO]
+
+echo
+echo Symbol table for "Q"
+echo
+
+display SYMBOL_TABLE_FILE[Q]
+display PRINTED_FILE[Q]
+
+
+close
+delete formel
+quit

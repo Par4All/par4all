@@ -27,7 +27,7 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 0.;
+         __scalar__0 = 0;
          I_18 = i_1_0-1;
          I_19 = isj*I_18;
          I_5 = j+I_19;

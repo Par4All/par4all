@@ -1,6 +1,6 @@
-//
-// Code after privatize_module for module main
-//
+#
+# Code after privatize_module for module main
+#
 int main()
 {
    int i, j;
@@ -19,9 +19,9 @@ int main()
    }
    return 0;
 }
-//
-// Code after internalize_parallel_code for module main
-//
+#
+# Code after internalize_parallel_code for module main
+#
 int main()
 {
    int i, j;

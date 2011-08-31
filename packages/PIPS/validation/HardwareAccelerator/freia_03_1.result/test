@@ -1055,8 +1055,8 @@ freia_status freia_03_helper_0_0_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST?;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST?;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST;
   // 1: +.(1) -> 1
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
@@ -1525,9 +1525,68 @@ digraph "freia_03_helper_0_0_0" {
 
 ! acceleration function
 
-// freia opencl includes
+// FREIA OpenCL includes
+#include <CL/opencl.h>
+#include "freia.h"
+#include "private/freia_opencl_runtime.h"
+
 
 // dag 0: 8 ops and 0 copies, optimized to 8 ops and 0+0 copies
+
+// hold kernels for freia_03_helper_0_0_0
+static cl_kernel freia_03_helper_0_0_0_kernel[2];
+
+// compile kernels for freia_03_helper_0_0_0
+static freia_status freia_03_helper_0_0_0_compile(void)
+{
+  // OpenCL source for freia_03_helper_0_0_0
+  const char * freia_03_helper_0_0_0_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function freia_03_helper_0_0_0\n"
+    "KERNEL void freia_03_helper_0_0_0(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  GLOBAL PIXEL * i1, // const?\n"
+    "  int ofs_i1,\n"
+    "  int width,\n"
+    "  int pitch,\n"
+    "  int c0,\n"
+    "  int c1,\n"
+    "  int c2,\n"
+    "  int c3,\n"
+    "  int c4)\n"
+    "{\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
+    "  int gid = pitch*get_global_id(0);\n"
+    "  int i;\n"
+    "  for (i=gid; i < (gid+width); i++)\n"
+    "  {\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t27 = PIXEL_ADD(in0, c0);\n"
+    "    PIXEL t28 = PIXEL_ADDSAT(in1, c1);\n"
+    "    PIXEL t33 = PIXEL_SET(c2);\n"
+    "    PIXEL t29 = PIXEL_ADD(t27, t28);\n"
+    "    PIXEL t30 = PIXEL_MUL(t27, c3);\n"
+    "    PIXEL t31 = PIXEL_DIV(t29, c4);\n"
+    "    PIXEL t32 = PIXEL_AND(t30, t31);\n"
+    "    PIXEL t34 = PIXEL_MUL(t32, t33);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t34;\n"
+    "  }\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(freia_03_helper_0_0_0_source, "freia_03_helper_0_0_0", "-DPIXEL8", &freia_03_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(freia_03_helper_0_0_0_source, "freia_03_helper_0_0_0", "-DPIXEL16", &freia_03_helper_0_0_0_kernel[1]);
+  return err;
+}
 
 // helper function freia_03_helper_0_0_0
 freia_status freia_03_helper_0_0_0(
@@ -1540,41 +1599,100 @@ freia_status freia_03_helper_0_0_0(
   int32_t c3,
   int32_t c4)
 {
-  call opencl kernel freia_03_helper_0_0_0(o0, i0, i1, c0, c1, c2, c3, c4);
-  return FREIA_OK;
+  freia_status err = FREIA_OK;
+  freia_data2d_opencl *pool= frclTarget.pool;
+  int pitch = o0->row[1] - o0->row[0];
+  int width = o0->widthWa;
+  size_t workSize[1];
+  workSize[0] = o0->heightWa;
+  uint32_t bpp = o0->bpp>>4;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    freia_status cerr = freia_03_helper_0_0_0_compile();
+    // compilation may have failed
+    if (cerr) return cerr;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled.
+  cl_kernel kernel = freia_03_helper_0_0_0_kernel[bpp];
+
+  // set kernel parameters
+  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId].mem);
+  cl_int ofs_o0 = freia_common_data_get_offset(o0);
+  err |= clSetKernelArg(kernel, 1, sizeof(cl_int), &ofs_o0);
+  err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &pool[i0->clId].mem);
+  cl_int ofs_i0 = freia_common_data_get_offset(i0);
+  err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &ofs_i0);
+  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &pool[i1->clId].mem);
+  cl_int ofs_i1 = freia_common_data_get_offset(i1);
+  err |= clSetKernelArg(kernel, 5, sizeof(cl_int), &ofs_i1);
+  err |= clSetKernelArg(kernel, 6, sizeof(cl_int), &width);
+  err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &pitch);
+  err |= clSetKernelArg(kernel, 8, sizeof(cl_int), &c0);
+  err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &c1);
+  err |= clSetKernelArg(kernel, 10, sizeof(cl_int), &c2);
+  err |= clSetKernelArg(kernel, 11, sizeof(cl_int), &c3);
+  err |= clSetKernelArg(kernel, 12, sizeof(cl_int), &c4);
+
+  // call kernel freia_03_helper_0_0_0
+  err |= clEnqueueNDRangeKernel(
+            frclTarget.queue,
+            kernel,
+            1, // number of dimensions
+            NULL, // undefined for OpenCL 1.0
+            workSize, // x and y dimensions
+            NULL, // local size
+            0, // don't wait events
+            NULL,
+            NULL); // do not produce an event
+
+  return err;
 }
-// freia opencl includes
-// generated opencl for function freia_03
+#include <freia_opencl_runtime.hcl>
+// generated OpenCL kernels for function freia_03
 
 // opencl for dag 0
 
 // opencl function freia_03_helper_0_0_0
-kernel freia_03_helper_0_0_0(
-  opencl image o0,
-  const opencl image i0,
-  const opencl image i1,
-  int32_t c0,
-  int32_t c1,
-  int32_t c2,
-  int32_t c3,
-  int32_t c4)
+KERNEL void freia_03_helper_0_0_0(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  GLOBAL PIXEL * i1, // const?
+  int ofs_i1,
+  int width,
+  int pitch,
+  int c0,
+  int c1,
+  int c2,
+  int c3,
+  int c4)
 {
-  for (i)
+  GLOBAL PIXEL * p0 = o0 + ofs_o0;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1;
+  int gid = pitch*get_global_id(0);
+  int i;
+  for (i=gid; i < (gid+width); i++)
   {
     // get input pixels
-    register pixel in0 = i0[i];
-    register pixel in1 = i1[i];
+    PIXEL in0 = j0[i];
+    PIXEL in1 = j1[i];
     // pixel computations
-    register pixel t27 = PIXEL_ADD_CONST(in0, c0);
-    register pixel t28 = PIXEL_ADDSAT_CONST(in1, c1);
-    register pixel t33 = PIXEL_SET_CONST(c2);
-    register pixel t29 = PIXEL_ADD(t27, t28);
-    register pixel t30 = PIXEL_MUL_CONST(t27, c3);
-    register pixel t31 = PIXEL_DIV_CONST(t29, c4);
-    register pixel t32 = PIXEL_AND(t30, t31);
-    register pixel t34 = PIXEL_MUL(t32, t33);
+    PIXEL t27 = PIXEL_ADD(in0, c0);
+    PIXEL t28 = PIXEL_ADDSAT(in1, c1);
+    PIXEL t33 = PIXEL_SET(c2);
+    PIXEL t29 = PIXEL_ADD(t27, t28);
+    PIXEL t30 = PIXEL_MUL(t27, c3);
+    PIXEL t31 = PIXEL_DIV(t29, c4);
+    PIXEL t32 = PIXEL_AND(t30, t31);
+    PIXEL t34 = PIXEL_MUL(t32, t33);
     // set output pixels
-    o0[i] = t34;
+    p0[i] = t34;
   }
 }
 

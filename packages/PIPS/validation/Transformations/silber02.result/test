@@ -481,7 +481,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
          current_0 = bytes[j_0*w+i_0];
          current_1 = lut[current_0];
-         dest[j_0*w+i_0] = (int) current_1+val>255?255:current_1+val;
+         dest[j_0*w+i_0] = adds(current_1, val);
       }
    
    

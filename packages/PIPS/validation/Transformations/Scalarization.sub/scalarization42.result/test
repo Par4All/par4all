@@ -1,6 +1,6 @@
-//
-// Code after scalarization for module main
-//
+#
+# Code after scalarization for module main
+#
 int main()
 {
    int a[10], b[10], c[10];

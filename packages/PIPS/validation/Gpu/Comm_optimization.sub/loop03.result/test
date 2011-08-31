@@ -1,6 +1,6 @@
-//
-// Initial code for module main
-//
+#
+# Initial code for module main
+#
 int main()
 {
    int i;
@@ -14,9 +14,9 @@ int main()
 
    int c = a[0];
 }
-//
-// Code after kernel_data_mapping for module main
-//
+#
+# Code after kernel_data_mapping for module main
+#
 int main()
 {
    int i;
