@@ -437,10 +437,11 @@ static void opencl_merge_and_compile(
   set current = set_make(set_pointer);
   list lcurrent = NIL;
 
+  // overall remaining statements to compile
   set global_remainings = set_make(set_pointer);
   set_assign_list(global_remainings, ls);
 
-  int stnb = -1;
+  int stnb = -1, max_stnb = -1;
 
   while (true)
   {
@@ -469,6 +470,10 @@ static void opencl_merge_and_compile(
             set_add_element(current, current, v);
             again = true;
             mergeable = false;
+
+            // keep track of previous which may have dependencies
+            int n = (int) dagvtx_number(v);
+            if (n>max_stnb) max_stnb = n;
           }
         }
       }
@@ -483,6 +488,12 @@ static void opencl_merge_and_compile(
             set_add_element(done, done, v);
             set_add_element(current, current, v);
             again = true;
+
+            if (!mergeable)
+            {
+              int n = (int) dagvtx_number(v);
+              if (n>max_stnb) max_stnb = n;
+            }
           }
         }
       }
@@ -511,6 +522,9 @@ static void opencl_merge_and_compile(
 
       // ??? should not be needed?
       freia_hack_fix_global_ins_outs(fulld, nd);
+
+      // ??? hack to ensure dependencies...
+      if (max_stnb>stnb) stnb = max_stnb;
 
       // and compile!
       stnb = opencl_compile_mergeable_dag

@@ -168,29 +168,29 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 		    else
 		      {
 			type eff_type =  expression_to_type(arg1);
-
-			if(!ENDP(reference_indices(effect_any_reference(real_arg_eff))))
+			reference eff_ref = effect_any_reference(real_arg_eff);
+			list last_ind = gen_last(reference_indices(eff_ref));
+			if(!ENDP(last_ind))
 			  {
 			    /* The operand of & is subcripted */
 			    /* the effect last index must be changed to '*' if it's
-			       not already the case
+			       not already the case and if it is not a structure or union field
 			    */
-			    reference eff_ref;
-			    expression last_eff_ind;
 			    expression n_exp;
-
-			    eff_ref = effect_any_reference(real_arg_eff);
-			    last_eff_ind =
-			      EXPRESSION(CAR(gen_last(reference_indices(eff_ref))));
-
-			    if(!unbounded_expression_p(last_eff_ind))
+			    expression last_eff_ind = EXPRESSION(CAR(last_ind));
+			    bool field_p = false;
+			    /* first check if the last index is a structure field */
+			    if (expression_reference_p(last_eff_ind))
+			      {
+				field_p = entity_field_p(reference_variable(expression_reference(last_eff_ind)));
+			      }
+			    if(!field_p && !unbounded_expression_p(last_eff_ind))
 			      {
 				n_exp = make_unbounded_expression();
 				(*effect_change_ith_dimension_expression_func)
 				  (real_arg_eff, n_exp,
 				   gen_length(reference_indices(eff_ref)));
 				free_expression(n_exp);
-
 			      }
 			  }
 
