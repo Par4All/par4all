@@ -166,7 +166,7 @@ this, there is an optional optimization that can be used with the
 analysis keep track of data movement and allocation to remove redundant
 communications and allocation, leading to great performance improvements. This
 options supposes that you make use of static and/or C99 VLA array, it would 
-be broken by malloc'ed arrays in parallel section.
+be broken by \texttt{malloc}'ed arrays in parallel section.
 
 Parallelization of some functions can be avoided by using
 \texttt{-{}-exclude-modules=\emph{regex}}. This is preferable when the
@@ -285,10 +285,10 @@ too many resources requested for launch
 \end{verbatim}
 signifies that there are not enough registers to run all the requested
 threads in a block. To remove this error,
-relaunch \texttt{p4a} with the P4A_MAX_TPB environment variable to limit the
+relaunch \texttt{p4a} with the \verb|P4A_MAX_TPB| environment variable to limit the
 number of threads per block under the default value of 256.
 
-For efficiency reasons on \textsc{NVIDIA} Fermi \Agpu, the threads are 
+For efficiency reasons on \textsc{nvidia} Fermi \Agpu, the threads are
 allocated as much as possible as a square. For instance with the default 256 
 threads per block, it will end up with 16 along the $X$ dimension and 16 along
 the $Y$ dimension. The threads per block allocation take into account unbalanced 
@@ -300,6 +300,7 @@ loop is mapped onto the $X$ \Agpu dimension.
 For more tweaking, look at the \Apfa Accel runtime source on
 \url{http://download.par4all.org/doc/Par4All_Accel_runtime/graph} or
 directly in the \Agit repository.
+
 
 \subsection{Automatic task generation for the SCMP architecture}
 \label{sec:scmp}
