@@ -22,7 +22,6 @@ static void _histogram(int data[NP][NP][NP],
 #endif
 #ifndef P4A
   /* Les casts ne passent pas dans PIPS :-( */
-  int i;
   for (i = 0; i < NPART; i++) {
     ++(((int *)histo)[((int*)data)[i]]);
   }
