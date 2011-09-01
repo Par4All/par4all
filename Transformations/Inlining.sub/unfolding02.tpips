@@ -7,6 +7,7 @@ setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__sig
 create unfolding02 unfolding01.c
 
 activate C_SYMBOL_TABLE
+setproperty CONSTANT_PATH_EFFECTS FALSE
 
 echo
 echo before unfolding
