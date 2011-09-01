@@ -126,40 +126,27 @@ static int opencl_compile_mergeable_dag(
          "freia_status ", cut_name, "(");
 
   sb_cat(helper_decls,
-         "  freia_status err = FREIA_OK;\n"
-         "  freia_data2d_opencl *pool= frclTarget.pool;\n");
+         "  freia_status err = FREIA_OK;\n");
 
   int n_outs = gen_length(dag_outputs(d)), n_ins = gen_length(dag_inputs(d));
 
-  // ??? what about vol(cst(3))?
+  // ??? what about vol(cst(3))? we could use default bpp/width/height?
   pips_assert("some images to process", n_ins+n_outs);
 
-  // set pitch and other stuff... we need an image!
-  string ref = "i0";
-  if (n_outs) ref = "o0";
   sb_cat(helper_decls,
-         // offset between lines computed by pointer arithmetic
-         "  int pitch = ", ref, "->row[1] - ", ref, "->row[0];\n"
-         // lines width
-         "  int width = ", ref, "->widthWa;\n",
-         // set block of threads
-         "  size_t workSize[1];\n" // 1D, per row
-         "  workSize[0] = ", ref, "->heightWa;\n"
-         // current bpp is taken from the output image...
-         // should it be from the input image, if any?
-         "  uint32_t bpp = ", ref, "->bpp>>4;\n"
-         "\n"
          // hmmm... should be really done at init time. how to do that?
+         "\n"
          "  // handle on the fly compilation...\n"
          "  static int to_compile = 1;\n"
          "  if (to_compile) {\n"
-         "    freia_status cerr = ", cut_name, "_compile();\n"
+         "    err |= ", cut_name, "_compile();\n"
          "    // compilation may have failed\n"
-         "    if (cerr) return cerr;\n"
+         "    if (err) return err;\n"
          "    to_compile = 0;\n"
          "  }\n"
          "\n"
-         "  // now get kernel, which must be have be compiled.\n"
+         "  // now get kernel, which must be have be compiled\n"
+         "  uint32_t bpp = ", n_ins? "i0": "o0", "->bpp>>4;\n"
          "  cl_kernel kernel = ", cut_name, "_kernel[bpp];\n");
 
   sb_cat(opencl,
@@ -168,7 +155,9 @@ static int opencl_compile_mergeable_dag(
          "KERNEL void ", cut_name, "(");
 
   // count stuff in the generated code
-  int nargs = 0, n_params = 0, cl_args = 0;
+  int nargs = 0, n_params = 0;
+  // first argument is kernel
+  int cl_args = 1;
 
   if (n_outs)
     sb_cat(opencl_tail, "    // set output pixels\n");
@@ -183,19 +172,12 @@ static int opencl_compile_mergeable_dag(
     // image p<out> = o<out> + ofs_o<out>;
     sb_cat(opencl_init,
            "  " OPENCL_IMAGE "p", si, " = ", "o", si, " + ofs_o", si, ";\n");
-    // sb_cat(helper_body, nargs? ", ": "", "o", itoa(i));
-    sb_cat(helper_body,
-           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
-           ", sizeof(cl_mem), &pool[o", si, "->clId].mem);\n");
-    cl_args++;
-    sb_cat(helper_body,
-           "  cl_int ofs_o", si, " = freia_common_data_get_offset(o", si, ");\n"
-           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
-           ", sizeof(cl_int), &ofs_o", si, ");\n");
-    cl_args++;
+    // , o<out>
+    sb_cat(helper_body, ", o", si);
     // p<out>[i] = t<n>;
     sb_cat(opencl_tail,
            "    p", si, "[i] = t", itoa((int) dagvtx_number(v)), ";\n");
+    cl_args+=2;
     nargs++;
     free(si);
     i++;
@@ -212,33 +194,19 @@ static int opencl_compile_mergeable_dag(
     // image j<in> = i<in> + ofs_i<out>;
     sb_cat(opencl_init,
            "  " OPENCL_IMAGE "j", si, " = ", "i", si, " + ofs_i", si, ";\n");
-    // sb_cat(helper_body, nargs? ", ": "", "i", si);
-    sb_cat(helper_body,
-           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
-           ", sizeof(cl_mem), &pool[i", si, "->clId].mem);\n");
-    cl_args++;
-    sb_cat(helper_body,
-           "  cl_int ofs_i", si, " = freia_common_data_get_offset(i", si, ");\n"
-           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
-           ", sizeof(cl_int), &ofs_i", si, ");\n");
-    cl_args++;
+    // , i<in>
+    sb_cat(helper_body, ", i", si);
     // pixel in<in> = j<in>[i];
     sb_cat(opencl_body,
            "    " OPENCL_PIXEL "in", si, " = j", si, "[i];\n");
+    cl_args+=2;
     nargs++;
     free(si);
   }
 
   // size parameters to handle an image row
-  sb_cat(opencl, cl_args? ",": "", "\n  int width,\n  int pitch");
-  sb_cat(helper_body,
-         "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
-         ", sizeof(cl_int), &width);\n");
-  cl_args++;
-  sb_cat(helper_body,
-         "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
-         ", sizeof(cl_int), &pitch);\n");
-  cl_args++;
+  sb_cat(opencl, ",\n  int width,\n  int pitch");
+  cl_args+=2;
 
   // there are possibly other kernel arguments yet to come...
 
@@ -281,7 +249,7 @@ static int opencl_compile_mergeable_dag(
 
     // input image arguments
     list preds = dag_vertex_preds(d, v);
-    bool nao = 0;
+    int nao = 0;
     FOREACH(dagvtx, p, preds)
     {
       if (dagvtx_number(p)==0)
@@ -299,10 +267,7 @@ static int opencl_compile_mergeable_dag(
       string sn = strdup(itoa(n_params));
       sb_cat(helper, ",\n  ", api->arg_in_types[i], " c", sn);
       sb_cat(opencl, ",\n  ", opencl_type(api->arg_in_types[i]), " c", sn);
-      //sb_cat(helper_body, ", c", sn);
-      sb_cat(helper_body,
-           "  err |= clSetKernelArg(kernel, ", itoa(cl_args),
-           ", sizeof(cl_int), &c", sn, ");\n");
+      sb_cat(helper_body, ", c", sn);
       cl_args++;
       sb_cat(opencl_body, nao++? ", ": "", "c", sn);
       free(sn);
@@ -318,22 +283,18 @@ static int opencl_compile_mergeable_dag(
   string_buffer_append_sb(helper, helper_decls);
   sb_cat(helper,
          "\n"
-         "  // set kernel parameters\n");
-  string_buffer_append_sb(helper, helper_body);
-  sb_cat(helper,
-         "\n"
          "  // call kernel ", cut_name, "\n",
-         "  err |= clEnqueueNDRangeKernel(\n"
-         "            frclTarget.queue,\n"
-         "            kernel,\n"
-         "            1, // number of dimensions\n"
-         "            NULL, // undefined for OpenCL 1.0\n"
-         "            workSize, // x and y dimensions\n"
-         "            NULL, // local size\n"
-         "            0, // don't wait events\n"
-         "            NULL,\n"
-         "            NULL); // do not produce an event\n"
+         "  err |= freia_op_call_kernel(kernel");
+  // tell about number of coming kernel parameters
+  sb_cat(helper, ", ", itoa(n_outs));   // output images
+  sb_cat(helper, ", ", itoa(n_ins));    // input images
+  sb_cat(helper, ", ", itoa(n_params)); // input integer parameters
+  sb_cat(helper, ", 0");                // output integer pointers
+  string_buffer_append_sb(helper, helper_body);
+  sb_cat(helper, ")\n"
          "\n"
+         // "  // what about reductions?\n"
+         // "\n"
          "  return err;\n}\n");
 
   sb_cat(opencl, ")\n{\n");
@@ -342,7 +303,8 @@ static int opencl_compile_mergeable_dag(
          // depends on worksize #dims: get_global_id(1)*pitch + g..g..id(0)
          "  int gid = pitch*get_global_id(0);\n"
          "  int i;\n"
-         "  for (i=gid; i < (gid+width); i++)\n  {\n");
+         "  for (i=gid; i < (gid+width); i++)\n"
+         "  {\n");
   string_buffer_append_sb(opencl, opencl_body);
   string_buffer_append_sb(opencl, opencl_tail);
   sb_cat(opencl, "  }\n}\n");
