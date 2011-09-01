@@ -291,7 +291,7 @@ static int opencl_compile_mergeable_dag(
   sb_cat(helper, ", ", itoa(n_params)); // input integer parameters
   sb_cat(helper, ", 0");                // output integer pointers
   string_buffer_append_sb(helper, helper_body);
-  sb_cat(helper, ")\n"
+  sb_cat(helper, ");\n"
          "\n"
          // "  // what about reductions?\n"
          // "\n"
