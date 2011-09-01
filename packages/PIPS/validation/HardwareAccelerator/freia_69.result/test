@@ -2051,15 +2051,16 @@ int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
    freia_data2d *t1, *t2;                                               /*0005*/
    // hardware accelerator generated variable
-   freia_data2d *o1_1 = freia_common_create_data(o1->bpp, o1->widthWa, o1->heightWa);
+   freia_data2d *o1_1 = freia_common_create_data(o1->bpp, o1->widthWa, o1->heightWa), *o0_1 = freia_common_create_data(o0->bpp, o0->widthWa, o0->heightWa);
    t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
    t2 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0007*/
 
    freia_69_helper_0_0_0(t1, o0, o1_1, in, 1, 1, 255, 1, 1, 1, 1, 1);   /*0009*/
    freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0016*/
-   freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0017*/
-   freia_69_helper_0_0_2(o0, o1, t2, in, o0, o1_1);                     /*0018*/
+   freia_aipo_erode_8c(o0_1, o0, freia_morpho_kernel_8c);               /*0017*/
    freia_aipo_erode_8c(t2, t1, freia_morpho_kernel_8c);                 /*0021*/
+   freia_69_helper_0_0_2(o0, o1, t2, in, o0_1, o1_1);                   /*0022*/
+   freia_common_destruct_data(o0_1);
    freia_common_destruct_data(o1_1);
 
    freia_common_destruct_data(t1);                                      /*0024*/
@@ -2073,15 +2074,16 @@ int freia_69(freia_data2d *o0, freia_data2d *o1, const freia_data2d *in)
 {
    freia_data2d *t1, *t2;                                               /*0005*/
    // hardware accelerator generated variable
-   freia_data2d *o1_1 = freia_common_create_data(o1->bpp, o1->widthWa, o1->heightWa);
+   freia_data2d *o1_1 = freia_common_create_data(o1->bpp, o1->widthWa, o1->heightWa), *o0_1 = freia_common_create_data(o0->bpp, o0->widthWa, o0->heightWa);
    t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0006*/
    t2 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0007*/
 
    freia_69_helper_0_0_0(t1, o0, o1_1, in, 1, 1, 255, 1, 1, 1, 1, 1);   /*0009*/
    freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0016*/
-   freia_aipo_erode_8c(o0, o0, freia_morpho_kernel_8c);                 /*0017*/
-   freia_69_helper_0_0_2(o0, o1, t2, in, o0, o1_1);                     /*0018*/
+   freia_aipo_erode_8c(o0_1, o0, freia_morpho_kernel_8c);               /*0017*/
    freia_aipo_erode_8c(t2, t1, freia_morpho_kernel_8c);                 /*0021*/
+   freia_69_helper_0_0_2(o0, o1, t2, in, o0_1, o1_1);                   /*0022*/
+   freia_common_destruct_data(o0_1);
    freia_common_destruct_data(o1_1);
 
    freia_common_destruct_data(t1);                                      /*0024*/

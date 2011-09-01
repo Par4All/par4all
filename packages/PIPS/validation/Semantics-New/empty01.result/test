@@ -1,0 +1,60 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+int empty01()
+{
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int empty01()
+{
+}
+
+Source code with transformers
+
+
+//  T() {}
+
+int caller()
+{
+
+//  T(i) {}
+
+   int i;
+
+//  T(i) {0<=i, i<=9}
+
+   for(i = 0; i <= 9; i += 1)
+
+//  T() {0<=i, i<=9}
+
+      empty01();
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int caller()
+{
+
+//  P() {}
+
+   int i;
+
+//  P(i) {}
+
+   for(i = 0; i <= 9; i += 1)
+
+//  P(i) {0<=i, i<=9}
+
+      empty01();
+}

@@ -1,0 +1,99 @@
+towns read_towns(const  char fname[])
+{
+//             <may be read   >: fname[*] __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: fd
+   FILE *fd = fopen(fname, "r");
+//             <    is written>: curr
+   size_t curr = 0;
+   char c;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data the_towns.n 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   towns the_towns = {1, (town *) malloc(sizeof(town))};
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "begin parsing ...\n");
+//             <may be read   >: fd[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fd[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+
+   while (!feof(fd)) {
+//             <    is read   >: curr the_towns.n
+      if (the_towns.n==curr) {
+//             <    is read   >: the_towns.n
+//             <    is written>: the_towns.n
+         the_towns.n *= 2;
+//             <    is read   >: the_towns.data the_towns.n 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+
+         the_towns.data = (town *) realloc(the_towns.data, the_towns.n*sizeof(town));
+      }
+//             <may be read   >: fd[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fd[0] the_towns.data[curr].latitude 
+//                               the_towns.data[curr].longitude 
+//                               the_towns.data[curr].stock 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: curr fd the_towns.data the_towns.data
+//                               the_towns.data
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &(the_towns.data)[curr].latitude, &(the_towns.data)[curr].longitude, &(the_towns.data)[curr].stock)!=3) {
+l99999:         ;
+//             <may be read   >: fd[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fd[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+         if (!!feof(fd)) goto _break_2;
+//             <may be read   >: fd[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fd[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+//             <    is written>: c
+         c = (char) fgetc(fd);
+//             <    is read   >: c
+         if (c=='\n'||c=='\r') {
+         }
+         else {
+            goto l99999;
+         }
+_break_2:         ;
+      }
+      else {
+//             <    is read   >: curr the_towns.data the_towns.data 
+//                               the_towns.data[curr].latitude
+//             <    is written>: the_towns.data[curr].latitude
+         (the_towns.data)[curr].latitude *= 3.14159265358979323846/180;
+//             <    is read   >: curr the_towns.data the_towns.data 
+//                               the_towns.data[curr].longitude
+//             <    is written>: the_towns.data[curr].longitude
+         (the_towns.data)[curr].longitude *= 3.14159265358979323846/180;
+//             <    is read   >: curr
+//             <    is written>: curr
+         ++curr;
+      }
+   }
+//             <may be read   >: fd[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fd[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+   fclose(fd);
+//             <    is read   >: curr the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns.data 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   the_towns.data = (town *) realloc(the_towns.data, curr*sizeof(town));
+//             <    is read   >: curr
+//             <    is written>: the_towns.n
+   the_towns.n = curr;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: curr stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "parsed %zu towns\n", curr);
+//             <    is read   >: the_towns.data the_towns.n
+   /*
+       for(curr=0;curr<the_towns.nb;curr++)
+           fprintf(stderr,OUTPUT_FORMAT,the_towns.data[curr][0],the_towns.data[curr][1],the_towns.data[curr][2]);
+       */
+   return the_towns;
+}

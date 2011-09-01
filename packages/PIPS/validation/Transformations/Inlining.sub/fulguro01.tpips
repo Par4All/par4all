@@ -8,8 +8,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setproperty C89_CODE_GENERATION TRUE
 setproperty INLINING_USE_INITIALIZATION_LIST FALSE
 
-# uncommment this line to have correct results
-#setenv CONSTANT_PATH_EFFECTS FALSE
+# uncommment this line to have more accruate results
+#setproperty CONSTANT_PATH_EFFECTS FALSE
 
 module flgr_get_data_array_vector_fgUINT16
 activate PRINT_CODE_PROPER_EFFECTS

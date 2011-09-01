@@ -2117,8 +2117,8 @@ int freia_43(void)
 
    freia_aipo_dilate_8c(i3, i0, freia_morpho_kernel_8c);                /*0047*/
    freia_aipo_erode_8c(i1, i0, freia_morpho_kernel_8c);                 /*0048*/
-   freia_43_helper_0_0_1(i7, i1, i2, i3, i6);                           /*0049*/
    freia_aipo_erode_8c(i6, i4, freia_morpho_kernel_8c);                 /*0054*/
+   freia_43_helper_0_0_1(i7, i1, i2, i3, i6);                           /*0055*/
 
    freia_common_tx_image(i7, &fdout);                                   /*0059*/
 
@@ -2168,8 +2168,8 @@ int freia_43(void)
 
    freia_aipo_dilate_8c(i3, i0, freia_morpho_kernel_8c);                /*0047*/
    freia_aipo_erode_8c(i1, i0, freia_morpho_kernel_8c);                 /*0048*/
-   freia_43_helper_0_0_1(i7, i1, i2, i3, i6);                           /*0049*/
    freia_aipo_erode_8c(i6, i4, freia_morpho_kernel_8c);                 /*0054*/
+   freia_43_helper_0_0_1(i7, i1, i2, i3, i6);                           /*0055*/
 
    freia_common_tx_image(i7, &fdout);                                   /*0059*/
 

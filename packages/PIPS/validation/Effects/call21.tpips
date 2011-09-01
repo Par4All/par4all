@@ -1,0 +1,30 @@
+delete call21
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create call21 call21.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[main]
+
+echo
+echo Proper pointer effects for "main"
+echo
+
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Pointer regions for "main"
+echo
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE[main]
+
+close
+delete call21
+quit
+

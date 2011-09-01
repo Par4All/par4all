@@ -16,5 +16,5 @@ display C_SOURCE_FILE[main]
 apply SIMPLIFY_CONTROL[main]
 display PRINTED_FILE[main]
 close
-#delete unfolding09
+delete unfolding09
 quit
