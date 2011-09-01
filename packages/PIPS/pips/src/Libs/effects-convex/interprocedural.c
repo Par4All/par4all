@@ -797,6 +797,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	    list l_eff_real = NIL;
 	    /* first we compute an effect on the real_arg */
 
+	    pips_debug(6, "point_to or field operator\n");
 	    l_real_arg = generic_proper_effects_of_complex_address_expression
 	      (real_arg, &l_eff_real, true);
 
@@ -826,7 +827,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 			  * we should verify that types are compatible. */
 			 new_eff = region_append(new_eff, eff_formal);
 			 /* shouldn't it be a union ? BC */
-			 l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
+			 /* l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));*/
 			 free_effect(eff_formal);
 
 		       } /* else du if (effect_undefined_p(eff_real)) */
