@@ -7303,11 +7303,15 @@ int main(int argc, char *argv[])
 //                               id_string[*] inputtype 
 //                               intravlc_tab[*] iqname[*] level 
 //                               matrix_coefficients 
+//                               motion_data[*].back_hor_f_code 
+//                               motion_data[*].back_vert_f_code 
+//                               motion_data[*].forw_hor_f_code 
+//                               motion_data[*].forw_vert_f_code 
 //                               motion_data[*].sxb motion_data[*].sxf
 //                               motion_data[*].syb motion_data[*].syf
-//                               motion_data[*][*] nframes niqname[*] 
-//                               profile qscale_tab[*] r statname[*] 
-//                               stderr[0] tplorg[*] tplref[*] 
+//                               nframes niqname[*] profile 
+//                               qscale_tab[*] r statname[*] stderr[0]
+//                               tplorg[*] tplref[*] 
 //                               transfer_characteristics 
 //                               vbv_buffer_size vertical_size 
 //                               video_format __IO_EFFECTS:LUNS[2] 
