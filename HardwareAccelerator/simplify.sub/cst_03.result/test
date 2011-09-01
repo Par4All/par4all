@@ -763,7 +763,7 @@ freia_status cst_03_helper_0_0_0(
   cl_kernel kernel = cst_03_helper_0_0_0_kernel[bpp];
 
   // call kernel cst_03_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 1, 0, 4, 0, o0, c0, c1, c2, c3)
+  err |= freia_op_call_kernel(kernel, 1, 0, 4, 0, o0, c0, c1, c2, c3);
 
   return err;
 }

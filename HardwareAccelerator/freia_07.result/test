@@ -1228,7 +1228,7 @@ freia_status freia_07_helper_0_0_0(
   cl_kernel kernel = freia_07_helper_0_0_0_kernel[bpp];
 
   // call kernel freia_07_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 2, 4, 0, 0, o0, o1, i0, i1, i2, i3)
+  err |= freia_op_call_kernel(kernel, 2, 4, 0, 0, o0, o1, i0, i1, i2, i3);
 
   return err;
 }

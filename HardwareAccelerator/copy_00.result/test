@@ -1383,7 +1383,7 @@ freia_status copy_00_helper_0_0_1(
   cl_kernel kernel = copy_00_helper_0_0_1_kernel[bpp];
 
   // call kernel copy_00_helper_0_0_1
-  err |= freia_op_call_kernel(kernel, 2, 4, 0, 0, o0, o1, i0, i1, i2, i3)
+  err |= freia_op_call_kernel(kernel, 2, 4, 0, 0, o0, o1, i0, i1, i2, i3);
 
   return err;
 }

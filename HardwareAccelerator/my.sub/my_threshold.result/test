@@ -562,7 +562,7 @@ freia_status my_threshold_helper_0_0_0(
   cl_kernel kernel = my_threshold_helper_0_0_0_kernel[bpp];
 
   // call kernel my_threshold_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 1, 1, 3, 0, o0, i0, c0, c1, c2)
+  err |= freia_op_call_kernel(kernel, 1, 1, 3, 0, o0, i0, c0, c1, c2);
 
   return err;
 }

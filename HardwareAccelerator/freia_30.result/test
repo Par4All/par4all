@@ -740,7 +740,7 @@ freia_status freia_30_helper_0_0_0(
   cl_kernel kernel = freia_30_helper_0_0_0_kernel[bpp];
 
   // call kernel freia_30_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 2, 1, 3, 0, o0, o1, i0, c0, c1, c2)
+  err |= freia_op_call_kernel(kernel, 2, 1, 3, 0, o0, o1, i0, c0, c1, c2);
 
   return err;
 }

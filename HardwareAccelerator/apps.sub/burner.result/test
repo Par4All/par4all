@@ -33961,7 +33961,7 @@ freia_status main_helper_1_0_1(
   cl_kernel kernel = main_helper_1_0_1_kernel[bpp];
 
   // call kernel main_helper_1_0_1
-  err |= freia_op_call_kernel(kernel, 4, 3, 9, 0, o0, o1, o2, o3, i0, i1, i2, c0, c1, c2, c3, c4, c5, c6, c7, c8)
+  err |= freia_op_call_kernel(kernel, 4, 3, 9, 0, o0, o1, o2, o3, i0, i1, i2, c0, c1, c2, c3, c4, c5, c6, c7, c8);
 
   return err;
 }
@@ -34059,7 +34059,7 @@ freia_status main_helper_3_0_0(
   cl_kernel kernel = main_helper_3_0_0_kernel[bpp];
 
   // call kernel main_helper_3_0_0
-  err |= freia_op_call_kernel(kernel, 1, 4, 4, 0, o0, i0, i1, i2, i3, c0, c1, c2, c3)
+  err |= freia_op_call_kernel(kernel, 1, 4, 4, 0, o0, i0, i1, i2, i3, c0, c1, c2, c3);
 
   return err;
 }

@@ -1432,7 +1432,7 @@ freia_status freia_60_helper_0_0_0(
   cl_kernel kernel = freia_60_helper_0_0_0_kernel[bpp];
 
   // call kernel freia_60_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 4, 3, 3, 0, o0, o1, o2, o3, i0, i1, i2, c0, c1, c2)
+  err |= freia_op_call_kernel(kernel, 4, 3, 3, 0, o0, o1, o2, o3, i0, i1, i2, c0, c1, c2);
 
   return err;
 }

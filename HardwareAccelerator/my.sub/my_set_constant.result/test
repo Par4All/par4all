@@ -508,7 +508,7 @@ freia_status my_set_constant_helper_0_0_0(
   cl_kernel kernel = my_set_constant_helper_0_0_0_kernel[bpp];
 
   // call kernel my_set_constant_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 1, 0, 1, 0, o0, c0)
+  err |= freia_op_call_kernel(kernel, 1, 0, 1, 0, o0, c0);
 
   return err;
 }

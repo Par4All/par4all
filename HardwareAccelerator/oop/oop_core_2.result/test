@@ -2974,7 +2974,7 @@ freia_status oop_core_helper_0_0_1(
   cl_kernel kernel = oop_core_helper_0_0_1_kernel[bpp];
 
   // call kernel oop_core_helper_0_0_1
-  err |= freia_op_call_kernel(kernel, 2, 6, 0, 0, o0, o1, i0, i1, i2, i3, i4, i5)
+  err |= freia_op_call_kernel(kernel, 2, 6, 0, 0, o0, o1, i0, i1, i2, i3, i4, i5);
 
   return err;
 }
@@ -3051,7 +3051,7 @@ freia_status oop_core_helper_0_0_3(
   cl_kernel kernel = oop_core_helper_0_0_3_kernel[bpp];
 
   // call kernel oop_core_helper_0_0_3
-  err |= freia_op_call_kernel(kernel, 1, 2, 3, 0, o0, i0, i1, c0, c1, c2)
+  err |= freia_op_call_kernel(kernel, 1, 2, 3, 0, o0, i0, i1, c0, c1, c2);
 
   return err;
 }

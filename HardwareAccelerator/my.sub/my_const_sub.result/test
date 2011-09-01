@@ -552,7 +552,7 @@ freia_status my_const_sub_helper_0_0_0(
   cl_kernel kernel = my_const_sub_helper_0_0_0_kernel[bpp];
 
   // call kernel my_const_sub_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 1, 1, 1, 0, o0, i0, c0)
+  err |= freia_op_call_kernel(kernel, 1, 1, 1, 0, o0, i0, c0);
 
   return err;
 }
