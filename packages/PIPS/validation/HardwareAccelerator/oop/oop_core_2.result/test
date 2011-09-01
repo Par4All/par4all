@@ -3241,7 +3241,7 @@ int oop_core(void)
 
    freia_status end;                                                    /*0029*/
    // hardware accelerator generated variable
-   freia_data2d *img2_2 = 0, *img2_4 = 0, *img1_2 = 0, *img1_4 = 0;
+   freia_data2d *img1_2 = 0, *img1_4 = 0, *imgtmp_1 = 0;
    
    // Input/output stream and image creations
    freia_common_open_input(&fdin, 0);                                   /*0032*/
@@ -3254,8 +3254,6 @@ int oop_core(void)
    img1_4 = freia_common_create_data(img1->bpp, img1->widthWa, img1->heightWa);
    img1_2 = freia_common_create_data(img1->bpp, img1->widthWa, img1->heightWa);
    img2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0039*/
-   img2_4 = freia_common_create_data(img2->bpp, img2->widthWa, img2->heightWa);
-   img2_2 = freia_common_create_data(img2->bpp, img2->widthWa, img2->heightWa);
    img3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0040*/
 
    imgtt0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0042*/
@@ -3266,6 +3264,7 @@ int oop_core(void)
    
    
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0051*/
+   imgtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
    
    
    end = freia_common_rx_image(imgtt4, &fdin);                          /*0054*/
@@ -3288,8 +3287,7 @@ int oop_core(void)
    
    
    freia_aipo_dilate_8c(imtmp_4, img0, freia_morpho_kernel_8c);         /*0067*/
-   freia_aipo_erode_8c(imgtmp, img0, freia_morpho_kernel_8c);           /*0068*/
-   oop_core_helper_0_0_1(img1_2, img2_2, img1_4, img2_4, imgtmp, imtmp_4, imtmp_5, imtmp_7);          /*0069*/
+   freia_aipo_erode_8c(imgtmp_1, img0, freia_morpho_kernel_8c);         /*0068*/
 
    freia_aipo_dilate_8c(imtmp_5, imgtt2, freia_morpho_kernel_8c);       /*0076*/
    freia_aipo_erode_8c(img1_4, imgtt2, freia_morpho_kernel_8c);         /*0077*/
@@ -3298,10 +3296,11 @@ int oop_core(void)
    freia_aipo_dilate_6c(img1, img1, freia_morpho_kernel_6c);            /*0083*/
 
    freia_aipo_dilate_8c(imtmp_7, imgtt4, freia_morpho_kernel_8c);       /*0095*/
-   freia_aipo_erode_8c(img2_4, imgtt4, freia_morpho_kernel_8c);         /*0096*/
+   freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
+   oop_core_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);            /*0097*/
    
    
-   freia_aipo_erode_6c(img2, img2_2, freia_morpho_kernel_6c);           /*0102*/
+   freia_aipo_erode_6c(img2, img2, freia_morpho_kernel_6c);             /*0102*/
    freia_aipo_dilate_6c(img2, img2, freia_morpho_kernel_6c);            /*0103*/
    oop_core_helper_0_0_3(img3, img1, img2, 15, 255, 1);                 /*0104*/
 
@@ -3319,8 +3318,6 @@ int oop_core(void)
    freia_common_destruct_data(img1_2);
    freia_common_destruct_data(img1_4);
    freia_common_destruct_data(img2);                                    /*0114*/
-   freia_common_destruct_data(img2_2);
-   freia_common_destruct_data(img2_4);
    freia_common_destruct_data(img3);                                    /*0115*/
    freia_common_destruct_data(imgtt0);                                  /*0116*/
    freia_common_destruct_data(imgtt1);                                  /*0117*/
@@ -3330,6 +3327,7 @@ int oop_core(void)
    freia_common_destruct_data(imgtt4);                                  /*0121*/
 
    freia_common_destruct_data(imgtmp);                                  /*0125*/
+   freia_common_destruct_data(imgtmp_1);
    
    /* close videos flow */
    freia_common_close_input(&fdin);                                     /*0128*/
@@ -3362,7 +3360,7 @@ int oop_core(void)
 
    freia_status end;                                                    /*0029*/
    // hardware accelerator generated variable
-   freia_data2d *img2_2 = 0, *img2_4 = 0, *img1_2 = 0, *img1_4 = 0;
+   freia_data2d *img1_2 = 0, *img1_4 = 0, *imgtmp_1 = 0;
    
    // Input/output stream and image creations
    freia_common_open_input(&fdin, 0);                                   /*0032*/
@@ -3375,8 +3373,6 @@ int oop_core(void)
    img1_4 = freia_common_create_data(img1->bpp, img1->widthWa, img1->heightWa);
    img1_2 = freia_common_create_data(img1->bpp, img1->widthWa, img1->heightWa);
    img2 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0039*/
-   img2_4 = freia_common_create_data(img2->bpp, img2->widthWa, img2->heightWa);
-   img2_2 = freia_common_create_data(img2->bpp, img2->widthWa, img2->heightWa);
    img3 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);  /*0040*/
 
    imgtt0 = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0042*/
@@ -3387,6 +3383,7 @@ int oop_core(void)
    
    
    imgtmp = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);               /*0051*/
+   imgtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
    
    
    end = freia_common_rx_image(imgtt4, &fdin);                          /*0054*/
@@ -3409,8 +3406,7 @@ int oop_core(void)
    
    
    freia_aipo_dilate_8c(imtmp_4, img0, freia_morpho_kernel_8c);         /*0067*/
-   freia_aipo_erode_8c(imgtmp, img0, freia_morpho_kernel_8c);           /*0068*/
-   oop_core_helper_0_0_1(img1_2, img2_2, img1_4, img2_4, imgtmp, imtmp_4, imtmp_5, imtmp_7);          /*0069*/
+   freia_aipo_erode_8c(imgtmp_1, img0, freia_morpho_kernel_8c);         /*0068*/
 
    freia_aipo_dilate_8c(imtmp_5, imgtt2, freia_morpho_kernel_8c);       /*0076*/
    freia_aipo_erode_8c(img1_4, imgtt2, freia_morpho_kernel_8c);         /*0077*/
@@ -3419,10 +3415,11 @@ int oop_core(void)
    freia_aipo_dilate_6c(img1, img1, freia_morpho_kernel_6c);            /*0083*/
 
    freia_aipo_dilate_8c(imtmp_7, imgtt4, freia_morpho_kernel_8c);       /*0095*/
-   freia_aipo_erode_8c(img2_4, imgtt4, freia_morpho_kernel_8c);         /*0096*/
+   freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
+   oop_core_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);            /*0097*/
    
    
-   freia_aipo_erode_6c(img2, img2_2, freia_morpho_kernel_6c);           /*0102*/
+   freia_aipo_erode_6c(img2, img2, freia_morpho_kernel_6c);             /*0102*/
    freia_aipo_dilate_6c(img2, img2, freia_morpho_kernel_6c);            /*0103*/
    oop_core_helper_0_0_3(img3, img1, img2, 15, 255, 1);                 /*0104*/
 
@@ -3440,8 +3437,6 @@ int oop_core(void)
    freia_common_destruct_data(img1_2);
    freia_common_destruct_data(img1_4);
    freia_common_destruct_data(img2);                                    /*0114*/
-   freia_common_destruct_data(img2_2);
-   freia_common_destruct_data(img2_4);
    freia_common_destruct_data(img3);                                    /*0115*/
    freia_common_destruct_data(imgtt0);                                  /*0116*/
    freia_common_destruct_data(imgtt1);                                  /*0117*/
@@ -3451,6 +3446,7 @@ int oop_core(void)
    freia_common_destruct_data(imgtt4);                                  /*0121*/
 
    freia_common_destruct_data(imgtmp);                                  /*0125*/
+   freia_common_destruct_data(imgtmp_1);
    
    /* close videos flow */
    freia_common_close_input(&fdin);                                     /*0128*/

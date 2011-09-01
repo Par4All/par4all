@@ -1,0 +1,8 @@
+int caller()
+{
+   int i;
+   //PIPS generated variable
+   int _return0;
+   for(i = 0; i <= 9; i += 1)
+      _return0;
+}

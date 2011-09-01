@@ -372,17 +372,17 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     }
 
     /* create the new instruction sequence
-     * no need to change all entities in the new statements, because we build a new text ressource later
-     * sg: not so true, beacuase of dependant types
+     * no need to change all entities in the new statements, because we build a new text resource later
+     * sg: not so true, because of dependant types
      */
     expanded = copy_statement(inlined_module_statement(p));
 
     statement declaration_holder = make_empty_block_statement();
 
-    /* add external declartions for all extern referenced entities it
+    /* add external declarations for all extern referenced entities it
      * is needed because inlined module and current module may not
      * share the same compilation unit.
-     * Not relevant for fortran
+     * Not relevant for Fortran
      *
      * FI: However, it would be nice to check first if the entity is not
      * already in the scope for the function or in the scope of its
@@ -453,7 +453,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 else
                 {
                     /*sg: unsafe
-                     *sg: i am unsure this is still needed */
+                     *sg: I am unsure this is still needed */
                     bool regenerate = entity_undefined_p(FindEntity(get_current_module_name(),entity_local_name(e)));
                     new=FindOrCreateEntity(get_current_module_name(),entity_local_name(e));
                     if(regenerate)
@@ -502,9 +502,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
      */
     {
         list tail = sequence_statements(instruction_sequence(statement_instruction(expanded)));
-        if(!ENDP(tail) && !ENDP(CDR(tail)))
         {
-            tail_ins(p)= statement_instruction(STATEMENT(CAR(gen_last(tail))));
 
             type treturn = functional_result(type_functional(entity_type(inlined_module(p))));
             if( type_void_p(treturn) ) /* only replace return statement by gotos */
@@ -523,7 +521,10 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 AddEntityToCurrentModule(returned_entity(p));
 
                 /* do the replacement */
-                gen_context_recurse(expanded, p, statement_domain, gen_true, &inline_return_crawler);
+                if(!ENDP(tail) && !ENDP(CDR(tail))) {
+                    tail_ins(p)= statement_instruction(STATEMENT(CAR(gen_last(tail))));
+                    gen_context_recurse(expanded, p, statement_domain, gen_true, &inline_return_crawler);
+                }
 
                 /* change the caller from an expression call to a call to a constant */
                 if( entity_constant_p(returned_entity(p)) )

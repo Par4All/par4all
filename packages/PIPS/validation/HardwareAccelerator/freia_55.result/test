@@ -1133,9 +1133,9 @@ freia_status freia_55(freia_data2d *out, freia_data2d *in)
    // hardware accelerator generated variable
    freia_data2d *tb_1 = freia_common_create_data(tb->bpp, tb->widthWa, tb->heightWa);
 
-   freia_55_helper_0_0_1(out, tb, tb_1, 255);                           /*0009*/
    freia_aipo_dilate_8c(tb_1, in, freia_morpho_kernel_8c);              /*0010*/
    freia_aipo_erode_8c(tb, tb_1, freia_morpho_kernel_8c);               /*0012*/
+   freia_55_helper_0_0_1(out, tb, tb_1, 255);                           /*0013*/
 
    freia_common_destruct_data(tb);                                      /*0016*/
    freia_common_destruct_data(tb_1);
@@ -1150,9 +1150,9 @@ freia_status freia_55(freia_data2d *out, freia_data2d *in)
    // hardware accelerator generated variable
    freia_data2d *tb_1 = freia_common_create_data(tb->bpp, tb->widthWa, tb->heightWa);
 
-   freia_55_helper_0_0_1(out, tb, tb_1, 255);                           /*0009*/
    freia_aipo_dilate_8c(tb_1, in, freia_morpho_kernel_8c);              /*0010*/
    freia_aipo_erode_8c(tb, tb_1, freia_morpho_kernel_8c);               /*0012*/
+   freia_55_helper_0_0_1(out, tb, tb_1, 255);                           /*0013*/
 
    freia_common_destruct_data(tb);                                      /*0016*/
    freia_common_destruct_data(tb_1);
