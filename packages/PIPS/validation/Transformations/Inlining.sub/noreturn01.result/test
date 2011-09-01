@@ -1,0 +1,8 @@
+int osterone()
+{
+   //PIPS generated variable
+   int _return0;
+
+   puts("yeah!\n");
+   return _return0;
+}

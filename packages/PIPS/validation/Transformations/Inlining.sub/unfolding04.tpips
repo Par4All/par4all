@@ -9,6 +9,7 @@ setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__sig
 create unfolding04 unfolding04.c
 
 activate C_SYMBOL_TABLE
+setproperty CONSTANT_PATH_EFFECTS FALSE
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 

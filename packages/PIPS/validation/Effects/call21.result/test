@@ -1,0 +1,28 @@
+int main()
+{
+   mystruct t;
+   foo(t.data);
+   return 0;
+}
+
+Proper pointer effects for "main"
+
+int main()
+{
+   mystruct t;
+//             <may be written>: t.data[*]
+   foo(t.data);
+   return 0;
+}
+
+Pointer regions for "main"
+
+int main()
+{
+   mystruct t;
+
+//  <t.data[PHI2]-W-MAY-{0<=PHI2, PHI2<=9}>
+
+   foo(t.data);
+   return 0;
+}

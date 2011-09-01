@@ -1,0 +1,46 @@
+void flgr_get_data_array_vector_fgUINT16(int *vector_array, int *data_array, int spp, int pos)
+{
+   register int val;
+   register int i, k;
+//             <    is read   >: pos spp
+//             <    is written>: i
+   i = pos*spp;
+//             <    is read   >: spp
+//             <    is written>: k
+
+   for(k = 0; k <= spp-1; k += 1) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: val
+      val = flgr_get_array_fgUINT16(data_array, i);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: k spp val vector_array
+      flgr_set_array_fgUINT16(vector_array, k, val);
+//             <    is read   >: i spp
+//             <    is written>: i
+      i++;
+   }
+}
+void flgr_get_data_array_vector_fgUINT16(int *vector_array, int *data_array, int spp, int pos)
+{
+   register int val;
+   register int i, k;
+   //PIPS generated variable
+   int _return0;
+   i = pos*spp;
+
+   for(k = 0; k <= spp-1; k += 1) {
+      _return0 = data_array[i];
+      val = _return0;
+      {
+         //PIPS generated variable
+         int *array0;
+         //PIPS generated variable
+         int pos0, value0;
+         array0 = vector_array;
+         pos0 = k;
+         value0 = val;
+         array0[pos0] = value0;
+      }
+      i++;
+   }
+}
