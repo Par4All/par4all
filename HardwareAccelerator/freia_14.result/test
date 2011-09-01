@@ -626,44 +626,22 @@ freia_status freia_14_helper_0_0_0(
   int32_t c0)
 {
   freia_status err = FREIA_OK;
-  freia_data2d_opencl *pool= frclTarget.pool;
-  int pitch = o0->row[1] - o0->row[0];
-  int width = o0->widthWa;
-  size_t workSize[1];
-  workSize[0] = o0->heightWa;
-  uint32_t bpp = o0->bpp>>4;
 
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    freia_status cerr = freia_14_helper_0_0_0_compile();
+    err |= freia_14_helper_0_0_0_compile();
     // compilation may have failed
-    if (cerr) return cerr;
+    if (err) return err;
     to_compile = 0;
   }
 
-  // now get kernel, which must be have be compiled.
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = o0->bpp>>4;
   cl_kernel kernel = freia_14_helper_0_0_0_kernel[bpp];
 
-  // set kernel parameters
-  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId].mem);
-  cl_int ofs_o0 = freia_common_data_get_offset(o0);
-  err |= clSetKernelArg(kernel, 1, sizeof(cl_int), &ofs_o0);
-  err |= clSetKernelArg(kernel, 2, sizeof(cl_int), &width);
-  err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &pitch);
-  err |= clSetKernelArg(kernel, 4, sizeof(cl_int), &c0);
-
   // call kernel freia_14_helper_0_0_0
-  err |= clEnqueueNDRangeKernel(
-            frclTarget.queue,
-            kernel,
-            1, // number of dimensions
-            NULL, // undefined for OpenCL 1.0
-            workSize, // x and y dimensions
-            NULL, // local size
-            0, // don't wait events
-            NULL,
-            NULL); // do not produce an event
+  err |= freia_op_call_kernel(kernel, 1, 0, 1, 0, o0, c0)
 
   return err;
 }
