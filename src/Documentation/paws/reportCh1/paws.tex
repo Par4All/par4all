@@ -1,0 +1,30 @@
+\section{PaWS - Pips as Web Service}
+
+\subsection{What is PaWS?}
+
+The aim of the PaWS project is to create a customizable, light and user-friendly WEB graphical interface for the PIPS framework.
+
+\subsubsection{PIPS and PyPS}
+\label{pips_and_pyps}
+
+{\bf PIPS (\emph{Programming Integrated Parallel System})} is a source-to-source compilation framework for analyzing and transforming C and Fortran programs\cite{pips4u}. It allows to verify, optimize and parallelize programs at source level. PIPS helps the users to understand compilation process and to optimize their programs (especially in reducing the execution time and latency). It can also provide assistance in debugging, maintaining and reingeneering code.
+
+{\bf PyPS} is the Python API for PIPS framework. PyPS can be used as a scripting language for creating high-level scripts to perform a sequence of PIPS operations. It also provides the shell for interactive usage of PIPS (with help and documentation). Another advantage of Pyps is that it does not require deep knowledge of Python, so it can be used even by not advanced users.
+
+PIPS framework has other interfaces like line interface: tpips (see \ref{tpips_interface}), shell interface: Pips or java interface jpips.
+
+%% the programable pass manager for pips
+
+\subsubsection{Problems}
+
+PIPS is a very powerful but complex framework. That makes the installation process complicated. Usage of PIPS very often requires also installation of other modules and their dependencies. The second problem is the lack of user-friendly graphocal interface which would allow to use PIPS in an intuitive way.
+
+\subsubsection{Solution - PaWS}
+
+PaWS (Pips as Web Service) is a web application, which was created as a solution to the problems mentioned above. It enables users to use PIPS framework without installing it on their machines. It presents not only single analysis or transformations which are available in PIPS, but also allows user to see more complex combination of PIPS operations. Besides that, user is able to generate dependence graphs from source code.
+
+Depending of user level of advance, it provides different ways of using PIPS - from inituitive demo to ability to change PIPS scripts code. User can decide which approach is most convenient for him/her.
+
+Application provides ready examples which might help to understand how PIPS works, but also lets user try analysis and transformations of his/her own code. There are also other user-friendly features available, like displaying graphs, printing result code or saving it on users machine.
+
+For now, there are preconditions, OpenMP and Array, IN and OUT regions with examples from basic tools available. There are also three tpips tutorials: acca, aile-excerpt and convol.
