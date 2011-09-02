@@ -685,7 +685,7 @@ def postpreprocess_simple(output_string):
                         # the end of #include that are at the top-level:
                         flush_lexer_output('/* P4A include '
                                            + returning_from
-                                           + ' stops here */\n')
+                                           + ' stops here */void p4a_dummy_recover();\n')
         elif include_stack and not simple_method:
             # We are in an inclusion, so decorate only full statements:
             if tok.type == 'comment':
@@ -773,6 +773,9 @@ def recover_header_simple(file_name, output_file_name):
         #python2.7
         #content = re.sub(r'/\* P4A include ([<"][^">]+[">]) starts here \*/.+?/\* P4A include \1 stops here \*/',
         #       r'#include \1', content, 0, re.DOTALL)
+        # Remove dummy declaration, was there to help PIPS to hold comments
+        content = re.sub(r'void p4a_dummy_recover\(\);\n',
+                r'', content, 0)
 
         so += content
         if verbose:
