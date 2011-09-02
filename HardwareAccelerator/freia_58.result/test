@@ -2056,23 +2056,14 @@ digraph "freia_58_helper_1_0" {
   "out'" [shape=circle];
 
   // computation vertices
+  "17 vol" [shape=diamond];
   "14 <" [shape=trapezium,orientation=270];
+  "14 <" -> "17 vol" [label="out"];
   "14 <" -> "out'";
   "in" -> "14 <";
   "10 D8" [shape=box];
   "10 D8" -> "14 <" [label="out_1"];
   "out" -> "10 D8";
-}
-// graph for dag "freia_58_helper_1_1" of module "freia_58" in dot format
-digraph "freia_58_helper_1_1" {
-  // inputs
-  "out" [shape=circle];
-
-  // outputs
-
-  // computation vertices
-  "17 vol" [shape=diamond];
-  "out" -> "17 vol";
 }
 
 ! acceleration function
