@@ -1116,7 +1116,7 @@ static freia_status freia_scalar_04_helper_0_0_0_compile(void)
     "    PIXEL in1 = j1[i];\n"
     "    // pixel computations\n"
     "    PIXEL t14 = PIXEL_ADD(in0, in1);\n"
-    "    PIXEL_MAX(red15, t14);\n"
+    "    PIXEL_MAXIMUM(red15, t14);\n"
     "    // set output pixels\n"
     "    p0[i] = t14;\n"
     "  }\n"
@@ -1153,13 +1153,13 @@ freia_status freia_scalar_04_helper_0_0_0(
   cl_kernel kernel = freia_scalar_04_helper_0_0_0_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel freia_scalar_04_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 1, 2, 0, 0, o0, i0, i1, &redres);
 
   // return reduction results
-  *po3 = redres.max;
+  *po3 = redres.maximum;
 
   return err;
 }
@@ -1200,7 +1200,7 @@ KERNEL void freia_scalar_04_helper_0_0_0(
     PIXEL in1 = j1[i];
     // pixel computations
     PIXEL t14 = PIXEL_ADD(in0, in1);
-    PIXEL_MAX(red15, t14);
+    PIXEL_MAXIMUM(red15, t14);
     // set output pixels
     p0[i] = t14;
   }

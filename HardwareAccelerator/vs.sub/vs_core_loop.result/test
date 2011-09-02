@@ -3832,8 +3832,8 @@ static freia_status vs_core_loop_helper_3_0_0_compile(void)
     "    PIXEL t91 = PIXEL_MUL(in2, c0);\n"
     "    PIXEL t92 = PIXEL_MUL(in1, c1);\n"
     "    PIXEL t93 = PIXEL_ADD(t92, t91);\n"
-    "    PIXEL_MAX(red98, t87);\n"
-    "    PIXEL_MIN(red99, t87);\n"
+    "    PIXEL_MAXIMUM(red98, t87);\n"
+    "    PIXEL_MINIMUM(red99, t87);\n"
     "    PIXEL t94 = PIXEL_DIV(t93, c2);\n"
     "    // set output pixels\n"
     "    p0[i] = t87;\n"
@@ -3879,14 +3879,14 @@ freia_status vs_core_loop_helper_3_0_0(
   cl_kernel kernel = vs_core_loop_helper_3_0_0_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel vs_core_loop_helper_3_0_0
   err |= freia_op_call_kernel(kernel, 2, 3, 3, 0, o0, o1, i0, i1, i2, c0, c1, c2, &redres);
 
   // return reduction results
-  *po5 = redres.max;
-  *po6 = redres.min;
+  *po5 = redres.maximum;
+  *po6 = redres.minimum;
 
   return err;
 }
@@ -4030,8 +4030,8 @@ KERNEL void vs_core_loop_helper_3_0_0(
     PIXEL t91 = PIXEL_MUL(in2, c0);
     PIXEL t92 = PIXEL_MUL(in1, c1);
     PIXEL t93 = PIXEL_ADD(t92, t91);
-    PIXEL_MAX(red98, t87);
-    PIXEL_MIN(red99, t87);
+    PIXEL_MAXIMUM(red98, t87);
+    PIXEL_MINIMUM(red99, t87);
     PIXEL t94 = PIXEL_DIV(t93, c2);
     // set output pixels
     p0[i] = t87;

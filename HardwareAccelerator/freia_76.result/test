@@ -787,7 +787,7 @@ static freia_status freia_76_helper_0_0_0_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL_MAX(red7, in0);\n"
+    "    PIXEL_MAXIMUM(red7, in0);\n"
     "    PIXEL_VOLUME(red8, in0);\n"
     "    PIXEL_MIN_COORD(red9, in0);\n"
     "  }\n"
@@ -830,17 +830,17 @@ freia_status freia_76_helper_0_0_0(
   cl_kernel kernel = freia_76_helper_0_0_0_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel freia_76_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 0, 1, 0, 0, i0, &redres);
 
   // return reduction results
-  *po1 = redres.max;
-  *po2 = redres.vol;
-  *po3 = redres.min;
-  *po4 = redres.min_x;
-  *po5 = redres.min_y;
+  *po1 = redres.maximum;
+  *po2 = redres.volume;
+  *po3 = redres.minimum;
+  *po4 = redres.min_coord_x;
+  *po5 = redres.min_coord_y;
 
   return err;
 }
@@ -873,7 +873,7 @@ KERNEL void freia_76_helper_0_0_0(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL_MAX(red7, in0);
+    PIXEL_MAXIMUM(red7, in0);
     PIXEL_VOLUME(red8, in0);
     PIXEL_MIN_COORD(red9, in0);
   }

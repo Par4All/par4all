@@ -590,15 +590,15 @@ freia_status my_global_min_coord_helper_0_0_0(
   cl_kernel kernel = my_global_min_coord_helper_0_0_0_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel my_global_min_coord_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 0, 1, 0, 0, i0, &redres);
 
   // return reduction results
-  *po1 = redres.min;
-  *po2 = redres.min_x;
-  *po3 = redres.min_y;
+  *po1 = redres.minimum;
+  *po2 = redres.min_coord_x;
+  *po3 = redres.min_coord_y;
 
   return err;
 }

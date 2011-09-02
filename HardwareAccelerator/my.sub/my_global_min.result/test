@@ -517,7 +517,7 @@ static freia_status my_global_min_helper_0_0_0_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL_MIN(red4, in0);\n"
+    "    PIXEL_MINIMUM(red4, in0);\n"
     "  }\n"
     "\n"
     "  // reduction copy out\n"
@@ -550,13 +550,13 @@ freia_status my_global_min_helper_0_0_0(
   cl_kernel kernel = my_global_min_helper_0_0_0_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel my_global_min_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 0, 1, 0, 0, i0, &redres);
 
   // return reduction results
-  *po1 = redres.min;
+  *po1 = redres.minimum;
 
   return err;
 }
@@ -589,7 +589,7 @@ KERNEL void my_global_min_helper_0_0_0(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL_MIN(red4, in0);
+    PIXEL_MINIMUM(red4, in0);
   }
 
   // reduction copy out

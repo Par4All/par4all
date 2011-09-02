@@ -1108,7 +1108,7 @@ static freia_status freia_skip_02_helper_0_0_0_compile(void)
     "    // get input pixels\n"
     "    PIXEL in0 = j0[i];\n"
     "    // pixel computations\n"
-    "    PIXEL_MIN(red10, in0);\n"
+    "    PIXEL_MINIMUM(red10, in0);\n"
     "    PIXEL t11 = PIXEL_AND(in0, c0);\n"
     "    PIXEL t13 = PIXEL_DIV(t11, c1);\n"
     "    // set output pixels\n"
@@ -1148,13 +1148,13 @@ freia_status freia_skip_02_helper_0_0_0(
   cl_kernel kernel = freia_skip_02_helper_0_0_0_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel freia_skip_02_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 1, 1, 2, 0, o0, i0, c0, c1, &redres);
 
   // return reduction results
-  *po2 = redres.min;
+  *po2 = redres.minimum;
 
   return err;
 }
@@ -1192,7 +1192,7 @@ KERNEL void freia_skip_02_helper_0_0_0(
     // get input pixels
     PIXEL in0 = j0[i];
     // pixel computations
-    PIXEL_MIN(red10, in0);
+    PIXEL_MINIMUM(red10, in0);
     PIXEL t11 = PIXEL_AND(in0, c0);
     PIXEL t13 = PIXEL_DIV(t11, c1);
     // set output pixels

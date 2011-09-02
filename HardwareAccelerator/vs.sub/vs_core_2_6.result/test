@@ -2813,8 +2813,8 @@ static freia_status vs_core_2_helper_0_0_0_compile(void)
     "    PIXEL t19 = PIXEL_MUL(in1, c0);\n"
     "    PIXEL t20 = PIXEL_MUL(in0, c1);\n"
     "    PIXEL t21 = PIXEL_ADD(t20, t19);\n"
-    "    PIXEL_MAX(red26, t15);\n"
-    "    PIXEL_MIN(red27, t15);\n"
+    "    PIXEL_MAXIMUM(red26, t15);\n"
+    "    PIXEL_MINIMUM(red27, t15);\n"
     "    PIXEL t22 = PIXEL_DIV(t21, c2);\n"
     "    // set output pixels\n"
     "    p0[i] = t15;\n"
@@ -2859,14 +2859,14 @@ freia_status vs_core_2_helper_0_0_0(
   cl_kernel kernel = vs_core_2_helper_0_0_0_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel vs_core_2_helper_0_0_0
   err |= freia_op_call_kernel(kernel, 2, 2, 3, 0, o0, o1, i0, i1, c0, c1, c2, &redres);
 
   // return reduction results
-  *po4 = redres.max;
-  *po5 = redres.min;
+  *po4 = redres.maximum;
+  *po5 = redres.minimum;
 
   return err;
 }
@@ -3000,8 +3000,8 @@ KERNEL void vs_core_2_helper_0_0_0(
     PIXEL t19 = PIXEL_MUL(in1, c0);
     PIXEL t20 = PIXEL_MUL(in0, c1);
     PIXEL t21 = PIXEL_ADD(t20, t19);
-    PIXEL_MAX(red26, t15);
-    PIXEL_MIN(red27, t15);
+    PIXEL_MAXIMUM(red26, t15);
+    PIXEL_MINIMUM(red27, t15);
     PIXEL t22 = PIXEL_DIV(t21, c2);
     // set output pixels
     p0[i] = t15;

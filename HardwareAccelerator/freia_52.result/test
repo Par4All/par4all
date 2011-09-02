@@ -18552,13 +18552,13 @@ freia_status freia_52_helper_0_0_2(
   cl_kernel kernel = freia_52_helper_0_0_2_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel freia_52_helper_0_0_2
   err |= freia_op_call_kernel(kernel, 1, 8, 1, 0, o0, i0, i1, i2, i3, i4, i5, i6, i7, c0, &redres);
 
   // return reduction results
-  *po9 = redres.vol;
+  *po9 = redres.volume;
 
   return err;
 }
@@ -18644,13 +18644,13 @@ freia_status freia_52_helper_1_0_1(
   cl_kernel kernel = freia_52_helper_1_0_1_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel freia_52_helper_1_0_1
   err |= freia_op_call_kernel(kernel, 1, 2, 0, 0, o0, i0, i1, &redres);
 
   // return reduction results
-  *po3 = redres.vol;
+  *po3 = redres.volume;
 
   return err;
 }

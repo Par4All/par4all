@@ -1307,7 +1307,7 @@ static freia_status freia_04_helper_0_0_1_compile(void)
     "    PIXEL t28 = PIXEL_SUB(in1, in0);\n"
     "    PIXEL t30 = PIXEL_THRESHOLD(in0, c0, c1, c2);\n"
     "    PIXEL t29 = PIXEL_THRESHOLD(t28, c3, c4, c5);\n"
-    "    PIXEL_MIN(red32, t30);\n"
+    "    PIXEL_MINIMUM(red32, t30);\n"
     "    PIXEL t33 = PIXEL_ADD(t29, t30);\n"
     "    // set output pixels\n"
     "    p0[i] = t29;\n"
@@ -1353,13 +1353,13 @@ freia_status freia_04_helper_0_0_1(
   cl_kernel kernel = freia_04_helper_0_0_1_kernel[bpp];
 
   // currently only one reduction structure...
-  freia_reduction_results redres;
+  freia_opencl_measure_status redres;
 
   // call kernel freia_04_helper_0_0_1
   err |= freia_op_call_kernel(kernel, 2, 2, 6, 0, o0, o1, i0, i1, c0, c1, c2, c3, c4, c5, &redres);
 
   // return reduction results
-  *po4 = redres.min;
+  *po4 = redres.minimum;
 
   return err;
 }
@@ -1411,7 +1411,7 @@ KERNEL void freia_04_helper_0_0_1(
     PIXEL t28 = PIXEL_SUB(in1, in0);
     PIXEL t30 = PIXEL_THRESHOLD(in0, c0, c1, c2);
     PIXEL t29 = PIXEL_THRESHOLD(t28, c3, c4, c5);
-    PIXEL_MIN(red32, t30);
+    PIXEL_MINIMUM(red32, t30);
     PIXEL t33 = PIXEL_ADD(t29, t30);
     // set output pixels
     p0[i] = t29;
