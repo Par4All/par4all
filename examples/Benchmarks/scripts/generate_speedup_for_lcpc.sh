@@ -9,7 +9,7 @@ export tests="2mm 3mm adi bicg correlation covariance doitgen fdtd-2d gauss-filt
 export labelfontsize=10
 
 # The differents version involved
-export versions="OpenMP HMPP PGI Cuda-naive Cuda-opt"
+export versions="Par4All-OpenMP Par4All-Cuda"
 
 
 # Get script dir

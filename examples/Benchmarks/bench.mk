@@ -11,7 +11,7 @@ endif
 
 # Common source file (for timing...)
 COMMON := ../../common/timing.c
-ACCEL_FLAGS := -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -arch=sm_13
+ACCEL_FLAGS := -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -arch=sm_20
 ACCEL_SRC := $(P4A_ACCEL_DIR)/p4a_accel.cu $(P4A_ACCEL_DIR)/p4a_communication_optimization_runtime.cpp
 # Params for benchmarks
 NRUNS := `seq 1 5`
