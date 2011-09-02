@@ -9,7 +9,7 @@
 static void _histogram(int data[NP][NP][NP],
               int histo[NP][NP][NP]) {
   int i,j,k;
-#ifdef P4A_CUDA_CHEAT
+#ifdef __PIPS__
   for (i = 0; i < NP; i++) {
     for (k = 0; k < NP; k++) {
       for (j = 0; j < NP; j++) {
@@ -20,7 +20,9 @@ static void _histogram(int data[NP][NP][NP],
 #else
   memset(histo, 0, NPART * sizeof(int));
 #endif
-#ifndef P4A
+
+
+#ifndef __PIPS__
   /* Les casts ne passent pas dans PIPS :-( */
   for (i = 0; i < NPART; i++) {
     ++(((int *)histo)[((int*)data)[i]]);
