@@ -289,13 +289,13 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min, measure_none }
     },
-    TRPX_MS(1, 3, "GLOBAL_MIN"), OPCL("MIN")
+    TRPX_MS(1, 3, "GLOBAL_MIN"), OPCL("MINIMUM")
   },
   { AIPO "global_max", "max", NULL, 0, 1, 1, 0, { TY_PIN, NULL, NULL },
     NO_PARAM, { spoc_input_0 | spoc_measure_0,
                 NO_POC, alu_unused, { measure_max, measure_none }
     },
-    TRPX_MS(1, 3, "GLOBAL_MAX"), OPCL("MAX")
+    TRPX_MS(1, 3, "GLOBAL_MAX"), OPCL("MAXIMUM")
   },
   { AIPO "global_min_coord", "min!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PUI, TY_PUI }, NO_PARAM,

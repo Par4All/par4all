@@ -291,7 +291,7 @@ static int opencl_compile_mergeable_dag(
         sb_cat(helper_decls,
                "\n"
                "  // currently only one reduction structure...\n"
-               "  freia_reduction_results redres;\n");
+               "  freia_opencl_measure_status redres;\n");
         // must be the last argument!
         sb_cat(helper_body_2, ", &redres");
         sb_cat(helper_tail, "\n  // return reduction results\n");
@@ -317,21 +317,23 @@ static int opencl_compile_mergeable_dag(
         sb_cat(opencl_body, "t", itoa(npred));
       sb_cat(opencl_body, ");\n");
 
+#define RED " = redres." // for a small code compaction
+
       // tail code to copy back stuff in OpenCL. ??? HARDCODED for now...
       if (same_string_p(api->compact_name, "max"))
       {
         sb_cat(opencl_end,  "  redX[idy].max = mmax.x;\n");
-        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.max;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "maximum;\n");
       }
       else if (same_string_p(api->compact_name, "min"))
       {
         sb_cat(opencl_end, "  redX[idy].min = mmin.x;\n");
-        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.min;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "minimum;\n");
       }
       else if (same_string_p(api->compact_name, "vol"))
       {
         sb_cat(opencl_end, "  redX[idy].vol = vol;\n");
-        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.vol;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "volume;\n");
       }
       else if (same_string_p(api->compact_name, "max!"))
       {
@@ -339,9 +341,9 @@ static int opencl_compile_mergeable_dag(
                "  redX[idy].max = mmax.x;\n"
                "  redX[idy].max_x = (uint) mmax.y;\n"
                "  redX[idy].max_y = idy;\n");
-        sb_cat(helper_tail, "  *po", itoa(nargs-3), " = redres.max;\n");
-        sb_cat(helper_tail, "  *po", itoa(nargs-2), " = redres.max_x;\n");
-        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.max_y;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "maximum;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "max_coord_x;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "max_coord_y;\n");
       }
       else if (same_string_p(api->compact_name, "min!"))
       {
@@ -349,9 +351,9 @@ static int opencl_compile_mergeable_dag(
                "  redX[idy].min = mmin.x;\n"
                "  redX[idy].min_x = (uint) mmin.y;\n"
                "  redX[idy].min_y = idy;\n");
-        sb_cat(helper_tail, "  *po", itoa(nargs-3), " = redres.min;\n");
-        sb_cat(helper_tail, "  *po", itoa(nargs-2), " = redres.min_x;\n");
-        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.min_y;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-3), RED "minimum;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-2), RED "min_coord_x;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), RED "min_coord_y;\n");
       }
 
       // skip to next operator
