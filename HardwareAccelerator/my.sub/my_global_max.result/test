@@ -461,6 +461,17 @@ digraph "my_global_max_helper_0_0" {
   "4 max" [shape=diamond];
   "i0" -> "4 max";
 }
+// graph for dag "my_global_max_helper_0_0_0" of module "my_global_max" in dot format
+digraph "my_global_max_helper_0_0_0" {
+  // inputs
+  "i0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "4 max" [shape=diamond];
+  "i0" -> "4 max";
+}
 
 ! acceleration function
 
@@ -471,23 +482,132 @@ digraph "my_global_max_helper_0_0" {
 
 
 // dag 0: 1 ops and 0 copies, optimized to 1 ops and 0+0 copies
+
+// hold kernels for my_global_max_helper_0_0_0
+static cl_kernel my_global_max_helper_0_0_0_kernel[2];
+
+// compile kernels for my_global_max_helper_0_0_0
+static freia_status my_global_max_helper_0_0_0_compile(void)
+{
+  // OpenCL source for my_global_max_helper_0_0_0
+  const char * my_global_max_helper_0_0_0_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function my_global_max_helper_0_0_0\n"
+    "KERNEL void my_global_max_helper_0_0_0(\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  int width,\n"
+    "  int pitch,\n"
+    "  GLOBAL TMeasure * redX)\n"
+    "{\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  int2 mmin = { PIXEL_MAX, 0 };\n"
+    "  int2 mmax = { PIXEL_MIN, 0 };\n"
+    "  int idy = get_global_id(0);\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int gid = pitch*get_global_id(0);\n"
+    "  int i;\n"
+    "  for (i=gid; i < (gid+width); i++)\n"
+    "  {\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL_MAX(red4, in0);\n"
+    "  }\n"
+    "\n"
+    "  // reduction copy out\n"
+    "  redX[idy].max = mmax.x;\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(my_global_max_helper_0_0_0_source, "my_global_max_helper_0_0_0", "-DPIXEL8", &my_global_max_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(my_global_max_helper_0_0_0_source, "my_global_max_helper_0_0_0", "-DPIXEL16", &my_global_max_helper_0_0_0_kernel[1]);
+  return err;
+}
+
+// helper function my_global_max_helper_0_0_0
+freia_status my_global_max_helper_0_0_0(
+  const freia_data2d * i0,
+  int32_t * po1)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= my_global_max_helper_0_0_0_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = my_global_max_helper_0_0_0_kernel[bpp];
+
+  // currently only one reduction structure...
+  freia_reduction_results redres;
+
+  // call kernel my_global_max_helper_0_0_0
+  err |= freia_op_call_kernel(kernel, 0, 1, 0, 0, i0, &redres);
+
+  // return reduction results
+  *po1 = redres.max;
+
+  return err;
+}
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function my_global_max
 
 // opencl for dag 0
 
+// opencl function my_global_max_helper_0_0_0
+KERNEL void my_global_max_helper_0_0_0(
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  int width,
+  int pitch,
+  GLOBAL TMeasure * redX)
+{
+  GLOBAL PIXEL * j0 = i0 + ofs_i0;
+
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  int2 mmin = { PIXEL_MAX, 0 };
+  int2 mmax = { PIXEL_MIN, 0 };
+  int idy = get_global_id(0);
+
+  // thread's pixel loop
+  int gid = pitch*get_global_id(0);
+  int i;
+  for (i=gid; i < (gid+width); i++)
+  {
+    // get input pixels
+    PIXEL in0 = j0[i];
+    // pixel computations
+    PIXEL_MAX(red4, in0);
+  }
+
+  // reduction copy out
+  redX[idy].max = mmax.x;
+}
+
 ! updated function
 
 freia_status my_global_max(freia_data2d *i0, int32_t *p0)
 {
-   return freia_aipo_global_max(i0, p0);                                /*0004*/
+   return my_global_max_helper_0_0_0(i0, p0);                           /*0004*/
 }
 
 ! cleaned up function
 
 freia_status my_global_max(freia_data2d *i0, int32_t *p0)
 {
-   return freia_aipo_global_max(i0, p0);                                /*0004*/
+   return my_global_max_helper_0_0_0(i0, p0);                           /*0004*/
 }
 #
 # FREIA COMPILATION DONE

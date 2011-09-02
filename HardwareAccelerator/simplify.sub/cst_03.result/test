@@ -720,6 +720,8 @@ static freia_status cst_03_helper_0_0_0_compile(void)
     "  int c3)\n"
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
+    "\n"
+    "  // thread's pixel loop\n"
     "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
@@ -784,6 +786,8 @@ KERNEL void cst_03_helper_0_0_0(
   int c3)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
+
+  // thread's pixel loop
   int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)

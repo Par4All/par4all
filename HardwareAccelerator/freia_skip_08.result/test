@@ -1101,7 +1101,9 @@ digraph "freia_skip_08_helper_0_0_0" {
   "t_1" [shape=circle];
 
   // computation vertices
+  "10 max" [shape=diamond];
   "9 +." [shape=trapezium,orientation=270];
+  "9 +." -> "10 max" [label="t_1"];
   "9 +." -> "t_1";
   "8 ^." [shape=trapezium,orientation=270];
   "8 ^." -> "9 +." [label="t_2"];
@@ -1167,10 +1169,19 @@ static freia_status freia_skip_08_helper_0_0_0_compile(void)
     "  int width,\n"
     "  int pitch,\n"
     "  int c0,\n"
-    "  int c1)\n"
+    "  int c1,\n"
+    "  GLOBAL TMeasure * redX)\n"
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  int2 mmin = { PIXEL_MAX, 0 };\n"
+    "  int2 mmax = { PIXEL_MIN, 0 };\n"
+    "  int idy = get_global_id(0);\n"
+    "\n"
+    "  // thread's pixel loop\n"
     "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
@@ -1180,9 +1191,13 @@ static freia_status freia_skip_08_helper_0_0_0_compile(void)
     "    // pixel computations\n"
     "    PIXEL t8 = PIXEL_XOR(in0, c0);\n"
     "    PIXEL t9 = PIXEL_ADD(t8, c1);\n"
+    "    PIXEL_MAX(red10, t9);\n"
     "    // set output pixels\n"
     "    p0[i] = t9;\n"
     "  }\n"
+    "\n"
+    "  // reduction copy out\n"
+    "  redX[idy].max = mmax.x;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(freia_skip_08_helper_0_0_0_source, "freia_skip_08_helper_0_0_0", "-DPIXEL8", &freia_skip_08_helper_0_0_0_kernel[0]);
@@ -1195,7 +1210,8 @@ freia_status freia_skip_08_helper_0_0_0(
   freia_data2d * o0,
   const freia_data2d * i0,
   int32_t c0,
-  int32_t c1)
+  int32_t c1,
+  int32_t * po2)
 {
   freia_status err = FREIA_OK;
 
@@ -1212,8 +1228,14 @@ freia_status freia_skip_08_helper_0_0_0(
   uint32_t bpp = i0->bpp>>4;
   cl_kernel kernel = freia_skip_08_helper_0_0_0_kernel[bpp];
 
+  // currently only one reduction structure...
+  freia_reduction_results redres;
+
   // call kernel freia_skip_08_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 1, 1, 2, 0, o0, i0, c0, c1);
+  err |= freia_op_call_kernel(kernel, 1, 1, 2, 0, o0, i0, c0, c1, &redres);
+
+  // return reduction results
+  *po2 = redres.max;
 
   return err;
 }
@@ -1243,6 +1265,8 @@ static freia_status freia_skip_08_helper_0_1_0_compile(void)
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "\n"
+    "  // thread's pixel loop\n"
     "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
@@ -1305,10 +1329,19 @@ KERNEL void freia_skip_08_helper_0_0_0(
   int width,
   int pitch,
   int c0,
-  int c1)
+  int c1,
+  GLOBAL TMeasure * redX)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
+
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  int2 mmin = { PIXEL_MAX, 0 };
+  int2 mmax = { PIXEL_MIN, 0 };
+  int idy = get_global_id(0);
+
+  // thread's pixel loop
   int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
@@ -1318,9 +1351,13 @@ KERNEL void freia_skip_08_helper_0_0_0(
     // pixel computations
     PIXEL t8 = PIXEL_XOR(in0, c0);
     PIXEL t9 = PIXEL_ADD(t8, c1);
+    PIXEL_MAX(red10, t9);
     // set output pixels
     p0[i] = t9;
   }
+
+  // reduction copy out
+  redX[idy].max = mmax.x;
 }
 
 // opencl function freia_skip_08_helper_0_1_0
@@ -1338,6 +1375,8 @@ KERNEL void freia_skip_08_helper_0_1_0(
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
+
+  // thread's pixel loop
   int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
@@ -1359,8 +1398,7 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t, i, 111, 12);                           /*0008*/
-   freia_aipo_global_max(t, &max);                                      /*0010*/
+   freia_skip_08_helper_0_0_0(t, i, 111, 12, &max);                     /*0008*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else
@@ -1376,8 +1414,7 @@ void freia_skip_08(freia_data2d *o, const freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_08_helper_0_0_0(t, i, 111, 12);                           /*0008*/
-   freia_aipo_global_max(t, &max);                                      /*0010*/
+   freia_skip_08_helper_0_0_0(t, i, 111, 12, &max);                     /*0008*/
    if (max>128)                                                         /*0011*/
       seuil = max-10;                                                   /*0012*/
    else

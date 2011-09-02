@@ -935,6 +935,23 @@ digraph "freia_scalar_03_helper_0_0" {
   "i1" -> "10 +";
   "i0" -> "10 +";
 }
+// graph for dag "freia_scalar_03_helper_0_0_0" of module "freia_scalar_03" in dot format
+digraph "freia_scalar_03_helper_0_0_0" {
+  // inputs
+  "i0" [shape=circle];
+  "i1" [shape=circle];
+
+  // outputs
+  "tmp" [shape=circle];
+
+  // computation vertices
+  "11 max" [shape=diamond];
+  "10 +" [shape=trapezium,orientation=270];
+  "10 +" -> "11 max" [label="tmp"];
+  "10 +" -> "tmp";
+  "i1" -> "10 +";
+  "i0" -> "10 +";
+}
 // graph for dag "freia_scalar_03_helper_0_1" of module "freia_scalar_03" in dot format
 digraph "freia_scalar_03_helper_0_1" {
   // inputs
@@ -958,10 +975,141 @@ digraph "freia_scalar_03_helper_0_1" {
 
 
 // dag 0: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+
+// hold kernels for freia_scalar_03_helper_0_0_0
+static cl_kernel freia_scalar_03_helper_0_0_0_kernel[2];
+
+// compile kernels for freia_scalar_03_helper_0_0_0
+static freia_status freia_scalar_03_helper_0_0_0_compile(void)
+{
+  // OpenCL source for freia_scalar_03_helper_0_0_0
+  const char * freia_scalar_03_helper_0_0_0_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function freia_scalar_03_helper_0_0_0\n"
+    "KERNEL void freia_scalar_03_helper_0_0_0(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  GLOBAL PIXEL * i1, // const?\n"
+    "  int ofs_i1,\n"
+    "  int width,\n"
+    "  int pitch,\n"
+    "  GLOBAL TMeasure * redX)\n"
+    "{\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
+    "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  int2 mmin = { PIXEL_MAX, 0 };\n"
+    "  int2 mmax = { PIXEL_MIN, 0 };\n"
+    "  int idy = get_global_id(0);\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int gid = pitch*get_global_id(0);\n"
+    "  int i;\n"
+    "  for (i=gid; i < (gid+width); i++)\n"
+    "  {\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t10 = PIXEL_ADD(in0, in1);\n"
+    "    PIXEL_MAX(red11, t10);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t10;\n"
+    "  }\n"
+    "\n"
+    "  // reduction copy out\n"
+    "  redX[idy].max = mmax.x;\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(freia_scalar_03_helper_0_0_0_source, "freia_scalar_03_helper_0_0_0", "-DPIXEL8", &freia_scalar_03_helper_0_0_0_kernel[0]);
+  err |= freia_op_compile_kernel(freia_scalar_03_helper_0_0_0_source, "freia_scalar_03_helper_0_0_0", "-DPIXEL16", &freia_scalar_03_helper_0_0_0_kernel[1]);
+  return err;
+}
+
+// helper function freia_scalar_03_helper_0_0_0
+freia_status freia_scalar_03_helper_0_0_0(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  int32_t * po3)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= freia_scalar_03_helper_0_0_0_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = freia_scalar_03_helper_0_0_0_kernel[bpp];
+
+  // currently only one reduction structure...
+  freia_reduction_results redres;
+
+  // call kernel freia_scalar_03_helper_0_0_0
+  err |= freia_op_call_kernel(kernel, 1, 2, 0, 0, o0, i0, i1, &redres);
+
+  // return reduction results
+  *po3 = redres.max;
+
+  return err;
+}
 #include <freia_opencl_runtime.hcl>
 // generated OpenCL kernels for function freia_scalar_03
 
 // opencl for dag 0
+
+// opencl function freia_scalar_03_helper_0_0_0
+KERNEL void freia_scalar_03_helper_0_0_0(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  GLOBAL PIXEL * i1, // const?
+  int ofs_i1,
+  int width,
+  int pitch,
+  GLOBAL TMeasure * redX)
+{
+  GLOBAL PIXEL * p0 = o0 + ofs_o0;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1;
+
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  int2 mmin = { PIXEL_MAX, 0 };
+  int2 mmax = { PIXEL_MIN, 0 };
+  int idy = get_global_id(0);
+
+  // thread's pixel loop
+  int gid = pitch*get_global_id(0);
+  int i;
+  for (i=gid; i < (gid+width); i++)
+  {
+    // get input pixels
+    PIXEL in0 = j0[i];
+    PIXEL in1 = j1[i];
+    // pixel computations
+    PIXEL t10 = PIXEL_ADD(in0, in1);
+    PIXEL_MAX(red11, t10);
+    // set output pixels
+    p0[i] = t10;
+  }
+
+  // reduction copy out
+  redX[idy].max = mmax.x;
+}
 
 ! updated function
 
@@ -971,8 +1119,7 @@ freia_status freia_scalar_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1
    int max, min = 10;                                                   /*0007*/
    bool bin = false;                                                    /*0008*/
    // break pipeline on scalar dependency
-   freia_aipo_add(tmp, i0, i1);                                         /*0010*/
-   freia_aipo_global_max(tmp, &max);                                    /*0011*/
+   freia_scalar_03_helper_0_0_0(tmp, i0, i1, &max);                     /*0010*/
    freia_aipo_threshold(o, tmp, min, max, bin);                         /*0012*/
    freia_common_destruct_data(tmp);                                     /*0013*/
    return FREIA_OK;                                                     /*0014*/
@@ -986,8 +1133,7 @@ freia_status freia_scalar_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1
    int max, min = 10;                                                   /*0007*/
    bool bin = 0;                                                        /*0008*/
    // break pipeline on scalar dependency
-   freia_aipo_add(tmp, i0, i1);                                         /*0010*/
-   freia_aipo_global_max(tmp, &max);                                    /*0011*/
+   freia_scalar_03_helper_0_0_0(tmp, i0, i1, &max);                     /*0010*/
    freia_aipo_threshold(o, tmp, 10, max, bin);                          /*0012*/
    freia_common_destruct_data(tmp);                                     /*0013*/
    return 0;                                                            /*0014*/

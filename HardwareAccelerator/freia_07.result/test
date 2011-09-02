@@ -1176,6 +1176,8 @@ static freia_status freia_07_helper_0_0_0_compile(void)
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
     "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
     "  GLOBAL PIXEL * j3 = i3 + ofs_i3;\n"
+    "\n"
+    "  // thread's pixel loop\n"
     "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
@@ -1260,6 +1262,8 @@ KERNEL void freia_07_helper_0_0_0(
   GLOBAL PIXEL * j1 = i1 + ofs_i1;
   GLOBAL PIXEL * j2 = i2 + ofs_i2;
   GLOBAL PIXEL * j3 = i3 + ofs_i3;
+
+  // thread's pixel loop
   int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)

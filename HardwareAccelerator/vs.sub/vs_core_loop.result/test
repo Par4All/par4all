@@ -3688,6 +3688,8 @@ digraph "vs_core_loop_helper_3_0_0" {
   // computation vertices
   "94 /." [shape=trapezium,orientation=270];
   "94 /." -> "imbg16'";
+  "99 min" [shape=diamond];
+  "98 max" [shape=diamond];
   "93 +" [shape=trapezium,orientation=270];
   "93 +" -> "94 /." [label="imbg16_1"];
   "92 *." [shape=trapezium,orientation=270];
@@ -3696,6 +3698,8 @@ digraph "vs_core_loop_helper_3_0_0" {
   "91 *." [shape=trapezium,orientation=270];
   "91 *." -> "93 +" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
+  "87 -|" -> "99 min" [label="immotion_6"];
+  "87 -|" -> "98 max" [label="immotion_6"];
   "87 -|" -> "immotion_6";
   "imbg" -> "87 -|";
   "imstab" -> "91 *.";
@@ -3799,13 +3803,22 @@ static freia_status vs_core_loop_helper_3_0_0_compile(void)
     "  int pitch,\n"
     "  int c0,\n"
     "  int c1,\n"
-    "  int c2)\n"
+    "  int c2,\n"
+    "  GLOBAL TMeasure * redX)\n"
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * p1 = o1 + ofs_o1;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
     "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
+    "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  int2 mmin = { PIXEL_MAX, 0 };\n"
+    "  int2 mmax = { PIXEL_MIN, 0 };\n"
+    "  int idy = get_global_id(0);\n"
+    "\n"
+    "  // thread's pixel loop\n"
     "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
@@ -3819,11 +3832,17 @@ static freia_status vs_core_loop_helper_3_0_0_compile(void)
     "    PIXEL t91 = PIXEL_MUL(in2, c0);\n"
     "    PIXEL t92 = PIXEL_MUL(in1, c1);\n"
     "    PIXEL t93 = PIXEL_ADD(t92, t91);\n"
+    "    PIXEL_MAX(red98, t87);\n"
+    "    PIXEL_MIN(red99, t87);\n"
     "    PIXEL t94 = PIXEL_DIV(t93, c2);\n"
     "    // set output pixels\n"
     "    p0[i] = t87;\n"
     "    p1[i] = t94;\n"
     "  }\n"
+    "\n"
+    "  // reduction copy out\n"
+    "  redX[idy].max = mmax.x;\n"
+    "  redX[idy].min = mmin.x;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(vs_core_loop_helper_3_0_0_source, "vs_core_loop_helper_3_0_0", "-DPIXEL8", &vs_core_loop_helper_3_0_0_kernel[0]);
@@ -3840,6 +3859,8 @@ freia_status vs_core_loop_helper_3_0_0(
   const freia_data2d * i2,
   int32_t c0,
   int32_t c1,
+  int32_t * po5,
+  int32_t * po6,
   int32_t c2)
 {
   freia_status err = FREIA_OK;
@@ -3857,8 +3878,15 @@ freia_status vs_core_loop_helper_3_0_0(
   uint32_t bpp = i0->bpp>>4;
   cl_kernel kernel = vs_core_loop_helper_3_0_0_kernel[bpp];
 
+  // currently only one reduction structure...
+  freia_reduction_results redres;
+
   // call kernel vs_core_loop_helper_3_0_0
-  err |= freia_op_call_kernel(kernel, 2, 3, 3, 0, o0, o1, i0, i1, i2, c0, c1, c2);
+  err |= freia_op_call_kernel(kernel, 2, 3, 3, 0, o0, o1, i0, i1, i2, c0, c1, c2, &redres);
+
+  // return reduction results
+  *po5 = redres.max;
+  *po6 = redres.min;
 
   return err;
 }
@@ -3892,6 +3920,8 @@ static freia_status vs_core_loop_helper_3_1_2_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
     "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
+    "\n"
+    "  // thread's pixel loop\n"
     "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
@@ -3971,13 +4001,22 @@ KERNEL void vs_core_loop_helper_3_0_0(
   int pitch,
   int c0,
   int c1,
-  int c2)
+  int c2,
+  GLOBAL TMeasure * redX)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * p1 = o1 + ofs_o1;
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
   GLOBAL PIXEL * j1 = i1 + ofs_i1;
   GLOBAL PIXEL * j2 = i2 + ofs_i2;
+
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  int2 mmin = { PIXEL_MAX, 0 };
+  int2 mmax = { PIXEL_MIN, 0 };
+  int idy = get_global_id(0);
+
+  // thread's pixel loop
   int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
@@ -3991,11 +4030,17 @@ KERNEL void vs_core_loop_helper_3_0_0(
     PIXEL t91 = PIXEL_MUL(in2, c0);
     PIXEL t92 = PIXEL_MUL(in1, c1);
     PIXEL t93 = PIXEL_ADD(t92, t91);
+    PIXEL_MAX(red98, t87);
+    PIXEL_MIN(red99, t87);
     PIXEL t94 = PIXEL_DIV(t93, c2);
     // set output pixels
     p0[i] = t87;
     p1[i] = t94;
   }
+
+  // reduction copy out
+  redX[idy].max = mmax.x;
+  redX[idy].min = mmin.x;
 }
 
 // opencl function vs_core_loop_helper_3_1_2
@@ -4017,6 +4062,8 @@ KERNEL void vs_core_loop_helper_3_1_2(
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
   GLOBAL PIXEL * j1 = i1 + ofs_i1;
   GLOBAL PIXEL * j2 = i2 + ofs_i2;
+
+  // thread's pixel loop
   int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
@@ -4104,14 +4151,12 @@ l99979:   ;                                                                    /
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, 100);     /*0087*/
+   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, &maxmotion, &minmotion, 100);           /*0087*/
    
    // background update
    
    // measures
-   freia_aipo_global_max(immotion, &maxmotion);                         /*0098*/
-   freia_aipo_global_min(immotion, &minmotion);                         /*0099*/
-
+   
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
@@ -4221,14 +4266,12 @@ l99998:   ;
    // constrast enhance
    
    // absolute difference background and current frame
-   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, 100);     /*0087*/
+   vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, &maxmotion, &minmotion, 100);           /*0087*/
    
    // background update
    
    // measures
-   freia_aipo_global_max(immotion, &maxmotion);                         /*0098*/
-   freia_aipo_global_min(immotion, &minmotion);                         /*0099*/
-
+   
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
    

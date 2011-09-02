@@ -6670,7 +6670,9 @@ digraph "main_helper_0_0_2" {
   "out" [shape=circle];
 
   // computation vertices
+  "201 vol" [shape=diamond];
   "199 !" [shape=trapezium,orientation=270];
+  "199 !" -> "201 vol" [label="out"];
   "199 !" -> "out";
   "192 <" [shape=trapezium,orientation=270];
   "192 <" -> "199 !" [label="w2_1"];
@@ -6700,6 +6702,23 @@ digraph "main_helper_1_0" {
   "204 D8" [shape=box];
   "204 D8" -> "205 <" [label="out_2"];
   "out" -> "204 D8";
+}
+// graph for dag "main_helper_1_0_1" of module "main" in dot format
+digraph "main_helper_1_0_1" {
+  // inputs
+  "in" [shape=circle];
+  "out_2" [shape=circle];
+
+  // outputs
+  "out" [shape=circle];
+
+  // computation vertices
+  "206 vol" [shape=diamond];
+  "205 <" [shape=trapezium,orientation=270];
+  "205 <" -> "206 vol" [label="out"];
+  "205 <" -> "out";
+  "in" -> "205 <";
+  "out_2" -> "205 <";
 }
 // graph for dag "main_helper_2_0" of module "main" in dot format
 digraph "main_helper_2_0" {
@@ -6772,12 +6791,21 @@ static freia_status main_helper_0_0_2_compile(void)
     "  int ofs_i2,\n"
     "  int width,\n"
     "  int pitch,\n"
-    "  int c0)\n"
+    "  int c0,\n"
+    "  GLOBAL TMeasure * redX)\n"
     "{\n"
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
     "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
+    "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  int2 mmin = { PIXEL_MAX, 0 };\n"
+    "  int2 mmax = { PIXEL_MIN, 0 };\n"
+    "  int idy = get_global_id(0);\n"
+    "\n"
+    "  // thread's pixel loop\n"
     "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
@@ -6791,9 +6819,13 @@ static freia_status main_helper_0_0_2_compile(void)
     "    PIXEL t176 = PIXEL_INF(t160, in2);\n"
     "    PIXEL t192 = PIXEL_INF(t176, in0);\n"
     "    PIXEL t199 = PIXEL_NOT(t192);\n"
+    "    PIXEL_VOLUME(red201, t199);\n"
     "    // set output pixels\n"
     "    p0[i] = t199;\n"
     "  }\n"
+    "\n"
+    "  // reduction copy out\n"
+    "  redX[idy].vol = vol;\n"
     "}\n";
   freia_status err = FREIA_OK;
   err |= freia_op_compile_kernel(main_helper_0_0_2_source, "main_helper_0_0_2", "-DPIXEL8", &main_helper_0_0_2_kernel[0]);
@@ -6807,7 +6839,8 @@ freia_status main_helper_0_0_2(
   const freia_data2d * i0,
   const freia_data2d * i1,
   const freia_data2d * i2,
-  int32_t c0)
+  int32_t c0,
+  int32_t * po4)
 {
   freia_status err = FREIA_OK;
 
@@ -6824,13 +6857,109 @@ freia_status main_helper_0_0_2(
   uint32_t bpp = i0->bpp>>4;
   cl_kernel kernel = main_helper_0_0_2_kernel[bpp];
 
+  // currently only one reduction structure...
+  freia_reduction_results redres;
+
   // call kernel main_helper_0_0_2
-  err |= freia_op_call_kernel(kernel, 1, 3, 1, 0, o0, i0, i1, i2, c0);
+  err |= freia_op_call_kernel(kernel, 1, 3, 1, 0, o0, i0, i1, i2, c0, &redres);
+
+  // return reduction results
+  *po4 = redres.vol;
 
   return err;
 }
 
 // dag 1: 3 ops and 0 copies, optimized to 3 ops and 0+0 copies
+
+// hold kernels for main_helper_1_0_1
+static cl_kernel main_helper_1_0_1_kernel[2];
+
+// compile kernels for main_helper_1_0_1
+static freia_status main_helper_1_0_1_compile(void)
+{
+  // OpenCL source for main_helper_1_0_1
+  const char * main_helper_1_0_1_source =
+    "#include <freia_opencl_runtime.hcl>\n"
+    "\n"
+    "// opencl function main_helper_1_0_1\n"
+    "KERNEL void main_helper_1_0_1(\n"
+    "  GLOBAL PIXEL * o0,\n"
+    "  int ofs_o0,\n"
+    "  GLOBAL PIXEL * i0, // const?\n"
+    "  int ofs_i0,\n"
+    "  GLOBAL PIXEL * i1, // const?\n"
+    "  int ofs_i1,\n"
+    "  int width,\n"
+    "  int pitch,\n"
+    "  GLOBAL TMeasure * redX)\n"
+    "{\n"
+    "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
+    "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
+    "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
+    "\n"
+    "  // reduction stuff is currently hardcoded...\n"
+    "  int vol = 0;\n"
+    "  int2 mmin = { PIXEL_MAX, 0 };\n"
+    "  int2 mmax = { PIXEL_MIN, 0 };\n"
+    "  int idy = get_global_id(0);\n"
+    "\n"
+    "  // thread's pixel loop\n"
+    "  int gid = pitch*get_global_id(0);\n"
+    "  int i;\n"
+    "  for (i=gid; i < (gid+width); i++)\n"
+    "  {\n"
+    "    // get input pixels\n"
+    "    PIXEL in0 = j0[i];\n"
+    "    PIXEL in1 = j1[i];\n"
+    "    // pixel computations\n"
+    "    PIXEL t205 = PIXEL_INF(in1, in0);\n"
+    "    PIXEL_VOLUME(red206, t205);\n"
+    "    // set output pixels\n"
+    "    p0[i] = t205;\n"
+    "  }\n"
+    "\n"
+    "  // reduction copy out\n"
+    "  redX[idy].vol = vol;\n"
+    "}\n";
+  freia_status err = FREIA_OK;
+  err |= freia_op_compile_kernel(main_helper_1_0_1_source, "main_helper_1_0_1", "-DPIXEL8", &main_helper_1_0_1_kernel[0]);
+  err |= freia_op_compile_kernel(main_helper_1_0_1_source, "main_helper_1_0_1", "-DPIXEL16", &main_helper_1_0_1_kernel[1]);
+  return err;
+}
+
+// helper function main_helper_1_0_1
+freia_status main_helper_1_0_1(
+  freia_data2d * o0,
+  const freia_data2d * i0,
+  const freia_data2d * i1,
+  int32_t * po3)
+{
+  freia_status err = FREIA_OK;
+
+  // handle on the fly compilation...
+  static int to_compile = 1;
+  if (to_compile) {
+    err |= main_helper_1_0_1_compile();
+    // compilation may have failed
+    if (err) return err;
+    to_compile = 0;
+  }
+
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
+  cl_kernel kernel = main_helper_1_0_1_kernel[bpp];
+
+  // currently only one reduction structure...
+  freia_reduction_results redres;
+
+  // call kernel main_helper_1_0_1
+  err |= freia_op_call_kernel(kernel, 1, 2, 0, 0, o0, i0, i1, &redres);
+
+  // return reduction results
+  *po3 = redres.vol;
+
+  return err;
+}
 
 // dag 2: 4 ops and 0 copies, optimized to 3 ops and 0+0 copies
 
@@ -6862,6 +6991,8 @@ static freia_status main_helper_2_0_0_compile(void)
     "  GLOBAL PIXEL * p0 = o0 + ofs_o0;\n"
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
+    "\n"
+    "  // thread's pixel loop\n"
     "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
@@ -6930,12 +7061,21 @@ KERNEL void main_helper_0_0_2(
   int ofs_i2,
   int width,
   int pitch,
-  int c0)
+  int c0,
+  GLOBAL TMeasure * redX)
 {
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
   GLOBAL PIXEL * j1 = i1 + ofs_i1;
   GLOBAL PIXEL * j2 = i2 + ofs_i2;
+
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  int2 mmin = { PIXEL_MAX, 0 };
+  int2 mmax = { PIXEL_MIN, 0 };
+  int idy = get_global_id(0);
+
+  // thread's pixel loop
   int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
@@ -6949,12 +7089,57 @@ KERNEL void main_helper_0_0_2(
     PIXEL t176 = PIXEL_INF(t160, in2);
     PIXEL t192 = PIXEL_INF(t176, in0);
     PIXEL t199 = PIXEL_NOT(t192);
+    PIXEL_VOLUME(red201, t199);
     // set output pixels
     p0[i] = t199;
   }
+
+  // reduction copy out
+  redX[idy].vol = vol;
 }
 
 // opencl for dag 1
+
+// opencl function main_helper_1_0_1
+KERNEL void main_helper_1_0_1(
+  GLOBAL PIXEL * o0,
+  int ofs_o0,
+  GLOBAL PIXEL * i0, // const?
+  int ofs_i0,
+  GLOBAL PIXEL * i1, // const?
+  int ofs_i1,
+  int width,
+  int pitch,
+  GLOBAL TMeasure * redX)
+{
+  GLOBAL PIXEL * p0 = o0 + ofs_o0;
+  GLOBAL PIXEL * j0 = i0 + ofs_i0;
+  GLOBAL PIXEL * j1 = i1 + ofs_i1;
+
+  // reduction stuff is currently hardcoded...
+  int vol = 0;
+  int2 mmin = { PIXEL_MAX, 0 };
+  int2 mmax = { PIXEL_MIN, 0 };
+  int idy = get_global_id(0);
+
+  // thread's pixel loop
+  int gid = pitch*get_global_id(0);
+  int i;
+  for (i=gid; i < (gid+width); i++)
+  {
+    // get input pixels
+    PIXEL in0 = j0[i];
+    PIXEL in1 = j1[i];
+    // pixel computations
+    PIXEL t205 = PIXEL_INF(in1, in0);
+    PIXEL_VOLUME(red206, t205);
+    // set output pixels
+    p0[i] = t205;
+  }
+
+  // reduction copy out
+  redX[idy].vol = vol;
+}
 
 // opencl for dag 2
 
@@ -6976,6 +7161,8 @@ KERNEL void main_helper_2_0_0(
   GLOBAL PIXEL * p0 = o0 + ofs_o0;
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
   GLOBAL PIXEL * j1 = i1 + ofs_i1;
+
+  // thread's pixel loop
   int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
@@ -7104,12 +7291,11 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0189*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0190*/
 
-   main_helper_0_0_2(out, w1_1, w1_1_10, w1_1_5, 255);                  /*0192*/
+   main_helper_0_0_2(out, w1_1, w1_1_10, w1_1_5, 255, &volcurrent);     /*0192*/
    
    
    
-   freia_aipo_global_vol(out, &volcurrent);                             /*0201*/
-
+   
    freia_common_destruct_data(w1_0);                                    /*0130*/
    freia_common_destruct_data(w1_0_5);
    freia_common_destruct_data(w1_0_10);
@@ -7120,8 +7306,7 @@ int main(int argc, char *argv[])
    do {                                                                 /*0208*/
       volprevious = volcurrent;                                         /*0203*/
       freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0204*/
-      freia_aipo_inf(out, out, in);                                     /*0205*/
-      freia_aipo_global_vol(out, &volcurrent);                          /*0206*/
+      main_helper_1_0_1(out, in, out, &volcurrent);                     /*0205*/
    }
    while (volcurrent!=volprevious);                                     /*0208*/
 
@@ -7255,12 +7440,11 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0189*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0190*/
 
-   main_helper_0_0_2(out, w1_1, w1_1_10, w1_1_5, 255);                  /*0192*/
+   main_helper_0_0_2(out, w1_1, w1_1_10, w1_1_5, 255, &volcurrent);     /*0192*/
    
    
    
-   freia_aipo_global_vol(out, &volcurrent);                             /*0201*/
-
+   
    freia_common_destruct_data(w1_0);                                    /*0130*/
    freia_common_destruct_data(w1_0_5);
    freia_common_destruct_data(w1_0_10);
@@ -7271,8 +7455,7 @@ int main(int argc, char *argv[])
    do {                                                                 /*0208*/
       volprevious = volcurrent;                                         /*0203*/
       freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);           /*0204*/
-      freia_aipo_inf(out, out, in);                                     /*0205*/
-      freia_aipo_global_vol(out, &volcurrent);                          /*0206*/
+      main_helper_1_0_1(out, in, out, &volcurrent);                     /*0205*/
    }
    while (volcurrent!=volprevious);                                     /*0208*/
 
