@@ -538,6 +538,7 @@ static void opencl_merge_and_compile(
     // build an homogeneous sub dag
     list computables;
     bool again = true, mergeable = true;
+    bool merge_reductions = get_bool_property("HWAC_OPENCL_MERGE_REDUCTIONS");
 
     // hand manage reductions on one image only
     entity reduced = NULL;
@@ -552,7 +553,8 @@ static void opencl_merge_and_compile(
       {
         FOREACH(dagvtx, v, computables)
         {
-          if (!opencl_mergeable_p(v))
+          if (!opencl_mergeable_p(v) ||
+              (dagvtx_is_measurement_p(v) && !merge_reductions))
           {
             lcurrent = CONS(dagvtx, v, lcurrent);
             set_add_element(done, done, v);
@@ -572,7 +574,7 @@ static void opencl_merge_and_compile(
         FOREACH(dagvtx, v, computables)
         {
           // ??? current runtime limitation...
-          if (dagvtx_is_measurement_p(v))
+          if (dagvtx_is_measurement_p(v) && merge_reductions)
           {
             list li = vtxcontent_inputs(dagvtx_content(v));
             pips_assert("one input image to reduction", gen_length(li)==1);
@@ -584,7 +586,11 @@ static void opencl_merge_and_compile(
               reduced = image;
           }
 
-          if (opencl_mergeable_p(v)==mergeable)
+          bool v_mergeable = opencl_mergeable_p(v);
+          if (!merge_reductions && dagvtx_is_measurement_p(v))
+            v_mergeable = false;
+
+          if (v_mergeable==mergeable)
           {
             lcurrent = CONS(dagvtx, v, lcurrent);
             set_add_element(done, done, v);
