@@ -126,14 +126,24 @@ static int opencl_compile_mergeable_dag(
   list lparams = NIL;
 
   string_buffer
+    // helper function
     helper = string_buffer_make(true),
     helper_decls = string_buffer_make(true),
     helper_body = string_buffer_make(true),
+    helper_body_2 = string_buffer_make(true),
+    helper_tail = string_buffer_make(true),
+    // opencl function
     opencl = string_buffer_make(true),
-    opencl_init = string_buffer_make(true),
+    opencl_2 = string_buffer_make(true),
+    opencl_head = string_buffer_make(true),
     opencl_body = string_buffer_make(true),
     opencl_tail = string_buffer_make(true),
+    opencl_end = string_buffer_make(true),
+    // compilation function
     compile = string_buffer_make(true);
+
+  // runtime temporary limitation: one image is reduced
+  entity reduced = NULL;
 
   sb_cat(helper,
          "\n"
@@ -185,7 +195,7 @@ static int opencl_compile_mergeable_dag(
            "\n  " OPENCL_IMAGE "o", si,
            ",\n  int ofs_o", si);
     // image p<out> = o<out> + ofs_o<out>;
-    sb_cat(opencl_init,
+    sb_cat(opencl_head,
            "  " OPENCL_IMAGE "p", si, " = ", "o", si, " + ofs_o", si, ";\n");
     // , o<out>
     sb_cat(helper_body, ", o", si);
@@ -207,7 +217,7 @@ static int opencl_compile_mergeable_dag(
     sb_cat(opencl, nargs? ",": "",
            "\n  " OPENCL_IMAGE "i", si, ", // const?\n  int ofs_i", si);
     // image j<in> = i<in> + ofs_i<out>;
-    sb_cat(opencl_init,
+    sb_cat(opencl_head,
            "  " OPENCL_IMAGE "j", si, " = ", "i", si, " + ofs_i", si, ";\n");
     // , i<in>
     sb_cat(helper_body, ", i", si);
@@ -252,19 +262,108 @@ static int opencl_compile_mergeable_dag(
     const freia_api_t * api = get_freia_api(opid);
     pips_assert("freia api found", api!=NULL);
 
+    bool is_a_reduction = api->arg_misc_out;
+
     // update for helper call arguments...
     lparams = gen_nconc(lparams,
-                        freia_extract_params(opid, call_arguments(c),
-                                             helper, opencl, NULL, &nargs));
+      freia_extract_params(opid, call_arguments(c),
+                           helper, is_a_reduction? NULL: opencl, NULL, &nargs));
+
+    // input image arguments
+    list preds = dag_vertex_preds(d, v);
+    int nao = 0;
+
+    // scalar output arguments: we are dealing with a reduction!
+    if (is_a_reduction)
+    {
+      vtxcontent c = dagvtx_content(v);
+      list li = vtxcontent_inputs(c);
+      pips_assert("one input image", gen_length(li)==1);
+      pips_assert("no scalar inputs", !api->arg_misc_in);
+
+      // get the reduced image
+      entity img = ENTITY(CAR(li));
+      // we deal with only one image at the time... runtime limitation
+      pips_assert("same image if any", !reduced ^ (img==reduced));
+      if (!reduced)
+      {
+        reduced = img;
+        sb_cat(helper_decls,
+               "\n"
+               "  // currently only one reduction structure...\n"
+               "  freia_reduction_results redres;\n");
+        // must be the last argument!
+        sb_cat(helper_body_2, ", &redres");
+        sb_cat(helper_tail, "\n  // return reduction results\n");
+        sb_cat(opencl_2, ",\n  GLOBAL TMeasure * redX");
+        // declare them all
+        sb_cat(opencl_head,
+               "\n"
+               "  // reduction stuff is currently hardcoded...\n"
+               "  int vol = 0;\n"
+               "  int2 mmin = { PIXEL_MAX, 0 };\n"
+               "  int2 mmax = { PIXEL_MIN, 0 };\n"
+               "  int idy = get_global_id(0);\n");
+        sb_cat(opencl_end, "\n  // reduction copy out\n");
+      }
+      // inner loop reduction code
+      sb_cat(opencl_body, "    ", api->opencl.macro, "(red",
+             itoa((int) dagvtx_number(v)), ", ");
+      dagvtx pred = DAGVTX(CAR(preds));
+      int npred = (int) dagvtx_number(pred);
+      if (npred==0)
+        sb_cat(opencl_body, "in", itoa(gen_position(pred, dag_inputs(d))-1));
+      else
+        sb_cat(opencl_body, "t", itoa(npred));
+      sb_cat(opencl_body, ");\n");
+
+      // tail code to copy back stuff in OpenCL. ??? HARDCODED for now...
+      if (same_string_p(api->compact_name, "max"))
+      {
+        sb_cat(opencl_end,  "  redX[idy].max = mmax.x;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.max;\n");
+      }
+      else if (same_string_p(api->compact_name, "min"))
+      {
+        sb_cat(opencl_end, "  redX[idy].min = mmin.x;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.min;\n");
+      }
+      else if (same_string_p(api->compact_name, "vol"))
+      {
+        sb_cat(opencl_end, "  redX[idy].vol = vol;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.vol;\n");
+      }
+      else if (same_string_p(api->compact_name, "max!"))
+      {
+        sb_cat(opencl_end,
+               "  redX[idy].max = mmax.x;\n"
+               "  redX[idy].max_x = (uint) mmax.y;\n"
+               "  redX[idy].max_y = idy;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-3), " = redres.max;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-2), " = redres.max_x;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.max_y;\n");
+      }
+      else if (same_string_p(api->compact_name, "min!"))
+      {
+        sb_cat(opencl_end,
+               "  redX[idy].min = mmin.x;\n"
+               "  redX[idy].min_x = (uint) mmin.y;\n"
+               "  redX[idy].min_y = idy;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-3), " = redres.min;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-2), " = redres.min_x;\n");
+        sb_cat(helper_tail, "  *po", itoa(nargs-1), " = redres.min_y;\n");
+      }
+
+      // skip to next operator
+      continue;
+    }
+    // else...
 
     // pixel t<vertex> = <op>(args...);
     sb_cat(opencl_body,
            "    " OPENCL_PIXEL "t", itoa((int) dagvtx_number(v)),
            " = ", api->opencl.macro, "(");
 
-    // input image arguments
-    list preds = dag_vertex_preds(d, v);
-    int nao = 0;
     FOREACH(dagvtx, p, preds)
     {
       if (dagvtx_number(p)==0)
@@ -276,7 +375,6 @@ static int opencl_compile_mergeable_dag(
     gen_free_list(preds), preds = NIL;
 
     // other (scalar) input arguments
-    pips_assert("no output parameters", !api->arg_misc_out);
     for (int i=0; i<(int) api->arg_misc_in; i++)
     {
       string sn = strdup(itoa(n_params));
@@ -288,7 +386,6 @@ static int opencl_compile_mergeable_dag(
       free(sn);
       n_params++;
     }
-
     sb_cat(opencl_body, ");\n");
   }
   gen_free_list(vertices), vertices = NIL;
@@ -305,24 +402,29 @@ static int opencl_compile_mergeable_dag(
   sb_cat(helper, ", ", itoa(n_ins));    // input images
   sb_cat(helper, ", ", itoa(n_params)); // input integer parameters
   sb_cat(helper, ", 0");                // output integer pointers
-  string_buffer_append_sb(helper, helper_body);
-  sb_cat(helper, ");\n"
-         "\n"
-         // "  // what about reductions?\n"
-         // "\n"
-         "  return err;\n}\n");
+  string_buffer_append_sb(helper, helper_body);   // image & param args
+  string_buffer_append_sb(helper, helper_body_2); // reduction args
+  sb_cat(helper, ");\n");
+  string_buffer_append_sb(helper, helper_tail);
+  sb_cat(helper, "\n  return err;\n}\n");
 
+  // OPENCL CODE
+  string_buffer_append_sb(opencl, opencl_2);
   sb_cat(opencl, ")\n{\n");
-  string_buffer_append_sb(opencl, opencl_init);
+  string_buffer_append_sb(opencl, opencl_head);
   sb_cat(opencl,
          // depends on worksize #dims: get_global_id(1)*pitch + g..g..id(0)
+         "\n"
+         "  // thread's pixel loop\n"
          "  int gid = pitch*get_global_id(0);\n"
          "  int i;\n"
          "  for (i=gid; i < (gid+width); i++)\n"
          "  {\n");
   string_buffer_append_sb(opencl, opencl_body);
   string_buffer_append_sb(opencl, opencl_tail);
-  sb_cat(opencl, "  }\n}\n");
+  sb_cat(opencl, "  }\n");
+  string_buffer_append_sb(opencl, opencl_end);
+  sb_cat(opencl, "}\n");
 
   // OpenCL compilation
   sb_cat(compile,
@@ -375,12 +477,16 @@ static int opencl_compile_mergeable_dag(
   // cleanup
   string_buffer_free(&helper);
   string_buffer_free(&helper_decls);
+  string_buffer_free(&helper_body_2);
   string_buffer_free(&helper_body);
+  string_buffer_free(&helper_tail);
   string_buffer_free(&compile);
   string_buffer_free(&opencl);
-  string_buffer_free(&opencl_init);
+  string_buffer_free(&opencl_2);
+  string_buffer_free(&opencl_head);
   string_buffer_free(&opencl_body);
   string_buffer_free(&opencl_tail);
+  string_buffer_free(&opencl_end);
 
   free(cut_name);
 
@@ -430,6 +536,10 @@ static void opencl_merge_and_compile(
     // build an homogeneous sub dag
     list computables;
     bool again = true, mergeable = true;
+
+    // hand manage reductions on one image only
+    entity reduced = NULL;
+
     while (again &&
            (computables = dag_computable_vertices(d, done, done, current)))
     {
@@ -448,7 +558,7 @@ static void opencl_merge_and_compile(
             again = true;
             mergeable = false;
 
-            // keep track of previous which may have dependencies
+            // keep track of previous which may have dependencies... hmmm...
             int n = (int) dagvtx_number(v);
             if (n>max_stnb) max_stnb = n;
           }
@@ -459,6 +569,19 @@ static void opencl_merge_and_compile(
       {
         FOREACH(dagvtx, v, computables)
         {
+          // ??? current runtime limitation...
+          if (dagvtx_is_measurement_p(v))
+          {
+            list li = vtxcontent_inputs(dagvtx_content(v));
+            pips_assert("one input image to reduction", gen_length(li)==1);
+            entity image = ENTITY(CAR(li));
+            if (reduced && reduced!=image)
+              // skip if reduction image is different from previous
+              continue;
+            else if (mergeable)
+              reduced = image;
+          }
+
           if (opencl_mergeable_p(v)==mergeable)
           {
             lcurrent = CONS(dagvtx, v, lcurrent);
@@ -466,7 +589,7 @@ static void opencl_merge_and_compile(
             set_add_element(current, current, v);
             again = true;
 
-            if (!mergeable)
+            if (!mergeable) // deps hack
             {
               int n = (int) dagvtx_number(v);
               if (n>max_stnb) max_stnb = n;

@@ -554,7 +554,7 @@ static bool dagvtx_is_copy_p(const dagvtx v)
 
 /* returns whether the vertex is an image measurement operation.
  */
-static bool dagvtx_is_measurement_p(const dagvtx v)
+bool dagvtx_is_measurement_p(const dagvtx v)
 {
   vtxcontent c = dagvtx_content(v);
   const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
