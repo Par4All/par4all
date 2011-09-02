@@ -1608,6 +1608,21 @@ static bool terapix_not_implemented(dag d)
   return false;
 }
 
+/* @brief choose a vertex, avoiding non combinable stuff if the list is started
+ */
+static dagvtx choose_terapix_vertex(const list lv, bool started)
+{
+  pips_assert("list contains vertices", lv);
+  if (started)
+  {
+    FOREACH(dagvtx, v, lv)
+      if (!not_implemented(v))
+        return v;
+  }
+  // just return the first vertex
+  return DAGVTX(CAR(lv));
+}
+
 /*********************************************************** TERAPIX DAG CUT */
 
 /* would it seem interesting to split d?
@@ -1827,6 +1842,7 @@ list freia_trpx_compile_calls
   erosion = hash_table_make(hash_pointer, 0);
   list ld = dag_split_on_scalars(fulld,
                                  not_implemented,
+                                 choose_terapix_vertex,
                                  (gen_cmp_func_t) dagvtx_terapix_priority,
                                  dag_terapix_reset_erosion,
                                  output_images);

@@ -77,6 +77,21 @@ static int dagvtx_opencl_priority(const dagvtx * pv1, const dagvtx * pv2)
     return dagvtx_number(v1)-dagvtx_number(v2);
 }
 
+/* @brief choose a vertex, avoiding other stuff if the list is started
+ */
+static dagvtx choose_opencl_vertex(const list lv, bool started)
+{
+  pips_assert("list contains vertices", lv);
+  if (started)
+  {
+    FOREACH(dagvtx, v, lv)
+      if (!dagvtx_other_stuff_p(v))
+        return v;
+  }
+  // just return the first vertex
+  return DAGVTX(CAR(lv));
+}
+
 /* @return opencl type for freia type
  */
 static string opencl_type(string t)
@@ -134,8 +149,8 @@ static int opencl_compile_mergeable_dag(
   pips_assert("some images to process", n_ins+n_outs);
 
   sb_cat(helper_decls,
-         // hmmm... should be really done at init time. how to do that?
          "\n"
+         // hmmm... should be really done at init time. how to do that?
          "  // handle on the fly compilation...\n"
          "  static int to_compile = 1;\n"
          "  if (to_compile) {\n"
@@ -576,7 +591,7 @@ list freia_opencl_compile_calls
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
   list ld =
-    dag_split_on_scalars(fulld, dagvtx_other_stuff_p,
+    dag_split_on_scalars(fulld, dagvtx_other_stuff_p, choose_opencl_vertex,
                          (gen_cmp_func_t) dagvtx_opencl_priority,
                          NULL, output_images);
 

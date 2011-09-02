@@ -2561,6 +2561,7 @@ list dag_fix_image_reuse(dag d, hash_table init, const hash_table occs)
 /* @brief split a dag on scalar dependencies only, with a greedy heuristics.
  * @param initial dag to split
  * @param alone_only whether to keep it alone (for non implemented cases)
+ * @param choose_vertex chose a vertex from computable ones, may be NULL
  * @param priority how to prioritize computable vertices
  * @param priority_update stuff to help prioritization
  * @return a list of sub-dags, some of which may contain no image operations
@@ -2571,6 +2572,7 @@ list dag_fix_image_reuse(dag d, hash_table init, const hash_table occs)
 list // of dags
 dag_split_on_scalars(const dag initial,
                      bool (*alone_only)(const dagvtx),
+                     dagvtx (*choose_vertex)(const list, bool),
                      gen_cmp_func_t priority,
                      void (*priority_update)(const dag),
                      const set output_images)
@@ -2611,25 +2613,28 @@ dag_split_on_scalars(const dag initial,
           dagvtx_dump(stderr, "computable", v);
       }
 
+      // sort, mostly for determinism
       gen_sort_list(computables, priority);
 
       // choose one while building the schedule?
-      dagvtx first = DAGVTX(CAR(computables));
+      dagvtx choice = choose_vertex?
+        choose_vertex(computables, lcurrent? true: false):
+        DAGVTX(CAR(computables));
       gen_free_list(computables), computables = NIL;
 
       ifdebug(7)
-        dagvtx_dump(stderr, "choice", first);
+        dagvtx_dump(stderr, "choice", choice);
 
       // do not add if not alone
-      if (alone_only && alone_only(first) && lcurrent)
+      if (alone_only && alone_only(choice) && lcurrent)
         break;
 
-      set_add_element(current, current, first);
-      set_add_element(computed, computed, first);
-      lcurrent = gen_nconc(lcurrent, CONS(dagvtx, first, NIL));
+      set_add_element(current, current, choice);
+      set_add_element(computed, computed, choice);
+      lcurrent = gen_nconc(lcurrent, CONS(dagvtx, choice, NIL));
 
       // getout if was alone
-      if (alone_only && alone_only(first))
+      if (alone_only && alone_only(choice))
         break;
     }
 
