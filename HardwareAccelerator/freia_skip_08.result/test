@@ -1232,7 +1232,7 @@ freia_status freia_skip_08_helper_0_0_0(
   freia_opencl_measure_status redres;
 
   // call kernel freia_skip_08_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 1, 1, 2, 0, o0, i0, c0, c1, &redres);
+  err |= freia_op_call_kernel(kernel, 1, 1, 2, 1, o0, i0, c0, c1, &redres);
 
   // return reduction results
   *po2 = redres.maximum;

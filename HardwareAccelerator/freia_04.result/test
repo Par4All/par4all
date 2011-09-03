@@ -1356,7 +1356,7 @@ freia_status freia_04_helper_0_0_1(
   freia_opencl_measure_status redres;
 
   // call kernel freia_04_helper_0_0_1
-  err |= freia_op_call_kernel(kernel, 2, 2, 6, 0, o0, o1, i0, i1, c0, c1, c2, c3, c4, c5, &redres);
+  err |= freia_op_call_kernel(kernel, 2, 2, 6, 1, o0, o1, i0, i1, c0, c1, c2, c3, c4, c5, &redres);
 
   // return reduction results
   *po4 = redres.minimum;

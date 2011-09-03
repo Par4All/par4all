@@ -2619,7 +2619,7 @@ freia_status vs_core_2_helper_0_0_0(
   freia_opencl_measure_status redres;
 
   // call kernel vs_core_2_helper_0_0_0
-  err |= freia_op_call_kernel(kernel, 2, 2, 3, 0, o0, o1, i0, i1, c0, c1, c2, &redres);
+  err |= freia_op_call_kernel(kernel, 2, 2, 3, 1, o0, o1, i0, i1, c0, c1, c2, &redres);
 
   // return reduction results
   *po4 = redres.maximum;

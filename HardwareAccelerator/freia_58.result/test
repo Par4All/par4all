@@ -2177,7 +2177,7 @@ freia_status freia_58_helper_1_0_1(
   freia_opencl_measure_status redres;
 
   // call kernel freia_58_helper_1_0_1
-  err |= freia_op_call_kernel(kernel, 1, 2, 0, 0, o0, i0, i1, &redres);
+  err |= freia_op_call_kernel(kernel, 1, 2, 0, 1, o0, i0, i1, &redres);
 
   // return reduction results
   *po3 = redres.volume;
