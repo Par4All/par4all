@@ -180,9 +180,7 @@ static int opencl_compile_mergeable_dag(
          "KERNEL void ", cut_name, "(");
 
   // count stuff in the generated code
-  int nargs = 0, n_params = 0;
-  // first argument is kernel
-  int cl_args = 1;
+  int nargs = 0, n_params = 0, n_misc = 0, cl_args = 1;
 
   if (n_outs)
     sb_cat(opencl_tail, "    // set output pixels\n");
@@ -305,6 +303,7 @@ static int opencl_compile_mergeable_dag(
                "  int2 mmax = { PIXEL_MIN, 0 };\n"
                "  int idy = get_global_id(0);\n");
         sb_cat(opencl_end, "\n  // reduction copy out\n");
+        n_misc = 1;
       }
       // inner loop reduction code
       sb_cat(opencl_body, "    ", api->opencl.macro, "(red",
@@ -403,7 +402,7 @@ static int opencl_compile_mergeable_dag(
   sb_cat(helper, ", ", itoa(n_outs));   // output images
   sb_cat(helper, ", ", itoa(n_ins));    // input images
   sb_cat(helper, ", ", itoa(n_params)); // input integer parameters
-  sb_cat(helper, ", 0");                // output integer pointers
+  sb_cat(helper, ", ", itoa(n_misc));   // output integer pointers
   string_buffer_append_sb(helper, helper_body);   // image & param args
   string_buffer_append_sb(helper, helper_body_2); // reduction args
   sb_cat(helper, ");\n");
