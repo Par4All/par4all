@@ -45,6 +45,15 @@ def get_cuda_dir():
                 + "). Please set the CUDA_DIR environment variable correctly")
     return cuda_dir
 
+amd_opencl_dir = ""
+def get_amd_opencl_dir():
+    global amd_opencl_dir
+    if not amd_opencl_dir:
+        if "AMDAPPSDKROOT" in os.environ:
+            amd_opencl_dir = os.path.expanduser(os.environ["AMDAPPSDKROOT"])
+    return amd_opencl_dir
+
+
 #cuda_sdk_dir = ""
 def get_cuda_sdk_dir():
     global cuda_sdk_dir
@@ -61,11 +70,18 @@ def get_cuda_sdk_dir():
     return cuda_sdk_dir
 
 def get_opencl_cpp_flags():
-    return [
-        "-I" + os.path.join(get_cuda_dir(), "include/CL") 
-        + " -I" + os.path.join(get_cuda_dir(), "include/CL2") 
-        + " -I" +  os.path.join(get_cuda_dir(), "include") 
-    ]
+    '''To be restructured for multi-platforms OpenCL
+	'''
+    opencl_dir=get_amd_opencl_dir()
+    if opencl_dir:
+        opencl_flags=["-I"+os.path.join(opencl_dir, "include")]
+    else:
+        opencl_dir=get_cuda_dir()
+        opencl_flags=["-I" + os.path.join(opencl_dir, "include/CL") 
+                + " -I" + os.path.join(opencl_dir, "include/CL2") 
+                + " -I" +  os.path.join(opencl_dir, "include") 
+                ]	
+    return opencl_flags
 
 def get_cuda_cpp_flags():
     return [
@@ -97,17 +113,26 @@ def get_cuda_ld_flags(m64 = True, cutil = False, cublas = False, cufft = False):
     return flags
 
 def get_opencl_ld_flags(m64 = True):
-    cuda_dir = get_cuda_dir()
+    '''To be restructured for multi-platforms OpenCL
+    '''	
+    opencl_dir=get_amd_opencl_dir()
+    if opencl_dir:
+        lib_opencl_path=os.path.join(opencl_dir, "lib/x86")
+    else:
+        opencl_dir = get_cuda_dir()
+        lib_opencl_path=os.path.join(opencl_dir, "lib")
     lib_arch_suffix = ""
     if m64:
         lib_arch_suffix = "_x86_64"
     else:
         lib_arch_suffix = "_i386"
     flags = [
-        "-L" + os.path.join(cuda_dir, "lib64"),
-        "-L" + os.path.join(cuda_dir, "lib"),
+#        "-L" + os.path.join(cuda_dir, "lib64"),
+        "-L" + os.path.join(opencl_dir, "lib64"),        
+#        "-L" + os.path.join(cuda_dir, "lib"),  # for cuda
+        "-L" + lib_opencl_path,
         "-L/usr/lib",
-        "-lOpenCL"
+        "-l OpenCL"
     ]
     return flags
 
@@ -299,6 +324,7 @@ class p4a_builder:
         self.ar = ar
         self.nvcc = nvcc
         self.fortran = fortran
+        self.opencl = opencl
 
         self.m64 = m64
         # update cuda flags only if somathing will be built at the end

@@ -124,7 +124,6 @@ def p4a_launcher_clean_up(match_object):
 
     return launcher
 
-
 def patch_to_use_p4a_methods(file_name, dir_name, includes):
     """This post-process the PIPS generated source files to use the
     Par4All Accel run-time"""
@@ -222,6 +221,23 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     ).*?\n}""",
         p4a_launcher_clean_up, content)
 
+	#OpenCL .c file
+	#To change the statement that call the kernel .cl:
+	#
+	#   //Opencl wrapper declaration
+    #//PIPS generated variable
+    #int i;
+	#P4A_call_accel_kernel_1d(p4a_wrapper_main, n, a[n]);
+	#
+	# to:
+	#
+	#//Opencl wrapper declaration
+    #//PIPS generated variable
+    #int i;
+    #P4A_call_accel_kernel_1d("p4a_wrapper_main.cl", n, a[n]);
+	 
+    content = re.sub("(p4a_wrapper_\\w+)(\)|,)", "\"\\1.cl\"\\2", content)
+
     # Get the virtual processor coordinates:
     ## Change
     ##    // To be assigned to a call to P4A_vp_1: j
@@ -267,6 +283,7 @@ def main():
 
     parser = optparse.OptionParser(usage = "usage: %prog [options] <files>",
                                    version = "$Id")
+                                   
     parser.add_option("-d", "--dest-dir",
                       action = "store", type = "string",
                       dest = "dest_dir", default = "P4A",
@@ -275,7 +292,7 @@ to put files in. It defaults to "P4A" in the current directory>""")
 
     parser.add_option("--includes", "-I", action = "append", metavar = "header_list", default = [],
                       help = "Specify some includes to be insetred at the begining of the file to be post processed.")
-
+                      
     group = optparse.OptionGroup(parser, "Debug options")
 
     group.add_option("-v",  "--verbose",
