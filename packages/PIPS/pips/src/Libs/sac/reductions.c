@@ -398,7 +398,7 @@ static statement generate_compact(reductionInfo ri)
     // Get the reduction variable
     rightExpr = reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri))));
 
-    string spostlude = get_string_property("SIMD_REMOVE_REDUCTIONS_POSTLUDE");
+    const char* spostlude = get_string_property("SIMD_REMOVE_REDUCTIONS_POSTLUDE");
     statement postlude = statement_undefined;
     if(empty_string_p(spostlude) || !(reduction_operator_sum_p(reduction_op(reductionInfo_reduction(ri))))) {
         // For each reductionInfo_vector reference, add it to the compact statement

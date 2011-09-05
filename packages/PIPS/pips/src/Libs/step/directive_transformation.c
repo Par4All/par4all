@@ -20,7 +20,7 @@ clause directive_transformation(string directive_txt)
     return make_clause_transformation(STEP_TRANSFORMATION_MPI);
   else
     {
-      string tranformation=get_string_property("STEP_DEFAULT_TRANSFORMATION");
+      const char* tranformation=get_string_property("STEP_DEFAULT_TRANSFORMATION");
       if (strncasecmp(tranformation,STEP_DEFAULT_TRANSFORMATION_MPI_TXT,strlen(STEP_DEFAULT_TRANSFORMATION_MPI_TXT))==0)
 	  return make_clause_transformation(STEP_TRANSFORMATION_MPI);
       else if (strncasecmp(tranformation,STEP_DEFAULT_TRANSFORMATION_HYBRID_TXT,strlen(STEP_DEFAULT_TRANSFORMATION_HYBRID_TXT))==0)

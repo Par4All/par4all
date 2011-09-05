@@ -1,0 +1,46 @@
+\section{PaWS Deployment and Management}
+\label{paws_managing}
+
+PaWS is based on the Pylons \cite{pylons} framework which is
+WSGI\footnote{WSGI stands for \emph{Web Server Gateway Interface}
+  \cite{wsgi} - Python specification for web servers, applications and
+  web applications for communication standardization.} compliant. This
+standard provides a lot of ways to deploy the WEB applications,
+depending on their needs \cite{python_app_deployment}.
+
+The easiest way is based on the \emph{Paste Script} module~\cite{paster}, which is part of Pylons and provides necessary server commands, such as:
+
+\begin{itemize}
+  \item {\bf Start the server}
+  
+\lstset{language=Python,caption={Starting the server},label=StartServer}
+\begin{lstlisting}
+. utils/pipsenv.sh
+paster serve --reload development.ini
+\end{lstlisting}
+  
+  \item {\bf Get the status of the server}
+  
+\lstset{language=Python,caption={Status},label=PasterStatus}
+\begin{lstlisting}
+paster serve --status development.ini
+\end{lstlisting}
+  
+  \item {\bf Create the new controller}
+  
+\lstset{language=Python,caption={Create the new controller},label=PasterController}
+\begin{lstlisting}
+paster controller <controller_name>
+\end{lstlisting}
+  
+\end{itemize}
+
+All those commands have to be invoked in the directory, which contains
+\emph{development.ini} file. See Section~\ref{structure} for detailed
+information).
+
+\subsection{Supervisor}
+
+Currently PaWS server is run using Supervisor \cite{supervisor}, the
+system for process control and monitoring. It provides a mechanism for
+automatic restart of the process if it crashes.

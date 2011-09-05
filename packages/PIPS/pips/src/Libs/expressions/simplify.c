@@ -61,7 +61,7 @@ static void do_simplify_subscripts(statement s) {
 }
 
 /* atomize subscript expressions so that thay can be reprsetned as references*/
-bool simplify_subscripts(string module_name)
+bool simplify_subscripts(const char* module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
@@ -289,7 +289,7 @@ list do_split_structure(entity e,statement s)
                 free(new_name);
                 /* we copied the field storage, that is rom, recompute a ram storage */
                 free_storage(entity_storage(new));
-                entity dyn_area = global_name_to_entity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME); 
+                entity dyn_area = FindEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME); 
                 entity_storage(new) = 
                     make_storage_ram(
                             make_ram(get_current_module_entity(), dyn_area,
@@ -373,7 +373,7 @@ void do_split_structure_parameter(entity e)
     gen_free_list(added);
 }
 
-bool split_structures(string module_name)
+bool split_structures(const char* module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
@@ -582,7 +582,7 @@ static void simplify_complex_statements(statement s)
 }
 
 /* split complexes into an array with first element <> real part and second element <> imaginary part */
-bool simplify_complex(string module_name)
+bool simplify_complex(const char* module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));

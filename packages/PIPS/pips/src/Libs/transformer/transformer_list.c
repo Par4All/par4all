@@ -710,7 +710,7 @@ transformer transformer_list_closure_to_precondition(list tl,
 						     transformer p_0)
 {
   transformer p_star = transformer_undefined;
-  string h = get_string_property("SEMANTICS_LIST_FIX_POINT_OPERATOR");
+  const char* h = get_string_property("SEMANTICS_LIST_FIX_POINT_OPERATOR");
 
   if(strcmp(h, "depth_two")) {
     p_star = transformer_list_closure_to_precondition_depth_two(tl, c_t, p_0);

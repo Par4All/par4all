@@ -591,9 +591,9 @@ entity global_new_value_to_global_old_value(entity v_new)
 
 /* the '#' character used in value naming conflicts with the reserved
    character for struct naming*/
-string global_value_name_to_user_name(string gn)
+const char* global_value_name_to_user_name(const char* gn)
 {
-  string un = strrchr(gn, BLOCK_SEP_CHAR);
+  const char* un = strrchr(gn, BLOCK_SEP_CHAR);
 
   if(un==NULL)
     un = local_name(gn);
@@ -603,10 +603,10 @@ string global_value_name_to_user_name(string gn)
   return un;
 }
 
-string external_value_name(entity e)
+const char* external_value_name(entity e)
 {
   entity m = get_current_module_entity();
-  string s = hash_get(hash_value_to_name, (char *) e);
+  const char* s = hash_get(hash_value_to_name, (char *) e);
 
   if(s==HASH_UNDEFINED_VALUE && !variable_in_module_p(e,m))
     {
@@ -652,7 +652,7 @@ string external_value_name(entity e)
 */
 const char * pips_user_value_name(entity e)
 {
-  string uvn = string_undefined;
+  const char* uvn = string_undefined;
 
   if(e == (entity) TCST) {
     uvn = "";
@@ -1186,7 +1186,7 @@ void add_local_intermediate_value(entity e)
 void remove_entity_values(entity e, bool readonly)
 {
   entity new_value = entity_to_new_value(e);
-  string s;
+  const char* s;
 
   /* pips_assert("remove_entity_values", e != entity_undefined); */
   pips_assert("remove_entity_values", new_value != entity_undefined);
@@ -1380,9 +1380,9 @@ string value_full_name(entity v)
 
 /* For debugging purposes, we might have to print system with temporary
    values */
-string readable_value_name(entity v)
+const char* readable_value_name(entity v)
 {
-  string n = "";
+  const char* n ;
 
   if(local_temporary_value_entity_p(v)) {
     n = entity_local_name(v);

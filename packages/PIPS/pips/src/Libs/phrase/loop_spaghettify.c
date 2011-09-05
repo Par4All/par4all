@@ -121,7 +121,7 @@
  */
 static entity make_index_variable (loop the_loop,
 				   statement stat,
-				   string module_name) 
+				   const char* module_name) 
 {
   return make_variable_from_name_and_entity (loop_index(the_loop),
 					     INDEX_VARIABLE_NAME,
@@ -134,7 +134,7 @@ static entity make_index_variable (loop the_loop,
  */
 static entity make_begin_variable (loop the_loop,
 				   statement stat,
-				   string module_name) 
+				   const char* module_name) 
 {
   return make_variable_from_name_and_entity (loop_index(the_loop),
 					     BEGIN_VARIABLE_NAME,
@@ -147,7 +147,7 @@ static entity make_begin_variable (loop the_loop,
  */
 static entity make_end_variable (loop the_loop,
 				 statement stat,
-				 string module_name) 
+				 const char* module_name) 
 {
   return make_variable_from_name_and_entity (loop_index(the_loop),
 					     END_VARIABLE_NAME,
@@ -160,7 +160,7 @@ static entity make_end_variable (loop the_loop,
  */
 static entity make_increment_variable (loop the_loop,
 				       statement stat,
-				       string module_name) 
+				       const char* module_name) 
 {
   return make_variable_from_name_and_entity (loop_index(the_loop),
 					     INCREMENT_VARIABLE_NAME,
@@ -305,7 +305,7 @@ static control make_exit_from_loop ()
  * of the unstructured loop 
  */
 static control make_body_from_loop (loop the_loop, 
-				    string module_name, 
+				    const char* module_name, 
 				    statement stat,
 				    entity index_variable,
 				    entity increment_variable)
@@ -348,7 +348,7 @@ static control make_body_from_loop (loop the_loop,
  */
 static unstructured make_unstructured_from_loop (loop the_loop, 
 						 statement stat, 
-						 string module_name) 
+						 const char* module_name) 
 {
   entity index_variable = make_index_variable (the_loop, stat, module_name);
   entity begin_variable = make_begin_variable (the_loop, stat, module_name);
@@ -388,7 +388,7 @@ static unstructured make_unstructured_from_loop (loop the_loop,
  * This function takes the statement stat as parameter and return a new 
  * spaghettized statement, asserting stat is a LOOP statement
  */
-statement spaghettify_loop (statement stat, string module_name)
+statement spaghettify_loop (statement stat, const char* module_name)
 {
   statement returned_statement = stat;
   instruction unstructured_instruction;

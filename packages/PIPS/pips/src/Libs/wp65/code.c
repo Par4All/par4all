@@ -394,7 +394,7 @@ make_scanning_over_tiles(
 	 
 	    /* I need new labels and new continues for my loops!
 	       make_loop_label() needs (at least) a module name */
-	    new_label = make_loop_label(9000, module_local_name(module));
+	    new_label = make_loop_label(9000, module);
 	    cs = make_continue_statement(new_label);
 
 	    if(instruction_block_p(statement_instruction(s))) 
@@ -645,7 +645,7 @@ int first_parallel_level,last_parallel_level;
 	r = make_range(lower, upper, int_to_expression(1));
 	/* I need new labels and new continues for my loops!
 	   make_loop_label() needs (at least) a module name */
-	new_label = make_loop_label(9000, module_local_name(module));
+	new_label = make_loop_label(9000, module);
 	cs = make_continue_statement(new_label);
 	if(instruction_block_p(statement_instruction(s)))
 	    (void) gen_nconc(instruction_block(statement_instruction(s)),

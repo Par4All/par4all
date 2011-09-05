@@ -430,7 +430,7 @@ value EvalNaryOp(int t, list la)
 int IsUnaryOperator(entity e)
 {
   int token;
-  string n = entity_local_name(e);
+  const char* n = entity_local_name(e);
 
   if (same_string_p(n, UNARY_MINUS_OPERATOR_NAME))
     token = MINUS;
@@ -458,7 +458,7 @@ int IsUnaryOperator(entity e)
 int IsBinaryOperator(entity e)
 {
   int token;
-  string n = entity_local_name(e);
+  const char* n = entity_local_name(e);
 
   if      (same_string_p(n, MINUS_OPERATOR_NAME)
 	   || same_string_p(n, MINUS_C_OPERATOR_NAME))

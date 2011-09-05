@@ -165,7 +165,7 @@ const char* entity_unambiguous_user_name(entity e)
 static const char* entity_more_or_less_minimal_name(entity e, bool strict_p)
 {
   entity m = get_current_module_entity();
-  string mln = module_local_name(m);
+  const char* mln = module_local_name(m);
   const char* emn = string_undefined;
   string cun = string_undefined; // compilation unit name
   entity cu = entity_undefined; // compilation unit
@@ -174,9 +174,9 @@ static const char* entity_more_or_less_minimal_name(entity e, bool strict_p)
 
   if(c_module_p(m) && !compilation_unit_p(mln)) {
     /* in pipsmake library...*/
-    string compilation_unit_of_module(string);
+    string compilation_unit_of_module(const char*);
     cun = compilation_unit_of_module(mln);
-    cu = global_name_to_entity(TOP_LEVEL_MODULE_NAME, cun);
+    cu = FindEntity(TOP_LEVEL_MODULE_NAME, cun);
     cudl = code_declarations(value_code(entity_initial(cu)));
     free(cun);
   }
@@ -332,7 +332,7 @@ bool language_module_p(entity m, string lid)
     /* FI: does not work with static functions */
     //string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), true);
     /* SG: must check if the ressource exist (not always the case) */
-    string lname= module_local_name(m);
+    const char* lname= module_local_name(m);
     if( db_resource_p(DBR_USER_FILE,lname) )
     {
         string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), true);
@@ -358,11 +358,11 @@ bool language_module_p(entity m, string lid)
  */
 void AddEntityToCompilationUnit(entity e, entity cu ) {
     statement s = statement_undefined;
-    string cum = module_local_name(cu);
+    const char* cum = module_local_name(cu);
     if( c_module_p(cu) ) {
         if(!db_resource_required_or_available_p(DBR_CODE,cum))
         {
-            bool controlizer(string);
+            bool controlizer(const char*);
             entity tmp = get_current_module_entity();
             statement stmt = get_current_module_statement();
             reset_current_module_entity();
@@ -398,11 +398,11 @@ void AddEntityToCompilationUnit(entity e, entity cu ) {
  */
 void RemoveEntityFromCompilationUnit(entity e, entity cu ) {
     statement s = statement_undefined;
-    string cum = module_local_name(cu);
+    const char* cum = module_local_name(cu);
     if( c_module_p(cu) ) {
         if(!db_resource_required_or_available_p(DBR_CODE,cum))
         {
-            bool controlizer(string);
+            bool controlizer(const char*);
             entity tmp = get_current_module_entity();
             statement stmt = get_current_module_statement();
             reset_current_module_entity();

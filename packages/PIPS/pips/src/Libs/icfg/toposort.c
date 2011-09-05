@@ -65,7 +65,7 @@
 */
 
 list module_name_to_callees(module_name)
-string module_name;
+const char* module_name;
 {
     callees cl;
     static hash_table hash_table_to_callees_string;
@@ -201,7 +201,7 @@ entity mod;
 } 
 
 void print_module_name_to_toposorts(module_name)
-string module_name;
+const char* module_name;
 {
     list sorted_list = NIL;
     string filename;

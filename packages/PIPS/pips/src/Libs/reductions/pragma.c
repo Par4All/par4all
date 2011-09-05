@@ -222,7 +222,7 @@ static string reduction_as_str (reduction r)
 
 ///@brief initialize all what is needed to generate omp pragma
 ///@param mod_name, the module name to analyze for reductions
-void reductions_pragma_omp_init (string mod_name) {
+void reductions_pragma_omp_init (const char* mod_name) {
   // prepare data structure for reductions
   set_printed_reductions((pstatement_reductions)
 			 db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,

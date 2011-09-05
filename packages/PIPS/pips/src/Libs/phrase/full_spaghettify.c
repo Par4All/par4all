@@ -70,7 +70,7 @@
 #include "phrase_tools.h"
 
 static control full_spaghettify_statement (statement stat,
-					   string module_name,
+					   const char* module_name,
 					   unstructured u,
 					   control current_control,
 					   control next_control);
@@ -90,7 +90,7 @@ static control replace_control_with_unstructured (unstructured the_unstructured,
 						  control current_control);
 
 static statement full_spaghettify_module (statement module_statement,
-					  string module_name)
+					  const char* module_name)
 {
   statement returned_statement;
   unstructured new_unstructured;
@@ -494,7 +494,7 @@ static control replace_control_with_unstructured (unstructured the_unstructured,
  * in the Control Flow Graph
  */
 static control full_spaghettify_statement (statement stat,
-					   string module_name,
+					   const char* module_name,
 					   unstructured module_unstructured,
 					   control current_control,
 					   control next_control)
@@ -598,7 +598,7 @@ static control full_spaghettify_statement (statement stat,
  * Phase main
  *********************************************************/
 
-bool full_spaghettify(string module_name)
+bool full_spaghettify(const char* module_name)
 {
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE,

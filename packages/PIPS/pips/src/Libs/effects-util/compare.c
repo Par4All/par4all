@@ -138,7 +138,7 @@ int cell_reference_compare(reference *pr1, reference *pr2)
       else
 	{
 	  entity module = get_current_module_entity();
-	  string current_mod = module_local_name(module);
+	  const char* current_mod = module_local_name(module);
 	  if (strcmp(current_mod, mod1) == 0)
 	    {
 	      if (top_level_entity_p(e2))

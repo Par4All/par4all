@@ -60,7 +60,7 @@
  */
 static bool sesam_task_label_p(entity e)
 {
-  char * prefix = get_string_property ("SCALOPES_KERNEL_TASK_PREFIX");
+  const char * prefix = get_string_property ("SCALOPES_KERNEL_TASK_PREFIX");
   const char * e_name = entity_user_name(e);
   char * found_s = strstr(e_name, prefix);
   return found_s != NULL;
@@ -85,9 +85,9 @@ static void sbp_context_init(sesam_buffers_processing_context * sbp_context)
  */
 static entity sesam_buffer_to_server_entity(entity buffer)
 {
-  string prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
+  const char* prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
   size_t prefix_size =  strlen(prefix);
-  string suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
+  const char* suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
 
 
   const char * buffer_name = entity_user_name(buffer);
@@ -116,9 +116,10 @@ static entity sesam_buffer_to_server_entity(entity buffer)
   char *res_name = strndup(name_without_prefix, size_var_name);
 
   pips_debug(5, "found server variable name: %s\n", res_name);
-  entity res = FindEntity(get_current_module_name(), res_name); /* try to find it in the current module*/
+  entity res = FindEntityFromUserName(get_current_module_name(), res_name); /* try to find it in the current module*/
   if (entity_undefined_p(res))
     res = FindEntity(TOP_LEVEL_MODULE_NAME, res_name); /* try to find a global variable */
+  free(res_name);
   pips_assert("Original entity found in current module or in global variables", !entity_undefined_p(res));
   return res;
 }
@@ -128,7 +129,7 @@ static entity sesam_buffer_to_server_entity(entity buffer)
  */
 static bool entity_sesam_buffer_p(entity e)
 {
-  string prefix =  get_string_property("ISOLATE_STATEMENT_VAR_PREFIX");
+  const char* prefix =  get_string_property("ISOLATE_STATEMENT_VAR_PREFIX");
   pips_debug(8, "prefix = %s \n", prefix);
 
   const char * e_name = entity_user_name(e);
@@ -326,7 +327,7 @@ static void print_entity_task_buffers(FILE *fp, set tasks,
    @param module_name is the current module name
    @param sbp_context is the object describing how the targeted sesam application uses buffers
  */
-static void print_sesam_tasks_buffers_header(char *module_name,
+static void print_sesam_tasks_buffers_header(const char* module_name,
             sesam_buffers_processing_context sbp_context)
 {
   string buffers_header_name = NULL;
@@ -397,7 +398,7 @@ static void print_sesam_tasks_buffers_header(char *module_name,
   fp = safe_fopen(server_file_name, "w");
 
   list l_server_tasks = set_to_sorted_list(server_tasks, (gen_cmp_func_t) compare_entities);
-  string prefix = get_string_property ("SCALOPES_SERVER_TASK_PREFIX");
+  const char* prefix = get_string_property ("SCALOPES_SERVER_TASK_PREFIX");
   FOREACH(ENTITY, server_task, l_server_tasks)
     {
       fprintf(fp, "%s%s\n", prefix, entity_user_name(server_task));
@@ -416,7 +417,7 @@ static void print_sesam_tasks_buffers_header(char *module_name,
 
    @param module_name is the current module name
  */
-bool sesam_buffers_processing(char *module_name)
+bool sesam_buffers_processing(const char* module_name)
 {
   // Use this module name and this environment variable to set
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,
@@ -445,7 +446,7 @@ bool sesam_buffers_processing(char *module_name)
   return (true);
 }
 
-bool sesam_servers_processing(char *module_name)
+bool sesam_servers_processing(const char* module_name)
 {
   // Use this module name and this environment variable to set
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,

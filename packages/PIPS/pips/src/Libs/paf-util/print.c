@@ -191,7 +191,7 @@ char * (*variable_name)();
  */
 void pu_inegalite_fprint(FILE *fp,
 			 Pcontrainte ineg,
-			 char * (*variable_name)(entity))
+			 const char * (*variable_name)(entity))
 {
     pu_contrainte_fprint(fp,ineg,IS_INEG,variable_name);
 }
@@ -202,7 +202,7 @@ void pu_inegalite_fprint(FILE *fp,
  */
 void pu_egalite_fprint(FILE *fp,
 		       Pcontrainte eg,
-		       char * (*variable_name)(entity))
+		       const char * (*variable_name)(entity))
 {
     pu_contrainte_fprint(fp,eg,IS_EG,variable_name);
 }
@@ -213,7 +213,7 @@ void pu_egalite_fprint(FILE *fp,
  */
 void vecteur_fprint(FILE *fp,
 		    Pcontrainte vec,
-		    char * (*variable_name)(entity))
+		    const char * (*variable_name)(entity))
 {
  pu_contrainte_fprint(fp,vec,IS_VEC,variable_name);
 }
@@ -416,7 +416,7 @@ bdt obj;
 
 
 /*============================================================================*/
-string pu_variable_name(v)
+const char* pu_variable_name(v)
 Variable v;
 {
  if(v == TCST)

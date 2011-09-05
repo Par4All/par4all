@@ -288,7 +288,7 @@ entity e;
 list args;
 transformer context;
 {
-    string s = entity_local_name(e);
+    const char* s = entity_local_name(e);
     IntrinsicDescriptor *pid = IntrinsicDescriptorTable;
     list lr;
 
@@ -359,7 +359,7 @@ affect_comp_regions(entity __attribute__ ((unused)) e,
 
 /*{{{  SearchIoElements*/
 static IoElementDescriptor *SearchIoElement(s, i)
-char *s, *i;
+const char *s, *i;
 {
     IoElementDescriptor *p = IoElementDescriptorTable;
 
@@ -434,8 +434,7 @@ transformer context;
 				CONS(EXPRESSION,
 				     EXPRESSION(CAR(pc)),NIL));
 
-	    private_io_entity = global_name_to_entity
-		(TOP_LEVEL_MODULE_NAME,
+	    private_io_entity = FindEntity(TOP_LEVEL_MODULE_NAME,
 		 IO_EFFECTS_ARRAY_NAME);
 
 	    pips_assert("regions_effects", private_io_entity != entity_undefined);

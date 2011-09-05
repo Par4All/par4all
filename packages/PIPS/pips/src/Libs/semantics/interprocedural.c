@@ -758,7 +758,7 @@ entity v;
     /* try to find an equivalent entity by its name
        (whereas we should use locations) */
     /*
-      e = global_name_to_entity(module_local_name(m),
+      e = FindEntity(module_local_name(m),
       entity_local_name(v));
       e = value_alias(value_to_variable(v));
     */

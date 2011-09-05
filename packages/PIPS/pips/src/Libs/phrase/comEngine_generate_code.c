@@ -90,7 +90,7 @@ list glToggleInitStats;
 /*
 This function create a new scalar variable
  */
-entity comEngine_make_new_scalar_variable(string prefix,
+entity comEngine_make_new_scalar_variable(const char* prefix,
 					  basic bas)
 {
   entity retEnt = entity_undefined;

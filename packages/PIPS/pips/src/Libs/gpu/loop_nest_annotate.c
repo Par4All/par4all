@@ -397,7 +397,7 @@ bool gpu_loop_nest_annotate_on_statement(statement s) {
 }
 
 
-bool gpu_loop_nest_annotate(char *module_name)
+bool gpu_loop_nest_annotate(const char* module_name)
 {
   // Use this module name and this environment variable to set
   statement module_statement =

@@ -91,7 +91,7 @@ static string st_forloop(forloop f);
  */
 static string st_entity_local_name(entity var)
 {
-  string name;
+  const char* name;
 
   pips_debug(6,"st_entity_local_name was : %s\n",entity_local_name(var));
 
@@ -419,7 +419,7 @@ static string c_basic_string(basic b)
 static string st_declaration(entity var)
 {
   string result = "Undefined entity";
-  string name = entity_local_name(var);
+  const char* name = entity_local_name(var);
   type t = entity_type(var);
   storage s = entity_storage(var);
 
@@ -1227,7 +1227,7 @@ static struct s_ppt intrinsic_to_smalltalk[] =
 
 static struct s_ppt * get_ppt(entity f)
 {
-  string called = entity_local_name(f);
+  const char* called = entity_local_name(f);
   struct s_ppt * table = intrinsic_to_smalltalk;
   while (table->intrinsic && !same_string_p(called, table->intrinsic))
     table++;
@@ -1665,7 +1665,7 @@ static string st_expression(expression e)
  * Phase main
  *********************************************************/
 
-bool print_code_smalltalk(string module_name)
+bool print_code_smalltalk(const char* module_name)
 {
   FILE * out;
   string ppt, smalltalkcode, dir, filename;

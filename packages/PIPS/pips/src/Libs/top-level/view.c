@@ -63,7 +63,7 @@
  */
 static string get_view_file(const char* print_type, bool displayable)
 {
-    string module_name = db_get_current_module_name();
+    const char* module_name = db_get_current_module_name();
 
    if(displayable && !displayable_file_p(print_type)) {
        pips_user_error("resource %s cannot be displayed\n", print_type);

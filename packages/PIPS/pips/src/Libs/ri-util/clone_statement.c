@@ -247,7 +247,7 @@ do_clone_label(entity l, clone_context cc/*, hash_table ht*/)
     }
 
     if(entity_undefined_p(replacement)) {
-        replacement=make_new_label(module_local_name(clone_context_new_module(cc)));
+        replacement=make_new_label(clone_context_new_module(cc));
         /* Insert those two values at beginning of the list (reverse inserting order
            as it's insterting before instead of inserting at the end) */
         clone_context_labels(cc) = CONS(ENTITY, replacement, clone_context_labels(cc));

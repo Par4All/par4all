@@ -200,7 +200,7 @@ void set_prettyprint_language_from_property( enum language_utype native ) {
   if (prettyprint_language == language_undefined) {
     prettyprint_language = make_language_fortran ();
   }
-  string lang = get_string_property ("PRETTYPRINT_LANGUAGE");
+  const char* lang = get_string_property ("PRETTYPRINT_LANGUAGE");
   if (strcmp (lang, "F77") == 0) {
     language_tag (prettyprint_language) = is_language_fortran;
   }
@@ -281,7 +281,7 @@ static list words_cast(cast obj, int precedence, list pdl);
 static list words_sizeofexpression(sizeofexpression obj, bool in_type_declaration, list pdl);
 static list words_subscript(subscript s, list pdl);
 static list words_application(application a, list pdl);
-static text text_forloop(entity module,string label,int margin,forloop obj,int n, list pdl);
+static text text_forloop(entity module,const char* label,int margin,forloop obj,int n, list pdl);
 
 /* This variable is used to disable the precedence system and hence to
    prettyprint all parentheses, which let the prettyprint reflect the
@@ -339,7 +339,7 @@ void close_prettyprint() {
 
    @return the printf-format string
  */
-string get_C_label_printf_format(string label) {
+string get_C_label_printf_format(const char* label) {
   /* If the label begin with a digit, prefix it with a 'l' to be C
      compatible.
 
@@ -464,7 +464,7 @@ static bool mark_block(unformatted *t_beg,
 /********************************************************************* WORDS */
 
 static int words_intrinsic_precedence(call);
-static int intrinsic_precedence(string);
+static int intrinsic_precedence(const char*);
 
 /**
  * @brief exported for craft
@@ -859,7 +859,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
 
   if (call_arguments(obj) == NIL) {
     if (type_statement_p(t))
-      return (CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
+      return (CHAIN_SWORD(pc, entity_local_name(f)+sizeof(LABEL_PREFIX) -1));
     if (value_constant_p(i) || value_symbolic_p(i)) {
       switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
@@ -979,7 +979,7 @@ list words_regular_call(call obj, bool is_a_subroutine, list pdl)
 	/* Alternate return actual argument have been replaced by
            character strings by the parser. */
 	entity cf = call_function(syntax_call(expression_syntax(eap)));
-	string ls = entity_local_name(cf);
+	const char* ls = entity_local_name(cf);
 	string ls1 = malloc(strlen(ls));
 	/* pips_assert("ls has at least four characters", strlen(ls)>=4); */
 
@@ -1071,7 +1071,7 @@ words_assign_op(call obj,
 {
   list pc = NIL, args = call_arguments(obj);
   int prec = words_intrinsic_precedence(obj);
-  string fun = entity_local_name(call_function(obj));
+  const char* fun = entity_local_name(call_function(obj));
 
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, true, pdl));
 
@@ -1197,8 +1197,8 @@ words_assign_substring_op(call obj,
  * @return the external string representation of the operator
  * @param name, the pips internal representation of the operator
  */
-static string renamed_op_handling (string name) {
-  string result = name;
+static const char* renamed_op_handling (const char* name) {
+  const char* result = name;
 
   if ( strcmp(result,PLUS_C_OPERATOR_NAME) == 0 )
     result = "+";
@@ -1255,7 +1255,7 @@ words_omp_red(call obj,
     if (nb_arg == 0) {
       // the first argument is an operator and need to be handle separately
       // because of the intenal management of operator
-      string op;
+      const char* op;
       syntax syn = expression_syntax (arg);
       pips_assert ("should be a reference", syntax_tag (syn) == is_syntax_reference);
       op = entity_local_name (reference_variable (syntax_reference (syn)));
@@ -1283,7 +1283,7 @@ words_nullary_op_c(call obj,
   list pc = NIL;
   list args = call_arguments(obj);
   entity func = call_function(obj);
-  string fname = entity_local_name(func);
+  const char* fname = entity_local_name(func);
   int nargs = gen_length(args);
   bool parentheses_p=true;
 
@@ -1351,7 +1351,7 @@ static list words_nullary_op_fortran(call obj,
   list pc = NIL;
   list args = call_arguments(obj);
   entity func = call_function(obj);
-  string fname = entity_local_name(func);
+  const char* fname = entity_local_name(func);
 
   if(same_string_p(fname,RETURN_FUNCTION_NAME)
      ||same_string_p(fname,C_RETURN_FUNCTION_NAME))
@@ -1523,7 +1523,7 @@ words_io_inst(call obj,
   bool complex_io_control_list = false;
   expression fmt_arg = expression_undefined;
   expression unit_arg = expression_undefined;
-  string called = entity_local_name(call_function(obj));
+  const char* called = entity_local_name(call_function(obj));
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   /* AP: I try to convert WRITE to PRINT. Three conditions must be
@@ -1672,7 +1672,7 @@ static list words_stat_io_inst(call obj,
   list pc = NIL;
   list pcio = call_arguments(obj);
   list pio_write = pcio;
-  string called = entity_local_name(call_function(obj));
+  const char* called = entity_local_name(call_function(obj));
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   /* Write call function */
@@ -1727,7 +1727,7 @@ words_prefix_unary_op(call obj,
   list pc = NIL;
   expression e = EXPRESSION(CAR(call_arguments(obj)));
   int prec = words_intrinsic_precedence(obj);
-  string fun = entity_local_name(call_function(obj));
+  const char* fun = entity_local_name(call_function(obj));
   if (strcmp(fun,PRE_INCREMENT_OPERATOR_NAME) == 0)
     fun = "++";
   else if (strcmp(fun,PRE_DECREMENT_OPERATOR_NAME) == 0)
@@ -1777,7 +1777,7 @@ words_postfix_unary_op(call obj,
     list pc = NIL;
     expression e = EXPRESSION(CAR(call_arguments(obj)));
     int prec = words_intrinsic_precedence(obj);
-    string fun = entity_local_name(call_function(obj));
+    const char* fun = entity_local_name(call_function(obj));
 
     pc = gen_nconc(pc, words_subexpression(e, prec, false, pdl));
 
@@ -1847,7 +1847,7 @@ words_inverse_op(call obj,
 /* This function is useful only for parsed codes since gotos are
    removed by the controlizer */
 list /* of string */
-words_goto_label(string tlabel)
+words_goto_label(const char* tlabel)
 {
     list pc = NIL;
   if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
@@ -1995,19 +1995,19 @@ eole_fms_specific_op(call obj, int precedence, bool leftmost, list pdl)
     prettyprint. For instance, n-ary add and multiply operators which are
     used in the EOLE project use "+" and "*" prettyprints instead of the
     entity_local_name (JZ - sept 98) */
-static string
+static const char*
 get_special_prettyprint_for_operator(call obj){
 
   static struct special_operator_prettyprint {
-    char * name;
-    char * op_prettyprint;
+    const char * name;
+    const char * op_prettyprint;
   } tab_operator_prettyprint[] = {
     {EOLE_SUM_OPERATOR_NAME,"+"},
     {EOLE_PROD_OPERATOR_NAME,"*"},
     {NULL,NULL}
   };
   int i = 0;
-  string op_name;
+  const char* op_name;
 
   /* get the entity name */
   op_name = entity_local_name(call_function(obj));
@@ -2103,7 +2103,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost, list pdl)
   list we1 = words_subexpression(EXPRESSION(CAR(args)), prec,
 				 prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: true, pdl);
   list we2;
-  string fun = entity_local_name(call_function(obj));
+  const char* fun = entity_local_name(call_function(obj));
 
   /* handling of internally renamed operators */
   fun = renamed_op_handling (fun);
@@ -2423,7 +2423,7 @@ static list
 words_intrinsic_call(call obj, int precedence, bool leftmost, list pdl)
 {
     struct intrinsic_handler *p = tab_intrinsic_handler;
-    char *n = entity_local_name(call_function(obj));
+    const char *n = entity_local_name(call_function(obj));
 
     while (p->name != NULL) {
 	if (strcmp(p->name, n) == 0) {
@@ -2436,7 +2436,7 @@ words_intrinsic_call(call obj, int precedence, bool leftmost, list pdl)
 }
 
 static int
-intrinsic_precedence(string n)
+intrinsic_precedence(const char* n)
 {
     struct intrinsic_handler *p = tab_intrinsic_handler;
 
@@ -2452,7 +2452,7 @@ intrinsic_precedence(string n)
 static int
 words_intrinsic_precedence(call obj)
 {
-    char *n = entity_local_name(call_function(obj));
+    const char *n = entity_local_name(call_function(obj));
     return intrinsic_precedence(n);
 }
 
@@ -2649,9 +2649,9 @@ sentence_tail(entity e)
 sentence
 sentence_goto_label(
     entity __attribute__ ((unused)) module,
-    string label,
+    const char* label,
     int margin,
-    string tlabel,
+    const char* tlabel,
     int n)
 {
     list pc = words_goto_label(tlabel);
@@ -2661,12 +2661,12 @@ sentence_goto_label(
 }
 
 static sentence sentence_goto(entity module,
-			      string label,
+			      const char* label,
 			      int margin,
 			      statement obj,
 			      int n) {
-    string tlabel = entity_local_name(statement_label(obj)) +
-      strlen(LABEL_PREFIX);
+    const char* tlabel = entity_local_name(statement_label(obj)) +
+      sizeof(LABEL_PREFIX) -1;
     pips_assert("Legal label required", strlen(tlabel)!=0);
     return sentence_goto_label(module, label, margin, tlabel, n);
 }
@@ -2690,7 +2690,7 @@ static sentence sentence_goto(entity module,
 */
 static text
 text_block(entity module,
-	   string label,
+	   const char* label,
 	   int margin,
 	   list objs,
 	   int n,
@@ -2982,7 +2982,7 @@ text_omp_directive(loop l, int m)
 
 /* exported for fortran90.c */
 text text_loop_default(entity module,
-		       string label,
+		       const char* label,
 		       int margin,
 		       loop obj,
 		       int n,
@@ -2993,7 +2993,7 @@ text text_loop_default(entity module,
   text r = make_text(NIL);
   statement body = loop_body( obj );
   entity the_label = loop_label(obj);
-  string do_label = entity_local_name(the_label) + strlen(LABEL_PREFIX);
+  const char* do_label = entity_local_name(the_label) + sizeof(LABEL_PREFIX) -1;
   bool structured_do = entity_empty_label_p(the_label);
   bool doall_loop_p = false;
   bool hpf_prettyprint = pp_hpf_style_p();
@@ -3124,7 +3124,7 @@ text text_loop_default(entity module,
 /* exported for conversion/look_for_nested_loops.c */
 text text_loop(
     entity module,
-    string label,
+    const char* label,
     int margin,
     loop obj,
     int n,
@@ -3133,7 +3133,7 @@ text text_loop(
   text r = make_text(NIL);
   statement body = loop_body( obj ) ;
   entity the_label = loop_label(obj);
-  string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
+  const char* do_label = entity_local_name(the_label)+sizeof(LABEL_PREFIX) -1;
   bool structured_do = entity_empty_label_p(the_label);
   bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
 
@@ -3199,7 +3199,7 @@ text text_loop(
 }
 
 static text text_whileloop(entity module,
-			   string label,
+			   const char* label,
 			   int margin,
 			   whileloop obj,
 			   int n,
@@ -3210,7 +3210,7 @@ static text text_whileloop(entity module,
   text r = make_text(NIL);
   statement body = whileloop_body( obj );
   entity the_label = whileloop_label(obj);
-  string do_label = entity_local_name(the_label) + strlen(LABEL_PREFIX);
+  const char* do_label = entity_local_name(the_label) + sizeof(LABEL_PREFIX) -1;
   bool structured_do = entity_empty_label_p(the_label);
   bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
 
@@ -3350,7 +3350,7 @@ init_text_statement(
 }
 
 static text text_logical_if(entity __attribute__ ((unused)) module,
-			    string label,
+			    const char* label,
 			    int margin,
 			    test obj,
 			    int n,
@@ -3414,7 +3414,7 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
 
 
 static text text_block_if(entity module,
-			  string label,
+			  const char* label,
 			  int margin,
 			  test obj,
 			  int n,
@@ -3516,47 +3516,50 @@ static text text_block_if(entity module,
 
 
 static text text_io_block_if(entity module,
-			     string label,
+			     const char* label,
 			     int margin,
 			     test obj,
 			     int n,
 			     list pdl) {
   text r = make_text(NIL);
   list pc = NIL;
-  string strglab = local_name(new_label_name(module)) + 1;
 
   if (!empty_statement_p(test_true(obj))) {
 
-    r = make_text(CONS(SENTENCE,
-		       sentence_goto_label(module, label, margin,
-					   strglab, n),
-		       NIL));
+      char* label_local_name = new_label_local_name(module);
+      char* strglab= label_local_name + 1;
 
-    ADD_SENTENCE_TO_TEXT(r,
-			 make_sentence(is_sentence_unformatted,
-				       make_unformatted(strdup(label), n,
-							margin, pc)));
-    MERGE_TEXTS(r, text_statement(module, margin,
-				  test_true(obj), pdl));
-    string str = string_undefined;
-    switch (get_prettyprint_language_tag()) {
-    case is_language_fortran:
-      str = strdup(CONTINUE_FUNCTION_NAME);
-      break;
-    case is_language_c:
-      str = strdup(C_CONTINUE_FUNCTION_NAME);
-      break;
-    case is_language_fortran95:
-      pips_internal_error("Need to update F95 case");
-      break;
-    default:
-      pips_internal_error("Language unknown !");
-      break;
-    }
+      r = make_text(CONS(SENTENCE,
+                  sentence_goto_label(module, label, margin,
+                      strglab, n),
+                  NIL));
 
-    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-            make_unformatted(strdup(strglab), n, margin,
-			     CONS(STRING, str, NIL))));
+      ADD_SENTENCE_TO_TEXT(r,
+              make_sentence(is_sentence_unformatted,
+                  make_unformatted(strdup(label), n,
+                      margin, pc)));
+      MERGE_TEXTS(r, text_statement(module, margin,
+                  test_true(obj), pdl));
+      string str = string_undefined;
+      switch (get_prettyprint_language_tag()) {
+          case is_language_fortran:
+              str = strdup(CONTINUE_FUNCTION_NAME);
+              break;
+          case is_language_c:
+              str = strdup(C_CONTINUE_FUNCTION_NAME);
+              break;
+          case is_language_fortran95:
+              pips_internal_error("Need to update F95 case");
+              break;
+          default:
+              pips_internal_error("Language unknown !");
+              break;
+      }
+
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+                  make_unformatted(strdup(strglab), n, margin,
+                      CONS(STRING, str, NIL))));
+      free(label_local_name);
   }
 
   if (!empty_statement_p(test_false(obj)))
@@ -3568,7 +3571,7 @@ static text text_io_block_if(entity module,
 
 
 static text text_block_ifthen(entity module,
-			      string label,
+			      const char* label,
 			      int margin,
 			      test obj,
 			      int n,
@@ -3612,7 +3615,7 @@ static text text_block_ifthen(entity module,
 
 
 static text text_block_else(entity module,
-			    string __attribute__ ((unused)) label,
+			    const char* __attribute__ ((unused)) label,
 			    int margin,
 			    statement stmt,
 			    int __attribute__ ((unused)) n,
@@ -3656,7 +3659,7 @@ static text text_block_else(entity module,
 
 
 static text text_block_elseif(entity module,
-			      string label,
+			      const char* label,
 			      int margin,
 			      test obj,
 			      int n,
@@ -3720,7 +3723,7 @@ static text text_block_elseif(entity module,
 
 
 static text text_test(entity module,
-		      string label,
+		      const char* label,
 		      int margin,
 		      test obj,
 		      int n,
@@ -3791,7 +3794,7 @@ void set_prettyprinter_head_hook(string(*f)(entity)){ head_hook=f;}
 void reset_prettyprinter_head_hook(){ head_hook=NULL;}
 
 static text text_instruction(entity module,
-			     string label,
+			     const char* label,
 			     int margin,
 			     instruction obj,
 			     int n,
@@ -4349,7 +4352,7 @@ text text_statement_enclosed(entity module,
     pips_debug(1, "I unexpectedly bumped into dead code?\n");
   }
 
-  string label;
+  const char* label;
 
   bool pragma_before_label_in_C = prettyprint_language_is_c_p()
     && statement_with_pragma_p(stmt) && !unlabelled_statement_p(stmt);
@@ -4906,7 +4909,7 @@ bool output_a_graph_view_of_the_unstructured_from_a_control(text r,
 
 void output_a_graph_view_of_the_unstructured(text r,
 					     entity module,
-					     string __attribute__ ((unused)) label,
+					     const char* __attribute__ ((unused)) label,
 					     int margin,
 					     unstructured u,
 					     int __attribute__ ((unused)) num)
@@ -5138,7 +5141,7 @@ static list words_application(application a, list pdl)
 }
 
 static text text_forloop(entity module,
-			 string label,
+			 const char* label,
 			 int margin,
 			 forloop obj,
 			 int n,

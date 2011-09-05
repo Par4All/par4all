@@ -516,7 +516,7 @@ void MakeDataStatement(list ldr, list ldv)
 {
   statement ds = statement_undefined;
   code mc = entity_code(get_current_module_entity());
-  entity dl = global_name_to_entity(TOP_LEVEL_MODULE_NAME, DATA_LIST_FUNCTION_NAME);
+  entity dl = FindEntity(TOP_LEVEL_MODULE_NAME, DATA_LIST_FUNCTION_NAME);
   expression pldr = expression_undefined;
 
   pips_assert("The static initialization pseudo-intrinsic is defined",
@@ -1076,7 +1076,7 @@ NameToCommon(string n)
     /* Check for potential conflicts */
     for(i=0; prefixes[i]!=NULL; i++) {
 	string name = strdup(concatenate(prefixes[i], n, NULL));
-	entity ce = global_name_to_entity(TOP_LEVEL_MODULE_NAME, name);
+	entity ce = FindEntity(TOP_LEVEL_MODULE_NAME, name);
 
 	if(!entity_undefined_p(ce)) {
 	    user_warning("NameToCommon", "Identifier %s used for a common and for a %s\n",
@@ -1307,7 +1307,7 @@ ImplicitType(e)
 entity e;
 {
     int i;
-    string s = entity_local_name(e);
+    const char* s = entity_local_name(e);
     type t = type_undefined;
     value v = value_undefined;
 
@@ -1354,7 +1354,7 @@ bool
 implicit_type_p(entity e)
 {
     int i;
-    string s = entity_local_name(e);
+    const char* s = entity_local_name(e);
     type t = entity_type(e);
     basic b;
 
@@ -1460,7 +1460,7 @@ retype_formal_parameters()
 		       module_local_name(m));
 
 	    /* Update type of internal variable used to store the function result */
-	    if((r=global_name_to_entity(module_local_name(m), module_local_name(m)))
+	    if((r=FindEntity(module_local_name(m), module_local_name(m)))
 	       != entity_undefined) {
 		free_type(entity_type(r));
 		entity_type(r) = ImplicitType(r);
@@ -1996,14 +1996,14 @@ entity c;
 
 entity 
 SafeFindOrCreateEntity(
-    string package, /* le nom du package */
-    string name /* le nom de l'entite */)
+    const char* package, /* le nom du package */
+    const char* name /* le nom de l'entite */)
 {
   entity e = entity_undefined;
 
   if(strcmp(package, TOP_LEVEL_MODULE_NAME) == 0) {
     /* This is a request for a global variable */
-    e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, NULL));
+    e = FindEntity(package , name );
   }
   else { /* May be a local or a global entity */
     /* This is a request for a local or a global variable. If a local
@@ -2074,8 +2074,8 @@ void add_entity_to_declarations (string name, string area, enum basic_utype tag,
   basic b = make_basic (tag, val);
   variable v = make_variable (b, NIL, NIL);
   entity_type (new_e) = make_type_variable (v);
-  string module_name = module_local_name(get_current_module_entity ());
-  entity stack_area = global_name_to_entity(module_name,
+  const char* module_name = module_local_name(get_current_module_entity ());
+  entity stack_area = FindEntity(module_name,
 											area);
   storage s = make_storage_ram(make_ram(get_current_module_entity (),
 										stack_area,

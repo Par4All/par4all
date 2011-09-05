@@ -297,7 +297,7 @@ list FindRefToDistArray(void * obj)
 /* hmmm...
  */
 entity FindOrCreateEntityLikeModel(package, name, model)
-string package, name;
+const char* package, *name;
 entity model;
 {
     string new_name = concatenate(package, 

@@ -29,7 +29,7 @@ License.
 static step_status status = (step_status) NULL;
 entity current_module_save;
 statement body_critical[MAX_NB_CRITICALS] ;
-string name_critical[MAX_NB_CRITICALS];
+const char* name_critical[MAX_NB_CRITICALS];
 int nb_critical;
 /*les liberations memoires sont faites par pipsdbm... */
 static void save_status()
@@ -404,7 +404,7 @@ static bool compile_directive_critical_filter(call c)
   return false;
 }
 
-bool step_compile(string module_name)
+bool step_compile(const char* module_name)
 { 
   entity module;
   statement body;

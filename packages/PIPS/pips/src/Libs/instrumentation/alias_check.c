@@ -118,7 +118,7 @@ typedef struct
 
 static entity current_mod = entity_undefined;
 static entity current_caller = entity_undefined; 
-static string caller_name;
+static const char* caller_name;
 static call current_call = call_undefined; 
 static list l_module_aliases = NIL;
 static statement module_statement = statement_undefined;
@@ -392,7 +392,7 @@ static void insert_test_before_statement(expression flags, expression condition,
 				      entity_local_name(e1),", aliased with ",
 				      entity_local_name(e2)," by call path ",
 				      print_call_path(path),"\'", NULL));
-  string mod_name = module_local_name(current_mod);
+  const char* mod_name = module_local_name(current_mod);
   string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,true);
   string base_name = pips_basename(user_file, NULL);
   string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
@@ -431,7 +431,7 @@ static void insert_flag_before_call_site(list flags,list path)
       entity caller = call_site_function(cs);
       int order = call_site_ordering(cs);
       statement s_flag = make_assign_statement(e_flag,make_true_expression());
-      string call_name = module_local_name(caller);
+      const char* call_name = module_local_name(caller);
       string user_file = db_get_memory_resource(DBR_USER_FILE,call_name,true);
       string base_name = pips_basename(user_file, NULL);
       string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
@@ -568,7 +568,7 @@ static void insert_check_alias_before_statement(entity e1, expression subval,
   list l = CONS(EXPRESSION,size,NIL);
   statement smt;
   int order = statement_ordering(s);
-  string mod_name = module_local_name(current_mod);
+  const char* mod_name = module_local_name(current_mod);
   string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,true);
   string base_name = pips_basename(user_file, NULL);
   string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));

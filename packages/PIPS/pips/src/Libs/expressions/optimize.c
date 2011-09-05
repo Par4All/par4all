@@ -110,9 +110,9 @@ static poptimization_strategy strategy = NULL;
  */
 static string 
 get_eole_command
-  (string in, /* input file from eole. */
-   string out,/* output file to eole. */
-   string flags)
+  (const char* in, /* input file from eole. */
+   const char* out,/* output file to eole. */
+   const char* flags)
 {
   return strdup(concatenate(get_string_property(EOLE), " ", 
 			    flags, " ",
@@ -239,7 +239,7 @@ static void write_list_of_rhs(FILE * out, list /* of expressionwithlevel */ le)
 /* export expressions to eole thru the newgen format.
  * both entities and rhs expressions are exported. 
  */
-static void write_to_eole(string module, list le, string file_name)
+static void write_to_eole(const char* module, list le, const char* file_name)
 {
   FILE * toeole;
   
@@ -271,7 +271,7 @@ read_and_allocate_string_from_file(FILE * file)
  * transformations and create them
  */
 static void 
-read_new_entities_from_eole(FILE * file, string module){
+read_new_entities_from_eole(FILE * file, const char* module){
   int num = 0;
   int i, test;
   string ent_type;
@@ -331,7 +331,7 @@ read_new_entities_from_eole(FILE * file, string module){
 /* import expressions from eole.
  */
 static list /* of expression */
-read_from_eole(string module, string file_name)
+read_from_eole(const char* module, const char* file_name)
 {
     FILE * fromeole;
     reference astuce;
@@ -379,7 +379,7 @@ swap_syntax_in_expression(  list /* of expressionwithlevel */ lcode,
 /* apply eole on all expressions in s.
  */
 static void 
-apply_eole_on_statement(string module_name, statement s, string flags)
+apply_eole_on_statement(const char* module_name, statement s, const char* flags)
 {
   list /* of expressionwithlevel/expression */ le, ln;
 
@@ -746,7 +746,7 @@ static binary_to_nary_t bton[] =
 
 static entity binary_to_nary(entity e)
 {
-  string lname = entity_local_name(e);
+  const char* lname = entity_local_name(e);
   binary_to_nary_t * pbn;
 
   for (pbn = bton; pbn->binary; pbn++)
@@ -759,7 +759,7 @@ static entity binary_to_nary(entity e)
 static bool nary_operator_p(entity e)
 {
   binary_to_nary_t * pbn;
-  string lname = entity_local_name(e);
+  const char* lname = entity_local_name(e);
 
   for (pbn = bton; pbn->nary; pbn++)
     if (same_string_p(pbn->nary, lname))
@@ -836,7 +836,7 @@ static symetric_opertor_t symop[] =
 
 static symetric_opertor_t * what_operator(entity e, int which_one)
 {
-  string lname = entity_local_name(e);
+  const char* lname = entity_local_name(e);
   symetric_opertor_t * sot;
   for (sot = symop; sot->asym; sot++)
     {
@@ -1284,7 +1284,7 @@ static optimization_strategy
 
 static void set_current_optimization_strategy(void)
 {
-  string name = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
+  const char* name = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
   for (strategy = strategies; strategy->name!=NULL; strategy++)
   {
     if (same_string_p(name, strategy->name))
@@ -1311,7 +1311,7 @@ ri-utils/expression.c such as davinci_dump_expression()
 /* dump all expressions in s as davinci graphs.
  */
 static void davinci_dump_expressions(
-   string module_name, string phase, statement s)
+   const char* module_name, string phase, statement s)
 {
   string dir, filename;
   FILE * out;
@@ -1387,7 +1387,7 @@ void convert_to_standard_operators(void * v) {
 
    @return true since it is supposed to always work
 */
-bool optimize_expressions(string module_name)
+bool optimize_expressions(const char* module_name)
 {
     statement s;
 

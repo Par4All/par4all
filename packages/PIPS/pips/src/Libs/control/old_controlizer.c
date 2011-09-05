@@ -466,7 +466,7 @@ statement loop_test(statement sl)
 		     make_plain_continue_statement());
   string csl = statement_comments(sl);
   string prev_comm = empty_comments_p(csl)? /* empty_comments */ strdup("")  : strdup(csl);
-  string lab = string_undefined;
+  const char* lab;
 
   if(entity_empty_label_p(loop_label(l)))
     lab = ""; // FI: to be replaced by a symbolic constant
@@ -631,7 +631,7 @@ static statement whileloop_test(statement sl)
     string csl = statement_comments(sl);
     /* string prev_comm = empty_comments_p(csl)? "" : strdup(csl); */
     string prev_comm = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
-    string lab = string_undefined;
+    const char* lab ;
 
     switch (get_prettyprint_language_tag()) {
       case is_language_fortran:

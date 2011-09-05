@@ -1327,7 +1327,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 list
 generic_proper_effects_of_intrinsic(entity e, list args)
 {
-    string s = entity_local_name(e);
+    const char* s = entity_local_name(e);
     IntrinsicDescriptor *pid = IntrinsicEffectsDescriptorTable;
     list lr;
 
@@ -1561,7 +1561,7 @@ substring_effect(entity e __attribute__ ((__unused__)), list args)
 
 static
  IoElementDescriptor*
-SearchIoElement(char *s, char *i)
+SearchIoElement(const char *s, const char *i)
 {
    IoElementDescriptor *p = IoElementDescriptorTable;
 
@@ -1579,7 +1579,7 @@ SearchIoElement(char *s, char *i)
 /* return the appropriate C IO function.Amira Mensi*/
 static
  IoElementDescriptor*
-SearchCIoElement(char *s)
+SearchCIoElement(const char *s)
 {
    IoElementDescriptor *p = IoElementDescriptorTable;
 
@@ -1611,8 +1611,7 @@ some_io_effects(entity e __attribute__ ((__unused__)), list args __attribute__ (
                    int_to_expression(STDERR_LUN),
                    NIL);
 
-    private_io_entity = global_name_to_entity
-      (IO_EFFECTS_PACKAGE_NAME,
+    private_io_entity = FindEntity(IO_EFFECTS_PACKAGE_NAME,
        IO_EFFECTS_ARRAY_NAME);
 
     pips_assert("io_effects", private_io_entity != entity_undefined);
@@ -1724,8 +1723,7 @@ static list io_effects(entity e, list args)
 
             indices = gen_nconc(indices, CONS(EXPRESSION, unit, NIL));
 
-            private_io_entity = global_name_to_entity
-                (IO_EFFECTS_PACKAGE_NAME,
+            private_io_entity = FindEntity(IO_EFFECTS_PACKAGE_NAME,
                  IO_EFFECTS_ARRAY_NAME);
 
             pips_assert("private_io_entity is defined", private_io_entity != entity_undefined);
@@ -1896,8 +1894,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
 
     indices = CONS(EXPRESSION, unit, NIL);
 
-    private_io_entity = global_name_to_entity
-      (IO_EFFECTS_PACKAGE_NAME, IO_EFFECTS_ARRAY_NAME);
+    private_io_entity = FindEntity(IO_EFFECTS_PACKAGE_NAME, IO_EFFECTS_ARRAY_NAME);
 
     pips_assert("private_io_entity is defined",
 		private_io_entity != entity_undefined);
@@ -2111,8 +2108,7 @@ static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bo
     //ifdebug(8) print_effects(lep);
   }, args);
 
-  private_rgs_entity = global_name_to_entity
-    (RAND_EFFECTS_PACKAGE_NAME,
+  private_rgs_entity = FindEntity(RAND_EFFECTS_PACKAGE_NAME,
      RAND_GEN_EFFECTS_NAME);
 
   pips_assert("gen_seed_effects", private_rgs_entity != entity_undefined);
@@ -2165,8 +2161,7 @@ static list any_heap_effects(entity e, list args)
     //ifdebug(8) print_effects(lep);
   }, args);
 
-  malloc_entity = global_name_to_entity
-    (MALLOC_EFFECTS_PACKAGE_NAME,
+  malloc_entity = FindEntity(MALLOC_EFFECTS_PACKAGE_NAME,
      MALLOC_EFFECTS_NAME);
 
   pips_assert("malloc entity pre-exists", !entity_undefined_p(malloc_entity));
@@ -2208,8 +2203,7 @@ static list memmove_effects(entity e, list args)
 /*     //ifdebug(8) print_effects(lep); */
 /*   }, args); */
 
-  memmove_entity = global_name_to_entity
-    (MEMMOVE_EFFECTS_PACKAGE_NAME,
+  memmove_entity = FindEntity(MEMMOVE_EFFECTS_PACKAGE_NAME,
      MEMMOVE_EFFECTS_NAME);
 
   pips_assert("memmove entity pre-exists", !entity_undefined_p(memmove_entity));
@@ -2248,9 +2242,9 @@ static entity make_dummy_io_ptr()
 				   IO_EFFECTS_PTR_NAME),
 		  t,
 		  make_storage(is_storage_ram,
-			       make_ram(global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+			       make_ram(FindEntity(TOP_LEVEL_MODULE_NAME,
 							      IO_EFFECTS_PACKAGE_NAME),
-					global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
+					FindEntity(IO_EFFECTS_PACKAGE_NAME,
 							      STATIC_AREA_LOCAL_NAME),
 					0, NIL)),
 		  make_value_unknown());
@@ -2404,8 +2398,7 @@ static list effects_of_C_ioelem(expression arg, tag act)
 	       it reads it and then writes it ...
 	    */
       indices = CONS(EXPRESSION, unit, NIL);
-      private_io_entity = global_name_to_entity
-	(IO_EFFECTS_PACKAGE_NAME,
+      private_io_entity = FindEntity(IO_EFFECTS_PACKAGE_NAME,
 	 IO_EFFECTS_ARRAY_NAME);
 
       pips_assert("private_io_entity is defined\n",
@@ -2479,8 +2472,7 @@ static list effects_of_C_ioelem(expression arg, tag act)
 	   indices = CONS(EXPRESSION,
 			  unit,
 			  NIL);
-	   private_io_entity = global_name_to_entity
-	     (IO_EFFECTS_PACKAGE_NAME,
+	   private_io_entity = FindEntity(IO_EFFECTS_PACKAGE_NAME,
 	      IO_EFFECTS_ARRAY_NAME);
 
 	   pips_assert("private_io_entity is defined\n",

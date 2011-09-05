@@ -94,7 +94,7 @@ bool unbounded_expression_p(expression e)
   syntax s = expression_syntax(e);
   if (syntax_call_p(s))
     {
-      string n = entity_local_name(call_function(syntax_call(s)));
+      const char* n = entity_local_name(call_function(syntax_call(s)));
       if (same_string_p(n, UNBOUNDED_DIMENSION_NAME))
 	return true;
     }
@@ -135,10 +135,10 @@ list make_unbounded_subscripts(int d)
    See also MakeCurrentFunction(), which is part of the Fortran
    parser.
  */
-static entity make_empty_module(string full_name,
+static entity make_empty_module(const char* full_name,
 				type r, language l)
 {
-  string name = string_undefined;
+  const char* name;
   entity e = gen_find_tabulated(full_name, entity_domain);
   entity DynamicArea, StaticArea, StackArea, HeapArea;
 
@@ -188,21 +188,21 @@ static entity make_empty_module(string full_name,
   return(e);
 }
 
-entity make_empty_program(string name,language l)
+entity make_empty_program(const char* name,language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME
 				 MODULE_SEP_STRING  MAIN_PREFIX, name, NULL);
   return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
-entity make_empty_subroutine(string name,language l)
+entity make_empty_subroutine(const char* name,language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME
 				 MODULE_SEP_STRING, name, NULL);
   return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
-entity make_empty_f95module(string name,language l)
+entity make_empty_f95module(const char* name,language l)
 {
   pips_assert("Module are only defined in Fortran95",language_fortran95_p(l));
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME
@@ -210,14 +210,14 @@ entity make_empty_f95module(string name,language l)
   return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
-entity make_empty_function(string name, type r, language l)
+entity make_empty_function(const char* name, type r, language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME
 				 MODULE_SEP_STRING, name, NULL);
   return make_empty_module(full_name, r,l);
 }
 
-entity make_empty_blockdata(string name,language l)
+entity make_empty_blockdata(const char* name,language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING
 				 BLOCKDATA_PREFIX, name, NULL);
@@ -235,35 +235,72 @@ code EntityCode(entity e)
   return(value_code(ve));
 }
 
-entity make_label(string strg)
+entity make_label(const char* module_name, const char* local_name)
 {
+    entity l = FindOrCreateEntity(module_name, local_name);
+    if( type_undefined_p(entity_type(l)) ) {
+        entity_type(l) =  MakeTypeStatement();
+        entity_storage(l) =  make_storage_rom();
+        entity_initial(l) = make_value_constant(make_constant_litteral());
+    }
+    return l;
+}
 
-  entity l = find_or_create_entity(strg);
-  if( type_undefined_p(entity_type(l)) ) {
-    entity_type(l) =  MakeTypeStatement();
-    entity_storage(l) =  make_storage_rom();
-    entity_initial(l) = make_value_constant(make_constant_litteral());
+/* Maximal value set for Fortran 77 */
+static int init = 100000;
+
+void reset_label_counter()
+{
+  init = 100000;
+}
+char* new_label_local_name(entity module)
+{
+  string local_name;
+  const char *module_name ;
+  const char * format;
+
+  pips_assert( "module != 0", module != 0 ) ;
+
+  if( module == entity_undefined ) {
+    module_name = GENERATED_LABEL_MODULE_NAME ;
+    format = "%d";
   }
-  return l;
+  else {
+    module_name = module_local_name(module) ;
+    format = c_module_p(module)?LABEL_PREFIX "l%d":LABEL_PREFIX "%d";
+  }
+  --init;
+  for(asprintf(&local_name, format, init);
+      init >= 0 && !entity_undefined_p(FindEntity(module_name, local_name)) ;) {
+    free(local_name);
+    --init;
+    asprintf(&local_name, format, init);
+    /* loop */
+  }
+  if(init == 0) {
+    pips_internal_error("no more available labels");
+  }
+  return local_name;
 }
 
 /* This function returns a new label */
-entity make_new_label(module_name)
-const char * module_name;
+entity make_new_label(entity module)
 {
   /* FI: do labels have to be declared?*/
   /* FI: it's crazy; the name is usually derived from the entity
      by the caller and here the entity is retrieved from its name! */
-  entity mod = local_name_to_top_level_entity(module_name);
-  string strg = new_label_name(mod);
-  return make_label(strg);
+  string local_name = new_label_local_name(module);
+  const char * module_name = entity_undefined_p(module)?
+      GENERATED_LABEL_MODULE_NAME:
+      module_local_name(module);
+  return make_label(module_name, local_name);
 
 }
 
 entity make_loop_label(int __attribute__ ((unused)) desired_number,
-		char * module_name)
+		entity module)
 {
-  entity e = make_new_label(module_name);
+  entity e = make_new_label(module);
   return e;
 }
 
@@ -343,10 +380,10 @@ string safe_entity_name(entity e)
  * with the "null" entity which codes the constant. FC 28/11/94.
  * SG: should return a const pointer
  */
-/*const*/ string
-entity_local_name(const entity e)
+const char *
+entity_local_name(entity e)
 {
-  string null_name = "null";
+  const char* null_name = "null";
   pips_assert("entity is defined", !entity_undefined_p(e));
   pips_assert("constant term or entity",
 	      e==NULL || entity_domain_number(e)==entity_domain);
@@ -436,7 +473,7 @@ bool string_block_scope_p(string s)
 string entity_name_without_scope(entity e)
 {
   string en = entity_name(e);
-  string mn = entity_module_name(e);
+  const char* mn = entity_module_name(e);
   string ns = strrchr(en, BLOCK_SEP_CHAR);
   string enws = string_undefined;
 
@@ -453,7 +490,7 @@ string entity_name_without_scope(entity e)
 
 
 /* allocates a new string */
-string local_name_to_scope(string ln)
+string local_name_to_scope(const char* ln)
 {
   string ns = strrchr(ln, BLOCK_SEP_CHAR);
   string s = string_undefined;
@@ -471,12 +508,11 @@ string local_name_to_scope(string ln)
 
 
 /* Returns the module local user name
- * SG: should return a const pointer
  */
-/*const*/ string module_local_name(entity e)
+const char* module_local_name(entity e)
 {
   /* No difference between modules and other entities, except for prefixes */
-  string name = local_name(entity_name(e));
+  const char* name = local_name(entity_name(e));
 
   return (name
    + strspn(name, F95MODULE_PREFIX MAIN_PREFIX BLOCKDATA_PREFIX COMMON_PREFIX));
@@ -484,9 +520,9 @@ string local_name_to_scope(string ln)
 
 /* Returns a pointer towards the resource name. The resource name is
    the module local name: it may include the  */
-string module_resource_name(entity e)
+const char* module_resource_name(entity e)
 {
-  string rn = entity_local_name(e);
+  const char* rn = entity_local_name(e);
 
   rn += strspn(rn, F95MODULE_PREFIX MAIN_PREFIX BLOCKDATA_PREFIX COMMON_PREFIX);
 
@@ -495,13 +531,13 @@ string module_resource_name(entity e)
 
 /* END_EOLE */
 
-string label_local_name(entity e)
+const char* label_local_name(entity e)
 {
-  string name = local_name(entity_name(e));
-  return name+strlen(LABEL_PREFIX);
+  const char* name = local_name(entity_name(e));
+  return name+sizeof(LABEL_PREFIX) -1 ;
 }
 
-bool label_name_conflict_with_labels(string n, list ll)
+bool label_name_conflict_with_labels(const char* n, list ll)
 {
   bool conflict_p = false;
   if(!empty_label_p(n)) {
@@ -518,7 +554,7 @@ bool label_name_conflict_with_labels(string n, list ll)
 
    @return the name or "TCST" if the entity is null.
 */
-string entity_name_or_TCST(entity e)
+const char* entity_name_or_TCST(entity e)
 {
   if (e != NULL)
     return entity_name(e);
@@ -545,7 +581,7 @@ entity e;
 }
 */
 
-string entity_and_common_name(entity e)
+const char* entity_and_common_name(entity e)
 {
   entity m = get_current_module_entity();
   string name ;
@@ -554,12 +590,12 @@ string entity_and_common_name(entity e)
   name = concatenate(entity_local_name(ram_section(storage_ram(entity_storage(e)))),
 		     MODULE_SEP_STRING,entity_name(e),NIL);
 
-  return name +strlen(COMMON_PREFIX);
+  return name +sizeof(COMMON_PREFIX) -1;
 }
 
 bool entity_empty_label_p(entity e)
 {
-  string lln = entity_local_name(e);
+  const char* lln = entity_local_name(e);
   bool empty_p = empty_label_p(lln);
   return empty_p;
 }
@@ -587,7 +623,7 @@ bool entity_module_p(entity e)
 
 bool entity_f95use_p(entity e)
 {
-  string name = entity_name(e);
+  const char* name = entity_name(e);
   return strncmp(name,F95_USE_LOCAL_NAME,strlen(F95_USE_LOCAL_NAME)) == 0;
 }
 
@@ -748,11 +784,11 @@ bool unnormalized_array_p(entity e)
 /* e is the field of a structure */
 bool entity_field_p(entity e)
 {
-  string eln = entity_local_name(e);
+  const char* eln = entity_local_name(e);
   bool field_p = false;
 
   if(*eln!='\'' && *eln!='"') {
-    string pos = strrchr(eln, MEMBER_SEP_CHAR);
+    const char* pos = strrchr(eln, MEMBER_SEP_CHAR);
 
     field_p = pos!=NULL;
   }
@@ -771,7 +807,7 @@ static
 entity entity_field_to_entity(entity f, char prefix)
 {
   entity s = entity_undefined;
-  string sn = strdup(entity_name(f)); /* structure name */
+  const string sn = strdup(entity_name(f)); /* structure name */
   string pos = strrchr(sn, MEMBER_SEP_CHAR);
   string usn = string_undefined;
   int usnl = 0;
@@ -789,6 +825,7 @@ entity entity_field_to_entity(entity f, char prefix)
 
   pips_debug(8, "struct entity name is \"\%s\"\n", sn);
   s = gen_find_tabulated(sn, entity_domain);
+  free(sn);
 
   return s;
 }
@@ -860,7 +897,7 @@ bool entity_enum_p(entity e)
 {
   /* Base the predicate on the entity name as for struct and union.*/
   //return type_enum_p(entity_type(e));
-  string ln = entity_local_name(e);
+  const char* ln = entity_local_name(e);
   string ns = strrchr(ln, BLOCK_SEP_CHAR);
   bool struct_p = (ns==NULL && *ln==ENUM_PREFIX_CHAR)
     || (ns!=NULL && *(ns+1)==ENUM_PREFIX_CHAR)
@@ -882,7 +919,7 @@ bool entity_enum_member_p(entity e)
 
 bool entity_struct_p(entity e)
 {
-  string ln = entity_local_name(e);
+  const char* ln = entity_local_name(e);
   string ns = strrchr(ln, BLOCK_SEP_CHAR);
   bool struct_p = (ns==NULL && *ln==STRUCT_PREFIX_CHAR)
     || (ns!=NULL && *(ns+1)==STRUCT_PREFIX_CHAR)
@@ -899,7 +936,7 @@ bool same_struct_entity_p(const entity e0, const entity e1)
 
 bool entity_union_p(entity e)
 {
-  string ln = entity_local_name(e);
+  const char* ln = entity_local_name(e);
   string ns = strrchr(ln, BLOCK_SEP_CHAR);
   bool union_p = (ns==NULL && *ln==UNION_PREFIX_CHAR)
     || (ns!=NULL && *(ns+1)==UNION_PREFIX_CHAR)
@@ -951,7 +988,7 @@ bool entity_in_common_p(entity e)
 
 /* See comments about module_name(). Its result is transient and must
    be strduped. */
-string entity_module_name(entity e)
+const char* entity_module_name(entity e)
 {
   return module_name(entity_name(e));
 }
@@ -1212,7 +1249,7 @@ entity local_name_to_top_level_entity(const char *n)
     string cun = strdup(n);
     string sep = strchr(cun, FILE_SEP);
     *(sep+1) = '\0';
-    module = global_name_to_entity(cun,n);
+    module = FindEntity(cun,n);
     free(cun);
   }
   else
@@ -1236,7 +1273,7 @@ entity module_name_to_entity(const char* mn) {
 /* similar to module_name_to_entity
  * but generates a warning and a stub if the entity is not found
  */
-entity module_name_to_runtime_entity(string name)
+entity module_name_to_runtime_entity(const char* name)
 {
     entity e = module_name_to_entity(name); 
     if ( entity_undefined_p( e ) )
@@ -1254,30 +1291,33 @@ entity module_name_to_runtime_entity(string name)
  * @brief Retrieve an entity from its package/module name and its local name
  * @return the entity if found, else entity_undefined
  */
-entity global_name_to_entity( const char* package, const char* name ) {
+entity FindEntity(const char* package, const char* name ) {
   return gen_find_tabulated( concatenate( package,
                                           MODULE_SEP_STRING,
                                           name,
-                                          NULL ), entity_domain );
+                                          NULL ),
+          entity_domain );
 }
 
-
-/**
- * @brief Retrieve an entity from its package/module name and its local name
- * @return the entity if found, else entity_undefined
- */
-entity FindEntity( const char* package, const char* name ) {
-  entity e = global_name_to_entity(package, name);
+entity FindEntityFromUserName( const char* package, const char* name ) {
+  entity e = FindEntity(package, name);
   if ( entity_undefined_p(e) ) {
     e = gen_find_tabulated( concatenate( package,
-					 MODULE_SEP_STRING,
-					 "0",
-					 BLOCK_SEP_STRING,
+					 MODULE_SEP_STRING "0" BLOCK_SEP_STRING,
 					 name,
-					 NULL ), entity_domain );
+					 NULL ),
+            entity_domain );
+  }
+  if ( entity_undefined_p(e) ) {
+    e = gen_find_tabulated( concatenate( package,
+					 MODULE_SEP_STRING ,
+					 name,
+					 NULL ),
+            entity_domain );
   }
   return e;
 }
+
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
@@ -1311,20 +1351,12 @@ entity FindEntity( const char* package, const char* name ) {
  *    (Francois Irigoin, ?? ???? 1991)
  */
 
-entity find_or_create_entity(string full_name)
+entity CreateEntity(const char *package_name, const char * local_name)
 {
-  entity e;
-
-  if ((e = gen_find_tabulated(full_name, entity_domain))
-      != entity_undefined) {
-    pips_debug(8, "Entity \"%s\" is found\n", full_name);
-  }
-  else {
-    pips_debug(8, "Entity \"%s\" is created\n", full_name);
-    e = make_entity(strdup(full_name),
-		    type_undefined, storage_undefined, value_undefined);
-  }
-  return e;
+    char * name;
+    asprintf(&name,"%s"MODULE_SEP_STRING"%s",package_name, local_name);
+    entity e = make_entity(name, type_undefined, storage_undefined, value_undefined);
+    return e;
 }
 
 
@@ -1334,12 +1366,12 @@ entity find_or_create_entity(string full_name)
    See SafeFindOrCreateEntity().
 */
 entity FindOrCreateEntity(const char* package /* package name */,
-			  const char* name /* entity name */)
+			  const char* local_name /* entity name */)
 {
-  entity e = entity_undefined;
-
-  e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, NULL));
-
+  entity e;
+  if(entity_undefined_p(e=FindEntity(package, local_name))) {
+      e = CreateEntity(package,local_name);
+  } 
   return e;
 }
 
@@ -1358,7 +1390,7 @@ entity FindOrCreateTopLevelEntity(const char* name)
 
 /* FIND_MODULE returns entity. Argument is module_name */
 /* This function should be replaced by local_name_to_top_level_entity() */
-/*entity find_entity_module(name)
+/*entity FindEntity(_module(name)
 string name;
 {
     string full_name = concatenate(TOP_LEVEL_MODULE_NAME,
@@ -1540,7 +1572,7 @@ static bool comparable_entity_in_list_p(entity common, entity v, list l)
 
   /* first find an entity with the same NAME.
    */
-  string nv = entity_local_name(v);
+  const char* nv = entity_local_name(v);
   MAP(ENTITY, e,
       {
 	if (same_string_p(entity_local_name(e),nv))
@@ -1802,7 +1834,7 @@ bool dummy_parameter_entity_p(entity p)
 
 
 /* This is useful for the C language only */
-entity MakeCompilationUnitEntity(string name)
+entity MakeCompilationUnitEntity(const char* name)
 {
   entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
 
@@ -1910,7 +1942,7 @@ entity entity_to_module_entity(entity e)
   else if(entity_module_p(e))
     m = e;
   else {
-    string mn = entity_module_name(e);
+    const char* mn = entity_module_name(e);
     m = module_name_to_entity(mn);
   }
 

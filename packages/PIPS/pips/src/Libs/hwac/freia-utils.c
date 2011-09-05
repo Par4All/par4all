@@ -289,34 +289,34 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min, measure_none }
     },
-    TRPX_MS(1, 3, "GLOBAL_MIN"), NO_OPCL
+    TRPX_MS(1, 3, "GLOBAL_MIN"), OPCL("MINIMUM")
   },
   { AIPO "global_max", "max", NULL, 0, 1, 1, 0, { TY_PIN, NULL, NULL },
     NO_PARAM, { spoc_input_0 | spoc_measure_0,
                 NO_POC, alu_unused, { measure_max, measure_none }
     },
-    TRPX_MS(1, 3, "GLOBAL_MAX"), NO_OPCL
+    TRPX_MS(1, 3, "GLOBAL_MAX"), OPCL("MAXIMUM")
   },
   { AIPO "global_min_coord", "min!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PUI, TY_PUI }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min_coord, measure_none }
     },
-    TRPX_MS(5, 3, "GLOBAL_MIN_COORD"), NO_OPCL
+    TRPX_MS(5, 3, "GLOBAL_MIN_COORD"), OPCL("MIN_COORD")
   },
   { AIPO "global_max_coord", "max!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PUI, TY_PUI }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_max_coord, measure_none }
     },
-    TRPX_MS(5, 3, "GLOBAL_MAX_COORD"), NO_OPCL
+    TRPX_MS(5, 3, "GLOBAL_MAX_COORD"), OPCL("MAX_COORD")
   },
   { AIPO "global_vol", "vol", NULL, 0, 1, 1, 0,
     { TY_PIN, NULL, NULL }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_vol, measure_none }
     },
-    TRPX_MS(2, 3, "GLOBAL_VOL"), NO_OPCL
+    TRPX_MS(2, 3, "GLOBAL_VOL"), OPCL("VOLUME")
   },
   // LINEAR
   // not implemented by SPOC!
@@ -347,7 +347,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
 /* @returns the description of a FREIA AIPO API function.
  * may be moved elswhere. raise an error if not found.
  */
-const freia_api_t * hwac_freia_api(const string function)
+const freia_api_t * hwac_freia_api(const char* function)
 {
   static hash_table cache = NULL;
   if (!cache)
@@ -1122,7 +1122,7 @@ static bool reference_written_p(
   const reference r,
   const hash_table signatures)
 {
-  string why = "default", func = "?";
+  const char* why = "default", *func = "?";
   bool written = false;
   call c = (call) gen_get_ancestor(call_domain, r);
   if (c)

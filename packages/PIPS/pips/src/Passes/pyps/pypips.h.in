@@ -16,7 +16,7 @@
 #undef assert
 /*properties.h*/
 extern bool get_bool_property(const char* /*name*/);
-extern string get_string_property(const char* /*name*/);
+extern const char* get_string_property(const char* /*name*/);
 extern int get_int_property(const char* /*name*/);
 
 extern char *module_loops(const char*,const char*);

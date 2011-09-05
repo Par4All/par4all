@@ -77,6 +77,8 @@
 #include "text-util.h"
 
 #include <stdio.h>
+#include <string.h>
+extern char * strdup(const char*);
 
 // globals defined somewhere in pips...
 // Temporary HACK, waiting for PIPS to be modified : these have to be moved
@@ -100,7 +102,7 @@ typedef loop pips_loop;
  extern type CurrentType;
  */
 statement gfc_function_body;
-char *CurrentPackage;
+const char *CurrentPackage;
 
 int global_current_offset = 0;
 
@@ -213,7 +215,7 @@ void gfc2pips_namespace(gfc_namespace* ns) {
     if(entity_variable_p(e)) {
       ram r = storage_ram(entity_storage(e));
       ram_function(r) = gfc2pips_main_entity;
-      string name = module_local_name(gfc2pips_main_entity);
+      const char* name = module_local_name(gfc2pips_main_entity);
       if(ram_section(r) == entity_undefined) {
         ram_section(r) = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
       }
@@ -276,14 +278,15 @@ void gfc2pips_namespace(gfc_namespace* ns) {
     gfc2pips_debug(3, "common founded: /%s/\n",st->name);
 
     // Check if the common exist first
+    char * upper;
     string common_global_name = concatenate(TOP_LEVEL_MODULE_NAME,
                                             MODULE_SEP_STRING
                                             COMMON_PREFIX,
-                                            str2upper(strdup(st->name)),
+                                            upper=strupper(strdup(st->name),st->name),
                                             NULL);
     entity com = gen_find_tabulated(common_global_name, entity_domain);
     if(com == entity_undefined) {
-      com = make_new_common((char *)str2upper((char *)st->name),
+      com = make_new_common(upper,
                             gfc2pips_main_entity);
       AddEntityToDeclarations(com, get_current_module_entity());
     }
@@ -349,11 +352,10 @@ void gfc2pips_namespace(gfc_namespace* ns) {
   if(unnamed_commons_nb) {
     gfc2pips_debug(2, "nb of elements in %d unnamed common(s) founded\n",unnamed_commons_nb);
 
+    char local_name[] = COMMON_PREFIX  BLANK_COMMON_LOCAL_NAME;
     entity com =
         FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
-                           str2upper(concatenate(COMMON_PREFIX,
-                                                 BLANK_COMMON_LOCAL_NAME,
-                                                 NULL)));
+                           strupper(local_name,local_name));
     entity_type(com) = make_type_area(make_area(0, NIL));
 
     entity_storage(com)
@@ -1175,18 +1177,15 @@ void gfc2pips_getTypesDeclared(gfc_namespace *ns) {
       }
       entity ent;
       if(current_symtree->n.sym->attr.external) {
-        ent = find_or_create_entity(concatenate(CurrentPackage,
-                                                MODULE_SEP_STRING,
-                                                STRUCT_PREFIX,
-                                                current_symtree->name,
-                                                NULL));
+          char * local_name;
+          asprintf(&local_name,STRUCT_PREFIX "%s",current_symtree->name);
+        ent = FindOrCreateEntity(CurrentPackage,local_name);
+        free(local_name);
       } else {
-        ent = find_or_create_entity(concatenate(CurrentPackage,
-                                                MODULE_SEP_STRING,
-                                                "",//scope,
-                                                STRUCT_PREFIX,
-                                                current_symtree->name,
-                                                NULL));
+          char * local_name;
+          asprintf(&local_name,STRUCT_PREFIX "%s"/*scope*/,current_symtree->name);
+        ent = FindOrCreateEntity(CurrentPackage,local_name);
+        free(local_name);
         /*ent = MakeDerivedEntity(
          current_symtree->n.sym->name,
          list_of_components,
@@ -1785,8 +1784,8 @@ entity gfc2pips_int_const2entity(int n) {
 entity gfc2pips_int2label(int n) {
   //return make_loop_label(n,concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,NULL));
   char str[60];
-  sprintf(str, "%s%s%s%d", CurrentPackage, MODULE_SEP_STRING, LABEL_PREFIX, n);//fprintf(stderr,"new label: %s %s %s %s %d\n",str,TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,n);
-  return make_label(str);
+  sprintf(str, LABEL_PREFIX "%d", n);//fprintf(stderr,"new label: %s %s %s %s %d\n",str,TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,n);
+  return make_label(CurrentPackage,str);
 }
 
 /**

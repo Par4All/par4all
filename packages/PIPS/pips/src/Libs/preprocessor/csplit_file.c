@@ -313,7 +313,7 @@ static void csplit_skip(FILE * f, int lines)
    source file between these file offset instead of between lines
    first_line and int last_line.
  */
-void csplit_copy(string module_name,
+void csplit_copy(const char* module_name,
 		 string signature,
 		 int first_line,
 		 int last_line,
@@ -324,7 +324,7 @@ void csplit_copy(string module_name,
   FILE * mfd = NULL;
   /* Unambiguous, unless the user has given the same name to two functions. */
   string unambiguous_module_file_name;
-  string unambiguous_module_name = is_static_p?
+  const char* unambiguous_module_name = is_static_p?
     strdup(concatenate(current_compilation_unit_name, /* MODULE_SEP_STRING,*/ module_name, NULL)) :
     module_name;
   /* string unambiguous_module_name = module_name; */

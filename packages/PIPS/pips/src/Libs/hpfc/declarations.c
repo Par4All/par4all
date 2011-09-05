@@ -203,9 +203,8 @@ entity e;
 	in_ram = storage_ram_p(s);
     ram 
 	r = (in_ram ? storage_ram(s) : ram_undefined);
-    string
-	suffix = entity_local_name(e),
-	prefix = 
+	const char* suffix = entity_local_name(e),
+	*prefix = 
 	    (in_ram ? 
 	     entity_local_name(in_common ? ram_section(r) : ram_function(r)) :
 	     "DEFAULT");

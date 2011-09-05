@@ -190,7 +190,7 @@ static expression MakeDataValueSet(expression n, expression c)
   {
     expression repeat_factor = expression_undefined;
     expression value_set = expression_undefined;
-    entity repeat_value = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+    entity repeat_value = FindEntity(TOP_LEVEL_MODULE_NAME,
 						REPEAT_VALUE_NAME);
     value vc = value_undefined;
 
@@ -1117,7 +1117,7 @@ module_name: global_name
 		CurrentPackage = strdup($1);
 	        BeginingOfProcedure();
 		free($1);
-		$$ = CurrentPackage;
+		$$ = (char*)CurrentPackage;
 	    }
         ;
 

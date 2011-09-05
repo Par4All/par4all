@@ -232,8 +232,8 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 typedef struct redeclaration_context {
   int cycle_depth;
   statement declaration_statement;
-  string scope;
-  string module_name;
+  const char* scope;
+  const char* module_name;
   hash_table renamings;
 } redeclaration_context_t;
 
@@ -254,9 +254,9 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
     rdcp->cycle_depth++;
   else if(instruction_sequence_p(i) && !ENDP(statement_declarations(s))) {
     FOREACH(ENTITY, v, statement_declarations(s)) {
-      string mn = rdcp->module_name;
+      const char* mn = rdcp->module_name;
       string vn = entity_name(v);
-      string vmn = module_name(vn);
+      const char* vmn = module_name(vn);
 
       if (hash_defined_p(rdcp->renamings, v)) {
 	pips_debug(5, "Skipping the already processed variable \"%s\" \n", entity_user_name(v)); 
@@ -411,7 +411,7 @@ static void redeclaration_exit_statement(statement s,
 }
 
 /* FI: added to wrap up the use of redeclaration context... */
-static void compute_renamings(statement s, string sc, string mn, hash_table renamings)
+static void compute_renamings(statement s, const char* sc, const char* mn, hash_table renamings)
 {
   string mnc = strdup(mn);
   redeclaration_context_t rdc = { 0, s, sc, mnc, renamings};
@@ -466,9 +466,9 @@ bool statement_flatten_declarations(entity module, statement s)
         /* Can we find out what the local scope of statement s is? */
         FOREACH(ENTITY, se, entity_declarations(module)) {
             string sen  = entity_name(se);
-            string seln = entity_local_name(se);
+            const char* seln = entity_local_name(se);
             string cs   = local_name_to_scope(seln); /* current scope for s */
-            string mn   = module_name(sen);
+            const char* mn   = module_name(sen);
             const char* cmn = entity_user_name(module);
 
             if(same_string_p(mn, cmn)) {
@@ -574,7 +574,7 @@ static void statement_purge_declarations(statement s)
    cannot be flatten either, but clean_up_sequences might help.
 
  */
-bool flatten_code(string module_name)
+bool flatten_code(const char* module_name)
 {
   entity module;
   statement module_stat;
@@ -638,7 +638,7 @@ void statement_split_initializations(statement s)
 
 /* Pipsmake 'split_initializations' phase
  */
-bool split_initializations(string module_name)
+bool split_initializations(const char* module_name)
 {
   statement module_stat;
   bool good_result_p = true;
@@ -726,7 +726,7 @@ split_update_operator_statement_walker(statement s)
     }
 }
 
-bool split_update_operator(string module_name)
+bool split_update_operator(const char* module_name)
 {
   set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement( (statement)	db_get_memory_resource(DBR_CODE, module_name, true) );

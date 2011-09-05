@@ -259,7 +259,7 @@ int ls;
 
     entity_initial(esv) = make_value_unknown();
 
-    a = global_name_to_entity(module_local_name(memory_module), 
+    a = FindEntity(module_local_name(memory_module), 
 			      DYNAMIC_AREA_LOCAL_NAME);
     entity_storage(esv)=make_storage(is_storage_ram,
 				     (make_ram(memory_module, 
@@ -321,7 +321,7 @@ hash_table v_to_lllv;
     int s;
     list llv = NIL;
     list lllv = NIL;
-    string computational_name = entity_local_name(compute_module);
+    const char* computational_name = entity_local_name(compute_module);
 
     type tv = entity_type(v);
     entity a; 
@@ -354,7 +354,7 @@ hash_table v_to_lllv;
 			 storage_undefined,
 			 value_undefined);
 
-	a = global_name_to_entity(module_local_name(compute_module), 
+	a = FindEntity(module_local_name(compute_module), 
 				  DYNAMIC_AREA_LOCAL_NAME);
 	pips_assert("make_new_local_variables",!entity_undefined_p(a));
 

@@ -52,7 +52,7 @@ static string control_to_label_name(control c, hash_table h);
 
 text
 text_unstructured(entity module,
-                  string label,
+                  const char* label,
                   int margin,
                   unstructured u,
 		  int num)
@@ -429,23 +429,35 @@ appears_first_in_trail(list trail, control c1, control c2)
  * There is no guarantee that a label generated here appears eventually
  * in the text produced.
  *
- * There is no guarentee that a label generated here is jumped at.
+ * There is no guarantee that a label generated here is jumped at.
  */
 
 static void 
 set_control_to_label(entity m, control c, hash_table h)
 {
-    string l;
+    char* l;
     statement st = control_statement(c) ;
 
     if ((l = hash_get(h, (char *) c)) == HASH_UNDEFINED_VALUE) {
-	string label = entity_name( statement_to_label( st )) ;
+        const char* label = entity_name( statement_to_label( st )) ;
+        if(empty_global_label_p( label )) {
+            char * lname = new_label_local_name(m);
+            const char * module_name = 
+                entity_undefined_p(m) ?
+                GENERATED_LABEL_MODULE_NAME:
+                module_local_name(m);
+                
+            asprintf(&l,"%s" MODULE_SEP_STRING "%s",module_name,lname);
+            free(lname);
+        }
+        else {
+            l=strdup(label);
+        }
 
-	l = empty_global_label_p( label ) ? new_label_name(m) : label ;
-	/* memory leak in debug code: statement_identification(). */
-	pips_debug(3, "Associates label %s to stmt %s\n",
-	      l, statement_identification(st));
-	hash_put(h, (char *) c, strdup(l)) ;
+        /* memory leak in debug code: statement_identification(). */
+        pips_debug(3, "Associates label %s to stmt %s\n",
+                l, statement_identification(st));
+        hash_put(h, (char *) c, l) ;
     }
     else {
 	debug(3, "set_control_to_label", "Retrieves label %s for stmt %s\n",
@@ -462,7 +474,7 @@ set_control_to_label(entity m, control c, hash_table h)
 static string
 control_to_label_name(control c, hash_table h)
 {
-    string l;
+    char* l;
     statement st = control_statement(c) ;
 
     if ((l = hash_get(h, (char *) c)) == HASH_UNDEFINED_VALUE) {
@@ -473,8 +485,7 @@ control_to_label_name(control c, hash_table h)
     else {
 	debug(3, "control_to_label_name", "Retrieves label %s for stmt %s\n",
 	      l, statement_identification(st));
-	l = local_name(l)+strlen(LABEL_PREFIX);
-	l = strdup(l);
+	l = strdup(local_name(l)+sizeof(LABEL_PREFIX)-1);
     }
 
     return l;

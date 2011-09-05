@@ -91,18 +91,18 @@ void remove_preferences(void * obj) {
 static graph dependence_graph=graph_undefined;
 
 static bool simd_load_call_p(call c) {
-  string funcName = entity_local_name(call_function(c));
-  string simd= get_string_property("ACCEL_LOAD");
+  const char* funcName = entity_local_name(call_function(c));
+  const char* simd= get_string_property("ACCEL_LOAD");
   return    same_stringn_p(funcName, simd, strlen(simd));
 }
 static bool simd_work_call_p(call c) {
-  string funcName = entity_local_name(call_function(c));
-  string simd= get_string_property("ACCEL_WORK");
+  const char* funcName = entity_local_name(call_function(c));
+  const char* simd= get_string_property("ACCEL_WORK");
   return    same_stringn_p(funcName, simd, strlen(simd));
 }
 static bool simd_store_call_p(call c) {
-  string funcName = entity_local_name(call_function(c));
-  string simd= get_string_property("ACCEL_STORE");
+  const char* funcName = entity_local_name(call_function(c));
+  const char* simd= get_string_property("ACCEL_STORE");
   return    same_stringn_p(funcName, simd, strlen(simd));
 }
 

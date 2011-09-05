@@ -64,12 +64,12 @@ static hash_table nts = hash_table_undefined;
 
 static text text_statement_array_comp_regions(entity, int, statement);
 static text text_array_comp_regions(list);
-static bool print_code_with_comp_regions(string, string, string, string);
-static text get_any_comp_regions_text(string, string, string, bool);
+static bool print_code_with_comp_regions(const char*, string, string, string);
+static text get_any_comp_regions_text(const char*, string, string, bool);
 
 /* }}} */
 
-text get_text_comp_regions(string module_name)
+text get_text_comp_regions(const char* module_name)
 {
     is_user_view_p = false;
     in_out_comp_regions_p = false;
@@ -81,13 +81,13 @@ text get_text_comp_regions(string module_name)
 }
 
 
-/* bool print_source_regions(string module_name)
+/* bool print_source_regions(const char* module_name)
  * input    : the name of the current module
  * modifies : nothing.
  * comment  : prints the original source code with the corresponding regions.	
  */
 bool print_source_comp_regions(module_name)
-string module_name;
+const char* module_name;
 {
     is_user_view_p = true;
     in_out_comp_regions_p = false;
@@ -99,13 +99,13 @@ string module_name;
 }
 
 
-/* bool print_code_comp_regions(string module_name)
+/* bool print_code_comp_regions(const char* module_name)
  * input    : the name of the current module
  * modifies : nothing.
  * comment  : prints the source code with the corresponding regions.	
  */
 bool print_code_comp_regions(module_name)
-string module_name;
+const char* module_name;
 {
     is_user_view_p = false;
     in_out_comp_regions_p = false;
@@ -116,14 +116,14 @@ string module_name;
 				   SEQUENTIAL_COMPSEC_SUFFIX);
 }
 
-/* bool print_code_with_comp_regions(string module_name, list summary_comp_regions)
+/* bool print_code_with_comp_regions(const char* module_name, list summary_comp_regions)
  * input    : the name of the current module, the name of the region and
  *            summary region resources and the file suffix
  *            the comp_regions are in the global variable local_regions_map.
  * modifies : nothing.
  * comment  : prints the source code with the corresponding comp_regions.	
  */
-static bool print_code_with_comp_regions(string module_name,
+static bool print_code_with_comp_regions(const char* module_name,
 				    string resource_name,
 				    string summary_resource_name,
 				    string file_suffix)
@@ -151,7 +151,7 @@ static bool print_code_with_comp_regions(string module_name,
 }
 
 /*{{{  get any comp_regions text*/
-static text get_any_comp_regions_text(string module_name,
+static text get_any_comp_regions_text(const char* module_name,
 			     string resource_name,
 			     string summary_resource_name,
 			     bool give_code_p)

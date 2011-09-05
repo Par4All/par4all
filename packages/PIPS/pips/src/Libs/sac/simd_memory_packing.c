@@ -56,7 +56,7 @@ bool simd_replace_parameters( hash_table array_to_vector )
         {
             /* recover the parameter name */
             entity dummy_e = dummy_identifier(d);
-            string parameter_name = entity_local_name(dummy_e);
+            const char* parameter_name = entity_local_name(dummy_e);
             /* get associated entity */
             entity real_e = FindOrCreateEntity(entity_local_name(get_current_module_entity()),parameter_name);
             /* find associated vector if any */
@@ -136,7 +136,7 @@ void simd_trace_call(statement s, hash_table array_to_vector)
     }
 
 }
-string compilation_unit_of_module(string);
+string compilation_unit_of_module(const char*);
 
 /** 
  * @brief pack load / store from char or short array

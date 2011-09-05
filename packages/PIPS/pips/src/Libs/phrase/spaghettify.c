@@ -81,7 +81,7 @@
  * - on WhileLoops (if property DESTRUCTURE_WHILELOOPS set to true)
  * - on ForLoops (if property DESTRUCTURE_FORLOOPS set to true)
  */
-statement spaghettify_statement (statement stat, string module_name)
+statement spaghettify_statement (statement stat, const char* module_name)
 {
   // Defaut behaviour is to return parameter statement stat
   statement returned_statement = stat;
@@ -169,7 +169,7 @@ statement spaghettify_statement (statement stat, string module_name)
  * Phase main
  *********************************************************/
 
-bool spaghettify(string module_name)
+bool spaghettify(const char* module_name)
 {
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 

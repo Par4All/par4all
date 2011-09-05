@@ -732,7 +732,7 @@ list effects_list;
     type   t = entity_type(f);
     value  v = entity_initial(f);
 
-    char *name = module_local_name(f);
+    const char *name = module_local_name(f);
 
     trace_on("call %s", entity_name(f));
 
@@ -945,7 +945,7 @@ list effects_list;
     entity var = reference_variable(ref);
     list ind = reference_indices(ref);
 
-    string name = module_local_name(var);
+    const char* name = module_local_name(var);
     basic b = variable_basic(type_variable(entity_type(var)));
     basic ib = MAKE_INT_BASIC;    /* indices basic */
     complexity comp, ci, ca;      /* ci=compindexation, ca=compaccess */

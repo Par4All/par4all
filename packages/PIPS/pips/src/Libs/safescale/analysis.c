@@ -30,7 +30,7 @@
 /**
    Analyze a given module
  */
-bool safescale_module_analysis(string module_name)
+bool safescale_module_analysis(const char* module_name)
 {
   statement module_statement;
   entity module;  

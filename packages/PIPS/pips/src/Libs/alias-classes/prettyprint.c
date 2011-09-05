@@ -159,7 +159,7 @@ text_region_no_action(effect reg)
 
 
 static text
-aliases_text(string module_name, string resource_name)
+aliases_text(const char* module_name, string resource_name)
 {
     list alias_lists;
     list al = NIL;
@@ -246,7 +246,7 @@ aliases_text(string module_name, string resource_name)
 
 
 static bool
-print_aliases( string module_name, string resource_name, string file_extn)
+print_aliases( const char* module_name, string resource_name, string file_extn)
 {
     char *file_resource_name;
     bool success = true;
@@ -269,7 +269,7 @@ print_aliases( string module_name, string resource_name, string file_extn)
 
 
 bool
-print_in_alias_pairs( string module_name )
+print_in_alias_pairs( const char* module_name )
 {
     bool success = true;
 
@@ -286,7 +286,7 @@ print_in_alias_pairs( string module_name )
 
 
 bool
-print_out_alias_pairs( string module_name )
+print_out_alias_pairs( const char* module_name )
 {
     bool success = true;
 
@@ -302,7 +302,7 @@ print_out_alias_pairs( string module_name )
 }
 
 bool
-print_alias_lists( string module_name )
+print_alias_lists( const char* module_name )
 {
     bool success = true;
 
@@ -318,7 +318,7 @@ print_alias_lists( string module_name )
 }
 
 bool
-print_alias_classes( string module_name )
+print_alias_classes( const char* module_name )
 {
     bool success = true;
 

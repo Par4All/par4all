@@ -1,0 +1,41 @@
+
+The major goal of the project was to create a lightweight WEB
+application that allows to use PIPS without installing it. Other goals
+were to provide different types of ways of using PIPS, which were
+depending on the user's level of familiarity with PIPS. Two lists of
+constraints and functional requirements can be found in
+Section~\ref{design_contraints} and \ref{design_requirements}.
+
+To achieve those goals, a WEB application was designed and
+developed. It presents PIPS in two modes, described in
+Section~\ref{paws_project}. The content of all pages of those modes is
+generated dynamically and is based on the structure of the directories
+and on the content of description files. Thanks to this design, the
+reconfiguration of PaWS is very easy and does not require knowledge of
+the Pylons framework.
+
+The implementation contains also a lot of user-friendly features (see
+requirements in Section~\ref{design_requirements} and components used
+\ref{components_used}), like creating, displaying and zooming graphs,
+resizing font size (according to user preferences), uploading user
+files (also archive .zip files), saving results of the operations on
+user's machine or printing them.
+
+The main goal for the future is to implement a third mode, full
+control, which will enable user to create graphically his/her own PIPS
+script. PaWS should also have more tests - currently there are no
+tests for its graphical interface. Another new utility would be a
+Pyps/Tpips code generation with all the properties, analyses and
+phases used for advanced mode. Also making it possible to save and
+print the dependence graphs might be useful.
+
+Other small, possible improvements are:
+\begin{itemize}
+  \item Adding the scale for a slider in the demonstation module.
+  \item Controlling the response time from the server.
+  \item Integrating the IR Navigator \cite{irnavigator}.
+\end{itemize}
+
+The current version of the PaWS framework meets all the design
+constraints and requirements imposed at the beginning. It can also be
+easily extended with the new functionality.

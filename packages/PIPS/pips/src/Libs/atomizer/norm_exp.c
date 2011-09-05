@@ -199,8 +199,8 @@ debug(3, "normal_expression_of_unstructured", "end UNSTRUCTURED\n");
 int get_nlc_number(nlc_ent)
 entity nlc_ent;
 {
-string nlc_name = entity_local_name(nlc_ent);
-string num = nlc_name+3;
+const char* nlc_name = entity_local_name(nlc_ent);
+const char* num = nlc_name+3;
 
 return(atoi(num));
 }

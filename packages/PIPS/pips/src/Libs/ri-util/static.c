@@ -117,7 +117,7 @@ error_reset_current_module_entity()
 */
 
 /** Get the name of the current module */
-string
+const char*
 get_current_module_name()
 {
   return module_local_name(current_module_entity);

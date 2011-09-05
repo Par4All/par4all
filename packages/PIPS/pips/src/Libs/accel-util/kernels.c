@@ -63,7 +63,7 @@
    @param[in] module_name is the name of the function to isolate
 */
 static void
-kernel_load_store_generator(statement s, string module_name)
+kernel_load_store_generator(statement s, const char* module_name)
 {
     if(statement_call_p(s))
     {
@@ -72,8 +72,8 @@ kernel_load_store_generator(statement s, string module_name)
 	   named "module_name". */
         if(same_string_p(module_local_name(call_function(c)),module_name))
         {
-	  string prefix =  get_string_property ("KERNEL_LOAD_STORE_VAR_PREFIX");
-	  string suffix =  get_string_property ("KERNEL_LOAD_STORE_VAR_SUFFIX");
+	  const char* prefix =  get_string_property ("KERNEL_LOAD_STORE_VAR_PREFIX");
+	  const char* suffix =  get_string_property ("KERNEL_LOAD_STORE_VAR_SUFFIX");
 	  pips_debug (5, "kernel_load_store used prefix : %s\n", prefix);
 	  pips_debug (5, "kernel_load_store used suffix : %s\n", suffix);
 	  do_isolate_statement(s, prefix, suffix);
@@ -90,7 +90,7 @@ kernel_load_store_generator(statement s, string module_name)
    which data need to be allocated and transfers. It can be DBR_REGIONS
    (more precise) or DBR_EFFECTS
  */
-static bool kernel_load_store_engine(const string module_name,
+static bool kernel_load_store_engine(const const char* module_name,
 				     const string enginerc) {
     /* generate a load stores on each caller */
 
@@ -105,7 +105,7 @@ static bool kernel_load_store_engine(const string module_name,
         module_to_value_mappings(get_current_module_entity());
         set_precondition_map( (statement_mapping) db_get_memory_resource(DBR_PRECONDITIONS, caller_name, true) );
         /*do the job */
-        gen_context_recurse(get_current_module_statement(),module_name,statement_domain,gen_true,kernel_load_store_generator);
+        gen_context_recurse(get_current_module_statement(),(char*)module_name,statement_domain,gen_true,kernel_load_store_generator);
         /* validate */
         module_reorder(get_current_module_statement());
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name,get_current_module_statement());
@@ -137,7 +137,7 @@ static bool kernel_load_store_engine(const string module_name,
 /** Generate malloc/copy-in/copy-out on the call sites of this module.
   * based on convex array regions
   */
-bool kernel_load_store(const string module_name) {
+bool kernel_load_store(const const char* module_name) {
     return kernel_load_store_engine(module_name, DBR_REGIONS);
 }
 
@@ -210,8 +210,8 @@ bool do_kernelize(statement s, entity loop_label)
       }
       }
 
-      string kernel_name=get_string_property_or_ask("KERNELIZE_KERNEL_NAME","name of the kernel ?");
-      string host_call_name=get_string_property_or_ask("KERNELIZE_HOST_CALL_NAME","name of the fucntion to call the kernel ?");
+      const char* kernel_name=get_string_property_or_ask("KERNELIZE_KERNEL_NAME","name of the kernel ?");
+      const char* host_call_name=get_string_property_or_ask("KERNELIZE_HOST_CALL_NAME","name of the fucntion to call the kernel ?");
 
       /* validate changes */
       callees kernels=(callees)db_get_memory_resource(DBR_KERNELS,"",true);
@@ -262,7 +262,7 @@ bool kernelize(char * module_name)
   set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
   /* retreive loop label */
-  string loop_label_name = get_string_property_or_ask("LOOP_LABEL","label of the loop to turn into a kernel ?\n");
+  const char* loop_label_name = get_string_property_or_ask("LOOP_LABEL","label of the loop to turn into a kernel ?\n");
   entity loop_label_entity = find_label_entity(module_name,loop_label_name);
   if( entity_undefined_p(loop_label_entity) )
     pips_user_error("label '%s' not found in module '%s' \n",loop_label_name,module_name);

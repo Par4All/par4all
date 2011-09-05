@@ -66,7 +66,7 @@ range obj;
 /*======================================================================*/
 text text_loop_cmf(module, label, margin, obj, n, lr, lidx)
      entity module;
-     string label;
+     const char* label;
      int margin;
      loop obj;
      int n;

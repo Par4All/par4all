@@ -1,0 +1,77 @@
+\section{PaWS - Towards Pips as a Web Service}
+
+For the time being, PaWS is a WEB interface. Some more work is needed
+to make it a WEB service.
+
+
+\subsection{What is PaWS?}
+
+The initial aim of the PaWS project is to create a customizable, light and
+user-friendly WEB graphical interface for the PIPS framework.
+
+``Web service'' in the PaWS acronym should not be taken literally. It
+is not the implementation of the Web Service
+standard~\cite{ws_standard}. PaWS framework idea refers to the
+conception of the service\footnote{Service is the independent software
+  element which shares complete, reusable functionality through a
+  well defined interface \cite{service_def}.} in general. The term
+``web'' in this case means that functionality shared by the PaWS
+service is available via the Internet.
+
+\subsubsection{PIPS and PyPS}
+\label{pips_and_pyps}
+
+{\bf PIPS}, a.k.a. \emph{Parallel Integrated Programming System} is a
+source-to-source compilation framework for analyzing and transforming
+C and Fortran programs~\cite{pips4u}. It can be used to verify, optimize and
+parallelize programs at source level. PIPS helps the users to
+understand compilation process and to optimize their programs
+(especially in reducing the execution time and latency). It can also
+provide assistance in debugging, maintaining and reingeneering code.
+
+{\bf PyPS} is the Python API for PIPS framework. PyPS can be used as a
+scripting language for creating high-level scripts to perform a
+sequence of PIPS operations. It also provides a kind of shell for
+interactive usage of PIPS, with on-line help and documentation. Another
+advantage of Pyps is that it does not require deep knowledge of
+Python, so it can be used even by not advanced users.
+
+PIPS framework has other line interfaces such as tpips (see
+\ref{tpips_interface}), a shell interface, Pips, and a Java interface,
+jpips.
+
+%% the programable pass manager for pips
+
+\subsubsection{Problems}
+
+PIPS is a very powerful but complex framework. Firstly, this makes the
+installation process complicated. It often requires also installation
+of other packagies, and their own dependencies. The second problem is
+the lack of user-friendly graphical interface which would allow to use
+PIPS in an intuitive way.
+
+\subsubsection{Solution - PaWS}
+
+PaWS (Pips as Web Service) is a WEB application, which was designed
+and implemented as a solution to the problems mentioned above. It
+enables people to experiment with PIPS without installing it on their
+machines. It presents not only elementary analyses or transformations
+that are available in PIPS, but also allows the user to experiment
+with more complex combination of PIPS passes. Besides that, the user is
+able to generate and view dependence graphs from source code.
+
+Depending on the user level, PaWS provides different ways of using
+PIPS - from an intuitive demonstration to the ability to change PIPS
+scripts code. Each user can decide which approach is most appropriate for
+him/her.
+
+PaWS provides ready examples which might help to understand how
+PIPS works, but it also lets user try analysis and transformations of
+his/her own code. There are also other user-friendly features
+available, like displaying graphs, printing result code or saving it
+on users machine.
+
+For the time being, the elementary analyses and transformations are
+preconditions, OpenMP and Array, IN and OUT regions, all with examples
+available. There are also three tpips tutorials: acca, aile-excerpt
+and convol.

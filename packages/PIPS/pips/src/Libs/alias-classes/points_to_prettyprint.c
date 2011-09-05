@@ -104,7 +104,7 @@ text text_points_to(entity module __attribute__ ((__unused__)),int margin __attr
   return t;
 }
 
-/* bool print_code_points_to(string module_name, */
+/* bool print_code_points_to(const char* module_name, */
 /* 			  string resource_name __attribute__ ((__unused__)), */
 /* 			  string file_suffix) */
 /* { */
@@ -140,7 +140,7 @@ text text_points_to(entity module __attribute__ ((__unused__)),int margin __attr
 /*   debug_off(); */
 /*   return true; */
 /* } */
-bool print_code_points_to(string module_name,
+bool print_code_points_to(const char* module_name,
 			  string resource_name __attribute__ ((__unused__)),
 			  string file_suffix)
 {
@@ -182,7 +182,7 @@ bool print_code_points_to(string module_name,
 
 
 //Handlers for PIPSMAKE
-bool print_code_points_to_list(string module_name)
+bool print_code_points_to_list(const char* module_name)
 {
 	return print_code_points_to(module_name,
 				    DBR_POINTS_TO_LIST,

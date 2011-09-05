@@ -103,7 +103,7 @@ compute_summary_reductions(entity f)
  * output: TRUE
  * side effects: stores the summary reductions to pipsdbm
  */
-bool summary_reductions(string module_name)
+bool summary_reductions(const char* module_name)
 {
     reductions red;
 
@@ -366,7 +366,7 @@ static void compute_proper_reductions(statement s)
  * - requires CODE PROPER_EFFECTS and callees' SUMMARY_{EFFECTS,REDUCTIONS}
  * - returns PROPER_REDUCTIONS to pips dbm
  */
-bool proper_reductions(string module_name)
+bool proper_reductions(const char* module_name)
 {
     entity module;
 
@@ -536,7 +536,7 @@ static void compute_cumulated_reductions(instruction i)
  * - requires CODE, PROPER_{EFFECTS,REDUCTIONS} and CUMULATED_EFFECTS
  * - returns CUMULATED_REDUCTIONS to pips dbm
  */
-bool cumulated_reductions(string module_name)
+bool cumulated_reductions(const char* module_name)
 {
     debug_on("REDUCTIONS_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", module_name);

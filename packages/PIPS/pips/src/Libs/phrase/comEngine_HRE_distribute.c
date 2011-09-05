@@ -74,8 +74,8 @@ static list glCurRep = NIL;
 
 // These are global variable to the names we want to
 // give to the created modules
-static string g_new_module_name = NULL;
-static string g_module_name = NULL;
+static const char* g_new_module_name = NULL;
+static const char* g_module_name = NULL;
 
 // This variable holds the number of
 // if we have entered at a given point of
@@ -951,7 +951,7 @@ static statement HRE_distribute_stat(statement stat, bool calledFromLoop)
 This function generates the HRE code using several
 processes on the HRE
  */
-statement HRE_distribute(statement stat, string new_module_name, string module_name)
+statement HRE_distribute(statement stat, string new_module_name, const char* module_name)
 {
   printf("stat bef HRE_distribute\n");
   print_statement(stat);

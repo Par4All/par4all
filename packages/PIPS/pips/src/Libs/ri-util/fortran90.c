@@ -350,7 +350,7 @@ static statement body_to_assignment_statement(statement b)
 }
 
 /* Generate range subscript for simple loop with only one assignment. */
-text text_loop_90(entity module, string label, int margin, loop obj, int n)
+text text_loop_90(entity module, const char* label, int margin, loop obj, int n)
 {
     /* text_loop_90() only is called if the loop is parallel and if its
      * body is a unique assignment statement or a list containing a

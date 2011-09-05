@@ -890,7 +890,7 @@ string s;
  for(; aux_l != NIL; aux_l = CDR(aux_l))
    {
     loop aux_loop = LOOP(CAR(aux_l));
-    string loop_name = entity_local_name(loop_label(aux_loop));
+    const char* loop_name = entity_local_name(loop_label(aux_loop));
     if(strcmp(loop_name, s) == 0)
        return(aux_loop);
    }

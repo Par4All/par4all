@@ -47,7 +47,7 @@ bool prepend_comment(char * module_name) {
 						  "PREPEND_COMMENT_DEBUG_LEVEL");
 
   // Get the value of the property containing the comment to be prepended
-  string comment = get_string_property("PREPEND_COMMENT");
+  const char* comment = get_string_property("PREPEND_COMMENT");
 
   insert_comments_to_statement(module_statement, comment);
 
@@ -83,7 +83,7 @@ bool prepend_call(string mn) {
   code co = make_code(NIL, strdup(""), make_sequence(NIL),NIL,
 		      make_language_c());
   value v = make_value_code(co);
-  string name = get_string_property("PREPEND_CALL");
+  const char* name = get_string_property("PREPEND_CALL");
   string ffn = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 				  MODULE_SEP_STRING,
 				  name,
@@ -109,7 +109,7 @@ static void do_add_pragma(statement s, statement p) {
 }
 
 bool add_pragma(string mn) {
-  string pragma_name = get_string_property("PRAGMA_NAME");
+  const char* pragma_name = get_string_property("PRAGMA_NAME");
   bool prepend = get_bool_property("PRAGMA_PREPEND");
   statement pragma_s = make_empty_statement();
   add_pragma_str_to_statement(pragma_s, pragma_name, true);

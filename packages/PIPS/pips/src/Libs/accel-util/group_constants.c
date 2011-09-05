@@ -165,7 +165,7 @@ typedef enum {
 
 static grouping_layout get_grouping_layout()
 {
-    string layout = get_string_property("GROUP_CONSTANTS_LAYOUT");
+    const char* layout = get_string_property("GROUP_CONSTANTS_LAYOUT");
     if(same_string_p(layout,"terapix")) return TERAPIX_GROUPING;
     return GROUPING_UNDEFINED;
 }

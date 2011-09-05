@@ -57,7 +57,7 @@
 #include "transformations.h"
 #include "control.h"
 
-/* bool scalar_expansion(char *module_name) 
+/* bool scalar_expansion(const char* module_name) 
  * input    : the name of the current module
  * output   : nothing.
  * modifies : replaces local scalar variables by arrays and updates the corresponding references
@@ -258,7 +258,7 @@ static void perform_expansion_and_unstack_index_and_dimension(loop l,scalar_expa
     }
 }
 
-static bool scalar_expansion(char *module_name)
+static bool scalar_expansion(const char* module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity(module_name) );
@@ -309,7 +309,7 @@ static bool scalar_expansion(char *module_name)
 /** 
  * alias for scalar expansion
  */
-bool variable_expansion(char *module_name)
+bool variable_expansion(const char* module_name)
 {
   return scalar_expansion(module_name);
 }
@@ -357,7 +357,7 @@ void do_expand_reference_in_declarations(statement s, entity oni[])
  * performs scalar_expansion on variables used for reductions
  * too
  */
-bool reduction_variable_expansion(char *module_name) {
+bool reduction_variable_expansion(const char* module_name) {
     bool success = false;
     /* prelude */
     set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name,true));
@@ -365,7 +365,7 @@ bool reduction_variable_expansion(char *module_name) {
     set_cumulated_reductions((pstatement_reductions) db_get_memory_resource(DBR_CUMULATED_REDUCTIONS, module_name, true));
 
     /* do the job */
-    string slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
+    const char* slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
     entity elabel = find_label_entity(module_name,slabel);
 
     if(entity_undefined_p(elabel)) {

@@ -44,7 +44,7 @@
 
 #include "transformations.h"
 
-bool loop_interchange(string module_name)
+bool loop_interchange(const char* module_name)
 {
   bool return_status = false;
 
