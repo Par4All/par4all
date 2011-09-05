@@ -167,67 +167,67 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_log2_0, NO_MES },
     TRPX_OP(3, "LOG2"), OPCL("LOG2")
   },
-  { AIPO "add_const", "+.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "add_const", "+_", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_add_0cst, NO_MES },
     TRPX_OP(3, "ADD_CONST"), OPCL("ADD")
   },
-  { AIPO "inf_const", "<.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "inf_const", "<_", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_inf_0cst, NO_MES },
     TRPX_OP(3, "INF_CONST"), OPCL("INF")
   },
-  { AIPO "sup_const", ">.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "sup_const", ">_", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES },
     TRPX_OP(3, "SUP_CONST"), OPCL("SUP")
   },
-  { AIPO "sub_const", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "sub_const", "-_", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES },
     TRPX_OP(3, "SUB_CONST"), OPCL("SUB")
   },
-  { AIPO "const_sub", ".-", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "const_sub", "_-", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_cst0, NO_MES },
     TRPX_OP(3, "CONST_SUB"), OPCL("SUBC")
   },
-  { AIPO "and_const", "&.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "and_const", "&_", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_and_0cst, NO_MES },
     TRPX_OP(3, "AND_CONST"), OPCL("AND")
   },
-  { AIPO "or_const", "|.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "or_const", "|_", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_or_0cst, NO_MES },
     TRPX_OP(3, "OR_CONST"), OPCL("OR")
   },
-  { AIPO "xor_const", "^.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "xor_const", "^_", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_xor_0cst, NO_MES },
     TRPX_OP(3, "XOR_CONST"), OPCL("XOR")
   },
-  { AIPO "addsat_const", "+s.", NULL, 1, 1, 0, 1, NO_PARAM,
+  { AIPO "addsat_const", "+s_", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_addsat_0cst, NO_MES },
     TRPX_OP(3, "ADDSAT_CONST"), OPCL("ADDSAT")
   },
-  { AIPO "subsat_const", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
+  { AIPO "subsat_const", "-s_", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES },
     TRPX_OP(3, "SUBSAT_CONST"), OPCL("SUBSAT")
   },
-  { AIPO "const_subsat", ".-s", NULL, 1, 1, 0, 1, NO_PARAM,
+  { AIPO "const_subsat", "_-s", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_cst0, NO_MES },
     TRPX_OP(3, "CONST_SUBSAT"), OPCL("SUBSATC")
   },
-  { AIPO "absdiff_const", "-|.", NULL, 1, 1, 0, 1, NO_PARAM,
+  { AIPO "absdiff_const", "-|_", NULL, 1, 1, 0, 1, NO_PARAM,
     { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_abssub_0cst, NO_MES },
     TRPX_OP(3, "ABSDIFF_CONST"), OPCL("ABSDIFF")
   },
-  { AIPO "mul_const", "*.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "mul_const", "*_", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_mul_0cst, NO_MES },
     TRPX_OP(3, "MUL_CONST"), OPCL("MUL")
   },
-  { AIPO "div_const", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "div_const", "/_", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES },
     TRPX_OP(3, "DIV_CONST"), OPCL("DIV")
   },
-  { AIPO "const_div", "./", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "const_div", "_/", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_cst0, NO_MES },
     TRPX_OP(3, "CONST_DIV"), OPCL("DIVC")
   },
