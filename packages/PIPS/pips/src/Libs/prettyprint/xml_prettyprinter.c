@@ -97,12 +97,12 @@ static gen_array_t intern_upperbounds_array;
 /* array containing the tasks names*/
 static gen_array_t tasks_names;
 
-static string global_module_name;
+static const char* global_module_name;
 #define BL             " "
 #define TB1            "\t"
 
 static hash_table hash_entity_def_to_task = hash_table_undefined;
-static string global_module_name;
+static const char* global_module_name;
 static int global_margin =0;
 
 bool fortran_appli = true;
@@ -131,8 +131,7 @@ static bool variable_p(entity e)
 #define RESULT_NAME	"result"
 static string xml_entity_local_name(entity var)
 {
-  string name;
-  char * car;
+  const char* name;
 
   if (current_module_is_a_function() &&
       var != get_current_module_entity() &&
@@ -158,10 +157,8 @@ static string xml_entity_local_name(entity var)
     }
 
   /* switch to upper cases... */
-  for (car = name; *car; car++)
-    *car = (char) toupper(*car);
-
-  return name;
+  char *rname=strupper(strdup(name),name);
+  return rname;
 }
 
 
@@ -390,7 +387,9 @@ static string xml_call_from_assignation(call c, int task_number, bool * input_pr
       }
       case is_syntax_reference:{
 	reference ref = syntax_reference(syn);
-	string varname = strdup(concatenate("A_", xml_entity_local_name(reference_variable(ref)), NULL));
+    string svar = xml_entity_local_name(reference_variable(ref));
+	string varname = strdup(concatenate("A_", svar, NULL));
+    free(svar);
 	if(gen_array_index(array_names, varname) != ITEM_NOT_IN_ARRAY){
 	  result = strdup(concatenate(result, xml_array_in_task(ref, false, task_number), NULL));
 	  *input_provided = true;
@@ -1091,7 +1090,7 @@ static string xml_code_string(entity module, statement stat)
 
 /* Initiates xml pretty print modules
  */
-bool print_xml_code_with_explicit_motif(string module_name)
+bool print_xml_code_with_explicit_motif(const char* module_name)
 {
   FILE * out;
   string ppt, xml, dir, filename;
@@ -1314,7 +1313,7 @@ static expression expression_plusplus(expression e)
     new_e = int_to_expression(1+ expression_to_int(e));
   }
   else {
-    entity add_ent = gen_find_entity("TOP-LEVEL:+");
+    entity add_ent = entity_intrinsic(PLUS_OPERATOR_NAME);
     new_e =  make_call_expression(add_ent,
 				  CONS(EXPRESSION, e, CONS(EXPRESSION,  int_to_expression(1), NIL)));
   }
@@ -1714,7 +1713,7 @@ static void xml_task( int taskNumber, nest_context_p nest, string_buffer result)
 
 static void  xml_tasks(statement stat, string_buffer result){
 
-  string  module_name = get_current_module_name();
+  const char*  module_name = get_current_module_name();
   nest_context_t nest;
   int taskNumber =0;
   nest.loops_for_call = stack_make(statement_domain,0,0);
@@ -1799,7 +1798,7 @@ static bool valid_specification_p(entity module __attribute__ ((unused)),
 /* Initiates xml pretty print modules
  */
 
-bool print_xml_code(string module_name)
+bool print_xml_code(const char* module_name)
 {
   FILE * out;
   string ppt;
@@ -2005,7 +2004,7 @@ static void xml_CodeSize(string_buffer sb_result)
   string_buffer_append_word("/CodeSize",sb_result);
 }
 
-void insert_xml_callees(string module_name) {
+void insert_xml_callees(const char* module_name) {
   FILE * out;
   string dir = db_get_current_workspace_directory();
   string sm = db_build_file_resource_name(DBR_XML_PRINTED_FILE,
@@ -2026,7 +2025,7 @@ void insert_xml_callees(string module_name) {
   free(xml_module_name);
 }
 
-void insert_xml_string(string module_name, string s) {
+void insert_xml_string(const char* module_name, string s) {
   FILE * out;
   string dir = db_get_current_workspace_directory();
   string sm = db_build_file_resource_name(DBR_XML_PRINTED_FILE,
@@ -2043,7 +2042,7 @@ void insert_xml_string(string module_name, string s) {
 // dans un fichier de parametres ...
 static bool entity_xml_parameter_p(entity e)
 {
-  string s = entity_local_name(e);
+  const char* s = entity_local_name(e);
   bool b=false;
   if (strstr(s,"PARAM")!=NULL || strstr(s,"param")!=NULL) b = true;
   return (b);
@@ -3085,7 +3084,7 @@ static void xml_Loops(stack st,bool call_external_loop_p, list *pattern_region, 
     string_buffer_append_word("/Loops",sb_result);
 }
 
-static Psysteme first_precondition_of_module(string module_name __attribute__ ((unused)))
+static Psysteme first_precondition_of_module(const char* module_name __attribute__ ((unused)))
 {
   statement st1 = get_current_module_statement();
   statement fst = statement_undefined;
@@ -3106,7 +3105,7 @@ static Psysteme first_precondition_of_module(string module_name __attribute__ ((
   prec = sc_dup((Psysteme) predicate_system(transformer_relation(t)));
   return prec;
 }
-static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
+static void  xml_Task(const char* module_name, int code_tag,string_buffer sb_result)
 {
   nest_context_t task_loopnest;
   task_loopnest.loops_for_call = stack_make(statement_domain,0,0);
@@ -3304,85 +3303,85 @@ static void xml_ConstOffset(int ActualArrayDim, string_buffer sb_result)
   int valr  ;
   string_buffer_append_word("Arguments",sb_result);
   global_margin++;
-  MAP(EXPRESSION,exp,{
+  FOREACH(EXPRESSION,exp,call_arguments(c)){
       ith ++;
       FormalArrayName = find_ith_formal_parameter(call_function(c),ith);
       sr = expression_syntax(exp);
 
       if(syntax_call_p(sr)) {
-	call cl = syntax_call(sr);
-	string fun = entity_local_name(call_function(cl));
-	if (strcmp(fun,ADDRESS_OF_OPERATOR_NAME) == 0) {
-	  expression exp2 = EXPRESSION(CAR(call_arguments(cl)));
-	  sr = expression_syntax(exp2);
-	}
+          call cl = syntax_call(sr);
+          const char* fun = entity_local_name(call_function(cl));
+          if (strcmp(fun,ADDRESS_OF_OPERATOR_NAME) == 0) {
+              expression exp2 = EXPRESSION(CAR(call_arguments(cl)));
+              sr = expression_syntax(exp2);
+          }
       }
       if (syntax_reference_p(sr)) {
-	ActualRef = syntax_reference(sr);
-	ActualArrayName = reference_variable(ActualRef);
-	aan = strdup(entity_user_name(ActualArrayName));
-	rw_ef = find_effect_actions_for_entity(call_effect,&efr,&efw, ActualArrayName);
+          ActualRef = syntax_reference(sr);
+          ActualArrayName = reference_variable(ActualRef);
+          aan = strdup(entity_user_name(ActualArrayName));
+          rw_ef = find_effect_actions_for_entity(call_effect,&efr,&efw, ActualArrayName);
       }
       else {
-	// Actual Parameter could be  an expression
-	aan = words_to_string(words_syntax(sr,NIL));
-	rw_ef = 1;
+          // Actual Parameter could be  an expression
+          aan = words_to_string(words_syntax(sr,NIL));
+          rw_ef = 1;
       }
       string_buffer_append_word("Argument",sb_result);
       if (!array_argument_p(exp)) { /* Scalar Argument */
-	global_margin++;
-	add_margin(global_margin,sb_result);
-	string_buffer_append(sb_result,
-			     concatenate(OPENANGLE,
-					 "ScalarArgument ActualName=",
-					 QUOTE,
-					 aan,
-					 QUOTE,BL,
-					 "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
-					 "AccessMode=",QUOTE,(rw_ef>=2)? "DEF": "USE", QUOTE,CLOSEANGLE,
-					 NL, NULL));
+          global_margin++;
+          add_margin(global_margin,sb_result);
+          string_buffer_append(sb_result,
+                  concatenate(OPENANGLE,
+                      "ScalarArgument ActualName=",
+                      QUOTE,
+                      aan,
+                      QUOTE,BL,
+                      "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
+                      "AccessMode=",QUOTE,(rw_ef>=2)? "DEF": "USE", QUOTE,CLOSEANGLE,
+                      NL, NULL));
 
-	if (expression_integer_value(exp, &iexp))
-	  string_buffer_append_numeric(i2a(iexp),sb_result);
-	else if (value_constant_p(EvalExpression(exp))) {
-	  string exps = words_to_string(words_expression(exp,NIL));
-	  string_buffer_append_numeric(exps,sb_result);
-	}
-	else if (eval_linear_expression(exp,prec,&valr))
-	  string_buffer_append_numeric(i2a(valr),sb_result);
-	string_buffer_append_word("/ScalarArgument",sb_result);
-	global_margin--;
+          if (expression_integer_value(exp, &iexp))
+              string_buffer_append_numeric(i2a(iexp),sb_result);
+          else if (value_constant_p(EvalExpression(exp))) {
+              string exps = words_to_string(words_expression(exp,NIL));
+              string_buffer_append_numeric(exps,sb_result);
+          }
+          else if (eval_linear_expression(exp,prec,&valr))
+              string_buffer_append_numeric(i2a(valr),sb_result);
+          string_buffer_append_word("/ScalarArgument",sb_result);
+          global_margin--;
       }
       else { /* Array Argument */
-	int ActualArrayDim = variable_entity_dimension(ActualArrayName);
-	char *  SActualArrayDim = strdup(itoa(ActualArrayDim));
-	int FormalArrayDim = variable_entity_dimension(FormalArrayName);
-	list ActualArrayInd = reference_indices(ActualRef);
-	global_margin++;
-	add_margin(global_margin,sb_result);
-	string_buffer_append(sb_result,
-			     concatenate(OPENANGLE,
-					 "ArrayArgument ActualName=",
-					 QUOTE,
-					 entity_user_name(ActualArrayName),QUOTE,BL,
-					 "ActualDim=", QUOTE,SActualArrayDim,QUOTE,BL,
-					 "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
-					 "FormalDim=", QUOTE,itoa(FormalArrayDim),QUOTE,BL,
-					 "AccessMode=",QUOTE,(rw_ef>=2)? "DEF":"USE",QUOTE,CLOSEANGLE,
-					 NL, NULL));
-	/* Save information to generate Task Graph */
-	if (rw_ef>=2)
-	  hash_put(hash_entity_def_to_task, (char *)ActualArrayName,(char *)function);
-	free(SActualArrayDim);
+          int ActualArrayDim = variable_entity_dimension(ActualArrayName);
+          char *  SActualArrayDim = strdup(itoa(ActualArrayDim));
+          int FormalArrayDim = variable_entity_dimension(FormalArrayName);
+          list ActualArrayInd = reference_indices(ActualRef);
+          global_margin++;
+          add_margin(global_margin,sb_result);
+          string_buffer_append(sb_result,
+                  concatenate(OPENANGLE,
+                      "ArrayArgument ActualName=",
+                      QUOTE,
+                      entity_user_name(ActualArrayName),QUOTE,BL,
+                      "ActualDim=", QUOTE,SActualArrayDim,QUOTE,BL,
+                      "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
+                      "FormalDim=", QUOTE,itoa(FormalArrayDim),QUOTE,BL,
+                      "AccessMode=",QUOTE,(rw_ef>=2)? "DEF":"USE",QUOTE,CLOSEANGLE,
+                      NL, NULL));
+          /* Save information to generate Task Graph */
+          if (rw_ef>=2)
+              hash_put(hash_entity_def_to_task, (char *)ActualArrayName,(char *)function);
+          free(SActualArrayDim);
 
-	xml_Connection(ActualArrayInd,ActualArrayDim,FormalArrayDim,sb_result);
-	xml_LoopOffset(ActualArrayInd,ActualArrayDim, loop_indices,sb_result);
-	xml_ConstOffset(ActualArrayDim,sb_result);
-	global_margin--;
-	string_buffer_append_word("/ArrayArgument",sb_result);
+          xml_Connection(ActualArrayInd,ActualArrayDim,FormalArrayDim,sb_result);
+          xml_LoopOffset(ActualArrayInd,ActualArrayDim, loop_indices,sb_result);
+          xml_ConstOffset(ActualArrayDim,sb_result);
+          global_margin--;
+          string_buffer_append_word("/ArrayArgument",sb_result);
       }
       string_buffer_append_word("/Argument",sb_result);
-    },call_arguments(c)) ;
+  }
   global_margin--;
   string_buffer_append_word("/Arguments",sb_result);
 }
@@ -3534,7 +3533,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
   string_buffer_append_word("/BoxGraph",sb_result);
 }
 
-static void xml_Boxes(string module_name, int code_tag,string_buffer sb_result)
+static void xml_Boxes(const char* module_name, int code_tag,string_buffer sb_result)
 {
   entity module = module_name_to_entity(module_name);
   nest_context_t nest;
@@ -3593,7 +3592,7 @@ static void xml_Boxes(string module_name, int code_tag,string_buffer sb_result)
 }
 
 
-static void xml_Application(string module_name, int code_tag,string_buffer sb_result)
+static void xml_Application(const char* module_name, int code_tag,string_buffer sb_result)
 {
   entity module = module_name_to_entity(module_name);
   string_buffer sb_ac = string_buffer_make(true);
@@ -3669,7 +3668,7 @@ static void xml_Application(string module_name, int code_tag,string_buffer sb_re
   return (entity_module_p(e) && same_string_p(entity_local_name(e), USER_MAIN));
 }
 
-int find_code_status(string module_name)
+int find_code_status(const char* module_name)
 {
   statement stat=(statement) db_get_memory_resource(DBR_CODE,
 						    module_name, true);
@@ -3691,7 +3690,7 @@ int find_code_status(string module_name)
   }
 }
 
-bool print_xml_application(string module_name)
+bool print_xml_application(const char* module_name)
 {
   FILE * out;
   entity module;

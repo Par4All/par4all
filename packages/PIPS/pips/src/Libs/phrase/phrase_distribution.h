@@ -74,7 +74,7 @@
  * Return the identified function name of the externalized portion of code
  * by searching comment matching tag 
  */
-string get_function_name_by_searching_tag (statement stat,string tag);
+string get_function_name_by_searching_tag (statement stat,const char* tag);
 
 /**
  * Return the identified function name of the externalized portion of code
@@ -194,24 +194,24 @@ list make_receive_array_params_modules (entity function,
  * Creates a private variable in specified module
  */
 entity create_private_variable_for_new_module (entity a_variable,
-					       string new_name, 
-					       string new_module_name,
+					       const char* new_name, 
+					       const char* new_module_name,
 					       entity module);
 
 /**
  * Create new variable parameter for a newly created module
  */
 entity create_parameter_for_new_module (variable var,
-					string parameter_name, 
-					string module_name,
+					const char* parameter_name, 
+					const char* module_name,
 					entity module,
 					int param_nb);
 
 /**
  * Create new integer variable parameter for a newly created module
  */
-entity create_integer_parameter_for_new_module (string parameter_name, 
-						string module_name,
+entity create_integer_parameter_for_new_module (const char* parameter_name, 
+						const char* module_name,
 						entity module,
 						int param_nb);
 
@@ -219,7 +219,7 @@ entity create_integer_parameter_for_new_module (string parameter_name,
  * Store (PIPDBM) newly created module module with module_statement 
  * as USER_FILE by saving pretty printing
  */
-void store_new_module (string module_name,
+void store_new_module (const char* module_name,
 		       entity module,
 		       statement module_statement); 
 

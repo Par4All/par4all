@@ -908,7 +908,7 @@ loop_nest_to_wp65_code(
 					 make_integer_constant_expression(pn-1),
 					 make_integer_constant_expression(1));
 	    entity looplabel = make_loop_label(9000, 
-					       entity_local_name(compute_module));
+					       compute_module);
 	    loop newloop = make_loop(proc_id, 
 				     looprange,
 				     ems,

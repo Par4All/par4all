@@ -28,8 +28,8 @@
 typedef struct {
 
   /* PIPSDEBM INTERFACES */
-  statement_cell_relations (*db_get_pv_func)(char *);
-  void (*db_put_pv_func)(char * , statement_cell_relations);
+  statement_cell_relations (*db_get_pv_func)(const char *);
+  void (*db_put_pv_func)(const char * , statement_cell_relations);
 
 /*   statement_cell_relations (*db_get_gen_pv_func)(char *); */
 /*   void (*db_put_gen_pv_func)(char * , statement_cell_relations); */

@@ -523,7 +523,7 @@ list words_basic(basic obj, list pdl)
       case is_basic_derived: {
         entity ent = basic_derived(obj);
         const char* name = entity_user_name( ent );
-        string lname = entity_local_name( ent );
+        const char* lname = entity_local_name( ent );
         type t = entity_type(ent);
 
         if ( strstr( lname, STRUCT_PREFIX DUMMY_STRUCT_PREFIX ) == NULL
@@ -677,7 +677,7 @@ empty_static_area_p(entity e)
  */
 static sentence sentence_area(entity e, entity module, bool pp_dimensions, list pdl)
 {
-    string area_name = module_local_name(e);
+    const char* area_name = module_local_name(e);
     type te = entity_type(e);
     list pc = NIL, entities = NIL;
     bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
@@ -846,7 +846,7 @@ static sentence sentence_data(entity e)
  * the full local declarations are generated. That's fun.
  */
 
-static text include(string file)
+static text include(const char* file)
 {
   return make_text
     (CONS(SENTENCE,
@@ -859,7 +859,8 @@ static text text_area_included(
     entity common /* the common the declaration of which are of interest */,
     entity module /* hte module dealt with */)
 {
-  string dir, file, local, name;
+  string dir, file, local;
+  const char* name;
   text t;
 
   dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
@@ -1586,7 +1587,7 @@ static text text_entity_declaration(entity module,
   static bool allocatable_pass_p = false;
   list allocatable_list = NULL;
 
-  string how_common = get_string_property("PRETTYPRINT_COMMONS");
+  const char* how_common = get_string_property("PRETTYPRINT_COMMONS");
   bool print_commons = !same_string_p(how_common, "none");
   /* prettyprint common in include if possible... */
   bool pp_cinc = same_string_p(how_common, "include") && !force_common;
@@ -1596,7 +1597,7 @@ static text text_entity_declaration(entity module,
   list * ppi = NULL;
   list * pph = NULL;
   text r, t_chars = make_text(NIL), t_area = make_text(NIL);
-  string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
+  const char* pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
   bool pp_in_type = false, pp_in_common = false;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
   /* Declarations cannot be sorted out because Fortran standard impose
@@ -3416,7 +3417,7 @@ void split_initializations_in_statement(statement s)
     instruction old = statement_instruction(s);
 
     FOREACH(ENTITY, var, decls) {
-      string mn  = module_name(entity_name(var));
+      string mn  = entity_module_name(var));
       string cmn = entity_user_name(get_current_module_entity());
       if ( strcmp(mn,cmn) == 0
 	   && !value_unknown_p(entity_initial(var))
@@ -3451,8 +3452,8 @@ void split_initializations_in_statement(statement s)
 	//statement sc = statement_undefined; // statement copy
 
 	FOREACH(ENTITY, var, decls) {
-	  string mn  = module_name(entity_name(var));
-	  string cmn =get_current_module_name();
+	  const char* mn  = entity_module_name(var);
+	  const char* cmn =get_current_module_name();
 	  if ( same_string_p(mn,cmn)
 	       && !value_unknown_p(entity_initial(var))
 	       ) {
@@ -3517,8 +3518,8 @@ void split_initializations_in_statement(statement s)
 	//statement sc = statement_undefined; // statement copy
 
 	FOREACH(ENTITY, var, decls) {
-	  string mn  = module_name(entity_name(var));
-          const char* cmn = get_current_module_name();
+        const char* mn  = entity_module_name(var);
+        const char* cmn = get_current_module_name();
 	  if ( strcmp(mn,cmn) == 0
 	       && !value_unknown_p(entity_initial(var))
 	       ) {

@@ -47,7 +47,7 @@
 
 /* @return a file descriptor.
  */
-FILE * check_fopen(char * file, char * mode)
+FILE * check_fopen(const char * file, const char * mode)
 {
   FILE * fd = fopen(file, mode);
   if (fd==(FILE*)NULL)
@@ -68,7 +68,7 @@ FILE * safe_fopen(const char *filename, const char *what)
   return f;
 }
 
-int safe_fclose(FILE * stream, char *filename)
+int safe_fclose(FILE * stream, const char *filename)
 {
   if(fclose(stream) == EOF) {
     if(errno==ENOSPC)
@@ -794,16 +794,16 @@ char * safe_new_tmp_file(char * prefix)
 #define DEFAULT_CONFIG_DIR "etc"
 #define CONFIG_DEFAULT_RIGHT "r"
 FILE *
-fopen_config(const string canonical_name,
-	     const string cproperty,
-	     const string cenv)
+fopen_config(const char* canonical_name,
+	     const char* cproperty,
+	     const char* cenv)
 {
   FILE * fconf;
 
   // try various combinaison :
   // pips property
   if (cproperty) {
-    string sproperty = get_string_property(cproperty);
+    const char* sproperty = get_string_property(cproperty);
     if (sproperty && (fconf = fopen(sproperty, CONFIG_DEFAULT_RIGHT)))
       return fconf;
   }

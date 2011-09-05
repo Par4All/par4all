@@ -96,7 +96,7 @@ static gen_array_t intern_upperbounds_array;
 /* array containing the tasks names*/
 static gen_array_t tasks_names;
 
-static string global_module_name;
+static const char* global_module_name;
 
 /**************************************************************** MISC UTILS */
 
@@ -114,8 +114,7 @@ static bool variable_p(entity e)
 #define RESULT_NAME	"result"
 static string claire_entity_local_name(entity var)
 {
-  string name;
-  char * car;
+  const char* name;
 
   if (current_module_is_a_function() &&
       var != get_current_module_entity() &&
@@ -141,10 +140,9 @@ static string claire_entity_local_name(entity var)
     }
 
   /* switch to upper cases... */
-  for (car = name; *car; car++)
-    *car = (char) toupper(*car);
+  char * rname = strupper(strdup(name),name);
   
-  return name;
+  return rname;
 }
 
 
@@ -1089,7 +1087,7 @@ static string claire_code_string(entity module, statement stat)
 
 /* Initiates claire pretty print modules
  */
-bool print_claire_code_with_explicit_motif(string module_name)
+bool print_claire_code_with_explicit_motif(const char* module_name)
 {
   FILE * out;
   string ppt, claire, dir, filename;
@@ -1318,7 +1316,7 @@ static expression expression_plusplus(expression e)
     new_e = int_to_expression(1+ expression_to_int(e));
   } 
   else {
-    entity add_ent = gen_find_entity("TOP-LEVEL:+");
+    entity add_ent = entity_intrinsic(PLUS_OPERATOR_NAME);
     new_e =  make_call_expression(add_ent, 
             CONS(EXPRESSION, e, CONS(EXPRESSION,  int_to_expression(1), NIL)));
   }
@@ -1808,7 +1806,7 @@ static void claire_task( int taskNumber, nest_context_p nest, string_buffer resu
 
 static void  claire_tasks(statement stat, string_buffer result){
 
-  string  module_name = get_current_module_name();
+  const char*  module_name = get_current_module_name();
   nest_context_t nest;
   int taskNumber =0;
   nest.loops_for_call = stack_make(statement_domain,0,0);
@@ -1883,7 +1881,7 @@ static bool valid_specification_p(entity module, statement stat)
 
 /* Initiates claire pretty print modules
  */
-bool print_claire_code(string module_name)
+bool print_claire_code(const char* module_name)
 {
   FILE * out;
   string ppt;

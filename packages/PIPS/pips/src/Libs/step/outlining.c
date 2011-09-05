@@ -51,9 +51,8 @@ void outlining_save()
 //####################### OUTLINE STEP 1 #######################
 
 /* block isn't duplicated in the outline_data genereted by outlining_close */
-entity outlining_start(string new_module_name)
+entity outlining_start(const char* new_module_name)
 {
-  int i=0;
   debug_on("STEP_TUTORIAL_LEVEL");
   pips_debug(1, "new_module_name = %s\n", new_module_name);
 
@@ -64,10 +63,9 @@ entity outlining_start(string new_module_name)
   pips_assert("outline_outlining", outline_data_undefined_p(outline_outlining));
 
   // ensure "NEW_MODULE_NAME" from "nEW_MOdULe_name"
-  for( i = 0; new_module_name[ i ]; i++)
-    new_module_name[ i ] = toupper( new_module_name[ i ] );
+  char * mname=strupper(strdup(new_module_name),new_module_name);
 
-  outlined_module = make_empty_subroutine(new_module_name,copy_language(module_language(get_current_module_entity())));
+  outlined_module = make_empty_subroutine(mname,copy_language(module_language(get_current_module_entity())));
 
   if (entity_undefined_p(outlined_module)) return false;
 
@@ -351,7 +349,7 @@ statement outlining_close(string new_user_file)
     ensure a label to designate the statement for reverse inlining transformation
   */
   if (entity_empty_label_p(label)) 
-    label = make_new_label(entity_user_name(get_current_module_entity()));
+    label = make_new_label(get_current_module_entity());
 
   call = make_statement(label,STATEMENT_NUMBER_UNDEFINED,STATEMENT_ORDERING_UNDEFINED,
 			strdup(concatenate("* Outlined code -> ",entity_user_name(outlined_module),"\n",NULL)),
@@ -410,7 +408,7 @@ statement outlining_close(string new_user_file)
 
 //####################### OUTLINE  #######################
 
-static bool outline_statement(statement stmt,string name,int from, int to)
+static bool outline_statement(statement stmt,const char* name,int from, int to)
 {
   pips_debug(1,"stmt = %p, name = %s\n", stmt, name);
 
@@ -433,7 +431,7 @@ static bool outline_statement(statement stmt,string name,int from, int to)
   return false;
 }
 
-static bool outline_block(statement stmt, string name, int from, int to)
+static bool outline_block(statement stmt, const char* name, int from, int to)
 {
   list treated = NIL;
   list block_list=NIL;
@@ -479,7 +477,7 @@ static bool outline_block(statement stmt, string name, int from, int to)
 
 static bool outline_block_filter(statement stmt)
 {
-  string name;
+  const char* name;
 
   pips_debug(1,"stmt = %p\n", stmt);
 
@@ -501,7 +499,7 @@ static bool outline_block_filter(statement stmt)
 
 
 /* Phase non utilisee pour l'instant */
-bool step_outlining(string module_name)
+bool step_outlining(const char* module_name)
 {
   statement body;
 
@@ -642,7 +640,7 @@ static bool inline_call_filter(statement stmt)
 }
 
 /* Phase non utilisee pour l'instant */
-bool step_inlining(string module_name)
+bool step_inlining(const char* module_name)
 {
   int label_id;
   statement body;

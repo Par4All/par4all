@@ -58,29 +58,29 @@ typedef void (*generic_attachment_function)(text);
 /* for db_* functions 
  */
 #define DB_GET_SE(name, NAME)				\
-static statement_effects db_get_##name(char * modname)	\
+static statement_effects db_get_##name(const char *module_name)	\
 { return (statement_effects)				\
-  db_get_memory_resource(DBR_##NAME, modname, true);}
+  db_get_memory_resource(DBR_##NAME, module_name, true);}
 
 #define DB_GET_LS(name, NAME)				\
-static list db_get_##name(char * modname)		\
+static list db_get_##name(const char *module_name)		\
 { return effects_to_list((effects)			\
-  db_get_memory_resource(DBR_##NAME, modname, true));}
+  db_get_memory_resource(DBR_##NAME, module_name, true));}
 
 #define DB_PUT_SE(name, NAME)						\
-static void db_put_##name(char * modname, statement_effects se)		\
-{ DB_PUT_MEMORY_RESOURCE(DBR_##NAME, modname, (char*) se);}
+static void db_put_##name(const char *module_name, statement_effects se)		\
+{ DB_PUT_MEMORY_RESOURCE(DBR_##NAME, module_name, (char*) se);}
 
 #define DB_PUT_LS(name, NAME)				\
-static void db_put_##name(char * modname, list l)	\
-{DB_PUT_MEMORY_RESOURCE(DBR_##NAME,modname,(char*)list_to_effects(l));}
+static void db_put_##name(const char *module_name, list l)	\
+{DB_PUT_MEMORY_RESOURCE(DBR_##NAME,module_name,(char*)list_to_effects(l));}
 
 #define DB_NOPUT_SE(name)\
-static void db_put_##name(char *m, statement_effects se) \
+static void db_put_##name(const char *m, statement_effects se) \
 { free_statement_effects(se); return; }
 
 #define DB_NOPUT_LS(name)\
-static void db_put_##name(char *m, list l) \
+static void db_put_##name(const char *m, list l) \
 { gen_full_free_list(l); return;}
 
 #define DB_GETPUT_SE(name, NAME) DB_GET_SE(name, NAME) DB_PUT_SE(name, NAME)

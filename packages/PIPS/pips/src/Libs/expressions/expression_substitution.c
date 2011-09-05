@@ -48,7 +48,7 @@
 #include "expressions.h"
 
 static expression pattern = expression_undefined;
-static string pattern_module_name = string_undefined;
+static const char* pattern_module_name = string_undefined;
 
 /* retrieves the expression used as a pattern based on
  * the one - statement function given in a property
@@ -104,7 +104,7 @@ bool replace_expression_similar_to_pattern(expression e)
     // match e against pattern and stocks symbols in hash_table
     if(expression_similar_get_context_p(e,pattern,&symbols)) 
     {
-        entity pattern_entity = global_name_to_entity(TOP_LEVEL_MODULE_NAME,pattern_module_name);
+        entity pattern_entity = FindEntity(TOP_LEVEL_MODULE_NAME,pattern_module_name);
         expression_normalized(e) = normalized_undefined;
 
         /* recover pattern's arguments */
@@ -154,7 +154,7 @@ bool replace_instruction_similar_to_pattern(instruction i)
 
 /* simple pass that performs substitution of expression by module call
  */
-bool expression_substitution(string module_name)
+bool expression_substitution(const char* module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));

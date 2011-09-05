@@ -1732,7 +1732,7 @@ static list
 generic_proper_effects_of_external(entity func, list args)
 {
     list le = NIL;
-    char *func_name = module_local_name(func);
+    const char *func_name = module_local_name(func);
 
     pips_debug(4, "translating effects for %s\n", func_name);
 
@@ -1805,7 +1805,7 @@ generic_r_proper_effects_of_call(call c)
   list le = NIL;
   entity e = call_function(c);
   tag t = value_tag(entity_initial(e));
-  string n = module_local_name(e);
+  const char* n = module_local_name(e);
   list pc = call_arguments(c);
   type uet = ultimate_type(entity_type(e));
 
@@ -2448,7 +2448,7 @@ void proper_effects_of_module_statement(statement module_stat)
     free_current_downward_cumulated_range_effects_stack();
 }
 
-bool proper_effects_engine(char *module_name)
+bool proper_effects_engine(const char *module_name)
 {
     /* Get the code of the module. */
     set_current_module_statement( (statement)
@@ -2499,7 +2499,7 @@ bool proper_effects_engine(char *module_name)
  */
 void
 expression_proper_effects_engine(
-    string module_name,
+    const char* module_name,
     statement current)
 {
     (*effects_computation_init_func)(module_name);

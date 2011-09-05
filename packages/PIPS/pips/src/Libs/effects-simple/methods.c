@@ -564,7 +564,7 @@ set_methods_for_simple_pointer_effects()
 }
 
 
-void set_methods_for_inout_effects(string module_name __attribute__ ((unused)))
+void set_methods_for_inout_effects(const char* module_name __attribute__ ((unused)))
 {
   set_methods_for_simple_effects();
 
@@ -594,7 +594,7 @@ void reset_methods_for_inout_effects()
   */
 }
 
-void set_methods_for_rw_effects_prettyprint(string module_name __attribute__ ((unused)))
+void set_methods_for_rw_effects_prettyprint(const char* module_name __attribute__ ((unused)))
 {
   set_action_interpretation(ACTION_READ, ACTION_WRITE);
   effects_prettyprint_func = print_effects;
@@ -602,7 +602,7 @@ void set_methods_for_rw_effects_prettyprint(string module_name __attribute__ ((u
   effects_to_text_func = simple_rw_effects_to_text;
 }
 
-void set_methods_for_inout_effects_prettyprint(string module_name __attribute__ ((unused)))
+void set_methods_for_inout_effects_prettyprint(const char* module_name __attribute__ ((unused)))
 {
   set_action_interpretation(ACTION_IN, ACTION_OUT);
   effects_prettyprint_func = print_effects;
@@ -610,7 +610,7 @@ void set_methods_for_inout_effects_prettyprint(string module_name __attribute__ 
   effects_to_text_func = simple_inout_effects_to_text;
 }
 
-void reset_methods_for_effects_prettyprint(string module_name __attribute__ ((unused)))
+void reset_methods_for_effects_prettyprint(const char* module_name __attribute__ ((unused)))
 {
     effects_prettyprint_func = (generic_prettyprint_function) abort;
     effect_prettyprint_func = (void (*) (effect)) abort;

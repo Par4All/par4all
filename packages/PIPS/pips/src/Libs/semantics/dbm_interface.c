@@ -141,7 +141,7 @@ transformer load_completed_statement_transformer(statement s)
 static void select_fix_point_operator()
 {
     if(get_bool_property(SEMANTICS_FIX_POINT)) {
-	string fp_name = get_string_property("SEMANTICS_FIX_POINT_OPERATOR");
+	const char* fp_name = get_string_property("SEMANTICS_FIX_POINT_OPERATOR");
 	if(strcmp(fp_name, "transfer")==0) {
 	    transformer_fix_point_operator = transformer_equality_fix_point;
 	}
@@ -542,7 +542,7 @@ static transformer main_summary_precondition(entity callee)
  *
  */
 
-static transformer ordinary_summary_precondition(string module_name,
+static transformer ordinary_summary_precondition(const char* module_name,
 						 entity callee)
 {
   transformer t = transformer_undefined;
@@ -783,7 +783,7 @@ bool summary_total_precondition(char * module_name)
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
  */
-bool generic_module_name_to_transformers(char *module_name, bool in_context)
+bool generic_module_name_to_transformers(const char* module_name, bool in_context)
 {
     transformer t_intra = transformer_undefined;
     transformer t_inter = transformer_undefined;
@@ -903,7 +903,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     return true;
 }
 
-bool module_name_to_transformers_in_context(char *module_name)
+bool module_name_to_transformers_in_context(const char* module_name)
 {
   bool rc = false;
   bool save_prop = get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT");
@@ -921,7 +921,7 @@ bool module_name_to_transformers_in_context(char *module_name)
   return rc;
 }
 
-bool module_name_to_transformers(char *module_name)
+bool module_name_to_transformers(const char* module_name)
 {
   bool rc = false;
   rc = generic_module_name_to_transformers(module_name, false);
@@ -932,7 +932,7 @@ bool module_name_to_transformers(char *module_name)
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
  */
-bool module_name_to_preconditions(char *module_name)
+bool module_name_to_preconditions(const char* module_name)
 {
     transformer t_inter;
     transformer pre;
@@ -1042,7 +1042,7 @@ bool module_name_to_preconditions(char *module_name)
     return true;
 }
 
-bool module_name_to_total_preconditions(char *module_name)
+bool module_name_to_total_preconditions(const char* module_name)
 {
   transformer t_inter = transformer_undefined;
   transformer t_pre = transformer_undefined;

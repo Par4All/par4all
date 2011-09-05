@@ -34,13 +34,13 @@ string statement_type_as_string (statement stat);
  * DEBUG FUNCTION: print debugging informations for
  * a statement stat
  */
-void debug_statement (string comments, statement stat, int debug_level);
+void debug_statement (const char* comments, statement stat, int debug_level);
 
 /**
  * DEBUG FUNCTION: print debugging informations for
  * a control a_control
  */
-void debug_control (string comments, control a_control, int debug_level);
+void debug_control (const char* comments, control a_control, int debug_level);
 
 /**
  * DEBUG FUNCTION: print debugging informations for
@@ -68,7 +68,7 @@ expression make_expression_from_entity(entity an_entity);
  * label, statement number and ordering of statement stat, 
  * and empty comments
  */
-statement make_binary_call_statement (string operator_name,
+statement make_binary_call_statement (const char* operator_name,
 				      expression expression1,
 				      expression expression2,
 				      statement stat);
@@ -80,8 +80,8 @@ statement make_binary_call_statement (string operator_name,
  * New variable is added to declarations
  */
 entity clone_variable_with_new_name(entity a_variable,
-				    string new_name, 
-				    string module_name);
+				    const char* new_name, 
+				    const char* module_name);
 
 /**
  * Build and return new entity obtained by cloning variable
@@ -92,9 +92,9 @@ entity clone_variable_with_new_name(entity a_variable,
  * name is unique.
  */
 entity make_variable_from_name_and_entity (entity cloned_variable,
-					   string base_name,
+					   const char* base_name,
 					   statement stat,
-					   string module_name);
+					   const char* module_name);
 
 /**
  * Build and return new statement which is a assignement of variable
@@ -113,10 +113,10 @@ unstructured statement_unstructured (statement stat);
  */
 int beautify_ordering (int an_ordering);
 
-void clean_statement_from_tags (string comment_portion,
+void clean_statement_from_tags (const char* comment_portion,
 				statement stat);
 
-list get_statements_with_comments_containing (string comment_portion,
+list get_statements_with_comments_containing (const char* comment_portion,
 					      statement stat);
 
 bool statement_is_contained_in_a_sequence_p (statement root_statement,

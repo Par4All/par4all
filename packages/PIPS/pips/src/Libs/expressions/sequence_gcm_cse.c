@@ -79,7 +79,7 @@ static char * table_of_AC_operators[] =
 
 static bool Is_Associative_Commutative(entity e)
 {
-  string local_name = entity_local_name(e);
+  const char* local_name = entity_local_name(e);
   int i = 0;
 
   while (table_of_AC_operators[i])
@@ -998,7 +998,7 @@ static bool prepare_icm(statement s) {
 
    @param[in,out] s is the statement of the module
  */
-void perform_icm_association(string name, /* of the module */
+void perform_icm_association(const char* name, /* of the module */
 			     statement s  /* of the module */)
 {
   pips_assert("clean static structures on entry",
@@ -2030,7 +2030,7 @@ static bool call_flt(call c)
     return true;
 }
 
-void perform_ac_cse(__attribute__((unused)) string name, statement s)
+void perform_ac_cse(__attribute__((unused)) const char* name, statement s)
 {
   /* they have to be recomputed, because if ICM before. */
 
@@ -2071,10 +2071,10 @@ void perform_ac_cse(__attribute__((unused)) string name, statement s)
 
    @return true if everything goes fine.
 */
-bool common_subexpression_elimination(string module_name)
+bool common_subexpression_elimination(const char* module_name)
 {
   bool   result;
-  string os = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
+  const char* os = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
 
   // Optimize expressions with "CSE" optimization strategy
   set_string_property("EOLE_OPTIMIZATION_STRATEGY", "CSE");
@@ -2097,10 +2097,10 @@ bool common_subexpression_elimination(string module_name)
    Beware, invariant_code_motion phase already exists too but deal with
    loop invariant code motion...
 */
-bool icm(string module_name)
+bool icm(const char* module_name)
 {
   bool   result;
-  string os = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
+  const char* os = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
 
   // Optimize expressions with "ICM" optimization strategy
   set_string_property("EOLE_OPTIMIZATION_STRATEGY", "ICM");

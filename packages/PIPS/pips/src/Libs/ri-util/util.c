@@ -133,7 +133,7 @@ const char* global_name_to_user_name(const char* global_name)
 }
 
 /* Does not take care of block scopes and returns a pointer */
-string local_name(const char * s)
+const char* local_name(const char * s)
 {
   char *start_ptr = strchr(s, MODULE_SEP);
   pips_assert("some separator", start_ptr != NULL);
@@ -142,7 +142,7 @@ string local_name(const char * s)
 
 /* END_EOLE */
 
-string make_entity_fullname(string module_name, string local_name)
+string make_entity_fullname(const char* module_name, const char* local_name)
 {
     return(concatenate(module_name,
 		       MODULE_SEP_STRING,
@@ -156,30 +156,30 @@ bool empty_string_p(const char* s)
     return(strcmp(s, "") == 0);
 }
 
-bool return_local_label_name_p(string s)
+bool return_local_label_name_p(const char* s)
 {
     return(strcmp(s, RETURN_LABEL_NAME) == 0);
 }
 
-bool empty_label_p(string s)
+bool empty_label_p(const char* s)
 {
   // s must be a local label name
   pips_assert("no separator", strchr(s, MODULE_SEP) == NULL);
-  // return(empty_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
+  // return(empty_local_label_name_p(local_name(s)+sizeof(LABEL_PREFIX)-1)) ;
   return (strcmp(s, EMPTY_LABEL_NAME) == 0);
 }
 
-bool empty_global_label_p(string gln)
+bool empty_global_label_p(const char* gln)
 {
   // gln must be a global label name
-  string lln = local_name(gln);
+  const char* lln = local_name(gln);
 
   return empty_label_p(lln);
 }
 
-bool return_label_p(string s)
+bool return_label_p(const char* s)
 {
-    return(return_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
+    return(return_local_label_name_p(local_name(s)+sizeof(LABEL_PREFIX)-1)) ;
 }
 
 entity find_label_entity(const char* module_name, const char* label_local_name)
@@ -211,7 +211,7 @@ entity find_label_entity(const char* module_name, const char* label_local_name)
  * should stack allocate a buffer of size strlen(s), but we would end
  * up returning a pointer to a popped area of the stack...
  */
-string module_name(const char * s)
+const char* module_name(const char * s)
 {
   /* FI: shouldnt'we allocate dynamically "local" since its size is
      smaller than the size of "s"? */
@@ -230,9 +230,9 @@ string module_name(const char * s)
     return(local);
 }
 
-string string_codefilename(char *s)
+string string_codefilename(const char *s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+    return(concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING,
 		       s, SEQUENTIAL_CODE_EXT, NULL));
 }
 
@@ -243,9 +243,9 @@ entity e;
     return(string_codefilename(entity_local_name(e)));
 }
 
-string string_par_codefilename(string s)
+string string_par_codefilename(const char *s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+    return(concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING,
 		       s, PARALLEL_CODE_EXT, NULL));
 }
 
@@ -254,16 +254,16 @@ string module_par_codefilename(entity e)
     return(string_par_codefilename(entity_local_name(e)));
 }
 
-string string_fortranfilename(string s)
+string string_fortranfilename(const char* s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+    return(concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING,
 		       s, SEQUENTIAL_FORTRAN_EXT, NULL));
 }
 
-bool string_fortran_filename_p(string s)
+bool string_fortran_filename_p(const char* s)
 {
   int fnl = strlen(s);
-  int sl = strlen(SEQUENTIAL_FORTRAN_EXT);
+  int sl = sizeof(SEQUENTIAL_FORTRAN_EXT)-1;
   bool is_fortran = false;
 
   if(fnl<=sl)
@@ -279,9 +279,9 @@ string module_fortranfilename(entity e)
     return(string_fortranfilename(entity_local_name(e)));
 }
 
-string string_par_fortranfilename(string s)
+string string_par_fortranfilename(const char* s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+    return(concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING,
 		       s, PARALLEL_FORTRAN_EXT, NULL));
 }
 
@@ -290,9 +290,9 @@ string module_par_fortranfilename(entity e)
     return(string_par_fortranfilename(entity_local_name(e)));
 }
 
-string string_pp_fortranfilename(string s)
+string string_pp_fortranfilename(const char* s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+    return(concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING,
 		       s, PRETTYPRINT_FORTRAN_EXT, NULL));
 }
 
@@ -301,9 +301,9 @@ string module_pp_fortranfilename(entity e)
     return(string_pp_fortranfilename(entity_local_name(e)));
 }
 
-string string_predicat_fortranfilename(string s)
+string string_predicat_fortranfilename(const char* s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+    return(concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING,
 		       s, PREDICAT_FORTRAN_EXT, NULL));
 }
 
@@ -312,9 +312,9 @@ string module_predicat_fortranfilename(entity e)
     return(string_predicat_fortranfilename(entity_local_name(e)));
 }
 
-string string_entitiesfilename(string s)
+string string_entitiesfilename(const char* s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+    return(concatenate(TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING,
 		       s, ENTITIES_EXT, NULL));
 }
 
@@ -324,44 +324,7 @@ string module_entitiesfilename(entity e)
 }
 
 
-/* Maximal value set for Fortran 77 */
-static int init = 100000;
 
-void reset_label_counter()
-{
-  init = 100000;
-}
-
-string new_label_name(entity module)
-{
-  string name;
-  char *module_name ;
-  char * format;
-
-  pips_assert( "module != 0", module != 0 ) ;
-
-  if( module == entity_undefined ) {
-    module_name = "__GENSYM" ;
-    format = "%s%s%s%d";
-  }
-  else {
-    module_name = module_local_name(module) ;
-    format = c_module_p(module)?"%s%s%sl%d":"%s%s%s%d";
-  }
-  --init;
-  for(asprintf(&name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,init);
-      init >= 0 && !entity_undefined_p(gen_find_tabulated(name, entity_domain)) ;) {
-    free(name);
-    --init;
-    asprintf(&name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,
-	    init);
-    /* loop */
-  }
-  if(init == 0) {
-    pips_internal_error("no more available labels");
-  }
-  return(name);
-}
 
 entity find_ith_parameter(entity e, int i)
 {
@@ -449,7 +412,7 @@ bool heap_area_p(entity aire)
 */
 entity module_to_heap_area(entity f)
 {
-  entity a = global_name_to_entity(entity_local_name(f), HEAP_AREA_LOCAL_NAME);
+  entity a = FindEntity(entity_local_name(f), HEAP_AREA_LOCAL_NAME);
 
   pips_assert("The heap area is defined for module f.\n",
 	      !entity_undefined_p(a));

@@ -459,7 +459,7 @@ static step_analyses step_analyse_critical_regions(list read_l, list write_l, li
   return make_step_analyses(recv_l, send_l, NIL, NIL, make_map_entity_bool());
 }
 
-bool step_analyse(string module_name)
+bool step_analyse(const char* module_name)
 { 
   list region_l,read_l,write_l,in_l,out_l;
   entity module = local_name_to_top_level_entity(module_name);
@@ -552,7 +552,7 @@ bool step_analyse(string module_name)
 
 static bool com_optimizable_p(map_entity_bool optimizable, entity v, entity directive_module)
 {
-  string v_name;
+  const char* v_name;
   entity array;
   bool optimizable_p;
 
@@ -582,7 +582,7 @@ static bool com_optimizable_p(map_entity_bool optimizable, entity v, entity dire
 
 bool step_com_optimize_p(map_entity_bool optimizable, entity v, entity directive_module)
 {
-  string v_name = entity_local_name(v);
+  const char* v_name = entity_local_name(v);
   entity array = gen_find_tabulated(concatenate(entity_user_name(directive_module), MODULE_SEP_STRING, v_name, NULL), entity_domain);
   if (io_effect_entity_p(v) ||
       !bound_map_entity_bool_p(optimizable, array))
@@ -593,7 +593,7 @@ bool step_com_optimize_p(map_entity_bool optimizable, entity v, entity directive
 
 static void set_optimizable(map_entity_bool optimizable, entity v, entity directive_module, bool is_optimizable)
 {
-  string v_name = entity_local_name(v);
+  const char* v_name = entity_local_name(v);
   entity array = gen_find_tabulated(concatenate(entity_user_name(directive_module), MODULE_SEP_STRING, v_name, NULL), entity_domain);
 
   if (!entity_undefined_p(array))
@@ -607,7 +607,7 @@ static void set_optimizable(map_entity_bool optimizable, entity v, entity direct
     }
 }
 
-bool step_analyse_com(string module_name)
+bool step_analyse_com(const char* module_name)
 {
 
 
@@ -645,7 +645,7 @@ bool step_analyse_com(string module_name)
       else
 	{
 	  entity S1_directive_module = call_function(statement_call(s1));
-	  string S1_directive_module_name = entity_local_name(S1_directive_module);
+	  const char* S1_directive_module_name = entity_local_name(S1_directive_module);
 	  step_analyses S1_analyses = load_global_step_analyses(S1_directive_module);
 	  directive d1 = load_global_directives(S1_directive_module);
 
@@ -689,7 +689,7 @@ bool step_analyse_com(string module_name)
 		      effect sink = conflict_sink(c);
 		      reference ref = region_any_reference(source);
 		      entity e = reference_variable(ref);
-		      string caller_side = entity_local_name(e);
+		      const char* caller_side = entity_local_name(e);
 		      int caller_side_length = strlen(caller_side);
 		      
 
@@ -711,7 +711,7 @@ bool step_analyse_com(string module_name)
 			  for(; !(send_array_p || ENDP(remaining_region)); POP(remaining_region))
 			    {
 			      region reg = REGION(CAR(remaining_region));
-			      string called_side = entity_local_name(reference_variable(region_any_reference(reg)));
+			      const char* called_side = entity_local_name(reference_variable(region_any_reference(reg)));
 			      send_array_p = (strncmp(caller_side, called_side, caller_side_length)==0);
 			    }
 			  
@@ -822,7 +822,7 @@ static void statement_to_send_recv(statement s, list *send, list *recv)
   if (statement_call_p(s) && entity_module_p(call_function(statement_call(s))))
     {
       entity func = call_function(statement_call(s));
-      string func_name = entity_local_name(func);
+      const char* func_name = entity_local_name(func);
       step_analyses_com analyses_com=(step_analyses_com)db_get_memory_resource(DBR_STEP_ANALYSES_COM, func_name, true);
       pips_debug(3, "\tCalled module %s\n",func_name);
       
@@ -856,7 +856,7 @@ static void statement_to_send_recv(statement s, list *send, list *recv)
   return;
 }
 
-bool step_analyse_com2(string module_name)
+bool step_analyse_com2(const char* module_name)
 {
   debug_on("STEP_ANALYSE_COM2_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module_name);

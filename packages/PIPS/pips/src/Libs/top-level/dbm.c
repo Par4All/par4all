@@ -86,8 +86,8 @@ static void pop_path(void)
 bool open_module(const char* name)
 {
     bool success = false;
-    string upper_case_name = strupper(strdup(name), name);
-    string module_name = string_undefined;
+    char* upper_case_name = strupper(strdup(name), name);
+    char* module_name ;
 
     if (!db_get_current_workspace_name())
       pips_user_error("No current workspace, open or create one first!\n");
@@ -104,10 +104,10 @@ bool open_module(const char* name)
       module_name = NULL;
 
     if(module_name) {
-      if (db_get_current_module_name()) /* reset if needed */
-	db_reset_current_module_name();
+        if (db_get_current_module_name()) /* reset if needed */
+            db_reset_current_module_name();
 
-      success = db_set_current_module_name(module_name);
+        success = db_set_current_module_name(module_name);
     }
 
     if (success) {
@@ -115,16 +115,15 @@ bool open_module(const char* name)
       user_log("Module %s selected\n", module_name);
     }
     else {
-      if(strcmp(name, upper_case_name)==0)
-	pips_user_warning("Could not open module %s\n", name);
-      else
-	pips_user_warning("Could not open module %s (nor %s)\n",
-			  name, upper_case_name);
+        if(strcmp(name, upper_case_name)==0)
+            pips_user_warning("Could not open module %s\n", name);
+        else
+            pips_user_warning("Could not open module %s (nor %s)\n",
+                    name, upper_case_name);
     }
 
     if (upper_case_name != module_name)
         free(upper_case_name);
-    free(module_name);
     return success;
 }
 

@@ -452,7 +452,7 @@ static tag distribution_format(expression e,
 {
     syntax s = expression_syntax(e);
     entity function;
-    string name;
+    const char* name;
     call c;
 
     pips_assert("valid distribution format", syntax_call_p(s));
@@ -980,7 +980,7 @@ static struct DirectiveHandler handlers[] =
 /* returns the handler for directive name.
  * assumes that name should point to a directive.
  */
-static void (*directive_handler(string name))(entity, list)
+static void (*directive_handler(const char* name))(entity, list)
 {
     struct DirectiveHandler *x=handlers;
     while (x->name && strcmp(name, x->name)) x++;
@@ -988,7 +988,7 @@ static void (*directive_handler(string name))(entity, list)
 	x->handler: HANDLER(nothing);
 }
 
-static bool directive_managed_now_p(string name)
+static bool directive_managed_now_p(const char* name)
 {
     return directive_handler(name)!=HANDLER(nothing);
 }
@@ -1002,7 +1002,7 @@ static bool directive_filter(call c)
   // DIRECTIVES
   if (hpf_directive_entity_p(f))
   {
-    string name = entity_local_name(f);
+    const char* name = entity_local_name(f);
     pips_debug(8, "hpfc entity is %s\n", entity_name(f));
 
     // call the appropriate handler for the directive.

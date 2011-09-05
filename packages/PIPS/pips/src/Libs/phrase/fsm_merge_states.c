@@ -51,7 +51,7 @@
  * Phase main
  *********************************************************/
 
-bool fsm_merge_states(string module_name)
+bool fsm_merge_states(const char* module_name)
 {
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 

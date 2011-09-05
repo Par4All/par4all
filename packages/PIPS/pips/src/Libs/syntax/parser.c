@@ -55,7 +55,7 @@ char *CurrentFN = NULL;
 cons *FormalParameters = NIL;
 
 /* the name of the current package, i.e. TOP-LEVEL or a module name? */
-char *CurrentPackage = NULL; 
+const char *CurrentPackage = NULL; 
 
 /* Four areas used to allocate variables which are not stored in a
    common. These areas are just like commons, but the dynamic area is the

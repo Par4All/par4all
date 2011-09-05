@@ -797,8 +797,8 @@ void print_number_of_loop_statistics(FILE * out,
 /* Print out the number of sequential versus parallel loops.
  */
 void print_parallelization_statistics(
-    string module, /**< the module name */
-    string msg,    /**< an additional message */
+    const char* module, /**< the module name */
+    const char* msg,    /**< an additional message */
     statement s    /**< the module statement to consider */) {
   if (get_bool_property("PARALLELIZATION_STATISTICS"))
     {

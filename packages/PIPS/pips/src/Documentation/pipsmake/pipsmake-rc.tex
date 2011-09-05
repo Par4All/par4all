@@ -10213,6 +10213,12 @@ no actual helper functions will be generated.
 HWAC_OPENCL_MERGE_OPERATIONS TRUE
 \end{PipsProp}
 
+Whether merged OpenCL image operations should include reductions as well.
+Added to help debugging the code.
+\begin{PipsProp}{HWAC_OPENCL_MERGE_REDUCTIONS}
+HWAC_OPENCL_MERGE_REDUCTIONS TRUE
+\end{PipsProp}
+
 Whether to generate OpenCL code for one operation on its own.
 It is not interesting to do so because it is just equivalent to
 the already existing AIPO implementation, but it can be useful for

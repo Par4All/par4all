@@ -203,7 +203,7 @@ static statement rm_block_block_statement(statement stat)
 
 
 /*============================================================================*/
-/* void atomizer(char *module_name): computes the translation of Fortran
+/* void atomizer(const char* module_name): computes the translation of Fortran
  * instructions into Three Adresses Code instructions.
  *
  * This translation is done after two pre-computations :

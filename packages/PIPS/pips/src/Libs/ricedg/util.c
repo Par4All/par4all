@@ -574,15 +574,15 @@ void prettyprint_dot_dependence_graph( FILE * fd,
 
 
   bool centered = get_bool_property( "PRINT_DOTDG_CENTERED" );
-  string title = get_string_property( "PRINT_DOTDG_TITLE" );
-  string title_position = get_string_property( "PRINT_DOTDG_TITLE_POSITION" );
-  string background = get_string_property( "PRINT_DOTDG_BACKGROUND" );
-  string nodeshape= get_string_property( "PRINT_DOTDG_NODE_SHAPE" );
-  string nodeshapecolor = get_string_property( "PRINT_DOTDG_NODE_SHAPE_COLOR" );
-  string nodefillcolor = get_string_property( "PRINT_DOTDG_NODE_FILL_COLOR" );
-  string nodefontcolor = get_string_property( "PRINT_DOTDG_NODE_FONT_COLOR" );
-  string nodefontsize = get_string_property( "PRINT_DOTDG_NODE_FONT_SIZE" );
-  string nodefontface = get_string_property( "PRINT_DOTDG_NODE_FONT_FACE" );
+  const char* title = get_string_property( "PRINT_DOTDG_TITLE" );
+  const char* title_position = get_string_property( "PRINT_DOTDG_TITLE_POSITION" );
+  const char* background = get_string_property( "PRINT_DOTDG_BACKGROUND" );
+  const char* nodeshape= get_string_property( "PRINT_DOTDG_NODE_SHAPE" );
+  const char* nodeshapecolor = get_string_property( "PRINT_DOTDG_NODE_SHAPE_COLOR" );
+  const char* nodefillcolor = get_string_property( "PRINT_DOTDG_NODE_FILL_COLOR" );
+  const char* nodefontcolor = get_string_property( "PRINT_DOTDG_NODE_FONT_COLOR" );
+  const char* nodefontsize = get_string_property( "PRINT_DOTDG_NODE_FONT_SIZE" );
+  const char* nodefontface = get_string_property( "PRINT_DOTDG_NODE_FONT_FACE" );
 
 
   /* graph style */
@@ -663,14 +663,14 @@ void prettyprint_dot_dependence_graph( FILE * fd,
 
 
 
-  string flowdep_color = get_string_property( "PRINT_DOTDG_FLOW_DEP_COLOR" );
-  string flowdep_style = get_string_property( "PRINT_DOTDG_FLOW_DEP_STYLE" );
-  string antidep_color = get_string_property( "PRINT_DOTDG_ANTI_DEP_COLOR" );
-  string antidep_style = get_string_property( "PRINT_DOTDG_ANTI_DEP_STYLE" );
-  string outputdep_color = get_string_property( "PRINT_DOTDG_OUTPUT_DEP_COLOR" );
-  string outputdep_style = get_string_property( "PRINT_DOTDG_OUTPUT_DEP_STYLE" );
-  string inputdep_color = get_string_property( "PRINT_DOTDG_INPUT_DEP_COLOR" );
-  string inputdep_style = get_string_property( "PRINT_DOTDG_INPUT_DEP_STYLE" );
+  const char* flowdep_color = get_string_property( "PRINT_DOTDG_FLOW_DEP_COLOR" );
+  const char* flowdep_style = get_string_property( "PRINT_DOTDG_FLOW_DEP_STYLE" );
+  const char* antidep_color = get_string_property( "PRINT_DOTDG_ANTI_DEP_COLOR" );
+  const char* antidep_style = get_string_property( "PRINT_DOTDG_ANTI_DEP_STYLE" );
+  const char* outputdep_color = get_string_property( "PRINT_DOTDG_OUTPUT_DEP_COLOR" );
+  const char* outputdep_style = get_string_property( "PRINT_DOTDG_OUTPUT_DEP_STYLE" );
+  const char* inputdep_color = get_string_property( "PRINT_DOTDG_INPUT_DEP_COLOR" );
+  const char* inputdep_style = get_string_property( "PRINT_DOTDG_INPUT_DEP_STYLE" );
 
 
   // Loop over the graph and print all dependences
@@ -687,8 +687,8 @@ void prettyprint_dot_dependence_graph( FILE * fd,
         action sink_act = effect_action( conflict_sink( c ) );
         reference sink_ref = effect_any_reference( conflict_sink( c ) );
         reference source_ref = effect_any_reference( conflict_source( c ) );
-        string color = inputdep_color;
-        string style = inputdep_style;
+        const char* color = inputdep_color;
+        const char* style = inputdep_style;
 
         if( action_read_p( source_act ) && action_write_p( sink_act ) ) {
           color = antidep_color;

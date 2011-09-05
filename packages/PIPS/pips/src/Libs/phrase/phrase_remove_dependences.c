@@ -599,7 +599,7 @@ static void phrase_remove_dependences_rwt(statement stat)
   statement_instruction(stat) = newInstr;
 }
 
-bool phrase_remove_dependences(string module_name)
+bool phrase_remove_dependences(const char* module_name)
 {
   statement module_stat;
 

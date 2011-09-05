@@ -1,0 +1,57 @@
+\section{Design constraints}
+\label{design_contraints}
+
+As explained in the previous section, the main goal of the PaWS
+framework is to create a very light WEB interface for PIPS. But PaWS is also
+subjected to other, more detailed constraints:
+
+\begin{enumerate}
+
+  \item {\bf No installation requirements} on a the client side, beyond
+  a browser.
+
+  \item {\bf PIPS scripting complexity is hidden}: the result of any
+    operation is displayed in a source form thru a few clicks.
+
+  \item {\bf Separation of PIPS, PyPS and PaWS}: to avoid dependencies
+    between pieces of software and to protect the WEB server from crashes
+    caused by PIPS internal errors.
+
+  \item {\bf Easy customization of PaWS}: PIPS developers, who are not
+    familiar with PaWS and Pylons, should be able to update the PaWS
+    configuration and add new passes or tutorials. 
+
+    % Process of changing particular element is easy, because
+    % application is based on the structure of the files which
+    % contains python modules with pyps functionalities, examples and
+    % files with descriptions of them.
+
+  \item {\bf PIPS server is up-to-date}: use a recent version of PIPS,
+    that is properly validated.
+
+  \item {\bf Security}: against spamming engines, it is obtained by
+    forbidding Python or shell input and by using a login and a
+    password.
+
+  \item {\bf Consistency} between:
+    \begin{itemize}
+      \item the output computed by Tpips and by Pyps;
+      \item the output of the cut-and-pasted code, code loaded from
+        the PaWS example, code loaded from the user machine and
+        modified code.
+    \end{itemize}
+
+  \item {\bf Use PIPS validation mechanism to validate PaWS
+      configuration}
+
+  \item {\bf Protection against server overload}: assure PaWS
+    availability; control response time.
+
+  \item {\bf Code Reuse}: use existing components as much as possible
+    and a generic approach to page creation.
+
+  \item {\bf OS neutrality}
+
+\end{enumerate}
+
+%%  \item {\bf remote execution of PIPS -> demo? not sure}

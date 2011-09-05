@@ -1112,8 +1112,8 @@ points_to opgen_must_constant_path(cell l __attribute__ ((__unused__)), cell r _
 
 bool opgen_may_module(entity e1, entity e2)
 {
-  string m1 = entity_module_name(e1);
-  string m2 = entity_module_name(e2);
+  const char* m1 = entity_module_name(e1);
+  const char* m2 = entity_module_name(e2);
   if(entity_any_module_p(e1) ||entity_any_module_p(e2))
     return true;
   else 
@@ -1122,8 +1122,8 @@ bool opgen_may_module(entity e1, entity e2)
 
 bool opgen_must_module(entity e1, entity e2)
 {
-  string m1 = entity_module_name(e1);
-  string m2 = entity_module_name(e2);
+  const char* m1 = entity_module_name(e1);
+  const char* m2 = entity_module_name(e2);
   if(entity_any_module_p(e1) || entity_any_module_p(e2))
     return false;
   else

@@ -162,7 +162,7 @@ DEFINE_LOCAL_STACK(current_statement, statement)
 
 static entity current_mod = entity_undefined;
 static entity current_caller = entity_undefined; 
-static string caller_name;
+static const char* caller_name;
 static list l_current_aliases = NIL;
 static list l_traversed = NIL;
 static int number_of_alias_associations = 0;
@@ -556,7 +556,7 @@ static bool common_is_visible_p(entity sec, entity mod)
   /* search for the common declaration in the callees */	
   if (!entity_main_module_p(mod))
     {
-      string mod_name = module_local_name(mod);
+      const char* mod_name = module_local_name(mod);
       callees all_callees = (callees) db_get_memory_resource(DBR_CALLEES,mod_name,true);
       list l_callees = callees_callees(all_callees); 
       MAP(STRING,callee_name,

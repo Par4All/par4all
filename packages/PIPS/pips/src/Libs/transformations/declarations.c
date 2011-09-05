@@ -149,7 +149,7 @@ void module_clean_declarations(entity module, statement module_statement) {
    @return true because always successful
 */
 bool
-clean_declarations(string module_name)
+clean_declarations(const char* module_name)
 {
 
   /* prelude */
@@ -186,9 +186,9 @@ clean_declarations(string module_name)
 
 struct helper {
   int removed_vars;   // how many variables where removed
-  string module;      // current module being cleaned up
-  string func_malloc; // allocation function
-  string func_free;   // deallocation function
+  const char* module;      // current module being cleaned up
+  const char* func_malloc; // allocation function
+  const char* func_free;   // deallocation function
   set referenced;     // referenced entities
 };
 
@@ -236,7 +236,7 @@ static bool loop_flt(loop l, struct helper * ctx)
   return true;
 }
 
-static bool unused_local_variable_p(entity var, set used, string module)
+static bool unused_local_variable_p(entity var, set used, const char* module)
 {
   bool unused = same_string_p(entity_module_name(var), module)
     // keep function auto-declaration for recursion

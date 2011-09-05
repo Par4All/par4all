@@ -791,7 +791,7 @@ static void html_print_statement(statement s) {
     case is_instruction_goto:
       /*      statement g = instruction_goto(i);
        entity el = statement_label(g);
-       string l = entity_local_name(el) + strlen(LABEL_PREFIX);
+       string l = entity_local_name(el) + sizeof(LABEL_PREFIX) -1;
        printf("%s", strdup( concatenate( "goto ", l, SEMICOLON, NULL ) ) );*/
       break;
       /* add switch, forloop break, continue, return instructions here*/

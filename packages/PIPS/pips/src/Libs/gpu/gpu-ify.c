@@ -34,14 +34,14 @@ static list loop_nests_to_outline;
 /* These are the possibles prefixes for outline stuff, they are computed from a
  * property and the current module name
  */
-static string kernel_prefix   = 0;
-static string wrapper_prefix  = 0;
-static string launcher_prefix = 0;
-static string fwrapper_prefix = 0;
+static const char * kernel_prefix   = 0;
+static const char * wrapper_prefix  = 0;
+static const char * launcher_prefix = 0;
+static const char * fwrapper_prefix = 0;
 
 
 /* Return a pointer on the first char after the bad_prefix */
-static const char* clean_prefix(const char* full_name, string bad_prefix) {
+static const char* clean_prefix(const char* full_name, const char* bad_prefix) {
   int len = strlen(bad_prefix);
   if(strncasecmp(full_name,bad_prefix,len)==0) {
     full_name = full_name+len;

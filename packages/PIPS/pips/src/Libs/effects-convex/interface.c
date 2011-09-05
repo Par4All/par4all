@@ -61,7 +61,7 @@
 /******************************************************* CONVEX R/W REGIONS */
 
 bool
-summary_pointer_regions(char *module_name)
+summary_pointer_regions(const char* module_name)
 {
     bool res;
     set_constant_paths_p(false);
@@ -73,11 +73,11 @@ summary_pointer_regions(char *module_name)
 }
 
 
-/* bool summary_regions(char *module_name): computes the global
+/* bool summary_regions(const char* module_name): computes the global
  * regions of a module : global regions only use formal or common variables.
  */
 bool
-summary_regions(char *module_name)
+summary_regions(const char* module_name)
 {
     bool res;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -93,7 +93,7 @@ summary_regions(char *module_name)
 
 
 bool
-may_pointer_regions(char *module_name)
+may_pointer_regions(const char* module_name)
 {
   bool res1, res2;
   set_bool_property("MUST_REGIONS", false);
@@ -110,14 +110,14 @@ may_pointer_regions(char *module_name)
   return res1 && res2;
 }
 
-/* bool may_regions(char *module_name)
+/* bool may_regions(const char* module_name)
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
 bool
-may_regions(char *module_name)
+may_regions(const char* module_name)
 {
     bool res1, res2;
 
@@ -143,7 +143,7 @@ may_regions(char *module_name)
 
 
 bool
-must_pointer_regions(char *module_name)
+must_pointer_regions(const char* module_name)
 {
   bool res1, res2;
   set_bool_property("MUST_REGIONS", true);
@@ -162,7 +162,7 @@ must_pointer_regions(char *module_name)
 }
 
 bool
-must_pointer_regions_with_points_to(char *module_name)
+must_pointer_regions_with_points_to(const char* module_name)
 {
   bool res1, res2;
   set_bool_property("MUST_REGIONS", true);
@@ -183,14 +183,14 @@ must_pointer_regions_with_points_to(char *module_name)
 }
 
 
-/* bool must_regions(char *module_name)
+/* bool must_regions(const char* module_name)
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
 bool
-must_regions(char *module_name)
+must_regions(const char* module_name)
 {
     bool res1, res2;
 
@@ -217,14 +217,14 @@ must_regions(char *module_name)
     return res1 && res2;
 }
 
-/* bool must_regions(char *module_name)
+/* bool must_regions(const char* module_name)
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
 bool
-must_regions_with_points_to(char *module_name)
+must_regions_with_points_to(const char* module_name)
 {
     bool res1, res2;
 
@@ -248,7 +248,7 @@ must_regions_with_points_to(char *module_name)
 /******************************************************** CONVEX IN REGIONS */
 
 
-/* bool in_summary_regions(char *module_name):
+/* bool in_summary_regions(const char* module_name):
  * input    : the name of the current module.
  * output   : nothing !
  * modifies : the database.
@@ -256,7 +256,7 @@ must_regions_with_points_to(char *module_name)
  *            regions of its embedding statement.
  */
 bool
-in_summary_regions(char *module_name)
+in_summary_regions(const char* module_name)
 {
     bool res;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -270,14 +270,14 @@ in_summary_regions(char *module_name)
     return res;
 }
 
-/* bool in_regions(char *module_name):
+/* bool in_regions(const char* module_name):
  * input    : the name of the current module.
  * output   : nothing !
  * modifies : the database.
  * comment  : computes the in regions of the current module.
  */
 bool
-in_regions(char *module_name)
+in_regions(const char* module_name)
 {
     bool res;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -313,7 +313,7 @@ out_summary_regions(char * module_name)
 }
 
 bool
-out_regions(char *module_name)
+out_regions(const char* module_name)
 {
     bool res;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -337,7 +337,7 @@ out_regions(char *module_name)
 
 static bool
 print_code_any_regions(
-    string module_name,
+    const char* module_name,
     int what_tag,
     bool is_user_view,
     bool is_attached,
@@ -370,28 +370,28 @@ print_code_any_regions(
 }
 
 bool
-print_code_proper_pointer_regions(string module_name)
+print_code_proper_pointer_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_PROPER_POINTER_REGIONS, string_undefined, ".preg");
 }
 
 bool
-print_code_pointer_regions(string module_name)
+print_code_pointer_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_POINTER_REGIONS, DBR_SUMMARY_POINTER_REGIONS, ".reg");
 }
 
 bool
-print_code_inv_pointer_regions(string module_name)
+print_code_inv_pointer_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_INV_POINTER_REGIONS, DBR_SUMMARY_POINTER_REGIONS, ".reg");
 }
 
 bool
-print_code_proper_regions(string module_name)
+print_code_proper_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_PROPER_REGIONS, string_undefined, ".preg");
@@ -405,56 +405,56 @@ print_source_proper_regions(char* module_name)
 }
 
 bool
-print_code_regions(string module_name)
+print_code_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_REGIONS, DBR_SUMMARY_REGIONS, ".reg");
 }
 
 bool
-print_source_regions(string module_name)
+print_source_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_rw, true, false,
 			  DBR_REGIONS, DBR_SUMMARY_REGIONS, ".ureg");
 }
 
 bool
-print_code_inv_regions(string module_name)
+print_code_inv_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_rw, false, false,
 			  DBR_INV_REGIONS, DBR_SUMMARY_REGIONS, ".reg");
 }
 
 bool
-print_source_inv_regions(string module_name)
+print_source_inv_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_rw, true, false,
 			  DBR_INV_REGIONS, DBR_SUMMARY_REGIONS, ".ureg");
 }
 
 bool
-print_code_in_regions(string module_name)
+print_code_in_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_inout, false, false,
 			  DBR_IN_REGIONS, DBR_IN_SUMMARY_REGIONS, ".inreg");
 }
 
 bool
-print_source_in_regions(string module_name)
+print_source_in_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_inout, true, false,
 			  DBR_IN_REGIONS, DBR_IN_SUMMARY_REGIONS, ".uinreg");
 }
 
 bool
-print_code_out_regions(string module_name)
+print_code_out_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_inout, false, false,
 			  DBR_OUT_REGIONS, DBR_OUT_SUMMARY_REGIONS, ".outreg");
 }
 
 bool
-print_source_out_regions(string module_name)
+print_source_out_regions(const char* module_name)
 {
     return print_code_any_regions(module_name, is_inout, true, false,
 		  DBR_OUT_REGIONS, DBR_OUT_SUMMARY_REGIONS, ".uoutreg");

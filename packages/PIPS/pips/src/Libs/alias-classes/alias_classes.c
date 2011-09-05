@@ -525,7 +525,7 @@ unite_lists_with_same_head()
 
 
 bool
-alias_classes( string module_name )
+alias_classes( const char* module_name )
 {
     entity module;
     list module_alias_lists;

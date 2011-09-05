@@ -88,7 +88,7 @@ static bool is_expression_omp_parallel_p (expression exp) {
 
 static if_clause_policy get_if_clause_policy (void) {
   if_clause_policy result = IGNORE_IF_POLICY;
-  string prop = get_string_property ("OMP_IF_MERGE_POLICY");
+  const char* prop = get_string_property ("OMP_IF_MERGE_POLICY");
   if (strcmp (prop, "ignore") == 0) {
     result = IGNORE_IF_POLICY;
   }
@@ -507,13 +507,12 @@ pragma_to_string (pragma p) {
  *  @param  s, the pragma string.
  *  @param  copy_flag, to be set to true to duplicate the string
  */
-void add_pragma_str_to_statement(statement st, string s, bool copy_flag) {
-
+void add_pragma_str_to_statement(statement st, const char* s, bool copy_flag) {
   /* Duplicate string if requested */
-  if (copy_flag ) s=strdup(s);
+  string ps = copy_flag ? strdup(s) : (char*)s /* dangerous !*/;
 
   /* Make a new pragma */
-  pragma p = make_pragma_string(s);
+  pragma p = make_pragma_string(ps);
 
   /* Will be save as an extension attached to
    * the statement's extension list

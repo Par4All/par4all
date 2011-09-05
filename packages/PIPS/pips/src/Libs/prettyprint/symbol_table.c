@@ -624,7 +624,7 @@ string get_symbol_table(entity m, bool isfortran)
   return result2;
 }
 
-void actual_symbol_table_dump(string module_name, bool isfortran)
+void actual_symbol_table_dump(const char* module_name, bool isfortran)
 {
   FILE *out;
   string ppt;
@@ -663,7 +663,7 @@ void actual_symbol_table_dump(string module_name, bool isfortran)
 
 }
 
-bool c_symbol_table(string module_name)
+bool c_symbol_table(const char* module_name)
 {
   set_prettyprint_language_tag(is_language_c);
   //all the way down to words_basic()
@@ -671,7 +671,7 @@ bool c_symbol_table(string module_name)
   return true;
 }
 
-bool fortran_symbol_table(string module_name)
+bool fortran_symbol_table(const char* module_name)
 {
   actual_symbol_table_dump(module_name, true);
   return true;

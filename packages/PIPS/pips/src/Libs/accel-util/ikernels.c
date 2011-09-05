@@ -88,27 +88,27 @@ static expression makeTransfertSizeExpression( entity e ) {
  * converts a region_to_dma_switch to corresponding dma name
  * according to properties
  */
-static string get_dma_name(enum region_to_dma_switch m, int d) {
+static const char* get_dma_name(enum region_to_dma_switch m, int d) {
   char *seeds[] = { "KERNEL_LOAD_STORE_LOAD_FUNCTION",
                     "KERNEL_LOAD_STORE_STORE_FUNCTION",
                     "KERNEL_LOAD_STORE_ALLOCATE_FUNCTION",
                     "KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION" };
-  char * propname = seeds[(int)m];
+  const char * propname = seeds[(int)m];
   /* If the DMA is not scalar, the DMA function name is in the property
    of the form KERNEL_LOAD_STORE_LOAD/STORE_FUNCTION_dD: */
+  char * apropname=NULL;
   if(d > 0 && (int)m < 2)
-    asprintf(&propname, "%s_%dD", seeds[(int)m], (int)d);
-  string dmaname = get_string_property(propname);
-  asprintf(&dmaname, "%s", dmaname);
-  if(d > 0 && (int)m < 2)
-    free(propname);
+    asprintf(&apropname, "%s_%dD", seeds[(int)m], (int)d);
+  const char* dmaname = get_string_property(propname);
+  if(apropname)
+    free(apropname);
   pips_debug(6,"Get dma name : %s\n",dmaname);
   return dmaname;
 }
 
 static statement make_dma_transfert(entity e, enum region_to_dma_switch dma) {
 
-  string function_name = get_dma_name(dma, 0);
+  const char* function_name = get_dma_name(dma, 0);
   entity mcpy = module_name_to_entity(function_name);
   if(entity_undefined_p(mcpy)) {
     mcpy
@@ -305,7 +305,7 @@ static bool array_must_fully_written_by_regions_p( entity e_used, list lreg) {
  */
 static set interprocedural_mapping(string res, call c) {
   entity callee = call_function(c);
-  string func_name = entity_local_name(callee);
+  const char* func_name = entity_local_name(callee);
   memory_mapping mem_map = (memory_mapping)db_get_memory_resource(res,
                                                                   func_name,
                                                                   true);
@@ -361,7 +361,7 @@ static set interprocedural_mapping(string res, call c) {
 
 
 
-bool is_a_kernel(string func_name) {
+bool is_a_kernel(const char* func_name) {
   callees kernels = (callees)db_get_memory_resource(DBR_KERNELS, "", true);
   bool found = false;
   FOREACH(STRING,kernel_name,callees_callees(kernels)) {
@@ -507,7 +507,7 @@ static void copy_from_forloop(statement st, forloop l) {
 
 static void copy_from_call(statement st, call c) {
   entity callee = call_function(c);
-  string func_name = entity_local_name(callee);
+  const char* func_name = entity_local_name(callee);
 
   /* The initial in */
   set copy_from_in = COPY_FROM_IN( st );
@@ -763,7 +763,7 @@ static void copy_to_forloop(statement st, forloop l) {
 }
 static void copy_to_call(statement st, call c) {
   entity callee = call_function(c);
-  string func_name = entity_local_name(callee);
+  const char* func_name = entity_local_name(callee);
 
   /* The initial */
   set copy_to_in = COPY_TO_IN( st );
@@ -1435,7 +1435,7 @@ static void wrap_argument(syntax s) {
 
 }
 
-static void wrap_call_argument(call c, string module_name) {
+static void wrap_call_argument(call c, const char* module_name) {
   if(!call_intrinsic_p(c)
       && same_string_p(module_local_name(call_function(c)),module_name)) {
 
@@ -1463,7 +1463,7 @@ bool wrap_kernel_argument(char * module_name) {
                                                     true);
 
   // Get the wrapper function
-  string function_name = get_string_property("WRAP_KERNEL_ARGUMENT_FUNCTION_NAME");
+  const char* function_name = get_string_property("WRAP_KERNEL_ARGUMENT_FUNCTION_NAME");
   wrapper_function = module_name_to_entity(function_name);
   if(entity_undefined_p(wrapper_function)) {
     wrapper_function

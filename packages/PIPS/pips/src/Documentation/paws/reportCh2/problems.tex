@@ -1,0 +1,69 @@
+\section{Encountered Problems}
+\label{encountered_problems}
+
+PaWS implementation process encountered several problems and bugs:
+
+\begin{itemize}
+
+\item {\bf Perserving the consistency between output of Tpips and Pyps
+    computations}
+  
+  At the beginning operations over prepared examples were performed
+  with Tpips script, while user provided code was handled by
+  Pyps. Also supplied example after user modification were analyze or
+  transformed with Pyps. That was causing a lack of consistency in the
+  output - Pyps in the basic level is working with the default values,
+  while in the Tpips script other settings can be used as well. Also
+  the style of the output pproduced by the Tpips and Pyps is slightly
+  different. To provide completely consistent output all operation in
+  the tools mode, for basic and for advanced levels, are performed by
+  Pyps. Tpips is used in the demonstration mode, which needs script with a
+  set of well-defined operations, wnot modifiable by a user.
+  
+  \item {\bf Validation of the Pyps code}
+  
+    PIPS and Pyps are constantly in the development process. That can
+    cause that the Pyps code used for the PaWS operations might
+    require changes according to the Pyps changes. To minimize
+    problems resulting from this, such as getting a wrong output or
+    being unable to perform operations, all of the Pyps code used in
+    PaWS is moved to the \emph{validation} directory, where it can
+    undergo validation process and be easily changed if it is needed.
+  
+  \item {\bf Updating PIPS automatically}
+  
+    This problem is related to the previous one - PIPS framework,
+    which is still changing, has to be updated frequently, to let the
+    users try the newest version of it. With automatic update, there
+    might be a problem when the current version of PIPS contains bugs or
+    is even broken. To avoid such situation, PIPS updates are controlled
+    manually.
+  
+  \item {\bf Provide concurrent access}
+  
+    The Pylons framework creates a new thread for each user request. This
+    might cause problems with Pyps, which requires a new process. Pyrops
+    (see Section \ref{other_technologies}) module, which separates
+    Pyps workspaces, was the solution of this problem. Pyrops is also
+    under development (it is build in Pyps).
+  %% bug with sharing workspaces?
+  
+  \item {\bf Overloading server}
+  
+    Too many user requests might overload the server. Problem has not
+    been solved for the time being.
+  
+  \item {\bf Points to the documentation}
+  
+    User should have information about the PIPS properties and
+    analyses which might be used in the advanced level of the tools
+    mode. The best option to provide it is to link them to the proper
+    sections in the PIPS online documentation
+    (\url{http://cri.ensmp.fr/pips/pipsmake-rc.htdoc/}). The problem
+    is to extract the exact addresses of the sections, whereas they
+    are generated randomly and changed during the documentation
+    compilation. Currently information about the PIPS settings
+    (properties, analyses and phases) is provided by the PaWS
+    description files.
+
+\end{itemize}

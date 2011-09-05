@@ -272,35 +272,6 @@ statement MakeGotoStatement(string label)
   return gts;
 }
 
-/* The labels in C have function scope... but beware of
-   inlining... and conflict with user labels */
-
-/* To disambiguate labels, in case inlining is performed later and to
-   suppress the potential for conflicts with user labels.
-
-   Temporary entities have to be generated to be replaced later by the
-   final labels. The temporary entities should be eliminated from the
-   symbol table...
- */
-string get_label_prefix()
-{
-  //    string s = get_current_module_name();
-  //string ns = s;
-  //char * p;
-  //if((p = strchr(s, '!'))!=NULL) {
-  ///* memory leak only for static functions */
-  //ns = strdup(s);
-  //p = strchr(ns, '!');
-  //*p = '_';
-  //}
-
-  string ns = "-"; // a character that cannot be used in a correct
-		   // label name; tobe substituted by _ or __ or ___
-		   // depending on conflicts
-
-  return ns;
-}
-
 entity MakeCLabel(string s)
 {
   string ename = strdup(concatenate(LABEL_PREFIX,s,NULL));

@@ -140,10 +140,10 @@ static void insert_mapping(oper_id_mapping* item)
     operator_id_tree_id(t) = item->id;
 }
 
-static int do_get_operator_id(string ename)
+static int do_get_operator_id(const char* ename)
 {
     operator_id_tree t = mappings;
-    for(char *s = ename; *s != 0; s++)
+    for(const char *s = ename; *s != 0; s++)
     {
         operator_id_tree next;
         intptr_t c = *s;
@@ -160,7 +160,7 @@ static int do_get_operator_id(string ename)
 
 int get_operator_id(entity e)
 {
-    string ename = entity_local_name(e);
+    const char* ename = entity_local_name(e);
     int res = do_get_operator_id(ename);
     if(res == UNKNOWN_TOK )
     {

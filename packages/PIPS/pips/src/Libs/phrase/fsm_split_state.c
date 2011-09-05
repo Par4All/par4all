@@ -51,7 +51,7 @@
  * Phase main
  *********************************************************/
 
-bool fsm_split_state(string module_name)
+bool fsm_split_state(const char* module_name)
 {
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 

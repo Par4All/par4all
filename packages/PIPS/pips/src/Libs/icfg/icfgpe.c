@@ -53,7 +53,7 @@
 
 list /* of effect */ effects_filter(list l_effs)
 {
-  entity e_flt = global_name_to_entity("MAIN", "KMAX");
+  entity e_flt = FindEntity("MAIN", "KMAX");
   if (!entity_undefined_p(e_flt)) {
     list l_flt = NIL;
     MAPL(l, {
@@ -69,7 +69,7 @@ list /* of effect */ effects_filter(list l_effs)
     return l_effs;
 }
 
-text get_text_proper_effects_flt(string module_name)
+text get_text_proper_effects_flt(const char* module_name)
 {
   text r = make_text(NIL);
   entity module;

@@ -354,7 +354,7 @@ static list coarse_grain_loop_parallelization(statement module_stat)
     @param module_name is the name of the module to parallelize
     @return true in case of success. Indeed, return alway true. :-)
  */
-static bool coarse_grain_parallelization_main(string module_name,
+static bool coarse_grain_parallelization_main(const char* module_name,
                                        bool use_reductions_p)
 {
     statement module_stat;
@@ -448,7 +448,7 @@ static bool coarse_grain_parallelization_main(string module_name,
     @param module_name is the name of the module to parallelize
     @return true in case of success. Indeed, return always true. :-)
  */
-bool coarse_grain_parallelization(string module_name) {
+bool coarse_grain_parallelization(const char* module_name) {
   /* Do not use reductions: */
   return coarse_grain_parallelization_main(module_name, false);
 }
@@ -463,7 +463,7 @@ bool coarse_grain_parallelization(string module_name) {
     @param module_name is the name of the module to parallelize
     @return true in case of success. Indeed, return always true. :-)
  */
-bool coarse_grain_parallelization_with_reduction(string module_name) {
+bool coarse_grain_parallelization_with_reduction(const char* module_name) {
   /* Use reductions: */
   return coarse_grain_parallelization_main(module_name, true);
 }

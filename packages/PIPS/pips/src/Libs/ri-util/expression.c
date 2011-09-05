@@ -976,7 +976,7 @@ dimension dim;
     bool res = false;
 
     if (syntax_call_p(dim_synt)) {
-	string dim_nom = entity_local_name(call_function(syntax_call(dim_synt)));
+	const char* dim_nom = entity_local_name(call_function(syntax_call(dim_synt)));
 
 	if (same_string_p(dim_nom, UNBOUNDED_DIMENSION_NAME))
 	    res = true;
@@ -2437,7 +2437,7 @@ static bool  davinci_dump_expression_rc(
     FILE * out, expression e, hash_table seen)
 {
   syntax s;
-  string name, shape, color;
+  const char* name, *shape, *color;
   list sons = NIL;
   bool first = true, something = true;
 
@@ -3268,7 +3268,8 @@ entity string_to_entity(const char * s,entity module)
     if(empty_string_p(s)) return entity_undefined;
 
     /* try float conversion */
-    string endptr,module_name=module_local_name(module);
+    string endptr;
+    const char *module_name=module_local_name(module);
     long int l = strtol(s,&endptr,10);
     if(!*endptr) return int_to_entity(l);
     float f = strtof(s,&endptr);

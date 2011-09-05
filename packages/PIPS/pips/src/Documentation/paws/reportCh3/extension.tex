@@ -1,0 +1,102 @@
+\section{How to Configure PaWS}
+
+Extending the PaWS framework is very easy and intuitive. In all cases
+it is sufficient to create a new directory, add a description file or
+invoke a simple script. All the details are described in this section.
+
+\subsection{How to Add a New Analysis or Transformation}
+\label{add_analysis_transformation}
+
+Adding a new pass, a PIPS analysis or transformation, is handled by a
+script, which simplifies the whole process. It is possible, thanks to
+the generic approach and the supplied templates, to create dynamically
+each WEB page.
+
+The Shell script \emph{add\_tool} creates all necessary files for both modes,
+such as controller, basic and advanced mako templates, skeleton of the
+file with PyPS code, described below, and validation subdirectory with the
+description file and empty lists with properties, analyses and phases
+for advanced mode. These must be filled in by the configurer.
+
+The configurer needs to provide four of five arguments to the script:
+
+\begin{itemize}
+
+  \item {\bf the name of the tool} which will be used as ID of the operation;
+
+  \item {\bf the header of the page} which will be displayed at the
+    top of the web page; if it is longer than one word, it should be
+    surrounded by parentheses;
+
+  \item {\bf the description of the tool} which will be placed in the
+    description file and visible on the introduction page; if it is
+    longer than one word, it should be surrounded by parentheses;
+
+  \item {\bf PyPS print code module} to print the code of the
+    operation. Script will create sample code in the directory of PyPS
+    modules (\emph{validation/Paws/pyps\_modules}) and test for
+    validation. If the code should be different than default, shown in
+    Listing~\ref{DefaultPyps}, it has to be updated manually;
+
+  \item {\bf the directory containing the existing examples} -
+    optional. They will be copied into the validation directory
+    (\emph{validation/Paws/tools/$<$operation\_id$>$}); if this
+    argument is not provided, directory
+    \emph{validation/Paws/tools/$<$operation\_id$>$} is created but it
+    remains empty.
+  
+\lstset{language=Python,caption={Default PyPS Code},label=DefaultPyps}
+\begin{lstlisting}
+def invoke_function(function, workspace):
+	return function._get_code(activate = module.<print_code_module>)
+\end{lstlisting}
+  
+\end{itemize}
+
+The Shell script \emph{add\_tool} is placed in
+\emph{paws\_app$\backslash$utils} directory. It is a bash script. See
+Listing~\ref{AddToolUsage} for an invocation example.
+
+\lstset{language=bash,caption={Usage of \emph{add\_tool} script},label=AddToolUsage}
+  \begin{lstlisting}
+. add_tool <name> <header> <description> <examples_dir> <pyps_module>
+  \end{lstlisting}
+
+\subsection{How to Add a New Demonstration}
+\label{add_demonstration}
+
+The addition of a new demonstration is also handled by a Shell script. The
+user needs to provide only two arguments:
+
+\begin{itemize}
+
+\item {\bf the source file} is the example file on which the TPIPS
+  script, which should have the same base name and be placed in the same
+  directory, will perform operations;
+
+\item {\bf a description of the case} which will be placed in the
+  description file and visible on the introduction page; if it is
+  longer than one word, it should be surrounded by parentheses.
+
+\end{itemize}
+
+The script \emph{add\_demo} is placed in direcotry
+\emph{paws\_app$\backslash$utils}. It is a bash script. The
+Listing~\ref{AddDemoUsage} provides an invocation example.
+
+\lstset{language=bash,caption={Usage of \emph{add\_demo} script},label=AddDemoUsage}
+  \begin{lstlisting}
+. add_demo <source_file> <description>
+  \end{lstlisting}
+
+\subsection{How to Add a New Example}
+\label{add_example}
+
+Adding new example for an existing tool is very easy. It is sufficient
+to place the new example file in the adequate subdirectory of the
+tools validation directory,
+\emph{validation/Paws/tools}. Subdirectories are described in the
+Section~\ref{other_modules}. Added example will be automatically
+visible on the WEB page of the tool it refers to when the user browses
+the tool examples.
+

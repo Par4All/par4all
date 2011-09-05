@@ -72,8 +72,8 @@ typedef dg_vertex_label vertex_label;
  * Create new variable parameter for a newly created module
  */
 entity create_parameter_for_new_module (variable var,
-					string parameter_name,
-					string module_name,
+					const char* parameter_name,
+					const char* module_name,
 					entity module,
 					int param_nb)
 {
@@ -123,8 +123,8 @@ entity create_parameter_for_new_module (variable var,
 /**
  * Create new integer variable parameter for a newly created module
  */
-entity create_integer_parameter_for_new_module (string parameter_name,
-						string module_name,
+entity create_integer_parameter_for_new_module (const char* parameter_name,
+						const char* module_name,
 						entity module,
 						int param_nb)
 {
@@ -140,7 +140,7 @@ entity create_integer_parameter_for_new_module (string parameter_name,
  * Store (PIPDBM) newly created module module with module_statement
  * as USER_FILE by saving pretty printing
  */
-void store_new_module (string module_name,
+void store_new_module (const char* module_name,
 		       entity module,
 		       statement module_statement)
 {
@@ -274,7 +274,7 @@ void declare_common_variables_in_module (entity common, entity module)
        create a new variable mapping the one declared in common */
 
     entity new_variable; 
-    string name = entity_local_name(v);
+    const char* name = entity_local_name(v);
     int v_offset = ram_offset(storage_ram(entity_storage(v)));
    
     /* Creates the name for the new variable */
@@ -431,14 +431,14 @@ string get_receive_parameter_module_name (variable var)
 /**
  * Return entity named name in specified module
  */
-entity entity_in_module (string name, entity module)
+entity entity_in_module (const char* name, entity module)
 {
   /* Is it the main module ? */
   if (strchr(entity_local_name(module),'%') != NULL) {
-    return global_name_to_entity(entity_local_name(module)+1,name);
+    return FindEntity(entity_local_name(module)+1,name);
   }
   else {
-    return global_name_to_entity(entity_local_name(module),name);
+    return FindEntity(entity_local_name(module),name);
   }
 
 }
@@ -462,7 +462,7 @@ make_global_common_and_initialize (entity main_module,
   sequence new_sequence;
   int i;
   list l_in, l_out;
-  string function_name;
+  const char* function_name;
   int id_function, id_param;
   entity units_nb_variable;
   entity functions_nb_variable;
@@ -617,7 +617,7 @@ static statement controlize_distribution (statement module_stat,
 {
   statement returned_statement = module_stat;
   list l_calls;
-  string function_name;
+  const char* function_name;
 
   entity start_ru_module;
   entity wait_ru_module;
@@ -1036,7 +1036,7 @@ static statement controlize_distribution (statement module_stat,
 
 static entity dynamic_area = entity_undefined;
 
-bool phrase_distributor_control_code(string module_name)
+bool phrase_distributor_control_code(const char* module_name)
 {
   statement module_stat;
   entity module;

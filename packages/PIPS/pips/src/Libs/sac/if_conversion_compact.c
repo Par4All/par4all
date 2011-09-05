@@ -68,7 +68,7 @@ statement_phi_function_p(statement s)
         expression rhs = binary_call_rhs(statement_call(s));
         if(expression_call_p(rhs))
         {
-            string phi_name = get_string_property("IF_CONVERSION_PHI");
+            const char* phi_name = get_string_property("IF_CONVERSION_PHI");
             entity phi = entity_intrinsic(phi_name);
             return same_entity_p(phi,call_function(expression_call(rhs)));
         }

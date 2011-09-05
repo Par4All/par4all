@@ -856,7 +856,7 @@ static list words_common_variable(entity e)
 
 static void insert_common_declaration(entity ent,entity sec)
 {
-  string mod_name = entity_module_name(ent);
+  const char* mod_name = entity_module_name(ent);
   entity mod = local_name_to_top_level_entity(mod_name);
   list entities = common_members_of_module(sec,mod,true);
   ifdebug(3)
@@ -866,7 +866,7 @@ static void insert_common_declaration(entity ent,entity sec)
     }
   if (!ENDP(entities))
     {
-      string area_name = module_local_name(sec);
+      const char* area_name = module_local_name(sec);
       bool comma = false;
       fprintf(out2,"      COMMON ");
       if (strcmp(area_name, BLANK_COMMON_LOCAL_NAME) != 0) 
@@ -910,7 +910,7 @@ static void initialize_and_verify_common_variable(entity ent, region reg)
   {
     if (entities_may_conflict_p(ent,other))
       {
-	string mod_name = entity_module_name(other);
+	const char* mod_name = entity_module_name(other);
 	entity mod = local_name_to_top_level_entity(mod_name);
 	if (entity_blockdata_p(mod))
 	  {
@@ -953,7 +953,7 @@ static void initialize_and_verify_common_variable(entity ent, region reg)
 	     INITIALIZATION_COMMONNAME the common, type, parameter declaration + common variable 
 	     initializations */	
 	  entity sec = ram_section(storage_ram(entity_storage(ent)));	
-	  string area_name = module_local_name(sec);
+	  const char* area_name = module_local_name(sec);
 	  ifdebug(1)
 	    fprintf(stderr,"\nCommon variable %s not in main module scope\n",entity_name(ent)); 
 	  if (!entity_in_list_p(sec,l_initialized_commons)) 
@@ -1040,7 +1040,7 @@ static void initialize_and_verify_local_variable(entity ent,region reg)
     }
 }
  
-bool used_before_set(char *module_name)
+bool used_before_set(const char* module_name)
 { 
   list l_in_regions = NIL;
   ubs module_ubs; 

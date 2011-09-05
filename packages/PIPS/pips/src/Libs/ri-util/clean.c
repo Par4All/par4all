@@ -36,7 +36,7 @@
 
 
 static entity current_function = entity_undefined;
-static char *current_function_local_name = NULL;
+static const char *current_function_local_name = NULL;
 
 
 static void set_current_function(function)

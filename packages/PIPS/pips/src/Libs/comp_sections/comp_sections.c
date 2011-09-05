@@ -28,7 +28,7 @@
 #include "all.h"
 /*}}}*/
 
-bool summary_complementary_sections(char *module_name)
+bool summary_complementary_sections(const char* module_name)
 {
     /*comp_global_regions(module_name);*/
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_COMPSEC,
@@ -37,13 +37,13 @@ bool summary_complementary_sections(char *module_name)
     return(true);
 }
 
-bool complementary_sections(char *module_name)
+bool complementary_sections(const char* module_name)
 {
     comp_regions(module_name);
     return(true);
 }
 
-bool print_code_complementary_sections(char *module_name)
+bool print_code_complementary_sections(const char* module_name)
 {
     print_code_comp_regions(module_name);
     return(true);

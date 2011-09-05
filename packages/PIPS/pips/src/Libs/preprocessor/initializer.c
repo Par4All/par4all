@@ -358,10 +358,10 @@ static text compilation_unit_text(entity cu, entity module)
    if compilation_unit_name is set to string_undefined, a new compilation unit is generated, but not in fortran, where compilation unit do not exist!
 */
 bool
-add_new_module_from_text(string module_name,
+add_new_module_from_text(const char* module_name,
 			 text code_text,
 			 bool is_fortran,
-			 string compilation_unit_name) {
+			 const char* compilation_unit_name) {
     pips_assert("fortran module have no compilation unit\n",!is_fortran || (is_fortran && string_undefined_p(compilation_unit_name)));
     bool success_p = true;
     entity m = local_name_to_top_level_entity(module_name);
@@ -487,7 +487,7 @@ add_new_module_from_text(string module_name,
    There is still some redundancy with module_name, module and stat
 */
 bool
-add_new_module(string module_name,
+add_new_module(const char* module_name,
 	       entity module,
 	       statement stat,
 	       bool is_fortran/*,
@@ -505,7 +505,7 @@ add_new_module(string module_name,
 
 /* Generate a source file for a module, if none available.
  */
-static bool missing_file_initializer(string module_name, bool is_fortran)
+static bool missing_file_initializer(const char* module_name, bool is_fortran)
 {
   entity m = local_name_to_top_level_entity(module_name);
   text stub = text_undefined;
@@ -537,7 +537,7 @@ static bool missing_file_initializer(string module_name, bool is_fortran)
 /*
  *
  */
-static bool module_in_user_file_p(string module, bool is_fortran) {
+static bool module_in_user_file_p(const char* module, bool is_fortran) {
   string res= is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
   return db_resource_p(res, module);
 }
@@ -550,7 +550,7 @@ void set_internal_missing_module_resolver_handler(string(* _internal_resolver)(c
 
 /*
  */
-static bool retrieve_a_missing_file_using_internal_resolver(string module,
+static bool retrieve_a_missing_file_using_internal_resolver(const char* module,
                                                             bool is_fortran) {
   bool module_found = false;
 
@@ -582,12 +582,12 @@ static bool retrieve_a_missing_file_using_internal_resolver(string module,
 }
 /*
 */
-static bool retrieve_a_missing_file_using_external_resolver(string module,
+static bool retrieve_a_missing_file_using_external_resolver(const char* module,
                                                             bool is_fortran) {
   bool module_found = false;
 
   // User gave the resolver command in a property
-  string missing_file_generator =
+  const char* missing_file_generator =
       get_string_property("PREPROCESSOR_MISSING_FILE_GENERATOR");
 
   // Full generator cmdline : append requested module name
@@ -648,7 +648,7 @@ static bool retrieve_a_missing_file_using_external_resolver(string module,
 
 /* Generate a new module by asking some files to the user. Can also
    generate a stub if replied as so by the user. */
-static bool ask_a_missing_file(string module, bool is_fortran) {
+static bool ask_a_missing_file(const char* module, bool is_fortran) {
   string file = 0;
   bool request_the_module = true;
   bool module_found = false;
@@ -715,9 +715,9 @@ static bool ask_a_missing_file(string module, bool is_fortran) {
  * - an external command can be run to retrieve the file containing the module
  * - an internal command can be run instead, it has to be registered first
  */
-bool generic_initializer(string module_name, bool is_fortran) {
+bool generic_initializer(const char* module_name, bool is_fortran) {
   bool success_p = false;
-  string missing = get_string_property("PREPROCESSOR_MISSING_FILE_HANDLING");
+  const char* missing = get_string_property("PREPROCESSOR_MISSING_FILE_HANDLING");
 
   if(same_string_p(missing, "error")) {
     pips_user_error("no source file for %s (might be an ENTRY point)\n"
@@ -753,7 +753,7 @@ bool generic_initializer(string module_name, bool is_fortran) {
 
 /* Create a module with its related file resources when there is no
    Fortran source for it. */
-bool fortran_initializer(string module_name)
+bool fortran_initializer(const char* module_name)
 {
   return generic_initializer(module_name, true);
 }
@@ -761,7 +761,7 @@ bool fortran_initializer(string module_name)
 
 /* A phase that creates a module with its related file resources when
    there is no Fortran source for it. */
-bool initializer(string module_name)
+bool initializer(const char* module_name)
 {
   bool res = false;
 
@@ -775,7 +775,7 @@ bool initializer(string module_name)
 
 /* A phase that creates a module with its related file resources when
    there is no C source for it. */
-bool c_initializer(string module_name)
+bool c_initializer(const char* module_name)
 {
   bool res = false;
 

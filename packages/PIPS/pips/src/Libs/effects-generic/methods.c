@@ -82,8 +82,8 @@ bool get_constant_paths_p()
 bool (*effect_consistent_p_func)(effect);
 
 /* initialisation and finalization */
-void (*effects_computation_init_func)(string /* module_name */);
-void (*effects_computation_reset_func)(string /* module_name */);
+void (*effects_computation_init_func)(const char* /* module_name */);
+void (*effects_computation_reset_func)(const char* /* module_name */);
 
 /* dup and free - This should be handled by newgen, but there is a problem
  * with the persistency of references - I do not understand what happens. */
@@ -180,35 +180,35 @@ void (*effects_descriptor_normalize_func)(list /* of effects */);
 
 /* getting/putting resources from/to pipsdbm */
 
-statement_effects (*db_get_proper_rw_effects_func)(char *);
-void (*db_put_proper_rw_effects_func)(char *, statement_effects);
+statement_effects (*db_get_proper_rw_effects_func)(const char *);
+void (*db_put_proper_rw_effects_func)(const char *, statement_effects);
 
-statement_effects (*db_get_invariant_rw_effects_func)(char *);
-void (*db_put_invariant_rw_effects_func)(char *, statement_effects);
+statement_effects (*db_get_invariant_rw_effects_func)(const char *);
+void (*db_put_invariant_rw_effects_func)(const char *, statement_effects);
 
-statement_effects (*db_get_rw_effects_func)(char *);
-void (*db_put_rw_effects_func)(char *, statement_effects);
+statement_effects (*db_get_rw_effects_func)(const char *);
+void (*db_put_rw_effects_func)(const char *, statement_effects);
 
-list (*db_get_summary_rw_effects_func)(char *);
-void (*db_put_summary_rw_effects_func)(char *, list);
+list (*db_get_summary_rw_effects_func)(const char *);
+void (*db_put_summary_rw_effects_func)(const char *, list);
 
-statement_effects (*db_get_in_effects_func)(char *);
-void (*db_put_in_effects_func)(char *, statement_effects);
+statement_effects (*db_get_in_effects_func)(const char *);
+void (*db_put_in_effects_func)(const char *, statement_effects);
 
-statement_effects (*db_get_cumulated_in_effects_func)(char *);
-void (*db_put_cumulated_in_effects_func)(char *, statement_effects);
+statement_effects (*db_get_cumulated_in_effects_func)(const char *);
+void (*db_put_cumulated_in_effects_func)(const char *, statement_effects);
 
-statement_effects (*db_get_invariant_in_effects_func)(char *);
-void (*db_put_invariant_in_effects_func)(char *, statement_effects);
+statement_effects (*db_get_invariant_in_effects_func)(const char *);
+void (*db_put_invariant_in_effects_func)(const char *, statement_effects);
 
-list (*db_get_summary_in_effects_func)(char *);
-void (*db_put_summary_in_effects_func)(char *, list);
+list (*db_get_summary_in_effects_func)(const char *);
+void (*db_put_summary_in_effects_func)(const char *, list);
 
-list (*db_get_summary_out_effects_func)(char *);
-void (*db_put_summary_out_effects_func)(char *, list);
+list (*db_get_summary_out_effects_func)(const char *);
+void (*db_put_summary_out_effects_func)(const char *, list);
 
-statement_effects  (*db_get_out_effects_func)(char *);
-void (*db_put_out_effects_func)(char *, statement_effects);
+statement_effects  (*db_get_out_effects_func)(const char *);
+void (*db_put_out_effects_func)(const char *, statement_effects);
 
 
 /* prettyprint function for debug */

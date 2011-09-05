@@ -128,7 +128,7 @@ summary_out_effects_stmt_filter(statement s)
 static list 
 out_effects_from_caller_to_callee(entity caller, entity callee)
 {
-    char *caller_name;
+    const char *caller_name;
     statement caller_statement;
 
     reset_current_module_entity();
@@ -164,7 +164,7 @@ out_effects_from_caller_to_callee(entity caller, entity callee)
 
 
 
-/* bool summary_out_effects_engine(char *module_name) 
+/* bool summary_out_effects_engine(const char* module_name) 
  * input    : the name of the current module.
  * output   : the list of summary out effects
  * modifies : nothing.
@@ -172,7 +172,7 @@ out_effects_from_caller_to_callee(entity caller, entity callee)
  *            out effects at all its call sites.	
  */
 bool
-summary_out_effects_engine(char *module_name)
+summary_out_effects_engine(const char* module_name)
 {   
 
     list l_eff = NIL;
@@ -779,7 +779,7 @@ out_effects_of_module_statement(statement module_stat)
 }
 
 
-/* bool out_effects_engine(char *module_name): 
+/* bool out_effects_engine(const char* module_name): 
  * input    : the name of the current module.
  * requires : that transformers and precondition maps be set if needed.
  *            (it depends on the chosen instanciation of *load_context_func
@@ -789,7 +789,7 @@ out_effects_of_module_statement(statement module_stat)
  * comment  : computes the out effects of the current module.	
  */
 bool
-out_effects_engine(char *module_name)
+out_effects_engine(const char* module_name)
 {
 
     statement module_stat;

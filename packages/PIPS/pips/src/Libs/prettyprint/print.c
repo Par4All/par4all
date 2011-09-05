@@ -57,9 +57,9 @@
  * texte structure. currently it looks like a massive memory leak.
  */
 bool make_text_resource(
-    string mod_name, /* module name */
-    string res_name, /* resource name [DBR_...] */
-    string file_ext, /* file extension */
+    const char* mod_name, /* module name */
+    const char* res_name, /* resource name [DBR_...] */
+    const char* file_ext, /* file extension */
     text texte       /* text to be printed as this resource */)
 {
     string filename, localfilename, dir;
@@ -84,9 +84,9 @@ bool make_text_resource(
 }
 
 bool make_text_resource_and_free(
-    string mod_name,
-    string res_name,
-    string file_ext,
+    const char* mod_name,
+    const char* res_name,
+    const char* file_ext,
     text t)
 {
     bool ok = make_text_resource(mod_name, res_name, file_ext, t);
@@ -204,8 +204,8 @@ bool print_code_or_source(string mod_name) {
 /* Build a textual resource for a parallel code using a string optional
    parallel style (dialect such as "f90", "doall", "hpf", "omp" */
 static bool print_parallelized_code_common(
-    string mod_name,
-    string style)
+    const char* mod_name,
+    const char* style)
 {
     bool success = false;
     text r = make_text(NIL);
@@ -300,7 +300,7 @@ bool print_parallelized77_code(string mod_name)
     return print_parallelized_code_common(mod_name, "doall");
 }
 
-bool print_parallelizedHPF_code(string module_name)
+bool print_parallelizedHPF_code(const char* module_name)
 {
     return print_parallelized_code_common(module_name, "hpf");
 }

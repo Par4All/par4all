@@ -94,15 +94,15 @@ void array_privatization_error_handler()
 
 static void private_regions_of_module_statement(statement module_stat);
 static void private_regions_of_module_loops(statement module_stat);
-static bool privatizer(char *module_name);
+static bool privatizer(const char* module_name);
 
-/* void array_privatizer(char *module_name) 
+/* void array_privatizer(const char* module_name) 
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
-bool array_privatizer(char *module_name)
+bool array_privatizer(const char* module_name)
 {
     store_as_regions = false;
     store_as_loop_locals = true;
@@ -113,13 +113,13 @@ bool array_privatizer(char *module_name)
 }
 
 
-/* void array_section_privatizer(char *module_name) 
+/* void array_section_privatizer(const char* module_name) 
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
-bool array_section_privatizer(char *module_name)
+bool array_section_privatizer(const char* module_name)
 {
     store_as_regions = true;
     store_as_loop_locals = true;
@@ -129,13 +129,13 @@ bool array_section_privatizer(char *module_name)
     return( privatizer(module_name) );    
 }
 
-/* void privatizer(char *module_name) 
+/* void privatizer(const char* module_name) 
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
-static bool privatizer(char *module_name)
+static bool privatizer(const char* module_name)
 {
     entity module;
     statement module_stat;
@@ -640,7 +640,7 @@ loop l;
 /*************************** PRETTYPRINT OF PRIVATIZED AND COPY-OUT REGIONS */
 
 bool
-print_code_privatized_regions(string module_name)
+print_code_privatized_regions(const char* module_name)
 {
     bool ok, blks_tmp, priv_tmp, scal_tmp;
 

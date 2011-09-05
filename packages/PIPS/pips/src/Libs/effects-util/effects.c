@@ -265,7 +265,7 @@ bool anywhere_effect_p(effect e)
 
 effect heap_effect(entity m, action ac)
 {
-  entity heap = global_name_to_entity(entity_local_name(m), HEAP_AREA_LOCAL_NAME );
+  entity heap = FindEntity(entity_local_name(m), HEAP_AREA_LOCAL_NAME );
   effect any = effect_undefined;
 
   if(entity_undefined_p(heap)) {

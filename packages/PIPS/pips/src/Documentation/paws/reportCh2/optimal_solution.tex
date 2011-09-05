@@ -1,0 +1,88 @@
+\section{Selection of the Optimal Architectural Solution}
+
+The selection of the optimal architectural solution and libraries used
+to create the framework is not an easy task. Constraints imposed on
+the PaWS framework (see Section \ref{design_contraints}) require
+design and implementation of a WEB application. It can be done with various
+programming languages and libraries.
+
+\subsubsection{Language Selection}
+
+One group of languages used in bigger development projects are Java,
+C++ and C\#. Using them requires program compilation and creation of
+binary files. Also the programming process requires more programming
+work and it is not efficient. What is more, C\# is dedicated to the
+Microsoft Windows operation system which disqualifies its use (see
+Design Contraints Section \ref{design_contraints}).
+
+The second group of possible languages are scripting languages like
+Perl, Python, Ruby and PHP. Perl is an obsolete language, but all of
+them are popular as a languages for WEB application design. They are
+constantly developed, stay upward-compatible, have a lively community
+of developpers, rich documentation, libraries and support. That
+explains their popularity.
+
+\subsubsection{WEB Support}
+
+There are three aproaches to create a WEB application using scripting
+languages. The first of them is based on CGI\cite{cgi} - Common
+Gateway Interface. This technology enables communication between the WEB
+server software and and other programs located on the server. The main
+disadvantage of this approach is that CGI usually requires the
+creation a new process for each request. This is not scalable, it is
+not possible to use the same context and global variables for several
+requests, and it can cause server load over very quickly. What is more,
+CGI does not provide session mechanisms and the Ajax library is not
+built-in.
+
+The second possibility is to use template engines like Cheetah
+\cite{cheetah} or Jinja2 \cite{jinja2}. The problem is that this
+solution is too lightweight - it supports only code generation and not
+provides other useful mechanisms such as routing, session variable
+handling etc.
+
+The third approach is the most popular approach. It is based on the
+Model-View-Controller design pattern (described in Section
+\ref{mvc}). This paradigm supports reusability, separation of layers
+of the application, is lightweight but easy to extend and takes care
+of persistent storage if it is needed. There are a lot of framework
+using the MVC pattern like Pylons \cite{pylons}, Django \cite{django}
+and Turbogears \cite{turbogears} in Python, Ruby on Rails
+\cite{rubyonrails} in Ruby and Symfony \cite{symfony}, CakePHP
+\cite{cakephp} and Yii \cite{yii} in PHP.
+
+\subsubsection{WEB Frameworks}
+
+PHP frameworks are more heavyweight and harder to learn than Python
+and Ruby ones. The most popular PHP web framework - Symphony also has
+problems with compatibility between its versions which makes difficult
+to use its support.
+
+Ruby on Rails is a very good framework, but has less support than
+Python frameworks, because Ruby is a younger language than
+Python. Also Ruby frameworks have performance problems.
+
+The use of Python tools has also other advantages. The main one is the
+availability of a Python binding in PIPS framework - PyPS, which can
+be use to dynamically perform PIPS operations instead of creating
+Tpips (see Section \ref{tpips_interface}) scripts on-the-fly. The
+selection of Python enables using PyPS in an easy way, by importing it as
+a Python module, but also does not exclude usage of Tpips.
+
+Three Python WEB frameworks were taken into consideration: Pylons,
+Django and Turbogears. The last one was rejected because of stability
+problems\footnote{TurboGears is based on CherryPy \cite{cherrypy}
+  unstable server.}. Despite the fact that Django is more popular than
+Pylons, the second one was chosen due to greater flexibility. Pylons
+can be extended with any component the user needs, while Django has a
+set of its own preferred components. A good example of this problem is
+the usage of ORM (Object-relational mapping\cite{orm}). Django does
+not allow to use all the available toolkits, like the most popular
+one - SQLAlchemy\cite{sqlalchemy}.
+
+Choosing the Pylons tool and its approach to architecture and
+structure of the application paid off very quickly - after less than
+seven days of work, the first prototype of the application was ready
+and able to communicate with PIPS.
+%% Very significant fact is that PaWS is not the first CRI project based on Pylons and I could count on strong support from more experienced developers.
+

@@ -161,19 +161,17 @@ bool entity_null_locations_p(entity e)
 entity entity_all_module_locations(entity m)
 {
   entity anywhere = entity_undefined;
-  string mn = entity_local_name(m);
-  string any_name = strdup(concatenate(mn,
-				       MODULE_SEP_STRING,
-				       ANYWHERE_LOCATION,
-				       NULL));
+  const char* mn = entity_local_name(m);
 
-  anywhere = gen_find_tabulated(any_name, entity_domain);
+  anywhere = FindEntity(mn,ANYWHERE_LOCATION);
   if(entity_undefined_p(anywhere)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
     /* FI: any_name? */
-    anywhere = make_entity(any_name /*ALL_MEMORY_ENTITY_NAME*/,
-			   t, make_storage_rom(), make_value_unknown());
+    anywhere = CreateEntity(mn,ANYWHERE_LOCATION);
+    entity_type(anywhere)=t;
+    entity_storage(anywhere)=make_storage_rom();
+    entity_initial(anywhere)=make_value_unknown();
   }
 
   return anywhere;
@@ -213,7 +211,7 @@ entity entity_all_module_xxx_locations(entity m, string xxx)
   return dynamic;
 }
 
-entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
+entity entity_all_module_xxx_locations_typed(const char* mn, const char* xxx, type t)
 {
   entity e = entity_undefined;
   int count = 0;
@@ -222,15 +220,13 @@ entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
   pips_assert("Type t is defined", !type_undefined_p(t));
 
   for(count = 0; !found_p; count++) {
-    string name = string_undefined;
-    type ot = type_undefined;
 
-    asprintf(&name, "%s%s%s%s%d",
-	     mn,
-	     MODULE_SEP_STRING,
-	     xxx,
-	     "_b", count);
-    e = find_or_create_entity(name);
+    type ot = type_undefined;
+    char * local_name;
+
+    asprintf(&local_name, "%s_b%d", xxx,count);
+    e = FindOrCreateEntity(mn,local_name);
+    free(local_name);
     ot = entity_type(e);
     if(type_undefined_p(ot)) {
       /* A new entity has been created */
@@ -276,13 +272,8 @@ bool entity_all_module_xxx_locations_p(entity e, string xxx)
 entity entity_all_xxx_locations(string xxx)
 {
   entity dynamic = entity_undefined;
-  string any_name = strdup(concatenate(ANY_MODULE_NAME,
-				       MODULE_SEP_STRING,
-				       xxx,
-				       //ANYWHERE_LOCATION,
-				       NULL));
-  dynamic = find_or_create_entity(any_name);
-  //dynamic = gen_find_tabulated(any_name, entity_domain);
+  dynamic = FindOrCreateEntity(ANY_MODULE_NAME,xxx);
+
   if(type_undefined_p(entity_type(dynamic))) {
     //area a = make_area(0,NIL); /* Size and layout are unknown */
     //type t = make_type_area(a);
@@ -307,12 +298,9 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
     string name = string_undefined;
     type ot = type_undefined;
 
-    asprintf(&name, "%s%s%s%s%d",
-	     ANY_MODULE_NAME,
-	     MODULE_SEP_STRING,
-	     xxx,
-	     "_b", count);
-    e = find_or_create_entity(name);
+    asprintf(&name, "%s_b%d",xxx,count);
+    e = FindOrCreateEntity(ANY_MODULE_NAME, name);
+    free(name);
     ot = entity_type(e);
     if(type_undefined_p(ot)) {
       /* A new entity has been created */
@@ -466,7 +454,7 @@ bool entity_all_dynamic_locations_p(entity e)
 bool entity_abstract_location_p(entity al)
 {
   bool abstract_p = false;
-  string mn = entity_module_name(al);
+  const char* mn = entity_module_name(al);
 
   if(strcmp(mn, ANY_MODULE_NAME)==0) {
     /* FI: this may change in the future and may not be a strong
@@ -474,7 +462,7 @@ bool entity_abstract_location_p(entity al)
     abstract_p = true;
   }
   else {
-    string ln = entity_local_name(al);
+    const char* ln = entity_local_name(al);
     string found = strstr(ln, ANYWHERE_LOCATION);
     abstract_p = (found!=NULL);
     if(!abstract_p) {
@@ -563,7 +551,7 @@ entity variable_to_abstract_location(entity v)
 	pips_internal_error("unexpected area");
 
       if(typed_p) {
-	string fn = entity_local_name(f);
+	const char* fn = entity_local_name(f);
 	al = entity_all_module_xxx_locations_typed(fn, ln, uvt);
       }
       else
@@ -607,12 +595,12 @@ entity abstract_locations_max(entity al1, entity al2)
     e = al1;
   else
     {
-      string ln1 = entity_local_name(al1);
-      string ln2 = entity_local_name(al2);
-      string mn1 = strdup(entity_module_name(al1));
-      string mn2 = strdup(entity_module_name(al2));
-      string ln;
-      string mn;
+      const char* ln1 = entity_local_name(al1);
+      const char* ln2 = entity_local_name(al2);
+      char* mn1 = strdup(entity_module_name(al1));
+      char* mn2 = strdup(entity_module_name(al2));
+      const char* ln;
+      const char* mn;
 
       if(!get_bool_property("ALIASING_ACROSS_TYPES")) {
 	//pips_internal_error("Option not implemented yet.");
@@ -630,8 +618,6 @@ entity abstract_locations_max(entity al1, entity al2)
       else
 	mn = ANY_MODULE_NAME;
       e = FindOrCreateEntity(mn, ln);
-      free(mn1);
-      free(mn2);
     }
   return e;
 }
@@ -641,8 +627,6 @@ entity abstract_locations_max(entity al1, entity al2)
 entity entity_locations_max(entity al1, entity al2)
 {
   entity e = entity_undefined;
-  string mn1 = strdup(entity_module_name(al1));
-  string mn2 = strdup(entity_module_name(al2));
   //string ln1 = entity_local_name(al1);
   //string ln2 = entity_local_name(al2);
 
@@ -678,8 +662,8 @@ entity entity_locations_max(entity al1, entity al2)
 	  entity f2 = ram_function(r2);
 	  entity a1 = ram_section(r1);
 	  entity a2 = ram_section(r2);
-	  string mn = string_undefined;
-	  string ln = string_undefined;
+	  const char* mn ;
+	  const char* ln ;
 
 	  if(f1==f2)
 	    mn = entity_local_name(f1);
@@ -702,8 +686,6 @@ entity entity_locations_max(entity al1, entity al2)
 	  pips_internal_error("not implemented");
       }
   }
-  free(mn1);
-  free(mn2);
   return e;
 }
 

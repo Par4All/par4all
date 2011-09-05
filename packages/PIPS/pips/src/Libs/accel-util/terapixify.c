@@ -413,11 +413,11 @@ void normalize_microcode_anotate() {
     FOREACH(entity,fa, module_formal_parameters(get_current_module_entity())) {
         if(entity_pointer_p(fa)) {
             const char* fa_name = entity_user_name(fa);
-            entity caller_faname = FindEntity(caller,fa_name);
+            entity caller_faname = FindEntityFromUserName(caller,fa_name);
             if(entity_undefined_p(caller_faname)){
                 string tmp=strdup(fa_name);
                 tmp[strlen(tmp)-1]=0;
-                caller_faname = FindEntity(caller,tmp);
+                caller_faname = FindEntityFromUserName(caller,tmp);
                 free(tmp);
             }
             pips_assert("parameter found",!entity_undefined_p(caller_faname));
@@ -459,7 +459,7 @@ static void terapix_optimize_accumulator(statement st) {
         }
         /* finally, rename this entity as the accumulator P */
 #define TERAPIX_ACC "P"
-        entity P = FindEntity(get_current_module_name(),TERAPIX_ACC);
+        entity P = FindEntityFromUserName(get_current_module_name(),TERAPIX_ACC);
         if(entity_undefined_p(P)) {
             P=make_scalar_entity(TERAPIX_ACC,get_current_module_name(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
             AddEntityToCurrentModule(P);
@@ -981,7 +981,7 @@ end:
 }
 
 bool
-generate_two_addresses_code(char *module_name)
+generate_two_addresses_code(const char* module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));

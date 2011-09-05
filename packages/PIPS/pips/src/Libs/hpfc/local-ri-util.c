@@ -52,7 +52,7 @@ static string fortran_library[] =
 bool fortran_library_entity_p(e)
 entity e;
 {
-    string *s, name=entity_local_name(e);
+    string *s; const char* name=entity_local_name(e);
 
     if (!top_level_entity_p(e)) return(false);
     for (s=fortran_library; *s!=(string) NULL; s++)

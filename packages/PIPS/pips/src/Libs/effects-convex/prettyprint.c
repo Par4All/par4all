@@ -246,7 +246,7 @@ text text_private_array_regions(list l)
  */
 static text 
 get_text_regions_for_module(
-    string module_name, 
+    const char* module_name, 
     string resource_name,
     string ifread,
     string ifwrite)
@@ -265,21 +265,21 @@ get_text_regions_for_module(
 }
 
 text 
-get_text_regions(string module_name)
+get_text_regions(const char* module_name)
 {
     return get_text_regions_for_module
 	(module_name, DBR_SUMMARY_REGIONS, ACTION_READ, ACTION_WRITE);
 }
 
 text 
-get_text_in_regions(string module_name)
+get_text_in_regions(const char* module_name)
 {
     return get_text_regions_for_module
 	(module_name, DBR_IN_SUMMARY_REGIONS, ACTION_IN, ACTION_OUT);
 }
 
 text 
-get_text_out_regions(string module_name)
+get_text_out_regions(const char* module_name)
 {
     return get_text_regions_for_module
 	(module_name, DBR_OUT_SUMMARY_REGIONS, ACTION_IN, ACTION_OUT);
@@ -356,7 +356,7 @@ void print_regions(list l) { print_rw_regions(l);}
  *
  * like this:
  *
- * string module_name;
+ * const char* module_name;
  * entity module;
  * ...
  * (set up call to module_to_value_mappings as indicated in its comments)
