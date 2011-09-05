@@ -137,7 +137,7 @@ static void add_counters(entity module, statement root)
 
 /* instrument a module with control structure counters for test & loops
  */
-bool add_control_counters(string module_name)
+bool add_control_counters(const char* module_name)
 {
   // get resources from database
   entity module = module_name_to_entity(module_name);

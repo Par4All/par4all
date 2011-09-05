@@ -48,7 +48,7 @@
  * (the prefix of which is HPF_PREFIX, as a convention)
  * both functions are available, based on the name and on the entity.
  */
-bool hpf_directive_string_p(string s)
+bool hpf_directive_string_p(const char* s)
 {
     return strncmp(HPF_PREFIX, s, strlen(HPF_PREFIX))==0;
 }
@@ -77,7 +77,7 @@ bool dead_fcd_directive_p(entity f)
 	same_string_p(HPF_PREFIX DEAD_SUFFIX, entity_local_name(f));
 }
 
-bool fcd_directive_string_p(string s)
+bool fcd_directive_string_p(const char* s)
 {
     return same_string_p(s, HPF_PREFIX SYNCHRO_SUFFIX) ||
 	   same_string_p(s, HPF_PREFIX TIMEON_SUFFIX) ||
@@ -98,7 +98,7 @@ bool fcd_directive_p(entity f)
  * and the directive will be kept in the callee list.
  * not kept if some property tells not to...
  */
-bool keep_directive_in_code_p(string s)
+bool keep_directive_in_code_p(const char* s)
 {
     return fcd_directive_string_p(s) &&
 	!(same_string_p(s, HPF_PREFIX SYNCHRO_SUFFIX) && 

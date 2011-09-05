@@ -76,14 +76,14 @@ list CompRegionsMayUnion(list l1, list l2, bool __attribute__ ((unused)) (*union
 
 /* {{{  intra procedural entry point "complementary_sections" calls comp_regions*/
 /* {{{  comments*/
-/* bool regions(char *module_name) 
+/* bool regions(const char* module_name) 
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
 /* }}} */
-bool comp_regions(char *module_name)
+bool comp_regions(const char* module_name)
 {
   /* {{{  code*/
   /* {{{  initialize*/
@@ -510,7 +510,7 @@ list comp_regions_of_call(call c, transformer context, list *plpropreg)
     list le = NIL;
     entity e = call_function(c);
     tag t = value_tag(entity_initial(e));
-    string n = module_local_name(e);
+    const char* n = module_local_name(e);
     list pc = call_arguments(c);
 
     *plpropreg = NIL;

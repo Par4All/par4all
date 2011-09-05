@@ -304,7 +304,7 @@ clean_shared_io_system(
      */
     MAP(ENTITY, e,
      {
-	 string s = entity_module_name(e);
+	 const char* s = entity_module_name(e);
 
 	 if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
 	     keep = CONS(ENTITY, e, keep);
@@ -423,7 +423,7 @@ clean_distributed_io_system(
      */
     MAP(ENTITY, e,
     {
-	string s = entity_module_name(e);
+	const char* s = entity_module_name(e);
 	
 	if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
 	    keep = CONS(ENTITY, e, keep);

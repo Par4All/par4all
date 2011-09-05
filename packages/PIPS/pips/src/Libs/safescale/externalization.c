@@ -458,7 +458,7 @@ static entity create_private_variable_for_new_module(entity a_variable, string n
   { 
     new_variable = make_entity(strdup(concatenate(new_module_name, MODULE_SEP_STRING, new_name, NULL)), copy_type(entity_type(a_variable)), storage_undefined, copy_value(entity_initial(a_variable)));
 
-    a = global_name_to_entity(new_module_name, DYNAMIC_AREA_LOCAL_NAME); 
+    a = FindEntity(new_module_name, DYNAMIC_AREA_LOCAL_NAME); 
     base = variable_basic(type_variable(entity_type(a_variable)));
     entity_storage(new_variable) = make_storage(is_storage_ram, make_ram(module, a, (basic_tag(base) != is_basic_overloaded) ? (add_variable_to_area(a, new_variable)):(0), NIL));
 
@@ -768,7 +768,7 @@ static void distribute(statement module_stat, entity module)
  */
 static entity dynamic_area = entity_undefined;
 
-bool safescale_distributor(string module_name)
+bool safescale_distributor(const char* module_name)
 {
   statement module_stat;
   entity module;

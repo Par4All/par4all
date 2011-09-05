@@ -476,7 +476,7 @@ entity hpfc_main_entity(entity e)
 
 /* returns the name of the entity e belongs too (common, function...)
  */
-string hpfc_main_entity_name(entity e)
+const char* hpfc_main_entity_name(entity e)
 {
     return(module_local_name(hpfc_main_entity(e)));
 }

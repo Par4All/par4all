@@ -255,7 +255,7 @@ void do_loop_expansion(statement st, expression size,bool center,bool apply_guar
 }
 
 
-bool loop_expansion(const string module_name)
+bool loop_expansion(const const char* module_name)
 {
     set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));
@@ -289,7 +289,7 @@ bool loop_expansion(const string module_name)
     gen_free_list(statements_to_clean);
     gen_free_list(statements_to_merge);
 
-    string lp_label=get_string_property_or_ask(
+    const char* lp_label=get_string_property_or_ask(
             "LOOP_LABEL",
             "Which loop do you want to expand?\n(give its label):"
     );
@@ -301,7 +301,7 @@ bool loop_expansion(const string module_name)
             statement loop_statement = find_loop_from_label(get_current_module_statement(),lb_entity);
             if(!statement_undefined_p(loop_statement))
             {
-                string srate = get_string_property("LOOP_EXPANSION_SIZE");
+                const char* srate = get_string_property("LOOP_EXPANSION_SIZE");
                 expression rate = string_to_expression(srate,get_current_module_entity());
                 /* ok for the ui part, let's do something !*/
                 do_loop_expansion(loop_statement,rate,get_bool_property("LOOP_EXPANSION_CENTER"),apply_guard);
@@ -385,7 +385,7 @@ void do_loop_expansion_init(statement st, expression size)
                         )
                 );
         free_clone_context(cc);
-        add_pragma_str_to_statement(inserted_statement,get_string_property("STATEMENT_INSERTION_PRAGMA"),true);
+        add_pragma_str_to_statement(inserted_statement,(char*)get_string_property("STATEMENT_INSERTION_PRAGMA"),true);
         insert_statement(st,inserted_statement,false);
     }
     else
@@ -403,7 +403,7 @@ bool loop_expansion_init(const char* module_name)
     debug_on("LOOP_EXPANSION_INIT_DEBUG_LEVEL");
 
 
-    string lp_label=get_string_property_or_ask(
+    const char* lp_label=get_string_property_or_ask(
             "LOOP_LABEL",
             "Which loop do you want to expand?\n(give its label):"
     );
@@ -416,7 +416,7 @@ bool loop_expansion_init(const char* module_name)
             statement loop_statement = find_loop_from_label(get_current_module_statement(),lb_entity);
             if(!statement_undefined_p(loop_statement))
             {
-                string srate = get_string_property("LOOP_EXPANSION_SIZE");
+                const char* srate = get_string_property("LOOP_EXPANSION_SIZE");
                 expression rate =string_to_expression(srate,get_current_module_entity());
                 /* ok for the ui part, let's do something !*/
                 do_loop_expansion_init(loop_statement,rate);

@@ -1,0 +1,121 @@
+\documentclass{book}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb} 
+\usepackage{listings}
+\usepackage[english]{babel}
+%%\usepackage[OT4]{fontenc}
+\usepackage{color} % allows to use font color 
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage[bookmarks=true,pdfborder={0,0,0}]{hyperref}
+\emergencystretch=11pt
+\renewcommand\lstlistingname{Listing}%
+\renewcommand\baselinestretch{1.2}
+\newcommand{\texttthyp}[1]{\texttt{\hyphenchar\font45\relax #1}}
+
+%%
+%%
+\makeindex 
+
+%%\bibliographystyle{ddabbrv}
+%\nocite{*}
+
+%%
+%%
+%% ======== METRYCZKA PRACY ========
+\title{Development of a WEB Interface for PIPS Compilation Framework}
+\author{Maria Szymczak}
+
+\begin{document}
+%%\nralbumu{203781}
+%%\promotor{Laurent Daverio, Francois Irigoin}
+%%\uczelniaNazwa{MINES ParisTech}
+%%\uczelniaImienia{}
+%%\wydzial{Centre de Recherche en Informatique}
+%%\kierunek{Informatique}
+%%\specjalnosc{}
+%%\specjalnoscdwa{}
+%%\rok{2011}
+%%\numerRaportu{A/471/CRI}
+%%\disclaimer{}
+
+\definecolor{darkgreen}{rgb}{0,0.45,0.08} 
+\definecolor{darkgray}{rgb}{0.95,0.95,0.95}
+\definecolor{violet}{rgb}{0.5,0,0.33}
+\lstset{language=Python}
+\lstset{basicstyle=\footnotesize}
+\lstset{backgroundcolor=\color{darkgray}}
+\lstset{numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=6pt}
+\lstset{linewidth=\textwidth, showstringspaces=false}
+\lstset{frame=tblr}
+\lstset{keywordstyle=\color{violet}\bfseries}
+\lstset{commentstyle=\color{darkgreen}}
+
+\maketitle
+%%
+
+%%
+%%
+%% ======== NASZE MAKRA ========
+%%
+\input{reportDef}
+%%
+%% ======== SPIS TREŚCI ========
+%%
+\tableofcontents
+%%
+%% ======== STRESZCZENIE PRACY (POLSKIE) ========
+%% \begin{streszczenie}
+%%
+%% \input{report}
+%%
+%% \end{streszczenie}
+%%
+
+%%
+%% ======== GŁÓWNA CZĘŚĆ PRACY ========
+%%
+%% ==== WSTĘP ====
+%%
+
+\input{reportIntro}
+
+%% ==== Rozdziały ====
+
+\input{reportCh1/reportCh1}
+
+\input{reportCh2/reportCh2}
+
+\input{reportCh3/reportCh3}
+
+\input{reportCh4/reportCh4}
+
+\input{reportEnd}
+
+%%\begin{ilustracje}
+%%\listoffigures
+%%\end{ilustracje}
+
+%%\begin{listingi}
+
+%%\end{listingi}
+
+%%\begin{skroty}
+
+%%\end{skroty}
+
+
+
+
+
+%% ======== BIBLIOGRAFIA ========
+%%
+\input{reportLit}
+%%
+%% ======== DODATKOWE ELEMENTY (nieobowiązkowe) ======== 
+%%
+%\printindex  
+%%
+
+\end{document}
+

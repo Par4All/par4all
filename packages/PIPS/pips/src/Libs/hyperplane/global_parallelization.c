@@ -48,7 +48,7 @@
 
 static bool always_select() { return true;}
 void global_parallelization(module_name)
-string module_name;
+const char* module_name;
 {
     entity module = local_name_to_top_level_entity(module_name);
     statement s;
@@ -70,7 +70,7 @@ string module_name;
 }
 
 bool
-loop_hyperplane(string module_name)
+loop_hyperplane(const char* module_name)
 {
     bool return_status = false;
 

@@ -139,7 +139,7 @@ void gpu_promote_sequential_on_statement(statement s) {
   gen_recurse(s,loop_domain,gpu_promote_sequential_walker_in,gen_null);
 }
 
-bool gpu_promote_sequential(string module_name) {
+bool gpu_promote_sequential(const char* module_name) {
   statement module_stat = (statement)db_get_memory_resource(DBR_CODE,
                                                             module_name,
                                                             true);

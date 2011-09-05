@@ -71,7 +71,7 @@ void model_fscan(FILE * fd, int * ppn, int * pbn, int * pls)
 void get_model(int * ppn, int * pbn, int * pls)
 {
     FILE * fd;
-    string model_rc = get_string_property("WP65_MODEL_FILE");
+    const char* model_rc = get_string_property("WP65_MODEL_FILE");
     if ((fd = fopen(model_rc, "r")) == NULL) {
 	fd = fopen_config(model_rc, NULL,NULL);
     }

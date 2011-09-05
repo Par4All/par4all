@@ -87,7 +87,7 @@ bool integer_constant_name_p(string name)
     return strlen(name)==strspn(name, INTEGER_CONSTANT_NAME_CHARS);
 }
 
-_int TK_CHARCON_to__int(string name)
+_int TK_CHARCON_to__int(const char* name)
 {
   _int r;
 
@@ -147,7 +147,7 @@ basic is the basic type of the constant: int, float, ...
 Character constants are typed as int.
 */
 
- entity make_C_or_Fortran_constant_entity(string name,
+ entity make_C_or_Fortran_constant_entity(const char* name,
 					  tag bt,
 					  size_t size,
 					  bool is_fortran)
@@ -341,8 +341,8 @@ entity MakeComplexConstant(expression r, expression i)
     entity re = call_function(syntax_call(expression_syntax(r)));
     entity ie = call_function(syntax_call(expression_syntax(i)));
     entity e;
-    char * name = strdup(concatenate("(",entity_local_name(re), ",",
-				     entity_local_name(ie),")", NULL));
+    char * name;
+    asprintf(&name,"(%s,%s)", entity_local_name(re),  entity_local_name(ie));
     type rt = entity_type(re);
     type it = entity_type(ie);
     type ert = functional_result(type_functional(rt));
@@ -384,7 +384,7 @@ bool complex_constant_expression_p(expression cce)
   bool is_complex_constant_p = false;
   if(expression_call_p(cce)) {
     entity f = call_function(syntax_call(expression_syntax(cce)));
-    string fn = entity_local_name(f);
+    const char* fn = entity_local_name(f);
 
     is_complex_constant_p = (strcmp(fn, IMPLIED_COMPLEX_NAME)==0
 			     || strcmp(fn, IMPLIED_DCOMPLEX_NAME)==0);

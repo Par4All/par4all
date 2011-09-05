@@ -88,7 +88,7 @@ static void module_summary_continuation_conditions(statement mod_stat);
 /* INTERFACE                                                                     */
 /*********************************************************************************/
 
-bool continuation_conditions(char *module_name)
+bool continuation_conditions(const char* module_name)
 {
 
     /* Get the code of the module. */

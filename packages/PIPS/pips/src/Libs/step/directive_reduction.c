@@ -84,7 +84,7 @@ clause step_check_reduction(entity module, string directive_txt)
       item=strtok(list_," ,");
       while (item != NULL && nb_item<=nb_comma)
 	{
-	  entity e=global_name_to_entity(entity_local_name(module), step_upperise(item));
+	  entity e=FindEntity(entity_local_name(module), step_upperise(item));
 	  if (entity_undefined_p (e)) 
 	    {
 	      msg_err="unknow variable";

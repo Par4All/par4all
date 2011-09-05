@@ -484,7 +484,7 @@ global_effect_translation(
     {
 	entity ent = ENTITY(CAR(l_com_ent));
 	target_func = module_name_to_entity(
-	    module_name(entity_name(ent)));
+	    entity_module_name(ent));
 	ifdebug(5)
 	{
 	    pips_debug(5, "common not declared in caller,\n"

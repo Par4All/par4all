@@ -255,13 +255,13 @@ PopBlock()
 
 entity 
 MakeLabel(s)
-string s;
+const char* s;
 {
     entity l;
     static char *name = NULL ;
 
     if( name == NULL ) {
-	name = (char *)malloc( LABEL_SIZE+strlen(LABEL_PREFIX)+1 ) ;
+	name = (char *)malloc( LABEL_SIZE+sizeof(LABEL_PREFIX) ) ;
     }
     debug(5, "MakeLabel", "\"%s\"\n", s);
 
@@ -1690,7 +1690,7 @@ int token;
 statement 
 make_check_io_statement(string n, expression u, entity l)
 {
-    entity a = global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, n);
+    entity a = FindEntity(IO_EFFECTS_PACKAGE_NAME, n);
     reference r = make_reference(a, CONS(EXPRESSION, u, NIL));
     expression c = reference_to_expression(r);
     statement b = instruction_to_statement(make_goto_instruction(l));

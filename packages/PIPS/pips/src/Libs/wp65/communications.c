@@ -493,7 +493,7 @@ array_scalar_access_to_compute_communication(
 				     make_integer_constant_expression(bn-1),
 				     make_integer_constant_expression(1));
 	statement loopbody = make_block_statement(ccode);
-	entity looplabel = make_loop_label(9000, entity_local_name(compute_module));
+	entity looplabel = make_loop_label(9000, compute_module);
 	   
 	loop newloop = make_loop(ent1, 
 				 looprange,
@@ -565,7 +565,7 @@ list array_scalar_access_to_bank_communication(entity memory_module,Pbase  bank_
 				     make_integer_constant_expression(bn-1),
 				     make_integer_constant_expression(1));
 	statement loopbody = make_block_statement(icode);
-	entity looplabel = make_loop_label(9000, entity_local_name(memory_module));
+	entity looplabel = make_loop_label(9000, memory_module);
 	
 	loop newloop = make_loop(ent1,looprange, loopbody, looplabel, 
 				 make_execution(is_execution_parallel,UU), NIL);

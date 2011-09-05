@@ -50,7 +50,7 @@
 /*
  * This function prints out a graph that contains callees only
  */
-static bool print_any_icfg(string module_name, int decor_type)
+static bool print_any_icfg(const char* module_name, int decor_type)
 {
   set_bool_property(ICFG_IFs, false);
   set_bool_property(ICFG_DOs, false);
@@ -61,7 +61,7 @@ static bool print_any_icfg(string module_name, int decor_type)
 /*
  * This function prints out a graph that contains DO's
  */
-static bool print_any_icfg_with_loops(string module_name, int decor_type)
+static bool print_any_icfg_with_loops(const char* module_name, int decor_type)
 {
   set_bool_property(ICFG_DOs, true);
   set_bool_property(ICFG_IFs, false);
@@ -72,7 +72,7 @@ static bool print_any_icfg_with_loops(string module_name, int decor_type)
 /*
  * This function prints out a graph that contains both IF's and DO's
  */
-static bool print_any_icfg_with_control(string module_name, int decor_type)
+static bool print_any_icfg_with_control(const char* module_name, int decor_type)
 {
   set_bool_property(ICFG_IFs, true);
   set_bool_property(ICFG_DOs, true);
@@ -84,7 +84,7 @@ static bool print_any_icfg_with_control(string module_name, int decor_type)
 bool prettyprint_fortran_icfg_p = true;
 bool prettyprint_C_icfg_p = false;
 
-bool generic_print_icfg(string module_name)
+bool generic_print_icfg(const char* module_name)
 {
   entity mod = local_name_to_top_level_entity(module_name);
 
@@ -110,7 +110,7 @@ bool generic_print_icfg(string module_name)
  * or even no properties at all?
  */
 bool parametrized_print_icfg(
-    string module_name,
+    const char* module_name,
     bool print_ifs,
     bool print_dos,
     text (*deco)(string))
@@ -124,145 +124,145 @@ bool parametrized_print_icfg(
   return true;
 }
 
-bool print_icfg(string module_name)
+bool print_icfg(const char* module_name)
 {
   return print_any_icfg(module_name,ICFG_DECOR_NONE);
 }
 
-bool print_icfg_with_complexities(string module_name)
+bool print_icfg_with_complexities(const char* module_name)
 {
   return print_any_icfg(module_name,ICFG_DECOR_COMPLEXITIES);
 }
 
-bool print_icfg_with_preconditions(string module_name)
+bool print_icfg_with_preconditions(const char* module_name)
 {
   return print_any_icfg(module_name,ICFG_DECOR_PRECONDITIONS);
 }
 
-bool print_icfg_with_total_preconditions(string module_name)
+bool print_icfg_with_total_preconditions(const char* module_name)
 {
   return print_any_icfg(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
 }
 
-bool print_icfg_with_transformers(string module_name)
+bool print_icfg_with_transformers(const char* module_name)
 {
   return print_any_icfg(module_name,ICFG_DECOR_TRANSFORMERS);
 }
 
-bool print_icfg_with_proper_effects(string module_name)
+bool print_icfg_with_proper_effects(const char* module_name)
 {
   return print_any_icfg(module_name,ICFG_DECOR_PROPER_EFFECTS);
 }
 
-bool print_icfg_with_filtered_proper_effects(string module_name) 
+bool print_icfg_with_filtered_proper_effects(const char* module_name) 
 {
   return print_any_icfg(module_name, ICFG_DECOR_FILTERED_PROPER_EFFECTS);
 }
 
-bool print_dvicfg_with_filtered_proper_effects(string module_name)
+bool print_dvicfg_with_filtered_proper_effects(const char* module_name)
 {
   set_bool_property(ICFG_DV, true);
   return print_any_icfg(module_name, ICFG_DECOR_FILTERED_PROPER_EFFECTS);
 }
 
-bool print_icfg_with_cumulated_effects(string module_name)
+bool print_icfg_with_cumulated_effects(const char* module_name)
 {
   return print_any_icfg(module_name,ICFG_DECOR_CUMULATED_EFFECTS);
 }
 
-bool print_icfg_with_regions(string module_name)
+bool print_icfg_with_regions(const char* module_name)
 { return print_any_icfg(module_name,ICFG_DECOR_REGIONS);}
 
-bool print_icfg_with_in_regions(string module_name)
+bool print_icfg_with_in_regions(const char* module_name)
 { return print_any_icfg(module_name,ICFG_DECOR_IN_REGIONS);}
 
-bool print_icfg_with_out_regions(string module_name)
+bool print_icfg_with_out_regions(const char* module_name)
 { return print_any_icfg(module_name,ICFG_DECOR_OUT_REGIONS);}
 
 /*
  * ICFGs with loops
  */
 
-bool print_icfg_with_loops(string module_name)
+bool print_icfg_with_loops(const char* module_name)
 {
   return print_any_icfg_with_loops(module_name,ICFG_DECOR_NONE);
 }
 
-bool print_icfg_with_loops_complexities(string module_name)
+bool print_icfg_with_loops_complexities(const char* module_name)
 {
   return print_any_icfg_with_loops(module_name,ICFG_DECOR_COMPLEXITIES);
 }
 
-bool print_icfg_with_loops_preconditions(string module_name)
+bool print_icfg_with_loops_preconditions(const char* module_name)
 {
   return print_any_icfg_with_loops(module_name,ICFG_DECOR_PRECONDITIONS);
 }
 
-bool print_icfg_with_loops_total_preconditions(string module_name)
+bool print_icfg_with_loops_total_preconditions(const char* module_name)
 {
   return print_any_icfg_with_loops(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
 }
 
-bool print_icfg_with_loops_transformers(string module_name)
+bool print_icfg_with_loops_transformers(const char* module_name)
 {
  return print_any_icfg_with_loops(module_name,ICFG_DECOR_TRANSFORMERS);
 }
 
-bool print_icfg_with_loops_proper_effects(string module_name)
+bool print_icfg_with_loops_proper_effects(const char* module_name)
 {
   return print_any_icfg_with_loops(module_name,ICFG_DECOR_PROPER_EFFECTS);
 }
 
-bool print_icfg_with_loops_cumulated_effects(string module_name)
+bool print_icfg_with_loops_cumulated_effects(const char* module_name)
 { return print_any_icfg_with_loops(module_name,ICFG_DECOR_CUMULATED_EFFECTS);}
 
-bool print_icfg_with_loops_regions(string module_name)
+bool print_icfg_with_loops_regions(const char* module_name)
 { return print_any_icfg_with_loops(module_name,ICFG_DECOR_REGIONS);}
 
-bool print_icfg_with_loops_in_regions(string module_name)
+bool print_icfg_with_loops_in_regions(const char* module_name)
 { return print_any_icfg_with_loops(module_name,ICFG_DECOR_IN_REGIONS);}
 
-bool print_icfg_with_loops_out_regions(string module_name)
+bool print_icfg_with_loops_out_regions(const char* module_name)
 { return print_any_icfg_with_loops(module_name,ICFG_DECOR_OUT_REGIONS);}
 
 /*
  * ICFGs with controls
  */
 
-bool print_icfg_with_control(string module_name)
+bool print_icfg_with_control(const char* module_name)
 {
   return print_any_icfg_with_control(module_name,ICFG_DECOR_NONE);
 }
 
-bool print_icfg_with_control_complexities(string module_name)
+bool print_icfg_with_control_complexities(const char* module_name)
 {
   return print_any_icfg_with_control(module_name,ICFG_DECOR_COMPLEXITIES);
 }
 
-bool print_icfg_with_control_preconditions(string module_name)
+bool print_icfg_with_control_preconditions(const char* module_name)
 {
   return print_any_icfg_with_control(module_name,ICFG_DECOR_PRECONDITIONS);
 }
 
-bool print_icfg_with_control_total_preconditions(string module_name)
+bool print_icfg_with_control_total_preconditions(const char* module_name)
 {
   return print_any_icfg_with_control(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
 }
 
-bool print_icfg_with_control_transformers(string module_name)
+bool print_icfg_with_control_transformers(const char* module_name)
 { return print_any_icfg_with_control(module_name,ICFG_DECOR_TRANSFORMERS);}
 
-bool print_icfg_with_control_proper_effects(string module_name)
+bool print_icfg_with_control_proper_effects(const char* module_name)
 { return print_any_icfg_with_control(module_name,ICFG_DECOR_PROPER_EFFECTS);}
 
-bool print_icfg_with_control_cumulated_effects(string module_name)
+bool print_icfg_with_control_cumulated_effects(const char* module_name)
 { return print_any_icfg_with_control(module_name,ICFG_DECOR_CUMULATED_EFFECTS);}
 
-bool print_icfg_with_control_regions(string module_name)
+bool print_icfg_with_control_regions(const char* module_name)
 { return print_any_icfg_with_control(module_name,ICFG_DECOR_REGIONS);}
 
-bool print_icfg_with_control_in_regions(string module_name)
+bool print_icfg_with_control_in_regions(const char* module_name)
 { return print_any_icfg_with_control(module_name,ICFG_DECOR_IN_REGIONS);}
 
-bool print_icfg_with_control_out_regions(string module_name)
+bool print_icfg_with_control_out_regions(const char* module_name)
 { return print_any_icfg_with_control(module_name,ICFG_DECOR_OUT_REGIONS);}

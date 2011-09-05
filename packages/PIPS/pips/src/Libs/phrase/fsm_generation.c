@@ -100,7 +100,7 @@ typedef dg_vertex_label vertex_label;
  * Phase main
  *********************************************************/
 
-bool fsm_generation(string module_name)
+bool fsm_generation(const char* module_name)
 {
   entity state_variable = NULL;
 

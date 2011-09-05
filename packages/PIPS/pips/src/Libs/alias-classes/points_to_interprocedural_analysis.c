@@ -1,7 +1,8 @@
+#ifdef HAVE_CONFIG_H
+    #include "pips_config.h"
+#endif
 #include <stdlib.h>
 #include <stdio.h>
-/* For strdup: */
-#define _GNU_SOURCE
 #include <string.h>
 
 #include "genC.h"
@@ -105,9 +106,9 @@ points_to create_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basi
   entity e = reference_variable(r);
   formal f = storage_formal( entity_storage(e) );
   int off = formal_offset(f);
-  string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(pointer_index), NULL));
-  string formal_name = strdup(concatenate(get_current_module_name() /* POINTS_TO_MODULE_NAME */ ,MODULE_SEP_STRING, s, NULL));
-  entity formal_parameter = gen_find_entity(formal_name);
+  string local_name;
+  asprintf(&local_name,"_%s_%d",entity_user_name(e),pointer_index);
+  entity formal_parameter = FindEntity(get_current_module_name(),local_name);
   type pt = type_to_pointed_type(t);
   if(type_variable_p(pt))
     bb = variable_basic(type_variable(pt));
@@ -117,15 +118,17 @@ points_to create_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basi
 						  make_dimension(int_to_expression(0),ex),NIL),
 					     NIL));
   if(entity_undefined_p(formal_parameter)) {
-    formal_parameter = make_entity(formal_name,
-				   tt,
+    formal_parameter = CreateEntity(get_current_module_name(),local_name);
+    entity_type(formal_parameter)=tt;
+    entity_storage(formal_parameter)=
 				   make_storage_formal(
 						       make_formal(
 								    get_current_module_entity() 
 								   /* module_name_to_entity(POINTS_TO_MODULE_NAME) */,
-								  off /* pointer_index */)),
-				   make_value_unknown());
+								  off /* pointer_index */));
+    entity_initial(formal_parameter)=  make_value_unknown();
   }
+  free(local_name);
   /* expression ex_sink =  entity_to_expression(formal_parameter); */
   /* set_methods_for_proper_simple_effects(); */
   /* effect ef = effect_undefined; */

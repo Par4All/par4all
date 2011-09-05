@@ -85,7 +85,7 @@ static statement_mapping	Gsc_map;
  * Prettyprints a static_control mapping attached to a module_name.
  */
 bool print_code_static_control(module_name)
-string module_name;
+const char* module_name;
 {
     entity	module;
     statement	module_stat;

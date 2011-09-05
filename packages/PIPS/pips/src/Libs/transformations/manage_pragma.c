@@ -251,7 +251,7 @@ static void add_loop_parallel_threshold(pragma pr) {
 /**
    merge the pragma on the outer loop
 **/
-bool omp_merge_pragma (const string module_name) {
+bool omp_merge_pragma (const const char* module_name) {
   // Use this module name and this environment variable to set
   statement mod_stmt = PIPS_PHASE_PRELUDE(module_name,
    					  "OPMIFY_CODE_DEBUG_LEVEL");
@@ -267,7 +267,7 @@ bool omp_merge_pragma (const string module_name) {
   }
 
   // getting the properties to configure the phase
-  string merge_policy = get_string_property ("OMP_MERGE_POLICY");
+  const char* merge_policy = get_string_property ("OMP_MERGE_POLICY");
   bool outer = (strcmp (merge_policy, "outer") == 0);
 
 
@@ -302,7 +302,7 @@ bool omp_merge_pragma (const string module_name) {
   return true;
 }
 
-bool omp_loop_parallel_threshold_set (const string module_name) {
+bool omp_loop_parallel_threshold_set (const const char* module_name) {
   debug_on("OPMIFY_CODE_DEBUG_LEVEL");
   statement mod_stmt = statement_undefined;
   // Get the code and tell PIPS_DBM we do want to modify it

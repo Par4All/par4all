@@ -78,7 +78,7 @@ static entity create_module_with_statement (statement stat,
  * by searching comment matching tag 
  */
 string get_function_name_by_searching_tag(statement stat,
-					  string tag) 
+					  const char* tag) 
 {
   string comments;
   string searched_string;
@@ -582,8 +582,8 @@ static entity create_parameter_variable_for_new_module (entity a_variable,
  * Creates a private variable in specified module
  */
 entity create_private_variable_for_new_module (entity a_variable,
-					       string new_name, 
-					       string new_module_name,
+					       const char* new_name, 
+					       const char* new_module_name,
 					       entity module)
 {
   entity new_variable;
@@ -604,7 +604,7 @@ entity create_private_variable_for_new_module (entity a_variable,
 				  copy_type (entity_type(a_variable)),
 				  storage_undefined,
 				  copy_value (entity_initial(a_variable)));
-      a = global_name_to_entity(new_module_name, DYNAMIC_AREA_LOCAL_NAME); 
+      a = FindEntity(new_module_name, DYNAMIC_AREA_LOCAL_NAME); 
       base = variable_basic(type_variable(entity_type(a_variable)));
       entity_storage(new_variable) = 
 	make_storage(is_storage_ram,
@@ -763,7 +763,7 @@ static entity create_module_with_statement (statement stat,
  * Phase main for PHRASE_DISTRIBUTOR_INIT
  *********************************************************/
 
-bool phrase_distributor_init(string module_name)
+bool phrase_distributor_init(const char* module_name)
 {
   
   /* get the resources */
@@ -811,7 +811,7 @@ bool phrase_distributor_init(string module_name)
 
 static entity dynamic_area = entity_undefined;
 
-bool phrase_distributor(string module_name)
+bool phrase_distributor(const char* module_name)
 {
   statement module_stat;
   entity module;

@@ -198,7 +198,7 @@ static bool stmt_flt(statement s)
 
 /***************************************************************** INTERFACE */
 
-bool filter_proper_effects(string module_name)
+bool filter_proper_effects(const char* module_name)
 {
   debug_on("FILTER_PROPER_EFFECTS_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module_name);

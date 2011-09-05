@@ -280,8 +280,8 @@ static void move_declarations(entity new_fun, statement stat)
 #define ALL_DECLS  "PRETTYPRINT_ALL_DECLARATIONS"
 #define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
 
-void create_HRE_module(string new_module_name,
-		       string module_name,
+void create_HRE_module(const char* new_module_name,
+		       const char* module_name,
 		       statement stat, entity new_fun)
 {
   //printf("new HRE module\n");
@@ -292,7 +292,9 @@ void create_HRE_module(string new_module_name,
   set_current_module_entity(module_name_to_entity(module_name));
 
   entity cloned = get_current_module_entity();
-  string name = entity_local_name(cloned), new_name, comments;
+  const char* name = entity_local_name(cloned);
+  const char* new_name;
+  string comments;
   //entity new_fun;
   //statement stat;
   bool saved_b1, saved_b2;
@@ -348,18 +350,17 @@ void create_HRE_module(string new_module_name,
   DB_PUT_MEMORY_RESOURCE(DBR_USER_FILE, new_name, 
 			 strdup(db_get_memory_resource(DBR_USER_FILE, name, true)));
 
-  free(new_name);
 }
 
 /*static void
 create_HRE_modules(statement externalized_code,
 		  string new_module_name,
 		  list l_in, list l_out, list l_params, list l_priv,
-		  string module_name, int hreMemSize)
+		  const char* module_name, int hreMemSize)
 {
 }
 */
-static void comEngine_distribute_code (string module_name,
+static void comEngine_distribute_code (const char* module_name,
 				       string function_name,
 			               statement externalized_code, 
 			               list l_in,
@@ -465,7 +466,7 @@ printf("comEngine_distribute_code 5\n");
 
 }
 
-void comEngine_distribute (string module_name, 
+void comEngine_distribute (const char* module_name, 
 			   statement module_stat, 
 		           entity module) 
 {
@@ -507,7 +508,7 @@ void comEngine_distribute (string module_name,
   hash_table_free(ht_out_regions);
 }
 
-bool phrase_comEngine_distributor(string module_name)
+bool phrase_comEngine_distributor(const char* module_name)
 {
   statement module_stat;
   entity module;

@@ -278,7 +278,7 @@ bool loop_auto_unroll(const char* mod_name) {
     debug_on("SIMDIZER_DEBUG_LEVEL");
 
     /* do the job */
-    string slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
+    const char* slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
     entity elabel = find_label_entity(mod_name,slabel);
 
     if(entity_undefined_p(elabel)) {
@@ -408,7 +408,7 @@ bool simdizer_auto_tile(const char * module_name) {
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
     /* do the job */
-    string slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
+    const char* slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
     entity elabel = find_label_entity(module_name,slabel);
 
     if(entity_undefined_p(elabel)) {

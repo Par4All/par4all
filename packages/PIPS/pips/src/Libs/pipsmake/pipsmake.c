@@ -1175,7 +1175,7 @@ int delete_obsolete_resources(void)
  */
 void delete_some_resources(void)
 {
-    string what = get_string_property("PIPSDBM_RESOURCES_TO_DELETE");
+    const char* what = get_string_property("PIPSDBM_RESOURCES_TO_DELETE");
     dont_interrupt_pipsmake_asap();
 
     user_log("Deletion of %s resources:\n", what);

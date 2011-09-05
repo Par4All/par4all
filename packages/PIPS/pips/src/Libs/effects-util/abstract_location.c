@@ -66,8 +66,8 @@ bool entity_heap_location_p(entity b)
     entity_all_module_heap_locations_p(b);
 
   if(!bucket_p) {
-      string ln = entity_local_name(b);
-      string found = strstr(ln, HEAP_AREA_LOCAL_NAME);
+      const char* ln = entity_local_name(b);
+      const char* found = strstr(ln, HEAP_AREA_LOCAL_NAME);
       bucket_p = found != NULL;
   }
 
@@ -77,15 +77,11 @@ bool entity_heap_location_p(entity b)
 entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
 {
   entity e;
-  string m = i2a(stmt_number);
-  string s = strdup(concatenate(get_current_module_name(),
-				MODULE_SEP_STRING,
-				HEAP_AREA_LOCAL_NAME,
-				"_l_",
-				m,
-				NULL));
+  string s;
+  asprintf(&s,HEAP_AREA_LOCAL_NAME "_l_%d",stmt_number);
 
-  e = find_or_create_entity(s);
+  e = FindOrCreateEntity(get_current_module_name(),s);
+  free(s);
   if(type_undefined_p(entity_type(e))) {
     entity f = get_current_module_entity();
     entity a = module_to_heap_area(f);
@@ -111,7 +107,7 @@ entity entity_flow_or_context_sentitive_heap_location(int stmt_number, type t)
 bool entity_flow_or_context_sentitive_heap_location_p(entity e)
 {
   bool result = false;
-  string ln = entity_local_name(e);
+  const char* ln = entity_local_name(e);
   string found = strstr(ln, ANYWHERE_LOCATION);
 
   pips_debug(9, "input entity: %s\n", ln);
@@ -280,7 +276,7 @@ type malloc_arg_to_type(expression e)
 entity malloc_type_to_abstract_location(type t, sensitivity_information *psi)
 {
     entity e = entity_undefined;
-  string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
+  const char* opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
   bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
   pips_debug(8, "begin for type %s\n",

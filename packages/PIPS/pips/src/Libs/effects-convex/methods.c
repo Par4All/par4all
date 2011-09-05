@@ -313,7 +313,7 @@ bool in_out_methods_p()
   return (effects_computation_init_func == init_convex_in_out_regions);
 }
 
-void init_convex_rw_prettyprint(string __attribute__ ((unused)) module_name)
+void init_convex_rw_prettyprint(const char* __attribute__ ((unused)) module_name)
 {
   set_action_interpretation(ACTION_READ, ACTION_WRITE);
   effects_prettyprint_func = print_rw_regions;
@@ -322,7 +322,7 @@ void init_convex_rw_prettyprint(string __attribute__ ((unused)) module_name)
 }
 
 void
-init_convex_rw_regions(string module_name)
+init_convex_rw_regions(const char* module_name)
 {
     regions_init();
     get_regions_properties();
@@ -343,7 +343,7 @@ init_convex_rw_regions(string module_name)
     init_convex_rw_prettyprint(module_name);
 }
 
-void init_convex_inout_prettyprint(string __attribute__ ((unused)) module_name)
+void init_convex_inout_prettyprint(const char* __attribute__ ((unused)) module_name)
 {
   set_action_interpretation(ACTION_IN, ACTION_OUT);
   effects_prettyprint_func = print_inout_regions;
@@ -351,7 +351,7 @@ void init_convex_inout_prettyprint(string __attribute__ ((unused)) module_name)
   effects_to_text_func = text_inout_array_regions;
 }
 
-void init_convex_in_out_regions(string module_name)
+void init_convex_in_out_regions(const char* module_name)
 {
     regions_init();
     if (!same_string_p(rule_phase(find_rule_by_resource("REGIONS")),
@@ -376,7 +376,7 @@ void init_convex_in_out_regions(string module_name)
     init_convex_inout_prettyprint(module_name);
 }
 
-void reset_convex_rw_regions(string module_name)
+void reset_convex_rw_regions(const char* module_name)
 {
     regions_end();
     region_translation_statistics_close(module_name, "rw");
@@ -386,7 +386,7 @@ void reset_convex_rw_regions(string module_name)
     free_value_mappings();
 }
 
-void reset_convex_in_out_regions(string __attribute__ ((unused)) module_name)
+void reset_convex_in_out_regions(const char* __attribute__ ((unused)) module_name)
 {
     regions_end();
     reset_transformer_map();
@@ -396,7 +396,7 @@ void reset_convex_in_out_regions(string __attribute__ ((unused)) module_name)
 }
 
 void
-init_convex_summary_rw_regions(string module_name)
+init_convex_summary_rw_regions(const char* module_name)
 {
     regions_init();
     /* for intermediate values */
@@ -407,14 +407,14 @@ init_convex_summary_rw_regions(string module_name)
     init_convex_rw_prettyprint(module_name);
 }
 
-void reset_convex_summary_rw_regions(string __attribute__ ((unused)) module_name)
+void reset_convex_summary_rw_regions(const char* __attribute__ ((unused)) module_name)
 {
     regions_end();
     reset_cumulated_rw_effects();
     free_value_mappings();
 }
 
-void init_convex_summary_in_out_regions(string module_name)
+void init_convex_summary_in_out_regions(const char* module_name)
 {
     regions_init();
     set_bool_property("MUST_REGIONS", true);
@@ -428,7 +428,7 @@ void init_convex_summary_in_out_regions(string module_name)
     init_convex_inout_prettyprint(module_name);
 }
 
-void reset_convex_prettyprint(string __attribute__ ((unused)) module_name)
+void reset_convex_prettyprint(const char* __attribute__ ((unused)) module_name)
 {
     effects_prettyprint_func = (generic_prettyprint_function) abort;
     effect_prettyprint_func = (void (*)(effect)) abort;
@@ -437,7 +437,7 @@ void reset_convex_prettyprint(string __attribute__ ((unused)) module_name)
 }
 
 void
-reset_convex_summary_in_out_regions(string __attribute__ ((unused)) module_name)
+reset_convex_summary_in_out_regions(const char* __attribute__ ((unused)) module_name)
 {
     regions_end();
     reset_cumulated_rw_effects();

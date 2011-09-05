@@ -107,7 +107,7 @@ string statement_type_as_string (statement stat)
  * DEBUG FUNCTION: print debugging informations for
  * a statement stat
  */
-void debug_statement (string comments, statement stat, int debug_level)
+void debug_statement (const char* comments, statement stat, int debug_level)
 {
   ifdebug(debug_level) {
     pips_debug(debug_level,"%s\n",comments);
@@ -130,7 +130,7 @@ void debug_statement (string comments, statement stat, int debug_level)
  * DEBUG FUNCTION: print debugging informations for
  * a control a_control
  */
-void debug_control (string comments, control a_control, int debug_level) {
+void debug_control (const char* comments, control a_control, int debug_level) {
 
   debug_statement (comments, control_statement(a_control), debug_level);
   pips_debug(debug_level,"  predecessors          = %zd\n", gen_length(control_predecessors(a_control)));
@@ -267,8 +267,8 @@ void short_debug_unstructured (unstructured an_unstructured,
  * New variable is added to declarations
  */
 entity clone_variable_with_new_name(entity a_variable,
-				    string new_name,
-				    string module_name)
+				    const char* new_name,
+				    const char* module_name)
 {
   entity module;
   entity new_variable;
@@ -323,9 +323,9 @@ entity clone_variable_with_new_name(entity a_variable,
  * name is unique.
  */
 entity make_variable_from_name_and_entity (entity cloned_variable,
-					   string base_name,
+					   const char* base_name,
 					   statement stat,
-					   string module_name)
+					   const char* module_name)
 {
   string variable_name;
   entity returned_variable = NULL;
@@ -351,7 +351,7 @@ entity make_variable_from_name_and_entity (entity cloned_variable,
  * label, statement number and ordering of statement stat,
  * and empty comments
  */
-statement make_binary_call_statement (string operator_name,
+statement make_binary_call_statement (const char* operator_name,
 				      expression expression1,
 				      expression expression2,
 				      statement stat)
@@ -411,7 +411,7 @@ int beautify_ordering (int an_ordering)
   return ordering_up + ((ordering_down-1) << 16);
 }
 
-void clean_statement_from_tags (string comment_portion,
+void clean_statement_from_tags (const char* comment_portion,
 				statement stat)
 {
   string comments;
@@ -478,7 +478,7 @@ static void check_if_statement_contains_comment(statement s, void* a_context)
 /**
  *
  */
-list get_statements_with_comments_containing (string comment_portion,
+list get_statements_with_comments_containing (const char* comment_portion,
 					      statement stat)
 {
   statement_checking_context context;

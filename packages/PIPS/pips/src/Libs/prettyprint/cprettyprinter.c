@@ -120,7 +120,7 @@ static list l_written = NIL;
  * i.e something like 987987D54654 : a bunch of digit with a letter in the
  * middle. if yes convert it to C (i.e replace D by E) and return true
  */
-static bool convert_doudle_value (string *str) {
+static bool convert_double_value(char**str) {
   bool result = true;
   int match = 0;
   int i = 0;
@@ -146,22 +146,23 @@ static bool convert_doudle_value (string *str) {
 /*
  * convert some fortran constant to their equivalent in C
  */
-static void const_wrapper(string* s)
+static void const_wrapper(char** s)
 {
   static char * const_to_c[][2] = {	{ ".true." , "1" } , { ".false." , "0" }};
   static const int const_to_c_sz = sizeof(const_to_c)/sizeof(*const_to_c);
   int i;
   pips_debug (5, "constant to convert : %s\n", *s);
-  if (convert_doudle_value (s) == false) {
+  if (convert_double_value (s) == false) {
 	/* search fortran constant */
 	char *name = strlower(strdup(*s),*s);
 	for(i=0;i<const_to_c_sz;i++)
 	  {
 		if(strcmp(name,const_to_c[i][0]) == 0 )
-		  {
-			*s = const_to_c[i][1];
-			break;
-		  }
+        {
+            free(*s);
+            *s = strdup(const_to_c[i][1]);
+            break;
+        }
 	  }
 	free(name);
   }
@@ -172,9 +173,9 @@ static void const_wrapper(string* s)
  * warning : return allocated string, otherwise it leads to modification (through strlower)
  * of critical entities
  */
-static string c_entity_local_name(entity var)
+static char* c_entity_local_name(entity var)
 {
-    string name;
+    const char* name;
 
     if (current_module_is_a_function() &&
             var != get_current_module_entity() &&
@@ -201,9 +202,9 @@ static string c_entity_local_name(entity var)
         /* switch to lower cases... */
 
     }
-    name=strlower(strdup(name),name);
-	pips_debug (5, "local name %s found\n", name);
-    return name;
+    char *rname=strlower(strdup(name),name);
+	pips_debug (5, "local name %s found\n", rname);
+    return rname;
 }
 
 // build the list of written entity
@@ -343,8 +344,8 @@ static string c_type_string(type t)
 // Convert the fortran type to its c string value
 static string c_basic_string(basic b)
 {
-  string result = "UNKNOWN_BASIC" SPACE;
-  bool allocated =false;
+  const char* result = "UNKNOWN_BASIC" SPACE;
+  char * aresult=NULL;
   bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
   switch (basic_tag(b)) {
   case is_basic_int: {
@@ -425,7 +426,7 @@ static string c_basic_string(basic b)
     {
       entity ent = basic_derived(b);
       type t = entity_type(ent);
-      string name = c_entity_local_name(ent);
+      char* name = c_entity_local_name(ent);
       result = concatenate(c_type_string(t),name,NULL);
       free(name);
       break;
@@ -433,8 +434,7 @@ static string c_basic_string(basic b)
   case is_basic_typedef:
     {
       entity ent = basic_typedef(b);
-      result = c_entity_local_name(ent);
-      allocated=true;
+      aresult = c_entity_local_name(ent);
       break;
     }
   case is_basic_complex:
@@ -443,7 +443,7 @@ static string c_basic_string(basic b)
   default:
     pips_internal_error("unhandled case");
   }
-  return allocated ? result : strdup(result);
+  return aresult ? aresult : strdup(result);
 }
 
 /// @return a newly allocated string of the dimensions in C
@@ -838,10 +838,11 @@ static string c_include (void) {
 								NULL));
 
   // take care of include file required by the user
-  string user_req = get_string_property ("CROUGH_INCLUDE_FILE_LIST");
+  const char* user_req = get_string_property ("CROUGH_INCLUDE_FILE_LIST");
   pips_debug (5, "including the user file list %s\n", user_req);
   string match = NULL;
-  match = strtok (user_req, " ,");
+  string tmp = strdup(user_req);
+  match = strtok (tmp, " ,");
   while (match != NULL) {
 	string old = result;
 	pips_debug (7, "including the file %s\n", match);
@@ -849,14 +850,14 @@ static string c_include (void) {
 	match = strtok (NULL, " ,");
 	free (old);
   }
-  free (match);
+  free (match);free(tmp);
 
   // user might use its own type that are define in a specific file
   bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
   pips_debug (5, "includind the user define type file %s\n", user_req);
   if (user_type == true) {
 	string old = result;
-	string f_name = get_string_property ("CROUGH_INCLUDE_FILE");
+	const char* f_name = get_string_property ("CROUGH_INCLUDE_FILE");
 	pips_debug (7, "including the file %s\n", f_name);
 	result = strdup (concatenate (result, "#include \"", f_name, "\"\n",
 								  NULL));
@@ -946,7 +947,7 @@ static string c_head(entity module)
 /* generate a basic c expression.
    no operator priority is assumed...
    */
-typedef string (*prettyprinter)(string, list);
+typedef string (*prettyprinter)(const char*, list);
 
 struct s_ppt
 {
@@ -969,7 +970,7 @@ typedef struct
 
 static bool expression_needs_parenthesis_p(expression);
 
-static string ppt_binary(string in_c, list le)
+static string ppt_binary(const char* in_c, list le)
 {
     string result;
     expression e1, e2;
@@ -997,7 +998,7 @@ static string ppt_binary(string in_c, list le)
     return result;
 }
 
-static string ppt_unary(string in_c, list le)
+static string ppt_unary(const char* in_c, list le)
 {
     string e, result;
     pips_assert("one arg to unary call", gen_length(le)==1);
@@ -1007,7 +1008,7 @@ static string ppt_unary(string in_c, list le)
     return result;
 }
 
-static string ppt_unary_post(string in_c, list le)
+static string ppt_unary_post(const char* in_c, list le)
 {
     string e, result;
     pips_assert("one arg to unary call", gen_length(le)==1);
@@ -1018,7 +1019,7 @@ static string ppt_unary_post(string in_c, list le)
 }
 
 /* SG: PBM spotted HERE */
-static string ppt_call(string in_c, list le)
+static string ppt_call(const char* in_c, list le)
 {
     string scall, old;
 	bool pointer = !get_bool_property ("CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL");
@@ -1100,7 +1101,7 @@ static void get_c_full_name (string* base_in_c, basic b) {
 // fortran intrinsic accepts different types but c function only
 // accept one type. This type of intrinsic is handle by this ppt_math
 // function, it calls the right c function according to its input types.
-static string ppt_math(string in_c, list le)
+static string ppt_math(const char* in_c, list le)
 {
   basic res_basic = basic_undefined;
   pips_assert ("need at least one argument", 0 != gen_length (le));
@@ -1135,7 +1136,7 @@ static string ppt_math(string in_c, list le)
 // fortran min and max intrinsic accept from 2 to n elements. This can be done
 // in c using an ellipse or using a simple macro. The second possibility is
 // chosen
-static string ppt_min_max (string in_c, list le)
+static string ppt_min_max (const char* in_c, list le)
 {
   bool flag = false;
   bool pointer = !get_bool_property ("CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL");
@@ -1164,7 +1165,7 @@ static string ppt_min_max (string in_c, list le)
 // @brief Generate a pips_user_error for intrinsic that can not be handle
 // right now according to the property defined by the user
 ///@param in_f, the instrinsic in fortran
-static string ppt_unknown(string in_f, list le)
+static string ppt_unknown(const char* in_f, list le)
 {
   if (get_bool_property ("CROUGH_PRINT_UNKNOWN_INTRINSIC") == false)
 	pips_user_error ("This intrinsic can not be tranbslated in c: %s\n", in_f);
@@ -1175,7 +1176,7 @@ static string ppt_unknown(string in_f, list le)
 // @brief Generate a pips_user_error for intrinsic that must not be fined in a
 // fortran code
 ///@param in_f, the instrinsic in fortran
-static string ppt_must_error(string in_f, list le)
+static string ppt_must_error(const char* in_f, list le)
 {
   string result = strdup ("");
   pips_user_error("This intrinsic should not be found in a fortran code: %s\n",
@@ -1353,7 +1354,7 @@ static struct s_ppt intrinsic_to_c[] = {
 
 static struct s_ppt * get_ppt(entity f)
 {
-    string called = entity_local_name(f);
+    const char* called = entity_local_name(f);
     struct s_ppt * table = intrinsic_to_c;
     while (table->intrinsic && !same_string_p(called, table->intrinsic))
         table++;
@@ -1384,7 +1385,7 @@ static string c_call(call c,bool breakable)
 {
     entity called = call_function(c);
     struct s_ppt * ppt = get_ppt(called);
-    string local_name = entity_local_name(called);
+    char* local_name = strdup(entity_local_name(called));
     string result = NULL;
 
     /* special case... */
@@ -1405,7 +1406,7 @@ static string c_call(call c,bool breakable)
     }
     else if (call_constant_p(c))
     {
-	  const_wrapper(&local_name);
+        const_wrapper(&local_name);
         result = strlower(strdup(local_name),local_name);
     }
     else
@@ -1415,6 +1416,7 @@ static string c_call(call c,bool breakable)
         result=strlower(strdup(result),result);
         free(tmp);
     }
+    //free(local_name);
 
     return result;
 }
@@ -1504,7 +1506,7 @@ static string c_unstructured(unstructured u,bool breakable)
     for(cc=trail; !ENDP(cc); POP(cc))
     {
         control c = CONTROL(CAR(cc));
-        string l = string_undefined;
+        const char* l;
         int nsucc = gen_length(control_successors(c));
         statement st = control_statement(c);
         ifdebug(3)
@@ -1814,7 +1816,7 @@ static string c_statement(statement s, bool breakable)
             {
                 statement g = instruction_goto(i);
                 entity el = statement_label(g);
-                string l = entity_local_name(el) + strlen(LABEL_PREFIX);
+                const char* l = entity_local_name(el) + sizeof(LABEL_PREFIX) -1;
                 result = strdup(concatenate("goto ",l, SEMICOLON, NULL));
                 break;
             }
@@ -1851,8 +1853,8 @@ static string interface_type_string (type t, bool value);
 /// @param value, set to true if the var has to be passed by value
 static string interface_basic_string(basic b, bool value)
 {
-  string result = "UNKNOWN_BASIC" SPACE;
-  bool allocated = false;
+  const char* result = "UNKNOWN_BASIC" SPACE;
+  char * aresult=NULL;
   bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
   switch (basic_tag(b)) {
   case is_basic_int: {
@@ -1927,13 +1929,9 @@ static string interface_basic_string(basic b, bool value)
       if (value == true) {
 	type t = basic_pointer(b);
 	pips_debug(2,"Basic pointer\n");
-	result = interface_type_string (t, false);
-	if (type_void_p (t)) {
-	  // if type is void and value flag set to true
-	  // the value specifier need to be add
-	  allocated = true;
-	}
-	else return result;
+	aresult = interface_type_string (t, false);
+	if (!type_void_p (t)) 
+	return aresult;
       }
       else {
 	result = "type (c_ptr)";
@@ -1949,11 +1947,13 @@ static string interface_basic_string(basic b, bool value)
     pips_internal_error("unhandled case");
   }
   if (value == true) {
-    string tmp = result;
-    result = strdup (concatenate (result, ", value", NULL));
-    if (allocated == true) free (tmp);
+      if(!aresult)aresult=strdup(result);
+      char * tmp =aresult;
+        aresult = strdup(concatenate (aresult, ", value", NULL));
+        free(tmp);
+    return aresult;
   }
-  return result ;
+  return strdup(result) ;
 }
 
 /// @param t, the type to be converted to its string representation
@@ -1961,7 +1961,7 @@ static string interface_basic_string(basic b, bool value)
 /// (i.e. not by pointer)
 static string interface_type_string (type t, bool value)
 {
-    string result = "UNKNOWN_TYPE" SPACE;
+    string result ;
     switch (type_tag(t)) {
     case is_type_variable: {
       basic b = variable_basic(type_variable(t));
@@ -1989,7 +1989,7 @@ static string interface_argument_type_string (entity var) {
   if (variable_dimensions (v) != NULL) {
     result = strdup ("type (c_ptr), value");
   } else {
-    result = strdup(interface_type_string(t, true));
+    result = interface_type_string(t, true);
   }
   return result;
 }
@@ -2129,7 +2129,7 @@ static string c_code_string(entity module, statement stat)
 
 /******************************************************** PIPSMAKE INTERFACE */
 
-bool print_interface (string module_name)
+bool print_interface (const char* module_name)
 {
   FILE * out;
   string interface_code, interface, dir, filename;
@@ -2172,7 +2172,7 @@ bool print_interface (string module_name)
   return true;
 }
 
-bool print_crough(string module_name)
+bool print_crough(const char* module_name)
 {
     FILE * out;
     string ppt, crough, dir, filename;
@@ -2240,7 +2240,7 @@ bool print_crough(string module_name)
 
 /* C indentation thru indent.
 */
-bool print_c_code(string module_name)
+bool print_c_code(const char* module_name)
 {
     string crough, cpretty, dir, cmd;
 

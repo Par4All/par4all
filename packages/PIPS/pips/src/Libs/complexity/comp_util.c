@@ -614,7 +614,7 @@ float file_factor;
  * of bigger complexity.
  */
 int intrinsic_cost(s, pargsbasic)
-char *s;
+const char *s;
 basic *pargsbasic;
 {
   struct intrinsic_cost_rec *p;
@@ -663,7 +663,7 @@ basic *pargsbasic;
 float constant_entity_to_float(e)
 entity e;
 {
-    char *cste = module_local_name(e);
+    const char *cste = module_local_name(e);
     basic b = entity_basic(e);
     float f;
 
@@ -946,7 +946,7 @@ void add_common_variables_to_hash_table(module, hash_complexity_params)
 entity module;
 hash_table hash_complexity_params;
 {
-    string module_name = module_local_name(module);
+    const char* module_name = module_local_name(module);
     list sefs_list = list_undefined;
     list ce = list_undefined;
 
@@ -985,7 +985,7 @@ void remove_common_variables_from_hash_table(module, hash_complexity_params)
 entity module;
 hash_table hash_complexity_params;
 {
-    string module_name = module_local_name(module);
+    const char* module_name = module_local_name(module);
     list sefs_list;
 
     pips_assert("remove_common_variables_from_hash_table",

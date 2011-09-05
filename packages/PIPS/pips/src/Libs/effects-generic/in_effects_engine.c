@@ -70,7 +70,7 @@
  */
 
 
-/* bool summary_in_effects_engine(char *module_name)
+/* bool summary_in_effects_engine(const char* module_name)
  * input    : the name of the current module.
  * output   : the list of summary in effects
  * modifies : nothing.
@@ -78,7 +78,7 @@
  *	      in effects of its embedding statement.
  */
 bool
-summary_in_effects_engine(char *module_name)
+summary_in_effects_engine(const char *module_name)
 {
 
     list l_glob = NIL, l_loc = NIL;
@@ -579,7 +579,7 @@ static list
 in_effects_of_external(entity func, list real_args)
 {
     list le = NIL;
-    char *func_name = module_local_name(func);
+    const char *func_name = module_local_name(func);
     statement current_stat = effects_private_current_stmt_head();
 
     pips_debug(4, "translating effects for %s\n", func_name);
@@ -639,7 +639,7 @@ in_effects_of_call(call c)
     list l_in = NIL;
     entity e = call_function(c);
     tag t = value_tag(entity_initial(e));
-    string n = module_local_name(e);
+    const char* n = module_local_name(e);
 
     list pc = call_arguments(c);
 
@@ -804,7 +804,7 @@ in_effects_of_module_statement(statement module_stat)
 }
 
 
-/* bool in_regions(char *module_name):
+/* bool in_regions(const char* module_name):
  * input    : the name of the current module.
  * requires : that transformers and precondition maps be set if needed.
  *	      (it depends on the chosen instanciation of *load_context_func
@@ -813,7 +813,7 @@ in_effects_of_module_statement(statement module_stat)
  * modifies :
  * comment  : computes the in effects of the current module.
  */
-bool in_effects_engine(char * module_name)
+bool in_effects_engine(const char * module_name)
 {
     statement module_stat;
     make_effects_private_current_context_stack();

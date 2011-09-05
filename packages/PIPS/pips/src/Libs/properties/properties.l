@@ -392,7 +392,7 @@ void set_bool_property(const char* name, bool b)
 
    @return the string value, not to be freed
 */
-string get_string_property(const char* name)
+const char* get_string_property(const char* name)
 {
     property p = get_property(name, false);
     if (! property_string_p(p))
@@ -411,7 +411,7 @@ string get_string_property(const char* name)
 
    @return the string value, not to be freed
 */
-string get_string_property_or_ask(const char* name,const char question[])
+const char* get_string_property_or_ask(const char* name,const char question[])
 {
     property p = get_property(name, false);
     if (! property_string_p(p))
@@ -431,7 +431,7 @@ string get_string_property_or_ask(const char* name,const char question[])
    @param[in] s is the value to store in the property. This string is
    strdup()ed in this function
 */
-void set_string_property(const char* name, string s)
+void set_string_property(const char* name, const char* s)
 {
     property p = get_property(name, false);
     if (! property_string_p(p))

@@ -201,7 +201,7 @@ static text text_code_reductions(statement s)
  */
 static bool
 print_any_reductions(
-    string module_name,
+    const char* module_name,
     string resource_name,
     string decoration_name,
     string summary_name,
@@ -246,7 +246,7 @@ print_any_reductions(
 
 /* Handlers for PIPSMAKE
  */
-bool print_code_proper_reductions(string module_name)
+bool print_code_proper_reductions(const char* module_name)
 {
     return print_any_reductions(module_name,
 				DBR_PROPER_REDUCTIONS,
@@ -255,7 +255,7 @@ bool print_code_proper_reductions(string module_name)
 				PROP_SUFFIX);
 }
 
-bool print_code_cumulated_reductions(string module_name)
+bool print_code_cumulated_reductions(const char* module_name)
 {
     return print_any_reductions(module_name,
 				DBR_CUMULATED_REDUCTIONS,

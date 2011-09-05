@@ -176,7 +176,7 @@ bool index_set_splitting(char* module_name)
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
     /* get the loop */
-    string loop_label = get_string_property("LOOP_LABEL");
+    const char* loop_label = get_string_property("LOOP_LABEL");
     entity loop_label_entity = entity_undefined;
     if( string_undefined_p( loop_label ) || 
             entity_undefined_p((loop_label_entity=find_label_entity(module_name, loop_label))) )
@@ -187,12 +187,12 @@ bool index_set_splitting(char* module_name)
         pips_user_error("no statement with label %s found\n",loop_label);
 
     /* get the bound */
-    string loop_bound = get_string_property("INDEX_SET_SPLITTING_BOUND");
+    const char* loop_bound = get_string_property("INDEX_SET_SPLITTING_BOUND");
     entity loop_bound_entity = entity_undefined;
     if( string_undefined_p( loop_bound ) )
         pips_user_error("please set INDEX_SET_SPLITTING_BOUND property to a known entity\n");
     else {
-        loop_bound_entity = FindEntity(module_name,loop_bound);
+        loop_bound_entity = FindEntityFromUserName(module_name,loop_bound);
         if(entity_undefined_p(loop_bound_entity)) // maybe its a constant
         {
             int integer ;
@@ -284,7 +284,7 @@ bool force_loop_fusion(char * module_name) {
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
     /* get the loop */
-    string loop_label = get_string_property("LOOP_LABEL");
+    const char* loop_label = get_string_property("LOOP_LABEL");
     entity loop_label_entity = entity_undefined;
     if( string_undefined_p( loop_label ) || 
             entity_undefined_p((loop_label_entity=find_label_entity(module_name, loop_label))) ) {

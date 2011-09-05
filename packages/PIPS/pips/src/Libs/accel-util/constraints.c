@@ -251,7 +251,7 @@ static bool do_solve_hardware_constraints(statement s)
     if(entity_undefined_p(unknown))
         pips_user_error("must provide the unknown value\n");
     /* } */
-    string constraint_type = get_string_property("SOLVE_HARDWARE_CONSTRAINTS_TYPE");
+    const char* constraint_type = get_string_property("SOLVE_HARDWARE_CONSTRAINTS_TYPE");
     if(same_string_p(constraint_type, "VOLUME"))
         return do_solve_hardware_constraints_on_volume(unknown,s);
     else if(same_string_p(constraint_type, "NB_PROC"))
@@ -271,7 +271,7 @@ bool solve_hardware_constraints(const char * module_name)
     module_to_value_mappings(get_current_module_entity());
     set_precondition_map( (statement_mapping) db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
 
-    string stmt_label=get_string_property("SOLVE_HARDWARE_CONSTRAINTS_LABEL");
+    const char* stmt_label=get_string_property("SOLVE_HARDWARE_CONSTRAINTS_LABEL");
     statement equation_to_solve = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
 
     bool result =false;

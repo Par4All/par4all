@@ -1,0 +1,222 @@
+\section{Initial Configuration}
+\label{currentconfiguration}
+
+This section contains information necessary to understand how PaWS has
+been initially configured.
+
+\subsection{Configuration File}
+
+The initial settings for PaWS are stored in a configuration file named
+\emph{paws.py} and located in the Pylons configuration directory,
+\emph{pawsapp/config}. Parameters stored there are access paths to the
+directories with PaWS helper files.
+
+The configuration file is written in Python. Thanks to that it can be
+imported as a Python module and no parsing of the file is needed to
+extract the settings. Parameters can also be defined as Python
+variables.
+
+\subsection{Introduction Page}
+
+The entry WEB page, (\emph{pass/index}), contains information about all
+the PaWS modes and their cases. The site is hosted by template
+\emph{paas.mako} and controller \emph{paas.py}, but the content of the
+site is based on the structure of description files described
+below. During each site loading, information about available tools and
+their descriptions is loaded from that directory. The site HTML code
+is generated dynamically from scratch using this information.
+
+When a new tool is added, a Shell script is run to create the
+description file and place it in the right place of the PaWS structure.
+
+\subsection{Descriptions Files}
+
+The description files are placed in the validation directory,
+\emph{validation/Paws}. This directory consists of subdirectories
+corresponding to the particular PaWS modes, and of two extra description
+files located in directory \emph{validation/Paws/main}:
+\emph{paas.txt} and \emph{functionalities.txt}.
+
+The subdirectories contain the description files for all of the cases
+of the mode they are refering to. For example, the subdirectory of the
+{\bf tools} mode currently contains the following files: \emph{in\_regions.txt},
+\emph{openmp.txt}, \emph{out\_regions.txt}, \emph{preconditions.txt}
+and \emph{regions.txt}.
+
+The first file from \emph{main} directory, \emph{paas.txt}, provides a
+general description of the PaWS framework. This description is visible
+on the main entrance page. The second file,
+\emph{functionalities.txt}, gathers information about PaWS modes:
+their title, visible on the entry page, name of the subdirectory with
+case descriptions, and flag indicating whether the mode has two levels,
+basic and advanced, or not\footnote{It would also be useful to control
+the display of the dependence graph, which is mostly useful for
+parallelization tool such as OpenMP.}.
+
+\subsection{Analyses and Transformations}
+
+Currently, there are four analyses and one transformation available:
+\emph{preconditions}, \emph{OpenMP}, \emph{IN regions}, \emph{OUT
+  regions} and \emph{regions}. Each of them has a basic level. Two of
+them, \emph{preconditions} and \emph{regions}, also have an advanced
+level configured.
+
+As written above, descriptions of the analysis and transformation
+passes are placed in the \emph{validation/Paws/tools} subdirectories
+and examples are in the \emph{validation/Paws/$<$tool\_name$>$}
+directories.
+
+The \emph{skeleton.mako} template is responsible for the code of all the
+site generation. There are two more specific templates inheriting
+from it - for basic level \emph{base.mako} and for advanced one
+\emph{advanced\_base.mako}. Together they provide complete support for
+all analyses and transformations.
+
+Pages dedicated to a different tool, both for basic and advanced mode,
+are hosted by a special controller, named
+\emph{tools\_$<$tool\_name$>$.py} and are customized by a Mako
+template, named \emph{tools\_$<$tool\_name$>$.mako} or
+\emph{tools\_$<$tool\_name$>$\_advanced.mako} for advanced
+mode. Controller and templates are created automatically when a new
+tool is added as described in
+Section~\ref{add_analysis_transformation}. For more details about the
+file structure, see Figure \ref{fig:paws_structure}.
+
+\subsubsection{Advanced Mode}
+
+The advanced mode of analysis and transformations supports more user
+control than the basic level. It is possible to set properties which
+will be used as argument when a pass is executed by PIPS. The user is
+also able to select concrete kind of analysis (or transformation) that
+will be activated and phases to be applied before the result is
+displayed. This is equivalent to setproperty, activate and apply in
+tpips.
+
+The advanced mode examples are stored in \emph{validation/Paws/tools/$<$tool\_name$>$} directories and they are shared with the basic mode.
+
+The content of the web pages for those settings and selections is
+created dynamically. It is based on the lists of possible properties,
+analyses and phases. Those lists are stored in
+\emph{validation/Paws/tools/$<$tool\_name$>$} directories. Each of
+these files has its own structure:
+
+\begin{itemize}
+
+\item {\bf Properties} are grouped in three categories: boolean,
+  integer and string properties. Each property should be declared in a
+  new line as it is shown in the
+  Listing~\ref{PropertyDeclaration}\footnote{Sign \emph{``-''} means
+    that any value is possible.}.
+  
+\lstset{language=Python,caption={Property declaration},label=PropertyDeclaration}
+\begin{lstlisting}
+PROPERTY_NAME;default_value;value_1;other_values...;description
+\end{lstlisting}
+
+\item {\bf Analyses} are grouped by modules. For instance module
+  \emph{preconditions} has four possible analyses
+  (\emph{preconditions\_intra\_full},
+  \emph{preconditions\_inter\_fast},
+  \emph{preconditions\_intra\_fast}, \emph{preconditions\_intra}). In
+  a given module, only one analysis can be selected. Analyses should
+  be declared in the new line as it is in the Listing~\ref{AnalysesDeclaration}.
+  
+  \lstset{language=Python,caption={Analyses declaration},label=AnalysesDeclaration}
+\begin{lstlisting}
+<<MODULE_NAME>>
+default_analysis_name;description
+analysis_1_name;description
+...
+\end{lstlisting}
+  
+\item {\bf Phases} are also declared using a new line for each of
+  them. Example is shown in Listing~\ref{PhasesDeclaration}.
+  
+  \lstset{language=Python,caption={Phases declaration},label=PhasesDeclaration}
+\begin{lstlisting}
+phases_1_name;default_value;description
+phases_2_name;default_value;description
+...
+\end{lstlisting}
+
+\end{itemize}
+
+\subsection{Demonstrations}
+
+There are three demonstrations available: \emph{aile\_excerpt},
+\emph{convol} and \emph{acca-2011}. Descriptions of all the cases are
+placed in directory \emph{pawsapp/public/descriptions/tutorial}.
+
+Each demonstration consists in an example source code, in C or
+Fortran, and a Tpips script. They are found in
+directory \emph{validation/Paws/demo}.
+
+Controller \emph{demo.py} and template \emph{demo.mako} are providing
+skeleton of the HTML code and basic functions common to all the
+demonstrations. As in the case of analyses and transformations, each
+demonstration is hosted by specific controller (named
+\emph{tutorial\_$<$demo\_name$>$.py}) and a Mako template called
+\emph{tutorial\_$<$demo\_name$>$.mako}. The automatic creation of
+them is described in Section~\ref{add_demonstration}.
+
+Each Tpips script used in a demonstration is parsed and divided in
+several steps. Markers for separating the steps are the lines starting
+with the command ``display''. It is the signal that the result of the
+operations should be shown to the user. Not only the result of the step is
+displayed, but also the Tpips commands of the step are presented to
+the user.
+
+A second point, that is very important for those who are designing
+demonstration cases, is the ways comments can be inserted in the
+output. There are two ways to do this:
+
+\begin{itemize}
+\item {\bf comments in Tpips script output} are simple bash comments
+  as it is shown in the Listing~\ref{TpipsComments}:
+  
+  \lstset{language=Python,caption={Comments in Tpips script output},label=TpipsComments}
+  \begin{lstlisting}
+# Remove existing workspace, if any
+delete acca-2011
+  \end{lstlisting}
+  
+  They are displayed as a part of the Tpips script linked to the current step.
+  
+\item {\bf comments in the resulting output} are created by writing
+  message to the standard output with \emph{echo}\cite{echo}
+  bash\cite{bash} command. It is important to remember that comments
+  should be suitable with the relevant programming language comments
+  style. Example of creating comments for C output is shown in
+  Listing~\ref{EchoComments}:
+    
+  \lstset{language=bash,caption={Comments in step result output},label=EchoComments}
+  \begin{lstlisting}
+echo '/*'
+echo ' * Source code for "compute" function.'
+echo ' */'
+echo
+  \end{lstlisting}
+  
+  These comments are displayed in the output window.
+  
+\end{itemize}
+
+\subsection{Examples}
+
+All examples for all analyses and transformations are stored in the
+validation directory \emph{validation/Paws}. Adding a new example is
+very easy and the process is described in Section~\ref{add_example}.
+
+There is a special controller, \emph{examples.py}, designed to handle the
+examples. It is responsible for getting information about available
+examples and for loading file contents.
+
+\subsection{Python Code}
+
+The Python code is located in the \emph{validation/Paws/pyps\_modules}
+directory. File \emph{paws\_base.py} is responsible for the basic
+operation, such as opening and closing the workspace or setting
+properties. Each analysis or transformation has its own file with an
+\emph{invoke\_function} method, which is responsible for concrete
+operation, i.e. for preconditions, file \emph{paws\_preconditions.py}
+contains code for getting preconditions code.

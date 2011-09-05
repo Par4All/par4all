@@ -820,7 +820,7 @@ static statement parallelization(list lls, __attribute__((unused)) bool (*loop_p
     return s;
 }
 
-bool nest_parallelization(string module_name)
+bool nest_parallelization(const char* module_name)
 {
     entity module;
     statement mod_stat = statement_undefined;

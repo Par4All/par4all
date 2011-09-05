@@ -111,7 +111,7 @@ graph obj;
 
 /*============================================================================*/
 bool print_array_dfg( module_name )
-string module_name;
+const char* module_name;
 {
   char *localfilename;
   FILE        *fd;

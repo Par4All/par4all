@@ -1,0 +1,140 @@
+\section{Components Used}
+\label{components_used}
+
+This section provides information about specific solutions and
+workarounds used in PaWS application.
+
+\begin{itemize}
+
+  \item {\bf Creating graphics} 
+  
+    Functional requirement No. \ref{req:dependence_graphs} specifies
+    that PaWS must be able to create and present dependence graphs. To
+    create them in \emph{dot} \cite{dot_format} format\footnote{The
+      DOT language is a description language for describing graphs in
+      a human and machine readable format.} a PIPS mechanism is used
+    (shown in the listing \ref{DotDependenceGraphPrinting}).
+  
+  \lstset{language=Python,caption={Dependence graph in dot format printing},label=DotDependenceGraphPrinting}
+  \begin{lstlisting}
+function.print_dot_dependence_graph()
+  \end{lstlisting}
+  
+  A file in \emph{dot} format is transformed into an image in
+  \emph{png} format by command \emph{dot} of GraphViz
+  Software\cite{graphviz}. Details can be found in \emph{dot} user
+  manual: \url{http://www.graphviz.org/pdf/dot.1.pdf}.
+  
+  \item {\bf Presenting graphics} 
+  
+    To present dependence graphs, the jQZoom Evolution\cite{jqzoom}
+    library is used. This is a light plugin based on JQuery, described
+    in \ref{web_application_technologies}. It allows to present the
+    image in more user-friendly way. There is small
+    thumbnail\footnote{Thumbnail is the small illustration which
+      represents the original image at a much smaller size.} shown and
+    hoovering mouse over it enables zooming preview of selected part
+    of the original, the large image. Moreover this plugin is very easy
+    to use, due to its usage of JQuery, and to integrate with PaWS.
+  
+    The only potential problem of jQZoom usage is the need to provide
+    two copies of the image in two sizes: big and thumbnail. To
+    fulfill this requirement the Python Image Library (PIL) \cite{pil}
+    is used. This is a Python module, which provides all the operations
+    dedicated to images processing and supports many files formats. It
+    is written in Python and hence is very easy to integrate in the PaWS
+    framework. This is its main advantage.
+  
+  \item {\bf Uploading files}
+  
+    According to the functional requirement
+    No. \ref{req:uploading_files}, PaWS enables user to browse and
+    pick his/her own files. Uploading user files caused two problems:
+
+  \begin{itemize}
+
+  \item HTML ``input'' with \emph{type=``file''} used for uploading
+    files is not customizable. That means that it is impossible to
+    change the style of the button and file name label, which is
+    causing aesthetic conflict with the rest of the HTML site.
+
+  \item Uploading files through AJAX requests is impossible because of
+    the browsers restrictions and the XmlHttpRequest object
+    limitations\cite{ajax_files_upload}. At the same time, PaWS needs
+    to be able to upload user files without refreshing the site. Since the
+    stardard HTML solution is causing site refreshing, this requires
+    the usage of AJAX.
+
+  \end{itemize}
+  
+  The first problem is easy to solve by creating transparent files
+  upload panel which covers false, styled panel (button and file name
+  label). Due to that solution, only well styled button and label are
+  visible but they are not active - invisible layer of not properly
+  styled files upload panel captures users activity.
+  
+  The second problem is more serious, but it has also been solved. There
+  is a hidden, also transparent and invisible, IFrame used as a target
+  for file uploading (``target'' attribute is used). When a form with
+  the file upload is submitted, the result will be present in a hidden,
+  refreshed IFrame, but it can not be seen by user. Content of this
+  frame is copied to its proper destination, the visible window. The last
+  step is very easy and can be done without refreshing the whole page.
+  
+  \item {\bf Loading multiple files}
+  
+    The same requirement No. \ref{req:uploading_files} results in the
+    possibility to load several user files packed in one archive file,
+    using ``zip'' extension. The only restriction is that all files
+    must be written in the same programming language. It is due to
+    PyPS framework current limitations.
+  
+    Python module \emph{zipfile}\cite{zipfile} is used to handle this
+    case. It provides archive creating, reading, writing and listing.
+  
+    For each file, a new tab is created and, when performing an
+    operation, the user has to choose one specific function to
+    analyse/transform. Dependence graphs are created for all functions
+    from all the files.
+  
+  \item {\bf Printing Result Files}
+  
+    Functional requirement No.~\ref{req:printing_results} requests the
+    possibility of printing the results of the PIPS analyses and
+    transformations. To print only the results, not a whole WEB page,
+    a special hidden, user invisible frame is used. At user request,
+    computation result is loaded into the invisible frame which is
+    printed.
+  
+    There is another possible solution for printing only part of a WEB
+    page - usage of special style class which defines which parts of
+    the site should be visible when the page is printed. The disadvantage
+    of this approach is that it prints all of the page, even if a large
+    part of it is invisible, which causes a large wasting of the
+    space.
+  
+  \item {\bf Language detection}
+  
+    Functional requirement No. \ref{req:language_detection} refers to
+    the language detection. It is based on simple tokens
+    recognition. It can distinguish between C and Fortran only.
+  %% In addition, distinction between different versions of Fortran language (77 and 95) needs compilation.
+
+  %% TO ADD: mechanism! Event when typing source code, pre-compilation
+  
+  \item {\bf Deleting temporary files}
+  
+    Most temporary files created during PaWS operations are deleted
+    immediately after use. Unfortunately, there are also files which
+    need to be kept on the server for a longer time. This applies to
+    the files which are used to present results to user, graphs images
+    or files with result of transformations and analysis for
+    download. To preserve disk space on the server side, requirement
+    No. \ref{req:deleting_files}, a cron\footnote{It is a customizable
+      Linux job scheduler, which runs periodically user scripts or
+      commands\cite{cron}.} task is used. Every hour, a Python script,
+    \emph{pawsd.py}, located in \emph{pawsapp$\backslash$utils}
+    directory, is invoked to delete all temporary files older than 2
+    hours.
+  
+\end{itemize}

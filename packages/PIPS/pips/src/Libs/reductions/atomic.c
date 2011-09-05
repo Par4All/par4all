@@ -83,7 +83,7 @@ static atomic_operation cuda[] = {
 
 static atomic_profile load_atomic_profile() {
   struct atomic_profile profile = { NULL, 0 };
-  string s_profile = get_string_property("ATOMIC_OPERATION_PROFILE");
+  const char* s_profile = get_string_property("ATOMIC_OPERATION_PROFILE");
   if(same_string_p(s_profile,"cuda")) {
     profile.profile = cuda;
     profile.profile_size = sizeof(cuda)/sizeof(atomic_operation);

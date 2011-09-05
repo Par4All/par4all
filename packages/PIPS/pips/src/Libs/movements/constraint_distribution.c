@@ -42,12 +42,6 @@
 #include "sc.h"
 
 
-static char *noms_var(i)
-entity i;
-{
- return(local_name(entity_name(i)));
-}
-
 
 /* Distribution of the constraints of the system ps in three systems.
  * System ps contains only contraints having to be used to generate 
@@ -135,9 +129,9 @@ Psysteme *sc_neg,*sc_pos,sc_test;
 	}
 	ifdebug(9) {
 	    (void) fprintf(stderr,"systeme negatif \n");
-	    sc_fprint(stderr,sc_neg[rank],noms_var);
+	    sc_fprint(stderr,sc_neg[rank],(get_variable_name_t)entity_local_name);
 	    (void) fprintf(stderr,"systeme positif \n");
-	    sc_fprint(stderr,sc_pos[rank],noms_var);
+	    sc_fprint(stderr,sc_pos[rank],(get_variable_name_t)entity_local_name);
 	}
     }
     debug(8,"bound_distribution","end\n");

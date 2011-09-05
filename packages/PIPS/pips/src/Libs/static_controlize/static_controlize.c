@@ -434,7 +434,7 @@ statement st;
     res_b = false;
 
     if(value_tag(entity_initial(e)) == is_value_intrinsic) {
-      string s = entity_local_name(e);
+      const char* s = entity_local_name(e);
       IOIntrinsicDescriptor *pid = IOIntrinsicDescriptorTable;
       bool found = false;
 

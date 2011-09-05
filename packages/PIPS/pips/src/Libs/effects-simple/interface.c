@@ -55,7 +55,7 @@
 /* SPECIFIC INTERFACES */
 
 bool
-cumulated_references(string module_name)
+cumulated_references(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(false);
@@ -67,7 +67,7 @@ cumulated_references(string module_name)
 }
 
 bool
-proper_references(string module_name)
+proper_references(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(false);
@@ -80,7 +80,7 @@ proper_references(string module_name)
 
 
 bool
-proper_pointer_effects(string module_name)
+proper_pointer_effects(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(false);
@@ -92,7 +92,7 @@ proper_pointer_effects(string module_name)
 }
 
 bool
-summary_pointer_effects(string module_name)
+summary_pointer_effects(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(false);
@@ -104,7 +104,7 @@ summary_pointer_effects(string module_name)
 }
 
 bool
-cumulated_pointer_effects(string module_name)
+cumulated_pointer_effects(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(false);
@@ -116,7 +116,7 @@ cumulated_pointer_effects(string module_name)
 }
 
 bool
-cumulated_pointer_effects_with_points_to(string module_name)
+cumulated_pointer_effects_with_points_to(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(false);
@@ -128,7 +128,7 @@ cumulated_pointer_effects_with_points_to(string module_name)
 }
 
 bool
-cumulated_pointer_effects_with_pointer_values(string module_name)
+cumulated_pointer_effects_with_pointer_values(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(false);
@@ -140,7 +140,7 @@ cumulated_pointer_effects_with_pointer_values(string module_name)
 }
 
 bool
-proper_effects(string module_name)
+proper_effects(const char* module_name)
 {
     bool ok;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -155,7 +155,7 @@ proper_effects(string module_name)
 }
 
 bool
-proper_effects_with_points_to(string module_name)
+proper_effects_with_points_to(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(true);
@@ -167,7 +167,7 @@ proper_effects_with_points_to(string module_name)
 }
 
 bool
-proper_effects_with_pointer_values(string module_name)
+proper_effects_with_pointer_values(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(true);
@@ -179,7 +179,7 @@ proper_effects_with_pointer_values(string module_name)
 }
 
 bool
-summary_effects(string module_name)
+summary_effects(const char* module_name)
 {
     bool ok;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -194,7 +194,7 @@ summary_effects(string module_name)
 }
 
 bool
-cumulated_effects(string module_name)
+cumulated_effects(const char* module_name)
 {
     bool ok;
      if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -209,7 +209,7 @@ cumulated_effects(string module_name)
 }
 
 bool
-cumulated_effects_with_points_to(string module_name)
+cumulated_effects_with_points_to(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(true);
@@ -221,7 +221,7 @@ cumulated_effects_with_points_to(string module_name)
 }
 
 bool
-cumulated_effects_with_pointer_values(string module_name)
+cumulated_effects_with_pointer_values(const char* module_name)
 {
     bool ok;
     set_constant_paths_p(true);
@@ -233,7 +233,7 @@ cumulated_effects_with_pointer_values(string module_name)
 }
 
 bool
-in_summary_effects(string module_name)
+in_summary_effects(const char* module_name)
 {
     bool ok;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -248,7 +248,7 @@ in_summary_effects(string module_name)
 }
 
 bool
-out_summary_effects(string module_name)
+out_summary_effects(const char* module_name)
 {
     bool ok;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -265,7 +265,7 @@ out_summary_effects(string module_name)
 
 
 bool
-in_effects(string module_name)
+in_effects(const char* module_name)
 {
     bool ok;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -281,7 +281,7 @@ in_effects(string module_name)
 }
 
 bool
-out_effects(string module_name)
+out_effects(const char* module_name)
 {
     bool ok;
     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
@@ -299,7 +299,7 @@ out_effects(string module_name)
 
 static bool
 print_code_effects(
-    string module_name,
+    const char* module_name,
     bool is_rw,
     bool is_user_view,
     bool is_attached,
@@ -325,70 +325,70 @@ print_code_effects(
 }
 
 bool
-print_code_proper_pointer_effects(string module_name)
+print_code_proper_pointer_effects(const char* module_name)
 {
     return print_code_effects(module_name, true, false, true,
 			      DBR_PROPER_POINTER_EFFECTS, string_undefined, ".prop");
 }
 
 bool
-print_code_cumulated_pointer_effects(string module_name)
+print_code_cumulated_pointer_effects(const char* module_name)
 {
     return print_code_effects(module_name, true, false, true,
 		      DBR_CUMULATED_POINTER_EFFECTS, DBR_SUMMARY_POINTER_EFFECTS, ".cumu");
 }
 
 bool
-print_code_proper_effects(string module_name)
+print_code_proper_effects(const char* module_name)
 {
     return print_code_effects(module_name, true, false, true,
 			      DBR_PROPER_EFFECTS, string_undefined, ".prop");
 }
 
 bool
-print_code_cumulated_effects(string module_name)
+print_code_cumulated_effects(const char* module_name)
 {
     return print_code_effects(module_name, true, false, true,
 		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".cumu");
 }
 
 bool
-print_code_proper_references(string module_name)
+print_code_proper_references(const char* module_name)
 {
     return print_code_effects(module_name, true, false, true,
 		      DBR_PROPER_REFERENCES, string_undefined, ".propref");
 }
 
 bool
-print_code_cumulated_references(string module_name)
+print_code_cumulated_references(const char* module_name)
 {
     return print_code_effects(module_name, true, false, true,
 		      DBR_CUMULATED_REFERENCES, string_undefined, ".cumuref");
 }
 
 bool
-print_code_in_effects(string module_name)
+print_code_in_effects(const char* module_name)
 {
     return print_code_effects(module_name, false, false, false,
 		      DBR_IN_EFFECTS, DBR_IN_SUMMARY_EFFECTS, ".ineff");
 }
 
 bool
-print_code_out_effects(string module_name)
+print_code_out_effects(const char* module_name)
 {
     return print_code_effects(module_name, false, false, false,
 		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".outeff");
 }
 
 bool
-print_source_proper_effects(string module_name)
+print_source_proper_effects(const char* module_name)
 {
     return print_code_effects(module_name, true, true, true,
 		      DBR_PROPER_EFFECTS, string_undefined, ".uprop");
 }
 
 bool
-print_source_cumulated_effects(string module_name)
+print_source_cumulated_effects(const char* module_name)
 {
     return print_code_effects(module_name, true, true, true,
 		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".ucumu");
@@ -396,14 +396,14 @@ print_source_cumulated_effects(string module_name)
 
 
 bool
-print_source_in_effects(string module_name)
+print_source_in_effects(const char* module_name)
 {
     return print_code_effects(module_name, false, true, false,
 		      DBR_IN_EFFECTS, DBR_IN_SUMMARY_EFFECTS, ".uineff");
 }
 
 bool
-print_source_out_effects(string module_name)
+print_source_out_effects(const char* module_name)
 {
     return print_code_effects(module_name, false, true, false,
 		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".uouteff");
@@ -413,7 +413,7 @@ print_source_out_effects(string module_name)
 /********************************************************** OTHER FUNCTIONS */
 
 text
-get_text_proper_pointer_effects(string module_name)
+get_text_proper_pointer_effects(const char* module_name)
 {
     text t;
 
@@ -428,7 +428,7 @@ get_text_proper_pointer_effects(string module_name)
 }
 
 text
-get_text_cumulated_pointer_effects(string module_name)
+get_text_cumulated_pointer_effects(const char* module_name)
 {
     text t;
 
@@ -443,7 +443,7 @@ get_text_cumulated_pointer_effects(string module_name)
 }
 
 text
-get_text_proper_effects(string module_name)
+get_text_proper_effects(const char* module_name)
 {
     text t;
 
@@ -458,7 +458,7 @@ get_text_proper_effects(string module_name)
 }
 
 text
-get_text_cumulated_effects(string module_name)
+get_text_cumulated_effects(const char* module_name)
 {
     text t;
 
@@ -636,7 +636,7 @@ statement_to_effects(statement s)
 
 /* SIDE EFFECT: set both proper_rw_effects and expr_prw_effects.
  */
-bool full_simple_proper_effects(string module_name, statement current)
+bool full_simple_proper_effects(const char* module_name, statement current)
 {
   bool ok = true;
   set_methods_for_proper_simple_effects();
@@ -645,7 +645,7 @@ bool full_simple_proper_effects(string module_name, statement current)
   return ok;
 }
 
-bool simple_cumulated_effects(string module_name, statement current)
+bool simple_cumulated_effects(const char* module_name, statement current)
 {
   bool ok = true;
   set_methods_for_proper_simple_effects();

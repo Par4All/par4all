@@ -389,7 +389,7 @@ static bool entity_local_variable_p(entity var, entity func) {
 
 
 static bool match_call_to_user_function(call c, bool *user_function_found) {
-  string match_name = entity_local_name(call_function(c));
+  const char* match_name = entity_local_name(call_function(c));
 
   FOREACH(STRING, func, keeped_functions) {
     if(strcmp(match_name,func)==0) {

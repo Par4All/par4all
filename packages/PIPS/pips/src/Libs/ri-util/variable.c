@@ -164,7 +164,7 @@ GenericAddLocalEntityToDeclarations(entity e, entity module, statement s,
    */
   if( storage_undefined_p(entity_storage(e)) && entity_variable_p(e) )
     {
-      entity dynamic_area = global_name_to_entity(module_local_name(module),
+      entity dynamic_area = FindEntity(module_local_name(module),
 						  DYNAMIC_AREA_LOCAL_NAME);
       int tmp;
       if(SizeOfArray(e,&tmp)) { // << CurrentOffsetOfArea fails if SizeOfArray is not computable
@@ -268,7 +268,7 @@ AddEntityToCurrentModule(entity e) {
 
 
 entity make_global_entity_from_local(entity local) {
-    string seed = entity_local_name(local);
+    const char* seed = entity_local_name(local);
     int counter=0;
     entity new = entity_undefined;
     string eln= strdup(seed);
@@ -279,7 +279,7 @@ entity make_global_entity_from_local(entity local) {
     free(eln);
     entity_type(new)=copy_type(entity_type(local));
     entity_initial(new)=copy_value(entity_initial(local));
-    entity a = global_name_to_entity(TOP_LEVEL_MODULE_NAME,DYNAMIC_AREA_LOCAL_NAME);
+    entity a = FindEntity(TOP_LEVEL_MODULE_NAME,DYNAMIC_AREA_LOCAL_NAME);
     entity f = local_name_to_top_level_entity(TOP_LEVEL_MODULE_NAME);
     entity_storage(new)=make_storage_ram(make_ram(f,a,add_any_variable_to_area(a,new,fortran_module_p(entity_to_module_entity(local))),NIL));
     return new;
@@ -296,9 +296,9 @@ entity make_stderr_variable()
   /* Unfortunately, I do not have an unknown basic to use... It
      should be a FILE * pointer... */
   basic b = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
-  entity f = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+  entity f = FindEntity(TOP_LEVEL_MODULE_NAME,
 				   TOP_LEVEL_MODULE_NAME);
-  entity a = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+  entity a = FindEntity(TOP_LEVEL_MODULE_NAME,
 				   STATIC_AREA_LOCAL_NAME);
 
   pips_assert("f & a are defined", !entity_undefined_p(f)
@@ -340,7 +340,7 @@ basic base;
 
   entity_type(e) = (type) MakeTypeVariable(b, NIL);
   f = local_name_to_top_level_entity(module_name);
-  a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
+  a = FindEntity(module_name, DYNAMIC_AREA_LOCAL_NAME);
 
   entity_storage(e) =
     make_storage(is_storage_ram,
@@ -411,15 +411,15 @@ generate_variable_with_unique_name_to_module(const char * seed_name,
 					     const char * prefix,
 					     const char * suffix,
 					     entity module) {
-  const string format = fortran_module_p(module) ?
+  const char* format = fortran_module_p(module) ?
     "%s "MODULE_SEP_STRING "%s%s%s":
     "%s "MODULE_SEP_STRING "0" BLOCK_SEP_STRING "%s%s%s";
 
-  const string format_num = fortran_module_p(module) ?
+  const char* format_num = fortran_module_p(module) ?
     "%s "MODULE_SEP_STRING "%s%s%s%d":
     "%s "MODULE_SEP_STRING "0" BLOCK_SEP_STRING "%s%s%s%d";
 
-  string module_name = module_local_name(module);
+  const char* module_name = module_local_name(module);
   string variable_name;
   int number = 0;
 
@@ -543,7 +543,7 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 					    entity module,
 					    basic b)
 {
-  string module_name = module_local_name(module);
+  const char* module_name = module_local_name(module);
   string ep = strdup(prefix);
   entity e;
   char * variable_name = NULL;
@@ -638,7 +638,7 @@ entity make_new_scalar_variable(entity module, basic b)
 /* J'ai ameliore la fonction make_scalar_entity afin de l'etendre  a des tableau   */
 static entity make_array_entity(name, module_name, base,lis)
 const char* name;
-string module_name;
+const char* module_name;
 basic base;
 list lis;
 {
@@ -657,7 +657,7 @@ list lis;
 
   entity_type(e) = (type) MakeTypeVariable(b, lis);
   f = local_name_to_top_level_entity(module_name);
-  a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
+  a = FindEntity(module_name, DYNAMIC_AREA_LOCAL_NAME);
   entity_storage(e) =
     make_storage(is_storage_ram,
 		 make_ram(f, a,
@@ -674,7 +674,7 @@ list lis;
 
 entity make_new_array_variable_with_prefix(const char* prefix, entity module,basic b,list dimensions)
 {
-  string module_name = module_local_name(module);
+  const char* module_name = module_local_name(module);
   entity e;
   e = make_array_entity(prefix, module_name, b, dimensions);
   return e;
@@ -777,7 +777,7 @@ entity make_new_entity(basic ba, int kind)
     double_entities, char_entities;
 
   entity new_ent, mod_ent;
-  char prefix[4], *name, *num;
+  char prefix[4], *name;
   int number = 0;
   entity dynamic_area;
 
@@ -821,8 +821,6 @@ entity make_new_entity(basic ba, int kind)
     }
 
   mod_ent = get_current_module_entity();
-  num = (char*) malloc(32);
-  (void) sprintf(num, "%d", number);
 
   /* The first part of the full name is the concatenation of the define
    * constant ATOMIZER_MODULE_NAME and the local name of the module
@@ -832,8 +830,7 @@ entity make_new_entity(basic ba, int kind)
      name = strdup(concatenate(ATOMIZER_MODULE_NAME, entity_local_name(mod_ent),
      MODULE_SEP_STRING, prefix, num, (char *) NULL));
   */
-  name = strdup(concatenate(entity_local_name(mod_ent),
-			    MODULE_SEP_STRING, prefix, num, (char *) NULL));
+  asprintf(&name,"%s" MODULE_SEP_STRING "%s%d",entity_local_name(mod_ent),prefix,number);
   /*
     new_ent = make_entity(name,
     make_type(is_type_variable,
@@ -849,7 +846,7 @@ entity make_new_entity(basic ba, int kind)
 						NIL,NIL)),
 			storage_undefined,
 			make_value(is_value_unknown, UU));
-  dynamic_area = global_name_to_entity(module_local_name(mod_ent),
+  dynamic_area = FindEntity(module_local_name(mod_ent),
 				       DYNAMIC_AREA_LOCAL_NAME);
   entity_storage(new_ent) = make_storage(is_storage_ram,
 					 make_ram(mod_ent,
@@ -903,7 +900,7 @@ entity make_new_entity(basic ba, int kind)
 
    If the entity is not a scalar, it aborts.
  */
-entity find_or_create_scalar_entity(string name, string module_name, tag base)
+entity find_or_create_scalar_entity(const char* name, const char* module_name, tag base)
 {
   entity e = entity_undefined;
   string nom = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
@@ -926,7 +923,7 @@ entity find_or_create_scalar_entity(string name, string module_name, tag base)
 entity
 find_or_create_typed_entity(
    string name,
-   string module_name,
+   const char* module_name,
    tag base)
 {
   entity e = entity_undefined;
@@ -966,7 +963,7 @@ make_scalar_integer_entity(const char *name, const char *module_name)
     entity_type(e) = (type) MakeTypeVariable(b, NIL);
 
     f = local_name_to_top_level_entity(module_name);
-    a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
+    a = FindEntity(module_name, DYNAMIC_AREA_LOCAL_NAME);
     pips_assert("make_scalar_integer_entity",
 		!entity_undefined_p(f) && !entity_undefined_p(a));
 
@@ -1197,7 +1194,7 @@ void remove_variable_entity(entity v)
   code c = code_undefined;
 
   if(storage_undefined_p(s)) {
-    string fn = entity_module_name(v);
+    const char* fn = entity_module_name(v);
     f = local_name_to_top_level_entity(fn);
   }
   else if(storage_ram_p(s)) {
@@ -1528,10 +1525,10 @@ expression generate_string_for_alternate_return_argument(string i)
 /* * (star) used as formal label parameter is replaced by a string
    variable as suggested by Fabien Coelho. Its storage and initial value
    are lated initialized by MakeFormalParameter(). */
-entity generate_pseudo_formal_variable_for_formal_label(string p, int l)
+entity generate_pseudo_formal_variable_for_formal_label(const char* p, int l)
 {
   entity fs = entity_undefined;
-  string lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX");
+  const char* lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX");
   /* string lsp = "FORMAL_RETURN_LABEL_"; */
   /* let's assume that there are fewer than 999 formal label arguments */
   char buffer[4];
@@ -1585,8 +1582,8 @@ bool formal_label_replacement_p(entity fp)
 {
   bool replacement_p = false;
 
-  string fpn = entity_local_name(fp);
-  string lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX");
+  const char* fpn = entity_local_name(fp);
+  const char* lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX");
   /* string lsp = "FORMAL_RETURN_LABEL_"; */
 
   replacement_p = (strstr(fpn, lsp)==fpn);

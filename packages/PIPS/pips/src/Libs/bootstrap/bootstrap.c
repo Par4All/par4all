@@ -168,7 +168,7 @@ static void CreateLogicalUnits()
               */
               make_storage(is_storage_ram,
                            make_ram(ent,
-                           global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
+                           FindEntity(IO_EFFECTS_PACKAGE_NAME,
                                                  STATIC_AREA_LOCAL_NAME),
                                     0, NIL)),
               make_value(is_value_unknown, UU));
@@ -192,7 +192,7 @@ static void CreateLogicalUnits()
               */
               make_storage(is_storage_ram,
                     make_ram(ent,
-                             global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
+                             FindEntity(IO_EFFECTS_PACKAGE_NAME,
                                                    STATIC_AREA_LOCAL_NAME),
                              0, NIL)),
               make_value(is_value_unknown, UU));
@@ -216,7 +216,7 @@ static void CreateLogicalUnits()
 		     */
 		     make_storage(is_storage_ram,
 				  make_ram(ent,
-					   global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
+					   FindEntity(IO_EFFECTS_PACKAGE_NAME,
 								 STATIC_AREA_LOCAL_NAME),
 					   0, NIL)),
 		     make_value(is_value_unknown, UU));
@@ -267,7 +267,7 @@ static entity CreateAbstractStateVariable(string pn, string vn)
 		   */
 		   make_storage(is_storage_ram,
 				make_ram(ent,
-					 global_name_to_entity(pn,
+					 FindEntity(pn,
 							       STATIC_AREA_LOCAL_NAME),
 					 0, NIL)),
 		   make_value(is_value_unknown, UU));
@@ -1773,7 +1773,7 @@ arguments_are_something(
       if (basic_overloaded_p(b))
 	{
 	  syntax s = expression_syntax(e);
-	  string what = NULL;
+	  const char* what  ;
 	  switch (syntax_tag(s)) {
 	  case is_syntax_call:
 	    what = entity_local_name(call_function(syntax_call(s)));
@@ -3451,7 +3451,7 @@ is_nextrec_specifier(expression exp, type_context_p context)
 static bool
 check_spec (string name,
             bool allowed,
-            string specifier,
+            const char* specifier,
             expression contents,
             type_context_p context,
             bool (*check_contents)(expression, type_context_p))
@@ -3505,7 +3505,7 @@ check_io_list(list /* of expression */ args,
               bool a_unformatted,
               bool a_nextrec)
 {
-  string spec;
+  const char* spec;
   pips_assert("Even number of arguments", gen_length(args)%2==0);
 
   for (; args; args = CDR(CDR(args)))
@@ -5442,7 +5442,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
  * Get the function for typing the specified intrinsic
  *
  */
-typing_function_t get_typing_function_for_intrinsic(string name)
+typing_function_t get_typing_function_for_intrinsic(const char* name)
 {
   static hash_table name_to_type_function = NULL;
 
@@ -5469,7 +5469,7 @@ typing_function_t get_typing_function_for_intrinsic(string name)
  * Get the function for switching to specific name from generic name
  *
  */
-switch_name_function get_switch_name_function_for_intrinsic(string name)
+switch_name_function get_switch_name_function_for_intrinsic(const char* name)
 {
   static hash_table name_to_switch_function = NULL;
 

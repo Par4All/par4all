@@ -212,13 +212,13 @@ empty_context_test_false(transformer context __attribute__ ((__unused__)) )
 }
 
 void
-effects_computation_no_init(string module_name __attribute__ ((__unused__)) )
+effects_computation_no_init(const char *module_name __attribute__ ((__unused__)) )
 {
     return;
 }
 
 void
-effects_computation_no_reset(string module_name __attribute__ ((__unused__)) )
+effects_computation_no_reset(const char *module_name __attribute__ ((__unused__)) )
 {
     return;
 }
@@ -271,7 +271,7 @@ bool statement_io_effect_p(statement s)
       exist. If it does not exist, statement_io_effect_p() will return
       false anyway. */
    entity private_io_entity =
-      global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
+      FindEntity(IO_EFFECTS_PACKAGE_NAME,
 			    IO_EFFECTS_ARRAY_NAME);
 
    MAP(EFFECT, an_effect,
@@ -351,7 +351,7 @@ list /* of effect */ make_effects_for_array_declarations(list refs)
 
 
 
-list summary_effects_from_declaration(string module_name __attribute__ ((unused)))
+list summary_effects_from_declaration(const char *module_name __attribute__ ((unused)))
 {
   list sel = NIL;
   //entity mod = module_name_to_entity(module_name);

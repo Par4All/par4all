@@ -73,7 +73,7 @@ bool static_module_name_p(const char* name)
    integer starting at 0
  */
 string
-build_new_top_level_module_name(string prefix, bool prevent_suffix) {
+build_new_top_level_module_name(const char* prefix, bool prevent_suffix) {
   string name;
   int version = 0;
 
@@ -466,8 +466,8 @@ list module_to_all_declarations(entity m)
   bool c_module_p(entity);
 
   if(c_module_p(m)) {
-    //string module_name = entity_user_name(m);
-    string module_name = entity_local_name(m);
+    //const char* module_name = entity_user_name(m);
+    const char* module_name = entity_local_name(m);
     statement s = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
     list sdl = statement_to_declarations(s);
 
@@ -534,8 +534,8 @@ entity function_to_return_value(entity m)
 		      entity_user_name(m));
     }
     else {
-      string mn = entity_local_name(m);
-      rv = global_name_to_entity(mn, mn);
+      const char* mn = entity_local_name(m);
+      rv = FindEntity(mn, mn);
 
       pips_assert("rv is defined", entity_defined_p(rv));
     }
@@ -573,13 +573,13 @@ bool void_function_p(entity m)
  * See also string_to_entities() and a similar piece of code in
  * inlining.c that was used to code this function.
  */
-list string_to_user_modules(string s)
+list string_to_user_modules(const char* s)
 {
   list ml = NIL; // module list
   string ds = strdup(s);
 
   string c_name= NULL;
-  for(c_name = strtok(s," ") ;
+  for(c_name = strtok(ds," ") ;
       c_name ;
       c_name=strtok(NULL," ") ) {
     entity m = local_name_to_top_level_entity(c_name);

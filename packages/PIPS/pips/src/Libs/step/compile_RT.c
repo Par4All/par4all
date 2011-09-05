@@ -362,7 +362,7 @@ statement call_STEP_subroutine(string name, list args, type t)
   pips_debug(1, "name = %s, arg = %p\n", name, args);
   if(!type_undefined_p(t))
     {
-      string runtime=get_string_property("STEP_RUNTIME");
+      const char* runtime=get_string_property("STEP_RUNTIME");
       if(strncmp("c",runtime,strlen(runtime))==0)
 	{
 	  entity step_symbolique_type=step_type(t);

@@ -499,8 +499,8 @@ static void scalarize_variable_in_statement(entity pv,
   // its declaration to the current module
   // If no default prefix is defined, use the variable name
   // as prefix
-  string dpref = get_string_property("SCALARIZATION_PREFIX");
-  string epref = strlen(dpref)==0?
+  const char* dpref = get_string_property("SCALARIZATION_PREFIX");
+  const char* epref = strlen(dpref)==0?
     concatenate(entity_user_name(pv), "_", NULL)
     : dpref;
   entity sv = make_new_scalar_variable_with_prefix(epref, get_current_module_entity(), svb);

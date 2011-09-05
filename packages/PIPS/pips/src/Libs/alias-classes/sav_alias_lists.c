@@ -95,7 +95,7 @@ no_alias_for(region reg)
 
 /*
 static void
-make_alias_list_sub_region(region reg, string module_name)
+make_alias_list_sub_region(region reg, const char* module_name)
 {
     list alias_list, l_pairs;
 */
@@ -115,7 +115,7 @@ make_alias_list_sub_region(region reg, string module_name)
 
 /*
 static void
-make_alias_list_if_sub_region(region reg, string module_name)
+make_alias_list_if_sub_region(region reg, const char* module_name)
 {
     Psysteme reg_sys, alias_reg_sys;
     region alias_reg;
@@ -156,7 +156,7 @@ make_alias_list_if_sub_region(region reg, string module_name)
 
 /*
 static void
-make_alias_lists_for_sub_regions(string module_name)
+make_alias_lists_for_sub_regions(const char* module_name)
 {
     entity module_entity = local_name_to_top_level_entity(module_name);
     callees module_callees;
@@ -386,7 +386,7 @@ add_pair_to_existing_list(list alias_pair)
 
 /* GLOBAL OUT: l_alias_lists */
 bool
-alias_lists( string module_name )
+alias_lists( const char* module_name )
     {
 /*    list in_alias_pairs, out_alias_pairs, in_alias_pair, out_alias_pair; */
     list in_alias_pairs, out_alias_pairs;

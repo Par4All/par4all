@@ -372,7 +372,7 @@ bool keep_symbols;
 int maximize;
 {
     entity f = call_function(call_instr);
-    char *name = module_local_name(f);
+    const char *name = module_local_name(f);
     list args = call_arguments(call_instr);
     type t = entity_type(f);
     value v = entity_initial(f);

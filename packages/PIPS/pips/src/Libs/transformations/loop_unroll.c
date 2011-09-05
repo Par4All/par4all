@@ -579,7 +579,7 @@ static void do_loop_unroll_with_prologue(statement loop_statement,
   replace_entity_by_expression(body,ind,expr);
   free_expression(expr);
 
-  label_entity = make_new_label(get_current_module_name());
+  label_entity = make_new_label(get_current_module_entity());
   stmt = make_continue_statement(label_entity);
   body = make_block_statement(
 			      make_statement_list(body,stmt)
@@ -628,7 +628,7 @@ static void do_loop_unroll_with_prologue(statement loop_statement,
 
   /* Create body of the loop, with updated index */
   body = make_empty_block_statement();
-  label_entity = make_new_label(get_current_module_name());
+  label_entity = make_new_label(get_current_module_entity());
   instruction_block(statement_instruction(body)) =
     CONS(STATEMENT, make_continue_statement(label_entity), NIL);
   while(--rate>=0) {
@@ -838,7 +838,7 @@ bool loop_fully_unrollable_p(loop l)
     && expression_integer_value(inc, &incval);
 
   if(unroll_p) {
-    string s = get_string_property("FULL_LOOP_UNROLL_EXCEPTIONS");
+    const char* s = get_string_property("FULL_LOOP_UNROLL_EXCEPTIONS");
     if(*s!=0) {
       list callees = statement_to_called_user_entities(loop_body(l));
       list exceptions = string_to_user_modules(s);
@@ -1023,7 +1023,7 @@ bool
 unroll(char *mod_name)
 {
     statement mod_stmt;
-    char *lp_label = NULL;
+    const char *lp_label = NULL;
     entity lb_ent;
     int rate;
     bool return_status =true;
@@ -1117,7 +1117,7 @@ bool
 full_unroll(char * mod_name)
 {
     statement mod_stmt = statement_undefined;
-    char *lp_label = string_undefined;
+    const char *lp_label = string_undefined;
     entity lb_ent = entity_undefined;
     bool return_status = true;
 

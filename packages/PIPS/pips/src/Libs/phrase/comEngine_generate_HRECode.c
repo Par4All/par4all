@@ -638,7 +638,7 @@ This function generates the HRE code
 statement comEngine_generate_HRECode(statement externalized_code,
 				     string new_module_name,
 				     list l_in, list l_out, list l_params, list l_priv,
-				     string module_name, int hreMemSize)
+				     const char* module_name, int hreMemSize)
 {
   statement newStat;
 

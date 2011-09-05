@@ -163,7 +163,7 @@ add_a_generic_prettyprint(
 }
 
 static void 
-load_resources(string module_name)
+load_resources(const char* module_name)
 {
     list l;
     for (l=lp; l; POP(l))
@@ -277,7 +277,7 @@ text_statement_any_effect_type(
 
 static text
 get_any_effects_text(
-    string module_name,
+    const char* module_name,
     bool give_code_p, bool use_values)
 {
     entity module;
@@ -377,7 +377,7 @@ get_any_effects_text(
  */
 bool
 print_source_or_code_effects_engine(
-    string module_name,
+    const char* module_name,
     string file_suffix,
     bool use_values)
 {
@@ -455,7 +455,7 @@ push_prettyprints(
  */
 text
 get_any_effect_type_text(
-    string module_name,
+    const char* module_name,
     string resource_name,
     string summary_resource_name,
     bool give_code_p)
@@ -471,7 +471,7 @@ get_any_effect_type_text(
  */
 bool
 print_source_or_code_with_any_effects_engine(
-    string module_name,
+    const char* module_name,
     string resource_name,
     string summary_resource_name,
     string file_suffix,
