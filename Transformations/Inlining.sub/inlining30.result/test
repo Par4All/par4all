@@ -36,6 +36,5 @@ Code after inlining
       CALL AA1(N, A)                                                    0009
       CALL AB(N, A, B)                                                  0010
       PRINT *, B                                                        0011
-99999 CONTINUE
-99998 CONTINUE                                                          0013
+99999 CONTINUE                                                          0013
       END
