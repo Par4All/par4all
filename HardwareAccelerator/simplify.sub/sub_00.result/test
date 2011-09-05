@@ -32,10 +32,10 @@ digraph "dag_0" {
   // computation vertices
   "10 thr" [shape=parallelogram];
   "10 thr" -> "o";
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "10 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "10 thr" [label="t"];
   "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "9 ^." [label="i"];
+  "7 -" -> "9 ^_" [label="i"];
   "7 -" -> "i'";
   "i" -> "7 -";
   "i" -> "7 -";
@@ -99,10 +99,10 @@ digraph "dag_0" {
   // computation vertices
   "10 thr" [shape=parallelogram];
   "10 thr" -> "o";
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "10 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "10 thr" [label="t"];
   "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "9 ^." [label="i"];
+  "7 -" -> "9 ^_" [label="i"];
   "7 -" -> "i'";
   "i" -> "7 -";
   "i" -> "7 -";
@@ -291,10 +291,10 @@ digraph "dag_0" {
   // computation vertices
   "10 thr" [shape=parallelogram];
   "10 thr" -> "o";
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "10 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "10 thr" [label="t"];
   "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "9 ^." [label="i"];
+  "7 -" -> "9 ^_" [label="i"];
   "7 -" -> "i'";
   "i" -> "7 -";
   "i" -> "7 -";
@@ -609,10 +609,10 @@ digraph "dag_0" {
   // computation vertices
   "10 thr" [shape=parallelogram];
   "10 thr" -> "o";
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "10 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "10 thr" [label="t"];
   "7 -" [shape=trapezium,orientation=270];
-  "7 -" -> "9 ^." [label="i"];
+  "7 -" -> "9 ^_" [label="i"];
   "7 -" -> "i'";
   "i" -> "7 -";
   "i" -> "7 -";

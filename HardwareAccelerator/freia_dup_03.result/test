@@ -29,12 +29,12 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o1";
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "10 +.";
-  "i" -> "9 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o1";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "10 +_";
+  "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_03" in dot format
 digraph "dag_cleaned_0" {
@@ -45,9 +45,9 @@ digraph "dag_cleaned_0" {
   "o0" [shape=circle];
 
   // computation vertices
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "9 +.";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "9 +_";
 
   // external copies: 1
   "o1" [shape=circle];
@@ -95,12 +95,12 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o1";
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "10 +.";
-  "i" -> "9 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o1";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "10 +_";
+  "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_03" in dot format
 digraph "dag_cleaned_0" {
@@ -111,9 +111,9 @@ digraph "dag_cleaned_0" {
   "o0" [shape=circle];
 
   // computation vertices
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "9 +.";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "9 +_";
 
   // external copies: 1
   "o1" [shape=circle];
@@ -130,9 +130,9 @@ digraph "freia_dup_03_helper_0_0" {
   "o0" [shape=circle];
 
   // computation vertices
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "9 +.";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "9 +_";
 }
 
 ! acceleration function
@@ -259,12 +259,12 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o1";
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "10 +.";
-  "i" -> "9 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o1";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "10 +_";
+  "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_03" in dot format
 digraph "dag_cleaned_0" {
@@ -275,9 +275,9 @@ digraph "dag_cleaned_0" {
   "o0" [shape=circle];
 
   // computation vertices
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "9 +.";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "9 +_";
 
   // external copies: 1
   "o1" [shape=circle];
@@ -294,9 +294,9 @@ digraph "freia_dup_03_helper_0_0_0" {
   "o0" [shape=circle];
 
   // computation vertices
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "9 +.";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "9 +_";
 }
 
 ! acceleration function
@@ -380,7 +380,7 @@ freia_status freia_dup_03_helper_0_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: +.(1) -> 1
+  // 0: +_(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -512,12 +512,12 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o1";
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "10 +.";
-  "i" -> "9 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o1";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "10 +_";
+  "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_03" in dot format
 digraph "dag_cleaned_0" {
@@ -528,9 +528,9 @@ digraph "dag_cleaned_0" {
   "o0" [shape=circle];
 
   // computation vertices
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "9 +.";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "9 +_";
 
   // external copies: 1
   "o1" [shape=circle];
@@ -547,9 +547,9 @@ digraph "freia_dup_03_helper_0_0" {
   "o0" [shape=circle];
 
   // computation vertices
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "o0";
-  "i" -> "9 +.";
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "o0";
+  "i" -> "9 +_";
 }
 
 ! acceleration function

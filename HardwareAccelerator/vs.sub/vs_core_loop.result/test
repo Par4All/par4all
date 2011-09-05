@@ -210,12 +210,12 @@ digraph "dag_3" {
   // computation vertices
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion"];
-  "118 -." [shape=trapezium,orientation=270];
-  "118 -." -> "119 &." [label="immotion"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion"];
+  "118 -_" [shape=trapezium,orientation=270];
+  "118 -_" -> "119 &_" [label="immotion"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 -." [label="immotion"];
+  "113 -" -> "118 -_" [label="immotion"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion"];
   "111 D8" [shape=box];
@@ -235,18 +235,18 @@ digraph "dag_3" {
   "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
   "95 =" [shape=circle];
   "95 =" -> "imbg'";
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "95 =" [label="imbg16"];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "95 =" [label="imbg16"];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "90 =" [shape=circle];
-  "90 =" -> "91 *." [label="imtmp3"];
+  "90 =" -> "91 *_" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "105 thr" [label="immotion"];
   "87 -|" -> "99 min" [label="immotion"];
@@ -311,12 +311,12 @@ digraph "dag_cleaned_3" {
   // computation vertices
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion_1"];
-  "118 +." [shape=trapezium,orientation=270];
-  "118 +." -> "119 &." [label="immotion_2"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion_1"];
+  "118 +_" [shape=trapezium,orientation=270];
+  "118 +_" -> "119 &_" [label="immotion_2"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 +." [label="immotion_3"];
+  "113 -" -> "118 +_" [label="immotion_3"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion_4"];
   "111 D8" [shape=box];
@@ -334,22 +334,22 @@ digraph "dag_cleaned_3" {
   "99 min" -> "101 ?" [arrowhead=empty,label="minmotion"];
   "98 max" [shape=diamond];
   "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16_1"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16_2"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16_1"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16_2"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "105 thr" [label="immotion_6"];
   "87 -|" -> "99 min" [label="immotion_6"];
   "87 -|" -> "98 max" [label="immotion_6"];
   "imbg" -> "87 -|";
   "imstab" -> "87 -|";
-  "imstab" -> "91 *.";
+  "imstab" -> "91 *_";
   "imstab" -> "120 *";
 
   // external copies: 1
@@ -697,12 +697,12 @@ digraph "dag_3" {
   // computation vertices
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion"];
-  "118 -." [shape=trapezium,orientation=270];
-  "118 -." -> "119 &." [label="immotion"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion"];
+  "118 -_" [shape=trapezium,orientation=270];
+  "118 -_" -> "119 &_" [label="immotion"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 -." [label="immotion"];
+  "113 -" -> "118 -_" [label="immotion"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion"];
   "111 D8" [shape=box];
@@ -722,18 +722,18 @@ digraph "dag_3" {
   "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
   "95 =" [shape=circle];
   "95 =" -> "imbg'";
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "95 =" [label="imbg16"];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "95 =" [label="imbg16"];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "90 =" [shape=circle];
-  "90 =" -> "91 *." [label="imtmp3"];
+  "90 =" -> "91 *_" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "105 thr" [label="immotion"];
   "87 -|" -> "99 min" [label="immotion"];
@@ -798,12 +798,12 @@ digraph "dag_cleaned_3" {
   // computation vertices
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion"];
-  "118 +." [shape=trapezium,orientation=270];
-  "118 +." -> "119 &." [label="immotion"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion"];
+  "118 +_" [shape=trapezium,orientation=270];
+  "118 +_" -> "119 &_" [label="immotion"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 +." [label="immotion"];
+  "113 -" -> "118 +_" [label="immotion"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion"];
   "111 D8" [shape=box];
@@ -821,22 +821,22 @@ digraph "dag_cleaned_3" {
   "99 min" -> "101 ?" [arrowhead=empty,label="minmotion"];
   "98 max" [shape=diamond];
   "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "105 thr" [label="immotion"];
   "87 -|" -> "99 min" [label="immotion"];
   "87 -|" -> "98 max" [label="immotion"];
   "imbg" -> "87 -|";
   "imstab" -> "87 -|";
-  "imstab" -> "91 *.";
+  "imstab" -> "91 *_";
   "imstab" -> "120 *";
 
   // external copies: 1
@@ -867,8 +867,8 @@ digraph "vs_core_loop_helper_3_0" {
   "imtmp3" [shape=circle];
 
   // computation vertices
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "imtmp3";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "imtmp3";
   "99 min" [shape=diamond];
   "98 max" [shape=diamond];
   "87 -|" [shape=trapezium,orientation=270];
@@ -876,7 +876,7 @@ digraph "vs_core_loop_helper_3_0" {
   "87 -|" -> "98 max" [label="immotion_6"];
   "87 -|" -> "immotion_6";
   "imbg" -> "87 -|";
-  "imstab" -> "91 *.";
+  "imstab" -> "91 *_";
   "imstab" -> "87 -|";
 }
 // graph for dag "vs_core_loop_helper_3_1" of module "vs_core_loop" in dot format
@@ -889,14 +889,14 @@ digraph "vs_core_loop_helper_3_1" {
   "imbg16'" [shape=circle];
 
   // computation vertices
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16_1"];
+  "93 +" -> "94 /_" [label="imbg16_1"];
   "imtmp3" -> "93 +";
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16_2"];
-  "imbg16" -> "92 *.";
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16_2"];
+  "imbg16" -> "92 *_";
 }
 // graph for dag "vs_core_loop_helper_3_2" of module "vs_core_loop" in dot format
 digraph "vs_core_loop_helper_3_2" {
@@ -907,12 +907,12 @@ digraph "vs_core_loop_helper_3_2" {
   "immotion_1" [shape=circle];
 
   // computation vertices
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "immotion_1";
-  "118 +." [shape=trapezium,orientation=270];
-  "118 +." -> "119 &." [label="immotion_2"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "immotion_1";
+  "118 +_" [shape=trapezium,orientation=270];
+  "118 +_" -> "119 &_" [label="immotion_2"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 +." [label="immotion_3"];
+  "113 -" -> "118 +_" [label="immotion_3"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion_4"];
   "111 D8" [shape=box];
@@ -1856,12 +1856,12 @@ digraph "dag_3" {
   // computation vertices
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion"];
-  "118 -." [shape=trapezium,orientation=270];
-  "118 -." -> "119 &." [label="immotion"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion"];
+  "118 -_" [shape=trapezium,orientation=270];
+  "118 -_" -> "119 &_" [label="immotion"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 -." [label="immotion"];
+  "113 -" -> "118 -_" [label="immotion"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion"];
   "111 D8" [shape=box];
@@ -1881,18 +1881,18 @@ digraph "dag_3" {
   "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
   "95 =" [shape=circle];
   "95 =" -> "imbg'";
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "95 =" [label="imbg16"];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "95 =" [label="imbg16"];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "90 =" [shape=circle];
-  "90 =" -> "91 *." [label="imtmp3"];
+  "90 =" -> "91 *_" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "105 thr" [label="immotion"];
   "87 -|" -> "99 min" [label="immotion"];
@@ -1957,12 +1957,12 @@ digraph "dag_cleaned_3" {
   // computation vertices
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion"];
-  "118 +." [shape=trapezium,orientation=270];
-  "118 +." -> "119 &." [label="immotion"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion"];
+  "118 +_" [shape=trapezium,orientation=270];
+  "118 +_" -> "119 &_" [label="immotion"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 +." [label="immotion"];
+  "113 -" -> "118 +_" [label="immotion"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion"];
   "111 D8" [shape=box];
@@ -1980,22 +1980,22 @@ digraph "dag_cleaned_3" {
   "99 min" -> "101 ?" [arrowhead=empty,label="minmotion"];
   "98 max" [shape=diamond];
   "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "105 thr" [label="immotion"];
   "87 -|" -> "99 min" [label="immotion"];
   "87 -|" -> "98 max" [label="immotion"];
   "imbg" -> "87 -|";
   "imstab" -> "87 -|";
-  "imstab" -> "91 *.";
+  "imstab" -> "91 *_";
   "imstab" -> "120 *";
 
   // external copies: 1
@@ -2027,15 +2027,15 @@ digraph "vs_core_loop_helper_3_0_0" {
   "imbg16'" [shape=circle];
 
   // computation vertices
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16_1"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16_2"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16_1"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16_2"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "99 min" [shape=diamond];
   "98 max" [shape=diamond];
   "87 -|" [shape=trapezium,orientation=270];
@@ -2043,7 +2043,7 @@ digraph "vs_core_loop_helper_3_0_0" {
   "87 -|" -> "98 max" [label="immotion_6"];
   "87 -|" -> "immotion_6";
   "imbg" -> "87 -|";
-  "imstab" -> "91 *.";
+  "imstab" -> "91 *_";
   "imstab" -> "87 -|";
 }
 // graph for dag "vs_core_loop_helper_3_1_0" of module "vs_core_loop" in dot format
@@ -2059,12 +2059,12 @@ digraph "vs_core_loop_helper_3_1_0" {
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
   "imstab" -> "120 *";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion_1"];
-  "118 +." [shape=trapezium,orientation=270];
-  "118 +." -> "119 &." [label="immotion_2"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion_1"];
+  "118 +_" [shape=trapezium,orientation=270];
+  "118 +_" -> "119 &_" [label="immotion_2"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 +." [label="immotion_3"];
+  "113 -" -> "118 +_" [label="immotion_3"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion_4"];
   "111 D8" [shape=box];
@@ -2464,7 +2464,7 @@ freia_status vs_core_loop_helper_3_0_0(
   mcu_macro[1][2].iter4 = 0;
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
-  // 3: *.(3) -> 3
+  // 3: *_(3) -> 3
   mcu_macro[0][3].xmin1 = imagelet_io_3_0;
   mcu_macro[1][3].xmin1 = imagelet_io_3_1;
   mcu_macro[0][3].ymin1 = 0;
@@ -2495,7 +2495,7 @@ freia_status vs_core_loop_helper_3_0_0(
   mcu_macro[1][3].iter4 = 0;
   mcu_macro[0][3].addrStart = TERAPIX_UCODE_MUL_CONST;
   mcu_macro[1][3].addrStart = TERAPIX_UCODE_MUL_CONST;
-  // 4: *.(2) -> 2
+  // 4: *_(2) -> 2
   mcu_macro[0][4].xmin1 = imagelet_io_2_0;
   mcu_macro[1][4].xmin1 = imagelet_io_2_1;
   mcu_macro[0][4].ymin1 = 0;
@@ -2549,7 +2549,7 @@ freia_status vs_core_loop_helper_3_0_0(
   mcu_macro[1][5].iter4 = 0;
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_ADD3;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_ADD3;
-  // 6: /.(3) -> 2
+  // 6: /_(3) -> 2
   mcu_macro[0][6].xmin1 = imagelet_io_3_0;
   mcu_macro[1][6].xmin1 = imagelet_io_3_1;
   mcu_macro[0][6].ymin1 = 0;
@@ -2928,7 +2928,7 @@ freia_status vs_core_loop_helper_3_1_0(
   mcu_macro[1][5].iter4 = 0;
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_SUB3;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_SUB3;
-  // 6: +.(4) -> 4
+  // 6: +_(4) -> 4
   mcu_macro[0][6].xmin1 = imagelet_4;
   mcu_macro[1][6].xmin1 = imagelet_4;
   mcu_macro[0][6].ymin1 = 0;
@@ -2959,7 +2959,7 @@ freia_status vs_core_loop_helper_3_1_0(
   mcu_macro[1][6].iter4 = 0;
   mcu_macro[0][6].addrStart = TERAPIX_UCODE_ADD_CONST;
   mcu_macro[1][6].addrStart = TERAPIX_UCODE_ADD_CONST;
-  // 7: &.(4) -> 4
+  // 7: &_(4) -> 4
   mcu_macro[0][7].xmin1 = imagelet_4;
   mcu_macro[1][7].xmin1 = imagelet_4;
   mcu_macro[0][7].ymin1 = 0;
@@ -3484,12 +3484,12 @@ digraph "dag_3" {
   // computation vertices
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion"];
-  "118 -." [shape=trapezium,orientation=270];
-  "118 -." -> "119 &." [label="immotion"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion"];
+  "118 -_" [shape=trapezium,orientation=270];
+  "118 -_" -> "119 &_" [label="immotion"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 -." [label="immotion"];
+  "113 -" -> "118 -_" [label="immotion"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion"];
   "111 D8" [shape=box];
@@ -3509,18 +3509,18 @@ digraph "dag_3" {
   "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
   "95 =" [shape=circle];
   "95 =" -> "imbg'";
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "95 =" [label="imbg16"];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "95 =" [label="imbg16"];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "90 =" [shape=circle];
-  "90 =" -> "91 *." [label="imtmp3"];
+  "90 =" -> "91 *_" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "105 thr" [label="immotion"];
   "87 -|" -> "99 min" [label="immotion"];
@@ -3585,12 +3585,12 @@ digraph "dag_cleaned_3" {
   // computation vertices
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion_1"];
-  "118 +." [shape=trapezium,orientation=270];
-  "118 +." -> "119 &." [label="immotion_2"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion_1"];
+  "118 +_" [shape=trapezium,orientation=270];
+  "118 +_" -> "119 &_" [label="immotion_2"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 +." [label="immotion_3"];
+  "113 -" -> "118 +_" [label="immotion_3"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion_4"];
   "111 D8" [shape=box];
@@ -3608,22 +3608,22 @@ digraph "dag_cleaned_3" {
   "99 min" -> "101 ?" [arrowhead=empty,label="minmotion"];
   "98 max" [shape=diamond];
   "98 max" -> "101 ?" [arrowhead=empty,label="maxmotion"];
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16_1"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16_2"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16_1"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16_2"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "105 thr" [label="immotion_6"];
   "87 -|" -> "99 min" [label="immotion_6"];
   "87 -|" -> "98 max" [label="immotion_6"];
   "imbg" -> "87 -|";
   "imstab" -> "87 -|";
-  "imstab" -> "91 *.";
+  "imstab" -> "91 *_";
   "imstab" -> "120 *";
 
   // external copies: 1
@@ -3657,21 +3657,21 @@ digraph "vs_core_loop_helper_3_0" {
   // computation vertices
   "99 min" [shape=diamond];
   "98 max" [shape=diamond];
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "imbg16'";
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16_1"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16_2"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16_1"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16_2"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "99 min" [label="immotion_6"];
   "87 -|" -> "98 max" [label="immotion_6"];
   "87 -|" -> "immotion_6";
   "imbg" -> "87 -|";
-  "imstab" -> "91 *.";
+  "imstab" -> "91 *_";
   "imstab" -> "87 -|";
 }
 // graph for dag "vs_core_loop_helper_3_0_0" of module "vs_core_loop" in dot format
@@ -3686,23 +3686,23 @@ digraph "vs_core_loop_helper_3_0_0" {
   "imbg16'" [shape=circle];
 
   // computation vertices
-  "94 /." [shape=trapezium,orientation=270];
-  "94 /." -> "imbg16'";
+  "94 /_" [shape=trapezium,orientation=270];
+  "94 /_" -> "imbg16'";
   "99 min" [shape=diamond];
   "98 max" [shape=diamond];
   "93 +" [shape=trapezium,orientation=270];
-  "93 +" -> "94 /." [label="imbg16_1"];
-  "92 *." [shape=trapezium,orientation=270];
-  "92 *." -> "93 +" [label="imbg16_2"];
-  "imbg16" -> "92 *.";
-  "91 *." [shape=trapezium,orientation=270];
-  "91 *." -> "93 +" [label="imtmp3"];
+  "93 +" -> "94 /_" [label="imbg16_1"];
+  "92 *_" [shape=trapezium,orientation=270];
+  "92 *_" -> "93 +" [label="imbg16_2"];
+  "imbg16" -> "92 *_";
+  "91 *_" [shape=trapezium,orientation=270];
+  "91 *_" -> "93 +" [label="imtmp3"];
   "87 -|" [shape=trapezium,orientation=270];
   "87 -|" -> "99 min" [label="immotion_6"];
   "87 -|" -> "98 max" [label="immotion_6"];
   "87 -|" -> "immotion_6";
   "imbg" -> "87 -|";
-  "imstab" -> "91 *.";
+  "imstab" -> "91 *_";
   "imstab" -> "87 -|";
 }
 // graph for dag "vs_core_loop_helper_3_1" of module "vs_core_loop" in dot format
@@ -3718,12 +3718,12 @@ digraph "vs_core_loop_helper_3_1" {
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
   "imstab" -> "120 *";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion_1"];
-  "118 +." [shape=trapezium,orientation=270];
-  "118 +." -> "119 &." [label="immotion_2"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion_1"];
+  "118 +_" [shape=trapezium,orientation=270];
+  "118 +_" -> "119 &_" [label="immotion_2"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 +." [label="immotion_3"];
+  "113 -" -> "118 +_" [label="immotion_3"];
   "112 E8" [shape=box];
   "112 E8" -> "113 -" [label="immotion_4"];
   "111 D8" [shape=box];
@@ -3751,12 +3751,12 @@ digraph "vs_core_loop_helper_3_1_2" {
   "120 *" [shape=trapezium,orientation=270];
   "120 *" -> "immotion";
   "imstab" -> "120 *";
-  "119 &." [shape=trapezium,orientation=270];
-  "119 &." -> "120 *" [label="immotion_1"];
-  "118 +." [shape=trapezium,orientation=270];
-  "118 +." -> "119 &." [label="immotion_2"];
+  "119 &_" [shape=trapezium,orientation=270];
+  "119 &_" -> "120 *" [label="immotion_1"];
+  "118 +_" [shape=trapezium,orientation=270];
+  "118 +_" -> "119 &_" [label="immotion_2"];
   "113 -" [shape=trapezium,orientation=270];
-  "113 -" -> "118 +." [label="immotion_3"];
+  "113 -" -> "118 +_" [label="immotion_3"];
   "immotion_4" -> "113 -";
   "imtmp" -> "113 -";
 }

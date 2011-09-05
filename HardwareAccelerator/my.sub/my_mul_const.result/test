@@ -23,9 +23,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 // graph for dag "dag_cleaned_0" of module "my_mul_const" in dot format
 digraph "dag_cleaned_0" {
@@ -36,9 +36,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 
 ! updated function for
@@ -69,9 +69,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 // graph for dag "dag_cleaned_0" of module "my_mul_const" in dot format
 digraph "dag_cleaned_0" {
@@ -82,9 +82,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 // graph for dag "my_mul_const_helper_0_0" of module "my_mul_const" in dot format
 digraph "my_mul_const_helper_0_0" {
@@ -95,9 +95,9 @@ digraph "my_mul_const_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 
 ! acceleration function
@@ -208,9 +208,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 // graph for dag "dag_cleaned_0" of module "my_mul_const" in dot format
 digraph "dag_cleaned_0" {
@@ -221,9 +221,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 // graph for dag "my_mul_const_helper_0_0_0" of module "my_mul_const" in dot format
 digraph "my_mul_const_helper_0_0_0" {
@@ -234,9 +234,9 @@ digraph "my_mul_const_helper_0_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 
 ! acceleration function
@@ -320,7 +320,7 @@ freia_status my_mul_const_helper_0_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: *.(1) -> 1
+  // 0: *_(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -436,9 +436,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 // graph for dag "dag_cleaned_0" of module "my_mul_const" in dot format
 digraph "dag_cleaned_0" {
@@ -449,9 +449,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 // graph for dag "my_mul_const_helper_0_0" of module "my_mul_const" in dot format
 digraph "my_mul_const_helper_0_0" {
@@ -462,9 +462,9 @@ digraph "my_mul_const_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 // graph for dag "my_mul_const_helper_0_0_0" of module "my_mul_const" in dot format
 digraph "my_mul_const_helper_0_0_0" {
@@ -475,9 +475,9 @@ digraph "my_mul_const_helper_0_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 *." [shape=trapezium,orientation=270];
-  "5 *." -> "o";
-  "i0" -> "5 *.";
+  "5 *_" [shape=trapezium,orientation=270];
+  "5 *_" -> "o";
+  "i0" -> "5 *_";
 }
 
 ! acceleration function

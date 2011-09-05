@@ -1176,9 +1176,9 @@ digraph "dag_0" {
   "558 !" -> "649 D8" [label="imWork1"];
   "558 !" -> "613 D8" [label="imWork1"];
   "558 !" -> "577 D8" [label="imWork1"];
-  "554 *." [shape=trapezium,orientation=270];
+  "554 *_" [shape=trapezium,orientation=270];
   "553 -" [shape=trapezium,orientation=270];
-  "553 -" -> "554 *." [label="imout_tophatLin"];
+  "553 -" -> "554 *_" [label="imout_tophatLin"];
   "550 !" [shape=trapezium,orientation=270];
   "550 !" -> "553 -" [label="imWork1"];
   "549 ?" [shape=none];
@@ -1430,9 +1430,9 @@ digraph "dag_0" {
   "247 !" -> "338 D8" [label="imWork1"];
   "247 !" -> "302 D8" [label="imWork1"];
   "247 !" -> "266 D8" [label="imWork1"];
-  "243 *." [shape=trapezium,orientation=270];
+  "243 *_" [shape=trapezium,orientation=270];
   "239 -" [shape=trapezium,orientation=270];
-  "239 -" -> "243 *." [label="imout_tophat"];
+  "239 -" -> "243 *_" [label="imout_tophat"];
   "231 D8" [shape=box];
   "231 D8" -> "239 -" [label="imout_tophat"];
   "230 D8" [shape=box];
@@ -1514,10 +1514,10 @@ digraph "dag_2" {
   "890 thr" [shape=parallelogram];
   "890 thr" -> "892 >" [label="imWork1"];
   "890 thr" -> "imWork1'";
-  "887 *." [shape=trapezium,orientation=270];
-  "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
+  "887 *_" [shape=trapezium,orientation=270];
+  "887 *_" -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon"];
+  "886 -" -> "887 *_" [label="imout_tophatLinRecon"];
   "imWork1" -> "886 -";
   "imin" -> "892 >";
   "imin" -> "886 -";
@@ -1679,10 +1679,10 @@ digraph "dag_cleaned_0" {
   "625 E8" -> "626 E8" [label="w1_1_33"];
   "624 E8" [shape=box];
   "624 E8" -> "625 E8" [label="w1_1_34"];
-  "600 <." [shape=trapezium,orientation=270];
-  "600 <." -> "636 <" [label="w2_1_7"];
+  "600 <_" [shape=trapezium,orientation=270];
+  "600 <_" -> "636 <" [label="w2_1_7"];
   "592 E8" [shape=box];
-  "592 E8" -> "600 <." [label="w1_1_35"];
+  "592 E8" -> "600 <_" [label="w1_1_35"];
   "591 E8" [shape=box];
   "591 E8" -> "592 E8" [label="w1_1_36"];
   "590 E8" [shape=box];
@@ -1861,10 +1861,10 @@ digraph "dag_cleaned_2" {
   // computation vertices
   "890 thr" [shape=parallelogram];
   "890 thr" -> "imWork1'";
-  "887 *." [shape=trapezium,orientation=270];
-  "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
+  "887 *_" [shape=trapezium,orientation=270];
+  "887 *_" -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon_1"];
+  "886 -" -> "887 *_" [label="imout_tophatLinRecon_1"];
   "imWork1" -> "886 -";
   "imin" -> "886 -";
 }
@@ -3814,9 +3814,9 @@ digraph "dag_0" {
   "334 !" -> "397 D8" [label="imWork1"];
   "334 !" -> "372 D8" [label="imWork1"];
   "334 !" -> "347 D8" [label="imWork1"];
-  "333 *." [shape=trapezium,orientation=270];
+  "333 *_" [shape=trapezium,orientation=270];
   "332 -" [shape=trapezium,orientation=270];
-  "332 -" -> "333 *." [label="imout_tophatLin"];
+  "332 -" -> "333 *_" [label="imout_tophatLin"];
   "330 !" [shape=trapezium,orientation=270];
   "330 !" -> "332 -" [label="imWork1"];
   "329 ?" [shape=none];
@@ -4068,9 +4068,9 @@ digraph "dag_0" {
   "121 !" -> "184 D8" [label="imWork1"];
   "121 !" -> "159 D8" [label="imWork1"];
   "121 !" -> "134 D8" [label="imWork1"];
-  "120 *." [shape=trapezium,orientation=270];
+  "120 *_" [shape=trapezium,orientation=270];
   "118 -" [shape=trapezium,orientation=270];
-  "118 -" -> "120 *." [label="imout_tophat"];
+  "118 -" -> "120 *_" [label="imout_tophat"];
   "114 D8" [shape=box];
   "114 D8" -> "118 -" [label="imout_tophat"];
   "113 D8" [shape=box];
@@ -4468,10 +4468,10 @@ digraph "dag_2" {
   "608 thr" [shape=parallelogram];
   "608 thr" -> "609 >" [label="imWork1"];
   "608 thr" -> "imWork1'";
-  "607 *." [shape=trapezium,orientation=270];
-  "607 *." -> "608 thr" [label="imout_tophatLinRecon"];
+  "607 *_" [shape=trapezium,orientation=270];
+  "607 *_" -> "608 thr" [label="imout_tophatLinRecon"];
   "606 -" [shape=trapezium,orientation=270];
-  "606 -" -> "607 *." [label="imout_tophatLinRecon"];
+  "606 -" -> "607 *_" [label="imout_tophatLinRecon"];
   "imWork1" -> "606 -";
   "imin" -> "609 >";
   "imin" -> "606 -";
@@ -4633,10 +4633,10 @@ digraph "dag_cleaned_0" {
   "380 E8" -> "381 E8" [label="w1_1"];
   "379 E8" [shape=box];
   "379 E8" -> "380 E8" [label="w1_1"];
-  "362 <." [shape=trapezium,orientation=270];
-  "362 <." -> "387 <" [label="w2_1"];
+  "362 <_" [shape=trapezium,orientation=270];
+  "362 <_" -> "387 <" [label="w2_1"];
   "358 E8" [shape=box];
-  "358 E8" -> "362 <." [label="w1_1"];
+  "358 E8" -> "362 <_" [label="w1_1"];
   "357 E8" [shape=box];
   "357 E8" -> "358 E8" [label="w1_1"];
   "356 E8" [shape=box];
@@ -5131,10 +5131,10 @@ digraph "dag_cleaned_2" {
   // computation vertices
   "608 thr" [shape=parallelogram];
   "608 thr" -> "imWork1'";
-  "607 *." [shape=trapezium,orientation=270];
-  "607 *." -> "608 thr" [label="imout_tophatLinRecon"];
+  "607 *_" [shape=trapezium,orientation=270];
+  "607 *_" -> "608 thr" [label="imout_tophatLinRecon"];
   "606 -" [shape=trapezium,orientation=270];
-  "606 -" -> "607 *." [label="imout_tophatLinRecon"];
+  "606 -" -> "607 *_" [label="imout_tophatLinRecon"];
   "imWork1" -> "606 -";
   "imin" -> "606 -";
 }
@@ -5148,10 +5148,10 @@ digraph "freia_52_helper_0_0" {
   "w2_1_7" [shape=circle];
 
   // computation vertices
-  "362 <." [shape=trapezium,orientation=270];
-  "362 <." -> "w2_1_7";
+  "362 <_" [shape=trapezium,orientation=270];
+  "362 <_" -> "w2_1_7";
   "358 E8" [shape=box];
-  "358 E8" -> "362 <." [label="w1_1_35"];
+  "358 E8" -> "362 <_" [label="w1_1_35"];
   "357 E8" [shape=box];
   "357 E8" -> "358 E8" [label="w1_1_36"];
   "356 E8" [shape=box];
@@ -5501,10 +5501,10 @@ digraph "freia_52_helper_2_0" {
   // computation vertices
   "608 thr" [shape=parallelogram];
   "608 thr" -> "imWork1'";
-  "607 *." [shape=trapezium,orientation=270];
-  "607 *." -> "608 thr" [label="imout_tophatLinRecon"];
+  "607 *_" [shape=trapezium,orientation=270];
+  "607 *_" -> "608 thr" [label="imout_tophatLinRecon"];
   "606 -" [shape=trapezium,orientation=270];
-  "606 -" -> "607 *." [label="imout_tophatLinRecon_1"];
+  "606 -" -> "607 *_" [label="imout_tophatLinRecon_1"];
   "imWork1" -> "606 -";
   "imin" -> "606 -";
 }
@@ -10340,9 +10340,9 @@ digraph "dag_0" {
   "558 !" -> "649 D8" [label="imWork1"];
   "558 !" -> "613 D8" [label="imWork1"];
   "558 !" -> "577 D8" [label="imWork1"];
-  "554 *." [shape=trapezium,orientation=270];
+  "554 *_" [shape=trapezium,orientation=270];
   "553 -" [shape=trapezium,orientation=270];
-  "553 -" -> "554 *." [label="imout_tophatLin"];
+  "553 -" -> "554 *_" [label="imout_tophatLin"];
   "550 !" [shape=trapezium,orientation=270];
   "550 !" -> "553 -" [label="imWork1"];
   "549 ?" [shape=none];
@@ -10594,9 +10594,9 @@ digraph "dag_0" {
   "247 !" -> "338 D8" [label="imWork1"];
   "247 !" -> "302 D8" [label="imWork1"];
   "247 !" -> "266 D8" [label="imWork1"];
-  "243 *." [shape=trapezium,orientation=270];
+  "243 *_" [shape=trapezium,orientation=270];
   "239 -" [shape=trapezium,orientation=270];
-  "239 -" -> "243 *." [label="imout_tophat"];
+  "239 -" -> "243 *_" [label="imout_tophat"];
   "231 D8" [shape=box];
   "231 D8" -> "239 -" [label="imout_tophat"];
   "230 D8" [shape=box];
@@ -10678,10 +10678,10 @@ digraph "dag_2" {
   "890 thr" [shape=parallelogram];
   "890 thr" -> "892 >" [label="imWork1"];
   "890 thr" -> "imWork1'";
-  "887 *." [shape=trapezium,orientation=270];
-  "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
+  "887 *_" [shape=trapezium,orientation=270];
+  "887 *_" -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon"];
+  "886 -" -> "887 *_" [label="imout_tophatLinRecon"];
   "imWork1" -> "886 -";
   "imin" -> "892 >";
   "imin" -> "886 -";
@@ -10843,10 +10843,10 @@ digraph "dag_cleaned_0" {
   "625 E8" -> "626 E8" [label="w1_1"];
   "624 E8" [shape=box];
   "624 E8" -> "625 E8" [label="w1_1"];
-  "600 <." [shape=trapezium,orientation=270];
-  "600 <." -> "636 <" [label="w2_1"];
+  "600 <_" [shape=trapezium,orientation=270];
+  "600 <_" -> "636 <" [label="w2_1"];
   "592 E8" [shape=box];
-  "592 E8" -> "600 <." [label="w1_1"];
+  "592 E8" -> "600 <_" [label="w1_1"];
   "591 E8" [shape=box];
   "591 E8" -> "592 E8" [label="w1_1"];
   "590 E8" [shape=box];
@@ -11025,10 +11025,10 @@ digraph "dag_cleaned_2" {
   // computation vertices
   "890 thr" [shape=parallelogram];
   "890 thr" -> "imWork1'";
-  "887 *." [shape=trapezium,orientation=270];
-  "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
+  "887 *_" [shape=trapezium,orientation=270];
+  "887 *_" -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon"];
+  "886 -" -> "887 *_" [label="imout_tophatLinRecon"];
   "imWork1" -> "886 -";
   "imin" -> "886 -";
 }
@@ -11215,8 +11215,8 @@ digraph "freia_52_helper_0_0_2" {
   "672 <" -> "708 <" [label="w2_1_5"];
   "636 <" [shape=trapezium,orientation=270];
   "636 <" -> "672 <" [label="w2_1_6"];
-  "600 <." [shape=trapezium,orientation=270];
-  "600 <." -> "636 <" [label="w2_1_7"];
+  "600 <_" [shape=trapezium,orientation=270];
+  "600 <_" -> "636 <" [label="w2_1_7"];
   "664 E8" [shape=box];
   "664 E8" -> "672 <" [label="w1_1_25"];
   "844 E8" [shape=box];
@@ -11242,7 +11242,7 @@ digraph "freia_52_helper_0_0_2" {
   "628 E8" [shape=box];
   "628 E8" -> "636 <" [label="w1_1_30"];
   "592 E8" [shape=box];
-  "592 E8" -> "600 <." [label="w1_1_35"];
+  "592 E8" -> "600 <_" [label="w1_1_35"];
   "842 E8" [shape=box];
   "842 E8" -> "843 E8" [label="w1_1_2"];
   "806 E8" [shape=box];
@@ -11313,10 +11313,10 @@ digraph "freia_52_helper_2_0_0" {
   // computation vertices
   "890 thr" [shape=parallelogram];
   "890 thr" -> "imWork1'";
-  "887 *." [shape=trapezium,orientation=270];
-  "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
+  "887 *_" [shape=trapezium,orientation=270];
+  "887 *_" -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon_1"];
+  "886 -" -> "887 *_" [label="imout_tophatLinRecon_1"];
   "imWork1" -> "886 -";
   "imin" -> "886 -";
 }
@@ -14041,7 +14041,7 @@ freia_status freia_52_helper_0_0_2(
   mcu_macro[1][31].iter4 = 0;
   mcu_macro[0][31].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][31].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 32: <.(8) -> 8
+  // 32: <_(8) -> 8
   mcu_macro[0][32].xmin1 = imagelet_io_8_0;
   mcu_macro[1][32].xmin1 = imagelet_io_8_1;
   mcu_macro[0][32].ymin1 = 0;
@@ -14770,7 +14770,7 @@ freia_status freia_52_helper_2_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_SUB3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_SUB3;
-  // 1: *.(2) -> 2
+  // 1: *_(2) -> 2
   mcu_macro[0][1].xmin1 = imagelet_io_2_0;
   mcu_macro[1][1].xmin1 = imagelet_io_2_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -17425,9 +17425,9 @@ digraph "dag_0" {
   "558 !" -> "649 D8" [label="imWork1"];
   "558 !" -> "613 D8" [label="imWork1"];
   "558 !" -> "577 D8" [label="imWork1"];
-  "554 *." [shape=trapezium,orientation=270];
+  "554 *_" [shape=trapezium,orientation=270];
   "553 -" [shape=trapezium,orientation=270];
-  "553 -" -> "554 *." [label="imout_tophatLin"];
+  "553 -" -> "554 *_" [label="imout_tophatLin"];
   "550 !" [shape=trapezium,orientation=270];
   "550 !" -> "553 -" [label="imWork1"];
   "549 ?" [shape=none];
@@ -17679,9 +17679,9 @@ digraph "dag_0" {
   "247 !" -> "338 D8" [label="imWork1"];
   "247 !" -> "302 D8" [label="imWork1"];
   "247 !" -> "266 D8" [label="imWork1"];
-  "243 *." [shape=trapezium,orientation=270];
+  "243 *_" [shape=trapezium,orientation=270];
   "239 -" [shape=trapezium,orientation=270];
-  "239 -" -> "243 *." [label="imout_tophat"];
+  "239 -" -> "243 *_" [label="imout_tophat"];
   "231 D8" [shape=box];
   "231 D8" -> "239 -" [label="imout_tophat"];
   "230 D8" [shape=box];
@@ -17763,10 +17763,10 @@ digraph "dag_2" {
   "890 thr" [shape=parallelogram];
   "890 thr" -> "892 >" [label="imWork1"];
   "890 thr" -> "imWork1'";
-  "887 *." [shape=trapezium,orientation=270];
-  "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
+  "887 *_" [shape=trapezium,orientation=270];
+  "887 *_" -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon"];
+  "886 -" -> "887 *_" [label="imout_tophatLinRecon"];
   "imWork1" -> "886 -";
   "imin" -> "892 >";
   "imin" -> "886 -";
@@ -17928,10 +17928,10 @@ digraph "dag_cleaned_0" {
   "625 E8" -> "626 E8" [label="w1_1_33"];
   "624 E8" [shape=box];
   "624 E8" -> "625 E8" [label="w1_1_34"];
-  "600 <." [shape=trapezium,orientation=270];
-  "600 <." -> "636 <" [label="w2_1_7"];
+  "600 <_" [shape=trapezium,orientation=270];
+  "600 <_" -> "636 <" [label="w2_1_7"];
   "592 E8" [shape=box];
-  "592 E8" -> "600 <." [label="w1_1_35"];
+  "592 E8" -> "600 <_" [label="w1_1_35"];
   "591 E8" [shape=box];
   "591 E8" -> "592 E8" [label="w1_1_36"];
   "590 E8" [shape=box];
@@ -18110,10 +18110,10 @@ digraph "dag_cleaned_2" {
   // computation vertices
   "890 thr" [shape=parallelogram];
   "890 thr" -> "imWork1'";
-  "887 *." [shape=trapezium,orientation=270];
-  "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
+  "887 *_" [shape=trapezium,orientation=270];
+  "887 *_" -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon_1"];
+  "886 -" -> "887 *_" [label="imout_tophatLinRecon_1"];
   "imWork1" -> "886 -";
   "imin" -> "886 -";
 }
@@ -18214,10 +18214,10 @@ digraph "freia_52_helper_0_0" {
   "625 E8" -> "626 E8" [label="w1_1_33"];
   "624 E8" [shape=box];
   "624 E8" -> "625 E8" [label="w1_1_34"];
-  "600 <." [shape=trapezium,orientation=270];
-  "600 <." -> "636 <" [label="w2_1_7"];
+  "600 <_" [shape=trapezium,orientation=270];
+  "600 <_" -> "636 <" [label="w2_1_7"];
   "592 E8" [shape=box];
-  "592 E8" -> "600 <." [label="w1_1_35"];
+  "592 E8" -> "600 <_" [label="w1_1_35"];
   "591 E8" [shape=box];
   "591 E8" -> "592 E8" [label="w1_1_36"];
   "590 E8" [shape=box];
@@ -18344,9 +18344,9 @@ digraph "freia_52_helper_0_0_2" {
   "636 <" [shape=trapezium,orientation=270];
   "636 <" -> "672 <" [label="w2_1_6"];
   "w1_1_30" -> "636 <";
-  "600 <." [shape=trapezium,orientation=270];
-  "600 <." -> "636 <" [label="w2_1_7"];
-  "w1_1_35" -> "600 <.";
+  "600 <_" [shape=trapezium,orientation=270];
+  "600 <_" -> "636 <" [label="w2_1_7"];
+  "w1_1_35" -> "600 <_";
 }
 // graph for dag "freia_52_helper_1_0" of module "freia_52" in dot format
 digraph "freia_52_helper_1_0" {
@@ -18396,10 +18396,10 @@ digraph "freia_52_helper_2_0" {
   // computation vertices
   "890 thr" [shape=parallelogram];
   "890 thr" -> "imWork1'";
-  "887 *." [shape=trapezium,orientation=270];
-  "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
+  "887 *_" [shape=trapezium,orientation=270];
+  "887 *_" -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon_1"];
+  "886 -" -> "887 *_" [label="imout_tophatLinRecon_1"];
   "imWork1" -> "886 -";
   "imin" -> "886 -";
 }
@@ -18415,10 +18415,10 @@ digraph "freia_52_helper_2_0_0" {
   // computation vertices
   "890 thr" [shape=parallelogram];
   "890 thr" -> "imWork1'";
-  "887 *." [shape=trapezium,orientation=270];
-  "887 *." -> "890 thr" [label="imout_tophatLinRecon"];
+  "887 *_" [shape=trapezium,orientation=270];
+  "887 *_" -> "890 thr" [label="imout_tophatLinRecon"];
   "886 -" [shape=trapezium,orientation=270];
-  "886 -" -> "887 *." [label="imout_tophatLinRecon_1"];
+  "886 -" -> "887 *_" [label="imout_tophatLinRecon_1"];
   "imWork1" -> "886 -";
   "imin" -> "886 -";
 }
