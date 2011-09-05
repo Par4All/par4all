@@ -8,7 +8,7 @@ out_gp="histogram.gp"
 cat > $out_gp << EOF
 reset
 
-set xrange[-0.5:25]
+set xrange[-0.5:26]
 set yrange[-2:9]
 
 set ytics(              \
