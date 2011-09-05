@@ -9,11 +9,11 @@ int main()
       // even if it belongs to the loop locals of the inner loop which is not parallel
       for(i = 0; i <= 9; i += 1) {
          //PIPS generated variable
-         int j1, tmp1;
+         int j, tmp;
          a[i][0] = i;
-         for(j1 = 1; j1 <= 9; j1 += 1) {
-            tmp1 = a[i][j1-1];
-            a[i][j1] = tmp1+j1;
+         for(j = 1; j <= 9; j += 1) {
+            tmp = a[i][j-1];
+            a[i][j] = tmp+j;
          }
       }
    }

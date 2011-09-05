@@ -1595,6 +1595,8 @@ static freia_status median_1_helper_0_0_1_compile(void)
     "  GLOBAL PIXEL * j0 = i0 + ofs_i0;\n"
     "  GLOBAL PIXEL * j1 = i1 + ofs_i1;\n"
     "  GLOBAL PIXEL * j2 = i2 + ofs_i2;\n"
+    "\n"
+    "  // thread's pixel loop\n"
     "  int gid = pitch*get_global_id(0);\n"
     "  int i;\n"
     "  for (i=gid; i < (gid+width); i++)\n"
@@ -1624,52 +1626,22 @@ freia_status median_1_helper_0_0_1(
   const freia_data2d * i2)
 {
   freia_status err = FREIA_OK;
-  freia_data2d_opencl *pool= frclTarget.pool;
-  int pitch = o0->row[1] - o0->row[0];
-  int width = o0->widthWa;
-  size_t workSize[1];
-  workSize[0] = o0->heightWa;
-  uint32_t bpp = o0->bpp>>4;
 
   // handle on the fly compilation...
   static int to_compile = 1;
   if (to_compile) {
-    freia_status cerr = median_1_helper_0_0_1_compile();
+    err |= median_1_helper_0_0_1_compile();
     // compilation may have failed
-    if (cerr) return cerr;
+    if (err) return err;
     to_compile = 0;
   }
 
-  // now get kernel, which must be have be compiled.
+  // now get kernel, which must be have be compiled
+  uint32_t bpp = i0->bpp>>4;
   cl_kernel kernel = median_1_helper_0_0_1_kernel[bpp];
 
-  // set kernel parameters
-  err |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &pool[o0->clId].mem);
-  cl_int ofs_o0 = freia_common_data_get_offset(o0);
-  err |= clSetKernelArg(kernel, 1, sizeof(cl_int), &ofs_o0);
-  err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &pool[i0->clId].mem);
-  cl_int ofs_i0 = freia_common_data_get_offset(i0);
-  err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &ofs_i0);
-  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &pool[i1->clId].mem);
-  cl_int ofs_i1 = freia_common_data_get_offset(i1);
-  err |= clSetKernelArg(kernel, 5, sizeof(cl_int), &ofs_i1);
-  err |= clSetKernelArg(kernel, 6, sizeof(cl_mem), &pool[i2->clId].mem);
-  cl_int ofs_i2 = freia_common_data_get_offset(i2);
-  err |= clSetKernelArg(kernel, 7, sizeof(cl_int), &ofs_i2);
-  err |= clSetKernelArg(kernel, 8, sizeof(cl_int), &width);
-  err |= clSetKernelArg(kernel, 9, sizeof(cl_int), &pitch);
-
   // call kernel median_1_helper_0_0_1
-  err |= clEnqueueNDRangeKernel(
-            frclTarget.queue,
-            kernel,
-            1, // number of dimensions
-            NULL, // undefined for OpenCL 1.0
-            workSize, // x and y dimensions
-            NULL, // local size
-            0, // don't wait events
-            NULL,
-            NULL); // do not produce an event
+  err |= freia_op_call_kernel(kernel, 1, 3, 0, 0, o0, i0, i1, i2);
 
   return err;
 }
@@ -1695,6 +1667,8 @@ KERNEL void median_1_helper_0_0_1(
   GLOBAL PIXEL * j0 = i0 + ofs_i0;
   GLOBAL PIXEL * j1 = i1 + ofs_i1;
   GLOBAL PIXEL * j2 = i2 + ofs_i2;
+
+  // thread's pixel loop
   int gid = pitch*get_global_id(0);
   int i;
   for (i=gid; i < (gid+width); i++)
