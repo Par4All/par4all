@@ -72,7 +72,7 @@ void set_contracted_rw_effects(bool b)
 
 /*********************************************** INTERPROCEDURAL COMPUTATION */
 
-bool summary_rw_effects_engine(string module_name)
+bool summary_rw_effects_engine(const char* module_name)
 {
 
     list l_glob = NIL, l_loc = NIL,l_loc2 = NIL, l_dec=NIL;
@@ -935,7 +935,7 @@ void rw_effects_of_module_statement(statement module_stat)
     free_effects_private_current_context_stack();
 }
 
-bool rw_effects_engine(char * module_name)
+bool rw_effects_engine(const char * module_name)
 {
     /* Get the code of the module. */
     set_current_module_statement( (statement)

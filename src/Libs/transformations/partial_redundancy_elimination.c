@@ -798,7 +798,7 @@ partial_redundancy_elimination_statement(statement module_statement)
 
    @return true since we are confident that everything goes fine
  */
-bool partial_redundancy_elimination(char *module_name)
+bool partial_redundancy_elimination(const char* module_name)
 {
   statement module_statement;
   set_current_module_entity(module_name_to_entity(module_name));

@@ -223,7 +223,7 @@ text_statement_continuation_conditions(
 
 
 static text 
-get_continuation_condition_text(char *module_name, bool give_code_p)
+get_continuation_condition_text(const char* module_name, bool give_code_p)
 {
     entity module;
     statement module_stat, user_stat = statement_undefined;
@@ -300,7 +300,7 @@ get_continuation_condition_text(char *module_name, bool give_code_p)
 }
 
 static bool 
-print_continuation_conditions(char *module_name)
+print_continuation_conditions(const char* module_name)
 {
     char *file_name, *file_resource_name;
     bool success = true;
@@ -326,14 +326,14 @@ print_continuation_conditions(char *module_name)
     return(success);
 }
 
-bool print_code_continuation_conditions(char *module_name)
+bool print_code_continuation_conditions(const char* module_name)
 {
     is_user_view_p = false;
     return print_continuation_conditions(module_name);
 }
 
 
-bool print_source_continuation_conditions(char *module_name)
+bool print_source_continuation_conditions(const char* module_name)
 {
     is_user_view_p = true;
     return print_continuation_conditions(module_name);

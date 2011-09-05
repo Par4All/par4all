@@ -243,7 +243,7 @@ char *module_name;
 text text_summary_complexity(module)
 entity module;
 {
-    string module_name = module_local_name(module);
+    const char* module_name = module_local_name(module);
     complexity stat_comp = (complexity)
 	db_get_memory_resource(DBR_SUMMARY_COMPLEXITY, module_name, true);
     cons *pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, false,
@@ -265,7 +265,7 @@ entity module;
 }
 
 text get_text_complexities(module_name)
-char *module_name;
+const char *module_name;
 {
     /* FI: different kind of complexities should later be made
        available.  Instead of the module intrinsic complexity, it would

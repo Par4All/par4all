@@ -109,8 +109,8 @@ void inline_return_remover(statement s,inlining_parameters p)
   /*
     Delete pragmas scop & endscop after inlining to give back original structure to user's program
   */
-  string pragma_begin = get_string_property("PRAGMA_BEGIN");
-  string pragma_end = get_string_property("PRAGMA_END");
+  const char* pragma_begin = get_string_property("PRAGMA_BEGIN");
+  const char* pragma_end = get_string_property("PRAGMA_END");
   list l_exts = extensions_extension (statement_extensions (s));
   FOREACH (EXTENSION, ext, l_exts) {
     pragma pr = extension_pragma (ext);
@@ -267,22 +267,22 @@ entity make_temporary_scalar_entity(expression from,statement * assign)
  * it avoid duplications due to copy_statement
  */
 static
-void inlining_regenerate_labels(statement s, string new_module)
+void inlining_regenerate_labels(statement s, entity new_module)
 {
     entity lbl = statement_label(s);
     if(!entity_empty_label_p(lbl))
     {
-        if( !entity_undefined_p(find_label_entity(new_module,label_local_name(lbl))))
+        if( !entity_undefined_p(find_label_entity(module_local_name(new_module),label_local_name(lbl))))
         {
             statement_label(s)=lbl=make_new_label(new_module);
         }
         else
-            FindOrCreateEntity(new_module,entity_local_name(lbl));
+            FindOrCreateEntity(module_local_name(new_module),entity_local_name(lbl));
         if( statement_loop_p(s) )
             loop_label(statement_loop(s))=lbl;
     }
     else if( statement_loop_p(s) ) {
-        if( !entity_undefined_p( find_label_entity(new_module,label_local_name(lbl)) ) )
+        if( !entity_undefined_p( find_label_entity(module_local_name(new_module),label_local_name(lbl)) ) )
             loop_label(statement_loop(s))=make_new_label(new_module);
     }
 }
@@ -350,8 +350,6 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     /* only inline the right call */
     pips_assert("inline the right call",inline_should_inline(inlined_module(p),callee));
 
-    string modified_module_name = entity_local_name(get_current_module_entity());
-
     value inlined_value = entity_initial(inlined_module(p));
     pips_assert("is a code", value_code_p(inlined_value));
     code inlined_code = value_code(inlined_value);
@@ -407,7 +405,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             if(!entity_enum_member_p(ref_ent) && /* enum member cannot be added to declarations */
                     !entity_formal_p(ref_ent) ) /* formal parameters are not considered */
             {
-                string emn = entity_module_name(ref_ent);
+                const char* emn = entity_module_name(ref_ent);
                 if(extern_entity_p(get_current_module_entity(),ref_ent) &&
                         !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ) )
                 {
@@ -490,10 +488,10 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
 
 
     /* avoid duplicated label due to copy_statement */
-    gen_context_recurse(expanded,modified_module_name,statement_domain,gen_true,inlining_regenerate_labels);
+    gen_context_recurse(expanded,get_current_module_entity(),statement_domain,gen_true,inlining_regenerate_labels);
 
     /* add label at the end of the statement */
-    laststmt(p)=make_continue_statement(make_new_label( modified_module_name ) );
+    laststmt(p)=make_continue_statement(make_new_label( get_current_module_entity() ) );
     insert_statement(expanded,laststmt(p),false);
 
     /* fix `return' calls
@@ -903,7 +901,7 @@ inline_calls(inlining_parameters p ,char * module)
  * @return true if we did something
  */
 static
-bool do_inlining(inlining_parameters p,char *module_name)
+bool do_inlining(inlining_parameters p, const char *module_name)
 {
     /* Get the module ressource */
     inlined_module (p)= module_name_to_entity( module_name );
@@ -965,7 +963,7 @@ bool do_inlining(inlining_parameters p,char *module_name)
  *
  * @return
  */
-bool inlining(char *module_name)
+bool inlining(const char* module_name)
 {
     iparam p =IPARAM_INIT;
     use_effects(&p)=true;
@@ -979,7 +977,7 @@ bool inlining(char *module_name)
  *
  * @return
  */
-bool inlining_simple(char *module_name)
+bool inlining_simple(const char* module_name)
 {
     iparam p =IPARAM_INIT;
     use_effects(&p)=false;
@@ -1000,7 +998,7 @@ bool inlining_simple(char *module_name)
  * @param module_name called module name
  */
 static bool
-run_inlining(string caller_name, string module_name, inlining_parameters p)
+run_inlining(string caller_name, const char* module_name, inlining_parameters p)
 {
   /* Get the module ressource */
   inlined_module (p)= module_name_to_entity( module_name );

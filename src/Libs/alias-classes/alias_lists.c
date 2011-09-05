@@ -315,7 +315,7 @@ add_alias_lists_callee( string callee_name )
  *                            l_alias_lists
  */
 static void
-add_alias_lists_callees(string module_name)
+add_alias_lists_callees(const char* module_name)
 {
     callees l_callees;
 
@@ -341,7 +341,7 @@ add_alias_lists_callees(string module_name)
  *                            l_alias_lists
  */
 bool
-alias_lists( string module_name )
+alias_lists( const char* module_name )
     {
     list in_alias_pairs, out_alias_pairs;
     entity module;

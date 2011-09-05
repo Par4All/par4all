@@ -199,7 +199,7 @@ static entity new_synonym(entity e)
 {
     int n = gen_length(entities_list(load_dynamic_hpf(e))); /* syn. number */
     entity primary = load_primary_entity(e), new_e;
-    string module = entity_module_name(e);
+    const char* module = entity_module_name(e);
     char new_name[100];	
     
     sprintf(new_name, "%s_%x", entity_local_name(primary), (unsigned int) n);
@@ -215,7 +215,7 @@ static entity new_synonym(entity e)
 	entity_storage(new_e) = 
 	    make_storage(is_storage_ram,
 	      make_ram(sub,
-	        global_name_to_entity(entity_local_name(sub),
+	        FindEntity(entity_local_name(sub),
 				      DYNAMIC_AREA_LOCAL_NAME), 0, NIL));
 	free_storage(s);
     }

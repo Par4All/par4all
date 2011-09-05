@@ -56,12 +56,7 @@
 
 entity Generate_C_ReturnLabel(entity m)
 {
-  string ln = strdup(concatenate(entity_module_name(m),
-				 MODULE_SEP_STRING,
-				 LABEL_PREFIX,
-				 RETURN_LABEL_NAME,
-				 NULL));
-  entity l = make_label(ln);
+  entity l = make_label(entity_module_name(m), LABEL_PREFIX RETURN_LABEL_NAME);
   return l;
 }
 

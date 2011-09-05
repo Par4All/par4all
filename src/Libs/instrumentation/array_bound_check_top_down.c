@@ -1157,7 +1157,7 @@ static void top_down_abc_statement(statement module_statement)
   stack_free(&context.uns);
 }
 
-bool array_bound_check_top_down(char *module_name)
+bool array_bound_check_top_down(const char* module_name)
 {
   statement module_statement;
   set_current_module_entity(local_name_to_top_level_entity(module_name));

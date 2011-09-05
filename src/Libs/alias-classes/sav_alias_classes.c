@@ -429,7 +429,7 @@ add_classes_for_this_callee( string callee_name )
 
 
 static void
-add_classes_callees(string module_name)
+add_classes_callees(const char* module_name)
 {
     callees all_callees;
 
@@ -450,7 +450,7 @@ add_classes_callees(string module_name)
 
 
 bool
-alias_classes( string module_name )
+alias_classes( const char* module_name )
 {
     list alias_lists;
     entity module;

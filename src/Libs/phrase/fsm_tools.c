@@ -80,7 +80,7 @@ expression make_expression_with_state_variable(entity state_variable,
  * exists, then this functions search a new name by incrementing the
  * integer name_identifier
  */
-entity create_state_variable (string module_name,
+entity create_state_variable (const char* module_name,
 			      int name_identifier)
 {
   entity module;
@@ -211,7 +211,7 @@ statement make_reset_state_variable_statement (statement stat,
 statement make_transition_statement(control current_node,
 				    statement root_statement,
 				    entity state_variable,
-				    string module_name)
+				    const char* module_name)
 {
   statement returned_statement = NULL;
   statement transition_statement = NULL;
@@ -398,7 +398,7 @@ statement make_transition_statement(control current_node,
  */
 statement make_fsm_transitions_statement (statement stat,
 					  entity state_variable,
-					  string module_name)
+					  const char* module_name)
 {
   statement returned_statement = NULL;
   statement current_statement = NULL;
@@ -445,7 +445,7 @@ statement make_fsm_transitions_statement (statement stat,
  */
 statement make_fsm_from_statement(statement stat,
 				  entity state_variable,
-				  string module_name)
+				  const char* module_name)
 {
   statement returned_statement;
   statement loop_statement;
@@ -534,7 +534,7 @@ statement make_fsm_from_statement(statement stat,
  */
 statement fsmize_statement (statement stat,
 			    entity state_variable,
-			    string module_name)
+			    const char* module_name)
 {
   // Defaut behaviour is to return parameter statement stat
   statement returned_statement = stat;

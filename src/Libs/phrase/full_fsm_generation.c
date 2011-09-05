@@ -61,7 +61,7 @@ typedef dg_vertex_label vertex_label;
  * Phase main
  *********************************************************/
 
-bool full_fsm_generation(string module_name)
+bool full_fsm_generation(const char* module_name)
 {
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 

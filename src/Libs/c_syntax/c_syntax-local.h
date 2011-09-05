@@ -28,3 +28,15 @@ extern int c_lineno ;
 extern int c_lex();
 extern int c_parse();
 
+
+/* The labels in C have function scope... but beware of
+   inlining... and conflict with user labels */
+/* To disambiguate labels, in case inlining is performed later and to
+   suppress the potential for conflicts with user labels.
+
+   Temporary entities have to be generated to be replaced later by the
+   final labels. The temporary entities should be eliminated from the
+   symbol table...
+ */
+#define get_label_prefix() "-"  // a character that cannot be used in a correct
+

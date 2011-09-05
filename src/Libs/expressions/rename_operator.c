@@ -21,7 +21,7 @@
 
 static set ops_set = NULL;
 static set suffixes_set = NULL;
-static string prefix = NULL;
+static const char* prefix = NULL;
 
 //Helper macro for tiedous tasks.
 #define __KV(key, value) if(strcmp( key ,s) == 0) return value;
@@ -200,7 +200,7 @@ void rw_loop(statement sl)
 }
 
 static 
-set make_string_set_from_prop(string prop)
+set make_string_set_from_prop(const char* prop)
 {
     set s = set_make(set_string);
     list l = strsplit(prop," ");
@@ -212,17 +212,17 @@ set make_string_set_from_prop(string prop)
 
 /* A short pass that replace operators by function calls
  */
-bool rename_operator(string module_name)
+bool rename_operator(const char* module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     
     /* some properties */
-    string ops_string = strdup(get_string_property("RENAME_OPERATOR_OPS"));
+    const char* ops_string = get_string_property("RENAME_OPERATOR_OPS");
     ops_set = make_string_set_from_prop(ops_string);
 
-    string suffixes_string = strdup(get_string_property("RENAME_OPERATOR_SUFFIXES"));
+    const char* suffixes_string = get_string_property("RENAME_OPERATOR_SUFFIXES");
     suffixes_set = make_string_set_from_prop(suffixes_string);
     
     prefix = get_string_property("RENAME_OPERATOR_PREFIX");
@@ -233,11 +233,9 @@ bool rename_operator(string module_name)
     gen_recurse(get_current_module_statement(), call_domain, gen_true, rename_op);
 
     /* free properties */
-    free(ops_string);
     set_free(ops_set);
     ops_set = NULL;
 
-    free(suffixes_string);
     set_free(suffixes_set);
     suffixes_set = NULL;
 

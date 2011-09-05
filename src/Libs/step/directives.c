@@ -24,7 +24,7 @@ string step_directives_USER_FILE_name()
 { 
   string file_name, full_name;
   string dir_name = db_get_current_workspace_directory();
-  string module = module_local_name(get_current_module_entity());
+  const char* module = module_local_name(get_current_module_entity());
   string name = strdup(concatenate(dir_name, "/", db_get_file_resource(DBR_USER_FILE,module,true), NULL));
 
   if (dot_f_file_p(name)|| dot_F_file_p(name) )
@@ -136,10 +136,11 @@ bool directive_filter_c(string name)
 
 
 /*######################################################################################################*/
-string step_make_new_directive_module_name(string suffix, string id)
+string step_make_new_directive_module_name(string suffix, const char* id)
 {
   int i;
-  string new_name, final_name, i_s;
+  string final_name, i_s;
+  char* new_name;
   entity current_module;
 
   pips_debug(1,"suffix = %s, id = %s\n", suffix, id);
@@ -154,7 +155,7 @@ string step_make_new_directive_module_name(string suffix, string id)
   if (current_directives_empty_p())
     {
       /* stack is empty */
-      new_name = module_local_name(current_module);
+      new_name = strdup(module_local_name(current_module));
     }
   else
     {
@@ -456,7 +457,7 @@ static directive_hooks directives_hooks[]= {
   }
 };
 
-bool step_directive_p(string directive, string entity_name) 
+bool step_directive_p(string directive, const char* entity_name) 
 {
   int retcode;
   char *debut;
@@ -473,7 +474,7 @@ bool step_directive_p(string directive, string entity_name)
   return retcode;
 }
 
-static directive_hooks hooks_by_txt(string txt)
+static directive_hooks hooks_by_txt(const char* txt)
 {
   int id_hook=0;
   directive_hooks hook;
@@ -516,9 +517,9 @@ static bool directive_statement_p(statement stmt)
   return b;
 }
 
-string statement_to_directive_txt(statement stmt)
+const char* statement_to_directive_txt(statement stmt)
 {
-  string txt;
+  const char* txt;
   entity f;
   pips_debug(1, "stmt = %p\n", stmt);
 
@@ -941,7 +942,7 @@ static bool dir_filter(statement stmt)
   return true;
 }
 
-bool step_directives(string module_name)
+bool step_directives(const char* module_name)
 {
   debug_on("STEP_DEBUG_LEVEL");
   pips_debug(1, "%d module_name = %s\n", __LINE__, module_name);
@@ -1166,7 +1167,7 @@ static bool dir_pragma_filter(statement stmt)
 }
 
 
-static bool step_pragma_to_call(string module_name)
+static bool step_pragma_to_call(const char* module_name)
 { 
   debug_on("STEP_DEBUG_LEVEL");
   pips_debug(1, "%d module_name = %s\n", __LINE__, module_name);

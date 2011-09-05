@@ -850,8 +850,8 @@ c_user_function_call_to_transformer(
 
   /* if there is no implicit cast */
   if(same_basic_p(rbt, entity_basic(e))) {
-    string fn = module_local_name(f);
-    entity rv = global_name_to_entity(fn, fn);
+    const char* fn = module_local_name(f);
+    entity rv = FindEntity(fn, fn);
     entity orv = entity_undefined;
     transformer t_equal = simple_equality_to_transformer(e, rv, false);
 
@@ -929,8 +929,8 @@ fortran_user_function_call_to_transformer(
 
   /* if(basic_int_p(rbt)) { */
   if(basic_equal_p(rbt, variable_basic(type_variable(entity_type(e))))) {
-    string fn = module_local_name(f);
-    entity rv = global_name_to_entity(fn, fn);
+    const char* fn = module_local_name(f);
+    entity rv = FindEntity(fn, fn);
     entity orv = entity_undefined;
     Psysteme sc = SC_UNDEFINED;
     Pcontrainte c = CONTRAINTE_UNDEFINED;
@@ -1623,8 +1623,8 @@ transformer c_return_to_transformer(entity e __attribute__ ((__unused__)),
 {
   transformer tf = transformer_undefined;
   entity m = get_current_module_entity();
-  string mn = entity_local_name(m);
-  entity rv = global_name_to_entity(mn, mn);
+  const char* mn = entity_local_name(m);
+  entity rv = FindEntity(mn, mn);
 
   if(ENDP(pc))
     tf = transformer_identity();

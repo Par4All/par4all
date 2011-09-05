@@ -455,8 +455,7 @@ bool check_call_mode_consistency(la, lt, the_fnct)
     list            la, lt;
     entity          the_fnct;
 {
-    string
-	module_name;
+	const char*module_name;
     list
 	sefs_list = list_undefined;
     expression
@@ -682,7 +681,7 @@ void check_one_common(entity local, entity module)
 
 	llayout = CDR(llayout);
 
-	if (strcmp(module_name(entity_name(current_variable)),
+	if (strcmp(entity_module_name(current_variable),
 		   module_local_name(module)))
 	    continue;
 

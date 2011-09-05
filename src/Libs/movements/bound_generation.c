@@ -48,11 +48,6 @@
 #include "polyedre.h"
 #include "dg.h"
 
-static char *noms_var(entity i)
-{
-    return(local_name(entity_name(i)));
-}
-
 
 /* This fonction generates the lower bounds of the "loop_rank"-th loop.
 */
@@ -408,7 +403,7 @@ bound_generation(
 	    ps = lsystem[n0_loop];
 	    ifdebug(8) {
 		(void) fprintf(stderr,"LE SYSTEME  est :\n");
-		(void) sc_fprint(stderr, ps, (get_variable_name_t) noms_var);
+		(void) sc_fprint(stderr, ps, (get_variable_name_t) entity_local_name);
 	    }
 	    number_of_lower_bounds = 0;
 	    number_of_upper_bounds = 0;
@@ -444,7 +439,7 @@ bound_generation(
 
 		/* looplabel = make_new_label(initial_module_name); */
 		/* new code by FI to add continue statements starts here */
-		looplabel = make_loop_label(9000, entity_local_name(module));
+		looplabel = make_loop_label(9000, module);
 		cs = make_continue_statement(looplabel);
 		if(instruction_block_p(statement_instruction(loopbody)))
 		    (void) gen_nconc(instruction_block(statement_instruction(loopbody)),
@@ -477,11 +472,11 @@ bound_generation(
 		    wp65_debug_print_text(entity_undefined, loopbody);
 		    pips_debug(8,"systeme pour la %d boucle \n",n0_loop);
 		    (void) sc_fprint(stderr, sc_neg[n0_loop],
-				     (get_variable_name_t) noms_var);
+				     (get_variable_name_t) entity_local_name);
 		    (void) sc_fprint(stderr, sc_pos[n0_loop],
-				     (get_variable_name_t) noms_var);
+				     (get_variable_name_t) entity_local_name);
 		    (void) sc_fprint(stderr, sc_test,
-				     (get_variable_name_t) noms_var);
+				     (get_variable_name_t) entity_local_name);
 		}
 	    }
 	}

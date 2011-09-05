@@ -62,7 +62,7 @@
 #define MODULE_SEP                       ':'
 
 #define MODULE_SEP_STRING                ":"
-#define LABEL_PREFIX                     "@" // Often assumed to be one character long
+#define LABEL_PREFIX                     "@"
 #define MAIN_PREFIX                      "%"
 #define COMMON_PREFIX                    "~"
 #define BLOCKDATA_PREFIX                 "&"
@@ -2145,6 +2145,9 @@ enum range_to_expression_mode{
 } ;
 #define range_to_distance_p(e) ((e) == range_to_distance)
 #define range_to_nbiter_p(e) ((e) == range_to_nbiter)
+
+
+#define GENERATED_LABEL_MODULE_NAME "__GENSYM"
 
 /* that is all for ri-util-local.h
  */

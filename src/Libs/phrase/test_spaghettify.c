@@ -85,7 +85,7 @@ static control make_condition_from_test (test the_test,
  * of the "destructured" test
  */
 static control make_if_true_from_test (test the_test,
-				       string module_name)
+				       const char* module_name)
 {
   return make_control (spaghettify_statement(test_true(the_test),
 					     module_name),
@@ -97,7 +97,7 @@ static control make_if_true_from_test (test the_test,
  * of the "destructured" test
  */
 static control make_if_false_from_test (test the_test,
-					string module_name)
+					const char* module_name)
 {
   return make_control (spaghettify_statement(test_false(the_test),
 					     module_name),
@@ -118,7 +118,7 @@ static control make_exit_from_test ()
  */
 static unstructured make_unstructured_from_test (test the_test,
 						 statement stat,
-						 string module_name)
+						 const char* module_name)
 {
   control condition = make_condition_from_test (the_test,stat);
   control exit = make_exit_from_test ();
@@ -139,7 +139,7 @@ static unstructured make_unstructured_from_test (test the_test,
  * This function takes the statement stat as parameter and return a new
  * spaghettized statement, asserting stat is a TEST statement
  */
-statement spaghettify_test (statement stat, string module_name)
+statement spaghettify_test (statement stat, const char* module_name)
 {
   statement returned_statement = stat;
   instruction unstructured_instruction;

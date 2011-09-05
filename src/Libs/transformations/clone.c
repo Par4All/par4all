@@ -106,7 +106,8 @@ static entity build_a_clone_for(entity cloned,
 				int argn,
 				int val)
 {
-  string name = entity_local_name(cloned), new_name, comments;
+  const char* name = entity_local_name(cloned);
+  char* comments, *new_name;
   entity new_fun;
   statement stat;
   bool saved_b1, saved_b2;
@@ -118,10 +119,10 @@ static entity build_a_clone_for(entity cloned,
 
   /* builds some kind of module / statement for the clone.
    */
-  new_name = get_string_property("CLONE_NAME");
-  new_name = empty_string_p(new_name) ?
+  const char *clone_name = get_string_property("CLONE_NAME");
+  new_name = empty_string_p(clone_name) ?
     build_new_top_level_module_name(name,false) :
-    strdup(new_name);
+    strdup(clone_name);
 
   new_fun = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,new_name);
   entity_type(new_fun) = copy_type(entity_type(cloned));
@@ -475,7 +476,7 @@ set_currents(string name)
 /* global resets
  */
 static void
-reset_currents(string name)
+reset_currents(const char* name)
 {
     close_clone();
     reset_current_module_entity();

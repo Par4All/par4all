@@ -42,7 +42,7 @@
 void 
 make_host_and_node_modules (entity module)
 {
-    string name = entity_local_name(module);
+    const char* name = entity_local_name(module);
     entity host, node;
 
     if (bound_new_node_p(module))
@@ -81,14 +81,13 @@ make_host_and_node_modules (entity module)
 	     * ??? this issue could be managed by the coherency function ?
 	     */
 	    string
-		var_name = concatenate(name, MODULE_SEP_STRING, name, NULL),
-		tmp_name;
+		var_name = concatenate(name, MODULE_SEP_STRING, name, NULL);
 	    entity
 		var = gen_find_tabulated(var_name, entity_domain), neh, nen;
 
 	    pips_assert("defined", !entity_undefined_p(var));
 
-	    tmp_name = entity_local_name(host);
+	    const char* tmp_name = entity_local_name(host);
 	    neh = find_or_create_scalar_entity(tmp_name, tmp_name, 
 					       is_basic_overloaded);
 	    tmp_name = entity_local_name(node);
@@ -349,7 +348,7 @@ hpfc_fclose(
 
 /* old name of obj while in module now.
  */
-static string 
+static const char* 
 old_name(
     entity module, /* module in which obj appears */
     entity obj)    /* obj */
@@ -381,7 +380,7 @@ hpfc_common_hook(
     entity module,
     entity common)
 {
-    string name = module_local_name(common);/* old_name(module, common); */
+    const char* name = module_local_name(common);/* old_name(module, common); */
     return strdup(concatenate
         ("      include \"", name, PARM_SUFFIX "\"\n"
 	 "      include \"", name,  
@@ -416,12 +415,12 @@ void
 put_generated_resources_for_common(entity common)
 {
     FILE *host_file, *node_file, *parm_file, *init_file;
-    string prefix, host_name, node_name, parm_name, init_name, dir_name;
+    string host_name, node_name, parm_name, init_name, dir_name;
     entity node_common, host_common;
 
     node_common = load_new_node(common),
     host_common = load_new_host(common);
-    prefix = module_local_name(common);
+    const char *prefix = module_local_name(common);
     dir_name = db_get_current_workspace_directory();
     
     host_name = src(prefix, HINC_SUFFIX);
@@ -467,9 +466,9 @@ put_generated_resources_for_common(entity common)
 void
 compile_a_special_io_function(entity module)
 {
-    string prefix, file_name, h_name, dir_name, fs, ft;
+    string  file_name, h_name, dir_name, fs, ft;
 
-    prefix = module_local_name(module);
+    const char *prefix = module_local_name(module);
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, true);
     dir_name = db_get_current_workspace_directory();
     h_name = src(prefix, HOST_SUFFIX);
@@ -491,11 +490,11 @@ compile_a_special_io_function(entity module)
 void
 compile_a_pure_function(entity module)
 {
-    string prefix, file_name, hn_name, dir_name, fs, ft;
+    string file_name, hn_name, dir_name, fs, ft;
 
     pips_debug(1, "compiling pure a function (%s)\n", entity_name(module));
 
-    prefix = module_local_name(module);
+    const char* prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, true);
     hn_name = src(prefix, BOTH_SUFFIX);
@@ -519,9 +518,9 @@ put_generated_resources_for_module(
 {
     FILE *host_file, *node_file, *parm_file, *init_file;
     entity module = get_current_module_entity();
-    string prefix, host_name, node_name, parm_name, init_name, dir_name;
+    string host_name, node_name, parm_name, init_name, dir_name;
     
-    prefix = module_local_name(module);
+    const char *prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
 
     host_name = src(prefix, HOST_SUFFIX);
@@ -597,7 +596,7 @@ put_generated_resources_for_program (string program_name)
 /* Compiler call, obsole. left here for allowing linking
  */
 void 
-hpfcompile (string module_name)
+hpfcompile (const char* module_name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "module: %s\n", module_name);

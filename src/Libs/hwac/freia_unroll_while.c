@@ -67,7 +67,7 @@ static bool fcs_count(statement s, fcs_ctx * ctx)
     call c = freia_statement_to_call(s);
     if (c)
     {
-      string called = entity_local_name(call_function(c));
+      const char* called = entity_local_name(call_function(c));
       // could be: dilate + inf + vol or erode + sup + vol
       if (same_string_p(called, AIPO "erode_8c") ||
           same_string_p(called, AIPO "erode_6c") ||

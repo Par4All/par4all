@@ -567,8 +567,8 @@ bool transformer_general_consistency_p(transformer tf, bool is_weak)
           high cost testing */
 	    ifdebug(8) {
 		bool aliasing = false;
-		string emn =entity_module_name(val);
-		string eln =entity_local_name(val);
+		const char* emn =entity_module_name(val);
+		const char* eln =entity_local_name(val);
 		list lt =  args;
 		entity e;
 		for (lt =  args; lt && !aliasing ;POP(lt))

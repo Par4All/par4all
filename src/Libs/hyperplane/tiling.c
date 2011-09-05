@@ -89,7 +89,7 @@ make_tile_index_entity(entity old_index)
 }
 
 bool
-static_partitioning_matrix(matrice P, int n, string serialized_matrix)
+static_partitioning_matrix(matrice P, int n, const char* serialized_matrix)
 {
     pips_assert("interactive_partitioning_matrix", n>=1);
     bool status = false;
@@ -326,7 +326,7 @@ statement tiling( list lls)
 
     P = matrice_new(n, n);
     HT = matrice_new(n, n);
-    string smatrix = get_string_property("LOOP_TILING_MATRIX");
+    const char* smatrix = get_string_property("LOOP_TILING_MATRIX");
 
     if(
             !static_partitioning_matrix(P,n,smatrix) &&
@@ -461,7 +461,7 @@ statement tiling( list lls)
 }
 
 bool
-loop_tiling(string module_name)
+loop_tiling(const char* module_name)
 {
     bool return_status = false;
 

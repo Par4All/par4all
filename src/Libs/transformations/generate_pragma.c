@@ -204,7 +204,7 @@ static void generate_str_omp_pragma_loop (loop l) {
 //////////////////////////////////////////////////////////////
 // the phases function name
 
-bool ompify_code (const string module_name) {
+bool ompify_code (const const char* module_name) {
   // Use this module name and this environment variable to set
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,
 						  "OMPIFY_CODE_DEBUG_LEVEL");
@@ -213,7 +213,7 @@ bool ompify_code (const string module_name) {
   string previous = strdup(get_string_property("PRETTYPRINT_PARALLEL"));
   set_string_property("PRETTYPRINT_PARALLEL", "omp");
   // we need to know which type of pragma need to be generated
-  string type = get_string_property("PRAGMA_TYPE");
+  const char* type = get_string_property("PRAGMA_TYPE");
 
   // we need to iniatlize few things to generate reduction
   reductions_pragma_omp_init (module_name);

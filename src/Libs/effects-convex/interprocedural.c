@@ -148,7 +148,7 @@ statement s;
 
 list out_regions_from_caller_to_callee(entity caller, entity callee)
 {
-    char *caller_name;
+    const char *caller_name;
     statement caller_statement;
 
     reset_current_module_entity();
@@ -231,7 +231,7 @@ list real_args;
 transformer context;
 {
     list le = NIL;
-    char *func_name = module_local_name(func);
+    const char *func_name = module_local_name(func);
 
     pips_debug(4, "translation regions for %s\n", func_name);
 
@@ -268,7 +268,7 @@ list regions_of_external(entity func,list real_args,transformer context,
 			 bool proper)
 {
     list le = NIL;
-    char *func_name = module_local_name(func);
+    const char *func_name = module_local_name(func);
 
     pips_debug(4, "translation regions for %s\n", func_name);
 
@@ -1671,7 +1671,7 @@ static list common_region_translation(entity callee, region reg,
     {
 	entity ent = ENTITY(CAR(l_com_ent));
 	entity_target_func =
-	    module_name_to_entity(module_name(entity_name(ent)));
+	    module_name_to_entity(entity_module_name(ent));
 	ifdebug(6)
 	{
 	    pips_debug(6, "common not declared in caller,\n"
@@ -1701,7 +1701,7 @@ static list common_region_translation(entity callee, region reg,
 
 	pips_debug(6, "current entity: %s\n", entity_name(new_ent));
 
-	if (strcmp(module_name(entity_name(new_ent)),
+	if (strcmp(entity_module_name(new_ent),
 		   module_local_name(entity_target_func)) == 0)
 	{
 	    int new_ent_size = array_size(new_ent);

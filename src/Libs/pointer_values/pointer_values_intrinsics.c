@@ -1125,7 +1125,7 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
   bool pointer_t2 = pointer_type_p(t2);
   free_type(t2);
 
-  string func_name = entity_local_name(func);
+  const char* func_name = entity_local_name(func);
 
   /* From ISO/IEC 9899:TC3 :
 
@@ -1237,7 +1237,7 @@ static void update_operator_to_post_pv(entity func, list func_args, list l_in,
     {
       list l_lhs_eff = pv_res->result_paths;
       //list l_lhs_kind = pv_res->result_paths_interpretations;
-      string func_name = entity_local_name(func);
+      const char* func_name = entity_local_name(func);
 
       pips_assert("update operators admit a single path\n",
 		  gen_length(l_lhs_eff) == (size_t) 1);
@@ -1421,7 +1421,7 @@ static void address_of_to_post_pv(entity __attribute__ ((unused))func, list func
 static void c_io_function_to_post_pv(entity func, list func_args, list l_in,
 				     pv_results * pv_res, pv_context *ctxt)
 {
-  string func_name = entity_local_name(func);
+  const char* func_name = entity_local_name(func);
   list general_args = NIL;
   bool free_general_args = false;
   list l_in_cur = l_in;
@@ -1667,7 +1667,7 @@ static void free_to_post_pv(list l_free_eff, list l_in,
 static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
 				      pv_results * pv_res, pv_context *ctxt)
 {
-  string func_name = entity_local_name(func);
+  const char* func_name = entity_local_name(func);
   expression malloc_arg = expression_undefined;
   bool free_malloc_arg = false;
   list l_in_cur = l_in;
@@ -1878,7 +1878,7 @@ static void default_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
 void intrinsic_to_post_pv(entity func, list func_args, list l_in,
 			  pv_results * pv_res, pv_context *ctxt)
 {
-  string func_name = entity_local_name(func);
+  const char* func_name = entity_local_name(func);
   pips_debug(1, "begin for %s\n", func_name);
 
   IntrinsicToPostPVDescriptor *pid = IntrinsicToPostPVDescriptorTable;

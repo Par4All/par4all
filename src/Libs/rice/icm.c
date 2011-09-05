@@ -56,8 +56,6 @@
  * Definition of local variables
  */
 static int reference_level=0;
-static string current_module_name; /* Bad hack to avoid an argument 
-				      in icm_codegen.... */
 
 static bool expression_invariant = false; 
 static set /* of entity */ invariant_entities = set_undefined;
@@ -1376,7 +1374,7 @@ statement icm_codegen(statement stat,
 
     set_proper_rw_effects((statement_effects) 
 			  db_get_memory_resource(DBR_PROPER_EFFECTS, 
-						 current_module_name, 
+						 get_current_module_name(), 
 						 true));
 
     /* Compute has_level hash and has_indices tables */
@@ -1465,7 +1463,7 @@ statement icm_codegen(statement stat,
    Prepare some stuffs and call icm_codegen...
 */
 bool
-invariant_code_motion(string module_name)
+invariant_code_motion(const char* module_name)
 {
     entity module = local_name_to_top_level_entity(module_name);
     statement mod_stat = statement_undefined;
@@ -1482,8 +1480,6 @@ invariant_code_motion(string module_name)
     mod_stat = get_current_module_statement();
 
     set_ordering_to_statement(mod_stat);
-
-    current_module_name = module_name;
 
     debug_on("ICM_DEBUG_LEVEL");
 

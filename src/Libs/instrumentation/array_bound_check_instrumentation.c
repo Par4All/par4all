@@ -461,7 +461,7 @@ static void  pips_code_abc_statement(statement module_statement)
 }
 
 
-bool old_array_bound_check_instrumentation(char *module_name)
+bool old_array_bound_check_instrumentation(const char* module_name)
 { 
   statement module_statement;  
   /* add COMMON ARRAY_BOUND_CHECK_COUNT to the declaration
@@ -552,7 +552,7 @@ bool old_array_bound_check_instrumentation(char *module_name)
 static list l_commons = NIL;
 static int number_of_scalar_variables = 0; 
 static int number_of_array_variables = 0; 
-bool array_bound_check_instrumentation(char *module_name)
+bool array_bound_check_instrumentation(const char* module_name)
 {
   entity mod = local_name_to_top_level_entity(module_name);
   list d = code_declarations(value_code(entity_initial(mod))); 

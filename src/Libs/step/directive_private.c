@@ -55,7 +55,7 @@ clause step_check_private(entity module, string directive_txt)
       item=strtok(list_," ,");
       while (item != NULL && nb_item<=nb_comma)
 	{
-	  entity e=global_name_to_entity(entity_local_name(module), step_upperise(item));
+	  entity e=FindEntity(entity_local_name(module), step_upperise(item));
 	  if (entity_undefined_p (e)) 
 	    {
 	      pips_user_warning("unknow variable %s in %s\n",item,entity_local_name(module));

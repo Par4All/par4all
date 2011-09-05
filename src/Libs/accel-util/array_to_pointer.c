@@ -857,7 +857,7 @@ static void do_array_to_pointer(entity m, statement s, param_t *p) {
 }
 
 /* linearize accesses to an array, and use pointers if asked to */
-bool linearize_array_generic (char *module_name)
+bool linearize_array_generic (const char* module_name)
 {
 
     debug_on("LINEARIZE_ARRAY_DEBUG_LEVEL");
@@ -909,12 +909,12 @@ bool linearize_array_generic (char *module_name)
 }
 
 /* linearize accesses to an array, and use pointers if asked to */
-bool linearize_array(char *module_name)
+bool linearize_array(const char* module_name)
 {
   return linearize_array_generic (module_name);
 }
 
-bool linearize_array_fortran(char *module_name)
+bool linearize_array_fortran(const char* module_name)
 {
   return linearize_array_generic (module_name);
 }

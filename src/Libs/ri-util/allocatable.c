@@ -82,7 +82,7 @@ bool entity_allocatable_p(entity e) {
 
   if(!same_stringn_p(entity_local_name(allocatable_struct),
       STRUCT_PREFIX ALLOCATABLE_PREFIX,
-      strlen(STRUCT_PREFIX ALLOCATABLE_PREFIX))) {
+      sizeof(STRUCT_PREFIX ALLOCATABLE_PREFIX)-1)) {
     return false;
   }
 
@@ -172,17 +172,15 @@ static entity make_data_field(basic b,
                               const char *struct_name,
                               const char *name,
                               list dimensions) {
-  string fullname = concatenate(TOP_LEVEL_MODULE_NAME,
-                                MODULE_SEP_STRING,
-                                struct_name,
-                                MEMBER_SEP_STRING,
-                                name,
-                                NULL);
+
+  string field ;
+  asprintf(&field, "%s" MEMBER_SEP_STRING"%s", struct_name,name);
 
   pips_assert("Trying to create data for an already existing struct ?",
-      gen_find_tabulated( fullname, entity_domain ) == entity_undefined );
+      FindEntity(TOP_LEVEL_MODULE_NAME,field) == entity_undefined );
 
-  entity data = find_or_create_entity(fullname);
+  entity data = FindOrCreateTopLevelEntity(field);
+  free(field);
   entity_type(data) = make_type_variable(make_variable(b, dimensions, NULL));
   entity_storage(data) = make_storage_rom();
   entity_initial(data) = make_value_unknown();
@@ -205,10 +203,7 @@ static entity make_bound(const char *struct_name, const char *lname, int suffix)
   pips_assert("Trying to create lower bound but already existing ?",
       gen_find_tabulated( name, entity_domain ) == entity_undefined );
 
-  bound = find_or_create_entity(concatenate(TOP_LEVEL_MODULE_NAME,
-                                            MODULE_SEP_STRING,
-                                            name,
-                                            NULL));
+  bound = FindOrCreateTopLevelEntity(name);
 
   entity_type(bound) = make_type_variable(make_variable(make_basic_int(4),
                                                         NULL,
@@ -238,8 +233,7 @@ entity find_or_create_allocatable_struct(basic b, string name, int ndim) {
   string prefixed_name = strdup(concatenate(STRUCT_PREFIX, struct_name, NULL));
 
   // Let's try to localize the structure
-  entity struct_entity = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
-                                               prefixed_name);
+  entity struct_entity = FindEntity(TOP_LEVEL_MODULE_NAME, prefixed_name);
 
   // Localization failed, let's create it
   if(struct_entity == entity_undefined) {
@@ -264,11 +258,10 @@ entity find_or_create_allocatable_struct(basic b, string name, int ndim) {
         = CONS(ENTITY,make_data_field(b, struct_name, name, dimensions),fields);
 
     // Create the struct
-    struct_entity = find_or_create_entity(concatenate(TOP_LEVEL_MODULE_NAME,
-                                                      MODULE_SEP_STRING,
-                                                      STRUCT_PREFIX,
-                                                      struct_name,
-                                                      NULL));
+    string field;
+    asprintf(&field,STRUCT_PREFIX "%s",struct_name);
+    struct_entity = FindOrCreateTopLevelEntity(field);
+    free(field);
     entity_type(struct_entity) = make_type_struct(fields);
     entity_storage(struct_entity) = make_storage_rom();
     entity_initial(struct_entity) = make_value_unknown();

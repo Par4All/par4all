@@ -755,18 +755,16 @@ make_block_with_stmt_if_not_already(statement stmt) {
 
 statement make_return_statement(entity module)
 {
-    char *module_name = entity_local_name(module);
-    string name = concatenate( module_name, MODULE_SEP_STRING, LABEL_PREFIX,
-		       RETURN_LABEL_NAME,NULL);
-    entity l = gen_find_tabulated(name, entity_domain);
-    if (entity_undefined_p(l)) l = make_label(strdup(name));
+    const char *module_name = entity_local_name(module);
+    entity l = FindEntity(module_name, LABEL_PREFIX RETURN_LABEL_NAME);
+    if (entity_undefined_p(l)) l = make_label(module_name, LABEL_PREFIX RETURN_LABEL_NAME);
     return make_call_statement(c_module_p(module)?C_RETURN_FUNCTION_NAME:RETURN_FUNCTION_NAME, NIL, l, empty_comments);
 }
 
 /*****************************************************************************
 
   Make a Fortran io statement : PRINT *,"message" following this format :
-
+BEL_PREFIX
   (keyword,lci,lio)
 
   keyword  (READ, WRITE, PRINT...).
@@ -800,7 +798,7 @@ statement make_C_print_statement(string message)
      to matter for strings... */
   expression eb =
     make_call_expression(MakeConstant(message,is_basic_string),NIL);
-  entity lun = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+  entity lun = FindEntity(TOP_LEVEL_MODULE_NAME,
 				     STDERR_NAME);
   expression ea = expression_undefined;
 
@@ -1210,7 +1208,7 @@ void print_statements(list sl)
 }
 
 
-void print_statement_of_module(statement s, string mn)
+void print_statement_of_module(statement s, const char* mn)
 {
   if(entity_undefined_p(get_current_module_entity())) {
     entity m = local_name_to_top_level_entity(mn);
@@ -1727,7 +1725,7 @@ append_comments_to_statement(statement s,
 */
 void
 insert_comments_to_statement(statement s,
-			     string the_comments)
+			     const char* the_comments)
 {
     string old;
 
@@ -1848,8 +1846,8 @@ fix_sequence_statement_attributes(statement s)
 	   CONTINUE to keep them: */
 	list instructions;
 	statement continue_s;
-	string label_name =
-	    entity_local_name(statement_label(s)) + strlen(LABEL_PREFIX);
+	const char* label_name =
+	    entity_local_name(statement_label(s)) + sizeof(LABEL_PREFIX) -1;
 
 	instructions = instruction_block(statement_instruction(s));
 
@@ -3313,7 +3311,7 @@ list find_statements_interactively(statement s)
  */
 struct fswp {
     list l;
-    string begin;
+    const char*begin;
 };
 
 
@@ -3346,7 +3344,7 @@ bool statement_with_pragma_p(statement s) {
 
    @return the first extension matching the pragma
 */
-extension get_extension_from_statement_with_pragma(statement s, string seed)
+extension get_extension_from_statement_with_pragma(statement s, const char* seed)
 {
     list exs = extensions_extension(statement_extensions(s));
     FOREACH(EXTENSION,ex,exs)
@@ -3379,7 +3377,7 @@ static bool find_statements_with_pragma_walker(statement s, struct fswp *p)
 
    @return a list of statement
 */
-list find_statements_with_pragma(statement s, string begin)
+list find_statements_with_pragma(statement s, const char* begin)
 {
   struct fswp p = { NIL, begin };
   gen_context_recurse(s,&p,statement_domain,find_statements_with_pragma_walker,gen_null);

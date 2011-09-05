@@ -1850,7 +1850,7 @@ list freia_trpx_compile_calls
 
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
-  string dag_cut = get_string_property(trpx_dag_cut);
+  const char* dag_cut = get_string_property(trpx_dag_cut);
   pips_assert("valid cutting strategy", trpx_dag_cut_is_valid(dag_cut));
 
   // globally remaining statements

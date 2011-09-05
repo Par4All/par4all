@@ -308,7 +308,7 @@ void update_called_modules(e)
 entity e;
 {
     bool already_here = false;
-    string n = entity_local_name(e);
+    const char* n = entity_local_name(e);
     string nom;
     entity cm = get_current_module_entity();
 
@@ -354,7 +354,7 @@ void remove_from_called_modules(entity e)
 {
     bool found = false;
     list l = called_modules;
-    string name = module_local_name(e);
+    const char* name = module_local_name(e);
 
     if (!called_modules) return;
 
@@ -1237,7 +1237,7 @@ void remove_module_entity(entity m)
 */
 void MakeCurrentFunction(type t,
 			 int msf,
-			 string cfn,
+			 const char* cfn,
 			 list lfp)
 {
     entity cf = entity_undefined; /* current function */
@@ -1293,7 +1293,7 @@ void MakeCurrentFunction(type t,
       }
     }
 
-    ce = global_name_to_entity(TOP_LEVEL_MODULE_NAME, cfn);
+    ce = FindEntity(TOP_LEVEL_MODULE_NAME, cfn);
     if(!entity_undefined_p(ce) && ce!=cf) {
       if(!value_undefined_p(entity_initial(cf)) || msf!=TK_BLOCKDATA) {
 	user_warning("MakeCurrentFunction", "Global name %s used for a function or subroutine"
@@ -1414,10 +1414,8 @@ void MakeCurrentFunction(type t,
 			     value_undefined);
       */
       /* CleanLocalEntities() does not remove any entity */
-      result = find_or_create_entity(concatenate(CurrentPackage,
-						 MODULE_SEP_STRING,
-						 module_local_name(cf),
-						 NULL));
+      result = FindOrCreateEntity(CurrentPackage,
+						 module_local_name(cf));
       DeclareVariable(result, t, NIL, make_storage(is_storage_return, cf),
 		      value_undefined);
       AddEntityToDeclarations(result, cf);
@@ -1682,8 +1680,7 @@ instruction MakeEntry(
     list lfp) /* list of formal parameters */
 {
     entity cm = get_current_module_entity(); /* current module cm */
-    string cmn = get_current_module_name(); /* current module name cmn */
-    entity l = make_new_label(cmn);
+    entity l = make_new_label(cm);
     statement s = make_continue_statement(l);
     /* The parser expects an instruction and not a statement. I use
      * a block wrapping to avoid tampering with lab_I.

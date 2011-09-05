@@ -141,7 +141,7 @@ static void select_op_rwt(call c, inst_sel_ctx * ctx)
 	return;
 }
 
-bool instruction_selection(string module_name)
+bool instruction_selection(const char* module_name)
 {
 	inst_sel_ctx ctx;
 	statement stat;

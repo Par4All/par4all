@@ -167,7 +167,7 @@ static void rm_live_loop_index(entity i)
 }
 
 
-void init_use_proper_effects(char *module_name)
+void init_use_proper_effects(const char* module_name)
 {
   set_proper_rw_effects((statement_effects)
 			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
@@ -211,7 +211,7 @@ bool entity_written_p(entity ent, effects fx)
 }
 
 
-void init_use_preconditions(char *module_name)
+void init_use_preconditions(const char* module_name)
 {
   set_precondition_map( (statement_mapping)
 			db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
@@ -1819,7 +1819,7 @@ void partial_eval_statement(statement stmt)
 /* Top-level function
  */
 
-bool partial_eval(char *module_name)
+bool partial_eval(const char* module_name)
 {
   entity module;
   statement module_statement;

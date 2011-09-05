@@ -315,7 +315,7 @@ static void FixCInternalLabels(statement s)
 
   /* Build the substitution table while avoiding label name conflicts */
   FOREACH(ENTITY, l, pll) {
-    string ln = label_local_name(l);
+    const char* ln = label_local_name(l);
     string p = get_label_prefix(); // The prefix is assumed to be one
 				   // character long
     if(*p==*ln) {
@@ -327,7 +327,7 @@ static void FixCInternalLabels(statement s)
 	nln = nnln;
       }
       /* Here we end up with a conflict free label name */
-      string mn = entity_module_name(l);
+      const char* mn = entity_module_name(l);
       // The current module is no longer definned at this point in the parser
       //entity nl = MakeCLabel(nln);
       string cln = strdup(concatenate(LABEL_PREFIX, nln, NULL));
@@ -353,7 +353,7 @@ static void FixCInternalLabels(statement s)
   return;
 }
 
-static bool actual_c_parser(string module_name,
+static bool actual_c_parser(const char* module_name,
 			    string dbr_file,
 			    bool is_compilation_unit_parser)
 {
@@ -624,14 +624,14 @@ static bool actual_c_parser(string module_name,
     return true;
 }
 
-bool c_parser(string module_name)
+bool c_parser(const char* module_name)
 {
   /* When the compilation_unit is parsed, it is parsed a second time
      and multiple declarations are certain to happen. */
    return actual_c_parser(module_name,DBR_C_SOURCE_FILE,false);
 }
 
-bool compilation_unit_parser(string module_name)
+bool compilation_unit_parser(const char* module_name)
 {
   return actual_c_parser(module_name,DBR_C_SOURCE_FILE,true);
 }

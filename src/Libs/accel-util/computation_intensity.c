@@ -55,7 +55,7 @@ typedef struct {
     int startup_overhead;
     int bandwidth;
     int frequency;
-    char *pragma;
+    const char *pragma;
 } computation_intensity_param;
 
 /* read properties to initialize cost model */

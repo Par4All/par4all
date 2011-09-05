@@ -70,7 +70,7 @@ bool dowhile_to_while_walker(statement stmt)
 }
 
 bool
-dowhile_to_while(char *module_name)
+dowhile_to_while(const char* module_name)
 {
 	/* prelude */
 	set_current_module_entity( module_name_to_entity(module_name) );

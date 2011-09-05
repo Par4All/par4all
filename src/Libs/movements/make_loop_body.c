@@ -87,6 +87,7 @@ entity v;
     return (false);
 }
 
+static
 entity
 find_entity(entity module, Pvecteur pv,string st)
 {

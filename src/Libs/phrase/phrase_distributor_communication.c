@@ -76,7 +76,7 @@ entity make_start_ru_module (hash_table ht_params,
   entity start_ru_module;
   entity func_id;
   entity unit_id = NULL;
-  string function_name;
+  const char* function_name;
   list stat_seq = NIL;
   sequence new_sequence;
   instruction sequence_instruction;
@@ -327,7 +327,7 @@ static statement make_communication_statement (entity function,
  * Create statement module_statement
  */
 static entity make_scalar_communication_module (variable var,
-						string module_name,
+						const char* module_name,
 						hash_table ht_communications,
 						statement* module_statement,
 						int number_of_deployment_units,
@@ -566,7 +566,7 @@ static list make_scalar_communication_modules (hash_table ht_communications,
   list l_modules = NIL;
  
   HASH_MAP (var, ht_regions_for_functions, {
-    string module_name = is_receiving?get_receive_parameter_module_name(var):get_send_parameter_module_name (var);
+    const char* module_name = is_receiving?get_receive_parameter_module_name(var):get_send_parameter_module_name (var);
     statement module_statement;
     pips_debug(2, "Creating module [%s]\n", module_name);
     l_modules
@@ -772,7 +772,7 @@ static statement make_array_communication_statement(entity function,
  * Creates an integer variable in specified module
  */
 entity create_private_integer_variable_for_new_module (string new_name,
-						       string new_module_name,
+						       const char* new_module_name,
 						       entity module)
 {
   entity new_variable;
@@ -793,7 +793,7 @@ entity create_private_integer_variable_for_new_module (string new_name,
 				  MakeTypeVariable(MakeBasic(is_basic_int), NIL),
 				  storage_undefined,
 				  value_undefined);
-      a = global_name_to_entity(new_module_name, DYNAMIC_AREA_LOCAL_NAME);
+      a = FindEntity(new_module_name, DYNAMIC_AREA_LOCAL_NAME);
       base = variable_basic(type_variable(entity_type(new_variable)));
       entity_storage(new_variable) =
 	make_storage(is_storage_ram,
@@ -827,7 +827,7 @@ static entity make_array_communication_module (entity function,
   entity new_module;
   entity unit_id = NULL;
   entity param;
-  string module_name = is_receiving?get_receive_param_module_name(function,reg):get_send_param_module_name(function,reg);
+  const char* module_name = is_receiving?get_receive_param_module_name(function,reg):get_send_param_module_name(function,reg);
   entity set_entity = get_current_module_entity();
   variable var = type_variable(entity_type(region_entity(reg)));
   statement module_statement;

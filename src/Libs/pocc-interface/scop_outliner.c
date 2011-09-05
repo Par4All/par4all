@@ -62,8 +62,8 @@ typedef void * vertex_label;
 #include "callgraph.h"
 
 
-static string pragma_begin;
-static string pragma_end;
+static const char* pragma_begin;
+static const char* pragma_end;
 static list lists_to_outline ;
 static list save_seq;
 static bool begin;

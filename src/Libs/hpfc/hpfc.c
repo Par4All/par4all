@@ -283,7 +283,7 @@ static void automatic_translation(entity old, entity host, entity node)
 
 static void set_resources_for_module(entity module)
 {
-    string module_name = strdup(module_local_name(module));
+    const char* module_name = module_local_name(module);
 
     /*   STATEMENT
      */
@@ -380,7 +380,6 @@ static void set_resources_for_module(entity module)
 			  entity_intrinsic(CONTINUE_FUNCTION_NAME),
 			  entity_intrinsic(CONTINUE_FUNCTION_NAME));
 
-    free(module_name);
 }
 
 static void 

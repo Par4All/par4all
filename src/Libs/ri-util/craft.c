@@ -92,7 +92,7 @@ expression exp;
 /*======================================================================*/
 text text_loop_craft(module, label, margin, obj, n, lr, lidx)
      entity module;
-     string label;
+     const char* label;
      int margin;
      loop obj;
      int n;

@@ -1758,7 +1758,7 @@ static bool any_use_statement(set stats)
   {
     call c = freia_statement_to_call(s);
     if (c) {
-      string name = entity_local_name(call_function(c));
+      const char* name = entity_local_name(call_function(c));
       pips_debug(9, "call to %s\n", name);
       // some freia utils are considered harmless,
       // others imply an actual "use"
@@ -2255,7 +2255,7 @@ bool dag_no_image_operation(dag d)
 /**************************************************** NEW INTERMEDIATE IMAGE */
 
 // in phrase
-extern entity clone_variable_with_new_name(entity, string, string);
+extern entity clone_variable_with_new_name(entity, const char*, const char*);
 // in pipsmake
 extern string compilation_unit_of_module(const char *);
 

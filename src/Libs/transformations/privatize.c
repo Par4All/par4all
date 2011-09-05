@@ -804,7 +804,7 @@ static void update_loop_locals(loop l)
    @brief update loop_locals found by privatize_module by taking parallel loops
    into account
  */
-bool update_loops_locals(string module_name, statement module_stat)
+bool update_loops_locals(const char* module_name, statement module_stat)
 {
   init_proper_rw_effects();
   init_rw_effects();

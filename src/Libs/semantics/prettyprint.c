@@ -74,9 +74,9 @@ static hash_table nts = hash_table_undefined;
 //static string non_feasible_system;
 
 static bool print_code_semantics();
-static text get_semantic_text(string,bool);
+static text get_semantic_text(const char*,bool);
 
-bool print_code_transformers(string module_name)
+bool print_code_transformers(const char* module_name)
 {
   is_user_view = false;
   is_transformer = true;
@@ -85,7 +85,7 @@ bool print_code_transformers(string module_name)
   return print_code_semantics(module_name);
 }
 
-bool print_code_preconditions(string module_name)
+bool print_code_preconditions(const char* module_name)
 {
   is_user_view = false;
   is_transformer = false;
@@ -95,7 +95,7 @@ bool print_code_preconditions(string module_name)
   return print_code_semantics(module_name);
 }
 
-bool print_code_total_preconditions(string module_name)
+bool print_code_total_preconditions(const char* module_name)
 {
   bool success;
 
@@ -108,7 +108,7 @@ bool print_code_total_preconditions(string module_name)
   return success;
 }
 
-bool print_source_transformers(string module_name)
+bool print_source_transformers(const char* module_name)
 {
   is_user_view = true;
   is_transformer = true;
@@ -117,7 +117,7 @@ bool print_source_transformers(string module_name)
   return print_code_semantics(module_name);
 }
 
-bool print_source_preconditions(string module_name)
+bool print_source_preconditions(const char* module_name)
 {
   is_user_view = true;
   is_transformer = false;
@@ -127,7 +127,7 @@ bool print_source_preconditions(string module_name)
   return print_code_semantics(module_name);
 }
 
-bool print_source_total_preconditions(string module_name)
+bool print_source_total_preconditions(const char* module_name)
 {
   is_user_view = true;
   is_transformer = false;
@@ -137,7 +137,7 @@ bool print_source_total_preconditions(string module_name)
   return print_code_semantics(module_name);
 }
 
-text get_text_transformers(string module_name)
+text get_text_transformers(const char* module_name)
 {
   is_user_view = false;
   is_transformer = true;
@@ -146,7 +146,7 @@ text get_text_transformers(string module_name)
   return get_semantic_text(module_name,false);
 }
 
-text get_text_preconditions(string module_name)
+text get_text_preconditions(const char* module_name)
 {
   is_user_view = false;
   is_transformer = false;
@@ -156,7 +156,7 @@ text get_text_preconditions(string module_name)
   return get_semantic_text(module_name,false);
 }
 
-text get_text_total_preconditions(string module_name)
+text get_text_total_preconditions(const char* module_name)
 {
   is_user_view = false;
   is_transformer = false;
@@ -166,7 +166,7 @@ text get_text_total_preconditions(string module_name)
   return get_semantic_text(module_name,false);
 }
 
-static bool print_code_semantics(string module_name)
+static bool print_code_semantics(const char* module_name)
 {
     bool success = true;
     text t = text_undefined;
@@ -207,7 +207,7 @@ static bool print_code_semantics(string module_name)
     return success;
 }
 
-static text get_semantic_text(string module_name, bool give_code_p)
+static text get_semantic_text(const char* module_name, bool give_code_p)
 {
   text r = make_text(NIL), txt_summary;
   entity mod;

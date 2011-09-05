@@ -484,7 +484,7 @@ static list identify_statements_to_distribute(statement module_stat)
 /**
    Main phase for block code detection
 */   
-bool safescale_distributor_init(string module_name)
+bool safescale_distributor_init(const char* module_name)
 {
   /* Get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);

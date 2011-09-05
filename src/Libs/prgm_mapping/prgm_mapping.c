@@ -122,7 +122,7 @@ typedef dfg_arc_label arc_label;
 
 /* ======================================================================== */
 bool print_plc(module_name)
-string module_name;
+const char* module_name;
 {
   char *localfilename;
   FILE        *fd;

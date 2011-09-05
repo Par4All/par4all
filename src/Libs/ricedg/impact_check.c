@@ -52,7 +52,7 @@ static list current_path = NIL;
 static list l_dynamic_check = NIL;
 static int statement_in_caller_ordering = 0;
 static statement statement_in_caller = statement_undefined;
-static string caller_name;
+static const char* caller_name;
 static call current_call = call_undefined;
 static int number_of_processed_modules = 0;
 static int number_of_impact_alias = 0;

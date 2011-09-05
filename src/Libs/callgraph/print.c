@@ -68,7 +68,7 @@ void print_callees(callees c)
  * This function prints out any graph that contains callees only
  */
 bool print_decorated_call_graph(module_name,decor_type)
-string module_name;
+const char* module_name;
 int decor_type;
 {
     bool success = false;
@@ -88,7 +88,7 @@ int decor_type;
  * Print callgrpah with no decoration 
  */
 bool print_call_graph(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 
@@ -101,7 +101,7 @@ string module_name;
  * Print callgrpah with proper effects
  */
 bool print_call_graph_with_proper_effects(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 
@@ -114,7 +114,7 @@ string module_name;
  * Print callgrpah with cumulated effects
  */
 bool print_call_graph_with_cumulated_effects(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 
@@ -128,7 +128,7 @@ string module_name;
  * Print callgrpah with regions
  */
 bool print_call_graph_with_regions(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 
@@ -141,7 +141,7 @@ string module_name;
  * Print callgrpah with IN regions
  */
 bool print_call_graph_with_in_regions(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 
@@ -154,7 +154,7 @@ string module_name;
  * Print callgraph with OUT regions
  */
 bool print_call_graph_with_out_regions(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 
@@ -167,7 +167,7 @@ string module_name;
  * Print callgrpah with preconditions
  */
 bool print_call_graph_with_preconditions(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 
@@ -180,7 +180,7 @@ string module_name;
  * Print callgrpah with preconditions
  */
 bool print_call_graph_with_total_preconditions(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 
@@ -193,7 +193,7 @@ string module_name;
  * Print callgrpah with transformers
  */
 bool print_call_graph_with_transformers(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 
@@ -206,7 +206,7 @@ string module_name;
  * Print callgrpah with complexities
  */
 bool print_call_graph_with_complexities(module_name)
-string module_name;
+const char* module_name;
 {
     bool success = false;
 

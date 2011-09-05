@@ -347,7 +347,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
 /* @returns the description of a FREIA AIPO API function.
  * may be moved elswhere. raise an error if not found.
  */
-const freia_api_t * hwac_freia_api(const string function)
+const freia_api_t * hwac_freia_api(const char* function)
 {
   static hash_table cache = NULL;
   if (!cache)
@@ -1122,7 +1122,7 @@ static bool reference_written_p(
   const reference r,
   const hash_table signatures)
 {
-  string why = "default", func = "?";
+  const char* why = "default", *func = "?";
   bool written = false;
   call c = (call) gen_get_ancestor(call_domain, r);
   if (c)

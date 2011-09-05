@@ -71,7 +71,7 @@
    is the mudule's last callee.
 */
 list
-string_to_callees(string module_name)
+string_to_callees(const char* module_name)
 {
   callees cl = callees_undefined;
 
@@ -80,7 +80,7 @@ string_to_callees(string module_name)
   else {
     // Should be dealt with in ri-util
     // string ln = global_name_to_user_name(module_name);
-    string ln = local_name(module_name);
+    const char* ln = local_name(module_name);
     ln += strspn(ln, MAIN_PREFIX)
       + strspn(ln, BLOCKDATA_PREFIX)
       + strspn(ln, COMMON_PREFIX);
@@ -94,7 +94,7 @@ list
 entity_to_callees(entity mod)
 {
     list callees_list=NIL;
-    string module_name = entity_name(mod);
+    const char* module_name = entity_name(mod);
     list rl = NIL;
 
     callees_list = string_to_callees(module_name);
@@ -216,8 +216,8 @@ callgraph_module_name(
     FILE * fp,
     int decor_type)
 {
-    string module_name = module_resource_name(module),
-	dir = db_get_current_workspace_directory();
+    const char* module_name = module_resource_name(module);
+	char *dir = db_get_current_workspace_directory();
     text r = make_text(NIL);
 
     switch (decor_type) {
@@ -257,7 +257,7 @@ callgraph_module_name(
 
     FOREACH(ENTITY, e,entity_to_callees(module))
     {
-	string n = module_resource_name(e);
+	const char* n = module_resource_name(e);
 	string f = db_get_memory_resource(DBR_CALLGRAPH_FILE, n, true);
 	string full = strdup(concatenate(dir, "/", f, NULL));
 
@@ -274,10 +274,10 @@ module_to_callgraph(
     entity module,
     int decor_type)
 {
-    string name, dir, local, full;
+    string dir, local, full;
     FILE * fp;
 
-    name = module_resource_name(module);
+    const char *name = module_resource_name(module);
     local = db_build_file_resource_name(DBR_CALLGRAPH_FILE, name, ".cg");
     dir = db_get_current_workspace_directory();
     full = strdup(concatenate(dir, "/", local, NULL));
@@ -308,7 +308,7 @@ add_call_to_callees(const call c, callees *current_callees) {
       storage_rom_p(entity_storage(called)) &&
       (value_code_p(entity_initial(called)) ||
        value_unknown_p(entity_initial(called)))) {
-    string name = entity_local_name(called);
+    const char* name = entity_local_name(called);
     // Only add the callee if not already here:
     FOREACH(STRING, s, callees_callees(*current_callees))
         if (same_string_p(name, s))
@@ -451,7 +451,7 @@ bool callgraph(string name)
   /* Define the module_set and initialize the module callers, except for
      modules whose source code is missing. */
   for(i=0; i<nmodules; i++) {
-    string module_name = gen_array_item(module_array, i);
+    const char* module_name = gen_array_item(module_array, i);
     callees c = callees_undefined;
 
     set_add_element(modules, modules, module_name);
@@ -468,7 +468,7 @@ bool callgraph(string name)
    * Simple but inefficient implementation for Cathar-2
    * */
   for(i=0; i<nmodules; i++) {
-    string module_name = gen_array_item(module_array, i);
+    const char* module_name = gen_array_item(module_array, i);
     callees called_modules = callees_undefined;
     list ccm = list_undefined;
 

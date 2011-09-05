@@ -99,7 +99,7 @@ static statement update_unstructured_declarations(statement module_stat)
    standard abstract syntax tree of PIPS (the RI).
 
    Interface for pipsdbm and pipsmake */
-bool new_controlizer(string module_name)
+bool new_controlizer(const char* module_name)
 {
   if (getenv(USE_OLD_CONTROLIZER_ENV_VAR_NAME) != NULL) {
     pips_user_warning("Force the use of the old controlizer because a '%s' environment variable is defined\n", USE_OLD_CONTROLIZER_ENV_VAR_NAME);
@@ -221,7 +221,7 @@ bool new_controlizer(string module_name)
    standard abstract syntax tree of PIPS (the RI).
 
    Interface for pipsdbm and pipsmake */
-bool controlizer(string module_name)
+bool controlizer(const char* module_name)
 {
   if (getenv(USE_NEW_CONTROLIZER_ENV_VAR_NAME) != NULL) {
     pips_user_warning("Force the use of the new controlizer because a '%s' environment variable is defined\n", USE_NEW_CONTROLIZER_ENV_VAR_NAME);

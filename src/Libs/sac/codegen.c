@@ -658,7 +658,7 @@ static bool sac_aligned_expression_p(expression e)
  * *lsType must be freed after being used. */
 static bool loadstore_type_conversion_string(int argc, list args, string* lsType, bool isLoad)
 {
-    string lsTypeTmp = local_name(get_simd_vector_type(args));
+    string lsTypeTmp = (char*)local_name(get_simd_vector_type(args));
     string realVectName = get_vect_name_from_data(argc, CDR(args));
     if (!same_string_p(realVectName, lsTypeTmp))
     {
@@ -695,7 +695,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
     int lastOffset = 0;
     char *functionName;
 
-    string lsType = local_name(get_simd_vector_type(args));
+    string lsType = (char*)local_name(get_simd_vector_type(args));
     bool all_scalar = false;
     bool all_same_aligned_ref = false;
     bool all_same_ref = true;

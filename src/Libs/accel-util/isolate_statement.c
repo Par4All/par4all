@@ -81,20 +81,21 @@ static size_t get_dma_dimension(entity to) {
  * converts a region_to_dma_switch to corresponding dma name
  * according to properties
  */
-static string get_dma_name(enum region_to_dma_switch m, size_t d) {
-    char *seeds[] = {
+static const char* get_dma_name(enum region_to_dma_switch m, size_t d) {
+    const char *seeds[] = {
         "KERNEL_LOAD_STORE_LOAD_FUNCTION",
         "KERNEL_LOAD_STORE_STORE_FUNCTION",
         "KERNEL_LOAD_STORE_ALLOCATE_FUNCTION",
         "KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION"
     };
-    char * propname = seeds[(int)m];
+    const char * propname = seeds[(int)m];
     /* If the DMA is not scalar, the DMA function name is in the property
        of the form KERNEL_LOAD_STORE_LOAD/STORE_FUNCTION_dD: */
+    char * apropname= NULL;
     if(d > 0 /* not scalar*/ && (int)m < 2)
-        asprintf(&propname,"%s_%dD", seeds[(int)m], (int)d);
-    string dmaname = get_string_property(propname);
-    if(d > 0 /* not scalar*/ && (int)m <2) free(propname);
+        asprintf(&apropname,"%s_%dD", seeds[(int)m], (int)d);
+    const char* dmaname = get_string_property(apropname?apropname:propname);
+    if(apropname) free(apropname);
     return dmaname;
 }
 
@@ -204,7 +205,7 @@ call dimensions_to_dma(entity from,
 {
   expression dest;
   list args = NIL;
-  string function_name = get_dma_name(m,get_dma_dimension(to));
+  const char* function_name = get_dma_name(m,get_dma_dimension(to));
 
   entity mcpy = module_name_to_entity(function_name);
   if (entity_undefined_p(mcpy)) {
@@ -362,8 +363,8 @@ static
 statement effects_to_dma(statement stat,
 			 enum region_to_dma_switch s,
 			 hash_table e2e, expression * condition,
-			 bool fine_grain_analysis, string prefix,
-			 string suffix)
+			 bool fine_grain_analysis, const char* prefix,
+			 const char* suffix)
 {
     /* if no dma is provided, skip the computation
      * it is used for scalope at least */
@@ -567,7 +568,7 @@ static bool do_isolate_statement_preconditions(statement s)
  * that is make sure that all access to variables in @p s
  * are made either on private variables or on new entities declared on a new memory space. The @p prefix is used as a prefix to new entities' name.
  */
-void do_isolate_statement(statement s, string prefix, string suffix) {
+void do_isolate_statement(statement s, const char* prefix, const char* suffix) {
     bool fine_grain_analysis = true;
     statement allocates, loads, stores, deallocates;
     /* this hash table holds an entity to (entity + tag ) binding */
@@ -897,15 +898,15 @@ isolate_statement(const char* module_name)
 
 
     /* get user input */
-    string stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
+    const char* stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
     statement statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
     /* and proceed */
     if(statement_undefined_p(statement_to_isolate))
         pips_user_error("statement labeled '%s' not found\n",stmt_label);
     else
       {
-	string prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
-	string suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
+	const char* prefix =  get_string_property ("ISOLATE_STATEMENT_VAR_PREFIX");
+	const char* suffix =  get_string_property ("ISOLATE_STATEMENT_VAR_SUFFIX");
 	pips_debug (5, "isolate_statement prefix : %s\n", prefix);
 	pips_debug (5, "isolate_statement suffix : %s\n", suffix);
 	do_isolate_statement(statement_to_isolate, prefix, suffix);

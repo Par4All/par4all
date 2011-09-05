@@ -101,7 +101,7 @@ static string convert_string_for_daVinci_graph (string s)
   return ret;
 }
 
-vertex get_vertex_by_string(string str_name, list l_of_vers)
+vertex get_vertex_by_string(const char* str_name, list l_of_vers)
 {
     MAP(VERTEX, ver, {
         text ver_label = (text)vertex_vertex_label(ver);
@@ -228,7 +228,7 @@ void print_marged_text_from_starting_node(FILE *fd, int margin, vertex start_ver
 }
 
 bool make_resource_from_starting_node
-(string mod_name, string res_name, string file_ext, vertex start_ver, list l_of_vers, bool res_text_type)
+(const char* mod_name, string res_name, string file_ext, vertex start_ver, list l_of_vers, bool res_text_type)
 {
     string filename, localfilename, dir;
     FILE *fd;

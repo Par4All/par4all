@@ -460,7 +460,7 @@ fs_filter(statement stat, graph dg)
 /* interface to pipsmake.
  * should have proper and cumulated effects...
  */
-bool forward_substitute(string module_name)
+bool forward_substitute(const char* module_name)
 {
     debug_on("FORWARD_SUBSTITUTE_DEBUG_LEVEL");
 

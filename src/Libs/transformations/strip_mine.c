@@ -235,7 +235,7 @@ bool strip_mine(char *mod_name)
 {
     entity module = module_name_to_entity(mod_name);
     statement mod_stmt;
-    char *lp_label=NULL;
+    const char *lp_label=NULL;
     bool return_status;
 
     debug_on("STRIP_MINE_DEBUG_LEVEL");

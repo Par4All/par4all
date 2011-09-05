@@ -63,14 +63,13 @@ bool selected_loop_p(statement s)
 }
 
 bool interactive_loop_transformation
-(string module_name,
+(const char* module_name,
  statement (*loop_transformation)(list,bool (*)(statement))
 )
 {
-  char *lp_label=NULL;
+  const char *lp_label=NULL;
   entity module = module_name_to_entity(module_name);
   statement s = statement_undefined;
-  string resp = string_undefined;
   bool return_status = false;
 
   pips_assert("interactive_loop_transformation", entity_module_p(module));
@@ -84,31 +83,12 @@ bool interactive_loop_transformation
   set_current_module_statement(s);
 
   /* Get the loop label from the user */
-  if( empty_string_p(get_string_property("LOOP_LABEL")) )
-    {
-      resp = user_request("Which loop do you want to transform?\n"
-			  "(give its label): ");
-      if (resp[0] == '\0') {
-	user_log("Interactive loop transformation has been cancelled.\n");
-	return_status = false;
-      }
-      else {
-	if( (lp_label=malloc(strlen(resp)+1)) == NULL)
-	  pips_internal_error("not enough memory");
-	sscanf(resp, "%s", lp_label);
-      }
-    }
-  else
-    {
-      lp_label = get_string_property("LOOP_LABEL");
+      lp_label = get_string_property_or_ask("LOOP_LABEL","Which loop do you want to transform?\n"
+                            "(give its label): ");
       if( string_undefined_p( lp_label ) )
 	{
 	  pips_user_error("please set %s  property to a valid label\n");
 	}
-      else
-	// to keep allocation consistency betwwen interactive / non interactive
-	lp_label=strdup(lp_label);
-    }
 
   if(lp_label)
     {
@@ -116,7 +96,6 @@ bool interactive_loop_transformation
       if (entity_undefined_p(selected_label)) {
 	pips_user_error("loop label `%s' does not exist\n", lp_label);
       }
-      free(lp_label);
 
       debug_on("INTERACTIVE_LOOP_TRANSFORMATION_DEBUG_LEVEL");
 
@@ -148,14 +127,14 @@ static void flag_loop(statement st, flag_loop_param_t *flp)
   instruction i = statement_instruction(st);
   if(instruction_loop_p(i) && entity_empty_label_p(statement_label(st)))
     {
-        statement_label(st) = make_new_label(get_current_module_name());
+        statement_label(st) = make_new_label(get_current_module_entity());
         flp->new_label_created=true;
     }
   if( !get_bool_property("FLAG_LOOPS_DO_LOOPS_ONLY")
       && instruction_forloop_p(i))
     {
         if(entity_empty_label_p(statement_label(st))) {
-            statement_label(st)=make_new_label(get_current_module_name());
+            statement_label(st)=make_new_label(get_current_module_entity());
             flp->new_label_created=true;
         }
       flp->loops=CONS(STRING,strdup(entity_user_name(statement_label(st))),flp->loops);
@@ -163,7 +142,7 @@ static void flag_loop(statement st, flag_loop_param_t *flp)
 }
 
 
-bool print_loops(char *module_name)
+bool print_loops(const char* module_name)
 {
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
@@ -202,7 +181,7 @@ bool print_loops(char *module_name)
  *
  * @return
  */
-bool flag_loops(char *module_name)
+bool flag_loops(const char* module_name)
 {
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));

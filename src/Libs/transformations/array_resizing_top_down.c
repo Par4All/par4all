@@ -141,7 +141,7 @@ bool module_is_called_by_main_program_p(entity mod)
 {
   if (!entity_main_module_p(mod))
     {
-      string mod_name = module_local_name(mod);
+      const char* mod_name = module_local_name(mod);
       callees callers = (callees) db_get_memory_resource(DBR_CALLERS,mod_name,true);
       list l_callers = callees_callees(callers); 
       while (!ENDP(l_callers))
@@ -520,11 +520,11 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
       
       if (!in_callee && strstr(entity_local_name(en),"I_PIPS_") != NULL)
 	{
-	  string callee_name = module_local_name(current_callee);
+	  const char* callee_name = module_local_name(current_callee);
 	  string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,true);
 	  string base_name = pips_basename(user_file, NULL);
 	  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
-	  string pips_variable_name = entity_local_name(en);
+	  const char* pips_variable_name = entity_local_name(en);
 	  string pips_common_name = strstr(entity_local_name(en),"PIPS_");
 	  string new_decl = strdup(concatenate("      INTEGER*8 ",pips_variable_name,"\n",
 					       "      COMMON /",pips_common_name,"/ ",pips_variable_name,"\n",NULL));
@@ -1284,7 +1284,7 @@ static void instrument_call_rwt(call c)
 
 static list top_down_adn_caller_array()
 {
-  string caller_name = module_local_name(current_caller);
+  const char* caller_name = module_local_name(current_caller);
   statement caller_statement = (statement) db_get_memory_resource(DBR_CODE,caller_name,true);  
   l_values_of_current_caller = NIL;
   make_current_statement_stack();
@@ -1306,7 +1306,7 @@ static list top_down_adn_caller_array()
 
 static void instrument_caller_array()
 {
-  string caller_name = module_local_name(current_caller);
+  const char* caller_name = module_local_name(current_caller);
   statement caller_statement = (statement) db_get_memory_resource(DBR_CODE,caller_name,true);  
   make_current_statement_stack();
   set_precondition_map((statement_mapping)
@@ -1330,7 +1330,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
      If this value does not exist  => code instrumentation */
 
   /* Find out the name of the printed file in Src directory: database/Src/file.f */
-  string callee_name = module_local_name(current_callee);
+  const char* callee_name = module_local_name(current_callee);
   string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,true);
   string base_name = pips_basename(user_file, NULL);
   string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
@@ -1543,7 +1543,7 @@ Algorithm : For each module that is called by the main program
        - Put MODULE.new_declarations = "Okay, normalization has been done with right value"
 - If the list is nil => put MODULE.new_declarations, "Okay, there is nothing to normalize"*/
 
-bool array_resizing_top_down(char *module_name)
+bool array_resizing_top_down(const char* module_name)
 { 
   /* instrument_file is used to store new array declarations and assignments which
      will be used by a script to insert these declarations in the source code in:

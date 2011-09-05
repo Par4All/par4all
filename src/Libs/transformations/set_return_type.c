@@ -48,7 +48,7 @@ bool set_return_type_as_typedef( const char *mod_name ) {
 
 
   // User give the new type via a string property
-  string s_new_type = get_string_property("SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE");
+  const char* s_new_type = get_string_property("SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE");
 
   // We'll now try to recover a valid typedef from this string
   entity e_new_type = entity_undefined;

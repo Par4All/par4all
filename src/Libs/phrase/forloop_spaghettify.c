@@ -85,7 +85,7 @@ static control make_exit_from_forloop ()
 }
 
 static control make_body_from_forloop (forloop curLoop, 
-				       string module_name)
+				       const char* module_name)
 {
   return make_control 
     (spaghettify_statement(forloop_body(curLoop),
@@ -94,7 +94,7 @@ static control make_body_from_forloop (forloop curLoop,
 
 static unstructured make_unstructured_from_forloop (forloop curLoop, 
 						    statement stat,
-						    string module_name)
+						    const char* module_name)
 {
   control condition = make_condition_from_forloop(curLoop, stat);
   control exit = make_exit_from_forloop();
@@ -132,7 +132,7 @@ static unstructured make_unstructured_from_forloop (forloop curLoop,
  * This function takes the statement stat as parameter and return a new 
  * spaghettized statement, asserting stat is a FORLOOP statement
  */
-statement spaghettify_forloop (statement stat, string module_name)
+statement spaghettify_forloop (statement stat, const char* module_name)
 {
   statement returned_statement = stat;
   instruction unstructured_instruction;

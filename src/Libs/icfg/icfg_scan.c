@@ -149,7 +149,7 @@ static bool statement_flt(statement s)
   /* process the not call statement to print out filtered proper effects */
   if (get_int_property(ICFG_DECOR) == ICFG_DECOR_FILTERED_PROPER_EFFECTS) {
     entity e_caller = get_current_module_entity();
-    string caller_name = module_local_name(e_caller);
+    const char* caller_name = module_local_name(e_caller);
     statement_effects m = (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, true);
 
     list l_effs = effects_effects(apply_statement_effects(m, s));
@@ -199,7 +199,7 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
 {
   text t = make_text(NIL);
 
-  string caller_name = module_local_name(e_caller);
+  const char* caller_name = module_local_name(e_caller);
   statement_effects m = (statement_effects) db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, true);
 
   list l_effs = effects_effects(apply_statement_effects(m, current_stmt_head()));
@@ -242,7 +242,7 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
 static void call_flt(call c)
 {
   entity e_callee = call_function(c);
-  string callee_name = module_local_name(e_callee);
+  const char* callee_name = module_local_name(e_callee);
 
   /* current_stmt_head() */
   pips_debug (5,"called entity is %s\n", entity_name(e_callee));
@@ -691,7 +691,7 @@ static void test_rwt (test l)
 
 void print_module_icfg(entity module)
 {
-  string module_name = module_local_name(module);
+  const char* module_name = module_local_name(module);
   statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,true);
   text txt = make_text(NIL);
   append_marged_text(txt, 0, module_name, "");

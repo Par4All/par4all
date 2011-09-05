@@ -227,7 +227,7 @@ entity get_current_compilation_unit_entity()
 
 /* A compilation unit is also considered as a module*/
 
-void MakeCurrentCompilationUnitEntity(string name)
+void MakeCurrentCompilationUnitEntity(const char* name)
 {
   entity e = MakeCompilationUnitEntity(name);
 
@@ -674,7 +674,7 @@ entity FindEntityFromLocalName(string name)
   if(entity_undefined_p(ent)) {
     /* Is it a static function? It must have been parsed in the compilation unit */
     string sname = strdup(concatenate(compilation_unit_name, name, NULL));
-    ent = global_name_to_entity(compilation_unit_name, sname);
+    ent = FindEntity(compilation_unit_name, sname);
     free(sname);
     return ent;
   }
@@ -846,24 +846,28 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
 
   if (is_external) {
     pips_debug(5,"Entity local name is %s with prefix %s\n",name,prefix);
-    ent = find_or_create_entity((concatenate(compilation_unit_name,MODULE_SEP_STRING,
-						   prefix,name,NULL)));
+    char *local_name;
+    asprintf(&local_name,"%s%s",prefix,name);
+    ent = FindOrCreateEntity(compilation_unit_name,local_name);
+    free(local_name);
   }
   else {
-    string scope = scope_to_block_scope(GetScope());
+      string scope = scope_to_block_scope(GetScope());
 
-    pips_debug(5,"Entity local name is %s with prefix %s and scope \"%s\"\n",
-	       name,prefix,scope);
-    pips_assert("scope is a block scope", string_block_scope_p(scope));
+      pips_debug(5,"Entity local name is %s with prefix %s and scope \"%s\"\n",
+              name,prefix,scope);
+      pips_assert("scope is a block scope", string_block_scope_p(scope));
 
-    if (static_module_p(get_current_module_entity()))
-      ent = find_or_create_entity((concatenate(/*compilation_unit_name,*/
-						     get_current_module_name(),MODULE_SEP_STRING,
-						     scope,prefix,name,NULL)));
-    else
-      ent = find_or_create_entity((concatenate(get_current_module_name(),MODULE_SEP_STRING,
-						     scope,prefix,name,NULL)));
-    free(scope);
+      char * local_name;
+      asprintf(&local_name,"%s%s%s",scope,prefix,name);
+      if (static_module_p(get_current_module_entity())) {
+          ent = FindOrCreateEntity( get_current_module_name(),  local_name);
+      }
+      else {
+          ent = FindOrCreateEntity(get_current_module_name(), local_name);
+      }
+      free(local_name);
+      free(scope);
   }
   pips_debug(5,"Entity global name is %s\n",entity_name(ent));
   return ent;
@@ -984,7 +988,11 @@ entity FindOrCreateCurrentEntity(string name,
       if (strcmp(scope,"") != 0 && !is_formal)
 	{
 	  /* Prefix for the current struct: use full_scope */
-	  ent = find_or_create_entity(concatenate(full_scope,name,NULL));
+        char * mname = strdup(module_name(full_scope));
+        char * tname = name;
+        asprintf(&name,"%s%s",local_name(full_scope),name);
+        ent = FindOrCreateEntity(mname,name);
+        free(mname);free(tname);
 	  if (is_external
 	      && !member_entity_p(ent) /* Maybe it would have been
 					  better to push "external" in
@@ -1069,39 +1077,35 @@ entity FindOrCreateCurrentEntity(string name,
 	    type ft = stack_undefined_p(st)? type_undefined : (type)stack_head(st);
 
 	    if(typedef_entity_p(function)) {
-	      string sn =string_undefined;
-
 	      // To get a unique identifier for each function typedef
 	      set_current_dummy_parameter_number((_int) ft);
-	      sn = i2a(get_current_dummy_parameter_number());
-	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
-						      MODULE_SEP_STRING,name,NULL));
-	      free(sn);
+          char * module_name;
+          asprintf(&module_name,DUMMY_PARAMETER_PREFIX"%d",get_current_dummy_parameter_number());
+
+	      ent = FindOrCreateEntity(module_name,name);
+	      free(module_name);
 	    }
 	    else if(!type_undefined_p(ft) && type_variable_p(ft)
 		&& basic_pointer_p(variable_basic(type_variable(ft)))) {
-	      string sn = string_undefined;
 
 	      // To get a unique identifier for each function pointerdeclaration, dummy or not
 	      set_current_dummy_parameter_number((_int) ft);
-	      sn = i2a(get_current_dummy_parameter_number());
+          char * module_name;
+          asprintf(&module_name,DUMMY_PARAMETER_PREFIX"%d",get_current_dummy_parameter_number());
 
-	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
-						      MODULE_SEP_STRING,name,NULL));
-	      free(sn);
+	      ent = FindOrCreateEntity(module_name,name);
+	      free(module_name);
 	    }
 	    else {
 	      /* It is too early to define formal parameters. Let's start with dummy parameters */
 	      // To get a unique identifier for each function (This
 	      // may not be sufficient as a function can be declared
 	      // any number of times with any parameter names)
-	      string sn = string_undefined;
-
 	      set_current_dummy_parameter_number((_int) function);
-	      sn = i2a(get_current_dummy_parameter_number());
-	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
-						      MODULE_SEP_STRING,name,NULL));
-	      free(sn);
+          char * module_name;
+          asprintf(&module_name,DUMMY_PARAMETER_PREFIX"%d",get_current_dummy_parameter_number());
+	      ent = FindOrCreateEntity(module_name,name);
+	      free(module_name);
 	      /*
 	      if(top_level_entity_p(function))
 		ent = find_or_create_entity(strdup(concatenate(entity_user_name(function),
@@ -1123,20 +1127,21 @@ entity FindOrCreateCurrentEntity(string name,
 	      if (is_external)
 		{
 		  /* This is a variable/function declared outside any module's body*/
-		  if (is_static)
-		  /* If it is a function, we'd like to increase its
-		     name. If it's a variable, we'd like not to
-		     increase its name with the compilation unit
-		     name. But we do not have much information here to
-		     make the decision. Let's assume it's a function
-		     and postpone to UpdateEntity() */
-		    /* Depending on the type, we should or not
-		       introduce a MODULE_SEP_STRING, but the type is
-		       still not fully known. Wait for UpdateFunctionEntity(). */
-		    ent = find_or_create_entity(concatenate(compilation_unit_name,
-								   MODULE_SEP_STRING,
-								   compilation_unit_name,
-								   name,NULL));
+            if (is_static) {
+                /* If it is a function, we'd like to increase its
+                   name. If it's a variable, we'd like not to
+                   increase its name with the compilation unit
+                   name. But we do not have much information here to
+                   make the decision. Let's assume it's a function
+                   and postpone to UpdateEntity() */
+                /* Depending on the type, we should or not
+                   introduce a MODULE_SEP_STRING, but the type is
+                   still not fully known. Wait for UpdateFunctionEntity(). */
+                char * local_name;
+                asprintf(&local_name,"%s%s",compilation_unit_name,name);
+                ent = FindOrCreateEntity(compilation_unit_name,local_name);
+                free(local_name);
+            }
 		  else {
 		    /* We may have to remove it from the extern list:
 		       C_syntax/global_extern01.c */
@@ -1155,19 +1160,14 @@ entity FindOrCreateCurrentEntity(string name,
 		{
 		  /* This is a variable/function declared inside a module's body: add block scope here
 		     Attention, the scope of a function declared in module is the module, not global.*/
+              char * local_name;
+              asprintf(&local_name,"%s%s",block_scope,name);
 		  if (static_module_p(get_current_module_entity()))
-		    /* The module name is unambiguous because it is used by pipdbm */
-		    ent = find_or_create_entity(concatenate(get_current_module_name(),
-								   MODULE_SEP_STRING,
-								   block_scope,
-								   name,
-								   NULL));
-		  else
-		    ent = find_or_create_entity((concatenate(get_current_module_name(),
-								   MODULE_SEP_STRING,
-								   block_scope,
-								   name,
-								   NULL)));
+              /* The module name is unambiguous because it is used by pipdbm */
+              ent = FindOrCreateEntity(get_current_module_name(),local_name);
+          else 
+              ent = FindOrCreateEntity(get_current_module_name(),local_name);
+          free(local_name);
 		  /* FI: why is ct not exploited? Because the
 		     information is later destroyed. I guess it is
 		     related to the type_stack stored in the entity_
@@ -1363,7 +1363,7 @@ entity RenameFunctionEntity(entity oe)
 {
   entity ne = oe;
   string oen = entity_name(oe);
-  string oeln = entity_local_name(oe);
+  const char* oeln = entity_local_name(oe);
   string sn = local_name_to_scope(oeln);
   //type oet = entity_type(oe);
 
@@ -1378,9 +1378,9 @@ entity RenameFunctionEntity(entity oe)
       stack ns = stack_copy(s);
 
       /* In fact, we'd like to know if it is found before we create it... */
-      ne = global_name_to_entity(TOP_LEVEL_MODULE_NAME, ln);
+      ne = FindEntity(TOP_LEVEL_MODULE_NAME, ln);
       if(entity_undefined_p(ne)) {
-	ne = find_or_create_entity(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, ln, NULL));
+	ne = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, ln );
 	entity_type(ne) = copy_type(entity_type(oe));
 	entity_storage(ne) = copy_storage(entity_storage(oe));
 	/* FI I do not understand how formal parameters could be declared before */
@@ -1824,7 +1824,7 @@ void UseFormalArguments(entity f)
       //formal pfs = storage_formal(ps);
 
       if(!stack_undefined_p(get_from_entity_type_stack_table(p))) {
-	new_p = find_or_create_entity(concatenate(mn,MODULE_SEP_STRING, pn, NULL));
+	new_p = FindOrCreateEntity(mn, pn );
 	entity_storage(new_p) = copy_storage(entity_storage(p));
 	entity_type(new_p) = copy_type(entity_type(p));
 	entity_initial(new_p) = copy_value(entity_initial(p));
@@ -2055,7 +2055,7 @@ void SubstituteDummyParameters(entity f, list el)
   for(list cel=el; !ENDP(cel); POP(cel)) {
     entity v = ENTITY(CAR(cel));
     if(dummy_parameter_entity_p(v)) {
-      string mn = entity_local_name(f);
+      const char* mn = entity_local_name(f);
       const char * ln = entity_user_name(v);
       entity nv = FindOrCreateEntity(mn, ln);
       stack s = get_from_entity_type_stack_table(v);
@@ -2103,7 +2103,7 @@ void CreateReturnEntity(entity f)
       }
       else if(!type_void_p(rt)) {
 	/* Create the return value */
-	string fn = entity_local_name(f);
+	const char* fn = entity_local_name(f);
 	entity re = FindOrCreateEntity(fn,fn);
 	if(type_undefined_p(entity_type(re))) {
 	  entity_type(re) = copy_type(rt);
@@ -2144,8 +2144,8 @@ void UpdateEntity2(entity f,
     entity v = ENTITY(CAR(cl));
     if(dummy_parameter_entity_p(v)) {
       const char * ln = entity_user_name(v);
-      string mn = entity_local_name(f);
-      entity fp = global_name_to_entity(mn, ln);
+      const char* mn = entity_local_name(f);
+      entity fp = FindEntity(mn, ln);
       if(entity_undefined_p(fp)) {
 	fp = FindOrCreateEntity(mn, ln);
 	entity_type(fp) = copy_type(entity_type(v));
@@ -2442,12 +2442,12 @@ entity CleanUpEntity(entity e)
 {
   entity ne = e;
   type et = entity_type(e);
-  string eln = entity_local_name(e);
+  const char* eln = entity_local_name(e);
 
   if(static_module_name_p(eln) && !type_functional_p(et)) {
     /* The variable name is wrong */
-    string neln = strstr(eln, FILE_SEP_STRING)+1;
-    string emn = entity_module_name(e);
+    const char* neln = strstr(eln, FILE_SEP_STRING)+1;
+    const char* emn = entity_module_name(e);
 
     ne = FindOrCreateEntity(emn, neln);
 
@@ -3095,7 +3095,7 @@ void AddToCalledModules(entity e)
     {
       bool already_here = false;
       //string n = top_level_entity_p(e)?entity_local_name(e):entity_name(e);
-      string n = entity_local_name(e);
+      const char* n = entity_local_name(e);
       MAP(STRING,s,
       {
 	if (strcmp(n, s) == 0)

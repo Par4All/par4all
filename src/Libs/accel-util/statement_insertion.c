@@ -172,7 +172,7 @@ static void statement_insertion_fix_access(list regions)
 static bool do_statement_insertion(statement s)
 {
     /* first find a statement with the relevant pragma */
-    string inserted_pragma = get_string_property("STATEMENT_INSERTION_PRAGMA");
+    const char* inserted_pragma = get_string_property("STATEMENT_INSERTION_PRAGMA");
     if(empty_string_p(inserted_pragma)) {
         pips_user_warning("STATEMENT_INSERTION_PRAGMA property should not be empty\n");
     }

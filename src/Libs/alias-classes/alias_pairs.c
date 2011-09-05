@@ -445,7 +445,7 @@ add_alias_pairs_for_this_call_site(call call_site)
 static void
 add_alias_pairs_for_this_caller( entity caller )
 {
-    char *caller_name;
+    const char *caller_name;
     statement caller_statement;
 
     reset_current_module_entity();
@@ -516,7 +516,7 @@ add_alias_pairs_for_this_caller( entity caller )
  * and list_pairs
  */
 static list
-alias_pairs( string module_name, list l_reg )
+alias_pairs( const char* module_name, list l_reg )
 {
 
     callees callers;
@@ -581,7 +581,7 @@ alias_pairs( string module_name, list l_reg )
  * current_caller_stmt
  */
 bool 
-in_alias_pairs( string module_name )
+in_alias_pairs( const char* module_name )
 {
     list l_reg, l_pairs;
 
@@ -618,7 +618,7 @@ in_alias_pairs( string module_name )
  * current_caller_stmt
  */
 bool 
-out_alias_pairs( string module_name )
+out_alias_pairs( const char* module_name )
 {
     list l_reg, l_pairs;
 

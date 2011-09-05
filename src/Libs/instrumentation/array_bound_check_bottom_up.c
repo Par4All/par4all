@@ -194,7 +194,7 @@ string int_to_dimension(int i)
 
 bool array_need_bound_check_p(entity e)
 {
-  string s = entity_module_name(e);
+  const char* s = entity_module_name(e);
   if (strcmp(s,IO_EFFECTS_PACKAGE_NAME)==0)
     return false;
   return true;
@@ -1088,7 +1088,7 @@ static void bottom_up_abc_statement(statement module_statement)
   stack_free(&context.uns);
 }
 
-bool array_bound_check_bottom_up(char *module_name)
+bool array_bound_check_bottom_up(const char* module_name)
 {
   statement module_statement;
   set_current_module_entity(local_name_to_top_level_entity(module_name));
@@ -1158,7 +1158,7 @@ make_strlen_expression(expression arg)
 {
     entity strlen_ent;
 
-    strlen_ent = gen_find_entity("TOP-LEVEL:strlen");
+    strlen_ent = FindOrCreateTopLevelEntity("strlen");
     return make_call_expression(strlen_ent, CONS(EXPRESSION, arg, NIL));
 }
 
@@ -1306,10 +1306,8 @@ expression_try_find_size(expression expr)
              * allocated by malloc() (or a similar function).
              */
             e_uname = entity_size_uname(e);
-            size_holder = gen_find_entity(make_entity_fullname(
-                            // XXX ? marche pas ...
-                            //STATIC_AREA_LOCAL_NAME, e_uname));
-                            "main", e_uname));
+            size_holder = FindOrCreateEntity("main",e_uname);
+
             free(e_uname);
             if (size_holder == entity_undefined)
                 return expression_undefined;
@@ -1666,11 +1664,11 @@ sprintf_check_expression(expression args[], int nargs)
     if (nargs < 2)
         return expression_undefined;
 
-    if ((snprintf_ent = gen_find_entity("TOP-LEVEL:snprintf"))
+    if ((snprintf_ent = FindEntity(TOP_LEVEL_MODULE_NAME,"snprintf"))
                 == entity_undefined)
         return expression_undefined;
 
-    if ((tmpbuf_ent = gen_find_entity("main:PIPS_tmpbuf")) == entity_undefined)
+    if ((tmpbuf_ent = FindEntity("main","PIPS_tmpbuf")) == entity_undefined)
         // XXX module "main" non correct
         tmpbuf_ent = make_scalar_entity("PIPS_tmpbuf", "main",
                                                 make_basic_int(1));
@@ -1776,7 +1774,7 @@ alloc_instrumentation(expression args[], int nargs)
     } else if (strcmp(func_name, "TOP-LEVEL:calloc") == 0) {
         if (func_nargs != 2)
             return statement_undefined;
-        size_expr = make_call_expression(gen_find_entity("TOP-LEVEL:*"),
+        size_expr = make_call_expression(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
 					 func_args);
     } else
         return statement_undefined;
@@ -1786,8 +1784,8 @@ alloc_instrumentation(expression args[], int nargs)
      * memory.
      */
     size_holder_name = entity_size_uname(ptr);
-    size_holder_ent = gen_find_entity(make_entity_fullname("main",
-							   size_holder_name));
+    size_holder_ent = FindEntity("main",
+							   size_holder_name);
     if (size_holder_ent == entity_undefined) {
         size_holder_ent =
 	  make_scalar_entity(size_holder_name,
@@ -1852,10 +1850,7 @@ cstr_args_check(statement s)
                 return statement_undefined;
         }
         e_uname = entity_size_uname(arg_ent);
-        size_holder = gen_find_entity(make_entity_fullname(
-                        // XXX ? marche pas ...
-                        //STATIC_AREA_LOCAL_NAME, e_uname));
-                        "main", e_uname));
+        size_holder = FindEntity("main", e_uname);
         free(e_uname);
         if (size_holder == entity_undefined)
             return statement_undefined;

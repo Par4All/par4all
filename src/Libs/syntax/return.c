@@ -56,7 +56,7 @@ static bool hide_rc_p = false;
 #define SET_RC_PREFIX "SET_"
 
 void
-SubstituteAlternateReturns(string option)
+SubstituteAlternateReturns(const char* option)
 {
     substitute_rc_p = (strcmp(option, "RC")==0) || (strcmp(option, "HRC")==0) ;
     hide_rc_p = (strcmp(option, "HRC")==0) ;
@@ -94,7 +94,7 @@ static entity return_code_variable = entity_undefined;
 
 entity GetReturnCodeVariable()
 {
-  string rc_name = get_string_property("PARSER_RETURN_CODE_VARIABLE");
+  const char* rc_name = get_string_property("PARSER_RETURN_CODE_VARIABLE");
   /* Cannot be asserted because the return_code_variable may either be a
    * formal parameter if the current module uses multiple return, or
    * a dynamic variable if it does not and if it calls a subroutine
@@ -104,7 +104,7 @@ entity GetReturnCodeVariable()
     pips_assert("entity return_code_variable is undefined",
     entity_undefined_p(return_code_variable));
   */
-  return_code_variable = global_name_to_entity(get_current_module_name(), rc_name);
+  return_code_variable = FindEntity(get_current_module_name(), rc_name);
   if(entity_undefined_p(return_code_variable)) {
     return_code_variable = FindOrCreateEntity(get_current_module_name(), rc_name);
   }
@@ -121,9 +121,9 @@ static entity GetFullyDefinedReturnCodeVariable()
   if(type_undefined_p(entity_type(rc))) {
     /* We must be dealing with the actual variable, not with the formal
        variable. */
-    string module_name = get_current_module_name();
+    const char* module_name = get_current_module_name();
     entity f = local_name_to_top_level_entity(module_name);
-    entity a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
+    entity a = FindEntity(module_name, DYNAMIC_AREA_LOCAL_NAME);
 
     entity_type(rc) = MakeTypeVariable(make_basic(is_basic_int, (void *) 4), NIL);
 
@@ -295,7 +295,7 @@ static statement make_get_rc_statement(expression rc_ref)
   string get_rc_name = strdup(concatenate(GET_RC_PREFIX,
 					  get_string_property("PARSER_RETURN_CODE_VARIABLE"),
 					  NULL));
-  entity get_rc = global_name_to_entity(TOP_LEVEL_MODULE_NAME, get_rc_name);
+  entity get_rc = FindEntity(TOP_LEVEL_MODULE_NAME, get_rc_name);
 
   if(entity_undefined_p(get_rc)) {
     get_rc = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, get_rc_name);
@@ -347,9 +347,9 @@ instruction generate_return_code_checks(list labels)
 
     ercv = entity_to_expression(rcv);
 
-    MAP(ENTITY, l, {
-	lln = CONS(STRING, label_local_name(l), lln);
-    }, labels);
+    FOREACH(ENTITY, l, labels) {
+        lln = CONS(STRING, (char*)label_local_name(l), lln);
+    }
 
     i = MakeComputedGotoInst(lln, ercv);
 
@@ -391,7 +391,7 @@ static entity set_rc_function()
   string set_rc_name = strdup(concatenate(SET_RC_PREFIX,
 					  get_string_property("PARSER_RETURN_CODE_VARIABLE"),
 					  NULL));
-  entity set_rc = global_name_to_entity(TOP_LEVEL_MODULE_NAME, set_rc_name);
+  entity set_rc = FindEntity(TOP_LEVEL_MODULE_NAME, set_rc_name);
 
   if(entity_undefined_p(set_rc)) {
     set_rc = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, set_rc_name);
@@ -477,8 +477,8 @@ instruction MakeReturn(expression e)
     /* Let's try to provide more useful information to the user */
     /* inst = MakeZeroOrOneArgCallInst("STOP", e); */
     if(expression_call_p(e)) {
-      string mn = get_current_module_name();
-      string sn = entity_local_name(call_function(syntax_call(expression_syntax(e))));
+      const char* mn = get_current_module_name();
+      const char* sn = entity_local_name(call_function(syntax_call(expression_syntax(e))));
 
       inst = MakeZeroOrOneArgCallInst
 	("STOP",
