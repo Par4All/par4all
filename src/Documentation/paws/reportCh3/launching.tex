@@ -1,9 +1,14 @@
-\section{PaWS deployment and managing}
+\section{PaWS Deployment and Management}
 \label{paws_managing}
 
-PaWS is based on Pylons \cite{pylons} framework which is WSGI\footnote{WSGI stands for \emph{Web Server Gateway Interface} \cite{wsgi} - Python specification for web servers, applications and web applications for communication standardization.} compliant. This standard provides a lot of ways to deploy the web applications, depending on their needs \cite{python_app_deployment}.
+PaWS is based on the Pylons \cite{pylons} framework which is
+WSGI\footnote{WSGI stands for \emph{Web Server Gateway Interface}
+  \cite{wsgi} - Python specification for web servers, applications and
+  web applications for communication standardization.} compliant. This
+standard provides a lot of ways to deploy the WEB applications,
+depending on their needs \cite{python_app_deployment}.
 
-The easiest way is based on \emph{Paste Script} module \cite{paster}, which is part of the Pylons and provides necessary server commands, such as:
+The easiest way is based on the \emph{Paste Script} module~\cite{paster}, which is part of Pylons and provides necessary server commands, such as:
 
 \begin{itemize}
   \item {\bf Start the server}
@@ -14,7 +19,7 @@ The easiest way is based on \emph{Paste Script} module \cite{paster}, which is p
 paster serve --reload development.ini
 \end{lstlisting}
   
-  \item {\bf Get status of the server}
+  \item {\bf Get the status of the server}
   
 \lstset{language=Python,caption={Status},label=PasterStatus}
 \begin{lstlisting}
@@ -30,8 +35,12 @@ paster controller <controller_name>
   
 \end{itemize}
 
-All those commands have to be invoked in the directory, which contains \emph{development.ini} file (see Section \ref{structure} for detailed information).
+All those commands have to be invoked in the directory, which contains
+\emph{development.ini} file. See Section~\ref{structure} for detailed
+information).
 
 \subsection{Supervisor}
 
-Currently PaWS server is run using Supervisor \cite{supervisor}, the system for process control and monitoring. It provides mechanism of automatic restart of the process if it crushes.
+Currently PaWS server is run using Supervisor \cite{supervisor}, the
+system for process control and monitoring. It provides a mechanism for
+automatic restart of the process if it crashes.
