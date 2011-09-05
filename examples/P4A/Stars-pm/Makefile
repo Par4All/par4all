@@ -4,10 +4,6 @@ CC= gcc
 PGCC= pgcc
 TARGET= stars-pm
 
-ifneq ($(do_not_cheat),1)
-P4A_CHEAT= -DP4A_CUDA_CHEAT
-endif
-
 P4A_OPTIONS+=-DP4A
 NVCCFLAGS=-lcufft
 
@@ -167,15 +163,15 @@ run-%: $(TARGET)_%
 
 %_autocuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) $(GPU_TIMING) $(P4A_CHEAT) $(CPPFLAGS)  --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)   --nvcc-flags="$(NVCCFLAGS)" --atomic
+	p4a $(P4A_OPTIONS) $(GPU_TIMING) $(CPPFLAGS)  --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)   --nvcc-flags="$(NVCCFLAGS)" --atomic
 	
 %_autocuda_comm_optimization : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) $(GPU_TIMING) $(P4A_CHEAT) $(CPPFLAGS) --com-optimization --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)  --nvcc-flags="$(NVCCFLAGS)" --atomic
+	p4a $(P4A_OPTIONS) $(GPU_TIMING) $(CPPFLAGS) --com-optimization --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)  --nvcc-flags="$(NVCCFLAGS)" --atomic
 	
 %_cuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
 	# Parallelize and build a CUDA version:
-	$(NVCC) $(CPPFLAGS) $(GPU_TIMING) $(LDFLAGS) $(NVCCFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
+	$(NVCC) $(CPPFLAGS) $(GPU_TIMING) $(LDFLAGS) $(NVCCFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(CUDA_SOURCES)  $(GRAPHICS) -arch sm_11 
 
 	
 include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(CPROTO_GRAPHICS_SRC)

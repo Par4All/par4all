@@ -76,6 +76,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   for (t = 0; t < tsteps; t++) {
     for (i1 = 0; i1 < n; i1++)
       for (i2 = 1; i2 < n; i2++) {
@@ -105,6 +109,10 @@ int main(int argc, char** argv) {
         X[n - 2 - i1][i2] = (X[n - 2 - i1][i2] - X[n - i1 - 3][i2] * A[n - 3
             - i1][i2]) / B[n - 2 - i1][i2];
   }
+#ifdef PGI_ACC
+}
+#endif
+
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

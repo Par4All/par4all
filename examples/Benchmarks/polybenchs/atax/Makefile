@@ -1,7 +1,6 @@
 TARGET=atax
-NTHREADS_OMP  = 10
-NTHREADS_CUDA = 128
+SIZE_PARAMS= -DNX=1000 -DNY=1000
 
-include ../../bench.mk
+include ../bench.mk
 
 

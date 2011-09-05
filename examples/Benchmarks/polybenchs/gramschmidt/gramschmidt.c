@@ -73,6 +73,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   for (k = 0; k < n; k++) {
     nrm = 0;
     for (i = 0; i < m; i++)
@@ -88,6 +92,9 @@ int main(int argc, char** argv) {
         A[i][j] = A[i][j] - Q[i][k] * R[k][j];
     }
   }
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

@@ -27,14 +27,12 @@ DATA_TYPE q[NX];
 static void init_array() {
   int i, j;
 
-  for (i = 0; i < NX;) {
+  for (i = 0; i < NX;i++) {
     r[i] = i * M_PI;
     p[i] = i * M_PI;
-    for (j = 0; j < NY;) {
+    for (j = 0; j < NY;j++) {
       A[i][j] = ((DATA_TYPE)i * j) / NX;
-      j++;
     }
-    i++;
   }
 }
 
@@ -72,6 +70,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   for (i = 0; i < ny; i++)
     s[i] = 0;
 
@@ -82,6 +84,10 @@ int main(int argc, char** argv) {
       q[i] = q[i] + A[i][j] * p[j];
     }
   }
+#ifdef PGI_ACC
+}
+#endif
+
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

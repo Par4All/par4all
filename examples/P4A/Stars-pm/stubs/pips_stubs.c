@@ -4,12 +4,13 @@
 #include "stars-pm.h"
 
 #ifndef P4A_RUNTIME_FFTW
+#include <stdlib.h>
 #include <fftw3.h>
 void fftwf_free(void *p) {
   free(p);
 }
 
-void fftwf_destroy_plan( void *p) {
+void fftwf_destroy_plan( fftwf_plan p) {
   free(p);
 }
 
@@ -23,11 +24,11 @@ fftwf_plan fftwf_plan_dft_3d(int nx, int ny, int nz, fftwf_complex *in, fftwf_co
   return fft;
 }
 
-void* fftwf_malloc(int size) {
+void *fftwf_malloc(size_t size) {
  return malloc(size);
 }
 
-void fftwf_init_threads() {
+int fftwf_init_threads() {
   fprintf(stderr,"FFTW STUB : %s\n",__FUNCTION__);
 }
 void fftwf_plan_with_nthreads(int nthreads) {

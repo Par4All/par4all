@@ -13,7 +13,7 @@ p4a_accel.cu: $(P4A_ACCEL_DIR)/p4a_accel.cu
 	ln -s $<
 
 #CPPFLAGS = -I.. -I.  -I../../../../P4A_CUDA -DP4A_ACCEL_CUDA -DP4A_DEBUG -I$(CUDA_DIR)/include -I$(NVIDIA_SDK_DIR)/C/common/inc -DUNIX
-CPPFLAGS = -I.. -I.  -I../../../../P4A_CUDA -DP4A_ACCEL_CUDA -DP4A_DEBUG -I$(CUDA_DIR)/include -DUNIX
+CPPFLAGS = -I.. -I.  -I../../../../P4A_CUDA -DP4A_ACCEL_CUDA -I$(CUDA_DIR)/include -DUNIX
 CUFLAGS += --compiler-options -fno-strict-aliasing --ptxas-options=-v -arch=sm_13 -O2 -c
 
 #LDFLAGS = -fPIC -L$(CUDA_DIR)/lib64 -L$(NVIDIA_SDK_DIR)/C/lib -L$(NVIDIA_SDK_DIR)/C/common/lib/linux

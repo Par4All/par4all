@@ -1,7 +1,6 @@
 TARGET=lu
-NTHREADS_OMP  = 10
-NTHREADS_CUDA = 128
+SIZE_PARAMS=-DN=4096
 
-include ../../bench.mk
+include ../bench.mk
 
 

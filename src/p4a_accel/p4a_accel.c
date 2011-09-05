@@ -13,6 +13,12 @@
 */
 
 #include <p4a_accel.h>
+#include <errno.h>
+
+/**
+ * Flag that trigger timing of kernel execution
+ */
+int p4a_timing = 0;
 
 /**
  *  This is used by P4A_TIMING routine to compute elapsed time for a kernel
@@ -21,7 +27,49 @@
 float p4a_timing_elapsedTime = -1;
 struct timeval p4a_time_begin, p4a_time_end;
 
+/**
+ * The main debug level for p4a
+ */
+int p4a_debug_level = 0;
+
+void p4a_main_init() {
+  checkStackSize();
+
+  /* Debug level stuff */
+  char *env_p4a_debug= getenv ("P4A_DEBUG");
+  if(env_p4a_debug) {
+    printf("%s",env_p4a_debug);
+    errno = 0;
+    int debug_level = strtol(env_p4a_debug, NULL,10);
+    if(errno==0) {
+      P4A_dump_message("Setting debug level to %d\n",debug_level);
+      p4a_debug_level= debug_level;
+    } else {
+      fprintf(stderr,"Invalid value for P4A_DEBUG: %s\n",env_p4a_debug);
+    }
+  }
+
+  /* Timing stuff */
+  char *env_p4a_timing= getenv ("P4A_TIMING");
+  if(env_p4a_timing) {
+    printf("%s",env_p4a_timing);
+    errno = 0;
+    int timing = strtol(env_p4a_timing, NULL,10);
+    if(errno==0) {
+      P4A_dump_message("Enable timing (%d)\n",timing);
+      p4a_timing= timing;
+    } else {
+      fprintf(stderr,"Invalid value for P4A_TIMING: %s\n",env_p4a_timing);
+    }
+  }
+}
+
+
 #ifdef P4A_ACCEL_OPENMP
+
+void p4a_init_openmp_accel() {
+  p4a_main_init();
+}
 
 /**
  * global structure used for timing purpose
@@ -148,18 +196,30 @@ void P4A_copy_to_accel(size_t element_size,
 int p4a_max_threads_per_block = P4A_CUDA_THREAD_MAX;
 
 void p4a_init_cuda_accel() {
+  // Main p4a initialization
+  p4a_main_init();
+
+  // Timing stuff
   toolTestExec(cudaEventCreate(&p4a_start_event));
   toolTestExec(cudaEventCreate(&p4a_stop_event));
-  checkStackSize();
+
+  // Threads per blocks
   char *env_p4a_max_tpb = getenv ("P4A_MAX_TPB");
   if(env_p4a_max_tpb) {
     errno = 0;
     int tpb = strtol(env_p4a_max_tpb, NULL,10);
     if(errno==0) {
+      P4A_dump_message("Setting max TPB to %d\n",tpb);
       p4a_max_threads_per_block = tpb;
+    } else {
+      fprintf(stderr,"Invalid value for P4A_MAX_TPB : %s\n",env_p4a_max_tpb);
     }
-
   }
+
+  // We prefer to have more L1 cache and less shared since we don't make use of it
+  cudaDeviceSetCacheConfig( cudaFuncCachePreferL1 );
+  toolTestExecMessage("P4A CUDA cache config failed");
+
 }
 
 
@@ -228,20 +288,20 @@ void P4A_accel_free(void *address) {
 void P4A_copy_from_accel(size_t element_size,
     void *host_address,
     void const*accel_address) {
-
-#ifdef P4A_TIMING
-  P4A_TIMING_accel_timer_start;
-#endif
+  if(p4a_timing) {
+    P4A_TIMING_accel_timer_start;
+  }
 
   cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost);
 
-#ifdef P4A_TIMING
-  P4A_TIMING_accel_timer_stop;
-  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
-  P4A_dump_message("Copied %zd bytes of memory from accel %p to host %p : "
-                    "%.1fms - %.2fGB/s\n",element_size, accel_address,host_address,
-                    p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
-#endif
+  if(p4a_timing) {
+    P4A_TIMING_accel_timer_stop;
+    P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+    P4A_dump_message("Copied %zd bytes of memory from accel %p to host %p : "
+                     "%.1fms - %.2fGB/s\n",element_size, accel_address,host_address,
+                      p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
+
+  }
 }
 
 /** Copy a scalar from the host to the hardware accelerator
@@ -264,19 +324,19 @@ void P4A_copy_from_accel(size_t element_size,
 void P4A_copy_to_accel(size_t element_size,
     void const*host_address,
     void *accel_address) {
-#ifdef P4A_TIMING
-  P4A_TIMING_accel_timer_start;
-#endif
+  if(p4a_timing) {
+    P4A_TIMING_accel_timer_start;
+  }
 
   cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice);
 
-#ifdef P4A_TIMING
-  P4A_TIMING_accel_timer_stop;
-  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
-  P4A_dump_message("Copied %zd bytes of memory from host %p to accel %p : "
-                    "%.1fms - %.2fGB/s\n",element_size, host_address,accel_address,
-                    p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
-#endif
+  if(p4a_timing) {
+    P4A_TIMING_accel_timer_stop;
+    P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+    P4A_dump_message("Copied %zd bytes of memory from host %p to accel %p : "
+                      "%.1fms - %.2fGB/s\n",element_size, host_address,accel_address,
+                      p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
+  }
 }
 
 

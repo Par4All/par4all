@@ -21,7 +21,8 @@
 # define DATA_PRINTF_MODIFIER "%0.2lf "
 #endif
 
-/* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */DATA_TYPE alpha;
+/* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */
+DATA_TYPE alpha;
 DATA_TYPE beta;
 DATA_TYPE acc[M][N];
 DATA_TYPE A[N][N];
@@ -84,6 +85,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   /*  C := alpha*A*B + beta*C, A is symetric */
   for (i = 0; i < m; i++)
     for (j = 0; j < n; j++) {
@@ -94,6 +99,9 @@ int main(int argc, char** argv) {
       }
       C[i][j] = beta * C[i][j] + alpha * A[i][i] * B[i][j] + alpha * acc[i][j];
     }
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

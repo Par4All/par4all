@@ -40,6 +40,12 @@ enum { P4A_vp_dim_max = 3 };
 
 extern double P4A_accel_timer_stop_and_float_measure();
 
+/* Main debug level */
+extern int p4a_debug_level;
+
+/* Flag that trigger timing of kernel execution */
+extern int p4a_timing;
+
 #if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENMP)
 #error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
 #endif
@@ -220,16 +226,17 @@ void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */);
 
 /** A macro to enable or skip debug instructions
 
-    Just define P4A_DEBUG to have debug information at runtime
+    Just define P4A_DEBUG environment variable to have debug information at runtime
 
     @param debug_stuff is some text that is included texto if P4A_DEBUG is
     defined
 */
-#ifdef P4A_DEBUG
-#define P4A_skip_debug(debug_stuff) debug_stuff
-#else
-#define P4A_skip_debug(debug_stuff)
-#endif
+#define P4A_skip_debug(level,debug_stuff) \
+do { \
+  if(p4a_debug_level>=level) { \
+    debug_stuff; \
+  } \
+} while(0);
 
 #include <stdio.h>
 

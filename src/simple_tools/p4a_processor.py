@@ -31,30 +31,44 @@ default_properties = dict(
     # Useless to go on if something goes wrong... :-(
     #ABORT_ON_USER_ERROR = True,
     ABORT_ON_USER_ERROR = False,
+
     # Compute the intraprocedural preconditions at the same
     # Compute the intraprocedural preconditions at the same
     # time as transformers and use them to improve the
     # accuracy of expression and statement transformers:
     SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT = True,
+
     # Use the more precise fix point operator to cope with
     # while loops:
     SEMANTICS_FIX_POINT_OPERATOR = "derivative",
+
     # Try to restructure the code for more precision:
     UNSPAGHETTIFY_TEST_RESTRUCTURING = True,
     UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True,
+
     # Simplify for loops into Fortran do-loops internally for
     # better precision of analysis:
     FOR_TO_DO_LOOP_IN_CONTROLIZER = True,
+
     # Warning: assume that there is no aliasing between IO
     # streams ('FILE *' variables):
     ALIASING_ACROSS_IO_STREAMS = False,
+
     # Warning: this is a work in progress. Assume no weird
     # aliasing
     CONSTANT_PATH_EFFECTS = False,
-    # Prevents automatic addition of OpenMP directives when
-    # unsplitting.  We will add them manually using ompify if
-    # requested.
-    PRETTYPRINT_SEQUENTIAL_STYLE = "do"
+
+    # Prevents automatic pretty-printing of OpenMP directives when
+    # unsplitting.  We will add them using ompify if requested.
+    PRETTYPRINT_SEQUENTIAL_STYLE = "do",
+
+    # Required property since floating point arithmetic operations are not
+    # associative because of rounding. PIPS does not take that into
+    # account now and is based on theoretical math... cf PIPS TRAC #551
+
+    # Well, François Irigoin seems to have improved this, so avoid
+    # the spam of parenthesis...
+    # PRETTYPRINT_ALL_PARENTHESES = True
 )
 
 # The default values of some PIPS properties are OK for C but has to be
@@ -113,6 +127,7 @@ class p4a_processor_input(object):
     cuda = False
     opencl = False
     com_optimization = False
+    cuda_cc = 2
     fftw3 = False
     openmp = False
     scmp = False
@@ -189,7 +204,7 @@ class p4a_processor(object):
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
                  filter_exclude = None, accel = False, cuda = False,
-                 opencl = False, openmp = False, com_optimization = False, fftw3 = False,
+                 opencl = False, openmp = False, com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  c99 = False, use_pocc = False, atomic = False,
                  properties = {}, apply_phases={}, activates = []):
@@ -201,6 +216,7 @@ class p4a_processor(object):
         self.opencl = opencl        
         self.openmp = openmp
         self.com_optimization = com_optimization
+        self.cuda_cc = cuda_cc
         self.fftw3 = fftw3
         self.c99 = c99
         self.pocc = use_pocc
@@ -358,37 +374,6 @@ class p4a_processor(object):
             and other_filter(module.name))
         # Select the interesting modules:
         return self.workspace.filter(filter)
-
-
-    def parallelize(self, fine = False, filter_select = None,
-                    filter_exclude = None, apply_phases_before = [], apply_phases_after = []):
-        """Apply transformations to parallelize the code in the workspace
-        """
-        all_modules = self.filter_modules(filter_select, filter_exclude)
-        if fine:
-            # Set to False (mandatory) for A&K algorithm on C source file
-            self.workspace.props.memory_effects_only = self.fortran
-
-        # Apply requested phases before parallezation
-        apply_user_requested_phases(all_modules, apply_phases_before)
-
-        # Try to privatize all the scalar variables in loops:
-        all_modules.privatize_module()
-
-        if fine:
-            # Use a fine-grain parallelization à la Allen & Kennedy:
-            all_modules.internalize_parallel_code(concurrent=True)
-
-        # Always use a coarse-grain parallelization with regions:
-        all_modules.coarse_grain_parallelization(concurrent=True)
-
-        if self.atomic:
-            # Use a coarse-grain parallelization with regions:
-            all_modules.flag_parallel_reduced_loops_with_atomic(concurrent=True)
-
-
-        # Apply requested phases after parallelization:
-        apply_user_requested_phases(all_modules, apply_phases_after)
 
 
     # RK: I think the following should be in another file because it
@@ -580,6 +565,51 @@ class p4a_processor(object):
         return (m != None)
 
 
+    def parallelize(self, fine = False, filter_select = None,
+                    filter_exclude = None, apply_phases_before = [], apply_phases_after = []):
+        """Apply transformations to parallelize the code in the workspace
+        """
+        all_modules = self.filter_modules(filter_select, filter_exclude)
+        if fine:
+            # Set to False (mandatory) for A&K algorithm on C source file
+            self.workspace.props.memory_effects_only = self.fortran
+
+        # Apply requested phases before parallezation
+        apply_user_requested_phases(all_modules, apply_phases_before)
+
+        # Try to privatize all the scalar variables in loops:
+        all_modules.privatize_module()
+
+        if fine:
+            # Use a fine-grain parallelization à la Allen & Kennedy:
+            all_modules.internalize_parallel_code(concurrent=True)
+
+        # Always use a coarse-grain parallelization with regions:
+        all_modules.coarse_grain_parallelization(concurrent=True)
+
+        if self.atomic:
+            # Use a coarse-grain parallelization with regions:
+            all_modules.flag_parallel_reduced_loops_with_atomic(concurrent=True)
+
+        #all_modules.flatten_code(unroll=False,concurrent=True)
+        #all_modules.simplify_control(concurrent=True)
+        all_modules.loop_fusion(concurrent=True)
+        #all_modules.localize_declaration(concurrent=True)
+        
+        # Scalarization doesn't preserve perfect loop nest at that time
+        #all_modules.scalarization(concurrent=True)
+
+        # Privatization information has been lost because of flatten_code
+        all_modules.privatize_module()
+        #if fine:
+            # Use a fine-grain parallelization à la Allen & Kennedy:
+            #all_modules.internalize_parallel_code(concurrent=True)
+
+
+        # Apply requested phases after parallelization:
+        apply_user_requested_phases(all_modules, apply_phases_after)
+
+
     def gpuify(self, filter_select = None,
                 filter_exclude = None,
                 fine = False,
@@ -591,6 +621,29 @@ class p4a_processor(object):
         workspace to generate GPU-oriented code
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
+
+        # Some "risky" optimizations
+        #all_modules.flatten_code(unroll=False,concurrent=True)
+        #all_modules.simplify_control(concurrent=True)
+        #all_modules.loop_fusion(concurrent=True)
+        # Have to debug (see polybench/2mm.c)
+        #all_modules.localize_declaration(concurrent=True)
+        #all_modules.scalarization(concurrent=True)
+
+        # We handle atomic operations here
+        if self.atomic:
+            # Idem for this phase:
+            all_modules.replace_reduction_with_atomic(concurrent=True)
+
+        # In CUDA there is a limitation on 2D grids of thread blocks, in
+        # OpenCL there is a 3D limitation, so limit parallelism at 2D
+        # top-level loops inside parallel loop nests:
+        # Fermi and more recent device allows a 3D grid :)
+        if self.cuda_cc >= 2 :
+            all_modules.limit_nested_parallelism(NESTED_PARALLELISM_THRESHOLD = 3, concurrent=True)
+        else:
+            all_modules.limit_nested_parallelism(NESTED_PARALLELISM_THRESHOLD = 2, concurrent=True)
+
 
         # First, only generate the launchers to work on them later. They
         # are generated by outlining all the parallel loops. In the
@@ -605,6 +658,7 @@ class p4a_processor(object):
                             GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
+                            annotate_loop_nests = True, # annotate for recover parallel loops later
                             concurrent=True)
 
         # Select kernel launchers by using the fact that all the generated
@@ -612,6 +666,11 @@ class p4a_processor(object):
         launcher_prefix = self.get_launcher_prefix ()
         kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
+
+
+        # We flag loops in kernel launchers as parallel, based on the annotation
+        # previously made
+        kernel_launchers.gpu_parallelize_annotated_loop_nest();
 
         # Normalize all loops in kernels to suit hardware iteration spaces:
         kernel_launchers.loop_normalize(
@@ -626,33 +685,6 @@ class p4a_processor(object):
         # Apply requested phases to kernel_launchers:
         apply_user_requested_phases(kernel_launchers, apply_phases_kernel_launcher)
 
-        # Since the privatization of a module does not change
-        # privatization of other modules, use concurrent=True (capply) to
-        # apply them without requiring pipsmake to carefully rebuild
-        # dependent resources:
-        kernel_launchers.privatize_module(concurrent=True)
-        # Idem for this phase:
-        kernel_launchers.coarse_grain_parallelization(concurrent=True)
-
-        if fine:
-            # When using a fine-grain parallelization (Allen & Kennedy) for
-            # producing launchers, we have to do it also in the launcher now.
-            kernel_launchers.internalize_parallel_code(concurrent=True)
-
-        if self.atomic:
-            # Idem for this phase:
-            kernel_launchers.replace_reduction_with_atomic(concurrent=True)
-
-        # In CUDA there is a limitation on 2D grids of thread blocks, in
-        # OpenCL there is a 3D limitation, so limit parallelism at 2D
-        # top-level loops inside parallel loop nests:
-        kernel_launchers.limit_nested_parallelism(NESTED_PARALLELISM_THRESHOLD = 2, concurrent=True)
-        #kernel_launchers.localize_declaration()
-
-        # Add iteration space decorations and insert iteration clamping
-        # into the launchers onto the outer parallel loop nests:
-        kernel_launchers.gpu_loop_nest_annotate(concurrent=True)
-
         # End to generate the wrappers and kernel contents, but not the
         # launchers that have already been generated:
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
@@ -666,6 +698,10 @@ class p4a_processor(object):
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
+        # scalarization is a nice optimization :)
+        # currently it's very limited when applied in kernel, but cannot be applied outside neither ! :-(
+        kernels.scalarization(concurrent=True)
+        
 		# Apply requested phases to kernel:
         apply_user_requested_phases(kernels, apply_phases_kernel)
 
@@ -674,6 +710,12 @@ class p4a_processor(object):
         wrapper_prefix = self.get_wrapper_prefix()
         wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
+
+        # clean all, this avoid lot of warnings at compile time
+        all_modules.clean_declarations()
+        kernels.clean_declarations()
+        wrappers.clean_declarations()
+        kernel_launchers.clean_declarations()
 
 
         if not self.com_optimization :
@@ -709,7 +751,6 @@ class p4a_processor(object):
         f_wrapper_prefix = self.get_fortran_wrapper_prefix ()
         f_wrapper_filter_re = re.compile(f_wrapper_prefix  + "_\\w+$")
         f_wrappers = self.workspace.filter(lambda m: f_wrapper_filter_re.match(m.name))
-#        f_wrappers.print_call_graph ()
 
         # Unfortunately CUDA (at least up to 4.0) does not accept C99
         # array declarations with sizes also passed as parameters in
@@ -717,9 +758,13 @@ class p4a_processor(object):
         # generating array declarations as pointers and by accessing them
         # as array[linearized expression]:
         if self.c99 or self.fortran:
-            kernel_launchers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.c99,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.c99,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.c99,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+            kernel_launchers.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
+            kernels.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
+            wrappers.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
+            
+            
+        if self.c99 or self.fortran:
+            kernels.unfolding()
 
         # Update the list of CUDA modules:
         p4a_util.add_list_to_set (map(lambda x:x.name, kernels),
@@ -795,6 +840,8 @@ class p4a_processor(object):
             self.generated_modules.extend(map(lambda x:x.name, wrappers))
             #self.generated_modules.extend (map(lambda x:x.name, kernel_launchers))
             #self.generated_modules.extend (map(lambda x:x.name, kernels))
+
+        
 
         # To be able to inject Par4All accelerator run time initialization
         # later:

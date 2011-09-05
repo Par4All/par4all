@@ -1,7 +1,6 @@
-TARGET=jacobi-1d-imper
-NTHREADS_OMP  = 10
-NTHREADS_CUDA = 128
-
-include ../../bench.mk
+TARGET=jacobi-1d
+SIZE_PARAMS= -DN=65536
+BENCH_SUITE:=Poly
+include ../bench.mk
 
 

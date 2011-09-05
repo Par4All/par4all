@@ -14,6 +14,11 @@ People only interested in quick results should look only at examples using p4a.
   - Jacobi : example of simple Jacobi solver applied to an image
 
 
+- Benchmarks contains open source benchmark that are used to measure
+  Par4All performance, for example to publish some articles. Useful to
+  reproduce article results too.
+
+
 - F77_matmul_OpenMP shows how to use the PIPS CLI tpips for advanced user
   but also simple p4a for Fortran
 

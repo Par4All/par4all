@@ -1,7 +1,6 @@
 TARGET=symm-exp
-NTHREADS_OMP  = 10
-NTHREADS_CUDA = 128
+SIZE_PARAMS=-DN=2048 -DM=2048
 
-include ../../bench.mk
+include ../bench.mk
 
 

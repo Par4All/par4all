@@ -117,6 +117,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   for (iz = 0; iz < Cz; iz++) {
     for (iy = 0; iy < Cym; iy++) {
       for (ix = 0; ix < Cxm; ix++) {
@@ -157,6 +161,9 @@ int main(int argc, char** argv) {
       Bza[iz][Cym][Cxm] = tmp[iz][iy];
     }
   }
+#ifdef PGI_ACC
+}
+#endif
 
 
   /* Cheat the compiler to limit the scope of optimisation */

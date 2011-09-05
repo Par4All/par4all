@@ -11,7 +11,7 @@ path=`dirname $0`
 path=`(cd $path && cd .. && pwd)`
 
 #db init
-create_table="create table timing (id int auto increment primary key, testcase varchar(255), version varchar(255), measure double);"
+create_table="create table timing (id integer primary key, testcase varchar, version varchar, bench_suite varchar, suite_order integer, measure double);"
 sqliteDB="${path}/timing.sqlite"
 
 if [[  -z $VERSION ]]; then
@@ -28,7 +28,7 @@ else
     echo "Initialising DB"
     echo $create_table | sqlite3 $sqliteDB
   fi
-  echo "INSERT INTO timing (testcase,version,measure) VALUES ('$1','${VERSION}',$3);" | sqlite3 $sqliteDB 
+  echo "INSERT INTO timing (testcase,version,bench_suite,measure) VALUES ('$1','${VERSION}','${BENCH_SUITE}',$3);" | sqlite3 $sqliteDB 
 fi
 
 

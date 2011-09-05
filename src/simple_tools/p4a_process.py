@@ -61,6 +61,7 @@ def process(input):
                 opencl = input.opencl,
                 openmp=input.openmp,
                 com_optimization = input.com_optimization,
+                cuda_cc = input.cuda_cc,
                 fftw3 = input.fftw3,
                 c99 = input.c99,
                 atomic = input.atomic,
@@ -70,7 +71,10 @@ def process(input):
                 properties = input.properties,
                 apply_phases = input.apply_phases
             )
-
+            if input.accel:
+                p4a_util.warn("Activating fine-grain parallelization for accelerator mode")
+                input.fine = True
+                
             output.database_dir = processor.get_database_directory()
 
             # First apply some generic parallelization:

@@ -47,6 +47,11 @@
 
 \maketitle
 
+% The version is here and not in the title to avoid triggering a bug in
+% tex4ht:
+\noindent\textbf{This manual is for \Apfa version \input{VERSION}}
+\bigskip
+
 This document can be found in PDF format on \PfaOrganizationPDF and in HTML
 on \PfaAllOrganizationHTDOC.
 
@@ -93,7 +98,7 @@ sections~\ref{sec:compilation} and above.
 \label{sec:pack-need-build}
 
 The installation has been tested on Ubuntu/Linux 9.10 \& 10.04,
-Fedora Core 13 \& 14 and Debian/unstable.
+Fedora Core 13, 14 \& 15 and Debian/unstable.
 
 To run \Apfa with Debian or Ubuntu, the following packages are needed:
 \begin{quote}
@@ -103,7 +108,7 @@ To run \Apfa with Debian or Ubuntu, the following packages are needed:
   \texttt{ipython}.
 \end{quote}
 
-To run \Apfa with Fedora Core 14 or 13, the following packages are needed:
+To run \Apfa with Fedora Core 15, 14 or 13, the following packages are needed:
 \begin{quote}
   \texttt{ncurses-5}, \texttt{readline}, \texttt{python},
   \texttt{python-ply}, \texttt{python3}, \texttt{gcc-gfortran},
@@ -121,10 +126,10 @@ packages are needed:
   \texttt{libreadline5-dev}, \texttt{python-dev}, \texttt{swig},
   \texttt{python-ply}, \texttt{libgmp3-dev},
   \texttt{libmpfr-dev}, \texttt{gfortran}, \texttt{subversion},
-  \texttt{git}
+  \texttt{git} \texttt{wget}
 \end{quote}
 
-To compile \Apfa with Fedora Core 14 or 13, the following additional
+To compile \Apfa with Fedora Core 15, 14 or 13, the following additional
 packages are needed:
 \begin{quote}
   \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
@@ -132,7 +137,7 @@ packages are needed:
   \texttt{readline-devel}, \texttt{python-devel}, \texttt{swig},
   \texttt{python-ply}, \texttt{gmp-devel},
   \texttt{mpfr-devel}, \texttt{gcc-gfortran}, \texttt{subversion},
-  \texttt{git}
+  \texttt{git} \texttt{wget}
 \end{quote}
 
 % To ease copy/paste:
@@ -144,7 +149,7 @@ additional packages are needed:
   \texttt{python-docutils}, \texttt{texlive-full}, \texttt{tex4ht}
 \end{quote}
 
-To compile the documentation with Fedora Core 14 or 13, the following
+To compile the documentation with Fedora Core 15, 14 or 13, the following
 additional packages are needed:
 \begin{quote}
   \texttt{texlive}, \texttt{tex4ht}
@@ -413,8 +418,18 @@ The \Apfa distribution contains the following directories:
   \Apfa packages from the \Aautotools;
 \item[\texttt{doc}] contains the sources of the \Apfa documentation,
   including those for the user and the programmer as well as those
-  about the infrastructure;
-\item[\texttt{examples}] contains some examples to exercise \Apfa;
+  about the infrastructure:
+  \begin{description}
+  \item[\texttt{organization}] stores indeed the sources of this document;
+  \item[\texttt{p4a\_coding\_rules}] contains some coding rules
+    applications should respect to be dealt seamlessly by \Apfa;
+  \item[\texttt{simple\_tools/p4a\_article}] describes the \Apfa
+    capabilities for the end user and is the user manual;
+  \item[\texttt{p4a\_slides}] is a very simplified version of the previous
+    manual as slides;
+  \end{description}
+\item[\texttt{examples}] contains some examples and benchmarks to exercise
+  \Apfa;
 \item[\texttt{packages}] contains the different components of \Apfa:
   \begin{description}
   \item[\texttt{PIPS}] contains the components of \Apips framework
@@ -540,7 +555,7 @@ reference branches as explained previously) is as follows:
 p4a_git --update-git-svn
 \end{verbatim}
 \item merge the new versions of the upstream packages into the \Apfa
-  reference branches
+  reference branches:
 \begin{verbatim}
 p4a_git --fetch-remote-git
 \end{verbatim}
@@ -550,6 +565,12 @@ p4a_git --fetch-remote-git
 p4a_git --pull-remote-git
 \end{verbatim}
 \end{itemize}
+Note that the 2 previous instructions work into \verb|$P4A_ROOT|, %$
+so make sure it does not point to a default installation directory such as
+\texttt{/usr/local/par4all}. You can update \verb|$P4A_ROOT| %$
+or use the \verb|--root .| option if you worked in the \texttt{par4all}
+working copy.
+
 At the end of this sequence of steps, the most recent developments in all
 of \Apfa is contained in the \verb|p4a| branch infrastructure.  After
 testing and validation, this branch can be published\footnote{But before
@@ -1127,28 +1148,25 @@ at once.
 If needed a \Apfa binary installation can be relocated. There are a few ways to relocate it:
 
 \begin{enumerate}
-\item Copy or move all \Apfa binary installation to another directory, 
-for example to copy 
-from \texttt{/usr/local/par4all} to \texttt{/opt} :
-
+\item Copy or move all \Apfa binary installation to another directory, for
+  example to copy from \texttt{/usr/local/par4all} to \texttt{/opt}:
 \begin{alltt}
 cp -av \emph{/usr/local/par4all} \emph{/opt}
 \end{alltt}
 
-\item Extract from a debian pakage, for example to install
-\Apfa in \texttt{/opt} directory:
-
+\item Extract from a Debian package, for example to install
+  \Apfa in \texttt{/opt} directory:
 \begin{alltt}
 sudo dpkg -x par4all-1.1.1-xxx.deb \emph{/opt}
 \end{alltt}
 
 \end{enumerate}
 
-After having installed \Apfa in a new installation directory (not the default one), 
-\verb|par4all-rc.sh| should be updated.
-\verb|P4A_DIST| and \verb|P4A_ROOT| variables in the \verb|par4all-rc.sh| 
-should be changed according to this new installation directory.
-The following examples are for the cases 1 and 2. 
+After having installed \Apfa in a new installation directory (not the
+default one), \verb|par4all-rc.sh| should be updated.  \verb|P4A_DIST| and
+\verb|P4A_ROOT| variables in the \verb|par4all-rc.sh| should be changed
+according to this new installation directory.  The following examples are
+for the cases 1 and 2.
 
 Relocation has been done by copying all the binary installation (case 1):
 \begin{alltt}
@@ -1162,22 +1180,50 @@ P4A_DIST='/opt/usr/local/par4all'
 P4A_ROOT='/opt/usr/local/par4all'
 \end{alltt}
 
+
 \section{Examples and demos}
 \label{sec:examples-demos}
 
-The \texttt{examples} directory contains examples to demonstrated the
-different features
-of \Apfa. There are many more examples in the validation directory of \Apfa
-(\S~\ref{sec:validation}), but they are less useful for training
-purposes.
+The \texttt{examples} directory contains examples and benchmarks to
+demonstrate the different features of \Apfa. Look at the local
+\texttt{README.txt} for more information.
+
+There are many more examples in the validation directory of \Apfa
+(\S~\ref{sec:validation}), but they are less useful for training purposes.
+
 
 \section{Validation}
 \label{sec:validation}
 
+The validation of \Apfa is done at different levels.
 
-Validation of \Apfa is done inside the \texttt{validation} directory with
-\texttt{make validate}. Currently, there is a also more comprehensive set of
-validation cases in the \texttt{package/PIPS/validation} directory.
+Since \Apfa relies heavily on \Apips, the \Apips validation can be run
+into the \texttt{package/PIPS/validation} directory of the \Agit working
+copy. Refer to the validation section of the \Apips developer guide for
+more information.
+
+Note that since the validation relies on the presence of some directories,
+old directories that may have been automatically created in the past but
+are useless now may create parasitic failure entries in validation
+results. So it may be useful to do a \texttt{git clean -d} in
+\texttt{package/PIPS/validation} before running the \Apips validation.  It
+is typically necessary also when validation directories have been moved
+around in the \Apips \Asvn and this is not well managed at the \Agit level
+since \Agit ignores empty directories.
+
+There is a private validation in the \texttt{validation} directory of the
+\texttt{par4all-priv} private directory. Refer to the
+\texttt{par4all-priv/validation/README.txt} file to have documentation on
+it. It is not explained in this document for confidentiality reasons.
+
+It is mandatory for \Apfa developer to run the validation before pushing
+big modifications to the reference \Agit server.
+
+Since \Apips is a keystone in \Apfa, \Apips developers should verify that
+their changes do not impact badly \Apfa by running the validation too, if
+possible.\footnote{Even if many \Apips contributors are also \Apfa
+  contributors, there are \Apips contributors not familiar nor even
+  related with \Apfa.}
 
 
 \subsection{\protect\texttt{p4a\_validate} utility}
@@ -1286,11 +1332,11 @@ multiple validations, \verb|pips_validate| should be run with the
 \input{p4a_validate-help}
 
 
-\subsection{Validation script}
+\subsection{\texttt{p4a\_validate\_class.py} validation script}
 \label{sec:validation_script}
 
-The python script \verb|p4a_validate_class.py| has several options for
-selecting validation tests.
+The \verb|p4a_validate_class.py| python script is a front-end to \Apfa
+validation and has several options for selecting validation tests.
 
 Currently, available options are:
 \begin{description}
@@ -1399,7 +1445,7 @@ to specific versions of particular branches such as
 \texttt{p4a-packages-0.2-beta}.
 
 
-\section{Useful \protect\Agit features for \protect\Apfa}
+\section{Useful \protect\Agit tricks for \protect\Apfa}
 \label{sec:some-agit-tricks}
 
 \subsection{Files committed to the wrong branch}
@@ -1584,4 +1630,3 @@ indeed. \smiley
 %%% mode: latex
 %%% ispell-local-dictionary: "american"
 %%% End:
-

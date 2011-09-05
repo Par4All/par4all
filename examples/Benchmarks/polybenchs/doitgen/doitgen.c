@@ -84,6 +84,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   for (r = 0; r < nr; r++)
     for (q = 0; q < nq; q++) {
       for (p = 0; p < np; p++) {
@@ -94,6 +98,9 @@ int main(int argc, char** argv) {
       for (p = 0; p < np; p++)
         A[r][q][p] = sum[r][q][p];
     }
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {

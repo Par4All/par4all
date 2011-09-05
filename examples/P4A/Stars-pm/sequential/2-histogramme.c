@@ -5,11 +5,24 @@
 
 
 
+
 static void _histogram(int data[NP][NP][NP],
               int histo[NP][NP][NP]) {
   int i,j,k;
+#ifdef __PIPS__
+  for (i = 0; i < NP; i++) {
+    for (k = 0; k < NP; k++) {
+      for (j = 0; j < NP; j++) {
+        histo[i][j][k] = 0;
+      }
+    }
+  }
+#else
   memset(histo, 0, NPART * sizeof(int));
-#ifndef P4A
+#endif
+
+
+#ifndef __PIPS__
   /* Les casts ne passent pas dans PIPS :-( */
   for (i = 0; i < NPART; i++) {
     ++(((int *)histo)[((int*)data)[i]]);

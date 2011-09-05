@@ -21,7 +21,8 @@
 # define DATA_PRINTF_MODIFIER "%0.2lf "
 #endif
 
-/* Array declaration. */DATA_TYPE float_n = 321414134.01;
+/* Array declaration. */
+DATA_TYPE float_n = 321414134.01;
 DATA_TYPE data[M + 1][N + 1];
 DATA_TYPE symmat[M + 1][M + 1];
 DATA_TYPE mean[M + 1];
@@ -73,6 +74,10 @@ int main(int argc, char** argv) {
     init_array();
   }
 
+#ifdef PGI_ACC
+#pragma acc region
+{
+#endif
   /* Determine mean of column vectors of input data matrix */
   for (j = 1; j <= m; j++) {
     mean[j] = 0.0;
@@ -94,6 +99,10 @@ int main(int argc, char** argv) {
         symmat[j1][j2] += data[i][j1] * data[i][j2];
       symmat[j2][j1] = symmat[j1][j2];
     }
+
+#ifdef PGI_ACC
+}
+#endif
 
   /* Cheat the compiler to limit the scope of optimisation */
   if(argv[0]==0) {
