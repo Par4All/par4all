@@ -1521,39 +1521,49 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
   if (get_bool_property("FREIA_REMOVE_USELESS_COPIES"))
   {
     set forwards = set_make(set_pointer);
+    bool changed = true;
 
     // I -copy-> X -> ... where I is an input is moved forward
-    // maybe I should iterate?
-    FOREACH(dagvtx, v, dag_inputs(d))
+
+    // we iterate the hard way, it could be little more subtle
+    // this is necessary, see copy_02
+    while (changed)
     {
-      list append = NIL;
-      entity in = vtxcontent_out(dagvtx_content(v));
-
-      FOREACH(dagvtx, s, dagvtx_succs(v))
+      changed = false;
+      FOREACH(dagvtx, v, dag_inputs(d))
       {
-        entity copy = vtxcontent_out(dagvtx_content(s));
-        if (dagvtx_is_copy_p(s))
+        list append = NIL;
+        entity in = vtxcontent_out(dagvtx_content(v));
+
+        FOREACH(dagvtx, s, dagvtx_succs(v))
         {
-          // forward propagation in dag & statements
-          FOREACH(dagvtx, s2, dagvtx_succs(s))
+          entity copy = vtxcontent_out(dagvtx_content(s));
+          if (dagvtx_is_copy_p(s))
           {
-            substitute_image_in_statement(s2, copy, in, true);
-            gen_replace_in_list(vtxcontent_inputs(dagvtx_content(s2)),
+            // forward propagation in dag & statements
+            FOREACH(dagvtx, s2, dagvtx_succs(s))
+            {
+              substitute_image_in_statement(s2, copy, in, true);
+              gen_replace_in_list(vtxcontent_inputs(dagvtx_content(s2)),
                                 copy, in);
-          }
-          // update succs
-          append = gen_nconc(dagvtx_succs(s), append);
-          dagvtx_succs(s) = NIL;
+            }
+            // update succs
+            append = gen_nconc(dagvtx_succs(s), append);
+            dagvtx_succs(s) = NIL;
 
-          set_add_element(forwards, forwards, s);
+            set_add_element(forwards, forwards, s);
+          }
         }
-      }
-      if (append)
-      {
-        FOREACH(dagvtx, a, append)
+        if (append)
         {
-          if (!gen_in_list_p(a, dagvtx_succs(v)))
-            dagvtx_succs(v) = CONS(dagvtx, a, dagvtx_succs(v));
+          FOREACH(dagvtx, a, append)
+          {
+            if (!gen_in_list_p(a, dagvtx_succs(v)))
+            {
+              dagvtx_succs(v) = CONS(dagvtx, a, dagvtx_succs(v));
+              changed = true;
+            }
+          }
         }
       }
     }
