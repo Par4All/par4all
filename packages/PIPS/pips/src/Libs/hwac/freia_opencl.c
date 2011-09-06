@@ -499,6 +499,7 @@ static int opencl_compile_mergeable_dag(
  */
 static void opencl_merge_and_compile(
   string module,
+  sequence sq,
   list ls,
   dag d,
   string fname_fulldag,
@@ -517,8 +518,10 @@ static void opencl_merge_and_compile(
 
   int n_cut = 0;
 
-  set done = set_make(set_pointer);
-  set current = set_make(set_pointer);
+  // of vertices
+  set done = set_make(set_pointer), current = set_make(set_pointer);
+  // of statements
+  set stats = set_make(set_pointer), dones = set_make(set_pointer);
   list lcurrent = NIL;
 
   // overall remaining statements to compile
@@ -545,6 +548,13 @@ static void opencl_merge_and_compile(
     while (again &&
            (computables = dag_computable_vertices(d, done, done, current)))
     {
+      ifdebug(5)
+      {
+        pips_debug(5, "%d computables\n", (int) gen_length(computables));
+        gen_fprint(stderr, "computables", computables,
+                   (gen_string_func_t) dagvtx_number_str);
+      }
+
       gen_sort_list(computables, (gen_cmp_func_t) dagvtx_opencl_priority);
       again = false;
       // first, try to extract non mergeable nodes ahead
@@ -611,6 +621,16 @@ static void opencl_merge_and_compile(
     // nothing, this is the end
     if (!lcurrent) break;
 
+    // fix statement connexity...
+    set_clear(stats);
+    FOREACH(dagvtx, v, lcurrent)
+    {
+      statement s = dagvtx_statement(v);
+      if (s) set_add_element(stats, stats, s);
+    }
+    freia_migrate_statements(sq, stats, dones);
+    set_union(dones, dones, stats);
+
     // restore vertices order
     lcurrent = gen_nreverse(lcurrent);
 
@@ -656,11 +676,14 @@ static void opencl_merge_and_compile(
   set_free(global_remainings);
   set_free(current);
   set_free(done);
+  set_free(stats);
+  set_free(dones);
   free(split_name);
 }
 
 /*
   @brief compile one dag for OPENCL
+  @param sq containing sequence
   @param ls statements underlying the full dag
   @param occs image occurences
   @param exchanges statements to exchange because of dependences
@@ -671,7 +694,8 @@ static void opencl_merge_and_compile(
 list freia_opencl_compile_calls
 (string module,
  dag fulld,
- list /* of statements */ ls,
+ sequence sq,
+ list ls,
  const hash_table occs,
  hash_table exchanges,
  const set output_images,
@@ -731,17 +755,25 @@ list freia_opencl_compile_calls
 
   if (get_bool_property(opencl_merge_prop))
   {
+    set stats = set_make(set_pointer), dones = set_make(set_pointer);
     FOREACH(dag, d, ld)
     {
       if (dag_no_image_operation(d))
         continue;
 
-      opencl_merge_and_compile(module, ls, d, fname_fulldag, n_split,
+      // fix statements connexity
+      dag_statements(stats, d);
+      freia_migrate_statements(sq, stats, dones);
+      set_union(dones, dones, stats);
+
+      opencl_merge_and_compile(module, sq, ls, d, fname_fulldag, n_split,
                                fulld, output_images, helper_file, opencl,
                                helpers, init);
 
       n_split++;
     }
+    set_free(stats);
+    set_free(dones);
   }
   // else, do nothing, this is basically like AIPO
 

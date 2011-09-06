@@ -2742,7 +2742,7 @@ type make_standard_long_integer_type(type t)
 
 /* What type should be used to perform memory allocation? No
    allocation of a new type. */
-type ultimate_type(type t)
+static type private_ultimate_type(type t, bool arrays_only)
 {
   type nt;
 
@@ -2761,8 +2761,12 @@ type ultimate_type(type t)
       entity e = basic_typedef(bt);
       type st = entity_type(e);
 
-      // recursion
-      nt = ultimate_type(st);
+      if (!arrays_only
+	  || (type_variable_p(st) &&!ENDP(variable_dimensions(type_variable(st))) ))
+	// recursion
+	nt = ultimate_type(st);
+      else
+	nt = t;
 
       // FC->SG the following stuff requires more comments to be understandable
       // FC->SG why this #if ???
@@ -2825,15 +2829,24 @@ type ultimate_type(type t)
     }
   }
 
-  pips_assert("nt is not a typedef",
-	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : true);
+  if (!arrays_only)
+    pips_assert("nt is not a typedef",
+		type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : true);
 
   // only under debug, because there is a big impact on performance
   ifdebug(1) pips_assert("type consistent",type_consistent_p(nt));
   return nt;
 }
 
+type ultimate_type(type t)
+{
+  return private_ultimate_type(t, false);
+}
 
+type ultimate_array_type(type t)
+{
+  return private_ultimate_type(t, true);
+}
 
 /**
 
