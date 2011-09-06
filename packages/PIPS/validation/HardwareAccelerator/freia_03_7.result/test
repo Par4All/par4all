@@ -65,19 +65,19 @@ digraph "dag_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "29 +" -> "31 /_" [label="t3"];
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_03" in dot format
 digraph "dag_cleaned_0" {
@@ -95,19 +95,19 @@ digraph "dag_cleaned_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "29 +" -> "31 /_" [label="t3"];
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 
 ! updated function for
@@ -215,19 +215,19 @@ digraph "dag_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "29 +" -> "31 /_" [label="t3"];
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_03" in dot format
 digraph "dag_cleaned_0" {
@@ -245,19 +245,19 @@ digraph "dag_cleaned_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "29 +" -> "31 /_" [label="t3"];
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 // graph for dag "freia_03_helper_0_0" of module "freia_03" in dot format
 digraph "freia_03_helper_0_0" {
@@ -275,19 +275,19 @@ digraph "freia_03_helper_0_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
+  "29 +" -> "31 /_" [label="t3"];
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
 }
 
 ! acceleration function
@@ -625,19 +625,19 @@ digraph "dag_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "29 +" -> "31 /_" [label="t3"];
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_03" in dot format
 digraph "dag_cleaned_0" {
@@ -655,19 +655,19 @@ digraph "dag_cleaned_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "29 +" -> "31 /_" [label="t3"];
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 // graph for dag "freia_03_helper_0_0_0" of module "freia_03" in dot format
 digraph "freia_03_helper_0_0_0" {
@@ -685,19 +685,19 @@ digraph "freia_03_helper_0_0_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
+  "29 +" -> "31 /_" [label="t3"];
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
 }
 
 ! acceleration function
@@ -806,7 +806,7 @@ freia_status freia_03_helper_0_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: +s.(2) -> 2
+  // 0: +s_(2) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -837,7 +837,7 @@ freia_status freia_03_helper_0_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_ADDSAT_CONST;
-  // 1: +.(1) -> 1
+  // 1: +_(1) -> 1
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -891,7 +891,7 @@ freia_status freia_03_helper_0_0_0(
   mcu_macro[1][2].iter4 = 0;
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ADD3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ADD3;
-  // 3: *.(1) -> 1
+  // 3: *_(1) -> 1
   mcu_macro[0][3].xmin1 = imagelet_io_1_0;
   mcu_macro[1][3].xmin1 = imagelet_io_1_1;
   mcu_macro[0][3].ymin1 = 0;
@@ -922,7 +922,7 @@ freia_status freia_03_helper_0_0_0(
   mcu_macro[1][3].iter4 = 0;
   mcu_macro[0][3].addrStart = TERAPIX_UCODE_MUL_CONST;
   mcu_macro[1][3].addrStart = TERAPIX_UCODE_MUL_CONST;
-  // 4: /.(2) -> 2
+  // 4: /_(2) -> 2
   mcu_macro[0][4].xmin1 = imagelet_io_2_0;
   mcu_macro[1][4].xmin1 = imagelet_io_2_1;
   mcu_macro[0][4].ymin1 = 0;
@@ -1198,19 +1198,19 @@ digraph "dag_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "29 +" -> "31 /_" [label="t3"];
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_03" in dot format
 digraph "dag_cleaned_0" {
@@ -1228,19 +1228,19 @@ digraph "dag_cleaned_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "29 +" -> "31 /_" [label="t3"];
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 // graph for dag "freia_03_helper_0_0" of module "freia_03" in dot format
 digraph "freia_03_helper_0_0" {
@@ -1258,19 +1258,19 @@ digraph "freia_03_helper_0_0" {
   "33 C" -> "34 *" [label="t7"];
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "29 +" -> "31 /_" [label="t3"];
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 // graph for dag "freia_03_helper_0_0_0" of module "freia_03" in dot format
 digraph "freia_03_helper_0_0_0" {
@@ -1286,21 +1286,21 @@ digraph "freia_03_helper_0_0_0" {
   "34 *" -> "o";
   "32 &" [shape=trapezium,orientation=270];
   "32 &" -> "34 *" [label="t6"];
-  "31 /." [shape=trapezium,orientation=270];
-  "31 /." -> "32 &" [label="t5"];
-  "30 *." [shape=trapezium,orientation=270];
-  "30 *." -> "32 &" [label="t4"];
+  "31 /_" [shape=trapezium,orientation=270];
+  "31 /_" -> "32 &" [label="t5"];
+  "30 *_" [shape=trapezium,orientation=270];
+  "30 *_" -> "32 &" [label="t4"];
   "29 +" [shape=trapezium,orientation=270];
-  "29 +" -> "31 /." [label="t3"];
+  "29 +" -> "31 /_" [label="t3"];
   "33 C" [shape=trapezium,orientation=270];
   "33 C" -> "34 *" [label="t7"];
-  "28 +s." [shape=trapezium,orientation=270];
-  "28 +s." -> "29 +" [label="t2"];
-  "i1" -> "28 +s.";
-  "27 +." [shape=trapezium,orientation=270];
-  "27 +." -> "30 *." [label="t1"];
-  "27 +." -> "29 +" [label="t1"];
-  "i0" -> "27 +.";
+  "28 +s_" [shape=trapezium,orientation=270];
+  "28 +s_" -> "29 +" [label="t2"];
+  "i1" -> "28 +s_";
+  "27 +_" [shape=trapezium,orientation=270];
+  "27 +_" -> "30 *_" [label="t1"];
+  "27 +_" -> "29 +" [label="t1"];
+  "i0" -> "27 +_";
 }
 
 ! acceleration function

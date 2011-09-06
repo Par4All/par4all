@@ -459,8 +459,8 @@ freia_status freia_55(freia_data2d *out, freia_data2d *in)
    freia_data2d *tc = freia_common_create_data(16, 128, 128);           /*0007*/
    // hardware accelerator generated variable
    freia_data2d *tb_1 = freia_common_create_data(tb->bpp, tb->widthWa, tb->heightWa);
-
    freia_55_helper_0_0_0(tb_1, tb, in, freia_morpho_kernel_8c);         /*0010*/
+
    freia_55_helper_0_1_0(tc, tb_1, 255);                                /*0011*/
    freia_55_helper_0_2_0(out, tb, tc);                                  /*0013*/
 
@@ -478,8 +478,8 @@ freia_status freia_55(freia_data2d *out, freia_data2d *in)
    freia_data2d *tc = freia_common_create_data(16, 128, 128);           /*0007*/
    // hardware accelerator generated variable
    freia_data2d *tb_1 = freia_common_create_data(tb->bpp, tb->widthWa, tb->heightWa);
-
    freia_55_helper_0_0_0(tb_1, tb, in, freia_morpho_kernel_8c);         /*0010*/
+
    freia_55_helper_0_1_0(tc, tb_1, 255);                                /*0011*/
    freia_55_helper_0_2_0(out, tb, tc);                                  /*0013*/
 
@@ -1108,9 +1108,9 @@ freia_status freia_55(freia_data2d *out, freia_data2d *in)
    freia_data2d *tb = freia_common_create_data(16, 128, 128);           /*0006*/
    // hardware accelerator generated variable
    freia_data2d *tb_1 = freia_common_create_data(tb->bpp, tb->widthWa, tb->heightWa);
-
    freia_aipo_dilate_8c(tb_1, in, freia_morpho_kernel_8c);              /*0010*/
    freia_aipo_erode_8c(tb, tb_1, freia_morpho_kernel_8c);               /*0012*/
+
    freia_55_helper_0_0_1(out, tb, tb_1, 255);                           /*0013*/
 
    freia_common_destruct_data(tb);                                      /*0016*/
@@ -1125,9 +1125,9 @@ freia_status freia_55(freia_data2d *out, freia_data2d *in)
    freia_data2d *tb = freia_common_create_data(16, 128, 128);           /*0006*/
    // hardware accelerator generated variable
    freia_data2d *tb_1 = freia_common_create_data(tb->bpp, tb->widthWa, tb->heightWa);
-
    freia_aipo_dilate_8c(tb_1, in, freia_morpho_kernel_8c);              /*0010*/
    freia_aipo_erode_8c(tb, tb_1, freia_morpho_kernel_8c);               /*0012*/
+
    freia_55_helper_0_0_1(out, tb, tb_1, 255);                           /*0013*/
 
    freia_common_destruct_data(tb);                                      /*0016*/

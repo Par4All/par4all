@@ -37,11 +37,11 @@ digraph "dag_0" {
   "11 <" -> "out";
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "8 D8" [shape=box];
   "8 D8" -> "10 E8" [label="tb"];
-  "8 D8" -> "9 <." [label="tb"];
+  "8 D8" -> "9 <_" [label="tb"];
   "in" -> "8 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_54" in dot format
@@ -57,11 +57,11 @@ digraph "dag_cleaned_0" {
   "11 <" -> "out";
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "8 D8" [shape=box];
   "8 D8" -> "10 E8" [label="tb_1"];
-  "8 D8" -> "9 <." [label="tb_1"];
+  "8 D8" -> "9 <_" [label="tb_1"];
   "in" -> "8 D8";
 }
 
@@ -117,11 +117,11 @@ digraph "dag_0" {
   "11 <" -> "out";
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "8 D8" [shape=box];
   "8 D8" -> "10 E8" [label="tb"];
-  "8 D8" -> "9 <." [label="tb"];
+  "8 D8" -> "9 <_" [label="tb"];
   "in" -> "8 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_54" in dot format
@@ -137,11 +137,11 @@ digraph "dag_cleaned_0" {
   "11 <" -> "out";
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "8 D8" [shape=box];
   "8 D8" -> "10 E8" [label="tb"];
-  "8 D8" -> "9 <." [label="tb"];
+  "8 D8" -> "9 <_" [label="tb"];
   "in" -> "8 D8";
 }
 // graph for dag "freia_54_helper_0_0" of module "freia_54" in dot format
@@ -155,12 +155,12 @@ digraph "freia_54_helper_0_0" {
   // computation vertices
   "11 <" [shape=trapezium,orientation=270];
   "11 <" -> "out";
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
   "8 D8" [shape=box];
-  "8 D8" -> "9 <." [label="tb_1"];
+  "8 D8" -> "9 <_" [label="tb_1"];
   "8 D8" -> "10 E8" [label="tb_1"];
   "in" -> "8 D8";
 }
@@ -327,11 +327,11 @@ digraph "dag_0" {
   "11 <" -> "out";
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "8 D8" [shape=box];
   "8 D8" -> "10 E8" [label="tb"];
-  "8 D8" -> "9 <." [label="tb"];
+  "8 D8" -> "9 <_" [label="tb"];
   "in" -> "8 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_54" in dot format
@@ -347,11 +347,11 @@ digraph "dag_cleaned_0" {
   "11 <" -> "out";
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "8 D8" [shape=box];
   "8 D8" -> "10 E8" [label="tb"];
-  "8 D8" -> "9 <." [label="tb"];
+  "8 D8" -> "9 <_" [label="tb"];
   "in" -> "8 D8";
 }
 // graph for dag "freia_54_helper_0_0_0" of module "freia_54" in dot format
@@ -365,12 +365,12 @@ digraph "freia_54_helper_0_0_0" {
   // computation vertices
   "11 <" [shape=trapezium,orientation=270];
   "11 <" -> "out";
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
   "8 D8" [shape=box];
-  "8 D8" -> "9 <." [label="tb_1"];
+  "8 D8" -> "9 <_" [label="tb_1"];
   "8 D8" -> "10 E8" [label="tb_1"];
   "in" -> "8 D8";
 }
@@ -517,7 +517,7 @@ freia_status freia_54_helper_0_0_0(
   mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 2: <.(2) -> 2
+  // 2: <_(2) -> 2
   mcu_macro[0][2].xmin1 = imagelet_2;
   mcu_macro[1][2].xmin1 = imagelet_2;
   mcu_macro[0][2].ymin1 = 0;
@@ -676,11 +676,11 @@ digraph "dag_0" {
   "11 <" -> "out";
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "8 D8" [shape=box];
   "8 D8" -> "10 E8" [label="tb"];
-  "8 D8" -> "9 <." [label="tb"];
+  "8 D8" -> "9 <_" [label="tb"];
   "in" -> "8 D8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_54" in dot format
@@ -696,11 +696,11 @@ digraph "dag_cleaned_0" {
   "11 <" -> "out";
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "8 D8" [shape=box];
   "8 D8" -> "10 E8" [label="tb_1"];
-  "8 D8" -> "9 <." [label="tb_1"];
+  "8 D8" -> "9 <_" [label="tb_1"];
   "in" -> "8 D8";
 }
 // graph for dag "freia_54_helper_0_0" of module "freia_54" in dot format
@@ -716,11 +716,11 @@ digraph "freia_54_helper_0_0" {
   "11 <" -> "out";
   "10 E8" [shape=box];
   "10 E8" -> "11 <" [label="tb"];
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
   "8 D8" [shape=box];
   "8 D8" -> "10 E8" [label="tb_1"];
-  "8 D8" -> "9 <." [label="tb_1"];
+  "8 D8" -> "9 <_" [label="tb_1"];
   "in" -> "8 D8";
 }
 // graph for dag "freia_54_helper_0_0_1" of module "freia_54" in dot format
@@ -736,9 +736,9 @@ digraph "freia_54_helper_0_0_1" {
   "11 <" [shape=trapezium,orientation=270];
   "11 <" -> "out";
   "tb" -> "11 <";
-  "9 <." [shape=trapezium,orientation=270];
-  "9 <." -> "11 <" [label="tc"];
-  "tb_1" -> "9 <.";
+  "9 <_" [shape=trapezium,orientation=270];
+  "9 <_" -> "11 <" [label="tc"];
+  "tb_1" -> "9 <_";
 }
 
 ! acceleration function

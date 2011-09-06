@@ -51,13 +51,13 @@ digraph "dag_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "16 =" [shape=circle];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "15 E8" -> "16 =" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
@@ -75,12 +75,12 @@ digraph "dag_cleaned_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
 }
@@ -162,13 +162,13 @@ digraph "dag_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "16 =" [shape=circle];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "15 E8" -> "16 =" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
@@ -186,12 +186,12 @@ digraph "dag_cleaned_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
 }
@@ -208,12 +208,12 @@ digraph "freia_72_helper_0_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
 }
@@ -410,13 +410,13 @@ digraph "dag_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "16 =" [shape=circle];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "15 E8" -> "16 =" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
@@ -434,12 +434,12 @@ digraph "dag_cleaned_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
 }
@@ -456,12 +456,12 @@ digraph "freia_72_helper_0_0_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
 }
@@ -609,7 +609,7 @@ freia_status freia_72_helper_0_0_0(
   mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // 2: +.(2) -> 2
+  // 2: +_(2) -> 2
   mcu_macro[0][2].xmin1 = imagelet_2;
   mcu_macro[1][2].xmin1 = imagelet_2;
   mcu_macro[0][2].ymin1 = 0;
@@ -811,13 +811,13 @@ digraph "dag_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "16 =" [shape=circle];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "15 E8" -> "16 =" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
@@ -835,12 +835,12 @@ digraph "dag_cleaned_0" {
   "23 &" -> "out";
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
 }
@@ -859,10 +859,10 @@ digraph "freia_72_helper_0_0" {
   "22 !" -> "23 &" [label="t3"];
   "20 D8" [shape=box];
   "20 D8" -> "22 !" [label="t1"];
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
   "15 E8" [shape=box];
-  "15 E8" -> "21 +." [label="t0"];
+  "15 E8" -> "21 +_" [label="t0"];
   "in" -> "20 D8";
   "in" -> "15 E8";
 }
@@ -881,9 +881,9 @@ digraph "freia_72_helper_0_0_1" {
   "22 !" [shape=trapezium,orientation=270];
   "22 !" -> "23 &" [label="t3"];
   "t1" -> "22 !";
-  "21 +." [shape=trapezium,orientation=270];
-  "21 +." -> "23 &" [label="t2"];
-  "t0" -> "21 +.";
+  "21 +_" [shape=trapezium,orientation=270];
+  "21 +_" -> "23 &" [label="t2"];
+  "t0" -> "21 +_";
 }
 
 ! acceleration function

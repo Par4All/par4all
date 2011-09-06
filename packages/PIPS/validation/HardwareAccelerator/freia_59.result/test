@@ -1424,11 +1424,11 @@ int freia_59(void)
 
    freia_aipo_dilate_8c(tmp, in, freia_morpho_kernel_8c);               /*0023*/
    freia_aipo_erode_8c(map, in, freia_morpho_kernel_8c);                /*0024*/
-   freia_aipo_sub(map, tmp, map);                                       /*0025*/
 
    freia_aipo_convolution(f2, in, kernel, 3, 3);                        /*0027*/
    freia_aipo_convolution(f3, f2, kernel, 3, 3);                        /*0028*/
    freia_aipo_convolution(f4, f3, kernel, 3, 3);                        /*0029*/
+   freia_aipo_sub(map, tmp, map);                                       /*0025*/
 
    freia_common_tx_image(in, &fdout);                                   /*0031*/
    freia_common_tx_image(f2, &fdout);                                   /*0032*/
@@ -1472,11 +1472,11 @@ int freia_59(void)
 
    freia_aipo_dilate_8c(tmp, in, freia_morpho_kernel_8c);               /*0023*/
    freia_aipo_erode_8c(map, in, freia_morpho_kernel_8c);                /*0024*/
-   freia_aipo_sub(map, tmp, map);                                       /*0025*/
 
    freia_aipo_convolution(f2, in, kernel, 3, 3);                        /*0027*/
    freia_aipo_convolution(f3, f2, kernel, 3, 3);                        /*0028*/
    freia_aipo_convolution(f4, f3, kernel, 3, 3);                        /*0029*/
+   freia_aipo_sub(map, tmp, map);                                       /*0025*/
 
    freia_common_tx_image(in, &fdout);                                   /*0031*/
    freia_common_tx_image(f2, &fdout);                                   /*0032*/

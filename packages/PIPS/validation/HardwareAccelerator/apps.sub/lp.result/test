@@ -2863,16 +2863,16 @@ int main(int argc, char *argv[])
    
    
    
-   
-   
    main_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);              /*0152*/
-   
    
    
    main_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);    /*0176*/
    
    
    main_helper_0_0_6(out, out, freia_morpho_kernel_8c);                 /*0195*/
+   
+   
+   
    main_helper_0_1_0(out, in, out);                                     /*0197*/
    
    
@@ -2939,16 +2939,16 @@ int main(int argc, char *argv[])
    
    
    
-   
-   
    main_helper_0_0_4(imout, imfilt, kernel3x1, kernel1x3);              /*0152*/
-   
    
    
    main_helper_0_0_5(out, imout, kernel1x3, freia_morpho_kernel_8c);    /*0176*/
    
    
    main_helper_0_0_6(out, out, freia_morpho_kernel_8c);                 /*0195*/
+   
+   
+   
    main_helper_0_1_0(out, in, out);                                     /*0197*/
    
    
@@ -6240,12 +6240,12 @@ int main(int argc, char *argv[])
    ret = 0;                                                             /*0036*/
 
    main_helper_0_0_0(imopen, imclose, in, kernel1x3);                   /*0038*/
+
    main_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);      /*0048*/
+
    main_helper_0_0_2(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);      /*0066*/
 
    main_helper_0_0_3(imout, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);        /*0085*/
-   
-   
    
    
    
@@ -6311,12 +6311,12 @@ int main(int argc, char *argv[])
    ret = 0;                                                             /*0036*/
 
    main_helper_0_0_0(imopen, imclose, in, kernel1x3);                   /*0038*/
+
    main_helper_0_0_1(imopen, imclose, imclose, imopen, kernel1x3);      /*0048*/
+
    main_helper_0_0_2(imopen, imcloseth, imclose, imopen, kernel1x3, 150, 255, 1);      /*0066*/
 
    main_helper_0_0_3(imout, imcloseth, imopen, kernel1x3, 1, 50, 1, kernel3x1);        /*0085*/
-   
-   
    
    
    
@@ -7378,8 +7378,7 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0093*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0095*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0097*/
-   
-   
+
    freia_aipo_dilate_8c(imclose, in, kernel1x3);                        /*0106*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0108*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0110*/
@@ -7399,8 +7398,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0137*/
 
    main_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);    /*0142*/
-   
-   
+
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0150*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0152*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0154*/
@@ -7410,8 +7408,7 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0161*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0163*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0165*/
-   
-   
+
    freia_aipo_erode_8c(imout, imfilt, kernel1x3);                       /*0174*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0176*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0178*/
@@ -7426,6 +7423,9 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0195*/
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0196*/
    freia_aipo_and(out, out, in);                                        /*0197*/
+   
+   
+   
    
    
    
@@ -7513,8 +7513,7 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0093*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0095*/
    freia_aipo_dilate_8c(imopen, imopen, kernel1x3);                     /*0097*/
-   
-   
+
    freia_aipo_dilate_8c(imclose, in, kernel1x3);                        /*0106*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0108*/
    freia_aipo_dilate_8c(imclose, imclose, kernel1x3);                   /*0110*/
@@ -7534,8 +7533,7 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(imclose, imclose, kernel1x3);                    /*0137*/
 
    main_helper_0_0_1(imand, imclose, imopen, 1, 50, 1, 150, 255, 1);    /*0142*/
-   
-   
+
    freia_aipo_erode_8c(imfilt, imand, kernel3x1);                       /*0150*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0152*/
    freia_aipo_erode_8c(imfilt, imfilt, kernel3x1);                      /*0154*/
@@ -7545,8 +7543,7 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0161*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0163*/
    freia_aipo_dilate_8c(imfilt, imfilt, kernel3x1);                     /*0165*/
-   
-   
+
    freia_aipo_erode_8c(imout, imfilt, kernel1x3);                       /*0174*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0176*/
    freia_aipo_erode_8c(imout, imout, kernel1x3);                        /*0178*/
@@ -7561,6 +7558,9 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0195*/
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);              /*0196*/
    freia_aipo_and(out, out, in);                                        /*0197*/
+   
+   
+   
    
    
    

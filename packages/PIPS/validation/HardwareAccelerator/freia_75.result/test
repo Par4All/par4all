@@ -31,12 +31,12 @@ digraph "dag_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_75" in dot format
 digraph "dag_cleaned_0" {
@@ -50,12 +50,12 @@ digraph "dag_cleaned_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 
 ! updated function for
@@ -99,12 +99,12 @@ digraph "dag_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_75" in dot format
 digraph "dag_cleaned_0" {
@@ -118,12 +118,12 @@ digraph "dag_cleaned_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 // graph for dag "freia_75_helper_0_0" of module "freia_75" in dot format
 digraph "freia_75_helper_0_0" {
@@ -137,12 +137,12 @@ digraph "freia_75_helper_0_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 
 ! acceleration function
@@ -298,12 +298,12 @@ digraph "dag_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_75" in dot format
 digraph "dag_cleaned_0" {
@@ -317,12 +317,12 @@ digraph "dag_cleaned_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 // graph for dag "freia_75_helper_0_0_0" of module "freia_75" in dot format
 digraph "freia_75_helper_0_0_0" {
@@ -336,12 +336,12 @@ digraph "freia_75_helper_0_0_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 
 ! acceleration function
@@ -457,7 +457,7 @@ freia_status freia_75_helper_0_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: +.(1) -> 1
+  // 0: +_(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -803,12 +803,12 @@ digraph "dag_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_75" in dot format
 digraph "dag_cleaned_0" {
@@ -822,12 +822,12 @@ digraph "dag_cleaned_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 // graph for dag "freia_75_helper_0_0" of module "freia_75" in dot format
 digraph "freia_75_helper_0_0" {
@@ -841,12 +841,12 @@ digraph "freia_75_helper_0_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 // graph for dag "freia_75_helper_0_0_0" of module "freia_75" in dot format
 digraph "freia_75_helper_0_0_0" {
@@ -860,12 +860,12 @@ digraph "freia_75_helper_0_0_0" {
   "10 max!" [shape=diamond];
   "9 min" [shape=diamond];
   "8 vol" [shape=diamond];
-  "7 +." [shape=trapezium,orientation=270];
-  "7 +." -> "10 max!" [label="out"];
-  "7 +." -> "9 min" [label="out"];
-  "7 +." -> "8 vol" [label="out"];
-  "7 +." -> "out";
-  "in" -> "7 +.";
+  "7 +_" [shape=trapezium,orientation=270];
+  "7 +_" -> "10 max!" [label="out"];
+  "7 +_" -> "9 min" [label="out"];
+  "7 +_" -> "8 vol" [label="out"];
+  "7 +_" -> "out";
+  "in" -> "7 +_";
 }
 
 ! acceleration function
