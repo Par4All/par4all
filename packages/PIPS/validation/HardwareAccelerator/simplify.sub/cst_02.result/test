@@ -34,12 +34,12 @@ digraph "dag_0" {
   // computation vertices
   "11 -" [shape=trapezium,orientation=270];
   "11 -" -> "o";
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "11 -" [label="t2"];
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "11 -" [label="t1"];
-  "i" -> "10 -.";
-  "i" -> "9 +.";
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "11 -" [label="t2"];
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "11 -" [label="t1"];
+  "i" -> "10 -_";
+  "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "cst_02" in dot format
 digraph "dag_cleaned_0" {
@@ -105,12 +105,12 @@ digraph "dag_0" {
   // computation vertices
   "11 -" [shape=trapezium,orientation=270];
   "11 -" -> "o";
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "11 -" [label="t2"];
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "11 -" [label="t1"];
-  "i" -> "10 -.";
-  "i" -> "9 +.";
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "11 -" [label="t2"];
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "11 -" [label="t1"];
+  "i" -> "10 -_";
+  "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "cst_02" in dot format
 digraph "dag_cleaned_0" {
@@ -255,12 +255,12 @@ digraph "dag_0" {
   // computation vertices
   "11 -" [shape=trapezium,orientation=270];
   "11 -" -> "o";
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "11 -" [label="t2"];
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "11 -" [label="t1"];
-  "i" -> "10 -.";
-  "i" -> "9 +.";
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "11 -" [label="t2"];
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "11 -" [label="t1"];
+  "i" -> "10 -_";
+  "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "cst_02" in dot format
 digraph "dag_cleaned_0" {
@@ -486,12 +486,12 @@ digraph "dag_0" {
   // computation vertices
   "11 -" [shape=trapezium,orientation=270];
   "11 -" -> "o";
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "11 -" [label="t2"];
-  "9 +." [shape=trapezium,orientation=270];
-  "9 +." -> "11 -" [label="t1"];
-  "i" -> "10 -.";
-  "i" -> "9 +.";
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "11 -" [label="t2"];
+  "9 +_" [shape=trapezium,orientation=270];
+  "9 +_" -> "11 -" [label="t1"];
+  "i" -> "10 -_";
+  "i" -> "9 +_";
 }
 // graph for dag "dag_cleaned_0" of module "cst_02" in dot format
 digraph "dag_cleaned_0" {

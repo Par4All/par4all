@@ -27,10 +27,10 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
   "7 =()" [shape=circle];
-  "7 =()" -> "8 *." [label="t"];
+  "7 =()" -> "8 *_" [label="t"];
   "i" -> "7 =()";
 }
 // graph for dag "dag_cleaned_0" of module "freia_63" in dot format
@@ -42,10 +42,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
   "7 =()" [shape=circle];
-  "7 =()" -> "8 *." [label="t"];
+  "7 =()" -> "8 *_" [label="t"];
   "i" -> "7 =()";
 }
 
@@ -85,10 +85,10 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
   "7 =()" [shape=circle];
-  "7 =()" -> "8 *." [label="t"];
+  "7 =()" -> "8 *_" [label="t"];
   "i" -> "7 =()";
 }
 // graph for dag "dag_cleaned_0" of module "freia_63" in dot format
@@ -100,10 +100,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
   "7 =()" [shape=circle];
-  "7 =()" -> "8 *." [label="t"];
+  "7 =()" -> "8 *_" [label="t"];
   "i" -> "7 =()";
 }
 // graph for dag "freia_63_helper_0_0" of module "freia_63" in dot format
@@ -115,9 +115,9 @@ digraph "freia_63_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
-  "t" -> "8 *.";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
+  "t" -> "8 *_";
 }
 
 ! acceleration function
@@ -240,10 +240,10 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
   "7 =()" [shape=circle];
-  "7 =()" -> "8 *." [label="t"];
+  "7 =()" -> "8 *_" [label="t"];
   "i" -> "7 =()";
 }
 // graph for dag "dag_cleaned_0" of module "freia_63" in dot format
@@ -255,10 +255,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
   "7 =()" [shape=circle];
-  "7 =()" -> "8 *." [label="t"];
+  "7 =()" -> "8 *_" [label="t"];
   "i" -> "7 =()";
 }
 // graph for dag "freia_63_helper_0_0_0" of module "freia_63" in dot format
@@ -270,9 +270,9 @@ digraph "freia_63_helper_0_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
-  "t" -> "8 *.";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
+  "t" -> "8 *_";
 }
 
 ! acceleration function
@@ -356,7 +356,7 @@ freia_status freia_63_helper_0_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: *.(1) -> 1
+  // 0: *_(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -484,10 +484,10 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
   "7 =()" [shape=circle];
-  "7 =()" -> "8 *." [label="t"];
+  "7 =()" -> "8 *_" [label="t"];
   "i" -> "7 =()";
 }
 // graph for dag "dag_cleaned_0" of module "freia_63" in dot format
@@ -499,10 +499,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
   "7 =()" [shape=circle];
-  "7 =()" -> "8 *." [label="t"];
+  "7 =()" -> "8 *_" [label="t"];
   "i" -> "7 =()";
 }
 // graph for dag "freia_63_helper_0_0" of module "freia_63" in dot format
@@ -514,10 +514,10 @@ digraph "freia_63_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 *." [shape=trapezium,orientation=270];
-  "8 *." -> "o";
+  "8 *_" [shape=trapezium,orientation=270];
+  "8 *_" -> "o";
   "7 =()" [shape=circle];
-  "7 =()" -> "8 *." [label="t"];
+  "7 =()" -> "8 *_" [label="t"];
   "i" -> "7 =()";
 }
 

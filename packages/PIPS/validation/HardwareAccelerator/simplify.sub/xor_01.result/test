@@ -27,10 +27,10 @@ digraph "dag_0" {
   "o'" [shape=circle];
 
   // computation vertices
-  "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o'";
+  "8 +_" [shape=trapezium,orientation=270];
+  "8 +_" -> "o'";
   "7 ^" [shape=trapezium,orientation=270];
-  "7 ^" -> "8 +." [label="o"];
+  "7 ^" -> "8 +_" [label="o"];
   "o" -> "7 ^";
   "o" -> "7 ^";
 }
@@ -81,10 +81,10 @@ digraph "dag_0" {
   "o'" [shape=circle];
 
   // computation vertices
-  "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o'";
+  "8 +_" [shape=trapezium,orientation=270];
+  "8 +_" -> "o'";
   "7 ^" [shape=trapezium,orientation=270];
-  "7 ^" -> "8 +." [label="o"];
+  "7 ^" -> "8 +_" [label="o"];
   "o" -> "7 ^";
   "o" -> "7 ^";
 }
@@ -226,10 +226,10 @@ digraph "dag_0" {
   "o'" [shape=circle];
 
   // computation vertices
-  "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o'";
+  "8 +_" [shape=trapezium,orientation=270];
+  "8 +_" -> "o'";
   "7 ^" [shape=trapezium,orientation=270];
-  "7 ^" -> "8 +." [label="o"];
+  "7 ^" -> "8 +_" [label="o"];
   "o" -> "7 ^";
   "o" -> "7 ^";
 }
@@ -452,10 +452,10 @@ digraph "dag_0" {
   "o'" [shape=circle];
 
   // computation vertices
-  "8 +." [shape=trapezium,orientation=270];
-  "8 +." -> "o'";
+  "8 +_" [shape=trapezium,orientation=270];
+  "8 +_" -> "o'";
   "7 ^" [shape=trapezium,orientation=270];
-  "7 ^" -> "8 +." [label="o"];
+  "7 ^" -> "8 +_" [label="o"];
   "o" -> "7 ^";
   "o" -> "7 ^";
 }

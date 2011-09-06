@@ -2112,11 +2112,9 @@ int anr999_01(void)
    ret_0 |= I_10_0;                                                     /*0066*/
    I_13 = 0;                                                            /*0070*/
    I_13;                                                                /*0071*/
-   
-   
+
    freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0041*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0042*/
-
    freia_aipo_dilate_8c(t, od, freia_morpho_kernel_8c);                 /*0052*/
    freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);                  /*0053*/
 
@@ -2124,8 +2122,10 @@ int anr999_01(void)
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0060*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0061*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0062*/
-   anr999_01_helper_0_0_1(og, in, og, t, &measure_min, &measure_vol);   /*0067*/
 
+   anr999_01_helper_0_0_1(og, in, og, t, &measure_min, &measure_vol);   /*0067*/
+   
+   
    freia_common_destruct_data(t);                                       /*0069*/
 
    printf("input global min = %d\n", measure_min);                      /*0073*/
@@ -2187,11 +2187,9 @@ int anr999_01(void)
 
    I_10_0 = 0;                                                          /*0065*/
    I_13 = 0;                                                            /*0070*/
-   
-   
+
    freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0041*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0042*/
-
    freia_aipo_dilate_8c(t, od, freia_morpho_kernel_8c);                 /*0052*/
    freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);                  /*0053*/
 
@@ -2199,8 +2197,10 @@ int anr999_01(void)
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0060*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0061*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0062*/
-   anr999_01_helper_0_0_1(og, in, og, t, &measure_min, &measure_vol);   /*0067*/
 
+   anr999_01_helper_0_0_1(og, in, og, t, &measure_min, &measure_vol);   /*0067*/
+   
+   
    freia_common_destruct_data(t);                                       /*0069*/
 
    printf("input global min = %d\n", measure_min);                      /*0073*/

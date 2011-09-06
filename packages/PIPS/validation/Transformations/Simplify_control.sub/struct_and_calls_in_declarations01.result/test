@@ -1,0 +1,52 @@
+ main
+     foo_open
+     foo_fscanf
+     foo_eof
+int main()
+{
+   double _u_value1 = 0.0;
+   double _u_value2 = 0.0;
+   double _u_value3 = 0.0;
+   char *_u_inputFile = "toto.c";
+   int _u_fdIn = foo_open(_u_inputFile, "r");
+   int _u_it = 1;
+l99999:   ;
+   if (!1) goto _break_1;
+   _u_value1 = foo_fscanf(1, _u_fdIn, "%lf");
+   _u_value2 = foo_fscanf(1, _u_fdIn, "%lf");
+   _u_value3 = foo_fscanf(1, _u_fdIn, "%lf");
+   int _tmpxx5 = foo_eof(_u_fdIn);
+   if (_tmpxx5!=0) goto _break_1;
+   _u_it = _u_it+1;
+   goto l99999;
+_break_1:   ;
+
+   return 0;
+}
+ main
+     foo_open
+     foo_fscanf
+     foo_eof
+int main()
+{
+   double _u_value1 = 0.0;
+   double _u_value2 = 0.0;
+   double _u_value3 = 0.0;
+   char *_u_inputFile = "toto.c";
+   int _u_fdIn = foo_open(_u_inputFile, "r");
+   int _u_it = 1;
+l99998:   ;
+   {
+      _u_value1 = foo_fscanf(1, _u_fdIn, "%lf");
+      _u_value2 = foo_fscanf(1, _u_fdIn, "%lf");
+      _u_value3 = foo_fscanf(1, _u_fdIn, "%lf");
+      int _tmpxx5 = foo_eof(_u_fdIn);
+   }
+   if (_tmpxx5!=0) goto l99999;
+   _u_it = _u_it+1;
+   goto l99998;
+l99999:   ;
+
+
+   return 0;
+}

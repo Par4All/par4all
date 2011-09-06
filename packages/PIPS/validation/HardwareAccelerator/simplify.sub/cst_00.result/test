@@ -32,16 +32,16 @@ digraph "dag_0" {
   "o'" [shape=circle];
 
   // computation vertices
-  "13 /." [shape=trapezium,orientation=270];
-  "13 /." -> "o'";
-  "12 *." [shape=trapezium,orientation=270];
-  "12 *." -> "13 /." [label="o"];
-  "11 -." [shape=trapezium,orientation=270];
-  "11 -." -> "12 *." [label="o"];
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "11 -." [label="o"];
+  "13 /_" [shape=trapezium,orientation=270];
+  "13 /_" -> "o'";
+  "12 *_" [shape=trapezium,orientation=270];
+  "12 *_" -> "13 /_" [label="o"];
+  "11 -_" [shape=trapezium,orientation=270];
+  "11 -_" -> "12 *_" [label="o"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "11 -_" [label="o"];
   "9 D6" [shape=box];
-  "9 D6" -> "10 +." [label="o"];
+  "9 D6" -> "10 +_" [label="o"];
   "8 =" [shape=circle];
   "8 =" -> "9 D6" [label="o"];
   "7 E8" [shape=box];
@@ -113,16 +113,16 @@ digraph "dag_0" {
   "o'" [shape=circle];
 
   // computation vertices
-  "13 /." [shape=trapezium,orientation=270];
-  "13 /." -> "o'";
-  "12 *." [shape=trapezium,orientation=270];
-  "12 *." -> "13 /." [label="o"];
-  "11 -." [shape=trapezium,orientation=270];
-  "11 -." -> "12 *." [label="o"];
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "11 -." [label="o"];
+  "13 /_" [shape=trapezium,orientation=270];
+  "13 /_" -> "o'";
+  "12 *_" [shape=trapezium,orientation=270];
+  "12 *_" -> "13 /_" [label="o"];
+  "11 -_" [shape=trapezium,orientation=270];
+  "11 -_" -> "12 *_" [label="o"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "11 -_" [label="o"];
   "9 D6" [shape=box];
-  "9 D6" -> "10 +." [label="o"];
+  "9 D6" -> "10 +_" [label="o"];
   "8 =" [shape=circle];
   "8 =" -> "9 D6" [label="o"];
   "7 E8" [shape=box];
@@ -273,16 +273,16 @@ digraph "dag_0" {
   "o'" [shape=circle];
 
   // computation vertices
-  "13 /." [shape=trapezium,orientation=270];
-  "13 /." -> "o'";
-  "12 *." [shape=trapezium,orientation=270];
-  "12 *." -> "13 /." [label="o"];
-  "11 -." [shape=trapezium,orientation=270];
-  "11 -." -> "12 *." [label="o"];
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "11 -." [label="o"];
+  "13 /_" [shape=trapezium,orientation=270];
+  "13 /_" -> "o'";
+  "12 *_" [shape=trapezium,orientation=270];
+  "12 *_" -> "13 /_" [label="o"];
+  "11 -_" [shape=trapezium,orientation=270];
+  "11 -_" -> "12 *_" [label="o"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "11 -_" [label="o"];
   "9 D6" [shape=box];
-  "9 D6" -> "10 +." [label="o"];
+  "9 D6" -> "10 +_" [label="o"];
   "8 =" [shape=circle];
   "8 =" -> "9 D6" [label="o"];
   "7 E8" [shape=box];
@@ -514,16 +514,16 @@ digraph "dag_0" {
   "o'" [shape=circle];
 
   // computation vertices
-  "13 /." [shape=trapezium,orientation=270];
-  "13 /." -> "o'";
-  "12 *." [shape=trapezium,orientation=270];
-  "12 *." -> "13 /." [label="o"];
-  "11 -." [shape=trapezium,orientation=270];
-  "11 -." -> "12 *." [label="o"];
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "11 -." [label="o"];
+  "13 /_" [shape=trapezium,orientation=270];
+  "13 /_" -> "o'";
+  "12 *_" [shape=trapezium,orientation=270];
+  "12 *_" -> "13 /_" [label="o"];
+  "11 -_" [shape=trapezium,orientation=270];
+  "11 -_" -> "12 *_" [label="o"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "11 -_" [label="o"];
   "9 D6" [shape=box];
-  "9 D6" -> "10 +." [label="o"];
+  "9 D6" -> "10 +_" [label="o"];
   "8 =" [shape=circle];
   "8 =" -> "9 D6" [label="o"];
   "7 E8" [shape=box];
