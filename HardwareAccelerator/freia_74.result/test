@@ -1023,9 +1023,9 @@ int freia_74(freia_data2d *out, const freia_data2d *in)
    t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0011*/
 
    freia_aipo_erode_8c(t0, in, kernel1x3);                              /*0015*/
-   ret_1 = ret_0;                                                       /*0016*/
    freia_aipo_dilate_8c(t1, in, kernel1x3);                             /*0017*/
    freia_74_helper_0_0_1(out, t0, t1, 1, 2);                            /*0018*/
+   ret_1 = ret_0;                                                       /*0016*/
 
    freia_common_destruct_data(t0);                                      /*0022*/
    freia_common_destruct_data(t1);                                      /*0023*/
@@ -1045,9 +1045,9 @@ int freia_74(freia_data2d *out, const freia_data2d *in)
    t1 = freia_common_create_data(in->bpp, in->widthWa, in->heightWa);   /*0011*/
 
    freia_aipo_erode_8c(t0, in, kernel1x3);                              /*0015*/
-   ret_1 = ret_0;                                                       /*0016*/
    freia_aipo_dilate_8c(t1, in, kernel1x3);                             /*0017*/
    freia_74_helper_0_0_1(out, t0, t1, 1, 2);                            /*0018*/
+   ret_1 = ret_0;                                                       /*0016*/
 
    freia_common_destruct_data(t0);                                      /*0022*/
    freia_common_destruct_data(t1);                                      /*0023*/

@@ -932,8 +932,8 @@ int freia_42(void)
    freia_common_rx_image(i0, &fdin);                                    /*0031*/
    freia_common_rx_image(i2, &fdin);                                    /*0032*/
    freia_common_rx_image(i4, &fdin);                                    /*0033*/
-
    freia_42_helper_0_0_0(i1, i6_2, i0, i4, freia_morpho_kernel_8c);     /*0036*/
+
    freia_42_helper_0_1_0(i3, i1_1, i0, i1, freia_morpho_kernel_8c);     /*0037*/
    freia_42_helper_0_2_0(i1, i1_1, i2);                                 /*0038*/
    freia_42_helper_0_3_0(i6, i3, i6_2);                                 /*0043*/
@@ -991,8 +991,8 @@ int freia_42(void)
    freia_common_rx_image(i0, &fdin);                                    /*0031*/
    freia_common_rx_image(i2, &fdin);                                    /*0032*/
    freia_common_rx_image(i4, &fdin);                                    /*0033*/
-
    freia_42_helper_0_0_0(i1, i6_2, i0, i4, freia_morpho_kernel_8c);     /*0036*/
+
    freia_42_helper_0_1_0(i3, i1_1, i0, i1, freia_morpho_kernel_8c);     /*0037*/
    freia_42_helper_0_2_0(i1, i1_1, i2);                                 /*0038*/
    freia_42_helper_0_3_0(i6, i3, i6_2);                                 /*0043*/

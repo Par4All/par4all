@@ -2323,9 +2323,9 @@ int main(int argc, char *argv[])
    
    
    main_helper_0_0_0(od, og, in, &measure_max, &measure_vol, freia_morpho_kernel_8c);  /*0021*/
-
-   main_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);           /*0029*/
    
+   
+   main_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);           /*0029*/
    
    
    
@@ -2370,9 +2370,9 @@ int main(int argc, char *argv[])
    
    
    main_helper_0_0_0(od, og, in, &measure_max, &measure_vol, freia_morpho_kernel_8c);  /*0021*/
-
-   main_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);           /*0029*/
    
+   
+   main_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);           /*0029*/
    
    
    
@@ -2883,7 +2883,6 @@ int main(int argc, char *argv[])
    freia_common_rx_image(in, &fdin);                                    /*0019*/
    
    
-   
    freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0024*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0025*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0026*/
@@ -2894,8 +2893,7 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0031*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0032*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0033*/
-   
-   
+
    freia_aipo_erode_8c(og, in, freia_morpho_kernel_8c);                 /*0048*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0049*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0050*/
@@ -2906,8 +2904,10 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0055*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0056*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0057*/
-
+   
+   
    main_helper_0_0_1(og, in, od, og, &measure_max, &measure_vol);       /*0059*/
+   
    
    
    printf("input global max = %d\n", measure_max);                      /*0063*/
@@ -2949,7 +2949,6 @@ int main(int argc, char *argv[])
    freia_common_rx_image(in, &fdin);                                    /*0019*/
    
    
-   
    freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0024*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0025*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0026*/
@@ -2960,8 +2959,7 @@ int main(int argc, char *argv[])
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0031*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0032*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0033*/
-   
-   
+
    freia_aipo_erode_8c(og, in, freia_morpho_kernel_8c);                 /*0048*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0049*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0050*/
@@ -2972,8 +2970,10 @@ int main(int argc, char *argv[])
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0055*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0056*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0057*/
-
+   
+   
    main_helper_0_0_1(og, in, od, og, &measure_max, &measure_vol);       /*0059*/
+   
    
    
    printf("input global max = %d\n", measure_max);                      /*0063*/

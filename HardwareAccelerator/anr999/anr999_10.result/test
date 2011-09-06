@@ -3948,7 +3948,8 @@ int anr999(void)
    I_13;                                                                /*0091*/
 
    anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
-
+   
+   
    anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0042*/
    anr999_helper_0_0_2(od, og, od, og, freia_morpho_kernel_8c);         /*0043*/
    anr999_helper_0_0_3(od, og, od, og, freia_morpho_kernel_8c);         /*0044*/
@@ -3958,7 +3959,6 @@ int anr999(void)
    anr999_helper_0_0_7(od, og, od, og, freia_morpho_kernel_8c);         /*0048*/
    anr999_helper_0_0_8(od, og, od, og, freia_morpho_kernel_8c);         /*0049*/
    anr999_helper_0_0_9(od, og, od, og, freia_morpho_kernel_8c);         /*0050*/
-   
    
    
    
@@ -4020,7 +4020,8 @@ int anr999(void)
    I_13 = 0;                                                            /*0090*/
 
    anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c);               /*0038*/
-
+   
+   
    anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c);         /*0042*/
    anr999_helper_0_0_2(od, og, od, og, freia_morpho_kernel_8c);         /*0043*/
    anr999_helper_0_0_3(od, og, od, og, freia_morpho_kernel_8c);         /*0044*/
@@ -4030,7 +4031,6 @@ int anr999(void)
    anr999_helper_0_0_7(od, og, od, og, freia_morpho_kernel_8c);         /*0048*/
    anr999_helper_0_0_8(od, og, od, og, freia_morpho_kernel_8c);         /*0049*/
    anr999_helper_0_0_9(od, og, od, og, freia_morpho_kernel_8c);         /*0050*/
-   
    
    
    
@@ -4580,8 +4580,7 @@ int anr999(void)
    ret_0 |= I_10_0;                                                     /*0086*/
    I_13 = 0;                                                            /*0090*/
    I_13;                                                                /*0091*/
-   
-   
+
    freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0041*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0042*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0043*/
@@ -4592,8 +4591,7 @@ int anr999(void)
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0048*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0049*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0050*/
-   
-   
+
    freia_aipo_erode_8c(og, in, freia_morpho_kernel_8c);                 /*0073*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0074*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0075*/
@@ -4604,7 +4602,9 @@ int anr999(void)
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0080*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0081*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0082*/
+
    anr999_helper_0_0_1(og, in, od, og, &measure_min, &measure_vol);     /*0087*/
+   
    
    
    printf("input global min = %d\n", measure_min);                      /*0093*/
@@ -4663,8 +4663,7 @@ int anr999(void)
 
    I_10_0 = 0;                                                          /*0085*/
    I_13 = 0;                                                            /*0090*/
-   
-   
+
    freia_aipo_dilate_8c(od, in, freia_morpho_kernel_8c);                /*0041*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0042*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0043*/
@@ -4675,8 +4674,7 @@ int anr999(void)
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0048*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0049*/
    freia_aipo_dilate_8c(od, od, freia_morpho_kernel_8c);                /*0050*/
-   
-   
+
    freia_aipo_erode_8c(og, in, freia_morpho_kernel_8c);                 /*0073*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0074*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0075*/
@@ -4687,7 +4685,9 @@ int anr999(void)
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0080*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0081*/
    freia_aipo_erode_8c(og, og, freia_morpho_kernel_8c);                 /*0082*/
+
    anr999_helper_0_0_1(og, in, od, og, &measure_min, &measure_vol);     /*0087*/
+   
    
    
    printf("input global min = %d\n", measure_min);                      /*0093*/

@@ -3037,12 +3037,12 @@ int freia_51(int32_t *k)
    t4 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);               /*0025*/
 
    freia_aipo_not(out, in);                                             /*0023*/
-
    freia_aipo_dilate_8c(t2, out, k);                                    /*0028*/
    freia_aipo_inf_const(t3, t2, 255);                                   /*0029*/
    freia_aipo_dilate_8c(t4, t3, k);                                     /*0033*/
    freia_51_helper_0_0_4(out, t4, 255, &volcurrent);                    /*0034*/
-
+   
+   
    do {                                                                 /*0045*/
       volprevious = volcurrent;                                         /*0040*/
       freia_aipo_dilate_8c(out, out, k);                                /*0041*/
@@ -3081,12 +3081,12 @@ int freia_51(int32_t *k)
    t4 = freia_common_create_data(out->bpp, out->widthWa, out->heightWa);               /*0025*/
 
    freia_aipo_not(out, in);                                             /*0023*/
-
    freia_aipo_dilate_8c(t2, out, k);                                    /*0028*/
    freia_aipo_inf_const(t3, t2, 255);                                   /*0029*/
    freia_aipo_dilate_8c(t4, t3, k);                                     /*0033*/
    freia_51_helper_0_0_4(out, t4, 255, &volcurrent);                    /*0034*/
-
+   
+   
    do {                                                                 /*0045*/
       volprevious = volcurrent;                                         /*0040*/
       freia_aipo_dilate_8c(out, out, k);                                /*0041*/

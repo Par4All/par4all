@@ -1834,12 +1834,12 @@ void freia_70(freia_data2d *out, const freia_data2d *in)
    freia_aipo_erode_8c(w1_0_2, w1_0, neighborTransposed_0);             /*0034*/
    freia_aipo_dilate_8c(w1_0_1, out_1, freia_morpho_k8_1);              /*0036*/
    freia_aipo_dilate_8c(w1_0, out_1, freia_morpho_k8_2);                /*0039*/
-
    freia_aipo_erode_8c(w1_1_1, w1_0_1, neighborTransposed_1);           /*0048*/
    freia_aipo_erode_8c(w1_1, w1_0, neighborTransposed_2);               /*0051*/
    freia_70_helper_0_0_2(out, w1_0_2, w1_1, w1_1_1, 255);               /*0052*/
    freia_common_destruct_data(out_1);
-
+   
+   
    freia_common_destruct_data(w1_0);                                    /*0054*/
    freia_common_destruct_data(w1_0_1);
    freia_common_destruct_data(w1_0_2);
@@ -1870,12 +1870,12 @@ void freia_70(freia_data2d *out, const freia_data2d *in)
    freia_aipo_erode_8c(w1_0_2, w1_0, neighborTransposed_0);             /*0034*/
    freia_aipo_dilate_8c(w1_0_1, out_1, freia_morpho_k8_1);              /*0036*/
    freia_aipo_dilate_8c(w1_0, out_1, freia_morpho_k8_2);                /*0039*/
-
    freia_aipo_erode_8c(w1_1_1, w1_0_1, neighborTransposed_1);           /*0048*/
    freia_aipo_erode_8c(w1_1, w1_0, neighborTransposed_2);               /*0051*/
    freia_70_helper_0_0_2(out, w1_0_2, w1_1, w1_1_1, 255);               /*0052*/
    freia_common_destruct_data(out_1);
-
+   
+   
    freia_common_destruct_data(w1_0);                                    /*0054*/
    freia_common_destruct_data(w1_0_1);
    freia_common_destruct_data(w1_0_2);

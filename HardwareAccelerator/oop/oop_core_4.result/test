@@ -2489,8 +2489,8 @@ int oop_core(void)
    oop_core_helper_0_0_0(img1, img2, img0, imgtt2, imgtt4, freia_morpho_kernel_8c);    /*0067*/
    
    
-   oop_core_helper_0_0_1(img3, img1, img2, freia_morpho_kernel_6c, 15, 255, 1);        /*0082*/
    
+   oop_core_helper_0_0_1(img3, img1, img2, freia_morpho_kernel_6c, 15, 255, 1);        /*0082*/
    
    
    
@@ -2578,8 +2578,8 @@ int oop_core(void)
    oop_core_helper_0_0_0(img1, img2, img0, imgtt2, imgtt4, freia_morpho_kernel_8c);    /*0067*/
    
    
-   oop_core_helper_0_0_1(img3, img1, img2, freia_morpho_kernel_6c, 15, 255, 1);        /*0082*/
    
+   oop_core_helper_0_0_1(img3, img1, img2, freia_morpho_kernel_6c, 15, 255, 1);        /*0082*/
    
    
    
@@ -3321,19 +3321,19 @@ int oop_core(void)
 
    freia_aipo_dilate_8c(imtmp_5, imgtt2, freia_morpho_kernel_8c);       /*0076*/
    freia_aipo_erode_8c(img1_4, imgtt2, freia_morpho_kernel_8c);         /*0077*/
+   freia_aipo_dilate_8c(imtmp_7, imgtt4, freia_morpho_kernel_8c);       /*0095*/
+   freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
+
+   oop_core_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);            /*0097*/
 
    freia_aipo_erode_6c(img1, img1_2, freia_morpho_kernel_6c);           /*0082*/
    freia_aipo_dilate_6c(img1, img1, freia_morpho_kernel_6c);            /*0083*/
 
-   freia_aipo_dilate_8c(imtmp_7, imgtt4, freia_morpho_kernel_8c);       /*0095*/
-   freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
-   oop_core_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);            /*0097*/
-   
-   
    freia_aipo_erode_6c(img2, img2, freia_morpho_kernel_6c);             /*0102*/
    freia_aipo_dilate_6c(img2, img2, freia_morpho_kernel_6c);            /*0103*/
    oop_core_helper_0_0_3(img3, img1, img2, 15, 255, 1);                 /*0104*/
-
+   
+   
    freia_common_destruct_data(imtmp_4);                                 /*0071*/
    freia_common_destruct_data(imtmp_5);                                 /*0079*/
    freia_common_destruct_data(imtmp_7);                                 /*0098*/
@@ -3440,19 +3440,19 @@ int oop_core(void)
 
    freia_aipo_dilate_8c(imtmp_5, imgtt2, freia_morpho_kernel_8c);       /*0076*/
    freia_aipo_erode_8c(img1_4, imgtt2, freia_morpho_kernel_8c);         /*0077*/
+   freia_aipo_dilate_8c(imtmp_7, imgtt4, freia_morpho_kernel_8c);       /*0095*/
+   freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
+
+   oop_core_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);            /*0097*/
 
    freia_aipo_erode_6c(img1, img1_2, freia_morpho_kernel_6c);           /*0082*/
    freia_aipo_dilate_6c(img1, img1, freia_morpho_kernel_6c);            /*0083*/
 
-   freia_aipo_dilate_8c(imtmp_7, imgtt4, freia_morpho_kernel_8c);       /*0095*/
-   freia_aipo_erode_8c(img2, imgtt4, freia_morpho_kernel_8c);           /*0096*/
-   oop_core_helper_0_0_1(img1_2, img2, img1_4, img2, imgtmp_1, imtmp_4, imtmp_5, imtmp_7);            /*0097*/
-   
-   
    freia_aipo_erode_6c(img2, img2, freia_morpho_kernel_6c);             /*0102*/
    freia_aipo_dilate_6c(img2, img2, freia_morpho_kernel_6c);            /*0103*/
    oop_core_helper_0_0_3(img3, img1, img2, 15, 255, 1);                 /*0104*/
-
+   
+   
    freia_common_destruct_data(imtmp_4);                                 /*0071*/
    freia_common_destruct_data(imtmp_5);                                 /*0079*/
    freia_common_destruct_data(imtmp_7);                                 /*0098*/

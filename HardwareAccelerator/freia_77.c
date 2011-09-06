@@ -14,9 +14,9 @@ void freia_77
 
   freia_aipo_add_const(t0, i0, 2);
   freia_aipo_erode_8c(t1, t0, freia_morpho_kernel_8c);
-  freia_aipo_erode_8c(t2, i0, freia_morpho_kernel_8c);
-  freia_aipo_absdiff(t3, t2, i1);
-  freia_aipo_inf(out, t3, t1);
+  freia_aipo_dilate_8c(t2, i0, freia_morpho_kernel_8c);
+  freia_aipo_sub(t3, t2, i1);
+  freia_aipo_add(out, t3, t1);
 
   freia_common_destruct_data(t0);
   freia_common_destruct_data(t1);

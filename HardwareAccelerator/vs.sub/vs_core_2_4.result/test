@@ -906,13 +906,13 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    freia_data2d *mv_6 = freia_common_create_data(mv->bpp, mv->widthWa, mv->heightWa);
 
    vs_core_2_helper_0_0_0(mv_6, t0, bg, in, &maxmotion, &minmotion, motion_a);         /*0015*/
-   
-   // bg update
    // was cast
-   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
    // was cast
    
    // measure
+   
+   // bg update
+   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 
@@ -945,13 +945,13 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    freia_data2d *mv_6 = freia_common_create_data(mv->bpp, mv->widthWa, mv->heightWa);
 
    vs_core_2_helper_0_0_0(mv_6, t0, bg, in, &maxmotion, &minmotion, motion_a);         /*0015*/
-   
-   // bg update
    // was cast
-   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
    // was cast
    
    // measure
+   
+   // bg update
+   vs_core_2_helper_0_1_0(bg, t0, bg, motion_b, motion_a+motion_b);     /*0020*/
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 
@@ -2227,12 +2227,12 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    int binvalue, maxmotion, minmotion;                                  /*0013*/
 
    vs_core_2_helper_0_0_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0015*/
-   
-   // bg update
    // was cast
    // was cast
    
    // measure
+   
+   // bg update
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 
@@ -2260,12 +2260,12 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    int binvalue, maxmotion, minmotion;                                  /*0013*/
 
    vs_core_2_helper_0_0_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);            /*0015*/
-   
-   // bg update
    // was cast
    // was cast
    
    // measure
+   
+   // bg update
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 
@@ -2878,12 +2878,12 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    int binvalue, maxmotion, minmotion;                                  /*0013*/
 
    vs_core_2_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, &maxmotion, &minmotion, motion_a+motion_b);            /*0015*/
-   
-   // bg update
    // was cast
    // was cast
    
    // measure
+   
+   // bg update
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 
@@ -2916,12 +2916,12 @@ freia_status vs_core_2(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, fre
    int binvalue, maxmotion, minmotion;                                  /*0013*/
 
    vs_core_2_helper_0_0_0(mv, bg, bg, in, motion_a, motion_b, &maxmotion, &minmotion, motion_a+motion_b);            /*0015*/
-   
-   // bg update
    // was cast
    // was cast
    
    // measure
+   
+   // bg update
    if (maxmotion-minmotion>motion_trig)                                 /*0029*/
       binvalue = maxmotion*motion_th/100;                               /*0030*/
 

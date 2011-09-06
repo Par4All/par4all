@@ -1117,8 +1117,8 @@ KERNEL void freia_16_helper_0_0_1(
 
 freia_status freia_16(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c, int32_t *k, int32_t *r0, int32_t *r1, int32_t *r2)
 {
-   // test re ordering of mes
    freia_aipo_erode_6c(o1, i, k);                                       /*0009*/
+   // test re ordering of mes
    freia_16_helper_0_0_1(o0, i, c, r0, r1, r2);                         /*0010*/
    return FREIA_OK;                                                     /*0013*/
 }
@@ -1127,8 +1127,8 @@ freia_status freia_16(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32
 
 freia_status freia_16(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t c, int32_t *k, int32_t *r0, int32_t *r1, int32_t *r2)
 {
-   // test re ordering of mes
    freia_aipo_erode_6c(o1, i, k);                                       /*0009*/
+   // test re ordering of mes
    freia_16_helper_0_0_1(o0, i, c, r0, r1, r2);                         /*0010*/
    return 0;                                                            /*0013*/
 }

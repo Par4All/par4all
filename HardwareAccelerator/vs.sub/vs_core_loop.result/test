@@ -1494,11 +1494,11 @@ l99979:   ;                                                                    /
    // absolute difference background and current frame
    vs_core_loop_helper_3_0_0(immotion_6, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);           /*0087*/
    
-   // background update
-   vs_core_loop_helper_3_1_0(imbg16, imbg16, imtmp3, 90, 100);          /*0092*/
-   
    // measures
    
+   // background update
+   vs_core_loop_helper_3_1_0(imbg16, imbg16, imtmp3, 90, 100);          /*0092*/
+
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
@@ -1607,11 +1607,11 @@ l99998:   ;
    // absolute difference background and current frame
    vs_core_loop_helper_3_0_0(immotion_6, imtmp3, imbg, imstab, &maxmotion, &minmotion, 10);           /*0087*/
    
-   // background update
-   vs_core_loop_helper_3_1_0(imbg16, imbg16, imtmp3, 90, 100);          /*0092*/
-   
    // measures
    
+   // background update
+   vs_core_loop_helper_3_1_0(imbg16, imbg16, imtmp3, 90, 100);          /*0092*/
+
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
    
@@ -3135,9 +3135,9 @@ l99979:   ;                                                                    /
    // absolute difference background and current frame
    vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, &maxmotion, &minmotion, 10, 90, 100);           /*0087*/
    
-   // background update
-   
    // measures
+   
+   // background update
    
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
@@ -3239,9 +3239,9 @@ l99998:   ;
    // absolute difference background and current frame
    vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, &maxmotion, &minmotion, 10, 90, 100);           /*0087*/
    
-   // background update
-   
    // measures
+   
+   // background update
    
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
@@ -4153,9 +4153,9 @@ l99979:   ;                                                                    /
    // absolute difference background and current frame
    vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, &maxmotion, &minmotion, 100);           /*0087*/
    
-   // background update
-   
    // measures
+   
+   // background update
    
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/
@@ -4268,9 +4268,9 @@ l99998:   ;
    // absolute difference background and current frame
    vs_core_loop_helper_3_0_0(immotion, imbg16, imbg, imbg16, imstab, 10, 90, &maxmotion, &minmotion, 100);           /*0087*/
    
-   // background update
-   
    // measures
+   
+   // background update
    
    if (maxmotion-minmotion>75)                                          /*0101*/
       binvalue = 30*maxmotion/100;                                      /*0102*/

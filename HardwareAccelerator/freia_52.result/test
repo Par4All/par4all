@@ -8176,7 +8176,16 @@ int freia_52(void)
    
    
    
+   freia_52_helper_0_0_1(w2_1_7, w1_1, neighborTransposed_8, 255);      /*0355*/
    
+   
+   
+   
+   
+   
+   
+   freia_52_helper_0_1_0(w1_1, w1_1_26, w1_0_32, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_9, neighborTransposed_10);               /*0379*/
+   freia_52_helper_0_1_1(w1_1, w1_1_25, w1_1_26, w1_1, neighborTransposed_9, neighborTransposed_10);  /*0383*/
    
    
    
@@ -8189,6 +8198,14 @@ int freia_52(void)
    err_1 |= _return21;                                                  /*0198*/
    
    
+   freia_52_helper_0_2_0(w2_1, w1_1, w2_1_7);                           /*0387*/
+   freia_52_helper_0_3_0(w2_1_5, w1_1_25, w2_1);                        /*0412*/
+   
+   
+   freia_52_helper_0_4_0(w1_1, w1_1_16, w1_0_32, freia_morpho_k4_0, freia_morpho_k4_1, neighborTransposed_11, neighborTransposed_12);              /*0429*/
+   freia_52_helper_0_4_1(w1_1, w1_1_15, w1_1_16, w1_1, neighborTransposed_11, neighborTransposed_12);                /*0433*/
+   
+   
    
    
    err_1 |= _return17;                                                  /*0223*/
@@ -8197,6 +8214,14 @@ int freia_52(void)
    
    
    err_1 |= _return18;                                                  /*0248*/
+   
+   
+   freia_52_helper_0_5_0(w2_1, w1_1, w2_1_5);                           /*0437*/
+   freia_52_helper_0_6_0(w2_1_3, w1_1_15, w2_1);                        /*0462*/
+   
+   
+   freia_52_helper_0_7_0(w1_1, w1_1_6, w1_0_32, freia_morpho_k6_0, freia_morpho_k6_1, neighborTransposed_13, neighborTransposed_14);               /*0479*/
+   freia_52_helper_0_7_1(w1_1, w1_1_5, w1_1, w1_1_6, neighborTransposed_13, neighborTransposed_14);   /*0483*/
    
    
    
@@ -8209,6 +8234,14 @@ int freia_52(void)
    err_1 |= _return15;                                                  /*0298*/
    
    
+   freia_52_helper_0_8_0(w2_1, w1_1, w2_1_3);                           /*0487*/
+   freia_52_helper_0_9_0(w2_1, w1_1_5, w2_1);                           /*0512*/
+   
+   
+   freia_52_helper_0_10_0(w1_1, w1_0_32, w2_1, freia_morpho_k6_2, neighborTransposed_15);             /*0529*/
+   freia_52_helper_0_10_1(imWork1, w1_1, w2_1, neighborTransposed_15, &volcurrent);    /*0533*/
+
+   ret_19 = 0;                                                          /*0545*/
    
    
    err_1 |= _return16;                                                  /*0323*/
@@ -8227,55 +8260,24 @@ int freia_52(void)
    
    
    
-   freia_52_helper_0_0_1(w2_1_7, w1_1, neighborTransposed_8, 255);      /*0355*/
-   
-   
-   
-   
-   freia_52_helper_0_1_0(w1_1, w1_1_26, w1_0_32, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_9, neighborTransposed_10);               /*0379*/
-   freia_52_helper_0_1_1(w1_1, w1_1_25, w1_1_26, w1_1, neighborTransposed_9, neighborTransposed_10);  /*0383*/
    err_3 |= _return28;                                                  /*0386*/
-   freia_52_helper_0_2_0(w2_1, w1_1, w2_1_7);                           /*0387*/
-   
-   
    
    
    err_3 |= _return29;                                                  /*0411*/
-   freia_52_helper_0_3_0(w2_1_5, w1_1_25, w2_1);                        /*0412*/
    
    
-   
-   
-   freia_52_helper_0_4_0(w1_1, w1_1_16, w1_0_32, freia_morpho_k4_0, freia_morpho_k4_1, neighborTransposed_11, neighborTransposed_12);              /*0429*/
-   freia_52_helper_0_4_1(w1_1, w1_1_15, w1_1_16, w1_1, neighborTransposed_11, neighborTransposed_12);                /*0433*/
    err_3 |= _return25;                                                  /*0436*/
-   freia_52_helper_0_5_0(w2_1, w1_1, w2_1_5);                           /*0437*/
-   
-   
    
    
    err_3 |= _return26;                                                  /*0461*/
-   freia_52_helper_0_6_0(w2_1_3, w1_1_15, w2_1);                        /*0462*/
    
    
-   
-   
-   freia_52_helper_0_7_0(w1_1, w1_1_6, w1_0_32, freia_morpho_k6_0, freia_morpho_k6_1, neighborTransposed_13, neighborTransposed_14);               /*0479*/
-   freia_52_helper_0_7_1(w1_1, w1_1_5, w1_1, w1_1_6, neighborTransposed_13, neighborTransposed_14);   /*0483*/
    err_3 |= _return22;                                                  /*0486*/
-   freia_52_helper_0_8_0(w2_1, w1_1, w2_1_3);                           /*0487*/
-   
-   
    
    
    err_3 |= _return23;                                                  /*0511*/
-   freia_52_helper_0_9_0(w2_1, w1_1_5, w2_1);                           /*0512*/
    
    
-   
-   
-   freia_52_helper_0_10_0(w1_1, w1_0_32, w2_1, freia_morpho_k6_2, neighborTransposed_15);             /*0529*/
-   freia_52_helper_0_10_1(imWork1, w1_1, w2_1, neighborTransposed_15, &volcurrent);    /*0533*/
    err_3 |= _return24;                                                  /*0536*/
    
    
@@ -8283,8 +8285,6 @@ int freia_52(void)
    _return10 = err_3;                                                   /*0541*/
    err_2 |= _return10;                                                  /*0542*/
    _return4 = err_2;                                                    /*0544*/
-
-   ret_19 = 0;                                                          /*0545*/
    freia_common_destruct_data(w1_0_32);
    freia_common_destruct_data(w1_1);                                    /*0539*/
    freia_common_destruct_data(w1_1_5);
@@ -8931,7 +8931,16 @@ int freia_52(void)
    
    
    
+   freia_52_helper_0_0_1(w2_1_7, w1_1, neighborTransposed_8, 255);      /*0355*/
    
+   
+   
+   
+   
+   
+   
+   freia_52_helper_0_1_0(w1_1, w1_1_26, w1_0_32, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_9, neighborTransposed_10);               /*0379*/
+   freia_52_helper_0_1_1(w1_1, w1_1_25, w1_1_26, w1_1, neighborTransposed_9, neighborTransposed_10);  /*0383*/
    
    
    
@@ -8944,6 +8953,14 @@ int freia_52(void)
    err_1 |= _return21;                                                  /*0198*/
    
    
+   freia_52_helper_0_2_0(w2_1, w1_1, w2_1_7);                           /*0387*/
+   freia_52_helper_0_3_0(w2_1_5, w1_1_25, w2_1);                        /*0412*/
+   
+   
+   freia_52_helper_0_4_0(w1_1, w1_1_16, w1_0_32, freia_morpho_k4_0, freia_morpho_k4_1, neighborTransposed_11, neighborTransposed_12);              /*0429*/
+   freia_52_helper_0_4_1(w1_1, w1_1_15, w1_1_16, w1_1, neighborTransposed_11, neighborTransposed_12);                /*0433*/
+   
+   
    
    
    err_1 |= _return17;                                                  /*0223*/
@@ -8952,6 +8969,14 @@ int freia_52(void)
    
    
    err_1 |= _return18;                                                  /*0248*/
+   
+   
+   freia_52_helper_0_5_0(w2_1, w1_1, w2_1_5);                           /*0437*/
+   freia_52_helper_0_6_0(w2_1_3, w1_1_15, w2_1);                        /*0462*/
+   
+   
+   freia_52_helper_0_7_0(w1_1, w1_1_6, w1_0_32, freia_morpho_k6_0, freia_morpho_k6_1, neighborTransposed_13, neighborTransposed_14);               /*0479*/
+   freia_52_helper_0_7_1(w1_1, w1_1_5, w1_1, w1_1_6, neighborTransposed_13, neighborTransposed_14);   /*0483*/
    
    
    
@@ -8964,6 +8989,14 @@ int freia_52(void)
    err_1 |= _return15;                                                  /*0298*/
    
    
+   freia_52_helper_0_8_0(w2_1, w1_1, w2_1_3);                           /*0487*/
+   freia_52_helper_0_9_0(w2_1, w1_1_5, w2_1);                           /*0512*/
+   
+   
+   freia_52_helper_0_10_0(w1_1, w1_0_32, w2_1, freia_morpho_k6_2, neighborTransposed_15);             /*0529*/
+   freia_52_helper_0_10_1(imWork1, w1_1, w2_1, neighborTransposed_15, &volcurrent);    /*0533*/
+
+   ret_19 = 0;                                                          /*0545*/
    
    
    err_1 |= _return16;                                                  /*0323*/
@@ -8982,55 +9015,24 @@ int freia_52(void)
    
    
    
-   freia_52_helper_0_0_1(w2_1_7, w1_1, neighborTransposed_8, 255);      /*0355*/
-   
-   
-   
-   
-   freia_52_helper_0_1_0(w1_1, w1_1_26, w1_0_32, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_9, neighborTransposed_10);               /*0379*/
-   freia_52_helper_0_1_1(w1_1, w1_1_25, w1_1_26, w1_1, neighborTransposed_9, neighborTransposed_10);  /*0383*/
    err_3 |= _return28;                                                  /*0386*/
-   freia_52_helper_0_2_0(w2_1, w1_1, w2_1_7);                           /*0387*/
-   
-   
    
    
    err_3 |= _return29;                                                  /*0411*/
-   freia_52_helper_0_3_0(w2_1_5, w1_1_25, w2_1);                        /*0412*/
    
    
-   
-   
-   freia_52_helper_0_4_0(w1_1, w1_1_16, w1_0_32, freia_morpho_k4_0, freia_morpho_k4_1, neighborTransposed_11, neighborTransposed_12);              /*0429*/
-   freia_52_helper_0_4_1(w1_1, w1_1_15, w1_1_16, w1_1, neighborTransposed_11, neighborTransposed_12);                /*0433*/
    err_3 |= _return25;                                                  /*0436*/
-   freia_52_helper_0_5_0(w2_1, w1_1, w2_1_5);                           /*0437*/
-   
-   
    
    
    err_3 |= _return26;                                                  /*0461*/
-   freia_52_helper_0_6_0(w2_1_3, w1_1_15, w2_1);                        /*0462*/
    
    
-   
-   
-   freia_52_helper_0_7_0(w1_1, w1_1_6, w1_0_32, freia_morpho_k6_0, freia_morpho_k6_1, neighborTransposed_13, neighborTransposed_14);               /*0479*/
-   freia_52_helper_0_7_1(w1_1, w1_1_5, w1_1, w1_1_6, neighborTransposed_13, neighborTransposed_14);   /*0483*/
    err_3 |= _return22;                                                  /*0486*/
-   freia_52_helper_0_8_0(w2_1, w1_1, w2_1_3);                           /*0487*/
-   
-   
    
    
    err_3 |= _return23;                                                  /*0511*/
-   freia_52_helper_0_9_0(w2_1, w1_1_5, w2_1);                           /*0512*/
    
    
-   
-   
-   freia_52_helper_0_10_0(w1_1, w1_0_32, w2_1, freia_morpho_k6_2, neighborTransposed_15);             /*0529*/
-   freia_52_helper_0_10_1(imWork1, w1_1, w2_1, neighborTransposed_15, &volcurrent);    /*0533*/
    err_3 |= _return24;                                                  /*0536*/
    
    
@@ -9038,8 +9040,6 @@ int freia_52(void)
    _return10 = err_3;                                                   /*0541*/
    err_2 |= _return10;                                                  /*0542*/
    _return4 = err_2;                                                    /*0544*/
-
-   ret_19 = 0;                                                          /*0545*/
    freia_common_destruct_data(w1_0_32);
    freia_common_destruct_data(w1_1);                                    /*0539*/
    freia_common_destruct_data(w1_1_5);
@@ -15420,6 +15420,22 @@ int freia_52(void)
    
    
    
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    err_1 |= _return20;                                                  /*0324*/
    
    
@@ -15464,41 +15480,27 @@ int freia_52(void)
    
    
    
-   
-   
    freia_52_helper_0_0_2(imWork1, w1_1_14, w1_1_19, w1_1_24, w1_1_29, w1_1_34, w1_1, w1_1_4, w1_1_9, neighborTransposed_8, neighborTransposed_9, neighborTransposed_11, neighborTransposed_12, neighborTransposed_13, neighborTransposed_14, neighborTransposed_15, neighborTransposed_10, 255, &volcurrent);           /*0589*/
-   
-   
+
+   ret_19 = 0;                                                          /*0864*/
    
    
    err_3 |= _return28;                                                  /*0635*/
    
    
-   
-   
    err_3 |= _return29;                                                  /*0671*/
-   
-   
    
    
    err_3 |= _return25;                                                  /*0707*/
    
    
-   
-   
    err_3 |= _return26;                                                  /*0743*/
-   
-   
    
    
    err_3 |= _return22;                                                  /*0779*/
    
    
-   
-   
    err_3 |= _return23;                                                  /*0815*/
-   
-   
    
    
    err_3 |= _return24;                                                  /*0851*/
@@ -15508,8 +15510,6 @@ int freia_52(void)
    _return10 = err_3;                                                   /*0859*/
    err_2 |= _return10;                                                  /*0860*/
    _return4 = err_2;                                                    /*0862*/
-
-   ret_19 = 0;                                                          /*0864*/
    freia_common_destruct_data(w1_0);                                    /*0544*/
    freia_common_destruct_data(w1_0_2);
    freia_common_destruct_data(w1_0_6);
@@ -16101,6 +16101,22 @@ int freia_52(void)
    
    
    
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    err_1 |= _return20;                                                  /*0324*/
    
    
@@ -16145,41 +16161,27 @@ int freia_52(void)
    
    
    
-   
-   
    freia_52_helper_0_0_2(imWork1, w1_1_14, w1_1_19, w1_1_24, w1_1_29, w1_1_34, w1_1, w1_1_4, w1_1_9, neighborTransposed_8, neighborTransposed_9, neighborTransposed_11, neighborTransposed_12, neighborTransposed_13, neighborTransposed_14, neighborTransposed_15, neighborTransposed_10, 255, &volcurrent);           /*0589*/
-   
-   
+
+   ret_19 = 0;                                                          /*0864*/
    
    
    err_3 |= _return28;                                                  /*0635*/
    
    
-   
-   
    err_3 |= _return29;                                                  /*0671*/
-   
-   
    
    
    err_3 |= _return25;                                                  /*0707*/
    
    
-   
-   
    err_3 |= _return26;                                                  /*0743*/
-   
-   
    
    
    err_3 |= _return22;                                                  /*0779*/
    
    
-   
-   
    err_3 |= _return23;                                                  /*0815*/
-   
-   
    
    
    err_3 |= _return24;                                                  /*0851*/
@@ -16189,8 +16191,6 @@ int freia_52(void)
    _return10 = err_3;                                                   /*0859*/
    err_2 |= _return10;                                                  /*0860*/
    _return4 = err_2;                                                    /*0862*/
-
-   ret_19 = 0;                                                          /*0864*/
    freia_common_destruct_data(w1_0);                                    /*0544*/
    freia_common_destruct_data(w1_0_2);
    freia_common_destruct_data(w1_0_6);
@@ -19422,74 +19422,133 @@ int freia_52(void)
    freia_aipo_not(imWork1, imin);                                       /*0247*/
    
    
-   
    freia_aipo_dilate_8c(w1_0_32, imWork1, freia_morpho_kernel_8c);      /*0266*/
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_0);              /*0267*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0268*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0269*/
    freia_aipo_dilate_8c(w1_0_28, w1_0, freia_morpho_k8_0);              /*0270*/
-   
-   
-   
-   
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_1);              /*0303*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0304*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0305*/
    freia_aipo_dilate_8c(w1_0_24, w1_0, freia_morpho_k8_1);              /*0306*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_2);              /*0339*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0340*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0341*/
+   freia_aipo_dilate_8c(w1_0_20, w1_0, freia_morpho_k8_2);              /*0342*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_0);              /*0375*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_0);                 /*0376*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_0);                 /*0377*/
+   freia_aipo_dilate_8c(w1_0_16, w1_0, freia_morpho_k4_0);              /*0378*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_1);              /*0411*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_1);                 /*0412*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_1);                 /*0413*/
+   freia_aipo_dilate_8c(w1_0_12, w1_0, freia_morpho_k4_1);              /*0414*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_0);              /*0447*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_0);                 /*0448*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_0);                 /*0449*/
+   freia_aipo_dilate_8c(w1_0_8, w1_0, freia_morpho_k6_0);               /*0450*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_1);              /*0483*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_1);                 /*0484*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_1);                 /*0485*/
+   freia_aipo_dilate_8c(w1_0_4, w1_0, freia_morpho_k6_1);               /*0486*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_2);              /*0519*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0520*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0521*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0522*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_28, neighborTransposed_8);            /*0588*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0589*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0590*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0591*/
+   freia_aipo_erode_8c(w1_1_35, w1_1, neighborTransposed_8);            /*0592*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_24, neighborTransposed_9);            /*0624*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0625*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0626*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0627*/
+   freia_aipo_erode_8c(w1_1_30, w1_1, neighborTransposed_9);            /*0628*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_20, neighborTransposed_10);           /*0660*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0661*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0662*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0663*/
+   freia_aipo_erode_8c(w1_1_25, w1_1, neighborTransposed_10);           /*0664*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_16, neighborTransposed_11);           /*0696*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0697*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0698*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0699*/
+   freia_aipo_erode_8c(w1_1_20, w1_1, neighborTransposed_11);           /*0700*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_12, neighborTransposed_12);           /*0732*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0733*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0734*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0735*/
+   freia_aipo_erode_8c(w1_1_15, w1_1, neighborTransposed_12);           /*0736*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_8, neighborTransposed_13);            /*0768*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0769*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0770*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0771*/
+   freia_aipo_erode_8c(w1_1_10, w1_1, neighborTransposed_13);           /*0772*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_4, neighborTransposed_14);            /*0804*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0805*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0806*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0807*/
+   freia_aipo_erode_8c(w1_1_5, w1_1, neighborTransposed_14);            /*0808*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0, neighborTransposed_15);              /*0840*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0841*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0842*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0843*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0844*/
+   freia_52_helper_0_0_2(imWork1, w1_1, w1_1_10, w1_1_15, w1_1_20, w1_1_25, w1_1_30, w1_1_35, w1_1_5, 255, &volcurrent);            /*0852*/
+
+   ret_19 = 0;                                                          /*0864*/
+   
+   
+   
+   
+   
    
    
    err_1 |= _return20;                                                  /*0324*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_2);              /*0339*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0340*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0341*/
-   freia_aipo_dilate_8c(w1_0_20, w1_0, freia_morpho_k8_2);              /*0342*/
    
    
    err_1 |= _return21;                                                  /*0360*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_0);              /*0375*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_0);                 /*0376*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_0);                 /*0377*/
-   freia_aipo_dilate_8c(w1_0_16, w1_0, freia_morpho_k4_0);              /*0378*/
    
    
    err_1 |= _return17;                                                  /*0396*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_1);              /*0411*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_1);                 /*0412*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_1);                 /*0413*/
-   freia_aipo_dilate_8c(w1_0_12, w1_0, freia_morpho_k4_1);              /*0414*/
    
    
    err_1 |= _return18;                                                  /*0432*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_0);              /*0447*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_0);                 /*0448*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_0);                 /*0449*/
-   freia_aipo_dilate_8c(w1_0_8, w1_0, freia_morpho_k6_0);               /*0450*/
    
    
    err_1 |= _return14;                                                  /*0468*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_1);              /*0483*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_1);                 /*0484*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_1);                 /*0485*/
-   freia_aipo_dilate_8c(w1_0_4, w1_0, freia_morpho_k6_1);               /*0486*/
    
    
    err_1 |= _return15;                                                  /*0504*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_2);              /*0519*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0520*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0521*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0522*/
    
    
    err_1 |= _return16;                                                  /*0540*/
@@ -19508,90 +19567,31 @@ int freia_52(void)
    
    
    
-   freia_aipo_erode_8c(w1_1, w1_0_28, neighborTransposed_8);            /*0588*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0589*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0590*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0591*/
-   freia_aipo_erode_8c(w1_1_35, w1_1, neighborTransposed_8);            /*0592*/
-   
-   
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_24, neighborTransposed_9);            /*0624*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0625*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0626*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0627*/
-   freia_aipo_erode_8c(w1_1_30, w1_1, neighborTransposed_9);            /*0628*/
    err_3 |= _return28;                                                  /*0635*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_20, neighborTransposed_10);           /*0660*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0661*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0662*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0663*/
-   freia_aipo_erode_8c(w1_1_25, w1_1, neighborTransposed_10);           /*0664*/
    err_3 |= _return29;                                                  /*0671*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_16, neighborTransposed_11);           /*0696*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0697*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0698*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0699*/
-   freia_aipo_erode_8c(w1_1_20, w1_1, neighborTransposed_11);           /*0700*/
    err_3 |= _return25;                                                  /*0707*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_12, neighborTransposed_12);           /*0732*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0733*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0734*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0735*/
-   freia_aipo_erode_8c(w1_1_15, w1_1, neighborTransposed_12);           /*0736*/
    err_3 |= _return26;                                                  /*0743*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_8, neighborTransposed_13);            /*0768*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0769*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0770*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0771*/
-   freia_aipo_erode_8c(w1_1_10, w1_1, neighborTransposed_13);           /*0772*/
    err_3 |= _return22;                                                  /*0779*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_4, neighborTransposed_14);            /*0804*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0805*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0806*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0807*/
-   freia_aipo_erode_8c(w1_1_5, w1_1, neighborTransposed_14);            /*0808*/
    err_3 |= _return23;                                                  /*0815*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0, neighborTransposed_15);              /*0840*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0841*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0842*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0843*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0844*/
    err_3 |= _return24;                                                  /*0851*/
-   freia_52_helper_0_0_2(imWork1, w1_1, w1_1_10, w1_1_15, w1_1_20, w1_1_25, w1_1_30, w1_1_35, w1_1_5, 255, &volcurrent);            /*0852*/
    
    
    
    _return10 = err_3;                                                   /*0859*/
    err_2 |= _return10;                                                  /*0860*/
    _return4 = err_2;                                                    /*0862*/
-
-   ret_19 = 0;                                                          /*0864*/
    freia_common_destruct_data(w1_0);                                    /*0544*/
    freia_common_destruct_data(w1_0_4);
    freia_common_destruct_data(w1_0_8);
@@ -20178,74 +20178,133 @@ int freia_52(void)
    freia_aipo_not(imWork1, imin);                                       /*0247*/
    
    
-   
    freia_aipo_dilate_8c(w1_0_32, imWork1, freia_morpho_kernel_8c);      /*0266*/
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_0);              /*0267*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0268*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0269*/
    freia_aipo_dilate_8c(w1_0_28, w1_0, freia_morpho_k8_0);              /*0270*/
-   
-   
-   
-   
    freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_1);              /*0303*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0304*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0305*/
    freia_aipo_dilate_8c(w1_0_24, w1_0, freia_morpho_k8_1);              /*0306*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_2);              /*0339*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0340*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0341*/
+   freia_aipo_dilate_8c(w1_0_20, w1_0, freia_morpho_k8_2);              /*0342*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_0);              /*0375*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_0);                 /*0376*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_0);                 /*0377*/
+   freia_aipo_dilate_8c(w1_0_16, w1_0, freia_morpho_k4_0);              /*0378*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_1);              /*0411*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_1);                 /*0412*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_1);                 /*0413*/
+   freia_aipo_dilate_8c(w1_0_12, w1_0, freia_morpho_k4_1);              /*0414*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_0);              /*0447*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_0);                 /*0448*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_0);                 /*0449*/
+   freia_aipo_dilate_8c(w1_0_8, w1_0, freia_morpho_k6_0);               /*0450*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_1);              /*0483*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_1);                 /*0484*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_1);                 /*0485*/
+   freia_aipo_dilate_8c(w1_0_4, w1_0, freia_morpho_k6_1);               /*0486*/
+   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_2);              /*0519*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0520*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0521*/
+   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0522*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_28, neighborTransposed_8);            /*0588*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0589*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0590*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0591*/
+   freia_aipo_erode_8c(w1_1_35, w1_1, neighborTransposed_8);            /*0592*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_24, neighborTransposed_9);            /*0624*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0625*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0626*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0627*/
+   freia_aipo_erode_8c(w1_1_30, w1_1, neighborTransposed_9);            /*0628*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_20, neighborTransposed_10);           /*0660*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0661*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0662*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0663*/
+   freia_aipo_erode_8c(w1_1_25, w1_1, neighborTransposed_10);           /*0664*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_16, neighborTransposed_11);           /*0696*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0697*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0698*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0699*/
+   freia_aipo_erode_8c(w1_1_20, w1_1, neighborTransposed_11);           /*0700*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_12, neighborTransposed_12);           /*0732*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0733*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0734*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0735*/
+   freia_aipo_erode_8c(w1_1_15, w1_1, neighborTransposed_12);           /*0736*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_8, neighborTransposed_13);            /*0768*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0769*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0770*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0771*/
+   freia_aipo_erode_8c(w1_1_10, w1_1, neighborTransposed_13);           /*0772*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0_4, neighborTransposed_14);            /*0804*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0805*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0806*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0807*/
+   freia_aipo_erode_8c(w1_1_5, w1_1, neighborTransposed_14);            /*0808*/
+   
+   
+   freia_aipo_erode_8c(w1_1, w1_0, neighborTransposed_15);              /*0840*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0841*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0842*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0843*/
+   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0844*/
+   freia_52_helper_0_0_2(imWork1, w1_1, w1_1_10, w1_1_15, w1_1_20, w1_1_25, w1_1_30, w1_1_35, w1_1_5, 255, &volcurrent);            /*0852*/
+
+   ret_19 = 0;                                                          /*0864*/
+   
+   
+   
+   
+   
    
    
    err_1 |= _return20;                                                  /*0324*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k8_2);              /*0339*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0340*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0341*/
-   freia_aipo_dilate_8c(w1_0_20, w1_0, freia_morpho_k8_2);              /*0342*/
    
    
    err_1 |= _return21;                                                  /*0360*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_0);              /*0375*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_0);                 /*0376*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_0);                 /*0377*/
-   freia_aipo_dilate_8c(w1_0_16, w1_0, freia_morpho_k4_0);              /*0378*/
    
    
    err_1 |= _return17;                                                  /*0396*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k4_1);              /*0411*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_1);                 /*0412*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k4_1);                 /*0413*/
-   freia_aipo_dilate_8c(w1_0_12, w1_0, freia_morpho_k4_1);              /*0414*/
    
    
    err_1 |= _return18;                                                  /*0432*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_0);              /*0447*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_0);                 /*0448*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_0);                 /*0449*/
-   freia_aipo_dilate_8c(w1_0_8, w1_0, freia_morpho_k6_0);               /*0450*/
    
    
    err_1 |= _return14;                                                  /*0468*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_1);              /*0483*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_1);                 /*0484*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_1);                 /*0485*/
-   freia_aipo_dilate_8c(w1_0_4, w1_0, freia_morpho_k6_1);               /*0486*/
    
    
    err_1 |= _return15;                                                  /*0504*/
    
    
-   freia_aipo_dilate_8c(w1_0, w1_0_32, freia_morpho_k6_2);              /*0519*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0520*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0521*/
-   freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k6_2);                 /*0522*/
    
    
    err_1 |= _return16;                                                  /*0540*/
@@ -20264,90 +20323,31 @@ int freia_52(void)
    
    
    
-   freia_aipo_erode_8c(w1_1, w1_0_28, neighborTransposed_8);            /*0588*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0589*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0590*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_8);               /*0591*/
-   freia_aipo_erode_8c(w1_1_35, w1_1, neighborTransposed_8);            /*0592*/
-   
-   
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_24, neighborTransposed_9);            /*0624*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0625*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0626*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_9);               /*0627*/
-   freia_aipo_erode_8c(w1_1_30, w1_1, neighborTransposed_9);            /*0628*/
    err_3 |= _return28;                                                  /*0635*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_20, neighborTransposed_10);           /*0660*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0661*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0662*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_10);              /*0663*/
-   freia_aipo_erode_8c(w1_1_25, w1_1, neighborTransposed_10);           /*0664*/
    err_3 |= _return29;                                                  /*0671*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_16, neighborTransposed_11);           /*0696*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0697*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0698*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_11);              /*0699*/
-   freia_aipo_erode_8c(w1_1_20, w1_1, neighborTransposed_11);           /*0700*/
    err_3 |= _return25;                                                  /*0707*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_12, neighborTransposed_12);           /*0732*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0733*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0734*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_12);              /*0735*/
-   freia_aipo_erode_8c(w1_1_15, w1_1, neighborTransposed_12);           /*0736*/
    err_3 |= _return26;                                                  /*0743*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_8, neighborTransposed_13);            /*0768*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0769*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0770*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_13);              /*0771*/
-   freia_aipo_erode_8c(w1_1_10, w1_1, neighborTransposed_13);           /*0772*/
    err_3 |= _return22;                                                  /*0779*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0_4, neighborTransposed_14);            /*0804*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0805*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0806*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_14);              /*0807*/
-   freia_aipo_erode_8c(w1_1_5, w1_1, neighborTransposed_14);            /*0808*/
    err_3 |= _return23;                                                  /*0815*/
    
    
-   
-   
-   freia_aipo_erode_8c(w1_1, w1_0, neighborTransposed_15);              /*0840*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0841*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0842*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0843*/
-   freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_15);              /*0844*/
    err_3 |= _return24;                                                  /*0851*/
-   freia_52_helper_0_0_2(imWork1, w1_1, w1_1_10, w1_1_15, w1_1_20, w1_1_25, w1_1_30, w1_1_35, w1_1_5, 255, &volcurrent);            /*0852*/
    
    
    
    _return10 = err_3;                                                   /*0859*/
    err_2 |= _return10;                                                  /*0860*/
    _return4 = err_2;                                                    /*0862*/
-
-   ret_19 = 0;                                                          /*0864*/
    freia_common_destruct_data(w1_0);                                    /*0544*/
    freia_common_destruct_data(w1_0_4);
    freia_common_destruct_data(w1_0_8);

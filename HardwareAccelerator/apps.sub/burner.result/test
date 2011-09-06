@@ -13085,9 +13085,9 @@ int main(int argc, char *argv[])
    
    // Change  pixel values for the display
    main_helper_3_0_0(imWork1, imZone1, imZone2, 40, 100);               /*0456*/
+
    main_helper_3_1_0(imWork1, imWork1, imZone3, 170);                   /*0458*/
    main_helper_3_2_0(out, imWork1, out, 250);                           /*0459*/
-   
    
    // output
    freia_common_tx_image(imin, &fdout);                                 /*0463*/
@@ -13195,9 +13195,9 @@ int main(int argc, char *argv[])
    
    // Change  pixel values for the display
    main_helper_3_0_0(imWork1, imZone1, imZone2, 40, 100);               /*0456*/
+
    main_helper_3_1_0(imWork1, imWork1, imZone3, 170);                   /*0458*/
    main_helper_3_2_0(out, imWork1, out, 250);                           /*0459*/
-   
    
    // output
    freia_common_tx_image(imin, &fdout);                                 /*0463*/
@@ -30394,6 +30394,7 @@ int main(int argc, char *argv[])
    transposeNeighbor(neighborTransposed_1, freia_morpho_k8_center_north);              /*0256*/
 
    main_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0054*/
+
    main_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0064*/
    main_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0074*/
    main_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0084*/
@@ -30403,7 +30404,8 @@ int main(int argc, char *argv[])
    main_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0124*/
    main_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0135*/
    main_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north, neighborTransposed_0, neighborTransposed_1);          /*0146*/
-
+   
+   
    main_helper_1_0_10(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0158*/
    main_helper_1_0_11(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0169*/
    main_helper_1_0_12(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0180*/
@@ -30413,8 +30415,6 @@ int main(int argc, char *argv[])
    main_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0224*/
    main_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0235*/
    main_helper_1_0_18(imZone1, imZone2, imZone3, imWork1, out, imWork1, imin, out, neighborTransposed_0, neighborTransposed_1, 105, 255, 1, 60, 105, 1, 100, 150, 1, freia_morpho_kernel_8c, &volcurrent);     /*0246*/
-   
-   
    
    
    
@@ -30491,6 +30491,7 @@ int main(int argc, char *argv[])
    transposeNeighbor(neighborTransposed_1, freia_morpho_k8_center_north);              /*0256*/
 
    main_helper_1_0_0(imWork1, out, in, freia_morpho_k8_center_east, freia_morpho_k8_center_north);    /*0054*/
+
    main_helper_1_0_1(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0064*/
    main_helper_1_0_2(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0074*/
    main_helper_1_0_3(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0084*/
@@ -30500,7 +30501,8 @@ int main(int argc, char *argv[])
    main_helper_1_0_7(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0124*/
    main_helper_1_0_8(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north);         /*0135*/
    main_helper_1_0_9(imWork1, out, imWork1, out, freia_morpho_k8_center_east, freia_morpho_k8_center_north, neighborTransposed_0, neighborTransposed_1);          /*0146*/
-
+   
+   
    main_helper_1_0_10(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0158*/
    main_helper_1_0_11(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0169*/
    main_helper_1_0_12(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0180*/
@@ -30510,8 +30512,6 @@ int main(int argc, char *argv[])
    main_helper_1_0_16(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0224*/
    main_helper_1_0_17(imWork1, out, imWork1, out, neighborTransposed_0, neighborTransposed_1);        /*0235*/
    main_helper_1_0_18(imZone1, imZone2, imZone3, imWork1, out, imWork1, imin, out, neighborTransposed_0, neighborTransposed_1, 105, 255, 1, 60, 105, 1, 100, 150, 1, freia_morpho_kernel_8c, &volcurrent);     /*0246*/
-   
-   
    
    
    
