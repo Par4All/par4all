@@ -1785,6 +1785,15 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
 
 /*************************************************** TERAPIX HANDLE SEQUENCE */
 
+static void migrate_statements(sequence sq, dag d, set dones)
+{
+  set stats = set_make(set_pointer);
+  dag_statements(stats, d);
+  freia_migrate_statements(sq, stats, dones);
+  set_union(dones, dones, stats);
+  set_free(stats);
+}
+
 /* do compile a list of statements for terapix
  * @param module, current module (function) name
  * @param ls, list of statements taken from the sequence
@@ -1796,6 +1805,7 @@ static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld,
 list freia_trpx_compile_calls
 (string module,
  dag fulld,
+ sequence sq,
  list /* of statements */ ls,
  const hash_table occs,
  hash_table exchanges,
@@ -1859,9 +1869,12 @@ list freia_trpx_compile_calls
 
   int n_split = 0;
   int stnb = -1;
+  set dones = set_make(set_pointer);
 
   FOREACH(dag, d, ld)
   {
+    // ??? should migrate beforehand?
+
     // skip if something is not implemented
     if (terapix_not_implemented(d))
       continue;
@@ -1871,6 +1884,7 @@ list freia_trpx_compile_calls
 
     if (trpx_dag_cut_none_p(dag_cut))
     {
+      migrate_statements(sq, d, dones);
       // direct handling of the dag
       stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
                        -1, global_remainings, helper_file, helpers, stnb, init);
@@ -1890,6 +1904,7 @@ list freia_trpx_compile_calls
       while ((cut = cut_decision(d, erosion)))
       {
         dag dc = cut_perform(d, cut, erosion, fulld, output_images);
+        migrate_statements(sq, dc, dones);
         // generate code for cut
         stnb =
           freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag, n_split,
@@ -1898,6 +1913,7 @@ list freia_trpx_compile_calls
         free_dag(dc);
         hash_table_clear(erosion);
       }
+      migrate_statements(sq, d, dones);
       stnb = freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
                  n_cut++, global_remainings, helper_file, helpers, stnb, init);
       hash_table_free(erosion);
