@@ -1520,13 +1520,15 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
 
   if (get_bool_property("FREIA_REMOVE_USELESS_COPIES"))
   {
+    set forwards = set_make(set_pointer);
+
     // I -copy-> X -> ... where I is an input is moved forward
     // maybe I should iterate?
-/*
     FOREACH(dagvtx, v, dag_inputs(d))
     {
       list append = NIL;
       entity in = vtxcontent_out(dagvtx_content(v));
+
       FOREACH(dagvtx, s, dagvtx_succs(v))
       {
         entity copy = vtxcontent_out(dagvtx_content(s));
@@ -1535,13 +1537,15 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
           // forward propagation in dag & statements
           FOREACH(dagvtx, s2, dagvtx_succs(s))
           {
-            substitute_image_in_statement(s, copy, in, true);
+            substitute_image_in_statement(s2, copy, in, true);
             gen_replace_in_list(vtxcontent_inputs(dagvtx_content(s2)),
                                 copy, in);
           }
           // update succs
           append = gen_nconc(dagvtx_succs(s), append);
           dagvtx_succs(s) = NIL;
+
+          set_add_element(forwards, forwards, s);
         }
       }
       if (append)
@@ -1553,7 +1557,7 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
         }
       }
     }
-*/
+
     // op -> X -copy-> A where A is an output is moved backwards
     FOREACH(dagvtx, v, dag_vertices(d))
     {
@@ -1563,6 +1567,9 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
       // skip already removed ops
       if (set_belong_p(remove, v)) continue;
 
+      // skip forward propagated inputs
+      if (set_belong_p(forwards, v)) continue;
+
       if (dagvtx_is_copy_p(v))
       {
         list preds = dag_vertex_preds(d, v);
@@ -1570,6 +1577,7 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
         entity res = vtxcontent_out(c);
         pips_assert("one output and one input to copy",
                 res!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
+
 
         // check for internal-t -one-copy-and-others-> A (output)
         // could be improved by dealing with the first copy only?
@@ -1640,6 +1648,8 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
           set_add_element(remove, remove, v);
       }
     }
+
+    set_free(forwards);
 
     ifdebug(8) {
       pips_debug(4, "after FREIA_REMOVE_USELESS_COPIES:\n");
