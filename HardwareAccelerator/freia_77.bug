@@ -1,2 +1,2 @@
-dependency issue when inserting helper
+dependency issue when inserting helper in OpenCL
 the underlying issue is that subgraphs must be reshuffled for dependency.
