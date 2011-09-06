@@ -65,17 +65,17 @@ digraph "dag_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_60" in dot format
 digraph "dag_cleaned_0" {
@@ -96,17 +96,17 @@ digraph "dag_cleaned_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3_1"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3_1"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 
 ! updated function for
@@ -215,17 +215,17 @@ digraph "dag_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_60" in dot format
 digraph "dag_cleaned_0" {
@@ -246,17 +246,17 @@ digraph "dag_cleaned_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 // graph for dag "freia_60_helper_0_0" of module "freia_60" in dot format
 digraph "freia_60_helper_0_0" {
@@ -269,12 +269,12 @@ digraph "freia_60_helper_0_0" {
   "im2'" [shape=circle];
 
   // computation vertices
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 // graph for dag "freia_60_helper_0_1" of module "freia_60" in dot format
 digraph "freia_60_helper_0_1" {
@@ -304,9 +304,9 @@ digraph "freia_60_helper_0_2" {
   "24 >" [shape=trapezium,orientation=270];
   "24 >" -> "im3'";
   "im4" -> "24 >";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3_1"];
-  "im3" -> "22 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3_1"];
+  "im3" -> "22 <_";
 }
 
 ! acceleration function
@@ -691,17 +691,17 @@ digraph "dag_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_60" in dot format
 digraph "dag_cleaned_0" {
@@ -722,17 +722,17 @@ digraph "dag_cleaned_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 // graph for dag "freia_60_helper_0_0_0" of module "freia_60" in dot format
 digraph "freia_60_helper_0_0_0" {
@@ -750,20 +750,20 @@ digraph "freia_60_helper_0_0_0" {
   // computation vertices
   "24 >" [shape=trapezium,orientation=270];
   "24 >" -> "im3'";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3_1"];
-  "im3" -> "22 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3_1"];
+  "im3" -> "22 <_";
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 
 ! acceleration function
@@ -874,7 +874,7 @@ freia_status freia_60_helper_0_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: <.(1) -> 1
+  // 0: <_(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -905,7 +905,7 @@ freia_status freia_60_helper_0_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_INF_CONST;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_INF_CONST;
-  // 1: <.(2) -> 2
+  // 1: <_(2) -> 2
   mcu_macro[0][1].xmin1 = imagelet_io_2_0;
   mcu_macro[1][1].xmin1 = imagelet_io_2_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -959,7 +959,7 @@ freia_status freia_60_helper_0_0_0(
   mcu_macro[1][2].iter4 = 0;
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_SUP3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_SUP3;
-  // 3: <.(3) -> 3
+  // 3: <_(3) -> 3
   mcu_macro[0][3].xmin1 = imagelet_io_3_0;
   mcu_macro[1][3].xmin1 = imagelet_io_3_1;
   mcu_macro[0][3].ymin1 = 0;
@@ -1221,17 +1221,17 @@ digraph "dag_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_60" in dot format
 digraph "dag_cleaned_0" {
@@ -1252,17 +1252,17 @@ digraph "dag_cleaned_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3_1"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3_1"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 // graph for dag "freia_60_helper_0_0" of module "freia_60" in dot format
 digraph "freia_60_helper_0_0" {
@@ -1283,17 +1283,17 @@ digraph "freia_60_helper_0_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3_1"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3_1"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 // graph for dag "freia_60_helper_0_0_0" of module "freia_60" in dot format
 digraph "freia_60_helper_0_0_0" {
@@ -1314,17 +1314,17 @@ digraph "freia_60_helper_0_0_0" {
   "23 >" [shape=trapezium,orientation=270];
   "23 >" -> "24 >" [label="im4"];
   "23 >" -> "im4";
-  "22 <." [shape=trapezium,orientation=270];
-  "22 <." -> "24 >" [label="im3_1"];
-  "im3" -> "22 <.";
-  "21 <." [shape=trapezium,orientation=270];
-  "21 <." -> "23 >" [label="im2"];
-  "21 <." -> "im2'";
-  "im2" -> "21 <.";
-  "20 <." [shape=trapezium,orientation=270];
-  "20 <." -> "23 >" [label="im1"];
-  "20 <." -> "im1'";
-  "im1" -> "20 <.";
+  "22 <_" [shape=trapezium,orientation=270];
+  "22 <_" -> "24 >" [label="im3_1"];
+  "im3" -> "22 <_";
+  "21 <_" [shape=trapezium,orientation=270];
+  "21 <_" -> "23 >" [label="im2"];
+  "21 <_" -> "im2'";
+  "im2" -> "21 <_";
+  "20 <_" [shape=trapezium,orientation=270];
+  "20 <_" -> "23 >" [label="im1"];
+  "20 <_" -> "im1'";
+  "im1" -> "20 <_";
 }
 
 ! acceleration function

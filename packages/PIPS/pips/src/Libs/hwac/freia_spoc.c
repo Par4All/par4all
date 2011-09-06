@@ -2243,6 +2243,7 @@ static list /* of dags */ split_dag(dag initial, const set output_images)
 list freia_spoc_compile_calls
   (string module,
    dag fulld,
+   sequence sq,
    list /* of statements */ ls,
    const hash_table occs,
    hash_table exchanges,
@@ -2300,11 +2301,18 @@ list freia_spoc_compile_calls
   int n_pipes = 0;
   int stnb = -1;
 
+  set stats = set_make(set_pointer), dones = set_make(set_pointer);
+
   FOREACH(dag, d, ld)
   {
     // skip non implemented stuff
     if (dag_spoc_not_implemented(d))
       continue;
+
+    // fix connectivity
+    dag_statements(stats, d);
+    freia_migrate_statements(sq, stats, dones);
+    set_union(dones, dones, stats);
 
     set remainings = set_make(set_pointer);
     set_append_vertex_statements(remainings, dag_vertices(d));
@@ -2350,6 +2358,9 @@ list freia_spoc_compile_calls
     set_free(remainings), remainings = NULL;
     free(fname_dag), fname_dag = NULL;
   }
+
+  set_free(stats);
+  set_free(dones);
 
   fprintf(helper_file, "// # SPOC calls: %d\n", n_spoc_calls);
 

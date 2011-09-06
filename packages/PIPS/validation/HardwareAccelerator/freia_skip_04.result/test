@@ -37,11 +37,11 @@ digraph "dag_0" {
   "14 thr" -> "o";
   "10 ?" [shape=none];
   "10 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "14 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "14 thr" [label="t"];
   "8 max" [shape=diamond];
   "8 max" -> "10 ?" [arrowhead=empty,label="max"];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_04" in dot format
@@ -57,11 +57,11 @@ digraph "dag_cleaned_0" {
   "14 thr" -> "o";
   "10 ?" [shape=none];
   "10 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "14 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "14 thr" [label="t"];
   "8 max" [shape=diamond];
   "8 max" -> "10 ?" [arrowhead=empty,label="max"];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 
@@ -117,11 +117,11 @@ digraph "dag_0" {
   "14 thr" -> "o";
   "10 ?" [shape=none];
   "10 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "14 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "14 thr" [label="t"];
   "8 max" [shape=diamond];
   "8 max" -> "10 ?" [arrowhead=empty,label="max"];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_04" in dot format
@@ -137,11 +137,11 @@ digraph "dag_cleaned_0" {
   "14 thr" -> "o";
   "10 ?" [shape=none];
   "10 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "14 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "14 thr" [label="t"];
   "8 max" [shape=diamond];
   "8 max" -> "10 ?" [arrowhead=empty,label="max"];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "freia_skip_04_helper_0_0" of module "freia_skip_04" in dot format
@@ -153,10 +153,10 @@ digraph "freia_skip_04_helper_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "t";
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "t";
   "8 max" [shape=diamond];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "freia_skip_04_helper_0_1" of module "freia_skip_04" in dot format
@@ -394,11 +394,11 @@ digraph "dag_0" {
   "14 thr" -> "o";
   "10 ?" [shape=none];
   "10 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "14 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "14 thr" [label="t"];
   "8 max" [shape=diamond];
   "8 max" -> "10 ?" [arrowhead=empty,label="max"];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_04" in dot format
@@ -414,11 +414,11 @@ digraph "dag_cleaned_0" {
   "14 thr" -> "o";
   "10 ?" [shape=none];
   "10 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "14 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "14 thr" [label="t"];
   "8 max" [shape=diamond];
   "8 max" -> "10 ?" [arrowhead=empty,label="max"];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "freia_skip_04_helper_0_0_0" of module "freia_skip_04" in dot format
@@ -430,10 +430,10 @@ digraph "freia_skip_04_helper_0_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "t";
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "t";
   "8 max" [shape=diamond];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "freia_skip_04_helper_0_1_0" of module "freia_skip_04" in dot format
@@ -589,7 +589,7 @@ freia_status freia_skip_04_helper_0_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
-  // 1: ^.(1) -> 1
+  // 1: ^_(1) -> 1
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -908,11 +908,11 @@ digraph "dag_0" {
   "14 thr" -> "o";
   "10 ?" [shape=none];
   "10 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "14 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "14 thr" [label="t"];
   "8 max" [shape=diamond];
   "8 max" -> "10 ?" [arrowhead=empty,label="max"];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_04" in dot format
@@ -928,11 +928,11 @@ digraph "dag_cleaned_0" {
   "14 thr" -> "o";
   "10 ?" [shape=none];
   "10 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "14 thr" [label="t"];
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "14 thr" [label="t"];
   "8 max" [shape=diamond];
   "8 max" -> "10 ?" [arrowhead=empty,label="max"];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "freia_skip_04_helper_0_0" of module "freia_skip_04" in dot format
@@ -944,10 +944,10 @@ digraph "freia_skip_04_helper_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "t";
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "t";
   "8 max" [shape=diamond];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "freia_skip_04_helper_0_0_0" of module "freia_skip_04" in dot format
@@ -959,10 +959,10 @@ digraph "freia_skip_04_helper_0_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "9 ^." [shape=trapezium,orientation=270];
-  "9 ^." -> "t";
+  "9 ^_" [shape=trapezium,orientation=270];
+  "9 ^_" -> "t";
   "8 max" [shape=diamond];
-  "i" -> "9 ^.";
+  "i" -> "9 ^_";
   "i" -> "8 max";
 }
 // graph for dag "freia_skip_04_helper_0_1" of module "freia_skip_04" in dot format

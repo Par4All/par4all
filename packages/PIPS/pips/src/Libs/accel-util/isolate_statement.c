@@ -519,8 +519,13 @@ statement effects_to_dma(statement stat,
               expression init = int_to_expression(0);
 
               /* Replace the reference to the array re to *eto: */
-              entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(entity_basic(re)),the_dims);
-              entity declaring_module = 
+	      type re_type = ultimate_array_type(entity_type(re));
+	      basic re_basic = basic_undefined;
+	      pips_assert("the type of the considered effect is expected to be variable",
+			  type_variable_p(re_type));
+	      re_basic = variable_basic(type_variable(re_type));
+              entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(re_basic),the_dims);
+              entity declaring_module =
                 get_current_module_entity();
               // PIER Here we need to add a P4A variable prefix to the name to help
               // p4a postprocessing

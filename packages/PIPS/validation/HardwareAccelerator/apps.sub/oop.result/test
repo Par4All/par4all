@@ -3624,13 +3624,13 @@ int main(int argc, char *argv[])
       freia_aipo_erode_8c(imgtmp_1, t0, freia_morpho_kernel_8c);        /*0198*/
       freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
       freia_aipo_erode_8c(i1_4, t2, freia_morpho_kernel_8c);            /*0204*/
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
+      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);              /*0221*/
+
+      main_helper_0_0_1(i1_2, i2, i1_4, i2, imgtmp_1, imtmp_0, imtmp_2, imtmp_3);      /*0222*/
 
       freia_aipo_erode_8c(i1, i1_2, freia_morpho_kernel_8c);            /*0209*/
       freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
-      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
-      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);              /*0221*/
-      main_helper_0_0_1(i1_2, i2, i1_4, i2, imgtmp_1, imtmp_0, imtmp_2, imtmp_3);      /*0222*/
-
       freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);              /*0226*/
       freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);
       freia_aipo_copy(t0, i0);
@@ -3785,13 +3785,13 @@ int main(int argc, char *argv[])
       freia_aipo_erode_8c(imgtmp_1, t0, freia_morpho_kernel_8c);        /*0198*/
       freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
       freia_aipo_erode_8c(i1_4, t2, freia_morpho_kernel_8c);            /*0204*/
+      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
+      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);              /*0221*/
+
+      main_helper_0_0_1(i1_2, i2, i1_4, i2, imgtmp_1, imtmp_0, imtmp_2, imtmp_3);      /*0222*/
 
       freia_aipo_erode_8c(i1, i1_2, freia_morpho_kernel_8c);            /*0209*/
       freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);             /*0210*/
-      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
-      freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);              /*0221*/
-      main_helper_0_0_1(i1_2, i2, i1_4, i2, imgtmp_1, imtmp_0, imtmp_2, imtmp_3);      /*0222*/
-
       freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);              /*0226*/
       freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);
       freia_aipo_copy(t0, i0);

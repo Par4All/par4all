@@ -314,9 +314,9 @@ digraph "dag_0" {
   "138 !" -> "180 D8" [label="out"];
   "138 !" -> "164 D8" [label="out"];
   "138 !" -> "148 D8" [label="out"];
-  "136 *." [shape=trapezium,orientation=270];
+  "136 *_" [shape=trapezium,orientation=270];
   "135 -" [shape=trapezium,orientation=270];
-  "135 -" -> "136 *." [label="lin"];
+  "135 -" -> "136 *_" [label="lin"];
   "133 !" [shape=trapezium,orientation=270];
   "133 !" -> "135 -" [label="out"];
   "128 =" [shape=circle];
@@ -393,9 +393,9 @@ digraph "dag_0" {
   "73 !" -> "114 D8" [label="out"];
   "73 !" -> "98 D8" [label="out"];
   "73 !" -> "82 D8" [label="out"];
-  "72 *." [shape=trapezium,orientation=270];
+  "72 *_" [shape=trapezium,orientation=270];
   "71 -" [shape=trapezium,orientation=270];
-  "71 -" -> "72 *." [label="top"];
+  "71 -" -> "72 *_" [label="top"];
   "69 D8" [shape=box];
   "69 D8" -> "71 -" [label="top"];
   "68 D8" [shape=box];
@@ -475,10 +475,10 @@ digraph "dag_2" {
   "212 thr" [shape=parallelogram];
   "212 thr" -> "213 >" [label="out"];
   "212 thr" -> "out'";
-  "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "212 thr" [label="rec"];
+  "211 *_" [shape=trapezium,orientation=270];
+  "211 *_" -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
-  "210 -" -> "211 *." [label="rec"];
+  "210 -" -> "211 *_" [label="rec"];
   "out" -> "210 -";
   "in" -> "213 >";
   "in" -> "210 -";
@@ -520,10 +520,10 @@ digraph "dag_cleaned_0" {
   "171 E8" -> "172 E8" [label="w1_1_8"];
   "170 E8" [shape=box];
   "170 E8" -> "171 E8" [label="w1_1_9"];
-  "160 <." [shape=trapezium,orientation=270];
-  "160 <." -> "176 <" [label="w2_1_2"];
+  "160 <_" [shape=trapezium,orientation=270];
+  "160 <_" -> "176 <" [label="w2_1_2"];
   "158 E8" [shape=box];
-  "158 E8" -> "160 <." [label="w1_1_10"];
+  "158 E8" -> "160 <_" [label="w1_1_10"];
   "157 E8" [shape=box];
   "157 E8" -> "158 E8" [label="w1_1_11"];
   "156 E8" [shape=box];
@@ -599,10 +599,10 @@ digraph "dag_cleaned_2" {
   // computation vertices
   "212 thr" [shape=parallelogram];
   "212 thr" -> "out'";
-  "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "212 thr" [label="rec"];
+  "211 *_" [shape=trapezium,orientation=270];
+  "211 *_" -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
-  "210 -" -> "211 *." [label="rec_1"];
+  "210 -" -> "211 *_" [label="rec_1"];
   "out" -> "210 -";
   "in" -> "210 -";
 }
@@ -1079,9 +1079,9 @@ digraph "dag_0" {
   "91 !" -> "120 D8" [label="out"];
   "91 !" -> "108 D8" [label="out"];
   "91 !" -> "96 D8" [label="out"];
-  "90 *." [shape=trapezium,orientation=270];
+  "90 *_" [shape=trapezium,orientation=270];
   "89 -" [shape=trapezium,orientation=270];
-  "89 -" -> "90 *." [label="lin"];
+  "89 -" -> "90 *_" [label="lin"];
   "88 !" [shape=trapezium,orientation=270];
   "88 !" -> "89 -" [label="out"];
   "85 =" [shape=circle];
@@ -1158,9 +1158,9 @@ digraph "dag_0" {
   "45 !" -> "74 D8" [label="out"];
   "45 !" -> "62 D8" [label="out"];
   "45 !" -> "50 D8" [label="out"];
-  "44 *." [shape=trapezium,orientation=270];
+  "44 *_" [shape=trapezium,orientation=270];
   "43 -" [shape=trapezium,orientation=270];
-  "43 -" -> "44 *." [label="top"];
+  "43 -" -> "44 *_" [label="top"];
   "42 D8" [shape=box];
   "42 D8" -> "43 -" [label="top"];
   "41 D8" [shape=box];
@@ -1275,10 +1275,10 @@ digraph "dag_2" {
   "157 thr" [shape=parallelogram];
   "157 thr" -> "158 >" [label="out"];
   "157 thr" -> "out'";
-  "156 *." [shape=trapezium,orientation=270];
-  "156 *." -> "157 thr" [label="rec"];
+  "156 *_" [shape=trapezium,orientation=270];
+  "156 *_" -> "157 thr" [label="rec"];
   "155 -" [shape=trapezium,orientation=270];
-  "155 -" -> "156 *." [label="rec"];
+  "155 -" -> "156 *_" [label="rec"];
   "out" -> "155 -";
   "in" -> "158 >";
   "in" -> "155 -";
@@ -1320,10 +1320,10 @@ digraph "dag_cleaned_0" {
   "114 E8" -> "115 E8" [label="w1_1"];
   "113 E8" [shape=box];
   "113 E8" -> "114 E8" [label="w1_1"];
-  "106 <." [shape=trapezium,orientation=270];
-  "106 <." -> "118 <" [label="w2_1"];
+  "106 <_" [shape=trapezium,orientation=270];
+  "106 <_" -> "118 <" [label="w2_1"];
   "105 E8" [shape=box];
-  "105 E8" -> "106 <." [label="w1_1"];
+  "105 E8" -> "106 <_" [label="w1_1"];
   "104 E8" [shape=box];
   "104 E8" -> "105 E8" [label="w1_1"];
   "103 E8" [shape=box];
@@ -1434,10 +1434,10 @@ digraph "dag_cleaned_2" {
   // computation vertices
   "157 thr" [shape=parallelogram];
   "157 thr" -> "out'";
-  "156 *." [shape=trapezium,orientation=270];
-  "156 *." -> "157 thr" [label="rec"];
+  "156 *_" [shape=trapezium,orientation=270];
+  "156 *_" -> "157 thr" [label="rec"];
   "155 -" [shape=trapezium,orientation=270];
-  "155 -" -> "156 *." [label="rec"];
+  "155 -" -> "156 *_" [label="rec"];
   "out" -> "155 -";
   "in" -> "155 -";
 }
@@ -1451,10 +1451,10 @@ digraph "main_helper_0_0" {
   "w2_1_2" [shape=circle];
 
   // computation vertices
-  "106 <." [shape=trapezium,orientation=270];
-  "106 <." -> "w2_1_2";
+  "106 <_" [shape=trapezium,orientation=270];
+  "106 <_" -> "w2_1_2";
   "105 E8" [shape=box];
-  "105 E8" -> "106 <." [label="w1_1_10"];
+  "105 E8" -> "106 <_" [label="w1_1_10"];
   "104 E8" [shape=box];
   "104 E8" -> "105 E8" [label="w1_1_11"];
   "103 E8" [shape=box];
@@ -1631,10 +1631,10 @@ digraph "main_helper_2_0" {
   // computation vertices
   "157 thr" [shape=parallelogram];
   "157 thr" -> "out'";
-  "156 *." [shape=trapezium,orientation=270];
-  "156 *." -> "157 thr" [label="rec"];
+  "156 *_" [shape=trapezium,orientation=270];
+  "156 *_" -> "157 thr" [label="rec"];
   "155 -" [shape=trapezium,orientation=270];
-  "155 -" -> "156 *." [label="rec_1"];
+  "155 -" -> "156 *_" [label="rec_1"];
   "out" -> "155 -";
   "in" -> "155 -";
 }
@@ -2785,30 +2785,30 @@ int main(int argc, char *argv[])
    main_helper_0_0_0(out_1, w1_1, in, freia_morpho_k8_0, neighborTransposed_5);        /*0045*/
    
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
    main_helper_0_0_1(w2_1_2, w1_1, neighborTransposed_5, 255);          /*0102*/
+   
+   
+   
+   
    
    
    
    main_helper_0_1_0(w1_1, w1_1_2, out_1, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_4, neighborTransposed_3);        /*0113*/
    main_helper_0_1_1(w1_1_5, w1_1, w1_1_2, w1_1, neighborTransposed_4, neighborTransposed_3);         /*0116*/
-
-   main_helper_0_2_0(w2_1, w1_1_5, w2_1_2);                             /*0118*/
    
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   main_helper_0_2_0(w2_1, w1_1_5, w2_1_2);                             /*0118*/
    
    
    main_helper_0_3_0(out, w1_1, w2_1, &volcurrent);                     /*0130*/
@@ -2904,30 +2904,30 @@ int main(int argc, char *argv[])
    main_helper_0_0_0(out_1, w1_1, in, freia_morpho_k8_0, neighborTransposed_5);        /*0045*/
    
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
    main_helper_0_0_1(w2_1_2, w1_1, neighborTransposed_5, 255);          /*0102*/
+   
+   
+   
+   
    
    
    
    main_helper_0_1_0(w1_1, w1_1_2, out_1, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_4, neighborTransposed_3);        /*0113*/
    main_helper_0_1_1(w1_1_5, w1_1, w1_1_2, w1_1, neighborTransposed_4, neighborTransposed_3);         /*0116*/
-
-   main_helper_0_2_0(w2_1, w1_1_5, w2_1_2);                             /*0118*/
    
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   main_helper_0_2_0(w2_1, w1_1_5, w2_1_2);                             /*0118*/
    
    
    main_helper_0_3_0(out, w1_1, w2_1, &volcurrent);                     /*0130*/
@@ -3277,9 +3277,9 @@ digraph "dag_0" {
   "138 !" -> "180 D8" [label="out"];
   "138 !" -> "164 D8" [label="out"];
   "138 !" -> "148 D8" [label="out"];
-  "136 *." [shape=trapezium,orientation=270];
+  "136 *_" [shape=trapezium,orientation=270];
   "135 -" [shape=trapezium,orientation=270];
-  "135 -" -> "136 *." [label="lin"];
+  "135 -" -> "136 *_" [label="lin"];
   "133 !" [shape=trapezium,orientation=270];
   "133 !" -> "135 -" [label="out"];
   "128 =" [shape=circle];
@@ -3356,9 +3356,9 @@ digraph "dag_0" {
   "73 !" -> "114 D8" [label="out"];
   "73 !" -> "98 D8" [label="out"];
   "73 !" -> "82 D8" [label="out"];
-  "72 *." [shape=trapezium,orientation=270];
+  "72 *_" [shape=trapezium,orientation=270];
   "71 -" [shape=trapezium,orientation=270];
-  "71 -" -> "72 *." [label="top"];
+  "71 -" -> "72 *_" [label="top"];
   "69 D8" [shape=box];
   "69 D8" -> "71 -" [label="top"];
   "68 D8" [shape=box];
@@ -3438,10 +3438,10 @@ digraph "dag_2" {
   "212 thr" [shape=parallelogram];
   "212 thr" -> "213 >" [label="out"];
   "212 thr" -> "out'";
-  "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "212 thr" [label="rec"];
+  "211 *_" [shape=trapezium,orientation=270];
+  "211 *_" -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
-  "210 -" -> "211 *." [label="rec"];
+  "210 -" -> "211 *_" [label="rec"];
   "out" -> "210 -";
   "in" -> "213 >";
   "in" -> "210 -";
@@ -3483,10 +3483,10 @@ digraph "dag_cleaned_0" {
   "171 E8" -> "172 E8" [label="w1_1"];
   "170 E8" [shape=box];
   "170 E8" -> "171 E8" [label="w1_1"];
-  "160 <." [shape=trapezium,orientation=270];
-  "160 <." -> "176 <" [label="w2_1"];
+  "160 <_" [shape=trapezium,orientation=270];
+  "160 <_" -> "176 <" [label="w2_1"];
   "158 E8" [shape=box];
-  "158 E8" -> "160 <." [label="w1_1"];
+  "158 E8" -> "160 <_" [label="w1_1"];
   "157 E8" [shape=box];
   "157 E8" -> "158 E8" [label="w1_1"];
   "156 E8" [shape=box];
@@ -3562,10 +3562,10 @@ digraph "dag_cleaned_2" {
   // computation vertices
   "212 thr" [shape=parallelogram];
   "212 thr" -> "out'";
-  "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "212 thr" [label="rec"];
+  "211 *_" [shape=trapezium,orientation=270];
+  "211 *_" -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
-  "210 -" -> "211 *." [label="rec"];
+  "210 -" -> "211 *_" [label="rec"];
   "out" -> "210 -";
   "in" -> "210 -";
 }
@@ -3661,8 +3661,8 @@ digraph "main_helper_0_0_2" {
   "192 <" -> "199 !" [label="w2_1"];
   "176 <" [shape=trapezium,orientation=270];
   "176 <" -> "192 <" [label="w2_1_1"];
-  "160 <." [shape=trapezium,orientation=270];
-  "160 <." -> "176 <" [label="w2_1_2"];
+  "160 <_" [shape=trapezium,orientation=270];
+  "160 <_" -> "176 <" [label="w2_1_2"];
   "190 E8" [shape=box];
   "190 E8" -> "192 <" [label="w1_1"];
   "189 E8" [shape=box];
@@ -3672,7 +3672,7 @@ digraph "main_helper_0_0_2" {
   "174 E8" [shape=box];
   "174 E8" -> "176 <" [label="w1_1_5"];
   "158 E8" [shape=box];
-  "158 E8" -> "160 <." [label="w1_1_10"];
+  "158 E8" -> "160 <_" [label="w1_1_10"];
   "187 E8" [shape=box];
   "187 E8" -> "188 E8" [label="w1_1_3"];
   "173 E8" [shape=box];
@@ -3719,10 +3719,10 @@ digraph "main_helper_2_0_0" {
   // computation vertices
   "212 thr" [shape=parallelogram];
   "212 thr" -> "out'";
-  "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "212 thr" [label="rec"];
+  "211 *_" [shape=trapezium,orientation=270];
+  "211 *_" -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
-  "210 -" -> "211 *." [label="rec_1"];
+  "210 -" -> "211 *_" [label="rec_1"];
   "out" -> "210 -";
   "in" -> "210 -";
 }
@@ -5028,7 +5028,7 @@ freia_status main_helper_0_0_2(
   mcu_macro[1][11].iter4 = 0;
   mcu_macro[0][11].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][11].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 12: <.(2) -> 4
+  // 12: <_(2) -> 4
   mcu_macro[0][12].xmin1 = imagelet_io_2_0;
   mcu_macro[1][12].xmin1 = imagelet_io_2_1;
   mcu_macro[0][12].ymin1 = 0;
@@ -5617,7 +5617,7 @@ freia_status main_helper_2_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_SUB3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_SUB3;
-  // 1: *.(2) -> 2
+  // 1: *_(2) -> 2
   mcu_macro[0][1].xmin1 = imagelet_io_2_0;
   mcu_macro[1][1].xmin1 = imagelet_io_2_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -5795,6 +5795,8 @@ int main(int argc, char *argv[])
    main_helper_0_0_0(w1_0, w1_0_7, w1_0_2, in, freia_morpho_k8_0, freia_morpho_k8_1, freia_morpho_k8_2);             /*0073*/
    
    
+   
+   
    main_helper_0_0_1(w1_1, w1_1_9, w1_1_4, w1_0, w1_0_2, w1_0_7, freia_morpho_k8_0, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_5, neighborTransposed_4, neighborTransposed_3);    /*0085*/
    
    
@@ -5812,8 +5814,6 @@ int main(int argc, char *argv[])
    
    
    main_helper_0_0_2(out, w1_1, w1_1_4, w1_1_9, neighborTransposed_5, neighborTransposed_4, neighborTransposed_3, 255, &volcurrent);               /*0155*/
-   
-   
    
    
    
@@ -5912,6 +5912,8 @@ int main(int argc, char *argv[])
    main_helper_0_0_0(w1_0, w1_0_7, w1_0_2, in, freia_morpho_k8_0, freia_morpho_k8_1, freia_morpho_k8_2);             /*0073*/
    
    
+   
+   
    main_helper_0_0_1(w1_1, w1_1_9, w1_1_4, w1_0, w1_0_2, w1_0_7, freia_morpho_k8_0, freia_morpho_k8_1, freia_morpho_k8_2, neighborTransposed_5, neighborTransposed_4, neighborTransposed_3);    /*0085*/
    
    
@@ -5929,8 +5931,6 @@ int main(int argc, char *argv[])
    
    
    main_helper_0_0_2(out, w1_1, w1_1_4, w1_1_9, neighborTransposed_5, neighborTransposed_4, neighborTransposed_3, 255, &volcurrent);               /*0155*/
-   
-   
    
    
    
@@ -6282,9 +6282,9 @@ digraph "dag_0" {
   "138 !" -> "180 D8" [label="out"];
   "138 !" -> "164 D8" [label="out"];
   "138 !" -> "148 D8" [label="out"];
-  "136 *." [shape=trapezium,orientation=270];
+  "136 *_" [shape=trapezium,orientation=270];
   "135 -" [shape=trapezium,orientation=270];
-  "135 -" -> "136 *." [label="lin"];
+  "135 -" -> "136 *_" [label="lin"];
   "133 !" [shape=trapezium,orientation=270];
   "133 !" -> "135 -" [label="out"];
   "128 =" [shape=circle];
@@ -6361,9 +6361,9 @@ digraph "dag_0" {
   "73 !" -> "114 D8" [label="out"];
   "73 !" -> "98 D8" [label="out"];
   "73 !" -> "82 D8" [label="out"];
-  "72 *." [shape=trapezium,orientation=270];
+  "72 *_" [shape=trapezium,orientation=270];
   "71 -" [shape=trapezium,orientation=270];
-  "71 -" -> "72 *." [label="top"];
+  "71 -" -> "72 *_" [label="top"];
   "69 D8" [shape=box];
   "69 D8" -> "71 -" [label="top"];
   "68 D8" [shape=box];
@@ -6443,10 +6443,10 @@ digraph "dag_2" {
   "212 thr" [shape=parallelogram];
   "212 thr" -> "213 >" [label="out"];
   "212 thr" -> "out'";
-  "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "212 thr" [label="rec"];
+  "211 *_" [shape=trapezium,orientation=270];
+  "211 *_" -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
-  "210 -" -> "211 *." [label="rec"];
+  "210 -" -> "211 *_" [label="rec"];
   "out" -> "210 -";
   "in" -> "213 >";
   "in" -> "210 -";
@@ -6488,10 +6488,10 @@ digraph "dag_cleaned_0" {
   "171 E8" -> "172 E8" [label="w1_1_8"];
   "170 E8" [shape=box];
   "170 E8" -> "171 E8" [label="w1_1_9"];
-  "160 <." [shape=trapezium,orientation=270];
-  "160 <." -> "176 <" [label="w2_1_2"];
+  "160 <_" [shape=trapezium,orientation=270];
+  "160 <_" -> "176 <" [label="w2_1_2"];
   "158 E8" [shape=box];
-  "158 E8" -> "160 <." [label="w1_1_10"];
+  "158 E8" -> "160 <_" [label="w1_1_10"];
   "157 E8" [shape=box];
   "157 E8" -> "158 E8" [label="w1_1_11"];
   "156 E8" [shape=box];
@@ -6567,10 +6567,10 @@ digraph "dag_cleaned_2" {
   // computation vertices
   "212 thr" [shape=parallelogram];
   "212 thr" -> "out'";
-  "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "212 thr" [label="rec"];
+  "211 *_" [shape=trapezium,orientation=270];
+  "211 *_" -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
-  "210 -" -> "211 *." [label="rec_1"];
+  "210 -" -> "211 *_" [label="rec_1"];
   "out" -> "210 -";
   "in" -> "210 -";
 }
@@ -6611,10 +6611,10 @@ digraph "main_helper_0_0" {
   "171 E8" -> "172 E8" [label="w1_1_8"];
   "170 E8" [shape=box];
   "170 E8" -> "171 E8" [label="w1_1_9"];
-  "160 <." [shape=trapezium,orientation=270];
-  "160 <." -> "176 <" [label="w2_1_2"];
+  "160 <_" [shape=trapezium,orientation=270];
+  "160 <_" -> "176 <" [label="w2_1_2"];
   "158 E8" [shape=box];
-  "158 E8" -> "160 <." [label="w1_1_10"];
+  "158 E8" -> "160 <_" [label="w1_1_10"];
   "157 E8" [shape=box];
   "157 E8" -> "158 E8" [label="w1_1_11"];
   "156 E8" [shape=box];
@@ -6680,9 +6680,9 @@ digraph "main_helper_0_0_2" {
   "176 <" [shape=trapezium,orientation=270];
   "176 <" -> "192 <" [label="w2_1_1"];
   "w1_1_5" -> "176 <";
-  "160 <." [shape=trapezium,orientation=270];
-  "160 <." -> "176 <" [label="w2_1_2"];
-  "w1_1_10" -> "160 <.";
+  "160 <_" [shape=trapezium,orientation=270];
+  "160 <_" -> "176 <" [label="w2_1_2"];
+  "w1_1_10" -> "160 <_";
 }
 // graph for dag "main_helper_1_0" of module "main" in dot format
 digraph "main_helper_1_0" {
@@ -6732,10 +6732,10 @@ digraph "main_helper_2_0" {
   // computation vertices
   "212 thr" [shape=parallelogram];
   "212 thr" -> "out'";
-  "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "212 thr" [label="rec"];
+  "211 *_" [shape=trapezium,orientation=270];
+  "211 *_" -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
-  "210 -" -> "211 *." [label="rec_1"];
+  "210 -" -> "211 *_" [label="rec_1"];
   "out" -> "210 -";
   "in" -> "210 -";
 }
@@ -6751,10 +6751,10 @@ digraph "main_helper_2_0_0" {
   // computation vertices
   "212 thr" [shape=parallelogram];
   "212 thr" -> "out'";
-  "211 *." [shape=trapezium,orientation=270];
-  "211 *." -> "212 thr" [label="rec"];
+  "211 *_" [shape=trapezium,orientation=270];
+  "211 *_" -> "212 thr" [label="rec"];
   "210 -" [shape=trapezium,orientation=270];
-  "210 -" -> "211 *." [label="rec_1"];
+  "210 -" -> "211 *_" [label="rec_1"];
   "out" -> "210 -";
   "in" -> "210 -";
 }
@@ -7237,61 +7237,61 @@ int main(int argc, char *argv[])
    
    
    freia_aipo_not(out_1, in);                                           /*0073*/
-   
-   
+
    freia_aipo_dilate_8c(w1_0, out_1, freia_morpho_k8_0);                /*0082*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0083*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0084*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0085*/
    freia_aipo_dilate_8c(w1_0_10, w1_0, freia_morpho_k8_0);              /*0086*/
-   
-   
-   
+
    freia_aipo_dilate_8c(w1_0, out_1, freia_morpho_k8_1);                /*0098*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0099*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0100*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0101*/
    freia_aipo_dilate_8c(w1_0_5, w1_0, freia_morpho_k8_1);               /*0102*/
-   
-   
-   
+
    freia_aipo_dilate_8c(w1_0, out_1, freia_morpho_k8_2);                /*0114*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0115*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0116*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0117*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0118*/
-   
-   
-   
-   
-   
-   
-   
-   
-   
+
    freia_aipo_erode_8c(w1_1, w1_0_10, neighborTransposed_5);            /*0154*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_5);               /*0155*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_5);               /*0156*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_5);               /*0157*/
    freia_aipo_erode_8c(w1_1_10, w1_1, neighborTransposed_5);            /*0158*/
-   
-   
-   
+
    freia_aipo_erode_8c(w1_1, w1_0_5, neighborTransposed_4);             /*0170*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_4);               /*0171*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_4);               /*0172*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_4);               /*0173*/
    freia_aipo_erode_8c(w1_1_5, w1_1, neighborTransposed_4);             /*0174*/
-   
-   
-   
+
    freia_aipo_erode_8c(w1_1, w1_0, neighborTransposed_3);               /*0186*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0187*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0188*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0189*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0190*/
-
+   
+   
+   
    main_helper_0_0_2(out, w1_1, w1_1_10, w1_1_5, 255, &volcurrent);     /*0192*/
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    
    
    
@@ -7386,61 +7386,61 @@ int main(int argc, char *argv[])
    
    
    freia_aipo_not(out_1, in);                                           /*0073*/
-   
-   
+
    freia_aipo_dilate_8c(w1_0, out_1, freia_morpho_k8_0);                /*0082*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0083*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0084*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_0);                 /*0085*/
    freia_aipo_dilate_8c(w1_0_10, w1_0, freia_morpho_k8_0);              /*0086*/
-   
-   
-   
+
    freia_aipo_dilate_8c(w1_0, out_1, freia_morpho_k8_1);                /*0098*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0099*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0100*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_1);                 /*0101*/
    freia_aipo_dilate_8c(w1_0_5, w1_0, freia_morpho_k8_1);               /*0102*/
-   
-   
-   
+
    freia_aipo_dilate_8c(w1_0, out_1, freia_morpho_k8_2);                /*0114*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0115*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0116*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0117*/
    freia_aipo_dilate_8c(w1_0, w1_0, freia_morpho_k8_2);                 /*0118*/
-   
-   
-   
-   
-   
-   
-   
-   
-   
+
    freia_aipo_erode_8c(w1_1, w1_0_10, neighborTransposed_5);            /*0154*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_5);               /*0155*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_5);               /*0156*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_5);               /*0157*/
    freia_aipo_erode_8c(w1_1_10, w1_1, neighborTransposed_5);            /*0158*/
-   
-   
-   
+
    freia_aipo_erode_8c(w1_1, w1_0_5, neighborTransposed_4);             /*0170*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_4);               /*0171*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_4);               /*0172*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_4);               /*0173*/
    freia_aipo_erode_8c(w1_1_5, w1_1, neighborTransposed_4);             /*0174*/
-   
-   
-   
+
    freia_aipo_erode_8c(w1_1, w1_0, neighborTransposed_3);               /*0186*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0187*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0188*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0189*/
    freia_aipo_erode_8c(w1_1, w1_1, neighborTransposed_3);               /*0190*/
-
+   
+   
+   
    main_helper_0_0_2(out, w1_1, w1_1_10, w1_1_5, 255, &volcurrent);     /*0192*/
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    
    
    

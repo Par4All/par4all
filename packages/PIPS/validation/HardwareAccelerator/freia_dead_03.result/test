@@ -44,9 +44,9 @@ digraph "dag_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "o";
-  "i0" -> "10 -.";
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "o";
+  "i0" -> "10 -_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dead_03" in dot format
 digraph "dag_cleaned_0" {
@@ -72,9 +72,9 @@ digraph "dag_cleaned_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o";
-  "i0" -> "10 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o";
+  "i0" -> "10 +_";
 }
 
 ! updated function for
@@ -132,9 +132,9 @@ digraph "dag_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "o";
-  "i0" -> "10 -.";
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "o";
+  "i0" -> "10 -_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dead_03" in dot format
 digraph "dag_cleaned_0" {
@@ -160,9 +160,9 @@ digraph "dag_cleaned_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o";
-  "i0" -> "10 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o";
+  "i0" -> "10 +_";
 }
 // graph for dag "freia_dead_03_helper_0_0" of module "freia_dead_03" in dot format
 digraph "freia_dead_03_helper_0_0" {
@@ -188,9 +188,9 @@ digraph "freia_dead_03_helper_1_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o";
-  "i0" -> "10 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o";
+  "i0" -> "10 +_";
 }
 
 ! acceleration function
@@ -401,9 +401,9 @@ digraph "dag_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "o";
-  "i0" -> "10 -.";
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "o";
+  "i0" -> "10 -_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dead_03" in dot format
 digraph "dag_cleaned_0" {
@@ -429,9 +429,9 @@ digraph "dag_cleaned_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o";
-  "i0" -> "10 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o";
+  "i0" -> "10 +_";
 }
 // graph for dag "freia_dead_03_helper_0_0_0" of module "freia_dead_03" in dot format
 digraph "freia_dead_03_helper_0_0_0" {
@@ -457,9 +457,9 @@ digraph "freia_dead_03_helper_1_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o";
-  "i0" -> "10 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o";
+  "i0" -> "10 +_";
 }
 
 ! acceleration function
@@ -693,7 +693,7 @@ freia_status freia_dead_03_helper_1_0_0(
   redres.raw = (void*) &redter;
   redres.size = sizeof(terapix_reduction);
 
-  // 0: +.(1) -> 1
+  // 0: +_(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -842,9 +842,9 @@ digraph "dag_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "o";
-  "i0" -> "10 -.";
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "o";
+  "i0" -> "10 -_";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dead_03" in dot format
 digraph "dag_cleaned_0" {
@@ -870,9 +870,9 @@ digraph "dag_cleaned_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o";
-  "i0" -> "10 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o";
+  "i0" -> "10 +_";
 }
 // graph for dag "freia_dead_03_helper_0_0" of module "freia_dead_03" in dot format
 digraph "freia_dead_03_helper_0_0" {
@@ -898,9 +898,9 @@ digraph "freia_dead_03_helper_1_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "o";
-  "i0" -> "10 +.";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "o";
+  "i0" -> "10 +_";
 }
 
 ! acceleration function

@@ -34,10 +34,10 @@ digraph "dag_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -55,10 +55,10 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -109,10 +109,10 @@ digraph "dag_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -130,10 +130,10 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -151,10 +151,10 @@ digraph "freia_skip_05_helper_0_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -322,10 +322,10 @@ digraph "dag_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -343,10 +343,10 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -364,10 +364,10 @@ digraph "freia_skip_05_helper_0_0_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -490,7 +490,7 @@ freia_status freia_skip_05_helper_0_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_SUB3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_SUB3;
-  // 1: ^.(1) -> 2
+  // 1: ^_(1) -> 2
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -662,10 +662,10 @@ digraph "dag_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -683,10 +683,10 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -704,10 +704,10 @@ digraph "freia_skip_05_helper_0_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";
@@ -725,10 +725,10 @@ digraph "freia_skip_05_helper_0_0_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "10 ^." [shape=trapezium,orientation=270];
-  "10 ^." -> "11 thr" [label="t"];
+  "10 ^_" [shape=trapezium,orientation=270];
+  "10 ^_" -> "11 thr" [label="t"];
   "8 -" [shape=trapezium,orientation=270];
-  "8 -" -> "10 ^." [label="i1"];
+  "8 -" -> "10 ^_" [label="i1"];
   "8 -" -> "i1'";
   "i1" -> "8 -";
   "i0" -> "8 -";

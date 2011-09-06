@@ -59,6 +59,18 @@ statement dagvtx_statement(const dagvtx v)
   return pstatement_statement_p(ps)? pstatement_statement(ps): NULL;
 }
 
+/* @brief build the set of actual statements in d
+ */
+void dag_statements(set stats, const dag d)
+{
+  set_clear(stats);
+  FOREACH(dagvtx, v, dag_vertices(d))
+  {
+    statement s = dagvtx_statement(v);
+    if (s) set_add_element(stats, stats, s);
+  }
+}
+
 /* a vertex with a non AIPO or image related statement.
  */
 bool dagvtx_other_stuff_p(const dagvtx v)
@@ -1508,6 +1520,40 @@ list /* of statements */ freia_dag_optimize(dag d, hash_table exchanges)
 
   if (get_bool_property("FREIA_REMOVE_USELESS_COPIES"))
   {
+    // I -copy-> X -> ... where I is an input is moved forward
+    // maybe I should iterate?
+/*
+    FOREACH(dagvtx, v, dag_inputs(d))
+    {
+      list append = NIL;
+      entity in = vtxcontent_out(dagvtx_content(v));
+      FOREACH(dagvtx, s, dagvtx_succs(v))
+      {
+        entity copy = vtxcontent_out(dagvtx_content(s));
+        if (dagvtx_is_copy_p(s))
+        {
+          // forward propagation in dag & statements
+          FOREACH(dagvtx, s2, dagvtx_succs(s))
+          {
+            substitute_image_in_statement(s, copy, in, true);
+            gen_replace_in_list(vtxcontent_inputs(dagvtx_content(s2)),
+                                copy, in);
+          }
+          // update succs
+          append = gen_nconc(dagvtx_succs(s), append);
+          dagvtx_succs(s) = NIL;
+        }
+      }
+      if (append)
+      {
+        FOREACH(dagvtx, a, append)
+        {
+          if (!gen_in_list_p(a, dagvtx_succs(v)))
+            dagvtx_succs(v) = CONS(dagvtx, a, dagvtx_succs(v));
+        }
+      }
+    }
+*/
     // op -> X -copy-> A where A is an output is moved backwards
     FOREACH(dagvtx, v, dag_vertices(d))
     {

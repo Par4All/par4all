@@ -70,11 +70,11 @@ digraph "dag_cleaned_0" {
   "14 <" -> "15 -" [label="td"];
   "13 E8" [shape=box];
   "13 E8" -> "14 <" [label="tb"];
-  "12 <." [shape=trapezium,orientation=270];
-  "12 <." -> "14 <" [label="tc"];
+  "12 <_" [shape=trapezium,orientation=270];
+  "12 <_" -> "14 <" [label="tc"];
   "11 D8" [shape=box];
   "11 D8" -> "13 E8" [label="tb_1"];
-  "11 D8" -> "12 <." [label="tb_1"];
+  "11 D8" -> "12 <_" [label="tb_1"];
   "in" -> "15 -";
   "in" -> "11 D8";
 }
@@ -167,11 +167,11 @@ digraph "dag_cleaned_0" {
   "14 <" -> "15 -" [label="td"];
   "13 E8" [shape=box];
   "13 E8" -> "14 <" [label="tb"];
-  "12 <." [shape=trapezium,orientation=270];
-  "12 <." -> "14 <" [label="tc"];
+  "12 <_" [shape=trapezium,orientation=270];
+  "12 <_" -> "14 <" [label="tc"];
   "11 D8" [shape=box];
   "11 D8" -> "13 E8" [label="tb"];
-  "11 D8" -> "12 <." [label="tb"];
+  "11 D8" -> "12 <_" [label="tb"];
   "in" -> "15 -";
   "in" -> "11 D8";
 }
@@ -186,12 +186,12 @@ digraph "freia_49_helper_0_0" {
   // computation vertices
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "td";
-  "12 <." [shape=trapezium,orientation=270];
-  "12 <." -> "14 <" [label="tc"];
+  "12 <_" [shape=trapezium,orientation=270];
+  "12 <_" -> "14 <" [label="tc"];
   "13 E8" [shape=box];
   "13 E8" -> "14 <" [label="tb"];
   "11 D8" [shape=box];
-  "11 D8" -> "12 <." [label="tb_1"];
+  "11 D8" -> "12 <_" [label="tb_1"];
   "11 D8" -> "13 E8" [label="tb_1"];
   "in" -> "11 D8";
 }
@@ -476,11 +476,11 @@ digraph "dag_cleaned_0" {
   "14 <" -> "15 -" [label="td"];
   "13 E8" [shape=box];
   "13 E8" -> "14 <" [label="tb"];
-  "12 <." [shape=trapezium,orientation=270];
-  "12 <." -> "14 <" [label="tc"];
+  "12 <_" [shape=trapezium,orientation=270];
+  "12 <_" -> "14 <" [label="tc"];
   "11 D8" [shape=box];
   "11 D8" -> "13 E8" [label="tb"];
-  "11 D8" -> "12 <." [label="tb"];
+  "11 D8" -> "12 <_" [label="tb"];
   "in" -> "15 -";
   "in" -> "11 D8";
 }
@@ -497,12 +497,12 @@ digraph "freia_49_helper_0_0_0" {
   "15 -" -> "out";
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "15 -" [label="td"];
-  "12 <." [shape=trapezium,orientation=270];
-  "12 <." -> "14 <" [label="tc"];
+  "12 <_" [shape=trapezium,orientation=270];
+  "12 <_" -> "14 <" [label="tc"];
   "13 E8" [shape=box];
   "13 E8" -> "14 <" [label="tb"];
   "11 D8" [shape=box];
-  "11 D8" -> "12 <." [label="tb_1"];
+  "11 D8" -> "12 <_" [label="tb_1"];
   "11 D8" -> "13 E8" [label="tb_1"];
   "in" -> "15 -";
   "in" -> "11 D8";
@@ -651,7 +651,7 @@ freia_status freia_49_helper_0_0_0(
   mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // 2: <.(2) -> 2
+  // 2: <_(2) -> 2
   mcu_macro[0][2].xmin1 = imagelet_2;
   mcu_macro[1][2].xmin1 = imagelet_2;
   mcu_macro[0][2].ymin1 = 0;
@@ -866,11 +866,11 @@ digraph "dag_cleaned_0" {
   "14 <" -> "15 -" [label="td"];
   "13 E8" [shape=box];
   "13 E8" -> "14 <" [label="tb"];
-  "12 <." [shape=trapezium,orientation=270];
-  "12 <." -> "14 <" [label="tc"];
+  "12 <_" [shape=trapezium,orientation=270];
+  "12 <_" -> "14 <" [label="tc"];
   "11 D8" [shape=box];
   "11 D8" -> "13 E8" [label="tb_1"];
-  "11 D8" -> "12 <." [label="tb_1"];
+  "11 D8" -> "12 <_" [label="tb_1"];
   "in" -> "15 -";
   "in" -> "11 D8";
 }
@@ -889,11 +889,11 @@ digraph "freia_49_helper_0_0" {
   "14 <" -> "15 -" [label="td"];
   "13 E8" [shape=box];
   "13 E8" -> "14 <" [label="tb"];
-  "12 <." [shape=trapezium,orientation=270];
-  "12 <." -> "14 <" [label="tc"];
+  "12 <_" [shape=trapezium,orientation=270];
+  "12 <_" -> "14 <" [label="tc"];
   "11 D8" [shape=box];
   "11 D8" -> "13 E8" [label="tb_1"];
-  "11 D8" -> "12 <." [label="tb_1"];
+  "11 D8" -> "12 <_" [label="tb_1"];
   "in" -> "15 -";
   "in" -> "11 D8";
 }
@@ -914,9 +914,9 @@ digraph "freia_49_helper_0_0_1" {
   "14 <" [shape=trapezium,orientation=270];
   "14 <" -> "15 -" [label="td"];
   "tb" -> "14 <";
-  "12 <." [shape=trapezium,orientation=270];
-  "12 <." -> "14 <" [label="tc"];
-  "tb_1" -> "12 <.";
+  "12 <_" [shape=trapezium,orientation=270];
+  "12 <_" -> "14 <" [label="tc"];
+  "tb_1" -> "12 <_";
 }
 
 ! acceleration function

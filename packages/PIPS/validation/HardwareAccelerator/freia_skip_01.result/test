@@ -35,11 +35,11 @@ digraph "dag_0" {
   "12 thr" -> "o";
   "11 ?" [shape=none];
   "11 ?" -> "12 thr" [arrowhead=empty,label="seuil"];
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "12 thr" [label="t"];
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "12 thr" [label="t"];
   "9 max" [shape=diamond];
   "9 max" -> "11 ?" [arrowhead=empty,label="max"];
-  "i" -> "10 -.";
+  "i" -> "10 -_";
   "i" -> "9 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_01" in dot format
@@ -55,11 +55,11 @@ digraph "dag_cleaned_0" {
   "12 thr" -> "o";
   "11 ?" [shape=none];
   "11 ?" -> "12 thr" [arrowhead=empty,label="seuil"];
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "12 thr" [label="t"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "12 thr" [label="t"];
   "9 max" [shape=diamond];
   "9 max" -> "11 ?" [arrowhead=empty,label="max"];
-  "i" -> "10 +.";
+  "i" -> "10 +_";
   "i" -> "9 max";
 }
 
@@ -111,11 +111,11 @@ digraph "dag_0" {
   "12 thr" -> "o";
   "11 ?" [shape=none];
   "11 ?" -> "12 thr" [arrowhead=empty,label="seuil"];
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "12 thr" [label="t"];
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "12 thr" [label="t"];
   "9 max" [shape=diamond];
   "9 max" -> "11 ?" [arrowhead=empty,label="max"];
-  "i" -> "10 -.";
+  "i" -> "10 -_";
   "i" -> "9 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_01" in dot format
@@ -131,11 +131,11 @@ digraph "dag_cleaned_0" {
   "12 thr" -> "o";
   "11 ?" [shape=none];
   "11 ?" -> "12 thr" [arrowhead=empty,label="seuil"];
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "12 thr" [label="t"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "12 thr" [label="t"];
   "9 max" [shape=diamond];
   "9 max" -> "11 ?" [arrowhead=empty,label="max"];
-  "i" -> "10 +.";
+  "i" -> "10 +_";
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_helper_0_0" of module "freia_skip_01" in dot format
@@ -147,10 +147,10 @@ digraph "freia_skip_01_helper_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "t";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "t";
   "9 max" [shape=diamond];
-  "i" -> "10 +.";
+  "i" -> "10 +_";
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_helper_0_1" of module "freia_skip_01" in dot format
@@ -382,11 +382,11 @@ digraph "dag_0" {
   "12 thr" -> "o";
   "11 ?" [shape=none];
   "11 ?" -> "12 thr" [arrowhead=empty,label="seuil"];
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "12 thr" [label="t"];
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "12 thr" [label="t"];
   "9 max" [shape=diamond];
   "9 max" -> "11 ?" [arrowhead=empty,label="max"];
-  "i" -> "10 -.";
+  "i" -> "10 -_";
   "i" -> "9 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_01" in dot format
@@ -402,11 +402,11 @@ digraph "dag_cleaned_0" {
   "12 thr" -> "o";
   "11 ?" [shape=none];
   "11 ?" -> "12 thr" [arrowhead=empty,label="seuil"];
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "12 thr" [label="t"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "12 thr" [label="t"];
   "9 max" [shape=diamond];
   "9 max" -> "11 ?" [arrowhead=empty,label="max"];
-  "i" -> "10 +.";
+  "i" -> "10 +_";
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_helper_0_0_0" of module "freia_skip_01" in dot format
@@ -418,10 +418,10 @@ digraph "freia_skip_01_helper_0_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "t";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "t";
   "9 max" [shape=diamond];
-  "i" -> "10 +.";
+  "i" -> "10 +_";
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_helper_0_1_0" of module "freia_skip_01" in dot format
@@ -577,7 +577,7 @@ freia_status freia_skip_01_helper_0_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
-  // 1: +.(1) -> 1
+  // 1: +_(1) -> 1
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -890,11 +890,11 @@ digraph "dag_0" {
   "12 thr" -> "o";
   "11 ?" [shape=none];
   "11 ?" -> "12 thr" [arrowhead=empty,label="seuil"];
-  "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "12 thr" [label="t"];
+  "10 -_" [shape=trapezium,orientation=270];
+  "10 -_" -> "12 thr" [label="t"];
   "9 max" [shape=diamond];
   "9 max" -> "11 ?" [arrowhead=empty,label="max"];
-  "i" -> "10 -.";
+  "i" -> "10 -_";
   "i" -> "9 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_01" in dot format
@@ -910,11 +910,11 @@ digraph "dag_cleaned_0" {
   "12 thr" -> "o";
   "11 ?" [shape=none];
   "11 ?" -> "12 thr" [arrowhead=empty,label="seuil"];
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "12 thr" [label="t"];
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "12 thr" [label="t"];
   "9 max" [shape=diamond];
   "9 max" -> "11 ?" [arrowhead=empty,label="max"];
-  "i" -> "10 +.";
+  "i" -> "10 +_";
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_helper_0_0" of module "freia_skip_01" in dot format
@@ -926,10 +926,10 @@ digraph "freia_skip_01_helper_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "t";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "t";
   "9 max" [shape=diamond];
-  "i" -> "10 +.";
+  "i" -> "10 +_";
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_helper_0_0_0" of module "freia_skip_01" in dot format
@@ -941,10 +941,10 @@ digraph "freia_skip_01_helper_0_0_0" {
   "t" [shape=circle];
 
   // computation vertices
-  "10 +." [shape=trapezium,orientation=270];
-  "10 +." -> "t";
+  "10 +_" [shape=trapezium,orientation=270];
+  "10 +_" -> "t";
   "9 max" [shape=diamond];
-  "i" -> "10 +.";
+  "i" -> "10 +_";
   "i" -> "9 max";
 }
 // graph for dag "freia_skip_01_helper_0_1" of module "freia_skip_01" in dot format

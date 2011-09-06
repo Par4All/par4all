@@ -297,13 +297,13 @@ module_to_callgraph(
 /************************************************************ UPDATE CALLEES */
 
 
-/** Add a call to a function to a callee list
+/** Add a call to a function to a callees list
  */
 static void
 add_call_to_callees(const call c, callees *current_callees) {
   entity called = call_function(c);
   pips_assert("defined entity", !entity_undefined_p(called));
-
+  pips_debug(8,"considering: %s ->",  entity_local_name(called));
   if (type_functional_p(entity_type(called)) &&
       storage_rom_p(entity_storage(called)) &&
       (value_code_p(entity_initial(called)) ||
@@ -313,11 +313,38 @@ add_call_to_callees(const call c, callees *current_callees) {
     FOREACH(STRING, s, callees_callees(*current_callees))
         if (same_string_p(name, s))
             return;
+    pips_debug(8,"adding: %s",  entity_local_name(called));
     callees_callees(*current_callees) =
       CONS(STRING, strdup(name), callees_callees(*current_callees));
   }
+  pips_debug(8,"\n");
 }
 
+/**
+   Add calls hidden in variable declarations to the current callees list
+ */
+static bool
+declaration_statement_add_call_to_callees(const statement s, callees *current_callees)
+{
+  bool decl_p = declaration_statement_p(s);
+
+  if (decl_p)
+    {
+      FOREACH(ENTITY, e, statement_declarations(s))
+	{
+	  if(type_variable_p(entity_type(e)))
+	    {
+	      value v_init = entity_initial(e);
+	      if (value_expression_p(v_init))
+		{
+		  gen_context_recurse(v_init, current_callees,
+				      call_domain, gen_true, add_call_to_callees);
+		}
+	    }
+	}
+    }
+  return !decl_p; /* currently, declarations are attached to CONTINUE statements */
+}
 
 /** Recompute the callees of a module statement.
 
@@ -327,14 +354,13 @@ add_call_to_callees(const call c, callees *current_callees) {
 */
 callees
 compute_callees(const statement stat) {
-  callees result;
   callees current_callees = make_callees(NIL);
   // Visit all the call site of the module:
-  gen_context_recurse(stat, &current_callees,
-		      call_domain, gen_true, add_call_to_callees);
-  result = current_callees;
-  current_callees = callees_undefined;
-  return result;
+  gen_context_multi_recurse(stat, &current_callees,
+		      statement_domain, declaration_statement_add_call_to_callees, gen_null,
+		      call_domain, gen_true, add_call_to_callees,
+		      NULL);
+  return current_callees;
 }
 
 
