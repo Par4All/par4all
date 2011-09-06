@@ -826,11 +826,11 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 			 /* Well this is valid only in the general case :
 			  * we should verify that types are compatible. */
 			 new_eff = region_append(new_eff, eff_formal);
-			 /* shouldn't it be a union ? BC */
-			 /* l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));*/
 			 free_effect(eff_formal);
 
 		       } /* else du if (effect_undefined_p(eff_real)) */
+
+			 /* shouldn't it be a union ? BC */
 		     l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
 		   } /* FOREACH(EFFECT, eff, l_sum_eff) */
 	      }
