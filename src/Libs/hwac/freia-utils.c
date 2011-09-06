@@ -1563,3 +1563,61 @@ set freia_compute_current_output_images(void)
   return freia_compute_output_images(get_current_module_entity(),
                                      get_current_module_statement());
 }
+
+/******************************************************** MIGRATE STATEMENTS */
+
+static string stat_nb(statement s)
+{
+  return itoa((int) statement_number(s));
+}
+
+/*
+  migrate a subset of statements in a sequence so that they are close together.
+  the relative order of statements is kept. the sequence is updated.
+  @param sq sequence to update, may be NULL
+  @param stats statements to move together
+  @param before statements that must appear before, may be NULL
+*/
+void freia_migrate_statements(sequence sq, const set stats, const set before)
+{
+  ifdebug(4) {
+    pips_debug(4, "migrating %d statements in %p\n", set_size(stats), sq);
+    set_fprint(stderr, "stats", stats, (gen_string_func_t) stat_nb);
+    set_fprint(stderr, "before", before, (gen_string_func_t) stat_nb);
+  }
+
+  // nothing to do
+  if (sq==NULL)
+  {
+    pips_assert("nothing to migrate", set_size(stats)<=1);
+    return;
+  }
+
+  // build before/in/end statement lists in reverse order
+  list lbefore = NIL, lin = NIL, lend = NIL;
+  FOREACH(statement, s, sequence_statements(sq))
+  {
+    if (set_belong_p(stats, s))
+      lin = CONS(statement, s, lin);
+    else
+    {
+      if (before && set_belong_p(before, s))
+        lbefore = CONS(statement, s, lbefore);
+      else
+      {
+        if (lin)
+          lend = CONS(statement, s, lend);
+        else
+          lbefore = CONS(statement, s, lbefore);
+      }
+    }
+  }
+
+  // check consistency
+  pips_assert("all statements seen", set_size(stats)==(int) gen_length(lin));
+
+  // update sequence
+  gen_free_list(sequence_statements(sq));
+  lin = gen_nconc(gen_nreverse(lin), gen_nreverse(lend));
+  sequence_statements(sq) = gen_nconc(gen_nreverse(lbefore), lin);
+}

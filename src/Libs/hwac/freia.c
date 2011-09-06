@@ -702,17 +702,21 @@ string freia_compile(string module, statement mod_stat, string target)
 
     list allocated = NIL;
     hash_table exchanges = NULL;
+    sequence sq = NULL;
     if (hash_defined_p(fsi.sequence, ls))
+    {
       exchanges = hash_table_make(hash_pointer, 0);
+      sq = hash_get(fsi.sequence, ls);
+    }
 
     if (freia_spoc_p(target))
-      allocated = freia_spoc_compile_calls(module, d, ls, occs, exchanges,
+      allocated = freia_spoc_compile_calls(module, d, sq, ls, occs, exchanges,
                                        output_images, helper, helpers, n_dags);
     else if (freia_terapix_p(target))
-      allocated = freia_trpx_compile_calls(module, d, ls, occs, exchanges,
+      allocated = freia_trpx_compile_calls(module, d, sq, ls, occs, exchanges,
                                        output_images, helper, helpers, n_dags);
     else if (freia_opencl_p(target))
-      allocated = freia_opencl_compile_calls(module, d, ls, occs, exchanges,
+      allocated = freia_opencl_compile_calls(module, d, sq, ls, occs, exchanges,
                                        output_images, helper, helpers, n_dags);
     else if (freia_aipo_p(target))
       allocated = freia_aipo_compile_calls(module, d, ls, occs, exchanges,

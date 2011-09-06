@@ -59,6 +59,18 @@ statement dagvtx_statement(const dagvtx v)
   return pstatement_statement_p(ps)? pstatement_statement(ps): NULL;
 }
 
+/* @brief build the set of actual statements in d
+ */
+void dag_statements(set stats, const dag d)
+{
+  set_clear(stats);
+  FOREACH(dagvtx, v, dag_vertices(d))
+  {
+    statement s = dagvtx_statement(v);
+    if (s) set_add_element(stats, stats, s);
+  }
+}
+
 /* a vertex with a non AIPO or image related statement.
  */
 bool dagvtx_other_stuff_p(const dagvtx v)
