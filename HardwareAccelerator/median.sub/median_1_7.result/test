@@ -168,10 +168,10 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    freia_aipo_dilate_8c(t, t, freia_morpho_kernel_8c);                  /*0033*/
 
    freia_aipo_sup(o, o_1, t);                                           /*0035*/
-   freia_common_destruct_data(o_1);
    
    // cleanup
    ret |= freia_common_destruct_data(t);                                /*0038*/
+   freia_common_destruct_data(o_1);
    return ret;                                                          /*0039*/
 }
 #
@@ -1910,10 +1910,10 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    
    median_1_helper_0_0_1(o, t, t_6, i);                                 /*0035*/
-   freia_common_destruct_data(t_6);
    
    // cleanup
    ret |= freia_common_destruct_data(t);                                /*0038*/
+   freia_common_destruct_data(t_6);
    return ret;                                                          /*0039*/
 }
 
@@ -1953,10 +1953,10 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    
    median_1_helper_0_0_1(o, t, t_6, i);                                 /*0035*/
-   freia_common_destruct_data(t_6);
    
    // cleanup
    ret |= freia_common_destruct_data(t);                                /*0038*/
+   freia_common_destruct_data(t_6);
    return ret;                                                          /*0039*/
 }
 #
