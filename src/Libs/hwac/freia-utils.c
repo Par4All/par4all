@@ -1352,7 +1352,8 @@ static bool only_minor_statements_in_between(
  * @param images list of entities to check and maybe allocate
  * @param init new image -> initial image
  * @param signatures helper -> _int # written args ahead (may be NULL)
- * @return actually allocated images
+ *
+ * @return list of actually allocated images
  */
 list freia_allocate_new_images_if_needed
 (list ls,
@@ -1484,8 +1485,25 @@ list freia_allocate_new_images_if_needed
       // insert_statement(first, image_alloc(v), true); // NO, init
       // ??? deallocation should be at end of allocation block...
       entity model = (entity) hash_get(init, v);
+      bool before = false;
       statement s = freia_memory_management_statement(model, occs, false);
-      insert_statement(s? s: last, image_free(v), false);
+      if (!s)
+      {
+        pips_user_warning("not quite sure where to put %s deallocation\n",
+                          entity_name(v));
+        // hmmm... try at the program level
+        statement ms = get_current_module_statement();
+        if (statement_sequence_p(ms))
+        {
+          s = STATEMENT(CAR(
+             gen_last(sequence_statements(statement_sequence(ms)))));
+          // hmmm... does not seem to work properly
+          //if (statement_call_p(s) &&
+          // ENTITY_C_RETURN_P(call_function(statement_call(s))))
+          before = true;
+        }
+      }
+      insert_statement(s? s: last, image_free(v), before);
     }
   }
 
