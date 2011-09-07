@@ -155,7 +155,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     1, 2, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_repcst_0, NO_MES }, TRPX_IO(3, "CONV_REPLACE_EQ_CONST"),
-    NO_OPCL
+    OPCL("REPLACE_EC")
   },
   // unary
   { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
