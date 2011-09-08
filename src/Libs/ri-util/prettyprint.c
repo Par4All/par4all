@@ -4299,7 +4299,9 @@ text text_statement_enclosed(entity module,
       }
       else if(gen_length(dl)!=gen_length(idl)) {
 	print_entities(dl);
+	fprintf(stderr, "\n"); // FI, OK a fputc might do as well
 	print_entities(idl);
+	fprintf(stderr, "\n");
 	pips_internal_error("A block statement with %d declarations"
 			    " contains %d declarations in its statements\n",
 			    gen_length(dl), gen_length(idl));
