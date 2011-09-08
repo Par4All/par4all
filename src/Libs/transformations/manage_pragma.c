@@ -194,6 +194,7 @@ static void merge_on_outer (list l_outer) {
       fprintf(stderr,"\n");
     }
     l_expr= filter_variables_in_pragma_expr(l_expr,locally_decls);
+    gen_free_list(locally_decls);
 
     // The pragma can now be added to the statement
     add_pragma_expr_to_statement (stmt, l_expr);

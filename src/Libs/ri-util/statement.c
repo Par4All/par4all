@@ -2809,6 +2809,7 @@ bool add_statement_declarations(statement s, list *statement_to_all_included_dec
 
 /* Get a list of all variables declared recursively within a statement
  * works for any newgen type, not only statements
+ * Warning: the list must be freed !
  */
 list statement_to_declarations(void* s)
 {
