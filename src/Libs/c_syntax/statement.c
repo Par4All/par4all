@@ -490,7 +490,10 @@ statement MakeForloopWithIndexDeclaration(list decls,
     printf("For loop statement declarations: \n");
     print_statements(decls);
   }
-  statement decl = make_statement_from_statement_list_or_empty_block(decls);
+  // FI: modified because insert_statement() should not be used with
+  // declaration statements although it would be OK in this special case
+  // statement decl = make_statement_from_statement_list_or_empty_block(decls);
+  statement decl = make_block_statement(decls);
   /* First generate naive but more robust version in the RI, such as:
 
      {
@@ -501,7 +504,8 @@ statement MakeForloopWithIndexDeclaration(list decls,
   statement for_s = MakeForloop(expression_undefined, e2, e3, body);
   /* We inject the for in its declaration statement to have the naive
      representation: */
-  insert_statement(decl, for_s, false);
+  // insert_statement(decl, for_s, false);
+  append_statement_to_block_statement(decl, for_s);
   // Gather all the direct declarations from the statements in the block
   list dl = statements_to_direct_declarations(statement_block(decl));
   // to put them on the block statement:

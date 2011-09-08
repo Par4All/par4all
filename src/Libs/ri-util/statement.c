@@ -2302,11 +2302,15 @@ statement_to_line_number(statement s)
  *
  * s cannot be a declaration statement, because the insertion scheme
  * used would modify its scope. Also s1 cannot be a declaration if s
- * is not a sequence.
+ * is not a sequence. And if s is a sequence
+ * add_declaration_statement() should be used instead.
  */
 
 void insert_statement(statement s, statement s1, bool before)
 {
+  pips_assert("Neither s nor s1 are declaration statements",
+	      !declaration_statement_p(s)
+	      && !declaration_statement_p(s1));
   list ls;
   instruction i = statement_instruction(s);
   if (instruction_sequence_p(i))
@@ -2356,6 +2360,14 @@ void insert_statement(statement s, statement s1, bool before)
 
       update_statement_instruction(s, make_instruction_sequence(make_sequence(ls)));
     }
+}
+
+void append_statement_to_block_statement(statement b, statement s)
+{
+  pips_assert("b is a block statement", statement_block_p(b));
+  list sl = statement_block(b);
+  sequence_statements(statement_sequence(b)) =
+    gen_nconc(sl, CONS(STATEMENT, s, NIL));
 }
 
 // there should be a space at the beginning of the string
