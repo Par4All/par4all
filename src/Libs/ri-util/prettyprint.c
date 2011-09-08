@@ -4287,7 +4287,7 @@ text text_statement_enclosed(entity module,
      except for the side effects of gen_list_and_not(), so dl and idl
      should be copied first. */
     if(statement_block_p(stmt)) {
-      list idl = statement_to_declarations(stmt);
+      list idl = statement_to_direct_declarations(stmt);
       if(ENDP(dl) && !ENDP(idl)) {
 	/* This may occur when declaration statements are added using
 	   subsequences by somebody forgetfull of scope issues */
