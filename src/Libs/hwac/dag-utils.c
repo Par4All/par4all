@@ -1250,6 +1250,7 @@ static bool dag_normalize(dag d)
       {
         changed = true;
         // sub_const -> add_const(opposite)
+        // does it always make sense for unsigned pixels?
         vtxcontent_opid(ct) = hwac_freia_api_index(AIPO "add_const");
         call_function(c) = local_name_to_top_level_entity(AIPO "add_const");
         list l3 = CDR(CDR(args));
