@@ -2807,8 +2807,8 @@ bool add_statement_declarations(statement s, list *statement_to_all_included_dec
   return true;
 }
 
-/* Get a list of all variables declared recursively within a statement
- * works for any newgen type, not only statements
+/* Get a list of all variables declared recursively within a statement.
+ * It works for any newgen type, not only statements.
  * Warning: the list must be freed !
  */
 list statement_to_declarations(void* s)
@@ -2829,8 +2829,31 @@ list statements_to_declarations(list sl)
         dl=gen_nconc(dl,statement_to_declarations(st));
     return dl;
 }
+
 
-list statement_to_direct_declarations(statement st)
+static list internal_statement_to_direct_declarations(statement st);
+
+static list unstructured_to_direct_declarations(unstructured u)
+{
+  list blocks = NIL; // list of statements
+  control c_in = unstructured_control(u); // entry point of u
+  list dl = NIL; // declaration list
+
+  CONTROL_MAP(c,
+	      {
+		statement s = control_statement(c);
+		list sdl = internal_statement_to_direct_declarations(s);
+		dl = gen_nconc(dl, sdl);
+	      },
+	      c_in,
+	      blocks);
+
+  gen_free_list(blocks);
+  return dl;
+}
+
+/* No recursive descent */
+static list internal_statement_to_direct_declarations(statement st)
 {
   list sdl = NIL;
 
@@ -2843,45 +2866,52 @@ list statement_to_direct_declarations(statement st)
   return sdl;
 }
 
-list unstructured_to_direct_declarations(unstructured u)
-{
-  list blocks = NIL; // list of statements
-  control c_in = unstructured_control(u); // entry point of u
-  list dl = NIL; // declaration list
-
-  CONTROL_MAP(c,
-	      {
-		statement s = control_statement(c);
-		list sdl = statement_to_direct_declarations(s);
-		dl = gen_nconc(dl, sdl);
-	      },
-	      c_in,
-	      blocks);
-
-  gen_free_list(blocks);
-  return dl;
-}
-
 /* Returns the declarations contained directly in the declaration
-   statements of a list of statement.
+   statements of a list of statements.
 
    @param sl
    List of statements
 
-   @return a newly allocated list of entities appearing the statement
-   declarations of the list. No recursive descent in loops or tests
-   because only variables of the current scope are returned. Recursive
-   descent in unstructured statements because their statements are in
-   the same scope as the statements in list sl
+   @return a newly allocated list of entities appearing in the statement
+   declarations of the list. No recursive descent in loops or tests or
+   sequences because only variables of the current scope are
+   returned. Recursive descent in unstructured statements because
+   their statements are in the same scope as the statements in list sl
 */
 list statements_to_direct_declarations(list sl)
 {
   list  dl = NIL;
   FOREACH(STATEMENT,st,sl) {
-    list sdl = statement_to_direct_declarations(st);
+    list sdl = internal_statement_to_direct_declarations(st);
     dl = gen_nconc(dl, sdl);
   }
 
+  return dl;
+}
+
+/* Returns the declarations contained directly in a statement s
+
+   @param s
+   any kind of statement
+
+   @return a newly allocated list of entities appearing statement s.
+   If s is a sequence, look for all declaration statements in the
+   statement list of s.
+
+   No recursive descent in loops or tests or sequences because only
+   variables of the current scope are returned. Recursive descent in
+   unstructured statements because their statements are in the same
+   scope as the statements in list sl
+*/
+list statement_to_direct_declarations(statement s)
+{
+  list dl = NIL;
+  if(statement_block_p(s)) {
+    list sl = statement_block(s);
+    dl = statements_to_direct_declarations(sl);
+  }
+  else
+    dl = internal_statement_to_direct_declarations(s);
   return dl;
 }
 

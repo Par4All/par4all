@@ -2709,9 +2709,12 @@ static list words_variable_or_function(entity module, entity e, bool is_first, l
   /* This part is for declarator initialization if there is.  If
      the entity is declared extern wrt current module, do not add
      this initialization*/
-  if (!entity_undefined_p(module)
+  if (/* normal mode: module is defined */
+      (!entity_undefined_p(module)
       && !extern_entity_p(module,e)
-      && !value_undefined_p(val)) {
+       && !value_undefined_p(val))
+      /* debugging mode: module is often undefined */
+      || (entity_undefined_p(module) && !value_undefined_p(val))) {
     if (value_expression_p(val)) {
       expression exp = value_expression(val);
       pc = CHAIN_SWORD(pc," = ");
