@@ -994,7 +994,7 @@ void p4a_load_kernel(const char *kernel,...)
 
   // If not found ...
   if (!k) {
-    P4A_skip_debug(P4A_dump_message("The kernel %s is loaded for the first time\n",kernel));
+    P4A_skip_debug(0,P4A_dump_message("The kernel %s is loaded for the first time\n",kernel));
 
 #ifdef __cplusplus
     k = new p4a_cl_kernel(kernel);
@@ -1006,7 +1006,7 @@ void p4a_load_kernel(const char *kernel,...)
     
     nKernel++; 
     char* kernelFile =  k->file_name;
-    P4A_skip_debug(P4A_dump_message("Program and Kernel creation from %s\n",kernel));
+    P4A_skip_debug(0,P4A_dump_message("Program and Kernel creation from %s\n",kernel));
     size_t kernelLength=0;
     const char *comment = "// This kernel was generated for P4A\n";
   // Same design as the NVIDIA oclLoadProgSource
@@ -1014,11 +1014,11 @@ void p4a_load_kernel(const char *kernel,...)
 					   comment,
 					   &kernelLength);
     if (cSourceCL == NULL)
-      P4A_skip_debug(P4A_dump_message("source du program null\n"));
+      P4A_skip_debug(0,P4A_dump_message("source du program null\n"));
     //else
     // P4A_skip_debug(P4A_dump_message("%s\n",cSourceCL));
       
-    P4A_skip_debug(P4A_dump_message("Kernel length = %lu\n",kernelLength));
+    P4A_skip_debug(0,P4A_dump_message("Kernel length = %lu\n",kernelLength));
     
     /*Create and compile the program : 1 for 1 kernel */
     p4a_program=clCreateProgramWithSource(p4a_context,1,

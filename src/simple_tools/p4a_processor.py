@@ -1107,9 +1107,10 @@ class p4a_processor(object):
                     os.remove(end_file)
                 except os.error:
                     pass
-                h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
-                p4a_util.merge_files (end_file, [h_file, output_file])
-                p4a_util.warn("end_file after join "+end_file)                        
+               # h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
+                p4a_util.merge_files (end_file, [output_file])
+                p4a_util.warn("end_file after join "+end_file)
+                     
 
             if (self.fortran == False):
                 # for C generate the header file

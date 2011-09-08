@@ -495,6 +495,7 @@ def main():
             accel_openmp = options.accel,
             icc = options.icc,
             cuda = options.cuda,
+            opencl=options.opencl,            
             atomic = options.atomic,
             com_optimization = options.com_optimization,
             cuda_cc = options.cuda_cc,

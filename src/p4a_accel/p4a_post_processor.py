@@ -156,7 +156,17 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
 """
     for include in includes:
         header += '#include "' + include + '"\n'
-    content = header + content
+    
+    #OpenCL only; inject P4A_wrapper_proto declaration. Wrapper contains 
+    #call to load kernels.
+    opencl_wrapper=re.search("""(?s)//Opencl wrapper declaration\n(.*?)(?#
+    # Get the p4a_wrapper_... call with its arguments:
+    )(p4a_wrapper_\\w+?)\\(([^;]*?)\\;""",
+		content)
+    if opencl_wrapper:
+		content=header+"P4A_wrapper_proto("+opencl_wrapper.group(2)+", "+opencl_wrapper.group(3)+";\n" + content
+    else:
+		content = header + content
 
     # Clean-up headers and inject standard headers:
     ## content = re.sub("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*/\* Define some macros helping to catch buffer overflows.  \*/",
@@ -165,7 +175,6 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     # Inject run time initialization:
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
-
 
     # Now the outliner output all the declarations in one line, so put
     # only one function per line for further replacement:
@@ -236,7 +245,7 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     #int i;
     #P4A_call_accel_kernel_1d("p4a_wrapper_main.cl", n, a[n]);
 	 
-    content = re.sub("(p4a_wrapper_\\w+)(\)|,)", "\"\\1.cl\"\\2", content)
+    #content = re.sub("(p4a_wrapper_\\w+)(\)|,)", "\"\\1.cl\"\\2", content)
 
     # Get the virtual processor coordinates:
     ## Change

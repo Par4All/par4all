@@ -34,7 +34,6 @@ extern "C" {
 /* For size_t: */
 #include <stddef.h>
 
-
 /** Note that in CUDA and OpenCL there is 3 dimensions max: */
 enum { P4A_vp_dim_max = 3 };
 
@@ -236,8 +235,15 @@ do { \
   if(p4a_debug_level>=level) { \
     debug_stuff; \
   } \
-} while(0);
+} while(0)
 
+/*
+#ifdef P4A_DEBUG
+#define P4A_skip_debug(debug_stuff) debug_stuff
+#else
+#define P4A_skip_debug(debug_stuff)
+#endif
+*/
 #include <stdio.h>
 
 /** Output a debug message à la printf */

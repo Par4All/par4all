@@ -33,9 +33,13 @@
 #include <fcntl.h>
 #include <sys/time.h>
 
+/* For checking stack size */
+#include <p4a_stacksize_test.h>
+
 // Includes the kernel and variable qualifiers.
 // Some are used when launching the kernel.
 //#include "p4a_accel_wrapper-OpenCL.h"
+
 
 /** @addtogroup P4A_log Debug messages and errors tracking.
     
@@ -651,8 +655,8 @@ parameters types are resolved.
 					  (int) P4A_CL_ITEM_PER_GROUP_IN_1D)}; \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   size_t grid_descriptor_name = {(int)size};				\
-  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
-  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
+  P4A_skip_debug(0,P4A_dump_grid_descriptor(grid_descriptor_name););	\
+  P4A_skip_debug(0,P4A_dump_block_descriptor(block_descriptor_name);)
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
@@ -700,15 +704,16 @@ parameters types are resolved.
   global_x *= p4a_block_x;						\
   int global_y = n_y_iter;						\
   size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; \
-  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
-  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
+  P4A_skip_debug(0,P4A_dump_grid_descriptor(grid_descriptor_name););	\
+  P4A_skip_debug(0,P4A_dump_block_descriptor(block_descriptor_name);)
 
 
-/** Dump a CL dim2 descriptor with an introduction message */
+/** Dump a CL dim2 descriptor with an introduction message 
+ *  OG:change descriptor_name[0] to descriptor_name, gcc does not accept, still question for one dim ?*/
 #define P4A_dump_descriptor(message, descriptor_name)			\
   P4A_dump_message(message "\""  #descriptor_name "\" of size %zu x %zu\n", \
-		   descriptor_name[0],					\
-		   descriptor_name[1])
+		   descriptor_name,					\
+		   descriptor_name)
 
 /** Dump a CL dim3 block descriptor */
 #define P4A_dump_block_descriptor(descriptor_name)			\
@@ -756,8 +761,8 @@ parameters types are resolved.
 */
 
 #define P4A_call_accel_kernel(context, parameters)			\
-  P4A_skip_debug(P4A_dump_location());					\
-  P4A_skip_debug(P4A_dump_message("Invoking %s with %s\n",	        \
+  P4A_skip_debug(0,P4A_dump_location());					\
+  P4A_skip_debug(0,P4A_dump_message("Invoking %s with %s\n",	        \
 				  #context,				\
 				  #parameters));			\
   P4A_TIMING_accel_timer_start;						\
@@ -857,7 +862,7 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     timer_call_from_p4a = false;					\
     P4A_TIMING_accel_timer_stop;					\
     P4A_TIMING_display_elasped_time(Kernel and arguments loading);	\
-    P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel	\
+    P4A_skip_debug(0,P4A_dump_message("Calling 1D kernel \"" #kernel	\
 				    "\" of size %d\n",P4A_n_iter_0));	\
     P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
 				     P4A_block_descriptor,		\
@@ -896,7 +901,7 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     timer_call_from_p4a = true;						\
     P4A_accel_timer_stop_and_float_measure();				\
     timer_call_from_p4a = false;					\
-    P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel	\
+    P4A_skip_debug(0,P4A_dump_message("Calling 2D kernel \"" #kernel	\
 				    "\" of size (%dx%d)\n",		\
 				    P4A_n_iter_0, P4A_n_iter_1));	\
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
