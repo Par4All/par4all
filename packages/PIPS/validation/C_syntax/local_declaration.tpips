@@ -4,12 +4,14 @@ setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
 
 create local_declaration local_declaration.c
 
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
-activate C_PARSER
+#activate C_PARSER
 
 setenv PRETTYPRINT_DEBUG_LEVEL 5 
+
+display PARSED_PRINTED_FILE[do_elem]
 
 display PRINTED_FILE[do_elem]
 

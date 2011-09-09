@@ -248,7 +248,7 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "main" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "t0" [shape=circle];
+  "i0" [shape=circle];
   "t2" [shape=circle];
   "t4" [shape=circle];
 
@@ -256,8 +256,6 @@ digraph "dag_cleaned_0" {
   "i3" [shape=circle];
 
   // computation vertices
-  "t0" -> "198 E8";
-  "t0" -> "197 D8";
   "230 thr" [shape=parallelogram];
   "230 thr" -> "i3";
   "228 <" [shape=trapezium,orientation=270];
@@ -297,12 +295,14 @@ digraph "dag_cleaned_0" {
   "198 E8" -> "199 -" [label="imgtmp_1"];
   "197 D8" [shape=box];
   "197 D8" -> "199 -" [label="imtmp_3"];
+  "i0" -> "197 D8";
+  "i0" -> "198 E8";
 
   // external copies: 1
-  "t0'" [shape=circle];
+  "t0" [shape=circle];
   "t0 =" [shape=circle,label="=",style="dashed"]
-  "i0" -> "t0 =";
-  "t0 =" -> "t0'";
+  "i0'" -> "t0 =";
+  "t0 =" -> "t0";
 }
 
 ! updated function for
@@ -385,8 +385,8 @@ int main(int argc, char *argv[])
       
       imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
 
-      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
-      freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);          /*0198*/
+      freia_aipo_dilate_8c(imtmp_3, i0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp, i0, freia_morpho_kernel_8c);          /*0198*/
       freia_aipo_sub(imgtmp, imtmp_3, imgtmp);                          /*0199*/
       freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
       freia_aipo_erode_8c(i1, t2, freia_morpho_kernel_8c);              /*0204*/
@@ -713,7 +713,7 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "main" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "t0" [shape=circle];
+  "i0" [shape=circle];
   "t2" [shape=circle];
   "t4" [shape=circle];
 
@@ -721,8 +721,6 @@ digraph "dag_cleaned_0" {
   "i3" [shape=circle];
 
   // computation vertices
-  "t0" -> "198 E8";
-  "t0" -> "197 D8";
   "230 thr" [shape=parallelogram];
   "230 thr" -> "i3";
   "228 <" [shape=trapezium,orientation=270];
@@ -762,17 +760,19 @@ digraph "dag_cleaned_0" {
   "198 E8" -> "199 -" [label="imgtmp"];
   "197 D8" [shape=box];
   "197 D8" -> "199 -" [label="imtmp_3"];
+  "i0" -> "197 D8";
+  "i0" -> "198 E8";
 
   // external copies: 1
-  "t0'" [shape=circle];
+  "t0" [shape=circle];
   "t0 =" [shape=circle,label="=",style="dashed"]
-  "i0" -> "t0 =";
-  "t0 =" -> "t0'";
+  "i0'" -> "t0 =";
+  "t0 =" -> "t0";
 }
 // graph for dag "main_helper_0_0" of module "main" in dot format
 digraph "main_helper_0_0" {
   // inputs
-  "t0" [shape=circle];
+  "i0" [shape=circle];
 
   // outputs
   "imgtmp" [shape=circle];
@@ -784,8 +784,8 @@ digraph "main_helper_0_0" {
   "198 E8" -> "199 -" [label="imgtmp_1"];
   "197 D8" [shape=box];
   "197 D8" -> "199 -" [label="imtmp_3"];
-  "t0" -> "198 E8";
-  "t0" -> "197 D8";
+  "i0" -> "198 E8";
+  "i0" -> "197 D8";
 }
 // graph for dag "main_helper_0_1" of module "main" in dot format
 digraph "main_helper_0_1" {
@@ -914,7 +914,7 @@ freia_status main_helper_0_0_0(
 
 
   // STAGE 0
-  // 0`t0 [0 input 0] -> [0 poc 0] 197 dilate_8c
+  // 0`i0 [0 input 0] -> [0 poc 0] 197 dilate_8c
   // nope
   // poc 197 dilate_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
@@ -922,7 +922,7 @@ freia_status main_helper_0_0_0(
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = pi0[i];
 
-  // 0`t0 [0 input 1] -> [0 poc 1] 198 erode_8c
+  // 0`i0 [0 input 1] -> [0 poc 1] 198 erode_8c
   // nope
   // poc 198 erode_8c stage 0 side 1
   si.poc[0][1].op = SPOC_POC_ERODE;
@@ -1454,7 +1454,7 @@ int main(int argc, char *argv[])
       
       
       
-      main_helper_0_0_0(imgtmp, t0, freia_morpho_kernel_8c);            /*0197*/
+      main_helper_0_0_0(imgtmp, i0, freia_morpho_kernel_8c);            /*0197*/
       main_helper_0_1_0(i1_3, t2, freia_morpho_kernel_8c);              /*0203*/
 
       main_helper_0_2_0(i1, i1_3, imgtmp, freia_morpho_kernel_8c);      /*0208*/
@@ -1598,7 +1598,7 @@ int main(int argc, char *argv[])
       
       
       
-      main_helper_0_0_0(imgtmp, t0, freia_morpho_kernel_8c);            /*0197*/
+      main_helper_0_0_0(imgtmp, i0, freia_morpho_kernel_8c);            /*0197*/
       main_helper_0_1_0(i1_3, t2, freia_morpho_kernel_8c);              /*0203*/
 
       main_helper_0_2_0(i1, i1_3, imgtmp, freia_morpho_kernel_8c);      /*0208*/
@@ -1912,7 +1912,7 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "main" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "t0" [shape=circle];
+  "i0" [shape=circle];
   "t2" [shape=circle];
   "t4" [shape=circle];
 
@@ -1920,8 +1920,6 @@ digraph "dag_cleaned_0" {
   "i3" [shape=circle];
 
   // computation vertices
-  "t0" -> "198 E8";
-  "t0" -> "197 D8";
   "230 thr" [shape=parallelogram];
   "230 thr" -> "i3";
   "228 <" [shape=trapezium,orientation=270];
@@ -1961,17 +1959,19 @@ digraph "dag_cleaned_0" {
   "198 E8" -> "199 -" [label="imgtmp"];
   "197 D8" [shape=box];
   "197 D8" -> "199 -" [label="imtmp_3"];
+  "i0" -> "197 D8";
+  "i0" -> "198 E8";
 
   // external copies: 1
-  "t0'" [shape=circle];
+  "t0" [shape=circle];
   "t0 =" [shape=circle,label="=",style="dashed"]
-  "i0" -> "t0 =";
-  "t0 =" -> "t0'";
+  "i0'" -> "t0 =";
+  "t0 =" -> "t0";
 }
 // graph for dag "main_helper_0_0_0" of module "main" in dot format
 digraph "main_helper_0_0_0" {
   // inputs
-  "t0" [shape=circle];
+  "i0" [shape=circle];
   "t2" [shape=circle];
   "t4" [shape=circle];
 
@@ -2018,8 +2018,8 @@ digraph "main_helper_0_0_0" {
   "198 E8" -> "199 -" [label="imgtmp_1"];
   "197 D8" [shape=box];
   "197 D8" -> "199 -" [label="imtmp_3"];
-  "t0" -> "198 E8";
-  "t0" -> "197 D8";
+  "i0" -> "198 E8";
+  "i0" -> "197 D8";
 }
 
 ! acceleration function
@@ -2537,7 +2537,7 @@ freia_status main_helper_0_0_0(
 
 
   // inputs:
-  // - imagelet 1 is i0 for t0
+  // - imagelet 1 is i0 for i0
   tile_in[0][0].x = imagelet_io_1_0;
   tile_in[0][0].y = 0;
   tile_in[1][0].x = imagelet_io_1_1;
@@ -2663,7 +2663,7 @@ int main(int argc, char *argv[])
       
       
       
-      main_helper_0_0_0(i3, t0, t2, t4, freia_morpho_kernel_8c, 15, 255, 1);           /*0197*/
+      main_helper_0_0_0(i3, i0, t2, t4, freia_morpho_kernel_8c, 15, 255, 1);           /*0197*/
       
       
       
@@ -2791,7 +2791,7 @@ int main(int argc, char *argv[])
       
       
       
-      main_helper_0_0_0(i3, t0, t2, t4, freia_morpho_kernel_8c, 15, 255, 1);           /*0197*/
+      main_helper_0_0_0(i3, i0, t2, t4, freia_morpho_kernel_8c, 15, 255, 1);           /*0197*/
       
       
       
@@ -3096,7 +3096,7 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "main" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "t0" [shape=circle];
+  "i0" [shape=circle];
   "t2" [shape=circle];
   "t4" [shape=circle];
 
@@ -3104,8 +3104,6 @@ digraph "dag_cleaned_0" {
   "i3" [shape=circle];
 
   // computation vertices
-  "t0" -> "198 E8";
-  "t0" -> "197 D8";
   "230 thr" [shape=parallelogram];
   "230 thr" -> "i3";
   "228 <" [shape=trapezium,orientation=270];
@@ -3145,17 +3143,19 @@ digraph "dag_cleaned_0" {
   "198 E8" -> "199 -" [label="imgtmp_1"];
   "197 D8" [shape=box];
   "197 D8" -> "199 -" [label="imtmp_3"];
+  "i0" -> "197 D8";
+  "i0" -> "198 E8";
 
   // external copies: 1
-  "t0'" [shape=circle];
+  "t0" [shape=circle];
   "t0 =" [shape=circle,label="=",style="dashed"]
-  "i0" -> "t0 =";
-  "t0 =" -> "t0'";
+  "i0'" -> "t0 =";
+  "t0 =" -> "t0";
 }
 // graph for dag "main_helper_0_0" of module "main" in dot format
 digraph "main_helper_0_0" {
   // inputs
-  "t0" [shape=circle];
+  "i0" [shape=circle];
   "t2" [shape=circle];
   "t4" [shape=circle];
 
@@ -3202,8 +3202,8 @@ digraph "main_helper_0_0" {
   "198 E8" -> "199 -" [label="imgtmp_1"];
   "197 D8" [shape=box];
   "197 D8" -> "199 -" [label="imtmp_3"];
-  "t0" -> "198 E8";
-  "t0" -> "197 D8";
+  "i0" -> "198 E8";
+  "i0" -> "197 D8";
 }
 // graph for dag "main_helper_0_0_1" of module "main" in dot format
 digraph "main_helper_0_0_1" {
@@ -3620,8 +3620,8 @@ int main(int argc, char *argv[])
       
       imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
 
-      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
-      freia_aipo_erode_8c(imgtmp_1, t0, freia_morpho_kernel_8c);        /*0198*/
+      freia_aipo_dilate_8c(imtmp_3, i0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp_1, i0, freia_morpho_kernel_8c);        /*0198*/
       freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
       freia_aipo_erode_8c(i1_4, t2, freia_morpho_kernel_8c);            /*0204*/
       freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
@@ -3781,8 +3781,8 @@ int main(int argc, char *argv[])
       
       imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);          /*0219*/
 
-      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);        /*0197*/
-      freia_aipo_erode_8c(imgtmp_1, t0, freia_morpho_kernel_8c);        /*0198*/
+      freia_aipo_dilate_8c(imtmp_3, i0, freia_morpho_kernel_8c);        /*0197*/
+      freia_aipo_erode_8c(imgtmp_1, i0, freia_morpho_kernel_8c);        /*0198*/
       freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);        /*0203*/
       freia_aipo_erode_8c(i1_4, t2, freia_morpho_kernel_8c);            /*0204*/
       freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);        /*0220*/
