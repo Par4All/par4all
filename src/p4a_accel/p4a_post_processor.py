@@ -159,12 +159,15 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     
     #OpenCL only; inject P4A_wrapper_proto declaration. Wrapper contains 
     #call to load kernels.
-    opencl_wrapper=re.search("""(?s)//Opencl wrapper declaration\n(.*?)(?#
+    opencl_wrappers=re.findall("""(?s)//Opencl wrapper declaration\n(.*?)(?#
     # Get the p4a_wrapper_... call with its arguments:
-    )(p4a_wrapper_\\w+?)\\(([^;]*?)\\;""",
+    )(p4a_wrapper_\\w+)([^;]*?)\\;""",
 		content)
-    if opencl_wrapper:
-		content=header+"P4A_wrapper_proto("+opencl_wrapper.group(2)+", "+opencl_wrapper.group(3)+";\n" + content
+    if opencl_wrappers:
+		wrapper_proto_declaration=""
+		for wrapper in opencl_wrappers:
+			wrapper_proto_declaration= wrapper_proto_declaration + "P4A_wrapper_proto("+wrapper[1]+wrapper[2]+";\n"
+		content=header+ wrapper_proto_declaration + content
     else:
 		content = header + content
 

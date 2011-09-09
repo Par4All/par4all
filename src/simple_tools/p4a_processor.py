@@ -987,32 +987,35 @@ class p4a_processor(object):
                 p4a_util.warn("output file " + output_file)                                           
                 p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
 
-    def merge_ml (self):
-        """ merge main and launcher in one file. The order is
+    def merge_function_launcher (self):
+        """ merge main and launchers in one file. The order is
         important the launcher call the wrapper that call the kernel. So
         they have to be in the inverse order into the file.
         """
-        for kernel in self.kernels:
-            # find the associated launcher with the kernel
-            launcher = self.kernel_to_launcher_name (kernel)
 
-            launcher_file = os.path.join(self.workspace.dirname, launcher,
-                                         launcher + ".pre.c") 
-            if self.opencl:				
-                # OpenCL:
-                # Merge main and launcher
-                main_file = os.path.join(self.workspace.dirname, "main",
-                                            "main.pre.c")
+        main_file = os.path.join(self.workspace.dirname, "main",
+                                            "main.pre.c")        
                 
-                #should be the name of the file (Onil)
-                for file in self.files:
-					(dir, name) = os.path.split(file)
-					output_file = os.path.join(self.workspace.dirname, "",
-                                            name)																				
-					p4a_util.merge_files (output_file, [launcher_file, main_file])
-					p4a_util.warn("output file merge ml " + output_file)
-					self.accel_post(output_file,
-                                os.path.join(self.workspace.dirname, "P4A"))                                                                                                  				
+        #should be the name of the file (Onil)
+        for file in self.files:
+            (dir, name) = os.path.split(file)
+            output_file = os.path.join(self.workspace.dirname, "",
+                name)
+            launcher_files=[]
+            for kernel in self.kernels:
+				# find the associated launcher with the kernel
+                launcher = self.kernel_to_launcher_name (kernel)
+
+                launcher_files.append(os.path.join(self.workspace.dirname, launcher,
+                                         launcher + ".pre.c") )
+            
+            launcher_files.append(main_file) 
+            p4a_util.warn("launcher files merge ml " + launcher_files[0] + launcher_files[1])                                        					                        																				
+            p4a_util.merge_files (output_file, launcher_files)
+            p4a_util.warn("output file merge ml " + output_file)
+            self.accel_post(output_file,
+                os.path.join(self.workspace.dirname, "P4A"))
+																																		
 
     def save_header (self, output_dir, name):
         content = "/*All the generated includes are summarized here*/\n\n"
@@ -1107,8 +1110,8 @@ class p4a_processor(object):
                     os.remove(end_file)
                 except os.error:
                     pass
-               # h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
-                p4a_util.merge_files (end_file, [output_file])
+                h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
+                p4a_util.merge_files (end_file, [h_file, output_file])
                 p4a_util.warn("end_file after join "+end_file)
                      
 
@@ -1208,7 +1211,7 @@ class p4a_processor(object):
                     # will only be the wrappers and the kernel (cf save_generated).
                     output_file = p4a_util.change_file_ext(output_file, ".cu")
                 if (self.opencl == True):
-                    self.merge_ml()                                      
+                    self.merge_function_launcher()                                      
                     #output_file = p4a_util.change_file_ext(output_file, ".c")
 					
             # Copy the PIPS production to its destination:
