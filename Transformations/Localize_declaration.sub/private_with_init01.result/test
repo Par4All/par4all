@@ -92,10 +92,10 @@ int main()
       int i;
       for(i = 1; i <= n; i += 1) {
          //PIPS generated variable
-         int k1;
-         k1 = 1;
-         while (k1<10)
-            k1 = k1+1;
+         int k;
+         k = 1;
+         while (k<10)
+            k = k+1;
       }
    }
 
