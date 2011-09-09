@@ -106,31 +106,31 @@ int main(int argc, char *argv[])
    //PIPS generated variable
    register freia_status _return9, _return10;
    //PIPS generated variable
-   register uint32_t i_0, i_1;
+   register freia_status ret_0;
    //PIPS generated variable
    int32_t neighborTransposed_0[9];
    //PIPS generated variable
-   register freia_status ret_0;
-   //PIPS generated variable
-   register uint32_t i_2, i_3;
-   //PIPS generated variable
-   int32_t neighborTransposed_1[9];
+   register uint32_t i_0, i_1;
    //PIPS generated variable
    register freia_status ret_1;
    //PIPS generated variable
-   register int i_4;
+   int32_t neighborTransposed_1[9];
+   //PIPS generated variable
+   register uint32_t i_2, i_3;
    //PIPS generated variable
    register freia_status ret_2;
    //PIPS generated variable
-   register int32_t volprevious;
-   //PIPS generated variable
-   int32_t volcurrent;
+   register int i_4;
    //PIPS generated variable
    register freia_status ret_3 = 0;
    //PIPS generated variable
-   register int i_5;
+   int32_t volcurrent;
+   //PIPS generated variable
+   register int32_t volprevious;
    //PIPS generated variable
    register freia_status ret_4;
+   //PIPS generated variable
+   register int i_5;
    
    // there should be a freia_initialize()? yup we should have one for opencl
    // 1st arg: 1=GPU, 2=CPU, 2nd arg sub-device
@@ -607,13 +607,13 @@ int main(int argc, char *argv[])
    
    
    freia_aipo_dilate_8c(out, imWork1, freia_morpho_kernel_8c);
-   i_5 = 1;
+   i_4 = 1;
    freia_aipo_dilate_8c(out, out, freia_morpho_kernel_8c);
-   i_5 = 1+1;
+   i_4 = 1+1;
    
    
    _return3 = 0;
-   ret_4 = 0;
+   ret_2 = 0;
 
    ret_3 = freia_aipo_global_vol(out, &volcurrent);
    do {
@@ -621,15 +621,15 @@ int main(int argc, char *argv[])
       
       
       freia_aipo_erode_8c(out, out, freia_morpho_kernel_8c);
-      i_4 = 1;
+      i_5 = 1;
       
       
       _return10 = 0;
-      ret_2 = 0;
-      ret_2 |= freia_aipo_sup(out, out, imWork1);
+      ret_4 = 0;
+      ret_4 |= freia_aipo_sup(out, out, imWork1);
       
       
-      _return9 = ret_2;
+      _return9 = ret_4;
       ret_3 |= _return9;
       ret_3 |= freia_aipo_global_vol(out, &volcurrent);
    }
@@ -637,10 +637,10 @@ int main(int argc, char *argv[])
    
    
    _return4 = ret_3;
-   ret_4 |= _return4;
+   ret_2 |= _return4;
    
    
-   _return0 = ret_4;
+   _return0 = ret_2;
    
    // Change  pixel values for the display
    freia_aipo_inf_const(imZone1, imZone1, 40);

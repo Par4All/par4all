@@ -264,37 +264,37 @@ int main(int argc, char *argv[])
    //PIPS generated variable
    register freia_status _return0, _return1, _return2, _return3, _return4, _return5, _return6, _return7, _return8, _return9, _return10, _return11, _return12, _return13, _return14, _return15, _return16, _return17;
    //PIPS generated variable
-   register int i_0, i_1;
-   //PIPS generated variable
    register freia_status ret_0;
-   //PIPS generated variable
-   register int i_2, i_3;
    //PIPS generated variable
    freia_data2d *imtmp_0;
    //PIPS generated variable
-   register freia_status ret_1;
+   register int i_0, i_1;
    //PIPS generated variable
-   register int i_4, i_5;
+   register freia_status ret_1;
    //PIPS generated variable
    freia_data2d *imtmp_1;
    //PIPS generated variable
+   register int i_2, i_3;
+   //PIPS generated variable
    register freia_status ret_2;
    //PIPS generated variable
-   register int i_6, i_7;
+   register int i_4, i_5;
    //PIPS generated variable
    register freia_status ret_3;
    //PIPS generated variable
-   register int i_8, i_9;
-   //PIPS generated variable
    freia_data2d *imtmp_2;
+   //PIPS generated variable
+   register int i_6, i_7;
    //PIPS generated variable
    register freia_status ret_4;
    //PIPS generated variable
-   register int i_10, i_11;
-   //PIPS generated variable
    freia_data2d *imtmp_3;
    //PIPS generated variable
+   register int i_8, i_9;
+   //PIPS generated variable
    register freia_status ret_5;
+   //PIPS generated variable
+   register int i_10, i_11;
 
    freia_initialize(argc, argv);
    
@@ -368,127 +368,127 @@ int main(int argc, char *argv[])
       freia_aipo_copy(i1, i0);
       freia_aipo_copy(t0, i1);
 
-      imtmp_3 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
+      imtmp_0 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
       
       
-      freia_aipo_dilate_8c(imtmp_3, t0, freia_morpho_kernel_8c);
-      i_11 = 1;
+      freia_aipo_dilate_8c(imtmp_0, t0, freia_morpho_kernel_8c);
+      i_0 = 1;
       
       
       _return6 = 0;
-      ret_5 = 0;
+      ret_0 = 0;
       
       
       freia_aipo_erode_8c(imgtmp, t0, freia_morpho_kernel_8c);
-      i_10 = 1;
+      i_1 = 1;
       
       
       _return12 = 0;
-      ret_5 |= freia_aipo_sub(imgtmp, imtmp_3, imgtmp);
+      ret_0 |= freia_aipo_sub(imgtmp, imtmp_0, imgtmp);
 
-      freia_common_destruct_data(imtmp_3);
+      freia_common_destruct_data(imtmp_0);
       _return0 = 0;
 
-      imtmp_2 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
+      imtmp_1 = freia_common_create_data(i1->bpp, i1->widthWa, i1->heightWa);
       
       
-      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);
-      i_9 = 1;
+      freia_aipo_dilate_8c(imtmp_1, t2, freia_morpho_kernel_8c);
+      i_2 = 1;
       
       
       _return7 = 0;
-      ret_4 = 0;
+      ret_1 = 0;
       
       
       freia_aipo_erode_8c(i1, t2, freia_morpho_kernel_8c);
-      i_8 = 1;
+      i_3 = 1;
       
       
       _return13 = 0;
-      ret_4 |= freia_aipo_sub(i1, imtmp_2, i1);
+      ret_1 |= freia_aipo_sub(i1, imtmp_1, i1);
 
-      freia_common_destruct_data(imtmp_2);
+      freia_common_destruct_data(imtmp_1);
       _return1 = 0;
       freia_aipo_absdiff(i1, imgtmp, i1);
       
       
       freia_aipo_erode_8c(i1, i1, freia_morpho_kernel_8c);
-      i_7 = 1;
+      i_4 = 1;
       
       
       _return14 = 0;
-      ret_3 = 0;
+      ret_2 = 0;
       
       
       freia_aipo_dilate_8c(i1, i1, freia_morpho_kernel_8c);
-      i_6 = 1;
+      i_5 = 1;
       
       
       _return8 = 0;
       
       
-      _return4 = ret_3;
+      _return4 = ret_2;
 
-      imtmp_1 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
+      imtmp_2 = freia_common_create_data(imgtmp->bpp, imgtmp->widthWa, imgtmp->heightWa);
       
       
-      freia_aipo_dilate_8c(imtmp_1, t2, freia_morpho_kernel_8c);
-      i_5 = 1;
+      freia_aipo_dilate_8c(imtmp_2, t2, freia_morpho_kernel_8c);
+      i_6 = 1;
       
       
       _return9 = 0;
-      ret_2 = 0;
+      ret_3 = 0;
       
       
       freia_aipo_erode_8c(imgtmp, t2, freia_morpho_kernel_8c);
-      i_4 = 1;
+      i_7 = 1;
       
       
       _return15 = 0;
-      ret_2 |= freia_aipo_sub(imgtmp, imtmp_1, imgtmp);
+      ret_3 |= freia_aipo_sub(imgtmp, imtmp_2, imgtmp);
 
-      freia_common_destruct_data(imtmp_1);
+      freia_common_destruct_data(imtmp_2);
       _return2 = 0;
 
-      imtmp_0 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);
+      imtmp_3 = freia_common_create_data(i2->bpp, i2->widthWa, i2->heightWa);
       
       
-      freia_aipo_dilate_8c(imtmp_0, t4, freia_morpho_kernel_8c);
-      i_3 = 1;
+      freia_aipo_dilate_8c(imtmp_3, t4, freia_morpho_kernel_8c);
+      i_8 = 1;
       
       
       _return10 = 0;
-      ret_1 = 0;
+      ret_4 = 0;
       
       
       freia_aipo_erode_8c(i2, t4, freia_morpho_kernel_8c);
-      i_2 = 1;
+      i_9 = 1;
       
       
       _return16 = 0;
-      ret_1 |= freia_aipo_sub(i2, imtmp_0, i2);
+      ret_4 |= freia_aipo_sub(i2, imtmp_3, i2);
 
-      freia_common_destruct_data(imtmp_0);
+      freia_common_destruct_data(imtmp_3);
       _return3 = 0;
       freia_aipo_absdiff(i2, imgtmp, i2);
       
       
       freia_aipo_erode_8c(i2, i2, freia_morpho_kernel_8c);
-      i_1 = 1;
+      i_10 = 1;
       
       
       _return17 = 0;
-      ret_0 = 0;
+      ret_5 = 0;
       
       
       freia_aipo_dilate_8c(i2, i2, freia_morpho_kernel_8c);
-      i_0 = 1;
+      i_11 = 1;
       
       
       _return11 = 0;
       
       
-      _return5 = ret_0;
+      _return5 = ret_5;
 
       freia_aipo_inf(i3, i2, i1);
 
