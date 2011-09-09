@@ -109,7 +109,7 @@ static void rename_loop_index(loop l, hash_table renamings)
    must be created or not. */
 static void rename_statement_declarations(statement s, hash_table renamings)
 {
-  if (continue_statement_p(s) /* declaration_statement_p(s) */) {
+  if (declaration_statement_p(s)) {
     list inits = NIL;
     list decls = statement_declarations(s); // Non-recursive
     instruction old = statement_instruction(s);
@@ -137,9 +137,9 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	    && value_unknown_p(entity_initial(nvar))) {
 	  expression ie = variable_initial_expression(var);
 	  statement is = make_assign_statement(entity_to_expression(nvar), ie);
-      gen_context_recurse(ie,renamings,
-                        reference_domain, gen_true, rename_reference);
-      replace_entities(entity_type(nvar),renamings);
+	  gen_context_recurse(ie,renamings,
+			      reference_domain, gen_true, rename_reference);
+	  replace_entities(entity_type(nvar),renamings);
 
 	  inits = gen_nconc(inits, CONS(statement, is, NIL));
 
@@ -168,7 +168,6 @@ static void rename_statement_declarations(statement s, hash_table renamings)
       RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),s);
     gen_free_list(tmp);
 
-
     if(!ENDP(inits)) {
       /* Insert the list of initialisation statements as a sequence at
 	 the beginning of s.
@@ -193,7 +192,8 @@ static void rename_statement_declarations(statement s, hash_table renamings)
       { /* C99*/
 	statement_instruction(s) =
 	  make_instruction_sequence(make_sequence(inits));
-    statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
+	/* FI: why kill he initial statement number? */
+	statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
 	if(!statement_with_empty_comment_p(s)) {
 	  string c = statement_comments(s);
 	  statement fs = STATEMENT(CAR(inits));
@@ -209,6 +209,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
     //gen_free_list(statement_declarations(s));
 
     statement_declarations(s) = ndecls;
+
     pips_debug(1, "End. Local declarations %s.\n",
 	       ENDP(ndecls)? "removed" : "updated");
   }
@@ -259,7 +260,8 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
       const char* vmn = module_name(vn);
 
       if (hash_defined_p(rdcp->renamings, v)) {
-	pips_debug(5, "Skipping the already processed variable \"%s\" \n", entity_user_name(v)); 
+	pips_debug(5, "Skipping the already processed variable \"%s\" \n",
+		   entity_user_name(v));
 	continue;
       }
 
@@ -270,8 +272,8 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	list dv = statement_declarations(ds);
 
 	if(!entity_is_argument_p(v, dv)) {
-        	pips_debug(5, "Entity is not an argument\n");
-		AddLocalEntityToDeclarations(v,get_current_module_entity(),ds);
+	  pips_debug(5, "Entity is not an argument\n");
+	  AddLocalEntityToDeclarations(v,get_current_module_entity(),ds);
 	}
 	hash_put_or_update(rdcp->renamings, v, v);
       }
@@ -284,7 +286,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	bool move_initialization_p = false;
 
 	/* Can we move or transform the initialization? */
-	if(expression_undefined_p(ie)) {
+	if(expression_undefined_p(ie) || entity_static_variable_p(v)) {
 
 	  /* No initialization issue, let's move the declaration */
 	  redeclare_p = true;
@@ -361,16 +363,19 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	  do {
 	    nv = make_entity_copy_with_new_name(v, negn, move_initialization_p);
 	    FOREACH(ENTITY, dv, dselist) {
-	      
+
 	      if (dv == v)
 	      {
-		pips_debug(8, "Skipping the variable \"%s\" we are working on\n", entity_user_name(v)); 
+		pips_debug(8, "Skipping the variable \"%s\" we are working on\n",
+			   entity_user_name(v));
 		continue;
 	      }
-	      
-	      is_same_name = strcmp(entity_user_name(dv), entity_user_name(nv)) == 0;
+
+	      is_same_name =
+		strcmp(entity_user_name(dv), entity_user_name(nv)) == 0;
 	      if (is_same_name) {
-		pips_debug(1, "Proposed variable \"%s\" conflicts with references in declaration statement\n",
+		pips_debug(1, "Proposed variable \"%s\" "
+			   "conflicts with references in declaration statement\n",
 			   entity_name(nv));
 		break;
 	      }
@@ -452,7 +457,9 @@ static void compute_renamings(statement s, const char* sc, const char* mn, hash_
   - rename loop indexes
 
   - replace declaration statements
+
   @return false if the initial condition are not met, i.e. no parent block
+
   FIXME : the return false is not implemented !
 */
 bool statement_flatten_declarations(entity module, statement s)
@@ -533,6 +540,7 @@ static void statement_purge_declarations_walker(sequence seq)
 {
     statement block = (statement)gen_get_ancestor(statement_domain,seq);
     list decls = gen_copy_seq(statement_declarations(block));
+
     FOREACH(ENTITY,e,decls)
     {
         bool decl_stat_found = false;
@@ -570,7 +578,7 @@ static void statement_purge_declarations(statement s)
    least one local variable. This is used to preserve the scoping
    mechanism used by the parser. Thus, "void foo(void){{{}}}" cannot
    be flatten. Note that clean_up_sequences could be used first to
-   avoid such cases. Funcion "void foo(void){{{extern int i;}}}"
+   avoid such cases. Function "void foo(void){{{extern int i;}}}"
    cannot be flatten either, but clean_up_sequences might help.
 
  */
@@ -620,7 +628,7 @@ bool flatten_code(const char* module_name)
   return (good_result_p);
 }
 
-
+
 /* Recurse through the statements of s and split local declarations.
    For the time being, we handle only blocks with declarations.
 
@@ -715,15 +723,20 @@ split_update_call(call c)
         }
     }
 }
+
 static void
 split_update_operator_statement_walker(statement s)
 {
+  /* FI: this should be guarded by a declaration_statement_p(s),
+     shouldn't it? */
+  if(declaration_statement_p(s)) {
     FOREACH(ENTITY,e,statement_declarations(s))
     {
         value v = entity_initial(e);
               if( !value_undefined_p(v) && value_expression_p( v ) )
                  gen_recurse(v,call_domain,gen_true, split_update_call);
     }
+  }
 }
 
 bool split_update_operator(const char* module_name)
