@@ -160,7 +160,9 @@ GenericAddLocalEntityToDeclarations(entity e, entity module, statement s,
 				    bool add_declaration_statement_p) {
   /* SG: fix the entity storage if undefined
    * it basically recompute the offset of a scalar variable
-   * I have not found how to do it for a variable size array, so I just dropped the case
+   * I have not found how to do it for a variable size array, so I
+   * just dropped the case -> a variable size array must be allocated
+   * in a different area, STACK_AREA, where offsets are not computed
    */
   if( storage_undefined_p(entity_storage(e)) && entity_variable_p(e) )
     {
@@ -206,7 +208,7 @@ GenericAddLocalEntityToDeclarations(entity e, entity module, statement s,
       /* The C prettyprinter is not based on code_declarations or
 	 statement_declarations but on declaration statements, which
 	 happen to be continue statment for the time being. */
-      if(!continue_statement_p(s) && add_declaration_statement_p) {
+      if(!declaration_statement_p(s) && add_declaration_statement_p) {
 	/* To preserve the source layout, declarations are
 	   statements */
 	add_declaration_statement(s, e);

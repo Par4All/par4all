@@ -141,7 +141,11 @@ static void freia_cleanup_status(statement s, set helpers)
 
 /**************************************************** LOOK FOR IMAGE SHUFFLE */
 
-static bool fis_call_flt(call c, bool * shuffle)
+typedef struct {
+  set shuffled;
+} fis_ctx;
+
+static bool fis_call_flt(call c, fis_ctx * ctx)
 {
   list args = call_arguments(c);
   if (ENTITY_ASSIGN_P(call_function(c)))
@@ -152,8 +156,8 @@ static bool fis_call_flt(call c, bool * shuffle)
     if (a2!=entity_undefined &&
         freia_image_variable_p(a1) && freia_image_variable_p(a2))
     {
-      *shuffle = true;
-      gen_recurse_stop(NULL);
+      set_add_element(ctx->shuffled, ctx->shuffled, a1);
+      set_add_element(ctx->shuffled, ctx->shuffled, a2);
       return false;
     }
   }
@@ -162,11 +166,11 @@ static bool fis_call_flt(call c, bool * shuffle)
 
 /* @return whether there is an image shuffle, i.e. image pointer assignments
  */
-static bool freia_image_shuffle(statement s)
+static bool freia_image_shuffle(statement s, set shuffled)
 {
-  bool shuffle = false;
-  gen_context_recurse(s, &shuffle, call_domain, fis_call_flt, gen_null);
-  return shuffle;
+  fis_ctx ctx = { shuffled };
+  gen_context_recurse(s, &ctx, call_domain, fis_call_flt, gen_null);
+  return set_size(shuffled)!=0;
 }
 
 /******************************************************* SWITCH CAST TO COPY */
@@ -603,7 +607,8 @@ string freia_compile(string module, statement mod_stat, string target)
     pips_internal_error("unexpected target %s", target);
 
   // check for image shuffles...
-  if (freia_image_shuffle(mod_stat))
+  set shuffled = set_make(set_pointer);
+  if (freia_image_shuffle(mod_stat, shuffled))
   {
     if (get_bool_property("FREIA_ALLOW_IMAGE_SHUFFLE"))
       pips_user_warning("image shuffle found in %s, "
@@ -666,9 +671,11 @@ string freia_compile(string module, statement mod_stat, string target)
   else if (freia_opencl_p(target))
     fprintf(helper, "%s", FREIA_OPENCL_INCLUDES);
 
-  // hmmm...
+  // hmmm... should rely on use-defs
   hash_table occs = freia_build_image_occurrences(mod_stat, NULL, NULL);
   set output_images = freia_compute_current_output_images();
+  // hmmm... panic mode
+  set_union(output_images, output_images, shuffled);
 
   // first explicitely build and fix the list of dags,
   // with some reverse order hocus-pocus for outputs computations...
@@ -752,6 +759,7 @@ string freia_compile(string module, statement mod_stat, string target)
   freia_clean_image_occurrences(occs);
   freia_close_dep_cache();
   set_free(output_images), output_images = NULL;
+  set_free(shuffled), shuffled = NULL;
   if (helpers) set_free(helpers), helpers = NULL;
   gen_free_list(fsi.seqs);
   set_free(fsi.in_loops);

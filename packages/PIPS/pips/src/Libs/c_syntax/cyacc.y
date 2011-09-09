@@ -669,9 +669,8 @@ globals:
 |   {is_external = true; } global globals
                         {
 			  list dsl = $3;
-			  list dl = statements_to_declarations(dsl);
 			  list gdsl = $2;
-			  list gdl = statements_to_declarations(gdsl);
+			  list dl = statements_to_declarations(dsl);
 			  /* Each variable should be declared only
 			     once. Type and initial value conflict
 			     should have been detected earlier. */
@@ -679,13 +678,16 @@ globals:
 			    pips_assert("Each variable is declared once", gen_once_p(dl));
 			  }
 			  ifdebug(9) {
+			    list gdl = statements_to_declarations(gdsl);
 			    fprintf(stderr, "New variables $2 (%p) are declared\n", gdl);
 			    print_entities(gdl);
 			    fprintf(stderr, "\n");
 			    fprintf(stderr, "*******Current declarations dl (%p) are: \n", dl);
 			    print_entities(dl);
 			    fprintf(stderr, "\n");
+			    gen_free_list(gdl);
 			  }
+			  gen_free_list(dl);
 
 			  /* The order of declarations must be
 			     preserved: a structure is declared before

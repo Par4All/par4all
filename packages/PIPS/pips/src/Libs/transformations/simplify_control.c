@@ -884,7 +884,7 @@ dead_statement_rewrite(statement s)
      /* Make sure the declaration list at the block level fits the
 	declarations in the sequence in case some where eliminated */
       list dl = statement_declarations(s);
-      list idl = statement_to_declarations(s);
+      list idl = statement_to_direct_declarations(s);
       gen_free_list(dl);
       statement_declarations(s) = idl;
        break;
