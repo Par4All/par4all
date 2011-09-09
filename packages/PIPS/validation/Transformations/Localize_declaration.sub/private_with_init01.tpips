@@ -1,19 +1,90 @@
 setenv WSPACE private_with_init01
 setenv FILE $WSPACE.c
+
 delete $WSPACE
 create $WSPACE $FILE
+
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty MEMORY_EFFECTS_ONLY FALSE
+
 activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FULL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL
+
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_ALL_C_BLOCKS TRUE
+
+echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALLFUNC]
+
+#echo
+#echo Initial code with effects
+#echo
+#
+#activate PRINT_CODE_CUMULATED_EFFECTS
+#display PRINTED_FILE[%ALLFUNC]
+#activate PRINT_CODE
+#
+#echo
+#echo Initial code with preconditions
+#echo
+#
+#activate PRINT_CODE_PRECONDITIONS
+#display PRINTED_FILE[%ALLFUNC]
+#activate PRINT_CODE
+#shell cp $WSPACE.database/main/main.prec.c before.prec
+
+echo
+echo Code after control simplification
+echo
+
+# simplify_control does not modify the code nor the symbol table...
+
 apply SIMPLIFY_CONTROL[main]
 display PRINTED_FILE[%ALLFUNC]
+
+#echo
+#echo Simplified code with preconditions
+#echo
+#
+#activate PRINT_CODE_PRECONDITIONS
+#display PRINTED_FILE[%ALLFUNC]
+# shell cp $WSPACE.database/main/main.prec.c after.prec
+activate PRINT_CODE
+
+#quit
+
+echo
+echo Code after flattening
+echo
+
 apply FLATTEN_CODE[main]
 display PRINTED_FILE[%ALLFUNC]
+
+#quit
+
+echo
+echo Code after privatization
+echo
+
 apply PRIVATIZE_MODULE[%ALLFUNC]
 #setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
+display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Code after declaration localization
+echo
+
 apply LOCALIZE_DECLARATION[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 

@@ -475,6 +475,7 @@ list module_to_all_declarations(entity m)
       if(!entity_is_argument_p(e, dl))
 	dl = gen_nconc(dl, CONS(ENTITY, e, NIL));
     }
+    gen_free_list(sdl);
   }
 
   return dl;

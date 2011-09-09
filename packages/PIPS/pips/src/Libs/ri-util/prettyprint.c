@@ -4279,15 +4279,16 @@ text text_statement_enclosed(entity module,
    */
   list dl = statement_declarations(stmt);
 
-  /* FI: consistency check - incompatible with unfolding */
+  /* FI: consistency check - incompatible with unfolding.. and with
+     the C parser... */
   ifdebug(1) {
     /* The real check is that dl and idl are equal, that is
      ENDP(gen_list_and_not(dl,idl)) && ENDP(gen_list_and_not(idl,dl)),
      except for the side effects of gen_list_and_not(), so dl and idl
      should be copied first. */
-    if(statement_block_p(stmt) && ENDP(dl)) {
-      list idl = statement_to_declarations(stmt);
-      if(!ENDP(idl)) {
+    if(statement_block_p(stmt)) {
+      list idl = statement_to_direct_declarations(stmt);
+      if(ENDP(dl) && !ENDP(idl)) {
 	/* This may occur when declaration statements are added using
 	   subsequences by somebody forgetfull of scope issues */
 	// Do not forget: the error is detected within the prettyprinter...
@@ -4295,6 +4296,15 @@ text text_statement_enclosed(entity module,
 	print_entities(idl);
 	pips_internal_error("A block statement with no declarations"
 			    " contains declarations\n");
+      }
+      else if(gen_length(dl)!=gen_length(idl)) {
+	print_entities(dl);
+	fprintf(stderr, "\n"); // FI, OK a fputc might do as well
+	print_entities(idl);
+	fprintf(stderr, "\n");
+	pips_internal_error("A block statement with %d declarations"
+			    " contains %d declarations in its statements\n",
+			    gen_length(dl), gen_length(idl));
       }
       else
 	gen_free_list(idl);

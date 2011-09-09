@@ -456,8 +456,9 @@ list generic_p_proper_effect_of_reference(reference ref,
 	  (allow_partials_on_pme ||
 	   gen_length(variable_dimensions(v)) == gen_length(l_inds))))
 	{
-	  *pme = (*reference_to_effect_func)
-	    (ref, write_p? make_action_write_memory() : make_action_read_memory(), true);
+        action a = write_p? make_action_write_memory() : make_action_read_memory();
+	  *pme = (*reference_to_effect_func)(ref, a, true);
+      free_action(a);
 	  pips_assert("*pme is wekly consistent", region_weakly_consistent_p(*pme));
 	}
     }

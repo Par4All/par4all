@@ -280,12 +280,15 @@ void clean_up_sequences_rewrite(statement s)
 	  clean_up_empty_block_removed++;
 	}
 	else {
+	  list dl = statement_to_direct_declarations(st);
 	  if (instruction_sequence_p(statement_instruction(st))
 	      && !empty_statement_p(st)
 	      // The next two tests should be useless
 	      // The sequence can be cleaned up even when declarations
 	      // and extensions are present
-	      && ENDP(statement_declarations(st))
+	      // FI: the second part of this test is awful but the
+	      // controlizer seems to rely on it... See flatten_code01
+	      && (ENDP(dl) || ENDP(statement_declarations(st)))
 	      // there can be statements with only extensions
 	      && ENDP(extensions_extension(statement_extensions(st)))) {
 	    /* A sequence without declarations in a sequence: they can be fused: */
@@ -309,7 +312,7 @@ void clean_up_sequences_rewrite(statement s)
 	    pips_debug(4, "Statement useful... %zd\n",
 		       gen_length(useful_sts));
 	  }
-
+	  gen_free_list(dl);
 	  deal_with_pending_comment(st, &the_comments);
 	}
       }

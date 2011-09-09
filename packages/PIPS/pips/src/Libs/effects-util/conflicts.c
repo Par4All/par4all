@@ -518,6 +518,8 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 			  pips_debug(5, "no conflict because types are not equal\n");
 			  conflict_p = false; /* well type_equal_p does not perform a good job :-( BC*/
 			}
+		      free_type(t1);
+		      free_type(t2);
 
 		      if ( conflict_p && !get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" )
 				&& entity_formal_p(e1) && entity_formal_p(e2) )
@@ -525,6 +527,7 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 			  pips_debug(5, "no conflict because entities are formals\n");
 			  conflict_p = false;
 			}
+
 		      /* should ALIASING_ACROSS_DATA_STRUCTURES be also tested here? */
 		      if ( conflict_p )
 			{

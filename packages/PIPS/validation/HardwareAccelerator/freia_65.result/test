@@ -111,10 +111,10 @@ freia_status freia_65(freia_data2d *o, const freia_data2d *i, int n)
          freia_aipo_sub(o_1, o, t);                                     /*0011*/
          freia_aipo_add_const(t, t, 1);                                 /*0012*/
          freia_aipo_xor_const(o, o_1, 17);                              /*0013*/
-         freia_common_destruct_data(o_1);
       }
    }
    freia_common_destruct_data(t);                                       /*0015*/
+   freia_common_destruct_data(o_1);
    return FREIA_OK;                                                     /*0016*/
 }
 #

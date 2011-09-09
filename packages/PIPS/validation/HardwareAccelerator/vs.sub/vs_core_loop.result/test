@@ -348,8 +348,8 @@ digraph "dag_cleaned_3" {
   "87 -|" -> "99 min" [label="immotion_6"];
   "87 -|" -> "98 max" [label="immotion_6"];
   "imbg" -> "87 -|";
-  "imstab" -> "87 -|";
   "imstab" -> "91 *_";
+  "imstab" -> "87 -|";
   "imstab" -> "120 *";
 
   // external copies: 1
@@ -835,8 +835,8 @@ digraph "dag_cleaned_3" {
   "87 -|" -> "99 min" [label="immotion"];
   "87 -|" -> "98 max" [label="immotion"];
   "imbg" -> "87 -|";
-  "imstab" -> "87 -|";
   "imstab" -> "91 *_";
+  "imstab" -> "87 -|";
   "imstab" -> "120 *";
 
   // external copies: 1
@@ -1994,8 +1994,8 @@ digraph "dag_cleaned_3" {
   "87 -|" -> "99 min" [label="immotion"];
   "87 -|" -> "98 max" [label="immotion"];
   "imbg" -> "87 -|";
-  "imstab" -> "87 -|";
   "imstab" -> "91 *_";
+  "imstab" -> "87 -|";
   "imstab" -> "120 *";
 
   // external copies: 1
@@ -3622,8 +3622,8 @@ digraph "dag_cleaned_3" {
   "87 -|" -> "99 min" [label="immotion_6"];
   "87 -|" -> "98 max" [label="immotion_6"];
   "imbg" -> "87 -|";
-  "imstab" -> "87 -|";
   "imstab" -> "91 *_";
+  "imstab" -> "87 -|";
   "imstab" -> "120 *";
 
   // external copies: 1

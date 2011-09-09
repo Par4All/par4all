@@ -408,6 +408,7 @@ bool FILE_star_effect_reference_p(reference ref)
 	}
     }
   pips_debug(8, "end with : %s\n", res? "true":"false");
+  free_type(t);
 
   return res;
 }

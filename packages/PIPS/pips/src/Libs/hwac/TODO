@@ -68,6 +68,7 @@
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
+- should move allocs out of loops? hmmm...
 
 * post-processing
 + remove malloc/free if not used
@@ -84,7 +85,7 @@
 + allocs may be in the middle of the calls
 + license_plate_copies takes too much time to compile? 1mn -> 4.5s
 + reuse of images in some cases when nodes are reordered... SSA?
-- wrong copy extraction order in vs_core_2, and copies not really removed
++ wrong copy extraction order in vs_core_2, and copies not really removed
 - should turn = in image copies?
 
 * spoc target
@@ -99,7 +100,8 @@
 + shadow 4-way declaration
 + handling of various parameters...
 + detect that an argument is used several times...
-- sequence extraction shouldn't include ops not implemented for the target?
++ sequence extraction shouldn't include ops not implemented for the
+  target? no managed later on.
 + use global max length/ops/critical path as a decision driver?
   beware: do not extract input, even if live?!
 + extension: interface with SG terapix microcode generation
