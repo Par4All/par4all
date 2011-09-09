@@ -71,6 +71,9 @@ def add_common_options(parser):
     group.add_option("--plain", "--no-color", "--no-fancy", "-z", action = "store_true", default = False,
         help = "Disable coloring of terminal output and disable all fancy tickers and spinners and this kind of eye-candy things :-)")
 
+    group.add_option("--no-spawn", action = "store_true", default = False,
+		help = "Do not spawn a child process to run processing (this child process is normally used to post-process the PIPS output and reporting simpler error message for example).")
+
     # Interestingly, if I use --exec instead of --execute, later I get a
     # syntax error on options.exec... Strange.
     group.add_option("--execute", metavar = "PYTHON-CODE", default = None,
