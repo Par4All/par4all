@@ -235,7 +235,7 @@ do { \
   if(p4a_debug_level>=level) { \
     debug_stuff; \
   } \
-} while(0)
+} while(0);
 
 /*
 #ifdef P4A_DEBUG
