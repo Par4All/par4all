@@ -70,6 +70,7 @@ static statement update_unstructured_declarations(statement module_stat)
        && !member_entity_p(e))
       udl = gen_nconc(udl, CONS(ENTITY, e, NIL));
   }, vfl);
+  gen_free_list(dl);
 
   if(!ENDP(udl)) {
     ifdebug(8) {
