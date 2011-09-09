@@ -96,9 +96,6 @@ def add_own_options(parser):
     proc_group.add_option("--property", "-P", action = "append", metavar = "NAME=VALUE", default = [],
 		help = "Define a property for PIPS. Several properties are defined by default (see p4a_process.py). There are many properties in PIPS that can be used to modify its behaviour. Have a look to the 'pipsmake-rc' documentation for their descriptions.")
 
-    proc_group.add_option("--no-spawn", action = "store_true", default = False,
-		help = "Do not spawn a child process to run processing (this child process is normally used to post-process the PIPS output and reporting simpler error message for example).")
-
     proc_group.add_option("--apply-before-parallelization", "--abp", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
 		help = "Add PIPS phases to be applied before parallelization.")
 
