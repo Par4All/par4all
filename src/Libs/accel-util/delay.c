@@ -278,7 +278,7 @@ static void manage_conflicts(statement s, context *c,bool before) {
   list tstats = gen_copy_seq(c->stats);
   FOREACH(STATEMENT,st,tstats) {
     if(statements_conflict_p(s,st)) {
-      insert_statement(s,st,before);
+      insert_statement_no_matter_what(s,st,before);
       gen_remove_once(&c->stats,st);
     }
   }
