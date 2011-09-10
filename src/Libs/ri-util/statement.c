@@ -2309,14 +2309,8 @@ statement_to_line_number(statement s)
  */
 static void generic_insert_statement(statement s,
 				     statement s1,
-				     bool before,
-				     bool force)
+				     bool before)
 {
-  if(!force) {
-    pips_assert("Neither s nor s1 are declaration statements",
-		!declaration_statement_p(s)
-		&& !declaration_statement_p(s1));
-  }
   list ls;
   instruction i = statement_instruction(s);
   if (instruction_sequence_p(i))
@@ -2368,10 +2362,13 @@ static void generic_insert_statement(statement s,
     }
 }
 
-/* See previous function */
+/* This is the normal entry point. See previous function for comments. */
 void insert_statement(statement s, statement s1, bool before)
 {
-  generic_insert_statement(s, s1, before, false);
+  pips_assert("Neither s nor s1 are declaration statements",
+	      !declaration_statement_p(s)
+	      && !declaration_statement_p(s1));
+  generic_insert_statement(s, s1, before);
 }
 
 /* Break the IR consistency or, at the very least, do not insert new
@@ -2379,7 +2376,7 @@ void insert_statement(statement s, statement s1, bool before)
    existing declarations. */
 void insert_statement_no_matter_what(statement s, statement s1, bool before)
 {
-  generic_insert_statement(s, s1, before, true);
+  generic_insert_statement(s, s1, before);
 }
 
 void append_statement_to_block_statement(statement b, statement s)
