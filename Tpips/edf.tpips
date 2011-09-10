@@ -1,5 +1,5 @@
-delete e
-create e edf.f
+delete edf
+create edf edf.f
 display PRINTED_FILE
 close
-delete e
+delete edf

@@ -1,15 +1,15 @@
 echo trying file nimportequoi.f
 setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
-create n1 nimportequoi.f
+create nimportequoi1 nimportequoi.f
 echo trying another file
-create n2 test.f
+create nimportequoi2 test.f
 display PRINTED_FILE
 close
 echo trying file nimportequoi.f again
-create n1 nimportequoi.f
+create nimportequoi1 nimportequoi.f
 echo the other database should still be there
-open n2
+open nimportequoi2
 display PRINTED_FILE
 close
-delete n2
-delete n1
+delete nimportequoi2
+delete nimportequoi1
