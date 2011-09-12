@@ -49,6 +49,7 @@ int main()
 
 // Points To:
 // _p_1 -> i , EXACT
+// p -> _p_1 , EXACT
 
 
    return 0;
