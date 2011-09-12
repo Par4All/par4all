@@ -207,6 +207,7 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
 	    le = gen_nconc(CONS(EFFECT, current_eff, NIL), le);
 	  }
 	}
+      free_type(current_type);
     }
   pips_debug_effects(8, "output effects:\n", le);
 
@@ -2315,7 +2316,7 @@ static list generic_proper_effects_of_declaration(entity decl)
 							  true);
 	    }
 	  l_eff= gen_nconc(l_eff, l_tmp);
-
+	  free_type(decl_t);
 	}
       pips_debug_effects(1, "ending with:", l_eff);
     }
