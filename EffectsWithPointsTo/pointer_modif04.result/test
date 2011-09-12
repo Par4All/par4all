@@ -154,9 +154,7 @@ int main()
  *********************** Use-Def Chains *********************
 
 	28 --> 30 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s.tab-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s.max-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

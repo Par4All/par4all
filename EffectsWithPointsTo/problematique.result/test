@@ -248,6 +248,8 @@ int main()
 		from <i-W-EXACT> to <i-W-EXACT>
 	17 --> 28 with conflicts
 		from <a-W-EXACT> to <a-R-EXACT>
+	13 --> 28 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
 	13 --> 17 with conflicts
 		from <a-W-EXACT> to <a-W-EXACT>
 	11 --> 25 with conflicts
@@ -264,6 +266,10 @@ int main()
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	09 --> 28 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	09 --> 17 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
 	09 --> 13 with conflicts
 		from <a-W-EXACT> to <a-W-EXACT>
 	09 --> 11 with conflicts

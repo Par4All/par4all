@@ -98,11 +98,9 @@ int main()
 
 	07 --> 08 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <x-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 	06 --> 07 with conflicts
 		from <y-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <y-W-EXACT> to <y-R-EXACT>
