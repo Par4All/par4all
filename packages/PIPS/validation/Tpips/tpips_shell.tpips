@@ -15,21 +15,21 @@ setproperty TPIPS_IS_A_SHELL TRUE
 
 echo ## phase 1
 
-delete tps
-create tps tpips_shell.src/*.f
+delete tpips_shell
+create tpips_shell tpips_shell.src/*.f
 
 # $ALL does not trigger the shell substitution... {} must be used.
 display PRINTED_FILE[%ALL]
 
 # some shell commands
 echo ## ls...
-cd tps.database
+cd tpips_shell.database
 ls -F
 cd ..
 
 close
 # quit
-delete tps
+delete tpips_shell
 
 #
 # 2 - command and file substitution
@@ -38,14 +38,14 @@ delete tps
 echo ## phase 2
 
 # now filters out foo.f
-create tps `echo tpips_shell.src/*.f | \
+create tpips_shell `echo tpips_shell.src/*.f | \
 		sed 's,tpips_shell.src/foo.f,,'`
 
 # there should be only BLA there.
 display PRINTED_FILE[%ALL]
 
 close
-delete tps
+delete tpips_shell
 
 echo ## done
 

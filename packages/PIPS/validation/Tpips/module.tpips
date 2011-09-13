@@ -1,4 +1,4 @@
-delete m
+delete module
 
 echo
 echo Select a wrong module name before the worskpace is created
@@ -7,7 +7,7 @@ echo
 module TOTO
 
 setproperty CHECK_FORTRAN_SYNTAX_BEFORE_RUNNING_PIPS FALSE
-create m module.f
+create module module.f
 set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 echo
@@ -42,4 +42,4 @@ echo
 module MODULE
 display PRINTED_FILE
 close
-delete m
+delete module

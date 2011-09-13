@@ -1,8 +1,8 @@
 #
 # matrix multiply
 #
-delete foo
-create foo matmul2.f
+delete matmul2
+create matmul2 matmul2.f
 module MATMUL
 #
 # CRAFT Fortran
@@ -12,6 +12,6 @@ display PARALLELPRINTED_FILE[MATMUL]
 #
 # clean
 #
-close foo
-delete foo
+close matmul2
+delete matmul2
 quit

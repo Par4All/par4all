@@ -132,6 +132,8 @@ int main()
 		from <y1-W-EXACT> to <y1-W-EXACT>
 	08 --> 10 with conflicts
 		from <y1-W-EXACT> to <y1-R-EXACT>
+	07 --> 11 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
 	07 --> 10 with conflicts
 		from <x-W-EXACT> to <x-W-EXACT>
 
