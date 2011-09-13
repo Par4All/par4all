@@ -168,8 +168,8 @@ if [[ -z $disable_mean ]]; then
   echo -n "Geo.Mean" >> $out_dat
   while [ "$mean_idx" -lt "$element_count" ]
   do    # List all the elements in the array.
-    #echo "e((${mean_expr[$mean_idx]})/$nmean)"
-    geomean=`echo "scale=2; e((${mean_expr[$mean_idx]})/$nmean)" | bc -l`
+    echo "e((${mean_expr[$mean_idx]})/$nmean)"
+    geomean=`echo "e((${mean_expr[$mean_idx]})/$nmean)" | bc -l | xargs printf "%1.2f"`
     #echo "$geomean"
     echo -n " $geomean" >> $out_dat
     ((mean_idx++))
@@ -191,7 +191,7 @@ if [[ -z $labelfontsize ]] ; then
 fi
 for ver in $versions; do
   echo "\\" >> $out_gp
-  color=`echo "scale=2; e($nver-2)/e($nvers-1)" | bc -l`
+  color=`echo "e($nver-2)/e($nvers-1)" | bc -l | xargs printf "%1.2f"`
   echo "$sep '$out_dat' u (log(\$$nver)/log(2)):xtic(1) lt 1 fs solid $color \\" >> $out_gp
   echo -n ",'' u (\$0-(${nvers}-g)/2.*1./(${nvers}+2)+($(($nver-2)))*1./(${nvers}+g)):(log(\$$nver)/log(2)):(log(\$$nver)/log(2)) w labels font 'Arial,$labelfontsize' right rotate by -90 offset -0.3,0.1 t ''" >> $out_gp
   nver=$(($nver+1))
