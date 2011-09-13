@@ -1,5 +1,5 @@
-delete b
-create b bang.f
+delete bang
+create bang bang.f
 display PRINTED_FILE
 close
-delete b
+delete bang

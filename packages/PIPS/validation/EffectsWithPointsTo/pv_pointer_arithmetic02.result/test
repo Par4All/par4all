@@ -130,20 +130,44 @@ int main()
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <p-R-EXACT> to <p-W-EXACT>
 	12 --> 14 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
 		from <p-R-EXACT> to <p-W-EXACT>
 	12 --> 13 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <p-R-EXACT> to <p-W-EXACT>
 	11 --> 14 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
 		from <p-R-EXACT> to <p-W-EXACT>
 	11 --> 13 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
 		from <p-R-EXACT> to <p-W-EXACT>
 	11 --> 12 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <p-R-EXACT> to <p-W-EXACT>
+	10 --> 14 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	10 --> 13 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	10 --> 12 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
 	10 --> 11 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 14 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 13 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 12 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 	08 --> 11 with conflicts

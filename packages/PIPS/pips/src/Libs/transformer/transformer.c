@@ -502,7 +502,9 @@ static transformer transformer_general_intersection(transformer t1,
   }
   else {
     Psysteme s1 = sc_dup((Psysteme) predicate_system(transformer_relation(t1)));
-    Psysteme s2 = sc_dup((Psysteme) predicate_system(transformer_relation(t2)));
+    /* no need to duplicate s2, it is done in sc_append.
+       Psysteme s2 = sc_dup((Psysteme) predicate_system(transformer_relation(t2))); */
+    Psysteme s2 = (Psysteme) predicate_system(transformer_relation(t2));
 
     t = transformer_identity();
     /*

@@ -59,16 +59,12 @@ resulting abstract location is *ANYWHERE*:*ANYWHERE*.
 entity entity_all_locations()
 {
   entity anywhere = entity_undefined;
-  string any_name = strdup(concatenate(ANY_MODULE_NAME,
-				       MODULE_SEP_STRING,
-				       ANYWHERE_LOCATION,
-				       NULL));
+  static const char any_name[] = ANY_MODULE_NAME MODULE_SEP_STRING  ANYWHERE_LOCATION;
   anywhere = gen_find_tabulated(any_name, entity_domain);
   if(entity_undefined_p(anywhere)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
-    anywhere = make_entity(any_name,
-			   t, make_storage_rom(), make_value_unknown());
+    anywhere = make_entity(strdup(any_name), t, make_storage_rom(), make_value_unknown());
   }
 
   return anywhere;
@@ -91,15 +87,12 @@ bool entity_all_locations_p(entity e)
 entity entity_nowhere_locations()
 {
   entity nowhere = entity_undefined;
-  string any_name = strdup(concatenate(ANY_MODULE_NAME,
-				       MODULE_SEP_STRING,
-				       NOWHERE_LOCATION,
-				       NULL));
+  static const char any_name [] = ANY_MODULE_NAME MODULE_SEP_STRING NOWHERE_LOCATION NOWHERE_LOCATION;
   nowhere =  gen_find_tabulated(any_name, entity_domain);
   if(entity_undefined_p(nowhere)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
-    nowhere = make_entity(any_name,
+    nowhere = make_entity(strdup(any_name),
 			   t, make_storage_rom(), make_value_unknown());
   }
 
@@ -124,15 +117,12 @@ bool entity_nowhere_locations_p(entity e)
 entity entity_null_locations()
 {
   entity null_pointer = entity_undefined;
-  string any_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
-				       MODULE_SEP_STRING,
-				       NULL_POINTER_NAME,
-				       NULL));
+  const char any_name [] = TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING NULL_POINTER_NAME;
   null_pointer = gen_find_tabulated(any_name, entity_domain);
   if(entity_undefined_p(null_pointer)) {
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
-    null_pointer = make_entity(any_name,
+    null_pointer = make_entity(strdup(any_name),
 			       t, make_storage_rom(), make_value_unknown());
   }
 
@@ -207,6 +197,7 @@ entity entity_all_module_xxx_locations(entity m, string xxx)
     entity_storage(dynamic) = make_storage_rom();
     entity_initial(dynamic) = make_value_unknown();
   }
+  free(any_name);
 
   return dynamic;
 }
@@ -450,45 +441,22 @@ bool entity_all_dynamic_locations_p(entity e)
   return entity_all_xxx_locations_p(e, DYNAMIC_AREA_LOCAL_NAME);
 }
 
+
 
 bool entity_abstract_location_p(entity al)
 {
-  bool abstract_p = false;
-  const char* mn = entity_module_name(al);
-
-  if(strcmp(mn, ANY_MODULE_NAME)==0) {
-    /* FI: this may change in the future and may not be a strong
-       enough condition */
-    abstract_p = true;
-  }
-  else {
-    const char* ln = entity_local_name(al);
-    string found = strstr(ln, ANYWHERE_LOCATION);
-    abstract_p = (found!=NULL);
-    if(!abstract_p) {
-      found = strstr(ln, STATIC_AREA_LOCAL_NAME);
-      abstract_p = (found!=NULL);
-    }
-    if(!abstract_p) {
-      found = strstr(ln, DYNAMIC_AREA_LOCAL_NAME);
-      abstract_p = (found!=NULL);
-    }
-    if(!abstract_p) {
-      found = strstr(ln, STACK_AREA_LOCAL_NAME);
-      abstract_p = (found!=NULL);
-    }
-    if(!abstract_p) {
-      found = strstr(ln, HEAP_AREA_LOCAL_NAME);
-      abstract_p = (found!=NULL);
-    }
-    if(!abstract_p) {
-      found = strstr(ln,NULL_POINTER_NAME);
-      abstract_p = (found!=NULL);
-    }
-  }
-
-  return abstract_p;
+  const char * en = entity_name(al);
+  const char * module_sep = strchr(en,MODULE_SEP_CHAR);
+  return   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
+      ||   0 == strncmp(module_sep, ANYWHERE_LOCATION, sizeof(ANYWHERE_LOCATION)-1)
+      ||   0 == strncmp(module_sep, STATIC_AREA_LOCAL_NAME, sizeof(STATIC_AREA_LOCAL_NAME)-1)
+      ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
+      ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
+      ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
+      ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
+      ;
 }
+
 
 /* returns the smallest abstract locations containing the location of
    variable v.
@@ -618,6 +586,7 @@ entity abstract_locations_max(entity al1, entity al2)
       else
 	mn = ANY_MODULE_NAME;
       e = FindOrCreateEntity(mn, ln);
+      free(mn1);free(mn2);
     }
   return e;
 }

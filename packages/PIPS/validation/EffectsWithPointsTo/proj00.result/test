@@ -198,11 +198,9 @@ static int alea(void)
 
 	27 --> 31 with conflicts
 		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	23 --> 31 with conflicts
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
@@ -220,9 +218,6 @@ static int alea(void)
 		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	20 --> 23 with conflicts
 		from <pi-W-EXACT> to <pi-R-EXACT>
-	16 --> 31 with conflicts
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	16 --> 18 with conflicts
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>

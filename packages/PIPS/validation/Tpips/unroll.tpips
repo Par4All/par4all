@@ -1,5 +1,5 @@
-delete u
-create u unroll.f
+delete unroll
+create unroll unroll.f
 module UNROLL
 display PRINTED_FILE
 apply UNROLL
@@ -7,6 +7,6 @@ apply UNROLL
 4
 display PRINTED_FILE
 close
-delete u
+delete unroll
 quit
 

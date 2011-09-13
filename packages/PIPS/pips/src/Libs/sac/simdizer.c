@@ -756,7 +756,7 @@ static void simdize_simple_statements(statement s, simdizer_context *sc)
             {
                 statement st = STATEMENT(CAR(iter));
                 if(declaration_statement_p(st))
-                    insert_statement(s,st,false);
+                    insert_statement_no_matter_what(s,st,false);
                 else {
                     if(statement_call_p(st))
                         seq=CONS(STATEMENT,st,seq);
@@ -991,11 +991,11 @@ static void do_split_decl_block_statements(statement s) {
       if(!ENDP(iter2) && !ENDP(prev2) ) { /* yes there is */
         CDR(prev2)=NIL;
         statement rtail = make_block_statement(iter2);
-        insert_statement(STATEMENT(CAR(prev)),tail,false);
-        insert_statement(STATEMENT(CAR(prev)),rtail,false);
+        insert_statement_no_matter_what(STATEMENT(CAR(prev)),tail,false);
+        insert_statement_no_matter_what(STATEMENT(CAR(prev)),rtail,false);
       }
       else {
-        insert_statement(STATEMENT(CAR(prev)),tail,false);
+        insert_statement_no_matter_what(STATEMENT(CAR(prev)),tail,false);
       }
     }
     else {

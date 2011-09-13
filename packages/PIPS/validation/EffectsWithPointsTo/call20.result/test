@@ -371,65 +371,33 @@ void pointer_set(pointer p, int v)
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	28 --> 32 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	28 --> 31 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	28 --> 30 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	25 --> 32 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p3-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	25 --> 31 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p2-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	25 --> 30 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p1-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	25 --> 28 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 	22 --> 32 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p3-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 	22 --> 31 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p2-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 	22 --> 30 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p1-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 	22 --> 28 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	22 --> 25 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <p3-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	19 --> 32 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	19 --> 31 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	19 --> 30 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	19 --> 28 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
@@ -438,45 +406,28 @@ void pointer_set(pointer p, int v)
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 	19 --> 25 with conflicts
 		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	19 --> 22 with conflicts
 		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	16 --> 32 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p3-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	16 --> 31 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p2-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	16 --> 30 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p1-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	16 --> 28 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 	16 --> 25 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
@@ -487,13 +438,10 @@ void pointer_set(pointer p, int v)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	16 --> 19 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 	13 --> 32 with conflicts
 		from <p3-W-EXACT> to <p3-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
@@ -505,27 +453,17 @@ void pointer_set(pointer p, int v)
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	13 --> 28 with conflicts
 		from <p3-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	13 --> 25 with conflicts
 		from <p3-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p3-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	13 --> 22 with conflicts
 		from <p3-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p3-W-EXACT> to <p3-R-EXACT>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	13 --> 19 with conflicts
 		from <p3-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	13 --> 16 with conflicts
 		from <p3-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p3-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 32 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	12 --> 31 with conflicts
@@ -538,16 +476,13 @@ void pointer_set(pointer p, int v)
 	12 --> 25 with conflicts
 		from <p2-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p2-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 22 with conflicts
 		from <p2-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 19 with conflicts
 		from <p2-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	12 --> 16 with conflicts
 		from <p2-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p2-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 13 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
@@ -564,16 +499,13 @@ void pointer_set(pointer p, int v)
 	11 --> 25 with conflicts
 		from <p1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 22 with conflicts
 		from <p1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 19 with conflicts
 		from <p1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	11 --> 16 with conflicts
 		from <p1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 13 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	11 --> 12 with conflicts

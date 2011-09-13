@@ -111,31 +111,29 @@ int main(void)
    //PIPS generated variable
    register freia_status _return1, _return2, _return3, _return4;
    //PIPS generated variable
-   register int i_0;
+   freia_data2d *imtmp_0;
    //PIPS generated variable
    register freia_status ret_0;
    //PIPS generated variable
-   freia_data2d *imtmp_0;
-   //PIPS generated variable
-   register int i_1;
-   //PIPS generated variable
-   register freia_status ret_1;
+   register int i_0;
    //PIPS generated variable
    freia_data2d *imtmp_1;
    //PIPS generated variable
-   register int i_2;
+   register freia_status ret_1;
    //PIPS generated variable
-   register freia_status ret_2;
+   register int i_1;
    //PIPS generated variable
    freia_data2d *imtmp_2;
    //PIPS generated variable
-   register int i_3;
+   register freia_status ret_2;
    //PIPS generated variable
-   register freia_status ret_3;
+   register int i_2;
    //PIPS generated variable
    freia_data2d *imtmp_3;
    //PIPS generated variable
-   register int i_4;
+   register freia_status ret_3;
+   //PIPS generated variable
+   register int i_3, i_4;
    
    
    /* open videos flow */
