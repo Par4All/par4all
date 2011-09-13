@@ -60,6 +60,7 @@
 /*  special characters
  */
 #define MODULE_SEP                       ':'
+#define MODULE_SEP_CHAR                  MODULE_SEP
 
 #define MODULE_SEP_STRING                ":"
 #define LABEL_PREFIX                     "@"
