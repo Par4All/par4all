@@ -50,11 +50,13 @@ int main(void)
    //PIPS generated variable
    register freia_status _return0, _return1, _return2, _return3;
    //PIPS generated variable
-   register int i_0, i_1, i_2;
+   register int i_0;
+   //PIPS generated variable
+   register freia_status ret;
    //PIPS generated variable
    freia_data2d *imtmp;
    //PIPS generated variable
-   register freia_status ret;
+   register int i_1, i_2;
 
    freia_common_open_input(&fdin, 0);
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);

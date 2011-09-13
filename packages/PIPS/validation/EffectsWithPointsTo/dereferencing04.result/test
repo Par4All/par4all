@@ -8,7 +8,7 @@ void dereferencing04()
    double *r;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p q r
-   *(p+q-r) = 0.;
+   *(p+(q-r)) = 0.;
 }
 
 POINTS-TO
@@ -39,7 +39,7 @@ void dereferencing04()
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   *(p+q-r) = 0.;
+   *(p+(q-r)) = 0.;
 }
 
 PROPER  EFFECTS WITH POINTS TO
@@ -51,7 +51,7 @@ void dereferencing04()
    double *r;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p q r
-   *(p+q-r) = 0.;
+   *(p+(q-r)) = 0.;
 }
 
  *********************** Use-Def Chains *********************

@@ -77,9 +77,9 @@ int main(int argc, char *argv[])
    //PIPS generated variable
    register int i_0, i_1;
    //PIPS generated variable
-   register uint32_t ny, nx, sy, sx;
+   freia_data2d *work1, *work2, *mask;
    //PIPS generated variable
-   freia_data2d *mask, *work2, *work1;
+   register uint32_t sx, sy, nx, ny;
 
    freia_initialize(argc, argv);
 

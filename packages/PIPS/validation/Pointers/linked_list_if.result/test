@@ -4,169 +4,315 @@ Proper effects for "initialize"
 list * initialize()
 {
    int *pi, i;
-//               <must be written>: l
-   list *l = (void *) 0, *nl;
-//               <may be read    >: stdin[0]
-//               <may be written >: stdin[0]
-//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
-//               <must be written>: __IO_EFFECTS:LUNS[0]
-   
-   
+//             <    is written>: l
+   list *l = (void *) 0, *nl, al;
+//             <    is written>: l
+   l = &al;
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
    if (!feof(stdin)) {
-//               <must be written>: i
+//             <may be read   >: stdin[0]
+//             <may be written>: i stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
       scanf("%d", &i);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ pi
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
       pi = malloc(sizeof(int));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: i pi
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i pi
       *pi = i;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ nl
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
       nl = malloc(sizeof(list *));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: nl pi
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: nl pi
       nl->val = pi;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: l nl
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l nl
       nl->next = l;
+//             <    is read   >: nl
+//             <    is written>: l
+      l = nl;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: nl
+      nl = nl->next;
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      if (!feof(stdin)) {
+//             <may be read   >: stdin[0]
+//             <may be written>: i stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+         scanf("%d", &i);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
+         pi = malloc(sizeof(int));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i pi
+         *pi = i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: nl _MALLOC_EFFECTS:_MALLOC_
+         nl = malloc(sizeof(list *));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: nl pi
+         nl->val = pi;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l nl
+         nl->next = l;
+//             <    is read   >: nl
+//             <    is written>: l
+         l = nl;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: nl
+         nl = nl->next;
+      }
    }
-//               <may be read    >: stdin[0]
-//               <may be written >: stdin[0]
-//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
-//               <must be written>: __IO_EFFECTS:LUNS[0]
-   if (!feof(stdin)) {
-//               <must be written>: i
-      scanf("%d", &i);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ pi
-      pi = malloc(sizeof(int));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: i pi
-      *pi = i;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ nl
-      nl = malloc(sizeof(list *));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: nl pi
-      nl->val = pi;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: l nl
-      nl->next = l;
-   }
-//               <may be read    >: stdin[0]
-//               <may be written >: stdin[0]
-//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
-//               <must be written>: __IO_EFFECTS:LUNS[0]
+//             <    is read   >: l
 
-   if (!feof(stdin)) {
-//               <must be written>: i
-      scanf("%d", &i);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ pi
-      pi = malloc(sizeof(int));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: i pi
-      *pi = i;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ nl
-      nl = malloc(sizeof(list *));
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: nl pi
-      nl->val = pi;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: l nl
-      nl->next = l;
-   }
-//               <must be read   >: l
-   
-   
    return l;
 }
 
 POINTS TO for "initialize"
 
-//  {}
+
+// Points To: none
+
 list * initialize()
 {
-//  points to = {}
+
+// Points To: none
+
    int *pi, i;
-//  points to = {}
-   list *l = (void *) 0, *nl;
-//  points to = {}
-   
-   
-   if (!feof(stdin)) {
-//  points to = {}
-      scanf("%d", &i);
-//  points to = {}
-      pi = malloc(sizeof(int));
-//  {(pi,*HEAP*_l_18,-Exact-)}
-      *pi = i;
-//  {(pi,*HEAP*_l_18,-Exact-)}
-      nl = malloc(sizeof(list *));
-//  {(nl,*HEAP*_l_20,-Exact-);(pi,*HEAP*_l_18,-Exact-)}
-      nl->val = pi;
-//  {(nl[0][val],*HEAP*_l_18,-Exact-);(nl,*HEAP*_l_20,-Exact-);(pi,
-//   *HEAP*_l_18,-Exact-)}
-      nl->next = l;
-   }
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
-//   *HEAP*_l_18,-MAY-)}
-   if (!feof(stdin)) {
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
-//   *HEAP*_l_18,-MAY-)}
-      scanf("%d", &i);
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
-//   *HEAP*_l_18,-MAY-)}
-      pi = malloc(sizeof(int));
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
-//   *HEAP*_l_26,-Exact-)}
-      *pi = i;
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,-MAY-);(pi,
-//   *HEAP*_l_26,-Exact-)}
-      nl = malloc(sizeof(list *));
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_28,-Exact-);(pi,
-//   *HEAP*_l_26,-Exact-)}
-      nl->val = pi;
-//  {(nl[0][val],*HEAP*_l_26,-Exact-);(nl,*HEAP*_l_28,-Exact-);(pi,
-//   *HEAP*_l_26,-Exact-)}
-      nl->next = l;
-   }
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
-//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
-//   *HEAP*_l_18,-MAY-);(pi,*HEAP*_l_26,-MAY-)}
+
+// Points To:
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   list *l = (void *) 0, *nl, al;
+
+// Points To:
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *NULL_POINTER* , EXACT
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   l = &al;
+
+// Points To:
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> al , EXACT
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    if (!feof(stdin)) {
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
-//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
-//   *HEAP*_l_18,-MAY-);(pi,*HEAP*_l_26,-MAY-)}
+
+// Points To:
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> al , EXACT
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       scanf("%d", &i);
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
-//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
-//   *HEAP*_l_18,-MAY-);(pi,*HEAP*_l_26,-MAY-)}
+
+// Points To:
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> al , EXACT
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
       pi = malloc(sizeof(int));
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
-//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
-//   *HEAP*_l_35,-Exact-)}
+
+// Points To:
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> al , EXACT
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> *HEAP*_l_17 , EXACT
+
       *pi = i;
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
-//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,-MAY-);(pi,
-//   *HEAP*_l_35,-Exact-)}
+
+// Points To:
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> al , EXACT
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// pi -> *HEAP*_l_17 , EXACT
+
       nl = malloc(sizeof(list *));
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl[0][val],*HEAP*_l_26,
-//   -MAY-);(nl,*HEAP*_l_37,-Exact-);(pi,*HEAP*_l_35,-Exact-)}
+
+// Points To:
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> al , EXACT
+// nl -> *HEAP*_l_19 , EXACT
+// pi -> *HEAP*_l_17 , EXACT
+
       nl->val = pi;
-//  {(nl[0][val],*HEAP*_l_35,-Exact-);(nl,*HEAP*_l_37,-Exact-);(pi,
-//   *HEAP*_l_35,-Exact-)}
+
+// Points To:
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> al , EXACT
+// nl -> *HEAP*_l_19 , EXACT
+// pi -> *HEAP*_l_17 , EXACT
+
       nl->next = l;
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> al , EXACT
+// nl -> *HEAP*_l_19 , EXACT
+// pi -> *HEAP*_l_17 , EXACT
+
+      l = nl;
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_19 , EXACT
+// nl -> *HEAP*_l_19 , EXACT
+// pi -> *HEAP*_l_17 , EXACT
+
+      nl = nl->next;
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_19 , EXACT
+// nl -> al , EXACT
+// pi -> *HEAP*_l_17 , EXACT
+
+      if (!feof(stdin)) {
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_19 , EXACT
+// nl -> al , EXACT
+// pi -> *HEAP*_l_17 , EXACT
+
+         scanf("%d", &i);
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_19 , EXACT
+// nl -> al , EXACT
+// pi -> *HEAP*_l_17 , EXACT
+
+         pi = malloc(sizeof(int));
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_19 , EXACT
+// nl -> al , EXACT
+// pi -> *HEAP*_l_27 , EXACT
+
+         *pi = i;
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_19 , EXACT
+// nl -> al , EXACT
+// pi -> *HEAP*_l_27 , EXACT
+
+         nl = malloc(sizeof(list *));
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_19 , EXACT
+// nl -> *HEAP*_l_29 , EXACT
+// pi -> *HEAP*_l_27 , EXACT
+
+         nl->val = pi;
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// *HEAP*_l_29.val -> *HEAP*_l_27 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_19 , EXACT
+// nl -> *HEAP*_l_29 , EXACT
+// pi -> *HEAP*_l_27 , EXACT
+
+         nl->next = l;
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// *HEAP*_l_29.next -> *HEAP*_l_19 , EXACT
+// *HEAP*_l_29.val -> *HEAP*_l_27 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_19 , EXACT
+// nl -> *HEAP*_l_29 , EXACT
+// pi -> *HEAP*_l_27 , EXACT
+
+         l = nl;
+
+// Points To:
+// *HEAP*_l_19.next -> al , EXACT
+// *HEAP*_l_19.val -> *HEAP*_l_17 , EXACT
+// *HEAP*_l_29.next -> *HEAP*_l_19 , EXACT
+// *HEAP*_l_29.val -> *HEAP*_l_27 , EXACT
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_29 , EXACT
+// nl -> *HEAP*_l_29 , EXACT
+// pi -> *HEAP*_l_27 , EXACT
+
+         nl = nl->next;
+      }
    }
-//  {(nl[0][val],*HEAP*_l_18,-MAY-);(nl,*HEAP*_l_20,
-//   -MAY-);(nl[0][val],*HEAP*_l_26,-MAY-);(nl,*HEAP*_l_28,
-//   -MAY-);(nl[0][val],*HEAP*_l_35,-MAY-);(nl,*HEAP*_l_37,-MAY-);(pi,
-//   *HEAP*_l_18,-MAY-);(pi,*HEAP*_l_26,-MAY-);(pi,*HEAP*_l_35,-MAY-)}
-   
-   
+
+// Points To:
+// *HEAP*_l_19.next -> al , MAY
+// *HEAP*_l_19.val -> *HEAP*_l_17 , MAY
+// *HEAP*_l_29.next -> *HEAP*_l_19 , MAY
+// *HEAP*_l_29.val -> *HEAP*_l_27 , MAY
+// al.next -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
+// al.val -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// l -> *HEAP*_l_29 , MAY
+// l -> al , MAY
+// l -> *HEAP*_l_19 , MAY
+// nl -> al , MAY
+// nl -> *HEAP*_l_19 , MAY
+// nl -> *ANY_MODULE*:*NOWHERE*_b1 , MAY
+// pi -> *HEAP*_l_17 , MAY
+// pi -> *HEAP*_l_27 , MAY
+// pi -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+
+
    return l;
 }
 

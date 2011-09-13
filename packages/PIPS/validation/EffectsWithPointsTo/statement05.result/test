@@ -152,11 +152,9 @@ int main()
 
 	12 --> 13 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <x-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 	11 --> 12 with conflicts
 		from <z-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <z-W-EXACT> to <z-R-EXACT>
@@ -165,6 +163,9 @@ int main()
 		from <t-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	09 --> 11 with conflicts
 		from <t-W-EXACT> to <t-R-EXACT>
+	08 --> 12 with conflicts
+		from <z-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <z-W-EXACT> to <z-R-EXACT>
 	08 --> 11 with conflicts
 		from <z-W-EXACT> to <z-W-EXACT>
 	06 --> 12 with conflicts

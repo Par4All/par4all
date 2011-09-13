@@ -125,6 +125,8 @@ int main()
 		from <p-W-EXACT> to <p-R-EXACT>
 	08 --> 11 with conflicts
 		from <q-W-EXACT> to <q-R-EXACT>
+	07 --> 14 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
 	07 --> 11 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 	05 --> 14 with conflicts
