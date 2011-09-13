@@ -4374,6 +4374,19 @@ bool qualifiers_const_p(list ql)
   return const_p;
 }
 
+/* Check that a qualifier list contains the restrict qualifier */
+bool qualifiers_restrict_p(list ql)
+{
+  bool restrict_p = false;
+  FOREACH(QUALIFIER, q, ql) {
+    if(qualifier_restrict_p(q)) {
+      restrict_p = true;
+      break;
+    }
+  }
+  return restrict_p;
+}
+
 /* Is there a const qualifier associated to type t
  *
  * FI: this should be extended in case const can be carried by a

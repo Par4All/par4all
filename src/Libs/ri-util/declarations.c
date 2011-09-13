@@ -1963,33 +1963,57 @@ text text_common_declaration(
 
 /* ================C prettyprinter functions================= */
 
-static list words_qualifier(list obj)
+static list generic_words_qualifier(list obj, bool initial_p, bool late_p)
 {
   list pc = NIL;
-  MAP(QUALIFIER,q,
-  {
+  FOREACH(QUALIFIER,q, obj) {
     switch (qualifier_tag(q)) {
     case is_qualifier_register:
-      pc = CHAIN_SWORD(pc,"register ");
+      if(initial_p)
+	pc = CHAIN_SWORD(pc,"register ");
       break;
     case is_qualifier_const:
-      pc = CHAIN_SWORD(pc,"const ");
+      if(late_p)
+	pc = CHAIN_SWORD(pc,"const ");
       break;
     case is_qualifier_restrict:
+      /* FI: might not be an initial qualifier either */
+      if(late_p)
       pc = CHAIN_SWORD(pc,"restrict ");
       break;
     case is_qualifier_volatile:
+      if(initial_p)
       pc = CHAIN_SWORD(pc,"volatile ");
       break;
     case is_qualifier_auto:
       /* FI: the auto case was missing; I have no idea why. */
+      if(initial_p)
       pc = CHAIN_SWORD(pc,"auto ");
       break;
     default :
       pips_internal_error("unexpected tag %d", qualifier_tag(q));
     }
-  },obj);
+  }
+
+  if(!initial_p && late_p && !ENDP(pc))
+    pc = gen_nconc(CHAIN_SWORD(NIL, " "), pc);
+
   return pc;
+}
+
+static list words_qualifier(list obj)
+{
+  return generic_words_qualifier(obj, true, true);
+}
+
+static list words_initial_qualifiers(list obj)
+{
+  return generic_words_qualifier(obj, true, false);
+}
+
+static list words_late_qualifiers(list obj)
+{
+  return generic_words_qualifier(obj, false, true);
 }
 
 /* obj is the type to describe
@@ -2275,14 +2299,24 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
        *  No space : it's only "after a comma to separate items in lists such as
        *  declaration lists or parameter lists in order to improve readability"
        */
-//      pc = CHAIN_SWORD(NIL, space_p? "*":"*");
+      // pc = CHAIN_SWORD(NIL, space_p? "*":"*");
       pc = CHAIN_SWORD(NIL, "*");
-      if (variable_qualifiers(type_variable(t)) != NIL)
-	pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
+      if (qualifiers_const_p(variable_qualifiers(type_variable(t)))
+	  || qualifiers_restrict_p(variable_qualifiers(type_variable(t)))) {
+	pc = gen_nconc(pc, words_late_qualifiers(variable_qualifiers(type_variable(t))) );
+	// We may have other qualifiers which must be output somewhere
+	// else, for instance "register"
+	/*
+	pc = gen_nconc(pc,
+		       words_qualifier(variable_qualifiers(type_variable(t))));
+	*/
+      }
       pc = gen_nconc(pc,name);
-      return generic_c_words_simplified_entity(t1, pc, is_safe, false,
-					       is_first, in_type_declaration,
-					       argument_p, pdl);
+      pc = generic_c_words_simplified_entity(t1, pc, is_safe, false,
+					     is_first, in_type_declaration,
+					     argument_p, pdl);
+      pc = gen_nconc(words_initial_qualifiers(variable_qualifiers(type_variable(t))), pc);
+      return pc;
     }
 
   /* Add type qualifiers if there are */
@@ -2706,9 +2740,9 @@ static list words_variable_or_function(entity module, entity e, bool is_first, l
 
   pc = gen_nconc(pc,c_words_simplified_entity(t,CHAIN_SWORD(NIL,name),
 					      is_first, in_type_declaration, pdl));
-  /* This part is for declarator initialization if there is.  If
-     the entity is declared extern wrt current module, do not add
-     this initialization*/
+  /* This part is for declarator initialization if there is. If the
+     entity is declared extern wrt current module, do not add this
+     initialization */
   if (/* normal mode: module is defined */
       (!entity_undefined_p(module)
       && !extern_entity_p(module,e)
