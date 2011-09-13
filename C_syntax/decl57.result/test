@@ -5,7 +5,6 @@
 // code is printed: the typedef declaration for JOCTET is wrong.
 
 typedef unsigned char JOCTET;
-
 struct jpeg_source_mgr {
-  const JOCTET * next_input_byte;
+   const JOCTET *next_input_byte;
 };

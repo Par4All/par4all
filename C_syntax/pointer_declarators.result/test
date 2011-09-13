@@ -1,7 +1,7 @@
 int main()
 {
    const int *ptr_to_constant;
-   int *const constant_ptr;
+   int * const constant_ptr;
    typedef int *int_ptr;
    const int_ptr constant_ptr1;
 }
