@@ -2298,19 +2298,19 @@ statement_to_line_number(statement s)
  * The sequence is either "s1;s2" if "before" is true or "s2;s1" else.
  *
  *
- * ATTENTION !!! : this version is not for unstructured case
+ * ATTENTION !!! : this version is not for unstructured case and this
+ * is not asserted.
  *
  * s cannot be a declaration statement, because the insertion scheme
  * used would modify its scope. Also s1 cannot be a declaration if s
  * is not a sequence. And if s is a sequence
- * add_declaration_statement() should be used instead.
+ * add_declaration_statement() should be used instead to insert the
+ * new declaration at the best possible place.
  */
-
-void insert_statement(statement s, statement s1, bool before)
+static void generic_insert_statement(statement s,
+				     statement s1,
+				     bool before)
 {
-  pips_assert("Neither s nor s1 are declaration statements",
-	      !declaration_statement_p(s)
-	      && !declaration_statement_p(s1));
   list ls;
   instruction i = statement_instruction(s);
   if (instruction_sequence_p(i))
@@ -2360,6 +2360,23 @@ void insert_statement(statement s, statement s1, bool before)
 
       update_statement_instruction(s, make_instruction_sequence(make_sequence(ls)));
     }
+}
+
+/* This is the normal entry point. See previous function for comments. */
+void insert_statement(statement s, statement s1, bool before)
+{
+  pips_assert("Neither s nor s1 are declaration statements",
+	      !declaration_statement_p(s)
+	      && !declaration_statement_p(s1));
+  generic_insert_statement(s, s1, before);
+}
+
+/* Break the IR consistency or, at the very least, do not insert new
+   declarations at the usual place, i.e. at the end of the already
+   existing declarations. */
+void insert_statement_no_matter_what(statement s, statement s1, bool before)
+{
+  generic_insert_statement(s, s1, before);
 }
 
 void append_statement_to_block_statement(statement b, statement s)

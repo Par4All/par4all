@@ -360,7 +360,7 @@ bool if_conversion_init(char * mod_name)
 
     // and share decl
     FOREACH(STATEMENT,s,statement_block(fake))
-        insert_statement(root,copy_statement(s),true);
+        insert_statement_no_matter_what(root,copy_statement(s),true);
     free_statement(fake);
 
     ifdebug(1) {
