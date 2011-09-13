@@ -117,8 +117,10 @@ static graph dg;
 /* Vertex_statement maps each statement to its vertex in the dependency graph. */
 static hash_table Vertex_statement;
 
-static bool one_trip_do;
-static bool keep_read_read_dependences;
+static bool one_trip_do_p;
+static bool keep_read_read_dependences_p;
+static bool mask_effects_p;
+static bool dataflow_dependence_only_p;
 
 /* Access functions for debug only */
 
@@ -359,7 +361,7 @@ static void mask_effects( set s, list l ) {
 static void genkill_any_loop( statement body,
                               statement st,
                               list locals,
-                              bool one_trip_do ) {
+                              bool one_trip_do_p ) {
   set gen = GEN( st );
   set ref = REF( st );
 
@@ -371,7 +373,7 @@ static void genkill_any_loop( statement body,
   set_union( ref, ref, REF( body ) );
 
   /* This is used only for do loop */
-  if ( one_trip_do ) {
+  if ( one_trip_do_p ) {
     /* If we assume the loop is always done at least one time, we can use
      * kill information from loop body.
      */
@@ -379,7 +381,7 @@ static void genkill_any_loop( statement body,
   }
 
   /* Filter effects on local variables */
-  if ( get_bool_property( "CHAINS_MASK_EFFECTS" ) ) {
+  if ( mask_effects_p ) {
     mask_effects( gen, locals );
     mask_effects( ref, locals );
   }
@@ -402,7 +404,7 @@ static void genkill_loop( loop l, statement st ) {
   list locals = gen_nconc( gen_copy_seq( llocals ), gen_copy_seq( slocals ) );
 
   /* Call the generic function handling all kind of loop */
-  genkill_any_loop( body, st, locals, one_trip_do );
+  genkill_any_loop( body, st, locals, one_trip_do_p );
 
   /* We free because we are good programmers and we don't leak ;-) */
   gen_free_list( locals );
@@ -421,7 +423,7 @@ static void genkill_forloop( forloop l, statement st ) {
   list locals = statement_declarations(st);
 
   /* Call the generic function handling all kind of loop */
-  genkill_any_loop( body, st, locals, one_trip_do );
+  genkill_any_loop( body, st, locals, one_trip_do_p );
 
 }
 
@@ -437,7 +439,7 @@ static void genkill_whileloop( whileloop l, statement st ) {
   list locals = statement_declarations(st);
 
   /* Call the generic function handling all kind of loop */
-  genkill_any_loop( body, st, locals, one_trip_do );
+  genkill_any_loop( body, st, locals, one_trip_do_p );
 }
 
 /**
@@ -482,7 +484,7 @@ static void genkill_block( cons *sts, statement st ) {
     set_free( ref );
 
     /* FIXME : This should be done after all recursion for performance... */
-    if ( get_bool_property( "CHAINS_MASK_EFFECTS" ) ) {
+    if ( mask_effects_p) {
       mask_effects( gen_st, statement_declarations(st) );
       mask_effects( ref_st, statement_declarations(st) );
     }
@@ -702,9 +704,9 @@ static void inout_test( statement s, test t ) {
  *
  * @param st is the statement that hold the loop
  * @param lo is the loop
- * @param one_trip_do tell if there is always at least one trip (do loop only)
+ * @param one_trip_do_p tell if there is always at least one trip (do loop only)
  */
-static void inout_any_loop( statement st, statement body, bool one_trip_do ) {
+static void inout_any_loop( statement st, statement body, bool one_trip_do_p ) {
   set diff = MAKE_STATEMENT_SET();
 
   /* Compute "in" sets for the loop body
@@ -719,7 +721,7 @@ static void inout_any_loop( statement st, statement body, bool one_trip_do ) {
   inout_statement( body );
 
   /* Compute "out" sets for the loop */
-  if ( one_trip_do ) {
+  if ( one_trip_do_p ) {
     /* Body is always done at least one time */
     set_assign( DEF_OUT( st ), DEF_OUT( body ) );
     set_assign( REF_OUT( st ), REF_OUT( body ) );
@@ -739,7 +741,7 @@ static void inout_any_loop( statement st, statement body, bool one_trip_do ) {
  */
 static void inout_loop( statement st, loop lo ) {
   statement body = loop_body( lo );
-  inout_any_loop( st, body, one_trip_do );
+  inout_any_loop( st, body, one_trip_do_p );
 }
 
 /**
@@ -761,7 +763,7 @@ static void inout_whileloop( statement st, whileloop wl ) {
  */
 static void inout_forloop( statement st, forloop fl ) {
   statement body = forloop_body( fl );
-  inout_any_loop( st, body, one_trip_do );
+  inout_any_loop( st, body, one_trip_do_p );
 }
 
 /**
@@ -1023,7 +1025,7 @@ static cons *pushnew_conflict( effect fin, effect fout, cons *cfs ) {
 static bool dd_du( effect fin, effect fout ) {
   bool conflict_p = action_write_p( effect_action( fin ));
 
-  if ( get_bool_property( "CHAINS_DATAFLOW_DEPENDENCE_ONLY" ) ) {
+  if ( dataflow_dependence_only_p ) {
     conflict_p = conflict_p && action_read_p( effect_action( fout ) );
   }
 
@@ -1035,7 +1037,7 @@ static bool dd_du( effect fin, effect fout ) {
  */
 static bool ud( effect fin, effect fout ) {
   return ( action_read_p( effect_action( fin ))
-      && ( action_write_p( effect_action( fout )) || keep_read_read_dependences ) );
+      && ( action_write_p( effect_action( fout )) || keep_read_read_dependences_p ) );
 }
 
 /**
@@ -1256,8 +1258,10 @@ static void usedef_control( c )
  */
 graph statement_dependence_graph( statement s ) {
   /* Initialize some properties */
-  one_trip_do = get_bool_property( "ONE_TRIP_DO" );
-  keep_read_read_dependences = get_bool_property( "KEEP_READ_READ_DEPENDENCE" );
+  one_trip_do_p = get_bool_property( "ONE_TRIP_DO" );
+  keep_read_read_dependences_p = get_bool_property( "KEEP_READ_READ_DEPENDENCE" );
+  mask_effects_p = get_bool_property("CHAINS_MASK_EFFECTS");
+  dataflow_dependence_only_p = get_bool_property("CHAINS_DATAFLOW_DEPENDENCE_ONLY");
 
   /* Initialize global hashtables */
   effects2statement = hash_table_make( hash_pointer, 0 );
