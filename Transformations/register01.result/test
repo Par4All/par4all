@@ -30,11 +30,10 @@ int dixsept(register int i)
    register int l = i+17, m = 2*i+13;
    return l+m;
 }
-int register01(register int i, int *register p)
+int register01(register int i, register int *p)
 {
    register int j = i;
    int k = 1;
-
    *p = j;
    p = &k;
    return dixsept(k);

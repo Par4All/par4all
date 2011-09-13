@@ -3,14 +3,26 @@ delete flatten_code01
 
 create flatten_code01 flatten_code01.c
 
+# For debugging
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_ALL_C_BLOCKS TRUE
+
+echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE[flatten_code01]
+
 echo
 echo Initial code
 echo
+
 display PRINTED_FILE[flatten_code01]
 
 echo
 echo Code after flatten_code
 echo
+
 apply FLATTEN_CODE[flatten_code01]
 activate PRINT_CODE
 display PRINTED_FILE[flatten_code01]
@@ -18,4 +30,3 @@ display PRINTED_FILE[flatten_code01]
 close
 delete flatten_code01
 quit
-
