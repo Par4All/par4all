@@ -1,3 +1,5 @@
+# $Id$
+ROOT    = ../../..
 
 TARGET	= step
 
@@ -6,7 +8,7 @@ PARSER_OMP = step_omp
 
 INSTALL_INC = STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h
 
-DERIVED_HEADERS = $(INSTALL_INC) $(PARSER_COMMENT).h $(PARSER_OMP).h ../../Runtimes/step/c/STEP.h
+DERIVED_HEADERS = $(INSTALL_INC) $(PARSER_COMMENT).h $(PARSER_OMP).h $(ROOT)/src/Runtimes/step/c/STEP.h
 DERIVED_CFILES	= $(PARSER_COMMENT).c $(PARSER_OMP).c
 
 INC_CFILES=	directives.c \
@@ -22,7 +24,6 @@ LIB_TARGET =    lib$(TARGET).a
 
 
 # common stuff
-ROOT    = ../../..
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
@@ -45,4 +46,5 @@ $(PARSER_OMP).c: $(PARSER_OMP).lex
 $(PARSER_OMP).h: $(PARSER_OMP).c
 
 srcdir	= .
+top_srcdir	= $(ROOT)
 include stepstuff.mk

@@ -44,5 +44,7 @@ STEP_RT_intrinsic.h: step_api.tmp
 	}\
 	END{printf ("/* Runtime API handler (end) */\n") >> "$@"}' $^
 
-../../Runtimes/step/c/STEP.h:
-	$(MAKE) -C ../../Runtimes/step/c STEP.h
+# this one means that Runtimes stuff must be somehow compiled as well.
+# so it must be am-ized...
+$(top_srcdir)/src/Runtimes/step/c/STEP.h:
+	$(MAKE) -C $(top_srcdir)/src/Runtimes/step/c STEP.h
