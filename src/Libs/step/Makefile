@@ -35,16 +35,6 @@ clean: local-clean
 local-clean:
 	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) step_api.tmp steprt_f.h
 
-$(PARSER_COMMENT).c: $(PARSER_COMMENT).lex
-	$(FLEX) $(LFLAGS) --prefix=$(PARSER_COMMENT)_ --header-file=$(PARSER_COMMENT).h -DYY_NO_INPUT -DIN_PIPS --outfile=`pwd`/$@ `pwd`/$^
-
-$(PARSER_COMMENT).h: $(PARSER_COMMENT).c
-
-$(PARSER_OMP).c: $(PARSER_OMP).lex
-	$(FLEX) $(LFLAGS) --prefix=$(PARSER_OMP)_ --header-file=$(PARSER_OMP).h -DYY_NO_INPUT --outfile=`pwd`/$@ `pwd`/$^
-
-$(PARSER_OMP).h: $(PARSER_OMP).c
-
 srcdir	= .
 top_srcdir	= $(ROOT)
 include stepstuff.mk

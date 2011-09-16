@@ -48,3 +48,16 @@ STEP_RT_intrinsic.h: step_api.tmp
 # so it must be am-ized...
 $(top_srcdir)/src/Runtimes/step/c/STEP.h:
 	$(MAKE) -C $(top_srcdir)/src/Runtimes/step/c STEP.h
+
+PARSER_COMMENT	= comment2pragma
+PARSER_OMP	= step_omp
+
+$(PARSER_COMMENT).c: $(PARSER_COMMENT).lex
+	$(FLEX) $(LFLAGS) --prefix=$(PARSER_COMMENT)_ --header-file=$(PARSER_COMMENT).h -DYY_NO_INPUT -DIN_PIPS --outfile=`pwd`/$@ $<
+
+$(PARSER_COMMENT).h: $(PARSER_COMMENT).c
+
+$(PARSER_OMP).c: $(PARSER_OMP).lex
+	$(FLEX) $(LFLAGS) --prefix=$(PARSER_OMP)_ --header-file=$(PARSER_OMP).h -DYY_NO_INPUT --outfile=`pwd`/$@ $<
+
+$(PARSER_OMP).h: $(PARSER_OMP).c
