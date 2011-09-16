@@ -2383,7 +2383,7 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 		 that as in the previous case).
 	      */
 	      entity output_ent = reference_variable(*output_ref);
-	      type bct = basic_concrete_type(entity_type(output_ent));
+	      type bct = entity_basic_concrete_type(output_ent);
 
 	      if (!entity_scalar_p(output_ent) || derived_type_p(bct) || pointer_type_p(bct))
 	      {
@@ -2440,7 +2440,6 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 		*output_desc = make_descriptor_convex(sc_new());
 		*exact_p = true;
 	      }
-	      free_type(bct);
 	    }
 
 	} /* if(!ENDP(input_remaining_indices))*/

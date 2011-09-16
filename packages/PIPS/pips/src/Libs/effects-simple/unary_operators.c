@@ -94,9 +94,7 @@ effect reference_to_simple_effect(reference ref, action act,
     {
 
       list ind = reference_indices(ref);
-      type t = entity_type(reference_variable(ref));
-      type ut = basic_concrete_type(t);
-
+      type ut = entity_basic_concrete_type(reference_variable(ref));
 
       if(type_variable_p(ut))
 	{
@@ -158,7 +156,7 @@ effect reference_to_simple_effect(reference ref, action act,
 					 variable_dimensions(utv)))
 			{
 			  simple_effect_add_expression_dimension
-			    (eff, make_unbounded_expression());	
+			    (eff, make_unbounded_expression());
 			} /* FOREACH */
 
 		    }
@@ -188,8 +186,6 @@ effect reference_to_simple_effect(reference ref, action act,
 	  approximation ap = make_approximation_exact();
 	  eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 	}
-      free_type(ut);
-
     }
 
   ifdebug(8)

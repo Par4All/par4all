@@ -170,7 +170,7 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
 
   FOREACH(ENTITY, f, l_fields)
     {
-      type current_type = basic_concrete_type(entity_type(f));
+      type current_type = entity_basic_concrete_type(f);
       basic current_basic = variable_basic(type_variable(current_type));
       effect current_eff = (*effect_dup_func)(input_eff);
 
@@ -207,7 +207,6 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
 	    le = gen_nconc(CONS(EFFECT, current_eff, NIL), le);
 	  }
 	}
-      free_type(current_type);
     }
   pips_debug_effects(8, "output effects:\n", le);
 
@@ -241,7 +240,7 @@ list generic_intermediary_proper_effects_of_reference(reference ref)
 {
   list le = NIL;
   entity ent = reference_variable(ref);
-  type t = basic_concrete_type(entity_type(ent));
+  type t = entity_basic_concrete_type(ent);
   list l_ind_orig = reference_indices(ref);
   list l_ind = l_ind_orig;
 
@@ -326,7 +325,6 @@ list generic_intermediary_proper_effects_of_reference(reference ref)
     }  /* if (type_variable_p(t)) */
   gen_nreverse(le);
   le = gen_nconc(generic_proper_effects_of_expressions(l_ind), le);
-  free_type(t);
 
   pips_debug_effects(7, "end with \n", le);
   return le;
@@ -361,7 +359,7 @@ list generic_p_proper_effect_of_reference(reference ref,
   list l_inds = reference_indices(ref);
   list l_inds_tmp = l_inds;
 
-  type t = basic_concrete_type(entity_type(ent));
+  type t = entity_basic_concrete_type(ent);
 
   *pme = effect_undefined;
 
@@ -507,7 +505,6 @@ list generic_p_proper_effect_of_reference(reference ref,
 
       pips_debug_effects(4, "and intermediate read effects : \n",le);
     }
-  free_type(t);
 
   return le;
 }
@@ -585,7 +582,7 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
 		  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 		}
 	    }
-      free_type(ref_type);
+	  free_type(ref_type);
 	}
 	else
 	  pips_internal_error("case not handled yet ");
@@ -2299,7 +2296,7 @@ static list generic_proper_effects_of_declaration(entity decl)
 	 loop distribution issue. */
       if (!variable_static_p(decl) && !value_unknown_p(v_init))
 	{
-	  type decl_t = basic_concrete_type(entity_type(decl));
+	  type decl_t = entity_basic_concrete_type(decl);
 	  list l_tmp = NIL;
 
 	  if (!ENDP(variable_dimensions(type_variable(decl_t))))
@@ -2316,7 +2313,6 @@ static list generic_proper_effects_of_declaration(entity decl)
 							  true);
 	    }
 	  l_eff= gen_nconc(l_eff, l_tmp);
-	  free_type(decl_t);
 	}
       pips_debug_effects(1, "ending with:", l_eff);
     }

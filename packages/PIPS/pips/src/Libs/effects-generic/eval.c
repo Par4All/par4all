@@ -23,7 +23,7 @@
 
 */
 #ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
+#include "pips_config.h"
 #endif
 
 #include <stdio.h>
@@ -41,12 +41,6 @@
 #include "newgen_set.h"
 #include "points_to_private.h"
 #include "effects-generic.h"
-
-/*
-
-*/
-
-
 
 /*
   @brief tries to find in the points-to list ptl a points-to with a
@@ -102,20 +96,21 @@
   points_to_filter_effects() to reduce the number of anywhere
   locations generated.
 
-
  */
 
-list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, list ptl, bool *exact_p,
-				      transformer current_precondition,
-				      bool (*cell_reference_preceding_p_func)(reference, descriptor,
-									      reference, descriptor ,
-									      transformer, bool, bool * ),
-				      void (*cell_reference_with_address_of_cell_reference_translation_func)(reference, descriptor,
-													    reference, descriptor,
-													    int,
-													    reference *, descriptor *,
-													     bool *),
-				      void (*cell_reference_conversion_func)(reference, reference *, descriptor *))
+list generic_eval_cell_with_points_to(
+  cell input_cell, descriptor input_desc, list ptl, bool *exact_p,
+  transformer current_precondition,
+  bool (*cell_reference_preceding_p_func)(reference, descriptor,
+                                          reference, descriptor ,
+                                          transformer, bool, bool * ),
+  void (*cell_reference_with_address_of_cell_reference_translation_func)
+      (reference, descriptor,
+       reference, descriptor,
+       int,
+       reference *, descriptor *,
+       bool *),
+  void (*cell_reference_conversion_func)(reference, reference *, descriptor *))
 {
   debug_on("EVAL_CELL_WITH_POINTS_TO_DEBUG_LEVEL");
   reference input_ref = reference_undefined;
@@ -140,13 +135,12 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
   pips_debug(8, "input reference  : %s\n",
 	words_to_string(words_reference(input_ref, NIL)));
   ifdebug(8)
-    {
-      points_to_list ptll = make_points_to_list(ptl);
-      fprintf(stderr, "%s\n", words_to_string(words_points_to_list("", ptll)));
-      points_to_list_list(ptll) = NIL;
-      free_points_to_list(ptll);
-
-    }
+  {
+    points_to_list ptll = make_points_to_list(ptl);
+    fprintf(stderr, "%s\n", words_to_string(words_points_to_list("", ptll)));
+    points_to_list_list(ptll) = NIL;
+    free_points_to_list(ptll);
+  }
 
   if (entity_abstract_location_p(input_ent))
     {
@@ -301,7 +295,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 										   &build_ref, &build_desc,
 										   &exact_translation_p);
 		  *exact_p = *exact_p && exact_translation_p;
-		  /* the approximation tag of the points-to is taken into account for the exactness of the result  */
+		  /* the approximation tag of the points-to is taken into account for the exactness of the result */
 		  *exact_p = *exact_p && approximation_exact_p(points_to_approximation(pt));
 		  pips_debug(8, "adding reference %s\n",
 			     words_to_string(words_reference(build_ref, NIL)));

@@ -760,14 +760,14 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 		  }
 	      }
 	    else if (basic_derived_p(b))
-	      {		
+	      {
 		if (!type_enum_p(entity_type(basic_derived(b))))
 		  {
 		    pips_debug(8, "struct or union case\n");
 		    list l_fields = type_fields(entity_type(basic_derived(b)));
 		    FOREACH(ENTITY, f, l_fields)
 		      {
-			type current_type = basic_concrete_type(entity_type(f));
+			type current_type = entity_basic_concrete_type(f);
 			effect current_eff = (*effect_dup_func)(eff_write);
 
 			// we add the field index
@@ -778,13 +778,12 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 			  (l_res,
 			   generic_effect_generate_all_accessible_paths_effects_with_level
 			   (current_eff,  current_type, act, true, level, pointers_only));
-			free_type(current_type);
 		      }
 		  }
 	      }
 	    else if (!basic_typedef_p(b))
 	      {
-		
+
 		if (!pointers_only && (add_array_dims || add_eff))
 		  l_res = gen_nconc
 		    (l_res,
@@ -954,9 +953,9 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	    if (!entity_undefined_p(field))
 	      {
 		/* the current type is the type of the field */
-		ct = basic_concrete_type(entity_type(field));
+		ct = entity_basic_concrete_type(field);
 		p = r_effect_pointer_type_p(eff, CDR(l_ind), ct);
-		free_type(ct);
+		/* free_type(ct); */
 		ct = type_undefined;
 		finished = true;
 	      }
@@ -965,10 +964,9 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	      {
 		while (!ENDP(l_ent) && p)
 		  {
-		    type new_ct = basic_concrete_type(entity_type(ENTITY(CAR(l_ent))));
+		    type new_ct = entity_basic_concrete_type(ENTITY(CAR(l_ent)));
 		    p = r_effect_pointer_type_p(eff, CDR(l_ind),
 						new_ct);
-		    free_type(new_ct);
 		    POP(l_ent);
 		  }
 		finished = true;
@@ -1000,7 +998,7 @@ bool effect_pointer_type_p(effect eff)
   reference ref = effect_any_reference(eff);
   list l_ind = reference_indices(ref);
   entity ent = reference_variable(ref);
-  type t = basic_concrete_type(entity_type(ent));
+  type t = entity_basic_concrete_type(ent);
 
   pips_debug(8, "begin with effect reference %s\n",
 	     words_to_string(words_reference(ref,NIL)));
@@ -1009,7 +1007,6 @@ bool effect_pointer_type_p(effect eff)
   else
     p = r_effect_pointer_type_p(eff, l_ind, t);
 
-  free_type(t);
   pips_debug(8, "end with p = %s\n", p== false ? "false" : "true");
   return p;
 
@@ -1019,7 +1016,7 @@ bool effect_pointer_type_p(effect eff)
 
 type simple_effect_reference_type(reference ref)
 {
-  type bct = basic_concrete_type(entity_type(reference_variable(ref)));
+  type bct = entity_basic_concrete_type(reference_variable(ref));
   type ct; /* current_type */
 
   list l_inds = reference_indices(ref);
@@ -1081,8 +1078,7 @@ type simple_effect_reference_type(reference ref)
 		if (!entity_undefined_p(field))
 		  {
 		    pips_debug(8, "known field, poping field dimension\n");
-		    free_type(bct);
-		    bct =  basic_concrete_type(entity_type(field));
+		    bct = entity_basic_concrete_type(field);
 		    ct = bct;
 		    POP(l_inds);
 		  }
@@ -1111,7 +1107,6 @@ type simple_effect_reference_type(reference ref)
     } /* while (!finished) */
 
 
-  free_type(bct);
   pips_debug(6, "returns with %s\n", words_to_string(words_type(t,NIL,false)));
   return t;
 

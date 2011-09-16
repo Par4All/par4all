@@ -818,7 +818,7 @@ list simple_effect_intermediary_pointer_paths_effect(effect eff)
   entity e = reference_variable(ref);
   list ref_inds = reference_indices(ref);
   reference tmp_ref = make_reference(e, NIL);
-  type t = basic_concrete_type(entity_type(e));
+  type t = entity_basic_concrete_type(e);
   bool finished = false;
 
   if (entity_all_locations_p(e))
@@ -865,7 +865,7 @@ list simple_effect_intermediary_pointer_paths_effect(effect eff)
 		    POP(ref_inds);
 
 		    type new_t = copy_type(basic_pointer(b));
-		    free_type(t);
+		    /* free_type(t);*/
 		    t = new_t;
 		  }
 		else
@@ -874,8 +874,7 @@ list simple_effect_intermediary_pointer_paths_effect(effect eff)
 	    else if (basic_derived_p(b))
 	      {
 		pips_debug(5,"derived basic\n");
-		type new_t = basic_concrete_type(entity_type(basic_derived(b)));
-		free_type(t);
+		type new_t = entity_basic_concrete_type(basic_derived(b));
 		t = new_t;
 	      }
 	    else
@@ -898,8 +897,7 @@ list simple_effect_intermediary_pointer_paths_effect(effect eff)
 	    POP(ref_inds);
 	    entity field_ent = expression_to_entity(field_exp);
 	    pips_assert("expression is a field entity\n", !entity_undefined_p(field_ent));
-	    type new_t = basic_concrete_type(entity_type(field_ent));
-	    free_type(t);
+	    type new_t = entity_basic_concrete_type(field_ent);
 	    t = new_t;
 	  }
 	  break;
@@ -908,8 +906,6 @@ list simple_effect_intermediary_pointer_paths_effect(effect eff)
 
 	}
     }
-  free_type(t);
-
   return l_res;
 }
 
