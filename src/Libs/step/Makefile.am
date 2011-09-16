@@ -10,6 +10,8 @@ BUILT_SOURCES=$(TARGET).h $(Fh) $(Fc)
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libstep.la
 dist_noinst_HEADERS=$(Fh) defines-local.h
+
+# Fc should not be included for step.h cproto generation?
 libstep_la_SOURCES=	comment2pragma.lex \
 			step_omp.lex \
 			directives.c \
