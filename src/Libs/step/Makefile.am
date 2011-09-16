@@ -15,7 +15,8 @@ libstep_la_SOURCES=	comment2pragma.lex \
 			directives.c \
 			analyse.c \
 			compile_RT.c \
-			compile.c
+			compile.c \
+			$(Fc)
 
 
 AM_CPPFLAGS=-DPIPS_RUNTIME_DIR=\"$(datadir)\"
