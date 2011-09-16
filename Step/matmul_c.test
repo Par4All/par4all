@@ -1,5 +1,5 @@
-FILE=sum
-LANG=f
+FILE=matmul_c
+LANG=c
 run_step.script $FILE.$LANG
 for f in $FILE/$FILE.database/Src/* ; do echo "###################### $f ######################"; cat $f; done
 rm -rf $FILE

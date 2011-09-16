@@ -569,19 +569,15 @@
          NROWA = M                                                      0046
          NCOLA = K                                                      0047
       ENDIF
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
       IF (.NOT.NOTA) THEN
          NROWA = K                                                      0049
          NCOLA = M                                                      0050
       ENDIF
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
       IF (NOTB) NROWB = K
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
       IF (.NOT.NOTB) NROWB = N
-!$omp end parallel do
 *
 *     Test the input parameters.
 *
@@ -594,49 +590,36 @@
      &   TRANSB, 'T')
 !$PIPS IF_TO_CONVERT
          IF (L_6) INFO = 2
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6) L_5 = M.LT.0
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.L_5) INFO = 3
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND..NOT.L_5) L_4 = N.LT.0
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.L_4)) INFO = 4
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND..NOT.L_4)) L_3 = K.LT.0
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.L_3))) INFO = 5
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND..NOT.L_3))) L_2
      &    = LDA.LT.MAX(1, NROWA)
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.
      &   L_2)))) INFO = 8
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.
      &   .NOT.L_2)))) L_1 = LDB.LT.MAX(1, NROWB)
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
      &   .NOT.L_2.AND.L_1))))) INFO = 10
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
      &   .NOT.L_2.AND..NOT.L_1))))) L_0 = LDC.LT.MAX(1, M)
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
      &   .NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))) INFO = 13
-!$omp end parallel do
       ENDIF
       IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
@@ -705,11 +688,9 @@
                            L_7 = BETA.EQ.ZERO
 !$PIPS IF_TO_CONVERT
                            IF (L_7) C(I,J) = ALPHA*TEMP
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
                            IF (.NOT.L_7) C(I,J) = ALPHA*TEMP+BETA*C(I
      &                     ,J)
-!$omp end parallel do
 110                        CONTINUE                                     0153
 120                     CONTINUE                                        0154
                   ENDIF
@@ -749,10 +730,8 @@
                         L_8 = BETA.EQ.ZERO
 !$PIPS IF_TO_CONVERT
                         IF (L_8) C(I,J) = ALPHA*TEMP
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
                         IF (.NOT.L_8) C(I,J) = ALPHA*TEMP+BETA*C(I,J)
-!$omp end parallel do
 190                     CONTINUE                                        0195
 200                  CONTINUE                                           0196
                ENDIF
@@ -794,19 +773,15 @@
          NROWA = M                                                      0046
          NCOLA = K                                                      0047
       ENDIF
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
       IF (.NOT.NOTA) THEN
          NROWA = K                                                      0049
          NCOLA = M                                                      0050
       ENDIF
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
       IF (NOTB) NROWB = K
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
       IF (.NOT.NOTB) NROWB = N
-!$omp end parallel do
 *
 *     Test the input parameters.
 *
@@ -819,49 +794,36 @@
      &   TRANSB, 'T')
 !$PIPS IF_TO_CONVERT
          IF (L_6) INFO = 2
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6) L_5 = M.LT.0
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.L_5) INFO = 3
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND..NOT.L_5) L_4 = N.LT.0
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.L_4)) INFO = 4
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND..NOT.L_4)) L_3 = K.LT.0
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.L_3))) INFO = 5
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND..NOT.L_3))) L_2
      &    = LDA.LT.MAX(1, NROWA)
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.
      &   L_2)))) INFO = 8
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.
      &   .NOT.L_2)))) L_1 = LDB.LT.MAX(1, NROWB)
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
      &   .NOT.L_2.AND.L_1))))) INFO = 10
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
      &   .NOT.L_2.AND..NOT.L_1))))) L_0 = LDC.LT.MAX(1, M)
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
          IF (.NOT.L_6.AND.(.NOT.L_5.AND.(.NOT.L_4.AND.(.NOT.L_3.AND.(
      &   .NOT.L_2.AND.(.NOT.L_1.AND.L_0)))))) INFO = 13
-!$omp end parallel do
       ENDIF
       IF (INFO.NE.0) THEN                                               0082
 *         CALL XERBLA( 'SGEMM ', INFO )
@@ -930,11 +892,9 @@
                            L_7 = BETA.EQ.ZERO
 !$PIPS IF_TO_CONVERT
                            IF (L_7) C(I,J) = ALPHA*TEMP
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
                            IF (.NOT.L_7) C(I,J) = ALPHA*TEMP+BETA*C(I
      &                     ,J)
-!$omp end parallel do
 110                        CONTINUE                                     0153
 120                     CONTINUE                                        0154
                   ENDIF
@@ -974,10 +934,8 @@
                         L_8 = BETA.EQ.ZERO
 !$PIPS IF_TO_CONVERT
                         IF (L_8) C(I,J) = ALPHA*TEMP
-!$omp end parallel do
 !$PIPS IF_TO_CONVERT
                         IF (.NOT.L_8) C(I,J) = ALPHA*TEMP+BETA*C(I,J)
-!$omp end parallel do
 190                     CONTINUE                                        0195
 200                  CONTINUE                                           0196
                ENDIF

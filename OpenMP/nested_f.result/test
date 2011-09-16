@@ -31,9 +31,7 @@ Open MP version
          DO K = 1, SIZE                                                 0008
             ARRAY(K,I) = I+K                                            0009
          ENDDO
-!$omp end parallel do
       ENDDO
-!$omp end parallel do
 
       PRINT *, ARRAY                                                    0013
       END

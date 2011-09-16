@@ -34,7 +34,6 @@
             ENDDO
          ENDDO
       ENDDO
-!$omp end parallel do
 
       PRINT *, ARRAY                                                    0014
 

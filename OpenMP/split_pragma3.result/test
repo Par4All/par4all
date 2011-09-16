@@ -49,6 +49,5 @@
          I = IM1+1
          A(J) = I*1.0
       ENDDO
-!$omp end parallel do
       PRINT *, A
       END
