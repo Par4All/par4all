@@ -1,18 +1,3 @@
-# $Id$
-
-PARSER_COMMENT	= comment2pragma
-
-$(PARSER_COMMENT).c: $(PARSER_COMMENT).lex
-        $(FLEX) $(LFLAGS) --prefix=$(PARSER_COMMENT)_ --header-file=$(PARSER_COMMENT).h -DYY_NO_INPUT -DIN_PIPS --outfile=`pwd`/$@ `pwd`/$^
-
-$(PARSER_COMMENT).h: $(PARSER_COMMENT).c
-
-PARSER_OMP	= step_omp
-
-$(PARSER_OMP).c: $(PARSER_OMP).lex
-        $(FLEX) $(LFLAGS) --prefix=$(PARSER_OMP)_ --header-file=$(PARSER_OMP).h -DYY_NO_INPUT --outfile=`pwd`/$@ `pwd`/$^
-
-$(PARSER_OMP).h: $(PARSER_OMP).c
 
 step_api.tmp: step_api.h
 	grep '^[ \t]*extern[ \t]*void[ \t]*STEP_API' $^		 |	\
