@@ -83,13 +83,15 @@ set points_to_nowhere_typed(list lhs_list, set input)
 
       /* create a new points to with as source the current
 	 element of lhs_set and sink the null value .*/
+    bool to_be_freed = false;
+    type c_type = cell_to_type(c, &to_be_freed);
       entity e = entity_all_xxx_locations_typed(NOWHERE_LOCATION,
-					      cell_reference_to_type
-					      (cell_reference(c)));
+					      c_type);
       reference r = make_reference(e, NIL);
       cell sink = make_cell_reference(r);
       points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
       set_add_element(gen, gen, (void*)pt_to);
+      if(to_be_freed) free_type(c_type);
     }
   /* gen + input_kill_diff*/
   set_union(res, gen, input_kill_diff);
@@ -257,13 +259,15 @@ list expression_to_constant_paths(expression e, set in)
     }
     else {
       pips_user_warning("Uninitialized pointer");
+      bool to_be_freed = false;
+      type c_type = cell_to_type(c, &to_be_freed);
       entity nowhere = entity_all_xxx_locations_typed(
 						      NOWHERE_LOCATION,
-						      cell_reference_to_type
-						      (cell_reference(c)));
+						      c_type);
       reference r = make_reference(nowhere,NIL);
       c = make_cell_reference(r);
       l = CONS(CELL, c, NIL);
+      if (to_be_freed) free_type(c_type);
     }
   }
   else {
@@ -410,17 +414,20 @@ list possible_constant_paths(
       pips_user_error("Uninitialized pointer \n");
     else {
       pips_user_warning("Uninitialized pointer \n");
+      bool to_be_freed = false;
+      type lhs_type = cell_to_type(lhs, &to_be_freed);
       entity nowhere =entity_all_xxx_locations_typed(
 						     NOWHERE_LOCATION,
-						     cell_reference_to_type
-						     (cell_reference(lhs))
-						     );
+						     lhs_type);
       reference r = make_reference(nowhere,NIL);
       cell c = make_cell_reference(r);
       paths = CONS(CELL, c, NIL);
+      if (to_be_freed) free_type(lhs_type);
     }
   }
   else {
+    bool to_be_freed = false;
+    type lhs_type = cell_to_type(lhs, &to_be_freed);
     FOREACH(cell, c, l){
       reference r = cell_to_reference(c);
       entity e = reference_variable(r);
@@ -429,13 +436,12 @@ list possible_constant_paths(
       if(entity_all_locations_p(e)){
 	entity anywhere =entity_all_xxx_locations_typed(
 							ANYWHERE_LOCATION,
-							cell_reference_to_type
-							(cell_reference(lhs))
-							);
+							lhs_type);
 	r = make_reference(anywhere,NIL);
 	c = make_cell_reference(r);
       }
       paths = gen_nconc(paths, CONS(CELL, c, NIL));
+      if (to_be_freed) free_type(lhs_type);
     }
   }
 

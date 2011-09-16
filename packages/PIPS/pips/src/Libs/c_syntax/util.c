@@ -1340,7 +1340,8 @@ void UpdateArrayEntity(entity e, list lq, list le)
 	{
 	  variable v = type_variable(t);
 	  variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
-	  variable_dimensions(v) = gen_nconc(variable_dimensions(v),CONS(DIMENSION,MakeDimension(le),NIL));
+	  variable_dimensions(v) =
+	    gen_nconc(variable_dimensions(v),CONS(DIMENSION,MakeDimension(le),NIL));
 	}
       else
 	{
@@ -2654,11 +2655,17 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
 	}
 	else if(type_variable_p(t2)) {
 	  if(pointer_type_p(t2)) {
-	    type pt = type_to_final_pointed_type(t2);
+	    // The qualifiers must be stored on the effective pointed type
+	    // type pt = type_to_final_pointed_type(t2);
+	    // type pt = type_to_pointed_type(t2);
+	    type pt = basic_pointer(variable_basic(type_variable(t2)));
 	    if(type_void_p(pt))
 	      type_void(pt) = ql;
-	    else if(type_variable_p(pt))
+	    else if(type_variable_p(pt)) {
+	      // If pt is a typedef, the typedef is altered...
 	      variable_qualifiers(type_variable(pt)) = ql;
+	      //variable_qualifiers(type_variable(t2)) = ql;
+	    }
 	    else if(type_functional_p(pt)) {
 	      /* What do we do for functional types for instance? */
 	      /* FI: I assume the qualifiers are carried by the
