@@ -1,9 +1,13 @@
+# $Id$
+
+Fh	= STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h
+
 TARGET	= step
 include_HEADERS=$(TARGET).h
-BUILT_SOURCES=$(TARGET).h
+BUILT_SOURCES=$(TARGET).h $(Fh)
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libstep.la
-dist_noinst_HEADERS=STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h defines-local.h
+dist_noinst_HEADERS=$(Fh) defines-local.h
 libstep_la_SOURCES=	comment2pragma.lex \
 			step_omp.lex \
 			directives.c \
@@ -14,4 +18,5 @@ libstep_la_SOURCES=	comment2pragma.lex \
 
 AM_CPPFLAGS=-DPIPS_RUNTIME_DIR=\"$(datadir)\"
 
+include stepstuff.mk
 include $(srcdir)/../pipslibs_includes.mk
