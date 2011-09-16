@@ -21,5 +21,7 @@ libstep_la_SOURCES=	comment2pragma.lex \
 
 AM_CPPFLAGS=-DPIPS_RUNTIME_DIR=\"$(datadir)\"
 
+# FIXME: should bot be here
+FLEX	= flex
 include stepstuff.mk
 include $(srcdir)/../pipslibs_includes.mk
