@@ -1,0 +1,15 @@
+delete const05
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create const05 const05.c
+
+
+display PARSED_PRINTED_FILE[const05!]
+
+close
+
+#delete const05
+
+quit

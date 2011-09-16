@@ -1,0 +1,10 @@
+// Check for const after pointers
+
+// Constant pointer
+// typedef int * const ipc_t;
+
+// Pointer to a constant
+//typedef const int * ipc_t;
+
+// Pointer to a constant
+typedef const int *ipc_t;

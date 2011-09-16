@@ -67,5 +67,4 @@
          ALF = GM*Q(5,I,J,K)/RO
          A1 = ALF-FI2
       ENDDO
-!$omp end parallel do
       END

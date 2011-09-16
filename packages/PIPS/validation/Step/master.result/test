@@ -1,173 +1,153 @@
-
-
-Source files copied in : master/Source/
-Generated source files : master/src
-###################### master/src/MASTER_PAR1_BARRIER1_HYBRID.f ######################
-!!
-!! file for MASTER_PAR1_BARRIER1_HYBRID.f
-!!
-      SUBROUTINE MASTER_PAR1_BARRIER1_HYBRID
-! MIL-STD-1753 Fortran extension not in PIPS
+###################### master/master.database/Src/MASTER_PAR_HYBRID.f ######################
+      SUBROUTINE MASTER_PAR_HYBRID(N, A, I, J)
       implicit none
       include "STEP.h"
-!$OMP barrier
-      CALL STEP_BARRIER                                                 0104
-
-      END
-###################### master/src/MASTER_PAR1_DO10_HYBRID.f ######################
-!!
-!! file for MASTER_PAR1_DO10_HYBRID.f
-!!
-      SUBROUTINE MASTER_PAR1_DO10_HYBRID(J, J_L, J_U, N, A)
-! MIL-STD-1753 Fortran extension not in PIPS
-      implicit none
-      include "STEP.h"
-      INTEGER STEP_J_UP, STEP_J_LOW, J_UP, J_LOW, IDX, J, J_L, J_U, N
-      INTEGER STEP_SR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 1:
-     &MAX_NB_LOOPSLICES), A(1:N)
-
+      INTEGER N, I, J
+      INTEGER STEP_RR_A(STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:1
+     &), A(1:N)
 !$omp master
-      CALL STEP_CONSTRUCT_BEGIN(STEP_DO)                                0108
-      CALL STEP_GET_COMMSIZE(STEP_COMM_SIZE)                            0109
-      CALL STEP_COMPUTE_LOOPSLICES(J_L, J_U, 1, STEP_COMM_SIZE)         0110
+      CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL)
+      CALL STEP_INIT_ARRAYREGIONS(A, STEP_INTEGER4, 1, 1, N)
 
-C     Put array boundaries into SEND region arrays
-C     First dimension: lower and upper bounds of each slice
-C     Second dimension: for each dimension of the original array
-C     Third dimension: store the boundaries of the local chunk.
+C RECV REGIONS
 
-      DO IDX = 1, STEP_COMM_SIZE                                        0117
-         CALL STEP_GET_LOOPBOUNDS(IDX-1, J_LOW, J_UP)                   0118
-C  <A(PHI1)-write-EXACT-{1<=PHI1, J_LOW<=PHI1, PHI1<=J_UP, PHI1<=N}>
-         STEP_SR_A(IDX_SLICE_LOW,1,IDX) = MAX(J_LOW, 1)                 0120
-         STEP_SR_A(IDX_SLICE_UP,1,IDX) = MIN(J_UP, N)                   0121
+C  <A(PHI1)-R-MAY-{1<=PHI1, PHI1<=10}>
+
+      STEP_RR_A(STEP_INDEX_SLICE_LOW,1) = 1
+      STEP_RR_A(STEP_INDEX_SLICE_UP,1) = 10
+      CALL STEP_SET_RECVREGIONS(A, 1, STEP_RR_A)
+      CALL STEP_REGISTER_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG, 
+     &STEP_TAG_DEFAULT)
+      CALL STEP_FLUSH
+!$omp end master
+!$omp barrier
+
+C BEGIN WORK
+!$omp parallel
+      CALL MASTER_PAR_HYBRID_DO_HYBRID(N, A, J)
+      PRINT *, "parallel1", A, I
+      I = -1
+      CALL MASTER_PAR_HYBRID_MASTER_HYBRID(N, A, I)
+      CALL MASTER_PAR_HYBRID_BARRIER_HYBRID
+! no implict barrier for "END MASTER" directive
+      PRINT *, "parallel2", A, I
+!$omp end parallel
+C END WORK
+!$omp master
+
+C     Communicating data to other nodes
+C     3 communication shemes for all-to-all personalized broadcast :
+C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
+      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
+     &)
+      CALL STEP_FLUSH
+      CALL STEP_CONSTRUCT_END(STEP_PARALLEL)
+!$omp end master
+!$omp barrier
+      END
+###################### master/master.database/Src/MASTER_PAR_HYBRID_BARRIER_HYBRID.f ######################
+      SUBROUTINE MASTER_PAR_HYBRID_BARRIER_HYBRID
+      implicit none
+      include "STEP.h"
+
+C BEGIN WORK
+!$omp barrier
+      CALL STEP_BARRIER
+C END WORK
+      END
+###################### master/master.database/Src/MASTER_PAR_HYBRID_DO_HYBRID.f ######################
+      SUBROUTINE MASTER_PAR_HYBRID_DO_HYBRID(N, A, J)
+      implicit none
+      include "STEP.h"
+      INTEGER IDX, STEP_COMM_RANK, STEP_J_UP, STEP_J_LOW, 
+     &STEP_COMM_SIZE, N, J
+      INTEGER STEP_SR_A(STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:1
+     &, 1:STEP_MAX_NB_LOOPSLICES), A(1:N)
+!$omp master
+      CALL STEP_CONSTRUCT_BEGIN(STEP_DO)
+      CALL STEP_GET_COMMSIZE(STEP_COMM_SIZE)
+      CALL STEP_COMPUTE_LOOPSLICES(1, N, 1, STEP_COMM_SIZE)
+
+C SEND REGIONS
+      DO IDX = 1, STEP_COMM_SIZE
+         CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_J_LOW, STEP_J_UP)
+
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10, STEP_J_LOW<=PHI1,
+C    PHI1<=STEP_J_UP, I==-3}>
+
+         STEP_SR_A(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(STEP_J_LOW, 1)
+         STEP_SR_A(STEP_INDEX_SLICE_UP,1,IDX) = MIN(STEP_J_UP, 10)
       ENDDO
-      CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)           0123
-
+      CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)
 !$omp end master
 !$omp barrier
 
-
-C     Where work is done...
-      CALL STEP_GET_RANK(STEP_COMM_RANK)                                0130
-      CALL STEP_GET_LOOPBOUNDS(STEP_COMM_RANK, STEP_J_LOW, STEP_J_UP)   0131
-!$OMP do
-      DO 10 J = STEP_J_LOW, STEP_J_UP                                   0133
-         A(J) = J                                                       0134
-         PRINT *, "do2", J                                              0135
-10       CONTINUE                                                       0136
-!$OMP end do
-
+C BEGIN WORK
+      CALL STEP_GET_RANK(STEP_COMM_RANK)
+      CALL STEP_GET_LOOPBOUNDS(STEP_COMM_RANK, STEP_J_LOW, STEP_J_UP)
+!$omp do
+      DO 10 J = STEP_J_LOW, STEP_J_UP
+         A(J) = J
+         PRINT *, "do2", J
+10       CONTINUE
+!$omp end do
+C END WORK
 !$omp master
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0144
-     &)                                                                 0144
-      CALL STEP_WAITALL                                                 0146
-      CALL STEP_CONSTRUCT_END(STEP_DO)                                  0147
-
+      CALL STEP_REGISTER_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG, 
+     &STEP_TAG_DEFAULT)
+      CALL STEP_FLUSH
+      CALL STEP_CONSTRUCT_END(STEP_DO)
 !$omp end master
 !$omp barrier
-
       END
-###################### master/src/MASTER_PAR1_HYBRID.f ######################
-!!
-!! file for MASTER_PAR1_HYBRID.f
-!!
-      SUBROUTINE MASTER_PAR1_HYBRID(J, N, A, I)
-! MIL-STD-1753 Fortran extension not in PIPS
+###################### master/master.database/Src/MASTER_PAR_HYBRID_MASTER_HYBRID.f ######################
+      SUBROUTINE MASTER_PAR_HYBRID_MASTER_HYBRID(N, A, I)
       implicit none
       include "STEP.h"
-      INTEGER J, N, I
-      INTEGER A(1:N)
-
+      INTEGER STEP_COMM_RANK, N, I
+      INTEGER STEP_SR_A(STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:1
+     &), STEP_RR_A(STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:1), A(
+     &1:N)
 !$omp master
-      CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL)                          0107
-      CALL STEP_INIT_ARRAYREGIONS(A, STEP_INTEGER4, 1, 1, N)            0108
+      CALL STEP_CONSTRUCT_BEGIN(STEP_MASTER)
 
-!$omp end master
-!$omp barrier
+C RECV REGIONS
 
-!$OMP parallel
-C$STEP !$omp do
-      CALL MASTER_PAR1_DO10_HYBRID(J, 1, N, N, A)                       0115
-      PRINT *, "parallel1", A, I                                        0116
-      I = -1                                                            0117
-C$STEP !$omp master
-      CALL MASTER_PAR1_MASTER1_HYBRID(N, A, I)                          0119
-C$STEP !$omp end master
-C$STEP !$omp barrier   ! no implict barrier for "END MASTER" directive
-      CALL MASTER_PAR1_BARRIER1_HYBRID                                  0122
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10, I==-1, J==11}>
 
+      STEP_RR_A(STEP_INDEX_SLICE_LOW,1) = 1
+      STEP_RR_A(STEP_INDEX_SLICE_UP,1) = 10
+      CALL STEP_SET_RECVREGIONS(A, 1, STEP_RR_A)
+      CALL STEP_REGISTER_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG, 
+     &STEP_TAG_DEFAULT)
+      CALL STEP_FLUSH
 
-      PRINT *, "parallel2", A, I                                        0125
-!$OMP end parallel
+C SEND REGIONS
 
-!$omp master
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10, J==11}>
 
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0133
-     &)                                                                 0133
-      CALL STEP_WAITALL                                                 0135
-      CALL STEP_CONSTRUCT_END(STEP_PARALLEL)                            0136
+      STEP_SR_A(STEP_INDEX_SLICE_LOW,1) = 1
+      STEP_SR_A(STEP_INDEX_SLICE_UP,1) = 10
+      CALL STEP_SET_SENDREGIONS(A, 1, STEP_SR_A)
 
-!$omp end master
-!$omp barrier
+C BEGIN WORK
+      CALL STEP_GET_RANK(STEP_COMM_RANK)
+      IF (STEP_COMM_RANK.EQ.0) THEN
+         PRINT *, "master", A, I
 
-      END
-###################### master/src/MASTER_PAR1_MASTER1_HYBRID.f ######################
-!!
-!! file for MASTER_PAR1_MASTER1_HYBRID.f
-!!
-      SUBROUTINE MASTER_PAR1_MASTER1_HYBRID(N, A, I)
-! MIL-STD-1753 Fortran extension not in PIPS
-      implicit none
-      include "STEP.h"
-      INTEGER N, I
-      INTEGER STEP_RR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1), STEP_SR_A(
-     &IDX_SLICE_LOW:IDX_SLICE_UP, 1:1), A(1:N)
-
-!$omp master
-      CALL STEP_CONSTRUCT_BEGIN(STEP_MASTER)                            0108
-      STEP_RR_A(IDX_SLICE_LOW,1) = 1                                    0109
-      STEP_RR_A(IDX_SLICE_UP,1) = N                                     0110
-      CALL STEP_SET_RECVREGIONS(A, 1, STEP_RR_A)                        0111
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOMASTERREGION(A, STEP_NBLOCKING_ALG)                0116
-      CALL STEP_WAITALL                                                 0117
-      STEP_SR_A(IDX_SLICE_LOW,1) = 1                                    0118
-      STEP_SR_A(IDX_SLICE_UP,1) = N                                     0119
-      CALL STEP_SET_SENDREGIONS(A, 1, STEP_SR_A)                        0120
-      CALL STEP_GET_RANK(STEP_COMM_RANK)                                0121
-      IF (STEP_COMM_RANK.EQ.0) THEN                                     0122
-         PRINT *, "master", A, I                                        0123
-
-         DO 20 I = 1, N                                                 0125
-            A(I) = 2*I                                                  0126
-20          CONTINUE                                                    0127
+         DO 20 I = 1, N
+            A(I) = 2*I
+20          CONTINUE
       ENDIF
-
-C     Communicating data to other nodes
-C     3 communication shemes for all-to-all personalized broadcast :
-C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_MASTERTOALLSCALAR(I, STEP_NBLOCKING_ALG,                0133
-     &STEP_INTEGER4)                                                    0133
-      CALL STEP_MASTERTOALLREGION(A, STEP_NBLOCKING_ALG)                0135
-      CALL STEP_WAITALL                                                 0136
-      CALL STEP_CONSTRUCT_END(STEP_MASTER)                              0137
-
+C END WORK
+      CALL STEP_REGISTER_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG, 
+     &STEP_TAG_DEFAULT)
+      CALL STEP_FLUSH
+      CALL STEP_CONSTRUCT_END(STEP_MASTER)
 !$omp end master
 !$omp barrier
-
       END
-###################### master/src/Makefile ######################
+###################### master/master.database/Src/Makefile ######################
 #Default Makefile to compile generated files
 
 BIN=a.out
@@ -176,7 +156,7 @@ FC=mpif77
 CC=mpicc
 
 
-FLAGS = -g -O2
+FLAGS = -g -O2 -I$(DIR_STEP)
 
 export COMPILER = gnu
 export STEP_KIND = 4
@@ -188,7 +168,7 @@ ifeq ($(COMPILER) , gnu)
    ifeq ($(STEP_KIND), 8)
       FFLAGS += -fdefault-integer-8
    endif
-   LDFLAGS = 
+   LDFLAGS =
 endif
 
 ifeq ($(COMPILER) , intel)
@@ -198,7 +178,7 @@ ifeq ($(COMPILER) , intel)
    ifeq ($(STEP_KIND), 8)
       FFLAGS += -i8
    endif
-   LDFLAGS = 
+   LDFLAGS =
 endif
 
 
@@ -207,65 +187,38 @@ CSOURCES= *.c
 FSOURCES= *.f
 OBJFILES= *.o
 
-LIB_STEP=libstep.a
-HEADER_F=steprt_f.h
-HEADER_C=steprt_c.h
-RUNTIME=c
+LIB_STEP=libstep.so
 DIR_STEP=step_rt
 
-all: gnu 
+all: gnu
 
-$(BIN) : $(DIR_STEP)/$(LIB_STEP) $(OBJFILES) BIN_CRITICAL_PCOORD
-	if ls  >/dev/null 2>&1 *.o ; then $(FC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -o $@; fi
+$(BIN) : $(DIR_STEP)/$(LIB_STEP) compile_c compile_f
+	if ls  >/dev/null 2>&1 *.o ; then $(FC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -Wl,-rpath=$(DIR_STEP) -o $@; fi
 
-BIN_CRITICAL_PCOORD: $(DIR_STEP)/critical_pcoord_program.c
-	$(CC) -o $(DIR_STEP)/critical_pcoord_program  $^ 	
-
-
-$(OBJFILES):
-	ln -sf $(DIR_STEP)/$(HEADER_F) $(HEADER_F)
-	ln -sf $(DIR_STEP)/$(HEADER_C) $(HEADER_C)
-	for f in `ls *_MPI.c` ; do \
-		echo $$f; \
-		echo >tmp "#include \"STEP_C.h\""; \
-		cat >>tmp $$f; \
-		mv tmp $$f; \
-	done;
+compile_c: $(DIR_STEP)/step_api.h
 	if ls  >/dev/null 2>&1 *.c ; then $(CC) $(OpenMP_FLAG) $(CFLAGS) -c $(CSOURCES); fi
+
+compile_f: $(DIR_STEP)/STEP.h
 	if ls  >/dev/null 2>&1 *.f ; then $(FC) $(OpenMP_FLAG) $(FFLAGS) -c $(FSOURCES); fi
 
 $(DIR_STEP)/$(LIB_STEP):
-	$(MAKE) -C $(DIR_STEP) $(LIB_STEP)
+	$(MAKE) -C $(DIR_STEP) $(LIB_STEP) STEP.h critical_pcoord_program
 
 clean:
 	$(MAKE) -C $(DIR_STEP) $@
-	rm -f $(HEADER_F) *.o *~ *__genmod.*
+	rm -f *.o *~ *__genmod.*
 
 clear: clean
 	rm -f $(BIN)
 
-gnu:	clear 
+gnu:	clear
 	export OMPI_F77=gfortran; export OMPI_FC=gfortran; export OMPI_CC=gcc; export LANG=C;  $(MAKE) $(BIN) COMPILER=gnu
 
 intel:	clear
 	export OMPI_F77=ifort; export OMPI_FC=ifort; export OMPI_CC=icc; export LANG=C;  make $(BIN) COMPILER=intel
 
 .IGNORE: clean clear
-###################### master/src/STEP.h ######################
-      INCLUDE 'steprt_f.h'
-
-      INTEGER STEP_COMM_SIZE, STEP_COMM_RANK
-
-      INTEGER MAX_NB_LOOPSLICES
-      PARAMETER (MAX_NB_LOOPSLICES = 16)
-      
-      INTEGER IDX_SLICE_LOW,IDX_SLICE_UP,STEP_IDX
-      PARAMETER (IDX_SLICE_LOW = 1,IDX_SLICE_UP=2)
-
-###################### master/src/master.f ######################
-!!
-!! file for master.f
-!!
+###################### master/master.database/Src/master.f ######################
 !
 !
 ! Example of a master directive
@@ -281,135 +234,9 @@ intel:	clear
       INTEGER I,J,A(N)
       CALL STEP_INIT_FORTRAN_ORDER
 
-      I = -3                                                            0015
-C$STEP !$omp parallel
-      CALL MASTER_PAR1_HYBRID(J, N, A, I)
-C$STEP !$omp end parallel
+      I = -3
+      CALL MASTER_PAR_HYBRID(N, A, I, J)
       CALL STEP_FINALIZE
 
       END
-###################### master/src/step_directives.f ######################
-!!
-!! file for step_directives.f
-!!
-      SUBROUTINE MASTER_PAR1(J, N, A, I)
-      INTEGER J, N, I
-      INTEGER A(1:N)
-C$STEP !$omp do
-      CALL MASTER_PAR1_DO10_HYBRID(J, 1, N, N, A)                       0005
-      PRINT *, "parallel1", A, I                                        0006
-      I = -1                                                            0007
-C$STEP !$omp master
-      CALL MASTER_PAR1_MASTER1_HYBRID(N, A, I)                          0009
-C$STEP !$omp end master
-C$STEP !$omp barrier   ! no implict barrier for "END MASTER" directive
-      CALL MASTER_PAR1_BARRIER1_HYBRID                                  0012
-
-
-      PRINT *, "parallel2", A, I                                        0015
-      END
-      SUBROUTINE MASTER_PAR1_BARRIER1
-      END
-      SUBROUTINE MASTER_PAR1_MASTER1(N, A, I)
-      INTEGER N, I
-      INTEGER A(1:N)
-      PRINT *, "master", A, I                                           0004
-
-      DO 20 I = 1, N                                                    0006
-         A(I) = 2*I                                                     0007
-20       CONTINUE                                                       0008
-      END
-      SUBROUTINE MASTER_PAR1_DO10(J, J_L, J_U, N, A)
-      INTEGER J, J_L, J_U, N
-      INTEGER A(1:N)
-      DO 10 J = J_L, J_U                                                0004
-         A(J) = J                                                       0005
-         PRINT *, "do2", J                                              0006
-10       CONTINUE                                                       0007
-      END
-###################### master/src/step_rt ######################
-###################### master/src/steprt_f.h ######################
-!
-!   Genereted file from c/step_common.h
-! 
-       INTEGER STEP_C
-       PARAMETER (STEP_C = 0)
-
-       INTEGER STEP_FORTRAN
-       PARAMETER (STEP_FORTRAN = 1)
-
-       INTEGER STEP_PARALLEL
-       PARAMETER (STEP_PARALLEL = 0)
-
-       INTEGER STEP_DO
-       PARAMETER (STEP_DO = 1)
-
-       INTEGER STEP_PARALLEL_DO
-       PARAMETER (STEP_PARALLEL_DO = 2)
-
-       INTEGER STEP_NOWAIT
-       PARAMETER (STEP_NOWAIT = 0)
-
-       INTEGER STEP_WAIT
-       PARAMETER (STEP_WAIT = 1)
-
-       INTEGER STEP_INTEGER
-       PARAMETER (STEP_INTEGER = 0)
-
-       INTEGER STEP_REAL
-       PARAMETER (STEP_REAL = 1)
-
-       INTEGER STEP_DOUBLE_PRECISION
-       PARAMETER (STEP_DOUBLE_PRECISION = 2)
-
-       INTEGER STEP_COMPLEX
-       PARAMETER (STEP_COMPLEX = 3)
-
-       INTEGER STEP_INTEGER1
-       PARAMETER (STEP_INTEGER1 = 4)
-
-       INTEGER STEP_INTEGER2
-       PARAMETER (STEP_INTEGER2 = 5)
-
-       INTEGER STEP_INTEGER4
-       PARAMETER (STEP_INTEGER4 = 6)
-
-       INTEGER STEP_INTEGER8
-       PARAMETER (STEP_INTEGER8 = 7)
-
-       INTEGER STEP_REAL4
-       PARAMETER (STEP_REAL4 = 8)
-
-       INTEGER STEP_REAL8
-       PARAMETER (STEP_REAL8 = 9)
-
-       INTEGER STEP_REAL16
-       PARAMETER (STEP_REAL16 = 10)
-
-       INTEGER STEP_COMPLEX8
-       PARAMETER (STEP_COMPLEX8 = 11)
-
-       INTEGER STEP_COMPLEX16
-       PARAMETER (STEP_COMPLEX16 = 12)
-
-       INTEGER STEP_TYPE_UNDEFINED
-       PARAMETER (STEP_TYPE_UNDEFINED = 13)
-
-       INTEGER STEP_TAG_DEFAULT
-       PARAMETER (STEP_TAG_DEFAULT = 0)
-
-       INTEGER STEP_NBLOCKING_ALG
-       PARAMETER (STEP_NBLOCKING_ALG = 0)
-
-       INTEGER STEP_PROD
-       PARAMETER (STEP_PROD = 0)
-
-       INTEGER STEP_MAX
-       PARAMETER (STEP_MAX = 1)
-
-       INTEGER STEP_MIN
-       PARAMETER (STEP_MIN = 2)
-
-       INTEGER STEP_SUM
-       PARAMETER (STEP_SUM = 3)
-
+###################### master/master.database/Src/step_rt ######################

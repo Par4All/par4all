@@ -19,15 +19,15 @@ int fn = 17;
 static int gn = 19;
 
 int main(void);
-void a_double(register double * pd, register double val)
+void a_double(register double *pd, register double val)
 {
    *pd = val;
 }
-void a_int(register int * pi, register int val)
+void a_int(register int *pi, register int val)
 {
    *pi = val;
 }
-void a_stuff(register stuff_t * s, register int val)
+void a_stuff(register stuff_t *s, register int val)
 {
    s->data = val;
 }
@@ -36,10 +36,8 @@ int main(void)
    // scalars
    int in = 1;
    register int ir = 1;
-
    register int kr;
    int kn;
-
    register int nr = 10;
    kr = 3;
    a_int(&in, ir);
@@ -47,10 +45,8 @@ int main(void)
 
    double jn = 2.0;
    register double jr = 2.0;
-
    double ln;
    register double lr;
-
    ln = 17.0;
    lr = 13.0;
    a_double(&ln, lr+17);
@@ -59,10 +55,8 @@ int main(void)
    // arrays
    int an[10];
    register  int ar[10];
-
    int bn[10][10], cn[10][10], dn[10][10];
    register  int br[10][10];
-
    an[0] = 0;
    ar[0] = 17;
    dn[0][0] = 3;
@@ -71,12 +65,11 @@ int main(void)
    a_int(&cn[3]+5, 31);
    register int sr = sizeof(ar)+sizeof(br[2])+sizeof(dn);
    int *p = dn;
-   int **register qr = &p;
+   register int **qr = &p;
    
    // struct
    register stuff_t s1r;
    stuff_t s1n;
-
    s1r.data = 10;
    s1n.data = 11;
    a_stuff(&s1n, 18);
