@@ -15,7 +15,7 @@
 #                                                                              *
 #*******************************************************************************
 
-LIBRARY = libstep.a
+LIBRARY = libstep.a libstep.so
 
 export STEP_KIND = 4
 STEP_ARG = int32_t
@@ -26,8 +26,8 @@ endif
 
 FC = mpif90
 CC = mpicc
-FLAGS = -g -O2 -DSTEP_ARG=$(STEP_ARG) -DINDEX_TYPE=$(STEP_ARG)
-#FLAGS += -O0 
+FLAGS = -g -O2 -DSTEP_ARG=$(STEP_ARG) -DINDEX_TYPE=$(STEP_ARG) -fPIC
+#FLAGS += -O0
 FLAGS += -Wall
 #FLAGS += -DSTEP_DEBUG
 #FLAGS += -DSTEP_COMMUNICATIONS_VERBOSE
@@ -43,32 +43,34 @@ CFLAGS += $(FLAGS) -I.
 
 
 INCLUDE_DIR = ./util
-LD_FLAGS = $(INCLUDE_DIR) -ltimings 
+LD_FLAGS = $(INCLUDE_DIR) -ltimings
 
 SRC = step_api.c steprt.c communications.c regions.c array.c timer.c trace.c
-OBJ = $(SRC:.c=.o) 
+OBJ = $(SRC:.c=.o)
 
 
-all: $(LIBRARY)
+all: $(LIBRARY) STEP.h critical_pcoord_program
 
-steprt_f.h: step_common.h
-	@echo >$@ "!\n!   Genereted file from $^\n!"
-	@sed -n "/^#define[\t ]\+\([^ \t]\+\)[ \t]\+\([0-9]\+\)/p"  $^ | \
+STEP.h: step_common.h
+	echo "!\n!   Genereted file from $^\n!" > $@ && \
+	sed -n "/^#define[\t ]\+\([^ \t]\+\)[ \t]\+\([0-9]\+\)/p" $^ | \
+	grep -v "^#define[\t ]*STEP_BARRIER" | \
 	sed "s,^#define[\t ]\+\([^ \t]\+\)[ \t]\+\([0-9]\+\),\n       INTEGER \1\n       PARAMETER (\1 = \2)," >>$@
 
-steprt_c.h: step_common.h
-#	@echo >$@ "/*\n   Genereted file from $^\n*/"
-#	@sed -n "/^#define[\t ]\+\([^ \t]\+\)[ \t]\+\([0-9]\+\)/p"  $^ | \
-#	sed "s,^#define[\t ]\+\([^ \t]\+\)[ \t]\+\([0-9]\+\),static const int \1 = \2;," >>$@
+critical_pcoord_program: critical_pcoord_program.c
+	$(CC) -o $@ $^
 
-step_type.o: step_type.f steprt_f.h steprt_c.h
+step_type.o: step_type.f STEP.h
 	$(FC) $(FFLAGS) -o $@ -c $<
 
 %.o: %.c
 	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -o $@ -c $<
 
-$(LIBRARY): step_type.o $(OBJ) 
+libstep.a: step_type.o $(OBJ)
 	ar rcs $@ $^
+
+libstep.so: step_type.o $(OBJ)
+	$(CC) -shared -o $@ $^
 
 alltests: test_array test_regions test_communications test_steprt test_step_api test_timer_c test_timer_f
 
@@ -81,10 +83,10 @@ test_regions: array.c regions.c trace.c
 test_communications: steprt.c communications.c array.c regions.c trace.c step_type.o
 	$(CC) -DTEST_COMMUNICATIONS $(CFLAGS) $^ -o $@
 
-test_steprt: steprt.c communications.c array.c regions.c trace.c step_type.o 
+test_steprt: steprt.c communications.c array.c regions.c trace.c step_type.o
 	$(CC) -D TEST_STEPRT $(FLAGS) $^ -o $@
 
-test_step_api: step_api.c steprt.c communications.c array.c regions.c trace.c step_type.o  
+test_step_api: step_api.c steprt.c communications.c array.c regions.c trace.c step_type.o
 	$(CC) -fopenmp -D TEST_STEP_API $(FLAGS) $^ -o $@
 #	$(FC) $(FFLAGS) $^ -o $@
 
@@ -98,6 +100,6 @@ test_timer_f: array.c timer.c trace.c
 clean:
 	@rm -f *.o  *~ *__genmod.* &>/dev/null
 	@rm -f $(LIBRARY) test_* *.report $ &>/dev/null
-	@rm -f steprt_f.h
+	@rm -f STEP.h critical_pcoord_program
 
 .IGNORE: clean

@@ -143,7 +143,7 @@
 \author{Remi Triolet and Fran\c{c}ois Irigoin\\
   with many other contributors\\
         MINES ParisTech \\
-        Mathématiques et Systèmes \\
+        Mathï¿½matiques et Systï¿½mes \\
         Centre de Recherche en Informatique \\
         77305 Fontainebleau Cedex \\
         France \\}
@@ -247,7 +247,7 @@
 %% \newcommand{\Delete}{\LINK{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
 \newcommand{\Delete}{{\em Delete}}
 
-%% Pour Béatrice :
+%% Pour Bï¿½atrice :
 \newcommand{\exact}[0]{{\tt EXACT}}
 \newcommand{\incluseg}{\subseteq}
 \newcommand{\phik}[1]{\ifmmode\phi_{#1}\else$\phi_{#1}$\fi}
@@ -269,7 +269,7 @@
 
 %\begin{PipsExample}
 %petit essai
-%à mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
+%ï¿½ mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
 %\end{PipsExample}
 
 %% The environment used to mark up the menus layout :
@@ -2899,7 +2899,7 @@ algorithms. A dependence graph is a refinement of use-def chains
 
 There are several ways to compute a dependence graph. Some of them are
 fast (\textsc{Banerjee}'s one for instance) but provide poor results, others
-might be slower (Rémi Triolet's one for instance) but produce better
+might be slower (Rï¿½mi Triolet's one for instance) but produce better
 results.
 
 Three different dependence tests are available, all based on
@@ -2953,9 +2953,9 @@ dependence graph. If they were removed instead of being ignored,
 use-def elimination would remove all \verb/free/ statements.
 
 The main contributors for the design and development of dependence
-analysis are Rémi \textsc{Triolet}, François \textsc{Irigoin} and Yi-qing
+analysis are Rï¿½mi \textsc{Triolet}, Franï¿½ois \textsc{Irigoin} and Yi-qing
 \textsc{Yang}~\cite{Yan93}. The code was improved by Corinne
-\textsc{Ancourt} and Béatrice \textsc{Creusillet}.
+\textsc{Ancourt} and Bï¿½atrice \textsc{Creusillet}.
 \end{PipsPass}
 
 \subsection{Menu for Dependence Tests}
@@ -3317,7 +3317,7 @@ polynomial} equations between scalar integer variables. SUIF~\cite{}
 also performs some kind of semantics analysis.
 
 The semantics analysis part of \Pips{} was designed and developed by
-François \textsc{Irigoin}.
+Franï¿½ois \textsc{Irigoin}.
 
 \subsection{Transformers}
 \label{subsubsection-transformers}
@@ -3359,7 +3359,7 @@ since call statements are accepted. Interprocedural algorithms use the
 Fast algorithms use a very primitive non-iterative transitive closure
 algorithm (two possible versions: flow sensitive or flow insensitive).
 Full algorithms use a transitive closure algorithm based on vector
-subspace (i.e. \emph{à la} K{\sc arr}~\cite{Kar76}) or one based on
+subspace (i.e. \emph{ï¿½ la} K{\sc arr}~\cite{Kar76}) or one based on
 the discrete derivatives~\cite{Iri05,ACI10}. The iterative fix point
 algorithm for transformers (i.e. H{\sc albwachs}/C{\sc
 ousot}~\cite{CH78} is implemented but not used because the results
@@ -4374,7 +4374,7 @@ The first version of the complexity estimator was designed and
 developed by Pierre \textsc{Berthomier}. It was restricted to intra-procedural
 analysis. This first version was enlarged and validated on real code for
 SPARC-2 machines by Lei Z{\sc hou}~\cite{Zho94}. Since, it has been modified
-slightly by François I{\sc rigoin}. For simple programs, complexity
+slightly by Franï¿½ois I{\sc rigoin}. For simple programs, complexity
 estimation are strongly correlated with execution times. The estimations
 can be used to see if program transformations are beneficial.
 
@@ -4731,11 +4731,11 @@ body, and which appears in the loop body region polyhedron, does not appear
 anymore in the invariant region polyhedron.
 
 \verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
-by Rémi \textsc{Triolet}~\cite{Tri84} and then revisited by François
+by Rï¿½mi \textsc{Triolet}~\cite{Tri84} and then revisited by Franï¿½ois
 \textsc{Irigoin}~\cite{TIF86}. Alexis \textsc{Platonoff}~\cite{Pla90}
 implemented the first version of region analysis in \Pips{}. These
 regions were computed with respect to the initial stores of the
-modules. François \textsc{Irigoin} and, mainly, Béatrice
+modules. Franï¿½ois \textsc{Irigoin} and, mainly, Bï¿½atrice
 \textsc{Creusillet}~\cite{CI95,CI96,Cre96}, added new functionalities to
 this first version as well as functions to compute \verb+MUST+
 regions, and \verb+IN+ and \verb+OUT+ regions.
@@ -5490,7 +5490,7 @@ PARALLELIZE_AGAIN_PARALLEL_CODE FALSE
 \end{PipsProp}
 The motivation is we may want to parallelize with a coarse grain method
 first, and finish with a fine grain method here to try to parallelize what
-has not been parallelized.  When applying \emph{à la} Rice parallelizing
+has not been parallelized.  When applying \emph{ï¿½ la} Rice parallelizing
 to parallelize some (still) sequential code, we may not want loop
 distribution on already parallel code to preserve cache resources, etc.
 
@@ -6236,7 +6236,7 @@ generated code, e.g. to propagate constant or eliminate dead code.
 Note that use-use dependencies are used to allocate temporary arrays in
 local memory (i.e. in the software cache).
 
-This compilation scheme was designed by Corinne \textsc{Ancourt} and François
+This compilation scheme was designed by Corinne \textsc{Ancourt} and Franï¿½ois
 \textsc{Irigoin}. It uses theoretical results in~\cite{AI91}. Its input is a very
 small subset of Fortran program (e.g. procedure calls are not supported).
 It was implemented by the designers, with help from Lei \textsc{Zhou}.
@@ -6558,223 +6558,59 @@ HPFC_EXTRACT_LATTICE TRUE
 \marginpar{RK: IT SudParis : insert your documentation here; FI: or a
   pointer towards you documentation}
 
-\subsubsection{STEP outlining-inlining}
-
-\begin{PipsPass}{outlining_init}
-The \PipsPassRef{outlining_init} phase initialize the
-\texttt{PROGRAM.outlined} ressource keeping trace of outlinined
-modules.
-\end{PipsPass}
-
-\begin{PipsMake}
-outlining_init              > PROGRAM.outlined
-\end{PipsMake}
-
-\begin{PipsPass}{step_outlining}
-The \PipsPassRef{step_outlining} phase is to test the outliner used
-by STEP.
-\end{PipsPass}
-
-\begin{PipsMake}
-step_outlining              > PROGRAM.outlined
-                            > MODULE.code
-                            > MODULE.callees
-   < PROGRAM.entities
-   < PROGRAM.outlined
-   < MODULE.code
-   < MODULE.callees
-\end{PipsMake}
-
-The property \PipsPropRef{OUTLINING_NAME} is the name for the new outlined
-module. The statement outlined are the statments which statement
-number are between \PipsPropRef{OUTLINING_FROM} and \PipsPropRef{OUTLINING_TO}.
-If the property \PipsPropRef{OUTLINING_SYMBOLIC} is set to true, the
-symbolic parametres are passed as argument to the outlined module.
-
-
-\begin{PipsProp}{OUTLINING_NAME}
-OUTLINING_NAME "outline"
-\end{PipsProp}
-\begin{PipsProp}{OUTLINING_FROM}
-OUTLINING_FROM 0
-\end{PipsProp}
-\begin{PipsProp}{OUTLINING_TO}
-OUTLINING_TO 0
-\end{PipsProp}
-\begin{PipsProp}{OUTLINING_SYMBOLIC}
-OUTLINING_SYMBOLIC TRUE
-\end{PipsProp}
-
-\begin{PipsPass}{step_inlining}
-The \PipsPassRef{step_inlining} phase is the reverse transformation of
-\PipsPassRef{step_outlining}. During the outlining, the new call
-statement is labelized. Setting the property
-\PipsPropRef{INLINING_LABEL} with this label inligne the code
-previously outlined by \PipsPassRef{step_outlining}.
-\end{PipsPass}
-
-\begin{PipsMake}
-step_inlining               > PROGRAM.outlined
-                            > MODULE.code
-                            > MODULE.callees
-   < PROGRAM.entities
-   < PROGRAM.outlined
-   < MODULE.code
-   < MODULE.callees
-\end{PipsMake}
-
-\begin{PipsProp}{INLINING_LABEL}
-INLINING_LABEL 0
-\end{PipsProp}
 
 \subsubsection{STEP Directives}
 
-\begin{PipsPass}{directives_init}
-The \PipsPassRef{directives_init} phase init the
-\texttt{PROGRAM.directives} ressource keeping trace of the directives
-reconized by the \PipsPassRef{step_directives} phase.
+\begin{PipsPass}{step_parser}
+The \PipsPassRef{step_parser} phase identifies the OpenMP
+constructs. The directive semantics are stored in the
+\texttt{MODULE.step\_directives} ressource.
 \end{PipsPass}
 
 \begin{PipsMake}
-directives_init             > PROGRAM.directives
-\end{PipsMake}
-
-\begin{PipsPass}{directive_filter}
-The \PipsPassRef{directive_filter} phase preproces an original
-source file to transform the OpenMP directives in statement
-understandable by the Pips parser.
-\end{PipsPass}
-
-\begin{PipsMake}
-directive_filter            > MODULE.directive_filtered_file
-   < MODULE.source_file
-\end{PipsMake}
-
-\begin{PipsPass}{directive_filter_c}
-The \PipsPassRef{directive_filter_c} phase preproces an original
-source file just as \PipsPassRef{directive_filter} but for C file.
-\end{PipsPass}
-
-\begin{PipsMake}
-directive_filter_c          > MODULE.directive_filtered_file
-   < MODULE.c_source_file
-   < COMPILATION_UNIT.declarations
-\end{PipsMake}
-
-\begin{PipsPass}{directive_parser}
-The \PipsPassRef{directive_parser} phase invoke the PIPS parser on
-pre-proceed source file \texttt{MODULES.directive\_filtered\_file}
-\end{PipsPass}
-
-\begin{PipsMake}
-directive_parser            > MODULE.parsed_code
-                            > MODULE.callees
-   < PROGRAM.entities
-   < MODULE.directive_filtered_file
-\end{PipsMake}
-
-\begin{PipsPass}{step_directives}
-The \PipsPassRef{step_directives} phase identifies the OpenMP
-constructs and outlines them in new modules. The directive semantics
-of outlined modules are stored in the \texttt{PROGRAM.directives} ressource.
-\end{PipsPass}
-
-\begin{PipsMake}
-step_directives             > PROGRAM.directives
-                            > PROGRAM.outlined
+step_parser                 > MODULE.step_directives
                             > MODULE.code
-                            > MODULE.callees
-   ! MODULE.directive_parser
-   < PROGRAM.entities
-   < PROGRAM.outlined
-   < PROGRAM.directives
    < MODULE.code
-   < MODULE.callees
 \end{PipsMake}
 
 
 \subsubsection{STEP Analysis}
 
-\begin{PipsPass}{step_init}
-The \PipsPassRef{step_init} phase init the
-\texttt{PROGRAM.step\_status} and \texttt{PROGRAM.step\_analyses}
-ressources
+\begin{PipsPass}{step_analyse_init}
+The \PipsPassRef{step_analyse_init} phase init the
+\texttt{PROGRAM.step\_comm} ressources
 \end{PipsPass}
 
 \begin{PipsMake}
-step_init                   > PROGRAM.step_status
-                            > PROGRAM.step_analyses
-\end{PipsMake}
-
-
-\begin{PipsPass}{step_atomize}
-The \PipsPassRef{step_atomize} phase transforms the code for
-expressions analyses and keep trace of the transformation in the
-\texttt{step\_atomized} ressource.
-\end{PipsPass}
-
-\begin{PipsMake}
-step_atomize                > MODULE.code
-                            > MODULE.step_atomized
-   < PROGRAM.entities
-   < MODULE.code
+step_analyse_init            > PROGRAM.step_comm
 \end{PipsMake}
 
 \begin{PipsPass}{step_analyse}
-The \PipsPassRef{step_analyse} phase triggers the convex array regions analyses to
-compute SEND and RECV regions leading to MPI messages.
+The \PipsPassRef{step_analyse} phase triggers the convex array
+regions analyses to compute SEND and RECV regions leading to MPI
+messages and checks whether a given SEND region corresponding to a
+directive construct is consumed by a RECV region corresponding to a
+directive construct. In this case, communications can be optimized.
 \end{PipsPass}
 
 \begin{PipsMake}
-step_analyse                > PROGRAM.step_analyses
+step_analyse                 > PROGRAM.step_comm
+                             > MODULE.step_send_regions
+                             > MODULE.step_recv_regions
    < PROGRAM.entities
-   < PROGRAM.directives
-   < PROGRAM.step_analyses
+   < PROGRAM.step_comm
+   < MODULE.step_directives
    < MODULE.code
-   < MODULE.summary_regions
-   < MODULE.in_summary_regions
-   < MODULE.out_summary_regions
-\end{PipsMake}
-
-\begin{PipsPass}{step_analyse_com}
-The \PipsPassRef{step_analyse_com} phase checks whether a given SEND
-region corresponding to a directive module is consumed by a RECV
-region corresponding to a directive module. In this case,
-communications can be optimized.
-\end{PipsPass}
-
-\begin{PipsMake}
-step_unatomize              > MODULE.code
-                            > MODULE.step_atomized
-   < PROGRAM.entities
-   < PROGRAM.directives
-   < PROGRAM.step_analyses
-   < MODULE.code
-\end{PipsMake}
-
-\begin{PipsMake}
-step_analyse_com2            > PROGRAM.step_analyses
-                             > MODULE.step_analyses_com
-   < PROGRAM.entities
-   < PROGRAM.directives
-   < PROGRAM.step_analyses
-   < CALLEES.step_analyses_com
-   < MODULE.callees
-   < MODULE.code
-   < MODULE.dg
-\end{PipsMake}
-
-\begin{PipsPass}{step_unatomize}
-The\PipsPassRef{step_unatomize} phase perfome the reverse
-transformation of the \PipsPassRef{step_atomize} phase in order to
-source-to-source transformation.
-\end{PipsPass}
-\begin{PipsMake}
-step_unatomize              > MODULE.code
-                            > MODULE.step_atomized
-   < PROGRAM.entities
-   < MODULE.step_atomized
-   < MODULE.code
+   < MODULE.preconditions
+   < MODULE.transformers
+   < MODULE.cumulated_effects
+   < MODULE.regions
+   < MODULE.in_regions
+   < MODULE.out_regions
+   < MODULE.chains
+   < CALLEES.code
+   < CALLEES.step_send_regions
+   < CALLEES.step_recv_regions
 \end{PipsMake}
 
 
@@ -6791,26 +6627,8 @@ allowed are :
 \item \verb+"OMP"+ : for OpenMP parallel code
 \end{itemize}
 
-The property \PipsPropRef{STEP_RUNTIME} define which runtime will be provided
-with the generated sources. The allowed value are :
-\begin{itemize}
-\item \verb+"c"+
-\item \verb+"fortran"+ (no more maintained)
-\end{itemize}
-
 \begin{PipsProp}{STEP_DEFAULT_TRANSFORMATION}
 STEP_DEFAULT_TRANSFORMATION "HYBRID"
-\end{PipsProp}
-\begin{PipsProp}{STEP_RUNTIME}
-STEP_RUNTIME "c"
-\end{PipsProp}
-
-The property \PipsPropRef{STEP_OPTIMIZED_COMMUNICATIONS} set to
-\texttt{FALSE} by \PipsPassRef{step_analyse} and set to \texttt{TRUE}
-by \PipsPassRef{step_analyse_com}
-
-\begin{PipsProp}{STEP_OPTIMIZED_COMMUNICATIONS}
-STEP_OPTIMIZED_COMMUNICATIONS TRUE
 \end{PipsProp}
 
 \begin{PipsPass}{step_compile}
@@ -6829,14 +6647,10 @@ The specific STEP clauses allowed are :
 \end{PipsPass}
 
 \begin{PipsMake}
-step_compile               > PROGRAM.step_status
-                           > MODULE.code
-                           > MODULE.callees
-   ! CALLEES.step_compile
+step_compile               > MODULE.step_file
    < PROGRAM.entities
-   < PROGRAM.directives
-   < PROGRAM.step_analyses
-   < PROGRAM.step_status
+   < PROGRAM.step_comm
+   < MODULE.step_directives
    < MODULE.code
 \end{PipsMake}
 
@@ -6847,10 +6661,8 @@ property.
 \end{PipsPass}
 
 \begin{PipsMake}
-step_install               > PROGRAM.user_file
-                           > ALL.user_file
-   < ALL.user_file
-   < ALL.printed_file
+step_install
+   < ALL.step_file
 \end{PipsMake}
 
 \begin{PipsProp}{STEP_INSTALL_PATH}
@@ -7692,7 +7504,7 @@ of wrapper is the normal behaviour but for simulation of an accelerator
 code, not using a wrapper is useful.
 
 The intrinsics function names to get an $i^{th}$ coordinate in the
-iteration space are defined by this GNU \emph{à la} \texttt{printf}
+iteration space are defined by this GNU \emph{ï¿½ la} \texttt{printf}
 format:
 \begin{PipsProp}{GPU_COORDINATE_INTRINSICS_FORMAT}
 GPU_COORDINATE_INTRINSICS_FORMAT "P4A_vp_%d"
@@ -9118,7 +8930,7 @@ logic (such as FPGAs or DataPaths).
 
 This library provides phases allowing to build and modify "Finite State
 Machine"-like code portions which will be later synthesized in
-reconfigurable units. This was implemented by Sylvain \textsc{Guérin}.
+reconfigurable units. This was implemented by Sylvain \textsc{Guï¿½rin}.
 
 \subsubsection{FSM Generation}
 \label{paragraph-fsm-generation}
@@ -11034,7 +10846,7 @@ accelerator is performed by another phase, see for instance
 Section~\ref{hardware-accelerator}.
 
 Initially developed in August 2009 by Laurent \textsc{Daverio}, with help from
-Fabien \textsc{Coelho} and François \textsc{Irigoin}.
+Fabien \textsc{Coelho} and Franï¿½ois \textsc{Irigoin}.
 
 \begin{PipsMake}
 alias flatten_code 'Flatten Code'
@@ -15124,8 +14936,8 @@ print_xml_application      > MODULE.xml_printed_file
 \chapter{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
 
-This part of \Pips{} was implemented at Centre d'Études Atomiques,
-Limeil-Brévannes, by Benoît de \textsc{Dinechin}, Arnauld
+This part of \Pips{} was implemented at Centre d'ï¿½tudes Atomiques,
+Limeil-Brï¿½vannes, by Benoï¿½t de \textsc{Dinechin}, Arnauld
 \textsc{Leservot} and Alexis \textsc{Platonoff}.
 
 Unfortunately, this part is no longer used in PIPS right now because of

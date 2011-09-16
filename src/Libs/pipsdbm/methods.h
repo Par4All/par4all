@@ -198,12 +198,11 @@
 
 /* STEP FILES
  */
-{ DBR_DIRECTIVE_FILTERED_FILE,  STRING_METHODS },
-{ DBR_DIRECTIVES,               NEWGEN_METHODS },
-{ DBR_STEP_STATUS,              NEWGEN_METHODS },
-{ DBR_STEP_ATOMIZED,            NEWGEN_METHODS },
-{ DBR_STEP_ANALYSES,            NEWGEN_METHODS },
-{ DBR_STEP_ANALYSES_COM,        NEWGEN_METHODS },
+{ DBR_STEP_DIRECTIVES,          NEWGEN_METHODS },
+{ DBR_STEP_COMM,                NEWGEN_METHODS },
+{ DBR_STEP_SEND_REGIONS,        NEWGEN_METHODS },
+{ DBR_STEP_RECV_REGIONS,        NEWGEN_METHODS },
+{ DBR_STEP_FILE,                STRING_METHODS },
 
 /* HPFC GENERATED FILES
  */
@@ -233,7 +232,6 @@
 { DBR_CODE,			NEWGEN_METHODS },
 { DBR_HEIGHT,			STRING_METHODS },
 { DBR_DEPTH,			STRING_METHODS },
-{ DBR_OUTLINED,			NEWGEN_METHODS },
 
   /* DECLARATIONS is a special resource to impose that each compilation unit
      must be parsed before its functions. It is in fact a hash table

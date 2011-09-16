@@ -6,7 +6,7 @@ FC=mpif77
 CC=mpicc
 
 
-FLAGS = -g -O2
+FLAGS = -g -O2 -I$(DIR_STEP)
 
 export COMPILER = gnu
 export STEP_KIND = 4
@@ -18,7 +18,7 @@ ifeq ($(COMPILER) , gnu)
    ifeq ($(STEP_KIND), 8)
       FFLAGS += -fdefault-integer-8
    endif
-   LDFLAGS = 
+   LDFLAGS =
 endif
 
 ifeq ($(COMPILER) , intel)
@@ -28,7 +28,7 @@ ifeq ($(COMPILER) , intel)
    ifeq ($(STEP_KIND), 8)
       FFLAGS += -i8
    endif
-   LDFLAGS = 
+   LDFLAGS =
 endif
 
 
@@ -37,44 +37,31 @@ CSOURCES= *.c
 FSOURCES= *.f
 OBJFILES= *.o
 
-LIB_STEP=libstep.a
-HEADER_F=steprt_f.h
-HEADER_C=steprt_c.h
-RUNTIME=c
+LIB_STEP=libstep.so
 DIR_STEP=step_rt
 
-all: gnu 
+all: gnu
 
-$(BIN) : $(DIR_STEP)/$(LIB_STEP) $(OBJFILES) BIN_CRITICAL_PCOORD
-	if ls  >/dev/null 2>&1 *.o ; then $(FC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -o $@; fi
+$(BIN) : $(DIR_STEP)/$(LIB_STEP) compile_c compile_f
+	if ls  >/dev/null 2>&1 *.o ; then $(FC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -Wl,-rpath=$(DIR_STEP) -o $@; fi
 
-BIN_CRITICAL_PCOORD: $(DIR_STEP)/critical_pcoord_program.c
-	$(CC) -o $(DIR_STEP)/critical_pcoord_program  $^ 	
-
-
-$(OBJFILES):
-	ln -sf $(DIR_STEP)/$(HEADER_F) $(HEADER_F)
-	ln -sf $(DIR_STEP)/$(HEADER_C) $(HEADER_C)
-	for f in `ls *_MPI.c` ; do \
-		echo $$f; \
-		echo >tmp "#include \"STEP_C.h\""; \
-		cat >>tmp $$f; \
-		mv tmp $$f; \
-	done;
+compile_c: $(DIR_STEP)/step_api.h
 	if ls  >/dev/null 2>&1 *.c ; then $(CC) $(OpenMP_FLAG) $(CFLAGS) -c $(CSOURCES); fi
+
+compile_f: $(DIR_STEP)/STEP.h
 	if ls  >/dev/null 2>&1 *.f ; then $(FC) $(OpenMP_FLAG) $(FFLAGS) -c $(FSOURCES); fi
 
 $(DIR_STEP)/$(LIB_STEP):
-	$(MAKE) -C $(DIR_STEP) $(LIB_STEP)
+	$(MAKE) -C $(DIR_STEP) $(LIB_STEP) STEP.h critical_pcoord_program
 
 clean:
 	$(MAKE) -C $(DIR_STEP) $@
-	rm -f $(HEADER_F) *.o *~ *__genmod.*
+	rm -f *.o *~ *__genmod.*
 
 clear: clean
 	rm -f $(BIN)
 
-gnu:	clear 
+gnu:	clear
 	export OMPI_F77=gfortran; export OMPI_FC=gfortran; export OMPI_CC=gcc; export LANG=C;  $(MAKE) $(BIN) COMPILER=gnu
 
 intel:	clear
