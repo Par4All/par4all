@@ -5,7 +5,7 @@ step_api.tmp: step_api.h
 	sed 's/[ \t]*,[ \t]*/,/g' | sort > $@
 
 STEP_name.h: STEP_name_variable.h step_api.tmp step_common.h
-	cp STEP_name_variable.h $@ && \
+	cp $(srcdir)/STEP_name_variable.h $@ && \
 	echo "/* Runtime MACRO (generated from step_common.h ) */" >> $@ && \
 	grep "^#define[ \t]*STEP_" step_common.h |grep -v STEP_COMMON_H_ | sed 's/^#define[ \t]*\([^ \t]*\).*/#define \1_NAME "\1"/g' |sort >> $@ && \
 	echo "/* Runtime MACRO (end) */" >> $@ && \

@@ -44,4 +44,5 @@ $(PARSER_OMP).c: $(PARSER_OMP).lex
 
 $(PARSER_OMP).h: $(PARSER_OMP).c
 
+srcdir	= .
 include stepstuff.mk
