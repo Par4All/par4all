@@ -267,14 +267,13 @@ list sequence_to_post_pv(sequence seq, list l_in, pv_context *ctxt)
 	    store_pv(stmt, make_cell_relations(gen_full_copy_list(l_cur)));
 	  FOREACH(ENTITY, e, statement_declarations(stmt))
 	    {
-	      type e_type = basic_concrete_type(entity_type(e));
+	      type e_type = entity_basic_concrete_type(e);
 	      /* beware don't push static variables and non pointer variables. */
 	      if (! static_area_p(ram_section(storage_ram(entity_storage(e))))
 		  &&!type_fundamental_basic_p(e_type)
-		  && type_leads_to_pointer_p(e_type))
+		  && basic_concrete_type_leads_to_pointer_p(e_type))
 		l_locals = CONS(ENTITY, e, l_locals);
 	      l_cur = declaration_to_post_pv(e, l_cur, ctxt);
-	      free_type(e_type);
 	    }
 	  //store_gen_pv(stmt, make_cell_relations(NIL));
 	  //store_kill_pv(stmt, make_effects(NIL));
@@ -365,7 +364,7 @@ static
 list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
-  type e_type = basic_concrete_type(entity_type(e));
+  type e_type = entity_basic_concrete_type(e);
   bool static_p = static_area_p(ram_section(storage_ram(entity_storage(e))));
 
   pips_debug(1, "begin\n");
@@ -382,7 +381,7 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 
       if (static_p
 	  && !type_fundamental_basic_p(e_type)
-	  && type_leads_to_pointer_p(e_type))
+	  && basic_concrete_type_leads_to_pointer_p(e_type))
 	/* when no initialization is provided for pointer static variables,
 	   or aggregate variables which recursively have pointer fields,
 	   then all pointers are initialized to NULL previous to program
@@ -423,7 +422,6 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 
   pips_debug_pvs(2, "returning:", l_out);
   pips_debug(1, "end\n");
-  free_type(e_type);
   return (l_out);
 }
 
@@ -1264,7 +1262,8 @@ void multiple_pointer_assignment_to_post_pv(effect lhs_base_eff, type lhs_type,
 		      && !anywhere_effect_p(rhs_base_eff))
 		    {
 		      reference rhs_ref = effect_any_reference(rhs_eff);
-		      type rhs_type = cell_reference_to_type(rhs_ref);
+		      bool to_be_freed = false;
+		      type rhs_type = cell_reference_to_type(rhs_ref, &to_be_freed);
 
 		      if (!type_equal_p(lhs_type, rhs_type))
 			{
@@ -1285,7 +1284,7 @@ void multiple_pointer_assignment_to_post_pv(effect lhs_base_eff, type lhs_type,
 			      (*effect_add_expression_dimension_func)(rhs_eff, dim);
 			    }
 			}
-		      free_type(rhs_type);
+		      if (to_be_freed) free_type(rhs_type);
 		    }
 		  l_rhs_eff = CONS(EFFECT, rhs_eff, l_rhs_eff);
 		  l_rhs_kind = CONS(CELL_INTERPRETATION, rhs_kind, l_rhs_kind);
@@ -1360,7 +1359,7 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
   pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
 					      make_cell_interpretation_value_of(), NIL);
 
-  if (type_fundamental_basic_p(lhs_type) || !type_leads_to_pointer_p(lhs_type))
+  if (type_fundamental_basic_p(lhs_type) || !basic_concrete_type_leads_to_pointer_p(lhs_type))
     {
       pips_debug(2, "non-pointer assignment\n");
       /* l_gen = NIL; l_kill = NIL; */

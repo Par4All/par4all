@@ -384,7 +384,7 @@ bool std_file_effects_p(list effects)
 bool FILE_star_effect_reference_p(reference ref)
 {
   bool res = false;
-  type t = basic_concrete_type(entity_type(reference_variable(ref)));
+  type t = entity_basic_concrete_type(reference_variable(ref));
   pips_debug(8, "begin with type %s\n",
 	     words_to_string(words_type(t,NIL,false)));
   if (type_variable_p(t))
@@ -408,8 +408,6 @@ bool FILE_star_effect_reference_p(reference ref)
 	}
     }
   pips_debug(8, "end with : %s\n", res? "true":"false");
-  free_type(t);
-
   return res;
 }
 

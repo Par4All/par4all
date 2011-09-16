@@ -1080,7 +1080,7 @@ reference make_regions_reference(entity ent)
 static Psysteme make_whole_array_predicate(entity e)
 {
     Psysteme ps = sc_new();
-    type t = basic_concrete_type(entity_type(e));
+    type t = entity_basic_concrete_type(e);
     int d = type_depth(t);
 
     /* Let's deal with scalar pointers at least */
@@ -1110,8 +1110,6 @@ static Psysteme make_whole_array_predicate(entity e)
 	    ps = sc_safe_append(ps,
 				sc_safe_normalize(entity_declaration_sc(e)));
     }
-    free_type(t);
-
     return ps;
 }
 
@@ -1131,11 +1129,10 @@ static Psysteme make_whole_array_predicate(entity e)
 effect make_reference_region(reference ref, action tac)
 {
   entity e = reference_variable(ref);
-  type t = entity_type(e);
   effect reg;
   bool linear_p = true;
   Psysteme sc;
-  type  bct = basic_concrete_type(t);
+  type bct = entity_basic_concrete_type(e);
   int d = effect_type_depth(bct), dim;
   bool pointer_p = pointer_type_p(bct);
   list reg_ref_inds = NIL;
@@ -1256,8 +1253,6 @@ effect make_reference_region(reference ref, action tac)
 		     UU),
 		    sc);
   debug_region_consistency(reg);
-
-  free_type(bct);
 
   ifdebug(3)
     {

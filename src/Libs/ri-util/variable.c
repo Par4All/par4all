@@ -1073,7 +1073,7 @@ bool entity_atomic_reference_p(entity e)
 bool entity_non_pointer_scalar_p(entity e)
 {
     bool atomic_p = false;
-    type ct = basic_concrete_type(entity_type(e));
+    type ct = entity_basic_concrete_type(e);
     if(type_variable_p(ct))  {
         variable vt = type_variable(ct);
 
@@ -1089,7 +1089,6 @@ bool entity_non_pointer_scalar_p(entity e)
                 || basic_complex_p(bt) || basic_bit_p(bt);
         }
 
-        free_type(ct);
     }
     return atomic_p;
 }

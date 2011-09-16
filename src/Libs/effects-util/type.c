@@ -120,7 +120,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 		      {
 			int tmp_result = -1;
 			entity current_field_entity = ENTITY(CAR(l_fields));
-			type current_type =  basic_concrete_type(entity_type(current_field_entity));
+			type current_type = entity_basic_concrete_type(current_field_entity);
 			size_t current_nb_dim = gen_length(variable_dimensions(type_variable(current_type)));
 
 			if (gen_length(CDR(current_l_ind)) >= current_nb_dim)
@@ -130,7 +130,6 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 			POP(l_fields);
 			if (tmp_result >= 0)
 			  result = result < 0 ? tmp_result : (tmp_result <= result ? tmp_result : result);
-			free_type(current_type);
 		      }
 
 		    *exact_p = (result < 0);
@@ -138,10 +137,9 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 		  }
 		else
 		  {
-		    current_type = basic_concrete_type(entity_type(current_field_entity));
+		    current_type = entity_basic_concrete_type(current_field_entity);
 		    result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
 		    if (result >=0) result++; // do not forget the field index !
-		    free_type(current_type);
 		  }
 	      }
 	  }
@@ -183,16 +181,16 @@ static int effect_reference_first_pointer_dimension_rank(reference ref, bool *ex
     }
   else
     {
-      if (FILE_star_effect_reference_p(ref))
+      if (false)
+      /* if (FILE_star_effect_reference_p(ref)) */
 	{
 	  result = 0;
 	  *exact_p = true;
 	}
       else
 	{
-	  type current_type = basic_concrete_type(ent_type);
+	  type current_type = entity_basic_concrete_type(ent);
 	  result = effect_indices_first_pointer_dimension_rank(current_l_ind, current_type, exact_p);
-	  free_type(current_type);
 	}
     }
 
@@ -251,7 +249,7 @@ bool effect_reference_dereferencing_p(reference ref, bool * exact_p)
 /*************************************************************************/
 /* cell references */
 
-static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
+static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type, bool *to_be_freed)
 {
   type t = type_undefined;  /* the return type */
   pips_assert("input type tag should be variable\n", type_variable_p(current_type));
@@ -266,58 +264,68 @@ static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
   /* the remainder of the function heavily relies on the following assumption */
   pips_assert("there should be no memory access paths to variable names\n", gen_length(ref_l_ind) >= current_nb_dim);
 
- /*first skip array dimensions if any*/
-  for(int i=0; i< (int) current_nb_dim; i++, POP(ref_l_ind));
-
-  if (ENDP(ref_l_ind)) /* We have reached the current basic */
+  if (ENDP(ref_l_ind)) /* We have reached the current basic and there are no array dimensions to skip */
     {
-      /* Warning : qualifiers are set to NIL, because I do not see
-	 the need for something else for the moment. BC.
-      */
-      t = make_type(is_type_variable, make_variable(copy_basic(current_basic), NIL, NIL));
+      t = current_type;
+      *to_be_freed = false;
     }
   else
     {
-      /* The cell reference contains indices that go beyond the current type array dimensions.
-         This can happen if and only if the current basic is a pointer or a derived
-         (typedef have been eliminated by the use of basic_concrete_type).
-      */
-      switch (basic_tag(current_basic))
+      /* skip array dimensions if any */
+      for(int i=0; i< (int) current_nb_dim; i++, POP(ref_l_ind));
+
+      if (ENDP(ref_l_ind)) /* We have reached the current basic */
 	{
-	case is_basic_pointer:
-	  {
-	    type new_current_type = basic_concrete_type(basic_pointer(current_basic));
-	    POP(ref_l_ind); /* pop the pointer dimension */
-	    t = r_variable_cell_reference_to_type(ref_l_ind, new_current_type);
-	    free_type(new_current_type);
-	    break;
-	  }
-	case is_basic_derived:
-	  {
-	    /* the next reference index should be a field entity */
-	    expression next_index = EXPRESSION(CAR(ref_l_ind));
-	    syntax s = expression_syntax(next_index);
-	    if (syntax_reference_p(s))
+	  /* Warning : qualifiers are set to NIL, because I do not see
+	     the need for something else for the moment. BC.
+	  */
+	  t = make_type(is_type_variable, make_variable(copy_basic(current_basic), NIL, NIL));
+	  *to_be_freed = true;
+	}
+      else
+	{
+	  /* The cell reference contains indices that go beyond the current type array dimensions.
+	     This can happen if and only if the current basic is a pointer or a derived
+	     (typedef have been eliminated by the use of basic_concrete_type).
+	  */
+	  switch (basic_tag(current_basic))
+	    {
+	    case is_basic_pointer:
 	      {
-		entity next_index_e = reference_variable(syntax_reference(s));
-		if (entity_field_p(next_index_e))
+		/* if the input type is a bct, then I think there is no need to compute the bct of a basic_pointer. BC.*/
+		/*type new_current_type = compute_basic_concrete_type(basic_pointer(current_basic));*/
+		type new_current_type = basic_pointer(current_basic);
+		POP(ref_l_ind); /* pop the pointer dimension */
+		t = r_variable_cell_reference_to_type(ref_l_ind, new_current_type, to_be_freed);
+		/* free_type(new_current_type);*/
+		break;
+	      }
+	    case is_basic_derived:
+	      {
+		/* the next reference index should be a field entity */
+		expression next_index = EXPRESSION(CAR(ref_l_ind));
+		syntax s = expression_syntax(next_index);
+		if (syntax_reference_p(s))
 		  {
-		    type new_current_type = basic_concrete_type(entity_type(next_index_e));
-		    POP(ref_l_ind); /* pop the field dimension */
-		    t = r_variable_cell_reference_to_type(ref_l_ind, new_current_type);
-		    free_type(new_current_type);
+		    entity next_index_e = reference_variable(syntax_reference(s));
+		    if (entity_field_p(next_index_e))
+		      {
+			type new_current_type = entity_basic_concrete_type(next_index_e);
+			POP(ref_l_ind); /* pop the field dimension */
+			t = r_variable_cell_reference_to_type(ref_l_ind, new_current_type, to_be_freed);
+		      }
+		    else
+		      pips_internal_error("the current basic tag is derived, but corresponding index is not a field entity");
 		  }
 		else
-		  pips_internal_error("the current basic tag is derived, but corresponding index is not a field entity");
+		  pips_internal_error("the current basic tag is derived, but corresponding index is not a reference");
+		break;
 	      }
-	    else
-	      pips_internal_error("the current basic tag is derived, but corresponding index is not a reference");
-	    break;
-	  }
-	default:
-	  {
-	    pips_internal_error("unexpected basic tag");
-	  }
+	    default:
+	      {
+		pips_internal_error("unexpected basic tag");
+	      }
+	    }
 	}
     }
 
@@ -328,6 +336,7 @@ static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
       pips_debug(8, "with basic : %s, and number of dimensions %d\n",
 		 basic_to_string(variable_basic(v)),
 		 (int) gen_length(variable_dimensions(v)));
+      pips_debug(8, "*to_be_freed = %s\n", *to_be_freed? "true": "false");
     }
   return t;
 }
@@ -340,21 +349,23 @@ static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
  @param ref is a reference from a cell.
  @return a *newly allocated* type corresponding to the type of the memory cells targeted by the access path.
  */
-type cell_reference_to_type(reference ref)
+type cell_reference_to_type(reference ref, bool *to_be_freed)
 {
   type t = type_undefined;
-  type ref_type = basic_concrete_type(entity_type(reference_variable(ref)));
+  type ref_type = entity_basic_concrete_type(reference_variable(ref));
+  *to_be_freed= false;
 
   pips_debug(6, "input reference: %s \n",  words_to_string(words_reference(ref,NIL)));
 
   if (ENDP(reference_indices(ref))) /* in particular, gets rid of non-store effect references */
-    t = ref_type;
+    {
+      t = ref_type;
+    }
   else
     {
       if(type_variable_p(ref_type))
 	{
-	  t = r_variable_cell_reference_to_type(reference_indices(ref), ref_type);
-	  free_type(ref_type);
+	  t = r_variable_cell_reference_to_type(reference_indices(ref), ref_type, to_be_freed);
 	}
       else if(type_functional_p(ref_type))
 	{
@@ -362,8 +373,9 @@ type cell_reference_to_type(reference ref)
 	     of the very same time */
 	  t = make_type(is_type_variable,
 			make_variable
-			(make_basic(is_basic_pointer, ref_type),
+			(make_basic(is_basic_pointer, copy_type(ref_type)),
 			 NIL, NIL));
+	  *to_be_freed = true;
 	}
       else
 	{
@@ -377,12 +389,12 @@ type cell_reference_to_type(reference ref)
   return t;
 }
 
-type cell_to_type(cell c)
+type cell_to_type(cell c, bool *to_be_freed)
 {
   pips_assert("a cell cannot be a gap yet\n", !cell_gap_p(c));
   reference ref = cell_reference_p(c)? cell_reference(c) : preference_reference(cell_preference(c));
 
-  return cell_reference_to_type(ref);
+  return cell_reference_to_type(ref, to_be_freed);
 }
 
 /**
@@ -583,17 +595,14 @@ bool basic_concrete_types_compatible_for_effects_interprocedural_translation_p(t
 			     We really need a global table for bcts */
 			  formal_structured_types = gen_type_cons(formal_ft, formal_structured_types);
 			  real_structured_types = gen_type_cons(real_ft, real_structured_types);
-			  type real_fbct = basic_concrete_type(real_ft);
-			  type formal_fbct = basic_concrete_type(formal_ft);
+			  type real_fbct = entity_basic_concrete_type(real_fe);
+			  type formal_fbct = entity_basic_concrete_type(formal_fe);
 			  /* It should be a strict type equality here, but I don't think type_equal_p
 			     is very robust when types are declared in headers
 			  */
 			  result =
 			    basic_concrete_types_compatible_for_effects_interprocedural_translation_p
 			    (real_fbct, formal_fbct);
-
-			  free_type(real_fbct);
-			  free_type(formal_fbct);
 
 			  list old_formal_structured_types = formal_structured_types;
 			  list old_real_structured_types = real_structured_types;
@@ -634,8 +643,8 @@ bool types_compatible_for_effects_interprocedural_translation_p(type real_arg_t,
     result = true;
   else
     {
-      type real_arg_ct = basic_concrete_type(real_arg_t);
-      type formal_arg_ct = basic_concrete_type(formal_arg_t);
+      type real_arg_ct = compute_basic_concrete_type(real_arg_t);
+      type formal_arg_ct = compute_basic_concrete_type(formal_arg_t);
 
       result =
 	basic_concrete_types_compatible_for_effects_interprocedural_translation_p

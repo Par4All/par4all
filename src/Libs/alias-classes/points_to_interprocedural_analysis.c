@@ -56,7 +56,7 @@ set formal_points_to_parameter(cell c)
 				     points_to_rank);
 	r = cell_reference(c);
 	e = reference_variable(r);
-	fpt = basic_concrete_type(entity_type(e));
+	fpt = entity_basic_concrete_type(e);
  	if(type_variable_p(fpt)){
 		/* We ignor dimensions for the being, descriptors are not
 		 * implemented yet...Amira Mensi*/

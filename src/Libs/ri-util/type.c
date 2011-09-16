@@ -1762,7 +1762,8 @@ type intrinsic_call_to_type(call c)
 	else if(ENTITY_DEREFERENCING_P(f))
 	  {
 	    expression e = EXPRESSION(CAR(args));
-	    type ct = ultimate_type(expression_to_type(e));
+	    type ct = ultimate_type(expression_to_type(e)); /* isn't expression_to_type expected to return a bct?
+							       well, there are cases (casts) which are not clear on this point... BC. */
 
 	    if (type_variable_p(ct))
 	      {
@@ -1775,7 +1776,7 @@ type intrinsic_call_to_type(call c)
 				t = copy_type(ultimate_type(basic_pointer(cb)));
 				pips_assert("The pointed type is consistent",
 						type_consistent_p(t));
-				free_type(ct);
+				free_type(ct); /* isn't it dangerous?, an ultimate_type can be an entity type!  */
 			}
 			else if(basic_string_p(cb))
 			{
@@ -1928,7 +1929,7 @@ type reference_to_type(reference ref)
   type t = type_undefined;
   pips_debug(6, "input entity type %s\n", words_to_string(words_type(entity_type(reference_variable(ref)), NIL, false)));
 
-  type exp_type = basic_concrete_type(entity_type(reference_variable(ref)));
+  type exp_type = entity_basic_concrete_type(reference_variable(ref));
 
   pips_debug(6, "reference case \n");
   pips_debug(6, "exp_type %s\n", words_to_string(words_type(exp_type, NIL, false)));
@@ -1997,7 +1998,6 @@ type reference_to_type(reference ref)
 			  type_to_string(exp_type),
 			  entity_name(reference_variable(ref)));
     }
-  free_type(exp_type);
   pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL, false)));
   return t;
 }
@@ -2498,61 +2498,7 @@ list type_fields(type t)
 
 }
 
-bool type_leads_to_pointer_p(type t)
-{
-  bool res = false;
-  type bct = basic_concrete_type(t);
 
-  switch (type_tag(bct))
-    {
-    case is_type_variable :
-      {
-	variable v = type_variable(bct);
-	basic b = variable_basic(v);
-	
-	/* If the basic is a pointer type, return true;
-	*/
-	if(basic_pointer_p(b))
-	  {
-	    res = true;
-	  }
-	else if (basic_derived_p(b))
-	  {		
-	    list l_fields = type_fields(entity_type(basic_derived(b)));
-	    while(!res && !ENDP(l_fields))
-	      {
-		entity f = ENTITY(CAR(l_fields));
-		type current_type = basic_concrete_type(entity_type(f));
-		// we call ourselves recursively
-		res = type_leads_to_pointer_p(current_type);
-		free_type(current_type);
-		POP(l_fields);
-	      }
-	  }
-	else if (!basic_typedef_p(b))
-	  {
-	    res = false;
-	  }
-	else
-	  {
-	    pips_internal_error("unexpected typedef basic");
-	  }
-	
-	break;
-      }
-    case is_type_void:
-      {
-	res = false;
-	break;
-      }
-    default:
-      {
-	pips_internal_error("case not handled yet");
-      }
-    } /*switch */
-  free_type(bct);
-  return res;
-}
 
 /* Returns true if t is of type struct, union or enum. Need to
    distinguish with the case struct/union/enum in type in RI, these
@@ -2848,7 +2794,58 @@ type ultimate_array_type(type t)
   return private_ultimate_type(t, true);
 }
 
+/************************/
+/* basic_concrete_types */
+/*                      */
+/************************/
+
+
+/*
+  basic_concrete_types are types in which all typedefs are removed and
+  consecutive array dimensions are gathered at the same level.  For
+  entities, these new types are kept in a hash table where the keys
+  are the original entity_types. These is done for performance
+  reasons.
+
+  At first, I tried to also keep basic concrete types to
+  computed types, however, this could lead to memory leaks or to
+  segmentation faults depending of whether the original type was freed
+  or not during computations. This is not the same for entity types
+  because entities survive to the basic concrete types table. BC.
+ */
+#define BCTYPES_TABLE_INIT_SIZE 10
+static hash_table entity_types_to_bctypes = hash_table_undefined;
+
+/*
+  Init and reset functions for the basic_concrete_types table.  They
+  are currently called by pipsmake (and callgraph) before and after
+  performing a phase on a module. This could also be done after
+  parsing and just before closing the database, however, I feard that
+  it would grow too much to be efficient, and I lack time to check
+  this assumtion. BC.
+ */
+
+void entity_basic_concrete_types_init()
+{
+  pips_assert("types_to_bctypes must be undefined", hash_table_undefined_p(entity_types_to_bctypes));
+  entity_types_to_bctypes = hash_table_make(hash_pointer, BCTYPES_TABLE_INIT_SIZE);
+}
+
+void entity_basic_concrete_types_reset()
+{
+  /* First, free all basic concrete types */
+  HASH_FOREACH(type, t3, type, t4, entity_types_to_bctypes)
+    {
+      free_type(t4);
+    }
+  hash_table_free(entity_types_to_bctypes);
+  entity_types_to_bctypes = hash_table_undefined;
+}
+
+
 /**
+   computes a new type which is the basic concrete type of the input type
+   (this new type is *not* stored in the entity_types_to_bctypes table).
 
  @param t is a type
 
@@ -2857,7 +2854,7 @@ type ultimate_array_type(type t)
 	   the inner types of the fields cannot be changed (they are entities).
 
 */
-type basic_concrete_type(type t)
+type compute_basic_concrete_type(type t)
 {
   type nt;
 
@@ -2882,7 +2879,7 @@ type basic_concrete_type(type t)
 	    type st = entity_type(e);
 
 	    pips_debug(9, "typedef  : %s\n", type_to_string(st));
-	    nt = basic_concrete_type(st);
+	    nt = compute_basic_concrete_type(st);
 	    if (type_variable_p(nt))
 	      {
 		variable_dimensions(type_variable(nt)) =
@@ -2892,7 +2889,7 @@ type basic_concrete_type(type t)
 	  }
 	else if(basic_pointer_p(bt))
 	  {
-	    type npt = basic_concrete_type(basic_pointer(bt));
+	    type npt = compute_basic_concrete_type(basic_pointer(bt));
 
 	     pips_debug(9, "pointer \n");
 	     nt = make_type_variable
@@ -2933,6 +2930,91 @@ type basic_concrete_type(type t)
 
   return nt;
 }
+
+/**
+   retrieves or computes and then returns the basic concrete type of an entity
+
+   @param e is the input entity
+   @return the basic concrete type of e stored in the entity_types_to_bctypes table.
+
+   @beware don't free this type, it will be freed by pipsmake when resetting the table.
+ */
+type entity_basic_concrete_type(entity e)
+{
+  pips_assert("types_to_bctypes must be defined", !hash_table_undefined_p(entity_types_to_bctypes));
+  type t = entity_type(e);
+  type bct = (type) hash_get(entity_types_to_bctypes, (void *) t);
+
+  if (type_undefined_p(bct))
+    {
+      bct = compute_basic_concrete_type(t);
+      hash_put(entity_types_to_bctypes, t, bct);
+    }
+  return bct;
+}
+
+
+/**
+   returns true when the input type successors may be pointers
+
+   the input type is supposed to be a basic_concrete_type
+ */
+bool basic_concrete_type_leads_to_pointer_p(type bct)
+{
+  bool res = false;
+
+  switch (type_tag(bct))
+    {
+    case is_type_variable :
+      {
+	variable v = type_variable(bct);
+	basic b = variable_basic(v);
+
+	/* If the basic is a pointer type, return true;
+	*/
+	if(basic_pointer_p(b))
+	  {
+	    res = true;
+	  }
+	else if (basic_derived_p(b))
+	  {
+	    list l_fields = type_fields(entity_type(basic_derived(b)));
+	    while(!res && !ENDP(l_fields))
+	      {
+		type current_type = entity_basic_concrete_type(ENTITY(CAR(l_fields)));
+		// we call ourselves recursively
+		res = basic_concrete_type_leads_to_pointer_p(current_type);
+		POP(l_fields);
+	      }
+	  }
+	else if (!basic_typedef_p(b))
+	  {
+	    res = false;
+	  }
+	else
+	  {
+	    pips_internal_error("unexpected typedef basic");
+	  }
+	break;
+      }
+    case is_type_void:
+      {
+	res = false;
+	break;
+      }
+    default:
+      {
+	pips_internal_error("case not handled yet");
+      }
+    } /*switch */
+  return res;
+}
+
+/*******************************/
+/* end of basic_concrete_types */
+/*                             */
+/*******************************/
+
 
 /* Is an object of type t compatible with a call? */
 bool call_compatible_type_p(type t)

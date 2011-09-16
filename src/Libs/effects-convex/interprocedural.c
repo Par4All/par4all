@@ -911,7 +911,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
       pips_internal_error("Illegal kind of syntax");
     } /* switch */
 
-  free_type(real_arg_t);
+  /* free_type(real_arg_t); */
 
   if (!transformer_undefined_p(context))
     (*effects_precondition_composition_op)(l_eff, context);
