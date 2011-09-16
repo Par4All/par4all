@@ -1458,6 +1458,7 @@ bool chains( char * module_name, enum chain_type use ) {
 
 
   set_effects( module_name, use );
+  set_conflict_testing_properties();
 
   module_graph = statement_dependence_graph( module_stat );
 
