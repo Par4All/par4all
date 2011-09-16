@@ -1,6 +1,7 @@
 # $Id$
 
-Fh	= STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h comment2pragma.h step_omp.h
+# what about: comment2pragma.h step_omp.h
+Fh	= STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h
 Fc	= comment2pragma.c step_omp.c
 
 TARGET	= step
