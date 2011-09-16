@@ -1,10 +1,11 @@
 # $Id$
 
-Fh	= STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h
+Fh	= STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h comment2pragma.h step_omp.h
+Fc	= comment2pragma.c step_omp.c
 
 TARGET	= step
 include_HEADERS=$(TARGET).h
-BUILT_SOURCES=$(TARGET).h $(Fh)
+BUILT_SOURCES=$(TARGET).h $(Fh) $(Fc)
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libstep.la
 dist_noinst_HEADERS=$(Fh) defines-local.h
