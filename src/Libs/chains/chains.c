@@ -1096,6 +1096,7 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
     // asserted what we want before (ud/du/dd)
     if((*which)(fin, fout) && effects_might_conflict_even_read_only_p(fin, fout)) {
       entity ein = effect_entity(fin);
+      bool ein_abstract_location_p = entity_abstract_location_p(ein);
       entity eout = effect_entity(fout);
       type tin = ultimate_type(entity_type(ein));
       type tout = ultimate_type(entity_type(eout));
@@ -1105,8 +1106,14 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
       int dout = gen_length(reference_indices(rout));
       bool add_conflict_p = true;
 
-      if(entity_abstract_location_p(ein)) {
+      /* I think that most of this is hazardous when mixes of
+         pointers, arrays and structs are involved. However, there
+         should be no pointer anymore with CONSTANT_PATH_EFFECTS set
+         to TRUE!  We need to think more about all of this. BC.
+      */
+      if(ein_abstract_location_p) {
         entity alout = variable_to_abstract_location(eout);
+	/* this test is not correct, rout should be converted to an abstract location, not eout. BC. */
         if(abstract_locations_may_conflict_p(ein, alout))
           add_conflict_p = true;
       } else if(pointer_type_p(tin) && pointer_type_p(tout)) {
@@ -1115,7 +1122,7 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
         if(din == dout) {
           /* This is the standard case */
           add_conflict_p = true;
-        } else if(din < dout) {
+        } else if(din < dout) { /* I'm not sure this can be the case because of effects_might_conflict_even_read_only_p(fin, fout) */
           /* a write on the shorter memory access path conflicts
            with the longer one. If a[i] is written, then a[i][j]
            depends on it. If a[i] is read, no conflict */
@@ -1143,7 +1150,7 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 
       if(add_conflict_p) {
         bool remove_this_conflict_p = false;
-        if(!entity_abstract_location_p(ein) && store_effect_p(fin)) {
+        if(!ein_abstract_location_p && store_effect_p(fin)) {
           /* Here we filter effect on loop indices except for abstract
            locations */
           list loops = load_statement_enclosing_loops(stout);
