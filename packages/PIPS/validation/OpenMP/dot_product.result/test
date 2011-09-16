@@ -38,12 +38,10 @@
       DO I = 1, N
          A(I) = I*1.0
       ENDDO
-!$omp end parallel do
 !$OMP PARALLEL DO 
       DO I = 1, N
          B(I) = I*2.0
       ENDDO
-!$omp end parallel do
       RESULT = 0.0
       CHUNK = CHUNKSIZE
 
@@ -51,7 +49,6 @@
       DO I = 1, N
          RESULT = RESULT+A(I)*B(I)
       ENDDO
-!$omp end parallel do
 
       PRINT *, 'Final Result= ', RESULT
       END

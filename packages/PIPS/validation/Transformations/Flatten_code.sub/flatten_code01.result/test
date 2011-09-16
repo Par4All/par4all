@@ -1,4 +1,21 @@
 
+Parsed code
+
+int flatten_code01()
+{
+   int i = 1;
+   int j;
+   i++;
+   {
+      int i = 2;
+      i++;
+      j = 1;
+   }
+   i = j;
+
+   printf("%d %d\n", i, j);
+}
+
 Initial code
 
 int flatten_code01()

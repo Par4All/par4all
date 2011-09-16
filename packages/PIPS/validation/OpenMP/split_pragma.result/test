@@ -77,6 +77,5 @@
          PARAM10 = I+PARAM19
          A(I) = PARAM14*1.0
       ENDDO
-!$omp end parallel do
       PRINT *, A
       END

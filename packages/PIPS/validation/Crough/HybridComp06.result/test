@@ -21,8 +21,7 @@ print code cumulated effects
 C             <may be written>: A
 C             <    is read   >: N
       SUBROUTINE TOTO(A, N)
-      INTEGER N
-      INTEGER*8 J, I, A
+      INTEGER*8 J, I, A, N
 C             <may be read   >: I J
 C             <may be written>: A J
 C             <    is read   >: N
@@ -73,12 +72,12 @@ C             <    is written>: __IO_EFFECTS:LUNS(6)
 #define init_complex(a,b) (a + b*I)
 
 void
-toto_ (long long *a_p4a_copy, int *n_p4a_copy)
+toto_ (long long *a_p4a_copy, long long *n_p4a_copy)
 {
   long long j;
   long long i;
   long long a = *a_p4a_copy;
-  int n = *n_p4a_copy;
+  long long n = *n_p4a_copy;
 
   for (i = 1; i <= n; i++)
     {

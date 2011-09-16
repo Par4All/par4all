@@ -1,0 +1,72 @@
+
+PROPER  EFFECTS 
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: psrc1
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: psrc2
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+
+   return;
+}
+
+POINTS-TO
+
+
+// Points To:
+// data1 -> _data1_1[0] , EXACT
+// data2 -> _data2_2[0] , EXACT
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+
+
+// Points To:
+// data1 -> _data1_1[0] , EXACT
+// data2 -> _data2_2[0] , EXACT
+
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+
+// Points To:
+// data1 -> _data1_1[0] , EXACT
+// data2 -> _data2_2[0] , EXACT
+// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+
+// Points To:
+// data1 -> _data1_1[0] , EXACT
+// data2 -> _data2_2[0] , EXACT
+// psrc1 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+// psrc2 -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void flgr1d_arith_add_fgINT32(FLGR_Data1D *data1, FLGR_Data1D *data2)
+{
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: psrc1
+   fgINT32 *psrc1 = (fgINT32 *) data1->array;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: psrc2
+   fgINT32 *psrc2 = (fgINT32 *) data2->array;
+
+   return;
+}
+
+ *********************** Use-Def Chains *********************
+
+	34 --> 35 with conflicts
+		from <psrc1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <psrc2-W-EXACT>
+
+****************** End of Dependence Graph ******************

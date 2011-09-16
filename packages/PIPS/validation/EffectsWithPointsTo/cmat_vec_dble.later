@@ -1,0 +1,1 @@
+cmat_vec_dble.c to fix a bug while initializing pointers to arrays of structures.

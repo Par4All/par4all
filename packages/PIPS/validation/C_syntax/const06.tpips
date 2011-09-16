@@ -1,0 +1,16 @@
+delete const06
+
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create const06 const06.c
+
+
+display PARSED_PRINTED_FILE[const06!]
+display PARSED_PRINTED_FILE[main]
+
+close
+
+#delete const06
+
+quit

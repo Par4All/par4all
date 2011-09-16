@@ -40,11 +40,12 @@ Code after outlining
 #define init_complex(a,b) (a + b*I)
 
 void
-toto_ (int *n_p4a_copy, long long a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0])
+toto_ (long long *n_p4a_copy,
+       long long a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0])
 {
   long long j;
   long long i;
-  int n = *n_p4a_copy;
+  long long n = *n_p4a_copy;
 
   for (i = 1; i <= n; i++)
     {

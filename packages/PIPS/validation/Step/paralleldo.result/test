@@ -1,8 +1,4 @@
-
-
-Source files copied in : paralleldo/Source/
-Generated source files : paralleldo/src
-###################### paralleldo/src/Makefile ######################
+###################### paralleldo/paralleldo.database/Src/Makefile ######################
 #Default Makefile to compile generated files
 
 BIN=a.out
@@ -11,7 +7,7 @@ FC=mpif77
 CC=mpicc
 
 
-FLAGS = -g -O2
+FLAGS = -g -O2 -I$(DIR_STEP)
 
 export COMPILER = gnu
 export STEP_KIND = 4
@@ -23,7 +19,7 @@ ifeq ($(COMPILER) , gnu)
    ifeq ($(STEP_KIND), 8)
       FFLAGS += -fdefault-integer-8
    endif
-   LDFLAGS = 
+   LDFLAGS =
 endif
 
 ifeq ($(COMPILER) , intel)
@@ -33,7 +29,7 @@ ifeq ($(COMPILER) , intel)
    ifeq ($(STEP_KIND), 8)
       FFLAGS += -i8
    endif
-   LDFLAGS = 
+   LDFLAGS =
 endif
 
 
@@ -42,123 +38,88 @@ CSOURCES= *.c
 FSOURCES= *.f
 OBJFILES= *.o
 
-LIB_STEP=libstep.a
-HEADER_F=steprt_f.h
-HEADER_C=steprt_c.h
-RUNTIME=c
+LIB_STEP=libstep.so
 DIR_STEP=step_rt
 
-all: gnu 
+all: gnu
 
-$(BIN) : $(DIR_STEP)/$(LIB_STEP) $(OBJFILES) BIN_CRITICAL_PCOORD
-	if ls  >/dev/null 2>&1 *.o ; then $(FC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -o $@; fi
+$(BIN) : $(DIR_STEP)/$(LIB_STEP) compile_c compile_f
+	if ls  >/dev/null 2>&1 *.o ; then $(FC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -Wl,-rpath=$(DIR_STEP) -o $@; fi
 
-BIN_CRITICAL_PCOORD: $(DIR_STEP)/critical_pcoord_program.c
-	$(CC) -o $(DIR_STEP)/critical_pcoord_program  $^ 	
-
-
-$(OBJFILES):
-	ln -sf $(DIR_STEP)/$(HEADER_F) $(HEADER_F)
-	ln -sf $(DIR_STEP)/$(HEADER_C) $(HEADER_C)
-	for f in `ls *_MPI.c` ; do \
-		echo $$f; \
-		echo >tmp "#include \"STEP_C.h\""; \
-		cat >>tmp $$f; \
-		mv tmp $$f; \
-	done;
+compile_c: $(DIR_STEP)/step_api.h
 	if ls  >/dev/null 2>&1 *.c ; then $(CC) $(OpenMP_FLAG) $(CFLAGS) -c $(CSOURCES); fi
+
+compile_f: $(DIR_STEP)/STEP.h
 	if ls  >/dev/null 2>&1 *.f ; then $(FC) $(OpenMP_FLAG) $(FFLAGS) -c $(FSOURCES); fi
 
 $(DIR_STEP)/$(LIB_STEP):
-	$(MAKE) -C $(DIR_STEP) $(LIB_STEP)
+	$(MAKE) -C $(DIR_STEP) $(LIB_STEP) STEP.h critical_pcoord_program
 
 clean:
 	$(MAKE) -C $(DIR_STEP) $@
-	rm -f $(HEADER_F) *.o *~ *__genmod.*
+	rm -f *.o *~ *__genmod.*
 
 clear: clean
 	rm -f $(BIN)
 
-gnu:	clear 
+gnu:	clear
 	export OMPI_F77=gfortran; export OMPI_FC=gfortran; export OMPI_CC=gcc; export LANG=C;  $(MAKE) $(BIN) COMPILER=gnu
 
 intel:	clear
 	export OMPI_F77=ifort; export OMPI_FC=ifort; export OMPI_CC=icc; export LANG=C;  make $(BIN) COMPILER=intel
 
 .IGNORE: clean clear
-###################### paralleldo/src/PARALLEL_DO_PARDO10_HYBRID.f ######################
-!!
-!! file for PARALLEL_DO_PARDO10_HYBRID.f
-!!
-      SUBROUTINE PARALLEL_DO_PARDO10_HYBRID(I, I_L, I_U, N, A)
-! MIL-STD-1753 Fortran extension not in PIPS
+###################### paralleldo/paralleldo.database/Src/PARALLEL_DO_PARDO_HYBRID.f ######################
+      SUBROUTINE PARALLEL_DO_PARDO_HYBRID(N, A, I)
       implicit none
       include "STEP.h"
-      INTEGER STEP_I_UP, STEP_I_LOW, I_UP, I_LOW, IDX, I, I_L, I_U, N
-      INTEGER STEP_SR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 1:
-     &MAX_NB_LOOPSLICES), A(1:N)
-
+      INTEGER IDX, STEP_COMM_RANK, STEP_I_UP, STEP_I_LOW, 
+     &STEP_COMM_SIZE, N, I
+      INTEGER STEP_SR_A(STEP_INDEX_SLICE_LOW:STEP_INDEX_SLICE_UP, 1:1
+     &, 1:STEP_MAX_NB_LOOPSLICES), A(1:N)
 !$omp master
-      CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL_DO)                       0108
-      CALL STEP_INIT_ARRAYREGIONS(A, STEP_INTEGER4, 1, 1, N)            0109
-      CALL STEP_GET_COMMSIZE(STEP_COMM_SIZE)                            0110
-      CALL STEP_COMPUTE_LOOPSLICES(I_L, I_U, 1, STEP_COMM_SIZE)         0111
+      CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL_DO)
+      CALL STEP_INIT_ARRAYREGIONS(A, STEP_INTEGER4, 1, 1, N)
+      CALL STEP_GET_COMMSIZE(STEP_COMM_SIZE)
+      CALL STEP_COMPUTE_LOOPSLICES(1, N, 1, STEP_COMM_SIZE)
 
-C     Put array boundaries into SEND region arrays
-C     First dimension: lower and upper bounds of each slice
-C     Second dimension: for each dimension of the original array
-C     Third dimension: store the boundaries of the local chunk.
+C SEND REGIONS
+      DO IDX = 1, STEP_COMM_SIZE
+         CALL STEP_GET_LOOPBOUNDS(IDX-1, STEP_I_LOW, STEP_I_UP)
 
-      DO IDX = 1, STEP_COMM_SIZE                                        0118
-         CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0119
-C  <A(PHI1)-write-EXACT-{1<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
-         STEP_SR_A(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0121
-         STEP_SR_A(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0122
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10, STEP_I_LOW<=PHI1,
+C    PHI1<=STEP_I_UP}>
+
+         STEP_SR_A(STEP_INDEX_SLICE_LOW,1,IDX) = MAX(STEP_I_LOW, 1)
+         STEP_SR_A(STEP_INDEX_SLICE_UP,1,IDX) = MIN(STEP_I_UP, 10)
       ENDDO
-      CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)           0124
-
+      CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)
 !$omp end master
 !$omp barrier
 
+C BEGIN WORK
+      CALL STEP_GET_RANK(STEP_COMM_RANK)
+      CALL STEP_GET_LOOPBOUNDS(STEP_COMM_RANK, STEP_I_LOW, STEP_I_UP)
+!$omp parallel do
 
-C     Where work is done...
-      CALL STEP_GET_RANK(STEP_COMM_RANK)                                0131
-      CALL STEP_GET_LOOPBOUNDS(STEP_COMM_RANK, STEP_I_LOW, STEP_I_UP)   0132
-!$OMP parallel do
-      DO 10 I = STEP_I_LOW, STEP_I_UP                                   0134
-         A(I) = I                                                       0135
-10       CONTINUE                                                       0136
-!$OMP end parallel do
-
+      DO 10 I = STEP_I_LOW, STEP_I_UP
+         A(I) = I
+10       CONTINUE
+!$omp end parallel do
+C END WORK
 !$omp master
 
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0144
-     &)                                                                 0144
-      CALL STEP_WAITALL                                                 0146
-      CALL STEP_CONSTRUCT_END(STEP_PARALLEL_DO)                         0147
-
+      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT
+     &)
+      CALL STEP_FLUSH
+      CALL STEP_CONSTRUCT_END(STEP_PARALLEL_DO)
 !$omp end master
 !$omp barrier
-
       END
-###################### paralleldo/src/STEP.h ######################
-      INCLUDE 'steprt_f.h'
-
-      INTEGER STEP_COMM_SIZE, STEP_COMM_RANK
-
-      INTEGER MAX_NB_LOOPSLICES
-      PARAMETER (MAX_NB_LOOPSLICES = 16)
-      
-      INTEGER IDX_SLICE_LOW,IDX_SLICE_UP,STEP_IDX
-      PARAMETER (IDX_SLICE_LOW = 1,IDX_SLICE_UP=2)
-
-###################### paralleldo/src/paralleldo.f ######################
-!!
-!! file for paralleldo.f
-!!
+###################### paralleldo/paralleldo.database/Src/paralleldo.f ######################
 !
 ! sum program_do
 !
@@ -174,107 +135,10 @@ C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
       PARAMETER (N=10)
       INTEGER I,A(N)
       CALL STEP_INIT_FORTRAN_ORDER
-C$STEP !$omp parallel do
-      CALL PARALLEL_DO_PARDO10_HYBRID(I, 1, N, N, A)
+      CALL PARALLEL_DO_PARDO_HYBRID(N, A, I)
 
-      PRINT *, A                                                        0021
+      PRINT *, A
       CALL STEP_FINALIZE
 
       END
-###################### paralleldo/src/step_directives.f ######################
-!!
-!! file for step_directives.f
-!!
-      SUBROUTINE PARALLEL_DO_PARDO10(I, I_L, I_U, N, A)
-      INTEGER I, I_L, I_U, N
-      INTEGER A(1:N)
-      DO 10 I = I_L, I_U                                                0004
-         A(I) = I                                                       0005
-10       CONTINUE                                                       0006
-      END
-###################### paralleldo/src/step_rt ######################
-###################### paralleldo/src/steprt_f.h ######################
-!
-!   Genereted file from c/step_common.h
-! 
-       INTEGER STEP_C
-       PARAMETER (STEP_C = 0)
-
-       INTEGER STEP_FORTRAN
-       PARAMETER (STEP_FORTRAN = 1)
-
-       INTEGER STEP_PARALLEL
-       PARAMETER (STEP_PARALLEL = 0)
-
-       INTEGER STEP_DO
-       PARAMETER (STEP_DO = 1)
-
-       INTEGER STEP_PARALLEL_DO
-       PARAMETER (STEP_PARALLEL_DO = 2)
-
-       INTEGER STEP_NOWAIT
-       PARAMETER (STEP_NOWAIT = 0)
-
-       INTEGER STEP_WAIT
-       PARAMETER (STEP_WAIT = 1)
-
-       INTEGER STEP_INTEGER
-       PARAMETER (STEP_INTEGER = 0)
-
-       INTEGER STEP_REAL
-       PARAMETER (STEP_REAL = 1)
-
-       INTEGER STEP_DOUBLE_PRECISION
-       PARAMETER (STEP_DOUBLE_PRECISION = 2)
-
-       INTEGER STEP_COMPLEX
-       PARAMETER (STEP_COMPLEX = 3)
-
-       INTEGER STEP_INTEGER1
-       PARAMETER (STEP_INTEGER1 = 4)
-
-       INTEGER STEP_INTEGER2
-       PARAMETER (STEP_INTEGER2 = 5)
-
-       INTEGER STEP_INTEGER4
-       PARAMETER (STEP_INTEGER4 = 6)
-
-       INTEGER STEP_INTEGER8
-       PARAMETER (STEP_INTEGER8 = 7)
-
-       INTEGER STEP_REAL4
-       PARAMETER (STEP_REAL4 = 8)
-
-       INTEGER STEP_REAL8
-       PARAMETER (STEP_REAL8 = 9)
-
-       INTEGER STEP_REAL16
-       PARAMETER (STEP_REAL16 = 10)
-
-       INTEGER STEP_COMPLEX8
-       PARAMETER (STEP_COMPLEX8 = 11)
-
-       INTEGER STEP_COMPLEX16
-       PARAMETER (STEP_COMPLEX16 = 12)
-
-       INTEGER STEP_TYPE_UNDEFINED
-       PARAMETER (STEP_TYPE_UNDEFINED = 13)
-
-       INTEGER STEP_TAG_DEFAULT
-       PARAMETER (STEP_TAG_DEFAULT = 0)
-
-       INTEGER STEP_NBLOCKING_ALG
-       PARAMETER (STEP_NBLOCKING_ALG = 0)
-
-       INTEGER STEP_PROD
-       PARAMETER (STEP_PROD = 0)
-
-       INTEGER STEP_MAX
-       PARAMETER (STEP_MAX = 1)
-
-       INTEGER STEP_MIN
-       PARAMETER (STEP_MIN = 2)
-
-       INTEGER STEP_SUM
-       PARAMETER (STEP_SUM = 3)
-
+###################### paralleldo/paralleldo.database/Src/step_rt ######################
