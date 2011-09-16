@@ -509,8 +509,9 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 		    }
 		  else
 		    {
-		      type t1 = cell_reference_to_type( r1 );
-		      type t2 = cell_reference_to_type( r2 );
+		      bool t1_to_be_freed = false, t2_to_be_freed = false;
+		      type t1 = cell_reference_to_type( r1, &t1_to_be_freed );
+		      type t2 = cell_reference_to_type( r2, &t2_to_be_freed  );
 
 		      if ( conflict_p && !get_bool_property( "ALIASING_ACROSS_TYPES" )
 			   && !type_equal_p(t1, t2) )
@@ -518,8 +519,8 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 			  pips_debug(5, "no conflict because types are not equal\n");
 			  conflict_p = false; /* well type_equal_p does not perform a good job :-( BC*/
 			}
-		      free_type(t1);
-		      free_type(t2);
+		      if (t1_to_be_freed) free_type(t1);
+		      if (t2_to_be_freed) free_type(t2);
 
 		      if ( conflict_p && !get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" )
 				&& entity_formal_p(e1) && entity_formal_p(e2) )

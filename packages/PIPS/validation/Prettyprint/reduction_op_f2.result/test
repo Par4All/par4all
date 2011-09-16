@@ -10,47 +10,38 @@
       DO I = 1, N
          S = S+1
       ENDDO
-!$omp end parallel do
 !$omp parallel do reduction(+:S)
       DO I = 1, N
          S = S-1
       ENDDO
-!$omp end parallel do
 !$omp parallel do reduction(*:S)
       DO I = 1, N
          S = S*2
       ENDDO
-!$omp end parallel do
 !$omp parallel do reduction(.AND.:M)
       DO I = 1, N
          M = M.AND.O
       ENDDO
-!$omp end parallel do
 !$omp parallel do reduction(.OR.:M)
       DO I = 1, N
          M = M.OR.O
       ENDDO
-!$omp end parallel do
 !$omp parallel do reduction(.EQV.:M)
       DO I = 1, N
          M = M.EQV.O
       ENDDO
-!$omp end parallel do
 !$omp parallel do reduction(.NEQV.:M)
       DO I = 1, N
          M = M.NEQV.O
       ENDDO
-!$omp end parallel do
 !$omp parallel do reduction(MAX:Y)
       DO I = 1, N
          Y = MAX(Y, X)
       ENDDO
-!$omp end parallel do
 !$omp parallel do reduction(MIN:Y)
       DO I = 1, N
          Y = MIN(Y, X)
       ENDDO
-!$omp end parallel do
 !     do i = 1, n
 !     k = IAND(k,j)
 !     end do

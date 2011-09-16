@@ -11,9 +11,7 @@
          DO K = 1, SIZE                                                 0009
             SUM = SUM+I+K                                               0010
          ENDDO
-!$omp end parallel do
       ENDDO
-!$omp end parallel do
 
       PRINT *, SUM                                                      0014
       END

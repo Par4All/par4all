@@ -1161,17 +1161,24 @@ set points_to_null_pointer(list lhs_list, set input)
   /* Computing the gen set*/
   FOREACH(cell, c, lhs_list){
       /* we test if lhs is an array, so we change a[i] into a[*] */
-      if(array_type_p(cell_to_type(c)))
-	c = array_to_store_independent(c);
+      bool to_be_freed = false;
+      type c_type = cell_to_type(c, &to_be_freed);
+      if(array_type_p(c_type))
+	{
+	  c = array_to_store_independent(c);
+	  if (to_be_freed) free_type(c_type);
+	  c_type = cell_to_type(c, &to_be_freed);
+	}
 
       /* create a new points to with as source the current
 	 element of lhs_set and sink the null value .*/
-      entity e =entity_all_xxx_locations_typed(NULL_POINTER_NAME,cell_to_type(c));
+      entity e =entity_all_xxx_locations_typed(NULL_POINTER_NAME,c_type);
       reference r = make_reference(e, NIL);
       cell sink = make_cell_reference(r);
       points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
       set_add_element(gen, gen, (void*) pt_to);
-
+      if (to_be_freed) free_type(c_type);
+      
     }
   /* gen + input_kill_diff*/
   set_union(res, gen, input_kill_diff);
@@ -1607,16 +1614,22 @@ set points_to_whileloop(whileloop wl, set pt_in, bool store __attribute__ ((__un
       reference kr = cell_to_reference(kc);
       list kl = reference_indices(kr);
       if((int)gen_length(sl)>k){
+	bool to_be_freed = false;
+	type sc_type = cell_to_type(sc, &to_be_freed);
 	entity anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-					 cell_to_type(sc));
+					 sc_type);
 	reference r = make_reference(anywhere,NIL);
 	sc = make_cell_reference(r);
+	if (to_be_freed) free_type(sc_type);
       }
       if((int)gen_length(kl)>k){
+	bool to_be_freed = false;
+	type kc_type = cell_to_type(kc, &to_be_freed);
 	entity anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-					 cell_to_type(kc));
+					 kc_type);
 	reference r = make_reference(anywhere,NIL);
 	kc = make_cell_reference(r);
+	if (to_be_freed) free_type(kc_type);
       }
       points_to npt = make_points_to(sc, kc, points_to_approximation(pt), make_descriptor_none());
       if(!points_to_equal_p(npt,pt)){
@@ -1667,16 +1680,23 @@ set points_to_forloop(forloop fl, set pt_in, bool store __attribute__ ((__unused
       reference kr = cell_to_reference(kc);
       list kl = reference_indices(kr);
       if((int)gen_length(sl)>k){
+	bool to_be_freed = false;
+	type sc_type = cell_to_type(sc, &to_be_freed);
+
 	entity anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-							cell_to_type(sc));
+							sc_type);
 	reference r = make_reference(anywhere,NIL);
 	sc = make_cell_reference(r);
+	if(to_be_freed) free_type(sc_type);
       }
       if((int)gen_length(kl)>k){
+	bool to_be_freed = false;
+	type kc_type = cell_to_type(kc, &to_be_freed);
 	entity anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-							cell_to_type(kc));
+							kc_type);
 	reference r = make_reference(anywhere,NIL);
 	kc = make_cell_reference(r);
+	if(to_be_freed) free_type(kc_type);
       }
       points_to npt = make_points_to(sc, kc, points_to_approximation(pt), make_descriptor_none());
       if(!points_to_equal_p(npt,pt)){
@@ -1720,16 +1740,24 @@ set points_to_loop(loop fl, set pt_in, bool store __attribute__ ((__unused__))) 
       reference kr = cell_to_reference(kc);
       list kl = reference_indices(kr);
       if((int)gen_length(sl)>k){
+	bool to_be_freed = false;
+	type sc_type = cell_to_type(sc, &to_be_freed);
+
 	entity anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-							cell_to_type(sc));
+							sc_type);
 	reference r = make_reference(anywhere,NIL);
 	sc = make_cell_reference(r);
+	if(to_be_freed) free_type(sc_type);
       }
       if((int)gen_length(kl)>k){
+	bool to_be_freed = false;
+	type kc_type = cell_to_type(kc, &to_be_freed);
+
 	entity anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-							cell_to_type(kc));
+							kc_type);
 	reference r = make_reference(anywhere,NIL);
 	kc = make_cell_reference(r);
+	if(to_be_freed) free_type(kc_type);
       }
       points_to npt = make_points_to(sc, kc, points_to_approximation(pt), make_descriptor_none());
       if(!points_to_equal_p(npt,pt)){
@@ -1775,16 +1803,23 @@ set points_to_do_whileloop(whileloop fl, set pt_in, bool store __attribute__ ((_
       reference kr = cell_to_reference(kc);
       list kl = reference_indices(kr);
       if((int)gen_length(sl)>k){
+	bool to_be_freed = false;
+	type sc_type = cell_to_type(sc, &to_be_freed);
+
 	entity anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-							cell_to_type(sc));
+							sc_type);
 	reference r = make_reference(anywhere,NIL);
 	sc = make_cell_reference(r);
+	if(to_be_freed) free_type(sc_type);
       }
       if((int)gen_length(kl)>k){
+	bool to_be_freed = false;
+	type kc_type = cell_to_type(sc, &to_be_freed);
 	entity anywhere =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-							cell_to_type(kc));
+							kc_type);
 	reference r = make_reference(anywhere,NIL);
 	kc = make_cell_reference(r);
+	if(to_be_freed) free_type(kc_type);
       }
       points_to npt = make_points_to(sc, kc, points_to_approximation(pt), make_descriptor_none());
       if(!points_to_equal_p(npt,pt)){

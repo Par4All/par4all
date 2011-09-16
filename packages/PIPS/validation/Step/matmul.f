@@ -1,8 +1,8 @@
-	PROGRAM MATMULT
-	implicit none
-	INTEGER  N, I, J, K
-	PARAMETER (N=10)
-	REAL*8 A(N,N), B(N,N), C(N,N)
+      PROGRAM MATMUL
+      implicit none
+      INTEGER  N, I, J, K
+      PARAMETER (N=10)
+      REAL*8 A(N,N), B(N,N), C(N,N)
 
 !$OMP PARALLEL
 

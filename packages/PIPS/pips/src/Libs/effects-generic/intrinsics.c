@@ -2857,7 +2857,8 @@ static list search_or_sort_effects(entity e, list args)
   l_tmp = NIL;
   FOREACH(EFFECT, base_eff, l_base_eff)
     {
-      type base_eff_type = cell_to_type(effect_cell(base_eff));
+      bool to_be_freed = false;
+      type base_eff_type = cell_to_type(effect_cell(base_eff), &to_be_freed);
       l_tmp = gen_nconc
 	(l_tmp,
 	 generic_effect_generate_all_accessible_paths_effects_with_level(base_eff,
@@ -2866,7 +2867,7 @@ static list search_or_sort_effects(entity e, list args)
 									 true,
 									 0,
 									 false));
-      free_type(base_eff_type);
+      if (to_be_freed) free_type(base_eff_type);
     }
   pips_debug_effects(8, "write effects for the base array:", l_tmp);
   le = gen_nconc(l_tmp, le);
