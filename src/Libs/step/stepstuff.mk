@@ -7,7 +7,7 @@ step_api.tmp: step_api.h
 STEP_name.h: STEP_name_variable.h step_api.tmp step_common.h
 	cp $(srcdir)/STEP_name_variable.h $@ && \
 	echo "/* Runtime MACRO (generated from step_common.h ) */" >> $@ && \
-	grep "^#define[ \t]*STEP_" step_common.h |grep -v STEP_COMMON_H_ | sed 's/^#define[ \t]*\([^ \t]*\).*/#define \1_NAME "\1"/g' |sort >> $@ && \
+	grep "^#define[ \t]*STEP_" $(srcdir)/step_common.h |grep -v STEP_COMMON_H_ | sed 's/^#define[ \t]*\([^ \t]*\).*/#define \1_NAME "\1"/g' |sort >> $@ && \
 	echo "/* Runtime MACRO (end) */" >> $@ && \
 	awk 'BEGIN{FS=","; printf ("/* Runtime API intrinsic name (generated from step_api.h ) */\n") >> "$@"}\
 	{\
