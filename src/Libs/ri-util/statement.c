@@ -2290,7 +2290,7 @@ statement_to_line_number(statement s)
 
 /* insert statement s1 before or after statement s
  *
- * If statement s is a sequence, simply insert s1 at the begining
+ * If statement s is a sequence, simply insert s1 at the beginning
  * or at the end of the sequence s.
  *
  * If not, create a new statement s2 with s's fields and update
