@@ -38,7 +38,7 @@ $(CPROTO_STAMP_FILE):$(CPROTO_STAMP_FILE)_init  $(SOURCES) $(srcdir)/Makefile.am
 		for cproto_source in $$cproto_sources ; do \
 			case $$cproto_source in \
 				*.c)\
-					$(CPROTO) -evcf2 -O /dev/null -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$cproto_source | sed -e '/YY_BUFFER_STATE/d;/yy_size_t/d';;\
+					$(CPROTO) -evcf2 -O /dev/null -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$cproto_source ;;\
 				*)\
 					cproto_proxy=`basename $${cproto_source}`.c ;\
 					sed -n -e '/^%{/,/%}/ p' -e '1,/^%%/ d' -e '/^%%/,$$ p' $$cproto_source | sed -e '/^%/ d'  > $$cproto_proxy ; \
