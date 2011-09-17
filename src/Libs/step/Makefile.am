@@ -6,12 +6,13 @@ Fc	= comment2pragma.c step_omp.c
 
 TARGET	= step
 include_HEADERS=$(TARGET).h
-BUILT_SOURCES=$(TARGET).h $(Fh) $(Fc)
+# Fc should not be included for step.h cproto generation?
+BUILT_SOURCES=$(TARGET).h $(Fh)
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libstep.la
 dist_noinst_HEADERS=$(Fh) defines-local.h
 
-# Fc should not be included for step.h cproto generation?
+# but should be compiled anyway
 libstep_la_SOURCES=	comment2pragma.lex \
 			step_omp.lex \
 			directives.c \
