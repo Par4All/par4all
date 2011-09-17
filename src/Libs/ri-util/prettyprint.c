@@ -2441,6 +2441,9 @@ void register_intrinsic_handler(const char* name,intrinsic_desc_t *desc) {
 static list
 words_intrinsic_call(call obj, int precedence, bool leftmost, list pdl)
 {
+    if(hash_table_undefined_p(intrinsic_handlers)) {
+        init_intrinsic_handlers();
+    }
     const char *n = entity_local_name(call_function(obj));
     intrinsic_desc_t *d = hash_get(intrinsic_handlers,n);
     if(d!= HASH_UNDEFINED_VALUE)
@@ -2452,6 +2455,9 @@ words_intrinsic_call(call obj, int precedence, bool leftmost, list pdl)
 static int
 intrinsic_precedence(const char* n)
 {
+    if(hash_table_undefined_p(intrinsic_handlers)) {
+        init_intrinsic_handlers();
+    }
     intrinsic_desc_t *d = hash_get(intrinsic_handlers,n);
     if(d!= HASH_UNDEFINED_VALUE)
         return d->prec;
