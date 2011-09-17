@@ -35,6 +35,7 @@ DEFINE_LOCAL_STACK(step_blocks, sequence);
 %option warn
 %option noyywrap
 %option noyy_top_state
+%option noinput
 %option stack
 
  /* DIRECTIVE step */
@@ -193,7 +194,7 @@ liste_element [^ \t,()\n]+
      pips_debug(2,"parallel remaining \"%s\"\n", yytext);
    }
    \n {
-     yyunput('\n', step_omp_text);
+     yyunput('\n', yytext);
      yy_pop_state();
      pips_debug(2,"end state parallel back to %d\n", YYSTATE);
    }
@@ -207,7 +208,7 @@ liste_element [^ \t,()\n]+
     add_clause_nowait();
    }
   \n {
-     yyunput('\n', step_omp_text);
+     yyunput('\n', yytext);
      yy_pop_state();
      pips_debug(2,"end state loop back to %d\n", YYSTATE);
    }
@@ -218,7 +219,7 @@ liste_element [^ \t,()\n]+
      pips_debug(2,"parallel_loop remaining \"%s\"\n", yytext);
    }
    \n {
-     yyunput('\n', step_omp_text);
+     yyunput('\n', yytext);
      yy_pop_state();
      pips_debug(2,"end state parallel_loop back to %d\n", YYSTATE);
    }
@@ -229,7 +230,7 @@ liste_element [^ \t,()\n]+
      pips_debug(2,"master remaining \"%s\"\n", yytext);
    }
    \n {
-     yyunput('\n', step_omp_text);
+     yyunput('\n', yytext);
      yy_pop_state();
      pips_debug(2,"end state master back to %d\n", YYSTATE);
    }
@@ -240,7 +241,7 @@ liste_element [^ \t,()\n]+
      pips_debug(2,"single remaining \"%s\"\n", yytext);
    }
    \n {
-     yyunput('\n', step_omp_text);
+     yyunput('\n', yytext);
      yy_pop_state();
      pips_debug(2,"end state single back to %d\n", YYSTATE);
    }
@@ -249,49 +250,49 @@ liste_element [^ \t,()\n]+
   {parallel}\n {
     directive_block_end(STEP_PARALLEL, yytext);
     pips_debug(2,"end state end +parallel back to %d\n", YYSTATE);
-    yyunput('\n', step_omp_text);
+    yyunput('\n', yytext);
     yy_pop_state();
   }
   {loop}\n {
     directive_block_end(STEP_DO, yytext);
     pips_debug(2,"end state end +loop back to %d\n", YYSTATE);
-    yyunput('\n', step_omp_text);
+    yyunput('\n', yytext);
     yy_pop_state();
   }
   {loop}{nowait}\n {
     directive_block_end(STEP_DO, yytext);
     add_clause_nowait();
     pips_debug(2,"end state end +loop back to %d\n", YYSTATE);
-    yyunput('\n', step_omp_text);
+    yyunput('\n', yytext);
     yy_pop_state();
   }
   {parallel_loop}\n {
     directive_block_end(STEP_PARALLEL_DO, yytext);
     pips_debug(2,"end state end +parallel_loop back to %d\n", YYSTATE);
-    yyunput('\n', step_omp_text);
+    yyunput('\n', yytext);
     yy_pop_state();
   }
   {master}\n {
     directive_block_end(STEP_MASTER, yytext);
     pips_debug(2,"end state end +master back to %d\n", YYSTATE);
-    yyunput('\n', step_omp_text);
+    yyunput('\n', yytext);
     yy_pop_state();
   }
   {single}\n {
     directive_block_end(STEP_SINGLE, yytext);
     pips_debug(2,"end state end +single back to %d\n", YYSTATE);
-    yyunput('\n', step_omp_text);
+    yyunput('\n', yytext);
     yy_pop_state();
   }
   {single}{nowait}\n {
     directive_block_end(STEP_SINGLE, yytext);
     add_clause_nowait();
     pips_debug(2,"end state end +single back to %d\n", YYSTATE);
-    yyunput('\n', step_omp_text);
+    yyunput('\n', yytext);
     yy_pop_state();
   }
   .|\n {
-    yyunput('\n', step_omp_text);
+    yyunput('\n', yytext);
     yy_pop_state();
     pips_debug(2,"Error directive end\n");
   }
@@ -357,7 +358,7 @@ liste_element [^ \t,()\n]+
   }
   {reduction_sep} {
     init_current_list();
-    yyunput('(', step_omp_text);
+    yyunput('(', yytext);
     yy_push_state(liste);
   }
   {reduction_end} {
@@ -387,7 +388,7 @@ liste_element [^ \t,()\n]+
     pips_debug(4," suivant\n");
   }
   {liste_end} {
-    yyunput(')', step_omp_text);
+    yyunput(')', yytext);
     yy_pop_state();
     pips_debug(4,"\nliste fin\n");
   }
@@ -638,8 +639,8 @@ static void step_pragma_handle(statement stmt)
 	  else
 	    pragma_str = strdup(pragma_string(current_pragma));
 
-	  step_omp__scan_string(pragma_str);
-	  step_omp_lex();
+	  yy_scan_string(pragma_str);
+	  yylex();
 
 	  free(pragma_str);
 	}

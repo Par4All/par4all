@@ -812,7 +812,7 @@ statement outliner_call(entity new_fun, list statements_to_outline, list effecti
  *
  * @return pointer to the newly generated statement (already inserted in statements_to_outline)
  */
-statement outliner(string outline_module_name, list statements_to_outline)
+statement outliner(const char* outline_module_name, list statements_to_outline)
 {
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
     entity new_fun = make_empty_subroutine(outline_module_name, copy_language(module_language(get_current_module_entity())));
@@ -823,7 +823,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     hash_table entity_to_effective_parameter = outliner_init(new_fun, statements_to_outline);
 
     /* pass loop bounds as parameters if required */
-    string loop_label = get_string_property("OUTLINE_LOOP_BOUND_AS_PARAMETER");
+    const char* loop_label = get_string_property("OUTLINE_LOOP_BOUND_AS_PARAMETER");
     statement theloop = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),loop_label);
     if(!statement_undefined_p(theloop) && statement_loop(theloop))
       outliner_extract_loop_bound(theloop,entity_to_effective_parameter);

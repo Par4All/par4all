@@ -123,7 +123,6 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
 #include "misc.h"
 #include "properties.h"
 
-#include "STEP_name.h"
 
 /* operator precedences are in the [0,100] range */
 
@@ -1054,7 +1053,7 @@ static list words_genuine_regular_call(call obj, bool is_a_subroutine, list pdl)
   return pc;
 }
 
-static list
+list
 words_call_intrinsic(call obj,
 		     int __attribute__ ((unused)) precedence,
 		     bool __attribute__ ((unused)) leftmost,
@@ -2257,196 +2256,207 @@ static list words_conditional_op(call obj,
  */
 
 static struct intrinsic_handler {
-    char * name;
-    list (*f)(call,int,bool,list);
-    int prec;
+    const char * name;
+    intrinsic_desc_t desc;
 } tab_intrinsic_handler[] = {
-    {POWER_OPERATOR_NAME, words_infix_binary_op, 30},
+    {POWER_OPERATOR_NAME, { words_infix_binary_op, 30} },
 
-    {CONCATENATION_FUNCTION_NAME, words_infix_binary_op, 30},
+    {CONCATENATION_FUNCTION_NAME, {words_infix_binary_op, 30} },
 
     /* The Fortran 77 standard does not allow x*-3 or x+-3, but this is dealt
     * with by argument leftmost, not by prorities.
     */
-    {UNARY_MINUS_OPERATOR_NAME, words_unary_minus, 25},
+    {UNARY_MINUS_OPERATOR_NAME, { words_unary_minus, 25} },
     /* {"--", words_unary_minus, 19}, */
 
-    {INVERSE_OPERATOR_NAME, words_inverse_op, 21},
+    {INVERSE_OPERATOR_NAME, { words_inverse_op, 21} },
 
-    {PLUS_OPERATOR_NAME, words_infix_binary_op, 20},
-    {MINUS_OPERATOR_NAME, words_infix_binary_op, 20},
+    {PLUS_OPERATOR_NAME, { words_infix_binary_op, 20} },
+    {MINUS_OPERATOR_NAME, { words_infix_binary_op, 20} },
 
     /* Non-arithemtic operators have priorities lesser than
      * MINIMAL_ARITHMETIC_PRECEDENCE leftmost is restaured to true for
      * unary minus.
      */
 
-    {LESS_THAN_OPERATOR_NAME, words_infix_binary_op, 15},
-    {GREATER_THAN_OPERATOR_NAME, words_infix_binary_op, 15},
-    {LESS_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
-    {GREATER_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
-    {EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
-    {NON_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
+    {LESS_THAN_OPERATOR_NAME, { words_infix_binary_op, 15} },
+    {GREATER_THAN_OPERATOR_NAME, { words_infix_binary_op, 15} },
+    {LESS_OR_EQUAL_OPERATOR_NAME, { words_infix_binary_op, 15} },
+    {GREATER_OR_EQUAL_OPERATOR_NAME, { words_infix_binary_op, 15} },
+    {EQUAL_OPERATOR_NAME, { words_infix_binary_op, 15} },
+    {NON_EQUAL_OPERATOR_NAME, { words_infix_binary_op, 15} },
 
-    {NOT_OPERATOR_NAME, words_prefix_unary_op, 9},
+    {NOT_OPERATOR_NAME, { words_prefix_unary_op, 9} },
 
-    {AND_OPERATOR_NAME, words_infix_binary_op, 8},
+    {AND_OPERATOR_NAME, { words_infix_binary_op, 8} },
 
-    {OR_OPERATOR_NAME, words_infix_binary_op, 6},
+    {OR_OPERATOR_NAME, { words_infix_binary_op, 6} },
 
-    {EQUIV_OPERATOR_NAME, words_infix_binary_op, 3},
-    {NON_EQUIV_OPERATOR_NAME, words_infix_binary_op, 3},
+    {EQUIV_OPERATOR_NAME, { words_infix_binary_op, 3} },
+    {NON_EQUIV_OPERATOR_NAME, { words_infix_binary_op, 3} },
 
-    {ASSIGN_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {ASSIGN_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
 
-    {ALLOCATE_FUNCTION_NAME, words_stat_io_inst, 0},
-    {DEALLOCATE_FUNCTION_NAME, words_stat_io_inst, 0},
-    {WRITE_FUNCTION_NAME, words_io_inst, 0},
-    {READ_FUNCTION_NAME, words_io_inst, 0},
-    {PRINT_FUNCTION_NAME, words_io_inst, 0},
-    {OPEN_FUNCTION_NAME, words_io_inst, 0},
-    {CLOSE_FUNCTION_NAME, words_io_inst, 0},
-    {INQUIRE_FUNCTION_NAME, words_io_inst, 0},
-    {BACKSPACE_FUNCTION_NAME, words_io_inst, 0},
-    {REWIND_FUNCTION_NAME, words_io_inst, 0},
-    {ENDFILE_FUNCTION_NAME, words_io_inst, 0},
-    {IMPLIED_DO_FUNCTION_NAME, words_implied_do, 0},
+    {ALLOCATE_FUNCTION_NAME, { words_stat_io_inst, 0} },
+    {DEALLOCATE_FUNCTION_NAME, { words_stat_io_inst, 0} },
+    {WRITE_FUNCTION_NAME, { words_io_inst, 0} },
+    {READ_FUNCTION_NAME, { words_io_inst, 0} },
+    {PRINT_FUNCTION_NAME, { words_io_inst, 0} },
+    {OPEN_FUNCTION_NAME, { words_io_inst, 0} },
+    {CLOSE_FUNCTION_NAME, { words_io_inst, 0} },
+    {INQUIRE_FUNCTION_NAME, { words_io_inst, 0} },
+    {BACKSPACE_FUNCTION_NAME, { words_io_inst, 0} },
+    {REWIND_FUNCTION_NAME, { words_io_inst, 0} },
+    {ENDFILE_FUNCTION_NAME, { words_io_inst, 0} },
+    {IMPLIED_DO_FUNCTION_NAME, { words_implied_do, 0} },
 
-    {RETURN_FUNCTION_NAME, words_nullary_op,0},
-    {C_RETURN_FUNCTION_NAME, words_nullary_op,0},
-    {PAUSE_FUNCTION_NAME, words_nullary_op,0 },
-    {STOP_FUNCTION_NAME, words_nullary_op, 0},
-    {CONTINUE_FUNCTION_NAME, words_nullary_op,0},
-    {END_FUNCTION_NAME, words_nullary_op, 0},
+    {RETURN_FUNCTION_NAME, { words_nullary_op,0} },
+    {C_RETURN_FUNCTION_NAME, { words_nullary_op,0} },
+    {PAUSE_FUNCTION_NAME, { words_nullary_op,0 } },
+    {STOP_FUNCTION_NAME, { words_nullary_op, 0} },
+    {CONTINUE_FUNCTION_NAME, { words_nullary_op,0} },
+    {END_FUNCTION_NAME, { words_nullary_op, 0} },
 
 
-    {FORMAT_FUNCTION_NAME, words_prefix_unary_op, 0},
-    {UNBOUNDED_DIMENSION_NAME, words_unbounded_dimension, 0},
-    {LIST_DIRECTED_FORMAT_NAME, words_list_directed, 0},
+    {FORMAT_FUNCTION_NAME, { words_prefix_unary_op, 0} },
+    {UNBOUNDED_DIMENSION_NAME, { words_unbounded_dimension, 0} },
+    {LIST_DIRECTED_FORMAT_NAME, { words_list_directed, 0} },
 
-    {SUBSTRING_FUNCTION_NAME, words_substring_op, 0},
-    {ASSIGN_SUBSTRING_FUNCTION_NAME, words_assign_substring_op, 0},
+    {SUBSTRING_FUNCTION_NAME, { words_substring_op, 0} },
+    {ASSIGN_SUBSTRING_FUNCTION_NAME, { words_assign_substring_op, 0} },
 
     /* These operators are used within the optimize transformation in
 order to manipulate operators such as n-ary add and multiply or
 multiply-add operators ( JZ - sept 98) */
-    {EOLE_FMA_OPERATOR_NAME, eole_fma_specific_op,
-                             MINIMAL_ARITHMETIC_PRECEDENCE },
-    {EOLE_FMS_OPERATOR_NAME, eole_fms_specific_op,
-                             MINIMAL_ARITHMETIC_PRECEDENCE },
-    {EOLE_SUM_OPERATOR_NAME, words_infix_nary_op, 20},
-    {EOLE_PROD_OPERATOR_NAME, words_infix_nary_op, 21},
+    {EOLE_FMA_OPERATOR_NAME, { eole_fma_specific_op,
+                             MINIMAL_ARITHMETIC_PRECEDENCE } },
+    {EOLE_FMS_OPERATOR_NAME, { eole_fms_specific_op,
+                             MINIMAL_ARITHMETIC_PRECEDENCE } },
+    {EOLE_SUM_OPERATOR_NAME, { words_infix_nary_op, 20} },
+    {EOLE_PROD_OPERATOR_NAME, { words_infix_nary_op, 21} },
 
     /* show IMA/IMS */
-    {IMA_OPERATOR_NAME, eole_fma_specific_op,
-	                         MINIMAL_ARITHMETIC_PRECEDENCE },
-	{IMS_OPERATOR_NAME, eole_fms_specific_op,
-	                         MINIMAL_ARITHMETIC_PRECEDENCE },
+    {IMA_OPERATOR_NAME, { eole_fma_specific_op,
+	                         MINIMAL_ARITHMETIC_PRECEDENCE } },
+	{IMS_OPERATOR_NAME, { eole_fms_specific_op,
+	                         MINIMAL_ARITHMETIC_PRECEDENCE } },
 
     /* 05/08/2003 - Nga Nguyen - Here are C intrinsics.
        The precedence is computed by using Table xx, page 49, book
        "The C programming language" of Kernighan and Ritchie, and by
        taking into account the precedence value of Fortran intrinsics. */
 
-    {FIELD_OPERATOR_NAME, words_infix_binary_op, 30},
-    {POINT_TO_OPERATOR_NAME, words_infix_binary_op, 30},
-    {POST_INCREMENT_OPERATOR_NAME, words_postfix_unary_op, 30},
-    {POST_DECREMENT_OPERATOR_NAME, words_postfix_unary_op, 30},
+    {FIELD_OPERATOR_NAME, { words_infix_binary_op, 30} },
+    {POINT_TO_OPERATOR_NAME, { words_infix_binary_op, 30} },
+    {POST_INCREMENT_OPERATOR_NAME, { words_postfix_unary_op, 30} },
+    {POST_DECREMENT_OPERATOR_NAME, { words_postfix_unary_op, 30} },
 
-    {PRE_INCREMENT_OPERATOR_NAME,  words_prefix_unary_op, 25},
-    {PRE_DECREMENT_OPERATOR_NAME,  words_prefix_unary_op, 25},
-    {ADDRESS_OF_OPERATOR_NAME,     words_prefix_unary_op,25},
-    {DEREFERENCING_OPERATOR_NAME,  words_prefix_unary_op, 25},
-    {UNARY_PLUS_OPERATOR_NAME, words_prefix_unary_op, 25},
+    {PRE_INCREMENT_OPERATOR_NAME, {  words_prefix_unary_op, 25} },
+    {PRE_DECREMENT_OPERATOR_NAME, {  words_prefix_unary_op, 25} },
+    {ADDRESS_OF_OPERATOR_NAME, {     words_prefix_unary_op,25} },
+    {DEREFERENCING_OPERATOR_NAME, {  words_prefix_unary_op, 25} },
+    {UNARY_PLUS_OPERATOR_NAME, { words_prefix_unary_op, 25} },
     /*{"-unary", words_prefix_unary_op, 25},*/
-    {BITWISE_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
-    {C_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
+    {BITWISE_NOT_OPERATOR_NAME, { words_prefix_unary_op, 25} },
+    {C_NOT_OPERATOR_NAME, { words_prefix_unary_op, 25} },
 
     /* What is the priority for CAST? 23? */
 
 #define CAST_OPERATOR_PRECEDENCE (23)
 
-    {C_MODULO_OPERATOR_NAME,  words_infix_binary_op, 22},
-    {MULTIPLY_OPERATOR_NAME, words_infix_binary_op, 22},
-    {DIVIDE_OPERATOR_NAME, words_infix_binary_op, 22},
+    {C_MODULO_OPERATOR_NAME, {  words_infix_binary_op, 22} },
+    {MULTIPLY_OPERATOR_NAME, { words_infix_binary_op, 22} },
+    {DIVIDE_OPERATOR_NAME, { words_infix_binary_op, 22} },
 
-    {PLUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
-    {MINUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
+    {PLUS_C_OPERATOR_NAME, { words_infix_binary_op, 20} },
+    {MINUS_C_OPERATOR_NAME, { words_infix_binary_op, 20} },
 
-    {LEFT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 18},
-    {RIGHT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 18},
+    {LEFT_SHIFT_OPERATOR_NAME, { words_infix_binary_op, 18} },
+    {RIGHT_SHIFT_OPERATOR_NAME, { words_infix_binary_op, 18} },
 
-    {C_LESS_THAN_OPERATOR_NAME, words_infix_binary_op, 15 },
-    {C_GREATER_THAN_OPERATOR_NAME, words_infix_binary_op, 15},
-    {C_LESS_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
-    {C_GREATER_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
+    {C_LESS_THAN_OPERATOR_NAME, { words_infix_binary_op, 15 } },
+    {C_GREATER_THAN_OPERATOR_NAME, { words_infix_binary_op, 15} },
+    {C_LESS_OR_EQUAL_OPERATOR_NAME, { words_infix_binary_op, 15} },
+    {C_GREATER_OR_EQUAL_OPERATOR_NAME, { words_infix_binary_op, 15} },
 
-    {C_EQUAL_OPERATOR_NAME, words_infix_binary_op, 14},
-    {C_NON_EQUAL_OPERATOR_NAME, words_infix_binary_op, 14},
+    {C_EQUAL_OPERATOR_NAME, { words_infix_binary_op, 14} },
+    {C_NON_EQUAL_OPERATOR_NAME, { words_infix_binary_op, 14} },
 
-    {BITWISE_AND_OPERATOR_NAME, words_infix_binary_op, 13},
-    {BITWISE_XOR_OPERATOR_NAME, words_infix_binary_op, 12},
-    {BITWISE_OR_OPERATOR_NAME, words_infix_binary_op, 11},
+    {BITWISE_AND_OPERATOR_NAME, { words_infix_binary_op, 13} },
+    {BITWISE_XOR_OPERATOR_NAME, { words_infix_binary_op, 12} },
+    {BITWISE_OR_OPERATOR_NAME, { words_infix_binary_op, 11} },
 
-    {C_AND_OPERATOR_NAME, words_infix_binary_op, 8},
-    {C_OR_OPERATOR_NAME, words_infix_binary_op, 6},
+    {C_AND_OPERATOR_NAME, { words_infix_binary_op, 8} },
+    {C_OR_OPERATOR_NAME, { words_infix_binary_op, 6} },
 
-    {MULTIPLY_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
-    {DIVIDE_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
-    {MODULO_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
-    {PLUS_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
-    {MINUS_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
-    {LEFT_SHIFT_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
-    {RIGHT_SHIFT_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
-    {BITWISE_AND_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
-    {BITWISE_XOR_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
-    {BITWISE_OR_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {MULTIPLY_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+    {DIVIDE_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+    {MODULO_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+    {PLUS_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+    {MINUS_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+    {LEFT_SHIFT_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+    {RIGHT_SHIFT_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+    {BITWISE_AND_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+    {BITWISE_XOR_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
+    {BITWISE_OR_UPDATE_OPERATOR_NAME, { words_assign_op, ASSIGN_OPERATOR_PRECEDENCE} },
 
     /* which precedence ? You are safe within an assignment. */
-    {CONDITIONAL_OPERATOR_NAME, words_conditional_op, ASSIGN_OPERATOR_PRECEDENCE+1},
+    {CONDITIONAL_OPERATOR_NAME, { words_conditional_op, ASSIGN_OPERATOR_PRECEDENCE+1} },
 
     /* which precedence ? You need parentheses within an assignment. */
-    {COMMA_OPERATOR_NAME, words_comma_op, ASSIGN_OPERATOR_PRECEDENCE-1},
+    {COMMA_OPERATOR_NAME, { words_comma_op, ASSIGN_OPERATOR_PRECEDENCE-1} },
 
     /* OMP pragma function part */
-    {OMP_OMP_FUNCTION_NAME,       words_nullary_op, 0},
-    {OMP_FOR_FUNCTION_NAME,       words_nullary_op, 0},
-    {OMP_PARALLEL_FUNCTION_NAME,  words_nullary_op, 0},
-    {OMP_REDUCTION_FUNCTION_NAME, words_omp_red,    0},
+    {OMP_OMP_FUNCTION_NAME, {       words_nullary_op, 0} },
+    {OMP_FOR_FUNCTION_NAME, {       words_nullary_op, 0} },
+    {OMP_PARALLEL_FUNCTION_NAME, {  words_nullary_op, 0} },
+    {OMP_REDUCTION_FUNCTION_NAME, { words_omp_red,    0} },
 
-#include "STEP_RT_intrinsic.h"
 
-    {NULL, null, 0}
+    {NULL, { null, 0} }
 };
+
+static hash_table intrinsic_handlers = hash_table_undefined;
+
+static void init_intrinsic_handlers() {
+    if(hash_table_undefined_p(intrinsic_handlers)) {
+        intrinsic_handlers = hash_table_make(hash_string,sizeof(tab_intrinsic_handler));
+        for(struct intrinsic_handler *p = &tab_intrinsic_handler[0];p->name;p++) {
+            // no copy because the memory is static
+            hash_put(intrinsic_handlers,p->name,&p->desc);
+        }
+    }
+}
+
+/* after this call, name and desc are owned by intrinsic_handlers, but will never be deallocated
+ * they must point to permanent storage
+ */ 
+void register_intrinsic_handler(const char* name,intrinsic_desc_t *desc) {
+    if(hash_table_undefined_p(intrinsic_handlers)) {
+        init_intrinsic_handlers();
+    }
+    hash_put(intrinsic_handlers,name,desc);
+}
 
 static list
 words_intrinsic_call(call obj, int precedence, bool leftmost, list pdl)
 {
-    struct intrinsic_handler *p = tab_intrinsic_handler;
     const char *n = entity_local_name(call_function(obj));
-
-    while (p->name != NULL) {
-	if (strcmp(p->name, n) == 0) {
-	  return((*(p->f))(obj, precedence, leftmost, pdl));
-	}
-	p++;
-    }
-
-    return words_regular_call(obj, false, pdl);
+    intrinsic_desc_t *d = hash_get(intrinsic_handlers,n);
+    if(d!= HASH_UNDEFINED_VALUE)
+        return d->f(obj, precedence, leftmost, pdl);
+    else
+        return words_regular_call(obj, false, pdl);
 }
 
 static int
 intrinsic_precedence(const char* n)
 {
-    struct intrinsic_handler *p = tab_intrinsic_handler;
-
-    while (p->name != NULL) {
-	if (strcmp(p->name, n) == 0)
-	    return(p->prec);
-	p++;
-    }
-
-    return 0;
+    intrinsic_desc_t *d = hash_get(intrinsic_handlers,n);
+    if(d!= HASH_UNDEFINED_VALUE)
+        return d->prec;
+    else
+        return 0;
 }
 
 static int
@@ -2495,6 +2505,13 @@ list words_call(
   return pc;
 }
 
+/* This one is exported. Outer parentheses are never useful. pdl can
+   point to an empty list, but it must be free on return*/
+list /* of string */ words_expression(expression obj, list pdl)
+{
+  return words_syntax(expression_syntax(obj), pdl);
+}
+
 /* exported for expression.c
  */
 list
@@ -2539,12 +2556,6 @@ words_syntax(syntax obj, list pdl)
     return(pc);
 }
 
-/* This one is exported. Outer parentheses are never useful. pdl can
-   point to an empty list, but it must be free on return*/
-list /* of string */ words_expression(expression obj, list pdl)
-{
-  return words_syntax(expression_syntax(obj), pdl);
-}
 
 /* exported for cmfortran.c
  */

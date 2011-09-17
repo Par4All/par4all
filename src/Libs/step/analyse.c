@@ -15,6 +15,8 @@ typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
 #include "graph.h" // for graph
 #include "ricedg.h" // for vertex_to_statement
+#include "bootstrap.h"
+
 
 
 GENERIC_LOCAL_FUNCTION(step_path, map_step_point)
@@ -137,7 +139,7 @@ bool step_partial_p(region reg)
   return load_step_partial(reg);
 }
 
-bool step_analysed_module_p(string module_name)
+bool step_analysed_module_p(const char* module_name)
 {
   return db_resource_required_or_available_p(DBR_STEP_SEND_REGIONS,  module_name);
 }
@@ -163,18 +165,39 @@ void debug_print_effects_list(list l, string txt)
 
 bool step_analyse_init(const char* __attribute__ ((unused)) module_name)
 {
-  DB_PUT_MEMORY_RESOURCE(DBR_STEP_COMM, "", make_step_comm(make_map_step_point(), make_map_effect_bool(), make_map_effect_bool()));
+
+    DB_PUT_MEMORY_RESOURCE(DBR_STEP_COMM, "", make_step_comm(make_map_step_point(), make_map_effect_bool(), make_map_effect_bool()));
 
 #ifdef PIPS_RUNTIME_DIR
-  string srcpath=strdup(PIPS_RUNTIME_DIR "/" STEP_DEFAULT_RT_H);
+    string srcpath=strdup(PIPS_RUNTIME_DIR "/" STEP_DEFAULT_RT_H);
 #else
-  string srcpath=strdup(concatenate(getenv("PIPS_ROOT"),"/",STEP_DEFAULT_RT_H,NULL));
+    string srcpath=strdup(concatenate(getenv("PIPS_ROOT"),"/",STEP_DEFAULT_RT_H,NULL));
 #endif
-  string old_path=pips_srcpath_append(srcpath);
-  free(old_path);
-  free(srcpath);
+    string old_path=pips_srcpath_append(srcpath);
+    free(old_path);
+    free(srcpath);
 
-  return true;
+    /* init intrinsics */
+    static struct intrin { 
+        char * name;
+        intrinsic_desc_t desc;
+    } step_intrinsics [] = {
+#include "STEP_RT_intrinsic.h"
+        { NULL , {NULL, 0} }
+    };
+    for(struct intrin *p = step_intrinsics;p->name;++p)
+        register_intrinsic_handler(p->name,&(p->desc));
+
+    /* other intrinsics */
+    static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
+    {
+#include "STEP_RT_bootstrap.h"
+        {NULL, 0, 0, 0, 0}
+    };
+    for(IntrinsicDescriptor *p=IntrinsicTypeDescriptorTable;p->name;p++)
+        register_intrinsic_type_descriptor(p) ;
+
+    return true;
 }
 
 void load_step_comm()

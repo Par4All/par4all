@@ -42,3 +42,15 @@ typedef struct
 typedef basic (*typing_function_t)(call, type_context_p);
 
 typedef void (*switch_name_function)(expression, type_context_p);
+
+/* The following data structure describes an intrinsic function: its
+   name and its arity and its type. */
+
+typedef struct IntrinsicDescriptor
+{
+  string name;
+  int nbargs;
+  type (*intrinsic_type)(int);
+  typing_function_t type_function;
+  switch_name_function name_function;
+} IntrinsicDescriptor;

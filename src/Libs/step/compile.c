@@ -700,6 +700,8 @@ static statement compile_mpi(statement stmt, string new_module_name, step_direct
 	}
     }
 
+  nowait=nowait; // << nowait is not used ! fix this
+
   assert(!entity_undefined_p(get_current_module_entity()));
   string directive_txt;
   entity index = entity_undefined;
@@ -991,7 +993,7 @@ bool step_compile(const char* module_name)
       set_cumulated_rw_effects(cummulated_rw_effects);
 
       /* Code transformation */
-      list last_module_name = CONS(STRING, module_name, NIL);
+      list last_module_name = CONS(STRING, (string)module_name, NIL);
       gen_context_recurse(stmt, &last_module_name, statement_domain, compile_filter, compile_rewrite);
 
       if (entity_main_module_p(module))

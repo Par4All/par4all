@@ -2158,3 +2158,9 @@ typedef enum {
   AND_IF_POLICY,
   OR_IF_POLICY
 } if_clause_policy;
+
+/* for intrinsic registration */
+typedef struct {
+    list (*f)(call,int,bool,list);
+    int prec;
+} intrinsic_desc_t;

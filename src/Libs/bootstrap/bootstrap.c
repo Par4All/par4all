@@ -4181,7 +4181,7 @@ MakeVoidParameter()
                         make_dummy_unknown());
 }
 
-static type
+type
 integer_to_overloaded_type(int n)
 {
   type t = type_undefined;
@@ -4195,7 +4195,7 @@ integer_to_overloaded_type(int n)
   return t;
 }
 
-static type
+type
 longinteger_to_overloaded_type(int n) /* MB */
 {
   type t = type_undefined;
@@ -4209,7 +4209,7 @@ longinteger_to_overloaded_type(int n) /* MB */
   return t;
 }
 
-static type
+type
 longlonginteger_to_overloaded_type(int n) /* MB */
 {
   type t = type_undefined;
@@ -4223,7 +4223,7 @@ longlonginteger_to_overloaded_type(int n) /* MB */
   return t;
 }
 
-static type
+type
 integer_to_void_type(int n)
 {
   type t = type_undefined;
@@ -4237,7 +4237,7 @@ integer_to_void_type(int n)
   return t;
 }
 
-static type __attribute__ ((unused))
+type __attribute__ ((unused))
 void_to_overloaded_type(int n)
 {
   type t = type_undefined;
@@ -4251,7 +4251,7 @@ void_to_overloaded_type(int n)
   return t;
 }
 
-static type
+type
 overloaded_to_void_type(int n)
 {
   type t = type_undefined;
@@ -4265,7 +4265,7 @@ overloaded_to_void_type(int n)
   return t;
 }
 
-static type
+type
 void_to_integer_type(int n)
 {
   type t = type_undefined;
@@ -4281,1162 +4281,10 @@ void_to_integer_type(int n)
 
 /******************************************************** INTRINSICS LIST */
 
-/* The following data structure describes an intrinsic function: its
-   name and its arity and its type. */
 
-typedef struct IntrinsicDescriptor
-{
-  string name;
-  int nbargs;
-  type (*intrinsic_type)(int);
-  typing_function_t type_function;
-  switch_name_function name_function;
-} IntrinsicDescriptor;
 
-/* The table of intrinsic functions. this table is used at the begining
-   of linking to create Fortran operators, commands and intrinsic functions.
 
-   Functions with a variable number of arguments are declared with INT_MAX
-   arguments.
-*/
-
-/* Nga Nguyen 27/06/2003 Fuse the tables of intrinsics for C and Fortran.
-   Since there are differences between some kind of operators, such as in
-   Fortran, "+" is only applied to arithmetic numbers, in C, "+" is also applied
-   to pointer, the typing functions are different. So in some cases, we have to
-   rename the operators */
-
-/* Pragma can be represented in the pips IR as a list of expression so new
- * functions/intrinsics are needed. For exmaple to represent OMP pragmas,
- * following intrinscs are needed:
- *    1 - omp, parallel and for which are constant so with 0 argument,
- *    2 - the colom poperator (for reduction) that takes two arguments
- *    3 - private and reduction that takes a variable number of arguments.
- */
-
-static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
-{
-  {PLUS_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
-  {MINUS_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
-  {DIVIDE_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
-  {MULTIPLY_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
-  {UNARY_MINUS_OPERATOR_NAME, 1, default_intrinsic_type, typing_arithmetic_operator, 0}, // unary minus
-  {POWER_OPERATOR_NAME, 2, default_intrinsic_type, typing_power_operator, 0},
-
-  /* internal inverse operator... */
-  { INVERSE_OPERATOR_NAME, 1, real_to_real_type,
-   typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
-
-  {ASSIGN_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-
-  {EQUIV_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_logical_operator, 0},
-  {NON_EQUIV_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_logical_operator, 0},
-
-  {OR_OPERATOR_NAME, 2, logical_to_logical_type, typing_logical_operator, 0},
-  {AND_OPERATOR_NAME, 2, logical_to_logical_type, typing_logical_operator, 0},
-  {NOT_OPERATOR_NAME, 1, logical_to_logical_type, typing_logical_operator, 0},
-
-  {LESS_THAN_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
-  {GREATER_THAN_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
-  {LESS_OR_EQUAL_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
-  {GREATER_OR_EQUAL_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
-  {EQUAL_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
-  {NON_EQUAL_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
-
-  {CONCATENATION_FUNCTION_NAME, 2, character_to_character_type, typing_concat_operator, 0},
-
-  /* FORTRAN IO statement */
-  {WRITE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_read_write, 0},
-  {REWIND_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_rewind, 0},
-  {BACKSPACE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_backspace, 0},
-  {OPEN_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_open, 0},
-  {CLOSE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_close, 0},
-  {READ_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_read_write, 0},
-  {BUFFERIN_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, typing_buffer_inout, 0},
-  {BUFFEROUT_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, typing_buffer_inout, 0},
-  {ENDFILE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_endfile, 0},
-  {IMPLIED_DO_NAME, (INT_MAX), default_intrinsic_type, typing_implied_do, 0},
-  {REPEAT_VALUE_NAME, 2, default_intrinsic_type, no_typing, 0},
-  {STATIC_INITIALIZATION_FUNCTION_NAME, (INT_MAX) , default_intrinsic_type, no_typing, 0},
-  {DATA_LIST_FUNCTION_NAME, (INT_MAX) , default_intrinsic_type, no_typing, 0},
-  {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type, check_format, 0},
-  {INQUIRE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_inquire, 0},
-
-  {SUBSTRING_FUNCTION_NAME, 3, substring_type, typing_substring, 0},
-  {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type, typing_assign_substring, 0},
-
-  /* Control statement */
-  {CONTINUE_FUNCTION_NAME, 0, default_intrinsic_type, statement_without_argument, 0},
-  {"ENDDO", 0, default_intrinsic_type, 0, 0}, // Why do we need this one?
-  {PAUSE_FUNCTION_NAME, 1, default_intrinsic_type,
-   statement_with_at_most_one_integer_or_character, 0},
-  {RETURN_FUNCTION_NAME, 0, default_intrinsic_type,
-   statement_with_at_most_one_expression_integer, 0},
-  {STOP_FUNCTION_NAME, 0, default_intrinsic_type,
-   statement_with_at_most_one_integer_or_character, 0},
-  {END_FUNCTION_NAME, 0, default_intrinsic_type, statement_without_argument, 0}, // Is it useful?
-
-
-  {INT_GENERIC_CONVERSION_NAME, 1, overloaded_to_integer_type,
-   typing_function_conversion_to_integer, simplification_int},
-  {IFIX_GENERIC_CONVERSION_NAME, 1, real_to_integer_type, typing_function_real_to_int,
-   simplification_int},
-  {IDINT_GENERIC_CONVERSION_NAME, 1, double_to_integer_type, typing_function_double_to_int,
-   simplification_int},
-  {REAL_GENERIC_CONVERSION_NAME, 1, overloaded_to_real_type, typing_function_conversion_to_real,
-   simplification_real},
-  {FLOAT_GENERIC_CONVERSION_NAME, 1, overloaded_to_real_type, typing_function_conversion_to_real,
-   simplification_real},
-  {DFLOAT_GENERIC_CONVERSION_NAME, 1, overloaded_to_double_type,
-   typing_function_conversion_to_double, simplification_double},
-  {SNGL_GENERIC_CONVERSION_NAME, 1, overloaded_to_real_type, typing_function_conversion_to_real,
-   simplification_real},
-  {DBLE_GENERIC_CONVERSION_NAME, 1, overloaded_to_double_type,
-   typing_function_conversion_to_double, simplification_double},
-  {DREAL_GENERIC_CONVERSION_NAME, 1, overloaded_to_double_type, /* Arnauld Leservot, code CEA */
-   typing_function_conversion_to_double, simplification_double},
-  {CMPLX_GENERIC_CONVERSION_NAME, (INT_MAX), overloaded_to_complex_type,
-   typing_function_conversion_to_complex, simplification_complex},
-
-  {DCMPLX_GENERIC_CONVERSION_NAME, (INT_MAX), overloaded_to_doublecomplex_type,
-   typing_function_conversion_to_dcomplex, simplification_dcomplex},
-
-  /* (0.,1.) -> switched to a function call... */
-  { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type,
-    typing_function_constant_complex, switch_specific_cmplx },
-  { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type,
-    typing_function_constant_dcomplex, switch_specific_dcmplx },
-
-  {CHAR_TO_INT_CONVERSION_NAME, 1, default_intrinsic_type, typing_function_char_to_int, 0},
-  {INT_TO_CHAR_CONVERSION_NAME, 1, default_intrinsic_type, typing_function_int_to_char, 0},
-
-  {AINT_CONVERSION_NAME, 1, real_to_real_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_aint},
-  {DINT_CONVERSION_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ANINT_CONVERSION_NAME, 1, real_to_real_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_anint},
-  {DNINT_CONVERSION_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {NINT_CONVERSION_NAME, 1, real_to_integer_type,
-   typing_function_RealDouble_to_Integer, switch_specific_nint},
-  {IDNINT_CONVERSION_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
-
-  //Fortran
-  {IABS_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ABS_OPERATOR_NAME, 1, real_to_real_type,
-   typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal,
-   switch_specific_abs},
-  {DABS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {CABS_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
-  {CDABS_OPERATOR_NAME, 1, doublecomplex_to_double_type,
-   typing_function_dcomplex_to_double, 0},
-
-  {MODULO_OPERATOR_NAME, 2, default_intrinsic_type,
-   typing_function_IntegerRealDouble_to_IntegerRealDouble,
-   switch_specific_mod},
-  {REAL_MODULO_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {DOUBLE_MODULO_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-
-  {ISIGN_OPERATOR_NAME, 2, integer_to_integer_type, typing_function_int_to_int, 0},
-  {SIGN_OPERATOR_NAME, 2, default_intrinsic_type,
-   typing_function_IntegerRealDouble_to_IntegerRealDouble,
-   switch_specific_sign},
-  {DSIGN_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-
-  {IDIM_OPERATOR_NAME, 2, integer_to_integer_type, typing_function_int_to_int, 0},
-  {DIM_OPERATOR_NAME, 2, default_intrinsic_type,
-   typing_function_IntegerRealDouble_to_IntegerRealDouble,
-   switch_specific_dim},
-  {DDIM_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-
-  {DPROD_OPERATOR_NAME, 2, real_to_double_type, typing_function_real_to_double, 0},
-
-  {MAX_OPERATOR_NAME, (INT_MAX), default_intrinsic_type,
-   typing_function_IntegerRealDouble_to_IntegerRealDouble,
-   switch_specific_max},
-  {MAX0_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
-   typing_function_int_to_int, 0},
-  {AMAX1_OPERATOR_NAME, (INT_MAX), real_to_real_type, typing_function_real_to_real, 0},
-  {DMAX1_OPERATOR_NAME, (INT_MAX), double_to_double_type,
-   typing_function_double_to_double, 0},
-  {AMAX0_OPERATOR_NAME, (INT_MAX), integer_to_real_type,
-   typing_function_int_to_real, 0},
-  {MAX1_OPERATOR_NAME, (INT_MAX), real_to_integer_type, typing_function_real_to_int, 0},
-
-  {MIN_OPERATOR_NAME, (INT_MAX), default_intrinsic_type,
-   typing_function_IntegerRealDouble_to_IntegerRealDouble,
-   switch_specific_min},
-  {MIN0_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
-   typing_function_int_to_int, 0},
-  {AMIN1_OPERATOR_NAME, (INT_MAX), real_to_real_type, typing_function_real_to_real, 0},
-  {DMIN1_OPERATOR_NAME, (INT_MAX), double_to_double_type,
-   typing_function_double_to_double, 0},
-  {AMIN0_OPERATOR_NAME, (INT_MAX), integer_to_real_type,
-   typing_function_int_to_real, 0},
-  {MIN1_OPERATOR_NAME, (INT_MAX), real_to_integer_type, typing_function_real_to_int, 0},
-
-  {LENGTH_OPERATOR_NAME, 1, character_to_integer_type, typing_function_char_to_int, 0},
-  {INDEX_OPERATOR_NAME, 2, character_to_integer_type, typing_function_char_to_int, 0},
-
-  {AIMAG_CONVERSION_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
-  {DIMAG_CONVERSION_NAME, 1, doublecomplex_to_double_type,
-   typing_function_dcomplex_to_double, 0},
-
-  {CONJG_OPERATOR_NAME, 1, complex_to_complex_type,
-   typing_function_complex_to_complex, 0},
-  {DCONJG_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
-   typing_function_dcomplex_to_dcomplex, 0},
-
-  {SQRT_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDoubleComplex_to_RealDoubleComplex,
-   switch_specific_sqrt},
-  {DSQRT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {CSQRT_OPERATOR_NAME, 1, complex_to_complex_type,
-   typing_function_complex_to_complex, 0},
-  {CDSQRT_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
-                typing_function_dcomplex_to_dcomplex, 0},
-
-  {EXP_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDoubleComplex_to_RealDoubleComplex,
-   switch_specific_exp},
-  {DEXP_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {CEXP_OPERATOR_NAME, 1, complex_to_complex_type,
-   typing_function_complex_to_complex, 0},
-  {CDEXP_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
-               typing_function_dcomplex_to_dcomplex, 0},
-
-  {LOG_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDoubleComplex_to_RealDoubleComplex,
-   switch_specific_log},
-  {ALOG_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {DLOG_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {CLOG_OPERATOR_NAME, 1, complex_to_complex_type,
-   typing_function_complex_to_complex, 0},
-  {CDLOG_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
-               typing_function_dcomplex_to_dcomplex, 0},
-
-  {LOG10_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_log10},
-  {ALOG10_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {DLOG10_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-
-  {SIN_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDoubleComplex_to_RealDoubleComplex,
-   switch_specific_sin},
-  {DSIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {CSIN_OPERATOR_NAME, 1, complex_to_complex_type,
-   typing_function_complex_to_complex, 0},
-  {CDSIN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
-               typing_function_dcomplex_to_dcomplex, 0},
-
-  {COS_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDoubleComplex_to_RealDoubleComplex,
-   switch_specific_cos},
-  {DCOS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {CCOS_OPERATOR_NAME, 1, complex_to_complex_type,
-   typing_function_complex_to_complex, 0},
-  {CDCOS_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
-               typing_function_dcomplex_to_dcomplex, 0},
-
-  {TAN_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_tan},
-  {DTAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-
-  {ASIN_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_asin},
-  {DASIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-
-  {ACOS_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_acos},
-  {DACOS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-
-  {ATAN_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_atan},
-  {DATAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ATAN2_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_atan2},
-  {DATAN2_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-
-  {SINH_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_sinh},
-  {DSINH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-
-  {COSH_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_cosh},
-  {DCOSH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-
-  {TANH_OPERATOR_NAME, 1, default_intrinsic_type,
-   typing_function_RealDouble_to_RealDouble, switch_specific_tanh},
-  {DTANH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-
-  {LGE_OPERATOR_NAME, 2, character_to_logical_type, typing_function_char_to_logical, 0},
-  {LGT_OPERATOR_NAME, 2, character_to_logical_type, typing_function_char_to_logical, 0},
-  {LLE_OPERATOR_NAME, 2, character_to_logical_type, typing_function_char_to_logical, 0},
-  {LLT_OPERATOR_NAME, 2, character_to_logical_type, typing_function_char_to_logical, 0},
-
-  {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type,
-   typing_function_format_name, 0},
-  {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type,
-   typing_function_overloaded, 0},
-
-  /* Bit manipulation functions : ISO/IEC 1539 */
-  {ISHFT_OPERATOR_NAME, 2, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISHFTC_OPERATOR_NAME, 3,integer_to_integer_type, typing_function_int_to_int, 0},
-  {IBITS_OPERATOR_NAME, 3, integer_to_integer_type, typing_function_int_to_int, 0},
-  {MVBITS_OPERATOR_NAME, 5,integer_to_integer_type, typing_function_int_to_int, 0},
-  {BTEST_OPERATOR_NAME, 2,integer_to_logical_type, typing_function_int_to_logical, 0},
-  {IBSET_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
-  {IBCLR_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
-  {BIT_SIZE_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
-  {IAND_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
-  {IEOR_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
-  {IOR_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
-
-  /* These operators are used within the OPTIMIZE transformation in
-     order to manipulate operators such as n-ary add and multiply or
-     multiply-add operators ( JZ - sept 98) */
-  {EOLE_SUM_OPERATOR_NAME, (INT_MAX), default_intrinsic_type ,
-   typing_arithmetic_operator, 0},
-  {EOLE_PROD_OPERATOR_NAME, (INT_MAX), default_intrinsic_type ,
-   typing_arithmetic_operator, 0},
-  {EOLE_FMA_OPERATOR_NAME, 3, default_intrinsic_type ,
-   typing_arithmetic_operator, 0},
-  {EOLE_FMS_OPERATOR_NAME, 3, default_intrinsic_type ,
-   typing_arithmetic_operator, 0},
-
-  /* integer combined multiply add or sub - FC oct 2005 */
-  { IMA_OPERATOR_NAME, 3, integer_to_integer_type,
-        typing_function_int_to_int, 0 },
-  { IMS_OPERATOR_NAME, 3, integer_to_integer_type,
-        typing_function_int_to_int, 0 },
-
-  /* Here are C intrinsics arranged in the order of the standard ISO/IEC 9899:TC2. MB */
-
-  /* ISO 6.5.2.3 structure and union members */
-  {FIELD_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
-  {POINT_TO_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
-  /* ISO 6.5.2.4 postfix increment and decrement operators, real or pointer type operand */
-  {POST_INCREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
-  {POST_DECREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
-  /* ISO 6.5.3.1 prefix increment and decrement operators, real or pointer type operand */
-  {PRE_INCREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
-  {PRE_DECREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
-  /* ISO 6.5.3.2 address and indirection operators, add pointer type */
-  {ADDRESS_OF_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
-  {DEREFERENCING_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
-  /* ISO 6.5.3.3 unary arithmetic operators */
-  {UNARY_PLUS_OPERATOR_NAME, 1, default_intrinsic_type, typing_arithmetic_operator, 0},
-  /* Unuary minus : ALREADY EXIST (FORTRAN)
-  {UNARY_MINUS_OPERATOR_NAME, 1, default_intrinsic_type, typing_arithmetic_operator, 0},*/
-  {BITWISE_NOT_OPERATOR_NAME, 1, integer_to_overloaded_type, typing_arithmetic_operator, 0},
-  {C_NOT_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
-  /* ISO 6.5.5 multiplicative operators : ALREADY EXIST (FORTRAN)
-     {MULTIPLY_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
-     {DIVIDE_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},*/
-  {C_MODULO_OPERATOR_NAME, 2, integer_to_overloaded_type, typing_arithmetic_operator, 0},
-  /* ISO 6.5.6 additive operators, arithmetic types or pointer + integer type*/
-  {PLUS_C_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
-  {MINUS_C_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
-  /* ISO 6.5.7 bitwise shift operators*/
-  {LEFT_SHIFT_OPERATOR_NAME, 2, integer_to_overloaded_type, 0, 0},
-  {RIGHT_SHIFT_OPERATOR_NAME, 2, integer_to_overloaded_type, 0, 0},
-  /* ISO 6.5.8 relational operators,arithmetic or pointer types */
-  {C_LESS_THAN_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {C_GREATER_THAN_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {C_LESS_OR_EQUAL_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {C_GREATER_OR_EQUAL_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
-  /* ISO 6.5.9 equality operators, return 0 or 1*/
-  {C_EQUAL_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {C_NON_EQUAL_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
-  /* ISO 6.5.10 bitwise AND operator */
-  {BITWISE_AND_OPERATOR_NAME, 2, integer_to_integer_type, typing_arithmetic_operator, 0},
-  /* ISO 6.5.11 bitwise exclusive OR operator */
-  {BITWISE_XOR_OPERATOR_NAME, 2, integer_to_integer_type, typing_arithmetic_operator, 0},
-  /* ISO 6.5.12 bitwise inclusive OR operator */
-  {BITWISE_OR_OPERATOR_NAME, 2, integer_to_integer_type, typing_arithmetic_operator, 0},
-  /* ISO 6.5.13 logical AND operator */
-  {C_AND_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
-  /* ISO 6.5.14 logical OR operator */
-  {C_OR_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
-   /* ISO 6.5.15 conditional operator */
-  {CONDITIONAL_OPERATOR_NAME, 3, default_intrinsic_type, 0, 0},
-  /* ISO 6.5.16.1 simple assignment : ALREADY EXIST (FORTRAN)
-     {ASSIGN_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0}, */
-  /* ISO 6.5.16.2 compound assignments*/
-  {MULTIPLY_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  {DIVIDE_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  {MODULO_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  {PLUS_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  {MINUS_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  {LEFT_SHIFT_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  {RIGHT_SHIFT_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  {BITWISE_AND_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  {BITWISE_XOR_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  {BITWISE_OR_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
-  /* ISO 6.5.17 comma operator */
-  {COMMA_OPERATOR_NAME, (INT_MAX), default_intrinsic_type, 0, 0},
-
-  {BREAK_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
-  {CASE_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
-  {DEFAULT_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
-  {C_RETURN_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-
-  /* intrinsic to handle C initialization */
-  {BRACE_INTRINSIC, (INT_MAX) , default_intrinsic_type, no_typing, 0},
-
-  /* #include <assert.h> */
-  {ASSERT_FUNCTION_NAME, 3, overloaded_to_void_type,0,0},
-  {ASSERT_FAIL_FUNCTION_NAME, 4, overloaded_to_void_type,0,0}, /* does not return */
-
-  /* #include <complex.h> */
-
-  {CACOS_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CACOSF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CACOSL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CASIN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CASINF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CASINL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CATAN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CATANF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CATANL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {C_CCOS_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CCOSF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CCOSL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {C_CSIN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CSINF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CSINL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CTAN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CTANF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CTANL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CACOSH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CACOSHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CACOSHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CASINH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CASINHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CASINHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CATANH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CATANHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CATANHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CCOSH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CCOSHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CCOSHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CSINH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CSINHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CSINHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CTANH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CTANHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CTANHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {C_CEXP_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CEXPF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CEXPL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {C_CLOG_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CLOGF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CLOGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {C_CABS_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
-  {CABSF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
-  {CABSL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
-  {CPOW_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CPOWF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CPOWL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {C_CSQRT_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CSQRTF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CSQRTL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CARG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
-  {CARGF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
-  {CARGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
-  {CIMAG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
-  {GCC_CIMAG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
-  {CIMAGF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
-  {CIMAGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
-  {CONJ_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CONJF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CONJL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CPROJ_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
-  {CPROJF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-  {CPROJL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
-  {CREAL_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
-  {GCC_CREAL_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
-  {CREALF_OPERATOR_NAME, 1,  complex_to_real_type, typing_function_complex_to_real, 0},
-  {CREALL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
-
-  /* #include <ctype.h> */
- 
-  {ISALNUM_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISALPHA_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISBLANK_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISCNTRL_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISDIGIT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISGRAPH_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISLOWER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISPRINT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISPUNCT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISSPACE_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISUPPER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {ISXDIGIT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {TOLOWER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {TOUPPER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  /* End ctype.h */
-  //not found in standard C99 (in GNU C Library)
-  {ISASCII_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {TOASCII_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {_TOLOWER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {_TOUPPER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-
-  /* Real type is void -> unsigned short int ** */
-  {CTYPE_B_LOC_OPERATOR_NAME, 0, integer_to_integer_type, 0, 0},
-
-  /* #include <errno.h> */
-  /*  {"errno", 0, overloaded_to_integer_type, 0, 0}, */
-  /* bits/errno.h */
-  {__ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
-
-
-  /* #include <fenv.h> */
-  {FECLEAREXCEPT_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {FERAISEEXCEPT_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {FESETEXCEPTFLAG_FUNCTION_NAME, 2,  overloaded_to_integer_type, 0, 0},
-  {FETESTEXCEPT_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {FEGETROUND_FUNCTION_NAME, 1, void_to_integer_type, 0, 0},
-  {FESETROUND_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  // fenv_t *
-  //{FESETENV_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  //{FEUPDATEENV_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-
-
-  /* #include <float.h> */
-  /* {"__flt_rounds", 1, void_to_integer_type, 0, 0}, */
-
-  /* #include <inttypes.h> */
-  {IMAXABS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {IMAXDIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-
-  /* #include <iso646.h> */
-
-  /* {"_sysconf", 1, integer_to_integer_type, 0, 0},
-
-  {"localeconv", 1, default_intrinsic_type, 0, 0},
-  {"dcgettext", 3, default_intrinsic_type, 0, 0},
-  {"dgettext", 2, default_intrinsic_type, 0, 0},
-  {"gettext", 1, default_intrinsic_type, 0, 0},
-  {"textdomain", 1, default_intrinsic_type, 0, 0},
-  {"bindtextdomain", 2, default_intrinsic_type, 0, 0},
-  {"wdinit", 1, void_to_integer_type, 0 ,0},
-  {"wdchkind", 1, overloaded_to_integer_type, 0 ,0},
-  {"wdbindf", 3, overloaded_to_integer_type, 0 ,0},
-  {"wddelim", 3, default_intrinsic_type, 0, 0},
-  {"mcfiller", 1, void_to_overloaded_type, 0, 0},
-  {"mcwrap", 1, void_to_integer_type, 0 ,0},*/
-
-  /* #include <limits.h> */
-
-  /* #include <locale.h> */
-  {SETLOCALE_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-
-  /* #include <math.h> */
-
-  {FPCLASSIFY_OPERATOR_NAME, 1, double_to_integer_type,typing_function_double_to_int, 0},
-  {ISFINITE_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
-  {ISINF_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
-  {ISNAN_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
-  {ISNORMAL_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
-  {SIGNBIT_OPERATOR_NAME, 1, double_to_integer_type,typing_function_double_to_int, 0},
-  {C_ACOS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double , 0},
-  {ACOSF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {ACOSL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {C_ASIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ASINF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {ASINL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {C_ATAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ATANF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {ATANL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {C_ATAN2_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {ATAN2F_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {ATAN2L_OPERATOR_NAME, 2, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {C_COS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {COSF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {COSL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {C_SIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {SINF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {SINL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {C_TAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {TANF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {TANL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {C_ACOSH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ACOSHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {ACOSHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {C_ASINH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ASINHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {ASINHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {C_ATANH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ATANHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {ATANHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {C_COSH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {COSHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {COSHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {C_SINH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {SINHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {SINHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {C_TANH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {TANHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {TANHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {C_EXP_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {EXPF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {EXPL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {EXP2_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {EXP2F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {EXP2L_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {EXPM1_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {EXPM1F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {EXPM1L_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},    
-  {FREXP_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},/*?*/
-  {ILOGB_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
-  {ILOGBF_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
-  {ILOGBL_OPERATOR_NAME, 1, longdouble_to_integer_type, typing_function_longdouble_to_int, 0},    
-  {LDEXP_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
-  {LDEXPF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
-  {LDEXPL_OPERATOR_NAME, 2, overloaded_to_longdouble_type, 0, 0},
-  {C_LOG_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {LOGF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {LOGL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {C_LOG10_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {LOG10F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {LOG10L_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {LOG1P_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {LOG1PF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {LOG1PL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {LOG2_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {LOG2F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {LOG2L_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {LOGB_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {LOGBF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {LOGBL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {MODF_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
-  {MODFF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
-  {SCALBN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
-  {SCALBNF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
-  {SCALBNL_OPERATOR_NAME, 2, overloaded_to_longdouble_type, 0, 0}, 
-  {SCALB_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0}, //POSIX.1-2001
-  {SCALBLN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
-  {SCALBLNF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
-  {SCALBLNL_OPERATOR_NAME, 2, overloaded_to_longdouble_type, 0, 0},
-  {CBRT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {CBRTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {CBRTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
-  {FABS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {FABSF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {FABSL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {HYPOT_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {HYPOTF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {HYPOTL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {POW_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {POWF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {POWL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {C_SQRT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {SQRTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {SQRTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {ERF_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ERFF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {ERFL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {ERFC_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ERFCF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {ERFCL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {GAMMA_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0}, /* GNU C Library */
-  {LGAMMA_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {LGAMMAF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {LGAMMAL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {TGAMMA_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {TGAMMAF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {CEIL_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {CEILF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {CEILL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {FLOOR_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {FLOORF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {FLOORL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
-  {NEARBYINT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {NEARBYINTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {NEARBYINTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
-  {RINT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {RINTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {RINTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
-  {LRINT_OPERATOR_NAME, 1,  double_to_longinteger_type, typing_function_double_to_longint, 0}, 
-  {LRINTF_OPERATOR_NAME, 1,  real_to_longinteger_type, typing_function_real_to_longint, 0},         
-  {LRINTL_OPERATOR_NAME, 1,  longdouble_to_longinteger_type, typing_function_longdouble_to_longint, 0},
-  {LLRINT_OPERATOR_NAME, 1,  double_to_longlonginteger_type, typing_function_double_to_longlongint, 0},
-  {LLRINTF_OPERATOR_NAME, 1,  real_to_longlonginteger_type, typing_function_real_to_longlongint, 0},
-  {LLRINTL_OPERATOR_NAME, 1,  longdouble_to_longlonginteger_type, typing_function_longdouble_to_longlongint, 0},
-  {ROUND_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {ROUNDF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {ROUNDL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
-  {LROUND_OPERATOR_NAME, 1,  double_to_longinteger_type, typing_function_double_to_longint, 0},   
-  {LROUNDF_OPERATOR_NAME, 1,  real_to_longinteger_type, typing_function_real_to_longint, 0},
-  {LROUNDL_OPERATOR_NAME, 1,  longdouble_to_longinteger_type, typing_function_longdouble_to_longint, 0},
-  {LLROUND_OPERATOR_NAME, 1,  double_to_longlonginteger_type, typing_function_double_to_longlongint, 0},   
-  {LLROUNDF_OPERATOR_NAME, 1,  real_to_longlonginteger_type, typing_function_real_to_longlongint, 0},
-  {LLROUNDL_OPERATOR_NAME, 1,  longdouble_to_longlonginteger_type, typing_function_longdouble_to_longlongint, 0},
-  {TRUNC_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {TRUNCF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
-  {TRUNCL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
-  {FMOD_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {FMODF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {FMODL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
-  {REMAINDER_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {REMAINDERF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {REMAINDERL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
-  {COPYSIGN_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {COPYSIGNF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {COPYSIGNL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
-  {NAN_OPERATOR_NAME, 1, char_pointer_to_double_type, 0, 0},
-  {NANF_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
-  {NANL_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
-  {NEXTAFTER_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {NEXTAFTERF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {NEXTAFTERL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
-  {NEXTTOWARD_OPERATOR_NAME, 2,  overloaded_to_double_type,0, 0},
-  {NEXTTOWARDF_OPERATOR_NAME, 2,  overloaded_to_real_type, 0, 0},
-  {NEXTTOWARDL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
-  {FDIM_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {FDIMF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {FDIML_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
-  {FMAX_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {FMAXF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {FMAXL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
-  {FMIN_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
-  {FMINF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
-  {FMINL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
-  {FMA_OPERATOR_NAME, 3, double_to_double_type, typing_function_double_to_double, 0},
-  {FMAF_OPERATOR_NAME, 3, real_to_real_type, typing_function_real_to_real, 0},
-  {FMAL_OPERATOR_NAME, 3,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
-  {ISGREATER_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
-  {ISGREATEREQUAL_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
-  {ISLESS_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
-  {ISLESSEQUAL_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
-  {ISLESSGREATER_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
-  {ISUNORDERED_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
-  /* End math.h */
-
-  {J0_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {J1_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {JN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
-
-  {Y0_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {Y1_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-  {YN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
- 
-  {MATHERR_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {SIGNIFICAND_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
-
-  {SIGFPE_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
-  {SINGLE_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
-  {DOUBLE_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
-  {EXTENDED_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
-  {QUADRUPLE_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
-  {DECIMAL_TO_SINGLE_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
-  {DECIMAL_TO_DOUBLE_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
-  {DECIMAL_TO_EXTENDED_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
-  {DECIMAL_TO_QUADRUPLE_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
-  {STRING_TO_DECIMAL_OPERATOR_NAME, 6, overloaded_to_void_type, 0, 0},
-  {FUNC_TO_DECIMAL_OPERATOR_NAME, 9, overloaded_to_void_type, 0, 0},
-  {FILE_TO_DECIMAL_OPERATOR_NAME, 8, overloaded_to_void_type, 0, 0},
-  {SECONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
-  {SFCONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
-  {SGCONVERT_OPERATOR_NAME, 4, default_intrinsic_type, 0, 0},
-  {ECONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
-  {FCONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
-  {GCONVERT_OPERATOR_NAME, 4, default_intrinsic_type, 0, 0},
-  {QECONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
-  {QFCONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
-  {QGCONVERT_OPERATOR_NAME, 4, default_intrinsic_type, 0, 0},
-
-
-  /* same name in stdlib
-     {"ecvt", 4, default_intrinsic_type, 0, 0},
-     {"fcvt", 4, default_intrinsic_type, 0, 0},
-     {"gcvt", 3, default_intrinsic_type, 0, 0},
-     {"strtod", 2, overloaded_to_double_type, 0, 0}, */
-
-  /*#include <setjmp.h>*/
-
-  {"setjmp", 1, overloaded_to_integer_type, 0, 0},
-  {"__setjmp", 1, overloaded_to_integer_type, 0, 0},
-  {"longjmp", 2, overloaded_to_void_type, 0, 0},
-  {"__longjmp", 2, overloaded_to_void_type, 0, 0},
-  {"sigsetjmp", 2, overloaded_to_integer_type, 0, 0},
-  {"siglongjmp", 2, overloaded_to_void_type, 0, 0},
-
-
-  /*#include <signal.h>*/
-  {SIGNAL_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
-  {RAISE_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-
-  /*#include <stdarg.h>*/
-  /*#include <stdbool.h>*/
-  /*#include <stddef.h>*/
-  /*#include <stdint.h>*/
-  /*#include <stdio.h>*/
-
-  {REMOVE_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {RENAME_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {TMPFILE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {TMPNAM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {FCLOSE_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {FFLUSH_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {FOPEN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {FREOPEN_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {SETBUF_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {SETVBUF_FUNCTION_NAME, 4, overloaded_to_integer_type, 0, 0},
-  {FPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {FSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {ISOC99_FSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {PRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {SCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {ISOC99_SCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {SPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {SSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {ISOC99_SSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {VSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {ISOC99_VSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {VSSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {ISOC99_VSSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {VFSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {ISOC99_VFSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {VFPRINTF_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
-  {VPRINTF_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {VSPRINTF_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
-  {FGETC_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {FGETS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {FPUTC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {FPUTS_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {GETC_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {_IO_GETC_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {PUTC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {_IO_PUTC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {GETCHAR_FUNCTION_NAME, 1, void_to_integer_type, 0, 0},
-  {PUTCHAR_FUNCTION_NAME, 1, integer_to_integer_type, 0, 0},
-  {GETS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {PUTS_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {UNGETC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {FREAD_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {FWRITE_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {FGETPOS_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {FSEEK_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
-  {FSETPOS_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {FTELL_FUNCTION_NAME,1, default_intrinsic_type, 0, 0},
-  {C_REWIND_FUNCTION_NAME,1, default_intrinsic_type, 0, 0},
-  {CLEARERR_FUNCTION_NAME,1, default_intrinsic_type, 0, 0},
-  {FEOF_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {FERROR_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {PERROR_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {__FILBUF_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {__FILSBUF_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {SETBUFFER_FUNCTION_NAME, 3, overloaded_to_void_type, 0, 0},
-  {SETLINEBUF_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {SNPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {VSNPRINTF_FUNCTION_NAME, 4, overloaded_to_integer_type, 0, 0},
-  {FDOPEN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {CTERMID_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {FILENO_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {POPEN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {CUSERID_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {TEMPNAM_FUNCTION_NAME, 2,default_intrinsic_type, 0, 0},
-  /* same name in stdlib
-     {"getopt", 3, overloaded_to_integer_type, 0, 0},
-     {"getsubopt", 3, default_intrinsic_type, 0, 0},*/
-  {GETW_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {PUTW_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {PCLOSE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {FSEEKO_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
-  {FTELLO_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {FOPEN64_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {FREOPEN64_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {TMPFILE64_FUNCTION_NAME, 1,default_intrinsic_type, 0, 0},
-  {FGETPOS64_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {FSETPOS64_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {FSEEKO64_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
-  {FTELLO64_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-
-  /* C IO system functions in man -S 2. The typing could be refined. See unistd.h */
-
-  {C_OPEN_FUNCTION_NAME,    (INT_MAX), overloaded_to_integer_type, 0, 0}, /* 2 or 3 arguments */
-  {CREAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
-  {C_CLOSE_FUNCTION_NAME,   1,         integer_to_integer_type,    0, 0},
-  {C_WRITE_FUNCTION_NAME,   2,         default_intrinsic_type, 0, 0}, /* returns ssize_t */
-  {C_READ_FUNCTION_NAME,    2,         default_intrinsic_type, 0, 0},
-  {USLEEP_FUNCTION_NAME,    1,         default_intrinsic_type, 0, 0},
-  /* {FCNTL_FUNCTION_NAME,     (INT_MAX), overloaded_to_integer_type, 0, 0},*/ /* 2 or 3 arguments of various types*/ /* located with fcntl.h */
-  {FSYNC_FUNCTION_NAME,     2,         integer_to_integer_type, 0, 0},
-  {FDATASYNC_FUNCTION_NAME, 2,         integer_to_integer_type, 0, 0},
-  {IOCTL_FUNCTION_NAME,     (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {SELECT_FUNCTION_NAME,    5,         overloaded_to_integer_type, 0, 0},
-  {PSELECT_FUNCTION_NAME,   6,         overloaded_to_integer_type, 0, 0},
-  {STAT_FUNCTION_NAME,      2,         overloaded_to_integer_type, 0, 0},
-  {FSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
-  {LSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
-
-
-  /*#include <stdlib.h>*/
-
-  {ATOF_FUNCTION_NAME, 1, char_pointer_to_double_type, 0, 0},
-  {ATOI_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ATOL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ATOLL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {STRTOD_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {STRTOF_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {STRTOL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {STRTOLL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {STRTOUL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {STRTOULL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {RAND_FUNCTION_NAME, 1,  void_to_integer_type, 0, 0},
-  {SRAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {CALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {FREE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {MALLOC_FUNCTION_NAME, 1, unsigned_integer_to_void_pointer_type, 0, 0},
-  {REALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {ALLOCA_FUNCTION_NAME, 1, unsigned_integer_to_void_pointer_type, 0, 0},
-  {ABORT_FUNCTION_NAME, 1, void_to_void_type, 0, 0},
-  {ATEXIT_FUNCTION_NAME, 1, void_to_void_to_int_pointer_type, 0, 0},
-  {EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},
-  {_EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},
-  {GETENV_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {SYSTEM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {BSEARCH_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
-  {QSORT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {C_ABS_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
-  {LABS_FUNCTION_NAME, 1, longinteger_to_longinteger_type, typing_function_longint_to_longint, 0},
-  {LLABS_FUNCTION_NAME, 1, longlonginteger_to_longlonginteger_type, typing_function_longlongint_to_longlongint, 0},
-  {DIV_FUNCTION_NAME, 2, integer_to_overloaded_type, 0, 0},
-  {LDIV_FUNCTION_NAME, 2, longinteger_to_overloaded_type, 0, 0},
-  {LLDIV_FUNCTION_NAME, 2, longlonginteger_to_overloaded_type, 0, 0},
-  {MBLEN_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {MBTOWC_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
-  {WCTOMB_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
-  {MBSTOWCS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {WCSTOMBS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-
-
-  //to check
-  {POSIX_MEMALIGN_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {ATOQ_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {EXITHANDLE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {DRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ERAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {JRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {LCONG48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {LRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {MRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {NRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {SEED48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {SRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {PUTENV_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {SETKEY_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {SWAB_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {MKSTEMP_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {MKSTEMP64_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {A614_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ECVT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {FCVT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {GCVT_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {GETSUBOPT_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {GRANTPT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {INITSTATE_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {C_164A_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {MKTEMP_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {PTSNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {RANDOM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0}, /* void -> long int */
-  {REALPATH_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {SETSTATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {SRANDOM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {TTYSLOT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {UNLOCKPT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {VALLOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {DUP2_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {QECVT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {QFCVT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {QGCVT_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {GETCWD_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {GETEXECNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {GETLOGIN_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {GETOPT_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {GETOPT_LONG_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
-  {GETOPT_LONG_ONLY_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
-  {GETPASS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {GETPASSPHRASE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {GETPW_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {ISATTY_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {MEMALIGN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {TTYNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {LLTOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {ULLTOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-
-  /*#include <string.h>*/
-
-  {MEMCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
-  {MEMMOVE_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
-  {STRCPY_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {STRNCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
-  {STRCAT_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {STRNCAT_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
-  {MEMCMP_FUNCTION_NAME,3,overloaded_to_integer_type, 0, 0},
-  {STRCMP_FUNCTION_NAME,2,overloaded_to_integer_type, 0, 0},
-  {STRCOLL_FUNCTION_NAME,2,overloaded_to_integer_type, 0, 0},
-  {STRNCMP_FUNCTION_NAME,3,overloaded_to_integer_type, 0, 0},
-  {STRXFRM_FUNCTION_NAME,3,overloaded_to_integer_type, 0, 0},
-  {MEMCHR_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
-  {STRCHR_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {STRCSPN_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {STRPBRK_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {STRRCHR_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {STRSPN_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {STRSTR_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {STRTOK_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {MEMSET_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
-  {STRERROR_FUNCTION_NAME,1,integer_to_overloaded_type, 0, 0},
-  {STRERROR_R_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
-  {STRLEN_FUNCTION_NAME,1,default_intrinsic_type, 0, 0},
-
-  /*#include <tgmath.h>*/
-  /*#include <time.h>*/
-  {TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {DIFFTIME_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {NANOSLEEP_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {GETTIMEOFDAY_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0}, // BSD-GNU
-  {CLOCK_GETTIME_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0}, // BSD-GNU
-  {CLOCK_FUNCTION_NAME, 0, void_to_overloaded_type, 0, 0},
-
-  /*#include <wchar.h>*/
-  { FWPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  { FWSCANF_FUNCTION_NAME,  (INT_MAX), overloaded_to_integer_type, 0, 0},
-  { SWPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  { SWSCANF_FUNCTION_NAME,  (INT_MAX), overloaded_to_integer_type, 0, 0},
-  { VFWPRINTF_FUNCTION_NAME,  3,       overloaded_to_integer_type, 0, 0},
-  { VFWSCANF_FUNCTION_NAME,   3,       overloaded_to_integer_type, 0, 0},
-  { VSWPRINTF_FUNCTION_NAME,  4,       overloaded_to_integer_type, 0, 0},
-  { VSWSCANF_FUNCTION_NAME,   3,       overloaded_to_integer_type, 0, 0},
-  { VWPRINTF_FUNCTION_NAME,   2,       overloaded_to_integer_type, 0, 0},
-  { VWSCANF_FUNCTION_NAME,    2,       overloaded_to_integer_type, 0, 0},
-  { WPRINTF_FUNCTION_NAME,  (INT_MAX), overloaded_to_integer_type, 0, 0},
-  { WSCANF_FUNCTION_NAME,   (INT_MAX), overloaded_to_integer_type, 0, 0},
-  { FGETWC_FUNCTION_NAME,     1,       default_intrinsic_type, 0, 0},
-  { FGETWS_FUNCTION_NAME,     3,       default_intrinsic_type, 0, 0},
-  { FPUTWC_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
-  { FPUTWS_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
-  { FWIDE_FUNCTION_NAME,      2,       overloaded_to_integer_type, 0, 0},
-  { GETWC_FUNCTION_NAME,      1,       default_intrinsic_type, 0, 0},
-  { GETWCHAR_FUNCTION_NAME,   0,       default_intrinsic_type, 0, 0},
-  { PUTWC_FUNCTION_NAME,      2,       default_intrinsic_type, 0, 0},
-  { PUTWCHAR_FUNCTION_NAME,   1,       default_intrinsic_type, 0, 0},
-  { UNGETWC_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
-  { WCSTOD_FUNCTION_NAME,     2,       overloaded_to_double_type, 0, 0},
-  { WCSTOF_FUNCTION_NAME,     2,       overloaded_to_real_type, 0, 0},
-  { WCSTOLD_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
-  { WCSTOL_FUNCTION_NAME,     3,       default_intrinsic_type, 0, 0},
-  { WCSTOLL_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
-  { WCSTOUL_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
-  { WCSTOULL_FUNCTION_NAME,   3,       default_intrinsic_type, 0, 0},
-  { WCSCPY_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
-  { WCSNCPY_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
-  { WMEMCPY_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
-  { WMEMMOVE_FUNCTION_NAME,   3,       default_intrinsic_type, 0, 0},
-  { WCSCAT_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
-  { WCSNCAT_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
-  { WCSCMP_FUNCTION_NAME,     2,       overloaded_to_integer_type, 0, 0},
-  { WCSCOLL_FUNCTION_NAME,    2,       overloaded_to_integer_type, 0, 0},
-  { WCSNCMP_FUNCTION_NAME,    3,       overloaded_to_integer_type, 0, 0},
-  { WCSXFRM_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
-  { WMEMCMP_FUNCTION_NAME,    3,       overloaded_to_integer_type, 0, 0},
-  { WCSCHR_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
-  { WCSCSPN_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
-  { WCSPBRK_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
-  { WCSRCHR_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
-  { WCSSPN_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
-  { WCSSTR_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
-  { WCSTOK_FUNCTION_NAME,     3,       default_intrinsic_type, 0, 0},
-  { WMEMCHR_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
-  { WCSLEN_FUNCTION_NAME,     1,       default_intrinsic_type, 0, 0},
-  { WMEMSET_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
-  { WCSFTIME_FUNCTION_NAME,   4,       default_intrinsic_type, 0, 0},
-  { BTOWC_FUNCTION_NAME,      1,       default_intrinsic_type, 0, 0},
-  { WCTOB_FUNCTION_NAME,      1,       overloaded_to_integer_type, 0, 0},
-  { MBSINIT_FUNCTION_NAME,    1,       overloaded_to_integer_type, 0, 0},
-  { MBRLEN_FUNCTION_NAME,     3,       default_intrinsic_type, 0, 0},
-  { MBRTOWC_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
-  { WCRTOMB_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
-  { MBSRTOWCS_FUNCTION_NAME,  4,       default_intrinsic_type, 0, 0},
-  { WCSRTOMBS_FUNCTION_NAME,  4,       default_intrinsic_type, 0, 0},
-
-  /*#include <wctype.h>*/
-
-  {ISWALNUM_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWALPHA_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWBLANK_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWCNTRL_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWDIGIT_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWGRAPH_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWLOWER_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWPRINT_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWPUNCT_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWSPACE_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWUPPER_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
-  {ISWXDIGIT_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
-  {ISWCTYPE_OPERATOR_NAME,  2, overloaded_to_integer_type, 0, 0},
-  {WCTYPE_OPERATOR_NAME,    1, default_intrinsic_type, 0, 0},
-  {TOWLOWER_OPERATOR_NAME,  1, default_intrinsic_type, 0, 0},
-  {TOWUPPER_OPERATOR_NAME,  1, default_intrinsic_type, 0, 0},
-  {TOWCTRANS_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
-  {WCTRANS_OPERATOR_NAME,   1, default_intrinsic_type, 0, 0},
-
-  /* netdb.h */
-  {__H_ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
-
-
-  /* #include <fcntl.h>*/
-
-  {FCNTL_FUNCTION_NAME,  (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {DIRECTIO_FUNCTION_NAME, 2,       integer_to_integer_type, 0, 0},
-  {OPEN64_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {CREAT64_FUNCTION_NAME,  2,       overloaded_to_integer_type, 0, 0},
-
-  /* OMP */
-  {OMP_IF_FUNCTION_NAME,        1,        default_intrinsic_type, 0, 0},
-  {OMP_OMP_FUNCTION_NAME,       0,        default_intrinsic_type, 0, 0},
-  {OMP_FOR_FUNCTION_NAME,       0,        default_intrinsic_type, 0, 0},
-  {OMP_PRIVATE_FUNCTION_NAME,(INT_MAX),   default_intrinsic_type, 0, 0},
-  {OMP_PARALLEL_FUNCTION_NAME,  0,        default_intrinsic_type, 0, 0},
-  {OMP_REDUCTION_FUNCTION_NAME,(INT_MAX), default_intrinsic_type, 0, 0},
-
-  /* BSD <err.h> */
-  {ERR_FUNCTION_NAME,   (INT_MAX), overloaded_to_void_type, 0, 0},
-  {ERRX_FUNCTION_NAME,  (INT_MAX), overloaded_to_void_type, 0, 0},
-  {WARN_FUNCTION_NAME,  (INT_MAX), overloaded_to_void_type, 0, 0},
-  {WARNX_FUNCTION_NAME, (INT_MAX), overloaded_to_void_type, 0, 0},
-  {VERR_FUNCTION_NAME,    3, 	   overloaded_to_void_type, 0, 0},
-  {VERRX_FUNCTION_NAME,   3, 	   overloaded_to_void_type, 0, 0},
-  {VWARN_FUNCTION_NAME,   2, 	   overloaded_to_void_type, 0, 0},
-  {VWARNX_FUNCTION_NAME,  2, 	   overloaded_to_void_type, 0, 0},
-
-#include "STEP_RT_bootstrap.h"
-
-  /* F95 */
-  {ALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {DEALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ETIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {DTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {CPU_TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-
-  /* F2003 */
-  {C_LOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-
-  /* PIPS run-time support for C code generation
-   *
-   * Source code located in validation/Hyperplane/run_time.src for the
-   * time being.
-   */
-  {PIPS_C_MIN_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
-   typing_function_int_to_int, 0},
-  {PIPS_C_MAX_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
-   typing_function_int_to_int, 0},
-
-  {NULL, 0, 0, 0, 0}
-};
-
+static hash_table intrinsic_type_descriptor_mapping = hash_table_undefined;
 
 /**************************************************************************
  * Get the function for typing the specified intrinsic
@@ -5444,26 +4292,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
  */
 typing_function_t get_typing_function_for_intrinsic(const char* name)
 {
-  static hash_table name_to_type_function = NULL;
-
-  /* Initialize first time */
-  if (!name_to_type_function)
-  {
-    IntrinsicDescriptor * pdt = IntrinsicTypeDescriptorTable;
-
-    name_to_type_function = hash_table_make(hash_string, 0);
-
-    for(; pdt->name; pdt++)
-    {
-      hash_put(name_to_type_function,
-               (void*)pdt->name, (void*)pdt->type_function);
-    }
-  }
-
-  pips_assert("typing function is defined",
-              hash_defined_p(name_to_type_function, name));
-
-  return (typing_function_t) hash_get(name_to_type_function, name);
+    return ((IntrinsicDescriptor *) hash_get(intrinsic_type_descriptor_mapping, name))->type_function;
 }
 /**************************************************************************
  * Get the function for switching to specific name from generic name
@@ -5471,26 +4300,7 @@ typing_function_t get_typing_function_for_intrinsic(const char* name)
  */
 switch_name_function get_switch_name_function_for_intrinsic(const char* name)
 {
-  static hash_table name_to_switch_function = NULL;
-
-  /* Initialize first time */
-  if (!name_to_switch_function)
-  {
-    IntrinsicDescriptor * pdt = IntrinsicTypeDescriptorTable;
-
-    name_to_switch_function = hash_table_make(hash_string, 0);
-
-    for(; pdt->name; pdt++)
-    {
-      hash_put(name_to_switch_function,
-               (void*)pdt->name, (void*)pdt->name_function);
-    }
-  }
-
-  pips_assert("switch function is defined",
-              hash_defined_p(name_to_switch_function, name));
-
-  return (switch_name_function) hash_get(name_to_switch_function, name);
+    return ((IntrinsicDescriptor *) hash_get(intrinsic_type_descriptor_mapping, name))->name_function;
 }
 
 /* This function creates an entity that represents an intrinsic
@@ -5560,15 +4370,1160 @@ FindOrMakeDefaultIntrinsic(string name, int arity)
 /* This function is called one time (at the very beginning) to create
    all intrinsic functions. */
 
+void register_intrinsic_type_descriptor(IntrinsicDescriptor *p) {
+    FindOrMakeIntrinsic(p->name, p->nbargs, p->intrinsic_type);
+    hash_put(intrinsic_type_descriptor_mapping,p->name,p);
+}
+
 void
 CreateIntrinsics()
 {
-  IntrinsicDescriptor *pid;
+    /* The table of intrinsic functions. this table is used at the begining
+       of linking to create Fortran operators, commands and intrinsic functions.
 
-  for (pid = IntrinsicTypeDescriptorTable; pid->name != NULL; pid++) {
-    FindOrMakeIntrinsic(pid->name, pid->nbargs, pid->intrinsic_type);
-  }
+       Functions with a variable number of arguments are declared with INT_MAX
+       arguments.
+       */
+
+    /* Nga Nguyen 27/06/2003 Fuse the tables of intrinsics for C and Fortran.
+       Since there are differences between some kind of operators, such as in
+       Fortran, "+" is only applied to arithmetic numbers, in C, "+" is also applied
+       to pointer, the typing functions are different. So in some cases, we have to
+       rename the operators */
+    /* Pragma can be represented in the pips IR as a list of expression so new
+     * functions/intrinsics are needed. For exmaple to represent OMP pragmas,
+     * following intrinscs are needed:
+     *    1 - omp, parallel and for which are constant so with 0 argument,
+     *    2 - the colom poperator (for reduction) that takes two arguments
+     *    3 - private and reduction that takes a variable number of arguments.
+     */
+
+    static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
+    {
+        {PLUS_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
+        {MINUS_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
+        {DIVIDE_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
+        {MULTIPLY_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
+        {UNARY_MINUS_OPERATOR_NAME, 1, default_intrinsic_type, typing_arithmetic_operator, 0}, // unary minus
+        {POWER_OPERATOR_NAME, 2, default_intrinsic_type, typing_power_operator, 0},
+
+        /* internal inverse operator... */
+        { INVERSE_OPERATOR_NAME, 1, real_to_real_type,
+            typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
+
+        {ASSIGN_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+
+        {EQUIV_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_logical_operator, 0},
+        {NON_EQUIV_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_logical_operator, 0},
+
+        {OR_OPERATOR_NAME, 2, logical_to_logical_type, typing_logical_operator, 0},
+        {AND_OPERATOR_NAME, 2, logical_to_logical_type, typing_logical_operator, 0},
+        {NOT_OPERATOR_NAME, 1, logical_to_logical_type, typing_logical_operator, 0},
+
+        {LESS_THAN_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
+        {GREATER_THAN_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
+        {LESS_OR_EQUAL_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
+        {GREATER_OR_EQUAL_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
+        {EQUAL_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
+        {NON_EQUAL_OPERATOR_NAME, 2, overloaded_to_logical_type, typing_relational_operator, 0},
+
+        {CONCATENATION_FUNCTION_NAME, 2, character_to_character_type, typing_concat_operator, 0},
+
+        /* FORTRAN IO statement */
+        {WRITE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_read_write, 0},
+        {REWIND_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_rewind, 0},
+        {BACKSPACE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_backspace, 0},
+        {OPEN_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_open, 0},
+        {CLOSE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_close, 0},
+        {READ_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_read_write, 0},
+        {BUFFERIN_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, typing_buffer_inout, 0},
+        {BUFFEROUT_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, typing_buffer_inout, 0},
+        {ENDFILE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_endfile, 0},
+        {IMPLIED_DO_NAME, (INT_MAX), default_intrinsic_type, typing_implied_do, 0},
+        {REPEAT_VALUE_NAME, 2, default_intrinsic_type, no_typing, 0},
+        {STATIC_INITIALIZATION_FUNCTION_NAME, (INT_MAX) , default_intrinsic_type, no_typing, 0},
+        {DATA_LIST_FUNCTION_NAME, (INT_MAX) , default_intrinsic_type, no_typing, 0},
+        {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type, check_format, 0},
+        {INQUIRE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_inquire, 0},
+
+        {SUBSTRING_FUNCTION_NAME, 3, substring_type, typing_substring, 0},
+        {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type, typing_assign_substring, 0},
+
+        /* Control statement */
+        {CONTINUE_FUNCTION_NAME, 0, default_intrinsic_type, statement_without_argument, 0},
+        {"ENDDO", 0, default_intrinsic_type, 0, 0}, // Why do we need this one?
+        {PAUSE_FUNCTION_NAME, 1, default_intrinsic_type,
+            statement_with_at_most_one_integer_or_character, 0},
+        {RETURN_FUNCTION_NAME, 0, default_intrinsic_type,
+            statement_with_at_most_one_expression_integer, 0},
+        {STOP_FUNCTION_NAME, 0, default_intrinsic_type,
+            statement_with_at_most_one_integer_or_character, 0},
+        {END_FUNCTION_NAME, 0, default_intrinsic_type, statement_without_argument, 0}, // Is it useful?
+
+
+        {INT_GENERIC_CONVERSION_NAME, 1, overloaded_to_integer_type,
+            typing_function_conversion_to_integer, simplification_int},
+        {IFIX_GENERIC_CONVERSION_NAME, 1, real_to_integer_type, typing_function_real_to_int,
+            simplification_int},
+        {IDINT_GENERIC_CONVERSION_NAME, 1, double_to_integer_type, typing_function_double_to_int,
+            simplification_int},
+        {REAL_GENERIC_CONVERSION_NAME, 1, overloaded_to_real_type, typing_function_conversion_to_real,
+            simplification_real},
+        {FLOAT_GENERIC_CONVERSION_NAME, 1, overloaded_to_real_type, typing_function_conversion_to_real,
+            simplification_real},
+        {DFLOAT_GENERIC_CONVERSION_NAME, 1, overloaded_to_double_type,
+            typing_function_conversion_to_double, simplification_double},
+        {SNGL_GENERIC_CONVERSION_NAME, 1, overloaded_to_real_type, typing_function_conversion_to_real,
+            simplification_real},
+        {DBLE_GENERIC_CONVERSION_NAME, 1, overloaded_to_double_type,
+            typing_function_conversion_to_double, simplification_double},
+        {DREAL_GENERIC_CONVERSION_NAME, 1, overloaded_to_double_type, /* Arnauld Leservot, code CEA */
+            typing_function_conversion_to_double, simplification_double},
+        {CMPLX_GENERIC_CONVERSION_NAME, (INT_MAX), overloaded_to_complex_type,
+            typing_function_conversion_to_complex, simplification_complex},
+
+        {DCMPLX_GENERIC_CONVERSION_NAME, (INT_MAX), overloaded_to_doublecomplex_type,
+            typing_function_conversion_to_dcomplex, simplification_dcomplex},
+
+        /* (0.,1.) -> switched to a function call... */
+        { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type,
+            typing_function_constant_complex, switch_specific_cmplx },
+        { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type,
+            typing_function_constant_dcomplex, switch_specific_dcmplx },
+
+        {CHAR_TO_INT_CONVERSION_NAME, 1, default_intrinsic_type, typing_function_char_to_int, 0},
+        {INT_TO_CHAR_CONVERSION_NAME, 1, default_intrinsic_type, typing_function_int_to_char, 0},
+
+        {AINT_CONVERSION_NAME, 1, real_to_real_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_aint},
+        {DINT_CONVERSION_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ANINT_CONVERSION_NAME, 1, real_to_real_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_anint},
+        {DNINT_CONVERSION_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {NINT_CONVERSION_NAME, 1, real_to_integer_type,
+            typing_function_RealDouble_to_Integer, switch_specific_nint},
+        {IDNINT_CONVERSION_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+
+        //Fortran
+        {IABS_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ABS_OPERATOR_NAME, 1, real_to_real_type,
+            typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal,
+            switch_specific_abs},
+        {DABS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {CABS_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
+        {CDABS_OPERATOR_NAME, 1, doublecomplex_to_double_type,
+            typing_function_dcomplex_to_double, 0},
+
+        {MODULO_OPERATOR_NAME, 2, default_intrinsic_type,
+            typing_function_IntegerRealDouble_to_IntegerRealDouble,
+            switch_specific_mod},
+        {REAL_MODULO_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {DOUBLE_MODULO_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+
+        {ISIGN_OPERATOR_NAME, 2, integer_to_integer_type, typing_function_int_to_int, 0},
+        {SIGN_OPERATOR_NAME, 2, default_intrinsic_type,
+            typing_function_IntegerRealDouble_to_IntegerRealDouble,
+            switch_specific_sign},
+        {DSIGN_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+
+        {IDIM_OPERATOR_NAME, 2, integer_to_integer_type, typing_function_int_to_int, 0},
+        {DIM_OPERATOR_NAME, 2, default_intrinsic_type,
+            typing_function_IntegerRealDouble_to_IntegerRealDouble,
+            switch_specific_dim},
+        {DDIM_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+
+        {DPROD_OPERATOR_NAME, 2, real_to_double_type, typing_function_real_to_double, 0},
+
+        {MAX_OPERATOR_NAME, (INT_MAX), default_intrinsic_type,
+            typing_function_IntegerRealDouble_to_IntegerRealDouble,
+            switch_specific_max},
+        {MAX0_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
+            typing_function_int_to_int, 0},
+        {AMAX1_OPERATOR_NAME, (INT_MAX), real_to_real_type, typing_function_real_to_real, 0},
+        {DMAX1_OPERATOR_NAME, (INT_MAX), double_to_double_type,
+            typing_function_double_to_double, 0},
+        {AMAX0_OPERATOR_NAME, (INT_MAX), integer_to_real_type,
+            typing_function_int_to_real, 0},
+        {MAX1_OPERATOR_NAME, (INT_MAX), real_to_integer_type, typing_function_real_to_int, 0},
+
+        {MIN_OPERATOR_NAME, (INT_MAX), default_intrinsic_type,
+            typing_function_IntegerRealDouble_to_IntegerRealDouble,
+            switch_specific_min},
+        {MIN0_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
+            typing_function_int_to_int, 0},
+        {AMIN1_OPERATOR_NAME, (INT_MAX), real_to_real_type, typing_function_real_to_real, 0},
+        {DMIN1_OPERATOR_NAME, (INT_MAX), double_to_double_type,
+            typing_function_double_to_double, 0},
+        {AMIN0_OPERATOR_NAME, (INT_MAX), integer_to_real_type,
+            typing_function_int_to_real, 0},
+        {MIN1_OPERATOR_NAME, (INT_MAX), real_to_integer_type, typing_function_real_to_int, 0},
+
+        {LENGTH_OPERATOR_NAME, 1, character_to_integer_type, typing_function_char_to_int, 0},
+        {INDEX_OPERATOR_NAME, 2, character_to_integer_type, typing_function_char_to_int, 0},
+
+        {AIMAG_CONVERSION_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
+        {DIMAG_CONVERSION_NAME, 1, doublecomplex_to_double_type,
+            typing_function_dcomplex_to_double, 0},
+
+        {CONJG_OPERATOR_NAME, 1, complex_to_complex_type,
+            typing_function_complex_to_complex, 0},
+        {DCONJG_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
+            typing_function_dcomplex_to_dcomplex, 0},
+
+        {SQRT_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDoubleComplex_to_RealDoubleComplex,
+            switch_specific_sqrt},
+        {DSQRT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {CSQRT_OPERATOR_NAME, 1, complex_to_complex_type,
+            typing_function_complex_to_complex, 0},
+        {CDSQRT_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
+            typing_function_dcomplex_to_dcomplex, 0},
+
+        {EXP_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDoubleComplex_to_RealDoubleComplex,
+            switch_specific_exp},
+        {DEXP_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {CEXP_OPERATOR_NAME, 1, complex_to_complex_type,
+            typing_function_complex_to_complex, 0},
+        {CDEXP_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
+            typing_function_dcomplex_to_dcomplex, 0},
+
+        {LOG_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDoubleComplex_to_RealDoubleComplex,
+            switch_specific_log},
+        {ALOG_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {DLOG_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {CLOG_OPERATOR_NAME, 1, complex_to_complex_type,
+            typing_function_complex_to_complex, 0},
+        {CDLOG_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
+            typing_function_dcomplex_to_dcomplex, 0},
+
+        {LOG10_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_log10},
+        {ALOG10_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {DLOG10_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
+        {SIN_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDoubleComplex_to_RealDoubleComplex,
+            switch_specific_sin},
+        {DSIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {CSIN_OPERATOR_NAME, 1, complex_to_complex_type,
+            typing_function_complex_to_complex, 0},
+        {CDSIN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
+            typing_function_dcomplex_to_dcomplex, 0},
+
+        {COS_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDoubleComplex_to_RealDoubleComplex,
+            switch_specific_cos},
+        {DCOS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {CCOS_OPERATOR_NAME, 1, complex_to_complex_type,
+            typing_function_complex_to_complex, 0},
+        {CDCOS_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type,
+            typing_function_dcomplex_to_dcomplex, 0},
+
+        {TAN_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_tan},
+        {DTAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
+        {ASIN_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_asin},
+        {DASIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
+        {ACOS_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_acos},
+        {DACOS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
+        {ATAN_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_atan},
+        {DATAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ATAN2_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_atan2},
+        {DATAN2_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
+        {SINH_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_sinh},
+        {DSINH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
+        {COSH_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_cosh},
+        {DCOSH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
+        {TANH_OPERATOR_NAME, 1, default_intrinsic_type,
+            typing_function_RealDouble_to_RealDouble, switch_specific_tanh},
+        {DTANH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
+        {LGE_OPERATOR_NAME, 2, character_to_logical_type, typing_function_char_to_logical, 0},
+        {LGT_OPERATOR_NAME, 2, character_to_logical_type, typing_function_char_to_logical, 0},
+        {LLE_OPERATOR_NAME, 2, character_to_logical_type, typing_function_char_to_logical, 0},
+        {LLT_OPERATOR_NAME, 2, character_to_logical_type, typing_function_char_to_logical, 0},
+
+        {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type,
+            typing_function_format_name, 0},
+        {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type,
+            typing_function_overloaded, 0},
+
+        /* Bit manipulation functions : ISO/IEC 1539 */
+        {ISHFT_OPERATOR_NAME, 2, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISHFTC_OPERATOR_NAME, 3,integer_to_integer_type, typing_function_int_to_int, 0},
+        {IBITS_OPERATOR_NAME, 3, integer_to_integer_type, typing_function_int_to_int, 0},
+        {MVBITS_OPERATOR_NAME, 5,integer_to_integer_type, typing_function_int_to_int, 0},
+        {BTEST_OPERATOR_NAME, 2,integer_to_logical_type, typing_function_int_to_logical, 0},
+        {IBSET_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+        {IBCLR_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+        {BIT_SIZE_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+        {IAND_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+        {IEOR_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+        {IOR_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+
+        /* These operators are used within the OPTIMIZE transformation in
+           order to manipulate operators such as n-ary add and multiply or
+           multiply-add operators ( JZ - sept 98) */
+        {EOLE_SUM_OPERATOR_NAME, (INT_MAX), default_intrinsic_type ,
+            typing_arithmetic_operator, 0},
+        {EOLE_PROD_OPERATOR_NAME, (INT_MAX), default_intrinsic_type ,
+            typing_arithmetic_operator, 0},
+        {EOLE_FMA_OPERATOR_NAME, 3, default_intrinsic_type ,
+            typing_arithmetic_operator, 0},
+        {EOLE_FMS_OPERATOR_NAME, 3, default_intrinsic_type ,
+            typing_arithmetic_operator, 0},
+
+        /* integer combined multiply add or sub - FC oct 2005 */
+        { IMA_OPERATOR_NAME, 3, integer_to_integer_type,
+            typing_function_int_to_int, 0 },
+        { IMS_OPERATOR_NAME, 3, integer_to_integer_type,
+            typing_function_int_to_int, 0 },
+
+        /* Here are C intrinsics arranged in the order of the standard ISO/IEC 9899:TC2. MB */
+
+        /* ISO 6.5.2.3 structure and union members */
+        {FIELD_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+        {POINT_TO_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+        /* ISO 6.5.2.4 postfix increment and decrement operators, real or pointer type operand */
+        {POST_INCREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+        {POST_DECREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+        /* ISO 6.5.3.1 prefix increment and decrement operators, real or pointer type operand */
+        {PRE_INCREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+        {PRE_DECREMENT_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+        /* ISO 6.5.3.2 address and indirection operators, add pointer type */
+        {ADDRESS_OF_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+        {DEREFERENCING_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+        /* ISO 6.5.3.3 unary arithmetic operators */
+        {UNARY_PLUS_OPERATOR_NAME, 1, default_intrinsic_type, typing_arithmetic_operator, 0},
+        /* Unuary minus : ALREADY EXIST (FORTRAN)
+           {UNARY_MINUS_OPERATOR_NAME, 1, default_intrinsic_type, typing_arithmetic_operator, 0},*/
+        {BITWISE_NOT_OPERATOR_NAME, 1, integer_to_overloaded_type, typing_arithmetic_operator, 0},
+        {C_NOT_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+        /* ISO 6.5.5 multiplicative operators : ALREADY EXIST (FORTRAN)
+           {MULTIPLY_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
+           {DIVIDE_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},*/
+        {C_MODULO_OPERATOR_NAME, 2, integer_to_overloaded_type, typing_arithmetic_operator, 0},
+        /* ISO 6.5.6 additive operators, arithmetic types or pointer + integer type*/
+        {PLUS_C_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+        {MINUS_C_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+        /* ISO 6.5.7 bitwise shift operators*/
+        {LEFT_SHIFT_OPERATOR_NAME, 2, integer_to_overloaded_type, 0, 0},
+        {RIGHT_SHIFT_OPERATOR_NAME, 2, integer_to_overloaded_type, 0, 0},
+        /* ISO 6.5.8 relational operators,arithmetic or pointer types */
+        {C_LESS_THAN_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {C_GREATER_THAN_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {C_LESS_OR_EQUAL_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {C_GREATER_OR_EQUAL_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
+        /* ISO 6.5.9 equality operators, return 0 or 1*/
+        {C_EQUAL_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {C_NON_EQUAL_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
+        /* ISO 6.5.10 bitwise AND operator */
+        {BITWISE_AND_OPERATOR_NAME, 2, integer_to_integer_type, typing_arithmetic_operator, 0},
+        /* ISO 6.5.11 bitwise exclusive OR operator */
+        {BITWISE_XOR_OPERATOR_NAME, 2, integer_to_integer_type, typing_arithmetic_operator, 0},
+        /* ISO 6.5.12 bitwise inclusive OR operator */
+        {BITWISE_OR_OPERATOR_NAME, 2, integer_to_integer_type, typing_arithmetic_operator, 0},
+        /* ISO 6.5.13 logical AND operator */
+        {C_AND_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
+        /* ISO 6.5.14 logical OR operator */
+        {C_OR_OPERATOR_NAME, 2, overloaded_to_integer_type, 0, 0},
+        /* ISO 6.5.15 conditional operator */
+        {CONDITIONAL_OPERATOR_NAME, 3, default_intrinsic_type, 0, 0},
+        /* ISO 6.5.16.1 simple assignment : ALREADY EXIST (FORTRAN)
+           {ASSIGN_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0}, */
+        /* ISO 6.5.16.2 compound assignments*/
+        {MULTIPLY_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        {DIVIDE_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        {MODULO_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        {PLUS_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        {MINUS_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        {LEFT_SHIFT_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        {RIGHT_SHIFT_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        {BITWISE_AND_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        {BITWISE_XOR_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        {BITWISE_OR_UPDATE_OPERATOR_NAME, 2, default_intrinsic_type, typing_of_assign, 0},
+        /* ISO 6.5.17 comma operator */
+        {COMMA_OPERATOR_NAME, (INT_MAX), default_intrinsic_type, 0, 0},
+
+        {BREAK_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
+        {CASE_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
+        {DEFAULT_FUNCTION_NAME, 0, default_intrinsic_type, 0, 0},
+        {C_RETURN_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+
+        /* intrinsic to handle C initialization */
+        {BRACE_INTRINSIC, (INT_MAX) , default_intrinsic_type, no_typing, 0},
+
+        /* #include <assert.h> */
+        {ASSERT_FUNCTION_NAME, 3, overloaded_to_void_type,0,0},
+        {ASSERT_FAIL_FUNCTION_NAME, 4, overloaded_to_void_type,0,0}, /* does not return */
+
+        /* #include <complex.h> */
+
+        {CACOS_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CACOSF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CACOSL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CASIN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CASINF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CASINL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CATAN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CATANF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CATANL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {C_CCOS_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CCOSF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CCOSL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {C_CSIN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CSINF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CSINL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CTAN_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CTANF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CTANL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CACOSH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CACOSHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CACOSHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CASINH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CASINHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CASINHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CATANH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CATANHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CATANHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CCOSH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CCOSHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CCOSHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CSINH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CSINHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CSINHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CTANH_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CTANHF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CTANHL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {C_CEXP_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CEXPF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CEXPL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {C_CLOG_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CLOGF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CLOGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {C_CABS_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+        {CABSF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
+        {CABSL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
+        {CPOW_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CPOWF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CPOWL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {C_CSQRT_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CSQRTF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CSQRTL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CARG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+        {CARGF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
+        {CARGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
+        {CIMAG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+        {GCC_CIMAG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+        {CIMAGF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
+        {CIMAGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
+        {CONJ_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CONJF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CONJL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CPROJ_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
+        {CPROJF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+        {CPROJL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
+        {CREAL_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+        {GCC_CREAL_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+        {CREALF_OPERATOR_NAME, 1,  complex_to_real_type, typing_function_complex_to_real, 0},
+        {CREALL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
+
+        /* #include <ctype.h> */
+
+        {ISALNUM_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISALPHA_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISBLANK_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISCNTRL_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISDIGIT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISGRAPH_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISLOWER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISPRINT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISPUNCT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISSPACE_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISUPPER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {ISXDIGIT_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {TOLOWER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {TOUPPER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        /* End ctype.h */
+        //not found in standard C99 (in GNU C Library)
+        {ISASCII_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {TOASCII_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {_TOLOWER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {_TOUPPER_OPERATOR_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+
+        /* Real type is void -> unsigned short int ** */
+        {CTYPE_B_LOC_OPERATOR_NAME, 0, integer_to_integer_type, 0, 0},
+
+        /* #include <errno.h> */
+        /*  {"errno", 0, overloaded_to_integer_type, 0, 0}, */
+        /* bits/errno.h */
+        {__ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
+
+
+        /* #include <fenv.h> */
+        {FECLEAREXCEPT_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {FERAISEEXCEPT_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {FESETEXCEPTFLAG_FUNCTION_NAME, 2,  overloaded_to_integer_type, 0, 0},
+        {FETESTEXCEPT_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {FEGETROUND_FUNCTION_NAME, 1, void_to_integer_type, 0, 0},
+        {FESETROUND_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        // fenv_t *
+        //{FESETENV_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        //{FEUPDATEENV_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+
+
+        /* #include <float.h> */
+        /* {"__flt_rounds", 1, void_to_integer_type, 0, 0}, */
+
+        /* #include <inttypes.h> */
+        {IMAXABS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {IMAXDIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+
+        /* #include <iso646.h> */
+
+        /* {"_sysconf", 1, integer_to_integer_type, 0, 0},
+
+           {"localeconv", 1, default_intrinsic_type, 0, 0},
+           {"dcgettext", 3, default_intrinsic_type, 0, 0},
+           {"dgettext", 2, default_intrinsic_type, 0, 0},
+           {"gettext", 1, default_intrinsic_type, 0, 0},
+           {"textdomain", 1, default_intrinsic_type, 0, 0},
+           {"bindtextdomain", 2, default_intrinsic_type, 0, 0},
+           {"wdinit", 1, void_to_integer_type, 0 ,0},
+           {"wdchkind", 1, overloaded_to_integer_type, 0 ,0},
+           {"wdbindf", 3, overloaded_to_integer_type, 0 ,0},
+           {"wddelim", 3, default_intrinsic_type, 0, 0},
+           {"mcfiller", 1, void_to_overloaded_type, 0, 0},
+           {"mcwrap", 1, void_to_integer_type, 0 ,0},*/
+
+        /* #include <limits.h> */
+
+        /* #include <locale.h> */
+        {SETLOCALE_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+
+        /* #include <math.h> */
+
+        {FPCLASSIFY_OPERATOR_NAME, 1, double_to_integer_type,typing_function_double_to_int, 0},
+        {ISFINITE_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISINF_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISNAN_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISNORMAL_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+        {SIGNBIT_OPERATOR_NAME, 1, double_to_integer_type,typing_function_double_to_int, 0},
+        {C_ACOS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double , 0},
+        {ACOSF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {ACOSL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {C_ASIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ASINF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {ASINL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {C_ATAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ATANF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {ATANL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {C_ATAN2_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {ATAN2F_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {ATAN2L_OPERATOR_NAME, 2, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {C_COS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {COSF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {COSL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {C_SIN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {SINF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {SINL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {C_TAN_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {TANF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {TANL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {C_ACOSH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ACOSHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {ACOSHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {C_ASINH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ASINHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {ASINHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {C_ATANH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ATANHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {ATANHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {C_COSH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {COSHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {COSHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {C_SINH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {SINHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {SINHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {C_TANH_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {TANHF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {TANHL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {C_EXP_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {EXPF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {EXPL_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {EXP2_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {EXP2F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {EXP2L_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {EXPM1_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {EXPM1F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {EXPM1L_OPERATOR_NAME, 1, longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},    
+        {FREXP_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},/*?*/
+        {ILOGB_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+        {ILOGBF_OPERATOR_NAME, 1, double_to_integer_type, typing_function_double_to_int, 0},
+        {ILOGBL_OPERATOR_NAME, 1, longdouble_to_integer_type, typing_function_longdouble_to_int, 0},    
+        {LDEXP_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+        {LDEXPF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
+        {LDEXPL_OPERATOR_NAME, 2, overloaded_to_longdouble_type, 0, 0},
+        {C_LOG_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {LOGF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {LOGL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {C_LOG10_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {LOG10F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {LOG10L_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {LOG1P_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {LOG1PF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {LOG1PL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {LOG2_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {LOG2F_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {LOG2L_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {LOGB_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {LOGBF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {LOGBL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {MODF_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+        {MODFF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
+        {SCALBN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+        {SCALBNF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
+        {SCALBNL_OPERATOR_NAME, 2, overloaded_to_longdouble_type, 0, 0}, 
+        {SCALB_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0}, //POSIX.1-2001
+        {SCALBLN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+        {SCALBLNF_OPERATOR_NAME, 2, overloaded_to_real_type, 0, 0},
+        {SCALBLNL_OPERATOR_NAME, 2, overloaded_to_longdouble_type, 0, 0},
+        {CBRT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {CBRTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {CBRTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0}, 
+        {FABS_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {FABSF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {FABSL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {HYPOT_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {HYPOTF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {HYPOTL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {POW_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {POWF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {POWL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {C_SQRT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {SQRTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {SQRTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {ERF_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ERFF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {ERFL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {ERFC_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ERFCF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {ERFCL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {GAMMA_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0}, /* GNU C Library */
+        {LGAMMA_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {LGAMMAF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {LGAMMAL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {TGAMMA_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {TGAMMAF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {CEIL_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {CEILF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {CEILL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {FLOOR_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {FLOORF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {FLOORL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+        {NEARBYINT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {NEARBYINTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {NEARBYINTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},  
+        {RINT_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {RINTF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {RINTL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+        {LRINT_OPERATOR_NAME, 1,  double_to_longinteger_type, typing_function_double_to_longint, 0}, 
+        {LRINTF_OPERATOR_NAME, 1,  real_to_longinteger_type, typing_function_real_to_longint, 0},         
+        {LRINTL_OPERATOR_NAME, 1,  longdouble_to_longinteger_type, typing_function_longdouble_to_longint, 0},
+        {LLRINT_OPERATOR_NAME, 1,  double_to_longlonginteger_type, typing_function_double_to_longlongint, 0},
+        {LLRINTF_OPERATOR_NAME, 1,  real_to_longlonginteger_type, typing_function_real_to_longlongint, 0},
+        {LLRINTL_OPERATOR_NAME, 1,  longdouble_to_longlonginteger_type, typing_function_longdouble_to_longlongint, 0},
+        {ROUND_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {ROUNDF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {ROUNDL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+        {LROUND_OPERATOR_NAME, 1,  double_to_longinteger_type, typing_function_double_to_longint, 0},   
+        {LROUNDF_OPERATOR_NAME, 1,  real_to_longinteger_type, typing_function_real_to_longint, 0},
+        {LROUNDL_OPERATOR_NAME, 1,  longdouble_to_longinteger_type, typing_function_longdouble_to_longint, 0},
+        {LLROUND_OPERATOR_NAME, 1,  double_to_longlonginteger_type, typing_function_double_to_longlongint, 0},   
+        {LLROUNDF_OPERATOR_NAME, 1,  real_to_longlonginteger_type, typing_function_real_to_longlongint, 0},
+        {LLROUNDL_OPERATOR_NAME, 1,  longdouble_to_longlonginteger_type, typing_function_longdouble_to_longlongint, 0},
+        {TRUNC_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {TRUNCF_OPERATOR_NAME, 1, real_to_real_type, typing_function_real_to_real, 0},
+        {TRUNCL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+        {FMOD_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {FMODF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {FMODL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+        {REMAINDER_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {REMAINDERF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {REMAINDERL_OPERATOR_NAME, 1,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},   
+        {COPYSIGN_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {COPYSIGNF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {COPYSIGNL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+        {NAN_OPERATOR_NAME, 1, char_pointer_to_double_type, 0, 0},
+        {NANF_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+        {NANL_OPERATOR_NAME, 1, default_intrinsic_type, 0, 0},
+        {NEXTAFTER_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {NEXTAFTERF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {NEXTAFTERL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+        {NEXTTOWARD_OPERATOR_NAME, 2,  overloaded_to_double_type,0, 0},
+        {NEXTTOWARDF_OPERATOR_NAME, 2,  overloaded_to_real_type, 0, 0},
+        {NEXTTOWARDL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+        {FDIM_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {FDIMF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {FDIML_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+        {FMAX_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {FMAXF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {FMAXL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+        {FMIN_OPERATOR_NAME, 2, double_to_double_type, typing_function_double_to_double, 0},
+        {FMINF_OPERATOR_NAME, 2, real_to_real_type, typing_function_real_to_real, 0},
+        {FMINL_OPERATOR_NAME, 2,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+        {FMA_OPERATOR_NAME, 3, double_to_double_type, typing_function_double_to_double, 0},
+        {FMAF_OPERATOR_NAME, 3, real_to_real_type, typing_function_real_to_real, 0},
+        {FMAL_OPERATOR_NAME, 3,  longdouble_to_longdouble_type, typing_function_longdouble_to_longdouble, 0},
+        {ISGREATER_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISGREATEREQUAL_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISLESS_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISLESSEQUAL_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISLESSGREATER_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+        {ISUNORDERED_OPERATOR_NAME, 2, double_to_integer_type, typing_function_double_to_int, 0},
+        /* End math.h */
+
+        {J0_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {J1_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {JN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+
+        {Y0_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {Y1_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+        {YN_OPERATOR_NAME, 2, overloaded_to_double_type, 0, 0},
+
+        {MATHERR_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {SIGNIFICAND_OPERATOR_NAME, 1, double_to_double_type, typing_function_double_to_double, 0},
+
+        {SIGFPE_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+        {SINGLE_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
+        {DOUBLE_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
+        {EXTENDED_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
+        {QUADRUPLE_TO_DECIMAL_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
+        {DECIMAL_TO_SINGLE_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
+        {DECIMAL_TO_DOUBLE_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
+        {DECIMAL_TO_EXTENDED_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
+        {DECIMAL_TO_QUADRUPLE_OPERATOR_NAME, 4, overloaded_to_void_type, 0, 0},
+        {STRING_TO_DECIMAL_OPERATOR_NAME, 6, overloaded_to_void_type, 0, 0},
+        {FUNC_TO_DECIMAL_OPERATOR_NAME, 9, overloaded_to_void_type, 0, 0},
+        {FILE_TO_DECIMAL_OPERATOR_NAME, 8, overloaded_to_void_type, 0, 0},
+        {SECONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
+        {SFCONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
+        {SGCONVERT_OPERATOR_NAME, 4, default_intrinsic_type, 0, 0},
+        {ECONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
+        {FCONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
+        {GCONVERT_OPERATOR_NAME, 4, default_intrinsic_type, 0, 0},
+        {QECONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
+        {QFCONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
+        {QGCONVERT_OPERATOR_NAME, 4, default_intrinsic_type, 0, 0},
+
+
+        /* same name in stdlib
+           {"ecvt", 4, default_intrinsic_type, 0, 0},
+           {"fcvt", 4, default_intrinsic_type, 0, 0},
+           {"gcvt", 3, default_intrinsic_type, 0, 0},
+           {"strtod", 2, overloaded_to_double_type, 0, 0}, */
+
+        /*#include <setjmp.h>*/
+
+        {"setjmp", 1, overloaded_to_integer_type, 0, 0},
+        {"__setjmp", 1, overloaded_to_integer_type, 0, 0},
+        {"longjmp", 2, overloaded_to_void_type, 0, 0},
+        {"__longjmp", 2, overloaded_to_void_type, 0, 0},
+        {"sigsetjmp", 2, overloaded_to_integer_type, 0, 0},
+        {"siglongjmp", 2, overloaded_to_void_type, 0, 0},
+
+
+        /*#include <signal.h>*/
+        {SIGNAL_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+        {RAISE_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+
+        /*#include <stdarg.h>*/
+        /*#include <stdbool.h>*/
+        /*#include <stddef.h>*/
+        /*#include <stdint.h>*/
+        /*#include <stdio.h>*/
+
+        {REMOVE_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {RENAME_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {TMPFILE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {TMPNAM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {FCLOSE_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {FFLUSH_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {FOPEN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {FREOPEN_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {SETBUF_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {SETVBUF_FUNCTION_NAME, 4, overloaded_to_integer_type, 0, 0},
+        {FPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {FSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {ISOC99_FSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {PRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {SCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {ISOC99_SCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {SPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {SSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {ISOC99_SSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {VSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {ISOC99_VSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {VSSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {ISOC99_VSSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {VFSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {ISOC99_VFSCANF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {VFPRINTF_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
+        {VPRINTF_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {VSPRINTF_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
+        {FGETC_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {FGETS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {FPUTC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {FPUTS_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {GETC_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {_IO_GETC_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {PUTC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {_IO_PUTC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {GETCHAR_FUNCTION_NAME, 1, void_to_integer_type, 0, 0},
+        {PUTCHAR_FUNCTION_NAME, 1, integer_to_integer_type, 0, 0},
+        {GETS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {PUTS_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {UNGETC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {FREAD_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
+        {FWRITE_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
+        {FGETPOS_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {FSEEK_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
+        {FSETPOS_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {FTELL_FUNCTION_NAME,1, default_intrinsic_type, 0, 0},
+        {C_REWIND_FUNCTION_NAME,1, default_intrinsic_type, 0, 0},
+        {CLEARERR_FUNCTION_NAME,1, default_intrinsic_type, 0, 0},
+        {FEOF_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {FERROR_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {PERROR_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {__FILBUF_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {__FILSBUF_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {SETBUFFER_FUNCTION_NAME, 3, overloaded_to_void_type, 0, 0},
+        {SETLINEBUF_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {SNPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {VSNPRINTF_FUNCTION_NAME, 4, overloaded_to_integer_type, 0, 0},
+        {FDOPEN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {CTERMID_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {FILENO_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {POPEN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {CUSERID_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {TEMPNAM_FUNCTION_NAME, 2,default_intrinsic_type, 0, 0},
+        /* same name in stdlib
+           {"getopt", 3, overloaded_to_integer_type, 0, 0},
+           {"getsubopt", 3, default_intrinsic_type, 0, 0},*/
+        {GETW_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {PUTW_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {PCLOSE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {FSEEKO_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
+        {FTELLO_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {FOPEN64_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {FREOPEN64_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {TMPFILE64_FUNCTION_NAME, 1,default_intrinsic_type, 0, 0},
+        {FGETPOS64_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {FSETPOS64_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {FSEEKO64_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
+        {FTELLO64_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+
+        /* C IO system functions in man -S 2. The typing could be refined. See unistd.h */
+
+        {C_OPEN_FUNCTION_NAME,    (INT_MAX), overloaded_to_integer_type, 0, 0}, /* 2 or 3 arguments */
+        {CREAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
+        {C_CLOSE_FUNCTION_NAME,   1,         integer_to_integer_type,    0, 0},
+        {C_WRITE_FUNCTION_NAME,   2,         default_intrinsic_type, 0, 0}, /* returns ssize_t */
+        {C_READ_FUNCTION_NAME,    2,         default_intrinsic_type, 0, 0},
+        {USLEEP_FUNCTION_NAME,    1,         default_intrinsic_type, 0, 0},
+        /* {FCNTL_FUNCTION_NAME,     (INT_MAX), overloaded_to_integer_type, 0, 0},*/ /* 2 or 3 arguments of various types*/ /* located with fcntl.h */
+        {FSYNC_FUNCTION_NAME,     2,         integer_to_integer_type, 0, 0},
+        {FDATASYNC_FUNCTION_NAME, 2,         integer_to_integer_type, 0, 0},
+        {IOCTL_FUNCTION_NAME,     (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {SELECT_FUNCTION_NAME,    5,         overloaded_to_integer_type, 0, 0},
+        {PSELECT_FUNCTION_NAME,   6,         overloaded_to_integer_type, 0, 0},
+        {STAT_FUNCTION_NAME,      2,         overloaded_to_integer_type, 0, 0},
+        {FSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
+        {LSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
+
+
+        /*#include <stdlib.h>*/
+
+        {ATOF_FUNCTION_NAME, 1, char_pointer_to_double_type, 0, 0},
+        {ATOI_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {ATOL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {ATOLL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {STRTOD_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {STRTOF_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {STRTOL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {STRTOLL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {STRTOUL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {STRTOULL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {RAND_FUNCTION_NAME, 1,  void_to_integer_type, 0, 0},
+        {SRAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {CALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {FREE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {MALLOC_FUNCTION_NAME, 1, unsigned_integer_to_void_pointer_type, 0, 0},
+        {REALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {ALLOCA_FUNCTION_NAME, 1, unsigned_integer_to_void_pointer_type, 0, 0},
+        {ABORT_FUNCTION_NAME, 1, void_to_void_type, 0, 0},
+        {ATEXIT_FUNCTION_NAME, 1, void_to_void_to_int_pointer_type, 0, 0},
+        {EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},
+        {_EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},
+        {GETENV_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {SYSTEM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {BSEARCH_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
+        {QSORT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
+        {C_ABS_FUNCTION_NAME, 1, integer_to_integer_type, typing_function_int_to_int, 0},
+        {LABS_FUNCTION_NAME, 1, longinteger_to_longinteger_type, typing_function_longint_to_longint, 0},
+        {LLABS_FUNCTION_NAME, 1, longlonginteger_to_longlonginteger_type, typing_function_longlongint_to_longlongint, 0},
+        {DIV_FUNCTION_NAME, 2, integer_to_overloaded_type, 0, 0},
+        {LDIV_FUNCTION_NAME, 2, longinteger_to_overloaded_type, 0, 0},
+        {LLDIV_FUNCTION_NAME, 2, longlonginteger_to_overloaded_type, 0, 0},
+        {MBLEN_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {MBTOWC_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
+        {WCTOMB_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+        {MBSTOWCS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {WCSTOMBS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+
+
+        //to check
+        {POSIX_MEMALIGN_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {ATOQ_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {EXITHANDLE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {DRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {ERAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {JRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {LCONG48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {LRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {MRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {NRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {SEED48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {SRAND48_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {PUTENV_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {SETKEY_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {SWAB_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {MKSTEMP_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {MKSTEMP64_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {A614_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {ECVT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
+        {FCVT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
+        {GCVT_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {GETSUBOPT_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {GRANTPT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {INITSTATE_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {C_164A_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {MKTEMP_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {PTSNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {RANDOM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0}, /* void -> long int */
+        {REALPATH_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {SETSTATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {SRANDOM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {TTYSLOT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {UNLOCKPT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {VALLOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {DUP2_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {QECVT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
+        {QFCVT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
+        {QGCVT_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {GETCWD_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {GETEXECNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {GETLOGIN_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {GETOPT_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+        {GETOPT_LONG_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
+        {GETOPT_LONG_ONLY_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
+        {GETPASS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {GETPASSPHRASE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {GETPW_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {ISATTY_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {MEMALIGN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {TTYNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {LLTOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {ULLTOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+
+        /*#include <string.h>*/
+
+        {MEMCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+        {MEMMOVE_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+        {STRCPY_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRNCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+        {STRCAT_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRNCAT_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+        {MEMCMP_FUNCTION_NAME,3,overloaded_to_integer_type, 0, 0},
+        {STRCMP_FUNCTION_NAME,2,overloaded_to_integer_type, 0, 0},
+        {STRCOLL_FUNCTION_NAME,2,overloaded_to_integer_type, 0, 0},
+        {STRNCMP_FUNCTION_NAME,3,overloaded_to_integer_type, 0, 0},
+        {STRXFRM_FUNCTION_NAME,3,overloaded_to_integer_type, 0, 0},
+        {MEMCHR_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+        {STRCHR_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRCSPN_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRPBRK_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRRCHR_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRSPN_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRSTR_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRTOK_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {MEMSET_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+        {STRERROR_FUNCTION_NAME,1,integer_to_overloaded_type, 0, 0},
+        {STRERROR_R_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+        {STRLEN_FUNCTION_NAME,1,default_intrinsic_type, 0, 0},
+
+        /*#include <tgmath.h>*/
+        /*#include <time.h>*/
+        {TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {DIFFTIME_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {NANOSLEEP_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+        {GETTIMEOFDAY_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0}, // BSD-GNU
+        {CLOCK_GETTIME_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0}, // BSD-GNU
+        {CLOCK_FUNCTION_NAME, 0, void_to_overloaded_type, 0, 0},
+
+        /*#include <wchar.h>*/
+        { FWPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        { FWSCANF_FUNCTION_NAME,  (INT_MAX), overloaded_to_integer_type, 0, 0},
+        { SWPRINTF_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        { SWSCANF_FUNCTION_NAME,  (INT_MAX), overloaded_to_integer_type, 0, 0},
+        { VFWPRINTF_FUNCTION_NAME,  3,       overloaded_to_integer_type, 0, 0},
+        { VFWSCANF_FUNCTION_NAME,   3,       overloaded_to_integer_type, 0, 0},
+        { VSWPRINTF_FUNCTION_NAME,  4,       overloaded_to_integer_type, 0, 0},
+        { VSWSCANF_FUNCTION_NAME,   3,       overloaded_to_integer_type, 0, 0},
+        { VWPRINTF_FUNCTION_NAME,   2,       overloaded_to_integer_type, 0, 0},
+        { VWSCANF_FUNCTION_NAME,    2,       overloaded_to_integer_type, 0, 0},
+        { WPRINTF_FUNCTION_NAME,  (INT_MAX), overloaded_to_integer_type, 0, 0},
+        { WSCANF_FUNCTION_NAME,   (INT_MAX), overloaded_to_integer_type, 0, 0},
+        { FGETWC_FUNCTION_NAME,     1,       default_intrinsic_type, 0, 0},
+        { FGETWS_FUNCTION_NAME,     3,       default_intrinsic_type, 0, 0},
+        { FPUTWC_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
+        { FPUTWS_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
+        { FWIDE_FUNCTION_NAME,      2,       overloaded_to_integer_type, 0, 0},
+        { GETWC_FUNCTION_NAME,      1,       default_intrinsic_type, 0, 0},
+        { GETWCHAR_FUNCTION_NAME,   0,       default_intrinsic_type, 0, 0},
+        { PUTWC_FUNCTION_NAME,      2,       default_intrinsic_type, 0, 0},
+        { PUTWCHAR_FUNCTION_NAME,   1,       default_intrinsic_type, 0, 0},
+        { UNGETWC_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
+        { WCSTOD_FUNCTION_NAME,     2,       overloaded_to_double_type, 0, 0},
+        { WCSTOF_FUNCTION_NAME,     2,       overloaded_to_real_type, 0, 0},
+        { WCSTOLD_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
+        { WCSTOL_FUNCTION_NAME,     3,       default_intrinsic_type, 0, 0},
+        { WCSTOLL_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
+        { WCSTOUL_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
+        { WCSTOULL_FUNCTION_NAME,   3,       default_intrinsic_type, 0, 0},
+        { WCSCPY_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
+        { WCSNCPY_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
+        { WMEMCPY_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
+        { WMEMMOVE_FUNCTION_NAME,   3,       default_intrinsic_type, 0, 0},
+        { WCSCAT_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
+        { WCSNCAT_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
+        { WCSCMP_FUNCTION_NAME,     2,       overloaded_to_integer_type, 0, 0},
+        { WCSCOLL_FUNCTION_NAME,    2,       overloaded_to_integer_type, 0, 0},
+        { WCSNCMP_FUNCTION_NAME,    3,       overloaded_to_integer_type, 0, 0},
+        { WCSXFRM_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
+        { WMEMCMP_FUNCTION_NAME,    3,       overloaded_to_integer_type, 0, 0},
+        { WCSCHR_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
+        { WCSCSPN_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
+        { WCSPBRK_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
+        { WCSRCHR_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
+        { WCSSPN_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
+        { WCSSTR_FUNCTION_NAME,     2,       default_intrinsic_type, 0, 0},
+        { WCSTOK_FUNCTION_NAME,     3,       default_intrinsic_type, 0, 0},
+        { WMEMCHR_FUNCTION_NAME,    2,       default_intrinsic_type, 0, 0},
+        { WCSLEN_FUNCTION_NAME,     1,       default_intrinsic_type, 0, 0},
+        { WMEMSET_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
+        { WCSFTIME_FUNCTION_NAME,   4,       default_intrinsic_type, 0, 0},
+        { BTOWC_FUNCTION_NAME,      1,       default_intrinsic_type, 0, 0},
+        { WCTOB_FUNCTION_NAME,      1,       overloaded_to_integer_type, 0, 0},
+        { MBSINIT_FUNCTION_NAME,    1,       overloaded_to_integer_type, 0, 0},
+        { MBRLEN_FUNCTION_NAME,     3,       default_intrinsic_type, 0, 0},
+        { MBRTOWC_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
+        { WCRTOMB_FUNCTION_NAME,    3,       default_intrinsic_type, 0, 0},
+        { MBSRTOWCS_FUNCTION_NAME,  4,       default_intrinsic_type, 0, 0},
+        { WCSRTOMBS_FUNCTION_NAME,  4,       default_intrinsic_type, 0, 0},
+
+        /*#include <wctype.h>*/
+
+        {ISWALNUM_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWALPHA_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWBLANK_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWCNTRL_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWDIGIT_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWGRAPH_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWLOWER_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWPRINT_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWPUNCT_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWSPACE_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWUPPER_OPERATOR_NAME,  1, overloaded_to_integer_type, 0, 0},
+        {ISWXDIGIT_OPERATOR_NAME, 1, overloaded_to_integer_type, 0, 0},
+        {ISWCTYPE_OPERATOR_NAME,  2, overloaded_to_integer_type, 0, 0},
+        {WCTYPE_OPERATOR_NAME,    1, default_intrinsic_type, 0, 0},
+        {TOWLOWER_OPERATOR_NAME,  1, default_intrinsic_type, 0, 0},
+        {TOWUPPER_OPERATOR_NAME,  1, default_intrinsic_type, 0, 0},
+        {TOWCTRANS_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+        {WCTRANS_OPERATOR_NAME,   1, default_intrinsic_type, 0, 0},
+
+        /* netdb.h */
+        {__H_ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
+
+
+        /* #include <fcntl.h>*/
+
+        {FCNTL_FUNCTION_NAME,  (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {DIRECTIO_FUNCTION_NAME, 2,       integer_to_integer_type, 0, 0},
+        {OPEN64_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+        {CREAT64_FUNCTION_NAME,  2,       overloaded_to_integer_type, 0, 0},
+
+        /* OMP */
+        {OMP_IF_FUNCTION_NAME,        1,        default_intrinsic_type, 0, 0},
+        {OMP_OMP_FUNCTION_NAME,       0,        default_intrinsic_type, 0, 0},
+        {OMP_FOR_FUNCTION_NAME,       0,        default_intrinsic_type, 0, 0},
+        {OMP_PRIVATE_FUNCTION_NAME,(INT_MAX),   default_intrinsic_type, 0, 0},
+        {OMP_PARALLEL_FUNCTION_NAME,  0,        default_intrinsic_type, 0, 0},
+        {OMP_REDUCTION_FUNCTION_NAME,(INT_MAX), default_intrinsic_type, 0, 0},
+
+        /* BSD <err.h> */
+        {ERR_FUNCTION_NAME,   (INT_MAX), overloaded_to_void_type, 0, 0},
+        {ERRX_FUNCTION_NAME,  (INT_MAX), overloaded_to_void_type, 0, 0},
+        {WARN_FUNCTION_NAME,  (INT_MAX), overloaded_to_void_type, 0, 0},
+        {WARNX_FUNCTION_NAME, (INT_MAX), overloaded_to_void_type, 0, 0},
+        {VERR_FUNCTION_NAME,    3, 	   overloaded_to_void_type, 0, 0},
+        {VERRX_FUNCTION_NAME,   3, 	   overloaded_to_void_type, 0, 0},
+        {VWARN_FUNCTION_NAME,   2, 	   overloaded_to_void_type, 0, 0},
+        {VWARNX_FUNCTION_NAME,  2, 	   overloaded_to_void_type, 0, 0},
+
+        /* F95 */
+        {ALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {DEALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {ETIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {DTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {CPU_TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+
+        /* F2003 */
+        {C_LOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+
+        /* PIPS run-time support for C code generation
+         *
+         * Source code located in validation/Hyperplane/run_time.src for the
+         * time being.
+         */
+        {PIPS_C_MIN_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
+            typing_function_int_to_int, 0},
+        {PIPS_C_MAX_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
+            typing_function_int_to_int, 0},
+
+        {NULL, 0, 0, 0, 0}
+    };
+    intrinsic_type_descriptor_mapping=hash_table_make(hash_string,sizeof(IntrinsicTypeDescriptorTable));
+    for(IntrinsicDescriptor *p = &IntrinsicTypeDescriptorTable[0];p->name;++p) {
+        register_intrinsic_type_descriptor(p);
+    }
 }
+
 
 bool
 bootstrap(string workspace)

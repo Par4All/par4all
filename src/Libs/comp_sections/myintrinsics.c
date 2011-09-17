@@ -117,12 +117,12 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
 name and the function to apply on a call to this intrinsic to get the
 effects of the call */
 
-typedef struct IntrinsicDescriptor {
+typedef struct {
     string name;
     list (*f)();
-} IntrinsicDescriptor;
+} IntrinsicEffectDescriptor;
 
-static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
+static IntrinsicEffectDescriptor IntrinsicDescriptorTable[] = {
     {"+",                        no_write_comp_regions},
     {"-",                        no_write_comp_regions},
     {"/",                        no_write_comp_regions},
@@ -289,7 +289,7 @@ list args;
 transformer context;
 {
     const char* s = entity_local_name(e);
-    IntrinsicDescriptor *pid = IntrinsicDescriptorTable;
+    IntrinsicEffectDescriptor *pid = IntrinsicDescriptorTable;
     list lr;
 
     debug(3, "proper_comp_regions_of_intrinsic", "begin\n");

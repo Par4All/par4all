@@ -1,9 +1,7 @@
 %{
-#ifdef IN_PIPS
 #include "defines-local.h"
 
 static statement current_statement = statement_undefined;
-#endif
 
 static char *directive_txt = NULL;
 static char *comment_txt = NULL;
@@ -25,6 +23,7 @@ static int directive_type = -1;
 %option warn
 %option noyywrap
 %option nounput
+%option noinput
 
  /*
    Attention PIPS supprime les blancs en début de commentaire en syntaxe libre, et insère un saut de ligne supplémentaire :
@@ -252,26 +251,6 @@ static char *get_directive_type(void)
     }
 }
 
-#ifndef IN_PIPS
-static void end_comment(void)
-{
-  if (comment_txt !=NULL)
-    printf("COMMENT :\"%s\"\n", comment_txt);
-  else
-    printf("\n");
-}
-
-static void end_directive(void)
-{
-  if (directive_syntaxe == directive_fixe)
-    remove_blank();
-
-  string type = get_directive_type();
-  printf("DIRECTIVE %s\t\"%s\"\n\t", type, directive_txt);
-  free(type);
-  end_comment_tmp();
-}
-#else
 
 static void end_comment(void)
 {
@@ -343,8 +322,8 @@ void step_comment2pragma_handle(statement stmt)
 	  statement_comments(stmt) = string_undefined;
 
 	  pips_debug(1,"Comment txt : begin scan\n");
-	  comment2pragma__scan_string(comment);
-	  comment2pragma_lex();
+	  yy_scan_string(comment);
+	  yylex();
 	  pips_debug(1,"Comment txt : end scan\n");
 
 	  free(comment);
@@ -361,8 +340,8 @@ void step_comment2pragma_handle(statement stmt)
       if (!empty_comments_p(decls_txt))
 	{
 	  pips_debug(1,"Declaration txt : begin scan\n");
-	  comment2pragma__scan_string(decls_txt);
-	  comment2pragma_lex();
+	  yy_scan_string(decls_txt);
+	  yylex();
 	  pips_debug(1,"Declaration txt : end scan\n");
 	}
       else
@@ -371,5 +350,3 @@ void step_comment2pragma_handle(statement stmt)
 	}
     }
 }
-
-#endif
