@@ -49,6 +49,8 @@ STEP_RT_intrinsic.h: step_api.tmp
 $(top_srcdir)/src/Runtimes/step/c/STEP.h:
 	$(MAKE) -C $(top_srcdir)/src/Runtimes/step/c STEP.h
 
+# it seems that am does not handle several lex files in a directory
+# so treating them manually is a simple workaround for that
 PARSER_COMMENT	= comment2pragma
 PARSER_OMP	= step_omp
 
