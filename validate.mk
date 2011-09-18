@@ -395,23 +395,23 @@ DFTPIPS	= default_tpips
 # warning: Semantics & Regions create local "properties.rc":-(
 DEFTEST	= default_test
 %.validate: %.c $(DEFTEST)
-	$(PF) ; WSPACE=$* FILE=$(here)/$< $(SHELL) $(DEFTEST) \
+	$(PF) ; WSPACE=$* FILE=$(here)/$< ./$(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 %.validate: %.f $(DEFTEST)
-	$(PF) ; WSPACE=$* FILE=$(here)/$< $(SHELL) $(DEFTEST) \
+	$(PF) ; WSPACE=$* FILE=$(here)/$< ./$(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 %.validate: %.F $(DEFTEST)
-	$(PF) ; WSPACE=$* FILE=$(here)/$< $(SHELL) $(DEFTEST) \
+	$(PF) ; WSPACE=$* FILE=$(here)/$< ./$(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 %.validate: %.f90 $(DEFTEST)
-	$(PF) ; WSPACE=$* FILE=$(here)/$< $(SHELL) $(DEFTEST) \
+	$(PF) ; WSPACE=$* FILE=$(here)/$< ./$(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 %.validate: %.f95 $(DEFTEST)
-	$(PF) ; WSPACE=$* FILE=$(here)/$< $(SHELL) $(DEFTEST) \
+	$(PF) ; WSPACE=$* FILE=$(here)/$< ./$(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 
