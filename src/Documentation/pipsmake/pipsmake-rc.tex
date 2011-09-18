@@ -3610,12 +3610,14 @@ statement, assuming that no information is available at the module entry
 point.
 
 Inter-procedural preconditions may be computed with {\em
-intra}-procedural transformers but the benefit is not
+  intra}-procedural transformers but the benefit is not
 clear. Intra-procedural preconditions may be computed with {\em
-inter}-procedural transformers. This is faster that a full
+  inter}-procedural transformers. This is faster that a full
 interprocedural analysis because there is no need for a top-down
 propagation of summary preconditions. This is compatible with code
-transformations like \PipsPassRef{partial_eval}, \PipsPassRef{simplify_control} and \PipsPassRef{dead_code_elimination}.
+transformations like \PipsPassRef{partial_eval},
+\PipsPassRef{simplify_control} and
+\PipsPassRef{dead_code_elimination}.
 
 Since these two options for transformer and precondition computations are
 independent and that \PipsPassRef{transformers_inter_full} and
@@ -6006,7 +6008,7 @@ if_conversion_compact                  > MODULE.code
 % +        < MODULE.proper_effects
 \begin{PipsPass}{loop_nest_unswitching}
   Converts max in loop bounds into tests. Also sets variable so that
-  \PipsPassRef{simplify_control} works afterward
+  \PipsPassRef{simplify_control} works afterwards.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -7891,7 +7893,9 @@ INDEX_SET_SPLITTING_BOUND ""
 \end{PipsProp}
 \end{itemize}
 
-Additionnaly, \PipsPropRef{INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND} can be used to accurately tell to split the loop before or after the bound given in \PipsPropRef{INDEX_SET_SPLITTING_BOUND}
+Additionnaly, \PipsPropRef{INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND} can
+be used to accurately tell to split the loop before or after the bound
+given in \PipsPropRef{INDEX_SET_SPLITTING_BOUND}
 \begin{PipsProp}{INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND}
 INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 \end{PipsProp}
@@ -7906,13 +7910,14 @@ INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 \subsubsection{Regular Loop Unroll}
 
 \begin{PipsPass}{unroll}
-Unroll requests a loop label and an unrolling factor from the user.
-Then it unrolls the specified loop as specified. The transformation is
-very general, and it is interesting to run \PipsPassRef{partial_eval},
-\PipsPassRef{simplify_control} and \PipsPassRef{dead_code_elimination} after this
-transformation. When the number of iterations cannot be proven to be a
-multiple of the unrolling factor, the extra iterations can be executed
-first or last (see \PipsPropRef{LOOP_UNROLL_WITH_PROLOGUE}).
+  Unroll requests a loop label and an unrolling factor from the user.
+  Then it unrolls the specified loop as specified. The transformation
+  is very general, and it is interesting to run
+  \PipsPassRef{partial_eval}, \PipsPassRef{simplify_control} and
+  \PipsPassRef{dead_code_elimination} after this transformation. When
+  the number of iterations cannot be proven to be a multiple of the
+  unrolling factor, the extra iterations can be executed first or last
+  (see \PipsPropRef{LOOP_UNROLL_WITH_PROLOGUE}).
 
 Labels in the body are deleted. To unroll nested loops, start with the
 innermost loop.
@@ -8392,15 +8397,16 @@ The cumulated effects are used in debug mode to display information.
 
 %% FIXME : is the following still applicable ? We renamed dead_code_elimination
 %% as expected
-Note that according to~\cite{ASU86}
-and~\cite{Muc97} , there is confusion between Dead-code elimination
-and Unreachable-code elimination. {\em Unreachable code} is code that
-cannot possibly be executed, regardless of the input data. {\em Dead code}
-elimination removes code that is executable but that has no effect on the
-result of the computation being performed (see Section $18.1$ and Section
-$18.10$ of~\cite{Muc97}). So \PipsPassRef{simplify_control} in PIPS is in
-fact unreachable code elimination. Dead code elimination is performed by
-phase \PipsPassRef{dead_code_elimination}.
+%%
+%% Note that according to~\cite{ASU86}
+%% and~\cite{Muc97} , there is confusion between Dead-code elimination
+%% and Unreachable-code elimination. {\em Unreachable code} is code that
+%% cannot possibly be executed, regardless of the input data. {\em Dead code}
+%% elimination removes code that is executable but that has no effect on the
+%% result of the computation being performed (see Section $18.1$ and Section
+%% $18.10$ of~\cite{Muc97}). So \PipsPassRef{simplify_control} in PIPS is in
+%% fact unreachable code elimination. Dead code elimination is performed by
+%% phase \PipsPassRef{dead_code_elimination}.
 
 The \PipsPassRef{simplify_control} phase also performs some {\em If
   Simplifications} and {\em Loop Simplifications}~\cite{Muc97}.
@@ -8420,6 +8426,12 @@ simplify_control          > MODULE.code
         < MODULE.preconditions
 \end{PipsMake}
 
+\begin{PipsPass}{suppress_dead_code}
+  This pass is the same as \PipsPassRef{simplify_control}. It is used
+  under this obsolete name in some validation scripts. The name has
+  been preserved for backward compatibility.
+\end{PipsPass}
+
 \begin{PipsMake}
 suppress_dead_code          > MODULE.code
                             > MODULE.callees
@@ -8428,6 +8440,25 @@ suppress_dead_code          > MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
         < MODULE.preconditions
+\end{PipsMake}
+
+\begin{PipsPass}{simplify_control_directly}
+  This pass is very similar to \PipsPassRef{simplify_control}, but it
+  does not require the preconditions. Only local information is
+  used. It can be useful to clean up input code with constant tests,
+  e.g. \verb/3>4/, and constant loop bounds. It can also be used after
+  \PipsPassRef{partial_eval} to avoid recomputing the preconditions
+  yet another time.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias simplify_control_directly 'Simplify Control Directly'
+simplify_control_directly    > MODULE.code
+                             > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
 \end{PipsMake}
 
 \subsubsection{Dead Code Elimination properties}
@@ -15236,6 +15267,7 @@ The transformation menu is displayed as here:
   restructure_control
   unspaghettify
   simplify_control
+  simplify_control_directly
   partial_eval
   dead_code_elimination
   stf

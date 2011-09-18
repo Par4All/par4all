@@ -44,8 +44,7 @@
 #include "semantics.h"
 
 /* Return true if statement s is reachable according to its precondition. */
-static bool 
-parametric_statement_feasible_p(statement s,
+static bool parametric_statement_feasible_p(statement s,
 				bool empty_p(transformer))
 {
   transformer pre;
@@ -70,8 +69,7 @@ parametric_statement_feasible_p(statement s,
 }
 
 /* Return false if precondition of statement s is transformer_empty() */
-bool 
-statement_weakly_feasible_p(statement s)
+bool statement_weakly_feasible_p(statement s)
 {
   transformer pre = load_statement_precondition(s);
   /* bool feasible_p = !transformer_empty_p(pre); */
@@ -91,16 +89,14 @@ statement_weakly_feasible_p(statement s)
 }
 
 /* Return true if statement s is reachable according to its precondition. */
-bool 
-statement_feasible_p(statement s)
+bool statement_feasible_p(statement s)
 {
   bool feasible_p = parametric_statement_feasible_p(s, transformer_empty_p);
   return feasible_p;
 }
 
 /* Return true if statement s is reachable according to its precondition. */
-bool 
-statement_strongly_feasible_p(statement s)
+bool statement_strongly_feasible_p(statement s)
 {
   bool feasible_p =
     parametric_statement_feasible_p(s, transformer_strongly_empty_p);
@@ -113,8 +109,7 @@ statement_strongly_feasible_p(statement s)
  * try to prove that it is not empty. In both case, you may fail
  * and be unable to decide emptiness or non-emptiness.
  */
-bool
-empty_range_wrt_precondition_p(range r, transformer p)
+bool empty_range_wrt_precondition_p(range r, transformer p)
 {
   bool empty = false;
 
@@ -278,8 +273,7 @@ bool check_range_wrt_precondition(range r, transformer p, bool check_empty)
  * prove that it is always true (because it is never false) or you can try
  * to prove that it is always false (because it is never true). In both
  * case, you may fail and be unable to decide emptiness or non-emptiness.  */
-bool
-condition_true_wrt_precondition_p(expression c, transformer p)
+bool condition_true_wrt_precondition_p(expression c, transformer p)
 {
   bool empty = false;
 
@@ -288,8 +282,7 @@ condition_true_wrt_precondition_p(expression c, transformer p)
   return empty;
 }
 
-bool
-condition_false_wrt_precondition_p(expression c, transformer p)
+bool condition_false_wrt_precondition_p(expression c, transformer p)
 {
   bool non_empty = false;
 
@@ -298,8 +291,9 @@ condition_false_wrt_precondition_p(expression c, transformer p)
   return non_empty;
 }
 
-bool
-check_condition_wrt_precondition(expression c, transformer pre, bool check_true)
+bool check_condition_wrt_precondition(expression c,
+				      transformer pre,
+				      bool check_true)
 {
   bool check = true;
   transformer twc = transformer_dup(pre);

@@ -3841,6 +3841,7 @@ bool precondition_minmax_of_expression(expression exp,
     free_entity(var);
     return success;
 }
+
 /* tries hard to simplify expression @p e if it is a min or a max
  * operator, by evaluating it under preconditions @p tr.
  * Two approaches are tested:
