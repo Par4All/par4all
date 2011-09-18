@@ -1,0 +1,56 @@
+#
+# Parsed printed file
+#
+void if02()
+{
+   int i = 0;
+
+   if (1>2)
+      printf("%d\n", i);
+
+   return;
+}
+#
+# Printed file
+#
+void if02()
+{
+   int i = 0;
+
+   if (1>2)
+      printf("%d\n", i);
+
+   return;
+}
+#
+# Cumulated effects
+#
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+void if02()
+{
+//             <    is written>: i
+   int i = 0;
+//             <may be read   >: i stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+
+   if (1>2)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("%d\n", i);
+
+   return;
+}
+#
+# simplify control
+#
+void if02()
+{
+   int i = 0;
+   
+   
+   return;
+}
