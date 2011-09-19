@@ -4265,6 +4265,14 @@ is really limited to preconditions and for the region's sake, the
 default value is set to true. Turn it to false if you have a doubt
 about the preconditions really available.
 
+The loop index is usually dead on loop exit. So keeping information
+about its value is useless... most of the times. However, it is
+preserved by default.
+
+\begin{PipsProp}{SEMANTICS_KEEP_DO_LOOP_EXIT_CONDITION}
+SEMANTICS_KEEP_DO_LOOP_EXIT_CONDITION TRUE
+\end{PipsProp}
+
 \begin{PipsProp}{SEMANTICS_FILTER_INITIAL_VALUES}
 SEMANTICS_FILTER_INITIAL_VALUES TRUE
 \end{PipsProp}

@@ -285,13 +285,18 @@ static bool
 dead_loop_p(loop l)
 {
   statement s;
-  bool feasible_p;
+  bool feasible_p = true;
+  intptr_t c = 0;
 
-  s = loop_body(l);
-  /* feasible_p = statement_feasible_p(s); */
-  if(get_statement_precondition==load_statement_precondition)
-    feasible_p = statement_strongly_feasible_p(s);
-
+  if(range_count(loop_range(l), &c)) {
+    feasible_p = (c>0);
+  }
+  else {
+    s = loop_body(l);
+    /* feasible_p = statement_feasible_p(s); */
+    if(get_statement_precondition==load_statement_precondition)
+      feasible_p = statement_strongly_feasible_p(s);
+  }
   return !feasible_p;
 }
 
@@ -1234,14 +1239,17 @@ bool generic_simplify_control(string mod_name, bool use_precondition_p)
 		  statement_consistent_p(mod_stmt));
   }
 
-  module_to_value_mappings(get_current_module_entity());
+  // Necessary because of simplify_boolean_expression_with_precondition()
+  // if(use_precondition_p)
+    module_to_value_mappings(get_current_module_entity());
   initialize_dead_code_statistics();
   some_unstructured_ifs_have_been_changed = false;
   suppress_dead_code_statement(mod_stmt);
   if(!c_module_p(get_current_module_entity()))
     insure_return_as_last_statement(get_current_module_entity(), &mod_stmt);
   display_dead_code_statistics();
-  free_value_mappings();
+  // See above: if(use_precondition_p)
+    free_value_mappings();
   reset_cumulated_rw_effects();
 
   debug_off();
