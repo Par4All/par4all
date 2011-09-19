@@ -5317,6 +5317,30 @@ be executed.
 POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING FALSE
 \end{PipsProp}
 
+The property \PipsPropRef{POINTS_TO_STRICT_POINTER_TYPES}
+is used to handle pointer arithmetic. According to C standard(section 6.5.6, item 8)
+the following C code :
+\begin{verbatim}
+int *p, i;
+p = \&i;
+p++ ;
+\end{verbatim}
+is correct and p points to the same area, expressed by the points to analysis as i[*].
+The default value is {\tt FALSE}, meaning that p points to an array element. When it's set to
+{\tt TRUE} typing becone strict ; meaning that p points to an integer and the behavior is undefined.
+So the analysis stops with a pips\_user\_error(illegal pointer arithmetic)
+\begin{PipsProp}{POINTS_TO_STRICT_POINTER_TYPES}
+POINTS_TO_STRICT_POINTER_TYPES FALSE
+\end{PipsProp}
+
+
+The integer property \PipsPropRef{POINTS_TO_K_LIMITING} specifies the maximum authorized length
+of an access path. Beyond this value the access path is changed into an ANYWHERE. This property
+is necessary while computing points to relations inside loops and it's default value is 10.
+\begin{PipsProp}{POINTS_TO_K_LIMITING}
+POINTS_TO_K_LIMITING 10
+\end{PipsProp}
+
 \subsection{Menu for Alias Views}
 
 \begin{PipsMake}

@@ -1,8 +1,7 @@
-#ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
-#endif
 #include <stdlib.h>
 #include <stdio.h>
+/* For strdup: */
+#define _GNU_SOURCE
 #include <string.h>
 
 #include "genC.h"
@@ -47,7 +46,6 @@ void points_to_backward_translation()
  * gradually of the points_to_stub by calling pointer_formal_parameter_to_stub_points_to() */
 set formal_points_to_parameter(cell c)
 {
-	
 	reference r = reference_undefined;
 	entity e = entity_undefined;
 	type fpt = type_undefined;
@@ -93,6 +91,7 @@ set formal_points_to_parameter(cell c)
 		}
 	}
 	return pt_in;
+
 }
 
 
@@ -102,42 +101,47 @@ points_to create_stub_points_to(cell c, type t,__attribute__ ((__unused__)) basi
 {
   basic bb = basic_undefined;
   expression ex = make_unbounded_expression();
+  reference sink_ref = reference_undefined;
   reference r = cell_to_reference(copy_cell(c));
   entity e = reference_variable(r);
   formal f = storage_formal( entity_storage(e) );
   int off = formal_offset(f);
-  string local_name;
-  asprintf(&local_name,"_%s_%d",entity_user_name(e),pointer_index);
-  entity formal_parameter = FindEntity(get_current_module_name(),local_name);
-  type pt = type_to_pointed_type(t);
-  if(type_variable_p(pt))
-    bb = variable_basic(type_variable(pt));
-  type tt = make_type_variable(
+  string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(pointer_index), NULL));
+  string formal_name = strdup(concatenate(get_current_module_name() /* POINTS_TO_MODULE_NAME */ ,MODULE_SEP_STRING, s, NULL));
+  entity formal_parameter = gen_find_entity(formal_name);
+  /* type pt = type_to_pointed_type(t); */
+  type pt = type_undefined;
+  bool type_strict_p = !get_bool_property("POINTS_TO_STRICT_POINTER_TYPES");
+  if(type_variable_p(t))
+    bb = variable_basic(type_variable(t));
+  if(type_strict_p)
+    pt = make_type_variable(
 			       make_variable(copy_basic(bb),
 					     CONS(DIMENSION,
 						  make_dimension(int_to_expression(0),ex),NIL),
 					     NIL));
+  else
+    pt = make_type_variable(
+			    make_variable(copy_basic(bb),
+					  NIL,
+					  NIL));
+ 
   if(entity_undefined_p(formal_parameter)) {
-    formal_parameter = CreateEntity(get_current_module_name(),local_name);
-    entity_type(formal_parameter)=tt;
-    entity_storage(formal_parameter)=
+    formal_parameter = make_entity(formal_name,
+				   pt,
 				   make_storage_formal(
 						       make_formal(
 								    get_current_module_entity() 
 								   /* module_name_to_entity(POINTS_TO_MODULE_NAME) */,
-								  off /* pointer_index */));
-    entity_initial(formal_parameter)=  make_value_unknown();
+								  off /* pointer_index */)),
+				   make_value_unknown());
   }
-  free(local_name);
-  /* expression ex_sink =  entity_to_expression(formal_parameter); */
-  /* set_methods_for_proper_simple_effects(); */
-  /* effect ef = effect_undefined; */
-  /* list l1 = generic_proper_effects_of_complex_address_expression(ex_sink, &ef, */
-  /* 									 true); */
-  reference sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
-  /* reference_indices_(sink_ref)= CONS(EXPRESSION, int_to_expression(0), NIL); */
-  /* effects_free(l1); */
-  /* generic_effects_reset_all_methods(); */
+
+  if(type_strict_p)
+    sink_ref = make_reference(formal_parameter, CONS(EXPRESSION, int_to_expression(0), NIL));
+  else
+    sink_ref = make_reference(formal_parameter,  NIL);
+
   cell sink_cell = make_cell_reference(sink_ref);
   approximation rel = make_approximation_exact();
   points_to pt_to = make_points_to(copy_cell(c), sink_cell, rel,
@@ -179,7 +183,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	expression ind = make_unbounded_expression();
 	reference r = make_reference(e, CONS(EXPRESSION, ind, NULL));
 	cell c = make_cell_reference(r);
-	pt_to = create_stub_points_to(c, upt, fpb);
+	pt_to = create_stub_points_to(c, pt/* upt */, fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
     }
@@ -272,6 +276,8 @@ set  derived_formal_parameter_to_stub_points_to(type pt, cell c)
    * in formal_points_to_parameter() */
 
   type upt = type_to_pointed_type(pt);
+  type bt =  compute_basic_concrete_type(pt);
+  print_type(bt);
   r = cell_reference(copy_cell(c));
   e = reference_variable(r);
 
@@ -348,6 +354,8 @@ set  typedef_formal_parameter_to_stub_points_to(type pt, cell c)
    * in formal_points_to_parameter() */
 
   type upt = type_to_pointed_type(pt);
+  type bt =  compute_basic_concrete_type(pt);
+  print_type(bt);
   r = cell_reference(copy_cell(c));
   e = reference_variable(r);
 
