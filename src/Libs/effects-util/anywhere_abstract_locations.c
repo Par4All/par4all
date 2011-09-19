@@ -616,7 +616,7 @@ entity entity_locations_max(entity al1, entity al2)
 	e = abstract_locations_max(al1, al);
       }
     else
-      if(entity_abstract_location_p(al2)) {
+      if(al2_abstract_location_p) {
 	entity al = variable_to_abstract_location(al1);
 	e = abstract_locations_max(al, al2);
       }

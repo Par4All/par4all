@@ -60,7 +60,7 @@
 /* These settings are done for performance reasons, especially in chains */
 /* initial values are current default values */
 static bool constant_path_effects_p = true;
-static bool user_effects_on_std_files = false;
+static bool user_effects_on_std_files_p = false;
 static bool aliasing_across_types_p = true;
 static bool aliasing_across_formal_parameters_p = false;
 
@@ -71,7 +71,7 @@ void set_conflict_testing_properties()
   aliasing_across_types_p = get_bool_property( "ALIASING_ACROSS_TYPES" );
   aliasing_across_formal_parameters_p =
     get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" );
-  user_effects_on_std_files = get_bool_property("USER_EFFECTS_ON_STD_FILES");
+  user_effects_on_std_files_p = get_bool_property("USER_EFFECTS_ON_STD_FILES");
 }
 
 /* Intersection tests */
@@ -481,6 +481,14 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 	  if (!same_entity_p(e1, e2) || (ENDP(ind1) && ENDP(ind2)) )
 	    conflict_p = false;
 	  else // same entity, with indices
+	    conflict_p = variable_references_may_conflict_p( e1, ind1, ind2 );
+	}
+      else if (!user_effects_on_std_files_p
+	       && (std_file_entity_p(e1) || std_file_entity_p(e2)))
+	{
+	  if (!same_entity_p(e1, e2))
+	    conflict_p = false;
+	  else
 	    conflict_p = variable_references_may_conflict_p( e1, ind1, ind2 );
 	}
       else
