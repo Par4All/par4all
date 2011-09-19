@@ -1,4 +1,5 @@
-/* Make sure min and max are taken into account in for loop conditions */
+/* Check the impact of property SEMANTICS_KEEP_DO_LOOP_EXIT_CONDITION
+   when set to false, which is not its default value */
 
 #include <stdio.h>
 
