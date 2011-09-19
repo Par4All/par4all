@@ -1,14 +1,6 @@
-/*
- * (c) HPC Project - 2010-2011 - All rights reserved
- *
- */
+// Bug: over simplification
 
 #include <stdio.h>
-
-/*----------------------------------------------------*/
-
-
-/*----------------------------------------------------*/
 
 void Run();
 int main() { Run(); return 0; }
