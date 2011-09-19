@@ -22,13 +22,13 @@ void pointer08()
    struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
 
 // Points To:
-// t -> &*HEAP*_l_8 , EXACT
+// t -> *HEAP*_l_8 , EXACT
 
    for(i = 0; i <= 9; i += 1)
 
 // Points To:
-// t[0].tree_list[*] -> &*HEAP*_l_10 , MAY
-// t -> &*HEAP*_l_8 , MAY
+// t[0].tree_list[*] -> *HEAP*_l_10 , MAY
+// t -> *HEAP*_l_8 , MAY
 
       (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
 }
