@@ -176,9 +176,7 @@ static int alea(void)
  *********************** Use-Def Chains *********************
 
 	22 --> 23 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <pi1-W-MAY> to <pi1-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <pp-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <pi1-R-EXACT>
