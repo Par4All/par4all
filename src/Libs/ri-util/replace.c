@@ -67,6 +67,9 @@ static void replace_entities_loop_walker(loop l, hash_table ht) {
  *
  * @param s newgen type where the substitution must be done
  * @param ht table of old->new pairs
+ *
+ * Warning: if the intersection between the input and output sets is not empty, the 
+ * behavior is undefined
  */
 void
 replace_entities(void* s, hash_table ht)
