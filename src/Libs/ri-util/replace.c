@@ -19,86 +19,85 @@
  * @{
  */
 
-struct entity_pair
-{
-    entity old;
-    entity new;
-};
-
 static void
-replace_entity_declaration_walker(statement s, struct entity_pair* thecouple)
+replace_entities_declaration_walker(statement s, hash_table ht)
 {
   // FI: this does not seem to replace the declaration itself
   // I need a side-effect on the statement_declarations list when
   // decl_ent == thecouple->old
     FOREACH(ENTITY,decl_ent,statement_declarations(s))
-    {
-        replace_entity(decl_ent,thecouple->old,thecouple->new);
-    }
+        replace_entities(decl_ent,ht);
 }
+
 static void
-replace_entity_reference_walker(reference r,struct entity_pair* thecouple)
+replace_entities_reference_walker(reference r, hash_table ht)
 {
-  if(same_entity_p(thecouple->old,reference_variable(r))) {
-    reference_variable(r)=thecouple->new;
-    expression next=(expression)r,parent=NULL;
-    /* we need to unormalize the uppermost parent of this expression
-     * otherwise its normalized field gets incorrect */
-    while((next=(expression) gen_get_ancestor(expression_domain,next)))
-        parent=next;
-    if(parent)
-        unnormalize_expression(parent); /* otherwise field normalized get wrong */
-  }
+    entity new = hash_get(ht,reference_variable(r));
+    if(new!= HASH_UNDEFINED_VALUE) {
+        reference_variable(r)=new;
+        expression next=(expression)r,parent=NULL;
+        /* we need to unormalize the uppermost parent of this expression
+         * otherwise its normalized field gets incorrect */
+        while((next=(expression) gen_get_ancestor(expression_domain,next)))
+            parent=next;
+        if(parent)
+            unnormalize_expression(parent); /* otherwise field normalized get wrong */
+    }
 }
 
-static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple) {
-  if(same_entity_p(thecouple->old, loop_index(l))) {
-    // We replace the loop index
-    loop_index(l) = thecouple->new;
-  }
-
-  // Handle loop locals, in-place replacement
-  list ll = loop_locals(l);
-  for(; !ENDP(ll); POP(ll)) {
-    entity local = ENTITY(CAR(ll));
-    if(same_entity_p(local, thecouple->old)) {
-      CAR(ll).p = (gen_chunk *)thecouple->new;
+static void replace_entities_loop_walker(loop l, hash_table ht) {
+    entity new = hash_get(ht,loop_index(l));
+    if(new!= HASH_UNDEFINED_VALUE) {
+        // We replace the loop index
+        loop_index(l) = new;
     }
-  }
+
+    // Handle loop locals, in-place replacement
+    for(list ll = loop_locals(l); !ENDP(ll); POP(ll)) {
+        entity local = ENTITY(CAR(ll));
+        entity new = hash_get(ht,local);
+        if(new!= HASH_UNDEFINED_VALUE) {
+            CAR(ll).p = (gen_chunkp)new;
+        }
+    }
 }
 
 /**
- * @brief Recursively substitute an entity for an old one in a statement
+ * @brief Recursively substitute a set of entities in a statement
  *
  * @param s newgen type where the substitution must be done
- * @param old old entity
- * @param new new entity
+ * @param ht table of old->new pairs
  */
 void
-replace_entity(void* s, entity old, entity new) {
-  struct entity_pair thecouple = { old, new };
+replace_entities(void* s, hash_table ht)
+{
   if( INSTANCE_OF(entity,(gen_chunkp)s) ) {
-      replace_entity(entity_type((entity)s),old,new);
+      replace_entities(entity_type((entity)s),ht);
       value v = entity_initial((entity)s);
       if( !value_undefined_p(v) && value_expression_p( v ) )
-          replace_entity(v,old,new);
+          replace_entities(v,ht);
   }
   else {
-      gen_context_multi_recurse(s, &thecouple,
-              reference_domain, gen_true, replace_entity_reference_walker,
+      gen_context_multi_recurse(s, ht,
+              reference_domain, gen_true, replace_entities_reference_walker,
               //expression_domain, gen_true, replace_entity_expression_walker,
-              statement_domain, gen_true, replace_entity_declaration_walker,
-              loop_domain, gen_true, replace_entity_loop_walker,
+              statement_domain, gen_true, replace_entities_declaration_walker,
+              loop_domain, gen_true, replace_entities_loop_walker,
               NULL);
   }
 }
 
+/* per variable version of replace_entities.
+ * Much slower if you have an hash table of old/new pairs than the replace_entities version
+ */
 void
-replace_entities(void* s, hash_table ht)
-{
-  HASH_FOREACH(entity, k, entity, v, ht)
-    replace_entity(s,k,v);
+replace_entity(void* s, entity old, entity new) {
+    hash_table ht = hash_table_make(hash_pointer,1);
+    hash_put(ht,old,new);
+    replace_entities(s,ht);
+    hash_table_free(ht);
 }
+
 
 /** Replace an old reference by a reference to a new entity in a statement
  */
