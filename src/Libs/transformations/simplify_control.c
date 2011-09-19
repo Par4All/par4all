@@ -1131,15 +1131,15 @@ static bool dead_statement_filter(statement s)
       entity op = call_function(c);
       if(ENTITY_CONDITIONAL_P(op)) {
 	list args = call_arguments(c);
-	expression c = EXPRESSION(CAR(args));
-	(void) simplify_boolean_expression_with_precondition(c, pre);
-	if(true_expression_p(c)) {
+	expression bool_exp = EXPRESSION(CAR(args));
+	(void) simplify_boolean_expression_with_precondition(bool_exp, pre);
+	if(true_expression_p(bool_exp)) {
 	  expression e1 = EXPRESSION(CAR(CDR(args)));
 	  instruction_tag(i) = is_instruction_expression;
 	  instruction_expression(i) = copy_expression(e1);
 	  free_call(c);
 	}
-	else if(false_expression_p(c)) {
+	else if(false_expression_p(bool_exp)) {
 	  expression e2 = EXPRESSION(CAR(CDR(CDR(args))));
 	  instruction_tag(i) = is_instruction_expression;
 	  instruction_expression(i) = copy_expression(e2);
@@ -1234,16 +1234,14 @@ bool generic_simplify_control(string mod_name, bool use_precondition_p)
 		  statement_consistent_p(mod_stmt));
   }
 
-  if(use_precondition_p)
-    module_to_value_mappings(get_current_module_entity());
+  module_to_value_mappings(get_current_module_entity());
   initialize_dead_code_statistics();
   some_unstructured_ifs_have_been_changed = false;
   suppress_dead_code_statement(mod_stmt);
   if(!c_module_p(get_current_module_entity()))
     insure_return_as_last_statement(get_current_module_entity(), &mod_stmt);
   display_dead_code_statistics();
-    if(use_precondition_p)
-      free_value_mappings();
+  free_value_mappings();
   reset_cumulated_rw_effects();
 
   debug_off();
