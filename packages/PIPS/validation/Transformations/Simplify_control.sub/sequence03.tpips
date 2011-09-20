@@ -1,0 +1,52 @@
+setenv WS=sequence03
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+# The source code is wrong, on purpose, to try to reproduce a bug situation
+setenv PIPS_CHECK_C="N"
+
+create $WS $WS.c
+
+module $WS
+
+echo #
+echo # Parsed printed file
+echo #
+
+display PARSED_PRINTED_FILE
+
+echo #
+echo # Printed file
+echo #
+
+activate NEW_CONTROLIZER
+
+#setenv CONTROL_DEBUG_LEVEL 9
+
+display PRINTED_FILE
+
+echo #
+echo # Cumulated effects
+echo #
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+echo #
+echo # simplify control
+echo #
+apply SIMPLIFY_CONTROL_DIRECTLY[$WS]
+activate PRINT_CODE
+display PRINTED_FILE
+
+echo #
+echo # simplify control a second time
+echo #
+apply SIMPLIFY_CONTROL_DIRECTLY[$WS]
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+delete $WS
+quit

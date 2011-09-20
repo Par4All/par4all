@@ -6,26 +6,32 @@
 #The program is distributed under the terms of the GNU General Public
 #License.
 
-# Ce script filtre le code généré par PIPS pour remplacer l'include de DEFAULT_STEP_HEADER par l'include de STEP_HEADER
+# Ce script filtre le code généré par PIPS pour remplacer l'include de textuel par la directive INCLUDE
 # - le premier argument indique le répertoir d'instalation
-# - le second argument indique DEFAULT_STEP_HEADER
-# - le troisième argument indique STEP_HEADER
 # - les arguments suivant indique les fichiers à filtrer
 
 INSTAL_DIR=$1
-DEFAULT_STEP_HEADER=$2
-STEP_HEADER=$3
-
-shift 3
+shift 1
 
 mkdir -p $INSTAL_DIR;
 
 while [[ $# -gt 0 ]];
 do
-    awk 'BEGIN {cut=0} cut == 0 && /! include "STEP.h"/ {cut=1} cut == 0 {print $0;} cut == 1 && /! end include "STEP.h"/ {cut=0}' $1 | \
-	sed 's,!       include "STEP.h",      include "STEP.h",g' | \
-	sed 's,!       implicit none,      implicit none,g' | \
-	sed 's,! MIL-STD-1753 Fortran extension not in PIPS\n,,' >$INSTAL_DIR/step.tmp
-    mv $INSTAL_DIR/step.tmp $INSTAL_DIR/$(basename $1)
+    f=$1
+    if [ $(basename $f) = $(basename $f .c) ] ; then
+	awk 'BEGIN {cut=0} cut == 0 && /! include "STEP.h"/ {cut=1} cut == 0 {print $0;} cut == 1 && /! end include "STEP.h"/ {cut=0}' $f | \
+	    sed 's,!       include "STEP.h",      include "STEP.h",g' | \
+	    sed 's,!       implicit none,      implicit none,g' | \
+	    sed 's,! MIL-STD-1753 Fortran extension not in PIPS\n,,' >$INSTAL_DIR/step.tmp
+    else
+	l=$(grep -n "#include \"step_api.h\"" $f|cut -d: -f1);
+	if [ ! -z $l ]; then
+	    base=$(basename $f .c);
+	    head -n $[$l-1] $f >$INSTAL_DIR/$base.h;
+	    echo "#include \"$base.h\"" >$INSTAL_DIR/step.tmp;
+	    tail -n $[ $(wc -l $f |cut -d' ' -f1) - $l + 1] $f >> $INSTAL_DIR/step.tmp;
+	fi;
+    fi
+    mv $INSTAL_DIR/step.tmp $INSTAL_DIR/$(basename $f)
     shift
 done

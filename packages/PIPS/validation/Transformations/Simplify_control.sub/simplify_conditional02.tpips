@@ -1,0 +1,49 @@
+setenv WS=simplify_conditional02
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+module Run
+
+echo #
+echo # Parsed printed file
+echo #
+
+display PARSED_PRINTED_FILE
+
+echo #
+echo # Printed file
+echo #
+
+activate NEW_CONTROLIZER
+
+#setenv CONTROL_DEBUG_LEVEL 9
+
+display PRINTED_FILE
+
+echo #
+echo # Cumulated effects
+echo #
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+echo #
+echo # simplify control
+echo #
+apply SIMPLIFY_CONTROL_DIRECTLY[Run]
+activate PRINT_CODE
+display PRINTED_FILE
+
+echo #
+echo # simplify control a second time
+echo #
+apply SIMPLIFY_CONTROL_DIRECTLY[Run]
+activate PRINT_CODE
+display PRINTED_FILE
+
+close
+delete $WS
+quit

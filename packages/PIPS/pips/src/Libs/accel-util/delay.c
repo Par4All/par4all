@@ -262,31 +262,55 @@ static context context_dup(context *c) {
   return cp;
 }
 
-static void delay_communications_statement(statement, context *);
+static void delay_communications_statement(statement, context *, list *block);
 
-static void delay_communications_sequence(sequence s, context *c) {
+static void delay_communications_sequence(sequence s, context *c, list *block) {
   list stats = gen_copy_seq(sequence_statements(s));
   if(c->backward) stats=gen_nreverse(stats); //reverse the walking when performing backward movements
   FOREACH(STATEMENT,st,stats) {
-    delay_communications_statement(st,c);
+    delay_communications_statement(st,c,&sequence_statements(s));
   }
   gen_free_list(stats);
 }
+static void create_block_if_needed(statement *s, list **block) {
+    if(!statement_block_p(*s) && !*block) {
+        pips_assert("declaration must be in a block\n",!declaration_statement_p(*s));
+        statement scopy = instruction_to_statement(statement_instruction(*s));
+        statement_instruction(*s)=instruction_undefined;
+        list tmp = CONS(STATEMENT,scopy,NIL);
+        update_statement_instruction(*s,make_instruction_block(tmp));
+        *block=&sequence_statements(statement_sequence(*s));
+        *s=scopy;
 
-static void manage_conflicts(statement s, context *c,bool before) {
+    }
+}
+
+static void insert_statement_in_block(statement s, statement inserted, bool before, list *block) {
+    if(statement_block_p(s))
+        insert_statement(s,inserted,before);
+    else {
+        create_block_if_needed(&s,&block);
+        if(before)
+            *block=gen_insert_before(inserted,s,*block);
+        else
+            gen_insert_after(inserted,s,*block);
+    }
+}
+
+static void manage_conflicts(statement s, context *c,bool before, list *block) {
   /* check conflicts with current stats */
   list tstats = gen_copy_seq(c->stats);
   FOREACH(STATEMENT,st,tstats) {
     if(statements_conflict_p(s,st)) {
-      insert_statement_no_matter_what(s,st,before);
+      insert_statement_in_block(s,st,before,block);
       gen_remove_once(&c->stats,st);
     }
   }
   gen_free_list(tstats);
 }
 
-static void delay_communications_call(statement s, context *c) {
-  manage_conflicts(s,c,!c->backward);
+static void delay_communications_call(statement s, context *c, list *block) {
+  manage_conflicts(s,c,!c->backward,block);
   /* memorize additional dma */
   if( (c->backward && simd_load_stat_p(s)) ||
           (!c->backward && simd_store_stat_p(s)) ) {
@@ -299,13 +323,13 @@ static void delay_communications_call(statement s, context *c) {
   }
 }
 
-static void delay_communications_test(statement s, context *c) {
-  manage_conflicts(s,c,!c->backward);
+static void delay_communications_test(statement s, context *c, list *block) {
+  manage_conflicts(s,c,!c->backward, block);
   /* explore both branches independently */
   test t = statement_test(s);
   context c0 = context_dup(c), c1=context_dup(c);
-  delay_communications_statement(test_true(t),&c0);
-  delay_communications_statement(test_false(t),&c1);
+  delay_communications_statement(test_true(t),&c0,NULL);
+  delay_communications_statement(test_false(t),&c1,NULL);
   /* manage state consistency after s :
    * currently very pessimistic: if a dma is made on a branch, it must be
    * done at the end of the branch.
@@ -323,7 +347,7 @@ static void delay_communications_test(statement s, context *c) {
       }
     }
     if(new) {
-      insert_statement(test_true(t),copy_statement(st0),c->backward);
+      insert_statement_in_block(test_true(t),copy_statement(st0),c->backward,NULL);
       gen_remove_once(&c0.stats,st0);
       gen_remove_once(&c->stats,st0);
     }
@@ -341,7 +365,7 @@ static void delay_communications_test(statement s, context *c) {
       }
     }
     if(new) {
-      insert_statement(test_false(t),copy_statement(st1),c->backward);
+      insert_statement_in_block(test_false(t),copy_statement(st1),c->backward,NULL);
       gen_remove_once(&c1.stats,st1);
       gen_remove_once(&c->stats,st1);
     }
@@ -363,18 +387,18 @@ static void delay_communications_test(statement s, context *c) {
       if((ffound= (o == statement_ordering(st1)))) break;
     /* insert it if it's missing somewhere */
     if(tfound && !ffound ) {
-      insert_statement(test_true(t),copy_statement(st),c->backward);
+      insert_statement_in_block(test_true(t),copy_statement(st),c->backward,block);
       gen_remove_once(&c->stats,st);
     }
     if(!tfound && ffound ) {
-      insert_statement(test_false(t),copy_statement(st),c->backward);
+      insert_statement_in_block(test_false(t),copy_statement(st),c->backward,block);
       gen_remove_once(&c->stats,st);
     }
   }
   gen_free_list(tstats);
 }
 
-static void delay_communications_anyloop(statement s, context *c) {
+static void delay_communications_anyloop(statement s, context *c, list *block) {
   statement body=statement_undefined;
   if(statement_loop_p(s)) body =loop_body(statement_loop(s));
   else if(statement_forloop_p(s)) body =forloop_body(statement_forloop(s));
@@ -382,13 +406,13 @@ static void delay_communications_anyloop(statement s, context *c) {
   pips_assert("all loops have body\n",!statement_undefined_p(s));
 
   /* first step is to check conflict with the head */
-  manage_conflicts(s,c,!c->backward);
+  manage_conflicts(s,c,!c->backward,block);
   /* then we check if there is a conflict inside the loop.
    * In that case better insert before the loop than inside */
   list tstats = gen_copy_seq(c->stats);
   FOREACH(STATEMENT,st,tstats) {
     if(recurse_statements_conflict_p(st,body) ) { // conflict with other iterations
-      insert_statement(s,st,!c->backward);
+      insert_statement_in_block(s,st,!c->backward,block);
       gen_remove_once(&c->stats,st);
     }
   }
@@ -396,7 +420,7 @@ static void delay_communications_anyloop(statement s, context *c) {
 
   /* then we propagate the dma inside the body */
   context cb = context_dup(c);
-  delay_communications_statement(body,c);
+  delay_communications_statement(body,c,NULL);
 
 
   /* then we check for conflicts with indices or over iterations */
@@ -404,7 +428,7 @@ static void delay_communications_anyloop(statement s, context *c) {
   FOREACH(STATEMENT,st,tstats) {
     if(statements_conflict_p(st,s) ||// conflict with the iteration
             recurse_statements_conflict_p(st,body) ) { // conflict with other iterations
-      insert_statement(body,st,c->backward);
+      insert_statement_in_block(body,st,c->backward,NULL);
       gen_remove_once(&c->stats,st);
     }
   }
@@ -422,26 +446,26 @@ static void delay_communications_anyloop(statement s, context *c) {
 
 }
 
-static void delay_communications_statement(statement s, context *c) {
+static void delay_communications_statement(statement s, context *c, list *block) {
   instruction i = statement_instruction(s);
   switch(instruction_tag(i)) {
     case is_instruction_expression:/* we could do better */
     case is_instruction_call:
-      delay_communications_call(s,c);break;
+      delay_communications_call(s,c,block);break;
     case is_instruction_sequence:
-      delay_communications_sequence(instruction_sequence(i),c);break;
+      delay_communications_sequence(instruction_sequence(i),c,NULL);break;
     case is_instruction_test:
-      delay_communications_test(s,c);break;
+      delay_communications_test(s,c,NULL);break;
     case is_instruction_loop:
     case is_instruction_whileloop:
     case is_instruction_forloop:
-      delay_communications_anyloop(s,c);break;
+      delay_communications_anyloop(s,c,NULL);break;
     default:
       pips_user_warning("not implemented yet, full memory barrier is assumed\n");
       {
           list tstats= gen_copy_seq(c->stats);
           FOREACH(STATEMENT,st,tstats) {
-              insert_statement(s,st,!c->backward);
+              insert_statement_in_block(s,st,!c->backward,block);
               gen_remove_once(&c->stats,st);
           }
           gen_free_list(tstats);
@@ -598,7 +622,7 @@ bool delay_load_communications(char * module_name)
     context c = { true, NIL, true, false };
 
     /* then a backward translation */
-    delay_communications_statement(module_stat,&c);
+    delay_communications_statement(module_stat,&c,NULL);
 
     /* propagate inter procedurally , except if we have no caller*/
     if(delay_communications_interprocedurally_p)
@@ -667,7 +691,7 @@ bool delay_store_communications(char * module_name)
     context c = { true, NIL, false, false };
 
     /* a first forward translation */
-    delay_communications_statement(module_stat,&c);
+    delay_communications_statement(module_stat,&c,NULL);
 
     /* propagate inter procedurally , except if we have no caller*/
     if(delay_communications_interprocedurally_p)

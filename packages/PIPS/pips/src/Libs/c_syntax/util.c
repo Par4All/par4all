@@ -902,6 +902,12 @@ bool CheckExternList()
     return true;
 }
 
+void put_new_typedef(string name)
+{
+  hash_put(keyword_typedef_table,strdup(name),(void *) TK_NAMED_TYPE);
+  pips_debug(5,"Add typedef name %s to hash table\n",name);
+}
+
 /* This function finds or creates the current entity. Only entity full
    name is created, other fields such as type, storage and initial
    value are undefined.  */
@@ -979,8 +985,11 @@ entity FindOrCreateCurrentEntity(string name,
       /* Tell the lexer about the new type names : add to
 	 keyword_typedef_table. Because of scopes, different types
 	 can have the same name... */
+      put_new_typedef(name);
+      /*
       hash_put(keyword_typedef_table,strdup(name),(void *) TK_NAMED_TYPE);
       pips_debug(5,"Add typedef name %s to hash table\n",name);
+      */
       ent = CreateEntityFromLocalNameAndPrefix(name,TYPEDEF_PREFIX,is_external);
     }
   else

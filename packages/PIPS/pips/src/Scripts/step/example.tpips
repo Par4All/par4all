@@ -1,14 +1,32 @@
-delete myProgram
-create myProgram myProg.f mySubprog1.f mySubProg2.f
+delete $workspace
+create $workspace $source_files
+
+setproperty PRAGMA_TYPE "str"
+
+activate NEW_CONTROLIZER
+
+setproperty STEP_DEFAULT_TRANSFORMATION "HYBRIDE"
+#setproperty STEP_DEFAULT_TRANSFORMATION "MPI"
+#setproperty STEP_DEFAULT_TRANSFORMATION "OMP"
+
+setenv STEP_DIRECTIVES_DEBUG_LEVEL 0
+apply STEP_DIRECTIVES[%ALL]
 
 activate MUST_REGIONS
+activate INTRAPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FULL
 
-apply STEP_DIRECTIVES[%ALL]
-apply STEP_ANALYSE[%ALL]
-apply STEP_COMPILE[%MAIN]
+activate REGION_CHAINS
+setenv STEP_ANALYSE_DEBUG_LEVEL 1
+apply STEP_ANALYSE[%MAIN]
 
-setproperty STEP_INSTALL_PATH "$PATH_GENERATED_FILE"
-apply STEP_INSTALL
+checkpoint
+
+setenv STEP_COMPILE_DEBUG_LEVEL 0
+apply STEP_COMPILE[%ALLFUNC]
+
+setenv STEP_INSTALL_DEBUG_LEVEL 0
+setproperty STEP_INSTALL_PATH ""
+apply STEP_INSTALL[%MAIN]
 
 close

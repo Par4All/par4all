@@ -801,6 +801,13 @@ transformer statement_to_postcondition(
 	  if(!ENDP(vl))
 	    post = safe_transformer_projection(post, vl);
 	}
+	else if(statement_loop_p(s)
+		&& !get_bool_property("SEMANTICS_KEEP_DO_LOOP_EXIT_CONDITION")) {
+	  loop l = statement_loop(s);
+	  entity i = loop_index(l);
+	  list vl = variable_to_values(i);
+	  post = safe_transformer_projection(post, vl);
+	}
 
 	/* add equivalence equalities */
 	pre = tf_equivalence_equalities_add(pre);

@@ -67,6 +67,7 @@ void do_symbolic_tiling(statement base, list vector)
     list tiled_loops_inner = NIL;
     list prelude = NIL;
     statement sloop=copy_statement(base);
+    set_conflict_testing_properties();
     FOREACH(EXPRESSION,tile_size,vector)
     {
         loop l = statement_loop(sloop);

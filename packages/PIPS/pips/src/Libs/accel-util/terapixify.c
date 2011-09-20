@@ -987,7 +987,7 @@ generate_two_addresses_code(const char* module_name)
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true));
-
+    set_conflict_testing_properties();
     gen_recurse(get_current_module_statement(),statement_domain,gen_true,two_addresses_code_generator);
 
     /* validate */

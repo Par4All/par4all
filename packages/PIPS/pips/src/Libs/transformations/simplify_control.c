@@ -75,6 +75,8 @@ static int dead_code_unstructured_if_false_branch_removed;
 static int dead_code_unstructured_if_true_branch_removed;
 static void suppress_dead_code_statement(statement);
 
+static transformer (*get_statement_precondition)(statement);
+
 static void
 initialize_dead_code_statistics()
 {
@@ -103,20 +105,20 @@ display_dead_code_statistics()
 			+ dead_code_if_replaced_by_its_effect;
 	elimination_count += dead_code_unstructured_if_removed
 	    + dead_code_unstructured_if_replaced_by_its_effect;
-	
-	if (elimination_count > 0) 
+
+	if (elimination_count > 0)
 	{
 	  user_log("* %d dead code part%s %s been discarded. *\n",
 		   elimination_count,
 		   elimination_count > 1 ? "s" : "",
 		   elimination_count > 1 ? "have" : "has");
-	  
+
 	  user_log("Statements removed (directly dead): %d\n",
 		   dead_code_statement_removed);
-	  
+
 	  user_log("Loops: loops removed: %d, loops executed only once: %d\n",
 		   dead_code_loop_removed, dead_code_loop_executed_once);
-	  
+
 	  user_log("Structured tests: \"if\" removed: %d, "
 		   "\"if\" replaced by side effects: %d\n"
 		   "\t(\"then\" removed: %d, "
@@ -124,7 +126,7 @@ display_dead_code_statistics()
 		   dead_code_if_removed, dead_code_if_replaced_by_its_effect,
 		   dead_code_if_true_branch_removed,
 		   dead_code_if_false_branch_removed);
-	  
+
 	  user_log("Unstructured tests: \"if\" removed: %d, "
 		   "\"if\" replaced by side effects: %d\n"
 		   "\t(unstructured \"then\" removed: %d, "
@@ -165,8 +167,8 @@ dead_test_filter(statement st_true, statement st_false)
 
   ifdebug(8)
     {
-      transformer pretrue = load_statement_precondition(st_true);
-      transformer prefalse = load_statement_precondition(st_false);
+      transformer pretrue = get_statement_precondition(st_true);
+      transformer prefalse = get_statement_precondition(st_false);
       fprintf(stderr,"NN true and false branches");
       sc_fprint(stderr,
 		predicate_system(transformer_relation(pretrue)),
@@ -176,12 +178,14 @@ dead_test_filter(statement st_true, statement st_false)
 		(char* (*)(Variable)) entity_local_name);
     }
 
-  if (!statement_strongly_feasible_p(st_true)) {
+  if (get_statement_precondition==load_statement_precondition
+      && !statement_strongly_feasible_p(st_true)) {
     pips_debug(5, "End: then_is_dead\n");
     return then_is_dead;
   }
 
-  if (!statement_strongly_feasible_p(st_false)) {
+  if (get_statement_precondition==load_statement_precondition
+      && !statement_strongly_feasible_p(st_false)) {
     pips_debug(5, "End: else_is_dead\n");
     return else_is_dead;
   }
@@ -281,12 +285,18 @@ static bool
 dead_loop_p(loop l)
 {
   statement s;
-  bool feasible_p;
+  bool feasible_p = true;
+  intptr_t c = 0;
 
-  s = loop_body(l);
-  /* feasible_p = statement_feasible_p(s); */
-  feasible_p = statement_strongly_feasible_p(s);
-
+  if(range_count(loop_range(l), &c)) {
+    feasible_p = (c>0);
+  }
+  else {
+    s = loop_body(l);
+    /* feasible_p = statement_feasible_p(s); */
+    if(get_statement_precondition==load_statement_precondition)
+      feasible_p = statement_strongly_feasible_p(s);
+  }
   return !feasible_p;
 }
 
@@ -319,7 +329,7 @@ remove_loop_statement(statement s, instruction i, loop l)
   statement_label(as1) = statement_label(s);
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
-  
+
   /* fix some extra attributes */
   store_cumulated_rw_effects_list(as1,gen_full_copy_list(load_cumulated_rw_effects_list(s)));
   store_cumulated_rw_effects_list(as2,gen_full_copy_list(load_cumulated_rw_effects_list(s)));
@@ -357,9 +367,9 @@ static bool loop_executed_once_p(statement s, loop l)
   if (expression_equal_p(m1, m2))
     return true;
 
-  pre = load_statement_precondition(s);
+  pre = get_statement_precondition(s);
   precondition_ps = predicate_system(transformer_relation(pre));
-  
+
   m3 = range_increment(rg);
   n_m1 = NORMALIZE_EXPRESSION(m1);
   n_m2 = NORMALIZE_EXPRESSION(m2);
@@ -369,17 +379,17 @@ static bool loop_executed_once_p(statement s, loop l)
   {
     /* m1 - m2 == 0 redundant ?
      */
-    Pcontrainte eq = contrainte_make(vect_substract(normalized_linear(n_m1), 
+    Pcontrainte eq = contrainte_make(vect_substract(normalized_linear(n_m1),
 						    normalized_linear(n_m2)));
 
     if (eq_redund_with_sc_p(precondition_ps, eq))
       retour = true;
-    
+
     contrainte_free(eq);
 
     if (retour) return true;
   }
-  if (normalized_linear_p(n_m3)) { 
+  if (normalized_linear_p(n_m3)) {
     /* Teste le signe de l'incr�ment en fonction des pr�conditions : */
     pv3 = vect_dup(normalized_linear(n_m3));
     pc3 = contrainte_make(pv3);
@@ -390,18 +400,18 @@ static bool loop_executed_once_p(statement s, loop l)
       return false;
     }
     TRY {
-      m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true); 
+      m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true);
       (void) vect_chg_sgn(pv3);
       m3_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true);
       UNCATCH(overflow_error);
     }
     pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
 	       m3_positif, m3_negatif);
-    
+
     /* Vire aussi pv3 & pc3 : */
     sc_rm(ps);
   }
-  if ((m3_positif ^ m3_negatif) && normalized_linear_p(n_m3) && 
+  if ((m3_positif ^ m3_negatif) && normalized_linear_p(n_m3) &&
       normalized_linear_p(n_m1) && normalized_linear_p(n_m2))
   {
     /* Si l'incr�ment a un signe � connu � et diff�rent de 0 et que
@@ -412,7 +422,7 @@ static bool loop_executed_once_p(statement s, loop l)
     pv1 = normalized_linear(n_m1);
     pv2 = normalized_linear(n_m2);
     pv3 = normalized_linear(n_m3);
-    
+
     /* pv = m1 - m2, i.e. m1 - m2 <= 0 */
     pv = vect_substract(pv1, pv2);
 
@@ -448,7 +458,7 @@ static bool loop_executed_once_p(statement s, loop l)
 }
 
 /* Remplace une boucle vide par la seule initialisation de l'indice : */
-static bool remove_dead_loop(statement s, instruction i, loop l) 
+static bool remove_dead_loop(statement s, instruction i, loop l)
 {
   expression index, rl;
   range lr;
@@ -611,8 +621,17 @@ static bool dead_deal_with_test(statement s,
 {
   statement st_true = test_true(t);
   statement st_false = test_false(t);
+  expression c = test_condition(t);
+  enum dead_test what_is_dead = nothing_about_test;
 
-  switch (dead_test_filter(st_true, st_false)) {
+  if(true_expression_p(c))
+    what_is_dead = else_is_dead;
+  else if(false_expression_p(c))
+    what_is_dead = then_is_dead;
+  else
+    what_is_dead = dead_test_filter(st_true, st_false);
+
+  switch (what_is_dead) {
 
   case then_is_dead :
     /* Delete the test and the useless true : */
@@ -673,7 +692,7 @@ static dead_test dead_unstructured_test_filter(statement st)
     dead_test test_status;
     transformer pre_true, pre_false;
     test t = instruction_test(statement_instruction(st));
-    transformer pre = load_statement_precondition(st);
+    transformer pre = get_statement_precondition(st);
     expression cond = test_condition(t);
 
     pips_assert("Preconditions are defined for all statements",
@@ -950,7 +969,7 @@ static bool dead_statement_filter(statement s)
   bool retour;
   effects crwe = load_cumulated_rw_effects(s);
   list crwl = effects_effects(crwe);
-  transformer pre = load_statement_precondition(s);
+  transformer pre = get_statement_precondition(s);
 
   pips_assert("statement s is consistent", statement_consistent_p(s));
 
@@ -1018,7 +1037,8 @@ static bool dead_statement_filter(statement s)
      * This can also happen when a function is never called, but
      * analyzed interprocedurally.
      */
-    if (!statement_weakly_feasible_p(s)) {
+    if (get_statement_precondition==load_statement_precondition
+	&& !statement_weakly_feasible_p(s)) {
       pips_debug(2, "Dead statement %td (%td, %td)\n",
 		 statement_number(s),
 		 ORDERING_NUMBER(statement_ordering(s)),
@@ -1028,7 +1048,9 @@ static bool dead_statement_filter(statement s)
       break;
     }
 
-    if (instruction_sequence_p(i) && !statement_feasible_p(s)) {
+    if (instruction_sequence_p(i)
+	&& get_statement_precondition==load_statement_precondition
+	&& !statement_feasible_p(s)) {
       pips_debug(2, "Dead sequence statement %td (%td, %td)\n",
 		 statement_number(s),
 		 ORDERING_NUMBER(statement_ordering(s)),
@@ -1106,6 +1128,32 @@ static bool dead_statement_filter(statement s)
       break;
     }
 
+    /* To deal with C conditional operator, at least, at the top
+       level in the statement, i.e. no recursive descent in the call
+       or the expression */
+    if(instruction_call_p(i)) {
+      call c = instruction_call(i);
+      entity op = call_function(c);
+      if(ENTITY_CONDITIONAL_P(op)) {
+	list args = call_arguments(c);
+	expression bool_exp = EXPRESSION(CAR(args));
+	(void) simplify_boolean_expression_with_precondition(bool_exp, pre);
+	if(true_expression_p(bool_exp)) {
+	  expression e1 = EXPRESSION(CAR(CDR(args)));
+	  instruction_tag(i) = is_instruction_expression;
+	  instruction_expression(i) = copy_expression(e1);
+	  free_call(c);
+	}
+	else if(false_expression_p(bool_exp)) {
+	  expression e2 = EXPRESSION(CAR(CDR(CDR(args))));
+	  instruction_tag(i) = is_instruction_expression;
+	  instruction_expression(i) = copy_expression(e2);
+	  free_call(c);
+	}
+      }
+      /* FI: no need to set retour nor to break*/
+    }
+
     /* Well, else we are going on the inspection... */
     retour = true;
     break;
@@ -1150,7 +1198,7 @@ static void suppress_dead_code_statement(statement mod_stmt)
 /*
  * Simply Control
  */
-bool simplify_control(string mod_name)
+bool generic_simplify_control(string mod_name, bool use_precondition_p)
 {
   statement mod_stmt;
 
@@ -1175,8 +1223,10 @@ bool simplify_control(string mod_name)
   set_proper_rw_effects((statement_effects)
       db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
 
-  set_precondition_map((statement_mapping)
-      db_get_memory_resource(DBR_PRECONDITIONS, mod_name, true));
+  if(use_precondition_p)
+    set_precondition_map((statement_mapping)
+			 db_get_memory_resource(DBR_PRECONDITIONS,
+						mod_name, true));
 
   set_cumulated_rw_effects((statement_effects)
       db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true));
@@ -1189,14 +1239,17 @@ bool simplify_control(string mod_name)
 		  statement_consistent_p(mod_stmt));
   }
 
-  module_to_value_mappings(get_current_module_entity());
+  // Necessary because of simplify_boolean_expression_with_precondition()
+  // if(use_precondition_p)
+    module_to_value_mappings(get_current_module_entity());
   initialize_dead_code_statistics();
   some_unstructured_ifs_have_been_changed = false;
   suppress_dead_code_statement(mod_stmt);
   if(!c_module_p(get_current_module_entity()))
     insure_return_as_last_statement(get_current_module_entity(), &mod_stmt);
   display_dead_code_statistics();
-  free_value_mappings();
+  // See above: if(use_precondition_p)
+    free_value_mappings();
   reset_cumulated_rw_effects();
 
   debug_off();
@@ -1210,9 +1263,11 @@ bool simplify_control(string mod_name)
 
   reset_current_module_statement();
   reset_current_module_entity();
-  reset_precondition_map();
+  if(use_precondition_p)
+    reset_precondition_map();
   reset_proper_rw_effects();
   ifdebug(1) {
+    if(use_precondition_p)
       free_value_mappings();
   }
 
@@ -1232,6 +1287,27 @@ bool simplify_control(string mod_name)
   return true;
 }
 
+/* Use preconditions to simplify control */
+bool simplify_control(string mod_name)
+{
+  get_statement_precondition = load_statement_precondition;
+  return generic_simplify_control(mod_name, true);
+}
+
+static transformer load_identity_precondition(statement s __attribute__ ((__unused__)))
+{
+  static transformer id = transformer_undefined;
+  if(transformer_undefined_p(id))
+    id = transformer_identity();
+  return id;
+}
+
+/* Do not use preconditions, only constant expressions */
+bool simplify_control_directly(string mod_name)
+{
+  get_statement_precondition = load_identity_precondition;
+  return generic_simplify_control(mod_name, false);
+}
 
 /*
  * Simply Control old alias
@@ -1247,7 +1323,7 @@ bool suppress_dead_code(string mod_name)
  * recursievly remove all labels from a module
  * only labels in unstructured are kept
  * @param module_name module considered
- * 
+ *
  * @return true (never fails)
  */
 bool
@@ -1255,7 +1331,7 @@ remove_useless_label(char* module_name)
 {
    /* Get the module ressource */
    entity module = module_name_to_entity( module_name );
-   statement module_statement = 
+   statement module_statement =
        (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
    set_current_module_entity( module );

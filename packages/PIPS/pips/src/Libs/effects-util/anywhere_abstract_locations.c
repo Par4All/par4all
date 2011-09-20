@@ -603,9 +603,10 @@ entity entity_locations_max(entity al1, entity al2)
     e = al1;
   }
   else {
-
-    if(entity_abstract_location_p(al1))
-      if(entity_abstract_location_p(al2)) {
+    bool al1_abstract_location_p = entity_abstract_location_p(al1);
+    bool al2_abstract_location_p = entity_abstract_location_p(al2);
+    if(al1_abstract_location_p )
+      if(al2_abstract_location_p ) {
 	/* Both al1 and al2 are abstract locations and they are
 	   different */
 	e = abstract_locations_max(al1, al2);
@@ -615,7 +616,7 @@ entity entity_locations_max(entity al1, entity al2)
 	e = abstract_locations_max(al1, al);
       }
     else
-      if(entity_abstract_location_p(al2)) {
+      if(al2_abstract_location_p) {
 	entity al = variable_to_abstract_location(al1);
 	e = abstract_locations_max(al, al2);
       }
@@ -754,7 +755,7 @@ entity entity_locations_dereference(entity al __attribute__ ((__unused__)))
   */
  bool abstract_locations_may_conflict_p(entity al1, entity al2)
  {
-   entity mal = entity_locations_max(al1, al2); // maximal abstraction location
+   entity mal = abstract_locations_max(al1, al2); // maximal abstraction location
    bool conflict_p = (mal==al1) || (mal==al2);
 
    return conflict_p;

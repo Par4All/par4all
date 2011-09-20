@@ -213,13 +213,13 @@ double distance(double X[2], double Y[2])
 // (0,10)
       SIMD_SINPD(vec20, vec30);
 // (0,11)
-      SIMD_STORE_V2DF(vec00, &pdata0[0]);
-// (0,12)
       SIMD_STORE_V2DF(vec20, &pdata1[0]);
+// (0,12)
+      SIMD_STORE_V2DF(vec00, &pdata0[0]);
 // (0,13)
-      SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
-// (0,14)
       SIMD_LOAD_GENERIC_V2DF(vec50, pdata0[0], pdata1[0]);
+// (0,14)
+      SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
 // (0,15)
       SIMD_MULPD(vec40, vec50, vec60);
 // (0,16)
@@ -257,13 +257,13 @@ double distance(double X[2], double Y[2])
 // (0,10)
       SIMD_SINPD(vec20, vec30);
 // (0,11)
-      SIMD_STORE_V2DF(vec00, &pdata0[0]);
-// (0,12)
       SIMD_STORE_V2DF(vec20, &pdata1[0]);
+// (0,12)
+      SIMD_STORE_V2DF(vec00, &pdata0[0]);
 // (0,13)
-      SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
-// (0,14)
       SIMD_LOAD_GENERIC_V2DF(vec50, pdata0[0], pdata1[0]);
+// (0,14)
+      SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
 // (0,15)
       SIMD_MULPD(vec40, vec50, vec60);
 // (0,16)
@@ -304,13 +304,13 @@ double distance(double X[2], double Y[2])
 // (0,10)
       SIMD_SINPD(vec20, vec30);
 // (0,11)
-      SIMD_STORE_V2DF(vec00, &pdata0[0]);
-// (0,12)
       SIMD_STORE_V2DF(vec20, &pdata1[0]);
+// (0,12)
+      SIMD_STORE_V2DF(vec00, &pdata0[0]);
 // (0,13)
-      SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
-// (0,14)
       SIMD_LOAD_GENERIC_V2DF(vec50, pdata0[0], pdata1[0]);
+// (0,14)
+      SIMD_LOAD_GENERIC_V2DF(vec60, pdata0[1], pdata1[1]);
 // (0,15)
       SIMD_MULPD(vec40, vec50, vec60);
 // (0,16)
