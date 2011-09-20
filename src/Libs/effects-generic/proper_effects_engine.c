@@ -1914,8 +1914,9 @@ proper_effects_of_call(call c)
 	     more statements than gcc, but control effects are not
 	     analyzed. Such statements can be created by program
 	     transformations. */
-	  pips_user_warning("Statement %d is ignored because it does not "
-			    "modify the store.\n", statement_number(current_stat));
+	  if (!declaration_statement_p(current_stat))
+	    pips_user_warning("Statement %d is ignored because it does not "
+			      "modify the store.\n", statement_number(current_stat));
 	  gen_full_free_list(l_proper);
 	  l_proper = NIL;
 	}
