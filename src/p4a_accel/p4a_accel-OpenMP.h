@@ -56,6 +56,8 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 */
 #define P4A_init_accel p4a_init_openmp_accel();
 
+void p4a_init_openmp_accel ();
+
 /** Release the hardware accelerator as OpenMP
 
     Nothing to do
