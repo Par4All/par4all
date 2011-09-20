@@ -483,14 +483,6 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 	  else // same entity, with indices
 	    conflict_p = variable_references_may_conflict_p( e1, ind1, ind2 );
 	}
-      else if (!user_effects_on_std_files_p
-	       && (std_file_entity_p(e1) || std_file_entity_p(e2)))
-	{
-	  if (!same_entity_p(e1, e2))
-	    conflict_p = false;
-	  else
-	    conflict_p = variable_references_may_conflict_p( e1, ind1, ind2 );
-	}
       else
 	{
 
@@ -552,6 +544,15 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 			{
 			  pips_debug(5, "no conflict because entities are formals\n");
 			  conflict_p = false;
+			}
+
+		      if (conflict_p && !user_effects_on_std_files_p
+			       && (std_file_entity_p(e1) || std_file_entity_p(e2)))
+			{
+			  if (!same_entity_p(e1, e2))
+			    conflict_p = false;
+			  else
+			    conflict_p = variable_references_may_conflict_p( e1, ind1, ind2 );
 			}
 
 		      /* should ALIASING_ACROSS_DATA_STRUCTURES be also tested here? */
