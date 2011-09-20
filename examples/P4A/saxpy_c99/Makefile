@@ -1,26 +1,10 @@
-CCFLAGS = -Wall --std=c99
+TARGET =  saxpy
 
-TARGETS =  saxpy-simple-seq saxpy-simple-cu saxpy-simple-omp saxpy-double-seq saxpy-double-cu saxpy-double-omp
 
-all : $(TARGETS)
+SOURCES= $(TARGET:=.c)
+P4A_CUDA_FLAGS=--c99
 
-%-simple-cu : %.c
-	p4a -C --c99 $< -o $@
+RUN_ARG?=8192
 
-%-simple-seq : %.c
-	gcc $(CCFLAGS) $<  -o $@
+include ../common.mk
 
-%-simple-omp : %.c
-	p4a -O $< -o $@
-
-%-double-cu : %.c
-	p4a -C --c99 -DUSE_DOUBLE $< -o $@
-
-%-double-seq : %.c
-	gcc $(CCFLAGS) -DUSE_DOUBLE $< -o $@
-
-%-double-omp : %.c
-	p4a -O -DUSE_DOUBLE $< -o $@
-
-clean:
-	@rm -rf $(TARGETS) *~ *.p4a.c
