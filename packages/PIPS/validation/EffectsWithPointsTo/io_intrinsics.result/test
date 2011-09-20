@@ -1286,12 +1286,9 @@ int main(char *fmt1, ...)
 
 	102 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	100 --> 105 with conflicts
 		from <stderr[0]-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
@@ -1300,21 +1297,16 @@ int main(char *fmt1, ...)
 		from <stderr[0]-R-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[2]-R-EXACT> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
 	100 --> 102 with conflicts
-		from <stderr[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[2]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stderr[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stderr-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[2]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	99 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	99 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1324,21 +1316,15 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	99 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	98 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	98 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1348,13 +1334,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	98 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	98 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1364,12 +1347,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	97 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	97 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1379,13 +1359,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	97 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	97 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1402,12 +1379,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	93 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	93 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1417,13 +1391,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	93 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	93 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1447,12 +1418,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	92 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	92 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1462,13 +1430,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	92 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	92 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1499,12 +1464,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	90 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	90 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1514,13 +1476,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	90 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	90 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1558,12 +1517,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	88 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	88 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1573,13 +1529,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	88 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	88 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1624,12 +1577,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	86 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	86 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1639,13 +1589,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	86 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	86 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1697,12 +1644,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	85 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	85 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1712,13 +1656,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	85 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	85 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1777,12 +1718,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	82 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	82 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1792,13 +1730,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	82 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	82 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1864,12 +1799,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	81 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	81 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1879,13 +1811,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	81 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	81 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -1957,294 +1886,222 @@ int main(char *fmt1, ...)
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	77 --> 102 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 99 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 98 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 97 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 93 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 92 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 90 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 88 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 86 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 85 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 82 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	77 --> 81 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 102 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 100 with conflicts
 		from <buf1[*]-W-MAY> to <buf1[*]-R-MAY>
 	76 --> 99 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 98 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 97 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 93 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 92 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 90 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 88 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 86 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 85 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 82 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 81 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <buf1[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	76 --> 77 with conflicts
 		from <buf1[*]-W-MAY> to <buf1[*]-R-MAY>
 	74 --> 102 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 99 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 98 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 97 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 93 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 92 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 90 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 88 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 86 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 85 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 82 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	74 --> 81 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -2256,111 +2113,87 @@ int main(char *fmt1, ...)
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 	73 --> 102 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 99 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 98 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 97 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 93 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 92 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 90 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 88 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 86 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 85 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 82 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 81 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <c-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	73 --> 76 with conflicts
@@ -2374,12 +2207,9 @@ int main(char *fmt1, ...)
 		from <c-W-EXACT> to <c-R-EXACT>
 	71 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	71 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -2389,13 +2219,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	71 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	71 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -2475,50 +2302,35 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	71 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	71 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	71 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	71 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	70 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	70 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -2528,13 +2340,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	70 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	70 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -2614,41 +2423,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	70 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	70 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	70 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	70 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	70 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -2659,12 +2456,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	69 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	69 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -2674,13 +2468,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	69 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	69 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -2760,41 +2551,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	69 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	69 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	69 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	69 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	69 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -2812,12 +2591,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	67 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	67 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -2827,13 +2603,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	67 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	67 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -2913,41 +2686,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	67 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	67 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	67 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	67 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	67 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -2972,12 +2733,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	66 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	66 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -2987,13 +2745,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	66 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	66 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -3073,41 +2828,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	66 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	66 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	66 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	66 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	66 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -3139,12 +2882,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	65 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	65 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -3154,13 +2894,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	65 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	65 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -3240,41 +2977,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	65 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	65 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	65 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	65 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	65 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -3313,12 +3038,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	64 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	64 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -3328,13 +3050,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	64 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	64 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -3414,41 +3133,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	64 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	64 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	64 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	64 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	64 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -4252,14 +3959,10 @@ int main(char *fmt1, ...)
 		from <vl-W-EXACT> to <vl-W-EXACT>
 		from <vl-W-EXACT> to <vl-R-EXACT>
 		from <vl-R-EXACT> to <vl-W-EXACT>
-	50 --> 105 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	50 --> 102 with conflicts
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	50 --> 100 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	50 --> 99 with conflicts
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
@@ -4304,15 +4007,9 @@ int main(char *fmt1, ...)
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	50 --> 77 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	50 --> 76 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
-	50 --> 74 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	50 --> 73 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	50 --> 71 with conflicts
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -4364,14 +4061,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
 	50 --> 52 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-	49 --> 105 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	49 --> 102 with conflicts
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	49 --> 100 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	49 --> 99 with conflicts
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
@@ -4416,15 +4109,9 @@ int main(char *fmt1, ...)
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	49 --> 77 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	49 --> 76 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
-	49 --> 74 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	49 --> 73 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	49 --> 71 with conflicts
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -4481,20 +4168,14 @@ int main(char *fmt1, ...)
 		from <*HEAP*_l_10[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*HEAP*_l_10[*]-W-MAY>
 	48 --> 105 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	48 --> 102 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	48 --> 100 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	48 --> 99 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
@@ -4540,30 +4221,18 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	48 --> 77 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	48 --> 76 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	48 --> 74 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	48 --> 73 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	48 --> 71 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -4717,121 +4386,97 @@ int main(char *fmt1, ...)
 		from <vl-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	44 --> 102 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 99 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 98 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 97 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 93 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 92 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 90 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 88 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 86 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 85 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 82 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 81 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -4851,71 +4496,57 @@ int main(char *fmt1, ...)
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 	44 --> 71 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 70 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 69 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 67 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 66 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 65 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	44 --> 64 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -4946,10 +4577,8 @@ int main(char *fmt1, ...)
 		from <vl-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	44 --> 48 with conflicts
 		from <vl-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <vl-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -5088,121 +4717,97 @@ int main(char *fmt1, ...)
 		from <vl-W-MAY> to <vl-R-EXACT>
 		from <vl-R-EXACT> to <vl-W-EXACT>
 	41 --> 102 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 99 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 98 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 97 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 93 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 92 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 90 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 88 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 86 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 85 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 82 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 81 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -5222,71 +4827,57 @@ int main(char *fmt1, ...)
 		from <stdin[0]-R-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 	41 --> 71 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 70 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 69 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 67 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 66 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 65 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	41 --> 64 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -5310,9 +4901,7 @@ int main(char *fmt1, ...)
 	41 --> 52 with conflicts
 		from <vl-R-EXACT> to <vl-W-EXACT>
 	41 --> 48 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <fmt1-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <_fmt1_1[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -5398,103 +4987,75 @@ int main(char *fmt1, ...)
 		from <vl-W-EXACT> to <vl-W-EXACT>
 		from <vl-W-EXACT> to <vl-R-EXACT>
 		from <vl-R-EXACT> to <vl-W-EXACT>
-	38 --> 105 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	38 --> 102 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	38 --> 100 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	38 --> 99 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 98 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 97 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 93 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 92 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 90 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 88 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 86 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 85 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 82 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 81 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -5505,9 +5066,7 @@ int main(char *fmt1, ...)
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	38 --> 76 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	38 --> 74 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
@@ -5516,63 +5075,47 @@ int main(char *fmt1, ...)
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	38 --> 73 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	38 --> 71 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 70 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 69 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 67 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 66 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 65 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 64 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -5601,8 +5144,6 @@ int main(char *fmt1, ...)
 	38 --> 49 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*HEAP*_l_10[*]-W-MAY>
 	38 --> 48 with conflicts
-		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	38 --> 45 with conflicts
@@ -5615,244 +5156,192 @@ int main(char *fmt1, ...)
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	38 --> 43 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
 	38 --> 42 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-MAY>
 	38 --> 41 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 	38 --> 40 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
 	37 --> 105 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 	37 --> 102 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 100 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 	37 --> 99 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 98 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 97 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 93 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 92 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 90 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 88 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 86 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 85 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 82 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 81 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 77 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 	37 --> 76 with conflicts
 		from <stdin[0]-W-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <stdin[0]-W-MAY> to <stdin[0]-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <stdin[0]-R-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 	37 --> 74 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 	37 --> 73 with conflicts
 		from <stdin[0]-W-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <stdin[0]-W-MAY> to <stdin[0]-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <stdin[0]-R-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 	37 --> 71 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 70 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 69 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 67 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 66 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 65 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 	37 --> 64 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -5901,10 +5390,8 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*HEAP*_l_10[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	37 --> 48 with conflicts
-		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i_name-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	37 --> 45 with conflicts
@@ -5912,9 +5399,7 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
 	37 --> 44 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
@@ -5928,11 +5413,9 @@ int main(char *fmt1, ...)
 		from <stdin[0]-W-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <stdin[0]-W-MAY> to <stdin[0]-R-MAY>
 		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
@@ -5942,8 +5425,6 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
 	37 --> 38 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	35 --> 102 with conflicts
@@ -6025,12 +5506,9 @@ int main(char *fmt1, ...)
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	34 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	34 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -6040,13 +5518,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	34 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	34 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -6126,41 +5601,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	34 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	34 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	34 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	34 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	34 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -6279,16 +5742,13 @@ int main(char *fmt1, ...)
 	34 --> 44 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	34 --> 43 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
@@ -6300,39 +5760,30 @@ int main(char *fmt1, ...)
 	34 --> 41 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 	34 --> 40 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
 	34 --> 38 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	34 --> 37 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i_name-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	34 --> 35 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-MAY>
@@ -6505,12 +5956,9 @@ int main(char *fmt1, ...)
 		from <vl-R-EXACT> to <vl-W-EXACT>
 	31 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	31 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -6520,13 +5968,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	31 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	31 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -6606,41 +6051,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	31 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	31 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	31 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	31 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	31 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -6759,16 +6192,13 @@ int main(char *fmt1, ...)
 	31 --> 44 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	31 --> 43 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
@@ -6780,39 +6210,30 @@ int main(char *fmt1, ...)
 	31 --> 41 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 	31 --> 40 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
 	31 --> 38 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	31 --> 37 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i_name-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	31 --> 35 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-MAY>
@@ -6923,12 +6344,9 @@ int main(char *fmt1, ...)
 		from <vl-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	28 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	28 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -6938,13 +6356,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	28 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	28 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -7024,41 +6439,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	28 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	28 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	28 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	28 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	28 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -7177,16 +6580,13 @@ int main(char *fmt1, ...)
 	28 --> 44 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	28 --> 43 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
@@ -7198,39 +6598,30 @@ int main(char *fmt1, ...)
 	28 --> 41 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 	28 --> 40 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
 	28 --> 38 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	28 --> 37 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i_name-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	28 --> 35 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-MAY>
@@ -7264,12 +6655,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
 	27 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	27 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -7279,13 +6667,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	27 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	27 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -7365,41 +6750,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	27 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	27 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	27 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	27 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	27 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -7518,16 +6891,13 @@ int main(char *fmt1, ...)
 	27 --> 44 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	27 --> 43 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
@@ -7539,39 +6909,30 @@ int main(char *fmt1, ...)
 	27 --> 41 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 	27 --> 40 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
 	27 --> 38 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	27 --> 37 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i_name-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	27 --> 35 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-MAY>
@@ -7612,12 +6973,9 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	26 --> 105 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	26 --> 102 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -7627,13 +6985,10 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	26 --> 100 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[2]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stderr-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[2]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stderr[0]-W-MAY>
 	26 --> 99 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -7713,41 +7068,29 @@ int main(char *fmt1, ...)
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	26 --> 77 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	26 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <buf1[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <buf1[*]-W-MAY>
 	26 --> 74 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	26 --> 73 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-W-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <c-W-EXACT>
 	26 --> 71 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
@@ -7866,16 +7209,13 @@ int main(char *fmt1, ...)
 	26 --> 44 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	26 --> 43 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
@@ -7887,39 +7227,30 @@ int main(char *fmt1, ...)
 	26 --> 41 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <fmt1-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_fmt1_1[*]-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 	26 --> 40 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <vl-W-EXACT>
 	26 --> 38 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
 	26 --> 37 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i_name-R-EXACT>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	26 --> 35 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <vl-W-MAY>

@@ -13,6 +13,10 @@ setproperty ACCEL_LOAD="load"
 setproperty ACCEL_STORE="store"
 apply DELAY_COMMUNICATIONS_INTER
 display PRINTED_FILE
+display PRINTED_FILE[main]
+apply DELAY_COMMUNICATIONS_INTER
+display PRINTED_FILE
+display PRINTED_FILE[main]
 
 apply UNSPLIT
 

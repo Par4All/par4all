@@ -151,9 +151,7 @@ int main()
  *********************** Use-Def Chains *********************
 
 	12 --> 13 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <x-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 	11 --> 12 with conflicts
 		from <z-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>

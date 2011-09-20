@@ -1,0 +1,50 @@
+#
+# Parsed printed file
+#
+void sequence04()
+{
+   int i = 4;
+   4>3?(void) 0:__assert_fail("4>3", "./sequence04.c", 12, (const char *) 0);
+
+   return;
+}
+#
+# Printed file
+#
+void sequence04()
+{
+   int i = 4;
+   4>3?(void) 0:__assert_fail("4>3", "./sequence04.c", 12, (const char *) 0);
+
+   return;
+}
+#
+# Cumulated effects
+#
+void sequence04()
+{
+//             <    is written>: i
+   int i = 4;
+   4>3?(void) 0:__assert_fail("4>3", "./sequence04.c", 12, (const char *) 0);
+
+   return;
+}
+#
+# simplify control
+#
+void sequence04()
+{
+   int i = 4;
+   (void) 0;
+
+   return;
+}
+#
+# simplify control a second time
+#
+void sequence04()
+{
+   int i = 4;
+
+   return;
+}
