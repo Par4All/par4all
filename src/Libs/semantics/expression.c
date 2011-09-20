@@ -2224,6 +2224,18 @@ integer_expression_to_transformer(
     reference r = syntax_reference(sexpr);
     tf = generic_reference_to_transformer(v, r, pre, is_internal);
   }
+  else if(syntax_cast_p(sexpr)) {
+    cast c = syntax_cast(sexpr);
+    type ct = cast_type(c);
+    expression cexp = cast_expression(c);
+    type cexpt = expression_to_type(cexp);
+    if (type_equal_p(ct, cexpt))
+      tf = integer_expression_to_transformer(v, cexp, pre, is_internal);
+    else
+      tf = transformer_undefined;
+    free_type(cexpt);
+
+  }
   else {
     /* vect_rm(ve); */
     tf = transformer_undefined;
