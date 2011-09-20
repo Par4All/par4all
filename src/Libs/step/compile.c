@@ -14,6 +14,7 @@ License.
 
 #include "effects-generic.h" // needed by effects-convex.h for descriptor
 #include "effects-convex.h" // for region
+#include "pipsmake.h" // for compilation_unit_of_module
 
 #include "semantics.h" // for expression_and_precondition_to_integer_interval
 #include "accel-util.h" // for outliner_patch_parameters, outliner_file, ...
@@ -38,7 +39,7 @@ static bool combinable_regions_p(region r1, region r2)
   return(same_var && same_act);
 }
 
-bool step_install(const char* __attribute__ ((unused)) program_name)
+bool step_install(__attribute__ ((unused)) const char* program_name)
 {
   debug_on("STEP_INSTALL_DEBUG_LEVEL");
 
@@ -1041,7 +1042,33 @@ bool step_compile(const char* module_name)
       string fsource_file;
       string source_file = db_get_memory_resource(is_fortran?DBR_INITIAL_FILE:DBR_C_SOURCE_FILE, module_name, true);
       assert(asprintf(&fsource_file,"%s/%s" , db_get_current_workspace_directory(), source_file)>=0);
+      pips_debug(1, "Copie from: %s\n", fsource_file);
       safe_copy(fsource_file, finit_name);
+
+      if(compilation_unit_p(module_name))
+	{
+	  safe_system(concatenate("echo '#include \"step_api.h\"' >>",finit_name,  NULL));
+	  pips_debug(1, "\tAdd prototype for STEP generated modules\n");
+	  gen_array_t modules = db_get_module_list_initial_order();
+	  int n = gen_array_nitems(modules), i;
+	  FILE *out = safe_fopen(finit_name, "a");
+	  for (i=0; i<n; i++)
+	    {
+	      string name = gen_array_item(modules, i);
+	      if (same_string_p((const char*)module_name, (const char*)compilation_unit_of_module(name)) &&
+		  !same_string_p(module_name, name) &&
+		  !step_analysed_module_p(name))
+		{
+		  statement stmt = make_plain_continue_statement();
+		  statement_declarations(stmt) = CONS(ENTITY, module_name_to_entity(name), NIL);
+		  text txt = text_statement(entity_undefined, 0, stmt, NIL);
+		  print_text(out, txt);
+		  free_text(txt);
+		  free_statement(stmt);
+		}
+	    }
+	  safe_fclose(out, finit_name);
+	}
     }
 
   DB_PUT_FILE_RESOURCE(DBR_STEP_FILE, module_name, finit_name);

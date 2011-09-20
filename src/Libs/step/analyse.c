@@ -163,7 +163,7 @@ void debug_print_effects_list(list l, string txt)
 }
 
 
-bool step_analyse_init(const char* __attribute__ ((unused)) module_name)
+bool step_analyse_init(__attribute__ ((unused)) const char* module_name)
 {
 
     DB_PUT_MEMORY_RESOURCE(DBR_STEP_COMM, "", make_step_comm(make_map_step_point(), make_map_effect_bool(), make_map_effect_bool()));
@@ -178,7 +178,7 @@ bool step_analyse_init(const char* __attribute__ ((unused)) module_name)
     free(srcpath);
 
     /* init intrinsics */
-    static struct intrin { 
+    static struct intrin {
         char * name;
         intrinsic_desc_t desc;
     } step_intrinsics [] = {
@@ -300,7 +300,7 @@ static list compute_send_regions(list write_l, list out_l)
 
   FOREACH(REGION, reg, send_l)
     {
-      if (io_effect_p(reg))
+      if (io_effect_p(reg)|| std_file_effect_p(reg))
 	pips_user_warning("STEP : possible IO concurrence\n");
       else
 	{
