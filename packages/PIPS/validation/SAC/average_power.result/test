@@ -344,8 +344,8 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             SIMD_MULPS(vec00_1, vec10_0, vec10_0);
             SIMD_STORE_V4SF(vec00_1, &pdata0[0]);
             SIMD_LOAD_V4SF(vec30_0, &ptrin[th0][rg][2+v0].re);
-            SIMD_LOAD_V4SF(vec40_0, &RED0[0]);
             SIMD_LOAD_V4SF(vec60_0, &RED0[4]);
+            SIMD_LOAD_V4SF(vec40_0, &RED0[0]);
             SIMD_MULPS(vec20_1, vec30_0, vec30_0);
             SIMD_SHUFFLE_V4SF(vec00_0, vec00_1, 1, 0, 3, 2);
             SIMD_ADDPS(vec40_0, vec00_0, vec40_0);
@@ -399,8 +399,8 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
             SIMD_LOAD_V4SF(vec10_0, &ptrin[th0][rg][v0].re);
             SIMD_MULPS(vec00_1, vec10_0, vec10_0);
             SIMD_LOAD_V4SF(vec30_0, &ptrin[th0][rg][2+v0].re);
-            SIMD_LOAD_V4SF(vec40_0, &RED0[0]);
             SIMD_LOAD_V4SF(vec60_0, &RED0[4]);
+            SIMD_LOAD_V4SF(vec40_0, &RED0[0]);
             SIMD_MULPS(vec20_1, vec30_0, vec30_0);
             SIMD_SHUFFLE_V4SF(vec00_0, vec00_1, 1, 0, 3, 2);
             SIMD_ADDPS(vec40_0, vec00_0, vec40_0);

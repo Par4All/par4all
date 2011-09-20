@@ -1,0 +1,41 @@
+#
+# Parsed printed file
+#
+void sequence06()
+{
+   int i = 4;
+   4<3?(void) 0:__assert_fail("4<3", "./sequence06.c", 9, (const char *) 0);
+
+   return;
+}
+#
+# Printed file
+#
+void sequence06()
+{
+   int i = 4;
+   4<3?(void) 0:__assert_fail("4<3", "./sequence06.c", 9, (const char *) 0);
+
+   return;
+}
+#
+# Cumulated effects
+#
+void sequence06()
+{
+//             <    is written>: i
+   int i = 4;
+   4<3?(void) 0:__assert_fail("4<3", "./sequence06.c", 9, (const char *) 0);
+
+   return;
+}
+#
+# simplify control
+#
+void sequence06()
+{
+   int i = 4;
+   __assert_fail("4<3", "./sequence06.c", 9, (const char *) 0);
+
+
+}

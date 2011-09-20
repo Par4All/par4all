@@ -153,10 +153,10 @@ void stencil8(t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1], int is
    t_real c10, c40, c_10;
    //SAC generated temporary array
    float aligned[4] = {0, 0, 0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0}, aligned2[4] = {0, 0, 0, 0}, aligned3[4] = {0, 0, 0, 0}, aligned4[4] = {0, 0, 0, 0}, aligned5[4] = {0, 0, 0, 0}, aligned6[4] = {0, 0, 0, 0}, aligned7[4] = {0, 0, 0, 0};
-   //PIPS generated variable
-   __m128 vec1, vec2, vec4, vec5, vec7, vec8, vec10, vec11, vec13, vec14, vec16, vec17, vec19, vec20, vec22, vec23, vec26, vec29, vec32, vec35, vec38, vec41, vec44, vec47, vec50, vec53, vec56, vec59, vec62, vec65, vec68, vec71, vec73, vec74, vec77, vec82, vec85, vec88, vec89, vec91, vec94, vec97, vec99, vec100;
    //SAC generated temporary array
    int aligned17[4] = {3, 3, 3, 3};
+   //PIPS generated variable
+   __m128 vec1, vec2, vec4, vec5, vec7, vec8, vec10, vec11, vec13, vec14, vec16, vec17, vec19, vec20, vec22, vec23, vec26, vec29, vec32, vec35, vec38, vec41, vec44, vec47, vec50, vec53, vec56, vec59, vec62, vec65, vec68, vec71, vec73, vec74, vec77, vec82, vec85, vec88, vec89, vec91, vec94, vec97, vec99, vec100;
    SIMD_LOAD_V4SI_TO_V4SF(vec52_0, &aligned17[0]);
    //SAC generated temporary array
    float aligned19[4] = {0, 0, 0, 0}, aligned20[4] = {0, 0, 0, 0}, aligned21[4] = {0, 0, 0, 0}, aligned22[4] = {0, 0, 0, 0}, aligned23[4] = {0, 0, 0, 0}, aligned24[4] = {0, 0, 0, 0}, aligned25[4] = {0, 0, 0, 0}, aligned26[4] = {0, 0, 0, 0}, aligned27[4] = {0, 0, 0, 0}, aligned28[4] = {0, 0, 0, 0};
@@ -166,9 +166,9 @@ void stencil8(t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1], int is
    aligned19[0] = c[0];
    aligned19[1] = c[1];
    aligned19[3] = c[2];
-   SIMD_LOAD_V4SF(vec55_0, &aligned19[0]);
-   SIMD_LOAD_GENERIC_V4SF(vec58_0, aligned19[1], aligned19[0], c_10, aligned19[3]);
    SIMD_LOAD_GENERIC_V4SF(vec61_0, aligned19[1], c10, c_10, aligned19[3]);
+   SIMD_LOAD_GENERIC_V4SF(vec58_0, aligned19[1], aligned19[0], c_10, aligned19[3]);
+   SIMD_LOAD_V4SF(vec55_0, &aligned19[0]);
    aligned23[2] = c[3];
    aligned7[0] = c[4];
    //  do i3=is3+L,ie3-L
@@ -178,10 +178,10 @@ void stencil8(t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1], int is
    aligned23[3] = c[7];
    aligned23[0] = c[6];
    aligned23[1] = c[5];
-   SIMD_LOAD_V4SF(vec64_0, &aligned23[0]);
-   SIMD_LOAD_GENERIC_V4SF(vec67_0, aligned23[0], aligned23[1], c40, aligned23[3]);
-   SIMD_LOAD_GENERIC_V4SF(vec70_0, aligned19[1], aligned19[0], aligned23[2], aligned19[3]);
    SIMD_LOAD_GENERIC_V4SF(vec76_0, aligned23[0], c40, aligned23[3], c40);
+   SIMD_LOAD_GENERIC_V4SF(vec70_0, aligned19[1], aligned19[0], aligned23[2], aligned19[3]);
+   SIMD_LOAD_GENERIC_V4SF(vec67_0, aligned23[0], aligned23[1], c40, aligned23[3]);
+   SIMD_LOAD_V4SF(vec64_0, &aligned23[0]);
    
    //do i1=is1+L,ie1-L
    
@@ -298,11 +298,11 @@ void stencil8(t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1], int is
    t_real c10, c40, c_10;
    //SAC generated temporary array
    float aligned[4] = {0, 0, 0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0}, aligned2[4] = {0, 0, 0, 0}, aligned3[4] = {0, 0, 0, 0}, aligned4[4] = {0, 0, 0, 0}, aligned5[4] = {0, 0, 0, 0}, aligned6[4] = {0, 0, 0, 0}, aligned7[4] = {0, 0, 0, 0};
-   //PIPS generated variable
-   __m128 vec1, vec2, vec4, vec5, vec7, vec8, vec10, vec11, vec13, vec14, vec16, vec17, vec19, vec20, vec22, vec23, vec26, vec29, vec32, vec35, vec38, vec41, vec44, vec47, vec50, vec53, vec56, vec59, vec62, vec65, vec68, vec71, vec73, vec74, vec77, vec82, vec85, vec88, vec89, vec91, vec94, vec97, vec99, vec100;
    //SAC generated temporary array
    int aligned17[4] = {3, 3, 3, 3};
    SIMD_LOAD_V4SI_TO_V4SF(vec52_0, &aligned17[0]);
+   //PIPS generated variable
+   __m128 vec1, vec2, vec4, vec5, vec7, vec8, vec10, vec11, vec13, vec14, vec16, vec17, vec19, vec20, vec22, vec23, vec26, vec29, vec32, vec35, vec38, vec41, vec44, vec47, vec50, vec53, vec56, vec59, vec62, vec65, vec68, vec71, vec73, vec74, vec77, vec82, vec85, vec88, vec89, vec91, vec94, vec97, vec99, vec100;
    //SAC generated temporary array
    float aligned19[4] = {0, 0, 0, 0}, aligned20[4] = {0, 0, 0, 0}, aligned21[4] = {0, 0, 0, 0}, aligned22[4] = {0, 0, 0, 0}, aligned23[4] = {0, 0, 0, 0}, aligned24[4] = {0, 0, 0, 0}, aligned25[4] = {0, 0, 0, 0}, aligned26[4] = {0, 0, 0, 0}, aligned27[4] = {0, 0, 0, 0}, aligned28[4] = {0, 0, 0, 0};
    //PIPS generated variable
@@ -443,11 +443,11 @@ void stencil8(t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1], int is
    t_real c10, c40, c_10;
    //SAC generated temporary array
    float aligned[4] = {0, 0, 0, 0}, aligned0[4] = {0, 0, 0, 0}, aligned1[4] = {0, 0, 0, 0}, aligned2[4] = {0, 0, 0, 0}, aligned3[4] = {0, 0, 0, 0}, aligned4[4] = {0, 0, 0, 0}, aligned5[4] = {0, 0, 0, 0}, aligned6[4] = {0, 0, 0, 0}, aligned7[4] = {0, 0, 0, 0};
-   //PIPS generated variable
-   __m128 vec1, vec2, vec4, vec5, vec7, vec8, vec10, vec11, vec13, vec14, vec16, vec17, vec19, vec20, vec22, vec23, vec26, vec29, vec32, vec35, vec38, vec41, vec44, vec47, vec50, vec53, vec56, vec59, vec62, vec65, vec68, vec71, vec73, vec74, vec77, vec82, vec85, vec88, vec89, vec91, vec94, vec97, vec99, vec100;
    //SAC generated temporary array
    int aligned17[4] = {3, 3, 3, 3};
    SIMD_LOAD_V4SI_TO_V4SF(vec52_0, &aligned17[0]);
+   //PIPS generated variable
+   __m128 vec1, vec2, vec4, vec5, vec7, vec8, vec10, vec11, vec13, vec14, vec16, vec17, vec19, vec20, vec22, vec23, vec26, vec29, vec32, vec35, vec38, vec41, vec44, vec47, vec50, vec53, vec56, vec59, vec62, vec65, vec68, vec71, vec73, vec74, vec77, vec82, vec85, vec88, vec89, vec91, vec94, vec97, vec99, vec100;
    //SAC generated temporary array
    float aligned19[4] = {0, 0, 0, 0}, aligned20[4] = {0, 0, 0, 0}, aligned21[4] = {0, 0, 0, 0}, aligned22[4] = {0, 0, 0, 0}, aligned23[4] = {0, 0, 0, 0}, aligned24[4] = {0, 0, 0, 0}, aligned25[4] = {0, 0, 0, 0}, aligned26[4] = {0, 0, 0, 0}, aligned27[4] = {0, 0, 0, 0}, aligned28[4] = {0, 0, 0, 0};
    //PIPS generated variable
@@ -456,9 +456,9 @@ void stencil8(t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1], int is
    aligned19[0] = c[0];
    aligned19[1] = c[1];
    aligned19[3] = c[2];
-   SIMD_LOAD_V4SF(vec55_0, &aligned19[0]);
-   SIMD_LOAD_GENERIC_V4SF(vec58_0, aligned19[1], aligned19[0], c_10, aligned19[3]);
    SIMD_LOAD_GENERIC_V4SF(vec61_0, aligned19[1], c10, c_10, aligned19[3]);
+   SIMD_LOAD_GENERIC_V4SF(vec58_0, aligned19[1], aligned19[0], c_10, aligned19[3]);
+   SIMD_LOAD_V4SF(vec55_0, &aligned19[0]);
    aligned23[2] = c[3];
    aligned7[0] = c[4];
    //  do i3=is3+L,ie3-L
@@ -468,10 +468,10 @@ void stencil8(t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1], int is
    aligned23[3] = c[7];
    aligned23[0] = c[6];
    aligned23[1] = c[5];
-   SIMD_LOAD_V4SF(vec64_0, &aligned23[0]);
-   SIMD_LOAD_GENERIC_V4SF(vec67_0, aligned23[0], aligned23[1], c40, aligned23[3]);
-   SIMD_LOAD_GENERIC_V4SF(vec70_0, aligned19[1], aligned19[0], aligned23[2], aligned19[3]);
    SIMD_LOAD_GENERIC_V4SF(vec76_0, aligned23[0], c40, aligned23[3], c40);
+   SIMD_LOAD_GENERIC_V4SF(vec70_0, aligned19[1], aligned19[0], aligned23[2], aligned19[3]);
+   SIMD_LOAD_GENERIC_V4SF(vec67_0, aligned23[0], aligned23[1], c40, aligned23[3]);
+   SIMD_LOAD_V4SF(vec64_0, &aligned23[0]);
    
    //do i1=is1+L,ie1-L
    

@@ -97,9 +97,7 @@ int main()
  *********************** Use-Def Chains *********************
 
 	07 --> 08 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <x-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 	06 --> 07 with conflicts
 		from <y-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>

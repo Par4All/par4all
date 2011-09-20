@@ -1,0 +1,64 @@
+#
+# Parsed printed file
+#
+void loop03()
+{
+   int i = 0;
+
+   for (i = 0;i<1;i++)
+      /* This loop is executed exactly once */
+      printf("%d\n", i);
+
+   return;
+}
+#
+# Printed file
+#
+void loop03()
+{
+   int i = 0;
+
+   for(i = 0; i <= 0; i += 1)
+      /* This loop is executed exactly once */
+      printf("%d\n", i);
+
+   return;
+}
+#
+# Cumulated effects
+#
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+void loop03()
+{
+//             <    is written>: i
+   int i = 0;
+//             <may be read   >: i stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: i
+
+   for(i = 0; i <= 0; i += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      /* This loop is executed exactly once */
+      printf("%d\n", i);
+
+   return;
+}
+#
+# simplify control
+#
+void loop03()
+{
+   int i = 0;
+
+   i = 0;
+   /* This loop is executed exactly once */
+   printf("%d\n", i);
+   i = 0+1;
+
+   return;
+}
