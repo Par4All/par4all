@@ -53,9 +53,26 @@
   stores, so it cannot be assumed that a[i] and a[i] represent the
   same memory location.
 
-
  */
 
+
+/* Properties settings for conflict testing functions */
+/* These settings are done for performance reasons, especially in chains */
+/* initial values are current default values */
+static bool constant_path_effects_p = true;
+static bool user_effects_on_std_files_p = false;
+static bool aliasing_across_types_p = true;
+static bool aliasing_across_formal_parameters_p = false;
+
+void set_conflict_testing_properties()
+{
+  bool get_bool_property( string );
+  constant_path_effects_p = get_bool_property("CONSTANT_PATH_EFFECTS");
+  aliasing_across_types_p = get_bool_property( "ALIASING_ACROSS_TYPES" );
+  aliasing_across_formal_parameters_p =
+    get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" );
+  user_effects_on_std_files_p = get_bool_property("USER_EFFECTS_ON_STD_FILES");
+}
 
 /* Intersection tests */
 
@@ -503,29 +520,39 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 		  // CONSTANT_PATH_EFFECTS is set to FALSE, effects may be erroneous.
 		  // so we need this to avoid over-optimistic program transformations
 
-		  if (get_bool_property("CONSTANT_PATH_EFFECTS"))
+		  if (constant_path_effects_p)
 		    {
 		      conflict_p = false;
 		    }
 		  else
 		    {
-		      type t1 = cell_reference_to_type( r1 );
-		      type t2 = cell_reference_to_type( r2 );
+		      bool t1_to_be_freed = false, t2_to_be_freed = false;
+		      type t1 = cell_reference_to_type( r1, &t1_to_be_freed );
+		      type t2 = cell_reference_to_type( r2, &t2_to_be_freed  );
 
-		      if ( conflict_p && !get_bool_property( "ALIASING_ACROSS_TYPES" )
+		      if ( conflict_p && !aliasing_across_types_p
 			   && !type_equal_p(t1, t2) )
 			{
 			  pips_debug(5, "no conflict because types are not equal\n");
 			  conflict_p = false; /* well type_equal_p does not perform a good job :-( BC*/
 			}
-		      free_type(t1);
-		      free_type(t2);
+		      if (t1_to_be_freed) free_type(t1);
+		      if (t2_to_be_freed) free_type(t2);
 
-		      if ( conflict_p && !get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" )
+		      if ( conflict_p && !aliasing_across_formal_parameters_p
 				&& entity_formal_p(e1) && entity_formal_p(e2) )
 			{
 			  pips_debug(5, "no conflict because entities are formals\n");
 			  conflict_p = false;
+			}
+
+		      if (conflict_p && !user_effects_on_std_files_p
+			       && (std_file_entity_p(e1) || std_file_entity_p(e2)))
+			{
+			  if (!same_entity_p(e1, e2))
+			    conflict_p = false;
+			  else
+			    conflict_p = variable_references_may_conflict_p( e1, ind1, ind2 );
 			}
 
 		      /* should ALIASING_ACROSS_DATA_STRUCTURES be also tested here? */

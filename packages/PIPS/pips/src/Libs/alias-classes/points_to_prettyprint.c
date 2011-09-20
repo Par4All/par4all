@@ -212,7 +212,7 @@ list words_points_to(points_to pt)
   pips_assert("approximation is not must\n", !approximation_exact_p(ap));
 
   w= gen_nconc(w, effect_words_reference(source_ref));
-  w = CHAIN_SWORD(w," -> &");
+  w = CHAIN_SWORD(w," -> ");
   w= gen_nconc(w, effect_words_reference(sink_ref));
   w = CHAIN_SWORD(w, approximation_may_p(ap) ? " (may)" : " (exact)" );
   return (w);
@@ -281,7 +281,7 @@ text text_points_to_relation(points_to pt_to)
   FOREACH(STRING, s, ls) {append(s);}
   gen_free_string_list(ls); ls = NIL;
 
-  append(" -> &");
+  append(" -> ");
 
   ls = effect_words_reference(sink_r);
   /* if (points_to_second_address_of_p(pt_to)) */
@@ -384,3 +384,4 @@ text text_pt_to(entity __attribute__ ((unused)) module_name, int __attribute__ (
   return(text_points_to_relations(l_pt_to, "Points To:"));
 
 }
+

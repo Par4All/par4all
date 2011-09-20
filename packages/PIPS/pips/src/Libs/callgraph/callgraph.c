@@ -516,6 +516,7 @@ bool callgraph(string name)
 	pips_user_warning("no source file for module %s, let's try so synthesize code\n",
 			  module_called);
 	reset_pips_current_computation();
+	entity_basic_concrete_types_reset();
 	/* set_pips_current_computation(DBR_CALLEES, module_called); */
 	/* push_pips_current_computation(DBR_CALLEES, module_called); */
 	if(rmake(DBR_CALLEES, module_called)) {
@@ -542,11 +543,13 @@ bool callgraph(string name)
 	    pips_user_error("Provide or let PIPS synthesize source code for module %s\n",
 	    module_called);*/
 	  set_pips_current_computation(BUILDER_CALLGRAPH, name);
+	  entity_basic_concrete_types_init();
 	  return false;
 	}
 	/* pop_pips_current_computation(DBR_CALLEES, module_called); */
 	/* reset_pips_current_computation(); */
 	set_pips_current_computation(BUILDER_CALLGRAPH, name);
+	entity_basic_concrete_types_init();
       }
 
       c = (callees) hash_get(module_callers, (void *) module_called);

@@ -254,8 +254,6 @@ void activate_language(language l)
       activate("PARSER");
     if(!active_phase_p("FORTRAN_SYMBOL_TABLE"))
       activate("FORTRAN_SYMBOL_TABLE");
-    if(!active_phase_p("DIRECTIVE_FILTER"))
-      activate("DIRECTIVE_FILTER");
   } else if(language_fortran95_p(l)) {
     /* Usual properties for Fortran 90/95 */
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", false);
@@ -277,8 +275,6 @@ void activate_language(language l)
       activate("C_PARSER");
     if(!active_phase_p("C_SYMBOL_TABLE"))
       activate("C_SYMBOL_TABLE");
-    if(!active_phase_p("DIRECTIVE_FILTER_C"))
-      activate("DIRECTIVE_FILTER_C");
   }
   else {
     /* The language is unknown*/

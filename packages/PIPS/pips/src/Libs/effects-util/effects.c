@@ -362,16 +362,20 @@ bool io_effects_p(list effects)
     return false;
 }
 
+bool std_file_entity_p(entity e)
+{
+ const char * s = entity_user_name(e);
+  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
+}
+
 bool std_file_effect_p(effect e)
 {
-  const char * s = entity_user_name(effect_entity(e));
-  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
+  return(std_file_entity_p(effect_entity(e)));
 }
 
 bool std_file_cell_p(cell c)
 {
-  const char * s = entity_user_name(cell_entity(c));
-  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
+  return(std_file_entity_p(cell_entity(c)));
 }
 
 bool std_file_effects_p(list effects)
@@ -384,7 +388,7 @@ bool std_file_effects_p(list effects)
 bool FILE_star_effect_reference_p(reference ref)
 {
   bool res = false;
-  type t = basic_concrete_type(entity_type(reference_variable(ref)));
+  type t = entity_basic_concrete_type(reference_variable(ref));
   pips_debug(8, "begin with type %s\n",
 	     words_to_string(words_type(t,NIL,false)));
   if (type_variable_p(t))
@@ -408,8 +412,6 @@ bool FILE_star_effect_reference_p(reference ref)
 	}
     }
   pips_debug(8, "end with : %s\n", res? "true":"false");
-  free_type(t);
-
   return res;
 }
 

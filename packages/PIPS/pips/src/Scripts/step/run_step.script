@@ -12,56 +12,14 @@ script=$(basename $0);
 usage()
 {
   cat >&2 <<-END
-	
 	$script is the STEP driver in front of pips.
-	
-	Usage: $script file.tpips
-	   As: tpips file.tpips
 
-	Usage: $script [options] destination file_1.f [file_n.f]
-	   Move file_1.f [file_n.f] in destination
-	   Create a .tpips file in destination with moved files as source
-	   Execute the genereted .tpips file
-
-	Usage: $script [options] file_1.f [file_n.f]";
-	   As: $script [options] file_1 file_1.f [file_n.f]"
-
-
-	OPTIONS:
-            -i file: include file
-	    -g generatedpath: path of the generated source files
-	    -c: clean database
-	    -f: if destination exist force remove
-            -s file: name of stubs files (without the extension suffix)
-            -d destinationpath: path of PIPS database
-            -v: verbose
-            -t transformation: default transformation OMP, MPI or HYBRID (default HYBRID)
-            -u: un-optimized communications (no partial communications)
+	Usage: $script file_1 [file_n]";
 
 	END
   exit ${1:-1}
 }
 
-OPTIMIZED=TRUE
-
-# options
-while getopts i:g:cfs:d:vt:r:u OPT
-do
-  case $OPT in
-    i) INCLUDE=$OPTARG;;
-    g) PATH_GENERATED_FILE=$OPTARG;;
-    c) CLEAN_DATABASE="clean" ;;
-    f) FORCE="force" ;;
-    s) STUBS="$STUBS $OPTARG";;
-    d) destination=$OPTARG;;
-    v) VERBOSE="verbose";;
-    t) TRANSFORMATION=$OPTARG;;
-    r) RUNTIME=$OPTARG;;
-    u) OPTIMIZED=FALSE;;
-    *) usage 4
-  esac
-done
-shift `expr $OPTIND - 1`
 
 if [ $# -lt 1 ]
 then
@@ -72,128 +30,70 @@ fi
 arg1=$1;
 extension=${arg1#${arg1%.*}};
 case $extension in
-    .tpips)
-	tpips $1;
-	exit $?;
-	;;
     .f)
 	workspace=$(basename $1 .f);
 	;;
+    .c)
+	workspace=$(basename $1 .c);
+	;;
     *)
-	workspace=$(basename $1);
-	shift;
+	exit 1;
 	;;
 esac
 
-if [ -n "$RUNTIME" ]
-then RUNTIME="setproperty STEP_RUNTIME \""$RUNTIME"\"";
-fi
-
-if [ -z "$TRANSFORMATION" ]
-then TRANSFORMATION="HYBRID";
-fi
-
-if [ -z "$destination" ]
-then destination=$workspace;
-fi
+destination=$workspace;
 
 if [ -e $destination ]
-then 
-    if [ -n "$FORCE" ]
-    then
-	rm -rf $destination;
-    else
-	echo Destination : $destination;
-	read -p "Remove $destination ? [y/n] : " -n 1 rep ;
-	if [ $rep != "y" ]; then echo ;echo "Abandon";
-	    exit 1;
-	fi
-	rm -rf $destination;
-    fi
+then
+    rm -rf $destination;
 fi
 
 mkdir -p $destination/Source;
 
-#Stubs handling
-if [ -n "$STUBS" ]
-then
-    echo "Stubs handling"
-    for f in $STUBS
-    do
-	echo $f;
-	stub=$f".stubs.f"
-	echo "cp $stub $destination/Source/;"
-	cp $stub $destination/Source/;
-	f=$f".f"
-	echo "cp $f $destination/Source/;"
-	cp $f $destination/Source/;
-	f=$f"ix"
-	echo "cp $f $destination/Source/;"
-	cp $f $destination/Source/;
-	
-	source_files="$source_files ./Source/$(basename $stub)";
-    done
-fi
-
 #Source file copy
-for i in $INCLUDE;
-do
-    cp $i $destination;
-done
 for f in $*
 do
     cp $f $destination/Source/;
     source_files="$source_files ./Source/$(basename $f)";
 done
 
-if [ -z "$PATH_GENERATED_FILE" ]
-then
-    PATH_GENERATED_FILE=$workspace.database/Src/
-fi
-
-
 
 #tpips file generation
 tpips_file=$destination/$workspace.tpips;
 cat >$tpips_file <<EOF
+
 delete $workspace
 create $workspace $source_files
+
+setproperty PRAGMA_TYPE "str"
+
+activate NEW_CONTROLIZER
+
+setproperty STEP_DEFAULT_TRANSFORMATION "HYBRIDE"
+#setproperty STEP_DEFAULT_TRANSFORMATION "MPI"
+#setproperty STEP_DEFAULT_TRANSFORMATION "OMP"
+
+setenv STEP_PARSER_DEBUG_LEVEL 0
+apply STEP_PARSER[%ALL]
+
 activate MUST_REGIONS
 activate INTRAPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FULL
 
-setproperty CHAINS_DATAFLOW_DEPENDENCE_ONLY FALSE
 activate REGION_CHAINS
+setenv STEP_ANALYSE_DEBUG_LEVEL 1
+apply STEP_ANALYSE[%MAIN]
 
-setproperty COMPUTE_ALL_DEPENDENCES TRUE
-activate RICE_REGIONS_DEPENDENCE_GRAPH
+checkpoint
 
-setproperty STEP_DEFAULT_TRANSFORMATION "$TRANSFORMATION"
-$RUNTIME
-apply STEP_DIRECTIVES[%ALL]
-apply STEP_ANALYSE[%ALL]
-apply STEP_ANALYSE_COM2[%MAIN]
-setproperty STEP_OPTIMIZED_COMMUNICATIONS $OPTIMIZED
-apply STEP_COMPILE[%MAIN]
-setproperty STEP_INSTALL_PATH "$PATH_GENERATED_FILE"
-apply STEP_INSTALL
+setenv STEP_COMPILE_DEBUG_LEVEL 0
+apply STEP_COMPILE[%ALLFUNC]
+
+setenv STEP_INSTALL_DEBUG_LEVEL 0
+setproperty STEP_INSTALL_PATH ""
+apply STEP_INSTALL[%MAIN]
+
 close
-EOF
-
-if [ -n "$STUBS" ]
-then
-    for f in $STUBS
-    do
-	f=$(basename $f)
-	cat >>$tpips_file <<EOF
-!rm ./$workspace.database/Src/$f.stubs.f
-!cd ./Source && cp $f.f ../$workspace.database/Src/
-!bash ./Source/$f.fix ./$workspace.database/Src/
-
-EOF
-    done
-fi
-cat >>$tpips_file <<EOF
 quit
 EOF
 #end tpips file generation
@@ -201,18 +101,4 @@ EOF
 
 #tpips run
 cd $destination;
-if [ -n "$VERBOSE" ]
-then
-    tpips $workspace.tpips
-else
-    tpips $workspace.tpips &> /dev/null
-fi
-
-#clean
-if [ -n "$CLEAN_DATABASE" ]
-then
-    rm -rf $workspace.database;
-fi
-
-echo;echo;echo "Source files copied in : $destination/Source/";
-echo "Generated source files : $destination/$PATH_GENERATED_FILE"
+tpips $workspace.tpips

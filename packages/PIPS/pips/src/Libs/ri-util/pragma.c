@@ -42,9 +42,6 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "text-util.h"
-#include "outlining_private.h"
-#include "step_private.h"
-#include "step.h"
 #include "properties.h"
 
 //***********************************************************Local constant
@@ -410,13 +407,12 @@ list pragma_omp_merge_expr (list l_pragma) {
 string close_pragma(pragma p) {
   string result = string_undefined;
   if(prettyprint_language_is_fortran_p()) {
-    if(pragma_entity_p (p))
-      result = directive_to_string(load_global_directives(pragma_entity(p)),
-                                   true);
-    else
+    /* STEP -> les pragma ne sont pas toujours fermés par des "omp end parallel do"
+
       result = strdup(concatenate(FORTRAN_PRAGMA_HEADER,
                                   "omp end parallel do",
                                   NULL));
+    */
   }
   return result;
 }
@@ -472,10 +468,6 @@ pragma_to_string (pragma p) {
       string_buffer_free_all(&sb);
       // restore the list as it was at the begining
       gen_nreverse(l_expr);
-      break;
-    case is_pragma_entity:
-      return directive_to_string(load_global_directives(pragma_entity(p)),
-                                 false);
       break;
     default:
       pips_internal_error("Unknown pragama type");
@@ -575,17 +567,4 @@ add_expr_to_pragma_expr_list (pragma pr, expression ex) {
   pips_debug(5, "after: %s", str);
   free (str);
   return;
-}
-
-void add_pragma_entity_to_statement(statement st, entity en)
-{
-  extensions es = statement_extensions(st);
-  /* Make a new pragma: */
-  pragma p = pragma_undefined;
-  p = make_pragma_entity(en);
-  extension e = make_extension(p);
-  /* Add the new pragma to the extension list: */
-  list el = extensions_extension(es);
-  el = gen_extension_cons(e, el);
-  extensions_extension(es) = el;
 }

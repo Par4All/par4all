@@ -78,7 +78,19 @@ typedef struct
   composedRegion receiveRegions;   
   composedRegion sendRegions;      
   bool interlaced_p;        // true if send regions are interlaced
+  Array pending_alltoall;       // alltoall requests that have not been processed yet
 }Descriptor_shared;
+
+
+typedef struct
+{
+  Descriptor_shared *desc_shared;
+  Descriptor_userArray *desc_userArray;
+  bool full_p;
+  uint32_t algorithm;
+  uint32_t tag;
+}Alltoall_descriptor;
+
 
 typedef struct
 {

@@ -1,39 +1,51 @@
 
 TARGET	= step
 
-LIB_CFILES=	step.c \
-		atomizer.c \
-		outlining.c \
-		directives.c \
-		directive_parallel.c \
-		directive_do.c \
-		directive_section.c \
-		directive_reduction.c \
-		directive_master.c \
-		directive_critical.c \
-		directive_barrier.c \
-		directive_private.c \
-		directive_transformation.c \
-		analyse.c \
-		compile_region.c \
-		compile.c \
-		compile_RT.c \
-		compile_parallel.c \
-		compile_do.c \
-		compile_reduction.c \
-		compile_master.c \
-		compile_critical.c \
-		compile_barrier.c \
-		compile_private.c \
-		compile_share.c 
-
-INC_TARGET =    $(TARGET).h
+PARSER_COMMENT = comment2pragma
+PARSER_OMP = step_omp
 
 INSTALL_INC = STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h
 
+DERIVED_HEADERS = $(INSTALL_INC) $(PARSER_COMMENT).h $(PARSER_OMP).h ../../Runtimes/step/c/STEP.h
+DERIVED_CFILES	= $(PARSER_COMMENT).c $(PARSER_OMP).c
+
+INC_CFILES=	directives.c \
+		analyse.c \
+		compile_RT.c \
+		compile.c
+
+LIB_CFILES = $(DERIVED_CFILES) $(INC_CFILES)
+
+INC_TARGET =    $(TARGET).h
+
 LIB_TARGET =    lib$(TARGET).a
+
 
 # common stuff
 ROOT    = ../../..
 PROJECT = pips
 include $(ROOT)/makes/main.mk
+
+# local stuff
+$(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
+
+clean: local-clean
+
+local-clean:
+	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) step_api.tmp steprt_f.h
+
+$(PARSER_COMMENT).c: $(PARSER_COMMENT).l
+	$(FLEX) $(LFLAGS) --prefix=$(PARSER_COMMENT)_ --header-file=$(PARSER_COMMENT).h -DYY_NO_INPUT -DIN_PIPS --outfile=`pwd`/$@ `pwd`/$^
+
+$(PARSER_COMMENT).h: $(PARSER_COMMENT).c
+
+$(PARSER_OMP).c: $(PARSER_OMP).l
+	$(FLEX) $(LFLAGS) --prefix=$(PARSER_OMP)_ --header-file=$(PARSER_OMP).h -DYY_NO_INPUT --outfile=`pwd`/$@ `pwd`/$^
+
+$(PARSER_OMP).h: $(PARSER_OMP).c
+
+srcdir=.
+include stepstuff.mk
+
+../../Runtimes/step/c/STEP.h:
+	$(MAKE) -C ../../Runtimes/step/c STEP.h

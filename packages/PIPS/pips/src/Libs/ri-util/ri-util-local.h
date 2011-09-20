@@ -699,10 +699,10 @@
 #define SQRTL_OPERATOR_NAME                "sqrtl"
 #define ERF_OPERATOR_NAME                  "erf"
 #define ERFF_OPERATOR_NAME                 "erff"
-#define ERFL_OPERATOR_NAME                 "erff"
+#define ERFL_OPERATOR_NAME                 "erfl"
 #define ERFC_OPERATOR_NAME                 "erfc"
 #define ERFCF_OPERATOR_NAME                "erfcf"
-#define ERFCL_OPERATOR_NAME                "erfcf"
+#define ERFCL_OPERATOR_NAME                "erfcl"
 #define GAMMA_OPERATOR_NAME                "gamma"
 #define LGAMMA_OPERATOR_NAME               "lgamma"
 #define LGAMMAF_OPERATOR_NAME              "lgammaf"
@@ -897,7 +897,7 @@
 #define ATOL_FUNCTION_NAME              "atol"
 #define ATOLL_FUNCTION_NAME             "atoll"
 #define STRTOD_FUNCTION_NAME            "strtod"
-#define STRTOF_FUNCTION_NAME            "strtod"
+#define STRTOF_FUNCTION_NAME            "strtof"
 #define STRTOL_FUNCTION_NAME            "strtol"
 #define STRTOLL_FUNCTION_NAME           "strtoll"
 #define STRTOUL_FUNCTION_NAME           "strtoul"
@@ -2158,3 +2158,9 @@ typedef enum {
   AND_IF_POLICY,
   OR_IF_POLICY
 } if_clause_policy;
+
+/* for intrinsic registration */
+typedef struct {
+    list (*f)(call,int,bool,list);
+    int prec;
+} intrinsic_desc_t;

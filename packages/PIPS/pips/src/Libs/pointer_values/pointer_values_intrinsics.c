@@ -1814,7 +1814,8 @@ static void safe_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
 
       FOREACH(EFFECT, eff, lw)
 	{
-	  type t = cell_to_type(effect_cell(eff));
+	  bool to_be_freed = false;
+	  type t = cell_to_type(effect_cell(eff), &to_be_freed);
 	  if (pointer_type_p(t))
 	    {
 	      single_pointer_assignment_to_post_pv(eff,
@@ -1828,6 +1829,7 @@ static void safe_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
 		}
 	      free_pv_results_paths(pv_res);
 	    }
+	  if (to_be_freed) free_type(t);
 	}
       pv_res->l_out = l_in_cur;
     }

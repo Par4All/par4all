@@ -95,12 +95,13 @@ static bool catch_user_error(bool (*f)(const char *), const char* rname, const c
     TRY
     {
       set_pips_current_computation(rname, oname);
+      entity_basic_concrete_types_init();
       success = (*f)(oname);
       UNCATCH(any_exception_error);
     }
 
     reset_pips_current_computation();
-
+    entity_basic_concrete_types_reset();
     return success;
 }
 

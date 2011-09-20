@@ -188,12 +188,38 @@ static void outliner_smart_replacment(statement in, entity old, entity new,size_
     gen_context_recurse(in,&ctxt,reference_domain,gen_true,do_outliner_smart_replacment);
 }
 
+static list statements_referenced_entities(list statements)
+{
+    list referenced_entities = NIL;
+    set sreferenced_entities = set_make(set_pointer);
+
+    FOREACH(STATEMENT, s, statements)
+    {
+        set tmp = get_referenced_entities(s);
+        ifdebug(7) {
+          pips_debug(0,"Statement :");
+          print_statement(s);
+          pips_debug(0,"referenced entities :");
+          print_entities(set_to_list(tmp));
+          fprintf(stderr,"\n");
+        }
+
+        set_union(sreferenced_entities,tmp,sreferenced_entities);
+        set_free(tmp);
+    }
+    /* set to list */
+    referenced_entities=set_to_list(sreferenced_entities);
+    set_free(sreferenced_entities);
+    return referenced_entities;
+}
 /**
  * purge the list of referenced entities by replacing calls to a[i][j] where i is a constant in statements
  * outlined_statements by a call to a single (new) variable
  */
-static hash_table outliner_smart_references_computation(list referenced_entities, list outlined_statements,entity new_module, statement new_body)
+static hash_table outliner_smart_references_computation(list outlined_statements,entity new_module)
 {
+  list referenced_entities = statements_referenced_entities(outlined_statements);
+
     /* this will hold new referenced_entities list */
     hash_table entity_to_init = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
     /* first check candidates, that is array entities accessed by a constant index */
@@ -315,6 +341,8 @@ static hash_table outliner_smart_references_computation(list referenced_entities
             }
         }
     }
+    gen_free_list(referenced_entities);
+
     return entity_to_init;
 }
 static list statements_localize_declarations(list statements,entity module,statement module_statement)
@@ -338,30 +366,6 @@ static list statements_localize_declarations(list statements,entity module,state
     }
     gen_free_list(sd);
     return localized;
-}
-static list statements_referenced_entities(list statements)
-{
-    list referenced_entities = NIL;
-    set sreferenced_entities = set_make(set_pointer);
-
-    FOREACH(STATEMENT, s, statements)
-    {
-        set tmp = get_referenced_entities(s);
-        ifdebug(7) {
-          pips_debug(0,"Statement :");
-          print_statement(s);
-          pips_debug(0,"referenced entities :");
-          print_entities(set_to_list(tmp));
-          fprintf(stderr,"\n");
-        }
-
-        set_union(sreferenced_entities,tmp,sreferenced_entities);
-        set_free(tmp);
-    }
-    /* set to list */
-    referenced_entities=set_to_list(sreferenced_entities);
-    set_free(sreferenced_entities);
-    return referenced_entities;
 }
 static void outliner_extract_loop_bound(statement sloop, hash_table entity_to_effective_parameter)
 {
@@ -456,57 +460,23 @@ static void outline_remove_duplicates(list *entities) {
     gen_free_list(tentities);
 }
 
-/**
- * outline the statements in statements_to_outline into a module named outline_module_name
- * the outlined statements are replaced by a call to the newly generated module
- * statements_to_outline is modified in place to represent that call
- *
- * @param outline_module_name name of the new module
-
- * @param statements_to_outline is a list of consecutive statements to
- * outline into outline_module_name
- *
- * @return pointer to the newly generated statement (already inserted in statements_to_outline)
- */
-statement outliner(const char* outline_module_name, list statements_to_outline)
+hash_table outliner_init(entity new_fun, list statements_to_outline)
 {
-    pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
-    entity new_fun = make_empty_subroutine(outline_module_name,copy_language(module_language(get_current_module_entity())));
-    /* D.K
-      add return to the new body
-    */
-    statement new_body = make_block_statement(statements_to_outline);
+  /* try to be smart concerning array references */
+  if(get_bool_property("OUTLINE_SMART_REFERENCE_COMPUTATION"))
+    return outliner_smart_references_computation(statements_to_outline, new_fun);
+  else
+    return hash_table_make(hash_pointer,1);
+}
 
-
+list outliner_scan(entity new_fun, list statements_to_outline, statement new_body)
+{
     /* Retrieve referenced entities */
     list referenced_entities = statements_referenced_entities(statements_to_outline);
 
     ifdebug(5) {
       pips_debug(0,"Referenced entities :\n");
       print_entities(referenced_entities);
-    }
-
-    /* try to be smart concerning array references */
-    hash_table entity_to_effective_parameter = hash_table_undefined;
-    if(get_bool_property("OUTLINE_SMART_REFERENCE_COMPUTATION"))
-    {
-        entity_to_effective_parameter = outliner_smart_references_computation(referenced_entities,statements_to_outline,new_fun,new_body);
-        /*and recompute referenced entities*/
-        gen_free_list(referenced_entities);
-        referenced_entities = statements_referenced_entities(statements_to_outline);
-    }
-    else
-        entity_to_effective_parameter = hash_table_make(hash_pointer,1);
-
-    /* pass loop bounds as parameters if required */
-    const char* loop_label = get_string_property("OUTLINE_LOOP_BOUND_AS_PARAMETER");
-    statement theloop = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),loop_label);
-    if(!statement_undefined_p(theloop) && statement_loop(theloop))
-    {
-        outliner_extract_loop_bound(theloop,entity_to_effective_parameter);
-        /*and recompute referenced entities*/
-        gen_free_list(referenced_entities);
-        referenced_entities = statements_referenced_entities(statements_to_outline);
     }
 
     /* Retrieve declared entities */
@@ -529,7 +499,11 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
         //basic b = entity_basic(e);
         /* function should be added to compilation unit */
         if(entity_function_p(e))
+	  {
             ;//AddEntityToModuleCompilationUnit(e,get_current_module_entity());
+	    if(fortran_module_p(new_fun)) /* fortran function results must be decared in the new function */
+	      tmp_list=CONS(ENTITY,e,tmp_list);
+	  }
         else if( !entity_constant_p(e) && !entity_field_p(e)
                 // This doesn't catch the typedef statement
                 // but any entity that type is a typedef
@@ -572,18 +546,24 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
 
     /* in some rare case, we can have too functions with the same local name */
     outline_remove_duplicates(&referenced_entities);
+    return referenced_entities;
+}
 
+void outliner_parameters(entity new_fun,  statement new_body, list referenced_entities,
+			 hash_table entity_to_effective_parameter,
+			 list *effective_parameters_, list *formal_parameters_)
+{
+  string outline_module_name = (string)entity_user_name(new_fun);
 
-    intptr_t i=0;
 
     /* all variables are promoted parameters */
-    list effective_parameters = NIL;
-    list formal_parameters = NIL;
+    list effective_parameters = *effective_parameters_;
+    list formal_parameters = *formal_parameters_;
+    intptr_t i=0;
+
     FOREACH(ENTITY,e,referenced_entities)
-    {
-        type t = entity_type(e);
-        bool is_parameter_p = /* != formal parameter */ (entity_symbolic_p(e) && storage_rom_p(entity_storage(e)) && type_functional_p(t));
-        if( type_variable_p(t) || is_parameter_p )
+      {
+        if( entity_variable_p(e) || entity_symbolic_p(e) )
         {
             pips_debug(6,"Add %s to outlined function parameters\n",entity_name(e));
 
@@ -592,14 +572,19 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
                     outline_module_name,
                     entity_user_name(e)
                     );
-            entity_type(dummy_entity)=is_parameter_p?
-                make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL)):
-                copy_type(t);
+
+	    if(entity_symbolic_p(e))
+	       entity_type(dummy_entity) = fortran_module_p(new_fun)?
+		 copy_type(functional_result(type_functional(entity_type(e)))):
+		 make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL));
+	    else
+	      entity_type(dummy_entity) = copy_type(entity_type(e));
+
             entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
 
 
             formal_parameters=CONS(PARAMETER,make_parameter(
-                        is_parameter_p?make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL)):copy_type(t),
+			copy_type(entity_type(dummy_entity)),
                         fortran_module_p(get_current_module_entity())?make_mode_reference():make_mode_value(),
                         make_dummy_identifier(dummy_entity)),formal_parameters);
 
@@ -610,23 +595,23 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
 
             effective_parameters=CONS(EXPRESSION,effective_parameter,effective_parameters);
         }
-        /* this is a constant variable */
-        else if(entity_constant_p(e)) {
-            AddLocalEntityToDeclarations(e,new_fun,new_body);
+        /* this is a constant variable or fortran function result */
+        else if(entity_constant_p(e)||entity_function_p(e)) {
+	  AddLocalEntityToDeclarations(e,new_fun,new_body);
         }
 
     }
-    formal_parameters=gen_nreverse(formal_parameters);
-    effective_parameters=gen_nreverse(effective_parameters);
+    *formal_parameters_=gen_nreverse(formal_parameters);
+    *effective_parameters_=gen_nreverse(effective_parameters);
     hash_table_free(entity_to_effective_parameter);
 
     ifdebug(5) {
       pips_debug(0,"Formals : \n");
-      print_parameters(formal_parameters);
+      print_parameters(*formal_parameters_);
       pips_debug(0,"Effectives : \n");
-      print_expressions(effective_parameters);
+      print_expressions(*effective_parameters_);
      }
-
+}
 
     /* we need to patch parameters , effective parameters and body in C
      * because parameters are passed by copy in function call
@@ -638,7 +623,8 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
      * will be used in the outlined module as below :
      *
      * void new_module( int *scalar_0 ) {
-     *   int scalar = *scalar_0;
+     *   int scalar;
+     *   scalar = *scalar_0;
      *   ...
      *   // Work on scalar
      *   ...
@@ -646,10 +632,12 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
      * }
      *
      */
-    if(c_module_p(get_current_module_entity()) && get_bool_property("OUTLINE_WRITTEN_SCALAR_BY_REFERENCE"))
-    {
-        list iter  = effective_parameters,
-             riter = referenced_entities;
+void outliner_patch_parameters(list statements_to_outline, list referenced_entities, list effective_parameters, list formal_parameters,
+			       statement new_body, statement begin, statement end)
+{
+  list iter  = effective_parameters;
+  list riter = referenced_entities;
+
         FOREACH(PARAMETER,p,formal_parameters)
         {
             expression x = EXPRESSION(CAR(iter));
@@ -705,8 +693,8 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
                     store_cumulated_rw_effects_list(out,NIL);
 
 
-                    insert_statement(new_body,in,true);
-                    insert_statement(new_body,out,false);
+                    insert_statement(begin,in,true);
+                    insert_statement(end,out,false);
 
                     pips_debug(4,"Add declaration for %s",entity_name(e));
                     add_declaration_statement(new_body,e);
@@ -725,7 +713,11 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
             POP(riter);
         }
         pips_assert("no effective parameter left", ENDP(iter));
-    }
+}
+
+void outliner_file(entity new_fun, list formal_parameters, statement *new_body)
+{
+  string outline_module_name = (string)entity_user_name(new_fun);
 
     /* prepare parameters and body*/
     module_functional_parameters(new_fun)=formal_parameters;
@@ -748,16 +740,16 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
     }
 
     /* add a return at the end of the body, in all cases */
-    insert_statement(new_body,make_return_statement(new_fun),false);
-
-
+    insert_statement(*new_body, make_return_statement(new_fun), false);
 
     /* we can now begin the outlining */
     bool saved = get_bool_property(STAT_ORDER);
     set_bool_property(STAT_ORDER,false);
-    text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, new_body);
+    text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, *new_body);
 
     add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), cu_name );
+    free_text(t);
+
     set_bool_property(STAT_ORDER,saved);
 
     /* horrible hack to prevent declaration duplication
@@ -775,6 +767,10 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
             entity_type(e)=type_undefined;
         }
     }
+}
+
+statement outliner_call(entity new_fun, list statements_to_outline, list effective_parameters)
+{
 
     /* and return the replacement statement */
     instruction new_inst =  make_instruction_call(make_call(new_fun,effective_parameters));
@@ -801,7 +797,56 @@ statement outliner(const char* outline_module_name, list statements_to_outline)
         statement_extensions(old_statement)=empty_extensions();
 
     }
-    free_text(t);
+    return new_stmt;
+}
+
+/**
+ * outline the statements in statements_to_outline into a module named outline_module_name
+ * the outlined statements are replaced by a call to the newly generated module
+ * statements_to_outline is modified in place to represent that call
+ *
+ * @param outline_module_name name of the new module
+
+ * @param statements_to_outline is a list of consecutive statements to
+ * outline into outline_module_name
+ *
+ * @return pointer to the newly generated statement (already inserted in statements_to_outline)
+ */
+statement outliner(const char* outline_module_name, list statements_to_outline)
+{
+    pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
+    entity new_fun = make_empty_subroutine(outline_module_name, copy_language(module_language(get_current_module_entity())));
+
+    statement new_body = make_block_statement(statements_to_outline);
+
+    /* 1 : init */
+    hash_table entity_to_effective_parameter = outliner_init(new_fun, statements_to_outline);
+
+    /* pass loop bounds as parameters if required */
+    const char* loop_label = get_string_property("OUTLINE_LOOP_BOUND_AS_PARAMETER");
+    statement theloop = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),loop_label);
+    if(!statement_undefined_p(theloop) && statement_loop(theloop))
+      outliner_extract_loop_bound(theloop,entity_to_effective_parameter);
+
+    /* 2 : scan */
+    list referenced_entities = outliner_scan(new_fun, statements_to_outline, new_body);
+
+    /* 3 : parameters */
+    list effective_parameters = NIL;
+    list formal_parameters = NIL;
+    outliner_parameters(new_fun, new_body, referenced_entities, entity_to_effective_parameter, &effective_parameters, &formal_parameters);
+
+    /* 4 : patch parameters */
+    if(c_module_p(get_current_module_entity()) && get_bool_property("OUTLINE_WRITTEN_SCALAR_BY_REFERENCE"))
+      outliner_patch_parameters(statements_to_outline, referenced_entities, effective_parameters, formal_parameters, new_body, new_body, new_body);
+
+    /* 5 : file */
+    outliner_file(new_fun, formal_parameters, &new_body);
+
+    /* 6 : call */
+    statement new_stmt = outliner_call(new_fun, statements_to_outline, effective_parameters);
+
+
     return new_stmt;
 }
 

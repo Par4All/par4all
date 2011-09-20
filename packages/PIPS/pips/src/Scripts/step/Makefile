@@ -1,6 +1,6 @@
 # $Id: Makefile 12535 2006-08-17 17:41:40Z coelho $
 
-F.sh = 	step_directives run_step.script	step_install step_filtre_include
+F.sh = run_step.script step_install step_filtre_include
 
 step_install:step_install.in
 	sed -e 's,@datadir@,$$PIPS_ROOT/src/Runtimes,g' $< > $@

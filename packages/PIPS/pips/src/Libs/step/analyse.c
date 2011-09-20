@@ -1,1017 +1,935 @@
-/* Copyright 2007, 2008 Alain Muller, Frederique Silber-Chaussumier
-
-This file is part of STEP.
-
-The program is distributed under the terms of the GNU General Public
-License.
-*/
-
-
-/*
- - Calcul des regions SEND
-
- - Test de l'entrelacement des regions SEND
-
- - Suppression des contraintes "complexes": contraintes non paralleles
-   aux axes
-
-IN: Utilise les analyses de PIPS sur les modules outlines
-   * SUMMARY_REGIONS (read, write)
-   * IN_SUMMARY_REGIONS
-   * OUT_SUMMARY_REGIONS
-
-OUT: met a jour la ressource step_status pour chaque module
-      - liste de regions SEND
-      - pour chaque region SEND, on sait si entrelacement ou non
-
-Creation: A. Muller, 2007-2008
-Modification: F. Silber-Chaussumier, 2008  
-
-*/
-
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
 
-#include "defines-local.h"
+#include "defines-local.h" // for STEP_DEFAULT_RT_H
+#include "preprocessor.h" // for pips_srcpath_append
+#include "transformer.h" // for add_intermediate_value
+#include "semantics.h" // for load_statement_precondition
+#include "effects-generic.h" // needed by effects-convex.h for descriptor
+#include "effects-simple.h" // for effect_to_string
+#include "effects-convex.h" // for region
 
-/* pour step_rw_regions */
-#include "effects-convex.h"
-/* pour add_intermediate_value, entity_to_intermediate_value, free_value_mappings */
-#include "transformer.h"
-/* pour set_cumulated_rw_effects, reset_cumulated_rw_effects, w_r_combinable_p */
-#include "effects-generic.h"
-/* pour module_to_value_mappings */
-#include "semantics.h"
-/* pour words_effect */
-#include "effects-simple.h"
-
-#include "dg.h"
+#include "dg.h" // for dg_arc_label, dg_vertex_label
 typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
-#include "graph.h"
-#include "ricedg.h"
+#include "graph.h" // for graph
+#include "ricedg.h" // for vertex_to_statement
+#include "bootstrap.h"
 
-#define LOCAL_DEBUG 2
 
-GENERIC_GLOBAL_FUNCTION(global_step_analyses,map_entity_step_analyses);
 
-void global_step_analyses_load()
+GENERIC_LOCAL_FUNCTION(step_path, map_step_point)
+GENERIC_LOCAL_FUNCTION(step_interlaced, map_effect_bool)
+GENERIC_LOCAL_FUNCTION(step_partial, map_effect_bool)
+
+
+/*
+  Calcul des statements paths
+
+  Pour tous statements S d'un module M,
+  on appelle SP(S) (statement_path) le chemin permettant de rejoindre le statement S à partir du statement "body" de M.
+*/
+
+static hash_table sp_table = hash_table_undefined;
+
+static bool sp_build(statement stmt, list *sp_current)
 {
-  set_global_step_analyses((map_entity_step_analyses)db_get_memory_resource(DBR_STEP_ANALYSES, "", true));
+  *sp_current = CONS(STATEMENT, stmt, *sp_current);
+
+  list sp = gen_nreverse(gen_copy_seq(*sp_current));
+  hash_put(sp_table, stmt, sp);
+
+  return true;
+}
+static void sp_unbuild(statement stmt, list *sp_current)
+{
+  gen_remove_once(sp_current, stmt);
 }
 
-void global_step_analyses_save()
+static void sp_init(statement body)
 {
-  DB_PUT_MEMORY_RESOURCE(DBR_STEP_ANALYSES, "", get_global_step_analyses());
-  reset_global_step_analyses();
+  assert(hash_table_undefined_p(sp_table));
+  sp_table = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
+
+  list sp_current = NIL;
+  gen_context_recurse(body, &sp_current, statement_domain, sp_build, sp_unbuild);
 }
 
-void global_step_analyse_init()
+static void sp_finalize(void)
 {
-  init_global_step_analyses();
-  global_step_analyses_save();
+  assert(!hash_table_undefined_p(sp_table));
+
+  HASH_MAP(stmt, sp,
+	   {
+	     gen_free_list(sp);
+	   }, sp_table)
+
+  hash_table_free(sp_table);
+  sp_table = hash_table_undefined;
 }
 
-static void step_print_region(char *text, list reg)
+static list sp_get(statement stmt)
 {
-  printf("\n%s : %zd\n", text, gen_length(reg));
-  print_rw_regions(reg);
+  return hash_get(sp_table, stmt);
 }
 
-static int step_nb_phi_vecteur(list phi_l, Pvecteur v)
+static statement sp_first_directive_statement(statement stmt)
 {
-  int nb_phi=0;
-
-  pips_debug(1, "phi_l = %p, v = %p\n", phi_l, v);
-
-  FOREACH(VARIABLE,phi,phi_l)
+  list sp = sp_get(stmt);
+  while(!ENDP(sp))
     {
-      if(vect_coeff((Variable)phi,v)!=VALUE_ZERO)
-	nb_phi++;
+      statement current = STATEMENT(CAR(sp));
+      if(step_directives_bound_p(current))
+	return current;
+      POP(sp);
     }
 
-  pips_debug(1, "nb_phi = %d\n", nb_phi);
-  return nb_phi;
+  return statement_undefined;
 }
 
-static void step_drop_complex_constraints(region reg)
+/*
+static void sp_print(list sp)
 {
-  list phi_l;
-  Pcontrainte c,ct;
-
-  pips_debug(1, "reg = %p\n", reg);
-
-  pips_debug(LOCAL_DEBUG, "Region entity %s\n", entity_name(region_entity(reg)));
-
-  phi_l = NIL;
-  FOREACH(EXPRESSION, exp,reference_indices(effect_any_reference(reg)))
+  int lvl = 0;
+  FOREACH(STATEMENT, stmt, sp)
     {
-      syntax s=expression_syntax(exp);
-      pips_assert("reference", syntax_reference_p(s));
-      entity phi=reference_variable(syntax_reference(s));
-      phi_l=CONS(ENTITY,phi,phi_l);
+      pips_debug(2, "statement_path stmt_lvl %d\n", lvl++);
+      STEP_DEBUG_STATEMENT(2, "", stmt);
+    }
+}
+
+static void sp_print_all(void)
+{
+  HASH_MAP(stmt, sp,
+	   {
+	     STEP_DEBUG_STATEMENT(2, "Statement key", stmt);
+	     pips_debug(2, "statement_path length=%d\n", (int)gen_length((list)sp));
+	     sp_print((list)sp);
+	   }, sp_table)
+}
+
+static list sp_factorise(statement s1, statement s2, list *sp1, list* sp2)
+{
+  list sp_common = NIL;
+
+  *sp1 = sp_get(s1);
+  *sp2 = sp_get(s2);
+
+  while(!ENDP(*sp1) && !ENDP(*sp2) && STATEMENT(CAR(*sp1))==STATEMENT(CAR(*sp2)))
+    {
+      sp_common = CONS(STATEMENT, STATEMENT(CAR(*sp1)), sp_common);
+      POP(*sp1);
+      POP(*sp2);
     }
 
-  sc_base(region_system(reg)) = BASE_NULLE;
+  return sp_common;
+}
+*/
 
-  pips_debug(LOCAL_DEBUG, "1 nb egalites : %i\n", sc_nbre_egalites(region_system(reg)));
+bool step_interlaced_p(region reg)
+{
+  assert(bound_step_interlaced_p(reg));
+  return load_step_interlaced(reg);
+}
 
-  if (sc_nbre_egalites(region_system(reg)))
+bool step_partial_p(region reg)
+{
+  assert(bound_step_partial_p(reg));
+  return load_step_partial(reg);
+}
+
+bool step_analysed_module_p(const char* module_name)
+{
+  return db_resource_required_or_available_p(DBR_STEP_SEND_REGIONS,  module_name);
+}
+
+void debug_print_effects_list(list l, string txt)
+{
+  if(ENDP(l))
+    pips_debug(1, "%s empty\n", txt);
+  else
     {
-      c = sc_egalites(region_system(reg));
-      sc_egalites(region_system(reg))=(Pcontrainte) NULL;
-      sc_nbre_egalites(region_system(reg)) = 0;
-      for (;!CONTRAINTE_UNDEFINED_P(c); c = ct)
+      bool property_prettyprint_scalar_regions = get_bool_property("PRETTYPRINT_SCALAR_REGIONS");
+      set_bool_property("PRETTYPRINT_SCALAR_REGIONS", true);
+
+      FOREACH(EFFECT, eff, l)
 	{
-	  ct=c->succ;
-	  if (step_nb_phi_vecteur(phi_l,contrainte_vecteur(c)) == 1)
-	    {
-	      pips_debug(LOCAL_DEBUG, "1 add\n");
-	      c->succ = NULL;
-	      sc_add_eg(region_system(reg),c);
-	    }
+	  string str_reg = text_to_string(text_rw_array_regions(CONS(EFFECT, eff, NIL)));
+	  pips_debug(1, "%s %p : %s\n", txt, eff, str_reg); free(str_reg);
 	}
+      set_bool_property("PRETTYPRINT_SCALAR_REGIONS", property_prettyprint_scalar_regions);
     }
-  
-  pips_debug(LOCAL_DEBUG, "2 nb inegalites : %i\n", sc_nbre_inegalites(region_system(reg)));
-  if (sc_nbre_inegalites(region_system(reg)))
-    {
-      c = sc_inegalites(region_system(reg));
-      sc_inegalites(region_system(reg))=(Pcontrainte) NULL;
-      sc_nbre_inegalites(region_system(reg)) = 0;
-      for (;!CONTRAINTE_UNDEFINED_P(c); c = ct) 
-	{
-	  ct=c->succ;
-	  if (step_nb_phi_vecteur(phi_l,contrainte_vecteur(c)) == 1)
-	    {
-	      pips_debug(LOCAL_DEBUG, "2 add\n");
-	      c->succ = NULL;
-	      sc_add_ineg(region_system(reg),c);
-	    }
-	}
-    }
-  sc_creer_base(region_system(reg));
 }
 
-#if 0
-/* Recherche des variables et tableaux privatisables  
-   
-   Calcul de PRIV a partir de LOCAL: variables ecrites non
-   importees, definies dans le corps
-   
-   LOCAL(i) = W(i) - {les regions correspondant a des tableaux dans IN(i)}
-     PRIV(i) = LOCAL(i) - {les regions corespondant a des tableaux dans OUT(i}
-     
-     Resultat non utilise: serait utile pour generer du OpenMP
-*/
-static list step_private_regions(list write_l, list in_l, list out_l)
+
+bool step_analyse_init(__attribute__ ((unused)) const char* module_name)
 {
 
-  list local_l = RegionsEntitiesInfDifference(regions_dup(write_l), regions_dup(in_l), w_r_combinable_p);
-  list priv_l = RegionsEntitiesInfDifference(regions_dup(local_l), regions_dup(out_l), w_w_combinable_p);
+    DB_PUT_MEMORY_RESOURCE(DBR_STEP_COMM, "", make_step_comm(make_map_step_point(), make_map_effect_bool(), make_map_effect_bool()));
 
-  ifdebug(LOCAL_DEBUG) step_print_region("Region priv ",priv_l);
-  return priv_l;
-}
-
-
-/* Recherche des variables et sections de tableau privatisables 
-   
-   Possibilite de diviser les tableaux en plusieurs sections au lieu
-   d'allouer tout le tableau sur chaque noeud
-   
-   LOCAL(i) = W(i) - inf IN(i)
-   PRIV_SEC(i) = LOCAL(i) -inf proj_i'[IN(i')]
-   
-   Resultat non utilise:
-   - serait utile quand allocation dynamique
-   
-   - pour generer du MPI avec adaptation de la taille du tableau
-   pour chaque noeud
-   
-   - pour generer du Open MP
-   
-   Resultats incertains: encore a debugger...
-*/
-static list step_private_section_regions(list write_l, list in_l, list out_l)
-{
-  list local_sec = RegionsInfDifference(regions_dup(write_l),regions_dup(in_l), w_r_combinable_p);
-  list priv_sec = RegionsInfDifference(regions_dup(local_sec),regions_dup(out_l), w_w_combinable_p);
-  
-  ifdebug(LOCAL_DEBUG) step_print_region("Region priv_sec ", priv_sec);
-  return priv_sec; 
-}
-
-
-/* Recherche des regions copy_out
-   
-   Quand on a eu la possibilite de diviser un tableau en plusieurs
-   sections sur differents noeuds
-   
-   Calcul des sections mises a jour et necessaires pour la suite des
-   calculs
-   
-   COPY_OUT(i) = PRIV_SEC(i) inter OUT(i)
-   
-   Meme utilite que precedemment
-   
-   Resultats incertains: encore a debugger...
-*/
-static list step_copy_out_regions(list priv_sec,list out_l)
-{
-    list copy_out = RegionsIntersection(regions_dup(priv_sec),regions_dup(out_l), w_w_combinable_p);
-
-    ifdebug(LOCAL_DEBUG) step_print_region("Region copy_out ", copy_out);
-    return copy_out;
-}
+#ifdef PIPS_RUNTIME_DIR
+    string srcpath=strdup(PIPS_RUNTIME_DIR "/" STEP_DEFAULT_RT_H);
+#else
+    string srcpath=strdup(concatenate(getenv("PIPS_ROOT"),"/",STEP_DEFAULT_RT_H,NULL));
 #endif
+    string old_path=pips_srcpath_append(srcpath);
+    free(old_path);
+    free(srcpath);
 
-/* Recherche des regions SEND 
-   
-   Regions communiquees apres un calcul (necessaires pour les calculs
-   suivants)
-   
-   SEND(tranche) = OUT inter W(tranche)
-   
-   Tout d'abord on retire les contraintes non paralleles aux axes
-*/
-static list step_send_regions(list write_l, list out_l)
-{
-  // simplification des regions (on ne garde que les contraintes ayant 1 "PHI")
-  FOREACH(REGION, reg, write_l){step_drop_complex_constraints(reg);};
-  FOREACH(REGION, reg, out_l) {step_drop_complex_constraints(reg);};
+    /* init intrinsics */
+    static struct intrin {
+        char * name;
+        intrinsic_desc_t desc;
+    } step_intrinsics [] = {
+#include "STEP_RT_intrinsic.h"
+        { NULL , {NULL, 0} }
+    };
+    for(struct intrin *p = step_intrinsics;p->name;++p)
+        register_intrinsic_handler(p->name,&(p->desc));
 
-  list send_l = RegionsIntersection(regions_dup(out_l), regions_dup(write_l), w_w_combinable_p);
-  list send_final = NIL;
-
-  FOREACH(REGION,r,send_l)
+    /* other intrinsics */
+    static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
     {
-      entity e=region_entity(r);
-      if (strcmp(entity_module_name(e),IO_EFFECTS_PACKAGE_NAME) ==0 )
+#include "STEP_RT_bootstrap.h"
+        {NULL, 0, 0, 0, 0}
+    };
+    for(IntrinsicDescriptor *p=IntrinsicTypeDescriptorTable;p->name;p++)
+        register_intrinsic_type_descriptor(p) ;
+
+    return true;
+}
+
+void load_step_comm()
+{
+  step_comm comms = (step_comm)db_get_memory_resource(DBR_STEP_COMM, "", true);
+
+  set_step_path(step_comm_path(comms));
+  set_step_interlaced(step_comm_interlaced(comms));
+  set_step_partial(step_comm_partial(comms));
+}
+
+void reset_step_comm()
+{
+  reset_step_path();
+  reset_step_interlaced();
+  reset_step_partial();
+}
+
+void store_step_comm()
+{
+  step_comm comms = (step_comm)db_get_memory_resource(DBR_STEP_COMM, "", true);
+
+  step_comm_path(comms) = get_step_path();
+  step_comm_interlaced(comms) = get_step_interlaced();
+  step_comm_partial(comms) = get_step_partial();
+
+  DB_PUT_MEMORY_RESOURCE(DBR_STEP_COMM, "", comms);
+
+  reset_step_path();
+  reset_step_interlaced();
+  reset_step_partial();
+}
+
+static void add_path(effect new, entity module, statement stmt, effect previous)
+{
+  pips_debug(4, "ADD_STEP_PATH\n");
+  store_step_path(new, make_step_point(module, stmt, previous));
+}
+
+static list get_path(effect start)
+{
+  list path = NIL;
+  effect current = start ;
+
+  while(bound_step_path_p(current))
+    {
+      step_point point = load_step_path(current);
+
+      path = CONS(STEP_POINT, point, path);
+
+      if (step_point_data(point) == current)
+	break;
+
+      current = step_point_data(point);
+    }
+
+  ifdebug(3)
+    {
+      int lvl=1;
+      FOREACH(STEP_POINT, point, path)
+	{
+	  string txt = safe_statement_identification(step_point_stmt(point));
+	  pips_debug(1, "lvl=%d module=%s statment= %s", lvl, entity_name(step_point_module(point)), txt);
+	  free(txt);
+	  debug_print_effects_list(CONS(EFFECT,step_point_data(point),NIL), "region");
+	  lvl++;
+	}
+    }
+
+  return path;
+}
+
+static void set_comm(effect data, bool full)
+{
+  list path = get_path(data);
+  assert(!ENDP(path));
+  effect first_send = step_point_data(STEP_POINT(CAR(path)));
+
+  if(full)
+    store_or_update_step_partial(first_send, false);
+  else if(!bound_step_partial_p(first_send))
+    store_step_partial(first_send, true);
+}
+
+static region rectangularization_region(region reg)
+{
+  reference r = region_any_reference(reg);
+  list ephis = expressions_to_entities(reference_indices(r));
+  Pbase phis = list_to_base(ephis);
+  gen_free_list(ephis);
+  region_system(reg) = sc_rectangular_hull(region_system(reg), phis);
+  base_rm(phis);
+  return reg;
+}
+
+static list compute_send_regions(list write_l, list out_l)
+{
+  list send_final = NIL;
+  list send_l = RegionsIntersection(regions_dup(out_l), regions_dup(write_l), w_w_combinable_p);
+
+  FOREACH(REGION, reg, send_l)
+    {
+      if (io_effect_p(reg)|| std_file_effect_p(reg))
 	pips_user_warning("STEP : possible IO concurrence\n");
       else
-	send_final=CONS(REGION,region_dup(r),send_final);
-    }
+	{
+	  region r = region_dup(rectangularization_region(reg));
 
+	  free_action(region_action(r));
+	  region_action(r) = make_action_write_memory();
+	  send_final = CONS(REGION, r, send_final);
+	}
+    }
   gen_full_free_list(send_l);
 
-  gen_sort_list(send_final, (int (*)(const void *,const void *)) effect_compare); 
-
-  ifdebug(LOCAL_DEBUG) step_print_region("Region Send ", send_final); 
   return send_final;
 }
 
-
-/* Test d'entrelacement des regions SEND 
-   
-   Une region est "entrelacee" si elle contient des tranches
-   d'indices sur des noeuds differents qui se chevauchent:
-   
-   - pourrait correspondre a des acces concurrents mais la norme OpenMP
-   garantit que ce n'est pas le cas
-   
-   - correspond ici au cas ou on ne determine pas suffisamment
-   precisement les acces aux regions: typiquement un noeud accede
-   aux elements pairs l'aitre noeud accede aux elements impairs
-   
-   
-   Traitement different si region entrelacee ou non
-   Region non entrelacee: communication MPI directe
-   
-   Region entrelacee: determination a l'execution de la modification
-*/
-static bool step_interlaced_iteration_regions_p(region reg, list loop_data_l)
+static list compute_recv_regions(list send_l, list in_l)
 {
-  Psysteme s = sc_dup(region_system(reg));
-  Psysteme  s_prime = sc_dup(s);
-  pips_debug(1, "reg = %p, loop_data_l = %p\n", reg, loop_data_l);
- 
-  FOREACH(LOOP_DATA,data,loop_data_l)
-    {
-      Pcontrainte c;
-      entity l_prime;
-      entity u_prime;
-      entity low=loop_data_lower(data);
-      entity up=loop_data_upper(data);
-
-      pips_debug(LOCAL_DEBUG, "low = %s up = %s\n",entity_name(low), entity_name(up));
-      
-      add_intermediate_value(low);
-      add_intermediate_value(up);
-      l_prime = entity_to_intermediate_value(low);
-      u_prime = entity_to_intermediate_value(up);
-      s_prime = sc_variable_rename(s_prime, (Variable)low, (Variable)l_prime);
-      s_prime = sc_variable_rename(s_prime, (Variable)up, (Variable)u_prime);
-
-      // contrainte U<L' qui s'ecrit : U-L'+1 <= 0
-      c = contrainte_make(vect_make(VECTEUR_NUL, 
-				    (Variable) up, VALUE_ONE,
-				    (Variable) l_prime, VALUE_MONE,
-				    TCST, VALUE_ONE));
-      sc_add_inegalite(s_prime, contrainte_dup(c));
-    }
-  
-  s = sc_append(s,s_prime);
-  s->base = BASE_NULLE;
-  sc_creer_base(s);
-  
-//sc_default_dump(s);
-  pips_debug(1, "Fin\n");
-
-  return sc_integer_feasibility_ofl_ctrl(s, NO_OFL_CTRL, true);
-}
-
-static list step_interlaced_iteration_regions(list loop_data_l, list send_l)
-{
-  list interlaced_l = NIL;
-
-  FOREACH(REGION,reg,send_l)
-    {
-      if (step_interlaced_iteration_regions_p(reg,loop_data_l))
-	interlaced_l = CONS(ENTITY, region_entity(reg), interlaced_l);
-    }
-
-  ifdebug(LOCAL_DEBUG) step_print_region("Region interlaced ", interlaced_l);
-
-  return interlaced_l;
-}
-
-
-/* recherche des regions RECV 
-   
-   Regions communiquees avant un calcul (necessaires pour le calcul
-   considere)
-   
-     
-   RECV(tranche) = IN union SEND_MAY ( union SEND(interlaced) )
-*/
-static list step_recv_regions(list send_l, list in_l)
-{
-  list recv_l;
+  list recv_final = NIL;
   list send_may_l = NIL;
 
-  FOREACH(REGION,r,send_l)
+  FOREACH(REGION, reg, send_l)
     {
-      if (region_may_p(r))
-	send_may_l=CONS(REGION, region_dup(r), send_may_l);
+      if (region_may_p(reg))
+	send_may_l=CONS(REGION, region_dup(reg), send_may_l);
     }
-  recv_l = RegionsMustUnion(regions_dup(in_l),regions_dup(send_may_l),r_w_combinable_p);
-
+  list recv_l = RegionsMustUnion(regions_dup(in_l), regions_dup(send_may_l), r_w_combinable_p);
   gen_full_free_list(send_may_l);
 
-  gen_sort_list(recv_l, (int (*)(const void *,const void *)) effect_compare);
-
-  ifdebug(LOCAL_DEBUG) step_print_region("Region Recv ", recv_l);
-  return recv_l;
-}
-
-#if 0
-/* Recherche des regions USED 
-   Si allocation dynamique possible, determination de l'espace memoire a utiliser
-   
-   USED(tranche) = R union W
-   
-   Resultat non utilise: pas d'allocation dynamique
-*/
-static list step_used_regions(list read_l, list write_l)
-{
-  list used_l = RegionsMustUnion(regions_dup(read_l), regions_dup(write_l), r_w_combinable_p);
-
-  ifdebug(LOCAL_DEBUG) step_print_region("Region Used ", used_l);
-  return used_l;
-}
-#endif
-
-static step_analyses step_analyse_loop_regions(list read_l, list write_l, list in_l, list out_l, list loop_data_l)
-{
-  // Recherche des regions SEND et de leur entrelacement
-  list send_l = step_send_regions(write_l, out_l);
-  list interlaced_l = step_interlaced_iteration_regions(loop_data_l,send_l);
-
-  // Recherche des regions RECV
-  list recv_l = step_recv_regions(send_l, in_l);
-
-  /* Resultat non utilise:
-  // Recherche des regions USED : si allocation dynamique possible, determination de l'espace memoire a utiliser
-  list used_l = step_used_regions(read_l, write_l);
-
-  // Recherche des regions PRIV : serait utile pour generer du OpenMP
-  list priv_l = step_private_regions(write_l, in_l, out_l);
-  */
-
-  return make_step_analyses(recv_l, send_l, interlaced_l, NIL, make_map_entity_bool());
-}
-
-static step_analyses step_analyse_master_regions(list read_l, list write_l, list in_l, list out_l)
-{
-  ifdebug(LOCAL_DEBUG)
-  {
-    step_print_region("Region read ", read_l);
-    step_print_region("Region write ", write_l);
-    step_print_region("Region in ", in_l);
-    step_print_region("Region out ", out_l);
-  }
-  // Recherche des regions SEND
-  list send_l = step_send_regions(write_l, out_l);
-
-  // Recherche des regions RECV
-  list recv_l = step_recv_regions(send_l, in_l);
-
-  ifdebug(LOCAL_DEBUG) step_print_region("Region master SEND ", send_l);
-  return make_step_analyses(recv_l, send_l, NIL, NIL, make_map_entity_bool());
-}
-static step_analyses step_analyse_parallel_regions(list read_l, list write_l, list in_l, list out_l)
-{
-  ifdebug(LOCAL_DEBUG)
-  {
-    step_print_region("Region read ", read_l);
-    step_print_region("Region write ", write_l);
-    step_print_region("Region in ", in_l);
-    step_print_region("Region out ", out_l);
-  }
-  // Recherche des regions SEND
-  list send_l = step_send_regions(write_l, out_l);
-
-  // Recherche des regions RECV
-  list recv_l = step_recv_regions(send_l, in_l);
-
-  ifdebug(LOCAL_DEBUG) step_print_region("Region parallel RECV ", recv_l);
-  return make_step_analyses(recv_l, send_l, NIL, NIL, make_map_entity_bool());
-}
-
-static step_analyses step_analyse_critical_regions(list read_l, list write_l, list in_l, list out_l)
-{
-  ifdebug(LOCAL_DEBUG)
-  {
-    step_print_region("Region read ", read_l);
-    step_print_region("Region write ", write_l);
-    step_print_region("Region in ", in_l);
-    step_print_region("Region out ", out_l);
-  }
-  // Recherche des regions SEND
-  list send_l = step_send_regions(write_l, out_l);
-
-  // Recherche des regions RECV
-  list recv_l = step_recv_regions(send_l, in_l);
-
-  ifdebug(LOCAL_DEBUG) step_print_region("Region critical SEND ", send_l);
-  return make_step_analyses(recv_l, send_l, NIL, NIL, make_map_entity_bool());
-}
-
-bool step_analyse(const char* module_name)
-{ 
-  list region_l,read_l,write_l,in_l,out_l;
-  entity module = local_name_to_top_level_entity(module_name);
-  step_analyses result=step_analyses_undefined;
-
-  debug_on("STEP_DEBUG_LEVEL");
-  pips_debug(1, "considering module %s\n", module_name);
-  debug_on("STEP_ANALYSE_DEBUG_LEVEL");
-
-  // recuperation des effects R W IN et OUT
-  region_l = effects_to_list((effects)db_get_memory_resource(DBR_SUMMARY_REGIONS, entity_user_name(module), true));
-  in_l = effects_to_list((effects)db_get_memory_resource(DBR_IN_SUMMARY_REGIONS, entity_user_name(module), true));
-  out_l = effects_to_list((effects)db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS, entity_user_name(module), true));
-
-  set_methods_for_convex_effects();
-  init_convex_rw_prettyprint(module_name);
-
-  read_l = regions_read_regions(region_l);
-  write_l = regions_write_regions(region_l);
-
-  global_step_analyses_load();
-  global_directives_load();
-  set_current_module_entity(module);
-
-  ifdebug(LOCAL_DEBUG)
-  {
-    /*
-      current_module_entity must be defined
-    */
-    step_print_region("Region read ", read_l);
-    step_print_region("Region write ", write_l);
-    step_print_region("Region in ", in_l);
-    step_print_region("Region out ", out_l);
-  }
-
-  set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, entity_user_name(module), true));
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, entity_user_name(module), true));
-  module_to_value_mappings(module);
-
-  // STEP analysis
-  if(bound_global_directives_p(module))
+  FOREACH(REGION, reg, recv_l)
     {
-      directive d=load_global_directives(module);
-      pips_debug(1,"Directive module : %s\n\t directive text: %s\n", module_name,directive_txt(d));
-      switch(type_directive_tag(directive_type(d)))
+      if (io_effect_p(reg) || std_file_effect_p(reg))
+	pips_debug(2,"drop effect on %s\n", entity_name(region_entity(reg)));
+      else
 	{
-	case is_type_directive_omp_parallel:
-	  result = step_analyse_parallel_regions(read_l, write_l, in_l, out_l);
-	  break;
-	case is_type_directive_omp_parallel_do:
-	  result = step_analyse_loop_regions(read_l,write_l,in_l,out_l,type_directive_omp_parallel_do(directive_type(d)));
-	  break;
-	case is_type_directive_omp_do:
-	  result = step_analyse_loop_regions(read_l,write_l,in_l,out_l,type_directive_omp_do(directive_type(d)));
-	  break;
-	case is_type_directive_omp_master:
-	  result = step_analyse_master_regions(read_l, write_l, in_l, out_l);
-	  break;
-	case is_type_directive_omp_critical:
-	  result = step_analyse_critical_regions(read_l, write_l, in_l, out_l);
-	  break;	
-	case is_type_directive_omp_barrier:
-	  pips_debug(2,"Directive %s : no analyse to perform\n", directive_txt(d));
-	  break;
-	default:
-	    pips_user_warning("Directive %s : analyse not yet implemented\n", directive_txt(d));
+	  region r = region_dup(rectangularization_region(reg));
+
+	  free_action(region_action(r));
+	  region_action(r) = make_action_read_memory();
+	  recv_final = CONS(REGION, r, recv_final);
 	}
-      store_or_update_global_step_analyses(module,result);
     }
-  else
-    pips_debug(2,"Not directive module\n");
+  gen_full_free_list(recv_l);
 
-  reset_current_module_statement();
-  reset_cumulated_rw_effects();
-  reset_current_module_entity(); 
-  free_value_mappings();
-
-  generic_effects_reset_all_methods();
-  reset_convex_prettyprint(module_name);
-  global_directives_save();
-  global_step_analyses_save();
-  
-  debug_off(); 
-  debug_off();
-
-  pips_debug(1, "FIN\n");
-  return true;
+  return recv_final;
 }
 
-
-static bool com_optimizable_p(map_entity_bool optimizable, entity v, entity directive_module)
+static bool interlaced_basic_workchunk_regions_p(region reg, list index_l)
 {
-  const char* v_name;
-  entity array;
-  bool optimizable_p;
-
-  if (io_effect_entity_p(v))
-    {
-      optimizable_p = false;
-      goto end;
-    }
-
-  v_name = entity_local_name(v);
-  pips_debug(1, "v_name = %s\n", v_name);
-  
-  array = gen_find_tabulated(concatenate(entity_user_name(directive_module), MODULE_SEP_STRING, v_name, NULL), entity_domain);
-
-  /* FSC: COMMENTER ICI */
-  /* AM: on verifie si l'entite 'v' n'est pas deja ete marquee comme non-optimizable dans la table 'optimizable' par des analyses precedentes
-   */
-  if (bound_map_entity_bool_p(optimizable, array))
-    optimizable_p = apply_map_entity_bool(optimizable, array);
-  else
-    optimizable_p = true;
-
- end:
-  pips_debug(1, "optimizable_p = %d\n", optimizable_p);
-  return optimizable_p;
-}
-
-bool step_com_optimize_p(map_entity_bool optimizable, entity v, entity directive_module)
-{
-  const char* v_name = entity_local_name(v);
-  entity array = gen_find_tabulated(concatenate(entity_user_name(directive_module), MODULE_SEP_STRING, v_name, NULL), entity_domain);
-  if (io_effect_entity_p(v) ||
-      !bound_map_entity_bool_p(optimizable, array))
+  if(ENDP(index_l))
     return false;
 
-  return apply_map_entity_bool(optimizable, array);
+  bool interlaced_p;
+  Psysteme s = sc_copy(region_system(reg));
+  Psysteme s_prime = sc_copy(s);
+
+  FOREACH(ENTITY, index, index_l)
+    {
+      add_intermediate_value(index);
+      entity index_prime = entity_to_intermediate_value(index);
+      s_prime = sc_variable_rename(s_prime, (Variable)index, (Variable)index_prime);
+
+      // contrainte I<I' qui s'ecrit : I-I'+1 <= 0
+      Pcontrainte c = contrainte_make(vect_make(VECTEUR_NUL,
+				    (Variable) index, VALUE_ONE,
+				    (Variable) index_prime, VALUE_MONE,
+				    TCST, VALUE_ONE));
+      sc_add_inegalite(s, c);
+    }
+
+  s = sc_append(s, s_prime);
+  sc_rm(s_prime);
+
+  s->base = BASE_NULLE;
+  sc_creer_base(s);
+
+  interlaced_p = sc_integer_feasibility_ofl_ctrl(s, NO_OFL_CTRL, true);
+
+  sc_rm(s);
+  return interlaced_p;
 }
 
-static void set_optimizable(map_entity_bool optimizable, entity v, entity directive_module, bool is_optimizable)
-{
-  const char* v_name = entity_local_name(v);
-  entity array = gen_find_tabulated(concatenate(entity_user_name(directive_module), MODULE_SEP_STRING, v_name, NULL), entity_domain);
+GENERIC_LOCAL_FUNCTION(step_send_regions, statement_effects)
+GENERIC_LOCAL_FUNCTION(step_recv_regions, statement_effects)
 
-  if (!entity_undefined_p(array))
+list load_send_regions_list(statement s)
+{
+  if (!bound_step_send_regions_p(s))
+    return NIL;
+
+  effects e = load_step_send_regions(s);
+  ifdebug(8) pips_assert("send regions loaded are consistent", effects_consistent_p(e));
+  return(effects_effects(e));
+}
+
+void store_send_regions_list(statement s, list l_regions)
+{
+  effects e = make_effects(l_regions);
+  ifdebug(8) pips_assert("send regions to store are consistent", effects_consistent_p(e));
+  store_step_send_regions(s, e);
+}
+
+void update_send_regions_list(statement s, list l_regions)
+{
+  if (bound_step_send_regions_p(s))
     {
-      if(!bound_map_entity_bool_p(optimizable, array))
-	extend_map_entity_bool(optimizable, array, is_optimizable);
-      else if(is_optimizable)
-	pips_assert("already optimizable",apply_map_entity_bool(optimizable, array));
-      else
-	update_map_entity_bool(optimizable, array, false);
+      effects e = load_step_send_regions(s);
+      effects_effects(e) = l_regions;
+      update_step_send_regions(s, e);
     }
 }
 
-bool step_analyse_com(const char* module_name)
+void add_send_regions_list(statement s, list l_regions)
 {
+  if (bound_step_send_regions_p(s))
+    {
+      effects e = load_step_send_regions(s);
+      effects_effects(e) = gen_nconc(l_regions, effects_effects(e));
+      update_step_send_regions(s, e);
+    }
+  else
+    store_send_regions_list(s, l_regions);
+}
 
+list load_recv_regions_list(statement s)
+{
+  if (!bound_step_recv_regions_p(s))
+    return NIL;
 
-  debug_on("STEP_ANALYSE_COM_DEBUG_LEVEL");
-  pips_debug(1, "considering module %s\n", module_name);
-  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
-  statement body = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+  effects e = load_step_recv_regions(s);
+  ifdebug(8) pips_assert("recv regions loaded are consistent", effects_consistent_p(e));
+  return(effects_effects(e));
+}
 
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
-  set_current_module_statement(body);
-  set_ordering_to_statement(body);
+void store_recv_regions_list(statement s, list l_regions)
+{
+  effects e = make_effects(l_regions);
+  ifdebug(8) pips_assert("recv regions to store are consistent", effects_consistent_p(e));
+  store_step_recv_regions(s, e);
+}
 
-  global_directives_load();
-  global_step_analyses_load();
-  reset_action_interpretation();
+void update_recv_regions_list(statement s, list l_regions)
+{
+  if (bound_step_recv_regions_p(s))
+    {
+      effects e = load_step_recv_regions(s);
+      effects_effects(e) = l_regions;
+      update_step_recv_regions(s, e);
+    }
+}
+
+void add_recv_regions_list(statement s, list l_regions)
+{
+  if (bound_step_recv_regions_p(s))
+    {
+      effects e = load_step_recv_regions(s);
+      effects_effects(e) = gen_nconc(l_regions, effects_effects(e));
+      update_step_recv_regions(s, e);
+    }
+  else
+    store_recv_regions_list(s, l_regions);
+}
+
+static void step_print_directives_regions(step_directive d, list send_l, list recv_l)
+{
+  ifdebug(3)
+    {
+      statement stmt_basic_workchunk = step_directive_basic_workchunk(d);
+      assert(!statement_undefined_p(stmt_basic_workchunk));
+
+      list rw_l = load_rw_effects_list(stmt_basic_workchunk);
+      list in_l = load_in_effects_list(stmt_basic_workchunk);
+      list out_l = load_out_effects_list(stmt_basic_workchunk);
+
+      string str_reg;
+      bool property_prettyprint_scalar_regions = get_bool_property("PRETTYPRINT_SCALAR_REGIONS");
+      set_bool_property("PRETTYPRINT_SCALAR_REGIONS", true);
+
+      str_reg = text_to_string(text_rw_array_regions(rw_l));
+      pips_debug(1, "REGIONS RW : %s\n", str_reg); free(str_reg);
+      str_reg = text_to_string(text_rw_array_regions(in_l));
+      pips_debug(1, "REGIONS IN : %s\n", str_reg); free(str_reg);
+      str_reg = text_to_string(text_rw_array_regions(out_l));
+      pips_debug(1, "REGIONS OUT : %s\n", str_reg); free(str_reg);
+
+      set_bool_property("PRETTYPRINT_SCALAR_REGIONS", property_prettyprint_scalar_regions);
+    }
+
+  debug_print_effects_list(recv_l, "REGION RECV");
+
+  if(ENDP(send_l))
+    debug_print_effects_list(send_l, "REGION SEND");
+  else
+    {
+      FOREACH(REGION, r, send_l)
+	{
+	  pips_assert("interlaced defined", bound_step_interlaced_p(r));
+	  list l = CONS(EFFECT, r, NIL);
+	  debug_print_effects_list(l, load_step_interlaced(r)?"REGION SEND INTERLACED":"REGION SEND");
+	  gen_free_list(l);
+	}
+    }
+}
+
+static list summarize_and_map(list effect_l, entity module, statement body)
+{
+  list summarized_l = NIL;
+
+  FOREACH(EFFECT, eff, effect_l)
+    {
+      effect new = copy_effect(eff);
+
+      pips_debug(2, "tmp summarize eff=%p new=%p\n", eff, new);
+      add_path(new, module, body, eff);
+      summarized_l = CONS(EFFECT, new, summarized_l);
+    }
+
+  return summarized_l;
+}
+
+static void summarize_and_map_step_regions(statement stmt)
+{
+  /*
+    Si on ne traite pas un statement imbrique dans une directive, on reporte
+    les regions SEND et RECV pour les analyses inter-procedurales
+    au niveau du statement body (representant le statement du call)
+  */
+  statement first_directive_stmt = sp_first_directive_statement(stmt);
+
+  if(statement_undefined_p(first_directive_stmt) || first_directive_stmt == stmt)
+    {
+      entity module = get_current_module_entity();
+      statement body = get_current_module_statement();
+
+      assert(stmt != body);
+      pips_assert("statement with step regions", bound_step_send_regions_p(stmt) && bound_step_recv_regions_p(stmt));
+
+      add_send_regions_list(body, summarize_and_map(load_send_regions_list(stmt), module, body));
+      add_recv_regions_list(body, summarize_and_map(load_recv_regions_list(stmt), module, body));
+
+      pips_debug(2, " SEND and RECV propaged on module %s\n", entity_name(module));
+    }
+}
+
+static list filtre_and_map_regions(list regions_l, entity module, statement stmt)
+{
+  list filtred_l = NIL;
+  FOREACH(REGION, reg, regions_l)
+    {
+      if(region_scalar_p(reg))
+	{
+	  pips_debug(2,"drop scalar %s\n", entity_name(region_entity(reg)));
+	  region_free(reg);
+	}
+      else
+	{
+	  filtred_l = CONS(REGION, reg, filtred_l);
+	  add_path(reg, module, stmt, reg);
+	}
+    }
+  gen_free_list(regions_l);
+  return filtred_l;
+}
+
+static void compute_directive_regions(statement stmt)
+{
+  entity module = get_current_module_entity();
+  step_directive d = step_directives_get(stmt);
+  assert(stmt==step_directive_block(d));
+
+  statement directive_stmt = step_directive_block(d);
+  statement stmt_basic_workchunk = step_directive_basic_workchunk(d);
+  assert(!statement_undefined_p(stmt_basic_workchunk));
 
   ifdebug(1)
     {
-      pips_debug(1, "Print current module: \n");
-      print_text(stderr, text_module(get_current_module_entity(), get_current_module_statement()));
-      pips_debug(1, "\n");
+      pips_debug(1,"\n");
+      step_directive_print(d);
     }
 
-  FOREACH(VERTEX, v1, graph_vertices(dg))
+  list rw_l = load_rw_effects_list(stmt_basic_workchunk);
+  list write_l = regions_write_regions(rw_l);
+  list in_l = load_in_effects_list(stmt_basic_workchunk);
+  list out_l = load_out_effects_list(stmt_basic_workchunk);
+
+  /*
+    Calcul des regions SEND et RECV
+  */
+  list send_l = filtre_and_map_regions(compute_send_regions(write_l, out_l), module, stmt);
+  list recv_l = filtre_and_map_regions(compute_recv_regions(send_l, in_l), module, stmt);
+
+  store_send_regions_list(directive_stmt, send_l);
+  store_recv_regions_list(directive_stmt, recv_l);
+
+
+  list index_l = step_directive_basic_workchunk_index(d);
+  FOREACH(REGION, reg, send_l)
     {
-      statement s1 = vertex_to_statement(v1);
+      /* Identification des regions SEND interlaced */
+      store_step_interlaced(reg, interlaced_basic_workchunk_regions_p(reg, index_l));
 
-      if (!(statement_call_p(s1) && bound_global_directives_p(call_function(statement_call(s1)))))
+      /* initialisation des communications SEND PARTIAL */
+      set_comm(reg, false); // false : PARTIAL
+    }
+
+  ifdebug(1)
+    {
+      step_print_directives_regions(d, send_l, recv_l);
+      pips_debug(1,"\n");
+    }
+
+  summarize_and_map_step_regions(stmt);
+}
+
+static list translate_and_map(statement stmt, list effect_l, transformer context)
+{
+  effect new;
+  list translated_l = NIL;
+  entity module = get_current_module_entity();
+  entity called = call_function(statement_call(stmt));
+  list args = call_arguments(statement_call(stmt));
+
+  FOREACH(EFFECT, eff, effect_l)
+    {
+      /* translate */
+      list called_l = CONS(EFFECT, eff, NIL);
+      list caller_l = generic_effects_backward_translation(called, args, called_l, context);
+      gen_free_list(called_l);
+
+      /* map */
+      switch (gen_length(caller_l))
 	{
-	  pips_debug(4, "\n");
-	  pips_debug(4, "from %s", safe_statement_identification(s1));
-	  pips_debug(4, "\tskip (not a directive module)\n");
-	  STEP_DEBUG_STATEMENT(4, "statement", s1);
-	}
-      else
-	{
-	  entity S1_directive_module = call_function(statement_call(s1));
-	  const char* S1_directive_module_name = entity_local_name(S1_directive_module);
-	  step_analyses S1_analyses = load_global_step_analyses(S1_directive_module);
-	  directive d1 = load_global_directives(S1_directive_module);
-
-	  pips_debug(1, "\n");
-	  pips_debug(1, "from %s", safe_statement_identification(s1));
-
-	  if(step_analyses_undefined_p(S1_analyses))
-	    pips_debug(3, "\tAnalyse not available for %s\n", S1_directive_module_name);
-	  else if (type_directive_omp_master_p(directive_type(d1))) 
-	    {
-	      // communication directive master non optimisable actuellement
-	      pips_debug(4, "\tskip (MASTER construct)\n");
-	    }
-	  else
-	    {
-	      map_entity_bool optimizable_S1 = step_analyses_optimizable(S1_analyses);
-	      pips_debug(3, "\tAnalyse available for %s\t\n",S1_directive_module_name);
-	      
-	      FOREACH(SUCCESSOR, su, vertex_successors(v1))
-		{
-		  statement s2 = vertex_to_statement(successor_vertex(su));
-		  bool directive_module_S2_p = statement_call_p(s2) && bound_global_directives_p(call_function(statement_call(s2)));
-		  pips_debug(1, "\tto %s", safe_statement_identification(s2));
-		  bool directive_master_2_p = false;
-		  if (directive_module_S2_p)  // communication directive master non optimisable actuellement
-		    {
-		      /* FSC: commenter ICI, à quoi sert d2? */
-		      /* AM: les directives master n'etant pas actuellement optimisable,
-			 on aura besoin de savoir si le statement S2 correspont a une directive master
-			 d2 sert a ne pas alourdir le statement suivant.
-		      */ 
-		      directive d2 = load_global_directives(call_function(statement_call(s2)));
-		      directive_master_2_p = type_directive_omp_master_p(directive_type(d2));
-		    }
-
-		  FOREACH(CONFLICT, c, dg_arc_label_conflicts((dg_arc_label)successor_arc_label(su)))
-		    {
-		      effect source = conflict_source(c);
-		      /* FSC a quoi sert sink ? */
-		      /* AM: a de l'affichage pips_debug */
-		      effect sink = conflict_sink(c);
-		      reference ref = region_any_reference(source);
-		      entity e = reference_variable(ref);
-		      const char* caller_side = entity_local_name(e);
-		      int caller_side_length = strlen(caller_side);
-		      
-
-		      /* FSC: le premier test sert-il a eliminer tout ce qui n'est pas un tableau? */
-		      /* a quoi sert le deuxieme test? */
-		      /* AM: oui. Le second test sert a verifier que le tableau 'e' ne fait pas deja l'objet
-			 d'une communication marquee comme non optimisable */
-		      if (reference_indices(ref) == NIL ||
-			  !com_optimizable_p(optimizable_S1, e, S1_directive_module))
-			pips_debug(3, "\t\t\t%s UNOPTIMIZABLE (1)\n", caller_side);
-		      else
-			{
-			  // on verifie que le tableau 'e' est SEND à partir de S1
-			  /* ATTENTION : le test se fait sur le nom du tableau car il correspond à une entite
-			     cote caller et a une autre entite cote called.
-			  */
-			  bool send_array_p = false;
-			  list remaining_region = step_analyses_send(S1_analyses);
-			  for(; !(send_array_p || ENDP(remaining_region)); POP(remaining_region))
-			    {
-			      region reg = REGION(CAR(remaining_region));
-			      const char* called_side = entity_local_name(reference_variable(region_any_reference(reg)));
-			      send_array_p = (strncmp(caller_side, called_side, caller_side_length)==0);
-			    }
-			  
-			  if (send_array_p)
-			    {
-			      bool is_optimizable_p = (directive_module_S2_p && !directive_master_2_p);
-
-			      pips_debug(2, "\t\t%s from\t%s", effect_to_string(source), text_to_string(text_region(source)));
-			      pips_debug(2, "\t\t%s to\t%s", effect_to_string(sink), text_to_string(text_region(sink)));
-			      if (directive_master_2_p)
-				pips_debug(3, "\t\tMASTER construct\n");
-			      pips_debug(2, "\t\t\t%s %sOPTIMIZABLE (2)\n", caller_side, is_optimizable_p?"":"UN");
-			      
-			      // mise a jour si la communication de ref est optimisable ou non
-			      set_optimizable(optimizable_S1, reference_variable(ref), S1_directive_module, is_optimizable_p);
-			    }
-			  else
-			    pips_debug(4, "\t\t%s skip (not a SEND array)\n", caller_side);
-			}
-		    }
-		}
-	      
-	      ifdebug(1)
-		{
-		  pips_debug(1, "RECAPITULATIF for : %s",safe_statement_identification(s1));
-		  MAP_ENTITY_BOOL_MAP(v, is_optimizable,
-				      {
-					pips_debug(1, "\t\t%s -> %sOPTIMIZABLE\n", entity_name(v), is_optimizable?"":"UN");
-				      }, optimizable_S1);
-		  pips_debug(1, "END RECAPITULATIF\n");
-		}
-	    }
+	case 1:
+	  new = EFFECT(CAR(caller_l));
+	  pips_debug(2, "translate eff=%p new=%p\n", eff, new);
+	  add_path(new, module, stmt, eff);
+	  translated_l = gen_nconc(translated_l, caller_l);
+	case 0:
+	  break;
+	default:
+	  assert(0);
 	}
     }
-  
-  global_step_analyses_save();
-  global_directives_save();
-  
-  reset_ordering_to_statement();
-  reset_current_module_statement();
-  reset_current_module_entity();
 
-  debug_off(); 
+  return translated_l;
+}
+
+static void translate_and_map_step_regions(statement stmt)
+{
+  entity called;
+  list caller_l, called_l;
+  statement_effects regions;
+
+  assert(statement_call_p(stmt));
+  called = call_function(statement_call(stmt));
+
+  assert(entity_module_p(called));
+  statement called_body = (statement) db_get_memory_resource(DBR_CODE, entity_user_name(called), true);
+  transformer context = load_statement_precondition(stmt);
+
+  ifdebug(1)
+    {
+      pips_debug(1,"------------------> CALL\n");
+      string txt = safe_statement_identification(stmt);
+      pips_debug(1, "%s\n", txt);
+      free(txt);
+    }
+
+  /* SEND */
+  regions = (statement_effects)db_get_memory_resource(DBR_STEP_SEND_REGIONS, entity_user_name(called), true);
+  called_l = effects_effects(apply_statement_effects(regions, called_body));
+  caller_l = translate_and_map(stmt, called_l, context);
+  store_send_regions_list(stmt, caller_l);
+
+  ifdebug(2)
+    {
+      debug_print_effects_list(called_l, "CALLED REGIONS SEND");
+      debug_print_effects_list(caller_l, "CALLER REGIONS SEND");
+    }
+
+  /* RECV */
+  regions = (statement_effects)db_get_memory_resource(DBR_STEP_RECV_REGIONS, entity_user_name(called), true);
+  called_l = effects_effects(apply_statement_effects(regions, called_body));
+  caller_l = translate_and_map(stmt, called_l, context);
+  store_recv_regions_list(stmt, caller_l);
+
+  ifdebug(2)
+    {
+      debug_print_effects_list(called_l, "CALLED REGIONS RECV");
+      debug_print_effects_list(caller_l, "CALLER REGIONS RECV");
+    }
+
+  summarize_and_map_step_regions(stmt);
+}
+
+static bool compute_step_regions(statement stmt)
+{
+  assert(!statement_undefined_p(stmt));
+
+  if(step_directives_bound_p(stmt))
+    compute_directive_regions(stmt);
+  else if (statement_call_p(stmt) && entity_module_p(call_function(statement_call(stmt))))
+    translate_and_map_step_regions(stmt);
+
   return true;
 }
 
-static list step_effect_backward_translation(statement current_stat, list comm_entities)
+static bool concerned_entity_p(effect conflict, list regions)
 {
-  call call_site=statement_call(current_stat);
-  entity callee=call_function(call_site);
-  list real_args=call_arguments(call_site);
-
-  list real_comm_entities = NIL, r_args;
-  int arg_num;
-
-  pips_debug(5,"callee=%s\n",entity_name(callee));
-  for (r_args = real_args, arg_num = 1; r_args != NIL;
-       r_args = CDR(r_args), arg_num++) 
+  FOREACH(REGION, reg, regions)
     {
-      FOREACH(STEP_COMM_ENTITIES, comm_e, comm_entities)
-	 {
-	   entity re=step_comm_entities_real(comm_e);
-	   entity fe=step_comm_entities_formal(comm_e);
-
-	   pips_debug(3,"argnum=%i\tfe=%s\n",arg_num,entity_name(re));
-	   if (ith_parameter_p(callee, re, arg_num))
-	     {
-	       expression real_exp = EXPRESSION(CAR(r_args));
-	       syntax real_syn = expression_syntax(real_exp);
-	       
-	       /* test reference simple */
-	       if(!syntax_reference_p(real_syn) || !ENDP(reference_indices(syntax_reference(real_syn))))
-		 {
-		   print_statement(current_stat);
-		   pips_user_error("Unsupported syntax arg=%i : %s\n",arg_num,words_to_string(words_syntax(real_syn, NIL)));
-		 }
-
-	       /* test de reshaping */
-	       /* TODO ? */
-
-
-	       re=reference_variable(syntax_reference(real_syn));
-	       real_comm_entities=CONS(STEP_COMM_ENTITIES, make_step_comm_entities(re, fe), real_comm_entities);
-	       pips_debug(3,"add comm_entity :(%s,%s)\n",entity_name(re),entity_name(fe));
-	     }
-	 }
-    }
-
-
-  return real_comm_entities;
-}
-
-static bool in_step_analyses_com_p(entity real, list l)
-{
-  bool result = false;
-  FOREACH(STEP_COMM_ENTITIES,c,l)
-    {
-      if(step_comm_entities_real(c)==real)
-	result=true;
-    }
-  return result;
-}
-
-static void statement_to_send_recv(statement s, list *send, list *recv)
-{
-  *send=NIL;
-  *recv=NIL;
-  if (statement_call_p(s) && entity_module_p(call_function(statement_call(s))))
-    {
-      entity func = call_function(statement_call(s));
-      const char* func_name = entity_local_name(func);
-      step_analyses_com analyses_com=(step_analyses_com)db_get_memory_resource(DBR_STEP_ANALYSES_COM, func_name, true);
-      pips_debug(3, "\tCalled module %s\n",func_name);
-      
-      if(!step_analyses_com_undefined_p(analyses_com))
+      pips_debug(4, "\n conflict %s regions %s",text_to_string(text_region(conflict)), text_to_string(text_region(reg)));
+      if (effect_comparable_p(conflict, reg))
 	{
-	  *send =  step_effect_backward_translation(s, step_analyses_com_send(analyses_com));
-	  *recv =  step_effect_backward_translation(s, step_analyses_com_recv(analyses_com));
-	}
-      else
-	pips_debug(3, "\tStep_analyse_com not available for %s\n", func_name);
-    }
-  else
-    {
-      pips_debug(3, "\tNot a call statement\n");
-      STEP_DEBUG_STATEMENT(4, "statement", s);
-    }
-  ifdebug(2)
-    {
-      printf("RECV:\n");
-      FOREACH(STEP_COMM_ENTITIES,c,*recv)
-	{
-	  printf("\t(%s, %s)\n", entity_name(step_comm_entities_real(c)),entity_name(step_comm_entities_formal(c)));
-	}
-      printf("SEND:\n");
-      FOREACH(STEP_COMM_ENTITIES,c,*send)
-	{
-	  printf("\t(%s, %s)\n", entity_name(step_comm_entities_real(c)),entity_name(step_comm_entities_formal(c)));
+	  pips_debug(4, "\t\tCHECK true\n");
+	  return true;
 	}
     }
-
-  return;
+  pips_debug(4, "\t\tCHECK false\n");
+  return false;
 }
 
-bool step_analyse_com2(const char* module_name)
+bool step_analyse(const char* module_name)
 {
-  debug_on("STEP_ANALYSE_COM2_DEBUG_LEVEL");
-  pips_debug(1, "considering module %s\n", module_name);
+  debug_on("STEP_ANALYSE_DEBUG_LEVEL");
+  pips_debug(1, "%d module_name = %s\n", __LINE__, module_name);
+
   entity module = local_name_to_top_level_entity(module_name);
-  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
-  statement body = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
-
   set_current_module_entity(module);
+
+  set_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
+  set_out_effects((statement_effects) db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
+  set_in_effects((statement_effects) db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
+
+  statement body = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   set_current_module_statement(body);
   set_ordering_to_statement(body);
 
+  init_convex_rw_regions(module_name);
+  set_methods_for_convex_effects();
 
-  /* initialisation des listes recv (et send) a l'union des list recv (et send) des modules appelles */
-  list recv = NIL;
-  list send = NIL;
-  list not_send = NIL;
-  list not_recv = NIL;
-  list l;
+  step_directives_init();
 
-  /* mise a jour des listes recv (et send) */
-  global_directives_load();
-  global_step_analyses_load();
-  reset_action_interpretation();
+  load_step_comm();
 
-  if(bound_global_directives_p(module))
+  sp_init(body);
+
+  /*
+    Compute SEND and RECV regions
+  */
+  pips_debug(1, "################ REGIONS  %s ###############\n", entity_name(module));
+  init_step_send_regions();
+  init_step_recv_regions();
+  /* Initialisation summery region*/
+  add_send_regions_list(body, NIL);
+  add_recv_regions_list(body, NIL);
+
+  gen_recurse(body, statement_domain, compute_step_regions, gen_null);
+
+
+  /*
+    DG analyse
+  */
+  pips_debug(2, "################ DG %s ###############\n", entity_name(module));
+  set not_send = set_make(set_pointer);
+  set not_recv = set_make(set_pointer);
+  graph dependences = (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
+  FOREACH(VERTEX, v1, graph_vertices(dependences))
     {
-      step_analyses analyses = load_global_step_analyses(module);
-      if (step_analyses_undefined_p(analyses))
-	{
-	  pips_user_warning("Missing step_analyses for module directive %s\n",entity_local_name(module));
-	}
-      else
-	{
-	  step_private_before(module);
-	  FOREACH(REGION, reg, step_analyses_recv(analyses))
-	    {
-	      if(!(io_effect_p(reg) ||
-		   region_scalar_p(reg) ||
-		   step_private_p(region_entity(reg))
-		   ))
-		recv=CONS(STEP_COMM_ENTITIES,make_step_comm_entities(region_entity(reg),region_entity(reg)),recv);
-	    }
-	  FOREACH(REGION, reg, step_analyses_send(analyses))
-	    {
-	      if(!(io_effect_p(reg) ||
-		   region_scalar_p(reg) ||
-		   step_private_p(region_entity(reg))
-		   ))
-		send=CONS(STEP_COMM_ENTITIES,make_step_comm_entities(region_entity(reg),region_entity(reg)),send);
-	    }
-	  step_private_after();
-	}
-    }
-
-
-  FOREACH(VERTEX, v1, graph_vertices(dg))
-    {
-      list send_s1, recv_s1;
+      list l_send = NIL;
       statement s1 = vertex_to_statement(v1);
-      STEP_DEBUG_STATEMENT(2, "statement s1", s1);
-      pips_debug(3, "from %s", safe_statement_identification(s1));
 
-      statement_to_send_recv(s1, &send_s1, &recv_s1);
-      send=gen_nconc(gen_full_copy_list(send_s1), send);
-      recv=gen_nconc(gen_full_copy_list(recv_s1), recv);
+      if (bound_step_send_regions_p(s1))
+	l_send = load_send_regions_list(s1);
+
+      ifdebug(2)
+	{
+	  STEP_DEBUG_STATEMENT(2, "statement s1", s1);
+	  pips_debug(2, "from %s", safe_statement_identification(s1));
+	  debug_print_effects_list(l_send, "SEND S1");
+	}
 
       FOREACH(SUCCESSOR, su, vertex_successors(v1))
 	{
-	  list send_s2, recv_s2;
+	  list l_recv = NIL;
 	  statement s2 = vertex_to_statement(successor_vertex(su));
-	  STEP_DEBUG_STATEMENT(2, "statement s2", s2);
-	  pips_debug(3, "to %s", safe_statement_identification(s2));
 
-	  statement_to_send_recv(s2, &send_s2, &recv_s2);
+	  if (bound_step_recv_regions_p(s2))
+	    l_recv = load_recv_regions_list(s2);
+
+	  ifdebug(2)
+	    {
+	      STEP_DEBUG_STATEMENT(2, "statement s2", s2);
+	      pips_debug(2, "to %s", safe_statement_identification(s2));
+	      debug_print_effects_list(l_recv, "RECV S2");
+	    }
 
 	  FOREACH(CONFLICT, c, dg_arc_label_conflicts((dg_arc_label)successor_arc_label(su)))
 	    {
 	      effect source = conflict_source(c);
 	      effect sink = conflict_sink(c);
-	      entity real = effect_variable(source);
-	      pips_debug(2, "\t\t%s from\t%s", effect_to_string(source), text_to_string(text_region(source)));
-	      pips_debug(2, "\t\t%s to  \t%s", effect_to_string(sink), text_to_string(text_region(sink)));
-	      
-	      if(in_step_analyses_com_p(real, send_s1) && !in_step_analyses_com_p(real, recv_s2))
+	      if(!io_effect_p(source) && !io_effect_p(sink))
 		{
-		  /* real n'est plus optimisable pour S1 */
-		  not_send = CONS(ENTITY, real, not_send);
-		  pips_debug(2,"set unoptimizable %s\n",entity_name(real));
-		}
+		  pips_debug(2, "Dependence :\n\t\t%s from\t%s\t\t%s to  \t%s",
+			     effect_to_string(source), text_to_string(text_region(source)),
+			     effect_to_string(sink), text_to_string(text_region(sink)));
 
-	      if(in_step_analyses_com_p(real, recv_s2) && !in_step_analyses_com_p(real, send_s1))
-		{
-		  /* real n'est plus remontable (produit par S1) */
-		  not_recv = CONS(ENTITY, real, not_recv);
-		  pips_debug(2,"set non remontable %s\n",entity_name(real));
+		  if(!(effect_write_p(source) && effect_read_p(sink)))
+		    pips_debug(2,"not WRITE->READ dependence (ignored)\n");
+		  else
+		    {
+		      pips_debug(2,"new WRITE->READ dependence\n");
+		      if(!(concerned_entity_p(source, l_send) && !concerned_entity_p(sink, l_recv)))
+			pips_debug(2,"############################# not unoptimizable %s\n", entity_name(effect_entity(source)));
+		      else
+			{
+			  /* l'entité n'est plus optimisable pour S1 (et donc non remontable)*/
+			  FOREACH(EFFECT, send_e, l_send)
+			    {
+			      if(effect_entity(source) == effect_entity(send_e))
+				{
+				  pips_debug(2,"############################# unoptimizable %p %s\n", send_e, entity_name(effect_entity(send_e)));
+				  not_send = set_add_element(not_send, not_send, send_e);
+				}
+			    }
+			}
+
+		      if(!(concerned_entity_p(sink, l_recv) && !concerned_entity_p(source, l_send)))
+			pips_debug(2,"############################# not unremontable %s\n", entity_name(effect_entity(sink)));
+		      else
+			{
+			  /* l'entité n'est plus remontable (produit par S1) */
+			   FOREACH(EFFECT, recv_e, l_recv)
+			    {
+			      if(effect_entity(sink) == effect_entity(recv_e))
+				{
+				  pips_debug(2,"############################# unremontable %p %s\n", recv_e, entity_name(effect_entity(recv_e)));
+				  not_recv = set_add_element(not_recv, not_recv, recv_e);
+				}
+			    }
+			}
+		    }
 		}
 	    }
 	  pips_debug(2, "statement s2 end\n");
 	}
-      pips_debug(2, "statement s1 end\n");      
+      pips_debug(2, "statement s1 end\n");
     }
 
-  l=recv;
-  recv=NIL;
-  FOREACH(STEP_COMM_ENTITIES, c, l)
+  /*
+    SUMMARY SEND and RECV REGIONS
+  */
+  list final_summary_send = NIL;
+  FOREACH(EFFECT, eff, load_send_regions_list(get_current_module_statement()))
     {
-      entity real=step_comm_entities_real(c);
-      if(!gen_in_list_p(real, not_recv))
-	{
-	  recv=CONS(STEP_COMM_ENTITIES, c, recv);
-	  pips_debug(1,"\tadd recv (%s, %s)\n", entity_name(real),entity_name(step_comm_entities_formal(c)));
-	}
+      assert(bound_step_path_p(eff));
+      step_point point = load_step_path(eff);
+
+      if(!set_belong_p(not_send, step_point_data(point)))
+	final_summary_send = CONS(EFFECT, eff, final_summary_send);
       else
-	{
-	  pips_debug(2,"\tDROP recv %s\n",entity_name(real));
-	}
+	pips_debug(2, "drop unoptimizable tmp_summary_send %p -> data %p\n", eff, step_point_data(point));
     }
-  
-  l=send;
-  send=NIL;
-  FOREACH(STEP_COMM_ENTITIES, c, l)
+  update_send_regions_list(body, final_summary_send);
+
+  list final_summary_recv = NIL;
+  FOREACH(EFFECT, eff, load_recv_regions_list(get_current_module_statement()))
     {
-      bool is_optimizable;
-      entity real = step_comm_entities_real(c);
-      entity formal = step_comm_entities_formal(c);
-      entity directive_module = module_name_to_entity(entity_module_name(formal));
-      pips_debug(2,"directive module : %s\n", entity_name(directive_module));
-      step_analyses analyses = load_global_step_analyses(directive_module);
-      map_entity_bool optimizable = step_analyses_optimizable(analyses);
-
-      if(!gen_in_list_p(real, not_send))
-	{
-	  is_optimizable = true;
-	  send=CONS(STEP_COMM_ENTITIES, c, send);
-	  pips_debug(1,"\tadd send (%s, %s)\n", entity_name(real),entity_name(step_comm_entities_formal(c)));
-	}
-      else
-	{
-	  is_optimizable = false;
-	  pips_debug(2,"\tDROP send %s\n",entity_name(real));
-	}
-
-      set_optimizable(optimizable, formal, directive_module, is_optimizable);
+      if(!set_belong_p(not_recv, eff))
+	final_summary_recv = CONS(EFFECT, eff, final_summary_recv);
     }
-    
-  
-  DB_PUT_MEMORY_RESOURCE(DBR_STEP_ANALYSES_COM, module_name, make_step_analyses_com(recv, send));
+  update_recv_regions_list(body, final_summary_recv);
 
-  global_step_analyses_save();
-  global_directives_save();
+  ifdebug(2)
+    {
+      debug_print_effects_list(final_summary_send, "FINAL SUMMARISED SEND");
+      debug_print_effects_list(final_summary_recv, "FINAL SUMMARISED RECV");
+    }
+
+  DB_PUT_MEMORY_RESOURCE(DBR_STEP_SEND_REGIONS, module_name, get_step_send_regions());
+  DB_PUT_MEMORY_RESOURCE(DBR_STEP_RECV_REGIONS, module_name, get_step_recv_regions());
+
+  /*
+    Update comm PARTIAL or FULL
+  */
+  SET_FOREACH(effect, eff, not_send)
+    {
+      set_comm(eff, true); // true : FULL
+    }
+  FOREACH(EFFECT, eff, final_summary_send)
+    {
+      set_comm(eff, false); // false : PARTIAL
+    }
+
+  ifdebug(1)
+    if(entity_main_module_p(module))
+      {
+	pips_debug(1, "################ COMM %s ###############\n", entity_name(module));
+	MAP_EFFECT_BOOL_MAP(eff, partial,
+			    {
+			      step_point point = load_step_path(eff);
+			      pips_debug(1, "module : %s\n", entity_user_name(step_point_module(point)));
+			      ifdebug(2)
+				print_statement(step_point_stmt(point));
+			      debug_print_effects_list(CONS(EFFECT,step_point_data(point),NIL), partial?"COMMUNICATION PARTIAL":"COMMUNICATION FULL");
+			    }, get_step_partial());
+      }
+
+  reset_step_send_regions();
+  reset_step_recv_regions();
+
+  sp_finalize();
+
+  store_step_comm();
+
+  step_directives_reset();
+
+  generic_effects_reset_all_methods();
+  reset_convex_rw_regions(module_name);
 
   reset_ordering_to_statement();
   reset_current_module_statement();
+
+  reset_in_effects();
+  reset_out_effects();
+  reset_rw_effects();
+
   reset_current_module_entity();
 
-  debug_off(); 
+  debug_off();
   return true;
 }
+
