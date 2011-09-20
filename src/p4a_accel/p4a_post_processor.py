@@ -74,6 +74,8 @@ def replace_by_opencl_own_declarations(content):
     content = re.sub("\(\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,","(P4A_accel_global_address \\1 \\2[\\3],", content)
     # ,...  ...[...]) substituted by ,P4A_accel_global_address ... * ...[...])
     content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\)",",P4A_accel_global_address \\1 \\2[\\3])", content)
+    
+    content = re.sub("(\w+) (p4a_kernel_\w+\()","P4A_accel_kernel \\1 \\2", content)
 
     return content
 
@@ -167,8 +169,9 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
 		wrapper_proto_declaration=""
 		for wrapper in opencl_wrappers:
 			wrapper_proto_declaration= wrapper_proto_declaration + "P4A_wrapper_proto("+wrapper[1]+", "+wrapper[2]+";\n"
-		content=re.sub(r"(#include <p4a_accel\.h>)","\\1 \n"+wrapper_proto_declaration, content)
-
+		#content=re.sub(r"(#include <p4a_accel\.h>)","\\1 \n"+wrapper_proto_declaration, content)
+		content= "#include <p4a_accel.h> \n" + wrapper_proto_declaration + content
+		
     else:
 		content = header + content
 

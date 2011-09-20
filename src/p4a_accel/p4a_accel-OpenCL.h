@@ -702,7 +702,10 @@ parameters types are resolved.
   /*size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter)};*/ \
   int global_x = (n_x_iter+P4A_CL_ITEM_MAX-1)/P4A_CL_ITEM_MAX;		\
   global_x *= p4a_block_x;						\
-  int global_y = n_y_iter;						\
+  int global_y = n_y_iter; \
+  /*OG: replace the following : */\
+   /* size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; \ */\
+  /* with */\
   size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; \
   P4A_skip_debug(0,P4A_dump_grid_descriptor(grid_descriptor_name););	\
   P4A_skip_debug(0,P4A_dump_block_descriptor(block_descriptor_name);)
@@ -712,8 +715,8 @@ parameters types are resolved.
  *  OG:change descriptor_name[0] to descriptor_name, gcc does not accept, still question for one dim ?*/
 #define P4A_dump_descriptor(message, descriptor_name)			\
   P4A_dump_message(message "\""  #descriptor_name "\" of size %zu x %zu\n", \
-		   descriptor_name,					\
-		   descriptor_name)
+		   descriptor_name[0],					\
+		   descriptor_name[1])
 
 /** Dump a CL dim3 block descriptor */
 #define P4A_dump_block_descriptor(descriptor_name)			\
