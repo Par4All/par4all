@@ -7,963 +7,297 @@ License.
 */
 
 #ifdef HAVE_CONFIG_H
-#include "pips_config.h"
+    #include "pips_config.h"
 #endif
-#include "defines-local.h"
-#include "step.h"
-#include "preprocessor.h"
-#include "syntax.h"
-#include "c_syntax.h"
 
+#include "defines-local.h" // for STEP_DEBUG_STATEMENT
+#include "control.h" // for module_reorder
 
-int count_critical=0;
-GENERIC_GLOBAL_FUNCTION(global_directives,directives);
+extern void step_directive_parser(statement body);
 
+GENERIC_LOCAL_FUNCTION(directives, step_directives);
 
-string step_directives_USER_FILE_name()
-{ 
-  string file_name, full_name;
-  string dir_name = db_get_current_workspace_directory();
-  const char* module = module_local_name(get_current_module_entity());
-  string name = strdup(concatenate(dir_name, "/", db_get_file_resource(DBR_USER_FILE,module,true), NULL));
-
-  if (dot_f_file_p(name)|| dot_F_file_p(name) )
-    {
-      file_name = "step_directives.f";
-    }
-  else if (dot_c_file_p(name))
-    {
-      file_name = "step_directives.c";
-      safe_system(concatenate("touch ", dir_name , "/", WORKSPACE_TMP_SPACE,file_name, NULL));
-    }
-  else
-    {
-      pips_internal_error("file type error");
-    }
-
-  full_name = strdup(concatenate(dir_name, "/", WORKSPACE_TMP_SPACE, "/", file_name, NULL));
-  free (dir_name);
-  return full_name;
-}
-
-bool directives_init(string __attribute__ ((unused)) module_name)
+void step_directives_init()
 {
-  init_global_directives();
-  global_directives_save();
-
-  db_make_subdirectory(WORKSPACE_TMP_SPACE);
-  string dir_name = db_get_current_workspace_directory();
-  safe_system(concatenate("touch ", dir_name , "/", WORKSPACE_TMP_SPACE, "/step_directives.f", NULL));
-
-  return true;
+  const char *module_name = entity_user_name(get_current_module_entity());
+  set_directives((step_directives)db_get_memory_resource(DBR_STEP_DIRECTIVES, module_name, true));
 }
 
-void global_directives_load()
+void step_directives_reset()
 {
-  set_global_directives((directives)db_get_memory_resource(DBR_DIRECTIVES, "", true));
+  reset_directives();
 }
 
-void global_directives_save()
+static void step_directives_save()
 {
-  DB_PUT_MEMORY_RESOURCE(DBR_DIRECTIVES, "", get_global_directives());
-  reset_global_directives();
+  const char *module_name = entity_user_name(get_current_module_entity());
+  DB_PUT_MEMORY_RESOURCE(DBR_STEP_DIRECTIVES, module_name, get_directives());
+  reset_directives();
 }
 
 
-
-/* directive stack used to outline directive body */
-DEFINE_GLOBAL_STACK(current_directives, directive);
-
-/*
-  Phase PIPS de pretraitement : les directives sont remplacees par des
-  appels a la fonction DIR_CALL
-
-  dont l'argument est le texte de la directive et le nouveau fichier a
-  pour suffixe STEP_FILTERED_SUFFIX.
-
-*/
-#define STEP_FILTERED_SUFFIX ".step_filtered"
-static int sequence_level = 0;
-
-bool directive_filter(string name)
+step_directive step_directives_get(statement stmt)
 {
-    string file_name, dir_name, new_name, src_name;
-
-    debug_on("STEP_DEBUG_LEVEL");
-    pips_debug(1, "considering module %s\n", name);
-    
-    dir_name = db_get_current_workspace_directory();
-    file_name = db_get_file_resource(DBR_SOURCE_FILE, name, true);
-    new_name = strdup(concatenate(name,"/",name, STEP_FILTERED_SUFFIX, NULL));
-    src_name = strdup(concatenate(dir_name, "/", file_name, NULL));
-
-    pips_debug(2,"cmd=%s",concatenate("step_directives"," < ", src_name, " > ", dir_name, "/", new_name,"\n", NULL));
-    safe_system(concatenate("step_directives"," < ", src_name, " > ", dir_name, "/", new_name, NULL));
-
-    DB_PUT_FILE_RESOURCE(DBR_DIRECTIVE_FILTERED_FILE, name, new_name);
-
-    free(src_name);
-    free(dir_name);
-
-    pips_debug(1, "fin\n");
-    debug_off();
-    return true;
+  return load_directives(stmt);
 }
 
-bool directive_filter_c(string name)
+bool step_directives_bound_p(statement stmt)
 {
-    string file_name, dir_name, new_name, src_name;
-
-    debug_on("STEP_DEBUG_LEVEL");
-    pips_debug(1, "considering module %s\n", name);
-    
-    dir_name = db_get_current_workspace_directory();
-    file_name = db_get_file_resource(DBR_C_SOURCE_FILE, name, true);
-    new_name = strdup(concatenate(name,"/",name, STEP_FILTERED_SUFFIX, NULL));
-    src_name = strdup(concatenate(dir_name, "/", file_name, NULL));
-
-    safe_system(concatenate("cp ", src_name, " ", dir_name, "/", new_name, NULL));
-
-    DB_PUT_FILE_RESOURCE(DBR_DIRECTIVE_FILTERED_FILE, name, new_name);
-
-    free(src_name);
-    free(dir_name);
-
-    pips_debug(1, "fin\n");
-    debug_off();
-    return true;
+  return bound_directives_p(stmt);
 }
 
-
-/*######################################################################################################*/
-string step_make_new_directive_module_name(string suffix, const char* id)
+void step_directives_store(statement stmt, step_directive d)
 {
-  int i;
-  string final_name, i_s;
-  char* new_name;
-  entity current_module;
-
-  pips_debug(1,"suffix = %s, id = %s\n", suffix, id);
-
-  current_module = get_current_module_entity();
-  pips_assert("current module defined", !entity_undefined_p(current_module));
-  pips_assert("stack defined", !stack_undefined_p(current_directives_stack));
-
-  new_name = string_undefined;
-  final_name = string_undefined;
-
-  if (current_directives_empty_p())
-    {
-      /* stack is empty */
-      new_name = strdup(module_local_name(current_module));
-    }
-  else
-    {
-      string previous_module_name;
-      
-      previous_module_name = directive_module_name(current_directives_head());
-
-      if(suffix)
-	  new_name = strdup(concatenate(previous_module_name,"_",suffix, id, NULL));
-      else
-	  new_name = strdup(previous_module_name);
-    }
-
-  pips_debug(2,"temporary new_name = %s\n", new_name);
-
-  if (suffix)      //  ensure name unicity
-    {
-      i = 1;
-      if (string_undefined_p(id) || strlen(id) > 0)
-	i_s = strdup("");
-      else
-	i_s=i2a(i++);
-      
-      final_name = strdup(concatenate(new_name, i_s, NULL));
-      while (!entity_undefined_p(gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, final_name,NULL), entity_domain)) ||
-	     !entity_undefined_p(find_label_entity(get_current_module_name(), i_s)))
-	{
-	  free(i_s);
-	  i_s = i2a(i++);
-	  free(final_name);
-	  final_name = strdup(concatenate(new_name, i_s, NULL));
-	} 
-
-      free(i_s);
-      free(new_name);
-
-      /*
-	Creation of the entity final_name
-	for matching the next try with the same "final_name" but for a new directive
-      */
-
-      make_empty_subroutine(final_name,copy_language(module_language(get_current_module_entity()))); 
-      new_name = final_name;
-    }
-
-  pips_debug(2,"final new_name = %s\n", new_name);
-  return new_name;
+  assert(statement_block_p(stmt));
+  store_directives(stmt, d);
 }
 
-void step_print_directive(directive drt)
+#define SB_LIST_VARIABLE(sb, list_var, txt_begin) 			\
+  if(!set_empty_p(list_var))						\
+    {									\
+      string s = string_undefined;					\
+      FOREACH(ENTITY, variable, set_to_sorted_list(list_var, (gen_cmp_func_t)compare_entities)) \
+	{								\
+	  if(s == string_undefined)					\
+	    s=strdup(concatenate(txt_begin, entity_user_name(variable), NULL)); \
+	  else								\
+	    s=strdup(concatenate(", ", entity_user_name(variable), NULL)); \
+	  string_buffer_append(sb, s);					\
+	}								\
+      string_buffer_append(sb, strdup(")"));				\
+    }
+
+bool step_directive_to_strings(step_directive d, bool is_fortran, string *begin_txt, string *end_txt)
 {
-  pips_assert("directive defined!", !directive_undefined_p(drt));
-  
-  pips_debug(1, "txt = %s, module_name = %s\n", directive_txt(drt), directive_module_name(drt));
+  bool block_directive = true;
+  bool end_directive = is_fortran;
 
-  if (directive_body(drt) == NIL)
-    {
-      pips_debug(1, "empty body\n");
-    }
-  else
-    {
-      statement stmt;
-      stmt = make_block_statement(gen_full_copy_list(directive_body(drt)));
-      pips_debug(1, "body:\n");
-      print_statement(stmt);
-      free_statement(stmt);
-    }
-
-  if (directive_clauses(drt) == NIL)
-    {
-      pips_debug(1, "no clause\n");
-    }
-  else
-    {
-      pips_debug(1, "clause(s) exist\n");
-    }
-}
-
-static directive make_directive_none(statement stmt)
-{
-  string id;
-  string new_name;
-  list stmt_list;
-  directive drt;
-  pips_debug(1,"stmt = %p\n", stmt);
-
-  if (statement_undefined_p(stmt))
-    {
-      id = NULL;
-      stmt_list = NIL;
-    }
-  else
-    {
-      id = "";
-      stmt_list = CONS(STATEMENT, copy_statement(stmt), NIL);
-    }
-
-  new_name = step_make_new_directive_module_name(NULL, id);
-  drt = make_directive(strdup("none"), new_name, make_type_directive_none(), stmt_list, NIL);
-
-  pips_debug(1,"drt = %p\n", drt);
-  return drt;
-}
-
-static instruction handle_directive_none(directive begin, directive end)
-{
-  instruction instr;
-
-  pips_debug(1,"begin = %p, end = %p\n", begin, end);
-
-  instr = instruction_undefined;
-
-  pips_assert("directive none", type_directive_none_p(directive_type(end)));
-  switch (gen_length(directive_body(end)))
-    {
-    case 0:
-      instr = make_continue_instruction();
-      break;
-    case 1:
-      instr = copy_instruction(statement_instruction(STATEMENT(CAR(directive_body(end)))));
-      break;
-    default:
-      instr = make_instruction_block(gen_full_copy_list(directive_body(end)));
-      break;
-    }
-  update_label_do_directive_module_name(begin, end);
-  //  free_directive(end);
-
-  pips_debug(1,"instr = %p\n", instr);
-  return instr;
-}
-
-static bool optional_end_directive_p(directive current)
-{
-  bool b;
-
-  pips_debug(1,"current = %p\n", current);
-
-  b = false;
-
-  if(type_directive_omp_do_p(directive_type(current)) &&
-     !ENDP(directive_body(current)))
-    {
-      /* if body not empty then omp_do is considered as ended */
-      b = true;
-    }
-
-  if(type_directive_omp_parallel_do_p(directive_type(current)) &&
-     !ENDP(directive_body(current)))
-    {
-      /* if body not empty then omp_parallel_do is considered as ended */
-      b = true;
-    }
-
-  pips_debug(1,"b = %d\n", b);
-  return b;
-}
-
-static bool hook_block_false(directive __attribute__ ((unused)) current,directive __attribute__ ((unused)) next)
-{
-  return false;
-}
-
-/*######################################################################################################*/
-typedef directive (*make_directive_hook) (statement);
-typedef bool (*block_directive_hook) (directive,directive);
-typedef instruction (*handle_directive_hook) (directive,directive); 
-
-typedef struct {
-  enum type_directive_utype directive_type_tag;
   string directive_txt;
-  make_directive_hook make; /* generation de la representation interne de la directive (type newgen) */
-  block_directive_hook begin;
-  block_directive_hook end;
-  handle_directive_hook handle; /* traitement de la directive: outlining */ 
-} directive_hooks;
-
-static directive_hooks directives_hooks[]= {
-  {is_type_directive_omp_parallel_sections,
-   PARALLEL_SECTIONS_TXT,
-   make_directive_omp_parallel_sections,
-   is_begin_directive_omp_parallel_sections,
-   hook_block_false,
-   handle_omp_sections
-  },
-  {is_type_directive_omp_end_parallel_sections,
-   END_PARALLEL_SECTIONS_TXT,
-   make_directive_omp_end_parallel_sections,
-   hook_block_false,
-   is_end_directive_omp_end_parallel_sections,
-   NULL
-  },
-  {is_type_directive_omp_sections,
-   SECTIONS_TXT,
-   make_directive_omp_sections,
-   is_begin_directive_omp_sections,
-   hook_block_false,
-   handle_omp_sections
-  },
-  {is_type_directive_omp_section,
-   SECTION_TXT,
-   make_directive_omp_section,
-   is_begin_directive_omp_section,
-   is_end_directive_omp_section,
-   handle_omp_section
-  },
-  {is_type_directive_omp_end_sections,
-   END_SECTIONS_TXT,
-   make_directive_omp_end_sections,
-   hook_block_false,
-   is_end_directive_omp_end_sections,
-   NULL
-  },
-  {is_type_directive_omp_parallel_do,
-   PARALLEL_DO_TXT,
-   make_directive_omp_parallel_do,
-   is_begin_directive_omp_parallel_do,
-   hook_block_false,
-   handle_omp_parallel_do
-  },
-  {is_type_directive_omp_end_parallel_do,
-   END_PARALLEL_DO_TXT,
-   make_directive_omp_end_parallel_do,
-   hook_block_false,
-   is_end_directive_omp_end_parallel_do,
-   handle_omp_parallel_do
-  },
-  {is_type_directive_omp_parallel,
-   PARALLEL_TXT,
-   make_directive_omp_parallel,
-   is_begin_directive_omp_parallel,
-   hook_block_false,
-   handle_omp_parallel
-  },
-  {is_type_directive_omp_end_parallel,
-   END_PARALLEL_TXT,
-   make_directive_omp_end_parallel,
-   hook_block_false,
-   is_end_directive_omp_end_parallel,
-   handle_omp_parallel
-  },
-  {is_type_directive_omp_do,
-   DO_TXT,
-   make_directive_omp_do,
-   is_begin_directive_omp_do,
-   hook_block_false,
-   handle_omp_do
-  },
-  {is_type_directive_omp_end_do,
-   END_DO_TXT,
-   make_directive_omp_end_do,
-   hook_block_false,
-   is_end_directive_omp_end_do,
-   handle_omp_do
-   },
-  {is_type_directive_omp_master,
-   MASTER_TXT,
-   make_directive_omp_master,
-   begin_directive_omp_master,
-   hook_block_false,
-   handle_omp_master
-  },
-  {is_type_directive_omp_end_master,
-   END_MASTER_TXT,
-   make_directive_omp_end_master,
-   hook_block_false,
-   end_directive_omp_end_master,
-   handle_omp_master
-  },
-  {is_type_directive_omp_critical,
-   CRITICAL_TXT,
-   make_directive_omp_critical,
-   begin_directive_omp_critical,
-   hook_block_false,
-   handle_omp_critical
-  },
-  {is_type_directive_omp_end_critical,
-   END_CRITICAL_TXT,
-   make_directive_omp_end_critical,
-   hook_block_false,
-   end_directive_omp_end_critical,
-   handle_omp_critical
-  },
-  
-  {is_type_directive_omp_barrier,
-   BARRIER_TXT,
-   make_directive_omp_barrier,
-   begin_directive_omp_barrier,
-   end_directive_omp_barrier,
-   handle_omp_barrier
-  },
-  /*must be the last*/
-  {is_type_directive_none,/* fake directive for sequence instruction handling*/
-   string_undefined,
-   (make_directive_hook)make_directive_none,
-   (block_directive_hook)hook_block_false,
-   (block_directive_hook)hook_block_false,
-   (handle_directive_hook)handle_directive_none
-  }
-};
-
-bool step_directive_p(string directive, const char* entity_name) 
-{
-  int retcode;
-  char *debut;
-
-  pips_debug(3, "directive = %s (len=%zd), entity_name = %s\n", directive, strlen(directive), entity_name);
-
-  if (string_undefined_p(directive))
-    return false;
-
-  debut=strcasestr(entity_name,directive);
-  retcode=((debut-(char*)entity_name)==1);
-
-  pips_debug(3, "retcode = %d\n", retcode);
-  return retcode;
-}
-
-static directive_hooks hooks_by_txt(const char* txt)
-{
-  int id_hook=0;
-  directive_hooks hook;
-
-  pips_debug(2, "txt = %s\n", txt);
-
-  while (id_hook < is_type_directive_none &&
-	 !step_directive_p(directives_hooks[id_hook].directive_txt, txt))
-    id_hook++;
-  hook = directives_hooks[id_hook];
-
-  pips_debug(2, "end\n");
-  return hook;
-}
-
-static directive_hooks hooks_by_directive(directive d)
-{
-  int id_hook=0;
-  while (id_hook < is_type_directive_none &&
-	 type_directive_tag(directive_type(d)) != directives_hooks[id_hook].directive_type_tag)
-    id_hook++;
-  return directives_hooks[id_hook];
-}
-
-/*######################################################################################################*/
-static bool directive_statement_p(statement stmt)
-{
-  entity f;
-  bool b;
-  
-  pips_debug(1, "stmt = %p\n", stmt);
-
-  if (statement_undefined_p(stmt) || !statement_call_p(stmt))
-    return false;
-  
-  f = call_function(statement_call(stmt));
-  b = (top_level_entity_p(f) && strncmp(DIR_CALL, entity_local_name(f), strlen(DIR_CALL))==0);
-
-  pips_debug(1, "b = %d\n", b);
-  return b;
-}
-
-const char* statement_to_directive_txt(statement stmt)
-{
-  const char* txt;
-  entity f;
-  pips_debug(1, "stmt = %p\n", stmt);
-
-  pips_assert("call",!statement_undefined_p(stmt) && statement_call_p(stmt));
-  f = call_function(statement_call(stmt));
-  pips_assert("directive",(top_level_entity_p(f) && strncmp(DIR_CALL, entity_local_name(f), strlen(DIR_CALL))==0));
-
-  txt = entity_local_name(expression_to_entity(EXPRESSION(CAR(call_arguments(statement_call(stmt))))));
-  
-  pips_debug(1, "txt = %s\n", txt);
-  return txt;
-}
-
-static bool directive_none_p(directive d)
-{
-  return type_directive_none_p(directive_type(d));
-}
-
-// un parser serait pas mal pour reconnaitre la type de directive avec ses clauses :)
-static directive make_directive_from_statement(statement stmt)
-{
-  directive drt;
-  pips_debug(1, "BEGIN stmt = %p\n", stmt);
-
-  STEP_DEBUG_STATEMENT(2, "stmt", stmt);
-
-  if (!directive_statement_p(stmt))
+  switch(step_directive_type(d))
     {
-      drt = make_directive_none(stmt);
+    case STEP_PARALLEL:
+      directive_txt = strdup("parallel");
+      break;
+    case STEP_DO:
+      directive_txt = strdup(is_fortran?"do":"for");
+      block_directive = is_fortran;
+      break;
+    case STEP_PARALLEL_DO:
+      directive_txt = strdup(is_fortran?"parallel do":"parallel for");
+      block_directive = is_fortran;
+      break;
+    case STEP_MASTER:
+      directive_txt = strdup("master");
+      break;
+    case STEP_SINGLE:
+      directive_txt = strdup("single");
+      break;
+    case STEP_BARRIER:
+      directive_txt = strdup("barrier");
+      block_directive = false;
+      end_directive = false;
+      break;
+    default: assert(0);
     }
+
+  /*  clause */
+  set private_l = set_make(set_pointer);
+  set shared_l = set_make(set_pointer);
+  bool nowait = false;
+
+  int op;
+  set reductions_l[STEP_OP_UNDEFINED];
+  for(op=0; op<STEP_OP_UNDEFINED; op++)
+    reductions_l[op] = set_make(set_pointer);
+
+  FOREACH(STEP_CLAUSE, c, step_directive_clauses(d))
+    {
+      switch (step_clause_tag(c))
+	{
+	case is_step_clause_private:
+	  set_append_list(private_l, step_clause_private(c));
+	  break;
+	case is_step_clause_shared:
+	  set_append_list(shared_l, step_clause_shared(c));
+	  break;
+	case is_step_clause_nowait:
+	  nowait = true;
+	  break;
+	case is_step_clause_reduction:
+	  MAP_ENTITY_INT_MAP(variable, op, {
+	      set_add_element(reductions_l[op], reductions_l[op], variable);
+	    }, step_clause_reduction(c));
+	  break;
+	case is_step_clause_transformation:
+	  break;
+	default: assert(0);
+	}
+    }
+
+
+  if(end_directive)
+    *end_txt = strdup(concatenate("omp end ",directive_txt, nowait?" nowait":"", NULL));
   else
-    {
-      /* Where the directive is created */
-      drt = ((hooks_by_txt(statement_to_directive_txt(stmt))).make)(stmt);
-      
-      if (directive_none_p(drt))
-	pips_internal_error("directive handling not yet implemented : %s", statement_to_directive_txt(stmt));
+    *end_txt = string_undefined;
 
-      directive_clauses(drt)=gen_nconc(directive_clauses(drt),CONS(CLAUSE,directive_transformation(directive_txt(drt)),NIL));
+  string_buffer sb = string_buffer_make(false);
+  string_buffer_cat(sb, strdup("omp "), strdup(directive_txt), NULL);
+
+  SB_LIST_VARIABLE(sb, private_l, " private(");
+  SB_LIST_VARIABLE(sb, shared_l, " shared(");
+
+  string op_txt[STEP_OP_UNDEFINED]={" reduction(*: "," reduction(max: "," reduction(min: "," reduction(+: "};
+  for(op=0; op<STEP_OP_UNDEFINED; op++)
+    SB_LIST_VARIABLE(sb, reductions_l[op], op_txt[op]);
+
+  if(nowait && !end_directive)
+    string_buffer_append(sb, strdup(" nowait"));
+
+  *begin_txt = string_buffer_to_string(sb);
+  string_buffer_free_all(&sb);
+
+  ifdebug(4)
+    {
+      printf("øøøøøøøøø directive begin : %s\n", *begin_txt);
+      printf("øøøøøøøøø directive end : %s\n", end_directive?*end_txt:"");
     }
 
-  pips_debug(1, "END drt = %p\n", drt);
-  return drt;
+  return block_directive;
 }
 
-static bool begin_directive_p(directive d)
+
+statement step_directive_basic_workchunk(step_directive d)
 {
-  return ((hooks_by_directive(d)).begin)(current_directives_head(),d);
-}
+  statement stmt = step_directive_block(d);
 
-static bool end_directive_p(directive d)
-{ 
-  return ((hooks_by_directive(d)).end)(current_directives_head(),d);
-}
-
-static void handle_directive_push(list remaining, directive drt)
-{
-  handle_directive_sections_push(remaining, drt);
-}
-
-static instruction handle_directive_pop(directive begin, directive end)
-{
-  pips_debug(1, "begin = %p, end = %p\n", begin, end);
-
-  if (directive_none_p(begin)&&directive_none_p(end))
+  switch(step_directive_type(d))
     {
-       /*
-	 Case of the fake directive
-       */ 
-      pips_debug(2, "case of a fake directive: handle end (head, end)\n");
-      return ((hooks_by_directive(end)).handle)(current_directives_head(),end);
-    }
-  else
-    {
-      /*
-	Case of a directive
-      */
-      pips_debug(2, "case of a directive: handle begin (begin, end)\n");
-      return ((hooks_by_directive(begin)).handle)(begin,end);
-    }
-  pips_debug(1, "end\n");
-}
+    case STEP_DO:
+    case STEP_PARALLEL_DO:
+      {
+	// on retourne le corps de boucle
+	list block = statement_block(stmt);
+	pips_assert("1 statement", gen_length(block) == 1);
 
-/*######################################################################################################*/
-static bool dir_filter(statement);
+	stmt = STATEMENT(CAR(block));
 
-static void add_instruction_to_list(instruction instr, list l)
-{
-  pips_debug(1, "instr = %p, l = %p\n", instr, l);
-
-  pips_assert("list",!ENDP(l));
-  
-  /* add at the beginning of the list */
-  if(instruction_sequence_p(instr))
-    {
-      CDR(l)=gen_nconc(gen_full_copy_list(instruction_block(instr)),CDR(l));
-      free_instruction(instr);
-    }
-  else
-    CDR(l)=CONS(STATEMENT,make_statement(entity_empty_label(), 
-					 STATEMENT_NUMBER_UNDEFINED,
-					 STATEMENT_ORDERING_UNDEFINED, 
-					 empty_comments,
-					 instr,
-					 NIL,NULL,empty_extensions ()),CDR(l));
-
-  pips_debug(1, "end\n");
-  return;
-}
-
-statement step_keep_directive_txt(directive begin,statement stmt,directive end)
-{
-  string new_comment;
-  
-  pips_debug(1, "begin = %p, stmt = %p, end = %p\n", begin, stmt, end);
-  
-
-  if(!(directive_undefined_p(begin) || directive_none_p(begin)))
-    {
-      string d_txt=step_remove_quote(directive_txt(begin));
-      new_comment = strdup(concatenate(STEP_KEEP_DIRECTIVE_PREFFIX,d_txt,"\n",NULL));
-      free(d_txt);
-
-      insert_statement(stmt, make_statement(entity_empty_label(), 
-					    STATEMENT_NUMBER_UNDEFINED,
-					    STATEMENT_ORDERING_UNDEFINED, 
-					    new_comment,
-					    make_continue_instruction(),
-					    NIL, NULL,empty_extensions ()),
-		       true); /* before */
+	if(statement_loop_p(stmt))
+	  stmt = loop_body(statement_loop(stmt));
+	else if (statement_forloop_p(stmt))
+	  stmt = forloop_body(statement_forloop(stmt));
+	else
+	  pips_assert("not a loop", false);
+	break;
+      }
+    default:
+      {
+	// on retourne le block de la directive
+      }
     }
 
-  if(!(directive_undefined_p(end) || directive_none_p(end)))
-    {
-      new_comment = strdup(concatenate(STEP_KEEP_DIRECTIVE_PREFFIX,step_remove_quote(directive_txt(end)),"\n",NULL));
-
-      insert_statement(stmt, make_statement(entity_empty_label(), 
-					    STATEMENT_NUMBER_UNDEFINED,
-					    STATEMENT_ORDERING_UNDEFINED, 
-					    new_comment,
-					    make_continue_instruction(),
-					    NIL, NULL, empty_extensions()),
-		       false); /* after */
-    }
-
-  pips_debug(1, "stmt = %p\n", stmt);
   return stmt;
 }
 
-static void directive_statement_filter(statement stmt)
+list step_directive_basic_workchunk_index(step_directive d)
 {
-  directive new_directive;
-  pips_debug(1, "stmt = %p\n", stmt);
+  list index_l = NIL;
+  statement stmt = step_directive_block(d);
 
-  pips_assert("non block",!statement_block_p(stmt) && directive_statement_p(stmt));
-  new_directive = make_directive_from_statement(stmt);
-  pips_debug(2,"directive %s\n",directive_txt(new_directive));
-
-  /*
-  a directive that is both begin and end is a single statement directive
-  for instance: barrier
-  */
-  if(!directive_none_p(new_directive) && 
-     begin_directive_p(new_directive) && end_directive_p(new_directive))
-	{
-	  free_instruction(statement_instruction(stmt));
-	  pips_debug(2, "1 HANDLE directive (new_drt, new_drt)\n");
-	  statement_instruction(stmt) = handle_directive_pop(new_directive,new_directive);
-	}
-  /*
-    a block begin/end  or an unknown directive is found in a non-block statement
-  */
-  else 
+  switch(step_directive_type(d))
     {
-      if (directive_none_p(new_directive) &&  // an unknown directive
-	  directive_statement_p(STATEMENT(CAR(directive_body(new_directive)))))
-	pips_internal_error("directive unknown.");
-      else
-	pips_internal_error("begin/end directive out of block.");
-      free_directive(new_directive); 
+    case STEP_DO:
+    case STEP_PARALLEL_DO:
+      {
+	list block = statement_block(stmt);
+	pips_assert("1 statement", gen_length(block) == 1);
+
+	stmt = STATEMENT(CAR(block));
+
+	if(statement_loop_p(stmt))
+	  index_l = CONS(ENTITY, loop_index(statement_loop(stmt)), index_l);
+	else if (statement_forloop_p(stmt))
+	  {
+	    expression init = forloop_initialization(statement_forloop(stmt));
+	    pips_assert("an assignment", assignment_expression_p(init));
+	    list assign_params = call_arguments(syntax_call(expression_syntax(init)));
+	    expression lhs = EXPRESSION(CAR(assign_params));
+	    entity e = expression_to_entity(lhs);
+	    pips_assert("an entity", !entity_undefined_p(e));
+	    index_l = CONS(ENTITY, e, index_l);
+	  }
+	else
+	  pips_assert("not a loop", false);
+	break;
+      }
+    default:
+      {
+	// on retourne la liste vide
+      }
     }
 
-  STEP_DEBUG_STATEMENT(1,"end filter statement ",stmt);
+  return gen_nreverse(index_l);
 }
 
-static void _directives_outline(list remaining, statement stmt)
+void step_directive_print(step_directive d)
 {
-  pips_debug(1,"remaining = %p, stmt = %p\n", remaining, stmt);
+  int type = step_directive_type(d);
+  list clauses = step_directive_clauses(d);
+  string begin_txt, end_txt;
+  bool is_fortran = fortran_module_p(get_current_module_entity());
+  bool is_block_construct = step_directive_to_strings(d, is_fortran, &begin_txt, &end_txt);
 
-  STEP_DEBUG_DIRECTIVE(2, "current_directives head", current_directives_head());
+  pips_debug(1, "====> TYPE %d : \nNB clauses : %d\n\tdirective begin : %s\n",
+	     type, (int)gen_length(clauses), begin_txt);
+  if (is_block_construct && !empty_comments_p(end_txt)) pips_debug(1,"\tdirective end : %s\n", end_txt);
 
-  if (optional_end_directive_p(current_directives_head())) 
+  ifdebug(1)
     {
-      /*
-	Case where the end directive is optional (and present or not)
-	for omp_do and omp_parallel_do
-	Where the current directive is handled (outlined)
-      */
-      
-      directive begin;
-
-      pips_debug(2, "optional end directive\n");
-
-      begin = current_directives_pop();
-      STEP_DEBUG_DIRECTIVE(2,"POP current_directives", begin);
-
-      /* handle (outline) the current directive */
-      pips_debug(2, "2 HANDLE directive (pop head, none)\n");
-      add_instruction_to_list(handle_directive_pop(begin, make_directive_none(stmt)), remaining);
+      statement stmt = step_directive_block(d);
+      assert(!statement_undefined_p(stmt));
+      pips_debug(1, "----> on statement :\n");
+      print_statement(stmt);
+      pips_debug(1, "\n");
     }
-  else
+  ifdebug(2)
     {
-      directive new_directive;
-      /* 
-	 Converts any instruction in a directive.
-	 For a statement which is not an OpenMP directive,
-	 it creates a directive of type directive_none
-      */
-      
-      new_directive = make_directive_from_statement(stmt);
-      
-      if(begin_directive_p(new_directive)) 
+      statement stmt = step_directive_basic_workchunk(d);
+      assert(!statement_undefined_p(stmt));
+
+      string index_str=strdup("");
+      FOREACH(ENTITY, e , step_directive_basic_workchunk_index(d))
 	{
-	  /* add a new directive into the stack */
-	  pips_debug(2, "begin directive\n");
-	  STEP_DEBUG_DIRECTIVE(2,"PUSH current_directives", new_directive);
-	  current_directives_push(new_directive);
-
-	  /* used only for omp_sections et omp_parallel_sections */
-	  handle_directive_push(remaining, new_directive);
+	  string previous = index_str;
+	  index_str = strdup(concatenate(previous, entity_local_name(e), " ", NULL));
+	  free(previous);
 	}
-      
-      /* a master directive is both begin and end */
-      if(end_directive_p(new_directive))
-	{
-	  /*
-	    Case where the end directive is present
-	    Where the current directive is handled (outlined)
-	  */
-	  directive begin;
-	  
-	  pips_debug(2, "end directive\n");
-	  begin = current_directives_pop();
-	  STEP_DEBUG_DIRECTIVE(2,"POP current_directives", begin);
-
-	  /* handle (outline) the current directive */
-	  pips_debug(2, "3 HANDLE directive (pop head, new_drt)\n");
-	  add_instruction_to_list(handle_directive_pop(begin, new_directive), remaining);
-	}
-      else if(directive_none_p(new_directive))
-	{
-	  /*
-	    Case where the statement is not a directive
-	    (directive_none)
-	    
-	    Add the none directive to the current directive body
-	  */
-	  
-	  directive current;
-	  pips_debug(2, "none directive\n");
-
-	  current = current_directives_head();
-	  STEP_DEBUG_DIRECTIVE(2,"head current_directives", current);
-
-	  /* free instr corresponding to the none new_directive */
-	  free_instruction(statement_instruction(stmt));
-	  pips_debug(2, "4 HANDLE directive (new_drt, new_drt)\n");
-	  statement_instruction(stmt) = handle_directive_pop(new_directive, new_directive);
-	  pips_debug(2, "ADD the none directive to the body of the head of current_directives\n");
-	  directive_body(current) = gen_nconc(directive_body(current), CONS(STATEMENT, copy_statement(stmt), NIL));
-
-	}
+      pips_debug(2, "\n----> basic workchunk (index : [%s] )\n", index_str);
+      print_statement(stmt);
+      pips_debug(2, "\n");
     }
-
-  
-  pips_debug(1,"end\n");
 }
 
-static void directives_outline(list remaining)
+bool step_parser(const char* module_name)
 {
-  statement stmt;
-  
-  pips_debug(1, "remaining = %p\n", remaining);
-
-  stmt = STATEMENT(CAR(remaining));
-  
-  STEP_DEBUG_STATEMENT(2, "stmt", stmt);
-
-  if(!directive_statement_p(stmt))
-    {
-      pips_debug(2, "not a directive statement\n");
-
-      gen_recurse(stmt, statement_domain, dir_filter, gen_null); 
-    }
-  else 
-    {
-      pips_debug(2, "directive statement\n");
-    }
-
-  pips_debug(2, "goes on...\n");
-
-  if (statement_block_p(stmt)) 
-    {
-      /* sequence flattening */
-      pips_debug(2, "block statement: sequence flattening\n");
-
-      CDR(remaining) = gen_nconc(gen_full_copy_list(instruction_block(statement_instruction(stmt))), CDR(remaining));
-    }
-  else 
-    {
-      /* look for the directive */
-      pips_debug(2, "not a block statement\n");
-      
-      _directives_outline(remaining, stmt);
-    }
-
-  pips_debug(2, "sequence_level = %d, nb remaining = %zd\n", sequence_level, gen_length(remaining) - 1);
-
-  pips_debug(2, "Size of the current_directives stack = %d\n", current_directives_size());
-
-  pips_debug(1, "end\n");
-}
-
-static void directive_block_filter(statement stmt)
-{
-  list sequence;
-  directive new_directive;
-
-  pips_debug(1, "stmt = %p\n", stmt);
-  pips_assert("begin filter block", statement_block_p(stmt));
-
-  STEP_DEBUG_STATEMENT(2, "stmt", stmt);
-
-  sequence = gen_full_copy_list(sequence_statements(instruction_sequence(statement_instruction(stmt))));
-
-  sequence_level ++;
-  /* 
-     make a fake directive to record sequence statement in the directive body
-  */
-
-  pips_debug(2, "push a fake none directive for level %d\n", sequence_level);
-  current_directives_push(make_directive_none(statement_undefined));
-
-  /*
-    for each statement of the sequence (not yet traited)
-  */
-  pips_debug(2, "directives_outline on the block level %d\n", sequence_level);
-  MAPL(remaining,
-       {
-	 pips_debug(2, "next stmt of sequence level %d\n", sequence_level);
-	 directives_outline(remaining);
-       }, sequence);
-  gen_full_free_list(sequence);
-  sequence_level --;
-
-  /*
-    handle the fake directive
-  */
-  pips_debug(2, "pop the fake none directive\n");
-  new_directive = current_directives_pop(); 
-  if (!type_directive_none_p(directive_type(new_directive)))
-    {
-      free_directive(new_directive);
-      pips_internal_error("directive not well formed.");
-    }
-  else // convert the fake directive into instruction
-    {
-      free_instruction(statement_instruction(stmt));
-      statement_instruction(stmt) = handle_directive_none(new_directive, new_directive);
-    }
-
-  STEP_DEBUG_STATEMENT(2,"end filter block stmt", stmt);
-  pips_debug(1, "end\n");
-}
-
-static bool dir_filter(statement stmt)
-{
-  pips_debug(1, "stmt = %p\n", stmt);
-
-  pips_assert("statement_defined",!statement_undefined_p(stmt));
-  STEP_DEBUG_STATEMENT(2, "start filter", stmt);
-  
-  /*
-    directive_statement corresponds to a one-line directive: barrier
-    and flush or directive_block after treatment
-
-  */
-
-  if (!statement_block_p(stmt))
-    {
-      pips_debug(2, "not a block statement\n");
-      if(directive_statement_p(stmt))
-	{
-	  pips_debug(2, "directive_statement (CALL_DIR)\n");
-	  
-	  directive_statement_filter(stmt);
-	}
-      else
-	{
-	  pips_debug(2, "not a directive statement\n");
-	}
-    }
-  /*
-    directive_block corresponds to directives with associated blocks
-    of statements as do, master...
-    
-    a directive may produce a block statement...
-  */
-  if (statement_block_p(stmt)) 
-    {
-      pips_debug(2, "block statement\n");
-
-      directive_block_filter(stmt); 
-      return false;
-    }
-
-  STEP_DEBUG_STATEMENT(2, "end filter", stmt);
-
-  pips_debug(1, "end\n");
-  return true;
-}
-
-bool step_directives(const char* module_name)
-{
-  debug_on("STEP_DEBUG_LEVEL");
+  debug_on("STEP_PARSER_DEBUG_LEVEL");
   pips_debug(1, "%d module_name = %s\n", __LINE__, module_name);
-   
-  debug_on("STEP_DIRECTIVES_DEBUG_LEVEL");
 
   statement stmt = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   set_current_module_entity(local_name_to_top_level_entity(module_name));
-  global_directives_load();
-  outlining_load();
 
-  pips_debug(2, "Initialization of the current_directives stack\n");
-  make_current_directives_stack();
+  init_directives();
 
-  /* where directives are outlined */
-  gen_recurse(stmt, statement_domain, dir_filter, gen_null); 
+  step_directive_parser(stmt);
 
-  pips_debug(2, "Finalization of the current_directives stack\n");
-  free_current_directives_stack();
-  outlining_save();
-  global_directives_save();
+  ifdebug(1)
+    {
+      STEP_DIRECTIVES_MAP(block_stmt, d,
+			  {
+			    assert(!statement_undefined_p(block_stmt));
+			    step_directive_print(d);
+			  }, get_directives());
+    }
+
+  step_directives_save();
   reset_current_module_entity();
 
 
@@ -971,255 +305,10 @@ bool step_directives(const char* module_name)
   if(ordering_to_statement_initialized_p())
     reset_ordering_to_statement();
 
-  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(stmt));
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stmt);
 
   pips_debug(1, "Fin step_directives\n");
-  debug_off(); 
   debug_off();
-  
+
   return true;
 }
-
-static string clauses_to_string(list clauses,bool close)
-{
-  string s;
-  string_buffer sb = string_buffer_make(false);
-
-  FOREACH(CLAUSE,c,clauses)
-    {
-      s = string_undefined;
-      switch (clause_tag(c))
-	{
-	case is_clause_reduction:
-	  if (close==false)
-	    s=clause_reduction_to_string(clause_reduction(c));
-	  break;
-	case is_clause_private:
-	  if (close==false)
-	    s=clause_private_to_string(clause_private(c));
-	  break;
-	case is_clause_transformation:
-	  break;
-	default:
-	  pips_user_warning("unexpected clause\n");
-	}
-      if(s != string_undefined)
-	string_buffer_append(sb, s);
-    }
-  s = string_buffer_to_string(sb);
-  string_buffer_free_all(&sb);
-  return s;
-}
-
-
-static string directive_formate(string unformated,string directive_guard,string directive_continue)
-{
-  char tmp[MAX_LINE_LENGTH+1];
-  string_buffer formated_bs = string_buffer_make(false);
-  string formated;
-  size_t size;
-
-  tmp[0]='\0';
-  strcat(tmp,directive_guard);
-  size=MAX_LINE_LENGTH-strlen(directive_guard);
-  string_buffer_append(formated_bs, strdup(strncat(tmp,unformated,size)));
-
-  while (strlen(unformated)>size)
-    {
-      unformated+=size;
-
-      tmp[0]='\0';
-      strcat(tmp,"\n");
-      strcat(tmp,directive_continue);
-      size=MAX_LINE_LENGTH-strlen(directive_continue);      
-      string_buffer_append(formated_bs,strdup(strncat((char*)tmp,unformated,size)));
-    }
-
-  formated = string_buffer_to_string(formated_bs);
-  string_buffer_free_all(&formated_bs);
-
-  return formated;
-}
-
-
-string directive_to_string(directive d,bool close)
-{
-  pips_debug(1, "d=%p, close=%u\n",d,close);
-  string d_txt=string_undefined;
-  string c_txt=string_undefined;
-  string directive_formated;
-  switch (type_directive_tag(directive_type(d)))
-    {
-    case is_type_directive_omp_parallel:
-      d_txt = directive_omp_parallel_to_string(d,close);
-      break;
-    case is_type_directive_omp_do:
-      d_txt = directive_omp_do_to_string(d,close);
-      break;
-    case is_type_directive_omp_parallel_do:
-      d_txt = directive_omp_parallel_do_to_string(d,close);
-      break;
-    case is_type_directive_omp_master:
-      d_txt = directive_omp_master_to_string(d,close);
-      break;
-    case is_type_directive_omp_critical:
-      d_txt = directive_omp_critical_to_string(d,close);
-      break;
-    case is_type_directive_omp_barrier:
-      d_txt = directive_omp_barrier_to_string(d,close);
-      break;
-    default:
-      d_txt = string_undefined;
-    }
-
-  if (d_txt ==string_undefined )
-    {
-      pips_user_warning("directive handling not yet implemented : %s\n",directive_txt(d));
-      if(close==false)
-	d_txt=strdup(concatenate(step_remove_quote(directive_txt(d)),NULL));
-    }
-  else
-    {
-      c_txt=clauses_to_string(directive_clauses(d),close);
-      d_txt=strdup(concatenate(d_txt,c_txt,NULL));
-    }
-
-  if (!string_undefined_p(d_txt) && strlen(d_txt))
-    {
-      directive_formated=directive_formate(d_txt, OMP_DIRECTIVE, OMP_DIR_CONT);
-      if (!string_undefined_p(c_txt)) free(c_txt);
-      free(d_txt);
-    }
-  else
-    directive_formated=strdup("");
-    
-  return directive_formated;
-
-}
-
-static void pragma_to_call(statement stmt, string pragma_str)
-{
-  string d_txt_begin=strdup("'");
-  string d_txt_end=strdup("'end ");
-  entity cst_string_begin, cst_string_end;
-  statement stmt_begin, stmt_end, stmt_body, stmt_new;
-  
-  if (strcasestr(pragma_str, "parallel"))
-    {
-      d_txt_begin=strdup(concatenate(d_txt_begin,"parallel ",NULL));
-      d_txt_end=strdup(concatenate(d_txt_end,"parallel ",NULL));
-    }
-  if (strcasestr(pragma_str, "for"))
-    {
-      d_txt_begin=strdup(concatenate(d_txt_begin,"do ",NULL));
-      d_txt_end=strdup(concatenate(d_txt_end,"do ",NULL));
-    }
-  d_txt_begin=strdup(concatenate(d_txt_begin,"'",NULL));
-  d_txt_end=strdup(concatenate(d_txt_end,"'",NULL));
-
-  cst_string_begin = MakeConstant(d_txt_begin, is_basic_string);
-  cst_string_end = MakeConstant(d_txt_end, is_basic_string);
-  
-  stmt_begin=make_call_statement(DIR_CALL, CONS(EXPRESSION,entity_to_expression(cst_string_begin),NIL), entity_undefined, string_undefined);
-  stmt_end=make_call_statement(DIR_CALL, CONS(EXPRESSION,entity_to_expression(cst_string_end),NIL), entity_undefined, string_undefined);
-
-  statement_extensions(stmt)=make_extensions(NIL);
-  stmt_body=copy_statement(stmt);
-  stmt_new=make_block_statement(CONS(STATEMENT,stmt_begin,CONS(STATEMENT,stmt_body,CONS(STATEMENT,stmt_end,NIL))));
-
-  statement_instruction(stmt)=copy_instruction(statement_instruction(stmt_new));
-  statement_comments(stmt)=empty_comments;
-  statement_number(stmt)=STATEMENT_NUMBER_UNDEFINED;
-
-  STEP_DEBUG_STATEMENT(2,"STATEMENT",stmt);
-}
-
-static bool dir_pragma_filter(statement stmt)
-{
-  list l=extensions_extension(statement_extensions(stmt));
-  FOREACH(EXTENSION, ext, l)
-    {
-      pragma p=extension_pragma(ext);
-      ifdebug(1)
-	{
-	  switch (pragma_tag(p))
-	    {
-	    case is_pragma_string:
-	      printf("pragma string :%s\n",pragma_string(p));
-	      break;
-	    case is_pragma_expression:
-	      printf("pragma expression :%s",pragma_to_string(p));
-	      break;
-	    case is_pragma_entity:
-	      printf("pragma entity : %s", entity_name(pragma_entity(p)));
-	      break;
-	    default:
-	      printf("unknow pragma\n");
-	    }
-	}
-      STEP_DEBUG_STATEMENT(2,"STATEMENT",stmt);
-
-      pips_assert("pragma string", pragma_string_p(p));
-      pragma_to_call(stmt, pragma_string(p));
-    }
-  return true;
-}
-
-
-static bool step_pragma_to_call(const char* module_name)
-{ 
-  debug_on("STEP_DEBUG_LEVEL");
-  pips_debug(1, "%d module_name = %s\n", __LINE__, module_name);
-   
-  debug_on("STEP_PRAGMA_TO_CALL_DEBUG_LEVEL");
-
-  statement stmt = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
-
-  gen_recurse(stmt, statement_domain, dir_pragma_filter, gen_null); 
-
-  reset_current_module_entity();
-
-  module_reorder(stmt);
-  if(ordering_to_statement_initialized_p())
-    reset_ordering_to_statement();
-
-  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(stmt));
-  DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE, module_name, stmt);
-
-  pips_debug(1, "Fin step_pragma_to_call\n");
-  debug_off(); 
-  debug_off();
-  return true;
-}
-
-
-/*
- * Main entry point for STEP parsing, it's basically a switch that will call
- * classical fortran parser for fortran file and C directive parser for C files
- * The switch is based on file extension
- */
-bool directive_parser(string module) {
-  string dir = db_get_current_workspace_directory();
-  string filename = strdup(concatenate(dir, "/", db_get_file_resource(DBR_USER_FILE,module,true), NULL));
-  bool return_value = false;
-
-  // FIXME : we do not handle fortran95 files here...
-  if (dot_f_file_p(filename) || dot_F_file_p(filename) ) {
-    // Fortran files
-    return_value = step_parser(module);
-  } else if (dot_c_file_p(filename)) {
-    // C files
-    if(step_c_parser(module)) {
-      return_value = step_pragma_to_call(module);
-    }
-  } else {
-    pips_user_error("We don't know how to handle this file extension, only "
-        " .c .f and .F are allowed : %s\n",filename);
-  }
-
-  free(filename);
-  return return_value;
-}
-

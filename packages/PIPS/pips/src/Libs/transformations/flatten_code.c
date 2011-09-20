@@ -508,10 +508,7 @@ bool statement_flatten_declarations(entity module, statement s)
             // This look like a bad hack, partially redundant with previous replacement
             // but... only partially ! For instance extensions was not handled previously.
             // Probably that there's need for factoring, but it'll be another time !
-            HASH_FOREACH(entity,old,entity,new,renamings) {
-              pips_debug(2,"Replace entity %s with %s\n",entity_name(old),entity_name(new));
-              replace_entity(s,old,new);
-            }
+            replace_entities(s,renamings);
 
             gen_free_list(declarations), declarations = NIL;
             hash_table_free(renamings), renamings = NULL;

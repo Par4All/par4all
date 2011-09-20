@@ -1,35 +1,21 @@
 TARGET	= step
 include_HEADERS=$(TARGET).h
-BUILT_SOURCES=$(TARGET).h
+BUILT_SOURCES=$(TARGET).h   STEP_RT_bootstrap.h STEP_RT_intrinsic.h STEP_name.h
 include $(top_srcdir)/makes/cproto.mk
 noinst_LTLIBRARIES=libstep.la
-dist_noinst_HEADERS=STEP_name.h STEP_RT_bootstrap.h STEP_RT_intrinsic.h defines-local.h
-libstep_la_SOURCES=step.c \
-		atomizer.c \
-		outlining.c \
-		directives.c \
-    directive_critical.c \
-    directive_transformation.c \
-    directive_parallel.c \
-		directive_do.c \
-		directive_section.c \
-		directive_reduction.c \
-		directive_master.c \
-		directive_barrier.c \
-		directive_private.c \
-		analyse.c \
-		compile.c \
-		compile_do.c \
-		compile_reduction.c \
-		compile_master.c \
-		compile_barrier.c \
-		compile_private.c \
-    compile_parallel.c \
-    compile_RT.c \
-    compile_region.c \
-    compile_share.c \
-    compile_critical.c
+dist_noinst_HEADERS=defines-local.h 
+libstep_la_SOURCES=	comment2pragma.l \
+			step_omp.l \
+			directives.c \
+			analyse.c \
+			compile_RT.c \
+			compile.c
 
+
+AM_LFLAGS=-p `basename $< .l`
 AM_CPPFLAGS=-DPIPS_RUNTIME_DIR=\"$(datadir)\"
+CLEANFILES=step_api.tmp STEP_RT_bootstrap.h STEP_RT_intrinsic.h STEP_name.h
 
 include $(srcdir)/../pipslibs_includes.mk
+include stepstuff.mk
+

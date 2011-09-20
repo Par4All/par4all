@@ -2224,6 +2224,18 @@ integer_expression_to_transformer(
     reference r = syntax_reference(sexpr);
     tf = generic_reference_to_transformer(v, r, pre, is_internal);
   }
+  else if(syntax_cast_p(sexpr)) {
+    cast c = syntax_cast(sexpr);
+    type ct = cast_type(c);
+    expression cexp = cast_expression(c);
+    type cexpt = expression_to_type(cexp);
+    if (type_equal_p(ct, cexpt))
+      tf = integer_expression_to_transformer(v, cexp, pre, is_internal);
+    else
+      tf = transformer_undefined;
+    free_type(cexpt);
+
+  }
   else {
     /* vect_rm(ve); */
     tf = transformer_undefined;
@@ -3841,6 +3853,7 @@ bool precondition_minmax_of_expression(expression exp,
     free_entity(var);
     return success;
 }
+
 /* tries hard to simplify expression @p e if it is a min or a max
  * operator, by evaluating it under preconditions @p tr.
  * Two approaches are tested:
@@ -4082,7 +4095,7 @@ int simplify_boolean_expression_with_precondition(expression e,
 						  transformer p)
 {
   int validity = -1; // unknown
-
+  bool done = false;
   if(logical_operator_expression_p(e)) {
     // We could try the global simplification as in the other case...
     syntax s = expression_syntax(e);
@@ -4093,6 +4106,7 @@ int simplify_boolean_expression_with_precondition(expression e,
       validity = simplify_boolean_expression_with_precondition(a,p);
       if(validity>=0)
 	validity = 1 - validity;
+      done = true;
     }
     else if(ENTITY_OR_P(op)) {
       expression a1 = EXPRESSION(CAR(call_arguments(c)));
@@ -4120,6 +4134,7 @@ int simplify_boolean_expression_with_precondition(expression e,
 	  else
 	    validity = -1;
       }
+      done =true;
     }
     else if(ENTITY_AND_P(op)) {
       expression a1 = EXPRESSION(CAR(call_arguments(c)));
@@ -4149,9 +4164,10 @@ int simplify_boolean_expression_with_precondition(expression e,
 	  }
 	}
       }
+      done =true;
     }
   }
-  else {
+  if (!done) {
     transformer tt = condition_to_transformer(e,p, true);
     transformer ft = condition_to_transformer(e,p, false);
 

@@ -864,6 +864,7 @@ bool simdizer(char * mod_name)
     remove_preferences(se);
     set_proper_rw_effects(se);
     push_generated_variable_commenter(sac_commenter);
+    set_conflict_testing_properties();
 
     debug_on("SIMDIZER_DEBUG_LEVEL");
 

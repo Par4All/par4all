@@ -35,8 +35,6 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "text-util.h"
-#include "outlining_private.h"
-#include "step_private.h"
 
 /*****************************************************A CONSTRUCTOR LIKE PART
  */

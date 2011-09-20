@@ -362,16 +362,20 @@ bool io_effects_p(list effects)
     return false;
 }
 
+bool std_file_entity_p(entity e)
+{
+ const char * s = entity_user_name(e);
+  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
+}
+
 bool std_file_effect_p(effect e)
 {
-  const char * s = entity_user_name(effect_entity(e));
-  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
+  return(std_file_entity_p(effect_entity(e)));
 }
 
 bool std_file_cell_p(cell c)
 {
-  const char * s = entity_user_name(cell_entity(c));
-  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
+  return(std_file_entity_p(cell_entity(c)));
 }
 
 bool std_file_effects_p(list effects)

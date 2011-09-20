@@ -248,7 +248,7 @@ void STEP_API(step_set_sendregions)(void *userArray, STEP_ARG *nb_workchunks, ST
 
   STEP_DEBUG({
       Descriptor_shared *desc = steprt_find_in_sharedTable(userArray);
-      
+
       assert(desc);
       rg_composedRegion_print(&(desc->sendRegions));
     })
@@ -259,7 +259,7 @@ void STEP_SET_SENDREGIONS(void *userArray, STEP_ARG nb_workchunks, STEP_ARG *reg
 
   STEP_DEBUG({
       Descriptor_shared *desc = steprt_find_in_sharedTable(userArray);
-      
+
       assert(desc);
       rg_composedRegion_print(&(desc->sendRegions));
     })
@@ -302,16 +302,53 @@ void STEP_API(step_set_recvregions)(void *userArray, STEP_ARG *nb_workchunks, ST
     })
 }
 
+void STEP_SET_RECVREGIONS(void *userArray, STEP_ARG nb_workchunks, STEP_ARG *regions)
+{
+  steprt_set_sharedTable(userArray, (uint32_t)nb_workchunks, regions, NULL, false);
+
+  STEP_DEBUG({
+      Descriptor_shared *desc = steprt_find_in_sharedTable(userArray);
+
+      assert(desc);
+      rg_composedRegion_print(&(desc->receiveRegions));
+    })
+}
+
+void STEP_API(step_register_alltoall_partial)(void *userArray, STEP_ARG *algorithm, STEP_ARG *tag)
+{
+  bool full_p = false;
+  steprt_register_alltoall(userArray, full_p, (uint32_t)*algorithm, (int_MPI)*tag);
+}
+void STEP_REGISTER_ALLTOALL_PARTIAL(void *userArray, STEP_ARG algorithm, STEP_ARG tag)
+{
+  bool full_p = false;
+  steprt_register_alltoall(userArray, full_p, (uint32_t)algorithm, (int_MPI)tag);
+}
+
 void STEP_API(step_alltoall_full)(void *userArray, STEP_ARG *algorithm, STEP_ARG *tag)
 {
   bool full_p = true;
   steprt_alltoall(userArray, full_p, (uint32_t)*algorithm, (int_MPI)*tag);
 }
+
+void STEP_API(step_alltoall)(STEP_ARG *algorithm, STEP_ARG *tag)
+{
+  bool full_p = true;
+  steprt_alltoall_all(full_p, (uint32_t)*algorithm, (int_MPI)*tag);
+}
+
+void STEP_ALLTOALL(STEP_ARG algorithm, STEP_ARG tag)
+{
+  bool full_p = true;
+  steprt_alltoall_all(full_p, (uint32_t)algorithm, (int_MPI)tag);
+}
+
 void STEP_ALLTOALL_FULL(void *userArray, STEP_ARG algorithm, STEP_ARG tag)
 {
   bool full_p = true;
   steprt_alltoall(userArray, full_p, (uint32_t)algorithm, (int_MPI)tag);
 }
+
 void STEP_API(step_alltoall_full_interlaced)(void *userArray, STEP_ARG *algorithm, STEP_ARG *tag)
 {
   bool full_p = true;
@@ -358,6 +395,16 @@ void STEP_API(step_alltomasterregion)(void *userArray, STEP_ARG *algorithm)
   STEP_DEBUG(
 	     printf("\ncommunications_AllToMasterRegion end userArray=%p\n", userArray);
 	     )
+}
+
+/* execute every pending communication and wait until
+ * all are done.
+ */
+void STEP_API(step_flush)(void)
+{
+  assert(CURRENTWORKSHARING);
+  steprt_run_registered_alltoall(CURRENTWORKSHARING);
+  communications_waitall(CURRENTWORKSHARING);
 }
 
 void STEP_API(step_waitall)(void)
@@ -506,7 +553,6 @@ void test_constructs()
 }
 
 #define N 10
-#define MAX_NB_LOOPSLICES 16
 #define LOW1 0
 #define UP1 N
 #define LOW2 0

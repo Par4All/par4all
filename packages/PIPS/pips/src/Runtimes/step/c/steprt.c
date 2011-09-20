@@ -178,6 +178,7 @@ static void steprt_set_sharedDescriptor(Descriptor_shared *desc_shared, Descript
   rg_composedRegion_set(&(desc_shared->receiveRegions), nbdims);
   rg_composedRegion_set(&(desc_shared->sendRegions), nbdims);
   desc_shared->interlaced_p = false;
+  array_set(&(desc_shared->pending_alltoall), Alltoall_descriptor);
 
   OUT_TRACE("end");
 }
@@ -249,10 +250,10 @@ void steprt_set_sharedTable(void *userArray, uint32_t nb_workchunks, STEP_ARG *r
 
   TRACE_P("NB_WORKCHUNKS = %d nb_workchunks = %d\n",  NB_WORKCHUNKS, nb_workchunks);
 
-  assert((CURRENTWORKSHARING->type == do_work && nb_workchunks == NB_WORKCHUNKS) ||
-	 (CURRENTWORKSHARING->type == parallel_work && nb_workchunks == 0) ||
-	 (CURRENTWORKSHARING->type == critical_work && nb_workchunks == 1) ||
-	 (CURRENTWORKSHARING->type == master_work && nb_workchunks == 1)); 
+//  assert((CURRENTWORKSHARING->type == do_work && nb_workchunks == NB_WORKCHUNKS) ||
+//	 (CURRENTWORKSHARING->type == parallel_work && nb_workchunks == 0) ||
+//	 (CURRENTWORKSHARING->type == critical_work && nb_workchunks == 1) ||
+//	 (CURRENTWORKSHARING->type == master_work && nb_workchunks == 1)); 
 
   if(!desc_shared)
     {
@@ -368,6 +369,20 @@ static Descriptor_worksharing *steprt_worksharing_current(void)
 
   return desc_worksharing;
 }
+
+/* move a worksharing sharedArray into a new one */
+void copy_sharedArray(Descriptor_worksharing* _old, Descriptor_worksharing* _new)
+{
+  /* make sure the elt_size wasn't overriden */
+  array_set(&_new->sharedArray, Descriptor_shared);
+
+  /* add the item to the upper worksharing */
+  array_append_vals(&(_new->sharedArray), _old->sharedArray.data, _old->sharedArray.len);
+
+  /* free the old worksharing array */
+  array_unset(&(_old->sharedArray));
+}
+
 void steprt_worksharing_set(worksharing_type type)
 {
   Descriptor_worksharing desc_worksharing;
@@ -383,6 +398,10 @@ void steprt_worksharing_set(worksharing_type type)
   array_set(&(desc_worksharing.reductionsArray), Descriptor_reduction);
   array_set(&(desc_worksharing.communicationsArray), MPI_Request);
 
+  if(CURRENTWORKSHARING) {
+    copy_sharedArray(CURRENTWORKSHARING, &desc_worksharing);
+  }
+
   array_append_vals(&steprt_worksharingTable, &desc_worksharing, 1);
   CURRENTWORKSHARING = steprt_worksharing_current();
 }
@@ -393,9 +412,21 @@ void steprt_worksharing_unset(void)
 
   IN_TRACE("begin");
   assert(CURRENTWORKSHARING != NULL);
+  Descriptor_worksharing *upper_worksharing = NULL;
 
-  for(i=0; i<CURRENTWORKSHARING->sharedArray.len; i++)
-    steprt_shared_unset(&(array_get_data_from_index(&(CURRENTWORKSHARING->sharedArray), Descriptor_shared, i)));
+  if(steprt_worksharingTable.len - 1 >0) {
+    /* there's an upper worksharing */
+    upper_worksharing = &(array_get_data_from_index(&steprt_worksharingTable,
+						    Descriptor_worksharing,
+						    (steprt_worksharingTable.len-2) ));
+    copy_sharedArray(CURRENTWORKSHARING, upper_worksharing);
+
+  } else {
+    for(i=0; i<CURRENTWORKSHARING->sharedArray.len; i++) {
+      /* remove reference to item in the current worksharing */
+      steprt_shared_unset(&(array_get_data_from_index(&(CURRENTWORKSHARING->sharedArray), Descriptor_shared, i)));
+    }
+  }
 
   array_unset(&(CURRENTWORKSHARING->sharedArray));
   array_unset(&(CURRENTWORKSHARING->scheduleArray));
@@ -820,22 +851,14 @@ static void communications_allToAll_full(Descriptor_userArray *desc_userArray,
   OUT_TRACE("end");
 }
 
-void steprt_alltoall(void * userArray, bool full_p, uint32_t algorithm, int_MPI tag)
-{ 
-  Descriptor_shared *desc_shared;
-  Descriptor_userArray *desc_userArray;
-
-
-  IN_TRACE("userArray = %p, full_p = %d, algorithm = %d, tag = %d", userArray, full_p, algorithm, tag);
-
-  desc_shared = steprt_find_in_sharedTable(userArray);
-  desc_userArray = steprt_find_in_userArrayTable(userArray);
-
+static void steprt_alltoall_generic(Descriptor_shared *desc_shared,
+				    Descriptor_userArray* desc_userArray,
+				    bool full_p,
+				    uint32_t algorithm,
+				    int_MPI tag)
+{
   assert(desc_shared);
   assert(desc_userArray);
-
-  TRACE_P("userArray nbdims = %d\n", rg_get_userArrayDims(&(desc_userArray->boundsRegions)));
-  TRACE_P("shared sendRegions nbdims = %d\n", rg_get_userArrayDims(&(desc_shared->sendRegions)));
 
   if(rg_get_nb_simpleRegions(&(desc_shared->sendRegions)) != 0 )
     {
@@ -847,11 +870,79 @@ void steprt_alltoall(void * userArray, bool full_p, uint32_t algorithm, int_MPI 
       communications_allToAll_full(desc_userArray, desc_shared, algorithm, tag);
     }
   else if(rg_get_nb_simpleRegions(&(desc_shared->receiveRegions)) != 0 )
-    { 
+    {
       communications_allToAll_partial(desc_userArray, desc_shared, algorithm, tag);
     }
-  
+}
+
+void steprt_run_registered_alltoall(Descriptor_worksharing *worksharing)
+{
+  int i;
+  int nb_sharedArray = worksharing->sharedArray.len;
+
+  for(i=0; i<nb_sharedArray; i++) {
+    Descriptor_shared *desc_shared = array_sized_index(&(worksharing->sharedArray), i);
+
+    while(desc_shared->pending_alltoall.len) {
+      Alltoall_descriptor *cur_alltoall = array_sized_index(&(desc_shared->pending_alltoall), 0);
+      assert(cur_alltoall);
+      steprt_alltoall_generic(cur_alltoall->desc_shared,
+			      cur_alltoall->desc_userArray,
+			      cur_alltoall->full_p,
+			      cur_alltoall->algorithm,
+			      cur_alltoall->tag);
+
+      /* request processed, remove it from the list */
+      array_remove_index_fast(&(desc_shared->pending_alltoall), 0);
+    }
+  }
+}
+
+void steprt_register_alltoall(void * userArray, bool full_p, uint32_t algorithm, int_MPI tag)
+{
+  Descriptor_shared *desc_shared;
+  Descriptor_userArray *desc_userArray;
+
+  desc_shared = steprt_find_in_sharedTable(userArray);
+  desc_userArray = steprt_find_in_userArrayTable(userArray);
+
+  Alltoall_descriptor new_item;
+  new_item.desc_shared = desc_shared;
+  new_item.desc_userArray = desc_userArray;
+  new_item.full_p = full_p;
+  new_item.algorithm = algorithm;
+  new_item.tag = tag;
+
+  /* add the descriptor to the list */
+  array_append_vals(&(desc_shared->pending_alltoall), &new_item, 1);
+}
+
+void steprt_alltoall(void * userArray, bool full_p, uint32_t algorithm, int_MPI tag)
+{
+  Descriptor_shared *desc_shared;
+  Descriptor_userArray *desc_userArray;
+
+  IN_TRACE("userArray = %p, full_p = %d, algorithm = %d, tag = %d", userArray, full_p, algorithm, tag);
+
+  desc_shared = steprt_find_in_sharedTable(userArray);
+  desc_userArray = steprt_find_in_userArrayTable(userArray);
+
+  TRACE_P("userArray nbdims = %d\n", rg_get_userArrayDims(&(desc_userArray->boundsRegions)));
+  TRACE_P("shared sendRegions nbdims = %d\n", rg_get_userArrayDims(&(desc_shared->sendRegions)));
+
+  steprt_alltoall_generic(desc_shared, desc_userArray, full_p, algorithm, tag);
   OUT_TRACE("end");
+}
+
+void steprt_alltoall_all(bool full_p, uint32_t algorithm, int_MPI tag)
+{
+  int i;
+  for(i=0; i<CURRENTWORKSHARING->sharedArray.len; i++) {
+    Descriptor_shared* new_desc = &(array_get_data_from_index(&CURRENTWORKSHARING->sharedArray,
+							      Descriptor_shared,
+							      i));
+    steprt_alltoall(new_desc->userArray, full_p, algorithm, tag);
+  }
 }
 
 void steprt_finalize()

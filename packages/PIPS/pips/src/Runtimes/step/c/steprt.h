@@ -29,6 +29,9 @@ extern void steprt_set_sharedTable(void *userArray, uint32_t nb_workchunks, STEP
 extern Descriptor_shared *steprt_find_in_sharedTable(void *userArray);
 
 extern void steprt_alltoall(void * userArray, bool full, uint32_t algorithm, int_MPI tag);
+extern void steprt_alltoall_all(bool full_p, uint32_t algorithm, int_MPI tag);
+extern void steprt_register_alltoall(void * userArray, bool full_p, uint32_t algorithm, int_MPI tag);
+extern void steprt_run_registered_alltoall(Descriptor_worksharing *worksharing);
 extern Descriptor_reduction *steprt_find_reduction(void *scalar);
 extern void steprt_initreduction(void *variable, uint32_t op, uint32_t type);
 extern void steprt_set_reduction_sendregions(Descriptor_reduction *desc_reduction, uint32_t nb_workchunks, STEP_ARG *regions);

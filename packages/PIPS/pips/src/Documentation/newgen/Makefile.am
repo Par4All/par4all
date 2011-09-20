@@ -47,7 +47,6 @@ F_c=ri.c \
 	sac_private.c \
 	ri_C.c \
 	cloning.c \
-	outlining_private.c \
 	step_private.c \
 	points_to_private.c \
 	kernel_memory_mapping.c \
@@ -84,7 +83,6 @@ F_h=ri.h \
 	sac_private.h \
 	ri_C.h \
 	cloning.h \
-	outlining_private.h \
 	step_private.h \
 	points_to_private.h \
 	kernel_memory_mapping.h \
@@ -122,7 +120,6 @@ F_tex=ri.tex \
 	sac_private.tex \
 	ri_C.tex \
 	cloning.tex \
-	outlining_private.tex \
 	step_private.tex \
 	points_to_private.tex \
 	kernel_memory_mapping.tex \
@@ -159,7 +156,6 @@ F_pdf=ri.pdf \
 	sac_private.pdf \
 	ri_C.pdf \
 	cloning.pdf \
-	outlining_private.pdf \
 	step_private.pdf \
 	points_to_private.pdf \
 	kernel_memory_mapping.pdf \

@@ -666,6 +666,21 @@ list variables_to_values(list list_mod)
   return list_val;
 }
 
+list variable_to_values(entity e)
+{
+  list list_val = NIL;
+
+  if(entity_has_values_p(e)) {
+    entity v_old = entity_to_old_value(e);
+    entity v_new = entity_to_new_value(e);
+
+    list_val = CONS(ENTITY, v_old, list_val);
+    list_val = CONS(ENTITY, v_new, list_val);
+  }
+
+  return list_val;
+}
+
 /* Build the list of values to be projected when the declaration list
    list_mod is not longer valid because a block is closed/left.
 
