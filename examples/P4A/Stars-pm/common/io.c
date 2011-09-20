@@ -29,7 +29,8 @@ void readDataFile(float mp[NP][NP][NP],
 
   // Test d'accès au fichier
   if(ic == NULL) {
-    perror("Impossible d'ouvrir le fichier.");
+    fprintf(stderr,"Impossible d'ouvrir le fichier '%s'\n",filename);
+    perror("");
     exit(-1);
   }
 
