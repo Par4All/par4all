@@ -26,11 +26,15 @@
 #ifdef USE_FLOAT
 typedef float data_t;
 #define INPUT_FORMAT "%f%*[ \t]%f%*[ \t]%f"
+#ifndef OUTPUT_FORMAT
 #define OUTPUT_FORMAT "%f %f %f\n"
+#endif
 #else
 typedef double data_t;
 #define INPUT_FORMAT "%lf%*[ \t]%lf%*[ \t]%lf"
+#ifndef OUTPUT_FORMAT
 #define OUTPUT_FORMAT "%lf %lf %lf\n"
+#endif
 #endif
 
 typedef struct {
