@@ -9,7 +9,7 @@ RUN_ARG=exp$(SIZE).a.bin
 COMMON_SOURCES = common/io.c
 COMMON_INCLUDES = include/stars-pm-generated_$(SIZE).h
 CPROTO_GRAPHICS_SRC = common/graphics.c common/glgraphics.c
-CLEAN_OTHERS = $(COMMON_INCLUDES) $(CPROTO_GRAPHICS_SRC:.c=.o) $(P4A_GENERATED)
+CLEAN_OTHERS = $(COMMON_INCLUDES) $(CPROTO_GRAPHICS_SRC:.c=.o)
 
 
 BASE_SOURCES= pm.c 1-discretization.c 2-histogramme.c 3-potential.c \
