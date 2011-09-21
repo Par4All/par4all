@@ -235,6 +235,10 @@ class p4a_processor(object):
 
             self.project_name = project_name
 
+            # The generated kernels source files will go into a directory named
+            # with project_name.generated 
+            self.new_files_folder = self.project_name + '.generated' 
+
             if self.recover_includes and not self.native_recover_includes:
                 # Use a special preprocessor to track #include by a
                 # man-in-the-middle attack :-) :
