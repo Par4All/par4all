@@ -19,9 +19,15 @@
 #include <stdlib.h>
 #include <math.h>
 
+#ifndef rangex
 #define rangex 290
+#endif
+#ifndef rangey
 #define rangey 299
+#endif
+#ifndef nb
 #define nb 2878
+#endif
 
 #ifdef USE_FLOAT
 typedef float data_t;
