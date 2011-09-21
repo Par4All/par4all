@@ -74,8 +74,11 @@ def replace_by_opencl_own_declarations(content):
     content = re.sub("\(\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,","(P4A_accel_global_address \\1 \\2[\\3],", content)
     # ,...  ...[...]) substituted by ,P4A_accel_global_address ... * ...[...])
     content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\)",",P4A_accel_global_address \\1 \\2[\\3])", content)
-    
-    content = re.sub("(\w+) (p4a_kernel_\w+\()","P4A_accel_kernel \\1 \\2", content)
+    # ,...  ...[...] or (...  ...[...]( substituted respectively by:
+    # P4A_accel_global_address ,... ...[...] or P4A_accel_global_address (... ...[...])
+    content = re.sub("([\,\(])(\s*\w+)\s*(\w+)\s*\[([\w+*\)\(]*)\]","\\1 P4A_accel_global_address \\2 \\3[\\4]", content)
+	# void p4a_wrapper_xxx(), substituted by: P4A_accel_kernel_wrapper p4a_wrapper_xxx()
+    content = re.sub("\w+ (p4a_wrapper_\w+\()","P4A_accel_kernel_wrapper \\1", content)    
 
     return content
 
@@ -160,7 +163,8 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
         header += '#include "' + include + '"\n'
     
     #OpenCL only; inject P4A_wrapper_proto declaration. Wrapper contains 
-    #call to load kernels.
+    #call to load kernels. Headers and typedef are already in the file,
+    #because it's generated with options: 
     opencl_wrappers=re.findall("""(?s)//Opencl wrapper declaration\n(.*?)(?#
     # Get the p4a_wrapper_... call with its arguments:
     )(p4a_wrapper_\\w+)\(([^;]*?)\\;""",
@@ -171,9 +175,12 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
 			wrapper_proto_declaration= wrapper_proto_declaration + "P4A_wrapper_proto("+wrapper[1]+", "+wrapper[2]+";\n"
 		#content=re.sub(r"(#include <p4a_accel\.h>)","\\1 \n"+wrapper_proto_declaration, content)
 		content= "#include <p4a_accel.h> \n" + wrapper_proto_declaration + content
-		
+		#remove p4a_wrapper_xxx and p4a_kernel_xxx declaration
+		#content = re.sub(r"void\s*p4a_launcher_\w+(.*?)(,\s*p4a_wrapper_\w+\((.*?)\))(.*?)(,\s*p4a_kernel_\w+\((.*?)\))"," \\4", content)
+		content = re.sub(r"(\,\s*p4a_kernel_\w+\((.*?)\))(.*?)(\,\s*p4a_wrapper_\w+\((.*?)\))"," \\3", content)
     else:
 		content = header + content
+
 
     # Clean-up headers and inject standard headers:
     ## content = re.sub("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*/\* Define some macros helping to catch buffer overflows.  \*/",
@@ -237,22 +244,6 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     ).*?\n}""",
         p4a_launcher_clean_up, content)
 
-	#OpenCL .c file
-	#To change the statement that call the kernel .cl:
-	#
-	#   //Opencl wrapper declaration
-    #//PIPS generated variable
-    #int i;
-	#P4A_call_accel_kernel_1d(p4a_wrapper_main, n, a[n]);
-	#
-	# to:
-	#
-	#//Opencl wrapper declaration
-    #//PIPS generated variable
-    #int i;
-    #P4A_call_accel_kernel_1d("p4a_wrapper_main.cl", n, a[n]);
-	 
-    #content = re.sub("(p4a_wrapper_\\w+)(\)|,)", "\"\\1.cl\"\\2", content)
 
     # Get the virtual processor coordinates:
     ## Change

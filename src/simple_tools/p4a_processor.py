@@ -676,7 +676,7 @@ class p4a_processor(object):
                             GPU_USE_FORTRAN_WRAPPER = self.fortran,
                             #GPU_USE_LAUNCHER = True,
                             GPU_USE_LAUNCHER = True,  
-                            GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = True,
+                            GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = False, 		#it was True and work
                             OUTLINE_INDEPENDENT_COMPILATION_UNIT = (self.opencl),
                             OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
                             annotate_loop_nests = True, # annotate for recover parallel loops later
@@ -687,7 +687,6 @@ class p4a_processor(object):
         launcher_prefix = self.get_launcher_prefix ()
         kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
-
 
         # We flag loops in kernel launchers as parallel, based on the annotation
         # previously made
@@ -984,7 +983,7 @@ class p4a_processor(object):
                                        wrapper + ".c")				
             else:
 				wrapper_file = os.path.join(self.workspace.dirname, "Src",
-                                       kernel + ".c")
+                                       wrapper + ".c")
             kernel_file = os.path.join(self.workspace.dirname, "Src",
                                         kernel + ".c")
             launcher_file = os.path.join(self.workspace.dirname, "Src",
@@ -1046,6 +1045,7 @@ class p4a_processor(object):
         p4a_util.warn("file to merge SRC " + launcher_files[0] + launcher_files[1])                                        					                        																				
         p4a_util.merge_files (output_file, launcher_files)
         p4a_util.warn("output file merge ml " + output_file)
+        self.accel_post(output_file)        
         self.accel_post(output_file,
             os.path.join(self.workspace.dirname, "P4A"))
 #        self.accel_post(output_file)																																		
@@ -1251,9 +1251,9 @@ class p4a_processor(object):
                     # the original files will remain standard c99 files and the cuda files
                     # will only be the wrappers and the kernel (cf save_generated).
 					output_file = p4a_util.change_file_ext(output_file, ".cu")
-                if (self.opencl == True):
-                    self.merge_function_launcher(pips_file)
-                    self.accel_post(pips_file)                                      
+                #if (self.opencl == True):
+                    #self.merge_function_launcher(pips_file)
+                    #self.accel_post(pips_file)                                      
                     #output_file = p4a_util.change_file_ext(output_file, ".c")
 					
             # Copy the PIPS production to its destination:

@@ -651,10 +651,13 @@ parameters types are resolved.
 					 size)				\
   cl_uint work_dim = 1;							\
   /* Define the number of thread per block: */				\
-  size_t block_descriptor_name = {P4A_min((int) size,			\
+  /* OG: size_t block_descriptor_name[] = {P4A_min((int) size,	*/		\
+					 /* (int) P4A_CL_ITEM_PER_GROUP_IN_1D)}; change to :*/ \
+  size_t block_descriptor_name[] = {P4A_min((int) size,			\
 					  (int) P4A_CL_ITEM_PER_GROUP_IN_1D)}; \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  size_t grid_descriptor_name = {(int)size};				\
+  /*OG: change size_t grid_descriptor_name = {(int)size};   with :*/ \
+  size_t grid_descriptor_name[] = {(int)size};				\
   P4A_skip_debug(0,P4A_dump_grid_descriptor(grid_descriptor_name););	\
   P4A_skip_debug(0,P4A_dump_block_descriptor(block_descriptor_name);)
 
@@ -704,7 +707,7 @@ parameters types are resolved.
   global_x *= p4a_block_x;						\
   int global_y = n_y_iter; \
   /*OG: replace the following : */\
-   /* size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; \ */\
+   /* size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; */\
   /* with */\
   size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; \
   P4A_skip_debug(0,P4A_dump_grid_descriptor(grid_descriptor_name););	\
