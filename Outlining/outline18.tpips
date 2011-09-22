@@ -1,0 +1,33 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="outline18"
+delete $WS
+create $WS $WS.c
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+
+echo
+echo Code after outlining
+echo
+
+
+setproperty OUTLINE_MODULE_NAME "kernel"
+setproperty OUTLINE_LABEL "kernel"
+apply OUTLINE[main]
+apply CLEAN_DECLARATIONS[main]
+
+display PRINTED_FILE[%ALL]
+
+echo
+echo unsplit
+echo
+
+apply UNSPLIT
+
+close
+delete $WS
+quit
