@@ -237,6 +237,8 @@ static void kill_effect( set kill, effect e ) {
      it is part of the first_effect_certainely_includes_second_effect_p
      test.
    */
+  // Non store effect kills ! That interesting and allow to get rid of some
+  // loop carried dependence when variables are declared in loop body :)
   if ( action_write_p(effect_action(e))
       && approximation_exact_p(effect_approximation(e)) ) {
     HASH_MAP(theEffect,theStatement, {
