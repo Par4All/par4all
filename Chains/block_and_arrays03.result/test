@@ -23,18 +23,18 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	12 --> 13 with conflicts
-		from <a[1]-W-EXACT> to <a[1]-R-EXACT>
-	11 --> 13 with conflicts
-		from <a[1]-W-EXACT> to <a[1]-R-EXACT>
-	11 --> 12 with conflicts
-		from <a[1]-W-EXACT> to <a[1]-W-EXACT>
-	10 --> 13 with conflicts
+	10 --> 11 with conflicts
 		from <a-WE-EXACT> to <a-RE-EXACT>
 	10 --> 12 with conflicts
 		from <a-WE-EXACT> to <a-RE-EXACT>
-	10 --> 11 with conflicts
+	10 --> 13 with conflicts
 		from <a-WE-EXACT> to <a-RE-EXACT>
+	11 --> 12 with conflicts
+		from <a[1]-W-EXACT> to <a[1]-W-EXACT>
+	11 --> 13 with conflicts
+		from <a[1]-W-EXACT> to <a[1]-R-EXACT>
+	12 --> 13 with conflicts
+		from <a[1]-W-EXACT> to <a[1]-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -65,18 +65,18 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	12 --> 13 with conflicts
-		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
-	11 --> 13 with conflicts
-		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
-	11 --> 12 with conflicts
-		from <a[PHI1]-W-EXACT> to <a[PHI1]-W-EXACT>
-	10 --> 13 with conflicts
+	10 --> 11 with conflicts
 		from <a-WE-EXACT> to <a-RE-EXACT>
 	10 --> 12 with conflicts
 		from <a-WE-EXACT> to <a-RE-EXACT>
-	10 --> 11 with conflicts
+	10 --> 13 with conflicts
 		from <a-WE-EXACT> to <a-RE-EXACT>
+	11 --> 12 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-W-EXACT>
+	11 --> 13 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
+	12 --> 13 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 

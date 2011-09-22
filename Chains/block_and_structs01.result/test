@@ -23,17 +23,17 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	10 --> 11 with conflicts
-		from <s1.f2-W-EXACT> to <s1.f2-R-EXACT>
-	09 --> 11 with conflicts
-		from <s1.f1-W-EXACT> to <s1.f1-R-EXACT>
-	08 --> 11 with conflicts
-		from <s1-WE-EXACT> to <s1-RE-EXACT>
+	08 --> 09 with conflicts
 		from <s1-WE-EXACT> to <s1-RE-EXACT>
 	08 --> 10 with conflicts
 		from <s1-WE-EXACT> to <s1-RE-EXACT>
-	08 --> 09 with conflicts
+	08 --> 11 with conflicts
 		from <s1-WE-EXACT> to <s1-RE-EXACT>
+		from <s1-WE-EXACT> to <s1-RE-EXACT>
+	09 --> 11 with conflicts
+		from <s1.f1-W-EXACT> to <s1.f1-R-EXACT>
+	10 --> 11 with conflicts
+		from <s1.f2-W-EXACT> to <s1.f2-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -66,17 +66,17 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	10 --> 11 with conflicts
-		from <s1.f2-W-EXACT> to <s1.f2-R-EXACT>
-	09 --> 11 with conflicts
-		from <s1.f1-W-EXACT> to <s1.f1-R-EXACT>
-	08 --> 11 with conflicts
-		from <s1-WE-EXACT> to <s1-RE-EXACT>
+	08 --> 09 with conflicts
 		from <s1-WE-EXACT> to <s1-RE-EXACT>
 	08 --> 10 with conflicts
 		from <s1-WE-EXACT> to <s1-RE-EXACT>
-	08 --> 09 with conflicts
+	08 --> 11 with conflicts
 		from <s1-WE-EXACT> to <s1-RE-EXACT>
+		from <s1-WE-EXACT> to <s1-RE-EXACT>
+	09 --> 11 with conflicts
+		from <s1.f1-W-EXACT> to <s1.f1-R-EXACT>
+	10 --> 11 with conflicts
+		from <s1.f2-W-EXACT> to <s1.f2-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 

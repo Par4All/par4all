@@ -119,42 +119,42 @@ C             <    is referenced>: S
 
  *********************** Use-Def Chains *********************
 
-	12 --> 11 with conflicts
-		from <S-R-EXACT> to <S-W-EXACT>
-	11 --> 14 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
-	11 --> 12 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
-	11 --> 11 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
-	09 --> 14 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
-	09 --> 11 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
-	07 --> 15 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
-		from <A-W-EXACT> to <A-R-EXACT>
-		from <A-R-EXACT> to <A-W-EXACT>
-	07 --> 07 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
-		from <A-W-EXACT> to <A-R-EXACT>
-		from <A-R-EXACT> to <A-W-EXACT>
-	07 --> 06 with conflicts
-		from <A-W-EXACT> to <A-R-EXACT>
-	06 --> 07 with conflicts
-		from <A-R-EXACT> to <A-W-EXACT>
-	06 --> 06 with conflicts
-		from <B-W-EXACT> to <B-W-EXACT>
-	05 --> 10 with conflicts
-		from <I-W-EXACT> to <I-W-EXACT>
-	04 --> 15 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
+	04 --> 06 with conflicts
 		from <A-W-EXACT> to <A-R-EXACT>
 	04 --> 07 with conflicts
 		from <A-W-EXACT> to <A-W-EXACT>
 		from <A-W-EXACT> to <A-R-EXACT>
-	04 --> 06 with conflicts
+	04 --> 15 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
 		from <A-W-EXACT> to <A-R-EXACT>
+	05 --> 10 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	06 --> 06 with conflicts
+		from <B-W-EXACT> to <B-W-EXACT>
+	06 --> 07 with conflicts
+		from <A-R-EXACT> to <A-W-EXACT>
+	07 --> 06 with conflicts
+		from <A-W-EXACT> to <A-R-EXACT>
+	07 --> 07 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+		from <A-R-EXACT> to <A-W-EXACT>
+	07 --> 15 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+		from <A-R-EXACT> to <A-W-EXACT>
+	09 --> 11 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+	09 --> 14 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	11 --> 11 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+	11 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	11 --> 14 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	12 --> 11 with conflicts
+		from <S-R-EXACT> to <S-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -223,42 +223,42 @@ C       COMMON /X/ S
 
  *********************** Use-Def Chains *********************
 
-	12 --> 11 with conflicts
-		from <S-R-EXACT> to <S-W-EXACT>
-	11 --> 14 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
-	11 --> 12 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
-	11 --> 11 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
-	09 --> 14 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
-	09 --> 11 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
-	07 --> 15 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
-		from <A-W-EXACT> to <A-R-EXACT>
-		from <A-R-EXACT> to <A-W-EXACT>
-	07 --> 07 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
-		from <A-W-EXACT> to <A-R-EXACT>
-		from <A-R-EXACT> to <A-W-EXACT>
-	07 --> 06 with conflicts
-		from <A-W-EXACT> to <A-R-EXACT>
-	06 --> 07 with conflicts
-		from <A-R-EXACT> to <A-W-EXACT>
-	06 --> 06 with conflicts
-		from <B-W-EXACT> to <B-W-EXACT>
-	05 --> 10 with conflicts
-		from <I-W-EXACT> to <I-W-EXACT>
-	04 --> 15 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
+	04 --> 06 with conflicts
 		from <A-W-EXACT> to <A-R-EXACT>
 	04 --> 07 with conflicts
 		from <A-W-EXACT> to <A-W-EXACT>
 		from <A-W-EXACT> to <A-R-EXACT>
-	04 --> 06 with conflicts
+	04 --> 15 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
 		from <A-W-EXACT> to <A-R-EXACT>
+	05 --> 10 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	06 --> 06 with conflicts
+		from <B-W-EXACT> to <B-W-EXACT>
+	06 --> 07 with conflicts
+		from <A-R-EXACT> to <A-W-EXACT>
+	07 --> 06 with conflicts
+		from <A-W-EXACT> to <A-R-EXACT>
+	07 --> 07 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+		from <A-R-EXACT> to <A-W-EXACT>
+	07 --> 15 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+		from <A-R-EXACT> to <A-W-EXACT>
+	09 --> 11 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+	09 --> 14 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	11 --> 11 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+	11 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	11 --> 14 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	12 --> 11 with conflicts
+		from <S-R-EXACT> to <S-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
