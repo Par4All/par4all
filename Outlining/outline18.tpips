@@ -18,8 +18,6 @@ echo
 setproperty OUTLINE_MODULE_NAME "kernel"
 setproperty OUTLINE_LABEL "kernel"
 apply OUTLINE[main]
-apply CLEAN_DECLARATIONS[main]
-
 display PRINTED_FILE[%ALL]
 
 echo
@@ -27,6 +25,8 @@ echo unsplit
 echo
 
 apply UNSPLIT
+
+shell gcc -fopenmp -c $WS.database/Src/$WS.c -o  $WS.database/Src/$WS.o
 
 close
 delete $WS
