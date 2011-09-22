@@ -70,6 +70,9 @@ static void inout_control();
 static void inout_statement();
 static void usedef_control();
 static void genref_statement();
+static bool dd_du( effect fin, effect fout );
+static bool ud( effect fin, effect fout );
+static void add_conflicts( effect fin, statement stout, bool(*which)() );
 
 /* Macro to create set */
 #define MAKE_STATEMENT_SET() (set_make( set_pointer ))
@@ -471,15 +474,11 @@ static void genref_unstructured( unstructured u, statement st ) {
   cons *blocs = NIL;
 
   set_clear( DEF_IN( st ) );
-  /* recursing
-   * FIXME : Mehdi : it seems to me not to be the right way to call an
-   * inout function here. Is it a hack ?
-   * We should do a more straight recursion. Something like :
-   CONTROL_MAP( cc, {statement st = control_statement( cc );
-   genref_statement( st );
-   }, c, blocs );
-   */
-  inout_control( c );
+  /* recursing */
+  CONTROL_MAP( c, {statement st = control_statement( c );
+        genref_statement( st );
+        },
+      c, blocs );
 
   if ( set_undefined_p( DEF_OUT( exit )) ) {
     set ref = MAKE_STATEMENT_SET();
@@ -883,9 +882,6 @@ static void inout_control( control ct ) {
   }
 
   CONTROL_MAP( c, {statement st = control_statement( c );
-
-        /* FIXME : I don't think genref should be called inside inout phase ! */
-        genref_statement( st );
         set_assign( DEF_OUT( st ), GEN( st ));
         set_assign( REF_OUT( st ), REF( st ));
 
@@ -1125,7 +1121,8 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 
     /* The sink vertex in the graph */
     successor sout = successor_undefined;
-    /* Try first to find an existing vertex for this statement */FOREACH( successor, s, vertex_successors( vin ) ) {
+    /* Try first to find an existing vertex for this statement */
+    FOREACH( successor, s, vertex_successors( vin ) ) {
       if(successor_vertex(s) == vout) {
         sout = s;
         break;
