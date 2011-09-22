@@ -69,7 +69,7 @@ static list load_statement_effects( statement s );
 static void inout_control();
 static void inout_statement();
 static void usedef_control();
-static void genkill_statement();
+static void genref_statement();
 
 /* Macro to create set */
 #define MAKE_STATEMENT_SET() (set_make( set_pointer ))
@@ -89,10 +89,6 @@ static hash_table Gen;
 /* Refs maps each statement to the effects it references. */
 static hash_table Ref;
 #define REF(st) ((set)hash_get( Ref, (char *)st ))
-
-/* Kill maps each statement to the effects it kills. */
-static hash_table Kill;
-#define KILL(st) ((set)hash_get( Kill, (char *)st ))
 
 /* Def_in maps each statement to the statements that are in-coming the statement */
 static hash_table Def_in;
@@ -188,7 +184,6 @@ static bool init_one_statement( statement st ) {
     hash_put( Def_out, (char *) st, (char *) MAKE_STATEMENT_SET() );
     hash_put( Ref_in, (char *) st, (char *) MAKE_STATEMENT_SET() );
     hash_put( Ref_out, (char *) st, (char *) MAKE_STATEMENT_SET() );
-    hash_put( Kill, (char *) st, (char *) MAKE_STATEMENT_SET() );
 
     /* FI: regions are not really proper effects...
      I should use proper effects for non-call instruction
@@ -206,7 +201,6 @@ static bool init_one_statement( statement st ) {
      to it: */
     set_clear( GEN( st ) );
     set_clear( REF( st ) );
-    set_clear( KILL( st ) );
     set_clear( DEF_OUT( st ) );
     set_clear( DEF_IN( st ) );
     set_clear( REF_OUT( st ) );
@@ -216,8 +210,8 @@ static bool init_one_statement( statement st ) {
   return true;
 }
 
-/* The GENKILL_xxx functions implement the computation of GEN, REF and
- KILL sets from Aho, Sethi and Ullman "Compilers" (p. 612). This is
+/* The genref_xxx functions implement the computation of GEN and REF
+ sets from Aho, Sethi and Ullman "Compilers" (p. 612). This is
  slightly more complex since we use a structured control graph, thus
  fixed point computations can be recursively required (the correctness
  of this is probable, although not proven, as far as I can tell). */
@@ -226,58 +220,50 @@ static bool init_one_statement( statement st ) {
  effects that modify one reference (i.e., assignments) are killed (see
  above). Write effects on arrays (see IDXS) don't kill the definitions of
  the array. Equivalence with non-array entities is managed properly. */
-
 /**
- * @brief Update the set of effects that an effect might kill
- * @param kill the set to initialize
- * @param e the "killer" effect
+ * @brief Kill the GEN set with a set of KILL effects
+ * @param gen the set to filter, modified by side effects
+ * @param killers the "killer" effects
  */
-static void kill_effect( set kill, effect e ) {
-  /* The test on the approximation is an optimization:
-     it is part of the first_effect_certainely_includes_second_effect_p
-     test.
-   */
-  // Non store effect kills ! That interesting and allow to get rid of some
-  // loop carried dependence when variables are declared in loop body :)
-  if ( action_write_p(effect_action(e))
-      && approximation_exact_p(effect_approximation(e)) ) {
-    HASH_MAP(theEffect,theStatement, {
-          /* We only kill store effect */
-          if(!store_effect_p(theEffect)) continue;
-
-          /* We avoid a self killing */
-          if( e != theEffect ) {
-            if ( first_effect_certainely_includes_second_effect_p(e, theEffect) ) {
-              set_add_element( kill, kill, theEffect );
-            }
-          }
-        },effects2statement)
+static void kill_effects(set gen, set killers) {
+  SET_FOREACH(effect,killer,killers) {
+    if ( action_write_p(effect_action(killer))
+        && approximation_exact_p(effect_approximation(killer)) ) {
+      set killed = MAKE_STATEMENT_SET();
+      SET_FOREACH(effect,e,gen) {
+        /* We only kill store effect */
+        if(!store_effect_p(e)) continue;
+        /* We avoid a self killing */
+        if( e != killer
+            && first_effect_certainely_includes_second_effect_p(killer, e) ) {
+            set_add_element( killed, killed, e );
+        }
+      }
+      set_difference(gen,gen,killed);
+      set_free(killed);
+    }
   }
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a single statement
+ * @brief Compute Gen and Ref set for a single statement
  * @param st the statement to compute
  */
-static void genkill_one_statement( statement st ) {
+static void genref_one_statement( statement st ) {
   set gen = GEN( st );
   set ref = REF( st );
-  set kill = KILL( st );
   set_clear( gen );
   set_clear( ref );
-  set_clear( kill );
-  /* Loop over effects to find which one will kill some others, generate
-   * or reference some variables
+  /* Loop over effects to find which one will generates
+   * or references some variables
    */
   FOREACH( effect, e, load_statement_effects(st) )
   {
     action a = effect_action( e );
 
     if ( action_write_p( a ) ) {
-      /* This effects is a write, it may kill some others effects ! */
       pips_assert("Effect isn't map to this statement !",
           st == hash_get(effects2statement, e));
-      kill_effect( kill, e );
 
       /* A write effect will always generate a definition */
       set_add_element( gen, gen, (char *) e );
@@ -293,25 +279,24 @@ static void genkill_one_statement( statement st ) {
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a test
+ * @brief Compute Gen and Ref set for a test
  * @param t the test
  * @param s the statement to compute
  */
-static void genkill_test( test t, statement s ) {
+static void genref_test( test t, statement s ) {
   statement st = test_true(t);
   statement sf = test_false(t);
   set ref = REF( s );
 
   /* compute true path */
-  genkill_statement( st );
+  genref_statement( st );
   /* compute false path */
-  genkill_statement( sf );
+  genref_statement( sf );
 
   /* Combine the two path to summarize the test */
   set_union( GEN( s ), GEN( st ), GEN( sf ) );
   set_union( ref, ref, REF( sf ) );
   set_union( ref, ref, REF( st ) );
-  set_intersection( KILL( s ), KILL( st ), KILL( sf ) );
 }
 
 /**
@@ -348,7 +333,7 @@ static void mask_effects( set s, list l ) {
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for any loop (do, for, while,...)
+ * @brief Compute Gen and Ref set for any loop (do, for, while,...)
  * @description It has to deal specially with the loop variable which is not
  * managed in the Dragon book. Effect masking is performed
  * on locals (i.e., gen&ref sets are pruned from local definitions).
@@ -360,27 +345,19 @@ static void mask_effects( set s, list l ) {
  * @param st the statement that hold the loop
  *
  */
-static void genkill_any_loop( statement body,
+static void genref_any_loop( statement body,
                               statement st,
                               list locals,
                               bool one_trip_do_p ) {
   set gen = GEN( st );
   set ref = REF( st );
 
-  /* Compute genkill on the loop body */
-  genkill_statement( body );
+  /* Compute genref on the loop body */
+  genref_statement( body );
 
   /* Summarize the body to the statement that hold the loop */
   set_union( gen, gen, GEN( body ) );
   set_union( ref, ref, REF( body ) );
-
-  /* This is used only for do loop */
-  if ( one_trip_do_p ) {
-    /* If we assume the loop is always done at least one time, we can use
-     * kill information from loop body.
-     */
-    set_union( KILL( st ), KILL( st ), KILL( body ) );
-  }
 
   /* Filter effects on local variables */
   if ( mask_effects_p ) {
@@ -391,13 +368,13 @@ static void genkill_any_loop( statement body,
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a "do" loop
- * @description see genkill_any_loop()
+ * @brief Compute Gen and Ref set for a "do" loop
+ * @description see genref_any_loop()
  *
  * @param l the loop to compute
  * @param st the statement that hold the loop
  */
-static void genkill_loop( loop l, statement st ) {
+static void genref_loop( loop l, statement st ) {
   statement body = loop_body( l );
 
   /* Building locals list */
@@ -406,46 +383,46 @@ static void genkill_loop( loop l, statement st ) {
   list locals = gen_nconc( gen_copy_seq( llocals ), gen_copy_seq( slocals ) );
 
   /* Call the generic function handling all kind of loop */
-  genkill_any_loop( body, st, locals, one_trip_do_p );
+  genref_any_loop( body, st, locals, one_trip_do_p );
 
   /* We free because we are good programmers and we don't leak ;-) */
   gen_free_list( locals );
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a "for" loop
- * @description see genkill_any_loop()
+ * @brief Compute Gen and Ref set for a "for" loop
+ * @description see genref_any_loop()
  *
  * @param l the loop to compute
  * @param st the statement that hold the loop
  *
  */
-static void genkill_forloop( forloop l, statement st ) {
+static void genref_forloop( forloop l, statement st ) {
   statement body = forloop_body( l );
   list locals = statement_declarations(st);
 
   /* Call the generic function handling all kind of loop */
-  genkill_any_loop( body, st, locals, one_trip_do_p );
+  genref_any_loop( body, st, locals, one_trip_do_p );
 
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a "while" loop
- * @description see genkill_any_loop()
+ * @brief Compute Gen and Ref set for a "while" loop
+ * @description see genref_any_loop()
  *
  * @param l the loop to compute
  * @param st the statement that hold the loop
  */
-static void genkill_whileloop( whileloop l, statement st ) {
+static void genref_whileloop( whileloop l, statement st ) {
   statement body = whileloop_body( l );
   list locals = statement_declarations(st);
 
   /* Call the generic function handling all kind of loop */
-  genkill_any_loop( body, st, locals, one_trip_do_p );
+  genref_any_loop( body, st, locals, one_trip_do_p );
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for a block
+ * @brief Compute Gen and Ref set for a block
  * @description The Dragon book only deals with a sequence of two statements.
  * here we generalize to lists, via recursion. Statement are processed in
  * reversed order (i.e. on the descending phase of recursion)
@@ -454,48 +431,32 @@ static void genkill_whileloop( whileloop l, statement st ) {
  * @param st the statement that hold the block
  *
  */
-static void genkill_block( cons *sts, statement st ) {
-  statement one;
+static void genref_block( cons *sts, statement st ) {
+  /* Summarize for the block */
+  set gen_st = GEN( st );
+  set ref_st = REF( st );
 
-  /* If we are not at the end of the block */
-  if ( !ENDP( sts ) ) {
-    /* Recurse till the end of the block */
-    genkill_block( CDR( sts ), st );
+  /* loop over statements inside the block */
+  FOREACH( statement, one, sts ) {
 
-    /* End of recursion, process current statement */
-    genkill_statement( one = STATEMENT( CAR( sts )) );
+    genref_statement( one );
 
-    /* Summarize for the block */
-    set diff = MAKE_STATEMENT_SET();
-    set gen = MAKE_STATEMENT_SET();
-    set ref = MAKE_STATEMENT_SET();
-    set kill_st = KILL( st );
-    set gen_st = GEN( st );
-    set ref_st = REF( st );
+    // We no longer use a "kill set" FIXME : one_trip_do, test, ....
+    kill_effects(gen_st,GEN(one));
+    set_union(gen_st,GEN(one),gen_st);
 
-    set_difference( diff, GEN( one ), kill_st );
-    set_union( gen, gen_st, diff );
-    set_difference( diff, KILL( one ), gen_st );
-    set_union( kill_st, kill_st, diff );
-    set_assign( gen_st, gen );
     set_union( ref_st, REF( one ), ref_st );
 
-    /* Memory freeing */
-    set_free( diff );
-    set_free( gen );
-    set_free( ref );
-
-    /* FIXME : This should be done after all recursion for performance... */
-    if ( mask_effects_p) {
-      mask_effects( gen_st, statement_declarations(st) );
-      mask_effects( ref_st, statement_declarations(st) );
-    }
-
+  }
+  // Gen for the block doesn't include locally declared variable
+  if ( mask_effects_p) {
+    mask_effects( gen_st, statement_declarations(st) );
+    mask_effects( ref_st, statement_declarations(st) );
   }
 }
 
 /**
- * @brief Compute Gen, Ref, and Kill set for an unstructured
+ * @brief Compute Gen and Ref set for an unstructured
  * @description computes the gens, refs, and kills set of the unstructured by
  * recursing on INOUT_CONTROL. The gens&refs can then be inferred.
  * The situation for the kills is more fishy; for the moment, we just keep
@@ -504,10 +465,9 @@ static void genkill_block( cons *sts, statement st ) {
  * @param u is the unstructured
  * @param st is the statement that hold the unstructured
  */
-static void genkill_unstructured( unstructured u, statement st ) {
+static void genref_unstructured( unstructured u, statement st ) {
   control c = unstructured_control( u );
   statement exit = control_statement( unstructured_exit( u ));
-  set kill = MAKE_STATEMENT_SET();
   cons *blocs = NIL;
 
   set_clear( DEF_IN( st ) );
@@ -516,21 +476,10 @@ static void genkill_unstructured( unstructured u, statement st ) {
    * inout function here. Is it a hack ?
    * We should do a more straight recursion. Something like :
    CONTROL_MAP( cc, {statement st = control_statement( cc );
-   genkill_statement( st );
+   genref_statement( st );
    }, c, blocs );
    */
   inout_control( c );
-
-  /* Kill set will be the intersection of all kill inside the unstructured
-   * FIXME : kill is initially empty, so the intersection will ALWAYS be empty !
-   */
-  CONTROL_MAP( cc, {
-        set_intersection( kill, kill, KILL( control_statement( cc )));
-      }, c, blocs );
-
-  /* FIXME : why not use directly KILL( st ) instead of using a temporary set ? */
-  set_assign( KILL( st ), kill );
-  set_free( kill );
 
   if ( set_undefined_p( DEF_OUT( exit )) ) {
     set ref = MAKE_STATEMENT_SET();
@@ -556,35 +505,35 @@ static void genkill_unstructured( unstructured u, statement st ) {
  * @param i is the instruction
  * @param st is the statement that hold the instruction
  */
-static void genkill_instruction( instruction i, statement st ) {
+static void genref_instruction( instruction i, statement st ) {
   cons *pc;
   test t;
   loop l;
 
   switch ( instruction_tag(i) ) {
     case is_instruction_block:
-      genkill_block( pc = instruction_block(i), st );
+      genref_block( pc = instruction_block(i), st );
       break;
     case is_instruction_test:
       t = instruction_test(i);
-      genkill_test( t, st );
+      genref_test( t, st );
       break;
     case is_instruction_loop:
       l = instruction_loop(i);
-      genkill_loop( l, st );
+      genref_loop( l, st );
       break;
     case is_instruction_whileloop: {
       whileloop l = instruction_whileloop(i);
-      genkill_whileloop( l, st );
+      genref_whileloop( l, st );
       break;
     }
     case is_instruction_forloop: {
       forloop l = instruction_forloop(i);
-      genkill_forloop( l, st );
+      genref_forloop( l, st );
       break;
     }
     case is_instruction_unstructured:
-      genkill_unstructured( instruction_unstructured( i ), st );
+      genref_unstructured( instruction_unstructured( i ), st );
       break;
     case is_instruction_call:
     case is_instruction_expression:
@@ -597,42 +546,40 @@ static void genkill_instruction( instruction i, statement st ) {
 }
 
 /**
- * @brief Compute recursively Gen, Ref, and Kill set for a statement.
+ * @brief Compute recursively Gen and Ref set for a statement.
  *  This is the main entry to this task.
- * @description computes the gens, refs, and kills set of the statement by
+ * @description computes the gens and refs set of the statement by
  * recursing
  *
  * @param s is the statement to compute
  */
-static void genkill_statement( statement s ) {
+static void genref_statement( statement s ) {
 
-  /* Compute genkill using effects associated to the statement itself */
-  genkill_one_statement( s );
+  /* Compute genref using effects associated to the statement itself */
+  genref_one_statement( s );
 
   ifdebug(2) {
     debug( 2,
-           "genkill_statement",
-           "Result genkill_one_statement for Statement %p [%s]:\n",
+           "genref_statement",
+           "Result genref_one_statement for Statement %p [%s]:\n",
            s,
            statement_identification( s ) );
     local_print_statement_set( "GEN", GEN( s ) );
     local_print_statement_set( "REF", REF( s ) );
-    local_print_statement_set( "KILL", KILL( s ) );
   }
 
   /* Recurse inside the statement (relevant for blocks, loop, ...) */
-  genkill_instruction( statement_instruction(s), s );
+  genref_instruction( statement_instruction(s), s );
 
   ifdebug(2) {
     debug( 2,
-           "genkill_statement",
+           "genref_statement",
            "Result for Statement %p [%s]:\n",
            s,
            statement_identification( s ) );
     ;
     local_print_statement_set( "GEN", GEN( s ) );
     local_print_statement_set( "REF", REF( s ) );
-    local_print_statement_set( "KILL", KILL( s ) );
   }
 }
 
@@ -709,15 +656,14 @@ static void inout_test( statement s, test t ) {
  * @param one_trip_do_p tell if there is always at least one trip (do loop only)
  */
 static void inout_any_loop( statement st, statement body, bool one_trip_do_p ) {
-  set diff = MAKE_STATEMENT_SET();
+  // Preload
+  set def_in_body = DEF_IN( body );
+  set def_in_st = DEF_IN( st );
+  set ref_in_st = REF_IN( st );
 
-  /* Compute "in" sets for the loop body
-   * FIXME : diff temporary can be avoided ! */
-  set_union( DEF_IN( body ), GEN( st ), set_difference( diff,
-                                                        DEF_IN( st ),
-                                                        KILL( st ) ) );
-  set_free( diff );
-  set_union( REF_IN( body ), REF_IN( st ), REF( st ) );
+  /* Compute "in" sets for the loop body */
+  set_union( def_in_body, GEN( st ), def_in_st);
+  set_union( REF_IN( body ), ref_in_st, REF( st ) );
 
   /* Compute loop body */
   inout_statement( body );
@@ -729,8 +675,8 @@ static void inout_any_loop( statement st, statement body, bool one_trip_do_p ) {
     set_assign( REF_OUT( st ), REF_OUT( body ) );
   } else {
     /* Body is not always done */
-    set_union( DEF_OUT( st ), DEF_OUT( body ), DEF_IN( st ) );
-    set_union( REF_OUT( st ), REF_OUT( body ), REF_IN( st ) );
+    set_union( DEF_OUT( st ), DEF_OUT( body ), def_in_st );
+    set_union( REF_OUT( st ), REF_OUT( body ), ref_in_st );
   }
 
 }
@@ -777,13 +723,22 @@ static void inout_forloop( statement st, forloop fl ) {
 static void inout_call( statement st, call __attribute__ ((unused)) c ) {
   /* Compute "out" sets  */
 
+  set_assign(DEF_OUT(st),DEF_IN(st));
+  kill_effects(DEF_OUT( st ),GEN(st));
+  set_union( DEF_OUT( st ), GEN( st ), DEF_OUT( st ));
+
+  set_assign(REF_OUT(st),REF_IN(st));
+  kill_effects(REF_OUT( st ),GEN(st));
+  set_union( REF_OUT( st ), REF( st ), REF_OUT( st ));
+
+/*
   set_union( DEF_OUT( st ), GEN( st ), set_difference( DEF_OUT( st ),
                                                        DEF_IN( st ),
                                                        KILL( st ) ) );
   set_union( REF_OUT( st ), REF( st ), set_difference( REF_OUT( st ),
                                                        REF_IN( st ),
                                                        KILL( st ) ) );
-
+  */
 }
 
 /**
@@ -851,8 +806,8 @@ static void inout_statement( statement st ) {
 
   /* Compute defaults "out" sets ; will be overwrite most of the time
    * FIXME : is it really useful ?? */
-  set_assign( DEF_OUT( st ), GEN( st ) );
-  set_assign( REF_OUT( st ), REF( st ) );
+  //set_assign( DEF_OUT( st ), GEN( st ) );
+  //set_assign( REF_OUT( st ), REF( st ) );
 
   /* Compute "out" sets for the instruction : recursion */
   switch ( instruction_tag( i = statement_instruction( st )) ) {
@@ -919,7 +874,6 @@ static void inout_control( control ct ) {
   set d_out = MAKE_STATEMENT_SET();
   set r_oldout = MAKE_STATEMENT_SET();
   set r_out = MAKE_STATEMENT_SET();
-  set diff = MAKE_STATEMENT_SET();
   cons *blocs = NIL;
 
 
@@ -930,8 +884,8 @@ static void inout_control( control ct ) {
 
   CONTROL_MAP( c, {statement st = control_statement( c );
 
-        /* FIXME : I don't think genkill should be called inside inout phase ! */
-        genkill_statement( st );
+        /* FIXME : I don't think genref should be called inside inout phase ! */
+        genref_statement( st );
         set_assign( DEF_OUT( st ), GEN( st ));
         set_assign( REF_OUT( st ), REF( st ));
 
@@ -961,8 +915,8 @@ static void inout_control( control ct ) {
           set_union( DEF_IN( st ), DEF_IN( st ), d_out );
           set_union( REF_IN( st ), REF_IN( st ), r_out );
           set_assign( d_oldout, DEF_OUT( st ));
-          set_union( DEF_OUT( st ), GEN( st ),
-              set_difference( diff, DEF_IN( st ), KILL( st )));
+          set_union( DEF_OUT( st ), GEN( st ),DEF_IN( st ));
+                     // FIXME set_difference( diff, DEF_IN( st ), KILL( st )));
           set_assign( r_oldout, REF_OUT( st ));
           set_union( REF_OUT( st ), REF( st ), REF_IN( st ));
           change |= (!set_equal_p( d_oldout, DEF_OUT( st )) ||
@@ -976,7 +930,6 @@ static void inout_control( control ct ) {
   set_free( d_out );
   set_free( r_oldout );
   set_free( r_out );
-  set_free( diff );
   gen_free_list( blocs );
 
 }
@@ -1275,7 +1228,6 @@ graph statement_dependence_graph( statement s ) {
   effects2statement = hash_table_make( hash_pointer, 0 );
   Gen = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE );
   Ref = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE );
-  Kill = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE );
   Def_in = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE );
   Def_out = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE );
   Ref_in = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE );
@@ -1287,15 +1239,15 @@ graph statement_dependence_graph( statement s ) {
 
   /* Initialize data structures for all the statements
 
-   It recursively initializes the sets of gens, kills, ins and outs for
+   It recursively initializes the sets of gens, ins and outs for
    the statements that appear in st. Note that not only call statements are
    there, but also enclosing statements (e.g, blocks and loops). */
   gen_recurse(s, statement_domain,
       init_one_statement,
       gen_identity);
 
-  /* Compute genkill phase */
-  genkill_statement( s );
+  /* Compute genref phase */
+  genref_statement( s );
 
   /* Compute inout phase */
   inout_statement( s );
@@ -1308,7 +1260,6 @@ graph statement_dependence_graph( statement s ) {
 
   TABLE_FREE(Gen);
   TABLE_FREE(Ref);
-  TABLE_FREE(Kill);
   TABLE_FREE(Def_in);
   TABLE_FREE(Def_out);
   TABLE_FREE(Ref_in);
