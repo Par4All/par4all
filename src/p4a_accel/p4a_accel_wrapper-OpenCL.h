@@ -27,7 +27,10 @@
     This is the return type of the kernel.
     The type is here undefined and must be locally defined.
 */
+/* change this define to void:
 #define P4A_accel_kernel inline 
+*/
+#define P4A_accel_kernel void 
 
 /** A declaration attribute of a hardware-accelerated kernel called from
     the host in CL 
@@ -82,6 +85,13 @@ EXTENSION cl_khr_byte_addressable_store : enable directive before any
 code that performs writes that may not be supported. 
 */
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable 
+
+/*
+Pragma to support double floating point precision
+* */
+
+#pragma OPENCL EXTENSION cl_khr_fp64: enable 
+
 
 /**
    @}
