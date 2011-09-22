@@ -31,13 +31,6 @@ display PRINTED_FILE(main)
 activate PRINT_CODE
 
 
-echo
-echo Use-def chains
-echo
-
-activate PRINT_CHAINS_GRAPH
-display DG_FILE
-
 echo // OMP style
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE(main)
@@ -52,12 +45,11 @@ echo
 
 display PRINTED_FILE[main]
 
-echo
-echo Compilation of result
-echo
-
-apply UNSPLIT
-shell gcc -fopenmp -c loop_private.database/Src/loop_private.c -o loop_private.database/Src/loop_private.o
+#echo
+#echo Compilation of result
+#echo
+#apply UNSPLIT
+#shell gcc -fopenmp -c loop_private.database/Src/loop_private.c -o loop_private.database/Src/loop_private.o
 
 close
 #delete loop_private
