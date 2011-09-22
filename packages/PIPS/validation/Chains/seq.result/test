@@ -425,42 +425,42 @@ C             <    is referenced>: I J N T X
 
  *********************** Use-Def Chains *********************
 
-	14 --> 14 with conflicts
-		from <X(JJ,K,1)-W-EXACT> to <X(JJ,K,1)-W-EXACT>
-	14 --> 13 with conflicts
-		from <X(JJ,K,1)-W-EXACT> to <X(J,K,1)-W-EXACT>
-	14 --> 12 with conflicts
-		from <JJ-R-EXACT> to <JJ-W-EXACT>
-	14 --> 11 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	13 --> 14 with conflicts
-		from <X(J,K,1)-W-EXACT> to <X(JJ,K,1)-W-EXACT>
-	13 --> 13 with conflicts
-		from <X(J,K,1)-W-EXACT> to <X(J,K,1)-W-EXACT>
-	13 --> 12 with conflicts
-		from <JJ-R-EXACT> to <JJ-W-EXACT>
-	13 --> 11 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	12 --> 14 with conflicts
-		from <JJ-W-EXACT> to <JJ-R-EXACT>
-	12 --> 13 with conflicts
-		from <JJ-W-EXACT> to <JJ-R-EXACT>
-	12 --> 12 with conflicts
-		from <JJ-W-EXACT> to <JJ-W-EXACT>
-	12 --> 11 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	11 --> 11 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
-	08 --> 14 with conflicts
-		from <MM-W-EXACT> to <MM-R-EXACT>
-	08 --> 13 with conflicts
+	07 --> 12 with conflicts
+		from <MS-W-EXACT> to <MS-R-EXACT>
+	08 --> 11 with conflicts
 		from <MM-W-EXACT> to <MM-R-EXACT>
 	08 --> 12 with conflicts
 		from <MM-W-EXACT> to <MM-R-EXACT>
-	08 --> 11 with conflicts
+	08 --> 13 with conflicts
 		from <MM-W-EXACT> to <MM-R-EXACT>
-	07 --> 12 with conflicts
-		from <MS-W-EXACT> to <MS-R-EXACT>
+	08 --> 14 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	11 --> 11 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	12 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	12 --> 12 with conflicts
+		from <JJ-W-EXACT> to <JJ-W-EXACT>
+	12 --> 13 with conflicts
+		from <JJ-W-EXACT> to <JJ-R-EXACT>
+	12 --> 14 with conflicts
+		from <JJ-W-EXACT> to <JJ-R-EXACT>
+	13 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	13 --> 12 with conflicts
+		from <JJ-R-EXACT> to <JJ-W-EXACT>
+	13 --> 13 with conflicts
+		from <X(J,K,1)-W-EXACT> to <X(J,K,1)-W-EXACT>
+	13 --> 14 with conflicts
+		from <X(J,K,1)-W-EXACT> to <X(JJ,K,1)-W-EXACT>
+	14 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	14 --> 12 with conflicts
+		from <JJ-R-EXACT> to <JJ-W-EXACT>
+	14 --> 13 with conflicts
+		from <X(JJ,K,1)-W-EXACT> to <X(J,K,1)-W-EXACT>
+	14 --> 14 with conflicts
+		from <X(JJ,K,1)-W-EXACT> to <X(JJ,K,1)-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -468,16 +468,42 @@ C             <    is referenced>: I J N T X
 
  *********************** Use-Def Chains *********************
 
-	21 --> 16 with conflicts
-		from <X(5,5,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
-		from <X(5,5,NEW)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
-	21 --> 12 with conflicts
+	08 --> 11 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	08 --> 12 with conflicts
+		from <NEW-W-EXACT> to <NEW-W-EXACT>
+	08 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	11 --> 11 with conflicts
+		from <OLD-W-EXACT> to <OLD-W-EXACT>
+	11 --> 12 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
 		from <NEW-R-EXACT> to <NEW-W-EXACT>
-	21 --> 11 with conflicts
+	11 --> 16 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	11 --> 21 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	12 --> 11 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
 		from <OLD-R-EXACT> to <OLD-W-EXACT>
-	16 --> 21 with conflicts
-		from <X(I,J,NEW)-W-EXACT> to <X(5,5,OLD)-R-EXACT>
-		from <X(I,J,NEW)-W-EXACT> to <X(5,5,NEW)-R-EXACT>
+	12 --> 12 with conflicts
+		from <NEW-W-EXACT> to <NEW-W-EXACT>
+	12 --> 16 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	12 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	14 --> 14 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	15 --> 15 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	16 --> 11 with conflicts
+		from <OLD-R-EXACT> to <OLD-W-EXACT>
+	16 --> 12 with conflicts
+		from <NEW-R-EXACT> to <NEW-W-EXACT>
+	16 --> 14 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	16 --> 15 with conflicts
+		from <I-R-EXACT> to <I-W-EXACT>
 	16 --> 16 with conflicts
 		from <X(I,J,NEW)-W-EXACT> to <X(I,J,NEW)-W-EXACT>
 		from <X(I,J,NEW)-W-EXACT> to <X(I-1,J,OLD)-R-EXACT>
@@ -490,42 +516,16 @@ C             <    is referenced>: I J N T X
 		from <X(I,J,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
 		from <X(I,J+1,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
 		from <X(I+1,J,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
-	16 --> 15 with conflicts
-		from <I-R-EXACT> to <I-W-EXACT>
-	16 --> 14 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	16 --> 12 with conflicts
-		from <NEW-R-EXACT> to <NEW-W-EXACT>
-	16 --> 11 with conflicts
+	16 --> 21 with conflicts
+		from <X(I,J,NEW)-W-EXACT> to <X(5,5,OLD)-R-EXACT>
+		from <X(I,J,NEW)-W-EXACT> to <X(5,5,NEW)-R-EXACT>
+	21 --> 11 with conflicts
 		from <OLD-R-EXACT> to <OLD-W-EXACT>
-	15 --> 15 with conflicts
-		from <I-W-EXACT> to <I-W-EXACT>
-	14 --> 14 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
-	12 --> 21 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
-	12 --> 16 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
-	12 --> 12 with conflicts
-		from <NEW-W-EXACT> to <NEW-W-EXACT>
-	12 --> 11 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
-		from <OLD-R-EXACT> to <OLD-W-EXACT>
-	11 --> 21 with conflicts
-		from <OLD-W-EXACT> to <OLD-R-EXACT>
-	11 --> 16 with conflicts
-		from <OLD-W-EXACT> to <OLD-R-EXACT>
-	11 --> 12 with conflicts
-		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	21 --> 12 with conflicts
 		from <NEW-R-EXACT> to <NEW-W-EXACT>
-	11 --> 11 with conflicts
-		from <OLD-W-EXACT> to <OLD-W-EXACT>
-	08 --> 21 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
-	08 --> 12 with conflicts
-		from <NEW-W-EXACT> to <NEW-W-EXACT>
-	08 --> 11 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	21 --> 16 with conflicts
+		from <X(5,5,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
+		from <X(5,5,NEW)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -540,28 +540,28 @@ C             <    is referenced>: I J N T X
 
  *********************** Use-Def Chains *********************
 
+	07 --> 07 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	08 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	08 --> 08 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
+	08 --> 10 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
+		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT>
+	09 --> 09 with conflicts
+		from <K-W-EXACT> to <K-W-EXACT>
+	10 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	10 --> 08 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
+		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT>
+	10 --> 09 with conflicts
+		from <K-R-EXACT> to <K-W-EXACT>
 	10 --> 10 with conflicts
 		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
 		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT>
 		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT>
-	10 --> 09 with conflicts
-		from <K-R-EXACT> to <K-W-EXACT>
-	10 --> 08 with conflicts
-		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
-		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT>
-	10 --> 07 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	09 --> 09 with conflicts
-		from <K-W-EXACT> to <K-W-EXACT>
-	08 --> 10 with conflicts
-		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
-		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT>
-	08 --> 08 with conflicts
-		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
-	08 --> 07 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	07 --> 07 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -569,32 +569,32 @@ C             <    is referenced>: I J N T X
 
  *********************** Use-Def Chains *********************
 
-	23 --> 24 with conflicts
-		from <DIGITALIZE:MP1-W-EXACT> to <DIGITALIZE:MP1-R-EXACT>
-		from <DIGITALIZE:MM1-W-EXACT> to <DIGITALIZE:MM1-R-EXACT>
-	22 --> 23 with conflicts
-		from <INIT:PX-W-EXACT> to <INIT:PX-R-EXACT>
-		from <INIT:DFI-W-EXACT> to <INIT:DFI-R-EXACT>
-	16 --> 18 with conflicts
-		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
-		from <B(*,*)-W-MAY> to <B(*,*)-R-MAY>
-	14 --> 18 with conflicts
-		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
-		from <B(*,*)-W-MAY> to <B(*,*)-R-MAY>
-		from <B(*,*)-R-MAY> to <B(*,*)-W-MAY>
-	14 --> 16 with conflicts
-		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
-		from <B(*,*)-R-MAY> to <B(*,*)-W-MAY>
+	12 --> 14 with conflicts
+		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
+		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
+	12 --> 16 with conflicts
+		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
+		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
 	12 --> 22 with conflicts
 		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(5)-W-EXACT>
 		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(5)-R-EXACT>
 		from <__IO_EFFECTS:LUNS(5)-R-EXACT> to <__IO_EFFECTS:LUNS(5)-W-EXACT>
-	12 --> 16 with conflicts
-		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
-		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
-	12 --> 14 with conflicts
-		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
-		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
+	14 --> 16 with conflicts
+		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
+		from <B(*,*)-R-MAY> to <B(*,*)-W-MAY>
+	14 --> 18 with conflicts
+		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
+		from <B(*,*)-W-MAY> to <B(*,*)-R-MAY>
+		from <B(*,*)-R-MAY> to <B(*,*)-W-MAY>
+	16 --> 18 with conflicts
+		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
+		from <B(*,*)-W-MAY> to <B(*,*)-R-MAY>
+	22 --> 23 with conflicts
+		from <INIT:PX-W-EXACT> to <INIT:PX-R-EXACT>
+		from <INIT:DFI-W-EXACT> to <INIT:DFI-R-EXACT>
+	23 --> 24 with conflicts
+		from <DIGITALIZE:MP1-W-EXACT> to <DIGITALIZE:MP1-R-EXACT>
+		from <DIGITALIZE:MM1-W-EXACT> to <DIGITALIZE:MM1-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -602,34 +602,34 @@ C             <    is referenced>: I J N T X
 
  *********************** Use-Def Chains *********************
 
-	12 --> 12 with conflicts
-		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
-	12 --> 08 with conflicts
-		from <S-R-EXACT> to <S-W-EXACT>
-	12 --> 07 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	10 --> 12 with conflicts
+	07 --> 07 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	08 --> 10 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
 		from <S-W-EXACT> to <S-R-EXACT>
+	08 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	09 --> 09 with conflicts
+		from <K-W-EXACT> to <K-W-EXACT>
+	10 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	10 --> 08 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+		from <S-R-EXACT> to <S-W-EXACT>
+	10 --> 09 with conflicts
+		from <K-R-EXACT> to <K-W-EXACT>
 	10 --> 10 with conflicts
 		from <S-W-EXACT> to <S-W-EXACT>
 		from <S-W-EXACT> to <S-R-EXACT>
 		from <S-R-EXACT> to <S-W-EXACT>
-	10 --> 09 with conflicts
-		from <K-R-EXACT> to <K-W-EXACT>
-	10 --> 08 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
-		from <S-R-EXACT> to <S-W-EXACT>
-	10 --> 07 with conflicts
+	10 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	12 --> 07 with conflicts
 		from <J-R-EXACT> to <J-W-EXACT>
-	09 --> 09 with conflicts
-		from <K-W-EXACT> to <K-W-EXACT>
-	08 --> 12 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
-	08 --> 10 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
-		from <S-W-EXACT> to <S-R-EXACT>
-	07 --> 07 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
+	12 --> 08 with conflicts
+		from <S-R-EXACT> to <S-W-EXACT>
+	12 --> 12 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -637,13 +637,13 @@ C             <    is referenced>: I J N T X
 
  *********************** Use-Def Chains *********************
 
-	12 --> 16 with conflicts
-		from <M-W-EXACT> to <M-R-EXACT>
-	12 --> 15 with conflicts
+	12 --> 13 with conflicts
 		from <M-W-EXACT> to <M-R-EXACT>
 	12 --> 14 with conflicts
 		from <M-W-EXACT> to <M-R-EXACT>
-	12 --> 13 with conflicts
+	12 --> 15 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 16 with conflicts
 		from <M-W-EXACT> to <M-R-EXACT>
 
 ****************** End of Dependence Graph ******************
@@ -652,38 +652,38 @@ C             <    is referenced>: I J N T X
 
  *********************** Use-Def Chains *********************
 
-	09 --> 09 with conflicts
-		from <X(J,I)-W-EXACT> to <X(J,I)-W-EXACT>
-	09 --> 08 with conflicts
-		from <X(J,I)-W-EXACT> to <X(I,J)-W-EXACT>
-		from <X(J,I)-W-EXACT> to <X(J,I)-R-EXACT>
-	09 --> 07 with conflicts
-		from <X(J,I)-W-EXACT> to <X(I,J)-R-EXACT>
-		from <T-R-EXACT> to <T-W-EXACT>
-	09 --> 06 with conflicts
+	06 --> 06 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	07 --> 06 with conflicts
 		from <J-R-EXACT> to <J-W-EXACT>
-	08 --> 09 with conflicts
-		from <X(I,J)-W-EXACT> to <X(J,I)-W-EXACT>
-		from <X(J,I)-R-EXACT> to <X(J,I)-W-EXACT>
+	07 --> 07 with conflicts
+		from <T-W-EXACT> to <T-W-EXACT>
+	07 --> 08 with conflicts
+		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT>
+	07 --> 09 with conflicts
+		from <T-W-EXACT> to <T-R-EXACT>
+		from <X(I,J)-R-EXACT> to <X(J,I)-W-EXACT>
+	08 --> 06 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	08 --> 07 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT>
 	08 --> 08 with conflicts
 		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
 		from <X(I,J)-W-EXACT> to <X(J,I)-R-EXACT>
 		from <X(J,I)-R-EXACT> to <X(I,J)-W-EXACT>
-	08 --> 07 with conflicts
-		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT>
-	08 --> 06 with conflicts
+	08 --> 09 with conflicts
+		from <X(I,J)-W-EXACT> to <X(J,I)-W-EXACT>
+		from <X(J,I)-R-EXACT> to <X(J,I)-W-EXACT>
+	09 --> 06 with conflicts
 		from <J-R-EXACT> to <J-W-EXACT>
-	07 --> 09 with conflicts
-		from <T-W-EXACT> to <T-R-EXACT>
-		from <X(I,J)-R-EXACT> to <X(J,I)-W-EXACT>
-	07 --> 08 with conflicts
-		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT>
-	07 --> 07 with conflicts
-		from <T-W-EXACT> to <T-W-EXACT>
-	07 --> 06 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	06 --> 06 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
+	09 --> 07 with conflicts
+		from <X(J,I)-W-EXACT> to <X(I,J)-R-EXACT>
+		from <T-R-EXACT> to <T-W-EXACT>
+	09 --> 08 with conflicts
+		from <X(J,I)-W-EXACT> to <X(I,J)-W-EXACT>
+		from <X(J,I)-W-EXACT> to <X(J,I)-R-EXACT>
+	09 --> 09 with conflicts
+		from <X(J,I)-W-EXACT> to <X(J,I)-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -996,50 +996,50 @@ C    J<=10}>
 
  *********************** Use-Def Chains *********************
 
-	14 --> 14 with conflicts
-		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
-		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
-		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
-	14 --> 13 with conflicts
-		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
-		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
-		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
-	14 --> 12 with conflicts
-		from <JJ-R-EXACT> to <JJ-W-EXACT>
-	14 --> 11 with conflicts
+	07 --> 12 with conflicts
+		from <MS-W-EXACT> to <MS-R-EXACT>
+	08 --> 11 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	08 --> 12 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	08 --> 13 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	08 --> 14 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	11 --> 11 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	12 --> 11 with conflicts
 		from <J-R-EXACT> to <J-W-EXACT>
-	13 --> 14 with conflicts
-		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
-		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
-		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+	12 --> 12 with conflicts
+		from <JJ-W-EXACT> to <JJ-W-EXACT>
+	12 --> 13 with conflicts
+		from <JJ-W-EXACT> to <JJ-R-EXACT>
+	12 --> 14 with conflicts
+		from <JJ-W-EXACT> to <JJ-R-EXACT>
+	13 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	13 --> 12 with conflicts
+		from <JJ-R-EXACT> to <JJ-W-EXACT>
 	13 --> 13 with conflicts
 		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
 		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
 		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
-	13 --> 12 with conflicts
+	13 --> 14 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+	14 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	14 --> 12 with conflicts
 		from <JJ-R-EXACT> to <JJ-W-EXACT>
-	13 --> 11 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	12 --> 14 with conflicts
-		from <JJ-W-EXACT> to <JJ-R-EXACT>
-	12 --> 13 with conflicts
-		from <JJ-W-EXACT> to <JJ-R-EXACT>
-	12 --> 12 with conflicts
-		from <JJ-W-EXACT> to <JJ-W-EXACT>
-	12 --> 11 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	11 --> 11 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
-	08 --> 14 with conflicts
-		from <MM-W-EXACT> to <MM-R-EXACT>
-	08 --> 13 with conflicts
-		from <MM-W-EXACT> to <MM-R-EXACT>
-	08 --> 12 with conflicts
-		from <MM-W-EXACT> to <MM-R-EXACT>
-	08 --> 11 with conflicts
-		from <MM-W-EXACT> to <MM-R-EXACT>
-	07 --> 12 with conflicts
-		from <MS-W-EXACT> to <MS-R-EXACT>
+	14 --> 13 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+	14 --> 14 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -1047,16 +1047,42 @@ C    J<=10}>
 
  *********************** Use-Def Chains *********************
 
-	21 --> 16 with conflicts
-		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
-		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
-	21 --> 12 with conflicts
+	08 --> 11 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	08 --> 12 with conflicts
+		from <NEW-W-EXACT> to <NEW-W-EXACT>
+	08 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	11 --> 11 with conflicts
+		from <OLD-W-EXACT> to <OLD-W-EXACT>
+	11 --> 12 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
 		from <NEW-R-EXACT> to <NEW-W-EXACT>
-	21 --> 11 with conflicts
+	11 --> 16 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	11 --> 21 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	12 --> 11 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
 		from <OLD-R-EXACT> to <OLD-W-EXACT>
-	16 --> 21 with conflicts
-		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
-		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+	12 --> 12 with conflicts
+		from <NEW-W-EXACT> to <NEW-W-EXACT>
+	12 --> 16 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	12 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	14 --> 14 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	15 --> 15 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	16 --> 11 with conflicts
+		from <OLD-R-EXACT> to <OLD-W-EXACT>
+	16 --> 12 with conflicts
+		from <NEW-R-EXACT> to <NEW-W-EXACT>
+	16 --> 14 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	16 --> 15 with conflicts
+		from <I-R-EXACT> to <I-W-EXACT>
 	16 --> 16 with conflicts
 		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
 		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
@@ -1069,42 +1095,16 @@ C    J<=10}>
 		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
 		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
 		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
-	16 --> 15 with conflicts
-		from <I-R-EXACT> to <I-W-EXACT>
-	16 --> 14 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	16 --> 12 with conflicts
-		from <NEW-R-EXACT> to <NEW-W-EXACT>
-	16 --> 11 with conflicts
+	16 --> 21 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+	21 --> 11 with conflicts
 		from <OLD-R-EXACT> to <OLD-W-EXACT>
-	15 --> 15 with conflicts
-		from <I-W-EXACT> to <I-W-EXACT>
-	14 --> 14 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
-	12 --> 21 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
-	12 --> 16 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
-	12 --> 12 with conflicts
-		from <NEW-W-EXACT> to <NEW-W-EXACT>
-	12 --> 11 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
-		from <OLD-R-EXACT> to <OLD-W-EXACT>
-	11 --> 21 with conflicts
-		from <OLD-W-EXACT> to <OLD-R-EXACT>
-	11 --> 16 with conflicts
-		from <OLD-W-EXACT> to <OLD-R-EXACT>
-	11 --> 12 with conflicts
-		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	21 --> 12 with conflicts
 		from <NEW-R-EXACT> to <NEW-W-EXACT>
-	11 --> 11 with conflicts
-		from <OLD-W-EXACT> to <OLD-W-EXACT>
-	08 --> 21 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
-	08 --> 12 with conflicts
-		from <NEW-W-EXACT> to <NEW-W-EXACT>
-	08 --> 11 with conflicts
-		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	21 --> 16 with conflicts
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -1119,28 +1119,28 @@ C    J<=10}>
 
  *********************** Use-Def Chains *********************
 
+	07 --> 07 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	08 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	08 --> 08 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	08 --> 10 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
+	09 --> 09 with conflicts
+		from <K-W-EXACT> to <K-W-EXACT>
+	10 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	10 --> 08 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	10 --> 09 with conflicts
+		from <K-R-EXACT> to <K-W-EXACT>
 	10 --> 10 with conflicts
 		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
 		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
 		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-	10 --> 09 with conflicts
-		from <K-R-EXACT> to <K-W-EXACT>
-	10 --> 08 with conflicts
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-	10 --> 07 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	09 --> 09 with conflicts
-		from <K-W-EXACT> to <K-W-EXACT>
-	08 --> 10 with conflicts
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
-	08 --> 08 with conflicts
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-	08 --> 07 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	07 --> 07 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -1148,39 +1148,39 @@ C    J<=10}>
 
  *********************** Use-Def Chains *********************
 
-	23 --> 24 with conflicts
-		from <DIGITALIZE:MP1-W-EXACT> to <DIGITALIZE:MP1-R-EXACT>
-		from <DIGITALIZE:MM1-W-EXACT> to <DIGITALIZE:MM1-R-EXACT>
+	12 --> 14 with conflicts
+		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
+		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
+	12 --> 16 with conflicts
+		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
+		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
+	12 --> 22 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-MAY>
+		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+	12 --> 23 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-MAY>
+		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+	14 --> 16 with conflicts
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-W-MAY>
+		from <B(PHI1,PHI2)-R-MAY> to <B(PHI1,PHI2)-W-MAY>
+	14 --> 18 with conflicts
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-W-MAY>
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-R-MAY>
+		from <B(PHI1,PHI2)-R-MAY> to <B(PHI1,PHI2)-W-MAY>
+	16 --> 18 with conflicts
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-W-MAY>
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-R-MAY>
 	22 --> 23 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MAY> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MAY> to <__IO_EFFECTS:LUNS(PHI1)-R-MAY>
 		from <INIT:PX-W-EXACT> to <INIT:PX-R-EXACT>
 		from <INIT:DFI-W-EXACT> to <INIT:DFI-R-EXACT>
 		from <__IO_EFFECTS:LUNS(PHI1)-R-MAY> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
-	16 --> 18 with conflicts
-		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-W-MAY>
-		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-R-MAY>
-	14 --> 18 with conflicts
-		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-W-MAY>
-		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-R-MAY>
-		from <B(PHI1,PHI2)-R-MAY> to <B(PHI1,PHI2)-W-MAY>
-	14 --> 16 with conflicts
-		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-W-MAY>
-		from <B(PHI1,PHI2)-R-MAY> to <B(PHI1,PHI2)-W-MAY>
-	12 --> 23 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-MAY>
-		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
-	12 --> 22 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-MAY>
-		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
-	12 --> 16 with conflicts
-		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
-		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
-	12 --> 14 with conflicts
-		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
-		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
+	23 --> 24 with conflicts
+		from <DIGITALIZE:MP1-W-EXACT> to <DIGITALIZE:MP1-R-EXACT>
+		from <DIGITALIZE:MM1-W-EXACT> to <DIGITALIZE:MM1-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -1188,34 +1188,34 @@ C    J<=10}>
 
  *********************** Use-Def Chains *********************
 
-	12 --> 12 with conflicts
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-	12 --> 08 with conflicts
-		from <S-R-EXACT> to <S-W-EXACT>
-	12 --> 07 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	10 --> 12 with conflicts
+	07 --> 07 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	08 --> 10 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
 		from <S-W-EXACT> to <S-R-EXACT>
+	08 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	09 --> 09 with conflicts
+		from <K-W-EXACT> to <K-W-EXACT>
+	10 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	10 --> 08 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+		from <S-R-EXACT> to <S-W-EXACT>
+	10 --> 09 with conflicts
+		from <K-R-EXACT> to <K-W-EXACT>
 	10 --> 10 with conflicts
 		from <S-W-EXACT> to <S-W-EXACT>
 		from <S-W-EXACT> to <S-R-EXACT>
 		from <S-R-EXACT> to <S-W-EXACT>
-	10 --> 09 with conflicts
-		from <K-R-EXACT> to <K-W-EXACT>
-	10 --> 08 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
-		from <S-R-EXACT> to <S-W-EXACT>
-	10 --> 07 with conflicts
+	10 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	12 --> 07 with conflicts
 		from <J-R-EXACT> to <J-W-EXACT>
-	09 --> 09 with conflicts
-		from <K-W-EXACT> to <K-W-EXACT>
-	08 --> 12 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
-	08 --> 10 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
-		from <S-W-EXACT> to <S-R-EXACT>
-	07 --> 07 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
+	12 --> 08 with conflicts
+		from <S-R-EXACT> to <S-W-EXACT>
+	12 --> 12 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -1223,18 +1223,18 @@ C    J<=10}>
 
  *********************** Use-Def Chains *********************
 
+	12 --> 13 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 14 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 15 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 16 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
 	16 --> 17 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
 		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT>
 		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
-	12 --> 16 with conflicts
-		from <M-W-EXACT> to <M-R-EXACT>
-	12 --> 15 with conflicts
-		from <M-W-EXACT> to <M-R-EXACT>
-	12 --> 14 with conflicts
-		from <M-W-EXACT> to <M-R-EXACT>
-	12 --> 13 with conflicts
-		from <M-W-EXACT> to <M-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -1242,38 +1242,38 @@ C    J<=10}>
 
  *********************** Use-Def Chains *********************
 
-	09 --> 09 with conflicts
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-	09 --> 08 with conflicts
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
-	09 --> 07 with conflicts
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
-		from <T-R-EXACT> to <T-W-EXACT>
-	09 --> 06 with conflicts
+	06 --> 06 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	07 --> 06 with conflicts
 		from <J-R-EXACT> to <J-W-EXACT>
-	08 --> 09 with conflicts
-		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	07 --> 07 with conflicts
+		from <T-W-EXACT> to <T-W-EXACT>
+	07 --> 08 with conflicts
 		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	07 --> 09 with conflicts
+		from <T-W-EXACT> to <T-R-EXACT>
+		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	08 --> 06 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	08 --> 07 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
 	08 --> 08 with conflicts
 		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
 		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
 		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-	08 --> 07 with conflicts
+	08 --> 09 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	09 --> 06 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	09 --> 07 with conflicts
 		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
-	08 --> 06 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	07 --> 09 with conflicts
-		from <T-W-EXACT> to <T-R-EXACT>
-		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-	07 --> 08 with conflicts
-		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
-	07 --> 07 with conflicts
-		from <T-W-EXACT> to <T-W-EXACT>
-	07 --> 06 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT>
-	06 --> 06 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
+		from <T-R-EXACT> to <T-W-EXACT>
+	09 --> 08 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
+	09 --> 09 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 

@@ -2778,10 +2778,11 @@
      &LU_NUB5, LU_IND4, LU_IB4, LU_NUB4, LU_IND3, LU_IB3, LU_NUB3, 
      &LU_IND2, LU_IB2, LU_NUB2, LU_IND1, LU_IB1, LU_NUB1, LU_IND0, 
      &LU_IB0, LU_NUB0, M, N, K, LDA, LDB, LDC, I, L
-      REAL*4 ZERO0, ONE0, F_03, F_02, F_01, F_00, F_13, F_12, F_11, 
-     &F_10, F_43, F_42, F_41, F_40, F_53, F_52, F_51, F_50, F_7, F_6
-     &, F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, ALPHA, A(1:SIZE
-     &, 1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:SIZE), TEMP
+      REAL*4 ZERO0, ONE0, TEMP1, TEMP0, F_03, F_02, F_01, F_00, F_13
+     &, F_12, F_11, F_10, F_43, F_42, F_41, F_40, F_53, F_52, F_51, 
+     &F_50, F_7, F_6, F_5, F_4, F_3, F_2, F_1, F_0, C3, C2, C1, C0, 
+     &ALPHA, A(1:SIZE, 1:SIZE), B(1:SIZE, 1:SIZE), BETA, C(1:SIZE, 1:
+     &SIZE), TEMP
       LOGICAL NOTB0, NOTA0, L_611, L_500, L_400, L_300, L_200, L_100
      &, L_000, L_911, L_110, L_120, L_130, L_140, L_150, L_160, L_170
      &, L_180, L_190, L_210, L_220, L_230, L_240, L_250, L_260, L_270
@@ -3036,27 +3037,27 @@
 *
                      DO 120 J3 = 1, N                                   0142
                         DO 110 I = 1, M                                 0143
-                           TEMP = ZERO0                                 0144
+                           TEMP0 = ZERO0                                0144
                            LU_NUB5 = K
                            LU_IB5 = MOD(LU_NUB5, 4)
                            DO 99989 LU_IND50 = 0, LU_IB5-1
                               F_1 = A(LU_IND50+1,I)*B(LU_IND50+1,J3)
-                              TEMP = TEMP+F_1
+                              TEMP0 = TEMP0+F_1
 99989                         CONTINUE
                            DO 99988 LU_IND5 = LU_IB5, LU_NUB5-1, 4
                               F_10 = A(LU_IND5+1,I)*B(LU_IND5+1,J3)
-                              TEMP = TEMP+F_10
+                              TEMP0 = TEMP0+F_10
                               F_11 = A(LU_IND5+2,I)*B(LU_IND5+2,J3)
-                              TEMP = TEMP+F_11
+                              TEMP0 = TEMP0+F_11
                               F_12 = A(LU_IND5+3,I)*B(LU_IND5+3,J3)
-                              TEMP = TEMP+F_12
+                              TEMP0 = TEMP0+F_12
                               F_13 = A(LU_IND5+4,I)*B(LU_IND5+4,J3)
-                              TEMP = TEMP+F_13
+                              TEMP0 = TEMP0+F_13
 99988                         CONTINUE
                            L_7 = BETA.EQ.ZERO0
-                           C0 = ALPHA*TEMP
+                           C0 = ALPHA*TEMP0
                            C(I,J3) = L_7?C0:C(I,J3)
-                           F_2 = ALPHA*TEMP
+                           F_2 = ALPHA*TEMP0
                            F_3 = BETA*C(I,J3)
                            C1 = F_2+F_3
                            L_98 = .NOT.L_7
@@ -3122,27 +3123,27 @@
 *
                   DO 200 J5 = 1, N                                      0184
                      DO 190 I = 1, M                                    0185
-                        TEMP = ZERO0                                    0186
+                        TEMP1 = ZERO0                                   0186
                         LU_NUB9 = K
                         LU_IB9 = MOD(LU_NUB9, 4)
                         DO 99981 LU_IND90 = 0, LU_IB9-1
                            F_5 = A(LU_IND90+1,I)*B(J5,LU_IND90+1)
-                           TEMP = TEMP+F_5
+                           TEMP1 = TEMP1+F_5
 99981                      CONTINUE
                         DO 99980 LU_IND9 = LU_IB9, LU_NUB9-1, 4
                            F_50 = A(LU_IND9+1,I)*B(J5,LU_IND9+1)
-                           TEMP = TEMP+F_50
+                           TEMP1 = TEMP1+F_50
                            F_51 = A(LU_IND9+2,I)*B(J5,LU_IND9+2)
-                           TEMP = TEMP+F_51
+                           TEMP1 = TEMP1+F_51
                            F_52 = A(LU_IND9+3,I)*B(J5,LU_IND9+3)
-                           TEMP = TEMP+F_52
+                           TEMP1 = TEMP1+F_52
                            F_53 = A(LU_IND9+4,I)*B(J5,LU_IND9+4)
-                           TEMP = TEMP+F_53
+                           TEMP1 = TEMP1+F_53
 99980                      CONTINUE
                         L_8 = BETA.EQ.ZERO0
-                        C2 = ALPHA*TEMP
+                        C2 = ALPHA*TEMP1
                         C(I,J5) = L_8?C2:C(I,J5)
-                        F_6 = ALPHA*TEMP
+                        F_6 = ALPHA*TEMP1
                         F_7 = BETA*C(I,J5)
                         C3 = F_6+F_7
                         L_99 = .NOT.L_8
@@ -3290,6 +3291,8 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
   v4sf vec00;
   float zero0;
   float one0;
+  float temp1;
+  float temp0;
   int nrowb0;
   int nrowa0;
   int j5;
@@ -3770,7 +3773,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 			{
 			  for (i = 1; i <= m; i++)
 			    {
-			      temp = zero0;
+			      temp0 = zero0;
 			      lu_nub5 = k;
 			      lu_ib5 = (lu_nub5 % 4);
 			      for (lu_ind50 = 0; lu_ind50 <= lu_ib5 - 1;
@@ -3779,7 +3782,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 				  f_1 =
 				    (a[i - 1][(1 + lu_ind50) - 1] *
 				     b[j3 - 1][(1 + lu_ind50) - 1]);
-				  temp = (temp + f_1);
+				  temp0 = (temp0 + f_1);
 				  continue;
 				}
 			      for (lu_ind5 = lu_ib5; lu_ind5 <= lu_nub5 - 1;
@@ -3793,15 +3796,15 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 							    1]);
 				  simd_mulps (vec90, vec100, vec110);
 				  simd_store_v4sf (vec90, pdata1[0]);
-				  temp = (temp + pdata1[0]);
-				  temp = (temp + pdata1[1]);
-				  temp = (temp + pdata1[2]);
-				  temp = (temp + pdata1[3]);
+				  temp0 = (temp0 + pdata1[0]);
+				  temp0 = (temp0 + pdata1[1]);
+				  temp0 = (temp0 + pdata1[2]);
+				  temp0 = (temp0 + pdata1[3]);
 				  continue;
 				}
 			      l_7 = (beta == zero0);
-			      c0 = (alpha * temp);
-			      f_2 = (alpha * temp);
+			      c0 = (alpha * temp0);
+			      f_2 = (alpha * temp0);
 			      c[j3 - 1][i - 1] =
 				__c - conditional__ (&l_7, &c0,
 						     c[j3 - 1][i - 1]);
@@ -3927,7 +3930,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 			{
 			  for (i = 1; i <= m; i++)
 			    {
-			      temp = zero0;
+			      temp1 = zero0;
 			      lu_nub9 = k;
 			      lu_ib9 = (lu_nub9 % 4);
 			      for (lu_ind90 = 0; lu_ind90 <= lu_ib9 - 1;
@@ -3936,7 +3939,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 				  f_5 =
 				    (a[i - 1][(1 + lu_ind90) - 1] *
 				     b[(1 + lu_ind90) - 1][j5 - 1]);
-				  temp = (temp + f_5);
+				  temp1 = (temp1 + f_5);
 				  continue;
 				}
 			      for (lu_ind9 = lu_ib9; lu_ind9 <= lu_nub9 - 1;
@@ -3956,15 +3959,15 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 							    1][j5 - 1]);
 				  simd_mulps (vec190, vec200, vec210);
 				  simd_store_v4sf (vec190, pdata3[0]);
-				  temp = (temp + pdata3[0]);
-				  temp = (temp + pdata3[1]);
-				  temp = (temp + pdata3[2]);
-				  temp = (temp + pdata3[3]);
+				  temp1 = (temp1 + pdata3[0]);
+				  temp1 = (temp1 + pdata3[1]);
+				  temp1 = (temp1 + pdata3[2]);
+				  temp1 = (temp1 + pdata3[3]);
 				  continue;
 				}
 			      l_8 = (beta == zero0);
-			      c2 = (alpha * temp);
-			      f_6 = (alpha * temp);
+			      c2 = (alpha * temp1);
+			      f_6 = (alpha * temp1);
 			      c[j5 - 1][i - 1] =
 				__c - conditional__ (&l_8, &c2,
 						     c[j5 - 1][i - 1]);

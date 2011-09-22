@@ -28,19 +28,19 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	05 --> 06 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-	04 --> 05 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	03 --> 06 with conflicts
-		from <i-WE-EXACT> to <i-RE-EXACT>
-	03 --> 05 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-		from <i-WE-EXACT> to <i-RE-EXACT>
 	03 --> 04 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>
 		from <i-WE-EXACT> to <i-RE-EXACT>
 		from <a-WE-EXACT> to <a-RE-EXACT>
+	03 --> 05 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	03 --> 06 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	04 --> 05 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	05 --> 06 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -57,19 +57,19 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	05 --> 06 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-	04 --> 05 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	03 --> 06 with conflicts
-		from <i-WE-EXACT> to <i-RE-EXACT>
-	03 --> 05 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-		from <i-WE-EXACT> to <i-RE-EXACT>
 	03 --> 04 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>
 		from <i-WE-EXACT> to <i-RE-EXACT>
 		from <a-WE-EXACT> to <a-RE-EXACT>
+	03 --> 05 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	03 --> 06 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	04 --> 05 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	05 --> 06 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 

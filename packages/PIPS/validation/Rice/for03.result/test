@@ -64,21 +64,6 @@ void for03(int n)
    }
 }
 
-Chains
-
-
- *********************** Use-Def Chains *********************
-
-	29 --> 29 with conflicts
-		from <e1.next[PHI2].x[PHI4]-W-EXACT> to <e1.next[PHI2].x[PHI4]-W-EXACT>
-	28 --> 28 with conflicts
-		from <e1.x[PHI2]-W-EXACT> to <e1.x[PHI2]-W-EXACT>
-	25 --> 29 with conflicts
-		from <e1.next-W-EXACT> to <e1.next[PHI2].x[PHI4]-W-EXACT>
-		from <e1.next-W-EXACT> to <e1.next-R-EXACT>
-
-****************** End of Dependence Graph ******************
-
 Privatize scalar variables
 
 

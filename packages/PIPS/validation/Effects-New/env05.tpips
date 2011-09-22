@@ -55,13 +55,6 @@ activate PRINT_CODE_POINTER_REGIONS
 display PRINTED_FILE[env05]
 
 echo
-echo Use-def chains
-echo
-
-activate PRINT_CHAINS_GRAPH
-display DG_FILE
-
-echo
 echo Code after use-def elimination
 echo
 

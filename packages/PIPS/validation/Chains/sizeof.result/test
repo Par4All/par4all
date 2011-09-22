@@ -1,0 +1,93 @@
+int env05()
+{
+   typedef int mile;                                                    /*0005*/
+   typedef mile km;                                                     /*0006*/
+   km j;                                                                /*0007*/
+
+   j = (km) 1;                                                          /*0009*/
+   j = sizeof(km);                                                      /*0010*/
+   return j;                                                            /*0011*/
+}
+int env05()
+{
+//             <    is declared>: mile
+   typedef int mile;                                                    /*0005*/
+//             <    is referenced>: mile
+//             <    is declared>: km
+   typedef mile km;                                                     /*0006*/
+//             <    is referenced>: km
+//             <    is declared>: j
+   km j;                                                                /*0007*/
+//             <    is written>: j
+//             <    is referenced>: j km
+
+   j = (km) 1;                                                          /*0009*/
+//             <    is written>: j
+//             <    is referenced>: j km
+   j = sizeof(km);                                                      /*0010*/
+//             <    is read   >: j
+//             <    is referenced>: j
+   return j;                                                            /*0011*/
+}
+// chains for env05
+
+ *********************** Use-Def Chains *********************
+
+	05 --> 06 with conflicts
+		from <mile-WT-EXACT> to <mile-RT-EXACT>
+	06 --> 07 with conflicts
+		from <km-WT-EXACT> to <km-RT-EXACT>
+	06 --> 09 with conflicts
+		from <km-WT-EXACT> to <km-RT-EXACT>
+	06 --> 10 with conflicts
+		from <km-WT-EXACT> to <km-RT-EXACT>
+	07 --> 09 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	07 --> 10 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	07 --> 11 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	09 --> 10 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	10 --> 11 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+int env05()
+{
+   typedef int mile;                                                    /*0005*/
+   typedef mile km;                                                     /*0006*/
+   km j;                                                                /*0007*/
+
+   j = (km) 1;                                                          /*0009*/
+   j = sizeof(km);                                                      /*0010*/
+   return j;                                                            /*0011*/
+}
+// chains for env05
+
+ *********************** Use-Def Chains *********************
+
+	05 --> 06 with conflicts
+		from <mile-WT-EXACT> to <mile-RT-EXACT>
+	06 --> 07 with conflicts
+		from <km-WT-EXACT> to <km-RT-EXACT>
+	06 --> 09 with conflicts
+		from <km-WT-EXACT> to <km-RT-EXACT>
+	06 --> 10 with conflicts
+		from <km-WT-EXACT> to <km-RT-EXACT>
+	07 --> 09 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	07 --> 10 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	07 --> 11 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	09 --> 10 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	10 --> 11 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None

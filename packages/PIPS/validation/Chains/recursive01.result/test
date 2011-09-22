@@ -1,0 +1,177 @@
+void foo(al_t e)
+{
+}
+void for03(int n)
+{
+   int j;                                                               /*0020*/
+   al_t e1;                                                             /*0021*/
+   al_t e2;                                                             /*0022*/
+   float t, delta_t, t_max;                                             /*0023*/
+
+   e1.next = &e2;                                                       /*0025*/
+
+   for(j = 0; j <= 99; j += 1) {                                        /*0027*/
+      (e1.x)[j] = 0.;                                                   /*0028*/
+      (e1.next->x)[j] = 1.;                                             /*0029*/
+   }
+}
+void foo(al_t e)
+{
+}
+void for03(int n)
+{
+//             <    is declared>: j
+   int j;                                                               /*0020*/
+//             <    is referenced>: al_t
+//             <    is declared>: e1
+   al_t e1;                                                             /*0021*/
+//             <    is referenced>: al_t
+//             <    is declared>: e2
+   al_t e2;                                                             /*0022*/
+//             <    is declared>: delta_t t t_max
+   float t, delta_t, t_max;                                             /*0023*/
+//             <    is written>: e1.next
+//             <    is referenced>: e1 e2
+
+   e1.next = &e2;                                                       /*0025*/
+//             <    is written>: j
+//             <    is referenced>: j
+
+   for(j = 0; j <= 99; j += 1) {                                        /*0027*/
+//             <    is read   >: j
+//             <    is written>: e1.x[j]
+//             <    is referenced>: e1 j
+      (e1.x)[j] = 0.;                                                   /*0028*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: e1.next j
+//             <    is referenced>: e1 j
+      (e1.next->x)[j] = 1.;                                             /*0029*/
+   }
+}
+// chains for foo
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for for03
+
+ *********************** Use-Def Chains *********************
+
+	20 --> 27 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	20 --> 28 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	20 --> 29 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	21 --> 25 with conflicts
+		from <e1-WE-EXACT> to <e1-RE-EXACT>
+	21 --> 28 with conflicts
+		from <e1-WE-EXACT> to <e1-RE-EXACT>
+	21 --> 29 with conflicts
+		from <e1-WE-EXACT> to <e1-RE-EXACT>
+	22 --> 25 with conflicts
+		from <e2-WE-EXACT> to <e2-RE-EXACT>
+	25 --> 29 with conflicts
+		from <e1.next-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <e1.next-W-EXACT> to <e1.next-R-EXACT>
+	28 --> 28 with conflicts
+		from <e1.x[j]-W-EXACT> to <e1.x[j]-W-EXACT>
+	28 --> 29 with conflicts
+		from <e1.x[j]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	29 --> 28 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <e1.x[j]-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-EXACT>
+	29 --> 29 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <e1.next-R-EXACT>
+		from <e1.next-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+
+****************** End of Dependence Graph ******************
+
+None
+void foo(al_t e)
+{
+}
+void for03(int n)
+{
+   int j;                                                               /*0020*/
+
+//  <e1-WE-EXACT-{}>
+//  <al_t-RT-EXACT-{}>
+
+   al_t e1;                                                             /*0021*/
+
+//  <e2-WE-EXACT-{}>
+//  <al_t-RT-EXACT-{}>
+
+   al_t e2;                                                             /*0022*/
+   float t, delta_t, t_max;                                             /*0023*/
+
+//  <e1-RE-EXACT-{}>
+//  <e1.next-W-EXACT-{}>
+//  <e2-RE-EXACT-{}>
+
+
+   e1.next = &e2;                                                       /*0025*/
+
+   for(j = 0; j <= 99; j += 1) {                                        /*0027*/
+
+//  <e1-RE-EXACT-{}>
+//  <e1.x[PHI2]-W-EXACT-{PHI2==j, 0<=j, j<=99}>
+
+      (e1.x)[j] = 0.;                                                   /*0028*/
+
+//  <e1-RE-EXACT-{}>
+//  <e1.next-R-EXACT-{0<=j, j<=99}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      (e1.next->x)[j] = 1.;                                             /*0029*/
+   }
+}
+// chains for foo
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for for03
+
+ *********************** Use-Def Chains *********************
+
+	20 --> 27 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	20 --> 28 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	20 --> 29 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	21 --> 25 with conflicts
+		from <e1-WE-EXACT> to <e1-RE-EXACT>
+	21 --> 28 with conflicts
+		from <e1-WE-EXACT> to <e1-RE-EXACT>
+	21 --> 29 with conflicts
+		from <e1-WE-EXACT> to <e1-RE-EXACT>
+	22 --> 25 with conflicts
+		from <e2-WE-EXACT> to <e2-RE-EXACT>
+	25 --> 29 with conflicts
+		from <e1.next-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <e1.next-W-EXACT> to <e1.next-R-EXACT>
+	28 --> 28 with conflicts
+		from <e1.x[PHI2]-W-EXACT> to <e1.x[PHI2]-W-EXACT>
+	28 --> 29 with conflicts
+		from <e1.x[PHI2]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	29 --> 28 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <e1.x[PHI2]-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-EXACT>
+	29 --> 29 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <e1.next-R-EXACT>
+		from <e1.next-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+
+****************** End of Dependence Graph ******************
+
+None

@@ -11,12 +11,12 @@
 
  ******** Whole Dependence Graph with Dependence Cones ******
 
-	08 --> 09 with conflicts
-		from <B-W-EXACT> to <B-R-EXACT>
-	07 --> 08 with conflicts
-		from <A-W-EXACT> to <A-R-EXACT>
 	06 --> 07 with conflicts
 		from <A-W-EXACT> to <A-W-EXACT>
+	07 --> 08 with conflicts
+		from <A-W-EXACT> to <A-R-EXACT>
+	08 --> 09 with conflicts
+		from <B-W-EXACT> to <B-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -34,13 +34,13 @@
 
  ******** Whole Dependence Graph with Dependence Cones ******
 
-	10 --> 11 with conflicts
-		from <B(PHI1)-W-EXACT> to <B(PHI1)-R-EXACT>
-	09 --> 10 with conflicts
-		from <A(PHI1)-W-EXACT> to <A(PHI1)-R-EXACT>
-	08 --> 10 with conflicts
-		from <A(PHI1)-W-EXACT> to <A(PHI1)-R-EXACT>
 	08 --> 09 with conflicts
 		from <A(PHI1)-W-EXACT> to <A(PHI1)-W-EXACT>
+	08 --> 10 with conflicts
+		from <A(PHI1)-W-EXACT> to <A(PHI1)-R-EXACT>
+	09 --> 10 with conflicts
+		from <A(PHI1)-W-EXACT> to <A(PHI1)-R-EXACT>
+	10 --> 11 with conflicts
+		from <B(PHI1)-W-EXACT> to <B(PHI1)-R-EXACT>
 
 ****************** End of Dependence Graph ******************

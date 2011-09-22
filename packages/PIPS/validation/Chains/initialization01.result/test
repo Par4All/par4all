@@ -62,31 +62,31 @@ C                               __IO_EFFECTS:LUNS
 
  *********************** Use-Def Chains *********************
 
-	18 --> 19 with conflicts
-		from <L-W-EXACT> to <L-R-EXACT>
-		from <K-W-EXACT> to <K-R-EXACT>
+	14 --> 15 with conflicts
+		from <I-R-EXACT> to <I-W-EXACT>
+	14 --> 16 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	15 --> 16 with conflicts
+		from <I-W-EXACT> to <I-R-EXACT>
+	15 --> 18 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	16 --> 17 with conflicts
 		from <J-W-EXACT> to <J-R-EXACT>
-	17 --> 19 with conflicts
-		from <__IO_EFFECTS:LUNS(6)-W-EXACT> to <__IO_EFFECTS:LUNS(6)-W-EXACT>
-		from <__IO_EFFECTS:LUNS(6)-W-EXACT> to <__IO_EFFECTS:LUNS(6)-R-EXACT>
-		from <__IO_EFFECTS:LUNS(6)-R-EXACT> to <__IO_EFFECTS:LUNS(6)-W-EXACT>
+	16 --> 18 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+		from <I-R-EXACT> to <I-W-EXACT>
 	17 --> 18 with conflicts
 		from <L-R-EXACT> to <L-W-EXACT>
 		from <K-R-EXACT> to <K-W-EXACT>
 		from <J-R-EXACT> to <J-W-EXACT>
-	16 --> 18 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
-		from <I-R-EXACT> to <I-W-EXACT>
-	16 --> 17 with conflicts
+	17 --> 19 with conflicts
+		from <__IO_EFFECTS:LUNS(6)-W-EXACT> to <__IO_EFFECTS:LUNS(6)-W-EXACT>
+		from <__IO_EFFECTS:LUNS(6)-W-EXACT> to <__IO_EFFECTS:LUNS(6)-R-EXACT>
+		from <__IO_EFFECTS:LUNS(6)-R-EXACT> to <__IO_EFFECTS:LUNS(6)-W-EXACT>
+	18 --> 19 with conflicts
+		from <L-W-EXACT> to <L-R-EXACT>
+		from <K-W-EXACT> to <K-R-EXACT>
 		from <J-W-EXACT> to <J-R-EXACT>
-	15 --> 18 with conflicts
-		from <I-W-EXACT> to <I-W-EXACT>
-	15 --> 16 with conflicts
-		from <I-W-EXACT> to <I-R-EXACT>
-	14 --> 16 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
-	14 --> 15 with conflicts
-		from <I-R-EXACT> to <I-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
@@ -133,17 +133,19 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
 
  *********************** Use-Def Chains *********************
 
-	18 --> 19 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-W-MAY> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
-		from <__IO_EFFECTS:LUNS(PHI1)-W-MAY> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT>
-		from <L-W-EXACT> to <L-R-EXACT>
-		from <K-W-EXACT> to <K-R-EXACT>
+	14 --> 15 with conflicts
+		from <I-R-EXACT> to <I-W-EXACT>
+	14 --> 16 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	15 --> 16 with conflicts
+		from <I-W-EXACT> to <I-R-EXACT>
+	15 --> 18 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	16 --> 17 with conflicts
 		from <J-W-EXACT> to <J-R-EXACT>
-		from <__IO_EFFECTS:LUNS(PHI1)-R-MAY> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
-	17 --> 19 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT>
-		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
+	16 --> 18 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+		from <I-R-EXACT> to <I-W-EXACT>
 	17 --> 18 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
 		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-MAY>
@@ -151,19 +153,17 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
 		from <L-R-EXACT> to <L-W-EXACT>
 		from <K-R-EXACT> to <K-W-EXACT>
 		from <J-R-EXACT> to <J-W-EXACT>
-	16 --> 18 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
-		from <I-R-EXACT> to <I-W-EXACT>
-	16 --> 17 with conflicts
+	17 --> 19 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT>
+		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
+	18 --> 19 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-MAY> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
+		from <__IO_EFFECTS:LUNS(PHI1)-W-MAY> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT>
+		from <L-W-EXACT> to <L-R-EXACT>
+		from <K-W-EXACT> to <K-R-EXACT>
 		from <J-W-EXACT> to <J-R-EXACT>
-	15 --> 18 with conflicts
-		from <I-W-EXACT> to <I-W-EXACT>
-	15 --> 16 with conflicts
-		from <I-W-EXACT> to <I-R-EXACT>
-	14 --> 16 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT>
-	14 --> 15 with conflicts
-		from <I-R-EXACT> to <I-W-EXACT>
+		from <__IO_EFFECTS:LUNS(PHI1)-R-MAY> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 
