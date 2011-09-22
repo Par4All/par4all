@@ -48,7 +48,7 @@ In statement number 17 (0.5):
 In statement number 18 (0.6):
 	"__IO_EFFECTS:LUNS" used but not initialized.
 In statement number 19 (0.7):
-	"J" used but not initialized.
+	"K" used but not initialized.
 	"L" used but not initialized.
 
 number of messages from flint for INITIALIZATION01 : 7
