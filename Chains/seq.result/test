@@ -520,6 +520,8 @@ C             <    is referenced>: I J N T X
 		from <NEW-R-EXACT> to <NEW-W-EXACT>
 	11 --> 11 with conflicts
 		from <OLD-W-EXACT> to <OLD-W-EXACT>
+	08 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
 	08 --> 12 with conflicts
 		from <NEW-W-EXACT> to <NEW-W-EXACT>
 	08 --> 11 with conflicts
@@ -626,8 +628,6 @@ C             <    is referenced>: I J N T X
 	08 --> 10 with conflicts
 		from <S-W-EXACT> to <S-W-EXACT>
 		from <S-W-EXACT> to <S-R-EXACT>
-	08 --> 08 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
 	07 --> 07 with conflicts
 		from <J-W-EXACT> to <J-W-EXACT>
 
@@ -1099,6 +1099,8 @@ C    J<=10}>
 		from <NEW-R-EXACT> to <NEW-W-EXACT>
 	11 --> 11 with conflicts
 		from <OLD-W-EXACT> to <OLD-W-EXACT>
+	08 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
 	08 --> 12 with conflicts
 		from <NEW-W-EXACT> to <NEW-W-EXACT>
 	08 --> 11 with conflicts
@@ -1212,8 +1214,6 @@ C    J<=10}>
 	08 --> 10 with conflicts
 		from <S-W-EXACT> to <S-W-EXACT>
 		from <S-W-EXACT> to <S-R-EXACT>
-	08 --> 08 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT>
 	07 --> 07 with conflicts
 		from <J-W-EXACT> to <J-W-EXACT>
 

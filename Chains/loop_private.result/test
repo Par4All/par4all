@@ -139,7 +139,6 @@ int main()
 	14 --> 16 with conflicts
 		from <z-W-EXACT> to <z-W-EXACT>
 	14 --> 13 with conflicts
-		from <z-W-EXACT> to <z-W-EXACT>
 		from <z-RE-EXACT> to <z-WE-EXACT>
 	13 --> 23 with conflicts
 		from <z-WE-EXACT> to <z-RE-EXACT>
@@ -279,7 +278,6 @@ int main()
 	14 --> 16 with conflicts
 		from <z-W-EXACT> to <z-W-EXACT>
 	14 --> 13 with conflicts
-		from <z-W-EXACT> to <z-W-EXACT>
 		from <z-RE-EXACT> to <z-WE-EXACT>
 	13 --> 23 with conflicts
 		from <z-WE-EXACT> to <z-RE-EXACT>
