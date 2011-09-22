@@ -656,7 +656,7 @@ static void inout_block( statement st, cons *sts ) {
 
     /* Get the ins for next statement */
     def_in = DEF_OUT( one );
-    set_union( ref_in, ref_in, REF_OUT( one ) );
+    ref_in = REF_OUT( one );
   }
 
   /* The outs for the whole block */
@@ -773,15 +773,14 @@ static void inout_forloop( statement st, forloop fl ) {
  * @param c is the call (unused)
  */
 static void inout_call( statement st, call __attribute__ ((unused)) c ) {
-  set diff = MAKE_STATEMENT_SET();
+  /* Compute "out" sets  */
 
-  /* Compute "out" sets
-   * FIXME diff temporary set can be avoided */
-  set_union( DEF_OUT( st ), GEN( st ), set_difference( diff,
+  set_union( DEF_OUT( st ), GEN( st ), set_difference( DEF_OUT( st ),
                                                        DEF_IN( st ),
                                                        KILL( st ) ) );
-  set_union( REF_OUT( st ), REF_IN( st ), REF( st ) );
-  set_free( diff );
+  set_union( REF_OUT( st ), REF( st ), set_difference( REF_OUT( st ),
+                                                       REF_IN( st ),
+                                                       KILL( st ) ) );
 
 }
 
