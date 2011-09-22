@@ -237,6 +237,8 @@ static void kill_effect( set kill, effect e ) {
      it is part of the first_effect_certainely_includes_second_effect_p
      test.
    */
+  // Non store effect kills ! That interesting and allow to get rid of some
+  // loop carried dependence when variables are declared in loop body :)
   if ( action_write_p(effect_action(e))
       && approximation_exact_p(effect_approximation(e)) ) {
     HASH_MAP(theEffect,theStatement, {
@@ -656,7 +658,7 @@ static void inout_block( statement st, cons *sts ) {
 
     /* Get the ins for next statement */
     def_in = DEF_OUT( one );
-    set_union( ref_in, ref_in, REF_OUT( one ) );
+    ref_in = REF_OUT( one );
   }
 
   /* The outs for the whole block */
@@ -773,15 +775,14 @@ static void inout_forloop( statement st, forloop fl ) {
  * @param c is the call (unused)
  */
 static void inout_call( statement st, call __attribute__ ((unused)) c ) {
-  set diff = MAKE_STATEMENT_SET();
+  /* Compute "out" sets  */
 
-  /* Compute "out" sets
-   * FIXME diff temporary set can be avoided */
-  set_union( DEF_OUT( st ), GEN( st ), set_difference( diff,
+  set_union( DEF_OUT( st ), GEN( st ), set_difference( DEF_OUT( st ),
                                                        DEF_IN( st ),
                                                        KILL( st ) ) );
-  set_union( REF_OUT( st ), REF_IN( st ), REF( st ) );
-  set_free( diff );
+  set_union( REF_OUT( st ), REF( st ), set_difference( REF_OUT( st ),
+                                                       REF_IN( st ),
+                                                       KILL( st ) ) );
 
 }
 
