@@ -22,11 +22,6 @@ apply CLEAN_DECLARATIONS[foo]
 
 display PRINTED_FILE[%ALL]
 
-echo
-echo unsplit
-echo
-
-apply UNSPLIT
 
 close
 delete $WS

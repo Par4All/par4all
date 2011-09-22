@@ -28,6 +28,3 @@ int pof()
 int pof();
 //PIPS generated variable
 void kernel(int a_0[1]);
-
-unsplit
-

@@ -36,6 +36,3 @@ kernel:
       j += b(i);
    *j_0 = j;
 }
-
-unsplit
-

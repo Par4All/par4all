@@ -20,13 +20,8 @@ setproperty OUTLINE_LABEL "kernel"
 apply OUTLINE[main]
 display PRINTED_FILE[%ALL]
 
-echo
-echo unsplit
-echo
-
-apply UNSPLIT
-
-shell gcc -fopenmp -c $WS.database/Src/$WS.c -o  $WS.database/Src/$WS.o
+#apply UNSPLIT
+#shell gcc -fopenmp -c $WS.database/Src/$WS.c -o  $WS.database/Src/$WS.o
 
 close
 delete $WS
