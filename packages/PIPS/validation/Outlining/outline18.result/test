@@ -1,0 +1,70 @@
+
+Initial code
+
+int main(void)
+{
+   my_type t[10];
+   {
+      int i;
+
+      for(i = 0; i <= 9; i += 1)
+         t[i].val = i;
+   }
+   {
+      int i;
+      
+      // go through my types
+      for(i = 0; i <= 9; i += 1) {
+         int v = t[i].val;
+kernel:         v = i;
+      }
+   }
+   return 0;
+}
+typedef struct {
+   int val;
+} my_type;
+
+
+///@brief update particles features
+int main(void);
+
+Code after outlining
+
+void kernel(int i, my_type t[10], int v_0[1])
+{
+   //PIPS generated variable
+   int v;
+   v = *v_0;
+kernel:   v = i;
+   *v_0 = v;
+}
+int main(void)
+{
+   my_type t[10];
+   {
+      int i;
+
+      for(i = 0; i <= 9; i += 1)
+         t[i].val = i;
+   }
+   {
+      int i;
+      
+      // go through my types
+      for(i = 0; i <= 9; i += 1) {
+         int v = t[i].val;
+kernel:         kernel(i, t, &v);
+      }
+   }
+   return 0;
+}
+typedef struct {
+   int val;
+} my_type;
+
+
+///@brief update particles features
+int main(void);
+//PIPS generated variable
+void kernel(int i, my_type t[10], int v_0[1]);

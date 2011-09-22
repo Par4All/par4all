@@ -22,12 +22,6 @@ apply OUTLINE[foo]
 
 display PRINTED_FILE[%ALL]
 
-echo
-echo unsplit
-echo
-
-apply UNSPLIT
-
 close
 delete outline06
 quit

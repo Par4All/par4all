@@ -49,8 +49,6 @@ int main()
 		from <i-W-EXACT> to <i-R-EXACT>
 	10 --> 14 with conflicts
 		from <a[i]-W-EXACT> to <a[i]-R-EXACT>
-	10 --> 13 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
 	10 --> 12 with conflicts
 		from <a[i]-W-EXACT> to <a[i]-W-EXACT>
 	10 --> 11 with conflicts
@@ -119,8 +117,6 @@ int main()
 		from <i-W-EXACT> to <i-R-EXACT>
 	10 --> 14 with conflicts
 		from <a[PHI1]-W-EXACT> to <a[PHI1]-R-EXACT>
-	10 --> 13 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
 	10 --> 12 with conflicts
 		from <a[PHI1]-W-EXACT> to <a[PHI1]-W-EXACT>
 	10 --> 11 with conflicts

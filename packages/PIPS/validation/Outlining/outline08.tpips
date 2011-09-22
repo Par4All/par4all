@@ -35,10 +35,10 @@ echo
 echo Unsplit resulting code
 echo
 
-apply UNSPLIT
-shell cc $WS.c -o $WS.database/Tmp/ref
-shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/new
-shell if test ` $WS.database/Tmp/ref` = `$WS.database/Tmp/new`; then echo "ok"; else echo "ko" ; fi
+#apply UNSPLIT
+#shell cc $WS.c -o $WS.database/Tmp/ref
+#shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/new
+#shell if test ` $WS.database/Tmp/ref` = `$WS.database/Tmp/new`; then echo "ok"; else echo "ko" ; fi
 
 close
 delete $WS

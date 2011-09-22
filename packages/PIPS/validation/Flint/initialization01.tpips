@@ -14,13 +14,6 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE
 
 echo
-echo Use-def chains for "INITIALIZATION01"
-echo
-
-activate PRINT_CHAINS_GRAPH
-display DG_FILE
-
-echo
 echo Flinted file
 echo
 

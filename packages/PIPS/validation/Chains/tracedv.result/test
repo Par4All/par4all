@@ -1,0 +1,265 @@
+	SUBROUTINE SUBA(N)
+	INTEGER N
+C       COMMON /X/ S
+      N = 1                                                             0004
+      CALL SUBC                                                         0005
+      END
+    	SUBROUTINE SUBB(M)
+	INTEGER*2 M
+    	REAL T
+C       COMMON /X/ S
+      T = M+1                                                           0005
+      CALL SUBD                                                         0006
+      END
+	SUBROUTINE SUBC
+      END
+	SUBROUTINE SUBD
+      END
+	PROGRAM TRACE
+	COMMON /X/ S
+	REAL A, B
+      A = 0                                                             0004
+      DO I = 1, 10                                                      0005
+         B = 2*A                                                        0006
+         A = A+1                                                        0007
+      ENDDO
+      S = 1                                                             0009
+      DO I = 1, 10                                                      0010
+         CALL SUBA(S)                                                   0011
+         CALL SUBB(S)                                                   0012
+      ENDDO
+      IF (S.GE.1) A = A*2                                               0014
+      END
+	SUBROUTINE SUBA(N)
+	INTEGER N
+C             <    is written>: N
+C             <    is referenced>: N
+C       COMMON /X/ S
+      N = 1                                                             0004
+      CALL SUBC                                                         0005
+      END
+    	SUBROUTINE SUBB(M)
+	INTEGER*2 M
+    	REAL T
+C             <    is read   >: M
+C             <    is written>: T
+C             <    is referenced>: M T
+C       COMMON /X/ S
+      T = M+1                                                           0005
+      CALL SUBD                                                         0006
+      END
+	SUBROUTINE SUBC
+      END
+	SUBROUTINE SUBD
+      END
+	PROGRAM TRACE
+	COMMON /X/ S
+	REAL A, B
+C             <    is written>: A
+C             <    is referenced>: A
+      A = 0                                                             0004
+C             <    is written>: I
+C             <    is referenced>: I
+      DO I = 1, 10                                                      0005
+C             <    is read   >: A
+C             <    is written>: B
+C             <    is referenced>: A B
+         B = 2*A                                                        0006
+C             <    is read   >: A
+C             <    is written>: A
+C             <    is referenced>: A
+         A = A+1                                                        0007
+      ENDDO
+C             <    is written>: S
+C             <    is referenced>: S
+      S = 1                                                             0009
+C             <    is written>: I
+C             <    is referenced>: I
+      DO I = 1, 10                                                      0010
+C             <    is written>: S
+C             <    is referenced>: S
+         CALL SUBA(S)                                                   0011
+C             <    is read   >: S
+C             <    is referenced>: S
+         CALL SUBB(S)                                                   0012
+      ENDDO
+C             <    is read   >: S
+C             <    is referenced>: S
+      IF (S.GE.1) A = A*2                                               0014
+      END
+// chains for SUBA
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for SUBB
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for SUBC
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for SUBD
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for TRACE
+
+ *********************** Use-Def Chains *********************
+
+	12 --> 11 with conflicts
+		from <S-R-EXACT> to <S-W-EXACT>
+	11 --> 14 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	11 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	11 --> 11 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+	09 --> 14 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	09 --> 11 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+	07 --> 15 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+		from <A-R-EXACT> to <A-W-EXACT>
+	07 --> 07 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+		from <A-R-EXACT> to <A-W-EXACT>
+	07 --> 06 with conflicts
+		from <A-W-EXACT> to <A-R-EXACT>
+	06 --> 07 with conflicts
+		from <A-R-EXACT> to <A-W-EXACT>
+	06 --> 06 with conflicts
+		from <B-W-EXACT> to <B-W-EXACT>
+	05 --> 10 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	04 --> 15 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+	04 --> 07 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+	04 --> 06 with conflicts
+		from <A-W-EXACT> to <A-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+	SUBROUTINE SUBA(N)
+	INTEGER N
+C       COMMON /X/ S
+      N = 1                                                             0004
+      CALL SUBC                                                         0005
+      END
+    	SUBROUTINE SUBB(M)
+	INTEGER*2 M
+    	REAL T
+C       COMMON /X/ S
+      T = M+1                                                           0005
+      CALL SUBD                                                         0006
+      END
+	SUBROUTINE SUBC
+      END
+	SUBROUTINE SUBD
+      END
+	PROGRAM TRACE
+	COMMON /X/ S
+	REAL A, B
+      A = 0                                                             0004
+      DO I = 1, 10                                                      0005
+         B = 2*A                                                        0006
+         A = A+1                                                        0007
+      ENDDO
+      S = 1                                                             0009
+      DO I = 1, 10                                                      0010
+         CALL SUBA(S)                                                   0011
+         CALL SUBB(S)                                                   0012
+      ENDDO
+      IF (S.GE.1) A = A*2                                               0014
+      END
+// chains for SUBA
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for SUBB
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for SUBC
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for SUBD
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for TRACE
+
+ *********************** Use-Def Chains *********************
+
+	12 --> 11 with conflicts
+		from <S-R-EXACT> to <S-W-EXACT>
+	11 --> 14 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	11 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	11 --> 11 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+	09 --> 14 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	09 --> 11 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+	07 --> 15 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+		from <A-R-EXACT> to <A-W-EXACT>
+	07 --> 07 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+		from <A-R-EXACT> to <A-W-EXACT>
+	07 --> 06 with conflicts
+		from <A-W-EXACT> to <A-R-EXACT>
+	06 --> 07 with conflicts
+		from <A-R-EXACT> to <A-W-EXACT>
+	06 --> 06 with conflicts
+		from <B-W-EXACT> to <B-W-EXACT>
+	05 --> 10 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	04 --> 15 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+	04 --> 07 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+		from <A-W-EXACT> to <A-R-EXACT>
+	04 --> 06 with conflicts
+		from <A-W-EXACT> to <A-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
