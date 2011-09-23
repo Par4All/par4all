@@ -2876,15 +2876,37 @@ type compute_basic_concrete_type(type t)
 	if(basic_typedef_p(bt))
 	  {
 	    entity e = basic_typedef(bt);
-	    type st = entity_type(e);
+	    type st = compute_basic_concrete_type(entity_type(e));
 
 	    pips_debug(9, "typedef  : %s\n", type_to_string(st));
-	    nt = compute_basic_concrete_type(st);
-	    if (type_variable_p(nt))
+	    if (type_variable_p(st))
 	      {
+		nt = st;
 		variable_dimensions(type_variable(nt)) =
 		  gen_nconc(gen_full_copy_list(lt),
 			    variable_dimensions(type_variable(nt)));
+	      }
+	    else if (type_void_p(st))
+	      {
+		if (ENDP(lt))
+		  nt = st;
+		else
+		  {
+		    nt = copy_type(t);
+		    free_type(st);
+		  }
+	      }
+	    else if (type_struct_p(st) || type_union_p(st) || type_enum_p(st))
+	      {
+		nt = make_type_variable(make_variable(make_basic_derived(e),
+						      gen_full_copy_list(lt),
+						      gen_full_copy_list(variable_qualifiers(vt))));
+		free_type(st);
+	      }
+	    else
+	      {
+		free_type(st);
+		nt = copy_type(t);
 	      }
 	  }
 	else if(basic_pointer_p(bt))
@@ -2924,9 +2946,9 @@ type compute_basic_concrete_type(type t)
       }
     }
 
-  pips_assert("nt is not a typedef",
+  /* pips_assert("nt is not a typedef",
 	      type_variable_p(nt)?
-	      !basic_typedef_p(variable_basic(type_variable(nt))) : true);
+	      !basic_typedef_p(variable_basic(type_variable(nt))) : true); */
 
   return nt;
 }

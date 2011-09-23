@@ -75,16 +75,28 @@ set get_private_entities(void *s)
     return tmp;
 }
 
+static bool skip_values(void *v) {
+    return !INSTANCE_OF(value,(gen_chunkp)v);
+}
+
+static bool skip_constants_intrinsics_members(entity e) {
+    return entity_not_constant_or_intrinsic_p(e) &&
+        !member_entity_p(e);
+}
+
+
 static
 void sort_entities_with_dep(list *l)
 {
     set params = set_make(set_pointer);
     FOREACH(ENTITY,e,*l)
     {
-        set e_ref = get_referenced_entities(e);
-        set_del_element(e_ref,e_ref,e);
-        set_union(params,params,e_ref);
-        set_free(e_ref);
+        if(!storage_rom_p(entity_storage(e))) { //<< to avoid gathering useless variables, unsure of the validity
+            set e_ref = get_referenced_entities_filtered(entity_type(e),skip_values,skip_constants_intrinsics_members);
+            set_del_element(e_ref,e_ref,e);
+            set_union(params,params,e_ref);
+            set_free(e_ref);
+        }
     }
 
     set base = set_make(set_pointer);
@@ -195,7 +207,19 @@ static list statements_referenced_entities(list statements)
 
     FOREACH(STATEMENT, s, statements)
     {
-        set tmp = get_referenced_entities(s);
+        /* we don't want initial values of outer entities */
+        set tmp = get_referenced_entities_filtered(s,skip_values,skip_constants_intrinsics_members);
+        /* gather local initial values skipped by the previous call*/
+        list decl = statement_to_declarations(s);
+        FOREACH(ENTITY,e,decl) {
+            set se = get_referenced_entities_filtered(entity_initial(e),skip_values,skip_constants_intrinsics_members);
+            set_union(tmp,tmp,se);
+            set_free(se);
+            se = get_referenced_entities_filtered(entity_type(e),skip_values,skip_constants_intrinsics_members);
+            set_union(tmp,tmp,se);
+            set_free(se);
+        }
+
         ifdebug(7) {
           pips_debug(0,"Statement :");
           print_statement(s);
@@ -491,9 +515,8 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
 
     /* purge the functions from the parameter list, we assume they are declared externally
      * also purge the formal parameters from other modules, gathered by get_referenced_entities but wrong here
-     * also purge members, not relevant
      */
-    list tmp_list=NIL;
+    list tmp = gen_copy_seq(referenced_entities);
     FOREACH(ENTITY,e,referenced_entities)
     {
         //basic b = entity_basic(e);
@@ -501,20 +524,11 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
         if(entity_function_p(e))
 	  {
             ;//AddEntityToModuleCompilationUnit(e,get_current_module_entity());
-	    if(fortran_module_p(new_fun)) /* fortran function results must be decared in the new function */
-	      tmp_list=CONS(ENTITY,e,tmp_list);
+	    if(!fortran_module_p(new_fun)) /* fortran function results must be declared in the new function */
+            gen_remove_once(&referenced_entities,e);
 	  }
-        else if( !entity_constant_p(e) && !entity_field_p(e)
-                // This doesn't catch the typedef statement
-                // but any entity that type is a typedef
-                //&& (basic_undefined_p(b) || !basic_typedef_p(b)) //&&
-                //!( formal_parameter_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
-            ) {
-            tmp_list=CONS(ENTITY,e,tmp_list);
-        }
     }
-    gen_free_list(referenced_entities);
-    referenced_entities=tmp_list;
+    gen_free_list(tmp);
 
 
 
@@ -525,7 +539,7 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
         entity cu = module_name_to_entity(cu_name);
         list cu_decls = entity_declarations(cu);
 
-        tmp_list=NIL;
+        list tmp_list=NIL;
 
         FOREACH(ENTITY,e,referenced_entities)
         {
