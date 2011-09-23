@@ -179,9 +179,7 @@ class p4a_processor(object):
     # - the list of module with interfaces:
     interface_modules = []
     # - the generated header files:
-    header_files = []
-	# - the dictionary of all generated modules, key is module name, value is the source file (for opencl):
-    #all_generated_modules=[]   
+    header_files = []  
     # - the set of CUDA modules:
     cuda_modules = set ()
     # - the set of C modules:
@@ -658,9 +656,6 @@ class p4a_processor(object):
                             GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,                            
-                            #The property OUTLINE_INDEPENDENT_COMPILATION_UNIT is True for opencl
-                            #to include typedef etc.(coming from the source files) in wrapper/kernel
-                            #OUTLINE_INDEPENDENT_COMPILATION_UNIT = (self.opencl),
                             OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
                             annotate_loop_nests = True, # annotate for recover parallel loops later
                             concurrent=True)
@@ -991,7 +986,7 @@ class p4a_processor(object):
             kernel_file = os.path.join(self.workspace.dirname, "Src",
                                         kernel + ".c")        
             output_file = os.path.join(self.workspace.dirname, wrapper,
-                                            wrapper + ".cl")                                         
+                                            wrapper + ".cl")                                                            
             p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
 
     def save_header (self, output_dir, name):
