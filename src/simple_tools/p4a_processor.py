@@ -235,6 +235,10 @@ class p4a_processor(object):
 
             self.project_name = project_name
 
+            # The generated kernels source files will go into a directory named
+            # with project_name.generated 
+            self.new_files_folder = self.project_name + '.generated' 
+
             if self.recover_includes and not self.native_recover_includes:
                 # Use a special preprocessor to track #include by a
                 # man-in-the-middle attack :-) :
@@ -696,6 +700,11 @@ class p4a_processor(object):
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
+        # Unfold kernel,  ususally won't hurt code size, but less painful with
+        # callees declared in others compilation units (unsupported in CUDA and
+        # OpenCL) and can allow some opportunities for scalarization & others
+        kernels.unfolding()
+
         # scalarization is a nice optimization :)
         # currently it's very limited when applied in kernel, but cannot be applied outside neither ! :-(
         kernels.scalarization(concurrent=True)
@@ -761,8 +770,6 @@ class p4a_processor(object):
             wrappers.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
             
             
-        if self.c99 or self.fortran:
-            kernels.unfolding()
 
         # Update the list of CUDA modules:
         p4a_util.add_list_to_set (map(lambda x:x.name, kernels),
