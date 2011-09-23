@@ -34,7 +34,6 @@ function stop_on_error() {
 
 
 # verb level 'message to be shown...'
-verb=0
 function verb() {
   local level=$1 msg=$2
   if (( $verb >= $level )); then
@@ -86,9 +85,11 @@ function create_branch_if_needed() {
 function do_update_CRI_git_svn() {
     verb 1 "Entering do_update_CRI_git_svn"
   enforce_P4A_TOP
-  cd $P4A_CRI_GIT_SVN
-  # Execute again this script to do a recursive git svn rebase:
-  $0 --recursive-git-svn
+  (
+    cd $P4A_CRI_GIT_SVN
+    # Execute again this script to do a recursive git svn rebase:
+    $0 --recursive-git-svn
+  )
 }
 
 
