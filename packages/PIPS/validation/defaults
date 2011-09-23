@@ -43,17 +43,15 @@ OpenMP
 Outlining
 # ngspice_bug:
 Step
-SC95
 Flint
 Bootstrap
 Terapix
 Tpips
-TutorialPPoPP2010
 Expressions
 Properties
 Crough
 Top-level
-Demo-2009
+Demo
 Inlining
 AcceleratorUtils
 PointerValues

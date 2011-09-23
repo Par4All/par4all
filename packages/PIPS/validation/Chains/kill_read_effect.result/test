@@ -1,0 +1,76 @@
+int main()
+{
+   int a, i = 0;                                                        /*0003*/
+   a = i;                                                               /*0004*/
+   i = 1;                                                               /*0005*/
+   i = 2;                                                               /*0006*/
+   return 0;                                                            /*0007*/
+}
+int main()
+{
+//             <    is written>: i
+//             <    is referenced>: i
+//             <    is declared>: a i
+   int a, i = 0;                                                        /*0003*/
+//             <    is read   >: i
+//             <    is written>: a
+//             <    is referenced>: a i
+   a = i;                                                               /*0004*/
+//             <    is written>: i
+//             <    is referenced>: i
+   i = 1;                                                               /*0005*/
+//             <    is written>: i
+//             <    is referenced>: i
+   i = 2;                                                               /*0006*/
+   return 0;                                                            /*0007*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	03 --> 04 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	03 --> 05 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	03 --> 06 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	04 --> 05 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	05 --> 06 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+int main()
+{
+   int a, i = 0;                                                        /*0003*/
+   a = i;                                                               /*0004*/
+   i = 1;                                                               /*0005*/
+   i = 2;                                                               /*0006*/
+   return 0;                                                            /*0007*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	03 --> 04 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	03 --> 05 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	03 --> 06 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	04 --> 05 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	05 --> 06 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None

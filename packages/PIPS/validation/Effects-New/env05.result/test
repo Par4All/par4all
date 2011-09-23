@@ -111,32 +111,6 @@ int env05()
    return j;                                                            /*0011*/
 }
 
-Use-def chains
-
-
- *********************** Use-Def Chains *********************
-
-	10 --> 11 with conflicts
-		from <j-W-EXACT> to <j-R-EXACT>
-	09 --> 10 with conflicts
-		from <j-W-EXACT> to <j-W-EXACT>
-	07 --> 11 with conflicts
-		from <j-WE-EXACT> to <j-RE-EXACT>
-	07 --> 10 with conflicts
-		from <j-WE-EXACT> to <j-RE-EXACT>
-	07 --> 09 with conflicts
-		from <j-WE-EXACT> to <j-RE-EXACT>
-	06 --> 10 with conflicts
-		from <km-WT-EXACT> to <km-RT-EXACT>
-	06 --> 09 with conflicts
-		from <km-WT-EXACT> to <km-RT-EXACT>
-	06 --> 07 with conflicts
-		from <km-WT-EXACT> to <km-RT-EXACT>
-	05 --> 06 with conflicts
-		from <mile-WT-EXACT> to <mile-RT-EXACT>
-
-****************** End of Dependence Graph ******************
-
 Code after use-def elimination
 
 int env05()

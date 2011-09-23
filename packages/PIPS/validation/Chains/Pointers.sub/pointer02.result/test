@@ -15,15 +15,15 @@ void pointer02(int n, float *p)
 
  *********************** Use-Def Chains *********************
 
-	09 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 09 with conflicts
-		from <n-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	06 --> 09 with conflicts
 		from <r-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <r-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	08 --> 09 with conflicts
+		from <n-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	09 --> 09 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

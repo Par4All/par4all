@@ -912,7 +912,7 @@ set points_to_general_assignment(__attribute__ ((__unused__)) statement st,
 {
   set res = set_generic_make(set_private, points_to_equal_p,
 				    points_to_rank);
-  list lhs_list = NIL, rhs_list = NIL ;
+  list lhs_list = NIL/*, rhs_list = NIL*/ ;
   bool nowhere_lhs_p = false, nowhere_rhs_p = false;
 
 /* we test the type of lhs by using expression_pointer_p(), I'm  not
@@ -937,7 +937,7 @@ set points_to_general_assignment(__attribute__ ((__unused__)) statement st,
        /* if it's a call to &, replace rhs by the first argument of & */
        if (entity_an_operator_p(call_function(c), ADDRESS_OF)){
 	 rhs = EXPRESSION(CAR(call_arguments(c)));
-	 rhs_list = expression_to_constant_paths(st, rhs, pts_in);//, &nowhere_rhs_p);
+	 // rhs_list = expression_to_constant_paths(st, rhs, pts_in);//, &nowhere_rhs_p);
 	 if(nowhere_rhs_p)
 	   set_assign(res, points_to_nowhere_typed(lhs_list, pts_in));
 	 else{
@@ -950,7 +950,7 @@ set points_to_general_assignment(__attribute__ ((__unused__)) statement st,
      }else if(syntax_cast_p(s)){
        set_assign(res, points_to_null_pointer(lhs_list, pts_in));
      }else if(expression_reference_p(rhs)){
-       rhs_list = expression_to_constant_paths(st, rhs, pts_in);//, &nowhere_rhs_p);
+       //rhs_list = expression_to_constant_paths(st, rhs, pts_in);//, &nowhere_rhs_p);
        if(nowhere_rhs_p)
 	 set_assign(res, points_to_nowhere_typed(lhs_list, pts_in));
        else{

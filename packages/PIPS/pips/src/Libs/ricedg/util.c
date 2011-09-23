@@ -100,6 +100,28 @@ static string dependence_graph_banner[8] = {
 	"\n **** Loop Carried Dependence Graph with Dependence Cones ***\n"
     };
 
+
+/**
+ * @brief This is a callback for qsort function, it compares two vertex
+ * @return 0 if these are equals, -1 if first is lower, 1 if second is lower
+ */
+int vertex_sort_callback( const vertex *v1, const vertex *v2 ) {
+  statement s1 = vertex_to_statement( *v1 );
+  statement s2 = vertex_to_statement( *v2 );
+  return statement_number(s1) > statement_number(s2);
+}
+
+
+/**
+ * @brief This is a callback for qsort function, it compares two successor
+ * @return 0 if these are equals, -1 if first is lower, 1 if second is lower
+ */
+int successor_sort_callback( const successor *succ1, const successor *succ2 ) {
+  vertex v1 = successor_vertex(*succ1);
+  vertex v2 = successor_vertex(*succ2);
+  return vertex_sort_callback( &v1, &v2 );
+}
+
 /**
  * @brief This is a callback for qsort function, it compares two conflicts
  * @return 0 if conflicts are equals, -1 if first is lower, 1 if second is lower
@@ -185,10 +207,11 @@ void prettyprint_dependence_graph( FILE * fd,
     fprintf( fd, "%s\n", dependence_graph_banner[banner_number] );
   }
 
+  gen_sort_list(graph_vertices(mod_graph), (gen_cmp_func_t)vertex_sort_callback);
   for ( pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1) ) {
     vertex v1 = VERTEX(CAR(pv1));
     statement s1 = vertex_to_statement( v1 );
-
+    gen_sort_list(vertex_successors(v1), (gen_cmp_func_t)successor_sort_callback);
     for ( ps = vertex_successors(v1); !ENDP(ps); ps = CDR(ps) ) {
       successor su = SUCCESSOR(CAR(ps));
       vertex v2 = successor_vertex(su);

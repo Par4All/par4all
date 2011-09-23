@@ -25,9 +25,8 @@ apply OUTLINE[$WS]
 
 display PRINTED_FILE[%ALLFUNC]
 
-apply UNSPLIT
-
-shell cc -c $WS.database/Src/$WS.c  -o $WS.database/Tmp/$WS.out
+#apply UNSPLIT
+#shell cc -c $WS.database/Src/$WS.c  -o $WS.database/Tmp/$WS.out
 
 close
 delete $WS

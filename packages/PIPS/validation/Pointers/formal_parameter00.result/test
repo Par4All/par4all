@@ -1,10 +1,10 @@
 
 PROPER EFFECTS
 
-int formal_parameter01(int **pi)
+void formal_parameter00(int *pi)
 {
-   int **q;
-   int *i;
+   int *q;
+   int i;
 //             <    is written>: i
 
    i = 0;
@@ -18,10 +18,10 @@ int formal_parameter01(int **pi)
 
 PROPER POINTER EFFECTS
 
-int formal_parameter01(int **pi)
+void formal_parameter00(int *pi)
 {
-   int **q;
-   int *i;
+   int *q;
+   int i;
 //             <    is written>: i
 
    i = 0;
@@ -39,22 +39,21 @@ POINTS TO
 // Points To:
 // pi -> _pi_1[0] , EXACT
 
-int formal_parameter01(int **pi)
+void formal_parameter00(int *pi)
 {
 
 // Points To:
 // pi -> _pi_1[0] , EXACT
 
-   int **q;
+   int *q;
 
 // Points To:
 // pi -> _pi_1[0] , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
-   int *i;
+   int i;
 
 // Points To:
-// i -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // pi -> _pi_1[0] , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
@@ -62,21 +61,18 @@ int formal_parameter01(int **pi)
    i = 0;
 
 // Points To:
-// i -> *NULL_POINTER* , EXACT
 // pi -> _pi_1[0] , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    q = pi;
 
 // Points To:
-// i -> *NULL_POINTER* , EXACT
 // pi -> _pi_1[0] , EXACT
 // q -> _pi_1[0] , EXACT
 
    pi = &i;
 
 // Points To:
-// i -> *NULL_POINTER* , EXACT
 // pi -> i , EXACT
 // q -> _pi_1[0] , EXACT
 

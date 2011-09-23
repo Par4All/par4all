@@ -1,0 +1,1280 @@
+
+      SUBROUTINE DIGITALIZE(X, LX, MX, NX)
+      REAL X(MX,NX,LX)
+
+      COMMON /C2/ M,MM1,MP1
+
+      MS = MM1/2                                                        0007
+      MM = MP1/2                                                        0008
+
+      DO K = 2, N-1                                                     0010
+         DO J = 2, MM                                                   0011
+            JJ = J+MS                                                   0012
+            X(J,K,1) = X(JJ,K,2)                                        0013
+            X(JJ,K,1) = X(J,K,2)                                        0014
+         ENDDO
+      ENDDO
+
+      END
+
+      SUBROUTINE FLIPFLOP(X,N,C)
+      INTEGER N
+      REAL X(N,N,2), C
+
+      INTEGER I, J, NEW, OLD, T
+
+      NEW = 1                                                           0008
+
+10    CONTINUE                                                          0010
+      OLD = NEW                                                         0011
+      NEW = 3-OLD                                                       0012
+
+      DO J = 2, N-1                                                     0014
+         DO I = 2, N-1                                                  0015
+            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0016
+     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0016
+         ENDDO
+      ENDDO
+
+      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0021
+
+      END
+
+      SUBROUTINE INIT
+
+      COMMON /C1/ PX,DFI
+
+      READ (5, *) PX, DFI                                               0006
+
+      END
+
+      SUBROUTINE MATMUL(X, Y, Z, L, M, N)
+c     compute x := y * z
+      REAL X(L,N), Y(L,M), Z(M,N)
+
+      DO I = 1, L                                                       0006
+         DO J = 1, N                                                    0007
+            X(I,J) = 0.                                                 0008
+            DO K = 1, M                                                 0009
+               X(I,J) = X(I,J)+Y(I,K)*Z(K,J)                            0010
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+      PROGRAM SEQ
+
+c     Goal: show different dependence tests and privatization
+
+      PARAMETER (N=10)
+      PARAMETER (LX=32, MX=92, NX=42)
+
+      REAL A(N,N), B(N,N), C(N,N,2)
+
+      REAL D(LX, MX, NX)
+
+      READ *, A                                                         0012
+
+      CALL MATMUL(B, A, A, N, N, N)                                     0014
+
+      CALL SMATMUL(B, A, A, N, N, N)                                    0016
+
+      CALL TRANSPOSE(B, N)                                              0018
+
+      CALL FLIPFLOP(C, N, 0.25)                                         0020
+
+      CALL INIT                                                         0022
+      CALL TESTINIT                                                     0023
+      CALL DIGITALIZE(D, LX, MX, NX)                                    0024
+
+      END
+
+      SUBROUTINE SMATMUL(X, Y, Z, L, M, N)
+c     compute x := y * z
+      REAL X(L,N), Y(L,M), Z(M,N)
+
+      DO I = 1, L                                                       0006
+         DO J = 1, N                                                    0007
+            S = 0.                                                      0008
+            DO K = 1, M                                                 0009
+               S = S+Y(I,K)*Z(K,J)                                      0010
+            ENDDO
+            X(I,J) = S                                                  0012
+         ENDDO
+      ENDDO
+
+      END
+
+      SUBROUTINE TESTINIT
+
+      PARAMETER (LX=32, MX=92, NX=42)
+
+      COMMON /C1/ PX,DFI
+
+      COMMON /C2/ M,MM1,MP1
+c
+c input data consistency checking
+c
+      M = NINT(PX/DFI+1.)                                               0012
+      MM1 = M-1                                                         0013
+      MP1 = M+1                                                         0014
+      IF (.NOT.(M.GT.1.AND.M.LE.MX)) THEN                               0015
+         WRITE (6, *) L, M, N, LCRY                                     0016
+         STOP 3                                                         0017
+      ENDIF
+      END
+
+      SUBROUTINE TRANSPOSE(X,N)
+      REAL X(N,N)
+
+      DO I = 1, N-1                                                     0005
+         DO J = I+1, N                                                  0006
+            T = X(I,J)                                                  0007
+            X(I,J) = X(J,I)                                             0008
+            X(J,I) = T                                                  0009
+         ENDDO
+      ENDDO
+
+      END
+
+      SUBROUTINE DIGITALIZE(X, LX, MX, NX)
+      REAL X(MX,NX,LX)
+
+      COMMON /C2/ M,MM1,MP1
+C             <    is read   >: MM1
+C             <    is written>: MS
+C             <    is referenced>: MM1 MS
+
+      MS = MM1/2                                                        0007
+C             <    is read   >: MP1
+C             <    is written>: MM
+C             <    is referenced>: MM MP1
+      MM = MP1/2                                                        0008
+C             <    is read   >: N
+C             <    is written>: K
+C             <    is referenced>: K N
+
+      DO K = 2, N-1                                                     0010
+C             <    is read   >: MM N
+C             <    is written>: J
+C             <    is referenced>: J MM N
+         DO J = 2, MM                                                   0011
+C             <    is read   >: J MM MS N
+C             <    is written>: JJ
+C             <    is referenced>: J JJ MM MS N
+            JJ = J+MS                                                   0012
+C             <    is read   >: J JJ K MM N X(JJ,K,2)
+C             <    is written>: X(J,K,1)
+C             <    is referenced>: J JJ K MM N X X
+            X(J,K,1) = X(JJ,K,2)                                        0013
+C             <    is read   >: J JJ K MM N X(J,K,2)
+C             <    is written>: X(JJ,K,1)
+C             <    is referenced>: J JJ K MM N X X
+            X(JJ,K,1) = X(J,K,2)                                        0014
+         ENDDO
+      ENDDO
+
+      END
+
+      SUBROUTINE FLIPFLOP(X,N,C)
+      INTEGER N
+      REAL X(N,N,2), C
+
+      INTEGER I, J, NEW, OLD, T
+C             <    is written>: NEW
+C             <    is referenced>: NEW
+
+      NEW = 1                                                           0008
+
+10    CONTINUE                                                          0010
+C             <    is read   >: NEW
+C             <    is written>: OLD
+C             <    is referenced>: NEW OLD
+      OLD = NEW                                                         0011
+C             <    is read   >: OLD
+C             <    is written>: NEW
+C             <    is referenced>: NEW OLD
+      NEW = 3-OLD                                                       0012
+C             <    is read   >: N
+C             <    is written>: J
+C             <    is referenced>: J N
+
+      DO J = 2, N-1                                                     0014
+C             <    is read   >: N
+C             <    is written>: I
+C             <    is referenced>: I N
+         DO I = 2, N-1                                                  0015
+C             <    is read   >: C I J N NEW OLD X(I,J,OLD)
+C                               X(I,J+1,OLD) X(I,J-1,OLD) X(I+1,J,OLD)
+C                               X(I-1,J,OLD)
+C             <    is written>: X(I,J,NEW)
+C             <    is referenced>: C I J N NEW OLD X X X X X X
+            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0016
+     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0016
+         ENDDO
+      ENDDO
+C             <    is read   >: NEW OLD X(5,5,NEW) X(5,5,OLD)
+C             <    is referenced>: NEW OLD X X
+
+      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0021
+
+      END
+
+      SUBROUTINE INIT
+
+      COMMON /C1/ PX,DFI
+C             <    is read   >: __IO_EFFECTS:LUNS(5)
+C             <    is written>: DFI PX __IO_EFFECTS:LUNS(5)
+C             <    is referenced>: DFI PX __IO_EFFECTS:LUNS 
+C                               __IO_EFFECTS:LUNS
+
+      READ (5, *) PX, DFI                                               0006
+
+      END
+
+      SUBROUTINE MATMUL(X, Y, Z, L, M, N)
+c     compute x := y * z
+      REAL X(L,N), Y(L,M), Z(M,N)
+C             <    is read   >: L
+C             <    is written>: I
+C             <    is referenced>: I L
+
+      DO I = 1, L                                                       0006
+C             <    is read   >: L N
+C             <    is written>: J
+C             <    is referenced>: J L N
+         DO J = 1, N                                                    0007
+C             <    is read   >: I J L N
+C             <    is written>: X(I,J)
+C             <    is referenced>: I J L N X
+            X(I,J) = 0.                                                 0008
+C             <    is read   >: L M N
+C             <    is written>: K
+C             <    is referenced>: K L M N
+            DO K = 1, M                                                 0009
+C             <    is read   >: I J K L M N X(I,J) Y(I,K) Z(K,J)
+C             <    is written>: X(I,J)
+C             <    is referenced>: I J K L M N X X Y Z
+               X(I,J) = X(I,J)+Y(I,K)*Z(K,J)                            0010
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+      PROGRAM SEQ
+
+c     Goal: show different dependence tests and privatization
+
+      PARAMETER (N=10)
+      PARAMETER (LX=32, MX=92, NX=42)
+
+      REAL A(N,N), B(N,N), C(N,N,2)
+
+      REAL D(LX, MX, NX)
+C             <may be written>: A(*,*)
+C             <    is read   >: __IO_EFFECTS:LUNS(5)
+C             <    is written>: __IO_EFFECTS:LUNS(5)
+C             <    is referenced>: A __IO_EFFECTS:LUNS 
+C                               __IO_EFFECTS:LUNS
+
+      READ *, A                                                         0012
+C             <may be read   >: A(*,*) A(*,*) B(*,*)
+C             <may be written>: B(*,*)
+C             <may be referenced>: A(*,*) A(*,*) B(*,*)
+
+      CALL MATMUL(B, A, A, N, N, N)                                     0014
+C             <may be read   >: A(*,*) A(*,*)
+C             <may be written>: B(*,*)
+C             <may be referenced>: A(*,*) A(*,*) B(*,*)
+
+      CALL SMATMUL(B, A, A, N, N, N)                                    0016
+C             <may be read   >: B(*,*)
+C             <may be written>: B(*,*)
+C             <may be referenced>: B(*,*)
+
+      CALL TRANSPOSE(B, N)                                              0018
+C             <may be read   >: C(*,*,*) C(*,*,*)
+C             <may be written>: C(*,*,*)
+C             <may be referenced>: C(*,*,*)
+
+      CALL FLIPFLOP(C, N, 0.25)                                         0020
+C             <    is read   >: __IO_EFFECTS:LUNS(5)
+C             <    is written>: INIT:DFI INIT:PX __IO_EFFECTS:LUNS(5)
+C             <    is referenced>: INIT:DFI INIT:PX __IO_EFFECTS:LUNS
+
+      CALL INIT                                                         0022
+C             <may be read   >: __IO_EFFECTS:LUNS(0)
+C                               __IO_EFFECTS:LUNS(6)
+C             <may be written>: __IO_EFFECTS:LUNS(0)
+C                               __IO_EFFECTS:LUNS(6)
+C             <may be referenced>: __IO_EFFECTS:LUNS
+C             <    is read   >: DIGITALIZE:M INIT:DFI INIT:PX
+C             <    is written>: DIGITALIZE:M DIGITALIZE:MM1 
+C                               DIGITALIZE:MP1
+C             <    is referenced>: DIGITALIZE:M DIGITALIZE:MM1 
+C                               DIGITALIZE:MP1 INIT:DFI INIT:PX
+      CALL TESTINIT                                                     0023
+C             <may be read   >: D(*,*,*)
+C             <may be written>: D(*,*,*)
+C             <may be referenced>: D(*,*,*)
+C             <    is read   >: DIGITALIZE:MM1 DIGITALIZE:MP1
+C             <    is referenced>: DIGITALIZE:MM1 DIGITALIZE:MP1
+      CALL DIGITALIZE(D, LX, MX, NX)                                    0024
+
+      END
+
+      SUBROUTINE SMATMUL(X, Y, Z, L, M, N)
+c     compute x := y * z
+      REAL X(L,N), Y(L,M), Z(M,N)
+C             <    is read   >: L
+C             <    is written>: I
+C             <    is referenced>: I L
+
+      DO I = 1, L                                                       0006
+C             <    is read   >: L N
+C             <    is written>: J
+C             <    is referenced>: J L N
+         DO J = 1, N                                                    0007
+C             <    is read   >: L N
+C             <    is written>: S
+C             <    is referenced>: L N S
+            S = 0.                                                      0008
+C             <    is read   >: L M N
+C             <    is written>: K
+C             <    is referenced>: K L M N
+            DO K = 1, M                                                 0009
+C             <    is read   >: I J K L M N S Y(I,K) Z(K,J)
+C             <    is written>: S
+C             <    is referenced>: I J K L M N S Y Z
+               S = S+Y(I,K)*Z(K,J)                                      0010
+            ENDDO
+C             <    is read   >: I J L N S
+C             <    is written>: X(I,J)
+C             <    is referenced>: I J L N S X
+            X(I,J) = S                                                  0012
+         ENDDO
+      ENDDO
+
+      END
+
+      SUBROUTINE TESTINIT
+
+      PARAMETER (LX=32, MX=92, NX=42)
+
+      COMMON /C1/ PX,DFI
+
+      COMMON /C2/ M,MM1,MP1
+C             <    is read   >: DFI PX
+C             <    is written>: M
+C             <    is referenced>: DFI M PX
+c
+c input data consistency checking
+c
+      M = NINT(PX/DFI+1.)                                               0012
+C             <    is read   >: M
+C             <    is written>: MM1
+C             <    is referenced>: M MM1
+      MM1 = M-1                                                         0013
+C             <    is read   >: M
+C             <    is written>: MP1
+C             <    is referenced>: M MP1
+      MP1 = M+1                                                         0014
+C             <    is read   >: M
+C             <    is referenced>: M
+      IF (.NOT.(M.GT.1.AND.M.LE.MX)) THEN                               0015
+C             <    is read   >: L LCRY M N __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
+C             <    is referenced>: L LCRY M N __IO_EFFECTS:LUNS 
+C                               __IO_EFFECTS:LUNS
+         WRITE (6, *) L, M, N, LCRY                                     0016
+C             <    is read   >: __IO_EFFECTS:LUNS(0)
+C             <    is written>: __IO_EFFECTS:LUNS(0)
+C             <    is referenced>: __IO_EFFECTS:LUNS __IO_EFFECTS:LUNS
+         STOP 3                                                         0017
+      ENDIF
+      END
+
+      SUBROUTINE TRANSPOSE(X,N)
+      REAL X(N,N)
+C             <    is read   >: N
+C             <    is written>: I
+C             <    is referenced>: I N
+
+      DO I = 1, N-1                                                     0005
+C             <    is read   >: I N
+C             <    is written>: J
+C             <    is referenced>: I J N
+         DO J = I+1, N                                                  0006
+C             <    is read   >: I J N X(I,J)
+C             <    is written>: T
+C             <    is referenced>: I J N T X
+            T = X(I,J)                                                  0007
+C             <    is read   >: I J N X(J,I)
+C             <    is written>: X(I,J)
+C             <    is referenced>: I J N X X
+            X(I,J) = X(J,I)                                             0008
+C             <    is read   >: I J N T
+C             <    is written>: X(J,I)
+C             <    is referenced>: I J N T X
+            X(J,I) = T                                                  0009
+         ENDDO
+      ENDDO
+
+      END
+// chains for DIGITALIZE
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 12 with conflicts
+		from <MS-W-EXACT> to <MS-R-EXACT>
+	08 --> 11 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	08 --> 12 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	08 --> 13 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	08 --> 14 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	11 --> 11 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	12 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	12 --> 12 with conflicts
+		from <JJ-W-EXACT> to <JJ-W-EXACT>
+	12 --> 13 with conflicts
+		from <JJ-W-EXACT> to <JJ-R-EXACT>
+	12 --> 14 with conflicts
+		from <JJ-W-EXACT> to <JJ-R-EXACT>
+	13 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	13 --> 12 with conflicts
+		from <JJ-R-EXACT> to <JJ-W-EXACT>
+	13 --> 13 with conflicts
+		from <X(J,K,1)-W-EXACT> to <X(J,K,1)-W-EXACT>
+	13 --> 14 with conflicts
+		from <X(J,K,1)-W-EXACT> to <X(JJ,K,1)-W-EXACT>
+	14 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	14 --> 12 with conflicts
+		from <JJ-R-EXACT> to <JJ-W-EXACT>
+	14 --> 13 with conflicts
+		from <X(JJ,K,1)-W-EXACT> to <X(J,K,1)-W-EXACT>
+	14 --> 14 with conflicts
+		from <X(JJ,K,1)-W-EXACT> to <X(JJ,K,1)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for FLIPFLOP
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 11 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	08 --> 12 with conflicts
+		from <NEW-W-EXACT> to <NEW-W-EXACT>
+	08 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	11 --> 11 with conflicts
+		from <OLD-W-EXACT> to <OLD-W-EXACT>
+	11 --> 12 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+		from <NEW-R-EXACT> to <NEW-W-EXACT>
+	11 --> 16 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	11 --> 21 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	12 --> 11 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+		from <OLD-R-EXACT> to <OLD-W-EXACT>
+	12 --> 12 with conflicts
+		from <NEW-W-EXACT> to <NEW-W-EXACT>
+	12 --> 16 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	12 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	14 --> 14 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	15 --> 15 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	16 --> 11 with conflicts
+		from <OLD-R-EXACT> to <OLD-W-EXACT>
+	16 --> 12 with conflicts
+		from <NEW-R-EXACT> to <NEW-W-EXACT>
+	16 --> 14 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	16 --> 15 with conflicts
+		from <I-R-EXACT> to <I-W-EXACT>
+	16 --> 16 with conflicts
+		from <X(I,J,NEW)-W-EXACT> to <X(I,J,NEW)-W-EXACT>
+		from <X(I,J,NEW)-W-EXACT> to <X(I-1,J,OLD)-R-EXACT>
+		from <X(I,J,NEW)-W-EXACT> to <X(I,J-1,OLD)-R-EXACT>
+		from <X(I,J,NEW)-W-EXACT> to <X(I,J,OLD)-R-EXACT>
+		from <X(I,J,NEW)-W-EXACT> to <X(I,J+1,OLD)-R-EXACT>
+		from <X(I,J,NEW)-W-EXACT> to <X(I+1,J,OLD)-R-EXACT>
+		from <X(I-1,J,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
+		from <X(I,J-1,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
+		from <X(I,J,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
+		from <X(I,J+1,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
+		from <X(I+1,J,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
+	16 --> 21 with conflicts
+		from <X(I,J,NEW)-W-EXACT> to <X(5,5,OLD)-R-EXACT>
+		from <X(I,J,NEW)-W-EXACT> to <X(5,5,NEW)-R-EXACT>
+	21 --> 11 with conflicts
+		from <OLD-R-EXACT> to <OLD-W-EXACT>
+	21 --> 12 with conflicts
+		from <NEW-R-EXACT> to <NEW-W-EXACT>
+	21 --> 16 with conflicts
+		from <X(5,5,OLD)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
+		from <X(5,5,NEW)-R-EXACT> to <X(I,J,NEW)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for INIT
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for MATMUL
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 07 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	08 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	08 --> 08 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
+	08 --> 10 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
+		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT>
+	09 --> 09 with conflicts
+		from <K-W-EXACT> to <K-W-EXACT>
+	10 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	10 --> 08 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
+		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT>
+	10 --> 09 with conflicts
+		from <K-R-EXACT> to <K-W-EXACT>
+	10 --> 10 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
+		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT>
+		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for SEQ
+
+ *********************** Use-Def Chains *********************
+
+	12 --> 14 with conflicts
+		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
+		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
+	12 --> 16 with conflicts
+		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
+		from <A(*,*)-W-MAY> to <A(*,*)-R-MAY>
+	12 --> 22 with conflicts
+		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(5)-W-EXACT>
+		from <__IO_EFFECTS:LUNS(5)-W-EXACT> to <__IO_EFFECTS:LUNS(5)-R-EXACT>
+		from <__IO_EFFECTS:LUNS(5)-R-EXACT> to <__IO_EFFECTS:LUNS(5)-W-EXACT>
+	14 --> 16 with conflicts
+		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
+		from <B(*,*)-R-MAY> to <B(*,*)-W-MAY>
+	14 --> 18 with conflicts
+		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
+		from <B(*,*)-W-MAY> to <B(*,*)-R-MAY>
+		from <B(*,*)-R-MAY> to <B(*,*)-W-MAY>
+	16 --> 18 with conflicts
+		from <B(*,*)-W-MAY> to <B(*,*)-W-MAY>
+		from <B(*,*)-W-MAY> to <B(*,*)-R-MAY>
+	22 --> 23 with conflicts
+		from <INIT:PX-W-EXACT> to <INIT:PX-R-EXACT>
+		from <INIT:DFI-W-EXACT> to <INIT:DFI-R-EXACT>
+	23 --> 24 with conflicts
+		from <DIGITALIZE:MP1-W-EXACT> to <DIGITALIZE:MP1-R-EXACT>
+		from <DIGITALIZE:MM1-W-EXACT> to <DIGITALIZE:MM1-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for SMATMUL
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 07 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	08 --> 10 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+		from <S-W-EXACT> to <S-R-EXACT>
+	08 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	09 --> 09 with conflicts
+		from <K-W-EXACT> to <K-W-EXACT>
+	10 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	10 --> 08 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+		from <S-R-EXACT> to <S-W-EXACT>
+	10 --> 09 with conflicts
+		from <K-R-EXACT> to <K-W-EXACT>
+	10 --> 10 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+		from <S-W-EXACT> to <S-R-EXACT>
+		from <S-R-EXACT> to <S-W-EXACT>
+	10 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	12 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	12 --> 08 with conflicts
+		from <S-R-EXACT> to <S-W-EXACT>
+	12 --> 12 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for TESTINIT
+
+ *********************** Use-Def Chains *********************
+
+	12 --> 13 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 14 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 15 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 16 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for TRANSPOSE
+
+ *********************** Use-Def Chains *********************
+
+	06 --> 06 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	07 --> 06 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	07 --> 07 with conflicts
+		from <T-W-EXACT> to <T-W-EXACT>
+	07 --> 08 with conflicts
+		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT>
+	07 --> 09 with conflicts
+		from <T-W-EXACT> to <T-R-EXACT>
+		from <X(I,J)-R-EXACT> to <X(J,I)-W-EXACT>
+	08 --> 06 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	08 --> 07 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT>
+	08 --> 08 with conflicts
+		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT>
+		from <X(I,J)-W-EXACT> to <X(J,I)-R-EXACT>
+		from <X(J,I)-R-EXACT> to <X(I,J)-W-EXACT>
+	08 --> 09 with conflicts
+		from <X(I,J)-W-EXACT> to <X(J,I)-W-EXACT>
+		from <X(J,I)-R-EXACT> to <X(J,I)-W-EXACT>
+	09 --> 06 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	09 --> 07 with conflicts
+		from <X(J,I)-W-EXACT> to <X(I,J)-R-EXACT>
+		from <T-R-EXACT> to <T-W-EXACT>
+	09 --> 08 with conflicts
+		from <X(J,I)-W-EXACT> to <X(I,J)-W-EXACT>
+		from <X(J,I)-W-EXACT> to <X(J,I)-R-EXACT>
+	09 --> 09 with conflicts
+		from <X(J,I)-W-EXACT> to <X(J,I)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+
+      SUBROUTINE DIGITALIZE(X, LX, MX, NX)
+      REAL X(MX,NX,LX)
+
+      COMMON /C2/ M,MM1,MP1
+
+      MS = MM1/2                                                        0007
+      MM = MP1/2                                                        0008
+
+      DO K = 2, N-1                                                     0010
+         DO J = 2, MM                                                   0011
+            JJ = J+MS                                                   0012
+
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JJ, PHI2==K, PHI3==2, J+MS==JJ,
+C    LX==32, MM1==MP1-2, MX==92, NX==42, 2<=J, J<=MM, 2<=K, K+1<=N,
+C    MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1, MM1<=2MS+1}>
+C  <X(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==1, J+MS==JJ,
+C    LX==32, MM1==MP1-2, MX==92, NX==42, 2<=J, J<=MM, 2<=K, K+1<=N,
+C    MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1, MM1<=2MS+1}>
+
+            X(J,K,1) = X(JJ,K,2)                                        0013
+
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, PHI2==K, PHI3==2, J+MS==JJ,
+C    LX==32, MM1==MP1-2, MX==92, NX==42, 2<=J, J<=MM, 2<=K, K+1<=N,
+C    MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1, MM1<=2MS+1}>
+C  <X(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==JJ, PHI2==K, PHI3==1, J+MS==JJ,
+C    LX==32, MM1==MP1-2, MX==92, NX==42, 2<=J, J<=MM, 2<=K, K+1<=N,
+C    MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1, MM1<=2MS+1}>
+
+            X(JJ,K,1) = X(J,K,2)                                        0014
+         ENDDO
+      ENDDO
+
+      END
+
+      SUBROUTINE FLIPFLOP(X,N,C)
+      INTEGER N
+      REAL X(N,N,2), C
+
+      INTEGER I, J, NEW, OLD, T
+
+      NEW = 1                                                           0008
+
+10    CONTINUE                                                          0010
+      OLD = NEW                                                         0011
+      NEW = 3-OLD                                                       0012
+
+      DO J = 2, N-1                                                     0014
+         DO I = 2, N-1                                                  0015
+
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==I, PHI2==J, PHI3==OLD, N==10,
+C    NEW+OLD==3, 2<=I, I<=9, 2<=J, J<=9}>
+C  <X(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==I+1, PHI2==J, PHI3==OLD, N==10,
+C    NEW+OLD==3, 2<=I, I<=9, 2<=J, J<=9}>
+C  <X(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==I-1, PHI2==J, PHI3==OLD, N==10,
+C    NEW+OLD==3, 2<=I, I<=9, 2<=J, J<=9}>
+C  <X(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==I, PHI2==J-1, PHI3==OLD, N==10,
+C    NEW+OLD==3, 2<=I, I<=9, 2<=J, J<=9}>
+C  <X(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==I, PHI2==J+1, PHI3==OLD, N==10,
+C    NEW+OLD==3, 2<=I, I<=9, 2<=J, J<=9}>
+C  <X(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==I, PHI2==J, PHI3==NEW, N==10,
+C    NEW+OLD==3, 2<=I, I<=9, 2<=J, J<=9}>
+
+            X(I,J,NEW) = C*X(I,J,OLD)+(1-C)*(X(I+1,J,OLD)+X(I-1,J,OLD   0016
+     &      )+X(I,J-1,OLD)+X(I,J+1,OLD))                                0016
+         ENDDO
+      ENDDO
+
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==5, PHI2==5, PHI3==NEW, N==10,
+C    NEW+OLD==3, 10<=J}>
+C  <X(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==5, PHI2==5, PHI3==OLD, N==10,
+C    NEW+OLD==3, 10<=J}>
+
+
+      IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0021
+
+      END
+
+      SUBROUTINE INIT
+
+      COMMON /C1/ PX,DFI
+
+C  <__IO_EFFECTS:LUNS-RE-EXACT-{}>
+C  <__IO_EFFECTS:LUNS-RE-EXACT-{}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+
+      READ (5, *) PX, DFI                                               0006
+
+      END
+
+      SUBROUTINE MATMUL(X, Y, Z, L, M, N)
+c     compute x := y * z
+      REAL X(L,N), Y(L,M), Z(M,N)
+
+      DO I = 1, L                                                       0006
+         DO J = 1, N                                                    0007
+
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, L==10, M==10, N==10, 1<=I,
+C    I<=10, 1<=J, J<=10}>
+
+            X(I,J) = 0.                                                 0008
+            DO K = 1, M                                                 0009
+
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, L==10, M==10, N==10, 1<=I,
+C    I<=10, 1<=J, J<=10, 1<=K, K<=10}>
+C  <X(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, L==10, M==10, N==10, 1<=I,
+C    I<=10, 1<=J, J<=10, 1<=K, K<=10}>
+C  <Y-RE-EXACT-{}>
+C  <Y(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==K, L==10, M==10, N==10, 1<=I,
+C    I<=10, 1<=J, J<=10, 1<=K, K<=10}>
+C  <Z-RE-EXACT-{}>
+C  <Z(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, L==10, M==10, N==10, 1<=I,
+C    I<=10, 1<=J, J<=10, 1<=K, K<=10}>
+
+               X(I,J) = X(I,J)+Y(I,K)*Z(K,J)                            0010
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+      PROGRAM SEQ
+
+c     Goal: show different dependence tests and privatization
+
+      PARAMETER (N=10)
+      PARAMETER (LX=32, MX=92, NX=42)
+
+      REAL A(N,N), B(N,N), C(N,N,2)
+
+      REAL D(LX, MX, NX)
+
+C  <A-RE-EXACT-{}>
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+C  <__IO_EFFECTS:LUNS-RE-EXACT-{}>
+C  <__IO_EFFECTS:LUNS-RE-EXACT-{}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
+
+
+      READ *, A                                                         0012
+
+C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+C  <B(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+
+
+      CALL MATMUL(B, A, A, N, N, N)                                     0014
+
+C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+C  <B(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10}>
+
+
+      CALL SMATMUL(B, A, A, N, N, N)                                    0016
+
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=10, 3<=PHI1+PHI2,
+C    PHI1+PHI2<=19, 1<=PHI2, PHI2<=10}>
+C  <B(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=10, 3<=PHI1+PHI2,
+C    PHI1+PHI2<=19, 1<=PHI2, PHI2<=10}>
+
+
+      CALL TRANSPOSE(B, N)                                              0018
+
+C  <C(PHI1,PHI2,PHI3)-R-MAY-{1<=PHI1, PHI1<=10, 3<=PHI1+PHI2,
+C    PHI2<=PHI1+8, PHI1<=PHI2+8, PHI1+PHI2<=19, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI3<=2}>
+C  <C(PHI1,PHI2,PHI3)-W-MAY-{2<=PHI1, PHI1<=9, 2<=PHI2, PHI2<=9,
+C    1<=PHI3, PHI3<=2}>
+
+
+      CALL FLIPFLOP(C, N, 0.25)                                         0020
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==5}>
+
+
+      CALL INIT                                                         0022
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{0<=PHI1, PHI1<=6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{0<=PHI1, PHI1<=6}>
+
+      CALL TESTINIT                                                     0023
+
+C  <D(PHI1,PHI2,PHI3)-R-MAY-{1<=PHI1, PHI1<=32, 1<=PHI2, PHI2<=92,
+C    1<=PHI3, PHI3<=42, DIGITALIZE:M==DIGITALIZE:MM1+1,
+C    DIGITALIZE:M==DIGITALIZE:MP1-1, 4<=DIGITALIZE:MP1,
+C    DIGITALIZE:MP1<=93}>
+C  <D(PHI1,PHI2,PHI3)-W-MAY-{1<=PHI1, PHI1<=32, 1<=PHI2, PHI2<=92,
+C    1<=PHI3, PHI3<=42, DIGITALIZE:M==DIGITALIZE:MM1+1,
+C    DIGITALIZE:M==DIGITALIZE:MP1-1, 3<=DIGITALIZE:MP1,
+C    DIGITALIZE:MP1<=93}>
+
+      CALL DIGITALIZE(D, LX, MX, NX)                                    0024
+
+      END
+
+      SUBROUTINE SMATMUL(X, Y, Z, L, M, N)
+c     compute x := y * z
+      REAL X(L,N), Y(L,M), Z(M,N)
+
+      DO I = 1, L                                                       0006
+         DO J = 1, N                                                    0007
+            S = 0.                                                      0008
+            DO K = 1, M                                                 0009
+
+C  <Y-RE-EXACT-{}>
+C  <Y(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==K, L==10, M==10, N==10, 1<=I,
+C    I<=10, 1<=J, J<=10, 1<=K, K<=10}>
+C  <Z-RE-EXACT-{}>
+C  <Z(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, L==10, M==10, N==10, 1<=I,
+C    I<=10, 1<=J, J<=10, 1<=K, K<=10}>
+
+               S = S+Y(I,K)*Z(K,J)                                      0010
+            ENDDO
+
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, K==11, L==10, M==10,
+C    N==10, 1<=I, I<=10, 1<=J, J<=10}>
+
+            X(I,J) = S                                                  0012
+         ENDDO
+      ENDDO
+
+      END
+
+      SUBROUTINE TESTINIT
+
+      PARAMETER (LX=32, MX=92, NX=42)
+
+      COMMON /C1/ PX,DFI
+
+      COMMON /C2/ M,MM1,MP1
+c
+c input data consistency checking
+c
+      M = NINT(PX/DFI+1.)                                               0012
+      MM1 = M-1                                                         0013
+      MP1 = M+1                                                         0014
+      IF (.NOT.(M.GT.1.AND.M.LE.MX)) THEN                               0015
+
+C  <__IO_EFFECTS:LUNS-RE-EXACT-{}>
+C  <__IO_EFFECTS:LUNS-RE-EXACT-{}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, M==MM1+1, M==MP1-1}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, M==MM1+1, M==MP1-1}>
+
+         WRITE (6, *) L, M, N, LCRY                                     0016
+
+C  <__IO_EFFECTS:LUNS-RE-EXACT-{}>
+C  <__IO_EFFECTS:LUNS-RE-EXACT-{}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==0, M==MM1+1, M==MP1-1}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==0, M==MM1+1, M==MP1-1}>
+
+         STOP 3                                                         0017
+      ENDIF
+      END
+
+      SUBROUTINE TRANSPOSE(X,N)
+      REAL X(N,N)
+
+      DO I = 1, N-1                                                     0005
+         DO J = I+1, N                                                  0006
+
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, N==10, 1<=I, I<=9, I+1<=J,
+C    J<=10}>
+
+            T = X(I,J)                                                  0007
+
+C  <X-RE-EXACT-{}>
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2)-R-EXACT-{PHI1==J, PHI2==I, N==10, 1<=I, I<=9, I+1<=J,
+C    J<=10}>
+C  <X(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, N==10, 1<=I, I<=9, I+1<=J,
+C    J<=10}>
+
+            X(I,J) = X(J,I)                                             0008
+
+C  <X-RE-EXACT-{}>
+C  <X(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==I, N==10, 1<=I, I<=9, I+1<=J,
+C    J<=10}>
+
+            X(J,I) = T                                                  0009
+         ENDDO
+      ENDDO
+
+      END
+// chains for DIGITALIZE
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 12 with conflicts
+		from <MS-W-EXACT> to <MS-R-EXACT>
+	08 --> 11 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	08 --> 12 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	08 --> 13 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	08 --> 14 with conflicts
+		from <MM-W-EXACT> to <MM-R-EXACT>
+	11 --> 11 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	12 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	12 --> 12 with conflicts
+		from <JJ-W-EXACT> to <JJ-W-EXACT>
+	12 --> 13 with conflicts
+		from <JJ-W-EXACT> to <JJ-R-EXACT>
+	12 --> 14 with conflicts
+		from <JJ-W-EXACT> to <JJ-R-EXACT>
+	13 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	13 --> 12 with conflicts
+		from <JJ-R-EXACT> to <JJ-W-EXACT>
+	13 --> 13 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+	13 --> 14 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+	14 --> 11 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	14 --> 12 with conflicts
+		from <JJ-R-EXACT> to <JJ-W-EXACT>
+	14 --> 13 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+	14 --> 14 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for FLIPFLOP
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 11 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	08 --> 12 with conflicts
+		from <NEW-W-EXACT> to <NEW-W-EXACT>
+	08 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	11 --> 11 with conflicts
+		from <OLD-W-EXACT> to <OLD-W-EXACT>
+	11 --> 12 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+		from <NEW-R-EXACT> to <NEW-W-EXACT>
+	11 --> 16 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	11 --> 21 with conflicts
+		from <OLD-W-EXACT> to <OLD-R-EXACT>
+	12 --> 11 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+		from <OLD-R-EXACT> to <OLD-W-EXACT>
+	12 --> 12 with conflicts
+		from <NEW-W-EXACT> to <NEW-W-EXACT>
+	12 --> 16 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	12 --> 21 with conflicts
+		from <NEW-W-EXACT> to <NEW-R-EXACT>
+	14 --> 14 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	15 --> 15 with conflicts
+		from <I-W-EXACT> to <I-W-EXACT>
+	16 --> 11 with conflicts
+		from <OLD-R-EXACT> to <OLD-W-EXACT>
+	16 --> 12 with conflicts
+		from <NEW-R-EXACT> to <NEW-W-EXACT>
+	16 --> 14 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	16 --> 15 with conflicts
+		from <I-R-EXACT> to <I-W-EXACT>
+	16 --> 16 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+	16 --> 21 with conflicts
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+		from <X(PHI1,PHI2,PHI3)-W-EXACT> to <X(PHI1,PHI2,PHI3)-R-EXACT>
+	21 --> 11 with conflicts
+		from <OLD-R-EXACT> to <OLD-W-EXACT>
+	21 --> 12 with conflicts
+		from <NEW-R-EXACT> to <NEW-W-EXACT>
+	21 --> 16 with conflicts
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+		from <X(PHI1,PHI2,PHI3)-R-EXACT> to <X(PHI1,PHI2,PHI3)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for INIT
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
+
+// chains for MATMUL
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 07 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	08 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	08 --> 08 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	08 --> 10 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
+	09 --> 09 with conflicts
+		from <K-W-EXACT> to <K-W-EXACT>
+	10 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	10 --> 08 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	10 --> 09 with conflicts
+		from <K-R-EXACT> to <K-W-EXACT>
+	10 --> 10 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
+		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for SEQ
+
+ *********************** Use-Def Chains *********************
+
+	12 --> 14 with conflicts
+		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
+		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
+	12 --> 16 with conflicts
+		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
+		from <A(PHI1,PHI2)-W-EXACT> to <A(PHI1,PHI2)-R-MAY>
+	12 --> 22 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-MAY>
+		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+	12 --> 23 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-MAY>
+		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+	14 --> 16 with conflicts
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-W-MAY>
+		from <B(PHI1,PHI2)-R-MAY> to <B(PHI1,PHI2)-W-MAY>
+	14 --> 18 with conflicts
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-W-MAY>
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-R-MAY>
+		from <B(PHI1,PHI2)-R-MAY> to <B(PHI1,PHI2)-W-MAY>
+	16 --> 18 with conflicts
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-W-MAY>
+		from <B(PHI1,PHI2)-W-MAY> to <B(PHI1,PHI2)-R-MAY>
+	22 --> 23 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-MAY> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+		from <__IO_EFFECTS:LUNS(PHI1)-W-MAY> to <__IO_EFFECTS:LUNS(PHI1)-R-MAY>
+		from <INIT:PX-W-EXACT> to <INIT:PX-R-EXACT>
+		from <INIT:DFI-W-EXACT> to <INIT:DFI-R-EXACT>
+		from <__IO_EFFECTS:LUNS(PHI1)-R-MAY> to <__IO_EFFECTS:LUNS(PHI1)-W-MAY>
+	23 --> 24 with conflicts
+		from <DIGITALIZE:MP1-W-EXACT> to <DIGITALIZE:MP1-R-EXACT>
+		from <DIGITALIZE:MM1-W-EXACT> to <DIGITALIZE:MM1-R-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for SMATMUL
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 07 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	08 --> 10 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+		from <S-W-EXACT> to <S-R-EXACT>
+	08 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	09 --> 09 with conflicts
+		from <K-W-EXACT> to <K-W-EXACT>
+	10 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	10 --> 08 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+		from <S-R-EXACT> to <S-W-EXACT>
+	10 --> 09 with conflicts
+		from <K-R-EXACT> to <K-W-EXACT>
+	10 --> 10 with conflicts
+		from <S-W-EXACT> to <S-W-EXACT>
+		from <S-W-EXACT> to <S-R-EXACT>
+		from <S-R-EXACT> to <S-W-EXACT>
+	10 --> 12 with conflicts
+		from <S-W-EXACT> to <S-R-EXACT>
+	12 --> 07 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	12 --> 08 with conflicts
+		from <S-R-EXACT> to <S-W-EXACT>
+	12 --> 12 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for TESTINIT
+
+ *********************** Use-Def Chains *********************
+
+	12 --> 13 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 14 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 15 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	12 --> 16 with conflicts
+		from <M-W-EXACT> to <M-R-EXACT>
+	16 --> 17 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT>
+		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+// chains for TRANSPOSE
+
+ *********************** Use-Def Chains *********************
+
+	06 --> 06 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT>
+	07 --> 06 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	07 --> 07 with conflicts
+		from <T-W-EXACT> to <T-W-EXACT>
+	07 --> 08 with conflicts
+		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	07 --> 09 with conflicts
+		from <T-W-EXACT> to <T-R-EXACT>
+		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	08 --> 06 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	08 --> 07 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
+	08 --> 08 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
+		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	08 --> 09 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-R-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+	09 --> 06 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT>
+	09 --> 07 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
+		from <T-R-EXACT> to <T-W-EXACT>
+	09 --> 08 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-R-EXACT>
+	09 --> 09 with conflicts
+		from <X(PHI1,PHI2)-W-EXACT> to <X(PHI1,PHI2)-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
