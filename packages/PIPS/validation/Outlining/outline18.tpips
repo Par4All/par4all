@@ -1,0 +1,29 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="outline18"
+delete $WS
+create $WS $WS.c
+
+echo
+echo Initial code
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALL]
+
+
+echo
+echo Code after outlining
+echo
+
+
+setproperty OUTLINE_MODULE_NAME "kernel"
+setproperty OUTLINE_LABEL "kernel"
+apply OUTLINE[main]
+display PRINTED_FILE[%ALL]
+
+#apply UNSPLIT
+#shell gcc -fopenmp -c $WS.database/Src/$WS.c -o  $WS.database/Src/$WS.o
+
+close
+delete $WS
+quit

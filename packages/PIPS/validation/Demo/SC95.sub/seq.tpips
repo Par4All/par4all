@@ -13,21 +13,21 @@ display PRINTED_FILE[SEQ]
 module MATMUL
 display PARALLELPRINTED_FILE[MATMUL]
 # Why do I have a sequential internal loop?
-display DG_FILE[MATMUL]
+#display DG_FILE[MATMUL]
 
 # Slightly more difficule, privatization is needed
 
 module SMATMUL
 display PARALLELPRINTED_FILE[SMATMUL]
 # Well, it did not work, let's look at the dependence graph
-display DG_FILE[SMATMUL]
+# display DG_FILE[SMATMUL]
 # Scalar S is the problem! Privatize it
 apply PRIVATIZE_MODULE[SMATMUL]
 # And now it's parallel!
 display PARALLELPRINTED_FILE[SMATMUL]
 # The only left dependence are now at level 3: the loop body must be
 # executed sequentially, of course..
-display DG_FILE[SMATMUL]
+#display DG_FILE[SMATMUL]
 
 # Loop bounds are sometimes necessary
 
@@ -35,14 +35,14 @@ module TRANSPOSE
 # No hope for simple parallelization
 display PARALLELPRINTED_FILE[TRANSPOSE]
 # Let's see what's wrong: Scalar T and X[I,J] vs X[J,I]
-display DG_FILE[TRANSPOSE]
+#display DG_FILE[TRANSPOSE]
 # Fix the two problems
 # Information available in loop bounds
 activate RICE_FULL_DEPENDENCE_GRAPH # Loop Bounds Used
 apply PRIVATIZE_MODULE[TRANSPOSE]
 display PARALLELPRINTED_FILE[TRANSPOSE]
 # Only non-loop-carried dependences
-display DG_FILE[TRANSPOSE]
+#display DG_FILE[TRANSPOSE]
 
 # Preconditions needed
 

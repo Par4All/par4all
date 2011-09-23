@@ -1,0 +1,102 @@
+
+Initial code
+
+int main(void)
+{
+   my_type t[10];
+   {
+      int i;
+//             <may be read   >: 0`1`i
+//             <may be written>: t[*].val
+//             <    is written>: 0`1`i
+
+      for(i = 0; i <= 9; i += 1)
+//             <may be written>: t[*].val
+//             <    is read   >: 0`1`i
+         t[i].val = i;
+   }
+   {
+      int i;
+//             <may be read   >: 0`3`i t[*].val
+//             <    is written>: 0`3`i
+      
+      // go through my types
+      for(i = 0; i <= 9; i += 1) {
+//             <may be read   >: t[*].val
+//             <    is read   >: 0`3`i
+//             <    is written>: v
+         int v = t[i].val;
+//             <    is read   >: 0`3`i
+//             <    is written>: v
+kernel:         v = i;
+      }
+   }
+   return 0;
+}
+typedef struct {
+   int val;
+} my_type;
+
+
+///@brief update particles features
+int main(void);
+
+Code after outlining
+
+//             <    is read   >: i v_0[0]
+//             <    is written>: v_0[0]
+void kernel(int v_0[1], int i)
+{
+   //PIPS generated variable
+   int v;
+//             <    is read   >: v_0[0]
+//             <    is written>: v
+   v = *v_0;
+//             <    is read   >: i
+//             <    is written>: v
+kernel:   v = i;
+//             <    is read   >: v
+//             <    is written>: v_0[0]
+   *v_0 = v;
+}
+int main(void)
+{
+   my_type t[10];
+   {
+      int i;
+//             <may be read   >: 0`1`i
+//             <may be written>: t[*].val
+//             <    is written>: 0`1`i
+
+      for(i = 0; i <= 9; i += 1)
+//             <may be written>: t[*].val
+//             <    is read   >: 0`1`i
+         t[i].val = i;
+   }
+   {
+      int i;
+//             <may be read   >: 0`3`i t[*].val
+//             <    is written>: 0`3`i
+      
+      // go through my types
+      for(i = 0; i <= 9; i += 1) {
+//             <may be read   >: t[*].val
+//             <    is read   >: 0`3`i
+//             <    is written>: v
+         int v = t[i].val;
+//             <    is read   >: 0`3`i v
+//             <    is written>: v
+kernel:         kernel(&v, i);
+      }
+   }
+   return 0;
+}
+typedef struct {
+   int val;
+} my_type;
+
+
+///@brief update particles features
+int main(void);
+//PIPS generated variable
+void kernel(int v_0[1], int i);

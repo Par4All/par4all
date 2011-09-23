@@ -1,26 +1,26 @@
 
  **************** Effective Dependence Graph ****************
 
+	76 --> 76 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> at levels  1
+	76 --> 76 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> at levels  1
+	76 --> 76 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> at levels  1
+	84 --> 84 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> at levels  1
+	84 --> 84 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> at levels  1
+	84 --> 84 with conflicts
+		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> at levels  1
+	84 --> 85 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT> at levels  2
 	86 --> 86 with conflicts
 		from <QSUM-W-EXACT> to <QSUM-W-EXACT> at levels  1 2
 	86 --> 86 with conflicts
 		from <QSUM-W-EXACT> to <QSUM-R-EXACT> at levels  1 2
 	86 --> 86 with conflicts
 		from <QSUM-R-EXACT> to <QSUM-W-EXACT> at levels  1 2
-	84 --> 85 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT> at levels  2
-	84 --> 84 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> at levels  1
-	84 --> 84 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> at levels  1
-	84 --> 84 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> at levels  1
-	76 --> 76 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> at levels  1
-	76 --> 76 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> at levels  1
-	76 --> 76 with conflicts
-		from <__IO_EFFECTS:LUNS(PHI1)-R-EXACT> to <__IO_EFFECTS:LUNS(PHI1)-W-EXACT> at levels  1
 
 ****************** End of Dependence Graph ******************
 C     excerpt from the Perfect Club program BDNA

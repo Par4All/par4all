@@ -7,6 +7,12 @@ Whole dependence graph, preconditions and loop bounds ignored (1)
 
  ******** Whole Dependence Graph with Dependence Cones ******
 
+	05 --> 05 with conflicts
+		from <J-W-EXACT> to <J-W-EXACT> at levels  1
+
+	06 --> 05 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT> at levels  1
+
 	06 --> 06 with conflicts
 		from <M(I,J)-W-EXACT> to <M(J,I)-R-EXACT> at levels  1
 Generating system:
@@ -24,12 +30,6 @@ Generating system:
 (1,-1)
 End of generating system ****
 
-	06 --> 05 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT> at levels  1
-
-	05 --> 05 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT> at levels  1
-
 
 ****************** End of Dependence Graph ******************
 
@@ -38,11 +38,11 @@ Whole dependence graph, preconditions ignored, loop bounds used (2)
 
  ******** Whole Dependence Graph with Dependence Cones ******
 
-	06 --> 05 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT> at levels  1
-
 	05 --> 05 with conflicts
 		from <J-W-EXACT> to <J-W-EXACT> at levels  1
+
+	06 --> 05 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT> at levels  1
 
 
 ****************** End of Dependence Graph ******************
@@ -52,11 +52,11 @@ Whole dependence graph, preconditions (and loop bounds) used (3)
 
  ******** Whole Dependence Graph with Dependence Cones ******
 
-	06 --> 05 with conflicts
-		from <J-R-EXACT> to <J-W-EXACT> at levels  1
-
 	05 --> 05 with conflicts
 		from <J-W-EXACT> to <J-W-EXACT> at levels  1
+
+	06 --> 05 with conflicts
+		from <J-R-EXACT> to <J-W-EXACT> at levels  1
 
 
 ****************** End of Dependence Graph ******************

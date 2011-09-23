@@ -65,13 +65,6 @@ display PRINTED_FILE[for03]
 activate PRINT_CODE
 
 echo
-echo Chains
-echo
-
-activate PRINT_CHAINS_GRAPH
-display DG_FILE
-
-echo
 echo Privatize scalar variables
 echo
 

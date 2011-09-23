@@ -21,10 +21,10 @@ int foo(int c)
 {
    int force;
    struct a of = {{c}};
-pas_trop:   kernel(c, of);
+pas_trop:   kernel(of);
    return of.the.jedi;
 }
-void kernel(int c, struct a of)
+void kernel(struct a of)
 {
    //PIPS generated variable
    int force;
@@ -37,7 +37,4 @@ struct a {
 };
 int foo(int c);
 //PIPS generated variable
-void kernel(int c, struct a of);
-
-unsplit
-
+void kernel(struct a of);

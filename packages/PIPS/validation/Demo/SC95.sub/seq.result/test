@@ -44,25 +44,6 @@ c     compute x := y * z
 
       END
 
- **************** Effective Dependence Graph ****************
-
-	10 --> 10 with conflicts
-		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT> at levels  3
-	10 --> 10 with conflicts
-		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT> at levels  3
-	10 --> 10 with conflicts
-		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT> at levels  3
-	09 --> 09 with conflicts
-		from <K-W-EXACT> to <K-W-EXACT> at levels  1 2
-	08 --> 10 with conflicts
-		from <X(I,J)-W-EXACT> to <X(I,J)-W-EXACT> at levels  3
-	08 --> 10 with conflicts
-		from <X(I,J)-W-EXACT> to <X(I,J)-R-EXACT> at levels  3
-	07 --> 07 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT> at levels  1
-
-****************** End of Dependence Graph ******************
-
       SUBROUTINE SMATMUL(X, Y, Z, L, M, N)
 c     compute x := y * z
       REAL X(L,N), Y(L,M), Z(M,N)
@@ -78,39 +59,6 @@ c     compute x := y * z
       ENDDO
 
       END
-
- **************** Effective Dependence Graph ****************
-
-	12 --> 10 with conflicts
-		from <S-R-EXACT> to <S-W-EXACT> at levels  1 2
-	12 --> 08 with conflicts
-		from <S-R-EXACT> to <S-W-EXACT> at levels  1 2
-	10 --> 12 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT> at levels  1 2 3
-	10 --> 10 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT> at levels  1 2 3
-	10 --> 10 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT> at levels  1 2 3
-	10 --> 10 with conflicts
-		from <S-R-EXACT> to <S-W-EXACT> at levels  1 2 3
-	10 --> 08 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT> at levels  1 2
-	10 --> 08 with conflicts
-		from <S-R-EXACT> to <S-W-EXACT> at levels  1 2
-	09 --> 09 with conflicts
-		from <K-W-EXACT> to <K-W-EXACT> at levels  1 2
-	08 --> 12 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT> at levels  1 2 3
-	08 --> 10 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT> at levels  1 2 3
-	08 --> 10 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT> at levels  1 2 3
-	08 --> 08 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT> at levels  1 2
-	07 --> 07 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT> at levels  1
-
-****************** End of Dependence Graph ******************
 
       SUBROUTINE SMATMUL(X, Y, Z, L, M, N)
 c     compute x := y * z
@@ -130,25 +78,6 @@ c     compute x := y * z
 
       END
 
- **************** Effective Dependence Graph ****************
-
-	10 --> 12 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT> at levels  3
-	10 --> 10 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT> at levels  3
-	10 --> 10 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT> at levels  3
-	10 --> 10 with conflicts
-		from <S-R-EXACT> to <S-W-EXACT> at levels  3
-	08 --> 12 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT> at levels  3
-	08 --> 10 with conflicts
-		from <S-W-EXACT> to <S-W-EXACT> at levels  3
-	08 --> 10 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT> at levels  3
-
-****************** End of Dependence Graph ******************
-
       SUBROUTINE TRANSPOSE(X,N)
       REAL X(N,N)
 
@@ -161,23 +90,6 @@ c     compute x := y * z
       ENDDO
 
       END
-
- **************** Effective Dependence Graph ****************
-
-	09 --> 07 with conflicts
-		from <T-R-EXACT> to <T-W-EXACT> at levels  1 2
-	08 --> 09 with conflicts
-		from <X(J,I)-R-EXACT> to <X(J,I)-W-EXACT> at levels  3
-	07 --> 09 with conflicts
-		from <T-W-EXACT> to <T-R-EXACT> at levels  1 2 3
-	07 --> 08 with conflicts
-		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT> at levels  3
-	07 --> 07 with conflicts
-		from <T-W-EXACT> to <T-W-EXACT> at levels  1 2
-	06 --> 06 with conflicts
-		from <J-W-EXACT> to <J-W-EXACT> at levels  1
-
-****************** End of Dependence Graph ******************
 
       SUBROUTINE TRANSPOSE(X,N)
       REAL X(N,N)
@@ -193,17 +105,6 @@ c     compute x := y * z
       ENDDO
 
       END
-
- **************** Effective Dependence Graph ****************
-
-	08 --> 09 with conflicts
-		from <X(J,I)-R-EXACT> to <X(J,I)-W-EXACT> at levels  3
-	07 --> 09 with conflicts
-		from <T-W-EXACT> to <T-R-EXACT> at levels  3
-	07 --> 08 with conflicts
-		from <X(I,J)-R-EXACT> to <X(I,J)-W-EXACT> at levels  3
-
-****************** End of Dependence Graph ******************
 
       SUBROUTINE FLIPFLOP(X,N,C)
       INTEGER N

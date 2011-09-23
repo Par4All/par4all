@@ -1,0 +1,328 @@
+int main()
+{
+   float a[10][10][10][10][10];                                         /*0005*/
+   int i, j, k, l, m;                                                   /*0006*/
+   float x;                                                             /*0007*/
+   x = 2.12;                                                            /*0008*/
+
+   for(i = 0; i <= 9; i += 1)                                           /*0010*/
+      for(j = 0; j <= 9; j += 1) {                                      /*0011*/
+         // comments 2
+         float z = 0.0;                                                 /*0013*/
+         z = 0.0;                                                       /*0014*/
+         for(k = 0; k <= 9; k += 1) {                                   /*0015*/
+            z = k*2.0;                                                  /*0016*/
+            for(l = 0; l <= 9; l += 1)                                  /*0017*/
+               for(m = 0; m <= 9; m += 1) {                             /*0018*/
+                  //comments 3
+                  float y;                                              /*0020*/
+                  y = 2.0;                                              /*0021*/
+                  // comments 4
+                  y = 3.5+x+z;                                          /*0023*/
+                  a[i][j][k][l][m] = x*y;                               /*0024*/
+               }
+         }
+      }
+   return 0;                                                            /*0030*/
+}
+int main()
+{
+//             <    is declared>: a
+   float a[10][10][10][10][10];                                         /*0005*/
+//             <    is declared>: i j k l m
+   int i, j, k, l, m;                                                   /*0006*/
+//             <    is declared>: x
+   float x;                                                             /*0007*/
+//             <    is written>: x
+//             <    is referenced>: x
+   x = 2.12;                                                            /*0008*/
+//             <    is written>: i
+//             <    is referenced>: i
+
+   for(i = 0; i <= 9; i += 1)                                           /*0010*/
+//             <    is written>: j
+//             <    is referenced>: j
+      for(j = 0; j <= 9; j += 1) {                                      /*0011*/
+         // comments 2
+//             <    is written>: z
+//             <    is referenced>: z
+//             <    is declared>: z
+         float z = 0.0;                                                 /*0013*/
+//             <    is written>: z
+//             <    is referenced>: z
+         z = 0.0;                                                       /*0014*/
+//             <    is written>: k
+//             <    is referenced>: k
+         for(k = 0; k <= 9; k += 1) {                                   /*0015*/
+//             <    is read   >: k
+//             <    is written>: z
+//             <    is referenced>: k z
+            z = k*2.0;                                                  /*0016*/
+//             <    is written>: l
+//             <    is referenced>: l
+            for(l = 0; l <= 9; l += 1)                                  /*0017*/
+//             <    is written>: m
+//             <    is referenced>: m
+               for(m = 0; m <= 9; m += 1) {                             /*0018*/
+                  //comments 3
+//             <    is declared>: y
+                  float y;                                              /*0020*/
+//             <    is written>: y
+//             <    is referenced>: y
+                  y = 2.0;                                              /*0021*/
+//             <    is read   >: x z
+//             <    is written>: y
+//             <    is referenced>: x y z
+                  // comments 4
+                  y = 3.5+x+z;                                          /*0023*/
+//             <    is read   >: i j k l m x y
+//             <    is written>: a[i][j][k][l][m]
+//             <    is referenced>: a i j k l m x y
+                  a[i][j][k][l][m] = x*y;                               /*0024*/
+               }
+         }
+      }
+   return 0;                                                            /*0030*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	05 --> 24 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	06 --> 10 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	06 --> 11 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	06 --> 15 with conflicts
+		from <k-WE-EXACT> to <k-RE-EXACT>
+	06 --> 16 with conflicts
+		from <k-WE-EXACT> to <k-RE-EXACT>
+	06 --> 17 with conflicts
+		from <l-WE-EXACT> to <l-RE-EXACT>
+	06 --> 18 with conflicts
+		from <m-WE-EXACT> to <m-RE-EXACT>
+	06 --> 24 with conflicts
+		from <m-WE-EXACT> to <m-RE-EXACT>
+		from <l-WE-EXACT> to <l-RE-EXACT>
+		from <k-WE-EXACT> to <k-RE-EXACT>
+		from <j-WE-EXACT> to <j-RE-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	07 --> 08 with conflicts
+		from <x-WE-EXACT> to <x-RE-EXACT>
+	07 --> 23 with conflicts
+		from <x-WE-EXACT> to <x-RE-EXACT>
+	07 --> 24 with conflicts
+		from <x-WE-EXACT> to <x-RE-EXACT>
+	08 --> 23 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	08 --> 24 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	11 --> 11 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	13 --> 13 with conflicts
+		from <z-WE-EXACT> to <z-WE-EXACT>
+		from <z-WE-EXACT> to <z-RE-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
+	13 --> 14 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-WE-EXACT> to <z-RE-EXACT>
+	13 --> 16 with conflicts
+		from <z-WE-EXACT> to <z-RE-EXACT>
+	13 --> 23 with conflicts
+		from <z-WE-EXACT> to <z-RE-EXACT>
+	14 --> 13 with conflicts
+		from <z-RE-EXACT> to <z-WE-EXACT>
+	14 --> 16 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+	15 --> 15 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+	16 --> 13 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
+	16 --> 15 with conflicts
+		from <k-R-EXACT> to <k-W-EXACT>
+	16 --> 16 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+	16 --> 23 with conflicts
+		from <z-W-EXACT> to <z-R-EXACT>
+	17 --> 17 with conflicts
+		from <l-W-EXACT> to <l-W-EXACT>
+	18 --> 18 with conflicts
+		from <m-W-EXACT> to <m-W-EXACT>
+	20 --> 20 with conflicts
+		from <y-WE-EXACT> to <y-WE-EXACT>
+	20 --> 21 with conflicts
+		from <y-WE-EXACT> to <y-RE-EXACT>
+	20 --> 23 with conflicts
+		from <y-WE-EXACT> to <y-RE-EXACT>
+	20 --> 24 with conflicts
+		from <y-WE-EXACT> to <y-RE-EXACT>
+	21 --> 20 with conflicts
+		from <y-RE-EXACT> to <y-WE-EXACT>
+	21 --> 23 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+	23 --> 13 with conflicts
+		from <z-R-EXACT> to <z-W-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
+	23 --> 16 with conflicts
+		from <z-R-EXACT> to <z-W-EXACT>
+	23 --> 20 with conflicts
+		from <y-RE-EXACT> to <y-WE-EXACT>
+	23 --> 24 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	24 --> 11 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	24 --> 15 with conflicts
+		from <k-R-EXACT> to <k-W-EXACT>
+	24 --> 17 with conflicts
+		from <l-R-EXACT> to <l-W-EXACT>
+	24 --> 18 with conflicts
+		from <m-R-EXACT> to <m-W-EXACT>
+	24 --> 20 with conflicts
+		from <y-RE-EXACT> to <y-WE-EXACT>
+	24 --> 24 with conflicts
+		from <a[i][j][k][l][m]-W-EXACT> to <a[i][j][k][l][m]-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+int main()
+{
+
+//  <a-WE-EXACT-{}>
+
+   float a[10][10][10][10][10];                                         /*0005*/
+   int i, j, k, l, m;                                                   /*0006*/
+   float x;                                                             /*0007*/
+   x = 2.12;                                                            /*0008*/
+
+   for(i = 0; i <= 9; i += 1)                                           /*0010*/
+      for(j = 0; j <= 9; j += 1) {                                      /*0011*/
+         // comments 2
+         float z = 0.0;                                                 /*0013*/
+         z = 0.0;                                                       /*0014*/
+         for(k = 0; k <= 9; k += 1) {                                   /*0015*/
+            z = k*2.0;                                                  /*0016*/
+            for(l = 0; l <= 9; l += 1)                                  /*0017*/
+               for(m = 0; m <= 9; m += 1) {                             /*0018*/
+                  //comments 3
+                  float y;                                              /*0020*/
+                  y = 2.0;                                              /*0021*/
+                  // comments 4
+                  y = 3.5+x+z;                                          /*0023*/
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1][PHI2][PHI3][PHI4][PHI5]-W-EXACT-{PHI1==i, PHI2==j,
+//    PHI3==k, PHI4==l, PHI5==m, 0<=i, i<=9, 0<=j, j<=9, 0<=k, k<=9,
+//    0<=l, l<=9, 0<=m, m<=9}>
+
+                  a[i][j][k][l][m] = x*y;                               /*0024*/
+               }
+         }
+      }
+   return 0;                                                            /*0030*/
+}
+// chains for main
+
+ *********************** Use-Def Chains *********************
+
+	05 --> 24 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	06 --> 10 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	06 --> 11 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	06 --> 15 with conflicts
+		from <k-WE-EXACT> to <k-RE-EXACT>
+	06 --> 16 with conflicts
+		from <k-WE-EXACT> to <k-RE-EXACT>
+	06 --> 17 with conflicts
+		from <l-WE-EXACT> to <l-RE-EXACT>
+	06 --> 18 with conflicts
+		from <m-WE-EXACT> to <m-RE-EXACT>
+	06 --> 24 with conflicts
+		from <m-WE-EXACT> to <m-RE-EXACT>
+		from <l-WE-EXACT> to <l-RE-EXACT>
+		from <k-WE-EXACT> to <k-RE-EXACT>
+		from <j-WE-EXACT> to <j-RE-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	07 --> 08 with conflicts
+		from <x-WE-EXACT> to <x-RE-EXACT>
+	07 --> 23 with conflicts
+		from <x-WE-EXACT> to <x-RE-EXACT>
+	07 --> 24 with conflicts
+		from <x-WE-EXACT> to <x-RE-EXACT>
+	08 --> 23 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	08 --> 24 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	11 --> 11 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	13 --> 13 with conflicts
+		from <z-WE-EXACT> to <z-WE-EXACT>
+		from <z-WE-EXACT> to <z-RE-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
+	13 --> 14 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-WE-EXACT> to <z-RE-EXACT>
+	13 --> 16 with conflicts
+		from <z-WE-EXACT> to <z-RE-EXACT>
+	13 --> 23 with conflicts
+		from <z-WE-EXACT> to <z-RE-EXACT>
+	14 --> 13 with conflicts
+		from <z-RE-EXACT> to <z-WE-EXACT>
+	14 --> 16 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+	15 --> 15 with conflicts
+		from <k-W-EXACT> to <k-W-EXACT>
+	16 --> 13 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
+	16 --> 15 with conflicts
+		from <k-R-EXACT> to <k-W-EXACT>
+	16 --> 16 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+	16 --> 23 with conflicts
+		from <z-W-EXACT> to <z-R-EXACT>
+	17 --> 17 with conflicts
+		from <l-W-EXACT> to <l-W-EXACT>
+	18 --> 18 with conflicts
+		from <m-W-EXACT> to <m-W-EXACT>
+	20 --> 20 with conflicts
+		from <y-WE-EXACT> to <y-WE-EXACT>
+	20 --> 21 with conflicts
+		from <y-WE-EXACT> to <y-RE-EXACT>
+	20 --> 23 with conflicts
+		from <y-WE-EXACT> to <y-RE-EXACT>
+	20 --> 24 with conflicts
+		from <y-WE-EXACT> to <y-RE-EXACT>
+	21 --> 20 with conflicts
+		from <y-RE-EXACT> to <y-WE-EXACT>
+	21 --> 23 with conflicts
+		from <y-W-EXACT> to <y-W-EXACT>
+	23 --> 13 with conflicts
+		from <z-R-EXACT> to <z-W-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
+	23 --> 16 with conflicts
+		from <z-R-EXACT> to <z-W-EXACT>
+	23 --> 20 with conflicts
+		from <y-RE-EXACT> to <y-WE-EXACT>
+	23 --> 24 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	24 --> 11 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	24 --> 15 with conflicts
+		from <k-R-EXACT> to <k-W-EXACT>
+	24 --> 17 with conflicts
+		from <l-R-EXACT> to <l-W-EXACT>
+	24 --> 18 with conflicts
+		from <m-R-EXACT> to <m-W-EXACT>
+	24 --> 20 with conflicts
+		from <y-RE-EXACT> to <y-WE-EXACT>
+	24 --> 24 with conflicts
+		from <a[PHI1][PHI2][PHI3][PHI4][PHI5]-W-EXACT> to <a[PHI1][PHI2][PHI3][PHI4][PHI5]-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None

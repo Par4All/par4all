@@ -60,8 +60,6 @@ Dependence graph
 
  ******** Whole Dependence Graph with Dependence Cones ******
 
-	12 --> 13 with conflicts
-		from <k-W-EXACT> to <k-R-EXACT>
 	-1 --> -1 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT> at levels  1
 
@@ -72,6 +70,8 @@ Dependence graph
 	-1 --> -1 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 		from <j-W-EXACT> to <j-R-EXACT>
+	12 --> 13 with conflicts
+		from <k-W-EXACT> to <k-R-EXACT>
 
 ****************** End of Dependence Graph ******************
 

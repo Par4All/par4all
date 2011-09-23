@@ -20,12 +20,6 @@ apply OUTLINE[pof]
 
 display PRINTED_FILE[%ALL]
 
-echo
-echo unsplit
-echo
-
-apply UNSPLIT
-
 close
 delete $WS
 quit

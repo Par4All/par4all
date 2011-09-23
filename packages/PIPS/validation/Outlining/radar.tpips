@@ -25,11 +25,8 @@ display PRINTED_FILE[%ALLFUNC]
 apply GPU_IFY[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 
-apply UNSPLIT[%ALLFUNC]
+#apply UNSPLIT[%ALLFUNC]
+#shell cc -c radar.database/Src/radar.c -o radar.database/Tmp/radar.o
 
 close
-
-shell cc -c radar.database/Src/radar.c -o radar.database/Tmp/radar.o
-
-
 quit
