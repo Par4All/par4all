@@ -9,7 +9,6 @@
 #define NPART (NP*NP*NP)
 #define LBOX 6.f
 #define G 1.f
-#define TMAX 7.5f
 #define DX ((float)LBOX/NP)
 #define DT ((float)5.f*1e-2f)
 #define NPBLOCK 128
@@ -17,6 +16,12 @@
 #define MODT 1000
 #define MODDISP 4
 #define CUERR() printf("\n %s \n",cudaGetErrorString(cudaGetLastError()))
+
+// Control the number of timestep (with DT)
+#ifndef TMAX
+  #define TMAX 7.5f
+#endif
+
 
 #ifndef M_PI
 #define M_PI (3.14159265358979323846f)
