@@ -18,45 +18,32 @@ Here we present 5 different executions of the same C sequential code:
 the same as the previous one but with the optimization of communication
 between host and GPU.
 
-- the manually converted in Cuda code. This one use atomic operations and
-require a GPU with compute capability > 1.1
+- the manually converted in Cuda code. 
 
+The CUDA versions use atomic operations and require a GPU with compute 
+capability > 1.1. Moreover Stars-pm CUDA version make use of Fermi 
+features and is not optimized for legacy GPU.
 
 You need to have the fftw3f library installed (the libfftw3-dev package on
 Debian/Ubuntu) to be able to link the code, and optionally OpenGL and/or
 GTK for visualization. You also need a recent Cuda SDK for cuda build.
 
-For the sequential execution
-
-  make stars-pm_seq : build the sequential program from the C sources
-
-For the OpenMP parallel execution on multicores:
-
-  (same as previously with _openmp instead of _seq)
-
-For the CUDA parallel execution on nVidia GPU:
-
-  (same as previously with _autocuda instead of _seq or _openmp)
-
-For the CUDA parallel execution with communication optimization :
-
-  (same as previously with _autocuda_comm_optimization as suffix instead of autocuda)
-
-For the manually written CUDA version parallel execution on nVidia GPU:
-
-  (same as previously with _cuda instead of _seq or _openmp or ...)
-
+  make seq : build the sequential program from the C sources
+  make openmp : build the openmp program from the C sources
+  make cuda : build CUDA version
+  make cuda-opt : build CUDA version with communication optimization
+  make cuda-manual: build the manually written CUDA version
 
 To get an output you might add opengl=1 and/or gtk=1 on cmd line, for instance
-"make stars-pm_seq opengl=1".
+"make seq opengl=1".
 You might also run "make clean" first to force rebuilding.
 
 You can set the P4A_OPTIONS variable to pass some options to p4a.
 
   For example, globally with an:
-  export P4A_OPTIONS='--nvcc-flags="-gencode arch=compute_20,code=sm_20"'
+  export P4A_OPTIONS='--nvcc-flags="-G"'
   or locally with:
-  make P4A_OPTIONS='--nvcc-flags="-gencode arch=compute_20,code=sm_20"' run_cuda
+  make P4A_OPTIONS='--nvcc-flags="-G"' run_cuda
 
 You can then execute the produced binary using files in "data/". There's bench
 for 3 size of datas (32,64, and 128). Default size if 128, the others can be obtained

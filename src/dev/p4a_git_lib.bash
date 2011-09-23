@@ -188,23 +188,30 @@ function do_pull_remote_git() {
         # Same for the polylib:
         pull_remote_1_git p4a-polylib packages/polylib ICPS-polylib ICPS/polylib
 
-	echo Update the global p4a hierarchy to keep in sync:
-	do_merge_remote_branches p4a
-
         # Revert back into the branch we were at the beginning:
         git checkout $current_branch
     )
 }
 
 
-# Pull into the given branch hierarchy all the parts from the p4a remote
-# git hierarchy:
-function do_merge_remote_branches() {
+# Pull into the given $1 branch hierarchy all the parts from the $2 p4a
+# remote git hierarchy. Use 'p4a' as default for $1 or $2 when null:
+function do_aggregate_branches() {
     verb 1 "Entering do_merge_remote_git"
     enforce_P4A_TOP
     stop_on_error
     local merge_to_prefix_branches=$1
     local merge_origin_branch_prefix=$2
+    if [[ -z $merge_to_prefix_branches ]]; then
+	# Default name:
+	merge_to_prefix_branches=p4a
+    fi
+    if [[ -z $merge_origin_branch_prefix ]]; then
+	# If we do not have $merge_origin_branch_prefix defined,
+	# we use the standard reference branch:
+	merge_origin_branch_prefix=p4a
+    fi
+
     # Since we only have integration branches here, we can always select
     # without conflict the branch we import. If the user committed by
     # error something into the integration branch, she can anyway
@@ -214,11 +221,6 @@ function do_merge_remote_branches() {
     ###local merge_strategy="--strategy recursive --strategy-option=theirs"
     local merge_strategy=""
 
-    if [[ -z $merge_origin_branch_prefix ]]; then
-	# If we do not have $merge_origin_branch_prefix defined,
-	# we use the standard reference branch:
-	merge_origin_branch_prefix=p4a
-    fi
     # Create target branches if needed:
     create_branch_if_needed $merge_to_prefix_branches $merge_origin_branch_prefix
     create_branch_if_needed $merge_to_prefix_branches-packages $merge_origin_branch_prefix-packages

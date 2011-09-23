@@ -1,6 +1,83 @@
+2011-09-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+ * Par4All 1.3
+
+   * Huge improvements in compilation speed of big linear source codes
+     with a lot of variables to cope with the output of the Scilab-to-C
+     compiler from HPC Project. Use aggressive caching of internal
+     structures and remove many memory leaks. Mainly in def-use analyses,
+     effects...
+
+   * Generate up to 3D kernel for CUDA 2.0+ architectures (Fermi...)
+
+   * Now compile for Fermi architecture with --cuda. Ask for more cache
+     than shared memory
+
+   * Improved debug information on GPU target about kernels. Now P4A_DEBUG
+     is an environment variable and no longer a compilation flag
+
+   * New block of threads layout for CUDA
+
+   * Use loop fusion both for OpenMP and Accel
+
+   * Use fine grain parallelization before coarse grain for Accel
+
+   * Many many bug fixes
+
+   * Generate better types for variables with aggregated type in kernels
+
+   * Added a phase to promote sequential code to GPU kernel code
+
+   * Improved loop fusion
+
+   * Do not parallelize loops with control side effects (return,
+   	 abort()...)
+
+   * Better handling of const
+
+   * Cope with in-lining of functions with lacking return
+
+   * Improved scalarization
+
+   * Improved variable localization/privatization
+
+   * Improved #include recovery
+
+   * New PyPS-made unfolding of functions
+
+   * Subtler linearization of arrays in GPU kernel that cannot be C99
+
+   * Fix bugs in the GPU communication optimization
+
+   * Accept trivial (idempotent) cast in C code
+
+   * Function calls can now happen in declarations
+
+   * Improved PIPS infrastructure
+
+   * Added automatic benchmarking and graphics generation to speed-up
+     scientific article generation (see article at LCPC this year). :-)
+     Can also run with PGI and HMPP compilers
+
+   * Register variables cannot conflict
+
+   * Improved C switch() desugaring
+
+   * Can now also accept less standard complex double instead of double
+     complex
+
+   * Par4All building infrastructure improved to be able to easily skip
+     some wrong commit from upstream projects (PIPS...)
+
+   * Can compile on Fedora 15
+
+
 2011-07-15  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
  * Par4All 1.2.1
+
+  * Unstable version, unreleased. Look at version 1.3 for the real changes.
+
 
 2011-07-07  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
@@ -12,8 +89,8 @@
     Project
 
   * Added in examples/Benchmarks some benchmark examples we use in
-	our publications so that anybody can verify Par4All performance on
-	them with own hardware
+    our publications so that anybody can verify Par4All performance on
+    them with own hardware
 
   * Improved support for CUDA atomic update for reductions
 

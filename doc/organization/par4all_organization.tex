@@ -548,35 +548,52 @@ git push origin p4a
 A typical example to build a \Apfa with the latest \Apips version into the
 reference \verb|p4a| branch infrastructure (after having merged
 reference branches as explained previously) is as follows:
+\begin{verbatim}
+p4a_git --build-new-p4a
+\end{verbatim}
+
+Indeed, the effect is to chain the following actions that can be manually
+used to tweak the aggregation process (for example to skip a wrong or
+out-of-phase commit in \Apips):
 \begin{itemize}
 \item fetch the most recent developments of upstream packets (\Apips,
-  \Apolylib...):
+  \Apolylib...) into the \texttt{git svn} repositories in the
+  \texttt{CRI-git-svn} folder:
 \begin{verbatim}
 p4a_git --update-git-svn
 \end{verbatim}
 \item merge the new versions of the upstream packages into the \Apfa
-  reference branches:
+  reference branches, such as \texttt{CRI-pips}:
 \begin{verbatim}
 p4a_git --fetch-remote-git
 \end{verbatim}
-\item fuse all the component branches into the \Apfa integration
-  branch hierarchy:
+\item pull all the component branches (such as \texttt{CRI-pips}) into the
+  \Apfa integration branch hierarchy (such as \texttt{p4a-pips}):
 \begin{verbatim}
 p4a_git --pull-remote-git
 \end{verbatim}
+  This is where you can play around upstream flows. For example you can
+  afterwards send the \texttt{p4a-pips} back a few commits, cherry-pick
+  from \texttt{CRI-pips} some useful contributions among broken commits.
+
+  Note that the 2 previous instructions work into \verb|$P4A_ROOT|, %$
+  so make sure it does not point to a default installation directory such
+  as \texttt{/usr/local/par4all}. You can update \verb|$P4A_ROOT| %$
+  or use the \verb|--root .| option if you worked in the \texttt{par4all}
+  working copy;
+\item fuse all the component branches into the \Apfa integration
+  branch hierarchy:
+\begin{verbatim}
+p4a_git --aggregate-branches
+\end{verbatim}
 \end{itemize}
-Note that the 2 previous instructions work into \verb|$P4A_ROOT|, %$
-so make sure it does not point to a default installation directory such as
-\texttt{/usr/local/par4all}. You can update \verb|$P4A_ROOT| %$
-or use the \verb|--root .| option if you worked in the \texttt{par4all}
-working copy.
 
 At the end of this sequence of steps, the most recent developments in all
-of \Apfa is contained in the \verb|p4a| branch infrastructure.  After
-testing and validation, this branch can be published\footnote{But before
-  this, think to verify it is correct with a tool like \texttt{gitk}
-  because it may be cumbersome to remove some wrongly pushed commits...}
-as the latest official version with:
+parts of \Apfa is contained in the \verb|p4a| branch infrastructure.
+After testing and validation, this branch can be published\footnote{But
+  before this, think to verify it is correct with a tool like
+  \texttt{gitk} because it may be cumbersome for the community to remove
+  some wrongly pushed commits...}  as the latest official version with:
 \begin{verbatim}
 p4a_git --branch-action git push origin p4a\$suffix
 \end{verbatim}
@@ -597,12 +614,12 @@ The developer can create from \texttt{p4a} a branch infrastructure
 with each attached to the main \verb|p4a|-prefixed branch
 infrastructure. To do this, use;
 \begin{verbatim}
-p4a_git --merge-remote-branches p4a-very-personal
+p4a_git --aggregate-branches p4a-very-personal
 \end{verbatim}
 
 To start from \texttt{p4a-0.2-alpha}, use:
 \begin{verbatim}
-p4a_git --merge-remote-branches p4a-very-personal p4a-0.2-alpha
+p4a_git --aggregate-branches p4a-very-personal p4a-0.2-alpha
 \end{verbatim}
 
 When finished, these branches can be pushed for sharing or merged
@@ -651,13 +668,9 @@ export P4A_ROOT=$P4A_TOP/p5
 export P4A_ETC=$P4A_TOP/par4all/src/dev
 $P4A_TOP/par4all/src/dev/p4a_git --add-remotes
 # To recreate the tracking branches:
-$P4A_TOP/par4all/src/dev/p4a_git --merge-remote-branches p4a remotes/origin/p4a
-# Update the svn-git gateways:
-$P4A_TOP/par4all/src/dev/p4a_git --update-git-svn
-# Get the content of svn-git gateways:
-$P4A_TOP/par4all/src/dev/p4a_git --fetch-remote-git
-# Merge all the component branches into the p4a branch:
-$P4A_TOP/par4all/src/dev/p4a_git --pull-remote-git
+$P4A_TOP/par4all/src/dev/p4a_git --aggregate-branches p4a remotes/origin/p4a
+# Update the svn-git gateways and get all the sources at the right place:
+$P4A_TOP/par4all/src/dev/p4a_git --build-new-p4a
 # Build all the infrastructure:
 $P4A_TOP/par4all/src/dev/p4a_setup.py
 # Source the new environment. Be carefull, it override the P4A_ETC
@@ -676,6 +689,8 @@ The \verb|p4a_git| options are available in short and long forms:
 \item[\texttt{-v} or \texttt{--verbose}] increase the verbosity of the
   script. For example, if used twice, the script enters into command
   tracing mode;
+\item[\texttt{-n} or \texttt{--build-new-p4a}] chain most following phases
+  to have a new \Apfa source version;
 \item[\texttt{-u} or \texttt{--update-git-svn}] update the \Apips{}
   \Agit-\Asvn gateways that are into \verb|$P4A_TOP/CRI-git-svn|;%$
 \item[\texttt{-g} or \texttt{--recursive-git-svn}] apply a \Agit command
@@ -687,10 +702,9 @@ The \verb|p4a_git| options are available in short and long forms:
 \item[\texttt{-p} or \texttt{--pull-remote-git}] pull the objects from the
   remote \Agit repositories into their respective branches and update the
   \texttt{p4a} branch hierarchy to point to the last version of \Apfa;
-\item[\texttt{-m} or \texttt{--merge-remote-branches}
-  \texttt{\emph{<to-prefix>}} \texttt{\emph{[<origin-prefix>]}}] merge
-  the entire
-  \texttt{p4a} branch infrastructure into the
+\item[\texttt{-m} or \texttt{--aggregate-branches}
+  \texttt{\emph{[<to-prefix>}} \texttt{\emph{[<origin-prefix>]]}}] merge the
+  entire \texttt{p4a} branch infrastructure into the
   \texttt{\emph{<to-prefix>}} branch architecture. If the
   \texttt{\emph{<to-prefix>}} branch infrastructure does not exist, it is
   created from the \texttt{\emph{<origin-prefix>}} branch infrastructure
