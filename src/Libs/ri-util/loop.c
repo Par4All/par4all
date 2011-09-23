@@ -902,8 +902,16 @@ bool loop_executed_at_least_once_p( loop l ) {
   range r = loop_range(l);
   expression low = range_lower(r);
   expression up = range_upper(r);
-  if(expression_constant_p(low) && expression_constant_p(up)) {
-    if(expression_to_int(up) > expression_to_int(low)) {
+  expression inc = range_increment(r);
+  if(expression_constant_p(low) && expression_constant_p(up)
+      && expression_constant_p(inc) ) {
+    if(expression_to_int(inc)>0
+        && expression_to_int(up) > expression_to_int(low)) {
+      // Increasing case
+      return_val = true;
+    } else if(expression_to_int(inc) < 0
+        && expression_to_int(up) < expression_to_int(low)) {
+      // Decreasing case
       return_val = true;
     }
   }
