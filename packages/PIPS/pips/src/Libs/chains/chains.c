@@ -93,20 +93,27 @@ static hash_table Gen;
 static hash_table Ref;
 #define REF(st) ((set)hash_get( Ref, (char *)st ))
 
-/* Def_in maps each statement to the statements that are in-coming the statement */
+/* current_defs is the set of DEF at the current point of the computation */
+static set current_defs;
+static set current_refs;
+
+/* Def_in maps each statement to the statements that are in-coming the statement
+ * It's only used for unstructured, current_defs is used for structured parts */
 static hash_table Def_in;
 #define DEF_IN(st) ((set)hash_get(Def_in, (char *)st))
 
-/* Def_out maps each statement to the statements that are out-coming the statement */
+/* Def_out maps each statement to the statements that are out-coming the statement
+ * It's only used for unstructured, current_defs is used for structured parts */
 static hash_table Def_out;
 #define DEF_OUT(st) ((set)hash_get(Def_out, (char *)st))
 
-/* Ref_in maps each statement to the effects that are in-coming the
- statement */
+/* Ref_in maps each statement to the effects that are in-coming the statement
+ * It's only used for unstructured, current_refs is used for structured parts */
 static hash_table Ref_in;
 #define REF_IN(st) ((set)hash_get(Ref_in, (char *)st))
 
-/* Ref_out maps each statement to the effects that are out-coming the statement */
+/* Ref_out maps each statement to the effects that are out-coming the statement
+ * It's only used for unstructured, current_refs is used for structured parts */
 static hash_table Ref_out;
 #define REF_OUT(st) ((set)hash_get(Ref_out, (char *)st))
 
@@ -116,6 +123,7 @@ static graph dg;
 /* Vertex_statement maps each statement to its vertex in the dependency graph. */
 static hash_table Vertex_statement;
 
+/* Some properties */
 static bool one_trip_do_p;
 static bool keep_read_read_dependences_p;
 static bool mask_effects_p;
@@ -180,7 +188,9 @@ static bool init_one_statement( statement st ) {
     hash_put( Vertex_statement, (char *) st, (char *) v );
     graph_vertices( dg ) = CONS( VERTEX, v, graph_vertices( dg ));
 
-    /* If the statement has never been seen, allocate new sets: */
+    /* If the statement has never been seen, allocate new sets:
+     * This could be optimized : {DEF,REF}_{IN,OUT} are
+     * needed only for unstructured */
     hash_put( Gen, (char *) st, (char *) MAKE_STATEMENT_SET() );
     hash_put( Ref, (char *) st, (char *) MAKE_STATEMENT_SET() );
     hash_put( Def_in, (char *) st, (char *) MAKE_STATEMENT_SET() );
@@ -230,6 +240,7 @@ static bool init_one_statement( statement st ) {
  */
 static void kill_effects(set gen, set killers) {
   SET_FOREACH(effect,killer,killers) {
+    /* A killer effect is exact and is a write (environment effects kills !!) */
     if ( action_write_p(effect_action(killer))
         && approximation_exact_p(effect_approximation(killer)) ) {
       set killed = MAKE_STATEMENT_SET();
@@ -589,28 +600,12 @@ static void genref_statement( statement s ) {
  * @param sts is the list of statement inside the block
  */
 static void inout_block( statement st, cons *sts ) {
-  /* The initial in for the block */
-  set def_in = DEF_IN( st );
-  set ref_in = REF_IN( st );
 
   /* loop over statements inside the block */
   FOREACH( statement, one, sts ) {
-    /* propagate "in" sets */
-    set_assign( DEF_IN( one ), def_in );
-    set_assign( REF_IN( one ), ref_in );
-
     /* Compute the outs from the ins for this statement */
     inout_statement( one );
-
-    /* Get the ins for next statement */
-    def_in = DEF_OUT( one );
-    ref_in = REF_OUT( one );
   }
-
-  /* The outs for the whole block */
-  set_assign( DEF_OUT( st ), def_in );
-  set_assign( REF_OUT( st ), ref_in );
-
 }
 
 /**
@@ -623,27 +618,35 @@ static void inout_test( statement s, test t ) {
   statement st = test_true( t );
   statement sf = test_false( t );
 
+  // Save DEF and REF
+  set def_in = set_dup(current_defs);
+  set ref_in = set_dup(current_refs);
+
   /*
    * Compute true path
    */
-  /* init "in" sets for this path */
-  set_assign( DEF_IN( st ), DEF_IN( s ) );
-  set_assign( REF_IN( st ), REF_IN( s ) );
-  /* Compute the path */
   inout_statement( st );
+
+  // Save DEF and REF
+  set def_out = current_defs;
+  set ref_out = current_refs;
+
+  // Restore DEF and REF
+  set current_defs = def_in;
+  set current_refs = ref_in;
 
   /*
    * Compute false path
    */
-  /* init "in" sets for this path */
-  set_assign( DEF_IN( sf ), DEF_IN( s ) );
-  set_assign( REF_IN( sf ), REF_IN( s ) );
-  /* Compute the path */
   inout_statement( sf );
 
   /* Compute the out for the test */
-  set_union( DEF_OUT( s ), DEF_OUT( st ), DEF_OUT( sf ) );
-  set_union( REF_OUT( s ), REF_OUT( st ), REF_OUT( sf ) );
+  set_union( current_defs, current_defs, def_out );
+  set_union( current_refs, current_refs, ref_out );
+
+  // Free temporary set
+  set_free(def_in);
+  set_free(ref_in);
 
 }
 
@@ -655,29 +658,31 @@ static void inout_test( statement s, test t ) {
  * @param one_trip_do_p tell if there is always at least one trip (do loop only)
  */
 static void inout_any_loop( statement st, statement body, bool one_trip_do_p ) {
-  // Preload
-  set def_in_body = DEF_IN( body );
-  set def_in_st = DEF_IN( st );
-  set ref_in_st = REF_IN( st );
+  set def_in;
+  set ref_in;
+
+  if ( ! one_trip_do_p ) {
+    // Save DEF and REF
+    def_in = set_dup(current_defs);
+    ref_in = set_dup(current_refs);
+  }
 
   /* Compute "in" sets for the loop body */
-  set_union( def_in_body, GEN( st ), def_in_st);
-  set_union( REF_IN( body ), ref_in_st, REF( st ) );
+  set_union( current_defs, current_defs, GEN( st ) );
+  set_union( current_refs, current_refs, REF( st ) );
 
   /* Compute loop body */
   inout_statement( body );
 
   /* Compute "out" sets for the loop */
-  if ( one_trip_do_p ) {
-    /* Body is always done at least one time */
-    set_assign( DEF_OUT( st ), DEF_OUT( body ) );
-    set_assign( REF_OUT( st ), REF_OUT( body ) );
-  } else {
-    /* Body is not always done */
-    set_union( DEF_OUT( st ), DEF_OUT( body ), def_in_st );
-    set_union( REF_OUT( st ), REF_OUT( body ), ref_in_st );
+  if ( ! one_trip_do_p ) {
+    /* Body is not always done, approximation by union */
+    set_union( current_defs, current_defs, def_in );
+    set_union( current_refs, current_refs, ref_in );
+    // Free temporary set
+    set_free(def_in);
+    set_free(ref_in);
   }
-
 }
 
 /**
@@ -687,8 +692,11 @@ static void inout_any_loop( statement st, statement body, bool one_trip_do_p ) {
  * @param lo is the loop
  */
 static void inout_loop( statement st, loop lo ) {
-  statement body = loop_body( lo );
-  inout_any_loop( st, body, one_trip_do_p );
+  // Try to detect loop executed at least once trivial case
+  bool executed_once_p = one_trip_do_p;
+  if(!executed_once_p) executed_once_p = loop_executed_at_least_once_p(lo);
+
+  inout_any_loop( st, loop_body( lo ), executed_once_p );
 }
 
 /**
@@ -722,22 +730,11 @@ static void inout_forloop( statement st, forloop fl ) {
 static void inout_call( statement st, call __attribute__ ((unused)) c ) {
   /* Compute "out" sets  */
 
-  set_assign(DEF_OUT(st),DEF_IN(st));
-  kill_effects(DEF_OUT( st ),GEN(st));
-  set_union( DEF_OUT( st ), GEN( st ), DEF_OUT( st ));
+  kill_effects(current_defs,GEN(st));
+  set_union( current_defs, GEN( st ), current_defs);
 
-  set_assign(REF_OUT(st),REF_IN(st));
-  kill_effects(REF_OUT( st ),GEN(st));
-  set_union( REF_OUT( st ), REF( st ), REF_OUT( st ));
-
-/*
-  set_union( DEF_OUT( st ), GEN( st ), set_difference( DEF_OUT( st ),
-                                                       DEF_IN( st ),
-                                                       KILL( st ) ) );
-  set_union( REF_OUT( st ), REF( st ), set_difference( REF_OUT( st ),
-                                                       REF_IN( st ),
-                                                       KILL( st ) ) );
-  */
+  kill_effects(current_refs,GEN(st));
+  set_union( current_refs, REF( st ), current_refs);
 }
 
 /**
@@ -752,8 +749,8 @@ static void inout_unstructured( statement st, unstructured u ) {
   statement s_exit = control_statement( exit );
 
   /* Compute "in" sets */
-  set_assign( DEF_IN( control_statement( c )), DEF_IN( st ) );
-  set_assign( REF_IN( control_statement( c )), REF_IN( st ) );
+  set_assign( DEF_IN( control_statement( c )), current_defs );
+  set_assign( REF_IN( control_statement( c )), current_refs );
 
   /* Compute the unstructured */
   inout_control( c );
@@ -778,6 +775,10 @@ static void inout_unstructured( statement st, unstructured u ) {
     set_assign( REF_OUT( st ), REF_OUT( s_exit ) );
   }
 
+  // Exit from unstructured, restore global DEF
+  set_assign( current_defs, DEF_OUT( st ) );
+  set_assign( current_refs, REF_OUT( st ) );
+
 }
 
 /**
@@ -791,22 +792,23 @@ static void inout_statement( statement st ) {
 
   ifdebug(2) {
     fprintf( stderr,
-             "%*s> Computing DEF_IN and OUT of statement %p (%td %td):\n",
+             "%*s> Computing DEF and REF for statement %p (%td %td):\n",
              indent++,
              "",
              st,
              statement_number( st ),
              statement_ordering( st ) );
-    local_print_statement_set( "DEF_IN", DEF_IN( st ) );
-    local_print_statement_set( "DEF_OUT", DEF_OUT( st ) );
-    local_print_statement_set( "REF_IN", REF_IN( st ) );
-    local_print_statement_set( "REF_OUT", REF_OUT( st ) );
+    local_print_statement_set( "DEF_IN", current_defs );
+    local_print_statement_set( "REF_IN", current_refs );
   }
-
-  /* Compute defaults "out" sets ; will be overwrite most of the time
-   * FIXME : is it really useful ?? */
-  //set_assign( DEF_OUT( st ), GEN( st ) );
-  //set_assign( REF_OUT( st ), REF( st ) );
+  /* Compute Def-Def and Def-Use conflicts from Def_in set */
+  SET_FOREACH( effect, defIn, current_defs) {
+    add_conflicts( defIn, st, dd_du );
+  }
+  /* Compute Use-Def conflicts from Ref_in set */
+  SET_FOREACH( effect, refIn, current_refs) {
+    add_conflicts( refIn, st, ud );
+  }
 
   /* Compute "out" sets for the instruction : recursion */
   switch ( instruction_tag( i = statement_instruction( st )) ) {
@@ -849,9 +851,7 @@ static void inout_statement( statement st ) {
              st,
              statement_number( st ),
              statement_ordering( st ) );
-    local_print_statement_set( "DEF_IN", DEF_IN( st ) );
     local_print_statement_set( "DEF_OUT", DEF_OUT( st ) );
-    local_print_statement_set( "REF_IN", REF_IN( st ) );
     local_print_statement_set( "REF_OUT", REF_OUT( st ) );
   }
 
@@ -920,7 +920,18 @@ static void inout_control( control ct ) {
         }, ct, blocs );
   }
 
-  CONTROL_MAP( c, {inout_statement( control_statement( c ));},
+  CONTROL_MAP( c, {
+                   statement st = control_statement( c );
+                   /* Prepare "in" sets */
+                   set_assign( current_defs, DEF_IN( st ) );
+                   set_assign( current_refs, REF_IN( st ) );
+
+                   inout_statement( st);
+
+                   /* Restore out sets */
+                   set_assign( DEF_OUT( st ), current_defs );
+                   set_assign( REF_OUT( st ), current_refs );
+                  },
       ct, blocs );
   set_free( d_oldout );
   set_free( d_out );
@@ -1143,70 +1154,6 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 }
 
 /**
- * @brief Updates the dependence graph between the statement ST and
- *  its "in" sets. Only calls & expression are taken into account.
- */
-static void usedef_statement( st )
-  statement st; {
-
-  instruction i = statement_instruction( st );
-  tag t;
-  /* Compute Def-Def and Def-Use conflicts from Def_in set */
-  SET_FOREACH( effect, defIn, DEF_IN( st )) {
-    add_conflicts( defIn, st, dd_du );
-  }
-  /* Compute Use-Def conflicts from Ref_in set */
-  SET_FOREACH( effect, refIn, REF_IN( st )) {
-    add_conflicts( refIn, st, ud );
-  }
-
-  /* Recurse on instruction inside statement */
-  switch ( t = instruction_tag( i ) ) {
-    case is_instruction_block:
-      MAPL( sts, {usedef_statement( STATEMENT( CAR( sts )));},
-          instruction_block( i ))
-      ;
-      break;
-    case is_instruction_test:
-      usedef_statement( test_true( instruction_test( i )) );
-      usedef_statement( test_false( instruction_test( i )) );
-      break;
-    case is_instruction_loop:
-      usedef_statement( loop_body( instruction_loop( i )) );
-      break;
-    case is_instruction_whileloop:
-      usedef_statement( whileloop_body( instruction_whileloop( i )) );
-      break;
-    case is_instruction_forloop:
-      usedef_statement( forloop_body( instruction_forloop( i )) );
-      break;
-    case is_instruction_call:
-    case is_instruction_expression:
-    case is_instruction_goto: // should lead to a core dump
-      break;
-    case is_instruction_unstructured:
-      usedef_control( unstructured_control( instruction_unstructured( i )) );
-      break;
-    default:
-      pips_internal_error("Unknown tag %d", t );
-  }
-}
-
-/**
- *  @brief USEDEF_CONTROL updates the dependence graph between each of the
- *  nodes of C and their "in" sets.
- *  Only calls & expression are taken into account.
- */
-static void usedef_control( c )
-  control c; {
-  cons *blocs = NIL;
-
-  CONTROL_MAP( n, {usedef_statement( control_statement( n ));},
-      c, blocs );
-  gen_free_list( blocs );
-}
-
-/**
  * @brief Compute from a given statement, the dependency graph.
  * @description Statement s is assumed "controlized", i.e. GOTO have been
  * replaced by unstructured.
@@ -1230,6 +1177,8 @@ graph statement_dependence_graph( statement s ) {
   Ref_in = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE );
   Ref_out = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE );
   Vertex_statement = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE );
+  current_defs = set_make(set_pointer);
+  current_refs = set_make(set_pointer);
 
   /* Initialize the dg */
   dg = make_graph( NIL );
@@ -1246,11 +1195,8 @@ graph statement_dependence_graph( statement s ) {
   /* Compute genref phase */
   genref_statement( s );
 
-  /* Compute inout phase */
+  /* Compute inout phase and create conflicts*/
   inout_statement( s );
-
-  /* Compute usedef phase */
-  usedef_statement( s );
 
 #define TABLE_FREE(t)							\
   {HASH_MAP( k, v, {set_free( (set)v ) ;}, t ) ; hash_table_free(t);}
@@ -1264,6 +1210,9 @@ graph statement_dependence_graph( statement s ) {
 
   hash_table_free( Vertex_statement );
   hash_table_free( effects2statement );
+
+  set_free(current_defs);
+  set_free(current_refs);
 
   return ( dg );
 }
@@ -1388,10 +1337,6 @@ bool chains( char * module_name, enum chain_type use ) {
   statement module_stat;
   graph module_graph;
   void print_graph();
-
-  debug_on("CHAINS_DEBUG_LEVEL");
-
-  debug_off();
 
   set_current_module_statement( (statement) db_get_memory_resource( DBR_CODE,
                                                                     module_name,

@@ -507,7 +507,7 @@ static list common_regions_backward_translation(entity func, list func_regions)
 /**
 
  @param l_sum_eff is a list of effects on a C function formal parameter. These
-        effects must be vissible from the caller, which means that their
+        effects must be visible from the caller, which means that their
         reference has at leat one index.
  @param real_arg is an expression. It's the real argument corresponding to
         the formal parameter which memory effects are represented by l_sum_eff.
@@ -1536,10 +1536,23 @@ list c_convex_effects_on_actual_parameter_forward_translation
     case is_syntax_cast:
       {
 	pips_debug(6, "cast expression\n");
-	l_formal =
-	  c_convex_effects_on_actual_parameter_forward_translation
-	  (callee, cast_expression(syntax_cast(real_s)),
-	   formal_ent, l_reg, context);
+	type formal_ent_type = entity_basic_concrete_type(formal_ent);
+	expression cast_exp = cast_expression(syntax_cast(real_s));
+	type cast_exp_type = expression_to_type(cast_exp);
+	if (basic_concrete_types_compatible_for_effects_interprocedural_translation_p(cast_exp_type, formal_ent_type))
+	  {
+	    l_formal =
+	      c_convex_effects_on_actual_parameter_forward_translation
+	      (callee, cast_exp,
+	       formal_ent, l_reg, context);
+	  }
+	else
+	  {
+	    expression formal_exp = entity_to_expression(formal_ent);
+	    l_formal = c_actual_argument_to_may_summary_effects(formal_exp, 'w');
+	    free_expression(formal_exp);
+	  }
+	free_type(cast_exp_type);
 	break;
       }
     case is_syntax_range:

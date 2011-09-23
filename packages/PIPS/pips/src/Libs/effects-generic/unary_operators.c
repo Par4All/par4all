@@ -504,6 +504,15 @@ void effect_add_dereferencing_dimension(effect eff)
   return;
 }
 
+static expression field_entity_to_expression(entity f)
+{
+  reference r = make_reference(f, NIL);
+  expression e;
+  syntax s = make_syntax(is_syntax_reference, r);
+  e = make_expression(s, make_normalized(is_normalized_complex, UU));
+  return e;
+}
+
 /* void effect_add_dereferencingfield_dimension(effect eff, int rank)
  * input    : an effect
  * output   : nothing
@@ -526,6 +535,7 @@ void effect_add_field_dimension(effect eff, entity field)
   cell eff_c = effect_cell(eff);
 
   pips_debug_effect(8, "begin with effect :\n", eff);
+  pips_debug(8, "and field: %s\n", entity_name(field));
 
   if (!entity_flow_or_context_sentitive_heap_location_p(effect_entity(eff))
 			      && effect_abstract_location_p(eff))
@@ -567,7 +577,7 @@ void effect_add_field_dimension(effect eff, entity field)
 
       reference_indices(ref) = gen_nconc(reference_indices(ref),
 					 CONS(EXPRESSION,
-					      entity_to_expression(field),
+					      field_entity_to_expression(field),
 					      NIL));
     }
   pips_debug_effect(8, "end with effect :\n",eff);
