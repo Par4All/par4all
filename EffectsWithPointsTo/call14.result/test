@@ -164,14 +164,29 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	25 --> 25 with conflicts
-		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	25 --> 24 with conflicts
+	15 --> 20 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	15 --> 22 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	15 --> 23 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	15 --> 24 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	15 --> 25 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	16 --> 20 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	16 --> 23 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	16 --> 24 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	20 --> 24 with conflicts
+		from <y[*][*]-W-MAY> to <y[i][j]-R-EXACT>
+	23 --> 23 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	24 --> 23 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	24 --> 24 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
@@ -185,34 +200,19 @@ int main()
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	24 --> 24 with conflicts
+	25 --> 24 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	24 --> 23 with conflicts
-		from <j-R-EXACT> to <j-W-EXACT>
-	23 --> 23 with conflicts
-		from <j-W-EXACT> to <j-W-EXACT>
-	20 --> 24 with conflicts
-		from <y[*][*]-W-MAY> to <y[i][j]-R-EXACT>
-	16 --> 24 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
-	16 --> 23 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
-	16 --> 20 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
-	15 --> 25 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	15 --> 24 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	15 --> 23 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	15 --> 22 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	15 --> 20 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
+	25 --> 25 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

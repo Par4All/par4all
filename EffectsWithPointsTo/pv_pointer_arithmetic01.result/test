@@ -94,19 +94,19 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	09 --> 10 with conflicts
+	06 --> 07 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
-		from <p-R-EXACT> to <p-W-EXACT>
-	08 --> 10 with conflicts
+	06 --> 08 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
-		from <p-R-EXACT> to <p-W-EXACT>
-	08 --> 09 with conflicts
+	06 --> 09 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
-		from <p-R-EXACT> to <p-W-EXACT>
-	07 --> 10 with conflicts
+	06 --> 10 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	07 --> 08 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <p-R-EXACT> to <p-W-EXACT>
@@ -114,21 +114,21 @@ int main()
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <p-R-EXACT> to <p-W-EXACT>
-	07 --> 08 with conflicts
+	07 --> 10 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <p-R-EXACT> to <p-W-EXACT>
-	06 --> 10 with conflicts
+	08 --> 09 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
-	06 --> 09 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	08 --> 10 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
-	06 --> 08 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	09 --> 10 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
-	06 --> 07 with conflicts
-		from <p-W-EXACT> to <p-W-EXACT>
-		from <p-W-EXACT> to <p-R-EXACT>
+		from <p-R-EXACT> to <p-W-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -107,6 +107,12 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	10 --> 13 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	11 --> 13 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	13 --> 13 with conflicts
 		from <a[0]-W-MAY> to <a[0]-W-MAY>
 		from <a[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -117,11 +123,5 @@ int main()
 		from <b[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <a[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	11 --> 13 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	10 --> 13 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 
 ****************** End of Dependence Graph ******************

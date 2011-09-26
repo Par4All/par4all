@@ -134,21 +134,15 @@ int main(int argc, char *argv[])
 
  *********************** Use-Def Chains *********************
 
-	14 --> 15 with conflicts
+	12 --> 13 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	13 --> 15 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	13 --> 14 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	12 --> 15 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	12 --> 14 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	12 --> 13 with conflicts
+	14 --> 15 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>

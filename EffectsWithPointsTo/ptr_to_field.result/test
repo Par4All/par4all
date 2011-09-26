@@ -149,25 +149,25 @@ int ptr_to_field()
 
  *********************** Use-Def Chains *********************
 
-	15 --> 16 with conflicts
-		from <*HEAP*_l_12.p-W-EXACT> to <*HEAP*_l_12.p-R-EXACT>
-	14 --> 17 with conflicts
-		from <*HEAP*_l_12.q-W-EXACT> to <*HEAP*_l_12.q-R-EXACT>
-	13 --> 17 with conflicts
-		from <n-W-EXACT> to <n-R-EXACT>
-	13 --> 16 with conflicts
-		from <n-W-EXACT> to <n-R-EXACT>
-	12 --> 17 with conflicts
-		from <m-W-EXACT> to <m-R-EXACT>
-	12 --> 16 with conflicts
-		from <m-W-EXACT> to <m-R-EXACT>
-	12 --> 15 with conflicts
-		from <m-W-EXACT> to <m-R-EXACT>
-	12 --> 14 with conflicts
-		from <m-W-EXACT> to <m-R-EXACT>
 	12 --> 13 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	12 --> 14 with conflicts
+		from <m-W-EXACT> to <m-R-EXACT>
+	12 --> 15 with conflicts
+		from <m-W-EXACT> to <m-R-EXACT>
+	12 --> 16 with conflicts
+		from <m-W-EXACT> to <m-R-EXACT>
+	12 --> 17 with conflicts
+		from <m-W-EXACT> to <m-R-EXACT>
+	13 --> 16 with conflicts
+		from <n-W-EXACT> to <n-R-EXACT>
+	13 --> 17 with conflicts
+		from <n-W-EXACT> to <n-R-EXACT>
+	14 --> 17 with conflicts
+		from <*HEAP*_l_12.q-W-EXACT> to <*HEAP*_l_12.q-R-EXACT>
+	15 --> 16 with conflicts
+		from <*HEAP*_l_12.p-W-EXACT> to <*HEAP*_l_12.p-R-EXACT>
 
 ****************** End of Dependence Graph ******************

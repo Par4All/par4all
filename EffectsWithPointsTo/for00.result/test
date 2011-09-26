@@ -129,21 +129,21 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	11 --> 11 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-	11 --> 10 with conflicts
-		from <b-W-EXACT> to <b-R-EXACT>
-	10 --> 11 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 10 with conflicts
-		from <a-W-EXACT> to <a-W-EXACT>
-	09 --> 09 with conflicts
-		from <c-W-EXACT> to <c-W-EXACT>
-	06 --> 11 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-	06 --> 10 with conflicts
-		from <b-W-EXACT> to <b-R-EXACT>
 	04 --> 09 with conflicts
 		from <c-W-EXACT> to <c-W-EXACT>
+	06 --> 10 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	06 --> 11 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+	09 --> 09 with conflicts
+		from <c-W-EXACT> to <c-W-EXACT>
+	10 --> 10 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+	10 --> 11 with conflicts
+		from <b-R-EXACT> to <b-W-EXACT>
+	11 --> 10 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	11 --> 11 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
 
 ****************** End of Dependence Graph ******************

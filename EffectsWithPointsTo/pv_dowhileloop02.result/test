@@ -94,26 +94,26 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	04 --> 11 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 12 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 13 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	07 --> 11 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	11 --> 11 with conflicts
+		from <*HEAP*_l_7[i]-W-EXACT> to <*HEAP*_l_7[i]-W-EXACT>
+	11 --> 12 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	12 --> 11 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
 	12 --> 12 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
 		from <i-R-EXACT> to <i-W-EXACT>
-	12 --> 11 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	11 --> 12 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	11 --> 11 with conflicts
-		from <*HEAP*_l_7[i]-W-EXACT> to <*HEAP*_l_7[i]-W-EXACT>
 	13 --> 12 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
-	07 --> 11 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	04 --> 12 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-		from <i-W-EXACT> to <i-R-EXACT>
-	04 --> 11 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	04 --> 13 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
 
 ****************** End of Dependence Graph ******************

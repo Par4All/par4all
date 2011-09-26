@@ -320,10 +320,55 @@ void pointer_set(pointer p, int v)
 
  *********************** Use-Def Chains *********************
 
-	25 --> 29 with conflicts
+	08 --> 16 with conflicts
+		from <i1-W-EXACT> to <i1-W-EXACT>
 		from <i3-W-EXACT> to <i3-R-EXACT>
-	22 --> 25 with conflicts
+		from <i2-W-EXACT> to <i2-R-EXACT>
+	08 --> 19 with conflicts
+		from <i3-W-EXACT> to <i3-R-EXACT>
+		from <i2-W-EXACT> to <i2-R-EXACT>
+	08 --> 22 with conflicts
 		from <i3-W-EXACT> to <i3-W-EXACT>
+	08 --> 25 with conflicts
+		from <i2-W-EXACT> to <i2-R-EXACT>
+	08 --> 29 with conflicts
+		from <i2-W-EXACT> to <i2-R-EXACT>
+	11 --> 16 with conflicts
+		from <p1-W-EXACT> to <p1-R-EXACT>
+	11 --> 19 with conflicts
+		from <p1-W-EXACT> to <p1-R-EXACT>
+	11 --> 25 with conflicts
+		from <p1-W-EXACT> to <p1-R-EXACT>
+	11 --> 29 with conflicts
+		from <p1-W-EXACT> to <p1-R-EXACT>
+	12 --> 16 with conflicts
+		from <p2-W-EXACT> to <p2-R-EXACT>
+	12 --> 19 with conflicts
+		from <p2-W-EXACT> to <p2-R-EXACT>
+	12 --> 25 with conflicts
+		from <p2-W-EXACT> to <p2-R-EXACT>
+	12 --> 29 with conflicts
+		from <p2-W-EXACT> to <p2-R-EXACT>
+	13 --> 16 with conflicts
+		from <p3-W-EXACT> to <p3-R-EXACT>
+	13 --> 19 with conflicts
+		from <p3-W-EXACT> to <p3-R-EXACT>
+	13 --> 22 with conflicts
+		from <p3-W-EXACT> to <p3-R-EXACT>
+	13 --> 25 with conflicts
+		from <p3-W-EXACT> to <p3-R-EXACT>
+	13 --> 29 with conflicts
+		from <p3-W-EXACT> to <p3-R-EXACT>
+	16 --> 19 with conflicts
+		from <i1-W-EXACT> to <i1-R-EXACT>
+	16 --> 22 with conflicts
+		from <i3-R-EXACT> to <i3-W-EXACT>
+	16 --> 25 with conflicts
+		from <i1-W-EXACT> to <i1-R-EXACT>
+	16 --> 29 with conflicts
+		from <i1-W-EXACT> to <i1-R-EXACT>
+	19 --> 22 with conflicts
+		from <i3-R-EXACT> to <i3-W-EXACT>
 	19 --> 29 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
@@ -331,57 +376,9 @@ void pointer_set(pointer p, int v)
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	19 --> 25 with conflicts
-		from <i3-R-EXACT> to <i3-W-EXACT>
-	19 --> 22 with conflicts
-		from <i3-R-EXACT> to <i3-W-EXACT>
-	16 --> 29 with conflicts
-		from <i1-W-EXACT> to <i1-R-EXACT>
-	16 --> 25 with conflicts
-		from <i1-W-EXACT> to <i1-R-EXACT>
-		from <i3-R-EXACT> to <i3-W-EXACT>
-	16 --> 22 with conflicts
-		from <i3-R-EXACT> to <i3-W-EXACT>
-	16 --> 19 with conflicts
-		from <i1-W-EXACT> to <i1-R-EXACT>
-	13 --> 29 with conflicts
-		from <p3-W-EXACT> to <p3-R-EXACT>
-	13 --> 25 with conflicts
-		from <p3-W-EXACT> to <p3-R-EXACT>
-	13 --> 22 with conflicts
-		from <p3-W-EXACT> to <p3-R-EXACT>
-	13 --> 19 with conflicts
-		from <p3-W-EXACT> to <p3-R-EXACT>
-	13 --> 16 with conflicts
-		from <p3-W-EXACT> to <p3-R-EXACT>
-	12 --> 29 with conflicts
-		from <p2-W-EXACT> to <p2-R-EXACT>
-	12 --> 25 with conflicts
-		from <p2-W-EXACT> to <p2-R-EXACT>
-	12 --> 19 with conflicts
-		from <p2-W-EXACT> to <p2-R-EXACT>
-	12 --> 16 with conflicts
-		from <p2-W-EXACT> to <p2-R-EXACT>
-	11 --> 29 with conflicts
-		from <p1-W-EXACT> to <p1-R-EXACT>
-	11 --> 25 with conflicts
-		from <p1-W-EXACT> to <p1-R-EXACT>
-	11 --> 19 with conflicts
-		from <p1-W-EXACT> to <p1-R-EXACT>
-	11 --> 16 with conflicts
-		from <p1-W-EXACT> to <p1-R-EXACT>
-	08 --> 29 with conflicts
-		from <i2-W-EXACT> to <i2-R-EXACT>
-	08 --> 25 with conflicts
-		from <i2-W-EXACT> to <i2-R-EXACT>
-	08 --> 22 with conflicts
+	22 --> 25 with conflicts
 		from <i3-W-EXACT> to <i3-W-EXACT>
-	08 --> 19 with conflicts
+	25 --> 29 with conflicts
 		from <i3-W-EXACT> to <i3-R-EXACT>
-		from <i2-W-EXACT> to <i2-R-EXACT>
-	08 --> 16 with conflicts
-		from <i1-W-EXACT> to <i1-W-EXACT>
-		from <i3-W-EXACT> to <i3-R-EXACT>
-		from <i2-W-EXACT> to <i2-R-EXACT>
 
 ****************** End of Dependence Graph ******************

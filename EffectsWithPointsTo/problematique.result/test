@@ -224,65 +224,63 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	28 --> 28 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
-	25 --> 28 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
-	25 --> 27 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	25 --> 25 with conflicts
-		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
-	24 --> 27 with conflicts
+	07 --> 20 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	21 --> 28 with conflicts
-		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-R-EXACT>
-	21 --> 27 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	21 --> 24 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	21 --> 21 with conflicts
-		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-W-EXACT>
-	20 --> 27 with conflicts
+	07 --> 24 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	20 --> 24 with conflicts
+	07 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	17 --> 28 with conflicts
-		from <a-W-EXACT> to <a-R-EXACT>
-	13 --> 28 with conflicts
-		from <a-W-EXACT> to <a-R-EXACT>
-	13 --> 17 with conflicts
-		from <a-W-EXACT> to <a-W-EXACT>
-	11 --> 25 with conflicts
-		from <c-W-EXACT> to <c-R-EXACT>
-	11 --> 17 with conflicts
-		from <c-W-EXACT> to <c-R-EXACT>
-	10 --> 28 with conflicts
-		from <b-W-EXACT> to <b-R-EXACT>
-	10 --> 21 with conflicts
-		from <b-W-EXACT> to <b-R-EXACT>
-	10 --> 13 with conflicts
-		from <b-W-EXACT> to <b-R-EXACT>
-	10 --> 11 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	09 --> 28 with conflicts
-		from <a-W-EXACT> to <a-R-EXACT>
-	09 --> 17 with conflicts
-		from <a-W-EXACT> to <a-W-EXACT>
-	09 --> 13 with conflicts
-		from <a-W-EXACT> to <a-W-EXACT>
-	09 --> 11 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	09 --> 10 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	07 --> 27 with conflicts
+	09 --> 13 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+	09 --> 17 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+	09 --> 28 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	10 --> 11 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	10 --> 13 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	10 --> 21 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	10 --> 28 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	11 --> 17 with conflicts
+		from <c-W-EXACT> to <c-R-EXACT>
+	11 --> 25 with conflicts
+		from <c-W-EXACT> to <c-R-EXACT>
+	13 --> 17 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+	13 --> 28 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	17 --> 28 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+	20 --> 24 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	07 --> 24 with conflicts
+	20 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	07 --> 20 with conflicts
+	21 --> 21 with conflicts
+		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-W-EXACT>
+	21 --> 24 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	21 --> 27 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	21 --> 28 with conflicts
+		from <*HEAP*_l_10[i]-W-EXACT> to <*HEAP*_l_10[i]-R-EXACT>
+	24 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
+	25 --> 25 with conflicts
+		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+	25 --> 27 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	25 --> 28 with conflicts
+		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
+	28 --> 28 with conflicts
+		from <*HEAP*_l_11[i]-W-EXACT> to <*HEAP*_l_11[i]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

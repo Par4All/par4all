@@ -82,19 +82,7 @@ void dereferencing05()
 
  *********************** Use-Def Chains *********************
 
-	08 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 09 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 08 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
-		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	06 --> 09 with conflicts
+	06 --> 07 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -102,7 +90,19 @@ void dereferencing05()
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	06 --> 07 with conflicts
+	06 --> 09 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
+		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	07 --> 08 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
+		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	07 --> 09 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
+		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	08 --> 09 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>

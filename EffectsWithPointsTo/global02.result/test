@@ -84,11 +84,11 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	10 --> 11 with conflicts
-		from <_p_1[0]-W-EXACT> to <_p_1[0]-R-EXACT>
-	09 --> 11 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
 	09 --> 10 with conflicts
 		from <q-W-EXACT> to <q-R-EXACT>
+	09 --> 11 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	10 --> 11 with conflicts
+		from <_p_1[0]-W-EXACT> to <_p_1[0]-R-EXACT>
 
 ****************** End of Dependence Graph ******************

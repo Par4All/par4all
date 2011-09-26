@@ -170,13 +170,23 @@ int main()
 		from <p-W-EXACT> to <p-R-EXACT>
 	-1 --> 14 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
-	14 --> 15 with conflicts
-		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	-1 --> -1 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	-1 --> -1 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	-1 --> -1 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	-1 --> 14 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	-1 --> 14 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	10 --> -1 with conflicts
+		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
+	10 --> 14 with conflicts
+		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
+	11 --> -1 with conflicts
+		from <pfin-W-EXACT> to <pfin-R-EXACT>
 	14 --> -1 with conflicts
 		from <p-R-EXACT> to <p-W-EXACT>
 	14 --> 14 with conflicts
@@ -186,24 +196,14 @@ int main()
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	14 --> 15 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 	14 --> -1 with conflicts
 		from <p-R-EXACT> to <p-W-EXACT>
-	-1 --> -1 with conflicts
-		from <p-R-EXACT> to <p-W-EXACT>
-	-1 --> -1 with conflicts
-		from <p-W-EXACT> to <p-W-EXACT>
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> 14 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> 14 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> -1 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	11 --> -1 with conflicts
-		from <pfin-W-EXACT> to <pfin-R-EXACT>
-	10 --> 14 with conflicts
-		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
-	10 --> -1 with conflicts
-		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
 
 ****************** End of Dependence Graph ******************

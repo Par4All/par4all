@@ -142,6 +142,24 @@ int main()
 		from <f-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <f-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <f-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	-1 --> -1 with conflicts
+		from <f-R-EXACT> to <f-W-EXACT>
+	-1 --> 14 with conflicts
+		from <f-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	-1 --> -1 with conflicts
+		from <f-W-EXACT> to <f-W-EXACT>
+		from <f-W-EXACT> to <f-R-EXACT>
+	-1 --> -1 with conflicts
+		from <f-W-EXACT> to <f-R-EXACT>
+	-1 --> 14 with conflicts
+		from <f-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <f-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	11 --> 14 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	12 --> 14 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	14 --> -1 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <f-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <f-R-EXACT>
@@ -156,23 +174,5 @@ int main()
 		from <b[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <a[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	-1 --> -1 with conflicts
-		from <f-R-EXACT> to <f-W-EXACT>
-	-1 --> 14 with conflicts
-		from <f-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	-1 --> -1 with conflicts
-		from <f-W-EXACT> to <f-W-EXACT>
-		from <f-W-EXACT> to <f-R-EXACT>
-	-1 --> 14 with conflicts
-		from <f-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <f-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	-1 --> -1 with conflicts
-		from <f-W-EXACT> to <f-R-EXACT>
-	12 --> 14 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	11 --> 14 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 
 ****************** End of Dependence Graph ******************

@@ -94,12 +94,12 @@ int main(int argc, char *argv[])
 
  *********************** Use-Def Chains *********************
 
+	06 --> 09 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
 	11 --> 11 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	06 --> 09 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************

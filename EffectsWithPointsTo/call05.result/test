@@ -174,14 +174,37 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	24 --> 24 with conflicts
-		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
-		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
-		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
-		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	24 --> 23 with conflicts
+	13 --> 18 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	13 --> 19 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	13 --> 21 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	13 --> 22 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	13 --> 23 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	13 --> 24 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	14 --> 19 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	14 --> 22 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	14 --> 23 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	18 --> 21 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	19 --> 19 with conflicts
+		from <y[i][*]-W-MAY> to <y[i][*]-W-MAY>
+	19 --> 21 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	19 --> 23 with conflicts
+		from <y[i][*]-W-MAY> to <y[i][j]-R-EXACT>
+	22 --> 22 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	23 --> 22 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	23 --> 23 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
@@ -195,42 +218,19 @@ int main()
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	23 --> 23 with conflicts
+	24 --> 23 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	23 --> 22 with conflicts
-		from <j-R-EXACT> to <j-W-EXACT>
-	22 --> 22 with conflicts
-		from <j-W-EXACT> to <j-W-EXACT>
-	19 --> 23 with conflicts
-		from <y[i][*]-W-MAY> to <y[i][j]-R-EXACT>
-	19 --> 21 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	19 --> 19 with conflicts
-		from <y[i][*]-W-MAY> to <y[i][*]-W-MAY>
-	18 --> 21 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-	14 --> 23 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
-	14 --> 22 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
-	14 --> 19 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
-	13 --> 24 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 23 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 22 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 21 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 19 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
-	13 --> 18 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
+	24 --> 24 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

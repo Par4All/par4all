@@ -81,9 +81,9 @@ int struct06()
 
  *********************** Use-Def Chains *********************
 
-	14 --> 14 with conflicts
-		from <x[i].un.first-W-EXACT> to <x[i].un.first-W-EXACT>
 	11 --> 13 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
+	14 --> 14 with conflicts
+		from <x[i].un.first-W-EXACT> to <x[i].un.first-W-EXACT>
 
 ****************** End of Dependence Graph ******************

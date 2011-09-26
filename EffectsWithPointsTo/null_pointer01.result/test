@@ -84,19 +84,19 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	07 --> 10 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <p-W-EXACT> to <p-R-EXACT>
+	07 --> 11 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	08 --> 10 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	08 --> 11 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <q-R-EXACT>
 	10 --> 11 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 11 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <q-W-EXACT> to <q-R-EXACT>
-	08 --> 10 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 11 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 10 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <p-W-EXACT> to <p-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -82,5 +82,7 @@ int main()
 
 	04 --> 06 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>
+	07 --> 10 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
 
 ****************** End of Dependence Graph ******************

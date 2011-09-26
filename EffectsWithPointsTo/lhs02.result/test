@@ -66,19 +66,19 @@ void lhs02()
 
  *********************** Use-Def Chains *********************
 
+	05 --> 08 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <i-R-EXACT>
+	05 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	06 --> 08 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	06 --> 10 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-MAY>
 	08 --> 10 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-	06 --> 10 with conflicts
-		from <j-W-EXACT> to <j-W-EXACT>
-		from <j-W-EXACT> to <j-R-MAY>
-	06 --> 08 with conflicts
-		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	05 --> 10 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	05 --> 08 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-W-EXACT> to <i-R-EXACT>
 
 ****************** End of Dependence Graph ******************

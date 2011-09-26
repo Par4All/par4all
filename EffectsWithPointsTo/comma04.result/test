@@ -119,9 +119,9 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	10 --> 16 with conflicts
-		from <s-W-EXACT> to <s-R-EXACT>
 	08 --> 16 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
+	10 --> 16 with conflicts
+		from <s-W-EXACT> to <s-R-EXACT>
 
 ****************** End of Dependence Graph ******************

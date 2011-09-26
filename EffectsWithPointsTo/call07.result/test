@@ -107,13 +107,13 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	18 --> 18 with conflicts
-		from <y[i][4]-W-EXACT> to <y[i][4]-W-EXACT>
-	13 --> 18 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
-	12 --> 18 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
 	12 --> 17 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
+	12 --> 18 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	13 --> 18 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	18 --> 18 with conflicts
+		from <y[i][4]-W-EXACT> to <y[i][4]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

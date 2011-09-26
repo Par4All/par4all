@@ -85,17 +85,17 @@ float main(int argc, char *argv[])
 
  *********************** Use-Def Chains *********************
 
-	17 --> 17 with conflicts
-		from <imagein[i][j].im-W-EXACT> to <imagein[i][j].im-W-EXACT>
-	17 --> 15 with conflicts
-		from <j-R-EXACT> to <j-W-EXACT>
-	16 --> 19 with conflicts
-		from <imagein[i][j].re-W-EXACT> to <imagein[2][1].re-R-EXACT>
-	16 --> 16 with conflicts
-		from <imagein[i][j].re-W-EXACT> to <imagein[i][j].re-W-EXACT>
-	16 --> 15 with conflicts
-		from <j-R-EXACT> to <j-W-EXACT>
 	15 --> 15 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
+	16 --> 15 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	16 --> 16 with conflicts
+		from <imagein[i][j].re-W-EXACT> to <imagein[i][j].re-W-EXACT>
+	16 --> 19 with conflicts
+		from <imagein[i][j].re-W-EXACT> to <imagein[2][1].re-R-EXACT>
+	17 --> 15 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	17 --> 17 with conflicts
+		from <imagein[i][j].im-W-EXACT> to <imagein[i][j].im-W-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -125,12 +125,12 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
 
  *********************** Use-Def Chains *********************
 
-	17 --> 19 with conflicts
-		from <nbout-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	10 --> 19 with conflicts
-		from <indent-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	09 --> 19 with conflicts
 		from <col-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <col-W-EXACT> to <col-R-EXACT>
+	10 --> 19 with conflicts
+		from <indent-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	17 --> 19 with conflicts
+		from <nbout-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************
