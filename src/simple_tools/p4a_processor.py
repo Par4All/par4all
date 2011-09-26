@@ -1049,7 +1049,7 @@ class p4a_processor(object):
 #                extension_out = ".cl"                
             else:
                 extension_out = ".c"
-        p4a_util.warn("generated modules length "+str(len(self.generated_modules))) 
+        #p4a_util.warn("generated modules length "+str(len(self.generated_modules))) 
             
         for name in self.generated_modules:
             # Where the file actually is in the .database workspace:
@@ -1060,7 +1060,7 @@ class p4a_processor(object):
                 pips_file = os.path.join(self.workspace.dirname, "Src",
                                      name + extension_in)
             
-            p4a_util.warn("pips_file " +pips_file)                                                                                  
+            #p4a_util.warn("pips_file " +pips_file)                                                                                  
             if self.accel and (p4a_util.c_file_p(pips_file) or p4a_util.opencl_file_p(pips_file)):
                 # We generate code for P4A Accel, so first post process
                 # the output and produce the result in the P4A subdiretory
@@ -1084,7 +1084,7 @@ class p4a_processor(object):
                 # Merging the content of the p4a_accel_wrapper-OpenCL.h
                 # in the .cl kernel file
                 end_file =  os.path.join(subs_dir, output_name)
-                p4a_util.warn("end file "+end_file)
+                #p4a_util.warn("end file "+end_file)
                 # In the merge operation, the output file is only open in 
                 # append mode. When multiple compilation are launched,
                 # without cleaning, the resulting file cumulates all
@@ -1095,7 +1095,7 @@ class p4a_processor(object):
                     pass
                 h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
                 p4a_util.merge_files (end_file, [h_file, output_file])
-                p4a_util.warn("end_file after join "+end_file)
+                #p4a_util.warn("end_file after join "+end_file)
                      
 
             if (self.fortran == False):
@@ -1143,7 +1143,7 @@ class p4a_processor(object):
             (dir, name) = os.path.split(file)
             # Where the file does well in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname, "Src", name)
-            p4a_util.warn("pips_file save_user_file "+pips_file)
+            #p4a_util.warn("pips_file save_user_file "+pips_file)
             # Recover the includes in the given file only if the flags have
             # been previously set and this is a C program:
             if self.recover_includes and not self.native_recover_includes and p4a_util.c_file_p(file):
@@ -1228,7 +1228,7 @@ class p4a_processor(object):
         new_file_flag =  self.new_file_generated ()
 
         output_dir = os.path.join(os.getcwd(), self.new_files_folder)
-        p4a_util.warn("p4a new file " + output_dir)
+        #p4a_util.warn("p4a new file " + output_dir)
         if dest_dir:
             output_dir = os.path.join(dest_dir,self.new_files_folder)
         if ((not (os.path.isdir(output_dir))) and (new_file_flag == True)):
@@ -1261,7 +1261,7 @@ class p4a_processor(object):
         output_files.extend (self.save_interface (output_dir))
         output_files.extend (self.save_generated (output_dir, subs_dir))
         #output_files.extend (self.save_generated (output_dir))        
-        p4a_util.warn("output_dir "+ output_dir)
+        #p4a_util.warn("output_dir "+ output_dir)
 
         # generate one header to warp all the generated header files
         if (new_file_flag == True):
