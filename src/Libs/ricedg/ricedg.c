@@ -832,6 +832,9 @@ static void rice_update_dependence_graph(
     }
 
     reset_context_map();
+
+    // No leak
+    gen_free_list(llv);
 }
 
 
@@ -2315,18 +2318,18 @@ statement stat;
     FOREACH (EFFECT, ef, load_cumulated_rw_effects_list(stat)) {
       entity en = effect_entity(ef) ;
       if( action_write_p( effect_action( ef )) && ! entity_all_locations_p(en) && entity_integer_scalar_p( en ))
-	lv = gen_nconc(lv, CONS(ENTITY, en, NIL));
+        lv = gen_nconc(lv, CONS(ENTITY, en, NIL));
     }
     l = statement_loop(stat);
     locals = loop_locals(l);
     FOREACH (ENTITY, v, locals) {
       if (gen_find_eq(v,lv) == entity_undefined)
-	lv = CONS(ENTITY, v, lv);
+        lv = CONS(ENTITY, v, lv);
     }
     locals = statement_declarations(loop_body(l));
     FOREACH (ENTITY, v, locals) {
       if (gen_find_eq(v,lv) == entity_undefined)
-	lv = CONS(ENTITY, v, lv);
+        lv = CONS(ENTITY, v, lv);
     }
     return(lv);
 }
