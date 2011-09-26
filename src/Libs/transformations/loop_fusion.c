@@ -248,7 +248,39 @@ void replace_entity_effects_walker(statement s, void *_thecouple ) {
 
 }
 
+/* temporary block statement for candidate fused body */
+static statement fused_statement = statement_undefined;
 
+/*
+ * Allocate a temporary block statement for sequence.
+ */
+static statement make_temporary_fused_statement(list sequence) {
+  if(statement_undefined_p(fused_statement)) {
+    // Construct the fused sequence
+    fused_statement = make_block_statement(sequence);
+    statement_ordering( fused_statement) = 999999999; // FIXME : dirty
+    pips_assert("ordering defined", ordering_to_statement_initialized_p());
+    overwrite_ordering_of_the_statement_to_current_mapping(fused_statement);
+
+    // Fix a little bit proper effects so that chains will be happy with it
+    store_proper_rw_effects_list(fused_statement, NIL);
+  } else {
+    sequence_statements(instruction_sequence(statement_instruction(fused_statement))) = sequence;
+  }
+  return fused_statement;
+}
+
+/*
+ *
+ */
+static void free_temporary_fused_statement() {
+  if(!statement_undefined_p(fused_statement)) {
+    sequence_statements(instruction_sequence(statement_instruction(fused_statement))) = NIL;
+    free_statement(fused_statement);
+    fused_statement = statement_undefined;
+  }
+
+}
 
 /**
  * @brief Try to fuse the two loop. Dependences are check against the new body
@@ -265,7 +297,6 @@ static bool fusion_loops(statement sloop1,
   pips_assert("Previous is a loop", statement_loop_p( sloop1 ) );
   pips_assert("Current is a loop", statement_loop_p( sloop2 ) );
   bool success = false;
-
 
 
   loop loop1 = statement_loop(sloop1);
@@ -297,7 +328,9 @@ static bool fusion_loops(statement sloop1,
   if(index1!=index2) {
     pips_debug(4,"Replace second loop index (%s) with first one (%s)\n",
                entity_name(index2), entity_name(index1));
-    // Get all variable referenced in loop2 body
+    // Get all variable referenced in loop2 body to find if index1 is referenced
+    // This could be optimized by a search for index1 and abort if found.
+    // this would avoid building a set
     set ref_entities = get_referenced_entities(loop2);
 
     // Assert that index1 is not referenced in loop2
@@ -310,6 +343,7 @@ static bool fusion_loops(statement sloop1,
       // FI: FIXME we should check that index2 is dead on exit of loop2
       replace_entity((void *)body_loop2, index2, index1);
 
+      // Replace entities in effects
       struct entity_pair thecouple = { index2, index1 };
       gen_context_recurse(body_loop2, &thecouple,
                           statement_domain, gen_true,
@@ -317,47 +351,53 @@ static bool fusion_loops(statement sloop1,
     }
     set_free(ref_entities);
   }
-  //statement new_body = make_block_with_stmt_if_not_already(body_loop1);
-  list seq1;
-  list fused;
 
-  if(statement_sequence_p(body_loop1)) {
-    seq1 = sequence_statements(statement_sequence(body_loop1));
-  } else {
-    seq1 = CONS(statement, body_loop1, NIL );
+
+  // Be sure that loop bodies are encapsulated in sequence
+  if(!statement_sequence_p(body_loop1)) {
+    loop_body(loop1) = make_block_statement(CONS(statement, body_loop1, NIL ));
+    body_loop1 = loop_body(loop1);
+    // Fix a little bit proper effects so that chains will be happy with it
+    store_proper_rw_effects_list(body_loop1, NIL);
   }
 
-  if(statement_sequence_p(body_loop2)) {
-    list seq2 = sequence_statements(statement_sequence(body_loop2));
-    fused = gen_concatenate(seq1, seq2);
-  } else {
-    list seq2 = CONS(statement, body_loop2, NIL );
-    fused = gen_concatenate(seq1, seq2);
+  if(!statement_sequence_p(body_loop2)) {
+    loop_body(loop2) = make_block_statement(CONS(statement, body_loop2, NIL ));
+    body_loop2 = loop_body(loop2);
+    // Fix a little bit proper effects so that chains will be happy with it
+    store_proper_rw_effects_list(body_loop2, NIL);
   }
+
+  // Build a list with the statements from loop 1 followed by stmts for loop 2
+  list seq1 = gen_copy_seq(sequence_statements(statement_sequence(body_loop1)));
+  list seq2 = gen_copy_seq(sequence_statements(statement_sequence(body_loop2)));
+  list fused = gen_nconc(seq1, seq2);
+
 
   // Let's check if the fusion is valid
 
   // Construct the fused sequence
-  statement fused_statement = make_block_statement(fused);
-  loop_body( loop1 ) = fused_statement;
-  statement_ordering( fused_statement) = 999999999; // FIXME : dirty
-  overwrite_ordering_of_the_statement_to_current_mapping(fused_statement);
+  loop_body( loop1 ) = make_temporary_fused_statement(fused);
 
-  // Fix a little bit proper effects so that chains will be happy with it
-  store_proper_rw_effects_list(fused_statement, NIL);
-  // Stuff for DG
+  // Stuff for Chains and DG
   set_enclosing_loops_map(loops_mapping_of_statement(sloop1));
 
-  // Build chains
-  debug_on("CHAINS_DEBUG_LEVEL");
-  graph chains = statement_dependence_graph(sloop1);
-  debug_off();
 
+  // Build chains
+  // do not debug on/off all the time : costly (read environment + atoi )?
+  // debug_on("CHAINS_DEBUG_LEVEL");
+  graph chains = statement_dependence_graph(sloop1);
+  //debug_off();
 
   // Build DG
-  debug_on("RICEDG_DEBUG_LEVEL");
+  // do not debug on/off all the time : costly (read environment + atoi )?
+  //debug_on("RICEDG_DEBUG_LEVEL");
   graph candidate_dg = compute_dg_on_statement_from_chains(sloop1, chains);
-  debug_off();
+  //debug_off();
+
+  // Cleaning
+  clean_enclosing_loops();
+  reset_enclosing_loops_map();
 
   ifdebug(5) {
     pips_debug(0, "Candidate CHAINS :\n");
@@ -367,9 +407,8 @@ static bool fusion_loops(statement sloop1,
     pips_debug(0, "Candidate fused loop :\n");
     print_statement(sloop1);
   }
+  free_graph(chains);
 
-  // Cleaning
-  reset_enclosing_loops_map();
 
   // Let's validate the fusion now
   // No write dep between a statement from loop2 to statement from loop1
@@ -440,6 +479,11 @@ static bool fusion_loops(statement sloop1,
     }
   }
 
+  // No longer need the DG
+  free_graph(candidate_dg);
+
+
+  bool inner_success = false;
   if(success && get_bool_property("LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS")) {
     // Check if we have perfect loop nests, and thus prevents losing parallelism
     statement inner_loop1 = get_first_inner_perfectly_nested_loop(body_loop1);
@@ -458,8 +502,8 @@ static bool fusion_loops(statement sloop1,
         pips_debug(4,"Try to fuse inner loops !\n");
         success = fusion_loops(inner_loop1,stmts1,inner_loop2,stmts2,maximize_parallelism);
         if(success) {
+          inner_success = true;
           pips_debug(4,"Inner loops fused :-)\n");
-          loop_body(loop1) = body_loop1;
         } else {
           pips_debug(4,"Inner loops not fusable :-(\n");
         }
@@ -478,7 +522,6 @@ static bool fusion_loops(statement sloop1,
     }
   }
 
-
   if(success) {
     // Cleaning FIXME
     // Fix real DG
@@ -488,19 +531,31 @@ static bool fusion_loops(statement sloop1,
     // exit, its exit value should be restored by an extra
     // assignment here
      // ...
+    loop_body(loop1) = body_loop1;
+    if(!inner_success) { // Usual case
+      gen_free_list(sequence_statements(statement_sequence(body_loop1)));
+      sequence_statements(statement_sequence(body_loop1)) = fused;
+      gen_free_list(sequence_statements(statement_sequence(body_loop2)));
+      sequence_statements(statement_sequence(body_loop2)) = NIL;
+      free_statement(sloop2);
+    } else {
+      // Inner loops have been fused
+      gen_free_list(fused);
+    }
   } else {
     // FI: this also should be controlled by information about the
     // liveness of both indices; also index1 must not be used in
     // loop2 as a temporary; so the memory effects of loops 2 should
-    // be checked before attempting the first subtitution
+    // be checked before attempting the first substitution
     if(index1!=index2) {
       replace_entity((void *)body_loop2, index1, index2);
       struct entity_pair thecouple = { index1, index2 };
       gen_context_recurse(body_loop2, &thecouple,
               statement_domain, gen_true, replace_entity_effects_walker);
     }
-    loop_body(loop1) = body_loop1;
     // Cleaning FIXME
+    loop_body(loop1) = body_loop1;
+    gen_free_list(fused);
   }
 
   ifdebug(3) {
@@ -526,6 +581,19 @@ static fusion_block make_empty_block(int num) {
   block->is_a_loop = false;
 
   return block;
+}
+
+
+static void free_block_list(list blocks) {
+  FOREACH(fusion_block,b,blocks) {
+    set_free(b->statements);
+    set_free(b->successors);
+    set_free(b->rr_successors);
+    set_free(b->predecessors);
+    set_free(b->rr_predecessors);
+    free(b);
+  }
+  gen_free_list(blocks);
 }
 
 /**
@@ -1099,6 +1167,10 @@ restart_generation:
       sequence_statements( s) = gen_nreverse(new_stmts);
     }
   }
+
+  // No leak
+  free_block_list(block_list);
+
   return true;
 }
 
@@ -1135,9 +1207,11 @@ bool loop_fusion(char * module_name) {
   set_proper_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS,
                                                                   module_name,
                                                                   true));
+  /*
   set_precondition_map((statement_mapping)db_get_memory_resource(DBR_PRECONDITIONS,
                                                                  module_name,
                                                                  true));
+                                                                 */
   /* Mandatory for DG construction */
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
                                                                      module_name,
@@ -1167,10 +1241,12 @@ bool loop_fusion(char * module_name) {
   ordering_to_dg_mapping = NULL;
   reset_proper_rw_effects();
   reset_cumulated_rw_effects();
-  reset_precondition_map();
+  //reset_precondition_map();
   reset_current_module_statement();
   reset_current_module_entity();
   reset_ordering_to_statement();
+  free_temporary_fused_statement(); // Free...
+
 
   pips_debug(2, "done for %s\n", module_name);
   debug_off();
