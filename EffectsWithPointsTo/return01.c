@@ -11,6 +11,8 @@ int* foo()
   else
     return q;
 
+  q = &cond;
+  return q;
 }
 
 int main()
