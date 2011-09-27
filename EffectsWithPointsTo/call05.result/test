@@ -52,24 +52,24 @@ POINTS-TO
 
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> _x_3[0] , EXACT
 
 void call05(int r, int m, int *x)
 {
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> _x_3[0] , EXACT
 
    int j;
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> _x_3[0] , EXACT
 
 
    for(j = 0; j <= m-1; j += 1)
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> _x_3[0] , EXACT
 
       x[j] = 10*r+j;
 }
@@ -133,7 +133,7 @@ void call05(int r, int m, int *x)
 
    for(j = 0; j <= m-1; j += 1)
 //             <    is read   >: j m r x
-//             <    is written>: _x_1[j]
+//             <    is written>: _x_3[j]
       x[j] = 10*r+j;
 }
 int main()
