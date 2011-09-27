@@ -356,15 +356,15 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 }
 
 // Points To:
-// file -> _file_6[0] , EXACT
-// line -> _line_7[0] , EXACT
+// file -> _file_1[0] , EXACT
+// line -> _line_3[0] , EXACT
 
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
 
 // Points To:
-// file -> _file_6[0] , EXACT
-// line -> _line_7[0] , EXACT
+// file -> _file_1[0] , EXACT
+// line -> _line_3[0] , EXACT
 
    fread(&line[0], sizeof(byte), width, file);
 }
@@ -376,7 +376,7 @@ int bmatrix(int f1, int f2, int f3, int f4)
 }
 
 // Points To:
-// f1 -> _f1_8[0] , EXACT
+// f1 -> _f1_1[0] , EXACT
 
 int nrerror(char *f1)
 {
