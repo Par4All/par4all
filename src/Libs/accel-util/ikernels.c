@@ -595,10 +595,17 @@ static void copy_from_statement(statement st) {
     case is_instruction_call:
       copy_from_call(st, instruction_call( i ));
       break;
-    case is_instruction_expression:
-      /* The second argument is not used */
-      copy_from_call(st, expression_call(instruction_expression( i )));
+    case is_instruction_expression: {
+      expression e = instruction_expression( i );
+      if(expression_call_p(e)) {
+        copy_from_call(st, expression_call(e));
+      } else {
+        pips_user_warning("Unsupported stmt expression : ");
+        print_expression(e);
+        fprintf(stderr,"\n");
+      }
       break;
+    }
     case is_instruction_goto:
       pips_error("inout_statement", "Unexpected tag %d\n", i);
       break;
@@ -866,10 +873,17 @@ static void copy_to_statement(statement st) {
     case is_instruction_call:
       copy_to_call(st, instruction_call( i ));
       break;
-    case is_instruction_expression:
-      /* The second argument is not used */
-      copy_to_call(st, expression_call(instruction_expression( i )));
+    case is_instruction_expression: {
+      expression e = instruction_expression( i );
+      if(expression_call_p(e)) {
+        copy_to_call(st, expression_call(e));
+      } else {
+        pips_user_warning("Unsupported stmt expression : ");
+        print_expression(e);
+        fprintf(stderr,"\n");
+      }
       break;
+    }
     case is_instruction_goto:
       pips_error("inout_statement", "Unexpected tag %d\n", i);
       break;
