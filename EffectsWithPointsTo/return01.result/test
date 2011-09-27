@@ -1,0 +1,154 @@
+
+PROPER  EFFECTS 
+
+int * foo()
+{
+//             <    is written>: cond i j
+   int cond = 0, i = 1, j = 2;
+   int *p, *q;
+//             <    is written>: p
+
+   p = &i;
+//             <    is written>: q
+   q = &j;
+//             <    is read   >: cond
+
+   if (cond)
+//             <    is read   >: p
+      return p;
+   else
+//             <    is read   >: q
+      return q;
+}
+int main()
+{
+   int *r;
+//             <    is written>: r
+   r = foo();
+
+   return 0;
+}
+int *foo();
+
+int main();
+
+POINTS-TO
+
+
+// Points To: none
+
+int * foo()
+{
+
+// Points To: none
+
+   int cond = 0, i = 1, j = 2;
+
+// Points To: none
+
+   int *p, *q;
+
+// Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+
+   p = &i;
+
+// Points To:
+// p -> i , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   q = &j;
+
+// Points To:
+// p -> i , EXACT
+// q -> j , EXACT
+
+
+   if (cond)
+
+// Points To:
+// p -> i , EXACT
+// q -> j , EXACT
+
+      return p;
+   else
+
+// Points To:
+// p -> i , EXACT
+// q -> j , EXACT
+
+      return q;
+}
+
+// Points To: none
+
+int main()
+{
+
+// Points To: none
+
+   int *r;
+
+// Points To:
+// r -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   r = foo();
+
+// Points To:
+// r -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
+
+
+   return 0;
+}
+
+// Points To: none
+
+
+// Points To: none
+
+int *foo();
+
+
+// Points To: none
+
+int main();
+
+PROPER  EFFECTS WITH POINTS TO
+
+int * foo()
+{
+//             <    is written>: cond i j
+   int cond = 0, i = 1, j = 2;
+   int *p, *q;
+//             <    is written>: p
+
+   p = &i;
+//             <    is written>: q
+   q = &j;
+//             <    is read   >: cond
+
+   if (cond)
+//             <    is read   >: p
+      return p;
+   else
+//             <    is read   >: q
+      return q;
+}
+int main()
+{
+   int *r;
+//             <    is written>: r
+   r = foo();
+
+   return 0;
+}
+int *foo();
+
+int main();
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************
