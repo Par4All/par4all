@@ -661,7 +661,9 @@ static void localize_declaration_walker(statement s, localize_ctx *ctx) {
 
         FOREACH(ENTITY,e,locals)
         {
-          if(!entity_in_list_p(e,sd) && !(skip_loop_indices && set_belong_p(li,e))) {
+          if(!entity_in_list_p(e,sd)
+	     && !same_entity_p(e,loop_index(l)) // do not localize this one, or initialize its value!
+	     && !(skip_loop_indices && set_belong_p(li,e))) {
             /* create a new name for the local entity */
             entity new_entity = make_localized_entity(e,ctx);
             pips_debug(1,"Creating localized entity : %s (from %s)\n",entity_name(new_entity), entity_name(e));
@@ -669,10 +671,7 @@ static void localize_declaration_walker(statement s, localize_ctx *ctx) {
             entity_type(new_entity)=copy_type(entity_type(e));
             entity_initial(new_entity) = make_value_unknown();
             /* add the variable to the loop body if it's not an index */
-            AddLocalEntityToDeclarations(new_entity,get_current_module_entity(),
-                                         same_entity_p(e,loop_index(l))?
-                                                                        s:
-                                                                        loop_body(l));
+            AddLocalEntityToDeclarations(new_entity,get_current_module_entity(), loop_body(l));
 
             list previous_replacements = hash_get(ctx->old_entity_to_new,e);
             if( previous_replacements == HASH_UNDEFINED_VALUE )
