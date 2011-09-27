@@ -251,6 +251,10 @@ void replace_entity_effects_walker(statement s, void *_thecouple ) {
 /* temporary block statement for candidate fused body */
 static statement fused_statement = statement_undefined;
 
+/* current ordering for generated statement */
+static int next_ordering = 999999;
+
+
 /*
  * Allocate a temporary block statement for sequence.
  */
@@ -258,7 +262,7 @@ static statement make_temporary_fused_statement(list sequence) {
   if(statement_undefined_p(fused_statement)) {
     // Construct the fused sequence
     fused_statement = make_block_statement(sequence);
-    statement_ordering( fused_statement) = 999999999; // FIXME : dirty
+    statement_ordering( fused_statement) = next_ordering++; // FIXME : dirty
     pips_assert("ordering defined", ordering_to_statement_initialized_p());
     overwrite_ordering_of_the_statement_to_current_mapping(fused_statement);
 
@@ -357,6 +361,8 @@ static bool fusion_loops(statement sloop1,
   if(!statement_sequence_p(body_loop1)) {
     loop_body(loop1) = make_block_statement(CONS(statement, body_loop1, NIL ));
     body_loop1 = loop_body(loop1);
+    statement_ordering( body_loop1 ) = next_ordering++; // FIXME : dirty
+    overwrite_ordering_of_the_statement_to_current_mapping( body_loop1 );
     // Fix a little bit proper effects so that chains will be happy with it
     store_proper_rw_effects_list(body_loop1, NIL);
   }
@@ -364,6 +370,8 @@ static bool fusion_loops(statement sloop1,
   if(!statement_sequence_p(body_loop2)) {
     loop_body(loop2) = make_block_statement(CONS(statement, body_loop2, NIL ));
     body_loop2 = loop_body(loop2);
+    statement_ordering( body_loop2 ) = next_ordering++; // FIXME : dirty
+    overwrite_ordering_of_the_statement_to_current_mapping( body_loop2 );
     // Fix a little bit proper effects so that chains will be happy with it
     store_proper_rw_effects_list(body_loop2, NIL);
   }
@@ -393,7 +401,7 @@ static bool fusion_loops(statement sloop1,
   // do not debug on/off all the time : costly (read environment + atoi )?
   //debug_on("RICEDG_DEBUG_LEVEL");
   graph candidate_dg = compute_dg_on_statement_from_chains(sloop1, chains);
-  //debug_off();
+  // debug_off();
 
   // Cleaning
   clean_enclosing_loops();
@@ -737,6 +745,17 @@ static set prune_successors_tree(fusion_block b) {
   return full_succ;
 }
 
+
+static void get_all_path_heads(fusion_block b, set heads) {
+  if(set_empty_p(b->predecessors)) {
+    set_add_element(heads,heads,b);
+  } else {
+    SET_FOREACH(fusion_block,pred,b->predecessors) {
+      get_all_path_heads(pred,heads);
+    }
+  }
+}
+
 /**
  * Merge two blocks (successors, predecessors, statements).
  */
@@ -797,7 +816,18 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
   set_del_element(block1->rr_predecessors, block1->rr_predecessors, block1);
   set_del_element(block1->rr_successors, block1->rr_successors, block1);
 
+
   block2->num = -1; // Disable block, will be garbage collected
+
+  // Fix the graph to be a tree
+  // Fixme : Heavy :-(
+  set heads = set_make(set_pointer);
+  get_all_path_heads(block1,heads);
+  SET_FOREACH(fusion_block,b,heads) {
+    set_free(prune_successors_tree(b));
+  }
+  set_free(heads);
+
 
   ifdebug(4) {
     pips_debug(4,"After merge :\n");
@@ -1107,7 +1137,7 @@ restart_loop: ;
        */
       list new_stmts = NIL;
 
-      ifdebug(4) {
+      ifdebug(3) {
         pips_debug(0,"Before regeneration\n");
         print_blocks(block_list);
       }
