@@ -19,6 +19,11 @@ int * foo()
    else
 //             <    is read   >: q
       return q;
+//             <    is written>: q
+
+   q = &cond;
+//             <    is read   >: q
+   return q;
 }
 int main()
 {
@@ -80,6 +85,19 @@ int * foo()
 // q -> j , EXACT
 
       return q;
+
+// Points To:
+// p -> i , EXACT
+// q -> j , EXACT
+
+
+   q = &cond;
+
+// Points To:
+// p -> i , EXACT
+// q -> cond , EXACT
+
+   return q;
 }
 
 // Points To: none
@@ -135,6 +153,11 @@ int * foo()
    else
 //             <    is read   >: q
       return q;
+//             <    is written>: q
+
+   q = &cond;
+//             <    is read   >: q
+   return q;
 }
 int main()
 {
