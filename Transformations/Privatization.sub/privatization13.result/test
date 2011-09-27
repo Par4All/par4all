@@ -26,24 +26,21 @@ int main()
 #
 int main()
 {
+   int i;
    int a[10][10];
-   {
-      //PIPS generated variable
-      int i;
-      
-      // tmp must be declared as private for the parallel loop
-      // even if it initially belongs to the loop locals of the
-      // inner loop which is not parallel
+   
+   // tmp must be declared as private for the parallel loop
+   // even if it initially belongs to the loop locals of the
+   // inner loop which is not parallel
 #pragma omp for private(i)
-      for(i = 0; i <= 9; i += 1) {
-         //PIPS generated variable
-         int j, tmp;
-         a[i][0] = i;
+   for(i = 0; i <= 9; i += 1) {
+      //PIPS generated variable
+      int j, tmp;
+      a[i][0] = i;
 #pragma omp for private(j,tmp)
-         for(j = 1; j <= 9; j += 1) {
-            tmp = a[i][j-1];
-            a[i][j] = tmp+j;
-         }
+      for(j = 1; j <= 9; j += 1) {
+         tmp = a[i][j-1];
+         a[i][j] = tmp+j;
       }
    }
    return 0;

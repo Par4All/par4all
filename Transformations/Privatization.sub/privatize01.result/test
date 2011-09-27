@@ -13,11 +13,8 @@ void papy_boom()
 #
 void papy_boom()
 {
-   {
-      //PIPS generated variable
-      int i1;
-#pragma omp for private(i1)
-      for(i1 = 0; i1 <= 9; i1 += 1)
-         printf("%i", i1);
-   }
+   int i = 0;
+#pragma omp for private(i)
+   for(i = 0; i <= 9; i += 1)
+      printf("%i", i);
 }

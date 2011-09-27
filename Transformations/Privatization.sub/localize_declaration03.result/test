@@ -22,20 +22,17 @@ void getimage(char *filename)
 #
 void getimage(char *filename)
 {
-   {
-      //PIPS generated variable
-      int i;
-      
-      /* Erase the memory, in case the image is not big enough: */
+   int i;
+   
+   /* Erase the memory, in case the image is not big enough: */
 #pragma omp for private(i)
-      for(i = 0; i <= 63; i += 1) {
-         //PIPS generated variable
-         int j;
+   for(i = 0; i <= 63; i += 1) {
+      //PIPS generated variable
+      int j;
 #pragma omp for private(j)
-         for(j = 0; j <= 63; j += 1) {
-            imagein[i][j].re = 0.0;
-            imagein[i][j].im = 0.0;
-         }
+      for(j = 0; j <= 63; j += 1) {
+         imagein[i][j].re = 0.0;
+         imagein[i][j].im = 0.0;
       }
    }
 }
