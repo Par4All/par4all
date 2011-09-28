@@ -80,7 +80,7 @@
   \emph{... and so many other contributors...}
 }
 
-\date{August 1996 - July 2010}
+\date{August 1996 -- \today}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -286,11 +286,11 @@ have PIPS sources somewhere on you hard drive.
 
 \begin{center}
 \noindent
-\includegraphics[scale=0.4]{eclipse/eclipse-project-creation-1.png}
+\includegraphics[scale=0.4]{eclipse/eclipse-project-creation-1}
 \end{center}
 \begin{center}
 \noindent
-\includegraphics[scale=0.35]{eclipse/eclipse-project-creation-2.png}
+\includegraphics[scale=0.35]{eclipse/eclipse-project-creation-2}
 \end{center}
 
 First use menu \textit{File} $=>$ \textit{New} $=>$ \textit{Project} or 
@@ -313,14 +313,14 @@ friendly way.
 
 \begin{center}
 \noindent
-\includegraphics[scale=0.4]{eclipse/eclipse-missing-includes.png}
+\includegraphics[scale=0.4]{eclipse/eclipse-missing-includes}
 \end{center}
 
 We are missing Newgen and Linear includes, we have only default Eclipse includes :
 
 \begin{center}
 \noindent
-\includegraphics[scale=0.4]{eclipse/eclipse-missing-includes-2.png}
+`\includegraphics[scale=0.4]{eclipse/eclipse-missing-includes-2}
 \end{center}
 
 Select project root and push \textit{alt+enter} or right click on it and select properties 
@@ -331,7 +331,7 @@ the same operation for including Newgen and Linear include dirs.
 
 \begin{center}
 \noindent
-\includegraphics[scale=0.35]{eclipse/eclipse-project-creation-add-includes.png}
+\includegraphics[scale=0.35]{eclipse/eclipse-project-creation-add-includes}
 \end{center}
 
 Validate two times and accept to rebuild the index when Eclipse ask. After index
@@ -344,7 +344,7 @@ the vertical bar just right to the code :
 
 \begin{center}
 \noindent
-\includegraphics[scale=0.4]{eclipse/eclipse-shortcut-vertical-bar.png}
+\includegraphics[scale=0.4]{eclipse/eclipse-shortcut-vertical-bar}
 \end{center}
 
 Clicking on this bar make you move inside a source file quickly, there is kind
@@ -356,7 +356,7 @@ of blue post it in chains ;-)
 
 \begin{center}
 \noindent
-\includegraphics[scale=0.4]{eclipse/eclipse-completion.png}
+\includegraphics[scale=0.4]{eclipse/eclipse-completion}
 \end{center}
 
 Eclipse provide you some completion capabilities, try to write the begin of a 
@@ -374,7 +374,7 @@ can use the star as a joker for searching symbol by their name.
 
 \begin{center}
 \noindent
-\includegraphics[scale=0.35]{eclipse/eclipse-symbol-lookup.png}
+\includegraphics[scale=0.35]{eclipse/eclipse-symbol-lookup}
 \end{center}
 
 PIPS/Newgen make high usage of macro, Eclipse has a powerful macro expansion 
@@ -1659,9 +1659,18 @@ how to run the validation. Basically, one must simply type
 or within a subdirectory. There are two main targets:
 \begin{description}
 \item[validate-out] generate \texttt{out} files in \texttt{.result}
-directories, which are to be compared to corresponding \texttt{test} file.
-\item[validate-test] overwrite \texttt{test} file, so that
-\texttt{svn diff} show the changes.
+directories, which are to be compared to corresponding \texttt{test} file;
+\item[validate-test] overwrite \texttt{test} file, so that \texttt{svn
+    diff} show the changes. This is also a way to accept the current
+  validation results by committing with \texttt{svn} the \texttt{test}
+  files you are happy with and using \texttt{svn revert} on the
+  \texttt{test} you are not to get back the initial state. Look at
+  \S~\ref{sec:intra-direct-parall} for use cases.
+
+  Note that if you are using \texttt{git} instead of \texttt{svn}, do not
+  use \texttt{validate-test} but \texttt{validate-out} with
+  \texttt{p4a\_validate -{}-accept} for example instead, as explained in
+  Par4All documentation;
 \item[validate] same as \texttt{validate-out}.
 \end{description}
 
@@ -2070,10 +2079,10 @@ but the same rules should be applied.
 Of course, it is less flexible to show information about a specific function
 among hundreds.
 
-%% FC->RK: I have not found any example of that in the validation
-Another way suggested by Erka for sharing test scripts between cases
-is to create a link to a script which uses its zeros argument for the
-test case name.
+Another way suggested by Ronan \texttt{Keryell} for sharing test scripts
+between cases is to create a link to a script which uses its 0th
+(\verb|$0| in shells)
+argument for the test case name. It is heavily used in the Par4All validation.
 
 Scripting used to be shell based when PIPS was started. It is now
 mostly \verb/tpips/ based. Such scripts should end with a close, a
@@ -2097,7 +2106,7 @@ independent as possible of each other. They shoud not use file names
 such as \verb/a.out/.
 
 
-\section{Parallel Validation}
+\subsection{Parallel Validation}
 \label{sec:par-validate}
 
 This infrastructure runs non regression tests in parallel, either at the
@@ -2161,7 +2170,9 @@ example of validation subdirectories.
 The validation makefile tries to guess whether pyps or fortran95 cases
 should be validated, and skips them otherwise.
 
-\subsection{Intra-directory parallel validation}
+
+\subsubsection{Intra-directory parallel validation}
+\label{sec:intra-direct-parall}
 
 For the intra-directory parallel validation, all validation scripts
 \textbf{must not} have \emph{side effects} that may interact
@@ -2213,7 +2224,7 @@ On can run a subset of tests based on a file prefix:
 Special targets \texttt{bug/later/default/slow-validate-test/out} allows
 to validate some subsets (later, bug, slow cases).
 
-\subsection{Inter-directory parallel validation}
+\subsubsection{Inter-directory parallel validation}
 
 For the inter-directory parallel validation, on defaults or only some
 directories by defining the \texttt{TARGET} make macro:

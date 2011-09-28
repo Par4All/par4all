@@ -68,7 +68,7 @@ static void reset_effects();
 static list load_statement_effects( statement s );
 static void inout_control();
 static void inout_statement();
-static void usedef_control();
+//static void usedef_control(); declared but never defined.
 static void genref_statement();
 static bool dd_du( effect fin, effect fout );
 static bool ud( effect fin, effect fout );
