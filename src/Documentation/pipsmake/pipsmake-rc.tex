@@ -7861,6 +7861,9 @@ array_expansion > PROGRAM.entities
   to lose parallelism when fusing outer loops from a loop nests without being
   able to fuse inner loops.
 
+  Property \PipsPropRef{LOOP_FUSION_MAX_FUSED_PER_LOOP} limit the number of fusion per loop.
+  A negative value means that no limit will be enforced.
+
   The fusion legality is checked in the standard way by comparing the
   dependence graphs obtained before and after fusion.
 
@@ -7889,6 +7892,10 @@ LOOP_FUSION_GREEDY FALSE
 
 \begin{PipsProp}{LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS}
 LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS TRUE
+\end{PipsProp}
+
+\begin{PipsProp}{LOOP_FUSION_MAX_FUSED_PER_LOOP}
+LOOP_FUSION_MAX_FUSED_PER_LOOP -1
 \end{PipsProp}
 
 
