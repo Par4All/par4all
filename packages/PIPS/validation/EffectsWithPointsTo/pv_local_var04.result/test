@@ -122,5 +122,9 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	12 --> 19 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+		from <a-W-EXACT> to <a-R-EXACT>
+		from <a-R-EXACT> to <a-W-EXACT>
 
 ****************** End of Dependence Graph ******************

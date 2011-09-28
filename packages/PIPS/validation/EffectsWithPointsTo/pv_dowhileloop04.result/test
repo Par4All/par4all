@@ -90,24 +90,24 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	04 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 11 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 12 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	10 --> 10 with conflicts
+		from <p[i]-W-EXACT> to <p[i]-W-EXACT>
+	10 --> 11 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	11 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
 	11 --> 11 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
 		from <i-R-EXACT> to <i-W-EXACT>
-	11 --> 10 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	10 --> 11 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	10 --> 10 with conflicts
-		from <p[i]-W-EXACT> to <p[i]-W-EXACT>
 	12 --> 11 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
-	04 --> 11 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-		from <i-W-EXACT> to <i-R-EXACT>
-	04 --> 10 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	04 --> 12 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -150,25 +150,27 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	12 --> 13 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <x-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
+	05 --> 12 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	06 --> 12 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	08 --> 11 with conflicts
+		from <z-W-EXACT> to <z-W-EXACT>
+	08 --> 12 with conflicts
+		from <z-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <z-W-EXACT> to <z-R-EXACT>
+	09 --> 11 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+	09 --> 12 with conflicts
+		from <t-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 12 with conflicts
 		from <z-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <z-W-EXACT> to <z-R-EXACT>
 		from <t-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	09 --> 12 with conflicts
-		from <t-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	09 --> 11 with conflicts
-		from <t-W-EXACT> to <t-R-EXACT>
-	08 --> 12 with conflicts
-		from <z-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <z-W-EXACT> to <z-R-EXACT>
-	08 --> 11 with conflicts
-		from <z-W-EXACT> to <z-W-EXACT>
-	06 --> 12 with conflicts
-		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	05 --> 12 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	12 --> 13 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <x-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 
 ****************** End of Dependence Graph ******************

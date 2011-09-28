@@ -172,21 +172,19 @@ init_kernel:   init_kernel(imagein_re);
 
 void init_kernel(float imagein_re[64][64])
 {
-   {
-      //PIPS generated variable
-      int i;
+   //PIPS generated variable
+   int i;
 
-init_kernel:      ;
-      for(i = 0; i <= 63; i += 1) {
-         //PIPS generated variable
-         int j;
-         for(j = 0; j <= 63; j += 1)
+init_kernel:   ;
+   for(i = 0; i <= 63; i += 1) {
+      //PIPS generated variable
+      int j;
+      for(j = 0; j <= 63; j += 1)
 
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 
-            imagein_re[i][j] = 2*i;
-      }
+         imagein_re[i][j] = 2*i;
    }
 }
 
@@ -195,21 +193,19 @@ init_kernel:      ;
 
 void init_kernel(float imagein_re[64][64])
 {
-   {
-      //PIPS generated variable
-      int i;
+   //PIPS generated variable
+   int i;
 
-init_kernel:      ;
-      for(i = 0; i <= 63; i += 1) {
-         //PIPS generated variable
-         int j;
-         for(j = 0; j <= 63; j += 1)
+init_kernel:   ;
+   for(i = 0; i <= 63; i += 1) {
+      //PIPS generated variable
+      int j;
+      for(j = 0; j <= 63; j += 1)
 
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 
-            imagein_re[i][j] = 2*i;
-      }
+         imagein_re[i][j] = 2*i;
    }
 }
 
@@ -218,23 +214,21 @@ init_kernel:      ;
 
 void init_kernel(float imagein_re[64][64])
 {
-   {
-      //PIPS generated variable
-      int i;
+   //PIPS generated variable
+   int i;
 
-init_kernel:      ;
+init_kernel:   ;
 #pragma omp parallel for 
-      for(i = 0; i <= 63; i += 1) {
-         //PIPS generated variable
-         int j;
+   for(i = 0; i <= 63; i += 1) {
+      //PIPS generated variable
+      int j;
 #pragma omp parallel for 
-         for(j = 0; j <= 63; j += 1)
+      for(j = 0; j <= 63; j += 1)
 
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 
-            imagein_re[i][j] = 2*i;
-      }
+         imagein_re[i][j] = 2*i;
    }
 }
 
@@ -250,17 +244,15 @@ init_kernel:      ;
 
 int main(int argc, char *argv[])
 {
+   int i;
 
 init_kernel:   init_kernel(imagein_re);
-   {
-      //PIPS generated variable
-      int i;
 
-      for(i = 0; i <= 63; i += 1) {
-         //PIPS generated variable
-         int j;
-         printf("Line %d:\n");
-         for(j = 0; j <= 63; j += 1)
+   for(i = 0; i <= 63; i += 1) {
+      //PIPS generated variable
+      int j;
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
 
 //  <imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
@@ -270,9 +262,8 @@ init_kernel:   init_kernel(imagein_re);
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
-            printf("%d ", imagein_re[i][j]);
-         puts("\n");
-      }
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
    }
 
    return 0;

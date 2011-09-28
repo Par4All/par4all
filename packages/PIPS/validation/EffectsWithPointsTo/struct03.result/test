@@ -94,11 +94,11 @@ int struct03()
 
  *********************** Use-Def Chains *********************
 
-	15 --> 15 with conflicts
-		from <x[i].deux.second-W-EXACT> to <x[i].deux.second-W-EXACT>
-	14 --> 14 with conflicts
-		from <x[i].un.first-W-EXACT> to <x[i].un.first-W-EXACT>
 	11 --> 13 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
+	14 --> 14 with conflicts
+		from <x[i].un.first-W-EXACT> to <x[i].un.first-W-EXACT>
+	15 --> 15 with conflicts
+		from <x[i].deux.second-W-EXACT> to <x[i].deux.second-W-EXACT>
 
 ****************** End of Dependence Graph ******************

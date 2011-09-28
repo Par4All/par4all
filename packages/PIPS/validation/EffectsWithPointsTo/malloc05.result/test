@@ -28,31 +28,31 @@ POINTS-TO
 
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 
 int main(int argc, char *argv[])
 {
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 
    int *pi;
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    float *px;
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 
    float *pz;
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
 // pz -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
    int (*pt)[30];
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 // pi -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // pt -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
    pi = (int *) malloc(sizeof(int));
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 // pi -> *HEAP*_l_13 , EXACT
 // pt -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *ANY_MODULE*:*NOWHERE*_b1 , EXACT
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
    px = (float *) malloc(sizeof(float));
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 // pi -> *HEAP*_l_13 , EXACT
 // pt -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *HEAP*_l_14 , EXACT
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
    pz = (float *) malloc(sizeof(float));
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 // pi -> *HEAP*_l_13 , EXACT
 // pt -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // px -> *HEAP*_l_14 , EXACT
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
    pt = (int (*)[30]) malloc(sizeof(*pt));
 
 // Points To:
-// argv[*] -> _argv_1[0] , EXACT
+// argv[*] -> _argv_2[0] , EXACT
 // pi -> *HEAP*_l_13 , EXACT
 // pt -> *HEAP*_l_16[0] , EXACT
 // px -> *HEAP*_l_14 , EXACT
@@ -134,21 +134,15 @@ int main(int argc, char *argv[])
 
  *********************** Use-Def Chains *********************
 
-	15 --> 16 with conflicts
+	13 --> 14 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	14 --> 16 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 	14 --> 15 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	13 --> 16 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	13 --> 15 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	13 --> 14 with conflicts
+	15 --> 16 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>

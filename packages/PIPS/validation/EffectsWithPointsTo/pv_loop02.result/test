@@ -78,9 +78,9 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	10 --> 10 with conflicts
-		from <*HEAP*_l_7[i]-W-EXACT> to <*HEAP*_l_7[i]-W-EXACT>
 	07 --> 10 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
+	10 --> 10 with conflicts
+		from <*HEAP*_l_7[i]-W-EXACT> to <*HEAP*_l_7[i]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -15,17 +15,13 @@ void pas_vous()
 #
 void pas_vous()
 {
-   int k;
-   {
-      //PIPS generated variable
-      int i;
+   int i, k;
 #pragma omp for private(i)
-      for(i = 0; i <= k-1; i += 1) {
-         //PIPS generated variable
-         int j;
+   for(i = 0; i <= k-1; i += 1) {
+      //PIPS generated variable
+      int j;
 #pragma omp for private(j)
-         for(j = 12; j <= i-1; j += 1)
-            printf("%d", j);
-      }
+      for(j = 12; j <= i-1; j += 1)
+         printf("%d", j);
    }
 }

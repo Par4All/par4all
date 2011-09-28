@@ -143,47 +143,47 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	14 --> 14 with conflicts
+	04 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 12 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 14 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
-		from <i-R-EXACT> to <i-W-EXACT>
-	14 --> 12 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	13 --> 13 with conflicts
-		from <q-W-EXACT> to <q-W-EXACT>
-		from <q-W-EXACT> to <q-R-EXACT>
-		from <q-R-EXACT> to <q-W-EXACT>
-	13 --> 12 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
-	12 --> 14 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	12 --> 13 with conflicts
-		from <q-R-EXACT> to <q-W-EXACT>
-	12 --> 12 with conflicts
-		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
-		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
-		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
-		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
-	10 --> 14 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	08 --> 13 with conflicts
-		from <q-W-EXACT> to <q-W-EXACT>
-		from <q-W-EXACT> to <q-R-EXACT>
-	08 --> 12 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
+	07 --> 08 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
 	07 --> 17 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	07 --> 08 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	04 --> 14 with conflicts
+	08 --> 12 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	08 --> 13 with conflicts
+		from <q-W-EXACT> to <q-W-EXACT>
+		from <q-W-EXACT> to <q-R-EXACT>
+	10 --> 14 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	12 --> 12 with conflicts
+		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
+		from <*HEAP*_l_7[0]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
+		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[0]-W-MAY>
+		from <*HEAP*_l_7[*]-W-MAY> to <*HEAP*_l_7[*]-W-MAY>
+	12 --> 13 with conflicts
+		from <q-R-EXACT> to <q-W-EXACT>
+	12 --> 14 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	13 --> 12 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	13 --> 13 with conflicts
+		from <q-W-EXACT> to <q-W-EXACT>
+		from <q-W-EXACT> to <q-R-EXACT>
+		from <q-R-EXACT> to <q-W-EXACT>
+	14 --> 12 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	14 --> 14 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
-	04 --> 12 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	04 --> 10 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************

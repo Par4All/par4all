@@ -113,12 +113,6 @@ int main()
 		from <t-W-EXACT> to <t-W-EXACT>
 		from <t-W-EXACT> to <t-R-EXACT>
 		from <t-R-EXACT> to <t-W-EXACT>
-	11 --> 11 with conflicts
-		from <p[i]-W-EXACT> to <p[i]-W-EXACT>
-	11 --> 10 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	10 --> 10 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
 	-1 --> -1 with conflicts
 		from <t-R-EXACT> to <t-W-EXACT>
 	-1 --> -1 with conflicts
@@ -126,5 +120,11 @@ int main()
 		from <t-W-EXACT> to <t-R-EXACT>
 	-1 --> -1 with conflicts
 		from <t-W-EXACT> to <t-R-EXACT>
+	10 --> 10 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	11 --> 10 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	11 --> 11 with conflicts
+		from <p[i]-W-EXACT> to <p[i]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

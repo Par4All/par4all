@@ -26,16 +26,13 @@ void privatize_local_variable()
 #
 void privatize_function_params(float sum)
 {
+   int j;
    float a[10];
-   {
+#pragma omp for private(j)
+   for(j = 0; j <= 9; j += 1) {
       //PIPS generated variable
-      int j1;
-#pragma omp for private(j1)
-      for(j1 = 0; j1 <= 9; j1 += 1) {
-         //PIPS generated variable
-         float sum;
-         sum += a[10];
-      }
+      float sum;
+      sum += a[10];
    }
 }
 #
@@ -43,15 +40,12 @@ void privatize_function_params(float sum)
 #
 void privatize_local_variable()
 {
+   int j;
    float a[10];
-   {
+#pragma omp for private(j)
+   for(j = 0; j <= 9; j += 1) {
       //PIPS generated variable
-      int j1;
-#pragma omp for private(j1)
-      for(j1 = 0; j1 <= 9; j1 += 1) {
-         //PIPS generated variable
-         float sum1;
-         sum1 += a[10];
-      }
+      float sum1;
+      sum1 += a[10];
    }
 }

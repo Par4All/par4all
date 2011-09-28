@@ -391,8 +391,6 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	64 --> 65 with conflicts
-		from <ret-W-EXACT> to <ret-W-EXACT>
 	63 --> 64 with conflicts
 		from <ret-W-EXACT> to <ret-W-EXACT>
 		from <a[1][3]-W-EXACT> to <a[1][3]-W-EXACT>
@@ -401,5 +399,7 @@ int main()
 		from <a[0][3]-W-EXACT> to <a[0][3]-R-EXACT>
 		from <a[1][3]-R-EXACT> to <a[1][3]-W-EXACT>
 		from <a[0][3]-R-EXACT> to <a[0][3]-W-EXACT>
+	64 --> 65 with conflicts
+		from <ret-W-EXACT> to <ret-W-EXACT>
 
 ****************** End of Dependence Graph ******************

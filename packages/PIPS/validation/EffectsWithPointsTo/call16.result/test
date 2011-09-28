@@ -27,17 +27,17 @@ POINTS-TO
 
 
 // Points To:
-// _a -> __a_1[0] , EXACT
-// _b -> __b_2[0] , EXACT
-// _c -> __c_3[0] , EXACT
+// _a -> __a_2[0] , EXACT
+// _b -> __b_3[0] , EXACT
+// _c -> __c_4[0] , EXACT
 
 void call16(int _i, int *_a, int *_b, int *_c)
 {
 
 // Points To:
-// _a -> __a_1[0] , EXACT
-// _b -> __b_2[0] , EXACT
-// _c -> __c_3[0] , EXACT
+// _a -> __a_2[0] , EXACT
+// _b -> __b_3[0] , EXACT
+// _c -> __c_4[0] , EXACT
 
    _a[_i] = _b[_i]+_c[_i];
 }
@@ -55,38 +55,38 @@ void call16(int _i, int *_a, int *_b, int *_c);
 void dotprod(int *a, int *b, int *c);
 
 // Points To:
-// a -> _a_4[0] , EXACT
-// b -> _b_5[0] , EXACT
-// c -> _c_6[0] , EXACT
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
 void dotprod(int *a, int *b, int *c)
 {
 
 // Points To:
-// a -> _a_4[0] , EXACT
-// b -> _b_5[0] , EXACT
-// c -> _c_6[0] , EXACT
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
    int i;
 
 // Points To:
-// a -> _a_4[0] , EXACT
-// b -> _b_5[0] , EXACT
-// c -> _c_6[0] , EXACT
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
    for(i = 0; i <= 999999; i += 1)
 
 // Points To:
-// a -> _a_4[0] , EXACT
-// b -> _b_5[0] , EXACT
-// c -> _c_6[0] , EXACT
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
       call16(i, a, b, c);
 
 // Points To:
-// a -> _a_4[0] , EXACT
-// b -> _b_5[0] , EXACT
-// c -> _c_6[0] , EXACT
+// a -> _a_1[0] , EXACT
+// b -> _b_2[0] , EXACT
+// c -> _c_3[0] , EXACT
 
    
    
@@ -97,8 +97,8 @@ PROPER  EFFECTS WITH POINTS TO
 
 void call16(int _i, int *_a, int *_b, int *_c)
 {
-//             <    is read   >: __b_2[_i] __c_3[_i] _a _b _c _i
-//             <    is written>: __a_1[_i]
+//             <    is read   >: __b_3[_i] __c_4[_i] _a _b _c _i
+//             <    is written>: __a_2[_i]
    _a[_i] = _b[_i]+_c[_i];
 }
 void call16(int _i, int *_a, int *_b, int *_c);
@@ -109,8 +109,8 @@ void dotprod(int *a, int *b, int *c)
    int i;
 //             <    is written>: i
    for(i = 0; i <= 999999; i += 1)
-//             <may be read   >: _b_5[*] _c_6[*]
-//             <may be written>: _a_4[*]
+//             <may be read   >: _b_2[*] _c_3[*]
+//             <may be written>: _a_1[*]
 //             <    is read   >: a b c i
       call16(i, a, b, c);
    
@@ -121,6 +121,6 @@ void dotprod(int *a, int *b, int *c)
  *********************** Use-Def Chains *********************
 
 	11 --> 11 with conflicts
-		from <_a_4[*]-W-MAY> to <_a_4[*]-W-MAY>
+		from <_a_1[*]-W-MAY> to <_a_1[*]-W-MAY>
 
 ****************** End of Dependence Graph ******************
