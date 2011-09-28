@@ -269,6 +269,7 @@ static statement make_temporary_fused_statement(list sequence) {
     // Fix a little bit proper effects so that chains will be happy with it
     store_proper_rw_effects_list(fused_statement, NIL);
   } else {
+    delete_rw_effects(fused_statement);
     sequence_statements(instruction_sequence(statement_instruction(fused_statement))) = sequence;
   }
   return fused_statement;
@@ -279,6 +280,7 @@ static statement make_temporary_fused_statement(list sequence) {
  */
 static void free_temporary_fused_statement() {
   if(!statement_undefined_p(fused_statement)) {
+
     sequence_statements(instruction_sequence(statement_instruction(fused_statement))) = NIL;
     free_statement(fused_statement);
     fused_statement = statement_undefined;
@@ -364,7 +366,8 @@ static bool fusion_loops(statement sloop1,
     statement_ordering( body_loop1 ) = next_ordering++; // FIXME : dirty
     overwrite_ordering_of_the_statement_to_current_mapping( body_loop1 );
     // Fix a little bit proper effects so that chains will be happy with it
-    store_proper_rw_effects_list(body_loop1, NIL);
+    store_proper_rw_effects_list(body_loop1, NIL); // FIXME should lead to a call to delete_rw_effects();
+
   }
 
   if(!statement_sequence_p(body_loop2)) {
@@ -373,7 +376,7 @@ static bool fusion_loops(statement sloop1,
     statement_ordering( body_loop2 ) = next_ordering++; // FIXME : dirty
     overwrite_ordering_of_the_statement_to_current_mapping( body_loop2 );
     // Fix a little bit proper effects so that chains will be happy with it
-    store_proper_rw_effects_list(body_loop2, NIL);
+    store_proper_rw_effects_list(body_loop2, NIL); // FIXME should lead to a call to delete_rw_effects();
   }
 
   // Build a list with the statements from loop 1 followed by stmts for loop 2
