@@ -225,15 +225,15 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	17 --> 18 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	15 --> 18 with conflicts
-		from <p_1-W-EXACT> to <p_1-R-EXACT>
-	13 --> 18 with conflicts
-		from <p_2-W-EXACT> to <p_2-R-EXACT>
-	12 --> 18 with conflicts
-		from <q_3-W-EXACT> to <q_3-R-EXACT>
 	11 --> 18 with conflicts
 		from <p_3-W-EXACT> to <p_3-W-EXACT>
+	12 --> 18 with conflicts
+		from <q_3-W-EXACT> to <q_3-R-EXACT>
+	13 --> 18 with conflicts
+		from <p_2-W-EXACT> to <p_2-R-EXACT>
+	15 --> 18 with conflicts
+		from <p_1-W-EXACT> to <p_1-R-EXACT>
+	17 --> 18 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
 
 ****************** End of Dependence Graph ******************

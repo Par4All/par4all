@@ -119,22 +119,20 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	11 --> 13 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-		from <p-W-EXACT> to <p-R-EXACT>
-		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	11 --> 12 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	09 --> 13 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	09 --> 12 with conflicts
+	09 --> 10 with conflicts
 		from <q-W-EXACT> to <q-R-EXACT>
 	09 --> 11 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	09 --> 10 with conflicts
+	09 --> 12 with conflicts
 		from <q-W-EXACT> to <q-R-EXACT>
+	11 --> 12 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	11 --> 13 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 
 ****************** End of Dependence Graph ******************

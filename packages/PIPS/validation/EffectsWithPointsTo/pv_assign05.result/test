@@ -122,21 +122,21 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	09 --> 10 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[0]-R-EXACT>
+	07 --> 09 with conflicts
+		from <s2.a-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 10 with conflicts
-		from <s2.b[0]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[0]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 09 with conflicts
-		from <s2.b[0]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[0]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	07 --> 10 with conflicts
 		from <s2.a-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 09 with conflicts
-		from <s2.a-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	08 --> 09 with conflicts
+		from <s2.b[0]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <s1.b[0]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	08 --> 10 with conflicts
+		from <s2.b[0]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <s1.b[0]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	09 --> 10 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[0]-R-EXACT>
 		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

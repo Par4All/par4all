@@ -120,6 +120,15 @@ int main()
 		from <p-R-EXACT> to <p-W-EXACT>
 	-1 --> 11 with conflicts
 		from <p-W-EXACT> to <p-R-EXACT>
+	-1 --> -1 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	-1 --> -1 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	-1 --> 11 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> -1 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
 	11 --> -1 with conflicts
 		from <p-R-EXACT> to <p-W-EXACT>
 	11 --> 11 with conflicts
@@ -127,14 +136,5 @@ int main()
 		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
 		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
 		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
-	-1 --> -1 with conflicts
-		from <p-W-EXACT> to <p-W-EXACT>
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> 11 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	-1 --> -1 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	08 --> -1 with conflicts
-		from <a-W-EXACT> to <a-R-EXACT>
 
 ****************** End of Dependence Graph ******************

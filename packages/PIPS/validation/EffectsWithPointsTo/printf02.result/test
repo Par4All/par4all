@@ -58,9 +58,9 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	06 --> 08 with conflicts
-		from <j-W-EXACT> to <j-R-EXACT>
 	05 --> 08 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>
+	06 --> 08 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
 
 ****************** End of Dependence Graph ******************

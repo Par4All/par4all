@@ -32,12 +32,11 @@ compute:   do {
 int main(int argc, char *argv[])
 {
    float b[N], c[N], a;
+   int i;
 
    a = 0;
 
 init:   do {
-      //PIPS generated variable
-      int i;
 #pragma omp for private(i)
       for(i = 0; i <= 999999; i += 1) {
          b[i] = i;
@@ -46,8 +45,6 @@ init:   do {
    }
    while (1);
 compute:   do {
-      //PIPS generated variable
-      int i;
 #pragma omp for private(i)
       for(i = 0; i <= 999999; i += 1)
          a = a+b[i]*c[i];

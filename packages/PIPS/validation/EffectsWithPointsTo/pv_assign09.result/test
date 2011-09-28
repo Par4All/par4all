@@ -77,14 +77,14 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	12 --> 13 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	12 --> 14 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
 	13 --> 14 with conflicts
 		from <a-W-EXACT> to <a-R-EXACT>
 		from <i-R-EXACT> to <i-W-EXACT>
 		from <b[i]-R-EXACT> to <b[++i]-W-EXACT>
-	12 --> 14 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-		from <i-W-EXACT> to <i-R-EXACT>
-	12 --> 13 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
 
 ****************** End of Dependence Graph ******************

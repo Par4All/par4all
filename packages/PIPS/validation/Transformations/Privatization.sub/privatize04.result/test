@@ -21,21 +21,17 @@ void c_est_dommage()
 #
 void c_est_dommage()
 {
-   int j, l;
-   {
-      //PIPS generated variable
-      int i;
+   int i, j, l;
 #pragma omp for private(i)
-      for(i = 0; i <= 1; i += 1) {
-         //PIPS generated variable
-         int j, k;
-         j = 12;
-         k = 22;
+   for(i = 0; i <= 1; i += 1) {
+      //PIPS generated variable
+      int j, k;
+      j = 12;
+      k = 22;
 #pragma omp for private(j,k)
-         for(j = 4; j >= 1; j += -5) {
-            k = 23;
-            l = k*2+j;
-         }
+      for(j = 4; j >= 1; j += -5) {
+         k = 23;
+         l = k*2+j;
       }
    }
    j = l;

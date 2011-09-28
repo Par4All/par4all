@@ -204,27 +204,29 @@ static int alea(void)
 
  *********************** Use-Def Chains *********************
 
-	24 --> 25 with conflicts
-		from <pi2-W-MAY> to <pi2-R-EXACT>
-		from <pi1-W-MAY> to <pi1-R-EXACT>
-	23 --> 25 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
-	23 --> 24 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
-	21 --> 25 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
-	21 --> 24 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
+	16 --> 24 with conflicts
+		from <pi1-W-EXACT> to <pi1-W-MAY>
+	16 --> 25 with conflicts
+		from <pi1-W-EXACT> to <pi1-R-EXACT>
+	17 --> 24 with conflicts
+		from <pi2-W-EXACT> to <pi2-W-MAY>
+	17 --> 25 with conflicts
+		from <pi2-W-EXACT> to <pi2-R-EXACT>
 	19 --> 20 with conflicts
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
-	17 --> 25 with conflicts
-		from <pi2-W-EXACT> to <pi2-R-EXACT>
-	17 --> 24 with conflicts
-		from <pi2-W-EXACT> to <pi2-W-MAY>
-	16 --> 25 with conflicts
-		from <pi1-W-EXACT> to <pi1-R-EXACT>
-	16 --> 24 with conflicts
-		from <pi1-W-EXACT> to <pi1-W-MAY>
+	21 --> 23 with conflicts
+		from <pp-W-EXACT> to <pp-W-EXACT>
+	21 --> 24 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	21 --> 25 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	23 --> 24 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	23 --> 25 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	24 --> 25 with conflicts
+		from <pi2-W-MAY> to <pi2-R-EXACT>
+		from <pi1-W-MAY> to <pi1-R-EXACT>
 
 ****************** End of Dependence Graph ******************

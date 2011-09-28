@@ -134,18 +134,24 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	17 --> 17 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
+	11 --> 16 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	12 --> 16 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	13 --> 14 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>
-		from <i-R-EXACT> to <i-W-EXACT>
-	17 --> 16 with conflicts
+	13 --> 16 with conflicts
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	13 --> 17 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	14 --> 16 with conflicts
 		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	16 --> 17 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <i-W-EXACT>
+	14 --> 17 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
 	16 --> 16 with conflicts
 		from <a[0]-W-MAY> to <a[0]-W-MAY>
 		from <a[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -156,23 +162,17 @@ int main()
 		from <b[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <a[0]-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	14 --> 17 with conflicts
-		from <i-R-EXACT> to <i-W-EXACT>
-	14 --> 16 with conflicts
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	13 --> 17 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
-		from <i-W-EXACT> to <i-R-EXACT>
-	13 --> 16 with conflicts
+	16 --> 17 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <i-W-EXACT>
+	17 --> 16 with conflicts
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	13 --> 14 with conflicts
+		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	17 --> 17 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
-	12 --> 16 with conflicts
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	11 --> 16 with conflicts
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <i-R-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -173,51 +173,54 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	17 --> 23 with conflicts
+	05 --> 21 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+	05 --> 23 with conflicts
+		from <l-W-EXACT> to <l-R-EXACT>
+	08 --> 17 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+	08 --> 20 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+	08 --> 21 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 22 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+	09 --> 17 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+	09 --> 20 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+	09 --> 22 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+	09 --> 23 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 		from <r-W-EXACT> to <r-R-EXACT>
-	17 --> 22 with conflicts
+	10 --> 17 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	10 --> 20 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	10 --> 22 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	11 --> 17 with conflicts
+		from <s-W-EXACT> to <s-R-EXACT>
+	11 --> 20 with conflicts
+		from <s-W-EXACT> to <s-R-EXACT>
+	11 --> 22 with conflicts
+		from <s-W-EXACT> to <s-R-EXACT>
+	17 --> 20 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 		from <p-W-EXACT> to <p-W-EXACT>
 	17 --> 21 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
-	17 --> 20 with conflicts
+	17 --> 22 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 		from <p-W-EXACT> to <p-W-EXACT>
-	11 --> 22 with conflicts
-		from <s-W-EXACT> to <s-R-EXACT>
-	11 --> 20 with conflicts
-		from <s-W-EXACT> to <s-R-EXACT>
-	11 --> 17 with conflicts
-		from <s-W-EXACT> to <s-R-EXACT>
-	10 --> 22 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
-	10 --> 20 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
-	10 --> 17 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
-	09 --> 23 with conflicts
+	17 --> 23 with conflicts
 		from <r-W-EXACT> to <r-W-EXACT>
 		from <r-W-EXACT> to <r-R-EXACT>
-	09 --> 22 with conflicts
-		from <r-W-EXACT> to <r-W-EXACT>
-	09 --> 20 with conflicts
-		from <r-W-EXACT> to <r-W-EXACT>
-	09 --> 17 with conflicts
-		from <r-W-EXACT> to <r-W-EXACT>
-	08 --> 22 with conflicts
+	21 --> 22 with conflicts
 		from <p-W-EXACT> to <p-W-EXACT>
-	08 --> 21 with conflicts
-		from <p-W-EXACT> to <p-W-EXACT>
-		from <p-W-EXACT> to <p-R-EXACT>
-	08 --> 20 with conflicts
-		from <p-W-EXACT> to <p-W-EXACT>
-	08 --> 17 with conflicts
-		from <p-W-EXACT> to <p-W-EXACT>
-	05 --> 23 with conflicts
-		from <l-W-EXACT> to <l-R-EXACT>
-	05 --> 21 with conflicts
-		from <j-W-EXACT> to <j-R-EXACT>
+		from <p-R-EXACT> to <p-W-EXACT>
 
 ****************** End of Dependence Graph ******************

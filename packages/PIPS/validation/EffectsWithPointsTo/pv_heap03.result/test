@@ -86,14 +86,14 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	07 --> 08 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	07 --> 09 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
 	07 --> 10 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	07 --> 09 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	07 --> 08 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -112,6 +112,14 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	06 --> 08 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	07 --> 08 with conflicts
+		from <q-W-EXACT> to <q-R-MAY>
+	07 --> 10 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	08 --> 09 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
 	09 --> 10 with conflicts
 		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
@@ -119,13 +127,5 @@ int main()
 		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
 		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
 		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
-	08 --> 09 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	07 --> 10 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
-	07 --> 08 with conflicts
-		from <q-W-EXACT> to <q-R-MAY>
-	06 --> 08 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -48,8 +48,8 @@ int main()
    *p = &i;
 
 // Points To:
-// _p_1 -> i , EXACT
-// p -> _p_1 , EXACT
+// _p_22770512 -> i , EXACT
+// p -> _p_22770512 , EXACT
 
 
    return 0;

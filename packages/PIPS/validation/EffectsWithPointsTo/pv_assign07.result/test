@@ -174,21 +174,21 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	20 --> 22 with conflicts
-		from <s2p-R-EXACT> to <s2p-W-EXACT>
-	19 --> 20 with conflicts
+	13 --> 19 with conflicts
+		from <s1p-W-EXACT> to <s1p-R-EXACT>
+	14 --> 20 with conflicts
+		from <s2p-W-EXACT> to <s2p-R-EXACT>
+	14 --> 22 with conflicts
+		from <s2p-W-EXACT> to <s2p-W-EXACT>
+	16 --> 19 with conflicts
+		from <s1.a-W-EXACT> to <s1.a-W-EXACT>
+	16 --> 20 with conflicts
 		from <s1.a-W-EXACT> to <s1.a-W-EXACT>
 	17 --> 19 with conflicts
 		from <s2.a-W-EXACT> to <s2.a-R-EXACT>
-	16 --> 20 with conflicts
+	19 --> 20 with conflicts
 		from <s1.a-W-EXACT> to <s1.a-W-EXACT>
-	16 --> 19 with conflicts
-		from <s1.a-W-EXACT> to <s1.a-W-EXACT>
-	14 --> 22 with conflicts
-		from <s2p-W-EXACT> to <s2p-W-EXACT>
-	14 --> 20 with conflicts
-		from <s2p-W-EXACT> to <s2p-R-EXACT>
-	13 --> 19 with conflicts
-		from <s1p-W-EXACT> to <s1p-R-EXACT>
+	20 --> 22 with conflicts
+		from <s2p-R-EXACT> to <s2p-W-EXACT>
 
 ****************** End of Dependence Graph ******************

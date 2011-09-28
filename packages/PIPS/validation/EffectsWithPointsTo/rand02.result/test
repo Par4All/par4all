@@ -189,102 +189,94 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 
  *********************** Use-Def Chains *********************
 
-	33 --> 33 with conflicts
-		from <u-W-EXACT> to <u-W-EXACT>
-	33 --> 24 with conflicts
+	16 --> 22 with conflicts
 		from <u-W-EXACT> to <u-R-EXACT>
-	33 --> 23 with conflicts
+	16 --> 23 with conflicts
 		from <u-W-EXACT> to <u-W-EXACT>
-	33 --> 22 with conflicts
+	16 --> 24 with conflicts
 		from <u-W-EXACT> to <u-R-EXACT>
-	32 --> 32 with conflicts
-		from <pt_out[iy][ix].im-W-EXACT> to <pt_out[iy][ix].im-W-EXACT>
-	32 --> 29 with conflicts
-		from <B-R-EXACT> to <B-W-EXACT>
-	32 --> 27 with conflicts
-		from <A-R-EXACT> to <A-W-EXACT>
-	32 --> 26 with conflicts
-		from <B-R-EXACT> to <B-W-EXACT>
-	32 --> 24 with conflicts
-		from <A-R-EXACT> to <A-W-EXACT>
-	32 --> 19 with conflicts
-		from <ix-R-EXACT> to <ix-W-EXACT>
-	31 --> 31 with conflicts
-		from <pt_out[iy][ix].re-W-EXACT> to <pt_out[iy][ix].re-W-EXACT>
-	31 --> 29 with conflicts
-		from <B-R-EXACT> to <B-W-EXACT>
-	31 --> 27 with conflicts
-		from <A-R-EXACT> to <A-W-EXACT>
-	31 --> 26 with conflicts
-		from <B-R-EXACT> to <B-W-EXACT>
-	31 --> 24 with conflicts
-		from <A-R-EXACT> to <A-W-EXACT>
-	31 --> 19 with conflicts
-		from <ix-R-EXACT> to <ix-W-EXACT>
-	29 --> 32 with conflicts
-		from <B-W-EXACT> to <B-R-EXACT>
-	29 --> 31 with conflicts
-		from <B-W-EXACT> to <B-R-EXACT>
-	29 --> 26 with conflicts
-		from <B-W-EXACT> to <B-W-EXACT>
-	28 --> 25 with conflicts
-		from <v-W-EXACT> to <v-W-EXACT>
-	27 --> 32 with conflicts
-		from <A-W-EXACT> to <A-R-EXACT>
-	27 --> 31 with conflicts
-		from <A-W-EXACT> to <A-R-EXACT>
-	27 --> 24 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
-	26 --> 29 with conflicts
-		from <B-W-EXACT> to <B-W-EXACT>
-	26 --> 28 with conflicts
-		from <v-R-EXACT> to <v-W-EXACT>
-	26 --> 25 with conflicts
-		from <v-R-EXACT> to <v-W-EXACT>
-	25 --> 28 with conflicts
-		from <v-W-EXACT> to <v-W-EXACT>
-	25 --> 26 with conflicts
-		from <v-W-EXACT> to <v-R-EXACT>
-	25 --> 25 with conflicts
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
-		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
-	25 --> 23 with conflicts
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
-		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
-	24 --> 33 with conflicts
+	16 --> 33 with conflicts
+		from <u-W-EXACT> to <u-W-EXACT>
+	19 --> 19 with conflicts
+		from <ix-W-EXACT> to <ix-W-EXACT>
+	22 --> 23 with conflicts
 		from <u-R-EXACT> to <u-W-EXACT>
-	24 --> 27 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
-	24 --> 23 with conflicts
+	22 --> 33 with conflicts
 		from <u-R-EXACT> to <u-W-EXACT>
-	23 --> 33 with conflicts
-		from <u-W-EXACT> to <u-W-EXACT>
-	23 --> 25 with conflicts
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
-		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
-	23 --> 24 with conflicts
-		from <u-W-EXACT> to <u-R-EXACT>
 	23 --> 23 with conflicts
 		from <u-W-EXACT> to <u-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
-	22 --> 33 with conflicts
-		from <u-R-EXACT> to <u-W-EXACT>
-	22 --> 23 with conflicts
-		from <u-R-EXACT> to <u-W-EXACT>
-	19 --> 19 with conflicts
-		from <ix-W-EXACT> to <ix-W-EXACT>
-	16 --> 33 with conflicts
-		from <u-W-EXACT> to <u-W-EXACT>
-	16 --> 24 with conflicts
+	23 --> 24 with conflicts
 		from <u-W-EXACT> to <u-R-EXACT>
-	16 --> 23 with conflicts
+	23 --> 25 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	23 --> 33 with conflicts
 		from <u-W-EXACT> to <u-W-EXACT>
-	16 --> 22 with conflicts
+	24 --> 23 with conflicts
+		from <u-R-EXACT> to <u-W-EXACT>
+	24 --> 27 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+	24 --> 33 with conflicts
+		from <u-R-EXACT> to <u-W-EXACT>
+	25 --> 23 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	25 --> 25 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-R-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+	25 --> 26 with conflicts
+		from <v-W-EXACT> to <v-R-EXACT>
+	25 --> 28 with conflicts
+		from <v-W-EXACT> to <v-W-EXACT>
+	26 --> 25 with conflicts
+		from <v-R-EXACT> to <v-W-EXACT>
+	26 --> 28 with conflicts
+		from <v-R-EXACT> to <v-W-EXACT>
+	26 --> 29 with conflicts
+		from <B-W-EXACT> to <B-W-EXACT>
+	27 --> 24 with conflicts
+		from <A-W-EXACT> to <A-W-EXACT>
+	27 --> 31 with conflicts
+		from <A-W-EXACT> to <A-R-EXACT>
+	27 --> 32 with conflicts
+		from <A-W-EXACT> to <A-R-EXACT>
+	28 --> 25 with conflicts
+		from <v-W-EXACT> to <v-W-EXACT>
+	29 --> 26 with conflicts
+		from <B-W-EXACT> to <B-W-EXACT>
+	29 --> 31 with conflicts
+		from <B-W-EXACT> to <B-R-EXACT>
+	29 --> 32 with conflicts
+		from <B-W-EXACT> to <B-R-EXACT>
+	31 --> 19 with conflicts
+		from <ix-R-EXACT> to <ix-W-EXACT>
+	31 --> 24 with conflicts
+		from <A-R-EXACT> to <A-W-EXACT>
+	31 --> 26 with conflicts
+		from <B-R-EXACT> to <B-W-EXACT>
+	31 --> 31 with conflicts
+		from <pt_out[iy][ix].re-W-EXACT> to <pt_out[iy][ix].re-W-EXACT>
+	32 --> 19 with conflicts
+		from <ix-R-EXACT> to <ix-W-EXACT>
+	32 --> 24 with conflicts
+		from <A-R-EXACT> to <A-W-EXACT>
+	32 --> 26 with conflicts
+		from <B-R-EXACT> to <B-W-EXACT>
+	32 --> 32 with conflicts
+		from <pt_out[iy][ix].im-W-EXACT> to <pt_out[iy][ix].im-W-EXACT>
+	33 --> 22 with conflicts
 		from <u-W-EXACT> to <u-R-EXACT>
+	33 --> 23 with conflicts
+		from <u-W-EXACT> to <u-W-EXACT>
+	33 --> 24 with conflicts
+		from <u-W-EXACT> to <u-R-EXACT>
+	33 --> 33 with conflicts
+		from <u-W-EXACT> to <u-W-EXACT>
 
 ****************** End of Dependence Graph ******************
