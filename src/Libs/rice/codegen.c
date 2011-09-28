@@ -418,8 +418,7 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
 
   pips_debug(9, "generating code ...\n");
 
-  for (ps = lsccs; ps != NULL; ps = CDR(ps)) {
-    scc s = SCC(CAR(ps));
+  FOREACH(scc,s,lsccs) {
     stata = statement_undefined;
     if(strongly_connected_p(s, l))
       stata = ConnectedStatements(g, s, l, task_parallelize_p);
@@ -478,6 +477,7 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
       INSERT_AT_END(block, eblock, CONS(STATEMENT, stata, NIL));
     }
   }
+  gen_free_list(lsccs);
 
   (void)MakeNestOfStatementList(l,
                                 nbl,

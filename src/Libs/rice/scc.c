@@ -73,7 +73,6 @@
  */
 static int Count, StackPointer;
 static vertex *Stack;
-static sccs Components;
 
 /*
  list of drivers functions used bt the SCC module
@@ -113,7 +112,7 @@ void reset_sccs_drivers() {
 
  v is the current vertex
  */
-void LowlinkCompute(graph g, set region, vertex v, int level) {
+void LowlinkCompute(graph g, set region, vertex v, int level, sccs Components) {
   dg_vertex_label dvl = (dg_vertex_label)vertex_vertex_label(v);
   sccflags fv = dg_vertex_label_sccflags(dvl);
   statement sv = ordering_to_statement(dg_vertex_label_statement(dvl));
@@ -144,7 +143,7 @@ void LowlinkCompute(graph g, set region, vertex v, int level) {
             sccflags_lowlink(fs), sccflags_dfnumber(fs));
 
         if(MARKED_NEW_P(s)) {
-          LowlinkCompute(g, region, s, level);
+          LowlinkCompute(g, region, s, level, Components);
           pips_debug(7, "successor after is %zd (%zd %zd %zd)\n",
               statement_number(ss), sccflags_mark(fs),
               sccflags_lowlink(fs), sccflags_dfnumber(fs));
@@ -206,6 +205,7 @@ int IsInStack(vertex v) {
  */
 sccs FindSccs(graph g, set region, int level) {
   list vertices = graph_vertices(g);
+  sccs Components;
 
   Count = 1;
   StackPointer = 0;
@@ -226,7 +226,7 @@ sccs FindSccs(graph g, set region, int level) {
   /* Bug FOREACH */FOREACH(VERTEX, v1, vertices) {
     if(!ignore_this_vertex_drv(region, v1))
       if(MARKED_NEW_P(v1)) {
-        LowlinkCompute(g, region, v1, level);
+        LowlinkCompute(g, region, v1, level, Components);
       }
   }
 
@@ -259,7 +259,7 @@ void ComputeInDegree(graph g, set region, int l) {
   }
 }
 
-list TopSortSccs(graph __attribute__ ((unused)) g, set region, int l) {
+list TopSortSccs(graph __attribute__ ((unused)) g, set region, int l,sccs Components) {
   list lsccs = NIL, elsccs = NIL, no_ins = NIL;
   FOREACH(SCC, s, sccs_sccs(Components)) {
     if(scc_indegree(s) == 0)
@@ -284,12 +284,9 @@ list TopSortSccs(graph __attribute__ ((unused)) g, set region, int l) {
         if(!ignore_this_successor_drv(v, region, su, l)) {
           vertex s = successor_vertex(su);
           scc ss = VERTEX_ENCLOSING_SCC(s);
-          if(!ignore_this_vertex_drv(region, s)) {
-            if(sv != ss) {
-              if((scc_indegree(ss) -= 1) == 0) {
-                no_ins = CONS(SCC, ss, no_ins);
-              }
-            }
+          if(sv != ss && (scc_indegree(ss) -= 1) == 0
+              && !ignore_this_vertex_drv(region, s)) {
+            no_ins = CONS(SCC, ss, no_ins);
           }
         }
       }
@@ -319,6 +316,7 @@ list TopSortSccs(graph __attribute__ ((unused)) g, set region, int l) {
  */
 list FindAndTopSortSccs(graph g, set region, int l) {
   list lsccs;
+  sccs Components;
 
   ifdebug(8) {
     pips_debug(8, "Dependence graph:\n");
@@ -335,7 +333,12 @@ list FindAndTopSortSccs(graph g, set region, int l) {
 
   pips_debug(3, "topological sort ...\n");
 
-  lsccs = TopSortSccs(g, region, l);
+  lsccs = TopSortSccs(g, region, l,Components);
+
+//  free_sccs(Components);
+  gen_free_list(sccs_sccs(Components));
+  free(Components);
+
 
   return (lsccs);
 }

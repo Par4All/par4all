@@ -489,7 +489,9 @@ bool sc_faisabilite_optim(sc)
       return (true);
 
     } TRY {
-      sc1 = sc_projection_optim_along_vecteur_ofl(sc1, base_dup(sc1->base));
+      Pbase base_sc1 = base_dup(sc1->base);
+      sc1 = sc_projection_optim_along_vecteur_ofl(sc1, base_sc1);
+      base_rm(base_sc1);
       if(sc_empty_p(sc1)) {
         debug(7, "sc_faisabilite_optim", "system not feasible\n");
         debug(6, "sc_faisabilite_optim", "end\n");
@@ -629,6 +631,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
   Pbase base_sc = base_dup(sc->base);
 
   pve = vect_dup(pv);
+  Pvecteur pve_to_free = pve;
 
   /* The elimination of variables by the part of equations */
   if(pve != NULL && sc->nb_eq != 0) {
@@ -668,6 +671,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
             sc_base_remove_variable(sc, v);
           }
           base_rm(base_sc);
+          vect_rm(pve_to_free);
           return (sc);
         }
         sc = sc_normalize(sc);
@@ -687,6 +691,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
             sc_base_remove_variable(sc, v);
           }
 
+          vect_rm(pve_to_free);
           return (sc);
 
         }
@@ -697,8 +702,11 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
         /*eliminate v in the list of variables pve*/
         if(prv == NULL) /* it's in head */
           pve = pv1 = pv1->succ;
-        else
-          prv->succ = pv1 = pv1->succ;
+        else {
+          prv->succ = pv1->succ;
+          free(pv1);
+          pv1 = prv->succ;
+        }
       }
     }
   }
@@ -746,6 +754,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
               sc_base_remove_variable(sc, v);
             }
             base_rm(base_sc);
+            vect_rm(pve_to_free);
             return (sc);
           }
 
@@ -765,6 +774,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
               sc_base_remove_variable(sc, v);
             }
 
+            vect_rm(pve_to_free);
             return (sc);
           }
           ifdebug(7) {
@@ -815,6 +825,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
           sc_base_remove_variable(sc, v);
         }
 
+        vect_rm(pve_to_free);
         return (sc);
       }
 
@@ -834,6 +845,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
           sc_base_remove_variable(sc, v);
         }
 
+        vect_rm(pve_to_free);
         return (sc);
       }
 
@@ -871,7 +883,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
     sc_base_remove_variable(sc, v);
   }
 
-  vect_rm(pve);
+  vect_rm(pve_to_free);
   base_rm(base_sc);
   debug(7, "sc_projection_optim_along_vecteur_ofl", "faisable\n");
   return (sc);
