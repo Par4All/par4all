@@ -96,15 +96,17 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	07 --> 08 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <x-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
+	04 --> 07 with conflicts
+		from <k-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	05 --> 07 with conflicts
+		from <h-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	06 --> 07 with conflicts
 		from <y-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <y-W-EXACT> to <y-R-EXACT>
-	05 --> 07 with conflicts
-		from <h-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	04 --> 07 with conflicts
-		from <k-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	07 --> 08 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <x-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
 
 ****************** End of Dependence Graph ******************

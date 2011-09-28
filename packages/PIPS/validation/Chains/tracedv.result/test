@@ -124,9 +124,6 @@ C             <    is referenced>: S
 	04 --> 07 with conflicts
 		from <A-W-EXACT> to <A-W-EXACT>
 		from <A-W-EXACT> to <A-R-EXACT>
-	04 --> 15 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
-		from <A-W-EXACT> to <A-R-EXACT>
 	05 --> 10 with conflicts
 		from <I-W-EXACT> to <I-W-EXACT>
 	06 --> 06 with conflicts
@@ -145,8 +142,6 @@ C             <    is referenced>: S
 		from <A-R-EXACT> to <A-W-EXACT>
 	09 --> 11 with conflicts
 		from <S-W-EXACT> to <S-W-EXACT>
-	09 --> 14 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
 	11 --> 11 with conflicts
 		from <S-W-EXACT> to <S-W-EXACT>
 	11 --> 12 with conflicts
@@ -228,9 +223,6 @@ C       COMMON /X/ S
 	04 --> 07 with conflicts
 		from <A-W-EXACT> to <A-W-EXACT>
 		from <A-W-EXACT> to <A-R-EXACT>
-	04 --> 15 with conflicts
-		from <A-W-EXACT> to <A-W-EXACT>
-		from <A-W-EXACT> to <A-R-EXACT>
 	05 --> 10 with conflicts
 		from <I-W-EXACT> to <I-W-EXACT>
 	06 --> 06 with conflicts
@@ -249,8 +241,6 @@ C       COMMON /X/ S
 		from <A-R-EXACT> to <A-W-EXACT>
 	09 --> 11 with conflicts
 		from <S-W-EXACT> to <S-W-EXACT>
-	09 --> 14 with conflicts
-		from <S-W-EXACT> to <S-R-EXACT>
 	11 --> 11 with conflicts
 		from <S-W-EXACT> to <S-W-EXACT>
 	11 --> 12 with conflicts

@@ -25,16 +25,12 @@ int erminable(char isme)
    ce;
    while (luke)
       ;
-   {
-      //PIPS generated variable
-      int the;
 
 #pragma omp for private(the)
-      for(the = 2; the <= 1; the += 1) {
-         //PIPS generated variable
-         int ce, luke;
-         ce = luke;
-         luke = ce;
-      }
+   for(the = 2; the <= 1; the += 1) {
+      //PIPS generated variable
+      int ce, luke;
+      ce = luke;
+      luke = ce;
    }
 }

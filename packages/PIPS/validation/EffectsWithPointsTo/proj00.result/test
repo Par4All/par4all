@@ -196,28 +196,30 @@ static int alea(void)
 
  *********************** Use-Def Chains *********************
 
-	27 --> 31 with conflicts
-		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	16 --> 18 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+	20 --> 23 with conflicts
+		from <pi-W-EXACT> to <pi-R-EXACT>
+	20 --> 31 with conflicts
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	21 --> 23 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	21 --> 27 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	21 --> 31 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 	23 --> 31 with conflicts
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	21 --> 31 with conflicts
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	21 --> 27 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
-	21 --> 23 with conflicts
-		from <pp-W-EXACT> to <pp-R-EXACT>
-	20 --> 31 with conflicts
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-	20 --> 23 with conflicts
-		from <pi-W-EXACT> to <pi-R-EXACT>
-	16 --> 18 with conflicts
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
-		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+	27 --> 31 with conflicts
+		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

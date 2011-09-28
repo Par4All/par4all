@@ -128,30 +128,30 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	14 --> 14 with conflicts
-		from <q-W-EXACT> to <q-W-EXACT>
-		from <q-W-EXACT> to <q-R-EXACT>
-		from <q-R-EXACT> to <q-W-EXACT>
-	14 --> 13 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
-	13 --> 14 with conflicts
-		from <q-R-EXACT> to <q-W-EXACT>
-	13 --> 13 with conflicts
-		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
-		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
-		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
-		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
-	09 --> 14 with conflicts
-		from <q-W-EXACT> to <q-W-EXACT>
-		from <q-W-EXACT> to <q-R-EXACT>
-	09 --> 13 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
+	08 --> 09 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
 	08 --> 17 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <p-W-EXACT> to <p-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	08 --> 09 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
+	09 --> 13 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	09 --> 14 with conflicts
+		from <q-W-EXACT> to <q-W-EXACT>
+		from <q-W-EXACT> to <q-R-EXACT>
+	13 --> 13 with conflicts
+		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
+		from <*HEAP*_l_8[0]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[0]-W-MAY>
+		from <*HEAP*_l_8[*]-W-MAY> to <*HEAP*_l_8[*]-W-MAY>
+	13 --> 14 with conflicts
+		from <q-R-EXACT> to <q-W-EXACT>
+	14 --> 13 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	14 --> 14 with conflicts
+		from <q-W-EXACT> to <q-W-EXACT>
+		from <q-W-EXACT> to <q-R-EXACT>
+		from <q-R-EXACT> to <q-W-EXACT>
 
 ****************** End of Dependence Graph ******************

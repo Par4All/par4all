@@ -115,11 +115,11 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	09 --> 10 with conflicts
-		from <s1.a-W-EXACT> to <s1.a-W-EXACT>
-	08 --> 11 with conflicts
-		from <s2-W-EXACT> to <s2-R-EXACT>
 	08 --> 09 with conflicts
 		from <s2-W-EXACT> to <s2-R-EXACT>
+	08 --> 11 with conflicts
+		from <s2-W-EXACT> to <s2-R-EXACT>
+	09 --> 10 with conflicts
+		from <s1.a-W-EXACT> to <s1.a-W-EXACT>
 
 ****************** End of Dependence Graph ******************

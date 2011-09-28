@@ -80,12 +80,12 @@ void point_to04()
 
  *********************** Use-Def Chains *********************
 
+	10 --> 12 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	10 --> 13 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
 	12 --> 13 with conflicts
 		from <c.d-W-EXACT> to <c.d-W-EXACT>
 		from <c.a-R-EXACT> to <c.a-W-EXACT>
-	10 --> 13 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
-	10 --> 12 with conflicts
-		from <p-W-EXACT> to <p-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -109,11 +109,11 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	08 --> 09 with conflicts
+	07 --> 08 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.a-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.c-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[*]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.a-R-EXACT>
 		from <s1.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s1.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -125,11 +125,11 @@ int main()
 		from <s1.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s1.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 08 with conflicts
+	08 --> 09 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.a-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.c-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.b[*]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.a-R-EXACT>
 		from <s1.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s1.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>

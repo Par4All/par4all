@@ -95,23 +95,23 @@ POINTS-TO
 
 
 // Points To:
-// array[*] -> _array_1[0] , EXACT
+// array[*] -> _array_2[0] , EXACT
 
 void f2(int n_ptrs, char *array[31])
 {
 
 // Points To:
-// array[*] -> _array_1[0] , EXACT
+// array[*] -> _array_2[0] , EXACT
 
    int ptr_no;
 
 // Points To:
-// array[*] -> _array_1[0] , EXACT
+// array[*] -> _array_2[0] , EXACT
 
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
 
 // Points To:
-// array[*] -> _array_1[0] , EXACT
+// array[*] -> _array_2[0] , EXACT
 
       fprintf(stderr, "%s\n", array[ptr_no]);
 }
@@ -262,7 +262,7 @@ void f2(int n_ptrs, char *array[31])
 //             <    is read   >: n_ptrs
 //             <    is written>: ptr_no
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1)
-//             <may be read   >: _array_1[*] stderr[0]
+//             <may be read   >: _array_2[*] stderr[0]
 //             <may be written>: stderr[0]
 //             <    is read   >: array[ptr_no] n_ptrs ptr_no stderr 
 //                               __IO_EFFECTS:LUNS[2]

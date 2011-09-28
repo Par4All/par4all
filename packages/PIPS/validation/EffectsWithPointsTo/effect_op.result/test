@@ -200,272 +200,90 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	18 --> 19 with conflicts
+	02 --> 05 with conflicts
 		from <b-W-EXACT> to <b-W-EXACT>
 		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	17 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	17 --> 18 with conflicts
+	03 --> 05 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 06 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 07 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 08 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 09 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 11 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 12 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 13 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 14 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 15 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 16 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	03 --> 17 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	05 --> 06 with conflicts
 		from <b-W-EXACT> to <b-W-EXACT>
 		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	16 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	16 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	16 --> 17 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	15 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	15 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	15 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	15 --> 16 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	14 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	14 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	14 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	14 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	14 --> 15 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	13 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	13 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	13 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	13 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	13 --> 15 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	13 --> 14 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	12 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	12 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	12 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	12 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	12 --> 15 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	12 --> 14 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	12 --> 13 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	11 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	11 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	11 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	11 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	11 --> 15 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	11 --> 14 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	11 --> 13 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	11 --> 12 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 15 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 14 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 13 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 12 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	10 --> 11 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 15 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 14 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 13 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 12 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 11 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	09 --> 10 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 15 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 14 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 13 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 12 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 11 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 10 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	08 --> 09 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 15 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 14 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 13 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 12 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 11 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 10 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 09 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	07 --> 08 with conflicts
-		from <b-W-EXACT> to <b-W-EXACT>
-		from <b-W-EXACT> to <b-R-EXACT>
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 15 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 14 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 13 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 12 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 11 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 10 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 09 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	06 --> 08 with conflicts
 		from <b-R-EXACT> to <b-W-EXACT>
 	06 --> 07 with conflicts
 		from <b-W-EXACT> to <b-W-EXACT>
 		from <b-W-EXACT> to <b-R-EXACT>
 		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 19 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 18 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 17 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 16 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 15 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 14 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 13 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 12 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 11 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 10 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 09 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 08 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 07 with conflicts
-		from <b-R-EXACT> to <b-W-EXACT>
-	05 --> 06 with conflicts
+	07 --> 08 with conflicts
 		from <b-W-EXACT> to <b-W-EXACT>
 		from <b-W-EXACT> to <b-R-EXACT>
 		from <b-R-EXACT> to <b-W-EXACT>
-	03 --> 17 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 16 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 15 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 14 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 13 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 12 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 11 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 10 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 09 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 08 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 07 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 06 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	03 --> 05 with conflicts
-		from <i-W-EXACT> to <i-R-EXACT>
-	02 --> 05 with conflicts
+	08 --> 09 with conflicts
 		from <b-W-EXACT> to <b-W-EXACT>
 		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	09 --> 10 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	10 --> 11 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	11 --> 12 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	12 --> 13 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	13 --> 14 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	14 --> 15 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	15 --> 16 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	16 --> 17 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	17 --> 18 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+	18 --> 19 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
 
 ****************** End of Dependence Graph ******************

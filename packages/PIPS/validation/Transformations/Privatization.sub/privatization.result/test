@@ -20,17 +20,13 @@ int main(int argc, char *argv[])
 {
    int i = 0;
    int j = i++, k = 0;
-   {
-      //PIPS generated variable
-      int i;
 #pragma omp for private(i)
-      for(i = 0; i <= 9; i += 1) {
-         //PIPS generated variable
-         int j;
+   for(i = 0; i <= 9; i += 1) {
+      //PIPS generated variable
+      int j;
 #pragma omp for private(j)
-         for(j = 0; j <= 9; j += 1)
-            k += i*j;
-      }
+      for(j = 0; j <= 9; j += 1)
+         k += i*j;
    }
    printf("%d\n", k);
    return 0;

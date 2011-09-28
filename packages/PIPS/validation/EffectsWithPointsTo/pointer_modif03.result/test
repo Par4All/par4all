@@ -148,13 +148,13 @@ s_t make_s(int i, float x)
 
  *********************** Use-Def Chains *********************
 
-	23 --> 25 with conflicts
-		from <j-W-EXACT> to <j-R-EXACT>
+	20 --> 21 with conflicts
+		from <s.entier-W-EXACT> to <s.entier-W-EXACT>
 	20 --> 23 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	20 --> 21 with conflicts
-		from <s.entier-W-EXACT> to <s.entier-W-EXACT>
+	23 --> 25 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -97,5 +97,7 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	09 --> 11 with conflicts
+		from <a[0]-W-EXACT> to <a[0]-W-EXACT>
 
 ****************** End of Dependence Graph ******************

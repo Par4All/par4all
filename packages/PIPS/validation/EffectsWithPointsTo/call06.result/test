@@ -35,29 +35,29 @@ POINTS-TO
 
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> _x_3[0] , EXACT
 
 void call06(int r, int m, int *x)
 {
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> _x_3[0] , EXACT
 
    int j;
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> _x_3[0] , EXACT
 
 
    for(j = 0; j <= m-1; j += 1)
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> _x_3[0] , EXACT
 
       x[j] = 10*r+j;
 
 // Points To:
-// x -> _x_1[0] , EXACT
+// x -> _x_3[0] , EXACT
 
    return;
 }
@@ -107,7 +107,7 @@ void call06(int r, int m, int *x)
 
    for(j = 0; j <= m-1; j += 1)
 //             <    is read   >: j m r x
-//             <    is written>: _x_1[j]
+//             <    is written>: _x_3[j]
       x[j] = 10*r+j;
    return;
 }
@@ -131,13 +131,13 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	20 --> 20 with conflicts
-		from <y[i][*]-W-MAY> to <y[i][*]-W-MAY>
-	15 --> 20 with conflicts
-		from <d2-W-EXACT> to <d2-R-EXACT>
-	14 --> 20 with conflicts
-		from <d1-W-EXACT> to <d1-R-EXACT>
 	14 --> 19 with conflicts
 		from <d1-W-EXACT> to <d1-R-EXACT>
+	14 --> 20 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	15 --> 20 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	20 --> 20 with conflicts
+		from <y[i][*]-W-MAY> to <y[i][*]-W-MAY>
 
 ****************** End of Dependence Graph ******************

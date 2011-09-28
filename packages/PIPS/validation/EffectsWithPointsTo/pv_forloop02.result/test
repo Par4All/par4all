@@ -119,13 +119,13 @@ int main()
 		from <*HEAP*_l_9[i]-R-EXACT> to <*HEAP*_l_9[i]-W-EXACT>
 	-1 --> 12 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
-	12 --> 12 with conflicts
-		from <i-W-EXACT> to <i-W-EXACT>
 	-1 --> -1 with conflicts
 		from <t-W-EXACT> to <t-R-EXACT>
 	-1 --> -1 with conflicts
 		from <t-W-EXACT> to <t-R-EXACT>
 	09 --> -1 with conflicts
 		from <a-W-EXACT> to <a-R-EXACT>
+	12 --> 12 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************

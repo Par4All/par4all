@@ -99,13 +99,13 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	12 --> 12 with conflicts
-		from <p-W-EXACT> to <p-W-EXACT>
-	12 --> 11 with conflicts
-		from <q-R-EXACT> to <q-W-EXACT>
-	11 --> 12 with conflicts
-		from <q-W-EXACT> to <q-R-EXACT>
 	11 --> 11 with conflicts
 		from <q-W-EXACT> to <q-W-EXACT>
+	11 --> 12 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	12 --> 11 with conflicts
+		from <q-R-EXACT> to <q-W-EXACT>
+	12 --> 12 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
 
 ****************** End of Dependence Graph ******************
