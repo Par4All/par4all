@@ -41,6 +41,8 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
+statement vertex_to_statement(vertex v);
+
 
 /* Set to 2 if we want to simplify in two passes */
 #define NB_SIMPLIFY_PASSES 1
