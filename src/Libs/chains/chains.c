@@ -72,7 +72,11 @@ static void inout_statement();
 static void genref_statement();
 static bool dd_du( effect fin, effect fout );
 static bool ud( effect fin, effect fout );
-static void add_conflicts( effect fin, statement stout, bool(*which)() );
+static void add_conflicts(effect fin,
+                          statement stout,
+                          vertex vout,
+                          cons *effect_outs,
+                          bool(*which)());
 
 /* Macro to create set */
 #define MAKE_STATEMENT_SET() (set_make( set_pointer ))
@@ -802,12 +806,14 @@ static void inout_statement( statement st ) {
     local_print_statement_set( "REF_IN", current_refs );
   }
   /* Compute Def-Def and Def-Use conflicts from Def_in set */
+  vertex statement_vertex = vertex_statement( st );
+  cons *effects = load_statement_effects( st );
   SET_FOREACH( effect, defIn, current_defs) {
-    add_conflicts( defIn, st, dd_du );
+    add_conflicts( defIn, st, statement_vertex, effects, dd_du );
   }
   /* Compute Use-Def conflicts from Ref_in set */
   SET_FOREACH( effect, refIn, current_refs) {
-    add_conflicts( refIn, st, ud );
+    add_conflicts( refIn, st, statement_vertex, effects, ud );
   }
 
   /* Compute "out" sets for the instruction : recursion */
@@ -1008,14 +1014,16 @@ static bool ud( effect fin, effect fout ) {
  * (e.g., i = s ; s = ... ; s = ...) creates an oo-dep between the i assignment
  * and the last s assignment.
  */
-static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
+static void add_conflicts(effect fin,
+                          statement stout,
+                          vertex vout,
+                          cons *effect_outs,
+                          bool(*which)()) {
   vertex vin;
-  vertex vout = vertex_statement( stout );
-  statement stin = hash_get( effects2statement, fin );
-  cons *effect_outs = load_statement_effects( stout );
   cons *cs = NIL;
 
   ifdebug(2) {
+    statement stin = hash_get( effects2statement, fin );
     _int stin_o = statement_ordering(stin);
     _int stout_o = statement_ordering(stout);
     fprintf( stderr,
@@ -1032,11 +1040,11 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 	     ( which == ud ) ? "ud" : "dd_du",
 	     entity_local_name(effect_to_entity(fin)));
   }
-  vin = vertex_statement( stin );
 
   /* To speed up pushnew_conflict() without damaging the integrity of
    the use-def chains */
   ifdebug(1) {
+    statement stin = hash_get( effects2statement, fin );
     cons *effect_ins = load_statement_effects( stin );
     if ( !gen_once_p( effect_ins ) ) {
       pips_internal_error("effect_ins are redundant");
@@ -1059,12 +1067,6 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
       entity ein = effect_entity(fin);
       bool ein_abstract_location_p = entity_abstract_location_p(ein);
       entity eout = effect_entity(fout);
-      type tin = ultimate_type(entity_type(ein));
-      type tout = ultimate_type(entity_type(eout));
-      reference rin = effect_any_reference(fin);
-      int din = gen_length(reference_indices(rin));
-      reference rout = effect_any_reference(fout);
-      int dout = gen_length(reference_indices(rout));
       bool add_conflict_p = true;
 
       /* I think that most of this is hazardous when mixes of
@@ -1077,35 +1079,45 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 	/* this test is not correct, rout should be converted to an abstract location, not eout. BC. */
         if(abstract_locations_may_conflict_p(ein, alout))
           add_conflict_p = true;
-      } else if(pointer_type_p(tin) && pointer_type_p(tout)) {
-        /* Second version due to accuracy improvements in effect
-         computation */
-        if(din == dout) {
-          /* This is the standard case */
-          add_conflict_p = true;
-        } else if(din < dout) { /* I'm not sure this can be the case because of effects_might_conflict_even_read_only_p(fin, fout) */
-          /* a write on the shorter memory access path conflicts
-           with the longer one. If a[i] is written, then a[i][j]
-           depends on it. If a[i] is read, no conflict */
-          add_conflict_p = action_write_p(effect_action(fin));
-        } else /* dout > din */{
-          /* same explanation as above */
-          add_conflict_p = action_write_p(effect_action(fout));
-        }
       } else {
-        /* Why should we limit this test to pointers? Structures,
-         structures of arrays and arrays of structures with
-         pointers embedded somewhere must behave in the very same
-         way. Why not unify the two cases? Because we have not
-         spent enough time thinking about memory access paths. */
-        if(din < dout) {
-          /* a write on the shorter memory access path conflicts
-           with the longer one. If a[i] is written, then a[i][j]
-           depends on it. If a[i] is read, no conflict */
-          add_conflict_p = action_write_p(effect_action(fin));
-        } else if(dout < din) {
-          /* same explanation as above */
-          add_conflict_p = action_write_p(effect_action(fout));
+        reference rin = effect_any_reference(fin);
+        int din = gen_length(reference_indices(rin));
+        reference rout = effect_any_reference(fout);
+        int dout = gen_length(reference_indices(rout));
+        type tin = ultimate_type(entity_type(ein));
+        type tout = ultimate_type(entity_type(eout));
+        if(pointer_type_p(tin) && pointer_type_p(tout)) {
+          /* Second version due to accuracy improvements in effect
+         computation */
+          if(din == dout) {
+            /* This is the standard case */
+            add_conflict_p = true;
+          } else if(din < dout) {
+            /* I'm not sure this can be the case because of
+             * effects_might_conflict_even_read_only_p(fin, fout) */
+            /* a write on the shorter memory access path conflicts
+             * with the longer one. If a[i] is written, then a[i][j]
+             * depends on it. If a[i] is read, no conflict */
+            add_conflict_p = action_write_p(effect_action(fin));
+          } else /* dout > din */{
+            /* same explanation as above */
+            add_conflict_p = action_write_p(effect_action(fout));
+          }
+        } else {
+          /* Why should we limit this test to pointers? Structures,
+           * structures of arrays and arrays of structures with
+           * pointers embedded somewhere must behave in the very same
+           * way. Why not unify the two cases? Because we have not
+           * spent enough time thinking about memory access paths. */
+          if(din < dout) {
+            /* a write on the shorter memory access path conflicts
+             * with the longer one. If a[i] is written, then a[i][j]
+             * depends on it. If a[i] is read, no conflict */
+            add_conflict_p = action_write_p(effect_action(fin));
+          } else if(dout < din) {
+            /* same explanation as above */
+            add_conflict_p = action_write_p(effect_action(fout));
+          }
         }
       }
 
@@ -1129,6 +1141,8 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 
   /* Add conflicts */
   if(!ENDP( cs )) {
+    statement stin = hash_get( effects2statement, fin );
+    vin = vertex_statement( stin );
 
     /* The sink vertex in the graph */
     successor sout = successor_undefined;
