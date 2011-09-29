@@ -37,8 +37,8 @@ static bool quick_privatize_statement_pair(statement /*s1*/,
                                            list /*conflicts*/);
 
 void quick_privatize_graph(graph dep_graph) {
-  /* we analyze arcs exiting from loop statements */FOREACH (VERTEX, v1, graph_vertices(dep_graph))
-  {
+  /* we analyze arcs exiting from loop statements */
+  FOREACH (VERTEX, v1, graph_vertices(dep_graph)) {
     statement s1 = vertex_to_statement(v1);
     list successors = vertex_successors(v1);
     if(statement_loop_p(s1)) {
