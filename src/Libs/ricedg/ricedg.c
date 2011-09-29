@@ -2322,7 +2322,6 @@ graph compute_dg_on_statement_from_chains(statement s, graph chains) {
 // * set_enclosing_loops_map
 // * loading cumulated effects
 graph compute_dg_on_statement_from_chains_in_place(statement s, graph chains) {
-  int i, j;
   dg = chains;
   dg_type = DG_FAST; //FIXME
 
