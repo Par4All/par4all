@@ -95,7 +95,9 @@ Psysteme sc_fusion(Psysteme s1, Psysteme s2)
 	s1->inegalites = s2->inegalites,
 	s1->nb_ineq = s2->nb_ineq;
 
-    free(s2);
+    s2->inegalites = NULL;
+    s2->egalites = NULL;
+    sc_rm(s2);
 
     return(s1);
 }
