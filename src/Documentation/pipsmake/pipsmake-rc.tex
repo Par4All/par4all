@@ -2539,6 +2539,17 @@ results. This property also affects the computation of convex array regions.
 CONSTANT_PATH_EFFECTS TRUE
 \end{PipsProp}
 
+Since \PipsPropRef{CONSTANT_PATH_EFFECTS} may be set to {\tt FALSE}
+erroneously, some tests are included in conflicts testing to avoid
+generating wrong code. However, these tests are costly, and can be
+turned off by setting
+\PipsPropRef{TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS} to {\tt
+  FALSE}. This must be used with care and only when there is no aliasing.
+\begin{PipsProp}{TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS }
+TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS FALSE
+\end{PipsProp}
+
+
 Property \PipsPropRef{USER_EFFECTS_ON_STD_FILES} is used to control the
 way the user uses {\tt stdout}, {\tt stdin} and {\tt stderr}. The
 default case ({\tt FALSE}) means that the user does not modify these
