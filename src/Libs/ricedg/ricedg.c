@@ -532,22 +532,22 @@ static void rdg_loop(statement stat) {
  * The procedure is made of many too many nested loops and tests:
  *
  * for all vertex v1 in graph dg
- *    if statement s1 associated to v1 in region
- *	 for all arcs a1 outgoing from v1
- *	    let v2 be the sink of a1 and s2 the statement associated to v2
- *	    if s2 in region
- *             for all conflicts c12 carried by a1
- *                if c12 has not yet been refined
- *		     if c12 may have a symmetric conflict
- *			for all arcs a2 outgoing from the sink v2 of a1
- *			   if sink(a2) equals v1
- *			      for all conflicts c21
- *				 if c21 equal c12
- *				    halleluia!
- *                   compute refined dependence information for c12
- *                       and possibly c21
- *                   possibly update c21 and possibly remove a2
- *	             update c12 and possibly remove a1
+ *   if statement s1 associated to v1 in region
+ *     for all arcs a1 outgoing from v1
+ *       let v2 be the sink of a1 and s2 the statement associated to v2
+ *         if s2 in region
+ *           for all conflicts c12 carried by a1
+ *             if c12 has not yet been refined
+ *               if c12 may have a symmetric conflict
+ *                 for all arcs a2 outgoing from the sink v2 of a1
+ *                   if sink(a2) equals v1
+ *                     for all conflicts c21
+ *                       if c21 equal c12
+ *                         halleluia!
+ *                         compute refined dependence information for c12
+ *                         and possibly c21
+ *                         possibly update c21 and possibly remove a2
+ *                         update c12 and possibly remove a1
  *
  * Good luck for the restructuring! I'm not sure the current procedure
  * might not end up removing as a2 the very same arc a1 it uses to
@@ -617,12 +617,12 @@ static void rice_update_dependence_graph(statement stat, set region) {
         }
 
         if(conflict_cone(c) != cone_undefined) {
-          /* This conflict cone has been updated. */ifdebug(4) {
+          /* This conflict cone has been updated. */
+          ifdebug(4) {
             fprintf(stderr, " \nThis dependence has been computed.\n");
           }
           true_conflicts = gen_nconc(true_conflicts, CONS(CONFLICT, c, NIL));
-        } else /*Compute this conflit and the opposite one */
-        {
+        } else { /*Compute this conflit and the opposite one */
           list ps2su = NIL, ps2sus = NIL, pcs2s1 = NIL, pchead1 = NIL;
           successor s2su = successor_undefined;
           vertex v1bis;
@@ -2311,21 +2311,27 @@ void writeresult(char *mod_name) {
 // * set_enclosing_loops_map
 // * loading cumulated effects
 graph compute_dg_on_statement_from_chains(statement s, graph chains) {
-  int i, j;
   dg = copy_graph(chains);
+  return compute_dg_on_statement_from_chains_in_place(s, dg);
+}
 
+
+
+// have to be done before call :
+// * set_ordering_to_statement
+// * set_enclosing_loops_map
+// * loading cumulated effects
+graph compute_dg_on_statement_from_chains_in_place(statement s, graph chains) {
+  int i, j;
+  dg = chains;
   dg_type = DG_FAST; //FIXME
 
   debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
   quick_privatize_graph(dg);
   debug_off();
 
-  for (i = 0; i <= 4; i++) {
-    for (j = 0; j <= 2; j++) {
-      deptype[i][j] = 0;
-      constdep[i][j] = 0;
-    }
-  }
+  memset(deptype,0,sizeof(deptype));
+  memset(constdep,0,sizeof(deptype));
 
   rdg_statement(s);
 
