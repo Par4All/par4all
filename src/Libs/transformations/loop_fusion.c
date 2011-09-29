@@ -403,13 +403,18 @@ static bool fusion_loops(statement sloop1,
   // Build chains
   // do not debug on/off all the time : costly (read environment + atoi )?
   // debug_on("CHAINS_DEBUG_LEVEL");
-  graph chains = statement_dependence_graph(sloop1);
+  graph candidate_dg = statement_dependence_graph(sloop1);
   //debug_off();
+
+  ifdebug(5) {
+    pips_debug(0, "Candidate CHAINS :\n");
+    print_graph(candidate_dg);
+  }
 
   // Build DG
   // do not debug on/off all the time : costly (read environment + atoi )?
   //debug_on("RICEDG_DEBUG_LEVEL");
-  graph candidate_dg = compute_dg_on_statement_from_chains(sloop1, chains);
+  candidate_dg = compute_dg_on_statement_from_chains_in_place(sloop1, candidate_dg);
   // debug_off();
 
   // Cleaning
@@ -417,14 +422,11 @@ static bool fusion_loops(statement sloop1,
   reset_enclosing_loops_map();
 
   ifdebug(5) {
-    pips_debug(0, "Candidate CHAINS :\n");
-    print_graph(chains);
     pips_debug(0, "Candidate DG :\n");
     print_graph(candidate_dg);
     pips_debug(0, "Candidate fused loop :\n");
     print_statement(sloop1);
   }
-  free_graph(chains);
 
 
   // Let's validate the fusion now
@@ -745,11 +747,11 @@ static set prune_successors_tree(fusion_block b) {
     set_free(full_succ_of_succ);
   }
   SET_FOREACH(fusion_block, succ_of_succ, full_succ ) {
-    set_del_element(b->successors, b->successors, succ_of_succ);
-    set_del_element(b->rr_successors, b->rr_successors, succ_of_succ);
     set_del_element(succ_of_succ->predecessors, succ_of_succ->predecessors, b);
     set_del_element(succ_of_succ->rr_predecessors, succ_of_succ->rr_predecessors, b);
   }
+  set_difference(b->successors, b->successors, full_succ);
+  set_difference(b->rr_successors, b->rr_successors, full_succ);
 
   full_succ = set_union(full_succ, full_succ, b->successors);
   return full_succ;
