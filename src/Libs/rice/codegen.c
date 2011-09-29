@@ -397,7 +397,8 @@ statement CodeGenerate(statement __attribute__ ((unused)) stat,
                        int l,
                        bool task_parallelize_p) {
   list lst = NIL;
-  cons *lsccs, *ps;
+  cons *lsccs;
+  // cons *ps; unused, but still present in commented out code
   list loops = NIL;
 
   cons *block = NIL, *eblock = NIL;
