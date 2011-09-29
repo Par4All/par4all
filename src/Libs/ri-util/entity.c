@@ -1059,9 +1059,9 @@ bool malloc_entity_p(entity e)
 // trying to generate stdin_ent, stdout_ent and stderr_ent again and again.
 
 static bool stdio_included_p = true; // assume first that stdio.h is included
-static entity stdin_ent = entity_undefined;
 entity get_stdin_entity()
 {
+  static entity stdin_ent = entity_undefined;
   if (stdio_included_p && entity_undefined_p(stdin_ent))
     {
       stdin_ent =  local_name_to_top_level_entity("stdin");
@@ -1076,10 +1076,10 @@ bool stdin_entity_p(entity e)
   return same_entity_p(e, get_stdin_entity());
 }
 
-static entity stdout_ent = entity_undefined;
 
 entity get_stdout_entity()
 {
+  static entity stdout_ent = entity_undefined;
   if (entity_undefined_p(stdout_ent))
     {
       stdout_ent =  local_name_to_top_level_entity("stdout");
@@ -1095,9 +1095,9 @@ bool stdout_entity_p(entity e)
   return same_entity_p(e, get_stdout_entity());
 }
 
-static entity stderr_ent = entity_undefined;
 entity get_stderr_entity()
 {
+  static entity stderr_ent = entity_undefined;
   if (entity_undefined_p(stderr_ent))
     {
       stderr_ent =  local_name_to_top_level_entity("stderr");
