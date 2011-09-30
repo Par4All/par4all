@@ -88,14 +88,14 @@ pyps.module.simdizer=simdizer
 # Unfolding, pyps way ! :-)
 def unfold(module,**kwargs):
     # Keep the list of
-    already_seen = set()
     while module.callees:
+      already_seen = set()
       one_inlining_done = 0
       for callee in module.callees:
-        if already_seen:
-          already_seen.insert(callee.name)
-          callee.inlining(callers=module.name)
-          one_inlining_done+=1
+	  	if callee.name not in already_seen:
+		  already_seen.add(callee.name)
+		  callee.inlining(callers=module.name)
+		  one_inlining_done+=1
       if one_inlining_done == 0:
       	break;
       
