@@ -1121,11 +1121,12 @@ is missing. This decision was made for two reasons:
 
 \end{enumerate}
 
-
+\begin{PipsPass}{flag_as_stub}
 Modules can be flagged as ``stubs'', aka functions provided to PIPS but which
 shouldn't be inlined or modified. Property 
 \PipsPropRef{PREPROCESSOR_INITIALIZER_FLAG_AS_STUB} controls if the initializer
 should declare new files as stubs.
+\end{PipsPass}
 
 \begin{PipsMake}
 bootstrap_stubs > PROGRAM.stubs
