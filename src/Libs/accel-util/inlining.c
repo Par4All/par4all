@@ -903,7 +903,7 @@ inline_calls(inlining_parameters p ,char * module)
 static
 bool do_inlining(inlining_parameters p, const char *module_name)
 {
-    if(get_bool_property("INLINING_IGNORE_STUBS")) {
+    if(get_bool_property("INLINING_IGNORE_STUBS") && db_resource_p(DBR_STUBS, "")) {
       // Look for stubs and prevent inlining them
       callees stubs=(callees)db_get_memory_resource(DBR_STUBS,"",true);
       FOREACH(string,stub,callees_callees(stubs)) {
