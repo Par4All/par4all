@@ -1241,3 +1241,31 @@ bool process_user_file(string file)
                                         were found or not, but do not
                                         accept name conflicts. */
 }
+
+
+/*
+ * Flag a function as a stub
+ */
+bool flag_as_stub(string module_name) {
+  if (!db_resource_p(DBR_STUBS, ""))
+    pips_internal_error("stubs not initialized");
+  callees stubs=(callees)db_get_memory_resource(DBR_STUBS,"",true);
+  callees_callees(stubs)= CONS(STRING,strdup(module_name),callees_callees(stubs));
+  FOREACH(string,stub,callees_callees(stubs)) {
+    pips_debug(0,"Stub : %s\n",stub);
+  }
+  DB_PUT_MEMORY_RESOURCE(DBR_STUBS,"",stubs);
+  return true;
+
+}
+
+bool bootstrap_stubs(__attribute__((unused)) char * module_name)
+{
+  if (db_resource_p(DBR_STUBS, ""))
+    pips_internal_error("kernels already initialized");
+  callees stubs=make_callees(NIL);
+  DB_PUT_MEMORY_RESOURCE(DBR_STUBS,"",stubs);
+  return true;
+}
+
+

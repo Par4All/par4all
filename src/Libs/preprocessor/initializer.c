@@ -747,6 +747,15 @@ bool generic_initializer(const char* module_name, bool is_fortran) {
   }
 
 
+  if(success_p && get_bool_property("PREPROCESSOR_INITIALIZER_FLAG_AS_STUB")) {
+    bool flag_as_stub(string);
+    if (!db_resource_p(DBR_STUBS, "")) {
+      bool bootstrap_stubs(string);
+      bootstrap_stubs((string)module_name);
+    }
+    flag_as_stub((string)module_name);
+  }
+
   return success_p;
 }
 
@@ -786,4 +795,4 @@ bool c_initializer(const char* module_name)
   return res;
 }
 
-
+

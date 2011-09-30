@@ -1122,6 +1122,25 @@ is missing. This decision was made for two reasons:
 \end{enumerate}
 
 
+Modules can be flagged as ``stubs'', aka functions provided to PIPS but which
+shouldn't be inlined or modified. Property 
+\PipsPropRef{PREPROCESSOR_INITIALIZER_FLAG_AS_STUB} controls if the initializer
+should declare new files as stubs.
+
+\begin{PipsMake}
+bootstrap_stubs > PROGRAM.stubs
+\end{PipsMake}
+
+\begin{PipsMake}
+flag_as_stub                     > PROGRAM.stubs
+                < PROGRAM.stubs
+\end{PipsMake}
+
+\begin{PipsProp}{PREPROCESSOR_INITIALIZER_FLAG_AS_STUB}
+PREPROCESSOR_INITIALIZER_FLAG_AS_STUB TRUE
+\end{PipsProp}
+
+
 \begin{PipsMake}
 initializer                     > MODULE.user_file
                                 > MODULE.initial_file
@@ -1148,6 +1167,7 @@ its compilation unit.
 c_initializer                     > MODULE.c_source_file
                                   > COMPILATION_UNIT.c_source_file
 \end{PipsMake}
+
 
 \section{Regeneration of User Source Files}
 \label{sec:regen-user-source}
@@ -10165,6 +10185,11 @@ inlining      > CALLERS.c_source_file
 Use following property to control how generated variables are initialized
 \begin{PipsProp}{INLINING_USE_INITIALIZATION_LIST}
 INLINING_USE_INITIALIZATION_LIST TRUE
+\end{PipsProp}
+
+Use following property to control wheter inlining should ignore stubs:
+\begin{PipsProp}{INLINING_IGNORE_STUBS}
+INLINING_IGNORE_STUBS TRUE
 \end{PipsProp}
 
 \begin{PipsPass}{inlining_simple}
