@@ -1251,9 +1251,6 @@ bool flag_as_stub(string module_name) {
     pips_internal_error("stubs not initialized");
   callees stubs=(callees)db_get_memory_resource(DBR_STUBS,"",true);
   callees_callees(stubs)= CONS(STRING,strdup(module_name),callees_callees(stubs));
-  FOREACH(string,stub,callees_callees(stubs)) {
-    pips_debug(0,"Stub : %s\n",stub);
-  }
   DB_PUT_MEMORY_RESOURCE(DBR_STUBS,"",stubs);
   return true;
 
