@@ -295,6 +295,7 @@ bool open_workspace(const char* name)
 	open_warning_file(dir);
 	free(dir);
 	set_entity_to_size();
+	reset_static_entities();
 	user_log("Workspace %s opened.\n", name);
 	success = open_module_if_unique();
 	if (success) init_processed_include_cache();
@@ -317,6 +318,7 @@ bool close_workspace(bool is_quit)
     close_log_file();
     close_processed_include_cache();
     reset_entity_to_size();
+    reset_static_entities();
     reset_label_counter();
     close_warning_file();
     pop_path();
