@@ -274,9 +274,9 @@ static bool expression_implied_do_index_p(expression exp, entity e)
           pips_debug(7, "index read in range expressions\n");
           dep=true;
       }
+      free_effect(eff);
     }
-
-    free_effects(make_effects(range_effects));
+    gen_free_list(range_effects);
   
     if (!dep) {
       if (same_entity_p(e,index))

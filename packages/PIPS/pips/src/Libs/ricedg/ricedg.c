@@ -466,6 +466,7 @@ static void rdg_loop(statement stat) {
       rdg_statement(loop_body(statement_loop(stat)));
     } else {
       rice_update_dependence_graph(stat, region);
+      set_free(region);
     }
   }
 }
@@ -531,22 +532,22 @@ static void rdg_loop(statement stat) {
  * The procedure is made of many too many nested loops and tests:
  *
  * for all vertex v1 in graph dg
- *    if statement s1 associated to v1 in region
- *	 for all arcs a1 outgoing from v1
- *	    let v2 be the sink of a1 and s2 the statement associated to v2
- *	    if s2 in region
- *             for all conflicts c12 carried by a1
- *                if c12 has not yet been refined
- *		     if c12 may have a symmetric conflict
- *			for all arcs a2 outgoing from the sink v2 of a1
- *			   if sink(a2) equals v1
- *			      for all conflicts c21
- *				 if c21 equal c12
- *				    halleluia!
- *                   compute refined dependence information for c12
- *                       and possibly c21
- *                   possibly update c21 and possibly remove a2
- *	             update c12 and possibly remove a1
+ *   if statement s1 associated to v1 in region
+ *     for all arcs a1 outgoing from v1
+ *       let v2 be the sink of a1 and s2 the statement associated to v2
+ *         if s2 in region
+ *           for all conflicts c12 carried by a1
+ *             if c12 has not yet been refined
+ *               if c12 may have a symmetric conflict
+ *                 for all arcs a2 outgoing from the sink v2 of a1
+ *                   if sink(a2) equals v1
+ *                     for all conflicts c21
+ *                       if c21 equal c12
+ *                         halleluia!
+ *                         compute refined dependence information for c12
+ *                         and possibly c21
+ *                         possibly update c21 and possibly remove a2
+ *                         update c12 and possibly remove a1
  *
  * Good luck for the restructuring! I'm not sure the current procedure
  * might not end up removing as a2 the very same arc a1 it uses to
@@ -616,12 +617,12 @@ static void rice_update_dependence_graph(statement stat, set region) {
         }
 
         if(conflict_cone(c) != cone_undefined) {
-          /* This conflict cone has been updated. */ifdebug(4) {
+          /* This conflict cone has been updated. */
+          ifdebug(4) {
             fprintf(stderr, " \nThis dependence has been computed.\n");
           }
           true_conflicts = gen_nconc(true_conflicts, CONS(CONFLICT, c, NIL));
-        } else /*Compute this conflit and the opposite one */
-        {
+        } else { /*Compute this conflit and the opposite one */
           list ps2su = NIL, ps2sus = NIL, pcs2s1 = NIL, pchead1 = NIL;
           successor s2su = successor_undefined;
           vertex v1bis;
@@ -908,7 +909,7 @@ list TestCoupleOfReferences(list n1,
                             statement s2,
                             effect ef2,
                             reference r2,
-                            list llv __attribute__ ((unused)),
+                            list llv,
                             Ptsg * gs __attribute__ ((unused)),
                             list * levelsop __attribute__ ((unused)),
                             Ptsg * gsop __attribute__ ((unused))) {
@@ -1047,9 +1048,12 @@ list TestCoupleOfReferences(list n1,
     }
 
     return (levels);
-  }
+  } else {
+    /* the case of scalar variables and equivalenced arrays */
 
-  else { /* the case of scalar variables and equivalenced arrays */
+    // llv is no longer used
+    gen_free_list(llv);
+
     cl = FindMaximumCommonLevel(n1, n2);
 
     for (i = 1; i <= cl; i++)
@@ -1170,7 +1174,8 @@ static list TestDependence(list n1,
 
   /* Elimination of loop indices from loop variants llv */
   /* We use n2 because we take care of variables modified in
-   an iteration only for the second system. */MAP(STATEMENT, s,
+   an iteration only for the second system. */
+  MAP(STATEMENT, s,
       {
         entity i = loop_index(statement_loop(s));
         gen_remove(&llv,i); /* llv is dead, must be freed... */
@@ -1198,7 +1203,8 @@ static list TestDependence(list n1,
 
   /* Further construction of the dependence system; Constant and GCD tests
    * at the same time.
-   */assert(sc_weak_consistent_p(dep_syst));
+   */
+  assert(sc_weak_consistent_p(dep_syst));
   if(gcd_and_constant_dependence_test(r1, r2, llv, n2, &dep_syst)) {
     /* independence proved */
     /* FI: the next statement was commented out... */
@@ -1386,7 +1392,6 @@ static list TestDependence(list n1,
   if(levels != NIL) {
 
     *gs = dependence_cone_positive(dep_syst1);
-    sc_rm(dep_syst1);
 
     /* If the cone is not feasible, there are no loop-carried dependences.
      * (FI: the cone is strictly positive then...)
@@ -1417,6 +1422,7 @@ static list TestDependence(list n1,
       *gs = SG_UNDEFINED;
     }
   }
+  sc_rm(dep_syst1);
 
   /* print results for arc s1->s2 */
 
@@ -1597,24 +1603,19 @@ static bool build_and_test_dependence_context(reference r1,
         sc_syst_debug(sc1);
       }
 
-      MAP(EXPRESSION, ex1,
-          {
-            normalized x1 = NORMALIZE_EXPRESSION(ex1);
+      FOREACH(EXPRESSION, ex1,reference_indices(r1)) {
+        normalized x1 = NORMALIZE_EXPRESSION(ex1);
 
-            if (normalized_linear_p(x1))
-            {
-              Pvecteur v1;
-              Pvecteur v;
-              v1 = (Pvecteur) normalized_linear(x1);
-              for(v = v1; !VECTEUR_NUL_P(v); v = v->succ)
-              {
-                if (vecteur_var(v) != TCST)
-                variables = base_add_variable(variables,
-                    vecteur_var(v));
-              }
-            }
-          },
-          reference_indices(r1));
+        if(normalized_linear_p(x1)) {
+          Pvecteur v1;
+          Pvecteur v;
+          v1 = (Pvecteur)normalized_linear(x1);
+          for (v = v1; !VECTEUR_NUL_P(v); v = v->succ) {
+            if(vecteur_var(v) != TCST)
+              variables = base_add_variable(variables, vecteur_var(v));
+          }
+        }
+      }
 
       sc_dep = sc_restricted_to_variables_transitive_closure(sc1, variables);
     }
@@ -1648,26 +1649,22 @@ static bool build_and_test_dependence_context(reference r1,
         sc_syst_debug(sc2);
       }
 
-      MAP(EXPRESSION, ex2,
-          {
-            normalized x2 = NORMALIZE_EXPRESSION(ex2);
+      FOREACH(EXPRESSION, ex2, reference_indices(r2)) {
+        normalized x2 = NORMALIZE_EXPRESSION(ex2);
 
-            if (normalized_linear_p(x2))
-            {
-              Pvecteur v2;
-              Pvecteur v;
+        if(normalized_linear_p(x2)) {
+          Pvecteur v2;
+          Pvecteur v;
 
-              v2 = (Pvecteur) normalized_linear(x2);
-              for(v = v2; !VECTEUR_NUL_P(v); v = v->succ)
-              {
-                if (vecteur_var(v) != TCST)
-                variables = base_add_variable(variables,
-                    vecteur_var(v));
-              }
+          v2 = (Pvecteur)normalized_linear(x2);
+          for (v = v2; !VECTEUR_NUL_P(v); v = v->succ) {
+            if(vecteur_var(v) != TCST)
+              variables = base_add_variable(variables, vecteur_var(v));
+          }
 
-            }
-          },
-          reference_indices(r2));
+        }
+      }
+
 
       sc_tmp = sc_restricted_to_variables_transitive_closure(sc2, variables);
     }
@@ -1715,6 +1712,7 @@ static bool build_and_test_dependence_context(reference r1,
 
     /* sc_tmp is emptied and freed by sc_fusion() */
     sc_dep = sc_fusion(sc_dep, sc_tmp);
+    vect_rm(sc_dep->base);
     sc_dep->base = BASE_NULLE;
     sc_creer_base(sc_dep);
 
@@ -2071,13 +2069,13 @@ static list TestDiVariables(Psysteme ps,
 static Ptsg dependence_cone_positive(dep_sc)
   Psysteme dep_sc; {
   Psysteme volatile sc_env = SC_UNDEFINED;
-  Ptsg volatile sg_env = sg_new();
+  Ptsg volatile sg_env = NULL;
   Pbase b;
   int n, j;
   int volatile i;
 
   if(SC_UNDEFINED_P(dep_sc))
-    return (sg_env);
+    return (sg_new());
 
   sc_env = sc_empty(base_dup(dep_sc->base));
   n = dep_sc->dimension;
@@ -2134,7 +2132,11 @@ static Ptsg dependence_cone_positive(dep_sc)
       sc_syst_debug(sub_sc);
     }
 
-    sc_env = sc_enveloppe_chernikova(sc_env, sub_sc);
+    {
+      Psysteme old_sc_env = sc_env;
+      sc_env = sc_enveloppe_chernikova(sc_env, sub_sc);
+      sc_rm(old_sc_env);
+    }
 
     sc_rm(sub_sc);
 
@@ -2161,7 +2163,8 @@ static Ptsg dependence_cone_positive(dep_sc)
 
     sg_env = sc_to_sg_chernikova(sc_env);
     sc_rm(sc_env);
-
+  } else {
+    sg_env = sg_new();
   }
 
   return (sg_env);
@@ -2308,21 +2311,26 @@ void writeresult(char *mod_name) {
 // * set_enclosing_loops_map
 // * loading cumulated effects
 graph compute_dg_on_statement_from_chains(statement s, graph chains) {
-  int i, j;
   dg = copy_graph(chains);
+  return compute_dg_on_statement_from_chains_in_place(s, dg);
+}
 
+
+
+// have to be done before call :
+// * set_ordering_to_statement
+// * set_enclosing_loops_map
+// * loading cumulated effects
+graph compute_dg_on_statement_from_chains_in_place(statement s, graph chains) {
+  dg = chains;
   dg_type = DG_FAST; //FIXME
 
   debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
   quick_privatize_graph(dg);
   debug_off();
 
-  for (i = 0; i <= 4; i++) {
-    for (j = 0; j <= 2; j++) {
-      deptype[i][j] = 0;
-      constdep[i][j] = 0;
-    }
-  }
+  memset(deptype,0,sizeof(deptype));
+  memset(constdep,0,sizeof(deptype));
 
   rdg_statement(s);
 

@@ -362,6 +362,19 @@ char * get_callees_of(char * module_name)
     return callees_string;
 }
 
+/* Returns the list of the modules called by that specific module,
+   separated by ' '. */
+char * pyps_get_stubs()
+{
+    gen_array_t stubs = get_stubs();
+
+    char * stubs_string = strdup(string_array_join(stubs, " "));
+
+    gen_array_free(stubs);
+
+    return stubs_string;
+}
+
 void setenviron(char *name, char *value)
 {
     setenv(name, value, 1);
