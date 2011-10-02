@@ -903,6 +903,16 @@ inline_calls(inlining_parameters p ,char * module)
 static
 bool do_inlining(inlining_parameters p, const char *module_name)
 {
+    if(get_bool_property("INLINING_IGNORE_STUBS") && db_resource_p(DBR_STUBS, "")) {
+      // Look for stubs and prevent inlining them
+      callees stubs=(callees)db_get_memory_resource(DBR_STUBS,"",true);
+      FOREACH(string,stub,callees_callees(stubs)) {
+        if(same_string_p(module_name,stub)) {
+          return true;
+        }
+      }
+    }
+
     /* Get the module ressource */
     inlined_module (p)= module_name_to_entity( module_name );
     inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, true);
@@ -965,8 +975,8 @@ bool do_inlining(inlining_parameters p, const char *module_name)
  */
 bool inlining(const char* module_name)
 {
-    iparam p =IPARAM_INIT;
-    use_effects(&p)=true;
+  iparam p =IPARAM_INIT;
+  use_effects(&p)=true;
 	return do_inlining(&p,module_name);
 }
 
@@ -979,8 +989,8 @@ bool inlining(const char* module_name)
  */
 bool inlining_simple(const char* module_name)
 {
-    iparam p =IPARAM_INIT;
-    use_effects(&p)=false;
+  iparam p =IPARAM_INIT;
+  use_effects(&p)=false;
 	return do_inlining(&p,module_name);
 }
 

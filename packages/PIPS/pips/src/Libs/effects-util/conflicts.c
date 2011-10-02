@@ -60,6 +60,7 @@
 /* These settings are done for performance reasons, especially in chains */
 /* initial values are current default values */
 static bool constant_path_effects_p = true;
+static bool trust_constant_path_effects_p = false;
 static bool user_effects_on_std_files_p = false;
 static bool aliasing_across_types_p = true;
 static bool aliasing_across_formal_parameters_p = false;
@@ -68,6 +69,7 @@ void set_conflict_testing_properties()
 {
   bool get_bool_property( string );
   constant_path_effects_p = get_bool_property("CONSTANT_PATH_EFFECTS");
+  trust_constant_path_effects_p = get_bool_property("TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS");
   aliasing_across_types_p = get_bool_property( "ALIASING_ACROSS_TYPES" );
   aliasing_across_formal_parameters_p =
     get_bool_property( "ALIASING_ACROSS_FORMAL_PARAMETERS" );
@@ -520,7 +522,7 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 		  // CONSTANT_PATH_EFFECTS is set to FALSE, effects may be erroneous.
 		  // so we need this to avoid over-optimistic program transformations
 
-		  if (constant_path_effects_p)
+		  if (constant_path_effects_p || trust_constant_path_effects_p)
 		    {
 		      conflict_p = false;
 		    }

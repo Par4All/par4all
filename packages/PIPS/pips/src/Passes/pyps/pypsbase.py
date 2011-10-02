@@ -225,6 +225,15 @@ class module(object): # deriving from object is needed for overloaded setter
         callees=self.__ws.cpypips.get_callees_of(self.name)
         return modules([ self.__ws[name] for name in callees.split(" ") ] if callees else [])
 
+    @property
+    def stub_p(self):
+        """test if a module is a stub"""
+        stubs=self.__ws.cpypips.pyps_get_stubs()
+        if stubs and self.name in stubs.split(" "):
+            return True
+        else:
+            return False
+
     def saveas(self,path,activate="print_code"):
         """save module's textual representation in `path' using `activate' printer"""
         with file(path,"w") as fd:
