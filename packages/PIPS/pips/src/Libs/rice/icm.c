@@ -41,6 +41,8 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
+statement vertex_to_statement(vertex v);
+
 
 /* Set to 2 if we want to simplify in two passes */
 #define NB_SIMPLIFY_PASSES 1
@@ -1102,19 +1104,20 @@ SimplifyGraph(graph g,
     reset_sccs_drivers();
 
     FOREACH(SCC, elmt, lsccs) {
-	/* Check if the component is strongly connected */
-	if (strongly_connected_p(elmt, level)) {
-	    set new_region = set_make(set_pointer);
-	    new_region = vertices_to_statements(scc_vertices(elmt), 
-						 new_region);
+      /* Check if the component is strongly connected */
+      if (strongly_connected_p(elmt, level)) {
+        set new_region = set_make(set_pointer);
+        new_region = vertices_to_statements(scc_vertices(elmt),
+                                            new_region);
 
-	    g = SupressDependances(g, new_region, level, count);
+        g = SupressDependances(g, new_region, level, count);
 
-	    set_free(new_region);
-	}
+        set_free(new_region);
+      }
     }
 
-    /* memory leak : lsccs */
+    // No leak
+    gen_free_list(lsccs);
 
     return g;
 }
@@ -1147,7 +1150,11 @@ SupressDependances(graph g,
 
     g = DoRedundantsStatements(lsccs, g, region, level, partially_invariant);
     
-    /* memory leak : lsccs */
+    // No leak
+    gen_free_list(lsccs);
+
+
+
     set_free(partially_invariant);
 
     if (count > 1) {

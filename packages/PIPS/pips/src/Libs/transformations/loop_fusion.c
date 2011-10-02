@@ -56,6 +56,7 @@ typedef dg_vertex_label vertex_label;
 #include "transformations.h"
 #include "chains.h"
 extern bool get_bool_property(string);
+extern int get_int_property(string);
 
 /**
  * Fusion configuration
@@ -63,6 +64,7 @@ extern bool get_bool_property(string);
 typedef struct fusion_params {
   bool maximize_parallelism; // Prevent sequentializing loop that were parallel
   bool greedy; // Fuse as much a we can, and not only loops that have reuse
+  unsigned int max_fused_per_loop; // Threshold to limit the number of fusion per loop
 } *fusion_params;
 
 /**
@@ -80,6 +82,7 @@ typedef struct fusion_block {
   set predecessors; // set of blocks this one depends from. Precedence constraint
   set rr_predecessors; // set of blocks that use data reused in this one, false dep
   bool is_a_loop;
+  int count_fusion; // Count the number of fusion that have occur
 }*fusion_block;
 
 /* Newgen list foreach compatibility */
@@ -143,7 +146,8 @@ static void print_graph(graph dependence_graph) {
  * Debug function that print block informations
  */
 static void print_block(fusion_block block) {
-  fprintf(stderr, "Block %d , predecessors : ", block->num);
+  fprintf(stderr, "Block %d (fused %d times), predecessors : ",
+          block->num, block->count_fusion);
   SET_FOREACH(fusion_block,pred,block->predecessors) {
     fprintf(stderr, "%d, ", pred->num);
   }
@@ -279,6 +283,10 @@ static statement make_temporary_fused_statement(list sequence) {
  */
 static void free_temporary_fused_statement() {
   if(!statement_undefined_p(fused_statement)) {
+
+    //sefault ! Don't know why...
+    //delete_rw_effects(fused_statement);
+    //
     sequence_statements(instruction_sequence(statement_instruction(fused_statement))) = NIL;
     free_statement(fused_statement);
     fused_statement = statement_undefined;
@@ -364,7 +372,8 @@ static bool fusion_loops(statement sloop1,
     statement_ordering( body_loop1 ) = next_ordering++; // FIXME : dirty
     overwrite_ordering_of_the_statement_to_current_mapping( body_loop1 );
     // Fix a little bit proper effects so that chains will be happy with it
-    store_proper_rw_effects_list(body_loop1, NIL);
+    store_proper_rw_effects_list(body_loop1, NIL); // FIXME should lead to a call to delete_rw_effects();
+
   }
 
   if(!statement_sequence_p(body_loop2)) {
@@ -373,7 +382,7 @@ static bool fusion_loops(statement sloop1,
     statement_ordering( body_loop2 ) = next_ordering++; // FIXME : dirty
     overwrite_ordering_of_the_statement_to_current_mapping( body_loop2 );
     // Fix a little bit proper effects so that chains will be happy with it
-    store_proper_rw_effects_list(body_loop2, NIL);
+    store_proper_rw_effects_list(body_loop2, NIL); // FIXME should lead to a call to delete_rw_effects();
   }
 
   // Build a list with the statements from loop 1 followed by stmts for loop 2
@@ -394,13 +403,18 @@ static bool fusion_loops(statement sloop1,
   // Build chains
   // do not debug on/off all the time : costly (read environment + atoi )?
   // debug_on("CHAINS_DEBUG_LEVEL");
-  graph chains = statement_dependence_graph(sloop1);
+  graph candidate_dg = statement_dependence_graph(sloop1);
   //debug_off();
+
+  ifdebug(5) {
+    pips_debug(0, "Candidate CHAINS :\n");
+    print_graph(candidate_dg);
+  }
 
   // Build DG
   // do not debug on/off all the time : costly (read environment + atoi )?
   //debug_on("RICEDG_DEBUG_LEVEL");
-  graph candidate_dg = compute_dg_on_statement_from_chains(sloop1, chains);
+  candidate_dg = compute_dg_on_statement_from_chains_in_place(sloop1, candidate_dg);
   // debug_off();
 
   // Cleaning
@@ -408,14 +422,11 @@ static bool fusion_loops(statement sloop1,
   reset_enclosing_loops_map();
 
   ifdebug(5) {
-    pips_debug(0, "Candidate CHAINS :\n");
-    print_graph(chains);
     pips_debug(0, "Candidate DG :\n");
     print_graph(candidate_dg);
     pips_debug(0, "Candidate fused loop :\n");
     print_statement(sloop1);
   }
-  free_graph(chains);
 
 
   // Let's validate the fusion now
@@ -587,6 +598,7 @@ static fusion_block make_empty_block(int num) {
   block->predecessors = set_make(set_pointer);
   block->rr_predecessors = set_make(set_pointer);
   block->is_a_loop = false;
+  block->count_fusion = 0;
 
   return block;
 }
@@ -735,11 +747,11 @@ static set prune_successors_tree(fusion_block b) {
     set_free(full_succ_of_succ);
   }
   SET_FOREACH(fusion_block, succ_of_succ, full_succ ) {
-    set_del_element(b->successors, b->successors, succ_of_succ);
-    set_del_element(b->rr_successors, b->rr_successors, succ_of_succ);
     set_del_element(succ_of_succ->predecessors, succ_of_succ->predecessors, b);
     set_del_element(succ_of_succ->rr_predecessors, succ_of_succ->rr_predecessors, b);
   }
+  set_difference(b->successors, b->successors, full_succ);
+  set_difference(b->rr_successors, b->rr_successors, full_succ);
 
   full_succ = set_union(full_succ, full_succ, b->successors);
   return full_succ;
@@ -828,6 +840,7 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
   }
   set_free(heads);
 
+  block1->count_fusion++;
 
   ifdebug(4) {
     pips_debug(4,"After merge :\n");
@@ -840,9 +853,10 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
 /**
  * @brief Checks if precedence constraints allow fusing two blocks
  */
-static bool fusable_blocks_p( fusion_block b1, fusion_block b2) {
+static bool fusable_blocks_p( fusion_block b1, fusion_block b2, unsigned int fuse_limit) {
   bool fusable_p = false;
-  if(b1!=b2 && b1->num>=0 && b2->num>=0 && b1->is_a_loop && b2->is_a_loop) {
+  if(b1!=b2 && b1->num>=0 && b2->num>=0 && b1->is_a_loop && b2->is_a_loop
+      && b1->count_fusion<fuse_limit && b2->count_fusion<fuse_limit) {
     // Blocks are active and are loops
 
     if(set_belong_p(b2->successors,b1)) {
@@ -922,9 +936,10 @@ static bool fuse_block( fusion_block b1,
  */
 static bool try_to_fuse_with_successors(fusion_block b,
                                         int *fuse_count,
-                                        bool maximize_parallelism) {
+                                        bool maximize_parallelism,
+                                        unsigned int fuse_limit) {
   // First step is to try to fuse with each successor
-  if(b->is_a_loop && b->num>=0) {
+  if(b->is_a_loop && b->num>=0 && b->count_fusion < fuse_limit) {
     pips_debug(5,"Block %d is a loop, try to fuse with successors !\n",b->num);
     SET_FOREACH(fusion_block, succ, b->successors)
     {
@@ -941,7 +956,7 @@ static bool try_to_fuse_with_successors(fusion_block b,
   }
   // Second step is recursion on successors (if any)
   SET_FOREACH(fusion_block, succ, b->successors) {
-    if(try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism))
+    if(try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism,fuse_limit))
       return true;
   }
 
@@ -958,12 +973,13 @@ static bool try_to_fuse_with_successors(fusion_block b,
  */
 static void try_to_fuse_with_rr_successors(fusion_block b,
                                         int *fuse_count,
-                                        bool maximize_parallelism) {
-  if(b->is_a_loop) {
+                                        bool maximize_parallelism,
+                                        unsigned int fuse_limit) {
+  if(b->is_a_loop && b->count_fusion < fuse_limit) {
     pips_debug(5,"Block %d is a loop, try to fuse with rr_successors !\n",b->num);
     SET_FOREACH(fusion_block, succ, b->rr_successors)
     {
-      if(fusable_blocks_p(b,succ) &&
+      if(fusable_blocks_p(b,succ,fuse_limit) &&
           fuse_block(b, succ, maximize_parallelism)) {
         /* predecessors and successors set have been modified for the current
          * block... we can no longer continue in this loop, let's restart
@@ -974,7 +990,7 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
          *
          */
         (*fuse_count)++;
-        try_to_fuse_with_rr_successors(b, fuse_count, maximize_parallelism);
+        try_to_fuse_with_rr_successors(b, fuse_count, maximize_parallelism, fuse_limit);
         return;
       }
     }
@@ -993,11 +1009,12 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
  */
 static void fuse_all_possible_blocks(list blocks,
                                      int *fusion_count,
-                                     bool maximize_parallelism) {
+                                     bool maximize_parallelism,
+                                     unsigned int fuse_limit) {
   FOREACH(fusion_block, b1, blocks) {
-    if(b1->is_a_loop) {
+    if(b1->is_a_loop && b1->count_fusion<fuse_limit) {
       FOREACH(fusion_block, b2, blocks) {
-        if(fusable_blocks_p(b1,b2)) {
+        if(fusable_blocks_p(b1,b2,fuse_limit)) {
           if(fuse_block(b1, b2, maximize_parallelism)) {
             (*fusion_count)++;
           }
@@ -1073,7 +1090,10 @@ restart_loop: ;
             block->num,
             block->is_a_loop);
 
-        if(try_to_fuse_with_successors(block, &fuse_count,params->maximize_parallelism)) {
+        if(try_to_fuse_with_successors(block,
+                                       &fuse_count,
+                                       params->maximize_parallelism,
+                                       params->max_fused_per_loop)) {
           // We fused some blocks, let's restart the process !
           // FIXME : we shouldn't have to restart the process, but it'll require
           // hard work in try_to_fuse_with_successors, so we'll do that later...
@@ -1088,7 +1108,10 @@ restart_loop: ;
      */
     FOREACH(fusion_block, block, block_list) {
       if(block->num>=0) { // Block is active
-        try_to_fuse_with_rr_successors(block, &fuse_count,params->maximize_parallelism);
+        try_to_fuse_with_rr_successors(block,
+                                       &fuse_count,
+                                       params->maximize_parallelism,
+                                       params->max_fused_per_loop);
       }
     }
 
@@ -1100,7 +1123,10 @@ restart_loop: ;
       ifdebug(3) {
         print_blocks(block_list);
       }
-      fuse_all_possible_blocks(block_list, &fuse_count,params->maximize_parallelism);
+      fuse_all_possible_blocks(block_list,
+                               &fuse_count,
+                               params->maximize_parallelism,
+                               params->max_fused_per_loop);
     }
 
 
@@ -1212,6 +1238,7 @@ static void compute_fusion_on_statement(statement s) {
   struct fusion_params params;
   params.maximize_parallelism = get_bool_property("LOOP_FUSION_MAXIMIZE_PARALLELISM");
   params.greedy = get_bool_property("LOOP_FUSION_GREEDY");
+  params.max_fused_per_loop = get_int_property("LOOP_FUSION_MAX_FUSED_PER_LOOP");
 
   // Go on fusion on every sequence of statement founded
   gen_context_recurse( s, &params, sequence_domain, fusion_in_sequence, gen_true);
@@ -1267,6 +1294,7 @@ bool loop_fusion(char * module_name) {
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
 
   // Free resources
+  free_temporary_fused_statement(); // Free...
   hash_table_free(ordering_to_dg_mapping);
   ordering_to_dg_mapping = NULL;
   reset_proper_rw_effects();
@@ -1275,7 +1303,6 @@ bool loop_fusion(char * module_name) {
   reset_current_module_statement();
   reset_current_module_entity();
   reset_ordering_to_statement();
-  free_temporary_fused_statement(); // Free...
 
 
   pips_debug(2, "done for %s\n", module_name);

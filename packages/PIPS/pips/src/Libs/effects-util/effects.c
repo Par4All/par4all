@@ -362,12 +362,6 @@ bool io_effects_p(list effects)
     return false;
 }
 
-bool std_file_entity_p(entity e)
-{
- const char * s = entity_user_name(e);
-  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
-}
-
 bool std_file_effect_p(effect e)
 {
   return(std_file_entity_p(effect_entity(e)));

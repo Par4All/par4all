@@ -295,6 +295,7 @@ bool open_workspace(const char* name)
 	open_warning_file(dir);
 	free(dir);
 	set_entity_to_size();
+	reset_static_entities();
 	user_log("Workspace %s opened.\n", name);
 	success = open_module_if_unique();
 	if (success) init_processed_include_cache();
@@ -317,6 +318,7 @@ bool close_workspace(bool is_quit)
     close_log_file();
     close_processed_include_cache();
     reset_entity_to_size();
+    reset_static_entities();
     reset_label_counter();
     close_warning_file();
     pop_path();
@@ -435,4 +437,18 @@ gen_array_t get_callees (string module)
             db_get_memory_resource(DBR_CALLEES, module,true);
 
     return gen_array_from_list(callees_callees(callee_modules));
+}
+
+/* Get all stubs. The returned value is allocated dynamically
+    and needs to be freed by the caller of this function */
+gen_array_t get_stubs ()
+{
+    list stubs = NIL;
+
+    if (db_resource_p(DBR_STUBS, "")) {
+      callees r_stubs = (callees)db_get_memory_resource(DBR_STUBS, "",true);
+      stubs = callees_callees(r_stubs);
+    }
+
+    return gen_array_from_list(stubs);
 }

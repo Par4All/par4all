@@ -192,23 +192,27 @@ static void html_print_code(code c) {
 
 static void html_print_storage(storage s) {
   begin_block("storage", true);
-  switch(storage_tag( s )) {
-    case is_storage_return:
-      html_output("Return", false);
-      html_print_entity_name(storage_return( s ));
-      break;
-    case is_storage_ram:
-      html_print_ram(storage_ram( s ));
-      break;
-    case is_storage_formal:
-      html_print_formal(storage_formal( s ));
-      break;
-    case is_storage_rom:
-      html_print_rom(storage_rom( s));
-      break;
-    default:
-      html_output("Unknown storage", true);
-      break;
+  if(storage_undefined_p(s)) {
+    html_output("undefined", false);
+  } else {
+    switch(storage_tag( s )) {
+      case is_storage_return:
+        html_output("Return", false);
+        html_print_entity_name(storage_return( s ));
+        break;
+      case is_storage_ram:
+        html_print_ram(storage_ram( s ));
+        break;
+      case is_storage_formal:
+        html_print_formal(storage_formal( s ));
+        break;
+      case is_storage_rom:
+        html_print_rom(storage_rom( s));
+        break;
+      default:
+        html_output("Unknown storage", true);
+        break;
+    }
   }
   end_block("storage", true);
 }
