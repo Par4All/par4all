@@ -180,6 +180,22 @@ static void loop_annotate(loop l, gpu_lna_context * p) {
         /* first check if the lower bound depend on enclosing loop indices */
         list l_eff_lower_bound = proper_effects_of_expression(c_lower);
         list l_eff_upper_bound = proper_effects_of_expression(c_upper);
+
+        /* We have to clean the list of effect from any "preference" since the
+         * next loop modify the references and can make our "preference" invalid
+         */
+        void remove_preferences(void * obj);
+        {
+          FOREACH(effect,e,l_eff_lower_bound) {
+            remove_preferences(e);
+          }
+        }
+        {
+          FOREACH(effect,e,l_eff_upper_bound) {
+            remove_preferences(e);
+          }
+        }
+
         FOREACH(LOOP, other_loop, p->l_enclosing_loops) {
           if(other_loop != l) {
             range range_other_loop = loop_range(other_loop);
