@@ -1,0 +1,68 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(x) {x==0}
+
+   int x = 0;
+
+//  T(x) {x#init==0}
+
+   while (1)
+
+//  T(x) {x<=x#init+1}
+
+      if (rand()) {
+
+//  T(x) {x==x#init+1}
+
+         x++;
+
+//  T(x) {x<=99, x<=x#init}
+
+         if (x>=100)
+
+//  T(x) {x==0, 100<=x#init}
+
+            x = 0;
+      }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int x = 0;
+
+//  P(x) {x==0}
+
+   while (1)
+
+//  P(x) {0<=x, x<=99}
+
+      if (rand()) {
+
+//  P(x) {0<=x, x<=99}
+
+         x++;
+
+//  P(x) {1<=x, x<=100}
+
+         if (x>=100)
+
+//  P(x) {x==100}
+
+            x = 0;
+      }
+}

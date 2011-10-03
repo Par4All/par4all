@@ -1,0 +1,84 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(x) {x==0}
+
+   int x = 0;
+
+//  T(d) {d==1, x==0}
+
+   int d = 1;
+
+//  T(d,x) {d#init==1, x#init==0}
+
+   while (1) {
+
+//  T(d) {}
+
+      if (x==0)
+
+//  T(d) {d==1, x==0}
+
+         d = 1;
+
+//  T(d) {}
+
+      if (x==1000)
+
+//  T(d) {d==-1, x==1000}
+
+         d = -1;
+
+//  T(x) {d+x#init==x}
+
+      x += d;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int x = 0;
+
+//  P(x) {x==0}
+
+   int d = 1;
+
+//  P(d,x) {d==1, x==0}
+
+   while (1) {
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      if (x==0)
+
+//  P(d,x) {x==0, 0<=d+1, d<=1}
+
+         d = 1;
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      if (x==1000)
+
+//  P(d,x) {x==1000, 0<=d+1, d<=1}
+
+         d = -1;
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      x += d;
+   }
+}

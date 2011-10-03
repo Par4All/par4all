@@ -1,0 +1,128 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(x,x_old) {}
+
+   int x_old, x;
+
+//  T(x_old) {x_old==0}
+
+   x_old = 0;
+
+//  T(x,x_old) {x_old#init==0}
+
+   while (1) {
+
+//  T(x) {}
+
+      x = rand()-rand();
+
+//  T() {0<=x+1000}
+
+      if (x<-1000)
+
+//  T() {0==-1}
+
+         exit(0);
+
+//  T() {0<=x+1000, x<=1000}
+
+      if (x>1000)
+
+//  T() {0==-1}
+
+         exit(0);
+
+//  T(x) {x<=x#init, x<=x_old+1, 0<=x#init+1000, x#init<=1000}
+
+      if (x>=x_old+1)
+
+//  T(x) {x==x_old+1, x<=x#init, 0<=x#init+1000, x#init<=1000}
+
+         x = x_old+1;
+
+//  T(x) {x#init<=x, x_old<=x+1, x<=x_old+1, x#init<=1000}
+
+      if (x<=x_old-1)
+
+//  T(x) {x==x_old-1, x#init<=x, x#init<=1000}
+
+         x = x_old-1;
+
+//  T(x_old) {x==x_old, x_old#init<=x+1, x<=x_old#init+1}
+
+      x_old = x;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int x_old, x;
+
+//  P(x,x_old) {}
+
+   x_old = 0;
+
+//  P(x,x_old) {x_old==0}
+
+   while (1) {
+
+//  P(x,x_old) {0<=x_old+1000, x_old<=1000}
+
+      x = rand()-rand();
+
+//  P(x,x_old) {0<=x_old+1000, x_old<=1000}
+
+      if (x<-1000)
+
+//  P(x,x_old) {x+1001<=0, 0<=x_old+1000, x_old<=1000}
+
+         exit(0);
+
+//  P(x,x_old) {0<=x+1000, 0<=x_old+1000, x_old<=1000}
+
+      if (x>1000)
+
+//  P(x,x_old) {1001<=x, 0<=x_old+1000, x_old<=1000}
+
+         exit(0);
+
+//  P(x,x_old) {0<=x+1000, x<=1000, 0<=x_old+1000, x_old<=1000}
+
+      if (x>=x_old+1)
+
+//  P(x,x_old) {0<=x+1000, x<=1000, x_old+1<=x, 0<=x_old+1000,
+//    x_old<=1000}
+
+         x = x_old+1;
+
+//  P(x,x_old) {0<=x+1000, x<=1000, x<=x_old+1, 0<=x_old+1000,
+//    x_old<=1000}
+
+      if (x<=x_old-1)
+
+//  P(x,x_old) {0<=x+1000, x<=1000, x+1<=x_old, 0<=x_old+1000,
+//    x_old<=1000}
+
+         x = x_old-1;
+
+//  P(x,x_old) {0<=x+1000, x<=1000, x_old<=x+1, x<=x_old+1,
+//    0<=x_old+1000, x_old<=1000}
+
+      x_old = x;
+   }
+}
