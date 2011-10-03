@@ -52,10 +52,7 @@ static entity stdin_ent = entity_undefined;
 static entity stdout_ent = entity_undefined;
 static entity stderr_ent = entity_undefined;
 
-// in some programs, stdio.h is not included; in this case stdin_ent, stdout_ent and stderr_ent
-// are never defined; if stdio_included_p is then set to false to avoid
-// trying to generate stdin_ent, stdout_ent and stderr_ent again and again.
-static bool stdio_included_p = true; // assume first that stdio.h is included
+static bool stdfile_entities_initialized_p = false;
 
 void reset_static_entities()
 {
@@ -63,7 +60,7 @@ void reset_static_entities()
   stdout_ent = entity_undefined;
   stderr_ent = entity_undefined;
 
-  stdio_included_p = true; // assume first that stdio.h is included
+  stdfile_entities_initialized_p = false;
 
 }
 
@@ -1080,14 +1077,22 @@ bool malloc_entity_p(entity e)
   return same_string_p(entity_local_name(e), MALLOC_EFFECTS_NAME);
 }
 
+
+void initialize_std_file_entities()
+{
+  if (!stdfile_entities_initialized_p)
+    {
+      stdin_ent = FindOrCreateTopLevelEntity("stdin");
+      stdout_ent =  FindOrCreateTopLevelEntity("stdout");
+      stderr_ent =  FindOrCreateTopLevelEntity("stderr");
+      stdfile_entities_initialized_p = true;
+    }
+}
+
+
 entity get_stdin_entity()
 {
-  if (stdio_included_p && entity_undefined_p(stdin_ent))
-    {
-      stdin_ent =  local_name_to_top_level_entity("stdin");
-      if (entity_undefined_p(stdin_ent))
-	stdio_included_p = false;
-    }
+  initialize_std_file_entities();
   return stdin_ent;
 }
 
@@ -1099,13 +1104,7 @@ bool stdin_entity_p(entity e)
 
 entity get_stdout_entity()
 {
-  if (stdio_included_p && entity_undefined_p(stdout_ent))
-    {
-      stdout_ent =  local_name_to_top_level_entity("stdout");
-      if (entity_undefined_p(stdout_ent))
-	stdio_included_p = false;
-    }
-
+  initialize_std_file_entities();
   return stdout_ent;
 }
 
@@ -1116,13 +1115,7 @@ bool stdout_entity_p(entity e)
 
 entity get_stderr_entity()
 {
-  if (stdio_included_p && entity_undefined_p(stderr_ent))
-    {
-      stderr_ent =  local_name_to_top_level_entity("stderr");
-      if (entity_undefined_p(stderr_ent))
-	stdio_included_p = false;
-
-    }
+  initialize_std_file_entities();
   return stderr_ent;
 }
 
@@ -1134,29 +1127,11 @@ bool stderr_entity_p(entity e)
 
 bool std_file_entity_p(entity e)
 {
-  if (stdio_included_p)
-    {
-      if (entity_undefined_p(stdin_ent)
-	  || entity_undefined_p(stdout_ent)
-	  || entity_undefined_p(stderr_ent))
-	{
-	  stdin_ent = local_name_to_top_level_entity("stdin");
-	  if (entity_undefined_p(stdin_ent))
-	    {
-	      stdio_included_p = false;
-	      stdout_ent = entity_undefined;
-	      stderr_ent = entity_undefined;
-	    }
-	  else
-	    {
-	      stdout_ent =  local_name_to_top_level_entity("stdout");
-	      stderr_ent =  local_name_to_top_level_entity("stderr");
-	    }
-	}
-    }
-  return(same_entity_p(e, stdin_ent)
-	 || same_entity_p(e, stdout_ent)
-	 || same_entity_p(e, stderr_ent));
+
+ initialize_std_file_entities();
+ return(same_entity_p(e, stdin_ent)
+	|| same_entity_p(e, stdout_ent)
+	|| same_entity_p(e, stderr_ent));
 }
 
 
