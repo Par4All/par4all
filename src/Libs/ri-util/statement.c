@@ -219,11 +219,7 @@ bool declaration_statement_p(statement s) {
     if(instruction_call_p(i)) {
       call c = instruction_call(i);
       entity f = call_function(c);
-      string n = entity_name(f);
-      /* You want entity_name(f)=="TOP-LEVEL:CONTINUE"*/
-      if(*(n+17)=='E')
-	if(*(n+3)=='-')
-	  declaration_p = strcmp(n, "TOP-LEVEL:CONTINUE")==0;
+      declaration_p = entity_continue_p(f);
     }
   }
 

@@ -51,16 +51,29 @@
 static entity stdin_ent = entity_undefined;
 static entity stdout_ent = entity_undefined;
 static entity stderr_ent = entity_undefined;
+static entity continue_ent = entity_undefined;
+static bool static_entities_initialized_p = false;
 
-static bool stdfile_entities_initialized_p = false;
+/* beware: cannot be called on creating the database */
+void set_static_entities()
+{
+  if (!static_entities_initialized_p)
+    {
+      stdin_ent = FindOrCreateTopLevelEntity("stdin");
+      stdout_ent = FindOrCreateTopLevelEntity("stdout");
+      stderr_ent = FindOrCreateTopLevelEntity("stderr");
+      continue_ent = FindOrCreateTopLevelEntity(CONTINUE_FUNCTION_NAME);
+      static_entities_initialized_p = true;
+    }
+}
 
 void reset_static_entities()
 {
   stdin_ent = entity_undefined;
   stdout_ent = entity_undefined;
   stderr_ent = entity_undefined;
-
-  stdfile_entities_initialized_p = false;
+  continue_ent = entity_undefined;
+  static_entities_initialized_p = false;
 
 }
 
@@ -1077,22 +1090,23 @@ bool malloc_entity_p(entity e)
   return same_string_p(entity_local_name(e), MALLOC_EFFECTS_NAME);
 }
 
-
-void initialize_std_file_entities()
+/**
+   checks if an entity is an IO_EFFECTS_PACKAGE_NAME, a
+   MALLOC_EFFECTS_NAME or a RAND_EFFECTS_PACKAGE_NAME entity. These
+   entities are used to model some internal effects of standard libraries
+   and they do not conflict with other entities.
+ */
+bool effects_package_entity_p(entity e)
 {
-  if (!stdfile_entities_initialized_p)
-    {
-      stdin_ent = FindOrCreateTopLevelEntity("stdin");
-      stdout_ent =  FindOrCreateTopLevelEntity("stdout");
-      stderr_ent =  FindOrCreateTopLevelEntity("stderr");
-      stdfile_entities_initialized_p = true;
-    }
+  return (strstr(entity_module_name(e), "_EFFECTS") != 0);
 }
+
+
 
 
 entity get_stdin_entity()
 {
-  initialize_std_file_entities();
+  set_static_entities();
   return stdin_ent;
 }
 
@@ -1104,7 +1118,7 @@ bool stdin_entity_p(entity e)
 
 entity get_stdout_entity()
 {
-  initialize_std_file_entities();
+  set_static_entities();
   return stdout_ent;
 }
 
@@ -1115,7 +1129,7 @@ bool stdout_entity_p(entity e)
 
 entity get_stderr_entity()
 {
-  initialize_std_file_entities();
+  set_static_entities();
   return stderr_ent;
 }
 
@@ -1127,25 +1141,14 @@ bool stderr_entity_p(entity e)
 
 bool std_file_entity_p(entity e)
 {
-
- initialize_std_file_entities();
- return(same_entity_p(e, stdin_ent)
-	|| same_entity_p(e, stdout_ent)
-	|| same_entity_p(e, stderr_ent));
+  set_static_entities();
+  return(same_entity_p(e, stdin_ent)
+	 || same_entity_p(e, stdout_ent)
+	 || same_entity_p(e, stderr_ent));
 }
 
 
 
-/**
-   checks if an entity is an IO_EFFECTS_PACKAGE_NAME, a
-   MALLOC_EFFECTS_NAME or a RAND_EFFECTS_PACKAGE_NAME entity. These
-   entities are used to model some internal effects of standard libraries
-   and they do not conflict with other entities.
- */
-bool effects_package_entity_p(entity e)
-{
-  return (strstr(entity_module_name(e), "_EFFECTS") != 0);
-}
 
 bool intrinsic_entity_p(entity e)
 {
@@ -1587,10 +1590,15 @@ bool arithmetic_intrinsic_p(entity e)
 
 /* true if continue. See also macro ENTITY_CONTINUE_P
  */
+
+entity get_continue_entity()
+{
+  set_static_entities();
+  return continue_ent;
+}
 bool entity_continue_p(entity f)
 {
-  return top_level_entity_p(f) &&
-    same_string_p(entity_local_name(f), CONTINUE_FUNCTION_NAME);
+  return same_entity_p(f, get_continue_entity());
 }
 
 
