@@ -837,7 +837,7 @@ class p4a_processor(object):
         # To be able to inject Par4All accelerator run time initialization
         # later:
         if "main" in self.workspace:
-            self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
+            self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel\n")
         else:
             p4a_util.warn('''
             There is no "main()" function in the given sources.
