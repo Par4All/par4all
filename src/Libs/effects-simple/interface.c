@@ -274,7 +274,7 @@ in_effects(const char* module_name)
       set_constant_paths_p(true);
     set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_inout_effects(module_name);
-    ok = in_effects_engine(module_name);
+    ok = in_effects_engine(module_name, simple);
     generic_effects_reset_all_methods();
     reset_methods_for_inout_effects();
     return ok;
@@ -289,7 +289,7 @@ out_effects(const char* module_name)
     else
       set_constant_paths_p(true);
     set_methods_for_inout_effects(module_name);
-    ok = out_effects_engine(module_name);
+    ok = out_effects_engine(module_name, simple);
     generic_effects_reset_all_methods();
     reset_methods_for_inout_effects();
     return ok;

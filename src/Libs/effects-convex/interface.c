@@ -286,7 +286,7 @@ in_regions(const char* module_name)
       set_constant_paths_p(true);
     set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_in_out_effects();
-    res = in_effects_engine(module_name);
+    res = in_effects_engine(module_name, convex);
     generic_effects_reset_all_methods();
     return res;
 }
@@ -322,7 +322,7 @@ out_regions(const char* module_name)
       set_constant_paths_p(true);
     set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_in_out_effects();
-    res = out_effects_engine(module_name);
+    res = out_effects_engine(module_name, convex);
     generic_effects_reset_all_methods();
     return res;
 }

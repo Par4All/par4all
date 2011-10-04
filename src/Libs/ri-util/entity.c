@@ -47,11 +47,23 @@
 /* Static variable to memoïze some entities for performance reasons */
 /********************************************************************/
 
-
+/* stdio files entities */
 static entity stdin_ent = entity_undefined;
 static entity stdout_ent = entity_undefined;
 static entity stderr_ent = entity_undefined;
+
+/* effects package entities */
+static entity rand_gen_ent  = entity_undefined;
+static entity malloc_effect_ent  = entity_undefined;
+static entity memmove_effect_ent  = entity_undefined;
+static entity luns_ent  = entity_undefined;
+static entity io_ptr_ent  = entity_undefined;
+static entity io_eof_ent  = entity_undefined;
+static entity io_error_luns_ent  = entity_undefined;
+
+/* continue statement */
 static entity continue_ent = entity_undefined;
+
 static bool static_entities_initialized_p = false;
 
 /* beware: cannot be called on creating the database */
@@ -62,7 +74,24 @@ void set_static_entities()
       stdin_ent = FindOrCreateTopLevelEntity("stdin");
       stdout_ent = FindOrCreateTopLevelEntity("stdout");
       stderr_ent = FindOrCreateTopLevelEntity("stderr");
+
+      rand_gen_ent  = FindOrCreateEntity(RAND_EFFECTS_PACKAGE_NAME,
+					 RAND_GEN_EFFECTS_NAME);
+      malloc_effect_ent  = FindOrCreateEntity(MALLOC_EFFECTS_PACKAGE_NAME,
+				       MALLOC_EFFECTS_NAME);
+      memmove_effect_ent  = FindOrCreateEntity(MEMMOVE_EFFECTS_PACKAGE_NAME,
+					MEMMOVE_EFFECTS_NAME);
+      luns_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
+				     IO_EFFECTS_ARRAY_NAME);
+      io_ptr_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
+				       IO_EFFECTS_PTR_NAME);
+      io_eof_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
+				       IO_EOF_ARRAY_NAME);
+      io_error_luns_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
+					      IO_ERROR_ARRAY_NAME);
+
       continue_ent = FindOrCreateTopLevelEntity(CONTINUE_FUNCTION_NAME);
+
       static_entities_initialized_p = true;
     }
 }
@@ -72,7 +101,17 @@ void reset_static_entities()
   stdin_ent = entity_undefined;
   stdout_ent = entity_undefined;
   stderr_ent = entity_undefined;
+
+  rand_gen_ent  = entity_undefined;
+  malloc_effect_ent  = entity_undefined;
+  memmove_effect_ent  = entity_undefined;
+  luns_ent  = entity_undefined;
+  io_ptr_ent  = entity_undefined;
+  io_eof_ent  = entity_undefined;
+  io_error_luns_ent  = entity_undefined;
+
   continue_ent = entity_undefined;
+
   static_entities_initialized_p = false;
 
 }
@@ -1073,21 +1112,28 @@ bool top_level_entity_p(entity e)
    effects of IO statements. */
 bool io_entity_p(entity e)
 {
-  return(strncmp(IO_EFFECTS_PACKAGE_NAME,
-		 entity_name(e),
-		 strlen(entity_module_name(e))) == 0);
+  set_static_entities();
+  return (same_entity_p(e, luns_ent) || same_entity_p(e, io_ptr_ent)
+	  || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
+}
+
+bool io_luns_entity_p(entity e)
+{
+  set_static_entities();
+  return (same_entity_p(e, luns_ent));
 }
 
 bool rand_effects_entity_p(entity e)
 {
-  return(strncmp(RAND_EFFECTS_PACKAGE_NAME,
-		 entity_name(e),
-		 strlen(entity_module_name(e))) == 0);
+  set_static_entities();
+  return (same_entity_p(e, rand_gen_ent));
 }
 
 bool malloc_entity_p(entity e)
 {
-  return same_string_p(entity_local_name(e), MALLOC_EFFECTS_NAME);
+  set_static_entities();
+  return (same_entity_p(e, malloc_effect_ent));
+
 }
 
 /**
@@ -1098,7 +1144,13 @@ bool malloc_entity_p(entity e)
  */
 bool effects_package_entity_p(entity e)
 {
-  return (strstr(entity_module_name(e), "_EFFECTS") != 0);
+  set_static_entities();
+  return (same_entity_p(e, rand_gen_ent)
+	  || same_entity_p(e, malloc_effect_ent)
+	  || same_entity_p(e, memmove_effect_ent)
+	  || same_entity_p(e, luns_ent) || same_entity_p(e, io_ptr_ent)
+	  || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
+
 }
 
 

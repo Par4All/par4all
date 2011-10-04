@@ -650,9 +650,21 @@ static bool loop_scalarization(loop l)
   effects oe   = load_out_effects(s);
   effects crwe = load_cumulated_rw_effects(s);
 
-  list irl  = effects_store_effects(effects_effects(ie));
-  list orl  = effects_store_effects(effects_effects(oe));
-  list crwl = effects_store_effects(effects_effects(crwe));
+  bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
+  bool memory_in_out_regions_only_p = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+
+  list irl = effects_effects(ie);
+  list orl = effects_effects(oe);
+  list crwl = effects_effects(crwe);
+
+  if (!memory_effects_only_p)
+    crwl = effects_store_effects(crwl);
+
+  if (!memory_in_out_regions_only_p)
+    {
+      irl  = effects_store_effects(irl);
+      orl  = effects_store_effects(orl);
+    }
 
   ifdebug(1) {
     pips_debug(1, "Entering function...\n");
@@ -777,9 +789,13 @@ static bool loop_scalarization(loop l)
   vect_rm(var_already_seen);
 
   // Do not leak
-  gen_free_list(irl);
-  gen_free_list(orl);
-  gen_free_list(crwl);
+   if (!memory_in_out_regions_only_p)
+     {
+       gen_free_list(orl);
+       gen_free_list(irl);
+     }
+   if (!memory_effects_only_p)
+     gen_free_list(crwl);
 
   return true;
 }
@@ -800,13 +816,26 @@ static bool statement_scalarization(statement s)
   transformer prec = load_statement_precondition(s);
   // Psysteme D       = predicate_system(transformer_relation(transformer_range(prec)));
 
+  bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
+  bool memory_in_out_regions_only_p = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+
   effects ie   = load_in_effects(s);
   effects oe   = load_out_effects(s);
   effects crwe = load_cumulated_rw_effects(s);
 
-  list irl  = effects_store_effects(effects_effects(ie));
-  list orl  = effects_store_effects(effects_effects(oe));
-  list crwl = effects_store_effects(effects_effects(crwe));
+  list irl  = effects_effects(ie);
+  list orl  = effects_effects(oe);
+  list crwl = effects_effects(crwe);
+
+  if (!memory_effects_only_p)
+    crwl = effects_store_effects(crwl);
+
+  if (!memory_in_out_regions_only_p)
+    {
+      irl  = effects_store_effects(irl);
+      orl  = effects_store_effects(orl);
+    }
+
 
   /* List of variables than shoud be privatized in s */
   list local_scalarized_variables = NIL;
@@ -966,9 +995,13 @@ static bool statement_scalarization(statement s)
 	   (void *) local_scalarized_variables);
 
   // Do not leak
-  gen_free_list(irl);
-  gen_free_list(orl);
-  gen_free_list(crwl);
+  if (!memory_in_out_regions_only_p)
+    {
+      gen_free_list(orl);
+      gen_free_list(irl);
+    }
+  if (!memory_effects_only_p)
+    gen_free_list(crwl);
 
   return true;
 }
@@ -1100,10 +1133,18 @@ static void scalarization_statement_out(statement s)
 	 when using gdb... */
 
       /* Privatize each of them, with copy_in or copy_out when necessary */
+      bool memory_in_out_regions_only_p = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+
       effects ie   = load_in_effects(s);
       effects oe   = load_out_effects(s);
-      list irl  = effects_store_effects(effects_effects(ie));
-      list orl  = effects_store_effects(effects_effects(oe));
+      list irl  = effects_effects(ie);
+      list orl  = effects_effects(oe);
+
+      if (!memory_in_out_regions_only_p)
+	{
+	  irl  = effects_store_effects(irl);
+	  orl  = effects_store_effects(orl);
+	}
 
       FOREACH(ENTITY, pv, local_scalarized_variables) {
 	entity iv  = (entity)
@@ -1125,6 +1166,13 @@ static void scalarization_statement_out(statement s)
 	 visited again. If the lists are not freed one by one, they
 	 should be freed later when the hash_tabe itself is freed */
       gen_free_list(local_scalarized_variables);
+
+       // Do not leak
+      if (!memory_in_out_regions_only_p)
+	{
+	  gen_free_list(orl);
+	  gen_free_list(irl);
+	}
     }
   }
   return;

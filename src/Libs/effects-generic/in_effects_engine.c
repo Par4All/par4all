@@ -62,6 +62,42 @@
 #include "effects-convex.h"
 
 
+
+typedef struct {
+  bool memory_effects_only;
+  bool memory_in_out_regions_only;
+  effects_representation_val representation;
+} in_effects_context;
+
+
+static void init_in_effects_context(in_effects_context *ctxt,
+			     effects_representation_val representation)
+{
+  ctxt->memory_effects_only = get_bool_property("MEMORY_EFFECTS_ONLY");
+  ctxt->memory_in_out_regions_only = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+  ctxt->representation = representation;
+}
+
+static list convert_rw_effects(list lrw, in_effects_context *ctxt)
+{
+  if (ctxt->representation == convex
+      && !ctxt->memory_effects_only
+      && ctxt->memory_in_out_regions_only)
+    lrw = effects_store_effects(lrw);
+
+  return lrw;
+}
+
+
+static void reset_converted_rw_effects(list *lrw, in_effects_context *ctxt)
+{
+  if (ctxt->representation == convex
+      && !ctxt->memory_effects_only
+      && ctxt->memory_in_out_regions_only)
+    gen_free_list(*lrw);
+  *lrw = NIL;
+}
+
 /* =============================================================================
  *
  * GENERIC INTERPROCEDURAL IN EFFECTS ANALYSIS
@@ -86,7 +122,7 @@ summary_in_effects_engine(const char *module_name)
 
     set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement( (statement)
-db_get_memory_resource(DBR_CODE, module_name, true) );
+              db_get_memory_resource(DBR_CODE, module_name, true) );
     module_stat = get_current_module_statement();
 
     (*effects_computation_init_func)(module_name);
@@ -94,9 +130,11 @@ db_get_memory_resource(DBR_CODE, module_name, true) );
     set_in_effects((*db_get_in_effects_func)(module_name));
 
     l_loc = load_in_effects_list(module_stat);
+
     l_glob = (*effects_local_to_global_translation_op)(l_loc);
 
     (*db_put_summary_in_effects_func)(module_name, l_glob);
+
 
     reset_current_module_entity();
     reset_current_module_statement();
@@ -121,7 +159,7 @@ static void list_gen_consistent_p(list l)
 */
 #define debug_consistent(l) /* ifdebug(9) list_gen_consistent_p(l) */
 
-static bool in_effects_stmt_filter(statement s)
+static bool in_effects_stmt_filter(statement s, in_effects_context *ctxt)
 {
     pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);
@@ -129,7 +167,7 @@ static bool in_effects_stmt_filter(statement s)
     return true;
 }
 
-static void in_effects_of_statement(statement s)
+static void in_effects_of_statement(statement s, in_effects_context *ctxt)
 {
     store_invariant_in_effects_list(s, NIL);
     debug_consistent(NIL);
@@ -138,7 +176,7 @@ static void in_effects_of_statement(statement s)
     pips_debug(1, "End statement %03zd :\n", statement_ordering(s));
 }
 
-static list r_in_effects_of_sequence(list l_inst)
+static list r_in_effects_of_sequence(list l_inst, in_effects_context *ctxt)
 {
     statement first_statement;
     list remaining_block = NIL;
@@ -166,7 +204,7 @@ print_statement(first_statement);
     if (!ENDP(remaining_block))
     {
 
-	s1_lr = load_rw_effects_list(first_statement);
+      s1_lr = convert_rw_effects(load_rw_effects_list(first_statement),ctxt);
 	ifdebug(6)
 	    {
 		pips_debug(6," rw effects for first statement:\n");
@@ -187,7 +225,7 @@ print_statement(first_statement);
 	//   t1 = (*add_loop_exit_condition_func)(t1,l);
 	// }
 
-	rb_lin = r_in_effects_of_sequence(remaining_block);
+	rb_lin = r_in_effects_of_sequence(remaining_block, ctxt);
 
 	(*effects_transformer_composition_op)(rb_lin, t1);
 
@@ -202,6 +240,9 @@ print_statement(first_statement);
 	    (*effects_sup_difference_op)(rb_lin, effects_dup(s1_lr),
 					 r_w_combinable_p),
 	    effects_same_action_p);
+
+	// no leak
+	reset_converted_rw_effects(&s1_lr,ctxt);
     }
     else
     {
@@ -220,7 +261,7 @@ print_statement(first_statement);
 }
 
 static void
-in_effects_of_sequence(sequence block)
+in_effects_of_sequence(sequence block, in_effects_context *ctxt)
 {
     list l_in = NIL;
     statement current_stat = effects_private_current_stmt_head();
@@ -236,7 +277,7 @@ in_effects_of_sequence(sequence block)
     }
     else
     {
-	l_in = r_in_effects_of_sequence(l_inst);
+      l_in = r_in_effects_of_sequence(l_inst, ctxt);
     }
 
     ifdebug(2)
@@ -254,7 +295,7 @@ in_effects_of_sequence(sequence block)
 
 
 static void
-in_effects_of_test(test t)
+in_effects_of_test(test t, in_effects_context *ctxt)
 {
     statement current_stat = effects_private_current_stmt_head();
     list lt, lf, lc_in;
@@ -274,10 +315,13 @@ in_effects_of_test(test t)
     /* IN effects of the condition */
     /* they are equal to the proper effects of the statement if there are
      * no side-effects. */
-    lc_in = effects_dup(load_proper_rw_effects_list(current_stat));
+
+    lc_in = convert_rw_effects(load_proper_rw_effects_list(current_stat),ctxt);
 
     /* in regions of the test */
-    l_in = (*effects_union_op)(l_in, lc_in, effects_same_action_p);
+    l_in = (*effects_union_op)(l_in, effects_dup(lc_in), effects_same_action_p);
+
+    reset_converted_rw_effects(&lc_in,ctxt);
 
     ifdebug(2)
     {
@@ -293,42 +337,42 @@ in_effects_of_test(test t)
 
 /* Rin[for (c) s] = Rr[for (c) s] * may
  */
-static void in_effects_of_forloop(forloop f)
+static void in_effects_of_forloop(forloop f, in_effects_context *ctxt)
 {
   statement current;
-  list /* of effect */ lin;
 
   pips_debug(1, "considering for loop 0x%p\n", (void *) f);
 
   current = effects_private_current_stmt_head();
-  lin = load_rw_effects_list(current);
-  lin = effects_read_effects_dup(lin);
+  list lrw = convert_rw_effects(load_rw_effects_list(current),ctxt);
+  list lin = effects_read_effects_dup(lrw);
   /* switch to MAY... */
   MAP(EFFECT, e,
       approximation_tag(effect_approximation(e)) = is_approximation_may,
       lin);
   store_in_effects_list(current, lin);
   store_invariant_in_effects_list(current, NIL);
+  reset_converted_rw_effects(&lrw, ctxt);
 }
 
 /* Rin[while (c) s] = Rr[while (c) s] * may
  */
-static void in_effects_of_whileloop(whileloop w)
+static void in_effects_of_whileloop(whileloop w, in_effects_context *ctxt)
 {
   statement current;
-  list /* of effect */ lin;
 
   pips_debug(1, "considering while loop 0x%p\n", (void *) w);
 
   current = effects_private_current_stmt_head();
-  lin = load_rw_effects_list(current);
-  lin = effects_read_effects_dup(lin);
+  list lrw = convert_rw_effects(load_rw_effects_list(current), ctxt);
+  list lin = effects_read_effects_dup(lrw);
   /* switch to MAY... */
   MAP(EFFECT, e,
       approximation_tag(effect_approximation(e)) = is_approximation_may,
       lin);
   store_in_effects_list(current, lin);
   store_invariant_in_effects_list(current, NIL);
+  reset_converted_rw_effects(&lrw, ctxt);
 }
 
 /* list in_effects_of_loop(loop l)
@@ -337,7 +381,7 @@ static void in_effects_of_whileloop(whileloop w)
  * modifies : in_regions_map.
  * comment  : IN(loop) = proj[i] (proj[i'] (IN(i) - W(i', i'<i))) U IN(i=1)
  */
-static void in_effects_of_loop(loop l)
+static void in_effects_of_loop(loop l, in_effects_context *ctxt)
 {
     statement current_stat = effects_private_current_stmt_head();
 
@@ -364,15 +408,17 @@ static void in_effects_of_loop(loop l)
     /* We assume that there is no side effect in the loop header;
      * thus the IN effects of the header are similar to its proper effects.
      */
-    l_prop = load_proper_rw_effects_list(current_stat);
-    l_prop = proper_to_summary_effects(l_prop);
+    list l_prop_init = convert_rw_effects(load_proper_rw_effects_list(current_stat), ctxt);
+    l_prop = proper_to_summary_effects(l_prop_init);
+    reset_converted_rw_effects(&l_prop_init, ctxt);
     l_prop_read = effects_read_effects_dup(l_prop);
     l_prop_write = effects_write_effects_dup(l_prop);
     /* END - IN EFFECTS OF HEADER */
 
     /* INVARIANT WRITE EFFECTS OF LOOP BODY STATEMENT. */
-    global_write =
-	effects_write_effects_dup(load_invariant_rw_effects_list(b));
+    list l_inv = convert_rw_effects(load_invariant_rw_effects_list(b), ctxt);
+    global_write = effects_write_effects_dup(l_inv);
+    reset_converted_rw_effects(&l_inv, ctxt);
 
     ifdebug(4){
 	pips_debug(4, "W(i)= \n");
@@ -632,7 +678,7 @@ static bool written_before_read_p(entity ent,list args)
 
 
 static void
-in_effects_of_call(call c)
+in_effects_of_call(call c, in_effects_context *ctxt)
 {
     statement current_stat = effects_private_current_stmt_head();
 
@@ -665,14 +711,15 @@ in_effects_of_call(call c)
       case is_value_intrinsic:
 	pips_debug(5, "intrinsic function %s\n", n);
 	debug_consistent(l_in);
-	l_in = load_rw_effects_list(current_stat);
-	debug_consistent(l_in);
+	list l_rw = convert_rw_effects(load_rw_effects_list(current_stat), ctxt);
+	debug_consistent(l_rw);
 	ifdebug(2){
 	    pips_debug(2, "R/W effects: \n");
-	    (*effects_prettyprint_func)(l_in);
+	    (*effects_prettyprint_func)(l_rw);
 	}
 
-	l_in = effects_read_effects_dup(l_in);
+	l_in = effects_read_effects_dup(l_rw);
+	reset_converted_rw_effects(&l_rw, ctxt);
 
 	/* Nga Nguyen 25/04/2002 : what about READ *,NDIM,(LSIZE(N), N=1,NDIM) ?
 	   Since NDIM is written before read => no IN effect on NDIM.
@@ -716,7 +763,7 @@ in_effects_of_call(call c)
    function is called for Fortran module although it does not have any
    effect.
  */
-static void in_effects_of_expression_instruction(instruction i)
+static void in_effects_of_expression_instruction(instruction i, in_effects_context *ctxt)
 {
   //list l_proper = NIL;
   statement current_stat = effects_private_current_stmt_head();
@@ -727,8 +774,9 @@ static void in_effects_of_expression_instruction(instruction i)
   /* Is the call an instruction, or a sub-expression? */
   if (instruction_expression_p(i))
     {
-      list lin = load_rw_effects_list(current_stat);
-      lin = effects_read_effects_dup(lin);
+      list lrw = convert_rw_effects(load_rw_effects_list(current_stat), ctxt);
+      list lin = effects_read_effects_dup(lrw);
+      reset_converted_rw_effects(&lrw, ctxt);
       store_in_effects_list(current_stat, lin);
     }
 
@@ -739,7 +787,7 @@ static void in_effects_of_expression_instruction(instruction i)
 
 
 static void
-in_effects_of_unstructured(unstructured u)
+in_effects_of_unstructured(unstructured u, in_effects_context *ctxt)
 {
     statement current_stat = effects_private_current_stmt_head();
     list blocs = NIL ;
@@ -777,14 +825,14 @@ in_effects_of_unstructured(unstructured u)
 
 
 static void
-in_effects_of_module_statement(statement module_stat)
+in_effects_of_module_statement(statement module_stat, in_effects_context *ctxt)
 {
   make_effects_private_current_stmt_stack();
 
   pips_debug(1,"begin\n");
 
-  gen_multi_recurse(
-	module_stat,
+  gen_context_multi_recurse(
+	module_stat, ctxt,
 	statement_domain, in_effects_stmt_filter, in_effects_of_statement,
 	sequence_domain, gen_true, in_effects_of_sequence,
 	test_domain, gen_true, in_effects_of_test,
@@ -813,7 +861,7 @@ in_effects_of_module_statement(statement module_stat)
  * modifies :
  * comment  : computes the in effects of the current module.
  */
-bool in_effects_engine(const char * module_name)
+bool in_effects_engine(const char * module_name, effects_representation_val representation)
 {
     statement module_stat;
     make_effects_private_current_context_stack();
@@ -840,7 +888,9 @@ bool in_effects_engine(const char * module_name)
     init_cumulated_in_effects();
 
     /* Compute the effects of the module. */
-    in_effects_of_module_statement(module_stat);
+    in_effects_context ctxt;
+    init_in_effects_context(&ctxt, representation);
+    in_effects_of_module_statement(module_stat, &ctxt);
 
     /* Put computed resources in DB. */
     (*db_put_in_effects_func)
