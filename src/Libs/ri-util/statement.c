@@ -1719,28 +1719,26 @@ append_comments_to_statement(statement s,
 
    @param the_comments is strdup'ed in this function.
 */
-void
-insert_comments_to_statement(statement s,
-			     const char* the_comments)
-{
-    string old;
+void insert_comments_to_statement(statement s,
+                                  const char* the_comments) {
+  string old;
 
-    if (empty_comments_p(the_comments))
-	/* Nothing to add... */
-	return;
+  if (empty_comments_p(the_comments))
+    /* Nothing to add... */
+    return;
 
-    old  = find_first_comment(s);
-    if (empty_comments_p(old))
-	/* There are no comments yet: */
-	put_a_comment_on_a_statement(s, strdup(the_comments));
-    else {
-	put_a_comment_on_a_statement(s, strdup(concatenate(the_comments, old, NULL)));
-	/* Courageous: you have to be sure that the comment returned
-	   by find_first_comment() belongs to the statement which is
-	   going to be used by put_a_comment_on_a_statement() knowing
-	   that both can be different from s if s is a sequence. */
-	free(old);
-    }
+  old  = find_first_comment(s);
+  if (empty_comments_p(old)) {
+    /* There are no comments yet: */
+    put_a_comment_on_a_statement(s, strdup(the_comments));
+  } else {
+    put_a_comment_on_a_statement(s, strdup(concatenate(the_comments,"\n", old, NULL)));
+    /* Courageous: you have to be sure that the comment returned
+	     by find_first_comment() belongs to the statement which is
+	     going to be used by put_a_comment_on_a_statement() knowing
+	     that both can be different from s if s is a sequence. */
+    free(old);
+  }
 }
 
 
