@@ -144,7 +144,17 @@ class p4a_builder:
         self.builder = build
 
         if atomic:
-            nvcc_flags = [ "-arch=sm_11" ] + nvcc_flags
+            if cuda_cc == "1.0":
+                raise p4a_util.p4a_error("Atomic operations isn't available with CUDA compute capability 1.0?")
+            elif cuda_cc == "1.1":
+                nvcc_flags = [ "-arch=sm_11" ] + nvcc_flags
+            elif cuda_cc == "1.2":
+                nvcc_flags = [ "-arch=sm_12" ] + nvcc_flags
+            elif cuda_cc == "1.3":
+                nvcc_flags = [ "-arch=sm_13" ] + nvcc_flags
+            elif cuda_cc == "2.0":
+                nvcc_flags = [ "-arch=sm_20" ] + nvcc_flags
+            
 
         if not nvcc:
             nvcc = "nvcc"
