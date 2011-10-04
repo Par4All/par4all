@@ -78,7 +78,7 @@ def add_own_options(parser):
     proc_group.add_option("--pocc", action = "store_true", default = False,
         help = "Use PoCC to optimize loop nest (experimental).")
 
-    proc_group.add_option("--cuda-cc", action = "append", default = "2.0",
+    proc_group.add_option("--cuda-cc", action = "store", default = "2.0",
         help = "Compute capabilities of Cuda target (default is 2.0)")
 
     proc_group.add_option("--select-modules", metavar = "REGEXP", default = None,
