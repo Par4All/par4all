@@ -87,6 +87,10 @@ $(TARGET)-cuda : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS)
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_CUDA_FLAGS) $(P4A_OPTIONS) $(GPU_TIMING) $(CPPFLAGS)  --cuda -o $@ $(COMMON_SOURCES) $(SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)   --nvcc-flags="$(NVCCFLAGS)"
 	
+$(TARGET)-opencl : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS)
+	# Parallelize and build an OpenCL version:
+	p4a $(P4A_OPENCL_FLAGS) $(P4A_OPTIONS) $(GPU_TIMING) $(CPPFLAGS)  --opencl -o $@ $(COMMON_SOURCES) $(SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(OPENCLLIBS)
+	
 $(TARGET)-cuda-opt : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS)
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_CUDA_FLAGS) $(P4A_OPTIONS) $(GPU_TIMING) $(CPPFLAGS) --com-optimization --cuda -o $@ $(COMMON_SOURCES) $(SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)  --nvcc-flags="$(NVCCFLAGS)"
