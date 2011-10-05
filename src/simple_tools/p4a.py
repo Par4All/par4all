@@ -376,6 +376,10 @@ def main():
             p4a_util.info("Enabling --accel because of --opencl")
             options.accel = True
 
+        if options.opencl and options.c99:
+            p4a_util.info("Disabling --c99 because of --opencl")
+            options.c99 = False
+
         if options.com_optimization and not options.accel:
             p4a_util.info("Enabling --accel because of --com-optimization")
             options.accel = True
