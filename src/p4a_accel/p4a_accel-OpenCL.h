@@ -714,6 +714,32 @@ parameters types are resolved.
   P4A_skip_debug(0,P4A_dump_block_descriptor(block_descriptor_name);)
 
 
+/** Allocate the descriptors for a 3D set of thread with a simple
+    strip-mining in each dimension for CL
+
+    globalWorkSize = global number of work-items.
+    localWorkSize = number of work-items in a work-group.
+    The dimension is equal to work_dim.
+
+    The total number of work-items in a work-group equals
+    localWorkSize[0] * ... * localWorkSize[work_dim-1]
+    This value must be less than CL_DEVICE_MAX_WORK_GROUP_SIZE.
+
+    localWorkSize can be set as NULL, and OpenCL implementation will
+    determine how to break the globalWorkSize.
+
+
+*/
+#define P4A_create_3d_thread_descriptors(grid_descriptor_name,    \
+           block_descriptor_name,   \
+           n_x_iter, n_y_iter, n_z_iter)    \
+  cl_uint work_dim = 3; \
+  size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter),(size_t)(n_z_iter)}; \
+  size_t *block_descriptor_name = NULL; \
+  P4A_skip_debug(0,P4A_dump_grid_descriptor(grid_descriptor_name););  \
+  P4A_skip_debug(0,P4A_dump_block_descriptor(block_descriptor_name);)
+
+
 /** Dump a CL dim2 descriptor with an introduction message 
  *  OG:change descriptor_name[0] to descriptor_name, gcc does not accept, still question for one dim ?*/
 #define P4A_dump_descriptor(message, descriptor_name)     \
@@ -916,6 +942,48 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,   \
              P4A_block_descriptor,    \
              P4A_n_iter_0, P4A_n_iter_1); \
+    /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
+    /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
+    /* multiple of P4A_block_descriptor */ \
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),     \
+        (p4a_queue,p4a_kernel,work_dim,NULL,    \
+         P4A_grid_descriptor,NULL,  \
+         0,NULL,&p4a_event));       \
+  } while (0)
+
+/** Call a kernel in a 2-dimension parallel loop in CL
+
+    The creation of the program depends on the kernel that is known only
+    from here. Could not place this initialization in the P4A_accel_init
+    macro.
+
+    do { } while(0) is needed to privatize local variable that can be
+    duplicate if many kernels are launched at the same time.
+
+    @param[in] kernel to call
+
+    @param[in] P4A_n_iter_0 is the number of iterations in the first dimension
+
+    @param[in] P4A_n_iter_1 is the number of iterations in the first dimension
+
+    @param ... following parameters are given to the kernel
+*/
+#define P4A_call_accel_kernel_3d(kernel, P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, ...) \
+  do {                  \
+    P4A_TIMING_accel_timer_start;         \
+    p4a_load_kernel(kernel,__VA_ARGS__);        \
+    P4A_argN(__VA_ARGS__);            \
+    P4A_TIMING_accel_timer_stop;          \
+    P4A_TIMING_display_elasped_time(Kernel and arguments loading);  \
+    timer_call_from_p4a = true;           \
+    P4A_accel_timer_stop_and_float_measure();       \
+    timer_call_from_p4a = false;          \
+    P4A_skip_debug(0,P4A_dump_message("Calling 2D kernel \"" #kernel  \
+            "\" of size (%dx%d)\n",   \
+            P4A_n_iter_0, P4A_n_iter_1)); \
+    P4A_create_3d_thread_descriptors(P4A_grid_descriptor,   \
+             P4A_block_descriptor,    \
+             P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2); \
     /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
     /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
     /* multiple of P4A_block_descriptor */ \
