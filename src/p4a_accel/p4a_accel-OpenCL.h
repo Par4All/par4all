@@ -336,7 +336,7 @@ extern cl_command_queue p4a_queue;
 
 /** OpenCL invocation of clEnqueueNDRangeKernel.
 */
-#define P4A_call_accel_kernel_context(kernel, ...)	kernel
+#define P4A_call_accel_kernel_context(kernel, ...)	p4a_global_error=kernel
 
 /** 
     @}
