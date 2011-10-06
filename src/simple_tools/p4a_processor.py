@@ -764,10 +764,11 @@ class p4a_processor(object):
         # kernels. So, we degrade the quality of the generated code by
         # generating array declarations as pointers and by accessing them
         # as array[linearized expression]:
-        if self.c99 or self.fortran:
-            kernel_launchers.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
-            kernels.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
-            wrappers.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
+        if self.c99 or self.fortran or self.opencl:
+            flag = self.c99 or self.opencl
+            kernel_launchers.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
+            wrappers.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
+            kernels.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
             
             
 
@@ -985,12 +986,14 @@ class p4a_processor(object):
             
             #wrapper from .database/wrapper_name/wrapper_name.c
             #to take wrapper without any type definition
-            wrapper_file = os.path.join(self.workspace.dirname, wrapper,
+            wrapper_file = os.path.join(self.workspace.dirname, "Src",
                                        wrapper + ".c")				
             kernel_file = os.path.join(self.workspace.dirname, "Src",
                                         kernel + ".c")        
-            output_file = os.path.join(self.workspace.dirname, wrapper,
-                                            wrapper + ".cl")                                                            
+            output_file = os.path.join(self.workspace.dirname, "Src",
+                                            wrapper + ".cl")
+            p4a_util.debug("Merge '" + kernel_file + "' and '" + wrapper_file + 
+                           "' in '" + output_file + "'") 
             p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
 
     def save_header (self, output_dir, name):
@@ -1049,12 +1052,9 @@ class p4a_processor(object):
         #p4a_util.warn("generated modules length "+str(len(self.generated_modules))) 
             
         for name in self.generated_modules:
+            p4a_util.debug("Save generated : '" + name + "'")
             # Where the file actually is in the .database workspace:
-            if self.opencl:
-                pips_file = os.path.join(self.workspace.dirname, name,
-                                     name + extension_in)
-            else:                                                  
-                pips_file = os.path.join(self.workspace.dirname, "Src",
+            pips_file = os.path.join(self.workspace.dirname, "Src",
                                      name + extension_in)
             
             #p4a_util.warn("pips_file " +pips_file)                                                                                  
@@ -1244,21 +1244,23 @@ class p4a_processor(object):
             #no longer needed
             #self.merge_lwk ()
             
+
+        # save the user files
+        output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
+        
         # During the opencl generation process, kernels and wrappers
         # have been generated in different files. 
         # Let's merge them in the same files
         if self.opencl:
             self.merge_wrapper_kernel ()
                       
-
-        # save the user files
-        output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
         # save pips generated files in the dedicated folder
         output_files.extend (self.save_crough (output_dir))
         output_files.extend (self.save_interface (output_dir))
         output_files.extend (self.save_generated (output_dir, subs_dir))
         #output_files.extend (self.save_generated (output_dir))        
         #p4a_util.warn("output_dir "+ output_dir)
+
 
         # generate one header to warp all the generated header files
         if (new_file_flag == True):
