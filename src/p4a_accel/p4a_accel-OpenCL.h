@@ -741,9 +741,10 @@ parameters types are resolved.
 /** Dump a CL dim2 descriptor with an introduction message 
  *  OG:change descriptor_name[0] to descriptor_name, gcc does not accept, still question for one dim ?*/
 #define P4A_dump_descriptor(message, descriptor_name)     \
-  P4A_dump_message(message "\""  #descriptor_name "\" of size %zu x %zu\n", \
+  P4A_dump_message(message "\""  #descriptor_name "\" of size %zu x %zu x %zu\n", \
        descriptor_name[0],          \
-       descriptor_name[1])
+       descriptor_name[1],          \
+       descriptor_name[2])
 
 /** Dump a CL dim3 block descriptor */
 #define P4A_dump_block_descriptor(descriptor_name)      \
