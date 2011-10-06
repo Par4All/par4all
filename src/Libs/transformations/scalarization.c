@@ -186,7 +186,7 @@ static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
       sc_print(g4, (get_variable_name_t)entity_local_name);
       }
     */
-    if (SC_EMPTY_P(g4)) {
+    if (SC_EMPTY_P(g4) || sc_empty_p(g4)) {
       functional_p = false;
     }
     else {
