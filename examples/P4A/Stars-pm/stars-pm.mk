@@ -17,7 +17,10 @@ BASE_SOURCES= pm.c 1-discretization.c 2-histogramme.c 3-potential.c \
 OBJS=$(BASE_SOURCES:.c=.o)
 
 SOURCES= $(BASE_SOURCES:%=sequential/%)
-export P4A_GENERATED=$(SOURCES:%.c=%.p4a.c) $(SOURCES:%.c=%.p4a.cu)
+ifndef P4A_GENERATED
+P4A_GENERATED=$(SOURCES:%.c=%.p4a.c) $(SOURCES:%.c=%.p4a.cu)
+endif
+export P4A_GENERATED
 PGI_SOURCES=  $(BASE_SOURCES:%=pgi/%)
 PGI_OBJS=  $(BASE_SOURCES:%.c=%.o)
 MANUAL_CUDA_SOURCES= cuda/pm.cu cuda/kernel_tools.cu \
@@ -33,7 +36,7 @@ STUBS = stubs/pips_stubs.c
 P4A_OMP_FLAGS=-DFFTW3_THREADED -lfftw3f_threads 
 P4A_CUDA_FLAGS=--atomic
 P4A_ACCEL_OPENMP_FLAGS=$(P4A_CUDA_FLAGS)
-NVCCFLAGS=-lcufft
+NVCCFLAGS+=-lcufft
 LDLIBS+= -lm -lfftw3f
 CULIBS+= -lm --fftw3
 CPPFLAGS+= -DNP=$(SIZE) -I./include -I./ -D_GNU_SOURCE

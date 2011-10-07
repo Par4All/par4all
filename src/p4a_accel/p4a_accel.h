@@ -49,6 +49,14 @@ extern int p4a_timing;
 #error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
 #endif
 
+#if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENCL) 
+#error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENCL defined, yet"
+#endif
+
+#if defined(P4A_ACCEL_OPENCL) && defined(P4A_ACCEL_OPENMP) 
+#error "You cannot have both P4A_ACCEL_OPENCL and P4A_ACCEL_OPENMP defined, yet"
+#endif
+
 /* Some common function prototypes. */
 
 /** Prototype for allocating memory on the hardware accelerator.
@@ -172,6 +180,11 @@ void P4A_copy_from_accel_4d(size_t element_size,
           void *host_address,
           const void *accel_address);
 
+/** Formats the standard MACROS  __FILE__ and __LINE__ for message print.
+ */
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define AT __FILE__ ":" TOSTRING(__LINE__)
 
 
 /**
@@ -224,6 +237,13 @@ do { \
   } \
 } while(0);
 
+/*
+#ifdef P4A_DEBUG
+#define P4A_skip_debug(debug_stuff) debug_stuff
+#else
+#define P4A_skip_debug(debug_stuff)
+#endif
+*/
 #include <stdio.h>
 
 /** Output a debug message à la printf */
@@ -249,7 +269,11 @@ do { \
 #ifdef P4A_ACCEL_OPENMP
 #include <p4a_accel-OpenMP.h>
 #else
-#error "You have to define either P4A_ACCEL_CUDA or P4A_ACCEL_OPENMP"
+#ifdef P4A_ACCEL_OPENCL
+#include <p4a_accel-OpenCL.h>
+#else
+#error "You have to define either P4A_ACCEL_CUDA, P4A_ACCEL_OPENMP or P4A_ACCEL_OPENCL"
+#endif
 #endif
 #endif
 

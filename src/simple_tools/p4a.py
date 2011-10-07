@@ -54,6 +54,9 @@ def add_own_options(parser):
     proc_group.add_option("--cuda", "-C", action = "store_true", default = False,
         help = "Enable CUDA generation. Implies --accel.")
 
+    proc_group.add_option("--opencl", action = "store_true", default = False,
+        help = "Enable OPENCL generation. Implies --accel.")
+        
     proc_group.add_option("--openmp", "-O", action = "store_true", default = False,
         help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All Accel run-time calls and memory transfers with OpenMP implementation instead of native shared-memory OpenMP output. If --cuda is not specified, this option is set by default.")
 
@@ -67,7 +70,7 @@ def add_own_options(parser):
         help = "This option is useful when generating some CUDA code from C99 sources. Indeed nvcc doesn't support the following C99 syntax : foo (int n, int a[n]), then if the --c99 option is enabled, p4a will automatically generates the CUDA code in new C89 files (with no VLA but pointers with linearized accesses instead) that will be compiled by nvcc. A simple call to each kernel will be inserted into the original file that can be compiled with your usual C99 compiler.")
 
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
-        help = "This cancels --openmp, --cuda and --scmp, and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
+        help = "This cancels --openmp, --cuda, --scmp, or --opencl and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
 
     proc_group.add_option("--fine", "-F", action = "store_true", default = False,
         help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
@@ -358,16 +361,24 @@ def main():
             p4a_util.die("Unknow cuda compute capability requested : '" + options.cuda_cc + "' (allowed : 1.0 1.1 1.2 1.3 2.0)")            
 
 
-        if options.simple and (options.cuda or options.openmp or options.scmp):
-            p4a_util.die("Cannot combine --simple with --cuda and/or --openmp and/or --scmp")
+        if options.simple and (options.cuda or options.opencl or options.openmp or options.scmp):
+            p4a_util.die("Cannot combine --simple with --cuda and/or --openmp and/or --scmp  and/or --opencl")
 
-        if not options.simple and not options.cuda and not options.openmp and not options.scmp:
+        if not options.simple and not options.cuda and not options.openmp and not options.scmp and not options.opencl:
             p4a_util.info("Defaulting to --openmp")
             options.openmp = True
 
         if options.cuda and not options.accel:
             p4a_util.info("Enabling --accel because of --cuda")
             options.accel = True
+
+        if options.opencl and not options.accel:
+            p4a_util.info("Enabling --accel because of --opencl")
+            options.accel = True
+
+        if options.opencl and options.c99:
+            p4a_util.info("Disabling --c99 because of --opencl")
+            options.c99 = False
 
         if options.com_optimization and not options.accel:
             p4a_util.info("Enabling --accel because of --com-optimization")
@@ -408,7 +419,7 @@ def main():
             if p4a_util.c_file_p(file) or p4a_util.fortran_file_p(file):
                 files.append(abs_file)
                 p4a_util.debug("Input file: " + abs_file)
-            elif p4a_util.cxx_file_p(file) or p4a_util.cuda_file_p(file):
+            elif p4a_util.cxx_file_p(file) or p4a_util.cuda_file_p(file) or p4a_util.opencl_file_p(file):
                 other_files.append(abs_file)
                 p4a_util.info("File format not supported by parallelizer, will not be parallelized: " + abs_file)
             elif p4a_util.header_file_p(file):
@@ -485,6 +496,7 @@ def main():
             accel_openmp = options.accel,
             icc = options.icc,
             cuda = options.cuda,
+            opencl=options.opencl,            
             atomic = options.atomic,
             com_optimization = options.com_optimization,
             cuda_cc = options.cuda_cc,
@@ -524,6 +536,7 @@ def main():
             input.project_name = project_name
             input.accel = options.accel
             input.cuda = options.cuda
+            input.opencl = options.opencl
             input.com_optimization = options.com_optimization
             input.cuda_cc = options.cuda_cc
             input.fftw3 = options.fftw3

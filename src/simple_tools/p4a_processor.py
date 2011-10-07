@@ -126,6 +126,7 @@ class p4a_processor_input(object):
     project_name = ""
     accel = False
     cuda = False
+    opencl = False
     com_optimization = False
     cuda_cc = 2
     fftw3 = False
@@ -179,7 +180,7 @@ class p4a_processor(object):
     # - the list of module with interfaces:
     interface_modules = []
     # - the generated header files:
-    header_files = []
+    header_files = []  
     # - the set of CUDA modules:
     cuda_modules = set ()
     # - the set of C modules:
@@ -204,7 +205,7 @@ class p4a_processor(object):
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
                  filter_exclude = None, accel = False, cuda = False,
-                 openmp = False, com_optimization = False, cuda_cc=2, fftw3 = False,
+                 opencl = False, openmp = False, com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  c99 = False, use_pocc = False, atomic = False,
                  properties = {}, apply_phases={}, activates = []):
@@ -213,6 +214,7 @@ class p4a_processor(object):
         self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
+        self.opencl = opencl        
         self.openmp = openmp
         self.com_optimization = com_optimization
         self.cuda_cc = cuda_cc
@@ -567,7 +569,6 @@ class p4a_processor(object):
         m = fortran_wrapper_file_name_re.match (os.path.basename (file_name))
         return (m != None)
 
-
     def parallelize(self, fine = False, filter_select = None,
                     filter_exclude = None, apply_phases_before = [], apply_phases_after = []):
         """Apply transformations to parallelize the code in the workspace
@@ -620,7 +621,7 @@ class p4a_processor(object):
         workspace to generate GPU-oriented code
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
-
+		
         # Some "risky" optimizations
         #all_modules.flatten_code(unroll=False,concurrent=True)
         #all_modules.simplify_control(concurrent=True)
@@ -649,13 +650,13 @@ class p4a_processor(object):
         # Fortran case, we want the launcher to be wrapped in an
         # independent Fortran function so that it will be prettyprinted
         # later in... C (for OpenCL or CUDA kernel definition). :-)
-        all_modules.gpu_ify(GPU_USE_WRAPPER = False,
-                            GPU_USE_KERNEL = False,
+        all_modules.gpu_ify(GPU_USE_WRAPPER = False, 
+                            GPU_USE_KERNEL = False,                             
                             GPU_USE_FORTRAN_WRAPPER = self.fortran,
                             GPU_USE_LAUNCHER = True,
-                            GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                            GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                            GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                            GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,                            
                             OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
                             annotate_loop_nests = True, # annotate for recover parallel loops later
                             concurrent=True)
@@ -665,7 +666,6 @@ class p4a_processor(object):
         launcher_prefix = self.get_launcher_prefix ()
         kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
-
 
         # We flag loops in kernel launchers as parallel, based on the annotation
         # previously made
@@ -687,9 +687,12 @@ class p4a_processor(object):
         # End to generate the wrappers and kernel contents, but not the
         # launchers that have already been generated:
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
-                                 OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                                 OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
-                                 concurrent=True)
+								 # opencl option will produce independent kernel and wrapper files                       
+								 GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.opencl,
+								 GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = False,								 
+								 OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
+								 OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
+								 concurrent=True)
 
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
@@ -761,10 +764,11 @@ class p4a_processor(object):
         # kernels. So, we degrade the quality of the generated code by
         # generating array declarations as pointers and by accessing them
         # as array[linearized expression]:
-        if self.c99 or self.fortran:
-            kernel_launchers.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
-            kernels.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
-            wrappers.linearize_array(use_pointers=self.c99,cast_at_call_site=True,vla_only=self.c99)
+        if self.c99 or self.fortran or self.opencl:
+            flag = self.c99 or self.opencl
+            kernel_launchers.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
+            wrappers.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
+            kernels.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
             
             
 
@@ -830,7 +834,14 @@ class p4a_processor(object):
 
         # Save the list of kernels for later work:
         self.kernels.extend (map(lambda x:x.name, kernels))
-        self.launchers.extend (map(lambda x:x.name, kernel_launchers))
+        if self.cuda:        
+			self.launchers.extend (map(lambda x:x.name, kernel_launchers))
+        if self.opencl:
+            # Comment the place where the opencl wrapper declaration must be placed
+            # from the post-process
+            for launcher in kernel_launchers:
+                self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration\n")           
+            self.generated_modules.extend(map(lambda x:x.name, wrappers))
 
         
 
@@ -945,19 +956,22 @@ class p4a_processor(object):
             wrapper  = self.kernel_to_wrapper_name  (kernel)
             launcher = self.kernel_to_launcher_name (kernel)
             # merge the files in the kernel file
-            # Where the files do well in the .database workspace:
-            kernel_file = os.path.join(self.workspace.dirname, "Src",
-                                       kernel + ".c")
+            # Where the files do dwell in the .database workspace:
+
             wrapper_file = os.path.join(self.workspace.dirname, "Src",
-                                        wrapper + ".c")
+                                       wrapper + ".c")
+            kernel_file = os.path.join(self.workspace.dirname, "Src",
+                                        kernel + ".c")
             launcher_file = os.path.join(self.workspace.dirname, "Src",
                                          launcher + ".c")
-            p4a_util.merge_files (kernel_file, [wrapper_file, launcher_file])
-            # remove the wrapper from the modules to be processed since already
-            #in the kernel
-            self.generated_modules.remove (wrapper)
-            self.generated_modules.remove (launcher)
-
+                                        
+            if self.cuda:
+				p4a_util.merge_files (kernel_file, [wrapper_file, launcher_file])
+				# remove the wrapper from the modules to be processed since already
+				#in the kernel
+				self.generated_modules.remove (wrapper)
+				self.generated_modules.remove (launcher)
+                
     def save_header (self, output_dir, name):
         content = "/*All the generated includes are summarized here*/\n\n"
         for header in self.header_files:
@@ -991,7 +1005,7 @@ class p4a_processor(object):
             result.append(output_file)
         return result
 
-    def save_generated (self, output_dir):
+    def save_generated (self, output_dir, subs_dir):
         """ Save the generated files that might have been generated by
         PIPS during the p4a process.
         """
@@ -999,17 +1013,28 @@ class p4a_processor(object):
         if (self.fortran == True):
             extension_in = ".f"
             extension_out = ".f08"
+        elif (self.opencl == True):
+            extension_in = ".cl"
+            extension_out = ".cl"
         else:
             extension_in = ".c"
             if (self.cuda == True):
                 extension_out = ".cu"
+#            elif (self.opencl == True):
+                #extension_in = ".cl"
+#                extension_out = ".cl"                
             else:
                 extension_out = ".c"
+        #p4a_util.warn("generated modules length "+str(len(self.generated_modules))) 
+            
         for name in self.generated_modules:
+            p4a_util.debug("Save generated : '" + name + "'")
             # Where the file actually is in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname, "Src",
                                      name + extension_in)
-            if self.accel and p4a_util.c_file_p(pips_file):
+            
+            #p4a_util.warn("pips_file " +pips_file)                                                                                  
+            if self.accel and (p4a_util.c_file_p(pips_file) or p4a_util.opencl_file_p(pips_file)):
                 # We generate code for P4A Accel, so first post process
                 # the output and produce the result in the P4A subdiretory
                 # of the .database
@@ -1023,9 +1048,28 @@ class p4a_processor(object):
             output_file = os.path.join(output_dir, output_name)
             if (self.fortran_wrapper_p (pips_file) == True):
                 self.post_process_fortran_wrapper (pips_file, name)
+
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
-            result.append(output_file)
+            result.append(output_file)      
+            
+            if (self.opencl == True):
+                # Merging the content of the p4a_accel_wrapper-OpenCL.h
+                # in the .cl kernel file
+                end_file =  os.path.join(subs_dir, output_name)
+                #p4a_util.warn("end file "+end_file)
+                # In the merge operation, the output file is only open in 
+                # append mode. When multiple compilation are launched,
+                # without cleaning, the resulting file cumulates all
+                # the versions. Removing the file before, prevent from this
+                try:
+                    os.remove(end_file)
+                except os.error:
+                    pass
+                h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
+                p4a_util.merge_files (end_file, [h_file, output_file])
+                #p4a_util.warn("end_file after join "+end_file)
+                     
 
             if (self.fortran == False):
                 # for C generate the header file
@@ -1072,7 +1116,7 @@ class p4a_processor(object):
             (dir, name) = os.path.split(file)
             # Where the file does well in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname, "Src", name)
-
+            #p4a_util.warn("pips_file save_user_file "+pips_file)
             # Recover the includes in the given file only if the flags have
             # been previously set and this is a C program:
             if self.recover_includes and not self.native_recover_includes and p4a_util.c_file_p(file):
@@ -1095,21 +1139,28 @@ class p4a_processor(object):
             if self.accel and p4a_util.c_file_p(file):
                 # We generate code for P4A Accel, so first post process
                 # the output:
+
                 self.accel_post(pips_file,
-                                os.path.join(self.workspace.dirname, "P4A"))
+					os.path.join(self.workspace.dirname, "P4A"))                                
                 # Where the P4A output file does dwell in the .database
                 # workspace:
                 p4a_file = os.path.join(self.workspace.dirname, "P4A", name)
                 # Update the normal location then:
                 pips_file = p4a_file
+                #p4a_util.warn("pips_file save_user_file 2 "+pips_file)
+                                
                 if (self.cuda == True) and (self.c99 == False):
                     # some C99 syntax is forbidden with Cuda. That's why there is
                     # a --c99 option that allows to generate a unique call site into the
                     # c99 original file to the wrappers (and then kenel). In such a case
                     # the original files will remain standard c99 files and the cuda files
                     # will only be the wrappers and the kernel (cf save_generated).
-                    output_file = p4a_util.change_file_ext(output_file, ".cu")
-
+					output_file = p4a_util.change_file_ext(output_file, ".cu")
+                #if (self.opencl == True):
+                    #self.merge_function_launcher(pips_file)
+                    #self.accel_post(pips_file)                                      
+                    #output_file = p4a_util.change_file_ext(output_file, ".c")
+					
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
             result.append (output_file)
@@ -1150,10 +1201,17 @@ class p4a_processor(object):
         new_file_flag =  self.new_file_generated ()
 
         output_dir = os.path.join(os.getcwd(), self.new_files_folder)
+        #p4a_util.warn("p4a new file " + output_dir)
         if dest_dir:
             output_dir = os.path.join(dest_dir,self.new_files_folder)
         if ((not (os.path.isdir(output_dir))) and (new_file_flag == True)):
             os.makedirs (output_dir)
+
+        # For the opencl kernels that have been pushed in generated_files
+        # but must be saved at the working place (substitutive directory)
+        subs_dir = os.getcwd()
+        if dest_dir:
+            subs_dir = dest_dir
 
         # Nvcc compiles .cu files as C++, thus we add extern C { declaration
         # to prevent mangling
@@ -1161,13 +1219,29 @@ class p4a_processor(object):
             self.launchers_insert_extern_C ()
             #no longer needed
             #self.merge_lwk ()
+            
 
         # save the user files
-        output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
+        output_files.extend (self.save_user_file (dest_dir, prefix, suffix))        
+        
+        if self.opencl:
+            # HACK inside : we expect the launcher and the kernel to be in the 
+            # same file which MUST be called wrapper_name.c
+            for kernel in self.kernels:
+                # find the associated wrapper with the kernel
+                src_dir = os.path.join(self.workspace.dirname, "Src")
+                wrapper  = os.path.join(src_dir,self.kernel_to_wrapper_name(kernel)+".cl")
+                kernel = os.path.join(src_dir,kernel+".c")
+                shutil.copyfile(kernel, wrapper)
+
+        
         # save pips generated files in the dedicated folder
         output_files.extend (self.save_crough (output_dir))
         output_files.extend (self.save_interface (output_dir))
-        output_files.extend (self.save_generated (output_dir))
+        output_files.extend (self.save_generated (output_dir, subs_dir))
+        #output_files.extend (self.save_generated (output_dir))        
+        #p4a_util.warn("output_dir "+ output_dir)
+
 
         # generate one header to warp all the generated header files
         if (new_file_flag == True):

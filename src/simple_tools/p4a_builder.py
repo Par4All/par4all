@@ -45,6 +45,15 @@ def get_cuda_dir():
                 + "). Please set the CUDA_DIR environment variable correctly")
     return cuda_dir
 
+amd_opencl_dir = ""
+def get_amd_opencl_dir():
+    global amd_opencl_dir
+    if not amd_opencl_dir:
+        if "AMDAPPSDKROOT" in os.environ:
+            amd_opencl_dir = os.path.expanduser(os.environ["AMDAPPSDKROOT"])
+    return amd_opencl_dir
+
+
 #cuda_sdk_dir = ""
 def get_cuda_sdk_dir():
     global cuda_sdk_dir
@@ -59,6 +68,20 @@ def get_cuda_sdk_dir():
             raise p4a_util.p4a_error("CUDA SDK directory not found or invalid (" + cuda_sdk_dir
                 + "). Please set the CUDA_SDK_DIR environment variable correctly")
     return cuda_sdk_dir
+
+def get_opencl_cpp_flags():
+    '''To be restructured for multi-platforms OpenCL
+	'''
+    opencl_dir=get_amd_opencl_dir()
+    if opencl_dir:
+        opencl_flags=["-I"+os.path.join(opencl_dir, "include")]
+    else:
+        opencl_dir=get_cuda_dir()
+        opencl_flags=["-I" + os.path.join(opencl_dir, "include/CL") 
+                + " -I" + os.path.join(opencl_dir, "include/CL2") 
+                + " -I" +  os.path.join(opencl_dir, "include") 
+                ]	
+    return opencl_flags
 
 def get_cuda_cpp_flags():
     return [
@@ -89,6 +112,30 @@ def get_cuda_ld_flags(m64 = True, cutil = False, cublas = False, cufft = False):
         p4a_util.die("TODO")
     return flags
 
+def get_opencl_ld_flags(m64 = True):
+    '''To be restructured for multi-platforms OpenCL
+    '''	
+    opencl_dir=get_amd_opencl_dir()
+    if opencl_dir:
+        lib_opencl_path=os.path.join(opencl_dir, "lib/x86")
+    else:
+        opencl_dir = get_cuda_dir()
+        lib_opencl_path=os.path.join(opencl_dir, "lib")
+    lib_arch_suffix = ""
+    if m64:
+        lib_arch_suffix = "_x86_64"
+    else:
+        lib_arch_suffix = "_i386"
+    flags = [
+#        "-L" + os.path.join(cuda_dir, "lib64"),
+        "-L" + os.path.join(opencl_dir, "lib64"),        
+#        "-L" + os.path.join(cuda_dir, "lib"),  # for cuda
+        "-L" + lib_opencl_path,
+        "-L/usr/lib",
+        "-l OpenCL"
+    ]
+    return flags
+
 class p4a_builder:
     """The p4a_builder is used for two main things.
     1 - It keeps track and arrange all the CPP, C, Fortran etc. flags.
@@ -115,6 +162,7 @@ class p4a_builder:
     # extra flags
     m64 = False
     cudafied = False
+    openclified = False
     extra_source_files = []
     builder = False
 
@@ -129,13 +177,24 @@ class p4a_builder:
         self.fortran_flags.append ("-ffree-line-length-none")
         self.cudafied = True
 
+    def openclify_flags(self):
+        if self.openclified:
+            return
+        self.cpp_flags += get_opencl_cpp_flags()
+        self.ld_flags += get_opencl_ld_flags(self.m64)
+
+        self.cpp_flags += [ "-DP4A_ACCEL_OPENCL", "-I" + os.environ["P4A_ACCEL_DIR"] ]
+        self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
+        self.fortran_flags.append ("-ffree-line-length-none")
+        self.openclified = True
+
     def __init__(self,
                  cpp_flags = [], c_flags = [], cxx_flags = [], ld_flags = [],
                  nvcc_flags = [], fortran_flags = [],
                  cpp = None, cc = None, cxx = None, ld = None, ar = None,
                  nvcc = None, fortran = None, arch = None,
-                 openmp = False, accel_openmp = False, icc = False,
-                 cuda = False,atomic=False,com_optimization=False,cuda_cc=2,fftw3=False,
+                 openmp = False, accel_openmp = False, icc = False,                
+                 cuda = False, opencl = False, atomic=False,com_optimization=False,cuda_cc=2,fftw3=False,
                  add_debug_flags = False, add_optimization_flags = False,
                  add_openmp_flag = False, no_default_flags = False,
                  build = False
@@ -232,6 +291,8 @@ class p4a_builder:
             self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_fftw3_runtime.cpp") ]
             if cuda :
                 ld_flags += [ "-lcufft" ]
+            elif opencl :
+                p4a_util.die("fftw3+opencl :  TODO")
             else :
                 ld_flags += [ "-lfftw3 -lfftw3f" ]
 
@@ -277,11 +338,17 @@ class p4a_builder:
         self.ar = ar
         self.nvcc = nvcc
         self.fortran = fortran
+        self.opencl = opencl
 
         self.m64 = m64
         # update cuda flags only if somathing will be built at the end
         if cuda and (self.builder == True):
             self.cudafy_flags()
+            
+        # update opencl flags only if something will be built at the end
+        if opencl and (self.builder == True):
+            self.openclify_flags()
+            c_flags.append ("-std=c99")
 
     def cu2cpp(self, file, output_file):
         p4a_util.run([ self.nvcc, "--cuda" ] + self.cpp_flags + self.nvcc_flags + [ "-o", output_file, file],
@@ -307,6 +374,7 @@ class p4a_builder:
         files += self.extra_source_files
 
         has_cuda = False
+        has_opencl = False
         has_c = False
         has_cxx = False
         has_fortran = False
@@ -331,6 +399,9 @@ class p4a_builder:
                 cucpp_file = make_safe_intermediate_file_path(file, build_dir, change_ext = ".cu.cpp")
                 self.cu2cpp(file, cucpp_file)
                 first_pass_files += [ cucpp_file ]
+            elif p4a_util.opencl_file_p(file):
+                has_opencl = True
+                self.openclify_flags()                
             else:
                 first_pass_files += [ file ]
 
@@ -365,6 +436,8 @@ class p4a_builder:
             if p4a_util.lib_file_p(output_file):
                 if has_cuda:
                     raise p4a_util.p4a_error("Cannot build a static library when using CUDA")
+                if has_opencl:
+                    raise p4a_util.p4a_error("Cannot build a static library when using OPENCL")
                 more_ld_flags += [ "-static" ]
             elif p4a_util.sharedlib_file_p(output_file):
                 more_ld_flags += [ "-shared" ]
@@ -415,7 +488,9 @@ class p4a_builder:
         for file in files:
             if p4a_util.cuda_file_p(file):
                 self.cudafy_flags()
-
+            if p4a_util.opencl_file_p(file):
+                self.openclify_flags()
+                
         # Append additional required files such as accel files.
         files += self.extra_source_files
 
@@ -428,6 +503,7 @@ class p4a_builder:
         # add .cu.cpp files to regular source files for each .cu file.
         cuda_files = []
         cuda_output_files = []
+        opencl_files = []
         source_files = []
         header_files = []
         for file in rel_files:
@@ -436,6 +512,8 @@ class p4a_builder:
                 cucpp_file = os.path.abspath(make_safe_intermediate_file_path(file, base_dir, change_ext = ".cu.cpp"))
                 cuda_output_files.append(cucpp_file)
                 source_files.append(cucpp_file)
+            elif p4a_util.opencl_file_p(file):
+                opencl_files.append(file)
             elif p4a_util.header_file_p(file):
                 header_files.append(file)
             else:
