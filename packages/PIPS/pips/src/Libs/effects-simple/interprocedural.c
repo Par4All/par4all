@@ -675,19 +675,19 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
 
 	bad_reshaping = false;
 	sc_creer_base(equations);
-	if ((equations = sc_normalize(equations)) != NULL) {
+	if (!sc_empty_p((equations = sc_normalize(equations)))) {
 	    debug(5, "translate_array_effect",
 		  "Test feasability for normalized system\n");
 	    bad_reshaping = sc_faisabilite(equations);
 	    debug(5, "translate_array_effect",
 		  "Test feasability for normalized system: %s\n",
 		  bool_to_string(bad_reshaping));
-	    sc_rm(equations);
 	}
 	else {
 	    debug(5, "translate_array_effect",
 		  "System could not be normalized\n");
 	}
+	sc_rm(equations);
     }
 
     if (! bad_reshaping) {

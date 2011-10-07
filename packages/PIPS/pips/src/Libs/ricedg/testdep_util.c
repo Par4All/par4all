@@ -476,7 +476,7 @@ bool sc_faisabilite_optim(sc)
   Psysteme sc; {
   debug(6, "sc_faisabilite_optim", "begin\n");
   sc = sc_normalize(sc);
-  if(sc != NULL) {
+  if(!sc_empty_p(sc)) {
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
     Psysteme volatile sc1 = sc_dup(sc);
@@ -509,6 +509,7 @@ bool sc_faisabilite_optim(sc)
   } else {
     debug(7, "sc_faisabilite_optim", "normalized system not feasible\n");
     debug(6, "sc_faisabilite_optim", "end\n");
+    sc_rm(sc);
     return (false);
   }
 }
@@ -676,7 +677,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
         }
         sc = sc_normalize(sc);
 
-        if(sc == NULL) {
+        if(sc_empty_p(sc)) {
           if(is_test_Di)
             NbrTestProjEqDi++;
           else
@@ -684,7 +685,6 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
           debug(7,
                 "sc_projection_optim_along_vecteur_ofl",
                 "normalisation infaisable\n");
-          sc = sc_empty(base_sc);
 
           for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
             v = pv1->var;
@@ -760,7 +760,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
 
           sc = sc_normalize(sc);
 
-          if(sc == NULL) {
+          if(sc_empty_p(sc)) {
             debug(7,
                   "sc_projection_optim_along_vecteur_ofl",
                   "normalisation-infaisable\n");
@@ -768,7 +768,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
               NbrTestProjEqDi++;
             else
               NbrTestProjEq++;
-            sc = sc_empty(base_sc);
+
             for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
               v = pv1->var;
               sc_base_remove_variable(sc, v);
@@ -831,7 +831,7 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
 
       sc = sc_normalize(sc);
 
-      if(sc == NULL) {
+      if(sc_empty_p(sc)) {
         if(is_test_Di)
           NbrTestProjFMDi++;
         else
@@ -839,7 +839,6 @@ Psysteme sc_projection_optim_along_vecteur_ofl(sc, pv)
         debug(7,
               "sc_projection_optim_along_vecteur_ofl",
               "normalisation-infaisable\n");
-        sc = sc_empty(base_sc);
         for (pv1 = pv; pv1 != NULL; pv1 = pv1->succ) {
           v = pv1->var;
           sc_base_remove_variable(sc, v);
@@ -932,10 +931,12 @@ bool sc_minmax_of_variable_optim(ps, var, pmin, pmax)
 
     ps = sc_projection_optim_along_vecteur_ofl(ps, pv);
     if(sc_empty_p(ps)) {
+      sc_rm(ps);
       UNCATCH(overflow_error);
       return false;
     }
-    if(SC_EMPTY_P(ps = sc_normalize(ps))) {
+    if(sc_empty_p(ps = sc_normalize(ps))) {
+      sc_rm(ps);
       UNCATCH(overflow_error);
       return false;
     }

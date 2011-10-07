@@ -110,9 +110,8 @@ cumu_range_effects()
 
       if(! current_downward_cumulated_range_effects_empty_p())
       {
-	  l_cumu_range =
-	      effects_dup(effects_effects
-			  (current_downward_cumulated_range_effects_head()));
+	  l_cumu_range = effects_effects
+			  (current_downward_cumulated_range_effects_head());
       }
       return(l_cumu_range);
 }
@@ -1875,7 +1874,6 @@ proper_effects_of_call(call c)
     list l_proper = NIL;
     statement current_stat = effects_private_current_stmt_head();
     instruction inst = statement_instruction(current_stat);
-    list l_cumu_range = cumu_range_effects();
 
     /* Is the call an instruction, or a sub-expression? */
     if (instruction_call_p(inst) && (instruction_call(inst) == c))
@@ -1885,7 +1883,7 @@ proper_effects_of_call(call c)
 
 	l_proper = generic_r_proper_effects_of_call(c);
 
-	l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
+	l_proper = gen_nconc(l_proper, effects_dup(cumu_range_effects()));
 
 	if (contract_p)
 	    l_proper = proper_effects_contract(l_proper);
@@ -1938,7 +1936,6 @@ static void proper_effects_of_expression_instruction(instruction i)
   list l_proper = NIL;
   statement current_stat = effects_private_current_stmt_head();
   //instruction inst = statement_instruction(current_stat);
-  list l_cumu_range = cumu_range_effects();
 
   /* Is the call an instruction, or a sub-expression? */
   if (instruction_expression_p(i)) {
@@ -2019,7 +2016,7 @@ static void proper_effects_of_expression_instruction(instruction i)
     pips_debug(2, "Effects for expression instruction in statement%03zd:\n",
 	       statement_ordering(current_stat));
 
-    l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
+    l_proper = gen_nconc(l_proper, effects_dup(cumu_range_effects()));
 
     if (contract_p)
       l_proper = proper_effects_contract(l_proper);
@@ -2062,9 +2059,7 @@ static bool
 loop_filter(loop l)
 {
     list l_proper = generic_proper_effects_of_range(loop_range(l));
-    list l_eff = cumu_range_effects();
-
-    l_eff = gen_nconc(l_proper, l_eff);
+    list l_eff = gen_nconc(l_proper, effects_dup(cumu_range_effects()));
     current_downward_cumulated_range_effects_push(make_effects(l_eff));
     return(true);
 }
@@ -2073,7 +2068,6 @@ static void proper_effects_of_loop(loop l)
 {
     statement current_stat = effects_private_current_stmt_head();
     list l_proper = NIL;
-    list l_cumu_range = NIL;
 
     entity i = loop_index(l);
     range r = loop_range(l);
@@ -2085,7 +2079,6 @@ static void proper_effects_of_loop(loop l)
 
     free_cumu_range_effects();
     current_downward_cumulated_range_effects_pop();
-    l_cumu_range = cumu_range_effects();
 
     /* proper_effects first */
 
@@ -2112,7 +2105,7 @@ static void proper_effects_of_loop(loop l)
     lb = generic_proper_effects_of_range(r);
 
     l_proper = gen_nconc(li, lb);
-    l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
+    l_proper = gen_nconc(l_proper, effects_dup(cumu_range_effects()));
 
     ifdebug(2)
     {
@@ -2144,7 +2137,6 @@ static void proper_effects_of_forloop(forloop l)
 {
     statement current_stat = effects_private_current_stmt_head();
     list l_proper = NIL;
-    list l_cumu_range = NIL;
 
     //    entity i = loop_index(l);
     // range r = loop_range(l);
@@ -2153,11 +2145,6 @@ static void proper_effects_of_forloop(forloop l)
 
     pips_debug(2, "Effects for statement%03zd:\n",
 	       statement_ordering(current_stat));
-
-    // What is this about? See Fabien...
-    // free_cumu_range_effects();
-    //current_downward_cumulated_range_effects_pop();
-    //l_cumu_range = cumu_range_effects();
 
     /* proper_effects first */
 
@@ -2172,7 +2159,15 @@ static void proper_effects_of_forloop(forloop l)
 
     l_proper = gen_nconc(li, lc);
     l_proper = gen_nconc(l_proper, linc);
-    l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
+
+    // cumulated range effects are added to internal statements of
+    // a la fortran do loops to simulate control effects, but it's unclear
+    // whether it should be the same with C for loops which cannot be
+    // represented as do loops.
+    // free_cumu_range_effects();
+    //current_downward_cumulated_range_effects_pop();
+    //l_cumu_range = cumu_range_effects();
+    //l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range)); 
 
     ifdebug(2)
     {
@@ -2213,14 +2208,13 @@ static void proper_effects_of_test(test t)
 {
     list l_proper=NIL;
     statement current_stat = effects_private_current_stmt_head();
-    list l_cumu_range = cumu_range_effects();
 
     pips_debug(2, "Effects for statement%03zd:\n",
 	       statement_ordering(current_stat));
 
     /* effects of the condition */
     l_proper = generic_proper_effects_of_expression(test_condition(t));
-    l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
+    l_proper = gen_nconc(l_proper, effects_dup(cumu_range_effects()));
 
     ifdebug(2)
     {
