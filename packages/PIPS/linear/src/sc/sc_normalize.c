@@ -74,6 +74,8 @@
  * etait non faisable
  *
  * FI: a revoir de pres; devrait retourner SC_EMPTY en cas de non faisabilite
+ * BC: now returns sc_empty when not feasible to avoid unecessary copy_base
+ * in caller.
  */
 Psysteme sc_normalize(ps)
 Psysteme ps;
@@ -81,8 +83,8 @@ Psysteme ps;
     Pcontrainte eq;
     bool is_sc_fais = true;
 
-    ps = sc_kill_db_eg(ps);
-    if (ps) {
+    ps = sc_safe_kill_db_eg(ps);
+    if (ps && !sc_empty_p(ps) && !sc_rn_p(ps)) {
 	for (eq = ps->egalites;
 	     (eq != NULL) && is_sc_fais;
 	     eq=eq->succ) {
@@ -103,14 +105,21 @@ Psysteme ps;
 	    }
 	}
 
-	ps = sc_kill_db_eg(ps);
-	sc_elim_empty_constraints(ps, true);
-	sc_elim_empty_constraints(ps, false);
+	ps = sc_safe_kill_db_eg(ps);
+	if (!sc_empty_p(ps))
+	  {
+	    sc_elim_empty_constraints(ps, true);
+	    sc_elim_empty_constraints(ps, false);
+	  }
     }
 
     if (!is_sc_fais)
-	sc_rm(ps), ps=NULL;
-
+      {
+	Psysteme new_ps = sc_empty(sc_base(ps));
+	sc_base(ps) = BASE_UNDEFINED;
+	sc_rm(ps);
+	ps = new_ps;
+      }
     return(ps);
 }
 
@@ -323,22 +332,14 @@ Pcontrainte ineq;
 /* Psysteme sc_safe_normalize(Psysteme ps)
  * output   : ps, normalized.
  * modifies : ps.
- * comment  : when ps is not feasible, returns sc_empty.	
+ * comment  : when ps is not feasible, returns sc_empty.
  */
 Psysteme sc_safe_normalize(ps)
 Psysteme ps;
 {
 
-    if (!sc_rn_p(ps) && !sc_empty_p(ps))
-    {
-	Pbase ps_base = base_copy(sc_base(ps));	
-	ps = sc_normalize(ps);
-	if (ps == SC_EMPTY)
-	    ps = sc_empty(ps_base);
-	else 
-	    base_rm(ps_base);
-    }
-    return(ps);
+  ps = sc_normalize(ps);
+  return(ps);
 }
 
 static Psysteme sc_rational_feasibility(Psysteme sc)

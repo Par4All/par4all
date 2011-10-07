@@ -27,6 +27,7 @@
 #endif
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -279,21 +280,22 @@ Psysteme volatile *psc;
 int ofl_ctrl;
 {
   Psysteme ps = *psc;
-  Pbase b;
-    
+
   if (SC_UNDEFINED_P(ps) || sc_rn_p(ps) || sc_empty_p(ps))
     return;
-  
-  b = base_copy(sc_base(ps)); /* save base */
-  ps = sc_normalize(ps);
 
-  if (SC_UNDEFINED_P(ps)) {
-    *psc = sc_empty(b);
-  } else {
-    base_rm(b);
-    build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
-    build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
-  }
+  *psc = sc_normalize(ps);
+ifscdebug(5) {   
+		  fprintf(stderr, "after normalize: \n");  
+		  sc_default_dump(*psc);
+		}
+  assert(!SC_UNDEFINED_P(*psc));
+  build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
+ifscdebug(5) {   
+		  fprintf(stderr, "after first nredund: \n");  
+		  sc_default_dump(*psc);
+		}
+  build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
 }
 
 
