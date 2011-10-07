@@ -129,6 +129,7 @@ bool process_equalities;
  *
  * - so called triangular version, FC 28/09/94
  */
+
 Psysteme sc_kill_db_eg(ps)
 Psysteme ps;
 {
@@ -185,6 +186,72 @@ Psysteme ps;
 
     return (ps);
 }
+
+/* same as above, but returns an empty system if the system is not feasible*/
+Psysteme sc_safe_kill_db_eg(ps)
+Psysteme ps;
+{
+    Pcontrainte
+	eq1 = NULL,
+	eq2 = NULL;
+
+    if (ps == NULL) 
+	return(NULL);
+
+    for (eq1 = ps->egalites; 
+	 eq1 != NULL; 
+	 eq1 = eq1->succ) 
+    {
+	if ((vect_size(eq1->vecteur) == 1) && 
+	    (eq1->vecteur->var == 0) && (eq1->vecteur->val != 0)) 
+	{
+	    /* b = 0 */
+	  Pbase base_tmp = ps->base;
+	  ps->base = BASE_UNDEFINED;
+	  sc_rm(ps);
+	  ps =sc_empty(ps->base);
+	  return(ps);
+	}
+
+	for (eq2 = eq1->succ;
+	     eq2 != NULL;
+	     eq2 = eq2->succ)
+	    if (egalite_equal(eq1, eq2))
+		eq_set_vect_nul(eq2);
+    }
+
+    for (eq1 = ps->inegalites;
+	 eq1 != NULL;
+	 eq1 = eq1->succ)
+    {
+	if ((vect_size(eq1->vecteur) == 1) && (eq1->vecteur->var == 0))
+	    if (eq1->vecteur->val <= 0)
+		vect_rm(eq1->vecteur),
+		eq1->vecteur = NULL;
+	    else
+	    {
+		/* 0 <= b < 0 */
+	      Pbase base_tmp = ps->base;
+	      ps->base = BASE_UNDEFINED;
+	      sc_rm(ps);
+	      ps =sc_empty(ps->base);
+	      return(ps);
+	    }
+
+	for (eq2 = eq1->succ;
+	     eq2 != NULL;
+	     eq2 = eq2->succ)
+	    if (contrainte_equal(eq1,eq2))
+		eq_set_vect_nul(eq2);
+    }
+
+    sc_rm_empty_constraints(ps, true);
+    sc_rm_empty_constraints(ps, false);
+
+    return (ps);
+}
+
+
 
 /*   That is all
  */

@@ -130,18 +130,19 @@ int ofl_ctrl;
 
     Pcontrainte eq;
     Value coeff;
-    Pbase base_init = base_copy((*psc)->base);
 
     /* trouver une egalite ou v a un coeff. minimal en valeur absolu */
     eq = contrainte_var_min_coeff((*psc)->egalites, v, &coeff, false);
-    
-    if (eq != NULL) {		
+
+    if (eq != NULL) {
 	if(!egalite_normalize(eq)) {
-	    sc_rm(*psc);
-	    *psc = sc_empty(base_init);	   
-	    return;
+	  Psysteme new_psc = sc_empty((*psc)->base);
+	  (*psc)->base = BASE_UNDEFINED;
+	  sc_rm(*psc);
+	  *psc = new_psc;
+	  return;
 	}
-	else 
+	else
 	{
 	    /* si au moins une egalite contient v avec un coeff. non nul */
 	    *psc = sc_variable_substitution_with_eq_ofl_ctrl
@@ -152,21 +153,21 @@ int ofl_ctrl;
 	bool fm_int_exact_p;
 	/* v n'apparait dans aucune egalite, il faut l'eliminer des inegalites
 	   par des combinaisons (fonction combiner) */
-	
-	fm_int_exact_p = 
-	    sc_fourier_motzkin_variable_elimination_ofl_ctrl(*psc, v, false, 
+
+	fm_int_exact_p =
+	    sc_fourier_motzkin_variable_elimination_ofl_ctrl(*psc, v, false,
 							     false, ofl_ctrl);
 	if (fm_int_exact_p == false) {
 	    /* detection de la non faisabilite du Psysteme */
-	    sc_rm(*psc);
-	    *psc = sc_empty(base_init);	    
-	    return;
+	Psysteme new_psc = sc_empty((*psc)->base);
+	  (*psc)->base = BASE_UNDEFINED;
+	  sc_rm(*psc);
+	  *psc = new_psc;
+	  return;
 	}
 	(*psc)->nb_ineq = nb_elems_list((*psc)->inegalites);
     }
-   
-    base_rm(base_init);
-   
+
 }
 
 
@@ -211,27 +212,18 @@ Pvecteur pv;
 int ofl_ctrl;
 {
     Pvecteur pv1;
-    Pbase scbase = base_copy((*psc)->base); 
 
     if (!VECTEUR_NUL_P(pv)) {
 	for (pv1 = pv;!VECTEUR_NUL_P(pv1) && !SC_UNDEFINED_P(*psc); pv1=pv1->succ) {
+
 	    sc_projection_along_variable_ofl_ctrl(psc,vecteur_var(pv1), 
 						       ofl_ctrl);
 	    if (!SC_UNDEFINED_P(*psc)) {
 		sc_base_remove_variable(*psc,vecteur_var(pv1));
 		(void) sc_nredund(psc);	
 	    }
+	    
 	}
-    }
-
-    if (SC_UNDEFINED_P(*psc)){ /* ne devrait plus arriver ! */
-	*psc = sc_empty(scbase);
-	for (pv1 = pv;!VECTEUR_NUL_P(pv1); pv1=pv1->succ) {
-	    sc_base_remove_variable(*psc,vecteur_var(pv1));
-	}
-    }
-    else {
-	base_rm(scbase);
     }
 
 }
@@ -269,8 +261,7 @@ int ofl_ctrl;
     Variable v;
     Value coeff;
     Psysteme sc = *psc;
-    Pbase base_sc = base_copy(sc->base);
-    
+
     pve = vect_copy(pv);
 
     /* elimination of variables with the equations of sc */
@@ -292,22 +283,18 @@ int ofl_ctrl;
 	    else {
 		/* the coefficient of v in eq is 1 : carry out integer
 		 * elimination for v with the other constraints of sc */
-		
+
 		sc = sc_variable_substitution_with_eq_ofl_ctrl
 		    (sc, eq, v, ofl_ctrl);
-		
+
 		if (sc_empty_p(sc))
 		    break;
-		
+
 		sc = sc_normalize(sc);
 
-		if (sc == NULL) {
-		    /* returned by sc_normalize if sc is unfeasible */
-		    sc = sc_empty(base_sc);
-		    base_sc = NULL;
+		if (sc_empty_p(sc))
 		    break;
-		}
-		
+
 		/* v has been eliminated : remove it from pve */
 		if (pvr == NULL) /* v is the fisrt */
 		    pve = current_pv = current_pv->succ;
@@ -327,11 +314,11 @@ int ofl_ctrl;
 	pvr = NULL;
 	current_pv = pve;
 
-	while (!VECTEUR_NUL_P(current_pv) && 
+	while (!VECTEUR_NUL_P(current_pv) &&
 	       (sc->nb_eq != 0) && !sc_empty_p(sc)) {
 
 	    v = current_pv->var;
-	    eq = eq_v_min_coeff(sc->egalites, v, &coeff); 
+	    eq = eq_v_min_coeff(sc->egalites, v, &coeff);
 	    if ((eq == NULL)) {
 		pvr = current_pv;
 		current_pv = current_pv->succ;
@@ -343,9 +330,8 @@ int ofl_ctrl;
 
 		sc = sc_variable_substitution_with_eq_ofl_ctrl
 		    (sc, eq, v, ofl_ctrl);
-		
-		
-		sc = sc_safe_normalize(sc);
+
+		sc = sc_normalize(sc);
 		if (sc_empty_p(sc))
 		    break;
 
@@ -359,13 +345,13 @@ int ofl_ctrl;
 	} /* while */
 
     } /* if */
-    
+
     /* carry out the elimination of Fourier-Motzkin for the remaining variables */
     if (pve != NULL && !sc_empty_p(sc)) {
-	
+        Pbase base_sc = base_copy(sc->base);
+
 	current_pv = pve;
 	while (current_pv != NULL) {
-
 	    v = current_pv->var;
 
 	    if (! sc_fourier_motzkin_variable_elimination_ofl_ctrl(sc, v, true,
@@ -378,24 +364,18 @@ int ofl_ctrl;
 		break;
 	    }
 
-	    sc = sc_safe_normalize(sc);
+	    sc = sc_normalize(sc);
 	    if (sc_empty_p(sc))
 		break;
-	    
 	    current_pv = current_pv->succ;
-	    
 
 	} /* while */
+	if (base_sc != NULL) base_rm(base_sc);
 
     } /* if */
 
-    if (base_sc != NULL)
-    {
-	/* base_sc has not been used to allocate a new system */
-	base_rm(base_sc);
-	sc->nb_ineq = nb_elems_list(sc->inegalites);
-	sc->nb_eq = nb_elems_list(sc->egalites);
-    }
+    sc->nb_ineq = nb_elems_list(sc->inegalites);
+    sc->nb_eq = nb_elems_list(sc->egalites);
 
     for(current_pv = pv; current_pv != NULL; current_pv = current_pv->succ) {
 	v = current_pv->var;
@@ -428,14 +408,13 @@ int ofl_ctrl;
 {
     Pcontrainte pr;
     Pcontrainte current_eq;
-    Pbase b_copy = base_copy(sc->base);
-  
+
     pr = NULL;
     current_eq = sc->egalites;
-    while(current_eq != NULL) 
+    while(current_eq != NULL)
     {
       /* eq must be removed from the list of equalities of sc */
-      if(current_eq == eq) 
+      if(current_eq == eq)
       {
 	if (pr == NULL){ /* eq is at the head of the list */
 	  sc->egalites = current_eq = current_eq->succ;
@@ -445,19 +424,23 @@ int ofl_ctrl;
 	  pr->succ = current_eq = current_eq->succ;
 	}
       }
-      else 
+      else
       {
-	switch (contrainte_subst_ofl_ctrl(v, eq, current_eq, true, ofl_ctrl)) 
+	switch (contrainte_subst_ofl_ctrl(v, eq, current_eq, true, ofl_ctrl))
 	{
-	case 0 : 
+	case 0 :
+	  {
 		/* the substitution found that the system is not feasible */
+	        Psysteme new_sc = sc_empty(sc->base);
+		sc->base=BASE_UNDEFINED;
 		sc_rm(sc);
-		sc = sc_empty(b_copy);
-		eq = contrainte_free(eq);		
-		return(sc); 
+		sc = new_sc;
+		eq = contrainte_free(eq);
+		return(sc);
 		break;
+	  }
 
-	case -1 : { 
+	case -1 : {
 	  /* the substitution created a trivial equation (0==0)
 		 * which must be eliminated */
 		Pcontrainte pc = current_eq;
@@ -469,7 +452,7 @@ int ofl_ctrl;
 		pc = NULL;
 		break;
 	}
-	
+
 	case 1 :
 	  pr = current_eq;
 	  current_eq = current_eq->succ;
@@ -481,18 +464,22 @@ int ofl_ctrl;
     pr = NULL;
     current_eq = sc->inegalites;
     while(current_eq != NULL) {
-	
+
 	switch (contrainte_subst_ofl_ctrl(v, eq, current_eq, false,ofl_ctrl)) {
 
-	case 0 : 
+	case 0 :
+	  {
 	    /* the substitution found that the system is not feasible */
+	    Psysteme new_sc = sc_empty(sc->base);
+	    sc->base=BASE_UNDEFINED;
 	    sc_rm(sc);
-	    sc = sc_empty(b_copy);
+	    sc = new_sc;
 	    eq = contrainte_free(eq);
 	    return(sc);
 	    break;
+	  }
 
-	case -1 : { 
+	case -1 : {
 	    	    /* the substitution created a trivial inequation (0=<cste)
 	     * which must be eliminated */
 	    Pcontrainte pc = current_eq;
@@ -511,11 +498,10 @@ int ofl_ctrl;
 	    break;
 	}
     }
-    
+
     eq = contrainte_free(eq);
     sc->nb_eq = nb_elems_list(sc->egalites);
     sc->nb_ineq = nb_elems_list(sc->inegalites);
-    base_rm(b_copy);
     return(sc);
 }
 

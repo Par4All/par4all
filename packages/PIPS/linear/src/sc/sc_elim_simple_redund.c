@@ -362,6 +362,60 @@ Psysteme ps;
     return (ps);
 }
 
+Psysteme sc_safe_elim_db_constraints(ps)
+Psysteme ps;
+{
+    Pcontrainte
+	eq1 = NULL,
+	eq2 = NULL;
+
+    if (SC_UNDEFINED_P(ps)) 
+	return(NULL);
+
+    for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) 
+    {
+	if ((vect_size(eq1->vecteur) == 1) && 
+	    (eq1->vecteur->var == 0) && (eq1->vecteur->val != 0)) 
+	{
+	    /* b = 0 */
+	  Pbase base_tmp = ps->base;
+	  ps->base = BASE_UNDEFINED;
+	  sc_rm(ps);
+	  ps =sc_empty(base_tmp);
+	  return(ps);
+	}
+
+	for (eq2 = eq1->succ; eq2 != NULL;eq2 = eq2->succ)
+	    if (egalite_equal(eq1, eq2))
+		eq_set_vect_nul(eq2);
+    }
+
+    for (eq1 = ps->inegalites; eq1 != NULL;eq1 = eq1->succ) {
+      if ((vect_size(eq1->vecteur) == 1) && (eq1->vecteur->var == 0)) {
+	  if (value_negz_p(val_of(eq1->vecteur))) {
+	    vect_rm(eq1->vecteur);
+		eq1->vecteur = NULL;
+	  }
+	  else {
+	    /* 0 <= b < 0 */
+	    Pbase base_tmp = ps->base;
+	    ps->base = BASE_UNDEFINED;
+	    sc_rm(ps);
+	    ps =sc_empty(base_tmp);
+	    return(ps);
+	  }
+      }
+	for (eq2 = eq1->succ;eq2 != NULL;eq2 = eq2->succ)
+	    if (contrainte_equal(eq1,eq2))
+		eq_set_vect_nul(eq2);
+    }
+
+    sc_elim_empty_constraints(ps, true);
+    sc_elim_empty_constraints(ps, false);
+
+    return (ps);
+}
+
 /* Psysteme sc_elim_double_constraints(Psysteme ps):
  * elimination des egalites et des inegalites identiques ou inutiles dans
  * le systeme apres reduction par le gcd; plus precisemment:
