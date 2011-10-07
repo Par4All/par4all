@@ -215,6 +215,7 @@ les anciens noms des fonctions */
 #define sc_triang_elim_redond(x,y) sc_triang_elim_redund(x,y)
 #define sc_rm_empty_constraints( ps,b) sc_elim_empty_constraints((ps),(b))
 #define sc_kill_db_eg( ps) sc_elim_db_constraints((ps))
+#define sc_safe_kill_db_eg( ps) sc_safe_elim_db_constraints((ps))
 #define non_redundent_subsystem( s1,  s2) extract_nredund_subsystem((s1), (s2))
 #define sc_nredund_ofl( psc) build_sc_nredund_2pass_ofl_ctrl((psc),FWD_OFL_CTRL)
 #define sc_nredund_optim( psc) build_sc_nredund_2pass((psc))
