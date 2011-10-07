@@ -291,7 +291,8 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
      * generated in a new compilation unit, there is no PARSED_CODE resource
      * available and thus we can't use AddEntityToCompilationUnit()
      */
-    if(kernel_name && !get_bool_property("GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT")) {
+    if(kernel_name && !string_undefined_p(kernel_name)
+        && !get_bool_property("GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT")) {
       string source_file_name =
         db_get_memory_resource(DBR_USER_FILE, kernel_name, true);
       DB_PUT_FILE_RESOURCE(DBR_USER_FILE, wrapper_name, strdup(source_file_name));
