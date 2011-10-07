@@ -284,6 +284,13 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
     string wrapper_name = build_outline_name(wrapper_prefix, mod_name);
     outliner(wrapper_name, sk);
 
+    /* Here we check if we had requested to outline a kernel previously, and we
+     * ensure that if the wrapper wasn't generated in a new compilation unit,
+     * then it should be added in the same compilation unit as the kernel.
+     * It won't be declared in the compilation unit, but if the kernel have been
+     * generated in a new compilation unit, there is no PARSED_CODE resource
+     * available and thus we can't use AddEntityToCompilationUnit()
+     */
     if(kernel_name && !get_bool_property("GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT")) {
       string source_file_name =
         db_get_memory_resource(DBR_USER_FILE, kernel_name, true);
