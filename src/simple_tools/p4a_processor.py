@@ -841,7 +841,7 @@ class p4a_processor(object):
             # from the post-process
             for launcher in kernel_launchers:
                 self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration\n")           
-            self.generated_modules.extend(map(lambda x:x.name, kernels))
+            self.generated_modules.extend(map(lambda x:x.name, wrappers))
 
         
 
@@ -1223,6 +1223,18 @@ class p4a_processor(object):
 
         # save the user files
         output_files.extend (self.save_user_file (dest_dir, prefix, suffix))        
+        
+        if self.opencl:
+            # HACK inside : we expect the launcher and the kernel to be in the 
+            # same file which MUST be called wrapper_name.c
+            for kernel in self.kernels:
+                # find the associated wrapper with the kernel
+                src_dir = os.path.join(self.workspace.dirname, "Src")
+                wrapper  = os.path.join(src_dir,self.kernel_to_wrapper_name(kernel)+".c")
+                kernel = os.path.join(src_dir,kernel+".c")
+                shutil.copyfile(kernel, wrapper)
+
+        
         # save pips generated files in the dedicated folder
         output_files.extend (self.save_crough (output_dir))
         output_files.extend (self.save_interface (output_dir))
