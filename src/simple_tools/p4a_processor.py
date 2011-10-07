@@ -689,7 +689,7 @@ class p4a_processor(object):
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
 								 # opencl option will produce independent kernel and wrapper files                       
 								 GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.opencl,
-								 GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.opencl,								 
+								 GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = False,								 
 								 OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
 								 OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
 								 concurrent=True)
@@ -841,7 +841,7 @@ class p4a_processor(object):
             # from the post-process
             for launcher in kernel_launchers:
                 self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration\n")           
-            self.generated_modules.extend(map(lambda x:x.name, wrappers))
+            self.generated_modules.extend(map(lambda x:x.name, kernels))
 
         
 
@@ -972,30 +972,6 @@ class p4a_processor(object):
 				self.generated_modules.remove (wrapper)
 				self.generated_modules.remove (launcher)
                 
-    def merge_wrapper_kernel (self):
-        """ merge wrapper and kernel in one file. Currently used by opencl. 
-        The order is important the wrapper call the kernel. So
-        they have to be in the inverse order into the file. 
-		"""               
-        for kernel in self.kernels:
-            # find the associated wrapper with the kernel
-            wrapper  = self.kernel_to_wrapper_name  (kernel)
-            
-            # merge the files in the kernel file
-            # Where the files do dwell in the .database workspace:
-            
-            #wrapper from .database/wrapper_name/wrapper_name.c
-            #to take wrapper without any type definition
-            wrapper_file = os.path.join(self.workspace.dirname, "Src",
-                                       wrapper + ".c")				
-            kernel_file = os.path.join(self.workspace.dirname, "Src",
-                                        kernel + ".c")        
-            output_file = os.path.join(self.workspace.dirname, "Src",
-                                            wrapper + ".cl")
-            p4a_util.debug("Merge '" + kernel_file + "' and '" + wrapper_file + 
-                           "' in '" + output_file + "'") 
-            p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
-
     def save_header (self, output_dir, name):
         content = "/*All the generated includes are summarized here*/\n\n"
         for header in self.header_files:
@@ -1038,7 +1014,7 @@ class p4a_processor(object):
             extension_in = ".f"
             extension_out = ".f08"
         elif (self.opencl == True):
-            extension_in = ".cl"
+            extension_in = ".c"
             extension_out = ".cl"
         else:
             extension_in = ".c"
@@ -1246,14 +1222,7 @@ class p4a_processor(object):
             
 
         # save the user files
-        output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
-        
-        # During the opencl generation process, kernels and wrappers
-        # have been generated in different files. 
-        # Let's merge them in the same files
-        if self.opencl:
-            self.merge_wrapper_kernel ()
-                      
+        output_files.extend (self.save_user_file (dest_dir, prefix, suffix))        
         # save pips generated files in the dedicated folder
         output_files.extend (self.save_crough (output_dir))
         output_files.extend (self.save_interface (output_dir))
