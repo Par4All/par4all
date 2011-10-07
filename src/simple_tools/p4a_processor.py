@@ -19,6 +19,7 @@ import sys
 import os
 import re
 import shutil
+import pypsex
 
 '''
 Par4All processing
@@ -589,10 +590,6 @@ class p4a_processor(object):
         # Always use a coarse-grain parallelization with regions:
         all_modules.coarse_grain_parallelization(concurrent=True)
 
-        if self.atomic:
-            # Use a coarse-grain parallelization with regions:
-            all_modules.flag_parallel_reduced_loops_with_atomic(concurrent=True)
-
         #all_modules.flatten_code(unroll=False,concurrent=True)
         #all_modules.simplify_control(concurrent=True)
         all_modules.loop_fusion(concurrent=True)
@@ -602,7 +599,7 @@ class p4a_processor(object):
         #all_modules.scalarization(concurrent=True)
 
         # Privatization information has been lost because of flatten_code
-        all_modules.privatize_module()
+        #all_modules.privatize_module()
         #if fine:
             # Use a fine-grain parallelization à la Allen & Kennedy:
             #all_modules.internalize_parallel_code(concurrent=True)
@@ -703,7 +700,7 @@ class p4a_processor(object):
         # Unfold kernel,  ususally won't hurt code size, but less painful with
         # callees declared in others compilation units (unsupported in CUDA and
         # OpenCL) and can allow some opportunities for scalarization & others
-        kernels.unfolding()
+        kernels.unfold()
 
         # scalarization is a nice optimization :)
         # currently it's very limited when applied in kernel, but cannot be applied outside neither ! :-(
@@ -840,7 +837,7 @@ class p4a_processor(object):
         # To be able to inject Par4All accelerator run time initialization
         # later:
         if "main" in self.workspace:
-            self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
+            self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel\n")
         else:
             p4a_util.warn('''
             There is no "main()" function in the given sources.
