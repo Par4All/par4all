@@ -1014,7 +1014,7 @@ class p4a_processor(object):
             extension_in = ".f"
             extension_out = ".f08"
         elif (self.opencl == True):
-            extension_in = ".c"
+            extension_in = ".cl"
             extension_out = ".cl"
         else:
             extension_in = ".c"
@@ -1230,7 +1230,7 @@ class p4a_processor(object):
             for kernel in self.kernels:
                 # find the associated wrapper with the kernel
                 src_dir = os.path.join(self.workspace.dirname, "Src")
-                wrapper  = os.path.join(src_dir,self.kernel_to_wrapper_name(kernel)+".c")
+                wrapper  = os.path.join(src_dir,self.kernel_to_wrapper_name(kernel)+".cl")
                 kernel = os.path.join(src_dir,kernel+".c")
                 shutil.copyfile(kernel, wrapper)
 
