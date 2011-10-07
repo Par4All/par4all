@@ -4,8 +4,8 @@
 
     This file is an implementation of the C to accelerator Par4All API.
 
-    Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
-    Compétitivité Images and Network) and SCALOPES (Artemis European
+    Funded by the FREIA (French ANR), TransMedi\@ (French PÃ©le de
+    CompÃ©titivitÃ© Images and Network) and SCALOPES (Artemis European
     Project project)
 
     "mailto:Stephanie.Even@enstb.org"
@@ -349,7 +349,7 @@ void P4A_copy_to_accel(size_t element_size,
 
 #include <string.h>
 
-/** @author Stéphanie Even
+/** @author StÃ©phanie Even
 
     Aside the procedure defined for CUDA or OpenMP, OpenCL needs
     loading the kernel from a source file.
@@ -374,7 +374,7 @@ static cl_program p4a_program=0;
 #define P4A_DEBUG_BUFFER_SIZE 10000
 static char p4a_debug_buffer[P4A_DEBUG_BUFFER_SIZE];
 
-/** @author : Stéphanie Even
+/** @author : StÃ©phanie Even
 
     In OpenCL, errorToString doesn't exists by default ...
     Macros have been picked from cl.h
@@ -706,7 +706,7 @@ void p4a_load_kernel(const char *kernel,...)
     
     nKernel++; 
     char* kernelFile =  k->file_name;
-    P4A_skip_debug(0,P4A_dump_message("Program and Kernel creation from %s\n",kernel));
+    P4A_skip_debug(0,P4A_dump_message("Program and Kernel creation from %s\n",kernelFile));
     size_t kernelLength=0;
     const char *comment = "// This kernel was generated for P4A\n";
   // Same design as the NVIDIA oclLoadProgSource
@@ -736,7 +736,7 @@ void p4a_load_kernel(const char *kernel,...)
   p4a_kernel = k->kernel;
  }
 
-/** @author : Stéphanie Even
+/** @author : StÃ©phanie Even
 
     Load and store the content of the kernel file in a string.
     Replace the oclLoadProgSource function of NVIDIA.
@@ -757,7 +757,7 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
 
   // Open the file
   int in = open(cl_kernel_file,O_RDONLY);
-  if (!in) {
+  if (in==-1) {
     fprintf(stderr,"Bad kernel source reference : %s\n",cl_kernel_file);
     exit(EXIT_FAILURE);
   }
