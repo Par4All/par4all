@@ -90,5 +90,7 @@ static void db_put_##name(const char *m, list l) \
 
 typedef enum {with_no_pointer_info, with_points_to, with_pointer_values} pointer_info_val;
 
+typedef enum {simple, convex} effects_representation_val;
+
 /* end of effects-generic-local.h
  */

@@ -47,15 +47,54 @@
 /* Static variable to memoïze some entities for performance reasons */
 /********************************************************************/
 
-
+/* stdio files entities */
 static entity stdin_ent = entity_undefined;
 static entity stdout_ent = entity_undefined;
 static entity stderr_ent = entity_undefined;
 
-// in some programs, stdio.h is not included; in this case stdin_ent, stdout_ent and stderr_ent
-// are never defined; if stdio_included_p is then set to false to avoid
-// trying to generate stdin_ent, stdout_ent and stderr_ent again and again.
-static bool stdio_included_p = true; // assume first that stdio.h is included
+/* effects package entities */
+static entity rand_gen_ent  = entity_undefined;
+static entity malloc_effect_ent  = entity_undefined;
+static entity memmove_effect_ent  = entity_undefined;
+static entity luns_ent  = entity_undefined;
+static entity io_ptr_ent  = entity_undefined;
+static entity io_eof_ent  = entity_undefined;
+static entity io_error_luns_ent  = entity_undefined;
+
+/* continue statement */
+static entity continue_ent = entity_undefined;
+
+static bool static_entities_initialized_p = false;
+
+/* beware: cannot be called on creating the database */
+void set_static_entities()
+{
+  if (!static_entities_initialized_p)
+    {
+      stdin_ent = FindOrCreateTopLevelEntity("stdin");
+      stdout_ent = FindOrCreateTopLevelEntity("stdout");
+      stderr_ent = FindOrCreateTopLevelEntity("stderr");
+
+      rand_gen_ent  = FindOrCreateEntity(RAND_EFFECTS_PACKAGE_NAME,
+					 RAND_GEN_EFFECTS_NAME);
+      malloc_effect_ent  = FindOrCreateEntity(MALLOC_EFFECTS_PACKAGE_NAME,
+				       MALLOC_EFFECTS_NAME);
+      memmove_effect_ent  = FindOrCreateEntity(MEMMOVE_EFFECTS_PACKAGE_NAME,
+					MEMMOVE_EFFECTS_NAME);
+      luns_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
+				     IO_EFFECTS_ARRAY_NAME);
+      io_ptr_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
+				       IO_EFFECTS_PTR_NAME);
+      io_eof_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
+				       IO_EOF_ARRAY_NAME);
+      io_error_luns_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
+					      IO_ERROR_ARRAY_NAME);
+
+      continue_ent = FindOrCreateTopLevelEntity(CONTINUE_FUNCTION_NAME);
+
+      static_entities_initialized_p = true;
+    }
+}
 
 void reset_static_entities()
 {
@@ -63,7 +102,17 @@ void reset_static_entities()
   stdout_ent = entity_undefined;
   stderr_ent = entity_undefined;
 
-  stdio_included_p = true; // assume first that stdio.h is included
+  rand_gen_ent  = entity_undefined;
+  malloc_effect_ent  = entity_undefined;
+  memmove_effect_ent  = entity_undefined;
+  luns_ent  = entity_undefined;
+  io_ptr_ent  = entity_undefined;
+  io_eof_ent  = entity_undefined;
+  io_error_luns_ent  = entity_undefined;
+
+  continue_ent = entity_undefined;
+
+  static_entities_initialized_p = false;
 
 }
 
@@ -1063,31 +1112,53 @@ bool top_level_entity_p(entity e)
    effects of IO statements. */
 bool io_entity_p(entity e)
 {
-  return(strncmp(IO_EFFECTS_PACKAGE_NAME,
-		 entity_name(e),
-		 strlen(entity_module_name(e))) == 0);
+  set_static_entities();
+  return (same_entity_p(e, luns_ent) || same_entity_p(e, io_ptr_ent)
+	  || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
+}
+
+bool io_luns_entity_p(entity e)
+{
+  set_static_entities();
+  return (same_entity_p(e, luns_ent));
 }
 
 bool rand_effects_entity_p(entity e)
 {
-  return(strncmp(RAND_EFFECTS_PACKAGE_NAME,
-		 entity_name(e),
-		 strlen(entity_module_name(e))) == 0);
+  set_static_entities();
+  return (same_entity_p(e, rand_gen_ent));
 }
 
 bool malloc_entity_p(entity e)
 {
-  return same_string_p(entity_local_name(e), MALLOC_EFFECTS_NAME);
+  set_static_entities();
+  return (same_entity_p(e, malloc_effect_ent));
+
 }
+
+/**
+   checks if an entity is an IO_EFFECTS_PACKAGE_NAME, a
+   MALLOC_EFFECTS_NAME or a RAND_EFFECTS_PACKAGE_NAME entity. These
+   entities are used to model some internal effects of standard libraries
+   and they do not conflict with other entities.
+ */
+bool effects_package_entity_p(entity e)
+{
+  set_static_entities();
+  return (same_entity_p(e, rand_gen_ent)
+	  || same_entity_p(e, malloc_effect_ent)
+	  || same_entity_p(e, memmove_effect_ent)
+	  || same_entity_p(e, luns_ent) || same_entity_p(e, io_ptr_ent)
+	  || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
+
+}
+
+
+
 
 entity get_stdin_entity()
 {
-  if (stdio_included_p && entity_undefined_p(stdin_ent))
-    {
-      stdin_ent =  local_name_to_top_level_entity("stdin");
-      if (entity_undefined_p(stdin_ent))
-	stdio_included_p = false;
-    }
+  set_static_entities();
   return stdin_ent;
 }
 
@@ -1099,13 +1170,7 @@ bool stdin_entity_p(entity e)
 
 entity get_stdout_entity()
 {
-  if (stdio_included_p && entity_undefined_p(stdout_ent))
-    {
-      stdout_ent =  local_name_to_top_level_entity("stdout");
-      if (entity_undefined_p(stdout_ent))
-	stdio_included_p = false;
-    }
-
+  set_static_entities();
   return stdout_ent;
 }
 
@@ -1116,13 +1181,7 @@ bool stdout_entity_p(entity e)
 
 entity get_stderr_entity()
 {
-  if (stdio_included_p && entity_undefined_p(stderr_ent))
-    {
-      stderr_ent =  local_name_to_top_level_entity("stderr");
-      if (entity_undefined_p(stderr_ent))
-	stdio_included_p = false;
-
-    }
+  set_static_entities();
   return stderr_ent;
 }
 
@@ -1134,26 +1193,7 @@ bool stderr_entity_p(entity e)
 
 bool std_file_entity_p(entity e)
 {
-  if (stdio_included_p)
-    {
-      if (entity_undefined_p(stdin_ent)
-	  || entity_undefined_p(stdout_ent)
-	  || entity_undefined_p(stderr_ent))
-	{
-	  stdin_ent = local_name_to_top_level_entity("stdin");
-	  if (entity_undefined_p(stdin_ent))
-	    {
-	      stdio_included_p = false;
-	      stdout_ent = entity_undefined;
-	      stderr_ent = entity_undefined;
-	    }
-	  else
-	    {
-	      stdout_ent =  local_name_to_top_level_entity("stdout");
-	      stderr_ent =  local_name_to_top_level_entity("stderr");
-	    }
-	}
-    }
+  set_static_entities();
   return(same_entity_p(e, stdin_ent)
 	 || same_entity_p(e, stdout_ent)
 	 || same_entity_p(e, stderr_ent));
@@ -1161,16 +1201,6 @@ bool std_file_entity_p(entity e)
 
 
 
-/**
-   checks if an entity is an IO_EFFECTS_PACKAGE_NAME, a
-   MALLOC_EFFECTS_NAME or a RAND_EFFECTS_PACKAGE_NAME entity. These
-   entities are used to model some internal effects of standard libraries
-   and they do not conflict with other entities.
- */
-bool effects_package_entity_p(entity e)
-{
-  return (strstr(entity_module_name(e), "_EFFECTS") != 0);
-}
 
 bool intrinsic_entity_p(entity e)
 {
@@ -1612,10 +1642,15 @@ bool arithmetic_intrinsic_p(entity e)
 
 /* true if continue. See also macro ENTITY_CONTINUE_P
  */
+
+entity get_continue_entity()
+{
+  set_static_entities();
+  return continue_ent;
+}
 bool entity_continue_p(entity f)
 {
-  return top_level_entity_p(f) &&
-    same_string_p(entity_local_name(f), CONTINUE_FUNCTION_NAME);
+  return same_entity_p(f, get_continue_entity());
 }
 
 

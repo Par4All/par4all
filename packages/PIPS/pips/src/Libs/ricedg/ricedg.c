@@ -1226,8 +1226,8 @@ static list TestDependence(list n1,
   }
 
   /* Consistency Test */
-  if((dep_syst = sc_normalize(dep_syst)) == SC_EMPTY) {
-    /* dep_syst has already been deallocated */
+  if(sc_empty_p(dep_syst = sc_normalize(dep_syst))) {
+    sc_rm(dep_syst);
     NbrTestSimple++;
     NbrIndepFind++;
     pips_debug(4, "initial normalized system not feasible\n");
@@ -2121,7 +2121,8 @@ static Ptsg dependence_cone_positive(dep_sc)
 
     }
 
-    if((sub_sc = sc_normalize(sub_sc)) == NULL) {
+    if(sc_empty_p(sub_sc = sc_normalize(sub_sc))) {
+      sc_rm(sub_sc); /* to mimic previous behavior of sc_normalize */
       pips_debug(7, "normalized system not feasible\n");
 
       continue;

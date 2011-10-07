@@ -179,6 +179,7 @@ bool create_workspace(gen_array_t files)
     open_warning_file(dir);
     free(dir);
     set_entity_to_size();
+    reset_static_entities();
 
     // pop_path() is too strict,
     // let's push anyway since user errors are not caught below!
@@ -240,6 +241,7 @@ bool create_workspace(gen_array_t files)
 	/* DB: free the hash_table, otherwise core dump during the next
          call to create_workspace */
 	reset_entity_to_size();
+	reset_static_entities();
 	close_log_file();
 	close_warning_file();
 	pop_path();

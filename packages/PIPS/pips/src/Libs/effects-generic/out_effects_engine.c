@@ -29,7 +29,7 @@
  * File: out_effects_engine.c
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * This File contains the generic functions necessary for the computation of 
+ * This File contains the generic functions necessary for the computation of
  * all types of out effects.
  *
  */
@@ -59,7 +59,40 @@
 
 #include "effects-generic.h"
 
+typedef struct {
+  bool memory_effects_only;
+  bool memory_in_out_regions_only;
+  effects_representation_val representation;
+} out_effects_context;
 
+
+static void init_out_effects_context(out_effects_context *ctxt,
+			     effects_representation_val representation)
+{
+  ctxt->memory_effects_only = get_bool_property("MEMORY_EFFECTS_ONLY");
+  ctxt->memory_in_out_regions_only = get_bool_property("MEMORY_IN_OUT_REGIONS_ONLY");
+  ctxt->representation = representation;
+}
+
+static list convert_rw_effects(list lrw, out_effects_context *ctxt)
+{
+  if (ctxt->representation == convex
+      && !ctxt->memory_effects_only
+      && ctxt->memory_in_out_regions_only)
+    lrw = effects_store_effects(lrw);
+
+  return lrw;
+}
+
+
+static void reset_converted_rw_effects(list *lrw, out_effects_context *ctxt)
+{
+  if (ctxt->representation == convex
+      && !ctxt->memory_effects_only
+      && ctxt->memory_in_out_regions_only)
+    gen_free_list(*lrw);
+  *lrw = NIL;
+}
 
 /**************************** GENERIC INTERPROCEDURAL OUT EFFECTS ANALYSIS */
 
@@ -68,13 +101,13 @@ static statement current_stmt = statement_undefined;
 static entity current_callee = entity_undefined;
 static list l_sum_out_eff = list_undefined;
 
-void 
+void
 reset_out_summary_effects_list()
 {
     l_sum_out_eff = list_undefined;
 }
 
-void 
+void
 update_out_summary_effects_list(list l_out)
 {
     if (list_undefined_p(l_sum_out_eff))
@@ -84,7 +117,7 @@ update_out_summary_effects_list(list l_out)
 						 effects_same_action_p);
 }
 
-list 
+list
 get_out_summary_effects_list()
 {
     return(l_sum_out_eff);
@@ -93,11 +126,11 @@ get_out_summary_effects_list()
 /* void out_effects_from_call_site_to_callee(call c)
  * input    : a potential call site for current_callee.
  * output   : nothing
- * modifies : l_sum_out_reg becomes the may union of l_sum_out_reg and 
- *            the translated out regions of the current call site. 
+ * modifies : l_sum_out_reg becomes the may union of l_sum_out_reg and
+ *            the translated out regions of the current call site.
  * comment  :
  */
-static void 
+static void
 out_effects_from_call_site_to_callee(call c)
 {
     transformer context;
@@ -108,7 +141,7 @@ out_effects_from_call_site_to_callee(call c)
 
     context = (*load_context_func)(current_stmt);
     l_out = load_out_effects_list(current_stmt);
-    
+
     l_tmp = generic_effects_forward_translation(current_callee,
 					      call_arguments(c), l_out,
 					      context);
@@ -116,7 +149,7 @@ out_effects_from_call_site_to_callee(call c)
 }
 
 
-static bool 
+static bool
 summary_out_effects_stmt_filter(statement s)
 {
     pips_debug(1, "statement %03zd\n", statement_number(s));
@@ -125,7 +158,7 @@ summary_out_effects_stmt_filter(statement s)
 }
 
 
-static list 
+static list
 out_effects_from_caller_to_callee(entity caller, entity callee)
 {
     const char *caller_name;
@@ -135,7 +168,7 @@ out_effects_from_caller_to_callee(entity caller, entity callee)
     set_current_module_entity(caller);
     caller_name = module_local_name(caller);
     pips_debug(2, "begin for caller: %s\n", caller_name);
-    
+
     /* All we need to perform the translation */
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, caller_name, true) );
@@ -150,7 +183,7 @@ out_effects_from_caller_to_callee(entity caller, entity callee)
 		      statement_domain, summary_out_effects_stmt_filter, gen_null,
 		      call_domain, out_effects_from_call_site_to_callee, gen_null,
 		      NULL);
-  
+
     reset_current_module_entity();
     set_current_module_entity(callee);
     reset_current_module_statement();
@@ -164,16 +197,16 @@ out_effects_from_caller_to_callee(entity caller, entity callee)
 
 
 
-/* bool summary_out_effects_engine(const char* module_name) 
+/* bool summary_out_effects_engine(const char* module_name)
  * input    : the name of the current module.
  * output   : the list of summary out effects
  * modifies : nothing.
  * comment  : computes the summary out effects of the current module, using the
- *            out effects at all its call sites.	
+ *            out effects at all its call sites.
  */
 bool
 summary_out_effects_engine(const char* module_name)
-{   
+{
 
     list l_eff = NIL;
 
@@ -187,7 +220,7 @@ summary_out_effects_engine(const char* module_name)
 
     set_current_module_entity(callee);
     make_effects_private_current_context_stack();
- 
+
     debug_on("OUT_EFFECTS_DEBUG_LEVEL");
     ifdebug(1)
     {
@@ -210,10 +243,10 @@ summary_out_effects_engine(const char* module_name)
     l_eff = get_out_summary_effects_list();
     if (list_undefined_p(l_eff))
 	l_eff = NIL;
-    
+
     (*db_put_summary_out_effects_func)(module_name, l_eff);
-	
-    ifdebug(1) 
+
+    ifdebug(1)
     {
       set_current_module_statement( (statement)
 				    db_get_memory_resource(DBR_CODE, module_local_name(callee), true) );
@@ -235,7 +268,7 @@ summary_out_effects_engine(const char* module_name)
 
 /***************************** GENERIC INTRAPROCEDURAL OUT EFFECTS ANALYSIS */
 
-/* void out_regions_from_unstructured_to_nodes(unstructured u, 
+/* void out_regions_from_unstructured_to_nodes(unstructured u,
  *                                             transformer c_trans, list l_out)
  * input    : an unstructured piece of code, the corresponding transformer, and
  *            the corresponding out regions.
@@ -248,8 +281,8 @@ summary_out_effects_engine(const char* module_name)
  *     at node i, then OUT_i = (OUT_0 union IN_0) inter W_i. And the result
  *     is a may region.
  */
-static bool 
-out_effects_from_unstructured_to_nodes(unstructured u)
+static bool
+out_effects_from_unstructured_to_nodes(unstructured u, out_effects_context *ctxt)
 {
     statement unst_stat = effects_private_current_stmt_head();
     list blocs = NIL;
@@ -257,16 +290,16 @@ out_effects_from_unstructured_to_nodes(unstructured u)
     list
 	l_out_unst, /* OUT effects of the unstructured */
 	l_in;       /* IN effects of the unstructured */
-    
+
     pips_debug(1, "begin\n");
-    
-    /* First, we get the out regions of the statement corresponding to the 
+
+    /* First, we get the out regions of the statement corresponding to the
      * unstructured.
      */
     l_out_unst = effects_dup(load_out_effects_list(unst_stat));
-        
+
     ct = unstructured_control( u );
-    
+
     if(control_predecessors(ct) == NIL && control_successors(ct) == NIL)
     {
 	/* there is only one statement in u; */
@@ -274,23 +307,25 @@ out_effects_from_unstructured_to_nodes(unstructured u)
 	store_out_effects_list(control_statement(ct), l_out_unst);
     }
     else
-    {	
+    {
 	transformer unst_trans = (*load_transformer_func)(unst_stat);
 	(*effects_transformer_inverse_composition_op)(l_out_unst, unst_trans);
-	
+
 	l_in = load_in_effects_list(unst_stat);
 	l_out_unst = (*effects_union_op)(l_out_unst, effects_dup(l_in),
 					 w_r_combinable_p);
 	effects_to_write_effects(l_out_unst);
-	
-	CONTROL_MAP(c, 
+
+	CONTROL_MAP(c,
 	{
 	    statement node_stat = control_statement(c);
 	    transformer node_prec = (*load_context_func)(node_stat);
 	    list l_out_node = effects_dup(l_out_unst);
+	    list l_rw = convert_rw_effects(load_rw_effects_list(node_stat), ctxt);
 	    list l_w_node =
-		effects_write_effects_dup(load_rw_effects_list(node_stat));
-	    
+		effects_write_effects_dup(l_rw);
+	    reset_converted_rw_effects(&l_rw, ctxt);
+
 	    l_out_node = (*effects_precondition_composition_op)
 		(l_out_node, node_prec);
 	    l_out_node = (*effects_intersection_op)
@@ -298,12 +333,12 @@ out_effects_from_unstructured_to_nodes(unstructured u)
 	    effects_to_may_effects(l_out_node);
 	    store_out_effects_list(node_stat, l_out_node);
 	    /* effects_free(l_w_node); */ /* ??? seems not a good idea... FC */
-	    
+
 	}, ct, blocs) ;
-		
+
 	gen_free_list(blocs) ;
-    }    
-    
+    }
+
     effects_free(l_out_unst);
 
     debug(1,"out_regions_from_unstructured_to_nodes","end\n");
@@ -319,12 +354,12 @@ out_effects_from_unstructured_to_nodes(unstructured u)
  *            for more details.
  */
 static bool
-out_effects_from_loop_to_body(loop l)
+out_effects_from_loop_to_body(loop l, out_effects_context *ctxt)
 {
     statement
 	loop_stat = effects_private_current_stmt_head(),
-	body_stat = loop_body(l); 
-    list 
+	body_stat = loop_body(l);
+    list
 	l_out_loop,
 	l_body_out = NIL,
 	l_body_w = NIL;
@@ -336,7 +371,7 @@ out_effects_from_loop_to_body(loop l)
 
     pips_debug(1, "begin\n");
     pips_debug(1, "loop index %s.\n", entity_minimal_name(i));
-    
+
     /* OUT effects of loop */
     l_out_loop = effects_dup(load_out_effects_list(loop_stat));
     ifdebug(1){
@@ -345,26 +380,28 @@ out_effects_from_loop_to_body(loop l)
     }
 
     /* Write effects of loop body */
-    l_body_w = effects_write_effects_dup(load_rw_effects_list(body_stat));
+    list l_rw = convert_rw_effects(load_rw_effects_list(body_stat), ctxt);
+    l_body_w = effects_write_effects_dup(l_rw);
+    reset_converted_rw_effects(&l_rw, ctxt);
     ifdebug(1){
 	debug(1,"","W(i) = \n");
 	(*effects_prettyprint_func)(l_body_w);
     }
 
-    /* l_out = append(T_B(l_out), loop_proper_preconditions) */ 
+    /* l_out = append(T_B(l_out), loop_proper_preconditions) */
     l_out_loop =
 	(*effects_transformer_inverse_composition_op)(l_out_loop, loop_trans);
-    range_descriptor = (*loop_descriptor_make_func)(l); 
+    range_descriptor = (*loop_descriptor_make_func)(l);
     if(descriptor_defined_p(range_descriptor))
       loop_proper_context = descriptor_to_context(range_descriptor);
     l_out_loop =
-	(*effects_precondition_composition_op)(l_out_loop, loop_proper_context); 
+	(*effects_precondition_composition_op)(l_out_loop, loop_proper_context);
 
     if (! normalizable_and_linear_loop_p(i, r) || ! get_descriptor_range_p())
     {
 	l_body_out =
 	    (*effects_intersection_op)(l_out_loop, l_body_w, w_w_combinable_p);
-	array_effects_to_may_effects(l_body_out);	
+	array_effects_to_may_effects(l_body_out);
     }
     else
     {
@@ -381,11 +418,11 @@ out_effects_from_loop_to_body(loop l)
 	entity
 	    i_prime = entity_to_intermediate_value(i),
 	    i_d_prime = entity_to_old_value(i);
-	Pvecteur 
+	Pvecteur
 	    i_prime_gt_i,
 	    i_d_prime_gt_i,
 	    i_prime_gt_i_d_prime;
-	descriptor 
+	descriptor
 	    d_i_i_prime,
 	    d_i_i_prime_i_d_prime;
 	transformer
@@ -393,27 +430,27 @@ out_effects_from_loop_to_body(loop l)
 	    c_i_i_prime_i_d_prime;
 
 	/* we will need to add several systems of constraints to the effects:
-	 * d_i_i_prime = {i'> i, lb<=i<=ub} 
+	 * d_i_i_prime = {i'> i, lb<=i<=ub}
 	 * d_i_i_prime_i_d_prime = {i<i''<i', lb<=i<=ub, lb<=i'<=ub} */
-	i_prime_gt_i = 
+	i_prime_gt_i =
 	    vect_make(
 		VECTEUR_NUL,
 		(Variable) (value_one_p(incr)? i : i_prime), VALUE_ONE,
 		(Variable) (value_one_p(incr)? i_prime : i), VALUE_MONE,
 		TCST, VALUE_ONE);
 	d_i_i_prime = copy_descriptor(range_descriptor);
-	d_i_i_prime = descriptor_inequality_add(d_i_i_prime, i_prime_gt_i); 
+	d_i_i_prime = descriptor_inequality_add(d_i_i_prime, i_prime_gt_i);
 	c_i_i_prime = descriptor_to_context(d_i_i_prime);
 	free_descriptor(d_i_i_prime);
 
 
-	i_d_prime_gt_i = 
+	i_d_prime_gt_i =
 	    vect_make(
 		VECTEUR_NUL,
 		(Variable) (value_one_p(incr)? i : i_d_prime), VALUE_ONE,
 		(Variable) (value_one_p(incr)? i_d_prime : i), VALUE_MONE,
 		TCST, VALUE_ONE);
-	i_prime_gt_i_d_prime = 
+	i_prime_gt_i_d_prime =
 	    vect_make(
 		VECTEUR_NUL,
 		(Variable) (value_one_p(incr)? i_d_prime : i_prime), VALUE_ONE,
@@ -429,7 +466,7 @@ out_effects_from_loop_to_body(loop l)
 	    descriptor_inequality_add(d_i_i_prime_i_d_prime, i_prime_gt_i_d_prime);
 	c_i_i_prime_i_d_prime = descriptor_to_context(d_i_i_prime_i_d_prime);
 	free_descriptor(d_i_i_prime_i_d_prime);
-	
+
 
 	/* l_next_w = proj_i'(W(i', i'>i)) */
 	l_next_w = effects_dup(l_body_w);
@@ -440,12 +477,12 @@ out_effects_from_loop_to_body(loop l)
 	ifdebug(1){
 	    debug(1,"","W(i', i'>i) = \n");
 	    (*effects_prettyprint_func)(l_next_w);
-	}	
+	}
 	(*effects_union_over_range_op)(l_next_w, i_prime, r, descriptor_undefined);
 	ifdebug(1){
 	    debug(1,"","proj_i'(W(i', i'>i)) = \n");
 	    (*effects_prettyprint_func)(l_next_w);
-	}	
+	}
 
 	/* l_out_glob = ( W(i) inter l_out_loop) -_{sup} l_next_w */
 	l_out_glob = (*effects_sup_difference_op)
@@ -459,7 +496,7 @@ out_effects_from_loop_to_body(loop l)
 	    debug(1,"","l_out_glob = \n");
 	    (*effects_prettyprint_func)(l_out_glob);
 	}
-	
+
 	/* l_prev_w = proj_i''(W(i'', i<i''<i')) */
 	l_prev_w = effects_dup(l_body_w);
 	l_prev_w =
@@ -470,15 +507,15 @@ out_effects_from_loop_to_body(loop l)
 	ifdebug(1){
 	    debug(1,"","W(i'', i<i''<i') = \n");
 	    (*effects_prettyprint_func)(l_prev_w);
-	}	
-	
+	}
+
 	l_prev_w = (*effects_union_over_range_op)
 	    (l_prev_w, i_d_prime, r, descriptor_undefined);
 
 	ifdebug(1){
 	    debug(1,"","proj_i''(W(i'', i<i''<i')) = \n");
 	    (*effects_prettyprint_func)(l_prev_w);
-	}	
+	}
 
 	/* l_next_in = proj_i'( IN(i', i'>i) -_{sup} l_prev_w) */
 	l_next_in = effects_dup(l_body_in);
@@ -492,14 +529,14 @@ out_effects_from_loop_to_body(loop l)
 	}
 	l_next_in = (*effects_sup_difference_op)
 	    (l_next_in, l_prev_w, r_w_combinable_p);
-	
+
 	ifdebug(1){
 	    debug(1,"","IN(i', i<i') - proj_i''(W(i'')) = \n");
 	    (*effects_prettyprint_func)(l_next_in);
 	}
 	l_next_in = (*effects_union_over_range_op)
 	    (l_next_in, i_prime, r, descriptor_undefined);
-	
+
 	/* l_out_loc = W(i) inter l_next_in */
 	l_out_loc = (*effects_intersection_op)(effects_dup(l_body_w),
 					       l_next_in,
@@ -508,13 +545,13 @@ out_effects_from_loop_to_body(loop l)
 	ifdebug(1){
 	    debug(1,"","l_out_loc = \n");
 	    (*effects_prettyprint_func)(l_out_loc);
-	}	
+	}
 
 	/* l_body_out = l_out_glob Umust l_out_loc */
 	l_body_out = (*effects_union_op)(l_out_glob, l_out_loc, w_w_combinable_p);
     }
 
-    store_out_effects_list(body_stat, l_body_out);    
+    store_out_effects_list(body_stat, l_body_out);
     return(true);
 }
 
@@ -523,15 +560,15 @@ out_effects_from_loop_to_body(loop l)
  * input    : a test.
  * output   : the true boolean.
  * modifies : .
- * comment  : computes the out regions of each branch of the test.	
+ * comment  : computes the out regions of each branch of the test.
  */
-static bool  
-out_effects_from_test_to_branches(test t)
+static bool
+out_effects_from_test_to_branches(test t, out_effects_context *ctxt)
 {
     statement
 	test_stat = effects_private_current_stmt_head(),
 	branche;
-    list 
+    list
 	l_out_test,
 	l_out_branche = NIL,
 	l_w_branche;
@@ -548,30 +585,34 @@ out_effects_from_test_to_branches(test t)
     for(i=1; i<=2; i++)
     {
 	branche = (i==1)? test_true(t) : test_false(t);
-	l_w_branche = effects_write_effects_dup(load_rw_effects_list(branche));
+	list l_rw_branche = convert_rw_effects(load_rw_effects_list(branche), ctxt);
+	l_w_branche = effects_write_effects_dup(l_rw_branche);
+	reset_converted_rw_effects(&l_rw_branche, ctxt);
 	prec_branche = (*load_context_func)(branche);
 
 	l_out_branche = effects_dup(l_out_test);
 	l_out_branche = (*effects_precondition_composition_op)
 	    (l_out_branche, prec_branche);
 	l_out_branche = (*effects_intersection_op)
-	    (l_out_branche, l_w_branche, w_w_combinable_p);	
+	    (l_out_branche, l_w_branche, w_w_combinable_p);
 	store_out_effects_list(branche, l_out_branche);
     }
-    
+
     pips_debug(1,"end\n");
     return(true);
 }
 
 /* Rout[s in for(c)s] = Rw[s] * MAY ?
  */
-static bool out_effects_from_for_to_body(forloop f)
+static bool out_effects_from_for_to_body(forloop f, out_effects_context *ctxt)
 {
   statement body;
   list /* of effect */ lout;
 
   body = forloop_body(f);
-  lout = effects_write_effects_dup(load_rw_effects_list(body));
+  list l_rw = convert_rw_effects(load_rw_effects_list(body), ctxt);
+  lout = effects_write_effects_dup(l_rw);
+  reset_converted_rw_effects(&l_rw, ctxt);
   MAP(EFFECT, e,
       approximation_tag(effect_approximation(e)) = is_approximation_may,
       lout);
@@ -582,13 +623,15 @@ static bool out_effects_from_for_to_body(forloop f)
 
 /* Rout[s in while(c)s] = Rw[s] * MAY ?
  */
-static bool out_effects_from_while_to_body(whileloop w)
+static bool out_effects_from_while_to_body(whileloop w, out_effects_context *ctxt)
 {
   statement body;
   list /* of effect */ lout;
 
   body = whileloop_body(w);
-  lout = effects_write_effects_dup(load_rw_effects_list(body));
+  list l_rw = convert_rw_effects(load_rw_effects_list(body), ctxt);
+  lout = effects_write_effects_dup(l_rw);
+  reset_converted_rw_effects(&l_rw, ctxt);
   MAP(EFFECT, e,
       approximation_tag(effect_approximation(e)) = is_approximation_may,
       lout);
@@ -598,15 +641,15 @@ static bool out_effects_from_while_to_body(whileloop w)
 }
 
 /* void out_regions_from_block_to_statements(list l_stat, list l_out, ctrans)
- * input    : a list of statement contituting a linear sequence, the 
+ * input    : a list of statement contituting a linear sequence, the
  *            correponding out regions and the transformer of the block.
  * output   : nothing.
  * modifies : nothing.
- * comment  : computes the out regions of each statement in the sequence.	
+ * comment  : computes the out regions of each statement in the sequence.
  *            uses the algorithm described in report E/185.
  */
 static bool
-out_effects_from_block_to_statements(sequence seq)
+out_effects_from_block_to_statements(sequence seq, out_effects_context *ctxt)
 {
     statement seq_stat = effects_private_current_stmt_head();
     list l_out_seq = load_out_effects_list(seq_stat);
@@ -623,13 +666,13 @@ out_effects_from_block_to_statements(sequence seq)
     {
 	/* empty block of statements. Nothing to do. */
 	if (get_bool_property("WARN_ABOUT_EMPTY_SEQUENCES"))
-	    pips_user_warning("empty sequence\n");	
+	    pips_user_warning("empty sequence\n");
 	return true;
     }
 
-    if (gen_length(l_stat) == 1) 
+    if (gen_length(l_stat) == 1)
     {
-	/* if there is only one instruction in the block of statement, 
+	/* if there is only one instruction in the block of statement,
          * its out effects are the effects of the block */
 
 	ifdebug(1)
@@ -663,14 +706,15 @@ out_effects_from_block_to_statements(sequence seq)
 		       " after block:\n");
 	    (*effects_prettyprint_func)(l_out_prime);
 	}
-	
+
 	/* We go through each statement (S_k) in reverse order */
 	MAP(STATEMENT, c_stat,
 	{
 	    transformer c_stat_trans = (*load_completed_transformer_func)(c_stat);
-	    list l_c_stat_w_eff = 
-		effects_write_effects(load_rw_effects_list(c_stat)); 
-	    
+	    list l_c_stat_rw_eff = convert_rw_effects(load_rw_effects_list(c_stat), ctxt);
+	    list l_c_stat_w_eff = effects_write_effects(l_c_stat_rw_eff);
+	    reset_converted_rw_effects(&l_c_stat_rw_eff, ctxt);
+
 	    ifdebug(1){
 		pips_debug(1,"intermediate effects\n");
 		debug(1,"","W(k) = \n");
@@ -678,19 +722,19 @@ out_effects_from_block_to_statements(sequence seq)
 		debug(1,"","W(k+1) = \n");
 		(*effects_prettyprint_func)(l_next_stat_w_eff);
 	    }
-	    
+
 	    /* OUT'_k = T_k^{-1} [ OUT'_{k+1} -_{sup} W_{k+1} ] */
 	    l_out_prime =
-		(*effects_sup_difference_op)(l_out_prime, 
-					     effects_dup(l_next_stat_w_eff), 
+		(*effects_sup_difference_op)(l_out_prime,
+					     effects_dup(l_next_stat_w_eff),
 					     w_w_combinable_p);
 	    (*effects_transformer_composition_op)(l_out_prime, c_stat_trans);
-	    
+
 	    ifdebug(1){
 		debug(1,"","OUT'_k = \n");
 		(*effects_prettyprint_func)(l_out_prime);
 	    }
-	    
+
 	    /* OUT_k = W_k inter [ OUT'_k Umust T_k^{-1} (IN'_{k+1})] */
 	    ifdebug(1){
 		debug(1,"","IN'_(k+1) = \n");
@@ -703,19 +747,19 @@ out_effects_from_block_to_statements(sequence seq)
 		      "(after elimination of modified variables)\n");
 		(*effects_prettyprint_func)(l_in_prime);
 	    }
-	    
-	    l_tmp = (*effects_union_op)(effects_dup(l_out_prime), 
+
+	    l_tmp = (*effects_union_op)(effects_dup(l_out_prime),
 					l_in_prime, w_w_combinable_p);
-	    
+
 	    ifdebug(1){
 		debug(1,"","OUT'_k Umust IN'_(k+1) = \n");
 		(*effects_prettyprint_func)(l_tmp);
 	    }
-	    
-	     l_out_stat = (*effects_intersection_op)(effects_dup(l_c_stat_w_eff), 
+
+	     l_out_stat = (*effects_intersection_op)(effects_dup(l_c_stat_w_eff),
 						     l_tmp,
 						     w_w_combinable_p);
-	     	     
+
 	     ifdebug(1){
 		 debug(1,"","OUT_k = \n");
 		 (*effects_prettyprint_func)(l_out_stat);
@@ -723,7 +767,7 @@ out_effects_from_block_to_statements(sequence seq)
 
 	     /* store the out effects of the current statement */
 	     store_out_effects_list(c_stat, l_out_stat);
-	     
+
 	     /* keep some information about the current statement, which will be
 	      * the next statement. */
 	     l_next_stat_w_eff = l_c_stat_w_eff;
@@ -731,23 +775,23 @@ out_effects_from_block_to_statements(sequence seq)
 	     effects_to_write_effects(l_in_prime);
 	},
 	    l_stat_reverse);
-	
+
     }
     pips_debug(1,"end\n");
     return(true);
 }
 
 
-static bool 
-out_effects_statement_filter(statement s)
+static bool
+out_effects_statement_filter(statement s, out_effects_context *ctxt)
 {
     pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
-    effects_private_current_stmt_push(s);   
+    effects_private_current_stmt_push(s);
     return true;
 }
 
 static void
-out_effects_statement_leave(statement s)
+out_effects_statement_leave(statement s, out_effects_context *ctxt)
 {
     effects_private_current_stmt_pop();
     pips_debug(1, "End statement %03zd :\n", statement_ordering(s));
@@ -755,14 +799,14 @@ out_effects_statement_leave(statement s)
 
 
 static void
-out_effects_of_module_statement(statement module_stat)
+out_effects_of_module_statement(statement module_stat, out_effects_context *ctxt)
 {
 
     make_effects_private_current_stmt_stack();
     pips_debug(1,"begin\n");
-    
-    gen_multi_recurse(
-      module_stat, 
+
+    gen_context_multi_recurse(
+			      module_stat,ctxt,
   statement_domain, out_effects_statement_filter, out_effects_statement_leave,
       sequence_domain, out_effects_from_block_to_statements, gen_null,
       test_domain, out_effects_from_test_to_branches, gen_null,
@@ -771,7 +815,7 @@ out_effects_of_module_statement(statement module_stat)
       forloop_domain, out_effects_from_for_to_body, gen_null,
        unstructured_domain, out_effects_from_unstructured_to_nodes, gen_null,
       call_domain, gen_false, gen_null, /* calls are treated in another phase*/
-      NULL);     
+      NULL);
 
     pips_debug(1,"end\n");
     free_effects_private_current_stmt_stack();
@@ -779,17 +823,17 @@ out_effects_of_module_statement(statement module_stat)
 }
 
 
-/* bool out_effects_engine(const char* module_name): 
+/* bool out_effects_engine(const char* module_name):
  * input    : the name of the current module.
  * requires : that transformers and precondition maps be set if needed.
  *            (it depends on the chosen instanciation of *load_context_func
  *             and *load_transformer_func).
  * output   : nothing !
- * modifies : 
- * comment  : computes the out effects of the current module.	
+ * modifies :
+ * comment  : computes the out effects of the current module.
  */
 bool
-out_effects_engine(const char* module_name)
+out_effects_engine(const char* module_name, effects_representation_val representation)
 {
 
     statement module_stat;
@@ -799,14 +843,14 @@ out_effects_engine(const char* module_name)
     debug(1, "out_effects", "begin\n");
 
     make_effects_private_current_context_stack();
-   
+
     set_current_module_entity(module_name_to_entity(module_name));
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, true) );
     module_stat = get_current_module_statement();
-    
+
     (*effects_computation_init_func)(module_name);
 
     /* Get the various effects and in_effects of the module. */
@@ -823,15 +867,17 @@ out_effects_engine(const char* module_name)
 
     /* initialise the map for out effects */
     init_out_effects();
-  
+
     /* Get the out_summary_effects of the current module */
     l_sum_out = (*db_get_summary_out_effects_func)(module_name);
 
-    /* And stores them as the out regions of the module statement */  
+    /* And stores them as the out regions of the module statement */
     store_out_effects_list(module_stat, effects_dup(l_sum_out));
 
     /* Compute the out_effects of the module. */
-    out_effects_of_module_statement(module_stat);
+    out_effects_context ctxt;
+    init_out_effects_context(&ctxt, representation);
+    out_effects_of_module_statement(module_stat, &ctxt);
 
     pips_debug(1, "end\n");
 

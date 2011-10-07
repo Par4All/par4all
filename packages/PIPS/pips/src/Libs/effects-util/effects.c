@@ -305,34 +305,17 @@ bool heap_cell_p(cell c)
 
 bool malloc_effect_p(effect e)
 {
-  bool heap_p;
-  reference r = effect_any_reference(e);
-  entity v = reference_variable(r);
-
-  heap_p = same_string_p(entity_local_name(v), MALLOC_EFFECTS_NAME);
-
-  return heap_p;
+  return malloc_entity_p(effect_entity(e));
 }
 
 bool malloc_cell_p(cell c)
 {
-  bool heap_p;
-  reference r = cell_any_reference(c);
-  entity v = reference_variable(r);
-
-  heap_p = same_string_p(entity_local_name(v), MALLOC_EFFECTS_NAME);
-
-  return heap_p;
+  return malloc_entity_p(cell_entity(c));
 }
 
 bool malloc_reference_p(reference r)
 {
-  bool heap_p;
-  entity v = reference_variable(r);
-
-  heap_p = same_string_p(entity_local_name(v), MALLOC_EFFECTS_NAME);
-
-  return heap_p;
+  return malloc_entity_p(reference_variable(r));
 }
 
 
@@ -340,8 +323,7 @@ bool malloc_reference_p(reference r)
 /*************** I/O EFFECTS *****************/
 bool io_effect_entity_p(entity e)
 {
-    return io_entity_p(e) &&
-	same_string_p(entity_local_name(e), IO_EFFECTS_ARRAY_NAME);
+    return io_luns_entity_p(e);
 }
 
 bool io_effect_p(effect e)

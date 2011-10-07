@@ -418,19 +418,26 @@ Psysteme cell_system_sc_append_and_normalize(Psysteme sc1, Psysteme sc2, int lev
 
 
   sc = sc1;
-  if(!sc_weak_consistent_p(sc1)) {
-    pips_debug(8, "Inconsistent system: \n");
-    sc_syst_debug(sc1);
-    assert(sc_weak_consistent_p(sc1));
-  }
-  assert(sc_weak_consistent_p(sc22));
+  ifdebug(1)
+    {
+      sc_syst_debug(sc1);
+      sc_syst_debug(sc2);
+      pips_assert("sc1 must be consistent", sc_weak_consistent_p(sc1));
+      pips_assert("sc2 must be consistent", sc_weak_consistent_p(sc22));
+    }
   sc22 = sc_safe_normalize(sc22);
   sc = sc_safe_append(sc_safe_normalize(sc), sc22);
-  assert(sc_weak_consistent_p(sc));
+  ifdebug(1)
+    {
+      assert(sc_weak_consistent_p(sc));
+    }
   if (level!=-1)
     sc = region_sc_normalize(sc, level);
-  assert(sc_weak_consistent_p(sc));
 
+  ifdebug(1)
+    {
+      assert(sc_weak_consistent_p(sc));
+    }
   sc_rm(sc22);
 
   return sc;
