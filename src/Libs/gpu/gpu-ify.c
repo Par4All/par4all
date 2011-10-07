@@ -206,6 +206,7 @@ gpu_ify_statement(statement s, int depth, const char* mod_name) {
     get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT");
 
   /* If we want to outline a kernel: */
+  string kernel_name = string_undefined;
   if (get_bool_property("GPU_USE_KERNEL")) {
     /* First outline the innermost code (the kernel itself) to avoid
        spoiling its memory effects if we start with the outermost code
@@ -215,6 +216,7 @@ gpu_ify_statement(statement s, int depth, const char* mod_name) {
     // Choose if we want the kernel in its own file:
     set_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT",
 		      get_bool_property("GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT"));
+    kernel_name = build_outline_name(kernel_prefix, mod_name);
     outliner(build_outline_name(kernel_prefix, mod_name),sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel:");
   }
@@ -279,7 +281,15 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
     // Choose if we want the wrapper in its own file:
     set_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT",
 		      get_bool_property("GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT"));
-    outliner(build_outline_name(wrapper_prefix, mod_name), sk);
+    string wrapper_name = build_outline_name(wrapper_prefix, mod_name);
+    outliner(wrapper_name, sk);
+
+    if(kernel_name && !get_bool_property("GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT")) {
+      string source_file_name =
+        db_get_memory_resource(DBR_USER_FILE, kernel_name, true);
+      DB_PUT_FILE_RESOURCE(DBR_USER_FILE, wrapper_name, strdup(source_file_name));
+    }
+
     //insert_comments_to_statement(inner, "// Call the compute kernel wrapper:");
   }
 
