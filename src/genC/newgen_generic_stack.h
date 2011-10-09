@@ -63,7 +63,8 @@
   }									\
   PREFIX void __attribute__ ((unused)) name##_rewrite(type i)		\
   {									\
-    assert((type)stack_pop(name##_stack)==i);				\
+    type __attribute__ ((unused)) t = (type)stack_pop(name##_stack);\
+    assert(t==i);				\
   }									\
   PREFIX type __attribute__ ((unused)) name##_replace(type i)		\
   {									\
