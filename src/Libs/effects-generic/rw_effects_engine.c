@@ -629,17 +629,28 @@ static void rw_effects_of_test(test t)
   pips_debug(2, "end\n");
 }
 
-static list rw_effects_of_declarations(list rb_lrw, list l_decl)
+/**
+   computes the cumulated effects of the declarations from the list of
+   effects after the declaration
+
+   @param[out] lrw_after_decls is the list of effects in the store after the declarations;
+   it is modified.
+   @param[in] l_decl is the ordered list of declarations.
+
+   usage: l = rw_effects_of_declarations(l, l_decl)
+ */
+static list rw_effects_of_declarations(list lrw_after_decls, list l_decl)
 {
-  list l_eff = NIL;
+  list lrw_before_decls = NIL; /* the returned list */
+  list lrw_after_first_decl = NIL; /* effects after first declaration */
 
   if (!ENDP(l_decl))
     {
-
       // treat last declarations first
       if (!ENDP(CDR(l_decl)))
-	rb_lrw = rw_effects_of_declarations(rb_lrw, CDR(l_decl));
-
+	lrw_after_first_decl = rw_effects_of_declarations(lrw_after_decls, CDR(l_decl));
+      else
+	lrw_after_first_decl = lrw_after_decls;
       // then handle top declaration
       entity decl = ENTITY(CAR(l_decl));
       storage decl_s = entity_storage(decl);
@@ -650,119 +661,123 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 	  pips_debug(8, "dealing with entity : %s with type %s\n", entity_local_name(decl),words_to_string(words_type(ct,NIL,false)));
 	}
 
-      if (storage_ram_p(decl_s))
-	{
+      if (storage_ram_p(decl_s)
 	  /* static variable declaration has no effect, even in case of initialization. */
-	  if (! static_area_p(ram_section(storage_ram(decl_s))))
+	  && !static_area_p(ram_section(storage_ram(decl_s)))
+	  && type_variable_p(entity_type(decl)))
+	{
+	  value v_init = entity_initial(decl);
+	  expression exp_init = expression_undefined;
+	  if(value_expression_p(v_init))
+	    exp_init = value_expression(v_init);
+
+	  // We must first eliminate effects on the declared variable
+	  // except if it is a static or extern variable.
+	  // or use the initial value to translate them to the preceding memory state
+	  // We should take care of the transformer too for convex effects. But which transformer ? Is the statement transfomer OK
+	  // or do we need to use the transformer for each variable initialization ?
+
+	  FOREACH(EFFECT, eff, lrw_after_first_decl)
 	    {
+	      reference eff_ref = effect_any_reference(eff);
+	      entity eff_ent = reference_variable(eff_ref);
 
-	      if(type_variable_p(entity_type(decl)))
+	      pips_debug_effect(8,"dealing_with_effect: \n", eff);
+
+	      if (eff_ent == decl)
 		{
-		  value v_init = entity_initial(decl);
-		  expression exp_init = expression_undefined;
-		  if(value_expression_p(v_init))
-		    exp_init = value_expression(v_init);
-
-		  // We must first eliminate effects on the declared variable
-		  // except if it is a static or extern variable.
-		  // or use the initial value to translate them to the preceding memory state
-		  // We should take care of the transformer too for convex effects. But which transformer ? Is the statement transfomer OK
-		  // or do we need to use the transformer for each variable initialization ?
-		  l_eff = NIL;
-		  FOREACH(EFFECT, eff, rb_lrw)
+		  pips_debug(8, "same entity\n");
+		  // there is no need to keep the effect if it's an effect on the sole declared variable (length of path = 0)
+		  if( !ENDP(reference_indices(eff_ref)))
+		    /* as a consequence, it is a store effect which is needed for the call to
+		       effect_reference_contains_pointer_dimension_p
+		    */
 		    {
-		      reference eff_ref = effect_any_reference(eff);
-		      entity eff_ent = reference_variable(eff_ref);
-
-		      pips_debug_effect(8,"dealing_with_effect: \n", eff);
-
-		      if (eff_ent == decl)
+		      bool exact_p;
+		      // no need to keep the effect if there is no pointer in the path of the effect
+		      if (effect_reference_contains_pointer_dimension_p(eff_ref, &exact_p))
 			{
-			  pips_debug(8, "same entity\n");
-			  // there is no need to keep the effect if it's an effect on the sole declared variable (length of path = 0)
-			  if( !ENDP(reference_indices(eff_ref)))
-			    /* as a consequence, it is a store effect which is needed for the call to
-			       effect_reference_contains_pointer_dimension_p
-			    */
+			  if(!expression_undefined_p(exp_init)) // there is an inital value
 			    {
-			      bool exact_p;
-			      // no need to keep the effect if there is no pointer in the path of the effect
-			      if (effect_reference_contains_pointer_dimension_p(eff_ref, &exact_p))
+			      // let us re-use an existing method even if it's not the fastest method
+			      // interprocedural translation and intra-procedural propagation will have to be re-packaged later
+			      list l_tmp = CONS(EFFECT, eff, NIL);
+			      list l_res_tmp;
+
+			      if(c_effects_on_formal_parameter_backward_translation_func == c_convex_effects_on_formal_parameter_backward_translation)
 				{
-				  if(!expression_undefined_p(exp_init)) // there is an inital value
-				    {
-				      // let us re-use an existing method even if it's not the fastest method
-				      // interprocedural translation and intra-procedural propagation will have to be re-packaged later
-				      list l_tmp = CONS(EFFECT, eff, NIL);
-				      list l_res_tmp;
-
-				      if(c_effects_on_formal_parameter_backward_translation_func == c_convex_effects_on_formal_parameter_backward_translation)
-					{
-					  Psysteme sc = sc_new();
-					  sc_creer_base(sc);
-					  set_translation_context_sc(sc);
-					}
-
-				      /* beware of casts : do not take them into account for the moment */
-				      syntax s_init = expression_syntax(exp_init);
-				      if (syntax_cast_p(s_init))
-					exp_init = cast_expression(syntax_cast(s_init));
-				      l_res_tmp = (*c_effects_on_formal_parameter_backward_translation_func)(l_tmp, exp_init, transformer_undefined);
-
-				      if(c_effects_on_formal_parameter_backward_translation_func == c_convex_effects_on_formal_parameter_backward_translation)
-					{
-					  reset_translation_context_sc();
-					}
-
-				      if (!exact_p) effects_to_may_effects(l_res_tmp);
-				      l_eff = (*effects_union_op)(l_res_tmp, l_eff, effects_same_action_p);
-				      gen_free_list(l_tmp);
-				    }
-				  else
-				    {
-				      pips_debug(8, "there is no inital_value\n");
-				      if (get_constant_paths_p())
-					{
-					  pips_debug(8, "-> anywhere effect \n");
-					  list l_tmp = gen_nconc(CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), NIL), l_eff);
-					  l_eff = clean_anywhere_effects(l_tmp);
-					  gen_full_free_list(l_tmp);
-					}
-
-				    }
+				  Psysteme sc = sc_new();
+				  sc_creer_base(sc);
+				  set_translation_context_sc(sc);
 				}
-			    } /* if( !ENP(reference_indices(eff_ref))) */
+
+			      /* beware of casts : do not take them into account for the moment */
+			      syntax s_init = expression_syntax(exp_init);
+			      if (syntax_cast_p(s_init))
+				exp_init = cast_expression(syntax_cast(s_init));
+			      l_res_tmp = (*c_effects_on_formal_parameter_backward_translation_func)(l_tmp, exp_init, transformer_undefined);
+
+			      if(c_effects_on_formal_parameter_backward_translation_func == c_convex_effects_on_formal_parameter_backward_translation)
+				{
+				  reset_translation_context_sc();
+				}
+
+			      if (!exact_p) effects_to_may_effects(l_res_tmp);
+
+			      lrw_before_decls = (*effects_union_op)(l_res_tmp, lrw_before_decls, effects_same_action_p);
+			      gen_full_free_list(l_tmp);
+			    }
+			  else
+			    {
+			      pips_debug(8, "there is no inital_value\n");
+			      if (get_constant_paths_p())
+				{
+				  pips_debug(8, "-> anywhere effect \n");
+				  list l_tmp = gen_nconc(CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), NIL), lrw_before_decls);
+				  lrw_before_decls = clean_anywhere_effects(l_tmp);
+				  gen_full_free_list(l_tmp);
+				}
+
+			    }
 			}
-		      else
-			{
-			  /**/
-			  // keep the effect if it's an effect on another entity
-			  l_eff = CONS(EFFECT, eff, l_eff);
-			}
+		    } /* if( !ENP(reference_indices(eff_ref))) */
+		}
+	      else
+		{
+		  /**/
+		  // keep the effect if it's an effect on another entity
+		  lrw_before_decls = CONS(EFFECT, eff, lrw_before_decls);
+		}
 
-		    }
-		  rb_lrw = gen_nreverse(l_eff); // we try to preserve the order in which effects arise
+	    } /* FOREACH */
+	  gen_free_list(lrw_after_first_decl);
+	  lrw_before_decls = gen_nreverse(lrw_before_decls); // we try to preserve the order in which effects arise
 
-		  // and then add the effects due to the initialization part
-		  if(!expression_undefined_p(exp_init))
-		    {
-		      rb_lrw = (*effects_union_op)(generic_proper_effects_of_expression(exp_init), rb_lrw, effects_same_action_p);
-		    }
-		} /* if (! static_area_p(ram_section(storage_ram(decl_s))))*/
+	  // and then add the effects due to the initialization part
+	  if(!expression_undefined_p(exp_init))
+	    {
+	      lrw_before_decls = (*effects_union_op)(generic_proper_effects_of_expression(exp_init),
+						     lrw_before_decls, effects_same_action_p);
+	    }
 
-	    } /* if (storage_ram(decl_s)) */
-	} /* if (!ENDP(CDR(l_decl))) */
+	} /* if (storage_ram(decl_s) && !static_area_p(ram_section(storage_ram(decl_s)))) */
+      else
+	{
+	  lrw_before_decls = lrw_after_first_decl;
+	}
+    } /* if (!ENDP(CDR(l_decl))) */
+  else
+     lrw_before_decls = lrw_after_decls;
       // we should also do some kind of unioning...
 
-    } /* if (!ENDP(l_decl))*/
   if (get_constant_paths_p())
     {
-      list l_tmp = rb_lrw;
-      rb_lrw = pointer_effects_to_constant_path_effects(rb_lrw);
+      list l_tmp = lrw_before_decls;
+      lrw_before_decls = pointer_effects_to_constant_path_effects(lrw_before_decls);
       effects_free(l_tmp);
     }
 
-  return rb_lrw;
+  return lrw_before_decls;
 }
 
 static list r_rw_effects_of_sequence(list l_inst)
@@ -789,7 +804,7 @@ static list r_rw_effects_of_sequence(list l_inst)
 	s1_lrw = NIL;
       }
     else
-      s1_lrw = effects_dup(load_rw_effects_list(first_statement));
+      s1_lrw = load_rw_effects_list(first_statement);
 
     /* Is it the last instruction of the block */
     if (!ENDP(remaining_block))
@@ -834,7 +849,7 @@ static list r_rw_effects_of_sequence(list l_inst)
 	}
 
 	/* RW(block) = RW(rest_of_block) U RW(S1) */
-	l_rw = (*effects_union_op)(rb_lrw, s1_lrw, effects_same_action_p);
+	l_rw = (*effects_union_op)(rb_lrw, effects_dup(s1_lrw), effects_same_action_p);
 
 	ifdebug(5){
 	    pips_debug(5, "R/W effects of remaining sequence "
@@ -844,7 +859,7 @@ static list r_rw_effects_of_sequence(list l_inst)
     }
     else
     {
-      l_rw = rw_effects_of_declarations(s1_lrw, l_decl);
+      l_rw = rw_effects_of_declarations(effects_dup(s1_lrw), l_decl);
       if (get_constant_paths_p())
 	  {
 	    list l_tmp = l_rw;
