@@ -1225,7 +1225,7 @@ class p4a_processor(object):
         output_files.extend (self.save_user_file (dest_dir, prefix, suffix))        
         
         if self.opencl:
-            # HACK inside : we expect the launcher and the kernel to be in the 
+            # HACK inside : we expect the wrapper and the kernel to be in the 
             # same file which MUST be called wrapper_name.c
             for kernel in self.kernels:
                 # find the associated wrapper with the kernel
