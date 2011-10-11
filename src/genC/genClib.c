@@ -3286,7 +3286,7 @@ gen_internal_context_multi_recurse
   if (!gen_trav_stop_recursion) {
     message_assert("back to root", stack_size(current_mrc->upwards) == 1);
     void * popped = stack_pop(current_mrc->upwards);
-    message_assert("back to root", popped = NULL);
+    message_assert("back to root", popped == NULL);
   }
   gen_trav_stop_recursion = false;
 
