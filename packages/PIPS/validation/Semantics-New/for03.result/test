@@ -1,0 +1,202 @@
+
+Source code with transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(cpi,cpj,i,j,k) {}
+
+   int i, k, j, cpi, cpj;
+   // indexes used in loops
+
+//  T() {}
+
+   float l[128*128];
+   
+   // Number of blocks
+
+//  T(n) {n==8}
+
+   int n = 128/16;
+
+//  T(cpi,cpj,i,k) {n==8, 0<=k, k<=7}
+
+
+   for(k = 0; k <= n-1; k += 1) {
+      
+      /* Temporary block */
+
+//  T() {n==8, 0<=k, k<=7}
+
+      float tmp[16*16];
+
+//  T() {n==8, 0<=k, k<=7}
+
+      float _tmp1[16*16];
+
+//  T(cpi) {n==8, 0<=cpi, cpi<=255, 0<=k, k<=7}
+
+
+      for(cpi = 0; cpi <= 255; cpi += 1)
+
+//  T() {n==8, 0<=cpi, cpi<=255, 0<=k, k<=7}
+
+         tmp[cpi] = cpi;
+
+//  T() {cpi==256, n==8, 0<=k, k<=7}
+
+
+      printf("1 cpi=%d\n", cpi);
+
+//  T(cpi,cpj) {cpi#init==256, n==8, 0<=cpi, cpi<=15, 0<=k, k<=7}
+
+
+      for(cpi = 0; cpi <= 15; cpi += 1)
+
+//  T(cpj) {n==8, 0<=cpi, cpi<=15, 0<=cpj, cpj<=15, 0<=k, k<=7}
+
+         for(cpj = 0; cpj <= 15; cpj += 1)
+
+//  T() {n==8, 0<=cpi, cpi<=15, 0<=cpj, cpj<=15, 0<=k, k<=7}
+
+            l[(k*16+cpi)*128+k*16+cpj] = tmp[cpi*16+cpj];
+
+//  T() {cpi==16, cpj==16, n==8, 0<=k, k<=7}
+
+
+      printf("2 cpi=%d\n", cpi);
+
+//  T(cpi,cpj) {cpi#init==16, cpj#init==16, n==8, 0<=cpi, cpi<=15,
+//    0<=k, k<=7}
+
+
+      for(cpi = 0; cpi <= 15; cpi += 1)
+
+//  T(cpj) {n==8, 0<=cpi, cpi<=15, cpi+1<=cpj, cpj<=15, 0<=k, k<=7}
+
+         for(cpj = cpi+1; cpj <= 15; cpj += 1) {
+
+//  T(0`1`2`3`idx1) {16cpi+cpj==0`1`2`3`idx1, n==8, 0<=cpi, cpi<=15,
+//    cpi+1<=cpj, cpj<=15, 0<=k, k<=7}
+
+            unsigned int idx1 = cpi*16+cpj;
+
+//  T(0`1`2`3`idx2) {16cpi+cpj==0`1`2`3`idx1, cpi+16cpj==0`1`2`3`idx2,
+//    n==8, 0<=cpi, cpi<=15, cpi+1<=cpj, cpj<=15, 0<=k, k<=7}
+
+            unsigned int idx2 = cpj*16+cpi;
+
+//  T() {16cpi+cpj==0`1`2`3`idx1, cpi+16cpj==0`1`2`3`idx2, n==8,
+//    0<=cpi, cpi<=15, cpi+1<=cpj, cpj<=15, 0<=k, k<=7}
+
+            _tmp1[idx2] = tmp[idx1];
+         }
+
+//  T() {cpi==16, cpj==16, n==8, 0<=k, k<=7}
+
+
+      printf("3 cpi=%d\n", cpi);
+
+//  T(cpi,cpj) {cpi#init==16, cpj#init==16, n==8, 0<=cpi, cpi<=15,
+//    0<=k, k<=7}
+
+
+      for(cpi = 0; cpi <= 15; cpi += 1)
+
+//  T(cpj) {n==8, 0<=cpi, cpi<=15, cpi+1<=cpj, cpj<=15, 0<=k, k<=7}
+
+         for(cpj = cpi+1; cpj <= 15; cpj += 1) {
+
+//  T(0`1`4`5`idx1) {16cpi+cpj==0`1`4`5`idx1, n==8, 0<=cpi, cpi<=15,
+//    cpi+1<=cpj, cpj<=15, 0<=k, k<=7}
+
+            unsigned int idx1 = cpi*16+cpj;
+
+//  T(0`1`4`5`idx2) {16cpi+cpj==0`1`4`5`idx1, cpi+16cpj==0`1`4`5`idx2,
+//    n==8, 0<=cpi, cpi<=15, cpi+1<=cpj, cpj<=15, 0<=k, k<=7}
+
+            unsigned int idx2 = cpj*16+cpi;
+
+//  T() {16cpi+cpj==0`1`4`5`idx1, cpi+16cpj==0`1`4`5`idx2, n==8,
+//    0<=cpi, cpi<=15, cpi+1<=cpj, cpj<=15, 0<=k, k<=7}
+
+            tmp[idx1] = tmp[idx2];
+
+//  T() {16cpi+cpj==0`1`4`5`idx1, cpi+16cpj==0`1`4`5`idx2, n==8,
+//    0<=cpi, cpi<=15, cpi+1<=cpj, cpj<=15, 0<=k, k<=7}
+
+            tmp[idx2] = _tmp1[idx2];
+         }
+
+//  T() {cpi==16, cpj==16, n==8, 0<=k, k<=7}
+
+
+      printf("4 cpi=%d\n", cpi);
+
+//  T(cpi,cpj,i) {cpi#init==16, cpj#init==16, n==8, i<=7, k+1<=i,
+//    0<=k, k<=7}
+
+
+      for(i = k+1; i <= n-1; i += 1) {
+
+//  T() {n==8, i<=7, k+1<=i, 0<=k, k<=7}
+
+         float lik[16*16];
+
+//  T(cpi,cpj) {n==8, 0<=cpi, cpi<=15, i<=7, k+1<=i, 0<=k, k<=7}
+
+
+         for(cpi = 0; cpi <= 15; cpi += 1)
+
+//  T(cpj) {n==8, 0<=cpi, cpi<=15, 0<=cpj, cpj<=15, i<=7, k+1<=i,
+//    0<=k, k<=7}
+
+            for(cpj = 0; cpj <= 15; cpj += 1)
+
+//  T() {n==8, 0<=cpi, cpi<=15, 0<=cpj, cpj<=15, i<=7, k+1<=i, 0<=k,
+//    k<=7}
+
+               lik[cpi*16+cpj] = tmp[cpi*16+cpj]+k;
+
+//  T(cpi,cpj) {cpi#init==16, cpj#init==16, n==8, 0<=cpi, cpi<=15,
+//    i<=7, k+1<=i, 0<=k, k<=7}
+
+
+         for(cpi = 0; cpi <= 15; cpi += 1)
+
+//  T(cpj) {n==8, 0<=cpi, cpi<=15, 0<=cpj, cpj<=15, i<=7, k+1<=i,
+//    0<=k, k<=7}
+
+            for(cpj = 0; cpj <= 15; cpj += 1)
+
+//  T() {n==8, 0<=cpi, cpi<=15, 0<=cpj, cpj<=15, i<=7, k+1<=i, 0<=k,
+//    k<=7}
+
+               l[(i*16+cpi)*128+k*16+cpj] = lik[cpi*16+cpj];
+      }
+   }
+
+//  T() {cpi==16, cpj==16, i==8, k==8, n==8}
+
+   // End of k loop
+   
+   
+   // Prints the result matrix l[0] in a file
+   printf("Block algorithm : L result matrix \n");
+
+//  T(i) {cpi==16, cpj==16, i#init==8, k==8, n==8, 0<=i, i<=16383}
+
+
+   for(i = 0; i <= 16383; i += 1)
+
+//  T() {cpi==16, cpj==16, k==8, n==8, 0<=i, i<=16383}
+
+      printf("% 6.3f ", l[i]);
+
+//  T(main) {cpi==16, cpj==16, i==16384, k==8, main==0, n==8}
+
+   return 0;
+}
