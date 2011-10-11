@@ -36,7 +36,7 @@ function stop_on_error() {
 # verb level 'message to be shown...'
 function verb() {
   local level=$1 msg=$2
-  if (( $verb >= $level )); then
+  if (( verb >= level )); then
       while (( level-- )) ; do echo -n '#' >&2 ; done
       echo " $msg" >&2
   fi
