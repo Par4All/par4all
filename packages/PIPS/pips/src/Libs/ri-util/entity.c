@@ -1623,7 +1623,6 @@ bool arithmetic_intrinsic_p(entity e)
   if (set_undefined_p(arithmetic_functions_set)) {
     arithmetic_functions_set = set_make(set_pointer);
     set_add_elements(arithmetic_functions_set, arithmetic_functions_set,
-		     entity_intrinsic(SCANF_FUNCTION_NAME),
 		     entity_intrinsic(PLUS_OPERATOR_NAME),
 		     entity_intrinsic(PLUS_C_OPERATOR_NAME),
 		     entity_intrinsic(MINUS_OPERATOR_NAME),

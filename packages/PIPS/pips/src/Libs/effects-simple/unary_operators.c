@@ -539,8 +539,8 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
   for(cind = ind; !ENDP(cind); POP(cind)) {
     expression se = EXPRESSION(CAR(cind));
 
-    if(!extended_integer_constant_expression_p(se)) {
-      if(!unbounded_expression_p(se)) {
+    if(!unbounded_expression_p(se)
+       && !extended_integer_constant_expression_p(se)) {
 
 	/* it may still be a field entity */
 	    if (!(expression_reference_p(se) &&
@@ -550,7 +550,6 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
 	      free_expression(se);
 	      EXPRESSION_(CAR(cind)) = make_unbounded_expression();
 	    }
-      }
     }
   }
 

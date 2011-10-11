@@ -10794,6 +10794,21 @@ scalarization  > MODULE.code
         < MODULE.out_regions
 \end{PipsMake}
 
+\begin{PipsPass}{quick_scalarization}
+  
+\end{PipsPass}
+
+
+\begin{PipsMake}
+alias quick_scalarization 'Quick Scalarization'
+quick_scalarization  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.proper_effects
+        < MODULE.dg
+\end{PipsMake}
+
 Since OUT regions are computed interprocedurally, strange code may
 result when a small or not so small function  without any real output
 is scalarized. The problem can be fixed by adding a \verb/PRINT/ or a

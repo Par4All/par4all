@@ -51,10 +51,12 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "dg.h"
 #include "effects.h"
 #include "database.h"
 #include "ri-util.h"
 #include "effects-util.h"
+#include "effects-simple.h"
 #include "control.h"
 #include "constants.h"
 #include "misc.h"
@@ -72,6 +74,11 @@
 #include "accel-util.h"
 #include "transformations.h"
 
+/* instantiation of the dependence graph */
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
 
 ////////////////////
 
@@ -146,7 +153,7 @@ static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
 {
   bool functional_p = true;
 
-  Psysteme g1, g2, g3, g4;
+  Psysteme g1, g2;
 
   // check validity conditions: d and r should be included in g's basis.
   Pbase gb = sc_base(g);
@@ -165,37 +172,36 @@ static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
     // Substitute r by r + dr in g2 (indexed by dimension)
     g2 = sc_add_offset_variables(g2, r, dr);
 
-    // Merge g1 and g2 into a unique system g3, eliminating redundencies.
-    g3 = sc_intersection(SC_EMPTY, g1, g2);
-    g3 = sc_elim_redond(g3);
+    // Merge g1 and g2 into a unique system g1, eliminating redundencies.
+    g1 = sc_append(g1, g2);
+    g1 = sc_elim_redond(g1);
 
-    // Project g3 on dr space -> result: g4. If projection fails, return FALSE.
+    // Project g1 on dr space. If projection fails, return FALSE.
     Pbase dr4 = BASE_NULLE;
-    // dr4 := list of variables of g3's basis which are not in dr
-    for ( cr = sc_base(g3) ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
+    // dr4 := list of variables of g1's basis which are not in dr
+    for ( cr = sc_base(g1) ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
       Variable vr = vecteur_var(cr);
       if (!base_find_variable(dr, vr))
         dr4 = base_add_variable(dr4, vr);
     }
-    g4 = sc_copy(g3);
-    sc_projection_along_variables_ofl_ctrl(&g4, dr4, OFL_CTRL);
+    sc_projection_along_variables_ofl_ctrl(&g1, dr4, OFL_CTRL);
     base_rm(dr4);
     /*
       ifdebug(1) {
-      pips_debug(1, "g4 =\n");
-      sc_print(g4, (get_variable_name_t)entity_local_name);
+      pips_debug(1, "g1 =\n");
+      sc_print(g1, (get_variable_name_t)entity_local_name);
       }
     */
-    if (SC_EMPTY_P(g4) || sc_empty_p(g4)) {
+    if (SC_EMPTY_P(g1) || sc_empty_p(g1)) {
       functional_p = false;
     }
     else {
       // Check that all r_b_i variables are null, using sc_minmax_of_variables()
       for ( cr = dr ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
-        Psysteme g4b = sc_copy(g4);
+        Psysteme g1b = sc_copy(g1);
         Variable dv  = vecteur_var(cr);
         Value pmin, pmax;
-        bool feasible_p = sc_minmax_of_variable(g4b,dv, &pmin, &pmax);
+        bool feasible_p = sc_minmax_of_variable(g1b,dv, &pmin, &pmax);
         if (!(feasible_p && value_eq(VALUE_ZERO, pmin) && value_eq(VALUE_ZERO, pmax))) {
           functional_p = false;
           break;
@@ -205,8 +211,6 @@ static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
     // Cleanup
     sc_rm(g1);
     sc_rm(g2);
-    sc_rm(g3);
-    sc_rm(g4);
   }
   return functional_p;
 }
@@ -1352,4 +1356,399 @@ bool constant_array_scalarization(const char * module_name)
     reset_current_module_entity();
     reset_current_module_statement();
     return true;
+}
+
+
+/***********************************************************************/
+/*                    QUICK SCALARIZATION                              */
+/***********************************************************************/
+
+/*
+  scalarizes arrays in already parallel loops. uses only the dg and proper effects.
+ */
+
+static bool array_effect_p(effect eff)
+{
+  bool result = false;
+  entity e = effect_entity(eff);
+  if (!entity_scalar_p(e) && ! effects_package_entity_p(e))
+    {
+      type t = entity_basic_concrete_type(e);
+
+      if (type_variable_p(t))
+	{
+	  list inds = reference_indices(effect_any_reference(eff));
+	  list dims = variable_dimensions(type_variable(t));
+	  result = (gen_length(inds) == gen_length(dims));
+	}
+    }
+  return result;
+}
+
+static bool scalarizable_entity_p(entity e)
+{
+  storage s = entity_storage( e ) ;
+
+  /* For C, it should be checked that e has no initial value because
+     there is no dependence arc between the initialization in t he
+     declaration and the other references. This is not very smart,
+     because it all depends on where e is declared.
+
+     FI: OK, I removed this safety test because declarations now
+     have effects and are part of the use-def chains
+
+     Also, stack_area_p() would be OK for a privatization.
+  */
+
+  return( entity_array_p( e ) &&
+	  ((storage_formal_p( s ) && parameter_passing_by_value_p(get_current_module_entity()) )||
+	   (storage_ram_p( s ) && dynamic_area_p( ram_section( storage_ram( s )))))) ;
+}
+
+
+
+static bool statement_compute_scalarizable_candidates(statement st, hash_table loops_scalarizable_candidates)
+{
+  if (statement_loop_p(st))
+    {
+      loop l = statement_loop(st);
+      statement b = loop_body(l);
+      set scalarizable_candidates = set_make(set_pointer);
+
+      pips_debug(1, "Entering loop statement %td (ordering %03zd)\n",
+                 statement_number( st ), statement_ordering(st)) ;
+
+      ifdebug(1)
+	{
+	  print_effects(load_cumulated_rw_effects_list(b));
+	}
+      /* first scan the cumulated effects in search of candidates */
+      FOREACH(EFFECT, eff, load_cumulated_rw_effects_list(b))
+	{
+	  entity e = effect_entity( eff ) ;
+	  if(!entity_abstract_location_p(e)
+	     // && scalarizable_entity_p(e)
+	     && action_write_p(effect_action(eff))
+	     && array_effect_p(eff)
+	     && !set_belong_p(scalarizable_candidates, e))
+	    {
+	      pips_debug(2, "adding array: %s from effects.\n", entity_name(e));
+	      set_add_element(scalarizable_candidates, scalarizable_candidates, e) ;
+	    }
+	}
+
+      /* then scan the loop_body declarations because they do not belong to cumulated effects */
+      FOREACH(ENTITY, e, statement_declarations(b))
+	{
+	  if(!entity_abstract_location_p(e)
+	     && scalarizable_entity_p(e)
+	     && !set_belong_p(scalarizable_candidates, e))
+	    {
+	      pips_debug(2, "adding array: %s from declarations.\n", entity_name(e));
+	      set_add_element(scalarizable_candidates, scalarizable_candidates, e) ;
+	    }
+	}
+
+      ifdebug(1)
+	{
+	  pips_debug(1, "candidates:");
+	  SET_FOREACH(entity, e, scalarizable_candidates)
+	    {
+	      fprintf(stderr, " %s", entity_local_name(e));
+	    }
+	  fprintf(stderr, "\n");
+	}
+
+      /* finally put the set of candidates in the input hash table */
+      hash_put(loops_scalarizable_candidates, l, scalarizable_candidates);
+      pips_debug(1, "leaving loop\n");
+    }
+  return true;
+}
+
+static void remove_scalarizable_candidate_from_loops(list prefix,
+						     list ls,
+						     entity e,
+						     hash_table loops_scalarizable_candidates)
+{
+  pips_debug(1, "Begin\n");
+
+  if(ENDP(prefix))
+    {
+      if(!ENDP(ls))
+	{
+	  ifdebug(1)
+	    {
+	      pips_debug(1, "Removing %s from locals of ", entity_name(e)) ;
+	      FOREACH(STATEMENT, st, ls)
+		{
+		  pips_debug(1, "%td ", statement_number(st)) ;
+		}
+	      pips_debug(1, "\n" ) ;
+	    }
+	  FOREACH(STATEMENT, st, ls)
+	    {
+	      pips_assert( "instruction i is a loop", statement_loop_p(st)) ;
+	      set scalarizable_candidates = (set) hash_get(loops_scalarizable_candidates,
+							   (char *) statement_loop(st));
+	      set_del_element(scalarizable_candidates, scalarizable_candidates, e);
+	      pips_debug(1, "Variable %s is removed from scalarizable candidates of statement %td\n",
+			 entity_name(e), statement_number(st));
+	    }
+	}
+      else
+	{
+	  pips_debug(1, "ls is empty, end of recursion\n");
+	}
+    }
+  else
+    {
+      pips_assert( "The first statements in prefix and in ls are the same statement",
+		   STATEMENT( CAR( prefix )) == STATEMENT( CAR( ls ))) ;
+
+      pips_debug(1, "Recurse on common prefix\n");
+
+      remove_scalarizable_candidate_from_loops(CDR(prefix), CDR(ls), e,
+					       loops_scalarizable_candidates);
+    }
+
+  pips_debug(1, "End\n");
+}
+
+static void update_scalarizable_candidates(vertex v, statement st,
+					   effect eff,
+					   hash_table loops_scalarizable_candidates)
+{
+  list ls = load_statement_enclosing_loops(st);
+  entity e = effect_entity(eff);
+
+  ifdebug(1)
+    {
+    if(statement_loop_p(st))
+      {
+	pips_debug(1, "Trying to scalarize %s in loop statement %td (ordering %03zd)",
+		   entity_local_name(e), statement_number( st ), statement_ordering(st)) ;
+      }
+    else
+      {
+	pips_debug(1, "Trying to privatize %s in statement %td\n",
+		   entity_local_name( e ), statement_number( st )) ;
+      }
+    }
+
+  FOREACH(SUCCESSOR, succ, vertex_successors(v))
+    {
+      vertex succ_v = successor_vertex( succ ) ;
+      dg_vertex_label succ_l =
+	(dg_vertex_label)vertex_vertex_label( succ_v ) ;
+      dg_arc_label arc_l =
+	(dg_arc_label)successor_arc_label( succ ) ;
+      statement succ_st =
+	ordering_to_statement(dg_vertex_label_statement(succ_l));
+      instruction succ_i = statement_instruction( succ_st ) ;
+      list succ_ls = load_statement_enclosing_loops( succ_st ) ;
+
+
+      FOREACH(CONFLICT, c, dg_arc_label_conflicts(arc_l))
+	{
+	  effect sc_eff = conflict_source( c ) ;
+	  effect sk_eff = conflict_sink( c ) ;
+	  bool keep = true;
+	  if(store_effect_p(sc_eff) && store_effect_p(sk_eff)
+	     && e == effect_entity(sc_eff)
+	     && e == effect_entity(sk_eff))
+	    {
+	      ifdebug(3)
+		{
+		  pips_debug(3, "source effect:");
+		  print_effect(sc_eff);
+		  pips_debug(3, "sink effect:");
+		  print_effect(sk_eff);
+		}
+	      list prefix = loop_prefix( ls, succ_ls ) ;
+
+	      /* Take into account def-def and use-def edges only
+		 if they are on a single and same element
+		 which is true if the indices are constants
+		 or only depend on common enclosing loops indices.
+	      */
+	      if(action_write_p(effect_action(sk_eff)))
+		{
+		  set common_loop_indices = set_make(set_pointer);
+		  FOREACH(loop, l, prefix)
+		    {
+		      set_add_element(common_loop_indices, common_loop_indices, loop_index(l));
+		    }
+		  list sc_inds = reference_indices(effect_any_reference(sc_eff));
+		  list sk_inds = reference_indices(effect_any_reference(sk_eff));
+
+		  for(; keep && !ENDP(sc_inds) && !ENDP(sk_inds); POP(sc_inds), POP(sk_inds))
+		    {
+		      expression sc_exp = EXPRESSION(CAR(sc_inds));
+		      expression sk_exp = EXPRESSION(CAR(sk_inds));
+		      if (unbounded_expression_p(sc_exp) || unbounded_expression_p(sk_exp))
+			keep = false;
+		      else
+			{
+			  list l_eff_sc_exp = proper_effects_of_expression(sc_exp);
+			  FOREACH(EFFECT, eff_sc_exp, l_eff_sc_exp)
+			    {
+			      entity e_sc_exp = effect_entity(eff_sc_exp);
+			      if (!set_belong_p(common_loop_indices, e_sc_exp))
+				{
+				  keep = false;
+				  break;
+				}
+			    }
+			  keep = keep && expression_equal_p(sc_exp, sk_exp);
+			}
+
+		    }
+		  set_free(common_loop_indices);
+		  continue ;
+		}
+
+	      /* PC dependance and the sink is a loop index - shouldn't be necessary here */
+	      if(action_read_p( effect_action( sk_eff )) &&
+		 (instruction_loop_p( succ_i) ||
+		  is_implied_do_index( e, succ_i)))
+		{
+		  keep = true;
+		}
+
+	      pips_debug(5,"Conflict for %s between statements %td and %td\n",
+			 entity_local_name(e),
+			 statement_number(st),
+			 statement_number(succ_st));
+
+	      if (v==succ_v)
+		{
+		  /* No decision can be made from this couple of effects alone */
+		  keep = true;
+		}
+	      else
+		{
+		  pips_debug(5,"remove %s from candidates in non common enclosing loops\n",
+			     entity_local_name(e));
+		  keep = false;
+		}
+	      if (!keep)
+		{
+		  pips_debug(1, "cannot keep candidate\n");
+		  /* e cannot be a local variable at a lower level than
+		     the common prefix because of this dependence
+		     arc. */
+		  remove_scalarizable_candidate_from_loops(prefix, ls, e ,loops_scalarizable_candidates) ;
+		  remove_scalarizable_candidate_from_loops(prefix, succ_ls, e, loops_scalarizable_candidates ) ;
+		}
+	      gen_free_list( prefix ) ;
+	    }
+	}
+    }
+
+  pips_debug(1, "End\n");
+}
+
+static void loop_scalarize_candidates(loop l, hash_table loops_scalarizable_candidates)
+{
+  set loop_scalarizable_candidates = hash_get(loops_scalarizable_candidates, l);
+
+  SET_FOREACH(entity, e, loop_scalarizable_candidates)
+    {
+      scalarize_variable_in_statement(e,
+				      loop_body(l),
+				      entity_undefined,
+				      entity_undefined);
+    }
+}
+
+static void scalarize_candidates(statement s, hash_table loops_scalarizable_candidates)
+{
+  gen_context_recurse(s, loops_scalarizable_candidates,
+		      loop_domain, gen_true, loop_scalarize_candidates);
+}
+
+bool quick_scalarization(char * module_name)
+{
+  entity module;
+  statement module_stat;
+
+  set_current_module_entity(module_name_to_entity(module_name));
+  module = get_current_module_entity();
+
+  set_current_module_statement( (statement)
+                                db_get_memory_resource(DBR_CODE, module_name, true) );
+  module_stat = get_current_module_statement();
+
+  set_proper_rw_effects((statement_effects)
+			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
+
+  set_cumulated_rw_effects((statement_effects)
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true) );
+
+  module_to_value_mappings(module);
+
+  /* Get the data dependence graph (chains) : */
+  graph dependence_graph = (graph)db_get_memory_resource(DBR_DG,
+                                                         module_name,
+                                                         true);
+
+  set_enclosing_loops_map( loops_mapping_of_statement( module_stat ) );
+  set_ordering_to_statement(module_stat);
+
+  debug_on("SCALARIZATION_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
+
+  /* Build maximal lists of scalarizable candidates */
+  hash_table loops_scalarizable_candidates =  hash_table_make(hash_pointer, 0);
+  gen_context_recurse(module_stat, loops_scalarizable_candidates,
+		      statement_domain, statement_compute_scalarizable_candidates,
+		      gen_null);
+
+
+  /* remove non private variables from locals */
+  FOREACH(VERTEX, v, graph_vertices( dependence_graph ))
+    {
+      dg_vertex_label vl = (dg_vertex_label) vertex_vertex_label( v ) ;
+      statement st =
+	ordering_to_statement(dg_vertex_label_statement(vl));
+
+      pips_debug(1, "Entering statement %03zd :\n", statement_ordering(st));
+      ifdebug(4) {
+	print_statement(st);
+      }
+
+      FOREACH(EFFECT, eff, load_proper_rw_effects_list( st ))
+	{
+	  ifdebug(4) {
+	    pips_debug(1, "effect :");
+	    print_effect(eff);
+	  }
+	  if( action_write_p(effect_action(eff)) && array_effect_p(eff)) {
+	    update_scalarizable_candidates( v, st, eff, loops_scalarizable_candidates) ;
+	  }
+	}
+    }
+
+  /* modify code with scalarized variables
+   */
+  scalarize_candidates(module_stat, loops_scalarizable_candidates);
+  hash_table_free(loops_scalarizable_candidates);
+
+  pips_debug(1, "end\n");
+  debug_off();
+
+  /* Save modified code to database */
+  module_reorder(module_stat);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+
+  clean_enclosing_loops( );
+  reset_ordering_to_statement();
+  reset_current_module_entity();
+  reset_current_module_statement();
+  reset_proper_rw_effects();
+  reset_cumulated_rw_effects();
+  free_value_mappings();
+
+  return (true);
 }

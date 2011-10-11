@@ -1753,13 +1753,17 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
     loop il = instruction_loop(statement_instruction(s));
     /* compute the loop body precondition */
     transformer raw_ipre = transformer_apply(ltf, pre);
-    //transformer ipre = transformer_range(raw_ipre);
-    //ipre = transformer_normalize(ipre, 2);
+    transformer ipre = transformer_range(raw_ipre);
+    ipre = transformer_normalize(ipre, 2);
     /* You do not need a range to recurse. A full precondition with
-       arguments is expected by complete_loop_transformer(). */
-    btf = complete_loop_transformer(load_statement_transformer(s), raw_ipre, il);
+       arguments is expected by complete_loop_transformer(). Maybe,
+       but it's much easier to debug with ranges as they only carry
+       the useful information. And the result is correct for
+       Semantics-New/for03.c and 04.c */
+    transformer st = load_statement_transformer(s);
+    btf = complete_loop_transformer(st, ipre, il);
     btf = transformer_normalize(btf, 2);
-    //free_transformer(ipre);
+    free_transformer(ipre);
     free_transformer(raw_ipre);
   }
   else {
@@ -1769,6 +1773,10 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
   /* btf = transformer_add_loop_index_incrementation(btf, l, pre); */
 
   /* compute the transformer when the loop is entered: T o T* */
+  /* Semantics-New/for04.c: this leads to t_enter ==
+     empty_transformer because the same conditions on the initial
+     values of cpi and cpj are preserved in both ltf, which is OK, and
+     btf, which is not OK. */
   t_enter = transformer_combine(transformer_dup(ltf), btf);
 
   ifdebug(8) {
@@ -1807,6 +1815,8 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
     transformer_identity() :
     transformer_dup(pre);
   t_skip = add_loop_index_initialization(tmp, l, pre);
+  //transformer ipre = transformer_apply(t_skip, pre);
+  //transformer ripre = transformer_range(ipre);
   transformer_free(tmp);
   t_skip = add_loop_skip_condition(t_skip, l, pre);
   t_skip = transformer_normalize(t_skip, 2);
@@ -1820,10 +1830,14 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
      readable that way. Since pre is information free, only loops with
      constant lower and upper bound and constant increment can benefit
      from this. */
+  /* pre cannot be used as such. the loop initialization must be
+     applied first: the previous comment seems to be correct. */
+  // if(empty_range_wrt_precondition_p(r, ripre)) {
   if(empty_range_wrt_precondition_p(r, pre)) {
     tf = t_skip;
     free_transformer(t_enter);
   }
+  // else if(non_empty_range_wrt_precondition_p(r, ripre)) {
   else if(non_empty_range_wrt_precondition_p(r, pre)) {
     tf = t_enter;
     free_transformer(t_skip);
@@ -1833,6 +1847,8 @@ transformer complete_loop_transformer(transformer ltf, transformer pre, loop l)
     free_transformer(t_enter);
     free_transformer(t_skip);
   }
+  //free_transformer(ipre);
+  //free_transformer(ripre);
 
   tf = transformer_normalize(tf, 2);
 
