@@ -322,7 +322,7 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 
 	case 0:
 	    /* Our best choice for accuracy, but damned slow on ocean */
-	    sc_reg = sc_elim_redund(sc_reg);
+	    sc_reg = sc_safe_elim_redund(sc_reg);
 	    break;
 
 	case 1:
