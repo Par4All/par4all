@@ -1,0 +1,76 @@
+
+Source code with transformers
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(cpi,cpj,i,j,k) {}
+
+   int i, k, j, cpi, cpj;
+   // indexes used in loops
+
+//  T() {}
+
+   float l[128*128];
+   
+   // Number of blocks
+
+//  T(n) {n==8}
+
+   int n = 128/16;
+
+//  T() {n==8}
+
+   float tmp[16*16];
+
+//  T() {n==8}
+
+   float _tmp1[16*16];
+
+//  T(cpi) {cpi==16, n==8}
+
+
+   cpi = 16;
+
+//  T(cpj) {cpi==16, cpj==16, n==8}
+
+   cpj = 16;
+
+//  T(cpi,cpj) {cpi#init==16, cpj#init==16, n==8, 0<=cpi, cpi<=15}
+
+
+   for(cpi = 0; cpi <= 15; cpi += 1)
+
+//  T(cpj) {n==8, 0<=cpi, cpi<=15, cpi+1<=cpj, cpj<=15}
+
+      for(cpj = cpi+1; cpj <= 15; cpj += 1) {
+
+//  T(idx1) {16cpi+cpj==idx1, n==8, 0<=cpi, cpi<=15, cpi+1<=cpj,
+//    cpj<=15}
+
+         unsigned int idx1 = cpi*16+cpj;
+
+//  T(idx2) {16cpi+cpj==idx1, cpi+16cpj==idx2, n==8, 0<=cpi, cpi<=15,
+//    cpi+1<=cpj, cpj<=15}
+
+         unsigned int idx2 = cpj*16+cpi;
+
+//  T() {16cpi+cpj==idx1, cpi+16cpj==idx2, n==8, 0<=cpi, cpi<=15,
+//    cpi+1<=cpj, cpj<=15}
+
+         _tmp1[idx2] = tmp[idx1];
+      }
+
+//  T() {cpi==16, cpj==16, n==8}
+
+
+   printf("3 cpi=%d\n", cpi);
+
+//  T(main) {cpi==16, cpj==16, main==0, n==8}
+
+
+   return 0;
+}
