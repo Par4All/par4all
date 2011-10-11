@@ -186,7 +186,7 @@ static void scan_unstructured(unstructured u, list loops)
 
 /* LOOP_PREFIX returns the common list prefix of lists L1 and L2. */
 
-static list loop_prefix(list l1, list l2)
+list loop_prefix(list l1, list l2)
 {
     statement st ;
 
