@@ -1,0 +1,128 @@
+int disjoint()
+{
+   int a[20], b = 0;                                                    /*0005*/
+   {
+      int i;                                                            /*0006*/
+      for(i = 0; i <= 9; i += 1)                                        /*0006*/
+         a[i] = 0;                                                      /*0007*/
+   }
+   {
+      int j;                                                            /*0009*/
+      for(j = 10; j <= 19; j += 1)                                      /*0009*/
+         b += a[j];                                                     /*0010*/
+   }
+}
+int disjoint()
+{
+//             <    is written>: b
+//             <    is referenced>: b
+//             <    is declared>: a b
+   int a[20], b = 0;                                                    /*0005*/
+   {
+//             <    is declared>: i
+      int i;                                                            /*0006*/
+//             <    is written>: i
+//             <    is referenced>: i
+      for(i = 0; i <= 9; i += 1)                                        /*0006*/
+//             <    is read   >: i
+//             <    is written>: a[i]
+//             <    is referenced>: a i
+         a[i] = 0;                                                      /*0007*/
+   }
+   {
+//             <    is declared>: j
+      int j;                                                            /*0009*/
+//             <    is written>: j
+//             <    is referenced>: j
+      for(j = 10; j <= 19; j += 1)                                      /*0009*/
+//             <    is read   >: a[j] b j
+//             <    is written>: b
+//             <    is referenced>: a b j
+         b += a[j];                                                     /*0010*/
+   }
+}
+// chains for disjoint
+
+ *********************** Use-Def Chains *********************
+
+	05 --> 07 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	05 --> 10 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-WE-EXACT> to <b-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	06 --> 06 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	06 --> 07 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	07 --> 07 with conflicts
+		from <a[i]-W-EXACT> to <a[i]-W-EXACT>
+	07 --> 10 with conflicts
+		from <a[i]-W-EXACT> to <a[j]-R-EXACT>
+	09 --> 09 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	09 --> 10 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	10 --> 10 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None
+int disjoint()
+{
+
+//  <a-WE-EXACT-{}>
+
+   int a[20], b = 0;                                                    /*0005*/
+   {
+      int i;                                                            /*0006*/
+      for(i = 0; i <= 9; i += 1)                                        /*0006*/
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-W-EXACT-{PHI1==i, b==0, 0<=i, i<=9}>
+
+         a[i] = 0;                                                      /*0007*/
+   }
+   {
+      int j;                                                            /*0009*/
+      for(j = 10; j <= 19; j += 1)                                      /*0009*/
+
+//  <a-RE-EXACT-{}>
+//  <a[PHI1]-R-EXACT-{PHI1==j, 10<=j, j<=19}>
+
+         b += a[j];                                                     /*0010*/
+   }
+}
+// chains for disjoint
+
+ *********************** Use-Def Chains *********************
+
+	05 --> 07 with conflicts
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	05 --> 10 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-WE-EXACT> to <b-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
+	06 --> 06 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	06 --> 07 with conflicts
+		from <i-WE-EXACT> to <i-RE-EXACT>
+	07 --> 07 with conflicts
+		from <a[PHI1]-W-EXACT> to <a[PHI1]-W-EXACT>
+	09 --> 09 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	09 --> 10 with conflicts
+		from <j-WE-EXACT> to <j-RE-EXACT>
+	10 --> 10 with conflicts
+		from <b-W-EXACT> to <b-W-EXACT>
+		from <b-W-EXACT> to <b-R-EXACT>
+		from <b-R-EXACT> to <b-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+None

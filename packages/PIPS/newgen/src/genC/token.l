@@ -111,6 +111,7 @@ void genspec_reset_string_to_parse()
 #endif
 
 %}
+%option nounput
 
 %%
 external		{return GRAM_EXTERNAL ;}
@@ -150,7 +151,6 @@ int yywrap()
 #ifdef FLEX_SCANNER
   yy_init = 1;
 #endif
-  message_assert("function not used", yyunput==yyunput);
   return 1;
 }
 
