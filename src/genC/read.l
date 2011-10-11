@@ -87,6 +87,7 @@ void newgen_lexer_position(FILE * out)
 %}
 
 %Start a_string
+%option nounput
 
 %%
 <a_string>\\\\          { append_to_literal("\\"); }
@@ -165,7 +166,6 @@ int yywrap(void)
 #ifdef FLEX_SCANNER
     yy_init = 1 ;
 #endif
-    message_assert("function not used", yyunput==yyunput);
     newgen_start_lexer(NULL);
     return 1;
 }

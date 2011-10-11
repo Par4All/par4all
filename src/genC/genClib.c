@@ -845,7 +845,7 @@ static void pop_gen_trav_env()
 /* These functions are used to implement the freeing of objects. A
    tabulated constructor has to stop recursive freeing. */
 
-static hash_table free_already_seen = (hash_table) NULL;
+static __thread hash_table free_already_seen = (hash_table) NULL;
 
 static bool
 free_already_seen_p(
@@ -3283,10 +3283,11 @@ gen_internal_context_multi_recurse
   stack_push(NULL, new_mrc.upwards); // root is conventionaly set to NULL
   gen_trav_obj(obj, &dr);
   // if there was no interruption, the stack must be back to the root
-  if (!gen_trav_stop_recursion)
-    message_assert("back to root",
-		   stack_size(current_mrc->upwards) == 1 &&
-		   stack_pop(current_mrc->upwards)==NULL);
+  if (!gen_trav_stop_recursion) {
+    message_assert("back to root", stack_size(current_mrc->upwards) == 1);
+    void * popped = stack_pop(current_mrc->upwards);
+    message_assert("back to root", popped = NULL);
+  }
   gen_trav_stop_recursion = false;
 
   // cleanup, and restore the previous context
