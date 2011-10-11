@@ -110,7 +110,7 @@ while [ "$1" ] ; do
 done
 
 
-if (( $verb >= 2 )) ; then
+if (( verb >= 2 )) ; then
     # Put shell tracing on:
     set -vx
 fi
