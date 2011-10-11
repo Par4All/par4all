@@ -201,9 +201,9 @@ Chunk 	: Shared_chunk CHUNK_BEGIN Type
 	  Datas3 RP 
           {
 	    $$ = stack_pop(current_chunk);
-	    message_assert("all data copied", 
-			   (int) (stack_pop(current_chunk_index) ==
-				  stack_pop(current_chunk_size)));
+	     void *ci = stack_pop(current_chunk_index),
+			  *cs = stack_pop(current_chunk_size);
+	    message_assert("all data copied", ci == cs );
 	  }
 	;
 
