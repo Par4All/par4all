@@ -81,12 +81,9 @@ def write_log(status,log_file,test_name_path):
 	lock.release()
 
 ### run test ###
-def process_timeout(command,status,queue_err,queue_output,shell_value,err_pipe):
-	# Process for tpips2 file
-	if err_pipe != 'STDOUT':
-		process = subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=shell_value)
-	else:
-		process = subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=shell_value)
+def process_timeout(command,status,queue_err,queue_output,shell_value):
+
+	process = subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=shell_value)
 
 	# Alarm for timeout
 	signal.signal(signal.SIGALRM, Alarm().alarm_handler)
@@ -111,7 +108,7 @@ def process_timeout(command,status,queue_err,queue_output,shell_value,err_pipe):
 		status.value = process.returncode
 
 ###### Function that kills a process after a timeout ######
-def run_process(command,shell_value,err_pipe):
+def run_process(command,shell_value):
 	status = multiprocessing.Value('i',0)
 	output = ''
 	err = ''
@@ -121,7 +118,7 @@ def run_process(command,shell_value,err_pipe):
 	queue_err = multiprocessing.Queue()
 
 	# Create and run process
-	process_timeout(command,status,queue_err,queue_output,shell_value,err_pipe)
+	process_timeout(command,status,queue_err,queue_output,shell_value)
 
 	# Output and error
 	output = queue_output.get()
@@ -134,31 +131,31 @@ def run_process(command,shell_value,err_pipe):
 
 #### Command to test ###
 def command_test(directory_test_path,test_name_path,err_file_path,test_file_path):
-	# by default error is sent to the PIPE
-	err_pipe = "PIPE"
+	# tpips2 has a different output
+	tpips2 = False
 	if (os.path.isfile(test_name_path+".test")):
 		command = [test_name_path+".test",""]
-		(int_status,output,err) = run_process(command,True,err_pipe)
+		(int_status,output,err) = run_process(command,True)
 
 	elif (os.path.isfile(test_name_path+".tpips")):
 		command = ["tpips",test_name_path+".tpips"]
-		(int_status,output,err) = run_process(command,False,err_pipe)
+		(int_status,output,err) = run_process(command,False)
 
 	elif (os.path.isfile(test_name_path+".tpips2")):
 		command = ["tpips",test_name_path+".tpips2"]
-		err_pipe = "STDOUT"
-		(int_status,output,err) = run_process(command,False,err_pipe)
+		tpips2 = True
+		(int_status,output,err) = run_process(command,False)
 
 	elif (os.path.isfile(test_name_path+".py")):
 		command = ["python",os.path.basename(test_name_path)+".py"]
-		(int_status,output,err) = run_process(command,False,err_pipe)
+		(int_status,output,err) = run_process(command,False)
 
 	elif (os.path.isfile(directory_test_path+"/default_tpips")):
 		# Change flag for default_tpips
 		os.chmod(directory_test_path+"/default_tpips", stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
 		command = "FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" tpips "+directory_test_path+"/default_tpips"
 		# Launch process
-		(int_status,output,err) = run_process(command,True,err_pipe)
+		(int_status,output,err) = run_process(command,True)
 
 	elif (os.path.isfile(directory_test_path+"/default_test")):
 		# Change flag for default_test
@@ -167,13 +164,13 @@ def command_test(directory_test_path,test_name_path,err_file_path,test_file_path
 		# upper=FILE
 		upper = os.path.basename(test_name_path).upper()
 		command = "FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" NAME="+upper+" "+directory_test_path+"/default_test 2>"+err_file_path
-		(int_status,output,err) = run_process(command,True,err_pipe)
+		(int_status,output,err) = run_process(command,True)
 
 	elif (os.path.isfile(directory_test_path+"/default_pyps.py")):
 		# Change flag for default_pyps.py
 		os.chmod(directory_test_path+"/default_pyps.py", stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
 		command = "FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" python "+directory_test_path+"/default_pyps.py 2>"+err_file_path
-		(int_status,output,err) = run_process(command,True,err_pipe)
+		(int_status,output,err) = run_process(command,True)
 
 	# Orphan status (there is source file, .result directory and test reference file but there is no script to execute (.tpips, .tpips2, etc...))
 	else:
@@ -185,6 +182,13 @@ def command_test(directory_test_path,test_name_path,err_file_path,test_file_path
 		err_file_path_h = open(err_file_path, 'w')
 		err_file_path_h.write(err)
 		err_file_path_h.close()
+
+		# Apply .flt file for tpips2
+		if os.path.isfile(test_name_path+".flt") & tpips2 == True:
+			command_flt = ["cat " + err_file_path + " | "+ test_name_path+'.flt']
+			process_flt =  subprocess.Popen(command_flt,stdout=subprocess.PIPE,shell=True)
+			output_flt = process_flt.stdout.read()
+			output = output + "### stderr\n"+ output_flt
 
 	return (int_status,output)
 
@@ -329,7 +333,7 @@ def test_par4all(directory_test_path,test_file_path,log_file):
 					out_is_filtered=1
 
 			output_file_h = open(output_file_path,'w')
-			output_file_h.write ('%s' % (out_filtered))	
+			output_file_h.write ('%s' % (out_filtered))
 			output_file_h.close()
 
 			# Diff between output filtered and reference filtered
