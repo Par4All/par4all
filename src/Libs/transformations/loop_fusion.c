@@ -66,7 +66,8 @@ typedef struct fusion_params {
   bool greedy; // Fuse as much a we can, and not only loops that have reuse
   unsigned int max_fused_per_loop; // Threshold to limit the number of fusion per loop
 } *fusion_params;
-
+struct fusion_block;
+typedef struct fusion_block **fbset;
 /**
  * Structure to hold block used for the fusion selection algorithm.
  * It's used in a sequence of statements to keep track of the precedence
@@ -74,13 +75,14 @@ typedef struct fusion_params {
  */
 typedef struct fusion_block {
   int num;
+  int id;    // real original num
   statement s; // The main statement (header for loops)
   // statements inside the block (in case of loop, header won't belong to)
   set statements;
-  set successors; // set of blocks that depend from this one. Precedence constraint
-  set rr_successors; // set of blocks that reuse data used in this one, false dep
-  set predecessors; // set of blocks this one depends from. Precedence constraint
-  set rr_predecessors; // set of blocks that use data reused in this one, false dep
+  fbset successors; // set of blocks that depend from this one. Precedence constraint
+  fbset rr_successors; // set of blocks that reuse data used in this one, false dep
+  fbset predecessors; // set of blocks this one depends from. Precedence constraint
+  fbset rr_predecessors; // set of blocks that use data reused in this one, false dep
   bool is_a_loop;
   int count_fusion; // Count the number of fusion that have occur
 }*fusion_block;
@@ -88,6 +90,76 @@ typedef struct fusion_block {
 /* Newgen list foreach compatibility */
 #define fusion_block_TYPE fusion_block
 #define fusion_block_CAST(x) ((fusion_block)((x).p))
+
+static int max_num;
+#ifdef __SSE2__
+#include <xmmintrin.h>
+static inline void fbset_clear(fbset self) {
+    __m128i z = _mm_setzero_si128();
+    for(fbset iter = self, end=self+max_num;iter!=end;iter+=4)
+        _mm_store_si128((__m128i*)iter,z);
+}
+static inline fbset fbset_make() {
+    fbset self =_mm_malloc(max_num*sizeof(fusion_block),32);
+    fbset_clear(self);
+    return self;
+}
+static inline void fbset_free(fbset fb) {
+    _mm_free(fb);
+}
+static void fbset_union(fbset self, fbset other) {
+    for(size_t i=0;i<max_num;i+=4){
+        __m128i s = _mm_load_si128((__m128i*)&self[i]),
+                o = _mm_load_si128((__m128i*)&other[i]);
+        s=_mm_or_si128(s,o);
+        _mm_store_si128((__m128i*)&self[i],s);
+    }
+}
+#else
+static inline void fbset_clear(fbset self) {
+    memset(self,0,sizeof(*self)*max_num);
+}
+static inline fbset fbset_make() {
+    return calloc(max_num,sizeof(fusion_block));
+}
+static inline void fbset_free(fbset fb) {
+    free(fb);
+}
+static void fbset_union(fbset self, fbset other) {
+    for(size_t i=0;i<max_num;i++)
+        if(other[i])
+            self[i]=other[i];
+}
+#endif
+
+static void fbset_difference(fbset self, fbset other) {
+    for(size_t i=0;i<max_num;i++)
+        if(other[i])
+            self[i]=NULL;
+}
+static inline void fbset_del_element(fbset self, fusion_block e) {
+    assert(e->id>=0);
+    self[e->id]=NULL;
+}
+static inline void fbset_add_element(fbset self, fusion_block e) {
+    assert(e->id>=0);
+    self[e->id]=e;
+}
+static bool fbset_belong_p(fbset self, fusion_block e) {
+    assert(e->id>=0);
+    return self[e->id]!=NULL;
+}
+static bool fbset_empty_p(fbset self) {
+    for(size_t i=0;i<max_num;i++)
+        if(self[i])
+            return false;
+    return true;
+}
+
+#define FBSET_FOREACH(e,s) \
+    fusion_block e;\
+    for(size_t __i=0;__i<max_num;__i++)\
+        if((e=s[__i]))
 
 /**
  * Get node in the DG corresponding to given statement ordering
@@ -148,19 +220,19 @@ static void print_graph(graph dependence_graph) {
 static void print_block(fusion_block block) {
   fprintf(stderr, "Block %d (fused %d times), predecessors : ",
           block->num, block->count_fusion);
-  SET_FOREACH(fusion_block,pred,block->predecessors) {
+  FBSET_FOREACH(pred,block->predecessors) {
     fprintf(stderr, "%d, ", pred->num);
   }
   fprintf(stderr, " | successors : ");
-  SET_FOREACH(fusion_block,succ,block->successors) {
+  FBSET_FOREACH(succ,block->successors) {
     fprintf(stderr, "%d, ", succ->num);
   }
   fprintf(stderr, " | rr_predecessors : ");
-  SET_FOREACH(fusion_block,rr_pred,block->rr_predecessors) {
+  FBSET_FOREACH(rr_pred,block->rr_predecessors) {
     fprintf(stderr, "%d, ", rr_pred->num);
   }
   fprintf(stderr, " | rr_successors : ");
-  SET_FOREACH(fusion_block,rr_succ,block->rr_successors) {
+  FBSET_FOREACH(rr_succ,block->rr_successors) {
     fprintf(stderr, "%d, ", rr_succ->num);
   }
   fprintf(stderr, "\n");
@@ -591,12 +663,13 @@ static bool fusion_loops(statement sloop1,
 static fusion_block make_empty_block(int num) {
   fusion_block block = (fusion_block)malloc(sizeof(struct fusion_block));
   block->num = num;
+  block->id = num;
   block->s = NULL;
   block->statements = set_make(set_pointer);
-  block->successors = set_make(set_pointer);
-  block->rr_successors = set_make(set_pointer);
-  block->predecessors = set_make(set_pointer);
-  block->rr_predecessors = set_make(set_pointer);
+  block->successors = fbset_make();
+  block->rr_successors = fbset_make();
+  block->predecessors = fbset_make();
+  block->rr_predecessors = fbset_make();
   block->is_a_loop = false;
   block->count_fusion = 0;
 
@@ -607,10 +680,10 @@ static fusion_block make_empty_block(int num) {
 static void free_block_list(list blocks) {
   FOREACH(fusion_block,b,blocks) {
     set_free(b->statements);
-    set_free(b->successors);
-    set_free(b->rr_successors);
-    set_free(b->predecessors);
-    set_free(b->rr_predecessors);
+    fbset_free(b->successors);
+    fbset_free(b->rr_successors);
+    fbset_free(b->predecessors);
+    fbset_free(b->rr_predecessors);
     free(b);
   }
   gen_free_list(blocks);
@@ -660,7 +733,7 @@ static fusion_block get_block_from_ordering(int ordering, list block_list) {
  */
 static void compute_successors(fusion_block b, list block_list) {
   pips_assert("Expect successors list to be initially empty",
-      set_empty_p(b->successors) && set_empty_p(b->rr_successors));
+      fbset_empty_p(b->successors) && fbset_empty_p(b->rr_successors));
   // Loop over statements that belong to this block
   SET_FOREACH(statement,s,b->statements)
   {
@@ -702,22 +775,18 @@ static void compute_successors(fusion_block b, list block_list) {
               if(action_write_p(effect_action(conflict_sink(a_conflict)))
                   || action_write_p(effect_action(conflict_source(a_conflict)))) {
                 // There's a real dependence here
-                set_add_element(b->successors,
-                                b->successors,
+                fbset_add_element(b->successors,
                                 (void *)sink_block);
                 // Mark current block as a predecessor ;-)
-                set_add_element(sink_block->predecessors,
-                                sink_block->predecessors,
+                fbset_add_element(sink_block->predecessors,
                                 (void *)b);
               } else {
                 // Read-read dependence is interesting to fuse, but is not a
                 // precedence constraint
-                set_add_element(b->rr_successors,
-                                b->rr_successors,
+                fbset_add_element(b->rr_successors,
                                 (void *)sink_block);
                 // Mark current block as a rr_predecessor ;-)
-                set_add_element(sink_block->rr_predecessors,
-                                sink_block->rr_predecessors,
+                fbset_add_element(sink_block->rr_predecessors,
                                 (void *)b);
               }
 
@@ -729,40 +798,49 @@ static void compute_successors(fusion_block b, list block_list) {
     }
   }
   // Optimization, do not try two time the same fusion !
-  set_difference(b->rr_successors, b->rr_successors, b->successors);
-  set_difference(b->rr_predecessors, b->rr_predecessors, b->predecessors);
+  fbset_difference(b->rr_successors, b->successors);
+  fbset_difference(b->rr_predecessors, b->predecessors);
 }
+
 
 /**
  * Prune the graph so that we have a DAG. There won't be anymore more than
  * one path between two block in the predecessors/successors tree. We keep only
  * longest path, no shortcut :-)
  */
-static set prune_successors_tree(fusion_block b) {
-  pips_debug(8,"visiting %d\n",b->num);
-  set full_succ = set_make(set_pointer);
-  SET_FOREACH(fusion_block, succ, b->successors) {
-    set full_succ_of_succ = prune_successors_tree(succ);
-    full_succ = set_union(full_succ, full_succ, full_succ_of_succ);
-    set_free(full_succ_of_succ);
-  }
-  SET_FOREACH(fusion_block, succ_of_succ, full_succ ) {
-    set_del_element(succ_of_succ->predecessors, succ_of_succ->predecessors, b);
-    set_del_element(succ_of_succ->rr_predecessors, succ_of_succ->rr_predecessors, b);
-  }
-  set_difference(b->successors, b->successors, full_succ);
-  set_difference(b->rr_successors, b->rr_successors, full_succ);
+static void prune_successors_tree_aux(fusion_block b, fbset full_succ) {
+    pips_debug(8,"visiting %d\n",b->num);
 
-  full_succ = set_union(full_succ, full_succ, b->successors);
-  return full_succ;
+    fbset full_succ_of_succ = fbset_make();
+    FBSET_FOREACH(succ, b->successors) {
+        prune_successors_tree_aux(succ, full_succ_of_succ);
+        fbset_union(full_succ,full_succ_of_succ);
+        fbset_clear(full_succ_of_succ);
+    }
+    fbset_free(full_succ_of_succ);
+
+    FBSET_FOREACH(succ_of_succ,full_succ){
+        fbset_del_element(succ_of_succ->predecessors, b);
+        fbset_del_element(succ_of_succ->rr_predecessors, b);
+        fbset_del_element(b->successors,succ_of_succ);
+        fbset_del_element(b->rr_successors,succ_of_succ);
+    }
+    fbset_union(full_succ,b->successors);
+}
+
+static fbset prune_successors_tree(fusion_block b) {
+    pips_debug(8,"visiting %d\n",b->num);
+    fbset full_succ = fbset_make();
+    prune_successors_tree_aux(b, full_succ);
+    return full_succ;
 }
 
 
 static void get_all_path_heads(fusion_block b, set heads) {
-  if(set_empty_p(b->predecessors)) {
+  if(fbset_empty_p(b->predecessors)) {
     set_add_element(heads,heads,b);
   } else {
-    SET_FOREACH(fusion_block,pred,b->predecessors) {
+    FBSET_FOREACH(pred,b->predecessors) {
       get_all_path_heads(pred,heads);
     }
   }
@@ -782,51 +860,50 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
   }
 
   // merge predecessors
-  set_union(block1->predecessors, block1->predecessors, block2->predecessors);
-
+  fbset_union(block1->predecessors, block2->predecessors);
   // merge rr_predecessors
-  set_union(block1->rr_predecessors, block1->rr_predecessors, block2->rr_predecessors);
-
+  fbset_union(block1->rr_predecessors, block2->rr_predecessors);
   // merge successors
-  set_union(block1->successors, block1->successors, block2->successors);
-
+  fbset_union( block1->successors, block2->successors);
   // merge rr_successors
-  set_union(block1->rr_successors, block1->rr_successors, block2->rr_successors);
-
+  fbset_union(block1->rr_successors, block2->rr_successors);
   // merge statement
   set_union(block1->statements, block1->statements, block2->statements);
 
   // Replace block2 with block1 as a predecessor of his successors
-  SET_FOREACH(fusion_block,succ,block2->successors) {
-    set_add_element(succ->predecessors, succ->predecessors, block1);
-    set_del_element(succ->predecessors, succ->predecessors, block2);
+  FBSET_FOREACH(succ,block2->successors) {
+      fbset_add_element(succ->predecessors, block1);
+      fbset_del_element(succ->predecessors, block2);
   }
+
   // Replace block2 with block1 as a predecessor of his rr_successors
-  SET_FOREACH(fusion_block,rr_succ,block2->rr_successors) {
-    set_add_element(rr_succ->rr_predecessors, rr_succ->rr_predecessors, block1);
-    set_del_element(rr_succ->rr_predecessors, rr_succ->rr_predecessors, block2);
+  FBSET_FOREACH(rr_succ,block2->rr_successors) {
+      fbset_add_element(rr_succ->rr_predecessors, block1);
+      fbset_del_element(rr_succ->rr_predecessors, block2);
   }
+
   // Replace block2 with block1 as a successor of his predecessors
-  SET_FOREACH(fusion_block,pred,block2->predecessors) {
-    if(pred != block1) {
-      set_add_element(pred->successors, pred->successors, block1);
-    }
-    set_del_element(pred->successors, pred->successors, block2);
+  FBSET_FOREACH(pred,block2->predecessors) {
+      if(pred != block1) {
+          fbset_add_element(pred->successors, block1);
+      }
+      fbset_del_element(pred->successors, block2);
   }
+
   // Replace block2 with block1 as a successor of his rr_predecessors
-  SET_FOREACH(fusion_block,rr_pred,block2->rr_predecessors) {
-    if(pred != block1) {
-      set_add_element(rr_pred->rr_successors, rr_pred->rr_successors, block1);
-    }
-    set_del_element(rr_pred->rr_successors, rr_pred->rr_successors, block2);
+  FBSET_FOREACH(rr_pred,block2->rr_predecessors) {
+      if(rr_pred != block1) {
+          fbset_add_element(rr_pred->rr_successors, block1);
+      }
+      fbset_del_element(rr_pred->rr_successors, block2);
   }
 
   // Remove block1 from predecessors and successors of ... block1
-  set_del_element(block1->predecessors, block1->predecessors, block1);
-  set_del_element(block1->successors, block1->successors, block1);
+  fbset_del_element(block1->predecessors, block1);
+  fbset_del_element(block1->successors, block1);
   // Remove block1 from rr_predecessors and rr_successors of ... block1
-  set_del_element(block1->rr_predecessors, block1->rr_predecessors, block1);
-  set_del_element(block1->rr_successors, block1->rr_successors, block1);
+  fbset_del_element(block1->rr_predecessors, block1);
+  fbset_del_element(block1->rr_successors, block1);
 
 
   block2->num = -1; // Disable block, will be garbage collected
@@ -836,7 +913,7 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
   set heads = set_make(set_pointer);
   get_all_path_heads(block1,heads);
   SET_FOREACH(fusion_block,b,heads) {
-    set_free(prune_successors_tree(b));
+    fbset_free(prune_successors_tree(b));
   }
   set_free(heads);
 
@@ -859,14 +936,14 @@ static bool fusable_blocks_p( fusion_block b1, fusion_block b2, unsigned int fus
       && b1->count_fusion<fuse_limit && b2->count_fusion<fuse_limit) {
     // Blocks are active and are loops
 
-    if(set_belong_p(b2->successors,b1)) {
+    if(fbset_belong_p(b2->successors,b1)) {
       ifdebug(6) {
         pips_debug(6,"b1 is a successor of b2, fusion prevented !\n");
         print_block(b1);
         print_block(b2);
       }
       fusable_p = false;
-    } else if(set_belong_p(b1->successors,b2)) {
+    } else if(fbset_belong_p(b1->successors,b2)) {
       // Adjacent blocks are fusable
       ifdebug(6) {
         pips_debug(6,"blocks are fusable because directly connected\n");
@@ -879,18 +956,18 @@ static bool fusable_blocks_p( fusion_block b1, fusion_block b2, unsigned int fus
       // here is a heavy way to check that, better not to think about
       // algorithm complexity :-(
       pips_debug(6,"Getting full successors for b1 (%d)\n",b1->num);
-      set full_succ_b1 = prune_successors_tree(b1);
-      if(!set_belong_p(full_succ_b1,b2)) {
+      fusion_block* full_succ_b1 = prune_successors_tree(b1);
+      if(!fbset_belong_p(full_succ_b1,b2)) {
         // b2 is not a successors of a successor of a .... of b1
         // look at the opposite !
         pips_debug(6,"Getting full successors for b2 (%d)\n",b2->num);
-        set full_succ_b2 = prune_successors_tree(b2);
-        if(!set_belong_p(full_succ_b2,b1)) {
+        fusion_block* full_succ_b2 = prune_successors_tree(b2);
+        if(!fbset_belong_p(full_succ_b2,b1)) {
           fusable_p = true;
         }
-        set_free(full_succ_b2);
+        fbset_free(full_succ_b2);
       }
-      set_free(full_succ_b1);
+      fbset_free(full_succ_b1);
     }
   }
   return fusable_p;
@@ -941,7 +1018,7 @@ static bool try_to_fuse_with_successors(fusion_block b,
   // First step is to try to fuse with each successor
   if(b->is_a_loop && b->num>=0 && b->count_fusion < fuse_limit) {
     pips_debug(5,"Block %d is a loop, try to fuse with successors !\n",b->num);
-    SET_FOREACH(fusion_block, succ, b->successors)
+    FBSET_FOREACH( succ, b->successors)
     {
       pips_debug(6,"Handling successor : %d\n",succ->num);
       if(fuse_block(b, succ, maximize_parallelism)) {
@@ -955,7 +1032,7 @@ static bool try_to_fuse_with_successors(fusion_block b,
     }
   }
   // Second step is recursion on successors (if any)
-  SET_FOREACH(fusion_block, succ, b->successors) {
+  FBSET_FOREACH(succ, b->successors) {
     if(try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism,fuse_limit))
       return true;
   }
@@ -977,7 +1054,7 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
                                         unsigned int fuse_limit) {
   if(b->is_a_loop && b->count_fusion < fuse_limit) {
     pips_debug(5,"Block %d is a loop, try to fuse with rr_successors !\n",b->num);
-    SET_FOREACH(fusion_block, succ, b->rr_successors)
+    FBSET_FOREACH(succ, b->rr_successors)
     {
       if(fusable_blocks_p(b,succ,fuse_limit) &&
           fuse_block(b, succ, maximize_parallelism)) {
@@ -1037,19 +1114,22 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
   /* Keep track of all blocks created */
   list block_list = NIL;
 
-  // We have to give a number to each block. It'll be used for regenerating
-  // the list of statement in the sequence wrt initial order.
-  int current_block_number = 1;
 
   // Keep track of the number of loop founded, to enable or disable next stage
-  int number_of_loop = 0;
+  int number_of_loop = 0, i=0;
 
   // Loop over the list of statements in the sequence and compute blocks
   list stmts = sequence_statements(s);
+  // We have to give a number to each block. It'll be used for regenerating
+  // the list of statement in the sequence wrt initial order.
+  max_num = gen_length(stmts);
+#ifdef __SSE2__
+  max_num=4*((max_num+3)/4);
+#endif
   FOREACH(statement, st, stmts) {
-    fusion_block b = make_block_from_statement(st, current_block_number);
+    fusion_block b = make_block_from_statement(st, i);
     block_list = gen_cons(b, block_list);
-    current_block_number++;
+    i++;
     if(statement_loop_p(st)) {
       number_of_loop++;
     }
@@ -1067,9 +1147,8 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
      *  Prune the graph so that we have a DAG
      */
     FOREACH(fusion_block, block, block_list) {
-      if(set_empty_p(block->predecessors)) { // Block has no predecessors
-        set full_succ = prune_successors_tree(block);
-        set_free(full_succ);
+      if(fbset_empty_p(block->predecessors)) { // Block has no predecessors
+        fbset_free(prune_successors_tree(block));
       }
     }
 
@@ -1084,7 +1163,7 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
     int fuse_count = 0;
 restart_loop: ;
     FOREACH(fusion_block, block, block_list) {
-      if(set_empty_p(block->predecessors)) { // Block has no predecessors
+      if(fbset_empty_p(block->predecessors)) { // Block has no predecessors
         pips_debug(2,
             "Operate on block %d (is_a_loop %d)\n",
             block->num,
@@ -1183,7 +1262,7 @@ restart_generation:
           }
           active_blocks++;
 
-          if(set_empty_p(block->predecessors)) { // Block has no predecessors
+          if(fbset_empty_p(block->predecessors)) { // Block has no predecessors
             // Block is eligible
             ifdebug(3) {
               pips_debug(3,"Eligible : ");
@@ -1195,9 +1274,9 @@ restart_generation:
             at_least_one_block_scheduled = true;
 
             // Release precedence constraint on successors
-            SET_FOREACH(fusion_block,succ,block->successors)
+            FBSET_FOREACH(succ,block->successors)
             {
-              set_del_element(succ->predecessors, succ->predecessors, block);
+              fbset_del_element(succ->predecessors, block);
             }
             // We have free some constraints, and thus we restart the process
             // to ensure that we generate in an order as close as possible to
