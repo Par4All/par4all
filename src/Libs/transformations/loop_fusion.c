@@ -96,7 +96,7 @@ static int max_num;
 #include <xmmintrin.h>
 static inline void fbset_clear(fbset self) {
     __m128i z = _mm_setzero_si128();
-    for(fbset iter = self, end=self+max_num;iter!=end;iter+=4)
+    for(fbset iter = self, end=self+max_num;iter!=end;iter+=sizeof(__m128i)/sizeof(fusion_block))
         _mm_store_si128((__m128i*)iter,z);
 }
 static inline fbset fbset_make() {
