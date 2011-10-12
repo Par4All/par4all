@@ -108,7 +108,7 @@ static inline void fbset_free(fbset fb) {
     _mm_free(fb);
 }
 static void fbset_union(fbset self, fbset other) {
-    for(size_t i=0;i<max_num;i+=4){
+    for(size_t i=0;i<max_num;i+=sizeof(__m128i)/sizeof(fusion_block)){
         __m128i s = _mm_load_si128((__m128i*)&self[i]),
                 o = _mm_load_si128((__m128i*)&other[i]);
         s=_mm_or_si128(s,o);
