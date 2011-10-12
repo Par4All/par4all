@@ -1,0 +1,50 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void whileifincr(void)
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(i) {0<=i, i#init<=i}
+
+   while (rand())
+
+//  T(i) {i#init<=i, i<=i#init+1}
+
+      if (i<42)
+
+//  T(i) {i==i#init+1, i<=42}
+
+         i++;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void whileifincr(void)
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   while (rand())
+
+//  P(i) {0<=i, i<=42}
+
+      if (i<42)
+
+//  P(i) {0<=i, i<=41}
+
+         i++;
+}
