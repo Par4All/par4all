@@ -1,4 +1,5 @@
 #include <xmmintrin.h>
+#include <emmintrin.h>
 
 typedef float  a2sf[2] __attribute__ ((aligned (16)));
 typedef float  a4sf[4] __attribute__ ((aligned (16)));
@@ -11,6 +12,16 @@ typedef __m128d v2df;
 typedef __m128i v4si;
 typedef __m128i v8si;
 typedef __m128i v8hi;
+/* int */
+#define SIMD_LOAD_V4SI(vec,arr) vec=_mm_loadu_si128((__m128i*)arr)
+#define SIMD_LOADA_V4SI(vec,arr) vec=_mm_load_si128((__m128i*)arr)
+#define SIMD_LOAD_BROADCAST_V4SI(vec,val) vec=_mm_set1_si128(val)
+#define SIMD_MULD(vec1,vec2,vec3) vec1=_mm_mul_epi32(vec2,vec3)
+#define SIMD_ADDD(vec1,vec2,vec3) vec1=_mm_add_epi32(vec2,vec3)
+#define SIMD_SUBD(vec1, vec2, vec3) vec1 = _mm_sub_epi32(vec2, vec3)
+
+#define SIMD_STORE_V4SI(vec,arr) _mm_storeu_si128((__m128i*)arr,vec)
+#define SIMD_STOREA_V4SI(vec,arr) _mm_store_si128((__m128i*)arr,vec)
 
 /* float */
 #define SIMD_LOAD_V4SF(vec,arr) vec=_mm_loadu_ps(arr)
