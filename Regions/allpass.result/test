@@ -72,8 +72,7 @@ double allpass(int D, double w[], double *p[], double a, double x)
 int main(int argc, char **argv)
 {
 
-//  <argv-R-MAY-{}>
-//  <argv[PHI1]-R-MAY-{PHI1==1}>
+//  <argv[PHI1][PHI2]-R-MAY-{PHI1==1}>
 
    int n = argc>1?atoi(argv[1]):1000;
    double r;
