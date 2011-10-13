@@ -103,8 +103,10 @@ static list va_list_effects(entity e, list args);
 static list search_or_sort_effects(entity e, list args);
 /* MB */
 static list generic_string_effects(entity e,list args);
+static list generic_string_reader_effects(entity e,list args);
 static list memmove_effects(entity e, list args);
 static list strtoxxx_effects(entity e, list args);
+static list strdup_effects(entity, list);
 
 
 
@@ -959,10 +961,10 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
 
   /* #include <stdlib.h> */
-  {ATOF_FUNCTION_NAME,                     no_write_effects},
-  {ATOI_FUNCTION_NAME,                     no_write_effects},
-  {ATOL_FUNCTION_NAME,                     no_write_effects},
-  {ATOLL_FUNCTION_NAME,                    no_write_effects},
+  {ATOF_FUNCTION_NAME,                     generic_string_reader_effects},
+  {ATOI_FUNCTION_NAME,                     generic_string_reader_effects},
+  {ATOL_FUNCTION_NAME,                     generic_string_reader_effects},
+  {ATOLL_FUNCTION_NAME,                    generic_string_reader_effects},
   {STRTOD_FUNCTION_NAME,                   strtoxxx_effects},
   {STRTOF_FUNCTION_NAME,                   strtoxxx_effects},
   {STRTOL_FUNCTION_NAME,                   strtoxxx_effects},
@@ -1002,6 +1004,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {MEMCPY_FUNCTION_NAME,                   generic_string_effects},
   {MEMMOVE_FUNCTION_NAME,                  generic_string_effects},
   {STRCPY_FUNCTION_NAME,                   generic_string_effects},
+  {STRDUP_FUNCTION_NAME,                   strdup_effects}, /* according to man page,  _BSD_SOURCE || _POSIX_C_SOURCE >= 200809L */
   {STRNCPY_FUNCTION_NAME,                  generic_string_effects},
   {STRCAT_FUNCTION_NAME,                   generic_string_effects},
   {STRNCAT_FUNCTION_NAME,                  generic_string_effects},
@@ -1021,7 +1024,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {MEMSET_FUNCTION_NAME,                   generic_string_effects},
   {STRERROR_FUNCTION_NAME,                 no_write_effects},
   {STRERROR_R_FUNCTION_NAME,               no_write_effects},
-  {STRLEN_FUNCTION_NAME,                   no_write_effects},
+  {STRLEN_FUNCTION_NAME,                   generic_string_reader_effects},
 
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME,                     no_write_effects},
@@ -1935,6 +1938,20 @@ static list c_io_effects(entity e, list args)
 }
 
 
+static list
+generic_string_reader_effects(entity e, list args) {
+    list le = NIL;
+    FOREACH(EXPRESSION,arg,args)
+        le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, 'r'));
+    return le;
+}
+
+static list strdup_effects(entity e, list args) {
+    list le = generic_string_reader_effects(e, args);
+    le = gen_nconc(any_heap_effects(e,args), le);
+    return le;
+}
+
 /*Molka Becher: generic_string_effects to encompass the C string.h intrinsics*/
 /*
   @brief handles several C intrinsics from string.h.
@@ -1943,6 +1960,7 @@ static list
 generic_string_effects(entity e, list args)
 {
   list le = NIL;
+  const char * lname = entity_local_name(e);
 
   pips_debug(5, "begin\n");
 
@@ -1950,7 +1968,7 @@ generic_string_effects(entity e, list args)
   le = generic_proper_effects_of_expressions(args);
 
   // then effects on special entities for memmove intrinsic
-  if (strcmp(entity_user_name(e),"memmove")==0)
+  if (same_string_p(lname,MEMMOVE_FUNCTION_NAME))
     {
       le = gen_nconc(le,memmove_effects(e, args));
     }
@@ -2021,7 +2039,7 @@ generic_string_effects(entity e, list args)
 
   // and on the same number of elements of the second one for all handled intrinsics
   // except memset.
-  if (strcmp(entity_user_name(e),"memset")!=0)
+  if (!same_string_p(lname,MEMSET_FUNCTION_NAME))
     {
       /* this is almost the same code as for arg1 just before,
 	 maybe this could be factorized. */

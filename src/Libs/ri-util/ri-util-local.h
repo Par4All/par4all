@@ -936,6 +936,7 @@
 #define MEMCPY_FUNCTION_NAME            "memcpy"
 #define MEMMOVE_FUNCTION_NAME           "memmove"
 #define STRCPY_FUNCTION_NAME            "strcpy"
+#define STRDUP_FUNCTION_NAME            "strdup"
 #define STRNCPY_FUNCTION_NAME           "strncpy"
 #define STRCAT_FUNCTION_NAME            "strcat"
 #define STRNCAT_FUNCTION_NAME           "strncat"

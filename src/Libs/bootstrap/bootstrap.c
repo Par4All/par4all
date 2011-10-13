@@ -5352,6 +5352,7 @@ CreateIntrinsics()
         {MEMCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
         {MEMMOVE_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
         {STRCPY_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRDUP_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
         {STRNCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
         {STRCAT_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
         {STRNCAT_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
