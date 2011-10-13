@@ -262,7 +262,7 @@ def test_par4all(directory_test_path,test_file_path,log_file):
 
 		if (int_status == timeout_value):
 			status = 'timeout'
-		if (int_status == orphan_status):
+		elif (int_status == orphan_status):
 			status = 'orphan'
 		elif(int_status != 0):
 			status = "failed"
