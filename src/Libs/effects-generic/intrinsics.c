@@ -78,6 +78,7 @@
 static list time_effects(entity, list );
 static list no_write_effects(entity e,list args);
 static list safe_c_effects(entity e,list args);
+static list safe_c_read_only_effects(entity e,list args);
 static list address_expression_effects(entity e,list args);
 static list conditional_effects(entity e,list args);
 static list address_of_effects(entity e,list args);
@@ -104,7 +105,6 @@ static list va_list_effects(entity e, list args);
 static list search_or_sort_effects(entity e, list args);
 /* MB */
 static list generic_string_effects(entity e,list args);
-static list generic_string_reader_effects(entity e,list args);
 static list memmove_effects(entity e, list args);
 static list strtoxxx_effects(entity e, list args);
 static list strdup_effects(entity, list);
@@ -962,10 +962,10 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
 
   /* #include <stdlib.h> */
-  {ATOF_FUNCTION_NAME,                     generic_string_reader_effects},
-  {ATOI_FUNCTION_NAME,                     generic_string_reader_effects},
-  {ATOL_FUNCTION_NAME,                     generic_string_reader_effects},
-  {ATOLL_FUNCTION_NAME,                    generic_string_reader_effects},
+  {ATOF_FUNCTION_NAME,                     safe_c_read_only_effects},
+  {ATOI_FUNCTION_NAME,                     safe_c_read_only_effects},
+  {ATOL_FUNCTION_NAME,                     safe_c_read_only_effects},
+  {ATOLL_FUNCTION_NAME,                    safe_c_read_only_effects},
   {STRTOD_FUNCTION_NAME,                   strtoxxx_effects},
   {STRTOF_FUNCTION_NAME,                   strtoxxx_effects},
   {STRTOL_FUNCTION_NAME,                   strtoxxx_effects},
@@ -1025,7 +1025,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {MEMSET_FUNCTION_NAME,                   generic_string_effects},
   {STRERROR_FUNCTION_NAME,                 no_write_effects},
   {STRERROR_R_FUNCTION_NAME,               no_write_effects},
-  {STRLEN_FUNCTION_NAME,                   generic_string_reader_effects},
+  {STRLEN_FUNCTION_NAME,                   safe_c_read_only_effects},
 
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME,                     time_effects},
@@ -1381,8 +1381,24 @@ safe_c_effects(entity e __attribute__ ((__unused__)),list args)
   pips_debug(5, "end\n");
   lr = gen_nconc(lr, lw);
   return(lr);
-
 }
+
+static list
+safe_c_read_only_effects(entity e __attribute__ ((__unused__)),list args)
+{
+  list lw = NIL, lr = NIL;
+
+  pips_debug(5, "begin\n");
+  lr = generic_proper_effects_of_expressions(args);
+  FOREACH(EXPRESSION, arg, args)
+    {
+      lw = gen_nconc(lw, c_actual_argument_to_may_summary_effects(arg, 'r'));
+    }
+  pips_debug(5, "end\n");
+  lr = gen_nconc(lr, lw);
+  return(lr);
+}
+
 
 static list
 address_expression_effects(entity op, list args)
@@ -1939,16 +1955,8 @@ static list c_io_effects(entity e, list args)
 }
 
 
-static list
-generic_string_reader_effects(entity e, list args) {
-    list le = NIL;
-    FOREACH(EXPRESSION,arg,args)
-        le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, 'r'));
-    return le;
-}
-
 static list strdup_effects(entity e, list args) {
-    list le = generic_string_reader_effects(e, args);
+    list le = safe_c_read_only_effects(e, args);
     le = gen_nconc(any_heap_effects(e,args), le);
     return le;
 }
