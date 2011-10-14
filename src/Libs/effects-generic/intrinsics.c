@@ -75,6 +75,7 @@
 
 /********************************************************* LOCAL FUNCTIONS */
 
+static list time_effects(entity, list );
 static list no_write_effects(entity e,list args);
 static list safe_c_effects(entity e,list args);
 static list address_expression_effects(entity e,list args);
@@ -1027,11 +1028,11 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {STRLEN_FUNCTION_NAME,                   generic_string_reader_effects},
 
   /*#include <time.h>*/
-  {TIME_FUNCTION_NAME,                     no_write_effects},
+  {TIME_FUNCTION_NAME,                     time_effects},
   {DIFFTIME_FUNCTION_NAME,                 no_write_effects},
-  {GETTIMEOFDAY_FUNCTION_NAME,             no_write_effects},
-  {CLOCK_GETTIME_FUNCTION_NAME,            no_write_effects},
-  {CLOCK_FUNCTION_NAME,                    no_write_effects},
+  {GETTIMEOFDAY_FUNCTION_NAME,             time_effects},
+  {CLOCK_GETTIME_FUNCTION_NAME,            time_effects},
+  {CLOCK_FUNCTION_NAME,                    time_effects},
 
   /*#include <wchar.h>*/
   {FWSCANF_FUNCTION_NAME,                  c_io_effects},
@@ -2762,6 +2763,23 @@ effects_of_implied_do(expression exp, tag act)
     return le;
 }
 
+/* Add a time effect, that is a read and a write on a particular hidden time variable */
+static
+list time_effects(entity e, list args) {
+	list le = NIL;
+    FOREACH(EXPRESSION,arg,args) // true for at least gettimeofday, clock and time
+        le = gen_nconc(le,
+                c_actual_argument_to_may_summary_effects(arg, 'w')); // may be a must ?
+    entity private_time_entity = FindEntity(TIME_EFFECTS_PACKAGE_NAME, TIME_EFFECTS_VARIABLE_NAME);
+
+    pips_assert("time_effects", private_time_entity != entity_undefined);
+
+    reference ref = make_reference(private_time_entity,NIL);
+    le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
+    le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
+    /* SG: should we free ref ? */
+    return le;
+}
 
 /**
    handling of variable argument list macros (va_end, va_start and va_copy)

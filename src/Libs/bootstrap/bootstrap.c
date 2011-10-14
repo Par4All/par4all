@@ -281,6 +281,14 @@ static void CreateRandomSeed()
   //add_thread_safe_variable(as);
   add_abstract_state_variable(as);
 }
+// added to handle time functions
+static void CreateTimeSeed()
+{
+  entity as =
+    CreateAbstractStateVariable(TIME_EFFECTS_PACKAGE_NAME, TIME_EFFECTS_VARIABLE_NAME);
+  //add_thread_safe_variable(as);
+  add_abstract_state_variable(as);
+}
 
 static void CreateHeapAbstractState()
 {
@@ -5550,6 +5558,7 @@ bootstrap(string workspace)
      heap abstract state
   */
   CreateRandomSeed();
+  CreateTimeSeed();
   CreateHeapAbstractState();
   /* Create hidden variable to modelize the abstract state of :
      temporary arry for memmove function. Molka Becher
