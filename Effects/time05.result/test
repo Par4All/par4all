@@ -1,0 +1,14 @@
+int main()
+{
+   time_t result;
+   struct tm *tm;
+//             <may be written>: result
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: 0`tm __TIME_EFFECTS:KALI
+   tm = localtime(&result);
+//             <may be written>: result
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: 0`tm __TIME_EFFECTS:KALI
+   tm = localtime(&result);
+   return 0;
+}
