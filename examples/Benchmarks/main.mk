@@ -36,7 +36,6 @@ openmp:
 		make -C $$target $@ ; \
 	done
 
-
 run_cuda:
 	for target in $(TARGETS) ; do \
 		make -C $$target run_cuda ; \
@@ -92,4 +91,13 @@ run_hmpp:
 		make -C $$target $@ ; \
 	done
 
+
+ppcg:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
+run_ppcg:
+	for target in $(TARGETS) ; do \
+		make -C $$target $@ ; \
+	done
 
