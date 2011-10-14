@@ -1,0 +1,13 @@
+int main()
+{
+   struct timeval tv;
+//             <may be written>: tv.tv_sec tv.tv_usec
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: __TIME_EFFECTS:KALI
+   gettimeofday(&tv, (void *) 0);
+//             <may be written>: tv.tv_sec tv.tv_usec
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: __TIME_EFFECTS:KALI
+   gettimeofday(&tv, (void *) 0);
+   return 0;
+}
