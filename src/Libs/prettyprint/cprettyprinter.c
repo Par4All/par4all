@@ -524,6 +524,9 @@ static string c_qualifier_string(list l)
             case is_qualifier_register:
                 result = concatenate(result,"register ",NULL);
                 break;
+            case is_qualifier_thread:
+                result = concatenate(result,"__thread ",NULL);
+                break;
             case is_qualifier_const:
                 result = concatenate(result,"const ",NULL);
                 break;

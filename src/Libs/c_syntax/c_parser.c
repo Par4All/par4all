@@ -167,6 +167,7 @@ void init_keyword_typedef_table()
   hash_put(keyword_typedef_table,"static", (char *) TK_STATIC);
   hash_put(keyword_typedef_table,"struct", (char *) TK_STRUCT);
   hash_put(keyword_typedef_table,"switch", (char *) TK_SWITCH);
+  hash_put(keyword_typedef_table,"__thread", (char *) TK_THREAD);
   hash_put(keyword_typedef_table,"typedef", (char *) TK_TYPEDEF);
   hash_put(keyword_typedef_table,"union", (char *) TK_UNION);
   hash_put(keyword_typedef_table,"unsigned", (char *) TK_UNSIGNED);

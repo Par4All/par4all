@@ -444,7 +444,7 @@ static string new_ellipsis()
 %token TK_CHAR TK_INT TK_DOUBLE TK_FLOAT TK_VOID TK_COMPLEX
 %token TK_ENUM TK_STRUCT TK_TYPEDEF TK_UNION
 %token TK_SIGNED TK_UNSIGNED TK_LONG TK_SHORT
-%token TK_VOLATILE TK_EXTERN TK_STATIC TK_CONST TK_RESTRICT TK_AUTO TK_REGISTER
+%token TK_VOLATILE TK_EXTERN TK_STATIC TK_CONST TK_RESTRICT TK_AUTO TK_REGISTER TK_THREAD
 
 %token TK_SIZEOF TK_ALIGNOF
 
@@ -1445,6 +1445,15 @@ decl_spec_list:                         /* ISO 6.7 */
 			  $$ = string_undefined;
 			  */
 			  $$ = build_signature(new_signature("register"), $2, NULL);
+			}
+|   TK_THREAD decl_spec_list_opt
+                        {
+			  pips_debug(5, "TK_THREAD decl_spec_list_opt->decl_spec_list\n");
+			  /*
+			  free_partial_signature($2);
+			  $$ = string_undefined;
+			  */
+			  $$ = build_signature(new_signature("thread"), $2, NULL);
 			}
                                         /* ISO 6.7.2 */
 |   type_spec decl_spec_list_opt_no_named
