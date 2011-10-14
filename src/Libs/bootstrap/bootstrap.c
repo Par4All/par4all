@@ -5385,6 +5385,7 @@ CreateIntrinsics()
         /*#include <tgmath.h>*/
         /*#include <time.h>*/
         {TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {LOCALTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
         {DIFFTIME_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
         {NANOSLEEP_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
         {GETTIMEOFDAY_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0}, // BSD-GNU

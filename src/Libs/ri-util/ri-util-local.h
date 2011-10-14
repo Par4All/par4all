@@ -962,6 +962,7 @@
 
 /*#include<time.h> */
 #define TIME_FUNCTION_NAME              "time"
+#define LOCALTIME_FUNCTION_NAME         "localtime"
 #define DIFFTIME_FUNCTION_NAME          "difftime"
 #define NANOSLEEP_FUNCTION_NAME         "nanosleep"
 

@@ -802,6 +802,7 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
 
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME,                     intrinsic_to_identical_post_pv},
+  {LOCALTIME_FUNCTION_NAME,                intrinsic_to_identical_post_pv},
   {DIFFTIME_FUNCTION_NAME,                 intrinsic_to_identical_post_pv},
   {GETTIMEOFDAY_FUNCTION_NAME,             intrinsic_to_identical_post_pv},
   {CLOCK_GETTIME_FUNCTION_NAME,            intrinsic_to_identical_post_pv},
