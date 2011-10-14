@@ -68,10 +68,23 @@ typedef dg_vertex_label vertex_label;
 
 #include "graph.h"
 
-/* privatizable() checks whether the entity e is privatizable. */
-static bool privatizable(entity e)
+typedef struct {
+  entity e;
+  bool loop_index_p;
+} privatizable_ctxt;
+
+static bool loop_in(loop l, privatizable_ctxt *ctxt)
+{
+  if (loop_index(l) == ctxt->e)
+    ctxt->loop_index_p = true;
+  return ctxt->loop_index_p;
+}
+
+/* privatizable() checks whether the entity e is privatizablein statement s. */
+static bool privatizable(entity e, statement st)
 {
     storage s = entity_storage( e ) ;
+    bool result = true;
 
     /* For C, it should be checked that e has no initial value because
        there is no dependence arc between the initialization in t he
@@ -84,9 +97,28 @@ static bool privatizable(entity e)
        Also, stack_area_p() would be OK for a privatization.
     */
 
-    return( entity_scalar_p( e ) &&
-            ((storage_formal_p( s ) && parameter_passing_by_value_p(get_current_module_entity()) )||
-                (storage_ram_p( s ) && dynamic_area_p( ram_section( storage_ram( s )))))) ;
+    pips_debug(3, "checking entity %s, with storage %s \n", entity_name(e), storage_to_string(s));
+
+    /* check if e is an internal loop index */
+    if (c_module_p(get_current_module_entity())
+	&& storage_ram_p( s ) && static_area_p( ram_section( storage_ram( s )))
+	&& top_level_entity_p( e))
+      {
+	pips_debug(3, "global variable\n");
+	privatizable_ctxt ctxt = {e, false};
+
+	gen_context_recurse(st, &ctxt, loop_domain, loop_in, gen_null);
+	result = ctxt.loop_index_p;
+      }
+
+    else
+      {
+	result = entity_scalar_p( e ) &&
+	  ((storage_formal_p( s ) && parameter_passing_by_value_p(get_current_module_entity()) )||
+	   (storage_ram_p( s ) && dynamic_area_p( ram_section( storage_ram( s ))))) ;
+      }
+    pips_debug(3, "returning %s\n", bool_to_string(result));
+    return(result);
 }
 
 /* SCAN_STATEMENT gathers the list of enclosing LOOPS of statement S.
@@ -121,7 +153,7 @@ static void scan_statement(statement s, list loops)
 
             if(!anywhere_effect_p(f)
                && action_write_p( effect_action( f ))
-               &&  privatizable( e )
+               &&  privatizable( e, b )
                &&  gen_find_eq( e, locals ) == entity_undefined ) {
                 locals = CONS( ENTITY, e, locals ) ;
             }
