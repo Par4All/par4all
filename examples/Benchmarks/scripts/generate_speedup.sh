@@ -28,12 +28,6 @@ set ytics(              \
 # closer to the boundary
 set x2tics in nomirror offset 5
 
-# We then use arrows to add-back the out-labels
-set arrow 6 from -0.5,9 to -0.5,10 nohead
-set arrow 7 from 19.5,9 to 19.5,10 nohead
-set arrow 8 from 22.5,9 to 22.5,10 nohead
-set arrow 9 from 23.5,9 to 23.5,10 nohead
-
 set xtics out nomirror
 set xtics rotate by -90
 
@@ -114,6 +108,11 @@ done
 
 nmean=0
 
+
+arrows=""
+arrow_cnt=1
+
+set arrow 6 from -0.5,9 to -0.5,10 nohead
 currentSuite="unset"
 currentTic=-0
 for test in $tests; do
@@ -122,7 +121,9 @@ for test in $tests; do
     tic=`echo "$currentTic -0.5" | bc `
     x2tics="$x2tics $x2sep \"$suite\" $tic"
     x2sep=","
-    currentSuite=$suite
+    arrows=`echo $arrows ; echo "set arrow $arrow_cnt from $tic,9 to $tic,10 nohead" `
+    ((arrow_cnt++))
+    currentSuite=$suite    
   fi
       
 
@@ -158,8 +159,10 @@ for test in $tests; do
   currentTic=$(($currentTic+1))
 done
 
+
 tic=`echo "$currentTic -0.5" | bc `
 x2tics="$x2tics $x2sep \"$suite\" $tic"
+echo $arrows >> $out_gp
 echo "set x2tics($x2tics)" >> $out_gp
 
 if [[ -z $disable_mean ]]; then
