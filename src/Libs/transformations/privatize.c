@@ -99,14 +99,18 @@ static bool privatizable(entity e, statement st)
 
     pips_debug(3, "checking entity %s, with storage %s \n", entity_name(e), storage_to_string(s));
 
-    /* check if e is an internal loop index */
+    /* Since there is currently no variable liveness analysis, we
+       cannot privatize global variables.  However, we consider that
+       inner loop indices are privatizable to allow correct
+       parallelization of outer loops
+    */
     if (c_module_p(get_current_module_entity())
 	&& storage_ram_p( s ) && static_area_p( ram_section( storage_ram( s )))
-	&& top_level_entity_p( e))
+	&& top_level_entity_p( e) /* this test may be removed since we check that e is used as a loop index */)
       {
 	pips_debug(3, "global variable\n");
 	privatizable_ctxt ctxt = {e, false};
-
+	/* check if e is an internal loop index */
 	gen_context_recurse(st, &ctxt, loop_domain, loop_in, gen_null);
 	result = ctxt.loop_index_p;
       }
