@@ -73,6 +73,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   out = 0;
   for (iter = 0; iter < tsteps; iter++) {
     for (i = 0; i <= length - 1; i++)
@@ -89,6 +92,9 @@ int main(int argc, char** argv) {
     }
     out += c[0][length - 1];
   }
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif

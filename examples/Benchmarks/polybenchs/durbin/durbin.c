@@ -70,6 +70,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   y[0][0] = r[0];
   beta[0] = 1;
   alpha[0] = r[0];
@@ -85,6 +88,9 @@ int main(int argc, char** argv) {
   }
   for (i = 0; i < n; i++)
     out[i] = y[i][N - 1];
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif

@@ -88,6 +88,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   for (r = 0; r < nr; r++)
     for (q = 0; q < nq; q++) {
       for (p = 0; p < np; p++) {
@@ -98,6 +101,9 @@ int main(int argc, char** argv) {
       for (p = 0; p < np; p++)
         A[r][q][p] = sum[r][q][p];
     }
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif
