@@ -1135,7 +1135,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
 
   //Posix
-  {POSIX_MEMALIGN_FUNCTION_NAME,           no_write_effects},
+  {POSIX_MEMALIGN_FUNCTION_NAME,           any_heap_effects},
+  {MEMALIGN_FUNCTION_NAME,                 any_heap_effects},
   {ATOQ_FUNCTION_NAME,                     no_write_effects},
   {LLTOSTR_FUNCTION_NAME,                  safe_c_effects},
   {ULLTOSTR_FUNCTION_NAME,                 no_write_effects},
