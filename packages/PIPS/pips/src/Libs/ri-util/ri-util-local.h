@@ -936,6 +936,7 @@
 #define MEMCPY_FUNCTION_NAME            "memcpy"
 #define MEMMOVE_FUNCTION_NAME           "memmove"
 #define STRCPY_FUNCTION_NAME            "strcpy"
+#define STRDUP_FUNCTION_NAME            "strdup"
 #define STRNCPY_FUNCTION_NAME           "strncpy"
 #define STRCAT_FUNCTION_NAME            "strcat"
 #define STRNCAT_FUNCTION_NAME           "strncat"
@@ -961,6 +962,7 @@
 
 /*#include<time.h> */
 #define TIME_FUNCTION_NAME              "time"
+#define LOCALTIME_FUNCTION_NAME         "localtime"
 #define DIFFTIME_FUNCTION_NAME          "difftime"
 #define NANOSLEEP_FUNCTION_NAME         "nanosleep"
 
@@ -1829,6 +1831,8 @@ the variable is unsigned, signed or not */
 /* Implicit variables to handle IO effetcs */
 /* package name for io routines */
 #define IO_EFFECTS_PACKAGE_NAME "__IO_EFFECTS"
+/* package name for time routines */
+#define TIME_EFFECTS_PACKAGE_NAME "__TIME_EFFECTS"
 /* package name for random routines */
 #define RAND_EFFECTS_PACKAGE_NAME "_RANDOM_EFFECTS"
 /* variable name for random unit */
@@ -1849,6 +1853,8 @@ the variable is unsigned, signed or not */
 #define IO_EOF_ARRAY_NAME "END_LUNS"
 /* array of error codes for LUNs */
 #define IO_ERROR_ARRAY_NAME "ERR_LUNS"
+/* variable holding time effects */
+#define TIME_EFFECTS_VARIABLE_NAME "KALI" /* kali is the goddess of time in the Hindu mythology */
 /* size of the unit specifier */
 #define IO_EFFECTS_UNIT_SPECIFIER_LENGTH 4
 /* Standard unit numbers depend on the operating system. Here are UNIX definitions. */

@@ -415,6 +415,8 @@ out_effects_from_loop_to_body(loop l, out_effects_context *ctxt)
 	    l_next_in,
 	    l_out_glob,
 	    l_out_loc;
+	add_intermediate_value(i);
+	add_old_value(i);
 	entity
 	    i_prime = entity_to_intermediate_value(i),
 	    i_d_prime = entity_to_old_value(i);
