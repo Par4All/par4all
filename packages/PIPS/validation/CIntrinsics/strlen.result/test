@@ -1,0 +1,33 @@
+
+Parsed printed file for "strlen"
+
+int main()
+{
+   char *str1 = "Sample string";
+   char str2[] = "Sample string";
+   int n;
+   n = strlen(str1);
+   n = strlen(str2);
+   n = strlen("prout");
+   return 0;
+}
+
+Proper effetcs for "strlen"
+
+int main()
+{
+//             <    is written>: str1
+   char *str1 = "Sample string";
+//             <may be written>: str2[*]
+   char str2[] = "Sample string";
+   int n;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: n
+   n = strlen(str1);
+//             <may be read   >: str2[*]
+//             <    is written>: n
+   n = strlen(str2);
+//             <    is written>: n
+   n = strlen("prout");
+   return 0;
+}

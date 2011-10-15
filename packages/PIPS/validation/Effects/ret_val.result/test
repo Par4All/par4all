@@ -2,6 +2,7 @@ long long int get_result(int argc, char **argv)
 {
 //             <    is written>: result
    long long int result = 0;
+//             <may be read   >: argv[1][*]
 //             <    is read   >: argv argv[1]
 //             <    is written>: result
    result = atoll(argv[1]);
@@ -27,6 +28,7 @@ long long int get_result(int argc, char **argv)
 {
 //             <    is written>: result
    long long int result = 0;
+//             <may be read   >: argv[1][*]
 //             <    is read   >: argv argv[1]
 //             <    is written>: result
    result = atoll(argv[1]);

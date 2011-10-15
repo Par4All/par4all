@@ -1,0 +1,39 @@
+delete strlen
+
+create strlen strlen.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Parsed printed file for "strlen"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Proper effetcs for "strlen"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+quit
+echo
+echo Proper Pointer effetcs for "strlen"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[main]
+
+echo
+echo Cumulated effetcs for "strlen"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+
+close
+delete strlen
+quit
+

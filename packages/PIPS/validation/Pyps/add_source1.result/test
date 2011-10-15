@@ -3,7 +3,6 @@ int main()
 
    source2();
 }
-Language 1
 void source2()
 {
    int i, j;

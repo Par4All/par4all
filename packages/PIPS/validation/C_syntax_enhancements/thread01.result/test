@@ -1,0 +1,7 @@
+int main()
+{
+   static __thread double t1;
+}
+__thread int t0;
+
+int main();

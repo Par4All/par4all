@@ -9,3 +9,4 @@ void restrict01a(const int * restrict p, int * const q);
 
 void restrict01b(__const int * __restrict p, int * __const q);
 
+float* __restrict__ xx;
