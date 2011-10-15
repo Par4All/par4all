@@ -57,8 +57,10 @@ int main()
 //             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
 //             <    is written>: __IO_EFFECTS:LUNS[0]
    gets(str2);
+//             <may be read   >: str1[*]
 //             <    is written>: len1
    len1 = strlen(str1);
+//             <may be read   >: str2[*]
 //             <    is written>: len2
    len2 = strlen(str2);
 //             <    is read   >: len1 len2

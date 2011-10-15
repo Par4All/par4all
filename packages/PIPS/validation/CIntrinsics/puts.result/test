@@ -1,0 +1,38 @@
+
+Parsed printed file for "puts"
+
+int main()
+{
+   char *str1 = "Sample string";
+   char str2[] = "Sample string";
+   puts(str1);
+   puts(str2);
+   puts("prout");
+   return 0;
+}
+
+Proper effetcs for "puts"
+
+int main()
+{
+//             <    is written>: str1
+   char *str1 = "Sample string";
+//             <may be written>: str2[*]
+   char str2[] = "Sample string";
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   puts(str1);
+//             <may be read   >: stdout[0] str2[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   puts(str2);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   puts("prout");
+   return 0;
+}

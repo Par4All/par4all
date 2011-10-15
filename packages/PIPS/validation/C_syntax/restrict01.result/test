@@ -7,10 +7,11 @@ Declarations for module "restrict01!" with type "() -> unknown"
 
 Variable list:
 
-	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 8
 	Declared entity "TOP-LEVEL:restrict01" with type "functional" "int * x int * -> void"
 	Declared entity "TOP-LEVEL:restrict01a" with type "functional" "int * x int * -> void"
 	Declared entity "TOP-LEVEL:restrict01b" with type "functional" "int * x int * -> void"
+	Declared entity "TOP-LEVEL:xx" with type "variable" "float *"
 	Declared entity "restrict01!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "restrict01!:*HEAP*" with type "area" with size 0
 	Declared entity "restrict01!:*STACK*" with type "area" with size 0
@@ -21,8 +22,8 @@ Variable list:
 
 Layouts for memory areas:
 
-Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 8:
+	Variable "TOP-LEVEL:xx"	offset = 0	size = 8
 
 
 Layout for memory area "restrict01!:*DYNAMIC*" of size 0:
@@ -55,3 +56,5 @@ void restrict01(int * restrict p, int * restrict q);
 void restrict01a(const int * restrict p, int * const q);
 
 void restrict01b(const int * restrict p, int * const q);
+
+float * restrict xx;

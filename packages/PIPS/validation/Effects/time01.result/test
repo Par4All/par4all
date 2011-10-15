@@ -1,0 +1,13 @@
+int main()
+{
+   time_t result;
+//             <may be written>: result
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: __TIME_EFFECTS:KALI
+   time(&result);
+//             <may be written>: result
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: __TIME_EFFECTS:KALI
+   time(&result);
+   return 0;
+}

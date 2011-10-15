@@ -1,0 +1,11 @@
+int main()
+{
+   clock_t c;
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: c __TIME_EFFECTS:KALI
+   c = clock();
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: c __TIME_EFFECTS:KALI
+   c = clock();
+   return 0;
+}

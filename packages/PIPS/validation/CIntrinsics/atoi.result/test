@@ -1,0 +1,33 @@
+
+Parsed printed file for "atoi"
+
+int main()
+{
+   char *str1 = "0";
+   char str2[] = "0";
+   int n;
+   n = atoi(str1);
+   n = atoi(str2);
+   n = atoi("1");
+   return 0;
+}
+
+Proper effetcs for "atoi"
+
+int main()
+{
+//             <    is written>: str1
+   char *str1 = "0";
+//             <may be written>: str2[*]
+   char str2[] = "0";
+   int n;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: n
+   n = atoi(str1);
+//             <may be read   >: str2[*]
+//             <    is written>: n
+   n = atoi(str2);
+//             <    is written>: n
+   n = atoi("1");
+   return 0;
+}

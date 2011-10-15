@@ -13,18 +13,18 @@ void foo_l(int a[4], int b[4], int c[4])
 {
    int tmp[4];
    {
-      //PIPS:SAC generated v2sf vector(s)
-      v2sf vec00, vec10, vec20, vec30, vec40, vec50, vec60, vec70, vec80;
-      SIMD_LOAD_V2SI_TO_V2SF(vec20, &c[0]);
-      SIMD_LOAD_BROADCAST_V2SF(vec10, b[0]);
-      SIMD_MULPS(vec00, vec10, vec20);
-      SIMD_STORE_GENERIC_V2SF_TO_V2SI(vec00, &tmp[0], &tmp[2]);
-      SIMD_LOAD_V2SI_TO_V2SF(vec50, &c[2]);
-      SIMD_LOAD_BROADCAST_V2SF(vec40, b[1]);
-      SIMD_MULPS(vec30, vec40, vec50);
-      SIMD_STORE_GENERIC_V2SF_TO_V2SI(vec30, &tmp[1], &tmp[3]);
-      SIMD_ADDPS(vec60, vec30, vec00);
-      SIMD_STORE_V2SF_TO_V2SI(vec60, &a[0]);
+      //PIPS:SAC generated v2si vector(s)
+      v2si vec00, vec10, vec20, vec30, vec40, vec50, vec60, vec70, vec80;
+      SIMD_LOAD_V2SI(vec20, &c[0]);
+      SIMD_LOAD_BROADCAST_V2SI(vec10, b[0]);
+      SIMD_MULD(vec00, vec10, vec20);
+      SIMD_STORE_GENERIC_V2SI(vec00, &tmp[0], &tmp[2]);
+      SIMD_LOAD_V2SI(vec50, &c[2]);
+      SIMD_LOAD_BROADCAST_V2SI(vec40, b[1]);
+      SIMD_MULD(vec30, vec40, vec50);
+      SIMD_STORE_GENERIC_V2SI(vec30, &tmp[1], &tmp[3]);
+      SIMD_ADDD(vec60, vec30, vec00);
+      SIMD_STORE_V2SI(vec60, &a[0]);
    }
 }
 

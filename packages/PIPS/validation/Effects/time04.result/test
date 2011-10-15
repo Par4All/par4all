@@ -1,0 +1,50 @@
+int main()
+{
+//             <    is written>: n
+   int n = 100;
+   int a[n];
+   struct timeval tic, toc;
+   {
+      int i;
+//             <    is read   >: n
+//             <    is written>: i
+      for(i = 0; i <= n-1; i += 1) {
+//             <may be written>: tic.tv_sec tic.tv_usec
+//             <    is read   >: n __TIME_EFFECTS:KALI
+//             <    is written>: __TIME_EFFECTS:KALI
+         gettimeofday(&tic, 0);
+         {
+            int j;
+//             <    is read   >: n
+//             <    is written>: j
+            for(j = 0; j <= n-1; j += 1)
+//             <    is read   >: j n
+//             <    is written>: a[j]
+               a[j] = j;
+         }
+//             <may be written>: toc.tv_sec toc.tv_usec
+//             <    is read   >: n __TIME_EFFECTS:KALI
+//             <    is written>: __TIME_EFFECTS:KALI
+         gettimeofday(&toc, 0);
+      }
+   }
+}
+int main()
+{
+   int n = 100;
+   int a[n];
+   struct timeval tic, toc;
+   {
+      int i;
+      for(i = 0; i <= n-1; i += 1) {
+         gettimeofday(&tic, 0);
+         {
+            int j;
+#pragma omp parallel for 
+            for(j = 0; j <= n-1; j += 1)
+               a[j] = j;
+         }
+         gettimeofday(&toc, 0);
+      }
+   }
+}

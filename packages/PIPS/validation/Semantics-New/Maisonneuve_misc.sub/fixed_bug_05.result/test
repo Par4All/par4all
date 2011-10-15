@@ -1,0 +1,28 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T() {0==-1}
+
+lbl:   exit(1);
+   goto lbl;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+lbl:   exit(1);
+   goto lbl;
+}
