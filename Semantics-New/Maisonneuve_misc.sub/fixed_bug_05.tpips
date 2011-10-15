@@ -1,5 +1,5 @@
-delete bug_05
-create bug_05 bug_05.c
+delete fixed_bug_05
+create fixed_bug_05 fixed_bug_05.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
