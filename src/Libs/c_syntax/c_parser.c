@@ -160,6 +160,7 @@ void init_keyword_typedef_table()
   hash_put(keyword_typedef_table,"register", (char *) TK_REGISTER);
   hash_put(keyword_typedef_table,"restrict", (char *) TK_RESTRICT);
   hash_put(keyword_typedef_table,"__restrict", (char *) TK_RESTRICT);
+  hash_put(keyword_typedef_table,"__restrict__", (char *) TK_RESTRICT);
   hash_put(keyword_typedef_table,"return", (char *) TK_RETURN);
   hash_put(keyword_typedef_table,"short", (char *) TK_SHORT);
   hash_put(keyword_typedef_table,"signed", (char *) TK_SIGNED);
