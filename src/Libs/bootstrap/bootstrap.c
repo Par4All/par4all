@@ -41,7 +41,7 @@
   - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings,
     FI, 25/12/96
   - Fortran specification conformant typing of expressions...
-  
+
   Molka Becher (MB), June 2010
   - Check of C intrinsics already added
   - Add of missing C intrinsics according to ISO/IEC 9899:TC2
