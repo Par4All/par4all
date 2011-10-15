@@ -227,7 +227,7 @@ int main()
 
          int k, l;
 
-//  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, i+n==j, i<=15, i<=j,
+//  P(BlockEnd,foo:0`l,i,j,k,l,n) {BlockEnd==3, i+n==j, i<=15, 0<=n,
 //    n<=2}
 
          k = foo((j, n));
