@@ -90,6 +90,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   for (t = 0; t < tmax; t++) {
     for (j = 0; j < ny; j++)
       ey[0][j] = _fict_[t];
@@ -104,6 +107,9 @@ int main(int argc, char** argv) {
         hz[i][j] = hz[i][j] - 0.7 * (ex[i][j + 1] - ex[i][j] + ey[i + 1][j]
             - ey[i][j]);
   }
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif

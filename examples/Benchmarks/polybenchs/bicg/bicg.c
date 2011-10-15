@@ -74,6 +74,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   for (i = 0; i < ny; i++)
     s[i] = 0;
 
@@ -84,6 +87,9 @@ int main(int argc, char** argv) {
       q[i] = q[i] + A[i][j] * p[j];
     }
   }
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif

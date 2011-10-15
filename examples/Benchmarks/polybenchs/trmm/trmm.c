@@ -73,11 +73,17 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   /*  B := alpha*A'*B, A triangular */
   for (i = 1; i < n; i++)
     for (j = 0; j < n; j++)
       for (k = 0; k < i; k++)
         B[i][j] += alpha * A[i][k] * B[j][k];
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif

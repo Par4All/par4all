@@ -74,12 +74,18 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
       x1[i] = x1[i] + A[i][j] * y_1[j];
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
       x2[i] = x2[i] + A[j][i] * y_2[j];
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif

@@ -86,6 +86,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   for (i = 0; i < N; i++)
     for (j = 0; j < N; j++)
       A[i][j] = A[i][j] + u1[i] * v1[j] + u2[i] * v2[j];
@@ -100,6 +103,9 @@ int main(int argc, char** argv) {
   for (i = 0; i < N; i++)
     for (j = 0; j < N; j++)
       w[i] = w[i] + alpha * A[i][j] * x[j];
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif

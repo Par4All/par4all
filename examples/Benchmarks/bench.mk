@@ -23,6 +23,9 @@ CUDA_SOURCE := $(TARGET).naive$(P4A_CUDA_SUFFIX)
 CUDA_OPT_SOURCE := $(TARGET).opt$(P4A_CUDA_SUFFIX)
 GENERATED_KERNELS = $(wildcard p4a_new_files/*.cu)
 HMPP_SOURCE := hmpp/$(TARGET).hmpp.c
+PPCG_PRE_SOURCE :=$(TARGET).ppcg.c
+PPCG_GENERATED= *_host.cu *_kernel.cu
+
 
 SEQ_TARGET := $(TARGET)_seq
 OMP_TARGET := $(TARGET)_openmp
@@ -30,7 +33,7 @@ CUDA_TARGET := $(TARGET)_cuda
 CUDA_OPT_TARGET := $(TARGET)_cuda_opt
 PGI_TARGET := $(TARGET)_cuda_pgi
 HMPP_TARGET := $(TARGET)_cuda_hmpp
-
+PPCG_TARGET := $(TARGET)_ppcg
 
 # Compilation flags
 CC := gcc
@@ -83,6 +86,11 @@ $(CUDA_OPT_SOURCE): $(SOURCE) $(COMMON)
 	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
 cuda_opt_src:$(CUDA_OPT_SOURCE)
 
+$(PPCG_PRE_SOURCE):  $(SOURCE) $(COMMON)
+	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) -S -DPGCC
+	mv $(SOURCE:%.c=%.p4a.c) $@
+
+
 # build binary for the 3 different versions
 $(SEQ_TARGET): $(SOURCE) $(COMMON)
 	gcc $(COMMON_FLAGS) $(CFLAGS) $(GCCFLAGS) $(LDFLAGS) $^ -o $@
@@ -104,6 +112,11 @@ pgi: $(PGI_TARGET)
 $(HMPP_TARGET): $(HMPP_SOURCE) $(COMMON)
 	hmpp --codelet-required --nvcc-options -arch,sm_13 gcc $(COMMON_FLAGS) $(CFLAGS) $(GCCFLAGS) $(LDFLAGS) $^ -o $@
 hmpp: $(HMPP_TARGET)
+
+ppcg: $(PPCG_TARGET)
+$(PPCG_TARGET): $(PPCG_PRE_SOURCE) $(COMMON)
+	ppcg $(PPCG_PRE_SOURCE)
+	nvcc -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(PPCG_GENERATED) $(COMMON)
 
 # Run target
 run_seq: $(SEQ_TARGET)
@@ -130,10 +143,15 @@ run_hmpp: $(HMPP_TARGET)
 	for run in $(NRUNS); do \
 		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
 	done
+run_ppcg: $(PPCG_TARGET)
+	for run in $(NRUNS); do \
+		BENCH_SUITE=$(BENCH_SUITE) $(TOP)/scripts/record_measure.sh $(TARGET) $@ `./$< $(RUN_ARGS) | tee -a $(TARGET)_$@.time`; \
+	done
+
 
 # Clean targets
 clean: 
-	rm -Rf $(OMP_SOURCE) $(CUDA_SOURCE) $(CUDA_OPT_SOURCE) *.database *.build .*.tmp p4a_new_files P4A  *.o mycodelet*.cu*
+	rm -Rf $(OMP_SOURCE) $(CUDA_SOURCE) $(CUDA_OPT_SOURCE) *.database *.build .*.tmp p4a_new_files P4A  *.o mycodelet*.cu* $(PPCG_GENERATED) $(PPCG_PRE_SOURCE)
 dist-clean: clean 
 	rm -f $(TARGET) $(PGI_TARGET) $(HMPP_TARGET) $(CUDA_TARGET) $(CUDA_OPT_TARGET) $(OMP_TARGET) $(SEQ_TARGET) $(TARGET)_run_seq.time $(TARGET)_run_openmp.time $(TARGET)_run_cuda.time $(TARGET)_run_cuda_opt.time mycodelet*.so
 

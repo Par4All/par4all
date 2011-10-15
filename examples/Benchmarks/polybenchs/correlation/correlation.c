@@ -82,6 +82,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   /* Determine mean of column vectors of input data matrix */
   for (j = 1; j <= m; j++) {
     mean[j] = 0.0;
@@ -120,6 +123,9 @@ int main(int argc, char** argv) {
     }
   }
   symmat[m][m] = 1.0;
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif
