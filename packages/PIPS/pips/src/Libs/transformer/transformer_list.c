@@ -1036,11 +1036,16 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
     sc = sc_multiply_constant_terms(sc, (Variable) ik, star_p);
     //Psysteme sc_t_prime_star = sc_projection_ofl(sc_t_prime_k, (Variable) ik);
     sc = sc_projection_ofl(sc, (Variable) ik);
-    sc->base = base_remove_variable(sc->base, (Variable) ik);
-    sc->dimension--;
-    // FI: I do not remember nor find how to get rid of local values...
-    //sc_rm(sc);
-    //sc = sc_t_prime_star;
+    if(SC_EMPTY_P(sc)) {
+      sc = sc_empty(BASE_NULLE);
+    }
+    else {
+      sc->base = base_remove_variable(sc->base, (Variable) ik);
+      sc->dimension--;
+      // FI: I do not remember nor find how to get rid of local values...
+      //sc_rm(sc);
+      //sc = sc_t_prime_star;
+    }
 
     ifdebug(8) {
       pips_debug(8, "All invariants on derivatives=\n");

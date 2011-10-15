@@ -297,7 +297,17 @@ void simd_do_atomize(expression ce, statement cs)
 }
 static bool reference_filter(expression exp, __attribute__((unused)) statement cs)
 {
-    if( expression_reference_p(exp) ) return get_bool_property("SIMD_ATOMIZER_ATOMIZE_REFERENCE");
+    if( expression_reference_p(exp) ) {
+        if( get_bool_property("SIMD_ATOMIZER_ATOMIZE_REFERENCE") ) return true;
+        else {
+            reference r = expression_reference(exp);
+            FOREACH(EXPRESSION, ind, reference_indices(r)) {
+                NORMALIZE_EXPRESSION(ind);
+                if(expression_linear_p(ind))
+                    gen_recurse_stop(ind);
+            }
+        }
+    }
     if(expression_call_p(exp))
     {
         call c = expression_call(exp);
@@ -326,6 +336,9 @@ static void atomize_call_statement(statement cs)
 			FOREACH(EXPRESSION, arg,call_arguments(expression_call(rhs)))
 				gen_context_recurse(arg,cs,expression_domain,reference_filter,simd_do_atomize);
 		}
+        else if (expression_reference_p(rhs)) {
+				gen_context_recurse(rhs,cs,expression_domain,reference_filter,simd_do_atomize);
+        }
         if(get_bool_property("SIMD_ATOMIZER_ATOMIZE_LHS"))
         {
             expression lhs = EXPRESSION(CAR(call_arguments(c)));

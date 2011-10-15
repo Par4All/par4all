@@ -336,7 +336,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 
    A more generic implementation would have been in ri-util instead.
 
-   There are asumptions that 2 comments have been pushed in the parser
+   There are assumptions that 2 comments have been pushed in the parser
    before.
 
    @param[in] e1 is the init part of the for
@@ -348,6 +348,9 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
    @param[in] body is the loop body statement
 
    @return a statement with the for
+
+   Beware that a block is returned instead of a forloop when a break
+   has been processed. The forloop is somewhere in there...
 */
 statement MakeForloop(expression e1,
 		      expression e2,
@@ -454,6 +457,23 @@ statement MakeForloop(expression e1,
   return smt;
 }
 
+/* Because a break in the forloop requires the generation of an extra
+   label statement after the forloop. See MakeForLoop(). */
+static forloop find_forloop_in_statement(statement s)
+{
+  forloop fl = forloop_undefined;
+  if(statement_forloop_p(s))
+    fl = statement_forloop(s);
+  else if(statement_block_p(s)) {
+    list sl = statement_block(s);
+    statement fs = STATEMENT(CAR(CDR(sl)));
+    if(statement_forloop_p(fs))
+      fl = statement_forloop(fs);
+  }
+  if(forloop_undefined_p(fl))
+    pips_internal_error("Unexpected forloop encoding\n");
+  return fl;
+}
 
 /* Create a C99 for-loop statement with a declaration as first parameter
    in the for clause, with some parser-specific characteristics.
@@ -540,7 +560,7 @@ statement MakeForloopWithIndexDeclaration(list decls,
       // Make from it an expression that can appear inside the for clause:
       expression e = call_to_expression(c);
       // Get the for-loop:
-      forloop f = statement_forloop(for_s);
+      forloop f = find_forloop_in_statement(for_s);
       // Remove the default-generated initialization expression:
       free_expression(forloop_initialization(f));
       // Put the new one instead:

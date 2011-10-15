@@ -1,0 +1,32 @@
+setenv WS c99_for_loop08
+delete $WS
+setenv PIPS_CPP_FLAGS=" -std=c99 "
+create $WS $WS.c
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+#activate C_PARSER
+
+
+echo
+echo Parsed code for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Code for "main"
+echo
+
+display PRINTED_FILE[main]
+
+close
+
+delete $WS
+
+quit
+

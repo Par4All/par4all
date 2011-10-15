@@ -13,12 +13,12 @@ int main()
    a4si pdata0 = {0, 1, 2, 3};
    int a[4], b[4];
    {
-      //PIPS:SAC generated v4sf vector(s)
-      v4sf vec00, vec10, vec20;
-      SIMD_LOAD_V4SI_TO_V4SF(vec20, &b[0]);
-      SIMD_LOAD_V4SI_TO_V4SF(vec10, &pdata0[0]);
-      SIMD_ADDPS(vec00, vec10, vec20);
-      SIMD_STORE_V4SF_TO_V4SI(vec00, &a[0]);
+      //PIPS:SAC generated v4si vector(s)
+      v4si vec00, vec10, vec20;
+      SIMD_LOAD_V4SI(vec20, &b[0]);
+      SIMD_LOAD_V4SI(vec10, &pdata0[0]);
+      SIMD_ADDD(vec00, vec10, vec20);
+      SIMD_STORE_V4SI(vec00, &a[0]);
    }
 }
 

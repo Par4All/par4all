@@ -1,0 +1,45 @@
+
+Parsed code for "main"
+
+int main()
+{
+   int a[5][6];
+   {
+      int i;
+      for (i = 0;i<5;i++) {
+         int j;
+
+         for (j = 0;j<6;j++) {
+            a[i][j] = i*5+j;
+            if (i+j==4)
+               goto _break_2;
+            printf("%d\n", i);
+         }
+_break_2:         ;
+      }
+   }
+   return 0;
+}
+
+Code for "main"
+
+int main()
+{
+   int a[5][6];
+   {
+      int i;
+      for (i = 0;i<5;i++) {
+         int j;
+         j = 0;
+l99999:         ;
+         if (!(j<6)) goto _break_2;
+         a[i][j] = i*5+j;
+         if (i+j==4) goto _break_2;
+         printf("%d\n", i);
+         j++;
+         goto l99999;
+_break_2:         ;
+      }
+   }
+   return 0;
+}

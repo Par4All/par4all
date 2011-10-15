@@ -784,6 +784,7 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {MEMCMP_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
   {STRCMP_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
   {STRCOLL_FUNCTION_NAME,                  intrinsic_to_identical_post_pv},
+  {STRDUP_FUNCTION_NAME,                   heap_intrinsic_to_post_pv},
   {STRNCMP_FUNCTION_NAME,                  intrinsic_to_identical_post_pv},
   {STRXFRM_FUNCTION_NAME,                  string_function_to_post_pv},
   {MEMCHR_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
@@ -801,6 +802,7 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
 
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME,                     intrinsic_to_identical_post_pv},
+  {LOCALTIME_FUNCTION_NAME,                intrinsic_to_identical_post_pv},
   {DIFFTIME_FUNCTION_NAME,                 intrinsic_to_identical_post_pv},
   {GETTIMEOFDAY_FUNCTION_NAME,             intrinsic_to_identical_post_pv},
   {CLOCK_GETTIME_FUNCTION_NAME,            intrinsic_to_identical_post_pv},
@@ -1707,6 +1709,18 @@ static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
     {
       malloc_arg = EXPRESSION(CAR(CDR(func_args)));
     }
+  else if (same_string_p(func_name, STRDUP_FUNCTION_NAME))
+  {
+      malloc_arg = MakeBinaryCall(
+              entity_intrinsic(PLUS_OPERATOR_NAME),
+              int_to_expression(1),
+              MakeUnaryCall(
+                  entity_intrinsic(STRLEN_FUNCTION_NAME),
+                  copy_expression(EXPRESSION(CAR(func_args)))
+                  )
+              );
+      free_malloc_arg = true;
+  }
 
   if (!expression_undefined_p(malloc_arg))
     {

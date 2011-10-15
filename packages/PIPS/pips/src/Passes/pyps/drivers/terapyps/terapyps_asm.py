@@ -191,6 +191,22 @@ def conv(input,output):
     line=RE.sub(r'\*im([0-9]+) = (MIN|MAX)\(re([0-9]+), \*im([0-9]+)\)',
             handler0,
             line)
+    #*++imX = MIN(reY,*++imZ)
+    def handler0(m):
+        # it's ok to use re(0-5) they are reserved for internal use
+        s=print_im("",im(m,4)+"+1*E")
+        if m.group(2) == "MIN":
+            s+=print_re("As",re(m,3)+"-im*re(0)")
+        else:
+            s+=print_re("As","im*re(0)-"+re(m,3))
+        s+=print_re("re(2)","im*re(0)")
+        s+=print_re("",re(m,3))
+        s+=print_im("",im(m,1)+"+1*E")
+        s+=print_re("im","if(As=1,P,re(2))")
+        return s
+    line=RE.sub(r'\*\+\+im([0-9]+) = (MIN|MAX)\(re([0-9]+), \*\+\+im([0-9]+)\)',
+            handler0,
+            line)
     #P = MIN(P,*imZ)
     def handler1(m):
         # it's ok to use re(0-5) they are reserved for internal use
@@ -217,9 +233,25 @@ def conv(input,output):
             s+=print_re("As","im*re(0)-"+re(m,3))
         s+=print_re(re(m,1),"im*re(0)")
         s+=print_re("",re(m,3))
-        s+=print_re(re(m,1),"if(As=1,P,)"+re(m,1)+")")
+        s+=print_re(re(m,1),"if(As=1,P,"+re(m,1)+")")
         return s
     line=RE.sub(r're([0-9]+) = (MIN|MAX)\(re([0-9]+), \*im([0-9]+)\)',
+            handler1,
+            line)
+
+    #reX = MIN(reY,*++imZ)
+    def handler1(m):
+        # it's ok to use re(0-5) they are reserved for internal use
+        s=print_im("",im(m,4)+"+1*E")
+        if m.group(2) == "MIN":
+            s+=print_re("As",re(m,3)+"-im*re(0)")
+        else:
+            s+=print_re("As","im*re(0)-"+re(m,3))
+        s+=print_re(re(m,1),"im*re(0)")
+        s+=print_re("",re(m,3))
+        s+=print_re(re(m,1),"if(As=1,P,"+re(m,1)+")")
+        return s
+    line=RE.sub(r're([0-9]+) = (MIN|MAX)\(re([0-9]+), \*\+\+im([0-9]+)\)',
             handler1,
             line)
 
@@ -239,6 +271,24 @@ def conv(input,output):
         return s
 
     line=RE.sub(r're([0-9]+) = (MIN|MAX)\(\*im([0-9]+), \*im([0-9]+)\)',
+            handler2,
+            line)
+    #reX=MIN(*++imY,*++imZ)
+    def handler2(m):
+        # it's ok to use re(0-5) they are reserved for internal use
+        s =print_im("",im(m,3)+"+1*E")
+        s+=print_re("re(1)","im*re(0)")
+        s+=print_im("",im(m,4)+"+1*E")
+        if m.group(2) == "MIN":
+            s+=print_re("As","P-im*re(0)")
+        else:
+            s+=print_re("As","im*re(0)-P")
+        s+=print_re("re(2)","im*re(0)")
+        s+=print_re("","re(1)")
+        s+=print_re(re(m,1),"if(As=1,P,re(2))")
+        return s
+
+    line=RE.sub(r're([0-9]+) = (MIN|MAX)\(\*\+\+im([0-9]+), \*\+\+im([0-9]+)\)',
             handler2,
             line)
 

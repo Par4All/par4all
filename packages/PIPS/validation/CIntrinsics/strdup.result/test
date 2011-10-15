@@ -1,0 +1,54 @@
+
+Parsed printed file for "strdup"
+
+int main()
+{
+   char *str1 = "Sample string";
+   char str2[] = "Sample string";
+   char *str3;
+   str3 = strdup(str1);
+   free(str3);
+   str3 = strdup(str2);
+   free(str3);
+   str3 = strdup("popop");
+   free(str3);
+   printf("str1: %s\nstr3: %s\n", str1, str3);
+   return 0;
+}
+
+Proper effetcs for "strdup"
+
+int main()
+{
+//             <    is written>: str1
+   char *str1 = "Sample string";
+//             <may be written>: str2[*]
+   char str2[] = "Sample string";
+   char *str3;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: str3 _MALLOC_EFFECTS:_MALLOC_
+   str3 = strdup(str1);
+//             <    is read   >: str3 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(str3);
+//             <may be read   >: str2[*]
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: str3 _MALLOC_EFFECTS:_MALLOC_
+   str3 = strdup(str2);
+//             <    is read   >: str3 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(str3);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: str3 _MALLOC_EFFECTS:_MALLOC_
+   str3 = strdup("popop");
+//             <    is read   >: str3 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(str3);
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("str1: %s\nstr3: %s\n", str1, str3);
+   return 0;
+}

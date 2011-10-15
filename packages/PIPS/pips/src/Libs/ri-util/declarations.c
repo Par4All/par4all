@@ -1972,6 +1972,10 @@ static list generic_words_qualifier(list obj, bool initial_p, bool late_p)
       if(initial_p)
 	pc = CHAIN_SWORD(pc,"register ");
       break;
+    case is_qualifier_thread:
+      if(initial_p)
+	pc = CHAIN_SWORD(pc,"__thread ");
+      break;
     case is_qualifier_const:
       if(late_p)
 	pc = CHAIN_SWORD(pc,"const ");
@@ -1990,8 +1994,6 @@ static list generic_words_qualifier(list obj, bool initial_p, bool late_p)
       if(initial_p)
       pc = CHAIN_SWORD(pc,"auto ");
       break;
-    default :
-      pips_internal_error("unexpected tag %d", qualifier_tag(q));
     }
   }
 

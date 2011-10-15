@@ -703,13 +703,6 @@ static bool vect_in_p(Pvecteur vin, Pvecteur vref)
     return true;
 }
 
-/* returns if e is normalized and linear.
- */
-bool expression_linear_p(expression e)
-{
-    normalized n = expression_normalized(e);
-    return !normalized_undefined_p(n) && normalized_linear_p(n);
-}
 
 static bool expression_flt(expression e)
 {

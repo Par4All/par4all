@@ -479,7 +479,7 @@ static void ResetDerivedEntityDeclarations()
 %token TK_CHAR TK_INT TK_DOUBLE TK_FLOAT TK_VOID TK_COMPLEX
 %token TK_ENUM TK_STRUCT TK_TYPEDEF TK_UNION
 %token TK_SIGNED TK_UNSIGNED TK_LONG TK_SHORT
-%token TK_VOLATILE TK_EXTERN TK_STATIC TK_CONST TK_RESTRICT TK_AUTO TK_REGISTER
+%token TK_VOLATILE TK_EXTERN TK_STATIC TK_CONST TK_RESTRICT TK_AUTO TK_REGISTER TK_THREAD
 
 %token TK_SIZEOF TK_ALIGNOF
 
@@ -2016,6 +2016,14 @@ my_decl_spec_list:                         /* ISO 6.7 */
 |   TK_STATIC decl_spec_list_opt
                         {
 			  c_parser_context_static(ycontext) = true;
+			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
+			  $$ = $2;
+			}
+|   TK_THREAD decl_spec_list_opt
+                        {
+			  /* Add to type variable qualifiers */
+			  c_parser_context_qualifiers(ycontext) = gen_nconc(c_parser_context_qualifiers(ycontext),
+									   CONS(QUALIFIER,make_qualifier_thread(),NIL));
 			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
