@@ -116,6 +116,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   for (i = 0; i < ni; i++)
     for (j = 0; j < nj; j++) {
       C[i][j] = 0;
@@ -128,6 +131,9 @@ int main(int argc, char** argv) {
       for (k = 0; k < nj; ++k)
         E[i][j] += C[i][k] * D[k][j];
     }
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif

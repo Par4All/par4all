@@ -87,6 +87,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   tot[0] = 0;
   for (k = t - 1; k <= 1 + t; k++)
     tot[k + 2 - t] = tot[k + 1 - t] + Gauss[k - t + 1];
@@ -110,6 +113,9 @@ int main(int argc, char** argv) {
       gauss_image[x][y] = g_acc2[x][y][3] / tot[3];
     }
   }
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif

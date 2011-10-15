@@ -82,6 +82,9 @@ int main(int argc, char** argv) {
 #pragma acc region
 {
 #endif
+#ifdef PGCC
+#pragma scop
+#endif
   /*  C := alpha*A*A' + beta*C */
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
@@ -90,6 +93,9 @@ int main(int argc, char** argv) {
     for (j = 0; j < n; j++)
       for (k = 0; k < m; k++)
         C[i][j] += alpha * A[i][k] * A[j][k];
+#ifdef PGCC
+#pragma endscop
+#endif
 #ifdef PGI_ACC
 }
 #endif
