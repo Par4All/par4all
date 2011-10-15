@@ -418,11 +418,14 @@ bool add_a_file( string file ) {
   language workspace_language(gen_array_t files);
   language l = workspace_language(filename_list);
   activate_language(l);
-  printf("Language %d\n",language_tag(l));
   free_language(l);
   gen_array_free(filename_list);
   bool process_user_file(string file);
-  return process_user_file(file);
+  if(process_user_file(file)==false) {
+    pips_user_error("Error adding new file.");
+    return false;
+  }
+  return true;
 }
 
 

@@ -1019,8 +1019,7 @@ static bool dead_statement_filter(statement s)
       break;
     }
 
-    /* Vire deja (presque) tout statement dont la precondition est
-       fausse : */
+    /* First remove (almost) all statements with an empty precondition */
     /* FI: This (very CPU expensive) test must be useless
      * because the control sequence
      * can only be broken by a test or by a loop or by a test in
@@ -1143,12 +1142,15 @@ static bool dead_statement_filter(statement s)
 	  instruction_tag(i) = is_instruction_expression;
 	  instruction_expression(i) = copy_expression(e1);
 	  free_call(c);
+	  // Not really removed, just simplified...
+	  dead_code_statement_removed++;
 	}
 	else if(false_expression_p(bool_exp)) {
 	  expression e2 = EXPRESSION(CAR(CDR(CDR(args))));
 	  instruction_tag(i) = is_instruction_expression;
 	  instruction_expression(i) = copy_expression(e2);
 	  free_call(c);
+	  dead_code_statement_removed++;
 	}
       }
       /* FI: no need to set retour nor to break*/

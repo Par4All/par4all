@@ -324,7 +324,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
                 enum basic_utype bas_pattern = get_basic_from_opcode(oc, count);
 
                 if(!basic_overloaded_p(bas) && bas_pattern!=basic_tag(bas)
-				&& !(bas_pattern == is_basic_float && basic_int_p(bas))) /* allow the promotion of an int
+				/*&& !(bas_pattern == is_basic_float && basic_int_p(bas))*/) /* allow the promotion of an int
 											    to a float */
 
                 {
@@ -352,7 +352,6 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
                 (opcode_vectorSize(oc) <= argc) &&
                  (opcode_vectorSize(oc)*mwidth*8 == get_int_property("SAC_SIMD_REGISTER_WIDTH"))) {
             best = oc;
-            break;
         }
     }
 
@@ -654,7 +653,7 @@ static bool sac_aligned_expression_p(expression e)
 }
 
 /* This function change the "load/store type" to XX_TO_XX if a conversion
- * is needed. It returns true if a changement is made, and the pointer
+ * is needed. It returns true if a change is made, and the pointer
  * *lsType must be freed after being used. */
 static bool loadstore_type_conversion_string(int argc, list args, string* lsType, bool isLoad)
 {

@@ -75,8 +75,10 @@
 
 /********************************************************* LOCAL FUNCTIONS */
 
+static list time_effects(entity, list );
 static list no_write_effects(entity e,list args);
 static list safe_c_effects(entity e,list args);
+static list safe_c_read_only_effects(entity e,list args);
 static list address_expression_effects(entity e,list args);
 static list conditional_effects(entity e,list args);
 static list address_of_effects(entity e,list args);
@@ -105,6 +107,7 @@ static list search_or_sort_effects(entity e, list args);
 static list generic_string_effects(entity e,list args);
 static list memmove_effects(entity e, list args);
 static list strtoxxx_effects(entity e, list args);
+static list strdup_effects(entity, list);
 
 
 
@@ -959,10 +962,10 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
 
   /* #include <stdlib.h> */
-  {ATOF_FUNCTION_NAME,                     no_write_effects},
-  {ATOI_FUNCTION_NAME,                     no_write_effects},
-  {ATOL_FUNCTION_NAME,                     no_write_effects},
-  {ATOLL_FUNCTION_NAME,                    no_write_effects},
+  {ATOF_FUNCTION_NAME,                     safe_c_read_only_effects},
+  {ATOI_FUNCTION_NAME,                     safe_c_read_only_effects},
+  {ATOL_FUNCTION_NAME,                     safe_c_read_only_effects},
+  {ATOLL_FUNCTION_NAME,                    safe_c_read_only_effects},
   {STRTOD_FUNCTION_NAME,                   strtoxxx_effects},
   {STRTOF_FUNCTION_NAME,                   strtoxxx_effects},
   {STRTOL_FUNCTION_NAME,                   strtoxxx_effects},
@@ -1002,6 +1005,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {MEMCPY_FUNCTION_NAME,                   generic_string_effects},
   {MEMMOVE_FUNCTION_NAME,                  generic_string_effects},
   {STRCPY_FUNCTION_NAME,                   generic_string_effects},
+  {STRDUP_FUNCTION_NAME,                   strdup_effects}, /* according to man page,  _BSD_SOURCE || _POSIX_C_SOURCE >= 200809L */
   {STRNCPY_FUNCTION_NAME,                  generic_string_effects},
   {STRCAT_FUNCTION_NAME,                   generic_string_effects},
   {STRNCAT_FUNCTION_NAME,                  generic_string_effects},
@@ -1021,14 +1025,15 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {MEMSET_FUNCTION_NAME,                   generic_string_effects},
   {STRERROR_FUNCTION_NAME,                 no_write_effects},
   {STRERROR_R_FUNCTION_NAME,               no_write_effects},
-  {STRLEN_FUNCTION_NAME,                   no_write_effects},
+  {STRLEN_FUNCTION_NAME,                   safe_c_read_only_effects},
 
   /*#include <time.h>*/
-  {TIME_FUNCTION_NAME,                     no_write_effects},
+  {TIME_FUNCTION_NAME,                     time_effects},
+  {LOCALTIME_FUNCTION_NAME,                time_effects},
   {DIFFTIME_FUNCTION_NAME,                 no_write_effects},
-  {GETTIMEOFDAY_FUNCTION_NAME,             no_write_effects},
-  {CLOCK_GETTIME_FUNCTION_NAME,            no_write_effects},
-  {CLOCK_FUNCTION_NAME,                    no_write_effects},
+  {GETTIMEOFDAY_FUNCTION_NAME,             time_effects},
+  {CLOCK_GETTIME_FUNCTION_NAME,            time_effects},
+  {CLOCK_FUNCTION_NAME,                    time_effects},
 
   /*#include <wchar.h>*/
   {FWSCANF_FUNCTION_NAME,                  c_io_effects},
@@ -1130,7 +1135,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
 
   //Posix
-  {POSIX_MEMALIGN_FUNCTION_NAME,           no_write_effects},
+  {POSIX_MEMALIGN_FUNCTION_NAME,           any_heap_effects},
+  {MEMALIGN_FUNCTION_NAME,                 any_heap_effects},
   {ATOQ_FUNCTION_NAME,                     no_write_effects},
   {LLTOSTR_FUNCTION_NAME,                  safe_c_effects},
   {ULLTOSTR_FUNCTION_NAME,                 no_write_effects},
@@ -1377,8 +1383,24 @@ safe_c_effects(entity e __attribute__ ((__unused__)),list args)
   pips_debug(5, "end\n");
   lr = gen_nconc(lr, lw);
   return(lr);
-
 }
+
+static list
+safe_c_read_only_effects(entity e __attribute__ ((__unused__)),list args)
+{
+  list lw = NIL, lr = NIL;
+
+  pips_debug(5, "begin\n");
+  lr = generic_proper_effects_of_expressions(args);
+  FOREACH(EXPRESSION, arg, args)
+    {
+      lw = gen_nconc(lw, c_actual_argument_to_may_summary_effects(arg, 'r'));
+    }
+  pips_debug(5, "end\n");
+  lr = gen_nconc(lr, lw);
+  return(lr);
+}
+
 
 static list
 address_expression_effects(entity op, list args)
@@ -1935,6 +1957,12 @@ static list c_io_effects(entity e, list args)
 }
 
 
+static list strdup_effects(entity e, list args) {
+    list le = safe_c_read_only_effects(e, args);
+    le = gen_nconc(any_heap_effects(e,args), le);
+    return le;
+}
+
 /*Molka Becher: generic_string_effects to encompass the C string.h intrinsics*/
 /*
   @brief handles several C intrinsics from string.h.
@@ -1943,6 +1971,7 @@ static list
 generic_string_effects(entity e, list args)
 {
   list le = NIL;
+  const char * lname = entity_local_name(e);
 
   pips_debug(5, "begin\n");
 
@@ -1950,7 +1979,7 @@ generic_string_effects(entity e, list args)
   le = generic_proper_effects_of_expressions(args);
 
   // then effects on special entities for memmove intrinsic
-  if (strcmp(entity_user_name(e),"memmove")==0)
+  if (same_string_p(lname,MEMMOVE_FUNCTION_NAME))
     {
       le = gen_nconc(le,memmove_effects(e, args));
     }
@@ -2021,7 +2050,7 @@ generic_string_effects(entity e, list args)
 
   // and on the same number of elements of the second one for all handled intrinsics
   // except memset.
-  if (strcmp(entity_user_name(e),"memset")!=0)
+  if (!same_string_p(lname,MEMSET_FUNCTION_NAME))
     {
       /* this is almost the same code as for arg1 just before,
 	 maybe this could be factorized. */
@@ -2744,6 +2773,23 @@ effects_of_implied_do(expression exp, tag act)
     return le;
 }
 
+/* Add a time effect, that is a read and a write on a particular hidden time variable */
+static
+list time_effects(entity e, list args) {
+	list le = NIL;
+    FOREACH(EXPRESSION,arg,args) // true for at least gettimeofday, clock and time
+        le = gen_nconc(le,
+                c_actual_argument_to_may_summary_effects(arg, 'w')); // may be a must ?
+    entity private_time_entity = FindEntity(TIME_EFFECTS_PACKAGE_NAME, TIME_EFFECTS_VARIABLE_NAME);
+
+    pips_assert("time_effects", private_time_entity != entity_undefined);
+
+    reference ref = make_reference(private_time_entity,NIL);
+    le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
+    le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
+    /* SG: should we free ref ? */
+    return le;
+}
 
 /**
    handling of variable argument list macros (va_end, va_start and va_copy)

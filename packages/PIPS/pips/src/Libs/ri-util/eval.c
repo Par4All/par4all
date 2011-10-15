@@ -603,6 +603,13 @@ expression_negative_integer_value_p(expression e) {
   intptr_t v;
   return expression_integer_value(e, &v) && (v < 0);
 }
+/* returns if e is normalized and linear.
+ */
+bool expression_linear_p(expression e)
+{
+    normalized n = expression_normalized(e);
+    return !normalized_undefined_p(n) && normalized_linear_p(n);
+}
 
 /**
  * computes the distance between the lower bound and the upper bound of the range

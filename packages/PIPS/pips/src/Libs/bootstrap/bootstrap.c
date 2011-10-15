@@ -41,7 +41,7 @@
   - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings,
     FI, 25/12/96
   - Fortran specification conformant typing of expressions...
-  
+
   Molka Becher (MB), June 2010
   - Check of C intrinsics already added
   - Add of missing C intrinsics according to ISO/IEC 9899:TC2
@@ -278,6 +278,14 @@ static void CreateRandomSeed()
 {
   entity as =
     CreateAbstractStateVariable(RAND_EFFECTS_PACKAGE_NAME, RAND_GEN_EFFECTS_NAME);
+  //add_thread_safe_variable(as);
+  add_abstract_state_variable(as);
+}
+// added to handle time functions
+static void CreateTimeSeed()
+{
+  entity as =
+    CreateAbstractStateVariable(TIME_EFFECTS_PACKAGE_NAME, TIME_EFFECTS_VARIABLE_NAME);
   //add_thread_safe_variable(as);
   add_abstract_state_variable(as);
 }
@@ -5352,6 +5360,7 @@ CreateIntrinsics()
         {MEMCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
         {MEMMOVE_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
         {STRCPY_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+        {STRDUP_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
         {STRNCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
         {STRCAT_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
         {STRNCAT_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
@@ -5376,6 +5385,7 @@ CreateIntrinsics()
         /*#include <tgmath.h>*/
         /*#include <time.h>*/
         {TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+        {LOCALTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
         {DIFFTIME_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
         {NANOSLEEP_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
         {GETTIMEOFDAY_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0}, // BSD-GNU
@@ -5549,6 +5559,7 @@ bootstrap(string workspace)
      heap abstract state
   */
   CreateRandomSeed();
+  CreateTimeSeed();
   CreateHeapAbstractState();
   /* Create hidden variable to modelize the abstract state of :
      temporary arry for memmove function. Molka Becher

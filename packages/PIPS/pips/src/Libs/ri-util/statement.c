@@ -1131,7 +1131,7 @@ statement_unstructured(statement s)
 forloop
 statement_forloop(statement s)
 {
-  pips_assert("statement_forloop", statement_forloop_p(s));
+  pips_assert("statement s is a forloop", statement_forloop_p(s));
 
   return instruction_forloop(statement_instruction(s));
 }

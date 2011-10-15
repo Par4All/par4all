@@ -531,25 +531,24 @@ string  csplit(
   }
 
   if(error_message==NULL) {
-  /* Do not forget to catch what could remain after the last function up
-     to the end of file: */
-  csplit_append_to_compilation_unit(INT_MAX, ULLONG_MAX);
+    /* Do not forget to catch what could remain after the last function up
+       to the end of file: */
+    csplit_append_to_compilation_unit(INT_MAX, ULLONG_MAX);
 
-  csplit_close_compilation_unit();
-  ResetTypedefStack();
-  safe_fclose(splitc_in, file_name);
-  splitc_in = NULL;
-  splitc_input_file_name = string_undefined;
-  safe_fclose(splitc_in_append, file_name);
-  splitc_in_append = NULL;
-  /*
-    safe_fclose(splitc_in_copy, file_name);
-    splitc_in_copy = NULL;
-  */
-  /* No close, because this file descriptor is managed by the caller. */
-  module_list_file = NULL;
-
-  csplit_reset();
+    csplit_close_compilation_unit();
+    ResetTypedefStack();
+    safe_fclose(splitc_in, file_name);
+    splitc_in = NULL;
+    splitc_input_file_name = string_undefined;
+    safe_fclose(splitc_in_append, file_name);
+    splitc_in_append = NULL;
+    /*
+      safe_fclose(splitc_in_copy, file_name);
+      splitc_in_copy = NULL;
+     */
+    /* No close, because this file descriptor is managed by the caller. */
+    module_list_file = NULL;
+    csplit_reset();
   }
   debug_off();
 
