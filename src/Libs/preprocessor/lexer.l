@@ -616,6 +616,11 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 	return (t);
 }
 "__attribute__"                 {
+
+/* FI: when we change our minds and want to make these tokens, we must
+ * insert them in keyword_typedef_table.
+ */
+
 				pips_debug(5,"TK_ATTRIBUTE %s\n",yytext);
 				return(TK_ATTRIBUTE);
 			}
