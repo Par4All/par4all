@@ -1,0 +1,14 @@
+# Check that declarations in do loops are not distributed
+
+delete for05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+create for05 for05.c
+
+display PARALLELPRINTED_FILE[for05]
+
+close
+quit
+

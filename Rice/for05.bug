@@ -1,0 +1,1 @@
+Not the most convincing case because the declaration of i is useless. The generated code is stupid, but correct.
