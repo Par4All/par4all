@@ -1,3 +1,9 @@
+// Engineered for Ronan Keryell: although the timing functions have an
+// RW effect on the hidden clock, the loop is distributed because the
+// statement a[i]=0; can be executed in a parallel loop and because
+// there are no dependencies between a general computation and a time
+// effect
+
 #include "time.h"
 
 #define N 100
