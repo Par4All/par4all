@@ -2610,6 +2610,21 @@ environment and type declaration effects are introduced.
 MEMORY_EFFECTS_ONLY TRUE
 \end{PipsProp}
 
+Some programs do measure execution times. All code placed between
+measurement points must not be moved out, as can happen when loops are
+distributed or, more generally, instructions are rescheduled. Since
+loops using time effects are not parallel, a clock variable is always
+updated when a time-related function is called. This is sufficient to
+avoid most problems, but not all of them because time effects of all
+other executed statements are kept implicit, i.e. the real time clock
+is not updated: and loops can still be distributed. If time
+measurements are key, this property must be turned on. By default, it
+is turned off.
+
+\begin{PipsProp}{TIME_EFFECTS_USED}
+TIME_EFFECTS_USED FALSE
+\end{PipsProp}
+
 
 \section{Reductions}
 \label{sec:reductions}
