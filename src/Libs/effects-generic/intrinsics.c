@@ -2794,6 +2794,7 @@ list time_effects(entity e, list args) {
     /* SG: should we free ref? */
 
     if(get_bool_property("TIME_EFFECTS_USED")) {
+      /* Barrier effect suggested by Mehdi Amini (Ticket 594) */
       effect re = make_anywhere_effect(make_action_read(make_action_kind_store()));
       effect we = make_anywhere_effect(make_action_write(make_action_kind_store()));
       le = CONS(EFFECT, re, le);
