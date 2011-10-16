@@ -1,0 +1,96 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int i, j, k;
+//		< is static > FALSE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int n = 512;
+//		< is static > FALSE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int m = 512;
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+   /*  C := alpha*A*B + beta*C, A is symetric */
+#pragma scop
+#pragma live-out C
+   for(i = 0; i <= m-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= m-1
+//		<   tests   >
+      for(j = 0; j <= n-1; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= m-1
+//                            0 <= 0`j <= n-1
+//		<   tests   >
+         acc = 0;
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= m-1
+//                            0 <= 0`j <= n-1
+//		<   tests   >
+         for(k = 0; k <= j-1-1; k += 1) {
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= m-1
+//                            0 <= 0`j <= n-1
+//                            0 <= 0`k <= j-1-1
+//		<   tests   >
+            C[k][j] += alpha*A[k][i]*B[i][j];
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= m-1
+//                            0 <= 0`j <= n-1
+//                            0 <= 0`k <= j-1-1
+//		<   tests   >
+            acc += B[k][j]*A[k][i];
+         }
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= m-1
+//                            0 <= 0`j <= n-1
+//		<   tests   >
+         C[i][j] = beta*C[i][j]+alpha*A[i][i]*B[i][j]+alpha*acc;
+      }
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`m, 0`n, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}
