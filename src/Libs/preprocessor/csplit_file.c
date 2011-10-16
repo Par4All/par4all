@@ -46,6 +46,10 @@
 #include "c_syntax.h"
 #include "splitc.h"
 
+/* used to keep track of include level  */
+char * current_include_file_path = NULL;
+char * current_file_path = NULL;
+
 
 /* Kind of useless since a file is used to mimic fsplit */
 static list module_name_list = list_undefined;
@@ -301,6 +305,10 @@ static void csplit_skip(FILE * f, int lines)
   }
 }
 */
+static bool path_header_p(const char * filepath) {
+    return filepath &&
+        filepath[strlen(filepath)-1] != 'c';
+}
 
 /* Create the module directory and file, copy the definition of the module
    and add the module name to the module name list.
@@ -444,7 +452,10 @@ void csplit_copy(const char* module_name,
     fprintf(compilation_unit_file, "extern %s;\n", signature);
 
   /* Step 5: Keep track of the new module */
-  fprintf(module_list_file, "%s %s\n", unambiguous_module_name, unambiguous_module_file_name);
+  /* SG hook: do not keep track of module declared inside a header */
+  if(!path_header_p(current_include_file_path)) {
+      fprintf(module_list_file, "%s %s\n", unambiguous_module_name, unambiguous_module_file_name);
+  }
 
   safe_fclose(mfd, unambiguous_module_file_name);
   free(unambiguous_module_file_name);
@@ -520,6 +531,8 @@ string  csplit(
   module_list_file = out;
   csplit_open_compilation_unit(file_name);
   MakeTypedefStack();
+  current_include_file_path = NULL;
+  current_file_path = NULL;
 
   CATCH(any_exception_error) {
     error_message = "parser error";
@@ -536,6 +549,9 @@ string  csplit(
     csplit_append_to_compilation_unit(INT_MAX, ULLONG_MAX);
 
     csplit_close_compilation_unit();
+    current_include_file_path = NULL;
+    free(current_file_path);
+    current_file_path=NULL;
     ResetTypedefStack();
     safe_fclose(splitc_in, file_name);
     splitc_in = NULL;
