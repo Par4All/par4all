@@ -163,15 +163,15 @@ static_control static_controlize_loop(loop l)
 static_control static_controlize_forloop(forloop fl)
 {
   static_control	sc;
-   
+
   pips_debug(3, "begin FORLOOP\n");
-  
-  
+
+
   sc = static_controlize_statement( forloop_body( fl ) );
   static_control_yes( sc ) = false;
-  
+
   SET_STATEMENT_MAPPING(Gstatic_control_map, forloop_body(fl), sc);
-  
+
   pips_debug(3, "end FORLOOP\n");
   return( sc );
 }
@@ -183,15 +183,15 @@ static_control static_controlize_forloop(forloop fl)
 static_control static_controlize_whileloop(whileloop wl)
 {
   static_control	sc;
-  
+
   pips_debug(3, "begin WHILELOOP\n");
-  
-  
+
+
   sc = static_controlize_statement( whileloop_body( wl ) );
   static_control_yes( sc ) = false;
-  
+
   SET_STATEMENT_MAPPING(Gstatic_control_map, whileloop_body(wl), sc);
-  
+
   pips_debug(3, "end WHILELOOP\n");
   return( sc );
 }
@@ -201,29 +201,26 @@ static_control static_controlize_whileloop(whileloop wl)
 /* static_control static_controlize_statement((statement) s)	AL 05/93
  * Computes s's static_control
  */
-static_control static_controlize_statement(s)
-statement s;
+static_control static_controlize_statement(statement s)
 {
   bool		is_static = true, static_test = false;
   instruction	inst = statement_instruction(s);
   static_control  sc, sc1, sc2;
   expression	exp, exp1, exp2;
-  
+
   pips_debug(3, "begin STATEMENT\n");
   pips_debug(7, "statement_ordering = %zd \n", statement_ordering(s));
-  
+
   switch(instruction_tag(inst))
     {
     case is_instruction_block :
       {
-	MAPL( stmt_ptr,
-	      {
-		statement local_stmt = STATEMENT(CAR( stmt_ptr ));
-		sc1 = static_controlize_statement( local_stmt );
-		SET_STATEMENT_MAPPING( Gstatic_control_map, local_stmt, sc1);
-		is_static = ( is_static && static_control_yes( sc1 ));
-	      },
-	      instruction_block( inst ) );
+	FOREACH(STATEMENT, local_stmt, instruction_block(inst)) {
+	  sc1 = static_controlize_statement( local_stmt );
+	  SET_STATEMENT_MAPPING( Gstatic_control_map, local_stmt, sc1);
+	  //printf("s=%p, sc=%p\n", local_stmt, sc1);
+	  is_static = ( is_static && static_control_yes( sc1 ));
+	}
 	break;
       }
     case is_instruction_test :
@@ -242,7 +239,7 @@ statement s;
 	sc1 = static_controlize_statement(test_true(t));
 	SET_STATEMENT_MAPPING( Gstatic_control_map, test_true( t ), sc1);
 	gen_remove( &Genclosing_tests, (void*) test_condition( t ));
-	
+
 	exp1 = MakeUnaryCall( ENTITY_NOT, copy_expression( test_condition(t) ));
 	if ( (exp2 = sc_conditional(exp1, &Genclosing_loops)) ==
 	     expression_undefined) {
@@ -261,7 +258,7 @@ statement s;
       {
 	loop the_loop = instruction_loop( inst );
 	forward_substitute_in_anyloop( instruction_loop( inst ),
-				    Gforward_substitute_table);
+				       Gforward_substitute_table);
 	sc1 = static_controlize_loop( the_loop );
 	is_static = static_control_yes( sc1 );
 	break;
@@ -270,7 +267,7 @@ statement s;
       {
 	forloop forl = instruction_forloop( inst );
 	forward_substitute_in_anyloop( instruction_forloop( inst ),
-				    Gforward_substitute_table);
+				       Gforward_substitute_table);
 	sc1 = static_controlize_forloop( forl );
 	is_static = static_control_yes( sc1 );
 	break;
@@ -279,29 +276,33 @@ statement s;
       {
 	whileloop whilel = instruction_whileloop( inst );
 	forward_substitute_in_anyloop( instruction_whileloop( inst ),
-				    Gforward_substitute_table);
+				       Gforward_substitute_table);
 	sc1 = static_controlize_whileloop( whilel );
 	is_static = static_control_yes( sc1 );
 	break;
       }
     case is_instruction_call :
-      { 
-	if (!continue_statement_p(s) || declaration_statement_p(s))
+      {
+	if (!(/*continue_statement_p(s) ||*/ declaration_statement_p(s)))
 	  {
 	    call the_call = instruction_call( inst);
 	    forward_substitute_in_call( &the_call, Gforward_substitute_table );
 	    is_static = static_control_yes(static_controlize_call( the_call ));
 	  }
+	else
+	  is_static = false;
 	if (get_bool_property("POCC_COMPATIBILITY"))
 	  {
-	    if (statement_contains_user_call_p(s) || io_intrinsic_p((call_function(instruction_call( inst)))))
+	    if (statement_contains_user_call_p(s)
+		|| io_intrinsic_p((call_function(instruction_call( inst)))))
 	      is_static = false;
 	  }
 	break;
       }
-      
+
     case is_instruction_goto :
       {
+	pips_internal_error("No goto in code ressource\n");
 	is_static = false;
 	break;
       }
@@ -313,30 +314,30 @@ statement s;
     case is_instruction_unstructured :
       {
 	unstructured local_un = instruction_unstructured( inst );
-	is_static = static_control_yes(
-				       static_controlize_unstructured( local_un ));
+	is_static =
+	  static_control_yes(static_controlize_unstructured( local_un ));
 	break;
       }
-    default : 
+    default :
       {
 	pips_error("static_controlize_statement", "Bad instruction tag");
       }
     }
-  if (!continue_statement_p(s) || declaration_statement_p(s))
+  //if (!(continue_statement_p(s) || declaration_statement_p(s)))
     sc = make_static_control(is_static,
 			     sc_list_of_entity_dup(Gstructure_parameters),
 			     sc_list_of_loop_dup(Genclosing_loops),
 			     sc_list_of_exp_dup(Genclosing_tests) );
-    
-    pips_debug(7,
-	       " Returning static_control : \n bool   : %s \n params : %s \n loops  : %zd \n tests  : %zd \n ",
-	       ((is_static)?"TRUE":"FALSE"),
-	       print_structurals( Gstructure_parameters ),
-	       gen_length( Genclosing_loops ),
-	       gen_length( Genclosing_tests ) );
-    pips_debug(3, "end STATEMENT\n");
+
+  pips_debug(7,
+	     " Returning static_control : \n bool   : %s \n params : %s \n loops  : %zd \n tests  : %zd \n ",
+	     ((is_static)?"TRUE":"FALSE"),
+	     print_structurals( Gstructure_parameters ),
+	     gen_length( Genclosing_loops ),
+	     gen_length( Genclosing_tests ) );
+  pips_debug(3, "end STATEMENT\n");
            
-    return sc;
+  return sc;
 
 }
 
@@ -356,13 +357,14 @@ unstructured u;
 	control_map_get_blocs(unstructured_control(u), &blocs ) ;
 	blocs = gen_nreverse( blocs ) ;
 
-	MAPL( ctl_ptr,	{
-		statement stmt = control_statement(CONTROL(CAR( ctl_ptr )));
-		sc	= static_controlize_statement( stmt );
-		SET_STATEMENT_MAPPING( Gstatic_control_map, stmt, sc );
-		is_static = is_static && static_control_yes( sc );
-		},
-	      blocs);
+	FOREACH(CONTROL, ctl, blocs) {
+	  statement stmt = control_statement(ctl);
+	  sc	= static_controlize_statement( stmt );
+	  pips_assert("stmt is consistent", statement_consistent_p(stmt));
+	  SET_STATEMENT_MAPPING( Gstatic_control_map, stmt, sc );
+	  //fprintf(stdout, "stmt=%p, sharing=%p\n", stmt, sc);
+	  is_static = is_static && static_control_yes( sc );
+	}
 
 	gen_free_list(blocs);
 	ret_sc = make_static_control( is_static,
@@ -496,7 +498,7 @@ bool static_controlize(string mod_name)
 
 	ifdebug(2)
 	  user_log("\n\n *** STATIC CONTROLIZE CODE for %s\n", mod_name);
-	
+
 	/*
 	 * Set the current language
 	 */
@@ -538,11 +540,11 @@ bool static_controlize(string mod_name)
 	/* loop_normalize_of_unstructured since we cannot ensure that */
 	/* mod_inst is an unstructured --11th Dec 1995, DB */
 
-	/*** 
+	/***
 	   D.K desactivate  the normalization of loops to guard the
-	   original code 
+	   original code
 	*/
-	
+
 	/*loop_normalize_of_statement(mod_stat,
 				       Gforward_substitute_table,
 				       &Genclosing_loops,
@@ -564,9 +566,12 @@ bool static_controlize(string mod_name)
 
 	/* We compute the static control infos for each instruction. */
 	/* Same remark as before --DB */
-	
+
 	sc = static_controlize_statement(mod_stat);
-	
+	pips_assert("controlized statement mod_stat is consistent",
+		    statement_consistent_p(mod_stat));
+	pips_assert("static_control sc is consistent",
+		    static_control_consistent_p(sc));
 
 	stco_renumber_code( mod_stat, 0 );
 
