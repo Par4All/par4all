@@ -291,7 +291,7 @@ static_control static_controlize_statement(statement s)
 	  }
 	else
 	  is_static = false;
-	if (get_bool_property("POCC_COMPATIBILITY"))
+	if (!get_bool_property("STATIC_CONTROLIZE_ACROSS_USER_CALLS"))
 	  {
 	    if (statement_contains_user_call_p(s)
 		|| io_intrinsic_p((call_function(instruction_call( inst)))))

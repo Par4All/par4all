@@ -14915,15 +14915,15 @@ print_code_smalltalk        > MODULE.smalltalk_code_file
 \end{PipsMake}
 
 
-\section{Prettyprinter for PoCC}
+\section{Prettyprinter for the Polyhderal Compiler Collection (PoCC)}
 \label{subsection-prettyprinter-pocc}
 \index{Prettyprinter PoCC}
 \index{OpenGPU}
 
 \begin{PipsPass}{pocc_prettyprinter}
-This pass is used for printing pragmas scop and endscop which delimit
-the control static parts in the code.
-Instrumented code could be an entry for the PoCC compiler.
+  This pass is used for printing pragmas \verb/scop/ and
+  \verb/endscop/ which delimit the static control parts (SCoP) of the
+  code.  Instrumented code can be an input for any PoCC compiler.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -14940,9 +14940,9 @@ pocc_prettyprinter      >    MODULE.code
 
 
 \begin{PipsPass}{scop_outliner}
-This pass is used for outlining the static control parts computed by
-the previous pass.
-Instrumented code could be an entry for the PoCC compiler.
+  This pass is used for outlining the static control parts (SCoP)
+  computed by the previous pass, pocc prettyprinted.  Instrumented
+  code can be an input for any PoCC compiler.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -14957,24 +14957,43 @@ scop_outliner      >     MODULE.code
 \end{PipsMake}
 
 
-For the outlinig of the control static parts, function prefix names to be used during the generation:
+For the outlinig of the control static parts, function prefix names to
+be used during the generation:
 \begin{PipsProp}{SCOP_PREFIX}
 SCOP_PREFIX "SCoP"
 \end{PipsProp}
-To generalize the outlining for any pragmas: begin \& end we use that properties:
-\begin{PipsProp}{PRAGMA_BEGIN}
-PRAGMA_BEGIN "scop"
+
+To generalize the outlining for other purposes, the two delimiter
+pragma used can be redefined using the next two
+properties:
+\begin{PipsProp}{PRAGMA_BEGIN_OUTLINING}
+PRAGMA_BEGIN_OUTLINIGING "scop"
 \end{PipsProp}
-\begin{PipsProp}{PRAGMA_END}
-PRAGMA_END "endscop"
+\begin{PipsProp}{PRAGMA_END_OUTLINING}
+PRAGMA_END_OUTLINING "endscop"
 \end{PipsProp}
-because of differences in definitions of static control part in pips
-and in pocc (for example, there is no function call in a static
-control code for pocc), we propose to set that property at true to
-generate a static control code that will be accepted by pocc.
-\begin{PipsProp}{POCC_COMPATIBILITY}
-POCC_COMPATIBILITY FALSE
+which maybe redundant with property
+\PipsPropRef{EXTERNALIZED_CODE_PRAGMA_BEGIN} of libraries
+\verb/phrase/ and \verb/safescale/. But both of these libraries are
+currently not maintained and not tested.
+
+Because of user function calls are not allowed in PoCC static control
+parts, whereas they are generally accepted in PIPS (see Arnauld
+Leservot's PhD), we introduce a property to control the impact of user
+calls. This property could be called \verb/POCC_COMPATIBILIRY/ if
+there were a set of limiting rules to apply for PoCC, but user calls
+are the only current issue\footnote{The PLUTO compiler does not
+  support intrinsics calls either, althoug it is part of the PoCC
+  collection.} So the property is called
+\PipsPassRef{STATIC_CONTROLIZE_ACROSS_USER_CALLS} and its default
+value is TRUE.
+\begin{PipsProp}{STATIC_CONTROLIZE_ACROSS_USER_CALLS}
+STATIC_CONTROLIZE_ACROSS_USER_CALLS TRUE
 \end{PipsProp}
+
+%\begin{PipsProp}{POCC_COMPATIBILITY}
+%POCC_COMPATIBILITY FALSE
+%\end{PipsProp}
 
 
 \section{Prettyprinter for CLAIRE}

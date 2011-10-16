@@ -1,3 +1,39 @@
+/*
+
+  $Id: scop_outliner.c$
+
+  Copyright 1989-2011 MINES ParisTech
+
+  This file is part of PIPS.
+
+  PIPS is free software: you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  any later version.
+
+  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.
+
+  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+/* Generate isolated source code the Polyhedral Compiler Collection
+   (Pocc), which includes PLUTO and another tool by Louis-Noel
+   Pouchet, as weel as CLooG, the C code generator of Cedric Bastoul.
+
+   The pieces of code that must be compiled by a tool in PoCC and
+   which are called Static Control Parts (SCop) are marked with two
+   pragmas, one at the begining, one at the end.
+
+   This function uses outlining to replace the SCoPs by calls to new functions
+   containing exactly the SCoPs.
+ */
+
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
@@ -88,26 +124,26 @@ static bool outlining_scop(sequence s)
 	  lists_to_outline  = CONS(STATEMENT, stmt, lists_to_outline );
 	  lists_to_outline = gen_nreverse(lists_to_outline);
 	  /*Outline SCoPs
-	   */ 
+	   */
 	  outliner(build_new_top_level_module_name(get_string_property("SCOP_PREFIX"), false), lists_to_outline);
 	  return true;
 	}
     }
     /*
-     *We handle stmts if we have already pragma scop,  
-     *that test avoids redundancy
+     *We handle stmts if we have already pragma scop, that test avoids
+     *redundancy
      */
     if(begin)
       {
 	if(statement_loop_p(stmt))
-	  { 
+	  {
 	    save_seq=NIL;
 	    instruction  inst = statement_instruction(stmt);
 	    loop l = instruction_loop (inst);
 	    statement body = loop_body(l);
 	    if (statement_sequence_p(body))
 	      save_seq = sequence_statements(statement_sequence(body));
-	    else 
+	    else
 	      save_seq = CONS(statement, body, NIL );
 	  }
 	bool find_p = false;
@@ -116,30 +152,30 @@ static bool outlining_scop(sequence s)
 	    find_p = true;
 	}
 	if( (!find_p ||statement_loop_p(stmt) ))
-	  lists_to_outline  = CONS(STATEMENT, stmt, lists_to_outline );      
+	  lists_to_outline  = CONS(STATEMENT, stmt, lists_to_outline );
       }
   }
   return true;
 }
 bool scop_outliner(char * module_name)
-{ 
+{
   statement	module_stat;
   lists_to_outline = NIL;
   set_current_module_entity(local_name_to_top_level_entity(module_name));
- 
+
   set_current_module_statement((statement)
 			       db_get_memory_resource(DBR_CODE, module_name, true));
   set_prettyprint_language_from_property(is_language_c);
   module_stat = get_current_module_statement();
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true)); 
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true));
 
-  pragma_begin = get_string_property("PRAGMA_BEGIN");
-  pragma_end = get_string_property("PRAGMA_END");
-   
+  pragma_begin = get_string_property("PRAGMA_BEGIN_OUTLINING");
+  pragma_end = get_string_property("PRAGMA_END_OUTLINING");
+
   begin= false;
   gen_recurse(module_stat, sequence_domain/*pragma_domain*/, outlining_scop , gen_null);
   lists_to_outline = gen_nreverse(lists_to_outline);
-     
+
   gen_free_list(lists_to_outline);
   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(module_stat));
 
@@ -148,6 +184,5 @@ bool scop_outliner(char * module_name)
   reset_cumulated_rw_effects();
   reset_current_module_entity();
   reset_current_module_statement();
-  return true;  
-} 
- 
+  return true;
+}
