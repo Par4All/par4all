@@ -1,3 +1,7 @@
+// Make sure that forloops that cannot be converted into a do loop are
+// not static control. Here both i and j are kinds of loop indices of
+// the external loop.
+
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/time.h>
