@@ -850,7 +850,7 @@ static transformer transformer_add_condition_information_updown(
 	cb = copy_basic(variable_basic(type_variable(ert)));
       }
 
-      if(ENTITY_LOGICAL_OPERATOR_P(f) || basic_logical_p(cb)) {
+      if(ENTITY_LOGICAL_OPERATOR_P(f) || ENTITY_TRUE_P(f) || ENTITY_FALSE_P(f) ) {
 	list args = call_arguments(syntax_call(s));
 
 	newpre = transformer_add_call_condition_information_updown
