@@ -11,8 +11,10 @@ echo
 display PARSED_PRINTED_FILE[main]
 
 echo
-echo Cumulated effetcs for "main"
+echo Cumulated effects for "main"
 echo
+
+setproperty TIME_EFFECTS_USED TRUE
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
