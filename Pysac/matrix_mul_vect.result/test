@@ -31,19 +31,19 @@ void matrix_mul_vect_l99999(size_t N, size_t i, float A[N][N], float B[N], float
    float RED0[4], RED1[1];
    //PIPS generated variable
    size_t j;
-   RED0[0] = 0.000000;
-   RED0[1] = 0.000000;
-   RED0[2] = 0.000000;
-   RED0[3] = 0.000000;
+   RED0[0] = 0.;
+   RED0[1] = 0.;
+   RED0[2] = 0.;
+   RED0[3] = 0.;
 l99999:
-   for(j = 0; j <= 0+4*((1+N-1-0)/4)-1; j += 4) {
+   for(j = 0; j <= 4*(N/4)-1; j += 4) {
       RED0[0] = RED0[0]+A[i][j]*B[j];
       RED0[1] = RED0[1]+A[i][1+j]*B[1+j];
       RED0[2] = RED0[2]+A[i][2+j]*B[2+j];
       RED0[3] = RED0[3]+A[i][3+j]*B[3+j];
    }
-   C[i] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+C[i];
-   for(j = 0+4*((1+N-1-0)/4); j <= N-1; j += 1)
+   C[i] = RED0[3]+(RED0[2]+(RED0[1]+(RED0[0]+C[i])));
+   for(j = 4*(N/4); j <= N-1; j += 1)
       C[i] = C[i]+A[i][j]*B[j];
 }
 void matrix_mul_vect_l99999(size_t N, size_t i, float A[N][N], float B[N], float C[N])
@@ -54,12 +54,12 @@ void matrix_mul_vect_l99999(size_t N, size_t i, float A[N][N], float B[N], float
    size_t j;
    //PIPS generated variable
    float F_0, F_1, F_2;
-   RED0[0] = 0.000000;
-   RED0[1] = 0.000000;
-   RED0[2] = 0.000000;
-   RED0[3] = 0.000000;
+   RED0[0] = 0.;
+   RED0[1] = 0.;
+   RED0[2] = 0.;
+   RED0[3] = 0.;
 l99999:
-   for(j = 0; j <= 0+4*((1+N-1-0)/4)-1; j += 4) {
+   for(j = 0; j <= 4*(N/4)-1; j += 4) {
       RED0[0] = __PIPS_SAC_MULADD(RED0[0], A[i][j], B[j]);
       RED0[1] = __PIPS_SAC_MULADD(RED0[1], A[i][1+j], B[1+j]);
       RED0[2] = __PIPS_SAC_MULADD(RED0[2], A[i][2+j], B[2+j]);
@@ -69,7 +69,7 @@ l99999:
    F_1 = RED0[1]+F_0;
    F_2 = RED0[2]+F_1;
    C[i] = RED0[3]+F_2;
-   for(j = 0+4*((1+N-1-0)/4); j <= N-1; j += 1)
+   for(j = 4*(N/4); j <= N-1; j += 1)
       C[i] = __PIPS_SAC_MULADD(C[i], A[i][j], B[j]);
 }
 void matrix_mul_vect_l99999(size_t N, size_t i, float A[N][N], float B[N], float C[N])
@@ -80,12 +80,12 @@ void matrix_mul_vect_l99999(size_t N, size_t i, float A[N][N], float B[N], float
    float F_20, F_10, F_00;
    //PIPS generated variable
    size_t j0, j1;
-   RED0[0] = 0.000000;
-   RED0[1] = 0.000000;
-   RED0[2] = 0.000000;
-   RED0[3] = 0.000000;
+   RED0[0] = 0.;
+   RED0[1] = 0.;
+   RED0[2] = 0.;
+   RED0[3] = 0.;
 l99999:
-   for(j0 = 0; j0 <= 0+4*((1+N-1-0)/4)-1; j0 += 4) {
+   for(j0 = 0; j0 <= 4*(N/4)-1; j0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec20;
       SIMD_LOAD_V4SF(vec20, &B[j0]);
@@ -98,7 +98,7 @@ l99999:
    F_10 = RED0[1]+F_00;
    F_20 = RED0[2]+F_10;
    C[i] = RED0[3]+F_20;
-   for(j1 = 0+4*((1+N-1-0)/4); j1 <= N-1; j1 += 1)
+   for(j1 = 4*(N/4); j1 <= N-1; j1 += 1)
       C[i] = __PIPS_SAC_MULADD(C[i], A[i][j1], B[j1]);
 }
 void matrix_mul_vect_l99999(size_t N, size_t i, float A[N][N], float B[N], float C[N])
@@ -111,13 +111,13 @@ void matrix_mul_vect_l99999(size_t N, size_t i, float A[N][N], float B[N], float
    size_t j0, j1;
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0;
-   RED0[0] = 0.000000;
-   RED0[1] = 0.000000;
-   RED0[2] = 0.000000;
-   RED0[3] = 0.000000;
+   RED0[0] = 0.;
+   RED0[1] = 0.;
+   RED0[2] = 0.;
+   RED0[3] = 0.;
    SIMD_LOAD_V4SF(vec00_0, &RED0[0]);
 l99999:
-   for(j0 = 0; j0 <= 0+4*((1+N-1-0)/4)-1; j0 += 4) {
+   for(j0 = 0; j0 <= 4*(N/4)-1; j0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       SIMD_LOAD_V4SF(vec10_0, &A[i][j0]);
       SIMD_LOAD_V4SF(vec20_0, &B[j0]);
@@ -128,7 +128,7 @@ l99999:
    F_10 = RED0[1]+F_00;
    F_20 = RED0[2]+F_10;
    C[i] = RED0[3]+F_20;
-   for(j1 = 0+4*((1+N-1-0)/4); j1 <= N-1; j1 += 1)
+   for(j1 = 4*(N/4); j1 <= N-1; j1 += 1)
       C[i] = __PIPS_SAC_MULADD(C[i], A[i][j1], B[j1]);
 }
 void matrix_mul_vect(size_t N, float C[N], float A[N][N], float B[N])

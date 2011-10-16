@@ -1,0 +1,125 @@
+void stencil01(int n, float a[n], float b[1+n])
+{
+   int i;
+   for(i = 0; i <= n-1; i += 1)
+      a[i] = (b[i]+b[i+1])*.5;
+}
+void stencil01(int n, float a[n], float b[1+n])
+{
+   int i;
+   for(i = 0; i <= n-1; i += 1)
+      a[i] = (b[i]+b[i+1])*.5;
+}
+void stencil01(int n, float a[n], float b[1+n])
+{
+   int i;
+l99999:   stencil01_l99999(n, a, b);
+}
+void stencil01_l99999(int n, float a[n], float b[1+n])
+{
+   //PIPS generated variable
+   int i;
+l99999:
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
+      a[i] = (b[i]+b[1+i])*.5;
+      a[1+i] = (b[1+i]+b[2+i])*.5;
+      a[2+i] = (b[2+i]+b[3+i])*.5;
+      a[3+i] = (b[3+i]+b[4+i])*.5;
+   }
+   for(i = 4*(n/4); i <= n-1; i += 1)
+      a[i] = (b[i]+b[1+i])*.5;
+}
+void stencil01_l99999(int n, float a[n], float b[1+n])
+{
+   //PIPS generated variable
+   int i;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4;
+l99999:
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
+      F_0 = b[i]+b[1+i];
+      a[i] = F_0*.5;
+      F_1 = b[1+i]+b[2+i];
+      a[1+i] = F_1*.5;
+      F_2 = b[2+i]+b[3+i];
+      a[2+i] = F_2*.5;
+      F_3 = b[3+i]+b[4+i];
+      a[3+i] = F_3*.5;
+   }
+   for(i = 4*(n/4); i <= n-1; i += 1) {
+      F_4 = b[i]+b[1+i];
+      a[i] = F_4*.5;
+   }
+}
+void stencil01_l99999(int n, float a[n], float b[1+n])
+{
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {.5, .5, .5, .5};
+   //PIPS generated variable
+   int i0, i1;
+l99999:
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      v4sf vec00, vec10, vec20, vec30, vec40, vec50;
+      SIMD_LOAD_V4SF(vec20, &b[1+i0]);
+      SIMD_LOAD_V4SF(vec10, &b[i0]);
+      SIMD_ADDPS(vec00, vec10, vec20);
+      SIMD_STORE_V4SF(vec00, &pdata0[0]);
+      SIMD_LOAD_V4SF(vec50, &pdata1[0]);
+      SIMD_MULPS(vec30, vec00, vec50);
+      SIMD_STORE_V4SF(vec30, &a[i0]);
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_4 = b[i1]+b[1+i1];
+      a[i1] = F_4*.5;
+   }
+}
+void stencil01_l99999(int n, float a[n], float b[1+n])
+{
+   //PIPS generated variable
+   float F_4;
+   //SAC generated temporary array
+   a4sf pdata1 = {.5, .5, .5, .5};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0;
+   SIMD_LOAD_V4SF(vec50_0, &pdata1[0]);
+   //PIPS generated variable
+   int i0, i1;
+l99999:
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec10_0, &b[i0]);
+      SIMD_LOAD_V4SF(vec20_0, &b[1+i0]);
+      SIMD_ADDPS(vec00_0, vec10_0, vec20_0);
+      SIMD_MULPS(vec30_0, vec00_0, vec50_0);
+      SIMD_STORE_V4SF(vec30_0, &a[i0]);
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_4 = b[i1]+b[1+i1];
+      a[i1] = F_4*.5;
+   }
+}
+void stencil01(int n, float a[n], float b[1+n])
+{
+   int i;
+l99999:   stencil01_l99999(n, a, b);
+}
+void stencil01(int n, float a[n], float b[1+n])
+{
+   int i;
+l99999:   stencil01_l99999(n, a, b);
+}
+void stencil01(int n, float a[n], float b[1+n])
+{
+l99999:   stencil01_l99999(n, a, b);
+}
+void stencil01(int n, float a[n], float b[1+n])
+{
+l99999:   stencil01_l99999(n, a, b);
+}
+void stencil01(int n, float a[n], float b[1+n])
+{
+l99999:   stencil01_l99999(n, a, b);
+}
