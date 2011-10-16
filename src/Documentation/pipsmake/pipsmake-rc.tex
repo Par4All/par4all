@@ -1121,6 +1121,16 @@ is missing. This decision was made for two reasons:
 
 \end{enumerate}
 
+Sometimes, a function happen to be defined (and not only declared) inside a header file with
+the inline keyword. In that case PIPS can consider it as a regular module
+or just ignore it, as its presence may be system-dependant. Property
+\PipsPropRef{IGNORE_FUNCTION_IN_HEADER} control this behavior and must be
+set \emph{before} workspace creation.
+
+\begin{PipsProp}{IGNORE_FUNCTION_IN_HEADER}
+  IGNORE_FUNCTION_IN_HEADER TRUE
+\end{PipsProp}
+
 \begin{PipsPass}{flag_as_stub}
 Modules can be flagged as ``stubs'', aka functions provided to PIPS but which
 shouldn't be inlined or modified. Property 

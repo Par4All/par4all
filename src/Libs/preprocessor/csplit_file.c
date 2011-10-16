@@ -43,6 +43,7 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "preprocessor.h"
+#include "properties.h"
 #include "c_syntax.h"
 #include "splitc.h"
 
@@ -453,7 +454,7 @@ void csplit_copy(const char* module_name,
 
   /* Step 5: Keep track of the new module */
   /* SG hook: do not keep track of module declared inside a header */
-  if(!path_header_p(current_include_file_path)) {
+  if(!get_bool_property("IGNORE_FUNCTION_IN_HEADER") || !path_header_p(current_include_file_path)) {
       fprintf(module_list_file, "%s %s\n", unambiguous_module_name, unambiguous_module_file_name);
   }
 
