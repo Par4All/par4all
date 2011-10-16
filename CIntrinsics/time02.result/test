@@ -1,0 +1,68 @@
+
+Parsed printed file for "main"
+
+int main()
+{
+   float a[100];
+   double b[100];
+   clockid_t c;
+   time_t t1, t2;
+   int i;
+
+   for (i = 0;i<100;i++) {
+      t1 = time(&t1);
+      a[i] = 0.;
+      t2 = time(&t2);
+      b[i] = difftime(t2, t1);
+   }
+   return 0;
+}
+
+Cumulated effetcs for "main"
+
+//             <may be read   >: __TIME_EFFECTS:KALI
+//             <may be written>: __TIME_EFFECTS:KALI
+int main()
+{
+   float a[100];
+   double b[100];
+   clockid_t c;
+   time_t t1, t2;
+   int i;
+//             <may be read   >: i t1 t2 __TIME_EFFECTS:KALI
+//             <may be written>: a[*] b[*] t1 t2 __TIME_EFFECTS:KALI
+//             <    is written>: i
+
+   for(i = 0; i <= 99; i += 1) {
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: t1 __TIME_EFFECTS:KALI
+      t1 = time(&t1);
+//             <may be written>: a[*]
+//             <    is read   >: i
+      a[i] = 0.;
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: t2 __TIME_EFFECTS:KALI
+      t2 = time(&t2);
+//             <may be written>: b[*]
+//             <    is read   >: i t1 t2
+      b[i] = difftime(t2, t1);
+   }
+   return 0;
+}
+int main()
+{
+   float a[100];
+   double b[100];
+   clockid_t c;
+   time_t t1, t2;
+   int i;
+
+   forall(i = 0; i <= 99; i += 1)
+      a[i] = 0.;
+   for(i = 0; i <= 99; i += 1) {
+      t1 = time(&t1);
+      t2 = time(&t2);
+      b[i] = difftime(t2, t1);
+   }
+   return 0;
+}
