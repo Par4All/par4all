@@ -52,10 +52,11 @@ Properties
 Crough
 Top-level
 Demo
+Static_controlize
 Inlining
 AcceleratorUtils
 PointerValues
-# put intra-directory parallel validations at the end!
+# put large intra-directory parallel validations at the end!
 Gpu
 Hpfc
 HardwareAccelerator
