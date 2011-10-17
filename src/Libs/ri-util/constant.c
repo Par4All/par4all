@@ -329,7 +329,10 @@ entity MakeConstant(string name, tag bt)
                     type_length = DefaultLengthOfBasic(bt);break;
                 case 'F':
                 default:
-                    type_length = 2*DefaultLengthOfBasic(bt);break;
+                    type_length = (c_module_p(get_current_module_entity()) ? // SG I am sure the default is double for C, I don't know for fortran
+                        2 :
+                        1
+                        ) *DefaultLengthOfBasic(bt);break;
             } break;
         default:
             type_length = DefaultLengthOfBasic(bt);
