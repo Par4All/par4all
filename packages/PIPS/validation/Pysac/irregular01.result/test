@@ -1,0 +1,124 @@
+void irregular01(int n, int a[n], int b[n])
+{
+   int i;
+   for(i = 0; i <= n-1; i += 1)
+      a[i] = a[b[i]+1];
+}
+void irregular01(int n, int a[n], int b[n])
+{
+   int i;
+   for(i = 0; i <= n-1; i += 1)
+      a[i] = a[b[i]+1];
+}
+void irregular01(int n, int a[n], int b[n])
+{
+   int i;
+l99999:   irregular01_l99999(n, a, b);
+}
+void irregular01_l99999(int n, int a[n], int b[n])
+{
+   //PIPS generated variable
+   int i;
+l99999:
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
+      a[i] = a[1+b[i]];
+      a[1+i] = a[1+b[1+i]];
+      a[2+i] = a[1+b[2+i]];
+      a[3+i] = a[1+b[3+i]];
+   }
+   for(i = 4*(n/4); i <= n-1; i += 1)
+      a[i] = a[1+b[i]];
+}
+void irregular01_l99999(int n, int a[n], int b[n])
+{
+   //PIPS generated variable
+   int i;
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4;
+l99999:
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
+      I_0 = 1+b[i];
+      a[i] = a[I_0];
+      I_1 = 1+b[1+i];
+      a[1+i] = a[I_1];
+      I_2 = 1+b[2+i];
+      a[2+i] = a[I_2];
+      I_3 = 1+b[3+i];
+      a[3+i] = a[I_3];
+   }
+   for(i = 4*(n/4); i <= n-1; i += 1) {
+      I_4 = 1+b[i];
+      a[i] = a[I_4];
+   }
+}
+void irregular01_l99999(int n, int a[n], int b[n])
+{
+   //SAC generated temporary array
+   a4si pdata0 = {1, 1, 1, 1}, pdata1 = {0, 0, 0, 0};
+   //PIPS generated variable
+   int I_0, I_1, I_2, I_3, I_4, i0, i1;
+l99999:
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
+      //PIPS:SAC generated v4si vector(s)
+      v4si vec00, vec10, vec20;
+      SIMD_LOAD_V4SI(vec20, &b[i0]);
+      SIMD_LOAD_V4SI(vec10, &pdata0[0]);
+      SIMD_ADDD(vec00, vec10, vec20);
+      SIMD_STORE_V4SI(vec00, &pdata1[0]);
+      a[i0] = a[pdata1[0]];
+      a[1+i0] = a[pdata1[1]];
+      a[2+i0] = a[pdata1[2]];
+      a[3+i0] = a[pdata1[3]];
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      I_4 = 1+b[i1];
+      a[i1] = a[I_4];
+   }
+}
+void irregular01_l99999(int n, int a[n], int b[n])
+{
+   //SAC generated temporary array
+   a4si pdata0 = {1, 1, 1, 1}, pdata1 = {0, 0, 0, 0};
+   //PIPS generated variable
+   v4si vec00_0, vec10_0, vec20_0;
+   SIMD_LOAD_V4SI(vec10_0, &pdata0[0]);
+   //PIPS generated variable
+   int I_4, i0, i1;
+l99999:
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
+      //PIPS:SAC generated v4si vector(s)
+      SIMD_LOAD_V4SI(vec20_0, &b[i0]);
+      SIMD_ADDD(vec00_0, vec10_0, vec20_0);
+      SIMD_STORE_V4SI(vec00_0, &pdata1[0]);
+      a[i0] = a[pdata1[0]];
+      a[1+i0] = a[pdata1[1]];
+      a[2+i0] = a[pdata1[2]];
+      a[3+i0] = a[pdata1[3]];
+   }
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      I_4 = 1+b[i1];
+      a[i1] = a[I_4];
+   }
+}
+void irregular01(int n, int a[n], int b[n])
+{
+   int i;
+l99999:   irregular01_l99999(n, a, b);
+}
+void irregular01(int n, int a[n], int b[n])
+{
+   int i;
+l99999:   irregular01_l99999(n, a, b);
+}
+void irregular01(int n, int a[n], int b[n])
+{
+l99999:   irregular01_l99999(n, a, b);
+}
+void irregular01(int n, int a[n], int b[n])
+{
+l99999:   irregular01_l99999(n, a, b);
+}
+void irregular01(int n, int a[n], int b[n])
+{
+l99999:   irregular01_l99999(n, a, b);
+}

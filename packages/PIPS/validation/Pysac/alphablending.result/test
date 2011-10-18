@@ -2,13 +2,13 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
 {
    unsigned int i;
    for(i = 0; i <= n-1; i += 1)
-      result[i] = alpha*src1[i]+(1-alpha)*src2[i];
+      result[i] = alpha*src1[i]+(1.f-alpha)*src2[i];
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
    unsigned int i;
    for(i = 0; i <= n-1; i += 1)
-      result[i] = alpha*src1[i]+(1-alpha)*src2[i];
+      result[i] = alpha*src1[i]+(1.f-alpha)*src2[i];
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)
 {
@@ -20,111 +20,97 @@ void alphablending_l99999(unsigned int n, float alpha, float result[n], float sr
    //PIPS generated variable
    unsigned int i;
 l99999:
-   for(i = 0; i <= 0+4*((1+n-1-0)/4)-1; i += 4) {
-      result[i] = alpha*src1[i]+((-alpha)+1)*src2[i];
-      result[1+i] = alpha*src1[1+i]+((-alpha)+1)*src2[1+i];
-      result[2+i] = alpha*src1[2+i]+((-alpha)+1)*src2[2+i];
-      result[3+i] = alpha*src1[3+i]+((-alpha)+1)*src2[3+i];
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
+      result[i] = alpha*src1[i]+(1.f-alpha)*src2[i];
+      result[1+i] = alpha*src1[1+i]+(1.f-alpha)*src2[1+i];
+      result[2+i] = alpha*src1[2+i]+(1.f-alpha)*src2[2+i];
+      result[3+i] = alpha*src1[3+i]+(1.f-alpha)*src2[3+i];
    }
-   for(i = 0+4*((1+n-1-0)/4); i <= n-1; i += 1)
-      result[i] = alpha*src1[i]+((-alpha)+1)*src2[i];
+   for(i = 4*(n/4); i <= n-1; i += 1)
+      result[i] = alpha*src1[i]+(1.f-alpha)*src2[i];
 }
 void alphablending_l99999(unsigned int n, float alpha, float result[n], float src1[n], float src2[n])
 {
    //PIPS generated variable
    unsigned int i;
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8, F_9, F_10, F_11, F_12, F_13, F_14;
+   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8, F_9;
 l99999:
-   for(i = 0; i <= 0+4*((1+n-1-0)/4)-1; i += 4) {
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
       F_0 = alpha*src1[i];
-      F_1 = -alpha;
-      F_2 = F_1+1;
-      result[i] = __PIPS_SAC_MULADD(F_0, F_2, src2[i]);
-      F_3 = alpha*src1[1+i];
-      F_4 = -alpha;
-      F_5 = F_4+1;
-      result[1+i] = __PIPS_SAC_MULADD(F_3, F_5, src2[1+i]);
-      F_6 = alpha*src1[2+i];
-      F_7 = -alpha;
-      F_8 = F_7+1;
-      result[2+i] = __PIPS_SAC_MULADD(F_6, F_8, src2[2+i]);
-      F_9 = alpha*src1[3+i];
-      F_10 = -alpha;
-      F_11 = F_10+1;
-      result[3+i] = __PIPS_SAC_MULADD(F_9, F_11, src2[3+i]);
+      F_1 = 1.f-alpha;
+      result[i] = __PIPS_SAC_MULADD(F_0, F_1, src2[i]);
+      F_2 = alpha*src1[1+i];
+      F_3 = 1.f-alpha;
+      result[1+i] = __PIPS_SAC_MULADD(F_2, F_3, src2[1+i]);
+      F_4 = alpha*src1[2+i];
+      F_5 = 1.f-alpha;
+      result[2+i] = __PIPS_SAC_MULADD(F_4, F_5, src2[2+i]);
+      F_6 = alpha*src1[3+i];
+      F_7 = 1.f-alpha;
+      result[3+i] = __PIPS_SAC_MULADD(F_6, F_7, src2[3+i]);
    }
-   for(i = 0+4*((1+n-1-0)/4); i <= n-1; i += 1) {
-      F_12 = alpha*src1[i];
-      F_13 = -alpha;
-      F_14 = F_13+1;
-      result[i] = __PIPS_SAC_MULADD(F_12, F_14, src2[i]);
+   for(i = 4*(n/4); i <= n-1; i += 1) {
+      F_8 = alpha*src1[i];
+      F_9 = 1.f-alpha;
+      result[i] = __PIPS_SAC_MULADD(F_8, F_9, src2[i]);
    }
 }
 void alphablending_l99999(unsigned int n, float alpha, float result[n], float src1[n], float src2[n])
 {
    //PIPS generated variable
-   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8, F_9, F_10, F_11, F_12, F_13, F_14;
+   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8, F_9;
    //SAC generated temporary array
-   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0};
-   //SAC generated temporary array
-   a4si pdata2 = {1, 1, 1, 1};
-   //SAC generated temporary array
-   a4sf pdata3 = {0, 0, 0, 0};
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {1.f, 1.f, 1.f, 1.f}, pdata2 = {0, 0, 0, 0};
    //PIPS generated variable
    unsigned int i0, i1;
 l99999:
-   for(i0 = 0; i0 <= 0+4*((1+n-1-0)/4)-1; i0 += 4) {
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
-      v4sf vec00, vec10, vec20, vec30, vec40, vec50, vec60, vec70, vec80, vec90, vec100, vec110;
+      v4sf vec00, vec10, vec20, vec30, vec40, vec50, vec60, vec70, vec80, vec90;
       SIMD_LOAD_V4SF(vec20, &src1[i0]);
       SIMD_LOAD_BROADCAST_V4SF(vec10, alpha);
       SIMD_MULPS(vec00, vec10, vec20);
       SIMD_STORE_V4SF(vec00, &pdata0[0]);
-      SIMD_UMINPS(vec30, vec10);
-      SIMD_STORE_V4SF(vec30, &pdata1[0]);
-      SIMD_LOAD_V4SI_TO_V4SF(vec70, &pdata2[0]);
-      SIMD_ADDPS(vec50, vec30, vec70);
-      SIMD_STORE_V4SF(vec50, &pdata3[0]);
-      SIMD_LOAD_V4SF(vec110, &src2[i0]);
-      SIMD_MULADDPS(vec80, vec00, vec50, vec110);
-      SIMD_STORE_V4SF(vec80, &result[i0]);
+      SIMD_LOAD_V4SF(vec40, &pdata1[0]);
+      SIMD_SUBPS(vec30, vec40, vec10);
+      SIMD_STORE_V4SF(vec30, &pdata2[0]);
+      SIMD_LOAD_V4SF(vec90, &src2[i0]);
+      SIMD_MULADDPS(vec60, vec00, vec30, vec90);
+      SIMD_STORE_V4SF(vec60, &result[i0]);
    }
-   for(i1 = 0+4*((1+n-1-0)/4); i1 <= n-1; i1 += 1) {
-      F_12 = alpha*src1[i1];
-      F_13 = -alpha;
-      F_14 = F_13+1;
-      result[i1] = __PIPS_SAC_MULADD(F_12, F_14, src2[i1]);
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_8 = alpha*src1[i1];
+      F_9 = 1.f-alpha;
+      result[i1] = __PIPS_SAC_MULADD(F_8, F_9, src2[i1]);
    }
 }
 void alphablending_l99999(unsigned int n, float alpha, float result[n], float src1[n], float src2[n])
 {
    //PIPS generated variable
-   float F_12, F_13, F_14;
-   //PIPS generated variable
-   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0, vec70_0, vec80_0, vec110_0;
-   SIMD_LOAD_BROADCAST_V4SF(vec10_0, alpha);
+   float F_8, F_9;
    //SAC generated temporary array
-   a4si pdata2 = {1, 1, 1, 1};
-   SIMD_LOAD_V4SI_TO_V4SF(vec70_0, &pdata2[0]);
+   a4sf pdata1 = {1.f, 1.f, 1.f, 1.f};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec60_0, vec90_0;
+   SIMD_LOAD_BROADCAST_V4SF(vec10_0, alpha);
+   SIMD_LOAD_V4SF(vec40_0, &pdata1[0]);
    //PIPS generated variable
    unsigned int i0, i1;
 l99999:
-   for(i0 = 0; i0 <= 0+4*((1+n-1-0)/4)-1; i0 += 4) {
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
-      SIMD_LOAD_V4SF(vec110_0, &src2[i0]);
+      SIMD_LOAD_V4SF(vec90_0, &src2[i0]);
       SIMD_LOAD_V4SF(vec20_0, &src1[i0]);
       SIMD_MULPS(vec00_0, vec10_0, vec20_0);
-      SIMD_UMINPS(vec30_0, vec10_0);
-      SIMD_ADDPS(vec50_0, vec30_0, vec70_0);
-      SIMD_MULADDPS(vec80_0, vec00_0, vec50_0, vec110_0);
-      SIMD_STORE_V4SF(vec80_0, &result[i0]);
+      SIMD_SUBPS(vec30_0, vec40_0, vec10_0);
+      SIMD_MULADDPS(vec60_0, vec00_0, vec30_0, vec90_0);
+      SIMD_STORE_V4SF(vec60_0, &result[i0]);
    }
-   for(i1 = 0+4*((1+n-1-0)/4); i1 <= n-1; i1 += 1) {
-      F_12 = alpha*src1[i1];
-      F_13 = -alpha;
-      F_14 = F_13+1;
-      result[i1] = __PIPS_SAC_MULADD(F_12, F_14, src2[i1]);
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1) {
+      F_8 = alpha*src1[i1];
+      F_9 = 1.f-alpha;
+      result[i1] = __PIPS_SAC_MULADD(F_8, F_9, src2[i1]);
    }
 }
 void alphablending(unsigned int n, float src1[n], float src2[n], float result[n], float alpha)

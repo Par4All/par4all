@@ -1,0 +1,26 @@
+delete unstructured01
+setproperty ABORT_ON_USER_ERROR TRUE
+create unstructured01 unstructured01.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
+
+module foo
+
+activate PRINT_CODE_STATIC_CONTROL
+
+echo
+echo Static areas for "foo"
+echo
+
+display PRINTED_FILE[foo]
+
+echo
+echo Static areas for "bar"
+echo
+
+display PRINTED_FILE[bar]
+
+close
+delete unstructured01
+quit

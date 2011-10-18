@@ -1,0 +1,26 @@
+#
+# Code after quick_scalarization for module foo
+#
+void foo(int tmp, int out[10], int index)
+{
+   out[index] = tmp;
+}
+#
+# Code after quick_scalarization for module main
+#
+int main()
+{
+   int a[10], b[10], i;
+
+   for(i = 0; i <= 9; i += 1) {
+      //PIPS generated variable
+      register int a_0;
+      a_0 = i;
+      foo(a_0, b, i);
+   }
+
+   for(i = 0; i <= 9; i += 1)
+      printf("%d\n", b[i]);
+
+   return 0;
+}

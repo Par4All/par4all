@@ -1,0 +1,34 @@
+
+Static areas for "foo"
+
+int foo()
+{
+//		< is static > TRUE
+//		< parameter > 
+//		<   loops   >
+//		<   tests   >
+
+end:   return 0;
+}
+
+Static areas for "bar"
+
+int bar()
+{
+//		< is static > FALSE
+//		< parameter > 0`l, 
+//		<   loops   >
+//		<   tests   >
+   int l = 0;
+//		< is static > TRUE
+//		< parameter > 0`l, 
+//		<   loops   >
+//		<   tests   >
+
+
+//		< is static > TRUE
+//		< parameter > 0`l, 
+//		<   loops   >
+//		<   tests   >
+end:   return l;
+}

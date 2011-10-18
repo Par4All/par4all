@@ -1,0 +1,157 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   int x, y, k;
+//		< is static > FALSE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   int t = 1920;
+//		< is static > FALSE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   int m = 1920;
+//		< is static > FALSE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   int n = 1080;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+#pragma scop
+#pragma live-out gauss_image
+   tot[0] = 0;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   for(k = t-1; k <= 1+t; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > t-1 <= 0`k <= 1+t
+//		<   tests   >
+      tot[k+2-t] = tot[k+1-t]+Gauss[k-t+1];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   for(k = t-1; k <= 1+t; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > t-1 <= 0`k <= 1+t
+//		<   tests   >
+      tot[k+2-t] = tot[k+1-t]+Gauss[k-t+1];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   for(x = 1; x <= n-2-1; x += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-2-1
+//		<   tests   >
+      for(y = 0; y <= m-1; y += 1) {
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-2-1
+//                            0 <= 0`y <= m-1
+//		<   tests   >
+         g_acc1[x][y][0] = 0;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-2-1
+//                            0 <= 0`y <= m-1
+//		<   tests   >
+         for(k = t-1; k <= 1+t; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-2-1
+//                            0 <= 0`y <= m-1
+//                            t-1 <= 0`k <= 1+t
+//		<   tests   >
+
+            g_acc1[x][y][k+2-t] = g_acc1[x][y][k+1-t]+in_image[x+k-t][y]*Gauss[k-t+1];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-2-1
+//                            0 <= 0`y <= m-1
+//		<   tests   >
+         g_tmp_image[x][y] = g_acc1[x][y][3]/tot[3];
+      }
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   for(x = 1; x <= n-1-1; x += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-1-1
+//		<   tests   >
+      for(y = 1; y <= m-1-1; y += 1) {
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-1-1
+//                            1 <= 0`y <= m-1-1
+//		<   tests   >
+         g_acc2[x][y][0] = 0;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-1-1
+//                            1 <= 0`y <= m-1-1
+//		<   tests   >
+         for(k = t-1; k <= 1+t; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-1-1
+//                            1 <= 0`y <= m-1-1
+//                            t-1 <= 0`k <= 1+t
+//		<   tests   >
+            
+            
+            g_acc2[x][y][k+2-t] = g_acc2[x][y][k+1-t]+g_tmp_image[x][y+k-t]*Gauss[k-t+1];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   > 1 <= 0`x <= n-1-1
+//                            1 <= 0`y <= m-1-1
+//		<   tests   >
+         gauss_image[x][y] = g_acc2[x][y][3]/tot[3];
+      }
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`t, 0`k, 0`y, 0`x, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}

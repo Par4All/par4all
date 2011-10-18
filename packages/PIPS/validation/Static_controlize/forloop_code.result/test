@@ -1,32 +1,32 @@
 int main()
 {
-//		< is static > TRUE
+//		< is static > FALSE
 //		< parameter > 0`N, 0`k, 0`j, 0`i, 
 //		<   loops   >
 //		<   tests   >
    int i, j, k, N;
 //		< is static > TRUE
-//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		< parameter > 0`N, 0`k, 0`j, 0`i, 
 //		<   loops   >
 //		<   tests   >
-   NSP1 = 0;
+   k = 0;
 //		< is static > FALSE
-//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		< parameter > 0`N, 0`k, 0`j, 0`i, 
 //		<   loops   >
 //		<   tests   >
    for (i = 0, j = 0;i<N, j<N;i++, j += i)
 //		< is static > FALSE
-//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		< parameter > 0`N, 0`k, 0`j, 0`i, 
 //		<   loops   >
 //		<   tests   >
-      for (NSP1 = 0;NSP1<N;NSP1++)
+      for (k = 0;k<N;k++)
 //		< is static > FALSE
-//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		< parameter > 0`N, 0`k, 0`j, 0`i, 
 //		<   loops   >
 //		<   tests   >
          A[i][j] = C[i][j];
 //		< is static > TRUE
-//		< parameter > 0`N, 0`k, 0`j, 0`i, NSP1, 
+//		< parameter > 0`N, 0`k, 0`j, 0`i, 
 //		<   loops   >
 //		<   tests   >
    return 0;

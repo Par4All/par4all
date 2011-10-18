@@ -1,0 +1,88 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int i, j, k;
+//		< is static > FALSE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int ni = 512;
+//		< is static > FALSE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int nj = 512;
+//		< is static > FALSE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int nk = 512;
+//		< is static > TRUE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+   /* C := alpha*A*B + beta*C */
+#pragma scop
+#pragma live-out C
+   for(i = 0; i <= ni-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//		<   tests   >
+      for(j = 0; j <= nj-1; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//                            0 <= 0`j <= nj-1
+//		<   tests   >
+         C[i][j] *= beta;
+//		< is static > TRUE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//                            0 <= 0`j <= nj-1
+//		<   tests   >
+         for(k = 0; k <= nk-1; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//                            0 <= 0`j <= nj-1
+//                            0 <= 0`k <= nk-1
+//		<   tests   >
+            C[i][j] += alpha*A[i][k]*B[k][j];
+      }
+//		< is static > TRUE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}

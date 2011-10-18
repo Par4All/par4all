@@ -1,9 +1,13 @@
 setproperty ABORT_ON_USER_ERROR TRUE
 delete choles
+
+# The source code is dead wrong, n unitialized, and it uses a Fortran extensio
+setenv PIPS_CHECK_FORTRAN="N"
+
 create choles choles.f
 
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
+#setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+#setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
 
 activate PRINT_CODE_STATIC_CONTROL
 display PRINTED_FILE

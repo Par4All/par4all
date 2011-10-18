@@ -45,7 +45,7 @@ int factorielle(int n)
         return n;
     }
 }
-float cosf(float x)
+float _cosf(float x)
 {
     float E = 0.001;
     int c=1;

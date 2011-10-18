@@ -1,0 +1,120 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int i, k;
+//		< is static > FALSE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int n = 4000;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+#pragma scop
+#pragma live-out out
+   y[0][0] = r[0];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   beta[0] = 1;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   alpha[0] = r[0];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   for(k = 1; k <= n-1; k += 1) {
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   > 1 <= 0`k <= n-1
+//		<   tests   >
+      beta[k] = beta[k-1]-alpha[k-1]*alpha[k-1]*beta[k-1];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   > 1 <= 0`k <= n-1
+//		<   tests   >
+      sum[0][k] = r[k];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   > 1 <= 0`k <= n-1
+//		<   tests   >
+      for(i = 0; i <= k-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   > 1 <= 0`k <= n-1
+//                            0 <= 0`i <= k-1
+//		<   tests   >
+         sum[i+1][k] = sum[i][k]+r[k-i-1]*y[i][k-1];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   > 1 <= 0`k <= n-1
+//		<   tests   >
+      alpha[k] = -sum[k][k]*beta[k];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   > 1 <= 0`k <= n-1
+//		<   tests   >
+      for(i = 0; i <= k-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   > 1 <= 0`k <= n-1
+//                            0 <= 0`i <= k-1
+//		<   tests   >
+         y[i][k] = y[i][k-1]+alpha[k]*y[k-i-1][k-1];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   > 1 <= 0`k <= n-1
+//		<   tests   >
+      y[k][k] = alpha[k];
+   }
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   for(i = 0; i <= n-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= n-1
+//		<   tests   >
+      out[i] = y[i][4000-1];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`n, 0`k, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}

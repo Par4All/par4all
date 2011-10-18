@@ -9,7 +9,8 @@ float ddot_r(int n, float b[n], float c[n])
 float ddot_r(int n, float b[n], float c[n])
 {
    int i;
-   float a = 0;
+   float a;
+   a = 0;
    for(i = 0; i <= n-1; i += 1)
       a += b[i]*c[i];
    return a;
@@ -17,7 +18,8 @@ float ddot_r(int n, float b[n], float c[n])
 float ddot_r(int n, float b[n], float c[n])
 {
    int i;
-   float a = 0;
+   float a;
+   a = 0;
 l99999:   ddot_r_l99999(n, &a, b, c);
    return a;
 }
@@ -30,19 +32,19 @@ void ddot_r_l99999(int n, float a_0[1], float b[n], float c[n])
    //PIPS generated variable
    float a;
    a = *a_0;
-   RED0[0] = 0.000000;
-   RED0[1] = 0.000000;
-   RED0[2] = 0.000000;
-   RED0[3] = 0.000000;
+   RED0[0] = 0.;
+   RED0[1] = 0.;
+   RED0[2] = 0.;
+   RED0[3] = 0.;
 l99999:
-   for(i = 0; i <= 0+4*((1+n-1-0)/4)-1; i += 4) {
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
       RED0[0] = RED0[0]+b[i]*c[i];
       RED0[1] = RED0[1]+b[1+i]*c[1+i];
       RED0[2] = RED0[2]+b[2+i]*c[2+i];
       RED0[3] = RED0[3]+b[3+i]*c[3+i];
    }
-   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
-   for(i = 0+4*((1+n-1-0)/4); i <= n-1; i += 1)
+   a = RED0[3]+(RED0[2]+(RED0[1]+(RED0[0]+a)));
+   for(i = 4*(n/4); i <= n-1; i += 1)
       a = a+b[i]*c[i];
    *a_0 = a;
 }
@@ -57,12 +59,12 @@ void ddot_r_l99999(int n, float a_0[1], float b[n], float c[n])
    //PIPS generated variable
    float F_0, F_1, F_2;
    a = *a_0;
-   RED0[0] = 0.000000;
-   RED0[1] = 0.000000;
-   RED0[2] = 0.000000;
-   RED0[3] = 0.000000;
+   RED0[0] = 0.;
+   RED0[1] = 0.;
+   RED0[2] = 0.;
+   RED0[3] = 0.;
 l99999:
-   for(i = 0; i <= 0+4*((1+n-1-0)/4)-1; i += 4) {
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
       RED0[0] = __PIPS_SAC_MULADD(RED0[0], b[i], c[i]);
       RED0[1] = __PIPS_SAC_MULADD(RED0[1], b[1+i], c[1+i]);
       RED0[2] = __PIPS_SAC_MULADD(RED0[2], b[2+i], c[2+i]);
@@ -72,7 +74,7 @@ l99999:
    F_1 = RED0[1]+F_0;
    F_2 = RED0[2]+F_1;
    a = RED0[3]+F_2;
-   for(i = 0+4*((1+n-1-0)/4); i <= n-1; i += 1)
+   for(i = 4*(n/4); i <= n-1; i += 1)
       a = __PIPS_SAC_MULADD(a, b[i], c[i]);
    *a_0 = a;
 }
@@ -87,12 +89,12 @@ void ddot_r_l99999(int n, float a_0[1], float b[n], float c[n])
    //PIPS generated variable
    float a0, a1;
    a0 = *a_0;
-   RED0[0] = 0.000000;
-   RED0[1] = 0.000000;
-   RED0[2] = 0.000000;
-   RED0[3] = 0.000000;
+   RED0[0] = 0.;
+   RED0[1] = 0.;
+   RED0[2] = 0.;
+   RED0[3] = 0.;
 l99999:
-   for(i0 = 0; i0 <= 0+4*((1+n-1-0)/4)-1; i0 += 4) {
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10, vec20;
       SIMD_LOAD_V4SF(vec20, &c[i0]);
@@ -105,7 +107,7 @@ l99999:
    F_10 = RED0[1]+F_00;
    F_20 = RED0[2]+F_10;
    a1 = RED0[3]+F_20;
-   for(i1 = 0+4*((1+n-1-0)/4); i1 <= n-1; i1 += 1)
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1)
       a1 = __PIPS_SAC_MULADD(a1, b[i1], c[i1]);
    *a_0 = a1;
 }
@@ -122,13 +124,13 @@ void ddot_r_l99999(int n, float a_0[1], float b[n], float c[n])
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0;
    a0 = *a_0;
-   RED0[0] = 0.000000;
-   RED0[1] = 0.000000;
-   RED0[2] = 0.000000;
-   RED0[3] = 0.000000;
+   RED0[0] = 0.;
+   RED0[1] = 0.;
+   RED0[2] = 0.;
+   RED0[3] = 0.;
    SIMD_LOAD_V4SF(vec00_0, &RED0[0]);
 l99999:
-   for(i0 = 0; i0 <= 0+4*((1+n-1-0)/4)-1; i0 += 4) {
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       SIMD_LOAD_V4SF(vec10_0, &b[i0]);
       SIMD_LOAD_V4SF(vec20_0, &c[i0]);
@@ -139,39 +141,47 @@ l99999:
    F_10 = RED0[1]+F_00;
    F_20 = RED0[2]+F_10;
    a1 = RED0[3]+F_20;
-   for(i1 = 0+4*((1+n-1-0)/4); i1 <= n-1; i1 += 1)
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1)
       a1 = __PIPS_SAC_MULADD(a1, b[i1], c[i1]);
    *a_0 = a1;
 }
 float ddot_r(int n, float b[n], float c[n])
 {
    int i;
-   float a = 0;
+   float a;
+   a = 0;
 l99999:   ddot_r_l99999(n, &a, b, c);
    return a;
 }
 float ddot_r(int n, float b[n], float c[n])
 {
    int i;
-   float a = 0;
+   float a;
+   a = 0;
 l99999:   ddot_r_l99999(n, &a, b, c);
    return a;
 }
 float ddot_r(int n, float b[n], float c[n])
 {
-   float a = 0;
-l99999:   ddot_r_l99999(n, &a, b, c);
-   return a;
+   //PIPS generated variable
+   float a0;
+   a0 = 0;
+l99999:   ddot_r_l99999(n, &a0, b, c);
+   return a0;
 }
 float ddot_r(int n, float b[n], float c[n])
 {
-   float a = 0;
-l99999:   ddot_r_l99999(n, &a, b, c);
-   return a;
+   //PIPS generated variable
+   float a0;
+   a0 = 0;
+l99999:   ddot_r_l99999(n, &a0, b, c);
+   return a0;
 }
 float ddot_r(int n, float b[n], float c[n])
 {
-   float a = 0;
-l99999:   ddot_r_l99999(n, &a, b, c);
-   return a;
+   //PIPS generated variable
+   float a0;
+   a0 = 0;
+l99999:   ddot_r_l99999(n, &a0, b, c);
+   return a0;
 }

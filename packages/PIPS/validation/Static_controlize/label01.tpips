@@ -1,0 +1,18 @@
+delete label01
+setproperty ABORT_ON_USER_ERROR TRUE
+create label01 label01.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
+
+activate PRINT_CODE_STATIC_CONTROL
+
+echo
+echo Static areas for "main"
+echo
+
+display PRINTED_FILE[main]
+
+close
+delete label01
+quit
