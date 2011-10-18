@@ -924,8 +924,8 @@ struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
     - One, is actually commented : the parameters list (...)
       must contain the number of parameters, the sizeof(type)
       and the parameter as a reference &;
-    - Second, the program source is parsed and the argument list is analysed.
-      The result of the aprser is :
+    - Second, the program source is parsed and the argument list is analyzed.
+      The result of the parser is :
       - the number of arguments
       - the sizeof(argument type)
 
@@ -950,7 +950,7 @@ void p4a_load_kernel(const char *kernel,...)
 
   // If not found ...
   if (!k) {
-    P4A_skip_debug(0,P4A_dump_message("The kernel %s is loaded for the first time\n",kernel));
+    P4A_skip_debug(1,P4A_dump_message("The kernel %s is loaded for the first time\n",kernel));
 
 #ifdef __cplusplus
     k = new p4a_cl_kernel(kernel);
@@ -962,19 +962,19 @@ void p4a_load_kernel(const char *kernel,...)
     
     nKernel++; 
     char* kernelFile =  k->file_name;
-    P4A_skip_debug(0,P4A_dump_message("Program and Kernel creation from %s\n",kernelFile));
+    P4A_skip_debug(2,P4A_dump_message("Program and Kernel creation from %s\n",kernelFile));
     size_t kernelLength=0;
     const char *comment = "// This kernel was generated for P4A\n";
   // Same design as the NVIDIA oclLoadProgSource
    char* cSourceCL = p4a_load_prog_source(kernelFile,
 					   comment,
 					   &kernelLength);
-    if (cSourceCL == NULL)
-      P4A_skip_debug(0,P4A_dump_message("source du program null\n"));
-    //else
-    // P4A_skip_debug(P4A_dump_message("%s\n",cSourceCL));
+    if (cSourceCL == NULL) {
+      P4A_dump_message("Error : loading source for kernel %s\n",kernelFile);
+      p4a_clean(EXIT_FAILURE);
+    }
       
-    P4A_skip_debug(0,P4A_dump_message("Kernel length = %lu\n",kernelLength));
+    P4A_skip_debug(4,P4A_dump_message("Kernel length = %lu\n",kernelLength));
     
     /*Create and compile the program : 1 for 1 kernel */
     p4a_program=clCreateProgramWithSource(p4a_context,1,

@@ -709,13 +709,12 @@ parameters types are resolved.
     Thus, the two calls inhibits each other but can't be mixed.
 
 */
-#define P4A_call_accel_kernel(kernel, grid, blocks, parameters)     \
+#define P4A_call_accel_kernel(kernel, grid, blocks, parameters, kernel_name, args)     \
   do {                  \
     P4A_skip_debug(3,P4A_dump_location());        \
-    P4A_skip_debug(1,P4A_dump_message("Invoking kernel %s (%zux%zux%zu , NULL) with args %s\n",  \
-                                      #kernel,        \
-                                      grid[0],grid[1],grid[2],        \
-                                      #parameters));      \
+    P4A_skip_debug(1,P4A_dump_message("Invoking kernel '%s(%s)' : (%zux%zux%zu , NULL)\n",  \
+                                      kernel_name, args,         \
+                                      grid[0],grid[1],grid[2])); \
     P4A_TIMING_accel_timer_start; \
     P4A_call_accel_kernel_context(kernel) \
     P4A_call_accel_kernel_parameters parameters;      \
@@ -823,7 +822,8 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
         (p4a_queue,p4a_kernel,work_dim,NULL,    \
          P4A_grid_descriptor,NULL,  \
-         0,NULL,&p4a_event));       \
+         0,NULL,&p4a_event), \
+         #kernel,#__VA_ARGS__);       \
   } while(0)
 
 
@@ -866,7 +866,8 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
         (p4a_queue,p4a_kernel,work_dim,NULL,    \
          P4A_grid_descriptor,NULL,  \
-         0,NULL,&p4a_event));       \
+         0,NULL,&p4a_event), \
+         #kernel,#__VA_ARGS__);       \
   } while (0)
 
 /** Call a kernel in a 2-dimension parallel loop in CL
@@ -908,7 +909,8 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
         (p4a_queue,p4a_kernel,work_dim,NULL,    \
          P4A_grid_descriptor,NULL,  \
-         0,NULL,&p4a_event));       \
+         0,NULL,&p4a_event), \
+         #kernel,#__VA_ARGS__);       \
   } while (0)
 
 /** 
