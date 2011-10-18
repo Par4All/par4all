@@ -498,9 +498,9 @@ static void scalarize_variable_in_statement(entity pv,
 
   // Copy the a reference to pv, just in case we need it later
   reference pvr = copy_reference(find_reference_to_variable(s, pv));
-  if (reference_undefined_p(pvr))
+
+  if (reference_undefined_p(pvr))  /* may happen with quick_scalarization */
     {
-      free_reference(pvr);
       return;
     }
 
