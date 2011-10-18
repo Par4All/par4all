@@ -27,7 +27,7 @@ You can personalize the name of the version for a run (no space
 allowed) with for instance:
 VERSION="Cuda-optimized-12-august" make run_cuda_opt
 
-The  scriptscripts/generate_speedup.sh can generate a gnuplot script that
+The script scripts/generate_speedup.sh can generate a gnuplot script that
 draws the speedup from the SQLite database. It can be parameterized with
 environment variables, for instance :
 
