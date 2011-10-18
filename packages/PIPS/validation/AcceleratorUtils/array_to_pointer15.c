@@ -2,6 +2,7 @@
 //     and reduction parallelization for a Power architecture
 //     kernel_size must be odd
 #include <stdio.h>
+#include <stdlib.h>
 #define kernel_size 3
 #define nsteps 1
 

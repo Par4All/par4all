@@ -1,0 +1,161 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int i, j, k;
+//		< is static > FALSE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int ni = 512;
+//		< is static > FALSE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int nj = 512;
+//		< is static > FALSE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int nk = 512;
+//		< is static > FALSE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int nl = 512;
+//		< is static > FALSE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int nm = 512;
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+   /* E := A*B */
+#pragma scop
+#pragma live-out G
+   for(i = 0; i <= ni-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//		<   tests   >
+      for(j = 0; j <= nj-1; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//                            0 <= 0`j <= nj-1
+//		<   tests   >
+         E[i][j] = 0;
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//                            0 <= 0`j <= nj-1
+//		<   tests   >
+         for(k = 0; k <= nk-1; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//                            0 <= 0`j <= nj-1
+//                            0 <= 0`k <= nk-1
+//		<   tests   >
+            E[i][j] += A[i][k]*B[k][j];
+      }
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* F := C*D */
+   for(i = 0; i <= nj-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= nj-1
+//		<   tests   >
+      for(j = 0; j <= nl-1; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= nj-1
+//                            0 <= 0`j <= nl-1
+//		<   tests   >
+         F[i][j] = 0;
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= nj-1
+//                            0 <= 0`j <= nl-1
+//		<   tests   >
+         for(k = 0; k <= nm-1; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= nj-1
+//                            0 <= 0`j <= nl-1
+//                            0 <= 0`k <= nm-1
+//		<   tests   >
+            F[i][j] += C[i][k]*D[k][j];
+      }
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   /* G := E*F */
+   for(i = 0; i <= ni-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//		<   tests   >
+      for(j = 0; j <= nl-1; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//                            0 <= 0`j <= nl-1
+//		<   tests   >
+         G[i][j] = 0;
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//                            0 <= 0`j <= nl-1
+//		<   tests   >
+         for(k = 0; k <= nj-1; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   > 0 <= 0`i <= ni-1
+//                            0 <= 0`j <= nl-1
+//                            0 <= 0`k <= nj-1
+//		<   tests   >
+            G[i][j] += E[i][k]*F[k][j];
+      }
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`nm, 0`nl, 0`nk, 0`nj, 0`ni, 0`k, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}

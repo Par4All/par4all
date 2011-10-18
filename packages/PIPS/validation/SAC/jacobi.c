@@ -79,12 +79,12 @@ void compute() {
  kernel1:
   for(i = 1;i < SIZE - 1; i++)
     for(j = 1;j < SIZE - 1; j++) {
-      save[i][j] = 0.25*(space[i - 1][j] + space[i + 1][j]
+      save[i][j] = 0.25f*(space[i - 1][j] + space[i + 1][j]
 			  + space[i][j - 1] + space[i][j + 1]);
     }
   for(i = 1;i < SIZE - 1; i++)
     for(j = 1;j < SIZE - 1; j++) {
-      space[i][j] = 0.25*(save[i - 1][j] + save[i + 1][j]
+      space[i][j] = 0.25f*(save[i - 1][j] + save[i + 1][j]
 			  + save[i][j - 1] + save[i][j + 1]);
     }
 }

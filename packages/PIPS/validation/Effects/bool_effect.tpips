@@ -1,7 +1,10 @@
 delete bool_effect
 create bool_effect bool_effect.c
 
+setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
 apply TRANSFORMERS_INTER_FULL (main)
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE(main)
 
 close bool_effect
 

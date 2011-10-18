@@ -54,7 +54,7 @@ display PRINTED_FILE
 apply SIMD_REMOVE_REDUCTIONS
 display PRINTED_FILE
 
-apply SINGLE_ASSIGNMENT
+apply SCALAR_RENAMING
 
 display PRINTED_FILE
 
@@ -65,7 +65,8 @@ display PRINTED_FILE
 #apply USE_DEF_ELIMINATION
 #display PRINTED_FILE
 
-apply SIMD_LOOP_CONST_ELIM
+apply DELAY_COMMUNICATIONS_INTRA
+
 #setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
 #apply OPTIMIZE_EXPRESSIONS
 #apply PARTIAL_REDUNDANCY_ELIMINATION
@@ -87,9 +88,9 @@ apply UNSPLIT
 shell sed -i -e '1,/faust-flag/ d'  $WS.database/Src/$WS.c
 
 shell cc $WS.c ../SAC/include/SIMD.c -lm -o $WS.database/Tmp/ref
-shell sed -i -e '1 i #include "SIMD.h"' $WS.database/Src/$WS.c
+shell sed -i -e '1 i #include "SIMD.h"' -e '1 i#define MOD(x,y) (x%y)' $WS.database/Src/$WS.c 
 shell cc -I../SAC/include $WS.database/Src/$WS.c ../SAC/include/SIMD.c -lm -o $WS.database/Tmp/seq
-shell sed -i -e '1 d' $WS.database/Src/$WS.c
+shell sed -i -e '1 d' -e '2 d' $WS.database/Src/$WS.c
 shell if test "`./$WS.database/Tmp/ref`" = "`$WS.database/Tmp/seq`" ; then echo seq-ok ; else echo seq-ko ; fi
 
 #shell ./compileC.sh $WS $WS.c $WS.database/Tmp/sse.c

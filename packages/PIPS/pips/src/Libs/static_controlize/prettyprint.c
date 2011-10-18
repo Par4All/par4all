@@ -237,22 +237,21 @@ list obj;
 
 
 	pips_debug(7, "doing \n");
-	MAPL( loop_ptr, {
-		cons*	pc	= NIL;
-		loop	l	= LOOP(CAR(loop_ptr));
-		entity	ind	= loop_index( l );
-		expression low  = range_lower(loop_range( l ));
-		expression up   = range_upper(loop_range( l ));
-		pc = CHAIN_SWORD(pc, strdup( before_string ));
-		pc = gen_nconc(pc, words_expression(low, NIL));
-		pc = CHAIN_SWORD(pc," <= ");
-		pc = CHAIN_SWORD(pc, entity_local_name(ind));
-		pc = CHAIN_SWORD(pc," <= ");
-		pc = gen_nconc(pc, words_expression(up, NIL));
-		pc = CHAIN_SWORD(pc,"\n") ;
-		ret_cons = gen_nconc(ret_cons, gen_copy_seq(pc));
-		before_string = blank_string;
-	}, obj);
+	FOREACH(LOOP, l, obj) {
+	  cons*	pc	= NIL;
+	  entity	ind	= loop_index( l );
+	  expression low  = range_lower(loop_range( l ));
+	  expression up   = range_upper(loop_range( l ));
+	  pc = CHAIN_SWORD(pc, strdup( before_string ));
+	  pc = gen_nconc(pc, words_expression(low, NIL));
+	  pc = CHAIN_SWORD(pc," <= ");
+	  pc = CHAIN_SWORD(pc, entity_local_name(ind));
+	  pc = CHAIN_SWORD(pc," <= ");
+	  pc = gen_nconc(pc, words_expression(up, NIL));
+	  pc = CHAIN_SWORD(pc,"\n") ;
+	  ret_cons = gen_nconc(ret_cons, gen_copy_seq(pc));
+	  before_string = blank_string;
+	}
 
 	if( ret_cons == NIL ) ret_cons = CHAIN_SWORD(ret_cons, "\n");
 	return( ret_cons );

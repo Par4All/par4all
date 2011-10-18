@@ -1,0 +1,199 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int i, j, j1, j2;
+//		< is static > FALSE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int m = 500;
+//		< is static > FALSE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   int n = 500;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+   
+   
+   
+   /* Determine mean of column vectors of input data matrix */
+#pragma scop
+#pragma live-out symmat
+   for(j = 1; j <= m; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//		<   tests   >
+      mean[j] = 0.0;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//		<   tests   >
+      for(i = 1; i <= n; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//                            1 <= 0`i <= n
+//		<   tests   >
+         mean[j] += data[i][j];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//		<   tests   >
+      mean[j] /= float_n;
+   }
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Determine standard deviations of column vectors of data matrix. */
+   for(j = 1; j <= m; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//		<   tests   >
+      stddev[j] = 0.0;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//		<   tests   >
+      for(i = 1; i <= n; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//                            1 <= 0`i <= n
+//		<   tests   >
+         stddev[j] += (data[i][j]-mean[j])*(data[i][j]-mean[j]);
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//		<   tests   >
+      stddev[j] /= float_n;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//		<   tests   >
+      stddev[j] = sqrt(stddev[j]);
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j <= m
+//		<   tests   >
+      /* The following in an inelegant but usual way to handle
+      	 near-zero std. dev. values, which below would cause a zero-
+      	 divide. */
+      stddev[j] = stddev[j]<=eps?1.0:stddev[j];
+   }
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Center and reduce the column vectors. */
+   for(i = 1; i <= n; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`i <= n
+//		<   tests   >
+      for(j = 1; j <= m; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`i <= n
+//                            1 <= 0`j <= m
+//		<   tests   >
+         data[i][j] -= mean[j];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`i <= n
+//                            1 <= 0`j <= m
+//		<   tests   >
+         data[i][j] /= sqrt(float_n)*stddev[j];
+      }
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Calculate the m * m correlation matrix. */
+   for(j1 = 1; j1 <= m-1; j1 += 1) {
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j1 <= m-1
+//		<   tests   >
+      symmat[j1][j1] = 1.0;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j1 <= m-1
+//		<   tests   >
+      for(j2 = j1+1; j2 <= m; j2 += 1) {
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j1 <= m-1
+//                            j1+1 <= 0`j2 <= m
+//		<   tests   >
+         symmat[j1][j2] = 0.0;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j1 <= m-1
+//                            j1+1 <= 0`j2 <= m
+//		<   tests   >
+         for(i = 1; i <= n; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j1 <= m-1
+//                            j1+1 <= 0`j2 <= m
+//                            1 <= 0`i <= n
+//		<   tests   >
+            symmat[j1][j2] += data[i][j1]*data[i][j2];
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   > 1 <= 0`j1 <= m-1
+//                            j1+1 <= 0`j2 <= m
+//		<   tests   >
+         symmat[j2][j1] = symmat[j1][j2];
+      }
+   }
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   symmat[m][m] = 1.0;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`n, 0`m, 0`j2, 0`j1, 0`j, 0`i, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}

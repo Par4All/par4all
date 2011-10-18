@@ -1,0 +1,111 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   >
+//		<   tests   >
+   int r, q, p, s;
+//		< is static > FALSE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   >
+//		<   tests   >
+   int nr = 128;
+//		< is static > FALSE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   >
+//		<   tests   >
+   int nq = 128;
+//		< is static > FALSE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   >
+//		<   tests   >
+   int np = 128;
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+#pragma scop
+#pragma live-out A
+   for(r = 0; r <= nr-1; r += 1)
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   > 0 <= 0`r <= nr-1
+//		<   tests   >
+      for(q = 0; q <= nq-1; q += 1) {
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   > 0 <= 0`r <= nr-1
+//                            0 <= 0`q <= nq-1
+//		<   tests   >
+         for(p = 0; p <= np-1; p += 1) {
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   > 0 <= 0`r <= nr-1
+//                            0 <= 0`q <= nq-1
+//                            0 <= 0`p <= np-1
+//		<   tests   >
+            sum[r][q][p] = 0;
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   > 0 <= 0`r <= nr-1
+//                            0 <= 0`q <= nq-1
+//                            0 <= 0`p <= np-1
+//		<   tests   >
+            for(s = 0; s <= np-1; s += 1)
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   > 0 <= 0`r <= nr-1
+//                            0 <= 0`q <= nq-1
+//                            0 <= 0`p <= np-1
+//                            0 <= 0`s <= np-1
+//		<   tests   >
+               sum[r][q][p] = sum[r][q][p]+A[r][q][s]*C4[s][p];
+         }
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   > 0 <= 0`r <= nr-1
+//                            0 <= 0`q <= nq-1
+//		<   tests   >
+         for(p = 0; p <= np-1; p += 1)
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   > 0 <= 0`r <= nr-1
+//                            0 <= 0`q <= nq-1
+//                            0 <= 0`p <= np-1
+//		<   tests   >
+            A[r][q][p] = sum[r][q][p];
+      }
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`np, 0`nq, 0`nr, 0`s, 0`p, 0`q, 0`r, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}

@@ -1,0 +1,37 @@
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T() {}
+
+   t_elem1 elem1;
+
+//  T() {}
+
+   t_elem2 elem2;
+
+//  T(main) {}
+
+   // this is ok
+   if (elem2.d_is_first)
+
+//  T(main) {main==2}
+
+      return 2;
+
+//  T(main) {}
+
+   // this fails
+   if (elem1.d_is_first)
+
+//  T(main) {main==1}
+
+      return 1;
+
+//  T(main) {main==0}
+
+   return 0;
+}
+

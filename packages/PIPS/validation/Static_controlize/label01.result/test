@@ -1,0 +1,33 @@
+
+Static areas for "main"
+
+int main()
+{
+//		< is static > FALSE
+//		< parameter > 0`1`j, 0`j, 
+//		<   loops   >
+//		<   tests   >
+   int a[10], j;
+//		< is static > TRUE
+//		< parameter > 0`1`j, 0`j, 
+//		<   loops   >
+//		<   tests   >
+k:   ;
+   {
+//		< is static > FALSE
+//		< parameter > 0`1`j, 0`j, 
+//		<   loops   >
+//		<   tests   >
+      int j;
+//		< is static > FALSE
+//		< parameter > 0`1`j, 0`j, 
+//		<   loops   >
+//		<   tests   >
+      for (j = 0;j<1;j++)
+//		< is static > FALSE
+//		< parameter > 0`1`j, 0`j, 
+//		<   loops   >
+//		<   tests   >
+         printf("");
+   }
+}

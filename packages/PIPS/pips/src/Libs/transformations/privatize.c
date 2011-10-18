@@ -634,6 +634,7 @@ static void localize_track_scope_out(statement s, localize_ctx *ctx) {
  * Create an (unique) entity taking into account the current scope
  */
 static entity make_localized_entity(entity e, localize_ctx *ctx) {
+  const char * module_name = get_current_module_name();
   string build_localized_name = strdup("");
   for(int i=1;i<=ctx->depth;i++) {
     string new_name;
@@ -647,14 +648,36 @@ static entity make_localized_entity(entity e, localize_ctx *ctx) {
 
   string unique_name = strdup(localized_name);
   int count = 0;
-  while(!entity_undefined_p(FindEntity(get_current_module_name(),unique_name))) {
+  while(!entity_undefined_p(FindEntity(module_name,unique_name))) {
     free(unique_name);
     asprintf(&unique_name,"%s%d",localized_name, ++count);
     pips_assert("infinite loop ?",count<10000);
   }
   free(localized_name);
 
-  return FindOrCreateEntity(get_current_module_name(),unique_name);
+  entity new_ent =  FindOrCreateEntity(module_name,unique_name);
+  entity_type(new_ent)=copy_type(entity_type(e));
+  entity_initial(new_ent) = make_value_unknown();
+
+  entity f = local_name_to_top_level_entity(module_name);
+  entity a = FindEntity(module_name, DYNAMIC_AREA_LOCAL_NAME);
+
+  type pvt      = ultimate_type(entity_type(new_ent));
+  variable pvtv = type_variable(pvt);
+  basic pvb     = variable_basic(pvtv);
+
+  int offset = 0;
+  if (c_module_p(get_current_module_entity()))
+    offset = (basic_tag(pvb)!=is_basic_overloaded)?
+      (add_C_variable_to_area(a, e)):(0);
+  else
+    offset = (basic_tag(pvb)!=is_basic_overloaded)?
+      (add_variable_to_area(a, e)):(0);
+  
+  entity_storage(new_ent) = make_storage(is_storage_ram,
+					 make_ram(f, a, offset, NIL));
+
+  return new_ent;
 }
 
 
@@ -704,8 +727,6 @@ static void localize_declaration_walker(statement s, localize_ctx *ctx) {
             entity new_entity = make_localized_entity(e,ctx);
             pips_debug(1,"Creating localized entity : %s (from %s)\n",entity_name(new_entity), entity_name(e));
             /* get the new entity and initialize it and register it*/
-            entity_type(new_entity)=copy_type(entity_type(e));
-            entity_initial(new_entity) = make_value_unknown();
             /* add the variable to the loop body if it's not an index */
             AddLocalEntityToDeclarations(new_entity,get_current_module_entity(), loop_body(l));
 

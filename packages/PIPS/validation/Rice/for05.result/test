@@ -1,0 +1,13 @@
+void for05(int n)
+{
+   int j;
+   float x[100];
+
+   forall(j = 1; j <= 99; j += 1) {
+      int i;
+   }
+   for(j = 1; j <= 99; j += 1) {
+      float y = 0;
+      x[j] = x[j-1]+y;
+   }
+}

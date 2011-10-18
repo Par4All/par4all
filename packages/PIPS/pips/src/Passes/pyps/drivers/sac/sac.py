@@ -121,6 +121,7 @@ class sacbase(object):
         # Perform auto-loop tiling
         allm=autotile(module,cond.get("verbose"))
         for module in allm:
+            module.partial_eval()
         
             module.simd_remove_reductions()
             if cond.get("verbose"):

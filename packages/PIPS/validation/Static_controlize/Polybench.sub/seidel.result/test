@@ -1,0 +1,77 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   int t, i, j;
+//		< is static > FALSE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   int tsteps = 20;
+//		< is static > FALSE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   int n = 1000;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+#pragma scop
+#pragma live-out A
+   for(t = 0; t <= tsteps-1; t += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= tsteps-1
+//		<   tests   >
+      for(i = 1; i <= n-2; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= tsteps-1
+//                            1 <= 0`i <= n-2
+//		<   tests   >
+         for(j = 1; j <= n-2; j += 1)
+//		< is static > TRUE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= tsteps-1
+//                            1 <= 0`i <= n-2
+//                            1 <= 0`j <= n-2
+//		<   tests   >
+            
+            
+            A[i][j] = (A[i-1][j-1]+A[i-1][j]+A[i-1][j+1]+A[i][j-1]+A[i][j]+A[i][j+1]+A[i+1][j-1]+A[i+1][j]+A[i+1][j+1])/9.0;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`n, 0`tsteps, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}
