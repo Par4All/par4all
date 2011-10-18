@@ -38,7 +38,7 @@ void p4a_main_init() {
   /* Debug level stuff */
   char *env_p4a_debug= getenv ("P4A_DEBUG");
   if(env_p4a_debug) {
-    printf("%s",env_p4a_debug);
+    P4A_dump_message("P4A_DEBUG environment variable is set : '%s'\n",env_p4a_debug);
     errno = 0;
     int debug_level = strtol(env_p4a_debug, NULL,10);
     if(errno==0) {
@@ -52,7 +52,7 @@ void p4a_main_init() {
   /* Timing stuff */
   char *env_p4a_timing= getenv ("P4A_TIMING");
   if(env_p4a_timing) {
-    printf("%s",env_p4a_timing);
+    P4A_dump_message("P4A_TIMING environment variable is set : '%s'\n",env_p4a_timing);
     errno = 0;
     int timing = strtol(env_p4a_timing, NULL,10);
     if(errno==0) {
@@ -367,47 +367,269 @@ void P4A_copy_to_accel(size_t element_size,
 */
 
 cl_int p4a_global_error=0;
-
-cl_device_id p4a_device_id=0;
+static cl_device_id p4a_device_id=0;
 static cl_program p4a_program=0;
 
 #define P4A_DEBUG_BUFFER_SIZE 10000
 static char p4a_debug_buffer[P4A_DEBUG_BUFFER_SIZE];
 
+/**
+ * Callback for OpenCL runtime, display some error asynchronously
+ */
+void p4a_opencl_notify(const char *errinfo,
+                  const void *private_info,
+                  size_t cb,
+                  void *user_data ) {
+  P4A_dump_message("OpenCL runtime error, %s : '%s'"
+      "(we ignore it at that time and the program is likely to fail...\n",
+      (char *)user_data,(char *)errinfo);
+}
+
+
+
+
+#define p4a_opencl_dump_platform_info(platform, param_name) \
+    p4a_opencl_dump_platform_info_(platform, param_name,#param_name)
+/**
+ * Dump an information about an OpenCL platform
+ */
+void p4a_opencl_dump_platform_info_(cl_platform_id platform,
+                                   cl_platform_info param_name,
+                                   const char header[]) {
+  size_t str_size;
+  // Get the string size for the requested param
+  p4a_global_error=clGetPlatformInfo(platform, param_name, 0, NULL, &str_size);
+  P4A_test_execution_with_message("clGetPlatformInfo");
+  if(str_size<=0) {
+    P4A_dump_message("Error : clGetPlatformInfo returns size <= 0 (%zu)\n",str_size);
+    p4a_clean(EXIT_FAILURE);
+  }
+
+  // Allocate a buffer for the string
+  char buffer[str_size+1];
+
+  // Get the string for this param
+  p4a_global_error=clGetPlatformInfo(platform, param_name, str_size, &buffer, NULL);
+  P4A_test_execution_with_message("clGetPlatformInfo");
+
+  // Dump it !
+  fprintf(stderr,"    - %s: %s\n",header,buffer);
+}
+
+/**
+ * Display and choose an OpenCL platform
+ */
+cl_platform_id p4a_opencl_get_platform() {
+  // Get the number of plaforms available
+  cl_uint num_platforms;
+  p4a_global_error=clGetPlatformIDs(0, NULL, &num_platforms);
+  P4A_test_execution_with_message("clGetPlatformIDs");
+
+  if(num_platforms <= 0) {
+    P4A_dump_message("No OpenCL platforms found :-(\n");
+    p4a_clean(EXIT_FAILURE);
+  }
+
+  cl_platform_id p4a_platform_ids[num_platforms];
+  p4a_global_error=clGetPlatformIDs(num_platforms, p4a_platform_ids, NULL);
+  P4A_test_execution_with_message("clGetPlatformIDs");
+
+  // Display the platforms
+  P4A_skip_debug(1,
+  {
+    P4A_dump_message("Available OpenCL platforms :\n");
+    for(cl_uint num=0; num<num_platforms; ++num) {
+      P4A_dump_message(" ** platform %d **\n",num);
+      p4a_opencl_dump_platform_info(p4a_platform_ids[num],CL_PLATFORM_NAME);
+      p4a_opencl_dump_platform_info(p4a_platform_ids[num],CL_PLATFORM_VENDOR);
+      p4a_opencl_dump_platform_info(p4a_platform_ids[num],CL_PLATFORM_VERSION);
+      p4a_opencl_dump_platform_info(p4a_platform_ids[num],CL_PLATFORM_PROFILE);
+      p4a_opencl_dump_platform_info(p4a_platform_ids[num],CL_PLATFORM_EXTENSIONS);
+    }
+  });
+
+  /* Choose the platform, check if an environment variable is set, else
+   * take the first available platform...
+   */
+  int chosen_platform = 0;
+  char *env_opencl_platform = getenv ("P4A_OPENCL_PLATFORM");
+  if(env_opencl_platform) {
+    P4A_dump_message("P4A_OPENCL_PLATFORM environment variable is set : '%s'\n",env_opencl_platform);
+    errno = 0;
+    int env_platform_id = strtol(env_opencl_platform, NULL,10);
+    if(errno==0) {
+      // Sanity check
+      if(env_platform_id>=0 && env_platform_id<num_platforms) {
+        P4A_dump_message("Choosing OpenCL platform %d\n",env_platform_id);
+        chosen_platform=env_platform_id;
+      } else {
+        P4A_dump_message("Invalid value for P4A_OPENCL_PLATFORM: %s\n",env_opencl_platform);
+        p4a_clean(EXIT_FAILURE);
+      }
+    } else {
+      P4A_dump_message("Invalid value for P4A_OPENCL_PLATFORM: %s\n",env_opencl_platform);
+    }
+  }
+
+  P4A_skip_debug(1,P4A_dump_message("OpenCL platform chosen : %d\n",chosen_platform));
+  return p4a_platform_ids[chosen_platform];
+}
+
+
+#define p4a_opencl_dump_device_info(device, param_name) \
+    p4a_opencl_dump_device_info_(device, param_name,#param_name)
+/**
+ * Dump an information about an OpenCL device
+ */
+void p4a_opencl_dump_device_info_(cl_device_id device,
+                                  cl_device_info param_name,
+                                  const char header[]) {
+  size_t str_size;
+  // Get the string size for the requested param
+  p4a_global_error=clGetDeviceInfo(device, param_name, 0, NULL, &str_size);
+  P4A_test_execution_with_message("clGetDeviceInfo");
+  if(str_size<=0) {
+    P4A_dump_message("Error : clGetDeviceInfo returns size <= 0 (%zu)\n",str_size);
+    p4a_clean(EXIT_FAILURE);
+  }
+
+  // Allocate a buffer for the string
+  char buffer[str_size+1];
+
+  // Get the string for this param
+  p4a_global_error=clGetDeviceInfo(device, param_name, str_size, &buffer, NULL);
+  P4A_test_execution_with_message("clGetDeviceInfo");
+
+  // Dump it !
+  fprintf(stderr,"    - %s: %s\n",header,buffer);
+
+}
+/**
+ * Display and choose a device for a given platform
+ */
+void p4a_opencl_init_devices(cl_platform_id platform_id) {
+  // Get the number of devices
+  cl_uint num_devices;
+  p4a_global_error = clGetDeviceIDs(platform_id,
+                                    CL_DEVICE_TYPE_ALL,
+                                    0,
+                                    NULL,
+                                    &num_devices);
+  P4A_test_execution_with_message("clGetDeviceIDs");
+
+  if(num_devices <= 0) {
+    P4A_dump_message("No devices found associated to this OpenCL platform :-(\n");
+    p4a_clean(EXIT_FAILURE);
+  }
+
+  // Allocate spaces for devices
+  cl_device_id devices[num_devices];
+
+  // Get devices list
+  p4a_global_error=clGetDeviceIDs(platform_id,
+                                  CL_DEVICE_TYPE_ALL,
+                                  num_devices,
+                                  devices,
+                                  NULL);
+  P4A_test_execution_with_message("clGetDeviceIDs");
+
+  /* Create a context for all devices */
+  p4a_context = clCreateContext(0,
+                                num_devices,
+                                devices,
+                                p4a_opencl_notify,
+                                "from 'context'",
+                                &p4a_global_error);
+  P4A_test_execution_with_message("clCreateContext");
+
+  P4A_skip_debug(1,
+  {
+    /* show info for each device in the context */
+    P4A_dump_message("Available OpenCL devices for platform");
+    p4a_opencl_dump_platform_info_(platform_id,CL_PLATFORM_NAME,"");
+    for(int num = 0; num < num_devices; ++num ) {
+      P4A_dump_message(" ** device %d **\n",num);
+      p4a_opencl_dump_device_info(devices[num],CL_DEVICE_NAME);
+
+      // Get the device type
+      cl_device_type type;
+      p4a_global_error=clGetDeviceInfo(devices[num],
+                                       CL_DEVICE_TYPE,
+                                       sizeof(cl_device_type),
+                                       &type,
+                                       NULL);
+      P4A_test_execution_with_message("clGetDeviceInfo");
+      fprintf(stderr,"    - CL_DEVICE_TYPE :");
+      switch(type) {
+        case CL_DEVICE_TYPE_CPU: fprintf(stderr,"CPU"); break;
+        case CL_DEVICE_TYPE_GPU: fprintf(stderr,"GPU"); break;
+        case CL_DEVICE_TYPE_ACCELERATOR: fprintf(stderr,"ACCELERATOR"); break;
+        case CL_DEVICE_TYPE_DEFAULT: fprintf(stderr,"DEFAULT"); break;
+        default: fprintf(stderr,"Unknown type"); p4a_clean(EXIT_FAILURE);
+      }
+      fprintf(stderr,"\n");
+
+      p4a_opencl_dump_device_info(devices[num],CL_DEVICE_EXTENSIONS );
+      p4a_opencl_dump_device_info(devices[num],CL_DEVICE_PROFILE);
+      p4a_opencl_dump_device_info(devices[num],CL_DEVICE_VENDOR);
+      p4a_opencl_dump_device_info(devices[num],CL_DEVICE_VERSION);
+      p4a_opencl_dump_device_info(devices[num],CL_DRIVER_VERSION);
+    }
+  });
+
+  /*
+   * Chose one device accordingly to an environment variable, or take the first
+   * one !
+   */
+  int chosen_device = 0;
+  char *env_opencl_device = getenv ("P4A_OPENCL_DEVICE");
+  if(env_opencl_device) {
+    P4A_dump_message("P4A_OPENCL_DEVICE environment variable is set : '%s'\n",env_opencl_device);
+    errno = 0;
+    int env_device = strtol(env_opencl_device, NULL,10);
+    if(errno==0) {
+      // Sanity check
+      if(env_device>=0 && env_device<num_devices) {
+        P4A_dump_message("Choosing OpenCL device %d\n",env_device);
+        chosen_device = env_device;
+      } else {
+        P4A_dump_message("Invalid value for P4A_OPENCL_DEVICE  : %s\n",env_opencl_device);
+        p4a_clean(EXIT_FAILURE);
+      }
+    } else {
+      P4A_dump_message("Invalid value for P4A_OPENCL_DEVICE: %s\n",env_opencl_device);
+    }
+  }
+
+  P4A_skip_debug(1,P4A_dump_message("OpenCL device chosen : %d\n",chosen_device));
+  /* Record the chosen device globaly */
+  p4a_device_id=devices[chosen_device];
+
+#if defined(P4A_PROFILING) || defined(P4A_TIMING)
+  cl_command_queue_properties p4a_queue_properties = CL_QUEUE_PROFILING_ENABLE;
+#else
+  cl_command_queue_properties p4a_queue_properties = 0;
+#endif
+
+  /* Create an in-order queue for this device */
+  p4a_queue=clCreateCommandQueue(p4a_context,
+                                 p4a_device_id,
+                                 p4a_queue_properties,
+                                 &p4a_global_error);
+  P4A_test_execution_with_message("clCreateCommandQueue");
+
+
+}
+
 void p4a_init_opencl() {
   // Common initialization for par4all Runtime
   p4a_main_init();
-  /* Get an OpenCL platform : a set of devices available
-   * The device_id is the selected device from his type
-   *   CL_DEVICE_TYPE_GPU
-   *   CL_DEVICE_TYPE_CPU
-   */
-  cl_platform_id p4a_platform_id = NULL;
-  p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);
-  P4A_test_execution_with_message("clGetPlatformIDs");
-  /* Get the devices,could be a collection of device */
-  extern cl_device_id p4a_device_id;
-  p4a_device_id = NULL;
-  p4a_global_error=clGetDeviceIDs(p4a_platform_id,
-          CL_DEVICE_TYPE_GPU,
-          1,
-          &p4a_device_id,
-          NULL);
-  P4A_test_execution_with_message("clGetDeviceIDs");
-  /* Create the context */
-  p4a_context=clCreateContext(0,/*const cl_context_properties *properties*/
-            1,/*cl_uint num_devices*/
-            &p4a_device_id,
-            NULL,/*CL_CALLBACK *pfn_notify*/
-            NULL,
-            &p4a_global_error);
-  P4A_test_execution_with_message("clCreateContext");
-  /* ... could query many device, we retain only the first one
-   * Create a file allocated to the first device ...   */
-  p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,
-         p4a_queue_properties,
-         &p4a_global_error);
-  P4A_test_execution_with_message("clCreateCommandQueue");
+
+  /* Get an OpenCL platform */
+  cl_platform_id p4a_platform_id = p4a_opencl_get_platform();
+
+  /* Initialize the devices, could be a collection of device */
+  p4a_opencl_init_devices(p4a_platform_id);
 
 }
 
@@ -446,7 +668,7 @@ char * p4a_error_to_string(int error)
     case CL_BUILD_PROGRAM_FAILURE:
 	#define CL_BUILD_PROGRAM_FAILURE_MSG "Build Program Failure : "
 	strncat(p4a_debug_buffer,CL_BUILD_PROGRAM_FAILURE_MSG,P4A_DEBUG_BUFFER_SIZE);
-	clGetProgramBuildInfo( 	p4a_program,
+	clGetProgramBuildInfo(p4a_program,
   				p4a_device_id,
   				CL_PROGRAM_BUILD_LOG ,
 			  	P4A_DEBUG_BUFFER_SIZE,
@@ -526,6 +748,7 @@ char * p4a_error_to_string(int error)
     default:
       break;
     }
+  return "Unknown";
 } 
 
 /** To quit properly OpenCL.
@@ -545,12 +768,6 @@ void p4a_clean(int exitCode)
 
     @{
  */
-
-#if defined(P4A_PROFILING) || defined(P4A_TIMING)
-cl_command_queue_properties p4a_queue_properties = CL_QUEUE_PROFILING_ENABLE;
-#else
-cl_command_queue_properties p4a_queue_properties = 0;
-#endif
 
 double p4a_time = 0.;
 double p4a_host_time = 0.;
@@ -678,6 +895,7 @@ struct p4a_cl_kernel *new_p4a_kernel(const char *kernel)
   char* kernelFile;
   asprintf(&kernelFile,"./%s.cl",kernel);
   strcpy(p4a_kernels_list[nKernel].file_name,kernelFile);
+  return &p4a_kernels_list[nKernel];
 }
 
 /** Search if the <kernel> is already in the list.
@@ -706,8 +924,8 @@ struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
     - One, is actually commented : the parameters list (...)
       must contain the number of parameters, the sizeof(type)
       and the parameter as a reference &;
-    - Second, the program source is parsed and the argument list is analysed.
-      The result of the aprser is :
+    - Second, the program source is parsed and the argument list is analyzed.
+      The result of the parser is :
       - the number of arguments
       - the sizeof(argument type)
 
@@ -732,7 +950,7 @@ void p4a_load_kernel(const char *kernel,...)
 
   // If not found ...
   if (!k) {
-    P4A_skip_debug(0,P4A_dump_message("The kernel %s is loaded for the first time\n",kernel));
+    P4A_skip_debug(1,P4A_dump_message("The kernel %s is loaded for the first time\n",kernel));
 
 #ifdef __cplusplus
     k = new p4a_cl_kernel(kernel);
@@ -744,19 +962,19 @@ void p4a_load_kernel(const char *kernel,...)
     
     nKernel++; 
     char* kernelFile =  k->file_name;
-    P4A_skip_debug(0,P4A_dump_message("Program and Kernel creation from %s\n",kernelFile));
+    P4A_skip_debug(2,P4A_dump_message("Program and Kernel creation from %s\n",kernelFile));
     size_t kernelLength=0;
     const char *comment = "// This kernel was generated for P4A\n";
   // Same design as the NVIDIA oclLoadProgSource
    char* cSourceCL = p4a_load_prog_source(kernelFile,
 					   comment,
 					   &kernelLength);
-    if (cSourceCL == NULL)
-      P4A_skip_debug(0,P4A_dump_message("source du program null\n"));
-    //else
-    // P4A_skip_debug(P4A_dump_message("%s\n",cSourceCL));
+    if (cSourceCL == NULL) {
+      P4A_dump_message("Error : loading source for kernel %s\n",kernelFile);
+      p4a_clean(EXIT_FAILURE);
+    }
       
-    P4A_skip_debug(0,P4A_dump_message("Kernel length = %lu\n",kernelLength));
+    P4A_skip_debug(4,P4A_dump_message("Kernel length = %lu\n",kernelLength));
     
     /*Create and compile the program : 1 for 1 kernel */
     p4a_program=clCreateProgramWithSource(p4a_context,1,
