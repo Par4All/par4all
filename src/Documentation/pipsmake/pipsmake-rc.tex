@@ -10917,7 +10917,8 @@ criteria. The next phase alleviates these drawbacks.
 \begin{PipsPass}{quick_scalarization}
   This Pass solely relies on proper and cumulated effets, and as such
   may fail to scalarize some accesses. However, it is expected to give
-  good results in current cases, especially after loop_fusion.
+  good results in current cases, especially after
+  \PipsPassRef{loop_fusion}.
 
   It basically uses the same algorithm as scalar privatization, but
   performs on the dependence graph rather than the chains graph for
