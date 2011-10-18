@@ -651,6 +651,80 @@ static bool sac_aligned_expression_p(expression e)
     }
     return false;
 }
+/*
+   This function creates a simd vector.
+   */
+static entity make_new_simd_vector_with_prefix(int itemSize, int nbItems, enum basic_utype basicTag, const char *vname)
+{
+    //extern list integer_entities, real_entities, double_entities;
+
+    basic simdVector;
+
+    entity new_ent, mod_ent;
+    char prefix[6]={ same_string_p(vname,VECTOR_POSTFIX)?'v':'a', '0', '\0', '\0', '\0', '\0' },
+         num[1 + sizeof(VECTOR_POSTFIX) + 3 ],
+         name[sizeof(prefix)+sizeof(num)+1];
+    static int number = 0;
+
+    mod_ent = get_current_module_entity();
+
+    /* build the variable prefix code, which is in fact also the type */
+    prefix[1] += nbItems;
+    switch(itemSize)
+    {
+        case 8:  prefix[2] = 'q'; break;
+        case 16: prefix[2] = 'h'; break;
+        case 32: prefix[2] = 's'; break;
+        case 64: prefix[2] = 'd'; break;
+    }
+
+
+    switch(basicTag)
+    {
+        case is_basic_int:
+            simdVector = make_basic_int(itemSize/8);
+            prefix[3] = 'i';
+            break;
+
+        case is_basic_float:
+            simdVector = make_basic_float(itemSize/8);
+            prefix[3] = 'f';
+            break;
+
+        default:
+            simdVector = make_basic_int(itemSize/8);
+            prefix[3] = 'i';
+            break;
+    }
+
+    pips_assert("buffer doesnot overflow",number<10000);
+    sprintf(name, "%s%u", vname,number++);
+    list lis=CONS(DIMENSION, make_dimension(int_to_expression(0),int_to_expression(nbItems-1)), NIL);  
+
+    basic typedefedSimdVector = get_typedefed_array(prefix,simdVector,lis);
+
+    new_ent = make_new_scalar_variable_with_prefix(name, mod_ent , typedefedSimdVector);
+
+#if 0
+    string type_name = strdup(concatenate(prefix,"_struct", (char *) NULL));
+    entity str_type = FindOrCreateEntity(entity_local_name(mod_ent), type_name);
+    entity_type(str_type) =make_type_variable(make_variable(simdVector,NIL,NIL)); 
+
+    entity str_dec = FindOrCreateEntity(entity_local_name(mod_ent), name);
+    entity_type(str_dec) = entity_type(str_type);
+#endif
+
+    if( same_string_p(vname, VECTOR_POSTFIX))
+        AddLocalEntityToDeclarations(new_ent,get_current_module_entity(),sac_current_block);
+    else
+        AddEntityToCurrentModule(new_ent);
+
+    return new_ent;
+}
+static entity make_new_simd_vector(int itemSize, int nbItems, enum basic_utype basicTag)
+{
+    return make_new_simd_vector_with_prefix(itemSize, nbItems, basicTag, VECTOR_POSTFIX);
+}
 
 /* This function change the "load/store type" to XX_TO_XX if a conversion
  * is needed. It returns true if a change is made, and the pointer
@@ -661,10 +735,49 @@ static bool loadstore_type_conversion_string(int argc, list args, string* lsType
     string realVectName = get_vect_name_from_data(argc, CDR(args));
     if (!same_string_p(realVectName, lsTypeTmp))
     {
-	    asprintf(lsType,"%s_TO_%s",
-			    isLoad?realVectName:lsTypeTmp,
-			    isLoad?lsTypeTmp:realVectName);
-	    return true;
+        entity forged_array = entity_undefined;
+        FOREACH(EXPRESSION,arg,CDR(args)) {
+            if(expression_reference_p(arg)) {
+                reference r = expression_reference(arg);
+                entity var = forged_array=reference_variable(r);
+                if(strncmp(entity_user_name(var),
+                            SAC_ALIGNED_VECTOR_NAME,
+                            sizeof(SAC_ALIGNED_VECTOR_NAME)-1)!=0) {
+                    forged_array=entity_undefined;
+                    break;
+                }
+                else if(entity_undefined_p(forged_array)) {
+                    forged_array = var;
+                }
+                else if(!same_entity_p(forged_array,var)) {
+                    forged_array=entity_undefined;
+                    break;
+                }
+            }
+        }
+        /* we can handle this situation :p */
+        if(!entity_undefined_p(forged_array)) {
+            expression exp = EXPRESSION(CAR(args));
+            reference r = expression_reference(exp);
+            type t = ultimate_type(entity_type(reference_variable(r)));
+            variable v = type_variable(t);
+            entity new = make_new_simd_vector_with_prefix(
+                    8*basic_type_size(variable_basic(v)),
+                    dimension_size(DIMENSION(CAR(variable_dimensions(v)))),
+                    basic_tag(variable_basic(v)),
+                    SAC_ALIGNED_VECTOR_NAME
+                    );
+            free_value(entity_initial(new));
+            entity_initial(new) = copy_value(entity_initial(forged_array));
+            FOREACH(EXPRESSION,ex,CDR(args))
+                replace_entity(ex,forged_array,new);
+        }
+        else {
+            asprintf(lsType,"%s_TO_%s",
+                    isLoad?realVectName:lsTypeTmp,
+                    isLoad?lsTypeTmp:realVectName);
+            return true;
+        }
     }
     return false;
 }
@@ -998,73 +1111,6 @@ static statement make_save_statement(int argc, list args)
 
 
 
-/*
-   This function creates a simd vector.
-   */
-static entity make_new_simd_vector(int itemSize, int nbItems, enum basic_utype basicTag)
-{
-    //extern list integer_entities, real_entities, double_entities;
-
-    basic simdVector;
-
-    entity new_ent, mod_ent;
-    char prefix[6]={ 'v', '0', '\0', '\0', '\0', '\0' },
-         num[1 + sizeof(VECTOR_POSTFIX) + 3 ],
-         name[sizeof(prefix)+sizeof(num)+1];
-    static int number = 0;
-
-    mod_ent = get_current_module_entity();
-
-    /* build the variable prefix code, which is in fact also the type */
-    prefix[1] += nbItems;
-    switch(itemSize)
-    {
-        case 8:  prefix[2] = 'q'; break;
-        case 16: prefix[2] = 'h'; break;
-        case 32: prefix[2] = 's'; break;
-        case 64: prefix[2] = 'd'; break;
-    }
-
-
-    switch(basicTag)
-    {
-        case is_basic_int:
-            simdVector = make_basic_int(itemSize/8);
-            prefix[3] = 'i';
-            break;
-
-        case is_basic_float:
-            simdVector = make_basic_float(itemSize/8);
-            prefix[3] = 'f';
-            break;
-
-        default:
-            simdVector = make_basic_int(itemSize/8);
-            prefix[3] = 'i';
-            break;
-    }
-
-    pips_assert("buffer doesnot overflow",number<10000);
-    sprintf(name, "%s%u",VECTOR_POSTFIX,number++);
-    list lis=CONS(DIMENSION, make_dimension(int_to_expression(0),int_to_expression(nbItems-1)), NIL);  
-
-    basic typedefedSimdVector = get_typedefed_array(prefix,simdVector,lis);
-
-    new_ent = make_new_scalar_variable_with_prefix(name, mod_ent , typedefedSimdVector);
-
-#if 0
-    string type_name = strdup(concatenate(prefix,"_struct", (char *) NULL));
-    entity str_type = FindOrCreateEntity(entity_local_name(mod_ent), type_name);
-    entity_type(str_type) =make_type_variable(make_variable(simdVector,NIL,NIL)); 
-
-    entity str_dec = FindOrCreateEntity(entity_local_name(mod_ent), name);
-    entity_type(str_dec) = entity_type(str_type);
-#endif
-
-    AddLocalEntityToDeclarations(new_ent,get_current_module_entity(),sac_current_block);
-
-    return new_ent;
-}
 
 
 

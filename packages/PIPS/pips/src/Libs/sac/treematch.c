@@ -30,6 +30,7 @@
 #include "effects.h"
 
 #include "resources.h"
+#include "properties.h"
 
 #include "misc.h"
 #include "ri-util.h"
@@ -156,8 +157,9 @@ static matchTree match_expression(expression arg, matchTree t,list *args)
         case is_syntax_reference:
             {
                 basic bas = basic_of_reference(syntax_reference(s));
-                if(bas == basic_undefined)
+                if(bas == basic_undefined || basic_type_size(bas)*8 >= get_int_property("SAC_SIMD_REGISTER_WIDTH"))
                 {
+                    free_basic(bas);
                     return matchTree_undefined;
                 }
                 else

@@ -73,6 +73,7 @@
 #include "splitc.h"
 #include "preprocessor.h"
 
+
 int csplit_line_number = 1; /**< To be exported to the parser for
 				splitting the preprocessed file */
 int user_line_number = 1; /**< To be exported to the parser for error
@@ -292,17 +293,24 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                    #line nnn
                                 */
                                 gdb_marker();
+                                size_t n;
                                 if(strstr(yytext, "#pragma")==yytext) {
                                    user_line_number--;
                                 }
                                 /* the preprocessor seems to provide line information in pragmas
                                    which are not #line pragmas. */
-                                else if(/* strstr(yytext, "#line")==yytext && */ strlen(yytext)>=4) {
+                                else if(/* strstr(yytext, "#line")==yytext && */ (n=strlen(yytext))>=4) {
                                    int initial_C_line_number = -1;
-                                   int items = sscanf(yytext+1, "%d", &initial_C_line_number);
-                                   if(items==1) {
+								   char include_file[n] ;
+                                   int items = sscanf(yytext+1, "%d \"%[^\"]\"", &initial_C_line_number,include_file);
+                                   if(items>=1) {
                                       /* Get rid of the pragma LF itslef */
                                       user_line_number = initial_C_line_number-1;
+                                      if(items==2) {
+                                        if(!current_file_path) current_file_path = strdup(include_file);
+                                        else if(!current_include_file_path) current_include_file_path=strdup(include_file);
+                                        else if(strcmp(include_file,current_file_path)==0) { free(current_include_file_path) ; current_include_file_path=NULL; }
+                                      }
                                    }
                                    else {
                                       pips_user_warning("No line number in # pragma: \"%s\".\n", yytext);

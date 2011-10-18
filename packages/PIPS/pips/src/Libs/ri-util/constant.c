@@ -319,8 +319,26 @@ entity make_constant_entity(string name,
 entity MakeConstant(string name, tag bt)
 {
     entity e;
+    size_t len = strlen(name);
+    size_t type_length;
+    /* SG : I like accurate knowledge of constant suffix to fill all cases accurately, there is still work to do there */
+    switch(bt) {
+        case is_basic_float:
+            switch(name[len-1]) {
+                case 'f':
+                    type_length = DefaultLengthOfBasic(bt);break;
+                case 'F':
+                default:
+                    type_length = (c_module_p(get_current_module_entity()) ? // SG I am sure the default is double for C, I don't know for fortran
+                        2 :
+                        1
+                        ) *DefaultLengthOfBasic(bt);break;
+            } break;
+        default:
+            type_length = DefaultLengthOfBasic(bt);
+    }
 
-    e = make_constant_entity(name, bt, DefaultLengthOfBasic(bt));
+    e = make_constant_entity(name, bt, type_length);
 
     /* The LengthOfBasic should be updated for type "string" */
 
