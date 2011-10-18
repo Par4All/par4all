@@ -10820,7 +10820,20 @@ scalarization  > MODULE.code
 \end{PipsMake}
 
 \begin{PipsPass}{quick_scalarization}
-  
+  Pass \PipsPassRef{scalarization} may be costly because it relies on
+  array regions analyses and uses them to check its legality
+  criteria. Pass \PipsPassRef{quick_scalarization} solely relies on
+  proper and cumulated effets, and as such may fail to scalarize some
+  accesses. However, it is expected to give good results in current
+  cases, especially after loop_fusion.
+
+  It basically uses the same algorithm as scalar privatization, but
+  performs on the dependence graph rather than the chains graph for
+  more precision about array dependences. Several legality criteria
+  are then tested to ensure the safety of the transformation. In
+  particular, it is checked that candidate references are not accessed
+  through hidden references (for instance in calls), and that only one
+  kind of reference is scalarized in the loop.
 \end{PipsPass}
 
 
