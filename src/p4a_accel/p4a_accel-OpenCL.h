@@ -274,6 +274,7 @@ extern cl_command_queue p4a_queue;
 */
 #define P4A_init_accel                                                  \
   p4a_init_opencl();
+void p4a_init_opencl();
 
 /** Release the hardware accelerator in CL
  */
@@ -622,7 +623,7 @@ parameters types are resolved.
            block_descriptor_name,   \
            size)        \
   cl_uint work_dim = 1;             \
-  size_t grid_descriptor_name[]={(size_t)(size)}; \
+  size_t grid_descriptor_name[]={(size_t)(size),1,1}; \
   size_t *block_descriptor_name = NULL; \
   P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name););
 
@@ -636,9 +637,8 @@ parameters types are resolved.
 #define P4A_create_2d_thread_descriptors(grid_descriptor_name,    \
            block_descriptor_name,   \
            n_x_iter, n_y_iter)    \
-  int p4a_block_x, p4a_block_y;           \
   cl_uint work_dim = 2;             \
-  size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter)}; \
+  size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter),1}; \
   size_t *block_descriptor_name = NULL; \
   P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name););
 
@@ -709,21 +709,21 @@ parameters types are resolved.
     Thus, the two calls inhibits each other but can't be mixed.
 
 */
+#define P4A_call_accel_kernel(kernel, grid, blocks, parameters)     \
+  do {                  \
+    P4A_skip_debug(3,P4A_dump_location());        \
+    P4A_skip_debug(1,P4A_dump_message("Invoking kernel %s (%zux%zux%zu , NULL) with args %s\n",  \
+                                      #kernel,        \
+                                      grid[0],grid[1],grid[2],        \
+                                      #parameters));      \
+    P4A_TIMING_accel_timer_start; \
+    P4A_call_accel_kernel_context(kernel) \
+    P4A_call_accel_kernel_parameters parameters;      \
+    P4A_test_execution_with_message("P4A OpenCL kernel execution"); \
+    P4A_TIMING_accel_timer_stop; \
+    P4A_TIMING_display_elasped_time(kernel); \
+  } while (0) \
 
-#define P4A_call_accel_kernel(context, parameters)      \
-  P4A_skip_debug(0,P4A_dump_location());          \
-  P4A_skip_debug(0,P4A_dump_message("Invoking %s with %s\n",          \
-          #context,       \
-          #parameters));      \
-  P4A_TIMING_accel_timer_start;           \
-  P4A_call_accel_kernel_context context         \
-  P4A_call_accel_kernel_parameters parameters;        \
-  P4A_test_execution_with_message("P4A OpenCL kernel execution"); \
-  timer_call_from_p4a = true;           \
-  P4A_accel_timer_stop_and_float_measure();       \
-  timer_call_from_p4a = false;            \
-  P4A_TIMING_accel_timer_stop;            \
-  P4A_TIMING_display_elasped_time(context)        \
 
 /** In OpenCL, each kernel is referenced by its name as a string, but
     is launched via a pointer. 
@@ -820,7 +820,7 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
     /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
     /* multiple of P4A_block_descriptor */ \
-    P4A_call_accel_kernel((clEnqueueNDRangeKernel),     \
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
         (p4a_queue,p4a_kernel,work_dim,NULL,    \
          P4A_grid_descriptor,NULL,  \
          0,NULL,&p4a_event));       \
@@ -863,7 +863,7 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
     /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
     /* multiple of P4A_block_descriptor */ \
-    P4A_call_accel_kernel((clEnqueueNDRangeKernel),     \
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
         (p4a_queue,p4a_kernel,work_dim,NULL,    \
          P4A_grid_descriptor,NULL,  \
          0,NULL,&p4a_event));       \
@@ -905,7 +905,7 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     /* Here we don't use the P4A_block_descriptor and leave OpenCL on his own */ \
     /* to chose a good mapping... In any case P4A_grid_descriptor must be a */ \
     /* multiple of P4A_block_descriptor */ \
-    P4A_call_accel_kernel((clEnqueueNDRangeKernel),     \
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),P4A_grid_descriptor,P4A_block_descriptor,     \
         (p4a_queue,p4a_kernel,work_dim,NULL,    \
          P4A_grid_descriptor,NULL,  \
          0,NULL,&p4a_event));       \

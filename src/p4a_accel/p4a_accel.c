@@ -748,6 +748,7 @@ char * p4a_error_to_string(int error)
     default:
       break;
     }
+  return "Unknown";
 } 
 
 /** To quit properly OpenCL.
@@ -894,6 +895,7 @@ struct p4a_cl_kernel *new_p4a_kernel(const char *kernel)
   char* kernelFile;
   asprintf(&kernelFile,"./%s.cl",kernel);
   strcpy(p4a_kernels_list[nKernel].file_name,kernelFile);
+  return &p4a_kernels_list[nKernel];
 }
 
 /** Search if the <kernel> is already in the list.
