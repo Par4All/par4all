@@ -153,9 +153,7 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
    //SAC generated temporary array
    a4si pdata2 = {1, 1, 1, 1};
    //SAC generated temporary array
-   v4sf pdata80 = {1, 1, 1, 1};
-   //SAC generated temporary array
-   a4sf pdata3 = {0, 0, 0, 0}, pdata4 = {0, 0, 0, 0};
+   a4sf pdata80 = {1, 1, 1, 1}, pdata3 = {0, 0, 0, 0}, pdata4 = {0, 0, 0, 0};
    //PIPS generated variable
    unsigned int i0, i1;
    for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
@@ -193,13 +191,11 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
    //SAC generated temporary array
    a4si pdata2 = {1, 1, 1, 1};
    //SAC generated temporary array
-   v4sf pdata80 = {1, 1, 1, 1};
+   a4sf pdata80 = {1, 1, 1, 1}, pdata3 = {0, 0, 0, 0}, pdata4 = {0, 0, 0, 0};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec140_0, vec00_1, vec10_1, vec20_1, vec30_1, vec40_1, vec50_1, vec60_1, vec70_1, vec90_1, vec100_1, vec110_1, vec120_1, vec130_1, vec140_1;
    SIMD_LOAD_BROADCAST_V4SF(vec10_0, alpha);
    SIMD_LOAD_V4SF(vec70_0, &pdata80[0]);
-   //SAC generated temporary array
-   a4sf pdata3 = {0, 0, 0, 0}, pdata4 = {0, 0, 0, 0};
    //PIPS generated variable
    unsigned int i0, i1;
    for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
@@ -230,7 +226,7 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
    //SAC generated temporary array
-   v4sf pdata80 = {1, 1, 1, 1};
+   a4sf pdata80 = {1, 1, 1, 1};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0, vec70_0, vec90_0, vec110_0, vec120_0;
    SIMD_LOAD_BROADCAST_V4SF(vec10_0, alpha);
@@ -264,7 +260,7 @@ void alphablending(unsigned int n, float src1[n], float src2[n], float result[n]
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
    //SAC generated temporary array
-   v4sf pdata80 = {1, 1, 1, 1};
+   a4sf pdata80 = {1, 1, 1, 1};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0, vec70_0, vec90_0, vec110_0, vec120_0;
    SIMD_LOAD_BROADCAST_V4SF(vec10_0, alpha);

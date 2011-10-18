@@ -60,7 +60,7 @@ void stencil01_l99999(int n, float a[n], float b[1+n])
    //SAC generated temporary array
    a4df pdata1 = {.5, .5, .5, .5};
    //SAC generated temporary array
-   v4sf pdata60 = {.5, .5, .5, .5};
+   a4sf pdata60 = {.5, .5, .5, .5};
    //PIPS generated variable
    int i0, i1;
 l99999:
@@ -85,7 +85,7 @@ void stencil01_l99999(int n, float a[n], float b[1+n])
    //PIPS generated variable
    float F_4;
    //SAC generated temporary array
-   v4sf pdata60 = {.5, .5, .5, .5};
+   a4sf pdata60 = {.5, .5, .5, .5};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0;
    SIMD_LOAD_V4SF(vec50_0, &pdata60[0]);
