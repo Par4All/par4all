@@ -612,102 +612,50 @@ parameters types are resolved.
 #define P4A_CL_ITEM_Z_PER_GROUP_IN_3D 8
 #endif
 
-/** Creation of block and thread descriptors for OpenCL */
-
-/** Allocate the descriptors for a linear set of thread with a
-    simple strip-mining for CL
-*/
+/** Creation of block and thread descriptors for OpenCL
+ *
+ * localWorkSize can be set as NULL, and OpenCL implementation will
+ * determine how to break the globalWorkSize. Let take advantage of that
+ * for the time being.
+ */
 #define P4A_create_1d_thread_descriptors(grid_descriptor_name,    \
            block_descriptor_name,   \
            size)        \
   cl_uint work_dim = 1;             \
-  /* Define the number of thread per block: */        \
-  /* OG: size_t block_descriptor_name[] = {P4A_min((int) size,  */    \
-           /* (int) P4A_CL_ITEM_PER_GROUP_IN_1D)}; change to :*/ \
-  size_t block_descriptor_name[] = {P4A_min((int) size,     \
-            (int) P4A_CL_ITEM_PER_GROUP_IN_1D)}; \
-  /* Define the ceil-rounded number of needed blocks of threads: */ \
-  /*OG: change size_t grid_descriptor_name = {(int)size};   with :*/ \
-  size_t grid_descriptor_name[] = {(int)size};        \
-  P4A_skip_debug(0,P4A_dump_grid_descriptor(grid_descriptor_name););  \
-  P4A_skip_debug(0,P4A_dump_block_descriptor(block_descriptor_name);)
+  size_t grid_descriptor_name[]={(size_t)(size)}; \
+  size_t *block_descriptor_name = NULL; \
+  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name););
 
 
-/** Allocate the descriptors for a 2D set of thread with a simple
-    strip-mining in each dimension for CL
-
-    globalWorkSize = global number of work-items.
-    localWorkSize = number of work-items in a work-group.
-    The dimension is equal to work_dim.
-
-    The total number of work-items in a work-group equals
-    localWorkSize[0] * ... * localWorkSize[work_dim-1]
-    This value must be less than CL_DEVICE_MAX_WORK_GROUP_SIZE.
-
-    localWorkSize can be set as NULL, and OpenCL implementation will 
-    determine how to break the globalWorkSize.
-  
-
-*/
+/** Allocate the descriptors for a 2D set of thread
+ *
+ * localWorkSize can be set as NULL, and OpenCL implementation will
+ * determine how to break the globalWorkSize. Let take advantage of that
+ * for the time being.
+ */
 #define P4A_create_2d_thread_descriptors(grid_descriptor_name,    \
            block_descriptor_name,   \
            n_x_iter, n_y_iter)    \
   int p4a_block_x, p4a_block_y;           \
-  /* Define the number of thread per block: */        \
-  if ((n_y_iter) > 10000) {           \
-    /* If we have a lot of interations in Y, use asymptotical block \
-       sizes: */              \
-    p4a_block_x = P4A_CL_ITEM_X_PER_GROUP_IN_2D;      \
-    p4a_block_y = P4A_CL_ITEM_Y_PER_GROUP_IN_2D;      \
-  }                 \
-  else {                \
-    /* Allocate a maximum of threads along X axis (the warp dimension) for \
-       better average efficiency: */          \
-    p4a_block_x = P4A_min((int) (n_x_iter),       \
-        (int) P4A_CL_ITEM_MAX);     \
-    p4a_block_y = P4A_min((int) (n_y_iter),       \
-        P4A_CL_ITEM_MAX/p4a_block_x);     \
-  }                 \
   cl_uint work_dim = 2;             \
-  /* The localWorkSize argument for clEnqueueNDRangeKernel */   \
-  size_t block_descriptor_name[]={(size_t)p4a_block_x,(size_t)p4a_block_y}; \
-  /* The globalWorkSize argument for clEnqueueNDRangeKernel */    \
-  /* Define the ceil-rounded number of needed blocks of threads: */ \
-  /*size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter)};*/ \
-  int global_x = (n_x_iter+P4A_CL_ITEM_MAX-1)/P4A_CL_ITEM_MAX;    \
-  global_x *= p4a_block_x;            \
-  int global_y = n_y_iter; \
-  /*OG: replace the following : */\
-   /* size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; */\
-  /* with */\
-  size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; \
-  P4A_skip_debug(0,P4A_dump_grid_descriptor(grid_descriptor_name););  \
-  P4A_skip_debug(0,P4A_dump_block_descriptor(block_descriptor_name);)
+  size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter)}; \
+  size_t *block_descriptor_name = NULL; \
+  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name););
 
 
-/** Allocate the descriptors for a 3D set of thread with a simple
-    strip-mining in each dimension for CL
-
-    globalWorkSize = global number of work-items.
-    localWorkSize = number of work-items in a work-group.
-    The dimension is equal to work_dim.
-
-    The total number of work-items in a work-group equals
-    localWorkSize[0] * ... * localWorkSize[work_dim-1]
-    This value must be less than CL_DEVICE_MAX_WORK_GROUP_SIZE.
-
-    localWorkSize can be set as NULL, and OpenCL implementation will
-    determine how to break the globalWorkSize.
-
-
-*/
+/** Allocate the descriptors for a 3D set of thread.
+ *
+ * localWorkSize can be set as NULL, and OpenCL implementation will
+ * determine how to break the globalWorkSize. Let take advantage of that
+ * for the time being.
+ */
 #define P4A_create_3d_thread_descriptors(grid_descriptor_name,    \
            block_descriptor_name,   \
            n_x_iter, n_y_iter, n_z_iter)    \
   cl_uint work_dim = 3; \
   size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter),(size_t)(n_z_iter)}; \
   size_t *block_descriptor_name = NULL; \
-  P4A_skip_debug(0,P4A_dump_grid_descriptor(grid_descriptor_name););
+  P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name););
 
 /** Dump a CL dim2 descriptor with an introduction message 
  *  OG:change descriptor_name[0] to descriptor_name, gcc does not accept, still question for one dim ?*/
