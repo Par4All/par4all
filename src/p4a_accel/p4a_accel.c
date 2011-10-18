@@ -374,6 +374,44 @@ static cl_program p4a_program=0;
 #define P4A_DEBUG_BUFFER_SIZE 10000
 static char p4a_debug_buffer[P4A_DEBUG_BUFFER_SIZE];
 
+void p4a_init_opencl() {
+  // Common initialization for par4all Runtime
+  p4a_main_init();
+  /* Get an OpenCL platform : a set of devices available
+   * The device_id is the selected device from his type
+   *   CL_DEVICE_TYPE_GPU
+   *   CL_DEVICE_TYPE_CPU
+   */
+  cl_platform_id p4a_platform_id = NULL;
+  p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);
+  P4A_test_execution_with_message("clGetPlatformIDs");
+  /* Get the devices,could be a collection of device */
+  extern cl_device_id p4a_device_id;
+  p4a_device_id = NULL;
+  p4a_global_error=clGetDeviceIDs(p4a_platform_id,
+          CL_DEVICE_TYPE_GPU,
+          1,
+          &p4a_device_id,
+          NULL);
+  P4A_test_execution_with_message("clGetDeviceIDs");
+  /* Create the context */
+  p4a_context=clCreateContext(0,/*const cl_context_properties *properties*/
+            1,/*cl_uint num_devices*/
+            &p4a_device_id,
+            NULL,/*CL_CALLBACK *pfn_notify*/
+            NULL,
+            &p4a_global_error);
+  P4A_test_execution_with_message("clCreateContext");
+  /* ... could query many device, we retain only the first one
+   * Create a file allocated to the first device ...   */
+  p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,
+         p4a_queue_properties,
+         &p4a_global_error);
+  P4A_test_execution_with_message("clCreateCommandQueue");
+
+}
+
+
 /** @author : Stéphanie Even
 
     In OpenCL, errorToString doesn't exists by default ...
@@ -384,29 +422,29 @@ char * p4a_error_to_string(int error)
   switch (error)
     {
     case CL_SUCCESS:
-      return (char *)"P4A : Success";
+      return (char *)"Success";
     case CL_DEVICE_NOT_FOUND:
-      return (char *)"P4A : Device Not Found";
+      return (char *)"Device Not Found";
     case CL_DEVICE_NOT_AVAILABLE:
-      return (char *)"P4A : Device Not Available";
+      return (char *)"Device Not Available";
     case CL_COMPILER_NOT_AVAILABLE:
-      return (char *)"P4A : Compiler Not Available";
+      return (char *)"Compiler Not Available";
     case CL_MEM_OBJECT_ALLOCATION_FAILURE:
-      return (char *)"P4A : Mem Object Allocation Failure";
+      return (char *)"Mem Object Allocation Failure";
     case CL_OUT_OF_RESOURCES:
-      return (char *)"P4A : Out Of Ressources";
+      return (char *)"Out Of Ressources";
     case CL_OUT_OF_HOST_MEMORY:
-      return (char *)"P4A : Out Of Host Memory";
+      return (char *)"Out Of Host Memory";
     case CL_PROFILING_INFO_NOT_AVAILABLE:
-      return (char *)"P4A : Profiling Info Not Available";
+      return (char *)"Profiling Info Not Available";
     case CL_MEM_COPY_OVERLAP:
-      return (char *)"P4A : Mem Copy Overlap";
+      return (char *)"Mem Copy Overlap";
     case CL_IMAGE_FORMAT_MISMATCH:
-      return (char *)"P4A : Image Format Mismatch";
+      return (char *)"Image Format Mismatch";
     case CL_IMAGE_FORMAT_NOT_SUPPORTED:
-      return (char *)"P4A : Image Format Not Supported";
+      return (char *)"Image Format Not Supported";
     case CL_BUILD_PROGRAM_FAILURE:
-	#define CL_BUILD_PROGRAM_FAILURE_MSG "P4A : Build Program Failure : "
+	#define CL_BUILD_PROGRAM_FAILURE_MSG "Build Program Failure : "
 	strncat(p4a_debug_buffer,CL_BUILD_PROGRAM_FAILURE_MSG,P4A_DEBUG_BUFFER_SIZE);
 	clGetProgramBuildInfo( 	p4a_program,
   				p4a_device_id,
@@ -416,75 +454,75 @@ char * p4a_error_to_string(int error)
 			  	NULL);
       return (char *)p4a_debug_buffer;
     case CL_MAP_FAILURE:
-      return (char *)"P4A : Map Failure";
+      return (char *)"Map Failure";
     case CL_INVALID_VALUE:
-      return (char *)"P4A : Invalid Value";
+      return (char *)"Invalid Value";
     case CL_INVALID_DEVICE_TYPE:
-      return (char *)"P4A : Invalid Device Type";
+      return (char *)"Invalid Device Type";
     case CL_INVALID_PLATFORM:
-      return (char *)"P4A : Invalid Platform";
+      return (char *)"Invalid Platform";
     case CL_INVALID_DEVICE:
-      return (char *)"P4A : Invalid Device";
+      return (char *)"Invalid Device";
     case CL_INVALID_CONTEXT:
-      return (char *)"P4A : Invalid Context";
+      return (char *)"Invalid Context";
     case CL_INVALID_QUEUE_PROPERTIES:
-      return (char *)"P4A : Invalid Queue Properties";
+      return (char *)"Invalid Queue Properties";
     case CL_INVALID_COMMAND_QUEUE:
-      return (char *)"P4A : Invalid Command Queue";
+      return (char *)"Invalid Command Queue";
     case CL_INVALID_HOST_PTR:
-      return (char *)"P4A : Invalid Host Ptr";
+      return (char *)"Invalid Host Ptr";
     case CL_INVALID_MEM_OBJECT:
-      return (char *)"P4A : Invalid Mem Object";
+      return (char *)"Invalid Mem Object";
     case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR:
-      return (char *)"P4A : Invalid Image Format Descriptor";
+      return (char *)"Invalid Image Format Descriptor";
     case CL_INVALID_IMAGE_SIZE:
-      return (char *)"P4A : Invalid Image Size";
+      return (char *)"Invalid Image Size";
     case CL_INVALID_SAMPLER:
-      return (char *)"P4A : Invalid Sampler";
+      return (char *)"Invalid Sampler";
     case CL_INVALID_BINARY:
-      return (char *)"P4A : Invalid Binary";
+      return (char *)"Invalid Binary";
     case CL_INVALID_BUILD_OPTIONS:
-      return (char *)"P4A : Invalid Build Options";
+      return (char *)"Invalid Build Options";
     case CL_INVALID_PROGRAM:
-      return (char *)"P4A : Invalid Program";
+      return (char *)"Invalid Program";
     case CL_INVALID_PROGRAM_EXECUTABLE:
-      return (char *)"P4A : Invalid Program Executable";
+      return (char *)"Invalid Program Executable";
     case CL_INVALID_KERNEL_NAME:
-      return (char *)"P4A : Invalid Kernel Name";
+      return (char *)"Invalid Kernel Name";
     case CL_INVALID_KERNEL_DEFINITION:
-      return (char *)"P4A : Invalid Kernel Definition";
+      return (char *)"Invalid Kernel Definition";
     case CL_INVALID_KERNEL:
-      return (char *)"P4A : Invalid Kernel";
+      return (char *)"Invalid Kernel";
     case CL_INVALID_ARG_INDEX:
-      return (char *)"P4A : Invalid Arg Index";
+      return (char *)"Invalid Arg Index";
     case CL_INVALID_ARG_VALUE:
-      return (char *)"P4A : Invalid Arg Value";
+      return (char *)"Invalid Arg Value";
     case CL_INVALID_ARG_SIZE:
-      return (char *)"P4A : Invalid Arg Size";
+      return (char *)"Invalid Arg Size";
     case CL_INVALID_KERNEL_ARGS:
-      return (char *)"P4A : Invalid Kernel Args";
+      return (char *)"Invalid Kernel Args";
     case CL_INVALID_WORK_DIMENSION:
-      return (char *)"P4A : Invalid Work Dimension";
+      return (char *)"Invalid Work Dimension";
     case CL_INVALID_WORK_GROUP_SIZE:
-      return (char *)"P4A : Invalid Work Group Size";
+      return (char *)"Invalid Work Group Size";
     case CL_INVALID_WORK_ITEM_SIZE:
-      return (char *)"P4A : Invalid Work Item Size";
+      return (char *)"Invalid Work Item Size";
     case CL_INVALID_GLOBAL_OFFSET:
-      return (char *)"P4A : Invalid Global Offset";
+      return (char *)"Invalid Global Offset";
     case CL_INVALID_EVENT_WAIT_LIST:
-      return (char *)"P4A : Invalid Event Wait List";
+      return (char *)"Invalid Event Wait List";
     case CL_INVALID_EVENT:
-      return (char *)"P4A : Invalid Event";
+      return (char *)"Invalid Event";
     case CL_INVALID_OPERATION:
-      return (char *)"P4A : Invalid Operation";
+      return (char *)"Invalid Operation";
     case CL_INVALID_GL_OBJECT:
-      return (char *)"P4A : Invalid GL Object";
+      return (char *)"Invalid GL Object";
     case CL_INVALID_BUFFER_SIZE:
-      return (char *)"P4A : Invalid Buffer Size";
+      return (char *)"Invalid Buffer Size";
     case CL_INVALID_MIP_LEVEL:
-      return (char *)"P4A : Invalid Mip Level";
+      return (char *)"Invalid Mip Level";
     case CL_INVALID_GLOBAL_WORK_SIZE:
-      return (char *)"P4A : Invalid Global Work Size";
+      return (char *)"Invalid Global Work Size";
     default:
       break;
     }

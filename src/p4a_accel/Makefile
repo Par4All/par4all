@@ -1,5 +1,9 @@
 # Use the PIPS infrastructure to generate a Doxygen documentation
 
+# make clean
+# make doxygen
+# make doxygen-publish
+
 # Some own Par4All stuff:
 include $(P4A_ROOT)/doc/libs/par4all.mk
 

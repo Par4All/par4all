@@ -273,36 +273,7 @@ extern cl_command_queue p4a_queue;
     Context and queue linked to the selected device are created.
 */
 #define P4A_init_accel                                                  \
-  /* Get an OpenCL platform : a set of devices available */   \
-  /* The device_id is the selected device from his type */    \
-  /* CL_DEVICE_TYPE_GPU */            \
-  /* CL_DEVICE_TYPE_CPU */            \
-  cl_platform_id p4a_platform_id = NULL;        \
-  p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);   \
-  P4A_test_execution_with_message("clGetPlatformIDs");      \
-  /* Get the devices,could be a collection of device */     \
-  extern cl_device_id p4a_device_id;          \
-  p4a_device_id = NULL;             \
-  p4a_global_error=clGetDeviceIDs(p4a_platform_id,      \
-          CL_DEVICE_TYPE_GPU,     \
-          1,          \
-          &p4a_device_id,     \
-          NULL);        \
-  P4A_test_execution_with_message("clGetDeviceIDs");      \
-  /* Create the context */            \
-  p4a_context=clCreateContext(0,/*const cl_context_properties *properties*/ \
-            1,/*cl_uint num_devices*/     \
-            &p4a_device_id,       \
-            NULL,/*CL_CALLBACK *pfn_notify*/    \
-            NULL,         \
-            &p4a_global_error);     \
-  P4A_test_execution_with_message("clCreateContext");     \
-  /* ... could query many device, we retain only the first one */ \
-  /* Create a file allocated to the first device ...   */               \
-  p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,   \
-         p4a_queue_properties,      \
-         &p4a_global_error);      \
-  P4A_test_execution_with_message("clCreateCommandQueue")
+  p4a_init_opencl();
 
 /** Release the hardware accelerator in CL
  */

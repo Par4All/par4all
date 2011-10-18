@@ -50,14 +50,14 @@ def insert_kernel_launcher_declaration(m):
 def replace_by_opencl_own_declarations(content):
     # Replace sinf by the opencl intrinsic sin function
     content = re.sub("sinf","sin",content)
+    
     # size_t is not a standard in OpenCL ...
     # size_t can be a 32-bit or a 64-bit unsigned integer, and the OpenCL
     # compiler does not accept variable types that are
     # implementation-dependent.
-
-    # Don't know where has been generated, but the opposite of what we want
-    # Comment this line in the opencl kernel file
-    content = re.sub("typedef unsigned int size_t;","//typedef unsigned int size_t;",content)
+    # all typedef.*size_t declaration have been changed using remove_libc_typedef(),
+    # but there is still some reste of the variable declarations using size_t types in .cl files
+    # and remove them
     content = re.sub("size_t","unsigned long int",content)
 
     # Opencl pointers and array variable must be explicitely declared
@@ -149,6 +149,8 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     # slurp all the file in a string:
     content = f.read()
     f.close()
+
+    content = remove_libc_typedef (content)
 
     if (p4a_util.opencl_file_p(file_base_name)):
         content = replace_by_opencl_own_declarations(content)
@@ -271,7 +273,6 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = re.sub(r'\(void \*\) 0',
                      "NULL", content)
 
-    content = remove_libc_typedef (content)
 
     if verbose:
         print content,

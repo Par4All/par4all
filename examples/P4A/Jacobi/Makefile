@@ -1,6 +1,6 @@
 
 
-include stars-pm.mk
+include jacobi.mk
 include ../common.mk
 
 
