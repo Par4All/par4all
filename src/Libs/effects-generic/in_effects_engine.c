@@ -548,6 +548,7 @@ static void in_effects_of_loop(loop l, in_effects_context *ctxt)
 	    /* computation of W(i') */
 	    /* i' is here an integer scalar value */
 	    if (get_descriptor_range_p()) {
+	      add_intermediate_value(i);
 	      i_prime = entity_to_intermediate_value(i);
 	      (*effects_descriptors_variable_change_func)
 		(global_write, i, i_prime);
