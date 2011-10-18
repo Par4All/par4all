@@ -661,7 +661,7 @@ static entity make_new_simd_vector_with_prefix(int itemSize, int nbItems, enum b
     basic simdVector;
 
     entity new_ent, mod_ent;
-    char prefix[6]={ 'v', '0', '\0', '\0', '\0', '\0' },
+    char prefix[6]={ same_string_p(vname,VECTOR_POSTFIX)?'v':'a', '0', '\0', '\0', '\0', '\0' },
          num[1 + sizeof(VECTOR_POSTFIX) + 3 ],
          name[sizeof(prefix)+sizeof(num)+1];
     static int number = 0;
