@@ -28,8 +28,10 @@ doxygen :: doxygen-plain doxygen-graph
 ifdef DOXYGEN_PUBLISH_LOCATION
 
 doxygen-publish:: make_destination_dir
-	$(RSYNC) plain/html/ $(DOXYGEN_PUBLISH_LOCATION)/plain
-	$(RSYNC) graph/html/ $(DOXYGEN_PUBLISH_LOCATION)/graph
+	# Synchonize stuff and ignore errors since there may be some access
+	# right problems:
+	-$(RSYNC) plain/html/ $(DOXYGEN_PUBLISH_LOCATION)/plain
+	-$(RSYNC) graph/html/ $(DOXYGEN_PUBLISH_LOCATION)/graph
 
 # Just to avoid publish to complaining if not implemented in the including
 # Makefile:
