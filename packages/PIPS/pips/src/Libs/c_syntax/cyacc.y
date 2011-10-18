@@ -745,7 +745,7 @@ declaration         {/* discard_C_comment();*/ }
 			  CParserError("ASM not implemented\n");
 			  $$ = NIL;
 			}
-|   TK_PRAGMA attr
+|   TK_PRAGMA /*attr*/
                         {
 			  CParserError("PRAGMA not implemented at top level\n");
 			  $$ = NIL;
@@ -1366,7 +1366,7 @@ statements_inside_block:
 			     source layout representation? */
 			  discard_C_comment();
 			}
-    local_labels block_attrs statement_list
+local_labels block_attrs statement_list
                         {
 			  $$ = MakeBlock($5);
 			  ExitScope();
@@ -1377,35 +1377,27 @@ block: /* ISO 6.8.2 */
                         {
 			  $$ = $1;
 			}
-|   statements_inside_block pragmas TK_RBRACE
-                        {
-			  /* Since pragmas cannot be attached to nothing,
-			     add a CONTINUE to attach them: */
-			  statement nop = make_plain_continue_statement();
-			  add_pragma_strings_to_statement(nop, gen_nreverse($2), false /* Do not reallocate the strings*/);
-			  /* Free the pragma list structure: */
-			  gen_free_list($2);
-			  /* Since we can also attach a comment, try to
-			     save one if any: */
-			  add_comment_and_line_number(nop,
-						      get_current_C_comment(),
-						      get_current_C_line_number());
-			  /* Add the pragmaifyed nop at the end of the block: */
-			  insert_statement($1, nop, false);
-			  $$ = $1;
-			}
+
 |   error location TK_RBRACE
 { abort();CParserError("Parse error: error location TK_RBRACE \n"); }
 ;
 
+
 block_attrs:
-   /* empty */          {}
-|  TK_BLOCKATTRIBUTE paren_attr_list_ne
-                        { CParserError("BLOCKATTRIBUTE not implemented\n"); }
+{}
+/*|  TK_BLOCKATTRIBUTE paren_attr_list_ne
+  { CParserError("BLOCKATTRIBUTE not implemented\n"); }*/
 ;
+
 
 statement_list:
     /* empty */         { $$ = NIL; }
+| pragmas {
+  statement s = make_continue_statement(entity_empty_label());
+  add_pragma_strings_to_statement(s, gen_nreverse($1),false);
+  gen_free_list($1);
+  $$ = CONS(STATEMENT, s, NIL);
+  }
 |   statement statement_list
                         {
 			  $$ = CONS(STATEMENT,$1,$2);
@@ -1455,7 +1447,7 @@ pragmas:
 pragma { /* Only one pragma... The common case, return it in a list */
   pips_debug(1, "No longer pragma\n");
   $$ = CONS(STRING, $1, NIL);
-}
+  }
 | pragma pragmas {
   /* Concatenate the pragma to the list of pragmas */
   $$ = CONS(STRING,$1,$2);
@@ -1476,13 +1468,6 @@ statement: pragmas statement_without_pragma
 | statement_without_pragma {
   $$ = $1;
   }
-
-| pragmas {
-  statement s = make_continue_statement(entity_empty_label());
-  add_pragma_strings_to_statement(s, gen_nreverse($1),false);
-  gen_free_list($1);
-  $$ = s;
-}
 ;
 
 
@@ -3357,11 +3342,14 @@ attributes_with_asm:
 ;
 
 attribute:
+/*
     TK_ATTRIBUTE TK_LPAREN paren_attr_list_ne TK_RPAREN
                         { CParserError("ATTRIBUTE not implemented\n"); }
 |   TK_DECLSPEC paren_attr_list_ne
                         { CParserError("ATTRIBUTE not implemented\n"); }
-|   TK_MSATTR
+			|
+*/
+   TK_MSATTR
                         { CParserError("ATTRIBUTE not implemented\n"); }
                                         /* ISO 6.7.3 */
 |   TK_CONST
@@ -3381,6 +3369,7 @@ attribute:
 /** (* PRAGMAS and ATTRIBUTES *) ***/
 /* (* We want to allow certain strange things that occur in pragmas, so we
     * cannot use directly the language of expressions *) */
+/*
 attr:
 |   id_or_typename
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
@@ -3466,23 +3455,24 @@ attr:
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 ;
 
-attr_list_ne:
+attr_list_ne:*/
 /* Never used because of conflict
 |
 */
-    attr
+/*    attr
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 |   attr TK_COMMA attr_list_ne
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 |   error TK_COMMA attr_list_ne
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
-;
+			;
 paren_attr_list_ne:
     TK_LPAREN attr_list_ne TK_RPAREN
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 |   TK_LPAREN error TK_RPAREN
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 ;
+*/
 /*** GCC TK_ASM instructions ***/
 asmattr:
     /* empty */

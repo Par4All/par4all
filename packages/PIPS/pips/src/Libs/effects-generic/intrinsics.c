@@ -2782,12 +2782,24 @@ list time_effects(entity e, list args) {
                 c_actual_argument_to_may_summary_effects(arg, 'w')); // may be a must ?
     entity private_time_entity = FindEntity(TIME_EFFECTS_PACKAGE_NAME, TIME_EFFECTS_VARIABLE_NAME);
 
-    pips_assert("time_effects", private_time_entity != entity_undefined);
+    pips_assert("private_time_entity is defined",
+		!entity_undefined_p(private_time_entity));
 
-    reference ref = make_reference(private_time_entity,NIL);
+    reference ref = reference_undefined;
+
+    ref = make_reference(private_time_entity,NIL);
+
     le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
     le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
-    /* SG: should we free ref ? */
+    /* SG: should we free ref? */
+
+    if(get_bool_property("TIME_EFFECTS_USED")) {
+      /* Barrier effect suggested by Mehdi Amini (Ticket 594) */
+      effect re = make_anywhere_effect(make_action_read(make_action_kind_store()));
+      effect we = make_anywhere_effect(make_action_write(make_action_kind_store()));
+      le = CONS(EFFECT, re, le);
+      le = CONS(EFFECT, we, le);
+    }
     return le;
 }
 

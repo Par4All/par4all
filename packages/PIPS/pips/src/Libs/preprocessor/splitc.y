@@ -99,6 +99,7 @@ string csplit_current_function_name2 = string_undefined;
 string csplit_definite_function_name = string_undefined;
 string csplit_definite_function_signature = string_undefined;
 
+
 static void reset_csplit_current_function_name()
    {
      if(!string_undefined_p(csplit_current_function_name)) {
@@ -623,25 +624,26 @@ global:
 			}
 |   function_def
                         {
-			  pips_debug(5, "function_def->global\n");
-			  csplit_is_external = 0; /* the variable is declared inside a function */
-			  pips_debug(1, "Function \"%s\" declaration and body are located between line %d and line %d\n",
-				  csplit_definite_function_name,
-				  get_csplit_current_beginning(),
-				  csplit_line_number);
 
-			  /* Hmm... It happens to early to gather
-			     following comments to its module... */
-			  csplit_copy(csplit_definite_function_name,
-				      csplit_definite_function_signature,
-				      get_csplit_current_beginning(),
-				      csplit_line_number,
-				      get_csplit_file_offset_beginning(),
-				      get_current_csplit_file_offset(),
-				      get_user_current_beginning(),
-				      current_function_is_static_p);
-
-                          reset_csplit_current_beginning();
+              /*SG: mechanism to prevent the generation of module for functions defined in standard header files
+                    it should never be the case, but it sometimes happen with inline functions */
+                  pips_debug(5, "function_def->global\n");
+                  csplit_is_external = 0; /* the variable is declared inside a function */
+                  pips_debug(1, "Function \"%s\" declaration and body are located between line %d and line %d\n",
+                      csplit_definite_function_name,
+                      get_csplit_current_beginning(),
+                      csplit_line_number);
+                  /* Hmm... It happens to early to gather
+                     following comments to its module... */
+                  csplit_copy(csplit_definite_function_name,
+                          csplit_definite_function_signature,
+                          get_csplit_current_beginning(),
+                          csplit_line_number,
+                          get_csplit_file_offset_beginning(),
+                          get_current_csplit_file_offset(),
+                          get_user_current_beginning(),
+                          current_function_is_static_p);
+              reset_csplit_current_beginning();
 			}
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN TK_SEMICOLON
                         {
