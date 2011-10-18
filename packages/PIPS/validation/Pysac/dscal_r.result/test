@@ -20,13 +20,13 @@ void dscal_r_l99999(int n, float da, float dx[n])
    //PIPS generated variable
    int i;
 l99999:
-   for(i = 0; i <= 0+4*((1+n-1-0)/4)-1; i += 4) {
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
       dx[i] = da*dx[i];
       dx[1+i] = da*dx[1+i];
       dx[2+i] = da*dx[2+i];
       dx[3+i] = da*dx[3+i];
    }
-   for(i = 0+4*((1+n-1-0)/4); i <= n-1; i += 1)
+   for(i = 4*(n/4); i <= n-1; i += 1)
       dx[i] = da*dx[i];
 }
 void dscal_r_l99999(int n, float da, float dx[n])
@@ -34,13 +34,13 @@ void dscal_r_l99999(int n, float da, float dx[n])
    //PIPS generated variable
    int i;
 l99999:
-   for(i = 0; i <= 0+4*((1+n-1-0)/4)-1; i += 4) {
+   for(i = 0; i <= 4*(n/4)-1; i += 4) {
       dx[i] = da*dx[i];
       dx[1+i] = da*dx[1+i];
       dx[2+i] = da*dx[2+i];
       dx[3+i] = da*dx[3+i];
    }
-   for(i = 0+4*((1+n-1-0)/4); i <= n-1; i += 1)
+   for(i = 4*(n/4); i <= n-1; i += 1)
       dx[i] = da*dx[i];
 }
 void dscal_r_l99999(int n, float da, float dx[n])
@@ -48,7 +48,7 @@ void dscal_r_l99999(int n, float da, float dx[n])
    //PIPS generated variable
    int i0, i1;
 l99999:
-   for(i0 = 0; i0 <= 0+4*((1+n-1-0)/4)-1; i0 += 4) {
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       v4sf vec00, vec10;
       SIMD_LOAD_V4SF(vec00, &dx[i0]);
@@ -56,7 +56,7 @@ l99999:
       SIMD_MULPS(vec00, vec10, vec00);
       SIMD_STORE_V4SF(vec00, &dx[i0]);
    }
-   for(i1 = 0+4*((1+n-1-0)/4); i1 <= n-1; i1 += 1)
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1)
       dx[i1] = da*dx[i1];
 }
 void dscal_r_l99999(int n, float da, float dx[n])
@@ -67,13 +67,13 @@ void dscal_r_l99999(int n, float da, float dx[n])
    v4sf vec00_0, vec10_0;
    SIMD_LOAD_BROADCAST_V4SF(vec10_0, da);
 l99999:
-   for(i0 = 0; i0 <= 0+4*((1+n-1-0)/4)-1; i0 += 4) {
+   for(i0 = 0; i0 <= 4*(n/4)-1; i0 += 4) {
       //PIPS:SAC generated v4sf vector(s)
       SIMD_LOAD_V4SF(vec00_0, &dx[i0]);
       SIMD_MULPS(vec00_0, vec10_0, vec00_0);
       SIMD_STORE_V4SF(vec00_0, &dx[i0]);
    }
-   for(i1 = 0+4*((1+n-1-0)/4); i1 <= n-1; i1 += 1)
+   for(i1 = 4*(n/4); i1 <= n-1; i1 += 1)
       dx[i1] = da*dx[i1];
 }
 void dscal_r(int n, float da, float dx[n])

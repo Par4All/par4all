@@ -1,0 +1,129 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   >
+//		<   tests   >
+   int iter, i, j, k;
+//		< is static > FALSE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   >
+//		<   tests   >
+   int length = 50;
+//		< is static > FALSE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   >
+//		<   tests   >
+   int tsteps = 10000;
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+   
+#pragma scop
+#pragma live-out out
+   out = 0;
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   >
+//		<   tests   >
+   for(iter = 0; iter <= tsteps-1; iter += 1) {
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//		<   tests   >
+      for(i = 0; i <= length-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//                            0 <= 0`i <= length-1
+//		<   tests   >
+         for(j = 0; j <= length-1; j += 1)
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//                            0 <= 0`i <= length-1
+//                            0 <= 0`j <= length-1
+//		<   tests   >
+            c[i][j] = 0;
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//		<   tests   >
+
+      for(i = 0; i <= length-2; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//                            0 <= 0`i <= length-2
+//		<   tests   >
+         for(j = i+1; j <= length-1; j += 1) {
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//                            0 <= 0`i <= length-2
+//                            i+1 <= 0`j <= length-1
+//		<   tests   >
+            sum_c[i][j][i] = 0;
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//                            0 <= 0`i <= length-2
+//                            i+1 <= 0`j <= length-1
+//		<   tests   >
+            for(k = i+1; k <= j-1; k += 1)
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//                            0 <= 0`i <= length-2
+//                            i+1 <= 0`j <= length-1
+//                            i+1 <= 0`k <= j-1
+//		<   tests   >
+               sum_c[i][j][k] = sum_c[i][j][k-1]+c[i][k]+c[k][j];
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//                            0 <= 0`i <= length-2
+//                            i+1 <= 0`j <= length-1
+//		<   tests   >
+            c[i][j] = sum_c[i][j][j-1]+W[i][j];
+         }
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   > 0 <= 0`iter <= tsteps-1
+//		<   tests   >
+      out += c[0][length-1];
+   }
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`tsteps, 0`length, 0`k, 0`j, 0`i, 0`iter, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}

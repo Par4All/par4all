@@ -8,11 +8,11 @@ kernel1:
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
 
-         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+         save[i][j] = 0.25f*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
 
-         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+         space[i][j] = 0.25f*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void compute()
 {
@@ -24,11 +24,11 @@ kernel1:
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
 
-         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+         save[i][j] = 0.25f*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
 
-         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+         space[i][j] = 0.25f*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void compute()
 {
@@ -40,11 +40,11 @@ kernel1:
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
 
-         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+         save[i][j] = 0.25f*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1)
 
-         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+         space[i][j] = 0.25f*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 void compute()
 {
@@ -61,7 +61,7 @@ kernel1:
          F_1 = F_0+space[i][j-1];
          F_2 = F_1+space[i][j+1];
 
-         save[i][j] = 0.25*F_2;
+         save[i][j] = 0.25f*F_2;
       }
    for(i = 1; i <= 62; i += 1)
       for(j = 1; j <= 62; j += 1) {
@@ -69,7 +69,7 @@ kernel1:
          F_4 = F_3+save[i][j-1];
          F_5 = F_4+save[i][j+1];
 
-         space[i][j] = 0.25*F_5;
+         space[i][j] = 0.25f*F_5;
       }
 }
 void compute()
@@ -85,25 +85,25 @@ void compute()
          F_0 = space[i-1][j]+space[i+1][j];
          F_1 = F_0+space[i][j-1];
          F_2 = F_1+space[i][j+1];
-         save[i][j] = 0.25*F_2;
+         save[i][j] = 0.25f*F_2;
          F_0 = space[i-1][j+1]+space[i+1][j+1];
          F_1 = F_0+space[i][j];
          F_2 = F_1+space[i][j+2];
-         save[i][j+1] = 0.25*F_2;
+         save[i][j+1] = 0.25f*F_2;
          F_0 = space[i-1][j+2]+space[i+1][j+2];
          F_1 = F_0+space[i][j+1];
          F_2 = F_1+space[i][j+3];
-         save[i][j+2] = 0.25*F_2;
+         save[i][j+2] = 0.25f*F_2;
          F_0 = space[i-1][j+3]+space[i+1][j+3];
          F_1 = F_0+space[i][j+2];
          F_2 = F_1+space[i][j+4];
-         save[i][j+3] = 0.25*F_2;
+         save[i][j+3] = 0.25f*F_2;
       }
       for(j = 61; j <= 62; j += 1) {
          F_0 = space[i-1][j]+space[i+1][j];
          F_1 = F_0+space[i][j-1];
          F_2 = F_1+space[i][j+1];
-         save[i][j] = 0.25*F_2;
+         save[i][j] = 0.25f*F_2;
       }
    }
    for(i = 1; i <= 62; i += 1) {
@@ -111,25 +111,25 @@ void compute()
          F_3 = save[i-1][j]+save[i+1][j];
          F_4 = F_3+save[i][j-1];
          F_5 = F_4+save[i][j+1];
-         space[i][j] = 0.25*F_5;
+         space[i][j] = 0.25f*F_5;
          F_3 = save[i-1][j+1]+save[i+1][j+1];
          F_4 = F_3+save[i][j];
          F_5 = F_4+save[i][j+2];
-         space[i][j+1] = 0.25*F_5;
+         space[i][j+1] = 0.25f*F_5;
          F_3 = save[i-1][j+2]+save[i+1][j+2];
          F_4 = F_3+save[i][j+1];
          F_5 = F_4+save[i][j+3];
-         space[i][j+2] = 0.25*F_5;
+         space[i][j+2] = 0.25f*F_5;
          F_3 = save[i-1][j+3]+save[i+1][j+3];
          F_4 = F_3+save[i][j+2];
          F_5 = F_4+save[i][j+4];
-         space[i][j+3] = 0.25*F_5;
+         space[i][j+3] = 0.25f*F_5;
       }
       for(j = 61; j <= 62; j += 1) {
          F_3 = save[i-1][j]+save[i+1][j];
          F_4 = F_3+save[i][j-1];
          F_5 = F_4+save[i][j+1];
-         space[i][j] = 0.25*F_5;
+         space[i][j] = 0.25f*F_5;
       }
    }
 }
@@ -146,25 +146,25 @@ void compute()
          F_0 = space[i-1][j]+space[1+i][j];
          F_1 = F_0+space[i][j-1];
          F_2 = F_1+space[i][1+j];
-         save[i][j] = 0.25*F_2;
+         save[i][j] = 0.25f*F_2;
          F_0 = space[i-1][1+j]+space[1+i][1+j];
          F_1 = F_0+space[i][j];
          F_2 = F_1+space[i][2+j];
-         save[i][1+j] = 0.25*F_2;
+         save[i][1+j] = 0.25f*F_2;
          F_0 = space[i-1][2+j]+space[1+i][2+j];
          F_1 = F_0+space[i][1+j];
          F_2 = F_1+space[i][3+j];
-         save[i][2+j] = 0.25*F_2;
+         save[i][2+j] = 0.25f*F_2;
          F_0 = space[i-1][3+j]+space[1+i][3+j];
          F_1 = F_0+space[i][2+j];
          F_2 = F_1+space[i][4+j];
-         save[i][3+j] = 0.25*F_2;
+         save[i][3+j] = 0.25f*F_2;
       }
       for(j = 61; j <= 62; j += 1) {
          F_0 = space[i-1][j]+space[1+i][j];
          F_1 = F_0+space[i][j-1];
          F_2 = F_1+space[i][1+j];
-         save[i][j] = 0.25*F_2;
+         save[i][j] = 0.25f*F_2;
       }
    }
    for(i = 1; i <= 62; i += 1) {
@@ -172,25 +172,25 @@ void compute()
          F_3 = save[i-1][j]+save[1+i][j];
          F_4 = F_3+save[i][j-1];
          F_5 = F_4+save[i][1+j];
-         space[i][j] = 0.25*F_5;
+         space[i][j] = 0.25f*F_5;
          F_3 = save[i-1][1+j]+save[1+i][1+j];
          F_4 = F_3+save[i][j];
          F_5 = F_4+save[i][2+j];
-         space[i][1+j] = 0.25*F_5;
+         space[i][1+j] = 0.25f*F_5;
          F_3 = save[i-1][2+j]+save[1+i][2+j];
          F_4 = F_3+save[i][1+j];
          F_5 = F_4+save[i][3+j];
-         space[i][2+j] = 0.25*F_5;
+         space[i][2+j] = 0.25f*F_5;
          F_3 = save[i-1][3+j]+save[1+i][3+j];
          F_4 = F_3+save[i][2+j];
          F_5 = F_4+save[i][4+j];
-         space[i][3+j] = 0.25*F_5;
+         space[i][3+j] = 0.25f*F_5;
       }
       for(j = 61; j <= 62; j += 1) {
          F_3 = save[i-1][j]+save[1+i][j];
          F_4 = F_3+save[i][j-1];
          F_5 = F_4+save[i][1+j];
-         space[i][j] = 0.25*F_5;
+         space[i][j] = 0.25f*F_5;
       }
    }
 }
@@ -209,25 +209,25 @@ void compute()
          F_00 = space[i0-1][j0]+space[1+i0][j0];
          F_10 = F_00+space[i0][j0-1];
          F_20 = F_10+space[i0][1+j0];
-         save[i0][j0] = 0.25*F_20;
+         save[i0][j0] = 0.25f*F_20;
          F_01 = space[i0-1][1+j0]+space[1+i0][1+j0];
          F_11 = F_01+space[i0][j0];
          F_21 = F_11+space[i0][2+j0];
-         save[i0][1+j0] = 0.25*F_21;
+         save[i0][1+j0] = 0.25f*F_21;
          F_02 = space[i0-1][2+j0]+space[1+i0][2+j0];
          F_12 = F_02+space[i0][1+j0];
          F_22 = F_12+space[i0][3+j0];
-         save[i0][2+j0] = 0.25*F_22;
+         save[i0][2+j0] = 0.25f*F_22;
          F_03 = space[i0-1][3+j0]+space[1+i0][3+j0];
          F_13 = F_03+space[i0][2+j0];
          F_23 = F_13+space[i0][4+j0];
-         save[i0][3+j0] = 0.25*F_23;
+         save[i0][3+j0] = 0.25f*F_23;
       }
       for(j = 61; j <= 62; j += 1) {
          F_0 = space[i0-1][j]+space[1+i0][j];
          F_1 = F_0+space[i0][j-1];
          F_2 = F_1+space[i0][1+j];
-         save[i0][j] = 0.25*F_2;
+         save[i0][j] = 0.25f*F_2;
       }
    }
    for(i1 = 1; i1 <= 62; i1 += 1) {
@@ -235,25 +235,25 @@ void compute()
          F_30 = save[i1-1][j1]+save[1+i1][j1];
          F_40 = F_30+save[i1][j1-1];
          F_50 = F_40+save[i1][1+j1];
-         space[i1][j1] = 0.25*F_50;
+         space[i1][j1] = 0.25f*F_50;
          F_31 = save[i1-1][1+j1]+save[1+i1][1+j1];
          F_41 = F_31+save[i1][j1];
          F_51 = F_41+save[i1][2+j1];
-         space[i1][1+j1] = 0.25*F_51;
+         space[i1][1+j1] = 0.25f*F_51;
          F_32 = save[i1-1][2+j1]+save[1+i1][2+j1];
          F_42 = F_32+save[i1][1+j1];
          F_52 = F_42+save[i1][3+j1];
-         space[i1][2+j1] = 0.25*F_52;
+         space[i1][2+j1] = 0.25f*F_52;
          F_33 = save[i1-1][3+j1]+save[1+i1][3+j1];
          F_43 = F_33+save[i1][2+j1];
          F_53 = F_43+save[i1][4+j1];
-         space[i1][3+j1] = 0.25*F_53;
+         space[i1][3+j1] = 0.25f*F_53;
       }
       for(j = 61; j <= 62; j += 1) {
          F_3 = save[i1-1][j]+save[1+i1][j];
          F_4 = F_3+save[i1][j-1];
          F_5 = F_4+save[i1][1+j];
-         space[i1][j] = 0.25*F_5;
+         space[i1][j] = 0.25f*F_5;
       }
    }
 }
@@ -263,7 +263,7 @@ void compute()
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5, F_50, F_51, F_52, F_53, F_40, F_41, F_42, F_43, F_30, F_31, F_32, F_33, F_20, F_21, F_22, F_23, F_10, F_11, F_12, F_13, F_00, F_01, F_02, F_03;
    //SAC generated temporary array
-   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0.25, 0.25, 0.25, 0.25}, pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0}, pdata6 = {0, 0, 0, 0}, pdata7 = {0.25, 0.25, 0.25, 0.25};
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0.25f, 0.25f, 0.25f, 0.25f}, pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0}, pdata6 = {0, 0, 0, 0}, pdata7 = {0.25f, 0.25f, 0.25f, 0.25f};
    //PIPS generated variable
    int i0, i1, j0, j1;
    
@@ -291,7 +291,7 @@ void compute()
          F_0 = space[i0-1][j]+space[1+i0][j];
          F_1 = F_0+space[i0][j-1];
          F_2 = F_1+space[i0][1+j];
-         save[i0][j] = 0.25*F_2;
+         save[i0][j] = 0.25f*F_2;
       }
    }
    for(i1 = 1; i1 <= 62; i1 += 1) {
@@ -316,7 +316,7 @@ void compute()
          F_3 = save[i1-1][j]+save[1+i1][j];
          F_4 = F_3+save[i1][j-1];
          F_5 = F_4+save[i1][1+j];
-         space[i1][j] = 0.25*F_5;
+         space[i1][j] = 0.25f*F_5;
       }
    }
 }
@@ -326,7 +326,7 @@ void compute()
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5, F_50, F_51, F_52, F_53, F_40, F_41, F_42, F_43, F_30, F_31, F_32, F_33, F_20, F_21, F_22, F_23, F_10, F_11, F_12, F_13, F_00, F_01, F_02, F_03;
    //SAC generated temporary array
-   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0.25, 0.25, 0.25, 0.25}, pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0}, pdata6 = {0, 0, 0, 0}, pdata7 = {0.25, 0.25, 0.25, 0.25};
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0.25f, 0.25f, 0.25f, 0.25f}, pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0}, pdata6 = {0, 0, 0, 0}, pdata7 = {0.25f, 0.25f, 0.25f, 0.25f};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec140_0, vec150_0, vec160_0, vec170_0, vec180_0, vec190_0, vec200_0, vec210_0, vec220_0, vec230_0, vec00_1, vec10_1, vec20_1, vec30_1, vec40_1, vec50_1, vec60_1, vec70_1, vec80_1, vec90_1, vec100_1, vec110_1, vec120_1, vec130_1, vec140_1, vec150_1, vec160_1, vec170_1, vec180_1, vec190_1, vec200_1, vec210_1, vec220_1, vec230_1;
    SIMD_LOAD_V4SF(vec220_0, &pdata7[0]);
@@ -353,7 +353,7 @@ void compute()
          F_0 = space[i0-1][j]+space[1+i0][j];
          F_1 = F_0+space[i0][j-1];
          F_2 = F_1+space[i0][1+j];
-         save[i0][j] = 0.25*F_2;
+         save[i0][j] = 0.25f*F_2;
       }
    }
    for(i1 = 1; i1 <= 62; i1 += 1) {
@@ -373,7 +373,7 @@ void compute()
          F_3 = save[i1-1][j]+save[1+i1][j];
          F_4 = F_3+save[i1][j-1];
          F_5 = F_4+save[i1][1+j];
-         space[i1][j] = 0.25*F_5;
+         space[i1][j] = 0.25f*F_5;
       }
    }
    SIMD_STORE_V4SF(vec180_0, &pdata6[0]);
@@ -389,7 +389,7 @@ void compute()
    //PIPS generated variable
    float F_0, F_1, F_2, F_3, F_4, F_5;
    //SAC generated temporary array
-   a4sf pdata3 = {0.25, 0.25, 0.25, 0.25}, pdata7 = {0.25, 0.25, 0.25, 0.25};
+   a4sf pdata3 = {0.25f, 0.25f, 0.25f, 0.25f}, pdata7 = {0.25f, 0.25f, 0.25f, 0.25f};
    //PIPS generated variable
    v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0, vec60_0, vec80_0, vec90_0, vec100_0, vec120_0, vec130_0, vec140_0, vec150_0, vec170_0, vec180_0, vec200_0, vec210_0, vec220_0;
    SIMD_LOAD_V4SF(vec220_0, &pdata7[0]);
@@ -416,7 +416,7 @@ void compute()
          F_0 = space[i0-1][j]+space[1+i0][j];
          F_1 = F_0+space[i0][j-1];
          F_2 = F_1+space[i0][1+j];
-         save[i0][j] = 0.25*F_2;
+         save[i0][j] = 0.25f*F_2;
       }
    }
    for(i1 = 1; i1 <= 62; i1 += 1) {
@@ -436,7 +436,7 @@ void compute()
          F_3 = save[i1-1][j]+save[1+i1][j];
          F_4 = F_3+save[i1][j-1];
          F_5 = F_4+save[i1][1+j];
-         space[i1][j] = 0.25*F_5;
+         space[i1][j] = 0.25f*F_5;
       }
    }
 }

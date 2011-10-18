@@ -1,11 +1,11 @@
 int main(int argc, char **argv)
 {
-//		< is static > TRUE
+//		< is static > FALSE
 //		< parameter > 0`k, 0`j, 0`i, argc, 
 //		<   loops   >
 //		<   tests   >
    double t_start, t_end;
-//		< is static > TRUE
+//		< is static > FALSE
 //		< parameter > 0`k, 0`j, 0`i, argc, 
 //		<   loops   >
 //		<   tests   >

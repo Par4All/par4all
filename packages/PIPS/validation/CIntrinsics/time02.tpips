@@ -1,0 +1,29 @@
+delete time02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create time02 time02.c
+
+echo
+echo Parsed printed file for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Cumulated effects for "main"
+echo
+
+setproperty TIME_EFFECTS_USED TRUE
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+display PARALLELPRINTED_FILE[main]
+
+close
+delete time02
+quit
+

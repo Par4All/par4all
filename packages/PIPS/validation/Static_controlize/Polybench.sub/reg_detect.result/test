@@ -1,0 +1,196 @@
+int main(int argc, char **argv)
+{
+//		< is static > FALSE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   int t, i, j, cnt;
+//		< is static > FALSE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   int length = 64;
+//		< is static > FALSE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   int maxgrid = 6;
+//		< is static > FALSE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   int niter = 100000;
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Initialize array. */
+   init_array();
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   /* Start timer. */
+   
+   
+   s = 0;
+//		< is static > FALSE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   for(j = 0; j <= maxgrid-1; j += 1) {
+//		< is static > FALSE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`j <= maxgrid-1
+//		<   tests   >
+      sum_tang[j][j] = tangent[(maxgrid+1)*j];
+//		< is static > FALSE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`j <= maxgrid-1
+//		<   tests   >
+      for(i = j+1; i <= maxgrid-1; i += 1)
+//		< is static > FALSE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`j <= maxgrid-1
+//                            j+1 <= 0`i <= maxgrid-1
+//		<   tests   >
+         sum_tang[j][i] = sum_tang[j][i-1]+tangent[i+maxgrid*j];
+   }
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+#pragma scop
+#pragma live-out s
+   for(t = 0; t <= niter-1; t += 1) {
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//		<   tests   >
+      for(j = 0; j <= maxgrid-1; j += 1)
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            0 <= 0`j <= maxgrid-1
+//		<   tests   >
+         for(i = j; i <= maxgrid-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            0 <= 0`j <= maxgrid-1
+//                            j <= 0`i <= maxgrid-1
+//		<   tests   >
+            for(cnt = 0; cnt <= length-1; cnt += 1)
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            0 <= 0`j <= maxgrid-1
+//                            j <= 0`i <= maxgrid-1
+//                            0 <= 0`cnt <= length-1
+//		<   tests   >
+               diff[j][i][cnt] = sum_tang[j][i];
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//		<   tests   >
+
+      for(j = 0; j <= maxgrid-1; j += 1)
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            0 <= 0`j <= maxgrid-1
+//		<   tests   >
+         for(i = j; i <= maxgrid-1; i += 1) {
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            0 <= 0`j <= maxgrid-1
+//                            j <= 0`i <= maxgrid-1
+//		<   tests   >
+            sum_diff[j][i][0] = diff[j][i][0];
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            0 <= 0`j <= maxgrid-1
+//                            j <= 0`i <= maxgrid-1
+//		<   tests   >
+            for(cnt = 1; cnt <= length-1; cnt += 1)
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            0 <= 0`j <= maxgrid-1
+//                            j <= 0`i <= maxgrid-1
+//                            1 <= 0`cnt <= length-1
+//		<   tests   >
+               sum_diff[j][i][cnt] = sum_diff[j][i][cnt-1]+diff[j][i][cnt];
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            0 <= 0`j <= maxgrid-1
+//                            j <= 0`i <= maxgrid-1
+//		<   tests   >
+            mean[j][i] = sum_diff[j][i][length-1];
+         }
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//		<   tests   >
+
+      for(i = 0; i <= maxgrid-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            0 <= 0`i <= maxgrid-1
+//		<   tests   >
+         path[0][i] = mean[0][i];
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//		<   tests   >
+
+      for(j = 1; j <= maxgrid-1; j += 1)
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            1 <= 0`j <= maxgrid-1
+//		<   tests   >
+         for(i = j; i <= maxgrid-1; i += 1)
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//                            1 <= 0`j <= maxgrid-1
+//                            j <= 0`i <= maxgrid-1
+//		<   tests   >
+            path[j][i] = path[j-1][i-1]+mean[j][i];
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   > 0 <= 0`t <= niter-1
+//		<   tests   >
+      s += path[maxgrid-1][1];
+   }
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+   
+   
+   /* Stop and print timer. */
+#pragma endscop
+   ;
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   print_array(argc, argv);
+//		< is static > TRUE
+//		< parameter > 0`niter, 0`maxgrid, 0`length, 0`cnt, 0`j, 0`i, 0`t, argc, 
+//		<   loops   >
+//		<   tests   >
+
+   return 0;
+}

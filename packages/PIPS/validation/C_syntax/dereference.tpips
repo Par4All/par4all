@@ -2,6 +2,8 @@ delete dereference
 
 setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG -I../Transformations/Inlining.sub/include/fulguro"
 
+setproperty IGNORE_FUNCTION_IN_HEADER FALSE
+
 create dereference dereference.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -9,6 +11,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty IGNORE_FUNCTION_IN_HEADER FALSE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
