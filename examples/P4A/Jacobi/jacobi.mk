@@ -3,12 +3,13 @@ TARGET= jacobi
 
 SOURCES= $(TARGET:=.c)
 
-RUN_ARG=Logo_HPC-Project-GTC.pgm
+RUN_ARG=Logo_HPC-Project-GTC.pgm 
 
 CLEAN_OTHERS+=output.pgm
 
 
 display% : run%
+	mv output.pgm output$*.pgm
 	# Display graphically the results:
 	eog output$*.pgm
 
