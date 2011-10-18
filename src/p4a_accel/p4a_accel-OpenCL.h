@@ -812,7 +812,7 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     timer_call_from_p4a = false;          \
     P4A_TIMING_accel_timer_stop;          \
     P4A_TIMING_display_elasped_time(Kernel and arguments loading);  \
-    P4A_skip_debug(0,P4A_dump_message("Calling 1D kernel \"" #kernel  \
+    P4A_skip_debug(2,P4A_dump_message("Calling 1D kernel \"" #kernel  \
             "\" of size %d\n",P4A_n_iter_0)); \
     P4A_create_1d_thread_descriptors(P4A_grid_descriptor,   \
              P4A_block_descriptor,    \
@@ -854,7 +854,7 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     timer_call_from_p4a = true;           \
     P4A_accel_timer_stop_and_float_measure();       \
     timer_call_from_p4a = false;          \
-    P4A_skip_debug(0,P4A_dump_message("Calling 2D kernel \"" #kernel  \
+    P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel  \
             "\" of size (%dx%d)\n",   \
             P4A_n_iter_0, P4A_n_iter_1)); \
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,   \
@@ -896,7 +896,7 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     timer_call_from_p4a = true;           \
     P4A_accel_timer_stop_and_float_measure();       \
     timer_call_from_p4a = false;          \
-    P4A_skip_debug(0,P4A_dump_message("Calling 2D kernel \"" #kernel  \
+    P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel  \
             "\" of size (%dx%d)\n",   \
             P4A_n_iter_0, P4A_n_iter_1)); \
     P4A_create_3d_thread_descriptors(P4A_grid_descriptor,   \

@@ -459,7 +459,7 @@ cl_platform_id p4a_opencl_get_platform() {
     int env_platform_id = strtol(env_opencl_platform, NULL,10);
     if(errno==0) {
       // Sanity check
-      if(env_platform_id>0 && env_platform_id<num_platforms) {
+      if(env_platform_id>=0 && env_platform_id<num_platforms) {
         P4A_dump_message("Choosing OpenCL platform %d\n",env_platform_id);
         chosen_platform=env_platform_id;
       } else {
@@ -589,7 +589,7 @@ void p4a_opencl_init_devices(cl_platform_id platform_id) {
     int env_device = strtol(env_opencl_device, NULL,10);
     if(errno==0) {
       // Sanity check
-      if(env_device>0 && env_device<num_devices) {
+      if(env_device>=0 && env_device<num_devices) {
         P4A_dump_message("Choosing OpenCL device %d\n",env_device);
         chosen_device = env_device;
       } else {
