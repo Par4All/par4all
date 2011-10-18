@@ -64,10 +64,10 @@ endif
 .PHONY: default clean dist-clean
 
 default:
-	more $(TOP)/USAGE
+	more $(TOP)/USAGE.txt
 
 $(TARGET):
-	more $(TOP)/USAGE
+	more $(TOP)/USAGE.txt
 
 
 # build source for parallel versions
