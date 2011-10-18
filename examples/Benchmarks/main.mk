@@ -1,9 +1,9 @@
 TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 
 default:
-	more $(TOP)/USAGE
+	more $(TOP)/USAGE.txt
 
-all: seq openmp cuda cuda_opt
+all: seq openmp cuda cuda_opt pgi hmpp
 
 clean: 
 	for target in $(TARGETS) ; do \
