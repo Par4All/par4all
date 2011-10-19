@@ -765,10 +765,11 @@ class p4a_processor(object):
         # generating array declarations as pointers and by accessing them
         # as array[linearized expression]:
         if self.c99 or self.fortran or self.opencl:
-            flag = self.c99 or self.opencl
-            kernel_launchers.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
-            wrappers.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
-            kernels.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
+            vla_only = self.c99 and not self.opencl
+            use_pointer = self.c99 or self.opencl
+            kernel_launchers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,vla_only=vla_only)
+            wrappers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,vla_only=vla_only)
+            kernels.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,vla_only=vla_only)
             
             
 
