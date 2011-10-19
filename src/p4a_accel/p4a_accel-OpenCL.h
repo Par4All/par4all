@@ -105,149 +105,59 @@ void   p4a_clean(int exitCode);
     clEnqueueNDRangeKernel for a kernel execution,
     clEnqueueWriteBuffer or clEnqueueReadBuffer for copy. The event
     records also the time elapsed during the execution of single
-    specific function. The p4a_time global variable has been defined
-    to cumulate the total time between the P4A_accel_timer_start call
-    and the P4A_accel_timer_stop_and_float_measure() call. The
-    p4a_time global variable is initialized at 0 at each call to the
-    P4A_accel_timer_start.
+    specific function.
 
     @{
 */
 
-/** A tag is required to enable profiling in an OpenCL command queue
-    - if 0 : no profiling enabled
-    - if CL_QUEUE_PROFILING_ENABLE : profiling enabled.
-
-    Must be defined at the creation of the command queue
-
-    Because the context and the queue are created in the p4a_init,
-    when p4a_accel_timer_start is called everywhere the
-    p4a_queue_properties is defined as global variable. It is
-    initialized in the p4a_accel.c and not here.
- */
-extern cl_command_queue_properties p4a_queue_properties;
-
-/** Cumulated time in OpenCL.  
-
-    In OpenCL, time is measured after each call of a
-    function (clEnqueueNDRangeKernel for a kernel execution,
-    clEnqueueWriteBuffer or clEnqueueReadBuffer for copy).  
-
-    We also need to cumulate each single time.
- */
-extern double p4a_time;
-extern double p4a_host_time;
 
 /** Event for timing in OpenCL */
 extern cl_event p4a_event;
 
-/** A tag to identify if timer_stop is called from inside P4A or from outside */
-extern bool timer_call_from_p4a;
+/** Start a timer on the accelerator in OpenCL */
+#define P4A_accel_timer_start
 
-/** A tag to identify if timer_stop is called from accel or host */
-extern bool P4A_TIMING_fromHost;
+/** Stop a timer on the accelerator in OpenCL */
+#define P4A_accel_timer_stop
 
-/** The absolute time recorded when the timer is started
-
-    To record times for OpenCL functions executed in the host (kernel load, ...)
- */
-extern struct timeval p4a_time_begin; 
-
-/** The absolute time recorded when the timer ends
-
-    To record times for OpenCL functions executed in the host (kernel load, ...)
- */
-extern struct timeval p4a_time_end;
-
-/** Start a timer on the accelerator in OpenCL.
-    
-    Initialize the global time variable that will cumulates the timer.
-    in the case of external user that is allowed to place the begin and
-    end commands everywhere she/he wants.
- */
-
-#ifdef P4A_PROFILING
-#define P4A_accel_timer_start \
-  p4a_time = 0.;    \
-  p4a_host_time = 0.
-  
-#else
-#define P4A_accel_timer_start 
-#endif
-
-// Stop a timer on the accelerator 
-/**  
-     No need in OpenCL since the timer is linked to instances of 
-     OpenCL functions.
-*/
-#define P4A_accel_timer_stop      \
-  gettimeofday(&p4a_time_end, NULL)
-
-#ifdef P4A_TIMING        
 // Set of routine for timing kernel executions
 extern float p4a_timing_elapsedTime;
-
-#define P4A_TIMING_accel_timer_start gettimeofday(&p4a_time_begin, NULL)
-
-#define P4A_TIMING_accel_timer_stop P4A_accel_timer_stop
-
-/** Elapsed time :
-    -# from OpenCL functions launched in the accelerator
-    -# Otherwise, function launched in the host (use of the gettimeofday)
-
-    The tag P4A_TIMING_fromHost is switch off from here.
-    At the moment it is switch on from p4a_load_kernel in p4a_accel.c.
- */
-#define P4A_TIMING_elapsed_time(elapsed)        \
-  {                 \
-    if (!P4A_TIMING_fromHost)    {          \
-      cl_ulong start,end;           \
-      clWaitForEvents(1, &p4a_event);         \
-      P4A_test_execution(clGetEventProfilingInfo(p4a_event,   \
-             CL_PROFILING_COMMAND_END, \
-             sizeof(cl_ulong),  \
-             &end,NULL));   \
-      P4A_test_execution(clGetEventProfilingInfo(p4a_event,   \
-             CL_PROFILING_COMMAND_START, \
-             sizeof(cl_ulong),  \
-             &start,NULL));   \
-      /* Time in ms */              \
-      elapsed = (float)(end - start)*1.0e-6;        \
-    }                 \
-    else {                \
-      elapsed = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)   \
-  + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6;   \
-      elapsed *= 1e3;             \
-      P4A_TIMING_fromHost = false;          \
-    }                 \
-  }
-
-#define P4A_TIMING_get_elapsed_time     \
-  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime)
-
-#define P4A_TIMING_display_elasped_time(msg)    \
-  {             \
-    P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);  \
-    P4A_dump_message("Time for '%s' : %f ms\n",   \
-         #msg,        \
-         p4a_timing_elapsedTime );    \
-  }
-
-#else
-
-#ifdef P4A_PROFILING
-#define P4A_TIMING_accel_timer_start gettimeofday(&p4a_time_begin, NULL)
-
-#else
 #define P4A_TIMING_accel_timer_start
-#endif
-
 #define P4A_TIMING_accel_timer_stop
-#define P4A_TIMING_elapsed_time(elapsed)
-#define P4A_TIMING_get_elapsed_time
-#define P4A_TIMING_display_elasped_time(msg)
 
-#endif //P4A_TIMING
+#define P4A_TIMING_elapsed_time(elapsed) \
+{ \
+  if(p4a_timing) { \
+    cl_ulong start,end;           \
+    clWaitForEvents(1, &p4a_event);         \
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event,   \
+                                               CL_PROFILING_COMMAND_END, \
+                                               sizeof(cl_ulong),  \
+                                               &end,NULL));   \
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event,   \
+                                               CL_PROFILING_COMMAND_START, \
+                                               sizeof(cl_ulong),  \
+                                               &start,NULL));   \
+    /* Time in ms */              \
+    elapsed = (float)(end - start)*1.0e-6;        \
+  } \
+}
+#define P4A_TIMING_get_elapsed_time \
+{ \
+  if(p4a_timing) { \
+    P4A_TIMING_elapsed_time(&p4a_timing_elapsedTime); \
+  } \
+}
+#define P4A_TIMING_display_elasped_time(msg) \
+{ \
+  if(p4a_timing) { \
+    P4A_TIMING_elapsed_time(p4a_timing_elapsedTime); \
+    P4A_dump_message("Time for '%s' : %fms\n",  \
+                     #msg,      \
+                     p4a_timing_elapsedTime ); \
+  } \
+}
+
 
 /** @} */
 
@@ -715,12 +625,10 @@ parameters types are resolved.
     P4A_skip_debug(1,P4A_dump_message("Invoking kernel '%s(%s)' : (%zux%zux%zu , NULL)\n",  \
                                       kernel_name, args,         \
                                       grid[0],grid[1],grid[2])); \
-    P4A_TIMING_accel_timer_start; \
     P4A_call_accel_kernel_context(kernel) \
     P4A_call_accel_kernel_parameters parameters;      \
     P4A_test_execution_with_message("P4A OpenCL kernel execution"); \
-    P4A_TIMING_accel_timer_stop; \
-    P4A_TIMING_display_elasped_time(kernel); \
+    P4A_TIMING_display_elasped_time(kernel_name); \
   } while (0) \
 
 
@@ -803,14 +711,9 @@ char * p4a_load_prog_source(char *cl_kernel_file,
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)   \
   do {                  \
-    P4A_TIMING_accel_timer_start;         \
     p4a_load_kernel(kernel,__VA_ARGS__);        \
     P4A_argN(__VA_ARGS__);            \
-    timer_call_from_p4a = true;           \
-    P4A_accel_timer_stop_and_float_measure();       \
     timer_call_from_p4a = false;          \
-    P4A_TIMING_accel_timer_stop;          \
-    P4A_TIMING_display_elasped_time(Kernel and arguments loading);  \
     P4A_skip_debug(2,P4A_dump_message("Calling 1D kernel \"" #kernel  \
             "\" of size %d\n",P4A_n_iter_0)); \
     P4A_create_1d_thread_descriptors(P4A_grid_descriptor,   \
@@ -846,14 +749,8 @@ char * p4a_load_prog_source(char *cl_kernel_file,
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {                  \
-    P4A_TIMING_accel_timer_start;         \
     p4a_load_kernel(kernel,__VA_ARGS__);        \
     P4A_argN(__VA_ARGS__);            \
-    P4A_TIMING_accel_timer_stop;          \
-    P4A_TIMING_display_elasped_time(Kernel and arguments loading);  \
-    timer_call_from_p4a = true;           \
-    P4A_accel_timer_stop_and_float_measure();       \
-    timer_call_from_p4a = false;          \
     P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel  \
             "\" of size (%dx%d)\n",   \
             P4A_n_iter_0, P4A_n_iter_1)); \
@@ -889,14 +786,8 @@ char * p4a_load_prog_source(char *cl_kernel_file,
 */
 #define P4A_call_accel_kernel_3d(kernel, P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, ...) \
   do {                  \
-    P4A_TIMING_accel_timer_start;         \
     p4a_load_kernel(kernel,__VA_ARGS__);        \
     P4A_argN(__VA_ARGS__);            \
-    P4A_TIMING_accel_timer_stop;          \
-    P4A_TIMING_display_elasped_time(Kernel and arguments loading);  \
-    timer_call_from_p4a = true;           \
-    P4A_accel_timer_stop_and_float_measure();       \
-    timer_call_from_p4a = false;          \
     P4A_skip_debug(2,P4A_dump_message("Calling 2D kernel \"" #kernel  \
             "\" of size (%dx%d)\n",   \
             P4A_n_iter_0, P4A_n_iter_1)); \
