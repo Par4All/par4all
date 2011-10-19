@@ -51,13 +51,12 @@ def replace_by_opencl_own_declarations(content):
     # Replace sinf by the opencl intrinsic sin function
     content = re.sub("sinf","sin",content)
     
-    # size_t is not a standard in OpenCL ...
+    # size_t is not allowed in kernel parameter OpenCL ...
     # size_t can be a 32-bit or a 64-bit unsigned integer, and the OpenCL
-    # compiler does not accept variable types that are
-    # implementation-dependent.
+    # compiler does not accept variable types that are implementation-dependent
+    # for kernel arguments.
     # all typedef.*size_t declaration have been changed using remove_libc_typedef(),
-    # but there is still some reste of the variable declarations using size_t types in .cl files
-    # and remove them
+    # Here we remove all of them, even if it's not a kernel argument...
     content = re.sub("size_t","unsigned long int",content)
 
     # Opencl pointers and array variable must be explicitely declared
