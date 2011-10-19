@@ -129,6 +129,8 @@ extern float p4a_timing_elapsedTime;
 { \
   if(p4a_timing) { \
     cl_ulong start,end;           \
+    clFlush(p4a_queue); \
+    clFinish(p4a_queue); \
     clWaitForEvents(1, &p4a_event);         \
     P4A_test_execution(clGetEventProfilingInfo(p4a_event,   \
                                                CL_PROFILING_COMMAND_END, \
@@ -713,7 +715,6 @@ char * p4a_load_prog_source(char *cl_kernel_file,
   do {                  \
     p4a_load_kernel(kernel,__VA_ARGS__);        \
     P4A_argN(__VA_ARGS__);            \
-    timer_call_from_p4a = false;          \
     P4A_skip_debug(2,P4A_dump_message("Calling 1D kernel \"" #kernel  \
             "\" of size %d\n",P4A_n_iter_0)); \
     P4A_create_1d_thread_descriptors(P4A_grid_descriptor,   \

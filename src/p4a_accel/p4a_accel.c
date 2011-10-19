@@ -744,8 +744,6 @@ void p4a_clean(int exitCode)
 double p4a_time = 0.;
 double p4a_host_time = 0.;
 cl_event p4a_event = NULL;
-bool timer_call_from_p4a = true;
-bool P4A_TIMING_fromHost = false;
 
 /** Counts the number of kernel to display nice timer / kernel load*/
 int nKernel = 0;
