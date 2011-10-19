@@ -170,13 +170,9 @@ extern float p4a_timing_elapsedTime;
     cudaEventElapsedTime(&elapsed, p4a_start_event, p4a_stop_event); \
   } \
 }
-#define P4A_TIMING_get_elapsed_time \
-{ \
-  if(p4a_timing) { \
-    P4A_TIMING_elapsed_time(&p4a_timing_elapsedTime); \
-    p4a_timing_elapsedTime; \
-  } \
-}
+#define P4A_TIMING_get_elapsed_time  \
+  P4A_TIMING_elapsed_time(&p4a_timing_elapsedTime);
+
 #define P4A_TIMING_display_elasped_time(msg) \
 { \
   if(p4a_timing) { \
