@@ -3,6 +3,7 @@ import pyps
 import os.path
 import broker
 import re
+import p4a_util
 
 class p4a_stubs_broker(broker.broker):
     """ broker that automatically gather stub files for the par4all runtime
@@ -26,15 +27,15 @@ class p4a_stubs_broker(broker.broker):
         
         for broker_dir in self.get_broker_dirs():
             fname = os.path.join(broker_dir,module+".c")
-            os.path.exists(fname)
-            return fname
+            if os.path.exists(fname):
+              return fname
         return ""
 
     def get_broker_dirs(self):
         """ return the list of directories to inspect"""
         return [
                 d for d in (os.path.join(self.stubs_dir, d1) for d1 in os.listdir(self.stubs_dir)
-                            if os.path.isdir(d1))                
+                            ) if os.path.isdir(d)                
                 ]
 
     def generate_p4a_atomic(self,module):
