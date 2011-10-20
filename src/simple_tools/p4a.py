@@ -118,7 +118,10 @@ def add_own_options(parser):
 		help = "Add PIPS phases to be applied before the ompify execution, for the OpenMP code generation")
 
     proc_group.add_option("--apply-after-ompify", "--aao", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
-		help = "Add PIPS phases to be applied after the ompify execution, for the OpenMP code generation")
+        help = "Add PIPS phases to be applied after the ompify execution, for the OpenMP code generation")
+
+    proc_group.add_option("--stubs-broker", action = "append", metavar = "broker1,broker2,...", default = [],
+        help = "Add a stubs broker, it's a resolver python class that is able to provide a source file based on a fonction name")
 
     parser.add_option_group(proc_group)
 
@@ -360,7 +363,6 @@ def main():
         else:
             p4a_util.die("Unknow cuda compute capability requested : '" + options.cuda_cc + "' (allowed : 1.0 1.1 1.2 1.3 2.0)")            
 
-
         if options.simple and (options.cuda or options.opencl or options.openmp or options.scmp):
             p4a_util.die("Cannot combine --simple with --cuda and/or --openmp and/or --scmp  and/or --opencl")
 
@@ -556,6 +558,9 @@ def main():
             input.output_prefix = options.output_prefix
             input.output_suffix = options.output_suffix
             input.apply_phases = dict(abp=[], aap=[], akg=[], aklg=[], awg=[], aag=[], abo=[], aao=[])
+            input.brokers=','.join(options.stubs_broker)
+
+
             
             # Pips phases to be applied can be specified by
             # several options or by separating phase names by ","

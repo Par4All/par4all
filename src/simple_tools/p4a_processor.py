@@ -144,6 +144,7 @@ class p4a_processor_input(object):
     output_dir=None
     output_suffix=""
     output_prefix=""
+    brokers=""
     # To store some arbitrary Python code to be executed inside p4a_process:
     execute_some_python_code_in_process = None
     apply_phases={}
@@ -207,7 +208,7 @@ class p4a_processor(object):
                  filter_exclude = None, accel = False, cuda = False,
                  opencl = False, openmp = False, com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
-                 c99 = False, use_pocc = False, atomic = False,
+                 c99 = False, use_pocc = False, atomic = False, brokers="",
                  properties = {}, apply_phases={}, activates = []):
 
         self.recover_includes = recover_includes
@@ -294,12 +295,15 @@ class p4a_processor(object):
             # If we have #include recovery and want to use the native one:
             recover_Include = self.recover_includes and self.native_recover_includes
             # Create the PyPS workspace:
+            if brokers != "":
+                brokers+=","
+            brokers+="p4a_stubs_broker"
             self.workspace = broker.workspace(*self.files,
                                               name = self.project_name,
                                               verbose = verbose,
                                               cppflags = cpp_flags,
                                               recoverInclude = recover_Include,
-                                              brokersList="p4a_stubs_broker")
+                                              brokersList=brokers)
 
             # Array regions are a must! :-) Ask for most precise array
             # regions:
@@ -765,10 +769,11 @@ class p4a_processor(object):
         # generating array declarations as pointers and by accessing them
         # as array[linearized expression]:
         if self.c99 or self.fortran or self.opencl:
-            flag = self.c99 or self.opencl
-            kernel_launchers.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
-            wrappers.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
-            kernels.linearize_array(use_pointers=flag,cast_at_call_site=True,vla_only=flag)
+            vla_only = self.c99 and not self.opencl
+            use_pointer = self.c99 or self.opencl
+            kernel_launchers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,vla_only=vla_only)
+            wrappers.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,vla_only=vla_only)
+            kernels.linearize_array(use_pointers=use_pointer,cast_at_call_site=True,vla_only=vla_only)
             
             
 
