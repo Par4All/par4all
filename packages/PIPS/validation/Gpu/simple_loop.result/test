@@ -93,11 +93,21 @@ double a[N], b[N], c[N];
 
 int main();
 //PIPS generated variable
-void p4a_kernel_main(int N, double a[N], double b[N], double c[N], int i), p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i), p4a_launcher_main(int N, double a[N], double b[N], double c[N]);
+void p4a_kernel_main(int N, double a[N], double b[N], double c[N], int i);
+//PIPS generated variable
+void p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i);
+//PIPS generated variable
+void p4a_launcher_main(int N, double a[N], double b[N], double c[N]);
 //PIPS generated variable
 typedef unsigned long int size_t;
 //PIPS generated variable
-void P4A_accel_malloc(void **address, size_t size), P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, const void *host_address, void *accel_address), P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address), P4A_accel_free(void *address);
+void P4A_accel_malloc(void **address, size_t size);
+//PIPS generated variable
+void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, const void *host_address, void *accel_address);
+//PIPS generated variable
+void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address);
+//PIPS generated variable
+void P4A_accel_free(void *address);
 void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
 {
    //PIPS generated variable
