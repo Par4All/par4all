@@ -344,11 +344,18 @@ basic base;
   f = local_name_to_top_level_entity(module_name);
   a = FindEntity(module_name, DYNAMIC_AREA_LOCAL_NAME);
 
+  int offset = 0;
+  if (c_module_p(module_name_to_entity(module_name)))
+    offset = (basic_tag(b)!=is_basic_overloaded)?
+      (add_C_variable_to_area(a, e)):(0);
+  else
+    offset = (basic_tag(b)!=is_basic_overloaded)?
+      (add_variable_to_area(a, e)):(0);
+
   entity_storage(e) =
     make_storage(is_storage_ram,
 		 make_ram(f, a,
-			  (basic_tag(base)!=is_basic_overloaded)?
-			  (add_variable_to_area(a, e)):(0),
+			  offset,
 			  NIL));
 
   /* FI: I would have expected is_value_unknown, especially with a RAM storage! */
