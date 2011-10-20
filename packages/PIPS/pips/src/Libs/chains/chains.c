@@ -1075,6 +1075,7 @@ static void add_conflicts(effect fin,
          to TRUE!  We need to think more about all of this. BC.
       */
       if(ein_abstract_location_p) {
+	pips_debug(2, "abstract location case \n");
         entity alout = variable_to_abstract_location(eout);
 	/* this test is not correct, rout should be converted to an abstract location, not eout. BC. */
         if(abstract_locations_may_conflict_p(ein, alout))
@@ -1087,6 +1088,7 @@ static void add_conflicts(effect fin,
         type tin = ultimate_type(entity_type(ein));
         type tout = ultimate_type(entity_type(eout));
         if(pointer_type_p(tin) && pointer_type_p(tout)) {
+	  pips_debug(2, "pointer type case \n");
           /* Second version due to accuracy improvements in effect
          computation */
           if(din == dout) {
@@ -1122,6 +1124,7 @@ static void add_conflicts(effect fin,
       }
 
       if(add_conflict_p) {
+	pips_debug(2, "add_conflicts_p is true; checking conflicts with loop indices\n");
         bool remove_this_conflict_p = false;
         if(!ein_abstract_location_p && store_effect_p(fin)) {
           /* Here we filter effect on loop indices except for abstract
@@ -1129,7 +1132,9 @@ static void add_conflicts(effect fin,
           list loops = load_statement_enclosing_loops(stout);
           FOREACH( statement, el, loops ) {
             entity il = loop_index(statement_loop(el));
+	    pips_debug(2, "checking conflict with %s\n", entity_name(il));
             remove_this_conflict_p |= entities_may_conflict_p(ein, il);
+	    pips_debug(2, "remove_this_conflict_ p = %s\n", bool_to_string(remove_this_conflict_p));
           }
         }
         if(!remove_this_conflict_p) {

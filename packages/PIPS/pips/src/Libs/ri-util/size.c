@@ -714,6 +714,9 @@ bool variable_entity_may_conflict_p(entity e1, entity e2)
     if(heap_area_p(a1))
       return false;
 
+    if (c_module_p(get_current_module_entity()))
+      return false;
+
     /* Let's assume we are dealing with Fortran code, but another test
        should be added about the current module language. No test on
        dynamic aliasing since we are dealing here with direct read and

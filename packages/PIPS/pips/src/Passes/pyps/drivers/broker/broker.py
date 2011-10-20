@@ -4,6 +4,7 @@ import pyps
 import pypsutils 
 import os.path
 import shutil
+import tempfile
 
 
 
@@ -12,8 +13,6 @@ class workspace(pyps.workspace):
     """ This is a broker workspace, it automatically register a callback to PIPS
     and fetch missing module using brokers, it'll also record stub file given to 
     PIPS and interact with Maker for a proper compilation """ 
-    
-    
     
     def __init__(self, *sources, **kwargs):
         # Record which files where given to pips as stub file
@@ -65,7 +64,7 @@ class brokers(object):
         """ Get a stub file using brokers, and register any file given to
         pips here so the we can exclude them from compilation later """
         
-        stub_file = "";
+        stub_file_name = "";
         
         # Delegate to brokers the sub file retrieving, we stop as soon as 
         # we have one broker that knows this function
@@ -74,16 +73,19 @@ class brokers(object):
             if orig_stub_file != "":
                 # Will copy the original stub file to a temporary location and rename
                 # it so that we ensure an unique name (no collision with user files)
-                new_name = "stub_broked_by_" + broker.__class__.__name__ + "_" + os.path.basename(orig_stub_file)
-                stub_file = os.path.join('/tmp',new_name)
-                shutil.copy2(orig_stub_file,stub_file)
+                stubfileName, stubExtension = os.path.splitext(os.path.basename(orig_stub_file))
+                new_name = "stub_broked_by_" + broker.__class__.__name__ + "_" + stubfileName
+                
+                stub_file=tempfile.NamedTemporaryFile(prefix=new_name,suffix=stubExtension,delete=False)
+                stub_file_name=stub_file.name
+                shutil.copy2(orig_stub_file,stub_file_name)
         
                 # register the file as a stub
-                self.stub_files.append(os.path.basename(stub_file)); 
+                self.stub_files.append(os.path.basename(stub_file_name)); 
                 break;
 
 
-        return stub_file
+        return stub_file_name
 
     
 
