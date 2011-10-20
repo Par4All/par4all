@@ -2449,10 +2449,30 @@ entity make_entity_copy_with_new_name(entity e,
     ram r = storage_ram(entity_storage(ne));
     entity m = ram_function(r);
 
-    /* FI: It would be better to perorm the memory allocation right
+    /* FI: It would be better to perform the memory allocation right
        away, instead of waiting for a later core dump in chains or
-       ricedg, but I'm in a hurry. */
-    ram_offset(r) = UNKNOWN_RAM_OFFSET;
+       ricedg, but I'm in a hurry. -> fixed, BC.
+    */
+    //ram_offset(r) = UNKNOWN_RAM_OFFSET;
+
+    const char * module_name = entity_module_name(ne);
+    entity a = FindEntity(module_name, DYNAMIC_AREA_LOCAL_NAME);
+    type t = entity_basic_concrete_type(ne);
+    basic b = type_variable_p(t) ? variable_basic(type_variable(t)) : basic_undefined;
+    int offset = 0;
+    if (basic_undefined_p(b)) /* I don't know if this can happen, and what we should do in such case. BC. */
+      offset = UNKNOWN_RAM_OFFSET;
+    else
+      {
+	if (c_module_p(module_name_to_entity(module_name)))
+	  offset = (basic_tag(b)!=is_basic_overloaded)?
+	    (add_C_variable_to_area(a, ne)):(0);
+	else
+	  offset = (basic_tag(b)!=is_basic_overloaded)?
+	    (add_variable_to_area(a, ne)):(0);
+      }
+
+    ram_offset(r) = offset;
 
     AddEntityToDeclarations(ne, m);
   }

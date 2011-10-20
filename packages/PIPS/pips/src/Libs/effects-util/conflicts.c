@@ -739,7 +739,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
       if (entity_null_locations_p(concrete_location))
         conflict_p = entity_all_locations_p(abstract_location);
 
-      else if ( entity_variable_p(concrete_location) )
+      else if ( type_variable_p(entity_basic_concrete_type(concrete_location)) )
 	    {
 	      if ( variable_return_p( concrete_location ) )
         {
@@ -785,7 +785,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 	    {
 	      conflict_p = same_entity_p(e1,e2);
 	    }
-      else if ( entity_variable_p(e1) && entity_variable_p(e2) )
+      else if ( type_variable_p(entity_basic_concrete_type(e1)) && type_variable_p(entity_basic_concrete_type(e2)) )
 	    {
 	      /* FIXME : variable_entity_must_conflict_p does not exist yet */
 	      if( !must_p)

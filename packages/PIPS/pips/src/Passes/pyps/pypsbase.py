@@ -539,7 +539,7 @@ class workspace(object):
             os.utime(f,None)
             
         shutil.copy(pypsutils.get_runtimefile("pipsdef.h","pypsbase"),rep)
-        return saved,headers+[os.path.join(rep,"pipsdef.h")]
+        return sorted(saved),sorted(headers+[os.path.join(rep,"pipsdef.h")])
 
     def divert(self, rep=None, maker=Maker()):
         """ save the workspace and generates a  makefile according to `maker' """

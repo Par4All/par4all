@@ -562,6 +562,61 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
     outline_remove_duplicates(&referenced_entities);
     return referenced_entities;
 }
+/* create a new type from given type, eventually renaming unnamed structures inside
+ * all new entities generated in the process are added to cu*/
+static
+type type_to_named_type(type t, entity cu) {
+    type tp = t;
+    variable tv = type_variable(tp);
+    basic b = variable_basic(tv);
+    if(basic_derived_p(b)) {
+        entity at = basic_derived(b);
+        bool is_struct = false;
+        if( (is_struct=strncmp(entity_user_name(at),DUMMY_STRUCT_PREFIX,sizeof(DUMMY_STRUCT_PREFIX)-1)==0) 
+                || strncmp(entity_user_name(at),DUMMY_UNION_PREFIX, sizeof(DUMMY_UNION_PREFIX)-1)==0 )
+        {
+            /* create a new named type */
+            int index = 0;
+            char* name = strdup("");;
+            do {
+                free(name);
+                asprintf(&name, "%s" MODULE_SEP_STRING "%cstruct_%d", entity_local_name(cu), is_struct?STRUCT_PREFIX_CHAR:UNION_PREFIX_CHAR,index++);
+            } while(!gen_chunk_undefined_p(gen_find_tabulated(name, entity_domain)));
+
+            FOREACH(ENTITY,filed,is_struct?type_struct(entity_type(at)):type_union(entity_type(at))) {
+            }
+            list newfields = NIL;
+            list fields = is_struct ? type_struct(entity_type(at)) : type_union(entity_type(at));
+            FOREACH(ENTITY, field, fields) {
+                char * ename;
+                asprintf(&ename,"%s" MODULE_SEP_STRING "struct_%d%s" , entity_local_name(cu), index -1, strrchr(entity_name(field),MEMBER_SEP_CHAR));
+                entity e = make_entity(ename,
+                        copy_type(entity_type(field)),
+                        copy_storage(entity_storage(field)),
+                        copy_value(entity_initial(field))
+                        );
+                newfields=CONS(ENTITY,e,newfields);
+            }
+            newfields=gen_nreverse(newfields);
+            type newet;
+            if(is_struct) newet = make_type_struct(newfields);
+            else newet = make_type_union(newfields);
+
+            entity newe = make_entity(name, newet, copy_storage(entity_storage(at)), copy_value(entity_initial(at)));
+            AddEntityToCompilationUnit(newe,cu);
+            type newt =
+                make_type_variable(
+                    make_variable(
+                        make_basic_derived(newe),
+                        gen_full_copy_list(variable_dimensions(tv)),
+                        gen_full_copy_list(variable_qualifiers(tv))
+                        )
+                    );
+            return newt;
+        }
+    }
+    return copy_type(t);
+}
 
 void outliner_parameters(entity new_fun,  statement new_body, list referenced_entities,
 			 hash_table entity_to_effective_parameter,
@@ -587,18 +642,22 @@ void outliner_parameters(entity new_fun,  statement new_body, list referenced_en
                     entity_user_name(e)
                     );
 
-	    if(entity_symbolic_p(e))
-	       entity_type(dummy_entity) = fortran_module_p(new_fun)?
-		 copy_type(functional_result(type_functional(entity_type(e)))):
-		 make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL));
-	    else
-	      entity_type(dummy_entity) = copy_type(entity_type(e));
+            if(entity_symbolic_p(e))
+                entity_type(dummy_entity) = fortran_module_p(new_fun)?
+                    copy_type(functional_result(type_functional(entity_type(e)))):
+                    make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL));
+            else {
+                if(!fortran_module_p(get_current_module_entity()))
+                    entity_type(e) = type_to_named_type(entity_type(e),module_entity_to_compilation_unit_entity(get_current_module_entity()));
+                entity_type(dummy_entity)=copy_type(entity_type(e));
+            }
+
 
             entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
 
 
             formal_parameters=CONS(PARAMETER,make_parameter(
-			copy_type(entity_type(dummy_entity)),
+                        copy_type(entity_type(dummy_entity)),
                         fortran_module_p(get_current_module_entity())?make_mode_reference():make_mode_value(),
                         make_dummy_identifier(dummy_entity)),formal_parameters);
 

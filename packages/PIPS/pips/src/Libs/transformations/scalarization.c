@@ -259,7 +259,7 @@ static entity scalarized_replacement_variable = entity_undefined;
 // gen_recurse callback function for
 // statement_substitute_scalarized_array_references
 static bool reference_substitute(reference r) {
-  bool result = false;
+  bool result = true;
   entity v = reference_variable(r);
   entity scalarized_v = reference_variable(scalarized_reference);
   // This test proved to strong by conditional04 because the region
@@ -272,7 +272,7 @@ static bool reference_substitute(reference r) {
     if (gen_length(inds) == d) {
       reference_variable(r) = scalarized_replacement_variable;
       reference_indices(r) = NIL; // TODO: add missing gen_full_free_list(reference_indices(r))
-      result = true;
+      result = false; /* do not recurse in reference indices which are discarded */
     }
   }
   return result;
@@ -1369,9 +1369,12 @@ bool constant_array_scalarization(const char * module_name)
 /***********************************************************************/
 
 /*
-  scalarizes arrays in already parallel loops. uses only the dg and proper effects.
+  scalarizes arrays in already parallel loops. uses only the dg and
+  simple effects (both proper and cumulated).
  */
 
+/** checks whether an effect memory path describes a set of array elements
+ */
 static bool array_effect_p(effect eff)
 {
   bool result = false;
@@ -1390,6 +1393,55 @@ static bool array_effect_p(effect eff)
   return result;
 }
 
+
+/** returns true if entity e belongs to C module "main"
+
+    could be moved to ri-util/entity.c, but this version is specific
+    because we assume that entity_module_main_p cannot return true if
+    the current module is not the "main" module. This is not valid in
+    the general case, for instance when performing interprocedural
+    translations. However, this choice has been made for performance
+    reasons.
+ */
+static bool entity_module_main_p(entity e)
+{
+  static entity current_module = entity_undefined;
+  static bool current_module_main_p = false;
+  bool result = false;
+
+  if (get_current_module_entity() != current_module)
+    {
+      current_module = get_current_module_entity();
+      if (c_module_p(current_module))
+	{
+	  const char* current_module_name= entity_local_name(current_module);
+	  if (strcmp(current_module_name, "main") == 0)
+	    current_module_main_p = true;
+
+	  pips_debug(8, "module name: %s, local_name: %s, returning %s\n",
+		  entity_name(current_module), entity_local_name(current_module),
+		  bool_to_string(current_module_main_p));
+	}
+    }
+
+  /* in the context of scalarization, an entity which is scalarizable
+     is an entity declared in the current module - so the current module
+     must be the "main" function.
+  */
+  if (current_module_main_p)
+    {
+      result = local_entity_of_module_p(e, current_module);
+      pips_debug(8, "does entity %s belong to module main? %s\n ",
+		 entity_name(e), bool_to_string(result));
+    }
+  else
+    result = false;
+
+  return result;
+}
+
+/** checks if an entity meets the scalarizability criteria.
+ */
 static bool scalarizable_entity_p(entity e)
 {
   storage s = entity_storage( e ) ;
@@ -1407,6 +1459,9 @@ static bool scalarizable_entity_p(entity e)
      necessary to handle them (OUT simple effects should not be
      precise enough), but we want to keep this algorithm very cheap on
      purpose.
+
+     we allow scalarization of arrays with "static" qualifier when
+     they are declared in the "main" module of a C application.
   */
   result = entity_array_p( e ) && !volatile_variable_p(e) &&
     ((storage_formal_p( s ) && parameter_passing_by_value_p(get_current_module_entity()) )
@@ -1414,7 +1469,7 @@ static bool scalarizable_entity_p(entity e)
      (storage_ram_p( s )
       && (dynamic_area_p(ram_section(storage_ram(s)))
 	  || stack_area_p(ram_section(storage_ram(s)))
-	  || static_area_p(ram_section(storage_ram(s))) )
+	  || (static_area_p(ram_section(storage_ram(s))) && entity_module_main_p(e)) )
       )
      );
 
@@ -1423,7 +1478,14 @@ static bool scalarizable_entity_p(entity e)
 }
 
 
+/**
+   if the statement st is a loop, gather the scalarizable candidates
+   in loops_scalarizable_candidates.
 
+   The candidates are the scalarizable arrayentities for which there
+   are cumulated effects attached to the loop body, or which are
+   declared inside the loop body.
+ */
 static bool statement_compute_scalarizable_candidates(statement st, hash_table loops_scalarizable_candidates)
 {
   if (statement_loop_p(st))
@@ -1483,6 +1545,11 @@ static bool statement_compute_scalarizable_candidates(statement st, hash_table l
   return true;
 }
 
+
+/** remove scalarizable candidate e from the
+    loops_scalarizable_candidates corresponding to the loops which are
+    in ls but not in prefix.
+ */
 static void remove_scalarizable_candidate_from_loops(list prefix,
 						     list ls,
 						     entity e,
@@ -1532,6 +1599,16 @@ static void remove_scalarizable_candidate_from_loops(list prefix,
   pips_debug(1, "End\n");
 }
 
+
+/**
+   Main part of the scalarization process: if edges from vertex @param
+   v corresponding to statement @param st may prevent scalarization of
+   effect @param eff entity, then remove the latter from non common
+   enclosing loops in @param loops_scalarizable_candidates.
+
+
+   This is mostly inspired from scalar variable privatization algorithm
+ */
 static void update_scalarizable_candidates(vertex v, statement st,
 					   effect eff,
 					   hash_table loops_scalarizable_candidates)
@@ -1667,7 +1744,8 @@ static void update_scalarizable_candidates(vertex v, statement st,
   pips_debug(1, "End\n");
 }
 
-
+/** local context type for scalarizability post-tests
+ */
 typedef struct {
   entity e;
   bool result;
@@ -1675,6 +1753,10 @@ typedef struct {
   list l_inds_first_ref;
 } scalarizability_test_ctxt;
 
+/** checks that all scalarizable proper effects of statement @param s
+    on current @param s ctxt entity are on the same reference
+    currently stored in @param ctxt.
+ */
 static bool entity_can_be_scalarized_in_statement_in(statement s, scalarizability_test_ctxt *ctxt)
 {
   pips_debug(1, "entering statement %td\n", statement_number(s));
@@ -1683,84 +1765,80 @@ static bool entity_can_be_scalarized_in_statement_in(statement s, scalarizabilit
   bool continue_p = true;
 
   if (!effects_may_read_or_write_memory_paths_from_entity_p(l_eff, ctxt->e))
-    /* the statement has no effect from entity e: it cannot prevent scalarization
-       nor it's inner statements
+    /* the statement has no cumulated effect from entity e: it cannot
+       prevent scalarization nor it's inner statements
     */
     continue_p = false;
   else
     {
-      /* the statement has cumulated effects from entity e;
-	 first check that it's not a call to a function
-	 then check its proper effects before going to inner statements
+      /* the statement has cumulated effects from entity e; check its
+	 proper effects before going to inner statements
       */
-      if (false)
+      l_eff = load_proper_rw_effects_list(s);
+      FOREACH(EFFECT, eff, l_eff)
 	{
-	}
-      else
-	{
-	  l_eff = load_proper_rw_effects_list(s);
-	  FOREACH(EFFECT, eff, l_eff)
+	  reference eff_ref = effect_any_reference(eff);
+	  entity eff_e = reference_variable(eff_ref);
+	  if (store_effect_p(eff) && eff_e == ctxt->e)
 	    {
-	      reference eff_ref = effect_any_reference(eff);
-	      entity eff_e = reference_variable(eff_ref);
-	      if (store_effect_p(eff) && eff_e == ctxt->e)
+	      if (reference_undefined_p(ctxt->first_ref))
 		{
-		  if (reference_undefined_p(ctxt->first_ref))
-		    {
-		      ctxt->first_ref = eff_ref;
-		      ctxt->l_inds_first_ref = reference_indices(ctxt->first_ref);
-		    }
-		  else
-		    {
-		      /* check that current ref is similar to first ref */
-		      list l_inds_eff_ref = reference_indices(eff_ref);
+		  ctxt->first_ref = eff_ref;
+		  ctxt->l_inds_first_ref = reference_indices(ctxt->first_ref);
+		}
+	      else
+		{
+		  /* check that current ref is similar to first ref */
+		  list l_inds_eff_ref = reference_indices(eff_ref);
 
-		      pips_assert("all scalarizable references have the same number of indices",
-				  gen_length(l_inds_eff_ref) == gen_length(ctxt->l_inds_first_ref));
+		  pips_assert("all scalarizable references have the same number of indices",
+			      gen_length(l_inds_eff_ref) == gen_length(ctxt->l_inds_first_ref));
 
-		      list l_first = ctxt->l_inds_first_ref;
-		      FOREACH(EXPRESSION, eff_exp, l_inds_eff_ref)
+		  list l_first = ctxt->l_inds_first_ref;
+		  FOREACH(EXPRESSION, eff_exp, l_inds_eff_ref)
+		    {
+		      expression first_exp = EXPRESSION(CAR(l_first));
+		      if (!expression_equal_p(first_exp, eff_exp))
 			{
-			  expression first_exp = EXPRESSION(CAR(l_first));
-			  if (!expression_equal_p(first_exp, eff_exp))
-			    {
-			      ctxt->result = false;
-			      continue_p = false; /* no need to go on recursing on statements */
-			      break;
-			    }
-			  POP(l_first);
+			  ctxt->result = false;
+			  continue_p = false; /* no need to go on recursing on statements */
+			  break;
 			}
-		      if (!ctxt->result)
-			break;
+		      POP(l_first);
 		    }
-		} /* if (eff_e == e) */
+		  if (!ctxt->result)
+		    break;
+		}
+	    } /* if (eff_e == e) */
 
-	    } /* FOREACH(EFFECT, eff, l_eff) */
-	} /* else */
+	} /* FOREACH(EFFECT, eff, l_eff) */
+
     }
 
   return continue_p;
 }
 
+/** after gathering scalarizable candidates, checks that entity @param
+    e can be scalarized in statement @param s according to 2 criteria:
 
+    1- there are no hidden references to the array due for
+     instance to a function call
+    2- all the accessed references are strictly the same;
+
+ */
 static bool entity_can_be_scalarized_in_statement_p(entity e, statement s)
 {
   bool result = true;
 
   /* First check that there are no hidden references to the array due for
-     instance to a function call, and the substitution might
-     break dependence arcs.
-
-     So, we go on only if the two are equal.
-
-     We assume that array variables cannot be declared volatile
+     instance to a function call.
   */
 
   // Estimate the dynamic number of *element* and *variable*
   // occurrences in the loop body
   int neo = count_references_to_variable_element(s, e);
   int nvo = count_references_to_variable(s, e);
-  if (nvo != neo) 
+  if (nvo != neo)
     {
       pips_debug(2,"First legality criterion not met: %d!=%d (nvo!=neo)\n",nvo,neo);
       result = false;
@@ -1787,7 +1865,7 @@ static bool entity_can_be_scalarized_in_statement_p(entity e, statement s)
 	 a scalarize_reference_in_statement function.
 	 2- references cannot be scalarized if accesses are performed through calls
 
- */
+*/
 static void check_loop_scalarizable_candidates(loop l, hash_table loops_scalarizable_candidates)
 {
   set loop_scalarizable_candidates = hash_get(loops_scalarizable_candidates, l);
@@ -1806,13 +1884,26 @@ static void check_loop_scalarizable_candidates(loop l, hash_table loops_scalariz
 
 }
 
+/** check if scalarizable candidates are legal candidates
+
+    legacy criteria:
+
+	 1- we only scalarize e if all references are on the same
+	 memory location. we could scalarize different references if we had
+	 a scalarize_reference_in_statement function.
+	 2- references cannot be scalarized if accesses are performed through calls
+
+*/
 static void check_scalarizable_candidates(statement s, hash_table loops_scalarizable_candidates)
 {
   gen_context_recurse(s, loops_scalarizable_candidates,
 		      loop_domain, gen_true, check_loop_scalarizable_candidates);
 }
 
+/** Once scalarizable candidates have been discovered, and checked,
+    actually perform the scalarization on the loop @param l.
 
+ */
 static void loop_scalarize_candidates(loop l, hash_table loops_scalarizable_candidates)
 {
   set loop_scalarizable_candidates = hash_get(loops_scalarizable_candidates, l);
@@ -1832,6 +1923,11 @@ static void loop_scalarize_candidates(loop l, hash_table loops_scalarizable_cand
   gen_free_list(l_loop_scalarizable_candidates);
 }
 
+/** Once scalarizable candidates have been discovered, and checked,
+    actually perform the scalarization on the loops reachable from
+    statement @param s.
+
+ */
 static void scalarize_candidates(statement s, hash_table loops_scalarizable_candidates)
 {
   gen_context_recurse(s, loops_scalarizable_candidates,

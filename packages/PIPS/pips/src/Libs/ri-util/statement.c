@@ -2476,6 +2476,7 @@ statement add_declaration_statement(statement s, entity e)
             statement spl = STATEMENT(CAR(pl));
             entity ecar = ENTITY(CAR(statement_declarations(spl)));
             if( comments_equal_p(statement_comments(spl),comment) &&
+                    !basic_undefined_p(entity_basic(e)) && !basic_undefined_p(entity_basic(ecar)) &&
                     basic_equal_p(entity_basic(e),entity_basic(ecar)) &&
                     qualifiers_equal_p(entity_qualifiers(e),entity_qualifiers(ecar))
               )

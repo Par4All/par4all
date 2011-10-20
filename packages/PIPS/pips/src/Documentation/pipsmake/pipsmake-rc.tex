@@ -13202,6 +13202,16 @@ reflect the abstract tree with redundant parentheses.
 PRETTYPRINT_ALL_PARENTHESES FALSE
 \end{PipsProp}
 
+By default, the C prettyprinter uses a minimum of braces to improve
+readability. However, gcc advocates the use of more braces to avoid
+some ambiguities about else clauses. In order to run succesfully gcc
+with options -Wall and -Werror, it is possible to force the print-out
+of all possible braces.
+
+\begin{PipsProp}{PRETTYPRINT_ALL_C_BRACES}
+PRETTYPRINT_ALL_C_BRACES FALSE
+\end{PipsProp}
+
 \subsubsection{Declarations}
 \label{subsubsection-declarations}
 \index{Declaration}
