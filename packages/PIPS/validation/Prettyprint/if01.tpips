@@ -1,0 +1,14 @@
+delete if01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create if01 if01.c
+
+display PARSED_PRINTED_FILE[main]
+
+apply UNSPLIT
+
+shell echo `(cd if01.database/Src; gcc -c -Wall if01.c) 2>&1`
+
+close
+quit

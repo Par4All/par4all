@@ -1,0 +1,18 @@
+delete if02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create if02 if02.c
+
+setproperty PRETTYPRINT_ALL_C_BRACES TRUE
+
+display PARSED_PRINTED_FILE[main]
+
+display PRINTED_FILE[main]
+
+apply UNSPLIT
+
+#shell echo `(cd if02.database/Src; gcc -c -Wall if02.c) 2>&1`
+
+close
+quit
