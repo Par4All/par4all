@@ -69,7 +69,8 @@ def process(input):
                 recover_includes = input.recover_includes,
                 native_recover_includes = input.native_recover_includes,
                 properties = input.properties,
-                apply_phases = input.apply_phases
+                apply_phases = input.apply_phases,
+                brokers = input.brokers
             )
             if input.accel:
                 p4a_util.warn("Activating fine-grain parallelization for accelerator mode")

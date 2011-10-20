@@ -144,6 +144,7 @@ class p4a_processor_input(object):
     output_dir=None
     output_suffix=""
     output_prefix=""
+    brokers=""
     # To store some arbitrary Python code to be executed inside p4a_process:
     execute_some_python_code_in_process = None
     apply_phases={}
@@ -207,7 +208,7 @@ class p4a_processor(object):
                  filter_exclude = None, accel = False, cuda = False,
                  opencl = False, openmp = False, com_optimization = False, cuda_cc=2, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
-                 c99 = False, use_pocc = False, atomic = False,
+                 c99 = False, use_pocc = False, atomic = False, brokers="",
                  properties = {}, apply_phases={}, activates = []):
 
         self.recover_includes = recover_includes
@@ -294,12 +295,15 @@ class p4a_processor(object):
             # If we have #include recovery and want to use the native one:
             recover_Include = self.recover_includes and self.native_recover_includes
             # Create the PyPS workspace:
+            if brokers != "":
+                brokers+=","
+            brokers+="p4a_stubs_broker"
             self.workspace = broker.workspace(*self.files,
                                               name = self.project_name,
                                               verbose = verbose,
                                               cppflags = cpp_flags,
                                               recoverInclude = recover_Include,
-                                              brokersList="p4a_stubs_broker")
+                                              brokersList=brokers)
 
             # Array regions are a must! :-) Ask for most precise array
             # regions:
