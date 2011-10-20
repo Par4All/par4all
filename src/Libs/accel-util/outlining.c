@@ -566,7 +566,7 @@ list outliner_scan(entity new_fun, list statements_to_outline, statement new_bod
  * all new entities generated in the process are added to cu*/
 static
 type type_to_named_type(type t, entity cu) {
-    type tp = ultimate_type(t);
+    type tp = t;
     variable tv = type_variable(tp);
     basic b = variable_basic(tv);
     if(basic_derived_p(b)) {
