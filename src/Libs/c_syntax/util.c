@@ -673,7 +673,9 @@ entity FindEntityFromLocalName(string name)
 
   if(entity_undefined_p(ent)) {
     /* Is it a static function? It must have been parsed in the compilation unit */
-    ent = FindEntity(compilation_unit_name, name);
+    string sname = strdup(concatenate(compilation_unit_name, name, NULL));
+    ent = FindEntity(compilation_unit_name, sname);
+    free(sname);
     return ent;
   }
 
