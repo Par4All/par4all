@@ -175,9 +175,11 @@ class module(object): # deriving from object is needed for overloaded setter
     def display(self,activate="print_code", rc="printed_file", **props):
         """display a given resource rc of the module, with the
         ability to change the properties"""
-        self.__ws.activate(activate)
-        pypsutils.set_properties(self.__ws,props)
-        return self.__ws.cpypips.display(rc.upper(),self.name)
+        self.__ws.activate(activate) # sg: this should be stack-based ?
+        if self.workspace: old_props = pypsutils.set_properties(self.workspace,pypsutils.update_props("DISPLAY",props))
+        res= self.__ws.cpypips.display(rc.upper(),self.name)
+        if self.workspace: pypsutils.set_properties(self.workspace,old_props)
+        return res
 
 
     def _set_code(self,newcode):
