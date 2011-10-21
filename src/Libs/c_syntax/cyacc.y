@@ -670,6 +670,22 @@ globals:
                         {
 			  list dsl = $3;
 			  list gdsl = $2;
+
+			  /* PRAGMA */
+			  if(!ENDP(dsl) && gen_length(gdsl)==1)
+			    {
+			      statement stmt = STATEMENT(CAR(dsl));
+			      statement stmt_pragma = STATEMENT(CAR(gdsl));
+			      list exs = extensions_extension(statement_extensions(stmt_pragma));
+			      if (!ENDP(exs))
+			      {
+				extensions_extension(statement_extensions(stmt)) = gen_nconc(exs, extensions_extension(statement_extensions(stmt)));
+				extensions_extension(statement_extensions(stmt_pragma)) = NIL;
+				gen_full_free_list(gdsl);
+				gdsl = NIL;
+			      }
+			    }
+
 			  list dl = statements_to_declarations(dsl);
 			  /* Each variable should be declared only
 			     once. Type and initial value conflict
@@ -747,8 +763,13 @@ declaration         {/* discard_C_comment();*/ }
 			}
 |   TK_PRAGMA /*attr*/
                         {
+			  /*
 			  CParserError("PRAGMA not implemented at top level\n");
 			  $$ = NIL;
+			  */
+			  statement s = make_continue_statement(entity_empty_label());
+			  add_pragma_str_to_statement(s, $1, true);
+			  $$ = CONS(STATEMENT, s, NIL);
 			}
 /* Old-style function prototype. This should be somewhere else, like in
    "declaration". For now we keep it at global scope only because in local
