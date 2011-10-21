@@ -406,20 +406,19 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 
 l99995:
    for(i_0 = 0; i_0 <= -1+w; i_0 += 1)
-l99996:      inner(h, w, &i_0, bytes, dest, lut, val);
+l99996:      inner(h, w, i_0, bytes, dest, lut, val);
    
    
    ;
 }
-void inner(int h, int w, int i_0_0[1], unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
+void inner(int h, int w, int i_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
    int I_3;
    //PIPS generated variable
    unsigned char current_0, current_1;
    //PIPS generated variable
-   int j_0, i_0;
-   i_0 = *i_0_0;
+   int j_0;
 l99996:
    for(j_0 = 0; j_0 <= h+(-1); j_0 += 1) {
       I_3 = j_0*w+i_0;
@@ -427,17 +426,15 @@ l99996:
       current_1 = lut[current_0];
       dest[I_3] = adds(current_1, val);
    }
-   *i_0_0 = i_0;
 }
-void inner(int h, int w, int i_0_0[1], unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
+void inner(int h, int w, int i_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
    int I_3;
    //PIPS generated variable
    unsigned char voltage_0, voltage_1;
    //PIPS generated variable
-   int j_0, i_0;
-   i_0 = *i_0_0;
+   int j_0;
 l99996:
    for(j_0 = 0; j_0 <= h+(-1); j_0 += 1) {
       I_3 = j_0*w+i_0;
@@ -445,5 +442,4 @@ l99996:
       voltage_1 = lut[voltage_0];
       dest[I_3] = adds(voltage_1, val);
    }
-   *i_0_0 = i_0;
 }
