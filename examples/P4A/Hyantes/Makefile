@@ -12,5 +12,7 @@ display% : run%
 	#gnuplot -persist -e "set pm3d map; set palette gray; set size ratio 1; splot 'output$*'"
 	gnuplot -persist -e "set pm3d map; set size ratio 1; splot 'output$*'"
 
+display_cuda-opt:
+	@echo "Cuda optimisation is not yet supported"
 
 include ../common.mk
