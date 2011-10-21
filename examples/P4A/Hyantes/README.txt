@@ -82,10 +82,23 @@ You can set the P4A_OPTIONS variable to pass some options to p4a.
   or locally with:
   make P4A_OPTIONS='--nvcc-flags="-gencode arch=compute_20,code=sm_20"' run_cuda
 
+For the OpenCL parallel execution on nVidia GPU:
+
+  make opencl : parallelize the code to OpenCL sources: the host program source
+  hyantes-static-99.p4a.c and the kernel program source p4a_wrapper_run.cl
+
+  make run_opencl : build first if needed, then run the OpenCL parallel
+  program
+
+    To compile for nVidia GPU, you need CUDA environment installed. 
+
+  make display_opencl : build first if needed, run if needed, then display
+  the output of the OpenCL parallel version with gnuplot
 
 For a full demo:
 
-  make demo : to chain make display_seq, make display_openmp, make display_cuda
+  make demo : to chain make display_seq, display_openmp, display_cuda, 
+  display_accel-openmp, display_opencl
 
 
 To run this example on GPU that does not support double precision, you
@@ -122,3 +135,5 @@ Some results:
   - OpenMP parallel execution time on CPUs: 18.9s, speed-up: 2.01
 
   - CUDA parallel execution time on GPU: 1.57s, speed-up: 24.2
+  
+  

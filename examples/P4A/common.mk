@@ -41,10 +41,10 @@ default:
 	# remains displayed...
 	more README.txt
 
-demo : display_seq display_openmp display_cuda display_cuda-opt display_accel-openmp ;
+demo : display_seq display_openmp display_cuda display_cuda-opt display_accel-openmp display_opencl;
 
 build-all: $(TARGET)_seq $(TARGET)_openmp $(TARGET)_autocuda \
-						$(TARGET)_autocuda_comm_optimization $(TARGET)_cuda
+						$(TARGET)_autocuda_comm_optimization $(TARGET)_cuda $(TARGET)_opencl
 
 clean :
 	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) \
@@ -67,7 +67,7 @@ run_%: $(TARGET)-%
 
 $(TARGET)-seq : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES)
 	# Compilation of the sequential program:
-	$(CC) $(CPPFLAGS) $(CPU_TIMING) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $(COMMON_SOURCES) $(SOURCES)
+	$(CC) $(CPPFLAGS) $(CPU_TIMING) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $(COMMON_SOURCES) $(SOURCES) $(GRAPHICS_SRC)
 
 $(TARGET)-pgi : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(PGI_SOURCES)
 	# Parallelize and build a CUDA version using PGI accelerator
