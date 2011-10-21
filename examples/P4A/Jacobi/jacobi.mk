@@ -13,6 +13,9 @@ display% : run%
 	# Display graphically the results:
 	eog output$*.pgm
 
+display_cuda-opt:
+	@echo "Cuda optimisation is not yet supported"
+
 check% : run%
 	mv output.pgm output$*.pgm
 	# Compare the result with the reference. Note that there may be
