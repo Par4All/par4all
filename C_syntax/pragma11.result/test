@@ -1,0 +1,79 @@
+
+Symbol table for pragma11!
+
+pragma11!
+
+Declarations for module "pragma11!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:a" with type "variable" "int"
+	Declared entity "TOP-LEVEL:pragma11" with type "functional" "void -> int"
+	Declared entity "pragma11!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "pragma11!:*HEAP*" with type "area" with size 0
+	Declared entity "pragma11!:*STACK*" with type "area" with size 0
+	Declared entity "pragma11!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:a"	offset = 0	size = 4
+
+
+Layout for memory area "pragma11!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma11!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma11!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma11!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module pragma11!
+
+
+Parsed printed file
+
+// BEGIN BLOCK
+//txt1
+//txt2
+#pragma directive1
+int a;
+
+//txt3
+//txt4
+//txt5
+#pragma directive2
+#pragma directive3
+int pragma11(void);
+#pragma directive4
+
+// END BLOCK
+
+Printed file
+
+// BEGIN BLOCK
+//txt1
+//txt2
+#pragma directive1
+int a;
+
+//txt3
+//txt4
+//txt5
+#pragma directive2
+#pragma directive3
+int pragma11(void);
+#pragma directive4
+
+// END BLOCK

@@ -1,0 +1,42 @@
+setenv WS pragma11
+delete $WS
+setproperty CHECK_C_SYNTAX_BEFORE_RUNNING_PIPS FALSE
+create $WS $WS.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_BLOCKS  TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+echo
+echo Symbol table for "$WS!"
+echo
+
+display SYMBOL_TABLE_FILE[$WS!]
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[$WS!]
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[$WS!]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+#delete $WS
+
+quit
