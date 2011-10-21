@@ -1579,14 +1579,14 @@ string gather_all_comments_of_a_statement(statement s)
 
 
 /* Find the first non-empty comment of a statement, if any
- * returns a pointer to the comment if found, NULL otherwise*/
+ * returns a pointer to the comment if found, pointer to NULL */
 char** find_first_statement_comment(statement s)
 {
     static char * an_empty_comment = empty_comments;
     if (statement_block_p(s)) {
         FOREACH(STATEMENT, st, statement_block(s)){
             char** comment = find_first_statement_comment(st);
-            if (comment)
+            if (!empty_comments_p(*comment))
                 /* We've found it! */
                 return comment;
         }
@@ -1618,7 +1618,7 @@ char** find_first_comment(statement s)
             /* let's hope the parser generates an empty string as
                comment rather than empty_comments which is defined as
                empty_string */
-            if (!empty_comments_p(*comment))
+            if (*comment!=empty_comments)
                 /* We've found it! */
                 return comment;
         }
