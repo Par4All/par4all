@@ -1,5 +1,5 @@
 /* Supplemental information about the floating-point formats.
-   Copyright (C) 2007, 2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2011 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
    This program is free software; you can redistribute it and/or modify
@@ -141,8 +141,8 @@
 #define SIZEOF_LDBL ((LDBL_TOTAL_BIT + CHAR_BIT - 1) / CHAR_BIT)
 
 /* Verify that SIZEOF_FLT <= sizeof (float) etc.  */
-typedef int verify_sizeof_flt[2 * (SIZEOF_FLT <= sizeof (float)) - 1];
-typedef int verify_sizeof_dbl[2 * (SIZEOF_DBL <= sizeof (double)) - 1];
-typedef int verify_sizeof_ldbl[2 * (SIZEOF_LDBL <= sizeof (long double)) - 1];
+typedef int verify_sizeof_flt[SIZEOF_FLT <= sizeof (float) ? 1 : -1];
+typedef int verify_sizeof_dbl[SIZEOF_DBL <= sizeof (double) ? 1 : - 1];
+typedef int verify_sizeof_ldbl[SIZEOF_LDBL <= sizeof (long double) ? 1 : - 1];
 
 #endif /* _FLOATPLUS_H */

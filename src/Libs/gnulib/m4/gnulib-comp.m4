@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2010 Free Software Foundation, Inc.
+# Copyright (C) 2002-2011 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -12,7 +12,8 @@
 # This file represents the compiled summary of the specification in
 # gnulib-cache.m4. It lists the computed macro invocations that need
 # to be invoked from configure.ac.
-# In projects using CVS, this file can be treated like other built files.
+# In projects that use version control, this file can be treated like
+# other built files.
 
 
 # This macro should be invoked from ../../../configure.ac, in the section
@@ -24,10 +25,8 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_ES$])dnl a valid locale name
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
-  AC_REQUIRE([AC_PROG_RANLIB])
+  AC_REQUIRE([gl_PROG_AR_RANLIB])
   # Code from module alloca-opt:
-  # Code from module arg-nonnull:
-  # Code from module c++defs:
   # Code from module errno:
   # Code from module extensions:
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
@@ -36,12 +35,17 @@ AC_DEFUN([gl_EARLY],
   # Code from module malloc-posix:
   # Code from module memchr:
   # Code from module multiarch:
+  # Code from module rawmemchr:
   # Code from module size_max:
+  # Code from module snippet/_Noreturn:
+  # Code from module snippet/arg-nonnull:
+  # Code from module snippet/c++defs:
+  # Code from module snippet/warn-on-use:
   # Code from module stddef:
   # Code from module stdint:
   # Code from module stdio:
   # Code from module stdlib:
-  # Code from module strdup:
+  # Code from module strchrnul:
   # Code from module strdup-posix:
   # Code from module string:
   # Code from module strndup:
@@ -49,7 +53,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module unistd:
   # Code from module vasnprintf:
   # Code from module vasprintf:
-  # Code from module warn-on-use:
+  # Code from module verify:
   # Code from module wchar:
   # Code from module xsize:
 ])
@@ -68,64 +72,68 @@ AC_DEFUN([gl_INIT],
   m4_pushdef([gl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='src/Libs/gnulib'
-  # Code from module alloca-opt:
-  gl_FUNC_ALLOCA
-  # Code from module arg-nonnull:
-  # Code from module c++defs:
-  # Code from module errno:
-  gl_HEADER_ERRNO_H
-  # Code from module extensions:
-  # Code from module float:
-  gl_FLOAT_H
-  # Code from module include_next:
-  # Code from module malloc-posix:
-  gl_FUNC_MALLOC_POSIX
-  gl_STDLIB_MODULE_INDICATOR([malloc-posix])
-  # Code from module memchr:
-  gl_FUNC_MEMCHR
-  gl_STRING_MODULE_INDICATOR([memchr])
-  # Code from module multiarch:
-  gl_MULTIARCH
-  # Code from module size_max:
-  gl_SIZE_MAX
-  # Code from module stddef:
-  gl_STDDEF_H
-  # Code from module stdint:
-  gl_STDINT_H
-  # Code from module stdio:
-  gl_STDIO_H
-  # Code from module stdlib:
-  gl_STDLIB_H
-  # Code from module strdup:
-  gl_FUNC_STRDUP
-  gl_STRING_MODULE_INDICATOR([strdup])
-  # Code from module strdup-posix:
-  gl_FUNC_STRDUP_POSIX
-  gl_STRING_MODULE_INDICATOR([strdup])
-  # Code from module string:
-  gl_HEADER_STRING_H
-  # Code from module strndup:
-  gl_FUNC_STRNDUP
-  gl_STRING_MODULE_INDICATOR([strndup])
-  # Code from module strnlen:
-  gl_FUNC_STRNLEN
-  gl_STRING_MODULE_INDICATOR([strnlen])
-  # Code from module unistd:
-  gl_UNISTD_H
-  # Code from module vasnprintf:
-  gl_FUNC_VASNPRINTF
-  # Code from module vasprintf:
-  gl_FUNC_VASPRINTF
-  gl_STDIO_MODULE_INDICATOR([vasprintf])
-  m4_ifdef([AM_XGETTEXT_OPTION],
-    [AM_][XGETTEXT_OPTION([--flag=asprintf:2:c-format])
-     AM_][XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
-  # Code from module warn-on-use:
-  # Code from module wchar:
-  gl_WCHAR_H
-  # Code from module xsize:
-  gl_XSIZE
-  # Code from module dummy:
+gl_FUNC_ALLOCA
+gl_HEADER_ERRNO_H
+gl_FLOAT_H
+if test $REPLACE_FLOAT_LDBL = 1; then
+  AC_LIBOBJ([float])
+fi
+gl_FUNC_MALLOC_POSIX
+if test $REPLACE_MALLOC = 1; then
+  AC_LIBOBJ([malloc])
+fi
+gl_STDLIB_MODULE_INDICATOR([malloc-posix])
+gl_FUNC_MEMCHR
+if test $HAVE_MEMCHR = 0 || test $REPLACE_MEMCHR = 1; then
+  AC_LIBOBJ([memchr])
+  gl_PREREQ_MEMCHR
+fi
+gl_STRING_MODULE_INDICATOR([memchr])
+gl_MULTIARCH
+gl_FUNC_RAWMEMCHR
+if test $HAVE_RAWMEMCHR = 0; then
+  AC_LIBOBJ([rawmemchr])
+  gl_PREREQ_RAWMEMCHR
+fi
+gl_STRING_MODULE_INDICATOR([rawmemchr])
+gl_SIZE_MAX
+gl_STDDEF_H
+gl_STDINT_H
+gl_STDIO_H
+gl_STDLIB_H
+gl_FUNC_STRCHRNUL
+if test $HAVE_STRCHRNUL = 0 || test $REPLACE_STRCHRNUL = 1; then
+  AC_LIBOBJ([strchrnul])
+  gl_PREREQ_STRCHRNUL
+fi
+gl_STRING_MODULE_INDICATOR([strchrnul])
+gl_FUNC_STRDUP_POSIX
+if test $ac_cv_func_strdup = no || test $REPLACE_STRDUP = 1; then
+  AC_LIBOBJ([strdup])
+  gl_PREREQ_STRDUP
+fi
+gl_STRING_MODULE_INDICATOR([strdup])
+gl_HEADER_STRING_H
+gl_FUNC_STRNDUP
+if test $HAVE_STRNDUP = 0 || test $REPLACE_STRNDUP = 1; then
+  AC_LIBOBJ([strndup])
+fi
+gl_STRING_MODULE_INDICATOR([strndup])
+gl_FUNC_STRNLEN
+if test $HAVE_DECL_STRNLEN = 0 || test $REPLACE_STRNLEN = 1; then
+  AC_LIBOBJ([strnlen])
+  gl_PREREQ_STRNLEN
+fi
+gl_STRING_MODULE_INDICATOR([strnlen])
+gl_UNISTD_H
+gl_FUNC_VASNPRINTF
+gl_FUNC_VASPRINTF
+gl_STDIO_MODULE_INDICATOR([vasprintf])
+m4_ifdef([AM_XGETTEXT_OPTION],
+  [AM_][XGETTEXT_OPTION([--flag=asprintf:2:c-format])
+   AM_][XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
+gl_WCHAR_H
+gl_XSIZE
   # End of code from modules
   m4_ifval(gl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gl_LIBSOURCES_DIR])[ ||
@@ -262,15 +270,17 @@ AC_DEFUN([gltests_LIBSOURCES], [
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
-  build-aux/arg-nonnull.h
-  build-aux/cPPdefs.h
-  build-aux/warn-on-use.h
+  build-aux/snippet/_Noreturn.h
+  build-aux/snippet/arg-nonnull.h
+  build-aux/snippet/cPPdefs.h
+  build-aux/snippet/warn-on-use.h
   lib/alloca.in.h
   lib/asnprintf.c
   lib/asprintf.c
   lib/dummy.c
   lib/errno.in.h
   lib/float_p.h
+  lib/float.c
   lib/float.in.h
   lib/malloc.c
   lib/memchr.c
@@ -279,12 +289,15 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/printf-args.h
   lib/printf-parse.c
   lib/printf-parse.h
+  lib/rawmemchr.c
+  lib/rawmemchr.valgrind
   lib/size_max.h
   lib/stddef.in.h
   lib/stdint.in.h
-  lib/stdio-write.c
   lib/stdio.in.h
   lib/stdlib.in.h
+  lib/strchrnul.c
+  lib/strchrnul.valgrind
   lib/strdup.c
   lib/string.in.h
   lib/strndup.c
@@ -293,11 +306,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/vasprintf.c
+  lib/verify.h
   lib/wchar.in.h
   lib/xsize.h
   m4/00gnulib.m4
   m4/alloca.m4
-  m4/asm-underscore.m4
   m4/errno_h.m4
   m4/extensions.m4
   m4/float_h.m4
@@ -311,12 +324,14 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/mmap-anon.m4
   m4/multiarch.m4
   m4/printf.m4
+  m4/rawmemchr.m4
   m4/size_max.m4
   m4/stddef_h.m4
   m4/stdint.m4
   m4/stdint_h.m4
   m4/stdio_h.m4
   m4/stdlib_h.m4
+  m4/strchrnul.m4
   m4/strdup.m4
   m4/string_h.m4
   m4/strndup.m4
