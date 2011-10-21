@@ -10222,9 +10222,20 @@ Use following property to control how generated variables are initialized
 INLINING_USE_INITIALIZATION_LIST TRUE
 \end{PipsProp}
 
-Use following property to control wheter inlining should ignore stubs:
+Use following property to control whether inlining should ignore stubs:
 \begin{PipsProp}{INLINING_IGNORE_STUBS}
 INLINING_IGNORE_STUBS TRUE
+\end{PipsProp}
+
+Use following property to control whether inlining should ignore stubs:
+\begin{PipsProp}{INLINING_IGNORE_STUBS}
+INLINING_IGNORE_STUBS TRUE
+\end{PipsProp}
+
+Set following property to TRUE to add comments on inlinied statements to
+keep track of their origin.
+\begin{PipsProp}{INLINING_COMMENT_ORIGIN}
+INLINING_COMMENT_ORIGIN FALSE
 \end{PipsProp}
 
 \begin{PipsPass}{inlining_simple}
