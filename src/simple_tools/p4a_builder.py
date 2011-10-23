@@ -116,19 +116,23 @@ def get_opencl_ld_flags(m64 = True):
     '''To be restructured for multi-platforms OpenCL
     '''	
     opencl_dir=get_amd_opencl_dir()
+    lib_arch_suffix = ""
     if opencl_dir:
-        lib_opencl_path=os.path.join(opencl_dir, "lib/x86")
+        lib_opencl_path=os.path.join(opencl_dir, "lib/")
+        if m64:
+            lib_arch_suffix = "x86_64"
+        else:
+            lib_arch_suffix = "x86"
     else:
         opencl_dir = get_cuda_dir()
         lib_opencl_path=os.path.join(opencl_dir, "lib")
-    lib_arch_suffix = ""
-    if m64:
-        lib_arch_suffix = "_x86_64"
-    else:
-        lib_arch_suffix = "_i386"
+        if m64:
+            lib_arch_suffix = "64"
+        else:
+            lib_arch_suffix = ""
     flags = [
 #        "-L" + os.path.join(cuda_dir, "lib64"),
-        "-L" + os.path.join(opencl_dir, "lib64"),        
+        "-L" + os.path.join(opencl_dir, lib_opencl_path + lib_arch_suffix),        
 #        "-L" + os.path.join(cuda_dir, "lib"),  # for cuda
         "-L" + lib_opencl_path,
         "-L/usr/lib",
