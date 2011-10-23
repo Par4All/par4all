@@ -84,7 +84,7 @@ def replace_by_opencl_own_declarations(content):
     # P4A_accel_kernel.*(.*  type  *var
     # substituted by:
     # P4A_accel_kernel.*(.*  P4A_accel_global_address type  *var
-    content = re.sub("(P4A_accel_kernel(?:_wrapper)?\s*\w*\()([^;]*)",patch_opencl_kernel_declaration, content)
+    content = re.sub("(P4A_accel_kernel(?:_wrapper)?\s*\w*\()([^;\n]*)",patch_opencl_kernel_declaration, content)
 
     return content
 
