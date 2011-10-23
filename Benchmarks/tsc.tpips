@@ -30,55 +30,115 @@ close
 
 shell (cd tsc.database; for i in $modules; do echo $i " " `grep -i '#pragma omp parallel for' $i/$i.par.c | wc -l` ;done; echo; echo Total `cat */*.par.c| grep -i  '#pragma omp parallel for' | wc -l`) >tsc.database/Tmp/faa
 
-# This list was established for the Fortran version of the benchmark
-# It still has to be done for the C version with lower case sxxx functions
-# Special cases that do not parallelize with default options
-# S123: conditional induction variable recognition; use transformer in dependence test, but that will not be enough 
-# S124: induction variable recognition: messed up by non affine upper bound (!)
-# S151S: induction variable recognition
-# S161: restructure control; coarse grain does not work because it is vectorizable not parallelizable with C(I+1) and C(I)
-# S152S: no loop in this module
-# S161: no loop in this module
-# S162: vector loop is not parallel
-# S234: retructure control + induction variable recognition
-# S253: vector with guards; or coarse grain parallelization
-# S258: scalar and array expansion wrap-around scalar under an if
-# S271: conditional vector coode; or coarse grain parallelization 
-# S2710: guarded vector code
-# S2711: semantic if removal; or guarded vector code; or coarse
-# S2712: guarded vector code; or idiom recognition; or coarse
-# S272: guarded vector code; or coarse
-# S273: guarded vector code; or coarse
-# S274: guarded vector code; or coarse
-# S275: if around inner loop, interchanging needed; or coarse
-# S276: index set splitting; multiple version; or guards; or coarse
-# S277: simplify control; guarded vector code; or coarse
-# S278: simplify control; guarded vector code; or coarse
-# S279: simplify control; guarded vector code; or coarse
-# S3110: if to max with index reduction, 2 dimensions
-# S3111: conditional sum reduction
-# S3113: maximum of absolute value; reduction
-# S314: max reduction
-# S315: max reduction + index reduction
-# S316: min reduction
-# S318: isamax, max absolute value, increments not equal to 1; simplify control
-# S331: search loop, if to last-1
-# S332: search loops, first value greater than threshold; loop exit
-# S341: pack positive values
-# S342: unpacking
-# S343: pack 2-d array into one dimension
-# S411: loop recognition/recovery
-# S412: loop recognition/recovery
-# S412: loop recognition/recovery
-# S413: loop recognition/recovery
-# S414: loop recognition/recovery + loop interchanging
-# S415: while loop recognition/recovery
-# S441: simplify control; guarded vector code; coarse grain
-# S442: simplify control; guarded vector code; coarse grain
-# S443: simplify control; guarded vector code; coarse grain
-# S471S: empty
-# S481: STOP within loop
-# S482: loop with exit
+#
+# Parallelization failures
+#
+
+# Only 58 out of 158 loops are parallelized. Note that some of them
+# are only vectorizable but not parallelizable
+
+#
+#s1113 0 0 0 index set splitting?
+#s112  0 0 0 loop reversal + real vectorization, not parallelization
+#s116  0 0 0 unrolled + vectorizable but not parallelizable
+#s1161 0 0 0 require pass restructure_control
+#s118  0 0 0 the j loop is a reduction, the i loop should be parallel... check the dependence graph
+#s121  0 0 0 induction variable
+#s122  0 0 0 induction variable + ?
+#s1221 0 0 0 lattice?
+#s123  0 0 0 conditional induction variable
+#s124  0 0 0 conditional induction variable
+#s1244 0 0 0 requires a copy of the old values of a in d?
+#s125  0 0 0 induction variable recognition
+#s1251 0 0 0 privatization or scalar expansion
+#s126  0 0 0 induction variable recognition
+#s127  0 0 0 induction variable recognition
+#s1279 0 0 0 mask required
+#s128  0 0 0 induction variable recognition
+#s1281 0 0 0 privatization?
+#s131  0 0 0 vectorizable but not parallelizable
+#s13110 0 0 0 reduction detection
+#s1351 0 0 0 induction pointer detection
+#s141  0 0 0 non-linear subscript expression
+#s1421 0 0 0 non aliasing detection -> Amira
+#s1421_2 0 0 0 call to s1421_2s, aliasing
+#s1421_2s 0 0 0
+#s151  0 0 0 interprocedural analysis
+#s151s 0 0 0 see above
+#s152  0 0 0 interprocedural analysis
+#s152s 0 0 0 see above
+#s161  0 0 0 restructure control
+#s162  0 0 0 vectorizable but not parallelizable
+#s171  0 0 0 partial eval or improvement of dependence test
+#s175  0 0 0 vectorizable but not parallelizable
+#
+#s2111 0 0 0
+#s241  0 0 0
+#s242  0 0 0
+#s243  0 0 0
+#s244  0 0 0
+#s251  0 0 0
+#s252  0 0 0
+#s253  0 0 0
+#s254  0 0 0
+#s255  0 0 0
+#s257  0 0 0
+#s258  0 0 0
+#s261  0 0 0
+#s271  0 0 0
+#s2710 0 0 0
+#s2711 0 0 0
+#s2712 0 0 0
+#s272  0 0 0
+#s273  0 0 0
+#s274  0 0 0
+#s275  0 0 0
+#s276  0 0 0
+#s277  0 0 0
+#s278  0 0 0
+#s279  0 0 0
+#s281  0 0 0
+#s291  0 0 0
+#s292  0 0 0
+#s293  0 0 0
+#s311  0 0 0
+#s3110 0 0 0
+#s3111 0 0 0
+#s31111 0 0 0
+#s3112 0 0 0
+#s3113 0 0 0
+#s312  0 0 0
+#s313  0 0 0
+#s314  0 0 0
+#s316  0 0 0
+#s317  0 0 0
+#s318  0 0 0
+#s321  0 0 0
+#s322  0 0 0
+#s323  0 0 0
+#s331  0 0 0
+#s332  0 0 0
+#s341  0 0 0
+#s342  0 0 0
+#s343  0 0 0
+#s352  0 0 0
+#s353  0 0 0
+#s4112 0 0 0
+#s4113 0 0 0
+#s4114 0 0 0
+#s4115 0 0 0
+#s4116 0 0 0
+#s421  0 0 0
+#s422  0 0 0
+#s423  0 0 0
+#s424  0 0 0
+#s441  0 0 0
+#s442  0 0 0
+#s443  0 0 0
+#s453  0 0 0
+#s481  0 0 0
+#s482  0 0 0
+#s491  0 0 0
 
 open tsc
 
