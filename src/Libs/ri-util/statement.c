@@ -1579,7 +1579,8 @@ string gather_all_comments_of_a_statement(statement s)
 
 
 /* Find the first non-empty comment of a statement, if any
- * returns a pointer to the comment if found, pointer to NULL */
+ * returns a pointer to the comment if found,
+ * pointer to NULL otherwise */
 char** find_first_statement_comment(statement s)
 {
     static char * an_empty_comment = empty_comments;
