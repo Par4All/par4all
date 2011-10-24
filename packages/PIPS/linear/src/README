@@ -1,6 +1,6 @@
-# README version 1.4
-# 96/07/13, 18:53:54
-# - Fabien COELHO 1996
+# README version 1.5
+# 2011/10/21, 10:52:00
+# - Francois IRIGOIN
 
 
 C3/LINEAR LIBRARY FOR LINEAR INTEGER PROGRAMMING
@@ -8,25 +8,43 @@ C3/LINEAR LIBRARY FOR LINEAR INTEGER PROGRAMMING
 
 contributors: [linear@cri.ensmp.fr]
 
-Corinne Ancourt, Neil Butler, Malik Imadache, Francois Irigoin,
-Yi-qing Yang, Béatrice Creusillet, Fabien Coelho.
+Corinne Ancourt, Neil Butler, Béatrice Creusillet, Fabien Coelho,
+Malik Imadache, Francois Irigoin, Duong Nguyen, Nga Nguyen, Yi-qing Yang.
 
+This library uses sparse data structures to store the vectors,
+constraints and constraint systems, and dense data structures for
+matrices.
+
+The C data type for the coefficients is Value. It can be set to 32 or
+64 bit integers, but is incompatible with big nums. Arithmetic
+overflows are trapped.
+
+The convex hull is based on the Polylib implementation of
+Chernikova. The Polylib must be installed to use Linear fully.
+
+The library is also interfaced with the Janus libray.
 
 BUILDING THE LIBRARIES
 ----------------------
+
+The libraries are available on Internet at URL:
+
+  LINEAR_SVN=http://svn.cri.ensmp.fr/svn/linear
+
 
 - for building these libraries, use gmake (GNU Make)
 - environment variables of interest for building the linear libraries
 
 directories:
-  LINEAR_DIR=/projects/C3/Linear # for instance
-  LINEAR_PRODDIR=$(LINEAR_DIR)/Production
-  LINEAR_INCDIR=$(LINEAR_PRODDIR)/Include (old: INCLUDEDIR)
+  LINEAR_ROOT= your-installation-directory/prod/linear
+  LINEAR_PRODDIR=$(LINEAR_ROOT)
+  LINEAR_INCDIR=$(LINEAR_PRODDIR)/include
   LINEAR_SHRDIR=${LINEAR_PRODDIR}/Share   (old in /Include)
-  LINEAR_LIBDIR=$(LINEAR_PRODDIR)/Lib
-  LINEAR_SRCDIR=$(LINEAR_PRODDIR)/Src
+  LINEAR_LIBDIR=$(LINEAR_PRODDIR)/lib
+  LINEAR_SRCDIR=$(LINEAR_PRODDIR)/src
 
 the order in which libraires should be built:
+
   LINEAR_ORDERED_LIBS="arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union"
 
 architecture:
@@ -45,6 +63,8 @@ USING THE LIBRARY
   include the needed headers stored in $LINEAR_INCLUDEDIR
   links to the libraries stored in $LINEAR_LIBDIR/$PIPS_ARCH
 
+  For use examples, see the Tests directory.
+
 
 DATA TYPES HIERARCHY
 --------------------
@@ -60,6 +80,41 @@ DATA TYPES HIERARCHY
   sparse_sc[matrice,sc]: sparse systems
   sg[sommet,ray_dte]: generating systems
   polyedre[sg,sc]: polyhedrons
+
+  union[sc]: polyhedron list, Presburger equivalent (see Arnauld
+  Leservot's PhD)
+
+  polynome[sc]: polynomial library
+
+  The interesting functions are located in the "sc" library when only
+  constraints are used. If the dual representation is used (sg
+  library), functions are to be found in the "polyedre" library.
+
+  Each source sub-directory, e.g. arithmetique, contains information
+  about its data structures in sub-directory/sub-directory.h,
+  e.g. arithmetique/arithmetique.h or sc/sc.h, and about the
+  sub-directory functions. This is information is usually given in
+  French. Source code also contains comments for each function.
+
+
+TEXTUAL INTERFACE
+-----------------
+
+  A textual format has been defined to input and output sparse
+  constraint systemsm (sc). Here is one example:
+
+  VAR i, j, k
+  {
+    i==1,
+    j <= 2i,
+    j + k == 3
+  }
+
+  Note that each dimension is named and declared. Here, a 3-D system
+  is declared with dimensions i, j and k. Note that multiplications
+  are implicit and the constraint formatting is free. Constraints can
+  be spread on multiple lines. An several constraints can be declared
+  in one line.
 
 # end of README
 #
