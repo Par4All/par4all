@@ -252,7 +252,7 @@ Pbase base_dup(Pbase b)
 /* Direct duplication. The initial Pbase is assumed to be valid.
  * Absolutely the same with base_dup, but base_up is the only function
  * that maintains the old order.
- * So recopy here for use with copy version including 
+ * So recopy here for use with copy version including
  * vect_copy, contrainte_copy, contraintes_copy, sc_copy (DN,24/6/02)
  * Does not change the parameter. Did have a look at all copy version (DN,1/7/2002)
  */
