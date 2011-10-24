@@ -41,10 +41,10 @@ do
     elif [ -d $dir/.git ]
     then
       # generate something for git-svn users
-      author=$(git log -1|sed -n -e 's/^Author: \([-a-zA-Z0-1_]*\) .*/\1/p;2q')
+      author=$(cd $dir &>/dev/null ; git log -1|sed -n -e 's/^Author: \([-a-zA-Z0-1_]*\) .*/\1/p;2q')
       repos='git-svn'
-      revision=$(git log -1|sed -n -e 's/commit \([a-f0-9]\{8\}\).*/\1/p;1q')
-      committed=$(git log -1 --date=iso|sed -n -e 's/Date: *\(.*\)/\1/p;3q')
+      revision=$(cd $dir &>/dev/null ; git log -1|sed -n -e 's/commit \([a-f0-9]\{8\}\).*/\1/p;1q')
+      committed=$(cd $dir &>/dev/null ; git log -1 --date=iso|sed -n -e 's/Date: *\(.*\)/\1/p;3q')
       committed=${committed/ +0000/ UTC}
       echo "$repos@$revision ($committed) [$author]"
     else

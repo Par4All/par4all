@@ -10,6 +10,7 @@
 # note that the time stamp is here to prevent too many runs of cproto ...
 
 CPROTO_STAMP_FILE=.cproto.stamp
+CPROTO_ERROR_FILE=.cproto.err
 
 cproto_bootstrap:$(CPROTO_STAMP_FILE)_init
 
@@ -38,11 +39,11 @@ $(CPROTO_STAMP_FILE):$(CPROTO_STAMP_FILE)_init  $(SOURCES) $(srcdir)/Makefile.am
 		for cproto_source in $$cproto_sources ; do \
 			case $$cproto_source in \
 				*.c)\
-					$(CPROTO) -evcf2 -O /dev/null -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$cproto_source ;;\
+					$(CPROTO) -O$(CPROTO_ERROR_FILE) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$cproto_source ;;\
 				*)\
 					cproto_proxy=`basename $${cproto_source}`.c ;\
 					sed -n -e '/^%{/,/%}/ p' -e '1,/^%%/ d' -e '/^%%/,$$ p' $$cproto_source | sed -e '/^%/ d'  > $$cproto_proxy ; \
-					$(CPROTO) -evcf2 -O /dev/null -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$cproto_proxy |\
+					$(CPROTO) -O$(CPROTO_ERROR_FILE) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$cproto_proxy |\
 						sed -e '/ yy/ d';\
 					rm -f $$cproto_proxy ;;\
 			esac ;\
@@ -56,7 +57,7 @@ $(TARGET).h:$(CPROTO_STAMP_FILE)
 	$(AM_v_GEN)cmp -s $(TARGET).h $(CPROTO_STAMP_FILE) || cp $(CPROTO_STAMP_FILE) $(TARGET).h
 
 clean-local:
-	rm -f $(TARGET).h $(CPROTO_STAMP_FILE) $(CPROTO_STAMP_FILE)_init
+	rm -f $(TARGET).h $(CPROTO_STAMP_FILE) $(CPROTO_STAMP_FILE)_init $(CPROTO_ERROR_FILE)
 
 EXTRA_DIST=$(TARGET)-local.h
 
