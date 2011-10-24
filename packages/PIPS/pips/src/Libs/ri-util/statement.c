@@ -1578,26 +1578,29 @@ string gather_all_comments_of_a_statement(statement s)
 }
 
 
-/* Find the first non-empty comment of a statement, if any: */
-string find_first_statement_comment(statement s)
+/* Find the first non-empty comment of a statement, if any
+ * returns a pointer to the comment if found,
+ * pointer to NULL otherwise */
+char** find_first_statement_comment(statement s)
 {
-    instruction i = statement_instruction(s);
-    if (instruction_sequence_p(i)) {
-	MAP(STATEMENT, st, {
-	    string comment = find_first_statement_comment(st);
-	    if (!empty_comments_p(comment))
-		/* We've found it! */
-		return comment;
-	}, sequence_statements(instruction_sequence(statement_instruction(s))));
-	/* No comment found: */
-	return empty_comments;
+    static char * an_empty_comment = empty_comments;
+    if (statement_block_p(s)) {
+        FOREACH(STATEMENT, st, statement_block(s)){
+            char** comment = find_first_statement_comment(st);
+            if (!empty_comments_p(*comment))
+                /* We've found it! */
+                return comment;
+        }
+        /* No comment found: */
+        return &an_empty_comment;
     }
     else
-	/* Ok, plain statement: */
-	return statement_comments(s);
+        /* Ok, plain statement: */
+        return &statement_comments(s);
 }
 
 /* Find the first comment of a statement, if any.
+ * returns a pointer to the comment if found, NULL otherwise
  *
  * Unfortunately empty_comments may be used to decorate a statement
  * although this makes the statement !gen_defined_p(). empty_comments
@@ -1606,25 +1609,26 @@ string find_first_statement_comment(statement s)
  *
  * The whole comment business should be cleaned up.
  */
-string find_first_comment(statement s)
+static
+char** find_first_comment(statement s)
 {
-    instruction i = statement_instruction(s);
-    if (instruction_sequence_p(i)) {
-	MAP(STATEMENT, st, {
-	    string comment = find_first_statement_comment(st);
-	    /* let's hope the parser generates an empty string as
-	       comment rather than empty_comments which is defined as
-	       empty_string */
-	    if (comment!=empty_comments)
-		/* We've found it! */
-		return comment;
-	}, sequence_statements(instruction_sequence(statement_instruction(s))));
-	/* No comment found: */
-	return empty_comments;
+    static char * an_empty_comment = empty_comments;
+    if (statement_block_p(s)) {
+        FOREACH(STATEMENT, st, statement_block(s)){
+            char** comment = find_first_statement_comment(st);
+            /* let's hope the parser generates an empty string as
+               comment rather than empty_comments which is defined as
+               empty_string */
+            if (*comment!=empty_comments)
+                /* We've found it! */
+                return comment;
+        }
+        /* No comment found: */
+        return &an_empty_comment;
     }
     else
-	/* comment carrying statement: */
-	return statement_comments(s);
+        /* comment carrying statement: */
+        return &statement_comments(s);
 }
 
 
@@ -1697,19 +1701,21 @@ void
 append_comments_to_statement(statement s,
 			     string the_comments)
 {
-    string old;
+
 
     if (empty_comments_p(the_comments))
 	/* Nothing to add... */
 	return;
 
-    old = find_first_statement_comment(s);
-    if (empty_comments_p(old))
-	/* There is no comment yet: */
-	put_a_comment_on_a_statement(s, strdup(the_comments));
+    char **old = find_first_statement_comment(s);
+    if (empty_comments_p(*old))
+        /* There is no comment yet: */
+        put_a_comment_on_a_statement(s, strdup(the_comments));
     else {
-	put_a_comment_on_a_statement(s, strdup(concatenate(old, the_comments, NULL)));
-	free(old);
+        char * new = strdup(concatenate(*old, the_comments, NULL));
+        free(*old);
+        *old=empty_comments;
+        put_a_comment_on_a_statement(s, new);
     }
 }
 
@@ -1721,23 +1727,19 @@ append_comments_to_statement(statement s,
 */
 void insert_comments_to_statement(statement s,
                                   const char* the_comments) {
-  string old;
-
   if (empty_comments_p(the_comments))
     /* Nothing to add... */
     return;
 
-  old  = find_first_comment(s);
-  if (empty_comments_p(old)) {
+  char **old  = find_first_comment(s);
+  if ( empty_comments_p(*old) ) {
     /* There are no comments yet: */
     put_a_comment_on_a_statement(s, strdup(the_comments));
   } else {
-    put_a_comment_on_a_statement(s, strdup(concatenate(the_comments, old, NULL)));
-    /* Courageous: you have to be sure that the comment returned
-	     by find_first_comment() belongs to the statement which is
-	     going to be used by put_a_comment_on_a_statement() knowing
-	     that both can be different from s if s is a sequence. */
-    free(old);
+      char * new = strdup(concatenate(the_comments, *old, NULL));
+      free(*old);
+      *old=empty_comments;
+      put_a_comment_on_a_statement(s, new);
   }
 }
 

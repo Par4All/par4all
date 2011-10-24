@@ -1,5 +1,5 @@
 /* vsprintf with automatic memory allocation.
-   Copyright (C) 1999, 2002-2010 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002-2011 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -87,6 +87,8 @@
 
 /* Checked size_t computations.  */
 #include "xsize.h"
+
+#include "verify.h"
 
 #if (NEED_PRINTF_DOUBLE || NEED_PRINTF_LONG_DOUBLE) && !defined IN_LIBINTL
 # include <math.h>
@@ -277,7 +279,7 @@ decimal_point_char (void)
      multithread-safe on glibc systems and MacOS X systems, but is not required
      to be multithread-safe by POSIX.  sprintf(), however, is multithread-safe.
      localeconv() is rarely multithread-safe.  */
-#  if HAVE_NL_LANGINFO && (__GLIBC__ || (defined __APPLE__ && defined __MACH__))
+#  if HAVE_NL_LANGINFO && (__GLIBC__ || defined __UCLIBC__ || (defined __APPLE__ && defined __MACH__))
   point = nl_langinfo (RADIXCHAR);
 #  elif 1
   char pointbuf[5];
@@ -322,11 +324,11 @@ is_infinite_or_zerol (long double x)
 
 typedef unsigned int mp_limb_t;
 # define GMP_LIMB_BITS 32
-typedef int mp_limb_verify[2 * (sizeof (mp_limb_t) * CHAR_BIT == GMP_LIMB_BITS) - 1];
+verify (sizeof (mp_limb_t) * CHAR_BIT == GMP_LIMB_BITS);
 
 typedef unsigned long long mp_twolimb_t;
 # define GMP_TWOLIMB_BITS 64
-typedef int mp_twolimb_verify[2 * (sizeof (mp_twolimb_t) * CHAR_BIT == GMP_TWOLIMB_BITS) - 1];
+verify (sizeof (mp_twolimb_t) * CHAR_BIT == GMP_TWOLIMB_BITS);
 
 /* Representation of a bignum >= 0.  */
 typedef struct
@@ -933,11 +935,11 @@ decode_long_double (long double x, int *ep, mpn_t *mp)
         abort ();
       m.limbs[--i] = (hi << (GMP_LIMB_BITS / 2)) | lo;
     }
-#if 0 /* On FreeBSD 6.1/x86, 'long double' numbers sometimes have excess
-         precision.  */
+#  if 0 /* On FreeBSD 6.1/x86, 'long double' numbers sometimes have excess
+           precision.  */
   if (!(y == 0.0L))
     abort ();
-#endif
+#  endif
   /* Normalise.  */
   while (m.nlimbs > 0 && m.limbs[m.nlimbs - 1] == 0)
     m.nlimbs--;
@@ -1751,8 +1753,9 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
     return NULL;
 
 #define CLEANUP() \
-  free (d.dir);                                                         \
-  if (a.arg)                                                            \
+  if (d.dir != d.direct_alloc_dir)                                      \
+    free (d.dir);                                                       \
+  if (a.arg != a.direct_alloc_arg)                                      \
     free (a.arg);
 
   if (PRINTF_FETCHARGS (args, &a) < 0)
@@ -2621,7 +2624,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                   size_t characters;
 #  if !DCHAR_IS_TCHAR
                   /* This code assumes that TCHAR_T is 'char'.  */
-                  typedef int TCHAR_T_verify[2 * (sizeof (TCHAR_T) == 1) - 1];
+                  verify (sizeof (TCHAR_T) == 1);
                   TCHAR_T *tmpsrc;
                   DCHAR_T *tmpdst;
                   size_t tmpdst_len;
@@ -4597,6 +4600,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                 TCHAR_T *fbp;
                 unsigned int prefix_count;
                 int prefixes[2] IF_LINT (= { 0 });
+                int orig_errno;
 #if !USE_SNPRINTF
                 size_t tmp_length;
                 TCHAR_T tmpbuf[700];
@@ -4751,6 +4755,10 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                   *fbp++ = ' ';
                 if (flags & FLAG_ALT)
                   *fbp++ = '#';
+#if __GLIBC__ >= 2 && !defined __UCLIBC__
+                if (flags & FLAG_LOCALIZED)
+                  *fbp++ = 'I';
+#endif
                 if (!pad_ourselves)
                   {
                     if (flags & FLAG_ZERO)
@@ -4834,14 +4842,15 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 #endif
                   *fbp = dp->conversion;
 #if USE_SNPRINTF
-# if !(__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3) || ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__))
+# if !(((__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3)) && !defined __UCLIBC__) || ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__))
                 fbp[1] = '%';
                 fbp[2] = 'n';
                 fbp[3] = '\0';
 # else
                 /* On glibc2 systems from glibc >= 2.3 - probably also older
-                   ones - we know that snprintf's returns value conforms to
-                   ISO C 99: the gl_SNPRINTF_DIRECTIVE_N test passes.
+                   ones - we know that snprintf's return value conforms to
+                   ISO C 99: the tests gl_SNPRINTF_RETVAL_C99 and
+                   gl_SNPRINTF_TRUNCATION_C99 pass.
                    Therefore we can avoid using %n in this situation.
                    On glibc2 systems from 2004-10-18 or newer, the use of %n
                    in format strings in writable memory may crash the program
@@ -4899,6 +4908,8 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                    via %n.  */
                 *(TCHAR_T *) (result + length) = '\0';
 #endif
+
+                orig_errno = errno;
 
                 for (;;)
                   {
@@ -5284,8 +5295,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                         DCHAR_T *tmpdst;
                         size_t tmpdst_len;
                         /* This code assumes that TCHAR_T is 'char'.  */
-                        typedef int TCHAR_T_verify
-                                    [2 * (sizeof (TCHAR_T) == 1) - 1];
+                        verify (sizeof (TCHAR_T) == 1);
 # if USE_SNPRINTF
                         tmpsrc = (TCHAR_T *) (result + length);
 # else
@@ -5498,6 +5508,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                     length += count;
                     break;
                   }
+                errno = orig_errno;
 #undef pad_ourselves
 #undef prec_ourselves
               }

@@ -335,12 +335,13 @@ static effect  effect_write_or_read_on_variable(list el, entity v, bool write_p)
  *
  * This criterion is for constant singleton region in context...
  */
-static bool constant_region_in_context_p(effect pr,
+static bool __attribute__ ((__unused__)) constant_region_in_context_p(effect pr,
 				  transformer t __attribute__ ((__unused__)))
 {
   entity v = effect_variable(pr);
   int nd = type_depth(entity_type(v));
   bool constant_p = (nd==0);
+
 
   if(!constant_p) {
     descriptor d = effect_descriptor(pr);
@@ -373,6 +374,7 @@ static bool constant_region_in_context_p(effect pr,
 	//base_rm(d_phi_b);
 
       }
+      pips_debug(2, "returning: %s\n", bool_to_string(constant_p));
     }
   }
 
@@ -809,6 +811,68 @@ static bool loop_scalarization(loop l)
   return true;
 }
 
+typedef struct {
+  bool constant_p;
+  entity e;
+  list trans_args;
+} reference_testing_ctxt;
+
+static bool reference_constant_wrt_ctxt_p(reference ref, reference_testing_ctxt *ctxt)
+{
+  bool continue_p = true;
+  if (reference_variable(ref) == ctxt->e)
+    {
+      FOREACH(EXPRESSION, exp, reference_indices(ref))
+	{
+	  list l_eff_exp = proper_effects_of_expression(exp);
+	  FOREACH(EFFECT, eff_exp, l_eff_exp)
+	    {
+	      entity e_exp = effect_entity(eff_exp);
+	      /* if the indice contains a reference to an array element, we assume it is not constant */
+	      /* we could use the cumulated effects of the current statement for more precision
+	         but as we could not scalarize the array because the region would not contain
+	         a single element, it's of no use here.
+	      */
+	      if (!entity_scalar_p(e_exp))
+		{
+		  ctxt->constant_p = false;
+		}
+	      else if (entity_in_list_p(e_exp, ctxt->trans_args))
+		{
+		  ctxt->constant_p = false;
+		}
+	    }
+	  gen_full_free_list(l_eff_exp);
+	  if (!ctxt->constant_p)
+	    break;
+	}
+      continue_p = ctxt->constant_p;
+    }
+  return continue_p;
+}
+
+static bool statement_entity_references_constant_in_context_p(statement s, entity e, transformer trans)
+{
+  int nd = type_depth(entity_type(e));
+  bool constant_p = (nd==0);
+
+  if(!constant_p) {
+    pips_debug(2,"Considering entity : %s", entity_name(e));
+
+    /* none of the arguments in t appears in an index of a reference from entity e */
+    reference_testing_ctxt ctxt;
+    ctxt.constant_p = true;
+    ctxt.e = e;
+    ctxt.trans_args = transformer_arguments(trans);
+
+    gen_context_recurse(s, &ctxt, reference_domain, reference_constant_wrt_ctxt_p, gen_null);
+    constant_p = ctxt.constant_p;
+    pips_debug(2, "returning: %s\n", bool_to_string(constant_p));
+  }
+
+  return constant_p;
+}
+
 
 /* Scalarize array references in any kind of statement
  *
@@ -965,7 +1029,16 @@ static bool statement_scalarization(statement s)
 		get_bool_property("SCALARIZATION_STRICT_MEMORY_ACCESSES");
 	      /* Check that a unique element of pv is used. Its region
 		 must be constant within the statement, i.e. wrt to the
-		 statement transformer tran */
+		 statement transformer tran.
+
+		 This last criterion is not strong enough, because variables
+		 modified in the statement have already been eliminated from
+		 regions. We enforce a stronger criterion implemented by
+		 statement_entity_references_constant_in_context_p which checks
+		 that each reference from pru entity has constant indices wrt
+		 to the statement transformer tran and has no complex indices
+		 (array elements, structs). BC.
+	      */
 	      /* prec might have to be replaced by prec_r, its range. */
 	      /* It is not clear if a unique element of pv should
 		 always be used, wasting some opportunities but
@@ -973,7 +1046,8 @@ static bool statement_scalarization(statement s)
 		 or if at most a unique element is used, which may to
 		 spurious out of bounds accesses. See scalarization30
 		 for an example and explanations. */
-	      if (constant_region_in_context_p(pru, tran)
+	      if (//constant_region_in_context_p(pru, tran)
+		  statement_entity_references_constant_in_context_p(s, effect_entity(pru), tran)
 		  && singleton_region_in_context_p(pru, prec,
 						   loop_indices_b, strict_p)) {
 		/* The array references can be replaced a references to a
