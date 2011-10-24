@@ -1,0 +1,173 @@
+# C Test Suite for Vectorizing Compilers
+#
+# David Padua & al, PACT 2011
+
+delete tsc
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+create tsc tsc.c
+
+# The SECOND source code is generated while pipsmake is running using
+# an outdated version of %ALL
+
+apply PRINT_CODE[%ALLFUNC]
+#apply INITIAL_PRECONDITION[SECOND]
+
+setenv modules=`(cd tsc.database; for i in s[1-9]*; do echo -n $i ""; done)`
+# echo $modules
+
+
+apply PRINT_PARALLELIZEDOMP_CODE[$modules]
+#apply PRINT_PARALLELIZED_CODE[$modules]
+
+close
+
+# Count the number of parallel loops in every module
+
+shell (cd tsc.database; for i in $modules; do echo $i " " `grep -i '#pragma omp parallel for' $i/$i.par.c | wc -l` ;done; echo; echo Total `cat */*.par.c| grep -i  '#pragma omp parallel for' | wc -l`) >tsc.database/Tmp/faa
+
+#
+# Parallelization failures
+#
+
+# Only 58 out of 158 loops are parallelized. Note that some of them
+# are only vectorizable but not parallelizable
+
+#
+#s1113 0 0 0 index set splitting?
+#s112  0 0 0 loop reversal + real vectorization, not parallelization
+#s116  0 0 0 unrolled + vectorizable but not parallelizable
+#s1161 0 0 0 require pass restructure_control
+#s118  0 0 0 the j loop is a reduction, the i loop should be parallel... check the dependence graph
+#s121  0 0 0 induction variable
+#s122  0 0 0 induction variable + ?
+#s1221 0 0 0 lattice?
+#s123  0 0 0 conditional induction variable
+#s124  0 0 0 conditional induction variable
+#s1244 0 0 0 requires a copy of the old values of a in d?
+#s125  0 0 0 induction variable recognition
+#s1251 0 0 0 privatization or scalar expansion
+#s126  0 0 0 induction variable recognition
+#s127  0 0 0 induction variable recognition
+#s1279 0 0 0 mask required
+#s128  0 0 0 induction variable recognition
+#s1281 0 0 0 privatization?
+#s131  0 0 0 vectorizable but not parallelizable
+#s13110 0 0 0 reduction detection
+#s1351 0 0 0 induction pointer detection
+#s141  0 0 0 non-linear subscript expression
+#s1421 0 0 0 non aliasing detection -> Amira
+#s1421_2 0 0 0 call to s1421_2s, aliasing
+#s1421_2s 0 0 0
+#s151  0 0 0 interprocedural analysis
+#s151s 0 0 0 see above
+#s152  0 0 0 interprocedural analysis
+#s152s 0 0 0 see above
+#s161  0 0 0 restructure control
+#s162  0 0 0 vectorizable but not parallelizable
+#s171  0 0 0 partial eval or improvement of dependence test
+#s175  0 0 0 vectorizable but not parallelizable
+#
+#s2111 0 0 0
+#s241  0 0 0
+#s242  0 0 0
+#s243  0 0 0
+#s244  0 0 0
+#s251  0 0 0
+#s252  0 0 0
+#s253  0 0 0
+#s254  0 0 0
+#s255  0 0 0
+#s257  0 0 0
+#s258  0 0 0
+#s261  0 0 0
+#s271  0 0 0
+#s2710 0 0 0
+#s2711 0 0 0
+#s2712 0 0 0
+#s272  0 0 0
+#s273  0 0 0
+#s274  0 0 0
+#s275  0 0 0
+#s276  0 0 0
+#s277  0 0 0
+#s278  0 0 0
+#s279  0 0 0
+#s281  0 0 0
+#s291  0 0 0
+#s292  0 0 0
+#s293  0 0 0
+#s311  0 0 0
+#s3110 0 0 0
+#s3111 0 0 0
+#s31111 0 0 0
+#s3112 0 0 0
+#s3113 0 0 0
+#s312  0 0 0
+#s313  0 0 0
+#s314  0 0 0
+#s316  0 0 0
+#s317  0 0 0
+#s318  0 0 0
+#s321  0 0 0
+#s322  0 0 0
+#s323  0 0 0
+#s331  0 0 0
+#s332  0 0 0
+#s341  0 0 0
+#s342  0 0 0
+#s343  0 0 0
+#s352  0 0 0
+#s353  0 0 0
+#s4112 0 0 0
+#s4113 0 0 0
+#s4114 0 0 0
+#s4115 0 0 0
+#s4116 0 0 0
+#s421  0 0 0
+#s422  0 0 0
+#s423  0 0 0
+#s424  0 0 0
+#s441  0 0 0
+#s442  0 0 0
+#s443  0 0 0
+#s453  0 0 0
+#s481  0 0 0
+#s482  0 0 0
+#s491  0 0 0
+
+open tsc
+
+apply RESTRUCTURE_CONTROL[$modules]
+capply RECOVER_FOR_LOOP[$modules]
+#apply SIMPLIFY_CONTROL[$modules]
+
+apply PRINT_PARALLELIZEDOMP_CODE[$modules]
+#apply PRINT_PARALLELIZED_CODE[$modules]
+
+close
+
+# Count the number of parallel loops in every module (FI: $modules should be used instead of *)
+# Because of loop distribution, the total number of parallel loops is not significant; to be improved
+
+shell (cd tsc.database; for i in $modules; do echo $i " " `grep -i '#pragma omp parallel for' $i/$i.par.c  | wc -l` ; done; echo; echo Total `cat */*.par.c| grep -i  '#pragma omp parallel for' | wc -l`) >tsc.database/Tmp/fbb
+
+open tsc
+
+#capply COARSE_GRAIN_PARALLELIZATION[$modules]
+apply PRINT_PARALLELIZEDOMP_CODE[$modules]
+#apply PRINT_PARALLELIZED_CODE[$modules]
+
+close
+
+# Count the number of parallel loops in every module
+
+shell (cd tsc.database; for i in $modules; do echo $i " " `grep -i '#pragma omp parallel for' $i/$i.par.c | wc -l` ; done; echo; echo Total `cat */*.par.c| grep -i  '#pragma omp parallel for' | wc -l`) >tsc.database/Tmp/fcc
+
+shell (cd tsc.database/Tmp; join faa fbb | join - fcc)
+
+quit
