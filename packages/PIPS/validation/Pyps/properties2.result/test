@@ -53,7 +53,7 @@ foo2 (void)
 #define crough_powi(a,b) ((a)^(b))
 #define init_complex(a,b) (a + b*I)
 
-plouch
+void
 foo3 (void)
 {
   int i;
@@ -116,7 +116,7 @@ foo5 (void)
 #define crough_powi(a,b) ((a)^(b))
 #define init_complex(a,b) (a + b*I)
 
-plouch
+P4A_accel_kernel_wrapper
 foo6 (void)
 {
   int i;
