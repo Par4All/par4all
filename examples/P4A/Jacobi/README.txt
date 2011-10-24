@@ -65,8 +65,8 @@ debugging, without any GPU):
 
 For the OpenCL parallel execution on nVidia GPU:
 
-  make opencl : parallelize the code to OpenCL sources: the host program source
-  *.p4a.c and the kernel program source *.cl
+  make opencl : parallelize the code to OpenCL sources: the host program sources
+  *.p4a.c and the kernel program sources *.cl
 
   make run_opencl : build first if needed, then run the OpenCL parallel
   program
