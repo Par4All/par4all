@@ -1,0 +1,18 @@
+delete while01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create while01 while01.c
+
+setproperty PRETTYPRINT_ALL_C_BRACES TRUE
+
+display PARSED_PRINTED_FILE[main]
+
+display PRINTED_FILE[main]
+
+apply UNSPLIT
+
+#shell echo `(cd while01.database/Src; gcc -c -Wall while01.c) 2>&1`
+
+close
+quit

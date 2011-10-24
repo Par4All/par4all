@@ -163,7 +163,7 @@ Variable v;
 }
 
 /* Variable base_find_variable_name(Pbase b, Variable v,
- *                                  char * (*variable_name)()): 
+ *                                  char * (*variable_name)()):
  * returns the variable (i.e. coord) in b that has the same name as v;
  * else returns VARIABLE_UNDEFINED
  */

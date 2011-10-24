@@ -1,5 +1,5 @@
 /* Substitute for and wrapper around <unistd.h>.
-   Copyright (C) 2003-2010 Free Software Foundation, Inc.
+   Copyright (C) 2003-2011 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
 #endif
+@PRAGMA_COLUMNS@
 
 /* Special invocation convention:
    - On mingw, several headers, including <winsock2.h>, include <unistd.h>,
@@ -35,7 +36,7 @@
 # define _GL_WINSOCK2_H_WITNESS
 
 /* Normal invocation.  */
-#elif !defined _GL_UNISTD_H
+#elif !defined _@GUARD_PREFIX@_UNISTD_H
 
 /* The include_next requires a split double-inclusion guard.  */
 #if @HAVE_UNISTD_H@
@@ -50,8 +51,8 @@
 # undef _GL_INCLUDING_WINSOCK2_H
 #endif
 
-#if !defined _GL_UNISTD_H && !defined _GL_INCLUDING_WINSOCK2_H
-#define _GL_UNISTD_H
+#if !defined _@GUARD_PREFIX@_UNISTD_H && !defined _GL_INCLUDING_WINSOCK2_H
+#define _@GUARD_PREFIX@_UNISTD_H
 
 /* NetBSD 5.0 mis-defines NULL.  Also get size_t.  */
 #include <stddef.h>
@@ -60,14 +61,16 @@
 /* Cygwin 1.7.1 declares symlinkat in <stdio.h>, not in <unistd.h>.  */
 /* But avoid namespace pollution on glibc systems.  */
 #if (!(defined SEEK_CUR && defined SEEK_END && defined SEEK_SET) \
-     || (@GNULIB_SYMLINKAT@ || defined GNULIB_POSIXCHECK)) \
+     || ((@GNULIB_SYMLINKAT@ || defined GNULIB_POSIXCHECK) \
+         && defined __CYGWIN__)) \
     && ! defined __GLIBC__
 # include <stdio.h>
 #endif
 
 /* Cygwin 1.7.1 declares unlinkat in <fcntl.h>, not in <unistd.h>.  */
 /* But avoid namespace pollution on glibc systems.  */
-#if (@GNULIB_UNLINKAT@ || defined GNULIB_POSIXCHECK) && ! defined __GLIBC__
+#if (@GNULIB_UNLINKAT@ || defined GNULIB_POSIXCHECK) && defined __CYGWIN__ \
+    && ! defined __GLIBC__
 # include <fcntl.h>
 #endif
 
@@ -82,10 +85,21 @@
 /* mingw declares getcwd in <io.h>, not in <unistd.h>.  */
 #if ((@GNULIB_GETCWD@ || defined GNULIB_POSIXCHECK) \
      && ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__))
-# include <io.h>
+# include <io.h>     /* mingw32, mingw64 */
+# include <direct.h> /* mingw64 */
 #endif
 
-#if (@GNULIB_WRITE@ || @GNULIB_READLINK@ || @GNULIB_READLINKAT@ \
+/* AIX and OSF/1 5.1 declare getdomainname in <netdb.h>, not in <unistd.h>.
+   NonStop Kernel declares gethostname in <netdb.h>, not in <unistd.h>.  */
+/* But avoid namespace pollution on glibc systems.  */
+#if ((@GNULIB_GETDOMAINNAME@ && (defined _AIX || defined __osf__)) \
+     || (@GNULIB_GETHOSTNAME@ && defined __TANDEM)) \
+    && !defined __GLIBC__
+# include <netdb.h>
+#endif
+
+#if (@GNULIB_READ@ || @GNULIB_WRITE@ \
+     || @GNULIB_READLINK@ || @GNULIB_READLINKAT@ \
      || @GNULIB_PREAD@ || @GNULIB_PWRITE@ || defined GNULIB_POSIXCHECK)
 /* Get ssize_t.  */
 # include <sys/types.h>
@@ -104,78 +118,77 @@
 /* The definition of _GL_WARN_ON_USE is copied here.  */
 
 
-#if @GNULIB_GETHOSTNAME@
-/* Get all possible declarations of gethostname().  */
-# if @UNISTD_H_HAVE_WINSOCK2_H@
-#  if !defined _GL_SYS_SOCKET_H
-#   if !(defined __cplusplus && defined GNULIB_NAMESPACE)
-#    undef socket
-#    define socket              socket_used_without_including_sys_socket_h
-#    undef connect
-#    define connect             connect_used_without_including_sys_socket_h
-#    undef accept
-#    define accept              accept_used_without_including_sys_socket_h
-#    undef bind
-#    define bind                bind_used_without_including_sys_socket_h
-#    undef getpeername
-#    define getpeername         getpeername_used_without_including_sys_socket_h
-#    undef getsockname
-#    define getsockname         getsockname_used_without_including_sys_socket_h
-#    undef getsockopt
-#    define getsockopt          getsockopt_used_without_including_sys_socket_h
-#    undef listen
-#    define listen              listen_used_without_including_sys_socket_h
-#    undef recv
-#    define recv                recv_used_without_including_sys_socket_h
-#    undef send
-#    define send                send_used_without_including_sys_socket_h
-#    undef recvfrom
-#    define recvfrom            recvfrom_used_without_including_sys_socket_h
-#    undef sendto
-#    define sendto              sendto_used_without_including_sys_socket_h
-#    undef setsockopt
-#    define setsockopt          setsockopt_used_without_including_sys_socket_h
-#    undef shutdown
-#    define shutdown            shutdown_used_without_including_sys_socket_h
-#   else
-     _GL_WARN_ON_USE (socket,
-                      "socket() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (connect,
-                      "connect() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (accept,
-                      "accept() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (bind,
-                      "bind() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (getpeername,
-                      "getpeername() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (getsockname,
-                      "getsockname() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (getsockopt,
-                      "getsockopt() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (listen,
-                      "listen() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (recv,
-                      "recv() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (send,
-                      "send() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (recvfrom,
-                      "recvfrom() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (sendto,
-                      "sendto() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (setsockopt,
-                      "setsockopt() used without including <sys/socket.h>");
-     _GL_WARN_ON_USE (shutdown,
-                      "shutdown() used without including <sys/socket.h>");
-#   endif
+/* Hide some function declarations from <winsock2.h>.  */
+
+#if @GNULIB_GETHOSTNAME@ && @UNISTD_H_HAVE_WINSOCK2_H@
+# if !defined _@GUARD_PREFIX@_SYS_SOCKET_H
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef socket
+#   define socket              socket_used_without_including_sys_socket_h
+#   undef connect
+#   define connect             connect_used_without_including_sys_socket_h
+#   undef accept
+#   define accept              accept_used_without_including_sys_socket_h
+#   undef bind
+#   define bind                bind_used_without_including_sys_socket_h
+#   undef getpeername
+#   define getpeername         getpeername_used_without_including_sys_socket_h
+#   undef getsockname
+#   define getsockname         getsockname_used_without_including_sys_socket_h
+#   undef getsockopt
+#   define getsockopt          getsockopt_used_without_including_sys_socket_h
+#   undef listen
+#   define listen              listen_used_without_including_sys_socket_h
+#   undef recv
+#   define recv                recv_used_without_including_sys_socket_h
+#   undef send
+#   define send                send_used_without_including_sys_socket_h
+#   undef recvfrom
+#   define recvfrom            recvfrom_used_without_including_sys_socket_h
+#   undef sendto
+#   define sendto              sendto_used_without_including_sys_socket_h
+#   undef setsockopt
+#   define setsockopt          setsockopt_used_without_including_sys_socket_h
+#   undef shutdown
+#   define shutdown            shutdown_used_without_including_sys_socket_h
+#  else
+    _GL_WARN_ON_USE (socket,
+                     "socket() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (connect,
+                     "connect() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (accept,
+                     "accept() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (bind,
+                     "bind() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (getpeername,
+                     "getpeername() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (getsockname,
+                     "getsockname() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (getsockopt,
+                     "getsockopt() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (listen,
+                     "listen() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (recv,
+                     "recv() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (send,
+                     "send() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (recvfrom,
+                     "recvfrom() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (sendto,
+                     "sendto() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (setsockopt,
+                     "setsockopt() used without including <sys/socket.h>");
+    _GL_WARN_ON_USE (shutdown,
+                     "shutdown() used without including <sys/socket.h>");
 #  endif
-#  if !defined _GL_SYS_SELECT_H
-#   if !(defined __cplusplus && defined GNULIB_NAMESPACE)
-#    undef select
-#    define select              select_used_without_including_sys_select_h
-#   else
-     _GL_WARN_ON_USE (select,
-                      "select() used without including <sys/select.h>");
-#   endif
+# endif
+# if !defined _@GUARD_PREFIX@_SYS_SELECT_H
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef select
+#   define select              select_used_without_including_sys_select_h
+#  else
+    _GL_WARN_ON_USE (select,
+                     "select() used without including <sys/select.h>");
 #  endif
 # endif
 #endif
@@ -425,6 +438,10 @@ _GL_EXTERN_C void _gl_unregister_fd (int fd);
 _GL_EXTERN_C int _gl_register_dup (int oldfd, int newfd);
 _GL_EXTERN_C const char *_gl_directory_name (int fd);
 
+# else
+#  if !@HAVE_DECL_FCHDIR@
+_GL_FUNCDECL_SYS (fchdir, int, (int /*fd*/));
+#  endif
 # endif
 _GL_CXXALIAS_SYS (fchdir, int, (int /*fd*/));
 _GL_CXXALIASWARN (fchdir);
@@ -548,13 +565,21 @@ _GL_WARN_ON_USE (getcwd, "getcwd is unportable - "
    Null terminate it if the name is shorter than LEN.
    If the NIS domain name is longer than LEN, set errno = EINVAL and return -1.
    Return 0 if successful, otherwise set errno and return -1.  */
-# if !@HAVE_GETDOMAINNAME@
+# if @REPLACE_GETDOMAINNAME@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef getdomainname
+#   define getdomainname rpl_getdomainname
+#  endif
+_GL_FUNCDECL_RPL (getdomainname, int, (char *name, size_t len)
+                                      _GL_ARG_NONNULL ((1)));
+_GL_CXXALIAS_RPL (getdomainname, int, (char *name, size_t len));
+# else
+#  if !@HAVE_DECL_GETDOMAINNAME@
 _GL_FUNCDECL_SYS (getdomainname, int, (char *name, size_t len)
                                       _GL_ARG_NONNULL ((1)));
+#  endif
+_GL_CXXALIAS_SYS (getdomainname, int, (char *name, size_t len));
 # endif
-/* Need to cast, because on MacOS X 10.5 systems, the second parameter is
-                                                        int len.  */
-_GL_CXXALIAS_SYS_CAST (getdomainname, int, (char *name, size_t len));
 _GL_CXXALIASWARN (getdomainname);
 #elif defined GNULIB_POSIXCHECK
 # undef getdomainname
@@ -632,7 +657,8 @@ _GL_CXXALIAS_RPL (gethostname, int, (char *name, size_t len));
 _GL_FUNCDECL_SYS (gethostname, int, (char *name, size_t len)
                                     _GL_ARG_NONNULL ((1)));
 #  endif
-/* Need to cast, because on Solaris 10 systems, the second parameter is
+/* Need to cast, because on Solaris 10 and OSF/1 5.1 systems, the second
+   parameter is
                                                       int len.  */
 _GL_CXXALIAS_SYS_CAST (gethostname, int, (char *name, size_t len));
 # endif
@@ -689,13 +715,22 @@ _GL_WARN_ON_USE (getlogin, "getlogin is unportable - "
      ${LOGNAME-$USER}        on Unix platforms,
      $USERNAME               on native Windows platforms.
  */
-# if !@HAVE_DECL_GETLOGIN_R@
+# if @REPLACE_GETLOGIN_R@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   define getlogin_r rpl_getlogin_r
+#  endif
+_GL_FUNCDECL_RPL (getlogin_r, int, (char *name, size_t size)
+                                   _GL_ARG_NONNULL ((1)));
+_GL_CXXALIAS_RPL (getlogin_r, int, (char *name, size_t size));
+# else
+#  if !@HAVE_DECL_GETLOGIN_R@
 _GL_FUNCDECL_SYS (getlogin_r, int, (char *name, size_t size)
                                    _GL_ARG_NONNULL ((1)));
-# endif
+#  endif
 /* Need to cast, because on Solaris 10 systems, the second argument is
                                                      int size.  */
 _GL_CXXALIAS_SYS_CAST (getlogin_r, int, (char *name, size_t size));
+# endif
 _GL_CXXALIASWARN (getlogin_r);
 #elif defined GNULIB_POSIXCHECK
 # undef getlogin_r
@@ -762,11 +797,14 @@ _GL_CXXALIAS_RPL (getpagesize, int, (void));
 #    if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #     define getpagesize() _gl_getpagesize ()
 #    else
+#     if !GNULIB_defined_getpagesize_function
 static inline int
 getpagesize ()
 {
   return _gl_getpagesize ();
 }
+#      define GNULIB_defined_getpagesize_function 1
+#     endif
 #    endif
 #   endif
 #  endif
@@ -829,6 +867,22 @@ _GL_CXXALIASWARN (endusershell);
 # if HAVE_RAW_DECL_ENDUSERSHELL
 _GL_WARN_ON_USE (endusershell, "endusershell is unportable - "
                  "use gnulib module getusershell for portability");
+# endif
+#endif
+
+
+#if @GNULIB_GROUP_MEMBER@
+/* Determine whether group id is in calling user's group list.  */
+# if !@HAVE_GROUP_MEMBER@
+_GL_FUNCDECL_SYS (group_member, int, (gid_t gid));
+# endif
+_GL_CXXALIAS_SYS (group_member, int, (gid_t gid));
+_GL_CXXALIASWARN (group_member);
+#elif defined GNULIB_POSIXCHECK
+# undef group_member
+# if HAVE_RAW_DECL_GROUP_MEMBER
+_GL_WARN_ON_USE (group_member, "group_member is unportable - "
+                 "use gnulib module group-member for portability");
 # endif
 #endif
 
@@ -954,6 +1008,24 @@ _GL_WARN_ON_USE (lseek, "lseek does not fail with ESPIPE on pipes on some "
 #endif
 
 
+#if @GNULIB_PIPE@
+/* Create a pipe, defaulting to O_BINARY mode.
+   Store the read-end as fd[0] and the write-end as fd[1].
+   Return 0 upon success, or -1 with errno set upon failure.  */
+# if !@HAVE_PIPE@
+_GL_FUNCDECL_SYS (pipe, int, (int fd[2]) _GL_ARG_NONNULL ((1)));
+# endif
+_GL_CXXALIAS_SYS (pipe, int, (int fd[2]));
+_GL_CXXALIASWARN (pipe);
+#elif defined GNULIB_POSIXCHECK
+# undef pipe
+# if HAVE_RAW_DECL_PIPE
+_GL_WARN_ON_USE (pipe, "pipe is unportable - "
+                 "use gnulib module pipe-posix for portability");
+# endif
+#endif
+
+
 #if @GNULIB_PIPE2@
 /* Create a pipe, applying the given flags when opening the read-end of the
    pipe and the write-end of the pipe.
@@ -990,6 +1062,7 @@ _GL_WARN_ON_USE (pipe2, "pipe2 is unportable - "
    specification <http://www.opengroup.org/susv3xsh/pread.html>.  */
 # if @REPLACE_PREAD@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef pread
 #   define pread rpl_pread
 #  endif
 _GL_FUNCDECL_RPL (pread, ssize_t,
@@ -1024,6 +1097,7 @@ _GL_WARN_ON_USE (pread, "pread is unportable - "
    <http://www.opengroup.org/susv3xsh/pwrite.html>.  */
 # if @REPLACE_PWRITE@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef pwrite
 #   define pwrite rpl_pwrite
 #  endif
 _GL_FUNCDECL_RPL (pwrite, ssize_t,
@@ -1047,6 +1121,28 @@ _GL_CXXALIASWARN (pwrite);
 _GL_WARN_ON_USE (pwrite, "pwrite is unportable - "
                  "use gnulib module pwrite for portability");
 # endif
+#endif
+
+
+#if @GNULIB_READ@
+/* Read up to COUNT bytes from file descriptor FD into the buffer starting
+   at BUF.  See the POSIX:2001 specification
+   <http://www.opengroup.org/susv3xsh/read.html>.  */
+# if @REPLACE_READ@ && @GNULIB_UNISTD_H_NONBLOCKING@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef read
+#   define read rpl_read
+#  endif
+_GL_FUNCDECL_RPL (read, ssize_t, (int fd, void *buf, size_t count)
+                                 _GL_ARG_NONNULL ((2)));
+_GL_CXXALIAS_RPL (read, ssize_t, (int fd, void *buf, size_t count));
+# else
+/* Need to cast, because on mingw, the third parameter is
+                                                          unsigned int count
+   and the return type is 'int'.  */
+_GL_CXXALIAS_SYS_CAST (read, ssize_t, (int fd, void *buf, size_t count));
+# endif
+_GL_CXXALIASWARN (read);
 #endif
 
 
@@ -1097,7 +1193,7 @@ _GL_CXXALIASWARN (readlinkat);
 # undef readlinkat
 # if HAVE_RAW_DECL_READLINKAT
 _GL_WARN_ON_USE (readlinkat, "readlinkat is not portable - "
-                 "use gnulib module symlinkat for portability");
+                 "use gnulib module readlinkat for portability");
 # endif
 #endif
 
@@ -1208,7 +1304,7 @@ _GL_FUNCDECL_RPL (ttyname_r, int,
 _GL_CXXALIAS_RPL (ttyname_r, int,
                   (int fd, char *buf, size_t buflen));
 # else
-#  if !@HAVE_TTYNAME_R@
+#  if !@HAVE_DECL_TTYNAME_R@
 _GL_FUNCDECL_SYS (ttyname_r, int,
                   (int fd, char *buf, size_t buflen) _GL_ARG_NONNULL ((2)));
 #  endif
@@ -1304,7 +1400,7 @@ _GL_WARN_ON_USE (usleep, "usleep is unportable - "
 /* Write up to COUNT bytes starting at BUF to file descriptor FD.
    See the POSIX:2001 specification
    <http://www.opengroup.org/susv3xsh/write.html>.  */
-# if @REPLACE_WRITE@ && @GNULIB_UNISTD_H_SIGPIPE@
+# if @REPLACE_WRITE@ && (@GNULIB_UNISTD_H_NONBLOCKING@ || @GNULIB_UNISTD_H_SIGPIPE@)
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   undef write
 #   define write rpl_write
@@ -1322,5 +1418,5 @@ _GL_CXXALIASWARN (write);
 #endif
 
 
-#endif /* _GL_UNISTD_H */
-#endif /* _GL_UNISTD_H */
+#endif /* _@GUARD_PREFIX@_UNISTD_H */
+#endif /* _@GUARD_PREFIX@_UNISTD_H */

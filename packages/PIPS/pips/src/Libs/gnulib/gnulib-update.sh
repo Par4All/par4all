@@ -4,9 +4,9 @@
 # we cannot solely rely on a gnulib-tool --update
 
 set -e
-gnulib-tool --import --dir=../../.. --lib=libgnu --source-base=src/Libs/gnulib --m4-base=src/Libs/gnulib/m4 --doc-base=doc --tests-base=tests --aux-dir=src/Libs/gnulib/aux --libtool --macro-prefix=gl strdup-posix strndup vasprintf
+gnulib-tool --import --dir=../../.. --lib=libgnu --source-base=src/Libs/gnulib --m4-base=src/Libs/gnulib/m4 --doc-base=doc --tests-base=tests --aux-dir=src/Libs/gnulib/aux --libtool --macro-prefix=gl strdup-posix strndup vasprintf strchrnul
 echo "Renaming c++defs into CPPdefs"
-mv aux/c\+\+defs\.h "aux/cPPdefs.h"
+mv aux/snippet/c\+\+defs\.h "aux/snippet/cPPdefs.h"
 find . -type f -exec sed -i -e 's/c++defs\.h/cPPdefs.h/g' {} \;
 find . -name '*~' -delete
 echo "Renaming float+ into float_p"

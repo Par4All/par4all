@@ -1,0 +1,18 @@
+int main()
+{
+   int i, a;
+
+   for (i = 0;i<10;i++) {
+      a = i;
+   }
+   return i;
+}
+int main()
+{
+   int i, a;
+
+   for(i = 0; i <= 9; i += 1) {
+      a = i;
+   }
+   return i;
+}

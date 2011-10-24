@@ -286,8 +286,10 @@ void capply(char * phasename, char ** targets)
         gen_array_append(target_list,*targets);
         targets++;
     }
-    safe_concurrent_apply(phasename,target_list);
+    bool ok = safe_concurrent_apply(phasename,target_list);
     gen_array_free(target_list);
+    if(!ok)
+        THROW(user_exception_error);
 }
 
 void display(char *rname, char *mname)

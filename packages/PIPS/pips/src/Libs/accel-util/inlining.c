@@ -788,6 +788,13 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
 
     if( !ENDP(statement_block(new_statements(p)))  ) /* something happens on the way to heaven */
     {
+        if(get_bool_property("INLINING_COMMENT_ORIGIN")) {
+            char *the_comment;
+            asprintf(&the_comment,"inlined by pips from ``%s''\n", entity_user_name(inlined_module(p)));
+            insert_comments_to_statement(new_statements(p),the_comment);
+            free(the_comment);
+        }
+
         type t= functional_result(type_functional(entity_type(inlined_module(p))));
         if( ! type_void_p(t) )
         {

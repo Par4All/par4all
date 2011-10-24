@@ -294,7 +294,7 @@ char * vect_sprint_as_monome(Pvecteur v,
 }
 
 
-/* void vect_dump(Pvecteur v): impression "physique" d'un vecteur creux 
+/* void vect_dump(Pvecteur v): impression "physique" d'un vecteur creux
  * sur stderr
  */
 void vect_dump(Pvecteur v) {
