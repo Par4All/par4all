@@ -410,11 +410,11 @@ bool gpu_loop_nest_annotate(const char* module_name) {
  * Callback for gen_recurse
  * Parallelize perfectly nested loop nest, till we reach the magic comment
  *
- * FIXME : should detect the begining sentinel, but since we use it in launcher,
+ * FIXME : should detect the beginning sentinel, but since we use it in launcher,
  * it has no importance at that time
  */
 bool parallelize_annotated_loop_nest(statement s) {
-  string comment = string_undefined;
+  char **comment=NULL;
   if(statement_loop_p(s)) {
     execution_tag(loop_execution(statement_loop(s))) = is_execution_parallel;
     // Check the inner comment to find out the sentinel and stop recursion
@@ -424,8 +424,7 @@ bool parallelize_annotated_loop_nest(statement s) {
   }
 
   // Check sentinel
-  if(comment && !string_undefined_p(comment) && NULL
-      != strstr(comment, "Loop nest P4A end")) {
+  if(comment  && !empty_comments_p(*comment) && NULL != strstr(*comment, "Loop nest P4A end")) {
     // stop recursion
     return false;
   }

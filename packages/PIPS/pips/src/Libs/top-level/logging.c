@@ -128,15 +128,21 @@ void smart_log_handler(const char *fmt, va_list args)
 }
 
 /* The # "stringificator" only works in a macro expansion... */
-#define PIPS_THANKS_STRING(arch)					\
-  "%s (ARCH=" arch ")\n  running as %s\n\n"				\
-  "  (c) 1988-2011 Centre de Recherche en Informatique,\n"		\
-  "                Unite de Recherche Mathematiques et Systemes,\n"	\
-  "                MINES-ParisTech, France.\n\n"			\
-  "  URL: http://www.cri.mines-paristech.fr/pips/\n"			\
-  "  EMAIL: pipsgroup@cri.ensmp.fr\n\n"					\
-  "  This software is provided as is, under the terms of the GPL.\n"	\
-  "  It includes software from GNU (readline, rx) and Berkeley (fsplit).\n\n"
+#define PIPS_THANKS_STRING(arch)                                        \
+  "%s (ARCH=" arch ")\n  running as %s\n"                               \
+  "\n"                                                                  \
+  "  (c) 1988-2011 Centre de Recherche en Informatique,\n"              \
+  "                Unite de Recherche Mathematiques et Systemes,\n"     \
+  "                MINES-ParisTech, France.\n"                          \
+  "\n"                                                                  \
+  "  CRI URL: http://cri.mines-paristech.fr/\n"                         \
+  "  PIPS URL: http://pips4u.org/\n"                                    \
+  "  EMAIL: pips-support at cri dot mines-paristech dot fr\n"           \
+  "\n"                                                                  \
+  "  This software is provided as is, under the terms of the GPL.\n"    \
+  "  It includes and uses software from GNU (gnulib, readline),\n"      \
+  "  Berkeley (fsplit), IRISA and others (polylib)...\n"                \
+  "\n"
 
 /* display pips thanks on startup, if it on a tty.
  */
