@@ -2,11 +2,6 @@ If you do not have write access to this directory, copy its content (with
 cp -a for example) somewhere you can write into and try the examples from
 this new location.
 
-# To chain all the demos:
-make demo
-
-
-
 Jacobi is a simple relaxation on an image that is done T times (400 times in
 this demo). The convolution kernel is the matrix
 0   1/4  0
@@ -14,9 +9,6 @@ this demo). The convolution kernel is the matrix
 0   1/4  0
 
 It uses the top left part of the HPC Project logo as input
-
-# To chain all the Jacobi demos:
-make demo
 
 For the sequential execution
 
@@ -51,18 +43,14 @@ For the CUDA parallel execution on nVidia GPU:
   make display_cuda : build first if needed, run if needed, then display
   the output of the CUDA parallel version
 
-For the CUDA parallel execution on nVidia GPU with communication optimization:
+For the CUDA optimized and parallel execution on nVidia GPU:
 
-  make cuda_opt : parallelize the code to CUDA source and compile
+  make cuda-opt : parallelize the code to CUDA source and compile
 
-  make run_cuda_opt : build first if needed, then run the CUDA parallel
+  make run_cuda-opt : build first if needed, then run the CUDA parallel
   program
 
-    Do not forget to have the CUDA runtime correctly
-    installed. LD_LIBRARY_PATH should contain at least the location of
-    CUDA runtime library.
-
-  make display_cuda_opt : build first if needed, run if needed, then display
+  make display_cuda-opt : build first if needed, run if needed, then display
   the output of the CUDA parallel version
 
 For an OpenMP parallel emulation of a GPU-like accelerator (useful for
@@ -75,12 +63,20 @@ debugging, without any GPU):
   make display_accel : build first if needed, run if needed, then display
   the output of the accelerator OpenMP parallel emulation version
 
-For an OpenMP parallel emulation of a GPU-like accelerator (useful for
-debugging, without any GPU) with communication optimization:
+For the OpenCL parallel execution on nVidia GPU:
 
-  make accel_opt : parallelize the code to GPU-like OpenMP source and compile
+  make opencl : parallelize the code to OpenCL sources: the host program sources
+  *.p4a.c and the kernel program sources *.cl
 
-  make run_accel_opt : build first if needed, then run the parallel program
+  make run_opencl : build first if needed, then run the OpenCL parallel
+  program
 
-  make display_accel_opt : build first if needed, run if needed, then display
-  the output of the accelerator OpenMP parallel emulation version
+	To compile for nVidia GPU, you need CUDA environment installed. 
+
+  make display_opencl : build first if needed, run if needed, then display
+  the output of the OpenCL parallel version with gnuplot
+
+To chain all the Jacobi demos, make display_seq, display_openmp, display_cuda, 
+display_cuda-opt, display_accel-openmp, display_opencl:
+
+  make demo

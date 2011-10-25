@@ -28,14 +28,134 @@ You need to have the fftw3f library installed (the libfftw3-dev package on
 Debian/Ubuntu) to be able to link the code, and optionally OpenGL and/or
 GTK for visualization. You also need a recent Cuda SDK for cuda build.
 
-  make seq : build the sequential program from the C sources
-  make openmp : build the openmp program from the C sources
-  make cuda : build CUDA version
-  make cuda-opt : build CUDA version with communication optimization
-  make cuda-manual: build the manually written CUDA version
+For the sequential execution
 
-To get an output you might add opengl=1 and/or gtk=1 on cmd line, for instance
-"make seq opengl=1".
+  make seq 	: build the sequential program
+  
+  make run_seq : build first if needed, then run the sequential program
+  
+  make seq_gtk : build the sequential program with using gtk for visualisation 
+  
+  make run_seq_gtk : build first if needed, then run the sequential program with 
+				gtk visualisation				
+  
+  make seq_opengl : build the sequential program with using opelng for visualisation  
+  
+  make run_seq_opengl : build first if needed, then run the sequential program with 
+				opengl visualisation 
+
+For the OpenMP parallel execution on multicores:
+  
+  make openmp : parallelize the code to OpenMP sources and compile them
+  
+  make run_openmp : build first if needed, then run the OpenMP parallel program
+  
+  make openmp_gtk : parallelize the code to OpenMP sources and build the parallel 
+				executable code which uses gtk for visualisation 
+  
+  make run_openmp_gtk : build first if needed, then run the parallel program with 
+				gtk visualisation
+				
+  make openmp_opengl : parallelize the code to OpenMP sources and build the parallel 
+				executable code which uses opengl for visualisation
+  
+  make run_openmp_opengl : build first if needed, then run the openmp program with 
+				opengl visualisation
+
+For the CUDA parallel execution on nVidia GPU:
+
+  make cuda : parallelize the code to CUDA sources 
+
+  make run_cuda : build first if needed, then run the CUDA parallel program
+
+    Do not forget to have the CUDA runtime correctly
+    installed. LD_LIBRARY_PATH should contain at least the location of
+    CUDA runtime library.
+
+  make cuda_gtk : parallelize the code to cuda sources and build the parallel 
+				executable code which uses gtk for visualisation
+  
+  make run_cuda_gtk : build first if needed, then run the parallel program with 
+				gtk visualisation
+				
+  make cuda_opengl : parallelize the code to cuda sources and build the parallel 
+				executable code which uses opengl for visualisation
+  
+  make run_cuda_opengl : build first if needed, then run the parallel program with 
+				opengl visualisation
+
+For the CUDA optimized and parallel execution on nVidia GPU:
+
+  make cuda-opt : parallelize the code to CUDA soptimized ource and compile
+
+  make run_cuda-opt : build first if needed, then run the CUDA optimized parallel
+				program
+
+  make cuda-opt_gtk : parallelize the code to cuda optimized sources and build the parallel 
+			executable code which uses gtk for visualisation
+  
+  make run_cuda-opt_gtk : build first if needed, then run the parallel program with 
+				gtk visualisation
+				
+  make cuda-opt_opengl : parallelize the code to cuda optimized sources and build the parallel 
+				executable code which uses opengl for visualisation
+  
+  make run_cuda-opt_opengl : build first if needed, then run the parallel program with 
+				opengl visualisation
+				
+For an OpenMP parallel emulation of a GPU-like accelerator (useful for
+debugging, without any GPU):
+
+  make accel-openmp : parallelize the code to GPU-like OpenMP source
+
+  make run_accel-openmp : build first if needed, then run the parallel program
+
+  make accel-openmp_gtk : parallelize the code to GPU-like OpenMP sources and build the parallel 
+				binary code which uses gtk for visualisation
+  
+  make run_accel-openmp_gtk : build first if needed, then run the parallel program with 
+				gtk visualisation
+				
+  make accel-openmp_opengl : parallelize the code to cuda sources and build the parallel 
+				executable code which uses opengl for visualisation
+  
+  make run_accel-openmp_opengl : build first if needed, then run the parallel program with 
+				opengl visualisation
+
+For the OpenCL parallel execution on nVidia GPU:
+
+  make opencl : parallelize the code to OpenCL sources: the host program sources
+				and the kernel program sources
+
+  make run_opencl : build first if needed, then run the OpenCL parallel
+				program
+
+    To compile for nVidia GPU, you need CUDA environment installed. 
+
+  make opencl_gtk : parallelize the code to OpenCL sources and build the parallel 
+				binary code which uses gtk for visualisation
+  
+  make run_opencl_gtk : build first if needed, then run the parallel program with 
+				gtk visualisation
+				
+  make opencl_opengl : parallelize the code to OpenCL sources and build the parallel 
+				executable code which uses opengl for visualisation
+  
+  make run_opencl_opengl : build first if needed, then run the parallel program with 
+				opengl visualisation
+				
+For manually written CUDA version:
+  make cuda-manual : compile the manual cuda codes using nvcc
+
+For a full demo using gtk to visualise the output:
+
+  make demo : to run all seq, OpenMP, CUDA, optimized CUDA, OpenMP GPU emulator and OpenCL
+
+For a full demo using OpenGL for visualisation:
+
+  make demo_opengl : to run all seq, OpenMP, CUDA, optimized CUDA, 
+				OpenMP GPU emulator and OpenCL and display using OpenGL
+
 You might also run "make clean" first to force rebuilding.
 
 You can set the P4A_OPTIONS variable to pass some options to p4a.
@@ -47,8 +167,6 @@ You can set the P4A_OPTIONS variable to pass some options to p4a.
 
 You can then execute the produced binary using files in "data/". There's bench
 for 3 size of datas (32,64, and 128). Default size if 128, the others can be obtained
- by adding SIZE=32 or SIZE=64 to the makefile command line.
-
-The run is now done simply with ./stars-pm_{suffix}{_size}[_options] data/exp{size}.a.bin
+by adding SIZE=32 or SIZE=64 to the makefile command line.
 
 Have a look at *.sh file in current directory for example.

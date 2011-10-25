@@ -9,8 +9,8 @@ P4A_CUDA_SUFFIX=.cu
 endif 
 
 
-# Common source file (for timing...)
-COMMON := ../../common/timing.c
+# Common source file (for timing)
+COMMON := $(TOP)/common/timing.c
 ACCEL_FLAGS := -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -arch=sm_20
 ACCEL_SRC := $(P4A_ACCEL_DIR)/p4a_accel.cu $(P4A_ACCEL_DIR)/p4a_communication_optimization_runtime.cpp
 # Params for benchmarks
@@ -37,8 +37,8 @@ PPCG_TARGET := $(TARGET)_ppcg
 
 # Compilation flags
 CC := gcc
-COMMON_FLAGS:= -I../../common/ -DPOLYBENCH_TIME
-CFLAGS:= -O3
+COMMON_FLAGS:= -I$(TOP)/common/ -DPOLYBENCH_TIME
+CFLAGS+= -O3
 GCCFLAGS:= -fno-strict-aliasing -fPIC -std=c99  
 LDFLAGS:= -lm
 P4A_FLAGS+= -p $(TARGET)_p4a -r
@@ -53,12 +53,6 @@ GCCFLAGS+=-W -Wall -DP4A_DEBUG
 PGI_FLAGS+=-Minfo
 endif
 
-ifndef std_size
-CFLAGS+=$(SIZE_PARAMS)
-P4A_FLAGS+=$(SIZE_PARAMS)
-endif
-
-
 
 # Default target : display usage
 .PHONY: default clean dist-clean
@@ -72,51 +66,59 @@ $(TARGET):
 
 # build source for parallel versions
 $(OMP_SOURCE): $(SOURCE) $(COMMON)
-	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS)
+	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) $(SIZE_PARAMS)
 	mv $(<:%.c=%.p4a.c) $@
 openmp_src:$(OMP_SOURCE)
 
 $(CUDA_SOURCE): $(SOURCE) $(COMMON)
-	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) --cuda
+	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) $(SIZE_PARAMS) --cuda 
 	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
 cuda_src:$(CUDA_SOURCE)
 
 $(CUDA_OPT_SOURCE): $(SOURCE) $(COMMON)
-	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) --cuda --com-optimization
+	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) $(SIZE_PARAMS) --cuda --com-optimization
 	mv $(<:%.c=%.p4a$(P4A_CUDA_SUFFIX)) $@
 cuda_opt_src:$(CUDA_OPT_SOURCE)
 
 $(PPCG_PRE_SOURCE):  $(SOURCE) $(COMMON)
-	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) -S -DPGCC
+	p4a $^ $(COMMON_FLAGS) $(P4A_FLAGS) $(SIZE_PARAMS) -S -DPGCC
 	mv $(SOURCE:%.c=%.p4a.c) $@
 
 
 # build binary for the 3 different versions
 $(SEQ_TARGET): $(SOURCE) $(COMMON)
-	gcc $(COMMON_FLAGS) $(CFLAGS) $(GCCFLAGS) $(LDFLAGS) $^ -o $@
+	gcc $(COMMON_FLAGS) $(CFLAGS) $(GCCFLAGS) $(LDFLAGS) $(SIZE_PARAMS) $^ -o $@
 seq: $(SEQ_TARGET)
+$(TARGET)-seq:seq
 
 $(OMP_TARGET): $(OMP_SOURCE) $(COMMON)
-	gcc -fopenmp $(COMMON_FLAGS) $(CFLAGS) $(GCCFLAGS) $(LDFLAGS) $^ -o $@
+	gcc -fopenmp $(COMMON_FLAGS) $(CFLAGS) $(GCCFLAGS) $(LDFLAGS) $(SIZE_PARAMS) $^ -o $@
 openmp: $(OMP_TARGET)
+$(TARGET)-openmp:openmp
 
 $(CUDA_TARGET): $(CUDA_SOURCE) $(COMMON)
-	nvcc $^ -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(GENERATED_KERNELS)
+	nvcc $^ -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(GENERATED_KERNELS) $(SIZE_PARAMS)
 cuda: $(CUDA_TARGET)
+$(TARGET)-cuda:cuda
+
 $(CUDA_OPT_TARGET): $(CUDA_OPT_SOURCE) $(COMMON)
-	nvcc $^ -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(GENERATED_KERNELS)
+	nvcc $^ -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(GENERATED_KERNELS) $(SIZE_PARAMS)
 cuda_opt: $(CUDA_OPT_TARGET)
+$(TARGET)-cuda-opt:cuda_opt
+
 $(PGI_TARGET): $(SOURCE) $(COMMON)
-	pgcc $^ -o $@ $(COMMON_FLAGS) $(LDFLAGS) $(CFLAGS) -DPGI_ACC -ta=nvidia,cc13 $(PGI_FLAGS)
+	pgcc $^ -o $@ $(COMMON_FLAGS) $(LDFLAGS) $(CFLAGS) -DPGI_ACC -ta=nvidia,cc13 $(PGI_FLAGS) $(SIZE_PARAMS)
 pgi: $(PGI_TARGET)
 $(HMPP_TARGET): $(HMPP_SOURCE) $(COMMON)
-	hmpp --codelet-required --nvcc-options -arch,sm_13 gcc $(COMMON_FLAGS) $(CFLAGS) $(GCCFLAGS) $(LDFLAGS) $^ -o $@
+	hmpp --codelet-required --nvcc-options -arch,sm_13 gcc $(COMMON_FLAGS) $(CFLAGS) $(GCCFLAGS) $(LDFLAGS) $^ -o $@ $(SIZE_PARAMS)
 hmpp: $(HMPP_TARGET)
+$(TARGET)-hmpp:hmpp
 
-ppcg: $(PPCG_TARGET)
 $(PPCG_TARGET): $(PPCG_PRE_SOURCE) $(COMMON)
-	ppcg $(PPCG_PRE_SOURCE)
+	ppcg $(PPCG_PRE_SOURCE) $(SIZE_PARAMS)
 	nvcc -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(PPCG_GENERATED) $(COMMON)
+ppcg: $(PPCG_TARGET)
+$(TARGET)-%:ppcg
 
 # Run target
 run_seq: $(SEQ_TARGET)
