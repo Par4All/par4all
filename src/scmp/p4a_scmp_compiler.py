@@ -63,21 +63,17 @@ class p4a_scmp_compiler(p4a_processor):
         # add scmp properties to user properties
         properties = dict(user_properties)
         properties.update(default_scmp_properties)
-
         p4a_processor.__init__(self, workspace, project_name,
                                cpp_flags,
                                verbose, files, filter_select, filter_exclude,
-                               False, False, False, False, False,
+                               False, False, False, False, False, 2, False,
                                recover_includes,
                                native_recover_includes,
-                               True,
-                               properties, [], activates)
+                               True, False, False, "",
+                               properties, {}, activates)
         self.kernel_tasks_labels = []
         self.server_tasks_labels = []
         self.generated_files = []
-
-
-
 
     def save_user_files (self):
         """ Save the user files
@@ -457,7 +453,7 @@ class p4a_scmp_compiler(p4a_processor):
         print("done")
 
     def get_scalopes_kernel_task_prefix (self):
-        return self.workspace.props.SCALOPES_KERNEL_TASK_PREFIX
+        return self.workspace.props.scalopes_kernel_task_prefix
 
     def export_application_header_files(self):
         print("exporting user header files...")

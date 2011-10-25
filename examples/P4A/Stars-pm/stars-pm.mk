@@ -8,7 +8,8 @@ RUN_ARG=./data/exp$(SIZE).a.bin
 
 COMMON_SOURCES = common/io.c
 COMMON_INCLUDES = include/stars-pm-generated_$(SIZE).h
-CLEAN_OTHERS = $(COMMON_INCLUDES) $(CPROTO_GRAPHICS_SRC:.c=.o)
+COMMON_GRAPHICS_SRC = common/glgraphics.c common/graphics.c
+CLEAN_OTHERS = $(COMMON_INCLUDES) $(COMMON_GRAPHICS_SRC:.c=.o)
 
 
 BASE_SOURCES= pm.c 1-discretization.c 2-histogramme.c 3-potential.c \
@@ -64,7 +65,7 @@ P4A_OPTIONS+= -D_GRAPHICS_ --extra-obj=common/graphics.o
 BIN_SUFFIX:=$(BIN_SUFFIX)_gtk
 endif
 
-include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(SOURCES) $(CPROTO_GRAPHICS_SRC) $(GRAPHICS_OBJ) 
+include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(SOURCES) $(CPROTO_GRAPHICS_SRC) 
 	@echo "Generating headers $@" 
 	echo >$@
 	rm -f include/stars-pm-generated_* *.o
