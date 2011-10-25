@@ -341,7 +341,16 @@ list effect_to_may_effect_list(effect eff)
     return(CONS(EFFECT,eff,NIL));
 }
 
-
+list effects_to_written_scalar_entities(list l_eff)
+{
+  list l_ent = NIL;
+  FOREACH(EFFECT, eff, l_eff)
+    {
+      if (store_effect_p(eff) && effect_write_p(eff) && effect_scalar_p(eff))
+	l_ent = CONS(ENTITY, effect_entity(eff), l_ent);
+    }
+  return l_ent;
+}
 /***********************************************************************/
 /* UNDEFINED UNARY OPERATORS                                           */
 /***********************************************************************/

@@ -24,6 +24,7 @@ gpips_LDFLAGS=$(GTKp_2_0_LIBS)\
 	$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS)
 
 AM_CPPFLAGS=\
+	-I../../Libs/gnulib \
 	-I$(top_srcdir)/src/Documentation/constants\
 	-I../Passes/wpips -I$(srcdir)/../wpips\
 	-I../../Documentation/pipsmake\

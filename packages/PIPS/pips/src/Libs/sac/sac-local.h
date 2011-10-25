@@ -68,5 +68,5 @@ typedef dg_vertex_label vertex_label;
 extern FILE *patterns_yyin;
 extern int patterns_yyparse();
 extern int patterns_yylex();
-extern void patterns_yyerror(char*);
+extern void patterns_yyerror(const char*);
 

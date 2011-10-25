@@ -961,10 +961,12 @@ static list instruction_to_transformer_list(instruction i,
   }
   pips_debug(9, "resultat:\n");
   ifdebug(9)
-    if(!list_undefined_p(tl))
-      (void) print_transformers(tl);
-    else
-      (void) fprintf(stderr, "undefined list\n");
+    {
+      if(!list_undefined_p(tl))
+	(void) print_transformers(tl);
+      else
+	(void) fprintf(stderr, "undefined list\n");
+    }
   pips_debug(8, "end\n");
   return tl;
 }

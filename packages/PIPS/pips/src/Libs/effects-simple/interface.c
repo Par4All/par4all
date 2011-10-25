@@ -492,6 +492,7 @@ proper_effects_of_expression(expression e)
     {
 	set_methods_for_simple_effects();
 	make_effects_private_current_context_stack();
+	debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
     }
 
     effects_private_current_context_push(transformer_undefined);
@@ -500,6 +501,7 @@ proper_effects_of_expression(expression e)
     if (!context_stack_defined_p)
     {
 	free_effects_private_current_context_stack();
+	debug_off();
     }
 
     return(le);

@@ -23,6 +23,7 @@ nodist__pypips_la_SOURCES =pypips_wrap.c
 _pypips_la_LDFLAGS = -module $(PYTHON_LDFLAGS)
 _pypips_la_LIBADD = ../../Libs/libpipslibs.la $(PYTHON_EXTRALIBS) $(LINEARLIBS_LIBS) $(NEWGENLIBS_LIBS)
 _pypips_la_CPPFLAGS = \
+	-I../../Libs/gnulib \
 	$(PYTHON_CPPFLAGS)\
 	-I$(top_srcdir)/src/Documentation/constants \
 	-I../../Documentation/pipsmake \

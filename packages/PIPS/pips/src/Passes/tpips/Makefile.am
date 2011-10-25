@@ -28,6 +28,7 @@ completion_list.h :	\
 
 BUILT_SOURCES=$(TARGET).h completion_list.h tp_yacc.h
 AM_CPPFLAGS=\
+	-I../../Libs/gnulib \
 	-I$(top_srcdir)/src/Documentation/constants\
 	-I../../Documentation/pipsmake\
 	-I../../Documentation/newgen\

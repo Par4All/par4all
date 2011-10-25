@@ -786,7 +786,8 @@ entity make_new_entity(basic ba, int kind)
     double_entities, char_entities;
 
   entity new_ent, mod_ent;
-  char prefix[4], *name;
+  // prefix+1 (line#820) must hold 3 characters
+  char prefix[5], *name;
   int number = 0;
   entity dynamic_area;
 
