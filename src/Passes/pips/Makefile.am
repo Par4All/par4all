@@ -9,6 +9,7 @@ include_HEADERS=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk
 
 AM_CPPFLAGS=\
+	-I../../Libs/gnulib \
 	-I$(top_srcdir)/src/Documentation/constants \
 	-I../../Documentation/pipsmake \
 	-I../../Documentation/newgen \
