@@ -851,7 +851,7 @@ static bool reference_constant_wrt_ctxt_p(reference ref, reference_testing_ctxt 
   return continue_p;
 }
 
-static bool statement_entity_references_constant_in_context_p(statement s, entity e, transformer trans)
+static bool statement_entity_references_constant_in_context_p(statement s, entity e, list l_modified_variables)
 {
   int nd = type_depth(entity_type(e));
   bool constant_p = (nd==0);
@@ -859,11 +859,11 @@ static bool statement_entity_references_constant_in_context_p(statement s, entit
   if(!constant_p) {
     pips_debug(2,"Considering entity : %s", entity_name(e));
 
-    /* none of the arguments in t appears in an index of a reference from entity e */
+    /* none of the modified variables appears in an index of a reference from entity e */
     reference_testing_ctxt ctxt;
     ctxt.constant_p = true;
     ctxt.e = e;
-    ctxt.trans_args = transformer_arguments(trans);
+    ctxt.trans_args = l_modified_variables;
 
     gen_context_recurse(s, &ctxt, reference_domain, reference_constant_wrt_ctxt_p, gen_null);
     constant_p = ctxt.constant_p;
@@ -1047,7 +1047,8 @@ static bool statement_scalarization(statement s)
 		 spurious out of bounds accesses. See scalarization30
 		 for an example and explanations. */
 	      if (//constant_region_in_context_p(pru, tran)
-		  statement_entity_references_constant_in_context_p(s, effect_entity(pru), tran)
+		  statement_entity_references_constant_in_context_p(s, effect_entity(pru),
+								    transformer_arguments(tran))
 		  && singleton_region_in_context_p(pru, prec,
 						   loop_indices_b, strict_p)) {
 		/* The array references can be replaced a references to a
@@ -1715,7 +1716,7 @@ static void update_scalarizable_candidates(vertex v, statement st,
 	ordering_to_statement(dg_vertex_label_statement(succ_l));
       instruction succ_i = statement_instruction( succ_st ) ;
       list succ_ls = load_statement_enclosing_loops( succ_st ) ;
-
+      list prefix = loop_prefix( ls, succ_ls ) ;
 
       FOREACH(CONFLICT, c, dg_arc_label_conflicts(arc_l))
 	{
@@ -1733,7 +1734,6 @@ static void update_scalarizable_candidates(vertex v, statement st,
 		  pips_debug(3, "sink effect:");
 		  print_effect(sk_eff);
 		}
-	      list prefix = loop_prefix( ls, succ_ls ) ;
 
 	      /* Take into account def-def and use-def edges only
 		 if they are on a single and same element
@@ -1743,10 +1743,14 @@ static void update_scalarizable_candidates(vertex v, statement st,
 	      if(action_write_p(effect_action(sk_eff)))
 		{
 		  set common_loop_indices = set_make(set_pointer);
-		  FOREACH(loop, l, prefix)
+		  pips_debug(3, "common loop indices :");
+		  FOREACH(statement, s, prefix)
 		    {
+		      loop l = statement_loop(s);
+		      ifdebug(3) {fprintf(stderr, "%s ", entity_name(loop_index(l)));}
 		      set_add_element(common_loop_indices, common_loop_indices, loop_index(l));
 		    }
+		  ifdebug(3) {fprintf(stderr, "\n");}
 		  list sc_inds = reference_indices(effect_any_reference(sc_eff));
 		  list sk_inds = reference_indices(effect_any_reference(sk_eff));
 
@@ -1774,32 +1778,33 @@ static void update_scalarizable_candidates(vertex v, statement st,
 
 		    }
 		  set_free(common_loop_indices);
-		  continue ;
-		}
+		} /* if(action_write_p(effect_action(sk_eff))) */
 
 	      /* PC dependance and the sink is a loop index - shouldn't be necessary here */
-	      if(action_read_p( effect_action( sk_eff )) &&
+	      else if(action_read_p( effect_action( sk_eff )) &&
 		 (instruction_loop_p( succ_i) ||
 		  is_implied_do_index( e, succ_i)))
 		{
 		  keep = true;
 		}
-
-	      pips_debug(5,"Conflict for %s between statements %td and %td\n",
-			 entity_local_name(e),
-			 statement_number(st),
-			 statement_number(succ_st));
-
-	      if (v==succ_v)
-		{
-		  /* No decision can be made from this couple of effects alone */
-		  keep = true;
-		}
 	      else
 		{
-		  pips_debug(5,"remove %s from candidates in non common enclosing loops\n",
-			     entity_local_name(e));
-		  keep = false;
+		  pips_debug(5,"Conflict for %s between statements %td and %td\n",
+			     entity_local_name(e),
+			     statement_number(st),
+			     statement_number(succ_st));
+
+		  if (v==succ_v)
+		    {
+		      /* No decision can be made from this couple of effects alone */
+		      keep = true;
+		    }
+		  else
+		    {
+		      pips_debug(5,"remove %s from candidates in non common enclosing loops\n",
+				 entity_local_name(e));
+		      keep = false;
+		    }
 		}
 	      if (!keep)
 		{
@@ -1810,10 +1815,10 @@ static void update_scalarizable_candidates(vertex v, statement st,
 		  remove_scalarizable_candidate_from_loops(prefix, ls, e ,loops_scalarizable_candidates) ;
 		  remove_scalarizable_candidate_from_loops(prefix, succ_ls, e, loops_scalarizable_candidates ) ;
 		}
-	      gen_free_list( prefix ) ;
 	    }
-	}
-    }
+	} /* FOREACH(CONFLICT, c, dg_arc_label_conflicts(arc_l)) */
+      gen_free_list( prefix ) ;
+    } /* FOREACH(SUCCESSOR, succ, vertex_successors(v)) */
 
   pips_debug(1, "End\n");
 }
@@ -1838,9 +1843,11 @@ static bool entity_can_be_scalarized_in_statement_in(statement s, scalarizabilit
   list l_eff = load_cumulated_rw_effects_list(s);
   bool continue_p = true;
 
-  if (!effects_may_read_or_write_memory_paths_from_entity_p(l_eff, ctxt->e))
-    /* the statement has no cumulated effect from entity e: it cannot
-       prevent scalarization nor it's inner statements
+  if (!effects_may_read_or_write_memory_paths_from_entity_p(l_eff, ctxt->e)
+      && !entity_in_list_p(ctxt->e, statement_declarations(s)))
+    /* the statement has no cumulated effect from entity e, and e is
+       not declared inside: it cannot prevent scalarization, nor it's
+       inner statements.
     */
     continue_p = false;
   else
@@ -1898,12 +1905,16 @@ static bool entity_can_be_scalarized_in_statement_in(statement s, scalarizabilit
     1- there are no hidden references to the array due for
      instance to a function call
     2- all the accessed references are strictly the same;
-
+    3- the privatizable reference indices do not depend on variables modified
+       inside the loop body.
  */
-static bool entity_can_be_scalarized_in_statement_p(entity e, statement s)
+static bool entity_can_be_scalarized_in_statement_p(entity e, statement s,
+						    list l_modified_variables)
 {
   bool result = true;
 
+  pips_debug(2, "checking for entity %s in statement %td\n",
+	     entity_name(e), statement_number(s));
   /* First check that there are no hidden references to the array due for
      instance to a function call.
   */
@@ -1926,6 +1937,33 @@ static bool entity_can_be_scalarized_in_statement_p(entity e, statement s)
       ctxt.l_inds_first_ref = NIL;
       gen_context_recurse(s, &ctxt, statement_domain, entity_can_be_scalarized_in_statement_in, gen_null);
       result = ctxt.result;
+      if (!result)
+	{
+	  pips_debug(2,"Second legality criterion not met\n");
+	}
+      else if (reference_undefined_p(ctxt.first_ref))
+	{
+	  pips_debug(2,"No remaining reference found\n");
+	  result = false;
+	}
+      else
+	{
+	  // check that the reference indices do not depend on variables modified in the statement
+	  ifdebug(3)
+	    {
+	      pips_debug(3, "checking reference %s wrt entities:\n",
+			 words_to_string(effect_words_reference(ctxt.first_ref)));
+	      print_entities(l_modified_variables);
+	    }
+	  reference_testing_ctxt ref_test_ctxt;
+	  ref_test_ctxt.constant_p = true;
+	  ref_test_ctxt.e = e;
+	  ref_test_ctxt.trans_args = l_modified_variables;
+	  (void) reference_constant_wrt_ctxt_p(ctxt.first_ref, &ref_test_ctxt);
+	  ref_test_ctxt.trans_args = NIL;
+	  result = ref_test_ctxt.constant_p;
+	  pips_debug(2,"Third legality criterion %s met\n", result? "" : "not");
+	}
     }
   return result;
 }
@@ -1945,17 +1983,23 @@ static void check_loop_scalarizable_candidates(loop l, hash_table loops_scalariz
   set loop_scalarizable_candidates = hash_get(loops_scalarizable_candidates, l);
   statement body = loop_body(l);
   list l_loop = CONS(STATEMENT, (statement) gen_get_ancestor(statement_domain, l),NIL);
+  list l_modified_variables = effects_to_written_scalar_entities(load_cumulated_rw_effects_list(body));
+  FOREACH(ENTITY, e, statement_declarations(body))
+    {
+      if (entity_scalar_p(e))
+	l_modified_variables = CONS(ENTITY, e, l_modified_variables);
+    }
 
   SET_FOREACH(entity, e, loop_scalarizable_candidates)
     {
-      if (!entity_can_be_scalarized_in_statement_p(e, body))
+      if (!entity_can_be_scalarized_in_statement_p(e, body, l_modified_variables))
 	remove_scalarizable_candidate_from_loops(NIL,
 						 l_loop,
 						 e,
 						 loops_scalarizable_candidates);
     }
   gen_free_list(l_loop);
-
+  gen_free_list(l_modified_variables);
 }
 
 /** check if scalarizable candidates are legal candidates

@@ -3019,6 +3019,7 @@ text text_loop_default(entity module,
   bool hpf_prettyprint = pp_hpf_style_p();
   bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
   bool all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
+  bool braces_p = !one_liner_p(body) || prettyprint_all_c_braces_p;
 
   if (execution_sequential_p(loop_execution(obj))) {
     doall_loop_p = false;
@@ -3065,7 +3066,7 @@ text text_loop_default(entity module,
     break;
   case is_language_c:
     pc = gen_nconc(pc, C_loop_range(loop_range(obj), loop_index(obj), pdl));
-    if (!one_liner_p(body))
+    if (braces_p)
       pc = CHAIN_SWORD(pc," {");
     if ((label != NULL) && (label[0] != '\0')) {
       pips_debug(9, "the label %s need to be print for a for C loop", label);
@@ -3128,7 +3129,7 @@ text text_loop_default(entity module,
     }
     break;
   case is_language_c:
-    if (!one_liner_p(body))
+    if (braces_p)
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     break;
   default:
@@ -3274,30 +3275,33 @@ static text text_whileloop(entity module,
       }
       break;
     case is_language_c:
-      if(one_liner_p(body)) {
-	pc = CHAIN_SWORD(NIL,"while (");
-	pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
-	pc = CHAIN_SWORD(pc,")");
-	u = make_unformatted(strdup(label), n, margin, pc);
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
-	MERGE_TEXTS(r, text_statement_enclosed(module,
-					       margin+INDENTATION,
-					       body,
-					       !one_liner_p(body),
-					       !one_liner_p(body),
-					       pdl));
+      {
+	bool braces_p = !one_liner_p(body) || prettyprint_all_c_braces_p;
+	if(!braces_p) {
+	  pc = CHAIN_SWORD(NIL,"while (");
+	  pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
+	  pc = CHAIN_SWORD(pc,")");
+	  u = make_unformatted(strdup(label), n, margin, pc);
+	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
+	  MERGE_TEXTS(r, text_statement_enclosed(module,
+						 margin+INDENTATION,
+						 body,
+						 !one_liner_p(body),
+						 !one_liner_p(body),
+						 pdl));
 
-	//if (structured_do)
-	//ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-      } else {
-	pc = CHAIN_SWORD(NIL,"while (");
-	pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
-	pc = CHAIN_SWORD(pc,") {");
-	u = make_unformatted(strdup(label), n, margin, pc);
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
-	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body, pdl));
-	if(structured_do)
-	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+	  //if (structured_do)
+	  //ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+	} else {
+	  pc = CHAIN_SWORD(NIL,"while (");
+	  pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
+	  pc = CHAIN_SWORD(pc,") {");
+	  u = make_unformatted(strdup(label), n, margin, pc);
+	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
+	  MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body, pdl));
+	  if(structured_do)
+	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+	}
       }
       break;
     default:
@@ -5188,6 +5192,7 @@ static text text_forloop(entity module,
     text r = make_text(NIL);
     statement body = forloop_body(obj) ;
     //instruction i = statement_instruction(body);
+    bool braces_p = !one_liner_p(body) || prettyprint_all_c_braces_p;
 
     pc = CHAIN_SWORD(pc,"for (");
     if (!expression_undefined_p(forloop_initialization(obj)))
@@ -5202,11 +5207,11 @@ static text text_forloop(entity module,
     pc = CHAIN_SWORD(pc,C_STATEMENT_END_STRING);
     if (!expression_undefined_p(forloop_increment(obj)))
       pc = gen_nconc(pc, words_expression(forloop_increment(obj), pdl));
-    pc = CHAIN_SWORD(pc,one_liner_p(body)?")":") {");
+    pc = CHAIN_SWORD(pc,!braces_p?")":") {");
     u = make_unformatted(strdup(label), n, margin, pc) ;
     ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
 
-    if(one_liner_p(body)) {
+    if(!braces_p) {
       MERGE_TEXTS(r, text_statement_enclosed(module,
 					     margin+INDENTATION,
 					     body,

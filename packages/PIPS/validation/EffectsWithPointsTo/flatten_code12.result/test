@@ -37,7 +37,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void flatten_code12(void)
 {
@@ -67,7 +70,10 @@ void flatten_code12(void)
    }
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

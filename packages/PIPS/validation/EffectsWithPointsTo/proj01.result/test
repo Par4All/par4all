@@ -30,7 +30,10 @@ int main(void)
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main(void)
 {

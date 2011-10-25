@@ -207,8 +207,8 @@ resource:	NAME
 	;
 %%
 
-void yyerror_lex_part(char *);
-void yyerror(char * s)
+void yyerror_lex_part(const char *);
+void yyerror(const char * s)
 {
     int c;
     yyerror_lex_part(s);
@@ -217,7 +217,7 @@ void yyerror(char * s)
     exit(EXIT_FAILURE);
 }
 
-void 
+void
 fprint_virtual_resources(FILE *fd, const char* dir, list lrv)
 {
     MAP(VIRTUAL_RESOURCE, vr,

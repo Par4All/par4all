@@ -27,8 +27,11 @@ int main()
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // col -> _col_1[0] , EXACT
+
+
+// Points To OUT: none
 
 void foo(int *col)
 {
@@ -45,7 +48,10 @@ void foo(int *col)
    return;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

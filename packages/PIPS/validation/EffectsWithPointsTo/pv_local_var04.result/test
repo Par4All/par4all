@@ -29,7 +29,14 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT:
+// p -> a , MAY
+// q -> b , MAY
+// r -> a , MAY
+// s -> b , MAY
 
 int main()
 {

@@ -30,8 +30,13 @@ int main()
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // pi -> _pi_1[0] , EXACT
+// q -> _q_2[0] , EXACT
+
+
+// Points To OUT:
+// pi -> _pi_1[*] , EXACT
 // q -> _q_2[0] , EXACT
 
 void call01(int *pi, tf_t *q)
@@ -64,7 +69,10 @@ void call01(int *pi, tf_t *q)
    (q->two)[4] = 2;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

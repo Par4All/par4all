@@ -34,7 +34,7 @@ extern FILE * syn_in;
 extern int syn_lex();
 extern void syn_reset_lex();
 extern int syn_parse();
-extern void syn_error(char*);
+extern void syn_error(const char*);
 
 /* definition of implementation dependent constants */
 

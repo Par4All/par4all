@@ -277,7 +277,7 @@ int yywrap(void)
    return 1;
 }
 
-void yyerror(char* s)
+void yyerror(const char* s)
 {
    pips_internal_error("patterns parser:%zd: %s\n",sac_lineno, s);
 }

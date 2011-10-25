@@ -688,7 +688,7 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 			}
 %%
 
-void yyerror(char * msg)
+void yyerror(const char * msg)
 {
     user_warning("yyerror",
                  "C %s near \"%s\" at preprocessed line %d (user line %d)\n",

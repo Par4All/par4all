@@ -61,7 +61,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void lhs01()
 {
@@ -142,7 +145,10 @@ void lhs01()
       j = 3;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

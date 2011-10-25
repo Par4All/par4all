@@ -1,0 +1,18 @@
+#
+# Code after quick_scalarization for module main
+#
+int main()
+{
+   int i, j, t;
+   int u[10][10], res;
+   for(t = 1; t <= 99; t += 1) {
+      for(i = 0; i <= 9; i += 1)
+         for(j = 0; j <= 9; j += 1)
+            u[i][j] = 0.0;
+
+      for(i = 0; i <= 9; i += 1)
+         for(j = 0; j <= 9; j += 1)
+            res = res+u[i][j];
+   }
+   return res;
+}

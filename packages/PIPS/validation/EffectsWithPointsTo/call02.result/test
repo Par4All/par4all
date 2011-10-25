@@ -41,7 +41,12 @@ int main()
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
+// p -> _p_5[0] , EXACT
+// q[*] -> _q_4[0] , EXACT
+
+
+// Points To OUT:
 // p -> _p_5[0] , EXACT
 // q[*] -> _q_4[0] , EXACT
 
@@ -82,7 +87,10 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
    *q[i] = 3;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
