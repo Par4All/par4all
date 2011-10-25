@@ -34,7 +34,11 @@ int main()
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
+// x -> _x_3[0] , EXACT
+
+
+// Points To OUT:
 // x -> _x_3[0] , EXACT
 
 void call06(int r, int m, int *x)
@@ -62,7 +66,10 @@ void call06(int r, int m, int *x)
    return;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

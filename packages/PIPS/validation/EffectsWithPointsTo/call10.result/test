@@ -32,7 +32,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void call10(int i, int x[10], int j, int y[10])
 {
@@ -59,7 +62,10 @@ void call10(int i, int x[10], int j, int y[10])
       y[i] = 0;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

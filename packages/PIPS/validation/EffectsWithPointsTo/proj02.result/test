@@ -6,7 +6,9 @@ int main(void)
    int i;
 //             <    is written>: pp
    int **pp = (void *) 0;
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __TIME_EFFECTS:KALI
 
    srand(time((void *) 0));
 //             <may be read   >: stdout[0]
@@ -59,7 +61,10 @@ static int alea(void)
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main(void)
 {
@@ -131,7 +136,10 @@ int main(void)
    return 0;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 static int alea(void)
 {
@@ -156,7 +164,9 @@ int main(void)
    int i;
 //             <    is written>: pp
    int **pp = (void *) 0;
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __TIME_EFFECTS:KALI
 
    srand(time((void *) 0));
 //             <may be read   >: stdout[0]
@@ -226,6 +236,13 @@ static int alea(void)
 	17 --> 18 with conflicts
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+	17 --> 30 with conflicts
+		from <__TIME_EFFECTS:KALI-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__TIME_EFFECTS:KALI-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__TIME_EFFECTS:KALI-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <__TIME_EFFECTS:KALI-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <__TIME_EFFECTS:KALI-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__TIME_EFFECTS:KALI-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	20 --> 22 with conflicts
 		from <pi-W-EXACT> to <pi-R-EXACT>
 	20 --> 30 with conflicts

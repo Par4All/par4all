@@ -35,7 +35,10 @@ void foo()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void assign05()
 {
@@ -66,7 +69,10 @@ void assign05()
    *r = 0;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 /* To be out of Emami's patterns with a user call */
 
@@ -85,7 +91,10 @@ void assign05();
 
 void foo();
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int * bar(int j)
 {
@@ -95,7 +104,10 @@ int * bar(int j)
    return &j;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void foo()
 {

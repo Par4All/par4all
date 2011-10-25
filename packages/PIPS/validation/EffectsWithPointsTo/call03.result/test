@@ -26,7 +26,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void call03()
 {
@@ -50,7 +53,10 @@ void call03()
    (q->two)[4] = 2;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
