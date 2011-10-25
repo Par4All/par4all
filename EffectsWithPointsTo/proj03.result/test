@@ -11,7 +11,9 @@ int main(void)
    int **pp = &pi;
 //             <    is written>: j
    int j = 2;
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __TIME_EFFECTS:KALI
 
    srand(time((void *) 0));
 //             <may be read   >: stdout[0]
@@ -45,25 +47,14 @@ int main(void)
    **pp = 0;
    return 0;
 }
-static int alea(void)
-{
-//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
-//             <    is written>: r _RANDOM_EFFECTS:GEN_SEED
-   int r = rand();
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: r stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("%d\n", r);
-//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
-   return rand()%2==1;
-}
 
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main(void)
 {
@@ -149,24 +140,6 @@ int main(void)
    return 0;
 }
 
-// Points To: none
-
-static int alea(void)
-{
-
-// Points To: none
-
-   int r = rand();
-
-// Points To: none
-
-   printf("%d\n", r);
-
-// Points To: none
-
-   return rand()%2==1;
-}
-
 PROPER  EFFECTS WITH POINTS TO
 
 int main(void)
@@ -179,7 +152,9 @@ int main(void)
    int **pp = &pi;
 //             <    is written>: j
    int j = 2;
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __TIME_EFFECTS:KALI
 
    srand(time((void *) 0));
 //             <may be read   >: stdout[0]
@@ -213,20 +188,6 @@ int main(void)
    **pp = 0;
    return 0;
 }
-static int alea(void)
-{
-//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
-//             <    is written>: r _RANDOM_EFFECTS:GEN_SEED
-   int r = rand();
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: r stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("%d\n", r);
-//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
-   return rand()%2==1;
-}
 
  *********************** Use-Def Chains *********************
 
@@ -252,6 +213,10 @@ static int alea(void)
 	19 --> 21 with conflicts
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
 		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+	19 --> 33 with conflicts
+		from <__TIME_EFFECTS:KALI-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__TIME_EFFECTS:KALI-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <__TIME_EFFECTS:KALI-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	23 --> 25 with conflicts
 		from <pj-W-EXACT> to <pj-R-EXACT>
 	23 --> 33 with conflicts
