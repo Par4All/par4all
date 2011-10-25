@@ -106,8 +106,11 @@ int main()
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // b -> _b_1[0] , EXACT
+
+
+// Points To OUT: none
 
 int foo(float (*b)[3])
 {
@@ -163,7 +166,10 @@ int foo(float (*b)[3])
    return 1;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int foo2(float b[5][3])
 {
@@ -210,7 +216,10 @@ int foo2(float b[5][3])
    return 1;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int foo3()
 {
@@ -257,7 +266,10 @@ int foo3()
    return 1;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

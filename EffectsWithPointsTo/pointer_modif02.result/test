@@ -31,10 +31,13 @@ int main();
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // _dest_1[0] -> __dest_1_1[0] , EXACT
 // dest -> _dest_1[0] , EXACT
 // source -> _source_2[0] , EXACT
+
+
+// Points To OUT: none
 
 int foo(int **dest, int *source)
 {
@@ -47,7 +50,10 @@ int foo(int **dest, int *source)
    *dest = source;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
@@ -83,7 +89,10 @@ int main()
    return 0;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 
 // Points To: none

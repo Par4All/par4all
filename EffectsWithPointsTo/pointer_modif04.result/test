@@ -42,7 +42,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void compute_s(s_t s, int max)
 {
@@ -61,7 +64,10 @@ void compute_s(s_t s, int max)
       (s.tab)[i] = i*2.0;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void init_s(s_t s, int max)
 {
@@ -77,7 +83,10 @@ void init_s(s_t s, int max)
    s.max = max;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

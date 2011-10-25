@@ -292,8 +292,11 @@ int main(char *fmt1, ...)
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // fmt1 -> _fmt1_1[0] , EXACT
+
+
+// Points To OUT: none
 
 int main(char *fmt1, ...)
 {

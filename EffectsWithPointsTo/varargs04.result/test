@@ -94,8 +94,11 @@ int main()
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // array[*] -> _array_2[0] , EXACT
+
+
+// Points To OUT: none
 
 void f2(int n_ptrs, char *array[31])
 {
@@ -116,7 +119,10 @@ void f2(int n_ptrs, char *array[31])
       fprintf(stderr, "%s\n", array[ptr_no]);
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void f3(int n_ptrs, int f4_after, ...)
 {
@@ -218,8 +224,11 @@ void f3(int n_ptrs, int f4_after, ...)
    f4(n_ptrs, array);
 }
 
-// Points To:
+// Points To IN:
 // array[*] -> _array_2[0] , EXACT
+
+
+// Points To OUT: none
 
 void f4(int n_ptrs, char *array[31])
 {
@@ -240,7 +249,10 @@ void f4(int n_ptrs, char *array[31])
       fprintf(stdout, "%s\n", array[ptr_no]);
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

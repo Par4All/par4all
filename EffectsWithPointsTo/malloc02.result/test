@@ -19,8 +19,11 @@ int main(int argc, char *argv[])
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // argv[*] -> _argv_2[0] , EXACT
+
+
+// Points To OUT: none
 
 int main(int argc, char *argv[])
 {

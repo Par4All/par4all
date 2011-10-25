@@ -26,7 +26,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void dereferencing06()
 {
@@ -52,7 +55,10 @@ void dereferencing06()
    *p++ = 1;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

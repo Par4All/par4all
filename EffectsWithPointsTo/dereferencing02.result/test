@@ -44,7 +44,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void dereferencing02()
 {
@@ -120,7 +123,10 @@ void dereferencing02()
    *q++;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

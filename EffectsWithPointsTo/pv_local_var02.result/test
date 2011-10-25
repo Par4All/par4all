@@ -23,7 +23,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
@@ -69,9 +72,7 @@ int main()
       p = q;
    }
 
-// Points To:
-// p -> a[*] , MAY
-// p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// Points To: none
 
    return 0;
 }

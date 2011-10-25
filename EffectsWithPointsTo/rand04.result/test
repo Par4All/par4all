@@ -9,7 +9,9 @@ int main(void)
 //             <    is written>: pi2
    int *pi2 = &i2;
    int **pp;
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __TIME_EFFECTS:KALI
    srand(time((void *) 0));
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -52,7 +54,10 @@ static int alea(void)
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main(void)
 {
@@ -134,7 +139,10 @@ int main(void)
    return 0;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 static int alea(void)
 {
@@ -162,7 +170,9 @@ int main(void)
 //             <    is written>: pi2
    int *pi2 = &i2;
    int **pp;
-//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: __TIME_EFFECTS:KALI
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __TIME_EFFECTS:KALI
    srand(time((void *) 0));
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]

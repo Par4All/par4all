@@ -19,8 +19,11 @@ void formal_parameter00(int *pi)
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
 // pi -> _pi_1[0] , EXACT
+
+
+// Points To OUT: none
 
 void formal_parameter00(int *pi)
 {

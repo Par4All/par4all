@@ -20,7 +20,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void call09(int i, int j)
 {
@@ -30,7 +33,10 @@ void call09(int i, int j)
    i = i+j;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

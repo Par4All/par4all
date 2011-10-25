@@ -49,7 +49,10 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
