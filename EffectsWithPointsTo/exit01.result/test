@@ -43,8 +43,7 @@ void exit01()
 
    exit(0);
 
-// Points To:
-// j -> i , EXACT
+// Points To: none
 
    i = 2;
 }
