@@ -6,24 +6,28 @@ int * foo()
 //             <    is written>: cond i j
    int cond = 0, i = 1, j = 2;
    int *p, *q;
+   //PIPS generated variable
+   int *foo;
 //             <    is written>: p
 
    p = &i;
 //             <    is written>: q
    q = &j;
+//:   BEGIN UNSTRUCTURED
 //             <    is read   >: cond
 
-   if (cond)
+   if (cond) goto l99999;
+//             <    is read   >: q
+//             <    is written>: foo
+   foo = q;
+   return foo;
+l99999:   ;
 //             <    is read   >: p
-      return p;
-   else
-//             <    is read   >: q
-      return q;
-//             <    is written>: q
-
-   q = &cond;
-//             <    is read   >: q
-   return q;
+//             <    is written>: foo
+   foo = p;
+//             <    is read   >: foo
+   return foo;
+//:   END UNSTRUCTURED
 }
 int main()
 {
@@ -40,7 +44,10 @@ int main();
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int * foo()
 {
@@ -52,8 +59,16 @@ int * foo()
 // Points To: none
 
    int *p, *q;
+   //PIPS generated variable
 
 // Points To:
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   int *foo;
+
+// Points To:
+// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
@@ -61,46 +76,44 @@ int * foo()
    p = &i;
 
 // Points To:
+// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> i , EXACT
 // q -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    q = &j;
 
 // Points To:
+// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // p -> i , EXACT
 // q -> j , EXACT
 
-
-   if (cond)
-
-// Points To:
-// p -> i , EXACT
-// q -> j , EXACT
-
-      return p;
-   else
-
-// Points To:
-// p -> i , EXACT
-// q -> j , EXACT
-
-      return q;
-
-// Points To:
-// p -> i , EXACT
-// q -> j , EXACT
-
-
-   q = &cond;
-
-// Points To:
-// p -> i , EXACT
-// q -> cond , EXACT
-
-   return q;
-}
+//:   BEGIN UNSTRUCTURED
 
 // Points To: none
+
+
+   if (cond) goto l99999;
+
+// Points To: none
+
+   foo = q;
+   return foo;
+l99999:   ;
+
+// Points To: none
+
+   foo = p;
+
+// Points To: none
+
+   return foo;
+//:   END UNSTRUCTURED
+}
+
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
@@ -121,7 +134,10 @@ int main()
    return 0;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 
 // Points To: none
@@ -140,24 +156,28 @@ int * foo()
 //             <    is written>: cond i j
    int cond = 0, i = 1, j = 2;
    int *p, *q;
+   //PIPS generated variable
+   int *foo;
 //             <    is written>: p
 
    p = &i;
 //             <    is written>: q
    q = &j;
+//:   BEGIN UNSTRUCTURED
 //             <    is read   >: cond
 
-   if (cond)
+   if (cond) goto l99999;
+//             <    is read   >: q
+//             <    is written>: foo
+   foo = q;
+   return foo;
+l99999:   ;
 //             <    is read   >: p
-      return p;
-   else
-//             <    is read   >: q
-      return q;
-//             <    is written>: q
-
-   q = &cond;
-//             <    is read   >: q
-   return q;
+//             <    is written>: foo
+   foo = p;
+//             <    is read   >: foo
+   return foo;
+//:   END UNSTRUCTURED
 }
 int main()
 {

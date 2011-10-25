@@ -43,7 +43,10 @@ s_t make_s(int i, float x)
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {
@@ -76,7 +79,10 @@ int main()
    return j;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 s_t make_s(int i, float x)
 {

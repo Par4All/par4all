@@ -31,7 +31,10 @@ int main()
 POINTS-TO
 
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 void call04(int n, int m, int x[n][m])
 {
@@ -54,7 +57,10 @@ void call04(int n, int m, int x[n][m])
          x[i][j] = 0;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

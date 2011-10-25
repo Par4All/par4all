@@ -78,7 +78,11 @@ int main()
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
+// p -> _p_1[0] , EXACT
+
+
+// Points To OUT:
 // p -> _p_1[0] , EXACT
 
 void foo(int *p)
@@ -95,7 +99,10 @@ void foo(int *p)
    return;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int main()
 {

@@ -1,0 +1,124 @@
+
+PROPER  EFFECTS 
+
+void exit02()
+{
+   int i;
+   int *j;
+//             <    is written>: i
+   i = 1;
+//             <    is read   >: i
+   if (i) {
+//             <    is written>: j
+      j = &i;
+      exit(0);
+   }
+   else {
+      static int *p;
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = malloc(i*sizeof(int));
+   }
+//             <    is written>: i
+
+   i = 2;
+}
+
+POINTS-TO
+
+
+// Points To IN: none
+
+
+// Points To OUT: none
+
+void exit02()
+{
+
+// Points To: none
+
+   int i;
+
+// Points To: none
+
+   int *j;
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   i = 1;
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+   if (i) {
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      j = &i;
+
+// Points To:
+// j -> i , EXACT
+
+      exit(0);
+   }
+   else {
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      static int *p;
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+
+      p = malloc(i*sizeof(int));
+   }
+
+// Points To:
+// j -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
+// p -> *HEAP*_l_14[0] , MAY
+
+
+   i = 2;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void exit02()
+{
+   int i;
+   int *j;
+//             <    is written>: i
+   i = 1;
+//             <    is read   >: i
+   if (i) {
+//             <    is written>: j
+      j = &i;
+      exit(0);
+   }
+   else {
+      static int *p;
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+      p = malloc(i*sizeof(int));
+   }
+//             <    is written>: i
+
+   i = 2;
+}
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 08 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	07 --> 14 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	07 --> 17 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	14 --> 17 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+
+****************** End of Dependence Graph ******************

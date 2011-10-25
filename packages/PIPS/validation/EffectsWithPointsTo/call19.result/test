@@ -53,7 +53,11 @@ int foo(int a)
 POINTS-TO
 
 
-// Points To:
+// Points To IN:
+// p -> _p_1[0] , EXACT
+
+
+// Points To OUT:
 // p -> _p_1[0] , EXACT
 
 int bla(int *p)
@@ -70,7 +74,11 @@ int bla(int *p)
    return 17;
 }
 
-// Points To:
+// Points To IN:
+// q -> _q_1[0] , EXACT
+
+
+// Points To OUT:
 // q -> _q_1[0] , EXACT
 
 int call19(int *q)
@@ -139,7 +147,10 @@ int call19(int *q)
    return i;
 }
 
-// Points To: none
+// Points To IN: none
+
+
+// Points To OUT: none
 
 int foo(int a)
 {
