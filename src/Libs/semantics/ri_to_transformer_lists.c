@@ -1037,8 +1037,10 @@ list statement_to_transformer_list(statement s,
     }
     else {
       tl = instruction_to_transformer_list(i, tf, pre, e);
-      /* FI: an empty tl means that s does not return... Also, tf
-	 should not be added to tl if it is not feasible */
+      /* FI: an empty tl means that s does not return. An undefined
+	 tl means that instruction_to_transformer() is not
+	 implemented in a satisfactory way. So the existing
+	 transformer is used by default. */
       if(list_undefined_p(tl)) {
 	transformer tf = load_statement_transformer(s);
 	tl = CONS(TRANSFORMER, copy_transformer(tf), NIL);
