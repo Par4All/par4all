@@ -946,7 +946,7 @@ static list instruction_to_transformer_list(instruction i,
     //tf = unstructured_to_transformer(instruction_unstructured(i), pre, e);
     //tl = CONS(TRANSFORMER, tf, NIL);
     // Reuse the existing transformer
-    tl = NIL;
+    tl = list_undefined;
     break ;
   case is_instruction_expression:
     /* Nothing fancy yet in spite of the C ? and , operators*/
@@ -954,13 +954,17 @@ static list instruction_to_transformer_list(instruction i,
     //tf = expression_to_transformer(instruction_expression(i), pre, e);
     //tl = CONS(TRANSFORMER, tf, NIL);
     // Reuse the existing transformer
-    tl = NIL;
+    tl = list_undefined;
     break;
   default:
     pips_internal_error("unexpected tag %d", instruction_tag(i));
   }
   pips_debug(9, "resultat:\n");
-  ifdebug(9) (void) print_transformers(tl);
+  ifdebug(9)
+    if(!list_undefined_p(tl))
+      (void) print_transformers(tl);
+    else
+      (void) fprintf(stderr, "undefined list\n");
   pips_debug(8, "end\n");
   return tl;
 }
@@ -1033,14 +1037,14 @@ list statement_to_transformer_list(statement s,
     }
     else {
       tl = instruction_to_transformer_list(i, tf, pre, e);
-      /* FI: an empty tl means that s does not return... Also, tf
-	 should not be added to tl if it is not feasible */
-      /*
-      if(ENDP(tl)) {
+      /* FI: an empty tl means that s does not return. An undefined
+	 tl means that instruction_to_transformer() is not
+	 implemented in a satisfactory way. So the existing
+	 transformer is used by default. */
+      if(list_undefined_p(tl)) {
 	transformer tf = load_statement_transformer(s);
 	tl = CONS(TRANSFORMER, copy_transformer(tf), NIL);
       }
-      */
     }
 
     FOREACH(TRANSFORMER, nt, tl) {
