@@ -296,7 +296,8 @@ POINTS-TO
 // fmt1 -> _fmt1_1[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// fmt1 -> _fmt1_1[0] , EXACT
 
 int main(char *fmt1, ...)
 {

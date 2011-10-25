@@ -110,7 +110,8 @@ POINTS-TO
 // b -> _b_1[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// b -> _b_1[0] , EXACT
 
 int foo(float (*b)[3])
 {

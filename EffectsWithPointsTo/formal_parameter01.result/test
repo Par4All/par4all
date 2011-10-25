@@ -24,7 +24,8 @@ POINTS-TO
 // pi -> _pi_1[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// _pi_1[0] -> __pi_1_1[0] , EXACT
 
 int formal_parameter01(int **pi)
 {

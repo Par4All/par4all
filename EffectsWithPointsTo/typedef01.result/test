@@ -60,7 +60,8 @@ void compute()
 // argv[*] -> _argv_2[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// argv[*] -> _argv_2[0] , EXACT
 
 int main(int argc, char *argv[])
 {

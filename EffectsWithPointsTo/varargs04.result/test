@@ -98,7 +98,8 @@ POINTS-TO
 // array[*] -> _array_2[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// array[*] -> _array_2[0] , EXACT
 
 void f2(int n_ptrs, char *array[31])
 {
@@ -228,7 +229,8 @@ void f3(int n_ptrs, int f4_after, ...)
 // array[*] -> _array_2[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// array[*] -> _array_2[0] , EXACT
 
 void f4(int n_ptrs, char *array[31])
 {

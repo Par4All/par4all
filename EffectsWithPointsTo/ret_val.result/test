@@ -35,7 +35,9 @@ POINTS-TO
 // argv -> _argv_2[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
 
 long long int get_result(int argc, char **argv)
 {
@@ -70,7 +72,9 @@ long long int get_result(int argc, char **argv)
 // argv -> _argv_2[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// _argv_2[0] -> __argv_2_2[0] , EXACT
+// argv -> _argv_2[0] , EXACT
 
 int main(int argc, char **argv)
 {

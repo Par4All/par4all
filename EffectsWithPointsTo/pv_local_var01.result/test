@@ -78,6 +78,7 @@ int main()
    }
 
 // Points To:
+// p -> a[*] , MAY
 // p -> *ANY_MODULE*:*NOWHERE*_b0 , MAY
 
    return 0;

@@ -35,7 +35,9 @@ POINTS-TO
 // q -> _q_2[0] , EXACT
 
 
-// Points To OUT: none
+// Points To OUT:
+// pi -> _pi_1[*] , EXACT
+// q -> _q_2[0] , EXACT
 
 void call01(int *pi, tf_t *q)
 {

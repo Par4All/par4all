@@ -17,7 +17,9 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// i -> k , EXACT
+// j -> k , EXACT
 
 int global01()
 {
