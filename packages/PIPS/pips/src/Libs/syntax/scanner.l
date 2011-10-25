@@ -285,7 +285,7 @@ DCON (({MANT}|{UICON}){DEXP}?)
 			}
 %%
 
-void yyerror(char * msg)
+void yyerror(const char * msg)
 {
     int c;
 
