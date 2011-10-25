@@ -1,0 +1,42 @@
+delete exit02
+create exit02 exit02.c 
+
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+
+
+#setenv POINTER_VALUES_DEBUG_LEVEL 2
+
+echo 
+echo PROPER  EFFECTS 
+echo
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[exit02]
+
+
+#module main
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[exit02]
+
+echo 
+echo PROPER  EFFECTS WITH POINTS TO
+echo
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[exit02]
+
+
+activate PRINT_CHAINS_GRAPH
+display DG_FILE 
+
+
+close
+delete exit02
+quit
