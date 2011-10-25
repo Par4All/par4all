@@ -207,7 +207,7 @@ resource:	NAME
 	;
 %%
 
-void yyerror_lex_part(char *);
+void yyerror_lex_part(const char *);
 void yyerror(const char * s)
 {
     int c;
