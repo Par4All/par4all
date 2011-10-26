@@ -33,7 +33,7 @@ endif
 # Keep intermediate files for the demo for further inspection:
 .PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) $(TARGET:=-seq) $(TARGET:=-openmp) $(TARGET:=-cuda) $(TARGET:=-accel-openmp) $(TARGET:=-opencl)
 
-
+.DEFAULT_GOAL := default
 
 default:
 	echo "This the content of the file README.txt:"
