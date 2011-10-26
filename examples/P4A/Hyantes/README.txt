@@ -5,7 +5,7 @@ Hypercarte project aims to develop new methods for the cartographic
 representation of human distributions (population density, population
 increase, etc.) with various smoothing functions and opportunities for
 time-scale animations of maps. Hyantes provides one of the smoothing
-methods related to multiscalar neighbourhood density estimation. It is a C
+methods related to multi-scalar neighbourhood density estimation. It is a C
 library that takes sets of geographic data as inputs and computes a
 smoothed representation of this data taking account of neighbourhood's
 influence.
@@ -17,63 +17,39 @@ Here we present 3 different executions of the same C sequential code:
 
 - sequential execution
 
-- automatic parallelization with p4a for parallel execution on multicores
+- automatic parallelization with p4a for parallel execution on multi-cores
   with OpenMP
 
 - automatic parallelization with p4a --cuda for parallel execution on
   nVidia GPU
 
-
-There is a simple Makefile used to launch the different phases.
-
 You need to have gnuplot installed to be able to display the results.
+
+See ../README.txt to get the generic commands to parallelize, build and execute 
+this example. More commands allowing to display the computation results using 
+gnuplot, are the following:
 
 For the sequential execution
 
-  make seq : build the sequential program from hyantes-static-99.c
-
-  make run_seq : build first if needed, then run the sequential program
-
   make display_seq : build first if needed, run if needed, then display
-  the output of the sequential version with gnuplot
+  		the output of the sequential version with gnuplot
 
-For the OpenMP parallel execution on multicores:
-
-  make openmp : parallelize the code to OpenMP source
-  hyantes-static-99.p4a.c and program hyantes-static-99_openmp
-
-  make run_openmp : build first if needed, then run the OpenMP parallel
-  program
+For the OpenMP parallel execution on multi-cores:
 
   make display_openmp : build first if needed, run if needed, then display
-  the output of the OpenMP parallel version with gnuplot
+  		the output of the OpenMP parallel version with gnuplot
 
 For the CUDA parallel execution on nVidia GPU:
 
-  make cuda : parallelize the code to CUDA source hyantes-static-99.p4a.cu
-  and program hyantes-static-99_cuda
-
-  make run_cuda : build first if needed, then run the CUDA parallel
-  program
-
-    Do not forget to have the CUDA runtime correctly
-    installed. LD_LIBRARY_PATH should contain at least the location of
-    CUDA runtime library.
-
   make display_cuda : build first if needed, run if needed, then display
-  the output of the CUDA parallel version with gnuplot
+  		the output of the CUDA parallel version with gnuplot
 
 For an OpenMP parallel emulation of a GPU-like accelerator (useful for
 debugging, without any GPU):
 
-  make accel : parallelize the code to GPU-like OpenMP source
-  hyantes-static-99.p4a-accel.c and program hyantes-static-99_accel
-
-  make run_accel : build first if needed, then run the parallel program
-
   make display_accel : build first if needed, run if needed, then display
-  the output of the accelerator OpenMP parallel emulation version with
-  gnuplot
+  		the output of the accelerator OpenMP parallel emulation 
+		version with gnuplot
 
 You can set the P4A_OPTIONS variable to pass some options to p4a.
 
@@ -84,21 +60,13 @@ You can set the P4A_OPTIONS variable to pass some options to p4a.
 
 For the OpenCL parallel execution on nVidia GPU:
 
-  make opencl : parallelize the code to OpenCL sources: the host program source
-  hyantes-static-99.p4a.c and the kernel program source p4a_wrapper_run.cl
-
-  make run_opencl : build first if needed, then run the OpenCL parallel
-  program
-
-    To compile for nVidia GPU, you need CUDA environment installed. 
-
   make display_opencl : build first if needed, run if needed, then display
-  the output of the OpenCL parallel version with gnuplot
+  		the output of the OpenCL parallel version with gnuplot
 
 For a full demo:
 
   make demo : to chain make display_seq, display_openmp, display_cuda, 
-  display_accel-openmp, display_opencl
+  		display_accel-openmp, display_opencl
 
 
 To run this example on GPU that does not support double precision, you

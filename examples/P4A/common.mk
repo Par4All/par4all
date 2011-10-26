@@ -39,7 +39,7 @@ default:
 	echo "This the content of the file README.txt:"
 	# Use more and not less because when quitting, the displayed text
 	# remains displayed...
-	more README.txt
+	more ../README.txt README.txt
 
 demo : display_seq display_openmp display_cuda display_cuda-opt display_accel-openmp display_opencl;
 
