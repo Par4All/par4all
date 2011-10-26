@@ -14,7 +14,7 @@ default:
 demo : $(TARGET)_scmp
 
 %_scmp : %.c
-	p4a --scmp -p $(TARGET) $<
+	p4a --scmp -p $* $<
 
 clean :
 	rm -rf *~ *.database ./applis ./applis_processing
