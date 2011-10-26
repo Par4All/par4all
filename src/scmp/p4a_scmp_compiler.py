@@ -122,14 +122,19 @@ class p4a_scmp_compiler(p4a_processor):
         print("Commenting out old stubs function declarations...")
         for file in files:
             print ("considering file " + file + "...")
-            os.rename(file, file+".tmp")
-            with open(file+".tmp", "r") as f_orig:
-                with open(file, "w") as f:
-                    ch = f_orig.read()
-                    ch = ch.replace("void P4A_accel_malloc(void **address",
-                                    "//void P4A_accel_malloc(void **address")
-                    f.write(ch)
-            os.remove(file+".tmp")
+            ch=""
+            with open(file, "r") as f:
+                ch = f.read()
+                ch = ch.replace("void P4A_accel_malloc(void **address",
+                                "//void P4A_accel_malloc(void **address")
+                ch = ch.replace("void P4A_copy_from_accel_1d(size_t",
+                                "//void P4A_copy_from_accel_1d(size_t")
+                ch = ch.replace("void P4A_accel_free(void",
+                                "//void P4A_accel_free(void")
+                ch = ch.replace("void P4A_copy_to_accel_1d(size_t ",
+                                "//void P4A_copy_to_accel_1d(size_t ")
+            with open(file, "w") as f:
+                f.write(ch)
         print("done")
 
     def save_scmp_buffers_file(self):
