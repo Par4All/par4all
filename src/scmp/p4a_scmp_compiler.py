@@ -120,19 +120,24 @@ class p4a_scmp_compiler(p4a_processor):
         """ comment out the olf stubs function declarations
         """
         print("Commenting out old stubs function declarations...")
+        malloc_ch = "void " + default_scmp_properties["KERNEL_LOAD_STORE_ALLOCATE_FUNCTION"]
+        free_ch = "void " + default_scmp_properties["KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION"]
+        copy_to_1d_ch = "void " + default_scmp_properties["KERNEL_LOAD_STORE_LOAD_FUNCTION_1D"]
+        copy_from_1d_ch = "void " + default_scmp_properties["KERNEL_LOAD_STORE_STORE_FUNCTION_1D"]
+        copy_to_2d_ch = "void " + default_scmp_properties["KERNEL_LOAD_STORE_LOAD_FUNCTION_2D"]
+        copy_from_2d_ch = "void " + default_scmp_properties["KERNEL_LOAD_STORE_STORE_FUNCTION_2D"]
         for file in files:
             print ("considering file " + file + "...")
             ch=""
             with open(file, "r") as f:
                 ch = f.read()
-                ch = ch.replace("void P4A_accel_malloc(void **address",
-                                "//void P4A_accel_malloc(void **address")
-                ch = ch.replace("void P4A_copy_from_accel_1d(size_t",
-                                "//void P4A_copy_from_accel_1d(size_t")
-                ch = ch.replace("void P4A_accel_free(void",
-                                "//void P4A_accel_free(void")
-                ch = ch.replace("void P4A_copy_to_accel_1d(size_t ",
-                                "//void P4A_copy_to_accel_1d(size_t ")
+                ch = ch.replace(malloc_ch, "//" + malloc_ch)
+                ch = ch.replace(free_ch, "//" + free_ch)
+                ch = ch.replace(copy_to_1d_ch, "//" + copy_to_1d_ch)
+                ch = ch.replace(copy_to_2d_ch, "//" + copy_to_2d_ch)
+                ch = ch.replace(copy_from_1d_ch, "//" + copy_from_1d_ch)
+                ch = ch.replace(copy_from_2d_ch, "//" + copy_from_2d_ch)
+
             with open(file, "w") as f:
                 f.write(ch)
         print("done")
