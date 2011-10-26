@@ -4,7 +4,7 @@ parallelize some code.
 People only interested in quick results should look only at examples using p4a.
 
 - P4A directory contains basic examples that use p4a directly to generate
-  OpenMP or CUDA parallel programs:
+  OpenMP, CUDA, optimized CUDA and OpenCL parallel programs:
 
   - Hyantes : a geographic application on potential smoothening
 
@@ -12,6 +12,8 @@ People only interested in quick results should look only at examples using p4a.
     Dominique Aubert and Mehdi Amini.
 
   - Jacobi : example of simple Jacobi solver applied to an image
+
+	- saxpy_c99
 
 
 - Benchmarks contains open source benchmark that are used to measure
