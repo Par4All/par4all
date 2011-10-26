@@ -249,10 +249,14 @@ etc-install .build_etc: $(INSTALL_ETC)
 	$(INSTALL) -d $(ETC.d)
 	for f in $(INSTALL_ETC) ; do \
 	  if [ -d $$f ] ; then \
+	    find $$f -type d -name '.svn' -prune -o -type d -print | \
+	      while read dir ; do \
+		[ -d $(ETC.d)/$$dir ] || mkdir $(ETC.d)/$$dir ; \
+	      done ; \
 	    find $$f -type d -name '.svn' -prune -o -type f -print | \
 	      while read file ; do \
 	        echo "installing $$file" ; \
-		$(INSTALL) -D -m 644 $$file $(ETC.d)/$$file ; \
+		$(INSTALL) -m 644 $$file $(ETC.d)/$$file ; \
 	      done ; \
 	  else \
 	    $(CMP) $$f $(ETC.d)/$$f || \
