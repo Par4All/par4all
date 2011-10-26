@@ -251,7 +251,7 @@ etc-install .build_etc: $(INSTALL_ETC)
 	  if [ -d $$f ] ; then \
 	    find $$f -type d -name '.svn' -prune -o -type d -print | \
 	      while read dir ; do \
-		[ -d $$dir ] || mkdir $$dir ; \
+		[ -d $(ETC.d)/$$dir ] || mkdir $(ETC.d)/$$dir ; \
 	      done ; \
 	    find $$f -type d -name '.svn' -prune -o -type f -print | \
 	      while read file ; do \
