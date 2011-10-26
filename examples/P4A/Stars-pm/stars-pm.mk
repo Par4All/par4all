@@ -83,8 +83,8 @@ display_%:run_%_gtk ;
 
 run_%_opengl:%_opengl
 
-#display_opengl_%:run_%_opengl
+display_opengl_%:run_%_opengl
 
-#demo_opengl : display_opengl_seq display_opengl_openmp display_opengl_cuda display_opengl_cuda-opt display_opengl_accel-openmp display_opengl_opencl;
+demo_opengl : display_opengl_seq display_opengl_openmp display_opengl_cuda display_opengl_cuda-opt display_opengl_accel-openmp display_opengl_opencl;
 
 	
