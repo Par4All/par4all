@@ -74,17 +74,13 @@ include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(SOURCES) $(CPROTO_GR
 %_gtk:
 	$(MAKE) $* gtk=1
 
-run_%_gtk:%_gtk
-
 display_%:run_%_gtk ;
 
 %_opengl:
 	$(MAKE) $* opengl=1
 
-run_%_opengl:%_opengl
+opengl_display_%:run_%_opengl ;
 
-display_opengl_%:run_%_opengl ;
-
-demo_opengl : display_opengl_seq display_opengl_openmp display_opengl_cuda display_opengl_cuda-opt display_opengl_accel-openmp display_opengl_opencl;
+demo_opengl : opengl_display_seq opengl_display_openmp opengl_display_cuda opengl_display_cuda-opt opengl_display_accel-openmp opengl_display_opencl;
 
 	
