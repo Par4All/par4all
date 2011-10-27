@@ -20,7 +20,6 @@
 #
 
 dist_bin_SCRIPTS = \
-	pips_validate \
 	pips_manual_accept \
 	pips_force_accept \
 	pips_emacs_diff \
