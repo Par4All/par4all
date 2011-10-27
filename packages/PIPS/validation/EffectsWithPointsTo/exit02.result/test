@@ -30,7 +30,8 @@ POINTS-TO
 // Points To IN: none
 
 
-// Points To OUT: none
+// Points To OUT:
+// p -> *HEAP*_l_14[0] , MAY
 
 void exit02()
 {
