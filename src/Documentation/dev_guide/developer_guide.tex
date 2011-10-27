@@ -1809,95 +1809,9 @@ the \texttt{SUMMARY\_Archive} directory.
 \subsection{Validation scripts}
 \label{sec:validation-scripts}
 
-\textbf{Note that these scripts are basically OBSOLETE.
-They are superseded by local \texttt{Makefile} targets which do the same
-but also parallelize the process per directory or per file.
-See Section~\ref{sec:par-validate}}.
+IS THIS OBSOLETE?
 
-Three validation scripts are available:
 \begin{description}
-\item[pips\_validate]: \index{Validate} Non-regression tests;
-  The arguments are names of subdirectories in
-  \texttt{\$PIPS\_ROOT/../../validation} or source files within these
-  directories.  See \texttt{pips\_validate -h} for help and a list of
-  options.
-
-  Tests are organized more or less on a library basis in \texttt{validation}.
-  Non-regression tests are characterized by one or more source
-  programs which must have a known result.
-
-  Set \texttt{PIPSDBM\_DEBUG\_LEVEL} to 5 to check data structures when
-  they are stored and to 9 to check them when they are delivered; some
-  data structures are not checked, among them, all that contain
-  external types;
-
-  The validation is performed for each source file found in a directory.
-  These validation scripts \textbf{must not} rely on absolute path,
-  otherwise moving the validation around is impossible.
-  %%
-  As the tests are run in the validation directory which contains the
-  source, relative paths always work.
-
-  The scripts looks for validation scripts in the following order:
-  \begin{enumerate}
-  \item a corresponding \textbf{executable} \texttt{.test} file, and
-    executes it. If th file is not \textbf{executable}, this validation
-    test is marked as \textbf{failed};
-
-  \item a \texttt{.tpips} file which is executed as a tpips script;
-
-  \item a corresponding \texttt{.tpips2} file which is executed as a
-    tpips script, with the error stream is appended and possibly filtered
-    by a \texttt{.flt} script afterwards.
-
-    Validating the error stream is a \textbf{very bad idea} as it leads
-    to never ending regression variations. It is even worth when the
-    output comes from external tools such as compilers error output;
-
-    Please take care to filter only the significant part of the result,
-    and that it should depend on pips only, so that it is likely to
-    be replicated elsewhere.
-
-  \item a \texttt{default\_test} file as a template for a \texttt{.test} file.
-
-    First it performs some substitutions
-    (\texttt{tested\_file}, \texttt{tested\_dir}, \texttt{tested\_name}
-    and \texttt{TESTED\_NAME} are substituted by the full file name,
-    the validation directory, the name prefix in lower or upper)
-    and then it executes the generated test file;
-
-  \item a \texttt{default\_tpips} file and runs it with \textsc{tpips}.
-
-    The environment variables \texttt{FILE} and \texttt{WSPACE} contain
-    the full-path file name and the file name prefix;
-
-  \item if none of these cases apply, the scripts parallelize all modules
-    by using the PIPS shell interface: \texttt{Delete} the old workspace
-    if any, \texttt{Init} a new one from the Fortran file,
-    \texttt{Display} all the parallelize modules and \texttt{Delete} the
-    workspace. Since it runs in several \texttt{pips} processes, it is a
-    natural way to exercise PIPS persistence.
-  \end{enumerate}
-
-  For maintenance purposes, the \texttt{default\_tpips} approach is the
-  best choice (only one source file to maintain for all the sources of a
-  validation directory). However, this can be used only if the very same
-  test is to be applied. As a second choice, the \texttt{.tpips} script is
-  encouraged. It is very important not to validate \texttt{stderr} output
-  and pips with some level of debugging on, because these outputs are not
-  very stable from one architecture to another.
-
-  Choosing tpips-based scripts also helps a lot with debugging, for
-  instance with a \texttt{default\_tpips} case:
-\begin{verbatim}
-  sh> WSPACE=foo FILE=foo.f gdb /path/to/binary/of/tpips
-  gdb> run default_tpips
-  ...
-\end{verbatim}
-
-  This script is also used by the various nightly validations such as
-  \verb|pips_at_night|.
-
 \item[pips\_manual\_accept] \index{Validate} interactive script to accept
   new validation results. It accepts a list of directories or validation
   files to ask for accepting or it deals with all the validation by
@@ -1946,50 +1860,6 @@ PIPS_GRAPHICAL_DIFF=pips_emacs_diff pips_manual_accept --new
   and only if the corresponding pips sources are already in the subversion
   repository of course!
 \end{description}
-
-%%\begin{itemize}
-%%\item \verb+bug-to-validate+: \index{bug-to-validate}When a bug is
-%%  corrected, run \verb+bug-to-validate+ to move the bug case from
-%%  \verb+Bugs/xxx+ to \verb+Validation/xxx+.
-%%  Do not forget to update \verb+Documentation/pips-bugs.ftex+.
-%%
-%%\item \verb+pips-experiment+: \index{pips-experiment}runs the same
-%%  analyses and transformations on each module in a workspace.
-%%
-%%\item \verb+print-dg-statistics+: \index{print-dg-statistics}exploits some
-%%  of the statistics generated by the dependence graph computation when a
-%%  specific property is set to {\tt TRUE}
-%%  (\verb+RICE_DG_PROVIDE_STATISTICS+).
-%%
-%%\item there many other things in this directory; volunteers to write their
-%%  documentation here are welcome!
-%%\end{itemize}
-
-
-\subsubsection{Filtering}
-\label{sec:filtering}
-
-Once the tpips script has been run, the current output has to be compared
-with the expected one (the reference). As explained previously, before to
-perfom a basic difference (using the \texttt{diff} shell command) the
-pips\_validate script search for user defined filters to apply on the
-outputs. This search is done as follow:
-\begin{enumerate}
-\item Search for \texttt{test\_and\_out.filter}. If found the filter is
-  applied on both the current tpips output and on the reference.
-\item Otherwhise:
-  \begin{enumerate}
-  \item Search for \texttt{test.filter}. If found the filter is applied on
-    the reference only. If not found \texttt{pips\_validate} apply the
-    default identical filter.
-  \item Search for \texttt{out.filter}, if found the filter is applied on
-    the current tpips output only. If not found \texttt{pips\_validate}
-    apply the default identical filter.
-  \end{enumerate}
-\end{enumerate}
-A filter has to be a shell script getting an input file as its first
-parameter and printing the filtered file to the standard output.
-
 
 \subsubsection{Writing test cases and their validation scripts}
 \label{sec:writing-a-validation-script}
