@@ -89,22 +89,34 @@ int * foo()
 
 //:   BEGIN UNSTRUCTURED
 
-// Points To: none
+// Points To:
+// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> i , EXACT
+// q -> j , EXACT
 
 
    if (cond) goto l99999;
 
-// Points To: none
+// Points To:
+// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> i , EXACT
+// q -> j , EXACT
 
    foo = q;
    return foo;
 l99999:   ;
 
-// Points To: none
+// Points To:
+// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> i , EXACT
+// q -> j , EXACT
 
    foo = p;
 
-// Points To: none
+// Points To:
+// foo -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// p -> i , EXACT
+// q -> j , EXACT
 
    return foo;
 //:   END UNSTRUCTURED
