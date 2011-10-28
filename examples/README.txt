@@ -10,11 +10,12 @@ using p4a.
   - Hyantes : a geographic application on potential smoothening
 
   - Stars-pm : a particle-mesh N-body cosmological simulation, written by
-    Dominique Aubert and Mehdi Amini.
+    		Dominique Aubert and Mehdi Amini.
 
   - Jacobi : example of simple Jacobi solver applied to an image
 
-	- saxpy_c99
+  - saxpy_c99 : SAXPY (Single-precision real Alpha X Plus Y) combines 
+		scalar multiplication and vector addition WRITTEN IN C 99
 
 - Benchmarks contains open source benchmark that are used to measure
   Par4All performance, for example to publish some articles. Useful to
