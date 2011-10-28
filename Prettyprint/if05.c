@@ -1,4 +1,5 @@
-// PIPS prettyprinter
+// PIPS prettyprinter: no output expected, but the prettyprinted code
+// misses key braces and the external else message is printed out.
 
 #include <stdio.h>
 
@@ -11,7 +12,7 @@ int main()
       i =1;
   }
   else
-    printf("external else\n");
+    printf("\nexternal else\n");
 
   return i;
 }
