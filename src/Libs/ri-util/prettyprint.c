@@ -394,30 +394,14 @@ bool one_liner_p(statement s)
 
 bool gcc_if_block_braces_required_p(test obj)
 {
-  list l_stm = NIL;
-  statement tb = test_true(obj);
+  statement tb = effective_test_true(obj);
+
   if(one_liner_p(tb)) {
     if (statement_test_p(tb)) {
       test nested_test = statement_test(tb);
       statement fb = test_false(nested_test);
       if (!empty_statement_p(fb))
 	return prettyprint_gcc_c_braces_p;
-    }
-    else {
-      if(statement_sequence_p(tb)) {
-	sequence seq = statement_sequence(tb);
-	l_stm = sequence_statements(seq);
-    
-	FOREACH(STATEMENT, s, l_stm) {
-	  bool tb_is_test = statement_test_p(s);
-	  if (tb_is_test) {
-	    test nested_test = statement_test(s);
-	    statement fb = test_false(nested_test);
-	    if (!empty_statement_p(fb))
-	      return prettyprint_gcc_c_braces_p;
-	  }
-	}
-      }
     }
   }
   return false;
@@ -3483,12 +3467,13 @@ static text text_block_if(entity module,
   bool one_liner_true_statement = one_liner_p(test_true(obj)) && !prettyprint_all_c_braces_p;
   bool one_liner_false_statement = one_liner_p(test_false(obj)) && !prettyprint_all_c_braces_p;
   bool else_branch_p = false; /* The else branch must be printed */
-  /*
-  statement true_statement = test_true(obj);
-  statement false_statement = test_false(obj);
-  print_statement(true_statement);
-  print_statement(false_statement);
-  */
+  /* Do we have an else clause to prettyprint? */
+  bool outer_else_p = !empty_statement_p(test_false(obj));
+  /* Do we have a test a true clause, a test with no else clause? */
+  statement ts = effective_test_true(obj);
+  bool inner_test_p = statement_test_p(ts);
+  bool inner_else_p = inner_test_p?
+    !empty_statement_p(test_false(statement_test(ts))) : false;
 
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
@@ -3500,7 +3485,9 @@ static text text_block_if(entity module,
     case is_language_c:
       pc = CHAIN_SWORD(pc, "if (");
       pc = gen_nconc(pc, words_expression(test_condition(obj), pdl));
-      if(one_liner_true_statement && !gcc_if_block_braces_required_p(obj)) {
+      if(one_liner_true_statement
+	 && !(outer_else_p && inner_test_p && !inner_else_p) // Prettyprint/if05.c
+	 && !gcc_if_block_braces_required_p(obj)) {
 	pc = CHAIN_SWORD(pc, ")");
       } else
 	pc = CHAIN_SWORD(pc, ") {");
@@ -3539,7 +3526,9 @@ static text text_block_if(entity module,
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
       break;
     case is_language_c:
-      if(!one_liner_true_statement || prettyprint_all_c_braces_p)
+      if(!one_liner_true_statement
+	 || (outer_else_p && inner_test_p && !inner_else_p) // Prettyprint/if05.c
+	 || prettyprint_all_c_braces_p)
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
       if(one_liner_false_statement) {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else"));
@@ -3554,6 +3543,7 @@ static text text_block_if(entity module,
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION,
 				  test_false_obj, pdl));
   }
+
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
