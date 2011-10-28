@@ -415,7 +415,7 @@ static entity make_local_value_entity(int n, int nature, type t)
   else
     (void) strcpy(value_name, TEMPORARY_VALUE_PREFIX);
   (void) sprintf(value_name+2,"%d",n);
-  debug(8,"make_local_value_entity","value name: %s\n",value_name);
+  pips_debug(8,"value name: %s\n",value_name);
   s = strdup(concatenate(SEMANTICS_MODULE_NAME,
 			 MODULE_SEP_STRING, value_name, (char *) NULL));
 
@@ -1348,6 +1348,8 @@ entity new_value_to_old_value(entity n_val)
   return o_val;
 }
 
+/* Static aliasing. useful for Fortran, useless for C. When no alias
+   is found, an undefined entity must be returned. */
 entity value_alias(entity e)
 {
   entity a = entity_undefined;
@@ -1365,9 +1367,9 @@ entity value_alias(entity e)
   }, hash_value_to_name);
 
   if(a==entity_undefined)
-    debug(8,"value_alias","return: %s\n", "entity_undefined");
+    pips_debug(8, "return: %s\n", "entity_undefined");
   else
-    debug(8,"value_alias","return: %s\n", entity_name(a));
+    pips_debug(8, "return: %s\n", entity_name(a));
 
   return a;
 }
