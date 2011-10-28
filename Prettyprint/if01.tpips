@@ -6,6 +6,12 @@ create if01 if01.c
 
 display PARSED_PRINTED_FILE[main]
 
+shell echo `(cd if01.database/main; gcc -c -Wall main.pp.c) 2>&1`
+
+display PRINTED_FILE[main]
+
+shell echo `(cd if01.database/main; gcc -c -Wall main.pre.c) 2>&1`
+
 apply UNSPLIT
 
 shell echo `(cd if01.database/Src; gcc -c -Wall if01.c) 2>&1`
