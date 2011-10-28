@@ -755,6 +755,11 @@ entity v;
     Psysteme sc = SC_UNDEFINED;
     Pbase b = BASE_UNDEFINED;
 
+    if(top_level_entity_p(v)) {
+      // No need to translate
+      return;
+    }
+
     /* try to find an equivalent entity by its name
        (whereas we should use locations) */
     /*
