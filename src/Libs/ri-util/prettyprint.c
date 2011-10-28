@@ -289,6 +289,9 @@ static bool precedence_p = true;
 /* This variable is used to print braces around all blocks including
    blocks with only one statement. */
 static bool prettyprint_all_c_braces_p = false;
+/* This variable is used to gracefuly print braces around if / else
+   blocks to avoid gcc warnings */
+static bool prettyprint_gcc_c_braces_p = false;
 
 /******************************************************************* STYLES */
 
@@ -387,6 +390,37 @@ bool one_liner_p(statement s)
   }
 
   return yes;
+}
+
+bool gcc_if_block_braces_required_p(test obj)
+{
+  list l_stm = NIL;
+  statement tb = test_true(obj);
+  if(one_liner_p(tb)) {
+    if (statement_test_p(tb)) {
+      test nested_test = statement_test(tb);
+      statement fb = test_false(nested_test);
+      if (!empty_statement_p(fb))
+	return prettyprint_gcc_c_braces_p;
+    }
+    else {
+      if(statement_sequence_p(tb)) {
+	sequence seq = statement_sequence(tb);
+	l_stm = sequence_statements(seq);
+    
+	FOREACH(STATEMENT, s, l_stm) {
+	  bool tb_is_test = statement_test_p(s);
+	  if (tb_is_test) {
+	    test nested_test = statement_test(s);
+	    statement fb = test_false(nested_test);
+	    if (!empty_statement_p(fb))
+	      return prettyprint_gcc_c_braces_p;
+	  }
+	}
+      }
+    }
+  }
+  return false;
 }
 
 
@@ -3449,6 +3483,12 @@ static text text_block_if(entity module,
   bool one_liner_true_statement = one_liner_p(test_true(obj)) && !prettyprint_all_c_braces_p;
   bool one_liner_false_statement = one_liner_p(test_false(obj)) && !prettyprint_all_c_braces_p;
   bool else_branch_p = false; /* The else branch must be printed */
+  /*
+  statement true_statement = test_true(obj);
+  statement false_statement = test_false(obj);
+  print_statement(true_statement);
+  print_statement(false_statement);
+  */
 
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
@@ -3460,7 +3500,7 @@ static text text_block_if(entity module,
     case is_language_c:
       pc = CHAIN_SWORD(pc, "if (");
       pc = gen_nconc(pc, words_expression(test_condition(obj), pdl));
-      if(one_liner_true_statement) {
+      if(one_liner_true_statement && !gcc_if_block_braces_required_p(obj)) {
 	pc = CHAIN_SWORD(pc, ")");
       } else
 	pc = CHAIN_SWORD(pc, ") {");
@@ -3521,7 +3561,8 @@ static text text_block_if(entity module,
       break;
     case is_language_c:
       if((!else_branch_p && !one_liner_true_statement)
-	 || (else_branch_p && !one_liner_false_statement))
+	 || (else_branch_p && !one_liner_false_statement)
+	 || gcc_if_block_braces_required_p(obj))
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")));
       break;
     default:
@@ -4767,6 +4808,7 @@ text text_named_module(
 
   precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");
   prettyprint_all_c_braces_p = get_bool_property("PRETTYPRINT_ALL_C_BRACES");
+  prettyprint_gcc_c_braces_p = get_bool_property("PRETTYPRINT_GCC_C_BRACES");
   list l = NIL;
   switch(get_prettyprint_language_tag()) {
   case is_language_fortran:
