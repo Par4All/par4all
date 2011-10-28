@@ -15,6 +15,10 @@ static int (*histo)[NP][NP] = NULL;
 pthread_t thread1 = 0;
 int redisplay_p = 2;
 
+/*OG added*/
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int exit_OK = 0;
+
 static int yrot = 0;
 static int blend = 1;
 static int light = 0;
@@ -210,9 +214,17 @@ static void init() {
 }
 
 void *mainloop(void *unused) {
+  int e=1;
   init();
   renderScene();
   glutMainLoop();
+  while(e){
+	pthread_mutex_lock(&mutex);
+	e=!exit_OK;
+	pthread_mutex_unlock(&mutex);
+	}
+  sleep(10);
+  pthread_exit(NULL);
   thread1 = 0;
   return NULL;
 }
@@ -238,7 +250,12 @@ void graphic_gldraw_histo(int argc_, char **argv_, int histo_[NP][NP][NP]) {
 }
 
 void graphic_gldestroy(void) {
-  pthread_kill(thread1, 9);
+  //pthread_kill(thread1, 9);
+  pthread_mutex_lock(&mutex);
+  exit_OK=1;
+  sleep(10);
+  pthread_mutex_unlock(&mutex);
+  pthread_mutex_destroy(&mutex);
   thread1 = 0;
 }
 
