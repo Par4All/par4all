@@ -1,3 +1,8 @@
+#include "pipsdef.h"
+
+/*
+ * file for recoverInclude1.c
+ */
 /* nothing 
 #include "i am not here.h"
    is at it seems */
