@@ -992,6 +992,12 @@ bool entity_enum_member_p(entity e)
   return !value_undefined_p(ev) && value_symbolic_p(ev);
 }
 
+bool entity_enum_variable_p(entity e) {
+    type t = ultimate_type(entity_type(e));
+    basic b  = type_variable_p(t) ? variable_basic(type_variable(t)): basic_undefined;
+    return !basic_undefined_p(b) && basic_derived_p(b) && entity_enum_p(basic_derived(b));
+}
+
 bool entity_struct_p(entity e)
 {
   const char* ln = entity_local_name(e);
