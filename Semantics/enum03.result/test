@@ -40,3 +40,21 @@ void hs_set_r()
 
 Preconditions for "hs_set_r"
 
+
+//  P() {}
+
+void hs_set_r()
+{
+
+//  P() {}
+
+   enum a o;
+
+//  P(o) {}
+
+   int res = vhs_set_r(o);
+
+//  P(o,res) {res==1}
+
+   return;
+}
