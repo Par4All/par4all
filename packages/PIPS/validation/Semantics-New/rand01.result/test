@@ -29,11 +29,5 @@ int rand01()
 
 WARNINGS
 
-INITIAL_PRECONDITION[rand01] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning rand01 instead
-PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
-TRANSFORMERS_INTER_FULL[rand01] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[rand01] (intrinsic_to_transformer) Value returned by intrinsic "rand" is ignored.
-PRINT_CODE_TRANSFORMERS[rand01] (add_or_kill_equivalenced_variables) storage return
-PRECONDITIONS_INTER_FULL[rand01] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_PRECONDITIONS[rand01] (add_or_kill_equivalenced_variables) storage return

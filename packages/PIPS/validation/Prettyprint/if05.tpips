@@ -1,0 +1,26 @@
+delete if05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty PRETTYPRINT_GCC_C_BRACES FALSE
+
+# setproperty PRETTYPRINT_ALL_C_BRACES TRUE
+
+create if05 if05.c
+
+# shell (cd if05.database; gcc ../if05.c; ./a.out)
+
+display PARSED_PRINTED_FILE[main]
+
+# shell echo `(cd if05.database/main; gcc -c -Wall main.pp.c) 2>&1`
+
+display PRINTED_FILE[main]
+
+# shell echo `(cd if05.database/main; gcc -c -Wall main.pre.c) 2>&1`
+
+apply UNSPLIT
+
+# shell echo `(cd if05.database/Src; gcc -c -Wall if05.c 2>&1; gcc if05.c; ./a.out)`
+
+close
+quit
