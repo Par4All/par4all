@@ -138,16 +138,17 @@ int main(int argc, char **argv) {
 #ifdef _GRAPHICS_
   graphic_destroy(); // Free GTK stuff
 #endif
-#ifdef _GLGRAPHICS_
-  graphic_gldestroy(); // Free opengl stuff
-#endif
-
 
 #ifndef P4A_BENCH
   puts("-----------------------------");
   puts("         Finished");
   puts("-----------------------------");
 #endif
+
+#ifdef _GLGRAPHICS_
+  graphic_gldestroy(); // Free opengl stuff
+#endif
+
 
   return 0;
 }
