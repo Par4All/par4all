@@ -68,8 +68,8 @@ or back-end compilers to build complete tool chains.
 not interested in \Apips details but wish to produce parallel code from
 user sources.
 
-This script can take C or Fortran source files and generate \Aopenmp or
-\Acuda output to run on shared memory multicore processors or
+This script can take C or Fortran source files and generate \Aopenmp,
+\Acuda or \Aopencl output to run on shared memory multicore processors or
 \Agpu, respectively.
 
 The output is created in files with the same name as the original ones, with a
@@ -301,6 +301,65 @@ For more tweaking, look at the \Apfa Accel runtime source on
 \url{http://download.par4all.org/doc/Par4All_Accel_runtime/graph} or
 directly in the \Agit repository.
 
+\subsection{Automatic parallelization with OpenCL generation}
+\label{sec:autom-parall-with-OpenCL}
+
+To generate from a C program source a \Aopencl program that is also compiled
+into an executable, use:
+\begin{verbatim}
+p4a --opencl example.c -o e
+\end{verbatim}
+which produces a host program \texttt{example.p4a.c}, a \Aopencl kernel program source 
+\texttt{p4a\_wrapper\_example.cl} and an \texttt{e} executable. The current version of 
+\Apfa generates \Aopencl codes that are to be run on a \Agpu. 
+The \Agpu accelerator support relies on a small \Apfa Accel interface that connects to the
+\Aopencl infrastructure. Data-parallel loops are automatically transformed
+into \Aopencl kernels and saved as *.cl files. These files 
+will be loaded, compiled and executed on the \Agpu. \emph{Ad
+  hoc} communications between the host memory and the \Agpu memory are
+generated to enable kernel execution. 
+
+\subsubsection{P4A Accel runtime for OpenCL}
+\label{sec:p4a-accel-runtime}
+
+Like \Apfa generation for CUDA,  \Apfa does not directly generate
+direct \Aopencl code and instead generates calls to functions and
+macrofunctions defined in the P4A Accel runtime.
+
+The P4A Accel runtime itself can also be debugged by defining \verb|P4A_DEBUG| 
+environment variable to 1 (or more) to output debugging messages around all
+the \Aopencl kernels invocations, such as: {\scriptsize
+\begin{verbatim}
+
+$ P4A_DEBUG=3 ./run_opencl
+ P4A: P4A_DEBUG environment variable is set : '3'
+ P4A: Setting debug level to 3
+ P4A: Available OpenCL platforms :
+ P4A:  ** platform 0 **
+    - CL_PLATFORM_NAME: NVIDIA CUDA
+    - CL_PLATFORM_VENDOR: NVIDIA Corporation
+    - CL_PLATFORM_VERSION: OpenCL 1.1 CUDA 4.1.1
+    - CL_PLATFORM_PROFILE: FULL_PROFILE
+    - CL_PLATFORM_EXTENSIONS: cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing cl_nv_compiler_options cl_nv_device_attribute_query cl_nv_pragma_unroll 
+ P4A: OpenCL platform chosen : 0
+ P4A: Available OpenCL devices for platform    - : NVIDIA CUDA
+ P4A:  ** device 0 **
+    - CL_DEVICE_NAME: Tesla C2050
+    - CL_DEVICE_TYPE :GPU
+    - CL_DEVICE_EXTENSIONS: cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing cl_nv_compiler_options cl_nv_device_attribute_query cl_nv_pragma_unroll  cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_fp64 
+    - CL_DEVICE_PROFILE: FULL_PROFILE
+    - CL_DEVICE_VENDOR: NVIDIA Corporation
+    - CL_DEVICE_VERSION: OpenCL 1.1 CUDA
+    - CL_DRIVER_VERSION: 285.05.05
+ P4A: OpenCL device chosen : 0
+ P4A: The kernel p4a_wrapper_main is loaded for the first time
+ P4A: Program and Kernel creation from ./p4a_wrapper_main.cl
+ P4A: Calling 2D kernel "p4a_wrapper_main" of size (13x17)
+ P4A: line 27 of function p4a_launcher_main in file "/usr/home/me/where/is/myfile/example.p4a.c":
+ P4A: Invoking kernel 'p4a_wrapper_main(i, j, a)' : (13x17x1 , NULL)
+\end{verbatim}
+
+}
 
 \subsection{Automatic task generation for the SCMP architecture}
 \label{sec:scmp}
@@ -345,7 +404,7 @@ The global architecture of \Apfa is given on
 figure~\ref{fig:transit_intestinal}.
 
 \begin{figure}
-  \includegraphics[width=\hsize]{p4a_work_flow}
+  %\includegraphics[width=\hsize]{p4a_work_flow}
   \caption{Intestinal view of \texttt{p4a}.}
   \label{fig:transit_intestinal}
 \end{figure}
@@ -434,6 +493,13 @@ First an example to change only one method:
 Another example showing how to change a whole class as well:
 \lstinputlisting[language=Python]{p4a_process_inject_class.py}
 
+\section{Auxiliaries tools}
+
+\subsection{\Apfa Selective C Pre Processor}
+
+The \texttt{p4a\_scpp} tool can be used to pre-process a specific
+\texttt{\#include} directive while leaving the others untouched. See
+\texttt{p4a\_scpp --help} for more informations.
 
 %%ContentEnd
 
@@ -444,4 +510,4 @@ Another example showing how to change a whole class as well:
 %%% mode: latex
 %%% ispell-local-dictionary: "american"
 %%% End:
-
+% vim: spell spelllang=en

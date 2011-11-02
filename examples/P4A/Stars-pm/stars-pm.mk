@@ -4,6 +4,9 @@ TARGET= stars-pm
 # can be overwrite on cmdline
 SIZE?=128
 
+#colors
+NO_COLOR=
+
 RUN_ARG=./data/exp$(SIZE).a.bin
 
 COMMON_SOURCES = common/io.c
@@ -76,11 +79,15 @@ include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(SOURCES) $(CPROTO_GR
 
 display_%:run_%_gtk ;
 
-%_opengl:
+%_opengl: demo_opengl_message
 	$(MAKE) $* opengl=1
 
-opengl_display_%:run_%_opengl ;
+opengl_display_%: demo_opengl_message run_%_opengl ;
 
-demo_opengl : opengl_display_seq opengl_display_openmp opengl_display_cuda opengl_display_cuda-opt opengl_display_accel-openmp opengl_display_opencl;
+demo_opengl_message:
+	@echo "\n Please close the window at the end of the execution. In case of the chain of demos \
+	(command "make demo_opengl"), this allows the execution of the next demo\n"
+
+demo_opengl : opengl_display_seq opengl_display_openmp  opengl_display_accel-openmp ;
 
 	
