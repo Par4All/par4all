@@ -170,10 +170,4 @@ int main()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
-INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
-PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
-TRANSFORMERS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
-PRECONDITIONS_INTER_FULL[main] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 INTERPROCEDURAL_SUMMARY_PRECONDITION[for02!] (ordinary_summary_precondition) empty precondition to for02! because not in call tree from main.

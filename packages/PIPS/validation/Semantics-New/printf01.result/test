@@ -47,12 +47,4 @@ int printf01()
 
 WARNINGS
 
-INITIAL_PRECONDITION[printf01] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning printf01 instead
-PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
-PROGRAM_PRECONDITION[] (translate_global_value) Information about TOP-LEVEL:sys_nerr lost,
-check structure of common /*STATIC*/ in modules TOP-LEVEL and printf01
-TRANSFORMERS_INTER_FULL[printf01] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_TRANSFORMERS[printf01] (add_or_kill_equivalenced_variables) storage return
-PRECONDITIONS_INTER_FULL[printf01] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_PRECONDITIONS[printf01] (add_or_kill_equivalenced_variables) storage return

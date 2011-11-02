@@ -83,10 +83,4 @@ int pointer03()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
-INITIAL_PRECONDITION[pointer03] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer03 instead
-PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
-TRANSFORMERS_INTER_FULL[pointer03] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_TRANSFORMERS[pointer03] (add_or_kill_equivalenced_variables) storage return
-PRECONDITIONS_INTER_FULL[pointer03] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_PRECONDITIONS[pointer03] (add_or_kill_equivalenced_variables) storage return
