@@ -659,7 +659,8 @@ def work(options, args = None):
         "src/postprocessor/p4a_recover_includes",
         "src/validation/p4a_validate",
         "src/validation/p4a_validation",
-        "src/p4a_accel/p4a_post_processor.py"
+        "src/p4a_accel/p4a_post_processor.py",
+        "src/simple_tools/p4a_scpp"
         ]:
         p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_bin ])
 
