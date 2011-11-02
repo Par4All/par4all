@@ -1,0 +1,47 @@
+#!/bin/sh
+# p4a_scpp  - P4A Selective C PreProcessor
+# Authors: Serge Guelton <serge.guelton@hpc-project.com>
+
+CPP=${CPP:-cpp}
+SED=${SED:-sed}
+p4a_guard="// et les gardiens, qui les gardera"
+p4a_re=
+p4a_input=-
+P4A_CPPFLAGS=
+
+# process arguments
+for arg in $* ; do
+	case $arg in
+		-h|--help)
+	cat << EOF
+p4a_scpp - P4A Selective C PreProcessor
+usage: p4a_scpp [-h|--help] [cpp flags] <include reg exp> [input_file]
+sample: p4a_scpp -DNDEBUG stdio\\\\.h hello_world.c
+EOF
+			exit 0
+			;;
+		-*)
+			P4A_CPPFLAGS="$P4A_CPPFLAGS $arg"
+			;;
+		*)
+			if test -z "$p4a_re" ; then
+				p4a_re=$arg
+			else
+				p4a_input=$arg
+			fi
+			;;
+	esac
+done
+
+# check the include regular expression
+if test -z "$p4a_re" ; then
+	echo "missing include regular exception"
+	/bin/sh $0 --help
+	exit 1
+fi
+
+# guard all # command , then remove the one we are interested in, process them and remove remaining guards.
+$SED -r -e "s%(\#\s*((define)|(line)|(pragma)|(if)|(else)|(endif)|(include)))%$p4a_guard \1%g" "$p4a_input" |\
+	$SED -r -e "s%$p4a_guard (\#\s*include\s*[\"<]$p4a_re[\">])%\1%g" | \
+	$CPP -CC $P4A_CPPFLAGS |\
+	$SED -r -e "s%$p4a_guard (\#\s*((define)|(line)|(pragma)|(if)|(else)|(endif)|(include)))%\1%g"
