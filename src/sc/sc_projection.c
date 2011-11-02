@@ -22,8 +22,8 @@
 
 */
 
-/* Package SC : sc_projection.c
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* Package systeme de contraintes (SC) : sc_projection.c
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Projection of a system of constraints (equalities and inequalities)
  * along one or several variables. The variables are always eliminated,
@@ -33,12 +33,16 @@
  * Arguments of these functions :
  *
  * - s or sc is the system of constraints.
+ *
  * - ofl_ctrl is the way overflow errors are handled
+ *
  *     ofl_ctrl == NO_OFL_CTRL
  *               -> overflow errors are not handled
+ *
  *     ofl_ctrl == OFL_CTRL
  *               -> overflow errors are handled in the called function
  *                  (not often available, check first!)
+ *
  *     ofl_ctrl == FWD_OFL_CTRL
  *               -> overflow errors must be handled by the calling function
  *
@@ -46,13 +50,24 @@
  *
  *  The base of the Psysteme is not always updated. Check the comments at the
  *  head of each function for more details.
+ *
  *  In the functions that update the base, there is an assert if the variables
  *  that are eliminated do not belong to the base.
+ *
+ *  No attempt is made at speeding the projection when many variables
+ *  are projected simultaneously. The projection could be speeded up
+ *  when all variables used in the constraints are projected and when
+ *  all variables projected are used in convex components not related
+ *  to the preserved variables. In the later case, the convex
+ *  components must be checked for emptiness. The system decomposition
+ *  in convex components is performed by function xyz... (see Beatrice
+ *  Creusillet)
  *
  * Authors :
  *
  * Remi Triolet, Malik Imadache, Francois Irigoin, Yi-Qing Yang,
- * Corinne Ancourt, Be'atrice Creusillet.
+ * Corinne Ancourt, Be'atrice Creusillet, Fabien Coelho, Duong Nguyen,
+ * Serge Guelton.
  *
  */
 
@@ -75,6 +90,8 @@
 
 #define EXCEPTION_PRINT_PROJECTION true
 
+// Duong Nguyen: constants used to filter out the most complicated
+// systems of constraints
 #ifdef FILTERING
 
 #define FILTERING_DIMENSION_PROJECTION filtering_dimension_projection
@@ -113,14 +130,18 @@ catch_alarm_projection (int sig)
  *             et expansion virtuelle en un cylindre d'axe v.
  *
  * Modifications:
+ *
  *  - ajout de la normalisation de l'equation eq avant les substitutions;
  *    cette normalisation permet de detecter une equation infaisable; le
  *    probleme a ete mis en evidence par Yi-Qing dans le test de dependance
  *    de PIPS pour T(2*i+4*j) vs T(2*i+2*j+1) donnant 2*j + 2*di + 2*dj + 1 =0;
  *    la projection de j faisait perdre la non-faisabilite; Francois Irigoin,
  *    8 novembre 1991
- * - Added timeout control in sc_fourier_motzkin_variable_elimination_ofl_ctrl.
- *   Better use sc_projection_along_variable_ofl_ctrl_timeout_ctrl. DN 29/10/02
+ *
+ * - Added timeout control in
+ *   sc_fourier_motzkin_variable_elimination_ofl_ctrl.  Better use
+ *   sc_projection_along_variable_ofl_ctrl_timeout_ctrl. Duong Nguyen
+ *   29/10/2002
  */
 void sc_projection_along_variable_ofl_ctrl(psc, v, ofl_ctrl)
 Psysteme volatile *psc;
@@ -1056,13 +1077,14 @@ void sc_project_very_simple_equalities(Psysteme s)
  *
  * See (void) sc_projection_along_variable_ofl_ctrl(psc, v, ofl_ctrl).
  *
- * We need a function that returns nothing, modifies the input systeme,
- * but can print the original system of constraints only in case of failure, it means we have to
- * catch overflow_error from sc_fourier_motzkin_variable_elimination_ofl_ctrl,
- * in order to print the systems only in Linear.
- * This function will make a copy of the system, and print it to stderr if there is an exception.
- * Surely the copy will be removed afterward. (DN 17/7/02)
- * add SIZE CONTROL
+ * We need a function that returns nothing, modifies the input
+ * systeme, but can print the original system of constraints only in
+ * case of failure, it means we have to catch overflow_error from
+ * sc_fourier_motzkin_variable_elimination_ofl_ctrl, in order to print
+ * the systems only in Linear.  This function will make a copy of the
+ * system, and print it to stderr if there is an exception.  Surely
+ * the copy will be removed afterward. (Duong Nguyen 17/7/02) add SIZE
+ * CONTROL
 */
 
 void sc_projection_along_variable_ofl_ctrl_timeout_ctrl(psc, v, ofl_ctrl)
