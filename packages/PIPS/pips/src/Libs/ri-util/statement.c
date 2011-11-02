@@ -1074,6 +1074,22 @@ statement_test(statement s)
   return instruction_test(statement_instruction(s));
 }
 
+/* returns the effective true branch of a test by skipping a possible
+   sequence of one element. OK, this should be performed
+   recursively... */
+statement effective_test_true(test t)
+{
+  statement ets = test_true(t);
+
+  if(statement_block_p(ets)) {
+    list sl = statement_block(ets);
+    if(gen_length(sl)==1) {
+      ets = STATEMENT(CAR(sl));
+    }
+  }
+
+  return ets;
+}
 
 /* Get the loop of a statement */
 loop

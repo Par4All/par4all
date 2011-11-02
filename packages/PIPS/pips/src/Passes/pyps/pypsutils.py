@@ -12,15 +12,15 @@ to make user interface cleaner
 """
 
 guard_begin = "PIPS include guard begin:"
-guard_begin_re = re.compile(r"^/\* %s (.+) \*/$" % guard_begin)
+guard_begin_re = re.compile(r"^// %s (.+) $" % guard_begin)
 guard_end = "PIPS include guard end:"
 include_re = re.compile(r"^\s*#\s*include\s*(\S+)\s*.*$")
 
 def mkguard(guard, line):
-    p = line.rstrip("\r\n").split("/*", 1)
-    str =  "/* %s %s */\n" % (guard, p[0])
+    p = line.rstrip("\r\n").split("//", 1)
+    str =  "// %s %s \n" % (guard, p[0])
     if(len(p) == 2):
-        str += "/*" + p[1] + "\n"
+        str += "//" + p[1] + "\n"
     return str
 
 def guardincludes(fname):

@@ -297,11 +297,14 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
       remove_entity_values(e, readonly);
     }
   }
-  else if(storage_return_p(s))
+  else if(storage_return_p(s)) {
     /* semantics analysis should be performed on this kind of variable
        but it has probably been eliminated earlier; no equivalence
        possible anyway! */
-    pips_user_warning("storage return\n");
+    // FI: the warning message is not useful. See formal parameters
+    // pips_user_warning("storage return\n");
+    ;
+  }
   else if(storage_formal_p(s))
     /* to be dealt with later if we assume non-standard dynamic
        aliasing between formal parameters */
