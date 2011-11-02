@@ -1,0 +1,60 @@
+
+Cumulated effects for "hs_set_r"
+
+void hs_set_r()
+{
+   enum a o;
+//             <    is read   >: o
+//             <    is written>: res
+   int res = vhs_set_r(o);
+   return;
+}
+
+Cumulated effects for "vhs_set_r"
+
+int vhs_set_r(enum a o)
+{
+   return 1;
+}
+
+Preconditions for "hs_set_r"
+
+
+//  T() {}
+
+void hs_set_r()
+{
+
+//  T(o) {}
+
+   enum a o;
+
+//  T(res) {res==1}
+
+   int res = vhs_set_r(o);
+
+//  T() {res==1}
+
+   return;
+}
+
+Preconditions for "hs_set_r"
+
+
+//  P() {}
+
+void hs_set_r()
+{
+
+//  P() {}
+
+   enum a o;
+
+//  P(o) {}
+
+   int res = vhs_set_r(o);
+
+//  P(o,res) {res==1}
+
+   return;
+}

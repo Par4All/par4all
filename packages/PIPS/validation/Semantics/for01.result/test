@@ -193,9 +193,4 @@ Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 TRANSFORMERS_INTRA_FAST[main] (transformers_intra_fast) Property SEMANTICS_FIX_POINT is ignored
-TRANSFORMERS_INTRA_FAST[main] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
-INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
-PRECONDITIONS_INTRA[main] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTRA_FAST[for01!] (transformers_intra_fast) Property SEMANTICS_FIX_POINT is ignored

@@ -1,11 +1,74 @@
 int main()
 {
    int i, c = 0;
+
    if (c>1)
+      if (c>2) {
+         if (c>3)
+            i = 1;
+         else
+            i = 2;
+      }
+
+   if (c>1) {
+      if (c>2) {
+         if (c>3)
+            i = 1;
+      }
+      else
+         i = 2;
+   }
+
+   if (c>1) {
       if (c>2)
          i = 1;
       else
          i = 2;
+   }
+
+   if (c>1)
+      if (c>2)
+         i = 1;
+
+   if (c>2)
+      i = 1;
+
    return i;
 }
-if01.c: In function ‘main’: if01.c:12: warning: suggest explicit braces to avoid ambiguous ‘else’
+int main()
+{
+   int i, c = 0;
+
+   if (c>1)
+      if (c>2) {
+         if (c>3)
+            i = 1;
+         else
+            i = 2;
+      }
+
+   if (c>1) {
+      if (c>2) {
+         if (c>3)
+            i = 1;
+      }
+      else
+         i = 2;
+   }
+
+   if (c>1) {
+      if (c>2)
+         i = 1;
+      else
+         i = 2;
+   }
+
+   if (c>1)
+      if (c>2)
+         i = 1;
+
+   if (c>2)
+      i = 1;
+
+   return i;
+}

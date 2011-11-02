@@ -1,0 +1,26 @@
+int main()
+{
+   int i, c = 3;
+
+   if (c>2) {
+      if (c>4)
+         i = 1;
+   }
+   else
+      printf("\nexternal else\n");
+
+   return i;
+}
+int main()
+{
+   int i, c = 3;
+
+   if (c>2) {
+      if (c>4)
+         i = 1;
+   }
+   else
+      printf("\nexternal else\n");
+
+   return i;
+}

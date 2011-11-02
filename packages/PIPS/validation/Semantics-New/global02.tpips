@@ -1,0 +1,80 @@
+delete global02
+
+# setenv PIPS_CPP_FLAGS "-I /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/include/ -DNDEBUG"
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+# create bc /home/creusil/P4A_PIPS/P4A/cold/tests/p4a/bc.cold-pre-p4a.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_display_s0d2_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_mclose_i0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_disp_i0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_terminate.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_meshgrid_i2i2_d2d2.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_display_s0i0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_disp_d0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_Matplot_d2_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_matrix_d2i0i0_d2.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_meof_i0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_mfscanf_i0i0s0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_mfprintf_i0s0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_mul_i2d2_d2.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_init.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_send_to_scilab_s1_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_tic__.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_linspace_d0d0i0_d2.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_svd_d2_d2d2d2.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_clock__d2.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_write_to_scilab_s0d2_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_display_s0i2_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_mopen_s0s0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_mfprintf_i0s0d0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_disp_s0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_toc__.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_max_d2_d0.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_display_s0d0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_Matplot_d2s0_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_disp_d2_.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_mul_d2d2_d2.c /home/creusil/P4A_PIPS/P4A/cold/p4a/stubs/src/scilab_rt_mean_d2s0_d2.c
+
+
+create global02 global02.c
+
+set MAXIMUM_USER_ERROR 42
+set PYPS TRUE
+set PREPROCESSOR_MISSING_FILE_HANDLING "internal_resolver"
+activate MUST_REGIONS
+set FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+set UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
+set SEMANTICS_FIX_POINT_OPERATOR "derivative"
+set UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+set ALIASING_ACROSS_IO_STREAMS FALSE
+set ABORT_ON_USER_ERROR FALSE
+set SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+set CONSTANT_PATH_EFFECTS FALSE
+set PRETTYPRINT_SEQUENTIAL_STYLE "do"
+set MEMORY_EFFECTS_ONLY FALSE
+set ALIASING_ACROSS_TYPES FALSE
+set SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+set SEMANTICS_NORMALIZATION_LEVEL_BEFORE_STORAGE 2
+set SEMANTICS_KEEP_DO_LOOP_EXIT_CONDITION FALSE
+set TRUST_CONSTANT_PATH_EFFECTS_IN_CONFLICTS TRUE
+
+#activate TRANSFORMERS_INTRA_FAST
+#activate PRECONDITIONS_INTRA_FAST
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+activate PRINT_CODE
+
+quit
+
+activate RICE_FAST_DEPENDENCE_GRAPH
+activate NEW_CONTROLIZER
+capply SIMPLIFY_CONTROL_DIRECTLY[main]
+apply PRIVATIZE_MODULE[main]
+set PRETTYPRINT_SEQUENTIAL_STYLE "do"
+capply INTERNALIZE_PARALLEL_CODE[main]
+capply COARSE_GRAIN_PARALLELIZATION[main]
+quit
+capply SIMPLIFY_CONTROL_DIRECTLY[main]
+set FULL_LOOP_UNROLL_EXCEPTIONS ""
+set FLATTEN_CODE_UNROLL FALSE
+capply FLATTEN_CODE[main]
+set LOOP_FUSION_GREEDY FALSE
+set LOOP_FUSION_MAXIMIZE_PARALLELISM TRUE
+set LOOP_FUSION_KEEP_PERFECT_PARALLEL_LOOP_NESTS TRUE
+set LOOP_FUSION_MAX_FUSED_PER_LOOP -1
+capply LOOP_FUSION[main]
+set PRETTYPRINT_BLOCKS TRUE
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[main]
+set SCALARIZATION_PREFIX ""
+set SCALARIZATION_PRESERVE_PERFECT_LOOP_NEST FALSE
+set SCALARIZATION_FORCE_OUT FALSE
+set SEMANTICS_TRUST_ARRAY_DECLARATIONS FALSE
+set SEMANTICS_TRUST_ARRAY_REFERENCES FALSE
+set SCALARIZATION_THRESHOLD 2
+set SCALARIZATION_STRICT_MEMORY_ACCESSES FALSE
+apply SCALARIZATION[main]
+apply CLEAN_DECLARATIONS[main]
+apply PRIVATIZE_MODULE[main]
+set LOCALIZE_DECLARATION_SKIP_LOOP_INDICES FALSE
+apply LOCALIZE_DECLARATION[main]
+set PRAGMA_TYPE "expr"
+capply OMPIFY_CODE[main,scilab_rt_Matplot_d2_,scilab_rt_Matplot_d2s0_,scilab_rt_clock__d2,scilab_rt_disp_d0_,scilab_rt_disp_d2_,scilab_rt_disp_i0_,scilab_rt_disp_s0_,scilab_rt_display_s0d0_,scilab_rt_display_s0d2_,scilab_rt_display_s0i0_,scilab_rt_display_s0i2_,scilab_rt_init,scilab_rt_linspace_d0d0i0_d2,scilab_rt_matrix_d2i0i0_d2,scilab_rt_max_d2_d0,scilab_rt_mclose_i0_,scilab_rt_mean_d2s0_d2,scilab_rt_meof_i0_,scilab_rt_meshgrid_i2i2_d2d2,scilab_rt_mfprintf_i0s0_,scilab_rt_mfprintf_i0s0d0_,scilab_rt_mfscanf_i0i0s0_,scilab_rt_mopen_s0s0_,scilab_rt_mul_d2d2_d2,scilab_rt_mul_i2d2_d2,scilab_rt_send_to_scilab_s1_,scilab_rt_svd_d2_d2d2d2,scilab_rt_terminate,scilab_rt_tic__,scilab_rt_toc__,scilab_rt_write_to_scilab_s0d2_]
+set OMP_MERGE_POLICY "outer"
+set OMP_IF_MERGE_POLICY "ignore"
+capply OMP_MERGE_PRAGMA[main,scilab_rt_Matplot_d2_,scilab_rt_Matplot_d2s0_,scilab_rt_clock__d2,scilab_rt_disp_d0_,scilab_rt_disp_d2_,scilab_rt_disp_i0_,scilab_rt_disp_s0_,scilab_rt_display_s0d0_,scilab_rt_display_s0d2_,scilab_rt_display_s0i0_,scilab_rt_display_s0i2_,scilab_rt_init,scilab_rt_linspace_d0d0i0_d2,scilab_rt_matrix_d2i0i0_d2,scilab_rt_max_d2_d0,scilab_rt_mclose_i0_,scilab_rt_mean_d2s0_d2,scilab_rt_meof_i0_,scilab_rt_meshgrid_i2i2_d2d2,scilab_rt_mfprintf_i0s0_,scilab_rt_mfprintf_i0s0d0_,scilab_rt_mfscanf_i0i0s0_,scilab_rt_mopen_s0s0_,scilab_rt_mul_d2d2_d2,scilab_rt_mul_i2d2_d2,scilab_rt_send_to_scilab_s1_,scilab_rt_svd_d2_d2d2d2,scilab_rt_terminate,scilab_rt_tic__,scilab_rt_toc__,scilab_rt_write_to_scilab_s0d2_]
+set PRETTYPRINT_SEQUENTIAL_STYLE "do"
+apply UNSPLIT[%ALL]
+quit
