@@ -71,7 +71,7 @@ void p4a_launcher_main()
 void p4a_launcher_main_1(int finger_mat[64][16], int inv_qpsk_user1[16*64+16], int ovsf_code_ref[16])
 {
    //PIPS generated variable
-   int c, i, j;
+   int c;
    //#endif
    
    
@@ -82,7 +82,7 @@ void p4a_launcher_main_1(int finger_mat[64][16], int inv_qpsk_user1[16*64+16], i
 void p4a_launcher_main_2(int coeff2[16], int finger_mat[64][16], int symbole_flow_user1[64])
 {
    //PIPS generated variable
-   int c, j;
+   int j;
    for(j = 0; j <= 15; j += 1)
       // To be assigned to a call to P4A_vp_0: j
       p4a_wrapper_main_2(coeff2, finger_mat, j, symbole_flow_user1);
