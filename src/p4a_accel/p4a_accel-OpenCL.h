@@ -569,8 +569,7 @@ parameters types are resolved.
   size_t *block_descriptor_name = NULL; \
   P4A_skip_debug(4,P4A_dump_grid_descriptor(grid_descriptor_name););
 
-/** Dump a CL dim2 descriptor with an introduction message 
- *  OG:change descriptor_name[0] to descriptor_name, gcc does not accept, still question for one dim ?*/
+/** Dump a CL dim2 descriptor with an introduction message */
 #define P4A_dump_descriptor(message, descriptor_name)     \
   P4A_dump_message(message "\""  #descriptor_name "\" of size %zu x %zu x %zu\n", \
        descriptor_name[0],          \
