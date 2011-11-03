@@ -126,8 +126,8 @@ can be found into the document describing all the infrastructure:
 http://www.par4all.org/documentation/par4all-infrastructure
 
 
-Examples and demos:
----------
+Examples and demos
+------------------
 
 In the examples directory there are few examples or demos showing some ``p4a``,
 ``tpips`` and ``pyps`` use cases. 
