@@ -9501,6 +9501,18 @@ flag_parallel_reduced_loops_with_atomic > MODULE.code
         < MODULE.cumulated_reductions
 \end{PipsMake}
 
+\begin{PipsPass}{flag_parallel_reduced_loops_with_openmp_directives}
+  Flag loops with openmp directives, taking into account reductions.
+\end{PipsPass}
+
+\begin{PipsMake}
+flag_parallel_reduced_loops_with_openmp_directives > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.reduction_parallel_loops
+        < MODULE.cumulated_reductions
+\end{PipsMake}
+
 
 \subsection{Forward Substitution}
 \index{Common subexpression elimination}
