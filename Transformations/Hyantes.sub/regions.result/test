@@ -1,0 +1,2575 @@
+
+//  <pt[PHI1][PHI2].lat-R-EXACT-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange}>
+//  <pt[PHI1][PHI2].lon-R-EXACT-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange}>
+//  <pt[PHI1][PHI2].pot-R-EXACT-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lonRange])
+{
+   size_t i;
+
+//  <pt[PHI1][PHI2].lat-R-EXACT-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange}>
+//  <pt[PHI1][PHI2].lon-R-EXACT-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange}>
+//  <pt[PHI1][PHI2].pot-R-EXACT-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   for(i = 0; i <= latRange-1; i += 1) {
+      {
+         size_t j;
+
+//  <pt[PHI1][PHI2].lat-R-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=lonRange,
+//    0<=i, i+1<=latRange}>
+//  <pt[PHI1][PHI2].lon-R-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=lonRange,
+//    0<=i, i+1<=latRange}>
+//  <pt[PHI1][PHI2].pot-R-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=lonRange,
+//    0<=i, i+1<=latRange}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+         for(j = 0; j <= lonRange-1; j += 1)
+
+//  <pt[PHI1][PHI2].lat-R-EXACT-{PHI1==i, PHI2==j, 0<=j,
+//    j+1<=lonRange, 0<=i, i+1<=latRange}>
+//  <pt[PHI1][PHI2].lon-R-EXACT-{PHI1==i, PHI2==j, 0<=j,
+//    j+1<=lonRange, 0<=i, i+1<=latRange}>
+//  <pt[PHI1][PHI2].pot-R-EXACT-{PHI1==i, PHI2==j, 0<=j,
+//    j+1<=lonRange, 0<=i, i+1<=latRange}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+            printf("%lf %lf %lf\n", pt[i][j].lon, pt[i][j].lat, pt[i][j].pot);
+      }
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+      putchar('\n');
+   }
+}
+
+//  <sz-R-EXACT-{}>
+//  <sz[PHI1]-W-EXACT-{PHI1==0}>
+
+char * * hs_list_smoothing(size_t *sz)
+{
+   static const size_t names_count = sizeof(func_names)/sizeof(*func_names);
+
+//  <sz-R-EXACT-{}>
+//  <sz[PHI1]-W-EXACT-{PHI1==0}>
+
+   *sz = names_count;
+   /*cast for backward compatibility only*/
+   return (const char **) func_names;
+}
+
+//  <func_names[PHI1]-R-MAY-{0<=PHI1}>
+//  <g_config.fid-W-MAY-{}>
+//  <g_config.fparam-W-MAY-{}>
+//  <g_config.herrno-W-MAY-{}>
+//  <opt-R-EXACT-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+int hs_set(hs_option_t opt, ...)
+{
+   va_list args;
+   va_start(args, opt);
+
+//  <func_names[PHI1]-R-MAY-{0<=PHI1}>
+//  <g_config.fid-W-MAY-{}>
+//  <g_config.fparam-W-MAY-{}>
+//  <g_config.herrno-W-MAY-{}>
+//  <opt-R-EXACT-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+   int res = vhs_set_r(&g_config, opt, &args);
+   va_end(args);
+   return res;
+}
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].fid-W-MAY-{PHI1==0, opt==4}>
+//  <config[PHI1].fparam-W-MAY-{PHI1==0, opt==4}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0, opt==4}>
+//  <func_names[PHI1]-R-MAY-{0<=PHI1}>
+//  <opt-R-EXACT-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+int hs_set_r(hs_config_t *config, hs_option_t opt, ...)
+{
+   va_list args;
+   va_start(args, opt);
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].fid-W-MAY-{PHI1==0, opt==4}>
+//  <config[PHI1].fparam-W-MAY-{PHI1==0, opt==4}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0, opt==4}>
+//  <func_names[PHI1]-R-MAY-{0<=PHI1}>
+//  <opt-R-EXACT-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+   int res = vhs_set_r(config, opt, &args);
+   va_end(args);
+   return res;
+}
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference)
+{
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &g_config);
+}
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
+{
+   if (_resoLat<=0||_resoLon<=0)
+      return (void *) 0;
+
+   size_t lonRange = (size_t) _resoLon;
+   size_t latRange = (size_t) _resoLat;
+
+   size_t nb;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].herrno-W-MAY-{PHI1==0}>
+//  <pFileReference-R-EXACT-{}>
+//  <pFileReference[PHI1]-R-MAY-{PHI1==0}>
+//  <pFileReference[PHI1]-W-MAY-{PHI1==0}>
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+   hs_potential_t *the_towns = hs_read_towns(pFileReference, &nb, configuration);
+
+//  <plots-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   hs_potential_t (*plots)[latRange][lonRange] = malloc(sizeof(hs_potential_t)*latRange*lonRange);
+
+//  <configuration-R-MAY-{}>
+//  <configuration[PHI1].herrno-W-MAY-{PHI1==0}>
+//  <plots-R-EXACT-{}>
+
+   if (!plots) {
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].herrno-W-EXACT-{PHI1==0}>
+
+      configuration->herrno = 12;
+      return (void *) 0;
+   }
+
+//  <visu.MLon-R-EXACT-{}>
+//  <visu.mLon-R-EXACT-{}>
+
+   data_t lonStep = (visu.MLon-visu.mLon)/_resoLon;
+
+//  <visu.MLat-R-EXACT-{}>
+//  <visu.mLat-R-EXACT-{}>
+
+   data_t latStep = (visu.MLat-visu.mLat)/_resoLat;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].fparam-R-EXACT-{PHI1==0}>
+
+   data_t range = (*configuration).fparam;
+   {
+      size_t i;
+
+//  <plots-R-EXACT-{}>
+//  <plots[PHI1][PHI2][PHI3].lat-W-EXACT-{PHI1==0, 0<=PHI2,
+//    PHI2+1<=latRange, 0<=PHI3, PHI3+1<=lonRange}>
+//  <plots[PHI1][PHI2][PHI3].lon-W-EXACT-{PHI1==0, 0<=PHI2,
+//    PHI2+1<=latRange, 0<=PHI3, PHI3+1<=lonRange}>
+//  <plots[PHI1][PHI2][PHI3].pot-W-EXACT-{PHI1==0, 0<=PHI2,
+//    PHI2+1<=latRange, 0<=PHI3, PHI3+1<=lonRange}>
+//  <visu.mLat-R-EXACT-{1<=latRange, 1<=lonRange}>
+//  <visu.mLon-R-EXACT-{1<=latRange, 1<=lonRange}>
+
+      
+      /* init step: prepare output array */
+      for(i = 0; i <= latRange-1; i += 1) {
+         size_t j;
+
+//  <plots-R-EXACT-{}>
+//  <plots[PHI1][PHI2][PHI3].lat-W-EXACT-{PHI1==0, PHI2==i, 0<=PHI3,
+//    PHI3+1<=lonRange, 0<=i, i+1<=latRange}>
+//  <plots[PHI1][PHI2][PHI3].lon-W-EXACT-{PHI1==0, PHI2==i, 0<=PHI3,
+//    PHI3+1<=lonRange, 0<=i, i+1<=latRange}>
+//  <plots[PHI1][PHI2][PHI3].pot-W-EXACT-{PHI1==0, PHI2==i, 0<=PHI3,
+//    PHI3+1<=lonRange, 0<=i, i+1<=latRange}>
+//  <visu.mLat-R-EXACT-{0<=i, i+1<=latRange, 1<=lonRange}>
+//  <visu.mLon-R-EXACT-{0<=i, i+1<=latRange, 1<=lonRange}>
+
+         for(j = 0; j <= lonRange-1; j += 1) {
+
+//  <plots-R-EXACT-{}>
+//  <plots[PHI1][PHI2][PHI3].lon-W-EXACT-{PHI1==0, PHI2==i, PHI3==j,
+//    0<=j, j+1<=lonRange, 0<=i, i+1<=latRange}>
+//  <visu.mLon-R-EXACT-{0<=j, j+1<=lonRange, 0<=i, i+1<=latRange}>
+
+            ((*plots)[i])[j].lon = visu.mLon+lonStep*j;
+
+//  <plots-R-EXACT-{}>
+//  <plots[PHI1][PHI2][PHI3].lat-W-EXACT-{PHI1==0, PHI2==i, PHI3==j,
+//    0<=j, j+1<=lonRange, 0<=i, i+1<=latRange}>
+//  <visu.mLat-R-EXACT-{0<=j, j+1<=lonRange, 0<=i, i+1<=latRange}>
+
+            ((*plots)[i])[j].lat = visu.mLat+latStep*i;
+
+//  <plots-R-EXACT-{}>
+//  <plots[PHI1][PHI2][PHI3].pot-W-EXACT-{PHI1==0, PHI2==i, PHI3==j,
+//    0<=j, j+1<=lonRange, 0<=i, i+1<=latRange}>
+
+            ((*plots)[i])[j].pot = 0.;
+         }
+      }
+   }
+
+   lonStep *= 3.14159265358979323846/180;
+   latStep *= 3.14159265358979323846/180;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].fid-R-MAY-{PHI1==0}>
+//  <configuration[PHI1].status-W-MAY-{PHI1==0}>
+//  <plots-R-EXACT-{}>
+//  <plots[PHI1][PHI2][PHI3].pot-R-MAY-{PHI1==0, 0<=PHI2,
+//    PHI2+1<=latRange, 0<=PHI3, PHI3+1<=lonRange, 1<=nb}>
+//  <plots[PHI1][PHI2][PHI3].pot-W-MAY-{PHI1==0, 0<=PHI2,
+//    PHI2+1<=latRange, 0<=PHI3, PHI3+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns-R-EXACT-{}>
+//  <the_towns[PHI1][PHI2].lat-R-MAY-{PHI1==0, 0<=PHI2, PHI2+1<=nb}>
+//  <the_towns[PHI1][PHI2].lon-R-MAY-{PHI1==0, 0<=PHI2, PHI2+1<=nb}>
+//  <the_towns[PHI1][PHI2].pot-R-MAY-{PHI1==0, 0<=PHI2, PHI2+1<=nb}>
+//  <visu.MLat-R-EXACT-{}>
+//  <visu.MLon-R-EXACT-{}>
+//  <visu.mLat-R-EXACT-{}>
+//  <visu.mLon-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+
+   do_run(visu, lonStep, latStep, range, lonRange, latRange, nb, *plots, *((hs_potential_t (*)[nb]) the_towns), configuration);
+
+//  <the_towns-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   free(the_towns);
+
+//  <plots-R-EXACT-{}>
+
+   return (hs_potential_t *) plots;
+}
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_name, double function_param, hs_coord_t visu, FILE *pFileReference)
+{
+
+//  <config.fid-W-EXACT-{}>
+//  <config.fparam-W-EXACT-{}>
+//  <config.g_file_serialize-W-EXACT-{}>
+//  <config.g_is_raw_data-W-EXACT-{}>
+//  <config.herrno-W-EXACT-{}>
+//  <config.status-W-EXACT-{}>
+//  <config.threshold-W-EXACT-{}>
+
+   hs_config_t config = {(void *) 0, 0, 0, 0, 500, 0, 0};
+
+//  <config.fid-W-MAY-{}>
+//  <config.fparam-W-MAY-{}>
+//  <config.herrno-W-MAY-{}>
+//  <func_names[PHI1]-R-MAY-{0<=PHI1}>
+//  <function_name-R-EXACT-{}>
+//  <function_name[PHI1]-R-MAY-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+   hs_set_r(&config, HS_SMOOTH_FUNC, function_name, function_param);
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &config);
+}
+
+//  <g_config.status-R-EXACT-{}>
+
+unsigned long int hs_status()
+{
+
+//  <g_config.status-R-EXACT-{}>
+
+   return g_config.status;
+}
+
+//  <configuration-R-MAY-{}>
+//  <configuration[PHI1].fid-R-MAY-{PHI1==0}>
+//  <configuration[PHI1].status-W-MAY-{PHI1==0}>
+//  <plots[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <plots[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].pot-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <visu.mLat-R-MAY-{}>
+//  <visu.mLon-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+static void do_run(hs_coord_t visu, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t plots[latRange][lonRange], hs_potential_t the_towns[nb], hs_config_t *configuration)
+{
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].fid-R-EXACT-{PHI1==0}>
+
+
+/*data_t (*contrib)[latRange][lonRange] = malloc(sizeof(data_t)*latRange*lonRange);
+	if(!contrib) {
+		configuration->herrno=ENOMEM;
+		return;
+	}*/
+
+   if (configuration->fid==F_DISK) goto _switch_1_case_F_DISK;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].fid-R-EXACT-{PHI1==0}>
+
+   if (configuration->fid==F_AMORTIZED_DISK) goto _switch_1_case_F_AMORTIZED_DISK;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].fid-R-EXACT-{PHI1==0}>
+
+   if (configuration->fid==F_GAUSSIAN) goto _switch_1_case_F_GAUSSIAN;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].fid-R-EXACT-{PHI1==0}>
+
+   if (configuration->fid==F_EXPONENTIAL) goto _switch_1_case_F_EXPONENTIAL;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].fid-R-EXACT-{PHI1==0}>
+
+   if (configuration->fid==F_PARETO) goto _switch_1_case_F_PARETO;
+_switch_1_default:   ;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].status-W-EXACT-{PHI1==0}>
+//  <plots[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <plots[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <visu.mLat-R-EXACT-{}>
+//  <visu.mLon-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_PARETO:   ;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].status-W-EXACT-{PHI1==0}>
+//  <plots[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <plots[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <visu.mLat-R-EXACT-{}>
+//  <visu.mLon-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+   do_run_PARETO(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_EXPONENTIAL:   ;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].status-W-EXACT-{PHI1==0}>
+//  <plots[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <plots[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <visu.mLat-R-EXACT-{}>
+//  <visu.mLon-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+   do_run_EXPONENTIAL(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_GAUSSIAN:   ;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].status-W-EXACT-{PHI1==0}>
+//  <plots[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <plots[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <visu.mLat-R-EXACT-{}>
+//  <visu.mLon-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+   do_run_GAUSSIAN(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_AMORTIZED_DISK:   ;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].status-W-EXACT-{PHI1==0}>
+//  <plots[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <plots[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <visu.mLat-R-EXACT-{}>
+//  <visu.mLon-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+   do_run_AMORTIZED_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_DISK:   ;
+
+//  <configuration-R-EXACT-{}>
+//  <configuration[PHI1].status-W-EXACT-{PHI1==0}>
+//  <plots[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <plots[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <the_towns[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <visu.mLat-R-EXACT-{}>
+//  <visu.mLon-R-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+_break_1:   ;
+}
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+
+   config->status = 0;
+   {
+      size_t k;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+         data_t pot = t[k].pot;
+         town_sum += pot;
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+
+            if (latmin>t[k].lat)
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        do {
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                           contrib[i-imin][j-jmin] = pot/(1+tmp);
+                        }
+                        while (0);
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
+//    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     if (c>0) {
+
+//  <pt[PHI1][PHI2].pot-R-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 0<=k, k+1<=nb}>
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+
+   config->status = 0;
+   {
+      size_t k;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+         data_t pot = t[k].pot;
+         town_sum += pot;
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+
+            if (latmin>t[k].lat)
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        do {
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                           contrib[i-imin][j-jmin] = pot;
+                        }
+                        while (0);
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
+//    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     if (c>0) {
+
+//  <pt[PHI1][PHI2].pot-R-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 0<=k, k+1<=nb}>
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+
+   config->status = 0;
+   {
+      size_t k;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+         data_t pot = t[k].pot;
+         town_sum += pot;
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+
+            if (latmin>t[k].lat)
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        do {
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                           contrib[i-imin][j-jmin] = pot*exp(-(2./range)*tmp);
+                        }
+                        while (0);
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
+//    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     if (c>0) {
+
+//  <pt[PHI1][PHI2].pot-R-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 0<=k, k+1<=nb}>
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+
+   config->status = 0;
+   {
+      size_t k;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+         data_t pot = t[k].pot;
+         town_sum += pot;
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+
+            if (latmin>t[k].lat)
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        do {
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                           contrib[i-imin][j-jmin] = pot*exp(-(3.14159265358979323846/(4.*range*range))*tmp*tmp);
+                        }
+                        while (0);
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
+//    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     if (c>0) {
+
+//  <pt[PHI1][PHI2].pot-R-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 0<=k, k+1<=nb}>
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0}>
+
+   config->status = 0;
+   {
+      size_t k;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{0<=PHI1, PHI1+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+//  <t[PHI1].pot-R-EXACT-{0<=PHI1, PHI1+1<=nb}>
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  <t[PHI1].pot-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+         data_t pot = t[k].pot;
+         town_sum += pot;
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{0<=PHI1, PHI1+1<=latRange, 0<=PHI2,
+//    PHI2+1<=lonRange, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lat-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=PHI1, PHI1+1<=nb}>
+//  <t[PHI1].lon-R-MAY-{PHI1==k, 0<=k, k+1<=nb, 1<=latRange,
+//    1<=lonRange}>
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+
+            if (latmin>t[k].lat)
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0<=k, k+1<=nb}>
+
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imax<=latRange, 0<=imin, 0<=k,
+//    k+1<=nb}>
+
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, imin+1<=imax, imax<=latRange,
+//    0<=imin, jmin+1<=jmax, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmin+1<=jmax,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <t[PHI1].lat-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <t[PHI1].lon-R-EXACT-{PHI1==k, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  <contrib[PHI1][PHI2]-R-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  <contrib[PHI1][PHI2]-W-MAY-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        do {
+                           data_t tmp = tmp*tmp;
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                           contrib[i-imin][j-jmin] = pot*1./(1+2/range*tmp*tmp);
+                        }
+                        while (0);
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  <contrib[PHI1][PHI2]-W-EXACT-{PHI1+imin==0`1`2`3`4`i,
+//    PHI2+jmin==0`1`2`3`4`5`6`j, 0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j, 0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  <contrib[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+imin+1<=imax, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1+1<=imax, imin<=PHI1, PHI2+1<=jmax,
+//    jmin<=PHI2, imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin,
+//    0<=k, k+1<=nb}>
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i, 0<=PHI2,
+//    PHI2+jmin+1<=jmax, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i, PHI2+1<=jmax,
+//    jmin<=PHI2, 0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i,
+//    imax<=latRange, 0<=imin, jmax<=lonRange, 0<=jmin, 0<=k,
+//    k+1<=nb}>
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  <contrib[PHI1][PHI2]-R-EXACT-{PHI1+imin==0`1`2`3`10`11`i,
+//    PHI2+jmin==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  <pt[PHI1][PHI2].pot-R-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-MAY-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                     if (c>0) {
+
+//  <pt[PHI1][PHI2].pot-R-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+//  <pt[PHI1][PHI2].pot-W-EXACT-{PHI1==0`1`2`3`10`11`i,
+//    PHI2==0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j, 0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}>
+
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].status-W-EXACT-{PHI1==0, 0<=k, k+1<=nb}>
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  <config-R-MAY-{}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0}>
+//  <fd-R-EXACT-{}>
+//  <fd[PHI1]-R-MAY-{PHI1==0}>
+//  <fd[PHI1]-W-MAY-{PHI1==0}>
+//  <len-R-EXACT-{}>
+//  <len[PHI1]-W-EXACT-{PHI1==0}>
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+static hs_potential_t * hs_read_towns(FILE *fd, size_t *len, hs_config_t *config)
+{
+   size_t curr = 0;
+   size_t nb = 1;
+
+//  <the_towns-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   hs_potential_t *the_towns = malloc(sizeof(hs_potential_t));
+
+//  <config-R-MAY-{}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0, curr==0, nb==1}>
+//  <the_towns-R-EXACT-{}>
+
+   if (!the_towns) {
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].herrno-W-EXACT-{PHI1==0, curr==0, nb==1}>
+
+      config->herrno = 12;
+      return (void *) 0;
+   }
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+   fputs("begin parsing ...\n", stderr);
+
+//  <config-R-MAY-{}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0}>
+//  <fd-R-EXACT-{}>
+//  <fd[PHI1]-R-MAY-{PHI1==0}>
+//  <fd[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns-R-MAY-{}>
+//  <the_towns-W-MAY-{}>
+//  <the_towns[PHI1].lat-R-MAY-{0<=PHI1, curr<=PHI1}>
+//  <the_towns[PHI1].lat-W-MAY-{0<=PHI1, curr<=PHI1}>
+//  <the_towns[PHI1].lon-R-MAY-{0<=PHI1, curr<=PHI1}>
+//  <the_towns[PHI1].lon-W-MAY-{0<=PHI1, curr<=PHI1}>
+//  <the_towns[PHI1].pot-W-MAY-{0<=PHI1, curr<=PHI1}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+
+   while (!feof(fd)) {
+
+//  <config-R-MAY-{}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0, curr==nb, 0<=curr}>
+//  <the_towns-R-MAY-{}>
+//  <the_towns-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
+
+      if (nb==curr) {
+         nb *= 2;
+
+//  <the_towns-R-EXACT-{}>
+//  <the_towns-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+         the_towns = realloc(the_towns, nb*sizeof(hs_potential_t));
+
+//  <config-R-MAY-{}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0, 2curr==nb, 0<=curr}>
+//  <the_towns-R-EXACT-{}>
+
+         if (!the_towns) {
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].herrno-W-EXACT-{PHI1==0, 2curr==nb, 0<=curr}>
+
+            config->herrno = 12;
+            return (void *) 0;
+         }
+      }
+
+//  <fd-R-EXACT-{}>
+//  <fd[PHI1]-R-MAY-{PHI1==0}>
+//  <fd[PHI1]-W-MAY-{PHI1==0}>
+//  <the_towns-R-EXACT-{}>
+//  <the_towns[PHI1].lat-R-MAY-{PHI1==curr, 0<=curr}>
+//  <the_towns[PHI1].lat-W-MAY-{PHI1==curr, 0<=curr}>
+//  <the_towns[PHI1].lon-R-MAY-{PHI1==curr, 0<=curr}>
+//  <the_towns[PHI1].lon-W-MAY-{PHI1==curr, 0<=curr}>
+//  <the_towns[PHI1].pot-W-MAY-{PHI1==curr, 0<=curr}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &the_towns[curr].lat, &the_towns[curr].lon, &the_towns[curr].pot)!=3) {
+l99999:         ;
+
+//  <fd-R-EXACT-{}>
+//  <fd[PHI1]-R-MAY-{PHI1==0}>
+//  <fd[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+         if (!!feof(fd)) goto _break_2;
+
+//  <fd-R-EXACT-{}>
+//  <fd[PHI1]-R-MAY-{PHI1==0}>
+//  <fd[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+         char c = (char) fgetc(fd);
+         if (c=='\n'||c=='\r'||c=='#') {
+         }
+         else {
+            goto l99999;
+         }
+_break_2:         ;
+      }
+      else {
+
+//  <the_towns-R-EXACT-{}>
+//  <the_towns[PHI1].lat-R-EXACT-{PHI1==curr, 0<=curr}>
+//  <the_towns[PHI1].lat-W-EXACT-{PHI1==curr, 0<=curr}>
+
+         the_towns[curr].lat *= 3.14159265358979323846/180;
+
+//  <the_towns-R-EXACT-{}>
+//  <the_towns[PHI1].lon-R-EXACT-{PHI1==curr, 0<=curr}>
+//  <the_towns[PHI1].lon-W-EXACT-{PHI1==curr, 0<=curr}>
+
+         the_towns[curr].lon *= 3.14159265358979323846/180;
+         ++curr;
+      }
+   }
+
+//  <the_towns-R-EXACT-{}>
+//  <the_towns-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   the_towns = realloc(the_towns, curr*sizeof(hs_potential_t));
+
+//  <config-R-MAY-{}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0, 0<=curr}>
+//  <the_towns-R-EXACT-{}>
+
+   if (!the_towns) {
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].herrno-W-EXACT-{PHI1==0, 0<=curr}>
+
+      config->herrno = 12;
+      return (void *) 0;
+   }
+
+//  <len-R-EXACT-{}>
+//  <len[PHI1]-W-EXACT-{PHI1==0, 0<=curr}>
+
+   *len = curr;
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+   fprintf(stderr, "parsed %zd towns\n", curr);
+
+//  <the_towns-R-EXACT-{}>
+
+   return the_towns;
+}
+
+//  <ap-R-MAY-{}>
+//  <ap[PHI1]-R-MAY-{PHI1==0, opt==4}>
+//  <ap[PHI1]-W-MAY-{PHI1==0, opt==4}>
+//  <config-R-MAY-{}>
+//  <config[PHI1].fid-W-MAY-{PHI1==0, opt==4}>
+//  <config[PHI1].fparam-W-MAY-{PHI1==0, opt==4}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0}>
+//  <func_names[PHI1]-R-MAY-{0<=PHI1, opt==4}>
+//  <opt-R-MAY-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+static int vhs_set_r(hs_config_t *config, hs_option_t opt, va_list *ap)
+{
+   int res = 1;
+
+//  <opt-R-EXACT-{}>
+
+   if (opt==HS_PARSE_ONLY) goto _switch_1_case_HS_PARSE_ONLY;
+
+//  <opt-R-EXACT-{}>
+
+   if (opt==HS_THRESHOLD) goto _switch_1_case_HS_THRESHOLD;
+
+//  <opt-R-EXACT-{}>
+
+   if (opt==HS_LOAD_RAW) goto _switch_1_case_HS_LOAD_RAW;
+
+//  <opt-R-EXACT-{}>
+
+   if (opt==HS_LOAD_PRECOMPUTED) goto _switch_1_case_HS_LOAD_PRECOMPUTED;
+
+//  <opt-R-EXACT-{}>
+
+   if (opt==HS_SMOOTH_FUNC) goto _switch_1_case_HS_SMOOTH_FUNC;
+
+//  <opt-R-EXACT-{}>
+
+   if (opt==HS_MODULE_OPT) goto _switch_1_case_HS_MODULE_OPT;
+
+_switch_1_default:   ;
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+   fprintf(stderr, "[hs_set] unknow option \n");
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_MODULE_OPT:   ;
+   //res = init_module(ap);
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_SMOOTH_FUNC:   ;
+   {
+
+//  <ap-R-EXACT-{}>
+//  <ap[PHI1]-R-EXACT-{PHI1==0, res==1, opt==4}>
+//  <ap[PHI1]-W-EXACT-{PHI1==0, res==1, opt==4}>
+//  <fname-W-EXACT-{}>
+
+      char *fname = va_arg(*ap, char *);
+
+//  <ap-R-EXACT-{}>
+//  <ap[PHI1]-R-EXACT-{PHI1==0, res==1, opt==4}>
+//  <ap[PHI1]-W-EXACT-{PHI1==0, res==1, opt==4}>
+
+      double fparam = va_arg(*ap, double);
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].fparam-W-EXACT-{PHI1==0, res==1, opt==4}>
+
+      config->fparam = fparam;
+      //set_func_inter(fname, fparam);
+      size_t sz;
+      size_t i;
+      hs_list_smoothing(&sz);
+      i = 0;
+l99998:      ;
+      if (!(i<sz)) goto _break_2;
+
+//  <fname-R-EXACT-{}>
+//  <func_names[PHI1]-R-EXACT-{PHI1==i, res==1, opt==4, 0<=i,
+//    i+1<=sz}>
+
+      if (strcmp(func_names[i], fname)==0) goto l99999;
+      i++;
+      goto l99998;
+l99999:      ;
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].fid-W-EXACT-{PHI1==0, res==1, opt==4, 0<=i,
+//    i+1<=sz}>
+
+      config->fid = (smoothing_fun_t) i;
+_break_2:      ;
+
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
+
+      if (i==sz) {
+         res = 0;
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+         fprintf(stderr, "error : unreconized smoothing function \n");
+      }
+   }
+   goto _break_1;
+_switch_1_case_HS_LOAD_PRECOMPUTED:   ;
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_LOAD_RAW:   ;
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_THRESHOLD:   ;
+   goto _break_1;
+_switch_1_case_HS_PARSE_ONLY:   ;
+   res = 0;
+_break_1:   ;
+
+//  <config-R-MAY-{}>
+//  <config[PHI1].herrno-W-MAY-{PHI1==0, res<=0}>
+
+   if (!res)
+
+//  <config-R-EXACT-{}>
+//  <config[PHI1].herrno-W-EXACT-{PHI1==0, res<=0}>
+
+      config->herrno = 22;
+   return res;
+}

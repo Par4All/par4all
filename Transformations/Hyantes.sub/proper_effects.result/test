@@ -1,0 +1,1414 @@
+void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lonRange])
+{
+   size_t i;
+//             <    is read   >: latRange
+//             <    is written>: i
+   for(i = 0; i <= latRange-1; i += 1) {
+      {
+         size_t j;
+//             <    is read   >: latRange lonRange
+//             <    is written>: j
+         for(j = 0; j <= lonRange-1; j += 1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i j latRange lonRange pt[i][j].lat 
+//                               pt[i][j].lon pt[i][j].pot stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            printf("%lf %lf %lf\n", pt[i][j].lon, pt[i][j].lat, pt[i][j].pot);
+      }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: latRange stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      putchar('\n');
+   }
+}
+char * * hs_list_smoothing(size_t *sz)
+{
+   static const size_t names_count = sizeof(func_names)/sizeof(*func_names);
+//             <    is read   >: names_count sz
+//             <    is written>: sz[0]
+   *sz = names_count;
+   /*cast for backward compatibility only*/
+   return (const char **) func_names;
+}
+int hs_set(hs_option_t opt, ...)
+{
+   va_list args;
+//             <    is read   >: args
+//             <    is written>: args
+   va_start(args, opt);
+//             <may be read   >: args func_names[*] stderr stderr[0] 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               hs_list_smoothing:0`names_count
+//             <may be written>: args g_config.fid g_config.fparam 
+//                               g_config.herrno stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: opt
+//             <    is written>: res
+   int res = vhs_set_r(&g_config, opt, &args);
+//             <may be written>: args
+//             <    is read   >: args
+   va_end(args);
+//             <    is read   >: res
+   return res;
+}
+int hs_set_r(hs_config_t *config, hs_option_t opt, ...)
+{
+   va_list args;
+//             <    is read   >: args
+//             <    is written>: args
+   va_start(args, opt);
+//             <may be read   >: args func_names[*] stderr stderr[0] 
+//                               __IO_EFFECTS:LUNS[2] 
+//                               hs_list_smoothing:0`names_count
+//             <may be written>: args config[0].fid config[0].fparam 
+//                               config[0].herrno stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: config opt
+//             <    is written>: res
+   int res = vhs_set_r(config, opt, &args);
+//             <may be written>: args
+//             <    is read   >: args
+   va_end(args);
+//             <    is read   >: res
+   return res;
+}
+hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference)
+{
+//             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &g_config);
+}
+hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
+{
+//             <    is read   >: _resoLat _resoLon
+   if (_resoLat<=0||_resoLon<=0)
+      return (void *) 0;
+
+//             <    is read   >: _resoLon
+//             <    is written>: lonRange
+   size_t lonRange = (size_t) _resoLon;
+//             <    is read   >: _resoLat
+//             <    is written>: latRange
+   size_t latRange = (size_t) _resoLat;
+
+   size_t nb;
+//             <may be read   >: pFileReference[0] stderr[0] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: configuration[0].herrno 
+//                               pFileReference[0] stderr[0] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: configuration pFileReference stderr 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: nb the_towns _MALLOC_EFFECTS:_MALLOC_
+//                               __IO_EFFECTS:LUNS[2]
+   hs_potential_t *the_towns = hs_read_towns(pFileReference, &nb, configuration);
+//             <    is read   >: latRange lonRange 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: plots _MALLOC_EFFECTS:_MALLOC_
+   hs_potential_t (*plots)[latRange][lonRange] = malloc(sizeof(hs_potential_t)*latRange*lonRange);
+//             <    is read   >: plots
+   if (!plots) {
+//             <    is read   >: configuration
+//             <    is written>: configuration[0].herrno
+      configuration->herrno = 12;
+      return (void *) 0;
+   }
+//             <    is read   >: _resoLon visu.MLon visu.mLon
+//             <    is written>: lonStep
+   data_t lonStep = (visu.MLon-visu.mLon)/_resoLon;
+//             <    is read   >: _resoLat visu.MLat visu.mLat
+//             <    is written>: latStep
+   data_t latStep = (visu.MLat-visu.mLat)/_resoLat;
+//             <    is read   >: configuration configuration[0].fparam
+//             <    is written>: range
+   data_t range = (*configuration).fparam;
+   {
+      size_t i;
+//             <    is read   >: latRange
+//             <    is written>: i
+      
+      /* init step: prepare output array */
+      for(i = 0; i <= latRange-1; i += 1) {
+         size_t j;
+//             <    is read   >: latRange lonRange
+//             <    is written>: j
+         for(j = 0; j <= lonRange-1; j += 1) {
+//             <    is read   >: i j latRange lonRange lonStep plots 
+//                               visu.mLon
+//             <    is written>: plots[0][i][j].lon
+            ((*plots)[i])[j].lon = visu.mLon+lonStep*j;
+//             <    is read   >: i j latRange latStep lonRange plots 
+//                               visu.mLat
+//             <    is written>: plots[0][i][j].lat
+            ((*plots)[i])[j].lat = visu.mLat+latStep*i;
+//             <    is read   >: i j latRange lonRange plots
+//             <    is written>: plots[0][i][j].pot
+            ((*plots)[i])[j].pot = 0.;
+         }
+      }
+   }
+//             <    is read   >: lonStep
+//             <    is written>: lonStep
+
+   lonStep *= 3.14159265358979323846/180;
+//             <    is read   >: latStep
+//             <    is written>: latStep
+   latStep *= 3.14159265358979323846/180;
+//             <may be read   >: configuration[0].fid 
+//                               plots[0][*][*].pot stderr stderr[0] 
+//                               the_towns[0][*].lat 
+//                               the_towns[0][*].lon 
+//                               the_towns[0][*].pot 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: configuration[0].status 
+//                               plots[0][*][*].pot stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: configuration latRange latStep 
+//                               lonRange lonStep nb plots range 
+//                               the_towns visu.MLat visu.MLon 
+//                               visu.mLat visu.mLon
+
+   do_run(visu, lonStep, latStep, range, lonRange, latRange, nb, *plots, *((hs_potential_t (*)[nb]) the_towns), configuration);
+//             <    is read   >: the_towns _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(the_towns);
+//             <    is read   >: plots
+   return (hs_potential_t *) plots;
+}
+hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_name, double function_param, hs_coord_t visu, FILE *pFileReference)
+{
+//             <    is written>: config.fid config.fparam 
+//                               config.g_file_serialize 
+//                               config.g_is_raw_data config.herrno 
+//                               config.status config.threshold
+   hs_config_t config = {(void *) 0, 0, 0, 0, 500, 0, 0};
+//             <may be read   >: func_names[*] function_name[*] stderr
+//                               stderr[0] __IO_EFFECTS:LUNS[2] 
+//                               hs_list_smoothing:0`names_count
+//             <may be written>: config.fid config.fparam 
+//                               config.herrno stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: function_name function_param
+   hs_set_r(&config, HS_SMOOTH_FUNC, function_name, function_param);
+//             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: stderr _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &config);
+}
+unsigned long int hs_status()
+{
+//             <    is read   >: g_config.status
+   return g_config.status;
+}
+static void do_run(hs_coord_t visu, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t plots[latRange][lonRange], hs_potential_t the_towns[nb], hs_config_t *configuration)
+{
+//             <    is read   >: configuration configuration[0].fid
+
+/*data_t (*contrib)[latRange][lonRange] = malloc(sizeof(data_t)*latRange*lonRange);
+	if(!contrib) {
+		configuration->herrno=ENOMEM;
+		return;
+	}*/
+
+   if (configuration->fid==F_DISK) goto _switch_1_case_F_DISK;
+//             <    is read   >: configuration configuration[0].fid
+   if (configuration->fid==F_AMORTIZED_DISK) goto _switch_1_case_F_AMORTIZED_DISK;
+//             <    is read   >: configuration configuration[0].fid
+   if (configuration->fid==F_GAUSSIAN) goto _switch_1_case_F_GAUSSIAN;
+//             <    is read   >: configuration configuration[0].fid
+   if (configuration->fid==F_EXPONENTIAL) goto _switch_1_case_F_EXPONENTIAL;
+//             <    is read   >: configuration configuration[0].fid
+   if (configuration->fid==F_PARETO) goto _switch_1_case_F_PARETO;
+_switch_1_default:   ;
+//             <may be read   >: plots[*][*].pot stderr stderr[0] 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
+//             <may be written>: plots[*][*].pot stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: configuration latRange latStep 
+//                               lonRange lonStep nb range visu.mLat 
+//                               visu.mLon
+//             <    is written>: configuration[0].status
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_PARETO:   ;
+//             <may be read   >: plots[*][*].pot stderr stderr[0] 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
+//             <may be written>: plots[*][*].pot stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: configuration latRange latStep 
+//                               lonRange lonStep nb range visu.mLat 
+//                               visu.mLon
+//             <    is written>: configuration[0].status
+   do_run_PARETO(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_EXPONENTIAL:   ;
+//             <may be read   >: plots[*][*].pot stderr stderr[0] 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
+//             <may be written>: plots[*][*].pot stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: configuration latRange latStep 
+//                               lonRange lonStep nb range visu.mLat 
+//                               visu.mLon
+//             <    is written>: configuration[0].status
+   do_run_EXPONENTIAL(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_GAUSSIAN:   ;
+//             <may be read   >: plots[*][*].pot stderr stderr[0] 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
+//             <may be written>: plots[*][*].pot stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: configuration latRange latStep 
+//                               lonRange lonStep nb range visu.mLat 
+//                               visu.mLon
+//             <    is written>: configuration[0].status
+   do_run_GAUSSIAN(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_AMORTIZED_DISK:   ;
+//             <may be read   >: plots[*][*].pot stderr stderr[0] 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
+//             <may be written>: plots[*][*].pot stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: configuration latRange latStep 
+//                               lonRange lonStep nb range visu.mLat 
+//                               visu.mLon
+//             <    is written>: configuration[0].status
+   do_run_AMORTIZED_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_DISK:   ;
+//             <may be read   >: plots[*][*].pot stderr stderr[0] 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lat the_towns[*].lat 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].lon the_towns[*].lon 
+//                               the_towns[*].pot __IO_EFFECTS:LUNS[2]
+//             <may be written>: plots[*][*].pot stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is read   >: configuration latRange latStep 
+//                               lonRange lonStep nb range visu.mLat 
+//                               visu.mLon
+//             <    is written>: configuration[0].status
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+_break_1:   ;
+}
+static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+//             <    is written>: town_sum
+   data_t town_sum = 0.;
+//             <    is written>: total_sum
+   data_t total_sum = 0.;
+//             <    is read   >: config
+//             <    is written>: config[0].status
+   config->status = 0;
+   {
+      size_t k;
+//             <    is read   >: nb
+//             <    is written>: k
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+//             <    is read   >: k t[k].pot
+//             <    is written>: pot
+         data_t pot = t[k].pot;
+//             <    is read   >: nb pot town_sum
+//             <    is written>: town_sum
+         town_sum += pot;
+//             <    is read   >: nb pot
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+//             <    is written>: sum
+            data_t sum = 0.;
+
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmax
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmin
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k latmin nb t[k].lat
+
+            if (latmin>t[k].lat)
+//             <    is read   >: k latmin nb t[k].lat
+//             <    is written>: latmin
+               latmin = 2*t[k].lat-latmin;
+//             <    is read   >: latMin latStep latmin
+//             <    is written>: imin
+            long int imin = floor((latmin-latMin)/latStep);
+//             <    is read   >: latMin latStep latmax
+//             <    is written>: imax
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+//             <    is read   >: imin nb
+
+            if (imin<0)
+//             <    is read   >: nb
+//             <    is written>: imin
+               imin = 0;
+//             <    is read   >: imax latRange nb
+            if (imax>latRange)
+//             <    is read   >: latRange nb
+//             <    is written>: imax
+               imax = latRange;
+//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is written>: deltalon
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmax
+            data_t lonmax = t[k].lon+deltalon;
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmin
+            data_t lonmin = t[k].lon-deltalon;
+//             <    is read   >: lonMin lonStep lonmin
+//             <    is written>: jmin
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+//             <    is read   >: lonMin lonStep lonmax
+//             <    is written>: jmax
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+//             <    is read   >: jmin nb
+
+            if (jmin<0)
+//             <    is read   >: nb
+//             <    is written>: jmin
+               jmin = 0;
+//             <    is read   >: jmax lonRange nb
+            if (jmax>lonRange)
+//             <    is read   >: lonRange nb
+//             <    is written>: jmax
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`4`i
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`4`5`6`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
+//                               k latMin latMin latStep latStep 
+//                               lonMin lonMin lonStep lonStep 
+//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is written>: tmp
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+//             <    is read   >: imax imin jmax jmin nb range tmp
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb pot tmp
+//             <    is written>: contrib[i-imin][j-jmin]
+                           contrib[i-imin][j-jmin] = pot/(1+tmp);
+                        }
+                        while (0);
+//             <    is read   >: contrib[i-imin][j-jmin] 0`1`2`3`4`i 
+//                               imax imin 0`1`2`3`4`5`6`j jmax jmin 
+//                               nb sum
+//             <    is written>: sum
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb
+//             <    is written>: contrib[i-imin][j-jmin]
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+//             <    is read   >: nb sum
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`10`11`i
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`10`11`12`13`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: contrib[i-imin][j-jmin] 
+//                               0`1`2`3`10`11`i imin 
+//                               0`1`2`3`10`11`12`13`j jmin
+//             <    is written>: c
+                     data_t c = contrib[i-imin][j-jmin];
+//             <    is read   >: c imax imin jmax jmin nb
+                     if (c>0) {
+//             <    is read   >: c 0`1`2`3`10`11`i imax imin 
+//                               0`1`2`3`10`11`12`13`j jmax jmin nb 
+//                               pot pt[i][j].pot sum
+//             <    is written>: pt[i][j].pot
+                        pt[i][j].pot += c*pot/sum;
+//             <    is read   >: c imax imin jmax jmin nb pot sum 
+//                               total_sum
+//             <    is written>: total_sum
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+//             <    is read   >: config k nb
+//             <    is written>: config[0].status
+         config->status = (unsigned long int) k;
+      }
+   }
+//             <    is read   >: total_sum town_sum
+
+   if (fabs(town_sum-total_sum)>0.0001)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+//             <    is written>: town_sum
+   data_t town_sum = 0.;
+//             <    is written>: total_sum
+   data_t total_sum = 0.;
+//             <    is read   >: config
+//             <    is written>: config[0].status
+   config->status = 0;
+   {
+      size_t k;
+//             <    is read   >: nb
+//             <    is written>: k
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+//             <    is read   >: k t[k].pot
+//             <    is written>: pot
+         data_t pot = t[k].pot;
+//             <    is read   >: nb pot town_sum
+//             <    is written>: town_sum
+         town_sum += pot;
+//             <    is read   >: nb pot
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+//             <    is written>: sum
+            data_t sum = 0.;
+
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmax
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmin
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k latmin nb t[k].lat
+
+            if (latmin>t[k].lat)
+//             <    is read   >: k latmin nb t[k].lat
+//             <    is written>: latmin
+               latmin = 2*t[k].lat-latmin;
+//             <    is read   >: latMin latStep latmin
+//             <    is written>: imin
+            long int imin = floor((latmin-latMin)/latStep);
+//             <    is read   >: latMin latStep latmax
+//             <    is written>: imax
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+//             <    is read   >: imin nb
+
+            if (imin<0)
+//             <    is read   >: nb
+//             <    is written>: imin
+               imin = 0;
+//             <    is read   >: imax latRange nb
+            if (imax>latRange)
+//             <    is read   >: latRange nb
+//             <    is written>: imax
+               imax = latRange;
+//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is written>: deltalon
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmax
+            data_t lonmax = t[k].lon+deltalon;
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmin
+            data_t lonmin = t[k].lon-deltalon;
+//             <    is read   >: lonMin lonStep lonmin
+//             <    is written>: jmin
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+//             <    is read   >: lonMin lonStep lonmax
+//             <    is written>: jmax
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+//             <    is read   >: jmin nb
+
+            if (jmin<0)
+//             <    is read   >: nb
+//             <    is written>: jmin
+               jmin = 0;
+//             <    is read   >: jmax lonRange nb
+            if (jmax>lonRange)
+//             <    is read   >: lonRange nb
+//             <    is written>: jmax
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`4`i
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`4`5`6`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
+//                               k latMin latMin latStep latStep 
+//                               lonMin lonMin lonStep lonStep 
+//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is written>: tmp
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+//             <    is read   >: imax imin jmax jmin nb range tmp
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb pot
+//             <    is written>: contrib[i-imin][j-jmin]
+                           contrib[i-imin][j-jmin] = pot;
+                        }
+                        while (0);
+//             <    is read   >: contrib[i-imin][j-jmin] 0`1`2`3`4`i 
+//                               imax imin 0`1`2`3`4`5`6`j jmax jmin 
+//                               nb sum
+//             <    is written>: sum
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb
+//             <    is written>: contrib[i-imin][j-jmin]
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+//             <    is read   >: nb sum
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`10`11`i
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`10`11`12`13`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: contrib[i-imin][j-jmin] 
+//                               0`1`2`3`10`11`i imin 
+//                               0`1`2`3`10`11`12`13`j jmin
+//             <    is written>: c
+                     data_t c = contrib[i-imin][j-jmin];
+//             <    is read   >: c imax imin jmax jmin nb
+                     if (c>0) {
+//             <    is read   >: c 0`1`2`3`10`11`i imax imin 
+//                               0`1`2`3`10`11`12`13`j jmax jmin nb 
+//                               pot pt[i][j].pot sum
+//             <    is written>: pt[i][j].pot
+                        pt[i][j].pot += c*pot/sum;
+//             <    is read   >: c imax imin jmax jmin nb pot sum 
+//                               total_sum
+//             <    is written>: total_sum
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+//             <    is read   >: config k nb
+//             <    is written>: config[0].status
+         config->status = (unsigned long int) k;
+      }
+   }
+//             <    is read   >: total_sum town_sum
+
+   if (fabs(town_sum-total_sum)>0.0001)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+//             <    is written>: town_sum
+   data_t town_sum = 0.;
+//             <    is written>: total_sum
+   data_t total_sum = 0.;
+//             <    is read   >: config
+//             <    is written>: config[0].status
+   config->status = 0;
+   {
+      size_t k;
+//             <    is read   >: nb
+//             <    is written>: k
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+//             <    is read   >: k t[k].pot
+//             <    is written>: pot
+         data_t pot = t[k].pot;
+//             <    is read   >: nb pot town_sum
+//             <    is written>: town_sum
+         town_sum += pot;
+//             <    is read   >: nb pot
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+//             <    is written>: sum
+            data_t sum = 0.;
+
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmax
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmin
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k latmin nb t[k].lat
+
+            if (latmin>t[k].lat)
+//             <    is read   >: k latmin nb t[k].lat
+//             <    is written>: latmin
+               latmin = 2*t[k].lat-latmin;
+//             <    is read   >: latMin latStep latmin
+//             <    is written>: imin
+            long int imin = floor((latmin-latMin)/latStep);
+//             <    is read   >: latMin latStep latmax
+//             <    is written>: imax
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+//             <    is read   >: imin nb
+
+            if (imin<0)
+//             <    is read   >: nb
+//             <    is written>: imin
+               imin = 0;
+//             <    is read   >: imax latRange nb
+            if (imax>latRange)
+//             <    is read   >: latRange nb
+//             <    is written>: imax
+               imax = latRange;
+//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is written>: deltalon
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmax
+            data_t lonmax = t[k].lon+deltalon;
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmin
+            data_t lonmin = t[k].lon-deltalon;
+//             <    is read   >: lonMin lonStep lonmin
+//             <    is written>: jmin
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+//             <    is read   >: lonMin lonStep lonmax
+//             <    is written>: jmax
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+//             <    is read   >: jmin nb
+
+            if (jmin<0)
+//             <    is read   >: nb
+//             <    is written>: jmin
+               jmin = 0;
+//             <    is read   >: jmax lonRange nb
+            if (jmax>lonRange)
+//             <    is read   >: lonRange nb
+//             <    is written>: jmax
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`4`i
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`4`5`6`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
+//                               k latMin latMin latStep latStep 
+//                               lonMin lonMin lonStep lonStep 
+//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is written>: tmp
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+//             <    is read   >: imax imin jmax jmin nb range tmp
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb pot range tmp
+//             <    is written>: contrib[i-imin][j-jmin]
+                           contrib[i-imin][j-jmin] = pot*exp(-(2./range)*tmp);
+                        }
+                        while (0);
+//             <    is read   >: contrib[i-imin][j-jmin] 0`1`2`3`4`i 
+//                               imax imin 0`1`2`3`4`5`6`j jmax jmin 
+//                               nb sum
+//             <    is written>: sum
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb
+//             <    is written>: contrib[i-imin][j-jmin]
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+//             <    is read   >: nb sum
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`10`11`i
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`10`11`12`13`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: contrib[i-imin][j-jmin] 
+//                               0`1`2`3`10`11`i imin 
+//                               0`1`2`3`10`11`12`13`j jmin
+//             <    is written>: c
+                     data_t c = contrib[i-imin][j-jmin];
+//             <    is read   >: c imax imin jmax jmin nb
+                     if (c>0) {
+//             <    is read   >: c 0`1`2`3`10`11`i imax imin 
+//                               0`1`2`3`10`11`12`13`j jmax jmin nb 
+//                               pot pt[i][j].pot sum
+//             <    is written>: pt[i][j].pot
+                        pt[i][j].pot += c*pot/sum;
+//             <    is read   >: c imax imin jmax jmin nb pot sum 
+//                               total_sum
+//             <    is written>: total_sum
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+//             <    is read   >: config k nb
+//             <    is written>: config[0].status
+         config->status = (unsigned long int) k;
+      }
+   }
+//             <    is read   >: total_sum town_sum
+
+   if (fabs(town_sum-total_sum)>0.0001)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+//             <    is written>: town_sum
+   data_t town_sum = 0.;
+//             <    is written>: total_sum
+   data_t total_sum = 0.;
+//             <    is read   >: config
+//             <    is written>: config[0].status
+   config->status = 0;
+   {
+      size_t k;
+//             <    is read   >: nb
+//             <    is written>: k
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+//             <    is read   >: k t[k].pot
+//             <    is written>: pot
+         data_t pot = t[k].pot;
+//             <    is read   >: nb pot town_sum
+//             <    is written>: town_sum
+         town_sum += pot;
+//             <    is read   >: nb pot
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+//             <    is written>: sum
+            data_t sum = 0.;
+
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmax
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmin
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k latmin nb t[k].lat
+
+            if (latmin>t[k].lat)
+//             <    is read   >: k latmin nb t[k].lat
+//             <    is written>: latmin
+               latmin = 2*t[k].lat-latmin;
+//             <    is read   >: latMin latStep latmin
+//             <    is written>: imin
+            long int imin = floor((latmin-latMin)/latStep);
+//             <    is read   >: latMin latStep latmax
+//             <    is written>: imax
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+//             <    is read   >: imin nb
+
+            if (imin<0)
+//             <    is read   >: nb
+//             <    is written>: imin
+               imin = 0;
+//             <    is read   >: imax latRange nb
+            if (imax>latRange)
+//             <    is read   >: latRange nb
+//             <    is written>: imax
+               imax = latRange;
+//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is written>: deltalon
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmax
+            data_t lonmax = t[k].lon+deltalon;
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmin
+            data_t lonmin = t[k].lon-deltalon;
+//             <    is read   >: lonMin lonStep lonmin
+//             <    is written>: jmin
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+//             <    is read   >: lonMin lonStep lonmax
+//             <    is written>: jmax
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+//             <    is read   >: jmin nb
+
+            if (jmin<0)
+//             <    is read   >: nb
+//             <    is written>: jmin
+               jmin = 0;
+//             <    is read   >: jmax lonRange nb
+            if (jmax>lonRange)
+//             <    is read   >: lonRange nb
+//             <    is written>: jmax
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`4`i
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`4`5`6`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
+//                               k latMin latMin latStep latStep 
+//                               lonMin lonMin lonStep lonStep 
+//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is written>: tmp
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+//             <    is read   >: imax imin jmax jmin nb range tmp
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb pot range tmp
+//             <    is written>: contrib[i-imin][j-jmin]
+                           contrib[i-imin][j-jmin] = pot*exp(-(3.14159265358979323846/(4.*range*range))*tmp*tmp);
+                        }
+                        while (0);
+//             <    is read   >: contrib[i-imin][j-jmin] 0`1`2`3`4`i 
+//                               imax imin 0`1`2`3`4`5`6`j jmax jmin 
+//                               nb sum
+//             <    is written>: sum
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb
+//             <    is written>: contrib[i-imin][j-jmin]
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+//             <    is read   >: nb sum
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`10`11`i
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`10`11`12`13`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: contrib[i-imin][j-jmin] 
+//                               0`1`2`3`10`11`i imin 
+//                               0`1`2`3`10`11`12`13`j jmin
+//             <    is written>: c
+                     data_t c = contrib[i-imin][j-jmin];
+//             <    is read   >: c imax imin jmax jmin nb
+                     if (c>0) {
+//             <    is read   >: c 0`1`2`3`10`11`i imax imin 
+//                               0`1`2`3`10`11`12`13`j jmax jmin nb 
+//                               pot pt[i][j].pot sum
+//             <    is written>: pt[i][j].pot
+                        pt[i][j].pot += c*pot/sum;
+//             <    is read   >: c imax imin jmax jmin nb pot sum 
+//                               total_sum
+//             <    is written>: total_sum
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+//             <    is read   >: config k nb
+//             <    is written>: config[0].status
+         config->status = (unsigned long int) k;
+      }
+   }
+//             <    is read   >: total_sum town_sum
+
+   if (fabs(town_sum-total_sum)>0.0001)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+//             <    is written>: town_sum
+   data_t town_sum = 0.;
+//             <    is written>: total_sum
+   data_t total_sum = 0.;
+//             <    is read   >: config
+//             <    is written>: config[0].status
+   config->status = 0;
+   {
+      size_t k;
+//             <    is read   >: nb
+//             <    is written>: k
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+//             <    is read   >: k t[k].pot
+//             <    is written>: pot
+         data_t pot = t[k].pot;
+//             <    is read   >: nb pot town_sum
+//             <    is written>: town_sum
+         town_sum += pot;
+//             <    is read   >: nb pot
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+//             <    is written>: sum
+            data_t sum = 0.;
+
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmax
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k k range range t[k].lat t[k].lat
+//             <    is written>: latmin
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+//             <    is read   >: k latmin nb t[k].lat
+
+            if (latmin>t[k].lat)
+//             <    is read   >: k latmin nb t[k].lat
+//             <    is written>: latmin
+               latmin = 2*t[k].lat-latmin;
+//             <    is read   >: latMin latStep latmin
+//             <    is written>: imin
+            long int imin = floor((latmin-latMin)/latStep);
+//             <    is read   >: latMin latStep latmax
+//             <    is written>: imax
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+//             <    is read   >: imin nb
+
+            if (imin<0)
+//             <    is read   >: nb
+//             <    is written>: imin
+               imin = 0;
+//             <    is read   >: imax latRange nb
+            if (imax>latRange)
+//             <    is read   >: latRange nb
+//             <    is written>: imax
+               imax = latRange;
+//             <    is read   >: k k range t[k].lat t[k].lat
+//             <    is written>: deltalon
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmax
+            data_t lonmax = t[k].lon+deltalon;
+//             <    is read   >: deltalon k t[k].lon
+//             <    is written>: lonmin
+            data_t lonmin = t[k].lon-deltalon;
+//             <    is read   >: lonMin lonStep lonmin
+//             <    is written>: jmin
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+//             <    is read   >: lonMin lonStep lonmax
+//             <    is written>: jmax
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+//             <    is read   >: jmin nb
+
+            if (jmin<0)
+//             <    is read   >: nb
+//             <    is written>: jmin
+               jmin = 0;
+//             <    is read   >: jmax lonRange nb
+            if (jmax>lonRange)
+//             <    is read   >: lonRange nb
+//             <    is written>: jmax
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`4`i
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`4`5`6`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: 0`1`2`3`4`i 0`1`2`3`4`i 
+//                               0`1`2`3`4`5`6`j 0`1`2`3`4`5`6`j k k k
+//                               k latMin latMin latStep latStep 
+//                               lonMin lonMin lonStep lonStep 
+//                               t[k].lat t[k].lat t[k].lon t[k].lon
+//             <    is written>: 0`1`2`3`4`5`6`7`tmp
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+//             <    is read   >: imax imin jmax jmin nb range 
+//                               0`1`2`3`4`5`6`7`tmp
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+//             <    is read   >: 0`1`2`3`4`5`6`7`8`9`tmp 
+//                               0`1`2`3`4`5`6`7`8`9`tmp
+//             <    is written>: 0`1`2`3`4`5`6`7`8`9`tmp
+                           data_t tmp = tmp*tmp;
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb pot range 
+//                               0`1`2`3`4`5`6`7`8`9`tmp
+//             <    is written>: contrib[i-imin][j-jmin]
+                           contrib[i-imin][j-jmin] = pot*1./(1+2/range*tmp*tmp);
+                        }
+                        while (0);
+//             <    is read   >: contrib[i-imin][j-jmin] 0`1`2`3`4`i 
+//                               imax imin 0`1`2`3`4`5`6`j jmax jmin 
+//                               nb sum
+//             <    is written>: sum
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+//             <    is read   >: 0`1`2`3`4`i imax imin 0`1`2`3`4`5`6`j
+//                               jmax jmin nb
+//             <    is written>: contrib[i-imin][j-jmin]
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+//             <    is read   >: nb sum
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+//             <    is read   >: imax imin nb
+//             <    is written>: 0`1`2`3`10`11`i
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+//             <    is read   >: imax imin jmax jmin nb
+//             <    is written>: 0`1`2`3`10`11`12`13`j
+                  for(j = jmin; j <= jmax-1; j += 1) {
+//             <    is read   >: contrib[i-imin][j-jmin] 
+//                               0`1`2`3`10`11`i imin 
+//                               0`1`2`3`10`11`12`13`j jmin
+//             <    is written>: c
+                     data_t c = contrib[i-imin][j-jmin];
+//             <    is read   >: c imax imin jmax jmin nb
+                     if (c>0) {
+//             <    is read   >: c 0`1`2`3`10`11`i imax imin 
+//                               0`1`2`3`10`11`12`13`j jmax jmin nb 
+//                               pot pt[i][j].pot sum
+//             <    is written>: pt[i][j].pot
+                        pt[i][j].pot += c*pot/sum;
+//             <    is read   >: c imax imin jmax jmin nb pot sum 
+//                               total_sum
+//             <    is written>: total_sum
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+//             <    is read   >: config k nb
+//             <    is written>: config[0].status
+         config->status = (unsigned long int) k;
+      }
+   }
+//             <    is read   >: total_sum town_sum
+
+   if (fabs(town_sum-total_sum)>0.0001)
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static hs_potential_t * hs_read_towns(FILE *fd, size_t *len, hs_config_t *config)
+{
+//             <    is written>: curr
+   size_t curr = 0;
+//             <    is written>: nb
+   size_t nb = 1;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns _MALLOC_EFFECTS:_MALLOC_
+   hs_potential_t *the_towns = malloc(sizeof(hs_potential_t));
+//             <    is read   >: the_towns
+   if (!the_towns) {
+//             <    is read   >: config
+//             <    is written>: config[0].herrno
+      config->herrno = 12;
+      return (void *) 0;
+   }
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fputs("begin parsing ...\n", stderr);
+//             <may be read   >: fd[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fd[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+
+   while (!feof(fd)) {
+//             <    is read   >: curr nb
+      if (nb==curr) {
+//             <    is read   >: nb
+//             <    is written>: nb
+         nb *= 2;
+//             <    is read   >: nb the_towns _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns _MALLOC_EFFECTS:_MALLOC_
+         the_towns = realloc(the_towns, nb*sizeof(hs_potential_t));
+//             <    is read   >: the_towns
+         if (!the_towns) {
+//             <    is read   >: config
+//             <    is written>: config[0].herrno
+            config->herrno = 12;
+            return (void *) 0;
+         }
+      }
+//             <may be read   >: fd[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fd[0] the_towns[curr].lat 
+//                               the_towns[curr].lon 
+//                               the_towns[curr].pot 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: curr fd the_towns
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &the_towns[curr].lat, &the_towns[curr].lon, &the_towns[curr].pot)!=3) {
+l99999:         ;
+//             <may be read   >: fd[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fd[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+         if (!!feof(fd)) goto _break_2;
+//             <may be read   >: fd[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fd[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fd
+//             <    is written>: c
+         char c = (char) fgetc(fd);
+//             <    is read   >: c
+         if (c=='\n'||c=='\r'||c=='#') {
+         }
+         else {
+            goto l99999;
+         }
+_break_2:         ;
+      }
+      else {
+//             <    is read   >: curr the_towns the_towns[curr].lat
+//             <    is written>: the_towns[curr].lat
+         the_towns[curr].lat *= 3.14159265358979323846/180;
+//             <    is read   >: curr the_towns the_towns[curr].lon
+//             <    is written>: the_towns[curr].lon
+         the_towns[curr].lon *= 3.14159265358979323846/180;
+//             <    is read   >: curr
+//             <    is written>: curr
+         ++curr;
+      }
+   }
+//             <    is read   >: curr the_towns 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: the_towns _MALLOC_EFFECTS:_MALLOC_
+   the_towns = realloc(the_towns, curr*sizeof(hs_potential_t));
+//             <    is read   >: the_towns
+   if (!the_towns) {
+//             <    is read   >: config
+//             <    is written>: config[0].herrno
+      config->herrno = 12;
+      return (void *) 0;
+   }
+//             <    is read   >: curr len
+//             <    is written>: len[0]
+   *len = curr;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: curr stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "parsed %zd towns\n", curr);
+//             <    is read   >: the_towns
+   return the_towns;
+}
+static int vhs_set_r(hs_config_t *config, hs_option_t opt, va_list *ap)
+{
+//             <    is written>: res
+   int res = 1;
+//             <    is read   >: opt
+   if (opt==HS_PARSE_ONLY) goto _switch_1_case_HS_PARSE_ONLY;
+//             <    is read   >: opt
+   if (opt==HS_THRESHOLD) goto _switch_1_case_HS_THRESHOLD;
+//             <    is read   >: opt
+   if (opt==HS_LOAD_RAW) goto _switch_1_case_HS_LOAD_RAW;
+//             <    is read   >: opt
+   if (opt==HS_LOAD_PRECOMPUTED) goto _switch_1_case_HS_LOAD_PRECOMPUTED;
+//             <    is read   >: opt
+   if (opt==HS_SMOOTH_FUNC) goto _switch_1_case_HS_SMOOTH_FUNC;
+//             <    is read   >: opt
+   if (opt==HS_MODULE_OPT) goto _switch_1_case_HS_MODULE_OPT;
+
+_switch_1_default:   ;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   fprintf(stderr, "[hs_set] unknow option \n");
+//             <    is written>: res
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_MODULE_OPT:   ;
+//             <    is written>: res
+   //res = init_module(ap);
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_SMOOTH_FUNC:   ;
+   {
+//             <    is read   >: ap ap ap[0]
+//             <    is written>: ap[0] fname
+      char *fname = va_arg(*ap, char *);
+//             <    is read   >: ap ap ap[0]
+//             <    is written>: ap[0] fparam
+      double fparam = va_arg(*ap, double);
+//             <    is read   >: config fparam
+//             <    is written>: config[0].fparam
+      config->fparam = fparam;
+      //set_func_inter(fname, fparam);
+      size_t sz;
+      size_t i;
+//             <    is read   >: hs_list_smoothing:0`names_count
+//             <    is written>: sz
+      hs_list_smoothing(&sz);
+//             <    is written>: i
+      i = 0;
+l99998:      ;
+//             <    is read   >: i sz
+      if (!(i<sz)) goto _break_2;
+//             <    is read   >: fname func_names[i] i
+      if (strcmp(func_names[i], fname)==0) goto l99999;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+      goto l99998;
+l99999:      ;
+//             <    is read   >: config i
+//             <    is written>: config[0].fid
+      config->fid = (smoothing_fun_t) i;
+_break_2:      ;
+//             <    is read   >: i sz
+      if (i==sz) {
+//             <    is written>: res
+         res = 0;
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+         fprintf(stderr, "error : unreconized smoothing function \n");
+      }
+   }
+   goto _break_1;
+_switch_1_case_HS_LOAD_PRECOMPUTED:   ;
+//             <    is written>: res
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_LOAD_RAW:   ;
+//             <    is written>: res
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_THRESHOLD:   ;
+   goto _break_1;
+_switch_1_case_HS_PARSE_ONLY:   ;
+//             <    is written>: res
+   res = 0;
+_break_1:   ;
+//             <    is read   >: res
+   if (!res)
+//             <    is read   >: config
+//             <    is written>: config[0].herrno
+      config->herrno = 22;
+//             <    is read   >: res
+   return res;
+}
