@@ -94,6 +94,11 @@ static atomic_profile load_atomic_profile() {
 }
 
 
+typedef enum {
+  DO_REPLACE,
+  DO_NOT_REPLACE,
+  USE_OPENMP
+} process_reductions_mode;
 /**
  * Keep track of what is done in replace recursion
  */
@@ -286,9 +291,9 @@ static bool process_reductions_in_loop(statement loop_stat,
     loop l = statement_loop(loop_stat);
 //    reduction_reference(r);
     reductions rs = (reductions)load_statement_reductions(loop_stat);
-    if(rs && !ENDP(reductions_list(rs))) {
+    if(rs && !ENDP(reductions_list(rs)) ) { 
       pips_debug(1,"Loop has a reduction ! Let's replace reductions inside\n");
-      struct replace_ctx ctx = { replace,false,false,profile,replaced_statements };
+      struct replace_ctx ctx = { replace, false, false, profile, replaced_statements };
       gen_context_recurse(l,
                           &ctx,
                           statement_domain,
@@ -311,8 +316,17 @@ static bool process_reductions_in_loop(statement loop_stat,
   return ret;
 }
 
+static bool process_reductions_in_openmp_loop(statement st) {
+  pips_assert("in a loop", statement_loop_p(st));
+  loop l = statement_loop(st);
+  bool ret = false;
+  if ((ret=!omp_pragma_expr_for_reduction (l, st, false)))
+    ret=omp_pragma_expr_for (l, st);
+  return ret;
+}
 
-static bool process_reduced_loops(string mod_name, bool replace) {
+
+static bool process_reduced_loops(const char *mod_name, process_reductions_mode mode) {
   atomic_profile current_profile = load_atomic_profile();
   if(!current_profile.profile && current_profile.profile_size) {
     return false;
@@ -327,6 +341,10 @@ static bool process_reduced_loops(string mod_name, bool replace) {
       (pstatement_reductions)db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,
                                                     mod_name,
                                                     true));
+  set_printed_reductions(
+      (pstatement_reductions)db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,
+                                                    mod_name,
+                                                    true));
 
   // Load targeted loops, those that need reductions to be parallel !
   reduced_loops loops = (reduced_loops)db_get_memory_resource(DBR_REDUCTION_PARALLEL_LOOPS,
@@ -336,7 +354,17 @@ static bool process_reduced_loops(string mod_name, bool replace) {
   set_ordering_to_statement(module_stat);
   FOREACH(int, ordering, reduced_loops_ordering(loops)) {
     statement s = ordering_to_statement(ordering);
-    process_reductions_in_loop(s,&current_profile,&replaced_statements,replace);
+      switch(mode) {
+        case DO_REPLACE:
+          process_reductions_in_loop(s,&current_profile,&replaced_statements, true);
+          break;
+        case DO_NOT_REPLACE:
+          process_reductions_in_loop(s,&current_profile,&replaced_statements, false);
+          break;
+        case USE_OPENMP:
+          process_reductions_in_openmp_loop(s);
+          break;
+      }
   }
   reset_ordering_to_statement();
 
@@ -354,6 +382,7 @@ static bool process_reduced_loops(string mod_name, bool replace) {
        compute_callees(get_current_module_statement()));
 
   reset_statement_reductions();
+  reset_printed_reductions();
   reset_current_module_entity();
   reset_current_module_statement();
   return true;
@@ -366,7 +395,7 @@ static bool process_reduced_loops(string mod_name, bool replace) {
 bool replace_reduction_with_atomic( string mod_name) {
   debug_on("REPLACE_REDUCTION_WITH_ATOMIC_DEBUG_LEVEL");
 
-  bool result = process_reduced_loops(mod_name,true);
+  bool result = process_reduced_loops(mod_name, DO_REPLACE);
 
   debug_off();
 
@@ -380,7 +409,22 @@ bool replace_reduction_with_atomic( string mod_name) {
 bool flag_parallel_reduced_loops_with_atomic( string mod_name) {
   debug_on("FLAG_PARALLEL_REDUCED_LOOPS_WITH_ATOMIC_DEBUG_LEVEL");
 
-  bool result = process_reduced_loops(mod_name,false);
+  bool result = process_reduced_loops(mod_name, DO_NOT_REPLACE);
+
+  debug_off();
+
+  return result;
+
+}
+
+/**
+ * Flag loop as parallel with OpenMP directives taking reductions into
+ * account
+ */
+bool flag_parallel_reduced_loops_with_openmp_directives(const char * mod_name) {
+  debug_on("FLAG_PARALLEL_REDUCED_LOOPS_WITH_ATOMIC_DEBUG_LEVEL");
+
+  bool result = process_reduced_loops(mod_name, USE_OPENMP);
 
   debug_off();
 

@@ -24,9 +24,6 @@ static bool all_reduction = false;
 ///@brief reset the all_reduction flag
 static void reset_all_reduction (void) {
   all_reduction = true;
-#ifdef HAVE_CONFIG_H
-    #include "pips_config.h"
-#endif
 }
 
 ///@return true if the statement is a reduction
@@ -239,7 +236,8 @@ void reductions_pragma_omp_end (void) {
 //to return
 //@param l, the loop associated with the statement
 //@param stmt, the statement to analyzed for reductions, must be a loop
-list reductions_get_omp_pragma_expr (loop l, statement stmt) {
+//@param srict, when set to true, only loop with one statement are considered
+list reductions_get_omp_pragma_expr (loop l, statement stmt, bool strict) {
   list exprs = NIL;
   // check that reduction as been detected at loop level
   if  (statement_is_reduction (stmt) == true) {
@@ -251,8 +249,9 @@ list reductions_get_omp_pragma_expr (loop l, statement stmt) {
       // check that all the statements of the loop are reductions otherwise, do
       // not generate omp reduction pragma
       // the test is too restrictive so need to be improved
-      gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
-      if (all_reduction == true) {
+      if(strict)
+          gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
+      if (all_reduction) {
 				reductions rs = load_printed_reductions(stmt);
 				FOREACH (REDUCTION, red, reductions_list(rs)) {
 				  exprs = gen_expression_cons (reduction_as_expr (red), exprs);
@@ -299,4 +298,55 @@ string reductions_get_omp_pragma_str (loop l, statement stmt) {
   pips_debug(5, "finish with pragma: %s\n", result);
   string_buffer_free_all (&buf);
   return result;
+}
+
+///@return the new pragma
+///@param l, the loop to analyze for omp reduction
+///@param exprs, the pragma as a list of expression
+static list omp_append_private_clause (loop l, list exprs) {
+  // the private variables as a list of entites
+  list private = loop_private_variables_as_entites (l, true, true);
+  // add private clause if needed
+  if (gen_length (private) != 0) {
+    expression expr_private  = pragma_private_as_expr (private);
+    exprs = gen_expression_cons (expr_private, exprs);
+  }
+  return exprs;
+}
+
+/// @brief generate pragma for a reduction as a list of expressions
+/// @return true if a pragma has been generated
+/// @param l, the loop to analyze for omp reduction
+/// @param stmt, the statament where the pragma should be attached
+/// @param strict, if set to true, only one-liner statements with reductions are handled
+bool omp_pragma_expr_for_reduction (loop l, statement stmt, bool strict) {
+  // the list of expression to generate
+  list exprs = NULL;
+  exprs = reductions_get_omp_pragma_expr(l, stmt, strict);
+  // insert the pragma (if any) as an expression to the current statement
+  if (exprs != NULL) {
+    // check if a private clause is needed on top of the reduction clause
+    exprs = omp_append_private_clause (l, exprs);
+    add_pragma_expr_to_statement (stmt, exprs);
+    pips_debug (5, "new reduction pragma as an extension added\n");
+  }
+  return (exprs != NULL);
+}
+
+/// @brief generate "pragma omp for" as a list of expressions
+/// @return true if a pragma has been generated
+/// @param l, the loop to analyze for omp for
+/// @param stmt, the statament where the pragma should be attached
+bool omp_pragma_expr_for (loop l, statement stmt) {
+  list exprs = NULL;
+  if (execution_parallel_p(loop_execution(l))) {
+    // the list of expression to generate initialized with
+    // pragma "omp parallel for"
+    list exprs = pragma_omp_parallel_for_as_exprs ();
+    exprs = omp_append_private_clause (l, exprs);
+    // insert the pragma as an expression to the current statement
+    add_pragma_expr_to_statement (stmt, exprs);
+    pips_debug (5, "new for pragma as an extension added\n");
+  }
+  return (exprs != NULL);
 }
