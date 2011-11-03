@@ -1,0 +1,645 @@
+void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lonRange])
+{
+   size_t i;
+   for(i = 0; i <= latRange-1; i += 1) {
+      {
+         size_t j;
+         for(j = 0; j <= lonRange-1; j += 1)
+            printf("%lf %lf %lf\n", pt[i][j].lon, pt[i][j].lat, pt[i][j].pot);
+      }
+      putchar('\n');
+   }
+}
+char * * hs_list_smoothing(size_t *sz)
+{
+   static const size_t names_count = sizeof(func_names)/sizeof(*func_names);
+   *sz = names_count;
+   /*cast for backward compatibility only*/
+   return (const char **) func_names;
+}
+int hs_set(hs_option_t opt, ...)
+{
+   va_list args;
+   va_start(args, opt);
+   int res = vhs_set_r(&g_config, opt, &args);
+   va_end(args);
+   return res;
+}
+int hs_set_r(hs_config_t *config, hs_option_t opt, ...)
+{
+   va_list args;
+   va_start(args, opt);
+   int res = vhs_set_r(config, opt, &args);
+   va_end(args);
+   return res;
+}
+hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference)
+{
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &g_config);
+}
+hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
+{
+   if (_resoLat<=0||_resoLon<=0)
+      return (void *) 0;
+
+   size_t lonRange = (size_t) _resoLon;
+   size_t latRange = (size_t) _resoLat;
+
+   size_t nb;
+   hs_potential_t *the_towns = hs_read_towns(pFileReference, &nb, configuration);
+   hs_potential_t (*plots)[latRange][lonRange] = malloc(sizeof(hs_potential_t)*latRange*lonRange);
+   if (!plots) {
+      configuration->herrno = 12;
+      return (void *) 0;
+   }
+   data_t lonStep = (visu.MLon-visu.mLon)/_resoLon;
+   data_t latStep = (visu.MLat-visu.mLat)/_resoLat;
+   data_t range = (*configuration).fparam;
+   {
+      size_t i;
+      
+      /* init step: prepare output array */
+      for(i = 0; i <= latRange-1; i += 1) {
+         size_t j;
+         for(j = 0; j <= lonRange-1; j += 1) {
+            ((*plots)[i])[j].lon = visu.mLon+lonStep*j;
+            ((*plots)[i])[j].lat = visu.mLat+latStep*i;
+            ((*plots)[i])[j].pot = 0.;
+         }
+      }
+   }
+
+   lonStep *= 3.14159265358979323846/180;
+   latStep *= 3.14159265358979323846/180;
+
+   do_run(visu, lonStep, latStep, range, lonRange, latRange, nb, *plots, *((hs_potential_t (*)[nb]) the_towns), configuration);
+   free(the_towns);
+   return (hs_potential_t *) plots;
+}
+hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_name, double function_param, hs_coord_t visu, FILE *pFileReference)
+{
+   hs_config_t config = {(void *) 0, 0, 0, 0, 500, 0, 0};
+   hs_set_r(&config, HS_SMOOTH_FUNC, function_name, function_param);
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &config);
+}
+unsigned long int hs_status()
+{
+   return g_config.status;
+}
+static void do_run(hs_coord_t visu, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t plots[latRange][lonRange], hs_potential_t the_towns[nb], hs_config_t *configuration)
+{
+
+/*data_t (*contrib)[latRange][lonRange] = malloc(sizeof(data_t)*latRange*lonRange);
+	if(!contrib) {
+		configuration->herrno=ENOMEM;
+		return;
+	}*/
+
+   if (configuration->fid==F_DISK) goto _switch_1_case_F_DISK;
+   if (configuration->fid==F_AMORTIZED_DISK) goto _switch_1_case_F_AMORTIZED_DISK;
+   if (configuration->fid==F_GAUSSIAN) goto _switch_1_case_F_GAUSSIAN;
+   if (configuration->fid==F_EXPONENTIAL) goto _switch_1_case_F_EXPONENTIAL;
+   if (configuration->fid==F_PARETO) goto _switch_1_case_F_PARETO;
+_switch_1_default:   ;
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_PARETO:   ;
+   do_run_PARETO(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_EXPONENTIAL:   ;
+   do_run_EXPONENTIAL(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_GAUSSIAN:   ;
+   do_run_GAUSSIAN(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_AMORTIZED_DISK:   ;
+   do_run_AMORTIZED_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+_switch_1_case_F_DISK:   ;
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+_break_1:   ;
+}
+static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+   config->status = 0;
+   {
+      size_t k;
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+         data_t pot = t[k].pot;
+         town_sum += pot;
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+            if (latmin>t[k].lat)
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+            data_t lonmax = t[k].lon+deltalon;
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+                           contrib[i-imin][j-jmin] = pot/(1+tmp);
+                        }
+                        while (0);
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t c = contrib[i-imin][j-jmin];
+                     if (c>0) {
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+         config->status = (unsigned long int) k;
+      }
+   }
+
+   if (fabs(town_sum-total_sum)>0.0001)
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+   config->status = 0;
+   {
+      size_t k;
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+         data_t pot = t[k].pot;
+         town_sum += pot;
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+            if (latmin>t[k].lat)
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+            data_t lonmax = t[k].lon+deltalon;
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+                           contrib[i-imin][j-jmin] = pot;
+                        }
+                        while (0);
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t c = contrib[i-imin][j-jmin];
+                     if (c>0) {
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+         config->status = (unsigned long int) k;
+      }
+   }
+
+   if (fabs(town_sum-total_sum)>0.0001)
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+   config->status = 0;
+   {
+      size_t k;
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+         data_t pot = t[k].pot;
+         town_sum += pot;
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+            if (latmin>t[k].lat)
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+            data_t lonmax = t[k].lon+deltalon;
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+                           contrib[i-imin][j-jmin] = pot*exp(-(2./range)*tmp);
+                        }
+                        while (0);
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t c = contrib[i-imin][j-jmin];
+                     if (c>0) {
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+         config->status = (unsigned long int) k;
+      }
+   }
+
+   if (fabs(town_sum-total_sum)>0.0001)
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+   config->status = 0;
+   {
+      size_t k;
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+         data_t pot = t[k].pot;
+         town_sum += pot;
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+            if (latmin>t[k].lat)
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+            data_t lonmax = t[k].lon+deltalon;
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+                           contrib[i-imin][j-jmin] = pot*exp(-(3.14159265358979323846/(4.*range*range))*tmp*tmp);
+                        }
+                        while (0);
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t c = contrib[i-imin][j-jmin];
+                     if (c>0) {
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+         config->status = (unsigned long int) k;
+      }
+   }
+
+   if (fabs(town_sum-total_sum)>0.0001)
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+   data_t town_sum = 0.;
+   data_t total_sum = 0.;
+   config->status = 0;
+   {
+      size_t k;
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+         data_t pot = t[k].pot;
+         town_sum += pot;
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+            data_t sum = 0.;
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+            if (latmin>t[k].lat)
+               latmin = 2*t[k].lat-latmin;
+            long int imin = floor((latmin-latMin)/latStep);
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+            if (imin<0)
+               imin = 0;
+            if (imax>latRange)
+               imax = latRange;
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+            data_t lonmax = t[k].lon+deltalon;
+            data_t lonmin = t[k].lon-deltalon;
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+            if (jmin<0)
+               jmin = 0;
+            if (jmax>lonRange)
+               jmax = lonRange;
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+               size_t i;
+
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+                        do {
+                           data_t tmp = tmp*tmp;
+                           contrib[i-imin][j-jmin] = pot*1./(1+2/range*tmp*tmp);
+                        }
+                        while (0);
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+               size_t i;
+               for(i = imin; i <= imax-1; i += 1) {
+                  size_t j;
+                  for(j = jmin; j <= jmax-1; j += 1) {
+                     data_t c = contrib[i-imin][j-jmin];
+                     if (c>0) {
+                        pt[i][j].pot += c*pot/sum;
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+         config->status = (unsigned long int) k;
+      }
+   }
+
+   if (fabs(town_sum-total_sum)>0.0001)
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+static hs_potential_t * hs_read_towns(FILE *fd, size_t *len, hs_config_t *config)
+{
+   size_t curr = 0;
+   size_t nb = 1;
+   hs_potential_t *the_towns = malloc(sizeof(hs_potential_t));
+   if (!the_towns) {
+      config->herrno = 12;
+      return (void *) 0;
+   }
+   fputs("begin parsing ...\n", stderr);
+
+   while (!feof(fd)) {
+      if (nb==curr) {
+         nb *= 2;
+         the_towns = realloc(the_towns, nb*sizeof(hs_potential_t));
+         if (!the_towns) {
+            config->herrno = 12;
+            return (void *) 0;
+         }
+      }
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &the_towns[curr].lat, &the_towns[curr].lon, &the_towns[curr].pot)!=3) {
+l99999:         ;
+         if (!!feof(fd)) goto _break_2;
+         char c = (char) fgetc(fd);
+         if (c=='\n'||c=='\r'||c=='#') {
+         }
+         else {
+            goto l99999;
+         }
+_break_2:         ;
+      }
+      else {
+         the_towns[curr].lat *= 3.14159265358979323846/180;
+         the_towns[curr].lon *= 3.14159265358979323846/180;
+         ++curr;
+      }
+   }
+   the_towns = realloc(the_towns, curr*sizeof(hs_potential_t));
+   if (!the_towns) {
+      config->herrno = 12;
+      return (void *) 0;
+   }
+   *len = curr;
+   fprintf(stderr, "parsed %zd towns\n", curr);
+   return the_towns;
+}
+static int vhs_set_r(hs_config_t *config, hs_option_t opt, va_list *ap)
+{
+   int res = 1;
+   if (opt==HS_PARSE_ONLY) goto _switch_1_case_HS_PARSE_ONLY;
+   if (opt==HS_THRESHOLD) goto _switch_1_case_HS_THRESHOLD;
+   if (opt==HS_LOAD_RAW) goto _switch_1_case_HS_LOAD_RAW;
+   if (opt==HS_LOAD_PRECOMPUTED) goto _switch_1_case_HS_LOAD_PRECOMPUTED;
+   if (opt==HS_SMOOTH_FUNC) goto _switch_1_case_HS_SMOOTH_FUNC;
+   if (opt==HS_MODULE_OPT) goto _switch_1_case_HS_MODULE_OPT;
+
+_switch_1_default:   ;
+   fprintf(stderr, "[hs_set] unknow option \n");
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_MODULE_OPT:   ;
+   //res = init_module(ap);
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_SMOOTH_FUNC:   ;
+   {
+      char *fname = va_arg(*ap, char *);
+      double fparam = va_arg(*ap, double);
+      config->fparam = fparam;
+      //set_func_inter(fname, fparam);
+      size_t sz;
+      size_t i;
+      hs_list_smoothing(&sz);
+      i = 0;
+l99998:      ;
+      if (!(i<sz)) goto _break_2;
+      if (strcmp(func_names[i], fname)==0) goto l99999;
+      i++;
+      goto l99998;
+l99999:      ;
+      config->fid = (smoothing_fun_t) i;
+_break_2:      ;
+      if (i==sz) {
+         res = 0;
+         fprintf(stderr, "error : unreconized smoothing function \n");
+      }
+   }
+   goto _break_1;
+_switch_1_case_HS_LOAD_PRECOMPUTED:   ;
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_LOAD_RAW:   ;
+   res = 0;
+   goto _break_1;
+_switch_1_case_HS_THRESHOLD:   ;
+   goto _break_1;
+_switch_1_case_HS_PARSE_ONLY:   ;
+   res = 0;
+_break_1:   ;
+   if (!res)
+      config->herrno = 22;
+   return res;
+}

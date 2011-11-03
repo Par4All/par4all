@@ -18,16 +18,18 @@ int volume(int a[256][256])
 {
    int v = 0;
    int i, j;
-   //PIPS generated variable
-   int RED[256];
-   for(i = 0; i <= 255; i += 1)
-      RED[i] = 0;
+   {
+      //PIPS generated variable
+      int RED[256];
+      for(i = 0; i <= 255; i += 1)
+         RED[i] = 0;
 volume:
-   for(i = 0; i <= 255; i += 1)
-      for(j = 0; j <= 255; j += 1)
-         RED[i] = RED[i]+a[i][j];
-   for(i = 0; i <= 255; i += 1)
-      v = v+RED[i];
+      for(i = 0; i <= 255; i += 1)
+         for(j = 0; j <= 255; j += 1)
+            RED[i] = RED[i]+a[i][j];
+      for(i = 0; i <= 255; i += 1)
+         v = v+RED[i];
+   }
    return v;
 }
 

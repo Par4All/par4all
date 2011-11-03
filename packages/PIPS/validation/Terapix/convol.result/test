@@ -70,7 +70,7 @@ l99993:   work(isi, isj, image, kernel, new_image);
 void work(int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
-   int i, j;
+   int i;
 
 l99993:
    for(i = 1; i <= 510; i += 128)

@@ -1,4 +1,4 @@
-/* Check that external initializationa are properly taken into
+/* Check that external initializations are properly taken into
    account. */
 #include <stdio.h>
 
