@@ -31,6 +31,7 @@ publish:
 
 # local stuff
 clean: local-clean
+	$(RM) -rf ../../figures/*.eps ../../figures/*.pdf
 
 local-clean:
 	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) \
@@ -46,6 +47,10 @@ local-clean:
 
 # Add the dependence on some automatically generated help:
 p4a_script.tex: p4a-help.tex ../../figures/p4a_work_flow.pdf
+
+# generate .eps from svg
+%.eps: %.svg
+	inkscape $< --export-eps=$@ --export-text-to-path
 
 # How to generate the script documentation:
 %-help.tex: %.help Makefile
