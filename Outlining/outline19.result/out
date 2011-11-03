@@ -1,0 +1,14 @@
+float ing(int i)
+{
+   int b[100];
+   for(i = 0; i <= 99; i += 1)
+      b[i] = i;
+}
+void ding(int b[100])
+{
+   //PIPS generated variable
+   int i0;
+l99999:
+   for(i0 = 0; i0 <= 99; i0 += 1)
+      b[i0] = i0;
+}
