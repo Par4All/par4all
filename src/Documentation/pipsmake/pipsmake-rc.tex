@@ -13223,8 +13223,10 @@ of all possible braces.
 PRETTYPRINT_ALL_C_BRACES FALSE
 \end{PipsProp}
 
-Prints gracefully required braces required by gcc to avoid {\em ambiguous
-else} warning messages.
+The previous property leads to hard to read source code. Property
+\PipsPropRef{PRETTYPRINT_GCC_C_BRACES} is used to print only a few
+additional braces required by gcc to avoid {\em ambiguous else}
+warning messages.
 
 \begin{PipsProp}{PRETTYPRINT_GCC_C_BRACES}
 PRETTYPRINT_GCC_C_BRACES FALSE
