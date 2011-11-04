@@ -1,0 +1,134 @@
+
+Cumulated effects for "static03"
+
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+void static03()
+{
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   // BEGIN BLOCK
+   static int i = 0;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%d\n", i);
+   // END BLOCK
+}
+
+Cumulated effects for "main"
+
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static03:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static03:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   // BEGIN BLOCK
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static03:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   static03();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static03:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   static03();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static03:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   static03();
+   // END BLOCK
+}
+
+Transformers for "static03"
+
+
+//  T() {}
+
+void static03()
+{
+
+//  T() {}
+
+   // BEGIN BLOCK
+
+//  T() {}
+
+   static int i = 0;
+
+//  T() {}
+
+
+   printf("%d\n", i);
+   // END BLOCK
+}
+
+Transformers for "main"
+
+
+//  T() {static03:0`i==0}
+
+int main()
+{
+
+//  T() {static03:0`i==0}
+
+   // BEGIN BLOCK
+
+//  T() {static03:0`i==0}
+
+   static03();
+
+//  T() {static03:0`i==0}
+
+   static03();
+
+//  T() {static03:0`i==0}
+
+   static03();
+   // END BLOCK
+}
+
+Preconditions for "main"
+
+
+//  P() {static03:0`i==0}
+
+int main()
+{
+
+//  P() {static03:0`i==0}
+
+   // BEGIN BLOCK
+
+//  P() {static03:0`i==0}
+
+   static03();
+
+//  P() {static03:0`i==0}
+
+   static03();
+
+//  P() {static03:0`i==0}
+
+   static03();
+   // END BLOCK
+}

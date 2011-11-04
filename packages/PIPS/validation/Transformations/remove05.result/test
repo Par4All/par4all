@@ -1,0 +1,41 @@
+int main(int argc, char *argv[])
+{
+   int j;
+   {
+      int i;
+      for(i = 1; i <= argc-1; i += 1) {
+         int n = atoi(argv[i]);
+         int m = 0;
+rof:
+         for(j = 0; j <= n-1; j += 1)
+            m += j;
+         printf("%d\n", m);
+      }
+   }
+   return 0;
+}
+int main(int argc, char *argv[])
+{
+   int j;
+   {
+      int i;
+l99999:
+      for(i = 1; i <= argc-1; i += 1) {
+         int n = atoi(argv[i]);
+         int m = 0;
+         {
+            //PIPS generated variable
+            int RED[n];
+            for(j = 0; j <= n-1; j += 1)
+               RED[j] = 0;
+rof:
+            for(j = 0; j <= n-1; j += 1)
+               RED[j] += j;
+            for(j = 0; j <= n-1; j += 1)
+               m = m+RED[j];
+         }
+         printf("%d\n", m);
+      }
+   }
+   return 0;
+}

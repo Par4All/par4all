@@ -1,0 +1,1881 @@
+
+//  T() {}
+
+void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lonRange])
+{
+
+//  T(i) {}
+
+   size_t i;
+
+//  T(i) {0<=i, i+1<=latRange}
+
+   for(i = 0; i <= latRange-1; i += 1) {
+      {
+
+//  T(j) {}
+
+         size_t j;
+
+//  T(j) {0<=j, j+1<=lonRange}
+
+         for(j = 0; j <= lonRange-1; j += 1)
+
+//  T() {}
+
+            printf("%lf %lf %lf\n", pt[i][j].lon, pt[i][j].lat, pt[i][j].pot);
+      }
+
+//  T() {}
+
+      putchar('\n');
+   }
+}
+
+//  T() {}
+
+char * * hs_list_smoothing(size_t *sz)
+{
+
+//  T() {}
+
+   static const size_t names_count = sizeof(func_names)/sizeof(*func_names);
+
+//  T() {}
+
+   *sz = names_count;
+
+//  T() {}
+
+   /*cast for backward compatibility only*/
+   return (const char **) func_names;
+}
+
+//  T(hs_set) {}
+
+int hs_set(hs_option_t opt, ...)
+{
+
+//  T(args) {}
+
+   va_list args;
+
+//  T(args) {}
+
+   va_start(args, opt);
+
+//  T(res) {}
+
+   int res = vhs_set_r(&g_config, opt, &args);
+
+//  T(args) {}
+
+   va_end(args);
+
+//  T(hs_set) {hs_set==res}
+
+   return res;
+}
+
+//  T(hs_set_r) {}
+
+int hs_set_r(hs_config_t *config, hs_option_t opt, ...)
+{
+
+//  T(args) {}
+
+   va_list args;
+
+//  T(args) {}
+
+   va_start(args, opt);
+
+//  T(res) {}
+
+   int res = vhs_set_r(config, opt, &args);
+
+//  T(args) {}
+
+   va_end(args);
+
+//  T(hs_set_r) {hs_set_r==res}
+
+   return res;
+}
+
+//  T() {}
+
+hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference)
+{
+
+//  T(_resoLat,_resoLon) {}
+
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &g_config);
+}
+
+//  T() {}
+
+hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
+{
+
+//  T() {}
+
+   if (_resoLat<=0||_resoLon<=0)
+
+//  T() {}
+
+      return (void *) 0;
+
+
+//  T(lonRange) {}
+
+   size_t lonRange = (size_t) _resoLon;
+
+//  T(latRange) {}
+
+   size_t latRange = (size_t) _resoLat;
+
+
+//  T(nb) {}
+
+   size_t nb;
+
+//  T() {}
+
+   hs_potential_t *the_towns = hs_read_towns(pFileReference, &nb, configuration);
+
+//  T() {}
+
+   hs_potential_t (*plots)[latRange][lonRange] = malloc(sizeof(hs_potential_t)*latRange*lonRange);
+
+//  T() {}
+
+   if (!plots) {
+
+//  T() {}
+
+      configuration->herrno = 12;
+
+//  T() {}
+
+      return (void *) 0;
+   }
+
+//  T() {}
+
+   data_t lonStep = (visu.MLon-visu.mLon)/_resoLon;
+
+//  T() {}
+
+   data_t latStep = (visu.MLat-visu.mLat)/_resoLat;
+
+//  T() {}
+
+   data_t range = (*configuration).fparam;
+   {
+
+//  T(i) {}
+
+      size_t i;
+
+//  T(i) {0<=i, i+1<=latRange}
+
+      
+      /* init step: prepare output array */
+      for(i = 0; i <= latRange-1; i += 1) {
+
+//  T(j) {}
+
+         size_t j;
+
+//  T(j) {0<=j, j+1<=lonRange}
+
+         for(j = 0; j <= lonRange-1; j += 1) {
+
+//  T() {}
+
+            ((*plots)[i])[j].lon = visu.mLon+lonStep*j;
+
+//  T() {}
+
+            ((*plots)[i])[j].lat = visu.mLat+latStep*i;
+
+//  T() {}
+
+            ((*plots)[i])[j].pot = 0.;
+         }
+      }
+   }
+
+//  T() {}
+
+
+   lonStep *= 3.14159265358979323846/180;
+
+//  T() {}
+
+   latStep *= 3.14159265358979323846/180;
+
+//  T() {}
+
+
+   do_run(visu, lonStep, latStep, range, lonRange, latRange, nb, *plots, *((hs_potential_t (*)[nb]) the_towns), configuration);
+
+//  T() {}
+
+   free(the_towns);
+
+//  T() {}
+
+   return (hs_potential_t *) plots;
+}
+
+//  T() {}
+
+hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_name, double function_param, hs_coord_t visu, FILE *pFileReference)
+{
+
+//  T() {}
+
+   hs_config_t config = {(void *) 0, 0, 0, 0, 500, 0, 0};
+
+//  T() {}
+
+   hs_set_r(&config, HS_SMOOTH_FUNC, function_name, function_param);
+
+//  T(_resoLat,_resoLon) {}
+
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &config);
+}
+
+//  T(hs_status) {}
+
+unsigned long int hs_status()
+{
+
+//  T(hs_status) {}
+
+   return g_config.status;
+}
+
+//  T() {}
+
+static void do_run(hs_coord_t visu, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t plots[latRange][lonRange], hs_potential_t the_towns[nb], hs_config_t *configuration)
+{
+
+//  T() {}
+
+
+/*data_t (*contrib)[latRange][lonRange] = malloc(sizeof(data_t)*latRange*lonRange);
+	if(!contrib) {
+		configuration->herrno=ENOMEM;
+		return;
+	}*/
+
+   if (configuration->fid==F_DISK) goto _switch_1_case_F_DISK;
+
+//  T() {}
+
+   if (configuration->fid==F_AMORTIZED_DISK) goto _switch_1_case_F_AMORTIZED_DISK;
+
+//  T() {}
+
+   if (configuration->fid==F_GAUSSIAN) goto _switch_1_case_F_GAUSSIAN;
+
+//  T() {}
+
+   if (configuration->fid==F_EXPONENTIAL) goto _switch_1_case_F_EXPONENTIAL;
+
+//  T() {}
+
+   if (configuration->fid==F_PARETO) goto _switch_1_case_F_PARETO;
+
+//  T() {}
+
+_switch_1_default:   ;
+
+//  T() {}
+
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_F_PARETO:   ;
+
+//  T() {}
+
+   do_run_PARETO(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_F_EXPONENTIAL:   ;
+
+//  T() {}
+
+   do_run_EXPONENTIAL(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_F_GAUSSIAN:   ;
+
+//  T() {}
+
+   do_run_GAUSSIAN(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_F_AMORTIZED_DISK:   ;
+
+//  T() {}
+
+   do_run_AMORTIZED_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_F_DISK:   ;
+
+//  T() {}
+
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+
+//  T() {}
+
+_break_1:   ;
+}
+
+//  T() {}
+
+static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  T() {}
+
+   data_t town_sum = 0.;
+
+//  T() {}
+
+   data_t total_sum = 0.;
+
+//  T() {}
+
+   config->status = 0;
+   {
+
+//  T(k) {}
+
+      size_t k;
+
+//  T(k) {0<=k, k+1<=nb}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  T() {}
+
+         data_t pot = t[k].pot;
+
+//  T() {}
+
+         town_sum += pot;
+
+//  T() {}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  T() {}
+
+            data_t sum = 0.;
+
+
+//  T() {}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+
+            if (latmin>t[k].lat)
+
+//  T() {}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  T(imin) {}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  T(imax) {}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  T(imin) {0<=imin, imin#init<=imin}
+
+
+            if (imin<0)
+
+//  T(imin) {imin==0}
+
+               imin = 0;
+
+//  T(imax) {imax<=imax#init, imax<=latRange}
+
+            if (imax>latRange)
+
+//  T(imax) {imax==latRange}
+
+               imax = latRange;
+
+//  T() {}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  T() {}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  T() {}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  T(jmin) {}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  T(jmax) {}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  T(jmin) {0<=jmin, jmin#init<=jmin}
+
+
+            if (jmin<0)
+
+//  T(jmin) {jmin==0}
+
+               jmin = 0;
+
+//  T(jmax) {jmax<=jmax#init, jmax<=lonRange}
+
+            if (jmax>lonRange)
+
+//  T(jmax) {jmax==lonRange}
+
+               jmax = lonRange;
+
+
+//  T() {}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  T(0`1`2`3`4`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`4`i) {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`4`5`6`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`4`5`6`j) {0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  T() {}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  T() {}
+
+                        do {
+
+//  T() {}
+
+                           contrib[i-imin][j-jmin] = pot/(1+tmp);
+                        }
+                        while (0);
+
+//  T() {}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  T() {}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  T() {}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  T(0`1`2`3`10`11`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`10`11`i) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`10`11`12`13`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`10`11`12`13`j) {0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  T() {}
+
+                     if (c>0) {
+
+//  T() {}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  T() {}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  T() {}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  T() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  T() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  T() {}
+
+static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  T() {}
+
+   data_t town_sum = 0.;
+
+//  T() {}
+
+   data_t total_sum = 0.;
+
+//  T() {}
+
+   config->status = 0;
+   {
+
+//  T(k) {}
+
+      size_t k;
+
+//  T(k) {0<=k, k+1<=nb}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  T() {}
+
+         data_t pot = t[k].pot;
+
+//  T() {}
+
+         town_sum += pot;
+
+//  T() {}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  T() {}
+
+            data_t sum = 0.;
+
+
+//  T() {}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+
+            if (latmin>t[k].lat)
+
+//  T() {}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  T(imin) {}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  T(imax) {}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  T(imin) {0<=imin, imin#init<=imin}
+
+
+            if (imin<0)
+
+//  T(imin) {imin==0}
+
+               imin = 0;
+
+//  T(imax) {imax<=imax#init, imax<=latRange}
+
+            if (imax>latRange)
+
+//  T(imax) {imax==latRange}
+
+               imax = latRange;
+
+//  T() {}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  T() {}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  T() {}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  T(jmin) {}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  T(jmax) {}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  T(jmin) {0<=jmin, jmin#init<=jmin}
+
+
+            if (jmin<0)
+
+//  T(jmin) {jmin==0}
+
+               jmin = 0;
+
+//  T(jmax) {jmax<=jmax#init, jmax<=lonRange}
+
+            if (jmax>lonRange)
+
+//  T(jmax) {jmax==lonRange}
+
+               jmax = lonRange;
+
+
+//  T() {}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  T(0`1`2`3`4`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`4`i) {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`4`5`6`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`4`5`6`j) {0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  T() {}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  T() {}
+
+                        do {
+
+//  T() {}
+
+                           contrib[i-imin][j-jmin] = pot;
+                        }
+                        while (0);
+
+//  T() {}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  T() {}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  T() {}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  T(0`1`2`3`10`11`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`10`11`i) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`10`11`12`13`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`10`11`12`13`j) {0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  T() {}
+
+                     if (c>0) {
+
+//  T() {}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  T() {}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  T() {}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  T() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  T() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  T() {}
+
+static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  T() {}
+
+   data_t town_sum = 0.;
+
+//  T() {}
+
+   data_t total_sum = 0.;
+
+//  T() {}
+
+   config->status = 0;
+   {
+
+//  T(k) {}
+
+      size_t k;
+
+//  T(k) {0<=k, k+1<=nb}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  T() {}
+
+         data_t pot = t[k].pot;
+
+//  T() {}
+
+         town_sum += pot;
+
+//  T() {}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  T() {}
+
+            data_t sum = 0.;
+
+
+//  T() {}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+
+            if (latmin>t[k].lat)
+
+//  T() {}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  T(imin) {}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  T(imax) {}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  T(imin) {0<=imin, imin#init<=imin}
+
+
+            if (imin<0)
+
+//  T(imin) {imin==0}
+
+               imin = 0;
+
+//  T(imax) {imax<=imax#init, imax<=latRange}
+
+            if (imax>latRange)
+
+//  T(imax) {imax==latRange}
+
+               imax = latRange;
+
+//  T() {}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  T() {}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  T() {}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  T(jmin) {}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  T(jmax) {}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  T(jmin) {0<=jmin, jmin#init<=jmin}
+
+
+            if (jmin<0)
+
+//  T(jmin) {jmin==0}
+
+               jmin = 0;
+
+//  T(jmax) {jmax<=jmax#init, jmax<=lonRange}
+
+            if (jmax>lonRange)
+
+//  T(jmax) {jmax==lonRange}
+
+               jmax = lonRange;
+
+
+//  T() {}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  T(0`1`2`3`4`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`4`i) {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`4`5`6`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`4`5`6`j) {0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  T() {}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  T() {}
+
+                        do {
+
+//  T() {}
+
+                           contrib[i-imin][j-jmin] = pot*exp(-(2./range)*tmp);
+                        }
+                        while (0);
+
+//  T() {}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  T() {}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  T() {}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  T(0`1`2`3`10`11`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`10`11`i) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`10`11`12`13`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`10`11`12`13`j) {0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  T() {}
+
+                     if (c>0) {
+
+//  T() {}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  T() {}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  T() {}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  T() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  T() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  T() {}
+
+static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  T() {}
+
+   data_t town_sum = 0.;
+
+//  T() {}
+
+   data_t total_sum = 0.;
+
+//  T() {}
+
+   config->status = 0;
+   {
+
+//  T(k) {}
+
+      size_t k;
+
+//  T(k) {0<=k, k+1<=nb}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  T() {}
+
+         data_t pot = t[k].pot;
+
+//  T() {}
+
+         town_sum += pot;
+
+//  T() {}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  T() {}
+
+            data_t sum = 0.;
+
+
+//  T() {}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+
+            if (latmin>t[k].lat)
+
+//  T() {}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  T(imin) {}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  T(imax) {}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  T(imin) {0<=imin, imin#init<=imin}
+
+
+            if (imin<0)
+
+//  T(imin) {imin==0}
+
+               imin = 0;
+
+//  T(imax) {imax<=imax#init, imax<=latRange}
+
+            if (imax>latRange)
+
+//  T(imax) {imax==latRange}
+
+               imax = latRange;
+
+//  T() {}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  T() {}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  T() {}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  T(jmin) {}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  T(jmax) {}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  T(jmin) {0<=jmin, jmin#init<=jmin}
+
+
+            if (jmin<0)
+
+//  T(jmin) {jmin==0}
+
+               jmin = 0;
+
+//  T(jmax) {jmax<=jmax#init, jmax<=lonRange}
+
+            if (jmax>lonRange)
+
+//  T(jmax) {jmax==lonRange}
+
+               jmax = lonRange;
+
+
+//  T() {}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  T(0`1`2`3`4`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`4`i) {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`4`5`6`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`4`5`6`j) {0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  T() {}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  T() {}
+
+                        do {
+
+//  T() {}
+
+                           contrib[i-imin][j-jmin] = pot*exp(-(3.14159265358979323846/(4.*range*range))*tmp*tmp);
+                        }
+                        while (0);
+
+//  T() {}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  T() {}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  T() {}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  T(0`1`2`3`10`11`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`10`11`i) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`10`11`12`13`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`10`11`12`13`j) {0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  T() {}
+
+                     if (c>0) {
+
+//  T() {}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  T() {}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  T() {}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  T() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  T() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  T() {}
+
+static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  T() {}
+
+   data_t town_sum = 0.;
+
+//  T() {}
+
+   data_t total_sum = 0.;
+
+//  T() {}
+
+   config->status = 0;
+   {
+
+//  T(k) {}
+
+      size_t k;
+
+//  T(k) {0<=k, k+1<=nb}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  T() {}
+
+         data_t pot = t[k].pot;
+
+//  T() {}
+
+         town_sum += pot;
+
+//  T() {}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  T() {}
+
+            data_t sum = 0.;
+
+
+//  T() {}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  T() {}
+
+
+            if (latmin>t[k].lat)
+
+//  T() {}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  T(imin) {}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  T(imax) {}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  T(imin) {0<=imin, imin#init<=imin}
+
+
+            if (imin<0)
+
+//  T(imin) {imin==0}
+
+               imin = 0;
+
+//  T(imax) {imax<=imax#init, imax<=latRange}
+
+            if (imax>latRange)
+
+//  T(imax) {imax==latRange}
+
+               imax = latRange;
+
+//  T() {}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  T() {}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  T() {}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  T(jmin) {}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  T(jmax) {}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  T(jmin) {0<=jmin, jmin#init<=jmin}
+
+
+            if (jmin<0)
+
+//  T(jmin) {jmin==0}
+
+               jmin = 0;
+
+//  T(jmax) {jmax<=jmax#init, jmax<=lonRange}
+
+            if (jmax>lonRange)
+
+//  T(jmax) {jmax==lonRange}
+
+               jmax = lonRange;
+
+
+//  T() {}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  T(0`1`2`3`4`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`4`i) {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`4`5`6`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`4`5`6`j) {0`1`2`3`4`5`6`j+1<=jmax,
+//    jmin<=0`1`2`3`4`5`6`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  T() {}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  T() {}
+
+                        do {
+
+//  T() {}
+
+                           data_t tmp = tmp*tmp;
+
+//  T() {}
+
+                           contrib[i-imin][j-jmin] = pot*1./(1+2/range*tmp*tmp);
+                        }
+                        while (0);
+
+//  T() {}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  T() {}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  T() {}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  T(0`1`2`3`10`11`i) {}
+
+               size_t i;
+
+//  T(0`1`2`3`10`11`i) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  T(0`1`2`3`10`11`12`13`j) {}
+
+                  size_t j;
+
+//  T(0`1`2`3`10`11`12`13`j) {0`1`2`3`10`11`12`13`j+1<=jmax,
+//    jmin<=0`1`2`3`10`11`12`13`j}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  T() {}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  T() {}
+
+                     if (c>0) {
+
+//  T() {}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  T() {}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  T() {}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  T() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  T() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  T() {}
+
+static hs_potential_t * hs_read_towns(FILE *fd, size_t *len, hs_config_t *config)
+{
+
+//  T(curr) {curr==0}
+
+   size_t curr = 0;
+
+//  T(nb) {nb==1}
+
+   size_t nb = 1;
+
+//  T() {}
+
+   hs_potential_t *the_towns = malloc(sizeof(hs_potential_t));
+
+//  T() {}
+
+   if (!the_towns) {
+
+//  T() {}
+
+      config->herrno = 12;
+
+//  T() {}
+
+      return (void *) 0;
+   }
+
+//  T() {}
+
+   fputs("begin parsing ...\n", stderr);
+
+//  T(curr,nb) {curr#init<=curr}
+
+
+   while (!feof(fd)) {
+
+//  T(nb) {}
+
+      if (nb==curr) {
+
+//  T(nb) {nb==2nb#init}
+
+         nb *= 2;
+
+//  T() {}
+
+         the_towns = realloc(the_towns, nb*sizeof(hs_potential_t));
+
+//  T() {}
+
+         if (!the_towns) {
+
+//  T() {}
+
+            config->herrno = 12;
+
+//  T() {}
+
+            return (void *) 0;
+         }
+      }
+
+//  T(curr) {curr#init<=curr, curr<=curr#init+1}
+
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &the_towns[curr].lat, &the_towns[curr].lon, &the_towns[curr].pot)!=3) {
+l99999:         ;
+
+//  T() {}
+
+         if (!!feof(fd)) goto _break_2;
+
+//  T(c) {}
+
+         char c = (char) fgetc(fd);
+
+//  T() {}
+
+         if (c=='\n'||c=='\r'||c=='#') {
+         }
+         else {
+            goto l99999;
+         }
+
+//  T() {}
+
+_break_2:         ;
+      }
+      else {
+
+//  T() {}
+
+         the_towns[curr].lat *= 3.14159265358979323846/180;
+
+//  T() {}
+
+         the_towns[curr].lon *= 3.14159265358979323846/180;
+
+//  T(curr) {curr==curr#init+1}
+
+         ++curr;
+      }
+   }
+
+//  T() {}
+
+   the_towns = realloc(the_towns, curr*sizeof(hs_potential_t));
+
+//  T() {}
+
+   if (!the_towns) {
+
+//  T() {}
+
+      config->herrno = 12;
+
+//  T() {}
+
+      return (void *) 0;
+   }
+
+//  T() {}
+
+   *len = curr;
+
+//  T() {}
+
+   fprintf(stderr, "parsed %zd towns\n", curr);
+
+//  T() {}
+
+   return the_towns;
+}
+
+//  T(options!vhs_set_r) {}
+
+static int vhs_set_r(hs_config_t *config, hs_option_t opt, va_list *ap)
+{
+
+//  T(res) {res==1}
+
+   int res = 1;
+
+//  T() {}
+
+   if (opt==HS_PARSE_ONLY) goto _switch_1_case_HS_PARSE_ONLY;
+
+//  T() {}
+
+   if (opt==HS_THRESHOLD) goto _switch_1_case_HS_THRESHOLD;
+
+//  T() {}
+
+   if (opt==HS_LOAD_RAW) goto _switch_1_case_HS_LOAD_RAW;
+
+//  T() {}
+
+   if (opt==HS_LOAD_PRECOMPUTED) goto _switch_1_case_HS_LOAD_PRECOMPUTED;
+
+//  T() {}
+
+   if (opt==HS_SMOOTH_FUNC) goto _switch_1_case_HS_SMOOTH_FUNC;
+
+//  T() {}
+
+   if (opt==HS_MODULE_OPT) goto _switch_1_case_HS_MODULE_OPT;
+
+//  T() {}
+
+
+_switch_1_default:   ;
+
+//  T() {}
+
+   fprintf(stderr, "[hs_set] unknow option \n");
+
+//  T(res) {res==0}
+
+   res = 0;
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_HS_MODULE_OPT:   ;
+
+//  T(res) {res==0}
+
+   //res = init_module(ap);
+   res = 0;
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_HS_SMOOTH_FUNC:   ;
+   {
+
+//  T() {}
+
+      char *fname = va_arg(*ap, char *);
+
+//  T() {}
+
+      double fparam = va_arg(*ap, double);
+
+//  T() {}
+
+      config->fparam = fparam;
+      //set_func_inter(fname, fparam);
+
+//  T(sz) {}
+
+      size_t sz;
+
+//  T(i) {}
+
+      size_t i;
+
+//  T() {}
+
+      hs_list_smoothing(&sz);
+
+//  T(i) {i==0}
+
+      i = 0;
+l99998:      ;
+
+//  T() {}
+
+      if (!(i<sz)) goto _break_2;
+
+//  T() {}
+
+      if (strcmp(func_names[i], fname)==0) goto l99999;
+
+//  T(i) {i==i#init+1}
+
+      i++;
+      goto l99998;
+l99999:      ;
+
+//  T() {}
+
+      config->fid = (smoothing_fun_t) i;
+
+//  T() {}
+
+_break_2:      ;
+
+//  T(res) {}
+
+      if (i==sz) {
+
+//  T(res) {res==0}
+
+         res = 0;
+
+//  T() {}
+
+         fprintf(stderr, "error : unreconized smoothing function \n");
+      }
+   }
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_HS_LOAD_PRECOMPUTED:   ;
+
+//  T(res) {res==0}
+
+   res = 0;
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_HS_LOAD_RAW:   ;
+
+//  T(res) {res==0}
+
+   res = 0;
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_HS_THRESHOLD:   ;
+   goto _break_1;
+
+//  T() {}
+
+_switch_1_case_HS_PARSE_ONLY:   ;
+
+//  T(res) {res==0}
+
+   res = 0;
+
+//  T() {}
+
+_break_1:   ;
+
+//  T() {}
+
+   if (!res)
+
+//  T() {}
+
+      config->herrno = 22;
+
+//  T(options!vhs_set_r) {options!vhs_set_r==res}
+
+   return res;
+}
