@@ -205,6 +205,16 @@ class module(object): # deriving from object is needed for overloaded setter
         else:
             return [ loop(self,l) for l in loops.split(" ") ] if loops else []
 
+    @property
+    def all_loops(self):
+        all_loops = []
+        loops = self.loops()
+        while loops:
+            l = loops.pop()
+            all_loops.append(l)
+            loops += l.loops()
+        return all_loops
+
     def inner_loops(self):
         """get all inner loops"""
         inner_loops = []

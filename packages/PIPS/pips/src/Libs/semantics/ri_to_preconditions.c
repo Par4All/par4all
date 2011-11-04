@@ -464,7 +464,12 @@ static transformer c_data_to_prec_for_variables(entity m, list /* of entity */le
 	 likely to be static initializations. */
       expression ie = variable_initial_expression(e);
       transformer pre_r = transformer_range(pre);
-      transformer npre = safe_assigned_expression_to_transformer(e, ie, pre_r);
+      transformer npre = transformer_undefined;
+      if( !expression_undefined_p(ie) )
+          npre = any_expression_to_transformer(e, ie, pre_r, false);
+      /* any_expression_to_transformer may end up with an undefined transformer ... */
+      if(transformer_undefined_p(npre))
+          npre=transformer_identity();
 
       pips_debug(8, "begin for variable %s\n", entity_name(e));
 

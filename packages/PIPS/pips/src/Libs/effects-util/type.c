@@ -133,13 +133,13 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
 		      }
 
 		    *exact_p = (result < 0);
-		    if (result >= 0) result ++; // do not forget the field index !
+		    if (result >= 0) result += i+1; // do not forget the field index and array dimensions!
 		  }
 		else
 		  {
 		    current_type = entity_basic_concrete_type(current_field_entity);
 		    result = effect_indices_first_pointer_dimension_rank(CDR(current_l_ind), current_type, exact_p);
-		    if (result >=0) result++; // do not forget the field index !
+		    if (result >=0) result += i+1; // do not forget the field index and array dimensions!
 		  }
 	      }
 	  }

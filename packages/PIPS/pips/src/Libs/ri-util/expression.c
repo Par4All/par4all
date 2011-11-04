@@ -37,6 +37,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "linear.h"
 
@@ -1029,8 +1030,12 @@ expression find_ith_expression(list le, int r)
   */
 expression int_to_expression(_int i)
 {
-    entity e = int_to_entity(i);
-    return call_to_expression(make_call(e,NIL));
+    bool negative_p = i<0;
+    entity e = int_to_entity(abs(i));
+    expression exp =  call_to_expression(make_call(e,NIL));
+    if(negative_p)
+        exp = MakeUnaryCall(entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),exp);
+    return exp;
 }
 
 expression float_to_expression(float c)
@@ -3271,12 +3276,17 @@ entity string_to_entity(const char * s,entity module)
     string endptr;
     const char *module_name=module_local_name(module);
     long int l = strtol(s,&endptr,10);
-    if(!*endptr) return int_to_entity(l);
+    if(!*endptr) {
+        if(l>=0)
+            return int_to_entity(l);
+        else /* no negative integer entity in pips */
+            return entity_undefined;
+    }
     float f = strtof(s,&endptr);
     if(!*endptr) return float_to_entity(f);
 
     entity candidate = entity_undefined;
-    /* first find all relevent entities */
+    /* first find all relevant entities */
     FOREACH(ENTITY,e,entity_declarations(module))
     {
         /* this an heuristic to find the one with a suiting scope
@@ -3302,6 +3312,19 @@ expression string_to_expression(const char * s,entity module)
     entity e = string_to_entity(s,module);
     if(entity_undefined_p(e)) {
         /* try to find simple expression */
+        /* unary operators */
+        for(const char *iter = s ; *iter ; iter++) {
+            if(isspace(*iter)) continue;
+            if(*iter=='-') {
+                expression etmp = string_to_expression(iter+1, module);
+                if(!expression_undefined_p(etmp)) {
+                    return MakeUnaryCall(entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),
+                            etmp);
+                }
+            }
+        }
+        
+        /*binary operators*/
         static const char* seeds[] = {   PLUS_OPERATOR_NAME, MINUS_OPERATOR_NAME,MULTIPLY_OPERATOR_NAME, DIVIDE_OPERATOR_NAME};
 	for(int i=0; i < (int) (sizeof(seeds)/sizeof(seeds[0])); i++) {
             char *where = strchr(s,seeds[i][0]);
