@@ -88,6 +88,5 @@ demo_opengl_message:
 	@echo "\n Please close the window at the end of the execution. In case of the chain of demos \
 	(command "make demo_opengl"), this allows the execution of the next demo\n"
 
-demo_opengl : opengl_display_seq opengl_display_openmp  opengl_display_accel-openmp ;
-
+demo_opengl : opengl_display_seq opengl_display_openmp opengl_display_accel-openmp opengl_display_cuda opengl_display_cuda-opt opengl_display_opencl;
 	
