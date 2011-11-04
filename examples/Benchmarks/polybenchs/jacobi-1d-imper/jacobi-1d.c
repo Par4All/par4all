@@ -9,8 +9,8 @@
 #ifndef TSTEPS
 # define TSTEPS 10000
 #endif
-#ifndef N
-# define N 4096
+#ifndef Y
+# define Y 4096
 #endif
 
 /* Default data type is double. */
@@ -21,15 +21,15 @@
 # define DATA_PRINTF_MODIFIER "%0.2lf "
 #endif
 
-DATA_TYPE A[N];
-DATA_TYPE B[N];
+DATA_TYPE A[Y];
+DATA_TYPE B[Y];
 
 static void init_array() {
   int i, j;
 
-  for (i = 0; i < N;) {
-    A[i] = ((DATA_TYPE)4 * i + 10) / N;
-    B[i] = ((DATA_TYPE)7 * i + 11) / N;
+  for (i = 0; i < Y;) {
+    A[i] = ((DATA_TYPE)4 * i + 10) / Y;
+    B[i] = ((DATA_TYPE)7 * i + 11) / Y;
     i++;
   }
 }
@@ -42,7 +42,7 @@ static void print_array(int argc, char** argv) {
   if(argc > 42 && !strcmp(argv[0], ""))
 #endif
   {
-    for (i = 0; i < N; i++) {
+    for (i = 0; i < Y; i++) {
       fprintf(stderr, DATA_PRINTF_MODIFIER, A[i]);
       if(i % 80 == 20)
         fprintf(stderr, "\n");
@@ -54,7 +54,7 @@ static void print_array(int argc, char** argv) {
 int main(int argc, char** argv) {
   int t, i, j;
   int tsteps = TSTEPS;
-  int n = N;
+  int n = Y;
 
   /* Initialize array. */
   init_array();

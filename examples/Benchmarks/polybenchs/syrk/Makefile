@@ -1,5 +1,5 @@
 TARGET=syrk
-SIZE_PARAMS=-DN=256 -DM=256
+SIZE_PARAMS=-DY=256 -DX=256
 
 include ../bench.mk
 
