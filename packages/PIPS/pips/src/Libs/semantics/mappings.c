@@ -499,7 +499,12 @@ void module_to_value_mappings(entity m)
 	entity e = reference_variable(effect_any_reference(ef));
 	action a = effect_action(ef);
 	if(analyzable_scalar_entity_p(e) && action_read_p(a)) {
-	  if(c_module_p(m) && storage_return_p(entity_storage(e)))
+        if(c_module_p(m) && 
+                ( storage_return_p(entity_storage(e))
+                  /* static variables have an old value too */
+                  ||  entity_static_variable_p(e) 
+                )
+          )
 	    add_interprocedural_value_entities(e);
 	  else
 	    add_interprocedural_new_value_entity(e);

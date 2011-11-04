@@ -387,6 +387,7 @@ bool reduction_variable_expansion(const char* module_name) {
             list trailing_statements = NIL;
 
             /* each reduction will be expanded into a new entity, then a loop will perform the reduction */
+            list newly_declared_entities = NIL;
             FOREACH(REDUCTION,red,reductions)
             {
                 if(gen_length(reference_indices(reduction_reference(red))) <= 1 ) {
@@ -403,7 +404,7 @@ bool reduction_variable_expansion(const char* module_name) {
                                 basic_of_reference(reduction_reference(red)),
                                 CONS(DIMENSION,copy_dimension(thedim),NIL)
                                 );
-                        AddEntityToCurrentModule(new_entity);
+                        newly_declared_entities = CONS(ENTITY, new_entity, newly_declared_entities);
 
 
                         /* perform the expansion */
@@ -471,6 +472,9 @@ bool reduction_variable_expansion(const char* module_name) {
 
                 }
             }
+            FOREACH(ENTITY,new_entity, newly_declared_entities)
+                AddLocalEntityToDeclarations(new_entity, get_current_module_entity(), theloopstatement);
+            gen_free_list(newly_declared_entities);
 
             if(!ENDP(trailing_statements)) {
                 /* create trailing statement and append them */

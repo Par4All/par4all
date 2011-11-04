@@ -44,28 +44,30 @@ int main()
    int m = 0;
    int n = 0;
    int o = 2;
-   //PIPS generated variable
-   int RED[10];
 
 l0:
    for(m = 0; m <= 9; m += 1) {
       n = n+1;
       a[m] = n;
    }
-   for(m = 0; m <= 9; m += 1)
-      RED[m] = 0;
+   {
+      //PIPS generated variable
+      int RED[10];
+      for(m = 0; m <= 9; m += 1)
+         RED[m] = 0;
 
 l1:
-   for(m = 0; m <= 9; m += 1) {
-      // comments 4
-      n = n+1;
-      RED[m] = 2+RED[m];
-      RED[m] = 2+RED[m];
-      n = n+5;
-      b[0][0][1][m][0] = n;
+      for(m = 0; m <= 9; m += 1) {
+         // comments 4
+         n = n+1;
+         RED[m] = 2+RED[m];
+         RED[m] = 2+RED[m];
+         n = n+5;
+         b[0][0][1][m][0] = n;
+      }
+      for(m = 0; m <= 9; m += 1)
+         o = o+RED[m];
    }
-   for(m = 0; m <= 9; m += 1)
-      o = o+RED[m];
    printf("%d\n", o);
 
    return 0;

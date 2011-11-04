@@ -156,7 +156,7 @@ void kernel1(float_t save[64][64], float_t space[64][64], int i)
 void launch_kernel1(float_t save[64][64], float_t space[64][64])
 {
    //PIPS generated variable
-   int i, j;
+   int i;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
            could use also a flip-flop dimension instead... */

@@ -61,18 +61,52 @@
 
 #define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
 
-static
-void get_private_entities_walker(loop l, set s)
-{
-    set_append_list(s,loop_locals(l));
+static void get_loop_locals_and_remove_walker(statement st, set s) {
+    if(statement_loop_p(st)) {
+        loop l = statement_loop(st);
+        list locals = loop_locals(l);
+
+        /* loop_locals is sometimes too big,
+         * mainly due to the way gpu_ify is done ...
+         */
+        set re0 = get_referenced_entities(loop_body(l));
+        set re1 = get_referenced_entities(loop_range(l));
+        set_add_element(re0,re0,loop_index(l));
+        set_union(re0,re0,re1);
+        set_free(re1);
+
+        /* validate everything */
+        FOREACH(ENTITY,el,locals) {
+            if(set_belong_p(re0,el))
+                set_add_element(s,s,el);
+        }
+        set_free(re0);
+
+        /* remove instructions for later processing */
+        free_instruction(statement_instruction(st));
+        statement_instruction(st)=instruction_undefined;
+    }
 }
 
 static
-set get_private_entities(void *s)
-{
-    set tmp = set_make(set_pointer);
-    gen_context_recurse(s,tmp,loop_domain,gen_true,get_private_entities_walker);
-    return tmp;
+set get_loop_locals_and_remove(statement st) {
+    set locals = set_make(set_pointer);
+    gen_context_recurse(st, locals, statement_domain, gen_true, get_loop_locals_and_remove_walker);
+    return locals;
+}
+
+/* try hard to reproduce in / out regions with only loop_locals
+ * it is time to move to regions ... are they stable enough ?
+ */
+static
+set get_private_entities(statement st){
+    statement clone = copy_statement(st);
+    set locals = get_loop_locals_and_remove(clone);
+    set re = get_referenced_entities(clone);
+    set_difference(locals,locals,re);
+    set_free(re);
+    free_statement(clone);
+    return locals;
 }
 
 static bool skip_values(void *v) {
@@ -138,6 +172,7 @@ static
 list private_variables(statement stat)
 {
     set s = get_private_entities(stat);
+
     list l =NIL;
     SET_FOREACH(entity,e,s) {
         struct cpv p = { .e=e, .rm=false };
@@ -375,13 +410,23 @@ static list statements_localize_declarations(list statements,entity module,state
     list localized = NIL;
     FOREACH(STATEMENT, s, statements)
     {
-        /* We want to declare private variables as locals, but it may not
+        /* We want to declare private variables **that are never used else where** as locals, but it may not
            be valid */
         list private_ents = private_variables(s);
         gen_sort_list(private_ents,(gen_cmp_func_t)compare_entities);
         FOREACH(ENTITY,e,private_ents)
         {
             if(gen_chunk_undefined_p(gen_find_eq(e,sd))) {
+                if(formal_parameter_p(e)) { // otherwise bad interaction with formal parameter pretty printing
+                    localized=CONS(ENTITY,e,localized); // this is to make sure that the original `e' is removed from the referenced entities too
+                    entity ep = make_new_scalar_variable_with_prefix(
+                            entity_user_name(e),
+                            module,
+                            copy_basic(entity_basic(e))
+                            );
+                    replace_entity(s,e,ep);
+                    e=ep;
+                }
                 AddLocalEntityToDeclarations(e,module,module_statement);
                 localized=CONS(ENTITY,e,localized);
             }

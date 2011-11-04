@@ -1178,12 +1178,14 @@ set gen_must_constant_paths(cell l, list R, set in_must, bool* address_of_p, int
 	if (locations_equal_p(r, points_to_source(i))/*  && !entity_abstract_location_p(el) */)
 	  pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
 	if(array_entity_p(reference_variable(cell_to_reference(r)))){
-	  reference ref = cell_to_reference(r);
-	  expression ex = reference_to_expression(ref);
-	  if(!expression_pointer_p(ex))
-	  pt = make_points_to(l, r, a, make_descriptor_none());
+	  reference ref = cell_any_reference(r);
+	  bool t_to_be_freed = false;
+	  type t = cell_reference_to_type(ref, &t_to_be_freed);
+	  if(!pointer_type_p(t))
+	    pt = make_points_to(l, r, a, make_descriptor_none());
 	  else
 	    pt = make_points_to(l, points_to_sink(i), a, make_descriptor_none());
+	  if (t_to_be_freed) free_type(t);
 	}
 	if(!points_to_undefined_p(pt))
 	  set_add_element(gen_must_cps, gen_must_cps, (void*) pt);

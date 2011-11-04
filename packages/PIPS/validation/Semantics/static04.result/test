@@ -1,0 +1,203 @@
+int main()
+{
+   static04();
+   static04();
+   static04();
+}
+void static04()
+{
+   static int i = sizeof(i);
+
+   printf("%d\n", i);
+}
+int main()
+{
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static04:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   static04();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static04:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   static04();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static04:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   static04();
+}
+void static04()
+{
+   static int i = sizeof(i);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%d\n", i);
+}
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static04:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+int main()
+{
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static04:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   static04();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static04:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   static04();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1] 
+//                               static04:0`i
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   static04();
+}
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+void static04()
+{
+   static int i = sizeof(i);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%d\n", i);
+}
+
+//  T() {}
+
+int main()
+{
+
+//  T() {}
+
+   static04();
+
+//  T() {}
+
+   static04();
+
+//  T() {}
+
+   static04();
+}
+
+//  T() {}
+
+void static04()
+{
+
+//  T() {}
+
+   static int i = sizeof(i);
+
+//  T() {}
+
+
+   printf("%d\n", i);
+}
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   static04();
+
+//  P() {}
+
+   static04();
+
+//  P() {}
+
+   static04();
+}
+
+//  P() {}
+
+void static04()
+{
+
+//  P() {}
+
+   static int i = sizeof(i);
+
+//  P() {}
+
+
+   printf("%d\n", i);
+}
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+int main()
+{
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+   static04();
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+   static04();
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+   static04();
+}
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+void static04()
+{
+   static int i = sizeof(i);
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+
+   printf("%d\n", i);
+}

@@ -349,7 +349,7 @@ static list coarse_grain_loop_parallelization(statement module_stat)
 
 
 /** Parallelize code by using region informations to prove iteration
-    independance.
+    independence.
 
     @param module_name is the name of the module to parallelize
     @return true in case of success. Indeed, return alway true. :-)
@@ -454,10 +454,10 @@ bool coarse_grain_parallelization(const char* module_name) {
 }
 
 /** Parallelize code by using region informations to prove iteration
-    independance. Use reduction information to filter out false
+    independence. Use reduction information to filter out false
     dependencies.
 
-    This is an independant phase and not only a property since we need
+    This is an independent phase and not only a property since we need
     more resources.
 
     @param module_name is the name of the module to parallelize

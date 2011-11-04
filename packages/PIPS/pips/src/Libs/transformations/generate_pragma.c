@@ -55,55 +55,6 @@
 
 /////////////////////////////////////////////////////PRAGMA AS EXPRESSION
 
-///@return the new pragma
-///@param l, the loop to analyze for omp reduction
-///@param exprs, the pragma as a list of expression
-static list append_private_clause (loop l, list exprs) {
-  // the private variables as a list of entites
-  list private = loop_private_variables_as_entites (l, true, true);
-  // add private clause if needed
-  if (gen_length (private) != 0) {
-    expression expr_private  = pragma_private_as_expr (private);
-    exprs = gen_expression_cons (expr_private, exprs);
-  }
-  return exprs;
-}
-
-/// @brief generate pragma for a reduction as a list of expressions
-/// @return true if a pragma has been generated
-/// @param l, the loop to analyze for omp reduction
-/// @param stmt, the statament where the pragma should be attached
-static bool pragma_expr_for_reduction (loop l, statement stmt) {
-  // the list of expression to generate
-  list exprs = NULL;
-  exprs = reductions_get_omp_pragma_expr (l, stmt);
-  // insert the pragma (if any) as an expression to the current statement
-  if (exprs != NULL) {
-    // check if a private clause is needed on top of the reduction clause
-    exprs = append_private_clause (l, exprs);
-    add_pragma_expr_to_statement (stmt, exprs);
-    pips_debug (5, "new reduction pragma as an extension added\n");
-  }
-  return (exprs != NULL);
-}
-
-/// @brief generate "pragma omp for" as a list of expressions
-/// @return true if a pragma has been generated
-/// @param l, the loop to analyze for omp for
-/// @param stmt, the statament where the pragma should be attached
-static bool pragma_expr_for (loop l, statement stmt) {
-  list exprs = NULL;
-  if (execution_parallel_p(loop_execution(l))) {
-    // the list of expression to generate initialized with
-    // pragma "omp parallel for"
-    list exprs = pragma_omp_parallel_for_as_exprs ();
-    exprs = append_private_clause (l, exprs);
-    // insert the pragma as an expression to the current statement
-    add_pragma_expr_to_statement (stmt, exprs);
-    pips_debug (5, "new for pragma as an extension added\n");
-  }
-  return (exprs != NULL);
-}
 
 /// @brief generate pragma as a list of expressions for a loop
 /// @return void
@@ -112,14 +63,14 @@ static void generate_expr_omp_pragma_loop (loop l) {
 
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
 
-  if (pragma_expr_for_reduction (l, stmt) == false)
+  if (omp_pragma_expr_for_reduction (l, stmt, true) == false)
     // A reduction pragma has already been found no need to look for a simple
     // parallel for loop. Note that founding such a simple parallel for loop
     // might show some problems in the code. For example dead code or the usage
     // of initialized variables. In such a case PIPS follows the principle :
     // If the code is false or dead then, do it in parallel, it will still be
     // false or dead.
-    pragma_expr_for (l, stmt);
+    omp_pragma_expr_for (l, stmt);
 
   return;
 }
@@ -215,7 +166,7 @@ bool ompify_code (const const char* module_name) {
   // we need to know which type of pragma need to be generated
   const char* type = get_string_property("PRAGMA_TYPE");
 
-  // we need to iniatlize few things to generate reduction
+  // we need to initialize few things to generate reduction
   reductions_pragma_omp_init (module_name);
 
   // generate pragma string or expression using the correct language:

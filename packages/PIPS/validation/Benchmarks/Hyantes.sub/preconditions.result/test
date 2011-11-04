@@ -1,0 +1,2107 @@
+
+//  P() {}
+
+void hs_display(size_t lonRange, size_t latRange, hs_potential_t pt[latRange][lonRange])
+{
+
+//  P() {}
+
+   size_t i;
+
+//  P(i) {}
+
+   for(i = 0; i <= latRange-1; i += 1) {
+      {
+
+//  P(i) {0<=i, i+1<=latRange}
+
+         size_t j;
+
+//  P(i,j) {0<=i, i+1<=latRange}
+
+         for(j = 0; j <= lonRange-1; j += 1)
+
+//  P(i,j) {0<=i, i+1<=latRange, 0<=j, j+1<=lonRange}
+
+            printf("%lf %lf %lf\n", pt[i][j].lon, pt[i][j].lat, pt[i][j].pot);
+      }
+
+//  P(i) {0<=i, i+1<=latRange}
+
+      putchar('\n');
+   }
+}
+
+//  P() {}
+
+char * * hs_list_smoothing(size_t *sz)
+{
+
+//  P() {}
+
+   static const size_t names_count = sizeof(func_names)/sizeof(*func_names);
+
+//  P() {}
+
+   *sz = names_count;
+
+//  P() {}
+
+   /*cast for backward compatibility only*/
+   return (const char **) func_names;
+}
+
+//  P() {}
+
+int hs_set(hs_option_t opt, ...)
+{
+
+//  P() {}
+
+   va_list args;
+
+//  P(args) {}
+
+   va_start(args, opt);
+
+//  P(args) {}
+
+   int res = vhs_set_r(&g_config, opt, &args);
+
+//  P(args,res) {}
+
+   va_end(args);
+
+//  P(args,res) {}
+
+   return res;
+}
+
+//  P() {opt==4}
+
+int hs_set_r(hs_config_t *config, hs_option_t opt, ...)
+{
+
+//  P() {opt==4}
+
+   va_list args;
+
+//  P(args) {opt==4}
+
+   va_start(args, opt);
+
+//  P(args) {opt==4}
+
+   int res = vhs_set_r(config, opt, &args);
+
+//  P(args,res) {opt==4}
+
+   va_end(args);
+
+//  P(args,res) {opt==4}
+
+   return res;
+}
+
+//  P() {}
+
+hs_potential_t * hs_smooth(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference)
+{
+
+//  P() {}
+
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &g_config);
+}
+
+//  P() {}
+
+hs_potential_t * hs_smooth_r(int _resoLat, int _resoLon, hs_coord_t visu, FILE *pFileReference, hs_config_t *configuration)
+{
+
+//  P() {}
+
+   if (_resoLat<=0||_resoLon<=0)
+
+//  P() {}
+
+      return (void *) 0;
+
+
+//  P() {}
+
+   size_t lonRange = (size_t) _resoLon;
+
+//  P(lonRange) {}
+
+   size_t latRange = (size_t) _resoLat;
+
+
+//  P(latRange,lonRange) {}
+
+   size_t nb;
+
+//  P(latRange,lonRange,nb) {}
+
+   hs_potential_t *the_towns = hs_read_towns(pFileReference, &nb, configuration);
+
+//  P(latRange,lonRange,nb) {}
+
+   hs_potential_t (*plots)[latRange][lonRange] = malloc(sizeof(hs_potential_t)*latRange*lonRange);
+
+//  P(latRange,lonRange,nb) {}
+
+   if (!plots) {
+
+//  P(latRange,lonRange,nb) {}
+
+      configuration->herrno = 12;
+
+//  P(latRange,lonRange,nb) {}
+
+      return (void *) 0;
+   }
+
+//  P(latRange,lonRange,nb) {}
+
+   data_t lonStep = (visu.MLon-visu.mLon)/_resoLon;
+
+//  P(latRange,lonRange,nb) {}
+
+   data_t latStep = (visu.MLat-visu.mLat)/_resoLat;
+
+//  P(latRange,lonRange,nb) {}
+
+   data_t range = (*configuration).fparam;
+   {
+
+//  P(latRange,lonRange,nb) {}
+
+      size_t i;
+
+//  P(i,latRange,lonRange,nb) {}
+
+      
+      /* init step: prepare output array */
+      for(i = 0; i <= latRange-1; i += 1) {
+
+//  P(i,latRange,lonRange,nb) {0<=i, i+1<=latRange}
+
+         size_t j;
+
+//  P(i,j,latRange,lonRange,nb) {0<=i, i+1<=latRange}
+
+         for(j = 0; j <= lonRange-1; j += 1) {
+
+//  P(i,j,latRange,lonRange,nb) {0<=i, i+1<=latRange, 0<=j,
+//    j+1<=lonRange}
+
+            ((*plots)[i])[j].lon = visu.mLon+lonStep*j;
+
+//  P(i,j,latRange,lonRange,nb) {0<=i, i+1<=latRange, 0<=j,
+//    j+1<=lonRange}
+
+            ((*plots)[i])[j].lat = visu.mLat+latStep*i;
+
+//  P(i,j,latRange,lonRange,nb) {0<=i, i+1<=latRange, 0<=j,
+//    j+1<=lonRange}
+
+            ((*plots)[i])[j].pot = 0.;
+         }
+      }
+   }
+
+//  P(latRange,lonRange,nb) {}
+
+
+   lonStep *= 3.14159265358979323846/180;
+
+//  P(latRange,lonRange,nb) {}
+
+   latStep *= 3.14159265358979323846/180;
+
+//  P(latRange,lonRange,nb) {}
+
+
+   do_run(visu, lonStep, latStep, range, lonRange, latRange, nb, *plots, *((hs_potential_t (*)[nb]) the_towns), configuration);
+
+//  P(latRange,lonRange,nb) {}
+
+   free(the_towns);
+
+//  P(latRange,lonRange,nb) {}
+
+   return (hs_potential_t *) plots;
+}
+
+//  P() {}
+
+hs_potential_t * hs_smoothing(int _resoLat, int _resoLon, const char *function_name, double function_param, hs_coord_t visu, FILE *pFileReference)
+{
+
+//  P() {}
+
+   hs_config_t config = {(void *) 0, 0, 0, 0, 500, 0, 0};
+
+//  P() {}
+
+   hs_set_r(&config, HS_SMOOTH_FUNC, function_name, function_param);
+
+//  P() {}
+
+   return hs_smooth_r(_resoLat, _resoLon, visu, pFileReference, &config);
+}
+
+//  P() {}
+
+unsigned long int hs_status()
+{
+
+//  P() {}
+
+   return g_config.status;
+}
+
+//  P() {}
+
+static void do_run(hs_coord_t visu, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t plots[latRange][lonRange], hs_potential_t the_towns[nb], hs_config_t *configuration)
+{
+
+//  P() {}
+
+
+/*data_t (*contrib)[latRange][lonRange] = malloc(sizeof(data_t)*latRange*lonRange);
+	if(!contrib) {
+		configuration->herrno=ENOMEM;
+		return;
+	}*/
+
+   if (configuration->fid==F_DISK) goto _switch_1_case_F_DISK;
+
+//  P() {}
+
+   if (configuration->fid==F_AMORTIZED_DISK) goto _switch_1_case_F_AMORTIZED_DISK;
+
+//  P() {}
+
+   if (configuration->fid==F_GAUSSIAN) goto _switch_1_case_F_GAUSSIAN;
+
+//  P() {}
+
+   if (configuration->fid==F_EXPONENTIAL) goto _switch_1_case_F_EXPONENTIAL;
+
+//  P() {}
+
+   if (configuration->fid==F_PARETO) goto _switch_1_case_F_PARETO;
+
+//  P() {}
+
+_switch_1_default:   ;
+
+//  P() {}
+
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  P() {}
+
+_switch_1_case_F_PARETO:   ;
+
+//  P() {}
+
+   do_run_PARETO(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  P() {}
+
+_switch_1_case_F_EXPONENTIAL:   ;
+
+//  P() {}
+
+   do_run_EXPONENTIAL(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  P() {}
+
+_switch_1_case_F_GAUSSIAN:   ;
+
+//  P() {}
+
+   do_run_GAUSSIAN(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  P() {}
+
+_switch_1_case_F_AMORTIZED_DISK:   ;
+
+//  P() {}
+
+   do_run_AMORTIZED_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+   goto _break_1;
+
+//  P() {}
+
+_switch_1_case_F_DISK:   ;
+
+//  P() {}
+
+   do_run_DISK(visu.mLon*3.14159265358979323846/180, visu.mLat*3.14159265358979323846/180, lonStep, latStep, range, lonRange, latRange, nb, plots, the_towns, configuration);
+
+//  P() {}
+
+_break_1:   ;
+}
+
+//  P() {}
+
+static void do_run_AMORTIZED_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  P() {}
+
+   data_t town_sum = 0.;
+
+//  P() {}
+
+   data_t total_sum = 0.;
+
+//  P() {}
+
+   config->status = 0;
+   {
+
+//  P() {}
+
+      size_t k;
+
+//  P(k) {}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  P(k) {0<=k, k+1<=nb}
+
+         data_t pot = t[k].pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         town_sum += pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t sum = 0.;
+
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+
+            if (latmin>t[k].lat)
+
+//  P(k) {0<=k, k+1<=nb}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  P(k) {0<=k, k+1<=nb}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  P(imin,k) {0<=k, k+1<=nb}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  P(imax,imin,k) {0<=k, k+1<=nb}
+
+
+            if (imin<0)
+
+//  P(imax,imin,k) {imin+1<=0, 0<=k, k+1<=nb}
+
+               imin = 0;
+
+//  P(imax,imin,k) {0<=imin, 0<=k, k+1<=nb}
+
+            if (imax>latRange)
+
+//  P(imax,imin,k) {latRange+1<=imax, 0<=imin, 0<=k, k+1<=nb}
+
+               imax = latRange;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  P(imax,imin,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+
+            if (jmin<0)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmin+1<=0,
+//    0<=k, k+1<=nb}
+
+               jmin = 0;
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=jmin, 0<=k,
+//    k+1<=nb}
+
+            if (jmax>lonRange)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    lonRange+1<=jmax, 0<=jmin, 0<=k, k+1<=nb}
+
+               jmax = lonRange;
+
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        do {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                           contrib[i-imin][j-jmin] = pot/(1+tmp);
+                        }
+                        while (0);
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     if (c>0) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  P(k) {0<=k, k+1<=nb}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  P() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  P() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  P() {}
+
+static void do_run_DISK(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  P() {}
+
+   data_t town_sum = 0.;
+
+//  P() {}
+
+   data_t total_sum = 0.;
+
+//  P() {}
+
+   config->status = 0;
+   {
+
+//  P() {}
+
+      size_t k;
+
+//  P(k) {}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  P(k) {0<=k, k+1<=nb}
+
+         data_t pot = t[k].pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         town_sum += pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t sum = 0.;
+
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+
+            if (latmin>t[k].lat)
+
+//  P(k) {0<=k, k+1<=nb}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  P(k) {0<=k, k+1<=nb}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  P(imin,k) {0<=k, k+1<=nb}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  P(imax,imin,k) {0<=k, k+1<=nb}
+
+
+            if (imin<0)
+
+//  P(imax,imin,k) {imin+1<=0, 0<=k, k+1<=nb}
+
+               imin = 0;
+
+//  P(imax,imin,k) {0<=imin, 0<=k, k+1<=nb}
+
+            if (imax>latRange)
+
+//  P(imax,imin,k) {latRange+1<=imax, 0<=imin, 0<=k, k+1<=nb}
+
+               imax = latRange;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  P(imax,imin,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+
+            if (jmin<0)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmin+1<=0,
+//    0<=k, k+1<=nb}
+
+               jmin = 0;
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=jmin, 0<=k,
+//    k+1<=nb}
+
+            if (jmax>lonRange)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    lonRange+1<=jmax, 0<=jmin, 0<=k, k+1<=nb}
+
+               jmax = lonRange;
+
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        do {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                           contrib[i-imin][j-jmin] = pot;
+                        }
+                        while (0);
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     if (c>0) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  P(k) {0<=k, k+1<=nb}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  P() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  P() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  P() {}
+
+static void do_run_EXPONENTIAL(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  P() {}
+
+   data_t town_sum = 0.;
+
+//  P() {}
+
+   data_t total_sum = 0.;
+
+//  P() {}
+
+   config->status = 0;
+   {
+
+//  P() {}
+
+      size_t k;
+
+//  P(k) {}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  P(k) {0<=k, k+1<=nb}
+
+         data_t pot = t[k].pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         town_sum += pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t sum = 0.;
+
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+
+            if (latmin>t[k].lat)
+
+//  P(k) {0<=k, k+1<=nb}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  P(k) {0<=k, k+1<=nb}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  P(imin,k) {0<=k, k+1<=nb}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  P(imax,imin,k) {0<=k, k+1<=nb}
+
+
+            if (imin<0)
+
+//  P(imax,imin,k) {imin+1<=0, 0<=k, k+1<=nb}
+
+               imin = 0;
+
+//  P(imax,imin,k) {0<=imin, 0<=k, k+1<=nb}
+
+            if (imax>latRange)
+
+//  P(imax,imin,k) {latRange+1<=imax, 0<=imin, 0<=k, k+1<=nb}
+
+               imax = latRange;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  P(imax,imin,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+
+            if (jmin<0)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmin+1<=0,
+//    0<=k, k+1<=nb}
+
+               jmin = 0;
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=jmin, 0<=k,
+//    k+1<=nb}
+
+            if (jmax>lonRange)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    lonRange+1<=jmax, 0<=jmin, 0<=k, k+1<=nb}
+
+               jmax = lonRange;
+
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        do {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                           contrib[i-imin][j-jmin] = pot*exp(-(2./range)*tmp);
+                        }
+                        while (0);
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     if (c>0) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  P(k) {0<=k, k+1<=nb}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  P() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  P() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  P() {}
+
+static void do_run_GAUSSIAN(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  P() {}
+
+   data_t town_sum = 0.;
+
+//  P() {}
+
+   data_t total_sum = 0.;
+
+//  P() {}
+
+   config->status = 0;
+   {
+
+//  P() {}
+
+      size_t k;
+
+//  P(k) {}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  P(k) {0<=k, k+1<=nb}
+
+         data_t pot = t[k].pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         town_sum += pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t sum = 0.;
+
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+
+            if (latmin>t[k].lat)
+
+//  P(k) {0<=k, k+1<=nb}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  P(k) {0<=k, k+1<=nb}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  P(imin,k) {0<=k, k+1<=nb}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  P(imax,imin,k) {0<=k, k+1<=nb}
+
+
+            if (imin<0)
+
+//  P(imax,imin,k) {imin+1<=0, 0<=k, k+1<=nb}
+
+               imin = 0;
+
+//  P(imax,imin,k) {0<=imin, 0<=k, k+1<=nb}
+
+            if (imax>latRange)
+
+//  P(imax,imin,k) {latRange+1<=imax, 0<=imin, 0<=k, k+1<=nb}
+
+               imax = latRange;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  P(imax,imin,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+
+            if (jmin<0)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmin+1<=0,
+//    0<=k, k+1<=nb}
+
+               jmin = 0;
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=jmin, 0<=k,
+//    k+1<=nb}
+
+            if (jmax>lonRange)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    lonRange+1<=jmax, 0<=jmin, 0<=k, k+1<=nb}
+
+               jmax = lonRange;
+
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        do {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                           contrib[i-imin][j-jmin] = pot*exp(-(3.14159265358979323846/(4.*range*range))*tmp*tmp);
+                        }
+                        while (0);
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     if (c>0) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  P(k) {0<=k, k+1<=nb}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  P() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  P() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  P() {}
+
+static void do_run_PARETO(data_t lonMin, data_t latMin, data_t lonStep, data_t latStep, data_t range, size_t lonRange, size_t latRange, size_t nb, hs_potential_t pt[latRange][lonRange], hs_potential_t t[nb], hs_config_t *config)
+{
+
+//  P() {}
+
+   data_t town_sum = 0.;
+
+//  P() {}
+
+   data_t total_sum = 0.;
+
+//  P() {}
+
+   config->status = 0;
+   {
+
+//  P() {}
+
+      size_t k;
+
+//  P(k) {}
+
+      /*for each town, we shall calculate its contribution on the window */
+      
+      for(k = 0; k <= nb-1; k += 1) {
+
+//  P(k) {0<=k, k+1<=nb}
+
+         data_t pot = t[k].pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         town_sum += pot;
+
+//  P(k) {0<=k, k+1<=nb}
+
+         /* only process if it is relevant */
+         if (pot>0) {
+            /* contribution step: compute contribution of t[k] to the whole map */
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t sum = 0.;
+
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmax = acos(cos(t[k].lat)*cos(range/6368.)-fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+            data_t latmin = acos(cos(t[k].lat)*cos(range/6368.)+fabs(sin(t[k].lat)*sin(range/6368.)));
+
+//  P(k) {0<=k, k+1<=nb}
+
+
+            if (latmin>t[k].lat)
+
+//  P(k) {0<=k, k+1<=nb}
+
+               latmin = 2*t[k].lat-latmin;
+
+//  P(k) {0<=k, k+1<=nb}
+
+            long int imin = floor((latmin-latMin)/latStep);
+
+//  P(imin,k) {0<=k, k+1<=nb}
+
+            size_t imax = 1+ceil((latmax-latMin)/latStep);
+
+//  P(imax,imin,k) {0<=k, k+1<=nb}
+
+
+            if (imin<0)
+
+//  P(imax,imin,k) {imin+1<=0, 0<=k, k+1<=nb}
+
+               imin = 0;
+
+//  P(imax,imin,k) {0<=imin, 0<=k, k+1<=nb}
+
+            if (imax>latRange)
+
+//  P(imax,imin,k) {latRange+1<=imax, 0<=imin, 0<=k, k+1<=nb}
+
+               imax = latRange;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t deltalon = acos((cos(range/6368)-pow(sin(t[k].lat), 2))/pow(cos(t[k].lat), 2));
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmax = t[k].lon+deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            data_t lonmin = t[k].lon-deltalon;
+
+//  P(imax,imin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            long int jmin = floor((lonmin-lonMin)/lonStep);
+
+//  P(imax,imin,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+            size_t jmax = 1+ceil((lonmax-lonMin)/lonStep);
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=k, k+1<=nb}
+
+
+            if (jmin<0)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmin+1<=0,
+//    0<=k, k+1<=nb}
+
+               jmin = 0;
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, 0<=jmin, 0<=k,
+//    k+1<=nb}
+
+            if (jmax>lonRange)
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    lonRange+1<=jmax, 0<=jmin, 0<=k, k+1<=nb}
+
+               jmax = lonRange;
+
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb}
+
+            data_t contrib[imax-imin+1][jmax-jmin+1];
+            {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`4`i,imax,imin,jmax,jmin,k) {0`1`2`3`4`i+1<=imax,
+//    imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t tmp = 6368.*acos(cos(latMin+latStep*i)*cos(t[k].lat)*(cos(lonMin+lonStep*j)*cos(t[k].lon)+sin(lonMin+lonStep*j)*sin(t[k].lon))+sin(latMin+latStep*i)*sin(t[k].lat));
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     /* if distance from town is within range, set contribution */
+                     if (tmp<range) {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        do {
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                           data_t tmp = tmp*tmp;
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                           contrib[i-imin][j-jmin] = pot*1./(1+2/range*tmp*tmp);
+                        }
+                        while (0);
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        sum += contrib[i-imin][j-jmin];
+                     }
+                     else
+
+//  P(0`1`2`3`4`5`6`j,0`1`2`3`4`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`4`5`6`j+1<=jmax, jmin<=0`1`2`3`4`5`6`j,
+//    0`1`2`3`4`i+1<=imax, imin<=0`1`2`3`4`i, imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        contrib[i-imin][j-jmin] = 0;
+                  }
+               }
+            }
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+            
+            /* normalization step: make sure pot is fully represented by its contributions */
+            if (sum>0) {
+
+//  P(imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               size_t i;
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {imax<=latRange, 0<=imin,
+//    jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+               for(i = imin; i <= imax-1; i += 1) {
+
+//  P(0`1`2`3`10`11`i,imax,imin,jmax,jmin,k) {0`1`2`3`10`11`i+1<=imax,
+//    imin<=0`1`2`3`10`11`i, imax<=latRange, 0<=imin, jmax<=lonRange,
+//    0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  size_t j;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                  for(j = jmin; j <= jmax-1; j += 1) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     data_t c = contrib[i-imin][j-jmin];
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                     if (c>0) {
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        pt[i][j].pot += c*pot/sum;
+
+//  P(0`1`2`3`10`11`12`13`j,0`1`2`3`10`11`i,imax,imin,jmax,jmin,k)
+//    {0`1`2`3`10`11`12`13`j+1<=jmax, jmin<=0`1`2`3`10`11`12`13`j,
+//    0`1`2`3`10`11`i+1<=imax, imin<=0`1`2`3`10`11`i, imax<=latRange,
+//    0<=imin, jmax<=lonRange, 0<=jmin, 0<=k, k+1<=nb, 1<=nb}
+
+                        total_sum += c*pot/sum;
+                     }
+                  }
+               }
+            }
+         }
+
+//  P(k) {0<=k, k+1<=nb}
+
+         config->status = (unsigned long int) k;
+      }
+   }
+
+//  P() {}
+
+
+   if (fabs(town_sum-total_sum)>0.0001)
+
+//  P() {}
+
+      fprintf(stderr, "Warning : information lost during processing, you may consider increasing the window resolution\n");
+}
+
+//  P() {}
+
+static hs_potential_t * hs_read_towns(FILE *fd, size_t *len, hs_config_t *config)
+{
+
+//  P() {}
+
+   size_t curr = 0;
+
+//  P(curr) {curr==0}
+
+   size_t nb = 1;
+
+//  P(curr,nb) {curr==0, nb==1}
+
+   hs_potential_t *the_towns = malloc(sizeof(hs_potential_t));
+
+//  P(curr,nb) {curr==0, nb==1}
+
+   if (!the_towns) {
+
+//  P(curr,nb) {curr==0, nb==1}
+
+      config->herrno = 12;
+
+//  P(curr,nb) {curr==0, nb==1}
+
+      return (void *) 0;
+   }
+
+//  P(curr,nb) {curr==0, nb==1}
+
+   fputs("begin parsing ...\n", stderr);
+
+//  P(curr,nb) {curr==0, nb==1}
+
+
+   while (!feof(fd)) {
+
+//  P(curr,nb) {0<=curr}
+
+      if (nb==curr) {
+
+//  P(curr,nb) {curr==nb, 0<=curr}
+
+         nb *= 2;
+
+//  P(curr,nb) {2curr==nb, 0<=curr}
+
+         the_towns = realloc(the_towns, nb*sizeof(hs_potential_t));
+
+//  P(curr,nb) {2curr==nb, 0<=curr}
+
+         if (!the_towns) {
+
+//  P(curr,nb) {2curr==nb, 0<=curr}
+
+            config->herrno = 12;
+
+//  P(curr,nb) {2curr==nb, 0<=curr}
+
+            return (void *) 0;
+         }
+      }
+
+//  P(curr,nb) {0<=curr}
+
+      if (fscanf(fd, "%lf%*[ \t]%lf%*[ \t]%lf", &the_towns[curr].lat, &the_towns[curr].lon, &the_towns[curr].pot)!=3) {
+l99999:         ;
+
+//  P(c,curr,nb) {0<=curr}
+
+         if (!!feof(fd)) goto _break_2;
+
+//  P(c,curr,nb) {0<=curr}
+
+         char c = (char) fgetc(fd);
+
+//  P(c,curr,nb) {0<=curr}
+
+         if (c=='\n'||c=='\r'||c=='#') {
+         }
+         else {
+            goto l99999;
+         }
+
+//  P(c,curr,nb) {0<=curr}
+
+_break_2:         ;
+      }
+      else {
+
+//  P(curr,nb) {0<=curr}
+
+         the_towns[curr].lat *= 3.14159265358979323846/180;
+
+//  P(curr,nb) {0<=curr}
+
+         the_towns[curr].lon *= 3.14159265358979323846/180;
+
+//  P(curr,nb) {0<=curr}
+
+         ++curr;
+      }
+   }
+
+//  P(curr,nb) {0<=curr}
+
+   the_towns = realloc(the_towns, curr*sizeof(hs_potential_t));
+
+//  P(curr,nb) {0<=curr}
+
+   if (!the_towns) {
+
+//  P(curr,nb) {0<=curr}
+
+      config->herrno = 12;
+
+//  P(curr,nb) {0<=curr}
+
+      return (void *) 0;
+   }
+
+//  P(curr,nb) {0<=curr}
+
+   *len = curr;
+
+//  P(curr,nb) {0<=curr}
+
+   fprintf(stderr, "parsed %zd towns\n", curr);
+
+//  P(curr,nb) {0<=curr}
+
+   return the_towns;
+}
+
+//  P() {}
+
+static int vhs_set_r(hs_config_t *config, hs_option_t opt, va_list *ap)
+{
+
+//  P() {}
+
+   int res = 1;
+
+//  P(res) {res==1}
+
+   if (opt==HS_PARSE_ONLY) goto _switch_1_case_HS_PARSE_ONLY;
+
+//  P(res) {res==1}
+
+   if (opt==HS_THRESHOLD) goto _switch_1_case_HS_THRESHOLD;
+
+//  P(res) {res==1}
+
+   if (opt==HS_LOAD_RAW) goto _switch_1_case_HS_LOAD_RAW;
+
+//  P(res) {res==1}
+
+   if (opt==HS_LOAD_PRECOMPUTED) goto _switch_1_case_HS_LOAD_PRECOMPUTED;
+
+//  P(res) {res==1}
+
+   if (opt==HS_SMOOTH_FUNC) goto _switch_1_case_HS_SMOOTH_FUNC;
+
+//  P(res) {res==1}
+
+   if (opt==HS_MODULE_OPT) goto _switch_1_case_HS_MODULE_OPT;
+
+//  P(res) {res==1}
+
+
+_switch_1_default:   ;
+
+//  P(res) {res==1}
+
+   fprintf(stderr, "[hs_set] unknow option \n");
+
+//  P(res) {res==1}
+
+   res = 0;
+   goto _break_1;
+
+//  P(res) {opt==5, res==1}
+
+_switch_1_case_HS_MODULE_OPT:   ;
+
+//  P(res) {opt==5, res==1}
+
+   //res = init_module(ap);
+   res = 0;
+   goto _break_1;
+
+//  P(res) {opt==4, res==1}
+
+_switch_1_case_HS_SMOOTH_FUNC:   ;
+   {
+
+//  P(res) {opt==4, res==1}
+
+      char *fname = va_arg(*ap, char *);
+
+//  P(res) {opt==4, res==1}
+
+      double fparam = va_arg(*ap, double);
+
+//  P(res) {opt==4, res==1}
+
+      config->fparam = fparam;
+      //set_func_inter(fname, fparam);
+
+//  P(res) {opt==4, res==1}
+
+      size_t sz;
+
+//  P(res,sz) {opt==4, res==1}
+
+      size_t i;
+
+//  P(i,res,sz) {opt==4, res==1}
+
+      hs_list_smoothing(&sz);
+
+//  P(i,res,sz) {opt==4, res==1}
+
+      i = 0;
+l99998:      ;
+
+//  P(i,res,sz) {opt==4, res==1, 0<=i}
+
+      if (!(i<sz)) goto _break_2;
+
+//  P(i,res,sz) {opt==4, res==1, 0<=i, i+1<=sz}
+
+      if (strcmp(func_names[i], fname)==0) goto l99999;
+
+//  P(i,res,sz) {opt==4, res==1, 0<=i, i+1<=sz}
+
+      i++;
+      goto l99998;
+l99999:      ;
+
+//  P(i,res,sz) {opt==4, res==1, 0<=i, i+1<=sz}
+
+      config->fid = (smoothing_fun_t) i;
+
+//  P(i,res,sz) {opt==4, res==1, 0<=i}
+
+_break_2:      ;
+
+//  P(i,res,sz) {opt==4, res==1, 0<=i}
+
+      if (i==sz) {
+
+//  P(i,res,sz) {i==sz, opt==4, res==1, 0<=i}
+
+         res = 0;
+
+//  P(i,res,sz) {i==sz, opt==4, res==0, 0<=i}
+
+         fprintf(stderr, "error : unreconized smoothing function \n");
+      }
+   }
+   goto _break_1;
+
+//  P(res) {opt==3, res==1}
+
+_switch_1_case_HS_LOAD_PRECOMPUTED:   ;
+
+//  P(res) {opt==3, res==1}
+
+   res = 0;
+   goto _break_1;
+
+//  P(res) {opt==2, res==1}
+
+_switch_1_case_HS_LOAD_RAW:   ;
+
+//  P(res) {opt==2, res==1}
+
+   res = 0;
+   goto _break_1;
+
+//  P(res) {opt==1, res==1}
+
+_switch_1_case_HS_THRESHOLD:   ;
+   goto _break_1;
+
+//  P(res) {opt==0, res==1}
+
+_switch_1_case_HS_PARSE_ONLY:   ;
+
+//  P(res) {opt==0, res==1}
+
+   res = 0;
+
+//  P(res) {}
+
+_break_1:   ;
+
+//  P(res) {}
+
+   if (!res)
+
+//  P(res) {res<=0}
+
+      config->herrno = 22;
+
+//  P(res) {}
+
+   return res;
+}
