@@ -436,7 +436,6 @@ entity float_to_entity(float c)
 
 entity int_to_entity(_int c)
 {
-    pips_assert("no negative integer entity in pips",c>=0);
     string num;
     asprintf(&num, "%d", (int) c);
     entity e = MakeConstant(num,is_basic_int);
