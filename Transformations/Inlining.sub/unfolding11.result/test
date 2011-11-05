@@ -1,0 +1,32 @@
+P4A_accel_kernel main(unsigned int maxX, unsigned int maxY, unsigned int macroX, unsigned int macroY, int *results, unsigned char *table1, unsigned char *table2)
+{
+   // Loop nest P4A end
+   if (macroY<=maxY-17&&macroX<=maxX-17) {
+      int ret = Intermediate_function(macroX, macroY, maxX, maxY, table1, table2);
+      *(results+macroX+macroY*maxX) = ret;
+   }
+}
+P4A_accel_kernel main(unsigned int maxX, unsigned int maxY, unsigned int macroX, unsigned int macroY, int *results, unsigned char *table1, unsigned char *table2)
+{
+   //PIPS generated variable
+   int _return0;
+   
+   // Loop nest P4A end
+   if (macroY<=maxY-17&&macroX<=maxX-17) {
+      int ret;
+      {
+         int sum = 0;
+         {
+            unsigned int y;
+            for(y = 0; y <= maxY-1; y += 1) {
+               unsigned int x;
+               for(x = 0; x <= maxX-1; x += 1)
+                  sum += table1[y+macroY][x+macroX]-table2[y+macroY][x+macroX];
+            }
+         }
+         _return0 = sum;
+      }
+      ret = _return0;
+      *(results+macroX+macroY*maxX) = ret;
+   }
+}
