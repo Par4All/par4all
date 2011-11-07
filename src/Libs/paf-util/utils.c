@@ -1837,7 +1837,7 @@ bool (*compare_obj)();
  * Else, we create a new expression with a binary call.
  *
  * Note: The function MakeBinaryCall() comes from Pips/.../syntax/expression.c
- *       The function make_integer_constant_expression() comes from ri-util.
+ *       The function int_to_expression() comes from ri-util.
  * Note: This function is almost equivalent to make_op_exp() but for the
  * rational calculus.
  */
@@ -1871,15 +1871,15 @@ expression rational_op_exp(string op_name, expression exp1, expression exp2)
     val2 = expression_to_int(exp2);
 
     if (ENTITY_PLUS_P(op_ent))
-      result_exp = make_integer_constant_expression(val1 + val2);
+      result_exp = int_to_expression(val1 + val2);
     else if(ENTITY_MINUS_P(op_ent))
-      result_exp = make_integer_constant_expression(val1 - val2);
+      result_exp = int_to_expression(val1 - val2);
     else if(ENTITY_MULTIPLY_P(op_ent))
-      result_exp = make_integer_constant_expression(val1 * val2);
+      result_exp = int_to_expression(val1 * val2);
     else { /* ENTITY_DIVIDE_P(op_ent) */
       /* rational calculus */
       if((val1 % val2) == 0)
-	result_exp = make_integer_constant_expression((int) (val1 / val2));
+	result_exp = int_to_expression((int) (val1 / val2));
     }
   }
   else {
@@ -1900,7 +1900,7 @@ expression rational_op_exp(string op_name, expression exp1, expression exp2)
       else if(ENTITY_MINUS_P(op_ent))
 	result_exp = MakeUnaryCall(unary_minus_ent, exp2);
       else /* ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent) */
-	result_exp = make_integer_constant_expression(0);
+	result_exp = int_to_expression(0);
     }
     else if(expression_equal_integer_p(exp1, 1)) {
       if(ENTITY_MULTIPLY_P(op_ent))
@@ -1910,7 +1910,7 @@ expression rational_op_exp(string op_name, expression exp1, expression exp2)
       if (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent))
 	result_exp = exp1;
       else if (ENTITY_MULTIPLY_P(op_ent))
-	result_exp = make_integer_constant_expression(0);
+	result_exp = int_to_expression(0);
       else /* ENTITY_DIVIDE_P(op_ent) */
 	user_error("rational_op_exp", "division by zero");
     }
@@ -2450,7 +2450,7 @@ Value       d;
 
   if(VECTEUR_NUL_P(v))
     /* make a "zero" expression */
-    e = make_integer_constant_expression(0);
+    e = int_to_expression(0);
   else if(value_zero_p(value_mod(vect_pgcd_all(v), value_abs(d))))
     /* divide "v" by "d", and make the expression with no denominator */
       e = make_vecteur_expression(vect_div(v, d));

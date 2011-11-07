@@ -103,7 +103,7 @@ int number_of_lower_bounds,loop_rank;
 		vect_chg_coeff(&pv2,var,VALUE_ZERO);
 		expr = ex1 = make_vecteur_expression(pv2);
     		if (value_notmone_p(coeff)) {
-		    ex2 = make_integer_constant_expression(
+		    ex2 = int_to_expression(
 			VALUE_TO_INT(value_abs(coeff)));
 		    lex2 =CONS(EXPRESSION,ex2,NIL);
 		    expr=make_div_expression(ex1,lex2);
@@ -194,7 +194,7 @@ int number_of_upper_bounds, loop_rank;
 		vect_chg_sgn(pv2);
 	      
 		if (value_notone_p(coeff)) {
-		    ex2 = make_integer_constant_expression(
+		    ex2 = int_to_expression(
 			VALUE_TO_INT(value_abs(coeff)));
 		    lex2 = CONS(EXPRESSION,ex2,NIL);
 		    expr= make_div_expression(ex1,lex2);
@@ -278,7 +278,7 @@ Pbase index_base;
 	vect_chg_coeff(&(left_ineq->vecteur),var,VALUE_ZERO);
 	ex1 = make_vecteur_expression(left_ineq->vecteur);
 	if (value_notmone_p(coeff)) {
-	    ex2 = make_integer_constant_expression(
+	    ex2 = int_to_expression(
 		VALUE_TO_INT(value_abs(coeff)));
 	    lex2 = CONS(EXPRESSION,ex2,NIL);
 	    exl = make_div_expression(ex1,lex2);	
@@ -295,7 +295,7 @@ Pbase index_base;
 	vect_chg_sgn(right_ineq->vecteur);
     
 	if (value_notone_p(coeff)) {
-	    ex4 = make_integer_constant_expression(
+	    ex4 = int_to_expression(
 		VALUE_TO_INT(value_abs(coeff)));
 	    lex2 =CONS(EXPRESSION,ex4,NIL);
 	    exr = make_div_expression(ex3,lex2);	
@@ -435,7 +435,7 @@ bound_generation(
 						     n0_loop);
 
 		looprange = make_range(lower_bound,upper_bound,
-				       make_integer_constant_expression(1));
+				       int_to_expression(1));
 
 		/* looplabel = make_new_label(initial_module_name); */
 		/* new code by FI to add continue statements starts here */

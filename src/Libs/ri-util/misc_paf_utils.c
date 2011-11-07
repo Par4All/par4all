@@ -99,8 +99,8 @@ expression 	exp1, exp2;
 	if (expression_constant_p( exp1 ) && expression_constant_p( exp2 )) {
 		int val1 = expression_to_int( exp1 );
 		int val2 = expression_to_int( exp2 );
-		if (val1 > val2) rexp = make_integer_constant_expression(val1);
-		else rexp = make_integer_constant_expression( val2 );
+		if (val1 > val2) rexp = int_to_expression(val1);
+		else rexp = int_to_expression( val2 );
 	}
 	else rexp = MakeBinaryCall( ent, exp1, exp2 );
 

@@ -484,7 +484,7 @@ list        l;
 
   /* build the expression t-local = -1 */
   lexp = CONS(EXPRESSION, make_entity_expression(t, NIL), NIL);
-  ADD_ELEMENT_TO_LIST(lexp, EXPRESSION, make_integer_constant_expression(-1));
+  ADD_ELEMENT_TO_LIST(lexp, EXPRESSION, int_to_expression(-1));
   ca = make_call(entity_intrinsic(ASSIGN_OPERATOR_NAME), lexp);
   ins = make_instruction(is_instruction_call, ca);
   stat = MAKE_STATEMENT(ins);
@@ -541,9 +541,9 @@ bool val;
   expression e;
 
   if(val)
-    e = make_integer_constant_expression(1);
+    e = int_to_expression(1);
   else
-    e = make_integer_constant_expression(0);
+    e = int_to_expression(0);
 
   lexp = CONS(EXPRESSION, make_entity_expression(f, NIL), NIL);
   ADD_ELEMENT_TO_LIST(lexp, EXPRESSION, e);
@@ -575,7 +575,7 @@ instruction build_flag_test(f, t)
  stat = MAKE_STATEMENT(ins);
 
  lexp = CONS(EXPRESSION, make_entity_expression(f, NIL), NIL);
- ADD_ELEMENT_TO_LIST(lexp, EXPRESSION, make_integer_constant_expression(1));
+ ADD_ELEMENT_TO_LIST(lexp, EXPRESSION, int_to_expression(1));
  ca = make_call(entity_intrinsic(EQUAL_OPERATOR_NAME), lexp);
  exp = make_expression(make_syntax(is_syntax_call, ca), normalized_undefined);
  
@@ -620,7 +620,7 @@ instruction make_increment_instruction(t, i)
  list        lexp;
 
  lexp = CONS(EXPRESSION, make_entity_expression(t, NIL), NIL);
- ADD_ELEMENT_TO_LIST(lexp, EXPRESSION, make_integer_constant_expression(i));
+ ADD_ELEMENT_TO_LIST(lexp, EXPRESSION, int_to_expression(i));
  ca = make_call(entity_intrinsic(PLUS_OPERATOR_NAME), lexp);
  exp1 = make_expression(make_syntax(is_syntax_call, ca), 
 			normalized_undefined);

@@ -467,7 +467,7 @@ int option;
     /* "A < 0" becomes "A + 1 <= 0"*/
     aux_pred = make_op_exp(PLUS_OPERATOR_NAME,
 			   negate_expression(EXPRESSION(CAR(pred_l))),
-			   make_integer_constant_expression(1));
+			   int_to_expression(1));
 
     pred_l = CONS(EXPRESSION, aux_pred, CDR(pred_l));
    }
@@ -553,7 +553,7 @@ int i;
  extern expression crt_exp;
  expression aux_exp;
 
- aux_exp = make_integer_constant_expression(i);
+ aux_exp = int_to_expression(i);
 
  if(lin_exp_l == NIL)
     crt_exp = aux_exp;

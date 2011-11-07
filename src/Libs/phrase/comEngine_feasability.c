@@ -493,8 +493,8 @@ static bool check_loop_distribution_feasability(statement stat)
       }
   }, bodyEff);
 
-  if(!same_expression_p(rgIncr, make_integer_constant_expression(1)) ||
-     !same_expression_p(rgLower, make_integer_constant_expression(0)))
+  if(!same_expression_p(rgIncr, int_to_expression(1)) ||
+     !same_expression_p(rgLower, int_to_expression(0)))
     {
       success = false;
 

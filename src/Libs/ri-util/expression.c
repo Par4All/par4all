@@ -1385,11 +1385,6 @@ bool call_equal_p(call c1, call c2)
   return true;
 }
 
-/* proxy to int_to_expression */
-expression make_integer_constant_expression(int c)
-{
-    return int_to_expression(c);
-}
 
 int integer_constant_expression_value(expression e)
 {
@@ -1481,7 +1476,7 @@ expression make_factor_expression(int coeff, entity vari)
 {
   expression e1, e2, e3;
 
-  e1 = make_integer_constant_expression(coeff);
+  e1 = int_to_expression(coeff);
   if (vari==NULL)
     return(e1);			/* a constant only */
   else {
@@ -1521,7 +1516,7 @@ expression make_vecteur_expression(Pvecteur pv)
   c_op_sub = entity_intrinsic(MINUS_C_OPERATOR_NAME);
 
   if (VECTEUR_NUL_P(v))
-    return make_integer_constant_expression(0);
+    return int_to_expression(0);
 
   coef = VALUE_TO_INT(vecteur_val(v));
 
@@ -1609,7 +1604,7 @@ expression make_constraint_expression(Pvecteur v, Variable index)
   if (VECTEUR_NUL_P(pv))
     /* If the vector wihout the index is the vector null, we have simply
        index = 0: */
-    return make_integer_constant_expression(0);
+    return int_to_expression(0);
 
   /* If the coefficient for the index is positive, inverse all the
      vector since the index goes at the other side of "=": */
@@ -1641,7 +1636,7 @@ expression make_constraint_expression(Pvecteur v, Variable index)
     div = gen_find_tabulated("TOP-LEVEL:/",entity_domain);
     pips_assert("Division operator not found", div != entity_undefined);
 
-    ex2 = make_integer_constant_expression(VALUE_TO_INT(coeff));
+    ex2 = int_to_expression(VALUE_TO_INT(coeff));
     ex = make_expression(make_syntax(is_syntax_call,
 				     make_call(div,
 					       CONS(EXPRESSION,ex1,
@@ -1837,7 +1832,7 @@ bool expression_equal_integer_p(expression exp, int i)
  * Else, we create a new expression with a binary call.
  *
  * Note: The function MakeBinaryCall() comes from Pips/.../syntax/expression.c
- *       The function make_integer_constant_expression() comes from ri-util.
+ *       The function int_to_expression() comes from ri-util.
  *
  * Warning: using the same semantic as MakeBinaryCall,
  * make_op_exp owns the pointer exp1 and exp2 after the call,
@@ -1871,16 +1866,16 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
       debug(6, "make_op_exp", "Constant expressions\n");
 
       if (ENTITY_PLUS_P(op_ent))
-	result_exp = make_integer_constant_expression(val1 + val2);
+	result_exp = int_to_expression(val1 + val2);
       else if(ENTITY_MINUS_P(op_ent))
-	result_exp = make_integer_constant_expression(val1 - val2);
+	result_exp = int_to_expression(val1 - val2);
       else if(ENTITY_MULTIPLY_P(op_ent))
-	result_exp = make_integer_constant_expression(val1 * val2);
+	result_exp = int_to_expression(val1 * val2);
       else if(ENTITY_MODULO_P(op_ent))
-          result_exp = make_integer_constant_expression(val1 % val2);
+          result_exp = int_to_expression(val1 % val2);
       else /* ENTITY_DIVIDE_P(op_ent) */
 	/* we compute here as FORTRAN would do */
-	result_exp = make_integer_constant_expression((int) (val1 / val2));
+	result_exp = int_to_expression((int) (val1 / val2));
       free_expression(exp1);
       free_expression(exp2);
     }
@@ -1909,7 +1904,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
         free_expression(exp1);
       }
 	  else /* ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent) */ {
-	    result_exp = make_integer_constant_expression(0);
+	    result_exp = int_to_expression(0);
         free_expression(exp1);free_expression(exp2);
       }
 	}
@@ -1926,7 +1921,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 	  if (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent))
 	    result_exp = exp1;
 	  else if (ENTITY_MULTIPLY_P(op_ent)) {
-	    result_exp = make_integer_constant_expression(0);
+	    result_exp = int_to_expression(0);
         free_expression(exp1);
       }
 	  else /* ENTITY_DIVIDE_P(op_ent) */

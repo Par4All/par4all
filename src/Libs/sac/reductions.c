@@ -205,7 +205,7 @@ static expression make_maxval_expression(basic b)
         case is_basic_int:
             {
                 long long max = (2 << (basic_int(b) - 2)) - 1;
-                return make_integer_constant_expression(max);
+                return int_to_expression(max);
             }
 
         default:
@@ -227,7 +227,7 @@ static expression make_minval_expression(basic b)
         case is_basic_int:
             {
                 long long min = -(2 << (basic_int(b) - 2));
-                return make_integer_constant_expression(min);
+                return int_to_expression(min);
             }
 
         default:
