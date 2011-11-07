@@ -229,8 +229,8 @@
             CALL HPFC CMPNEIGHBOUR(-1)
             CALL HPFC RCVFR N
             CALL HPFC REAL8 UNPACK 3(A, ARRAYS A LO1, ARRAYS A UP1, 
-     &      ARRAYS A LO2, ARRAYS A UP2, ARRAYS A LO3, ARRAYS A UP3, -
-     &      1, 0, 1, 40, 40, 1, OLD, OLD, 1)
+     &      ARRAYS A LO2, ARRAYS A UP2, ARRAYS A LO3, ARRAYS A UP3, 
+     &      -1, 0, 1, 40, 40, 1, OLD, OLD, 1)
          ENDIF
 ! P(1:2, 1) receive A(1:48, 40, X) from (+1)
          IF (MY POS(2,3).EQ.1) THEN
@@ -245,8 +245,8 @@
             CALL HPFC CMPNEIGHBOUR(-2)
             CALL HPFC RCVFR N
             CALL HPFC REAL8 UNPACK 3(A, ARRAYS A LO1, ARRAYS A UP1, 
-     &      ARRAYS A LO2, ARRAYS A UP2, ARRAYS A LO3, ARRAYS A UP3, -
-     &      1, 0, 1, 2, 39, 1, OLD, OLD, 1)
+     &      ARRAYS A LO2, ARRAYS A UP2, ARRAYS A LO3, ARRAYS A UP3, 
+     &      -1, 0, 1, 2, 39, 1, OLD, OLD, 1)
          ENDIF
 ! P(2, 2) receive A(0, 0, X) from (-3)
          IF (MY POS(1,3).EQ.2.AND.MY POS(2,3).EQ.2) THEN
