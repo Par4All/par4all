@@ -6,11 +6,11 @@
 #include "timing.h"
 
 /* Default problem size. */
-#ifndef M
-# define M 1920
+#ifndef X
+# define X 1920
 #endif
-#ifndef N
-# define N 1080
+#ifndef Y
+# define Y 1080
 #endif
 #ifndef T
 # define T 1920
@@ -26,18 +26,18 @@
 
 DATA_TYPE tot[4];
 DATA_TYPE Gauss[4];
-DATA_TYPE g_tmp_image[N][M];
-DATA_TYPE g_acc1[N][M][4];
-DATA_TYPE g_acc2[N][M][4];
-DATA_TYPE in_image[N][M]; //input
-DATA_TYPE gauss_image[N][M]; //output
+DATA_TYPE g_tmp_image[Y][X];
+DATA_TYPE g_acc1[Y][X][4];
+DATA_TYPE g_acc2[Y][X][4];
+DATA_TYPE in_image[Y][X]; //input
+DATA_TYPE gauss_image[Y][X]; //output
 
 static void init_array() {
   int i, j;
 
-  for (i = 0; i < N;) {
-    for (j = 0; j < M;) {
-      in_image[i][j] = ((DATA_TYPE)i * j) / M;
+  for (i = 0; i < Y;) {
+    for (j = 0; j < X;) {
+      in_image[i][j] = ((DATA_TYPE)i * j) / X;
       j++;
     }
     i++;
@@ -56,10 +56,10 @@ static void print_array(int argc, char** argv) {
   if(argc > 42 && !strcmp(argv[0], ""))
 #endif
   {
-    for (i = 1; i < N-1; i++)
-      for (j = 1; j < M-1; j++) {
+    for (i = 1; i < Y-1; i++)
+      for (j = 1; j < X-1; j++) {
         fprintf(stderr, DATA_PRINTF_MODIFIER, gauss_image[i][j]);
-        if((i * N + j) % 80 == 20)
+        if((i * Y + j) % 80 == 20)
           fprintf(stderr, "\n");
       }
     fprintf(stderr, "\n");
@@ -69,8 +69,8 @@ static void print_array(int argc, char** argv) {
 int main(int argc, char** argv) {
   int x, y, k;
   int t = T;
-  int m = M;
-  int n = N;
+  int m = X;
+  int n = Y;
 
   /* Initialize array. */
   init_array();

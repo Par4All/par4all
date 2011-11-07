@@ -6,11 +6,11 @@
 #include "timing.h"
 
 /* Default problem size. */
-#ifndef M
-# define M 500
+#ifndef X
+# define X 500
 #endif
-#ifndef N
-# define N 500
+#ifndef Y
+# define Y 500
 #endif
 
 /* Default data type is double. */
@@ -24,17 +24,17 @@
 /* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */
 DATA_TYPE float_n = 321414134.01;
 DATA_TYPE eps = 0.005;
-DATA_TYPE data[M + 1][N + 1];
-DATA_TYPE symmat[M + 1][M + 1];
-DATA_TYPE stddev[M + 1];
-DATA_TYPE mean[M + 1];
+DATA_TYPE data[X + 1][Y + 1];
+DATA_TYPE symmat[X + 1][X + 1];
+DATA_TYPE stddev[X + 1];
+DATA_TYPE mean[X + 1];
 
 static void init_array() {
   int i, j;
 
-  for (i = 0; i <= M;) {
-    for (j = 0; j <= N;) {
-      data[i][j] = ((DATA_TYPE)i * j) / (M + 1);
+  for (i = 0; i <= X;) {
+    for (j = 0; j <= Y;) {
+      data[i][j] = ((DATA_TYPE)i * j) / (X + 1);
       j++;
     }
     i++;
@@ -50,10 +50,10 @@ void print_array(int argc, char** argv) {
   if(argc > 42 && !strcmp(argv[0], ""))
 #endif
   {
-    for (i = 1; i <= M; i++)
-      for (j = 1; j <= M; j++) {
+    for (i = 1; i <= X; i++)
+      for (j = 1; j <= X; j++) {
         fprintf(stderr, DATA_PRINTF_MODIFIER, symmat[i][j]);
-        if((i * M + j) % 80 == 20)
+        if((i * X + j) % 80 == 20)
           fprintf(stderr, "\n");
       }
     fprintf(stderr, "\n");
@@ -62,8 +62,8 @@ void print_array(int argc, char** argv) {
 
 int main(int argc, char** argv) {
   int i, j, j1, j2;
-  int m = M;
-  int n = N;
+  int m = X;
+  int n = Y;
 
   /* Initialize array. */
   init_array();
