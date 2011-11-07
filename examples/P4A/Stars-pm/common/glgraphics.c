@@ -1,13 +1,11 @@
 #include <stdio.h>
-/*#include <GL/glut.h>*/
-#include <GL/freeglut.h>
+#include <GL/glut.h>
 #include <pthread.h>
 #include <math.h>
 #include "varglob.h"
 #include "glgraphics.h"
 #include <signal.h>
 
-int pthread_kill(pthread_t thread, int sig);
 int usleep(int usec);
 
 int idList;
@@ -215,12 +213,7 @@ static void init() {
 void *mainloop(void *unused) {
   init();
   renderScene();
-  /* we want glutMainLoop() to return */
-  glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
-              GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-
   glutMainLoop();
-  printf("main loop\n");
   return NULL;
 }
 
@@ -245,6 +238,8 @@ void graphic_gldraw_histo(int argc_, char **argv_, int histo_[NP][NP][NP]) {
 }
 
 void graphic_gldestroy(void) {
+	
+  /* wait thread1 to finish */
   pthread_join(thread1,NULL);
   thread1 = 0;
 }

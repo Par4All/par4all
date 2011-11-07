@@ -1,5 +1,5 @@
 TARGET=gesummv
-SIZE_PARAMS= -DN=8000
+SIZE_PARAMS= -DY=8000
 
 include ../bench.mk
 

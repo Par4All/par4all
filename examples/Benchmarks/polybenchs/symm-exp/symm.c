@@ -6,11 +6,11 @@
 #include "timing.h"
 
 /* Default problem size. */
-#ifndef N
-# define N 512
+#ifndef Y
+# define Y 512
 #endif
-#ifndef M
-# define M 512
+#ifndef X
+# define X 512
 #endif
 
 /* Default data type is double (dsymm). */
@@ -24,9 +24,9 @@
 DATA_TYPE alpha;
 DATA_TYPE beta;
 DATA_TYPE acc;
-DATA_TYPE A[N][N];
-DATA_TYPE B[M][N];
-DATA_TYPE C[M][N];
+DATA_TYPE A[Y][Y];
+DATA_TYPE B[X][Y];
+DATA_TYPE C[X][Y];
 
 static inline
 void init_array() {
@@ -34,17 +34,17 @@ void init_array() {
 
   alpha = 12435;
   beta = 4546;
-  for (i = 0; i < N;) {
-    for (j = 0; j < N;) {
-      A[i][j] = ((DATA_TYPE)i * j) / N;
+  for (i = 0; i < Y;) {
+    for (j = 0; j < Y;) {
+      A[i][j] = ((DATA_TYPE)i * j) / Y;
       j++;
     }
     i++;
   }
-  for (i = 0; i < M;) {
-    for (j = 0; j < N;) {
-      B[i][j] = ((DATA_TYPE)i * j + 1) / N;
-      C[i][j] = ((DATA_TYPE)i * j + 2) / N;
+  for (i = 0; i < X;) {
+    for (j = 0; j < Y;) {
+      B[i][j] = ((DATA_TYPE)i * j + 1) / Y;
+      C[i][j] = ((DATA_TYPE)i * j + 2) / Y;
       j++;
       i++;
     }
@@ -60,10 +60,10 @@ void print_array(int argc, char** argv) {
   if(argc > 42 && !strcmp(argv[0], ""))
 #endif
   {
-    for (i = 0; i < M; i++)
-      for (j = 0; j < N; j++) {
+    for (i = 0; i < X; i++)
+      for (j = 0; j < Y; j++) {
         fprintf(stderr, DATA_PRINTF_MODIFIER, C[i][j]);
-        if((i * N + j) % 80 == 20)
+        if((i * Y + j) % 80 == 20)
           fprintf(stderr, "\n");
       }
     fprintf(stderr, "\n");
@@ -72,8 +72,8 @@ void print_array(int argc, char** argv) {
 
 int main(int argc, char** argv) {
   int i, j, k;
-  int n = N;
-  int m = M;
+  int n = Y;
+  int m = X;
 
   /* Initialize array. */
   init_array();

@@ -320,11 +320,15 @@ will be loaded, compiled and executed on the \Agpu. \emph{Ad
 generated to enable kernel execution. 
 
 \subsubsection{P4A Accel runtime for OpenCL}
-\label{sec:p4a-accel-runtime}
+\label{sec:p4a-accel-runtime_opencl}
 
 Like \Apfa generation for CUDA,  \Apfa does not directly generate
 direct \Aopencl code and instead generates calls to functions and
 macrofunctions defined in the P4A Accel runtime.
+
+For more information on P4A Accel runtime for OpenCL, have a look at \Apfa Accel runtime source on 
+\url{http://download.par4all.org/doc/Par4All_Accel_runtime/graph} or
+directly in the \Agit repository.
 
 The P4A Accel runtime itself can also be debugged by defining \verb|P4A_DEBUG| 
 environment variable to 1 (or more) to output debugging messages around all
@@ -404,7 +408,7 @@ The global architecture of \Apfa is given on
 figure~\ref{fig:transit_intestinal}.
 
 \begin{figure}
-  %\includegraphics[width=\hsize]{p4a_work_flow}
+  \includegraphics[width=\hsize]{p4a_work_flow}
   \caption{Intestinal view of \texttt{p4a}.}
   \label{fig:transit_intestinal}
 \end{figure}
@@ -495,7 +499,7 @@ Another example showing how to change a whole class as well:
 
 \section{Auxiliaries tools}
 
-\subsection{\Apfa Selective C Pre Processor}
+\subsection{Selective C Pre Processor}
 
 The \texttt{p4a\_scpp} tool can be used to pre-process a specific
 \texttt{\#include} directive while leaving the others untouched. See

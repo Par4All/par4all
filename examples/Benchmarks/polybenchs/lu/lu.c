@@ -6,8 +6,8 @@
 #include "timing.h"
 
 /* Default problem size. */
-#ifndef N
-# define N 1024
+#ifndef Y
+# define Y 1024
 #endif
 
 /* Default data type is double. */
@@ -19,14 +19,14 @@
 #endif
 
 /* Array declaration. Enable malloc if POLYBENCH_TEST_MALLOC. */
-DATA_TYPE A[N][N];
+DATA_TYPE A[Y][Y];
 
 static void init_array() {
   int i, j;
 
-  for (i = 0; i < N;) {
-    for (j = 0; j < N;) {
-      A[i][j] = ((DATA_TYPE)i * j + 1) / N;
+  for (i = 0; i < Y;) {
+    for (j = 0; j < Y;) {
+      A[i][j] = ((DATA_TYPE)i * j + 1) / Y;
       j++;
     }
     i++;
@@ -41,10 +41,10 @@ static void print_array(int argc, char** argv) {
   if(argc > 42 && !strcmp(argv[0], ""))
 #endif
   {
-    for (i = 0; i < N; i++)
-      for (j = 0; j < N; j++) {
+    for (i = 0; i < Y; i++)
+      for (j = 0; j < Y; j++) {
         fprintf(stderr, DATA_PRINTF_MODIFIER, A[i][j]);
-        if((i * N + j) % 80 == 20)
+        if((i * Y + j) % 80 == 20)
           fprintf(stderr, "\n");
       }
     fprintf(stderr, "\n");
@@ -53,7 +53,7 @@ static void print_array(int argc, char** argv) {
 
 int main(int argc, char** argv) {
   int i, j, k;
-  int n = N;
+  int n = Y;
 
   /* Initialize array. */
   init_array();

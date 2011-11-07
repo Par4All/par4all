@@ -21,7 +21,7 @@ SOURCE := $(TARGET).c
 OMP_SOURCE := $(TARGET).openmp.c
 CUDA_SOURCE := $(TARGET).naive$(P4A_CUDA_SUFFIX)
 CUDA_OPT_SOURCE := $(TARGET).opt$(P4A_CUDA_SUFFIX)
-GENERATED_KERNELS = $(wildcard p4a_new_files/*.cu)
+GENERATED_KERNELS = $(wildcard $(TARGET)_p4a.generated/*.cu)
 HMPP_SOURCE := hmpp/$(TARGET).hmpp.c
 PPCG_PRE_SOURCE :=$(TARGET).ppcg.c
 PPCG_GENERATED= *_host.cu *_kernel.cu
@@ -115,7 +115,7 @@ hmpp: $(HMPP_TARGET)
 $(TARGET)-hmpp:hmpp
 
 $(PPCG_TARGET): $(PPCG_PRE_SOURCE) $(COMMON)
-	ppcg $(PPCG_PRE_SOURCE) $(SIZE_PARAMS)
+	ppcg $(PPCG_PRE_SOURCE)
 	nvcc -o $@ $(NVCC_FLAGS) $(COMMON_FLAGS) $(LDFLAGS) $(ACCEL_FLAGS) $(ACCEL_SRC) $(PPCG_GENERATED) $(COMMON)
 ppcg: $(PPCG_TARGET)
 $(TARGET)-%:ppcg

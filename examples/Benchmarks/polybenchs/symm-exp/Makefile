@@ -1,5 +1,5 @@
 TARGET=symm-exp
-SIZE_PARAMS=-DN=2048 -DM=2048
+SIZE_PARAMS=-DY=2048 -DX=2048
 
 include ../bench.mk
 

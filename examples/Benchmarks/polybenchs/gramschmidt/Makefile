@@ -1,5 +1,5 @@
 TARGET=gramschmidt
-SIZE_PARAMS= -DM=2048 -DN=2048
+SIZE_PARAMS= -DX=2048 -DY=2048
 
 include ../bench.mk
 
