@@ -12,10 +12,9 @@ with vworkspace() as w:
     if l.loops():
       try:
         l.symbolic_tiling(force=True,vector=",".join(tiling_vector))
-	l.set_execution_parallel(False)
       except:
         raise
 
-  m.loop_normalize(one_increment=True)
   m.display()
+  #no loop normalize as it is not pips friendly there
 
