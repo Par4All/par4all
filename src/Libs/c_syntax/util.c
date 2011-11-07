@@ -759,9 +759,8 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 
      1. FILE!MODULE:BLOCK`PREFIXname or MODULE:BLOCK`PREFIXname
      2. FILE!MODULE:PREFIXname or MODULE:PREFIXname
-     3. FILE!:FILE!PREFIXname 
-     4. FILE!:PREFIXname (used to be FILE!PREFIXname)
-     5. TOP-LEVEL:PREFIXname
+     3. FILE!:PREFIXname (used to be FILE!PREFIXname)
+     4. TOP-LEVEL:PREFIXname
 
      with 5 possible prefixes: blank, STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX, TYPEDEF_PREFIX
 
@@ -794,13 +793,6 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   }
 
   /* Is it a static variable declared in the compilation unit? */
-  if(entity_undefined_p(ent)) {
-    global_name = (concatenate(compilation_unit_name,MODULE_SEP_STRING, compilation_unit_name,
-				     prefix,name,NULL));
-    ent = gen_find_tabulated(global_name,entity_domain);
-  }
-
-  /* Is it a global variable declared in the compilation unit? */
   if(entity_undefined_p(ent)) {
     global_name = (concatenate(compilation_unit_name,MODULE_SEP_STRING,
 				     prefix,name,NULL));
