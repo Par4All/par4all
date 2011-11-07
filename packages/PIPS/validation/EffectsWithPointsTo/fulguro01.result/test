@@ -947,13 +947,13 @@ PROPER  EFFECTS WITH POINTS TO
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
    int j;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _data1_2[0].array data1
 //             <    is written>: psrc1
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _data2_3[0].array data2
 //             <    is written>: psrc2
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _datdest_1[0].array datdest
 //             <    is written>: pdest
    fgINT32 *pdest = (fgINT32 *) datdest->array;
    fgINT32 v1;
@@ -1083,13 +1083,13 @@ int flgr2d_arith_add_fgINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 }
 void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _datdest_1[0].row datdest
 //             <    is written>: pdest
    FLGR_Data1D **pdest = datdest->row;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _data1_2[0].row data1
 //             <    is written>: p1
    FLGR_Data1D **p1 = data1->row;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _data2_3[0].row data2
 //             <    is written>: p2
    FLGR_Data1D **p2 = data2->row;
    int i;

@@ -1,0 +1,37 @@
+delete scope03
+create scope03 scope03.c  _scope03.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 6
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Printed file for scope03_c
+echo
+
+
+display PRINTED_FILE[scope03!]
+
+echo
+echo Printed file for _scope03
+echo
+
+display PRINTED_FILE[_scope03!]
+display PRINTED_FILE[timer_start]
+
+echo
+echo Unsplit the application
+echo
+
+apply UNSPLIT[%PROGRAM]
+shell cat scope03.database/Src/*.c
+
+close
+
+delete scope03
+quit
+
+

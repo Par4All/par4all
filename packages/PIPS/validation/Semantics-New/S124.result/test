@@ -156,10 +156,10 @@ c
          J = 0                                                          0017
          DO 10 I = 1, N/2                                               0018
             IF (B(I).GT.0.) THEN                                        0019
-               J = I+-1+1                                               0020
+               J = I-1+1                                                0020
                A(I) = B(I)+D(I)*E(I)                                    0021
             ELSE
-               J = I+-1+1                                               0023
+               J = I-1+1                                                0023
                A(I) = C(I)+D(I)*E(I)                                    0024
             ENDIF
 10          CONTINUE                                                    0026
@@ -193,10 +193,10 @@ c
 !$OMP    PARALLEL DO PRIVATE(J)
          DO 10 I = 1, N/2                                               0018
             IF (B(I).GT.0.) THEN                                        0019
-               J = I+-1+1                                               0020
+               J = I-1+1                                                0020
                A(I) = B(I)+D(I)*E(I)                                    0021
             ELSE
-               J = I+-1+1                                               0023
+               J = I-1+1                                                0023
                A(I) = C(I)+D(I)*E(I)                                    0024
             ENDIF
 10          CONTINUE                                                    0026

@@ -171,16 +171,21 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    int ki_0;
    int kj_0;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72;
+   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72, I_73, I_74, I_75, I_76, I_77;
    I_17 = -2+isj;
-   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
+   I_73 = -2;
+   I_74 = -1;
+   I_75 = -1;
+   I_76 = -1;
+   I_77 = -1;
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+I_73); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0;
-         I_18 = i_1_0+-1;
+         I_18 = i_1_0+I_74;
          I_19 = isj*I_18;
          I_5 = I_19+j;
-         I_0 = I_5+-1;
+         I_0 = I_5+I_75;
          F_9 = image[I_0]*kernel[0];
          __scalar__0 = F_9+__scalar__0;
          F_10 = image[I_5]*kernel[1];
@@ -192,7 +197,7 @@ l99994:
          I_38 = isj*i_1_0;
          I_20 = I_38;
          I_9 = I_20+j;
-         I_2 = I_9+-1;
+         I_2 = I_9+I_76;
          F_12 = image[I_2]*kernel[3];
          __scalar__0 = F_12+__scalar__0;
          F_13 = image[I_9]*kernel[4];
@@ -204,7 +209,7 @@ l99994:
          I_21 = i_1_0+1;
          I_22 = isj*I_21;
          I_14 = I_22+j;
-         I_4 = I_14+-1;
+         I_4 = I_14+I_77;
          F_15 = image[I_4]*kernel[6];
          __scalar__0 = F_15+__scalar__0;
          F_16 = image[I_14]*kernel[7];
@@ -249,21 +254,31 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    int ki_0;
    int kj_0;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72;
-   I_17 = -2;
-   I_17 = I_17+isj;
-   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
+   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72, I_73, I_74, I_75, I_76, I_77;
+   I_17 = 2;
+   I_17 = -I_17+isj;
+   I_73 = 2;
+   I_73 = -I_73;
+   I_74 = 1;
+   I_74 = -I_74;
+   I_75 = 1;
+   I_75 = -I_75;
+   I_76 = 1;
+   I_76 = -I_76;
+   I_77 = 1;
+   I_77 = -I_77;
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+I_73); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0;
          I_18 = i_1_0;
-         I_18 = I_18+-1;
+         I_18 = I_18+I_74;
          I_19 = isj;
          I_19 = I_19*I_18;
          I_5 = I_19;
          I_5 = I_5+j;
          I_0 = I_5;
-         I_0 = I_0+-1;
+         I_0 = I_0+I_75;
          F_9 = image[I_0];
          F_9 = F_9*kernel[0];
          __scalar__0 = F_9+__scalar__0;
@@ -282,7 +297,7 @@ l99994:
          I_9 = I_20;
          I_9 = I_9+j;
          I_2 = I_9;
-         I_2 = I_2+-1;
+         I_2 = I_2+I_76;
          F_12 = image[I_2];
          F_12 = F_12*kernel[3];
          __scalar__0 = F_12+__scalar__0;
@@ -302,7 +317,7 @@ l99994:
          I_14 = I_22;
          I_14 = I_14+j;
          I_4 = I_14;
-         I_4 = I_4+-1;
+         I_4 = I_4+I_77;
          F_15 = image[I_4];
          F_15 = F_15*kernel[6];
          __scalar__0 = F_15+__scalar__0;
@@ -352,21 +367,31 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    int ki_0;
    int kj_0;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72;
-   I_17 = -2;
-   addi(I_17, I_17, isj);
-   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
+   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72, I_73, I_74, I_75, I_76, I_77;
+   I_17 = 2;
+   addi(I_17, -I_17, isj);
+   I_73 = 2;
+   I_73 = -I_73;
+   I_74 = 1;
+   I_74 = -I_74;
+   I_75 = 1;
+   I_75 = -I_75;
+   I_76 = 1;
+   I_76 = -I_76;
+   I_77 = 1;
+   I_77 = -I_77;
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+I_73); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0;
          I_18 = i_1_0;
-         addi(I_18, I_18, -1);
+         addi(I_18, I_18, I_74);
          I_19 = isj;
          muli(I_19, I_18);
          I_5 = I_19;
          addi(I_5, I_5, j);
          I_0 = I_5;
-         addi(I_0, I_0, -1);
+         addi(I_0, I_0, I_75);
          F_9 = image[I_0];
          muli(F_9, kernel[0]);
          addi(__scalar__0, F_9, __scalar__0);
@@ -385,7 +410,7 @@ l99994:
          I_9 = I_20;
          addi(I_9, I_9, j);
          I_2 = I_9;
-         addi(I_2, I_2, -1);
+         addi(I_2, I_2, I_76);
          F_12 = image[I_2];
          muli(F_12, kernel[3]);
          addi(__scalar__0, F_12, __scalar__0);
@@ -405,7 +430,7 @@ l99994:
          I_14 = I_22;
          addi(I_14, I_14, j);
          I_4 = I_14;
-         addi(I_4, I_4, -1);
+         addi(I_4, I_4, I_77);
          F_15 = image[I_4];
          muli(F_15, kernel[6]);
          addi(__scalar__0, F_15, __scalar__0);
@@ -455,21 +480,31 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    int ki_0;
    int kj_0;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72;
-   I_17 = -2;
-   addi(I_17, I_17, isj);
-   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
+   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72, I_73, I_74, I_75, I_76, I_77;
+   I_17 = 2;
+   addi(I_17, -I_17, isj);
+   I_73 = 2;
+   I_73 = -I_73;
+   I_74 = 1;
+   I_74 = -I_74;
+   I_75 = 1;
+   I_75 = -I_75;
+   I_76 = 1;
+   I_76 = -I_76;
+   I_77 = 1;
+   I_77 = -I_77;
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+I_73); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0;
          I_18 = i_1_0;
-         addi(I_18, I_18, -1);
+         addi(I_18, I_18, I_74);
          I_19 = isj;
          muli(I_19, I_18);
          I_5 = I_19;
          addi(I_5, I_5, j);
          I_0 = I_5;
-         addi(I_0, I_0, -1);
+         addi(I_0, I_0, I_75);
          F_9 = image[I_0];
          muli(F_9, kernel[0]);
          addi(__scalar__0, F_9, __scalar__0);
@@ -488,7 +523,7 @@ l99994:
          I_9 = I_20;
          addi(I_9, I_9, j);
          I_2 = I_9;
-         addi(I_2, I_2, -1);
+         addi(I_2, I_2, I_76);
          F_12 = image[I_2];
          muli(F_12, kernel[3]);
          addi(__scalar__0, F_12, __scalar__0);
@@ -508,7 +543,7 @@ l99994:
          I_14 = I_22;
          addi(I_14, I_14, j);
          I_4 = I_14;
-         addi(I_4, I_4, -1);
+         addi(I_4, I_4, I_77);
          F_15 = image[I_4];
          muli(F_15, kernel[6]);
          addi(__scalar__0, F_15, __scalar__0);
@@ -558,21 +593,31 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    int ki_0;
    int kj_0;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72;
-   seti(I_17, -2);
-   addi(I_17, I_17, isj);
-   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
+   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_10, I_11, I_12, I_13, I_15, I_16, I_23, I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72, I_73, I_74, I_75, I_76, I_77;
+   seti(I_17, 2);
+   addi(I_17, -I_17, isj);
+   seti(I_73, 2);
+   seti(I_73, -I_73);
+   seti(I_74, 1);
+   seti(I_74, -I_74);
+   seti(I_75, 1);
+   seti(I_75, -I_75);
+   seti(I_76, 1);
+   seti(I_76, -I_76);
+   seti(I_77, 1);
+   seti(I_77, -I_77);
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+I_73); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
          seti(__scalar__0, 0);
          seti(I_18, i_1_0);
-         addi(I_18, I_18, -1);
+         addi(I_18, I_18, I_74);
          seti(I_19, isj);
          muli(I_19, I_18);
          seti(I_5, I_19);
          addi(I_5, I_5, j);
          seti(I_0, I_5);
-         addi(I_0, I_0, -1);
+         addi(I_0, I_0, I_75);
          seti(F_9, image[I_0]);
          muli(F_9, kernel[0]);
          addi(__scalar__0, F_9, __scalar__0);
@@ -591,7 +636,7 @@ l99994:
          seti(I_9, I_20);
          addi(I_9, I_9, j);
          seti(I_2, I_9);
-         addi(I_2, I_2, -1);
+         addi(I_2, I_2, I_76);
          seti(F_12, image[I_2]);
          muli(F_12, kernel[3]);
          addi(__scalar__0, F_12, __scalar__0);
@@ -611,7 +656,7 @@ l99994:
          seti(I_14, I_22);
          addi(I_14, I_14, j);
          seti(I_4, I_14);
-         addi(I_4, I_4, -1);
+         addi(I_4, I_4, I_77);
          seti(F_15, image[I_4]);
          muli(F_15, kernel[6]);
          addi(__scalar__0, F_15, __scalar__0);
@@ -661,21 +706,31 @@ void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
    int ki_0;
    int kj_0;
    //PIPS generated variable
-   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_38;
-   seti(I_17, -2);
-   addi(I_17, I_17, isj);
-   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+-2); i_1_0 += 1)
+   int I_0, I_1, I_2, I_3, I_4, I_6, I_7, I_8, I_38, I_73, I_74, I_75, I_76, I_77;
+   seti(I_17, 2);
+   addi(I_17, -I_17, isj);
+   seti(I_73, 2);
+   seti(I_73, -I_73);
+   seti(I_74, 1);
+   seti(I_74, -I_74);
+   seti(I_75, 1);
+   seti(I_75, -I_75);
+   seti(I_76, 1);
+   seti(I_76, -I_76);
+   seti(I_77, 1);
+   seti(I_77, -I_77);
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi+I_73); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
          seti(__scalar__0, 0);
          seti(I_18, i_1_0);
-         addi(I_18, I_18, -1);
+         addi(I_18, I_18, I_74);
          seti(I_19, isj);
          muli(I_19, I_18);
          seti(I_5, I_19);
          addi(I_5, I_5, j);
          seti(I_0, I_5);
-         addi(I_0, I_0, -1);
+         addi(I_0, I_0, I_75);
          seti(F_9, image[I_0]);
          muli(F_9, kernel[0]);
          addi(__scalar__0, F_9, __scalar__0);
@@ -694,7 +749,7 @@ l99994:
          seti(I_9, I_20);
          addi(I_9, I_9, j);
          seti(I_2, I_9);
-         addi(I_2, I_2, -1);
+         addi(I_2, I_2, I_76);
          seti(F_12, image[I_2]);
          muli(F_12, kernel[3]);
          addi(__scalar__0, F_12, __scalar__0);
@@ -714,7 +769,7 @@ l99994:
          seti(I_14, I_22);
          addi(I_14, I_14, j);
          seti(I_4, I_14);
-         addi(I_4, I_4, -1);
+         addi(I_4, I_4, I_77);
          seti(F_15, image[I_4]);
          muli(F_15, kernel[6]);
          addi(__scalar__0, F_15, __scalar__0);

@@ -11,11 +11,11 @@ int main()
 //             <    is read   >: s1.b[0]
 //             <    is written>: s2.b[0]
    (s2.b)[0] = (s1.b)[0];
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: s1.a
+//             <    is written>: tab_s[0].a
    tab_s[0].a = s1.a;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: s1.b[0]
+//             <    is written>: tab_s[0].b[0]
    (tab_s[0].b)[0] = (s1.b)[0];
    return 0;
 }
@@ -77,7 +77,6 @@ int main()
    tab_s[0].a = s1.a;
 
 // Points To:
-// *ANY_MODULE*:*NOWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -85,11 +84,11 @@ int main()
 // s2.b[0] -> *ANY_MODULE*:*ANYWHERE*_b0 , EXACT
 // s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    (tab_s[0].b)[0] = (s1.b)[0];
 
 // Points To:
-// *ANY_MODULE*:*NOWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -98,6 +97,7 @@ int main()
 // s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // tab_s[0].b[0] -> *ANY_MODULE*:*ANYWHERE*_b1 , EXACT
+// tab_s[0].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
    return 0;
 }
@@ -114,32 +114,16 @@ int main()
 //             <    is read   >: s1.b[0]
 //             <    is written>: s2.b[0]
    (s2.b)[0] = (s1.b)[0];
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: s1.a
+//             <    is written>: tab_s[0].a
    tab_s[0].a = s1.a;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: s1.b[0]
+//             <    is written>: tab_s[0].b[0]
    (tab_s[0].b)[0] = (s1.b)[0];
    return 0;
 }
 
  *********************** Use-Def Chains *********************
 
-	07 --> 09 with conflicts
-		from <s2.a-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	07 --> 10 with conflicts
-		from <s2.a-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 09 with conflicts
-		from <s2.b[0]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[0]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 10 with conflicts
-		from <s2.b[0]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[0]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	09 --> 10 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[0]-R-EXACT>
-		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 
 ****************** End of Dependence Graph ******************

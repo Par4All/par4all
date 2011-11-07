@@ -1,0 +1,42 @@
+
+Printed file for scope03_c
+
+double elapsed_time;
+
+
+int main();
+
+Printed file for _scope03
+
+static void elapsed_time(void);
+void timer_start();
+void timer_start()
+{
+   elapsed_time();
+}
+
+Unsplit the application
+
+/*
+ * file for _scope03.c
+ */
+static void elapsed_time(void);
+void timer_start();
+static void elapsed_time(void)
+{
+}
+void timer_start()
+{
+   elapsed_time();
+}
+/*
+ * file for scope03.c
+ */
+double elapsed_time;
+
+
+int main();
+int main()
+{
+   return 0;
+}
