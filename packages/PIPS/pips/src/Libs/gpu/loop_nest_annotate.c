@@ -260,7 +260,7 @@ static void loop_annotate(loop l, gpu_lna_context * p) {
         c_number_iter_exp = make_op_exp(MINUS_OPERATOR_NAME, c_upper, c_lower);
         c_number_iter_exp = make_op_exp(PLUS_OPERATOR_NAME,
                                         c_number_iter_exp,
-                                        make_integer_constant_expression(1));
+                                        int_to_expression(1));
         /* We will have deepest loop size first: */
         p->l_number_iter_exp = CONS(EXPRESSION, c_number_iter_exp,
             p->l_number_iter_exp);

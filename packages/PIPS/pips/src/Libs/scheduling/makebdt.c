@@ -743,7 +743,7 @@ bdt build_bdt_null(v)
 
  stat = dfg_vertex_label_statement((dfg_vertex_label)vertex_vertex_label(v));
  node = (Pbdt_node)hash_get(h_node, (char *) stat);
- exp  = make_integer_constant_expression(0);
+ exp  = int_to_expression(0);
 
  lexp = CONS(EXPRESSION, exp, NIL);
  sche = make_schedule(stat, predicate_undefined, lexp); 
@@ -2124,7 +2124,7 @@ list simplify_dimension(ld, ps_eq, l)
      if (change)
 	{
          if (VECTEUR_UNDEFINED_P(vi)) 
-       	      exp = make_integer_constant_expression(0);
+       	      exp = int_to_expression(0);
          else 
 	    {
 	     if (d == 1) exp = Pvecteur_to_expression(vi);

@@ -139,7 +139,7 @@ reference    r;
       exp = EXPRESSION(CAR(reference_indices(r)));
       lexp = CDR(reference_indices(r));
       /* build the modulo expression */
-      lexp2 = CONS(EXPRESSION, make_integer_constant_expression(d+1), NIL);
+      lexp2 = CONS(EXPRESSION, int_to_expression(d+1), NIL);
       lexp2 = CONS(EXPRESSION, exp, lexp2);
       ca = make_call(entity_intrinsic(MODULO_OPERATOR_NAME), lexp2);
       exp2 = make_expression(make_syntax(is_syntax_call, ca),
@@ -148,7 +148,7 @@ reference    r;
     }
     else if (d == 0) {
       lexp = CDR(reference_indices(r));
-      exp = make_integer_constant_expression(0);
+      exp = int_to_expression(0);
       reference_indices(r) = CONS(EXPRESSION, exp, lexp);
     }
   }

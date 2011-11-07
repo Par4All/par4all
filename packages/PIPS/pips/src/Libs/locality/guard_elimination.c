@@ -645,7 +645,7 @@ statement  free_guards( s)
     cif1=contrainte_make(pvif1);
     exp=Pvecteur_to_expression(pvif1);
     test_condition (instruction_test(statement_instruction(first)))= 
-      eq_expression (exp, make_integer_constant_expression(0) );
+      eq_expression (exp, int_to_expression(0) );
   }
   if(if2){
     Pcontrainte peq;
@@ -676,7 +676,7 @@ statement  free_guards( s)
     exp=Pvecteur_to_expression(pvif2);
     test_condition (instruction_test(statement_instruction(last)))= 
       eq_expression 
-      (exp, make_integer_constant_expression(0) );
+      (exp, int_to_expression(0) );
   }
   lis=NIL; 
   lisjcopy2= gen_full_copy_list(lisjcopy);
@@ -700,9 +700,9 @@ statement  free_guards( s)
       Value minjp=-100,maxjp=100;
       indice=i/2;
       range_lower(loop_range(tab_loop[i]))=
-	make_integer_constant_expression( sommetg[indice]);
+	int_to_expression( sommetg[indice]);
       range_upper(loop_range(tab_loop[i]))=
-	make_integer_constant_expression( sommetg[indice]);
+	int_to_expression( sommetg[indice]);
       for (peq = sc_newbase->inegalites;peq!=NULL;peq=peq->succ){
 	Pvecteur v;
 	Value  constante,val1,val2;
@@ -798,9 +798,9 @@ statement  free_guards( s)
       Value minjp1=-100,minjp2=-100,maxjp1=100,maxjp2=100;
       indice=i/2;
       range_lower(loop_range(tab_loop[i]))=
-	make_integer_constant_expression( sommetg[indice]+1);
+	int_to_expression( sommetg[indice]+1);
       range_upper(loop_range(tab_loop[i]))=
-	make_integer_constant_expression( sommetg[indice+1]-1);
+	int_to_expression( sommetg[indice+1]-1);
       for (peq = sc_newbase->inegalites;peq!=NULL;peq=peq->succ){
 	Pvecteur v;
 	Value constante,val1,val2;
@@ -982,13 +982,13 @@ statement  free_guards( s)
 	  vect_erase_var( &pv,indice2);
 	  exp1=Pvecteur_to_expression(pv);
 	  s= copy_statement (first);
-	  lexp = CONS(EXPRESSION, make_integer_constant_expression
+	  lexp = CONS(EXPRESSION, int_to_expression
 		      (-vect_coeff(indice2,pvif1)), NIL);
 	  lexp = CONS(EXPRESSION, exp1, lexp);
 	  ca = make_call(entity_intrinsic(MODULO_OPERATOR_NAME), lexp);
 	  exp1 = make_expression(make_syntax(is_syntax_call, ca),
 				 normalized_undefined);
-	  exp2=make_integer_constant_expression(0);
+	  exp2=int_to_expression(0);
 	  exp1=eq_expression(exp1,exp2);
 	  test_condition(instruction_test(statement_instruction(s)))=exp1; 
 	  lisi=CONS(STATEMENT,s,lisi);
@@ -1019,13 +1019,13 @@ statement  free_guards( s)
 	  vect_erase_var( &pv,indice2);
 	  exp1=Pvecteur_to_expression(pv);
 	  s= copy_statement (last);
-	  lexp = CONS(EXPRESSION, make_integer_constant_expression
+	  lexp = CONS(EXPRESSION, int_to_expression
 		      (-vect_coeff(indice2,pvif2)), NIL);
 	  lexp = CONS(EXPRESSION, exp1, lexp);
 	  ca = make_call(entity_intrinsic(MODULO_OPERATOR_NAME), lexp);
 	  exp1 = make_expression(make_syntax(is_syntax_call, ca),
 				 normalized_undefined);
-	  exp2=make_integer_constant_expression(0);
+	  exp2=int_to_expression(0);
 	  exp1=eq_expression(exp1,exp2);
 	  test_condition(instruction_test(statement_instruction(s)))=exp1; 
 	  listemp=CONS(STATEMENT,s ,NIL);
@@ -1064,13 +1064,13 @@ statement  free_guards( s)
 	  exp1=Pvecteur_to_expression(pv);;
 	    s= copy_statement (last);
 
-	    lexp = CONS(EXPRESSION, make_integer_constant_expression
+	    lexp = CONS(EXPRESSION, int_to_expression
 		      (-val), NIL);
 	   lexp = CONS(EXPRESSION, exp1, lexp); 
 	  ca = make_call(entity_intrinsic(MODULO_OPERATOR_NAME), lexp);
 	  exp1 = make_expression(make_syntax(is_syntax_call, ca),
 				 normalized_undefined);
-	    exp2=make_integer_constant_expression(0);
+	    exp2=int_to_expression(0);
 	    exp1=eq_expression(exp1,exp2); 
 	      test_condition(instruction_test(statement_instruction(s)))=exp1;    
 		test_true(instruction_test(statement_instruction(s)))=copy_statement (sif1);   
@@ -1110,13 +1110,13 @@ statement  free_guards( s)
 	  vect_erase_var( &pv,indice2);
 	  exp1=Pvecteur_to_expression(pv);
 	  s= copy_statement (first);
-	  lexp = CONS(EXPRESSION, make_integer_constant_expression
+	  lexp = CONS(EXPRESSION, int_to_expression
 		      (-vect_coeff(indice2,pvif1)), NIL);
 	  lexp = CONS(EXPRESSION, exp1, lexp);
 	  ca = make_call(entity_intrinsic(MODULO_OPERATOR_NAME), lexp);
 	  exp1 = make_expression(make_syntax(is_syntax_call, ca),
 				 normalized_undefined);
-	  exp2=make_integer_constant_expression(0);
+	  exp2=int_to_expression(0);
 	  exp1=eq_expression(exp1,exp2);
 	  test_condition(instruction_test(statement_instruction(s)))=exp1;    
 	  test_true(instruction_test(statement_instruction(s)))=copy_statement(sif2);
@@ -1149,13 +1149,13 @@ statement  free_guards( s)
     if(i==0) {
       CHUNK( CAR(lisp))= (gen_chunk *) make_block_statement(NIL); 
       range_lower(loop_range(tab_loop[i+1]))= 
-	make_integer_constant_expression( sommetg[(i+1)/2]);  
+	int_to_expression( sommetg[(i+1)/2]);  
     }
     else{
       if(i==2*nbr_vertice-2){
 	CHUNK( CAR(lisp))= (gen_chunk *) make_block_statement(NIL); 
 	range_upper(loop_range(tab_loop[i-1]))= 
-	  make_integer_constant_expression(sommetg[(i-1)/2+1]);
+	  int_to_expression(sommetg[(i-1)/2+1]);
       }
       else{   
 	body1=loop_body(tab_loop[i]);
@@ -1185,13 +1185,13 @@ statement  free_guards( s)
 	if (range_equal_p(range1,range2)) {
 	  CHUNK( CAR(lisp))= (gen_chunk *) make_block_statement(NIL); 
 	  range_upper(loop_range(tab_loop[i-1]))=
-	    make_integer_constant_expression( sommetg[(i-1)/2+1]);
+	    int_to_expression( sommetg[(i-1)/2+1]);
 	}
 	else {
 	  CHUNK( CAR(lisp))= (gen_chunk *) make_block_statement(NIL); 
 	  if (range_equal_p(range1,range3)) 
 	    range_lower(loop_range(tab_loop[i+1]))= 
-	      make_integer_constant_expression( sommetg[(i+1)/2]);  
+	      int_to_expression( sommetg[(i+1)/2]);  
 	}
       };  
     };

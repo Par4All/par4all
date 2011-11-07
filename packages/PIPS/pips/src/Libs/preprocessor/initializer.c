@@ -229,9 +229,17 @@ static text stub_text(entity module, bool is_fortran)
       st = make_text(ls);
     }
     else { /* assume is_C */
+        list body=CHAIN_SWORD(NIL,"{");
+        /* SG: this just a few samples to show the possibility of the system
+         * A better idea would be to analyse arguments to guess which part of the memory could be touched. For instance, use a variable to represent the ``foreign state'' of the generated functions, and deduce from the argument type the kind of effects e can safely assume */
+        if(get_bool_property("STUB_MEMORY_BARRIER"))
+            body = CHAIN_SWORD(body, PIPS_MEMORY_BARRIER_OPERATOR_NAME "();");
+        if(get_bool_property("STUB_IO_BARRIER"))
+            body = CHAIN_SWORD(body, PIPS_IO_BARRIER_OPERATOR_NAME "();");
+        body=CHAIN_SWORD(body,"}");
 	sentence bs = make_sentence(is_sentence_unformatted,
 				    make_unformatted(string_undefined, 0, 0,
-						     CONS(STRING, strdup("{}"), NIL)));
+						     body));
 	const char* name = entity_user_name(module);
 	type t = entity_type(module);
 	/* FI: I do not know what to use to initialize pdl usefully */

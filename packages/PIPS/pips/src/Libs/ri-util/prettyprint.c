@@ -1825,11 +1825,19 @@ words_unary_minus(call obj, int precedence, bool leftmost, list pdl)
     int prec = words_intrinsic_precedence(obj);
 
     if ( prec < precedence || !leftmost || (!precedence_p && precedence>0))
-	pc = CHAIN_SWORD(pc, "(");
-    pc = CHAIN_SWORD(pc, "-");
-    pc = gen_nconc(pc, words_subexpression(e, prec, false, pdl));
+        pc = CHAIN_SWORD(pc, "(");
+    /* make sure the minus can not be split apart from its argument */
+    list sub = words_subexpression(e, prec, false, pdl);
+    string fst = STRING(CAR(sub));
+    POP(sub);
+    string nfst ;
+    asprintf(&nfst,"-%s",fst);
+    free(fst);
+    sub=CONS(STRING,nfst,sub);
+    pc = gen_nconc(pc, sub);
+
     if ( prec < precedence || !leftmost || (!precedence_p && precedence>0))
-	pc = CHAIN_SWORD(pc, ")");
+        pc = CHAIN_SWORD(pc, ")");
 
     return(pc);
 }

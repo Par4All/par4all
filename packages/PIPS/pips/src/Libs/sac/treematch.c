@@ -220,7 +220,7 @@ static list merge_lists(list l, list format)
         }
         else
         {
-            expression e = make_integer_constant_expression(patternArg_static(param));
+            expression e = int_to_expression(patternArg_static(param));
 
             res = CONS(EXPRESSION, e, res);
         }

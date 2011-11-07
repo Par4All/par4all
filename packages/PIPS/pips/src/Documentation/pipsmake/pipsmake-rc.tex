@@ -938,6 +938,17 @@ PREPROCESSOR_MISSING_FILE_HANDLING "error"
 PREPROCESSOR_MISSING_FILE_GENERATOR ""
 \end{PipsProp}
 
+The generated stub can have various default effect, say to prevent
+over-optimistic parallelization.
+
+\begin{PipsProp}{STUB_MEMORY_BARRIER}
+STUB_MEMORY_BARRIER FALSE
+\end{PipsProp}
+
+\begin{PipsProp}{STUB_IO_BARRIER}
+STUB_IO_BARRIER FALSE
+\end{PipsProp}
+
 
 \subsubsection{Fortran file preprocessing}
 \label{sec:fortr-file-prepr}

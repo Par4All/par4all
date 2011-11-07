@@ -166,6 +166,8 @@ void reset_static_phase_variables()
     DECLARE_ERROR_HANDLER(error_reset_proper_rw_effects);
     DECLARE_ERROR_HANDLER(error_reset_cumulated_rw_effects);
     DECLARE_ERROR_HANDLER(reset_transformer_map);
+    DECLARE_ERROR_HANDLER(reset_precondition_map);
+    DECLARE_ERROR_HANDLER(reset_total_precondition_map);
     DECLARE_ERROR_HANDLER(icfg_error_handler);
 
     /* Macro-generated resets in effects-generic/utils.c */
