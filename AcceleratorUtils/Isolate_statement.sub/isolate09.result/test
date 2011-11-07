@@ -169,9 +169,9 @@ l99995:
       for(j_t = 0; j_t <= 0; j_t += 1) {
          //PIPS generated variable
          short (*src10)[-10*i_t+3+1][4] = (short (*)[-10*i_t+3+1][4]) 0, (*src00)[-10*i_t+3+1][4] = (short (*)[-10*i_t+3+1][4]) 0, (*result0)[-10*i_t+3+1][4] = (short (*)[-10*i_t+3+1][4]) 0;
-         P4A_accel_malloc((void **) &result0, sizeof(short)*(-10*i_t+4)*4);
-         P4A_accel_malloc((void **) &src00, sizeof(short)*(-10*i_t+4)*4);
-         P4A_accel_malloc((void **) &src10, sizeof(short)*(-10*i_t+4)*4);
+         P4A_accel_malloc((void **) &result0, sizeof(short)*((-10)*i_t+4)*4);
+         P4A_accel_malloc((void **) &src00, sizeof(short)*((-10)*i_t+4)*4);
+         P4A_accel_malloc((void **) &src10, sizeof(short)*((-10)*i_t+4)*4);
          P4A_copy_to_accel_2d(sizeof(short), 4, 4, -10*i_t+4, 4, 10*i_t, 0, &src0[0][0], *src00);
          P4A_copy_to_accel_2d(sizeof(short), 4, 4, -10*i_t+4, 4, 10*i_t, 0, &src1[0][0], *src10);
 
