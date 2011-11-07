@@ -1480,7 +1480,6 @@ expression make_min_expression(expression e1, expression e2, enum language_utype
 expression make_factor_expression(int coeff, entity vari)
 {
   expression e1, e2, e3;
-  entity operateur_multi;
 
   e1 = make_integer_constant_expression(coeff);
   if (vari==NULL)
@@ -1489,13 +1488,7 @@ expression make_factor_expression(int coeff, entity vari)
     e2 = entity_to_expression(vari);
     if (coeff == 1) return(e2);
     else {
-      operateur_multi = gen_find_tabulated("TOP-LEVEL:*",entity_domain);
-      e3 = make_expression(make_syntax(is_syntax_call,
-				       make_call(operateur_multi,
-						 CONS(EXPRESSION, e1,
-						      CONS(EXPRESSION, e2,
-							   NIL)))),
-			   normalized_undefined);
+      e3 = MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),e1,e2);
       return (e3);
     }
   }

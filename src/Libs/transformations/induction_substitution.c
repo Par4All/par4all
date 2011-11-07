@@ -245,11 +245,11 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
 
     if(increment_p || decrement_p ) {
       if( increment_call_p( c ) ) {
-        unsugarized = MakeBinaryCall( entity_intrinsic( PLUS_OPERATOR_NAME ), //
+        unsugarized = make_op_exp(  PLUS_OPERATOR_NAME , //
                                       substitute, //
                                       int_to_expression(1) );
       } else if( decrement_call_p( c ) ) {
-        unsugarized = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
+        unsugarized = make_op_exp(  MINUS_OPERATOR_NAME , //
                                       substitute, //
                                       int_to_expression(1) );
       }
@@ -276,19 +276,19 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
          * Transform z += 1 in z = induction + 1
          */
         if ( native_call_p( c, MULTIPLY_UPDATE_OPERATOR_NAME ) ) {
-          unsugarized = MakeBinaryCall( entity_intrinsic( MULTIPLY_OPERATOR_NAME ), //
+          unsugarized = make_op_exp( ( MULTIPLY_OPERATOR_NAME ), //
                                         substitute, //
                                         copy_expression( substitute_on ) );
         } else if ( native_call_p( c, DIVIDE_UPDATE_OPERATOR_NAME ) ) {
-          unsugarized = MakeBinaryCall( entity_intrinsic( DIVIDE_OPERATOR_NAME ), //
+          unsugarized = make_op_exp( ( DIVIDE_OPERATOR_NAME ), //
                                         substitute, //
                                         copy_expression( substitute_on ) );
         } else if ( native_call_p( c, PLUS_UPDATE_OPERATOR_NAME ) ) {
-          unsugarized = MakeBinaryCall( entity_intrinsic( PLUS_OPERATOR_NAME ), //
+          unsugarized = make_op_exp( ( PLUS_OPERATOR_NAME ), //
                                         substitute, //
                                         copy_expression( substitute_on ) );
         } else if ( native_call_p( c, MINUS_UPDATE_OPERATOR_NAME ) ) {
-          unsugarized = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
+          unsugarized = make_op_exp( ( MINUS_OPERATOR_NAME ), //
                                         substitute, //
                                         copy_expression( substitute_on ) );
         }
@@ -329,7 +329,7 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
         instruction owner = ctx->root_instruction;
         if(!(instruction_call_p(owner) && instruction_call(owner)==c)) {
           expression minus;
-          minus = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
+          minus = make_op_exp( ( MINUS_OPERATOR_NAME ), //
                                   entity_to_expression( induction_variable_candidate), //
                                   int_to_expression(1) );
           new_call = make_call(entity_intrinsic( COMMA_OPERATOR_NAME ),
@@ -486,7 +486,7 @@ static bool subtitute_induction_statement_in( statement s ) {
                 local_expr = entity_to_expression( v );
               } else {
                 /* General case : produce "coeff*v" */
-                local_expr = MakeBinaryCall( entity_intrinsic( MULTIPLY_OPERATOR_NAME ), //
+                local_expr = make_op_exp( ( MULTIPLY_OPERATOR_NAME ), //
                                              int_to_expression( coeff ), //
                                              entity_to_expression( v ) );
               }
@@ -517,7 +517,7 @@ static bool subtitute_induction_statement_in( statement s ) {
               substitute = local_expr;
             } else {
               /* it's not the first one, we chain it with a "+" operation */
-              substitute = MakeBinaryCall( entity_intrinsic( PLUS_OPERATOR_NAME ), //
+              substitute = make_op_exp(  PLUS_OPERATOR_NAME , //
                                            local_expr, //
                                            substitute );
             }
@@ -579,11 +579,12 @@ static bool subtitute_induction_statement_in( statement s ) {
           if ( induction_variable_candidate_coeff == -1 ) {
             /* Instead of dividing by -1, we rather use
              * unary minus in front of expression */
-            substitute = MakeUnaryCall( entity_intrinsic( UNARY_MINUS_OPERATOR_NAME ),
+            substitute = make_op_exp(  MINUS_OPERATOR_NAME ,
+                    int_to_expression(0),
                                         substitute );
           } else if ( induction_variable_candidate_coeff != 1 ) {
             /* General case */
-            substitute = MakeBinaryCall( entity_intrinsic( DIVIDE_OPERATOR_NAME ), //
+            substitute = make_op_exp(  DIVIDE_OPERATOR_NAME , //
                                          substitute, //
                                          int_to_expression( induction_variable_candidate_coeff ) );
           }
@@ -778,8 +779,8 @@ static bool do_strength_reduction_gather(expression exp, strength_reduction_cont
                             entity_to_expression(already_there),
                             expression_integer_value(ctxt->init,&v) && v == 0 ?
                             entity_to_expression(other):
-                            MakeBinaryCall(
-                                entity_intrinsic(PLUS_C_OPERATOR_NAME),
+                            make_op_exp(
+                                PLUS_C_OPERATOR_NAME,
                                 entity_to_expression(other),
                                 copy_expression(ctxt->init)
                                 )
