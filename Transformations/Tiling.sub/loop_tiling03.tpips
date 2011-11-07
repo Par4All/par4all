@@ -6,7 +6,6 @@ create loop_tiling03 loop_tiling03.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
-activate C_PARSER
 
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
@@ -16,9 +15,6 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 #setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
 
 # We use the winning combination, except TRANSFORMERS_IN_CONTEXT
-activate INTERPROCEDURAL_SUMMARY_PRECONDITION
-activate TRANSFORMERS_INTER_FULL
-activate PRECONDITIONS_INTER_FULL
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 echo
