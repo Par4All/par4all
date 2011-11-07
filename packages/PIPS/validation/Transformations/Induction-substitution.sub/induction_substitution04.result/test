@@ -52,8 +52,8 @@ void induction04(int SIZE, double A[SIZE], double B[SIZE][SIZE])
    for(i = 0; i <= SIZE-1; i += 1) {
       k = i;
       for(j = 0; j <= SIZE-1; j += 1) {
-         sum = B[j-(-((-i)+(-j)))][-((-i)+(-j))]+A[-((-i)+(-j))];
-         A[k = -((-i)+(-j))+1, k-1] = sum;
+         sum = B[j-(i+j)][i+j]+A[i+j];
+         A[k = i+j+1, k-1] = sum;
       }
    }
 }

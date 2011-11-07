@@ -12,16 +12,19 @@ int main()
    do {
       mystruct tab_s[2];
 //             <may be read   >: s1.b[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: tab_s[0].b[*]
 //             <    is read   >: s1.a s1.c
+//             <    is written>: tab_s[0].a tab_s[0].c
       tab_s[0] = s1;
 //             <may be read   >: s1.b[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: tab_s[1].b[*]
 //             <    is read   >: s1.a s1.c
+//             <    is written>: tab_s[1].a tab_s[1].c
       tab_s[1] = s1;
 //             <may be read   >: s2.b[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: tab_s[1].b[*]
 //             <    is read   >: s2.a s2.c
+//             <    is written>: tab_s[1].a tab_s[1].c
       tab_s[1] = s2;
 //             <    is read   >: i
 //             <    is written>: i
@@ -72,64 +75,78 @@ int main()
    do {
 
 // Points To:
-// *ANY_MODULE*:*NOWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       mystruct tab_s[2];
 
 // Points To:
-// *ANY_MODULE*:*NOWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       tab_s[0] = s1;
 
 // Points To:
-// *ANY_MODULE*:*NOWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       tab_s[1] = s1;
 
 // Points To:
-// *ANY_MODULE*:*NOWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       tab_s[1] = s2;
 
 // Points To:
-// *ANY_MODULE*:*NOWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s2.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[1].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
+// tab_s[0].c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 
       i++;
    }
    while (i<10);
 
 // Points To:
-// *ANY_MODULE*:*NOWHERE*_b0 -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.b[*] -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.a -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
 // s1.c -> *ANY_MODULE*:*NOWHERE*_b0 , EXACT
@@ -153,16 +170,19 @@ int main()
    do {
       mystruct tab_s[2];
 //             <may be read   >: s1.b[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: tab_s[0].b[*]
 //             <    is read   >: s1.a s1.c
+//             <    is written>: tab_s[0].a tab_s[0].c
       tab_s[0] = s1;
 //             <may be read   >: s1.b[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: tab_s[1].b[*]
 //             <    is read   >: s1.a s1.c
+//             <    is written>: tab_s[1].a tab_s[1].c
       tab_s[1] = s1;
 //             <may be read   >: s2.b[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: tab_s[1].b[*]
 //             <    is read   >: s2.a s2.c
+//             <    is written>: tab_s[1].a tab_s[1].c
       tab_s[1] = s2;
 //             <    is read   >: i
 //             <    is written>: i
@@ -174,117 +194,35 @@ int main()
 
  *********************** Use-Def Chains *********************
 
-	08 --> 12 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 13 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	08 --> 14 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	08 --> 15 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
 	08 --> 16 with conflicts
 		from <i-W-EXACT> to <i-R-EXACT>
 	12 --> 12 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.a-R-EXACT>
-		from <s1.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	12 --> 13 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.a-R-EXACT>
-		from <s1.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	12 --> 14 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.a-R-EXACT>
-		from <s1.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	12 --> 15 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-	13 --> 12 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.a-R-EXACT>
-		from <s1.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <tab_s[0].c-W-EXACT> to <tab_s[0].c-W-EXACT>
+		from <tab_s[0].b[*]-W-MAY> to <tab_s[0].b[*]-W-MAY>
+		from <tab_s[0].a-W-EXACT> to <tab_s[0].a-W-EXACT>
 	13 --> 13 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.a-R-EXACT>
-		from <s1.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <tab_s[1].c-W-EXACT> to <tab_s[1].c-W-EXACT>
+		from <tab_s[1].b[*]-W-MAY> to <tab_s[1].b[*]-W-MAY>
+		from <tab_s[1].a-W-EXACT> to <tab_s[1].a-W-EXACT>
 	13 --> 14 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.a-R-EXACT>
-		from <s1.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s1.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	13 --> 15 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-	14 --> 12 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.a-R-EXACT>
-		from <s2.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s2.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s2.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <tab_s[1].c-W-EXACT> to <tab_s[1].c-W-EXACT>
+		from <tab_s[1].b[*]-W-MAY> to <tab_s[1].b[*]-W-MAY>
+		from <tab_s[1].a-W-EXACT> to <tab_s[1].a-W-EXACT>
 	14 --> 13 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s1.a-R-EXACT>
-		from <s2.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s2.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s2.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <tab_s[1].c-W-EXACT> to <tab_s[1].c-W-EXACT>
+		from <tab_s[1].b[*]-W-MAY> to <tab_s[1].b[*]-W-MAY>
+		from <tab_s[1].a-W-EXACT> to <tab_s[1].a-W-EXACT>
 	14 --> 14 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.c-R-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.b[*]-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <s2.a-R-EXACT>
-		from <s2.c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s2.b[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <s2.a-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	14 --> 15 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
-		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
-	15 --> 12 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	15 --> 13 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	15 --> 14 with conflicts
-		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <tab_s[1].c-W-EXACT> to <tab_s[1].c-W-EXACT>
+		from <tab_s[1].b[*]-W-MAY> to <tab_s[1].b[*]-W-MAY>
+		from <tab_s[1].a-W-EXACT> to <tab_s[1].a-W-EXACT>
 	15 --> 15 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 		from <i-W-EXACT> to <i-R-EXACT>
 		from <i-R-EXACT> to <i-W-EXACT>
-	16 --> 12 with conflicts
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	16 --> 13 with conflicts
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	16 --> 14 with conflicts
-		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	16 --> 15 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 

@@ -44,9 +44,9 @@ C                                                                    0 (STMT)
 
       END
 --- After partial eval
-C                                                            20*N + 30 (SUMMARY)
+C                                                            20*N + 32 (SUMMARY)
       SUBROUTINE LOWER0(N)
-C                                                             4*N + 14 (DO)
+C                                                             4*N + 15 (DO)
 
 C     Check integration for negative lower bounds
 
@@ -58,7 +58,7 @@ C                                                                    3 (STMT)
          T = T+1.                                                       0009
 C                                                                    0 (STMT)
 30       CONTINUE                                                       0010
-C                                                             4*N + 10 (DO)
+C                                                             4*N + 11 (DO)
 
       DO 50 I = -1, N                                                   0012
 C                                                                    3 (STMT)
