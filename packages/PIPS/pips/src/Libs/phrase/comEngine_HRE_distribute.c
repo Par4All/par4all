@@ -235,7 +235,7 @@ static expression get_indExp_from_ref(reference curRef, hash_table ht,
   // beginning of the fifo
   if(ind == entity_undefined)
     {
-      indExp = make_integer_constant_expression(0);
+      indExp = int_to_expression(0);
     }
   else
     {
@@ -419,8 +419,8 @@ statement generate_ind_fifo_stat2(entity oldInd, entity newInd, bool bRead)
 
   newStat =
     make_read_write_fifo_stat(name,
-			      make_integer_constant_expression(fifoNum),
-			      make_integer_constant_expression(indNum),
+			      int_to_expression(fifoNum),
+			      int_to_expression(indNum),
 			      entity_to_expression(newInd));
   return newStat;
 }
@@ -622,9 +622,9 @@ static statement generate_code()
       loop curLoop = statement_loop(STATEMENT(CAR(glCurLoop)));
 
       loop newLoop = make_loop(gNewInd,
-			       make_range(make_integer_constant_expression(0),
+			       make_range(int_to_expression(0),
 					  copy_expression(gBufferSizeEnt),
-					  make_integer_constant_expression(1)),
+					  int_to_expression(1)),
 			       newStat,
 			       loop_label(curLoop),
 			       make_execution(is_execution_sequential, UU),
@@ -736,7 +736,7 @@ static void create_loop_HRE_module()
 
     list addArg = gen_make_list(expression_domain,
 				entity_to_expression(newInd),
-				make_integer_constant_expression(1),
+				int_to_expression(1),
 				NULL);
 
     expression rExp =

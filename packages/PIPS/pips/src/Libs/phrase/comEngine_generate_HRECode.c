@@ -79,7 +79,7 @@ expression get_fifo_from_ref(reference ref)
 
   if(fifoNum != (intptr_t)HASH_UNDEFINED_VALUE)
     {
-      retExp = make_integer_constant_expression(fifoNum);
+      retExp = int_to_expression(fifoNum);
     }
 
   return retExp;
@@ -169,7 +169,7 @@ static statement generate_fifo_stat(reference curRef, expression buffIndExp,
 
   if(buffIndExp == expression_undefined)
     {
-      realInd = make_integer_constant_expression(0);
+      realInd = int_to_expression(0);
     }
   else
     {

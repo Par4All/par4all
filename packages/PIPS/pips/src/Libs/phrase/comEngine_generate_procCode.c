@@ -367,7 +367,7 @@ static statement make_mmcd_load_store_stat(string name,
     {
       list addArg = gen_make_list(expression_domain,
 				  entity_to_expression(gStepEnt),
-				  make_integer_constant_expression(1),
+				  int_to_expression(1),
 				  NULL);
 
       stepExp =
@@ -420,7 +420,7 @@ static statement generate_mmcd_stat_from_ref(reference curRef, int offset,
   // the fifo Number to use
   if(lToggleEnt == NIL)
     {
-      hreBuff = make_integer_constant_expression(realFifoNum);
+      hreBuff = int_to_expression(realFifoNum);
     }
   // else, ...
   else
@@ -432,7 +432,7 @@ static statement generate_mmcd_stat_from_ref(reference curRef, int offset,
       entity toggleEnt = get_toggleEnt_from_ref(curRef, lToggleEnt);
 
       list addArg = gen_make_list(expression_domain,
-				  make_integer_constant_expression(realFifoNum),
+				  int_to_expression(realFifoNum),
 				  entity_to_expression(toggleEnt),
 				  NULL);
 
@@ -455,7 +455,7 @@ static statement generate_mmcd_stat_from_ref(reference curRef, int offset,
   newStat =
     make_mmcd_load_store_stat(name, hreBuff,
 			      reference_to_expression(copy_reference(curRef)),
-			      make_integer_constant_expression(offset), count);
+			      int_to_expression(offset), count);
 
   return newStat;
 }
@@ -537,7 +537,7 @@ statement make_step_inc_statement(int incNum)
 {
   list addArg = gen_make_list(expression_domain,
 			      entity_to_expression(gStepEnt),
-			      make_integer_constant_expression(incNum),
+			      int_to_expression(incNum),
 			      NULL);
 
   expression rExp = call_to_expression(make_call(entity_intrinsic(PLUS_OPERATOR_NAME),
@@ -679,10 +679,10 @@ statement make_toggle_mmcd(entity ent)
 
   statement newStat =
     make_mmcd_load_store_stat(strdup(GEN_LOAD_MMCD),
-			      make_integer_constant_expression(fifoNum),
+			      int_to_expression(fifoNum),
 			      entity_to_expression(ent),
-			      make_integer_constant_expression(1),
-			      make_integer_constant_expression(1));
+			      int_to_expression(1),
+			      int_to_expression(1));
 
   return newStat;
 }
@@ -725,10 +725,10 @@ statement make_init_newInd_stat(statement stat, entity newInd)
 
   statement newStat =
     make_mmcd_load_store_stat(strdup(GEN_LOAD_MMCD),
-			      make_integer_constant_expression(fifoNum),
+			      int_to_expression(fifoNum),
 			      entity_to_expression(newInd),
-			      make_integer_constant_expression(1),
-			      make_integer_constant_expression(1));
+			      int_to_expression(1),
+			      int_to_expression(1));
 
   //printf("make_init_newInd_stat end\n");
   return newStat;
@@ -783,7 +783,7 @@ statement make_transStat(statement stat, entity newOuterInd,
 
   list addArg = gen_make_list(expression_domain,
 			      modExp,
-			      make_integer_constant_expression(1),
+			      int_to_expression(1),
 			      NULL);
 
   expression addExp =
@@ -978,7 +978,7 @@ statement make_exec_mmcd()
 
   list arg = gen_make_list(expression_domain,
 			   entity_to_expression(gStepEnt),
-			   make_integer_constant_expression(number++),
+			   int_to_expression(number++),
 			   NULL);
 
   statement mmcdStat =
@@ -1003,7 +1003,7 @@ statement generate_stat_from_ref_list_proc(list lRef, list lToggleEnt,
   list lWriteStats = NIL;
 
   generate_mmcd_stats_from_ref(lRef, NULL,
-			       make_integer_constant_expression(1),
+			       int_to_expression(1),
 			       lToggleEnt,
 			       &lReadStats, &lWriteStats);
 
@@ -1038,7 +1038,7 @@ list generate_stat_from_ref_list_proc_list(list lRef, list lInStats)
   list lWriteStats = NIL;
 
   generate_mmcd_stats_from_ref(lRef, NULL,
-			       make_integer_constant_expression(1),
+			       int_to_expression(1),
 			       NIL,
 			       &lReadStats, &lWriteStats);
 
@@ -1317,7 +1317,7 @@ statement comEngine_generate_procCode(statement externalized_code,
   // Add the step variable initialization
   statement stepStat = 
     make_assign_statement(entity_to_expression(gStepEnt),
-			  make_integer_constant_expression(1));
+			  int_to_expression(1));
   
   // Add the start HRE statement
   statement startStat = 

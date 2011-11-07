@@ -79,7 +79,7 @@ static void unary_into_binary_ref(reference ref)
 {
     list lt; 
     if (gen_length((lt = reference_indices(ref))) ==1) {
-	expression expr = make_integer_constant_expression(1);
+	expression expr = int_to_expression(1);
 	reference_indices(ref)= CONS(EXPRESSION, EXPRESSION(CAR(lt)),
 				     CONS(EXPRESSION,expr,NIL));
     }

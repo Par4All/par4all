@@ -1253,7 +1253,7 @@ compute_final_index_value(expression m1, expression m2, expression m3)
 	}
     }
     else {
-	expression zero = make_integer_constant_expression(0);
+	expression zero = int_to_expression(0);
 	expression p_int, E3, E4;
 
 	p_int = MakeUnaryCall(entity_intrinsic(INT_GENERIC_CONVERSION_NAME), 

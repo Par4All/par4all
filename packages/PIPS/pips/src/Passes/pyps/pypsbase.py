@@ -7,6 +7,7 @@ import sys
 import tempfile
 import shutil
 import shlex
+import glob
 import re
 from subprocess import Popen, PIPE
 
@@ -385,6 +386,10 @@ class workspace(object):
                 new_sources += [newfname]
                 pypsutils.guardincludes(newfname)
             self.__sources = new_sources
+
+         # remove any existing previous checkpoint state
+        for chkdir in glob.glob(".%s.chk*" % self.dirname):
+            shutil.rmtree(chkdir)
  
          # try to create the workspace now
         try:
@@ -467,6 +472,8 @@ class workspace(object):
     def checkpoint(self):
         """checkpoints the workspace and returns a workspace id"""
         self.cpypips.close_workspace(0)
+        # not checkpointing in tmpdir to avoid recursive duplications,
+        # could be made better
         chkdir=".%s.chk%d" % (self.dirname, len(self.__checkpoints))
         shutil.copytree(self.dirname, chkdir)
         self.__checkpoints.append(chkdir)

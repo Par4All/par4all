@@ -139,7 +139,7 @@ expression psystem_to_expression(ps)
   Pcontrainte  pc;
 
   if (SC_UNDEFINED_P(ps))
-    return(make_integer_constant_expression(0));
+    return(int_to_expression(0));
   else {
     and_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
 						      AND_OPERATOR_NAME),
@@ -159,7 +159,7 @@ expression psystem_to_expression(ps)
     for(pc = ps->inegalites; pc!=NULL; pc = pc->succ) {
       Pvecteur pv = pc->vecteur;
       expression exp = make_vecteur_expression(pv);
-      exp2 = MakeBinaryCall(leq_ent, exp, make_integer_constant_expression(0));
+      exp2 = MakeBinaryCall(leq_ent, exp, int_to_expression(0));
 
       if(exp1 == expression_undefined)  exp1 = exp2;
       else exp1 = MakeBinaryCall(and_ent, exp1, exp2);
@@ -168,7 +168,7 @@ expression psystem_to_expression(ps)
     for(pc = ps->egalites; pc!=NULL; pc = pc->succ) {
       Pvecteur pv = pc->vecteur;
       exp2 = MakeBinaryCall(equ_ent, make_vecteur_expression(pv),
-			    make_integer_constant_expression(0));
+			    int_to_expression(0));
       if(exp1 == expression_undefined)  exp1 = exp2;
       else  exp1 = MakeBinaryCall(and_ent, exp1, exp2);
     }

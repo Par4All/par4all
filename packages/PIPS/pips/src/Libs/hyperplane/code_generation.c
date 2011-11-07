@@ -82,7 +82,7 @@ statement code_generation(list lls,
 
 	/* new bounds for new index related to the old index of the old loop*/
 	make_bound_expression(pb->var, base_newindex,sc_newbase, &lower, &upper);
-	rl = make_range(lower, upper, make_integer_constant_expression(1));
+	rl = make_range(lower, upper, int_to_expression(1));
 
 	/*
     loop l_old = loop_undefined;

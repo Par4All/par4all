@@ -188,7 +188,7 @@ This function makes a statement to initialize a toggle variable
 statement make_toggle_init_statement(entity toggleEnt)
 {
   return make_assign_statement(entity_to_expression(toggleEnt),
-			       make_integer_constant_expression(0));
+			       int_to_expression(0));
 }
 
 /*
@@ -222,7 +222,7 @@ statement make_toggle_inc_statement(entity toggleEnt, int val)
 {
   list modArg = gen_make_list(expression_domain,
 			      entity_to_expression(toggleEnt),
-			      make_integer_constant_expression(val),
+			      int_to_expression(val),
 			      NULL);
 
   expression modExp =
@@ -448,9 +448,9 @@ static statement usual_loop_tiling(statement stat, statement newBody,
 
       // The following lines create the inner loop of the loop tiling
       // operation
-      range innerRange = make_range(make_integer_constant_expression(0),
+      range innerRange = make_range(int_to_expression(0),
 				    entity_to_expression(transferSize),
-				    make_integer_constant_expression(1));
+				    int_to_expression(1));
 
       loop innerLoop = make_loop(newInnerInd,
 				 innerRange,

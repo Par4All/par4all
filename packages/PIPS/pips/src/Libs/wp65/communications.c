@@ -407,7 +407,7 @@ array_indices_communication(
 	pv2 = vect_add(pv2,pv1);
 	vect_add_elem(&pv2,TCST,value_plus(value_uminus(ms),VALUE_MONE));
 	exp1= make_vecteur_expression(pv2);
-	exp2 = make_integer_constant_expression(bn*ls);
+	exp2 = int_to_expression(bn*ls);
 	lex2 =CONS(EXPRESSION,exp2,NIL);
 	exp3 = make_div_expression(exp1,lex2);	
 	exp4 = make_vecteur_expression(vect_new(vligne,VALUE_ONE));
@@ -423,7 +423,7 @@ array_indices_communication(
 	vect_add_elem(&pv2,vligne,int_to_value((-bn*ls)));
 	vect_add_elem(&pv2,TCST,value_plus(value_uminus(ms),VALUE_MONE));
 	exp1= make_vecteur_expression(pv2);
-	exp2 = make_integer_constant_expression(ls);
+	exp2 = int_to_expression(ls);
 	lex2 =CONS(EXPRESSION,exp2,NIL);
 	exp3 = make_div_expression(exp1,lex2);	
 	exp4 = make_vecteur_expression(vect_new(vbank,VALUE_ONE));
@@ -489,9 +489,9 @@ array_scalar_access_to_compute_communication(
 
 	list ccode= constant_symbolic_communication(compute_module,lst,
 						    !load_code,ent1);
-	range looprange = make_range(make_integer_constant_expression(0),
-				     make_integer_constant_expression(bn-1),
-				     make_integer_constant_expression(1));
+	range looprange = make_range(int_to_expression(0),
+				     int_to_expression(bn-1),
+				     int_to_expression(1));
 	statement loopbody = make_block_statement(ccode);
 	entity looplabel = make_loop_label(9000, compute_module);
 	   
@@ -561,9 +561,9 @@ list array_scalar_access_to_bank_communication(entity memory_module,Pbase  bank_
 						    !load_code,(entity) bank_indices->var); 
 	list icode= constant_symbolic_communication(memory_module,lt,
 						    load_code,ent1);
-	range looprange = make_range(make_integer_constant_expression(0),
-				     make_integer_constant_expression(bn-1),
-				     make_integer_constant_expression(1));
+	range looprange = make_range(int_to_expression(0),
+				     int_to_expression(bn-1),
+				     int_to_expression(1));
 	statement loopbody = make_block_statement(icode);
 	entity looplabel = make_loop_label(9000, memory_module);
 	

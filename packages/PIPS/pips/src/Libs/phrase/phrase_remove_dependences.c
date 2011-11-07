@@ -401,7 +401,7 @@ static list make_lInitStats(list lInitStats, reference maxOffRef, list lNewEnt,
 					      reference_to_expression(copy_reference(maxOffRef)));
 
     list addArg = gen_make_list(expression_domain,
-				make_integer_constant_expression(count),
+				int_to_expression(count),
 				copy_expression(indInit),
 				NULL);
 
@@ -449,7 +449,7 @@ static list make_lSwitchStats(list lSwitchStats, reference maxOffRef, list lNewE
 
   list addArg = gen_make_list(expression_domain,
 			      entity_to_expression(loopInd),
-			      make_integer_constant_expression(1),
+			      int_to_expression(1),
 			      NULL);
 
   expression addExp = call_to_expression(make_call(entity_intrinsic(PLUS_OPERATOR_NAME),

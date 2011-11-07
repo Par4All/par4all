@@ -5523,6 +5523,10 @@ CreateIntrinsics()
         {PIPS_C_MAX_OPERATOR_NAME, (INT_MAX), integer_to_integer_type,
             typing_function_int_to_int, 0},
 
+        /* PIPS intrinsics to simulate various effects */
+        {PIPS_MEMORY_BARRIER_OPERATOR_NAME, 0, void_to_void_type, 0, 0},
+        {PIPS_IO_BARRIER_OPERATOR_NAME, 0, void_to_void_type, 0, 0},
+
         {NULL, 0, 0, 0, 0}
     };
     intrinsic_type_descriptor_mapping=hash_table_make(hash_string,sizeof(IntrinsicTypeDescriptorTable));

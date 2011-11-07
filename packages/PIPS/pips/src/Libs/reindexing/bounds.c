@@ -471,7 +471,7 @@ list lvar, lrange;
 	    words_to_string(words_expression(upper)));
   }
 
-  incr = make_integer_constant_expression(1);
+  incr = int_to_expression(1);
   
   return(make_range(lower, upper, incr));
 }

@@ -91,7 +91,7 @@ gener_DOSEQ(
 
 	/*new bounds de new index correspondant a old index de cet loop*/
 	make_bound_expression(pb->var,base_newindex,sc_newbase,&lower,&upper);
-	rl = make_range(lower,upper,make_integer_constant_expression(1));
+	rl = make_range(lower,upper,int_to_expression(1));
 
 
 	if (CDR(lls)!=NULL) {

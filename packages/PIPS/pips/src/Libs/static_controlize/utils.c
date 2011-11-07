@@ -245,8 +245,8 @@ list *ell;
 				syntax_call(expression_syntax( exp )))));
 		exp2 = MakeBinaryCall( ENTITY_GE,
 			   make_op_exp( MINUS_OPERATOR_NAME,
-				make_integer_constant_expression(-1), exp1 ),
-			   make_integer_constant_expression(0) );
+				int_to_expression(-1), exp1 ),
+			   int_to_expression(0) );
 		ret_exp = exp2;
 	}
 	else if(ENTITY_AND_P(call_function(
@@ -325,9 +325,9 @@ list ndf_normalized_test(expression exp, list *ell)
 				 syntax_call(expression_syntax( arg1 )))));
 			exp2 = MakeBinaryCall( ENTITY_GE,
 				 make_op_exp( MINUS_OPERATOR_NAME,
-				   make_integer_constant_expression(-1),
+				   int_to_expression(-1),
 				   exp3 ),
-				 make_integer_constant_expression(0) );
+				 int_to_expression(0) );
 			ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, exp2 );
 			return( ret_list );
 		}
@@ -522,14 +522,14 @@ list *ell;
 						 make_op_exp(
 							     MINUS_OPERATOR_NAME,
 							     arg2, arg1 ),
-						 make_integer_constant_expression(1) ),
-				    make_integer_constant_expression(0) );
+						 int_to_expression(1) ),
+				    int_to_expression(0) );
 	}
 	else if (ENTITY_LESS_OR_EQUAL_P( fun )) {
 	  ret_exp = MakeBinaryCall( ENTITY_GE,
 				    make_op_exp( MINUS_OPERATOR_NAME,
 						 arg2, arg1 ),
-				    make_integer_constant_expression(0) );
+				    int_to_expression(0) );
 	}
 	else if (ENTITY_GREATER_THAN_P( fun )) {
 	  ret_exp = MakeBinaryCall( ENTITY_GE,
@@ -537,24 +537,24 @@ list *ell;
 						 make_op_exp(
 							     MINUS_OPERATOR_NAME,
 							     arg1, arg2 ),
-						 make_integer_constant_expression(1) ),
-				    make_integer_constant_expression(0) );
+						 int_to_expression(1) ),
+				    int_to_expression(0) );
 	}
 	else if (ENTITY_GREATER_OR_EQUAL_P( fun )) {
 	  ret_exp = MakeBinaryCall( (entity) ENTITY_GE,
 				    make_op_exp( MINUS_OPERATOR_NAME,
 						 arg1, arg2 ),
-				    make_integer_constant_expression(0) );
+				    int_to_expression(0) );
 	}
 	else if (ENTITY_EQUAL_P( fun )) {
 	  ret_exp1 = MakeBinaryCall( ENTITY_GE,
 				     make_op_exp( MINUS_OPERATOR_NAME,
 						  arg1, arg2 ),
-				     make_integer_constant_expression(0) );
+				     int_to_expression(0) );
 	  ret_exp2 = MakeBinaryCall( ENTITY_GE,
 				     make_op_exp( MINUS_OPERATOR_NAME,
 						  arg4, arg3 ),
-				     make_integer_constant_expression(0) ) ;
+				     int_to_expression(0) ) ;
 	   ret_exp = MakeBinaryCall( ENTITY_AND, ret_exp1, ret_exp2);
 	}
 	else if (ENTITY_NON_EQUAL_P( fun )) {
@@ -562,14 +562,14 @@ list *ell;
                                 make_op_exp( MINUS_OPERATOR_NAME,
 					     make_op_exp( MINUS_OPERATOR_NAME,
                                         arg1, arg2 ),
-				   make_integer_constant_expression(1) ),
-				 make_integer_constant_expression(0) );
+				   int_to_expression(1) ),
+				 int_to_expression(0) );
 	  ret_exp2 =  MakeBinaryCall( ENTITY_GE,
                                 make_op_exp( MINUS_OPERATOR_NAME,
 				   make_op_exp( MINUS_OPERATOR_NAME,
                                         arg4, arg3 ),
-				   make_integer_constant_expression(1) ),
-				      make_integer_constant_expression(0) );
+				   int_to_expression(1) ),
+				      int_to_expression(0) );
 	  ret_exp = MakeBinaryCall( ENTITY_OR, ret_exp1, ret_exp2);
 	}
 	else ret_exp = expression_undefined;
