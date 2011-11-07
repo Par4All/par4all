@@ -576,7 +576,7 @@ Pscell pc;
 
 	if(lcr_ab == NIL) {
 	  cr = make_range(lower, upper,
-			  make_integer_constant_expression(1));
+			  int_to_expression(1));
 	  lcr_ab = CONS(RANGE, cr, NIL);
 	  lcr_range = gen_nconc(lcr_range, lcr_ab);
 	}
@@ -612,7 +612,7 @@ Pscell pc;
 
 	if(lcr_ab == NIL) {
 	  cr = make_range(lower, upper,
-			   make_integer_constant_expression(1));
+			   int_to_expression(1));
 	  lcr_ab = CONS(RANGE, cr, NIL);
 	  lcr_range = gen_nconc(lcr_range, lcr_ab);
 	}
@@ -648,7 +648,7 @@ Pscell pc;
 
 	if(lcr_ab == NIL) {
 	  cr = make_range(lower, upper,
-			   make_integer_constant_expression(1));
+			   int_to_expression(1));
 	  lcr_ab = CONS(RANGE, cr, NIL);
 	  lcr_range = gen_nconc(lcr_range, lcr_ab);
 	}
@@ -762,7 +762,7 @@ void make_array_bounds(cv)
       cr = RANGE(CAR(la));
 
       if(is_first && (d >= 0) && (d != INFINITY)) {
-	range_upper(cr) = make_integer_constant_expression(d);
+	range_upper(cr) = int_to_expression(d);
 
 	is_first = false;
       }
@@ -788,7 +788,7 @@ void make_array_bounds(cv)
 	else
 	  range_upper(cr) = make_rational_exp(pv_aux, cr_om);
       }
-      range_lower(cr) = make_integer_constant_expression(0);
+      range_lower(cr) = int_to_expression(0);
     }
   }
 
@@ -2130,7 +2130,7 @@ int          *c;
 	exp = Pvecteur_to_expression(vc);
 	if(value_gt(co,VALUE_ONE) || value_lt(co,VALUE_MONE)) {
 	  exp = make_op_exp(DIVIDE_OPERATOR_NAME, exp,
-			    make_integer_constant_expression(
+			    int_to_expression(
 				VALUE_TO_INT(value_abs(co))));
 	}
 	lnew = gen_nconc(lnew, CONS(EXPRESSION, exp, NIL));
@@ -2532,14 +2532,14 @@ int          *c;
 	      sa = MAKE_STATEMENT(make_init_time(ent, EXPRESSION(CAR(lb))));
 	    else if (sc_empty_p(pcond))
 	      sa = MAKE_STATEMENT(make_init_time(ent,
-						 make_integer_constant_expression(-1)));
+						 int_to_expression(-1)));
 	    else
 	      sa = st_make_nice_test(Psysteme_to_expression(pcond),
 				     CONS(STATEMENT,
 					  MAKE_STATEMENT(make_init_time(ent, EXPRESSION(CAR(lb)))),
 					  NIL),
 				     CONS(STATEMENT,
-					  MAKE_STATEMENT(make_init_time(ent, make_integer_constant_expression(-1))),
+					  MAKE_STATEMENT(make_init_time(ent, int_to_expression(-1))),
 					  NIL));
 
 	    ADD_ELEMENT_TO_LIST((*linit), STATEMENT, sa);
@@ -2998,7 +2998,7 @@ int          cn;
 	if (!VECTEUR_NUL_P(vec))
 	  exp2 = Pvecteur_to_expression(vec);
 	else
-	  exp2 = make_integer_constant_expression(0);
+	  exp2 = int_to_expression(0);
 
 	/* put the test on global time IF t == bdt_value */
 	exp = build_global_time_test_with_exp(tim, exp2);
@@ -3020,7 +3020,7 @@ int          cn;
      * initialization list of stat called linit.  */
     if(pc->ltau != NIL) {
       ins = make_init_time(get_time_ent(cn, STRING_TAU, 0), 
-			   make_integer_constant_expression(0));
+			   int_to_expression(0));
       ADD_ELEMENT_TO_LIST((*linit), STATEMENT, MAKE_STATEMENT(ins));
     }
   }
@@ -3252,8 +3252,8 @@ statement re_do_it(the_dfg, the_bdt, the_plc)
 							  IS_MAX));
   upper = make_expression(make_syntax(is_syntax_call, ca),
 			  normalized_undefined);
-  lower = make_integer_constant_expression(0);
-  incr = make_integer_constant_expression(1);
+  lower = int_to_expression(0);
+  incr = int_to_expression(1);
   ran = make_range(lower, upper, incr);
 
   loo = make_loop(tim, ran, stat, entity_empty_label(),

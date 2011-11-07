@@ -2390,7 +2390,7 @@ char*   module_name;
     for(l = plc_placements(pfunc); !ENDP(l); POP(l)) {
       placement crt_func = PLACEMENT(CAR(l));
       placement_dims(crt_func) = CONS(EXPRESSION,
-      				      make_integer_constant_expression(0),
+      				      int_to_expression(0),
 				      NIL);
     }
 
@@ -2609,7 +2609,7 @@ fprint_plc_pp_dims(stderr, pfunc);
         dims = placement_dims(crt_func);
 
       if(exp == expression_undefined)
-	exp = make_integer_constant_expression(0);
+	exp = int_to_expression(0);
 
       placement_dims(crt_func) = gen_nconc(dims, CONS(EXPRESSION, exp, NIL));
     }

@@ -793,8 +793,16 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   }
 
   /* Is it a static variable declared in the compilation unit? */
+  /* we have an issue there : a static function will be declared  FILE!MODULE:FILE!name,
+   * but a static variable will be declared FILE!MODULE:name
+   * so try both ... CleanupEntity has been fixed to remove buggy situations ...*/
   if(entity_undefined_p(ent)) {
     global_name = (concatenate(compilation_unit_name,MODULE_SEP_STRING,
+				     prefix,name,NULL));
+    ent = gen_find_tabulated(global_name,entity_domain);
+  }
+  if(entity_undefined_p(ent)) {
+    global_name = (concatenate(compilation_unit_name,MODULE_SEP_STRING,compilation_unit_name,
 				     prefix,name,NULL));
     ent = gen_find_tabulated(global_name,entity_domain);
   }
@@ -2448,6 +2456,9 @@ void UpdateEntities(list le, stack ContextStack, stack FormalStack, stack Functi
   }
 }
 
+/* if returned entity != original entity, e **must** be freed,
+ * otherwise an invalid entity is still tabulated */
+static
 entity CleanUpEntity(entity e)
 {
   entity ne = e;
@@ -2469,6 +2480,7 @@ entity CleanUpEntity(entity e)
     pips_debug(1, "Entity %s should have a functional type\n", entity_name(e));
     pips_debug(1, "New Entity %s created\n", entity_name(ne));
     /* Entity e should be removed... but it's pretty dangerous. */
+    /* let the caller do it */
   }
 
   return ne;
@@ -2525,7 +2537,7 @@ void CleanUpEntities(list le)
       /* Update entity in current entity list */
       CAR(ce).p = (gen_chunk *) ne;
 
-      //free_entity(e);
+      free_entity(e);
     }
   }
 }

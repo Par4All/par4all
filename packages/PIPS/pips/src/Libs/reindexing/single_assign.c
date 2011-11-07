@@ -666,7 +666,7 @@ fprint_pred(stdout, pred);
   for(pc = ps->inegalites; pc!=NULL; pc = pc->succ) {
     Pvecteur pv = pc->vecteur;
     expression exp = make_vecteur_expression(pv);
-    exp2 = MakeBinaryCall(leq_ent, exp, make_integer_constant_expression(0));
+    exp2 = MakeBinaryCall(leq_ent, exp, int_to_expression(0));
 
 if(get_debug_level() > 6) {
 pu_vect_fprint(stdout, pv);
@@ -691,7 +691,7 @@ fprintf(stdout, "\t\t\t\t\t\tINEG: exp1 = %s\n",
   for(pc = ps->egalites; pc!=NULL; pc = pc->succ) {
     Pvecteur pv = pc->vecteur;
     exp2 = MakeBinaryCall(equ_ent, make_vecteur_expression(pv),
-    			  make_integer_constant_expression(0));
+    			  int_to_expression(0));
     if(exp1 == expression_undefined)
       exp1 = exp2;
     else

@@ -163,7 +163,7 @@ PROPER  EFFECTS WITH POINTS TO
 
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _vct_4[0].array vct
 //             <    is written>: array_s
    fgUINT16 *array_s = (fgUINT16 *) vct->array;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
@@ -217,15 +217,12 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 		from <I_0-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	15 --> 16 with conflicts
 		from <array_s-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <array_d-W-EXACT>
-	15 --> 17 with conflicts
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <I_0-W-EXACT>
 	15 --> 24 with conflicts
 		from <array_s-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_return0-W-EXACT>
 	15 --> 26 with conflicts
 		from <array_s-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <vct-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_vct_4[0].array-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	16 --> 17 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <I_0-W-EXACT>
 	16 --> 24 with conflicts

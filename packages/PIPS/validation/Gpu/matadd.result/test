@@ -264,15 +264,15 @@
       INTEGER I, J
       REAL A(M, N), B(M, N), C(M, N)
 
-      DO I = 0, M-1+1+-1
-         DO J = 0, N-1+1+-1
+      DO I = 0, M-1
+         DO J = 0, N-1
             B(I+1,J+1) = I+1
             C(I+1,J+1) = J+1
          ENDDO
       ENDDO
 
-      DO I = 0, M-1+1+-1
-         DO J = 0, N-1+1+-1
+      DO I = 0, M-1
+         DO J = 0, N-1
             A(I+1,J+1) = B(I+1,J+1)+C(I+1,J+1)
          ENDDO
       ENDDO
@@ -540,17 +540,17 @@ main (int argc, char *argv[])
   float b[n - 0][m - 0];
   float c[n - 0][m - 0];
 
-  for (i = 0; i <= ((m - 1) + 1) + -1; i++)
+  for (i = 0; i <= m - 1; i++)
     {
-      for (j = 0; j <= ((n - 1) + 1) + -1; j++)
+      for (j = 0; j <= n - 1; j++)
 	{
 	  b[(j + 1) - 1][(i + 1) - 1] = (i + 1);
 	  c[(j + 1) - 1][(i + 1) - 1] = (j + 1);
 	}
     }
-  for (i = 0; i <= ((m - 1) + 1) + -1; i++)
+  for (i = 0; i <= m - 1; i++)
     {
-      for (j = 0; j <= ((n - 1) + 1) + -1; j++)
+      for (j = 0; j <= n - 1; j++)
 	{
 	  a[(j + 1) - 1][(i + 1) - 1] =
 	    (b[(j + 1) - 1][(i + 1) - 1] + c[(j + 1) - 1][(i + 1) - 1]);
@@ -828,10 +828,10 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 
 
 !$OMP PARALLEL DO PRIVATE(J)
-      DO I = 0, M-1+1+-1
+      DO I = 0, M-1
 
 !$OMP    PARALLEL DO 
-         DO J = 0, N-1+1+-1
+         DO J = 0, N-1
             B(I+1,J+1) = I+1
             C(I+1,J+1) = J+1
          ENDDO
@@ -839,10 +839,10 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 
 
 !$OMP PARALLEL DO PRIVATE(J)
-      DO I = 0, M-1+1+-1
+      DO I = 0, M-1
 
 !$OMP    PARALLEL DO 
-         DO J = 0, N-1+1+-1
+         DO J = 0, N-1
             A(I+1,J+1) = B(I+1,J+1)+C(I+1,J+1)
          ENDDO
       ENDDO
@@ -1229,9 +1229,9 @@ p4a_launcher_matadd (int *m_p4a_copy, int *n_p4a_copy,
   int m = *m_p4a_copy;
   int n = *n_p4a_copy;
 
-  for (i = 0; i <= ((m - 1) + 1) + -1; i++)
+  for (i = 0; i <= m - 1; i++)
     {
-      for (j = 0; j <= ((n - 1) + 1) + -1; j++)
+      for (j = 0; j <= n - 1; j++)
 	{
 	  p4a_wrapper_matadd (&m, &n, b, c, &i, &j);
 	}
@@ -1262,9 +1262,9 @@ p4a_launcher_matadd_1 (int *m_p4a_copy, int *n_p4a_copy,
   int m = *m_p4a_copy;
   int n = *n_p4a_copy;
 
-  for (i = 0; i <= ((m - 1) + 1) + -1; i++)
+  for (i = 0; i <= m - 1; i++)
     {
-      for (j = 0; j <= ((n - 1) + 1) + -1; j++)
+      for (j = 0; j <= n - 1; j++)
 	{
 	  p4a_wrapper_matadd_1 (&m, &n, a, b, c, &i, &j);
 	}

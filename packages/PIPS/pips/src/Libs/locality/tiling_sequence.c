@@ -621,8 +621,8 @@ static statement  fusion()
     {
       range range1;
       range1=loop_range(ls); 
-      range_lower(range1)=make_integer_constant_expression(merged_nest[j].lower);
-      range_upper(range1)= make_integer_constant_expression(merged_nest[j].upper);
+      range_lower(range1)=int_to_expression(merged_nest[j].lower);
+      range_upper(range1)= int_to_expression(merged_nest[j].upper);
       if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
       else loop_body(ls)=s;
     };
@@ -864,9 +864,9 @@ static statement fusion_buffer()
     
       range1=loop_range(ls); 
       range_lower(range1)=
-	make_integer_constant_expression(merged_nest[j].lower);
+	int_to_expression(merged_nest[j].lower);
       range_upper(range1)=
-       make_integer_constant_expression(merged_nest[j].upper);
+       int_to_expression(merged_nest[j].upper);
       
       if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
       else loop_body(ls)=s;
@@ -1046,8 +1046,8 @@ statement Hierarchical_tiling ()
     {
       range range1;  
       range1=loop_range(ls); 
-      range_lower(range1)=make_integer_constant_expression(tiled_nest[j].lower);
-      range_upper(range1)= make_integer_constant_expression(tiled_nest[j].upper);
+      range_lower(range1)=int_to_expression(tiled_nest[j].lower);
+      range_upper(range1)= int_to_expression(tiled_nest[j].upper);
       if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
     };
   s1=loop_to_statement(loop1);
@@ -1909,8 +1909,8 @@ statement Tiling_buffer_allocation ()
     {
       range range1;  
       range1=loop_range(ls); 
-      range_lower(range1)=make_integer_constant_expression(tiled_nest[j].lower);
-      range_upper(range1)= make_integer_constant_expression(tiled_nest[j].upper);
+      range_lower(range1)=int_to_expression(tiled_nest[j].lower);
+      range_upper(range1)= int_to_expression(tiled_nest[j].upper);
       if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
     };
   tiling_indice= ( Pvecteur  *)malloc(depth *sizeof( Pvecteur*));
@@ -2318,8 +2318,8 @@ statement  Tiling2_buffer()
     {
       range range1;  
       range1=loop_range(ls); 
-      range_lower(range1)=make_integer_constant_expression(tiled_nest[j].lower);
-      range_upper(range1)= make_integer_constant_expression(tiled_nest[j].upper);
+      range_lower(range1)=int_to_expression(tiled_nest[j].lower);
+      range_upper(range1)= int_to_expression(tiled_nest[j].upper);
       if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
     };
   s1=loop_to_statement(loop1);

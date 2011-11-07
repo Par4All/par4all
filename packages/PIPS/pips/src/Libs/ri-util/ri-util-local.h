@@ -1139,6 +1139,10 @@
 #define LOOP_COUNTER_MODULE_NAME        "LOOP-COUNTER"
 #define DI_VAR_MODULE_NAME              "DI-VAR"
 
+/* special pips intrinsics with global effects */
+#define PIPS_MEMORY_BARRIER_OPERATOR_NAME "__pips_memory_barrier"
+#define PIPS_IO_BARRIER_OPERATOR_NAME "__pips_io_barrier"
+
 /* macros */
 
 /* FI: entity_local_name() should be sufficient for these comparisons */

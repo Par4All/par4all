@@ -1,0 +1,25 @@
+void test(int n, int m, int a[n][m])
+{
+   int i, j;
+#pragma omp parallel for 
+l99998:
+   for(i = 0; i <= n-1; i += 1)
+#pragma omp parallel for 
+l99999:
+      for(j = 0; j <= m-1; j += 1)
+         a[i][j] = 0;
+}
+void test(int n, int m, int a[n][m])
+{
+   int i, j;
+   //PIPS generated variable
+   int I_0;
+l99998:
+   for(I_0 = 0; I_0 <= (n-1)/N; I_0 += 1)
+#pragma omp parallel for 
+      for(i = I_0*N; i <= MIN(n-1, I_0*N+(N-1)); i += 1)
+#pragma omp parallel for 
+l99999:
+         for(j = 0; j <= m-1; j += 1)
+            a[i][j] = 0;
+}

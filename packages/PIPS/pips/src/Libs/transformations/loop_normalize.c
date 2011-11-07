@@ -171,14 +171,14 @@ void loop_normalize_statement(statement s) {
 
     expression nlc_exp = entity_to_expression(index);
     // New range new_lb:(nub2+(new_lb-1)):1
-    range_lower(lr) = make_integer_constant_expression(new_lb);
+    range_lower(lr) = int_to_expression(new_lb);
     range_upper(lr) =
       make_op_exp(PLUS_OPERATOR_NAME,
                   nub2,
                   make_op_exp(MINUS_OPERATOR_NAME,
-                              make_integer_constant_expression(new_lb),
-                              make_integer_constant_expression(1)));
-    range_increment(lr) = make_integer_constant_expression(1);
+                              int_to_expression(new_lb),
+                              int_to_expression(1)));
+    range_increment(lr) = int_to_expression(1);
 
     // Base change: (index - new_lb)*ri  + rl
     expression new_index_exp =
@@ -187,7 +187,7 @@ void loop_normalize_statement(statement s) {
                   make_op_exp(MULTIPLY_OPERATOR_NAME,
                               make_op_exp(MINUS_OPERATOR_NAME,
                                           nlc_exp,
-                                          make_integer_constant_expression(new_lb)),
+                                          int_to_expression(new_lb)),
                               copy_expression(ri)));
 
 
@@ -208,12 +208,12 @@ void loop_normalize_statement(statement s) {
       if ( expression_constant_p(nub3)) {
         int upper = expression_to_int(nub3);
         if (upper > 0)
-          exp_max = make_integer_constant_expression(upper);
+          exp_max = int_to_expression(upper);
       }
       else {
         entity max_ent = FindEntity(TOP_LEVEL_MODULE_NAME,MAX_OPERATOR_NAME);
         exp_max = make_max_exp(max_ent, copy_expression(nub),
-                               make_integer_constant_expression(0));
+                               int_to_expression(0));
       }
       if (expression_undefined_p(exp_max))
         exp_plus = copy_expression(rl);

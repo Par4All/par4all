@@ -157,7 +157,7 @@ normalized NormalizeCall(call c)
     if(get_bool_property("EVAL_SYMBOLIC_CONSTANT"))
         n = NormalizeConstant((symbolic_constant(value_symbolic(v))));
     else
-        n= make_normalized_complex();
+        n= make_normalized_linear( vect_new(f, VALUE_ONE) );
 	break;
       case is_value_unknown:
       case is_value_code:

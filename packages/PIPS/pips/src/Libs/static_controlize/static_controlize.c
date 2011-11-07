@@ -659,16 +659,16 @@ int *Gcount_nlc;
   nlc_exp = make_entity_expression( nlc_ent, NIL);
   loop_index( l ) = nlc_ent;
   if(fortran_module_p(get_current_module_entity())) {
-    range_lower( lr ) = make_integer_constant_expression( 1 );
+    range_lower( lr ) = int_to_expression( 1 );
     range_upper( lr ) = nub2;
   }
   else {
     /* assume C */
-    range_lower( lr ) = make_integer_constant_expression( 0 );
+    range_lower( lr ) = int_to_expression( 0 );
     range_upper( lr ) = make_op_exp(MINUS_OPERATOR_NAME, nub2,
-				    make_integer_constant_expression(1));
+				    int_to_expression(1));
   }
-  range_increment( lr ) = make_integer_constant_expression( 1 );
+  range_increment( lr ) = int_to_expression( 1 );
 
   /* Generate the change of basis expression: the new index starts at
      0 in C and 1 in Fortran:
@@ -697,7 +697,7 @@ int *Gcount_nlc;
     int upper = expression_to_int( nub3 );
     if ( upper > 0 )
       /* nub3 is not used any longer */
-      exp_max = make_integer_constant_expression( upper );
+      exp_max = int_to_expression( upper );
   }
   else {
     max_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
@@ -705,7 +705,7 @@ int *Gcount_nlc;
 				 entity_domain);
     /* FI: Why copy nub? it does not seem used anywhere else. */
     exp_max = make_max_exp(max_ent, copy_expression( nub ),
-			   make_integer_constant_expression( 0 ));
+			   int_to_expression( 0 ));
   }
   if ( exp_max == expression_undefined )
     exp_plus = copy_expression( rl );

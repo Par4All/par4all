@@ -79,12 +79,12 @@ complex_bound_generation(Value coeff1,
     debug(8,"complex_bound_generation","begin\n");
     expr1 = make_vecteur_expression(exp1);
     expr2 = make_vecteur_expression(exp2);
-    ex1 = make_integer_constant_expression(
+    ex1 = int_to_expression(
 	VALUE_TO_INT(value_abs(coeff1)));
-    ex2 = make_integer_constant_expression(
+    ex2 = int_to_expression(
 	VALUE_TO_INT(value_abs(coeff2)));
     if (value_notone_p(coeff3))
-	ex3 = make_integer_constant_expression(
+	ex3 = int_to_expression(
 	    VALUE_TO_INT(value_abs(coeff3)));
     lex2 = CONS(EXPRESSION,ex2,NIL);
     ex4 = make_div_expression(expr1,lex2);

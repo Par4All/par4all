@@ -1,0 +1,38 @@
+void foo_l(double a[4], double b[4], double c[4])
+{
+   double tmp[4];
+   tmp[0] = b[0]*1.;
+   tmp[1] = b[1]*2.;
+
+   tmp[2] = b[0]*3;
+   tmp[3] = b[1]*4;
+   a[0] = tmp[0]+tmp[1];
+   a[1] = tmp[2]+tmp[3];
+}
+void foo_l(double a[4], double b[4], double c[4])
+{
+   //SAC generated temporary array
+   a2df pdata0 = {1., 2.};
+   //SAC generated temporary array
+   a2sf pdata30 = {1., 2.};
+   //SAC generated temporary array
+   a2si pdata1 = {3, 4};
+   //SAC generated temporary array
+   a2sf pdata70 = {3, 4};
+   double tmp[4];
+   {
+      //PIPS:SAC generated v2sf vector(s)
+      v2sf vec00, vec10, vec20, vec40, vec50, vec60, vec80, vec90, vec100;
+      SIMD_LOAD_V2SF(vec20, &pdata30[0]);
+      SIMD_LOAD_V2DF_TO_V2SF(vec10, &b[0]);
+      SIMD_MULPS(vec00, vec10, vec20);
+      SIMD_STORE_V2SF_TO_V2DF(vec00, &tmp[0]);
+      SIMD_LOAD_V2SF(vec60, &pdata70[0]);
+      SIMD_MULPS(vec40, vec10, vec60);
+      SIMD_STORE_V2SF_TO_V2DF(vec40, &tmp[2]);
+      SIMD_LOAD_GENERIC_V2DF_TO_V2SF(vec100, tmp[1], tmp[3]);
+      SIMD_LOAD_GENERIC_V2DF_TO_V2SF(vec90, tmp[0], tmp[2]);
+      SIMD_ADDPS(vec80, vec90, vec100);
+      SIMD_STORE_V2SF_TO_V2DF(vec80, &a[0]);
+   }
+}

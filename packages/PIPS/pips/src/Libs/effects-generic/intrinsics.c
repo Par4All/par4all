@@ -87,7 +87,7 @@ static list update_effects(entity e,list args);
 static list unique_update_effects(entity e,list args);
 static list assign_substring_effects(entity e,list args);
 static list substring_effect(entity e,list args);
-static list some_io_effects(entity e, list args);
+static list make_io_read_write_memory_effects(entity e, list args);
 static list io_effects(entity e, list args);
 static list c_io_effects(entity e, list args);
 static list read_io_effects(entity e, list args);
@@ -337,9 +337,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   {CONTINUE_FUNCTION_NAME,                 no_write_effects},
   {"ENDDO",                                no_write_effects},
-  {PAUSE_FUNCTION_NAME,                    some_io_effects},
+  {PAUSE_FUNCTION_NAME,                    make_io_read_write_memory_effects},
   {RETURN_FUNCTION_NAME,                   no_write_effects},
-  {STOP_FUNCTION_NAME,                     some_io_effects},
+  {STOP_FUNCTION_NAME,                     make_io_read_write_memory_effects},
   {END_FUNCTION_NAME,                      no_write_effects},
   {FORMAT_FUNCTION_NAME,                   no_write_effects},
 
@@ -1249,6 +1249,10 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   /* _POSIX_C_SOURCE >= 199309L */
   {NANOSLEEP_FUNCTION_NAME,                 safe_c_effects},
 
+  /* PIPS internal intrinsics */
+  {PIPS_MEMORY_BARRIER_OPERATOR_NAME,       make_anywhere_read_write_memory_effects},
+  {PIPS_IO_BARRIER_OPERATOR_NAME,           make_io_read_write_memory_effects},
+
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
      {int mbtowc(wchar_t *, const char *, size_t, 0, 0},
@@ -1618,7 +1622,7 @@ SearchCIoElement(const char *s)
 
 
 static list
-some_io_effects(entity e __attribute__ ((__unused__)), list args __attribute__ ((__unused__)))
+make_io_read_write_memory_effects(entity e __attribute__ ((__unused__)), list args __attribute__ ((__unused__)))
 {
     /* Fortran standard deliberately does not define the exact output
        device of a PAUSE or STOP statement. See Page B-6 in ANSI X3.9-1978
@@ -1923,7 +1927,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
 
     ref1 = make_reference(private_io_entity, indices);
     ref2 = copy_reference(ref1);
-    /* FI: I would like not to use "preference" isntead of
+    /* FI: I would like not to use "preference" instead of
        "reference", but this causes a bug in cumulated effects and I
        do not have time to chase it. */
     eff1 = (*reference_to_effect_func)(ref1, make_action_read_memory(), false);

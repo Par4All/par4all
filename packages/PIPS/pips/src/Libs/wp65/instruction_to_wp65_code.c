@@ -437,7 +437,7 @@ generate_io_wp65_code(statement s1,statement body,hash_table v_to_esv,bool loop_
 	    expression low = dimension_lower(DIMENSION(CAR(ldim)));
 	    expression up = dimension_upper(DIMENSION(CAR(ldim)));
 	    range looprange = make_range(low, up,
-				   make_integer_constant_expression(1));
+				   int_to_expression(1));
 	    loop loopi = ith_loop_in_loop_nest(result,i);
 	    loop_range(loopi) = looprange;
 	}
@@ -904,9 +904,9 @@ loop_nest_to_wp65_code(
 				       last_parallel_level);
 	
 	if (fully_sequential) {
-	    range looprange = make_range(make_integer_constant_expression(0),
-					 make_integer_constant_expression(pn-1),
-					 make_integer_constant_expression(1));
+	    range looprange = make_range(int_to_expression(0),
+					 int_to_expression(pn-1),
+					 int_to_expression(1));
 	    entity looplabel = make_loop_label(9000, 
 					       compute_module);
 	    loop newloop = make_loop(proc_id, 
