@@ -9,7 +9,7 @@ int main(int argc, char **argv)
    {
       int i;
 
-//  <a[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+PHI2+2<=2N, PHI1+1<=N,
+//  <a[PHI1][PHI2]-W-MAY-{0<=PHI1, 4PHI1+PHI2+5<=5N, PHI1+1<=N,
 //    0<=PHI2, PHI2+1<=N, N==argc}>
 
       

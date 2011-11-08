@@ -120,8 +120,8 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
          //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2+1<=n, n==10}>
          
          ;
-         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 9);
+         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_RR_c[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_RR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = n-1;
          
@@ -129,8 +129,8 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
          //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
          
          ;
-         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 9);
+         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_RR_a[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_RR_a[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
          
@@ -160,8 +160,8 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int n, float a[n][n], float b[n][n], float c[n
          //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2+1<=n, n==10}>
          
          ;
-         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 9);
+         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = n-1;
       }
@@ -216,8 +216,8 @@ void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][
          //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
          
          ;
-         STEP_SR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_SR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 9);
+         STEP_SR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_SR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_SR_b[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_SR_b[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
          
@@ -225,8 +225,8 @@ void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][
          //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
          
          ;
-         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 9);
+         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_SR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_SR_c[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
          
@@ -234,8 +234,8 @@ void main_PAR_HYBRID_FOR_HYBRID(int n, float a[n][n], float b[n][n], float c[n][
          //    PHI1<=STEP_i_UP, 0<=PHI2, PHI2<=9, n==10}>
          
          ;
-         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 9);
+         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
          STEP_SR_a[IDX-1][2-1][STEP_INDEX_SLICE_LOW-1] = 0;
          STEP_SR_a[IDX-1][2-1][STEP_INDEX_SLICE_UP-1] = 9;
       }
