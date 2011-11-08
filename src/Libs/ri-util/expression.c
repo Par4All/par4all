@@ -1885,8 +1885,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
       normalized nor1 = NORMALIZE_EXPRESSION(exp1);
       normalized nor2 = NORMALIZE_EXPRESSION(exp2);
 
-      if((normalized_tag(nor1) == is_normalized_linear) &&
-	 (normalized_tag(nor2) == is_normalized_linear) &&
+      if((normalized_linear_p(nor1) && normalized_linear_p(nor2) ) &&
 	 (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent)) )
 	{
 	  pips_debug(6, "Linear operation\n");
@@ -1968,10 +1967,9 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
   Pvecteur V1, V2, newV = VECTEUR_NUL;
 
   debug( 7, "make_lin_op_exp", "doing\n");
-  if((normalized_tag(expression_normalized(exp1)) == is_normalized_complex) ||
-     (normalized_tag(expression_normalized(exp2)) == is_normalized_complex))
-    user_error("make_lin_op_exp",
-	       "expressions MUST be linear and normalized");
+  if(normalized_complex_p(expression_normalized(exp1)) ||
+     normalized_complex_p(expression_normalized(exp2)) )
+    pips_internal_error( "expressions MUST be linear and normalized");
 
   V1 = (Pvecteur) normalized_linear(expression_normalized(exp1));
   V2 = (Pvecteur) normalized_linear(expression_normalized(exp2));
@@ -3399,9 +3397,9 @@ expression monome_to_expression(Pmonome pm)
                 Value val = exp>0 ? exp: -exp;
                 tmp = entity_to_expression((entity)var);
                 while(--val)
-                    tmp=MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),tmp,entity_to_expression((entity)var));
+                    tmp=make_op_exp(MULTIPLY_OPERATOR_NAME,tmp,entity_to_expression((entity)var));
                 if(exp<0)
-                    tmp=MakeBinaryCall(entity_intrinsic(DIVIDE_OPERATOR_NAME),int_to_expression(1),tmp);
+                    tmp=make_op_exp(DIVIDE_OPERATOR_NAME,int_to_expression(1),tmp);
             }
             term=expression_undefined_p(term)?tmp:make_op_exp(MULTIPLY_OPERATOR_NAME,term,tmp);
         }
@@ -3424,7 +3422,7 @@ expression polynome_to_expression(Ppolynome pp)
             expression s =	monome_to_expression(polynome_monome(pp));
             if(expression_undefined_p(r)) r=s;
             else
-                r=MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), r, s);
+                r=make_op_exp(PLUS_OPERATOR_NAME, r, s);
             pp = polynome_succ(pp);
         }
     }
