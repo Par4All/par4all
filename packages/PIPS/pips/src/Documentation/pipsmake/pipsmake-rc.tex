@@ -7807,6 +7807,20 @@ print_loops	> MODULE.loops_file
 	< MODULE.loops
 \end{PipsMake}
 
+\subsection{Loop range Normalization}
+
+\begin{PipsPass}{linearize_loop_range}
+  Use intermediate variables as loop upper and lower bound when they are
+  not affine.
+\end{PipsPass}
+\begin{PipsMake}
+linearize_loop_range > MODULE.code
+    < PROGRAM.entities
+	< MODULE.code
+\end{PipsMake}
+
+
+
 \subsection{Loop Distribution}
 \label{subsection-loop-distribution}
 \index{Loop Distribution}
