@@ -5,7 +5,7 @@ int main()
    int i, j, k;
    double alpha = 1;
    double C[M][N];
-   // Loop nest P4A begin,2D((-2<-3+N?-3+N:-2)+1, N)
+   // Loop nest P4A begin,2D((-2<N-3?N-3:-2)+1, N)
 #pragma omp parallel for 
    for(j = 0; j <= N-1; j += 1)
 #pragma omp parallel for 
