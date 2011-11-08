@@ -50,14 +50,14 @@ void runner_l99998(int n, int in0[n][n], int in1[n][n], int out[n][n])
       int i, j;
 l99998:
 #pragma terapix
-      for(I_0 = 0; I_0 <= (-1+n)/__TERAPYPS_WIDTH; I_0 += 1) {
-         I_1 = MAX(INT((-1+n)/__TERAPYPS_HEIGHT+1), 0);
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-1)/__TERAPYPS_HEIGHT+1), 0);
          I_9 = I_0*__TERAPYPS_WIDTH;
-         for(I_1 = 0; I_1 <= (-1+n)/__TERAPYPS_HEIGHT; I_1 += 1) {
-            i = I_9+MAX(INT(MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1)-I_9+1), 0);
+         for(I_1 = 0; I_1 <= (n-1)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            i = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
             I_14 = I_1*__TERAPYPS_HEIGHT;
-            for(i = I_9; i <= MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1); i += 1)
-               for(j = I_14; j <= MIN(-1+n, I_14+__TERAPYPS_HEIGHT+-1); j += 1)
+            for(i = I_9; i <= MIN(n-1, I_9+__TERAPYPS_WIDTH-1); i += 1)
+               for(j = I_14; j <= MIN(n-1, I_14+__TERAPYPS_HEIGHT-1); j += 1)
                   out[i][j] = in0[i][j]+in1[i][j];
          }
       }

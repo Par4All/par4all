@@ -8196,8 +8196,8 @@ C    LZY<=7LTN+121, 1<=LZY, 256<=NMAX2}
 C
 C WE ARE IN PHYSICAL SPACE NOW - FIND  (U,V).GRAD (Z):
 C
-         IF (MOD(NSTEPS, KUP).EQ.1) CALL UVELPH(A, N2PD, N1H, WORK, -   0680
-     &   1)                                                             0680
+         IF (MOD(NSTEPS, KUP).EQ.1) CALL UVELPH(A, N2PD, N1H, WORK,     0680
+     &   -1)                                                            0680
 
 C  P(I,IEXSHF,IPH,ISIGN,J,K,K1Q,K1QM,K2Q,K2QJ,K2QM,K3Q,K3QM,KDATA,KPF,
 C    KPN,KPP,KPRESS,KPY,KSM,KTA,KTAPE,KTF,KTN,KTO,KTP,KUF,KUP,KVF,KVP,
@@ -8220,8 +8220,8 @@ C    NUMBER==250, NVECT==2, NVSKIP==1, NWEIG==127, NXSHUF==2,
 C    4LTN+318<=KTO, KTO<=8LTN+120, LH<=LEV, 1<=LH, LZY<=7LTN+121,
 C    1<=LZY, 256<=NMAX2}
 
-         IF (MOD(NSTEPS, KVP).EQ.1) CALL VVELPH(A, N2PD, N1H, WORK, -   0681
-     &   1)                                                             0681
+         IF (MOD(NSTEPS, KVP).EQ.1) CALL VVELPH(A, N2PD, N1H, WORK,     0681
+     &   -1)                                                            0681
 
 C  P(I,IEXSHF,IPH,ISIGN,J,K,K1Q,K1QM,K2Q,K2QJ,K2QM,K3Q,K3QM,KDATA,KPF,
 C    KPN,KPP,KPRESS,KPY,KSM,KTA,KTAPE,KTF,KTN,KTO,KTP,KUF,KUP,KVF,KVP,

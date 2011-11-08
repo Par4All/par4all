@@ -1,0 +1,498 @@
+void c_print_results(char *name, char class, int n1, int n2, int n3, int niter, double t, double mops, char *optype, int passed_verification, char *npbversion, char *compiletime, char *cc, char *clink, char *c_lib, char *c_inc, char *cflags, char *clinkflags)
+{
+   printf("\n\n %s Benchmark Completed\n", name);
+
+   printf(" Class           =                        %c\n", class);
+
+   if (n3==0) {
+      long int nn = n1;
+      if (n2!=0)
+         nn *= n2;
+      printf(" Size            =             %12ld\n", nn);
+   }
+   else
+      printf(" Size            =             %4dx%4dx%4d\n", n1, n2, n3);
+
+   printf(" Iterations      =             %12d\n", niter);
+
+   printf(" Time in seconds =             %12.2f\n", t);
+
+   printf(" Mop/s total     =             %12.2f\n", mops);
+
+   printf(" Operation type  = %24s\n", optype);
+
+   if (passed_verification<0)
+      printf(" Verification    =            NOT PERFORMED\n");
+   else if (passed_verification)
+      printf(" Verification    =               SUCCESSFUL\n");
+   else
+      printf(" Verification    =             UNSUCCESSFUL\n");
+
+   printf(" Version         =             %12s\n", npbversion);
+
+   printf(" Compile date    =             %12s\n", compiletime);
+
+   printf("\n Compile options:\n");
+
+   printf("    CC           = %s\n", cc);
+
+   printf("    CLINK        = %s\n", clink);
+
+   printf("    C_LIB        = %s\n", c_lib);
+
+   printf("    C_INC        = %s\n", c_inc);
+
+   printf("    CFLAGS       = %s\n", cflags);
+
+   printf("    CLINKFLAGS   = %s\n", clinkflags);
+   
+   
+   
+   
+   
+   printf("\n--------------------------------------\n");
+   printf(" Please send all errors/feedbacks to:\n");
+   printf(" Center for Manycore Programming\n");
+   printf(" cmp@aces.snu.ac.kr\n");
+   printf(" http://aces.snu.ac.kr\n");
+   printf("--------------------------------------\n");
+}
+static double elapsed_time(void)
+{
+   double t;
+
+   wtime_(&t);
+   return t;
+}
+int main()
+{
+   double Mops, t1, t2, t3, t4, x1, x2;
+   double sx, sy, tm, an, tt, gc;
+   double sx_verify_value, sy_verify_value, sx_err, sy_err;
+   int np;
+   int i, ik, kk, l, k, nit;
+   int k_offset, j;
+   logical verified, timers_enabled;
+
+   double dum[3] = {1.0, 1.0, 1.0};
+   char size[16];
+
+   FILE *fp;
+   if ((fp = fopen("timer.flag", "r"))==(void *) 0)
+      timers_enabled = false;
+   else {
+      timers_enabled = true;
+      fclose(fp);
+   }
+   
+   //--------------------------------------------------------------------
+   //  Because the size of the problem is too large to store in a 32-bit
+   //  integer for some classes, we put it into a string (for printing).
+   //  Have to strip off the decimal point put in there by the floating
+   //  point print statement (internal file)
+   //--------------------------------------------------------------------
+   
+   sprintf(size, "%15.0lf", pow(2.0, 24+1));
+   j = 14;
+   if (size[j]=='.')
+      j--;
+   size[j+1] = '\0';
+   printf("\n\n NAS Parallel Benchmarks (NPB3.3-SER-C) - EP Benchmark\n");
+   printf("\n Number of random numbers generated: %15s\n", size);
+
+   verified = false;
+   np = 1<<24-16;
+   
+   //--------------------------------------------------------------------
+   //  Call the random number generator functions and initialize
+   //  the x-array to reduce the effects of paging on the timings.
+   //  Also, call all mathematical functions that are used. Make
+   //  sure these initializations cannot be eliminated as dead code.
+   //--------------------------------------------------------------------
+   
+   vranlc(0, &dum[0], dum[1], &dum[2]);
+   dum[0] = randlc(&dum[1], dum[2]);
+   for(i = 0; i <= 131071; i += 1)
+      x[i] = -1.0e99;
+   Mops = log(sqrt(fabs(1.0>1.0?1.0:1.0)));
+
+   timer_clear(0);
+   timer_clear(1);
+   timer_clear(2);
+   timer_start(0);
+
+   t1 = 1220703125.0;
+   vranlc(0, &t1, 1220703125.0, x);
+   
+   //--------------------------------------------------------------------
+   //  Compute AN = A ^ (2 * NK) (mod 2^46).
+   //--------------------------------------------------------------------
+   
+   t1 = 1220703125.0;
+
+   for(i = 0; i <= 16; i += 1)
+      t2 = randlc(&t1, t1);
+
+   an = t1;
+   tt = 271828183.0;
+   gc = 0.0;
+   sx = 0.0;
+   sy = 0.0;
+
+   for(i = 0; i <= 9; i += 1)
+      q[i] = 0.0;
+   
+   //--------------------------------------------------------------------
+   //  Each instance of this loop may be performed independently. We compute
+   //  the k offsets separately to take into account the fact that some nodes
+   //  have more numbers to generate than others
+   //--------------------------------------------------------------------
+   
+   k_offset = -1;
+
+   for(k = 1; k <= np; k += 1) {
+      kk = k_offset+k;
+      t1 = 271828183.0;
+      t2 = an;
+      i = 1;
+l99999:      ;
+
+// Find starting seed t1 for this kk.
+
+      if (!(i<=100)) goto _break_5;
+      ik = kk/2;
+      if (2*ik!=kk)
+         t3 = randlc(&t1, t2);
+      if (ik==0) goto _break_5;
+      t3 = randlc(&t2, t2);
+      kk = ik;
+      i++;
+      goto l99999;
+_break_5:      ;
+      
+      //--------------------------------------------------------------------
+      //  Compute uniform pseudorandom numbers.
+      //--------------------------------------------------------------------
+      if (timers_enabled)
+         timer_start(2);
+      vranlc(2*(1<<16), &t1, 1220703125.0, x);
+      if (timers_enabled)
+         timer_stop(2);
+      
+      //--------------------------------------------------------------------
+      //  Compute Gaussian deviates by acceptance-rejection method and 
+      //  tally counts in concentri//square annuli.  This loop is not 
+      //  vectorizable. 
+      //--------------------------------------------------------------------
+      if (timers_enabled)
+         timer_start(1);
+
+      for(i = 0; i <= 65535; i += 1) {
+         x1 = 2.0*x[2*i]-1.0;
+         x2 = 2.0*x[2*i+1]-1.0;
+         t1 = x1*x1+x2*x2;
+         if (t1<=1.0) {
+            t2 = sqrt(-2.0*log(t1)/t1);
+            t3 = x1*t2;
+            t4 = x2*t2;
+            l = fabs(t3)>fabs(t4)?fabs(t3):fabs(t4);
+            q[l] = q[l]+1.0;
+            sx = sx+t3;
+            sy = sy+t4;
+         }
+      }
+
+      if (timers_enabled)
+         timer_stop(1);
+   }
+
+   for(i = 0; i <= 9; i += 1)
+      gc = gc+q[i];
+
+   timer_stop(0);
+   tm = timer_read(0);
+
+   nit = 0;
+   verified = true;
+   if (24==24) {
+      sx_verify_value = -3.247834652034740e+3;
+      sy_verify_value = -6.958407078382297e+3;
+   }
+   else if (24==25) {
+      sx_verify_value = -2.863319731645753e+3;
+      sy_verify_value = -6.320053679109499e+3;
+   }
+   else if (24==28) {
+      sx_verify_value = -4.295875165629892e+3;
+      sy_verify_value = -1.580732573678431e+4;
+   }
+   else if (24==30) {
+      sx_verify_value = 4.033815542441498e+4;
+      sy_verify_value = -2.660669192809235e+4;
+   }
+   else if (24==32) {
+      sx_verify_value = 4.764367927995374e+4;
+      sy_verify_value = -8.084072988043731e+4;
+   }
+   else if (24==36) {
+      sx_verify_value = 1.982481200946593e+5;
+      sy_verify_value = -1.020596636361769e+5;
+   }
+   else if (24==40) {
+      sx_verify_value = -5.319717441530e+05;
+      sy_verify_value = -3.688834557731e+05;
+   }
+   else
+      verified = false;
+
+   if (verified) {
+      sx_err = fabs((sx-sx_verify_value)/sx_verify_value);
+      sy_err = fabs((sy-sy_verify_value)/sy_verify_value);
+      verified = sx_err<=1.0e-8&&sy_err<=1.0e-8;
+   }
+
+   Mops = pow(2.0, 24+1)/tm/1000000.0;
+
+   printf("\nEP Benchmark Results:\n\n");
+   printf("CPU Time =%10.4lf\n", tm);
+   printf("N = 2^%5d\n", 24);
+   printf("No. Gaussian Pairs = %15.0lf\n", gc);
+   printf("Sums = %25.15lE %25.15lE\n", sx, sy);
+   printf("Counts: \n");
+   for(i = 0; i <= 9; i += 1)
+      printf("%3d%15.0lf\n", i, q[i]);
+   
+   
+   
+   
+   
+   print_results("EP", 'S', 24+1, 0, 0, nit, tm, Mops, "Random numbers generated", verified, "3.3.1", "08 Nov 2011", "gcc", "$(CC)", "-lm", "-I../common", "-g -Wall -O3", "-O3", "randdp");
+
+   if (timers_enabled) {
+      if (tm<=0.0)
+         tm = 1.0;
+      tt = timer_read(0);
+      printf("\nTotal time:     %9.3lf (%6.2lf)\n", tt, tt*100.0/tm);
+      tt = timer_read(1);
+      printf("Gaussian pairs: %9.3lf (%6.2lf)\n", tt, tt*100.0/tm);
+      tt = timer_read(2);
+      printf("Random numbers: %9.3lf (%6.2lf)\n", tt, tt*100.0/tm);
+   }
+
+   return 0;
+}
+void print_results(char *name, char class, int n1, int n2, int n3, int niter, double t, double mops, char *optype, logical verified, char *npbversion, char *compiletime, char *cs1, char *cs2, char *cs3, char *cs4, char *cs5, char *cs6, char *cs7)
+{
+   char size[16];
+   int j;
+
+   printf("\n\n %s Benchmark Completed.\n", name);
+   printf(" Class           =             %12c\n", class);
+   if (n2==0&&n3==0)
+      if (name[0]=='E'&&name[1]=='P') {
+         sprintf(size, "%15.0lf", pow(2.0, n1));
+         j = 14;
+         if (size[j]=='.') {
+            size[j] = ' ';
+            j--;
+         }
+         size[j+1] = '\0';
+         printf(" Size            =          %15s\n", size);
+      }
+      else
+         printf(" Size            =             %12d\n", n1);
+   else
+      printf(" Size            =           %4dx%4dx%4d\n", n1, n2, n3);
+
+   printf(" Iterations      =             %12d\n", niter);
+   printf(" Time in seconds =             %12.2lf\n", t);
+   printf(" Mop/s total     =          %15.2lf\n", mops);
+   printf(" Operation type  = %24s\n", optype);
+   if (verified)
+      printf(" Verification    =             %12s\n", "SUCCESSFUL");
+   else
+      printf(" Verification    =             %12s\n", "UNSUCCESSFUL");
+   printf(" Version         =             %12s\n", npbversion);
+   printf(" Compile date    =             %12s\n", compiletime);
+   
+   
+   printf("\n Compile options:\n""    CC           = %s\n", cs1);
+   printf("    CLINK        = %s\n", cs2);
+   printf("    C_LIB        = %s\n", cs3);
+   printf("    C_INC        = %s\n", cs4);
+   printf("    CFLAGS       = %s\n", cs5);
+   printf("    CLINKFLAGS   = %s\n", cs6);
+   printf("    RAND         = %s\n", cs7);
+   
+   
+   
+   
+   
+   
+   printf("\n--------------------------------------\n"" Please send all errors/feedbacks to:\n"" Center for Manycore Programming\n"" cmp@aces.snu.ac.kr\n"" http://aces.snu.ac.kr\n""--------------------------------------\n\n");
+}
+double randlc(double *x, double a)
+{
+   //--------------------------------------------------------------------
+   //
+   //  This routine returns a uniform pseudorandom double precision number in the
+   //  range (0, 1) by using the linear congruential generator
+   //
+   //  x_{k+1} = a x_k  (mod 2^46)
+   //
+   //  where 0 < x_k < 2^46 and 0 < a < 2^46.  This scheme generates 2^44 numbers
+   //  before repeating.  The argument A is the same as 'a' in the above formula,
+   //  and X is the same as x_0.  A and X must be odd double precision integers
+   //  in the range (1, 2^46).  The returned value RANDLC is normalized to be
+   //  between 0 and 1, i.e. RANDLC = 2^(-46) * x_1.  X is updated to contain
+   //  the new seed x_1, so that subsequent calls to RANDLC using the same
+   //  arguments will generate a continuous sequence.
+   //
+   //  This routine should produce the same results on any computer with at least
+   //  48 mantissa bits in double precision floating point data.  On 64 bit
+   //  systems, double precision should be disabled.
+   //
+   //  David H. Bailey     October 26, 1990
+   //
+   //--------------------------------------------------------------------
+   
+   // r23 = pow(0.5, 23.0);
+   ////  pow(0.5, 23.0) = 1.1920928955078125e-07
+   // r46 = r23 * r23;
+   // t23 = pow(2.0, 23.0);
+   ////  pow(2.0, 23.0) = 8.388608e+06
+   // t46 = t23 * t23;
+   
+   const double r23 = 1.1920928955078125e-07;
+   const double r46 = r23*r23;
+   const double t23 = 8.388608e+06;
+   const double t46 = t23*t23;
+
+   double t1, t2, t3, t4, a1, a2, x1, x2, z;
+   double r;
+   
+   //--------------------------------------------------------------------
+   //  Break A into two parts such that A = 2^23 * A1 + A2.
+   //--------------------------------------------------------------------
+   t1 = r23*a;
+   a1 = (int) t1;
+   a2 = a-t23*a1;
+   
+   //--------------------------------------------------------------------
+   //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+   //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+   //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+   //--------------------------------------------------------------------
+   t1 = r23**x;
+   x1 = (int) t1;
+   x2 = *x-t23*x1;
+   t1 = a1*x2+a2*x1;
+   t2 = (int) (r23*t1);
+   z = t1-t23*t2;
+   t3 = t23*z+a2*x2;
+   t4 = (int) (r46*t3);
+   *x = t3-t46*t4;
+   r = r46**x;
+
+   return r;
+}
+void timer_clear(int n)
+{
+   elapsed[n] = 0.0;
+}
+double timer_read(int n)
+{
+   return elapsed[n];
+}
+void timer_start(int n)
+{
+   start[n] = elapsed_time();
+}
+void timer_stop(int n)
+{
+   double t, now;
+
+   now = elapsed_time();
+   t = now-start[n];
+   elapsed[n] += t;
+}
+void vranlc(int n, double *x, double a, double y[])
+{
+   //--------------------------------------------------------------------
+   //
+   //  This routine generates N uniform pseudorandom double precision numbers in
+   //  the range (0, 1) by using the linear congruential generator
+   //
+   //  x_{k+1} = a x_k  (mod 2^46)
+   //
+   //  where 0 < x_k < 2^46 and 0 < a < 2^46.  This scheme generates 2^44 numbers
+   //  before repeating.  The argument A is the same as 'a' in the above formula,
+   //  and X is the same as x_0.  A and X must be odd double precision integers
+   //  in the range (1, 2^46).  The N results are placed in Y and are normalized
+   //  to be between 0 and 1.  X is updated to contain the new seed, so that
+   //  subsequent calls to VRANLC using the same arguments will generate a
+   //  continuous sequence.  If N is zero, only initialization is performed, and
+   //  the variables X, A and Y are ignored.
+   //
+   //  This routine is the standard version designed for scalar or RISC systems.
+   //  However, it should produce the same results on any single processor
+   //  computer with at least 48 mantissa bits in double precision floating point
+   //  data.  On 64 bit systems, double precision should be disabled.
+   //
+   //--------------------------------------------------------------------
+   
+   // r23 = pow(0.5, 23.0);
+   ////  pow(0.5, 23.0) = 1.1920928955078125e-07
+   // r46 = r23 * r23;
+   // t23 = pow(2.0, 23.0);
+   ////  pow(2.0, 23.0) = 8.388608e+06
+   // t46 = t23 * t23;
+   
+   const double r23 = 1.1920928955078125e-07;
+   const double r46 = r23*r23;
+   const double t23 = 8.388608e+06;
+   const double t46 = t23*t23;
+
+   double t1, t2, t3, t4, a1, a2, x1, x2, z;
+
+   int i;
+   
+   //--------------------------------------------------------------------
+   //  Break A into two parts such that A = 2^23 * A1 + A2.
+   //--------------------------------------------------------------------
+   t1 = r23*a;
+   a1 = (int) t1;
+   a2 = a-t23*a1;
+   
+   //--------------------------------------------------------------------
+   //  Generate N results.   This loop is not vectorizable.
+   //--------------------------------------------------------------------
+   for(i = 0; i <= n-1; i += 1) {
+      //--------------------------------------------------------------------
+      //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+      //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+      //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+      //--------------------------------------------------------------------
+      t1 = r23**x;
+      x1 = (int) t1;
+      x2 = *x-t23*x1;
+      t1 = a1*x2+a2*x1;
+      t2 = (int) (r23*t1);
+      z = t1-t23*t2;
+      t3 = t23*z+a2*x2;
+      t4 = (int) (r46*t3);
+      *x = t3-t46*t4;
+      y[i] = r46**x;
+   }
+
+   return;
+}
+void wtime_(double *t)
+{
+   static int sec = -1;
+   struct timeval tv;
+   gettimeofday(&tv, (void *) 0);
+   if (sec<0)
+      sec = tv.tv_sec;
+   *t = tv.tv_sec-sec+1.0e-6*tv.tv_usec;
+}

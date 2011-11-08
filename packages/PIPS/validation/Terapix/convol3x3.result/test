@@ -72,14 +72,14 @@ void runner_l99996(int n, int img[n][n], int img_out[n-4][n-4], int kernel[3][3]
       int ki, kj, x, y;
 l99996:
 #pragma terapix
-      for(I_0 = 0; I_0 <= (-5+n)/__TERAPYPS_WIDTH; I_0 += 1) {
-         I_1 = MAX(INT((-5+n)/__TERAPYPS_HEIGHT+1), 0);
+      for(I_0 = 0; I_0 <= (n-5)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-5)/__TERAPYPS_HEIGHT+1), 0);
          I_9 = I_0*__TERAPYPS_WIDTH;
-         for(I_1 = 0; I_1 <= (-5+n)/__TERAPYPS_HEIGHT; I_1 += 1) {
-            x = I_9+MAX(INT(MIN(-5+n, I_9+__TERAPYPS_WIDTH+-1)-I_9+1), 0);
+         for(I_1 = 0; I_1 <= (n-5)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            x = I_9+MAX(INT(MIN(n-5, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
             I_14 = I_1*__TERAPYPS_HEIGHT;
-            for(x = I_9; x <= MIN(-5+n, I_9+__TERAPYPS_WIDTH+-1); x += 1)
-               for(y = I_14; y <= MIN(-5+n, I_14+__TERAPYPS_HEIGHT+-1); y += 1) {
+            for(x = I_9; x <= MIN(n-5, I_9+__TERAPYPS_WIDTH-1); x += 1)
+               for(y = I_14; y <= MIN(n-5, I_14+__TERAPYPS_HEIGHT-1); y += 1) {
                   int v = 0;
                   for(ki = 0; ki <= 2; ki += 1)
                      for(kj = 0; kj <= 2; kj += 1)
@@ -744,7 +744,7 @@ l99993:
 
       v3 = 0;
       for(ki = 0; ki <= 2; ki += 1) {
-         P_0 = img00+258*ki+y;
+         P_0 = 258*ki+y+img00;
          P_1 = caillou0+3*ki;
          for(kj = 0; kj <= 2; kj += 1)
             v3 += *(kj+P_0)**(kj+P_1);

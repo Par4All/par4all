@@ -82,8 +82,8 @@ C  <RATX(PHI1)-W-MAY-{PHI1==I, 2<=I, I<=NPP1}>
 
             IF (X.GE.1.D-20) THEN                                       0036
                SQTR = SQRT(RO/(T**3))                                   0037
-               W = 1.22D16*X/(1.D0+X)*(1.D0+SQTR)/SQRT(T13)*EXP(-       0038
-     &         102.6D0/T13)                                             0038
+               W = 1.22D16*X/(1.D0+X)*(1.D0+SQTR)/SQRT(T13)*EXP(        0038
+     &         -102.6D0/T13)                                            0038
                ALPHA = 5.48D17*(Y*0.25D0/X)**2*EXP(-100.D0/T13)         0040
 C     changed to avoid data dependencies
 C               IF(ALPHA.LE.1.D5) GAMA=SQRT(ALPHA*(2.D0+ALPHA))-ALPHA
@@ -219,8 +219,8 @@ C  <RATX(PHI1)-W-MAY-{PHI1==I, 2<=I, I<=NPP1}>
 
             IF (X.GE.1.D-20) THEN                                       0036
                SQTR = SQRT(RO/(T**3))                                   0037
-               W = 1.22D16*X/(1.D0+X)*(1.D0+SQTR)/SQRT(T13)*EXP(-       0038
-     &         102.6D0/T13)                                             0038
+               W = 1.22D16*X/(1.D0+X)*(1.D0+SQTR)/SQRT(T13)*EXP(        0038
+     &         -102.6D0/T13)                                            0038
                ALPHA = 5.48D17*(Y*0.25D0/X)**2*EXP(-100.D0/T13)         0040
 C     changed to avoid data dependencies
 C               IF(ALPHA.LE.1.D5) GAMA=SQRT(ALPHA*(2.D0+ALPHA))-ALPHA
