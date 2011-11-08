@@ -135,7 +135,7 @@ C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=N, 0<=K}>
 
          CALL INC1(K)                                                   0011
 
-C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=N}>
+C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=K, I<=N}>
 C  <WORK(PHI1,PHI2)-IN-EXACT-{PHI2==K-1, 1<=PHI1, PHI1<=N, 1<=I, I<=K,
 C    I<=N}>
 

@@ -23,8 +23,8 @@ void main_PARFOR_HYBRID(int array[10], int i_0[1])
          //    PHI1<=STEP_i_UP}>
          
          ;
-         STEP_SR_array[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_SR_array[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 9);
+         STEP_SR_array[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_SR_array[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(9, STEP_i_UP);
       }
       STEP_SET_SENDREGIONS(array, STEP_COMM_SIZE, (STEP_ARG *) STEP_SR_array);
    }
