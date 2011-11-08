@@ -1,0 +1,83 @@
+
+//  P() {}
+
+el imine(int n)
+{
+
+//  P() {}
+
+   int a = 0;
+   {
+
+//  P(a) {a==0}
+
+      int i;
+
+//  P(a,i) {a==0}
+
+      for(i = n*n; i >= 1; i += -1)
+
+//  P(a,i) {0<=a, 0<=a+i, 1<=i}
+
+         a++;
+   }
+
+//  P(a) {0<=a}
+
+   return a;
+}
+
+//  P() {}
+
+el imine(int n)
+{
+
+//  P() {}
+
+   int a = 0;
+   {
+
+//  P(a) {a==0}
+
+      int i;
+      {
+         //PIPS generated variable
+
+//  P(a,i) {a==0}
+
+         int I_0 = n*n;
+
+//  P(I_0,a,i) {a==0, 0<=I_0}
+
+
+
+//  P(I_0,a,i) {a==0, 0<=I_0}
+
+         for(i = I_0; i >= 1; i += -1)
+
+//  P(I_0,a,i) {a+i==I_0, 0<=I_0, 0<=a, 1<=i}
+
+            a++;
+      }
+   }
+
+//  P(a) {0<=a}
+
+   return a;
+}
+el imine(int n)
+{
+   int a = 0;
+   {
+      int i;
+      {
+         //PIPS generated variable
+         int I_0 = n*n;
+
+         for(i = 1; i <= I_0; i += 1)
+            a++;
+         i = -1*MAX(I_0, 0)+I_0;
+      }
+   }
+   return a;
+}
