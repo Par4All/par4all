@@ -67,14 +67,14 @@ void runner_l99997(int n, int img[n][n], int img_out[n][n-2], int mask[3])
       int x, y, z;
 l99997:
 #pragma terapix
-      for(I_0 = 0; I_0 <= (-1+n)/__TERAPYPS_WIDTH; I_0 += 1) {
-         I_1 = MAX(INT((-3+n)/__TERAPYPS_HEIGHT+1), 0);
+      for(I_0 = 0; I_0 <= (n-1)/__TERAPYPS_WIDTH; I_0 += 1) {
+         I_1 = MAX(INT((n-3)/__TERAPYPS_HEIGHT+1), 0);
          I_9 = I_0*__TERAPYPS_WIDTH;
-         for(I_1 = 0; I_1 <= (-3+n)/__TERAPYPS_HEIGHT; I_1 += 1) {
-            y = I_9+MAX(INT(MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1)-I_9+1), 0);
+         for(I_1 = 0; I_1 <= (n-3)/__TERAPYPS_HEIGHT; I_1 += 1) {
+            y = I_9+MAX(INT(MIN(n-1, I_9+__TERAPYPS_WIDTH-1)-I_9+1), 0);
             I_14 = I_1*__TERAPYPS_HEIGHT;
-            for(y = I_9; y <= MIN(-1+n, I_9+__TERAPYPS_WIDTH+-1); y += 1)
-               for(x = I_14; x <= MIN(-3+n, I_14+__TERAPYPS_HEIGHT+-1); x += 1) {
+            for(y = I_9; y <= MIN(n-1, I_9+__TERAPYPS_WIDTH-1); y += 1)
+               for(x = I_14; x <= MIN(n-3, I_14+__TERAPYPS_HEIGHT-1); x += 1) {
                   int val = 0;
                   for(z = 0; z <= 2; z += 1)
                      val += img[y][z+x]*mask[z];
