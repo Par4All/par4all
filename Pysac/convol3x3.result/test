@@ -48,7 +48,7 @@ void convol3x3_l99998(int isi, int isj, float image[isi][isj], float new_image[i
 l99998:
    for(i = 0; i <= isi-1; i += 1)
 l99993:
-      for(I_0 = 0; I_0 <= (isj-1)/4; I_0 += 1)
+      for(I_0 = 0; I_0 <= -0.25+0.25*isj; I_0 += 1)
          if (isj-1>4*I_0+3)
 l99997:
             for(j1 = 4*I_0; j1 <= MIN(isj-1, 4*I_0+3); j1 += 1)
@@ -68,7 +68,7 @@ void convol3x3_l99998(int isi, int isj, float image[isi][isj], float new_image[i
 l99998:
    for(i = 0; i <= isi-1; i += 1)
 l99993:
-      for(I_0 = 0; I_0 <= (isj-1)/4; I_0 += 1)
+      for(I_0 = 0; I_0 <= -0.25+0.25*isj; I_0 += 1)
          if (isj-1>4*I_0+3)
 l99997:
             for(j1 = 4*I_0; j1 <= MIN(isj-1, 4*I_0+3); j1 += 1)
@@ -88,7 +88,7 @@ void convol3x3_l99998(int isi, int isj, float image[isi][isj], float new_image[i
 l99998:
    for(i = 1; i <= isi; i += 1)
 l99993:
-      for(I_0 = 1; I_0 <= (isj-1)/4+1; I_0 += 1)
+      for(I_0 = 1; I_0 <= 0.25*isj-0.25+1; I_0 += 1)
          if (isj-1>4*I_0-1) {
 l99997:            ;
             new_image[i-1][4*I_0+1-5] = image[i-1][4*I_0+1-5];
@@ -177,7 +177,7 @@ void convol3x3_l99998(int isi, int isj, float image[isi][isj], float new_image[i
 l99998:
    for(i = 1; i <= isi; i += 1)
 l99993:
-      for(I_0 = 1; I_0 <= 1+(isj-1)/4; I_0 += 1)
+      for(I_0 = 1; I_0 <= 0.25*isj-0.25+1; I_0 += 1)
          if (isj-1>4*I_0-1) {
 l99997:            ;
             new_image[i-1][4*I_0-4] = image[i-1][4*I_0-4];
@@ -200,7 +200,7 @@ void convol3x3_l99998(int isi, int isj, float image[isi][isj], float new_image[i
 l99998:
    for(i = 1; i <= isi; i += 1)
 l99993:
-      for(I_0 = 1; I_0 <= 1+(isj-1)/4; I_0 += 1)
+      for(I_0 = 1; I_0 <= 0.25*isj-0.25+1; I_0 += 1)
          if (isj-1>4*I_0-1) {
 l99997:            ;
             new_image[i-1][4*I_0-4] = image[i-1][4*I_0-4];
@@ -223,7 +223,7 @@ void convol3x3_l99998(int isi, int isj, float image[isi][isj], float new_image[i
 l99998:
    for(i0 = 1; i0 <= isi; i0 += 1)
 l99993:
-      for(I_0 = 1; I_0 <= 1+(isj-1)/4; I_0 += 1)
+      for(I_0 = 1; I_0 <= 0.25*isj-0.25+1; I_0 += 1)
          if (isj-1>4*I_0-1) {
 l99997:            ;
             new_image[i0-1][4*I_0-4] = image[i0-1][4*I_0-4];
@@ -246,7 +246,7 @@ void convol3x3_l99998(int isi, int isj, float image[isi][isj], float new_image[i
 l99998:
    for(i0 = 1; i0 <= isi; i0 += 1)
 l99993:
-      for(I_0 = 1; I_0 <= 1+(isj-1)/4; I_0 += 1)
+      for(I_0 = 1; I_0 <= 0.25*isj-0.25+1; I_0 += 1)
          if (isj-1>4*I_0-1) {
 l99997:            ;
             new_image[i0-1][4*I_0-4] = image[i0-1][4*I_0-4];

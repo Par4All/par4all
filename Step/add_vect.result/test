@@ -104,15 +104,15 @@ void main_PAR_HYBRID_FOR_HYBRID_1(int a[100000], int b[100000], int d[100000], i
          //    PHI1<=STEP_i_UP}>
          
          ;
-         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 99999);
+         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_RR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(99999, STEP_i_UP);
          
          //  <b[PHI1]-R-EXACT-{0<=PHI1, PHI1<=99999, STEP_i_LOW<=PHI1,
          //    PHI1<=STEP_i_UP}>
          
          ;
-         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 99999);
+         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(99999, STEP_i_UP);
       }
       STEP_SET_RECVREGIONS(a, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_a);
       STEP_SET_RECVREGIONS(b, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_b);
@@ -177,15 +177,15 @@ void main_PAR_HYBRID_FOR_HYBRID(int a[100000], int b[100000], int c[100000], int
          //    PHI1<=STEP_i_UP}>
          
          ;
-         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 99999);
+         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_RR_b[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(99999, STEP_i_UP);
          
          //  <c[PHI1]-R-EXACT-{0<=PHI1, PHI1<=99999, STEP_i_LOW<=PHI1,
          //    PHI1<=STEP_i_UP}>
          
          ;
-         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 99999);
+         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_RR_c[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(99999, STEP_i_UP);
       }
       STEP_SET_RECVREGIONS(b, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_b);
       STEP_SET_RECVREGIONS(c, STEP_COMM_SIZE, (STEP_ARG *) STEP_RR_c);
@@ -202,8 +202,8 @@ void main_PAR_HYBRID_FOR_HYBRID(int a[100000], int b[100000], int c[100000], int
          //    PHI1<=STEP_i_UP}>
          
          ;
-         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(STEP_i_LOW, 0);
-         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(STEP_i_UP, 99999);
+         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_LOW-1] = MAX(0, STEP_i_LOW);
+         STEP_SR_a[IDX-1][1-1][STEP_INDEX_SLICE_UP-1] = MIN(99999, STEP_i_UP);
       }
       STEP_SET_SENDREGIONS(a, STEP_COMM_SIZE, (STEP_ARG *) STEP_SR_a);
    }
