@@ -270,3 +270,51 @@ bool loop_normalize(char *mod_name)
     return true;
 }
 
+static void do_linearize_loop_range(statement st, bool * did_something) {
+    if(statement_loop_p(st)) {
+        loop l = statement_loop(st);
+        range r = loop_range(l);
+        expression *bounds[] = {
+            &range_upper(r),
+            &range_lower(r)
+        };
+        for(size_t i = 0; i< sizeof(bounds) / sizeof(bounds[0]) ; i++) {
+            expression *bound = bounds[i];
+            normalized nbound = NORMALIZE_EXPRESSION(*bound);
+            if(normalized_complex_p(nbound)) {
+                entity newe = make_new_scalar_variable(
+                        get_current_module_entity(),
+                        basic_of_expression(*bound)
+                        );
+                free_value(entity_initial(newe));
+                entity_initial(newe) = make_value_expression(*bound);
+                *bound=entity_to_expression(newe);
+                AddLocalEntityToDeclarations(newe,get_current_module_entity(),st);
+                *did_something=true;
+            }
+
+        }
+    }
+}
+
+/** look for non affine loop_range and move them outside of the loop to make it easier for PIPS to analyze them */
+bool linearize_loop_range(const char *module_name) {
+    set_current_module_entity(module_name_to_entity(module_name));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true));
+
+    bool did_something = false;
+    gen_context_recurse(get_current_module_statement(), &did_something,
+            statement_domain, gen_true, do_linearize_loop_range);
+
+    if(did_something) {
+        module_reorder(get_current_module_statement()); ///< we may have had statements
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+    }
+    reset_current_module_entity();
+    reset_current_module_statement();
+
+    return true;
+
+
+}
+

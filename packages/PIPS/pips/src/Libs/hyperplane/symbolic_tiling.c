@@ -94,15 +94,15 @@ generate_tile:;
         entity index = make_new_scalar_variable(get_current_module_entity(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
         AddEntityToCurrentModule(index);
         expression lower_bound = 
-            binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,
+            make_op_exp(MULTIPLY_OPERATOR_NAME,
                     entity_to_expression(index),
                     copy_expression(tile_size)
                     );
         expression upperbound_lhs = copy_expression(range_upper(loop_range(l)));
         expression upperbound_rhs = 
-            binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+            make_op_exp(PLUS_OPERATOR_NAME,
                     copy_expression(lower_bound),
-                    binary_intrinsic_expression(MINUS_OPERATOR_NAME,
+                    make_op_exp(MINUS_OPERATOR_NAME,
                         copy_expression(tile_size),
                         int_to_expression(1)
                         )
@@ -137,7 +137,7 @@ generate_tile:;
         //range_increment(loop_range(l))=copy_expression(tile_size);
         /* will help partial_eval */
         range_upper(loop_range(l))=
-            binary_intrinsic_expression(DIVIDE_OPERATOR_NAME,
+            make_op_exp(DIVIDE_OPERATOR_NAME,
                     range_upper(loop_range(l)),
                     copy_expression(tile_size)
                     );
