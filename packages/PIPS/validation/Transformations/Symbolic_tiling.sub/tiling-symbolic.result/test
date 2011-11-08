@@ -156,9 +156,9 @@ C    1<=SZ}>
       DO I = 1, SZ, T                                                   0011
 
 C  <B(PHI1,PHI2)-IN-MAY-{I<=PHI1+1, PHI1<=I+10, 0<=PHI2, PHI2<=SZ+10,
-C    1<=I, I<=SZ, 1<=SZ}>
+C    1<=I, I<=SZ}>
 C  <KERNEL(PHI1,PHI2)-IN-EXACT-{0<=PHI1, PHI1<=2, 0<=PHI2, PHI2<=2,
-C    1<=I, I<=SZ, 1<=SZ}>
+C    1<=I, I<=SZ}>
 
          DO J = 1, SZ, T                                                0012
 
@@ -218,7 +218,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=SZ}>
       DO I = 1, SZ                                                      0026
 
 C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==I, 1<=PHI2, PHI2<=SZ, 1<=I, I<=SZ}>
-C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=I, I<=SZ, 1<=SZ}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=I, I<=SZ}>
 
          DO J = 1, SZ                                                   0027
 

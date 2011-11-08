@@ -1254,7 +1254,9 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 
    pips_debug(5, "begin\n");
 
+   debug_on("SEMANTICS_DEBUG_LEVEL");
    t = (*load_completed_transformer_func)(s);
+   debug_off();
 
    if (l_eff !=NIL)
      {

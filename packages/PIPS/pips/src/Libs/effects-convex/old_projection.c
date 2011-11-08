@@ -1186,7 +1186,9 @@ void region_exact_projection_along_variable(region reg, entity var)
 		    sc_projection_along_variable_ofl_ctrl(psc,(Variable) var,
 							  FWD_OFL_CTRL);
 		    sc_base_remove_variable(sc, (Variable) var);
-		    sc = region_sc_normalize(sc,2);
+		    // sometimes produces erroneous systems - BC 11/8/2011
+		    // sc = region_sc_normalize(sc,2);
+		    sc = region_sc_normalize(sc,1);
 		    region_system_(reg) = newgen_Psysteme(sc);
 
 		    if (op_statistics_p() &&
@@ -1202,7 +1204,9 @@ void region_exact_projection_along_variable(region reg, entity var)
 		    sc = sc_projection_ofl_along_variables_with_test
 			(sc, pv_var,  &is_proj_exact);
 		    vect_rm(pv_var);
-		    sc = region_sc_normalize(sc,2);
+		    // sometimes produces erroneous systems - BC 11/8/2011
+		    // sc = region_sc_normalize(sc,2);
+		    sc = region_sc_normalize(sc,1);
 		    region_system_(reg)= newgen_Psysteme(sc);
 
 		    if (region_approximation_tag(reg) == is_approximation_exact)

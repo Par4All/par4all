@@ -22,7 +22,7 @@ void scalarization09(double A[SIZE], double B[SIZE][SIZE])
 
    for(i = 0; i <= SIZE-1; i += 1)
 
-//  <A[PHI1]-IN-EXACT-{PHI1==i, 1<=SIZE, i+1<=SIZE, 0<=i}>
+//  <A[PHI1]-IN-EXACT-{PHI1==i, i+1<=SIZE, 0<=i}>
 //  <B[PHI1][PHI2]-IN-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=SIZE,
 //    i+1<=SIZE, 0<=i}>
 
