@@ -1031,6 +1031,11 @@ expression find_ith_expression(list le, int r)
 expression int_to_expression(_int i)
 {
     bool negative_p = i<0;
+    /* special hook for VALUE_MIN: the problem is that VALUE_MIN cannot be represented in the IR because -VALUE_MIN does not fit into and _int, so we replace it by VALUE_MIN -1, which is still big ... */
+    if(negative_p)
+    while(i==-i) { // ie while we have an integer overflow
+        ++i;
+    }
     entity e = int_to_entity(abs(i));
     expression exp =  call_to_expression(make_call(e,NIL));
     if(negative_p)
