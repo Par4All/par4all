@@ -14,6 +14,7 @@ void test(int n, int m, int a[n][m])
    int i, j;
    //PIPS generated variable
    int I_0;
+#pragma omp parallel for private(i)
 l99998:
    for(I_0 = 0; I_0 <= (n-1)/N; I_0 += 1)
 #pragma omp parallel for 
