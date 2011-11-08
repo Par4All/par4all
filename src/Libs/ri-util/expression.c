@@ -1890,18 +1890,18 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
       normalized nor1 = NORMALIZE_EXPRESSION(exp1);
       normalized nor2 = NORMALIZE_EXPRESSION(exp2);
 
+      /* dividing by one or minus one is similar to multiplying */ 
+      _int val;
+      if(ENTITY_DIVIDE_P(op_ent) && expression_integer_value(exp2,&val)
+              && (val ==1 || val == -1) )
+          op_ent = entity_intrinsic(MULTIPLY_OPERATOR_NAME);
+
       if((normalized_linear_p(nor1) && normalized_linear_p(nor2) ) &&
-	 (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent) || ENTITY_DIVIDE_P(op_ent)) )
+	 (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent) ) )
 	{
 	  pips_debug(6, "Linear operation\n");
 
-      if(ENTITY_DIVIDE_P(op_ent)) {
-        /* there may be some polynomial simplification there */
-        result_exp = MakeBinaryCall(op_ent, exp1, exp2);
-        simplify_expression(&result_exp);
-      }
-      else
-        result_exp = make_lin_op_exp(op_ent, copy_expression(exp1), copy_expression(exp2));
+      result_exp = make_lin_op_exp(op_ent, copy_expression(exp1), copy_expression(exp2));
 	}
       else if(expression_equal_integer_p(exp1, 0))
 	{
