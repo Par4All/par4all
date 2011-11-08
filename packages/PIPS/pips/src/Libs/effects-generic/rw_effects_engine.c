@@ -431,7 +431,11 @@ static void rw_effects_of_loop(loop l)
     /* We finally add the loop proper effects */
     l_loop = (*effects_union_op)(l_loop, l_prop, effects_same_action_p);
 
-    (*effects_descriptor_normalize_func)(l_loop);
+    ifdebug(4){
+      pips_debug(4, "rw effects of loop after adding proper effects:\n");
+      (*effects_prettyprint_func)(l_loop);
+    }
+   (*effects_descriptor_normalize_func)(l_loop);
 
     ifdebug(2){
 	pips_debug(2, "R/W effects: \n");
@@ -820,7 +824,8 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    if (!transformer_undefined_p(t1))
 	    {
 	      pips_debug(3, "transformer of first statement:\n");
-	      print_transformer(t1);
+	      fprint_transformer(stderr, t1, (get_variable_name_t) entity_local_name);
+	      //print_transformer(t1);
 	    }
 	}
 	if (rb_lrw !=NIL)
@@ -898,6 +903,11 @@ static void rw_effects_of_sequence(sequence seq)
     }
 
     (*effects_descriptor_normalize_func)(le);
+
+    ifdebug(2){
+	pips_debug(2, "R/W effects after normalization: \n");
+	(*effects_prettyprint_func)(le);
+    }
 
     store_rw_effects_list(current_stat, le);
     pips_debug(2, "end\n");
