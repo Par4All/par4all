@@ -1894,7 +1894,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
       _int val;
       if(( ENTITY_DIVIDE_P(op_ent) || ENTITY_MULTIPLY_P(op_ent))
               && expression_integer_value(exp2,&val)
-              && (val ==1 || val == -1) ) {
+              && ( val == -1) ) {
           free_expression(exp2);
           return make_op_exp(MINUS_OPERATOR_NAME,int_to_expression(0),exp1);
       }
