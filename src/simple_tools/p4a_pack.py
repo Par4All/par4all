@@ -85,16 +85,16 @@ def add_module_options(parser):
         help = "Specify version for source packages.")
 
     group.add_option("--append-date", "--date", action = "store_true", default = False,
-        help = "Automatically append current date/time to version string.")
+        help = "Automatically append current date & time to version string.")
 
     group.add_option("--publish", action = "store_true", default = False,
         help = "Publish the produced packages on the server.")
-        
+
     group.add_option("--publish-only", action = "append", metavar = "FILE", default = [],
-        help = "Publish only a file (.deb or tgz or stgz) without rebuilding it. Several files are allowed")        
+        help = "Publish only a file (.deb or tgz or stgz) without rebuilding it. Several files are allowed")
 
     group.add_option("--retry-publish", action = "store_true",  default = False,
-        help = "Retry to publish only files (.deb and/or tgz and/or stgz) without rebuilding them.")        
+        help = "Retry to publish only files (.deb and/or tgz and/or stgz) without rebuilding them.")
 
     group.add_option("--release", dest = "development", action = "store_false", default = True,
         help = "When publishing, put the packages in release directories instead of development ones.")
@@ -247,21 +247,21 @@ def publish_deb(file, host, repos_dir, arch, publish_only=False):
     if not publish_only:
 		p4a_util.warn("Removing existing .deb file for arch " + arch + " (" + repos_arch_dir + ")")
 		p4a_util.run([ "ssh", host, "rm -fv " + repos_arch_dir + "/*.deb" ])
-    p4a_util.run([ "ssh", host, "mkdir -p " + repos_arch_dir ])    
+    p4a_util.run([ "ssh", host, "mkdir -p " + repos_arch_dir ])
     p4a_util.warn("Copying " + file + " on " + host + " (" + repos_arch_dir + ")")
-    p4a_util.run([ "rsync --partial --sparse --timeout=3600", file, host + ":" + repos_arch_dir ], error_code=30, 
-		msg= " (timeout).\n" + "Retry to publish using p4a_pack.py with option --retry-publish")  
+    p4a_util.run([ "rsync --partial --sparse --timeout=3600", file, host + ":" + repos_arch_dir ], error_code=30,
+		msg= " (timeout).\n" + "Retry to publish using p4a_pack.py with option --retry-publish")
     p4a_util.warn("Please allow max. 5 minutes for deb repository indexes to get updated by cron")
     p4a_util.warn("Alternatively, you can run /srv/update-par4all.sh on " + host + " as root")
 
 
-def publish_files(files, distro, deb_distro, arch, deb_arch, development = False, publish_only=False):
+def publish_files(files, distro, deb_distro, arch, deb_arch, development = False, publish_only = False):
     global default_publish_host
     global default_publish_dir, default_development_publish_dir
     global default_deb_publish_dir, default_deb_development_publish_dir
 
-    publish_dir = ""
-    deb_publish_dir = ""
+    publish_dir = None
+    deb_publish_dir = None
     if development:
         publish_dir = default_development_publish_dir
         deb_publish_dir = default_deb_development_publish_dir
@@ -282,8 +282,11 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
         p4a_util.warn("Copying " + file + " in " + publish_dir + " on " + default_publish_host)
         p4a_util.warn("If something goes wrong, try running /srv/fixacl-par4all.sh to fix permissions")
         p4a_util.warn("If something goes wrong, try creating directories or publishing the file manually")
-        p4a_util.run([ "ssh", default_publish_host, "mkdir -p " + publish_dir ])   
-        p4a_util.run([ "rsync --partial --sparse --timeout=3600", file, default_publish_host + ":" + publish_dir ], error_code=30, 
+        # Use -p to create any intermediate dir hierarchy without failing
+        # on already existence:
+        p4a_util.run([ "ssh", default_publish_host, "mkdir -p " + publish_dir ])
+        # Survive to rsync error #30 "Timeout in data send/receive":
+        p4a_util.run([ "rsync --partial --sparse --timeout=600", file, default_publish_host + ":" + publish_dir ], error_code=30,
 			msg= " (timeout).\n" + "Retry to publish using p4a_pack.py with option --retry-publish")
         ext = p4a_util.get_file_ext(file)
         if ext == ".deb":
@@ -320,14 +323,14 @@ def work(options, args = []):
         if not options.publish:
             p4a_util.die("You specified files on command line but did not specify --publish")
         publish_files(args, distro, distro, arch, deb_arch, options.development)
-        return				
+        return
 
     if options.development and not options.append_date:
         options.append_date = True
 
 	if len(options.publish_only):
 		publish_files(options.publish_only, distro, distro, arch, deb_arch, options.development, publish_only=True)
-		return	
+		return
 
     if (not options.deb #and not options.sdeb
         and not options.tgz and not options.stgz):
@@ -345,12 +348,12 @@ def work(options, args = []):
 				file_to_publish+=glob.glob("*.deb")
 		if options.tgz or options.stgz:
 			if options.pack_output_dir:
-				file_to_publish+=glob.glob(options.pack_output_dir+"/*.gz")			
+				file_to_publish+=glob.glob(options.pack_output_dir+"/*.gz")
 			else:
 				file_to_publish+=glob.glob("*.gz")
 		publish_files(file_to_publish, distro, distro, arch, deb_arch, options.development, publish_only=True)
-		return	
-						
+		return
+
     prefix = options.install_prefix
     if prefix:
         p4a_util.warn("Installation prefix: " + prefix + " (--install-prefix)")
