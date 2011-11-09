@@ -252,7 +252,7 @@ def flush_log():
 def skip_file_up_to_word(o_file,word,fold):
     """ Skip all the file lines until the <fold> occurence of <word>
     For instance, in the wrapper file, the signature is omitted thus
-    it the file will be skipped until the second occurence of 
+    it the file will be skipped until the second occurence of
     word="P4A_accel_kernel_wrapper"
     """
     n = 0
@@ -355,8 +355,10 @@ class runner(Thread):
         self.silent = silent
 
         if self.silent:
+            # Output only debugging launch info in silent mode:
             debug("Running '" + self.cmd + "' in " + self.working_dir, level = 3)
         else:
+            # Display that a command will be run:
             cmd(self.cmd, dir = self.working_dir)
 
         try:
@@ -467,7 +469,7 @@ class runner(Thread):
             time.sleep(0.05)
         self.hide_spinner()
 
-    def wait(self, error_code=0, msg=""):
+    def wait(self, error_code = 0, msg = ""):
         try:
             if self.redir:
                 self.join()
@@ -480,7 +482,7 @@ class runner(Thread):
             if self.err and get_verbosity() == 0:
                 sys.stderr.write(self.err + "\n")
             self.stderr_handler("Environment was: " + repr(self.env))
-            if ret==error_code:
+            if ret == error_code:
 				raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
 					+ " failed with exit code " + str(ret) + msg, code = ret)
             else:
@@ -489,9 +491,11 @@ class runner(Thread):
 		#~ stop_master_spinner()
         return [ self.out, self.err, ret ]
 
+
 def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
         shell = True, extra_env = {}, silent = False,
-        stdout_handler = None, stderr_handler = None, error_code=0, msg=""):
+        stdout_handler = None, stderr_handler = None,
+        error_code = 0, retry = 1, msg = ""):
     '''Helper function to spawn an external command and wait for it to finish.'''
     if stdout_handler is None and stderr_handler is None:
         if silent:
@@ -501,10 +505,31 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
         else:
             stdout_handler = lambda s: debug(s, bare = True)
             stderr_handler = lambda s: info(s, bare = True)
-    r = runner(cmd_list, can_fail = can_fail,
-        force_locale = force_locale, working_dir = working_dir, extra_env = extra_env,
-        stdout_handler = stdout_handler, stderr_handler = stderr_handler, silent = silent)
-    return r.wait(error_code, msg)
+
+    # To gather the output on multiple iterations:
+    out = ""
+    err = ""
+    # For funny case we do not iterate at all:
+    ret = 0
+    # Iterate on the command if asked to insist:
+    for i in range(1, retry + 1):
+        # On the last retry, command failure launches an exception, if not
+        # allowed to fail:
+        i_can_fail = (i != retry) | can_fail
+        r = runner(cmd_list, can_fail = i_can_fail,
+                   force_locale = force_locale, working_dir = working_dir,
+                   extra_env = extra_env, stdout_handler = stdout_handler,
+                   stderr_handler = stderr_handler, silent = silent)
+        (i_out, i_err, ret) = r.wait(error_code, msg)
+        # Keep track of the command output:
+        out += i_out
+        err += i_err
+        if ret == 0:
+            # No error during the execution, so stop retrying:
+            break
+    # Return all the outputs but only the last return code error:
+    return (out, err, ret)
+
 
 def which(cmd, silent = True):
     '''Calls the "which" UNIX utility for the given program.'''
@@ -821,9 +846,10 @@ def generate_c_header (in_c_file, out_h_file, additional_args= []):
     args.append (out_h_file)
     args.append (in_c_file)
     run (args, force_locale = None)
-    
+
+
 def quote_fname(fname):
-    """quote file name or any string to avoid problems with file/directory names 
+    """quote file name or any string to avoid problems with file/directory names
 	that contain spaces or any other kind of nasty characters
 	"""
     return '"%s"' % (
@@ -834,7 +860,7 @@ def quote_fname(fname):
 		.replace('`', '\`')
 		.replace('!', '\!')
 		)
-    
+
 if __name__ == "__main__":
     print(__doc__)
     print("This module is not directly executable")

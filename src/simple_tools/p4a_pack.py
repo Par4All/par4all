@@ -306,9 +306,10 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
         # Use -p to create any intermediate dir hierarchy without failing
         # on already existence:
         p4a_util.run([ "ssh", default_publish_host, "mkdir -p " + publish_dir ])
-        # Survive to rsync error #30 "Timeout in data send/receive":
-        p4a_util.run([ "rsync --partial --sparse --timeout=600", file, default_publish_host + ":" + publish_dir ], error_code=30,
-			msg= " (timeout).\n" + "Retry to publish using p4a_pack.py with option --retry-publish")
+        # Survive to rsync error #30 "Timeout in data send/receive", by
+        # retrying 10 times after rsync has waited for 60 seconds:
+        p4a_util.run([ "rsync --partial --sparse --timeout=60", file, default_publish_host + ":" + publish_dir ], error_code = 30, retry = 10,
+            msg= " (timeout).\n" + "Retry to publish using p4a_pack.py with option --retry-publish")
         ext = p4a_util.get_file_ext(file)
         if ext == ".deb":
             publish_deb(file, default_publish_host, deb_publish_dir, deb_arch, publish_only)
