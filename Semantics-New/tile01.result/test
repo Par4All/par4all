@@ -1,0 +1,48 @@
+
+Preconditions for "test"
+
+
+//  P() {}
+
+void test(int n, int m, int a[n][m])
+{
+
+//  P() {}
+
+   int i, j;
+   //PIPS generated variable
+
+//  P(i,j) {}
+
+   int I_0;
+   {
+
+//  P(I_0,i,j) {}
+
+      int I_3 = (n-1)/N;
+
+//  P(I_0,I_3,i,j) {}
+
+      for(I_0 = 0; I_0 <= I_3; I_0 += 1) {
+
+//  P(I_0,I_3,i,j) {0<=I_0, I_0<=I_3}
+
+         int I_1 = MIN(n-1, I_0*N+(N-1)), I_2 = I_0*N;
+
+//  P(I_0,I_1,I_2,I_3,i,j) {0<=I_0, I_0<=I_3, I_1+1<=n}
+
+         for(i = I_2; i <= I_1; i += 1)
+
+//  P(I_0,I_1,I_2,I_3,i,j) {0<=I_0, I_0<=I_3, i<=I_1, I_1+1<=n,
+//    I_2<=i}
+
+            for(j = 0; j <= m-1; j += 1)
+
+//  P(I_0,I_1,I_2,I_3,i,j) {0<=I_0, I_0<=I_3, i<=I_1, I_1+1<=n,
+//    I_2<=i, 0<=j, j+1<=m}
+
+               //PIPS generated variable
+               a[i][j] = 0;
+      }
+   }
+}

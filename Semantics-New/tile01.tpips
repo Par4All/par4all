@@ -1,0 +1,15 @@
+delete tile01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create tile01 tile01.c
+
+echo
+echo Preconditions for "test"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+quit

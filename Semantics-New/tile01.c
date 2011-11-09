@@ -1,4 +1,5 @@
-
+// The MIN function is not defined. PIPS identify it with the Fortran
+// MIN intrinsics
 
 extern int N;
 void test(int n, int m, int a[n][m])
@@ -18,5 +19,3 @@ void test(int n, int m, int a[n][m])
       }
    }
 }
-
-
