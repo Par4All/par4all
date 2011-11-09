@@ -18,6 +18,7 @@ import platform
 import tempfile
 import shutil
 import glob
+import time
 
 '''
 Par4All packing routines: allows you to create .deb or .tar.gz packages of Par4all.
@@ -40,7 +41,8 @@ package_name                        = "par4all"
 
 default_publish_host                = "download.par4all.org"
 default_publish_dir                 = "/srv/www-par4all/download/releases/$DISTRO/$ARCH"
-default_development_publish_dir     = "/srv/www-par4all/download/development/$DISTRO/$ARCH/$DATE"
+# Use a more hierarchical directory to clean things up:
+default_development_publish_dir     = "/srv/www-par4all/download/development/$DISTRO/$ARCH/$YEAR/$MONTH/$DATE"
 default_deb_publish_dir             = "/srv/www-par4all/download/apt/$DISTRO/dists/releases/main"
 default_deb_development_publish_dir = "/srv/www-par4all/download/apt/$DISTRO/dists/development/main"
 
@@ -91,7 +93,7 @@ def add_module_options(parser):
         help = "Publish the produced packages on the server.")
 
     group.add_option("--publish-only", action = "append", metavar = "FILE", default = [],
-        help = "Publish only a file (.deb or tgz or stgz) without rebuilding it. Several files are allowed")
+        help = "Publish only a given file (.deb, tgz, stgz or even whatever for testing) without rebuilding it. Several files are allowed by using this option several times.")
 
     group.add_option("--retry-publish", action = "store_true",  default = False,
         help = "Retry to publish only files (.deb and/or tgz and/or stgz) without rebuilding them.")
@@ -255,6 +257,29 @@ def publish_deb(file, host, repos_dir, arch, publish_only=False):
     p4a_util.warn("Alternatively, you can run /srv/update-par4all.sh on " + host + " as root")
 
 
+def make_publish_dirs_from_template(publish_dir, distro, arch,
+                                    deb_publish_dir, deb_distro, deb_arch):
+    "Build the publish dir with its package dir at the same time for atomicity"
+    # We have to compute the time only once, because time is evolving! :-/
+    # Just imagine this program run at midnight for example and the debug
+    # joy we would have...
+    time_once = time.gmtime()
+    date = time.strftime("%Y-%m-%d", time_once)
+    year = time.strftime("%Y", time_once)
+    month = time.strftime("%m", time_once)
+    # Substitute placeholders such as $DISTRO, $DATE, etc.
+    return (string.Template(publish_dir).substitute(DISTRO = distro,
+                                                    ARCH = arch,
+                                                    YEAR = year,
+                                                    MONTH = month,
+                                                    DATE = date),
+            string.Template(deb_publish_dir).substitute(DISTRO = distro,
+                                                        ARCH = arch,
+                                                        YEAR = year,
+                                                        MONTH = month,
+                                                        DATE = date))
+
+
 def publish_files(files, distro, deb_distro, arch, deb_arch, development = False, publish_only = False):
     global default_publish_host
     global default_publish_dir, default_development_publish_dir
@@ -269,11 +294,7 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
         publish_dir = default_publish_dir
         deb_publish_dir = default_deb_publish_dir
 
-    # Substitute placeholders such as $DISTRO, $DATE etc.
-    publish_dir = string.Template(publish_dir).substitute(
-        DISTRO = distro, ARCH = arch, DATE = p4a_util.utc_date())
-    deb_publish_dir = string.Template(deb_publish_dir).substitute(
-        DISTRO = deb_distro, ARCH = deb_arch, DATE = p4a_util.utc_date())
+    (publish_dir, deb_publish_dir) = make_publish_dirs_from_template(publish_dir, distro, arch, deb_publish_dir, deb_distro, deb_arch)
 
     for file in files:
         file = os.path.abspath(os.path.expanduser(file))
