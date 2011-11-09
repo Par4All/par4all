@@ -11,6 +11,7 @@ CLEAN_OTHERS+=output.pgm
 display% : run%
 	mv output.pgm output$*.pgm
 	# Display graphically the results:
+	@echo "Please close the window at the end of the execution"
 	eog output$*.pgm
 
 display_cuda-opt:
