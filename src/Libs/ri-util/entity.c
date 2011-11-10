@@ -240,24 +240,28 @@ static entity make_empty_module(const char* full_name,
   entity_type(DynamicArea) = make_type_area(make_area(0, NIL));
   entity_storage(DynamicArea) = make_storage_rom();
   entity_initial(DynamicArea) = make_value_unknown();
+  entity_kind(DynamicArea) = ABSTRACT_LOCATION;
   AddEntityToDeclarations(DynamicArea, e);
 
   StaticArea = FindOrCreateEntity(name, STATIC_AREA_LOCAL_NAME);
   entity_type(StaticArea) = make_type_area(make_area(0, NIL));
   entity_storage(StaticArea) = make_storage_rom();
   entity_initial(StaticArea) = make_value_unknown();
+  entity_kind(StaticArea) = ABSTRACT_LOCATION;
   AddEntityToDeclarations(StaticArea, e);
 
   StackArea = FindOrCreateEntity(name, STACK_AREA_LOCAL_NAME);
   entity_type(StackArea) = make_type_area(make_area(0, NIL));
   entity_storage(StackArea) = make_storage_rom();
   entity_initial(StackArea) = make_value_unknown();
+  entity_kind(StackArea) = ABSTRACT_LOCATION;
   AddEntityToDeclarations(StackArea, e);
 
   HeapArea = FindOrCreateEntity(name, HEAP_AREA_LOCAL_NAME);
   entity_type(HeapArea) = make_type_area(make_area(0, NIL));
   entity_storage(HeapArea) = make_storage_rom();
   entity_initial(HeapArea) = make_value_unknown();
+  entity_kind(HeapArea) = ABSTRACT_LOCATION;
   AddEntityToDeclarations(HeapArea, e);
 
   return(e);

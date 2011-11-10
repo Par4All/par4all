@@ -53,6 +53,7 @@ entity undefined_pointer_value_entity()
     type t = make_type_variable(v);
     u = make_entity(u_name,
 		    t, make_storage_rom(), make_value_unknown());
+    entity_kind(u)=ABSTRACT_LOCATION;
   }
   return u;
 }
@@ -71,6 +72,7 @@ entity null_pointer_value_entity()
     type t = make_type_variable(v);
     u = make_entity(u_name,
 		    t, make_storage_rom(), make_value_unknown());
+    entity_kind(u)=ABSTRACT_LOCATION;
   }
   return u;
 }

@@ -65,6 +65,7 @@ entity entity_all_locations()
     area a = make_area(0,NIL); /* Size and layout are unknown */
     type t = make_type_area(a);
     anywhere = make_entity(strdup(any_name), t, make_storage_rom(), make_value_unknown());
+    entity_kind(anywhere)=ABSTRACT_LOCATION;
   }
 
   return anywhere;
@@ -94,6 +95,7 @@ entity entity_nowhere_locations()
     type t = make_type_area(a);
     nowhere = make_entity(strdup(any_name),
 			   t, make_storage_rom(), make_value_unknown());
+    entity_kind(nowhere)=ABSTRACT_LOCATION;
   }
 
    return nowhere;
@@ -124,6 +126,7 @@ entity entity_null_locations()
     type t = make_type_area(a);
     null_pointer = make_entity(strdup(any_name),
 			       t, make_storage_rom(), make_value_unknown());
+    entity_kind(null_pointer) = ABSTRACT_LOCATION;
   }
 
   return null_pointer;
@@ -162,6 +165,7 @@ entity entity_all_module_locations(entity m)
     entity_type(anywhere)=t;
     entity_storage(anywhere)=make_storage_rom();
     entity_initial(anywhere)=make_value_unknown();
+    entity_kind(anywhere)=ABSTRACT_LOCATION;
   }
 
   return anywhere;
@@ -196,6 +200,7 @@ entity entity_all_module_xxx_locations(entity m, string xxx)
     entity_type(dynamic) = t;
     entity_storage(dynamic) = make_storage_rom();
     entity_initial(dynamic) = make_value_unknown();
+    entity_kind(dynamic)=ABSTRACT_LOCATION;
   }
   free(any_name);
 
@@ -272,6 +277,7 @@ entity entity_all_xxx_locations(string xxx)
     entity_type(dynamic) = make_type_unknown();
     entity_storage(dynamic) = make_storage_rom();
     entity_initial(dynamic) = make_value_unknown();
+    entity_kind(dynamic)=ABSTRACT_LOCATION;
   }
 
   return dynamic;
@@ -301,6 +307,7 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
       entity_type(e) = copy_type(t);
       entity_storage(e) = make_storage_rom();
       entity_initial(e) = make_value_unknown();
+      entity_kind(e)=ABSTRACT_LOCATION;
       found_p = true;
     }
     else if(type_equal_p(t, ot))
@@ -445,16 +452,21 @@ bool entity_all_dynamic_locations_p(entity e)
 
 bool entity_abstract_location_p(entity al)
 {
-  const char * en = entity_name(al);
-  const char * module_sep = strchr(en,MODULE_SEP_CHAR);
-  return   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
-      ||   0 == strncmp(module_sep, ANYWHERE_LOCATION, sizeof(ANYWHERE_LOCATION)-1)
-      ||   0 == strncmp(module_sep, STATIC_AREA_LOCAL_NAME, sizeof(STATIC_AREA_LOCAL_NAME)-1)
-      ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
-      ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
-      ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
-      ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
-      ;
+    ifdebug(1) {
+        const char * en = entity_name(al);
+        const char * module_sep = strchr(en,MODULE_SEP_CHAR);
+        bool abstract_locations_p = (   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
+                ||   0 == strncmp(module_sep, ANYWHERE_LOCATION, sizeof(ANYWHERE_LOCATION)-1)
+                ||   0 == strncmp(module_sep, STATIC_AREA_LOCAL_NAME, sizeof(STATIC_AREA_LOCAL_NAME)-1)
+                ||   0 == strncmp(module_sep, DYNAMIC_AREA_LOCAL_NAME, sizeof(DYNAMIC_AREA_LOCAL_NAME)-1)
+                ||   0 == strncmp(module_sep, STACK_AREA_LOCAL_NAME, sizeof(STACK_AREA_LOCAL_NAME)-1)
+                ||   0 == strncmp(module_sep, HEAP_AREA_LOCAL_NAME, sizeof(HEAP_AREA_LOCAL_NAME)-1)
+                ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
+                )
+            ;
+        pips_assert("entity_kind is consistent",abstract_locations_p == (entity_kind(al)&ABSTRACT_LOCATION));
+    }
+    return entity_kind(al) & ABSTRACT_LOCATION;
 }
 
 
@@ -583,9 +595,10 @@ entity abstract_locations_max(entity al1, entity al2)
 
       if(strcmp(mn1, mn2)==0)
 	mn = mn1;
-      else
+      else 
 	mn = ANY_MODULE_NAME;
       e = FindOrCreateEntity(mn, ln);
+      entity_kind(e)=ABSTRACT_LOCATION; /*SG: unsure */
       free(mn1);free(mn2);
     }
   return e;
@@ -651,6 +664,7 @@ entity entity_locations_max(entity al1, entity al2)
 	  else
 	    ln = ANYWHERE_LOCATION;
 	  e = FindOrCreateEntity(mn, ln);
+      entity_kind(e)=ABSTRACT_LOCATION;
 	}
 	else
 	  pips_internal_error("not implemented");
