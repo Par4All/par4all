@@ -1,0 +1,342 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage{a4wide}
+\usepackage{url}
+
+\usepackage{alltt}
+% Hmmm... Do not work with UTF-8:
+% \usepackage{verbatim}
+
+\usepackage{listings}%[hyper,procnames]
+\lstset{extendedchars=true, language=C++, basicstyle=\scriptsize\ttfamily, numbers=left,
+  numberstyle=\tiny, stepnumber=5, numberfirstline=true,
+  tabsize=8, tab=\rightarrowfill, keywordstyle=\bf,
+  stringstyle=\rmfamily, commentstyle=\rmfamily\itshape}
+
+\usepackage{abbrev_reactive}
+\let\OldRightarrow=\Rightarrow
+\RequirePackage{marvosym}
+\let\MarvosymRightarrow=\Rightarrow
+\let\Rightarrow=\OldRightarrow
+\RequirePackage{wasysym}
+\let\Lightning\UnTrucIndefini% Car conflit entre ifsym et marvosym
+\let\Sun\UnTrucIndefini%
+\RequirePackage[weather]{ifsym}
+
+
+\newcommand{\LINK}[1]{\url{#1}\xspace}
+\newcommand{\PfaInstallationPDF}{\LINK{http://download.par4all.org/doc/installation/par4all_installation_guide.pdf}}
+\newcommand{\PfaAllInstallationHTDOC}{\LINK{http://download.par4all.org/doc/installation/par4all_installation_guide.htdoc}}
+
+\sloppy
+
+% Number everything in the TOC:
+\setcounter{secnumdepth}{10}
+\setcounter{tocdepth}{10}
+
+\begin{document}
+
+\title{\protect\Apfa Installation Guide\\
+  ---\\
+  HPC Project}
+
+\author{\Apfa \textsc{team}}
+
+\maketitle
+
+% The version is here and not in the title to avoid triggering a bug in
+% tex4ht:
+\noindent\textbf{This installation guide is for \Apfa version \input{VERSION}}
+\bigskip
+
+This document can be found in PDF format on \PfaInstallationPDF and in HTML
+on \PfaAllInstallationHTDOC.
+
+% To automatically build reports from this content:
+%%ContentBegin
+
+\section{Introduction}
+\label{sec:introduction}
+
+
+You can install \Apfa in different ways, more or less automatic. The easiest
+way to install \Apfa is to use update manager or tarball files. If you are
+interested in a more advanced installation from the sources, you can clone 
+the \Apfa \Agit repository.
+
+This document describes these different ways of installing \Apfa as well as 
+the prerequisites of the installation and the way to verify that your installation
+is correctly done.
+
+\section{Requirements}
+\label{sec:requirements}
+
+Current version of \Apfa should work on any \texttt{GNU/Linux} distribution, especially Debian, 
+Ubuntu and Fedora.
+
+\subsection{Packages needed to build and run Par4All}
+\label{sec:pack-need-build}
+
+% To ease copy/paste:
+% cproto indent flex bison automake libtool autoconf libreadline5-dev python-dev swig python-ply libgmp3-dev libmpfr-dev gfortran subversion git
+
+To compile \Apfa with Debian or Ubuntu, the following additional
+packages are needed:
+\begin{quote}
+  \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
+  \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
+  \texttt{libreadline5-dev}, \texttt{python-dev}, \texttt{swig},
+  \texttt{python-ply}, \texttt{libgmp3-dev},
+  \texttt{libmpfr-dev}, \texttt{gfortran}, \texttt{subversion},
+  \texttt{git} \texttt{wget}
+\end{quote}
+
+To compile \Apfa with Fedora Core 15, 14 or 13, the following additional
+packages are needed:
+\begin{quote}
+  \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
+  \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
+  \texttt{readline-devel}, \texttt{python-devel}, \texttt{swig},
+  \texttt{python-ply}, \texttt{gmp-devel},
+  \texttt{mpfr-devel}, \texttt{gcc-gfortran}, \texttt{subversion},
+  \texttt{git} \texttt{wget}
+\end{quote}
+
+% To ease copy/paste:
+% libncurses5 libreadline5 python python-ply gfortran
+
+To run \Apfa with Debian or Ubuntu, the following packages are needed:
+\begin{quote}
+  \texttt{libmpfr1ldbl},
+  \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
+  \texttt{python-ply}, \texttt{gfortran},
+  \texttt{ipython}.
+\end{quote}
+
+To run \Apfa with Fedora Core 15, 14 or 13, the following packages are needed:
+\begin{quote}
+  \texttt{ncurses-5}, \texttt{readline}, \texttt{python},
+  \texttt{python-ply}, \texttt{python3}, \texttt{gcc-gfortran},
+  \texttt{ipython}.
+\end{quote}
+
+To compile the documentation with Debian or Ubuntu, the following
+additional packages are needed:
+\begin{quote}
+  \texttt{python-docutils}, \texttt{texlive-full}, \texttt{tex4ht}
+\end{quote}
+
+To compile the documentation with Fedora Core 15, 14 or 13, the following
+additional packages are needed:
+\begin{quote}
+  \texttt{texlive}, \texttt{tex4ht}
+\end{quote}
+
+\subsection{CUDA environment to compile and execute on NVidia GPU}
+
+To compile and to run the \Acuda and \Aopencl output, you should have the following
+environment variables set:
+\begin{itemize}
+\item \verb|CUDA_DIR| to the directory where \Acuda has been installed (default to
+  \texttt{/usr/local/cuda}
+\item \verb|LD_LIBRARY_PATH| should contains at least \verb|$CUDA_DIR/lib64|
+\end{itemize}
+
+\section{Installations}
+\label{sec:installation}
+
+This section represents different ways to install \Apfa.
+
+The installation is done into \texttt{/usr/local/par4all}. If you want \Apfa
+installed in another location, use the compilation way of life at 
+section~\ref{sec:options}.
+
+\subsection{Installation using update manager}
+
+The best way if you are on \texttt{GNU/Linux} Debian or Ubuntu is to use
+our package repository. This way, when a new version is out, your
+classical package manager can automatically install it.
+
+To use our package repository, pick \texttt{one} of the following lines, and
+add it graphically with the \texttt{Update Manager} with
+\texttt{Settings.../Third-Party Software} or append it with a text editor to
+your \texttt{/etc/apt/sources.list}, if you are using Ubuntu::
+
+\begin{verbatim}
+  deb http://download.par4all.org/apt/ubuntu releases main
+  # --OR--
+  deb http://download.par4all.org/apt/ubuntu development main
+\end{verbatim}
+
+or if you are running Debian::
+\begin{verbatim}
+  deb http://download.par4all.org/apt/debian releases main
+  # --OR--
+  deb http://download.par4all.org/apt/debian development main
+\end{verbatim}
+
+So you need to choose between \texttt{releases} or \texttt{development}
+versions. Development packages are generated often, may be unstable, and
+are best suited if you want to track more closely the \Apfa development.
+
+Once this is done, run your favorite graphics package tool
+(synaptic...) or:
+\begin{verbatim}
+  sudo aptitude update
+  sudo aptitude install par4all
+\end{verbatim}
+
+And you are (almost) good to go! To set your environment up and test your \Apfa
+installation, please refer to the section~\ref{sec:testing}, 
+or log out and log in again for the environment to get properly set
+up for \Apfa.
+
+\subsection{Installation using tarball files}
+
+A less automatic way on Debian or Ubuntu is to install the Par4All
+\texttt{.deb} package you have found on \url{http://download.par4all.org} with:
+\begin{verbatim}
+  sudo gdebi <the_package>.deb
+\end{verbatim}
+or 
+\begin{verbatim}
+  sudo dpkg -i <the_package>.deb 
+\end{verbatim}
+
+The second one would also work but does not
+automatically install dependencies you should install later.
+
+An even less automatic way is to use a tarball \texttt{.tar.gz} file. It
+contains the binaries as built on a stable Ubuntu or unstable Debian
+distribution.
+
+Once you have downloaded one of these \texttt{.tar.gz} packages from
+\url{http://download.par4all.org}, extract it with the following command::
+\begin{verbatim}
+  tar xvzf <the_package>.tar.gz
+\end{verbatim}
+
+It will create a directory named \texttt{par4all}. Move this directory to its final
+location:
+\begin{verbatim}
+  sudo mv par4all /usr/local
+\end{verbatim}
+
+Then please go to the section~\ref{sec:testing} to get information on how to test 
+your installation.
+
+\subsection{ Installation using \protect\Agit}
+
+From the \Apfa source directory, \Apfa is compiled and configured
+by running \verb|src/simple_tools/p4a_setup.py|. See
+\url{http://www.par4all.org/documentation/par4all_organization} for details.
+
+To download and compile \Apfa from the \Agit, do the following:
+\begin{alltt}
+# Get a working copy of the Par4All public read-only git repository:
+git clone --branch p4a git://git.hpc-project.com/git/par4all.git
+# Go into the working copy:
+cd par4all
+# Build everything using 8 processes to speed up things:
+src/simple_tools/p4a_setup.py [--prefix=\emph{/install/dir}] [-v[v[v]]] --jobs=8 [...]
+\end{alltt}%
+
+\Apfa will be installed into \verb|/usr/local/par4all| by default.
+The target directory must be writable by the installer, either by running
+as \texttt{root} with \texttt{sudo} or by creating first a
+writable target directory as follows:
+\begin{alltt}
+mkdir /usr/local/par4all
+chown \emph{your_login_name} /usr/local/par4all
+\end{alltt}
+In general, it is less dangerous to limit the number of commands
+executed as \texttt{root}, therefore, the latter approach to \Apfa
+installation is preferable.
+
+To install in another location, the \verb|--prefix| option can be used,
+for example to choose \texttt{/opt/par4all}. Warning: do not use plain
+system directory names such as \texttt{/usr} or \texttt{/usr/local}
+because some system files such as \texttt{/usr/include/assert.h} may be
+overwritten and havoc may happen...
+
+To see more installation options (including specifying the locations for
+other packages), run \verb|p4a_setup.py -h| or see
+section~\ref{sec:installation_options}.
+
+To pull a new version, do:
+\begin{verbatim}
+git pull origin p4a
+\end{verbatim}
+
+and run \verb|p4a_setup.py| again. The
+\verb|--rebuild| and \verb|--clean| parameters should be used to
+ensure that all sources are recompiled
+(since \Apips is a frequently-updated project, incremental build is
+not always guaranteed to succeed). Removing the \texttt{build}
+directory
+when the \verb|--prefix| directory changes is also recommended
+in order to remove obsolete
+information about the installation directory that may remain in
+the \texttt{build} directory and cause the compilation to fail.
+
+\subsection{Installation options}
+\label{sec:installation_options}
+
+The compilation and installation of \Apfa is controlled by the
+\verb|p4a_setup.py| script, with the usage and options described in
+this section.
+
+\input{p4a_setup-help}
+
+\subsection{Advanced installation}
+
+\section{Setting up environment and testing \protect\Apfa}
+\label{sec:testing}
+
+In any case, you will then need to source one of the following shell
+scripts which set up the environment variables for proper \Apfa
+execution:
+\begin{itemize}
+\item if you use \texttt{bash, sh, dash}, etc.:
+\begin{verbatim}
+      source /usr/local/par4all/etc/par4all-rc.sh
+\end{verbatim}
+\item if you use \texttt{csh, tcsh}, etc.:
+\begin{verbatim}
+      source /usr/local/par4all/etc/par4all-rc.csh
+\end{verbatim}
+\end{itemize}
+
+\subsection{Testing and verification}
+
+Once you set your environment up, you can, for example, run \texttt{p4a -h}
+to get help about the usage of the \texttt{p4a} frontend script.
+
+\subsubsection{Examples and demos}
+
+In the examples directory there are few examples or demos showing some \texttt{p4a,
+tpips, pyps} use cases. You can use these examples to test your installation.
+For example, to test \texttt{p4a} go to the directory \texttt{par4all/example/P4A/Hyantes}
+and run:
+\begin{verbatim}
+      make demo
+\end{verbatim}
+if you got all environment installed, included \Acuda environment.
+
+If you do not have \Acuda environment in your machine, you can test your installation with
+\Aopenmp, as the following:
+\begin{verbatim}
+      make display_opencl
+\end{verbatim}
+which will transform the Hyantes sequential codes to the \Aopenmp, compile the generated codes,
+run and display the results.
+To get more information on the examples, have a look at \texttt{examples/README.txt}
+
+Then you can look at the manual of \texttt{p4a} on
+\url{http://www.par4all.org/documentation} for information on how to use Par4All.
+
+\end{document}
+
+
+
