@@ -1078,11 +1078,13 @@ static void add_conflicts(effect fin,
          to TRUE!  We need to think more about all of this. BC.
       */
       if(ein_abstract_location_p) {
-	pips_debug(2, "abstract location case \n");
+#if 0 //SG: as is, this code is equivalent to doing nothing
+	    pips_debug(2, "abstract location case \n");
         entity alout = variable_to_abstract_location(eout);
 	/* this test is not correct, rout should be converted to an abstract location, not eout. BC. */
         if(abstract_locations_may_conflict_p(ein, alout))
           add_conflict_p = true;
+#endif
       } else {
         reference rin = effect_any_reference(fin);
         int din = gen_length(reference_indices(rin));

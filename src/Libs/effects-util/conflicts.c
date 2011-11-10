@@ -863,48 +863,36 @@ bool entities_must_conflict_p( entity e1, entity e2 ) {
 */
 
 /**
-   tests whether first reference certainely includes second one
+   tests whether first reference certainly includes second one
 
-   @see first_effect_certainely_includes_second_effect_p
+   @see first_effect_certainly_includes_second_effect_p
  */
-bool first_reference_certainely_includes_second_reference_p(reference r1, reference r2)
+static
+bool first_reference_certainly_includes_second_reference_p(reference r1, reference r2)
 {
-  bool r1_certainely_includes_r2_p = false; /* safe result */
+  bool r1_certainly_includes_r2_p = false; /* safe result */
 
-  if (reference_scalar_p(r1) && reference_scalar_p(r2)
-      && same_entity_p(reference_variable(r1), reference_variable(r2)))
-    r1_certainely_includes_r2_p = true;
+  if (  same_entity_p(reference_variable(r1), reference_variable(r2)) &&
+          reference_scalar_p(r1) && reference_scalar_p(r2) )
+    r1_certainly_includes_r2_p = true;
 
-  return r1_certainely_includes_r2_p;
+  return r1_certainly_includes_r2_p;
 }
 
-/* tests whether first cell certainely includes second one
+/* tests whether first cell certainly includes second one
 
-   @see first_effect_certainely_includes_second_effect_p
+   @see first_effect_certainly_includes_second_effect_p
  */
-bool first_cell_certainely_includes_second_cell_p(cell c1, cell c2)
+static
+bool first_cell_certainly_includes_second_cell_p(cell c1, cell c2)
 {
-  bool cell1_certainely_includes_cell2_p = false; /* safe result */
+  bool cell1_certainly_includes_cell2_p = false; /* safe result */
 
-  reference r1 = reference_undefined;
-  reference r2 = reference_undefined;
+  reference r1 = cell_to_reference(c1);
+  reference r2 = cell_to_reference(c2);
 
-  if ( cell_reference_p(c1) )
-    r1 = cell_reference(c1);
-  else if ( cell_preference_p(c1) )
-    r1 = preference_reference(cell_preference(c1));
-
-  if ( cell_reference_p(c2) )
-    r2 = cell_reference(c2);
-  else if ( cell_preference_p(c2) )
-    r2 = preference_reference(cell_preference(c2));
-
-  if ( reference_undefined_p(r1) || reference_undefined_p(r2) ) {
-    pips_internal_error("either undefined references or gap "
-        "not implemented yet\n");
-  }
-  cell1_certainely_includes_cell2_p = first_reference_certainely_includes_second_reference_p(r1, r2);
-  return cell1_certainely_includes_cell2_p;
+  cell1_certainly_includes_cell2_p = first_reference_certainly_includes_second_reference_p(r1, r2);
+  return cell1_certainly_includes_cell2_p;
 }
 
 
@@ -932,16 +920,16 @@ bool first_cell_certainely_includes_second_cell_p(cell c1, cell c2)
  */
 bool first_effect_certainly_includes_second_effect_p(effect eff1, effect eff2)
 {
-  bool eff1_certainely_includes_eff2_p = false; /* safe result */
+  bool eff1_certainly_includes_eff2_p = false; /* safe result */
 
-  if (first_effect_may_includes_second_effect_p(eff1) // this call is sometimes redundant, I keep it there to avoid further error
-          && effect_scalar_p(eff2)
-      && first_cell_certainely_includes_second_cell_p(effect_cell(eff1), effect_cell(eff2)))
+  if (   effect_scalar_p(eff2)
+      && first_cell_certainly_includes_second_cell_p(effect_cell(eff1), effect_cell(eff2)))
     {
-      eff1_certainely_includes_eff2_p = true;
+      pips_assert("first_effect_may_includes_second_effect_p was called before",first_effect_may_includes_second_effect_p(eff1));
+      eff1_certainly_includes_eff2_p = true;
     }
 
-  return eff1_certainely_includes_eff2_p;
+  return eff1_certainly_includes_eff2_p;
 }
 
 // verify the predicate over eff1 before calling first_effect_certainly_includes_second_effect_p
