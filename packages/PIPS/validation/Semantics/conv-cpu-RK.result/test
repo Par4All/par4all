@@ -189,28 +189,23 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
          int idx = i*n+j;
 
 
-//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
-//    0<=j, j<=9999}
+//  P(i,idx,j) {10000i+j==idx, n==10000, 0<=i, i<=9999, 0<=j, j<=9999}
 
          _Bool right = i>0;
 
-//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
-//    0<=j, j<=9999}
+//  P(i,idx,j) {10000i+j==idx, n==10000, 0<=i, i<=9999, 0<=j, j<=9999}
 
          _Bool left = i<n-1;
 
-//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
-//    0<=j, j<=9999}
+//  P(i,idx,j) {10000i+j==idx, n==10000, 0<=i, i<=9999, 0<=j, j<=9999}
 
          _Bool top = j>0;
 
-//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
-//    0<=j, j<=9999}
+//  P(i,idx,j) {10000i+j==idx, n==10000, 0<=i, i<=9999, 0<=j, j<=9999}
 
          _Bool bottom = j<n-1;
 
-//  P(i,idx,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000,
-//    0<=j, j<=9999}
+//  P(i,idx,j) {10000i+j==idx, n==10000, 0<=i, i<=9999, 0<=j, j<=9999}
 
          c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
       }
