@@ -213,20 +213,17 @@ entity find_label_entity(const char* module_name, const char* label_local_name)
  */
 const char* module_name(const char * s)
 {
-  /* FI: shouldnt'we allocate dynamically "local" since its size is
+  /* FI: shouldn't we allocate dynamically "local" since its size is
      smaller than the size of "s"? */
     static char local[MAXIMAL_MODULE_NAME_SIZE + 1];
-    string p_sep = NULL;
 
-    /* We have problem with C, an entity name does not always need MODULE_SEP*/
-    /* FI: that is a problem for PIPS. Which entity name do not have a MODULE_SEP? */
-
-    strncpy(local, s, MAXIMAL_MODULE_NAME_SIZE);
-    local[MAXIMAL_MODULE_NAME_SIZE] = 0;
-    if (((p_sep = strchr(local, MODULE_SEP)) == NULL) /* && ((p_sep = strstr(local, FILE_SEP_STRING)) == NULL ) */ )
-      pips_internal_error("module name too long, or illegal: \"%s\"", s);
-    else
-	*p_sep = '\0';
+    char * local_iter=&local[0];
+    const char *iter,*end;
+    for(iter=s, end=s+MAXIMAL_MODULE_NAME_SIZE; *iter != MODULE_SEP && iter != end ; ++iter) {
+        *local_iter++=*iter;
+    }
+    pips_assert("module name too long, or illegal", *iter == MODULE_SEP);
+    *local_iter=0;
     return(local);
 }
 
