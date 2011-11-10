@@ -456,7 +456,7 @@ bool entity_abstract_location_p(entity al)
                 ||   0 == strncmp(module_sep, NULL_POINTER_NAME, sizeof(NULL_POINTER_NAME)-1)
                 )
             ;
-        pips_assert("entity_kind is consistent",abstract_locations_p == (entity_kind(al)&ABSTRACT_LOCATION));
+        pips_assert("entity_kind is consistent",abstract_locations_p == ((entity_kind(al)&ABSTRACT_LOCATION)==ABSTRACT_LOCATION));
     }
     return entity_kind(al) & ABSTRACT_LOCATION;
 }
