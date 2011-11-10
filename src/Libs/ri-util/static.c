@@ -88,7 +88,8 @@ get_current_module_entity()
 }
 
 
-/** Reset the the current module entity
+
+/** Reset the current module entity
 
     It asserts the module entity was previously set.
  */

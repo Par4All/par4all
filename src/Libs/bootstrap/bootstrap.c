@@ -108,7 +108,7 @@ void CreateAreas()
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
 	      make_value(is_value_unknown, UU),
-          ABSTRACT_LOCATION);
+          ABSTRACT_LOCATION|ENTITY_DYNAMIC_AREA);
 
 
   make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
@@ -116,7 +116,7 @@ void CreateAreas()
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
 	      make_value(is_value_unknown, UU),
-          ABSTRACT_LOCATION);
+          ABSTRACT_LOCATION|ENTITY_STATIC_AREA);
 }
 
 static void CreateLogicalUnits()
@@ -149,7 +149,7 @@ static void CreateLogicalUnits()
               make_type(is_type_area, make_area(0, NIL)),
               make_storage(is_storage_rom, UU),
               make_value(is_value_unknown, UU),
-              EFFECTS_PACKAGE|ABSTRACT_LOCATION);
+              EFFECTS_PACKAGE|ABSTRACT_LOCATION|ENTITY_STATIC_AREA);
 
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
@@ -263,7 +263,7 @@ static entity CreateAbstractStateVariable(string pn, string vn)
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
 	      make_value(is_value_unknown, UU),
-          EFFECTS_PACKAGE|ABSTRACT_LOCATION);
+          EFFECTS_PACKAGE|ABSTRACT_LOCATION|ENTITY_STATIC_AREA);
 
   /* entity for random seed or other abstract states like heap: It is
      an unsigned int. */

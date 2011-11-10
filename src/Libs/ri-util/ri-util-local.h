@@ -2175,9 +2175,13 @@ typedef struct {
 } intrinsic_desc_t;
 
 enum {
-  DEFAULT_ENTITY_KIND = 0,
-  EFFECTS_PACKAGE = 1,
-  ABSTRACT_LOCATION = 2
+    DEFAULT_ENTITY_KIND = 0,
+    EFFECTS_PACKAGE = 1,
+    ABSTRACT_LOCATION = 2,
+    ENTITY_STACK_AREA = 4,
+    ENTITY_HEAP_AREA = 8,
+    ENTITY_DYNAMIC_AREA = 16,
+    ENTITY_STATIC_AREA = 32,
 };
 
 #define make_entity(n,t,s,i) make_entity(n,t,s,i,DEFAULT_ENTITY_KIND)

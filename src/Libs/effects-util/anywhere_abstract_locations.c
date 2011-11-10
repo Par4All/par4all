@@ -89,7 +89,7 @@ entity entity_nowhere_locations()
 {
   static entity nowhere = entity_undefined;
   if(entity_undefined_p(nowhere)) {
-      static const char any_name [] = ANY_MODULE_NAME MODULE_SEP_STRING NOWHERE_LOCATION NOWHERE_LOCATION;
+      static const char any_name [] = ANY_MODULE_NAME MODULE_SEP_STRING NOWHERE_LOCATION ;
       area a = make_area(0,NIL); /* Size and layout are unknown */
       type t = make_type_area(a);
       nowhere = make_entity(strdup(any_name),
@@ -266,6 +266,10 @@ entity entity_all_xxx_locations(string xxx)
     entity_storage(dynamic) = make_storage_rom();
     entity_initial(dynamic) = make_value_unknown();
     entity_kind(dynamic)=ABSTRACT_LOCATION;
+    if(same_string_p(xxx,HEAP_AREA_LOCAL_NAME)) entity_kind(dynamic)|=ENTITY_HEAP_AREA;
+    else if(same_string_p(xxx,STACK_AREA_LOCAL_NAME)) entity_kind(dynamic)|=ENTITY_STACK_AREA;
+    else if(same_string_p(xxx,STATIC_AREA_LOCAL_NAME)) entity_kind(dynamic)|=ENTITY_STATIC_AREA;
+    else if(same_string_p(xxx,DYNAMIC_AREA_LOCAL_NAME)) entity_kind(dynamic)|=ENTITY_DYNAMIC_AREA;
   }
 
   return dynamic;
@@ -585,8 +589,7 @@ entity abstract_locations_max(entity al1, entity al2)
 	mn = mn1;
       else 
 	mn = ANY_MODULE_NAME;
-      e = FindOrCreateEntity(mn, ln);
-      entity_kind(e)=ABSTRACT_LOCATION; /*SG: unsure */
+      e = FindEntity(mn, ln);
       free(mn1);free(mn2);
     }
   return e;
@@ -651,8 +654,7 @@ entity entity_locations_max(entity al1, entity al2)
 	    ln = HEAP_AREA_LOCAL_NAME;
 	  else
 	    ln = ANYWHERE_LOCATION;
-	  e = FindOrCreateEntity(mn, ln);
-      entity_kind(e)=ABSTRACT_LOCATION;
+	  e = FindEntity(mn, ln);
 	}
 	else
 	  pips_internal_error("not implemented");

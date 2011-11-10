@@ -392,17 +392,22 @@ bool allocatable_area_p(entity aire) {
 
 bool dynamic_area_p(entity aire)
 {
-  return same_string_p(module_local_name(aire), DYNAMIC_AREA_LOCAL_NAME);
+  return entity_kind(aire) & ENTITY_DYNAMIC_AREA;
 }
 
 bool static_area_p(entity aire)
 {
-  return same_string_p(module_local_name(aire), STATIC_AREA_LOCAL_NAME);
+  return entity_kind(aire) & ENTITY_STATIC_AREA;
 }
 
 bool heap_area_p(entity aire)
 {
-  return same_string_p(module_local_name(aire), HEAP_AREA_LOCAL_NAME);
+  return entity_kind(aire) & ENTITY_HEAP_AREA;
+}
+
+bool stack_area_p(entity aire)
+{
+  return entity_kind(aire) & ENTITY_STACK_AREA;
 }
 
 /* Returns the heap area a associated to module f.Area a is always a
@@ -418,11 +423,6 @@ entity module_to_heap_area(entity f)
 	      !entity_undefined_p(a));
 
   return a;
-}
-
-bool stack_area_p(entity aire)
-{
-  return same_string_p(module_local_name(aire),STACK_AREA_LOCAL_NAME);
 }
 
 bool entity_area_p(entity e)

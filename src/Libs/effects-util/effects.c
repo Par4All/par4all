@@ -870,12 +870,9 @@ bool action_equal_p(action a1, action a2)
    maintenance. */
 action_kind action_to_action_kind(action a)
 {
-  action_kind ak = action_read_p(a) ? action_read(a): action_write(a);
-
-  if(!action_read_p(a) && !action_write_p(a))
-    pips_internal_error("Inconsistent action kind.");
-
-  return ak;
+    pips_assert("consistent action kind.",action_read_p(a) || action_write_p(a));
+    action_kind ak = action_read_p(a) ? action_read(a): action_write(a);
+    return ak;
 }
 
 action_kind effect_action_kind(effect eff)
