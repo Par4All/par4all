@@ -909,7 +909,7 @@ bool first_cell_certainely_includes_second_cell_p(cell c1, cell c2)
 
 
 /**
-   tests whether first effect certainely includes second one. The effects
+   tests whether first effect certainly includes second one. The effects
    are not necessarily functions of the same store.
 
    This means that a[i]-exact does not necessarily contains a[i]-exact
@@ -930,18 +930,23 @@ bool first_cell_certainely_includes_second_cell_p(cell c1, cell c2)
    So in all cases, the function safely returns false for effects
    described with access paths which are not single entities.
  */
-bool first_effect_certainely_includes_second_effect_p(effect eff1, effect eff2)
+bool first_effect_certainly_includes_second_effect_p(effect eff1, effect eff2)
 {
   bool eff1_certainely_includes_eff2_p = false; /* safe result */
 
-  if (effect_exact_p(eff1)
-      && effect_scalar_p(eff1) && effect_scalar_p(eff2)
+  if (first_effect_may_includes_second_effect_p(eff1) // this call is sometimes redundant, I keep it there to avoid further error
+          && effect_scalar_p(eff2)
       && first_cell_certainely_includes_second_cell_p(effect_cell(eff1), effect_cell(eff2)))
     {
       eff1_certainely_includes_eff2_p = true;
     }
 
   return eff1_certainely_includes_eff2_p;
+}
+
+// verify the predicate over eff1 before calling first_effect_certainly_includes_second_effect_p
+bool first_effect_may_includes_second_effect_p(effect eff1) {
+    return effect_exact_p(eff1) &&  effect_scalar_p(eff1) ;
 }
 
 /* misc functions */

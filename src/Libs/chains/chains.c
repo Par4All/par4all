@@ -243,24 +243,27 @@ static bool init_one_statement( statement st ) {
  * @param killers the "killer" effects
  */
 static void kill_effects(set gen, set killers) {
-  SET_FOREACH(effect,killer,killers) {
-    /* A killer effect is exact and is a write (environment effects kills !!) */
-    if ( action_write_p(effect_action(killer))
-        && approximation_exact_p(effect_approximation(killer)) ) {
-      set killed = MAKE_STATEMENT_SET();
-      SET_FOREACH(effect,e,gen) {
-        /* We only kill store effect */
-        if(!store_effect_p(e)) continue;
-        /* We avoid a self killing */
-        if( e != killer
-            && first_effect_certainely_includes_second_effect_p(killer, e) ) {
-            set_add_element( killed, killed, e );
+    set killed = MAKE_STATEMENT_SET();
+    SET_FOREACH(effect,killer,killers) {
+        /* A killer effect is exact and is a write (environment effects kills !!) */
+        if ( action_write_p(effect_action(killer))
+                && approximation_exact_p(effect_approximation(killer)) &&
+                first_effect_may_includes_second_effect_p(killer) ) {
+            SET_FOREACH(effect,e,gen) {
+                /* We only kill store effect */
+                if(store_effect_p(e)) {
+                    /* We avoid a self killing */
+                    if( e != killer
+                            && first_effect_certainly_includes_second_effect_p(killer, e) ) {
+                        set_add_element( killed, killed, e );
+                    }
+                }
+            }
+            set_difference(gen,gen,killed);
+            set_clear(killed);
         }
-      }
-      set_difference(gen,gen,killed);
-      set_free(killed);
     }
-  }
+    set_free(killed);
 }
 
 /**
