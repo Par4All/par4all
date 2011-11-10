@@ -1150,13 +1150,7 @@ bool malloc_entity_p(entity e)
  */
 bool effects_package_entity_p(entity e)
 {
-  set_static_entities();
-  return (same_entity_p(e, rand_gen_ent)
-	  || same_entity_p(e, malloc_effect_ent)
-	  || same_entity_p(e, memmove_effect_ent)
-	  || same_entity_p(e, luns_ent) || same_entity_p(e, io_ptr_ent)
-	  || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
-
+  return entity_kind(e) & EFFECTS_PACKAGE;
 }
 
 

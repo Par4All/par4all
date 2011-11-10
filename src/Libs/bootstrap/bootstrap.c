@@ -82,6 +82,7 @@
 #include "properties.h"
 
 #define LOCAL static
+#undef make_entity
 
 /* Working with hash_table of basic
  */
@@ -106,14 +107,16 @@ void CreateAreas()
 			       DYNAMIC_AREA_LOCAL_NAME),
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
-	      make_value(is_value_unknown, UU));
+	      make_value(is_value_unknown, UU),
+          DEFAULT_ENTITY_KIND);
 
 
   make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
 			       STATIC_AREA_LOCAL_NAME),
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
-	      make_value(is_value_unknown, UU));
+	      make_value(is_value_unknown, UU),
+          DEFAULT_ENTITY_KIND);
 }
 
 static void CreateLogicalUnits()
@@ -136,7 +139,8 @@ static void CreateLogicalUnits()
                               make_functional(NIL,make_type(is_type_void,
                                                             NIL))),
                     make_storage(is_storage_rom, UU),
-                    make_value(is_value_code, c));
+                    make_value(is_value_code, c),
+                    DEFAULT_ENTITY_KIND);
 
   set_current_module_entity(ent);
 
@@ -144,7 +148,8 @@ static void CreateLogicalUnits()
                                STATIC_AREA_LOCAL_NAME),
               make_type(is_type_area, make_area(0, NIL)),
               make_storage(is_storage_rom, UU),
-              make_value(is_value_unknown, UU));
+              make_value(is_value_unknown, UU),
+              EFFECTS_PACKAGE);
 
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
@@ -168,7 +173,8 @@ static void CreateLogicalUnits()
                            FindEntity(IO_EFFECTS_PACKAGE_NAME,
                                                  STATIC_AREA_LOCAL_NAME),
                                     0, NIL)),
-              make_value(is_value_unknown, UU));
+              make_value(is_value_unknown, UU),
+              EFFECTS_PACKAGE);
 
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
@@ -192,7 +198,8 @@ static void CreateLogicalUnits()
                              FindEntity(IO_EFFECTS_PACKAGE_NAME,
                                                    STATIC_AREA_LOCAL_NAME),
                              0, NIL)),
-              make_value(is_value_unknown, UU));
+              make_value(is_value_unknown, UU),
+              EFFECTS_PACKAGE);
 
   /* GO: entity for io logical units: It is an array which*/
   luns = make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
@@ -216,7 +223,8 @@ static void CreateLogicalUnits()
 					   FindEntity(IO_EFFECTS_PACKAGE_NAME,
 								 STATIC_AREA_LOCAL_NAME),
 					   0, NIL)),
-		     make_value(is_value_unknown, UU));
+		     make_value(is_value_unknown, UU),
+             EFFECTS_PACKAGE);
 
   reset_current_module_entity();
   add_abstract_state_variable(luns);
@@ -245,7 +253,8 @@ static entity CreateAbstractStateVariable(string pn, string vn)
 			      make_functional(NIL,make_type(is_type_void,
 							    NIL))),
 		    make_storage(is_storage_rom, UU),
-		    make_value(is_value_code, c));
+		    make_value(is_value_code, c),
+            DEFAULT_ENTITY_KIND);
 
   set_current_module_entity(ent);
 
@@ -253,7 +262,8 @@ static entity CreateAbstractStateVariable(string pn, string vn)
 			       STATIC_AREA_LOCAL_NAME),
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
-	      make_value(is_value_unknown, UU));
+	      make_value(is_value_unknown, UU),
+          EFFECTS_PACKAGE);
 
   /* entity for random seed or other abstract states like heap: It is
      an unsigned int. */
@@ -267,7 +277,8 @@ static entity CreateAbstractStateVariable(string pn, string vn)
 					 FindEntity(pn,
 							       STATIC_AREA_LOCAL_NAME),
 					 0, NIL)),
-		   make_value(is_value_unknown, UU));
+		   make_value(is_value_unknown, UU),
+           EFFECTS_PACKAGE);
 
   reset_current_module_entity();
   return as;
@@ -4322,7 +4333,8 @@ static entity MakeIntrinsic(string name, int arity, type (*intrinsic_type)(int))
   e = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME, name),
                   intrinsic_type(arity),
                   make_storage(is_storage_rom, UU),
-                  make_value(is_value_intrinsic, NIL));
+                  make_value(is_value_intrinsic, NIL),
+                  DEFAULT_ENTITY_KIND);
 
   return e;
 }
@@ -5578,7 +5590,8 @@ bootstrap(string workspace)
                      MakeTypeStatement(),
                      make_storage_rom(),
                      make_value(is_value_constant,
-                                make_constant_litteral()));
+                                make_constant_litteral()),
+                     DEFAULT_ENTITY_KIND);
 
   /* FI: I suppress the owner filed to make the database moveable */
   /* FC: the content must be consistent with pipsdbm/methods.h */

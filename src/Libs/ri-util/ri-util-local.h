@@ -2173,3 +2173,11 @@ typedef struct {
     list (*f)(call,int,bool,list);
     int prec;
 } intrinsic_desc_t;
+
+enum {
+  DEFAULT_ENTITY_KIND = 0,
+  EFFECTS_PACKAGE = 1,
+  ABSTRACT_LOCATION = 2
+};
+
+#define make_entity(n,t,s,i) make_entity(n,t,s,i,DEFAULT_ENTITY_KIND)
