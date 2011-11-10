@@ -1,4 +1,4 @@
-// The regions are erroneously empty for the first loop nest.
+// Same as linked_regions01.c, but with cleaner C code
 
 #include <stdio.h>
 
@@ -8,9 +8,9 @@ int main()
   double A[100][100];
   for (int i=1; i<=N; i++) {
     for (int j=1; j<=N; j++) {
-      int x0 = (i*j);
-      double x1 = ((double)N / 2);
-      if ((x0<x1)) {
+      //int x0 = (i*j);
+      //double x1 = ((double)N / 2);
+      if ((2*i*j<N)) {
         A[(N-i)-1][(i+j)-1] = 1.0;
         A[i-1][((N-i)-j)-1] = 1.0;
       }
@@ -25,4 +25,3 @@ int main()
 
   return 0;
 }
-
