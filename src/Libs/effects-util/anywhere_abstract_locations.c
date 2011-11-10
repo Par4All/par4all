@@ -173,12 +173,12 @@ bool entity_all_module_locations_p(entity e)
  * Generic set of functions for all kinds of areas
 */
 
-entity entity_all_module_xxx_locations(entity m, string xxx)
+entity entity_all_module_xxx_locations(entity m, const char *xxx)
 {
   entity dynamic = entity_undefined;
-  string any_name = strdup(concatenate(xxx,
-				       ANYWHERE_LOCATION,
-				       NULL));
+  string any_name;
+  asprintf(&any_name, "%s" ANYWHERE_LOCATION, xxx);
+
   //dynamic = gen_find_tabulated(any_name, entity_domain);
   dynamic = FindOrCreateEntity(entity_local_name(m), any_name);
   if(storage_undefined_p(entity_storage(dynamic))) {
@@ -508,7 +508,7 @@ entity variable_to_abstract_location(entity v)
       entity f = ram_function(r);
       entity a = ram_section(r);
       //string mn = entity_local_name(f);
-      string ln = string_undefined;
+      const char *ln = string_undefined;
       type uvt = ultimate_type(entity_type(v));
 
       if(static_area_p(a))
