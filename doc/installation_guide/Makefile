@@ -30,7 +30,7 @@ default: full-compile phase7
 include $(ROOT)/makes/main.mk
 
 # Where to find commands we want generate documentation:
-VPATH = ../../src/dev:../../src/simple_tools:../../src/p4a_accel:../../src/postprocessor
+VPATH = ../../src/dev:../../src/simple_tools
 
 publish:
 	ssh $(INSTALL_MACHINE) mkdir -p $(INSTALL_MACHINE_DIR)
@@ -41,7 +41,7 @@ clean: local-clean
 
 local-clean:
 	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) \
-		*.aux *.bbl *.blg *.rel *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out *.help *-help.tex parsetab.py release-notes.tex release-notes-extract.tex
+		*.aux *.bbl *.blg *.rel *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out *.help *-help.tex parsetab.py
 
 
 # Add the dependence on some automatically generated help:
