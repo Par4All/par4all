@@ -63,7 +63,9 @@ static entity io_error_luns_ent  = entity_undefined;
 
 /* continue statement */
 static entity continue_ent = entity_undefined;
-
+#define STATIC_ENTITY_CACHE_SIZE 128
+static entity *static_entity_cache[STATIC_ENTITY_CACHE_SIZE];
+static size_t static_entity_size=0;
 static bool static_entities_initialized_p = false;
 
 /* beware: cannot be called on creating the database */
@@ -111,9 +113,18 @@ void reset_static_entities()
   io_error_luns_ent  = entity_undefined;
 
   continue_ent = entity_undefined;
-
+  for(size_t i =0;i< static_entity_size;i++)
+      *static_entity_cache[i]=entity_undefined;
+  static_entity_size=0;
   static_entities_initialized_p = false;
+}
 
+/* add given entity to the set of entities that must reset upon workspace deletion
+ * practically, all static entities should be stored that way
+ */
+void register_static_entity(entity *e) {
+    static_entity_cache[static_entity_size++]=e;
+    pips_assert("static entity cache is large enough",static_entity_size<STATIC_ENTITY_CACHE_SIZE);
 }
 
 

@@ -87,15 +87,15 @@ bool entity_all_locations_p(entity e)
 
 entity entity_nowhere_locations()
 {
-  entity nowhere = entity_undefined;
-  static const char any_name [] = ANY_MODULE_NAME MODULE_SEP_STRING NOWHERE_LOCATION NOWHERE_LOCATION;
-  nowhere =  gen_find_tabulated(any_name, entity_domain);
+  static entity nowhere = entity_undefined;
   if(entity_undefined_p(nowhere)) {
-    area a = make_area(0,NIL); /* Size and layout are unknown */
-    type t = make_type_area(a);
-    nowhere = make_entity(strdup(any_name),
-			   t, make_storage_rom(), make_value_unknown());
-    entity_kind(nowhere)=ABSTRACT_LOCATION;
+      static const char any_name [] = ANY_MODULE_NAME MODULE_SEP_STRING NOWHERE_LOCATION NOWHERE_LOCATION;
+      area a = make_area(0,NIL); /* Size and layout are unknown */
+      type t = make_type_area(a);
+      nowhere = make_entity(strdup(any_name),
+              t, make_storage_rom(), make_value_unknown());
+      entity_kind(nowhere)=ABSTRACT_LOCATION;
+      register_static_entity(&nowhere);
   }
 
    return nowhere;
@@ -103,46 +103,34 @@ entity entity_nowhere_locations()
 /* test if an entity is the bottom of the lattice*/
 bool entity_nowhere_locations_p(entity e)
 {
-
-  bool nowhere_p;
-  nowhere_p = same_string_p(entity_local_name(e), NOWHERE_LOCATION);
-  if(nowhere_p)
-    pips_assert("defined in any module name",
-		same_string_p(entity_module_name(e), ANY_MODULE_NAME));
-  return nowhere_p;
+    return same_entity_p(e,entity_nowhere_locations());
 }
 
+
 /* return TOP-LEVEL:*NULL_POINTER*
  * The NULL pointer should be a global variable, unique for all modules
  * FI: why isn't it called entity_null_location()?
  */
 entity entity_null_locations()
 {
-  entity null_pointer = entity_undefined;
-  const char any_name [] = TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING NULL_POINTER_NAME;
-  null_pointer = gen_find_tabulated(any_name, entity_domain);
-  if(entity_undefined_p(null_pointer)) {
-    area a = make_area(0,NIL); /* Size and layout are unknown */
-    type t = make_type_area(a);
-    null_pointer = make_entity(strdup(any_name),
-			       t, make_storage_rom(), make_value_unknown());
-    entity_kind(null_pointer) = ABSTRACT_LOCATION;
-  }
+    static entity null_pointer = entity_undefined;
+    if(entity_undefined_p(null_pointer)) {
+        const char any_name [] = TOP_LEVEL_MODULE_NAME MODULE_SEP_STRING NULL_POINTER_NAME;
+        area a = make_area(0,NIL); /* Size and layout are unknown */
+        type t = make_type_area(a);
+        null_pointer = make_entity(strdup(any_name),
+                t, make_storage_rom(), make_value_unknown());
+        entity_kind(null_pointer) = ABSTRACT_LOCATION;
+        register_static_entity(&null_pointer);
+    }
 
-  return null_pointer;
+    return null_pointer;
 }
 
 /* test if an entity is the NULL POINTER*/
 bool entity_null_locations_p(entity e)
 {
-
-  bool null_pointer_p;
-  null_pointer_p = same_string_p(entity_local_name(e), NULL_POINTER_NAME);
-  if(null_pointer_p)
-    pips_assert("defined in top-level module name",
-		same_string_p(entity_module_name(e),TOP_LEVEL_MODULE_NAME));
-
-  return null_pointer_p;
+    return same_entity_p(e,entity_null_locations());
 }
 
 /* return m:*ANYWHERE*
