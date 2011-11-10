@@ -255,11 +255,14 @@ transformer declaration_to_transformer(entity v, transformer pre)
     /* Use the dimension expressions and the initial value */
     transformer dt = dimensions_to_transformer(v, pre);
     transformer npre = transformer_apply(dt, pre);
+    transformer nr = transformer_range(npre);
     expression ie = variable_initial_expression(v);
-    transformer itf = safe_assigned_expression_to_transformer(v, ie, npre);
+    transformer itf = safe_assigned_expression_to_transformer(v, ie, nr);
     tf = dt;
     tf = transformer_combine(tf, itf);
     free_expression(ie);
+    free_transformer(npre);
+    free_transformer(nr);
   }
 
   pips_assert("tf is defined", !transformer_undefined_p(tf));

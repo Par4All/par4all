@@ -1212,7 +1212,8 @@
 #define ENTITY_BITWISE_OR_P(e) (entity_an_operator_p(e, BITWISE_OR))
 #define ENTITY_BITWISE_XOR_P(e) (entity_an_operator_p(e, BITWISE_XOR))
 #define ENTITY_NOT_P(e) (entity_an_operator_p(e, NOT) || entity_an_operator_p(e, C_NOT))
-#define ENTITY_NON_EQUAL_P(e) (entity_an_operator_p(e, NON_EQUAL) || entity_an_operator_p(e, C_NON_EQUAL))
+// NON_EQUIV is in fact a logical operator - to simplify semantics
+#define ENTITY_NON_EQUAL_P(e) (entity_an_operator_p(e, NON_EQUAL) || entity_an_operator_p(e, NON_EQUIV) || entity_an_operator_p(e, C_NON_EQUAL))
 #define ENTITY_EQUIV_P(e) entity_an_operator_p(e, EQUIV)
 #define ENTITY_NON_EQUIV_P(e) entity_an_operator_p(e, NON_EQUIV)
 #define ENTITY_LEFT_SHIFT_P(e) entity_an_operator_p(e, LEFT_SHIFT)
@@ -1225,10 +1226,7 @@
 #define ENTITY_LOGICAL_OPERATOR_P(e) ( ENTITY_RELATIONAL_OPERATOR_P(e) || \
                                        ENTITY_AND_P(e) || \
                                        ENTITY_OR_P(e) || \
-                                       ENTITY_NOT_P(e) || \
-                                       ENTITY_NON_EQUAL_P(e) || \
-                                       ENTITY_EQUIV_P(e) || \
-                                       ENTITY_NON_EQUIV_P(e) )
+                                       ENTITY_NOT_P(e))
 
 #define ENTITY_TRUE_P(e) entity_an_operator_p(e, TRUE)
 #define ENTITY_FALSE_P(e) entity_an_operator_p(e, FALSE)
@@ -1240,7 +1238,8 @@
 #define ENTITY_LESS_OR_EQUAL_P(e) (entity_an_operator_p(e, LESS_OR_EQUAL) || entity_an_operator_p(e, C_LESS_OR_EQUAL))
 #define ENTITY_LESS_THAN_P(e) (entity_an_operator_p(e, LESS_THAN) || entity_an_operator_p(e, C_LESS_THAN))
 
-#define ENTITY_EQUAL_P(e) (entity_an_operator_p(e, EQUAL) || entity_an_operator_p(e, C_EQUAL))
+// EQUIV is in fact a logical operator - to simplify semantics
+#define ENTITY_EQUAL_P(e) (entity_an_operator_p(e, EQUAL) || entity_an_operator_p(e, EQUIV) || entity_an_operator_p(e, C_EQUAL))
 
 #define ENTITY_RELATIONAL_OPERATOR_P(e) ( \
                                          ENTITY_GREATER_OR_EQUAL_P(e) || \
