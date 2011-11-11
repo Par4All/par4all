@@ -63,7 +63,7 @@ if (( $verb >= 1)) ; then
 fi
 
 # Subdirectory where there is some documentation to build or publish:
-doc_dirs="doc/organization doc/simple_tools/p4a_article doc/simple_tools/p4a_slides src/p4a_accel"
+doc_dirs="doc/organization doc/simple_tools/user_guide doc/simple_tools/p4a_article doc/simple_tools/p4a_slides src/p4a_accel"
 
 for d in $doc_dirs; do
     ad=$P4A_ROOT/$d
