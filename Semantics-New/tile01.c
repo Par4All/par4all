@@ -1,4 +1,4 @@
-// The MIN function is not defined. PIPS identify it with the Fortran
+// The MIN function is not defined. PIPS identifies it with the Fortran
 // MIN intrinsics
 
 extern int N;

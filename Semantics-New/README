@@ -18,6 +18,24 @@ gulwani03.c: example from Gulwani (same as opan3)
 
 gulvani_xxx.c: Vivien Maisonneuve (one control node)
 
+linked_regions02.c: a bug with regions linked to the way transformers
+                    and preconditions are computed. I fixed a bug in
+                    declaration_to_transformer (use a range instead of
+                    a precondition) and the region computation
+                    generated lots of overflows and, worse, return a
+                    wrong result for the loop regions
+
+linked_regions03.c: same as linked_regions02, but with additional ifs
+                    to obtain intermediate results; also check of the transformer
+                    computation for multiplication when the arguments are positive and
+                    have upper bounds
+
+linked_regions04.c: same as linked_region03.c, but the loops are
+                    distributed to integrate/sum the array references
+                    one by one before computing the convex hull. No
+                    overflow, much faster, correct result for the
+                    convex array regions.
+
 mehdi01.c:  example submitted by Mehdi Amini
 
 summary_precondition02.c:

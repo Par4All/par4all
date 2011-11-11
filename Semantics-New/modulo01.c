@@ -7,4 +7,6 @@ main()
   int j;
 
   j = (i++)%2;
+
+  return 0;
 }
