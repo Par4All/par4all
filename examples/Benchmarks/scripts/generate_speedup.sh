@@ -4,56 +4,6 @@
 out_dat="timing.dat"
 out_gp="histogram.gp"
 
-#HEADER
-cat > $out_gp << EOF
-reset
-
-set xrange[-0.5:26]
-set yrange[-2:9]
-
-set ytics(              \
-	"0.25x"  -2,    \
-	"0.5x"   -1,    \
-	"1x"      0,    \
-	"2x"      1,    \
-	"4x"      2,    \
-	"8x"      3,    \
-	"16x"     4,    \
-	"32x"     5,    \
-	"64x"     6,    \
-        "128x"    7,    \
-        "256x"    8)
-
-# We need 'in' ticks, so that the suite labels are
-# closer to the boundary
-set x2tics in nomirror offset 5
-
-set xtics out nomirror
-set xtics rotate by -90
-
-
-set grid ytics noxtics x2tics
-
-g = 1
-set style histogram cluster gap 1
-set style data histogram
-
-unset xtics
-set xtics out rotate by -30 nomirror offset 0,0 font "Arial,12" 
-set key Right noreverse enhanced autotitles columnhead nobox 
-
-set style fill solid border -1
-
-set size 1, 0.5
-
-set ylabel "Speedup (Log_{2})"
-
-set terminal postscript eps enhanced "Times-New-Roman" 10 size 9,4
-set output "speedup.eps"
-
-EOF
-
-
 
 if [[ -z $dbfile ]]; then
 dbfile="timing.sqlite"
@@ -77,7 +27,7 @@ exclude_tests="where testcase not in ($exclude_tests)"
 fi
 
 if [[ -z $tests ]]; then
-tests=`echo "select testcase from timing $exclude_tests group by testcase order by suite_order,testcase;" | sqlite3 $dbfile`
+tests=`echo "select testcase from timing $exclude_tests group by testcase order by suite_order,bench_suite,testcase;" | sqlite3 $dbfile`
 fi
 
 
@@ -121,7 +71,7 @@ for test in $tests; do
     tic=`echo "$currentTic -0.5" | bc `
     x2tics="$x2tics $x2sep \"$suite\" $tic"
     x2sep=","
-    arrows=`echo $arrows ; echo "set arrow $arrow_cnt from $tic,9 to $tic,10 nohead" `
+    arrows=`echo "$arrows" ; echo "set arrow $arrow_cnt from $tic,9 to $tic,10 nohead" `
     ((arrow_cnt++))
     currentSuite=$suite    
   fi
@@ -160,9 +110,62 @@ for test in $tests; do
 done
 
 
+
+#HEADER
+cat > $out_gp << EOF
+reset
+
+set xrange[-0.5:$((nmean+1))]
+set yrange[-2:9]
+
+set ytics(              \
+	"0.25x"  -2,    \
+	"0.5x"   -1,    \
+	"1x"      0,    \
+	"2x"      1,    \
+	"4x"      2,    \
+	"8x"      3,    \
+	"16x"     4,    \
+	"32x"     5,    \
+	"64x"     6,    \
+        "128x"    7,    \
+        "256x"    8)
+
+# We need 'in' ticks, so that the suite labels are
+# closer to the boundary
+set x2tics in nomirror offset 5
+
+set xtics out nomirror
+set xtics rotate by -90
+
+
+set grid ytics noxtics x2tics
+
+g = 1
+set style histogram cluster gap 1
+set style data histogram
+
+unset xtics
+set xtics out rotate by -30 nomirror offset 0,0 font "Arial,12" 
+set key Right noreverse enhanced autotitles columnhead nobox 
+
+set style fill solid border -1
+
+set size 1, 0.5
+
+set ylabel "Speedup (Log_{2})"
+
+set terminal postscript eps enhanced "Times-New-Roman" 12 size 9,4
+set output "speedup.eps"
+
+EOF
+
+
+
+
 tic=`echo "$currentTic -0.5" | bc `
 x2tics="$x2tics $x2sep \"$suite\" $tic"
-echo $arrows >> $out_gp
+echo "$arrows" >> $out_gp
 echo "set x2tics($x2tics)" >> $out_gp
 
 if [[ -z $disable_mean ]]; then
@@ -190,7 +193,7 @@ fi
 echo -n "plot " >> $out_gp
 nver=2
 if [[ -z $labelfontsize ]] ; then
-  labelfontsize=$((11-${nmean}/4))
+  labelfontsize=$((20-${nmean}/4))
 fi
 for ver in $versions; do
   echo "\\" >> $out_gp
