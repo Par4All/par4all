@@ -30,7 +30,10 @@
   ---\\
   HPC Project}
 
-\author{Ronan \textsc{Keryell} \& Grégoire \textsc{Péan}}
+% Do not forget to add your name here when you contribute to this document:
+\author{Mehdi \textsc{Amini} \and Béatrice \textsc{Creusillet} \and Onil
+  \textsc{Goubier} \and Serge \textsc{Guelton} \and Ronan \textsc{Keryell} \and
+  Janice \textsc{Onanian-McMahon} \and Grégoire \textsc{Péan}}
 
 \maketitle
 
@@ -87,7 +90,9 @@ compilation by the back-end.
 
 The \Apfa documentation is available from \url{http://www.par4all.org} and
 more specifically, this document can be found in \Apdf from
-\url{http://download.par4all.org/doc/simple_tools/p4a/par4all_user_guide.pdf}
+\url{http://download.par4all.org/doc/par4all_user_guide/par4all_user_guide.pdf}
+and in \Ahtml from
+\url{http://download.par4all.org/doc/par4all_user_guide/par4all_user_guide.htdoc}.
 
 Since \Apfa is a large project in progress with continuous updates,
 users should refer to the current release notes and the general
@@ -141,8 +146,8 @@ From the high-level user point of view, the sources follow this journey:
 \subsection{Automatic parallelization with OpenMP generation}
 \label{sec:autom-parall-with}
 
-To generate \Aopenmp code from a C or Fortran program, use \texttt{p4a} with option 
- \texttt{--openmp}, for example for a Fortran program:
+To generate \Aopenmp code from a C or Fortran program, use \texttt{p4a}
+with option \texttt{--openmp}, for example for a Fortran program:
 \begin{verbatim}
 p4a --openmp example.f
 \end{verbatim}

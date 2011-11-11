@@ -2,7 +2,7 @@ INSTALL_DOC = par4all_user_guide.pdf
 INSTALL_HTM = par4all_user_guide.htdoc
 
 # Where to install the documentation:
-INSTALL_MACHINE_DIR=$(INSTALL_MACHINE_DOC_DIR)/user_guide
+INSTALL_MACHINE_DIR=$(INSTALL_MACHINE_DOC_DIR)/par4all_user_guide
 
 TEXINPUTS:=$(TEXINPUTS):$(shell pwd)/../figures//::$(shell pwd)/../../examples/Python::
 
