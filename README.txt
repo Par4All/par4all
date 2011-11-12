@@ -60,6 +60,8 @@ New features :
 - Some more options on ``p4a``, such as --atomic to use atomic operations
   for parallelizing reductions on GPU.
 
+Look at the changelog file for more details.
+
 
 Hardware and software requirements
 ----------------------------------
