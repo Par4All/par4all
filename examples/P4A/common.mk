@@ -44,7 +44,7 @@ default:
 demo : display_seq display_openmp display_cuda display_cuda-opt display_accel-openmp display_opencl;
 
 build-all: $(TARGET)-seq $(TARGET)-openmp $(TARGET)-pgi $(TARGET)-accel-openmp \
-						$(TARGET)-cuda $(TARGET)-cuda-opt $(TARGET)-cuda-manual $(TARGET)-opencl 
+						$(TARGET)-cuda $(TARGET)-cuda-opt $(TARGET)-cuda-manual $(TARGET)-opencl
 
 clean :
 	rm -rf $(TARGET)-seq $(TARGET)-openmp $(TARGET)-pgi $(TARGET)-accel-openmp \
@@ -74,30 +74,28 @@ $(TARGET)-pgi : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(PGI_SOURCES)
 	# Parallelize and build a CUDA version using PGI accelerator
 	$(PGCC) -ta=nvidia,time $(CPPFLAGS) $(CPU_TIMING) $(LDFLAGS) $(LDLIBS) -o $@ $(COMMON_SOURCES) $(PGI_SOURCES)
 
-$(TARGET)-openmp : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS) $(GRAPHICS_OBJ) 
+$(TARGET)-openmp : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS) $(GRAPHICS_OBJ)
 	# Parallelize and build an OpenMP version:
 	p4a $(P4A_OMP_FLAGS) $(P4A_OPTIONS) $(CPU_TIMING) $(CPPFLAGS)  -o $@ $(COMMON_SOURCES) $(SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
 	# P4A openmp end !
 
-$(TARGET)-accel-openmp : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS) $(GRAPHICS_OBJ) 
+$(TARGET)-accel-openmp : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS) $(GRAPHICS_OBJ)
 	# Parallelize and build an OpenMP version:
 	p4a -A --openmp $(P4A_ACCEL_OPENMP_FLAGS) $(P4A_OPTIONS) $(CPU_TIMING) $(CPPFLAGS)  -o $@ $(COMMON_SOURCES) $(SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
 	# P4A openmp end !
 
-$(TARGET)-cuda : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS) $(GRAPHICS_OBJ) 
+$(TARGET)-cuda : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS) $(GRAPHICS_OBJ)
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_CUDA_FLAGS) $(P4A_OPTIONS) $(GPU_TIMING) $(CPPFLAGS)  --cuda -o $@ $(COMMON_SOURCES) $(SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)   --nvcc-flags="$(NVCCFLAGS)"
-	
-$(TARGET)-opencl : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS) $(GRAPHICS_OBJ) 
+
+$(TARGET)-opencl : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS) $(GRAPHICS_OBJ)
 	# Parallelize and build an OpenCL version:
 	p4a $(P4A_OPENCL_FLAGS) $(P4A_OPTIONS) $(GPU_TIMING) $(CPPFLAGS)  --opencl -o $@ $(COMMON_SOURCES) $(SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(OPENCLLIBS)
-	
+
 $(TARGET)-cuda-opt : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(SOURCES) $(STUBS) $(GRAPHICS_OBJ)
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_CUDA_FLAGS) $(P4A_OPTIONS) $(GPU_TIMING) $(CPPFLAGS) --com-optimization --cuda -o $@ $(COMMON_SOURCES) $(SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)  --nvcc-flags="$(NVCCFLAGS)"
-	
-$(TARGET)-cuda-manual : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(MANUAL_CUDA_SOURCES) $(GRAPHICS_OBJ) 
-	# Parallelize and build a CUDA version:
-	$(NVCC) $(CPPFLAGS) $(GPU_TIMING) $(LDFLAGS) $(NVCCFLAGS) $(LDLIBS) -o $@ $(COMMON_SOURCES) $(MANUAL_CUDA_SOURCES)  -arch sm_11 
 
-	
+$(TARGET)-cuda-manual : $(COMMON_INCLUDES) $(COMMON_SOURCES) $(MANUAL_CUDA_SOURCES) $(GRAPHICS_OBJ)
+	# Parallelize and build a CUDA version:
+	$(NVCC) $(CPPFLAGS) $(GPU_TIMING) $(LDFLAGS) $(NVCCFLAGS) $(LDLIBS) -o $@ $(COMMON_SOURCES) $(MANUAL_CUDA_SOURCES)

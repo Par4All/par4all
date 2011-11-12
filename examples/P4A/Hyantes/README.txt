@@ -29,9 +29,9 @@ Here we present 3 different executions of the same C sequential code:
 
 You need to have gnuplot installed to be able to display the results.
 
-See ../README.txt to get the generic commands to parallelize, build and execute 
-this example. More commands allowing to display the computation results using 
-gnuplot, are the following:
+See ../README.txt to get the generic commands to parallelize, build and
+execute this example. More commands allowing to display the computation
+results using gnuplot, are the following:
 
 For the sequential execution
 
@@ -52,15 +52,8 @@ For an OpenMP parallel emulation of a GPU-like accelerator (useful for
 debugging, without any GPU):
 
   make display_accel : build first if needed, run if needed, then display
-  		the output of the accelerator OpenMP parallel emulation 
+  		the output of the accelerator OpenMP parallel emulation
 		version with gnuplot
-
-You can set the P4A_OPTIONS variable to pass some options to p4a.
-
-  For example, globally with an:
-  export P4A_OPTIONS='--nvcc-flags="-gencode arch=compute_20,code=sm_20"'
-  or locally with:
-  make P4A_OPTIONS='--nvcc-flags="-gencode arch=compute_20,code=sm_20"' run_cuda
 
 For the OpenCL parallel execution on nVidia GPU:
 
@@ -69,16 +62,20 @@ For the OpenCL parallel execution on nVidia GPU:
 
 For a full demo:
 
-  make demo : to chain make display_seq, display_openmp, display_cuda, 
+  make demo : to chain make display_seq, display_openmp, display_cuda,
   		display_accel-openmp, display_opencl
 
 
 To run this example on GPU that does not support double precision, you
-should compile it with make USE_FLOAT=1 or the results are just garbage
-(because if nvcc has a single precision fall-back, the communication
-correctly computed by Par4All are still in... double). Of course the
-results are slightly different in single precision compared to double
-precision.
+should compile it with
+make USE_FLOAT=1 P4A_OPTIONS='--cuda-cc=1.1' ...
+or the results are just garbage (because if nvcc has a single precision
+fall-back, the communication correctly computed by Par4All are still
+in... double). Of course the results are slightly different in single
+precision compared to double precision.
+
+
+
 
 Some results:
 
@@ -107,5 +104,10 @@ Some results:
   - OpenMP parallel execution time on CPUs: 18.9s, speed-up: 2.01
 
   - CUDA parallel execution time on GPU: 1.57s, speed-up: 24.2
-  
-  
+
+
+
+### Local Variables:
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### End:

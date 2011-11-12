@@ -55,8 +55,8 @@ def add_own_options(parser):
         help = "Enable CUDA generation. Implies --accel.")
 
     proc_group.add_option("--opencl", action = "store_true", default = False,
-        help = "Enable OPENCL generation. Implies --accel.")
-        
+        help = "Enable OpenCL generation. Implies --accel.")
+
     proc_group.add_option("--openmp", "-O", action = "store_true", default = False,
         help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All Accel run-time calls and memory transfers with OpenMP implementation instead of native shared-memory OpenMP output. If --cuda is not specified, this option is set by default.")
 
@@ -79,10 +79,10 @@ def add_own_options(parser):
         help = "Use atomic operations for parallelizing reductions on GPU (experimental).")
 
     proc_group.add_option("--pocc", action = "store_true", default = False,
-        help = "Use PoCC to optimize loop nest (experimental).")
+        help = "Use PoCC to optimize loop nest (experimental). PoCC has to be already installed on your system. See pocc.sf.net, the Polyhedral Compiler Collection")
 
     proc_group.add_option("--cuda-cc", action = "store", default = "2.0",
-        help = "Compute capabilities of Cuda target (default is 2.0)")
+        help = "Compute capabilities of CUDA target (default is 2.0). For example if you have a message like 'P4A CUDA kernel execution failed : invalid device function' at execution time, the generated code may be incompatible with your GPU and you have to use this option to select the good architecture version.")
 
     proc_group.add_option("--select-modules", metavar = "REGEXP", default = None,
         help = "Process only the modules (functions and subroutines) whith names matching the regular expression. For example '^saxpy$|dgemm\' will keep only functions or procedures which name is exactly saxpy or contains \"dgemm\". For more information about regular expressions, look at the section 're' of the Python library reference for example. In Fortran, the regex should match uppercase names. Be careful to escape special characters from the shell. Simple quotes are a good way to go for it.")
@@ -361,7 +361,7 @@ def main():
         elif options.cuda_cc == "2.0":
             options.cuda_cc=2
         else:
-            p4a_util.die("Unknow cuda compute capability requested : '" + options.cuda_cc + "' (allowed : 1.0 1.1 1.2 1.3 2.0)")            
+            p4a_util.die("Unknow cuda compute capability requested : '" + options.cuda_cc + "' (allowed : 1.0 1.1 1.2 1.3 2.0)")
 
         if options.simple and (options.cuda or options.opencl or options.openmp or options.scmp):
             p4a_util.die("Cannot combine --simple with --cuda and/or --openmp and/or --scmp  and/or --opencl")
@@ -498,7 +498,7 @@ def main():
             accel_openmp = options.accel,
             icc = options.icc,
             cuda = options.cuda,
-            opencl=options.opencl,            
+            opencl=options.opencl,
             atomic = options.atomic,
             com_optimization = options.com_optimization,
             cuda_cc = options.cuda_cc,
@@ -561,10 +561,10 @@ def main():
             input.brokers=','.join(options.stubs_broker)
 
 
-            
+
             # Pips phases to be applied can be specified by
             # several options or by separating phase names by ","
-            # Concatenate all the phases found in each option:            
+            # Concatenate all the phases found in each option:
             for phases in options.apply_before_parallelization:
                 input.apply_phases['abp'] += phases.split(",")
             for phases in options.apply_after_parallelization:
@@ -574,7 +574,7 @@ def main():
             for phases in options.apply_kernel_launcher_gpuify:
                 input.apply_phases['aklg'] += phases.split(",")
             for phases in options.apply_wrapper_gpuify:
-                input.apply_phases['awg'] += phases.split(",")                              
+                input.apply_phases['awg'] += phases.split(",")
             for phases in options.apply_after_gpuify:
                 input.apply_phases['aag'] += phases.split(",")
             for phases in options.apply_before_ompify:
@@ -724,7 +724,7 @@ def main():
                 builder.cmake_write(project_name, all_buildable_files + header_files,
                     output_files, extra_obj = options.extra_obj, dir = options.cmake_dir)
             if options.cmake_gen or options.cmake_build:
-                builder.cmake_gen(dir = options.cmake_dir, 
+                builder.cmake_gen(dir = options.cmake_dir,
                     cmake_flags = options.cmake_flags, build = options.cmake_build)
             return
 
