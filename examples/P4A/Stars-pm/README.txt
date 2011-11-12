@@ -1,5 +1,6 @@
-Stars-pm is a particle-mesh N-body cosmological simulation, written by
-Dominique Aubert and Mehdi Amini.
+Stars-PM is a particle-mesh N-body cosmological simulation, written by
+Dominique Aubert and Mehdi Amini from Observatoire Astronomique de
+Strasbourg.
 
 Here we present 5 different executions of the same C sequential code:
 
@@ -17,110 +18,128 @@ Here we present 5 different executions of the same C sequential code:
 the same as the previous one but with the optimization of communication
 between host and GPU.
 
-- the manually converted in CUDA code. 
+- the manually converted in CUDA code.
 
-The CUDA versions use atomic operations and require a GPU with compute 
-capability > 1.1. Moreover Stars-pm CUDA version make use of Fermi 
+The CUDA versions use atomic operations and require a GPU with compute
+capability > 1.1. Moreover Stars-pm CUDA version make use of Fermi
 features and is not optimized for legacy GPU.
 
 You need to have the fftw3f library installed (the libfftw3-dev package on
 Debian/Ubuntu) to be able to link the code, and optionally OpenGL and/or
 GTK for visualization. You also need a recent CUDA SDK for CUDA build.
 
-See ../README.txt to get the generic commands to parallelize, build and execute 
-this example. More commands allowing to display the computation results using 
-gtk or OpenGL, are the following:
+See ../README.txt to get the generic commands to parallelize, build and
+execute this example. More commands allowing to display the computation
+results using gtk or OpenGL, are the following:
+
 
 For the sequential execution
-  
-  make seq_gtk : build the sequential program with using gtk for visualization 
-  
-  make run_seq_gtk : build first if needed, then run the sequential program with 
-				gtk visualization				
-  
-  make seq_opengl : build the sequential program with using OpenGL for visualization  
-  
-  make run_seq_opengl : build first if needed, then run the sequential program with 
-				OpenGL visualization 
+
+  make seq_gtk : build the sequential program with using gtk for
+  visualization
+
+  make run_seq_gtk : build first if needed, then run the sequential
+  program with gtk visualization
+
+  make seq_opengl : build the sequential program with using OpenGL for
+  visualization
+
+  make run_seq_opengl : build first if needed, then run the sequential
+  program with OpenGL visualization
+
 
 For the OpenMP parallel execution on multi-cores:
-  
-  make openmp_gtk : parallelize the code to OpenMP sources and build the parallel 
-				executable code which uses gtk for visualization 
-  
-  make run_openmp_gtk : build first if needed, then run the parallel program with 
-				gtk visualization
-				
-  make openmp_opengl : parallelize the code to OpenMP sources and build the parallel 
-				executable code which uses OpenGL for visualization
-  
-  make run_openmp_opengl : build first if needed, then run the OpenMP program with 
-				OpenGL visualization
+
+  make openmp_gtk : parallelize the code to OpenMP sources and build the
+  parallel executable code which uses gtk for visualization
+
+  make run_openmp_gtk : build first if needed, then run the parallel
+  program with gtk visualization
+
+  make openmp_opengl : parallelize the code to OpenMP sources and build
+  the parallel executable code which uses OpenGL for
+  visualization
+
+  make run_openmp_opengl : build first if needed, then run the OpenMP
+  program with OpenGL visualization
+
 
 For the CUDA parallel execution on nVidia GPU:
 
-  make cuda_gtk : parallelize the code to CUDA sources and build the parallel 
-				executable code which uses gtk for visualization
-  
-  make run_cuda_gtk : build first if needed, then run the parallel program with 
-				gtk visualization
-				
-  make cuda_opengl : parallelize the code to CUDA sources and build the parallel 
-				executable code which uses OpenGL for visualization
-  
-  make run_cuda_opengl : build first if needed, then run the CUDA parallel program with 
-				OpenGL visualization
+  make cuda_gtk : parallelize the code to CUDA sources and build the
+  parallel executable code which uses gtk for visualization
+
+  make run_cuda_gtk : build first if needed, then run the parallel program
+  with gtk visualization
+
+  make cuda_opengl : parallelize the code to CUDA sources and build the
+  parallel executable code which uses OpenGL for
+  visualization
+
+  make run_cuda_opengl : build first if needed, then run the CUDA parallel
+  program with OpenGL visualization
+
 
 For the CUDA optimized and parallel execution on nVidia GPU:
 
-  make cuda-opt_gtk : parallelize the code to CUDA optimized sources and build the parallel 
-			executable code which uses gtk for visualization
-  
-  make run_cuda-opt_gtk : build first if needed, then run the parallel program with 
-				gtk visualization
-				
-  make cuda-opt_opengl : parallelize the code to CUDA optimized sources and build the parallel 
-				executable code which uses OpenGL for visualization
-  
-  make run_cuda-opt_opengl : build first if needed, then run the optimized CUDA parallel 
-				program with OpenGL visualization
-				
+  make cuda-opt_gtk : parallelize the code to CUDA optimized sources and
+  build the parallel executable code which uses gtk for
+  visualization
+
+  make run_cuda-opt_gtk : build first if needed, then run the parallel
+  program with gtk visualization
+
+  make cuda-opt_opengl : parallelize the code to CUDA optimized sources
+  and build the parallel executable code which uses OpenGL
+  for visualization
+
+  make run_cuda-opt_opengl : build first if needed, then run the optimized
+  CUDA parallel program with OpenGL visualization
+
+
 For an OpenMP parallel emulation of a GPU-like accelerator (useful for
 debugging, without any GPU):
 
-  make accel-openmp_gtk : parallelize the code to GPU-like OpenMP sources and build the parallel 
-				binary code which uses gtk for visualization
-  
-  make run_accel-openmp_gtk : build first if needed, then run the parallel program with 
-				gtk visualization
-				
-  make accel-openmp_opengl : parallelize the code to CUDA sources and build the parallel 
-				executable code which uses OpenGL for visualization
-  
-  make run_accel-openmp_opengl : build first if needed, then run the parallel program with 
-				OpenGL visualization
+  make accel-openmp_gtk : parallelize the code to GPU-like OpenMP sources
+  and build the parallel binary code which uses gtk for visualization
+
+  make run_accel-openmp_gtk : build first if needed, then run the parallel
+  program with gtk visualization
+
+  make accel-openmp_opengl : parallelize the code to CUDA sources and
+  build the parallel executable code which uses OpenGL for
+  visualization
+
+  make run_accel-openmp_opengl : build first if needed, then run the
+  parallel program with OpenGL visualization
+
 
 For the OpenCL parallel execution on nVidia GPU:
 
-  make opencl_gtk : parallelize the code to OpenCL sources and build the parallel 
-				binary code which uses gtk for visualization
-  
-  make run_opencl_gtk : build first if needed, then run the parallel program with 
-				gtk visualization
-				
-  make opencl_opengl : parallelize the code to OpenCL sources and build the parallel 
-				executable code which uses OpenGL for visualization
-  
-  make run_opencl_opengl : build first if needed, then run the OpenCL parallel program with 
-				OpenGL visualization
-				
+  make opencl_gtk : parallelize the code to OpenCL sources and build the
+  parallel binary code which uses gtk for visualization
+
+  make run_opencl_gtk : build first if needed, then run the parallel
+  program with gtk visualization
+
+  make opencl_opengl : parallelize the code to OpenCL sources and build
+  the parallel executable code which uses OpenGL for
+  visualization
+
+  make run_opencl_opengl : build first if needed, then run the OpenCL
+  parallel program with OpenGL visualization
+
+
 For manually written CUDA version:
+
   make cuda-manual : compile the manual CUDA codes using nvcc
 
-By default a full demo uses gtk to display the output, to display all demo using OpenGL:
 
-  make demo_opengl : to run all seq, OpenMP, CUDA, optimized CUDA, 
-				OpenMP GPU emulator and OpenCL and to display using OpenGL
+By default a full demo uses gtk to display the output, to display all demo
+using OpenGL:
+
+  make demo_opengl : to run all seq, OpenMP, CUDA, optimized CUDA, OpenMP
+  GPU emulator and OpenCL and to display using OpenGL
 
 Make sure to run "make clean" before running a demo.
 
@@ -131,8 +150,18 @@ You can set the P4A_OPTIONS variable to pass some options to p4a.
   or locally with:
   make P4A_OPTIONS='--nvcc-flags="-G"' run_cuda
 
-You can then execute the produced binary using files in "data/". There's bench
-for 3 size of data (32,64, and 128). Default size if 128, the others can be obtained
-by adding SIZE=32 or SIZE=64 to the makefile command line.
+
+You can then execute the produced binary using files in "data/". There's
+bench for 3 size of data (32,64, and 128). Default size if 128, the others
+can be obtained by adding SIZE=32 or SIZE=64 to the make command line.
 
 Have a look at *.sh file in current directory for example.
+
+
+
+
+
+### Local Variables:
+### mode: flyspell
+### ispell-local-dictionary: "american"
+### End:
