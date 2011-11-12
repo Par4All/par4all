@@ -46,7 +46,9 @@ local-clean:
 	mv $*-crop.pdf $@
 
 # Add the dependence on some automatically generated help:
-par4all_user_guide.tex: p4a-help.tex ../figures/p4a_work_flow.pdf
+# The .pdf figure is for pdfLaTeX but the .eps is for LaTeX4HT.
+par4all_user_guide.tex: p4a-help.tex ../figures/p4a_work_flow.pdf  ../figures/p4a_work_flow.eps
+
 
 # generate .eps from svg
 %.eps: %.svg
