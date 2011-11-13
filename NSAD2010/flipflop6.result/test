@@ -21,7 +21,8 @@ int main()
    t = 0;
 
 //  T(i,new,old,t) {new#init==1, old#init==0, t#init==0, 0<=new,
-//    new<=1, 1<=new+t, 0<=old, old<=1, old<=t, 0<=t, t<=999}
+//    new<=1, 1<=new+t, new<=t+1, 0<=old, old<=1, 0<=old+t, old<=t,
+//    t<=999}
 
    while (t<1000) {
 
@@ -29,15 +30,17 @@ int main()
 
       for(i = 0; i <= 9; i += 1)
 
-//  T() {0<=i, i<=9, t<=999}
+//  T() {0<=i, i<=9, 0<=new, new<=1, 0<=old, old<=1, t<=999}
 
          x[new][i] = g(x[old][i]);
 
-//  T(new) {i==10, 0<=new, new<=1, t<=999}
+//  T(new) {i==10, 0<=new, new<=1, 0<=new#init, new#init<=1, 0<=old,
+//    old<=1, t<=999}
 
       new = (new+1)%2;
 
-//  T(old) {i==10, 0<=new, new<=1, 0<=old, old<=1, t<=999}
+//  T(old) {i==10, 0<=new, new<=1, 0<=old, old<=1, 0<=old#init,
+//    old#init<=1, t<=999}
 
       old = (old+1)%2;
 

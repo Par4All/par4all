@@ -4,6 +4,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create flipflop6 flipflop6.c
 
+setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
