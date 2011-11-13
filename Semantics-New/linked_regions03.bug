@@ -1,1 +1,1 @@
-x0 should be bounded. problem with multiplication interpretation
+the loop region should not be empty; since we are in Semantics-New, we could simply drop the print-out of the regions in linked_regions03.tpips; this is dealt with by Betrice in Regions.
