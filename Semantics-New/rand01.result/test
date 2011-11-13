@@ -2,15 +2,19 @@
 TRANSFORMERS
 
 
-//  T() {}
+//  T(rand01) {rand01==0}
 
 int rand01()
 {
 
 //  T() {}
 
-   // Use to make transformers aborting
+   // Used to make transformers aborting
    rand();
+
+//  T(rand01) {rand01==0}
+
+   return 0;
 }
 
 PRECONDITIONS
@@ -23,11 +27,22 @@ int rand01()
 
 //  P() {}
 
-   // Use to make transformers aborting
+   // Used to make transformers aborting
    rand();
+
+//  P() {}
+
+   return 0;
 }
 
 WARNINGS
 
+COMPILATION_UNIT_PARSER[rand01!] (c_parse) comment "
+/* A `sigset_t' has a bit for each signal.  */
+
+
+
+
+" is lost
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning rand01 instead
 TRANSFORMERS_INTER_FULL[rand01] (intrinsic_to_transformer) Value returned by intrinsic "rand" is ignored.
