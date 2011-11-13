@@ -31,7 +31,7 @@ C
       IF (IS.EQ.0) GOTO 99999                                           0014
 
 C  T(K,L,M1,M2,MX,N,N1,N2) {L==1, M==M2+2, M1==2, N2==4, 0<=IS+1,
-C    IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, M<=N1+1, 2M<=N1+4, 0<=MX,
+C    IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, M<=N1+1, 2M<=N1+4, 0<=MX+63,
 C    MX<=63, 32<=N, N<=64, 8<=N1, N1<=16, 1<=NQ, NQ<=64}
 
 C (22,1)
@@ -45,24 +45,24 @@ C   Check if input parameters are invalid.
 C
       K = U(1)                                                          0047
 
-C  T(MX) {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C  T(MX) {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,3)
       MX = MOD(K, 64)                                                   0048
 
-C  T() {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C  T() {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,4)
       IF (IS.NE.1.AND.IS.NE.-1.OR.M.LT.1.OR.M.GT.MX) THEN               0049
 
 C  T() {0<=IS+1, IS<=1, MX<=59IS+M+58, 59IS+MX<=M+58, MX<=58IS+63,
-C    58IS+MX<=63, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    58IS+MX<=63, 5<=M, M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,5)
 C        BEGIN BLOCK
 
 C  T() {0<=IS+1, IS<=1, MX<=59IS+M+58, 59IS+MX<=M+58, MX<=58IS+63,
-C    58IS+MX<=63, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    58IS+MX<=63, 5<=M, M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,6)
 C       WRITE (6, 1)  IS, M, MX
@@ -72,7 +72,7 @@ C       STOP
 C        END BLOCK
       ENDIF
 
-C  T(N) {0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63,
+C  T(N) {0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX+63, MX<=63,
 C    32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,9)
@@ -87,7 +87,7 @@ C     probably be limited to 2.
 C
       N = 2**M                                                          0065
 
-C  T(M1) {M1==2, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX,
+C  T(M1) {M1==2, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX+63,
 C    MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,10)
@@ -95,26 +95,26 @@ C      M1 = MIN (M / 2, 6)
       M1 = MIN(M/2, 2)                                                  0067
 
 C  T(M2) {M==M2+2, M1==2, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N,
-C    0<=MX, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    0<=MX+63, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,11)
       M2 = M-M1                                                         0068
 
 C  T(N2) {M==M2+2, M1==2, N2==4, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N,
-C    2M<=N, 0<=MX, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    2M<=N, 0<=MX+63, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,12)
       N2 = 2**M1                                                        0069
 
 C  T(N1) {M==M2+2, M1==2, N2==4, 0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N,
-C    2M<=N, M<=N1+1, 2M<=N1+4, 0<=MX, MX<=63, 32<=N, N<=64, 8<=N1,
+C    2M<=N, M<=N1+1, 2M<=N1+4, 0<=MX+63, MX<=63, 32<=N, N<=64, 8<=N1,
 C    N1<=16, 1<=NQ, NQ<=64}
 
 C (22,13)
       N1 = 2**M2                                                        0070
 
 C  T(L) {L==1, M==M2+2, M1==2, N2==4, 0<=IS+1, IS<=1, 5<=M, M<=6,
-C    M+1<=N, 2M<=N, M<=N1+1, 2M<=N1+4, 0<=MX, MX<=63, 32<=N, N<=64,
+C    M+1<=N, 2M<=N, M<=N1+1, 2M<=N1+4, 0<=MX+63, MX<=63, 32<=N, N<=64,
 C    8<=N1, N1<=16, 1<=NQ, NQ<=64}
 
 C (22,14)
@@ -540,21 +540,21 @@ C (22,3)
       MX = MOD(K, 64)                                                   0048
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1, 5<=M,
-C    M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,4)
       IF (IS.NE.1.AND.IS.NE.-1.OR.M.LT.1.OR.M.GT.MX) THEN               0049
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1,
 C    MX<=59IS+M+58, 59IS+MX<=M+58, MX<=58IS+63, 58IS+MX<=63, 5<=M,
-C    M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,5)
 C        BEGIN BLOCK
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1,
 C    MX<=59IS+M+58, 59IS+MX<=M+58, MX<=58IS+63, 58IS+MX<=63, 5<=M,
-C    M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,6)
 C       WRITE (6, 1)  IS, M, MX
@@ -565,7 +565,7 @@ C        END BLOCK
       ENDIF
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1, 5<=M,
-C    M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+C    M<=6, 0<=MX+63, MX<=63, 1<=NQ, NQ<=64}
 
 C (22,9)
 C>> A normal call to CFFTZ starts here.  M1 is the number of the first
@@ -580,36 +580,37 @@ C
       N = 2**M                                                          0065
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {0<=IS+1, IS<=1, 5<=M,
-C    M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63, 32<=N, N<=64, 1<=NQ, NQ<=64}
+C    M<=6, M+1<=N, 2M<=N, 0<=MX+63, MX<=63, 32<=N, N<=64, 1<=NQ,
+C    NQ<=64}
 
 C (22,10)
 C      M1 = MIN (M / 2, 6)
       M1 = MIN(M/2, 2)                                                  0067
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {M1==2, 0<=IS+1, IS<=1,
-C    5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63, 32<=N, N<=64, 1<=NQ,
+C    5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX+63, MX<=63, 32<=N, N<=64, 1<=NQ,
 C    NQ<=64}
 
 C (22,11)
       M2 = M-M1                                                         0068
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {M==M2+2, M1==2, 0<=IS+1,
-C    IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63, 32<=N, N<=64,
+C    IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX+63, MX<=63, 32<=N, N<=64,
 C    1<=NQ, NQ<=64}
 
 C (22,12)
       N2 = 2**M1                                                        0069
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {M==M2+2, M1==2, N2==4,
-C    0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX, MX<=63, 32<=N,
-C    N<=64, 1<=NQ, NQ<=64}
+C    0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, 0<=MX+63, MX<=63,
+C    32<=N, N<=64, 1<=NQ, NQ<=64}
 
 C (22,13)
       N1 = 2**M2                                                        0070
 
 C  P(I,J,K,KN,KU,L,LN,M1,M2,MX,N,N1,N2,NU) {M==M2+2, M1==2, N2==4,
 C    0<=IS+1, IS<=1, 5<=M, M<=6, M+1<=N, 2M<=N, M<=N1+1, 2M<=N1+4,
-C    0<=MX, MX<=63, 32<=N, N<=64, 8<=N1, N1<=16, 1<=NQ, NQ<=64}
+C    0<=MX+63, MX<=63, 32<=N, N<=64, 8<=N1, N1<=16, 1<=NQ, NQ<=64}
 
 C (22,14)
       L = 1                                                             0074
