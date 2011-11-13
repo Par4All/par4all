@@ -1,16 +1,29 @@
 delete mm03
 
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
 # take array bounds into account to keep information lost with MOD
 set REGIONS_WITH_ARRAY_BOUNDS TRUE
 
 create mm03 mm03.f
 
 module SAXPY
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[SAXPY]
+quit
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[SAXPY]
+
 activate MUST_REGIONS # MUST regions
 activate PRINT_CODE_REGIONS # Statements & Regions
 display PRINTED_FILE[SAXPY]
 
 module MM03
+
 display PRINTED_FILE[MM03]  # Statements & Regions
 
 close
