@@ -1,5 +1,8 @@
 /* bug seen in Transformations/eval.c: how do we guess effects on
-   Fortran parameters? How dowe hanfle C differently from Fortran? */
+ * Fortran parameters? How do we hanfle C differently from Fortran?
+ *
+ * It turns out that modulo seems to be the same for C and Fortran.
+ */
 
 #include <stdio.h>
 
