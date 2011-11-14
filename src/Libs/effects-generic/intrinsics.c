@@ -1840,9 +1840,9 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	 ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
 	{
 	  // The output is written to stdout
-	  entity std_ent =  local_name_to_top_level_entity("stdout");
+	  entity std_ent =  get_stdout_entity();
 	  if (entity_undefined_p(std_ent))
-	    pips_user_error("stdout is not defined: check if \"stdio.h\""
+	    pips_user_irrecoverable_error("stdout is not defined: check if \"stdio.h\""
 			    " is included)\n");
 	  else
 	    std_ref = make_reference(std_ent, NIL);
@@ -1859,9 +1859,9 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	       || ENTITY_GETCHAR_P(e))
 	{
 	  //The input is obtained from stdin
-	  entity std_ent =  local_name_to_top_level_entity("stdin");
+	  entity std_ent =  get_stdin_entity();
 	  if (entity_undefined_p(std_ent))
-	    pips_user_error("stdin is not defined (check if <stdio.h> is included)\n");
+	    pips_user_irrecoverable_error("stdin is not defined (check if <stdio.h> is included)\n");
 	  else
 	    std_ref = make_reference(std_ent, NIL);
 
@@ -1873,9 +1873,9 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	}
       else if (ENTITY_PERROR_P(e))
 	{
-	  entity std_ent =  local_name_to_top_level_entity("stderr");
+	  entity std_ent =  get_stderr_entity();
 	  if (entity_undefined_p(std_ent))
-	    pips_user_error("stderr is not defined (check if <stdio.h> is included)\n");
+	    pips_user_irrecoverable_error("stderr is not defined (check if <stdio.h> is included)\n");
 	  else
 	    std_ref = make_reference(std_ent, NIL);
 

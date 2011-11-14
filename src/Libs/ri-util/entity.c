@@ -73,9 +73,9 @@ void set_static_entities()
 {
   if (!static_entities_initialized_p)
     {
-      stdin_ent = FindOrCreateTopLevelEntity("stdin");
-      stdout_ent = FindOrCreateTopLevelEntity("stdout");
-      stderr_ent = FindOrCreateTopLevelEntity("stderr");
+      stdin_ent = FindEntity(TOP_LEVEL_MODULE_NAME, "stdin");
+      stdout_ent = FindEntity(TOP_LEVEL_MODULE_NAME, "stdout");
+      stderr_ent = FindEntity(TOP_LEVEL_MODULE_NAME, "stderr");
 
       rand_gen_ent  = FindOrCreateEntity(RAND_EFFECTS_PACKAGE_NAME,
 					 RAND_GEN_EFFECTS_NAME);
