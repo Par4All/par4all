@@ -39,7 +39,7 @@
 
    * Cope with in-lining of functions with lacking return
 
-   * Improved scalarization
+   * New quick scalarization phase
 
    * Improved variable localization/privatization
 
