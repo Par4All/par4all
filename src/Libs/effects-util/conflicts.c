@@ -922,20 +922,31 @@ bool first_effect_certainly_includes_second_effect_p(effect eff1, effect eff2)
 {
   bool eff1_certainly_includes_eff2_p = false; /* safe result */
 
-  if (   effect_scalar_p(eff2)
-      && first_cell_certainly_includes_second_cell_p(effect_cell(eff1), effect_cell(eff2)))
+  if ( effect_exact_p(eff1) && effect_scalar_p(eff1)
+       && effect_scalar_p(eff2)
+       && first_cell_certainly_includes_second_cell_p(effect_cell(eff1), effect_cell(eff2)))
     {
-      pips_assert("first_effect_may_includes_second_effect_p was called before",first_effect_may_includes_second_effect_p(eff1));
       eff1_certainly_includes_eff2_p = true;
     }
 
   return eff1_certainly_includes_eff2_p;
 }
 
-// verify the predicate over eff1 before calling first_effect_certainly_includes_second_effect_p
-bool first_effect_may_includes_second_effect_p(effect eff1) {
-    return effect_exact_p(eff1) &&  effect_scalar_p(eff1) ;
+bool first_exact_scalar_effect_certainly_includes_second_effect_p(effect eff1, effect eff2)
+{
+  bool eff1_certainly_includes_eff2_p = false; /* safe result */
+
+  if ( effect_scalar_p(eff2)
+      && first_cell_certainly_includes_second_cell_p(effect_cell(eff1), effect_cell(eff2)))
+    {
+      pips_assert("the first effect is an exact and scalar effect",
+		  effect_exact_p(eff1) && effect_scalar_p(eff1));
+      eff1_certainly_includes_eff2_p = true;
+    }
+
+  return eff1_certainly_includes_eff2_p;
 }
+
 
 /* misc functions */
 
