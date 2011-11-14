@@ -34,7 +34,7 @@ some parameters to get better performance on a given application.
 
 More on Par4All features:
 
-- Par4All support almost complete C99;
+- Par4All supports almost complete C99;
 
 - Fortran 77 with some extensions is to be used for production. Work on
   Fortran95 is still in progress;
@@ -79,7 +79,7 @@ HPC Project
 92360 Meudon La Forêt
 FRANCE
 Phone: +33 1 46 01 03 27
-Fax: +33 1 46 01 03 46
+Fax: +33 1 46 01 05 46
 
 Par4All support : support@par4all.org
 

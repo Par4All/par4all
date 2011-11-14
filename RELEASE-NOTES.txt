@@ -80,22 +80,6 @@ Additions
   - Can use PoCC to optimize some loop nests
 
 
-Removals
---------
-
-
-Changes
--------
-
-
-Fixes
------
-
-
-Special features
-----------------
-
-
 Knowing issues
 --------------
 

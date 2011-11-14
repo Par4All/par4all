@@ -13,7 +13,7 @@ influence.
 For more information: http://hyantes.gforge.inria.fr
 
 
-Here we present 3 different executions of the same C sequential code:
+Here we present 5 different executions of the same C sequential code:
 
 - sequential execution
 
@@ -22,6 +22,12 @@ Here we present 3 different executions of the same C sequential code:
 
 - automatic parallelization with p4a --cuda for parallel execution on
   nVidia GPU
+
+- automatic parallelization with p4a --accel for an OpenMP parallel 
+  emulation of a GPU-like accelerator
+
+- automatic parallelization with p4a --opencl the OpenCL parallel 
+  execution on nVidia GPU
 
 You need to have gnuplot installed to be able to display the results.
 
