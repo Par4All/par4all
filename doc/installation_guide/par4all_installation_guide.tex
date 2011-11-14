@@ -153,8 +153,9 @@ environment variables set:
 This section represents different ways to install \Apfa.
 
 The installation is done into \texttt{/usr/local/par4all}. If you want \Apfa
-installed in another location, see the
-section~\ref{sec:installation_options} for the installation from the sources.
+installed in another location, have a loot at the section~\ref{sec:relocation} 
+for a binary installation and at the section~\ref{sec:installation_options} 
+for the installation from the sources.
 
 \subsection{Installation using \protect\Apfa package repository}
 
@@ -267,6 +268,7 @@ according to the OS and version you want, download a \texttt{...\_i686.tar.gz} f
 \item \protect\url{http://download.par4all.org/development/ubuntu/i686}
 \end{itemize}
 
+
 \subsubsection{Installing the distribution}
 
 Once you have downloaded one of these \texttt{.tar.gz} packages from
@@ -283,6 +285,8 @@ location:
 
 Then please go to the section~\ref{sec:testing} to get information on how to set up 
 your environment and to test your installation.
+
+
 
 \subsection{Installation using the sources}
 
@@ -373,6 +377,46 @@ when the \verb|--prefix| directory changes is also recommended
 in order to remove obsolete
 information about the installation directory that may remain in
 the \texttt{build} directory and cause the compilation to fail.
+
+
+\subsection{Relocating binary installation}
+\label{sec:relocation}
+If needed a \Apfa binary installation can be relocated. There are a few ways to relocate it:
+
+\begin{enumerate}
+\item Copy or move all \Apfa binary installation to another directory, for
+  example to copy from \texttt{/usr/local/par4all} to \texttt{/opt}:
+\begin{alltt}
+cp -av \emph{/usr/local/par4all} \emph{/opt}
+\end{alltt}
+
+\item Extract from a Debian package, for example to install
+  \Apfa in \texttt{/opt} directory:
+\begin{alltt}
+sudo dpkg -x par4all-1.1.1-xxx.deb \emph{/opt}
+\end{alltt}
+
+\end{enumerate}
+
+After having installed \Apfa in a new installation directory (not the
+default one), \verb|par4all-rc.sh| should be updated.  \verb|P4A_DIST| and
+\verb|P4A_ROOT| variables in the \verb|par4all-rc.sh| should be changed
+according to this new installation directory.  The following examples are
+for the cases 1 and 2.
+
+Relocation has been done by copying all the binary installation (case 1):
+\begin{alltt}
+P4A_DIST='/opt/par4all'
+P4A_ROOT='/opt/par4all'
+\end{alltt}
+
+Relocation has been done using \texttt{dpkg -x} command (case 2) :
+\begin{alltt}
+P4A_DIST='/opt/usr/local/par4all'
+P4A_ROOT='/opt/usr/local/par4all'
+\end{alltt}
+
+
 
 \subsection{Advanced installation}
 
