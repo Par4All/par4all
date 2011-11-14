@@ -5262,6 +5262,10 @@ CreateIntrinsics()
         {C_WRITE_FUNCTION_NAME,   2,         default_intrinsic_type, 0, 0}, /* returns ssize_t */
         {C_READ_FUNCTION_NAME,    2,         default_intrinsic_type, 0, 0},
         {USLEEP_FUNCTION_NAME,    1,         default_intrinsic_type, 0, 0},
+	{LINK_FUNCTION_NAME,      2,         overloaded_to_integer_type, 0, 0},
+	{SYMLINK_FUNCTION_NAME,   2,         overloaded_to_integer_type, 0, 0},
+	{UNLINK_FUNCTION_NAME,    1,         overloaded_to_integer_type, 0, 0},
+
         /* {FCNTL_FUNCTION_NAME,     (INT_MAX), overloaded_to_integer_type, 0, 0},*/ /* 2 or 3 arguments of various types*/ /* located with fcntl.h */
         {FSYNC_FUNCTION_NAME,     2,         integer_to_integer_type, 0, 0},
         {FDATASYNC_FUNCTION_NAME, 2,         integer_to_integer_type, 0, 0},
@@ -5271,8 +5275,6 @@ CreateIntrinsics()
         {STAT_FUNCTION_NAME,      2,         overloaded_to_integer_type, 0, 0},
         {FSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
         {LSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
-
-
         /*#include <stdlib.h>*/
 
         {ATOF_FUNCTION_NAME, 1, char_pointer_to_double_type, 0, 0},

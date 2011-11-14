@@ -615,8 +615,20 @@ effect regions_must_convex_hull(region r1, region r2)
       {
 	pips_debug(8, "compute the convex hull...\n");
 	sr = region_sc_convex_hull(s1, s2);
+	ifdebug(8)
+	  {
+	    pips_debug(8, "cute convex hull:\n");
+	    sc_syst_debug(sr);
+	  }
+
 	pips_debug(8, "eliminate redudances...\n");
 	sc_nredund(&sr);
+	ifdebug(8)
+	  {
+	    pips_debug(8, "after redundancy elimination:\n");
+	    sc_syst_debug(sr);
+	  }
+
 	UNCATCH(overflow_error);
       }
 

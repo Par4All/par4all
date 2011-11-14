@@ -267,6 +267,9 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {C_CLOSE_FUNCTION_NAME,       "f",       is_action_read, is_approximation_exact},
   {C_WRITE_FUNCTION_NAME,       "frr",     is_action_read, is_approximation_exact},
   {C_READ_FUNCTION_NAME,        "fwn",     is_action_read, is_approximation_exact},
+  {LINK_FUNCTION_NAME,          "r*",      is_action_read, is_approximation_exact},
+  {SYMLINK_FUNCTION_NAME,       "r*",      is_action_read, is_approximation_exact},
+  {UNLINK_FUNCTION_NAME,        "r",       is_action_read, is_approximation_exact},
   {FCNTL_FUNCTION_NAME,         "fnn*",    is_action_read, is_approximation_exact},
   {FSYNC_FUNCTION_NAME,         "f",       is_action_read, is_approximation_exact},
   {FDATASYNC_FUNCTION_NAME,     "f",       is_action_read, is_approximation_exact},
@@ -1202,6 +1205,10 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {C_CLOSE_FUNCTION_NAME,                  unix_io_effects},
   {C_WRITE_FUNCTION_NAME,                  unix_io_effects},
   {C_READ_FUNCTION_NAME,                   unix_io_effects},
+  {LINK_FUNCTION_NAME,                     c_io_effects},
+  {SYMLINK_FUNCTION_NAME,                  c_io_effects},
+  {UNLINK_FUNCTION_NAME,                   c_io_effects},
+
   {FCNTL_FUNCTION_NAME,                    unix_io_effects},
   {FSYNC_FUNCTION_NAME,                    unix_io_effects},
   {FDATASYNC_FUNCTION_NAME,                unix_io_effects},
@@ -1872,15 +1879,16 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	  else
 	    std_ref = make_reference(std_ent, NIL);
 
-	  /* we cannot use STDERR_FILENO because the stderr variable may have been modified by the user */
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
 	    unit = int_to_expression(STDERR_FILENO);
 	  else
+	    /* we cannot use STDERR_FILENO because the stderr variable may have been modified by the user */
 	    unit = make_unbounded_expression();
 	}
 
-      else if(ENTITY_FOPEN_P(e))
-	// the fopen function has the path's file as first argument.
+      else if(ENTITY_FOPEN_P(e) || ENTITY_UNLINK_SYSTEM_P(e) || ENTITY_LINK_SYSTEM_P(e)
+	      || ENTITY_SYMLINK_SYSTEM_P(e))
+	// the fopen and link/unlink functions the path's file as arguments.
 	unit = make_unbounded_expression();
 
       else if(ENTITY_BUFFERIN_P(e) || ENTITY_BUFFEROUT_P(e))
