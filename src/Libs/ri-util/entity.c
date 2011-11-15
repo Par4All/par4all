@@ -1247,6 +1247,11 @@ bool symbolic_entity_p(entity e)
   return (!value_undefined_p(entity_initial(e)) && value_symbolic_p(entity_initial(e)));
 }
 
+bool intrinsic_name_p(const char *local_name) {
+    entity e = FindEntity(TOP_LEVEL_MODULE_NAME, local_name);
+    return !entity_undefined_p(e) && intrinsic_entity_p(e);
+}
+
 /* FI: I do not understand this function name (see next one!). It seems to me
  * that any common or user function or user subroutine would
  * be returned.

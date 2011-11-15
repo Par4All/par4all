@@ -454,9 +454,11 @@ void csplit_copy(const char* module_name,
 
   /* Step 5: Keep track of the new module */
   /* SG hook: do not keep track of module declared inside a header */
-  if(!get_bool_property("IGNORE_FUNCTION_IN_HEADER") || !path_header_p(current_include_file_path)) {
+  if(!get_bool_property("IGNORE_FUNCTION_IN_HEADER")
+          || !path_header_p(current_include_file_path)) {
       fprintf(module_list_file, "%s %s\n", unambiguous_module_name, unambiguous_module_file_name);
   }
+
 
   safe_fclose(mfd, unambiguous_module_file_name);
   free(unambiguous_module_file_name);
@@ -495,10 +497,10 @@ void csplit_reset()
 /** Split a C file into one file per module (function or procedure) plus
 
     @param dir_name the directory name where the input file is to pick
-    @param file_name the the C input file name to split
+    @param file_name the C input file name to split
     @param out file opened to record module and compilation unit names
 
-    @return an error message or NULL if no error has occured.
+    @return an error message or NULL if no error has occurred.
 */
 string  csplit(
 	       char * dir_name,

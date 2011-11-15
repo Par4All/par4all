@@ -4393,7 +4393,7 @@ void register_intrinsic_type_descriptor(IntrinsicDescriptor *p) {
 }
 
 void
-CreateIntrinsics()
+CreateIntrinsics( set module_list )
 {
     /* The table of intrinsic functions. this table is used at the begining
        of linking to create Fortran operators, commands and intrinsic functions.
@@ -5545,7 +5545,8 @@ CreateIntrinsics()
     };
     intrinsic_type_descriptor_mapping=hash_table_make(hash_string,sizeof(IntrinsicTypeDescriptorTable));
     for(IntrinsicDescriptor *p = &IntrinsicTypeDescriptorTable[0];p->name;++p) {
-        register_intrinsic_type_descriptor(p);
+        if(!set_belong_p(module_list,p->name))
+            register_intrinsic_type_descriptor(p);
     }
 }
 
@@ -5558,7 +5559,14 @@ bootstrap(string workspace)
   if (db_resource_p(DBR_ENTITIES, ""))
     pips_internal_error("entities already initialized");
 
-  CreateIntrinsics();
+  /* Create all intrinsics, skipping user-defined one */
+  set module_list = set_make(set_string);
+  gen_array_t ml = db_get_module_list();
+  for(int i=0;i< gen_array_nitems(ml);i++)
+      set_add_element(module_list, module_list, (char*)gen_array_item(ml,i));
+  CreateIntrinsics(module_list);
+  set_free(module_list);
+  gen_array_free(ml);
 
   /* Creates the dynamic and static areas for the super global
    * arrays such as the logical unit array (see below).
