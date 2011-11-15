@@ -47,11 +47,11 @@
 /* Static variable to memoïze some entities for performance reasons */
 /********************************************************************/
 
-/* stdio files entities */
-static entity stdin_ent = entity_undefined;
-static entity stdout_ent = entity_undefined;
-static entity stderr_ent = entity_undefined;
 
+/* variables to store internal entities created at bootstrap
+   beware: these variables are intialized during the parser phase
+*/
+static bool internal_static_entities_initialized_p = false;
 /* effects package entities */
 static entity rand_gen_ent  = entity_undefined;
 static entity malloc_effect_ent  = entity_undefined;
@@ -63,20 +63,39 @@ static entity io_error_luns_ent  = entity_undefined;
 
 /* continue statement */
 static entity continue_ent = entity_undefined;
+
+/* variables to store entities from standard includes */
+/* As they are not created at bootstrap as the internal entities,
+   they cannot be initialized at the same time because the
+   corresponding entities may not have been already created
+*/
+static bool std_static_entities_initialized_p = false;
+/* stdio files entities */
+static entity stdin_ent = entity_undefined;
+static entity stdout_ent = entity_undefined;
+static entity stderr_ent = entity_undefined;
+
 #define STATIC_ENTITY_CACHE_SIZE 128
 static entity *static_entity_cache[STATIC_ENTITY_CACHE_SIZE];
 static size_t static_entity_size=0;
-static bool static_entities_initialized_p = false;
 
 /* beware: cannot be called on creating the database */
-void set_static_entities()
+void set_std_static_entities()
 {
-  if (!static_entities_initialized_p)
+  if (!std_static_entities_initialized_p)
     {
       stdin_ent = FindEntity(TOP_LEVEL_MODULE_NAME, "stdin");
       stdout_ent = FindEntity(TOP_LEVEL_MODULE_NAME, "stdout");
       stderr_ent = FindEntity(TOP_LEVEL_MODULE_NAME, "stderr");
+      std_static_entities_initialized_p = true;
+    }
+}
 
+/* beware: cannot be called on creating the database */
+void set_internal_static_entities()
+{
+  if (!internal_static_entities_initialized_p)
+    {
       rand_gen_ent  = FindOrCreateEntity(RAND_EFFECTS_PACKAGE_NAME,
 					 RAND_GEN_EFFECTS_NAME);
       malloc_effect_ent  = FindOrCreateEntity(MALLOC_EFFECTS_PACKAGE_NAME,
@@ -94,7 +113,7 @@ void set_static_entities()
 
       continue_ent = FindOrCreateTopLevelEntity(CONTINUE_FUNCTION_NAME);
 
-      static_entities_initialized_p = true;
+      internal_static_entities_initialized_p = true;
     }
 }
 
@@ -103,6 +122,7 @@ void reset_static_entities()
   stdin_ent = entity_undefined;
   stdout_ent = entity_undefined;
   stderr_ent = entity_undefined;
+  std_static_entities_initialized_p = false;
 
   rand_gen_ent  = entity_undefined;
   malloc_effect_ent  = entity_undefined;
@@ -116,7 +136,7 @@ void reset_static_entities()
   for(size_t i =0;i< static_entity_size;i++)
       *static_entity_cache[i]=entity_undefined;
   static_entity_size=0;
-  static_entities_initialized_p = false;
+  internal_static_entities_initialized_p = false;
 }
 
 /* add given entity to the set of entities that must reset upon workspace deletion
@@ -1133,26 +1153,26 @@ bool top_level_entity_p(entity e)
    effects of IO statements. */
 bool io_entity_p(entity e)
 {
-  set_static_entities();
+  set_internal_static_entities();
   return (same_entity_p(e, luns_ent) || same_entity_p(e, io_ptr_ent)
 	  || same_entity_p(e, io_eof_ent) || same_entity_p(e, io_error_luns_ent));
 }
 
 bool io_luns_entity_p(entity e)
 {
-  set_static_entities();
+  set_internal_static_entities();
   return (same_entity_p(e, luns_ent));
 }
 
 bool rand_effects_entity_p(entity e)
 {
-  set_static_entities();
+  set_internal_static_entities();
   return (same_entity_p(e, rand_gen_ent));
 }
 
 bool malloc_entity_p(entity e)
 {
-  set_static_entities();
+  set_internal_static_entities();
   return (same_entity_p(e, malloc_effect_ent));
 
 }
@@ -1173,7 +1193,7 @@ bool effects_package_entity_p(entity e)
 
 entity get_stdin_entity()
 {
-  set_static_entities();
+  set_std_static_entities();
   return stdin_ent;
 }
 
@@ -1185,7 +1205,7 @@ bool stdin_entity_p(entity e)
 
 entity get_stdout_entity()
 {
-  set_static_entities();
+  set_std_static_entities();
   return stdout_ent;
 }
 
@@ -1196,7 +1216,7 @@ bool stdout_entity_p(entity e)
 
 entity get_stderr_entity()
 {
-  set_static_entities();
+  set_std_static_entities();
   return stderr_ent;
 }
 
@@ -1208,7 +1228,7 @@ bool stderr_entity_p(entity e)
 
 bool std_file_entity_p(entity e)
 {
-  set_static_entities();
+  set_std_static_entities();
   return(same_entity_p(e, stdin_ent)
 	 || same_entity_p(e, stdout_ent)
 	 || same_entity_p(e, stderr_ent));
@@ -1659,7 +1679,7 @@ bool arithmetic_intrinsic_p(entity e)
 
 entity get_continue_entity()
 {
-  set_static_entities();
+  set_internal_static_entities();
   return continue_ent;
 }
 bool entity_continue_p(entity f)
