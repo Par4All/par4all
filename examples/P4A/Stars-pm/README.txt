@@ -26,7 +26,8 @@ features and is not optimized for legacy GPU.
 
 You need to have the fftw3f library installed (the libfftw3-dev package on
 Debian/Ubuntu) to be able to link the code, and optionally OpenGL and/or
-GTK for visualization. You also need a recent CUDA SDK for CUDA build.
+GTK for visualization. The libgtk2.0-dev package is necessary for 
+GTK visualisation. You also need a recent CUDA SDK for CUDA build.
 
 See ../README.txt to get the generic commands to parallelize, build and
 execute this example. More commands allowing to display the computation

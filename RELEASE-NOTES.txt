@@ -52,7 +52,7 @@ Additions
             ...
         }
 
-    Using ``--c99`` option, ``p4a`` will automatically generates the CUDA code
+    Using ``--c99`` option, ``p4a`` will automatically generate the CUDA code
     in new C89 files (with no VLA but pointers with linearized accesses
     instead) that will be compiled by ``nvcc``. A simple call to each kernel
     will be inserted into the original files ``*.p4a.c`` that can be compiled
@@ -78,22 +78,6 @@ Additions
   - Atomic operations for parallelizing reductions on GPU
 
   - Can use PoCC to optimize some loop nests
-
-
-Removals
---------
-
-
-Changes
--------
-
-
-Fixes
------
-
-
-Special features
-----------------
 
 
 Knowing issues
