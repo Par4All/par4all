@@ -1,0 +1,65 @@
+delete overload01
+
+create overload01 overload01.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo Parsed printed file for "strdup"
+echo
+
+display PARSED_PRINTED_FILE[strdup]
+
+echo
+echo Proper effetcs for "strdup"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[strdup]
+
+echo
+echo Proper Pointer effetcs for "strdup"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[strdup]
+
+echo
+echo Cumulated effetcs for "strdup"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[strdup]
+
+echo
+echo Parsed printed file for "overload01!MAX"
+echo
+
+display PARSED_PRINTED_FILE[overload01!MAX]
+
+echo
+echo Proper effetcs for "overload01!MAX"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[overload01!MAX]
+
+echo
+echo Proper Pointer effetcs for "overload01!MAX"
+echo
+
+activate PRINT_CODE_PROPER_POINTER_EFFECTS
+display PRINTED_FILE[overload01!MAX]
+
+echo
+echo Cumulated effetcs for "overload01!MAX"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[overload01!MAX]
+
+
+close
+delete overload01
+quit
+
