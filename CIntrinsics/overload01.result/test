@@ -1,0 +1,107 @@
+
+Parsed printed file for "strdup"
+
+char * strdup(const char *s)
+{
+   size_t len = strlen(s);
+   char *new = malloc(sizeof(char)*(1+len));
+   if (new)
+      strcpy(new, s);
+   return new;
+}
+
+Proper effetcs for "strdup"
+
+char * strdup(const char *s)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: len
+   size_t len = strlen(s);
+//             <    is read   >: len _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: new _MALLOC_EFFECTS:_MALLOC_
+   char *new = malloc(sizeof(char)*(1+len));
+//             <    is read   >: new
+   if (new)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      strcpy(new, s);
+//             <    is read   >: new
+   return new;
+}
+
+Proper Pointer effetcs for "strdup"
+
+char * strdup(const char *s)
+{
+//             <may be read   >: s[*]
+//             <    is read   >: s
+//             <    is written>: len
+   size_t len = strlen(s);
+//             <    is read   >: len _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: new _MALLOC_EFFECTS:_MALLOC_
+   char *new = malloc(sizeof(char)*(1+len));
+//             <    is read   >: new
+   if (new)
+//             <may be read   >: s[*]
+//             <may be written>: new[*]
+//             <    is read   >: new s
+      strcpy(new, s);
+//             <    is read   >: new
+   return new;
+}
+
+Cumulated effetcs for "strdup"
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+char * strdup(const char *s)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: len
+   size_t len = strlen(s);
+//             <    is read   >: len _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: new _MALLOC_EFFECTS:_MALLOC_
+   char *new = malloc(sizeof(char)*(1+len));
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   if (new)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      strcpy(new, s);
+//             <    is read   >: new
+   return new;
+}
+
+Parsed printed file for "overload01!MAX"
+
+static void MAX(int a[1])
+{
+   a[0] = 0;
+}
+
+Proper effetcs for "overload01!MAX"
+
+static void MAX(int a[1])
+{
+//             <    is written>: a[0]
+   a[0] = 0;
+}
+
+Proper Pointer effetcs for "overload01!MAX"
+
+static void MAX(int a[1])
+{
+//             <    is written>: a[0]
+   a[0] = 0;
+}
+
+Cumulated effetcs for "overload01!MAX"
+
+//             <    is written>: a[0]
+static void MAX(int a[1])
+{
+//             <    is written>: a[0]
+   a[0] = 0;
+}
