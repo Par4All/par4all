@@ -1,7 +1,7 @@
 TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 
 default:
-	more $(TOP)/USAGE.txt
+	more $(TOP)/README.txt
 
 all: seq openmp cuda cuda_opt pgi hmpp
 
