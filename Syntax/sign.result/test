@@ -1,5 +1,29 @@
-### stderr
-user warning in MakeCurrentFunction: Intrinsic SIGN redefined.
-This is not supported by PIPS. Please rename SIGN
-user error in MakeCurrentFunction: Parser error between lines 3 and 3
-Name conflict between a subroutine and/or a function and an intrinsic
+C     Bug: an intrinsic is overriden
+C     SG: no longer a bug, PIPS supports this :p
+
+      FUNCTION SIGN(X,Y)
+C
+      X1 = 0.47619                                                      0006
+      Y1 = X1                                                           0007
+      X2 = 0.9523                                                       0008
+      Y2 = X2                                                           0009
+      IREG = 3                                                          0010
+      IF (X.GT.X2.AND.Y.GT.Y1) IREG = 1                                 0011
+      IF (X.GT.X1.AND.X.LE.X2.AND.Y.GT.Y2) IREG = 1                     0012
+      IF (X.GT.X1.AND.X.LE.X2.AND.Y.GT.Y1.AND.Y.LE.Y2) IREG = 2         0013
+      IF (IREG.EQ.1) GOTO 6                                             0014
+      IF (IREG.EQ.2) GOTO 7                                             0014
+      IF (IREG.EQ.3) GOTO 8                                             0014
+C
+6     CONTINUE                                                          0016
+      SIGN = 0.02*2.1**2                                                0017
+      RETURN
+C
+8     CONTINUE                                                          0024
+      SIGN = 0.05*2.1**2                                                0025
+      RETURN
+C
+7     CONTINUE                                                          0020
+      SIGN = 0.03*2.1**2                                                0021
+C
+      END
