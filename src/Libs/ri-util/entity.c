@@ -56,6 +56,7 @@ static bool internal_static_entities_initialized_p = false;
 static entity rand_gen_ent  = entity_undefined;
 static entity malloc_effect_ent  = entity_undefined;
 static entity memmove_effect_ent  = entity_undefined;
+static entity time_effect_ent  = entity_undefined;
 static entity luns_ent  = entity_undefined;
 static entity io_ptr_ent  = entity_undefined;
 static entity io_eof_ent  = entity_undefined;
@@ -102,6 +103,8 @@ void set_internal_static_entities()
 				       MALLOC_EFFECTS_NAME);
       memmove_effect_ent  = FindOrCreateEntity(MEMMOVE_EFFECTS_PACKAGE_NAME,
 					MEMMOVE_EFFECTS_NAME);
+      time_effect_ent  = FindOrCreateEntity(TIME_EFFECTS_PACKAGE_NAME,
+					TIME_EFFECTS_VARIABLE_NAME);
       luns_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
 				     IO_EFFECTS_ARRAY_NAME);
       io_ptr_ent  = FindOrCreateEntity(IO_EFFECTS_PACKAGE_NAME,
@@ -123,6 +126,7 @@ void reset_internal_static_entities()
   rand_gen_ent  = entity_undefined;
   malloc_effect_ent  = entity_undefined;
   memmove_effect_ent  = entity_undefined;
+  time_effect_ent  = entity_undefined;
   luns_ent  = entity_undefined;
   io_ptr_ent  = entity_undefined;
   io_eof_ent  = entity_undefined;
@@ -1193,6 +1197,11 @@ bool memmove_effect_entity_p(entity e) {
   return (same_entity_p(e, memmove_effect_ent));
 }
 
+bool time_effect_entity_p(entity e) {
+  set_internal_static_entities();
+  return (same_entity_p(e, time_effect_ent));
+}
+
 /**
    checks if an entity is an IO_EFFECTS_PACKAGE_NAME, a
    MALLOC_EFFECTS_NAME or a RAND_EFFECTS_PACKAGE_NAME entity. These
@@ -1205,6 +1214,7 @@ bool effects_package_entity_p(entity e)
     bool result = rand_effects_entity_p(e) 
         || malloc_effect_entity_p(e)
         || memmove_effect_entity_p(e)
+        || time_effect_entity_p(e)
         || io_entity_p(e);
     pips_assert("entity kind is consistent", result == ((entity_kind(e) & EFFECTS_PACKAGE) == EFFECTS_PACKAGE));
 #endif
