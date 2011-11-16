@@ -117,12 +117,8 @@ void set_internal_static_entities()
     }
 }
 
-void reset_static_entities()
+void reset_internal_static_entities()
 {
-  stdin_ent = entity_undefined;
-  stdout_ent = entity_undefined;
-  stderr_ent = entity_undefined;
-  std_static_entities_initialized_p = false;
 
   rand_gen_ent  = entity_undefined;
   malloc_effect_ent  = entity_undefined;
@@ -138,6 +134,21 @@ void reset_static_entities()
   static_entity_size=0;
   internal_static_entities_initialized_p = false;
 }
+
+void reset_std_static_entities()
+{
+  stdin_ent = entity_undefined;
+  stdout_ent = entity_undefined;
+  stderr_ent = entity_undefined;
+  std_static_entities_initialized_p = false;
+}
+
+void reset_static_entities()
+{
+  reset_std_static_entities();
+  reset_internal_static_entities();
+}
+
 
 /* add given entity to the set of entities that must reset upon workspace deletion
  * practically, all static entities should be stored that way

@@ -83,6 +83,20 @@
 
 #include "pipsmake.h"
 
+
+void set_current_phase_context(const char* rname, const char* oname)
+{
+  set_pips_current_computation(rname, oname);
+  entity_basic_concrete_types_init();
+  reset_std_static_entities();
+}
+void reset_current_phase_context()
+{
+  reset_pips_current_computation();
+  entity_basic_concrete_types_reset();
+  reset_std_static_entities();
+}
+
 static bool catch_user_error(bool (*f)(const char *), const char* rname, const char* oname)
 {
     bool success = false;
@@ -94,14 +108,11 @@ static bool catch_user_error(bool (*f)(const char *), const char* rname, const c
     }
     TRY
     {
-      set_pips_current_computation(rname, oname);
-      entity_basic_concrete_types_init();
+      set_current_phase_context(rname, oname);
       success = (*f)(oname);
       UNCATCH(any_exception_error);
     }
-
-    reset_pips_current_computation();
-    entity_basic_concrete_types_reset();
+    reset_current_phase_context();
     return success;
 }
 
