@@ -2128,15 +2128,6 @@ list words_brace_expression(expression exp, list pdl)
   return pc;
 }
 
-list words_constructor_expression(expression assignee, expression exp, list pdl) {
-    type t = expression_to_user_type(assignee);
-    list lt = words_type(t,pdl, false);
-    free_type(t);
-    list l = CONS(STRING, strdup("("), lt);
-    l= CHAIN_SWORD(l,")");
-    return gen_nconc(l, words_brace_expression(exp, pdl));
-}
-
 list words_dimensions(list dims, list pdl)
 {
   list pc = NIL;
