@@ -1145,7 +1145,8 @@ expression:
 /* (* We handle GCC constructor expressions *) */
 |   TK_LPAREN type_name TK_RPAREN TK_LBRACE initializer_list_opt TK_RBRACE
 		        {
-			  CParserError("GCC constructor expressions not implemented\n");
+			  /* the pretty printer takes care of pritning this correctly */
+			  $$ = MakeBraceExpression($5);
 			}
 /* (* GCC's address of labels *)  */
 |   TK_AND_AND TK_IDENT

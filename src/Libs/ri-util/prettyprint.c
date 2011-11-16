@@ -1129,9 +1129,10 @@ words_assign_op(call obj,
       /* Brace expressions are not allowed in standard assignments */
       exp = EXPRESSION(CAR(CDR(args)));
       if (ENTITY_ASSIGN_P(call_function(obj))) {
-	if (brace_expression_p(exp))
-	  //pc = gen_nconc(pc,words_brace_expression(exp));
-	  pips_user_error("Brace expressions are not allowed in assignments\n");
+	if (brace_expression_p(exp)) {
+      // use GCC constructor extension */
+	  pc = gen_nconc(pc,words_constructor_expression(EXPRESSION(CAR(args)), exp, pdl));
+    }
 	else {
 	  /* Be careful with expression lists, they may require
            surrounding parentheses. */
