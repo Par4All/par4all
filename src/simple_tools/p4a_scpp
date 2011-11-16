@@ -17,6 +17,7 @@ for arg in $* ; do
 p4a_scpp - P4A Selective C PreProcessor
 usage: p4a_scpp [-h|--help] [cpp flags] <include reg exp> [input_file]
 sample: p4a_scpp -DNDEBUG stdio\\\\.h hello_world.c
+        p4a_scpp stdio\\\\.h /usr/include/stdlib.h | indent -linux
 EOF
 			exit 0
 			;;
