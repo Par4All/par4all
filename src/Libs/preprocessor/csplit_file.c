@@ -453,8 +453,11 @@ void csplit_copy(const char* module_name,
     fprintf(compilation_unit_file, "extern %s;\n", signature);
 
   /* Step 5: Keep track of the new module */
-  /* SG hook: do not keep track of module declared inside a header */
-  if(!get_bool_property("IGNORE_FUNCTION_IN_HEADER")
+  /* SG hook: do not keep track of module declared inside a header
+   * not very reliable in the presence of used inline function in user header,
+   * so left apart as of now
+   */
+  if(true || !get_bool_property("IGNORE_FUNCTION_IN_HEADER")
           || !path_header_p(current_include_file_path)) {
       fprintf(module_list_file, "%s %s\n", unambiguous_module_name, unambiguous_module_file_name);
   }
