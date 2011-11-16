@@ -261,7 +261,7 @@ class p4a_builder:
 
         if openmp:
             # Ask for C99 since PIPS generates C99 code:
-            c_flags.append ("-std=c99")
+            c_flags.append ("-std=gnu99")
             if add_openmp_flag:
                 if icc:
                     c_flags += [ "-openmp" ]
@@ -352,7 +352,7 @@ class p4a_builder:
         # update opencl flags only if something will be built at the end
         if opencl and (self.builder == True):
             self.openclify_flags()
-            c_flags.append ("-std=c99")
+            c_flags.append ("-std=gnu99")
 
     def cu2cpp(self, file, output_file):
         p4a_util.run([ self.nvcc, "--cuda" ] + self.cpp_flags + self.nvcc_flags + [ "-o", output_file, file],
