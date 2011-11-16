@@ -187,16 +187,15 @@ communications and allocation, leading to great performance improvements. This
 options supposes that you make use of static and/or C99 VLA array, it would 
 be broken by \texttt{malloc}'ed arrays in parallel section. For example:
 \begin{verbatim}
-p4a --cuda optimized_example.c -o cuda_optimized_example
+p4a --cuda --com-optimization optimized_example.c -o cuda_optimized_example
 \end{verbatim}
 
 Par4All can also deal with C99 code sources. Indeed \texttt{nvcc} doesn't support the
 following C99 syntax:
 \begin{verbatim}
-        f_type my_function(size_t n, size_t m,
-                           float array[n][m]) {
+f_type my_function(size_t n, size_t m, float array[n][m]) {
             ...
-        }
+}
 \end{verbatim}
 
 Using \texttt{--c99} option, \texttt{p4a} will automatically generate the CUDA code
@@ -216,9 +215,9 @@ generates the executable file \texttt{c99\_example}.
 To generate an \Aopenmp emulation executable of \Agpu-like accelerated
 code (for debugging or if a \Agpu is not available), use:
 \begin{verbatim}
-p4a --accel --openmp example.c -o openmp_example
+p4a --accel --openmp example.c -o accel_openmp_example
 \end{verbatim}
-which produces a \texttt{openmp\_example} binary executable file with its
+which produces a \texttt{accel\_openmp\_example} binary executable file with its
 corresponding \texttt{example.p4a.c} program source. This \Aopenmp
 emulation of \Acuda with memory transfer may be helpful for debugging
 since there is no longer emulation mode in recent versions of \Acuda.
