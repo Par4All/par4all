@@ -1,0 +1,11 @@
+delete global03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create global03 global03.c
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+close
+delete global03
