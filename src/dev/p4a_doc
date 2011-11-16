@@ -2,6 +2,12 @@
 
 # Script to deal with Par4All documentation
 
+# Subdirectory where there is some documentation to build or publish:
+# doc/organization and doc/simple_tools/p4a_article are deprecated now...
+doc_dirs="doc/developer_guide doc/installation_guide doc/organization doc/p4a_coding_rules doc/simple_tools/p4a_article doc/simple_tools/p4a_slides doc/user_guide src/p4a_accel"
+
+
+
 # What to do:
 make_target=""
 
@@ -61,9 +67,6 @@ if (( $verb >= 1)) ; then
     # Put shell tracing on:
     set -vx
 fi
-
-# Subdirectory where there is some documentation to build or publish:
-doc_dirs="doc/organization doc/user_guide doc/simple_tools/p4a_article doc/simple_tools/p4a_slides doc/p4a_coding_rules src/p4a_accel"
 
 
 for d in $doc_dirs; do

@@ -160,42 +160,20 @@ scalar variables.
 
 
 \subsection{Automatic parallelization with CUDA generation}
-\label{sec:autom-parall-with-1}
+\label{sec:autom-parall-with-cuda}
 
 To generate from a C program source a \Acuda program that is also compiled
 into an executable, use:
 \begin{verbatim}
-p4a --cuda example.c -o e
+p4a --cuda example.c -o cuda_example
 \end{verbatim}
 which produces an \texttt{example.p4a.cu} \Acuda program source and an
-\texttt{e} executable that will run on a \Agpu. The \Agpu accelerator
+\texttt{cuda\_example} executable that will run on a \Agpu. The \Agpu accelerator
 support relies on a small \Apfa Accel interface that connects to the
 \Acuda infrastructure. Data-parallel loops are automatically transformed
 into \Acuda kernels that execute on the \Agpu. \emph{Ad
   hoc} communications between the host memory and the \Agpu memory are
 generated to enable kernel execution.
-
-To generate an \Aopenmp emulation executable of \Agpu-like accelerated
-code (for debugging or if a \Agpu is not available), use:
-\begin{verbatim}
-p4a --accel --openmp example.c -o e
-\end{verbatim}
-which produces a \texttt{e} binary executable file with its
-corresponding \texttt{example.p4a.c} program source. This \Aopenmp
-emulation of \Acuda with memory transfer may be helpful for debugging
-since there is no longer emulation mode in recent versions of \Acuda.
-
-The advantage of the source-to-source approach is that the
-generated code can be further improved manually or used as a starting
-point for other
-developments. When compiling the \Apfa Accel generated code,
-different preprocessor symbols can be defined according to the expected target:
-\begin{itemize}
-\item \verb|P4A_ACCEL_CUDA| preprocessor symbol, the source is to be
-  compiled as \Acuda;
-\item \verb|P4A_ACCEL_OPENMP| preprocessor symbol, the source is to be
-  compiled as \Aopenmp or sequential emulation code.
-\end{itemize}
 
 The native compilation scheme is to generate allocation on the \Agpu for
 each parallel loop nest, transfer to the \Agpu the data needed for the
@@ -207,31 +185,42 @@ this, there is an optional optimization that can be used with the
 analysis keep track of data movement and allocation to remove redundant
 communications and allocation, leading to great performance improvements. This
 options supposes that you make use of static and/or C99 VLA array, it would 
-be broken by \texttt{malloc}'ed arrays in parallel section.
+be broken by \texttt{malloc}'ed arrays in parallel section. For example:
+\begin{verbatim}
+p4a --cuda --com-optimization optimized_example.c -o cuda_optimized_example
+\end{verbatim}
 
-Parallelization of some functions can be avoided by using
-\texttt{-{}-exclude-modules=\emph{regex}}. This is preferable when the
-parallel part is not compute-intensive enough to compensate for
-the overhead of transferring data and launching a kernel. In this
-case, parallel execution is more expensive than sequential execution. 
-The option \texttt{-{}-select-modules=\emph{regex}} is complementary to the
-previous one and can be useful to speedup the process by focusing on specific
-functions.
+Par4All can also deal with C99 code sources. Indeed \texttt{nvcc} doesn't support the
+following C99 syntax:
+\begin{verbatim}
+f_type my_function(size_t n, size_t m, float array[n][m]) {
+            ...
+}
+\end{verbatim}
 
-There is also an option to exclude some files from the back-end
-compilation, for example, to use libraries that have been optimized
-already. To use this option,
-the program is analyzed by providing stubs definitions in a source
-file. The stubs definitions
-are dummy function definitions that have similar global memory
-effects to the original functions so that \Apips global
-interprocedural analysis can proceed correctly. For subsequent compilation
-in the back-end stage, this file is skipped with \verb|--exclude-file|, then
-the dummy calls are replaced with the real library functions by linking
-them with \texttt{-l} or compiling them with \verb|--extra-file|.
+Using \texttt{--c99} option, \texttt{p4a} will automatically generate the CUDA code
+in new C89 files (with no VLA but pointers with linearized accesses
+instead) that will be compiled by \texttt{nvcc}. A simple call to each kernel
+will be inserted into the original files \texttt{*.p4a.c} that can be compiled
+with your usual C99 compiler, and linked to the object files compiled from
+\texttt{*.cu}, to produce an executable. For example:
+\begin{verbatim}
+p4a --cuda --c99 c99_example.c -o c99_example
+\end{verbatim}
+generates the executable file \texttt{c99\_example}.
 
-Look at section~\ref{sec:options} for a full list of options.
+\subsection{Automatic parallelization with \protect\Aopenmp emulation of \protect\Agpu}
+\label{sec:autom-parall-with-cuda}
 
+To generate an \Aopenmp emulation executable of \Agpu-like accelerated
+code (for debugging or if a \Agpu is not available), use:
+\begin{verbatim}
+p4a --accel --openmp example.c -o accel_openmp_example
+\end{verbatim}
+which produces a \texttt{accel\_openmp\_example} binary executable file with its
+corresponding \texttt{example.p4a.c} program source. This \Aopenmp
+emulation of \Acuda with memory transfer may be helpful for debugging
+since there is no longer emulation mode in recent versions of \Acuda.
 
 
 \subsection{Automatic parallelization with OpenCL generation}
@@ -240,10 +229,10 @@ Look at section~\ref{sec:options} for a full list of options.
 To generate from a C program source a \Aopencl program that is also compiled
 into an executable, use:
 \begin{verbatim}
-p4a --opencl example.c -o e
+p4a --opencl example.c -o opencl_example
 \end{verbatim}
 which produces a host program \texttt{example.p4a.c}, a \Aopencl kernel program source 
-\texttt{p4a\_wrapper\_example.cl} and an \texttt{e} executable. The current version of 
+\texttt{p4a\_wrapper\_example.cl} and an \texttt{opencl\_example} executable. The current version of 
 \Apfa generates \Aopencl codes that are to be run on a \Agpu. 
 The \Agpu accelerator support relies on a small \Apfa Accel interface that connects to the
 \Aopencl infrastructure. Data-parallel loops are automatically transformed
@@ -251,8 +240,6 @@ into \Aopencl kernels and saved as *.cl files. These files
 will be loaded, compiled and executed on the \Agpu. \emph{Ad
   hoc} communications between the host memory and the \Agpu memory are
 generated to enable kernel execution. 
-
-
 
 \subsection{Automatic task generation for the SCMP architecture}
 \label{sec:scmp}
@@ -278,6 +265,45 @@ The compiler generates two directories:
 Some further post-processing may be required to limit the memory
 footprint of the generated application. This process has not yet been
 automated.
+
+\subsection{More on \protect\Apfa automatic task generation}
+
+The advantage of the source-to-source approach is that the
+generated code can be further improved manually or used as a starting
+point for other
+developments. When compiling the \Apfa Accel generated code,
+different preprocessor symbols can be defined according to the expected target:
+\begin{itemize}
+\item \verb|P4A_ACCEL_CUDA| preprocessor symbol, the source is to be
+  compiled as \Acuda;
+\item \verb|P4A_ACCEL_OPENMP| preprocessor symbol, the source is to be
+  compiled as \Aopenmp or sequential emulation code.
+\item \verb|P4A_ACCEL_OPENCL| preprocessor symbol, the source is to be
+  compiled as \Aopencl code.
+\end{itemize}
+
+Parallelization of some functions can be avoided by using
+\texttt{-{}-exclude-modules=\emph{regex}}. This is preferable when the
+parallel part is not compute-intensive enough to compensate for
+the overhead of transferring data and launching a kernel. In this
+case, parallel execution is more expensive than sequential execution. 
+The option \texttt{-{}-select-modules=\emph{regex}} is complementary to the
+previous one and can be useful to speedup the process by focusing on specific
+functions.
+
+There is also an option to exclude some files from the back-end
+compilation, for example, to use libraries that have been optimized
+already. To use this option,
+the program is analyzed by providing stubs definitions in a source
+file. The stubs definitions
+are dummy function definitions that have similar global memory
+effects to the original functions so that \Apips global
+interprocedural analysis can proceed correctly. For subsequent compilation
+in the back-end stage, this file is skipped with \verb|--exclude-file|, then
+the dummy calls are replaced with the real library functions by linking
+them with \texttt{-l} or compiling them with \verb|--extra-file|.
+
+Look at section~\ref{sec:options} for a full list of options.
 
 \section{\protect\texttt{p4a} full option list}
 \label{sec:options}
@@ -358,9 +384,7 @@ current state of \Apfa and \Apips and that maximize the precision of analyses an
 thus help the tool in generating efficient code. To get more information on \Apfa 
 coding rules please refer to \url{http://download.par4all.org/doc/p4a_coding_rules}.
 
-\subsection{Troubleshooting and debugging}
-
-\subsubsection{P4A Accel runtime tweaking for CUDA}
+\subsection{P4A Accel runtime tweaking for CUDA}
 \label{sec:p4a-accel-runtime}
 
 To ease code generation and portability, \Apfa does not directly generate
@@ -469,7 +493,7 @@ For more tweaking, look at the \Apfa Accel runtime source on
 \url{http://download.par4all.org/doc/Par4All_Accel_runtime/graph} or
 directly in the \Agit repository.
 
-\subsubsection{P4A Accel runtime for OpenCL}
+\subsection{P4A Accel runtime for OpenCL}
 \label{sec:p4a-accel-runtime_opencl}
 
 Like \Apfa generation for CUDA,  \Apfa does not directly generate
