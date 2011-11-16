@@ -1181,11 +1181,16 @@ bool rand_effects_entity_p(entity e)
   return (same_entity_p(e, rand_gen_ent));
 }
 
-bool malloc_entity_p(entity e)
+bool malloc_effect_entity_p(entity e)
 {
   set_internal_static_entities();
   return (same_entity_p(e, malloc_effect_ent));
 
+}
+
+bool memmove_effect_entity_p(entity e) {
+  set_internal_static_entities();
+  return (same_entity_p(e, memmove_effect_ent));
 }
 
 /**
@@ -1196,6 +1201,13 @@ bool malloc_entity_p(entity e)
  */
 bool effects_package_entity_p(entity e)
 {
+#ifndef NDEBUG
+    bool result = rand_effects_entity_p(e) 
+        || malloc_effect_entity_p(e)
+        || memmove_effect_entity_p(e)
+        || io_entity_p(e);
+    pips_assert("entity kind is consistent", result == ((entity_kind(e) & EFFECTS_PACKAGE) == EFFECTS_PACKAGE));
+#endif
   return entity_kind(e) & EFFECTS_PACKAGE;
 }
 

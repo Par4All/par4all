@@ -389,21 +389,37 @@ bool allocatable_area_p(entity aire) {
 
 bool dynamic_area_p(entity aire)
 {
+#ifndef NDEBUG
+    bool result = same_string_p(module_local_name(aire), DYNAMIC_AREA_LOCAL_NAME);
+    pips_assert("entity_kind is consistent", result == ( (entity_kind(aire) & ENTITY_DYNAMIC_AREA) == ENTITY_DYNAMIC_AREA));
+#endif
   return entity_kind(aire) & ENTITY_DYNAMIC_AREA;
 }
 
 bool static_area_p(entity aire)
 {
+#ifndef NDEBUG
+    bool result = same_string_p(module_local_name(aire), STATIC_AREA_LOCAL_NAME);
+    pips_assert("entity_kind is consistent", result == ( (entity_kind(aire) & ENTITY_STATIC_AREA) == ENTITY_STATIC_AREA));
+#endif
   return entity_kind(aire) & ENTITY_STATIC_AREA;
 }
 
 bool heap_area_p(entity aire)
 {
+#ifndef NDEBUG
+    bool result = same_string_p(module_local_name(aire), HEAP_AREA_LOCAL_NAME);
+    pips_assert("entity_kind is consistent", result == ( (entity_kind(aire) & ENTITY_HEAP_AREA) == ENTITY_HEAP_AREA));
+#endif
   return entity_kind(aire) & ENTITY_HEAP_AREA;
 }
 
 bool stack_area_p(entity aire)
 {
+#ifndef NDEBUG
+    bool result = same_string_p(module_local_name(aire), STACK_AREA_LOCAL_NAME);
+    pips_assert("entity_kind is consistent", result == ( (entity_kind(aire) & ENTITY_STACK_AREA) == ENTITY_STACK_AREA));
+#endif
   return entity_kind(aire) & ENTITY_STACK_AREA;
 }
 

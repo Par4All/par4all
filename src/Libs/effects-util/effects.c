@@ -305,17 +305,17 @@ bool heap_cell_p(cell c)
 
 bool malloc_effect_p(effect e)
 {
-  return malloc_entity_p(effect_entity(e));
+  return malloc_effect_entity_p(effect_entity(e));
 }
 
 bool malloc_cell_p(cell c)
 {
-  return malloc_entity_p(cell_entity(c));
+  return malloc_effect_entity_p(cell_entity(c));
 }
 
 bool malloc_reference_p(reference r)
 {
-  return malloc_entity_p(reference_variable(r));
+  return malloc_effect_entity_p(reference_variable(r));
 }
 
 

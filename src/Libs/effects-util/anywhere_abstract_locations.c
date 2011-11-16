@@ -444,7 +444,7 @@ bool entity_all_dynamic_locations_p(entity e)
 
 bool entity_abstract_location_p(entity al)
 {
-    ifdebug(1) {
+#ifndef NDEBUG
         const char * en = entity_name(al);
         const char * module_sep = strchr(en,MODULE_SEP_CHAR);
         bool abstract_locations_p = (   0 == strncmp(en,ANY_MODULE_NAME,module_sep++ - en) // << FI: this may change in the future and may not be a strong enough condition
@@ -457,7 +457,7 @@ bool entity_abstract_location_p(entity al)
                 )
             ;
         pips_assert("entity_kind is consistent",abstract_locations_p == ((entity_kind(al)&ABSTRACT_LOCATION)==ABSTRACT_LOCATION));
-    }
+#endif
     return entity_kind(al) & ABSTRACT_LOCATION;
 }
 
