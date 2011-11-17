@@ -4,8 +4,8 @@ Parsed code
 int main(int argc, char *argv[])
 {
    icplx_t i, k;
-   i = (icplx_t){0, 1};
-   k = (icplx_t){argc, i.im};
+   i = (icplx_t) {0, 1};
+   k = (icplx_t) {argc, i.im};
    return 0;
 }
 
@@ -14,8 +14,8 @@ Printed code
 int main(int argc, char *argv[])
 {
    icplx_t i, k;
-   i = (icplx_t){0, 1};
-   k = (icplx_t){argc, i.im};
+   i = (icplx_t) {0, 1};
+   k = (icplx_t) {argc, i.im};
    return 0;
 }
 
@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
 {
    icplx_t i, k;
 //             <    is written>: i.im i.re
-   i = (icplx_t){0, 1};
+   i = (icplx_t) {0, 1};
 //             <    is read   >: argc i.im
 //             <    is written>: k.im k.re
-   k = (icplx_t){argc, i.im};
+   k = (icplx_t) {argc, i.im};
    return 0;
 }
 
@@ -39,10 +39,10 @@ int main(int argc, char *argv[])
 {
    icplx_t i, k;
 //             <    is written>: i.im i.re
-   i = (icplx_t){0, 1};
+   i = (icplx_t) {0, 1};
 //             <    is read   >: argc i.im
 //             <    is written>: k.im k.re
-   k = (icplx_t){argc, i.im};
+   k = (icplx_t) {argc, i.im};
    return 0;
 }
 
@@ -60,11 +60,11 @@ int main(int argc, char *argv[])
 
 //  P() {}
 
-   i = (icplx_t){0, 1};
+   i = (icplx_t) {0, 1};
 
 //  P() {}
 
-   k = (icplx_t){argc, i.im};
+   k = (icplx_t) {argc, i.im};
 
 //  P() {}
 
@@ -85,11 +85,11 @@ int main(int argc, char *argv[])
 
 //  T() {}
 
-   i = (icplx_t){0, 1};
+   i = (icplx_t) {0, 1};
 
 //  T() {}
 
-   k = (icplx_t){argc, i.im};
+   k = (icplx_t) {argc, i.im};
 
 //  T(main) {main==0}
 
