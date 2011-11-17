@@ -528,6 +528,7 @@ entity variable_to_abstract_location(entity v)
       }
       else
 	al = entity_all_module_xxx_locations(f, ln);
+      entity_kind(al)=ABSTRACT_LOCATION; // should it be a static/dynamic/stack/heap area too ? not according to static_area_p
     }
   }
   else
