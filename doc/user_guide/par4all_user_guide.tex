@@ -518,13 +518,17 @@ $ P4A_DEBUG=3 ./run_opencl
     - CL_PLATFORM_VENDOR: NVIDIA Corporation
     - CL_PLATFORM_VERSION: OpenCL 1.1 CUDA 4.1.1
     - CL_PLATFORM_PROFILE: FULL_PROFILE
-    - CL_PLATFORM_EXTENSIONS: cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing cl_nv_compiler_options cl_nv_device_attribute_query cl_nv_pragma_unroll 
+    - CL_PLATFORM_EXTENSIONS: cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing 
+        cl_nv_compiler_options cl_nv_device_attribute_query cl_nv_pragma_unroll 
  P4A: OpenCL platform chosen : 0
  P4A: Available OpenCL devices for platform    - : NVIDIA CUDA
  P4A:  ** device 0 **
     - CL_DEVICE_NAME: Tesla C2050
     - CL_DEVICE_TYPE :GPU
-    - CL_DEVICE_EXTENSIONS: cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing cl_nv_compiler_options cl_nv_device_attribute_query cl_nv_pragma_unroll  cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_fp64 
+    - CL_DEVICE_EXTENSIONS: cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing 
+        cl_nv_compiler_options cl_nv_device_attribute_query cl_nv_pragma_unroll  
+        cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics 
+        cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_fp64 
     - CL_DEVICE_PROFILE: FULL_PROFILE
     - CL_DEVICE_VENDOR: NVIDIA Corporation
     - CL_DEVICE_VERSION: OpenCL 1.1 CUDA
@@ -539,7 +543,7 @@ $ P4A_DEBUG=3 ./run_opencl
 
 }
 
-\subsection{Auxiliaries tools}
+\subsection{Auxiliary tools}
 
 \subsubsection{Selective C Pre Processor}
 
