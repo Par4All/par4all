@@ -1,0 +1,23 @@
+struct complex  i()
+{
+//             <    is written>: _i.im _i.re
+   struct complex _i = {0, 1};
+//             <    is read   >: _i.im _i.re
+   return _i;
+}
+int main()
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: im
+   int im = i().im;
+//             <    is read   >: im
+   return im;
+}
+struct complex {
+   int re;
+   int im;
+};
+
+struct complex i();
+
+int main();
