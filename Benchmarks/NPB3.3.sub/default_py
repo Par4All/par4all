@@ -1,7 +1,7 @@
 from __future__ import with_statement
 from pyps import workspace, module
 from glob import glob
-with workspace(*(glob("*.c") + glob("../common.sub/*s.c") + [ "../common.sub/randdp.c", "../common.sub/wtime.c"]), cppflags="-I.. -I../common.sub -DCLASS=S", ldflags="-lm") as w:
+with workspace(*(glob("*.c") + glob("../common.sub/*s.c") + [ "../common.sub/randdp.c", "../common.sub/wtime.c"]), name='npb', cppflags="-I.. -I../common.sub -DCLASS=S", ldflags="-lm") as w:
     w.all_functions.display()
     w.all_functions.print_code_proper_effects()
     w.all_functions.print_code_cumulated_effects()
