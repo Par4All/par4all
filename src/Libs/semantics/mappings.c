@@ -176,7 +176,7 @@ static void add_intraprocedural_value_entities(entity e)
   type ut = ultimate_type(entity_type(e));
 
   pips_debug(8, "for %s\n", entity_name(e));
-  if(!entity_has_values_p(e) && type_variable_p(ut) && !typedef_entity_p(e)) {
+  if(!entity_has_values_p(e) && type_variable_p(ut) ) {
     add_intraprocedural_value_entities_unconditionally(e);
   }
 }
@@ -407,6 +407,12 @@ void add_implicit_interprocedural_write_effects(entity al, list el)
     }
   }
 }
+
+static bool entity_for_value_mapping_p(entity e) {
+    return entity_not_constant_or_intrinsic_p(e) 
+        && !typedef_entity_p(e)
+        && !entity_field_p(e);
+}
 
 /* void module_to_value_mappings(entity m): build hash tables between
  * variables and values (old, new and intermediate), and between values
@@ -591,6 +597,16 @@ void module_to_value_mappings(entity m)
 	  }
       }
     }
+
+    /* scan other referenced variables to make sure everyone has an entry in the symbol table */
+    set re = get_referenced_entities_filtered(get_current_module_statement(), (bool (*)(void *))gen_true, entity_for_value_mapping_p);
+    SET_FOREACH(entity, e, re) {
+        if(analyzable_scalar_entity_p(e) && !entity_has_values_p(e)) {
+            pips_assert("should not go there ?", !storage_return_p(entity_storage(e)));
+            add_interprocedural_value_entities(e);
+        }
+    }
+    set_free(re);
 
     //}}, code_declarations(value_code(entity_initial(m))));
 
