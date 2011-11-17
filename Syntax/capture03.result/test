@@ -1,3 +1,22 @@
+user warning in tp_parse: capture03: No such workspace
+Registering file capture03.f
+Splitting file    ./capture03.f
+  Module         MIN
+  Module         FOO
+  Module         CAPTURE03
+Workspace capture03 created and opened.
+Main module PROGRAM "CAPTURE03" selected.
+Module CAPTURE03 selected
+Module CAPTURE03 already active.
+Module CAPTURE03 already active.
+Request: build resource PRINTED_FILE for module CAPTURE03.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CAPTURE03)
+  PARSER                         building   PARSED_CODE(CAPTURE03)
+                                 building   CALLEES(CAPTURE03)
+  CONTROLIZER                    building   CODE(CAPTURE03)
+  PRINT_CODE                     building   PRINTED_FILE(CAPTURE03)
+PRINTED_FILE made for CAPTURE03.
 C     test de la (non) capture des intrinsics, e.g. MIN used as a 
 C     statement function, while another user module uses a function
 C     with the same name
@@ -9,13 +28,40 @@ C     Here "min" is the Fortran intrinsics
       CALL FOO(I)                                                       0009
       PRINT *, I                                                        0010
       END
+Module FOO selected
+Request: build resource PRINTED_FILE for module FOO.
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+  CONTROLIZER                    building   CODE(FOO)
+  PRINT_CODE                     building   PRINTED_FILE(FOO)
+PRINTED_FILE made for FOO.
 
       SUBROUTINE FOO(K)
 c     Here, "min" is a user function
       EXTERNAL MIN
       K = MIN(K, K)                                                     0005
       END
+Module MIN selected
+Request: build resource PRINTED_FILE for module MIN.
+  FILTER_FILE                    building   SOURCE_FILE(MIN)
+  PARSER                         building   PARSED_CODE(MIN)
+                                 building   CALLEES(MIN)
+  CONTROLIZER                    building   CODE(MIN)
+  PRINT_CODE                     building   PRINTED_FILE(MIN)
+PRINTED_FILE made for MIN.
 
       FUNCTION MIN(L,M)
       MIN = L+M                                                         0003
       END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CAPTURE03.
+  Closing module FOO.
+  Closing module MIN.
+Closing program.
+Closing workspace.
+Workspace capture03 closed.
+
+Workspace capture03 deleted.

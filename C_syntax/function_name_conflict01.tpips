@@ -24,17 +24,16 @@ display PARSED_PRINTED_FILE[rand]
 
 close
 open function_name_conflict01
-echo
-echo Warnings for "rand"
-echo
-
-shell cat function_name_conflict01.database/Warnings
 
 echo
 echo Parsed printed file for "function_name_conflict01"
 echo
 
 display PARSED_PRINTED_FILE[function_name_conflict01]
+
+echo
+echo Callgraph file for "function_name_conflict01"
+echo
 
 display CALLGRAPH_FILE[function_name_conflict01]
 
