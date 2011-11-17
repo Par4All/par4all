@@ -1,0 +1,3 @@
+delete asm01
+create asm01 asm01.c
+display PRINTED_FILE[main]
