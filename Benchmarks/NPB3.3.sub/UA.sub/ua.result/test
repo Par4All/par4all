@@ -1010,6 +1010,22 @@ void c_print_results(char *name, char class, int n1, int n2, int n3, int niter, 
    printf(" http://aces.snu.ac.kr\n");
    printf("--------------------------------------\n");
 }
+static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
+}
+static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
+}
 static double elapsed_time(void)
 {
    double t;
@@ -1330,6 +1346,14 @@ void convect(logical ifmortar)
       tmort[i] = tmort[i]/mormult[i];
    if (timeron)
       timer_stop(3);
+}
+static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
 }
 void copy(double a[], double b[], int n)
 {
@@ -4029,7 +4053,7 @@ static void com_dpc(int iside, int iel, int enumber, int n, int isize)
       iend = 1;
    }
    else {
-      0?(void) 0:__assert_fail("0", ".PYPSfKPt0m.tmp/precond.c", 689, (const char *) 0);
+      0?(void) 0:__assert_fail("0", ".PYPSC4BCPf.tmp/precond.c", 689, (const char *) 0);
       nn1start = 0;
       nn1end = 0;
       nn2start = 0;
@@ -4074,7 +4098,7 @@ static void com_dpc(int iside, int iel, int enumber, int n, int isize)
       anc0 = 0.0;
    }
    else {
-      0?(void) 0:__assert_fail("0", ".PYPSfKPt0m.tmp/precond.c", 738, (const char *) 0);
+      0?(void) 0:__assert_fail("0", ".PYPSC4BCPf.tmp/precond.c", 738, (const char *) 0);
       anc1 = 0.0;
       ac = 0.0;
       anc2 = 0.0;
@@ -4313,12 +4337,28 @@ void print_results(char *name, char class, int n1, int n2, int n3, int niter, do
    
    printf("\n--------------------------------------\n"" Please send all errors/feedbacks to:\n"" Center for Manycore Programming\n"" cmp@aces.snu.ac.kr\n"" http://aces.snu.ac.kr\n""--------------------------------------\n\n");
 }
+static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
+}
 void r_init(double a[], int n, double _const)
 {
    int i;
 
    for(i = 0; i <= n-1; i += 1)
       a[i] = _const;
+}
+static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
 }
 double randlc(double *x, double a)
 {
@@ -4839,6 +4879,14 @@ void setpcmo_pre()
       laplacian(temp, p0, element_size);
       transfb_cor_f(7, &pcmor_cor[element_size][6], temp);
    }
+}
+static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
 }
 void setuppc()
 {
@@ -6256,6 +6304,14 @@ void transfb_nc2(double tmor[5][5], double tx[5][5])
             tmor[col][j] = tmor[col][j]+qbnew[0][j][i-1]*temp[col][i];
    }
 }
+static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
+}
 void verify(char *Class, logical *verified)
 {
    double norm, epsilon, norm_dif, norm_ref;
@@ -6321,6 +6377,14 @@ void verify(char *Class, logical *verified)
       printf(" Verification Successful\n");
    else
       printf(" Verification failed\n");
+}
+static unsigned short __bswap_16(unsigned short __bsx)
+{
+   return (unsigned short) (__bsx>>8&0xff|(__bsx&0xff)<<8);
+}
+static unsigned int __bswap_32(unsigned int __bsx)
+{
+   return (__bsx&0xff000000)>>24|(__bsx&0x00ff0000)>>8|(__bsx&0x0000ff00)<<8|(__bsx&0x000000ff)<<24;
 }
 void vranlc(int n, double *x, double a, double y[])
 {

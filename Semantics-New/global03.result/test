@@ -1,0 +1,31 @@
+
+//  T() {}
+
+void do_refine(int *irefine)
+{
+
+//  T(k) {}
+
+   int k, ne[4];
+
+//  T(num_refine) {}
+
+   int num_refine;
+
+//  T(nelt) {nelt==nelt#init+1}
+
+   nelt += 1;
+
+//  T(k) {k==0}
+
+   for(k = 0; k <= 0; k += 1)
+
+//  T() {}
+
+      ne[k] = nelt;
+
+//  T(k,nelt,num_refine) {}
+
+   *irefine += num_refine;
+}
+
