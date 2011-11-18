@@ -22,7 +22,10 @@
 
 */
 
- /* package sc */
+ /* package sc
+  *
+  * Normalization, which include some redundacy elimination
+ */
 
 #ifdef HAVE_CONFIG_H
     #include "config.h"
@@ -40,8 +43,479 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
+
+/* Bounded normalization relies on numerical bounds l and b for vector
+ * x, such that l<=x<=b.
+ *
+ * However, lower and upper bounds are not always available for all
+ * components x_i of x. And 0 is a perfectly valid bound. Hence, the
+ * bound information cannot be carried by only two vectors. Four
+ * vectors are used, two basis vectors, lb and ub, used to specifiy if
+ * a bound is available, and two vectors l and b to contain the bounds.
+ *
+ * Note that l and u are not usual vectors. The constant bounds appear
+ * as variable coefficients. For instance, l=2u+3v, together with
+ * lb=u+v+w, means that the lower bounds for x_u, x_v and x_w are 2, 3
+ * and 0.
+ *
+ * Note also that it might be useful to separate the
+ * sc_bounded_normalization into two functions, one to create the
+ * bounding box and one to eliminate constraints according to the
+ * bounding box. For instance, when a system is projected along
+ * several dimensions, the bounding box could be computed initially
+ * and reused at each projection stage. The advantage is to preserve
+ * information that may be killed by a redundancy test. The
+ * inconvenient is not to take advantage of the newly created
+ * constraints. The best might be to update the bouding box at each
+ * stage.
+ *
+ * FI: I do not want to introduce a new data structure to represent a
+ * bounding box, and I do not like the idea of keeping independently
+ * four vectors.
+ */
+
+/* Auxiliary function for sc_bounded_normalization()
+ *
+ * Update bound information for variable var. A lower or upper bound_p
+ * and bound_base_p must be passer regardless of lower_p. lower_p is
+ * only used to know how to tighten the bound if it is already
+ * defined. The information to use is:
+ *
+ * lower_p? var <= nb : var>=nb
+ *
+ * It is not possible to detect an empty system here
+ */
+static void update_lower_or_upper_bound(Pvecteur * bound_p,
+					Pvecteur * bound_base_p,
+					Variable var,
+					Value nb, /* new bound */
+					bool lower_p)
+{
+  if(vect_coeff(var, *bound_base_p)!=0) {
+    /* A bound is already known. It must be updated if the new one is better. */
+    Value pb = vect_coeff(var, *bound_p); /* previous bound */
+    if(lower_p) { /* bigger is better */
+      if(nb>pb) { /* update bound */
+	vect_add_elem(bound_p, var, value_minus(nb,pb));
+      }
+      else {
+	/* The current constraint is redundant */
+	;
+      }
+    }
+    else { /* smaller is better */
+      if(nb<pb) { /* update bound */
+	vect_add_elem(bound_p, var, value_minus(nb,pb));
+      }
+      else {
+	/* The current constraint is redundant */
+	;
+      }
+    }
+  }
+  else {
+    /* No bound is known yet */
+    base_add_dimension(bound_base_p, var);
+    vect_add_elem(bound_p, var, nb);
+  }
+}
+
+/* Updates upper and lower bounds, (ubound_p, ubound_base_p) and
+ * (lbound_p, lbound_base_p), with equations var==nb
+ *
+ * Do not test for nb==0. This would increase the code size a lot for
+ * a very limited benefit.
+ *
+ * This function returns a boolean to signal an empy interval,
+ * i.e. a non-feasible system.
+ *
+ * Auxiliary function of sc_bounded_normalization()
+ */
+static bool update_lower_and_upper_bounds(Pvecteur * ubound_p,
+					  Pvecteur * ubound_base_p,
+					  Pvecteur * lbound_p,
+					  Pvecteur * lbound_base_p,
+					  Variable var,
+					  Value nb) /* new bound */
+{
+  bool empty_p = false;
+
+  if(var==TCST) {
+    /* Some constraint like 0==0, i.e. the NULL vector, or 0==3 an impossible constraint */
+    // abort();
+    if(!value_zero_p(nb))
+      empty_p = true;
+  }
+  else {
+    /* Update the upper bound */
+    if(vect_coeff(var,*ubound_base_p)!=0) {
+      /* A pre-existing upper bound exists */
+      Value ob = vect_coeff(var, *ubound_p);
+	if(value_gt(ob, nb)) {
+	  /* The new bound nb is stricter and consistent with the preexisting upper bound */
+	  vect_add_elem(ubound_p, var, value_minus(nb,ob));
+	}
+	else if(value_eq(ob,nb))
+	  ;
+	else {
+	  empty_p = true;
+	  //abort();
+	  ; /* ignore the non feasability */
+	  /* but maintain consistency to avoid a later abort */
+	  //vect_add_elem(ubound_p, var, value_minus(nb,ob));
+	}
+    }
+    else {
+      base_add_dimension(ubound_base_p, var);
+      vect_add_elem(ubound_p, var, nb);
+    }
+
+    /* Update the lower bound, almost identical, but for the compatibility check */
+    if(vect_coeff(var,*lbound_base_p)!=0) {
+      /* A lower bound has already been defined */
+      Value ob = vect_coeff(var, *lbound_p);
+	if(value_lt(ob, nb)) {
+	  /* The new bound nb is stricter and consistent with the preexisting lower bound */
+	  vect_add_elem(lbound_p, var, value_minus(nb,ob));
+	}
+	else if(value_eq(ob,nb))
+	  ;
+	else {
+	  empty_p = true;
+	  /* ps is empty with contradictory equations and inequalities
+	     supposedly trapped earlier */
+	  // abort();
+	  ; /* ignore the non feasability */
+	  /* but maintain consistency to avoid a later abort */
+	  //vect_add_elem(lbound_p, var, value_minus(nb,ob));
+	}
+    }
+    else {
+      base_add_dimension(lbound_base_p, var);
+      vect_add_elem(lbound_p, var, nb);
+    }
+    if(!empty_p && vect_coeff(var, *lbound_p)!=vect_coeff(var,*ubound_p))
+      abort();
+  }
+  return empty_p;
+}
 
 
+/* Eliminate trivially redundant integer constraint using a O(n)
+ * algorithm, where n is the number of constraints. And possibly
+ * detect an non feasible constraint system ps.
+ *
+ * This function must not be used to decide emptyness when checking
+ * redundancy with Fourier-Motzkin because this may increase the
+ * initial rational convex polyhedron. No integer point is added, but
+ * rational points may be added, which may lead to an accuracy loss
+ * when a convex hull is performed.
+ *
+ * Principle: If two constant vectors, l et u, such that l<=x<=u,
+ * where x is the vector representing all variables, then the bound b
+ * of any constraint a.x<=b can be compared to a.k where k_i=u_i if
+ * a_i is positive, and k_i=l_i elsewhere. The constraint can be
+ * eliminated if a.k<=b.
+ *
+ * It is not necessary to have upper and lower bounds for all
+ * components of x to compute the redundancy condition. It is
+ * sufficient to meet the condition:
+ *
+ *  forall i s.t. a_i>0 \exists u_i and forall i s.t. a_i<0 \exists b_i
+ *
+ * The complexity is O(n x d) where n is the number of constraints and
+ * d the dimension, vs O(n^2 x d^2) for some other normalization
+ * functions.
+ *
+ * The normalization is not rational. It assumes that only integer
+ * points are relevant. For instance, 2x<=3 is reduced to x<=1. It
+ * would be possible to use the same function in rational, but the
+ * divisions should be removed, the bounding box would require six
+ * vectors, with two new vectors used to keep the variable
+ * coefficients, here 2, and the comparisons should be replaced by
+ * rational comparisons. Quite a lot of changes, although the general
+ * structure would stay the same.
+ *
+ * This function was developped to cope successfully with
+ * Semantics/type03. The projection performed in
+ * transformer_intra_to_inter() explodes without this function.
+ *
+ * Note that the upper and lower bounds, u and l, are stored in Pvecteur in an
+ * unusual way. The coefficients are used to store the constants.
+ *
+ * Note also that constant terms are stored in the lhs in linear, but
+ * they are computed here as rhs. In other words, x - 2 <=0 is the
+ * internal storage, but the upper bound is 2 as in x<=2.
+ *
+ * Note that the simple inequalities used to compute the bounding box
+ * cannot be eliminated. Hence, their exact copies are also
+ * preserved. Another redundancy test is necessary to get rid of them.
+ *
+ * This function could be renamed sc_bounded_redundancy_elimination()
+ * and be placed into one of the two files, sc_elim_redund.c or
+ * sc_elim_simple_redund.c. It just happened that redundancy
+ * elimination uses normalization and gdb led me to
+ * sc_normalization() when I tried to debug Semantics/type03.c.
+ */
+Psysteme sc_bounded_normalization(Psysteme ps)
+{
+  /* Compute the trivial upper and lower bounds for the systeme
+     basis. Since we cannot distinguish between "exist" and "0", we
+     need two extra basis to know if the bound exists or not */
+  //Pbase b = sc_base(ps);
+  Pvecteur u = VECTEUR_NUL;
+  Pvecteur l = VECTEUR_NUL;
+  Pbase ub = BASE_NULLE;
+  Pbase lb = BASE_NULLE;
+  Pcontrainte eq = CONTRAINTE_UNDEFINED; /* can be an equation or an inequality */
+  bool empty_p = false;
+
+  /* First look for bounds in equalities, although they may have been
+     exploited otherwise */
+  for(eq = sc_egalites(ps); !CONTRAINTE_UNDEFINED_P(eq); eq = contrainte_succ(eq)) {
+    Pvecteur v = contrainte_vecteur(eq);
+    int n = vect_size(v);
+    Value k;
+    if(n==1) {
+      Variable var = vecteur_var(v);
+      update_lower_and_upper_bounds(&u, &ub, &l, &lb, var, VALUE_ZERO);
+    }
+    else if(n==2 && (k=vect_coeff(TCST,v))!=0) {
+      Variable var = vecteur_var(v);
+      Value c = vecteur_val(v);
+
+      if(var==TCST) {
+	Pvecteur vn = vecteur_succ(v);
+	var = vecteur_var(vn);
+	c = vecteur_val(vn);
+      }
+
+      /* FI: I do not trust the modulo operator */
+      if(c<0) {
+	c = -c;
+	k = -k;
+      }
+
+      Value r = modulo(k,c);
+      if(r==0) {
+	Value b_var = -value_div(k,c);
+	empty_p = update_lower_and_upper_bounds(&u, &ub, &l, &lb, var, b_var);
+      }
+      else {
+	/* ps is empty with two contradictory equations supposedly trapped earlier */
+	empty_p = true;;
+      }
+    }
+  }
+
+  if(!empty_p) {
+    /* Secondly look for bounds in inequalities */
+    for(eq=sc_inegalites(ps); !CONTRAINTE_UNDEFINED_P(eq); eq = contrainte_succ(eq)) {
+      Pvecteur v = contrainte_vecteur(eq);
+      int n = vect_size(v);
+      Value k = VALUE_ZERO;
+      if(n==1) {
+	Variable var = vecteur_var(v);
+	if(var!=TCST) {
+	  /* The variable is bounded by zero */
+	  Value c = vecteur_val(v);
+	  if(c>0) /* upper bound */
+	    update_lower_or_upper_bound(&u, &ub, var, VALUE_ZERO, c>0);
+	  else /* lower bound */
+	    update_lower_or_upper_bound(&l, &lb, var, VALUE_ZERO, c>0);
+	}
+      }
+      else if(n==2 && (k=vect_coeff(TCST,v))!=0) {
+	Variable var = vecteur_var(v);
+	Value c = vecteur_val(v);
+	if(var==TCST) {
+	  Pvecteur vn = vecteur_succ(v);
+	  var = vecteur_var(vn);
+	  c = vecteur_val(vn);
+	}
+	/* FI: I not too sure how div and pdiv operate nor on what I
+	   need here... This explains why the divisions are replicated
+	   after the test on the sign of the coefficient. */
+	if(value_pos_p(c)) { /* upper bound */
+	  Value b_var = -value_pdiv(k,c);
+	  update_lower_or_upper_bound(&u, &ub, var, b_var, value_pos_p(c));
+	}
+	else { /* lower bound */
+	  Value b_var = -value_pdiv(k,c);
+	  update_lower_or_upper_bound(&l, &lb, var, b_var, value_pos_p(c));
+	}
+      }
+    }
+
+    /* Check that the bounding box is not empty because a lower bound
+       is strictly greater than the corresponding upper bound. This
+       could be checked above each time a new bound is defined or
+       redefined. */
+    Pvecteur vc;
+    for(vc=ub; !VECTEUR_UNDEFINED_P(vc) && !empty_p; vc=vecteur_succ(vc)) {
+      Variable var = vecteur_var(vc);
+      Value upper = vect_coeff(var, u);
+      if(value_notzero_p(vect_coeff(var, lb))) {
+	Value lower = vect_coeff(var, l);
+	if(lower>upper)
+	  empty_p = true;
+      }
+    }
+
+    /* The upper and lower bounds should be printed here for debug */
+    if(false && (!VECTEUR_NUL_P(ub) || !VECTEUR_NUL_P(lb)) ) {
+      if(empty_p) {
+	fprintf(stderr, "sc_bounded_normalization: empty bounding box\n");
+      }
+      else {
+	fprintf(stderr, "sc_bounded_normalization: base for upper bound and upper bound:\n");
+	vect_dump(ub);
+	vect_dump(u);
+	fprintf(stderr, "sc_bounded_normalization: base for lower bound and lower bound:\n");
+	vect_dump(lb);
+	vect_dump(l);
+	fprintf(stderr, "sc_bounded_normalization: constraints found:\n");
+	/* Impression par intervalle, avec verification l<=u quand l et u
+	   sont tous les deux disponibles */
+	Pvecteur vc;
+	for(vc=ub; !VECTEUR_UNDEFINED_P(vc); vc=vecteur_succ(vc)) {
+	  Variable var = vecteur_var(vc);
+	  Value upper = vect_coeff(var, u);
+	  if(vect_coeff(var, lb)!=0) {
+	    Value lower = vect_coeff(var, l);
+	    if(lower<upper)
+	      fprintf(stderr, "%d <= %s <= %d\n", (int) lower, variable_dump_name(var),
+		      (int) upper);
+	    else if(lower==upper)
+	      fprintf(stderr, "%s == %d\n", variable_dump_name(var), (int) upper);
+	    else /* lower>upper */
+	      abort(); // should have been filtered above
+	  }
+	  else {
+	    fprintf(stderr, "%s <= %d\n", variable_dump_name(var), (int) upper);
+	  }
+	}
+	for(vc=lb; !VECTEUR_UNDEFINED_P(vc); vc=vecteur_succ(vc)) {
+	  Variable var = vecteur_var(vc);
+	  Value lower = vect_coeff(var, l);
+	  if(vect_coeff(var, ub)==0) {
+	    fprintf(stderr, "%d <= %s \n", (int) lower, variable_dump_name(var));
+	  }
+	}
+      }
+    }
+
+    if(!empty_p) {
+      /* Check inequalities for redundancy with respect to ub and lb, if
+	 ub and lb contain a minum of information */
+      if(base_dimension(ub)+base_dimension(lb) >=1) {
+	for(eq=sc_inegalites(ps);
+	    !CONTRAINTE_UNDEFINED_P(eq) && !empty_p; eq = contrainte_succ(eq)) {
+	  Pvecteur v = contrainte_vecteur(eq);
+	  int n = vect_size(v);
+	  Pvecteur vc;
+	  Value nlb = VALUE_ZERO; /* new lower bound: useful to check feasiblity */
+	  Value nub = VALUE_ZERO; /* new upper bound */
+	  Value ob = VALUE_ZERO; /* old bound */
+	  bool lb_failed_p = false; /* a lower bound cannot be estimated */
+	  bool ub_failed_p = false; /* the bounding box does not contain
+				    enough information to check
+				    redundancy with the upper bound */
+	  /* Try to compute the bounds nub and nlb implied by the bounding box */
+	  for(vc=v; !VECTEUR_NUL_P(vc) && !(ub_failed_p&&lb_failed_p);
+	      vc = vecteur_succ(vc)) {
+	    Variable var = vecteur_var(vc);
+	    Value c = vecteur_val(vc);
+	    if(var==TCST) { /* I assume the constraint to be consistent
+			       with only one coefficient per dimension */
+	      value_assign(ob, value_uminus(c)); /* move the bound to the
+						    right hand side of the
+						    inequality */
+	    }
+	    else {
+	      if(value_pos_p(c)) { /* an upper bound of var is needed */
+		if(vect_coeff(var, ub)!=0) { /* the value macro should be used */
+		  Value ub_var = vect_coeff(var, u);
+		  value_addto(nub, value_mult(c, ub_var));
+		}
+		else {
+		  ub_failed_p = true;
+		}
+		if(vect_coeff(var, lb)!=0) {
+		  Value lb_var = vect_coeff(var, l);
+		  value_addto(nlb, value_mult(c, lb_var));
+		  //fprintf(stderr, "c=%lld, lb_var=%lld, nlb=%d\n", c, lb_var, nlb);
+		}
+		else {
+		  lb_failed_p = true;
+		}
+	      }
+	      else { /* c<0 : a lower bound is needed for var*/
+		if(vect_coeff(var, lb)!=0) {
+		  Value lb_var = vect_coeff(var, l);
+		  value_addto(nub, value_mult(c, lb_var));
+		}
+		else {
+		  ub_failed_p = true;
+		}
+		if(vect_coeff(var, ub)!=0) {
+		  Value ub_var = vect_coeff(var, u);
+		  value_addto(nlb, value_mult(c, ub_var));
+		  //fprintf(stderr, "c=%lld, ub_var=%lld, nlb=%d\n", c, ub_var, nlb);
+		}
+		else {
+		  lb_failed_p = true;
+		}
+	      }
+	    }
+	  }
+
+	  /* If the new bound nub is tighter, nub <= ob, ob-nub >= 0 */
+	  if(!ub_failed_p) {
+	    /* Do not destroy the constraints defining the bounding box */
+	    bool posz_p = value_posz_p(value_minus(ob,nub));
+	    bool pos_p = value_pos_p(value_minus(ob,nub));
+	    if( (n>2 && posz_p)
+		|| (n==2 && value_zero_p(vect_coeff(TCST, v)) && posz_p)
+		|| (n==2 && value_notzero_p(vect_coeff(TCST, v)) && pos_p)
+		|| (n==1 && value_zero_p(vect_coeff(TCST, v)) && pos_p)) {
+	      /* The constraint eq is redundant */
+	      if(false) {
+		fprintf(stderr, "Redundant constraint:\n");
+		vect_dump(v);
+	      }
+	      eq_set_vect_nul(eq);
+	    }
+	    else { /* Preserve this constraint */
+	      ;
+	    }
+	  }
+
+	  /* The new estimated lower bound must be less than the upper
+	     bound of the constraint, or the system is empty.*/
+	  if(!lb_failed_p) { /* the estimated lower bound, nlb, must
+				be less or equal to the effective
+				upper bound ob: nlb <= ob, 0<=ob-nlb */
+	    /* if ob==nlb, an equation has been detected but it is
+	       hard to exploit here */
+	    bool pos_p = value_posz_p(value_minus(ob,nlb));
+	    if(!pos_p) /* to have a nice breakpoint location */
+	      empty_p = true;
+	  }
+	}
+      }
+    }
+  }
+
+  if(empty_p) {
+    Psysteme ns = sc_empty(sc_base(ps));
+    sc_base(ps) = BASE_NULLE;
+    sc_rm(ps);
+    ps = ns;
+  }
+  return ps;
+}
+
 /* Psysteme sc_normalize(Psysteme ps): normalisation d'un systeme d'equation
  * et d'inequations lineaires en nombres entiers ps, en place.
  *
@@ -70,20 +544,43 @@
  *   ou  d2/    Ax <= b,
  *              Ax <= c    avec c >= b ou b >= c
  *
+ * Il manque une elimination de redondance particuliere pour traiter
+ * les booleens. Si on a deux vecteurs constants, l et u, tels que
+ * l<=x<=u, alors la borne b de n'importe quelle contrainte a.x<=b
+ * peut etre comparee a a.k ou k_i=u_i si a_i est positif et k_i=l_i
+ * sinon. La contrainte a peut etre eliminee si a.k <= b. Si des
+ * composantes de x n'aparaissent dans aucune contrainte, on ne
+ * dispose en consequence pas de bornes, mais ca n'a aucune
+ * importance. On veut donc avoir une condition pour chaque
+ * contrainte: forall i s.t. a.i!=0 \exists l_i and b_i
+ * s.t. l_i<=x_i<=b_i. Voir sc_bounded_normalization().
+ *
  * sc_normalize retourne NULL quand la normalisation a montre que le systeme
  * etait non faisable
  *
- * FI: a revoir de pres; devrait retourner SC_EMPTY en cas de non faisabilite
  * BC: now returns sc_empty when not feasible to avoid unecessary copy_base
  * in caller.
+ * 
+ * FI: should check the input for sc_empty_p()
  */
-Psysteme sc_normalize(ps)
-Psysteme ps;
+Psysteme sc_normalize(Psysteme ps)
 {
     Pcontrainte eq;
     bool is_sc_fais = true;
 
+    /* I do not want to disturb every pass of PIPS that uses directly
+     * or indirectly sc_normalize. Since sc_bounded_normalization()
+     * has been developped specifically for transformer_projection(),
+     * it is called directly from the function implementing
+     * transformer_projection(). But it is not sufficient for type03.
+     */
+    static int francois=1;
+    if(francois==1)
+      ps = sc_bounded_normalization(ps);
+
+    /* FI: this takes (a lot of) time but I do not know why: O(n^2)? */
     ps = sc_safe_kill_db_eg(ps);
+
     if (ps && !sc_empty_p(ps) && !sc_rn_p(ps)) {
 	for (eq = ps->egalites;
 	     (eq != NULL) && is_sc_fais;
@@ -115,6 +612,9 @@ Psysteme ps;
 
     if (!is_sc_fais)
       {
+	/* FI: piece of code that will appear in many places...  How
+	 * can we call it: empty_sc()? sc_make_empty()? sc_to_empty()?
+	 */
 	Psysteme new_ps = sc_empty(sc_base(ps));
 	sc_base(ps) = BASE_UNDEFINED;
 	sc_rm(ps);

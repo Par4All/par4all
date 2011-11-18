@@ -362,22 +362,27 @@ Psysteme ps;
     return (ps);
 }
 
-Psysteme sc_safe_elim_db_constraints(ps)
-Psysteme ps;
+/* The returned value must be used because they argument is freed when
+ * the system is not feasible
+ *
+ * FI: I added an elimination and check of the colinear constraints.
+ */
+Psysteme sc_safe_elim_db_constraints(Psysteme ps)
 {
-    Pcontrainte
+  Pcontrainte
 	eq1 = NULL,
 	eq2 = NULL;
+  bool empty_p = false; // The system is empty 
 
-    if (SC_UNDEFINED_P(ps)) 
-	return(NULL);
+  if (SC_UNDEFINED_P(ps)) 
+    return(NULL);
 
-    for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) 
+  for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) 
     {
-	if ((vect_size(eq1->vecteur) == 1) && 
-	    (eq1->vecteur->var == 0) && (eq1->vecteur->val != 0)) 
+      if ((vect_size(eq1->vecteur) == 1) && 
+	  (eq1->vecteur->var == 0) && (eq1->vecteur->val != 0)) 
 	{
-	    /* b = 0 */
+	  /* b = 0 */
 	  Pbase base_tmp = ps->base;
 	  ps->base = BASE_UNDEFINED;
 	  sc_rm(ps);
@@ -385,35 +390,90 @@ Psysteme ps;
 	  return(ps);
 	}
 
-	for (eq2 = eq1->succ; eq2 != NULL;eq2 = eq2->succ)
-	    if (egalite_equal(eq1, eq2))
-		eq_set_vect_nul(eq2);
+      for (eq2 = eq1->succ; eq2 != NULL;eq2 = eq2->succ)
+	if (egalite_equal(eq1, eq2))
+	  eq_set_vect_nul(eq2);
     }
 
-    for (eq1 = ps->inegalites; eq1 != NULL;eq1 = eq1->succ) {
-      if ((vect_size(eq1->vecteur) == 1) && (eq1->vecteur->var == 0)) {
-	  if (value_negz_p(val_of(eq1->vecteur))) {
-	    vect_rm(eq1->vecteur);
-		eq1->vecteur = NULL;
+  for (eq1 = ps->inegalites; eq1 != NULL && !empty_p; eq1 = eq1->succ) {
+    if ((vect_size(eq1->vecteur) == 1) && (eq1->vecteur->var == 0)) {
+      if (value_negz_p(val_of(eq1->vecteur))) {
+	vect_rm(eq1->vecteur);
+	eq1->vecteur = NULL;
+      }
+      else {
+	/* 0 <= b < 0 */
+	Pbase base_tmp = ps->base;
+	ps->base = BASE_UNDEFINED;
+	sc_rm(ps);
+	ps =sc_empty(base_tmp);
+	return(ps);
+      }
+    }
+    
+    for (eq2 = eq1->succ;eq2 != NULL;eq2 = eq2->succ) {
+      if (contrainte_equal(eq1,eq2))
+	eq_set_vect_nul(eq2);
+      else if(true) {
+	/* Use rational simplification */
+	Value a1, a2;
+	if(contrainte_parallele(eq1, eq2, &a1, &a2)) {
+	  Pvecteur v1 = contrainte_vecteur(eq1);
+	  Pvecteur v2 = contrainte_vecteur(eq2);
+	  if(a1<0 && a2<0) {
+	    a1 = -a1;
+	    a2 = -a2;
+	  }
+	  if(a1>0 && a2>0) {
+	    /* The constraints are opposed. Their constant terms must be compatible */
+	    Value k1 = vect_coeff(TCST, v1);
+	    Value k2 = vect_coeff(TCST, v2);
+	    Value k = value_mult(a2,k1) + value_mult(a1,k2);
+	    if(k>0) {
+	      /* The constraint system is not feasible */
+	      /* ps should be replaced by sc_empty */
+	      empty_p = true;
+	      break;
+	    }
 	  }
 	  else {
-	    /* 0 <= b < 0 */
-	    Pbase base_tmp = ps->base;
-	    ps->base = BASE_UNDEFINED;
-	    sc_rm(ps);
-	    ps =sc_empty(base_tmp);
-	    return(ps);
+	    /* The signs of a1 and a2 are different */
+	    if(a1<0) a1 = -a1;
+	    if(a2<0) a2 = -a2;
+	    Value k1 = vect_coeff(TCST, v1);
+	    Value k2 = vect_coeff(TCST, v2);
+	    Value nk1 = value_product(a2,k1);
+	    Value nk2 = value_product(a1,k2);
+	    if(nk1<nk2) {
+	      /* get rid of the first constraint */
+	      eq_set_vect_nul(eq1);
+	    }
+	    else {
+	      eq_set_vect_nul(eq2);
+	    }
 	  }
+	}
       }
-	for (eq2 = eq1->succ;eq2 != NULL;eq2 = eq2->succ)
-	    if (contrainte_equal(eq1,eq2))
-		eq_set_vect_nul(eq2);
     }
+  }
 
+  if(empty_p) {
+    /* FI: it would be safer to keep *ps and to change each field 
+     *
+     * I thought there was a function to remove the useless stuff from
+     * a Psystem and to make it an empty one, but I could not find it.
+     */
+    Pbase b = sc_base(ps);
+    sc_base(ps) = BASE_NULLE;
+    sc_rm(ps);
+    ps = sc_empty(b);
+  }
+  else {
     sc_elim_empty_constraints(ps, true);
     sc_elim_empty_constraints(ps, false);
+  }
 
-    return (ps);
+  return (ps);
 }
 
 /* Psysteme sc_elim_double_constraints(Psysteme ps):
