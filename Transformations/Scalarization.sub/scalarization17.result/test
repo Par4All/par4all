@@ -2,22 +2,22 @@
 IN regions
 
 
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=SIZE, SIZE==10}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2+1<=SIZE,
+//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1<=9, SIZE==10}>
+//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9,
 //    SIZE==10}>
 
 void scalarization17(double A[SIZE], double B[SIZE][SIZE])
 {
 
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=SIZE, SIZE==10}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2+1<=SIZE,
+//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1<=9, SIZE==10}>
+//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9,
 //    SIZE==10}>
 
    // BEGIN BLOCK
    int i, j;
 
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=SIZE, SIZE==10}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2+1<=SIZE,
+//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1<=9, SIZE==10}>
+//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9,
 //    SIZE==10}>
 
    for(i = 0; i <= SIZE-1; i += 1)
