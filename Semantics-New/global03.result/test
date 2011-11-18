@@ -1,4 +1,30 @@
 
+Cumulated effects for "do_refine"
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+void do_refine(int *irefine)
+{
+   int k, ne[4];
+   int num_refine;
+//             <    is read   >: nelt
+//             <    is written>: nelt
+   nelt += 1;
+//             <may be read   >: k nelt
+//             <may be written>: ne[*]
+//             <    is written>: k
+   for(k = 0; k <= 0; k += 1)
+//             <may be written>: ne[*]
+//             <    is read   >: k nelt
+      ne[k] = nelt;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   *irefine += num_refine;
+}
+
+Transformers for "do_refine"
+
+
 //  T() {}
 
 void do_refine(int *irefine)
