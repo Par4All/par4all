@@ -414,7 +414,7 @@ Psysteme sc_safe_elim_db_constraints(Psysteme ps)
     for (eq2 = eq1->succ;eq2 != NULL;eq2 = eq2->succ) {
       if (contrainte_equal(eq1,eq2))
 	eq_set_vect_nul(eq2);
-      else if(true) {
+      else if(false) {
 	/* Use rational simplification */
 	Value a1, a2;
 	if(contrainte_parallele(eq1, eq2, &a1, &a2)) {
