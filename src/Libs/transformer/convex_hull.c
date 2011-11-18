@@ -103,7 +103,7 @@ static transformer transformer_convex_hulls
     /* These equalities should only be added if the variable explicitly
        appears in at least one constraint in the other constraint
        system. Mathematical proof?. */
-    MAP(ENTITY, a, {
+    FOREACH(ENTITY, a,  transformer_arguments(t1)) {
       if(!entity_is_argument_p(a, transformer_arguments(t2))) {
 	entity a_new = entity_to_new_value(a);
 	if(base_contains_variable_p(b1_min, (Variable) a_new)) {
@@ -124,9 +124,9 @@ static transformer transformer_convex_hulls
 	  }
 	}
       }
-    }, transformer_arguments(t1));
+    }
     base_rm(b1_min);
-    MAP(ENTITY, a, {
+    FOREACH(ENTITY, a, transformer_arguments(t2)) {
       if(!entity_is_argument_p(a, transformer_arguments(t1))) {
 	entity a_new = entity_to_new_value(a);
 	if(base_contains_variable_p(b2_min, (Variable) a_new)) {
@@ -147,7 +147,7 @@ static transformer transformer_convex_hulls
 	  }
 	}
       }
-    }, transformer_arguments(t2));
+    }
     base_rm(b2_min);
 
     pips_debug(6,"Number of equations added to t1: %d, to t2: %d\n"
@@ -172,6 +172,9 @@ static transformer transformer_convex_hulls
 
     /* meet operation (with no side-effect on arguments r1 and r2) */
     r = (* method)(r1, r2);
+
+    /* There is no way to distinguish between SC_RN and SC_EMPY since
+       both are defined as NULL */
     if(SC_EMPTY_P(r)) {
       /* FI: this could be eliminated if SC_EMPTY was really usable; 27/5/93 */
       /* and replaced by a SC_UNDEFINED_P() and pips_error() */
@@ -185,7 +188,13 @@ static transformer transformer_convex_hulls
     sc_rm(r1);
     sc_rm(r2);
 
-    predicate_system(transformer_relation(t)) = r;
+    if(sc_is_empty_p(r)) {
+      /* To eliminate the arguments in case r is really empty */
+      t = empty_transformer(t);
+    }
+    else
+      predicate_system(transformer_relation(t)) = r;
+
   }
 
   ifdebug(6) {
