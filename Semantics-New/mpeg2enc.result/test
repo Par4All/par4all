@@ -4485,20 +4485,20 @@ void stats()
             if ((mb_type&(8|4))==8) goto _switch_5_case_8;
             if ((mb_type&(8|4))==4) goto _switch_5_case_4;
             if ((mb_type&(8|4))==(8|4)) goto _switch_5_case_8|4;
-
 _switch_5_default:            ;
             _IO_putc('0', statfile);
             goto _break_5;
-
 _switch_5_case_8|4:            ;
+
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
-            
-            
 _switch_5_case_4:            ;
+
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto _break_5;
 _switch_5_case_8:            ;
+            
+            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 _break_5:            ;
          }
@@ -21041,7 +21041,6 @@ void stats(void)
 
 //  T() {}
 
-
 _switch_5_default:            ;
 
 //  T() {}
@@ -21051,21 +21050,20 @@ _switch_5_default:            ;
 
 //  T() {}
 
-
 _switch_5_case_8|4:            ;
 
 //  T() {}
+
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
 
 //  T() {}
 
-            
-            
 _switch_5_case_4:            ;
 
 //  T() {}
+
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto _break_5;
@@ -21076,6 +21074,8 @@ _switch_5_case_8:            ;
 
 //  T() {}
 
+            
+            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 
 //  T() {}
@@ -31046,7 +31046,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31073,7 +31073,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31100,7 +31100,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31127,7 +31127,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31156,7 +31156,6 @@ _break_3:         ;
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, i==3, mpeg1==1, prog_seq==1, 1<=M,
-//    3constrparms<=M+2,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31184,7 +31183,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31211,7 +31210,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31238,7 +31237,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31265,7 +31264,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31294,7 +31293,6 @@ _break_3:         ;
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
 //    dc_prec==0, i==3, mpeg1==1, prog_seq==1, 1<=M,
-//    3constrparms<=M+2,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31322,7 +31320,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31349,7 +31347,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31376,7 +31374,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -31403,7 +31401,7 @@ _break_3:         ;
 //    matrix_coefficients,mpeg1,nframes,profile,prog_frame,prog_seq,r,
 //    repeatfirst,s,tc0,topfirst,transfer_characteristics,
 //    vbv_buffer_size,vertical_size,video_format) {chroma_format==1,
-//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M, 3constrparms<=M+2,
+//    dc_prec==0, mpeg1==1, prog_seq==1, 1<=M,
 //    15615constrparms+horizontal_size<=5205M+11178,
 //    15807constrparms+vertical_size<=5269M+11114, 1<=N,
 //    1<=aspectratio, aspectratio<=14, 1<=color_primaries,
@@ -34147,42 +34145,40 @@ void profile_and_level_checks()
    if (profile>=4) {
 
 //  P(i) {1<=M, 1<=chroma_format, chroma_format<=3,
-//    2chroma_format<=profile+3, 2chroma_format+profile<=7,
-//    0<=dc_prec, dc_prec<=3, 1<=frame_rate_code, frame_rate_code<=8,
-//    1<=horizontal_size, horizontal_size<=16383, 4<=level, level<=10,
-//    4<=profile, profile<=5, 0<=prog_seq, prog_seq<=1,
-//    0<=repeatfirst, repeatfirst<=1, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
+//    2chroma_format+profile<=7, 0<=dc_prec, dc_prec<=3,
+//    1<=frame_rate_code, frame_rate_code<=8, 1<=horizontal_size,
+//    horizontal_size<=16383, 4<=level, level<=10, 4<=profile,
+//    profile<=5, 0<=prog_seq, prog_seq<=1, 0<=repeatfirst,
+//    repeatfirst<=1, 1<=vbv_buffer_size, vbv_buffer_size<=262143,
+//    1<=vertical_size, vertical_size<=16383}
 
       if (frame_rate_code<=2&&repeatfirst)
 
 //  P(i) {repeatfirst==1, 1<=M, 1<=chroma_format, chroma_format<=3,
-//    2chroma_format<=profile+3, 2chroma_format+profile<=7,
-//    0<=dc_prec, dc_prec<=3, 1<=frame_rate_code, frame_rate_code<=2,
-//    1<=horizontal_size, horizontal_size<=16383, 4<=level, level<=10,
-//    4<=profile, profile<=5, 0<=prog_seq, prog_seq<=1,
-//    1<=vbv_buffer_size, vbv_buffer_size<=262143, 1<=vertical_size,
-//    vertical_size<=16383}
+//    2chroma_format+profile<=7, 0<=dc_prec, dc_prec<=3,
+//    1<=frame_rate_code, frame_rate_code<=2, 1<=horizontal_size,
+//    horizontal_size<=16383, 4<=level, level<=10, 4<=profile,
+//    profile<=5, 0<=prog_seq, prog_seq<=1, 1<=vbv_buffer_size,
+//    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
 
          error("repeat_first_first must be zero");
 
 //  P(i) {1<=M, 1<=chroma_format, chroma_format<=3,
-//    2chroma_format<=profile+3, 2chroma_format+profile<=7,
-//    0<=dc_prec, dc_prec<=3, 1<=frame_rate_code, frame_rate_code<=8,
-//    1<=horizontal_size, horizontal_size<=16383, 4<=level, level<=10,
-//    4<=profile, profile<=5, 0<=prog_seq, prog_seq<=1,
-//    0<=repeatfirst, repeatfirst<=1, 1<=vbv_buffer_size,
-//    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
+//    2chroma_format+profile<=7, 0<=dc_prec, dc_prec<=3,
+//    1<=frame_rate_code, frame_rate_code<=8, 1<=horizontal_size,
+//    horizontal_size<=16383, 4<=level, level<=10, 4<=profile,
+//    profile<=5, 0<=prog_seq, prog_seq<=1, 0<=repeatfirst,
+//    repeatfirst<=1, 1<=vbv_buffer_size, vbv_buffer_size<=262143,
+//    1<=vertical_size, vertical_size<=16383}
 
       if (frame_rate_code<=6&&prog_seq&&repeatfirst)
 
 //  P(i) {prog_seq==1, repeatfirst==1, 1<=M, 1<=chroma_format,
-//    chroma_format<=3, 2chroma_format<=profile+3,
-//    2chroma_format+profile<=7, 0<=dc_prec, dc_prec<=3,
-//    1<=frame_rate_code, frame_rate_code<=6, 1<=horizontal_size,
-//    horizontal_size<=16383, 4<=level, level<=10, 4<=profile,
-//    profile<=5, 1<=vbv_buffer_size, vbv_buffer_size<=262143,
-//    1<=vertical_size, vertical_size<=16383}
+//    chroma_format<=3, 2chroma_format+profile<=7, 0<=dc_prec,
+//    dc_prec<=3, 1<=frame_rate_code, frame_rate_code<=6,
+//    1<=horizontal_size, horizontal_size<=16383, 4<=level, level<=10,
+//    4<=profile, profile<=5, 1<=vbv_buffer_size,
+//    vbv_buffer_size<=262143, 1<=vertical_size, vertical_size<=16383}
 
          error("repeat_first_first must be zero");
    }
@@ -34654,8 +34650,8 @@ void putAC(int run, int signed_level, int vlcformat)
          if (signed_level>127)
 
 //  P(0`level,len,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt)
-//    {len==0, 1<=0`level, 0<=0`level+signed_level,
-//    signed_level<=0`level, putbits!:bytecnt#init<=putbits!:bytecnt,
+//    {len==0, 1<=0`level, signed_level<=0`level,
+//    putbits!:bytecnt#init<=putbits!:bytecnt,
 //    15putbits!:bytecnt#init+2putbits!:outcnt+12<=15putbits!:bytecnt+
 //    2putbits!:outcnt#init,
 //    8putbits!:bytecnt#init+putbits!:outcnt+12<=8putbits!:bytecnt+
@@ -34677,7 +34673,7 @@ void putAC(int run, int signed_level, int vlcformat)
 
 //  P(0`level,len,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt)
 //    {len==0, 1<=0`level, 0<=0`level+signed_level,
-//    signed_level<=0`level, putbits!:bytecnt#init<=putbits!:bytecnt,
+//    putbits!:bytecnt#init<=putbits!:bytecnt,
 //    8putbits!:bytecnt#init+putbits!:outcnt+12<=8putbits!:bytecnt+
 //    putbits!:outcnt#init,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
@@ -35244,8 +35240,8 @@ void putintrablk(short *blk, int cc)
 //    n+736putbits!:bytecnt#init+96putbits!:outcnt+63<=736
 //    putbits!:bytecnt+96putbits!:outcnt#init+run,
 //    n+512putbits!:bytecnt#init+64putbits!:outcnt+63<=512
-//    putbits!:bytecnt+64putbits!:outcnt#init+run, 63<=63n+run,
-//    run+1<=n, putbits!:bytecnt#init<=putbits!:bytecnt,
+//    putbits!:bytecnt+64putbits!:outcnt#init+run, run+1<=n,
+//    putbits!:bytecnt#init<=putbits!:bytecnt,
 //    15putbits!:bytecnt#init+2putbits!:outcnt+1<=15putbits!:bytecnt+2
 //    putbits!:outcnt#init,
 //    8putbits!:bytecnt#init+putbits!:outcnt+1<=8putbits!:bytecnt+
@@ -35565,7 +35561,7 @@ void putnonintrablk(short *blk)
 //    n+960putbits!:bytecnt#init+128putbits!:outcnt+64<=960
 //    putbits!:bytecnt+128putbits!:outcnt#init+run,
 //    n+512putbits!:bytecnt#init+64putbits!:outcnt+64<=512
-//    putbits!:bytecnt+64putbits!:outcnt#init+run, 0<=63n+run, run<=n,
+//    putbits!:bytecnt+64putbits!:outcnt#init+run, run<=n,
 //    putbits!:bytecnt#init<=putbits!:bytecnt,
 //    8putbits!:bytecnt#init+putbits!:outcnt+1<=8putbits!:bytecnt+
 //    putbits!:outcnt#init,
@@ -35591,7 +35587,7 @@ void putnonintrablk(short *blk)
 //    n+960putbits!:bytecnt#init+128putbits!:outcnt+64<=960
 //    putbits!:bytecnt+128putbits!:outcnt#init+run,
 //    n+512putbits!:bytecnt#init+64putbits!:outcnt+64<=512
-//    putbits!:bytecnt+64putbits!:outcnt#init+run, 0<=63n+run, run<=n,
+//    putbits!:bytecnt+64putbits!:outcnt#init+run, run<=n,
 //    putbits!:bytecnt#init<=putbits!:bytecnt,
 //    8putbits!:bytecnt#init+putbits!:outcnt+1<=8putbits!:bytecnt+
 //    putbits!:outcnt#init,
@@ -39787,8 +39783,8 @@ static void putDC(sVLCtable *tab, int val)
 //  P(absval,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt,size)
 //    {absval==0, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
-//    putbits!:outcnt#init, 1<=size, 0<=2047size+2val, 2val<=2047size,
-//    0<=val, val<=2047}
+//    putbits!:outcnt#init, 1<=size, 2val<=2047size, 0<=val,
+//    val<=2047}
 
          absval = val;
       else
@@ -39796,8 +39792,8 @@ static void putDC(sVLCtable *tab, int val)
 //  P(absval,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt,size)
 //    {absval==0, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
-//    putbits!:outcnt#init, 1<=size, 0<=2047size+2val, 2val<=2047size,
-//    0<=val+2047, val+1<=0}
+//    putbits!:outcnt#init, 1<=size, 0<=2047size+2val, 0<=val+2047,
+//    val+1<=0}
 
          absval = val+(1<<size)-1;
 
@@ -43334,7 +43330,6 @@ void stats(void)
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-
 _switch_5_default:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
@@ -43350,13 +43345,13 @@ _switch_5_default:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-
 _switch_5_case_8|4:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
+
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto _break_5;
@@ -43366,14 +43361,13 @@ _switch_5_case_8|4:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-            
-            
 _switch_5_case_4:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
+
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto _break_5;
@@ -43390,6 +43384,8 @@ _switch_5_case_8:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
+            
+            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,

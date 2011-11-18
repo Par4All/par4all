@@ -1,4 +1,5 @@
-// Same as linked_regions01.c, but with cleaner C code
+// Same as linked_regions01.c, but with cleaner C code. if(1) tests
+// added to obtain information about itermediate convex array regions.
 
 #include <stdio.h>
 
@@ -12,12 +13,16 @@ int main()
     for (j=1; j<=N; j++) {
       //int x0 = (i*j);
       //double x1 = ((double)N / 2);
-      if ((2*i*j<N)) {
-        A[(N-i)-1][(i+j)-1] = 1.0;
-        A[i-1][((N-i)-j)-1] = 1.0;
-      }
-      if ((i==j)) {
-        A[i-1][j-1] = 1.0;
+      if(1) {
+	if ((2*i*j<N)) {
+	  if(1) {
+	    A[(N-i)-1][(i+j)-1] = 1.0;
+	    A[i-1][((N-i)-j)-1] = 1.0;
+	  }
+	}
+	if ((i==j)) {
+	  A[i-1][j-1] = 1.0;
+	}
       }
     }
   }
