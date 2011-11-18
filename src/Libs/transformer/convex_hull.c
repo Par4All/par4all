@@ -188,7 +188,7 @@ static transformer transformer_convex_hulls
     sc_rm(r1);
     sc_rm(r2);
 
-    if(sc_is_empty_p(r)) {
+    if(sc_empty_p(r)) {
       /* To eliminate the arguments in case r is really empty */
       t = empty_transformer(t);
     }
