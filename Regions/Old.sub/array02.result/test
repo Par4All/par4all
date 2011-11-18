@@ -30,26 +30,26 @@ int main()
 }
 Select the most precise analysis:
 
-//  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1+1<=maxcompute,
-//    0<=PHI2, PHI2<=31, maxcompute==32}>
-//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1+1<=maxcompute,
-//    0<=PHI2, PHI2<=31, maxcompute==32}>
+//  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=31, 0<=PHI2,
+//    PHI2<=31, maxcompute==32}>
+//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=31, 0<=PHI2,
+//    PHI2<=31, maxcompute==32}>
 
 void compute(int maxcompute)
 {
 
-//  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1+1<=maxcompute,
-//    0<=PHI2, PHI2<=31, maxcompute==32}>
-//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1+1<=maxcompute,
-//    0<=PHI2, PHI2<=31, maxcompute==32}>
+//  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=31, 0<=PHI2,
+//    PHI2<=31, maxcompute==32}>
+//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=31, 0<=PHI2,
+//    PHI2<=31, maxcompute==32}>
 
    // BEGIN BLOCK
    int i, j;
 
-//  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1+1<=maxcompute,
-//    0<=PHI2, PHI2<=31, maxcompute==32}>
-//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1+1<=maxcompute,
-//    0<=PHI2, PHI2<=31, maxcompute==32}>
+//  <image[PHI1][PHI2].im-W-EXACT-{0<=PHI1, PHI1<=31, 0<=PHI2,
+//    PHI2<=31, maxcompute==32}>
+//  <image[PHI1][PHI2].re-W-EXACT-{0<=PHI1, PHI1<=31, 0<=PHI2,
+//    PHI2<=31, maxcompute==32}>
 
 
    for(i = 0; i <= maxcompute-1; i += 1)
@@ -324,8 +324,8 @@ void compute(int maxcompute)
    // BEGIN BLOCK
    int i, j;
 
-//  <image[PHI1][PHI2].re-OUT-EXACT-{0<=PHI1, PHI1+1<=maxcompute,
-//    0<=PHI2, PHI2<=31, maxcompute==32}>
+//  <image[PHI1][PHI2].re-OUT-EXACT-{0<=PHI1, PHI1<=31, 0<=PHI2,
+//    PHI2<=31, maxcompute==32}>
 
 
    for(i = 0; i <= maxcompute-1; i += 1)
