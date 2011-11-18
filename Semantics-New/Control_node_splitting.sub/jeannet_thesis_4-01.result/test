@@ -587,19 +587,19 @@ void ts_singlestate(void)
 
             deadlock();
 
-//  P(ok,x,y) {ok==1, 10<=x, y<=x, 0<=y, y<=3}
+//  P(ok,x,y) {ok==1, 10<=x, 0<=y, y<=3}
 
          x++;
 
-//  P(ok,x,y) {ok==1, 11<=x, y+1<=x, 0<=y, y<=3}
+//  P(ok,x,y) {ok==1, 11<=x, 0<=y, y<=3}
 
          y++;
 
-//  P(ok,x,y) {ok==1, 11<=x, y<=x, 1<=y, y<=4}
+//  P(ok,x,y) {ok==1, 11<=x, 1<=y, y<=4}
 
          ok = 1;
 
-//  P(ok,x,y) {ok==1, 11<=x, y<=x, 1<=y, y<=4}
+//  P(ok,x,y) {ok==1, 11<=x, 1<=y, y<=4}
 
          if (!ok)
 

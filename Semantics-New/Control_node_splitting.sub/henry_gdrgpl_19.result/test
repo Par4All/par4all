@@ -372,11 +372,11 @@ void ts_singlestate(void)
 
             deadlock();
 
-//  P(d,x) {0<=d+1, d<=1, 2x<=d+1999, 1<=x, x<=999}
+//  P(d,x) {0<=d+1, d<=1, 1<=x, x<=999}
 
          x += d;
 
-//  P(d,x) {0<=d+1, d<=1, 2x<=3d+1999, x<=d+999, d+1<=x}
+//  P(d,x) {0<=d+1, d<=1, x<=d+999, d+1<=x}
 
          if (!(-1<=d&&d<=1&&d>=2*x-1999))
 
@@ -390,7 +390,7 @@ void ts_singlestate(void)
 
          if (!(x==1000))
 
-//  P(d,x) {0<=d+1, d<=1, 2x<=d+1999, 0<=x, x<=999}
+//  P(d,x) {0<=d+1, d<=1, 0<=x, x<=999}
 
             deadlock();
 

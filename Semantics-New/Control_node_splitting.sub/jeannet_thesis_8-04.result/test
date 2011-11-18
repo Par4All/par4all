@@ -35,9 +35,10 @@ void ts_singlestate(void)
 
       checking_error();
 
-//  T(s,x,y) {0<=e, e<=1, 0<=f, f<=1, s#init+x#init<=s+x,
-//    6s#init+5y#init<=6s+5y, 3s#init+2y#init<=3s+2y,
-//    2s#init+3y#init<=2s+3y, 2x#init+y<=2x+y#init, y#init<=y}
+//  T(s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s,
+//    s#init+x#init<=s+x, 6s#init+5y#init<=6s+5y,
+//    3s#init+2y#init<=3s+2y, 2x#init+y<=2x+y#init, y<=2x, 0<=y,
+//    y#init<=y}
 
    while (rand_b())
 
@@ -480,8 +481,7 @@ void ts_singlestate(void)
 
          if (!(s==3))
 
-//  P(e,f,s,x,y) {0<=e, e<=1, e+s<=3, 0<=f, f<=1, 1<=s, s<=2, y<=2x,
-//    0<=y}
+//  P(e,f,s,x,y) {0<=e, e<=1, 0<=f, f<=1, 1<=s, s<=2, y<=2x, 0<=y}
 
             deadlock();
 
