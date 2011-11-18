@@ -44,32 +44,28 @@ void compute()
 }
 
 //  <tab1[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2, PHI2<=62}>
-//  <tab2[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, PHI1<=62PHI2,
-//    PHI2<=62}>
+//  <tab2[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2, PHI2<=62}>
 //  <tab3-R-EXACT-{}>
-//  <tab3[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, PHI1<=62PHI2,
-//    PHI2<=62}>
+//  <tab3[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2, PHI2<=62}>
 
 void compute()
 {
    int i, j;
 
 //  <tab1[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2, PHI2<=62}>
-//  <tab2[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, PHI1<=62PHI2,
-//    PHI2<=62}>
+//  <tab2[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2, PHI2<=62}>
 //  <tab3-R-EXACT-{}>
-//  <tab3[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, PHI1<=62PHI2,
-//    PHI2<=62}>
+//  <tab3[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2, PHI2<=62}>
 
 
    for(i = 1; i <= 62; i += 1)
 
 //  <tab1[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=62, 1<=i,
 //    i<=62}>
-//  <tab2[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2<=62, i<=62PHI2, 1<=i,
+//  <tab2[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=62, 1<=i,
 //    i<=62}>
 //  <tab3-R-EXACT-{}>
-//  <tab3[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2<=62, i<=62PHI2, 1<=i,
+//  <tab3[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=62, 1<=i,
 //    i<=62}>
 
       for(j = 1; j <= 62; j += 1) {
@@ -79,13 +75,13 @@ void compute()
 
          tab1[i][j] = i*j;
 
-//  <tab2[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=62, i<=62j,
+//  <tab2[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=62, 1<=j,
 //    j<=62}>
 
          tab2[i][j] = i*j;
 
 //  <tab3-R-EXACT-{}>
-//  <tab3[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=62, i<=62j,
+//  <tab3[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=62, 1<=j,
 //    j<=62}>
 
          tab3[i][j] = i*j;
