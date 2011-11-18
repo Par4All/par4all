@@ -200,10 +200,10 @@ static bool update_lower_and_upper_bounds(Pvecteur * ubound_p,
   return empty_p;
 }
 
-
-/* Eliminate trivially redundant integer constraint using a O(n)
- * algorithm, where n is the number of constraints. And possibly
- * detect an non feasible constraint system ps.
+/* Eliminate trivially redundant integer constraint using a O(n x d^2)
+ * algorithm, where n is the number of constraints and d the
+ * dimension. And possibly detect an non feasible constraint system
+ * ps.
  *
  * This function must not be used to decide emptyness when checking
  * redundancy with Fourier-Motzkin because this may increase the
@@ -249,13 +249,38 @@ static bool update_lower_and_upper_bounds(Pvecteur * ubound_p,
  *
  * Note that the simple inequalities used to compute the bounding box
  * cannot be eliminated. Hence, their exact copies are also
- * preserved. Another redundancy test is necessary to get rid of them.
+ * preserved. Another redundancy test is necessary to get rid of
+ * them. They could be eliminated when computing the bounding box if
+ * the function updating the bounds returned the information. Note
+ * that non feasability cannot be checked because the opposite bound
+ * vectors are not passed. If they were, then no simple return code
+ * would do.
+ *
+ * The same is true for equations. But the function updating the
+ * bounds cannot return directly two pieces of information: the
+ * constraint system is empty or the constraint is redundant.
  *
  * This function could be renamed sc_bounded_redundancy_elimination()
  * and be placed into one of the two files, sc_elim_redund.c or
  * sc_elim_simple_redund.c. It just happened that redundancy
  * elimination uses normalization and gdb led me to
  * sc_normalization() when I tried to debug Semantics/type03.c.
+ *
+ * This function could be split into three functions, one to compute
+ * the bounding box, one to simplify a constraint system according to
+ * a bounding box and the third one calling those two. This could be
+ * useful when projecting a system because the initial bounding box
+ * remains valid all along the projection, no matter that happens to
+ * the initial constraint. However, the bounding box might be improved
+ * with the projections... Since the bounding box computation is fast
+ * enough, the function was not split and the transformer (see PIPS)
+ * projection uses it at each stage.
+ *
+ * However, I could not think of a simple data structure to store the
+ * bounding box as a unique object. With more variables, it would be
+ * better to use hash tables to link variables to their lower and
+ * upper bound and to their value when they are constant. Hence the
+ * use of four sparse vectors as explained above.
  */
 Psysteme sc_bounded_normalization(Psysteme ps)
 {
