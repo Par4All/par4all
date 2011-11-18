@@ -136,7 +136,7 @@ int main(void)
 
          x = x+1, y = y+1;
 
-//  P(x,y) {101<=x, x<=102, 2<=x+y, y<=x, x+y<=202, 0<=y}
+//  P(x,y) {101<=x, x<=102, y<=x, x+y<=202, 0<=y}
 
    // immediate widening: :0 <= y <= x, x >= 101
    // iterated once: 0 <= y <= x, 101 <= x <= 102, x+y<=202

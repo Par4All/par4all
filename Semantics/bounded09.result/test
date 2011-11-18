@@ -1,0 +1,70 @@
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(b,i,x) {}
+
+   int i, b, x;
+
+//  T() {1<=b}
+
+   1<=b?(void) 0:__assert_fail("1<=b", "./bounded09.c", 9, (const char *) 0);
+
+//  T() {0<=x}
+
+   0<=x?(void) 0:__assert_fail("0<=x", "./bounded09.c", 10, (const char *) 0);
+
+//  T(i) {i#init<=i, i<=i#init+1}
+
+
+   if (b+x+2<=0)
+
+//  T(i) {i==i#init+1}
+
+      i++;
+
+//  T(main) {main==0}
+
+
+   return 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, b, x;
+
+//  P(b,i,x) {}
+
+   1<=b?(void) 0:__assert_fail("1<=b", "./bounded09.c", 9, (const char *) 0);
+
+//  P(b,i,x) {1<=b}
+
+   0<=x?(void) 0:__assert_fail("0<=x", "./bounded09.c", 10, (const char *) 0);
+
+//  P(b,i,x) {1<=b, 0<=x}
+
+
+   if (b+x+2<=0)
+
+//  P() {0==-1}
+
+      i++;
+
+//  P(b,i,x) {1<=b, 0<=x}
+
+
+   return 0;
+}

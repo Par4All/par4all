@@ -1,0 +1,39 @@
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(b,i,x) {}
+
+   int i, b, x;
+
+//  T() {1<=b, 0<=x}
+
+   
+   //assert(1<=b);
+   //assert(0<=x);
+   if (b<1||x<0)
+
+//  T() {0==-1}
+
+      abort();
+
+//  T() {1<=b, 0<=x}
+
+   //i++;
+   
+   if (b+x+2<=0)
+
+//  T() {0==-1}
+
+      i++;
+
+//  T(main) {main==0, 1<=b, 0<=x}
+
+
+   return 0;
+}
