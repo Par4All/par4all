@@ -422,6 +422,12 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 				    enough information to check
 				    redundancy with the upper bound */
 	  /* Try to compute the bounds nub and nlb implied by the bounding box */
+	  /* We should not stop on double failure but go to the end
+	     and substitute constant variables on the fiable,
+	     computing a delta value to be added to the constant term
+	     and setting the variable coefficient to zero; we should
+	     have not only lb and ub but also cb, the base for the
+	     constant terms */
 	  for(vc=v; !VECTEUR_NUL_P(vc) && !(ub_failed_p&&lb_failed_p);
 	      vc = vecteur_succ(vc)) {
 	    Variable var = vecteur_var(vc);
@@ -432,6 +438,7 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 						    right hand side of the
 						    inequality */
 	    }
+	    /* We could check here if var has a constant value */
 	    else {
 	      if(value_pos_p(c)) { /* an upper bound of var is needed */
 		if(vect_coeff(var, ub)!=0) { /* the value macro should be used */
@@ -469,6 +476,8 @@ Psysteme sc_bounded_normalization(Psysteme ps)
 	      }
 	    }
 	  }
+	  /* We should update here the constant term with delta, the
+	     value accumulated with the constant terms */
 
 	  /* If the new bound nub is tighter, nub <= ob, ob-nub >= 0 */
 	  if(!ub_failed_p) {
